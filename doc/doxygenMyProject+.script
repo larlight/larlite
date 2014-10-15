@@ -1,0 +1,11 @@
+# New, simpler script for generating doxygen documentation.
+# It uses the main (maintained) doxygenMyProject.script,
+
+@INCLUDE = $(ANA_PROC_DIR)/doc/doxygenMyProject.script
+
+OUTPUT_DIRECTORY       = $(ANA_PROC_DIR)/doc/dOxygenMyProject+
+
+#
+# ROOT
+#
+INPUT +=$(ROOTSYS)/include

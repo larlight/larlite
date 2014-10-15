@@ -1,0 +1,36 @@
+#######################
+#                     #
+# README for Base/bin #
+#                     #
+#######################
+
+This directory contains Base package test routines.
+Here's a list of binaries + explanation + usage.
+But hey, please first compile!
+
+##############
+#            #
+# To Compile #
+#            #
+##############
+
+Try:
+
+> make
+
+###################################
+#                                 #
+# What They Are + How To Use Them #
+#                                 #
+###################################
+
+(*) test_base ... Super simple routine to test larlight_base and Message class.
+    	      	  Here's usage:
+
+    > test_base
+
+
+
+
+
+    

@@ -1,0 +1,34 @@
+#############################
+#                           #
+# README for Analysis/bin #
+#                           #
+#############################
+
+This directory contains Analysis package test routines.
+Here's a list of binaries + explanation + usage.
+But hey, please first compile!
+
+##############
+#            #
+# To Compile #
+#            #
+##############
+
+Try:
+
+> make
+
+###################################
+#                                 #
+# What They Are + How To Use Them #
+#                                 #
+###################################
+
+(*) test_simple_ana ... For testing ana_processor event loop using ana_base
+    		    	analysis unit. It requires an input root file to run
+			the event loop on. You can use a root file you made
+			with one of DataFormat/bin routines. Say you have
+			your LArLight ROOT file, trial.root. You can try:
+
+    > test_simple_ana trial.root
+    

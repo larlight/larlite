@@ -1,0 +1,63 @@
+#####################################################################################
+#
+# A top Makefile for building my project.
+# One needs to define $LARLITE_BASEDIR to build the sub directories.
+#
+#####################################################################################
+#
+# IMPOSE CONDITION BETWEEN LARLITE_BASEDIR & PWD =>
+#   do not compile if PWD !=$LARLITE_BASEDIR is set elsewhere
+#
+ifndef LARLITE_BASEDIR
+ LARLITE_BASEDIR := $(shell cd . && pwd -P)
+endif
+NORMALIZED_LARLITE_BASEDIR := $(shell cd ${LARLITE_BASEDIR} && pwd -P)
+ifneq ($(NORMALIZED_LARLITE_BASEDIR), $(shell cd . && pwd -P))
+ ifneq ($(wildcard ./PMTDecoder/*),)
+ERROR_MESSAGE := $(error Your source code detected in current dir, but LARLITE_BASEDIR is not current dir.  \
+   To avoid recompiling the wrong installation,\
+   LARLITE_BASEDIR must be set to the current directory when making.  \
+   Currently it is set to ${LARLITE_BASEDIR} [$(NORMALIZED_LARLITE_BASEDIR)].  \
+   Current directory is $(shell pwd).)
+ endif
+endif
+export LARLITE_BASEDIR
+
+all:
+	@mkdir -p $(LARLITE_BASEDIR)/lib
+	@echo "Start building core"
+	@make --directory=$(LARLITE_COREDIR)
+	@echo
+	@echo "Start building UserDev"
+	@make --directory=$(LARLITE_USERDEVDIR)
+	@echo 
+	@echo "Start building main"
+	@make --directory=$(LARLITE_BASEDIR)/main
+	@echo 
+	@echo "Exiting"
+
+clean:
+	@echo "Cleaning core"
+	@make clean --directory=$(LARLITE_COREDIR)
+	@echo
+	@echo "Cleaning UserDev"
+	@make clean --directory=$(LARLITE_USERDEVDIR)
+	@echo
+	@echo "Cleaning main"
+	@make clean --directory=$(LARLITE_BASEDIR)/main
+	@echo
+	@echo "Exiting"
+
+#####################################################################################
+#
+# DOCUMENTATION...
+#
+doxygen:
+	@echo 'dOxygenising your code...'
+	@doxygen $(LARLITE_BASEDIR)/doc/doxygenMyProject.script
+
+doxygen+:
+	@echo 'dOxygenising MyProject + local-ROOT...'
+	@doxygen $(LARLITE_BASEDIR)/doc/doxygenMyProject+.script
+#
+#####################################################################################

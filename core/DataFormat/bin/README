@@ -1,0 +1,55 @@
+#############################
+#                           #
+# README for DataFormat/bin #
+#                           #
+#############################
+
+This directory contains I/O testing routines.
+Here's a list of binaries + explanation + usage.
+But hey, please first compile!
+
+##############
+#            #
+# To Compile #
+#            #
+##############
+
+Try:
+
+> make
+
+###################################
+#                                 #
+# What They Are + How To Use Them #
+#                                 #
+###################################
+
+(*) test_simple_io ... You can use this executable to run a simple I/O test.
+    		       This routine first writes out a sample LArLight data
+		       file with all kinds of event-wise data containers.
+		       After that, it attempts to read what was written on
+		       the root file. When doing this, it compares number
+		       of events written per data type vs. number of events
+		       read to make sure all went OK. Here's usage:
+
+    > test_simple_io
+
+
+
+(*) simple_write ... You can use this executable to create a LArLight root 
+    		     file with 100 events containing larlight::DATA::Track 
+		     object. The output file name is trial.root. Here's how
+		     to run it.
+
+    > simple_write
+
+(*) simple_read ... You can use this executable to read what you created in 
+    		    simple_write. Here is how to run it (assuming you have
+		    "trial.root" file).
+
+    > simple_read trial.root
+
+
+
+
+    

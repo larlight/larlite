@@ -1,0 +1,66 @@
+#ifndef LARUTILMANAGER_CXX
+#define LARUTILMANAGER_CXX
+
+#include "LArUtilManager.h"
+
+namespace larutil {
+
+  bool LArUtilManager::Reconfigure(larlite::geo::DetId_t type)
+  {
+
+    if(type == LArUtilConfig::Detector()) return true;
+
+    bool status = LArUtilConfig::SetDetector(type);
+
+    if(!status) return status;
+
+    return ReconfigureUtilities();
+
+  }
+
+  bool LArUtilManager::ReconfigureUtilities()
+  {
+    bool status = true;
+
+    // Geometry
+    larlite::Message::send(larlite::msg::kNORMAL,__FUNCTION__,"Reconfiguring Geometry");
+    Geometry* geom = (Geometry*)(Geometry::GetME(false));
+    geom->SetFileName(Form("%s/LArUtil/dat/%s",
+			   getenv("LARLITE_CORE_DIR"),
+			   kUTIL_DATA_FILENAME[LArUtilConfig::Detector()].c_str()));
+    geom->SetTreeName(kTREENAME_GEOMETRY);
+    status = status && geom->LoadData(true);
+
+    // LArProperties
+    larlite::Message::send(larlite::msg::kNORMAL,__FUNCTION__,"Reconfiguring LArProperties");
+    LArProperties* larp = (LArProperties*)(LArProperties::GetME(false));
+    larp->SetFileName(Form("%s/LArUtil/dat/%s",
+			   getenv("LARLITE_CORE_DIR"),
+			   kUTIL_DATA_FILENAME[LArUtilConfig::Detector()].c_str()));
+    larp->SetTreeName(kTREENAME_LARPROPERTIES);
+    status = status && larp->LoadData(true);
+
+    // DetectorProperties
+    larlite::Message::send(larlite::msg::kNORMAL,__FUNCTION__,"Reconfiguring DetectorProperties");
+    DetectorProperties* detp = (DetectorProperties*)(DetectorProperties::GetME(false));
+    detp->SetFileName(Form("%s/LArUtil/dat/%s",
+			   getenv("LARLITE_CORE_DIR"),
+			   kUTIL_DATA_FILENAME[LArUtilConfig::Detector()].c_str()));
+    detp->SetTreeName(kTREENAME_DETECTORPROPERTIES);
+    status = status && detp->LoadData(true);
+
+    if(status){
+
+      // GeometryUtilities
+      larlite::Message::send(larlite::msg::kNORMAL,__FUNCTION__,"Reconfiguring GeometryUtilities...");
+      GeometryUtilities* gser = (GeometryUtilities*)(GeometryUtilities::GetME());
+      gser->Reconfigure();
+
+    }
+
+    return status;
+  }
+
+}
+
+#endif

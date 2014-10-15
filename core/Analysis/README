@@ -1,0 +1,159 @@
+###############################
+#                             #
+# README for Analysis Package #
+#                             #
+###############################
+
+This package defines a simple analysis framework to work with data 
+stored by Decoder in the data format defined in DataFormat package.
+
+The analysis here is defined as some action to be performed on
+event-by-event basis. To do this, the package provide two classes:
+
+(*) ana_processor
+(*) ana_base 
+
+Basic idea: 
+
+      Analyzer should write his/her own analysis class, which
+      inherits from ana_base, to perform an event-by-event action 
+      (i.e. analysis). ana_processor class, on the other hand, is 
+      responsible for running an event-loop AND operating your
+      ana_base inherited analysis class instance in this event
+      loop to perform your analysis. For running your analysis,
+      you tell ana_processor an input DATA root file location 
+      and attach your analysis class instance to it. Then tell
+      ana_processor to run an event loop. 
+
+Bit of philosophy: 
+
+      Each analysis class is motivated to have one, and preferably
+      only one,  very specific purpose. As a consequence, modulated
+      analysis classes can be re-used for different purpose later.
+
+      For instance, you may have a certain reconstruction defined
+      in analysis class A, and analysis on the reconstruction output
+      defined in class B. You can run these through ana_processor
+      in a single event loop. Maybe tomorrow, your student come up
+      with analysis C which runs on output of A. All you have to
+      do is to "add" class C instance to your ana_processor to include
+      this new analysis in the event loop. Maybe next day analysis
+      class D is developed to replace B. Again, all needed is to 
+      attach D class instance in place of class B attached before.
+
+      This way, each analyzer can work independently on his/her
+      code development, and merging of his/her code with others' 
+      become very simple. No need of copy & paste (i.e. duplication)
+      of existing code nor debugging the common part of the code
+      such as file i/o.
+
+##################
+#                #
+# ana_base class #
+#                #
+##################
+
+This is a *base class* for an analysis "module".
+It contains three functions to be implemented by a user.
+
+(*) bool initialize()
+
+    - A function that is called within ana_processor at
+      the very beginning of the event loop, before reading
+      in the 1st event. This is where you may want to prepare
+      your histograms, TTrees, etc to be used in event-by-event
+      analysis.
+
+(*) bool analyze(const event_waveform* data)
+    
+    - A function that is called within ana_processor for
+      every event in an event loop. This is where your analysis
+      or any event-by-event action should be done.
+
+(*) bool finalize()
+
+    - A function that is called at the end of event loop,
+      after processing all events in the input data file.
+      This is where you may want to clear up memory and
+      save your analysis result. You have an option of saving
+      ROOT objects (i.e. TObject inherited class) in a root 
+      file. The so-called "analysis output root file" is prepared
+      by ana_processor, and no need to create a new one by yourself.
+      This root file is accessible through a TFile poitner "_fout".
+
+#############################################
+#                                           #
+# Generating *your* analysis class template #
+#                                           #
+#############################################
+
+As described above, your analysis class should inherit from ana_base
+class. To produce a template of such class header/source file, a
+script called "gen_newana" is prepared.
+
+To generate a template for analysis class with a name KAZU, try:
+
+> cd $MAKE_TOP_DIR/Analysis
+> ./bin/gen_newana KAZU
+
+This should generate KAZU.hh and KAZU.cc which you can also tell
+from the output message after running the above command. Then
+all you need to do is:
+
+> make
+
+This compiles KAZU class defined in KAZU.hh and KAZU.cc.
+FYI: in addition to above, gen_newana script also modifies 
+Analysis-TypeDef.hh and LinkDef.h seemlessly so that, upon 
+compilation, your class is linked through CINT dictionary. 
+Therefore no need to make modification in these header files 
+for this purpose.
+
+Now you have KAZU.hh and KAZU.cc or whatever better name you have.
+Implement the details and run the analysis.
+
+###########################
+#                         #
+# Running *your* Analysis #
+#                         #
+###########################
+
+There are two examples provided under $MAKE_TOP_DIR/Analysis:
+
+(a) bin/simple_loop.cc
+(b) mac/simple_loop.py
+
+Choose whichever you prefer. There should be negligible difference 
+in performance in (a) and (b) no matter what analysis you run. 
+By default, both source runs the same, simple event loop with 
+a provided class by default (i.e. no need to generate *your* analysis
+class if you want to just try out).
+
+To run these, try:
+
+   > cd bin
+   > make
+   > ./simple_loop
+
+or
+
+   > cd mac
+   > python simple_loop.py
+
+FYI: in future, you might want to have multiple compiled executable
+     like bin/simple_loop. You can define your source code, say
+     run_my_loop.cc, under the same bin directory first. This source
+     must have ".cc" extension. Then add your program name w/o ".cc"
+     extension, in above case "run_my_loop", to PROGRAMS variable in
+     the bin/GNUmakefile file. This makefile can handle a compilation
+     of arbitrary number of sources defined in PROGRAMS variable. So
+     you can keep adding your source in future if you wish.
+
+     Of course, re-compilation upon "make" per source file only happens
+     if the source file is updated.
+
+
+
+
+
+
