@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef HIT_H
-#define HIT_H
+#ifndef LARLITE_HIT_H
+#define LARLITE_HIT_H
 
 #include "data_base.h"
 #include <vector>

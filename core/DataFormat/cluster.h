@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef CLUSTER_H
-#define CLUSTER_H
+#ifndef LARLITE_CLUSTER_H
+#define LARLITE_CLUSTER_H
 
 #include "data_base.h"
 

@@ -1,5 +1,5 @@
-#ifndef SHOWER_CXX
-#define SHOWER_CXX
+#ifndef LARLITE_SHOWER_CXX
+#define LARLITE_SHOWER_CXX
 
 #include "shower.h"
 

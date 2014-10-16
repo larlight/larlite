@@ -1,5 +1,5 @@
-#ifndef ENDPOINT2D_CXX
-#define ENDPOINT2D_CXX
+#ifndef LARLITE_ENDPOINT2D_CXX
+#define LARLITE_ENDPOINT2D_CXX
 
 #include "endpoint2d.h"
 

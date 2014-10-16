@@ -1,5 +1,5 @@
-#ifndef MCPART_CXX
-#define MCPART_CXX
+#ifndef LARLITE_MCPART_CXX
+#define LARLITE_MCPART_CXX
 
 #include "mcpart.h"
 

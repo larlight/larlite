@@ -6,8 +6,8 @@
 // \author lockwitz@fnal.gov
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef COSMICTAG_CXX
-#define COSMICTAG_CXX
+#ifndef LARLITE_COSMICTAG_CXX
+#define LARLITE_COSMICTAG_CXX
 
 //#include "AnalysisBase/CosmicTag.h"
 //#include "messagefacility/MessageLogger/MessageLogger.h"

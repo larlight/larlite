@@ -13,8 +13,8 @@
     @{*/
 
 
-#ifndef MESSENGER_H
-#define MESSENGER_H
+#ifndef LARLITE_MESSENGER_H
+#define LARLITE_MESSENGER_H
 
 #include <cstdio>
 #include <iostream>

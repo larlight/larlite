@@ -11,8 +11,8 @@
 /** \addtogroup LArUtil
 
     @{*/
-#ifndef LARUTILCONFIG_H
-#define LARUTILCONFIG_H
+#ifndef LARLITE_LARUTILCONFIG_H
+#define LARLITE_LARUTILCONFIG_H
 
 #include <iostream>
 #include "Base/Base-TypeDef.h"

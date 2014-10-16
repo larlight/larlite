@@ -1,5 +1,5 @@
-#ifndef SPACEPOINT_CXX
-#define SPACEPOINT_CXX
+#ifndef LARLITE_SPACEPOINT_CXX
+#define LARLITE_SPACEPOINT_CXX
 
 #include "spacepoint.h"
 

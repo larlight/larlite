@@ -6,8 +6,8 @@
 // \author andrzej.szelc@yale.edu
 //
 ////////////////////////////////////////////////////////////////////////
-#ifndef UTIL_GEOMETRYUTILITIES_H
-#define UTIL_GEOMETRYUTILITIES_H
+#ifndef LARLITE_UTIL_GEOMETRYUTILITIES_H
+#define LARLITE_UTIL_GEOMETRYUTILITIES_H
 
 #include <TMath.h>
 #include <TLorentzVector.h>

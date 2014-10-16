@@ -1,5 +1,5 @@
-#ifndef MCNU_CXX
-#define MCNU_CXX
+#ifndef LARLITE_MCNU_CXX
+#define LARLITE_MCNU_CXX
 
 #include "mcnu.h"
 

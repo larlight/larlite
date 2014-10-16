@@ -1,5 +1,5 @@
-#ifndef WIRE_CXX
-#define WIRE_CXX
+#ifndef LARLITE_WIRE_CXX
+#define LARLITE_WIRE_CXX
 
 #include "wire.h"
 

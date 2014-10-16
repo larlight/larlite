@@ -1,5 +1,5 @@
-#ifndef VERTEX_CXX
-#define VERTEX_CXX
+#ifndef LARLITE_VERTEX_CXX
+#define LARLITE_VERTEX_CXX
 
 #include "vertex.h"
 

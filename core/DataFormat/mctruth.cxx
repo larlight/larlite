@@ -1,5 +1,5 @@
-#ifndef MCTRUTH_CXX
-#define MCTRUTH_CXX
+#ifndef LARLITE_MCTRUTH_CXX
+#define LARLITE_MCTRUTH_CXX
 
 #include "mctruth.h"
 

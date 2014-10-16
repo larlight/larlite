@@ -1,5 +1,5 @@
-#ifndef MCSHOWER_CXX
-#define MCSHOWER_CXX
+#ifndef LARLITE_MCSHOWER_CXX
+#define LARLITE_MCSHOWER_CXX
 
 #include "mcshower.h"
 

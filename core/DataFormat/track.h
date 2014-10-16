@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef TRACK_H
-#define TRACK_H
+#ifndef LARLITE_TRACK_H
+#define LARLITE_TRACK_H
 
 #include "data_base.h"
 #include "TVector3.h"

@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef FRAMEWORKCONSTANTS_H
-#define FRAMEWORKCONSTANTS_H
+#ifndef LARLITE_FRAMEWORKCONSTANTS_H
+#define LARLITE_FRAMEWORKCONSTANTS_H
 #include <string>
 
 /// Namespace of everything in this framework

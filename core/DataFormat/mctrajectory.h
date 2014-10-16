@@ -12,8 +12,8 @@
     
 @{*/
 
-#ifndef MCTRAJECTORY_H
-#define MCTRAJECTORY_H
+#ifndef LARLITE_MCTRAJECTORY_H
+#define LARLITE_MCTRAJECTORY_H
 
 #include "data_base.h"
 #include <set>

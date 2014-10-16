@@ -1,5 +1,5 @@
-#ifndef CALORIMETRY_CXX
-#define CALORIMETRY_CXX
+#ifndef LARLITE_CALORIMETRY_CXX
+#define LARLITE_CALORIMETRY_CXX
 
 #include "calorimetry.h"
 

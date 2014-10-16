@@ -1,5 +1,5 @@
-#ifndef LARPROPERTIES_CXX
-#define LARPROPERTIES_CXX
+#ifndef LARLITE_LARPROPERTIES_CXX
+#define LARLITE_LARPROPERTIES_CXX
 
 #include "LArProperties.h"
 

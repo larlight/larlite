@@ -1,5 +1,5 @@
-#ifndef HIT_CXX
-#define HIT_CXX
+#ifndef LARLITE_HIT_CXX
+#define LARLITE_HIT_CXX
 
 #include "hit.h"
 

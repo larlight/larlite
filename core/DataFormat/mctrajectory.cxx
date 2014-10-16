@@ -1,5 +1,5 @@
-#ifndef MCTRAJECTORY_CXX
-#define MCTRAJECTORY_CXX
+#ifndef LARLITE_MCTRAJECTORY_CXX
+#define LARLITE_MCTRAJECTORY_CXX
 
 #include "mctrajectory.h"
 

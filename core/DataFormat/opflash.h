@@ -7,8 +7,8 @@
 //         cschiu@mit.edu
 //
 ////////////////////////////////////////////////////////////////////////////
-#ifndef OPFLASH_H
-#define OPFLASH_H
+#ifndef LARLITE_OPFLASH_H
+#define LARLITE_OPFLASH_H
 
 #include "data_base.h"
 #include <vector>

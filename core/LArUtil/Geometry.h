@@ -11,8 +11,8 @@
 /** \addtogroup LArUtil
 
     @{*/
-#ifndef GEOMETRY_H
-#define GEOMETRY_H
+#ifndef LARLITE_GEOMETRY_H
+#define LARLITE_GEOMETRY_H
 
 #include "LArUtilBase.h"
 #include <TMath.h>

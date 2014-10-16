@@ -11,8 +11,8 @@
 /** \addtogroup LArUtil
 
     @{*/
-#ifndef DETECTORPROPERTIES_H
-#define DETECTORPROPERTIES_H
+#ifndef LARLITE_DETECTORPROPERTIES_H
+#define LARLITE_DETECTORPROPERTIES_H
 
 #include "LArUtilBase.h"
 

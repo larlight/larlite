@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef MCCONSTANTS_H
-#define MCCONSTANTS_H
+#ifndef LARLITE_MCCONSTANTS_H
+#define LARLITE_MCCONSTANTS_H
 #include <string>
 
 /// Namespace of everything in this framework

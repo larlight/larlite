@@ -1,5 +1,5 @@
-#ifndef STORAGE_MANAGER_CXX
-#define STORAGE_MANAGER_CXX
+#ifndef LARLITE_STORAGE_MANAGER_CXX
+#define LARLITE_STORAGE_MANAGER_CXX
 #include "storage_manager.h"
 
 namespace larlite {

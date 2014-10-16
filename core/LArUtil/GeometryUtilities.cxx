@@ -7,6 +7,9 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
+#ifndef LARLITE_GEOMETRYUTILITIES_CXX
+#define LARLITE_GEOMETRYUTILITIES_CXX
+
 #include "GeometryUtilities.h"
 
 namespace larutil{
@@ -1289,3 +1292,4 @@ namespace larutil{
   }
   
 } // namespace
+#endif

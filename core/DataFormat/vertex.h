@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef VERTEX_H
-#define VERTEX_H
+#ifndef LARLITE_VERTEX_H
+#define LARLITE_VERTEX_H
 
 #include "data_base.h"
 

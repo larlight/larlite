@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef DATA_BASE_H
-#define DATA_BASE_H
+#ifndef LARLITE_DATA_BASE_H
+#define LARLITE_DATA_BASE_H
 
 #include "Base/Base-TypeDef.h"
 #include <TObject.h>

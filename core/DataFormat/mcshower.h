@@ -12,8 +12,8 @@
     
 @{*/
 
-#ifndef MCSHOWER_H
-#define MCSHOWER_H
+#ifndef LARLITE_MCSHOWER_H
+#define LARLITE_MCSHOWER_H
 
 #include "data_base.h"
 

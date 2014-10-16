@@ -12,8 +12,8 @@
     
 @{*/
 
-#ifndef SIMCH_H
-#define SIMCH_H
+#ifndef LARLITE_SIMCH_H
+#define LARLITE_SIMCH_H
 
 #include "data_base.h"
 #include <map>

@@ -1,5 +1,5 @@
-#ifndef ANA_PROCESSOR_CXX
-#define ANA_PROCESSOR_CXX
+#ifndef LARLITE_ANA_PROCESSOR_CXX
+#define LARLITE_ANA_PROCESSOR_CXX
 
 #include "ana_processor.h"
 

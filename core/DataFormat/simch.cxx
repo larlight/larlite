@@ -1,5 +1,5 @@
-#ifndef SIMCH_CXX
-#define SIMCH_CXX
+#ifndef LARLITE_SIMCH_CXX
+#define LARLITE_SIMCH_CXX
 
 #include "simch.h"
 

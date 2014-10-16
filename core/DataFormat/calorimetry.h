@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef CALORIMETRY_H
-#define CALORIMETRY_H
+#ifndef LARLITE_CALORIMETRY_H
+#define LARLITE_CALORIMETRY_H
 
 #include "data_base.h"
 

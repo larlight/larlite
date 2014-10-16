@@ -1,5 +1,5 @@
-#ifndef USER_INFO_CXX
-#define USER_INFO_CXX
+#ifndef LARLITE_USER_INFO_CXX
+#define LARLITE_USER_INFO_CXX
 
 #include "user_info.h"
 

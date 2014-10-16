@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef WIRE_H
-#define WIRE_H
+#ifndef LARLITE_WIRE_H
+#define LARLITE_WIRE_H
 
 #include "data_base.h"
 

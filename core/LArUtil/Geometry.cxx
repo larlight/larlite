@@ -1,5 +1,5 @@
-#ifndef GEOMETRY_CXX
-#define GEOMETRY_CXX
+#ifndef LARLITE_GEOMETRY_CXX
+#define LARLITE_GEOMETRY_CXX
 
 #include "Geometry.h"
 

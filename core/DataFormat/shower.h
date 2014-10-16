@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef SHOWER_H
-#define SHOWER_H
+#ifndef LARLITE_SHOWER_H
+#define LARLITE_SHOWER_H
 
 #include "data_base.h"
 #include <TVector3.h>

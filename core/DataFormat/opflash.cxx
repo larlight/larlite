@@ -8,8 +8,8 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef OPFLASH_CXX
-#define OPFLASH_CXX
+#ifndef LARLITE_OPFLASH_CXX
+#define LARLITE_OPFLASH_CXX
 
 //#include "RecoBase/OpFlash.h"
 //#include "messagefacility/MessageLogger/MessageLogger.h"

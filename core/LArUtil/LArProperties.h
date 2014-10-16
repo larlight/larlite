@@ -12,8 +12,8 @@
 /** \addtogroup LArUtil
 
     @{*/
-#ifndef LARPROPERTIES_H
-#define LARPROPERTIES_H
+#ifndef LARLITE_LARPROPERTIES_H
+#define LARLITE_LARPROPERTIES_H
 
 #include "LArUtilBase.h"
 #include "LArUtilException.h"

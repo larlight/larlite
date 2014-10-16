@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef SPACEPOINT_H
-#define SPACEPOINT_H
+#ifndef LARLITE_SPACEPOINT_H
+#define LARLITE_SPACEPOINT_H
 
 #include "data_base.h"
 #include "TVector3.h"

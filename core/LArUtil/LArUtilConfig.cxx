@@ -1,5 +1,5 @@
-#ifndef LARUTILCONFIG_CXX
-#define LARUTILCONFIG_CXX
+#ifndef LARLITE_LARUTILCONFIG_CXX
+#define LARLITE_LARUTILCONFIG_CXX
 
 #include "LArUtilConfig.h"
 

@@ -1,5 +1,5 @@
-#ifndef TRACK_CXX
-#define TRACK_CXX
+#ifndef LARLITE_TRACK_CXX
+#define LARLITE_TRACK_CXX
 
 #include "track.h"
 

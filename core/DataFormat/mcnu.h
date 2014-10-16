@@ -12,8 +12,8 @@
     
 @{*/
 
-#ifndef MCNU_H
-#define MCNU_H
+#ifndef LARLITE_MCNU_H
+#define LARLITE_MCNU_H
 
 #include "mcpart.h"
 

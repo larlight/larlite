@@ -1,5 +1,5 @@
-#ifndef LARUTILBASE_CXX
-#define LARUTILBASE_CXX
+#ifndef LARLITE_LARUTILBASE_CXX
+#define LARLITE_LARUTILBASE_CXX
 
 #include "LArUtilBase.h"
 

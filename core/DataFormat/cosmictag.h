@@ -6,8 +6,8 @@
 // \author lockwitz@fnal.gov
 //
 ////////////////////////////////////////////////////////////////////////////
-#ifndef ANAB_COSMICTAG_H
-#define ANAB_COSMICTAG_H
+#ifndef LARLITE_COSMICTAG_H
+#define LARLITE_COSMICTAG_H
 
 #include <vector>
 #include <iosfwd>

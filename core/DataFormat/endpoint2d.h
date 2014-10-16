@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef ENDPOINT2D_H
-#define ENDPOINT2D_H
+#ifndef LARLITE_ENDPOINT2D_H
+#define LARLITE_ENDPOINT2D_H
 
 #include "data_base.h"
 

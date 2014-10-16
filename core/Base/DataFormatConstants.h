@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef DATAFORMATCONSTANTS_H
-#define DATAFORMATCONSTANTS_H
+#ifndef LARLITE_DATAFORMATCONSTANTS_H
+#define LARLITE_DATAFORMATCONSTANTS_H
 
 #include <string>
 #include <limits>

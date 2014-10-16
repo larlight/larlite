@@ -1,5 +1,5 @@
-#ifndef MESSENGER_CXX
-#define MESSENGER_CXX
+#ifndef LARLITE_MESSENGER_CXX
+#define LARLITE_MESSENGER_CXX
 
 #include "messenger.h"
 namespace larlite {

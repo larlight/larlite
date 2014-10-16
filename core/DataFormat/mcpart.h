@@ -12,8 +12,8 @@
     
 @{*/
 
-#ifndef MCPART_H
-#define MCPART_H
+#ifndef LARLITE_MCPART_H
+#define LARLITE_MCPART_H
 
 #include "mctrajectory.h"
 

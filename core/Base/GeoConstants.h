@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef GEOCONSTANTS_H
-#define GEOCONSTANTS_H
+#ifndef LARLITE_GEOCONSTANTS_H
+#define LARLITE_GEOCONSTANTS_H
 #include <string>
 
 /// Namespace of everything in this framework

@@ -11,8 +11,8 @@
 /** \addtogroup DataFormat
 
     @{*/
-#ifndef USER_INFO_H
-#define USER_INFO_H
+#ifndef LARLITE_USER_INFO_H
+#define LARLITE_USER_INFO_H
 
 #include "data_base.h"
 #include <map>

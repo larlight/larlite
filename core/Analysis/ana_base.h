@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef ANA_BASE_H
-#define ANA_BASE_H
+#ifndef LARLITE_ANA_BASE_H
+#define LARLITE_ANA_BASE_H
 
 #include <TFile.h>
 #include <TGraph.h>

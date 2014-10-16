@@ -11,8 +11,8 @@
 /** \addtogroup LArUtil
 
     @{*/
-#ifndef LARUTILBASE_H
-#define LARUTILBASE_H
+#ifndef LARLITE_LARUTILBASE_H
+#define LARLITE_LARUTILBASE_H
 
 #include <map>
 #include <sstream>

@@ -1,5 +1,5 @@
-#ifndef DATA_BASE_CXX
-#define DATA_BASE_CXX
+#ifndef LARLITE_DATA_BASE_CXX
+#define LARLITE_DATA_BASE_CXX
 
 #include "data_base.h"
 

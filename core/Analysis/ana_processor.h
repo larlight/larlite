@@ -11,8 +11,8 @@
 /** \addtogroup Analysis
 
     @{*/
-#ifndef ANA_PROCESSOR_H
-#define ANA_PROCESSOR_H
+#ifndef LARLITE_ANA_PROCESSOR_H
+#define LARLITE_ANA_PROCESSOR_H
 
 #include <TFile.h>
 #include <vector>

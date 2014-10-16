@@ -12,8 +12,8 @@
     
 @{*/
 
-#ifndef MCTRUTH_H
-#define MCTRUTH_H
+#ifndef LARLITE_MCTRUTH_H
+#define LARLITE_MCTRUTH_H
 
 #include "mcnu.h"
 

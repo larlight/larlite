@@ -1,5 +1,5 @@
-#ifndef CLUSTER_CXX
-#define CLUSTER_CXX
+#ifndef LARLITE_CLUSTER_CXX
+#define LARLITE_CLUSTER_CXX
 
 #include "cluster.h"
 

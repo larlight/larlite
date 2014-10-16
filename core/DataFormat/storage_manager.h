@@ -11,8 +11,8 @@
 
     @{*/
 
-#ifndef STORAGE_MANAGER_H
-#define STORAGE_MANAGER_H
+#ifndef LARLITE_STORAGE_MANAGER_H
+#define LARLITE_STORAGE_MANAGER_H
 
 #include <set>
 #include <TFile.h>
