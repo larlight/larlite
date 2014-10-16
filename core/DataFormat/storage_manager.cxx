@@ -69,7 +69,7 @@ namespace larlite {
     }
     
     // If data class object does not exist, and if it's either kWRITE or kBOTH mode, create it.
-    if( (data_ptr_iter != _ptr_data_array[type].end() || !((*data_ptr_iter).second)) && 
+    if( (data_ptr_iter == _ptr_data_array[type].end() || !((*data_ptr_iter).second)) && 
        _mode != kREAD) {
 
       create_data_ptr(type,name);
@@ -500,6 +500,15 @@ namespace larlite {
   }
   
   void storage_manager::create_data_ptr(data::DataType_t const type, std::string const& name){
+
+    if(get_verbosity() <= msg::kINFO)
+
+      Message::send(msg::kINFO,__FUNCTION__,
+		    Form("Requested a new data pointer of type %s (=%d) by %s",
+			 data::kDATA_TREE_NAME[type].c_str(),
+			 type,
+			 name.c_str())
+		    );
 
     auto name_ptr = _ptr_data_array[type].find(name);
     if(name_ptr == _ptr_data_array[type].end()) {
