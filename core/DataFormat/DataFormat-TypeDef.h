@@ -67,7 +67,7 @@ namespace larlite{
   class event_endpoint2d;
 
   class spacepoint;
-  class event_sps;  
+  class event_spacepoint;  
 
   class vertex;
   class event_vertex;

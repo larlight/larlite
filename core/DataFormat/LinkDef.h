@@ -59,7 +59,7 @@
 
 #pragma link C++ class larlite::spacepoint+;
 #pragma link C++ class std::vector<larlite::spacepoint>+;
-#pragma link C++ class larlite::event_sps+;
+#pragma link C++ class larlite::event_spacepoint+;
 
 #pragma link C++ class larlite::track+;
 #pragma link C++ class std::vector<larlite::track>+;
