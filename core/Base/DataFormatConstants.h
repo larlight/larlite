@@ -82,7 +82,7 @@ namespace larlite{
       "hit",
       "cosmictag",
       "ophit",
-      "opflash"
+      "opflash",
       "cluster",
       "seed",
       "sps",
