@@ -40,7 +40,6 @@ namespace larlite{
     /// Defines a type of data product class
     enum DataType_t {
       kUndefined=0,
-      kAssociation,        ///< LArLight association data product
       kEvent,
       kMCTruth,            ///< simb::MCTruth 
       kMCParticle,         ///< simb::MCParticle
@@ -69,7 +68,6 @@ namespace larlite{
 
     const std::string kDATA_TREE_NAME[kDATA_TYPE_MAX] = {
       "unknown",
-      "ass",
       "event",
       "mctruth",
       "mcpart",

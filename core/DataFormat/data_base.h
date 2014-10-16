@@ -16,6 +16,7 @@
 #define LARLITE_DATA_BASE_H
 
 #include "Base/Base-TypeDef.h"
+#include "larlite_dataformat_utils.h"
 #include <TObject.h>
 #include <TString.h>
 
@@ -91,13 +92,19 @@ namespace larlite{
     /// Clear method
     virtual void clear_data();
     
+    //
+    // Simple type variable setters
+    // 
     /// run number setter
     void set_run      (UInt_t run) { fRunNumber    = run; }
     /// sub-run number setter
     void set_subrun   (UInt_t run) { fSubRunNumber = run; }
     /// event-id setter
     void set_event_id (UInt_t id ) { fEventID      = id;  }
-    
+
+    //
+    // Simple type variable getters
+    //     
     /// run number getter
     UInt_t run      () const { return fRunNumber;    }
     /// sub-run number getter
@@ -108,6 +115,32 @@ namespace larlite{
     data::DataType_t data_type() const {return _type; }
     /// producer's name
     const std::string& name() { return _name; }
+    /// Product ID
+    ProductID_t product_id() { return std::make_pair(_type,_name); }
+
+    //
+    // Association adders
+    //
+    /// Adder for an association
+    void set_association(const ProductID_t type,
+			 const size_t index_source,
+			 const AssUnit_t& ass);
+
+    /// Adder for a while set of association
+    void set_association(const ProductID_t type,
+			 const AssSet_t& ass);
+
+    /// Getter for # of associated data product types
+    size_t size_association(const ProductID_t type) const;
+
+    /// Getter for # of associated data product instances
+    size_t size_association(const ProductID_t type, const size_t index_source) const;
+
+    /// Getter for associated data product indecies for all objects
+    const AssSet_t& association(const ProductID_t type) const;
+
+    /// Getter for associated data product indecies from one object
+    const AssUnit_t& association(const ProductID_t type, const size_t index_source) const;
 
   protected:
     
@@ -122,6 +155,9 @@ namespace larlite{
 
     /// Producer's name
     std::string _name;
+    
+    /// Association data holder
+    AssMap_t fAssociation;
 
     ////////////////////////
     ClassDef(event_base,1)

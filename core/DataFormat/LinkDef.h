@@ -28,7 +28,7 @@
 
 #pragma link C++ class larlite::data_base+;
 #pragma link C++ class larlite::event_base+;
-#pragma link C++ class larlite::association+;
+//#pragma link C++ class larlite::association+;
 
 #pragma link C++ class larlite::wire+;
 #pragma link C++ class std::vector<larlite::wire>+;

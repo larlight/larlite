@@ -10,8 +10,9 @@
 #include <TMatrixD.h>
 #include <TLorentzVector.h>
 
+#include "larlite_dataformat_utils.h"
 #include "data_base.h"
-#include "larlite_association.h"
+//#include "larlite_association.h"
 
 #include "wire.h"
 #include "hit.h"
@@ -44,7 +45,7 @@ namespace larlite{
 
   class data_base;
   class event_base;
-  class association;
+  //class association;
 
   class wire;
   class event_wire;
