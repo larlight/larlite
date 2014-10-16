@@ -55,7 +55,7 @@ namespace larlite {
 
 	  _current_event_id = (*data_ptr_iter).second->event_id();
 
-	else if((*data_ptr_iter).second->event_id() != _current_event_id) {
+	else if( (int)((*data_ptr_iter).second->event_id()) != _current_event_id) {
 	  
 	  print(msg::kERROR,__FUNCTION__,
 		Form("Detected event-alignment mismatch! (%d != %d)",
@@ -758,7 +758,7 @@ namespace larlite {
 		
 		_current_event_id = _ptr_data_array[i][name_ptr.first]->event_id();
 	      
-	      else if(_current_event_id != _ptr_data_array[i][name_ptr.first]->event_id()) {
+	      else if(_current_event_id != (int)(_ptr_data_array[i][name_ptr.first]->event_id())) {
 		
 		print(msg::kERROR,__FUNCTION__,
 		      Form("Detected event-alignment mismatch! (%d != %d)",
