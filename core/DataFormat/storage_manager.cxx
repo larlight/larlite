@@ -509,113 +509,66 @@ namespace larlite {
     if((*name_ptr).second) return;
     
     switch(type){
+    case data::kEvent:
+      _ptr_data_array[type][name]=(event_base*)(new event_base(type,name));
+      break;
+    case data::kSimChannel:
+      _ptr_data_array[type][name]=(event_base*)(new event_simch(name));
+      break;
+    case data::kMCShower:
+      _ptr_data_array[type][name]=(event_base*)(new event_mcshower(name));
+      break;
+    case data::kTrack:
+      _ptr_data_array[type][name]=(event_base*)(new event_track(name));
+      break;
+    case data::kMCTruth:
+      _ptr_data_array[type][name]=(event_base*)(new event_mctruth(name));
+      break;
+    case data::kMCParticle:
+      _ptr_data_array[type][name]=(event_base*)(new event_mcpart(name));
+      break;
+    case data::kSpacePoint:
+      _ptr_data_array[type][name]=(event_base*)(new event_spacepoint(name));
+      break;
+    case data::kUserInfo:
+      _ptr_data_array[type][name]=(event_base*)(new event_user(name));
+      break;
+    case data::kWire:
+      _ptr_data_array[type][name]=(event_base*)(new event_wire(name));
+      break;
     case data::kHit:
       _ptr_data_array[type][name]=(event_base*)(new event_hit(name));
-      //_ptr_data_array[type][name]=(event_base*)(new event_base);
       break;
-      /*
-    case data::kEvent:
-      _ptr_data_array[type]=(event_base*)(new event_base(type));
+    case data::kCluster:
+      _ptr_data_array[type][name]=(event_base*)(new event_cluster(name));
       break;
-    case data::SimChannel:
-      _ptr_data_array[type]=(event_base*)(new event_simch(type));
+    case data::kShower:
+      _ptr_data_array[type][name]=(event_base*)(new event_shower(name));
       break;
-    case data::MCShower:
-      _ptr_data_array[type]=(event_base*)(new event_mcshower(type));
+    case data::kVertex:
+      _ptr_data_array[type][name]=(event_base*)(new event_vertex(name));
       break;
-    case data::Track:
-    case data::Bezier:
-    case data::Kalman3DHit:
-    case data::Kalman3DSPS:
-      _ptr_data_array[type]=(event_base*)(new event_track(type));
+    case data::kEndPoint2D:
+      _ptr_data_array[type][name]=(event_base*)(new event_endpoint2d(name));
       break;
-    case data::MCTruth:
-      _ptr_data_array[type]=(event_base*)(new event_mctruth(type));
+    case data::kCalorimetry:
+      _ptr_data_array[type][name]=(event_base*)(new event_calorimetry(name));
       break;
-    case data::MCParticle:
-      _ptr_data_array[type]=(event_base*)(new event_mcpart(type));
-      break;
-    case data::SpacePoint:
-      _ptr_data_array[type]=(event_base*)(new event_sps(type));
-      break;
-    case data::UserInfo:
-      _ptr_data_array[type]=(event_base*)(new event_user(type));
-      break;
-    case data::FIFO:
-      _ptr_data_array[type]=(event_base*)(new event_fifo(type));
-      break;
-    case data::PMTFIFO:
-      _ptr_data_array[type]=(event_base*)(new event_pmtfifo(type));
-      break;
-    case data::TPCFIFO:
-      _ptr_data_array[type]=(event_base*)(new event_tpcfifo(type));
-      break;
-    case data::Pulse:
-    case data::PMTPulse_ThresWin:
-    case data::TPCPulse_ThresWin:
-    case data::PMTPulse_FixedWin:
-    case data::TPCPulse_FixedWin:
-      _ptr_data_array[type]=(event_base*)(new event_pulse(type));
-      break;
-    case data::Trigger:
-      _ptr_data_array[type]=(event_base*)(new trigger(type));
-      break;
-    case data::Wire:
-      _ptr_data_array[type]=(event_base*)(new event_wire(type));
-      break;
-    case data::Hit:
-    case data::MCShowerHit:
-    case data::CrawlerHit:
-    case data::GausHit:
-    case data::APAHit:
-    case data::FFTHit:
-    case data::RFFHit:
-      _ptr_data_array[type]=(event_base*)(new event_hit(type));
-      break;
-    case data::Cluster:
-    case data::MCShowerCluster:
-    case data::CrawlerCluster:
-    case data::DBCluster:
-    case data::FuzzyCluster:
-    case data::HoughCluster:
-    case data::ShowerAngleCluster:
-    case data::RyanCluster:
-      _ptr_data_array[type]=(event_base*)(new event_cluster(type));
-      break;
-    case data::Shower:
-    case data::RyanShower:
-      _ptr_data_array[type]=(event_base*)(new event_shower(type));
-      break;
-    case data::Vertex:
-    case data::FeatureVertex:
-    case data::HarrisVertex:
-      _ptr_data_array[type]=(event_base*)(new event_vertex(type));
-      break;
-    case data::EndPoint2D:
-    case data::FeatureEndPoint2D:
-    case data::HarrisEndPoint2D:
-      _ptr_data_array[type]=(event_base*)(new event_endpoint2d(type));
-      break;
-    case data::Calorimetry:
-      _ptr_data_array[type]=(event_base*)(new event_calorimetry(type));
-      break;
-    case data::MCNeutrino:
+    case data::kMCNeutrino:
       print(msg::kERROR,__FUNCTION__,Form("MCNeutrino is stored within MCTruth! Retrieve MCTruth instead."));
       break;
-    case data::MCTrajectory:
+    case data::kMCTrajectory:
       print(msg::kERROR,__FUNCTION__,Form("MCTrajectory is stored within MCParticle! Retrieve MCParticle instead."));
       break;
-    case data::Seed:
-    case data::CosmicTag:
-      _ptr_data_array[type]=(event_base*)(new event_cosmictag());
+    case data::kCosmicTag:
+      _ptr_data_array[type][name]=(event_base*)(new event_cosmictag(name));
       break;
-    case data::OpFlash:
-      _ptr_data_array[type]=(event_base*)(new event_opflash());
+    case data::kOpFlash:
+      _ptr_data_array[type][name]=(event_base*)(new event_opflash(name));
       break;
-    case data::OpHit:
-      _ptr_data_array[type]=(event_base*)(new event_ophit());
+    case data::kOpHit:
+      _ptr_data_array[type][name]=(event_base*)(new event_ophit(name));
       break;
-      */
     default:
       print(msg::kERROR,__FUNCTION__,Form("Data identifier not supported: %d",(int)type));
       break;

@@ -84,24 +84,24 @@ namespace larlite {
   };
   
   /**
-     \class event_sps
+     \class event_spacepoint
      A collection storage class of multiple spacepoints
   */
-  class event_sps : public std::vector<larlite::spacepoint>,
+  class event_spacepoint : public std::vector<larlite::spacepoint>,
 		    public event_base {
     
   public:
     
     /// Default constructor
-    event_sps(std::string name="noname") : event_base(data::kSpacePoint,name) {clear_data();}
+    event_spacepoint(std::string name="noname") : event_base(data::kSpacePoint,name) {clear_data();}
     
     /// Default copy constructor
-    event_sps(const event_sps& original) : std::vector<larlite::spacepoint>(original),
+    event_spacepoint(const event_spacepoint& original) : std::vector<larlite::spacepoint>(original),
 					   event_base(original)
     {}
     
     /// Default destructor
-    ~event_sps(){}
+    ~event_spacepoint(){}
     
     /// Method to clear currently held data contents in the buffer
     virtual void clear_data(){event_base::clear_data(); clear();}
@@ -109,7 +109,7 @@ namespace larlite {
   private:
     
     ////////////////////////
-    ClassDef(event_sps,3)
+    ClassDef(event_spacepoint,3)
     ////////////////////////
   };
 }
