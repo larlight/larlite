@@ -44,6 +44,7 @@ namespace larlite{
 
   class data_base;
   class event_base;
+  class association;
 
   class wire;
   class event_wire;

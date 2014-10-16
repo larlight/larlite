@@ -20,6 +20,7 @@
 #include <TError.h>
 #include "Base/larlite_base.h"
 #include "data_base.h"
+#include "larlite_association.h"
 #include "hit.h"
 #include "track.h"
 #include "mctruth.h"

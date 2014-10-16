@@ -512,6 +512,9 @@ namespace larlite {
     case data::kEvent:
       _ptr_data_array[type][name]=(event_base*)(new event_base(type,name));
       break;
+    case data::kAssociation:
+      _ptr_data_array[type][name]=(association*)(new association(name));
+      break;
     case data::kSimChannel:
       _ptr_data_array[type][name]=(event_base*)(new event_simch(name));
       break;
