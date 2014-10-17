@@ -13,28 +13,10 @@
 #include <iosfwd>
 #include <iostream>
 #include <iomanip>
-
+#include "Base/AnalysisConstants.h"
 #include "data_base.h"
 
 namespace larlite {
-
-  typedef enum cosmic_tag_id{
-    kUnknown=-1,
-    kNotTagged=0,
-    kGeometry_YY=1,
-    kGeometry_YZ,
-    kGeometry_ZZ,
-    kGeometry_XX,
-    kGeometry_XY,
-    kGeometry_XZ,
-    kGeometry_Y=21,
-    kGeometry_Z,
-    kGeometry_X,
-    kOutsideDrift_Partial=100,
-    kOutsideDrift_Complete,
-    kFlash_BeamIncompatible=200,
-    kFlash_Match=300
-  } CosmicTagID_t;
 
   class cosmictag : public data_base {
 
@@ -47,14 +29,14 @@ namespace larlite {
     float fCosmicScore; // -1 means very likely neutrino, 
                         // 0 means probably not a cosmic (or unknown), 
                         // 1 means cosmic
-    CosmicTagID_t fCosmicType; 
+    anab::CosmicTagID_t fCosmicType; 
 
   public:
 
     cosmictag(std::vector<float> ePt1,
 	      std::vector<float> ePt2,
 	      float cScore,
-	      CosmicTagID_t cTypes);
+	      anab::CosmicTagID_t cTypes);
 
     cosmictag(float cScore);
 
@@ -67,7 +49,7 @@ namespace larlite {
 
     inline const float& CosmicScore() const {return fCosmicScore; }
 
-    inline const CosmicTagID_t& CosmicType() const {return fCosmicType; }
+    inline const anab::CosmicTagID_t& CosmicType() const {return fCosmicType; }
 
   protected:
     

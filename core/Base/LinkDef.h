@@ -11,6 +11,7 @@
 
 #pragma link C++ namespace larlite;
 #pragma link C++ namespace larlite::simb;
+#pragma link C++ namespace larlite::anab;
 #pragma link C++ namespace larlite::msg;
 #pragma link C++ namespace larlite::data;
 #pragma link C++ namespace larlite::geo;

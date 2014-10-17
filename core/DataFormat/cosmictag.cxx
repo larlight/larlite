@@ -21,7 +21,7 @@ namespace larlite{
     endPt1(0),
     endPt2(0),
     fCosmicScore(0),
-    fCosmicType(CosmicTagID_t::kUnknown)
+    fCosmicType(anab::CosmicTagID_t::kUnknown)
   {
   }
 
@@ -31,7 +31,7 @@ namespace larlite{
     endPt1(0),
     endPt2(0),
     fCosmicScore(f),
-    fCosmicType(CosmicTagID_t::kUnknown)
+    fCosmicType(anab::CosmicTagID_t::kUnknown)
   {
   }
 
@@ -40,7 +40,7 @@ namespace larlite{
 		       std::vector<float> ePt2,
 		       //		       double flashTime, // should go
 		       float cScore,
-		       CosmicTagID_t cType) :
+		       anab::CosmicTagID_t cType) :
     data_base(data::kCosmicTag),
     endPt1(ePt1),
     endPt2(ePt2),
