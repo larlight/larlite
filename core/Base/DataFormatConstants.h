@@ -43,6 +43,7 @@ namespace larlite{
       kEvent,
       kMCTruth,            ///< simb::MCTruth 
       kMCParticle,         ///< simb::MCParticle
+      kMCFlux,             ///< simb::MCFlux
       kMCTrajectory,       ///< simb::MCTrajectory
       kMCNeutrino,         ///< simb::MCNeutrino
       kSimChannel,         ///< sim::SimChannel
@@ -71,6 +72,7 @@ namespace larlite{
       "event",
       "mctruth",
       "mcpart",
+      "mcflux",
       "mctrajectory",
       "mcnu",
       "simch",

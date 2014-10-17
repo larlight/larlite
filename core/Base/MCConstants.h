@@ -18,6 +18,21 @@
 
 /// Namespace of everything in this framework
 namespace larlite{
+
+
+  namespace simb{
+
+  enum flux_code_{
+    kHistPlusFocus  = +1, ///< Flux for positive horn focus
+    kHistMinusFocus = -1, ///< Flux for negative horn focus
+    kGenerator      =  0, ///< A bogus flux assumed by the generator
+    kNtuple         =  2, ///< Full flux simulation ntuple
+    kSimple_Flux    =  3  ///< A simplified flux ntuple for quick running
+  }; 
+  
+  
+  }
+
   
   /// Defines constants for MC truth information
   namespace mc{
