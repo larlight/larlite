@@ -26,9 +26,12 @@
 #include "shower.h"
 #include "vertex.h"
 #include "calorimetry.h"
+#include "partid.h"
+#include "pfpart.h"
 
 #include "user_info.h"
 
+#include "gtruth.h"
 #include "mcshower.h"
 #include "mctrajectory.h"
 #include "mcpart.h"
@@ -46,7 +49,7 @@ namespace larlite{
 
   class data_base;
   class event_base;
-  //class association;
+  class product_id;
 
   class wire;
   class event_wire;
@@ -87,6 +90,9 @@ namespace larlite{
   class user_info;
   class event_user;
 
+  class gtruth;
+  class event_gtruth;
+
   class mcshower;
   class event_mcshower;
 
@@ -94,8 +100,10 @@ namespace larlite{
   class mctrajectory;
 
   class mcpart;
-  class mcflux;
   class event_mcpart;
+
+  class mcflux;
+  class event_mcflux;
 
   class mcnu;
   class mctruth;
@@ -104,6 +112,13 @@ namespace larlite{
   class ide;
   class simch;
   class event_simch;
+
+  class pfpart;
+  class event_pfpart;
+
+  class partid;
+  class event_partid;
+
   /*
   class trigger;
   */

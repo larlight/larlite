@@ -116,31 +116,31 @@ namespace larlite{
     /// producer's name
     const std::string& name() { return _name; }
     /// Product ID
-    ProductID_t product_id() { return std::make_pair(_type,_name); }
+    ::larlite::product_id id() { return ::larlite::product_id(_type,_name); }
 
     //
     // Association adders
     //
     /// Adder for an association
-    void set_association(const ProductID_t type,
+    void set_association(const product_id type,
 			 const size_t index_source,
 			 const AssUnit_t& ass);
 
     /// Adder for a while set of association
-    void set_association(const ProductID_t type,
+    void set_association(const product_id type,
 			 const AssSet_t& ass);
 
     /// Getter for # of associated data product types
-    size_t size_association(const ProductID_t type) const;
+    size_t size_association(const product_id type) const;
 
     /// Getter for # of associated data product instances
-    size_t size_association(const ProductID_t type, const size_t index_source) const;
+    size_t size_association(const product_id type, const size_t index_source) const;
 
     /// Getter for associated data product indecies for all objects
-    const AssSet_t& association(const ProductID_t type) const;
+    const AssSet_t& association(const product_id type) const;
 
     /// Getter for associated data product indecies from one object
-    const AssUnit_t& association(const ProductID_t type, const size_t index_source) const;
+    const AssUnit_t& association(const product_id type, const size_t index_source) const;
 
   protected:
     

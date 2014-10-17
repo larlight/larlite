@@ -10,6 +10,7 @@
 #pragma link off all functions;
 
 #pragma link C++ namespace larlite;
+#pragma link C++ namespace larlite::simb;
 #pragma link C++ namespace larlite::msg;
 #pragma link C++ namespace larlite::data;
 #pragma link C++ namespace larlite::geo;

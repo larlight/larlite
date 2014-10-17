@@ -41,6 +41,7 @@ namespace larlite{
     enum DataType_t {
       kUndefined=0,
       kEvent,
+      kGTruth,             ///< simb::GTruth
       kMCTruth,            ///< simb::MCTruth 
       kMCParticle,         ///< simb::MCParticle
       kMCFlux,             ///< simb::MCFlux
@@ -62,6 +63,8 @@ namespace larlite{
       kVertex,             ///< recob::Vertex
       kEndPoint2D,         ///< recob::EndPoint2D
       kCalorimetry,        ///< anab::Calorimetry
+      kParticleID,         ///< anab::ParticleID
+      kPFParticle,         ///< recob::PFParticle
       kUserInfo,           ///< dynamic data container (LArLite original)
       kTrigger,            ///< Trigger data (LArLite original)
       kDATA_TYPE_MAX
@@ -70,6 +73,7 @@ namespace larlite{
     const std::string kDATA_TREE_NAME[kDATA_TYPE_MAX] = {
       "unknown",
       "event",
+      "gtruth",
       "mctruth",
       "mcpart",
       "mcflux",
@@ -90,7 +94,9 @@ namespace larlite{
       "shower",
       "vertex",
       "end2d",
-      "calorimetry",
+      "calo",
+      "partid",
+      "pfpart",
       "user",
       "trigger"
     };

@@ -26,6 +26,8 @@
 #pragma link C++ class std::vector<TMatrixD>+;
 #pragma link C++ class std::vector<TLorentzVector>+;
 
+#pragma link C++ class larlite::product_id+;
+
 #pragma link C++ class larlite::data_base+;
 #pragma link C++ class larlite::event_base+;
 //#pragma link C++ class larlite::association+;
@@ -78,9 +80,21 @@
 #pragma link C++ class std::vector<larlite::calorimetry>+;
 #pragma link C++ class larlite::event_calorimetry+;
 
+#pragma link C++ class larlite::pfpart+;
+#pragma iink C++ class std::vector<larlite::pfpart>+;
+#pragma link C++ class larlite::event_pfpart+;
+
+#pragma link C++ class larlite::partid+;
+#pragma link C++ class std::vector<larlite::partid>+;
+#pragma link C++ class larlite::event_partid+;
+
 #pragma link C++ class larlite::user_info+;
 #pragma link C++ class std::vector<larlite::user_info>+;
 #pragma link C++ class larlite::event_user+;
+
+#pragma link C++ class larlite::gtruth+;
+#pragma link C++ class std::vector<larlite::gtruth>+;
+#pragma link C++ class larlite::event_gtruth+;
 
 #pragma link C++ class larlite::mcshower+;
 #pragma link C++ class std::vector<larlite::mcshower>+;

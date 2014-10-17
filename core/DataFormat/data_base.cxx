@@ -14,7 +14,7 @@ namespace larlite {
     fAssociation.clear();
   }
 
-  void event_base::set_association(const ProductID_t type,
+  void event_base::set_association(const product_id type,
 				   const size_t index_source,
 				   const AssUnit_t& ass) {			   
     auto loc = fAssociation.find(type);
@@ -45,7 +45,7 @@ namespace larlite {
 
   }
   
-  void event_base::set_association(const ProductID_t type,
+  void event_base::set_association(const product_id type,
 				   const AssSet_t& ass)
   {
 
@@ -67,14 +67,14 @@ namespace larlite {
 
   }
   
-  size_t event_base::size_association(const ProductID_t type) const
+  size_t event_base::size_association(const product_id type) const
   {
     auto loc = fAssociation.find(type);
     if(loc == fAssociation.end()) return 0;
     else return (*loc).second.size();
   }
 
-  size_t event_base::size_association(const ProductID_t type, const size_t index_source) const
+  size_t event_base::size_association(const product_id type, const size_t index_source) const
   {
     auto loc = fAssociation.find(type);
     if(loc == fAssociation.end()) return 0;
@@ -82,7 +82,7 @@ namespace larlite {
     else return (*loc).second[index_source].size();
   }
 
-  const AssSet_t& event_base::association(const ProductID_t type) const
+  const AssSet_t& event_base::association(const product_id type) const
   {
     auto loc = fAssociation.find(type);
     if(loc == fAssociation.end()) {
@@ -97,7 +97,7 @@ namespace larlite {
     return (*loc).second;
   }
 
-  const AssUnit_t& event_base::association(const ProductID_t type, const size_t index_source) const
+  const AssUnit_t& event_base::association(const product_id type, const size_t index_source) const
   {
     auto loc = fAssociation.find(type);
     if(loc == fAssociation.end()) {

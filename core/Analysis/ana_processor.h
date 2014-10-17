@@ -70,7 +70,7 @@ namespace larlite {
     void set_ana_output_file(std::string name){_ofile_name=name;}
     
     /// Setter for I/O mode ... READ or WRITE or BOTH 
-    void set_io_mode(storage_manager::MODE mode){_storage->set_io_mode(mode);}
+    void set_io_mode(storage_manager::IOMode_t mode){_storage->set_io_mode(mode);}
     
     /// Setter to specify a certain data class to be read from input
     //void set_data_to_read(data::DataType_t type,Bool_t read=true)

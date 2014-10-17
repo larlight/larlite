@@ -4,7 +4,7 @@
 //
 
 #include <TSystem.h>
-#include <Analysis-TypeDef.hh>
+#include <Analysis/Analysis-TypeDef.hh>
 
 int main(int argc, char** argv){
 
@@ -25,13 +25,13 @@ int main(int argc, char** argv){
     << std::endl;
 
   // Create ana_processor instance
-  larlight::ana_processor my_proc;
+  larlite::ana_processor my_proc;
 
   // Set input root file
   my_proc.add_input_file(argv[1]);
 
   // Specify IO mode
-  my_proc.set_io_mode(larlight::storage_manager::READ);
+  my_proc.set_io_mode(larlite::storage_manager::kREAD);
 
   // Specify input TDirectory name if given
   if(argc>2)
@@ -41,7 +41,7 @@ int main(int argc, char** argv){
   my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 
   // Attach a template process
-  my_proc.add_process(new larlight::ana_base);
+  my_proc.add_process(new larlite::ana_base);
 
   std::cout
     << std::endl

@@ -1,6 +1,6 @@
 #include <TSystem.h>
 #include <TVector3.h>
-#include <storage_manager.hh>
+#include <DataFormat/storage_manager.h>
 
 int main(){
 
@@ -10,14 +10,14 @@ int main(){
   // decoder output root file. 
   //
 
-  larlight::storage_manager my_storage;
+  larlite::storage_manager my_storage;
 
   // If you wish, change the message level to DEBUG.
   // Commented out by default.
   //my_storage.set_verbosity(larlight::MSG::DEBUG);
 
   // Step 0: Set I/O mode: we are reading in, so "READ"
-  my_storage.set_io_mode(larlight::storage_manager::WRITE);
+  my_storage.set_io_mode(larlite::storage_manager::kWRITE);
 
   // Step 1: Set output file 
   my_storage.set_out_filename("trial.root");
@@ -37,7 +37,7 @@ int main(){
   }
 
   // Let's fill event_track for 100 events.
-  larlight::event_track* my_event_track = (larlight::event_track*)(my_storage.get_data(larlight::DATA::Track));
+  auto my_event_track = (larlite::event_track*)(my_storage.get_data(larlite::data::kTrack,"test"));
   int run_id = 1;
   int subrun_id = 1;
   for( int i=0; i<100; i++){
@@ -49,7 +49,7 @@ int main(){
 
     // Let's make 2 tracks!
     for( int j=0; j<2; j++){
-      larlight::track t;
+      larlite::track t;
       t.set_track_id(j); 
 
       // Let's make a track with 20 fake space points

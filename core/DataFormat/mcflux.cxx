@@ -5,7 +5,8 @@
 
 namespace larlite {
 
-  mcflux::mcflux() : frun(-999)
+  mcflux::mcflux() : data_base(data::kMCFlux)
+		   , frun(-999)
 		   , fevtno(-999)
 		   , fndxdz(-999.)
 		   , fndydz(-999.)
@@ -73,14 +74,12 @@ namespace larlite {
 		   , fgenz(-999.)
 		   , fdk2gen(-999.)
 		   , fgen2vtx(-999.)
-		   , data_base(data::kMCFlux)
-
   {
     for (int i=0; i<6; ++i) fFluxGen[i]=fFluxPos[i]=fFluxNeg[i]= 0;
   }
 
   void mcflux::Reset(){
-
+    clear_data();
     frun      = -999;
     fevtno    = -999;
     fndxdz    = -999.;
@@ -175,6 +174,17 @@ namespace larlite {
     if (pdgcode==-16) return flux[5];
     return 0.0;
   }
+
+  //......................................................................                                                                     
+  void mcflux::SetFluxPos(double nue,  double nuebar,
+                          double numu, double numubar,
+                          double nutau,double nutaubar)
+  {
+    fFluxPos[0] = nue;   fFluxPos[1] = nuebar;
+    fFluxPos[2] = numu;  fFluxPos[3] = numubar;
+    fFluxPos[4] = nutau; fFluxPos[5] = nutaubar;
+  }
+
 
   //......................................................................                                                                     
 

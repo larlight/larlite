@@ -1,4 +1,4 @@
-#include "DataFormat-TypeDef.hh"
+#include "DataFormat/DataFormat-TypeDef.h"
 
 int main()
 {
@@ -11,12 +11,12 @@ int main()
 
   const std::string test_fname("from_io_test_you_can_remove_me.root");
   
-  larlight::storage_manager man;
-  man.set_io_mode(man.WRITE);
+  larlite::storage_manager man;
+  man.set_io_mode(man.kWRITE);
   man.set_out_filename(test_fname);
-  man.set_verbosity(larlight::MSG::NORMAL);
+  man.set_verbosity(larlite::msg::kNORMAL);
 
-  int nevents_written[larlight::DATA::DATA_TYPE_MAX]={0};
+  int nevents_written[larlite::data::kDATA_TYPE_MAX]={0};
 
   std::cout 
     << std::endl
@@ -26,18 +26,18 @@ int main()
   man.open();
   for(int i=0; i<10; i++) {
 
-    for(int j=0; j<larlight::DATA::DATA_TYPE_MAX; ++j) {
+    for(int j=0; j<larlite::data::kDATA_TYPE_MAX; ++j) {
 
-      if( j == larlight::DATA::Seed ||
-	  j == larlight::DATA::Event ||
-	  j == larlight::DATA::MCTrajectory ||
-	  j == larlight::DATA::MCNeutrino ||
-	  j == larlight::DATA::DATA_TYPE_MAX )
+      if( j == larlite::data::kSeed ||
+	  j == larlite::data::kEvent ||
+	  j == larlite::data::kMCTrajectory ||
+	  j == larlite::data::kMCNeutrino ||
+	  j == larlite::data::kDATA_TYPE_MAX )
 
 	continue;
-      man.get_data((larlight::DATA::DATA_TYPE)j);
-      
-      nevents_written[j]++;
+      auto ptr = man.get_data((larlite::data::DataType_t)j,"test");
+      if(ptr)
+	nevents_written[j]++;
     }
 
     man.next_event();
@@ -52,20 +52,20 @@ int main()
     << "First event loop finished & file closed."
     << std::endl;
 
-  for(int i=0; i<larlight::DATA::DATA_TYPE_MAX; ++i) {
+  for(int i=0; i<larlite::data::kDATA_TYPE_MAX; ++i) {
     
     if(nevents_written[i])
 
       std::cout 
 	<< Form("Written %s_tree with %d events",
-		larlight::DATA::DATA_TREE_NAME[i].c_str(),
+		larlite::data::kDATA_TREE_NAME[i].c_str(),
 		nevents_written[i])
 	<< std::endl;
   }
   std::cout << std::endl;
     
   // (2) Alright now let's test reading what was written.
-  man.set_io_mode(man.READ);
+  man.set_io_mode(man.kREAD);
   man.add_in_filename(test_fname);
 
   std::cout
@@ -75,9 +75,9 @@ int main()
   man.open();
   while(man.next_event()) {
 
-    for(int i=0; i<larlight::DATA::DATA_TYPE_MAX; ++i) {
+    for(int i=0; i<larlite::data::kDATA_TYPE_MAX; ++i) {
 
-      larlight::event_base* my_event_data = man.get_data((larlight::DATA::DATA_TYPE)i);
+      auto my_event_data = man.get_data((larlite::data::DataType_t)i,"test");
 
       if(my_event_data)
 
@@ -96,20 +96,20 @@ int main()
     << "//********************************************//" 
     << std::endl;
 
-  for(int i=0; i<larlight::DATA::DATA_TYPE_MAX; ++i) {
+  for(int i=0; i<larlite::data::kDATA_TYPE_MAX; ++i) {
 
     if(nevents_written[i]>0)
 
-      larlight::Message::send(larlight::MSG::ERROR,
+      larlite::Message::send(larlite::msg::kERROR,
 			      Form("TTree, \"%s_tree\", has more entries (+%d) than expected!",
-				   larlight::DATA::DATA_TREE_NAME[i].c_str(),
+				   larlite::data::kDATA_TREE_NAME[i].c_str(),
 				   nevents_written[i]));
     
     else if(nevents_written[i]<0)
       
-      larlight::Message::send(larlight::MSG::ERROR,
+      larlite::Message::send(larlite::msg::kERROR,
 			      Form("TTree, \"%s_tree\", has less entries (%d) than expected!",
-				   larlight::DATA::DATA_TREE_NAME[i].c_str(),
+				   larlite::data::kDATA_TREE_NAME[i].c_str(),
 				   nevents_written[i]));
     
   }

@@ -6,7 +6,7 @@ namespace larlite {
 
   storage_manager* storage_manager::me=0;
   
-  storage_manager::storage_manager(storage_manager::MODE mode)
+  storage_manager::storage_manager(storage_manager::IOMode_t mode)
     : larlite_base()
     , _ptr_data_array (data::kDATA_TYPE_MAX,std::map<std::string,larlite::event_base*>())
     , _in_ch  (data::kDATA_TYPE_MAX,std::map<std::string,TChain*>())
@@ -518,6 +518,9 @@ namespace larlite {
     if((*name_ptr).second) return;
     
     switch(type){
+    case data::kGTruth:
+      _ptr_data_array[type][name]=(event_base*)(new event_gtruth(name));
+      break;
     case data::kEvent:
       _ptr_data_array[type][name]=(event_base*)(new event_base(type,name));
       break;
@@ -585,6 +588,12 @@ namespace larlite {
       break;
     case data::kOpHit:
       _ptr_data_array[type][name]=(event_base*)(new event_ophit(name));
+      break;
+    case data::kPFParticle:
+      _ptr_data_array[type][name]=(event_base*)(new event_pfpart(name));
+      break;
+    case data::kParticleID:
+      _ptr_data_array[type][name]=(event_base*)(new event_partid(name));
       break;
     default:
       print(msg::kERROR,__FUNCTION__,Form("Data identifier not supported: %d",(int)type));

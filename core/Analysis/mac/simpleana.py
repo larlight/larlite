@@ -6,8 +6,8 @@ filename = sys.argv[1]
 
 fout = TFile.Open("ana.root","RECREATE")
 
-dataman=larlight.storage_manager()
-dataman.set_io_mode(dataman.READ)
+dataman=larlite.storage_manager()
+dataman.set_io_mode(dataman.kREAD)
 dataman.add_in_filename(sys.argv[1])
 dataman.set_in_rootdir("scanner")
 dataman.open()

@@ -17,16 +17,4 @@ rootlibmap() {
 ######################################################
 # DataFormat
 rootlibmap libDataFormat.rootmap libDataFormat.so $LARLITE_COREDIR/DataFormat/LinkDef.h \
-    libBase.so libPhysics.so libTree.so
-
-
-
-
-
-
-
-
-
-
-
-
+    libPhysics.so libTree.so libBase.so

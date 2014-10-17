@@ -113,8 +113,6 @@ namespace larlite{
     /// Default destructor
     ~event_cluster(){}
 
-    data::DataType_t get_hit_type() const;
-
   private:
     
     ////////////////////////

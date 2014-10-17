@@ -123,8 +123,8 @@ namespace larlite{
                  double y,
                  double z);
 
-    //???????????????
-    void clear_data();
+    void clear_data()
+    { data_base::clear_data(); Reset(); }
     
   protected:
                                                                        

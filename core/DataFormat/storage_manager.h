@@ -39,7 +39,9 @@
 #include "opflash.h"
 #include "ophit.h"
 #include "mcflux.h"
-
+#include "pfpart.h"
+#include "partid.h"
+#include "gtruth.h"
 namespace larlite {
   /**
      \class storage_manager
@@ -50,7 +52,7 @@ namespace larlite {
   public:
     
     /// Defines I/O mode ... currently only read OR write.
-    enum MODE{
+    enum IOMode_t{
       kREAD,       ///< I/O mode: READ
       kWRITE,      ///< I/O mode: WRITE
       kBOTH,       ///< I/O mode both read & write
@@ -58,7 +60,7 @@ namespace larlite {
     };
     
     /// Defines I/O process status flags
-    enum STATUS{
+    enum IOStatus_t{
       kINIT,       ///< I/O operation status: initiated
       kOPENED,     ///< I/O file opened
       kREADY_IO,   ///< All pre-I/O process finished (making TTrees, etc.)
@@ -67,7 +69,7 @@ namespace larlite {
     };
     
     /// Default constructor. Allow user to specify the I/O mode here.
-    storage_manager(MODE mode=kUNDEFINED);
+    storage_manager(IOMode_t mode=kUNDEFINED);
     
     /// Default destructor.
     virtual ~storage_manager(){}
@@ -77,7 +79,7 @@ namespace larlite {
     //{ _read_data_array[type]=read; }
     
     /// Setter for I/O mode.
-    void set_io_mode(MODE mode)         {_mode=mode;}
+    void set_io_mode(IOMode_t mode)         {_mode=mode;}
     
     /// Setter for input filename
     //void set_in_filename(std::string name) {_in_fname=name;}
@@ -99,7 +101,7 @@ namespace larlite {
     void enable_event_alignment(bool doit=true) {_check_alignment=doit;}
     
     /// Getter for I/O mode.
-    MODE io_mode() const         {return _mode;}
+    IOMode_t io_mode() const         {return _mode;}
     
     /// Getter for an array of input files set by the user
     std::vector<std::string> input_filename() const {return _in_fnames;}
@@ -108,7 +110,7 @@ namespace larlite {
     std::string output_filename() const {return _out_fname;}
     
     /// Getter for process status stamp. See storage_manager::STATUS
-    STATUS status() const        {return _status;}
+    IOStatus_t status() const        {return _status;}
     
     /// Reset variables and I/O process to prepare for a new I/O.
     void reset();
@@ -188,10 +190,10 @@ namespace larlite {
     Int_t _current_event_id;
     
     /// status control stamp
-    STATUS _status;
+    IOStatus_t _status;
     
     /// I/O mode 
-    MODE _mode;
+    IOMode_t _mode;
     
     /// Boolean to record what data to be read out from a file
     std::vector<std::map<std::string,bool> > _read_data_array;

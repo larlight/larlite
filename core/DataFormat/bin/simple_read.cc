@@ -1,6 +1,6 @@
 #include <TSystem.h>
 #include <TVector3.h>
-#include <storage_manager.hh>
+#include <DataFormat/storage_manager.h>
 
 int main(int argc, char** argv){
 
@@ -18,17 +18,14 @@ int main(int argc, char** argv){
   // decoder output root file. 
   //
 
-  larlight::storage_manager my_storage;
+  larlite::storage_manager my_storage;
 
   // If you wish, change the message level to DEBUG.
   // Commented out by default.
-  my_storage.set_verbosity(larlight::MSG::DEBUG);
+  my_storage.set_verbosity(larlite::msg::kDEBUG);
   
   // Step 0: Set I/O mode: we are reading in, so "READ"
-  my_storage.set_io_mode(larlight::storage_manager::READ);
-
-  // Step 0.5: Specify data type to readout
-  my_storage.set_data_to_read(larlight::DATA::Track);
+  my_storage.set_io_mode(larlite::storage_manager::kREAD);
 
   // Step 1: Add input file from user input
   my_storage.add_in_filename(argv[1]);
@@ -50,7 +47,7 @@ int main(int argc, char** argv){
   // Let's loop over!
   while(my_storage.next_event()){
 
-    larlight::event_track* my_track_v = (larlight::event_track*)(my_storage.get_data(larlight::DATA::Track));
+    auto my_track_v = (larlite::event_track*)(my_storage.get_data(larlite::data::kTrack,"test"));
 
     if(!my_track_v) {
 
