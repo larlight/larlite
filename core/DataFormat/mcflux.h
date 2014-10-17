@@ -17,7 +17,7 @@
 
 #include "data_base.h"
 #include <vector>
-
+#include <cmath>
 namespace larlite{
   /**
      \class hit
