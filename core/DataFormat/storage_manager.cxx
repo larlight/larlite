@@ -541,6 +541,9 @@ namespace larlite {
     case data::kMCParticle:
       _ptr_data_array[type][name]=(event_base*)(new event_mcpart(name));
       break;
+    case data::kMCFlux:
+      _ptr_data_array[type][name]=(event_base*)(new event_mcflux(name));
+      break;
     case data::kSpacePoint:
       _ptr_data_array[type][name]=(event_base*)(new event_spacepoint(name));
       break;

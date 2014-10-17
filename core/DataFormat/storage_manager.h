@@ -38,6 +38,7 @@
 #include "cosmictag.h"
 #include "opflash.h"
 #include "ophit.h"
+#include "mcflux.h"
 
 namespace larlite {
   /**

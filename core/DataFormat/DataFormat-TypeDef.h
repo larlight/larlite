@@ -32,6 +32,7 @@
 #include "mcshower.h"
 #include "mctrajectory.h"
 #include "mcpart.h"
+#include "mcflux.h"
 #include "mcnu.h"
 #include "mctruth.h"
 #include "simch.h"
@@ -93,6 +94,7 @@ namespace larlite{
   class mctrajectory;
 
   class mcpart;
+  class mcflux;
   class event_mcpart;
 
   class mcnu;

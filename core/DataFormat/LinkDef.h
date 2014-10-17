@@ -86,13 +86,17 @@
 #pragma link C++ class std::vector<larlite::mcshower>+;
 #pragma link C++ class larlite::event_mcshower+;
 
-#pragma link C++ class larlite::mcstep+;
-#pragma link C++ class std::vector<larlite::mcstep>+;
-#pragma link C++ class larlite::mctrajectory+;
-
 #pragma link C++ class larlite::mcpart+;
 #pragma link C++ class std::vector<larlite::mcpart>+;
 #pragma link C++ class larlite::event_mcpart+;
+
+#pragma link C++ class larlite::mcflux+;
+#pragma link C++ class std::vector<larlite::mcflux>+;
+#pragma link C++ class larlite::event_mcflux+;
+
+#pragma link C++ class larlite::mcstep+;
+#pragma link C++ class std::vector<larlite::mcstep>+;
+#pragma link C++ class larlite::mctrajectory+;
 
 #pragma link C++ class larlite::mcnu+;
 #pragma link C++ class std::vector<larlite::mcnu>+;
