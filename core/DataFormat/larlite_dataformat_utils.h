@@ -46,6 +46,12 @@ namespace larlite{
     /// virtual dtor
     virtual ~product_id(){}
 
+    /// copy ctor
+    product_id(const product_id& original){
+      this->first=original.first;
+      this->second=original.second;
+    }
+
     /// For sorting
     inline bool operator< ( const product_id& rhs ) const 
     { 

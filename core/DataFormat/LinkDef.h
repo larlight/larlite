@@ -12,15 +12,15 @@
 #pragma link C++ class std::vector<std::vector<float> >+;
 
 #pragma link C++ class std::pair<size_t,size_t>+;
-#pragma link C++ class std::pair<std::string,bool>+;
-#pragma link C++ class std::pair<std::string,std::string>+;
+#pragma link C++ class std::pair<string,bool>+;
+#pragma link C++ class std::pair<string,string>+;
 
-#pragma link C++ class std::map<std::string,bool>+;
-#pragma link C++ class std::map<std::string,std::string>+;
-#pragma link C++ class std::map<std::string,std::vector<bool> >+;
-#pragma link C++ class std::map<std::string,std::vector<int > >+;
-#pragma link C++ class std::map<std::string,std::vector<double> >+;
-#pragma link C++ class std::map<std::string,std::vector<std::string> >+;
+#pragma link C++ class std::map<string,bool>+;
+#pragma link C++ class std::map<string,string>+;
+#pragma link C++ class std::map<string,std::vector<bool> >+;
+#pragma link C++ class std::map<string,std::vector<int > >+;
+#pragma link C++ class std::map<string,std::vector<double> >+;
+#pragma link C++ class std::map<string,std::vector<string> >+;
 
 #pragma link C++ class std::vector<TVector3>+;
 #pragma link C++ class std::vector<TMatrixD>+;
@@ -32,6 +32,7 @@
 #pragma link C++ class std::vector<larlite::AssUnit_t>+;
 #pragma link C++ class larlite::AssSet_t+;
 
+#pragma link C++ class std::pair<larlite::data::DataType_t,string>+;
 #pragma link C++ class larlite::product_id+;
 
 #pragma link C++ class larlite::data_base+;
