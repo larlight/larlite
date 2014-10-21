@@ -1,7 +1,7 @@
 #ifndef LARLITE_STORAGE_MANAGER_CXX
 #define LARLITE_STORAGE_MANAGER_CXX
 #include "storage_manager.h"
-#include "storage_manager.template.cc"
+//#include "storage_manager.template.cc"
 
 namespace larlite {
 

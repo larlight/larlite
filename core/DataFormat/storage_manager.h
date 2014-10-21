@@ -142,9 +142,9 @@ namespace larlite {
 	Type specific data product getter.
 	Specialize the template to the data product of your choice, and it cast the
 	pointer + return reference for you.
-    */
     template <class T>
     T* get_data(std::string const name);
+    */
     
     /// What data is available?
     std::map<larlite::data::DataType_t,std::set<std::string> > list_data_types() const;
@@ -170,10 +170,10 @@ namespace larlite {
     inline UInt_t get_entries_written() const {return _nevents_written;}
 
     /// Data product class => enum type converter
-
+    /*
     template <class T>
     const ::larlite::data::DataType_t data_type() const;
-
+    */
   private:
     
     static storage_manager* me; ///< shared object instance pointer
@@ -236,9 +236,10 @@ namespace larlite {
 
 }
 
+/*
 #ifndef __CINT__
 #include "storage_manager.template.hh"
 #endif
-
+*/
 #endif
 /** @} */ // end of doxygen group storage_manager
