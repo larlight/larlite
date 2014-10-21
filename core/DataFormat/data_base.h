@@ -82,7 +82,8 @@ namespace larlite{
 					     fRunNumber(original.fRunNumber),
 					     fSubRunNumber(original.fSubRunNumber),
 					     fEventID(original.fEventID),
-					     _name(original._name)
+					     _name(original._name),
+					     fAssociation(original.fAssociation)
     {}
 
     

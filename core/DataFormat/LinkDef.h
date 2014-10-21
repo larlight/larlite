@@ -137,6 +137,6 @@
 //#pragma link C++ class larlite::trigger+;
 
 #pragma link C++ class larlite::storage_manager+;
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_track>(string);
+//#pragma link C++ function larlite::storage_manager::get_data<larlite::event_track>(string);
 
 #endif

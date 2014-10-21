@@ -143,8 +143,8 @@ namespace larlite {
 	Specialize the template to the data product of your choice, and it cast the
 	pointer + return reference for you.
     */
-    template <class T>
-    T* get_data(std::string const name);
+    //template <class T>
+    //T* get_data(std::string const name);
     
     /// What data is available?
     std::map<larlite::data::DataType_t,std::set<std::string> > list_data_types() const;
@@ -170,8 +170,9 @@ namespace larlite {
     inline UInt_t get_entires_written() const {return _nevents_written;}
 
     /// Data product class => enum type converter
+    /*
     template <class T>
-    const ::larlite::data::DataType_t data_type() const
+    const ::larlite::data::DataType_t data_type()
     { 
       Message::send(msg::kERROR,
 		    __PRETTY_FUNCTION__,
@@ -179,7 +180,7 @@ namespace larlite {
       throw std::exception();
       return data::kUndefined;
     }
-    
+    */    
   private:
     
     static storage_manager* me; ///< shared object instance pointer
