@@ -19,11 +19,11 @@
 #include <vector>
 #include <cmath>
 namespace larlite{
+
   /**
-     \class hit
+     \class mcflux
      LArSoft MCFlux class equivalent data container
   */
-
   class mcflux : public data_base {
     
   public:
