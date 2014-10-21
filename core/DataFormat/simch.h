@@ -43,12 +43,12 @@ namespace larlite {
 			     z(origin.z)
     {}
 
-    Int_t    trackID;      ///< Geant4 supplied track ID
-    Double_t numElectrons; ///< total number of electrons for this track ID and time
-    Double_t energy;       ///< total energy deposited for this track ID and time
-    Double_t x;            ///< x position of ionization
-    Double_t y;            ///< y position of ionization
-    Double_t z;            ///< z position of ionization
+    int    trackID;      ///< Geant4 supplied track ID
+    double numElectrons; ///< total number of electrons for this track ID and time
+    double energy;       ///< total energy deposited for this track ID and time
+    double x;            ///< x position of ionization
+    double y;            ///< y position of ionization
+    double z;            ///< z position of ionization
     
     /// Initialize attributes
     void clear_data();
@@ -79,38 +79,38 @@ namespace larlite {
     virtual void clear_data();
 
     ///--- Setters ---///
-    void set_channel(UShort_t ch)
+    void set_channel(unsigned short ch)
     { fChannel = ch; }
 
-    void add_ide(UShort_t tdc, ide in);
+    void add_ide(unsigned short tdc, ide in);
 
     ///--- Getters ---///
 
     /// Channel number getter
-    UShort_t Channel() const
+    unsigned short Channel() const
     { return fChannel; }
 
     /**
        method to return a collection of IDE structs for all geant4
        track ids represented between startTDC and endTDC
     */
-    std::vector<larlite::ide> TrackIDsAndEnergies(UShort_t startTDC,
-						   UShort_t endTDC) const;
+    std::vector<larlite::ide> TrackIDsAndEnergies(unsigned short startTDC,
+						   unsigned short endTDC) const;
     
     /// IDE map getter
-    const std::map<UShort_t, std::vector<larlite::ide> >& TDCIDEMap() const
+    const std::map<unsigned short, std::vector<larlite::ide> >& TDCIDEMap() const
     { return fTDCIDEs; }
 
     /**
        The number of ionization electrons associated with this channel for the
        specified TDC.
     */
-    Double_t Charge(UShort_t tdc) const;
+    double Charge(unsigned short tdc) const;
 
     /**
        Total energy deposit associated with this channel for the specified TDC.
     */    
-    Double_t Energy(UShort_t tdc) const;
+    double Energy(unsigned short tdc) const;
 
     /// Comparison operator
     //inline bool operator< (const simch& other) { return fChannel < other.fChannel };
@@ -118,10 +118,10 @@ namespace larlite {
   private:
 
     /// electronics channel associated with these sim::Electrons
-    UShort_t fChannel; 
+    unsigned short fChannel; 
 
     /// vector of IDE structs for each TDC with signal
-    std::map<UShort_t, std::vector< larlite::ide > > fTDCIDEs;
+    std::map<unsigned short, std::vector< larlite::ide > > fTDCIDEs;
 
     ////////////////////////
     ClassDef(simch,1)

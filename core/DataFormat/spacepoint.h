@@ -31,10 +31,10 @@ namespace larlite {
     /// Default constructor
     spacepoint() : data_base(data::kSpacePoint) {clear_data();}
     
-    spacepoint(Int_t id, 
-	       Double_t x,  Double_t y,  Double_t z,
-	       Double_t ex, Double_t ey, Double_t ez,
-	       Double_t chi2) : data_base(data::kSpacePoint)
+    spacepoint(int id, 
+	       double x,  double y,  double z,
+	       double ex, double ey, double ez,
+	       double chi2) : data_base(data::kSpacePoint)
     {
       clear_data();
       fID=id;
@@ -50,10 +50,10 @@ namespace larlite {
     /// Default destructor
     virtual ~spacepoint(){}
     
-    Int_t           ID()     const { return fID;     }
-    const Double_t* XYZ()    const { return fXYZ;    }
-    const Double_t* ErrXYZ() const { return fErrXYZ; }
-    Double_t        Chisq()  const { return fChisq;  }
+    int           ID()     const { return fID;     }
+    const double* XYZ()    const { return fXYZ;    }
+    const double* ErrXYZ() const { return fErrXYZ; }
+    double        Chisq()  const { return fChisq;  }
     
     /// Method to clear data member
     void clear_data() {
@@ -70,10 +70,10 @@ namespace larlite {
     
   protected:
     
-    Int_t                        fID;        ///< SpacePoint ID
-    Double_t                     fXYZ[3];    ///< position of SpacePoint in xyz
-    Double_t                     fErrXYZ[6]; ///< Error matrix (triangular).
-    Double_t                     fChisq;     ///< Chisquare. 
+    int                        fID;        ///< SpacePoint ID
+    double                     fXYZ[3];    ///< position of SpacePoint in xyz
+    double                     fErrXYZ[6]; ///< Error matrix (triangular).
+    double                     fChisq;     ///< Chisquare. 
     
   private:
     

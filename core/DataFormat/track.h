@@ -34,21 +34,21 @@ namespace larlite {
     /// Default destructor
     virtual ~track(){}
     
-    inline Int_t     track_id      ()               const { return fID;                  }
+    inline int     track_id      ()               const { return fID;                  }
     inline size_t    n_point       ()               const { return fDir.size();          }
     inline size_t    n_covariance  ()               const { return fCov.size();          }
     inline size_t    n_momentum    ()               const { return fFitMomentum.size();  }
     inline size_t    n_dQdx        ()               const { return fdQdx.size();         }
     
-    inline const TVector3& direction_at  (UInt_t p) const { return fDir.at(p);           }
-    inline const TVector3& vertex_at     (UInt_t p) const { return fXYZ.at(p);           }
-    inline       Double_t    momentum_at (UInt_t p) const { return fFitMomentum.at(p);   }
-    inline const TMatrixD& covariance_at (UInt_t p) const { return fCov.at(p);           }
+    inline const TVector3& direction_at  (unsigned int p) const { return fDir.at(p);           }
+    inline const TVector3& vertex_at     (unsigned int p) const { return fXYZ.at(p);           }
+    inline       double    momentum_at (unsigned int p) const { return fFitMomentum.at(p);   }
+    inline const TMatrixD& covariance_at (unsigned int p) const { return fCov.at(p);           }
     
-    inline void set_track_id   (const Int_t id)     { fID = id;                  }
+    inline void set_track_id   (const int id)     { fID = id;                  }
     inline void add_vertex     (const TVector3 v) { fXYZ.push_back(v);         }
     inline void add_direction  (const TVector3 v) { fDir.push_back(v);         }
-    inline void add_momentum   (const Double_t   v) { fFitMomentum.push_back(v); }
+    inline void add_momentum   (const double   v) { fFitMomentum.push_back(v); }
     inline void add_covariance (const TMatrixD m) { fCov.push_back(m);         }
     
     virtual void clear_data();
@@ -56,7 +56,7 @@ namespace larlite {
   protected:
     
     /// track's ID
-    Int_t fID;            
+    int fID;            
     
     /// position of points along the track
     std::vector<TVector3> fXYZ;
@@ -74,14 +74,14 @@ namespace larlite {
        charge deposition per unit length at points
        along track outer vector index is over view
     */
-    std::vector< std::vector <Double_t> > fdQdx;
+    std::vector< std::vector <double> > fdQdx;
     
     /**
        momentum at start and end of track
        determined from a fit. Intermediate points
        can be added if desired
     */
-    std::vector<Double_t> fFitMomentum;
+    std::vector<double> fFitMomentum;
     
   private:
     

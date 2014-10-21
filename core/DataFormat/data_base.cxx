@@ -14,6 +14,27 @@ namespace larlite {
     fAssociation.clear();
   }
 
+  void event_base::list_association() const
+  {
+    std::cout << "  Listing associations stored..." << std::endl;
+    for(auto const& id_ass : fAssociation) {
+
+      size_t ass_count=0;
+
+      for(auto const& ass_set : id_ass.second)
+
+	ass_count = ass_set.size();
+
+      std::cout << "    Type: " << data::kDATA_TREE_NAME[id_ass.first.first].c_str()
+		<< " (enum = "  << id_ass.first.first << ") "
+		<< " produced by \"" << id_ass.first.second.c_str() << "\""
+		<< " ... length is "  << id_ass.second.size()
+		<< " => " << ass_count << std::endl;
+
+    }
+    std::cout << "  ... done!" << std::endl;
+  }
+
   void event_base::set_association(const product_id type,
 				   const size_t index_source,
 				   const AssUnit_t& ass) {			   

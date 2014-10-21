@@ -39,52 +39,52 @@ namespace larlite {
     //--- Getters ---//
 
     /// Shower mother's PDGID
-    Int_t  MotherPDGID()   const { return fMotherPDGID;   }
+    int  MotherPDGID()   const { return fMotherPDGID;   }
 
     /// Shower mother's G4 track ID 
-    UInt_t MotherTrackID() const { return fMotherTrackID; }
+    unsigned int MotherTrackID() const { return fMotherTrackID; }
 
     /// Mother's creation process
     const std::string& MotherCreationProcess() const { return fMotherProcess; }
 
     /// Shower mother's start point position
-    const std::vector<Double_t>& MotherPosition() const { return fMotherVtx;      }
+    const std::vector<double>& MotherPosition() const { return fMotherVtx;      }
 
     /// Shower mother's start point momentum
-    const std::vector<Double_t>& MotherMomentum() const { return fMotherMomentum; }
+    const std::vector<double>& MotherMomentum() const { return fMotherMomentum; }
 
     /// Array of daughters' track ID
-    const std::vector<UInt_t>&  DaughterTrackID() const
+    const std::vector<unsigned int>&  DaughterTrackID() const
     { return fDaughterTrackID; }
 
     /// (x,y,z,dE) vector as a weighted average of daughters' energy deposition points
-    const std::vector<Double_t>& DaughterPosition() const
+    const std::vector<double>& DaughterPosition() const
     { return fDaughterVtx; }
 
     /// (x,y,z,dE) vector as a weighted average of daughters' energy deposition points
-    const std::vector<Double_t>& DaughterMomentum() const
+    const std::vector<double>& DaughterMomentum() const
     { return fDaughterMomentum; }
 
     /// Charge deposited by daughters per plane
-    Double_t Charge(const size_t plane) const;
+    double Charge(const size_t plane) const;
 
     //--- Setters ---//
 
-    void SetMotherID(Int_t pdgid, UInt_t trackid)
+    void SetMotherID(int pdgid, unsigned int trackid)
     { fMotherPDGID = pdgid; fMotherTrackID = trackid; }
 
     void SetMotherProcess(const std::string& process)
     { fMotherProcess = process; }
 
-    void SetMotherPoint(const std::vector<Double_t> &vtx);
+    void SetMotherPoint(const std::vector<double> &vtx);
 
-    void SetMotherMomentum(const std::vector<Double_t> &mom);
+    void SetMotherMomentum(const std::vector<double> &mom);
 
-    void SetDaughterPosition(const std::vector<Double_t> &vtx);
+    void SetDaughterPosition(const std::vector<double> &vtx);
 
-    void SetDaughterMomentum(const std::vector<Double_t> &mom);
+    void SetDaughterMomentum(const std::vector<double> &mom);
     
-    void SetDaughterTrackList(const std::vector<UInt_t> &list)
+    void SetDaughterTrackList(const std::vector<unsigned int> &list)
     { fDaughterTrackID = list; }
 
     void SetPlaneCharge(const std::vector<double>& q)
@@ -93,16 +93,16 @@ namespace larlite {
   private:
 
     //---- Mother info ----//
-    Int_t  fMotherPDGID;                   ///< mother PDG code
-    UInt_t fMotherTrackID;                 ///< mother G4 Track ID
+    int  fMotherPDGID;                   ///< mother PDG code
+    unsigned int fMotherTrackID;                 ///< mother G4 Track ID
     std::string fMotherProcess;            ///< mother creation process
-    std::vector<Double_t> fMotherVtx;      ///< mother position 4-vector @ generation
-    std::vector<Double_t> fMotherMomentum; ///< mother momentum 4-vector @ generation
+    std::vector<double> fMotherVtx;      ///< mother position 4-vector @ generation
+    std::vector<double> fMotherMomentum; ///< mother momentum 4-vector @ generation
 
     //---- Daughter info ----//
-    std::vector<UInt_t>  fDaughterTrackID;  ///< Daughters' track ID
-    std::vector<Double_t> fDaughterVtx;      ///< Daughters' deposit point closest to the mother vtx
-    std::vector<Double_t> fDaughterMomentum; ///< Daughters' deposit sum momentum 4-vector
+    std::vector<unsigned int>  fDaughterTrackID;  ///< Daughters' track ID
+    std::vector<double> fDaughterVtx;      ///< Daughters' deposit point closest to the mother vtx
+    std::vector<double> fDaughterMomentum; ///< Daughters' deposit sum momentum 4-vector
 
     //---- Charge per plane ----//
     std::vector<double> fPlaneCharge; ///< Charge deposit per plane

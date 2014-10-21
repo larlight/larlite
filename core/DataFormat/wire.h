@@ -30,8 +30,8 @@ namespace larlite {
     wire() : data_base(data::kWire) {clear_data();}
 
     /// Alternative constructor
-    wire(const std::vector<Float_t> wf,
-	 const UInt_t ch,
+    wire(const std::vector<float> wf,
+	 const unsigned int ch,
 	 const geo::View_t view,
 	 const geo::SigType_t sig) 
       : data_base(data::kWire),
@@ -55,9 +55,9 @@ namespace larlite {
     void clear_data();
     
     /// Setter for an waveform
-    void set_signal(const std::vector<Float_t> wf) { fSignal=wf; }
+    void set_signal(const std::vector<float> wf) { fSignal=wf; }
     /// Setter for a channel number
-    void set_channel(UInt_t    ch)   { fChannel = ch;   }
+    void set_channel(unsigned int    ch)   { fChannel = ch;   }
     /// Setter for view type
     void set_view   (geo::View_t v)    { fView = v;       }
     /// Setter for signal type
@@ -65,20 +65,20 @@ namespace larlite {
     
     // Get Methods
     /// Getter for waveform
-    const std::vector<Float_t>&  Signal()     const { return fSignal;        }
+    const std::vector<float>&  Signal()     const { return fSignal;        }
     /// Getter for view type
     geo::View_t                View()       const { return fView;          }
     /// Getter for signal type
     geo::SigType_t             SignalType() const { return fSignalType;    }
     /// Getter for channel number
-    UInt_t                   Channel()    const { return fChannel;       }
+    unsigned int                   Channel()    const { return fChannel;       }
     
   protected:
     
-    std::vector<Float_t> fSignal;     ///< the calibrated signal waveform
+    std::vector<float> fSignal;     ///< the calibrated signal waveform
     geo::View_t        fView;       ///< view corresponding to the plane of this wire
     geo::SigType_t     fSignalType; ///< signal type of the plane for this wire
-    UInt_t             fChannel;    ///< channel number
+    unsigned int             fChannel;    ///< channel number
     
   private:
     

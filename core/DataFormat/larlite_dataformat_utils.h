@@ -39,8 +39,8 @@ namespace larlite{
     { this->first=data::kUndefined; this->second="noname"; }
 
     /// alternative ctor
-    product_id(data::DataType_t const& type,
-	       std::string const& name)
+    product_id(data::DataType_t const type,
+	       std::string const name)
     { this->first=type; this->second=name; }
 
     /// virtual dtor

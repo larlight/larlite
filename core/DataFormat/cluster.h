@@ -34,30 +34,30 @@ namespace larlite{
     /// Default destructor
     virtual ~cluster(){}
     
-    void set_charge   (Double_t q)      { fTotalCharge = q; }
-    void set_dtdw     (Double_t v)      { fdTdW=v; }
-    void set_dqdw     (Double_t v)      { fdQdW=v; }
-    void set_dtdw_err (Double_t v)      { fSigmadTdW=v; }
-    void set_dqdw_err (Double_t v)      { fSigmadQdW=v; }
-    void set_id       (Int_t i)         { fID = i; }
+    void set_charge   (double q)      { fTotalCharge = q; }
+    void set_dtdw     (double v)      { fdTdW=v; }
+    void set_dqdw     (double v)      { fdQdW=v; }
+    void set_dtdw_err (double v)      { fSigmadTdW=v; }
+    void set_dqdw_err (double v)      { fSigmadQdW=v; }
+    void set_id       (int i)         { fID = i; }
     void set_view     (geo::View_t v) { fView=v; }
-    void set_start_vtx     (const std::vector<Double_t> vtx) { fStartPos=vtx;      }
-    void set_end_vtx       (const std::vector<Double_t> vtx) { fEndPos=vtx;        }
-    void set_start_vtx_err (const std::vector<Double_t> vtx) { fSigmaStartPos=vtx; }
-    void set_end_vtx_err   (const std::vector<Double_t> vtx) { fSigmaEndPos=vtx;   }
+    void set_start_vtx     (const std::vector<double> vtx) { fStartPos=vtx;      }
+    void set_end_vtx       (const std::vector<double> vtx) { fEndPos=vtx;        }
+    void set_start_vtx_err (const std::vector<double> vtx) { fSigmaStartPos=vtx; }
+    void set_end_vtx_err   (const std::vector<double> vtx) { fSigmaEndPos=vtx;   }
     
-    inline Double_t       Charge()    const { return fTotalCharge;   }
-    inline Double_t       dTdW()      const { return fdTdW;          }
-    inline Double_t       dQdW()      const { return fdQdW;          }
-    inline Double_t       SigmadTdW() const { return fSigmadTdW;     }
-    inline Double_t       SigmadQdW() const { return fSigmadQdW;     }
-    inline Int_t          ID()        const { return fID;            }
+    inline double       Charge()    const { return fTotalCharge;   }
+    inline double       dTdW()      const { return fdTdW;          }
+    inline double       dQdW()      const { return fdQdW;          }
+    inline double       SigmadTdW() const { return fSigmadTdW;     }
+    inline double       SigmadQdW() const { return fSigmadQdW;     }
+    inline int          ID()        const { return fID;            }
     inline geo::View_t  View()      const { return fView;          }
     
-    inline const std::vector<Double_t>& StartPos()      const { return fStartPos;      }
-    inline const std::vector<Double_t>& EndPos()        const { return fEndPos;        }
-    inline const std::vector<Double_t>& SigmaStartPos() const { return fSigmaStartPos; }
-    inline const std::vector<Double_t>& SigmaEndPos()   const { return fSigmaEndPos;   }
+    inline const std::vector<double>& StartPos()      const { return fStartPos;      }
+    inline const std::vector<double>& EndPos()        const { return fEndPos;        }
+    inline const std::vector<double>& SigmaStartPos() const { return fSigmaStartPos; }
+    inline const std::vector<double>& SigmaEndPos()   const { return fSigmaEndPos;   }
     virtual void clear_data(){
       data_base::clear_data();
       fTotalCharge = -1;
@@ -72,16 +72,16 @@ namespace larlite{
     
   private:
     
-    Double_t              fTotalCharge;    ///< total charge in cluster
-    Double_t              fdTdW;           ///< slope of cluster in tdc vs wire
-    Double_t              fdQdW;           ///< slope of cluster in charge vs wire
-    Double_t              fSigmadTdW;      ///< slope of cluster in tdc vs wire
-    Double_t              fSigmadQdW;      ///< slope of cluster in charge vs wire
-    std::vector<Double_t> fStartPos;       ///< start of cluster in (wire, tdc) plane
-    std::vector<Double_t> fEndPos;         ///< start of cluster in (wire, tdc) plane
-    std::vector<Double_t> fSigmaStartPos;  ///< start of cluster in (wire, tdc) plane
-    std::vector<Double_t> fSigmaEndPos;    ///< start of cluster in (wire, tdc) plane
-    Int_t                 fID;             ///< cluster's ID
+    double              fTotalCharge;    ///< total charge in cluster
+    double              fdTdW;           ///< slope of cluster in tdc vs wire
+    double              fdQdW;           ///< slope of cluster in charge vs wire
+    double              fSigmadTdW;      ///< slope of cluster in tdc vs wire
+    double              fSigmadQdW;      ///< slope of cluster in charge vs wire
+    std::vector<double> fStartPos;       ///< start of cluster in (wire, tdc) plane
+    std::vector<double> fEndPos;         ///< start of cluster in (wire, tdc) plane
+    std::vector<double> fSigmaStartPos;  ///< start of cluster in (wire, tdc) plane
+    std::vector<double> fSigmaEndPos;    ///< start of cluster in (wire, tdc) plane
+    int                 fID;             ///< cluster's ID
     geo::View_t           fView;           ///< View associated w/ this cluster
     
     ////////////////////////

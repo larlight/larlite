@@ -30,12 +30,12 @@ namespace larlite {
     mcpart() : data_base(data::kMCParticle) {clear_data();}
     
     /// Alternative constructor
-    mcpart(const Int_t       trackId,
-	   const Int_t       pdgid,
+    mcpart(const int       trackId,
+	   const int       pdgid,
 	   const std::string process,
-	   const Int_t       mother = data::kINVALID_INT,
-	   const Double_t    mass   = data::kINVALID_DOUBLE,
-	   const Int_t       status = data::kINVALID_INT   );
+	   const int       mother = data::kINVALID_INT,
+	   const double    mass   = data::kINVALID_DOUBLE,
+	   const int       status = data::kINVALID_INT   );
 
     /// Default destructor
     virtual ~mcpart(){}
@@ -47,8 +47,8 @@ namespace larlite {
 
     inline void AddDaughter     (const int trackID)   { fdaughters.insert(trackID);  }
     inline void SetPolarization (TVector3 const& p)   { fpolarization = p;           }
-    inline void SetRescatter    (Int_t code)          { frescatter    = code;        }
-    inline void SetWeight       (Double_t wt)         { fWeight       = wt;          }
+    inline void SetRescatter    (int code)          { frescatter    = code;        }
+    inline void SetWeight       (double wt)         { fWeight       = wt;          }
     inline void SetTrajectory   (const mctrajectory steps) { ftrajectory   = steps;       }
     inline void AddTrajectory   (const mcstep step)   { ftrajectory.push_back(step); }
     inline void AddTrajectory   (const TLorentzVector& position,
@@ -63,36 +63,36 @@ namespace larlite {
 
     ///--- Getters ---///
 
-    Int_t                  StatusCode()   const { return fstatus;       }
-    Int_t                  TrackId()      const { return ftrackId;      }
-    Int_t                  PdgCode()      const { return fpdgCode;      }
-    Int_t                  Mother()       const { return fmother;       }
+    int                  StatusCode()   const { return fstatus;       }
+    int                  TrackId()      const { return ftrackId;      }
+    int                  PdgCode()      const { return fpdgCode;      }
+    int                  Mother()       const { return fmother;       }
     const std::string      Process()      const { return fprocess;      }
     const mctrajectory&    Trajectory()   const { return ftrajectory;   }
-    Double_t               Mass()         const { return fmass;         }
+    double               Mass()         const { return fmass;         }
     const TVector3&        Polarization() const { return fpolarization; }
-    const std::set<Int_t>& Daughters()    const { return fdaughters;    } 
-    Double_t               Weight()       const { return fWeight;       }
+    const std::set<int>& Daughters()    const { return fdaughters;    } 
+    double               Weight()       const { return fWeight;       }
     TLorentzVector         GetGvtx()      const { return fGvtx;         }
-    Int_t                  Rescatter()    const { return frescatter;    }
+    int                  Rescatter()    const { return frescatter;    }
 
     const std::vector<std::pair<size_t,size_t> >& FiducialTrack() const 
     {return ftrackFiducial;}
 
   private:
 
-    Int_t           fstatus;       ///< Status code from generator, geant, etc
-    Int_t           ftrackId;      ///< TrackId
-    Int_t           fpdgCode;      ///< PDG code
-    Int_t           fmother;       ///< Mother
+    int           fstatus;       ///< Status code from generator, geant, etc
+    int           ftrackId;      ///< TrackId
+    int           fpdgCode;      ///< PDG code
+    int           fmother;       ///< Mother
     std::string     fprocess;      ///< Detector-simulation physics process that created the particle
     mctrajectory    ftrajectory;   ///< particle trajectory (position,momentum)
-    Double_t        fmass;         ///< Mass; from PDG unless overridden Should be in GeV
+    double        fmass;         ///< Mass; from PDG unless overridden Should be in GeV
     TVector3        fpolarization; ///< Polarization
-    std::set<Int_t> fdaughters;    ///< Sorted list of daughters of this particle.
-    Double_t        fWeight;       ///< Assigned weight to this particle for MC tests
+    std::set<int> fdaughters;    ///< Sorted list of daughters of this particle.
+    double        fWeight;       ///< Assigned weight to this particle for MC tests
     TLorentzVector  fGvtx;         ///< Vertex needed by generater (genie) to rebuild. genie::EventRecord for event reweighting
-    Int_t           frescatter;    ///< rescatter code
+    int           frescatter;    ///< rescatter code
 
     std::vector<std::pair<size_t,size_t> > ftrackFiducial; ///< mctrajectory indexes for a trajectory inside fiducial volume
    

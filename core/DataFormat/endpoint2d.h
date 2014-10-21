@@ -30,12 +30,12 @@ namespace larlite {
     endpoint2d() : data_base(data::kEndPoint2D) {clear_data();}
 
     /// Alternative constructor
-    endpoint2d(Double_t    driftTime,
-	       UInt_t      wire,
-	       Double_t    strength,
-	       Int_t       id,
+    endpoint2d(double    driftTime,
+	       unsigned int      wire,
+	       double    strength,
+	       int       id,
 	       geo::View_t view,
-	       Double_t    totalQ);
+	       double    totalQ);
     
     /// Default destructor
     virtual ~endpoint2d(){}
@@ -44,21 +44,21 @@ namespace larlite {
     virtual void clear_data();
 
     ///--- Getters ---///
-    Double_t    Charge()    const { return fTotalCharge; }
+    double    Charge()    const { return fTotalCharge; }
     geo::View_t View()      const { return fView;        }
-    Double_t    DriftTime() const { return fDriftTime;   }
-    UInt_t      Wire()      const { return fWire;        }
-    Int_t       ID()        const { return fID;          }
-    Double_t    Strength()  const { return fStrength;    }
+    double    DriftTime() const { return fDriftTime;   }
+    unsigned int      Wire()      const { return fWire;        }
+    int       ID()        const { return fID;          }
+    double    Strength()  const { return fStrength;    }
 
   private:
 
-    Double_t    fDriftTime;    ///< vertex's drift time
-    UInt_t      fWire;         ///< vertex's wireID
-    Int_t       fID;           ///< vertex's ID
-    Double_t    fStrength;     ///< vertex's strength
+    double    fDriftTime;    ///< vertex's drift time
+    unsigned int      fWire;         ///< vertex's wireID
+    int       fID;           ///< vertex's ID
+    double    fStrength;     ///< vertex's strength
     geo::View_t fView;         ///< view for this end point
-    Double_t    fTotalCharge;  ///< total charge of hits associated with end point 
+    double    fTotalCharge;  ///< total charge of hits associated with end point 
     
     ////////////////////////
     ClassDef(endpoint2d,1)

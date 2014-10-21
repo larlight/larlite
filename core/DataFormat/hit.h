@@ -35,58 +35,58 @@ namespace larlite{
     void clear_data();
     
     // Set methods
-    void set_waveform  (const std::vector<Double_t>& wf) { fHitSignal = wf;}
-    void set_times     (Double_t start, Double_t peak, Double_t end)
+    void set_waveform  (const std::vector<double>& wf) { fHitSignal = wf;}
+    void set_times     (double start, double peak, double end)
     {fStartTime = start; fPeakTime = peak; fEndTime = end;}
-    void set_times_err (Double_t start, Double_t peak, Double_t end)
+    void set_times_err (double start, double peak, double end)
     {fSigmaStartTime = start; fSigmaPeakTime = peak; fSigmaEndTime = end;}
-    void set_charge    (Double_t q, Double_t q_max)
+    void set_charge    (double q, double q_max)
     {fCharge=q; fMaxCharge = q_max;}
-    void set_charge_err(Double_t q, Double_t q_max)
+    void set_charge_err(double q, double q_max)
     {fSigmaCharge=q; fSigmaMaxCharge=q_max;}
-    void set_multiplicity(Int_t m){ fMultiplicity=m;}
-    void set_channel (UInt_t ch){ fChannel=ch;}
-    void set_wire    (UInt_t wire) { fWire=wire;}
-    void set_fit_goodness(Double_t v){ fGoodnessOfFit = v;}
+    void set_multiplicity(int m){ fMultiplicity=m;}
+    void set_channel (unsigned int ch){ fChannel=ch;}
+    void set_wire    (unsigned int wire) { fWire=wire;}
+    void set_fit_goodness(double v){ fGoodnessOfFit = v;}
     void set_view(geo::View_t v){ fView = v;}
     void set_sigtype(geo::SigType_t t) {fSignalType=t;}
     
     // Get Methods 
-    const std::vector<Double_t>& HitSignal()    const { return fHitSignal;      }  
-    Double_t        StartTime()                 const { return fStartTime;      }  
-    Double_t        EndTime()                   const { return fEndTime;        }
-    Double_t        PeakTime()                  const { return fPeakTime;       }
-    Double_t        SigmaStartTime()            const { return fSigmaStartTime; }
-    Double_t        SigmaEndTime()              const { return fSigmaEndTime;   }
-    Double_t        SigmaPeakTime()             const { return fSigmaPeakTime;  }
-    Int_t           Multiplicity()              const { return fMultiplicity;   }
-    UInt_t          Channel()                   const { return fChannel;        }
-    UInt_t          Wire()                      const { return fWire;           }
-    Double_t        Charge(bool max=false)      const { return ( max ? fMaxCharge : fCharge);}
-    Double_t        SigmaCharge(bool max=false) const { return ( max ? fSigmaMaxCharge : fSigmaCharge ); }
-    Double_t        GoodnessOfFit()             const { return fGoodnessOfFit;  }
+    const std::vector<double>& HitSignal()    const { return fHitSignal;      }  
+    double        StartTime()                 const { return fStartTime;      }  
+    double        EndTime()                   const { return fEndTime;        }
+    double        PeakTime()                  const { return fPeakTime;       }
+    double        SigmaStartTime()            const { return fSigmaStartTime; }
+    double        SigmaEndTime()              const { return fSigmaEndTime;   }
+    double        SigmaPeakTime()             const { return fSigmaPeakTime;  }
+    int           Multiplicity()              const { return fMultiplicity;   }
+    unsigned int          Channel()                   const { return fChannel;        }
+    unsigned int          Wire()                      const { return fWire;           }
+    double        Charge(bool max=false)      const { return ( max ? fMaxCharge : fCharge);}
+    double        SigmaCharge(bool max=false) const { return ( max ? fSigmaMaxCharge : fSigmaCharge ); }
+    double        GoodnessOfFit()             const { return fGoodnessOfFit;  }
     geo::SigType_t  SignalType()                const { return fSignalType;     }
     geo::View_t     View()                      const { return fView;           }
     
   protected:
     
-    std::vector<Double_t>   fHitSignal;      ///< vector of ADC values within the hit window
-    Double_t                fStartTime;      ///< initial tdc tick for hit 
-    Double_t                fSigmaStartTime; ///< uncertainty on initial tick
-    Double_t                fPeakTime;       ///< tdc for the peak charge deposition
-    Double_t                fSigmaPeakTime;  ///< uncertainty for tdc of the peak
-    Double_t                fEndTime;        ///< final tdc tick for hit
-    Double_t                fSigmaEndTime;   ///< uncertainty on final tick
-    Double_t                fCharge;         ///< total charge deposited for hit
-    Double_t                fSigmaCharge;    ///< uncertainty in total charge deposited
-    Double_t                fMaxCharge;      ///< maximum ADC value in hit window
-    Double_t                fSigmaMaxCharge; ///< maximum ADC value in hit window
-    Int_t                   fMultiplicity;   ///< how many hits could this one be shared with
-    Double_t                fGoodnessOfFit;  ///< how well do we believe we know this hit?
+    std::vector<double>   fHitSignal;      ///< vector of ADC values within the hit window
+    double                fStartTime;      ///< initial tdc tick for hit 
+    double                fSigmaStartTime; ///< uncertainty on initial tick
+    double                fPeakTime;       ///< tdc for the peak charge deposition
+    double                fSigmaPeakTime;  ///< uncertainty for tdc of the peak
+    double                fEndTime;        ///< final tdc tick for hit
+    double                fSigmaEndTime;   ///< uncertainty on final tick
+    double                fCharge;         ///< total charge deposited for hit
+    double                fSigmaCharge;    ///< uncertainty in total charge deposited
+    double                fMaxCharge;      ///< maximum ADC value in hit window
+    double                fSigmaMaxCharge; ///< maximum ADC value in hit window
+    int                   fMultiplicity;   ///< how many hits could this one be shared with
+    double                fGoodnessOfFit;  ///< how well do we believe we know this hit?
     geo::View_t             fView;           ///< view for the plane of the hit
     geo::SigType_t          fSignalType;     ///< signal type for the plane of the hit
-    UInt_t                  fChannel;        ///< channel number
-    UInt_t                  fWire;           ///< wire number
+    unsigned int                  fChannel;        ///< channel number
+    unsigned int                  fWire;           ///< wire number
 
   private:
     

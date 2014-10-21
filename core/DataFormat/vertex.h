@@ -30,8 +30,8 @@ namespace larlite {
     vertex() : data_base(data::kVertex) {clear_data();}
 
     /// Alternative constructor
-    vertex(Double_t* xyz,
-	   Int_t      id=data::kINVALID_INT);
+    vertex(double* xyz,
+	   int      id=data::kINVALID_INT);
     
     /// Copy constructor
     vertex(const vertex &original) : data_base(original),
@@ -45,16 +45,16 @@ namespace larlite {
     virtual void clear_data();
 
     ///--- Getters ---///
-    void XYZ(Double_t *xyz) const;
-    Int_t ID() const   { return fID;     }
-    Double_t X() const { return fXYZ[0]; }
-    Double_t Y() const { return fXYZ[1]; }
-    Double_t Z() const { return fXYZ[2]; }
+    void XYZ(double *xyz) const;
+    int ID() const   { return fID;     }
+    double X() const { return fXYZ[0]; }
+    double Y() const { return fXYZ[1]; }
+    double Z() const { return fXYZ[2]; }
     
   private:
 
-    Double_t fXYZ[3];    ///< location of vertex
-    Int_t    fID;        ///< id number for vertex
+    double fXYZ[3];    ///< location of vertex
+    int    fID;        ///< id number for vertex
     
     ////////////////////////
     ClassDef(vertex,1)

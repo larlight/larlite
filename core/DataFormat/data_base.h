@@ -97,21 +97,21 @@ namespace larlite{
     // Simple type variable setters
     // 
     /// run number setter
-    void set_run      (UInt_t run) { fRunNumber    = run; }
+    void set_run      (unsigned int run) { fRunNumber    = run; }
     /// sub-run number setter
-    void set_subrun   (UInt_t run) { fSubRunNumber = run; }
+    void set_subrun   (unsigned int run) { fSubRunNumber = run; }
     /// event-id setter
-    void set_event_id (UInt_t id ) { fEventID      = id;  }
+    void set_event_id (unsigned int id ) { fEventID      = id;  }
 
     //
     // Simple type variable getters
     //     
     /// run number getter
-    UInt_t run      () const { return fRunNumber;    }
+    unsigned int run      () const { return fRunNumber;    }
     /// sub-run number getter
-    UInt_t subrun   () const { return fSubRunNumber; }
+    unsigned int subrun   () const { return fSubRunNumber; }
     /// event-id getter
-    UInt_t event_id () const { return fEventID;      }
+    unsigned int event_id () const { return fEventID;      }
     /// data type getter
     data::DataType_t data_type() const {return _type; }
     /// producer's name
@@ -143,16 +143,28 @@ namespace larlite{
     /// Getter for associated data product indecies from one object
     const AssUnit_t& association(const product_id type, const size_t index_source) const;
 
+    /// Getter for associated data product indecies for all objects
+    const AssSet_t& association(const data::DataType_t type, const std::string name) const
+    { return association(product_id(type,name)); }
+
+    /// Getter for associated data product indecies from one object
+    const AssUnit_t& association(const data::DataType_t type, const std::string name,
+				 const size_t index_source) const
+    { return association(product_id(type,name),index_source); }
+
+    /// List association
+    void list_association() const;
+
   protected:
     
     /// Run number
-    UInt_t fRunNumber;
+    unsigned int fRunNumber;
     
     /// Sub-Run number
-    UInt_t fSubRunNumber;
+    unsigned int fSubRunNumber;
     
     /// Event ID
-    UInt_t fEventID;
+    unsigned int fEventID;
 
     /// Producer's name
     std::string _name;

@@ -35,66 +35,66 @@ namespace larlite{
     virtual void clear_data();
     
     // Set methods
-    void set_id                (const Int_t id)                      { fID = id;                 }
-    void set_total_energy      (const std::vector< Double_t >& q)    { fTotalEnergy = q;         }
-    void set_total_energy_err  (const std::vector< Double_t >& q)    { fSigmaTotalEnergy = q;    }
-    void set_total_MIPenergy   (const std::vector< Double_t >& q)    { fTotalMIPEnergy = q;      }
-    void set_total_MIPenergy_err  (const std::vector< Double_t >& q) { fSigmaTotalMIPEnergy = q; }
+    void set_id                (const int id)                      { fID = id;                 }
+    void set_total_energy      (const std::vector< double >& q)    { fTotalEnergy = q;         }
+    void set_total_energy_err  (const std::vector< double >& q)    { fSigmaTotalEnergy = q;    }
+    void set_total_MIPenergy   (const std::vector< double >& q)    { fTotalMIPEnergy = q;      }
+    void set_total_MIPenergy_err  (const std::vector< double >& q) { fSigmaTotalMIPEnergy = q; }
     void set_total_best_plane  (const int q)                         { fBestPlane = q;        }
     
     void set_direction       (const TVector3& dir)        { fDCosStart = dir;        }
     void set_direction_err   (const TVector3& dir_e)      { fSigmaDCosStart = dir_e; }
     void set_start_point     (const TVector3& xyz)        { fXYZstart = xyz;        }
     void set_start_point_err (const TVector3& xyz_e)      { fSigmaXYZstart = xyz_e; }
-    void set_dedx      (const std::vector< Double_t >& q) { fdEdx = q;        }
-    void set_dedx_err  (const std::vector< Double_t >& q) { fSigmadEdx = q;        }
+    void set_dedx      (const std::vector< double >& q) { fdEdx = q;        }
+    void set_dedx_err  (const std::vector< double >& q) { fSigmadEdx = q;        }
    
     
-//     void set_max_width     (Double_t x, Double_t y) 
+//     void set_max_width     (double x, double y) 
 //     { fMaxWidthX=x; fMaxWidthY=y; }
-//     void set_distance_max_width (Double_t d)       { fDistanceMaxWidth = d;   }
+//     void set_distance_max_width (double d)       { fDistanceMaxWidth = d;   }
 
     // Get Methods 
-    //inline Double_t TotalCharge()      const { return fTotalCharge;      }
-    inline Int_t    ID()               const { return fID;               }
-   // inline Double_t MaxWidthX()        const { return fMaxWidthX;           }
-  //  inline Double_t MaxWidthY()        const { return fMaxWidthY;           }
-  //  inline Double_t DistanceMaxWidth() const { return fDistanceMaxWidth; }
+    //inline double TotalCharge()      const { return fTotalCharge;      }
+    inline int    ID()               const { return fID;               }
+   // inline double MaxWidthX()        const { return fMaxWidthX;           }
+  //  inline double MaxWidthY()        const { return fMaxWidthY;           }
+  //  inline double DistanceMaxWidth() const { return fDistanceMaxWidth; }
     inline const TVector3& Direction()    const { return fDCosStart;          }
     inline const TVector3& DirectionErr() const { return fSigmaDCosStart;     }
     
     inline const TVector3& ShowerStart()    const { return fXYZstart;          }
     inline const TVector3& ShowerStartErr() const { return fSigmaXYZstart;     }
 
-    inline const std::vector< Double_t >& Energy()    const { return fTotalEnergy;          }
-    inline const std::vector< Double_t >& EnergyErr() const { return fSigmaTotalEnergy;     }
+    inline const std::vector< double >& Energy()    const { return fTotalEnergy;          }
+    inline const std::vector< double >& EnergyErr() const { return fSigmaTotalEnergy;     }
     
-    inline const std::vector< Double_t >& MIPEnergy()    const { return fTotalMIPEnergy;          }
-    inline const std::vector< Double_t >& MIPEnergyErr() const { return fSigmaTotalMIPEnergy;     }
-    inline Int_t    best_plane()               const { return fBestPlane;               }
+    inline const std::vector< double >& MIPEnergy()    const { return fTotalMIPEnergy;          }
+    inline const std::vector< double >& MIPEnergyErr() const { return fSigmaTotalMIPEnergy;     }
+    inline int    best_plane()               const { return fBestPlane;               }
     
-    inline const std::vector< Double_t >& dEdx()    const { return fdEdx;          }
-    inline const std::vector< Double_t >& dEdxErr() const { return fSigmadEdx;     }
+    inline const std::vector< double >& dEdx()    const { return fdEdx;          }
+    inline const std::vector< double >& dEdxErr() const { return fSigmadEdx;     }
     
   protected:
 
-    Int_t fID;
+    int fID;
     TVector3 fDCosStart;             ///< direction cosines at start of shower
     TVector3 fSigmaDCosStart;        ///< uncertainting on initial direction cosines
     TVector3 fXYZstart;             ///< direction cosines at start of shower
     TVector3 fSigmaXYZstart;        ///< uncertainting on initial direction cosines
-    std::vector< Double_t > fTotalEnergy;           ///< Calculated Energy per each plane
-    std::vector< Double_t > fSigmaTotalEnergy;           ///< Calculated Energy per each plane
-    std::vector< Double_t > fdEdx;           ///< Calculated dEdx per each plane
-    std::vector< Double_t > fSigmadEdx;           ///< Calculated dEdx per each plane
+    std::vector< double > fTotalEnergy;           ///< Calculated Energy per each plane
+    std::vector< double > fSigmaTotalEnergy;           ///< Calculated Energy per each plane
+    std::vector< double > fdEdx;           ///< Calculated dEdx per each plane
+    std::vector< double > fSigmadEdx;           ///< Calculated dEdx per each plane
     
-    std::vector< Double_t > fTotalMIPEnergy;           ///< Calculated Energy per each plane
-    std::vector< Double_t > fSigmaTotalMIPEnergy;           ///< Calculated Energy per each plane
-    Int_t fBestPlane;
-  //  Double_t fMaxWidthX;             ///< maximum width of the prong in the x(0)
-  //  Double_t fMaxWidthY;             ///< maximum width of the prong in the y(0)
-  //  Double_t fDistanceMaxWidth;      ///< distance from the start of the prong to its maximum width
-  //  Double_t fTotalCharge;           ///< total charge of hits in the shower
+    std::vector< double > fTotalMIPEnergy;           ///< Calculated Energy per each plane
+    std::vector< double > fSigmaTotalMIPEnergy;           ///< Calculated Energy per each plane
+    int fBestPlane;
+  //  double fMaxWidthX;             ///< maximum width of the prong in the x(0)
+  //  double fMaxWidthY;             ///< maximum width of the prong in the y(0)
+  //  double fDistanceMaxWidth;      ///< distance from the start of the prong to its maximum width
+  //  double fTotalCharge;           ///< total charge of hits in the shower
 
   private:
     

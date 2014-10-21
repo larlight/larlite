@@ -264,29 +264,29 @@ namespace larlite {
 	      obj = key_iter.Next();			    
 	      if(!obj) break;
 	      obj = fin_dir->Get(obj->GetName());
-	      Message::send(msg::kINFO,__FUNCTION__,Form("Found object %s (type=%s)",obj->GetName(),obj->ClassName()));
+	      print(msg::kINFO,__FUNCTION__,Form("Found object %s (type=%s)",obj->GetName(),obj->ClassName()));
 	      if(std::string(obj->ClassName())!="TTree") {
-		Message::send(msg::kINFO,__FUNCTION__,Form("Skipping %s ... (not TTree)",obj->GetName()));
+		print(msg::kINFO,__FUNCTION__,Form("Skipping %s ... (not TTree)",obj->GetName()));
 		continue;
 	      }
 	      std::string obj_name = obj->GetName();
 	      char c[2] = "_";
 	      if(obj_name.find_first_of(c) > obj_name.size() ||
 		 obj_name.find_first_of(c) == obj_name.find_last_of(c)) {
-		Message::send(msg::kINFO,__FUNCTION__,Form("Skipping %s ... (not LArLite TTree)",obj->GetName()));
+		print(msg::kINFO,__FUNCTION__,Form("Skipping %s ... (not LArLite TTree)",obj->GetName()));
 		continue;
 	      }
 	      std::string type_name( obj_name.substr(0,obj_name.find_first_of(c)) );
 	      std::string suffix( obj_name.substr(obj_name.find_last_of(c)+1, obj_name.size()-obj_name.find_last_of(c)) );
 	      std::string producer_name( obj_name.substr(obj_name.find_first_of(c)+1,obj_name.find_last_of(c)-obj_name.find_first_of(c)-1) );
 	      if(suffix != "tree") {
-		Message::send(msg::kINFO,__FUNCTION__,Form("Skipping %s ... (not LArLite TTree)",obj->GetName()));
+		print(msg::kINFO,__FUNCTION__,Form("Skipping %s ... (not LArLite TTree)",obj->GetName()));
 		continue;
 	      }
 	      for(size_t i=0; i<data::kDATA_TYPE_MAX; ++i)
 		if(data::kDATA_TREE_NAME[i] == type_name) {
 		  _in_ch[(data::DataType_t)i].insert(std::make_pair(producer_name.c_str(),nullptr));
-		  Message::send(msg::kINFO,__FUNCTION__,Form("Found %s tree made by %s...",type_name.c_str(),producer_name.c_str()));
+		  print(msg::kINFO,__FUNCTION__,Form("Found %s tree made by %s...",type_name.c_str(),producer_name.c_str()));
 		  break;
 		}
 	    }
@@ -299,11 +299,11 @@ namespace larlite {
 
     case kWRITE:
       sprintf(_buf,"Opening a file in kWRITE mode: %s",_out_fname.c_str());
-      Message::send(msg::kNORMAL,__FUNCTION__,_buf);
+      print(msg::kNORMAL,__FUNCTION__,_buf);
       _fout=TFile::Open(_out_fname.c_str(),"RECREATE");
       if(!_fout) {
 	sprintf(_buf,"Open attempt failed for a file: %s", _out_fname.c_str());
-	Message::send(msg::kERROR,__FUNCTION__,_buf);
+	print(msg::kERROR,__FUNCTION__,_buf);
 	status=false;
       }else if(!_name_out_tdirectory.empty()) {
 	
@@ -324,7 +324,7 @@ namespace larlite {
     if(!status) return status;
     
     if(_verbosity[msg::kDEBUG])
-      Message::send(msg::kDEBUG,__PRETTY_FUNCTION__,"ends ...");
+      print(msg::kDEBUG,__PRETTY_FUNCTION__,"ends ...");
     
     _status=kOPENED;
     return prepare_tree();
@@ -348,7 +348,7 @@ namespace larlite {
     
     if(_status!=kOPENED) {
       sprintf(_buf,"Unexpected function call @ _status=%d!",_status);
-      Message::send(msg::kERROR,__FUNCTION__,_buf);
+      print(msg::kERROR,__FUNCTION__,_buf);
       status=false;
     }
     
