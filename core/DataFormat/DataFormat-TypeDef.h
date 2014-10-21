@@ -14,12 +14,15 @@
 #include "data_base.h"
 //#include "larlite_association.h"
 
+#include "rawdigit.h"
+
 #include "wire.h"
 #include "hit.h"
 #include "cluster.h"
 #include "cosmictag.h"
 #include "opflash.h"
 #include "ophit.h"
+#include "seed.h"
 #include "endpoint2d.h"
 #include "spacepoint.h"
 #include "track.h"
@@ -51,6 +54,9 @@ namespace larlite{
   class event_base;
   class product_id;
 
+  class rawdigit;
+  class event_rawdigit;
+
   class wire;
   class event_wire;
 
@@ -75,6 +81,9 @@ namespace larlite{
   class spacepoint;
   class event_spacepoint;  
 
+  class seed;
+  class event_seed;
+  
   class vertex;
   class event_vertex;
 

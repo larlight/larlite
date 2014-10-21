@@ -8,6 +8,7 @@
 // Header files included here
 #include "FrameworkConstants.h"
 #include "MCConstants.h"
+#include "RawConstants.h"
 #include "GeoConstants.h"
 #include "DataFormatConstants.h"
 #include "larlite_base.h"

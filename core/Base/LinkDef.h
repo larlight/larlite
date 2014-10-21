@@ -15,7 +15,6 @@
 #pragma link C++ namespace larlite::msg;
 #pragma link C++ namespace larlite::data;
 #pragma link C++ namespace larlite::geo;
-#pragma link C++ namespace larlite::mc;
 
 #pragma link C++ enum larlite::geo::SigType_t;
 #pragma link C++ enum larlite::geo::View_t;

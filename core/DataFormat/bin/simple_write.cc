@@ -37,7 +37,8 @@ int main(){
   }
 
   // Let's fill event_track for 100 events.
-  auto my_event_track = (larlite::event_track*)(my_storage.get_data(larlite::data::kTrack,"test"));
+  //auto my_event_track = my_storage.get_data<larlite::event_track>("test");
+  auto my_event_track = (::larlite::event_track*)(my_storage.get_data(larlite::data::kTrack,"test"));
   int run_id = 1;
   int subrun_id = 1;
   for( int i=0; i<100; i++){

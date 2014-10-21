@@ -13,7 +13,7 @@ namespace larlite {
     fPartList.clear();
     fMCNeutrino.clear_data();
     fNeutrinoSet=false;
-    fOrigin=mc::kUnknown;
+    fOrigin=simb::kUnknown;
   }
 
   //*************************************

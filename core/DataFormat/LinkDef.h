@@ -32,6 +32,10 @@
 #pragma link C++ class larlite::event_base+;
 //#pragma link C++ class larlite::association+;
 
+#pragma link C++ class larlite::rawdigit+;
+#pragma link C++ class std::vector<larlite::rawdigit>+;
+#pragma link C++ class larlite::event_rawdigit+;
+
 #pragma link C++ class larlite::wire+;
 #pragma link C++ class std::vector<larlite::wire>+;
 #pragma link C++ class larlite::event_wire+;
@@ -59,6 +63,10 @@
 #pragma link C++ class larlite::endpoint2d+;
 #pragma link C++ class std::vector<larlite::endpoint2d>+;
 #pragma link C++ class larlite::event_endpoint2d+;
+
+#pragma link C++ class larlite::seed+;
+#pragma link C++ class std::vector<larlite::seed>+;
+#pragma link C++ class larlite::event_seed+;
 
 #pragma link C++ class larlite::spacepoint+;
 #pragma link C++ class std::vector<larlite::spacepoint>+;
@@ -129,5 +137,6 @@
 //#pragma link C++ class larlite::trigger+;
 
 #pragma link C++ class larlite::storage_manager+;
+#pragma link C++ function larlite::storage_manager::get_data<larlite::event_track>(string);
 
 #endif

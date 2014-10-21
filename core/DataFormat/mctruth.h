@@ -37,7 +37,7 @@ namespace larlite {
 
     ///--- Setters/Adders ---///
     void Add(mcpart part)              { fPartList.push_back(part); }
-    void SetOrigin( mc::Origin_t orig) { fOrigin = orig;            }
+    void SetOrigin( simb::Origin_t orig) { fOrigin = orig;            }
     void SetNeutrino(Int_t CCNC,
 		     Int_t mode,
 		     Int_t interactionType,
@@ -51,20 +51,20 @@ namespace larlite {
 
     ///--- Getters ---///
 
-    const std::vector<larlite::mcpart>& GetParticles() const { return fPartList;    }
+    const std::vector<larlite::mcpart>&  GetParticles() const { return fPartList;    }
     const mcnu&                          GetNeutrino()  const { return fMCNeutrino;  }
-    mc::Origin_t                         Origin()       const { return fOrigin;      }
+    simb::Origin_t                       Origin()       const { return fOrigin;      }
     Bool_t                               NeutrinoSet()  const { return fNeutrinoSet; }
 
   private:
     
-    std::vector<larlite::mcpart> fPartList;    ///< list of particles in this event
+    std::vector<larlite::mcpart>  fPartList;    ///< list of particles in this event
     mcnu                          fMCNeutrino;  ///< reference to neutrino info - null if not a neutrino
-    mc::Origin_t                  fOrigin;      ///< origin for this event
+    simb::Origin_t                fOrigin;      ///< origin for this event
     Bool_t                        fNeutrinoSet; ///< flag for whether the neutrino information has been set
     
     ////////////////////////
-    ClassDef(mctruth,6)
+    ClassDef(mctruth,1)
     ////////////////////////
       
   };

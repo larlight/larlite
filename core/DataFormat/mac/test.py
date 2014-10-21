@@ -1,6 +1,5 @@
 import sys
 from ROOT import *
-#gSystem.Load("libDataFormat")
 from ROOT import larlite as fmwk
 
 man=fmwk.storage_manager()

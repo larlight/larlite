@@ -1,6 +1,7 @@
 #include <TSystem.h>
 #include <TVector3.h>
 #include <DataFormat/storage_manager.h>
+#include <DataFormat/storage_manager.template.cc>
 
 int main(int argc, char** argv){
 
@@ -47,7 +48,8 @@ int main(int argc, char** argv){
   // Let's loop over!
   while(my_storage.next_event()){
 
-    auto my_track_v = (larlite::event_track*)(my_storage.get_data(larlite::data::kTrack,"test"));
+    //auto my_track_v = my_storage.get_data<larlite::event_track>("test");
+    auto my_track_v = (::larlite::event_track*)(my_storage.get_data(::larlite::data::kTrack,"test"));
 
     if(!my_track_v) {
 

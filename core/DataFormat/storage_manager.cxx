@@ -1,6 +1,7 @@
 #ifndef LARLITE_STORAGE_MANAGER_CXX
 #define LARLITE_STORAGE_MANAGER_CXX
 #include "storage_manager.h"
+#include "storage_manager.template.cc"
 
 namespace larlite {
 
@@ -25,11 +26,16 @@ namespace larlite {
     _mode=mode;
     
   };
-  
-  event_base* storage_manager::get_data(data::DataType_t const type,
-					std::string const name) 
+
+  template <class T>
+  T* storage_manager::get_data(std::string const name)
   {
-    
+    auto type = data_type<T>();
+    return (T*)(get_data(type,name));
+  }
+
+  event_base* storage_manager::get_data(data::DataType_t const type, std::string const name)
+  {
     // Read entry _index-1
     if(!_index && _mode != kWRITE) {
 
@@ -118,8 +124,7 @@ namespace larlite {
       }
     }
     
-    return result_ptr;
-    
+    return result_ptr;    
   }
   
   std::map<larlite::data::DataType_t,std::set<std::string> > storage_manager::list_data_types() const {
@@ -524,11 +529,9 @@ namespace larlite {
     case data::kEvent:
       _ptr_data_array[type][name]=(event_base*)(new event_base(type,name));
       break;
-      /*
-    case data::kAssociation:
-      _ptr_data_array[type][name]=(association*)(new association(name));
+    case data::kRawDigit:
+      _ptr_data_array[type][name]=(event_base*)(new event_rawdigit(name));
       break;
-      */
     case data::kSimChannel:
       _ptr_data_array[type][name]=(event_base*)(new event_simch(name));
       break;
@@ -570,6 +573,9 @@ namespace larlite {
       break;
     case data::kEndPoint2D:
       _ptr_data_array[type][name]=(event_base*)(new event_endpoint2d(name));
+      break;
+    case data::kSeed:
+      _ptr_data_array[type][name]=(event_base*)(new event_seed(name));
       break;
     case data::kCalorimetry:
       _ptr_data_array[type][name]=(event_base*)(new event_calorimetry(name));

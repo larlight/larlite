@@ -26,6 +26,7 @@
 #include "mctruth.h"
 #include "user_info.h"
 #include "spacepoint.h"
+#include "rawdigit.h"
 #include "wire.h"
 #include "hit.h"
 #include "cluster.h"
@@ -35,6 +36,7 @@
 #include "calorimetry.h"
 #include "vertex.h"
 #include "endpoint2d.h"
+#include "seed.h"
 #include "cosmictag.h"
 #include "opflash.h"
 #include "ophit.h"
@@ -133,11 +135,16 @@ namespace larlite {
     /// Close I/O file. 
     bool close(); 
     
-    /** Universal data pointer getter to return data_base* pointer for specified data type.
-	A user then cast the pointer type to whatever the relevant data class pointer type to access members.
+    /// Universal data pointer getter to return data_base* pointer for specified data type.
+    event_base* get_data(data::DataType_t const type, std::string const name);
+
+    /** 
+	Type specific data product getter.
+	Specialize the template to the data product of your choice, and it cast the
+	pointer + return reference for you.
     */
-    event_base* get_data(data::DataType_t const type,
-			std::string const name);
+    template <class T>
+    T* get_data(std::string const name);
     
     /// What data is available?
     std::map<larlite::data::DataType_t,std::set<std::string> > list_data_types() const;
@@ -161,6 +168,17 @@ namespace larlite {
     
     /// Getter for a counter of written-out events
     inline UInt_t get_entires_written() const {return _nevents_written;}
+
+    /// Data product class => enum type converter
+    template <class T>
+    const ::larlite::data::DataType_t data_type() const
+    { 
+      Message::send(msg::kERROR,
+		    __PRETTY_FUNCTION__,
+		    "No corresponding data::DataType_t enum value found!");
+      throw std::exception();
+      return data::kUndefined;
+    }
     
   private:
     
@@ -221,6 +239,8 @@ namespace larlite {
     std::vector<std::map<std::string,TChain*> > _in_ch;
     std::vector<std::map<std::string,TTree*>  > _out_ch;
   };
+
 }
+
 #endif
 /** @} */ // end of doxygen group storage_manager
