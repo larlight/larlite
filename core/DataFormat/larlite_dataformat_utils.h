@@ -47,10 +47,8 @@ namespace larlite{
     virtual ~product_id(){}
 
     /// copy ctor
-    product_id(const product_id& original){
-      this->first=original.first;
-      this->second=original.second;
-    }
+    product_id(const product_id& original) : std::pair<larlite::data::DataType_t,std::string>(original)
+    {}
 
     /// For sorting
     inline bool operator< ( const product_id& rhs ) const 

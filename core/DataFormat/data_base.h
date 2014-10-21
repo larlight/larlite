@@ -131,6 +131,19 @@ namespace larlite{
     void set_association(const product_id type,
 			 const AssSet_t& ass);
 
+    /// Adder for an association
+    void set_association(const data::DataType_t data_type,
+			 const std::string data_name,
+			 const size_t index_source,
+			 const AssUnit_t& ass)
+    { set_association(product_id(data_type,data_name),index_source,ass); }
+
+    /// Adder for a while set of association
+    void set_association(const data::DataType_t data_type,
+			 const std::string data_name,
+			 const AssSet_t& ass)
+    { set_association(product_id(data_type,data_name),ass); }
+
     /// Getter for # of associated data product types
     size_t size_association(const product_id type) const;
 

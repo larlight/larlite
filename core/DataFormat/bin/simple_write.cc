@@ -1,6 +1,6 @@
 #include <TSystem.h>
 #include <TVector3.h>
-#include <DataFormat/storage_manager.cxx>
+#include <DataFormat/storage_manager.h>
 
 int main(){
 
@@ -63,6 +63,10 @@ int main(){
       // Append to the event track array
       my_event_track->push_back(t);
     }
+
+    larlite::AssSet_t ass;
+    ass.push_back(larlite::AssUnit_t(1,0));
+    my_event_track->set_association(larlite::data::kHit,"test",ass);
 
     // Store event
     my_storage.next_event();
