@@ -29,6 +29,13 @@ namespace larlite {
     /// Default constructor
     mctruth() : data_base(data::kMCTruth) {clear_data();}
 
+    mctruth(const mctruth& origin) : data_base(origin),
+				     fPartList(origin.fPartList),
+				     fMCNeutrino(origin.fMCNeutrino),
+				     fOrigin(origin.fOrigin),
+				     fNeutrinoSet(origin.fNeutrinoSet)
+    {}
+
     /// Default destructor
     virtual ~mctruth(){}
 

@@ -27,7 +27,7 @@
 #pragma link C++ class std::vector<TLorentzVector>+;
 
 #pragma link C++ class std::vector<unsigned int>+;
-#pragma link C++ class std::vector<std::vector<unsigned int> >+;
+//#pragma link C++ class std::vector<std::vector<unsigned int> >+;
 #pragma link C++ class larlite::AssUnit_t+;
 #pragma link C++ class std::vector<larlite::AssUnit_t>+;
 #pragma link C++ class larlite::AssSet_t+;

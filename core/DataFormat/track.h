@@ -30,6 +30,15 @@ namespace larlite {
     
     /// Default constructor
     track() : data_base(data::kTrack) { clear_data(); }
+
+    track(const track& original) :   data_base(original),
+				     fID(original.fID),
+				     fXYZ(original.fXYZ),
+				     fDir(original.fDir),
+				     fCov(original.fCov),
+				     fdQdx(original.fdQdx),
+				     fFitMomentum(original.fFitMomentum)
+    {}
     
     /// Default destructor
     virtual ~track(){}

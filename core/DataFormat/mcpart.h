@@ -37,6 +37,23 @@ namespace larlite {
 	   const double    mass   = data::kINVALID_DOUBLE,
 	   const int       status = data::kINVALID_INT   );
 
+    /// Copy constructor
+    mcpart(const mcpart& origin) : data_base(origin),
+				   fstatus(origin.fstatus),
+				   ftrackId(origin.ftrackId),
+				   fpdgCode(origin.fpdgCode),
+				   fmother(origin.fmother),
+				   fprocess(origin.fprocess),
+				   ftrajectory(origin.ftrajectory),
+				   fmass(origin.fmass),
+				   fpolarization(origin.fpolarization),
+				   fdaughters(origin.fdaughters),
+				   fWeight(origin.fWeight),
+				   fGvtx(origin.fGvtx),
+				   frescatter(origin.frescatter),
+				   ftrackFiducial(origin.ftrackFiducial)
+    {}
+
     /// Default destructor
     virtual ~mcpart(){}
 

@@ -30,6 +30,19 @@ namespace larlite {
     /// Default constructor
     mcshower() : data_base(data::kMCShower) {clear_data();}
 
+    /// Copy constructor
+    mcshower(const mcshower& origin) : data_base(origin),
+				       fMotherPDGID(origin.fMotherPDGID),
+				       fMotherTrackID(origin.fMotherTrackID),
+				       fMotherProcess(origin.fMotherProcess),
+				       fMotherVtx(origin.fMotherVtx),
+				       fMotherMomentum(origin.fMotherMomentum),
+				       fDaughterTrackID(origin.fDaughterTrackID),
+				       fDaughterVtx(origin.fDaughterVtx),
+				       fDaughterMomentum(origin.fDaughterMomentum),
+                                       fPlaneCharge(origin.fPlaneCharge)
+    {}
+
     /// Default destructor
     virtual ~mcshower(){}
 

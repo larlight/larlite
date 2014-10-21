@@ -46,6 +46,19 @@ namespace larlite {
       fErrXYZ[2]=ez;
       fChisq=chi2;
     }
+
+    /// Copy constructor
+    spacepoint(const spacepoint& original) : data_base(original),
+					     fID(original.fID),
+					     fChisq(original.fChisq)
+    {
+      fXYZ[0]=original.fXYZ[0];
+      fXYZ[1]=original.fXYZ[1];
+      fXYZ[2]=original.fXYZ[2];
+      fErrXYZ[0]=original.fErrXYZ[0];
+      fErrXYZ[1]=original.fErrXYZ[1];
+      fErrXYZ[2]=original.fErrXYZ[2];
+    }
     
     /// Default destructor
     virtual ~spacepoint(){}

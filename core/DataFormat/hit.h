@@ -32,6 +32,27 @@ namespace larlite{
     /// Default destructor
     virtual ~hit(){}
 
+    hit(const hit &original) : data_base(original),
+			       fHitSignal(original.fHitSignal),
+			       fStartTime(original.fStartTime),
+			       fSigmaStartTime(original.fSigmaStartTime),
+			       fPeakTime(original.fPeakTime),
+			       fSigmaPeakTime(original.fSigmaPeakTime),
+			       fEndTime(original.fEndTime),
+			       fSigmaEndTime(original.fSigmaEndTime),
+			       fCharge(original.fCharge),
+			       fSigmaCharge(original.fSigmaCharge),
+			       fMaxCharge(original.fMaxCharge),
+			       fSigmaMaxCharge(original.fSigmaMaxCharge),
+                               fMultiplicity(original.fMultiplicity),
+                               fGoodnessOfFit(original.fGoodnessOfFit),
+                               fView(original.fView),
+                               fSignalType(original.fSignalType),
+                               fChannel(original.fChannel),
+                               fWire(original.fWire)
+    {};
+  
+
     void clear_data();
     
     // Set methods

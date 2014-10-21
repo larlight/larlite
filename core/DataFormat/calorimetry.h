@@ -28,6 +28,17 @@ namespace larlite{
     
     /// Default constructor
     calorimetry() : data_base(data::kCalorimetry) {clear_data();}
+
+    /// Copy constructor
+    calorimetry(const calorimetry& original) : data_base(original),
+					       fKineticEnergy(original.fKineticEnergy),
+					       fdEdx(original.fdEdx),
+					       fdQdx(original.fdQdx),
+					       fResidualRange(original.fResidualRange),
+					       fDeadWireResR(original.fDeadWireResR),
+					       fRange(original.fRange),
+					       fTrkPitch(original.fTrkPitch)
+    {}
     
     /// Default destructor
     virtual ~calorimetry(){}

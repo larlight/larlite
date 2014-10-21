@@ -43,6 +43,22 @@ namespace larlite {
 	 double y,
 	 double qsqr);
     
+    /// Copy constructor
+    mcnu(const mcnu& origin) : data_base(origin),
+			       fNu(origin.fNu),
+			       fLepton(origin.fLepton),
+			       fMode(origin.fMode),
+			       fInteractionType(origin.fInteractionType),
+			       fCCNC(origin.fCCNC),
+			       fTarget(origin.fTarget),
+			       fHitNuc(origin.fHitNuc),
+			       fHitQuark(origin.fHitQuark),
+			       fW(origin.fW),
+			       fX(origin.fX),
+			       fY(origin.fY),
+			       fQSqr(origin.fQSqr)
+    {}
+
     /// Default destructor
     virtual ~mcnu(){}
 
