@@ -1,6 +1,6 @@
 #include <TSystem.h>
 #include <TVector3.h>
-#include <DataFormat/storage_manager.h>
+#include <DataFormat/storage_manager.cxx>
 
 int main(){
 
@@ -42,7 +42,7 @@ int main(){
   int run_id = 1;
   int subrun_id = 1;
   for( int i=0; i<100; i++){
-
+    std::cout<<my_storage.get_entries_written()<<std::endl;
     int event_id = i;
     my_event_track->set_run(run_id);
     my_event_track->set_subrun(subrun_id);
