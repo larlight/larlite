@@ -34,6 +34,7 @@
 
 #pragma link C++ class std::pair<larlite::data::DataType_t,string>+;
 #pragma link C++ class larlite::product_id+;
+#pragma link C++ class std::vector<larlite::product_id>+;
 
 #pragma link C++ class larlite::data_base+;
 #pragma link C++ class larlite::event_base+;

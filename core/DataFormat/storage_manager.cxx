@@ -164,7 +164,7 @@ namespace larlite {
     _mode=kUNDEFINED;
     _status=kINIT;
     _in_fnames.clear();
-    
+    _input_product_id.clear();
     for(size_t i=0; i<data::kDATA_TYPE_MAX; ++i) {
       //_read_data_array[i]=true;   // Attempt to read in all data by default
       //_write_data_array[i]=false; // Attemp to write no data by default 
@@ -287,6 +287,7 @@ namespace larlite {
 		if(data::kDATA_TREE_NAME[i] == type_name) {
 		  _in_ch[(data::DataType_t)i].insert(std::make_pair(producer_name.c_str(),nullptr));
 		  print(msg::kINFO,__FUNCTION__,Form("Found %s tree made by %s...",type_name.c_str(),producer_name.c_str()));
+		  _input_product_id.push_back(product_id((data::DataType_t)i,producer_name.c_str()));
 		  break;
 		}
 	    }

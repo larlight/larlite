@@ -134,6 +134,9 @@ namespace larlite {
     
     /// Close I/O file. 
     bool close(); 
+
+    /// Function to list product ID loaded or created
+    const std::vector<::larlite::product_id>& list_input_product() const { return _input_product_id; }
     
     /// Universal data pointer getter to return data_base* pointer for specified data type.
     event_base* get_data(data::DataType_t const type, std::string const name);
@@ -174,6 +177,9 @@ namespace larlite {
     template <class T>
     const ::larlite::data::DataType_t data_type() const;
     */
+
+    const std::string& product_name(data::DataType_t const type) const
+    { return data::kDATA_TREE_NAME[type]; }
   private:
     
     static storage_manager* me; ///< shared object instance pointer
@@ -206,6 +212,9 @@ namespace larlite {
     
     /// I/O mode 
     IOMode_t _mode;
+
+    /// Array of product_id 
+    std::vector<::larlite::product_id> _input_product_id;
     
     /// Boolean to record what data to be read out from a file
     std::vector<std::map<std::string,bool> > _read_data_array;
