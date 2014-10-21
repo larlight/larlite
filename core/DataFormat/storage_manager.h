@@ -167,7 +167,7 @@ namespace larlite {
     inline UInt_t get_entries_read() const {return _nevents_read;}
     
     /// Getter for a counter of written-out events
-    inline UInt_t get_entires_written() const {return _nevents_written;}
+    inline UInt_t get_entries_written() const {return _nevents_written;}
 
     /// Data product class => enum type converter
     /*

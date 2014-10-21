@@ -1,7 +1,7 @@
 #include <TSystem.h>
 #include <TVector3.h>
 #include <DataFormat/storage_manager.h>
-#include <DataFormat/storage_manager.template.cc>
+//#include <DataFormat/storage_manager.template.cc>
 
 int main(int argc, char** argv){
 

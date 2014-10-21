@@ -87,8 +87,9 @@ namespace larlite {
       if(data_ptr_iter!=_ptr_data_array[type].end() && (*data_ptr_iter).second) {
 
 	result_ptr = (*data_ptr_iter).second;
-	
-	_fout->cd(_name_out_tdirectory.c_str());
+
+	if(!_name_out_tdirectory.empty())
+	  _fout->cd(_name_out_tdirectory.c_str());
 
 	auto out_ch_iter = _out_ch[type].find(name);
 	if(out_ch_iter == _out_ch[type].end()) {
