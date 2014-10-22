@@ -8,13 +8,14 @@ if not 'LARLITE_USERDEVDIR' in os.environ.keys():
    sys.stderr.write('$LARLITE_USERDEVDIR not defined!\n\n')
    sys.exit(1)
 
-name=sys.argv[1]
+name=sys.argv[1].rstrip('/')
 target_dir='%s/%s' % (os.environ['LARLITE_USERDEVDIR'],name)
 source_dir='%s/bin/repo_tmp' % os.environ['LARLITE_USERDEVDIR']
 
-if not os.path.exists(target_dir):
+if not os.path.exists(target_dir) or os.listdir(target_dir) == ['.git']:
    try:
-      os.makedirs(target_dir)
+      if not os.path.exists(target_dir):
+         os.makedirs(target_dir)
       os.makedirs('%s/bin' % target_dir)
       # Copy templates
       os.system("scp -r %s/* %s/bin/" % (source_dir,target_dir))
