@@ -16,7 +16,7 @@ rootlibmap() {
 
 ######################################################
 # LArUtil
-rootlibmap libLArUtil.rootmap libLArUtil.so $LARLITE_COREDIR/LArUtil/LinkDef.h \
+rootlibmap libLArLite_LArUtil.rootmap libLArLite_LArUtil.so $LARLITE_COREDIR/LArUtil/LinkDef.h \
     libTree.so
 
 

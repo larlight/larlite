@@ -4,7 +4,7 @@
 
 # specific names for this package
 DICT  = DataFormatCint
-SHLIB = libDataFormat.so
+SHLIB = libLArLite_DataFormat.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
 HEADERS = $(filter-out $(FMWK_HEADERS), $(wildcard *.h))

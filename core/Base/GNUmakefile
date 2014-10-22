@@ -4,7 +4,7 @@
 
 # specific names for this package
 DICT  = BaseCint
-SHLIB = libBase.so
+SHLIB = libLArLite_Base.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
 HEADERS = $(filter-out $(FMWK_HEADERS), $(wildcard *.h))

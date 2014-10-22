@@ -16,7 +16,7 @@ rootlibmap() {
 
 ######################################################
 # Base
-rootlibmap libBase.rootmap libBase.so $LARLITE_COREDIR/Base/LinkDef.h
+rootlibmap libLArLite_Base.rootmap libLArLite_Base.so $LARLITE_COREDIR/Base/LinkDef.h
 
 
 

@@ -16,8 +16,8 @@ rootlibmap() {
 
 ######################################################
 # Analysis
-rootlibmap libAnalysis.rootmap libAnalysis.so $LARLITE_COREDIR/Analysis/LinkDef.h \
-    libBase.so libDataFormat.so libHist.so  libTree.so 
+rootlibmap libLArLite_Analysis.rootmap libLArLite_Analysis.so $LARLITE_COREDIR/Analysis/LinkDef.h \
+    libLArLite_Base.so libLArLite_DataFormat.so libHist.so  libTree.so 
 
 
 
