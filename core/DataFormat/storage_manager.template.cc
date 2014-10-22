@@ -1,7 +1,7 @@
 #ifndef LARLITE_STORAGE_MANAGER_TEMPLATE_CXX
 #define LARLITE_STORAGE_MANAGER_TEMPLATE_CXX
 //#include "storage_manager.h"
-#include "storage_manager.h"
+//#include "storage_manager.h"
 
 namespace larlite {
 
@@ -84,13 +84,14 @@ namespace larlite {
   //template<> const ::larlite::data::DataType_t storage_manager::data_type<::larlite::event_trigger> ()
   //{ return data::kTrigger; }
 
+  /*
   template <class T>
   T* storage_manager::get_data(std::string const name)
   {
     auto type = data_type<T>();
     return (T*)(get_data(type,name));
   }
-
+  */
 }
 #endif
   

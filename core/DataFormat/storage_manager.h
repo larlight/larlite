@@ -145,9 +145,15 @@ namespace larlite {
 	Type specific data product getter.
 	Specialize the template to the data product of your choice, and it cast the
 	pointer + return reference for you.
-    template <class T>
-    T* get_data(std::string const name);
     */
+    //T* get_data(std::string const name);
+    template <class T>
+    T* get_data(std::string const name)
+    {
+      auto type = data_type<T>();
+      return (T*)(get_data(type,name));
+    }
+
     
     /// What data is available?
     std::map<larlite::data::DataType_t,std::set<std::string> > list_data_types() const;
@@ -173,10 +179,8 @@ namespace larlite {
     inline UInt_t get_entries_written() const {return _nevents_written;}
 
     /// Data product class => enum type converter
-    /*
     template <class T>
     const ::larlite::data::DataType_t data_type() const;
-    */
 
     const std::string& product_name(data::DataType_t const type) const
     { return data::kDATA_TREE_NAME[type]; }
@@ -245,10 +249,32 @@ namespace larlite {
 
 }
 
-/*
+
 #ifndef __CINT__
-#include "storage_manager.template.hh"
+//#include "storage_manager.template.hh"
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_gtruth> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_mctruth> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_mcpart> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_mcflux> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_simch> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_mcshower> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_rawdigit> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_wire> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_hit> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_ophit> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_opflash> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_cluster> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_seed> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_spacepoint> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_track> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_shower> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_vertex> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_endpoint2d> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_calorimetry> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_partid> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_pfpart> () const;
+template<> const ::larlite::data::DataType_t larlite::storage_manager::data_type<::larlite::event_user> () const;
 #endif
-*/
+
 #endif
-/** @} */ // end of doxygen group storage_manager
+/** @} */ // end of doxygen group larlite::storage_manager
