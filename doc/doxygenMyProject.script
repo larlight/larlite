@@ -591,8 +591,9 @@ RECURSIVE              = YES
 
 EXCLUDE                = dOxygenMyProject \
                          dOxygenMyProject+ \
-                         DATA \
-			 Encoder
+			 bin \
+			 tmp \
+			 lib
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or
 # directories that are symbolic links (a Unix filesystem feature) are excluded
@@ -612,7 +613,9 @@ EXCLUDE_PATTERNS       = *Cint.cxx \
 			 *.py \
 			 *.root \
 			 *.dat \
-			 *.txt		 
+			 *.txt \
+			 */tmp/* \
+			 */bin/* 
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the

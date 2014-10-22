@@ -1,9 +1,9 @@
 # New, simpler script for generating doxygen documentation.
 # It uses the main (maintained) doxygenMyProject.script,
 
-@INCLUDE = $(ANA_PROC_DIR)/doc/doxygenMyProject.script
+@INCLUDE = $(LARLITE_BASEDIR)/doc/doxygenMyProject.script
 
-OUTPUT_DIRECTORY       = $(ANA_PROC_DIR)/doc/dOxygenMyProject+
+OUTPUT_DIRECTORY       = $(LARLITE_BASEDIR)/doc/dOxygenMyProject+
 
 #
 # ROOT
