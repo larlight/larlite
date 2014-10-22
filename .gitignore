@@ -16,3 +16,5 @@
 *.swp
 /bin/larlite
 /GNUmakefile
+/UserDev/*
+!/UserDev/bin

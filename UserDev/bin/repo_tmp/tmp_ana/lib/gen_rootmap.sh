@@ -16,7 +16,7 @@ rootlibmap() {
 
 ######################################################
 # Package_Name
-rootlibmap libPackage_Name.rootmap libPackage_Name.so $LARLITE_USERDEVDIR/Package_Name/LinkDef.h \
+rootlibmap libRepositoryName_Package_Name.rootmap libRepositoryName_Package_Name.so $LARLITE_USERDEVDIR/RepositoryName/Package_Name/LinkDef.h \
     libAnalysis.so
 
 

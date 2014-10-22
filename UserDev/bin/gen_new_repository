@@ -1,0 +1,59 @@
+#!/usr/bin/python
+import sys, os
+
+if len(sys.argv)<2:
+   sys.stderr.write('Usage: %s REPOSITORY_NAME\n\n' % sys.argv[0])
+   sys.exit(1)
+if not 'LARLITE_USERDEVDIR' in os.environ.keys():
+   sys.stderr.write('$LARLITE_USERDEVDIR not defined!\n\n')
+   sys.exit(1)
+
+name=sys.argv[1]
+target_dir='%s/%s' % (os.environ['LARLITE_USERDEVDIR'],name)
+source_dir='%s/bin/repo_tmp' % os.environ['LARLITE_USERDEVDIR']
+
+if not os.path.exists(target_dir):
+   try:
+      os.makedirs(target_dir)
+      os.makedirs('%s/bin' % target_dir)
+      # Copy bin directory
+      os.system("scp -r %s/* %s/bin/" % (source_dir,target_dir))
+
+   except OSError:
+      sys.stderr.write('Failed to create a dir: %s\n' % target_dir)
+      sys.stderr.write('Maybe lacking a permission?\n\n')
+      sys.exit(1)
+else:
+   sys.stderr.write('Package \"%s\" already exists under %s\n' % (name,target_dir))
+   sys.stderr.write('Please remove before running this script.\n\n')
+   sys.exit(1)
+
+flist = [ 'gen_empty_package',
+          'gen_ana_package',
+          'tmp_ana/GNUmakefile.tmp',
+          'tmp_ana/lib/gen_rootmap.sh',
+          'tmp_ana/bin/GNUmakefile.tmp',
+          'tmp_ana/bin/gen_empty_class',
+          'tmp_ana/bin/gen_newana',
+          'tmp_empty/GNUmakefile.tmp',
+          'tmp_empty/lib/gen_rootmap.sh',
+          'tmp_empty/bin/GNUmakefile.tmp',
+          'tmp_empty/bin/gen_empty_class' ]
+
+for f in flist:
+
+   full_path = '%s/bin/%s' % (target_dir,f)
+   contents  = open(full_path,'r').read()
+   contents  = contents.replace('RepositoryName',name)
+   contents  = contents.replace('REPOSITORYNAME',name.upper())
+   contents  = contents.replace('repositoryname',name.lower())
+   fout = open(full_path,'w')
+   fout.write(contents)
+   fout.close()
+
+print
+print 'Generated a new repository dir:', target_dir
+print
+print 'You can use gen scripts under bin sub-directory to generate your packages in the new repo'
+print
+sys.exit(0)

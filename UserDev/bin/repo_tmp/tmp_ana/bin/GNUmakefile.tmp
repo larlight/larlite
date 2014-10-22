@@ -1,10 +1,10 @@
 # Include your header file location
 CXXFLAGS += -I$(LARLITE_COREDIR)
-CXXFLAGS += -I$(LARLITE_USERDEVDIR)/Package_Name
+CXXFLAGS += -I$(LARLITE_USERDEVDIR)/RepositoryName
 CXXFLAGS += -I. $(shell root-config --cflags) -g
 
 # Include your shared object lib location
-LDFLAGS += -L$(LARLITE_LIBDIR) -lPackage_Name -lAnalysis -lDataFormat -lBase 
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRepositoryName_Package_Name -lAnalysis -lDataFormat -lBase 
 LDFLAGS += $(shell root-config --libs) -lPhysics -lMatrix -g
 
 # platform-specific options
