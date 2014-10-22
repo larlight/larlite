@@ -16,8 +16,12 @@ if not os.path.exists(target_dir):
    try:
       os.makedirs(target_dir)
       os.makedirs('%s/bin' % target_dir)
-      # Copy bin directory
+      # Copy templates
       os.system("scp -r %s/* %s/bin/" % (source_dir,target_dir))
+      os.system("rm %s/bin/GNUmakefile.tmp" % target_dir)
+      os.system("rm -r %s/bin/doc" % target_dir)
+      os.system("scp %s/GNUmakefile.tmp %s/GNUmakefile" % (source_dir,target_dir))
+      os.system("scp -r %s/doc %s/" % (source_dir,target_dir))
 
    except OSError:
       sys.stderr.write('Failed to create a dir: %s\n' % target_dir)
@@ -28,21 +32,24 @@ else:
    sys.stderr.write('Please remove before running this script.\n\n')
    sys.exit(1)
 
-flist = [ 'gen_empty_package',
-          'gen_ana_package',
-          'tmp_ana/GNUmakefile.tmp',
-          'tmp_ana/lib/gen_rootmap.sh',
-          'tmp_ana/bin/GNUmakefile.tmp',
-          'tmp_ana/bin/gen_empty_class',
-          'tmp_ana/bin/gen_newana',
-          'tmp_empty/GNUmakefile.tmp',
-          'tmp_empty/lib/gen_rootmap.sh',
-          'tmp_empty/bin/GNUmakefile.tmp',
-          'tmp_empty/bin/gen_empty_class' ]
+flist = [ 'GNUmakefile',
+          'doc/doxygenMyProject.script',
+          'doc/doxygenMyProject+.script',
+          'bin/gen_empty_package',
+          'bin/gen_ana_package',
+          'bin/tmp_ana/GNUmakefile.tmp',
+          'bin/tmp_ana/lib/gen_rootmap.sh',
+          'bin/tmp_ana/bin/GNUmakefile.tmp',
+          'bin/tmp_ana/bin/gen_empty_class',
+          'bin/tmp_ana/bin/gen_newana',
+          'bin/tmp_empty/GNUmakefile.tmp',
+          'bin/tmp_empty/lib/gen_rootmap.sh',
+          'bin/tmp_empty/bin/GNUmakefile.tmp',
+          'bin/tmp_empty/bin/gen_empty_class' ]
 
 for f in flist:
 
-   full_path = '%s/bin/%s' % (target_dir,f)
+   full_path = '%s/%s' % (target_dir,f)
    contents  = open(full_path,'r').read()
    contents  = contents.replace('RepositoryName',name)
    contents  = contents.replace('REPOSITORYNAME',name.upper())

@@ -66,6 +66,13 @@ for src in src_list.keys():
 
 os.system('chmod 774 %s/lib/gen_rootmap.sh' % target_dir)
 
+# Add new package to the list of directories to be compiled
+contents=open('%s/%s/GNUmakefile' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME), 'r').read()
+contents=contents.replace('#ADD_NEW_SUBDIR','%s #ADD_NEW_SUBDIR' % name)
+fout = open('%s/%s/GNUmakefile' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME), 'w')
+fout.write(contents)
+fout.close()
+
 print
 print 'Generated the followings under %s.' % target_dir
 for key in src_list.keys():
