@@ -21,8 +21,10 @@ if not os.path.exists(target_dir) or os.listdir(target_dir) == ['.git']:
       os.system("scp -r %s/* %s/bin/" % (source_dir,target_dir))
       os.system("rm %s/bin/GNUmakefile.tmp" % target_dir)
       os.system("rm -r %s/bin/doc" % target_dir)
+      os.system("rm -r %s/bin/gitignore" % target_dir)
       os.system("scp %s/GNUmakefile.tmp %s/GNUmakefile" % (source_dir,target_dir))
       os.system("scp -r %s/doc %s/" % (source_dir,target_dir))
+      os.system("scp  %s/gitignore %s/.gitignore" % (source_dir,target_dir))
 
    except OSError:
       sys.stderr.write('Failed to create a dir: %s\n' % target_dir)
