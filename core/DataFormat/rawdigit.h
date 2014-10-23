@@ -54,14 +54,14 @@ namespace larlite{
       , fSigma(0.)
       , fCompression(compression)
     {clear_data();}
-
+    /*
     inline rawdigit(unsigned int              channel,
 		    const std::vector<short>& adclist,
 		    raw::Compress_t           compression
 		    )
       : rawdigit(channel, 0, adclist, compression)
     {clear_data();}
-    
+    */    
     /// Default destructor
     virtual ~rawdigit(){}
 
