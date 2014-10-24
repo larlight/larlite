@@ -14,6 +14,8 @@
 #include "data_base.h"
 //#include "larlite_association.h"
 
+#include "potsummary.h"
+
 #include "rawdigit.h"
 
 #include "wire.h"
@@ -53,6 +55,8 @@ namespace larlite{
   class data_base;
   class event_base;
   class product_id;
+
+  class potsummary;
 
   class rawdigit;
   class event_rawdigit;

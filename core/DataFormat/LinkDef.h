@@ -40,6 +40,8 @@
 #pragma link C++ class larlite::event_base+;
 //#pragma link C++ class larlite::association+;
 
+#pragma link C++ class larlite::potsummary+;
+
 #pragma link C++ class larlite::rawdigit+;
 #pragma link C++ class std::vector<larlite::rawdigit>+;
 #pragma link C++ class larlite::event_rawdigit+;

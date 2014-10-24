@@ -499,6 +499,9 @@ namespace larlite {
     if((*name_ptr).second) return;
     
     switch(type){
+    case data::kPOTSummary:
+      _ptr_data_array[type][name]=(event_base*)(new potsummary(name));
+      break;
     case data::kGTruth:
       _ptr_data_array[type][name]=(event_base*)(new event_gtruth(name));
       break;

@@ -67,6 +67,7 @@ namespace larlite{
       kPFParticle,         ///< recob::PFParticle
       kUserInfo,           ///< dynamic data container (LArLite original)
       kTrigger,            ///< Trigger data (LArLite original)
+      kPOTSummary,         ///< sumdata::POTSummary 
       kDATA_TYPE_MAX
     };
 
@@ -98,7 +99,8 @@ namespace larlite{
       "partid",
       "pfpart",
       "user",
-      "trigger"
+      "trigger",
+      "potsummary"
     };
     
   }
