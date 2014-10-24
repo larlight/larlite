@@ -14,7 +14,6 @@
 #ifndef LARLITE_STORAGE_MANAGER_H
 #define LARLITE_STORAGE_MANAGER_H
 
-#include <set>
 #include <TFile.h>
 #include <TChain.h>
 #include <TError.h>
@@ -136,7 +135,7 @@ namespace larlite {
     bool close(); 
 
     /// Function to list product ID loaded or created
-    const std::vector<::larlite::product_id>& list_input_product() const { return _input_product_id; }
+    const std::vector<larlite::product_id>& list_input_product() const { return _input_product_id; }
     
     /// Universal data pointer getter to return data_base* pointer for specified data type.
     event_base* get_data(data::DataType_t const type, std::string const name);
@@ -153,10 +152,6 @@ namespace larlite {
       auto type = data_type<T>();
       return (T*)(get_data(type,name));
     }
-
-    
-    /// What data is available?
-    std::map<larlite::data::DataType_t,std::set<std::string> > list_data_types() const;
     
     /// Getter for a shared object instance pointer. Not limited to be a singleton.
     static storage_manager* get() 
@@ -218,7 +213,7 @@ namespace larlite {
     IOMode_t _mode;
 
     /// Array of product_id 
-    std::vector<::larlite::product_id> _input_product_id;
+    std::vector<larlite::product_id> _input_product_id;
     
     /// Boolean to record what data to be read out from a file
     std::vector<std::map<std::string,bool> > _read_data_array;

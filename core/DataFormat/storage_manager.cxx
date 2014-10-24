@@ -120,26 +120,7 @@ namespace larlite {
     
     return result_ptr;    
   }
-  
-  std::map<larlite::data::DataType_t,std::set<std::string> > storage_manager::list_data_types() const {
 
-    std::map<larlite::data::DataType_t,std::set<std::string> > result;
-    for(int i=0;i<larlite::data::kDATA_TYPE_MAX; i++) {
-
-      for(auto const& name_ptr : _ptr_data_array[i]) {
-
-	if(result.find((data::DataType_t)i)==result.end()) 
-
-	  result.insert(std::make_pair((data::DataType_t)i,std::set<std::string>()));
-
-	result[(data::DataType_t)i].insert(name_ptr.first);
-
-      }
-
-    }
-    return result;
-  }
-  
   void storage_manager::reset()
   {
     if(_verbosity[msg::kDEBUG])
@@ -285,7 +266,7 @@ namespace larlite {
 	      }
 	      for(size_t i=0; i<data::kDATA_TYPE_MAX; ++i)
 		if(data::kDATA_TREE_NAME[i] == type_name) {
-		  _in_ch[(data::DataType_t)i].insert(std::make_pair(producer_name.c_str(),nullptr));
+		  _in_ch[(data::DataType_t)i].insert(std::make_pair(producer_name.c_str(),(TChain*)nullptr));
 		  print(msg::kINFO,__FUNCTION__,Form("Found %s tree made by %s...",type_name.c_str(),producer_name.c_str()));
 		  _input_product_id.push_back(product_id((data::DataType_t)i,producer_name.c_str()));
 		  break;
