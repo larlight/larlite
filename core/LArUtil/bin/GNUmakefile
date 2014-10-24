@@ -3,7 +3,7 @@ CXXFLAGS += -I$(LARLITE_COREDIR)
 CXXFLAGS += -I. $(shell root-config --cflags) -g
 
 # Include your shared object lib location
-LDFLAGS += -L$(LARLITE_LIBDIR) -lBase -lLArUtil
+LDFLAGS += -L$(LARLITE_LIBDIR) -lLArLite_Base -lLArLite_LArUtil
 LDFLAGS += $(shell root-config --libs) -lPhysics -lMatrix -g
 
 # platform-specific options
