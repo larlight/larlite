@@ -32,6 +32,7 @@
 #include <map>
 
 #include "DataFormat/hit.h"
+//#include "DataFormat/DataFormat-TypeDef.h"
 #include "LArUtil/LArUtil-TypeDef.h"
 //#include "HoughBaseAlg.hh"
 #include "TPrincipal.h"
@@ -47,7 +48,7 @@ namespace cluster {
     ClusterParamsAlg();
 
     /// Alternative constructor with larlight's hits
-    ClusterParamsAlg(const std::vector<const larlite::hit*>&);
+    ClusterParamsAlg(const std::vector<const ::larlite::hit*>&);
 
     /// Alternative constructor with larutil::PxHit vector
     ClusterParamsAlg(const std::vector<larutil::PxHit>&);
@@ -62,7 +63,7 @@ namespace cluster {
 
     size_t MinNHits() const { return fMinNHits; }
     
-    int SetHits(const std::vector<const larlite::hit*> &);
+    int SetHits(const std::vector<const ::larlite::hit*> &);
 
     int SetHits(const std::vector<larutil::PxHit> &);
 

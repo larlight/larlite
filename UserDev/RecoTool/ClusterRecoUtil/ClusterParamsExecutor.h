@@ -15,8 +15,7 @@
 #define RECOTOOL_CLUSTERPARAMSEXECUTOR_H
 
 #include "ClusterParamsAlg.h"
-//#include "DataFormat/storage_manager.h"
-#include "DataFormat/DataFormat-TypeDef.h"
+#include "DataFormat/storage_manager.h"
 #include "LArUtil/Geometry.h"
 #include <TH2D.h>
 #include <TF1.h>

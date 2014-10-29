@@ -1,7 +1,7 @@
-#ifndef RECOTOOL_FANNSERVICE_CC
-#define RECOTOOL_FANNSERVICE_CC
+#ifndef RECOTOOL_FANNSERVICE_CXX
+#define RECOTOOL_FANNSERVICE_CXX
 
-#include "FANNService.hh"
+#include "FANNService.h"
 
 namespace cluster{
 
