@@ -1,7 +1,7 @@
 /**
  * \file MCShowerClusterer.h
  *
- * \ingroup ClusterRecoUtil
+ * \ingroup MCShowerReco
  * 
  * \brief This class takes in MCShower files, constructs fake hits (with 
  *  fixed width), clusters the hits together such that each MCShower has
@@ -11,7 +11,7 @@
  * @author davidkaleko
  */
 
-/** \addtogroup ClusterRecoUtil
+/** \addtogroup MCShowerReco
 
     @{*/
 

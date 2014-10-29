@@ -11,7 +11,6 @@
 #include "CRUException.h"
 #include "CRUHelper.h"
 #include "ClusterParamsExecutor.h"
-#include "MCShowerClusterer.h"
 #include "Polygon2D.h"
 // Class forward declaration here
 namespace cluster{
@@ -22,9 +21,6 @@ namespace cluster{
   class CRUHelper;
 }
 
-namespace larlite {
-  class MCShowerClusterer;
-}
 class Polygon2D;
 //ADD_EMPTY_CLASS ... do not change this comment line
 

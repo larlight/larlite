@@ -26,7 +26,6 @@
 
 #pragma link C++ class cluster::CRUException+;
 #pragma link C++ class cluster::CRUHelper+;
-#pragma link C++ class larlite::MCShowerClusterer+;
 
 //ADD_NEW_CLASS ... do not change this line
 #endif

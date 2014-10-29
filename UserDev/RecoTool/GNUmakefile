@@ -20,7 +20,7 @@ endif
 #
 # Define directories to be compile upon a global "make"...
 #
-SUBDIRS := FANN ClusterRecoUtil #ADD_NEW_SUBDIR ... do not remove this comment from this line
+SUBDIRS := FANN ClusterRecoUtil MCShowerReco #ADD_NEW_SUBDIR ... do not remove this comment from this line
 
 #####################################################################################
 #
