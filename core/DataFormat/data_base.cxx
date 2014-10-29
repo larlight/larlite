@@ -143,6 +143,50 @@ namespace larlite {
     return (*loc).second[index_source];
   }
 
+  const std::vector< ::larlite::product_id> event_base::association_keys() const
+  {
+    std::vector< ::larlite::product_id> results;
+    results.reserve(fAssociation.size());
+
+    for(auto const& key_value : fAssociation)
+
+      results.push_back(key_value.first);
+
+    return results;
+  }
+
+  const std::vector<std::string> event_base::association_keys(const data::DataType_t type) const
+  {
+    std::vector<std::string> results;
+
+    for(auto const& key_value : fAssociation) 
+
+      if(key_value.first.first == type) results.push_back(key_value.first.second);
+
+    return results;
+
+  }
+
+  const std::vector<std::string> event_base::association_keys(const data::DataType_t type,
+							      const size_t index_source) const
+  {
+    std::vector<std::string> results;
+    
+    for(auto const& key_value : fAssociation) {
+
+      if(key_value.first.first != type) continue;
+
+      if(key_value.second.size() <= index_source) continue;
+
+      if(key_value.second.at(index_source).size())
+
+	results.push_back(key_value.first.second);
+    }
+
+    return results;
+  }
+
+
 
 }
 

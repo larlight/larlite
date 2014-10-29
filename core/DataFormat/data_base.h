@@ -165,6 +165,16 @@ namespace larlite{
 				 const size_t index_source) const
     { return association(product_id(type,name),index_source); }
 
+    /// Getter for associated data products' key info (product_id)
+    const std::vector< ::larlite::product_id> association_keys() const;
+
+    /// Getter for associated data products' key info (product_id)
+    const std::vector<std::string> association_keys(const data::DataType_t type) const;
+
+    /// Getter for associated data products' key info (product_id)
+    const std::vector<std::string> association_keys(const data::DataType_t type,
+						    const size_t index_source) const;
+    
     /// List association
     void list_association() const;
 

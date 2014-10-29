@@ -18,3 +18,4 @@
 /GNUmakefile
 /UserDev/*
 !/UserDev/bin
+!/UserDev/RecoTool
