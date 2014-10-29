@@ -12,7 +12,7 @@ namespace larutil {
     _name = "LArProperties";
     if(default_load){
       _file_name = Form("%s/LArUtil/dat/%s",
-			getenv("LARLITE_CORE_DIR"),
+			getenv("LARLITE_COREDIR"),
 			kUTIL_DATA_FILENAME[LArUtilConfig::Detector()].c_str());
       _tree_name = kTREENAME_LARPROPERTIES;
       LoadData();
