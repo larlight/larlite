@@ -16,6 +16,9 @@ INCFLAGS += -I$(LARLITE_COREDIR)
 INCFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool
 INCFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool/FANN/include
 
+# Add -p flag to CINT compilation
+CINTFLAGS += -p
+
 # platform-specific options
 OSNAME          = $(shell uname -s)
 HOST            = $(shell uname -n)
@@ -25,9 +28,6 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
 # set compiler options for ROOT
 CXXFLAGS +=  `root-config --cflags`
-
-# set CINT flag
-CINTFLAGS += "-p"
 
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE

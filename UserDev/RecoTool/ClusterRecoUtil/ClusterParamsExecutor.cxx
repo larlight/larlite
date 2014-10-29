@@ -33,7 +33,7 @@ namespace cluster {
 
     auto ev_hits = mgr->get_data< ::larlite::event_hit>(hit_ass_names[0]);
 
-    auto const hit_index_v = ev_cluster->association(larlite::data::kHit,hit_ass_names[0],cluster_index);
+    auto const hit_index_v = ev_cluster->association(::larlite::data::kHit,hit_ass_names[0],cluster_index);
 
     if(!hit_index_v.size()) {
       throw cluster::CRUException("Associated hits not found!");
@@ -52,6 +52,7 @@ namespace cluster {
     
    return Execute(ev_hits->event_id(), cluster_index, plane);
   }
+
 
   int ClusterParamsExecutor::LoadAllHits(const ::larlite::event_hit *hits, const UChar_t plane_id)
   {
