@@ -14,9 +14,4 @@
 *~
 *.pcm
 *.swp
-/bin/larlite
-/GNUmakefile
-/UserDev/*
-!/UserDev/bin
-!/UserDev/RecoTool
-!/UserDev/BasicTool
+
