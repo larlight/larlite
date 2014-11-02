@@ -16,8 +16,8 @@ rootlibmap() {
 
 ######################################################
 # GeoAlgo
-rootlibmap libBGComptonStudy_GeoAlgo.rootmap libBGComptonStudy_GeoAlgo.so $LARLITE_USERDEVDIR/BGComptonStudy/GeoAlgo/LinkDef.h \
-    libLArLite_Analysis.so
+rootlibmap libBasicTool_GeoAlgo.rootmap libBasicTool_GeoAlgo.so $LARLITE_USERDEVDIR/BasicTool/GeoAlgo/LinkDef.h
+
 
 
 
