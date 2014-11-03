@@ -47,7 +47,7 @@ namespace larlite{
     virtual ~product_id(){}
 
     /// copy ctor
-    product_id(const product_id& original) : std::pair<larlite::data::DataType_t,std::string>(original)
+    product_id(const product_id& original) : std::pair<data::DataType_t,std::string>(original)
     {}
 
     /// For sorting
@@ -61,7 +61,7 @@ namespace larlite{
   };
 
   /// Association data type meant to be stored within event_X data product
-  typedef std::map<larlite::product_id,larlite::AssSet_t> AssMap_t;
+  typedef std::map<product_id,AssSet_t> AssMap_t;
 
 }
 #endif
