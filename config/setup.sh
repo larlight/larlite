@@ -1,13 +1,14 @@
 #!/bin/bash
 
-# If LARLITE_BASEDIR not set, try to guess
-if [[ -z $LARLITE_BASEDIR ]]; then
+if [[ -z $FORCE_LARLITE_BASEDIR ]]; then
+    # If LARLITE_BASEDIR not set, try to guess
     # Find the location of this script:
     me="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
     # Find the directory one above.
     export LARLITE_BASEDIR="$( cd "$( dirname "$me" )" && pwd )"
+else
+    export LARLITE_BASEDIR=$FORCE_LARLITE_BASEDIR
 fi
-
 echo "LARLITE_BASEDIR = $LARLITE_BASEDIR"
 if [[ -z $LARLITE_BASEDIR ]]; then
     echo \$LARLITE_BASEDIR not set! 
