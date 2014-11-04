@@ -17,6 +17,10 @@ rootlibmap() {
 ######################################################
 # ShowerReco3D
 rootlibmap libRecoTool_ShowerReco3D.rootmap libRecoTool_ShowerReco3D.so $LARLITE_USERDEVDIR/RecoTool/ShowerReco3D/LinkDef.h \
+    libRecoTool_ClusterRecoUtil.so \
+    libRecoTool_FANN.so \
+    libRecoTool_CMToolApp.so \
+    libRecoTool_AnalysisAlg.so \
     libLArLite_Analysis.so
 
 
