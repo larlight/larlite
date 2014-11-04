@@ -2,8 +2,8 @@
 // type-def file for ROOT
 //
 
-#ifndef LARLITE_MCSHOWERRECO_TYPEDEF_H
-#define LARLITE_MCSHOWERRECO_TYPEDEF_H
+#ifndef RECOTOOL_MCSHOWERRECO_TYPEDEF_H
+#define RECOTOOL_MCSHOWERRECO_TYPEDEF_H
 
 // Header files included here
 #include "MCShowerClusterer.h"
