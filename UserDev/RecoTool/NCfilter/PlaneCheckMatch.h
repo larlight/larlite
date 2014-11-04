@@ -19,7 +19,7 @@
 #include <vector>
 #include "Analysis/ana_base.h"
 #include "LArUtil/PxUtils.h"
-#include "LArutil/LArUtilBase.h"
+#include "LArUtil/LArUtilBase.h"
 #include "ClusterRecoUtil/CRUHelper.h"
 #include "ClusterRecoUtil/ClusterParamsAlg.h"
 #include "Quality.h"
