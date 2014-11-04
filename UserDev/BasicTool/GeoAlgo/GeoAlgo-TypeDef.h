@@ -14,17 +14,15 @@
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
-namespace larlite {
-
-//ADD_ANA_CLASS ... do not change this comment line
-
-}
+namespace geoalgo {
 
   class DistToBoxWall;
   class GeoAlgoException;
   class PointToLineDist;
   class TwoLineIntersection;
   class TrajectoryInVolume;
+
+}
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
 
