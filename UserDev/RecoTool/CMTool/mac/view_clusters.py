@@ -3,7 +3,6 @@ import ROOT, sys, os
 from ROOT import *
 
 # Now import ana_processor & your class. For this example, ana_base.
-gSystem.Load("libCMTool")
 from ROOT import *
 if len(sys.argv) != 2:
     print
@@ -31,7 +30,7 @@ raw_viewer   = larlite.ClusterViewer()
 
 my_proc.add_process(raw_viewer)
 
-raw_viewer.SetClusterProducer("fuzzycluster")
+raw_viewer.SetClusterProducer("pandora")
 
 gStyle.SetOptStat(0)
 
