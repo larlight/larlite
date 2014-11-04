@@ -22,7 +22,7 @@
 #include "Analysis/ana_base.h"
 #include "LArUtil/PxUtils.h"
 #include "LArUtil/LArUtilBase.h"
-#include "ClusterRecoutil/CRUHelper.h"
+#include "ClusterRecoUtil/CRUHelper.h"
 #include "ClusterRecoUtil/ClusterParamsAlg.h"
 
 // ROOT includes
