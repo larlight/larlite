@@ -12,18 +12,16 @@ if len(sys.argv) != 2:
 
 
 filename = sys.argv[1]
-my_proc = larlight.ana_processor()
-my_proc.set_verbosity(larlight.MSG.DEBUG)
+my_proc = larlite.ana_processor()
+my_proc.set_verbosity(larlite.msg.kDEBUG)
 
-my_proc.set_io_mode(larlight.storage_manager.READ)
+my_proc.set_io_mode(larlite.storage_manager.kREAD)
 
 my_proc.add_input_file(filename)
 
-larlight.storage_manager.get().set_in_rootdir("scanner")
-
 my_proc.set_ana_output_file("")
 
-raw_viewer   = larlight.ClusterViewer()
+raw_viewer   = larlite.ClusterViewer()
 
 #decide if to show hit charge OR MCShowers on RHS of TCanvas [default: false]
 #raw_viewer.SetDrawShowers(True)
@@ -33,12 +31,12 @@ raw_viewer   = larlight.ClusterViewer()
 
 my_proc.add_process(raw_viewer)
 
-raw_viewer.SetClusterType(larlight.DATA.Cluster)
+raw_viewer.SetClusterProducer("fuzzycluster")
 
 gStyle.SetOptStat(0)
 
 #start on first event always
-user_input_evt_no = -1;
+user_input_evt_no = 0;
 
 while true:
 
