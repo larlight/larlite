@@ -19,9 +19,9 @@ namespace geoalgo {
     
     //Distance Algorithm: see "Real-Time Collision Analysis" book, section 5.1.2.1
     
-    std::vector<float> line; // End-Start
-    std::vector<float> pToStart; // point - Start
-    std::vector<float> pToEnd;  // point - End
+    std::vector<double> line; // End-Start
+    std::vector<double> pToStart; // point - Start
+    std::vector<double> pToEnd;  // point - End
     
     for (size_t i=0; i < _point.size(); i++){
       line.push_back(_segmentEnd.at(i)-_segmentStart.at(i));
@@ -29,16 +29,94 @@ namespace geoalgo {
       pToEnd.push_back(_point.at(i)-_segmentEnd.at(i));
     }
     
-    float e = DotProduct(pToStart,line);
-    float segLenSquared = DotProduct(line,line);
+    double e = DotProduct(pToStart,line);
+    double segLenSquared = DotProduct(line,line);
     if (e <= 0.) return sqrt(DotProduct(pToStart,pToStart));
     else if (e > segLenSquared) return sqrt(DotProduct(pToEnd,pToEnd));
     else return sqrt( DotProduct(pToStart,pToStart)-(e*e)/segLenSquared );
     
   }
-
   
-  double PointToLineDist::DotProduct(std::vector<float> A, std::vector<float> B){
+  
+  double PointToLineDist::DistanceToTrack(std::vector<double> p, std::vector<std::vector<double> > track){
+    /*
+      if (p.size() != 3){
+      std::cout << "Gave non-3D point...exiting and returning -1" << std::endl;
+      return -1;
+      }
+      for (size_t i=0; i < track.size(); i++){
+      if ( track.at(i).size() != 3 ){
+      std::cout << "Gave non-3D point...exiting and returning -1" << std::endl;
+      return -1;
+      }
+      }
+    */
+    //now that we checked the dimension of the points...we can perform our calculation!
+    
+    //keep track of shortest disntace
+    double dist = 9999999.;
+    for (size_t i=0; i < track.size()-1; i++){
+      double distTmp = Distance(p, track.at(i), track.at(i+1));
+      if ( distTmp < dist )
+	dist = distTmp;
+    }
+    
+    return dist;
+  }
+  
+  
+  double PointToLineDist::DistanceToListOfTracks(std::vector<double> p, std::vector<std::vector<std::vector<double> > > *trackList){
+    
+    //keep track of shortest disntace
+    double dist = 9999999.;
+    for (size_t j=0; j < trackList->size(); j++){
+      for (size_t i=0; i < trackList->at(j).size()-1; i++){
+	double distTmp = Distance(p, trackList->at(j).at(i), trackList->at(j).at(i+1));
+	if ( distTmp < dist )
+	  dist = distTmp;
+      }//for all segments in track
+    }//for all tracks in trackList
+    
+    return dist;
+  }
+  
+  
+  double PointToLineDist::DistanceToTrack(std::vector<double> p, std::vector<std::vector<double> > track, double bufferDist){
+    
+    // This algorithm first checks that any of the trakectory points are closer to p than bufferDist amount...
+    // if so then calculates actual distance...should hopefully make things faster
+    
+    if (p.size() != 3){
+      std::cout << "Gave non-3D point...exiting and returning -1" << std::endl;
+      return -1;
+    }
+    for (size_t i=0; i < track.size(); i++){
+      if ( track.at(i).size() != 3 ){
+	std::cout << "Gave non-3D point...exiting and returning -1" << std::endl;
+	return -1;
+      }
+    }
+    
+    //now that we checked the dimension of the points...we can perform our calculation!
+    
+    //keep track of shortest disntace
+    double dist = 9999999.;
+    for (size_t i=0; i < track.size()-1; i++){
+      //if point i is closer then buffer-region
+      if ( ( (p.at(0)-track.at(i).at(0))*(p.at(0)-track.at(i).at(0)) + 
+	     (p.at(1)-track.at(i).at(1))*(p.at(1)-track.at(i).at(1)) + 
+	     (p.at(2)-track.at(i).at(2))*(p.at(2)-track.at(i).at(2)) ) < (bufferDist*bufferDist) ){
+	double distTmp = Distance(p, track.at(i), track.at(i+1));
+	if ( distTmp < dist )
+	  dist = distTmp;
+      }//if within buffer-distance
+    }//for all track points
+    
+    return dist;
+  }
+  
+  
+  double PointToLineDist::DotProduct(std::vector<double> A, std::vector<double> B){
     
     if (A.size() != B.size()){
       std::cout << "Error: Did not provide equal-dimension points" << std::endl;
@@ -48,7 +126,7 @@ namespace geoalgo {
     double dotProd = 0.;
     for (size_t i=0; i < A.size(); i++)
       dotProd += A.at(i)*B.at(i);
-
+    
     return dotProd;
   }
   
@@ -57,10 +135,10 @@ namespace geoalgo {
     bool cont = true;
     int next;
     
-    std::vector<float> point(3,1);
-    std::vector<float> A;
-    std::vector<float> B;
-    float Ax,Ay,Az,Bx,By,Bz;
+    std::vector<double> point(3,1);
+    std::vector<double> A;
+    std::vector<double> B;
+    double Ax,Ay,Az,Bx,By,Bz;
     
     while (cont){
       
@@ -94,7 +172,8 @@ namespace geoalgo {
       else { cont = false; }
     }
     
-    return;
+  return;
   }
+  
 }
 #endif
