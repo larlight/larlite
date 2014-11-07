@@ -6,17 +6,29 @@
 namespace geoalgo {
 
 
-  double SegmentPoCA::CloasestApproachToTrajectory(std::vector<std::vector<double>> traj, std::vector<double> s2, std::vector<double> e2){
-
+  double SegmentPoCA::ClosestApproachToTrajectory(std::vector<std::vector<double>> traj,
+						  std::vector<double> s2,
+						  std::vector<double> e2,
+						  std::vector<double> c1,
+						  std::vector<double> c2,
+						  double t1,
+						  double t2){
+    
     double min = 99999999;
-    std::vector<double> c1;
-    std::vector<double> c2;
-    double t1;
-    double t2;
+    std::vector<double> c1tmp;
+    std::vector<double> c2tmp;
+    double t1tmp;
+    double t2tmp;
     
     for (size_t i=0; i < (traj.size()-1); i++){
-      double minTmp = CloasestApproach(traj.at(i),traj.at(i+1),s2,e2,c1,c2,t1,t2);
-      if (minTmp < min) { min = minTmp; }
+      double minTmp = ClosestApproach(traj.at(i),traj.at(i+1),s2,e2,c1tmp,c2tmp,t1tmp,t2tmp);
+      if (minTmp < min) {
+	min = minTmp;
+	c1 = c1tmp;
+	c2 = c2tmp;
+	t1 = t1tmp;
+	t2 = t2tmp;
+      }
     }//for all trajectory segments
 
     return min;
@@ -24,15 +36,15 @@ namespace geoalgo {
   
   // Find smallest distance between segmens (s1-e1) and (s2-e2)
   // See "Real-Time Collision Analysis" Sec. 5.1.9
-  double SegmentPoCA::CloasestApproach(std::vector<double> s1,
-				       std::vector<double> e1,
-				       std::vector<double> s2,
-				       std::vector<double> e2,
-				       std::vector<double> &c1,
-				       std::vector<double> &c2,
-				       double &t1,
-				       double &t2){
-
+  double SegmentPoCA::ClosestApproach(std::vector<double> s1,
+				      std::vector<double> e1,
+				      std::vector<double> s2,
+				      std::vector<double> e2,
+				      std::vector<double> &c1,
+				      std::vector<double> &c2,
+				      double &t1,
+				      double &t2){
+    
     // c1 is the closest point on line 1
     // c2 is the closest point on line 2
     // t1 is the parametrized point for the first segment (line = s1 + t1*(e1-s1)) with t1 from 0 to 1
@@ -121,7 +133,7 @@ namespace geoalgo {
     double t1;
     double t2;
 
-    double distance = CloasestApproach(s1, e1, s2, e2, c1, c2, t1, t2);
+    double distance = ClosestApproach(s1, e1, s2, e2, c1, c2, t1, t2);
     std::cout << "line 1: [" << s1.at(0) << ", " << s1.at(1) << ", " << s1.at(2) << "]   --->    ["
 	      << e1.at(0) << ", " << e1.at(1) << ", " << e1.at(2) << "]" << std::endl;
     std::cout << "line 2: [" << s2.at(0) << ", " << s2.at(1) << ", " << s2.at(2) << "]   --->    ["

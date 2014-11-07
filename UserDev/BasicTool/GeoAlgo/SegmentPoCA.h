@@ -40,16 +40,22 @@ namespace geoalgo {
     virtual ~SegmentPoCA(){}
 
 
-    double CloasestApproachToTrajectory(std::vector<std::vector<double>> traj, std::vector<double> s2, std::vector<double> e2);
+    double ClosestApproachToTrajectory(std::vector<std::vector<double>> traj,
+				       std::vector<double> s2,
+				       std::vector<double> e2,
+				       std::vector<double> c1,
+				       std::vector<double> c2,
+				       double t1,
+				       double t2);
 
-    double CloasestApproach(std::vector<double> s1,
-			    std::vector<double> e1,
-			    std::vector<double> s2,
-			    std::vector<double> e2,
-			    std::vector<double> &c1,
-			    std::vector<double> &c2,
-			    double &t1,
-			    double &t2);
+    double ClosestApproach(std::vector<double> s1,
+			   std::vector<double> e1,
+			   std::vector<double> s2,
+			   std::vector<double> e2,
+			   std::vector<double> &c1,
+			   std::vector<double> &c2,
+			   double &t1,
+			   double &t2);
     
     double Clamp(double n, double min, double max);
 
