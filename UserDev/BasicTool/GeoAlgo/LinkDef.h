@@ -15,6 +15,7 @@
 #pragma link C++ class geoalgo::PointToLineDist+;
 #pragma link C++ class geoalgo::TwoLineIntersection+;
 #pragma link C++ class geoalgo::TrajectoryInVolume+;
+#pragma link C++ class geoalgo::SegmentPoCA+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif

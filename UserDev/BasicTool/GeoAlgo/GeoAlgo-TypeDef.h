@@ -11,6 +11,7 @@
 #include "PointToLineDist.h"
 #include "TwoLineIntersection.h"
 #include "TrajectoryInVolume.h"
+#include "SegmentPoCA.h"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -21,6 +22,7 @@ namespace geoalgo {
   class PointToLineDist;
   class TwoLineIntersection;
   class TrajectoryInVolume;
+  class SegmentPoca;
 
 }
 //ADD_EMPTY_CLASS ... do not change this comment line
