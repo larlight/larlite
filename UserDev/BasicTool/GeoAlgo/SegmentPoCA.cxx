@@ -9,10 +9,10 @@ namespace geoalgo {
   double SegmentPoCA::ClosestApproachToTrajectory(std::vector<std::vector<double>> traj,
 						  std::vector<double> s2,
 						  std::vector<double> e2,
-						  std::vector<double> c1,
-						  std::vector<double> c2,
-						  double t1,
-						  double t2){
+						  std::vector<double> &c1,
+						  std::vector<double> &c2,
+						  double &t1,
+						  double &t2){
     
     double min = 99999999;
     std::vector<double> c1tmp;
