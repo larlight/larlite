@@ -21,7 +21,7 @@ namespace larlite {
     // Need some bool to check about the quality of the protoclusters
     unsigned int nplanes = larutil::Geometry::GetME()->Nplanes();
         
-    bool TryFuzzyCluster = false;	
+    //bool TryFuzzyCluster = false;// since we dont have db cluster	
     // This is what the final clusters will be 
     std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> BestClusters(nplanes);
     // These bools are used to stop when we have a good match and good cluster
@@ -32,14 +32,11 @@ namespace larlite {
     std::vector<bool> QualFlip;
     
     // grab the incoming clusters. 
-    //auto Incoming_cluster = (const event_cluster*)(storage->get_data(DATA::DBCluster));
-    auto Incoming_cluster = storage->get_data<event_cluster>("dbcluster");
-    //auto Incoming_cluster = storage->get_data<event_cluster>("fuzzycluster");
-    //auto Incoming_cluster = storage->get_data<event_cluster>("cccluster");
+    auto Incoming_cluster = storage->get_data<event_cluster>("fuzzycluster");
 
     // First of all create an output
     auto Output_cluster = storage->get_data<event_cluster>("ncfilter");
-
+/*
   TryFuzzy:
     if(TryFuzzyCluster){
       // This is fine... really....
@@ -57,11 +54,13 @@ namespace larlite {
       std::cout<<"Trying Fuzzy"<<std::endl;
     }
 
-    auto hit_producers = Incoming_cluster->association_keys(data::kHit);
-    if(!(hit_producers.size())) 
-      print(msg::kERROR,__FUNCTION__,"No associated hit found!");
+	*/ // since we dont have db cluster at the moment 
+
+   // auto hit_producers = Incoming_cluster->association_keys(data::kHit);
+   // if(!(hit_producers.size())) 
+    //  print(msg::kERROR,__FUNCTION__,"No associated hit found!");
     
-    auto hits = storage->get_data<event_hit>(hit_producers[0]);
+    auto hits = storage->get_data<event_hit>("gaushit");
     
     if(!hits || !Incoming_cluster) {
       print(msg::kERROR,__FUNCTION__,"No DBCluster or associated hits found!");
@@ -229,8 +228,11 @@ namespace larlite {
 	&& BestClusters[2].first.size()==0 && BestClusters[2].second.size()==0 && TryFuzzyCluster==false ){TryFuzzyCluster = true; goto TryFuzzy;} 
     */ 
     
+/*
     if(FlagGoodPlanes[0]==false && FlagGoodPlanes[1]==false && FlagGoodPlanes[2]==false && TryFuzzyCluster==false){TryFuzzyCluster = true; goto TryFuzzy;} 
-    
+*/   
+
+
     //==================================
     //=== Try to unmerge some things ===
     //==================================
@@ -260,7 +262,8 @@ namespace larlite {
     */	
     
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-    std::cout<< " \n\n\n"<<std::endl;
+    //std::cout<< " \n\n\n"<<std::endl;
+//    std::cout<< " \n"<<std::endl;
 
     // Prepare association container
     AssSet_t  hit_ass_set;
@@ -276,6 +279,8 @@ namespace larlite {
 	::larlite::cluster lite_cluster;
 	// Skip if there's no hit
 	if(!(BestClusters[a].first.size()) || !(BestClusters[a].second.size())) continue;
+	// skip if the hits are too small
+	if((BestClusters[a].first.size()<25) || (BestClusters[a].second.size()<25)) continue;
 	
 	//
 	// Save clusters
