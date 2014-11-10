@@ -13,6 +13,8 @@
 #pragma link C++ namespace showerreco::energy;
 
 #pragma link C++ class larlite::ShowerReco3D+;
+#pragma link C++ class larlite::ComputePi0Mass+;
+#pragma link C++ class larlite::ShowerQuality+;
 //ADD_NEW_CLASS ... do not change this line
 #pragma link C++ class showerreco::ShowerRecoException+;
 #pragma link C++ class showerreco::ShowerRecoAlgBase+;

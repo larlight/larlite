@@ -7,6 +7,8 @@
 
 // Header files included here
 #include "ShowerReco3D.h"
+#include "ComputePi0Mass.h"
+#include "ShowerQuality.h"
 //ADD_NEW_HEADER ... do not change this comment line
 #include "ShowerRecoException.h"
 #include "ShowerCalo.h"
@@ -26,6 +28,8 @@ namespace showerreco {
 
 namespace larlite {
   class ShowerReco3D;
+  class ComputePi0Mass;
+  class ShowerQuality;
 //ADD_ANA_CLASS ... do not change this comment line
 }
 
