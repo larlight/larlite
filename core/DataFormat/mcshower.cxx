@@ -10,55 +10,36 @@ namespace larlite {
   //-------------------------------------------------------------
   {
     data_base::clear_data();
-    fMotherPDGID   = data::kINVALID_INT;
-    fMotherTrackID = data::kINVALID_UINT;
-    fMotherProcess = "";
-    fMotherVtx.clear();
-    fMotherVtx.resize(4,0);
-    fMotherMomentum.clear();
-    fMotherMomentum.resize(4,0);
+    TLorentzVector invalid(data::kINVALID_DOUBLE,
+			   data::kINVALID_DOUBLE,
+			   data::kINVALID_DOUBLE,
+			   data::kINVALID_DOUBLE);
+    mcstep invalid_step(invalid,invalid);
+
+    fOrigin    = simb::kUnknown;
+
+    fPDGCode   = data::kINVALID_INT;
+    fG4TrackID = data::kINVALID_UINT;
+    fProcess   = "";
+    fG4Start   = invalid_step;
+    fG4End     = invalid_step;
+
+    fMotherPDGCode   = data::kINVALID_INT;
+    fMotherG4TrackID = data::kINVALID_UINT;
+    fMotherProcess   = "";
+    fMotherG4Start   = invalid_step;
+    fMotherG4End     = invalid_step;
+
+    fAncestorPDGCode   = data::kINVALID_INT;
+    fAncestorG4TrackID = data::kINVALID_UINT;
+    fAncestorProcess   = "";
+    fAncestorG4Start   = invalid_step;
+    fAncestorG4End     = invalid_step;
+
+    fDetProfile = invalid_step;
+    
     fDaughterTrackID.clear();
-    fDaughterMomentum.clear();
-    fDaughterMomentum.resize(4,0);
-    fDaughterVtx.clear();
-    fDaughterVtx.resize(4,0);
     fPlaneCharge.clear();
-  }
-
-  void mcshower::SetMotherPoint(const std::vector<Double_t> &vtx)
-  {
-    if(vtx.size()!=4) {
-      std::cerr<<"\033[93m"<<"Input must have 4 dimension (x,y,z,t)!"<<"\033[00m"<<std::endl;
-      return;
-    }
-    fMotherVtx = vtx;
-  }
-  
-  void mcshower::SetMotherMomentum(const std::vector<Double_t> &mom)
-  {
-    if(mom.size()!=4) {
-      std::cerr<<"\033[93m"<<"Input must have 4 dimension (Px,Py,Pz,E)!"<<"\033[00m"<<std::endl;
-      return;
-    }
-    fMotherMomentum = mom;
-  }
-  
-  void mcshower::SetDaughterPosition(const std::vector<Double_t> &vtx)
-  {
-    if(vtx.size()!=4) {
-      std::cerr<<"\033[93m"<<"Input must have 4 dimension (x,y,z,t)!"<<"\033[00m"<<std::endl;
-      return;
-    }
-    fDaughterVtx = vtx;
-  }
-
-  void mcshower::SetDaughterMomentum(const std::vector<Double_t> &mom)
-  {
-    if(mom.size()!=4) {
-      std::cerr<<"\033[93m"<<"Input must have 4 dimension (Px,Py,Pz,E)!"<<"\033[00m"<<std::endl;
-      return;
-    }
-    fDaughterMomentum = mom;
   }
 
   //----------------------------------------------------

@@ -15,7 +15,7 @@
 #ifndef LARLITE_MCSHOWER_H
 #define LARLITE_MCSHOWER_H
 
-#include "data_base.h"
+#include "mctrajectory.h"
 
 namespace larlite {
   /**
@@ -32,14 +32,23 @@ namespace larlite {
 
     /// Copy constructor
     mcshower(const mcshower& origin) : data_base(origin),
-				       fMotherPDGID(origin.fMotherPDGID),
-				       fMotherTrackID(origin.fMotherTrackID),
+				       fOrigin(origin.fOrigin),
+				       fG4TrackID(origin.fG4TrackID),
+				       fProcess(origin.fProcess),
+				       fG4Start(origin.fG4Start),
+				       fG4End(origin.fG4End),
+				       fMotherPDGCode(origin.fMotherPDGCode),
+				       fMotherG4TrackID(origin.fMotherG4TrackID),
 				       fMotherProcess(origin.fMotherProcess),
-				       fMotherVtx(origin.fMotherVtx),
-				       fMotherMomentum(origin.fMotherMomentum),
-				       fDaughterTrackID(origin.fDaughterTrackID),
-				       fDaughterVtx(origin.fDaughterVtx),
-				       fDaughterMomentum(origin.fDaughterMomentum),
+				       fMotherG4Start(origin.fMotherG4Start),
+				       fMotherG4End(origin.fMotherG4End),
+				       fAncestorPDGCode(origin.fAncestorPDGCode),
+				       fAncestorG4TrackID(origin.fAncestorG4TrackID),
+				       fAncestorProcess(origin.fAncestorProcess),
+                                       fAncestorG4Start(origin.fAncestorG4Start),
+				       fAncestorG4End(origin.fAncestorG4End),
+                                       fDaughterTrackID(origin.fDaughterTrackID),
+                                       fDetProfile(origin.fDetProfile),
                                        fPlaneCharge(origin.fPlaneCharge)
     {}
 
@@ -51,77 +60,94 @@ namespace larlite {
 
     //--- Getters ---//
 
-    /// Shower mother's PDGID
-    int  MotherPDGID()   const { return fMotherPDGID;   }
+    simb::Origin_t     Origin    () const { return fOrigin;    }
 
-    /// Shower mother's G4 track ID 
-    unsigned int MotherTrackID() const { return fMotherTrackID; }
+    int                PdgCode   () const { return fPDGCode;   }
+    unsigned int       G4TrackID () const { return fG4TrackID; } 
+    const std::string& Process   () const { return fProcess;   }
+    const mcstep&      G4Start   () const { return fG4Start;   }
+    const mcstep&      G4End     () const { return fG4End;     }
 
-    /// Mother's creation process
-    const std::string& MotherCreationProcess() const { return fMotherProcess; }
+    int                MotherPdgCode   () const { return fMotherPDGCode;   }
+    unsigned int       MotherG4TrackID () const { return fMotherG4TrackID; }
+    const std::string& MotherProcess   () const { return fMotherProcess;   }
+    const mcstep&      MotherG4Start   () const { return fMotherG4Start;   }
+    const mcstep&      MotherG4End     () const { return fMotherG4End;     }
 
-    /// Shower mother's start point position
-    const std::vector<double>& MotherPosition() const { return fMotherVtx;      }
+    int                AncestorPdgCode   () const { return fAncestorPDGCode;   }
+    unsigned int       AncestorG4TrackID () const { return fAncestorG4TrackID; }
+    const std::string& AncestorProcess   () const { return fAncestorProcess;   }
+    const mcstep&      AncestorG4Start   () const { return fAncestorG4Start;   }
+    const mcstep&      AncestorG4End     () const { return fAncestorG4End;     }
 
-    /// Shower mother's start point momentum
-    const std::vector<double>& MotherMomentum() const { return fMotherMomentum; }
+    const mcstep& DetProfile () const { return fDetProfile; }
+    
+    const std::vector<unsigned int>&  DaughterTrackID() const { return fDaughterTrackID; }
 
-    /// Array of daughters' track ID
-    const std::vector<unsigned int>&  DaughterTrackID() const
-    { return fDaughterTrackID; }
-
-    /// (x,y,z,dE) vector as a weighted average of daughters' energy deposition points
-    const std::vector<double>& DaughterPosition() const
-    { return fDaughterVtx; }
-
-    /// (x,y,z,dE) vector as a weighted average of daughters' energy deposition points
-    const std::vector<double>& DaughterMomentum() const
-    { return fDaughterMomentum; }
-
-    /// Charge deposited by daughters per plane
     double Charge(const size_t plane) const;
 
     //--- Setters ---//
+    void Origin    ( simb::Origin_t o ) { fOrigin    = o;    }
 
-    void SetMotherID(int pdgid, unsigned int trackid)
-    { fMotherPDGID = pdgid; fMotherTrackID = trackid; }
+    void PdgCode   ( int id                  ) { fPDGCode   = id;   }
+    void G4TrackID ( unsigned int id         ) { fG4TrackID = id;   }
+    void Process   ( const std::string &name ) { fProcess   = name; }
+    void G4Start   ( const mcstep &s         ) { fG4Start   = s;    }
+    void G4End     ( const mcstep &s         ) { fG4End     = s;    }
 
-    void SetMotherProcess(const std::string& process)
-    { fMotherProcess = process; }
+    void MotherPdgCode   ( int id                  ) { fMotherPDGCode   = id;   }
+    void MotherG4TrackID ( unsigned int id         ) { fMotherG4TrackID = id;   }
+    void MotherProcess   ( const std::string& name ) { fMotherProcess   = name; }
+    void MotherG4Start   ( const mcstep& s         ) { fMotherG4Start   = s;    }
+    void MotherG4End     ( const mcstep& s         ) { fMotherG4End     = s;    }
 
-    void SetMotherPoint(const std::vector<double> &vtx);
+    void AncestorPdgCode   ( int id                  ) { fAncestorPDGCode   = id;   }
+    void AncestorG4TrackID ( unsigned int id         ) { fAncestorG4TrackID = id;   }
+    void AncestorProcess   ( const std::string& name ) { fAncestorProcess   = name; }
+    void AncestorG4Start   ( const mcstep& s         ) { fAncestorG4Start   = s;    }
+    void AncestorG4End     ( const mcstep& s         ) { fAncestorG4End     = s;    }
 
-    void SetMotherMomentum(const std::vector<double> &mom);
+    void DetProfile ( const mcstep& s) { fDetProfile = s; }
 
-    void SetDaughterPosition(const std::vector<double> &vtx);
+    void DaughterTrackID ( const std::vector<unsigned int>& id_v ) { fDaughterTrackID = id_v; }
 
-    void SetDaughterMomentum(const std::vector<double> &mom);
-    
-    void SetDaughterTrackList(const std::vector<unsigned int> &list)
-    { fDaughterTrackID = list; }
+    void Charge (const std::vector<double>& q) { fPlaneCharge = q; }
 
-    void SetPlaneCharge(const std::vector<double>& q)
-    { fPlaneCharge = q; }
+  protected:
 
-  private:
+    //---- Origin info ----//
+    simb::Origin_t fOrigin;    ///< Origin information
 
-    //---- Mother info ----//
-    int  fMotherPDGID;                   ///< mother PDG code
-    unsigned int fMotherTrackID;                 ///< mother G4 Track ID
-    std::string fMotherProcess;            ///< mother creation process
-    std::vector<double> fMotherVtx;      ///< mother position 4-vector @ generation
-    std::vector<double> fMotherMomentum; ///< mother momentum 4-vector @ generation
+    //---- Shower particle info ----//
+    int          fPDGCode;     ///< Shower particle PDG code
+    unsigned int fG4TrackID;   ///< Shower particle G4 track ID
+    std::string  fProcess;     ///< Shower particle's creation process
+    mcstep       fG4Start;     ///< Shower particle's G4 start point
+    mcstep       fG4End;       ///< Shower particle's G4 end point
 
-    //---- Daughter info ----//
-    std::vector<unsigned int>  fDaughterTrackID;  ///< Daughters' track ID
-    std::vector<double> fDaughterVtx;      ///< Daughters' deposit point closest to the mother vtx
-    std::vector<double> fDaughterMomentum; ///< Daughters' deposit sum momentum 4-vector
+    //---- Mother's particle info ---//
+    int          fMotherPDGCode;   ///< Shower's mother PDG code   
+    unsigned int fMotherG4TrackID; ///< Shower's mother G4 track ID
+    std::string  fMotherProcess;   ///< Shower's mother creation process
+    mcstep       fMotherG4Start;   ///< Shower's mother G4 start point
+    mcstep       fMotherG4End;     ///< Shower's mother G4 end point
+
+    //---- Ancestor's particle info ---//
+    int          fAncestorPDGCode;   ///< Shower's ancestor PDG code   
+    unsigned int fAncestorG4TrackID; ///< Shower's ancestor G4 track ID
+    std::string  fAncestorProcess;   ///< Shower's ancestor creation process
+    mcstep       fAncestorG4Start;   ///< Shower's ancestor G4 start point
+    mcstep       fAncestorG4End;     ///< Shower's ancestor G4 end point
+
+    //---- Energy deposition info ----//
+    std::vector<unsigned int>  fDaughterTrackID; ///< Daughters' track ID
+    mcstep                     fDetProfile;      ///< Combined energy deposition information
 
     //---- Charge per plane ----//
     std::vector<double> fPlaneCharge; ///< Charge deposit per plane
 
     ////////////////////////
-    ClassDef(mcshower,5)
+    ClassDef(mcshower,6)
     ////////////////////////
       
   };
@@ -152,7 +178,7 @@ namespace larlite {
   private:
     
     //////////////////////////
-    ClassDef(event_mcshower,1)
+    ClassDef(event_mcshower,2)
     //////////////////////////
   };
   

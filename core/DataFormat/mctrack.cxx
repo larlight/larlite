@@ -18,29 +18,27 @@ namespace larlite {
 
     fMotherPDGCode   = data::kINVALID_INT;
     fMotherG4TrackID = data::kINVALID_UINT;
+    fMotherProcess   = "";
 
     fAncestorPDGCode   = data::kINVALID_INT;
     fAncestorG4TrackID = data::kINVALID_UINT;
+    fAncestorProcess   = "";
 
     TLorentzVector invalid(data::kINVALID_DOUBLE,
 			   data::kINVALID_DOUBLE,
 			   data::kINVALID_DOUBLE,
 			   data::kINVALID_DOUBLE);
 
-    fG4Start.SetPosition(invalid);
-    fG4Start.SetMomentum(invalid);
-    fG4End.SetPosition(invalid);
-    fG4End.SetMomentum(invalid);
+    mcstep invalid_step(invalid,invalid);
 
-    fMotherG4Start.SetPosition(invalid);
-    fMotherG4Start.SetMomentum(invalid);
-    fMotherG4End.SetPosition(invalid);
-    fMotherG4End.SetMomentum(invalid);
+    fG4Start = invalid_step;
+    fG4End   = invalid_step;
 
-    fAncestorG4Start.SetPosition(invalid);
-    fAncestorG4Start.SetMomentum(invalid);
-    fAncestorG4End.SetPosition(invalid);
-    fAncestorG4End.SetMomentum(invalid);
+    fMotherG4Start = invalid_step;
+    fMotherG4End   = invalid_step;
+    
+    fAncestorG4Start = invalid_step;
+    fAncestorG4End   = invalid_step;
 
   }
 
