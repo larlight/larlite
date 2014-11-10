@@ -38,39 +38,77 @@ namespace larlite{
     /// copy ctor
     mctrack(const mctrack& orig) : std::vector<larlite::mcstep>(orig),
 				   data_base(orig),
+				   fOrigin(orig.fOrigin),
 				   fPDGCode(orig.fPDGCode),
-				   fCreationProcess(orig.fCreationProcess),
+				   fG4TrackID(orig.fG4TrackID),
+				   fProcess(orig.fProcess),
 				   fG4Start(orig.fG4Start),
 				   fG4End(orig.fG4End),
+				   fMotherPDGCode(orig.fMotherPDGCode),
+				   fMotherG4TrackID(orig.fMotherG4TrackID),
+				   fMotherG4Start(orig.fMotherG4Start),
+				   fMotherG4End(orig.fMotherG4End),
 				   fAncestorPDGCode(orig.fAncestorPDGCode),
-				   fAncestorG4Start(orig.fAncestorG4Start)
+				   fAncestorG4TrackID(orig.fAncestorG4TrackID),
+                                   fAncestorG4Start(orig.fAncestorG4Start),
+				   fAncestorG4End(orig.fAncestorG4End)
     {}
 
     void clear_data();
 
-    const int           PdgCode() const         { return fPDGCode;         }
-    const std::string&  CreationProcess() const { return fCreationProcess; }
-    const mcstep&       G4Start() const         { return fG4Start;         }
-    const mcstep&       G4End()   const         { return fG4End;           }
-    const int           AncestorPDGCode() const { return fAncestorPDGCode; }
-    const mcstep&       AncestorG4Start() const { return fAncestorG4Start; }
+    simb::Origin_t      Origin     () const { return fOrigin;            }
+    int                 PdgCode    () const { return fPDGCode;           }
+    unsigned int        G4TrackID  () const { return fG4TrackID;         }
+    const std::string&  Process    () const { return fProcess;           }
+    const mcstep&       G4Start    () const { return fG4Start;           }
+    const mcstep&       G4End      () const { return fG4End;             }
 
-    void PdgCode         ( int id           ) { fPDGCode = id;           }
-    void CreationProcess ( std::string name ) { fCreationProcess = name; }
-    void G4Start         ( const mcstep s   ) { fG4Start = s;            }
-    void G4End           ( const mcstep s   ) { fG4End = s;              }
-    void AncestorPDGCode ( int id           ) { fAncestorPDGCode = id;   }
-    void AncestorG4Start ( const mcstep s   ) { fAncestorG4Start = s;    }
+    int           MotherPDGCode    () const { return fMotherPDGCode;     }
+    unsigned int  MotherG4TrackID  () const { return fMotherG4TrackID;   }
+    const mcstep& MotherG4Start    () const { return fMotherG4Start;     }
+    const mcstep& MotherG4End      () const { return fMotherG4End;       }
+
+    int           AncestorPDGCode  () const { return fAncestorPDGCode;   }
+    unsigned int  AncestorG4TrackID() const { return fAncestorG4TrackID; }
+    const mcstep& AncestorG4Start  () const { return fAncestorG4Start;   }
+    const mcstep& AncestorG4End    () const { return fAncestorG4End;     }
+
+    
+    void Origin          ( simb::Origin_t o ) { fOrigin    = o;        }
+    void PdgCode         ( int id           ) { fPDGCode   = id;       }
+    void G4TrackID       ( unsigned int id  ) { fG4TrackID = id;       }
+    void Process         ( std::string name ) { fProcess   = name;     }
+    void G4Start         ( const mcstep s   ) { fG4Start   = s;        }
+    void G4End           ( const mcstep s   ) { fG4End     = s;        }
+
+    void MotherPDGCode   ( int id           ) { fMotherPDGCode   = id; }
+    void MotherG4TrackID ( unsigned int id  ) { fMotherG4TrackID = id; }
+    void MotherG4Start   ( const mcstep s   ) { fMotherG4Start   = s;  }
+    void MotherG4End     ( const mcstep s   ) { fMotherG4End     = s;  }
+
+    void AncestorPDGCode   ( int id           ) { fAncestorPDGCode   = id; }
+    void AncestorG4TrackID ( unsigned int id  ) { fAncestorG4TrackID = id; }
+    void AncestorG4Start   ( const mcstep s   ) { fAncestorG4Start   = s;  }
+    void AncestorG4End     ( const mcstep s   ) { fAncestorG4End     = s;  }
 
   protected:
 
-    int         fPDGCode;         ///< PDG code of this track particle
-    std::string fCreationProcess; ///< Creation process of this track particle
-    mcstep      fG4Start;         ///< G4 start position/momentum of this track particle
-    mcstep      fG4End;           ///< G4 end position/momentum of this track particle
+    simb::Origin_t fOrigin;    ///< Origin of this particle (see simb::Origin_t)
+    int            fPDGCode;   ///< PDG code of this track particle
+    unsigned int   fG4TrackID; ///< G4 track ID
+    std::string    fProcess;   ///< Creation process of this track particle
+    mcstep         fG4Start;   ///< G4 start position/momentum of this track particle
+    mcstep         fG4End;     ///< G4 end position/momentum of this track particle
 
-    int    fAncestorPDGCode; ///< This particle's ancestor's PDG code
-    mcstep fAncestorG4Start; ///< This particle's ancestor's start position/momentum
+    int            fMotherPDGCode;   ///< This particle's mother's PDG code
+    unsigned int   fMotherG4TrackID; ///< This particle's mother's G4 track ID
+    mcstep         fMotherG4Start;   ///< This particle's mother's start position/momentum
+    mcstep         fMotherG4End;     ///< This particle's mother's end position/momentum
+
+    int            fAncestorPDGCode;   ///< This particle's ancestor's PDG code
+    unsigned int   fAncestorG4TrackID; ///< This particle's ancestor's G4 track ID
+    mcstep         fAncestorG4Start;   ///< This particle's ancestor's start position/momentum
+    mcstep         fAncestorG4End;     ///< This particle's ancestor's start position/momentum
 
     ////////////////////////
     ClassDef(mctrack,1)
