@@ -48,11 +48,11 @@ namespace larlite{
 
     void clear_data();
 
-    const int           PdgCode() const         { return fPDGCode;         }
+    int                 PdgCode() const         { return fPDGCode;         }
     const std::string&  CreationProcess() const { return fCreationProcess; }
     const mcstep&       G4Start() const         { return fG4Start;         }
     const mcstep&       G4End()   const         { return fG4End;           }
-    const int           AncestorPDGCode() const { return fAncestorPDGCode; }
+    int                 AncestorPDGCode() const { return fAncestorPDGCode; }
     const mcstep&       AncestorG4Start() const { return fAncestorG4Start; }
 
     void PdgCode         ( int id           ) { fPDGCode = id;           }
