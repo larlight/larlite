@@ -68,6 +68,7 @@ namespace larlite{
       kUserInfo,           ///< dynamic data container (LArLite original)
       kTrigger,            ///< Trigger data (LArLite original)
       kPOTSummary,         ///< sumdata::POTSummary 
+      kMCTrack,            ///< sim::MCTrack
       kDATA_TYPE_MAX
     };
 
@@ -100,7 +101,8 @@ namespace larlite{
       "pfpart",
       "user",
       "trigger",
-      "potsummary"
+      "potsummary",
+      "mctrack"
     };
     
   }

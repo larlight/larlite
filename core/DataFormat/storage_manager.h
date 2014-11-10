@@ -32,6 +32,7 @@
 #include "cluster.h"
 #include "shower.h"
 #include "mcshower.h"
+#include "mctrack.h"
 #include "simch.h"
 #include "calorimetry.h"
 #include "vertex.h"
@@ -272,6 +273,7 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_partid> () const;
   template<> data::DataType_t storage_manager::data_type<event_pfpart> () const;
   template<> data::DataType_t storage_manager::data_type<event_user> () const;
+  template<> data::DataType_t storage_manager::data_type<event_mctrack> () const;
 }
 #endif
 

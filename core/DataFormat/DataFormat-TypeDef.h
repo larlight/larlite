@@ -38,6 +38,7 @@
 
 #include "gtruth.h"
 #include "mcshower.h"
+#include "mctrack.h"
 #include "mctrajectory.h"
 #include "mcpart.h"
 #include "mcflux.h"
@@ -108,6 +109,9 @@ namespace larlite{
 
   class mcshower;
   class event_mcshower;
+
+  class mctrack;
+  class event_mctrack;
 
   class mcstep;
   class mctrajectory;

@@ -580,6 +580,9 @@ namespace larlite {
     case data::kParticleID:
       _ptr_data_array[type][name]=(event_base*)(new event_partid(name));
       break;
+    case data::kMCTrack:
+      _ptr_data_array[type][name]=(event_mctrack*)(new event_mctrack(name));
+      break;
     default:
       print(msg::kERROR,__FUNCTION__,Form("Data identifier not supported: %d",(int)type));
       break;

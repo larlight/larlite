@@ -130,6 +130,10 @@
 #pragma link C++ class std::vector<larlite::mcstep>+;
 #pragma link C++ class larlite::mctrajectory+;
 
+#pragma link C++ class larlite::mctrack+;
+#pragma link C++ class std::vector<larlite::mctrack>+;
+#pragma link C++ class larlite::event_mctrack+;
+
 #pragma link C++ class larlite::mcnu+;
 #pragma link C++ class std::vector<larlite::mcnu>+;
 

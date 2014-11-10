@@ -39,6 +39,10 @@ namespace larlite {
 
     virtual ~mcstep(){}
     
+    mcstep(const mcstep& orig) : _position(orig._position),
+				 _momentum(orig._momentum)
+    {}
+
     const TLorentzVector& Momentum() const {return _momentum;}
 
     const TLorentzVector& Position() const {return _position;}
