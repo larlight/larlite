@@ -265,7 +265,7 @@ namespace larlite {
       }
 
       if(best_plane_index < 0) {
-	throw ShowerRecoException(Form("Failed to identify the best plane for shower %zu",
+	throw ::showerreco::ShowerRecoException::ShowerRecoException(Form("Failed to identify the best plane for shower %zu",
 				       shower_index)
 				  );
       }
