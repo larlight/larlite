@@ -12,6 +12,7 @@
 // Class forward declaration here
 namespace fcl {
   class PSet;
+  class PSetManger;
   class FhiclLiteException;
 }
   class CfgFileReader;

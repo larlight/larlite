@@ -583,6 +583,9 @@ namespace larlite {
     case data::kMCTrack:
       _ptr_data_array[type][name]=(event_mctrack*)(new event_mctrack(name));
       break;
+    case data::kMCTree:
+      _ptr_data_array[type][name]=(event_mctree*)(new event_mctree(name));
+      break;
     default:
       print(msg::kERROR,__FUNCTION__,Form("Data identifier not supported: %d",(int)type));
       break;

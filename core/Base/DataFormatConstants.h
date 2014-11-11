@@ -69,6 +69,7 @@ namespace larlite{
       kTrigger,            ///< Trigger data (LArLite original)
       kPOTSummary,         ///< sumdata::POTSummary 
       kMCTrack,            ///< sim::MCTrack
+      kMCTree,             ///< sim::MCTree
       kDATA_TYPE_MAX
     };
 
@@ -102,7 +103,8 @@ namespace larlite{
       "user",
       "trigger",
       "potsummary",
-      "mctrack"
+      "mctrack",
+      "mctree"
     };
     
   }

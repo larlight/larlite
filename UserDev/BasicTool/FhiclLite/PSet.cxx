@@ -44,19 +44,26 @@ namespace fcl {
     return (*iter).second;
   }
 
-  std::string PSet::dump() const
+  std::string PSet::dump(int x) const
   {
+
+    //input "x" is used to determine nesting & level of tabbing required for output
+    std::string tabbing = "";
+    for (int i=0; i < x; i++)
+      tabbing += "\t";
+
     std::string res = fName;
-    res += ": {\n";
+    res += tabbing.c_str();
+    res += " {\n";
     for(auto const& key_value : fParams_m) 
 
-      res += Form("  %s: %s\n", key_value.first.c_str(), key_value.second.c_str());
+      res += Form("%s  %s : %s\n", tabbing.c_str(), key_value.first.c_str(), key_value.second.c_str());
     
     for(auto const& key_value : fPSets_m)
 
-      res += Form("  %s", key_value.second.dump().c_str());
+      res += Form("  %s", key_value.second.dump(x+1).c_str());
 
-    res += "}\n";
+    res += Form("%s }\n",tabbing.c_str());
     
     return res;
   }

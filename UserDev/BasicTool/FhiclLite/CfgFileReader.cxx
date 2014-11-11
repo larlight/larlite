@@ -14,16 +14,18 @@ void strip(std::string& str, const std::string& key)
 
 CfgFileReader::CfgFileReader()
 {
-  keywords.insert(":");
-  keywords.insert("{");
-  keywords.insert("}");
+  keywords.insert(":"); // for key->param separator
+  keywords.insert("{"); // for begin of PSet
+  keywords.insert("}"); // for end of PSet
   Reset();
+  SetVerbose(false);
 }
 
 void CfgFileReader::Reset()
 {
   key_name="";
   mode=kIdle;
+  _PSetManager.Reset();  
 }
 
 void CfgFileReader::ProcessWord(const std::string& word) 
@@ -36,47 +38,63 @@ void CfgFileReader::ProcessWord(const std::string& word)
   */
 
   if( word == "{" ) { 
-    if( mode != kPSetKeyDone)
+    if( mode != kKeyDone )
       throw fcl::FhiclLiteException("Wrong { usage");
     if( key_name.empty() )
       throw fcl::FhiclLiteException("PSet name not set!");
-    std::cout<<"PSET: "<<key_name.c_str()<<std::endl;
-    mode = kSearchParamKey;
+
+    if(_verbose) { std::cout<<"Found {. PSET: "<<key_name.c_str() << "\tMode: " << mode << std::endl; }
+    key_name = "";
+
+    // found the beginning of a set
+    // modify variables to reflect change
+    if (_PSetManager.getCurrentSet()){
+      //create a new sub-Set of current set
+      _PSetManager.addSubSet(key_name);
+    }
+    else{
+      // create a new pset
+      _PSetManager.addSet(fcl::PSet(key_name.c_str()));
+    }
+
+    mode = kIdle;
   }
 
   else if( word == ":") {
-    if( mode != kParamKeyDone )
+    if( mode != kKeyDone )
       throw fcl::FhiclLiteException("Wrong : usage");
     if( key_name.empty() )
       throw fcl::FhiclLiteException("Param name not set!");
-    std::cout<<"KEY: "<<key_name.c_str()<<std::endl;
     mode = kSearchParamValue;
+    if (_verbose) { std::cout<<"KEY: "<<key_name.c_str() << "\tMode: " << mode << std::endl; }
   }
 
   else if( word == "}") { 
-    if( mode != kSearchParamKey )
+    if( mode != kIdle )
       throw fcl::FhiclLiteException("Wrong } usage");
     mode = kIdle;
+    if (_verbose) { std::cout << "found }.\tMode: " << mode << std::endl; }
     key_name="";
+    // reached the end of the set
+    // modify variables to reflect change
+    _PSetManager.closeCurrentSet();
   }
 
   else {
     if(mode==kIdle) {
       if(!key_name.empty()) {
-	std::cout<<key_name.c_str()<< " ... " <<word.c_str()<<std::endl;
+	if (_verbose) { std::cout << key_name.c_str() << " ... " << word.c_str() << std::endl; }
 	throw fcl::FhiclLiteException("Two consecutive strings?!");
       }
-      mode = kPSetKeyDone;
+      mode = kKeyDone;
       key_name = word;
     }
-    else if(mode==kSearchParamKey) {
-      mode = kParamKeyDone;
-      key_name = word;      
-    }
     else if(mode==kSearchParamValue) {
-      std::cout<<"VALUE: "<<word.c_str()<<std::endl;;
-      mode = kSearchParamKey;
+      // add this parameter to current set
+      _PSetManager.addParameter(key_name,word.c_str());
+      mode = kIdle;
       key_name = "";
+      if (_verbose) { std::cout<<"VALUE: "<<word.c_str() << "\tMode: " << mode << std::endl; }
     }
   }
 
@@ -126,6 +144,15 @@ void CfgFileReader::ReadFile(std::string fname)
       ReadWord(word);
 
   }
+
+  // now use PSet "dump" to test it - temporary
+  _PSetManager.dump();
+  /*
+  for (size_t i=0; i < _set.size(); i++){
+    std::string dumpOutput = _set.at(i).dump(0);
+    std::cout << dumpOutput << std::endl;
+  }
+  */
 
   filestrm.close();
   //linestream >> val1 >> val2;
