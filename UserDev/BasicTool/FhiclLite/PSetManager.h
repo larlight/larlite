@@ -44,7 +44,13 @@ namespace fcl {
     { _set.clear(); }
 
     /// Add a set for this file
-    void addSet(PSet ps) { _set.push_back(ps); }
+    void addSet(PSet ps) { _set.push_back(ps); _currentSet = &(_set.back());}
+
+    /// Add a subset for this file
+    void addSubSet(std::string key);
+
+    /// Just finished a parameter set. Close it
+    void closeCurrentSet();
 
     // Get Pointer to last element of _set
     PSet* getBackSet() { return &(_set.back()); }
@@ -68,6 +74,9 @@ namespace fcl {
     
     /// Set Top Set
     void setTopSet(PSet *ps) { _topSet = ps; }
+
+    /// Add Parameter to currentSet
+    void addParameter(std::string key, std::string param);
 
     /// Dump
     void dump();
