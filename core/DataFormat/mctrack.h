@@ -46,10 +46,12 @@ namespace larlite{
 				   fG4End(orig.fG4End),
 				   fMotherPDGCode(orig.fMotherPDGCode),
 				   fMotherG4TrackID(orig.fMotherG4TrackID),
+				   fMotherProcess(orig.fMotherProcess),
 				   fMotherG4Start(orig.fMotherG4Start),
 				   fMotherG4End(orig.fMotherG4End),
 				   fAncestorPDGCode(orig.fAncestorPDGCode),
 				   fAncestorG4TrackID(orig.fAncestorG4TrackID),
+                                   fAncestorProcess(orig.fAncestorProcess),
                                    fAncestorG4Start(orig.fAncestorG4Start),
 				   fAncestorG4End(orig.fAncestorG4End)
     {}
