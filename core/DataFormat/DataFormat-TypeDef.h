@@ -123,9 +123,8 @@ namespace larlite{
   class mcpart;
   class event_mcpart;
 
-  class treenode;
   class mctree;
-  class event_mcpart;
+  class event_mctree;
 
   class mcflux;
   class event_mcflux;
