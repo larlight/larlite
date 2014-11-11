@@ -21,9 +21,9 @@ from ROOT import geoalgo
 example = geoalgo.SegmentPoCA()
 
 p1 = ROOT.vector('double')()
-p1.push_back(0)
-p1.push_back(0)
-p1.push_back(0)
+p1.push_back(0.01)
+p1.push_back(0.02)
+p1.push_back(-0.01)
 
 p2 = ROOT.vector('double')()
 p2.push_back(2)
@@ -31,14 +31,14 @@ p2.push_back(0)
 p2.push_back(0)
 
 t1 = ROOT.vector('double')()
-t1.push_back(0)
-t1.push_back(0)
-t1.push_back(-2)
+t1.push_back(0.3)
+t1.push_back(0.02)
+t1.push_back(1.3)
 
 t2 = ROOT.vector('double')()
-t2.push_back(2)
-t2.push_back(0)
-t2.push_back(2)
+t2.push_back(3.34)
+t2.push_back(-0.04)
+t2.push_back(5.0)
 
 example.TestPoCA(p1,p2,t1,t2)
 
