@@ -28,10 +28,16 @@ namespace larlite {
   public:
     
     /// Default constructor 
-  mctree() : data_base(data::kMCTree), treenode::treenode() {clear_data();}
+    mctree() : data_base(data::kMCTree), treenode::treenode() {clear_data();}
     
     /// Alternative constructor
-      mctree(int trackId);
+    mctree(int trackId);
+
+    /// Copy ctor
+    mctree(const mctree& orig) 
+      : data_base(orig)
+      , treenode(orig)
+    {}
 
     /// Default destructor
     virtual ~mctree(){}

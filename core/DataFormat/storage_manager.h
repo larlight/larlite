@@ -24,6 +24,7 @@
 #include "hit.h"
 #include "track.h"
 #include "mctruth.h"
+#include "mctree.h"
 #include "user_info.h"
 #include "spacepoint.h"
 #include "rawdigit.h"
@@ -274,6 +275,7 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_pfpart> () const;
   template<> data::DataType_t storage_manager::data_type<event_user> () const;
   template<> data::DataType_t storage_manager::data_type<event_mctrack> () const;
+  template<> data::DataType_t storage_manager::data_type<event_mctree> () const;
 }
 #endif
 

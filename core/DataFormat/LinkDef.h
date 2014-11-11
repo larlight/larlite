@@ -122,6 +122,8 @@
 #pragma link C++ class std::vector<larlite::mcpart>+;
 #pragma link C++ class larlite::event_mcpart+;
 
+#pragma link C++ class treenode+;
+#pragma link C++ class std::vector<treenode>+;
 #pragma link C++ class larlite::mctree+;
 #pragma link C++ class std::vector<larlite::mctree>+;
 #pragma link C++ class larlite::event_mctree+;
