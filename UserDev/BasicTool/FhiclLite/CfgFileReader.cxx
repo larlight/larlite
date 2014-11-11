@@ -48,20 +48,12 @@ void CfgFileReader::ProcessWord(const std::string& word)
     // found the beginning of a set
     // modify variables to reflect change
     if (_PSetManager.getCurrentSet()){
-      // a set is open...create the new set as part of it
-      _PSetManager.setTopSet(_PSetManager.getCurrentSet());
-      //      _topSet = _thisSet;
-      _PSetManager.getTopSet()->set(key_name.c_str(), fcl::PSet(key_name.c_str()) );
-      //      _topSet->set(key_name.c_str(), fcl::PSet(key_name.c_str()) );
-      _PSetManager.setCurrentSet(&(_PSetManager.getTopSet()->get_pset_writeable(key_name.c_str())));
-      //      _thisSet = &_topSet->get_pset_writeable(key_name.c_str());
+      //create a new sub-Set of current set
+      _PSetManager.addSubSet(key_name);
     }
     else{
       // create a new pset
       _PSetManager.addSet(fcl::PSet(key_name.c_str()));
-      //      _set.push_back(fcl::PSet(key_name.c_str()));
-      _PSetManager.setCurrentSet(_PSetManager.getBackSet());
-      //      _thisSet = &_set.back();
     }
 
     mode = kIdle;
@@ -84,10 +76,7 @@ void CfgFileReader::ProcessWord(const std::string& word)
     key_name="";
     // reached the end of the set
     // modify variables to reflect change
-    _PSetManager.setCurrentSet(_PSetManager.getTopSet());
-    //    _thisSet = _topSet;
-    _PSetManager.clearTopSet();
-    //    _topSet = 0;
+    _PSetManager.closeCurrentSet();
   }
 
   else {
@@ -100,8 +89,8 @@ void CfgFileReader::ProcessWord(const std::string& word)
       key_name = word;
     }
     else if(mode==kSearchParamValue) {
-      _PSetManager.getCurrentSet()->set(key_name,word.c_str());
-      //      _thisSet->set(key_name,word.c_str());
+      // add this parameter to current set
+      _PSetManager.addParameter(key_name,word.c_str());
       mode = kIdle;
       key_name = "";
       std::cout<<"VALUE: "<<word.c_str() << "\tMode: " << mode << std::endl;;
