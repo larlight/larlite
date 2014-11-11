@@ -42,6 +42,8 @@ public:
 
   void ReadFile(std::string fname);
 
+  void SetVerbose(bool on) { _verbose = on; }
+
 protected:
 
   enum Mode_t {
@@ -66,10 +68,8 @@ protected:
   // PSetManager
   fcl::PSetManager _PSetManager;
 
-  //  std::vector<fcl::PSet> _set;
-
-  //  fcl::PSet *_thisSet;
-  //  fcl::PSet *_topSet;
+  //verbosity
+  bool _verbose;
 
 };
 

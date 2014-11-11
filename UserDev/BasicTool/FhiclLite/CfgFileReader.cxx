@@ -18,6 +18,7 @@ CfgFileReader::CfgFileReader()
   keywords.insert("{"); // for begin of PSet
   keywords.insert("}"); // for end of PSet
   Reset();
+  SetVerbose(false);
 }
 
 void CfgFileReader::Reset()
@@ -42,7 +43,7 @@ void CfgFileReader::ProcessWord(const std::string& word)
     if( key_name.empty() )
       throw fcl::FhiclLiteException("PSet name not set!");
 
-    std::cout<<"Found {. PSET: "<<key_name.c_str() << "\tMode: " << mode << std::endl;
+    if(_verbose) { std::cout<<"Found {. PSET: "<<key_name.c_str() << "\tMode: " << mode << std::endl; }
     key_name = "";
 
     // found the beginning of a set
@@ -65,14 +66,14 @@ void CfgFileReader::ProcessWord(const std::string& word)
     if( key_name.empty() )
       throw fcl::FhiclLiteException("Param name not set!");
     mode = kSearchParamValue;
-    std::cout<<"KEY: "<<key_name.c_str() << "\tMode: " << mode << std::endl;
+    if (_verbose) { std::cout<<"KEY: "<<key_name.c_str() << "\tMode: " << mode << std::endl; }
   }
 
   else if( word == "}") { 
     if( mode != kIdle )
       throw fcl::FhiclLiteException("Wrong } usage");
     mode = kIdle;
-    std::cout << "found }.\tMode: " << mode << std::endl;
+    if (_verbose) { std::cout << "found }.\tMode: " << mode << std::endl; }
     key_name="";
     // reached the end of the set
     // modify variables to reflect change
@@ -82,7 +83,7 @@ void CfgFileReader::ProcessWord(const std::string& word)
   else {
     if(mode==kIdle) {
       if(!key_name.empty()) {
-	std::cout<<key_name.c_str()<< " ... " <<word.c_str()<<std::endl;
+	if (_verbose) { std::cout << key_name.c_str() << " ... " << word.c_str() << std::endl; }
 	throw fcl::FhiclLiteException("Two consecutive strings?!");
       }
       mode = kKeyDone;
@@ -93,7 +94,7 @@ void CfgFileReader::ProcessWord(const std::string& word)
       _PSetManager.addParameter(key_name,word.c_str());
       mode = kIdle;
       key_name = "";
-      std::cout<<"VALUE: "<<word.c_str() << "\tMode: " << mode << std::endl;;
+      if (_verbose) { std::cout<<"VALUE: "<<word.c_str() << "\tMode: " << mode << std::endl; }
     }
   }
 

@@ -30,14 +30,11 @@ namespace fcl{
 
 
   void PSetManager::closeCurrentSet(){
-    if (!_topSet){
-      std::cout << "should through exeption here..." << std::endl;
-      return;
-    }
-    else{
-      _currentSet = _topSet;
-      _topSet = 0;
-    }
+
+    //need to make the top = to the curren't parent...
+
+    _currentSet = _topSet;
+    _topSet = 0;
 
     return;
   }
