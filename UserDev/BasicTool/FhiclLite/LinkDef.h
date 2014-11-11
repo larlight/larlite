@@ -10,6 +10,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class fcl::PSet+;
+#pragma link C++ class fcl::PSetManager+;
 #pragma link C++ class fcl::FhiclLiteException+;
 
 #pragma link C++ class CfgFileReader+;

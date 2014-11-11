@@ -21,7 +21,8 @@
 #include <vector>
 #include <set>
 #include "FhiclLiteException.h"
-#include "PSet.h"
+#include "PSetManager.h"
+
 /**
    \class CfgFileReader
    User defined class CfgFileReader ... these comments are used to generate
@@ -62,15 +63,14 @@ protected:
 
   Mode_t mode;
 
-  std::vector<fcl::PSet> _set;
+  // PSetManager
+  fcl::PSetManager _PSetManager;
 
-  fcl::PSet *_thisSet;
-  fcl::PSet *_topSet;
+  //  std::vector<fcl::PSet> _set;
 
-  // vareiable to keep track of how many open PSets there are
-  // reason: if reaches the end of file and not == 0 -> Bad!
-  int _NopenPSet;
-  
+  //  fcl::PSet *_thisSet;
+  //  fcl::PSet *_topSet;
+
 };
 
 #endif
