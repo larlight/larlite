@@ -41,10 +41,14 @@
 #include "mctrack.h"
 #include "mctrajectory.h"
 #include "mcpart.h"
+#include "mctree.h"
 #include "mcflux.h"
 #include "mcnu.h"
 #include "mctruth.h"
 #include "simch.h"
+
+#include "treenode.h"
+
 /*
 #include "trigger.h"
 */
@@ -118,6 +122,9 @@ namespace larlite{
 
   class mcpart;
   class event_mcpart;
+ 
+  class mctree;
+  class event_mcpart;
 
   class mcflux;
   class event_mcflux;
@@ -140,7 +147,10 @@ namespace larlite{
   class trigger;
   */
   class storage_manager;
+
 }
+
+class treenode;
 #endif
 
 
