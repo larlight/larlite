@@ -14,14 +14,14 @@ namespace larlite {
     fOrigin  = simb::kUnknown;
     fProcess = "";
     fPDGCode         = data::kINVALID_INT;
-    fG4TrackID       = data::kINVALID_UINT;
+    fTrackID         = data::kINVALID_UINT;
 
     fMotherPDGCode   = data::kINVALID_INT;
-    fMotherG4TrackID = data::kINVALID_UINT;
+    fMotherTrackID   = data::kINVALID_UINT;
     fMotherProcess   = "";
 
     fAncestorPDGCode   = data::kINVALID_INT;
-    fAncestorG4TrackID = data::kINVALID_UINT;
+    fAncestorTrackID   = data::kINVALID_UINT;
     fAncestorProcess   = "";
 
     TLorentzVector invalid(data::kINVALID_DOUBLE,
@@ -31,14 +31,14 @@ namespace larlite {
 
     mcstep invalid_step(invalid,invalid);
 
-    fG4Start = invalid_step;
-    fG4End   = invalid_step;
+    fStart = invalid_step;
+    fEnd   = invalid_step;
 
-    fMotherG4Start = invalid_step;
-    fMotherG4End   = invalid_step;
+    fMotherStart = invalid_step;
+    fMotherEnd   = invalid_step;
     
-    fAncestorG4Start = invalid_step;
-    fAncestorG4End   = invalid_step;
+    fAncestorStart = invalid_step;
+    fAncestorEnd   = invalid_step;
 
   }
 

@@ -64,22 +64,22 @@ namespace larlite {
     simb::Origin_t     Origin    () const { return fOrigin;    }
 
     int                PdgCode   () const { return fPDGCode;   }
-    unsigned int       G4TrackID () const { return fTrackID; } 
+    unsigned int       TrackID () const { return fTrackID; } 
     const std::string& Process   () const { return fProcess;   }
-    const mcstep&      G4Start   () const { return fStart;   }
-    const mcstep&      G4End     () const { return fEnd;     }
+    const mcstep&      Start   () const { return fStart;   }
+    const mcstep&      End     () const { return fEnd;     }
 
     int                MotherPdgCode   () const { return fMotherPDGCode;   }
-    unsigned int       MotherG4TrackID () const { return fMotherTrackID; }
+    unsigned int       MotherTrackID () const { return fMotherTrackID; }
     const std::string& MotherProcess   () const { return fMotherProcess;   }
-    const mcstep&      MotherG4Start   () const { return fMotherStart;   }
-    const mcstep&      MotherG4End     () const { return fMotherEnd;     }
+    const mcstep&      MotherStart   () const { return fMotherStart;   }
+    const mcstep&      MotherEnd     () const { return fMotherEnd;     }
 
     int                AncestorPdgCode   () const { return fAncestorPDGCode;   }
-    unsigned int       AncestorG4TrackID () const { return fAncestorTrackID; }
+    unsigned int       AncestorTrackID () const { return fAncestorTrackID; }
     const std::string& AncestorProcess   () const { return fAncestorProcess;   }
-    const mcstep&      AncestorG4Start   () const { return fAncestorStart;   }
-    const mcstep&      AncestorG4End     () const { return fAncestorEnd;     }
+    const mcstep&      AncestorStart   () const { return fAncestorStart;   }
+    const mcstep&      AncestorEnd     () const { return fAncestorEnd;     }
 
     const mcstep& DetProfile () const { return fDetProfile; }
     
@@ -91,22 +91,22 @@ namespace larlite {
     void Origin    ( simb::Origin_t o ) { fOrigin    = o;    }
 
     void PdgCode   ( int id                  ) { fPDGCode   = id;   }
-    void G4TrackID ( unsigned int id         ) { fTrackID = id;   }
+    void TrackID ( unsigned int id         ) { fTrackID = id;   }
     void Process   ( const std::string &name ) { fProcess   = name; }
-    void G4Start   ( const mcstep &s         ) { fStart   = s;    }
-    void G4End     ( const mcstep &s         ) { fEnd     = s;    }
+    void Start   ( const mcstep &s         ) { fStart   = s;    }
+    void End     ( const mcstep &s         ) { fEnd     = s;    }
 
     void MotherPdgCode   ( int id                  ) { fMotherPDGCode   = id;   }
-    void MotherG4TrackID ( unsigned int id         ) { fMotherTrackID = id;   }
+    void MotherTrackID ( unsigned int id         ) { fMotherTrackID = id;   }
     void MotherProcess   ( const std::string& name ) { fMotherProcess   = name; }
-    void MotherG4Start   ( const mcstep& s         ) { fMotherStart   = s;    }
-    void MotherG4End     ( const mcstep& s         ) { fMotherEnd     = s;    }
+    void MotherStart   ( const mcstep& s         ) { fMotherStart   = s;    }
+    void MotherEnd     ( const mcstep& s         ) { fMotherEnd     = s;    }
 
     void AncestorPdgCode   ( int id                  ) { fAncestorPDGCode   = id;   }
-    void AncestorG4TrackID ( unsigned int id         ) { fAncestorTrackID = id;   }
+    void AncestorTrackID ( unsigned int id         ) { fAncestorTrackID = id;   }
     void AncestorProcess   ( const std::string& name ) { fAncestorProcess   = name; }
-    void AncestorG4Start   ( const mcstep& s         ) { fAncestorStart   = s;    }
-    void AncestorG4End     ( const mcstep& s         ) { fAncestorEnd     = s;    }
+    void AncestorStart   ( const mcstep& s         ) { fAncestorStart   = s;    }
+    void AncestorEnd     ( const mcstep& s         ) { fAncestorEnd     = s;    }
 
     void DetProfile ( const mcstep& s) { fDetProfile = s; }
 
