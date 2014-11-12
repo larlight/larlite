@@ -19,22 +19,22 @@ namespace larlite {
     fOrigin    = simb::kUnknown;
 
     fPDGCode   = data::kINVALID_INT;
-    fG4TrackID = data::kINVALID_UINT;
+    fTrackID = data::kINVALID_UINT;
     fProcess   = "";
-    fG4Start   = invalid_step;
-    fG4End     = invalid_step;
+    fStart   = invalid_step;
+    fEnd     = invalid_step;
 
     fMotherPDGCode   = data::kINVALID_INT;
-    fMotherG4TrackID = data::kINVALID_UINT;
+    fMotherTrackID = data::kINVALID_UINT;
     fMotherProcess   = "";
-    fMotherG4Start   = invalid_step;
-    fMotherG4End     = invalid_step;
+    fMotherStart   = invalid_step;
+    fMotherEnd     = invalid_step;
 
     fAncestorPDGCode   = data::kINVALID_INT;
-    fAncestorG4TrackID = data::kINVALID_UINT;
+    fAncestorTrackID = data::kINVALID_UINT;
     fAncestorProcess   = "";
-    fAncestorG4Start   = invalid_step;
-    fAncestorG4End     = invalid_step;
+    fAncestorStart   = invalid_step;
+    fAncestorEnd     = invalid_step;
 
     fDetProfile = invalid_step;
     
