@@ -33,6 +33,7 @@ namespace larlite {
     /// Copy constructor
     mcshower(const mcshower& origin) : data_base(origin),
 				       fOrigin(origin.fOrigin),
+                                       fPDGCode(origin.fPDGCode),
 				       fG4TrackID(origin.fG4TrackID),
 				       fProcess(origin.fProcess),
 				       fG4Start(origin.fG4Start),

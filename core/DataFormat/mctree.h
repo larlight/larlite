@@ -17,6 +17,7 @@
 
 #include "data_base.h"
 #include "treenode.h"
+#include <set>
 
 namespace larlite {
   /**
@@ -80,6 +81,12 @@ namespace larlite {
     void clearMap() { _particleMap.clear(); }
 
     void setMap(std::map<int,int> map) { _particleMap = map; }
+
+    // given trackId returns position in event_mcpart
+    int searchParticleMap(std::set<int>::iterator it){ return _particleMap.find(*it)->second; }
+
+    // given trackId returns position in event_mcpart
+    int searchParticleMap(int trackId);
 
   private:
 
