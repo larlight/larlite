@@ -23,7 +23,7 @@ namespace larlite{
      \class mctrack
      LArSoft MCTrack class equivalent data container
   */
-  class mctrack : std::vector<larlite::mcstep>,
+  class mctrack : public std::vector<larlite::mcstep>,
 		  public data_base {
     
   public:
