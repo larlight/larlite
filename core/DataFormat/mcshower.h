@@ -87,26 +87,28 @@ namespace larlite {
 
     double Charge(const size_t plane) const;
 
+    const std::vector<double>& Charge() const { return fPlaneCharge; }
+
     //--- Setters ---//
-    void Origin    ( simb::Origin_t o ) { fOrigin    = o;    }
+    void Origin  ( simb::Origin_t o ) { fOrigin    = o;    }
 
-    void PdgCode   ( int id                  ) { fPDGCode   = id;   }
-    void TrackID ( unsigned int id         ) { fTrackID = id;   }
-    void Process   ( const std::string &name ) { fProcess   = name; }
-    void Start   ( const mcstep &s         ) { fStart   = s;    }
-    void End     ( const mcstep &s         ) { fEnd     = s;    }
+    void PdgCode ( int id                  ) { fPDGCode   = id;   }
+    void TrackID ( unsigned int id         ) { fTrackID = id;     }
+    void Process ( const std::string &name ) { fProcess   = name; }
+    void Start   ( const mcstep &s         ) { fStart   = s;      }
+    void End     ( const mcstep &s         ) { fEnd     = s;      }
 
-    void MotherPdgCode   ( int id                  ) { fMotherPDGCode   = id;   }
-    void MotherTrackID ( unsigned int id         ) { fMotherTrackID = id;   }
-    void MotherProcess   ( const std::string& name ) { fMotherProcess   = name; }
-    void MotherStart   ( const mcstep& s         ) { fMotherStart   = s;    }
-    void MotherEnd     ( const mcstep& s         ) { fMotherEnd     = s;    }
+    void MotherPdgCode ( int id                  ) { fMotherPDGCode   = id;   }
+    void MotherTrackID ( unsigned int id         ) { fMotherTrackID = id;     }
+    void MotherProcess ( const std::string& name ) { fMotherProcess   = name; }
+    void MotherStart   ( const mcstep& s         ) { fMotherStart   = s;      }
+    void MotherEnd     ( const mcstep& s         ) { fMotherEnd     = s;      }
 
-    void AncestorPdgCode   ( int id                  ) { fAncestorPDGCode   = id;   }
-    void AncestorTrackID ( unsigned int id         ) { fAncestorTrackID = id;   }
-    void AncestorProcess   ( const std::string& name ) { fAncestorProcess   = name; }
-    void AncestorStart   ( const mcstep& s         ) { fAncestorStart   = s;    }
-    void AncestorEnd     ( const mcstep& s         ) { fAncestorEnd     = s;    }
+    void AncestorPdgCode ( int id                  ) { fAncestorPDGCode   = id;   }
+    void AncestorTrackID ( unsigned int id         ) { fAncestorTrackID = id;     }
+    void AncestorProcess ( const std::string& name ) { fAncestorProcess   = name; }
+    void AncestorStart   ( const mcstep& s         ) { fAncestorStart   = s;      }
+    void AncestorEnd     ( const mcstep& s         ) { fAncestorEnd     = s;      }
 
     void DetProfile ( const mcstep& s) { fDetProfile = s; }
 
