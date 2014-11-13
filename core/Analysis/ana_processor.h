@@ -73,8 +73,14 @@ namespace larlite {
     void set_io_mode(storage_manager::IOMode_t mode){_storage->set_io_mode(mode);}
     
     /// Setter to specify a certain data class to be read from input
-    //void set_data_to_read(data::DataType_t type,Bool_t read=true)
-    //{_storage->set_data_to_read(type,read);}
+    void set_data_to_read(data::DataType_t const type, 
+			  const std::string name)
+    { _storage->set_data_to_read(type,name); }
+
+    /// Setter to specify a certain data class to be written into output
+    void set_data_to_write(data::DataType_t const type, 
+			   const std::string name)
+    { _storage->set_data_to_write(type,name); }    
     
     /// Getter of running analysis status
     Bool_t get_ana_status(ana_base* ptr) const;

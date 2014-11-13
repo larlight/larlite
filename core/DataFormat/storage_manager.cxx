@@ -12,6 +12,8 @@ namespace larlite {
     , _ptr_data_array (data::kDATA_TYPE_MAX,std::map<std::string,larlite::event_base*>())
     , _in_ch  (data::kDATA_TYPE_MAX,std::map<std::string,TChain*>())
     , _out_ch (data::kDATA_TYPE_MAX,std::map<std::string,TTree*>() )
+    , _read_data_array(data::kDATA_TYPE_MAX,std::map<std::string,bool>())
+    , _write_data_array(data::kDATA_TYPE_MAX,std::map<std::string,bool>())
   {
     _name="storage_manager";
     //_event_wf=0;
@@ -21,7 +23,6 @@ namespace larlite {
     _name_out_tdirectory="";
     _status=kINIT;
     _check_alignment=true;
-
     reset();
     _mode=mode;
     
@@ -29,6 +30,7 @@ namespace larlite {
 
   event_base* storage_manager::get_data(data::DataType_t const type, std::string const name)
   {
+
     // Read entry _index-1
     if(!_index && _mode != kWRITE) {
 
@@ -66,7 +68,7 @@ namespace larlite {
 	}
       }
     }
-    
+
     // If data class object does not exist, and if it's either kWRITE or kBOTH mode, create it.
     if( (data_ptr_iter == _ptr_data_array[type].end() || !((*data_ptr_iter).second)) && 
        _mode != kREAD) {
@@ -146,12 +148,14 @@ namespace larlite {
     _status=kINIT;
     _in_fnames.clear();
     _input_product_id.clear();
+    _use_read_bool = false;
+    _use_write_bool = false;
     for(size_t i=0; i<data::kDATA_TYPE_MAX; ++i) {
-      //_read_data_array[i]=true;   // Attempt to read in all data by default
-      //_write_data_array[i]=false; // Attemp to write no data by default 
       _in_ch[i].clear();
       _out_ch[i].clear();
       _ptr_data_array[i].clear();
+      _write_data_array[i].clear();      
+      _read_data_array[i].clear();      
     }
     
     if(_verbosity[msg::kDEBUG])
@@ -237,13 +241,29 @@ namespace larlite {
 	      fin_dir = (TDirectoryFile*)obj;
 	    
 	  }
+	  
 	  if(fin_dir) {
 	    TList* key_list = fin_dir->GetListOfKeys();
 	    TIter key_iter(key_list);
 	    TObject* obj = nullptr;
+	    std::set<std::string> name_candidates;
+	    if(_use_read_bool) {
+	      for(size_t i=0; i<data::kDATA_TYPE_MAX; ++i) {
+		
+		for(auto const& name_bool : _read_data_array[i]) {
+		  
+		  if(name_bool.second)
+
+		    name_candidates.insert(Form("%s_%s_tree",
+						data::kDATA_TREE_NAME[i].c_str(),
+						(name_bool.first).c_str()));
+		}
+	      }
+	    }
 	    while(1) {
 	      obj = key_iter.Next();			    
 	      if(!obj) break;
+	      if(name_candidates.size() && name_candidates.find(obj->GetName()) == name_candidates.end()) continue;
 	      obj = fin_dir->Get(obj->GetName());
 	      print(msg::kINFO,__FUNCTION__,Form("Found object %s (type=%s)",obj->GetName(),obj->ClassName()));
 	      if(std::string(obj->ClassName())!="TTree") {
@@ -338,7 +358,6 @@ namespace larlite {
       
       if(!_status) break;
       
-      //if(_mode!=kWRITE && _read_data_array[i]) {
       if(_mode!=kWRITE && _in_ch[i].size()) {
 
 	for(auto& name_ptr : _in_ch[i]) {
@@ -632,18 +651,15 @@ namespace larlite {
 	
 	for(size_t i=0; i<data::kDATA_TYPE_MAX; i++) {
 	  
-	  if(!_out_ch[i].size()) {
-	    
-	    if(_verbosity[msg::kDEBUG])
-	      
-	      Message::send(msg::kDEBUG,__FUNCTION__,
-			    Form("Skipping to write a Tree %s_tree...", 
-				 data::kDATA_TREE_NAME[(data::DataType_t)i].c_str()));
-	    
-	    continue;
-	  }
+	  if(!_out_ch[i].size()) continue;
+
+	  if(_use_write_bool && !_write_data_array[i].size()) continue;
 
 	  for(auto& name_ptr : _out_ch[i]) {
+
+	    if(_use_write_bool && 
+	       _write_data_array[i].find(name_ptr.first) == _write_data_array[i].end())
+	      continue;
 
 	    if(_verbosity[msg::kINFO])
 	    
@@ -763,10 +779,16 @@ namespace larlite {
 
       for(size_t i=0; i<data::kDATA_TYPE_MAX; ++i) { 
 
+	if(_use_read_bool && !(_read_data_array[i].size()))
+	  continue;
+
 	for(auto& name_ptr : _in_ch[i]) {
       
 	  if((name_ptr.second)) {
 
+	    if(_use_read_bool && _read_data_array[i].find(name_ptr.first) == _read_data_array[i].end())
+	      continue;
+	    
 	    (name_ptr.second)->GetEntry(_index);
 
 	    if( _check_alignment ) {
@@ -792,14 +814,19 @@ namespace larlite {
     }else if(_mode == kREAD) {
       
       // if data::kEvent is present, use that as absolute check
-      if( _in_ch[(size_t)(data::kEvent)].find("main") != _in_ch[(size_t)(data::kEvent)].end() &&
-	  _in_ch[(size_t)(data::kEvent)]["main"] ) {
-	
+      static bool check_main_exist = false;
+      static bool main_exist = false;
+      if(!check_main_exist) {
+	check_main_exist = true;
+	main_exist = ( _in_ch[(size_t)(data::kEvent)].find("main") != _in_ch[(size_t)(data::kEvent)].end() &&
+		       _in_ch[(size_t)(data::kEvent)]["main"] );
+      }
+      if(main_exist) {
+	  
 	_in_ch[(size_t)(data::kEvent)]["main"]->GetEntry(_index);
 	
 	_current_event_id = _ptr_data_array[data::kEvent]["main"]->event_id();
       }
-
     }
     _index++;
     _nevents_read++;
@@ -810,9 +837,14 @@ namespace larlite {
     
     for(size_t i=0; i<data::kDATA_TYPE_MAX; ++i) {
 
+      if(_use_write_bool && !(_write_data_array[i].size())) continue;
+
       for(auto& name_ptr : _out_ch[i]) {
       
 	if(!(name_ptr.second)) continue;
+	if( _use_write_bool && 
+	    _write_data_array[i].find((name_ptr.first)) == _write_data_array[i].end()) 
+	  continue;
 
 	name_ptr.second->Fill();
 	_ptr_data_array[i][name_ptr.first]->clear_data();

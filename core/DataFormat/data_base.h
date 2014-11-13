@@ -19,7 +19,7 @@
 #include "larlite_dataformat_utils.h"
 #include <TObject.h>
 #include <TString.h>
-
+#include "DataFormatException.h"
 namespace larlite{
 
   /**

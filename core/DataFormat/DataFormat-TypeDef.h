@@ -10,6 +10,7 @@
 #include <TMatrixD.h>
 #include <TLorentzVector.h>
 
+#include "DataFormatException.h"
 #include "larlite_dataformat_utils.h"
 #include "data_base.h"
 //#include "larlite_association.h"
@@ -56,6 +57,8 @@
 // Class forward declaration here
 
 namespace larlite{
+
+  class DataFormatException;
 
   class data_base;
   class event_base;
