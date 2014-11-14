@@ -15,7 +15,7 @@
 #ifndef PDGSELECTION_H
 #define PDGSELECTION_H
 
-#include "ana_base.h"
+#include "Analysis/ana_base.h"
 #include "ShowerAnaException.h"
 
 namespace larlite {

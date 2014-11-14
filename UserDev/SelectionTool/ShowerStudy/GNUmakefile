@@ -12,9 +12,7 @@ OBJECTS = $(SOURCES:.cxx=.o)
 
 # include options for this package
 INCFLAGS  = -I.                       #Include itself
-INCFLAGS += -I$(LARLITE_COREDIR)/Analysis
-INCFLAGS += -I$(LARLITE_COREDIR)/Base
-INCFLAGS += -I$(LARLITE_COREDIR)/DataFormat
+INCFLAGS += -I$(LARLITE_COREDIR)
 
 # platform-specific options
 OSNAME          = $(shell uname -s)

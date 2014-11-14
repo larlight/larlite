@@ -11,8 +11,8 @@
 /** \addtogroup ClusterRecoUtil
 
     @{*/
-#ifndef SHOWERANAEXCEPTION_H
-#define SHOWERANAEXCEPTION_H
+#ifndef SELECTIONTOOL_SHOWERANAEXCEPTION_H
+#define SELECTIONTOOL_SHOWERANAEXCEPTION_H
 
 #include <iostream>
 #include <exception>

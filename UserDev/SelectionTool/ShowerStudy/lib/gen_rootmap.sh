@@ -16,4 +16,6 @@ rootlibmap() {
 
 ######################################################
 # ShowerStudy
-rootlibmap libSelectionTool_ShowerStudy.rootmap libSelectionTool_ShowerStudy.so $LARLITE_USERDEVDIR/SelectionTool/ShowerStudy/LinkDef.h 
+rootlibmap libSelectionTool_ShowerStudy.rootmap libSelectionTool_ShowerStudy.so $LARLITE_USERDEVDIR/SelectionTool/ShowerStudy/LinkDef.h \
+    libLArLite_Analysis.so \
+    libLArLite_DataFormat.so

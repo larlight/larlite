@@ -1,5 +1,5 @@
-#ifndef PDGSELECTION_CXX
-#define PDGSELECTION_CXX
+#ifndef SELECTIONTOOL_PDGSELECTION_CXX
+#define SELECTIONTOOL_PDGSELECTION_CXX
 
 #include "PDGSelection.h"
 
@@ -64,7 +64,7 @@ namespace larlite {
       auto& gen_list = _found_list.at(kGENERATOR);
 
       // Pull out larlight::event_mctruth data product
-      auto ev_mct = (const event_mctruth*)(storage->get_data(DATA::MCTruth));
+      auto ev_mct = storage->get_data<event_mctruth>("generator");
 
       // Check if this is a valid data product
       if(!ev_mct) 
@@ -96,7 +96,7 @@ namespace larlite {
       auto& secondary_list = _found_list.at(kG4SECONDARY);
 
       // Pull out larlight::event_mcpart data product
-      auto ev_mcp = (const event_mcpart*)(storage->get_data(DATA::MCParticle));
+      auto ev_mcp = storage->get_data<event_mcpart>("largeant");
 
       // Check data product validity
       if(!ev_mcp) 
@@ -159,9 +159,9 @@ namespace larlite {
 
   bool PDGSelection::finalize() {
 
-    print(MSG::NORMAL,__FUNCTION__,Form("Selected %zu out of %zu events...",
-					_nevent_selected,
-					_nevent_analyzed)
+    print(msg::kNORMAL,__FUNCTION__,Form("Selected %zu out of %zu events...",
+					 _nevent_selected,
+					 _nevent_analyzed)
 	  );
 
     return true;

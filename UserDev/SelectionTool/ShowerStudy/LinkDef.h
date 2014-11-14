@@ -9,8 +9,8 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class PDGSelection+;
-#pragma link C++ class ShowerAnaException+;
+#pragma link C++ class larlite::PDGSelection+;
+#pragma link C++ class showerana::ShowerAnaException+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
