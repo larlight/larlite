@@ -101,7 +101,7 @@
 #pragma link C++ class larlite::event_calorimetry+;
 
 #pragma link C++ class larlite::pfpart+;
-#pragma iink C++ class std::vector<larlite::pfpart>+;
+#pragma link C++ class std::vector<larlite::pfpart>+;
 #pragma link C++ class larlite::event_pfpart+;
 
 #pragma link C++ class larlite::partid+;
