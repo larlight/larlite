@@ -18,8 +18,8 @@ namespace larlite {
       
       auto const& mcs = mcshower_v[i];
 
-      if( mcs.MotherMomentum()[3] > _max_energy ||
-	  mcs.MotherMomentum()[3] < _min_energy ) continue;
+      if( mcs.Start().Momentum()[3] > _max_energy ||
+	  mcs.Start().Momentum()[3] < _min_energy ) continue;
 
       used_shower_id.insert(i);
 

@@ -173,9 +173,6 @@ namespace larlite {
       return false;
     }
 
-    // Get geo instance
-    auto geo = larutil::Geometry::GetME();
-
     // Retrieve mcshower data product
     auto ev_mcs = storage->get_data<event_mcshower>("mcshower");
 
@@ -202,17 +199,17 @@ namespace larlite {
       auto const& mc_shower = ev_mcs->at(mcs_index);
 
       // MC Info
-      fTreeParams.mc_x = mc_shower.DaughterPosition()[0];
-      fTreeParams.mc_y = mc_shower.DaughterPosition()[1];
-      fTreeParams.mc_z = mc_shower.DaughterPosition()[2];
+      fTreeParams.mc_x = mc_shower.DetProfile().X();
+      fTreeParams.mc_y = mc_shower.DetProfile().Y();
+      fTreeParams.mc_z = mc_shower.DetProfile().Z();
 
-      fTreeParams.mc_energy = mc_shower.DaughterMomentum().at(3);
-      fTreeParams.mc_pdgid  = mc_shower.MotherPDGID();
-      fTreeParams.mc_containment = mc_shower.DaughterMomentum().at(3) / mc_shower.MotherMomentum().at(3);
+      fTreeParams.mc_energy = mc_shower.DetProfile().E();
+      fTreeParams.mc_pdgid  = mc_shower.PdgCode();
+      fTreeParams.mc_containment = mc_shower.DetProfile().E() / mc_shower.Start().E();
 
-      fTreeParams.mc_dcosx = mc_shower.DaughterMomentum().at(0) / fTreeParams.mc_energy;
-      fTreeParams.mc_dcosy = mc_shower.DaughterMomentum().at(1) / fTreeParams.mc_energy;
-      fTreeParams.mc_dcosz = mc_shower.DaughterMomentum().at(2) / fTreeParams.mc_energy;
+      fTreeParams.mc_dcosx = mc_shower.DetProfile().Px() / fTreeParams.mc_energy;
+      fTreeParams.mc_dcosy = mc_shower.DetProfile().Py() / fTreeParams.mc_energy;
+      fTreeParams.mc_dcosz = mc_shower.DetProfile().Pz() / fTreeParams.mc_energy;
 
       // Reco vtx
       fTreeParams.reco_x = reco_shower.ShowerStart()[0];

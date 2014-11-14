@@ -112,8 +112,8 @@ namespace larlite {
 	auto reco_dir = s.Direction();
 	auto reco_vtx = s.ShowerStart();
 
-	auto mc_dir = mcs.DaughterMomentum();
-	auto mc_vtx = mcs.DaughterPosition();
+	auto mc_dir = mcs.DetProfile().Momentum();
+	auto mc_vtx = mcs.DetProfile().Position();
 
 	double mag = sqrt(pow(mc_dir[0],2)+pow(mc_dir[1],2)+pow(mc_dir[2],2));
 	mc_dir[0] /= mag;
