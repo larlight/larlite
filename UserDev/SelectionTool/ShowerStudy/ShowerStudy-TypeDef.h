@@ -16,8 +16,10 @@ namespace larlite{
 namespace showerana{
   class ShowerAnaException;
 }
+  class Pi0ProfileCut;
 //ADD_EMPTY_CLASS ... do not change this comment line
 
 #endif
+
 
 
