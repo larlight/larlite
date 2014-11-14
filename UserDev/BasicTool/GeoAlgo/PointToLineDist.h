@@ -29,34 +29,28 @@ namespace geoalgo {
   public:
     
     /// Default constructor
-    PointToLineDist(){ _point.clear(); _segmentStart.clear(); _segmentEnd.clear(); _debug=false; };
+    PointToLineDist(){ _debug=false; };
     
     /// Default destructor
     virtual ~PointToLineDist(){};
     
-  double Distance();
+  double Distance(std::vector<double> *point,
+		  std::vector<double> *segmentStart,
+		  std::vector<double> *segmentEnd);
 
-  double Distance(std::vector<double> point,
-		  std::vector<double> segmentStart,
-		  std::vector<double> segmentEnd) { _point = point; _segmentStart = segmentStart; _segmentEnd = segmentEnd; return Distance(); }
+  double DistanceToTrack(std::vector<double> *p, std::vector<std::vector<double> > *track);
 
-  double DistanceToTrack(std::vector<double> p, std::vector<std::vector<double> > track);
+  double DistanceToListOfTracks(std::vector<double> *p, std::vector<std::vector<std::vector<double> > > *trackList);
 
-  double DistanceToListOfTracks(std::vector<double> p, std::vector<std::vector<std::vector<double> > > *trackList);
+  double DistanceToTrack(std::vector<double> *p, std::vector<std::vector<double> > *track, double bufferDist);
 
-  double DistanceToTrack(std::vector<double> p, std::vector<std::vector<double> > track, double bufferDist);
-
-  double DotProduct(std::vector<double> A, std::vector<double> B);
+  double DotProduct(std::vector<double> *A, std::vector<double> *B);
 
   void TestDist();
 
   void SetDebug(bool on) { _debug = on; }
 
   private:
-    
-    std::vector<double>  _point;
-    std::vector<double>  _segmentStart;
-    std::vector<double> _segmentEnd;
     
     bool _debug;
     
