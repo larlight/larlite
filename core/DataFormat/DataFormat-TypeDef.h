@@ -10,6 +10,7 @@
 #include <TMatrixD.h>
 #include <TLorentzVector.h>
 
+#include "DataFormatException.h"
 #include "larlite_dataformat_utils.h"
 #include "data_base.h"
 //#include "larlite_association.h"
@@ -41,10 +42,14 @@
 #include "mctrack.h"
 #include "mctrajectory.h"
 #include "mcpart.h"
+#include "mctree.h"
 #include "mcflux.h"
 #include "mcnu.h"
 #include "mctruth.h"
 #include "simch.h"
+
+#include "treenode.h"
+
 /*
 #include "trigger.h"
 */
@@ -52,6 +57,8 @@
 // Class forward declaration here
 
 namespace larlite{
+
+  class DataFormatException;
 
   class data_base;
   class event_base;
@@ -119,6 +126,9 @@ namespace larlite{
   class mcpart;
   class event_mcpart;
 
+  class mctree;
+  class event_mctree;
+
   class mcflux;
   class event_mcflux;
 
@@ -140,7 +150,10 @@ namespace larlite{
   class trigger;
   */
   class storage_manager;
+
 }
+
+class treenode;
 #endif
 
 

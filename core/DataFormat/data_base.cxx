@@ -56,7 +56,7 @@ namespace larlite {
 		  << " by " << type.second.c_str() 
 		  << " already has entry " << index_source
 		  <<"\033[00m" << std::endl;
-	throw std::exception();
+	throw DataFormatException();
 	
       }else
 
@@ -82,7 +82,7 @@ namespace larlite {
 		  << " by " << type.second.c_str() 
 		  << " already exists!"
 		  <<"\033[00m" << std::endl;
-	throw std::exception();
+	throw DataFormatException();
 	
     }
 
@@ -113,7 +113,7 @@ namespace larlite {
 		<< " by " << type.second.c_str()
 		<< " does not exist!"
 		<< "\033[00m" << std::endl;
-      throw std::exception();
+      throw DataFormatException();
     }
     return (*loc).second;
   }
@@ -128,7 +128,7 @@ namespace larlite {
 		<< " by " << type.second.c_str() 
 		<< " does not exist!"
 		<< "\033[00m" << std::endl;
-      throw std::exception();
+      throw DataFormatException();
     }
     if( (*loc).second.size() <= index_source ) {
 
@@ -137,7 +137,7 @@ namespace larlite {
 		<< " by " << type.second.c_str()
 		<< " does not exist for element [" << index_source<<"]"
 		<< "\033[00m" << std::endl;
-      throw std::exception();
+      throw DataFormatException();
     }
 
     return (*loc).second[index_source];

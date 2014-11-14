@@ -64,7 +64,7 @@ namespace fcl {
     PSet& get_pset_writeable(std::string key);
 
     /// Dump into a text format
-    std::string dump() const;
+    std::string dump(int x) const;
 
   protected:
 
@@ -73,7 +73,7 @@ namespace fcl {
     std::map<std::string,std::string> fParams_m;
 
     std::map<std::string,PSet> fPSets_m;
-    
+
   };
 }
 

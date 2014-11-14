@@ -20,10 +20,10 @@
 #include "Base/larlite_base.h"
 #include "data_base.h"
 #include "potsummary.h"
-//#include "larlite_association.h"
 #include "hit.h"
 #include "track.h"
 #include "mctruth.h"
+#include "mctree.h"
 #include "user_info.h"
 #include "spacepoint.h"
 #include "rawdigit.h"
@@ -78,8 +78,20 @@ namespace larlite {
     virtual ~storage_manager(){}
     
     /// Setter to specify a certain data class to be read from input
-    //void set_data_to_read(data::DataType_t const type, bool read=true)
-    //{ _read_data_array[type]=read; }
+    void set_data_to_read(data::DataType_t const type, 
+			  const std::string name)
+    {
+      _use_read_bool = true;
+      _read_data_array[(size_t)type].insert(std::make_pair(name,true));
+    }
+
+    /// Setter to specify a certain data class to be written into output
+    void set_data_to_write(data::DataType_t const type,
+			   const std::string name)
+    {
+      _use_write_bool = true;
+      _write_data_array[(size_t)type].insert(std::make_pair(name,true));
+    }
     
     /// Setter for I/O mode.
     void set_io_mode(IOMode_t mode)         {_mode=mode;}
@@ -217,12 +229,6 @@ namespace larlite {
     /// Array of product_id 
     std::vector<larlite::product_id> _input_product_id;
     
-    /// Boolean to record what data to be read out from a file
-    std::vector<std::map<std::string,bool> > _read_data_array;
-    
-    /// Boolean to record what data to be written out from a file
-    std::vector<std::map<std::string,bool> > _write_data_array;
-
     /// Boolean to enable event alignment check
     bool _check_alignment;
     
@@ -242,6 +248,17 @@ namespace larlite {
     /// TTree instance
     std::vector<std::map<std::string,TChain*> > _in_ch;
     std::vector<std::map<std::string,TTree*>  > _out_ch;
+
+    /// Boolean for whether or not to use _out_write_bool
+    bool _use_read_bool;    
+    /// Boolean to record what data to be read out from a file
+    std::vector<std::map<std::string,bool> > _read_data_array;
+
+    /// Boolean for whether or not to use _out_write_bool
+    bool _use_write_bool;    
+    /// Boolean to record what data to be written out from a file
+    std::vector<std::map<std::string,bool> > _write_data_array;
+
   };
 
 }
@@ -274,6 +291,7 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_pfpart> () const;
   template<> data::DataType_t storage_manager::data_type<event_user> () const;
   template<> data::DataType_t storage_manager::data_type<event_mctrack> () const;
+  template<> data::DataType_t storage_manager::data_type<event_mctree> () const;
 }
 #endif
 

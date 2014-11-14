@@ -87,7 +87,8 @@ namespace larlite{
   public:
     
     /// Default constructor
-    event_pfpart(std::string name="noname") : event_base(data::kPFParticle,name) { clear_data(); }
+    event_pfpart(std::string name="noname") : event_base(data::kPFParticle,name) 
+    { clear_data(); }
     
     /// Default copy constructor
     event_pfpart(const event_pfpart& original) : std::vector<larlite::pfpart>(original), event_base(original)

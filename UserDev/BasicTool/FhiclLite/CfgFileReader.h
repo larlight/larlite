@@ -21,6 +21,8 @@
 #include <vector>
 #include <set>
 #include "FhiclLiteException.h"
+#include "PSetManager.h"
+
 /**
    \class CfgFileReader
    User defined class CfgFileReader ... these comments are used to generate
@@ -40,13 +42,16 @@ public:
 
   void ReadFile(std::string fname);
 
+  void SetVerbose(bool on) { _verbose = on; }
+
 protected:
 
   enum Mode_t {
     kIdle,            /// Default or after "}"
-    kPSetKeyDone,     /// After a single word string within kIdle
+    kKeyDone,
+    //   kPSetKeyDone,     /// After a single word string within kIdle
     kSearchParamKey,  /// After "{" or after a single word within kSearchParamValue
-    kParamKeyDone,    
+    //    kParamKeyDone,    
     kSearchParamValue /// After ":"
   };
 
@@ -59,7 +64,13 @@ protected:
   std::string key_name;
 
   Mode_t mode;
-  
+
+  // PSetManager
+  fcl::PSetManager _PSetManager;
+
+  //verbosity
+  bool _verbose;
+
 };
 
 #endif

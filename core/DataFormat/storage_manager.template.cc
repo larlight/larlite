@@ -77,6 +77,9 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_mctrack> () const
   { return data::kMCTrack;  }
 
+  template<> data::DataType_t storage_manager::data_type<event_mctree> () const
+  { return data::kMCTree;  }
+
   template <class T>
   data::DataType_t storage_manager::data_type() const
   { 

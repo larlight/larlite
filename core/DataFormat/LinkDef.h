@@ -36,6 +36,8 @@
 #pragma link C++ class larlite::product_id+;
 #pragma link C++ class std::vector<larlite::product_id>+;
 
+#pragma link C++ class larlite::DataFormatException+;
+
 #pragma link C++ class larlite::data_base+;
 #pragma link C++ class larlite::event_base+;
 //#pragma link C++ class larlite::association+;
@@ -99,7 +101,7 @@
 #pragma link C++ class larlite::event_calorimetry+;
 
 #pragma link C++ class larlite::pfpart+;
-#pragma iink C++ class std::vector<larlite::pfpart>+;
+#pragma link C++ class std::vector<larlite::pfpart>+;
 #pragma link C++ class larlite::event_pfpart+;
 
 #pragma link C++ class larlite::partid+;
@@ -121,6 +123,12 @@
 #pragma link C++ class larlite::mcpart+;
 #pragma link C++ class std::vector<larlite::mcpart>+;
 #pragma link C++ class larlite::event_mcpart+;
+
+#pragma link C++ class treenode+;
+#pragma link C++ class std::vector<treenode>+;
+#pragma link C++ class larlite::mctree+;
+#pragma link C++ class std::vector<larlite::mctree>+;
+#pragma link C++ class larlite::event_mctree+;
 
 #pragma link C++ class larlite::mcflux+;
 #pragma link C++ class std::vector<larlite::mcflux>+;
@@ -147,6 +155,8 @@
 #pragma link C++ class std::map<UShort_t,larlite::simch>+;
 #pragma link C++ class std::vector<larlite::simch>+;
 #pragma link C++ class larlite::event_simch+;
+
+#pragma link C++ class treenode+;
 
 //#pragma link C++ class larlite::trigger+;
 
