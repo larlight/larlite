@@ -1,0 +1,93 @@
+#!/usr/bin/python
+import sys, os
+REPO_NAME="SelectionTool"
+if len(sys.argv)<2:
+   sys.stderr.write('Usage: %s PACKAGE_NAME\n\n' % sys.argv[0])
+   sys.exit(1)
+if not 'LARLITE_USERDEVDIR' in os.environ.keys():
+   sys.stderr.write('$LARLITE_USERDEVDIR not defined!\n\n')
+   sys.exit(1)
+
+name=sys.argv[1]
+target_dir='%s/%s/%s' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME,name)
+source_dir='%s/%s/bin/tmp_ana' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
+
+if not os.path.exists(target_dir):
+   try:
+      os.makedirs(target_dir)
+      os.makedirs('%s/bin' % target_dir)
+      os.makedirs('%s/mac' % target_dir)
+      os.makedirs('%s/lib' % target_dir)
+      # Copy analysis code generator
+      os.system("scp -r %s/bin/tmp %s/bin/" % (source_dir,target_dir))
+
+   except OSError:
+      sys.stderr.write('Failed to create a dir: %s\n' % target_dir)
+      sys.stderr.write('Maybe lacking a permission?\n\n')
+      sys.exit(1)
+else:
+   sys.stderr.write('Package \"%s\" already exists under %s\n' % (name,target_dir))
+   sys.stderr.write('Please remove before running this script.\n\n')
+   sys.exit(1)
+
+in_makefile='%s/GNUmakefile.tmp' % source_dir
+in_linkdef='%s/LinkDef.tmp' % source_dir
+in_typedef='%s/TypeDef.tmp' % source_dir
+in_source='%s/cxx.tmp' % source_dir
+in_header='%s/h.tmp' % source_dir
+in_rootmap='%s/lib/gen_rootmap.sh' % source_dir
+in_tmp_script_ana='%s/bin/gen_newana' % source_dir
+in_tmp_header_ana='%s/bin/tmp/ana.h' % source_dir
+in_tmp_script_empty='%s/bin/gen_empty_class' % source_dir
+in_tmp_header_empty='%s/bin/tmp/empty.h' % source_dir
+in_bin_makefile='%s/bin/GNUmakefile.tmp' % source_dir
+in_bin_source='%s/bin/example.tmp' % source_dir
+in_mac_script='%s/mac/tmp.py' % source_dir
+
+src_list = { in_makefile : '%s/GNUmakefile'     % target_dir,
+             in_linkdef  : '%s/LinkDef.h'       % target_dir,
+             in_typedef  : '%s/%s-TypeDef.h'    % (target_dir,name),
+             in_source   : '%s/sample_ana.cxx'      % target_dir,
+             in_header   : '%s/sample_ana.h'        % target_dir,
+             in_rootmap  : '%s/lib/gen_rootmap.sh'    % target_dir,
+             in_tmp_script_ana : '%s/bin/gen_newana'  % target_dir,
+             in_tmp_header_ana : '%s/bin/tmp/ana.h'  % target_dir,
+             in_tmp_script_empty : '%s/bin/gen_empty_class' % target_dir,
+             in_tmp_header_empty : '%s/bin/tmp/empty.h'    % target_dir,
+             in_bin_makefile   : '%s/bin/GNUmakefile' % target_dir,
+             in_bin_source     : '%s/bin/example.cc'  % target_dir,
+             in_mac_script     : '%s/mac/example.py'  % target_dir  }
+
+for src in src_list.keys():
+   contents=open(src,'r').read()
+   contents=contents.replace('PACKAGE_NAME',name.upper())
+   contents=contents.replace('package_name',name.lower())
+   contents=contents.replace('Package_Name',name)
+   contents=contents.replace('SHELL_USER_NAME',os.environ['USER'])
+   fout=open(src_list[src],'w')
+   fout.write(contents)
+   fout.close()
+
+os.system('chmod 774 %s/lib/gen_rootmap.sh' % target_dir)
+
+# Add new package to the list of directories to be compiled
+contents=open('%s/%s/GNUmakefile' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME), 'r').read()
+contents=contents.replace('#ADD_NEW_SUBDIR','%s #ADD_NEW_SUBDIR' % name)
+fout = open('%s/%s/GNUmakefile' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME), 'w')
+fout.write(contents)
+fout.close()
+
+print
+print 'Generated the followings under %s.' % target_dir
+for key in src_list.keys():
+   print '    %s' % src_list[key]
+print
+print 'To compile your program, try:'
+print '    > make --directory=%s' % target_dir
+print ' OR'
+print '    > cd %s; make;' % target_dir
+print
+print 'If needed, make sure you define linked libraries in rootmap generation script.'
+print 'The script is: %s/make_rootmap.sh' % os.environ['LARLITE_LIBDIR']
+print
+sys.exit(0)
