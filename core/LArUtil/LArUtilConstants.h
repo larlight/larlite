@@ -23,7 +23,7 @@ namespace larutil{
   const std::string kTREENAME_GEOMETRY = "scanner/Geometry";
   const std::string kTREENAME_DETECTORPROPERTIES = "scanner/DetectorProperties";
   const std::string kTREENAME_LARPROPERTIES = "scanner/LArProperties";
-  
+  const std::string kTREENAME_TIMESERVICE = "scanner/TimeService";
   //--- LArSoft parameters ---//
 
   // Recombination factor coefficients come from Nucl.Instrum.Meth.A523:275-286,2004

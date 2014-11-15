@@ -19,7 +19,8 @@
 #pragma link C++ class larutil::LArProperties+;
 #pragma link C++ class larutil::DetectorProperties+;
 #pragma link C++ class larutil::GeometryUtilities+;
-
+#pragma link C++ class larutil::TimeService+;
+#pragma link C++ class larutil::ElecClock+;
 #pragma link C++ class larutil::PxPoint+;
 #pragma link C++ class larutil::PxLine+;
 #pragma link C++ class larutil::PxHit+;

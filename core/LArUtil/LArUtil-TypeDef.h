@@ -11,6 +11,8 @@
 #include "Geometry.h"
 #include "LArProperties.h"
 #include "DetectorProperties.h"
+#include "ElecClock.h"
+#include "TimeService.h"
 #include "GeometryUtilities.h"
 #include "LArUtilConfig.h"
 
@@ -21,6 +23,8 @@ namespace larutil {
   class Geometry;
   class LArProperties;
   class DetectorProperties;
+  class ElecClock;
+  class TimeService;
   class GeometryUtilities;
   class LArUtilConfig;
   class LArUtilManager;
