@@ -8,6 +8,9 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<potsummary> () const
   { return data::kPOTSummary; }
 
+  template<> data::DataType_t storage_manager::data_type<trigger> () const
+  { return data::kTrigger; }
+
   template<> data::DataType_t storage_manager::data_type<event_gtruth> () const
   { return data::kGTruth; }
 

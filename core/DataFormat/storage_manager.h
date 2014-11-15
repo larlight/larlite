@@ -19,6 +19,7 @@
 #include <TError.h>
 #include "Base/larlite_base.h"
 #include "data_base.h"
+#include "trigger.h"
 #include "potsummary.h"
 #include "hit.h"
 #include "track.h"
@@ -268,6 +269,7 @@ namespace larlite {
 //#include "storage_manager.template.hh"
 namespace larlite {
   template<> data::DataType_t storage_manager::data_type<potsummary> () const;
+  template<> data::DataType_t storage_manager::data_type<trigger> () const;
   template<> data::DataType_t storage_manager::data_type<event_gtruth> () const;
   template<> data::DataType_t storage_manager::data_type<event_mctruth> () const;
   template<> data::DataType_t storage_manager::data_type<event_mcpart> () const;

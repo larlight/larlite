@@ -49,10 +49,8 @@
 #include "simch.h"
 
 #include "treenode.h"
-
-/*
 #include "trigger.h"
-*/
+
 #include "storage_manager.h"
 // Class forward declaration here
 
@@ -146,9 +144,7 @@ namespace larlite{
   class partid;
   class event_partid;
 
-  /*
   class trigger;
-  */
   class storage_manager;
 
 }

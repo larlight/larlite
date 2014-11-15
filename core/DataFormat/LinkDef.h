@@ -158,7 +158,7 @@
 
 #pragma link C++ class treenode+;
 
-//#pragma link C++ class larlite::trigger+;
+#pragma link C++ class larlite::trigger+;
 
 #pragma link C++ class larlite::storage_manager+;
 
