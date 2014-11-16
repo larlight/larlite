@@ -24,12 +24,12 @@ namespace geoalgo {
   void DistToBoxWall::Reset() 
   {
     _xyz_min[0] = 0.; 
-    _xyz_min[1] = -116.;
+    _xyz_min[1] = -116.5;
     _xyz_min[2] = 0.; 
     
-    _xyz_max[0] = 256.;
-    _xyz_max[1] = 116.;
-    _xyz_max[2] = 1030.;
+    _xyz_max[0] = 256.35;
+    _xyz_max[1] = 116.5;
+    _xyz_max[2] = 1036.8;
   }
   
   double DistToBoxWall::DistanceToWall(std::vector<double> const& point) const

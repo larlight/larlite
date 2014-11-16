@@ -11,7 +11,7 @@
 
 #pragma link C++ class larlite::PDGSelection+;
 #pragma link C++ class showerana::ShowerAnaException+;
-#pragma link C++ class Pi0ProfileCut+;
+#pragma link C++ class showerana::Pi0ProfileCut+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
