@@ -20,7 +20,7 @@
 #include <set>
 #include "DataFormat/simch.h"
 #include "DataFormat/mcshower.h"
-
+#include "LArUtil/TimeService.h"
 /**
    \class MCShowerBTAlg
    MCShowerBTAlg is meant to back-track reco-ed hits/clusters to MCShower
@@ -43,10 +43,10 @@ namespace larlite {
   public:
     
     /// Default constructor (min energy is 0.02GeV)
-    MCShowerBTAlg(){ 
+    MCShowerBTAlg() {
       _min_energy = 0.02; 
       _max_energy = 1.e3;
-    };
+    }
 
     /// Default destructor
     virtual ~MCShowerBTAlg(){}
@@ -105,7 +105,6 @@ namespace larlite {
     std::vector<const larlite::simch*> fSimCh_v;
     std::map<unsigned int, unsigned int> fShowerPartMap;
     std::vector<unsigned int> fShowerIndex_v;
-    
     double _max_energy;
     double _min_energy;
   };

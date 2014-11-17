@@ -58,7 +58,7 @@ namespace larlite {
   
   std::vector<double> MCShowerBTAlg::MCShowerQ(const WireRange_t &h) const
   {
-    
+
     std::vector<double> num_electrons_v(fShowerIndex_v.size()+1,0);
 
     if(h.ch >= fSimCh_v.size() || !fSimCh_v[h.ch]) {
@@ -67,10 +67,13 @@ namespace larlite {
       return std::vector<double>();
 
     }      
+    
+    auto *ts = ::larutil::TimeService::GetME();
       
     auto sch = fSimCh_v[h.ch];
 
-    auto ide_v = sch->TrackIDsAndEnergies(h.start, h.end);
+    auto ide_v = sch->TrackIDsAndEnergies( ts->TPCTick2TDC(h.start), 
+					   ts->TPCTick2TDC(h.end) );
 
     if(!(ide_v.size())) {
 

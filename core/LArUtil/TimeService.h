@@ -28,7 +28,7 @@ namespace larutil {
   protected:
     
     /// Default constructor
-    TimeService(bool default_load=true);
+    TimeService(bool default_load=false);
     
     /// Default destructor
     ~TimeService(){};
@@ -78,7 +78,7 @@ namespace larutil {
 
   public:
 
-    static const TimeService* GetME(bool default_load=true)
+    static const TimeService* GetME(bool default_load=false)
     {
       if(!_me) _me = new TimeService(default_load);
       return _me;

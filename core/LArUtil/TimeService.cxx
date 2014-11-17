@@ -9,6 +9,7 @@ namespace larutil {
 
   TimeService::TimeService(bool default_load) : LArUtilBase()
   {
+    ClearData();
     _name = "TimeService";
     if(default_load) {
       _file_name = Form("%s/LArUtil/dat/%s",
@@ -21,6 +22,16 @@ namespace larutil {
 
   void TimeService::ClearData()
   {
+    fG4RefTime        = -3.2e3;
+    fFramePeriod      =  1.6e3;
+    fTriggerOffsetTPC = -1.6e3;
+    fTriggerTime      =  3.2e3;
+    fBeamGateTime     =  3.2e3;
+
+    fTPCClock     = ElecClock(fTriggerTime, fFramePeriod, 2);
+    fOpticalClock = ElecClock(fTriggerTime, fFramePeriod, 64);
+    fTriggerClock = ElecClock(fTriggerTime, fFramePeriod, 16);
+    /*
     fG4RefTime   = kDEFAULT_MC_CLOCK_T0;
     fFramePeriod = kDEFAULT_FRAME_PERIOD;
     fTriggerOffsetTPC = kDEFAULT_TRIG_OFFSET_TPC;
@@ -29,6 +40,7 @@ namespace larutil {
     fTPCClock = ElecClock(0,kDEFAULT_FRAME_PERIOD,kDEFAULT_FREQUENCY_TPC);
     fOpticalClock = ElecClock(0,kDEFAULT_FRAME_PERIOD,kDEFAULT_FREQUENCY_OPTICAL);
     fTriggerClock = ElecClock(0,kDEFAULT_FRAME_PERIOD,kDEFAULT_FREQUENCY_TRIGGER);
+    */
   }
 
   bool TimeService::ReadTree()
