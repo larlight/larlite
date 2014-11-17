@@ -5,7 +5,7 @@
 
 namespace geoalgo {
 
-
+  //this is a comment
   double SegmentPoCA::ClosestApproachToTrajectory(std::vector<std::vector<double>> *traj,
 						  std::vector<double> *s2,
 						  std::vector<double> *e2,
