@@ -30,7 +30,16 @@ namespace larlite {
     
     auto ev_cluster = storage->get_data<event_cluster>(_cluster_producer);
 
+    if(!ev_cluster->size()) return true;
+
     auto hit_producer = ev_cluster->association_keys(data::kHit).at(0);
+
+    if(!hit_producer.size()) {
+
+      print(msg::kERROR,__FUNCTION__,
+	    Form("Non empty cluster has no association to hits!"));
+      return false;
+    }
 
     std::vector<std::vector<unsigned short> > merged_indexes;
     _mgr.GetBookKeeper().PassResult(merged_indexes);
