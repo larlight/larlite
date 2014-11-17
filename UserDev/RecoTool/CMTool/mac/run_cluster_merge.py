@@ -1,5 +1,5 @@
 from ROOT import *
-gSystem.Load("libAnalysis")
+from mergeDef import *
 import sys
 
 import argparse
@@ -44,19 +44,19 @@ if args.ana_output == None:
     print "\t"+args.ana_output
 
 
-ana_proc = larlight.ana_processor()
+ana_proc = larlite.ana_processor()
 
 if args.verbose:
-    ana_proc.set_verbosity(larlight.MSG.DEBUG)
+    ana_proc.set_verbosity(larlite.msg.DEBUG)
 
 # Not sure what this does
-ana_proc.set_io_mode(larlight.storage_manager.BOTH)
+ana_proc.set_io_mode(larlite.storage_manager.kBOTH)
 
 # Add the input file.  Not sure if the above takes multiple input files yet
 ana_proc.add_input_file(args.source)
 
 # ?
-larlight.storage_manager.get().set_in_rootdir("scanner")
+# larlite.storage_manager.get().set_in_rootdir("scanner")
 
 # set output file
 ana_proc.set_output_file(args.data_output)
@@ -64,22 +64,30 @@ ana_proc.set_output_file(args.data_output)
 # Set destination for ana stuff
 ana_proc.set_ana_output_file(args.ana_output)
 
-my_merge_alg = larlight.ClusterMergeAlg()
-my_merger = larlight.ClusterMerge()
+prelimMerger = GetPrelimMergerInstance()
+# prelimMerger = GetPrelimMergerInstance(producer="fuzzycluster",saveOutput=True)
 
-my_merger.set_mergealg(my_merge_alg)
+secondMerger = GetSecondMergerInstance()
+# secondMerger = GetSecondMergerInstance(producer="mergedfuzzycluster",saveOutput=True)
 
-ana_proc.add_process(my_merge_alg)
+ana_proc.add_process(prelimMerger)
+# ana_proc.add_process(secondMerger)
 
-ana_proc.add_process(my_merger)
+# my_merge_alg = larlite.ClusterMergeAlg()
+# my_merger = larlite.ClusterMerge()
+
+# my_merger.set_mergealg(my_merge_alg)
+
+# ana_proc.add_process(my_merge_alg)
+
+# ana_proc.add_process(my_merger)
 
 c=TCanvas("c","Wire v. Time Cluster Viewer",900,600)
 
 
 
-while ana_proc.process_event() and ana_proc.get_process_status() == ana_proc.PROCESSING:
+while ana_proc.process_event() and ana_proc.get_process_status() == ana_proc.kPROCESSING:
     currentview = 0;
-    print my_merge_alg.GetMergeTree()
     for iview in xrange(0,3):
         for iclus in xrange(ana_proc.GetClusterGraph_Reco(int(iview),bool(true)).size()):
             gstart=ana_proc.GetClusterGraph_Reco(int(iview),bool(true)).at(iclus)
