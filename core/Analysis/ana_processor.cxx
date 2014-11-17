@@ -8,7 +8,8 @@ namespace larlite {
   ana_processor::ana_processor(){
     _name="ana_processor";
     _ofile_name="";
-    _storage=storage_manager::get();
+    //_storage=storage_manager::get();=
+    _storage = new storage_manager;
     _fout=0;
     reset();
     _filter_enable = false;
