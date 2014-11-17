@@ -5,7 +5,7 @@
 
 namespace larlite {
   ShowerQuality::ShowerQuality() {
-    
+
     _name="ShowerQuality"; 
     _fout=0;
 
@@ -32,10 +32,12 @@ namespace larlite {
 
     mDEDX.clear();
     hBestPlane = nullptr;
+
+    fTree = nullptr;
   }
 
   bool ShowerQuality::initialize() {
-
+    
     if(fShowerProducer.empty()) {
 
       print(msg::kERROR,__FUNCTION__,
@@ -174,7 +176,17 @@ namespace larlite {
     }
 
     // Retrieve mcshower data product
-    auto ev_mcs = storage->get_data<event_mcshower>("mcshower");
+    auto ev_mcs = storage->get_data<event_mcshower>("mcreco");
+    
+    if(!ev_mcs) {
+      print(msg::kERROR,__FUNCTION__,"ShowerQuality: MCShower data product not found!");
+      return false;
+    }
+    if(ev_mcs->size()<1) {
+      print(msg::kERROR,__FUNCTION__,"ShowerQuality: MCShower product found, but there are no mcshowers in this event!");
+      return false;
+    }
+
 
     // Retrieve associated cluster indices
     auto ass_cluster_v = ev_shower->association(data::kCluster,ass_keys[0]);
@@ -323,6 +335,7 @@ namespace larlite {
 
     if(_fout) {
 
+      
       // Write shower histograms if any entry made
       if(hMatchCorrectness->GetEntries()) {
 	
