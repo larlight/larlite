@@ -88,7 +88,6 @@ if args.display == None:
 
 else:
 
-
     c=TCanvas("c","Wire v. Time Cluster Viewer",900,600)
 
 

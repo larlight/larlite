@@ -17,56 +17,10 @@ mgr.set_ana_output_file("")
 
 proc = fmwk.ClusterMerger()
 
-#set the input cluster type... prelim merger starts with 
-#FuzzyCluster and outputs Cluster
-proc.SetClusterProducer("fuzzycluster")
-proc.SaveOutputCluster(True)
+prelimMerger = GetPrelimMergerInstance()
+# prelimMerger = GetPrelimMergerInstance(producer="fuzzycluster",saveOutput=True)
 
-
-########################################
-# attach merge algos here
-########################################
-
-## PROHIBIT ALGOS ##
-prohib_array = cmtool.CBAlgoArray()
-
-tracksep_prohibit = cmtool.CBAlgoTrackSeparate()
-tracksep_prohibit.SetUseEP(True)
-prohib_array.AddAlgo(tracksep_prohibit,False)
-
-outofcone_prohibit = cmtool.CBAlgoOutOfConeSeparate()
-outofcone_prohibit.SetMaxAngleSep(20.)
-prohib_array.AddAlgo(outofcone_prohibit,False)
-
-proc.GetManager().AddSeparateAlgo(prohib_array)
-
-## MERGE ALGOS ##
-merge_array = cmtool.CBAlgoArray()
-
-shortdist_alg = cmtool.CBAlgoShortestDist()
-shortdist_alg.SetMinHits(10)
-shortdist_alg.SetSquaredDistanceCut(5.)
-merge_array.AddAlgo(shortdist_alg,False)
-
-trackblob = cmtool.CBAlgoStartTrack()
-merge_array.AddAlgo(trackblob,False)
-
-pcontain = cmtool.CBAlgoPolyContain()
-merge_array.AddAlgo(pcontain,False)
-
-proc.GetManager().AddMergeAlgo(merge_array)
-
-########################################
-# done attaching merge algos
-########################################
-
-########################################
-# cmerge manager parameters
-########################################
-proc.GetManager().MergeTillConverge(True)
-
-
-mgr.add_process(proc)
+mgr.add_process(prelimMerger)
 
 mgr.run()
 
