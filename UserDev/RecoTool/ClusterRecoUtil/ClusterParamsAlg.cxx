@@ -734,7 +734,7 @@ namespace cluster{
      //forward loop
     double running_integral=fProfileIntegralForward;
     int startbin,endbin;
-    for(startbin=fProfileMaximumBin; startbin>1 && startbin<fChargeProfile.size();startbin--)
+    for(startbin=fProfileMaximumBin; startbin>1 && startbin < (int)(fChargeProfile.size());startbin--)
     {
       running_integral-=fChargeProfile.at(startbin);
       if( fChargeProfile.at(startbin)<fChargeCutoffThreshold.at(fPlane) && running_integral/fProfileIntegralForward<0.01 )

@@ -70,24 +70,24 @@ namespace cmtool {
 //	std::cout<<"Looking for the hits vector size"<<hits0.size()<<","<<hits1.size()<<","<<hits2.size()<<std::endl;
 //        std::cout<<"############# End of loop############# "<<std::endl;
 	// make an integrale over the cluster
-	bool pl0 = false;
-	bool pl1 = false;
-	bool pl2 = false;
+	//bool pl0 = false;
+	//bool pl1 = false;
+	//bool pl2 = false;
 	float tprof01 = -1;
 	float tprof02 = -1;
 	float tprof12 = -1;
 	if(hits0.size()>0)
 	{
-	  pl0 = true;
+	  //pl0 = true;
 	  if(hits1.size()>0)
 	    {
-	      pl1 = true;
+	      //pl1 = true;
 	      //we need to do a profile
 	      tprof01 =TProfCompare(hits0,hits1);
 	    }// hits1size>0
 	  if(hits2.size()>0)
 	    {
-	      pl2 = true;
+	      //pl2 = true;
 	      //we need to do a profile
 	      tprof02 =TProfCompare(hits0,hits2);
 		}// hits2size>0
@@ -95,10 +95,10 @@ namespace cmtool {
 	
 	if(hits1.size()>0)
 	  {
-	    pl1 = true;
+	    //pl1 = true;
 	    if(hits2.size()>0)
 	      {
-		pl2 = true;
+		//pl2 = true;
 		//we need to do a profile
 		tprof12 =TProfCompare(hits1,hits2);
 	      }//hits2.size>0

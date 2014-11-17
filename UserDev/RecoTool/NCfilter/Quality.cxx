@@ -103,8 +103,8 @@ double time_diff = ( larutil::DetectorProperties::GetME()->GetXTicksOffset(hita.
 	
 
 	// clusters are comming in as Pxhit so we are already in CM 
-        double aroughslope;
-        double aroughcept;
+        double aroughslope=0;
+        double aroughcept=0;
 		// Why is this a problem ? ? ? RG
         double broughslope = -987654321;
         double broughcept = -987654321;
