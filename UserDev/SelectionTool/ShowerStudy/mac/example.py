@@ -27,7 +27,7 @@ my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 
 my_proc.enable_filter(True)
 
-my_proc.set_verbosity(fmwk.msg.kDEBUG)
+#my_proc.set_verbosity(fmwk.msg.kDEBUG)
 
 # Attach a template process
 ana_unit_0 = fmwk.PDGSelection()
