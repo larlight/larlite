@@ -22,21 +22,16 @@ for x in xrange(len(sys.argv)-1):
 # Specify IO mode
 my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 
-# Specify input TDirectory name if given
-#if len(sys.argv) > 2:
-
-#    my_proc.set_input_rootdir(sys.argv[2])
-
 # Specify analysis output root file name
 my_proc.set_ana_output_file("");
 
 # Specify data output root file name
-my_proc.set_output_file("out.root")
+my_proc.set_output_file("showerreco_batch_out.root")
 
 #
 # Kazu disables to read-in shower data product from input (only speeds up)
 #
-my_proc.set_rootdir('scanner')
+
 # Create analysis unit
 ana_unit = fmwk.ShowerReco3D()
 
@@ -46,7 +41,7 @@ sralg.Verbose(False)
 ana_unit.SetShowerAlgo(sralg)
 
 # Specify cluster type
-ana_unit.SetClusterProducer("mergedfuzzy")
+ana_unit.SetClusterProducer("mergedmergedfuzzycluster")
 
 # 
 # Attach Matching algorithm
