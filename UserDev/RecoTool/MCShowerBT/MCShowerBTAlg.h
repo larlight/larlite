@@ -102,7 +102,7 @@ namespace larlite {
 
   protected:
 
-    std::vector<const larlite::simch*> fSimCh_v;
+    std::vector<larlite::simch> fSimCh_v;
     std::map<unsigned int, unsigned int> fShowerPartMap;
     std::vector<unsigned int> fShowerIndex_v;
     double _max_energy;

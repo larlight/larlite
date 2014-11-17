@@ -23,24 +23,29 @@ namespace larlite {
     //
 
     // Load MCShower and SimCh
-    auto ev_mcshower = storage->get_data<event_mcshower>("mcshower");
+    auto ev_mcshower = storage->get_data<event_mcshower>("mcreco");
 
     auto ev_simch    = storage->get_data<event_simch>("largeant");
 
-    if(!ev_mcshower || !ev_simch) {
-
-      print(msg::kERROR,__FUNCTION__,"MCShower/SimCh data product not found!");
-
+    if(!ev_mcshower) {
+      print(msg::kERROR,__FUNCTION__,"MCShower data product not found!");
       return false;
+    }
 
+    if(!ev_simch) {
+      print(msg::kERROR,__FUNCTION__,"SimCh data product not found!");
+      return false;
     }
 
     // Return if no mcshower
-    if(ev_mcshower->size()<1) return false;
+    if(ev_mcshower->size()<1) {
+      print(msg::kERROR,__FUNCTION__,"MCShower product found, but there are no mcshowers in this event!");
+      return false;
+    }
 
     // Load cluster
     auto ev_cluster = storage->get_data<event_cluster>(cluster_producer);
-    
+
     if(!ev_cluster) {
       
       print(msg::kERROR,__FUNCTION__,Form("Cluster by \"%s\" not found...",
@@ -49,8 +54,11 @@ namespace larlite {
 	    );
       return false;
       
-    }else if(ev_cluster->size()<1) return false;
-
+    }
+    else if(ev_cluster->size()<1) {
+      print(msg::kERROR,__FUNCTION__,"Cluster product found, but there are no clusters in this event!");
+      return false;
+    }
     // Load association
     auto hit_ass_key = ev_cluster->association_keys(data::kHit);
 
@@ -118,7 +126,7 @@ namespace larlite {
 	w.start = h.StartTime();
 	w.end   = h.EndTime();
 	hit_v.push_back(w);
-	
+
       }
 
       _cluster_plane_id.push_back(plane);

@@ -11,6 +11,7 @@ namespace larlite {
   void MCShowerBTAlg::BuildMap(const std::vector<mcshower>& mcshower_v,
 			       const std::vector<simch>& simch_v)
   {
+
     fShowerPartMap.clear();
     fShowerIndex_v.clear();
     std::set<unsigned int> used_shower_id;
@@ -32,13 +33,63 @@ namespace larlite {
     for(auto const& index : used_shower_id) fShowerIndex_v.push_back(index);
 
     fSimCh_v.clear();
-    for(auto const& sch : simch_v) {
+    //std::cout<<"cleared fSimCh_v"<<std::endl;
 
-      if(fSimCh_v.size() <= sch.Channel()) fSimCh_v.resize(sch.Channel(),nullptr);
-      fSimCh_v[sch.Channel()] = &sch;
+    /*
+    std::map<size_t,size_t> simch_map;
+
+    for(size_t i=0; i<simch_v.size(); ++i)
+      
+      simch_map.insert(std::make_pair((size_t)simch_v[i].Channel(),(size_t)i));
+
+    for(auto const& ch_index : simch_map) {
+
+      auto ch = ch_index.first;
+      auto index = ch_index.second;
+
+      while(fSimCh_v.size() < ch)
+
+	fSimCh_v.push_back(nullptr);
+
+      const ::larlite::simch* sch_ptr = &simch_v[index];
+
+      fSimCh_v.push_back(sch_ptr);
+      std::cout<<sch_ptr<< " : " << (*fSimCh_v.rbegin())<<std::endl;
+    }
+    */
+    
+    /*
+    for(size_t i=0; i<simch_v.size(); ++i) {
+
+      if(fSimCh_v.size() < simch_v[i].Channel()) 
+	fSimCh_v.resize(simch_v[i].Channel()-1,nullptr);
+      
+      //fSimCh_v[simch_v[i].Channel()] = (const ::larlite::simch*)(&(simch_v[i]));
+      fSimCh_v.push_back(&simch_v[i]);
+      std::cout<<"filled fSimCh_v["<<simch_v[i].Channel()<<"] with "<<(&(simch_v[i]))<<" : "<<fSimCh_v[simch_v[i].Channel()]<<std::endl;
 
     }
-    
+    */
+
+    for(auto const& sch : simch_v) {
+
+      if(fSimCh_v.size() < sch.Channel()) fSimCh_v.resize(sch.Channel());
+      if(fSimCh_v.size() == sch.Channel()) fSimCh_v.push_back(sch);
+      else fSimCh_v[sch.Channel()] = ::larlite::simch(sch);
+      //fSimCh_v[sch.Channel()] = (::larlite::simch*)(&sch);
+      //fSimCh_v[sch.Channel()] = sch;
+      //std::cout<<"filled fSimCh_v["<<sch.Channel()<<"] with "<<&sch<<" : "<<fSimCh_v[sch.Channel()]<<std::endl;
+
+    }
+
+    /*
+    size_t local_ctr=0;
+    for(auto const& ptr : fSimCh_v) {
+      if(ptr) local_ctr++;
+      std::cout<<ptr<<std::endl;
+    }
+    std::cout<<"end of buildmap(mcshower_v,simch_v) filled w/ "<< local_ctr << "/"<<fSimCh_v.size()<<std::endl;
+    */
   }
 
   std::vector<double> MCShowerBTAlg::MCShowerQFrac(const WireRange_t &h) const
@@ -61,19 +112,20 @@ namespace larlite {
 
     std::vector<double> num_electrons_v(fShowerIndex_v.size()+1,0);
 
-    if(h.ch >= fSimCh_v.size() || !fSimCh_v[h.ch]) {
+    //if(h.ch >= fSimCh_v.size() || !fSimCh_v[h.ch]) {
+    if(h.ch >= fSimCh_v.size()){
 
       std::cerr<<"Hit has no matched simchannel!!"<<std::endl;
       return std::vector<double>();
 
     }      
-    
+
     auto *ts = ::larutil::TimeService::GetME();
       
     auto sch = fSimCh_v[h.ch];
 
-    auto ide_v = sch->TrackIDsAndEnergies( ts->TPCTick2TDC(h.start), 
-					   ts->TPCTick2TDC(h.end) );
+    auto ide_v = sch.TrackIDsAndEnergies( ts->TPCTick2TDC(h.start), 
+					  ts->TPCTick2TDC(h.end) );
 
     if(!(ide_v.size())) {
 
