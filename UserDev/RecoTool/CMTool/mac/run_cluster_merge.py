@@ -14,7 +14,10 @@ parser.add_argument("-s","--source",help="Name of input file")
 parser.add_argument("-o","--data-output",help="Output data file, if event is changed")
 parser.add_argument("-a","--ana-output",help="Analysis output file")
 parser.add_argument("-n", "--num-events",help="Number of events to process")
-parser.add_argument("-d","--display",help="Turn on the display to see each view before and after." )
+parser.add_argument("-f", "--first",help="First event to start processing")
+parser.add_argument("-d","--display",help="Turn on the display to see each view before and after",
+                    action="store_true")
+parser.add_argument("-c","--cluster",help="Producer of original cluster")
 args = parser.parse_args()
 
 if len(sys.argv) == 1:
@@ -43,6 +46,17 @@ if args.ana_output == None:
     print "No ana output file selected.  If necessary, output will go to:"
     print "\t"+args.ana_output
 
+if args.num_events == None:
+    args.num_events = 0
+
+if args.first == None:
+    args.first = 0
+
+if args.cluster == None:
+    args.cluster = "fuzzycluster"
+
+print args.cluster, " is a ", type(args.cluster)
+
 
 ana_proc = larlite.ana_processor()
 
@@ -64,67 +78,47 @@ ana_proc.set_output_file(args.data_output)
 # Set destination for ana stuff
 ana_proc.set_ana_output_file(args.ana_output)
 
-prelimMerger = GetPrelimMergerInstance()
+prelimMerger = GetPrelimMergerInstance(str(args.cluster))
 # prelimMerger = GetPrelimMergerInstance(producer="fuzzycluster",saveOutput=True)
 
-secondMerger = GetSecondMergerInstance()
+secondMerger = GetSecondMergerInstance(str("merged"+args.cluster))
 # secondMerger = GetSecondMergerInstance(producer="mergedfuzzycluster",saveOutput=True)
 
 ana_proc.add_process(prelimMerger)
 ana_proc.add_process(secondMerger)
 
-# my_merge_alg = larlite.ClusterMergeAlg()
-# my_merger = larlite.ClusterMerge()
 
-# my_merger.set_mergealg(my_merge_alg)
-
-# ana_proc.add_process(my_merge_alg)
-
-# ana_proc.add_process(my_merger)
-
-# if this is not displaying, just run:
+# if this is not displaying clusters, just run:
 if args.display == None:
-    ana_proc.run()
+    ana_proc.run(int(args.first),int(args.num_events))
 
 else:
 
-    c=TCanvas("c","Wire v. Time Cluster Viewer",900,600)
+    raw_viewer = larlite.ClusterViewer()
+    raw_viewer.SetClusterProducer(str(args.cluster))
+    first_viewer = larlite.ClusterViewer()
+    first_viewer.SetClusterProducer(str("merged"+args.cluster))
+    second_viewer = larlite.ClusterViewer()
+    second_viewer.SetClusterProducer(str("mergedmerged"+args.cluster))
+
+    ana_proc.add_process(raw_viewer)
+    ana_proc.add_process(first_viewer)
+    ana_proc.add_process(second_viewer)
 
 
+    while true:
 
-    while ana_proc.process_event() and ana_proc.get_process_status() == ana_proc.kPROCESSING:
-        currentview = 0;
-        for iview in xrange(0,3):
-            for iclus in xrange(ana_proc.GetClusterGraph_Reco(int(iview),bool(true)).size()):
-                gstart=ana_proc.GetClusterGraph_Reco(int(iview),bool(true)).at(iclus)
-                gend  =ana_proc.GetClusterGraph_Reco(int(iview),bool(false)).at(iclus)
-                xmin=ana_proc.GetHisto_Hits(int(iview)).GetXaxis().GetXmin()
-                xmax=ana_proc.GetHisto_Hits(int(iview)).GetXaxis().GetXmax()
-                ymin=ana_proc.GetHisto_Hits(int(iview)).GetYaxis().GetXmin()
-                ymax=ana_proc.GetHisto_Hits(int(iview)).GetYaxis().GetXmax()
-                gstart.GetXaxis().SetLimits(xmin,xmax)
-                gend.GetXaxis().SetLimits(xmin,xmax)       
-                gstart.GetYaxis().SetRangeUser(ymin,ymax)
-                gend.GetYaxis().SetRangeUser(ymin,ymax)
-                gstart.SetTitle("View: %d, Cluster: %d"%(iview+1,iclus))
-                gstart.SetMarkerSize(3)
-                gstart.SetMarkerStyle(30)
-                gend.SetMarkerSize(3)
-                gend.SetMarkerStyle(29)
-                gstart.Draw("ALP")
-                gend.Draw("LP")
-                ana_proc.GetHisto_Reco(int(iview)).at(iclus).Draw("same")
-                leg = TLegend(0.6,0.65,0.88,0.85)
-                leg.AddEntry(gstart,"Start Point","p")
-                leg.AddEntry(gend,"End Point","p")
-                leg.Draw()
-                c_graph.Update()
-                print "Drawing cluster %d out of %d for view %d. To look at the next cluster hit enter." % (iclus,ana_proc.GetClusterGraph_Reco(int(iview),bool(true)).size()-1,iview+1)
-                sys.stdin.readline()
+        try:
+            args.first = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
+        except SyntaxError:
+            args.first = int(args.first) + 1
 
-        print "Hit Enter to continue to next evt..."
-        sys.stdin.readline()
+        ana_proc.process_event(int(args.first))
 
-    #ana_proc.run()
+        raw_viewer.DrawAllClusters();
+        first_viewer.DrawAllClusters();
+        second_viewer.DrawAllClusters();
+
+
 
 
