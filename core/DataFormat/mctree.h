@@ -19,6 +19,7 @@
 #include "treenode.h"
 #include <set>
 #include <map>
+#include <exception>
 
 namespace larlite {
   /**
