@@ -306,7 +306,7 @@ namespace larlite {
       hEnergyAssym->Fill ( (fTreeParams.reco_energy - fTreeParams.mc_energy) / 
 			   (fTreeParams.reco_energy + fTreeParams.mc_energy) * 2. );
       
-      hEnergyDiff->Fill  ( fTreeParams.reco_energy - fTreeParams.mc_energy );
+      hEnergyDiff->Fill  ( fTreeParams.mc_energy - fTreeParams.reco_energy );
 
       if(mDEDX.find(fTreeParams.mc_pdgid) == mDEDX.end()) 
 
