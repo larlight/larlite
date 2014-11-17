@@ -58,7 +58,7 @@ namespace showerreco {
     int worst_plane=-1,best_plane=-1;
     double min_length=9999999;
     double max_length=0;
-    for (int ip=0;ip<fPlaneID.size();ip++)
+    for (size_t ip=0;ip<fPlaneID.size();ip++)
     {
       if(fabs( fEndPoint[ip].w - fStartPoint[ip].w ) < min_length )
 	{
@@ -80,7 +80,7 @@ namespace showerreco {
     if(fPlaneID.size()>2)
       {
 	int local_index=0;
-	for(int ip=0;ip<fPlaneID.size();ip++) 
+	for(size_t ip=0;ip<fPlaneID.size();ip++) 
 	  {
 	    if(fStartPoint[ip].plane!=worst_plane) 
 	      index_to_use[local_index++]=ip;

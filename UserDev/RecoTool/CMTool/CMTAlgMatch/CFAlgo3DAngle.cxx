@@ -135,7 +135,7 @@ namespace cmtool {
 				 <<", "<<clusters.at(2)->GetParams().N_Hits ;
 		std::cout<<"\nTheta1 , Theta2 : "<<ratio_theta1<<", "<<ratio_theta2;
 		std::cout<<"\nPhi Ratio: "<<ratio_phi;
-	//	std::cout<<"\nHits ratio mid : "<<ratio_max_middle ;
+		std::cout<<"\nHits ratio mid : "<<ratio_max_middle ;
 	//	std::cout<<"\nHits ratio min : "<<ratio_max_min ;
 		std::cout<<"\nTotal is: " <<ratio<<" ***************";
 

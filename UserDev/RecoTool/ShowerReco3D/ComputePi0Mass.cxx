@@ -53,7 +53,7 @@ namespace larlite {
     auto cluster_producers = ev_shower->association_keys(data::kCluster);
     if(!cluster_producers.size())
      // throw fSRException.ShowerRecoException(Form("Shower product by \"%s\" does not contain association to clusters!",_shower_producer.c_str()));
-      throw ::showerreco::ShowerRecoException::ShowerRecoException(Form("Shower product by \"%s\" does not contain association to clusters!",_shower_producer.c_str()));
+      throw ::showerreco::ShowerRecoException(Form("Shower product by \"%s\" does not contain association to clusters!",_shower_producer.c_str()));
 
     auto ev_cluster = storage->get_data<event_cluster>(cluster_producers[0]);
 

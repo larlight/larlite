@@ -19,10 +19,11 @@ namespace larlite {
     try{
       return _particleMap.at(trackId);
     }
-    catch (const std::out_of_range& oor){
+    catch(const std::exception& oor){
+    //catch (const std::out_of_range& oor){
       //       std::cerr << "Out of Range Error: Mother TrackID not found. Likely a Primary particle." << std::endl;
     }
-    return -1;
+    //return -1;
   }
 
 

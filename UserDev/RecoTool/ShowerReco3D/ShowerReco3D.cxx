@@ -60,9 +60,9 @@ namespace larlite {
     auto shower_v = storage->get_data<event_shower>("showerreco");
     shower_v->clear();
     shower_v->reserve(matched_pairs.size());
-    shower_v->set_event_id(storage->get_data<::larlite::event_cluster>(fClusterProducer)->event_id());
-    shower_v->set_run(storage->get_data<::larlite::event_cluster>(fClusterProducer)->run());
-    shower_v->set_subrun(storage->get_data<::larlite::event_cluster>(fClusterProducer)->subrun());
+    shower_v->set_event_id(storage->get_data<event_cluster>(fClusterProducer)->event_id());
+    shower_v->set_run(storage->get_data<event_cluster>(fClusterProducer)->run());
+    shower_v->set_subrun(storage->get_data<event_cluster>(fClusterProducer)->subrun());
 
     // Create association holder
     AssSet_t ass_index_v;

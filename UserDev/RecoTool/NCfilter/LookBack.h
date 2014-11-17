@@ -47,10 +47,10 @@ namespace cluster {
   public:
 
     /// Default constructor
-    LookBack(){};
+    LookBack(){radius_of_interest=2; }
 
     /// Default destructor
-    virtual ~LookBack(){};
+    virtual ~LookBack(){}
 
     /**
        Clustering function. Returns a vector of clusters.
@@ -64,16 +64,12 @@ namespace cluster {
   std::pair<std::vector<unsigned int>,std::vector<unsigned int>> ClusterRefine(std::pair<std::vector<unsigned int>,std::vector<unsigned int>> hitpair, std::vector<larlite::hit> hitsvect);
 
 
- protected:
-        //cluster::CRUHelper fCRUHelper;
-        //cluster::Quality fQuality;
-
-	double radius_of_interest=2; 
-
-
-
-
-
+  protected:
+    //cluster::CRUHelper fCRUHelper;
+    //cluster::Quality fQuality;
+    
+    double radius_of_interest;
+    
   };
 }
 #endif

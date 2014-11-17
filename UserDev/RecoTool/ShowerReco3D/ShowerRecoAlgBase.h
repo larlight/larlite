@@ -53,10 +53,10 @@ namespace showerreco {
     virtual void Reset() = 0;
 
     /// Setter for a matched combination of clusters
-    virtual void AppendInputClusters(const std::vector< ::cluster::ClusterParamsAlg>& cpan_v);
+    virtual void AppendInputClusters(const std::vector<cluster::ClusterParamsAlg>& cpan_v);
 
     /// Execute reconstruction
-    std::vector< ::larlite::shower> Reconstruct();
+    std::vector<larlite::shower> Reconstruct();
 
     /// Verbosity switch
     virtual void Verbose(bool on=true) { fVerbosity=on; }
@@ -68,7 +68,7 @@ namespace showerreco {
     { return; }
 
     /// Function to reconstruct one shower
-    virtual ::larlite::shower RecoOneShower(const std::vector< ::showerreco::ShowerCluster_t>& clusters) = 0;
+    virtual ::larlite::shower RecoOneShower(const std::vector<showerreco::ShowerCluster_t>& clusters) = 0;
     
   protected:
     
@@ -76,7 +76,7 @@ namespace showerreco {
     bool fVerbosity;
 
     /// Input clusters
-    std::vector<std::vector< ::showerreco::ShowerCluster_t> > fInputClusters;
+    std::vector<std::vector<showerreco::ShowerCluster_t> > fInputClusters;
   };
 }
 

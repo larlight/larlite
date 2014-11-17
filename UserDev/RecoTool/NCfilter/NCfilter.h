@@ -40,7 +40,7 @@ namespace larlite {
   public:
 
     /// Default constructor
-    NCfilter() : ana_base() { _name="NCfilter"; }
+    NCfilter() : ana_base() { _name="NCfilter"; radius_of_interest=2.0;}
 
     /// Default destructor
     virtual ~NCfilter(){};
@@ -69,7 +69,7 @@ namespace larlite {
         ::cluster::PlaneCheckMatch fPlaneCheckMatch;
         ::cluster::LookBack fLookBack;
 
-	double radius_of_interest = 2.0;
+    double radius_of_interest;
 
 
     private: 
