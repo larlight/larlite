@@ -13,23 +13,23 @@ if len(sys.argv) != 2:
 
 filename = sys.argv[1]
 #filename = "/Users/davidkaleko/Data/ShowerStudy/PDGID_11/shower_larlight_11.root"
-my_proc = larlight.ana_processor()
-my_proc.set_verbosity(larlight.MSG.DEBUG)
+my_proc = larlite.ana_processor()
+my_proc.set_verbosity(larlite.msg.kDEBUG)
 
-my_proc.set_io_mode(larlight.storage_manager.READ)
+my_proc.set_io_mode(larlite.storage_manager.kREAD)
 
 my_proc.add_input_file(filename)
 
-larlight.storage_manager.get().set_in_rootdir("scanner")
-larlight.storage_manager.get().set_data_to_read(larlight.DATA.MCTruth,False)
-larlight.storage_manager.get().set_data_to_read(larlight.DATA.Shower,False)
-larlight.storage_manager.get().set_data_to_read(larlight.DATA.Calorimetry,False)
-larlight.storage_manager.get().set_data_to_read(larlight.DATA.UserInfo,False)
+# larlite.storage_manager.get().set_in_rootdir("scanner")
+# larlite.storage_manager.get().set_data_to_read(larlite.data.kMCTruth,"mctruth")
+# larlite.storage_manager.get().set_data_to_read(larlite.data.kShower,False)
+# larlite.storage_manager.get().set_data_to_read(larlite.data.kCalorimetry,False)
+# larlite.storage_manager.get().set_data_to_read(larlite.data.kUserInfo,False)
 
 my_proc.set_ana_output_file("")
 
-raw_viewer   = larlight.ClusterViewer()
-merge_viewer = larlight.MergeViewer()
+raw_viewer   = larlite.ClusterViewer()
+merge_viewer = larlite.MergeViewer()
 
 ########################################
 # merge viewer parameters
@@ -87,8 +87,8 @@ my_proc.add_process(raw_viewer)
 
 my_proc.add_process(merge_viewer)
 
-raw_viewer.SetClusterType(larlight.DATA.FuzzyCluster)
-merge_viewer.SetClusterType(larlight.DATA.FuzzyCluster)
+raw_viewer.SetClusterProducer("fuzzycluster")
+merge_viewer.SetClusterProducer("fuzzycluster")
 
 gStyle.SetOptStat(0)
 

@@ -26,30 +26,40 @@ namespace larlite {
 
     if(!_write_output) return true;
 
-    // Proceed to write an output data product
-    
+    // To write an output, get input cluster data
     auto ev_cluster = storage->get_data<event_cluster>(_cluster_producer);
 
-    if(!ev_cluster->size()) return true;
+    // Initialize the output cluster data product
+    auto out_cluster_v = storage->get_data<event_cluster>(Form("merged%s",_cluster_producer.c_str()));
+    out_cluster_v->clear();
+    out_cluster_v->set_event_id(ev_cluster->event_id());
+    out_cluster_v->set_run(ev_cluster->run());
+    out_cluster_v->set_subrun(ev_cluster->subrun());
 
-    auto hit_producer = ev_cluster->association_keys(data::kHit).at(0);
+    // Proceed to write an output data product if any cluster data product exists in the input
+    if(!ev_cluster->size()) {
+      print(msg::kWARNING,__FUNCTION__,
+	    Form("No input clusters! Saving empty event to output ttree..."));
+      return true;
+    }
 
-    if(!hit_producer.size()) {
+    // Get hit producer name
+    auto hit_producer_v = ev_cluster->association_keys(data::kHit);
+
+    if(!hit_producer_v.size()) {
 
       print(msg::kERROR,__FUNCTION__,
 	    Form("Non empty cluster has no association to hits!"));
       return false;
     }
+    auto hit_producer = hit_producer_v[0];
 
     std::vector<std::vector<unsigned short> > merged_indexes;
     _mgr.GetBookKeeper().PassResult(merged_indexes);
-    
-    auto out_cluster_v = storage->get_data<event_cluster>(Form("merged%s",_cluster_producer.c_str()));
-    out_cluster_v->clear();
+
+    // Reserve output vector size for faster push_back
     out_cluster_v->reserve(merged_indexes.size());
-    out_cluster_v->set_event_id(ev_cluster->event_id());
-    out_cluster_v->set_run(ev_cluster->run());
-    out_cluster_v->set_subrun(ev_cluster->subrun());
+    
     //tmp_index to know what plane to use
     unsigned int tmp_index = 0;
     AssSet_t hit_ass;
