@@ -12,6 +12,7 @@ namespace larlite {
     _fout=0;
     reset();
     _filter_enable = false;
+    _ana_unit_status = true;
   }
   
   void ana_processor::set_verbosity(msg::Level level){
@@ -101,9 +102,12 @@ namespace larlite {
       }
       
     }    
+    _ana_unit_status = true;
     _process=kREADY;
     _index=0;
     _nevents=0;
+    if(_verbosity[msg::kDEBUG])
+      Message::send(msg::kDEBUG,__PRETTY_FUNCTION__,"ends...");
     return status;
   }
   
@@ -126,9 +130,15 @@ namespace larlite {
     if(_process==kREADY)
       _process=kPROCESSING;
     
-    bool event_found = _storage->go_to(index);
+    bool event_found = 0;
+    if(_filter_enable)
+      event_found = _storage->go_to(index,_ana_unit_status);
+    else  
+      event_found = _storage->go_to(index);
     
     if(event_found){
+
+      _ana_unit_status = true;
 
       for(size_t i=0; i<_analyzers.size(); ++i){
 
@@ -136,17 +146,21 @@ namespace larlite {
 
 	_ana_status[i] = _analyzers[i]->analyze(_storage);
 
-	if(!_ana_status[i] && _filter_enable) break;
+	_ana_unit_status = _ana_unit_status && _ana_status[i];
+
+	if(!_ana_unit_status && _filter_enable) break;
 	
       }
       
       _index++;
       _nevents++;
-      
+
       return true;
     }
-    else
+    else {
+
       return finalize();
+    }
   }
   
   Bool_t ana_processor::run(UInt_t start_index, UInt_t nevents){
@@ -178,7 +192,7 @@ namespace larlite {
     int ten_percent_ctr=0;
     
     while(status){
-      
+
       status=process_event(_index);
 
       if( nevents >= 10 && (_nevents >= ten_percent_ctr * nevents/10.) ) {
@@ -192,8 +206,11 @@ namespace larlite {
       
       if(nevents && nevents == _nevents){
 	Message::send(msg::kNORMAL,__FUNCTION__,Form("Processed %d/%d events! Aborting...",_nevents,nevents));
-
-	_storage->next_event();
+	
+	if(_filter_enable)
+	  _storage->next_event(_ana_unit_status);
+	else
+	  _storage->next_event();
 
 	break;
       }

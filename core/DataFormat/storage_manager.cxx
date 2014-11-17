@@ -712,7 +712,7 @@ namespace larlite {
     return status;
   }
   
-  bool storage_manager::go_to(uint32_t index) {
+  bool storage_manager::go_to(uint32_t index,bool store) {
     
     bool status=true;
     if(_mode==kWRITE){
@@ -728,12 +728,12 @@ namespace larlite {
     }else
       _index=index;
     
-    if(status) status=next_event();
+    if(status) status=next_event(store);
     
     return status;
   }
   
-  bool storage_manager::next_event(){
+  bool storage_manager::next_event(bool store){
     
     bool status=true;
     
@@ -747,10 +747,11 @@ namespace larlite {
 	status=read_event();
 	break;
       case kWRITE:
-	status=write_event();
+	if(store)
+	  status=write_event();
 	break;
       case kBOTH:
-	if(_nevents_read)
+	if(_nevents_read && store)
 	  status = write_event();
 	if(status) status = read_event();
 	break;

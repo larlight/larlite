@@ -131,6 +131,7 @@ namespace larlite {
     storage_manager* _storage; ///< Storage manager pointer
 
     bool _filter_enable;
+    bool _ana_unit_status;
     
   };
 }

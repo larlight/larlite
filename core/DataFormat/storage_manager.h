@@ -141,10 +141,10 @@ namespace larlite {
     bool is_ready_io();
     
     /// Stores an event to the output in WRITE mode, and loads an event to local memory in READ mode.
-    bool next_event(); 
+    bool next_event(bool store=true); 
     
     /// Move to the TTree entry with the provided index number
-    bool go_to(UInt_t index);
+    bool go_to(UInt_t index, bool store=true);
     
     /// Close I/O file. 
     bool close(); 
