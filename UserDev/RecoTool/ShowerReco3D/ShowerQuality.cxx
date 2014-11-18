@@ -129,14 +129,14 @@ namespace larlite {
     if(hMatchedClusterEff) delete hMatchedClusterEff;
     if(hMatchedClusterPur) delete hMatchedClusterPur;
     
-    hMatchedClusterEff = new TH1D("hMatchedClusterEff",
+    hMatchedClusterEff = new TH1D("hMatchedClusterEff_PlaneCombo",
 				  "Matched Shower Cluster's Charge Efficiency; Efficiency; Clusters",
 				  101,-0.005,1.005);
-
-    hMatchedClusterPur = new TH1D("hMatchedClusterPur_Plane%zu",
+    
+    hMatchedClusterPur = new TH1D("hMatchedClusterPur_PlaneCombo",
 				  "Matched Shower Cluster's Charge Purity; Purity; Clusters",
 				  101,-0.005,1.005);
-
+    
 
     //
     // Best plane ID histogram initialization
