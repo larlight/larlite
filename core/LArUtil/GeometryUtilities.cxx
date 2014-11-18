@@ -868,13 +868,13 @@ namespace larutil{
   
     //////////////////////////////////////////////////////////
   Int_t GeometryUtilities::GetXYZ(const PxPoint *p0,
-				 const PxPoint *p1,
-				 Double_t* xyz) const
+				  const PxPoint *p1,
+				  Double_t* xyz) const
   {
     
     Double_t pos[3]={0.};
     geom->PlaneOriginVtx(p0->plane, pos);
-    Double_t x=(p0->t)+ detp->TriggerOffset()*fTimetoCm+pos[0];
+    Double_t x=(p0->t) - detp->TriggerOffset()*fTimetoCm+pos[0];
     double yz[2];
     
     GetYZ(p0,p1,yz);
