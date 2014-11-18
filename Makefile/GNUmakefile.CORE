@@ -16,8 +16,8 @@ endif
 
 # root class dictionary
 $(DICT).cxx: $(HEADERS) LinkDef.h
-	@echo '<< generating dict >>'
-	@$(LARLITE_DICTGEN) -f $(DICT).cxx -c $(CINTFLAGS) $(INCFLAGS) $(HEADERS) LinkDef.h
+	@echo '<< generating CINT >>'
+	@rootcint -f $(DICT).cxx -c $(CINTFLAGS) $(INCFLAGS) $(HEADERS) LinkDef.h
 
 # default rule for making .o files from .cxx files
 %.o: %.cxx
