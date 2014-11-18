@@ -4,7 +4,8 @@
 // #pragma statement: order matters! Google it ;)
 //
 
-#ifdef __CINT__
+#if defined(__ROOTCINT__) || defined(__ROOTCLING__)
+
 #pragma link off all globals;
 #pragma link off all classes;
 #pragma link off all functions;
@@ -108,9 +109,9 @@
 #pragma link C++ class std::vector<larlite::partid>+;
 #pragma link C++ class larlite::event_partid+;
 
-#pragma link C++ class larlite::user_info+;
-#pragma link C++ class std::vector<larlite::user_info>+;
-#pragma link C++ class larlite::event_user+;
+//#pragma link C++ class larlite::user_info+;
+//#pragma link C++ class std::vector<larlite::user_info>+;
+//#pragma link C++ class larlite::event_user+;
 
 #pragma link C++ class larlite::gtruth+;
 #pragma link C++ class std::vector<larlite::gtruth>+;

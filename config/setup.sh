@@ -18,7 +18,7 @@ else
     if [[ -z `command -v rootcint` ]]; then
 	echo
 	echo Looks like you do not have ROOT installed.
-	echo You cannot use LArLight w/o ROOT!
+	echo You cannot use LArLite w/o ROOT!
 	echo Aborting.
 	echo
 	return;
@@ -43,7 +43,7 @@ else
 	if [[ -z `command -v $LARLITE_CXX` ]]; then
 	    echo
 	    echo Looks like you do not have neither clang or g++!
-	    echo You need one of those to compile LArLight... Abort config...
+	    echo You need one of those to compile LArLite... Abort config...
 	    echo
 	    return;
 	fi
@@ -53,11 +53,11 @@ else
 	    echo
 	    echo "***************** COMPILER WARNING *******************"
 	    echo "*                                                    *"
-	    echo "* You are using g++ on Darwin to compile LArLight.   *"
-	    echo "* Currently LArLight assumes you do not have C++11   *"
+	    echo "* You are using g++ on Darwin to compile LArLite.    *"
+	    echo "* Currently LArLite assumes you do not have C++11    *"
 	    echo "* in this combination. Contact the author if this is *"
 	    echo "* not the case. At this rate you have no ability to  *"
-	    echo "* compile packages using C++11 in LArLight.          *"
+	    echo "* compile packages using C++11 in LArLite.           *"
 	    echo "*                                                    *"
 	    echo "* Help to install clang? See manual/contact author!  *"
 	    echo "*                                                    *"
@@ -65,6 +65,23 @@ else
 	    echo 
 	fi
     fi
+
+    # Check dictionary generator
+    LARLITE_DICTGEN=rootcling
+    if [ `command -v $LARLITE_DICTGEN` ]; then
+	export LARLITE_DICTGEN
+    else
+	LARLITE_DICTGEN=rootcint
+	if [[ -z `command -v $LARLITE_DICTGEN` ]]; then
+	    echo
+	    echo "Looks like you do not have neither rootcling (ROOT6) or rootcint (ROOT5)!"
+	    echo "You need one of those to compile LArLite... Abort config..."
+	    echo
+	    return;
+	fi
+	export LARLITE_DICTGEN
+    fi
+
     if [[ -z $ROOTSYS ]]; then
 	case `uname -n` in
 	    (houston.nevis.columbia.edu)
@@ -76,16 +93,16 @@ else
 	    ;;
 	    (*)
 	    echo
-	    echo "****************** PyROOT WARNING ********************"
-	    echo "*                                                    *"
+	    echo "****************** PyROOT WARNING *********************"
+	    echo "*                                                     *"
 	    echo "* Did not find your \$ROOTSYS. To use PyROOT feature, *"
-	    echo "* Make sure ROOT.py is installed (comes with ROOT).  *"
+	    echo "* Make sure ROOT.py is installed (comes with ROOT).   *"
 	    echo "* You need to export \$PYTHONPATH to include the dir  *"
-	    echo "* where ROOT.py exists.                              *"
-	    echo "*                                                    *"
-	    echo "* Help to install PyROOT? See manual/contact author! *"
-	    echo "*                                                    *"
-	    echo "******************************************************"
+	    echo "* where ROOT.py exists.                               *"
+	    echo "*                                                     *"
+	    echo "* Help to install PyROOT? See manual/contact author!  *"
+	    echo "*                                                     *"
+	    echo "*******************************************************"
 	    echo
 	    ;;
 	esac
