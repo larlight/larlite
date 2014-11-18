@@ -81,6 +81,10 @@ namespace larlite {
     void set_data_to_write(data::DataType_t const type, 
 			   const std::string name)
     { _storage->set_data_to_write(type,name); }    
+
+    /// alignment check switch
+    void enable_event_alignment(bool doit=true)
+    { _storage->enable_event_alignment(doit); }
     
     /// Getter of running analysis status
     Bool_t get_ana_status(ana_base* ptr) const;
