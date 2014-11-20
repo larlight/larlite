@@ -73,6 +73,9 @@ namespace geoalgo {
     /// Getter for distance from a TLorentzVector point to the box boundary
     double DistanceToWall(TLorentzVector const& point) const;
 
+    double DistanceToWall(TLorentzVector const& point,
+			  TLorentzVector const& dir,
+			  bool ForwardOrBack) const;
 
     /// Getter for a distance from a point to the box boundary along a direction (or backwards)
     /// Specify 0 for backwards, 1 for forwards
@@ -80,6 +83,9 @@ namespace geoalgo {
 			  std::vector<double> dir,
 			  bool ForwardOrBack ) const;
     
+    double DistanceToWall(double x, double y, double z, 
+			  double dirx, double diry, double dirz, 
+			  bool ForwardOrBack) const;
 
     /// Getter for distance from point to box (when point is outside box)
     double DistanceToWallFromOut(std::vector<double> const &point) const;
