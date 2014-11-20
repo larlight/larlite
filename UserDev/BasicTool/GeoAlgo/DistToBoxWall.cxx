@@ -141,6 +141,7 @@ namespace geoalgo {
 				       double dirx, double diry, double dirz,
 				       bool ForwardOrBack) const
   {
+
     
     //This function computes the distance from a point to the closest wall of the box
     // along the specified direction (both taken from input arguments). The box is
@@ -205,7 +206,6 @@ namespace geoalgo {
     else  // dir[0] is equal to zero
       dist_to_yz = 10000;
     
-    
     double dist_to_xy = 0;
     if(dirz!=0)
       {
@@ -225,9 +225,9 @@ namespace geoalgo {
     //
     double dist_to_zx = 0;
     
-    if(dirx!=0)
+    if(diry!=0)
       {
-	if(dirx < 0)
+	if(diry < 0)
 	  
 	  dist_to_zx = (y - _xyz_min[1]) / (-1. * diry);
 	
@@ -237,6 +237,7 @@ namespace geoalgo {
       }
     else //dir[1] is equal to zero
       dist_to_zx=10000;
+
     //
     //(6) Return the minimum of (3), (4), and (5)
     //
