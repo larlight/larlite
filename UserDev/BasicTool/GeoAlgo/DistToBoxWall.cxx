@@ -103,6 +103,21 @@ namespace geoalgo {
     return dist;
   }
   
+  
+//   double DistToBoxWall::DistanceToWallCorrectTime(std::vector<double> const& point,
+// 				       std::vector<double> dir, double d_time, bool ForwardOrBack ) const
+//   {
+//     
+//     double time_correction=d_time
+//     
+//     std::vector<double> newpoint=
+//     
+//     
+//     
+//   }
+  
+  
+  
   double DistToBoxWall::DistanceToWall(std::vector<double> const& point,
 				       std::vector<double> dir, bool ForwardOrBack ) const
   {
@@ -164,39 +179,55 @@ namespace geoalgo {
     //
     
     double dist_to_yz = 0;
-    if(dir[0] < 0 )
+    if(dir[0]!=0.0)
+    {
+      if(dir[0] < 0 )
       
-      dist_to_yz = (point[0] - _xyz_min[0]) / (-1. * dir[0]);
+	dist_to_yz = (point[0] - _xyz_min[0]) / (-1. * dir[0]);
     
-    else
+      else
       
-      dist_to_yz = (_xyz_max[0] - point[0]) / dir[0];
+	dist_to_yz = (_xyz_max[0] - point[0]) / dir[0];
     
-    //
-    // (4) Compute distance to reach XY plane
-    //
+      //
+      // (4) Compute distance to reach XY plane
+      //
+    }	
+    else  // dir[0] is equal to zero
+      dist_to_yz = 10000;
+	
+	
     double dist_to_xy = 0;
-    if(dir[2] < 0)
+    if(dir[2]!=0)
+    {
+      if(dir[2] < 0)
       
-      dist_to_xy = (point[2] - _xyz_min[2]) / (-1. * dir[2]);
+	dist_to_xy = (point[2] - _xyz_min[2]) / (-1. * dir[2]);
     
-    else
+      else
       
-      dist_to_xy = (_xyz_max[2] - point[2]) / dir[2];
-    
+	dist_to_xy = (_xyz_max[2] - point[2]) / dir[2];
+    }
+    else //dir[2] is equal to zero
+       dist_to_xy= 10000;
     
     //
     // (5) Compute distance to reach XZ plane
     //
     double dist_to_zx = 0;
-    if(dir[1] < 0)
-      
-      dist_to_zx = (point[1] - _xyz_min[1]) / (-1. * dir[1]);
     
-    else
+    if(dir[1]!=0)
+    {
+      if(dir[1] < 0)
       
-      dist_to_zx = (_xyz_max[1] - point[1]) / dir[1];
+	dist_to_zx = (point[1] - _xyz_min[1]) / (-1. * dir[1]);
     
+      else
+      
+	dist_to_zx = (_xyz_max[1] - point[1]) / dir[1];
+    }
+    else //dir[1] is equal to zero
+        dist_to_zx=10000;
     //
     //(6) Return the minimum of (3), (4), and (5)
     //
