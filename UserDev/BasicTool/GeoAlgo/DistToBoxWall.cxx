@@ -297,6 +297,13 @@ namespace geoalgo {
 
   }
 
+
+  double DistToBoxWall::DistanceToWall(TVector3 const& point) const{
+
+    return DistanceToWall(point.X(),point.Y(),point.Z());
+
+  }
+
   double DistToBoxWall::DistanceToWall(TLorentzVector const& point,
 				       TLorentzVector const& dir,
 				       bool ForwardOrBack) const{
