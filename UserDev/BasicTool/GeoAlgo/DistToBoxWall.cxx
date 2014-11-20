@@ -103,6 +103,21 @@ namespace geoalgo {
     return dist;
   }
   
+  
+//   double DistToBoxWall::DistanceToWallCorrectTime(std::vector<double> const& point,
+// 				       std::vector<double> dir, double d_time, bool ForwardOrBack ) const
+//   {
+//     
+//     double time_correction=d_time
+//     
+//     std::vector<double> newpoint=
+//     
+//     
+//     
+//   }
+  
+  
+
   double DistToBoxWall::DistanceToWall(std::vector<double> const& point,
 				       std::vector<double> dir, bool ForwardOrBack ) const
   {
@@ -118,6 +133,15 @@ namespace geoalgo {
       throw GeoAlgoException(msg.str());
     }
     
+    return DistanceToWall(point.at(0),point.at(1),point.at(2),dir.at(0),dir.at(1),dir.at(2),ForwardOrBack);
+  
+  }
+
+     double DistToBoxWall::DistanceToWall(double x, double y, double z,
+				       double dirx, double diry, double dirz,
+				       bool ForwardOrBack) const
+     {
+   
     //This function computes the distance from a point to the closest wall of the box
     // along the specified direction (both taken from input arguments). The box is
     // pre-defined by _xyz_min and _xyz_max values. Specify 0 for backwards, 1 for forwards. 
@@ -137,26 +161,26 @@ namespace geoalgo {
     //
     // (1) Check if a point is inside the box. If not, return -1.
     //
-    if( (point[0] < _xyz_min[0] || _xyz_max[0] < point[0]) || // point is outside X boundaries OR
-	(point[1] < _xyz_min[1] || _xyz_max[1] < point[1]) || // point is outside Y boundaries OR
-	(point[2] < _xyz_min[2] || _xyz_max[2] < point[2]) )  // point is outside Z boundaries 
+    if( (x < _xyz_min[0] || _xyz_max[0] < x) || // point is outside X boundaries OR
+	(y < _xyz_min[1] || _xyz_max[1] < y) || // point is outside Y boundaries OR
+	(z < _xyz_min[2] || _xyz_max[2] < z) )  // point is outside Z boundaries 
       return -99;
     
     //
     // (2) Normalize dir vector
     //
-    double dir_magnitude = sqrt( pow(dir[0],2) + pow(dir[1],2) + pow(dir[2],2) );
-    dir[0] /= dir_magnitude;
-    dir[1] /= dir_magnitude;
-    dir[2] /= dir_magnitude;
+    double dir_magnitude = sqrt( pow(dirx,2) + pow(diry,2) + pow(dirz,2) );
+    dirx /= dir_magnitude;
+    diry /= dir_magnitude;
+    dirz /= dir_magnitude;
     
     //
     // (2.5) Swap direction if user wants backwards direction
     // 	
     if(!ForwardOrBack){
-      dir[0] *= -1 ;
-      dir[1] *= -1 ;
-      dir[2] *= -1 ;
+      dirx *= -1 ;
+      diry *= -1 ;
+      dirz *= -1 ;
     }
     
     //
@@ -164,39 +188,55 @@ namespace geoalgo {
     //
     
     double dist_to_yz = 0;
-    if(dir[0] < 0 )
+    if(dirx!=0.0)
+    {
+      if(dirx < 0 )
       
-      dist_to_yz = (point[0] - _xyz_min[0]) / (-1. * dir[0]);
+	dist_to_yz = (x - _xyz_min[0]) / (-1. * dirx);
     
-    else
+      else
       
-      dist_to_yz = (_xyz_max[0] - point[0]) / dir[0];
+	dist_to_yz = (_xyz_max[0] - x) / dirx;
     
-    //
-    // (4) Compute distance to reach XY plane
-    //
+      //
+      // (4) Compute distance to reach XY plane
+      //
+    }	
+    else  // dir[0] is equal to zero
+      dist_to_yz = 10000;
+	
+	
     double dist_to_xy = 0;
-    if(dir[2] < 0)
+    if(dirz!=0)
+    {
+      if(dirz < 0)
       
-      dist_to_xy = (point[2] - _xyz_min[2]) / (-1. * dir[2]);
+	dist_to_xy = (z - _xyz_min[2]) / (-1. * dirz);
     
-    else
+      else
       
-      dist_to_xy = (_xyz_max[2] - point[2]) / dir[2];
-    
+	dist_to_xy = (_xyz_max[2] - z) / dirz;
+    }
+    else //dir[2] is equal to zero
+       dist_to_xy= 10000;
     
     //
     // (5) Compute distance to reach XZ plane
     //
     double dist_to_zx = 0;
-    if(dir[1] < 0)
-      
-      dist_to_zx = (point[1] - _xyz_min[1]) / (-1. * dir[1]);
     
-    else
+    if(dirx!=0)
+    {
+      if(dirx < 0)
       
-      dist_to_zx = (_xyz_max[1] - point[1]) / dir[1];
+	dist_to_zx = (x - _xyz_min[1]) / (-1. * dirx);
     
+      else
+      
+	dist_to_zx = (_xyz_max[1] - x) / dirx;
+    }
+    else //dir[1] is equal to zero
+        dist_to_zx=10000;
     //
     //(6) Return the minimum of (3), (4), and (5)
     //
@@ -255,6 +295,21 @@ namespace geoalgo {
 
     return DistanceToWall(point.X(),point.Y(),point.Z());
 
+  }
+
+
+  double DistToBoxWall::DistanceToWall(TVector3 const& point) const{
+
+    return DistanceToWall(point.X(),point.Y(),point.Z());
+
+  }
+
+  double DistToBoxWall::DistanceToWall(TLorentzVector const& point,
+				       TLorentzVector const& dir,
+				       bool ForwardOrBack) const{
+    
+    return DistanceToWall(point.X(),point.Y(),point.Z(),dir.X(),dir.Y(),dir.Z(),ForwardOrBack);
+    
   }
 }
 
