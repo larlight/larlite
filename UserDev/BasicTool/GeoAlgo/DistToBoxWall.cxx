@@ -80,7 +80,7 @@ namespace geoalgo {
     
     double dist_to_yz = x - _xyz_min[0];
     if( dist_to_yz > (_xyz_max[0] - x) ) dist_to_yz = _xyz_max[0] - x;
-
+    
     //
     // (3) Compute the distance to the XZ wall
     //   
@@ -104,20 +104,20 @@ namespace geoalgo {
   }
   
   
-//   double DistToBoxWall::DistanceToWallCorrectTime(std::vector<double> const& point,
-// 				       std::vector<double> dir, double d_time, bool ForwardOrBack ) const
-//   {
-//     
-//     double time_correction=d_time
-//     
-//     std::vector<double> newpoint=
-//     
-//     
-//     
-//   }
+  //   double DistToBoxWall::DistanceToWallCorrectTime(std::vector<double> const& point,
+  // 				       std::vector<double> dir, double d_time, bool ForwardOrBack ) const
+  //   {
+  //     
+  //     double time_correction=d_time
+  //     
+  //     std::vector<double> newpoint=
+  //     
+  //     
+  //     
+  //   }
   
   
-
+  
   double DistToBoxWall::DistanceToWall(std::vector<double> const& point,
 				       std::vector<double> dir, bool ForwardOrBack ) const
   {
@@ -134,14 +134,14 @@ namespace geoalgo {
     }
     
     return DistanceToWall(point.at(0),point.at(1),point.at(2),dir.at(0),dir.at(1),dir.at(2),ForwardOrBack);
-  
+    
   }
-
-     double DistToBoxWall::DistanceToWall(double x, double y, double z,
+  
+  double DistToBoxWall::DistanceToWall(double x, double y, double z,
 				       double dirx, double diry, double dirz,
 				       bool ForwardOrBack) const
-     {
-   
+  {
+    
     //This function computes the distance from a point to the closest wall of the box
     // along the specified direction (both taken from input arguments). The box is
     // pre-defined by _xyz_min and _xyz_max values. Specify 0 for backwards, 1 for forwards. 
@@ -189,36 +189,36 @@ namespace geoalgo {
     
     double dist_to_yz = 0;
     if(dirx!=0.0)
-    {
-      if(dirx < 0 )
-      
-	dist_to_yz = (x - _xyz_min[0]) / (-1. * dirx);
-    
-      else
-      
-	dist_to_yz = (_xyz_max[0] - x) / dirx;
-    
-      //
-      // (4) Compute distance to reach XY plane
-      //
-    }	
+      {
+	if(dirx < 0 )
+	  
+	  dist_to_yz = (x - _xyz_min[0]) / (-1. * dirx);
+	
+	else
+	  
+	  dist_to_yz = (_xyz_max[0] - x) / dirx;
+	
+	//
+	// (4) Compute distance to reach XY plane
+	//
+      }	
     else  // dir[0] is equal to zero
       dist_to_yz = 10000;
-	
-	
+    
+    
     double dist_to_xy = 0;
     if(dirz!=0)
-    {
-      if(dirz < 0)
-      
-	dist_to_xy = (z - _xyz_min[2]) / (-1. * dirz);
-    
-      else
-      
-	dist_to_xy = (_xyz_max[2] - z) / dirz;
-    }
+      {
+	if(dirz < 0)
+	  
+	  dist_to_xy = (z - _xyz_min[2]) / (-1. * dirz);
+	
+	else
+	  
+	  dist_to_xy = (_xyz_max[2] - z) / dirz;
+      }
     else //dir[2] is equal to zero
-       dist_to_xy= 10000;
+      dist_to_xy= 10000;
     
     //
     // (5) Compute distance to reach XZ plane
@@ -226,17 +226,17 @@ namespace geoalgo {
     double dist_to_zx = 0;
     
     if(dirx!=0)
-    {
-      if(dirx < 0)
-      
-	dist_to_zx = (x - _xyz_min[1]) / (-1. * dirx);
-    
-      else
-      
-	dist_to_zx = (_xyz_max[1] - x) / dirx;
-    }
+      {
+	if(dirx < 0)
+	  
+	  dist_to_zx = (y - _xyz_min[1]) / (-1. * diry);
+	
+	else
+	  
+	  dist_to_zx = (_xyz_max[1] - y) / diry;
+      }
     else //dir[1] is equal to zero
-        dist_to_zx=10000;
+      dist_to_zx=10000;
     //
     //(6) Return the minimum of (3), (4), and (5)
     //
