@@ -80,7 +80,7 @@ namespace geoalgo {
     
     double dist_to_yz = x - _xyz_min[0];
     if( dist_to_yz > (_xyz_max[0] - x) ) dist_to_yz = _xyz_max[0] - x;
-
+    
     //
     // (3) Compute the distance to the XZ wall
     //   
@@ -116,8 +116,6 @@ namespace geoalgo {
   //     
   //   }
   
-  
-
   double DistToBoxWall::DistanceToWall(std::vector<double> const& point,
 				       std::vector<double> dir, bool ForwardOrBack ) const
   {
@@ -134,7 +132,7 @@ namespace geoalgo {
     }
     
     return DistanceToWall(point.at(0),point.at(1),point.at(2),dir.at(0),dir.at(1),dir.at(2),ForwardOrBack);
-  
+    
   }
 
   double DistToBoxWall::DistanceToWall(double x, double y, double z,
@@ -209,8 +207,9 @@ namespace geoalgo {
     //
     // (4) Compute distance to reach XY plane
     //
-	
+
     double dist_to_xy = 0;
+
     if(dirz < 0)
       
       dist_to_xy = (z - _xyz_min[2]) / (-1. * dirz);
@@ -289,6 +288,13 @@ namespace geoalgo {
 
     return DistanceToWall(point.X(),point.Y(),point.Z());
     
+  }
+
+
+  double DistToBoxWall::DistanceToWall(TVector3 const& point) const{
+
+    return DistanceToWall(point.X(),point.Y(),point.Z());
+
   }
 
   double DistToBoxWall::DistanceToWall(TLorentzVector const& point,

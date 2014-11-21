@@ -73,6 +73,9 @@ namespace geoalgo {
     /// Getter for distance from a TLorentzVector point to the box boundary
     double DistanceToWall(TLorentzVector const& point) const;
 
+    /// Getter for distance from a TVector3 point to the box boundary
+    double DistanceToWall(TVector3 const& point) const;
+
     double DistanceToWall(TLorentzVector const& point,
 			  TLorentzVector const& dir,
 			  bool ForwardOrBack) const;
