@@ -83,6 +83,9 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_mctree> () const
   { return data::kMCTree;  }
 
+  template<> data::DataType_t storage_manager::data_type<event_cosmictag> () const
+  { return data::kCosmicTag; }
+
   template <class T>
   data::DataType_t storage_manager::data_type() const
   { 

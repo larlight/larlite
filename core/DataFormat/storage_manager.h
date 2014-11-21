@@ -294,6 +294,7 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_user> () const;
   template<> data::DataType_t storage_manager::data_type<event_mctrack> () const;
   template<> data::DataType_t storage_manager::data_type<event_mctree> () const;
+  template<> data::DataType_t storage_manager::data_type<event_cosmictag>() const;
 }
 #endif
 
