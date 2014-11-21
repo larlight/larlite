@@ -283,27 +283,7 @@ namespace geoalgo {
       return ( z_dist_min < z_dist_max ? z_dist_min : z_dist_max ) ;
     
   }
-  
-  double DistToBoxWall::DistanceToWall(TLorentzVector const& point) const{
 
-    return DistanceToWall(point.X(),point.Y(),point.Z());
-    
-  }
-
-
-  double DistToBoxWall::DistanceToWall(TVector3 const& point) const{
-
-    return DistanceToWall(point.X(),point.Y(),point.Z());
-
-  }
-
-  double DistToBoxWall::DistanceToWall(TLorentzVector const& point,
-				       TLorentzVector const& dir,
-				       bool ForwardOrBack) const{
-    
-    return DistanceToWall(point.X(),point.Y(),point.Z(),dir.X(),dir.Y(),dir.Z(),ForwardOrBack);
-    
-  }
 }
 
 
