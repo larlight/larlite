@@ -15,6 +15,8 @@
 #define LARLITE_GEOOBJECTS_H
 
 #include "GeoAlgoException.h"
+#include <TVector3.h>
+#include <TLorentzVector.h>
 #include <iostream>
 #include <vector>
 #include <sstream>
@@ -40,6 +42,22 @@ namespace geoalgo {
     /// Default ctor w/ a bare std::vector<double>
     Point(const std::vector<double> &obj) : std::vector<double>(obj)
     {}
+
+    /// ctor w/ x & y
+    Point(const double x, const double y) : Point(2)
+    { (*this)[0] = x; (*this)[1] = y; }
+
+    /// ctor w/ x, y & z
+    Point(const double x, const double y, const double z) : Point(3)
+    { (*this)[0] = x; (*this)[1] = y; (*this)[2] = z; }
+
+    /// ctor w/ TVector3
+    Point(const TVector3 &pt) : Point(3)
+    { (*this)[0] = pt[0]; (*this)[1] = pt[1]; (*this)[2] = pt[2]; }
+
+    /// ctor w/ TLorentzVector
+    Point(const TLorentzVector &pt) : Point(3)
+    { (*this)[0] = pt[0]; (*this)[1] = pt[1]; (*this)[2] = pt[2]; }
     
     /// Default dtor
     virtual ~Point(){}
@@ -107,39 +125,18 @@ namespace geoalgo {
     Trajectory(size_t npoints, size_t ndimension) : std::vector<geoalgo::Point>(npoints, Point(ndimension))
     {}
 
-    /// Ctor using a vector of point
-    Trajectory(const std::vector<geoalgo::Point> &obj){
-      if(obj.size()) {
-	size_t dim=(*obj.begin()).size();
-	for(auto const& p : obj) {
-	  if(p.size() != dim) {
-	    std::ostringstream msg;
-	    msg << "<<" << __FUNCTION__ << ">>"
-		<< " Input vector of Point contains point of different dimension!" << std::endl;
-	    throw GeoAlgoException(msg.str());
-	  }
-	}
-	this->reserve(obj.size());
-	for(auto const& p : obj) this->push_back(p);
-      }
-    }
-
     /// Ctor using a vector of mere vector point expression
     Trajectory(const std::vector<std::vector<double> > &obj)
     {
-      if(obj.size()) {
-	size_t dim=(*obj.begin()).size();
-	for(auto const& p : obj) {
-	  if(p.size() != dim) {
-	    std::ostringstream msg;
-	    msg << "<<" << __FUNCTION__ << ">>"
-		<< " Input vector of Point contains point of different dimension!" << std::endl;
-	    throw GeoAlgoException(msg.str());
-	  }
-	}
-	this->reserve(obj.size());
-	for(auto const& p : obj) this->push_back(Point(p));
-      }
+      this->reserve(obj.size());
+      for(auto const& p : obj) this->push_back(Point(p));
+    }
+
+    /// Ctor using a vector of point
+    Trajectory(const std::vector<geoalgo::Point> &obj)
+    {
+      this->reserve(obj.size());
+      for(auto const& p : obj) this->push_back(p);
     }
 
     /// Default dtor
