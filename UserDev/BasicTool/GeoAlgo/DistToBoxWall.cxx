@@ -190,51 +190,48 @@ namespace geoalgo {
       diry *= -1 ;
       dirz *= -1 ;
     }
+
+    
+    // If the i-direction component is 0
+    // this distance is infinite
     
     //
     // (3) Compute distance to reach YZ plane
     //
-    
     double dist_to_yz = 0;
-    if(dirx < 0 )
-      
+    if( dirx < 0 )
       dist_to_yz = (x - _xyz_min[0]) / (-1. * dirx);
-    
-    else
-      
+    else if ( dirx > 0 )
       dist_to_yz = (_xyz_max[0] - x) / dirx;
+    else
+      dist_to_yz = _xyz_max[2]-_xyz_min[2];
     
     //
     // (4) Compute distance to reach XY plane
     //
-
     double dist_to_xy = 0;
-
-    if(dirz < 0)
-      
+    if ( dirz < 0 )
       dist_to_xy = (z - _xyz_min[2]) / (-1. * dirz);
-    
-    else
-      
+    else if (dirz > 0 )
       dist_to_xy = (_xyz_max[2] - z) / dirz;
+    else
+      dist_to_xy = _xyz_max[2]-_xyz_min[2];
     
     //
     // (5) Compute distance to reach XZ plane
     //
     double dist_to_zx = 0;
-    if(dirx < 0)
-      
-      dist_to_zx = (x - _xyz_min[1]) / (-1. * dirx);
-    
+    if ( diry < 0 )
+      dist_to_zx = (y - _xyz_min[1]) / (-1. * diry);
+    else if ( diry > 0 )
+      dist_to_zx = (_xyz_max[1] - y) / diry;
     else
-      
-      dist_to_zx = (_xyz_max[1] - x) / dirx;
+      dist_to_zx = _xyz_max[2]-_xyz_min[2];
 
     //
     //(6) Return the minimum of (3), (4), and (5)
     //
     double dist = ( dist_to_yz < dist_to_zx ? dist_to_yz : dist_to_zx );
-    
     dist = ( dist < dist_to_xy ? dist : dist_to_xy ); 
     
     return dist;

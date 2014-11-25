@@ -11,8 +11,8 @@
 /** \addtogroup GeoAlgo
 
     @{*/
-#ifndef TRAJECTORYINVOLUME_HH
-#define TRAJECTORYINVOLUME_HH
+#ifndef BASICTOOL_TRAJECTORYINVOLUME_H
+#define BASICTOOL_TRAJECTORYINVOLUME_H
 
 #include <iostream>
 #include <vector>

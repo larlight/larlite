@@ -15,8 +15,8 @@
 /** \addtogroup GeoAlgo
 
     @{*/
-#ifndef SEGMENTPOCA_H
-#define SEGMENTPOCA_H
+#ifndef BASICTOOL_SEGMENTPOCA_H
+#define BASICTOOL_SEGMENTPOCA_H
 
 #include <iostream>
 #include <vector>
@@ -40,25 +40,28 @@ namespace geoalgo {
     virtual ~SegmentPoCA(){}
 
 
-    double ClosestApproachToTrajectory(std::vector<std::vector<double>> *traj,
-				       std::vector<double> *s2,
-				       std::vector<double> *e2,
+    double ClosestApproachToTrajectory(const std::vector<std::vector<double>> &traj,
+				       const std::vector<double> &s2,
+				       const std::vector<double> &e2,
 				       std::vector<double> &c1,
-				       std::vector<double> &c2);
+				       std::vector<double> &c2) const;
 
-    double ClosestApproach(std::vector<double> *s1,
-			   std::vector<double> *e1,
-			   std::vector<double> *s2,
-			   std::vector<double> *e2,
+    double ClosestApproach(const std::vector<double> &s1,
+			   const std::vector<double> &e1,
+			   const std::vector<double> &s2,
+			   const std::vector<double> &e2,
 			   std::vector<double> &c1,
-			   std::vector<double> &c2);
+			   std::vector<double> &c2) const;
     
-    double Clamp(double n, double min, double max);
+    double Clamp(const double n, const double min, const double max) const;
 
-    double Dot(std::vector<double> *v1, std::vector<double> *v2);
+    double Dot(const std::vector<double> &v1, 
+	       const std::vector<double> &v2) const;
 
-    void TestPoCA(std::vector<double> s1, std::vector<double> e1,
-		  std::vector<double> s2, std::vector<double> e2);
+    void TestPoCA(const std::vector<double> &s1, 
+		  const std::vector<double> &e1,
+		  const std::vector<double> &s2, 
+		  const std::vector<double> &e2) const;
 
 
   private:

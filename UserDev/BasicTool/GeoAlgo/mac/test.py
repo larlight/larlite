@@ -20,15 +20,19 @@ from ROOT import geoalgo
 
 example = geoalgo.SegmentPoCA()
 
-p1 = ROOT.vector('double')()
-p1.push_back(0.01)
-p1.push_back(0.02)
-p1.push_back(-0.01)
+distToBoxWall = geoalgo.DistToBoxWall()
+distToBoxWall.SetXYZMin(0,-116,0)
+distToBoxWall.SetXYZMax(256,116,1036)
 
-p2 = ROOT.vector('double')()
-p2.push_back(2)
-p2.push_back(0)
-p2.push_back(0)
+pos = ROOT.vector('double')()
+pos.push_back(100)
+pos.push_back(0)
+pos.push_back(400)
+
+dircn = ROOT.vector('double')()
+dircn.push_back(0)
+dircn.push_back(-10)
+dircn.push_back(0)
 
 t1 = ROOT.vector('double')()
 t1.push_back(0.3)
@@ -40,7 +44,9 @@ t2.push_back(3.34)
 t2.push_back(-0.04)
 t2.push_back(5.0)
 
-example.TestPoCA(p1,p2,t1,t2)
+#example.TestPoCA(p1,p2,t1,t2)
 
+dist = distToBoxWall.DistanceToWall(pos,dircn,0)
+print dist
 
 # done!
