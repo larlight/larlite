@@ -1,5 +1,5 @@
-#ifndef ANA_CLASS_NAME_CXX
-#define ANA_CLASS_NAME_CXX
+#ifndef BASICTOOL_ANA_CLASS_NAME_CXX
+#define BASICTOOL_ANA_CLASS_NAME_CXX
 
 #include "Ana_Class_Name.h"
 

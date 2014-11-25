@@ -1,5 +1,5 @@
-#ifndef EMPTY_CLASS_NAME_CXX
-#define EMPTY_CLASS_NAME_CXX
+#ifndef BASICTOOL_EMPTY_CLASS_NAME_CXX
+#define BASICTOOL_EMPTY_CLASS_NAME_CXX
 
 #include "Empty_Class_Name.h"
 
