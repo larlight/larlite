@@ -10,6 +10,8 @@
 #pragma link off all functions;
 
 #pragma link C++ namespace geoalgo ;
+#pragma link C++ class geoalgo::Point+;
+#pragma link C++ class geoalgo::Trajectory+;
 #pragma link C++ class geoalgo::DistToBoxWall+;
 #pragma link C++ class geoalgo::GeoAlgoException+;
 #pragma link C++ class geoalgo::PointToLineDist+;
@@ -19,6 +21,7 @@
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 
 
 
