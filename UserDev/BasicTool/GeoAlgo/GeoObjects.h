@@ -19,6 +19,7 @@
 #include <vector>
 #include <sstream>
 #include <cmath>
+#include <limits>
 namespace geoalgo {
 
   // Forward declaration (don't worry)
