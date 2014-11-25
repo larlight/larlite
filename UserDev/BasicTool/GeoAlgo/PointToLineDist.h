@@ -11,9 +11,10 @@
 /** \addtogroup GeoAlgo
 
     @{*/
-#ifndef POINTTOLINEDIST_HH
-#define POINTTOLINEDIST_HH
+#ifndef BASICTOOL_POINTTOLINEDIST_H
+#define BASICTOOL_POINTTOLINEDIST_H
 
+#include "GeoAlgoException.h"
 #include <iostream>
 #include <vector>
 #include <math.h>
@@ -34,19 +35,24 @@ namespace geoalgo {
     /// Default destructor
     virtual ~PointToLineDist(){};
     
-  double Distance(std::vector<double> *point,
-		  std::vector<double> *segmentStart,
-		  std::vector<double> *segmentEnd);
+  double Distance(const std::vector<double> &point,
+		  const std::vector<double> &segmentStart,
+		  const std::vector<double> &segmentEnd) const;
 
-  double DistanceToTrack(std::vector<double> *p, std::vector<std::vector<double> > *track);
+  double DistanceToTrack(const std::vector<double> &p, 
+			 const std::vector<std::vector<double> > &track) const;
 
-  double DistanceToListOfTracks(std::vector<double> *p, std::vector<std::vector<std::vector<double> > > *trackList);
+  double DistanceToListOfTracks(const std::vector<double> &p, 
+				const std::vector<std::vector<std::vector<double> > > &trackList) const;
 
-  double DistanceToTrack(std::vector<double> *p, std::vector<std::vector<double> > *track, double bufferDist);
+  double DistanceToTrack(const std::vector<double> &p, 
+			 const std::vector<std::vector<double> > &track, 
+			 const double &bufferDist) const;
 
-  double DotProduct(std::vector<double> *A, std::vector<double> *B);
+  double DotProduct(const std::vector<double> &A, 
+		    const std::vector<double> &B) const;
 
-  void TestDist();
+  void TestDist() const;
 
   void SetDebug(bool on) { _debug = on; }
 
