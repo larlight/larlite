@@ -72,7 +72,7 @@ namespace geoalgo {
     if( (x < _xyz_min[0] || _xyz_max[0] < x) || // point is outside X boundaries OR
   	(y < _xyz_min[1] || _xyz_max[1] < y) || // point is outside Y boundaries OR
    	(z < _xyz_min[2] || _xyz_max[2] < z) )  // point is outside Z boundaries 
-      return -99; 
+      return -1; 
     
     //
     // (2) Compute the distance to the YZ wall
@@ -116,8 +116,6 @@ namespace geoalgo {
   //     
   //   }
   
-  
-  
   double DistToBoxWall::DistanceToWall(std::vector<double> const& point,
 				       std::vector<double> dir, bool ForwardOrBack ) const
   {
@@ -136,12 +134,11 @@ namespace geoalgo {
     return DistanceToWall(point.at(0),point.at(1),point.at(2),dir.at(0),dir.at(1),dir.at(2),ForwardOrBack);
     
   }
-  
+
   double DistToBoxWall::DistanceToWall(double x, double y, double z,
 				       double dirx, double diry, double dirz,
 				       bool ForwardOrBack) const
   {
-
     
     //This function computes the distance from a point to the closest wall of the box
     // along the specified direction (both taken from input arguments). The box is
@@ -165,12 +162,22 @@ namespace geoalgo {
     if( (x < _xyz_min[0] || _xyz_max[0] < x) || // point is outside X boundaries OR
 	(y < _xyz_min[1] || _xyz_max[1] < y) || // point is outside Y boundaries OR
 	(z < _xyz_min[2] || _xyz_max[2] < z) )  // point is outside Z boundaries 
-      return -99;
+      return -1;
     
     //
     // (2) Normalize dir vector
     //
     double dir_magnitude = sqrt( pow(dirx,2) + pow(diry,2) + pow(dirz,2) );
+    if(!dir_magnitude) {
+      
+      std::ostringstream msg;
+      msg
+	<< "<<" << __FUNCTION__ << ">>"
+	<< " Direction vector magnitude is 0!"
+	<< std::endl;
+      throw GeoAlgoException(msg.str());
+    }
+
     dirx /= dir_magnitude;
     diry /= dir_magnitude;
     dirz /= dir_magnitude;
@@ -189,54 +196,39 @@ namespace geoalgo {
     //
     
     double dist_to_yz = 0;
-    if(dirx!=0.0)
-      {
-	if(dirx < 0 )
-	  
-	  dist_to_yz = (x - _xyz_min[0]) / (-1. * dirx);
-	
-	else
-	  
-	  dist_to_yz = (_xyz_max[0] - x) / dirx;
-	
-	//
-	// (4) Compute distance to reach XY plane
-	//
-      }	
-    else  // dir[0] is equal to zero
-      dist_to_yz = 10000;
+    if(dirx < 0 )
+      
+      dist_to_yz = (x - _xyz_min[0]) / (-1. * dirx);
     
+    else
+      
+      dist_to_yz = (_xyz_max[0] - x) / dirx;
+    
+    //
+    // (4) Compute distance to reach XY plane
+    //
+
     double dist_to_xy = 0;
-    if(dirz!=0)
-      {
-	if(dirz < 0)
-	  
-	  dist_to_xy = (z - _xyz_min[2]) / (-1. * dirz);
-	
-	else
-	  
-	  dist_to_xy = (_xyz_max[2] - z) / dirz;
-      }
-    else //dir[2] is equal to zero
-      dist_to_xy= 10000;
+
+    if(dirz < 0)
+      
+      dist_to_xy = (z - _xyz_min[2]) / (-1. * dirz);
+    
+    else
+      
+      dist_to_xy = (_xyz_max[2] - z) / dirz;
     
     //
     // (5) Compute distance to reach XZ plane
     //
     double dist_to_zx = 0;
+    if(dirx < 0)
+      
+      dist_to_zx = (x - _xyz_min[1]) / (-1. * dirx);
     
-    if(diry!=0)
-      {
-	if(diry < 0)
-	  
-	  dist_to_zx = (y - _xyz_min[1]) / (-1. * diry);
-	
-	else
-	  
-	  dist_to_zx = (_xyz_max[1] - y) / diry;
-      }
-    else //dir[1] is equal to zero
-      dist_to_zx=10000;
+    else
+      
+      dist_to_zx = (_xyz_max[1] - x) / dirx;
 
     //
     //(6) Return the minimum of (3), (4), and (5)
@@ -257,17 +249,17 @@ namespace geoalgo {
     // 
     // The function proceeds in the following steps of computation:
     //
-    // (1) Check if a point is within the box. If so, return -99.
+    // (1) Check if a point is within the box. If so, return -1.
     // (2) Compute shortest distance from point to whichever boundary the point exceeded 
     // (3) Thas all.
     //
     
-    // (1) Check if point is inside box--if it is, return -99
+    // (1) Check if point is inside box--if it is, return -1
     if( (point[0] > _xyz_min[0] && _xyz_max[0] > point[0]) && // point is inside X boundaries OR
 	(point[1] > _xyz_min[1] && _xyz_max[1] > point[1]) && // point is inside Y boundaries OR
 	(point[2] > _xyz_min[2] && _xyz_max[2] > point[2]) )  // point is inside Z boundaries 
       
-      return -99;
+      return -1;
     
     // (2) Compute shortest distance
     double x_dist_min = abs(point[0] - _xyz_min[0]) ;
@@ -291,27 +283,7 @@ namespace geoalgo {
       return ( z_dist_min < z_dist_max ? z_dist_min : z_dist_max ) ;
     
   }
-  
-  double DistToBoxWall::DistanceToWall(TLorentzVector const& point) const{
 
-    return DistanceToWall(point.X(),point.Y(),point.Z());
-
-  }
-
-
-  double DistToBoxWall::DistanceToWall(TVector3 const& point) const{
-
-    return DistanceToWall(point.X(),point.Y(),point.Z());
-
-  }
-
-  double DistToBoxWall::DistanceToWall(TLorentzVector const& point,
-				       TLorentzVector const& dir,
-				       bool ForwardOrBack) const{
-    
-    return DistanceToWall(point.X(),point.Y(),point.Z(),dir.X(),dir.Y(),dir.Z(),ForwardOrBack);
-    
-  }
 }
 
 

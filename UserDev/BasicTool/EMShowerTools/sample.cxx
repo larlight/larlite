@@ -1,0 +1,6 @@
+#ifndef LARLITE_EMSHOWERTOOLS_SAMPLE_CXX
+#define LARLITE_EMSHOWERTOOLS_SAMPLE_CXX
+
+#include "sample.h"
+
+#endif
