@@ -25,6 +25,9 @@
 #include "SPAException.h"
 #include "SPTEnv.h"
 namespace sptool {
+
+  typedef std::vector<RooRealVar> RooRealVars_t;
+
   /**
      \class ShowerPdfFactory
      A factory class to instantiate specific PDFs (type RooAbsPdf) useful for shower selection.
@@ -40,11 +43,12 @@ namespace sptool {
     virtual ~ShowerPdfFactory(){};
     
     /// Instantiate radiation-length PDF
-    RooExponential  RadLenPdf() const;
-    
+    RooExponential  RadLenPdf(RooRealVars_t &vars) const;
+
   protected:
-    
-    std::vector<RooRealVar*> RadLenPdfVars() const;
+
+    /// Instantiate a set of RooRealVar for RadLenPdf
+    RooRealVars_t RadLenPdfVars() const;
     
   };
 }

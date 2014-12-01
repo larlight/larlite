@@ -9,6 +9,9 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+#pragma link C++ class vector<RooRealVar>+;
+#pragma link C++ class sptool::RooRealVars_t+;
+
 #pragma link C++ class sptool::SPTBase+;
 #pragma link C++ class sptool::SPAShower+;
 #pragma link C++ class sptool::SPAData+;
@@ -17,6 +20,7 @@
 //ADD_NEW_CLASS ... do not change this line
 #pragma link C++ class larlite::ExampleSPSelection+;
 #pragma link C++ class larlite::ExampleSPFit+;
+
 #endif
 
 

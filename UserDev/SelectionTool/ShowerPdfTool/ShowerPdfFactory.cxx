@@ -5,18 +5,25 @@
 
 namespace sptool {
 
-  RooExponential ShowerPdfFactory::RadLenPdf() const
+  RooExponential  ShowerPdfFactory::RadLenPdf(RooRealVars_t &vars) const
   {
-    auto vars = RadLenPdfVars();
-    return RooExponential("_RadLenPDF","Radiation Length",*(vars[0]),*(vars[1]));
+    if(!vars.size()) vars = RadLenPdfVars();
+    if(vars.size()!=2) throw SPAException(Form("%s requires 2 RooRealVar!",__FUNCTION__));
+
+    RooExponential pdf("_RadLenPDF","Radiation Length",
+		       vars[0],
+		       vars[1]
+		       );
+    
+    return pdf;
   }
 
-  std::vector<RooRealVar*> ShowerPdfFactory::RadLenPdfVars() const
+  RooRealVars_t ShowerPdfFactory::RadLenPdfVars() const
   {
-    std::vector<RooRealVar*> vars;
+    RooRealVars_t vars;
     vars.reserve(2);
-    vars.push_back(new RooRealVar("_RadLenx","Distance [cm]",kDOUBLE_MIN,kDOUBLE_MAX));
-    vars.push_back(new RooRealVar("_RadLenl","Radiation Length [cm]",kDOUBLE_MIN,kDOUBLE_MAX));
+    vars.push_back(RooRealVar("_RadLenx","Distance [cm]",kDOUBLE_MIN,kDOUBLE_MAX));
+    vars.push_back(RooRealVar("_RadLenl","Radiation Length [cm]",kDOUBLE_MIN,kDOUBLE_MAX));
     return vars;
   }
 
