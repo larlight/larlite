@@ -60,6 +60,9 @@ namespace sptool {
     /// Parameter (larlite::user_info) getter
     const ::larlite::user_info& Params() { return _params; }
 
+    /// Parameter (larlite::user_info) getter
+    ::larlite::user_info& WriteableParams() { return _params; }
+
     /// Load parameter values from a TFile. For official values, use default filename.
     void LoadParams(std::string fname="",size_t version=0);
 
