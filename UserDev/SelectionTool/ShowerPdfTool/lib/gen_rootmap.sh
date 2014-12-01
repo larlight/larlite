@@ -17,7 +17,8 @@ rootlibmap() {
 ######################################################
 # ShowerPdfTool
 rootlibmap libSelectionTool_ShowerPdfTool.rootmap libSelectionTool_ShowerPdfTool.so $LARLITE_USERDEVDIR/SelectionTool/ShowerPdfTool/LinkDef.h \
-    libLArLite_Analysis.so
+    libLArLite_Analysis.so \
+    libRooFit.so \
 
 
 
