@@ -45,11 +45,6 @@ namespace sptool {
     /// Instantiate radiation-length PDF
     RooExponential  RadLenPdf(RooRealVars_t &vars) const;
 
-  protected:
-
-    /// Instantiate a set of RooRealVar for RadLenPdf
-    RooRealVars_t RadLenPdfVars() const;
-    
   };
 }
 
