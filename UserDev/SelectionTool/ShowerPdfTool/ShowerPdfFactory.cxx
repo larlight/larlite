@@ -5,10 +5,10 @@
 
 namespace sptool {
 
-  RooAbsPdf*  ShowerPdfFactory::RadLenPdf() const
+  RooExponential ShowerPdfFactory::RadLenPdf() const
   {
     auto vars = RadLenPdfVars();
-    return new RooExponential("_RadLenPDF","Radiation Length",*(vars[0]),*(vars[1]));
+    return RooExponential("_RadLenPDF","Radiation Length",*(vars[0]),*(vars[1]));
   }
 
   std::vector<RooRealVar*> ShowerPdfFactory::RadLenPdfVars() const

@@ -40,7 +40,7 @@ namespace sptool {
     virtual ~ShowerPdfFactory(){};
     
     /// Instantiate radiation-length PDF
-    RooAbsPdf*  RadLenPdf() const;
+    RooExponential  RadLenPdf() const;
     
   protected:
     
