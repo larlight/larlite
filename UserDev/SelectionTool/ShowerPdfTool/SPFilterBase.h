@@ -17,6 +17,7 @@
 #include <iostream>
 #include "DataFormat/shower.h"
 #include "SPTBase.h"
+#include "SPAData.h"
 
 namespace sptool {
   /**
@@ -47,7 +48,7 @@ namespace sptool {
     virtual ~SPFilterBase(){};
 
     /// Select function
-    virtual bool Select (const ::larlite::shower &data) = 0;
+    virtual bool Select (const SPAData &data) = 0;
     
   };
 }

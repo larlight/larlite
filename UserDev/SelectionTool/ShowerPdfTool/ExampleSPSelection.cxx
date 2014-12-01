@@ -20,7 +20,7 @@ namespace larlite {
 
     auto ev_shower = storage->get_data<event_shower>(_shower_producer);
 
-    _mgr.Process(*ev_shower);
+    //_mgr.Process(*ev_shower);
   
     return true;
   }

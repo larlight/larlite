@@ -10,7 +10,7 @@ namespace sptool {
     , _filter (nullptr)
   {}
 
-  std::vector<std::pair<float,SPMatch_t> > SPAManager::Process(const std::vector<larlite::shower> &data)
+  std::vector<std::pair<float,SPMatch_t> > SPAManager::Process(const SPAData &data)
   {
     if(!_algo) 
 
@@ -19,14 +19,19 @@ namespace sptool {
     // Result container to be returned
     std::vector<std::pair<float,SPMatch_t> > result;
 
+    // local data container
+    SPAData input(data);
+    input._showers.clear();
+
     //
     // First, find out valid showers among input by running SPAFilter
     //
     std::vector<size_t> valid_index_v;
-    valid_index_v.reserve(data.size());
-    for(size_t i=0; i<data.size(); ++i) {
-
-      if(_filter && _filter->Select(data[i]))  valid_index_v.push_back(i);
+    valid_index_v.reserve(data._showers.size());
+    for(size_t i=0; i<data._showers.size(); ++i) {
+      input._showers.resize(1);
+      input._showers[0] = data._showers[i];
+      if(_filter && _filter->Select(input))  valid_index_v.push_back(i);
       else if(!_filter) valid_index_v.push_back(i);
     
     }
@@ -42,19 +47,21 @@ namespace sptool {
     std::fill(comb_index_v.begin() + _algo->_nshowers, comb_index_v.end(), true);
 
     do {
-      std::vector<const ::larlite::shower*> ptr_v;
+
       std::vector<size_t> index_v;
-      ptr_v.reserve(_algo->_nshowers);
       index_v.reserve(_algo->_nshowers);
+
+      input._showers.clear();
+      input._showers.reserve(_algo->_nshowers);
 
       for (int i = 0; i < comb_index_v.size(); ++i)
 	
 	if (!comb_index_v[i]) {
-	  ptr_v.push_back(&(data[valid_index_v[i]]));
+	  input._showers.push_back(data._showers[valid_index_v[i]]);
 	  index_v.push_back(valid_index_v[i]);
 	}
 
-      score_map.insert(std::make_pair(_algo->Select(ptr_v),index_v));
+      score_map.insert(std::make_pair(_algo->Select(input),index_v));
 
     } while (std::next_permutation(comb_index_v.begin(), comb_index_v.end()));
 
@@ -83,12 +90,6 @@ namespace sptool {
 
     return result;
   }
-
-  std::vector<std::pair<float,SPMatch_t> > SPAManager::Process(const std::vector<larlite::mcshower> &data)
-  {
-    return std::vector<std::pair<float,SPMatch_t> >();
-  }
-
 
 }
 #endif

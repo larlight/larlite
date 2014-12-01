@@ -18,6 +18,7 @@
 #include "DataFormat/shower.h"
 #include "DataFormat/mcshower.h"
 #include "SPTBase.h"
+#include "SPAData.h"
 
 namespace sptool {
   /**
@@ -32,9 +33,9 @@ namespace sptool {
      SPAlgoBase::_nshowers. 
 
      Naturally this algorithm should be able to compute likelihood parameters with suitable data sample. 
-     Each chunk of such data sample can be provided by SPAlgoBase::Fill function call which can take 
-     an array of either larlite::shower or larlite::mcshower data products. Finally SPAlgoBase::Fit 
-     function executes necessary procedure to extract parameter values.
+     Each chunk of such data sample can be provided by SPAlgoBase::Fill function call which takes an array
+     of sptool::SPAData data holder. Finally SPAlgoBase::Fit function executes necessary procedure to extract 
+     parameter values.
      
      As the class inherits from sptool::SPTBase, it has a systemtaic procedure to store/load parameter
      sets (variable name & values) from larlite::user_info.
@@ -50,13 +51,10 @@ namespace sptool {
     virtual ~SPAlgoBase(){}
 
     /// Function to evaluate input showers and determine a score
-    virtual float Select(const std::vector<const larlite::shower*> &data) = 0;
+    virtual float Select(const SPAData &data) = 0;
 
-    /// Provide reco-ed showers for sample fit
-    virtual void Fill(const std::vector<const larlite::shower*> &data) = 0;
-
-    /// Provide mcshowers for sample fit
-    virtual void Fill(const std::vector<const larlite::mcshower*> &data) = 0;
+    /// Provide data sample for fitting
+    virtual void Fill(const SPAData &data) = 0;
 
     /// Evaluate parameters
     virtual void Fit() = 0;

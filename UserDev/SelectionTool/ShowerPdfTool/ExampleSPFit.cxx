@@ -32,10 +32,11 @@ namespace larlite {
       for(size_t i=0; i<ev_mcs->size(); ++i)
 
 	data.push_back(&((*ev_mcs)[i]));
-
+      
+      /*
       if(data.size() == _algo->_nshowers)
 	_algo->Fill(data);
-
+      */
     }else{
 
       auto ev_shower = storage->get_data<event_shower>(_shower_producer);
@@ -44,20 +45,23 @@ namespace larlite {
       valid_index_v.reserve(ev_shower->size());
       for(size_t i=0; i<ev_shower->size(); ++i) {
 	
+	/*
 	if(_filter && _filter->Select((*ev_shower)[i]))  valid_index_v.push_back(i);
 	else if(!_filter) valid_index_v.push_back(i);
-	
+	*/
+	valid_index_v.push_back(i);
       }
 
       std::vector<const shower*> data;
       data.reserve(valid_index_v.size());
       for(auto const& index : valid_index_v) 
 	data.push_back(&((*ev_shower)[index]));
-
+      
+      /*
       if(data.size() == _algo->_nshowers)
 
 	_algo->Fill(data);
-
+      */
     }      
   
     return true;

@@ -75,11 +75,8 @@ namespace sptool {
     /// Filter setter
     void SetFilter(SPFilterBase* f) { _filter = f; }
 
-    /// Process input array of reco-ed showers
-    std::vector<std::pair<float,sptool::SPMatch_t> > Process(const std::vector<larlite::shower> &data);
-
-    /// Process input array of mc showers
-    std::vector<std::pair<float,sptool::SPMatch_t> > Process(const std::vector<larlite::mcshower> &data);
+    /// Process input data
+    std::vector<std::pair<float,sptool::SPMatch_t> > Process(const SPAData& data);
 
   protected:
 

@@ -6,6 +6,7 @@
 #include "SPTBase.h"
 #include "ExampleSPSelection.h"
 #include "ExampleSPFit.h"
+#include "SPAData.h"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -16,11 +17,12 @@ namespace larlite {
 }
 namespace sptool {
   class SPTBase;
+  class SPAShower;
+  class SPAData;
   class SPAManager;
   //ADD_FILTER_CLASS ... do not change this comment line
   //ADD_SPALGO_CLASS ... do not change this comment line
 }
-
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
 
@@ -37,3 +39,4 @@ namespace sptool {
 
     See doxygen documentation for each class for details.
  */
+

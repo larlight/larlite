@@ -28,10 +28,12 @@ namespace sptool {
     if(!nentries) throw SPAException(Form("Failed to load params for algo: %s",_name.c_str()));
 
     // Check if specified version is available
-    if(nentries < version) throw SPAException(Form("Cannot fetch version %zu (latest version %zu)",version,(nentries-1)));
+    if(version != kINVALID_SIZE && nentries < version) 
+
+      throw SPAException(Form("Cannot fetch version %zu (latest version %zu)",version,(nentries-1)));
 
     // Retrieve data
-    if(version)
+    if(version!=kINVALID_SIZE)
       ch->GetEntry(version);
     else
       ch->GetEntry(nentries-1);
