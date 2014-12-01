@@ -7,6 +7,7 @@
 #include "ExampleSPSelection.h"
 #include "ExampleSPFit.h"
 #include "SPAData.h"
+#include "ShowerPdfFactory.h"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -16,6 +17,7 @@ namespace larlite {
 //ADD_ANA_CLASS ... do not change this comment line
 }
 namespace sptool {
+  class ShowerPdfFactory;
   class SPTBase;
   class SPAShower;
   class SPAData;
@@ -39,4 +41,5 @@ namespace sptool {
 
     See doxygen documentation for each class for details.
  */
+
 

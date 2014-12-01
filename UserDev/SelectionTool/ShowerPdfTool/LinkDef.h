@@ -13,9 +13,10 @@
 #pragma link C++ class sptool::SPAShower+;
 #pragma link C++ class sptool::SPAData+;
 #pragma link C++ class sptool::SPAManager+;
+#pragma link C++ class sptool::ShowerPdfFactory+;
+//ADD_NEW_CLASS ... do not change this line
 #pragma link C++ class larlite::ExampleSPSelection+;
 #pragma link C++ class larlite::ExampleSPFit+;
-//ADD_NEW_CLASS ... do not change this line
-
 #endif
+
 
