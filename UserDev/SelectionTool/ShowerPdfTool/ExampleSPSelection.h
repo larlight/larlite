@@ -1,53 +1,58 @@
 /**
- * \file sample_ana.h
+ * \file ExampleSPSelection.h
  *
- * \ingroup Package_Name
+ * \ingroup ShowerPdfTool
  * 
- * \brief Class def header for a class sample_ana
+ * \brief Class def header for a class ExampleSPSelection
  *
- * @author SHELL_USER_NAME
+ * @author kazuhiro
  */
 
-/** \addtogroup Package_Name
+/** \addtogroup ShowerPdfTool
 
     @{*/
 
-#ifndef SELECTIONTOOL_PACKAGE_NAME_SAMPLE_ANA_H
-#define SELECTIONTOOL_PACKAGE_NAME_SAMPLE_ANA_H
+#ifndef LARLITE_EXAMPLESPSELECTION_H
+#define LARLITE_EXAMPLESPSELECTION_H
 
 #include "Analysis/ana_base.h"
+#include "SPAManager.h"
 
 namespace larlite {
   /**
-     \class sample_ana
-     User custom analysis class made by SHELL_USER_NAME
+     \class ExampleSPSelection
+     User custom analysis class made by kazuhiro
    */
-  class sample_ana : public ana_base{
+  class ExampleSPSelection : public ana_base{
   
   public:
 
     /// Default constructor
-    sample_ana() : ana_base() { _name="sample_ana"; }
+    ExampleSPSelection(){ _name="ExampleSPSelection"; _fout=0; _shower_producer=""; }
 
     /// Default destructor
-    virtual ~sample_ana(){};
+    virtual ~ExampleSPSelection(){}
 
-    /** IMPLEMENT in sample_ana.cc!
+    /** IMPLEMENT in ExampleSPSelection.cc!
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in sample_ana.cc! 
+    /** IMPLEMENT in ExampleSPSelection.cc! 
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in sample_ana.cc! 
+    /** IMPLEMENT in ExampleSPSelection.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
 
-    protected:
+    /// Selection manager class instance
+    ::sptool::SPAManager _mgr;
+
+    /// Shower producer module's label
+    std::string _shower_producer;
 
   };
 }

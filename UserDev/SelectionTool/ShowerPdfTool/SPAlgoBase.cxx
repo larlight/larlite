@@ -1,0 +1,6 @@
+#ifndef SELECTIONTOOL_SPALGOBASE_CXX
+#define SELECTIONTOOL_SPALGOBASE_CXX
+
+#include "SPAlgoBase.h"
+
+#endif

@@ -1,11 +1,11 @@
-#ifndef SELECTIONTOOL_PACKAGE_NAME_SAMPLE_ANA_CXX
-#define SELECTIONTOOL_PACKAGE_NAME_SAMPLE_ANA_CXX
+#ifndef ANA_CLASS_NAME_CXX
+#define ANA_CLASS_NAME_CXX
 
-#include "sample_ana.h"
+#include "Ana_Class_Name.h"
 
 namespace larlite {
 
-  bool sample_ana::initialize() {
+  bool Ana_Class_Name::initialize() {
 
     //
     // This function is called in the beggining of event loop
@@ -17,7 +17,7 @@ namespace larlite {
     return true;
   }
   
-  bool sample_ana::analyze(storage_manager* storage) {
+  bool Ana_Class_Name::analyze(storage_manager* storage) {
   
     //
     // Do your event-by-event analysis here. This function is called for 
@@ -39,7 +39,7 @@ namespace larlite {
     return true;
   }
 
-  bool sample_ana::finalize() {
+  bool Ana_Class_Name::finalize() {
 
     // This function is called at the end of event loop.
     // Do all variable finalization you wish to do here.
@@ -56,5 +56,6 @@ namespace larlite {
   
     return true;
   }
+
 }
 #endif

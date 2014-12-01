@@ -1,48 +1,48 @@
 /**
- * \file sample_ana.h
+ * \file Ana_Class_Name.h
  *
- * \ingroup Package_Name
+ * \ingroup Working_Package
  * 
- * \brief Class def header for a class sample_ana
+ * \brief Class def header for a class Ana_Class_Name
  *
- * @author SHELL_USER_NAME
+ * @author kazuhiro
  */
 
-/** \addtogroup Package_Name
+/** \addtogroup Working_Package
 
     @{*/
 
-#ifndef SELECTIONTOOL_PACKAGE_NAME_SAMPLE_ANA_H
-#define SELECTIONTOOL_PACKAGE_NAME_SAMPLE_ANA_H
+#ifndef LARLITE_ANA_CLASS_NAME_H
+#define LARLITE_ANA_CLASS_NAME_H
 
 #include "Analysis/ana_base.h"
 
 namespace larlite {
   /**
-     \class sample_ana
-     User custom analysis class made by SHELL_USER_NAME
+     \class Ana_Class_Name
+     User custom analysis class made by kazuhiro
    */
-  class sample_ana : public ana_base{
+  class Ana_Class_Name : public ana_base{
   
   public:
 
     /// Default constructor
-    sample_ana() : ana_base() { _name="sample_ana"; }
+    Ana_Class_Name(){ _name="Ana_Class_Name"; _fout=0;};
 
     /// Default destructor
-    virtual ~sample_ana(){};
+    virtual ~Ana_Class_Name(){};
 
-    /** IMPLEMENT in sample_ana.cc!
+    /** IMPLEMENT in Ana_Class_Name.cc!
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in sample_ana.cc! 
+    /** IMPLEMENT in Ana_Class_Name.cc! 
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in sample_ana.cc! 
+    /** IMPLEMENT in Ana_Class_Name.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();

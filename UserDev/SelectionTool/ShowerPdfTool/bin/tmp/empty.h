@@ -5,14 +5,14 @@
  * 
  * \brief Class def header for a class Empty_Class_Name
  *
- * @author SHELL_USER_NAME
+ * @author kazuhiro
  */
 
 /** \addtogroup Working_Package
 
     @{*/
-#ifndef SELECTIONTOOL_EMPTY_CLASS_NAME_H
-#define SELECTIONTOOL_EMPTY_CLASS_NAME_H
+#ifndef LARLITE_EMPTY_CLASS_NAME_H
+#define LARLITE_EMPTY_CLASS_NAME_H
 
 #include <iostream>
 

@@ -1,0 +1,6 @@
+#ifndef SELECTIONTOOL_SPFILTERBASE_CXX
+#define SELECTIONTOOL_SPFILTERBASE_CXX
+
+#include "SPFilterBase.h"
+
+#endif

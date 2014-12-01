@@ -2,8 +2,8 @@
 // type-def file for ROOT
 //
 
-#ifndef LARLITE_PACKAGE_NAME_TYPEDEF_H
-#define LARLITE_PACKAGE_NAME_TYPEDEF_H
+#ifndef SELECTIONTOOL_PACKAGE_NAME_TYPEDEF_H
+#define SELECTIONTOOL_PACKAGE_NAME_TYPEDEF_H
 
 // Header files included here
 #include "sample_ana.h"

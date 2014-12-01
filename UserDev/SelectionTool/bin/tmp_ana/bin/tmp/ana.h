@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef LARLITE_ANA_CLASS_NAME_H
-#define LARLITE_ANA_CLASS_NAME_H
+#ifndef SELECTIONTOOL_ANA_CLASS_NAME_H
+#define SELECTIONTOOL_ANA_CLASS_NAME_H
 
 #include "Analysis/ana_base.h"
 
