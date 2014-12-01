@@ -5,7 +5,7 @@
  * 
  * \brief Class def header for a class ShowerPdfFactory
  *
- * @author kazuhiro
+ * @author David, Jeremy, Kazu
  */
 
 /** \addtogroup ShowerPdfTool
@@ -30,7 +30,15 @@ namespace sptool {
 
   /**
      \class ShowerPdfFactory
-     A factory class to instantiate specific PDFs (type RooAbsPdf) useful for shower selection.
+     @brief Factory class to instantiate specific PDFs (type RooAbsPdf) useful for shower selection. \n
+     This utility class instantiates a various PDF useful for shower interaction selection.          \n
+     In particular this factory class is used by SPAlgoX (sptool::SPAlgoBase children classes) but   \n
+     it can be used in general outside SPT package. \n
+     A possible future extension includes an instantiation of RooRealVar_t with default values set for \n
+     specific physics though this is not yet implemented. \n
+
+     For questions, contact David Caratelli, Jeremy Hewes or Kazu where the last person is least knowledgeable \n
+     about PDF definition :)
   */
   class ShowerPdfFactory{
     

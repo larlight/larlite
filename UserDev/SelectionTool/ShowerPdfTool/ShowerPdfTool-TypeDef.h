@@ -38,8 +38,13 @@ namespace sptool {
     1) sptool::SPAlgoBase   \n
     2) sptool::SPFilterBase \n
     3) sptool::SPAManager   \n
+    4) sptool::ShowerPdfFactory \n
 
     See doxygen documentation for each class for details.
+
+    If you have a question about framework basics, contact kazu.
+    If you have a question about specific SPAlgoX or PDF in ShowerPdfFactory, contact Jeremy Hewes and David Caratelli.
+
  */
 
 
