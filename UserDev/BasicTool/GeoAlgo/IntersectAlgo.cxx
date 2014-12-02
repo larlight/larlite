@@ -59,7 +59,7 @@ namespace geoalgo {
   }
 
   // LineSegment sub-segment of HalfLine inside an AABox w/o checks
-  LineSegment_t IntersectAlgo::_SubSegmentInside_(const AABox_t& box, const HalfLine_t& line) const
+  LineSegment_t IntersectAlgo::_BoxOverlap_(const AABox_t& box, const HalfLine_t& line) const
   {
 
     // First find interection point of half-line and box
@@ -75,7 +75,7 @@ namespace geoalgo {
   }
 
   /// Get Trajectory inside box given some input trajectory -> now assumes trajectory cannot exit and re-enter box
-  Trajectory_t IntersectAlgo::_TrajectoryInside_(const AABox_t& box, const Trajectory_t& trj) const
+  Trajectory_t IntersectAlgo::_BoxOverlap_(const AABox_t& box, const Trajectory_t& trj) const
   {
 
     // if first & last points inside, then return full trajectory
@@ -84,21 +84,6 @@ namespace geoalgo {
 
     return trj;
 
-  }
-
-  
-  // swap tmin & tmax if tmin > tmax
-  void IntersectAlgo::_Swap_(double& tmin, double& tmax) const
-  {
-    double ttmp;
-    
-    if (tmin > tmax){
-      ttmp = tmax;
-      tmax = tmin;
-      tmin = ttmp;
-    }
-
-    return;
   }
 
 }

@@ -12,7 +12,7 @@
 #pragma link C++ namespace geoalgo+;
 #pragma link C++ class geoalgo::Vector+;
 #pragma link C++ class std::vector<geoalgo::Vector>+;
-#pragma link C++ class geoalgo::Trajectory;
+#pragma link C++ class geoalgo::Trajectory+;
 #pragma link C++ class geoalgo::HalfLine+;
 #pragma link C++ class geoalgo::LineSegment+;
 #pragma link C++ class geoalgo::AABox+;

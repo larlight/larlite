@@ -2,8 +2,8 @@
 // type-def file for ROOT
 //
 
-#ifndef LARLITE_GEOALGO_TYPEDEF_H
-#define LARLITE_GEOALGO_TYPEDEF_H
+#ifndef BASICTOOL_GEOALGO_TYPEDEF_H
+#define BASICTOOL_GEOALGO_TYPEDEF_H
 
 // Header files included here
 #include "GeoAlgoConstants.h"

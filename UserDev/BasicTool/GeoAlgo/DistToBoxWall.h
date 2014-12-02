@@ -11,8 +11,8 @@
 /** \addtogroup GeoAlgo
     
     @{*/
-#ifndef LARLITE_DISTTOBOXWALL_H
-#define LARLITE_DISTTOBOXWALL_H
+#ifndef BASICTOOL_DISTTOBOXWALL_H
+#define BASICTOOL_DISTTOBOXWALL_H
 
 #include "GeoAlgoException.h"
 #include <sstream>

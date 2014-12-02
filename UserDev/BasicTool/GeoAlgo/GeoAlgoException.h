@@ -11,8 +11,8 @@
 /** \addtogroup GeoAlgo
 
     @{*/
-#ifndef LARLITE_GEOALGOEXCEPTION_H
-#define LARLITE_GEOALGOEXCEPTION_H
+#ifndef BASICTOOL_GEOALGOEXCEPTION_H
+#define BASICTOOL_GEOALGOEXCEPTION_H
 
 #include <iostream>
 #include <exception>
