@@ -18,9 +18,8 @@
 #ifndef BASICTOOL_SEGMENTPOCA_H
 #define BASICTOOL_SEGMENTPOCA_H
 
-#include <iostream>
-#include <vector>
-#include <math.h> //for pow
+#include "GeoVector.h"
+#include "GeoTrajectory.h"
 
 namespace geoalgo {
   /**
@@ -40,29 +39,53 @@ namespace geoalgo {
     virtual ~SegmentPoCA(){}
 
 
-    double ClosestApproachToTrajectory(const std::vector<std::vector<double>> &traj,
-				       const std::vector<double> &s2,
-				       const std::vector<double> &e2,
-				       std::vector<double> &c1,
-				       std::vector<double> &c2) const;
+    double ClosestApproachToTrajectory(const Trajectory_t& traj,
+				       const Point_t& s2,
+				       const Point_t& e2,
+				       Point_t &c1,
+				       Point_t &c2) const;
 
-    double ClosestApproach(const std::vector<double> &s1,
-			   const std::vector<double> &e1,
-			   const std::vector<double> &s2,
-			   const std::vector<double> &e2,
-			   std::vector<double> &c1,
-			   std::vector<double> &c2) const;
+    double ClosestApproach(const Point_t &s1,
+			   const Point_t &e1,
+			   const Point_t &s2,
+			   const Point_t &e2,
+			   Point_t &c1,
+			   Point_t &c2) const
+    { 
+      compat(s1); compat(e1); compat(s2); compat(e2); 
+      return _ClosestApproach_(s1,e1,s2,e2,c1,c2);
+    }
     
     double Clamp(const double n, const double min, const double max) const;
 
-    double Dot(const std::vector<double> &v1, 
-	       const std::vector<double> &v2) const;
+    void TestPoCA(const Point_t &s1, 
+		  const Point_t &e1,
+		  const Point_t &s2, 
+		  const Point_t &e2) const;
 
-    void TestPoCA(const std::vector<double> &s1, 
-		  const std::vector<double> &e1,
-		  const std::vector<double> &s2, 
-		  const std::vector<double> &e2) const;
+    void compat(const Point_t &obj) const
+    {
+      if(obj.size()!=3) {
+	std::ostringstream msg;
+	msg << "<<" << __FUNCTION__ << ">>"
+	    << " cannot handle 3 dimensional object!" << std::endl;
+	throw GeoAlgoException(msg.str());
+      }
+    }
 
+    void compat(const Trajectory_t &obj) const
+    {
+      if(obj.size()) compat((*obj.begin()));
+    }
+    
+  protected:
+
+    double _ClosestApproach_(const Point_t &s1,
+			     const Point_t &e1,
+			     const Point_t &s2,
+			     const Point_t &e2,
+			     Point_t &c1,
+			     Point_t &c2) const;
 
   private:
     

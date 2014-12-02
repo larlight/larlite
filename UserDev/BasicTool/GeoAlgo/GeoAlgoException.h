@@ -28,8 +28,12 @@ namespace geoalgo {
 
   public:
         
-    GeoAlgoException(std::string msg="") : std::exception(), _msg(msg)
-    {}  
+    GeoAlgoException(std::string msg="") : std::exception()
+    { 
+      _msg  = "\033[93m<<EXCEPTION>>\033[00m\033[95m ";
+      _msg += msg;
+      _msg += "\033[00m\n";
+    }
     
     virtual ~GeoAlgoException() throw(){};
     virtual const char* what() const throw() 

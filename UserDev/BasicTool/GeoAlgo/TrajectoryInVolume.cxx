@@ -5,39 +5,18 @@
 
 namespace geoalgo {
 
-  void TrajectoryInVolume::AddTrajectoryPoint(std::vector<float> point){
-    
-    if (point.size() != 3)//allow only for 3D stuff
-      std::cout << "Warning: Point added to trajectory does not have 3 coordinates. Point not added..." << std::endl;
-    
-    else
-      _traj.push_back(point);
-    
-    return;
-  }
-  
-  bool TrajectoryInVolume::IsInVolume(){
-    
-    for (size_t n=0; n < (_traj.size()-1); n++){
-      if ( LineInVolume(_traj.at(n),_traj.at(n+1)) )
-	return true;
-    }
-    return false;
-  }
-  
-  bool TrajectoryInVolume::IsInVolume(std::vector<std::vector<float> > traj){
-    
-    _traj = traj;
-    
-    for (size_t n=0; n < (_traj.size()-1); n++){
-      if ( LineInVolume(_traj.at(n),_traj.at(n+1)) )
+  bool TrajectoryInVolume::IsInVolume(const Trajectory_t &traj) const
+  {
+    for (size_t n=0; n < (traj.size()-1); n++){
+      if ( LineInVolume(traj.at(n),traj.at(n+1)) )
 	return true;
     }
     return false;
   }
   
   
-  bool TrajectoryInVolume::LineInVolume(std::vector<float> point1, std::vector<float> point2){
+  bool TrajectoryInVolume::LineInVolume(const Point_t &point1, const Point_t &point2) const
+  {
     
     //first make sure neither point is inside volume. If so then trajectory is in volume!
     if ( PointInVolume(point1) or PointInVolume(point2) )
@@ -85,34 +64,17 @@ namespace geoalgo {
     return true;
   }
   
-  bool TrajectoryInVolume::PointInVolume(std::vector<float> point){
+  bool TrajectoryInVolume::PointInVolume(const Point_t &point) const 
+  {
     
-    if ( (point.at(0) > _xMin) and (point.at(0) < _xMax) and
-	 (point.at(1) > _yMin) and (point.at(1) < _yMax) and
-	 (point.at(2) > _zMin) and (point.at(2) < _zMax) )
+    if ( (point[0] > _xMin) and (point[0] < _xMax) and
+	 (point[1] > _yMin) and (point[1] < _yMax) and
+	 (point[2] > _zMin) and (point[2] < _zMax) )
       return true;
     
     return false;
   }
   
-  bool TrajectoryInVolume::PointInVolume(std::vector<double> point){
-    
-    if ( (point.at(0) > _xMin) and (point.at(0) < _xMax) and
-	 (point.at(1) > _yMin) and (point.at(1) < _yMax) and
-	 (point.at(2) > _zMin) and (point.at(2) < _zMax) )
-      return true;
-    
-    return false;
-  }
-  
-  double TrajectoryInVolume::Distance(std::vector<float> point1, std::vector<float> point2){
-    
-    double dist = sqrt( (point1.at(0)-point2.at(0))*(point1.at(0)-point2.at(0)) +
-			(point1.at(1)-point2.at(1))*(point1.at(1)-point2.at(1)) +
-			(point1.at(2)-point2.at(2))*(point1.at(2)-point2.at(2)) );
-    
-    return dist;
-  }
 }
 #endif
   

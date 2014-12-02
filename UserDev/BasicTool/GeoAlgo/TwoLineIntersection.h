@@ -1,5 +1,5 @@
 /**
- * \file TwoLineIntersection.hh
+ * \file TwoLineIntersection.h
  *
  * \ingroup GeoAlgo
  * 
@@ -15,14 +15,11 @@
 /** \addtogroup GeoAlgo
 
     @{*/
-#ifndef TWOLINEINTERSECTION_HH
-#define TWOLINEINTERSECTION_HH
+#ifndef BASICTOOL_TWOLINEINTERSECTION_H
+#define BASICTOOL_TWOLINEINTERSECTION_H
 
-#include <iostream>
-#include <vector>
-#include <limits>
-#include <climits>
-#include <math.h> //for pow
+#include "GeoVector.h"
+#include "GeoTrajectory.h"
 
 namespace geoalgo {
   /**
@@ -46,11 +43,11 @@ namespace geoalgo {
     //(midpoint of shortest line connecting the two 3D input lines)
     //and error is the length^2 of the shortest line connecting the two
     //3D input lines (0 error means the 3D lines actually intersect)  
-    std::vector<double> Intersection3D(std::vector<double> const& start1, 
-				       std::vector<double> const& dir1, 
-				       std::vector<double> const& start2, 
-				       std::vector<double> const& dir2);
-    
+    Point_t Intersection3D(Point_t const& start1, 
+			   Point_t const& dir1, 
+			   Point_t const& start2, 
+			   Point_t const& dir2);
+
   };
 }
 
