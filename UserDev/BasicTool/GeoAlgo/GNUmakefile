@@ -24,6 +24,9 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 # set compiler options for ROOT
 CXXFLAGS +=  `root-config --cflags`
 
+# set CINT flag
+CINTFLAGS += -p
+
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE
 

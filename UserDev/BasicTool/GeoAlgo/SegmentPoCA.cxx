@@ -6,17 +6,18 @@
 namespace geoalgo {
 
 
-  double SegmentPoCA::ClosestApproachToTrajectory(const std::vector<std::vector<double>> &traj,
-						  const std::vector<double> &s2,
-						  const std::vector<double> &e2,
-						  std::vector<double> &c1,
-						  std::vector<double> &c2) const
+  double SegmentPoCA::ClosestApproachToTrajectory(const Trajectory_t &traj,
+						  const Point_t &s2,
+						  const Point_t &e2,
+						  Point_t &c1,
+						  Point_t &c2) const
   {
+
+    traj.compat(s2);
+    traj.compat(e2);
     
     double min = 99999999;
-    std::vector<double> c1tmp;
-    std::vector<double> c2tmp;
-    
+    Point_t c1tmp, c2tmp;
     for (size_t i=0; i < (traj.size()-1); i++){
       double minTmp = ClosestApproach(traj[i],traj[i+1],s2,e2,c1tmp,c2tmp);
       if (minTmp < min) {
@@ -31,12 +32,12 @@ namespace geoalgo {
   
   // Find smallest distance between segmens (s1-e1) and (s2-e2)
   // See "Real-Time Collision Analysis" Sec. 5.1.9
-  double SegmentPoCA::ClosestApproach(const std::vector<double> &s1,
-				      const std::vector<double> &e1,
-				      const std::vector<double> &s2,
-				      const std::vector<double> &e2,
-				      std::vector<double> &c1,
-				      std::vector<double> &c2) const
+  double SegmentPoCA::_ClosestApproach_(const Point_t &s1,
+					const Point_t &e1,
+					const Point_t &s2,
+					const Point_t &e2,
+					Point_t &c1,
+					Point_t &c2) const
   {
     
     // c1 is the closest point on line 1
@@ -44,14 +45,14 @@ namespace geoalgo {
     // t1 is the parametrized point for the first segment (line = s1 + t1*(e1-s1)) with t1 from 0 to 1
     // t2 is the parametrized point for the first segment (line = s2 + t2*(e2-s2)) with t2 from 0 to 1
     double t1, t2;
-						   
-    std::vector<double> dir1 = {e1[0]-s1[0], e1[1]-s1[1], e1[2]-s1[2]};
-    std::vector<double> dir2 = {e2[0]-s2[0], e2[1]-s2[1], e2[2]-s2[2]};
-    std::vector<double> r = {s1[0] - s2[0], s1[1] - s2[1], s1[2] - s2[2]};
+    
+    Point_t dir1 = e1 - s1;
+    Point_t dir2 = e2 - s2;
+    Point_t r = s1 - s2;
 
-    double len1 = Dot(dir1,dir1);
-    double len2 = Dot(dir2,dir2);
-    double f = Dot(dir2,r);
+    double len1 = dir1.Length();
+    double len2 = dir2.Length();
+    double f = dir2 * r;
 
     // Check if segments too short
     if ( (len1 < _epsilon) and (len2 < _epsilon) ){
@@ -59,8 +60,8 @@ namespace geoalgo {
       t1 = t2 = 0.;
       c1 = s1;
       c2 = s2;
-      std::vector<double> distVector = {c2[0] - c1[0], c2[1] - c1[1], c2[2] - c1[2]};
-      return Dot(distVector,distVector);
+      Point_t distVector = c2 - c1;
+      return distVector.Length();
     }
     if (len1 < _epsilon){
       //first segment degenerates into a point
@@ -69,7 +70,7 @@ namespace geoalgo {
       t2 = Clamp(t2,0.,1.);
     }
     else{
-      float c = Dot(dir1,r);
+      float c = dir1 * r;
       if (len2 < _epsilon){
 	//second segment degenerates into a point
 	t2 = 0.;
@@ -77,7 +78,7 @@ namespace geoalgo {
       }
       else{
 	// the general case...no degeneracies
-	float b = Dot(dir1,dir2);
+	float b = dir1 * dir2;
 	float denom = (len1*len2)-(b*b);
 	
 	if (denom != 0.)
@@ -99,11 +100,11 @@ namespace geoalgo {
       }
     }
     
-    c1 = {s1[0] + dir1[0]*t1, s1[1] + dir1[1]*t1, s1[2] + dir1[2]*t1};
-    c2 = {s2[0] + dir2[0]*t2, s2[1] + dir2[1]*t2, s2[2] + dir2[2]*t2};
+    c1 = s1 + dir1 * t1;
+    c2 = s2 + dir2 * t2;
 
-    std::vector<double> distVector = {c2[0]-c1[0], c2[1]-c1[1], c2[2]-c1[2]};
-    return Dot(distVector,distVector);
+    Point_t distVector = c2 - c1;
+    return distVector.Length();
     
   }
 
@@ -117,22 +118,13 @@ namespace geoalgo {
     return n;
   }
   
-  double SegmentPoCA::Dot(const std::vector<double> &v1, 
-			  const std::vector<double> &v2) const
+  void SegmentPoCA::TestPoCA(const Point_t &s1, 
+			     const Point_t &e1,
+			     const Point_t &s2, 
+			     const Point_t &e2) const
   {
-    
-    double dot = v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
-    return dot;
-  }
-
-  
-  void SegmentPoCA::TestPoCA(const std::vector<double> &s1, 
-			     const std::vector<double> &e1,
-			     const std::vector<double> &s2, 
-			     const std::vector<double> &e2) const
-  {
-    std::vector<double> c1;
-    std::vector<double> c2;
+    Point_t c1;
+    Point_t c2;
 
     double distance = ClosestApproach(s1, e1, s2, e2, c1, c2);
     std::cout << "line 1: [" << s1[0] << ", " << s1[1] << ", " << s1[2] << "]   --.    ["
