@@ -29,7 +29,7 @@ namespace geoalgo {
   public:
     
     /// Ctor to specify # points and dimension of each point
-    Trajectory(size_t npoints, size_t ndimension) : std::vector<geoalgo::Point_t>(npoints, Point_t(ndimension))
+    Trajectory(size_t npoints=0, size_t ndimension=0) : std::vector<geoalgo::Point_t>(npoints, Point_t(ndimension))
     {}
 
     /// Ctor using a vector of mere vector point expression
@@ -74,6 +74,11 @@ namespace geoalgo {
     void push_back(const Point_t& obj) {
       compat(obj); std::vector<geoalgo::Point_t>::push_back(obj);
     }
+
+    /// push_back template
+    template <class T>
+    void push_back(const T& obj) 
+    { Point_t pt(obj); push_back(pt); }
 
     /// Dimensionality check function w/ Trajectory
     void compat(const Point_t& obj) const {

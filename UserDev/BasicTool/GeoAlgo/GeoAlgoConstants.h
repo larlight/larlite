@@ -5,7 +5,9 @@
 #include <climits>
 namespace geoalgo {
 
-  const double kINVALID_DOUBLE = std::numeric_limits<double>::max();
+  static const double kPI = 3.141592653589793238462643383279502884;
+
+  static const double kINVALID_DOUBLE = std::numeric_limits<double>::max();
 
 }
 #endif
