@@ -53,6 +53,9 @@ namespace sptool {
     /// Instantiate radiation-length PDF
     RooExponential  RadLenPdf(RooRealVars_t &vars) const;
 
+    /// Instantiate Angle-vs-Energy PDF
+    RooExponential  EvsAngPdf(RooRealVars_t &vars) const;
+
   };
 }
 
