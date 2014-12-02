@@ -55,24 +55,19 @@ namespace geoalgo {
       if(size()<2) return 0;
 
       double length = 0;
-      for(size_t i=0; i<size()-1; ++i) {
+      for(size_t i=0; i<size()-1; ++i) 
 
-	auto const& pt1 = (*this)[i];
-	auto const& pt2 = (*this)[i+1];
-	double length_sq = 0;
-	for(size_t j=0; j<pt1.size(); ++j)
-
-	  length_sq += (pt1[j]-pt2[j]) * (pt1[j]-pt2[j]);
-	
-	length += sqrt(length_sq);
-      }
+	length += _Dir_(i).Length();
       
-      return length;
+      return sqrt(length);
     }
 
     /// push_back overrie w/ dimensionality check 
     void push_back(const Point_t& obj) {
-      compat(obj); std::vector<geoalgo::Point_t>::push_back(obj);
+      compat(obj); 
+      if(size() && obj == (*rbegin()))
+	throw GeoAlgoException("<<push_back>> Cannot add an identical point to a trajectory!");
+      std::vector<geoalgo::Point_t>::push_back(obj);
     }
 
     /// push_back template
@@ -94,18 +89,6 @@ namespace geoalgo {
       }
     }
 
-    /// Returns a direction vector at a specified trajectory point
-    Vector Dir(size_t i=0) const {
-
-      if(size() < (i+2)) {
-	std::ostringstream msg;
-	msg << "<<" << __FUNCTION__ << ">>"
-	    << " length=" << size() << " is too short to find a direction @ index=" << i << std::endl;
-	throw GeoAlgoException(msg.str());
-      }
-      return _Dir_(i);
-    }
-
     /// Dimensionality check function w/ Point_t
     void compat(const Trajectory &obj) const {
 
@@ -121,6 +104,21 @@ namespace geoalgo {
 
       }
     }
+
+    /// Returns a direction vector at a specified trajectory point
+    Vector Dir(size_t i=0) const {
+
+      if(size() < (i+2)) {
+	std::ostringstream msg;
+	msg << "<<" << __FUNCTION__ << ">>"
+	    << " length=" << size() << " is too short to find a direction @ index=" << i << std::endl;
+	throw GeoAlgoException(msg.str());
+      }
+      return _Dir_(i);
+    }
+
+    Trajectory& operator+=(const Point_t& rhs)
+    { push_back(rhs); return *this; }
 
   public:
 

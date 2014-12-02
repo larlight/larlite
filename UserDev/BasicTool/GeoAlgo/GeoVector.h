@@ -201,6 +201,23 @@ namespace geoalgo {
       return res;
     }
 
+    inline bool operator< ( const Vector& rhs ) const 
+    { return Length() < rhs.Length(); }
+
+    inline bool operator< ( const double& rhs) const 
+    { return Length() < rhs; }
+
+    inline bool operator== ( const Vector& rhs) const
+    { 
+      compat(rhs); 
+      for(size_t i=0; i<size(); ++i) 
+	if((*this)[i] != rhs[i]) return false;
+      return true;
+    }
+
+    inline bool operator!= ( const Vector& rhs) const
+    { return !(*this == rhs); }
+
     /// Streamer
     #ifndef __CINT__
     friend std::ostream& operator << (std::ostream &o, ::geoalgo::Vector const& a)
@@ -246,9 +263,20 @@ namespace geoalgo {
   /// Point has same feature as Vector
   typedef Vector Vector_t;
   typedef Vector Point_t;
-
-
 }
+
+// Define a pointer comparison                                                                                                                     
+#ifndef __GCCXML__
+namespace std {
+  template <>
+  class less<geoalgo::Vector*>
+  {
+  public:
+    bool operator()( const geoalgo::Vector* lhs, const geoalgo::Vector* rhs )
+    { return (*lhs) < (*rhs); }
+  };
+}
+#endif
 
 #endif
 /** @} */ // end of doxygen group 
