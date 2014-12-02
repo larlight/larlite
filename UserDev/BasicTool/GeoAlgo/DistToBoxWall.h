@@ -21,6 +21,7 @@
 #include <cmath>
 #include <TVector3.h>
 #include <TLorentzVector.h>
+#include <cfloat>
 
 namespace geoalgo {
 
@@ -101,6 +102,10 @@ namespace geoalgo {
     double DistanceToWall(double x, double y, double z, 
 			  double dirx, double diry, double dirz, 
 			  bool ForwardOrBack) const;
+
+    double DistanceBackToTopWall(double x, double y, double z, 
+				 double dir) const;
+
 
     /// Getter for distance from point to box (when point is outside box)
     double DistanceToWallFromOut(std::vector<double> const &point) const;

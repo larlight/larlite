@@ -135,6 +135,33 @@ namespace geoalgo {
     
   }
 
+  // distance to a selected wall (x, y, z)
+  //dir now needs to be normalized
+  double DistToBoxWall::DistanceBackToTopWall(double x, double y, double z,
+					      double dir) const
+  {
+    
+    if( (x < _xyz_min[0] || _xyz_max[0] < x) || // point is outside X boundaries OR
+	(y < _xyz_min[1] || _xyz_max[1] < y) || // point is outside Y boundaries OR
+	(z < _xyz_min[2] || _xyz_max[2] < z) )  // point is outside Z boundaries 
+      return -1;
+    
+    
+    // Swap direction if user wants backwards direction
+    dir *= -1;
+
+    // Compute distance to reach XZ plane
+    double dist_to_wall = 0;
+
+    if ( dir > 0 )
+      dist_to_wall = (_xyz_max[1] - y) / dir;
+    else
+      dist_to_wall = DBL_MAX;
+
+
+    return dist_to_wall;
+  }
+
   double DistToBoxWall::DistanceToWall(double x, double y, double z,
 				       double dirx, double diry, double dirz,
 				       bool ForwardOrBack) const
@@ -237,6 +264,7 @@ namespace geoalgo {
     return dist;
   }
   
+
   
   double DistToBoxWall::DistanceToWallFromOut(std::vector<double> const &point) const{
     

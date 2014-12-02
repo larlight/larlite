@@ -76,6 +76,19 @@ namespace geoalgo {
     /// Default dtor
     virtual ~Vector(){}
 
+    /// Check if point is valid
+    bool IsValid() const {
+
+      for (auto const &v : (*this)){
+	// if any point is different from kINVALID_DOUBLE
+	// then the point is valid
+	if (v != kINVALID_DOUBLE)
+	  return true;
+      }
+
+      return false;
+    }
+
     /// Compute the squared length of the vector
     double SqLength() const {
       double res=0;

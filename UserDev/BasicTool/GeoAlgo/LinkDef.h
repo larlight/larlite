@@ -10,14 +10,14 @@
 #pragma link off all functions;
 
 #pragma link C++ namespace geoalgo+;
-//#pragma link C++ class geoalgo::Vector+;
+#pragma link C++ class geoalgo::Vector+;
 #pragma link C++ class geoalgo::Vector_t+;
 #pragma link C++ class geoalgo::Point_t+;
 #pragma link C++ class std::vector<geoalgo::Vector_t>+;
 #pragma link C++ class geoalgo::Trajectory_t+;
 #pragma link C++ class geoalgo::HalfLine_t+;
 #pragma link C++ class geoalgo::LineSegment_t+;
-#pragma link C++ class geoalgo::AABB_t+;
+#pragma link C++ class geoalgo::AABox_t+;
 #pragma link C++ class geoalgo::IntersectAlgo+;
 #pragma link C++ class geoalgo::DistanceAlgo+;
 

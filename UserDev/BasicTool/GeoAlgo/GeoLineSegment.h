@@ -45,7 +45,7 @@ namespace geoalgo {
     {DirReset();}
 
     /// Altenartive ctor (2)
-    LineSegment(const Point_t& start, const Vector_t& end)
+    LineSegment(const Point_t& start, const Point_t& end)
       : _start ( start )
       , _end   ( end   )
       , _dir   (3)

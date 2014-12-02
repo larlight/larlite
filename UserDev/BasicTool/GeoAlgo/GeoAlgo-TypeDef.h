@@ -12,7 +12,7 @@
 #include "GeoTrajectory.h"
 #include "GeoHalfLine.h"
 #include "GeoLineSegment.h"
-#include "GeoAABB.h"
+#include "GeoAABox.h"
 #include "IntersectAlgo.h"
 #include "DistanceAlgo.h"
 
@@ -30,7 +30,7 @@ namespace geoalgo {
   class Trajectory;
   class HalfLine;
   class LineSegment;
-  class AABB;
+  class AABox;
   class DistanceAlgo;
   class IntersectAlgo;
 

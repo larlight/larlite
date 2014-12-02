@@ -16,7 +16,8 @@
 
 #include "GeoHalfLine.h"
 #include "GeoLineSegment.h"
-#include "GeoAABB.h"
+#include "GeoTrajectory.h"
+#include "GeoAABox.h"
 
 namespace geoalgo {
 
@@ -41,14 +42,45 @@ namespace geoalgo {
     /// Default destructor
     virtual ~DistanceAlgo(){}
     
-    //double SqDist(const LineSegment_t& line1, const LineSegment_t& line2) const;
+
+    /// LineSegment_t & LineSegment_t distance - keep track of points
+    double SqDist(const LineSegment_t& seg1, const LineSegment_t& seg2, Point_t& c1, Point_t& c2) const
+    { seg1.Start().compat(seg2.Start()); return _SqDist_(seg1, seg2, c1, c2); }
+    /// LineSegment & LineSegment, don't keep track of points
+    double SqDist(const LineSegment_t& seg1, const LineSegment_t& seg2) const
+    { Point_t c1; Point_t c2; return SqDist(seg1, seg2, c1, c2); }
+
+    /// LineSegment & Trajectory, keep track of points
+    double SqDist(const LineSegment_t& seg, const Trajectory_t& trj, Point_t& c1, Point_t& c2) const;
+    /// LineSegment & Trajectory, keep track of points
+    double SqDist(const Trajectory_t& trj, const LineSegment_t& seg, Point_t& c1, Point_t& c2) const
+    { return SqDist(seg, trj, c1, c2); }
+    /// LineSegment & Trajectory, don't keep track of points
+    double SqDist(const Trajectory_t& trj, const LineSegment_t& seg) const
+    { Point_t c1; Point_t c2; return SqDist(seg, trj, c1, c2); }
+    /// LineSegment & Trajectory, don't keep track of points
+    double SqDist(const LineSegment_t& seg, const Trajectory_t& trj) const
+    { Point_t c1; Point_t c2; return SqDist(seg, trj, c1, c2); }
+    
+
+    /// Point_t & Trajectory_t distance
+    double SqDist(const Point_t& pt, const Trajectory_t& trj) const;
+    /// Point_t & Trajectory_t distance
+    double SqDist(const Trajectory_t& trj, const Point_t& pt) const
+    { return SqDist(pt,trj); }
+
+    /// Point_t & Trajectory_t closest point
+    Point_t ClosestPt(const Point_t& pt, const Trajectory_t& trj) const;
+    /// Point_t & Trajectory_t closest point
+    Point_t ClosestPt(const Trajectory_t& trj, const Point_t& pt) const
+    { return ClosestPt(pt,trj); }
 
     /// Point & LineSegment_t distance
     double SqDist(const Point_t& pt, const LineSegment_t& line) const
     { pt.compat(line.Start()); return _SqDist_(pt,line); }
     /// Point & LineSegment distance
     double SqDist(const LineSegment_t& line, const Point_t& pt) const
-    { return SqDist(line,pt); }
+    { return SqDist(pt,line); }
 
     /// Point & LineSegment closest point
     Point_t ClosestPt(const Point_t& pt, const LineSegment_t& line) const
@@ -77,18 +109,18 @@ namespace geoalgo {
     //double SqDist(const LineSegment_t& sline, const HalfLine_t& hline) const
     //{ return SqDist(hline,sline); }  
 
-    /// Point & AABB distance
-    double SqDist(const Point_t& pt, const AABB_t& box) const
+    /// Point & AABox distance
+    double SqDist(const Point_t& pt, const AABox_t& box) const
     { pt.compat(box.Min()); return _SqDist_(pt,box); }
-    /// Point & AABB distance
-    double SqDist(const AABB_t& box, const Point_t& pt)
+    /// Point & AABox distance
+    double SqDist(const AABox_t& box, const Point_t& pt)
     { return SqDist(pt,box); }
 
-    /// Point & AABB closest point
-    Point_t ClosestPt(const Point_t& pt, const AABB_t& box) const
+    /// Point & AABox closest point
+    Point_t ClosestPt(const Point_t& pt, const AABox_t& box) const
     { pt.compat(box.Min()); return _ClosestPt_(pt,box); }
-    /// Point & AABB closest point
-    Point_t ClosestPt(const AABB_t& box, const Point_t& pt) const
+    /// Point & AABox closest point
+    Point_t ClosestPt(const AABox_t& box, const Point_t& pt) const
     { return ClosestPt(pt,box); }
 
   protected:
@@ -101,6 +133,9 @@ namespace geoalgo {
     /// Point & LineSegment distance w/o dimensionality check
     double _SqDist_(const LineSegment_t& line, const Point_t&pt) const
     { return _SqDist_(pt,line); }
+
+    /// LineSegment & LineSegment distance w/o dimensionality check
+    double _SqDist_(const LineSegment_t& seg1, const LineSegment_t& seg2, Point_t& c1, Point_t& c2) const;
 
     // Point & LineSegment closest point w/o dimensionality check
     Point_t _ClosestPt_(const Point_t& pt, const LineSegment_t& line) const;
@@ -120,17 +155,20 @@ namespace geoalgo {
     Point_t _ClosestPt_(const HalfLine_t& line, const Point_t& pt) const
     { return _ClosestPt_(pt,line); }
 
-    /// Point & AABB distance w/o dimensionality check
-    double _SqDist_(const Point_t& pt, const AABB_t& box) const;
-    /// Point & AABB distance w/o dimensionality check
-    double _SqDist_(const AABB_t& box, const Point_t& pt) const
+    /// Point & AABox distance w/o dimensionality check
+    double _SqDist_(const Point_t& pt, const AABox_t& box) const;
+    /// Point & AABox distance w/o dimensionality check
+    double _SqDist_(const AABox_t& box, const Point_t& pt) const
     { return _SqDist_(pt,box); }
 
-    /// Point & AABB closest point w/o dimensionality check
-    Point_t _ClosestPt_(const Point_t& pt, const AABB_t& box) const;
-    /// Point & AABB closest point w/o dimensionality check
-    Point_t _ClosestPt_(const AABB_t& box, const Point_t& pt) const
+    /// Point & AABox closest point w/o dimensionality check
+    Point_t _ClosestPt_(const Point_t& pt, const AABox_t& box) const;
+    /// Point & AABox closest point w/o dimensionality check
+    Point_t _ClosestPt_(const AABox_t& box, const Point_t& pt) const
     { return _ClosestPt_(pt,box); }
+
+    /// Clamp function: checks if value out of bounds
+    double _Clamp_(const double n, const double min, const double max) const;
 
   };
 }

@@ -46,7 +46,7 @@ t2.push_back(5.0)
 
 #example.TestPoCA(p1,p2,t1,t2)
 
-dist = distToBoxWall.DistanceToWall(pos,dircn,0)
+dist = distToBoxWall.DistanceBackToTopWall(100,100,50,1)
 print dist
 
 # done!
