@@ -6,24 +6,28 @@
 namespace sptool {
 
   SPAShower::SPAShower() 
-    : _start(3)
-    , _dir(3)
-  {
-    Reset();
-  }
+  { Reset(); }
 
   void SPAShower::Reset() 
   {
-    for(size_t i=0; i<_start.size(); ++i) {
-      _start [i] = kINVALID_DOUBLE;
-      _dir   [i] = kINVALID_DOUBLE;
-    }
+    HalfLine::Start(::geoalgo::Point_t(3));
+    HalfLine::Dir(::geoalgo::Point_t(3));
 
     _radius     = kINVALID_DOUBLE;
     _cone_angle = kINVALID_DOUBLE;
     _energy     = kINVALID_DOUBLE;
     _dedx       = kINVALID_DOUBLE;
+    _cosmogenic = kINVALID_DOUBLE;
+  }
 
+  SPATrack::SPATrack()
+  { Reset(); }
+
+  void SPATrack::Reset()
+  {
+    Trajectory::clear();
+    _energy     = kINVALID_DOUBLE;
+    _cosmogenic = kINVALID_DOUBLE;
   }
 
   SPAData::SPAData()
