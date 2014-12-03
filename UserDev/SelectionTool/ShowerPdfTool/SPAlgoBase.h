@@ -57,7 +57,7 @@ namespace sptool {
     virtual void Fill(const SPAData &data) = 0;
 
     /// Evaluate parameters
-    virtual void Fit() = 0;
+    virtual void Fit(TFile* fout=nullptr) = 0;
 
     /// # of showers to operate on
     size_t _nshowers;

@@ -4,16 +4,19 @@
 // Header files included here
 #include "SPAManager.h"
 #include "SPTBase.h"
+#include "SPAData.h"
+#include "SPAHelper.h"
+#include "ShowerPdfFactory.h"
 #include "ExampleSPSelection.h"
 #include "ExampleSPFit.h"
-#include "SPAData.h"
-#include "ShowerPdfFactory.h"
+#include "SPTAnaBase.h"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
 namespace larlite {
   class ExampleSPSelection;
   class ExampleSPFit;
+  class SPTAnaBase;
 //ADD_ANA_CLASS ... do not change this comment line
 }
 namespace sptool {
@@ -22,6 +25,7 @@ namespace sptool {
   class SPAShower;
   class SPAData;
   class SPAManager;
+  class SPAHelper;
   //ADD_FILTER_CLASS ... do not change this comment line
   //ADD_SPALGO_CLASS ... do not change this comment line
 }
@@ -46,5 +50,7 @@ namespace sptool {
     If you have a question about specific SPAlgoX or PDF in ShowerPdfFactory, contact Jeremy Hewes and David Caratelli.
 
  */
+
+
 
 
