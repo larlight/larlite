@@ -43,7 +43,7 @@ namespace sptool {
     virtual void Fill(const std::vector<const larlite::mcshower*> &data);
 
     /// Evaluate parameters
-    virtual void Fit();
+    virtual void Fit(TFile* fout=nullptr);
 
   };
 }

@@ -20,7 +20,7 @@ namespace sptool {
   void SPAlgo_Class_Name::Fill(const std::vector<const larlite::mcshower*> &data)
   {}
 
-  void SPAlgo_Class_Name::Fit()
+  void SPAlgo_Class_Name::Fit(TFile* fout)
   {}
 
 }

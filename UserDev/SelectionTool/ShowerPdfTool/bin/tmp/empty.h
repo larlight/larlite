@@ -11,8 +11,8 @@
 /** \addtogroup Working_Package
 
     @{*/
-#ifndef LARLITE_EMPTY_CLASS_NAME_H
-#define LARLITE_EMPTY_CLASS_NAME_H
+#ifndef SELECTIONTOOL_EMPTY_CLASS_NAME_H
+#define SELECTIONTOOL_EMPTY_CLASS_NAME_H
 
 #include <iostream>
 
