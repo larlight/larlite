@@ -74,15 +74,15 @@ namespace geoalgo {
     //CLOSEST APPROACH BETWEEN SEGMENT AND VECTOR OF TRACKS
     //*****************************************************
     /// LineSegment & vector of Trajectories, keep track of points
-    double SqDist(const LineSegment_t& seg, const std::vector<Trajectory_t> &trj, Point_t& c1, Point_t& c2, int& trackIdx) const;
+    double SqDist(const LineSegment_t& seg, const std::vector<geoalgo::Trajectory_t> &trj, Point_t& c1, Point_t& c2, int& trackIdx) const;
     /// LineSegment & vector of Trajectories, keep track of points
-    double SqDist(const std::vector<Trajectory_t> &trj, const LineSegment_t& seg, Point_t& c1, Point_t& c2, int& trackIdx) const
+    double SqDist(const std::vector<geoalgo::Trajectory_t> &trj, const LineSegment_t& seg, Point_t& c1, Point_t& c2, int& trackIdx) const
     { return SqDist(seg, trj, c1, c2, trackIdx); }
     /// LineSegment & vector of Trajectories, don't keep track of points
-    double SqDist(const std::vector<Trajectory_t> &trj, const LineSegment_t& seg) const
+    double SqDist(const std::vector<geoalgo::Trajectory_t> &trj, const LineSegment_t& seg) const
     { Point_t c1; Point_t c2; int trackIdx; return SqDist(seg, trj, c1, c2, trackIdx); }
     /// LineSegment & vector of Trajectories, don't keep track of points
-    double SqDist(const LineSegment_t& seg, const std::vector<Trajectory_t> &trj) const
+    double SqDist(const LineSegment_t& seg, const std::vector<geoalgo::Trajectory_t> &trj) const
     { Point_t c1; Point_t c2; int trackIdx; return SqDist(seg, trj, c1, c2, trackIdx); }
 
 
