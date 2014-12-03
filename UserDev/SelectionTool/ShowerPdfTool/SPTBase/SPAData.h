@@ -11,10 +11,10 @@
 /** \addtogroup ShowerPdfTool
 
     @{*/
-#ifndef LARLITE_SPADATA_H
-#define LARLITE_SPADATA_H
+#ifndef SELECTIONTOOL_SPADATA_H
+#define SELECTIONTOOL_SPADATA_H
 
-#include <iostream>
+#include <set>
 #include <TObject.h>
 #include "GeoHalfLine.h"
 #include "GeoTrajectory.h"
@@ -102,6 +102,30 @@ namespace sptool {
   };
 
   /**
+    @brief Struct used by sptool::SPFilter Select() function return to note what should be filtered out.
+    This is really used as a communication tool between sptool::SPFilter and sptool::SPAManager.      \n
+    sptool::SPFilter is expected to remove some tracks, showers, and vtxs from sptool::SPAData object \n
+    while sptool::SPAData instance is owned by sptool::SPAManager. SPAOrder object is a used to       \n
+    communicate between those two: sptool::SPFilter should register index number of tracks, showers,  \n
+    and vtxs to be removed. sptool::SPAManager applies this change.
+   */
+  struct SPAOrder {
+
+  public:
+
+    std::set<size_t> _rm_tracks;
+    std::set<size_t> _rm_showers;
+    std::set<size_t> _rm_vtxs;
+
+    SPAOrder() 
+      : _rm_tracks()
+      , _rm_showers()
+      , _rm_vtxs()
+    {}
+
+  };
+
+  /**
      \class SPAData
      @brief Data holder class to contain full information, to be used by SPAlgoX and SPFilterX
      Contains a vector of showers, tracks, and vertex points. SPAManager will change the SPAShower
@@ -127,6 +151,8 @@ namespace sptool {
     std::vector<sptool::SPATrack>  _tracks;
     /// Candidate event vertecies
     std::vector<geoalgo::Point_t>  _vtxs;
+
+    void ApplyOrder(const SPAOrder& order);
 
     ClassDef(SPAData,1)
   };

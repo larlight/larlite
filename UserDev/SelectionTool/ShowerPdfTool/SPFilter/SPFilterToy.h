@@ -34,7 +34,7 @@ namespace sptool {
     virtual ~SPFilterToy(){};
 
     /// Select function
-    virtual bool Select (const SPAData &data);
+    virtual SPAOrder Select (const SPAData &data);
 
   };
 }

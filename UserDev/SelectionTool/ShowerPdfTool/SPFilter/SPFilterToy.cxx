@@ -10,8 +10,8 @@ namespace sptool {
     _name = "SPFilterToy";
   }
 
-  bool SPFilterToy::Select(const SPAData &data)
-  { return true; }
+  SPAOrder SPFilterToy::Select(const SPAData &data)
+  { return SPAOrder(); }
 
 }
 

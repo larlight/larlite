@@ -19,31 +19,41 @@ namespace sptool {
     // Result container to be returned
     std::vector<std::pair<float,SPMatch_t> > result;
 
-    // local data container
-    SPAData input(data);
-    input._showers.clear();
+    // Return if # showers is less than needed
+    if(_algo->_nshowers > data._showers.size()) return result;
 
     //
     // First, find out valid showers among input by running SPAFilter
     //
-    std::vector<size_t> valid_index_v;
-    valid_index_v.reserve(data._showers.size());
+    auto order = _filter->Select(data);
+
+    // Return if # remaining showers is less than needed
+    if( data._showers.size() < order._rm_showers.size() + _algo->_nshowers ) return result;
+
+    // Create a maping to the original data's _showers vector index
+    std::vector<size_t> shower_index_map;
+    shower_index_map.reserve(data._showers.size() - order._rm_showers.size());
     for(size_t i=0; i<data._showers.size(); ++i) {
-      input._showers.resize(1);
-      input._showers[0] = data._showers[i];
-      if(_filter && _filter->Select(input))  valid_index_v.push_back(i);
-      else if(!_filter) valid_index_v.push_back(i);
-    
+      if(order._rm_showers.find(i) == order._rm_showers.end())
+	shower_index_map.push_back(i);
     }
 
-    // Return empty result if # of valid showers is less than # of showers required by SPAlgo
-    if(valid_index_v.size() < _algo->_nshowers) return result;
+    // Create a reduced copy
+    SPAData red_data(data);
+    red_data.ApplyOrder(order);
+
+    if(shower_index_map.size() != red_data._showers.size())
+      throw SPAException("<<Process>> Logic error: reduced data's # showers and index map entries do not match!");
+
+    // Create a copy that will be handed to the algorithms
+    SPAData input(red_data);
+    input._showers.clear();
 
     //
     // Loop over valid shower indexies and call SPAlgo
     //
     std::multimap<float,SPMatch_t> score_map;
-    std::vector<bool> comb_index_v(valid_index_v.size());
+    std::vector<bool> comb_index_v(red_data._showers.size());
     std::fill(comb_index_v.begin() + _algo->_nshowers, comb_index_v.end(), true);
 
     do {
@@ -57,8 +67,8 @@ namespace sptool {
       for (int i = 0; i < comb_index_v.size(); ++i)
 	
 	if (!comb_index_v[i]) {
-	  input._showers.push_back(data._showers[valid_index_v[i]]);
-	  index_v.push_back(valid_index_v[i]);
+	  input._showers.push_back(red_data._showers[i]);
+	  index_v.push_back(shower_index_map[i]);
 	}
 
       score_map.insert(std::make_pair(_algo->Select(input),index_v));

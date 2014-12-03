@@ -48,7 +48,7 @@ namespace sptool {
     virtual ~SPFilterBase(){};
 
     /// Select function
-    virtual bool Select (const SPAData &data) = 0;
+    virtual SPAOrder Select (const SPAData &data) = 0;
     
   };
 }
