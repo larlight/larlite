@@ -17,42 +17,39 @@
 
 #include "Analysis/ana_base.h"
 #include "SPAManager.h"
-
+#include "SPTAnaBase.h"
 namespace larlite {
   /**
      \class ExampleSPSelection
-     User custom analysis class made by kazuhiro
+     Example analysis unit for running SPAManager
    */
-  class ExampleSPSelection : public ana_base{
+  class ExampleSPSelection : public SPTAnaBase {
   
   public:
 
     /// Default constructor
-    ExampleSPSelection(){ _name="ExampleSPSelection"; _fout=0; _shower_producer=""; }
+    ExampleSPSelection();
 
     /// Default destructor
     virtual ~ExampleSPSelection(){}
 
-    /** IMPLEMENT in ExampleSPSelection.cc!
+    /**
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in ExampleSPSelection.cc! 
+    /**
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in ExampleSPSelection.cc! 
+    /**
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
 
     /// Selection manager class instance
     ::sptool::SPAManager _mgr;
-
-    /// Shower producer module's label
-    std::string _shower_producer;
 
   };
 }

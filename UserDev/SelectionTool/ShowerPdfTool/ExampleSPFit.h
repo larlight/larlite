@@ -16,38 +16,36 @@
 #define LARLITE_EXAMPLESPFIT_H
 
 #include "Analysis/ana_base.h"
+#include "SPTAnaBase.h"
 #include "SPFilterBase.h"
 #include "SPAlgoBase.h"
 
 namespace larlite {
   /**
      \class ExampleSPFit
-     User custom analysis class made by kazuhiro
+     Example analysis unit for training an algorithm
    */
-  class ExampleSPFit : public ana_base{
+  class ExampleSPFit : public SPTAnaBase {
   
   public:
 
     /// Default constructor
-    ExampleSPFit() 
-      : _filter (nullptr)
-      , _algo   (nullptr)
-    { _name="ExampleSPFit"; _fout=0; _shower_producer=""; };
+    ExampleSPFit();
 
     /// Default destructor
     virtual ~ExampleSPFit(){};
 
-    /** IMPLEMENT in ExampleSPFit.cc!
+    /**
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in ExampleSPFit.cc! 
+    /**
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in ExampleSPFit.cc! 
+    /**
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
@@ -55,10 +53,6 @@ namespace larlite {
     void SetFilter(::sptool::SPFilterBase* f) { _filter = f; }
     
     void SetAlgo(::sptool::SPAlgoBase* a) { _algo = a; }
-
-    bool _mc;
-
-    std::string _shower_producer;
 
   protected:
     

@@ -5,29 +5,29 @@
 
 namespace larlite {
 
+  ExampleSPSelection::ExampleSPSelection() : SPTAnaBase()
+  { _name="ExampleSPSelection"; }
+
   bool ExampleSPSelection::initialize() {
 
-    if(_shower_producer.empty()) {
-      print(msg::kERROR,__FUNCTION__,
-	    "Shower producer name is not set...");
-      return false;
-    }
+    return SPTAnaBase::initialize();
 
-    return true;
   }
   
   bool ExampleSPSelection::analyze(storage_manager* storage) {
 
-    auto ev_shower = storage->get_data<event_shower>(_shower_producer);
+    auto status = SPTAnaBase::analyze(storage);
+    if(!status) return status;
 
-    //_mgr.Process(*ev_shower);
+    _mgr.Process(_data);
   
     return true;
   }
 
   bool ExampleSPSelection::finalize() {
 
-    return true;
+    return SPTAnaBase::finalize();
+
   }
 
 }
