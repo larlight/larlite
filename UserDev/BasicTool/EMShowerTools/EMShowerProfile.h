@@ -36,6 +36,14 @@ public:
   /// Given the distance [cm] from the shower start along the trunk, calculate energy containment
   double EnergyContainment(const double dist) const;
 
+  /// Given shower energy find opening angle
+  /// This is done with simple arctangent and calculation of shower length
+  double OpeningAngle(const double energy) const;
+
+  /// Given (nothing) return shower radius
+  /// Shower radius doesn't depend on energy (see: Moliere radius on google)
+  double ShowerRadius() const;
+
 };
 
 #endif
