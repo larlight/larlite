@@ -147,7 +147,34 @@ namespace geoalgo {
   }
 
 
-  // Closest point between a Trajectory_t and a Point_t
+
+  // Distance between vector of Trajectories and a Point
+  // Loop over Trajectories and find the closest one
+  // then keep track of that closest one
+  double DistanceAlgo::SqDist(const Point_t& pt, const std::vector<Trajectory_t> &trj, int &trackIdx) const
+  {
+
+    // holder for shortest distance
+    double minDist = kINVALID_DOUBLE;
+
+    // loop over trajectories
+    for (size_t t=0; t < trj.size(); t++){
+      
+      // trajectory & point dimensionality will be checked in next function
+      // now calculate distance w.r.t. this track
+      double tmpDist = SqDist(pt, trj[t]);
+      if (tmpDist < minDist){
+	minDist = tmpDist;
+	trackIdx = t;
+      }
+    }// for all tracks
+      
+    return minDist;
+  }
+
+
+
+  // Closest point between a Trajectory and a Point
   // Loop over segments that make up the trajectory and keep track
   // of shortest distance between any of them and the point
   // For the shortest distance find the point at which it is found
@@ -162,7 +189,7 @@ namespace geoalgo {
     trj.compat(pt);
 
     // Now keep track of smallest distance and loop over traj segments
-    double distMin = std::numeric_limits<double>::max();
+    double distMin = kINVALID_DOUBLE;
     // For that smallest distance, keep track of the segment for which it was found
     int pos = 0;
     for (size_t l=0; l < trj.size()-1; l++){
@@ -177,6 +204,38 @@ namespace geoalgo {
     return _ClosestPt_(pt,segMin);
   }
   
+
+  // Closest point between a vector of trajectories and a point
+  // Loop over segments that make up the trajectory and keep track
+  // of shortest distance between any of them and the point
+  // For the shortest distance find the point at which it is found
+  Point_t DistanceAlgo::ClosestPt(const Point_t& pt, const std::vector<Trajectory_t> &trj, int& TrackIdx) const
+  {
+
+    // since finding the smallest distance is faster than finding the closest point
+    // first loop through tracks, and find the one that is closest to the point
+    // then finally find the closest point on that track
+
+    for (size_t t=0; t < trj.size(); t++){
+
+      // holder for smallest distance
+      double minDist = kINVALID_DOUBLE;
+      
+      // track & point dimensionality will be checked per-track by next function
+      // now calculate distance w.r.t. this track
+      double tmpDist = SqDist(pt, trj[t]);
+      if (tmpDist < minDist){
+	minDist = tmpDist;
+	TrackIdx = t;
+      }
+
+    }// for all tracks
+
+    // now we know which track is closest -> find the closest point to that track
+    return ClosestPt(pt, trj[TrackIdx]);
+  }
+
+
   // Closest Approach between a segment and a Trajectory
   // loop over segments in trajectory and find the one that
   // is closest. Then find distance
@@ -210,7 +269,7 @@ namespace geoalgo {
   }
 
 
-  // Closest Approach between a Segment and a list of tracks
+  // Closest Approach between a Segment and a vector of tracks
   // keep track of points of closest approach both on nearest
   // track as well as on segment
   // keep track of which track has the point of closest approcah
@@ -226,12 +285,8 @@ namespace geoalgo {
     for (size_t t=0; t < trj.size(); t++){
 
       //need to loop over all tracks and find the one which is closest
-      // Make sure trajectory object is properly defined
-      if (!trj[t].size())
-	throw GeoAlgoException("Trajectory object not properly set...");
-    
-      // Check dimensionality compatibility between point and trajectory
-      trj[t].compat(seg.Start());
+
+      // dimensionality checks will be done in next function, per track.
 
       // now calculate closest approach
       double tmpDist = SqDist(seg, trj[t], c1min, c2min);

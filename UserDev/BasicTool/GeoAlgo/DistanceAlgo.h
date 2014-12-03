@@ -94,20 +94,49 @@ namespace geoalgo {
     /// Point_t & Trajectory_t distance
     double SqDist(const Trajectory_t& trj, const Point_t& pt) const
     { return SqDist(pt,trj); }
-
     /// Point_t & Trajectory_t closest point
     Point_t ClosestPt(const Point_t& pt, const Trajectory_t& trj) const;
     /// Point_t & Trajectory_t closest point
     Point_t ClosestPt(const Trajectory_t& trj, const Point_t& pt) const
     { return ClosestPt(pt,trj); }
 
+
+    //***************************************************
+    //CLOSEST APPROACH BETWEEN POINT AND VECTOR OF TRACKS
+    //***************************************************
+    /// Point_t & Trajectory_t distance - keep track of which track
+    double SqDist(const Point_t& pt, const std::vector<geoalgo::Trajectory_t> &trj, int& trackIdx) const;
+    /// Point_t & Trajectory_t distance - keep track of which track
+    double SqDist(const std::vector<geoalgo::Trajectory_t> &trj, const Point_t& pt, int& trackIdx) const
+    { return SqDist(pt,trj, trackIdx); }
+    /// Point_t & Trajectory_t distance - don't keep track
+    double SqDist(const Point_t& pt, const std::vector<geoalgo::Trajectory_t> &trj) const
+    { int trackIdx; return SqDist(pt, trj, trackIdx); }
+    /// Point_t & Trajectory_t distance - don't keep track
+    double SqDist(const std::vector<geoalgo::Trajectory_t> &trj, const Point_t& pt) const
+    { int trackIdx; return SqDist(pt, trj, trackIdx); }
+    /// Point_t & Trajectory_t closest point - keep track of which track is closest 
+    Point_t ClosestPt(const Point_t& pt, const std::vector<geoalgo::Trajectory_t> &trj, int &trackIdx) const;
+    /// Point_t & Trajectory_t closest point - keep track of which track is closest
+    Point_t ClosestPt(const std::vector<geoalgo::Trajectory_t> &trj, const Point_t& pt, int &trackIdx) const
+    { return ClosestPt(pt, trj, trackIdx); }
+    /// Point_t & Trajectory_t closest point - don't keep track of which track is closest 
+    Point_t ClosestPt(const Point_t& pt, const std::vector<geoalgo::Trajectory_t> &trj) const
+    { int trackIdx; return ClosestPt(pt, trj, trackIdx); }
+    /// Point_t & Trajectory_t closest point - don't keep track of which track is closest
+    Point_t ClosestPt(const std::vector<geoalgo::Trajectory_t> &trj, const Point_t& pt) const
+    { int trackIdx; return ClosestPt(pt, trj, trackIdx); }
+
+
+    //***********************************************
+    //CLOSEST APPROACH BETWEEN POINT AND LINE SEGMENT
+    //***********************************************
     /// Point & LineSegment_t distance
     double SqDist(const Point_t& pt, const LineSegment_t& line) const
     { pt.compat(line.Start()); return _SqDist_(pt,line); }
     /// Point & LineSegment distance
     double SqDist(const LineSegment_t& line, const Point_t& pt) const
     { return SqDist(pt,line); }
-
     /// Point & LineSegment closest point
     Point_t ClosestPt(const Point_t& pt, const LineSegment_t& line) const
     { pt.compat(line.Start()); return _ClosestPt_(pt,line); }
@@ -117,13 +146,15 @@ namespace geoalgo {
     
     //double SqDist(const HalfLine_t& line1, const HalfLine_t& line2) const;
 
+    //********************************************
+    //CLOSEST APPROACH BETWEEN POINT AND HALF LINE
+    //********************************************
     /// Point & HalfLine distance
     double SqDist(const Point_t& pt, const HalfLine_t& line) const
     { pt.compat(line.Start()); return _SqDist_(pt,line); }
     /// Point & HalfLine distance
     double SqDist(const HalfLine_t& line, const Point_t& pt) const
     { return SqDist(pt,line); }
-
     /// Point & HalfLine closest point
     Point_t ClosestPt(const Point_t& pt, const HalfLine_t& line) const
     { pt.compat(line.Start()); return _ClosestPt_(pt,line); }
@@ -135,13 +166,15 @@ namespace geoalgo {
     //double SqDist(const LineSegment_t& sline, const HalfLine_t& hline) const
     //{ return SqDist(hline,sline); }  
 
+    //***********************************************
+    //CLOSEST APPROACH BETWEEN POINT AXIS ALIGNED BOX
+    //***********************************************
     /// Point & AABox distance
     double SqDist(const Point_t& pt, const AABox_t& box) const
     { pt.compat(box.Min()); return _SqDist_(pt,box); }
     /// Point & AABox distance
     double SqDist(const AABox_t& box, const Point_t& pt)
     { return SqDist(pt,box); }
-
     /// Point & AABox closest point
     Point_t ClosestPt(const Point_t& pt, const AABox_t& box) const
     { pt.compat(box.Min()); return _ClosestPt_(pt,box); }
