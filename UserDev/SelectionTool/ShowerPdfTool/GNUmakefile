@@ -1,31 +1,15 @@
 #
-# This is an example GNUmakefile for my packages
+# This is an example GNUmakefile for ShowerPdfTool package
 #
 
-# specific names for this package
-DICT  = ShowerPdfToolCint
-SHLIB = libSelectionTool_ShowerPdfTool.so
-SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
-FMWK_HEADERS = LinkDef.h $(DICT).h
-HEADERS = $(filter-out $(FMWK_HEADERS), $(wildcard *.h))
-OBJECTS = $(SOURCES:.cxx=.o)
+SUBDIRS := SPTBase SPFilter SPAlgo SPTApp
 
-# include options for this package
-INCFLAGS = -I.                       #Include itself
-INCFLAGS += -I$(LARLITE_COREDIR)
+.phony: all clean
 
-# platform-specific options
-OSNAME          = $(shell uname -s)
-HOST            = $(shell uname -n)
-OSNAMEMODE      = $(OSNAME)
+all:
+	@for i in $(SUBDIRS); do ( echo "" && echo "Compiling $$i..." && cd $$i && $(MAKE) ) || exit $$?; done
 
-include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
-
-# set compiler options for ROOT
-CXXFLAGS +=  `root-config --cflags`
-
-# call the common GNUmakefile
-include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE
-
+clean:
+	@for i in $(SUBDIRS); do ( echo "" && echo "Cleaning $$i..." && cd $$i && $(MAKE) clean && rm -f $(LARLIGHT_LIBDIR)/$$i.* ) || exit $$?; done
 
 
