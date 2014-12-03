@@ -202,7 +202,12 @@ namespace geoalgo {
     }
 
     inline bool operator< ( const Vector& rhs ) const 
-    { return Length() < rhs.Length(); }
+    { 
+      compat(rhs);
+      for(size_t i=0; i<size(); ++i)
+	if((*this)[i] < rhs[i]) return true;
+      return false;
+    }
 
     inline bool operator< ( const double& rhs) const 
     { return Length() < rhs; }

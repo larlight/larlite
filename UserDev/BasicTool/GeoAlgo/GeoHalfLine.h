@@ -72,6 +72,23 @@ namespace geoalgo {
     void Dir(const double x, const double y, const double z)
     { _dir[0] = x; _dir[1] = y; _dir[2] = z; Normalize(); }
 
+    /// Start setter template
+    template<class T>
+    void Start(const T& pos)
+    { 
+      _start = Point_t(pos); 
+      if(_start.size()!=3) throw GeoAlgoException("<<Start>> Only 3 dimensional start point allowed!"); 
+    }
+    
+    /// Dir setter template
+    template<class T>
+    void Dir(const T& dir)
+    { 
+      _dir = Vector_t(dir);
+      if(_dir.size()!=3) throw GeoAlgoException("<<Start>> Only 3 dimensional start point allowed!"); 
+      Normalize();
+    }
+
   protected:
 
     /// Normalize direction
