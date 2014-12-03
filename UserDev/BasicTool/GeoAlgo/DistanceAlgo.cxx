@@ -5,6 +5,143 @@
 
 namespace geoalgo {
 
+
+  // Ref. RTCD 5.1.8 p. 146
+  // Distance between two infinite lines
+  double DistanceAlgo::_SqDist_(const Line_t& l1, const Line_t &l2, Point_t& L1, Point_t& L2) const
+  {
+
+    // closest approach when segment connecting the two lines
+    // is perpendicular to both lines
+    
+    // L1 = P1 + s(Q1-P1)
+    // L1 = P2 + t(Q2-P2)
+    // L1(s) and L2(t) are the closest approach points
+    // d1 = Q1-P1
+    // d2 = Q2-P2
+    // v(s,t) = L1(s) - L2(t)
+    // require d1*v == 0 && d2*v == 0
+
+    Vector_t d1 = l1.Pt2()-l1.Pt1();
+    Vector_t d2 = l2.Pt2()-l2.Pt1();
+    Vector_t r = l1.Pt1()-l2.Pt1();
+
+    double a = d1*d1;
+    double b = d1*d2;
+    double c = d1*r;
+    double e = d2*d2;
+    double f = d2*r;
+
+    double d = a*e-b*b;
+    
+    double s = (b*f-c*e)/d;
+    double t = (a*f-b*c)/d;
+
+    // s & t represent the paramteric points on the lines
+    // for the closest approach point
+    // now find the Point_t object at those locations
+    
+    L1 = l1.Pt1() + ( l1.Pt2()-l1.Pt1() )*s;
+    L2 = l2.Pt1() + ( l2.Pt2()-l2.Pt1() )*t;
+
+    // find distance between these points
+    double dist = _SqDist_(L1,L2);
+
+    return dist;
+  }
+
+
+  // Distance between two half-infinite lines
+  // use same function as for infinite lines
+  // but expect return points L1 and L2 to be
+  // "after" start point. Otherwise need
+  // to re-calculate using start point
+  // for one or both of the half-lines
+  double DistanceAlgo::_SqDist_(const HalfLine_t& l1, const HalfLine_t &l2, Point_t& L1, Point_t& L2) const
+  {
+
+    //Same as for _SqDist_ with infinite line but check whether s & t go out of bounds (i.e. negative)
+
+    Vector_t d1 = l1.Dir();
+    Vector_t d2 = l2.Dir();
+    Vector_t r = l1.Start()-l2.Start();
+
+    double a = d1*d1;
+    double b = d1*d2;
+    double c = d1*r;
+    double e = d2*d2;
+    double f = d2*r;
+
+    double d = a*e-b*b;
+    
+    double s = (b*f-c*e)/d;
+    double t = (a*f-b*c)/d;
+
+    // if s or t < 0, out of bounds for half-line
+    if (s < 0) s = 0;
+    if (t < 0) t = 0;
+
+    // s & t represent the paramteric points on the lines
+    // for the closest approach point
+    // now find the Point_t object at those locations
+    
+    L1 = l1.Start() + l1.Dir()*s;
+    L2 = l2.Start() + l2.Dir()*t;
+
+    // find distance between these points
+    double dist = _SqDist_(L1,L2);
+
+    return dist;
+  }
+
+
+
+  // Distance between two half-infinite lines
+  // use same function as for infinite lines
+  // but expect return points L1 and L2 to be
+  // "after" start point. Otherwise need
+  // to re-calculate using start point
+  // for one or both of the half-lines
+  double DistanceAlgo::_SqDist_(const HalfLine_t& hline, const LineSegment_t &seg, Point_t& L1, Point_t& L2) const
+  {
+
+    //Same as for _SqDist_ with infinite line but check whether s & t go out of bounds (i.e. negative)
+
+    Vector_t d1 = hline.Dir();
+    Vector_t d2 = seg.End()-seg.Start();
+    Vector_t r = hline.Start()-seg.Start();
+
+    double a = d1*d1;
+    double b = d1*d2;
+    double c = d1*r;
+    double e = d2*d2;
+    double f = d2*r;
+
+    double d = a*e-b*b;
+    
+    double s = (b*f-c*e)/d;
+    double t = (a*f-b*c)/d;
+
+    // if s is < 0 out of bounds for half-line
+    if (s < 0) s = 0;
+    // if t is < 0 or > 1, out of bounds for segment
+    if (t < 0) t = 0;
+    if (t > 1) t = 1;
+
+    // s & t represent the paramteric points on the lines
+    // for the closest approach point
+    // now find the Point_t object at those locations
+    
+    L1 = hline.Start() + hline.Dir()*s;
+    L2 = seg.Start() + (seg.End()-seg.Start())*t;
+
+    // find distance between these points
+    double dist = _SqDist_(L1,L2);
+
+    return dist;
+  }
+
+
   // Ref. RTCD Ch 5.1 p. 130
   double DistanceAlgo::_SqDist_(const Point_t& pt, const LineSegment_t& line) const
   {
