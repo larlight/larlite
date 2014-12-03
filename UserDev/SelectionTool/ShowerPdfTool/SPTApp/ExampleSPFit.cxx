@@ -33,28 +33,10 @@ namespace larlite {
     ::sptool::SPAData input = _data;
 
     // Filter out some showers
-    if(_filter) {
-      std::vector<size_t> valid_index_v;
-      valid_index_v.reserve(_data._showers.size());
-      for(size_t i=0; i<_data._showers.size(); ++i) {
-	input._showers.resize(1);
-	input._showers[0] = _data._showers[i];
-	if(_filter && _filter->Select(input))  valid_index_v.push_back(i);
-	else if(!_filter) valid_index_v.push_back(i);
-	
-      }
-      
-      if(valid_index_v.size() < _algo->_nshowers) return true;
-
-      input._showers.clear();
-      input._showers.reserve(valid_index_v.size());
-      for(auto const& index : valid_index_v)
-	input._showers.push_back(_data._showers[index]);
-
-    }
+    _data.ApplyOrder(_filter->Select(_data));
 
     // Make a combination and run
-    _algo->Fill(input);
+    _algo->Fill(_data);
 
     return true;
   }
