@@ -43,6 +43,9 @@ namespace geoalgo {
     virtual ~DistanceAlgo(){}
     
 
+    //******************************************
+    //CLOSEST APPROACH BETWEEN TWO LINE SEGMENTS
+    //******************************************
     /// LineSegment_t & LineSegment_t distance - keep track of points
     double SqDist(const LineSegment_t& seg1, const LineSegment_t& seg2, Point_t& c1, Point_t& c2) const
     { seg1.Start().compat(seg2.Start()); return _SqDist_(seg1, seg2, c1, c2); }
@@ -50,6 +53,10 @@ namespace geoalgo {
     double SqDist(const LineSegment_t& seg1, const LineSegment_t& seg2) const
     { Point_t c1; Point_t c2; return SqDist(seg1, seg2, c1, c2); }
 
+
+    //******************************************
+    //CLOSEST APPROACH BETWEEN SEGMENT AND TRACK
+    //******************************************
     /// LineSegment & Trajectory, keep track of points
     double SqDist(const LineSegment_t& seg, const Trajectory_t& trj, Point_t& c1, Point_t& c2) const;
     /// LineSegment & Trajectory, keep track of points
@@ -63,6 +70,25 @@ namespace geoalgo {
     { Point_t c1; Point_t c2; return SqDist(seg, trj, c1, c2); }
     
 
+    //*****************************************************
+    //CLOSEST APPROACH BETWEEN SEGMENT AND VECTOR OF TRACKS
+    //*****************************************************
+    /// LineSegment & vector of Trajectories, keep track of points
+    double SqDist(const LineSegment_t& seg, const std::vector<Trajectory_t> &trj, Point_t& c1, Point_t& c2, int& trackIdx) const;
+    /// LineSegment & vector of Trajectories, keep track of points
+    double SqDist(const std::vector<Trajectory_t> &trj, const LineSegment_t& seg, Point_t& c1, Point_t& c2, int& trackIdx) const
+    { return SqDist(seg, trj, c1, c2, trackIdx); }
+    /// LineSegment & vector of Trajectories, don't keep track of points
+    double SqDist(const std::vector<Trajectory_t> &trj, const LineSegment_t& seg) const
+    { Point_t c1; Point_t c2; int trackIdx; return SqDist(seg, trj, c1, c2, trackIdx); }
+    /// LineSegment & vector of Trajectories, don't keep track of points
+    double SqDist(const LineSegment_t& seg, const std::vector<Trajectory_t> &trj) const
+    { Point_t c1; Point_t c2; int trackIdx; return SqDist(seg, trj, c1, c2, trackIdx); }
+
+
+    //****************************************
+    //CLOSEST APPROACH BETWEEN POINT AND TRACK
+    //****************************************
     /// Point_t & Trajectory_t distance
     double SqDist(const Point_t& pt, const Trajectory_t& trj) const;
     /// Point_t & Trajectory_t distance

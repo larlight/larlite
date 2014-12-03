@@ -209,6 +209,46 @@ namespace geoalgo {
     return distMin;
   }
 
+
+  // Closest Approach between a Segment and a list of tracks
+  // keep track of points of closest approach both on nearest
+  // track as well as on segment
+  // keep track of which track has the point of closest approcah
+  double DistanceAlgo::SqDist(const LineSegment& seg, const std::vector<Trajectory_t> &trj, Point_t& c1, Point_t& c2, int& trackIdx) const
+  {
+
+    // holders to keep track of track with shortest distance
+    double minDist = kINVALID_DOUBLE;
+    // holders for points of closest approach
+    Point_t c1min;
+    Point_t c2min;
+
+    for (size_t t=0; t < trj.size(); t++){
+
+      //need to loop over all tracks and find the one which is closest
+      // Make sure trajectory object is properly defined
+      if (!trj[t].size())
+	throw GeoAlgoException("Trajectory object not properly set...");
+    
+      // Check dimensionality compatibility between point and trajectory
+      trj[t].compat(seg.Start());
+
+      // now calculate closest approach
+      double tmpDist = SqDist(seg, trj[t], c1min, c2min);
+      
+      // is this the best yet?
+      if (tmpDist < minDist){
+	minDist = tmpDist;
+	c1 = c1min;
+	c2 = c2min;
+	trackIdx = t;
+      }
+      
+    }// for all tracks in vector
+
+    return minDist;
+  }
+
   // Ref. RTCD Sec. 5.1.9
   double DistanceAlgo::_SqDist_(const LineSegment_t& seg1, const LineSegment_t& seg2,
 				Point_t& c1, Point_t& c2) const

@@ -5,14 +5,24 @@
 
 namespace geoalgo {
 
-  Point_t IntersectAlgo::_Intersection_(const AABox_t& box, const HalfLine_t& line) const
+  Point_t IntersectAlgo::Intersection(const AABox_t& box, const HalfLine_t& line, bool back) const
   {
 
     // Prepare return point
     Point_t res(3);
 
+    // if back == true then we need to invert the line's direction
+    // this way we get distance to back of wall
+    double pointing = 1.;
+    if (back)
+      pointing = -1.;
+    Vector_t lineDir = line.Dir()*pointing;
+    Point_t lineStart = line.Start();
+    HalfLine_t l(lineStart, lineDir);
+      
+
     // If line start point is outside either 0 or 2 intersections
-    if ( !box.Contain(line.Start()) )
+    if ( !box.Contain(l.Start()) )
       return res;
 
     // Calculate intersection point w.r.t. all boundaries
@@ -21,8 +31,8 @@ namespace geoalgo {
     double tmax = kINVALID_DOUBLE;
 
     // Get line start point & direction
-    Point_t s  = line.Start();
-    Vector_t d = line.Dir();
+    Point_t s  = l.Start();
+    Vector_t d = l.Dir();
 
     // Get Box Min & Max boundaries
     Point_t Min = box.Min();
@@ -59,11 +69,11 @@ namespace geoalgo {
   }
 
   // LineSegment sub-segment of HalfLine inside an AABox w/o checks
-  LineSegment_t IntersectAlgo::_BoxOverlap_(const AABox_t& box, const HalfLine_t& line) const
+  LineSegment_t IntersectAlgo::BoxOverlap(const AABox_t& box, const HalfLine_t& line) const
   {
 
     // First find interection point of half-line and box
-    Point_t intersection = _Intersection_(box, line);
+    Point_t intersection = Intersection(box, line);
 
     // Build a new LineSegment
     LineSegment_t x;
@@ -75,7 +85,7 @@ namespace geoalgo {
   }
 
   /// Get Trajectory inside box given some input trajectory -> now assumes trajectory cannot exit and re-enter box
-  Trajectory_t IntersectAlgo::_BoxOverlap_(const AABox_t& box, const Trajectory_t& trj) const
+  Trajectory_t IntersectAlgo::BoxOverlap(const AABox_t& box, const Trajectory_t& trj) const
   {
 
     // if first & last points inside, then return full trajectory
