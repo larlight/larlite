@@ -45,7 +45,7 @@ namespace geoalgo {
     L2 = l2.Pt1() + ( l2.Pt2()-l2.Pt1() )*t;
 
     // find distance between these points
-    double dist = L1._Dist_(L2);
+    double dist = L1._SqDist_(L2);
 
     return dist;
   }
@@ -89,7 +89,7 @@ namespace geoalgo {
     L2 = l2.Start() + l2.Dir()*t;
 
     // find distance between these points
-    double dist = L1._Dist_(L2);
+    double dist = L1._SqDist_(L2);
 
     return dist;
   }
