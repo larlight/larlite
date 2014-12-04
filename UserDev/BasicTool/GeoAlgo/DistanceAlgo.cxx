@@ -450,16 +450,16 @@ namespace geoalgo {
     auto const& e1 = seg1.End();
     auto const& e2 = seg2.End();
 
-    auto dir1 = e1 - s1;
-    auto dir2 = e2 - s2;
+    auto d1 = e1 - s1;
+    auto d2 = e2 - s2;
     auto    r = s1 - s2;
 
-    double len1 = dir1.Length();
-    double len2 = dir2.Length();
-    double f    = dir2 * r;
+    double a = d1.SqLength();
+    double e = d2.SqLength();
+    double f    = d2 * r;
 
     // check if segment is too short
-    if ( (len1 <= 0) and (len2 <= 0) ){
+    if ( (a <= 0) and (e <= 0) ){
       //both segments are too short
       t1 = t2 = 0.;
       c1 = s1;
@@ -467,45 +467,46 @@ namespace geoalgo {
       Vector_t distVector = c2 - c1;
       return distVector.Length();
     }
-    if (len1 <= 0){
+    if (a <= 0){
       //first segment degenerates into a point
       t1 = 0.;
-      t2 = f/len2;
+      t2 = f/e;
       t2 = _Clamp_(t2,0.,1.);
     }
     else{
-      float c = dir1 * r;
-      if (len2 <= 0){
+      double c = d1 * r;
+      if (e <= 0){
 	//second segment degenerates into a point
 	t2 = 0.;
-	t1 = _Clamp_(-c/len1,0.,1.);
+	t1 = _Clamp_(-c/a,0.,1.);
       }
       else{
 	// the general case...no degeneracies
-	float b = dir1 * dir2;
-	float denom = (len1*len2)-(b*b);
+	std::cout << "general case!" << std::endl;
+	double b = d1 * d2;
+	double denom = (a*e)-(b*b);
 	
 	if (denom != 0.)
-	  t1 = _Clamp_((b*f-c*len2)/denom, 0., 1.);
+	  t1 = _Clamp_((b*f-c*e)/denom, 0., 1.);
 	else
 	  t1 = 0.;
 	
-	t2 = (b*t1+f)/len2;
+	t2 = (b*t1+f)/e;
 	
 	if (t2 < 0.){
 	  t2 = 0.;
-	  t1 = _Clamp_(-c/len1, 0., 1.);
+	  t1 = _Clamp_(-c/a, 0., 1.);
 	}
 	else if (t2 > 1.){
 	  t2 = 1.;
-	  t1 = _Clamp_((b-c)/len1, 0., 1.);
+	  t1 = _Clamp_((b-c)/a, 0., 1.);
 	}
 	
       }
     }
     
-    c1 = s1 + dir1 * t1;
-    c2 = s2 + dir2 * t2;
+    c1 = s1 + d1 * t1;
+    c2 = s2 + d2 * t2;
     
     Vector_t distVector = c2 - c1;
     return distVector.Length();

@@ -42,8 +42,8 @@ namespace geoalgo {
       }
       // compute t-value with near & far end of box
       double ood = 1. / d[n];
-      double t1 = (Min[n]-s[n]) / ood;
-      double t2 = (Max[n]-s[n]) / ood;
+      double t1 = (Min[n]-s[n]) * ood;
+      double t2 = (Max[n]-s[n]) * ood;
       // t1 should be closest plane (or plane in back)
       // swap t1 & t2 if t1 > t2
       _Swap_(t1, t2);
