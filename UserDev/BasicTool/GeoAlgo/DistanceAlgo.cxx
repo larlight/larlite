@@ -180,8 +180,8 @@ namespace geoalgo {
 
     auto e = ac * ab;
     if( e <= 0. ) return (ac * ac);
-    auto f = ab.Length();
-    return (ac.Length() - e * e / f);
+    auto f = ab.SqLength();
+    return (ac.SqLength() - e * e / f);
   }
 
   // Ref. RTCD Ch 5.1 p. 128-129
