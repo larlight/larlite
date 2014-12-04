@@ -132,6 +132,16 @@ namespace geoalgo {
 	throw GeoAlgoException("<<Angle>> only possible for 2 or 3-dimensional vectors!");
       return _Angle_(obj);
     }
+
+    /// Normalize itself
+    void Normalize() { (*this) /= this->Length(); }
+
+    /// Return a direction unit vector
+    Vector Dir() {
+      Vector res(*this);
+      res /= res.Length();
+      return res;
+    }
       
     /// Dimensional check for a compatibility
     void compat(const Vector& obj) const {
