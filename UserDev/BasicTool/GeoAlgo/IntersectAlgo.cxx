@@ -8,22 +8,15 @@ namespace geoalgo {
   Point_t IntersectAlgo::Intersection(const AABox_t& box, const HalfLine_t& line, bool back) const
   {
 
-    // Prepare return point
-    Point_t res(3);
-
+    auto l = line;
     // if back == true then we need to invert the line's direction
     // this way we get distance to back of wall
-    double pointing = 1.;
     if (back)
-      pointing = -1.;
-    Vector_t lineDir = line.Dir()*pointing;
-    Point_t lineStart = line.Start();
-    HalfLine_t l(lineStart, lineDir);
-      
+      l.Dir(l.Dir() * -1);
 
     // If line start point is outside either 0 or 2 intersections
     if ( !box.Contain(l.Start()) )
-      return res;
+      return Point_t(3);
 
     // Calculate intersection point w.r.t. all boundaries
 
@@ -31,12 +24,12 @@ namespace geoalgo {
     double tmax = kINVALID_DOUBLE;
 
     // Get line start point & direction
-    Point_t s  = l.Start();
-    Vector_t d = l.Dir();
+    auto const& s = l.Start();
+    auto const& d = l.Dir();
 
     // Get Box Min & Max boundaries
-    Point_t Min = box.Min();
-    Point_t Max = box.Max();
+    auto const& Min = box.Min();
+    auto const& Max = box.Max();
     
     // for all boundaries
     for (size_t n=0; n < box.Min().size(); n++){
@@ -45,7 +38,7 @@ namespace geoalgo {
       if ( d[n] == 0 ){
 	// line is parallel -> no hit if point outside of box
 	if ( (s[n] < Min[n]) or (s[n] > Max[n]) )
-	  return res;
+	  return Point_t(3);
       }
       // compute t-value with near & far end of box
       double ood = 1. / d[n];
@@ -58,14 +51,12 @@ namespace geoalgo {
       if ( t1 > tmin ) tmin = t1;
       if ( t2 < tmax ) tmax = t2;
       // Exit with no intersection if slab intersection becomes empty
-      if ( tmin > tmax ) return res;
+      if ( tmin > tmax ) return Point_t(3);
     }//for all dimensions of box
 
     // tmin is the intersection as soon as we hit the first wall
     // find point of intersection
-    res = s + d*tmin;
-    
-    return res;
+    return s + d*tmin;
   }
 
   // LineSegment sub-segment of HalfLine inside an AABox w/o checks
