@@ -45,7 +45,7 @@ namespace geoalgo {
     L2 = l2.Pt1() + ( l2.Pt2()-l2.Pt1() )*t;
 
     // find distance between these points
-    double dist = _SqDist_(L1,L2);
+    double dist = L1._Dist_(L2);
 
     return dist;
   }
@@ -89,7 +89,7 @@ namespace geoalgo {
     L2 = l2.Start() + l2.Dir()*t;
 
     // find distance between these points
-    double dist = _SqDist_(L1,L2);
+    double dist = L1._Dist_(L2);
 
     return dist;
   }
@@ -107,9 +107,9 @@ namespace geoalgo {
 
     //Same as for _SqDist_ with infinite line but check whether s & t go out of bounds (i.e. negative)
 
-    Vector_t d1 = hline.Dir();
-    Vector_t d2 = seg.End()-seg.Start();
-    Vector_t r = hline.Start()-seg.Start();
+    auto const& d1 = hline.Dir();
+    auto const  d2 = seg.End()-seg.Start();
+    auto const   r = hline.Start()-seg.Start();
 
     double a = d1*d1;
     double b = d1*d2;
@@ -136,18 +136,17 @@ namespace geoalgo {
     L2 = seg.Start() + (seg.End()-seg.Start())*t;
 
     // find distance between these points
-    double dist = _SqDist_(L1,L2);
+    double dist = L1._SqDist_(L2);
 
     return dist;
   }
 
-
   // Ref. RTCD Ch 5.1 p. 130
-  double DistanceAlgo::_SqDist_(const Point_t& pt, const LineSegment_t& line) const
+  double DistanceAlgo::_SqDist_(const Point_t& pt, const Point_t& line_s, const Point_t& line_e) const
   {
-    auto const& ab = line.Dir();
-    auto const  ac = pt - line.Start();
-    auto const  bc = pt - line.End();
+    auto const  ab = line_e - line_s;
+    auto const  ac = pt - line_s;
+    auto const  bc = pt - line_e;
     auto e = ac * ab;
     if( e <= 0. ) return ac.Length();
     auto f = ab.Length();
@@ -275,8 +274,7 @@ namespace geoalgo {
     // Now keep track of smallest distance and loop over traj segments
     double distMin = kINVALID_DOUBLE;
     for (size_t l=0; l < trj.size()-1; l++){
-      LineSegment_t seg( trj[l], trj[l+1] );
-      double distTmp = _SqDist_(pt,seg);
+      double distTmp = _SqDist_(pt,trj[l],trj[l+1]);
       if (distTmp < distMin) { distMin = distTmp; }
     }
 
@@ -330,8 +328,7 @@ namespace geoalgo {
     // For that smallest distance, keep track of the segment for which it was found
     int pos = 0;
     for (size_t l=0; l < trj.size()-1; l++){
-      LineSegment_t seg( trj[l], trj[l+1] );
-      double distTmp = _SqDist_(pt,seg);
+      double distTmp = _SqDist_(pt,trj[l],trj[l+1]);
       if (distTmp < distMin) { distMin = distTmp; pos = l; }
     }
 
@@ -390,7 +387,7 @@ namespace geoalgo {
     Point_t c1min;
     Point_t c2min;
     // Now keep track of smallest distance and loop over traj segments
-    double distMin = std::numeric_limits<double>::max();
+    double distMin = kMAX_DOUBLE;
 
     for (size_t l=0; l < trj.size()-1; l++){
       LineSegment_t segTmp(trj[l], trj[l+1]);
@@ -414,7 +411,7 @@ namespace geoalgo {
   {
 
     // holders to keep track of track with shortest distance
-    double minDist = kINVALID_DOUBLE;
+    double minDist = kMAX_DOUBLE;
     // holders for points of closest approach
     Point_t c1min;
     Point_t c2min;
@@ -448,14 +445,14 @@ namespace geoalgo {
 
     double t1, t2;
 
-    Point_t s1 = seg1.Start();
-    Point_t s2 = seg2.Start();
-    Point_t e1 = seg1.End();
-    Point_t e2 = seg2.End();
+    auto const& s1 = seg1.Start();
+    auto const& s2 = seg2.Start();
+    auto const& e1 = seg1.End();
+    auto const& e2 = seg2.End();
 
-    Vector_t dir1 = e1 - s1;
-    Vector_t dir2 = e2 - s2;
-    Vector_t r   = s1 - s2;
+    auto dir1 = e1 - s1;
+    auto dir2 = e2 - s2;
+    auto    r = s1 - s2;
 
     double len1 = dir1.Length();
     double len2 = dir2.Length();

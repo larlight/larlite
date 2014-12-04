@@ -224,11 +224,13 @@ namespace geoalgo {
     /// HalfLine & HalfLine distance w/o dimensionality check
     double _SqDist_(const HalfLine_t& l1, const HalfLine_t& l2, Point_t& L1, Point_t& L2) const;
 
-    /// Point & Point distance w/o dimensionality check
-    double _SqDist_(const Point_t& pt1, const Point_t& pt2) const;
+    /// Point & LineSegment distance w/o dimensionality check
+    double _SqDist_(const Point_t& pt, const LineSegment_t& line) const
+    { return _SqDist_(pt,line.Start(),line.End()); }
 
     /// Point & LineSegment distance w/o dimensionality check
-    double _SqDist_(const Point_t& pt, const LineSegment_t& line) const;
+    double _SqDist_(const Point_t& pt, const Point_t& line_s, const Point_t& line_e) const;
+
     /// Point & LineSegment distance w/o dimensionality check
     double _SqDist_(const LineSegment_t& line, const Point_t&pt) const
     { return _SqDist_(pt,line); }

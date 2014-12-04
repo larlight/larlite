@@ -14,6 +14,8 @@
 #pragma link C++ class std::vector<geoalgo::Vector>+;
 #pragma link C++ class geoalgo::Trajectory+;
 #pragma link C++ class geoalgo::HalfLine+;
+#pragma link C++ class geoalgo::Line+;
+#pragma link C++ class geoalgo::DirectedLine+;
 #pragma link C++ class geoalgo::LineSegment+;
 #pragma link C++ class geoalgo::AABox+;
 #pragma link C++ class geoalgo::IntersectAlgo+;

@@ -9,5 +9,9 @@ namespace geoalgo {
 
   static const double kINVALID_DOUBLE = std::numeric_limits<double>::max();
 
+  static const double kMAX_DOUBLE = std::numeric_limits<double>::max();
+
+  static const double kMIN_DOUBLE = std::numeric_limits<double>::min();
+
 }
 #endif

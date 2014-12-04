@@ -31,6 +31,7 @@ namespace geoalgo {
   class LineSegment;
   class HalfLine;
   class PointToLineDist;
+  class DistanceAlgo;
 
   /**
      \class Vector
@@ -41,7 +42,7 @@ namespace geoalgo {
     friend class HalfLine;
     friend class LineSegment;
     friend class PointToLineDist;
-
+    friend class DistanceAlgo;
   public:
     /// Default ctor
     Vector() : std::vector<double>()

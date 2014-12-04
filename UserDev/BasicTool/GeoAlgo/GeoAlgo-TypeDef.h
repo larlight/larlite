@@ -11,6 +11,7 @@
 #include "GeoVector.h"
 #include "GeoTrajectory.h"
 #include "GeoHalfLine.h"
+#include "GeoLine.h"
 #include "GeoLineSegment.h"
 #include "GeoAABox.h"
 #include "IntersectAlgo.h"
@@ -29,6 +30,7 @@ namespace geoalgo {
   class Vector;
   class Trajectory;
   class HalfLine;
+  class Line;
   class LineSegment;
   class AABox;
   class DistanceAlgo;
