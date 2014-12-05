@@ -148,10 +148,10 @@ namespace geoalgo {
     auto const  ac = pt - line_s;
     auto const  bc = pt - line_e;
     auto e = ac * ab;
-    if( e <= 0. ) return ac.Length();
-    auto f = ab.Length();
-    if( e >= f ) return bc.Length();
-    return (ac.Length() - e * e / f);
+    if( e <= 0. ) return ac.SqLength();
+    auto f = ab.SqLength();
+    if( e >= f ) return bc.SqLength();
+    return (ac.SqLength() - e * e / f);
   }
 
   // Ref. RTCD Ch 5.1 p. 128-129
@@ -159,11 +159,11 @@ namespace geoalgo {
   {
     auto const& ab = line.Dir();
     // Project pt on line (ab), but deferring divide by ab * ab
-    auto t = (pt - line.Start()) * ab;
+    auto t = ((pt - line.Start()) * ab);
     // pt projects outside line, on the start side; clamp to start
     if( t <= 0. ) return line.Start();
     else {
-      auto denom = ab.Length();
+      auto denom = ab.SqLength();
       // pt projects outside line, on the end side; clamp to end
       if( t>= denom ) return line.End();
       // pt projects inside the line. must deferred divide now
@@ -180,8 +180,8 @@ namespace geoalgo {
 
     auto e = ac * ab;
     if( e <= 0. ) return (ac * ac);
-    auto f = ab.Length();
-    return (ac.Length() - e * e / f);
+    auto f = ab.SqLength();
+    return (ac.SqLength() - e * e / f);
   }
 
   // Ref. RTCD Ch 5.1 p. 128-129

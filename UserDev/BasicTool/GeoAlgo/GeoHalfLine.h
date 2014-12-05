@@ -94,7 +94,7 @@ namespace geoalgo {
     /// Normalize direction
     void Normalize()
     {
-      auto l = _dir.SqLength();
+      auto l = _dir.Length();
       if(!l)
 	throw GeoAlgoException("<<Normalize>> cannot normalize 0-length direction vector!");
       _dir /= l;
