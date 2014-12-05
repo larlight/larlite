@@ -13,7 +13,7 @@ OBJECTS = $(SOURCES:.cxx=.o)
 # include options for this package
 INCFLAGS = -I.                       #Include itself
 INCFLAGS += -I$(LARLITE_COREDIR)
-
+#INCFLAGS += $(shell python-config --includes)
 # platform-specific options
 OSNAME          = $(shell uname -s)
 HOST            = $(shell uname -n)
