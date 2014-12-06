@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [[ -z $LARLITE_BASEDIR ]]; then
+    # clean up previously set larlite directory path
+fi
+
 if [[ -z $FORCE_LARLITE_BASEDIR ]]; then
     # If LARLITE_BASEDIR not set, try to guess
     # Find the location of this script:
@@ -18,7 +22,7 @@ else
     if [[ -z `command -v rootcint` ]]; then
 	echo
 	echo Looks like you do not have ROOT installed.
-	echo You cannot use LArLight w/o ROOT!
+	echo You cannot use LArLite w/o ROOT!
 	echo Aborting.
 	echo
 	return;
@@ -43,7 +47,7 @@ else
 	if [[ -z `command -v $LARLITE_CXX` ]]; then
 	    echo
 	    echo Looks like you do not have neither clang or g++!
-	    echo You need one of those to compile LArLight... Abort config...
+	    echo You need one of those to compile LArLite... Abort config...
 	    echo
 	    return;
 	fi
@@ -53,11 +57,11 @@ else
 	    echo
 	    echo "***************** COMPILER WARNING *******************"
 	    echo "*                                                    *"
-	    echo "* You are using g++ on Darwin to compile LArLight.   *"
-	    echo "* Currently LArLight assumes you do not have C++11   *"
+	    echo "* You are using g++ on Darwin to compile LArLite.    *"
+	    echo "* Currently LArLite assumes you do not have C++11    *"
 	    echo "* in this combination. Contact the author if this is *"
 	    echo "* not the case. At this rate you have no ability to  *"
-	    echo "* compile packages using C++11 in LArLight.          *"
+	    echo "* compile packages using C++11 in LArLite.           *"
 	    echo "*                                                    *"
 	    echo "* Help to install clang? See manual/contact author!  *"
 	    echo "*                                                    *"
@@ -96,6 +100,7 @@ else
     python $LARLITE_BASEDIR/config/python/gen_usermakefile.py
     python $LARLITE_BASEDIR/config/python/gen_topmakefile.py
     export LD_LIBRARY_PATH=$LARLITE_LIBDIR:$LD_LIBRARY_PATH
+    export PYTHONPATH=$LARLITE_BASEDIR/python:$PYTHONPATH
     if [ $LARLITE_OS = 'Darwin' ]; then
 	export DYLD_LIBRARY_PATH=$LARLITE_LIBDIR:$DYLD_LIBRARY_PATH
     fi
