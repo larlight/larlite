@@ -23,4 +23,8 @@ if test_import(): sys.exit(1)
 from test_vector import test_vector
 if test_vector(): sys.exit(1)
 
-
+#
+# Test DistanceAlgo
+#
+from test_distanceAlgo import test_dAlgo
+if test_dAlgo(): sys.exit(1)
