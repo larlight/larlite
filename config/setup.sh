@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# clean up previously set env
+me="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
+`python $me/python/clean_env.py LD_LIBRARY_PATH`
+`python $me/python/clean_env.py DYLD_LIBRARY_PATH`
+`python $me/python/clean_env.py PYTHONPATH`
+`python $me/python/clean_env.py PATH`
 if [[ -z $FORCE_LARLITE_BASEDIR ]]; then
     # If LARLITE_BASEDIR not set, try to guess
     # Find the location of this script:
@@ -9,6 +15,8 @@ if [[ -z $FORCE_LARLITE_BASEDIR ]]; then
 else
     export LARLITE_BASEDIR=$FORCE_LARLITE_BASEDIR
 fi
+unset me;
+
 echo "LARLITE_BASEDIR = $LARLITE_BASEDIR"
 if [[ -z $LARLITE_BASEDIR ]]; then
     echo \$LARLITE_BASEDIR not set! 
