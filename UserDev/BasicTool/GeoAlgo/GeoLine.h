@@ -124,6 +124,9 @@ namespace geoalgo {
 
   public:
 
+    DirectedLine() : Line()
+    {}
+
     /// Alternative ctor (1)
     DirectedLine(const double x, const double y, const double z,
 		 const double dirx, const double diry, const double dirz)

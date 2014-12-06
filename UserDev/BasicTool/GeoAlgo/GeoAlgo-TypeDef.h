@@ -22,7 +22,7 @@
 #include "TwoLineIntersection.h"
 #include "TrajectoryInVolume.h"
 #include "SegmentPoCA.h"
-#include "GeoAlgoMPLBackEnd.h"
+#include "GeoObjCollection.h"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -42,10 +42,10 @@ namespace geoalgo {
   class TwoLineIntersection;
   class TrajectoryInVolume;
   class SegmentPoca;
+  
+  class GeoObjCollection;
 }
-namespace mpl {
-  class GeoAlgoMPLBackEnd;
-}
+
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
 

@@ -13,12 +13,19 @@
 #pragma link C++ class geoalgo::Vector+;
 #pragma link C++ class std::vector<geoalgo::Vector>+;
 #pragma link C++ class std::vector<std::vector<geoalgo::Vector> >+;
+#pragma link C++ class std::map<geoalgo::Vector,string>+;
 #pragma link C++ class geoalgo::Trajectory+;
+#pragma link C++ class std::vector<geoalgo::Trajectory>+;
 #pragma link C++ class geoalgo::HalfLine+;
+#pragma link C++ class std::vector<geoalgo::HalfLine>+;
 #pragma link C++ class geoalgo::Line+;
+#pragma link C++ class std::vector<geoalgo::Line>+;
 #pragma link C++ class geoalgo::DirectedLine+;
+#pragma link C++ class std::vector<geoalgo::DirectedLine>+;
 #pragma link C++ class geoalgo::LineSegment+;
+#pragma link C++ class std::vector<geoalgo::LineSegment>+;
 #pragma link C++ class geoalgo::AABox+;
+#pragma link C++ class std::vector<geoalgo::AABox>+;
 #pragma link C++ class geoalgo::IntersectAlgo+;
 #pragma link C++ class geoalgo::DistanceAlgo+;
 
@@ -29,8 +36,7 @@
 #pragma link C++ class geoalgo::TrajectoryInVolume+;
 #pragma link C++ class geoalgo::SegmentPoCA+;
 
-#pragma link C++ namespace mpl+;
-#pragma link C++ class mpl::GeoAlgoMPLBackEnd+;
+#pragma link C++ class geoalgo::GeoObjCollection+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
