@@ -4,7 +4,7 @@ from random import *
 import numpy as np
 from ROOT import geoalgo
 
-_epsilon = 1E-6
+_epsilon = 1E-7
 
 def test_dAlgo():
 
