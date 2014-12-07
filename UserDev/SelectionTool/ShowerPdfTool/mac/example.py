@@ -9,6 +9,7 @@ if len(sys.argv) < 2:
 
 from ROOT import gSystem
 from ROOT import larlite as fmwk
+from ROOT import sptool
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
@@ -19,16 +20,11 @@ my_proc.add_input_file(sys.argv[1])
 # Specify IO mode
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
-# Specify input TDirectory name if given
-if len(sys.argv) > 2:
-
-    my_proc.set_input_rootdir(sys.argv[2])
-
 # Specify output root file name
-my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
+my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root")
 
 # Attach a template process
-my_proc.add_process(fmwk.sample_ana());
+my_proc.add_process(fmwk.SPTAnaBase())
 
 print
 print  "Finished configuring ana_processor. Start event loop!"

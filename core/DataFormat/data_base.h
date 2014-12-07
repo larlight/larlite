@@ -115,9 +115,9 @@ namespace larlite{
     /// data type getter
     data::DataType_t data_type() const {return _type; }
     /// producer's name
-    const std::string& name() { return _name; }
+    const std::string& name() const { return _name; }
     /// Product ID
-    ::larlite::product_id id() { return ::larlite::product_id(_type,_name); }
+    ::larlite::product_id id() const { return ::larlite::product_id(_type,_name); }
 
     //
     // Association adders

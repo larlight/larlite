@@ -5,7 +5,7 @@ import numpy as np
 from time import *
 from ROOT import geoalgo
 
-_epsilon = 1E-6
+_epsilon = 1E-7
 
 # colors
 OK = '\033[92m'

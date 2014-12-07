@@ -39,4 +39,26 @@ double EMShowerProfile::EnergyContainment(const double dist) const {
   return (1 - pow(2.71828,(dist*(-1)/rad_length_cm)));
 }
 
+double EMShowerProfile::OpeningAngle(const double energy) const {
+
+  //          /                ^ 
+  //         /                 |R
+  //        /)(1/2)*o_angle    |
+  //      <- - - - - - - - - - - - - - - 
+  //        \    <-- length -->
+  //         \
+  //          \
+
+  //(1/2)*opening angle = arctan(R/L)
+
+  return 2*atan(ShowerRadius()/Length(energy));
+  
+}
+
+double EMShowerProfile::ShowerRadius() const {
+
+  //Moleiere radius in LAr is 10.1cm, according to Wikipedia
+  return 10.1;
+
+}
 #endif
