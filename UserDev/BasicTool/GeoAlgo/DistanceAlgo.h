@@ -44,6 +44,23 @@ namespace geoalgo {
     virtual ~DistanceAlgo(){}
     
 
+    //************************************************
+    //CLOSEST APPROACH BETWEEN POINT AND INFINITE LINE
+    //************************************************
+    // min distance between point and infinite line
+    double SqDist(const Line_t& line, const Point_t& pt) const
+    { pt.compat(line.Pt1()); return _SqDist_(line,pt); }
+    // min distance between point and infinite line
+    double SqDist(const Point_t& pt, const Line_t& line) const
+    { return SqDist(line,pt); }
+    // closest point (on infinite line) from point
+    Point_t ClosestPt(const Line_t& line, const Point_t& pt) const
+    { pt.compat(line.Pt1()); return _ClosestPt_(pt,line); }
+    // closest point (on infinite line) from point
+    Point_t ClosestPt(const Point_t& pt, const Line_t& line) const
+    { return _ClosestPt_(pt,line); }
+
+
     //*******************************************
     //CLOSEST APPROACH BETWEEN TWO INFINITE LINES
     //*******************************************
@@ -188,10 +205,10 @@ namespace geoalgo {
     //CLOSEST APPROACH BETWEEN HALF LINE AND LINE SEGMENT
     //***************************************************
     // half-line and line-segment. keep track of closest approach points
-    double SqDist(const HalfLine_t& hline, const LineSegment_t& seg, Point_t L1, Point_t L2) const
+    double SqDist(const HalfLine_t& hline, const LineSegment_t& seg, Point_t& L1, Point_t& L2) const
     { hline.Start().compat(seg.Start()); return _SqDist_(hline, seg, L1, L2); }
     // half-line and line-segment. keep track of closest approach points
-    double SqDist(const LineSegment_t& seg, const HalfLine_t& hline, Point_t L1, Point_t L2) const
+    double SqDist(const LineSegment_t& seg, const HalfLine_t& hline, Point_t& L1, Point_t& L2) const
     { return SqDist(hline,seg, L2, L1); }  
     // half-line and line-segment. Do not keep track of closest approach points
     double SqDist(const HalfLine_t& hline, const LineSegment_t& seg) const
@@ -200,9 +217,9 @@ namespace geoalgo {
     double SqDist(const LineSegment_t& seg, const HalfLine_t& hline) const
     { return SqDist(hline,seg); }  
 
-    //***********************************************
-    //CLOSEST APPROACH BETWEEN POINT AXIS ALIGNED BOX
-    //***********************************************
+    //***************************************************
+    //CLOSEST APPROACH BETWEEN POINT AND AXIS ALIGNED BOX
+    //***************************************************
     /// Point & AABox distance
     double SqDist(const Point_t& pt, const AABox_t& box) const
     { pt.compat(box.Min()); return _SqDist_(pt,box); }
@@ -252,12 +269,22 @@ namespace geoalgo {
     /// Point & HalfLine distance w/o dimensionality check
     double _SqDist_(const HalfLine_t& line, const Point_t& pt) const
     { return _SqDist_(pt,line); }
-
     // Point & HalfLine closest point w/o dimensionality check
     Point_t _ClosestPt_(const Point_t& pt, const HalfLine_t& line) const;
     // Point & HalfLine closest point w/o dimensionality check
     Point_t _ClosestPt_(const HalfLine_t& line, const Point_t& pt) const
     { return _ClosestPt_(pt,line); }
+
+    // Point & InfLine closest point w/o dimensionality check
+    Point_t _ClosestPt_(const Line_t& line, const Point_t& pt) const;
+    // Point & InfLine closest point w/o dimensionality check
+    Point_t _ClosestPt_(const Point_t& pt, const Line_t& line) const
+    { return _ClosestPt_(line,pt); }
+    // Point & InfLine  distance w/o dimensionality check
+    double _SqDist_(const Line_t& line, const Point_t& pt) const;
+    // Point & InfLine  distance w/o dimensionality check
+    double _SqDist_(const Point_t& pt, const Line_t& line) const
+    { return _SqDist_(line,pt); }
 
     /// Point & AABox distance w/o dimensionality check
     double _SqDist_(const Point_t& pt, const AABox_t& box) const;

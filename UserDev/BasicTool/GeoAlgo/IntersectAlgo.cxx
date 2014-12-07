@@ -54,9 +54,8 @@ namespace geoalgo {
       if ( tmin > tmax ) return Point_t(3);
     }//for all dimensions of box
 
-    // tmin is the intersection as soon as we hit the first wall
-    // find point of intersection
-    return s + d*tmin;
+    // for inside point, tmax marks the intersection with the line going forward
+    return s + d*tmax;
   }
 
   // LineSegment sub-segment of HalfLine inside an AABox w/o checks
