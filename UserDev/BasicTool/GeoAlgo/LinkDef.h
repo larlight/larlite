@@ -29,13 +29,6 @@
 #pragma link C++ class geoalgo::IntersectAlgo+;
 #pragma link C++ class geoalgo::DistanceAlgo+;
 
-#pragma link C++ class geoalgo::DistToBoxWall+;
-#pragma link C++ class geoalgo::GeoAlgoException+;
-#pragma link C++ class geoalgo::PointToLineDist+;
-#pragma link C++ class geoalgo::TwoLineIntersection+;
-#pragma link C++ class geoalgo::TrajectoryInVolume+;
-#pragma link C++ class geoalgo::SegmentPoCA+;
-
 #pragma link C++ class geoalgo::GeoObjCollection+;
 //ADD_NEW_CLASS ... do not change this line
 

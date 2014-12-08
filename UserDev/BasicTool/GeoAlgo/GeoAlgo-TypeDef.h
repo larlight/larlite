@@ -17,12 +17,6 @@
 #include "IntersectAlgo.h"
 #include "DistanceAlgo.h"
 
-#include "DistToBoxWall.h"
-#include "PointToLineDist.h"
-#include "TwoLineIntersection.h"
-#include "TrajectoryInVolume.h"
-#include "SegmentPoCA.h"
-#include "GeoObjCollection.h"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -37,12 +31,6 @@ namespace geoalgo {
   class DistanceAlgo;
   class IntersectAlgo;
 
-  class DistToBoxWall;
-  class PointToLineDist;
-  class TwoLineIntersection;
-  class TrajectoryInVolume;
-  class SegmentPoca;
-  
   class GeoObjCollection;
 }
 
