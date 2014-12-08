@@ -208,6 +208,7 @@ namespace geoalgo {
   // Ref. RTCD Ch 5.1 p. 128-129
   Point_t DistanceAlgo::_ClosestPt_(const Point_t& pt, const LineSegment_t& line) const
   {
+    
     auto const& ab = line.Dir();
     // Project pt on line (ab), but deferring divide by ab * ab
     auto t = ((pt - line.Start()) * ab);

@@ -65,9 +65,8 @@ namespace geoalgo {
     /// push_back overrie w/ dimensionality check 
     void push_back(const Point_t& obj) {
       compat(obj); 
-      if(size() && obj == (*rbegin()))
-	throw GeoAlgoException("<<push_back>> Cannot add an identical point to a trajectory!");
-      std::vector<geoalgo::Point_t>::push_back(obj);
+      if (!(size() && obj == (*rbegin())))
+	std::vector<geoalgo::Point_t>::push_back(obj);
     }
 
     /// push_back template

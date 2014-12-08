@@ -14,10 +14,10 @@ namespace geoalgo {
     auto pToEnd   = point - segmentEnd;
 
     double e = pToStart * line;
-    double segLenSquared = line.Length();
-    if (e <= 0.) return pToStart.Length();
-    else if (e > segLenSquared) return pToEnd.Length();
-    else return pToStart.Length() - (e*e)/segLenSquared;
+    double segLenSquared = line.SqLength();
+    if (e <= 0.) return pToStart.SqLength();
+    else if (e > segLenSquared) return pToEnd.SqLength();
+    else return pToStart.SqLength() - (e*e)/segLenSquared;
     
   }
   

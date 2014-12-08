@@ -50,8 +50,8 @@ namespace geoalgo {
     Point_t dir2 = e2 - s2;
     Point_t r = s1 - s2;
 
-    double len1 = dir1.Length();
-    double len2 = dir2.Length();
+    double len1 = dir1.SqLength();
+    double len2 = dir2.SqLength();
     double f = dir2 * r;
 
     // Check if segments too short
@@ -61,7 +61,7 @@ namespace geoalgo {
       c1 = s1;
       c2 = s2;
       Point_t distVector = c2 - c1;
-      return distVector.Length();
+      return distVector.SqLength();
     }
     if (len1 < _epsilon){
       //first segment degenerates into a point
@@ -104,7 +104,7 @@ namespace geoalgo {
     c2 = s2 + dir2 * t2;
 
     Point_t distVector = c2 - c1;
-    return distVector.Length();
+    return distVector.SqLength();
     
   }
 
