@@ -38,19 +38,19 @@ def plotHalfLine(hline,col):
     xy.plot( linesegX, linesegY, 'o-', color=col)
 
 #plot TRAJECTORY
-def plotTrajectory(traj):
+def plotTrajectory(traj,col):
 
-    Xpoints = np.array([])
-    Ypoints = np.array([])
-    Zpoints = np.array([])
+    Xpoints = np.empty(traj.size())
+    Ypoints = np.empty(traj.size())
+    Zpoints = np.empty(traj.size())
 
     for x in range(traj.size()):
 
-        Xpoints = np.append(Xpoints, traj[x][0])
-        Ypoints = np.append(Ypoints, traj[x][1])
-        Zpoints = np.append(Zpoints, traj[x][2])
+        Xpoints[x] = traj[x][0]
+        Ypoints[x] = traj[x][1]
+        Zpoints[x] = traj[x][2]
 
-    xy.plot( Xpoints, Ypoints, 'o-', color='k')
+    xy.plot( Xpoints, Ypoints, 'o-', color=col)
 
 #plot AABox
 def plotAABox(box):
@@ -100,36 +100,33 @@ xy.set_title("XY Projection",fontsize=18)
 xy.set_xlabel("X Coordinate",fontsize=18)
 xy.set_ylabel("Y Coordinate",fontsize=18)
 
-t = ROOT.vector(ROOT.vector('double'))()
-p = ROOT.vector('double')()
-p.push_back(-4)
-p.push_back(-5)
-p.push_back(-6)
-t.push_back(p)
-p = ROOT.vector('double')()
-p.push_back(-2)
-p.push_back(-4)
-p.push_back(-6)
-t.push_back(p)
-p = ROOT.vector('double')()
-p.push_back(0)
-p.push_back(-1)
-p.push_back(-3)
-t.push_back(p)
+
+pt  = geoalgo.Vector(3)
+trj = geoalgo.Trajectory()
+
+for x in xrange(5):
+    pt[0] = 0.1+x/10.
+    pt[1] = 0.1+x/10.
+    pt[2] = 0.
+    trj += pt
 
 #distance algo
 dAlgo = geoalgo.DistanceAlgo()
 
-pt = geoalgo.Vector(0.3,0.3,0)
-hl = geoalgo.HalfLine(0.5,0.5,0,0,1,0)
-plotPoint(pt,'r')
-plotHalfLine(hl,'b')
-cl = dAlgo.ClosestPt(pt,hl)
-plotPoint(cl,'k')
-plotSegment(geoalgo.LineSegment(cl,pt),'r')
-print "Distance to Closest Point: {0}".format(cl.Dist(pt))
-print "Sqrt Algo Min Dist: {0}".format(np.sqrt(dAlgo.SqDist(pt,hl)))
+l = geoalgo.LineSegment(0.3,0.4,0,0.2,0.6,0)
 
+dist = dAlgo.SqDist(l,trj)
+
+l1 = geoalgo.Vector(3)
+l2 = geoalgo.Vector(3)
+dist = dAlgo.SqDist(l,trj,l1,l2)
+
+plotTrajectory(trj,'b')
+plotSegment(l,'k')
+plotSegment(geoalgo.LineSegment(l2,l1),'r')
+
+print "SqDist distance   : {0}".format(dist)
+print "ClosestPt distance: {0}".format(l2.SqDist(l1))
 plt.show()
 
 # done!

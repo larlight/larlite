@@ -33,6 +33,17 @@ namespace geoalgo {
     double f = d2*r;
 
     double d = a*e-b*b;
+
+    // if d==0 the lines are parallel
+    // return Pt1 (doesn't matter) for line 1
+    // distance is distance between Pt1 of 1 line & second line
+    if (d == 0){
+      L1 = l1.Pt1();
+      L2 = _ClosestPt_(l1.Pt1(),l2);
+      return L1._SqDist_(L2);
+    }
+      
+	
     
     double s = (b*f-c*e)/d;
     double t = (a*f-b*c)/d;
@@ -73,6 +84,17 @@ namespace geoalgo {
     double f = d2*r;
 
     double d = a*e-b*b;
+
+    // Need to make sure d != 0
+    if ( d==0 ){
+      // lines are parallel
+      // check closest distance from one start point
+      // to other line. Order indifferent
+      // Choose l1 to have cloest point be Start point
+      L1 = l1.Start();
+      L2 = _ClosestPt_(L1,l2);
+      return L1._SqDist_(L2);
+    }
     
     double s = (b*f-c*e)/d;
     double t = (a*f-b*c)/d;
@@ -107,7 +129,7 @@ namespace geoalgo {
 
     //Same as for _SqDist_ with infinite line but check whether s & t go out of bounds (i.e. negative)
 
-    auto const& d1 = hline.Dir();
+    auto const  d1 = hline.Dir();
     auto const  d2 = seg.End()-seg.Start();
     auto const   r = hline.Start()-seg.Start();
 
@@ -119,26 +141,55 @@ namespace geoalgo {
 
     double d = a*e-b*b;
     
+    // if parallel then d == 0
+    if (d == 0){
+      // distance is smallest quantity between:
+      // - distance from segment start to line
+      // - distance from segment end to line
+      double sDist = _SqDist_(seg.Start(),hline);
+      double eDist = _SqDist_(seg.End(),hline);
+      if ( sDist <= eDist ) {
+	// get closest point on line
+	L1 = _ClosestPt_(seg.Start(),hline);
+	L2 = seg.Start();
+	return sDist;
+      }
+      else{
+	L1 = _ClosestPt_(seg.End(),hline);
+	L2 = seg.End();
+	return eDist;
+      }
+    }// if parallel
+
     double s = (b*f-c*e)/d;
-    double t = (a*f-b*c)/d;
 
-    // if s is < 0 out of bounds for half-line
-    if (s < 0) s = 0;
-    // if t is < 0 or > 1, out of bounds for segment
-    if (t < 0) t = 0;
-    if (t > 1) t = 1;
 
-    // s & t represent the paramteric points on the lines
-    // for the closest approach point
-    // now find the Point_t object at those locations
+    // now check if parameters are out of bounds
+    if ( s < 0 ){
+      s = 0; // closest point on half-line is start
+      // re-evaluate closest point on segment using line start point
+      L1 = hline.Start();
+      L2 = _ClosestPt_(L1,seg);
+      return L1._SqDist_(L2);
+    }
     
-    L1 = hline.Start() + hline.Dir()*s;
+    // if closest point is not beyond half-line
+    // it could be due to an intersection between half-line
+    // and segment projection.
+    // check value of t
+    double t = (a*f-b*c)/d;      
+    // if t > 0 && < 1 then the two lines intersect. We are good!
+    if ( (t < 1) and (t > 0) ){
+      L1 = hline.Start() + hline.Dir()*s;
+      L2 = seg.Start() + (seg.End()-seg.Start())*t;
+      return L1._SqDist_(L2);
+    }
+    // if out of bounds clamp
+    // then re-evaluate closest point on line
+    t = _Clamp_(t,0,1);
     L2 = seg.Start() + (seg.End()-seg.Start())*t;
-
-    // find distance between these points
-    double dist = L1._SqDist_(L2);
-
-    return dist;
+    L1 = _ClosestPt_(L2,hline);
+    return L1._SqDist_(L2);
   }
 
   // Ref. RTCD Ch 5.1 p. 130
@@ -184,6 +235,7 @@ namespace geoalgo {
     return (ac.SqLength() - e * e / f);
   }
 
+
   // Ref. RTCD Ch 5.1 p. 128-129
   Point_t DistanceAlgo::_ClosestPt_(const Point_t& pt, const HalfLine_t& line) const
   {
@@ -195,6 +247,28 @@ namespace geoalgo {
       return (line.Start() + ab * (t/denom));
     }
   }
+
+  // Point & Infinite Line min Distance
+  double DistanceAlgo::_SqDist_(const Line_t& line, const Point_t& pt) const
+  {
+    auto const  ab = line.Pt2()-line.Pt1();
+    auto const  ac = pt - line.Pt1();
+    auto const  bc = ac - ab;
+
+    auto e = ac * ab;
+    auto f = ab.SqLength();
+    return (ac.SqLength() - e * e / f);
+  }
+
+  // Point & Infinite Line Closest Point
+  Point_t DistanceAlgo::_ClosestPt_(const Line_t& line, const Point_t& pt) const
+  {
+    auto const& ab = line.Pt2()-line.Pt1();
+    auto t = (pt - line.Pt1()) * ab;
+    auto denom = ab.Length();
+    return (line.Pt1() + ab * (t/denom));
+  }
+
 
   // Ref. RTCD Ch 5.1 p. 131-132 ... modified to consider distance to the box's wall
   double DistanceAlgo::_SqDist_(const Point_t& pt, const AABox_t& box) const
@@ -223,9 +297,14 @@ namespace geoalgo {
       dist = ( dist < dist_to_xy ? dist : dist_to_xy );
       dist *= dist;
 
-    }else{
+    }
+    
+    else{
       // This refers to Ref. RTCD 5.1.3.1
+      // re-set distance
+      dist = 0;
       for(size_t i=0; i<pt.size(); ++i) {
+
 	auto const& v_pt  = pt[i];
 	auto const& v_max = box.Max()[i];
 	auto const& v_min = box.Min()[i];
@@ -438,7 +517,7 @@ namespace geoalgo {
     return minDist;
   }
 
-  // Ref. RTCD Sec. 5.1.9
+  // Ref. RTCD Sec. 5.1.9 - pg. 148-150
   double DistanceAlgo::_SqDist_(const LineSegment_t& seg1, const LineSegment_t& seg2,
 				Point_t& c1, Point_t& c2) const
   {
@@ -452,7 +531,7 @@ namespace geoalgo {
 
     auto d1 = e1 - s1;
     auto d2 = e2 - s2;
-    auto    r = s1 - s2;
+    auto r  = s1 - s2;
 
     double a = d1.SqLength();
     double e = d2.SqLength();
@@ -465,7 +544,7 @@ namespace geoalgo {
       c1 = s1;
       c2 = s2;
       Vector_t distVector = c2 - c1;
-      return distVector.Length();
+      return distVector.SqLength();
     }
     if (a <= 0){
       //first segment degenerates into a point
@@ -482,7 +561,6 @@ namespace geoalgo {
       }
       else{
 	// the general case...no degeneracies
-	std::cout << "general case!" << std::endl;
 	double b = d1 * d2;
 	double denom = (a*e)-(b*b);
 	
@@ -509,7 +587,7 @@ namespace geoalgo {
     c2 = s2 + d2 * t2;
     
     Vector_t distVector = c2 - c1;
-    return distVector.Length();
+    return distVector.SqLength();
     
   }
 
