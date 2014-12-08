@@ -2,7 +2,8 @@
 #define SELECTIONTOOL_SPTENV_H
 
 #include <string>
-
+#include <climits>
+#include <limits>
 namespace sptool {
 
   /// Default parameter set storage file name
