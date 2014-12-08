@@ -16,8 +16,8 @@
 
 #include <set>
 #include <TObject.h>
-#include "GeoHalfLine.h"
-#include "GeoTrajectory.h"
+#include "GeoAlgo/GeoHalfLine.h"
+#include "GeoAlgo/GeoTrajectory.h"
 #include "SPTEnv.h"
 #include "SPAException.h"
 namespace sptool {
