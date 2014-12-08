@@ -1,5 +1,5 @@
 
-export USER_MODULE="RecoTool"
+export USER_MODULE="BasicTool RecoTool"
 # Find the location of this script:
 me="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Find the directory one above.
