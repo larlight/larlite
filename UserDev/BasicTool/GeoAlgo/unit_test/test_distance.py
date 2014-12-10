@@ -15,20 +15,20 @@ ENDC = '\033[0m'
 
 def test_dAlgo():
 
-    print
-    print BLUE + "Precision Being Required to Consider Two numbers Equal: {0:.2e}".format(_epsilon) + ENDC
-    print
+    debug()
+    debug(BLUE + "Precision Being Required to Consider Two numbers Equal: {0:.2e}".format(_epsilon) + ENDC)
+    debug()
 
     # number of times to test each function
     tests = 10000
 
     # import Distance Algo
-    dAlgo = geoalgo.geoAlgo()
+    dAlgo = geoalgo.GeoAlgo()
     
     try:
 
         # test distance from point to infinite line
-        debug('Testing Point & Infinite Line Distance')
+        info('Testing Point & Infinite Line Distance')
         totSuccess = 0
         sqdistT = 0
         closestT = 0
@@ -67,14 +67,14 @@ def test_dAlgo():
                 if not ( np.abs(p1[x]-pAnswer2[x]) < _epsilon) : success = 0
             totSuccess += success
         if ( float(totSuccess)/tests < 1):
-            print NO + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC
+            info(NO + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
         else:
-            print OK + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC
-        print "Time for SqDist                       : {0:.3f} us".format(1E6*sqdistT/tests)
-        print "Time for ClosestPt                    : {0:.3f} us".format(1E6*closestT/tests)
+            info(OK + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
+        info("Time for SqDist                       : {0:.3f} us".format(1E6*sqdistT/tests))
+        info("Time for ClosestPt                    : {0:.3f} us".format(1E6*closestT/tests))
 
         # test distance from point to segment
-        debug('Testing Point & LineSegment Distance')
+        info('Testing Point & LineSegment Distance')
         totSuccess = 0
         sqdistT_out = 0.
         closestT_out = 0.
@@ -162,13 +162,13 @@ def test_dAlgo():
                 
             if (success == 1) : totSuccess += 1
         if ( float(totSuccess)/tests < 1):
-            print NO + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC
+            info(NO + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
         else:
-            print OK + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC
-        print "Time for SqDist (Pt Out of Segment)   : {0:.3f} us".format(1E6*sqdistT_out/tests)
-        print "Time for ClosestPt (Pt Out of Segment): {0:.3f} us".format(1E6*closestT_out/tests)
-        print "Time for SqDist (Pt In Segment)       : {0:.3f} us".format(1E6*sqdistT_in/tests)
-        print "Time for ClosestPt (Pt In Segment)    : {0:.3f} us".format(1E6*closestT_in/tests)
+            info(OK + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
+        info("Time for SqDist (Pt Out of Segment)   : {0:.3f} us".format(1E6*sqdistT_out/tests))
+        info("Time for ClosestPt (Pt Out of Segment): {0:.3f} us".format(1E6*closestT_out/tests))
+        info("Time for SqDist (Pt In Segment)       : {0:.3f} us".format(1E6*sqdistT_in/tests))
+        info("Time for ClosestPt (Pt In Segment)    : {0:.3f} us".format(1E6*closestT_in/tests))
             
         # test Point to HalfLine distance
         debug('Testing Point & HalfLine Distance')
@@ -243,13 +243,13 @@ def test_dAlgo():
 
             if (success == 1) : totSuccess += 1
         if ( float(totSuccess)/tests < 1):
-            print NO + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC
+            info(NO + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
         else:
-            print OK + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC
-        print "Time for SqDist (Pt Out of Segment)   : {0:.3f} us".format(1E6*sqdistT_out/tests)
-        print "Time for ClosestPt (Pt Out of Segment): {0:.3f} us".format(1E6*closestT_out/tests)
-        print "Time for SqDist (Pt In Segment)       : {0:.3f} us".format(1E6*sqdistT_in/tests)
-        print "Time for ClosestPt (Pt In Segment)    : {0:.3f} us".format(1E6*closestT_in/tests)
+            info(OK + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
+        info("Time for SqDist (Pt Out of Segment)   : {0:.3f} us".format(1E6*sqdistT_out/tests))
+        info("Time for ClosestPt (Pt Out of Segment): {0:.3f} us".format(1E6*closestT_out/tests))
+        info("Time for SqDist (Pt In Segment)       : {0:.3f} us".format(1E6*sqdistT_in/tests))
+        info("Time for ClosestPt (Pt In Segment)    : {0:.3f} us".format(1E6*closestT_in/tests))
 
         # test Distance between two Infinite Lines
         debug('Testing Inf Line & Inf Line Distance')
@@ -299,10 +299,10 @@ def test_dAlgo():
 
             if (success == 1) : totSuccess += 1
         if ( float(totSuccess)/tests < 1):
-            print NO + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC
+            info(NO + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
         else:
-            print OK + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC
-        print "Time for SqDist                       : {0:.3f} us".format(1E6*sqdistT/tests)
+            info(OK + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
+        info("Time for SqDist                       : {0:.3f} us".format(1E6*sqdistT/tests))
 
         # test Distance between two Half-Infinite Lines
         debug('Testing Half-Inf Line & Half-Inf Line Distance')
@@ -366,11 +366,11 @@ def test_dAlgo():
 
             if (success == 1) : totSuccess += 1
         if ( float(totSuccess)/tests < 1):
-            print NO + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC
+            info(NO + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
         else:
-            print OK + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC
-        print "Time for SqDist (OUT)                 : {0:.3f} us".format(1E6*sqdistT_out/timesOUT)
-        print "Time for SqDist (IN)                  : {0:.3f} us".format(1E6*sqdistT_in/timesIN)
+            info(OK + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
+        info("Time for SqDist (OUT)                 : {0:.3f} us".format(1E6*sqdistT_out/timesOUT))
+        info("Time for SqDist (IN)                  : {0:.3f} us".format(1E6*sqdistT_in/timesIN))
 
 
         # test Distance between Half-Line and Line Segment
@@ -481,25 +481,25 @@ def test_dAlgo():
             if (success4 == 1) : totSuccess4 += 1
 
         if ( float(totSuccess1)/tests < 1):
-            print NO + "Success: {0}%".format(100*float(totSuccess1)/tests) + ENDC
+            info(NO + "Success: {0}%".format(100*float(totSuccess1)/tests) + ENDC)
         else:
-            print OK + "Success: {0}%".format(100*float(totSuccess1)/tests) + ENDC
-        print "Time for SqDist (Case 1)              : {0:.3f} us".format(1E6*sqdistT1/tests)
+            info(OK + "Success: {0}%".format(100*float(totSuccess1)/tests) + ENDC)
+        info("Time for SqDist (Case 1)              : {0:.3f} us".format(1E6*sqdistT1/tests))
         if ( float(totSuccess2)/tests < 1):
-            print NO + "Success: {0}%".format(100*float(totSuccess2)/tests) + ENDC
+            info(NO + "Success: {0}%".format(100*float(totSuccess2)/tests) + ENDC)
         else:
-            print OK + "Success: {0}%".format(100*float(totSuccess2)/tests) + ENDC
-        print "Time for SqDist (Case 2)              : {0:.3f} us".format(1E6*sqdistT2/tests)
+            info(OK + "Success: {0}%".format(100*float(totSuccess2)/tests) + ENDC)
+        info("Time for SqDist (Case 2)              : {0:.3f} us".format(1E6*sqdistT2/tests))
         if ( float(totSuccess3)/tests < 1):
-            print NO + "Success: {0}%".format(100*float(totSuccess3)/tests) + ENDC
+            info(NO + "Success: {0}%".format(100*float(totSuccess3)/tests) + ENDC)
         else:
-            print OK + "Success: {0}%".format(100*float(totSuccess3)/tests) + ENDC
-        print "Time for SqDist (Case 3)              : {0:.3f} us".format(1E6*sqdistT3/tests)
+            info(OK + "Success: {0}%".format(100*float(totSuccess3)/tests) + ENDC)
+        info("Time for SqDist (Case 3)              : {0:.3f} us".format(1E6*sqdistT3/tests))
         if ( float(totSuccess4)/tests < 1):
-            print NO + "Success: {0}%".format(100*float(totSuccess4)/tests) + ENDC
+            info(NO + "Success: {0}%".format(100*float(totSuccess4)/tests) + ENDC)
         else:
-            print OK + "Success: {0}%".format(100*float(totSuccess4)/tests) + ENDC
-        print "Time for SqDist (Case 4)              : {0:.3f} us".format(1E6*sqdistT4/tests)
+            info(OK + "Success: {0}%".format(100*float(totSuccess4)/tests) + ENDC)
+        info("Time for SqDist (Case 4)              : {0:.3f} us".format(1E6*sqdistT4/tests))
 
         # test Distance between Half-Line and Line Segment
         debug('Testing Line Segment & Line Segment Distance')
@@ -613,25 +613,25 @@ def test_dAlgo():
             if (success4 == 1) : totSuccess4 += 1
 
         if ( float(totSuccess1)/tests < 1):
-            print NO + "Success: {0}%".format(100*float(totSuccess1)/tests) + ENDC
+            info(NO + "Success: {0}%".format(100*float(totSuccess1)/tests) + ENDC)
         else:
-            print OK + "Success: {0}%".format(100*float(totSuccess1)/tests) + ENDC
-        print "Time for SqDist (Case 1)              : {0:.3f} us".format(1E6*sqdistT1/tests)
+            info(OK + "Success: {0}%".format(100*float(totSuccess1)/tests) + ENDC)
+        info("Time for SqDist (Case 1)              : {0:.3f} us".format(1E6*sqdistT1/tests))
         if ( float(totSuccess2)/tests < 1):
-            print NO + "Success: {0}%".format(100*float(totSuccess2)/tests) + ENDC
+            info(NO + "Success: {0}%".format(100*float(totSuccess2)/tests) + ENDC)
         else:
-            print OK + "Success: {0}%".format(100*float(totSuccess2)/tests) + ENDC
-        print "Time for SqDist (Case 2)              : {0:.3f} us".format(1E6*sqdistT2/tests)
+            info(OK + "Success: {0}%".format(100*float(totSuccess2)/tests) + ENDC)
+        info("Time for SqDist (Case 2)              : {0:.3f} us".format(1E6*sqdistT2/tests))
         if ( float(totSuccess3)/tests < 1):
-            print NO + "Success: {0}%".format(100*float(totSuccess3)/tests) + ENDC
+            info(NO + "Success: {0}%".format(100*float(totSuccess3)/tests) + ENDC)
         else:
-            print OK + "Success: {0}%".format(100*float(totSuccess3)/tests) + ENDC
-        print "Time for SqDist (Case 3)              : {0:.3f} us".format(1E6*sqdistT3/tests)
+            info(OK + "Success: {0}%".format(100*float(totSuccess3)/tests) + ENDC)
+        info("Time for SqDist (Case 3)              : {0:.3f} us".format(1E6*sqdistT3/tests))
         if ( float(totSuccess4)/tests < 1):
-            print NO + "Success: {0}%".format(100*float(totSuccess4)/float(tests)) + ENDC
+            info(NO + "Success: {0}%".format(100*float(totSuccess4)/float(tests)) + ENDC)
         else:
-            print OK + "Success: {0}%".format(100*float(totSuccess4)/float(tests)) + ENDC
-        print "Time for SqDist (Case 4)              : {0:.3f} us".format(1E6*sqdistT4/tests)
+            info(OK + "Success: {0}%".format(100*float(totSuccess4)/float(tests)) + ENDC)
+        info("Time for SqDist (Case 4)              : {0:.3f} us".format(1E6*sqdistT4/tests))
 
 
         # test Distance between Point and AABox
@@ -747,32 +747,31 @@ def test_dAlgo():
             pt1 = dAlgo.ClosestPt(b,p)
             closestT2 += (time()-tim)
             pt2 = dAlgo.ClosestPt(p,b)
-            #print "Point: [{0}, {1}, {2}]".format(p[0],p[1],p[2])
-            #print "Expected: {0}. Got: {1}".format(answer,a1)
-            #print "Expected: {0}. Got: {1}".format(answer,a2)
+            #info("Point: [{0}, {1}, {2}]".format(p[0],p[1],p[2]))
+            #info("Expected: {0}. Got: {1}".format(answer,a1))
+            #info("Expected: {0}. Got: {1}".format(answer,a2))
             if not (np.abs(answer-a1) < _epsilon): success2 = 0
             if not (np.abs(answer-a2) < _epsilon): success2 = 0
             for x in xrange(3):
-                #print "\tExpected: {0}. Got: {1}".format(p[x],pt1[x])
-                #print "\tExpected: {0}. Got: {1}".format(p[x],pt2[x])
+                #info("\tExpected: {0}. Got: {1}".format(p[x],pt1[x]))
+                #info("\tExpected: {0}. Got: {1}".format(p[x],pt2[x]))
                 if not (pt1[x]-pMin[x] < _epsilon) : success2 = 0
                 if not (pt2[x]-pMin[x] < _epsilon) : success2 = 0
-            #print "Success: {0}".format(success2)
-            #print
+            #info("Success: {0}".format(success2))
             if (success2 == 1) : totSuccess2 += 1
 
         if ( float(totSuccess1)/tests < 1):
-            print NO + "Success: {0}%".format(100*float(totSuccess1)/tests) + ENDC
+            info(NO + "Success: {0}%".format(100*float(totSuccess1)/tests) + ENDC)
         else:
-            print OK + "Success: {0}%".format(100*float(totSuccess1)/tests) + ENDC
-        print "Time for SqDist (Case 1)              : {0:.3f} us".format(1E6*sqdistT1/tests)
-        print "Time for ClosestPt (Case 1)           : {0:.3f} us".format(1E6*closestT1/tests)
+            info(OK + "Success: {0}%".format(100*float(totSuccess1)/tests) + ENDC)
+        info("Time for SqDist (Case 1)              : {0:.3f} us".format(1E6*sqdistT1/tests))
+        info("Time for ClosestPt (Case 1)           : {0:.3f} us".format(1E6*closestT1/tests))
         if ( float(totSuccess2)/tests < 1):
-            print NO + "Success: {0}%".format(100*float(totSuccess2)/tests) + ENDC
+            info(NO + "Success: {0}%".format(100*float(totSuccess2)/tests) + ENDC)
         else:
-            print OK + "Success: {0}%".format(100*float(totSuccess2)/tests) + ENDC
-        print "Time for SqDist (Case 2)              : {0:.3f} us".format(1E6*sqdistT2/tests)
-        print "Time for ClosestPt (Case 2)           : {0:.3f} us".format(1E6*closestT2/tests)
+            info(OK + "Success: {0}%".format(100*float(totSuccess2)/tests) + ENDC)
+        info("Time for SqDist (Case 2)              : {0:.3f} us".format(1E6*sqdistT2/tests))
+        info("Time for ClosestPt (Case 2)           : {0:.3f} us".format(1E6*closestT2/tests))
             
     except Exception:
         error('geoalgo::DistanceAlgo unit test failed.')

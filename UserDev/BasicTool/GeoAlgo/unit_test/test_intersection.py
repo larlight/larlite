@@ -15,9 +15,9 @@ ENDC = '\033[0m'
 
 def test_dAlgo():
 
-    print
-    print BLUE + "Precision Being Required to Consider Two numbers Equal: {0:.2e}".format(_epsilon) + ENDC
-    print
+    debug()
+    debug(BLUE + "Precision Being Required to Consider Two numbers Equal: {0:.2e}".format(_epsilon) + ENDC)
+    debug()
 
     # number of times to test each function
     tests = 10000
@@ -28,7 +28,7 @@ def test_dAlgo():
     try:
 
         # test distance to and back from wall
-        debug('Testing Intersection Between Half-Line & AABox')
+        info('Testing Intersection Between Half-Line & AABox')
         totSuccess_f = 0
         intersectT_f = 0
         totSuccess_b = 0
@@ -69,10 +69,14 @@ def test_dAlgo():
             # answer should be distance between p & i
             # point should be i
             answer = i.SqDist(p)
+            pt1 = geoalgo.Vector(3)
+            pt2 = geoalgo.Vector(3)
             tim = time()
-            pt1 = iAlgo.Intersection(box,lin)
+            pt1_v = iAlgo.Intersection(box,lin)
             intersectT_f += (time()-tim)
-            pt2 = iAlgo.Intersection(lin,box)
+            pt2_v = iAlgo.Intersection(lin,box)
+            if pt1_v.size(): pt1 = pt1_v[0]
+            if pt2_v.size(): pt2 = pt2_v[0]
             a1 = pt1.SqDist(p)
             a2 = pt2.SqDist(p)
             if not ( np.abs(answer-a1) < _epsilon ) : success_f = 0
@@ -85,10 +89,14 @@ def test_dAlgo():
             # make line go in opposite direction -> intersection point should be the same
             d = p-i
             lin = geoalgo.HalfLine(p,d)
+            pt1 = geoalgo.Vector(3)
+            pt2 = geoalgo.Vector(3)
             tim = time()
-            pt1 = iAlgo.Intersection(box,lin,1)
+            pt1_v = iAlgo.Intersection(box,lin,1)
             intersectT_b += (time()-tim)
-            pt2 = iAlgo.Intersection(lin,box,1)
+            pt2_v = iAlgo.Intersection(lin,box,1)
+            if pt1_v.size(): pt1 = pt1_v[0]
+            if pt2_v.size(): pt2 = pt2_v[0]
             a1 = pt1.SqDist(p)
             a2 = pt2.SqDist(p)
             if not ( np.abs(answer-a1) < _epsilon ) : success_b = 0
@@ -99,15 +107,15 @@ def test_dAlgo():
             if (success_b == 1) : totSuccess_b += 1
 
         if ( float(totSuccess_f)/tests < 1):
-            print NO + "Success: {0}%".format(100*float(totSuccess_f)/tests) + ENDC
+            info(NO + "Success: {0}%".format(100*float(totSuccess_f)/tests) + ENDC)
         else:
-            print OK + "Success: {0}%".format(100*float(totSuccess_f)/tests) + ENDC
-        print "Time for Intersection                    : {0:.3f} us".format(1E6*intersectT_f/tests)
+            info(OK + "Success: {0}%".format(100*float(totSuccess_f)/tests) + ENDC)
+        info("Time for Intersection                    : {0:.3f} us".format(1E6*intersectT_f/tests))
         if ( float(totSuccess_b)/tests < 1):
-            print NO + "Success: {0}%".format(100*float(totSuccess_b)/tests) + ENDC
+            info(NO + "Success: {0}%".format(100*float(totSuccess_b)/tests) + ENDC)
         else:
-            print OK + "Success: {0}%".format(100*float(totSuccess_b)/tests) + ENDC
-        print "Time for Intersection                    : {0:.3f} us".format(1E6*intersectT_b/tests)
+            info(OK + "Success: {0}%".format(100*float(totSuccess_b)/tests) + ENDC)
+        info("Time for Intersection                    : {0:.3f} us".format(1E6*intersectT_b/tests))
 
 
     except Exception:
@@ -119,5 +127,7 @@ def test_dAlgo():
     return 0
 
 if __name__ == '__main__':
+    import test_msg
+    test_msg.test_msg.level = 0
     test_dAlgo()
 
