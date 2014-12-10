@@ -49,15 +49,21 @@ namespace sptool {
     
     /// Default destructor
     virtual ~SPAlgoBase(){}
-
+    
+    /// Function to initialise PDF variables
+    void Init();
+    
     /// Function to evaluate input showers and determine a score
     virtual float Select(const SPAData &data) = 0;
 
     /// Provide data sample for fitting
     virtual void Fill(const SPAData &data) = 0;
-
-    /// Evaluate parameters
-    virtual void Fit(TFile* fout=nullptr) = 0;
+    
+    /// Iteration functions
+    void ProcessBegin();
+    void ProcessEnd();
+    void EventBegin();
+    void EventEnd();
 
     /// # of showers to operate on
     size_t _nshowers;

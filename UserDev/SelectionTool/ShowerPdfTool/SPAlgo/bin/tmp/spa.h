@@ -39,9 +39,6 @@ namespace sptool {
     /// Provide data sample for fitting
     virtual void Fill(const SPAData &data);
 
-    /// Evaluate parameters
-    virtual void Fit(TFile* fout=nullptr);
-
   };
 }
 #endif

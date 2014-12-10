@@ -35,19 +35,25 @@ namespace sptool {
     virtual ~SPAlgoGammaSelection(){};
     
     /// Function to initialise RooFit variables
-    void Init(double xmin, double xmax, double lmin, double lmax);
+    void Init();
+    
+    /// Functions to set active mode
+    void SetElectronMode(){ _name = "PDF_electron"; xmin = 0; xmax = 100; lmin = -0.1; lmax = -0.01; };
+    void SetGammaMode(){ _name = "PDF_gamma"; xmin = 0; xmax = 0.1; lmin = -100; lmax = -10; };
 
     /// Function to evaluate input showers and determine a score
     virtual float Select(const SPAData &data);
 
     /// Provide data sample for fitting
     virtual void Fill(const SPAData &data);
-
-    /// Evaluate parameters
-    virtual void Fit(TFile* fout=nullptr);
     
   protected:
     
+    std::string _name;
+    double xmin = 0;
+    double xmax = 0;
+    double lmin = 0;
+    double lmax = 0;
     ShowerPdfFactory* _factory;
     RooRealVars_t _vars;
     RooExponential _pdf;
