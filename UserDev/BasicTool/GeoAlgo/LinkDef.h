@@ -26,9 +26,8 @@
 #pragma link C++ class std::vector<geoalgo::LineSegment>+;
 #pragma link C++ class geoalgo::AABox+;
 #pragma link C++ class std::vector<geoalgo::AABox>+;
-#pragma link C++ class geoalgo::IntersectAlgo+;
-#pragma link C++ class geoalgo::DistanceAlgo+;
 
+#pragma link C++ class geoalgo::GeoAlgo+;
 #pragma link C++ class geoalgo::GeoObjCollection+;
 //ADD_NEW_CLASS ... do not change this line
 

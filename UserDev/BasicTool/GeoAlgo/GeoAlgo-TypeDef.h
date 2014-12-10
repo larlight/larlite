@@ -14,8 +14,7 @@
 #include "GeoLine.h"
 #include "GeoLineSegment.h"
 #include "GeoAABox.h"
-#include "IntersectAlgo.h"
-#include "DistanceAlgo.h"
+#include "GeoAlgo.h"
 
 //ADD_NEW_HEADER ... do not change this comment line
 
@@ -28,8 +27,7 @@ namespace geoalgo {
   class Line;
   class LineSegment;
   class AABox;
-  class DistanceAlgo;
-  class IntersectAlgo;
+  class GeoAlgo;
 
   class GeoObjCollection;
 }

@@ -1,9 +1,9 @@
 /**
- * \file DistanceAlgo.h
+ * \file GeoAlgo.h
  *
  * \ingroup GeoAlgo
  * 
- * \brief Class def header for a class DistanceAlgo
+ * \brief Class def header for a class GeoAlgo
  *
  * @author kazuhiro
  */
@@ -11,8 +11,8 @@
 /** \addtogroup GeoAlgo
 
     @{*/
-#ifndef BASICTOOL_DISTANCEALGO_H
-#define BASICTOOL_DISTANCEALGO_H
+#ifndef BASICTOOL_GEOALGO_H
+#define BASICTOOL_GEOALGO_H
 
 #include "GeoLine.h"
 #include "GeoHalfLine.h"
@@ -22,27 +22,57 @@
 
 namespace geoalgo {
 
-  class PointToLineDist;
-
   /**
-     \class DistanceAlgo
-     @brief Algorithm to compute the distance and closest-point-of-approach among geometrical objects.
-     Most functions are taken from the reference Real-Time-Collision-Detection (RTCD):
+     \class GeoAlgo
+     @brief Algorithm to compute various geometrical relation among geometrical objects.
+     In particular functions to inspect following relations are implemented: \n
+     0) Distance between geometrical objects \n
+     1) Closest point of approach            \n
+     2) Intersection points                  \n
+     3) Containment/Overlap of objects       \n
 
+     Most functions are taken from the reference Real-Time-Collision-Detection (RTCD):
      Ref: http://realtimecollisiondetection.net
   */
-  class DistanceAlgo{
-
-    friend class PointToLineDist;
+  class GeoAlgo{
     
   public:
     
     /// Default constructor
-    DistanceAlgo(){}
+    GeoAlgo(){}
     
     /// Default destructor
-    virtual ~DistanceAlgo(){}
-    
+    virtual ~GeoAlgo(){}
+
+    //
+    // Intersections
+    //
+
+    /// Intersection between a HalfLine and an AABox
+    Point_t Intersection(const AABox_t& box, const HalfLine_t& line, bool back=false) const;
+    /// Intersection between a HalfLine and an AABox
+    Point_t Intersection(const HalfLine_t& line, const AABox_t& box, bool back=false) const
+    { return Intersection(box, line, back); }
+
+    /// Intersection between Trajectory and an AABox
+    std::vector<Point_t> Intersection(const AABox_t& box, const Trajectory_t& trj) const;
+    /// Intersection between Trajectory and an AABox
+    std::vector<Point_t> Intersection(const Trajectory_t& trj, const AABox_t& box) const
+    { return Intersection(box,trj); }
+
+    /// LineSegment sub-segment of HalfLine inside an AABox
+    LineSegment_t BoxOverlap(const AABox_t& box, const HalfLine_t& line) const;
+    /// LineSegment sub-segment of HalfLine inside an AABox
+    LineSegment_t BoxOverlap(const HalfLine_t& line, const AABox_t& box) const
+    { return BoxOverlap(box, line); }
+
+
+    /// Get Trajectory inside box given some input trajectory -> now assumes trajectory cannot exit and re-enter box
+    Trajectory_t BoxOverlap(const AABox_t& box, const Trajectory_t& trj) const;
+    /// Get Trajectory inside box given some input trajectory -> now assumes trajectory cannot exit and re-enter box
+    Trajectory_t BoxOverlap(const Trajectory_t& trj, const AABox_t& box) const
+    { return BoxOverlap(box, trj); }
+        
 
     //************************************************
     //CLOSEST APPROACH BETWEEN POINT AND INFINITE LINE
@@ -300,6 +330,10 @@ namespace geoalgo {
 
     /// Clamp function: checks if value out of bounds
     double _Clamp_(const double n, const double min, const double max) const;
+
+    /// Swap two points if min & max are inverted
+    inline void _Swap_(double& tmin, double& tmax) const
+    { if(tmin > tmax) std::swap(tmin,tmax); }
 
   };
 }
