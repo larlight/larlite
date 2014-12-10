@@ -40,13 +40,13 @@ class GeoViewer:
         Gray = c[0] * 0.3 + c[1] * 0.59 + c[2] * 0.11
         return c
 
-    def add(self,arg):
-        self._holder.Add(arg)
+    def add(self,arg,label=''):
+        self._holder.Add(arg,label)
 
-    def _add_point(self,arg,c=''):
+    def _add_point(self,arg,c='black'):
         data = self._converter.Convert(arg)
         if not c: c = self.rand_color()
-        self._ax.scatter(*data,color=c,marker='o')
+        self._ax.scatter(*data,color=c,marker='*',s=100)
 
     def _add_label(self,args):
         #data = self._converter.Convert(arg)
@@ -95,6 +95,7 @@ class GeoViewer:
 
         # Process GeoObj
         for x in self._holder.Point():
+            print x[0],x[1],x[2]
             self._add_point(x)
         for x in self._holder.LineSegment():
             self._add_linesegment(x)
