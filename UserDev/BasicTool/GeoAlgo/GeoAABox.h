@@ -86,7 +86,7 @@ namespace geoalgo {
 		(pt[2] < _min[2] || _max[2] < pt[2])    // point is outside Z boundaries
 		);
     }
-
+    
   protected:
 
     /// Minimum point

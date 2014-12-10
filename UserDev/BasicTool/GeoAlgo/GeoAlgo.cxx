@@ -19,7 +19,6 @@ namespace geoalgo {
       return Point_t(3);
 
     // Calculate intersection point w.r.t. all boundaries
-
     double tmin = 0;
     double tmax = kINVALID_DOUBLE;
 
@@ -65,26 +64,86 @@ namespace geoalgo {
     std::vector<Point_t> result;
     if(trj.size() < 2) return result;
 
-    /*
     auto const& min_pt = box.Min();
     auto const& max_pt = box.Max();
+
+    static std::vector<Point_t> min_plane_n;
+    static std::vector<Point_t> max_plane_n;
+    if(!min_plane_n.size()) {
+      min_plane_n.reserve(3);
+      min_plane_n.push_back(Vector_t(-1,0,0));
+      min_plane_n.push_back(Vector_t(0,-1,0));
+      min_plane_n.push_back(Vector_t(0,0,-1));
+      max_plane_n.reserve(3);
+      max_plane_n.push_back(Vector_t(1,0,0));
+      max_plane_n.push_back(Vector_t(0,1,0));
+      max_plane_n.push_back(Vector_t(0,0,1));
+    }
 
     bool inside=false;
     for(size_t i=0; i<trj.size(); ++i) {
       auto const& pt_b = trj[i];
       if(!i) inside = box.Contain(pt_b);
-      else{
-	if(inside != box.Contain(pt_b)) {
-	  auto const& pt_a = trj[i-1];
-	  // There's a boundary between last and this point
-	  auto  ab = pt_b - pt_a;
-	  double t = (
-
-	  inside = box.Contain(pt_b);
+      else if(inside != box.Contain(pt_b)) {
+	
+	inside = box.Contain(pt_b);
+	if(!_SqDist_(box,pt_b)) {
+	  result.push_back(pt_b);
+	  continue;
 	}
-      }      
+	auto const& pt_a = trj[i-1];
+	auto  ab = pt_b - pt_a;
+	ab.Normalize();
+	bool on_surface=false;
+	/*
+	  There's a boundary between last and this point Inspect 6 surface planes. 
+	  Use min_pt w/ 3 unit vectors (-1,0,0) (0,-1,0) (0,0,-1) and max_pt w/
+	  3 unit vectors (+1,0,0) (0,+1,0), (0,0,+1)
+	*/
+	// min_pt + 3 planes
+	for(size_t axis=0; axis<3; ++axis) {
+	  auto const& n = min_plane_n[axis];
+	  double s = (-1.) * ( n * (pt_a - min_pt) ) / (n * ab);
+	  if(1<s || s<0) continue;
+	  ab *= s;
+	  ab += pt_a;
+	  on_surface=true;
+	  for(size_t sur_axis=0; sur_axis<3; ++sur_axis) {
+	    if(sur_axis==axis) continue;
+	    if(ab[sur_axis] < min_pt[sur_axis] || max_pt[sur_axis] < ab[sur_axis]) {
+	      on_surface=false;
+	      break;
+	    }
+	  }
+	  if(on_surface) {
+	    result.push_back(ab);
+	    break;
+	  }
+	}
+	if(on_surface) continue;
+
+	// max_pt + 3 planes
+	for(size_t axis=0; axis<3; ++axis) {
+	  auto const& n = max_plane_n[axis];
+	  double s = (-1.) * ( n * (pt_a - max_pt) ) / (n * ab);
+	  if(1<s || s<0) continue;
+	  ab *= s;
+	  ab += pt_a;
+	  on_surface=true;
+	  for(size_t sur_axis=0; sur_axis<3; ++sur_axis) {
+	    if(sur_axis==axis) continue;
+	    if(ab[sur_axis] < min_pt[sur_axis] || max_pt[sur_axis] < ab[sur_axis]) {
+	      on_surface=false;
+	      break;
+	    }
+	  }
+	  if(on_surface) {
+	    result.push_back(ab);
+	    break;
+	  }
+	}
+      }
     }
-    */
     return result;
   }
 
