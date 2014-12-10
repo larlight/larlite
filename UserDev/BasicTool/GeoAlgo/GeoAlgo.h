@@ -49,10 +49,16 @@ namespace geoalgo {
     //
 
     /// Intersection between a HalfLine and an AABox
-    Point_t Intersection(const AABox_t& box, const HalfLine_t& line, bool back=false) const;
+    std::vector<Point_t> Intersection(const AABox_t& box, const HalfLine_t& line, bool back=false) const;
     /// Intersection between a HalfLine and an AABox
-    Point_t Intersection(const HalfLine_t& line, const AABox_t& box, bool back=false) const
+    std::vector<Point_t> Intersection(const HalfLine_t& line, const AABox_t& box, bool back=false) const
     { return Intersection(box, line, back); }
+
+    /// Intersection between LineSegment and an AABox
+    std::vector<Point_t> Intersection(const AABox_t& box, const LineSegment_t& l) const;
+    /// Intersection between LineSegment and an AABox
+    std::vector<Point_t> Intersection(const LineSegment_t& l, const AABox_t& box) const
+    { return Intersection(box,l); }
 
     /// Intersection between Trajectory and an AABox
     std::vector<Point_t> Intersection(const AABox_t& box, const Trajectory_t& trj) const;

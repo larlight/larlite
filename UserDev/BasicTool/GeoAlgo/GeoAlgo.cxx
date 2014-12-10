@@ -5,68 +5,17 @@
 
 namespace geoalgo {
 
-  Point_t GeoAlgo::Intersection(const AABox_t& box, const HalfLine_t& line, bool back) const
-  {
-
-    auto l = line;
-    // if back == true then we need to invert the line's direction
-    // this way we get distance to back of wall
-    if (back)
-      l.Dir(l.Dir() * -1);
-
-    // If line start point is outside either 0 or 2 intersections
-    if ( !box.Contain(l.Start()) )
-      return Point_t(3);
-
-    // Calculate intersection point w.r.t. all boundaries
-    double tmin = 0;
-    double tmax = kINVALID_DOUBLE;
-
-    // Get line start point & direction
-    auto const& s = l.Start();
-    auto const& d = l.Dir();
-
-    // Get Box Min & Max boundaries
-    auto const& Min = box.Min();
-    auto const& Max = box.Max();
-    
-    // for all boundaries
-    for (size_t n=0; n < box.Min().size(); n++){
-
-      //if the direction of the line is // to box
-      if ( d[n] == 0 ){
-	// line is parallel -> no hit if point outside of box
-	if ( (s[n] < Min[n]) or (s[n] > Max[n]) )
-	  return Point_t(3);
-      }
-      // compute t-value with near & far end of box
-      double ood = 1. / d[n];
-      double t1 = (Min[n]-s[n]) * ood;
-      double t2 = (Max[n]-s[n]) * ood;
-      // t1 should be closest plane (or plane in back)
-      // swap t1 & t2 if t1 > t2
-      _Swap_(t1, t2);
-      // compute the intersection of of slab-interesection intervals
-      if ( t1 > tmin ) tmin = t1;
-      if ( t2 < tmax ) tmax = t2;
-      // Exit with no intersection if slab intersection becomes empty
-      if ( tmin > tmax ) return Point_t(3);
-    }//for all dimensions of box
-
-    // for inside point, tmax marks the intersection with the line going forward
-    return s + d*tmax;
-  }
-
+  // Ref. RTCD 5.3.2 p. 177
+  // Intersection of a HalfLine w/ AABox
   std::vector<Point_t> GeoAlgo::Intersection(const AABox_t& box, 
-						   const Trajectory_t& trj) const
+					     const HalfLine_t& line, 
+					     bool back) const
   {
-
+    // Result container
     std::vector<Point_t> result;
-    if(trj.size() < 2) return result;
-
-    auto const& min_pt = box.Min();
-    auto const& max_pt = box.Max();
-
+    Point_t xs1(3); // Only 2 points max possible 
+    Point_t xs2(3); // Create in advance for early termination checks
+    // One-time only initialization for unit vectors
     static std::vector<Point_t> min_plane_n;
     static std::vector<Point_t> max_plane_n;
     if(!min_plane_n.size()) {
@@ -79,70 +28,136 @@ namespace geoalgo {
       max_plane_n.push_back(Vector_t(0,1,0));
       max_plane_n.push_back(Vector_t(0,0,1));
     }
-
-    bool inside=false;
-    for(size_t i=0; i<trj.size(); ++i) {
-      auto const& pt_b = trj[i];
-      if(!i) inside = box.Contain(pt_b);
-      else if(inside != box.Contain(pt_b)) {
-	
-	inside = box.Contain(pt_b);
-	if(!_SqDist_(box,pt_b)) {
-	  result.push_back(pt_b);
-	  continue;
-	}
-	auto const& pt_a = trj[i-1];
-	auto  ab = pt_b - pt_a;
-	ab.Normalize();
-	bool on_surface=false;
-	/*
-	  There's a boundary between last and this point Inspect 6 surface planes. 
-	  Use min_pt w/ 3 unit vectors (-1,0,0) (0,-1,0) (0,0,-1) and max_pt w/
-	  3 unit vectors (+1,0,0) (0,+1,0), (0,0,+1)
-	*/
-	// min_pt + 3 planes
-	for(size_t axis=0; axis<3; ++axis) {
-	  auto const& n = min_plane_n[axis];
-	  double s = (-1.) * ( n * (pt_a - min_pt) ) / (n * ab);
-	  if(1<s || s<0) continue;
-	  ab *= s;
-	  ab += pt_a;
-	  on_surface=true;
-	  for(size_t sur_axis=0; sur_axis<3; ++sur_axis) {
-	    if(sur_axis==axis) continue;
-	    if(ab[sur_axis] < min_pt[sur_axis] || max_pt[sur_axis] < ab[sur_axis]) {
-	      on_surface=false;
-	      break;
-	    }
-	  }
-	  if(on_surface) {
-	    result.push_back(ab);
-	    break;
-	  }
-	}
-	if(on_surface) continue;
-
-	// max_pt + 3 planes
-	for(size_t axis=0; axis<3; ++axis) {
-	  auto const& n = max_plane_n[axis];
-	  double s = (-1.) * ( n * (pt_a - max_pt) ) / (n * ab);
-	  if(1<s || s<0) continue;
-	  ab *= s;
-	  ab += pt_a;
-	  on_surface=true;
-	  for(size_t sur_axis=0; sur_axis<3; ++sur_axis) {
-	    if(sur_axis==axis) continue;
-	    if(ab[sur_axis] < min_pt[sur_axis] || max_pt[sur_axis] < ab[sur_axis]) {
-	      on_surface=false;
-	      break;
-	    }
-	  }
-	  if(on_surface) {
-	    result.push_back(ab);
-	    break;
-	  }
+    // min/max points of the AABox
+    auto const& min_pt = box.Min();
+    auto const& max_pt = box.Max();    
+    // start/dir of the line
+    auto const& start = line.Start();
+    auto        dir   = line.Dir();
+    if(back) dir *= -1;
+    // Inspect the case of parallel line
+    for(size_t i=0; i<min_pt.size(); ++i) {
+      if ( dir[i] == 0 &&
+	   (start[i] <= min_pt[i] ||  max_pt[i] <= start[i]) ) 
+	return result;
+    }
+    // Look for xs w/ 3 planes
+    for(size_t i=0; i<3; ++i) {
+      auto const& normal = min_plane_n[i];
+      double s = (-1.) * ( normal * (start - min_pt) ) / (normal * dir);
+      if(s<0) continue;
+      auto xs = start + dir * s;
+      // Check if the found point is within the surface area of other 2 axis
+      bool on_surface=true;
+      for(size_t sur_axis=0; sur_axis<3; ++sur_axis) {
+	if(sur_axis==i) continue;
+	if(xs[sur_axis] < min_pt[sur_axis] || max_pt[sur_axis] < xs[sur_axis]) {
+	  on_surface=false;
+	  break;
 	}
       }
+      if(on_surface) {
+	// Directly assign to xs1 instead of making a copy
+	if(!(xs1.IsValid())) for(size_t j=0; j<3; ++j) xs1[j]=xs[j];
+	else {
+	  // If xs2 is filled, no more point to search. Exit.
+	  for(size_t j=0; j<3; ++j) xs2[j]=xs[j];
+	  break;
+	}
+      }
+    }
+    // If xs2 is filled, simply return the result. Order the output via distance
+    if(xs2.IsValid()) {
+      result.reserve(2);
+      if(xs1._SqDist_(start) > xs2._SqDist_(start)) std::swap(xs1,xs2);
+      result.push_back(xs1);
+      result.push_back(xs2);
+      return result;
+    }
+    // Look for xs w/ 3 planes
+    for(size_t i=0; i<3; ++i) {
+      auto const& normal = max_plane_n[i];
+      double s = (-1.) * ( normal * (start - max_pt) ) / (normal * dir);
+      if(s<0) continue;
+      auto xs = start + dir * s;
+      bool on_surface=true;
+      for(size_t sur_axis=0; sur_axis<3; ++sur_axis) {
+	if(sur_axis==i) continue;
+	if(xs[sur_axis] < min_pt[sur_axis] || max_pt[sur_axis] < xs[sur_axis]) {
+	  on_surface=false;
+	  break;
+	}
+      }
+      if(on_surface) {
+	if(!(xs1.IsValid())) for(size_t j=0; j<3; ++j) xs1[j]=xs[j];
+	else {
+	  for(size_t j=0; j<3; ++j) xs2[j]=xs[j];
+	  break;
+	}
+      }
+    }
+    if(!xs1.IsValid()) return result;
+    if(xs2.IsValid()) {
+      result.reserve(2);
+      if(xs1._SqDist_(start) > xs2._SqDist_(start)) std::swap(xs1,xs2);
+      result.push_back(xs1);
+      result.push_back(xs2);
+      return result;
+    }
+    result.push_back(xs1);
+    return result;
+  }
+
+  // AABox_t & LineSegment_t intersection search. Make a use of AABox_t & HalfLine_t function
+  std::vector<Point_t> GeoAlgo::Intersection(const AABox_t& box, 
+					     const LineSegment_t& line) const
+  {
+    auto const& st = line.Start();
+    auto const& ed = line.End();
+    // Create a static HalfLine_t for this algorithm
+    static HalfLine_t hline(st,ed-st);
+    hline.Start(st[0],st[1],st[2]);
+    hline.Dir(ed[0]-st[0],ed[1]-st[1],ed[2]-st[2]);
+
+    auto hline_result = Intersection(box,hline);
+
+    if(!hline_result.size()) return hline_result;
+
+    // For non-empty result, only keep ones that is within the line length
+    std::vector<Point_t> result;
+    auto length = st._SqDist_(ed);
+    for(auto const& pt : hline_result)
+      if(st._SqDist_(pt) < length) result.push_back(pt);
+    return result;
+  }
+
+  // AABox_t & Trajectory_t intersection search. Make a use of AABox_t & HalfLine_t function
+  std::vector<Point_t> GeoAlgo::Intersection(const AABox_t& box, 
+					     const Trajectory_t& trj) const
+  {
+    
+    std::vector<Point_t> result;
+    if(trj.size() < 2) return result; // If only 1 point, return
+    // Check compat
+    trj.compat(box.Min());
+    // Call the onetime-only HalfLine constructor
+    static HalfLine_t hline(trj[0],trj[1]);
+    for(size_t i=0; i<trj.size()-1; ++i) {
+
+      auto const& st = trj[i];
+      auto const& ed = trj[i+1];
+      hline.Start(st[0],st[1],st[2]);
+      hline.Dir(ed[0]-st[0],ed[1]-st[1],ed[2]-st[2]);
+
+      auto hline_result = Intersection(box,hline);
+
+      if(!hline_result.size()) continue;
+      
+      // Check if the length makes sense 
+      auto length = st._SqDist_(ed);
+      for(auto const& pt : hline_result)
+	if(st._SqDist_(pt) < length) result.push_back(pt);
+
     }
     return result;
   }
@@ -150,17 +165,15 @@ namespace geoalgo {
   // LineSegment sub-segment of HalfLine inside an AABox w/o checks
   LineSegment_t GeoAlgo::BoxOverlap(const AABox_t& box, const HalfLine_t& line) const
   {
-
     // First find interection point of half-line and box
-    Point_t intersection = Intersection(box, line);
+    auto xs_v = Intersection(box, line);
+    if(xs_v.size()==2) return LineSegment_t(xs_v[0],xs_v[1]);
 
     // Build a new LineSegment
-    LineSegment_t x;
-    // if intersection point is valid over-write line segment
-    if ( intersection.IsValid() )
-      x = LineSegment(line.Start(), intersection);
+    if(!(xs_v.size())) return LineSegment_t();
 
-    return x;
+    // Only other possiblity is # = 1
+    return LineSegment_t(line.Start(),xs_v[0]);
   }
 
   /// Get Trajectory inside box given some input trajectory -> now assumes trajectory cannot exit and re-enter box
@@ -172,7 +185,6 @@ namespace geoalgo {
       return trj;
 
     return trj;
-
   }
 
   // Ref. RTCD 5.1.8 p. 146
