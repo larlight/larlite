@@ -22,6 +22,7 @@
 #include <RooAddPdf.h>
 #include <RooAbsPdf.h>
 #include <RooAbsData.h>
+#include <RooDataSet.h>
 #include "SPAException.h"
 #include "SPTEnv.h"
 namespace sptool {
