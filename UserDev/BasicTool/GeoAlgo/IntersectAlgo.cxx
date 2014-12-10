@@ -58,6 +58,36 @@ namespace geoalgo {
     return s + d*tmax;
   }
 
+  std::vector<Point_t> IntersectAlgo::Intersection(const AABox_t& box, 
+						   const Trajectory_t& trj) const
+  {
+
+    std::vector<Point_t> result;
+    if(trj.size() < 2) return result;
+
+    /*
+    auto const& min_pt = box.Min();
+    auto const& max_pt = box.Max();
+
+    bool inside=false;
+    for(size_t i=0; i<trj.size(); ++i) {
+      auto const& pt_b = trj[i];
+      if(!i) inside = box.Contain(pt_b);
+      else{
+	if(inside != box.Contain(pt_b)) {
+	  auto const& pt_a = trj[i-1];
+	  // There's a boundary between last and this point
+	  auto  ab = pt_b - pt_a;
+	  double t = (
+
+	  inside = box.Contain(pt_b);
+	}
+      }      
+    }
+    */
+    return result;
+  }
+
   // LineSegment sub-segment of HalfLine inside an AABox w/o checks
   LineSegment_t IntersectAlgo::BoxOverlap(const AABox_t& box, const HalfLine_t& line) const
   {
