@@ -39,8 +39,6 @@ namespace larlite {
   bool SPAnaGammaSelection::finalize() {
     
     auto status = SPTAnaBase::finalize();
-
-    _algo->Fit(_fout);
   
     return status;
   }

@@ -11,14 +11,15 @@ namespace sptool {
     _nshowers = 1;
   }
 
-  void SPAlgoGammaSelection::Init(double xmin, double xmax, double lmin, double lmax)
+  void SPAlgoGammaSelection::Init()
   {
     _factory = new ShowerPdfFactory();
+    
     _vars.reserve(2);
-    _vars.push_back(RooRealVar("_RadLenx","Distance [cm]",xmin,xmax));
-    _vars.push_back(RooRealVar("_RadLenl","Radiation length [cm]",lmin,lmax));
+    _vars.push_back(RooRealVar("_x","Distance [cm]",xmin,xmax));
+    _vars.push_back(RooRealVar("_l","Radiation length [cm]",lmin,lmax));
     _pdf = _factory->RadLenPdf(_vars);
-    _data = new RooDataSet("_data","RooFit distance data set",RooArgSet(_vars[0]));
+    _data = new RooDataSet(_name.c_str(),"RooFit distance data set",RooArgSet(_vars[0]));
   }
   
   float SPAlgoGammaSelection::Select(const SPAData &data)
@@ -35,9 +36,6 @@ namespace sptool {
       _data->fill();
     }
   }
-
-  void SPAlgoGammaSelection::Fit(TFile* fout)
-  {}
 
 }
 

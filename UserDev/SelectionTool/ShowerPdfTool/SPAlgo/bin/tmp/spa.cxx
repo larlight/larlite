@@ -17,9 +17,6 @@ namespace sptool {
   void SPAlgo_Class_Name::Fill(const SPAData &data)
   {}
 
-  void SPAlgo_Class_Name::Fit(TFile* fout)
-  {}
-
 }
 
 #endif

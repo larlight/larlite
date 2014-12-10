@@ -43,8 +43,6 @@ namespace larlite {
 
   bool ExampleSPFit::finalize() {
 
-    _algo->Fit(_fout);
-
     return true;
   }
 
