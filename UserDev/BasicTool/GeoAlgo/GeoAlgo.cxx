@@ -56,7 +56,7 @@ namespace geoalgo {
 	  break;
 	}
       }
-      if(on_surface) {
+      if(on_surface && xs != xs1) {
 	// Directly assign to xs1 instead of making a copy
 	if(!(xs1.IsValid())) for(size_t j=0; j<3; ++j) xs1[j]=xs[j];
 	else {
@@ -88,7 +88,7 @@ namespace geoalgo {
 	  break;
 	}
       }
-      if(on_surface) {
+      if(on_surface && xs != xs1) {
 	if(!(xs1.IsValid())) for(size_t j=0; j<3; ++j) xs1[j]=xs[j];
 	else {
 	  for(size_t j=0; j<3; ++j) xs2[j]=xs[j];
