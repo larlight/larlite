@@ -23,7 +23,7 @@ def test_dAlgo():
     tests = 10000
 
     # import Distance Algo
-    iAlgo = geoalgo.IntersectAlgo()
+    iAlgo = geoalgo.GeoAlgo()
     
     try:
 
