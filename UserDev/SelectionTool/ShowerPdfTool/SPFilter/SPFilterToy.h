@@ -36,6 +36,9 @@ namespace sptool {
     /// Select function
     virtual SPAOrder Select (const SPAData &data);
 
+    /// Fill function
+    virtual void Fill(const SPAData &data) {}
+
   };
 }
 #endif

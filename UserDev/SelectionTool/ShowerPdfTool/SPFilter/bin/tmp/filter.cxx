@@ -13,6 +13,9 @@ namespace sptool {
   SPAOrder Filter_Class_Name::Select(const SPAData &data)
   { return SPAOrder(); }
 
+  virtual void Filter_Class_Name::Fill(const SPAData& data)
+  {}
+
 }
 
 #endif
