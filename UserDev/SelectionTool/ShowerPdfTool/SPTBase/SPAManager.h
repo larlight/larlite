@@ -25,8 +25,6 @@
 
 namespace sptool {
 
-  typedef std::vector<size_t> SPMatch_t;
-
   /**
      \class SPAManager
      @brief Management tool for running SPAlgoX (sptool::SPAlgoBase children) and SPFilterX (sptool::SPFilterBase children)
@@ -60,7 +58,15 @@ namespace sptool {
 
   */
   class SPAManager{
-    
+
+  public:
+    enum SPAManagerStatus_t {
+      kIDLE,       ///< status after creation/reset before initialize
+      kINIT,       ///< status after initialize before processing
+      kPROCESSING, ///< status after 1st processing before finalize
+      kFINISHED    ///< status after finalize before reset
+    };
+
   public:
     
     /// Default constructor
@@ -76,9 +82,24 @@ namespace sptool {
     void SetFilter(SPFilterBase* f) { _filter = f; }
 
     /// Process input data
-    std::vector<std::pair<float,sptool::SPMatch_t> > Process(const SPAData& data);
+    SPArticleSet Process(const SPAData& data,
+			 bool select=true);
+
+    /// Function to be called before Process()
+    void Initialize();
+
+    /// Function to be called after Process()
+    void Finalize(TFile* fout=nullptr);
+
+    /// Function to reset things
+    void Reset();
+
+    /// Status getter
+    SPAManagerStatus_t Status() const { return _status; }
 
   protected:
+
+    SPAManagerStatus_t _status;
 
     SPAlgoBase* _algo;
 

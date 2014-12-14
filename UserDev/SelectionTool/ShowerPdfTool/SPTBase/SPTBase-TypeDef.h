@@ -5,8 +5,10 @@
 #include "SPAManager.h"
 #include "SPTBase.h"
 #include "SPAData.h"
+#include "SPArticle.h"
 #include "SPAHelper.h"
 #include "ShowerPdfFactory.h"
+#include "SPABookKeeper.h"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -14,9 +16,12 @@ namespace sptool {
   class ShowerPdfFactory;
   class SPTBase;
   class SPAShower;
+  class SPATrack;
   class SPAData;
+  class SPArticle;
   class SPAManager;
   class SPAHelper;
+  class SPABookKeeper;
 }
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
@@ -39,6 +44,7 @@ namespace sptool {
     If you have a question about specific SPAlgoX or PDF in ShowerPdfFactory, contact Jeremy Hewes and David Caratelli.
 
  */
+
 
 
 

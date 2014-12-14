@@ -49,7 +49,25 @@ namespace sptool {
 
     /// Select function
     virtual SPAOrder Select (const SPAData &data) = 0;
-    
+
+    /// Function to fill data sample
+    virtual void Fill(const SPAData &data) = 0;
+
+    /// Function to reset itself
+    virtual void Reset() = 0;
+
+    /// Called @ before processing the first event sample
+    virtual void ProcessBegin(){}
+
+    /// Called @ beginning of each event
+    virtual void EventBegin(){}
+
+    /// Called @ end of each event
+    virtual void EventEnd(){}
+
+    /// Called after processing the last event sample
+    virtual void ProcessEnd(TFile* fout=nullptr){}
+
   };
 }
 

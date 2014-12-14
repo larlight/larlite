@@ -14,6 +14,7 @@
 #ifndef SELECTIONTOOL_SPADATA_H
 #define SELECTIONTOOL_SPADATA_H
 
+#include <map>
 #include <set>
 #include <TObject.h>
 #include "GeoAlgo/GeoHalfLine.h"
@@ -21,6 +22,8 @@
 #include "SPTEnv.h"
 #include "SPAException.h"
 namespace sptool {
+
+  typedef std::vector<size_t> SPAComb_t;
 
   /**
      \class SPAShower
@@ -99,6 +102,7 @@ namespace sptool {
     /// Cosmic score
     double _cosmogenic;
 
+    ClassDef(SPATrack,1)
   };
 
   /**
@@ -152,10 +156,16 @@ namespace sptool {
     /// Candidate event vertecies
     std::vector<geoalgo::Point_t>  _vtxs;
 
+    /// Filter out tracks/showers/vtxs based on the SPAOrder
     void ApplyOrder(const SPAOrder& order);
+
+    /// Utility to make a combination of m-elements from the full set of n-elements
+    std::vector<sptool::SPAComb_t> Combination(const size_t n, 
+					       const size_t m) const;
 
     ClassDef(SPAData,1)
   };
+
 }
 #endif
 /** @} */ // end of doxygen group 

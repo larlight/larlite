@@ -17,13 +17,19 @@
 
 #pragma link C++ class sptool::SPTBase+;
 #pragma link C++ class sptool::SPAShower+;
+#pragma link C++ class sptool::SPATrack+;
 #pragma link C++ class sptool::SPAData+;
+#pragma link C++ class sptool::SPArticle+;
+#pragma link C++ class sptool::SPABookKeeper+;
+
 #pragma link C++ class sptool::SPAHelper+;
 #pragma link C++ class sptool::SPAManager+;
 #pragma link C++ class sptool::ShowerPdfFactory+;
+
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 
 
 
