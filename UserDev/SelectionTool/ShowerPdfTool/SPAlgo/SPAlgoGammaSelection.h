@@ -32,17 +32,18 @@ namespace sptool {
     SPAlgoGammaSelection();
 
     /// Default destructor
-    virtual ~SPAlgoGammaSelection(){};
+    virtual ~SPAlgoGammaSelection(){}
     
     /// Function to initialise RooFit variables
-    void Init();
-    
+    virtual void Reset();
+
     /// Functions to set active mode
-    void SetElectronMode(){ _name = "PDF_electron"; xmin = 0; xmax = 100; lmin = -0.1; lmax = -0.01; };
-    void SetGammaMode(){ _name = "PDF_gamma"; xmin = 0; xmax = 0.1; lmin = -100; lmax = -10; };
+    void SetElectronMode(){ _name = "PDF_electron"; xmin = 0; xmax = 100; lmin = -0.1; lmax = -0.01; }
+
+    void SetGammaMode(){ _name = "PDF_gamma"; xmin = 0; xmax = 0.1; lmin = -100; lmax = -10; }
 
     /// Function to evaluate input showers and determine a score
-    virtual float Select(const SPAData &data);
+    virtual SPArticleSet Select(const SPAData &data);
 
     /// Provide data sample for fitting
     virtual void Fill(const SPAData &data);

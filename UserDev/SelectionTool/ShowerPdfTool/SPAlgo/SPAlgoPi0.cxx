@@ -8,16 +8,12 @@ namespace sptool {
   SPAlgoPi0::SPAlgoPi0() : SPAlgoBase()
   {
     _name     = "SPAlgoPi0";
-    _nshowers = 1;
   }
 
-  float SPAlgoPi0::Select(const SPAData &data)
-  { return 1.0; }
+  SPArticleSet SPAlgoPi0::Select(const SPAData &data)
+  { return SPArticleSet(); }
 
   void SPAlgoPi0::Fill(const SPAData &data)
-  {}
-
-  void SPAlgoPi0::Fit(TFile* fout)
   {}
 
 }

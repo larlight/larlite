@@ -34,7 +34,7 @@ namespace sptool {
     virtual ~SPAlgo_Class_Name(){};
 
     /// Function to evaluate input showers and determine a score
-    virtual float Select(const SPAData &data);
+    virtual SPArticleSet Select(const SPAData &data);
 
     /// Provide data sample for fitting
     virtual void Fill(const SPAData &data);

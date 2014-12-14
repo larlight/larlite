@@ -8,11 +8,10 @@ namespace sptool {
   SPAlgo_Class_Name::SPAlgo_Class_Name() : SPAlgoBase()
   {
     _name     = "SPAlgo_Class_Name";
-    _nshowers = 1;
   }
 
-  float SPAlgo_Class_Name::Select(const SPAData &data)
-  { return 1.0; }
+  SPArticleSet SPAlgo_Class_Name::Select(const SPAData &data)
+  { return SPArticleSet(); }
 
   void SPAlgo_Class_Name::Fill(const SPAData &data)
   {}

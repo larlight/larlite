@@ -5,26 +5,31 @@
 
 namespace sptool {
 
-  SPAlgoGammaSelection::SPAlgoGammaSelection() : SPAlgoBase()
+  SPAlgoGammaSelection::SPAlgoGammaSelection() 
+    : SPAlgoBase()
+    , _factory(nullptr)
+    , _data(nullptr)
   {
     _name     = "SPAlgoGammaSelection";
-    _nshowers = 1;
+    SetGammaMode();
+    Reset();
   }
 
-  void SPAlgoGammaSelection::Init()
+  void SPAlgoGammaSelection::Reset()
   {
+    if(_factory) delete _factory;
     _factory = new ShowerPdfFactory();
-    
     _vars.reserve(2);
     _vars.push_back(RooRealVar("_x","Distance [cm]",xmin,xmax));
     _vars.push_back(RooRealVar("_l","Radiation length [cm]",lmin,lmax));
     _pdf = _factory->RadLenPdf(_vars);
+    if(_data) delete _data;
     _data = new RooDataSet(_name.c_str(),"RooFit distance data set",RooArgSet(_vars[0]));
   }
   
-  float SPAlgoGammaSelection::Select(const SPAData &data)
+  SPArticleSet SPAlgoGammaSelection::Select(const SPAData &data)
   {
-    
+    return SPArticleSet();
   }
 
   void SPAlgoGammaSelection::Fill(const SPAData &data)

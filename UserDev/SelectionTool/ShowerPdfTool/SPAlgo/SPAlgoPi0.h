@@ -34,13 +34,10 @@ namespace sptool {
     virtual ~SPAlgoPi0(){};
 
     /// Function to evaluate input showers and determine a score
-    virtual float Select(const SPAData &data);
+    virtual SPArticleSet Select(const SPAData &data);
 
-    /// Provide data sample for fitting
+    /// Function to fill data sample
     virtual void Fill(const SPAData &data);
-
-    /// Evaluate parameters
-    virtual void Fit(TFile* fout=nullptr);
 
   };
 }
