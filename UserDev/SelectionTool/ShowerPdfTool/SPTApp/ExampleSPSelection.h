@@ -51,6 +51,9 @@ namespace larlite {
     /// Selection manager class instance
     ::sptool::SPAManager _mgr;
 
+    /// Boolean to select whether select (true) or fit (false) mode
+    bool _mode;
+
   };
 }
 #endif

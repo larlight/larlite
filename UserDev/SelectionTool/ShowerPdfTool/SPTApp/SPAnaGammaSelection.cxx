@@ -19,7 +19,7 @@ namespace larlite {
       return false;
     }
     
-    _algo->Init();
+    _algo->Reset();
     
     return status;
   }
