@@ -33,6 +33,9 @@ namespace sptool {
     /// Default destructor
     virtual ~SPAlgo_Class_Name(){};
 
+    /// Reset function
+    virtual void Reset();
+
     /// Function to evaluate input showers and determine a score
     virtual SPArticleSet Select(const SPAData &data);
 

@@ -10,6 +10,9 @@ namespace sptool {
     _name     = "SPAlgo_Class_Name";
   }
 
+  void SPAlgo_Class_Name::Reset()
+  {}
+
   SPArticleSet SPAlgo_Class_Name::Select(const SPAData &data)
   { return SPArticleSet(); }
 
