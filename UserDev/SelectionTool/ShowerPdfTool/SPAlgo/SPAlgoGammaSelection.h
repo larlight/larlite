@@ -17,7 +17,8 @@
 
 #include "SPTBase/SPAlgoBase.h"
 #include "SPTBase/ShowerPdfFactory.h"
-
+#include <RooPlot.h>
+#include <TCanvas.h>
 namespace sptool {
 
   /**
@@ -38,26 +39,34 @@ namespace sptool {
     virtual void Reset();
 
     /// Functions to set active mode
-    void SetElectronMode(){ _name = "PDF_electron"; xmin = 0; xmax = 100; lmin = -0.1; lmax = -0.01; }
+    void SetElectronMode(){ 
+      _name = "PDF_electron"; 
+      _xmin = 0; _xmax = 100; 
+      _lmin = -0.1; _lmax = -0.01; 
+    }
 
-    void SetGammaMode(){ _name = "PDF_gamma"; xmin = 0; xmax = 0.1; lmin = -100; lmax = -10; }
+    void SetGammaMode(){ 
+      _name = "PDF_gamma"; 
+      _xmin = 0; _xmax = 0.1; 
+      _lmin = -100; _lmax = -10; }
 
     /// Function to evaluate input showers and determine a score
     virtual SPArticleSet Select(const SPAData &data);
 
     /// Provide data sample for fitting
     virtual void Fill(const SPAData &data);
+
+    virtual void ProcessEnd(TFile* fout);
     
   protected:
     
-    std::string _name;
-    double xmin = 0;
-    double xmax = 0;
-    double lmin = 0;
-    double lmax = 0;
-    ShowerPdfFactory* _factory;
+    double _xmin = 0;
+    double _xmax = 0;
+    double _lmin = 0;
+    double _lmax = 0;
+    ShowerPdfFactory _factory;
     RooRealVars_t _vars;
-    RooExponential _pdf;
+    RooExponential* _pdf;
     RooDataSet* _data;
   };
 }

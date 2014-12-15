@@ -22,6 +22,9 @@
 #pragma link C++ class sptool::SPArticle+;
 #pragma link C++ class sptool::SPABookKeeper+;
 
+#pragma link C++ class sptool::SPAlgoBase+;
+#pragma link C++ class sptool::SPFilterBase+;
+
 #pragma link C++ class sptool::SPAHelper+;
 #pragma link C++ class sptool::SPAManager+;
 #pragma link C++ class sptool::ShowerPdfFactory+;

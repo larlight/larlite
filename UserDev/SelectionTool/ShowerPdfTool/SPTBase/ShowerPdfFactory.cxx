@@ -5,7 +5,7 @@
 
 namespace sptool {
 
-  RooExponential  ShowerPdfFactory::RadLenPdf(RooRealVars_t &vars) const
+  RooExponential*  ShowerPdfFactory::RadLenPdf(RooRealVars_t &vars) const
   {
     // If user provides no pre-defined variables, define here
     if(!vars.size()){
@@ -18,11 +18,11 @@ namespace sptool {
     if(vars.size()!=2) throw SPAException(Form("%s requires 2 RooRealVar!",__FUNCTION__));
 
     // Instantiate pdf and return
-    return RooExponential("_RadLenPDF","Radiation Length",vars[0],vars[1]);
+    return new RooExponential("_RadLenPDF","Radiation Length",vars[0],vars[1]);
   }
 
 
-  RooExponential  ShowerPdfFactory::EvsAngPdf(RooRealVars_t &vars) const
+  RooExponential*  ShowerPdfFactory::EvsAngPdf(RooRealVars_t &vars) const
   {
     // If user provides no pre-defined variables, define here
     if(!vars.size()){
@@ -35,7 +35,7 @@ namespace sptool {
     if(vars.size()!=2) throw SPAException(Form("%s requires 2 RooRealVar!",__FUNCTION__));
 
     // Instantiate pdf and return
-    return RooExponential("_EvsAngPDF","Opening Angle PDF",vars[0],vars[1]);
+    return new RooExponential("_EvsAngPDF","Opening Angle PDF",vars[0],vars[1]);
   }
 
 }

@@ -48,13 +48,13 @@ namespace sptool {
     virtual ~SPFilterBase(){};
 
     /// Select function
-    virtual SPAOrder Select (const SPAData &data) = 0;
+    virtual SPAOrder Select (const SPAData &data){ return SPAOrder(); }
 
     /// Function to fill data sample
-    virtual void Fill(const SPAData &data) = 0;
+    virtual void Fill(const SPAData &data){}
 
     /// Function to reset itself
-    virtual void Reset() = 0;
+    virtual void Reset(){}
 
     /// Called @ before processing the first event sample
     virtual void ProcessBegin(){}

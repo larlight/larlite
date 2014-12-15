@@ -74,6 +74,7 @@ namespace sptool {
 	  << ")!";
       throw SPAException(msg.str());
     }
+    _status = kPROCESSING;
     if(_filter) _filter->EventBegin();
     if(_algo) _algo->EventBegin();
 
@@ -92,21 +93,25 @@ namespace sptool {
 
     }else{
 
-      //
-      // First, find out valid showers among input by running SPAFilter
-      //
-      auto const order = _filter->Select(data);
-      auto red_data = data;
-      red_data.ApplyOrder(order);
+      if(_filter) {
+	auto const order = _filter->Select(data);
+	auto red_data = data;
+	red_data.ApplyOrder(order);
       
-      //
-      // Run algorithm
-      //
-      auto res = _algo->Select(red_data);
-      if(_filter) _filter->EventEnd();
-      if(_algo) _algo->EventEnd();
+	auto res = _algo->Select(red_data);
+	if(_filter) _filter->EventEnd();
+	if(_algo) _algo->EventEnd();
+	
+	return res;
+      }	
+      else{ 
 
-      return res;
+	auto res = _algo->Select(data);
+	if(_filter) _filter->EventEnd();
+	if(_algo) _algo->EventEnd();
+	
+	return res;
+      }
     }
   }
 

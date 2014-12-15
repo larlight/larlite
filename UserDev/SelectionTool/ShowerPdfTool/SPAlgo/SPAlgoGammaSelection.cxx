@@ -7,23 +7,23 @@ namespace sptool {
 
   SPAlgoGammaSelection::SPAlgoGammaSelection() 
     : SPAlgoBase()
-    , _factory(nullptr)
+    , _pdf(nullptr)
     , _data(nullptr)
-  {
-    _name     = "SPAlgoGammaSelection";
-    SetGammaMode();
+  { 
+    SetGammaMode(); 
     Reset();
   }
 
+
   void SPAlgoGammaSelection::Reset()
   {
-    if(_factory) delete _factory;
-    _factory = new ShowerPdfFactory();
+    _vars.clear();
     _vars.reserve(2);
-    _vars.push_back(RooRealVar("_x","Distance [cm]",xmin,xmax));
-    _vars.push_back(RooRealVar("_l","Radiation length [cm]",lmin,lmax));
-    _pdf = _factory->RadLenPdf(_vars);
-    if(_data) delete _data;
+    _vars.push_back(RooRealVar("_x","Distance [cm]",_xmin,_xmax));
+    _vars.push_back(RooRealVar("_l","Radiation length [cm]",_lmin,_lmax));
+    delete _pdf;
+    _pdf = _factory.RadLenPdf(_vars);
+    delete _data;
     _data = new RooDataSet(_name.c_str(),"RooFit distance data set",RooArgSet(_vars[0]));
   }
   
@@ -40,6 +40,23 @@ namespace sptool {
       _vars[0].setVal(x);
       _data->fill();
     }
+  }
+
+  void SPAlgoGammaSelection::ProcessEnd(TFile* fout)
+  {
+    _pdf->fitTo(*_data);
+    
+    auto frame = _vars[0].frame();
+    _data->plotOn(frame);
+    _pdf->plotOn(frame);
+    TCanvas *c = new TCanvas("c","Distance PDF",1000,500);
+    frame->Draw();
+    c->SaveAs("aho.png");
+
+    _params.store("_xmin",_xmin);
+    _params.store("_xmax",_xmax);
+    _params.store("_lmin",_lmin);
+    _params.store("_lmax",_lmax);
   }
 
 }

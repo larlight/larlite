@@ -52,10 +52,10 @@ namespace sptool {
     virtual ~ShowerPdfFactory(){};
     
     /// Instantiate radiation-length PDF
-    RooExponential  RadLenPdf(RooRealVars_t &vars) const;
+    RooExponential*  RadLenPdf(RooRealVars_t &vars) const;
 
     /// Instantiate Angle-vs-Energy PDF
-    RooExponential  EvsAngPdf(RooRealVars_t &vars) const;
+    RooExponential*  EvsAngPdf(RooRealVars_t &vars) const;
 
   };
 }

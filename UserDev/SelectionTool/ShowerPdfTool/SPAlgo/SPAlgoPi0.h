@@ -16,6 +16,7 @@
 #define SELECTIONTOOL_SPALGOPI0_H
 
 #include "SPTBase/SPAlgoBase.h"
+#include "SPTBase/ShowerPdfFactory.h"
 
 namespace sptool {
 
@@ -31,13 +32,24 @@ namespace sptool {
     SPAlgoPi0();
 
     /// Default destructor
-    virtual ~SPAlgoPi0(){};
+    virtual ~SPAlgoPi0(){_vars.clear();}
+
+    virtual void Reset();
 
     /// Function to evaluate input showers and determine a score
     virtual SPArticleSet Select(const SPAData &data);
 
     /// Function to fill data sample
     virtual void Fill(const SPAData &data);
+
+    virtual void hello() { std::cout<<"ahoaho"<<std::endl;}
+
+  protected:
+    double _xmin, _xmax, _lmin, _lmax;
+    ShowerPdfFactory _factory;
+    RooRealVars_t _vars;
+    RooExponential* _pdf;
+    RooDataSet _data;
 
   };
 }

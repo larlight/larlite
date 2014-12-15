@@ -54,13 +54,13 @@ namespace sptool {
     virtual ~SPAlgoBase(){}
     
     /// Function to evaluate input showers and determine a score
-    virtual SPArticleSet Select(const SPAData &data) = 0;
+    virtual SPArticleSet Select(const SPAData &data) {return SPArticleSet(); }
 
     /// Function to fill data sample
-    virtual void Fill(const SPAData &data) = 0;
+    virtual void Fill(const SPAData &data){}
 
     /// Function to reset itself
-    virtual void Reset() = 0;
+    virtual void Reset(){}
 
     /// Called @ before processing the first event sample
     virtual void ProcessBegin(){}
