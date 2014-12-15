@@ -34,21 +34,18 @@ namespace sptool {
 
     /// Default destructor
     virtual ~SPAlgoGammaSelection(){}
+
+    /// Called only once by the constructor in its lifespan
+    void Init();
+
+    /// Override the sptool::SPTBase::LoadParams function
+    virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
     
     /// Function to initialise RooFit variables
     virtual void Reset();
 
-    /// Functions to set active mode
-    void SetElectronMode(){ 
-      _name = "PDF_electron"; 
-      _xmin = 0; _xmax = 100; 
-      _lmin = -0.1; _lmax = -0.01; 
-    }
-
-    void SetGammaMode(){ 
-      _name = "PDF_gamma"; 
-      _xmin = 0; _xmax = 0.1; 
-      _lmin = -100; _lmax = -10; }
+    /// Switch e- (false) / gamma (true) mode
+    void SetMode(const bool gamma) { _mode = gamma; }
 
     /// Function to evaluate input showers and determine a score
     virtual SPArticleSet Select(const SPAData &data);
@@ -59,15 +56,26 @@ namespace sptool {
     virtual void ProcessEnd(TFile* fout);
     
   protected:
+
+    bool _mode; ///< e-/gamma mode (true: gamma, false: e-)
     
-    double _xmin = 0;
-    double _xmax = 0;
-    double _lmin = 0;
-    double _lmax = 0;
-    ShowerPdfFactory _factory;
-    RooRealVars_t _vars;
-    RooExponential* _pdf;
-    RooDataSet* _data;
+    // Fit parameters
+    double _xmin = 0;   ///< rad length fit range min [cm]
+    double _xmax = 0;   ///< rad length fit range max [cm]
+    double _e_lmin = 0; ///< electron rad length param range min [cm]
+    double _e_lmax = 0; ///< electron rad length param range max [cm]
+    double _g_lmin = 0; ///< gamma rad length param range min [cm]
+    double _g_lmax = 0; ///< gamma rad length param range max [cm]
+
+    // e- pdf 
+    RooExponential* _e_pdf;  ///< e- pdf
+    RooDataSet*     _e_data; ///< e- pdf data set
+    RooRealVars_t   _e_vars; ///< e- pdf cariable set
+    // gamma pdf
+    RooExponential* _g_pdf;  ///< e- pdf
+    RooDataSet*     _g_data; ///< e- pdf data set
+    RooRealVars_t   _g_vars; ///< e- pdf cariable set
+
   };
 }
 #endif

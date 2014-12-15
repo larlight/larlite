@@ -64,10 +64,10 @@ namespace sptool {
     ::larlite::user_info& WriteableParams() { return _params; }
 
     /// Load parameter values from a TFile. For official values, use default filename.
-    void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
+    virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
 
     /// Store parameter values to a TFile. For official values, use default filename.
-    void StoreParams(std::string fname="");
+    virtual void StoreParams(std::string fname="");
 
   protected:
 

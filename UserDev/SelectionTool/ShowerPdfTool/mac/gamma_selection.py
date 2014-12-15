@@ -21,13 +21,14 @@ my_proc.add_input_file(sys.argv[1])
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
-my_proc.set_ana_output_file("/Users/jhewes15/neutrino/larlite/UserDev/SelectionTool/ShowerPdfTool/dat/pdf.root")
+my_proc.set_ana_output_file("gamma_pdf.root")
 
-my_algo = fmwk.SPAlgoGammaSelection()
-my_algo.Init()
-my_algo.SetElectronMode()
+my_algo = sptool.SPAlgoGammaSelection()
+my_algo.SetMode(True)
+my_algo.Reset()
+#my_algo.LoadParams()
 
-my_ana = fmwk.SPAnaGammaSelection()
+my_ana = fmwk.ExampleSPSelection()
 my_ana._mgr.SetSPAlgo(my_algo)
 
 # Attach a template process
@@ -36,7 +37,7 @@ my_proc.add_process(my_ana)
 print
 print  "Finished configuring ana_processor. Start event loop!"
 print
-
+#sys.exit(1)
 # Let's run it.
 my_proc.run();
 
@@ -44,6 +45,6 @@ my_proc.run();
 print
 print "Finished running ana_processor event loop!"
 print
-
+my_algo.StoreParams()
 sys.exit(0)
 
