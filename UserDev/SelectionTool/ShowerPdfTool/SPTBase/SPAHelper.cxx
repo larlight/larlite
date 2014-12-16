@@ -13,7 +13,7 @@ namespace sptool {
     res._tracks.clear();
     res._tracks.reserve(mct_v.size());
     for(auto const& mct : mct_v) {
-      if(!mct.size()) continue;
+      if(mct.size()<2) continue;
       res._tracks.push_back(SPATrack());
       auto& t = (*res._tracks.rbegin());
 
@@ -28,6 +28,7 @@ namespace sptool {
     res._showers.reserve(mcs_v.size());
     for(auto const& mcs : mcs_v) {
 
+      if(mcs.DetProfile().Momentum().E()<1) continue;
       res._showers.push_back(SPAShower(mcs.DetProfile().Position(),
 				       mcs.DetProfile().Momentum())
 			     );
@@ -49,7 +50,7 @@ namespace sptool {
     // Fill vertex
     std::set< ::geoalgo::Point_t> vtxs;
     for(auto const& mci : mci_v) {
-
+      
       res._vtxs.reserve(res._vtxs.size() + mci.GetParticles().size());
       for(auto const& mcp : mci.GetParticles()) {
 

@@ -21,6 +21,13 @@ namespace sptool {
     return new RooExponential("_RadLenPDF","Radiation Length",vars[0],vars[1]);
   }
 
+  RooExponential*  ShowerPdfFactory::RadLenPdfMod(RooRealVar &t, RooRealVar &tau) const
+  {
+
+    // Instantiate pdf and return
+    return new RooExponential("_RadLenPDF","Radiation Length",t,tau);
+  }
+
 
   RooExponential*  ShowerPdfFactory::EvsAngPdf(RooRealVars_t &vars) const
   {

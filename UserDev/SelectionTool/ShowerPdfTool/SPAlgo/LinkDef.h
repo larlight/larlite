@@ -10,7 +10,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class sptool::SPAlgoPi0+;
-#pragma link C++ class sptool::SPAlgoGammaSelection+;
+#pragma link C++ class sptool::SPAlgoEMPart+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif

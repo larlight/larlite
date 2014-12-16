@@ -23,6 +23,7 @@
 #include <RooAbsPdf.h>
 #include <RooAbsData.h>
 #include <RooDataSet.h>
+#include <RooFitResult.h>
 #include "SPAException.h"
 #include "SPTEnv.h"
 namespace sptool {
@@ -52,7 +53,9 @@ namespace sptool {
     virtual ~ShowerPdfFactory(){};
     
     /// Instantiate radiation-length PDF
-    RooExponential*  RadLenPdf(RooRealVars_t &vars) const;
+    RooExponential* RadLenPdf(RooRealVars_t &vars) const;
+
+    RooExponential* RadLenPdfMod(RooRealVar &t, RooRealVar &tau) const;
 
     /// Instantiate Angle-vs-Energy PDF
     RooExponential*  EvsAngPdf(RooRealVars_t &vars) const;

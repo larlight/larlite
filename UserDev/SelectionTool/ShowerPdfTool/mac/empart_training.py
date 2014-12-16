@@ -15,7 +15,10 @@ from ROOT import sptool
 my_proc = fmwk.ana_processor()
 
 # Set input root file
-my_proc.add_input_file(sys.argv[1])
+for x in xrange(len(sys.argv)-1):
+    fname = sys.argv[x+1]
+    if fname.find('gamma')>=0:
+        my_proc.add_input_file(fname)
 
 # Specify IO mode
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
@@ -23,13 +26,37 @@ my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 # Specify output root file name
 my_proc.set_ana_output_file("gamma_pdf.root")
 
-my_algo = sptool.SPAlgoGammaSelection()
+my_algo = sptool.SPAlgoEMPart()
 my_algo.SetMode(True)
-my_algo.Reset()
 #my_algo.LoadParams()
+
+my_algo.Reset()
+my_ana = fmwk.ExampleSPSelection()
+my_ana._mgr.SetSPAlgo(my_algo)
+my_ana._mode =False
+my_proc.add_process(my_ana)
+my_proc.run()
+
+# Re-set
+my_proc.reset()
+my_algo.SetMode(False)
+my_algo.Reset()
+
+# Set input root file
+for x in xrange(len(sys.argv)-1):
+    fname = sys.argv[x+1]
+    if fname.find('electron')>=0:
+        my_proc.add_input_file(fname)
+
+# Specify IO mode
+my_proc.set_io_mode(fmwk.storage_manager.kREAD)
+
+# Specify output root file name
+my_proc.set_ana_output_file("electron_pdf.root")
 
 my_ana = fmwk.ExampleSPSelection()
 my_ana._mgr.SetSPAlgo(my_algo)
+my_ana._mode =False
 
 # Attach a template process
 my_proc.add_process(my_ana)
@@ -39,12 +66,13 @@ print  "Finished configuring ana_processor. Start event loop!"
 print
 #sys.exit(1)
 # Let's run it.
-my_proc.run();
+my_proc.run()
 
 # done!
 print
 print "Finished running ana_processor event loop!"
 print
+
 my_algo.StoreParams()
 sys.exit(0)
 

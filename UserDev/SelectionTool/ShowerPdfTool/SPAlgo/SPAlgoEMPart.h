@@ -1,9 +1,9 @@
 /**
- * \file SPAlgoGammaSelection.h
+ * \file SPAlgoEMPart.h
  *
  * \ingroup SPAlgo
  * 
- * \brief Class def header for a class SPAlgoGammaSelection
+ * \brief Class def header for a class SPAlgoEMPart
  *
  * @author jhewes15
  */
@@ -22,18 +22,18 @@
 namespace sptool {
 
   /**
-     \class SPAlgoGammaSelection
+     \class SPAlgoEMPart
      User custom SPAFilter class made by jhewes15
    */
-  class SPAlgoGammaSelection : public SPAlgoBase {
+  class SPAlgoEMPart : public SPAlgoBase {
   
   public:
 
     /// Default constructor
-    SPAlgoGammaSelection();
+    SPAlgoEMPart();
 
     /// Default destructor
-    virtual ~SPAlgoGammaSelection(){}
+    virtual ~SPAlgoEMPart(){}
 
     /// Called only once by the constructor in its lifespan
     void Init();
@@ -60,12 +60,16 @@ namespace sptool {
     bool _mode; ///< e-/gamma mode (true: gamma, false: e-)
     
     // Fit parameters
-    double _xmin = 0;   ///< rad length fit range min [cm]
-    double _xmax = 0;   ///< rad length fit range max [cm]
-    double _e_lmin = 0; ///< electron rad length param range min [cm]
-    double _e_lmax = 0; ///< electron rad length param range max [cm]
-    double _g_lmin = 0; ///< gamma rad length param range min [cm]
-    double _g_lmax = 0; ///< gamma rad length param range max [cm]
+    double _xmin;   ///< rad length fit range min [cm]
+    double _xmax;   ///< rad length fit range max [cm]
+
+    double _e_lval; ///< electron rad length param mean [cm]
+    double _e_lmin; ///< electron rad length param range min [cm]
+    double _e_lmax; ///< electron rad length param range max [cm]
+
+    double _g_lval; ///< gamma rad length param mean [cm]
+    double _g_lmin; ///< gamma rad length param range min [cm]
+    double _g_lmax; ///< gamma rad length param range max [cm]
 
     // e- pdf 
     RooExponential* _e_pdf;  ///< e- pdf
