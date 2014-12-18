@@ -111,11 +111,11 @@ namespace larlite {
 
     /// Setter to enable filtering mode
     void enable_filter(bool doit=true) { _filter_enable = doit; }
-    
-  private:
-    
+
     /// A method to reset members
     void reset();
+    
+  private:
     
     /// A method to initialize and prepare for running analysis
     Bool_t initialize();
