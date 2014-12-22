@@ -17,6 +17,9 @@
 
 #include "SPTBase/SPAlgoBase.h"
 #include "SPTBase/ShowerPdfFactory.h"
+#include <RooProdPdf.h> 
+#include <RooPlot.h>
+#include <TCanvas.h>
 
 namespace sptool {
 
@@ -36,20 +39,33 @@ namespace sptool {
 
     virtual void Reset();
 
+    /// Override the sptool::SPTBase::LoadParams function
+    virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
+
     /// Function to evaluate input showers and determine a score
     virtual SPArticleSet Select(const SPAData &data);
 
     /// Function to fill data sample
     virtual void Fill(const SPAData &data);
 
+    /// Function executed at end of process
+    virtual void ProcessEnd(TFile* fout);
+
     virtual void hello() { std::cout<<"ahoaho"<<std::endl;}
 
   protected:
     double _xmin, _xmax, _lmin, _lmax;
+    double _rad_len;
     ShowerPdfFactory _factory;
+    RooRealVar*  _radLenRange;
+    RooRealVar*  _radLenVal;
     RooRealVars_t _vars;
-    RooExponential* _pdf;
-    RooDataSet _data;
+    RooExponential* _radLenPdf;
+    RooDataSet* _data;
+
+    // PDF for correlation between rad-length
+    // of two pi0 showers
+    RooProdPdf* _radLenCorrelationPdf;
 
   };
 }

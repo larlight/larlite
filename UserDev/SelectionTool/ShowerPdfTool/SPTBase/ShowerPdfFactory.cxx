@@ -5,27 +5,23 @@
 
 namespace sptool {
 
-  RooExponential*  ShowerPdfFactory::RadLenPdf(RooRealVars_t &vars) const
+  RooExponential*  ShowerPdfFactory::RadLenPdf(RooRealVar &x, RooRealVar &l) const
   {
-    // If user provides no pre-defined variables, define here
-    if(!vars.size()){
-      vars.reserve(2);
-      vars.push_back(RooRealVar("_RadLenx","Distance [cm]",kDOUBLE_MIN,kDOUBLE_MAX));
-      vars.push_back(RooRealVar("_RadLenl","Radiation Length [cm]",kDOUBLE_MIN,kDOUBLE_MAX));
-    }
-
-    // Check # of variables
-    if(vars.size()!=2) throw SPAException(Form("%s requires 2 RooRealVar!",__FUNCTION__));
-
     // Instantiate pdf and return
-    return new RooExponential("_RadLenPDF","Radiation Length",vars[0],vars[1]);
+    return new RooExponential("_RadLenPDF","Radiation Length",x,l);
   }
 
   RooExponential*  ShowerPdfFactory::RadLenPdfMod(RooRealVar &t, RooRealVar &tau) const
   {
-
     // Instantiate pdf and return
     return new RooExponential("_RadLenPDF","Radiation Length",t,tau);
+  }
+
+  
+  RooGaussian* ShowerPdfFactory::dEdxPdf(RooRealVar &x, RooRealVar &mu, RooRealVar &sigma) const
+  {
+    // vars[0] is the mean. vars[1] the spread
+    return new RooGaussian("_dEdxPdf","dEdx Pdf", x, mu, sigma);
   }
 
 
