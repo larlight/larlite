@@ -15,6 +15,8 @@
 #define SELECTIONTOOL_SPAHELPER_H
 
 #include <iostream>
+#include <TRandom.h>
+
 #include "DataFormat/mctruth.h"
 #include "DataFormat/mcshower.h"
 #include "DataFormat/mctrack.h"
@@ -24,7 +26,6 @@
 #include "DataFormat/vertex.h"
 #include "DataFormat/cosmictag.h"
 #include "DataFormat/calorimetry.h"
-
 #include "SPAData.h"
 
 namespace sptool {
