@@ -94,7 +94,38 @@ namespace sptool {
   
   SPArticleSet SPAlgoEMPart::Select(const SPAData &data)
   {
-    return SPArticleSet();
+    SPArticleSet res;
+    if(!data._vtxs.size()) return res;
+
+    for(auto const& s : data._showers) {
+
+      double g_like = 0;
+      double dist   = s.Start().Dist(data._vtxs[0]);
+
+      if(dist > 1.){
+	_g_vars[0].setVal(dist);
+	_e_vars[0].setVal(dist);
+
+	g_like = _g_pdf->getVal(_g_vars[0]) / ( _g_pdf->getVal(_g_vars[0]) + _e_pdf->getVal(_e_vars[0]) );
+      }
+
+      SPArticle p;
+      if(g_like>0.5) p.pdg_code(22);
+      else p.pdg_code(11);
+
+      p.pos(s.Start());
+      p.mom(s.Dir() * s._energy);
+      p.energy(s._energy);
+      
+      res.push_back(p);
+      /*
+      std::cout<<_g_vars[0].getVal()<< " ... " << g_like << " = ";
+      if(g_like) std::cout<<"gamma"<<std::endl;
+      else std::cout<<"electron"<<std::endl;
+      */
+    }
+    
+    return res;
   }
 
   void SPAlgoEMPart::Fill(const SPAData &data)
@@ -159,6 +190,49 @@ namespace sptool {
     TCanvas *c = new TCanvas("c",Form("Distance PDF for %s",part_name.c_str()),1000,500);
     frame->Draw();
     c->SaveAs(Form("RadLength_%s.png",part_name.c_str()));
+
+    c->SetTitle("Selection Likelihood");
+
+    TH1D *h11 = new TH1D("h11","Electron vs. Gamma Likelihood; Rad. Length [cm]; Likelihood",200,0,0.5);
+    TH1D *h22 = new TH1D("h22","Electron vs. Gamma Likelihood; Rad. Length [cm]; Likelihood",200,0,0.5);
+
+    for(size_t i=1; i<=100; ++i) {
+      _e_vars[0].setVal(0.5/200.*i);
+      _g_vars[0].setVal(0.5/200.*i);
+
+      h11->SetBinContent(i,_e_pdf->getVal(_e_vars[0]) / (_e_pdf->getVal(_e_vars[0]) + _g_pdf->getVal(_g_vars[0])));
+      h22->SetBinContent(i,_g_pdf->getVal(_g_vars[0]) / (_e_pdf->getVal(_e_vars[0]) + _g_pdf->getVal(_g_vars[0])));
+      /*
+      std::cout
+	<< _e_vars[0].getVal()
+	<< " : "
+	<< _e_pdf->getVal(_e_vars[0]) / (_e_pdf->getVal(_e_vars[0]) + _g_pdf->getVal(_g_vars[0]))
+	<< " : "
+	<< _g_pdf->getVal(_g_vars[0]) / (_e_pdf->getVal(_e_vars[0]) + _g_pdf->getVal(_g_vars[0]))
+	<< " ... "
+	<< _e_pdf->getVal(_e_vars[0])
+	<< " : "
+	<< _g_pdf->getVal(_g_vars[0])
+	<< std::endl;
+      */
+    }
+
+    h11->SetLineWidth(2);
+    h11->SetLineColor(kBlue);
+    h11->SetFillStyle(3004);
+    h11->SetFillColor(kBlue);
+    h22->SetLineWidth(2);
+    h22->SetLineColor(kRed);
+    h22->SetFillStyle(3003);
+    h22->SetFillColor(kRed);
+
+    h11->Draw();
+    h22->Draw("sames");
+    c->SaveAs("Likelihood.png");
+
+    delete h11;
+    delete h22;
+    delete c;
 
   }
 

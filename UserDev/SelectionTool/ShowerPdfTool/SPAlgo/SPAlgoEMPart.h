@@ -19,6 +19,8 @@
 #include "SPTBase/ShowerPdfFactory.h"
 #include <RooPlot.h>
 #include <TCanvas.h>
+#include <TH1D.h>
+
 namespace sptool {
 
   /**
