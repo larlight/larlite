@@ -20,6 +20,8 @@
 #include <RooPlot.h>
 #include <TCanvas.h>
 #include <TH1D.h>
+#include <cstdlib>
+#include <ctime>
 
 namespace sptool {
 
@@ -55,8 +57,9 @@ namespace sptool {
     /// Provide data sample for fitting
     virtual void Fill(const SPAData &data);
 
-    virtual void ProcessEnd(TFile* fout);
-    
+    /// What to do once event-loop is over
+    virtual void ProcessEnd(TFile* fout, bool select);
+
   protected:
 
     bool _mode; ///< e-/gamma mode (true: gamma, false: e-)

@@ -89,7 +89,7 @@ namespace sptool {
     void Initialize();
 
     /// Function to be called after Process()
-    void Finalize(TFile* fout=nullptr);
+    void Finalize(TFile* fout=nullptr, bool select=false);
 
     /// Function to reset things
     void Reset();

@@ -73,7 +73,7 @@ namespace sptool {
 
   }
 
-  void SPAlgoPi0::ProcessEnd(TFile* fout){
+  void SPAlgoPi0::ProcessEnd(TFile* fout, bool select){
     
     // Fit to radiation length & plot
     RooPlot* frame = nullptr;

@@ -49,7 +49,7 @@ namespace sptool {
     virtual void Fill(const SPAData &data);
 
     /// Function executed at end of process
-    virtual void ProcessEnd(TFile* fout);
+    virtual void ProcessEnd(TFile* fout, bool select);
 
     virtual void hello() { std::cout<<"ahoaho"<<std::endl;}
 

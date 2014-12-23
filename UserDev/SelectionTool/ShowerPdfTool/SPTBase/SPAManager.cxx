@@ -46,7 +46,7 @@ namespace sptool {
     _status = kINIT;
   }
   
-  void SPAManager::Finalize(TFile* fout)
+  void SPAManager::Finalize(TFile* fout, bool select)
   {
     if(_status != kPROCESSING) {
       std::ostringstream msg;
@@ -58,7 +58,7 @@ namespace sptool {
       throw SPAException(msg.str());
     }
     if(_filter) _filter->ProcessEnd(fout);
-    if(_algo) _algo->ProcessEnd(fout);
+    if(_algo) _algo->ProcessEnd(fout,select);
     _status = kFINISHED;
   }  
 

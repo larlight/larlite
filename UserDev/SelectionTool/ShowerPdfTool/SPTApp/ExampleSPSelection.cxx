@@ -30,7 +30,7 @@ namespace larlite {
 
   bool ExampleSPSelection::finalize() {
 
-    _mgr.Finalize(_fout);
+    _mgr.Finalize(_fout,_mode);
     return SPTAnaBase::finalize();
 
   }

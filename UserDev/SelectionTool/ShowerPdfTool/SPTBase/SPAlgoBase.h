@@ -72,7 +72,7 @@ namespace sptool {
     virtual void EventEnd(){}
 
     /// Called after processing the last event sample
-    virtual void ProcessEnd(TFile* fout=nullptr){}
+    virtual void ProcessEnd(TFile* fout=nullptr, bool select=true){}
 
   };
 }

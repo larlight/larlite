@@ -52,6 +52,7 @@ namespace sptool {
     _g_dedxsigma = _g_dedxmu*0.3;
     _g_dedxmin = _dedxmin;
     _g_dedxmax = _dedxmax;
+    std::srand(std::time(0));
   }
 
   void SPAlgoEMPart::LoadParams(std::string fname,size_t version)
@@ -170,16 +171,41 @@ namespace sptool {
 
       double g_like = 0;
       double dist   = s.Start().Dist(data._vtxs[0]);
+      double dEdx   = s._dedx;
+
+      // RAD LEN SELECTION
 
       if(dist > 1.){
 	_g_radLenVar->setVal(dist);
 	_e_radLenVar->setVal(dist);
-
 	g_like = _g_radLenPdf->getVal(*_g_radLenVar) / ( _g_radLenPdf->getVal(*_g_radLenVar) + _e_radLenPdf->getVal(*_e_radLenVar) );
+	if (g_like > 0.5)
+	  _g_radLenData->add(RooArgSet(*_g_radLenVar));
+	else
+	  _e_radLenData->add(RooArgSet(*_e_radLenVar));
+      }
+
+      g_like = 0.;
+      
+      // dEdx SELECTION
+      if ( (dEdx>0.) and (dEdx<10.) ){
+	_g_dEdxVar->setVal(dEdx);
+	_e_dEdxVar->setVal(dEdx);
+	//std::cout << "dEdx: " << dEdx << std::endl;
+	//std::cout << "Photon Pdf @ dEdx: " << _g_dEdxPdf->getVal(*_g_dEdxVar)
+	//	  << "Electron Pdf @ dEdx: " << _e_dEdxPdf->getVal(*_e_dEdxVar) << std::endl;
+	g_like = _g_dEdxPdf->getVal(*_g_dEdxVar) / ( _g_dEdxPdf->getVal(*_g_dEdxVar) + _e_dEdxPdf->getVal(*_g_dEdxVar) );
+	//std::cout << "gamma-like: " << g_like << std::endl << std::endl;
+	// fire a random number. If < g_like then make gamma, otherwise electron
+	double r = std::rand()/double(RAND_MAX);
+	if (r < g_like)
+	  _g_dEdxData->add(RooArgSet(*_g_dEdxVar));
+	else _e_dEdxData->add(RooArgSet(*_e_dEdxVar));
       }
 
       SPArticle p;
-      if(g_like>0.5) p.pdg_code(22);
+      if(g_like>0.5) 
+	p.pdg_code(22);
       else p.pdg_code(11);
 
       p.pos(s.Start());
@@ -216,16 +242,17 @@ namespace sptool {
     }
   }
 
-  void SPAlgoEMPart::ProcessEnd(TFile* fout)
+  void SPAlgoEMPart::ProcessEnd(TFile* fout, bool select)
   {
 
+    // Plot a bunch of stuff!
     RooPlot* frame_radLen = nullptr;
     RooPlot* frame_dEdx   = nullptr;
     RooFitResult* fit_res_radLen = nullptr;
     RooFitResult* fit_res_dEdx   = nullptr;
     std::string part_name = "gamma";
     if(!_mode) part_name = "electron";
-
+    
     if(_mode) {
       fit_res_radLen = _g_radLenPdf->fitTo(*_g_radLenData,RooFit::Save());
       fit_res_radLen->Print();
@@ -237,7 +264,9 @@ namespace sptool {
       _g_radLenPdf->plotOn(frame_radLen);
       _g_dEdxData->plotOn(frame_dEdx);
       _g_dEdxPdf->plotOn(frame_dEdx);
-    }else{
+    }
+    else{
+      part_name = "electron";
       fit_res_radLen = _e_radLenPdf->fitTo(*_e_radLenData,RooFit::Save());
       fit_res_radLen->Print();
       fit_res_dEdx   = _e_dEdxPdf->fitTo(*_e_dEdxData,RooFit::Save());
@@ -249,45 +278,7 @@ namespace sptool {
       _e_dEdxData->plotOn(frame_dEdx);
       _e_dEdxPdf->plotOn(frame_dEdx);
     }
-
-    if(_params.exist_darray(Form("%s_params",part_name.c_str()))) {
-      std::cout<<"["<<__FUNCTION__<<Form("] Overwriting the stored param: %s_params",part_name.c_str())<<std::endl;
-      _params.get_darray(Form("%s_params",part_name.c_str()))->clear();
-    }
-
-    RooRealVar* res_value_radLen = nullptr;
-    RooRealVar* res_value_dEdxMu = nullptr;
-    RooRealVar* res_value_dEdxSigma = nullptr;
-    if(_mode){
-      res_value_radLen = (RooRealVar*)(fit_res_radLen->floatParsFinal().find("_g_l"));
-      res_value_dEdxMu   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_g_dEdxMu"));
-      res_value_dEdxSigma   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_g_dEdxSigma"));
-    }
-    else{
-      res_value_radLen = (RooRealVar*)(fit_res_radLen->floatParsFinal().find("_e_l"));
-      res_value_dEdxMu   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_e_dEdxMu"));
-      res_value_dEdxSigma   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_e_dEdxSigma"));
-    }
-    std::cout<<"["<<__FUNCTION__<<Form("] Storing new %s_params: ",part_name.c_str()) << std::endl
-	     << "RadLen: "<< res_value_radLen->getVal() << " [" << res_value_radLen->getErrorLo()
-	     << " => " << res_value_radLen->getErrorHi() << "]" << std::endl
-	     << "dEdx: Mu: " << res_value_dEdxMu->getVal() << " Sigma: " << res_value_dEdxSigma << std::endl;
-    _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal());
-    _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorLo());
-    _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorHi());
-    _params.append(Form("%s_params",part_name.c_str()),res_value_dEdxMu->getVal());
-    _params.append(Form("%s_params",part_name.c_str()),res_value_dEdxSigma->getVal());
-
-    //_params.dump_contents();
-    if(_params.exist_darray("rad_range"))
-       _params.get_darray("rad_range")->clear();
-    _params.append("rad_range",_xmin);
-    _params.append("rad_range",_xmax);
-    if(_params.exist_darray("dedx_range"))
-       _params.get_darray("dedx_range")->clear();
-    _params.append("dedx_range",_dedxmin);
-    _params.append("dedx_range",_dedxmax);
-
+    
     TCanvas *c = new TCanvas("c",Form("Distance PDF for %s",part_name.c_str()),1000,500);
     frame_radLen->Draw();
     c->SaveAs(Form("RadLength_%s.png",part_name.c_str()));
@@ -295,12 +286,49 @@ namespace sptool {
     c = new TCanvas("c",Form("dEdx PDF for %s",part_name.c_str()),1000,500);
     frame_dEdx->Draw();
     c->SaveAs(Form("dEdx_%s.png",part_name.c_str()));
-
     c->SetTitle("Selection Likelihood");
+    
+    
+    if (!select){
 
+      RooRealVar* res_value_radLen = nullptr;
+      RooRealVar* res_value_dEdxMu = nullptr;
+      RooRealVar* res_value_dEdxSigma = nullptr;
+      if(_mode){
+	res_value_radLen = (RooRealVar*)(fit_res_radLen->floatParsFinal().find("_g_l"));
+	res_value_dEdxMu   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_g_dEdxMu"));
+	res_value_dEdxSigma   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_g_dEdxSigma"));
+      }
+      else{
+	res_value_radLen = (RooRealVar*)(fit_res_radLen->floatParsFinal().find("_e_l"));
+	res_value_dEdxMu   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_e_dEdxMu"));
+	res_value_dEdxSigma   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_e_dEdxSigma"));
+      }
+      std::cout<<"["<<__FUNCTION__<<Form("] Storing new %s_params: ",part_name.c_str()) << std::endl
+	       << "RadLen: "<< res_value_radLen->getVal() << " [" << res_value_radLen->getErrorLo()
+	       << " => " << res_value_radLen->getErrorHi() << "]" << std::endl
+	       << "dEdx: Mu: " << res_value_dEdxMu->getVal() << " Sigma: " << res_value_dEdxSigma << std::endl;
+      _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorLo());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorHi());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_dEdxMu->getVal());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_dEdxSigma->getVal());
+      
+      //_params.dump_contents();
+      if(_params.exist_darray("rad_range"))
+	_params.get_darray("rad_range")->clear();
+      _params.append("rad_range",_xmin);
+      _params.append("rad_range",_xmax);
+      if(_params.exist_darray("dedx_range"))
+	_params.get_darray("dedx_range")->clear();
+      _params.append("dedx_range",_dedxmin);
+      _params.append("dedx_range",_dedxmax);
+    }
+    
+    
     TH1D *h11 = new TH1D("h11","Electron vs. Gamma Likelihood; Rad. Length [cm]; Likelihood",200,0,0.5);
     TH1D *h22 = new TH1D("h22","Electron vs. Gamma Likelihood; Rad. Length [cm]; Likelihood",200,0,0.5);
-
+    
     for(size_t i=1; i<=100; ++i) {
       _e_radLenVar->setVal(0.5/200.*i);
       _g_radLenVar->setVal(0.5/200.*i);
@@ -325,6 +353,8 @@ namespace sptool {
     delete h11;
     delete h22;
     delete c;
+    
+
 
   }
 
