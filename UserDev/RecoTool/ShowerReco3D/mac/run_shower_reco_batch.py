@@ -38,10 +38,11 @@ ana_unit = fmwk.ShowerReco3D()
 # Attach shower reco alg
 sralg = showerreco.ShowerRecoAlg()
 sralg.Verbose(False)
+sralg.SetUseArea(True)
 ana_unit.SetShowerAlgo(sralg)
 
 # Specify cluster type
-ana_unit.SetClusterProducer("mergedmergedfuzzycluster")
+ana_unit.SetClusterProducer("mergedfuzzycluster")
 
 # 
 # Attach Matching algorithm

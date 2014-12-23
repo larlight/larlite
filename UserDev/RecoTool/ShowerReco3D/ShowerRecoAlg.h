@@ -37,6 +37,9 @@ namespace showerreco {
     /// Function to reset algorithm, to be called @ beginning of each event
     virtual void Reset() { ShowerRecoAlgBase::Reset(); }
 
+    /// Function to decide if to use Area or Pulse Amplitude for calculations
+    void SetUseArea(bool on) { fUseArea = on; }
+
   protected:
 
     /// Function to reconstruct a shower
