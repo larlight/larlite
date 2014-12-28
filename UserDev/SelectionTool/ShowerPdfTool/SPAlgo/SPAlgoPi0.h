@@ -33,7 +33,8 @@ namespace sptool {
     /// Default destructor
     virtual ~SPAlgoPi0(){}
 
-    virtual void Reset();
+    /// What to do before event-loop begins
+    virtual void ProcessBegin();
 
     /// Override the sptool::SPTBase::LoadParams function
     virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);

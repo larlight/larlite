@@ -2,7 +2,8 @@
 #define SELECTIONTOOL_SPAHELPER_CXX
 
 #include "SPAHelper.h"
-
+#include <limits>
+#include <climits>
 namespace sptool {
 
   SPAData SPAHelper::Generate ( const ::larlite::event_mctrack&  mct_v,
@@ -29,9 +30,13 @@ namespace sptool {
     for(auto const& mcs : mcs_v) {
 
       if(mcs.DetProfile().Momentum().E()<1) continue;
+      if(isnan(mcs.DetProfile().Momentum().E())) continue;
+      if(isnan(mcs.DetProfile().Momentum().Px())) continue;
+      //std::cout<<"SPAShower Creation... "<<mcs.DetProfile().Px()<<" : "<<mcs.DetProfile().Py()<<" : "<<mcs.DetProfile().Pz()<<" : "<<mcs.DetProfile().Momentum().E()<<std::endl;
       res._showers.push_back(SPAShower(mcs.DetProfile().Position(),
 				       mcs.DetProfile().Momentum())
 			     );
+
       auto& s = (*res._showers.rbegin());
 
       s._energy     = mcs.DetProfile().Momentum().E();

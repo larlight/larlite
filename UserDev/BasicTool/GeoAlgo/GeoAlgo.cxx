@@ -202,7 +202,6 @@ namespace geoalgo {
     // d2 = Q2-P2
     // v(s,t) = L1(s) - L2(t)
     // require d1*v == 0 && d2*v == 0
-
     Vector_t d1 = l1.Pt2()-l1.Pt1();
     Vector_t d2 = l2.Pt2()-l2.Pt1();
     Vector_t r = l1.Pt1()-l2.Pt1();
@@ -223,8 +222,6 @@ namespace geoalgo {
       L2 = _ClosestPt_(l1.Pt1(),l2);
       return L1._SqDist_(L2);
     }
-      
-	
     
     double s = (b*f-c*e)/d;
     double t = (a*f-b*c)/d;

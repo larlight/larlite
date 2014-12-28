@@ -24,10 +24,9 @@ namespace sptool {
     _pi0_mean      = 130.;
     _pi0_mean_min  = 100.;
     _pi0_mean_max  = 160.;
-    _pi0_sigma     = 30.;
+    _pi0_sigma     = 10.;
     _pi0_sigma_min = 5.;
-    _pi0_sigma_max = 80.;
-    Reset();
+    _pi0_sigma_max = 70.;
   }
 
   void SPAlgoPi0::LoadParams(std::string fname, size_t version){
@@ -72,9 +71,9 @@ namespace sptool {
     return;
   }
 
-  void SPAlgoPi0::Reset()
+  void SPAlgoPi0::ProcessBegin()
   {
-    _alg_emp.Reset();
+    _alg_emp.ProcessBegin();
     delete _pi0_massVar;
     delete _pi0_massMean;
     delete _pi0_massSigma;
@@ -125,8 +124,8 @@ namespace sptool {
 
     // Compute mass
     mass = sqrt(4 * shower_a._energy * shower_b._energy * pow(sin(angle/2.),2));
-    _pi0_massVar->setVal(mass);
 
+    _pi0_massVar->setVal(mass);
     auto vtx = pt_a + ((pt_b - pt_a) / 2.);
     likelihood  = _pi0_pdf->getVal(*_pi0_massVar);
     likelihood *= _alg_emp.Likelihood(false,shower_a._dedx,vtx.Dist(shower_a.Start()));
@@ -138,11 +137,8 @@ namespace sptool {
   SPArticleSet SPAlgoPi0::Reconstruct(const SPAData &data)
   { 
     SPArticleSet res;
-    if(!data._vtxs.size() || !data._showers.size()) return res;
+    if(!data._vtxs.size() || data._showers.size()<2) return res;
 
-    SPAData tmp_data;
-    tmp_data._showers.resize(2);
-    tmp_data._vtxs.resize(1);
     auto shower_combinations = data.Combination(data._showers.size(),2);
 
     SPABookKeeper bk;
@@ -155,10 +151,13 @@ namespace sptool {
 		 likelihood,
 		 mass);
       
-      if(likelihood > 0.5) {
-	bk.book(likelihood,comb);
+      bk.book(likelihood,comb);
+      if( 0 < mass &&
+	  (_pi0_mean - _pi0_sigma_max * 5.) < mass &&
+	  mass < (_pi0_mean + _pi0_sigma_max * 5.) ) {
 	_pi0_massVar->setVal(mass);
 	_pi0_massData->add(RooArgSet(*_pi0_massVar));
+	std::cout<<_pi0_massData->sumEntries()<<" entries... last: "<<_pi0_massData->get(_pi0_massData->sumEntries()-1)->getRealValue("_pi0_massVar")<<std::endl;
       }
     }
 

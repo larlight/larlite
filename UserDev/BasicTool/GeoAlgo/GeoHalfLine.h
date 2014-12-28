@@ -52,7 +52,7 @@ namespace geoalgo {
 
     /// Alternative ctor using template (3)
     template <class T, class U> HalfLine(const T& start, const U& dir)
-      : HalfLine(Point_t(start), Point_t(dir))
+      : HalfLine(Point_t(start), Vector_t(dir))
     {}
 
     /// Default destructor
@@ -97,6 +97,8 @@ namespace geoalgo {
       auto l = _dir.Length();
       if(!l)
 	throw GeoAlgoException("<<Normalize>> cannot normalize 0-length direction vector!");
+      if(isnan(l))
+	throw GeoAlgoException("<<Normalize>> cannot normalize inf-length direction vector!");
       _dir /= l;
     }
 

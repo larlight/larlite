@@ -18,6 +18,7 @@ rootlibmap() {
 # ShowerPdfTool
 rootlibmap libSelectionTool_SPTBase.rootmap libSelectionTool_SPTBase.so \
     $LARLITE_USERDEVDIR/SelectionTool/ShowerPdfTool/SPTBase/LinkDef.h \
+    libBasicTool_GeoAlgo.so \
     libRooFit.so \
     libLArLite_DataFormat.so
 
