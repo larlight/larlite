@@ -62,8 +62,8 @@ namespace sptool {
       auto darray = _params.get_darray("rad_range");
       _xmin = (*darray)[0];
       _xmax = (*darray)[1];
-      std::cout<<"["<<__FUNCTION__<<"]"
-	       << " Loaded distance fit range : "
+      std::cout<<"["<<__FUNCTION__<<"] "
+	       << "Loaded distance fit range : "
 	       << _xmin << " => " << _xmax
 	       << std::endl;
     }
@@ -71,8 +71,8 @@ namespace sptool {
       auto darray = _params.get_darray("dedx_range");
       _dedxmin = (*darray)[0];
       _dedxmax = (*darray)[1];
-      std::cout<<"["<<__FUNCTION__<<"]"
-	       << " Loaded dEdx range : "
+      std::cout<<"["<<__FUNCTION__<<"] "
+	       <<"Loaded dEdx range : "
 	       << _dedxmin << " => " << _dedxmax
 		       << std::endl;
     }
@@ -83,9 +83,11 @@ namespace sptool {
       _g_lmax = (*darray)[2];
       _g_dedxmu = (*darray)[3];
       _g_dedxsigma = (*darray)[4];
-      std::cout<<"["<<__FUNCTION__<<"]"
-	       <<" Loaded gamma parameters    : " << std::endl
-	       <<"Rad Length: " << _g_lval << " ["<<_g_lmin<<" => "<<_g_lmax<<"]" << std:: endl
+      std::cout<<"["<<__FUNCTION__<<"] "
+	       <<"Loaded gamma parameters..." << std::endl;
+      std::cout<<"["<<__FUNCTION__<<"] "
+	       <<"Rad Length: " << _g_lval << " ["<<_g_lmin<<" => "<<_g_lmax<<"]" << std:: endl;
+      std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"dEdx: Mean: " << _g_dedxmu << " Sigma: " << _g_dedxsigma
 	       <<std::endl;
     }
@@ -96,9 +98,11 @@ namespace sptool {
       _e_lmax = (*darray)[2];
       _e_dedxmu = (*darray)[3];
       _e_dedxsigma = (*darray)[4];
-      std::cout<<"["<<__FUNCTION__<<"]"
-	       <<" Loaded electron parameters    : " << std::endl
-	       <<"Rad Length: " << _e_lval << " ["<<_e_lmin<<" => "<<_e_lmax<<"]" << std:: endl
+      std::cout<<"["<<__FUNCTION__<<"] "
+	       <<"Loaded electron parameters... " << std::endl;
+      std::cout<<"["<<__FUNCTION__<<"] "
+	       <<"Rad Length: " << _e_lval << " ["<<_e_lmin<<" => "<<_e_lmax<<"]" << std:: endl;
+      std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"dEdx: Mu:" << _e_dedxmu << " Sigma: "<<_e_dedxsigma
 	       <<std::endl;
     }
@@ -304,10 +308,12 @@ namespace sptool {
       res_value_dEdxMu   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_e_dEdxMu"));
       res_value_dEdxSigma   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_e_dEdxSigma"));
     }
-    std::cout<<"["<<__FUNCTION__<<Form("] Storing new %s_params: ",part_name.c_str()) << std::endl
-	     << "RadLen: "<< res_value_radLen->getVal() << " [" << res_value_radLen->getErrorLo()
-	     << " => " << res_value_radLen->getErrorHi() << "]" << std::endl
-	     << "dEdx: Mu: " << res_value_dEdxMu->getVal() << " Sigma: " << res_value_dEdxSigma << std::endl;
+    std::cout << "["<<__FUNCTION__<<"] " << Form("Extracted %s_params... ",part_name.c_str()) << std::endl;
+    std::cout << "["<<__FUNCTION__<<"] "
+	      << "RadLen: "<< res_value_radLen->getVal() << " [" << res_value_radLen->getErrorLo() + res_value_radLen->getVal()
+	      << " => " << res_value_radLen->getErrorHi() + res_value_radLen->getVal() << "]" << std::endl;
+    std::cout << "["<<__FUNCTION__<<"] "
+	      << "dEdx: Mu: " << res_value_dEdxMu->getVal() << " Sigma: " << res_value_dEdxSigma << std::endl;
     _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal());
     _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorLo());
     _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorHi());

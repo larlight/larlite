@@ -1,76 +1,122 @@
 import sys
-
-if len(sys.argv) < 2:
-    msg  = '\n'
-    msg += "Usage 1: %s $INPUT_ROOT_FILE\n" % sys.argv[0]
-    msg += '\n'
-    sys.stderr.write(msg)
-    sys.exit(1)
-
 from ROOT import gSystem
 from ROOT import larlite as fmwk
 from ROOT import sptool
 
-# Create ana_processor instance
-my_proc = fmwk.ana_processor()
+def ask_binary(msg='Proceed? [y/n]:'):
+    
+    user_input=''
+    while not user_input:
+        sys.stdout.write(msg)
+        sys.stdout.flush()
+        user_input = sys.stdin.readline().rstrip('\n').lower()
+        if user_input in ['y','n']: break
 
-# Set input root file
-for x in xrange(len(sys.argv)-1):
-    fname = sys.argv[x+1]
-    if fname.find('gamma')>=0:
-        my_proc.add_input_file(fname)
+        print 'Invalid input:',user_input
+        user_input=''
 
-# Specify IO mode
-my_proc.set_io_mode(fmwk.storage_manager.kREAD)
+    return user_input == 'y'
 
-# Specify output root file name
-my_proc.set_ana_output_file("gamma_pdf.root")
+def main():
 
-my_algo = sptool.SPAlgoEMPart()
-my_algo.SetMode(True)
-#my_algo.LoadParams()
+    if len(sys.argv) < 2:
+        msg  = '\n'
+        msg += "Usage: %s $INPUT_ROOT_FILE\n" % sys.argv[0]
+        msg += "$INPUT_ROOT_FILE containing 'gamma' ('electron') is used for training SPAlgoEMPart gamma (electron) mode.\n"
+        msg += '\n'
+        sys.stderr.write(msg)
+        sys.exit(1)
 
-my_ana = fmwk.ExampleSPSelection()
-my_ana._mgr.SetSPAlgo(my_algo)
-my_ana._mgr._training_mode =True
-my_proc.add_process(my_ana)
-my_proc.run()
+    # Create ana_processor instance
+    my_proc = fmwk.ana_processor()
+    # Create algorithm
+    my_algo = sptool.SPAlgoEMPart()
+    # Create analysis unit
+    my_ana = fmwk.ExampleSPSelection()
+    my_ana._mgr.SetSPAlgo(my_algo)
+    my_ana._mgr._training_mode =True
 
-# Re-set
-my_proc.reset()
-my_algo.SetMode(False)
+    # Check if gamma/electron files are provided:
+    gamma_files    = []
+    electron_files = []
+    for x in xrange(len(sys.argv)-1):
+        fname = sys.argv[x+1]
+        if fname.find('gamma')>=0:
+            gamma_files.append(fname)
+        else:
+            electron_files.append(fname)
 
-# Set input root file
-for x in xrange(len(sys.argv)-1):
-    fname = sys.argv[x+1]
-    if fname.find('electron')>=0:
-        my_proc.add_input_file(fname)
+    print
+    print '  Running SPAlgoEMPart training script...'
+    print
+    print '  Identified %2d input files for gamma' % len(gamma_files)
+    print '  Identified %2d input files for electron' % len(electron_files)
+    if not ask_binary('  Proceed? [y/n]:'): return False
+    print
+    if ask_binary('  Load previously extracted fit parameters? [y/n]:'):
+        my_algo.LoadParams()    
+    #
+    # Training for gamma mode
+    #
+    gamma_trained = False
+    if len(gamma_files) and ask_binary('  Run training for gamma? [y/n]:'):
 
-# Specify IO mode
-my_proc.set_io_mode(fmwk.storage_manager.kREAD)
+        my_proc.set_io_mode(fmwk.storage_manager.kREAD)
+        my_proc.add_process(my_ana)
+        for f in gamma_files:
+            my_proc.add_input_file(f)
 
-# Specify output root file name
-my_proc.set_ana_output_file("electron_pdf.root")
+        my_algo.SetMode(True)
+        my_ana._mgr.Reset()
+        my_proc.set_ana_output_file("gamma_pdf.root")
+        print '    Start running gamma training...'
+        my_proc.run()
+        print
+        print '    Finished running gamma training...'
+        print
+        # Re-set
+        my_proc.reset()
+        gamma_trained = True
 
-my_ana = fmwk.ExampleSPSelection()
-my_ana._mgr.SetSPAlgo(my_algo)
-my_ana._mgr._training_mode =True
+    #
+    # Training for electron mode
+    #
+    electron_trained = False
+    if len(electron_files) and ask_binary('  Run training for electron? [y/n]:'):
 
-# Attach a template process
-my_proc.add_process(my_ana)
+        my_proc.set_io_mode(fmwk.storage_manager.kREAD)
+        my_proc.add_process(my_ana)
+        for f in electron_files:
+            my_proc.add_input_file(f)
 
-print
-print  "Finished configuring ana_processor. Start event loop!"
-print
-#sys.exit(1)
-# Let's run it.
-my_proc.run()
+        my_algo.SetMode(False)
+        my_ana._mgr.Reset()
+        my_proc.set_ana_output_file("electron_pdf.root")
+        print '    Start running electron training...'
+        my_proc.run()
+        print
+        print '    Finished running electron training...'
+        print
+        # Re-set
+        my_proc.reset()
+        electron_trained = True
 
-# done!
-print
-print "Finished running ana_processor event loop!"
-print
+    #
+    # Store trained parameters
+    #
+    if (gamma_trained or electron_trained) and ask_binary('  Store train result parameters? [y/n]:'):
+        my_algo.StoreParams()
+        print '  Parameter stored...'
+        print
 
-my_algo.StoreParams()
-sys.exit(0)
+    return True
+
+if __name__ == '__main__':
+    if not main(): 
+        print
+        print 'Process terminated.'
+    else:
+        print
+        print 'Process finished.'
+    print
 

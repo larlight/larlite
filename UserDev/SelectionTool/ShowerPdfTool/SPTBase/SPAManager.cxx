@@ -30,7 +30,6 @@ namespace sptool {
   void SPAManager::Reset() {
 
     switch(_status) {
-    case kINIT:
     case kPROCESSING:
       std::cout << "\033[93m[WARNING]\033[00m<<"
 		<< __FUNCTION__
