@@ -68,7 +68,7 @@ def main():
 
         my_algo.SetMode(True)
         my_ana._mgr.Reset()
-        my_proc.set_ana_output_file("gamma_pdf.root")
+        my_proc.set_ana_output_file("gamma_training.root")
         print '    Start running gamma training...'
         my_proc.run()
         print
@@ -91,7 +91,7 @@ def main():
 
         my_algo.SetMode(False)
         my_ana._mgr.Reset()
-        my_proc.set_ana_output_file("electron_pdf.root")
+        my_proc.set_ana_output_file("electron_training.root")
         print '    Start running electron training...'
         my_proc.run()
         print
