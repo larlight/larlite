@@ -8,7 +8,24 @@ namespace sptool {
   SPAManager::SPAManager() 
     : _algo   (nullptr)
     , _filter (nullptr)
-  { _status = kIDLE; Reset(); }
+  { 
+    _status = kIDLE; Reset(); 
+    _training_mode = false;
+  }
+
+  void SPAManager::SetSPAlgo(SPAlgoBase* a) 
+  { 
+    if(_status != kIDLE)
+      throw SPAException("Cannot set algorithm in non-kIDLE state...");
+    _algo = a; 
+  }
+
+  void SPAManager::SetFilter(SPAFilterBase* f)
+  { 
+    if(_status != kIDLE)
+      throw SPAException("Cannot set filter in non-kIDLE state...");
+    _filter = f;
+  }
 
   void SPAManager::Reset() {
 
@@ -41,12 +58,18 @@ namespace sptool {
       std::ostringstream msg;
       throw SPAException("No algorithm attached (must be attached before Initialize())!");
     }
-    if(_filter) _filter->ProcessBegin();
-    if(_algo) _algo->ProcessBegin();
+    if(_filter) {
+      _filter->_training_mode = this->_training_mode;
+      _filter->ProcessBegin();
+    }
+    if(_algo) {
+      _algo->_training_mode = this->_training_mode;
+      _algo->ProcessBegin();
+    }
     _status = kINIT;
   }
   
-  void SPAManager::Finalize(TFile* fout, bool select)
+  void SPAManager::Finalize(TFile* fout)
   {
     if(_status != kPROCESSING) {
       std::ostringstream msg;
@@ -57,14 +80,20 @@ namespace sptool {
 	  << ")!";
       throw SPAException(msg.str());
     }
-    if(_filter) _filter->ProcessEnd(fout);
-    if(_algo) _algo->ProcessEnd(fout,select);
+    if(_filter) {
+      _filter->_training_mode = this->_training_mode;
+      _filter->ProcessEnd(fout);
+    }
+    if(_algo) {
+      _algo->_training_mode = this->_training_mode;
+      _algo->ProcessEnd(fout);
+    }
     _status = kFINISHED;
   }  
 
-  SPArticleSet SPAManager::Process(const SPAData &data, 
-				   bool select)
+  SPArticleSet SPAManager::Process(SPAData &data)
   {
+    SPArticleSet res;
     if(_status != kPROCESSING && _status != kINIT) {
       std::ostringstream msg;
       msg <<"Cannot call Process() while status ("
@@ -75,44 +104,26 @@ namespace sptool {
       throw SPAException(msg.str());
     }
     _status = kPROCESSING;
-    if(_filter) _filter->EventBegin();
-    if(_algo) _algo->EventBegin();
-
-    if(!select) {
-
-      if(_filter) {
-	_filter->Fill(data);
-	_filter->EventEnd();
-      }
-      if(_algo){
-	_algo->Fill(data);
-	_algo->EventEnd();
-      }
-
-      return SPArticleSet();
-
-    }else{
-
-      if(_filter) {
-	auto const order = _filter->Select(data);
-	auto red_data = data;
-	red_data.ApplyOrder(order);
-      
-	auto res = _algo->Select(red_data);
-	if(_filter) _filter->EventEnd();
-	if(_algo) _algo->EventEnd();
-	
-	return res;
-      }	
-      else{ 
-
-	auto res = _algo->Select(data);
-	if(_filter) _filter->EventEnd();
-	if(_algo) _algo->EventEnd();
-	
-	return res;
-      }
+    if(_filter) {
+      _filter->_training_mode = this->_training_mode;
+      _filter->EventBegin();
     }
+    if(_algo) {
+      _algo->_training_mode = this->_training_mode;
+      _algo->EventBegin();
+    }
+
+    if(_filter) {
+      auto const order = _filter->Select(data);
+      data.ApplyOrder(order);
+    }
+
+    if(_algo)
+      res = _algo->Reconstruct(data);
+
+    if(_filter) _filter->EventEnd();
+    if(_algo) _algo->EventEnd();
+    return res;
   }
 
 }

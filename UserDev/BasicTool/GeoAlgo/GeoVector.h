@@ -124,7 +124,7 @@ namespace geoalgo {
     }
 
     /// Compute an opening angle w.r.t. the given vector
-    Vector Angle(const Vector &obj) const {
+    double Angle(const Vector &obj) const {
       compat(obj);
       if(size()!=2 && size()!=3)
 	throw GeoAlgoException("<<Angle>> only possible for 2 or 3-dimensional vectors!");
@@ -270,7 +270,7 @@ namespace geoalgo {
 
     /// Compute the angle in degrees between 2 vectors w/o dimension check.
     double _Angle_(const Vector& obj) const
-    { return acos( _Dot_(obj) / Length() / obj.Length() ) / kPI * 180.; }
+    { return acos( _Dot_(obj) / Length() / obj.Length() ); }
 
   };
 

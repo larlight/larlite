@@ -2,7 +2,7 @@
 # This is an example GNUmakefile for ShowerPdfTool package
 #
 
-SUBDIRS := SPTBase SPFilter SPAlgo SPTApp
+SUBDIRS := SPTBase SPAFilter SPAlgo SPTApp
 
 .phony: all clean
 

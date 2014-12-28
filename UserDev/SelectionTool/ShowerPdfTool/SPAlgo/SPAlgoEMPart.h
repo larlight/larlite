@@ -45,20 +45,20 @@ namespace sptool {
     /// Override the sptool::SPTBase::LoadParams function
     virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
     
-    /// Function to initialise RooFit variables
-    virtual void Reset();
-
     /// Switch e- (false) / gamma (true) mode
     void SetMode(const bool gamma) { _mode = gamma; }
 
-    /// Function to evaluate input showers and determine a score
-    virtual SPArticleSet Select(const SPAData &data);
+    /// What to do before event-loop begins
+    virtual void ProcessBegin();
 
-    /// Provide data sample for fitting
-    virtual void Fill(const SPAData &data);
+    /// Function to evaluate input showers and determine a score
+    virtual SPArticleSet Reconstruct(const SPAData &data);
 
     /// What to do once event-loop is over
-    virtual void ProcessEnd(TFile* fout, bool select);
+    virtual void ProcessEnd(TFile* fout);
+
+    /// Likelihood for a particle being gamma/electron
+    double Likelihood(bool is_electron, double dedx, double rad_length = -1.);
 
   protected:
 
@@ -97,7 +97,6 @@ namespace sptool {
     RooGaussian*    _e_dEdxPdf;   ///< e- dEdx PDF
     RooDataSet*     _e_dEdxData;
     RooRealVar*     _e_dEdxVar;
-    RooRealVar*     _e_dEdxRange;
     RooRealVar*     _e_dEdxMu;
     RooRealVar*     _e_dEdxSigma;
 
@@ -111,7 +110,6 @@ namespace sptool {
     RooGaussian*    _g_dEdxPdf; ///< gamma dEdx Pdf
     RooDataSet*     _g_dEdxData;
     RooRealVar*     _g_dEdxVar;
-    RooRealVar*     _g_dEdxRange;
     RooRealVar*     _g_dEdxMu;
     RooRealVar*     _g_dEdxSigma;
 

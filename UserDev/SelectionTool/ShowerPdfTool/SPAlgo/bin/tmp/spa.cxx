@@ -13,11 +13,8 @@ namespace sptool {
   void SPAlgo_Class_Name::Reset()
   {}
 
-  SPArticleSet SPAlgo_Class_Name::Select(const SPAData &data)
+  SPArticleSet SPAlgo_Class_Name::Reconstruct(const SPAData &data)
   { return SPArticleSet(); }
-
-  void SPAlgo_Class_Name::Fill(const SPAData &data)
-  {}
 
 }
 

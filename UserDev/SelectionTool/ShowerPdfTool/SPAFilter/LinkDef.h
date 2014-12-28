@@ -9,7 +9,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class sptool::SPFilterToy+;
+#pragma link C++ class sptool::SPAFilterToy+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif

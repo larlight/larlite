@@ -18,23 +18,21 @@
 #include <set>
 #include <map>
 #include <algorithm>
-#include "DataFormat/shower.h"
-#include "DataFormat/mcshower.h"
 #include "SPAlgoBase.h"
-#include "SPFilterBase.h"
+#include "SPAFilterBase.h"
 
 namespace sptool {
 
   /**
      \class SPAManager
-     @brief Management tool for running SPAlgoX (sptool::SPAlgoBase children) and SPFilterX (sptool::SPFilterBase children)
+     @brief Management tool for running SPAlgoX (sptool::SPAlgoBase children) and SPAFilterX (sptool::SPAFilterBase children)
      This class interfaces between the framework and SPT framework. Given a vector of shower data products
-     (either lalrite::shower or larlite::mcshower), it runs SPFilterX and SPAlgoX to identify combination
+     (either lalrite::shower or larlite::mcshower), it runs SPAFilterX and SPAlgoX to identify combination
      of shower data products for a specific interaction type defined by SPAlgoX (e.g. Pi0 decay). This is
-     done by SPAManager::Process function. A user must provide a relevant SPAlgoX and SPFilterX to be used.
+     done by SPAManager::Process function. A user must provide a relevant SPAlgoX and SPAFilterX to be used.
      In technical details, it takes the following steps:
 
-     0) If SPFilterX is provided, run over input shower array to pre-select relevant showers  \n
+     0) If SPAFilterX is provided, run over input shower array to pre-select relevant showers  \n
      1) From candidate shower list, make all possible combination of N-showers where N is     \n
         specified by SPAlgoX (see sptool::SPAlgoBase::_nshowers).                             \n
      2) Loop over all possible combinations and call SPAlgoBase::Select function to determine \n
@@ -76,20 +74,19 @@ namespace sptool {
     virtual ~SPAManager(){};
 
     /// SPAlgo setter
-    void SetSPAlgo(SPAlgoBase* a) { _algo = a; }
+    void SetSPAlgo(SPAlgoBase* a);
 
     /// Filter setter
-    void SetFilter(SPFilterBase* f) { _filter = f; }
+    void SetFilter(SPAFilterBase* f);
 
     /// Process input data
-    SPArticleSet Process(const SPAData& data,
-			 bool select=true);
+    SPArticleSet Process(SPAData& data);
 
     /// Function to be called before Process()
     void Initialize();
 
     /// Function to be called after Process()
-    void Finalize(TFile* fout=nullptr, bool select=false);
+    void Finalize(TFile* fout=nullptr);
 
     /// Function to reset things
     void Reset();
@@ -97,13 +94,16 @@ namespace sptool {
     /// Status getter
     SPAManagerStatus_t Status() const { return _status; }
 
+    /// Training mode
+    bool _training_mode;
+
   protected:
 
     SPAManagerStatus_t _status;
 
     SPAlgoBase* _algo;
 
-    SPFilterBase* _filter;
+    SPAFilterBase* _filter;
     
   };
 }

@@ -5,7 +5,8 @@
 
 namespace sptool {
 
-  void SPTBase::LoadParams(std::string fname, size_t version)
+  void SPTBase::LoadParams(std::string fname,
+			   size_t version)
   {
     // If file name is empty, use the default
     if(fname.empty())
@@ -25,7 +26,7 @@ namespace sptool {
     gErrorIgnoreLevel = kWarning;
 
     // Check if data is found
-    if(!nentries) throw SPAException(Form("Failed to load params for algo: %s",_name.c_str()));
+    if(!nentries) throw SPAException(Form("Failed to load params for class: %s",_name.c_str()));
 
     // Check if specified version is available
     if(version != kINVALID_SIZE && nentries < version) 

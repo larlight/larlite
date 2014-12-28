@@ -16,8 +16,8 @@ rootlibmap() {
 
 ######################################################
 # ShowerPdfTool
-rootlibmap libSelectionTool_SPFilter.rootmap libSelectionTool_SPFilter.so \
-    $LARLITE_USERDEVDIR/SelectionTool/ShowerPdfTool/SPFilter/LinkDef.h \
+rootlibmap libSelectionTool_SPAFilter.rootmap libSelectionTool_SPAFilter.so \
+    $LARLITE_USERDEVDIR/SelectionTool/ShowerPdfTool/SPAFilter/LinkDef.h \
     libSelectionTool_SPTBase.so
 
 

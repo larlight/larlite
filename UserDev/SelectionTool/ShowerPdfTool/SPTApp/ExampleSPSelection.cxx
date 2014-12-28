@@ -8,7 +8,6 @@ namespace larlite {
   ExampleSPSelection::ExampleSPSelection() : SPTAnaBase()
   { 
     _name="ExampleSPSelection"; 
-    _mode=true;
   }
 
   bool ExampleSPSelection::initialize() {
@@ -23,14 +22,14 @@ namespace larlite {
     auto status = SPTAnaBase::analyze(storage);
     if(!status) return status;
 
-    _mgr.Process(_data,_mode);
+    _mgr.Process(_data);
   
     return true;
   }
 
   bool ExampleSPSelection::finalize() {
 
-    _mgr.Finalize(_fout,_mode);
+    _mgr.Finalize(_fout);
     return SPTAnaBase::finalize();
 
   }

@@ -8,10 +8,10 @@ if not 'LARLITE_USERDEVDIR' in os.environ.keys():
    sys.stderr.write('$LARLITE_USERDEVDIR not defined!\n\n')
    sys.exit(1)
 
-name='SPFilter' + sys.argv[1]
-working_package='SPFilter'
-target_dir='%s/%s/ShowerPdfTool/SPFilter' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
-source_dir='%s/%s/ShowerPdfTool/SPFilter/bin/tmp' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
+name='SPAFilter' + sys.argv[1]
+working_package='SPAFilter'
+target_dir='%s/%s/ShowerPdfTool/SPAFilter' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
+source_dir='%s/%s/ShowerPdfTool/SPAFilter/bin/tmp' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
 
 in_source='%s/filter.cxx' % source_dir
 in_header='%s/filter.h' % source_dir
@@ -45,8 +45,8 @@ for line in contents:
    fout.write(line)
 
 # modify TypeDef
-contents=open('%s/SPFilter-TypeDef.h' % target_dir, 'r').read().split('\n')
-fout=open('%s/SPFilter-TypeDef.h' % target_dir,'w')
+contents=open('%s/SPAFilter-TypeDef.h' % target_dir, 'r').read().split('\n')
+fout=open('%s/SPAFilter-TypeDef.h' % target_dir,'w')
 for line in contents:
    line=line + '\n'
    if line.find('ADD_FILTER_CLASS')>=0:

@@ -2,101 +2,186 @@
 #define SELECTIONTOOL_SPALGOPI0_CXX
 
 #include "SPAlgoPi0.h"
+#include "SPTBase/SPABookKeeper.h"
+#include "GeoAlgo/GeoAlgo.h"
 
 namespace sptool {
 
   SPAlgoPi0::SPAlgoPi0() 
     : SPAlgoBase()
-    ,  _radLenPdf(nullptr)
-    , _radLenCorrelationPdf(nullptr)
-    , _data(nullptr)
+    , _pi0_pdf(nullptr)
+    , _pi0_massVar(nullptr)
+    , _pi0_massMean(nullptr)
+    , _pi0_massSigma(nullptr)
+    , _pi0_massData(nullptr)
   {
-    std::cout<<"Constructor"<<std::endl;
     _name     = "SPAlgoPi0";
-    _xmin = 0;
-    _xmax = 100;
-    _lmin = -1;
-    _lmax = 0;
-    _rad_len = -0.1;
+    _energy_min = 40.;
+    _energy_max = 1200.;
+    _angle_min  = 0.;
+    _angle_max  = 3.141592653589793;
+    _vtx_dist_max  = 10.;
+    _pi0_mean      = 130.;
+    _pi0_mean_min  = 100.;
+    _pi0_mean_max  = 160.;
+    _pi0_sigma     = 30.;
+    _pi0_sigma_min = 5.;
+    _pi0_sigma_max = 80.;
     Reset();
-    std::cout<<"Constructor end"<<std::endl;
   }
 
   void SPAlgoPi0::LoadParams(std::string fname, size_t version){
 
+    // Load EMPart params
+    _alg_emp.LoadParams(fname,version);
+
     //Load user_info
     SPTBase::LoadParams(fname,version);
+
     // Extract if parameters found
-    if (_params.exist_darray("rad_range")) {
-      auto darray = _params.get_darray("rad_range");
-      _xmin = (*darray)[0];
-      _xmax = (*darray)[1];
+
+    if(_params.exist_darray("energy_range")){
+      auto darray = _params.get_darray("energy_range");
+      _energy_min = (*darray)[0];
+      _energy_max = (*darray)[1];
     }
-    if (_params.exist_darray("rad_len")) {
-      auto darray = _params.get_darray("rad_len");
-      _rad_len = (*darray)[0];
+
+    if(_params.exist_darray("angle_range")){
+      auto darray = _params.get_darray("angle_range");
+      _angle_min = (*darray)[0];
+      _angle_max = (*darray)[1];
     }
-    // Use radiation length to build 2D rad-length correlation PDF
-    delete _radLenCorrelationPdf;
-    _radLenCorrelationPdf = new RooProdPdf("radLenCorr","Pi0 Showers Radiation Length Correlation", RooArgSet(*_radLenPdf,*_radLenPdf));
+
+    if(_params.exist_double("vtx_dist_max"))
+      _vtx_dist_max = _params.get_double("vtx_dist_max");
+      
+    if(_params.exist_darray("pi0_mean")){
+      auto darray = _params.get_darray("pi0_mean");
+      _pi0_mean     = (*darray)[0];
+      _pi0_mean_min = (*darray)[1];
+      _pi0_mean_max = (*darray)[2];
+    }
+
+    if(_params.exist_darray("pi0_sigma")){
+      auto darray = _params.get_darray("pi0_sigma");
+      _pi0_sigma     = (*darray)[0];
+      _pi0_sigma_min = (*darray)[1];
+      _pi0_sigma_max = (*darray)[2];
+    }
 
     return;
   }
 
   void SPAlgoPi0::Reset()
   {
-    std::cout<<"Calling "<<__FUNCTION__<<std::endl;
-    _radLenRange = new RooRealVar("_x","Distance [cm]",_xmin,_xmax);
-    _radLenVal   = new RooRealVar("_l","Radiation length [cm]",_rad_len,_lmin,_lmax);
-    delete _radLenPdf;
-    _radLenPdf = _factory.RadLenPdf(*_radLenRange,*_radLenVal);
-    delete _radLenCorrelationPdf;
-    _radLenCorrelationPdf = new RooProdPdf("radLenCorr","Pi0 Showers Radiation Length Correlation", RooArgSet(*_radLenPdf,*_radLenPdf));
-    delete _data;
-    _data = new RooDataSet("radLenData","RooFit Radiation Length Data",RooArgSet(_vars[0]));
-    std::cout<<"Called "<<__FUNCTION__<<std::endl;
+    _alg_emp.Reset();
+    delete _pi0_massVar;
+    delete _pi0_massMean;
+    delete _pi0_massSigma;
+    delete _pi0_massData;
+    delete _pi0_massPdf;
+
+    double mass_min = _pi0_mean - _pi0_sigma_max * 5.;
+    if(mass_min<0) mass_min = 0;
+    double mass_max = _pi0_mean + _pi0_sigma_max * 5.;
+    _pi0_massVar  = new RooRealVar("_pi0_massVar","Pi0 Mass Range [MeV]",
+				   mass_min, mass_max);
+
+    _pi0_massMean = new RooRealVar("_pi0_massMean","Pi0 Mass Mean [MeV]",
+				   _pi0_mean, _pi0_mean_min, _pi0_mean_max);
+
+    _pi0_massSigma = new RooRealVar("_pi0_massSigma","Pi0 Mass Sigma [MeV]",
+				    _pi0_sigma, _pi0_sigma_min, _pi0_sigma_max);
+
+    _pi0_massData = new RooDataSet("_pi0_massData", "Pi0 Mass Fit Data", RooArgSet(*_pi0_massVar));
+
+    ShowerPdfFactory factory;
+    _pi0_pdf = factory.Pi0Mass(*_pi0_massVar, *_pi0_massMean, *_pi0_massSigma);
+    
   }
+  
+  void SPAlgoPi0::Likelihood(const SPAShower& shower_a,
+			     const SPAShower& shower_b,
+			     double& likelihood,
+			     double& mass)
+  {
+    likelihood = 1.e-10;
+    mass       = -1.;
 
-  SPArticleSet SPAlgoPi0::Select(const SPAData &data)
-  { return SPArticleSet(); }
+    // Sanity check
+    if(shower_a._energy<0 || shower_b._energy<0) return;
 
-  void SPAlgoPi0::Fill(const SPAData &data)
+    // Pi0 Vtx point
+    ::geoalgo::GeoAlgo geo_alg;
+    ::geoalgo::Line_t   line_a( shower_a.Start(), shower_a.Start() + shower_a.Dir() );
+    ::geoalgo::Line_t   line_b( shower_b.Start(), shower_b.Start() + shower_b.Dir() );
+    ::geoalgo::Vector_t pt_a(3), pt_b(3);
+    double vtx_dist = sqrt(geo_alg.SqDist(line_a, line_b, pt_a, pt_b));
+    if(vtx_dist > _vtx_dist_max) return;
+
+    // Opening angle
+    double angle = shower_a.Dir().Angle(shower_b.Dir());
+    if(angle > 3.14159265358979323846/2.) return;
+
+    // Compute mass
+    mass = sqrt(4 * shower_a._energy * shower_b._energy * pow(sin(angle/2.),2));
+    _pi0_massVar->setVal(mass);
+
+    auto vtx = pt_a + ((pt_b - pt_a) / 2.);
+    likelihood  = _pi0_pdf->getVal(*_pi0_massVar);
+    likelihood *= _alg_emp.Likelihood(false,shower_a._dedx,vtx.Dist(shower_a.Start()));
+    likelihood *= _alg_emp.Likelihood(false,shower_b._dedx,vtx.Dist(shower_b.Start()));
+
+    return;
+  }
+  
+  SPArticleSet SPAlgoPi0::Reconstruct(const SPAData &data)
   { 
+    SPArticleSet res;
+    if(!data._vtxs.size() || !data._showers.size()) return res;
 
-    // Loop over all showers in the event and get Rad. Length info
-    // Assume these files come from a sample of photon showers
-    for ( auto &s : data._showers ){
-      double d = s.Start().Dist(data._vtxs[0]);
-      _vars[0].setVal(d);
-      _data->add(RooArgSet(_vars[0]));
+    SPAData tmp_data;
+    tmp_data._showers.resize(2);
+    tmp_data._vtxs.resize(1);
+    auto shower_combinations = data.Combination(data._showers.size(),2);
+
+    SPABookKeeper bk;
+    for(auto const& comb : shower_combinations) {
+
+      double likelihood = 0.;
+      double mass       = -1.;
+      Likelihood(data._showers[comb[0]],
+		 data._showers[comb[1]],
+		 likelihood,
+		 mass);
+      
+      if(likelihood > 0.5) {
+	bk.book(likelihood,comb);
+	_pi0_massVar->setVal(mass);
+	_pi0_massData->add(RooArgSet(*_pi0_massVar));
+      }
     }
 
+    return res;
   }
 
-  void SPAlgoPi0::ProcessEnd(TFile* fout, bool select){
-    
-    // Fit to radiation length & plot
-    RooPlot* frame = nullptr;
-    RooFitResult* fit_res = nullptr;
-    fit_res = _radLenPdf->fitTo(*_data,RooFit::Save());
-    fit_res->Print();
-    frame = _vars[0].frame();
-    _data->plotOn(frame);
-    _radLenPdf->plotOn(frame);
-    
-    // Save info
-    if (_params.exist_darray("rad_range"))
-      _params.get_darray("rad_range")->clear();
-    _params.append("rad_range",_xmin);
-    _params.append("rad_range",_xmax);
-    if (_params.exist_darray("rad_len"))
-      _params.get_darray("rad_len")->clear();
-    _params.append("rad_len",_rad_len);
+  void SPAlgoPi0::ProcessEnd(TFile* fout)
+  {
 
-    TCanvas *c = new TCanvas("c","Radiation Length PDF for Showers",1000,500);
-    frame->Draw();
-    c->SaveAs("RadLength.png");
-   
+    if(_training_mode) {
+      RooFitResult* fit_res = _pi0_pdf->fitTo(*_pi0_massData,RooFit::Save());
+      fit_res->Print();
+      
+      RooPlot* frame_mass = _pi0_massVar->frame();
+      _pi0_massData->plotOn(frame_mass);
+      _pi0_pdf->plotOn(frame_mass);
+      
+      TCanvas* c = new TCanvas("c","",600,500);
+      frame_mass->Draw();
+      c->SaveAs("pi0_mass.png");
+      delete c;
+    }
+
     return;
   }
 

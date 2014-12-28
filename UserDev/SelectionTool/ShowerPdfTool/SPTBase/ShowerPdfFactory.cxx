@@ -41,6 +41,13 @@ namespace sptool {
     return new RooExponential("_EvsAngPDF","Opening Angle PDF",vars[0],vars[1]);
   }
 
+  RooGaussian* ShowerPdfFactory::Pi0Mass(RooRealVar& x,
+					 RooRealVar& mu,
+					 RooRealVar& sigma) const
+  {
+    return new RooGaussian("_Pi0MassPdf","#Pi0 Mass Pdf",x,mu,sigma);
+  }
+
 }
 
 #endif

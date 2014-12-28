@@ -30,17 +30,15 @@ my_algo = sptool.SPAlgoEMPart()
 my_algo.SetMode(True)
 #my_algo.LoadParams()
 
-my_algo.Reset()
 my_ana = fmwk.ExampleSPSelection()
 my_ana._mgr.SetSPAlgo(my_algo)
-my_ana._mode =False
+my_ana._mgr._training_mode =True
 my_proc.add_process(my_ana)
 my_proc.run()
 
 # Re-set
 my_proc.reset()
 my_algo.SetMode(False)
-my_algo.Reset()
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):
@@ -56,7 +54,7 @@ my_proc.set_ana_output_file("electron_pdf.root")
 
 my_ana = fmwk.ExampleSPSelection()
 my_ana._mgr.SetSPAlgo(my_algo)
-my_ana._mode =False
+my_ana._mgr._training_mode =True
 
 # Attach a template process
 my_proc.add_process(my_ana)

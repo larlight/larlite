@@ -34,7 +34,7 @@ namespace sptool {
     
     0) sptool::SPTBase      \n
     1) sptool::SPAlgoBase   \n
-    2) sptool::SPFilterBase \n
+    2) sptool::SPAFilterBase \n
     3) sptool::SPAManager   \n
     4) sptool::ShowerPdfFactory \n
 
@@ -44,12 +44,3 @@ namespace sptool {
     If you have a question about specific SPAlgoX or PDF in ShowerPdfFactory, contact Jeremy Hewes and David Caratelli.
 
  */
-
-
-
-
-
-
-
-
-

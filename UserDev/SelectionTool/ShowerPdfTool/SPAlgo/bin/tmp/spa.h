@@ -37,10 +37,7 @@ namespace sptool {
     virtual void Reset();
 
     /// Function to evaluate input showers and determine a score
-    virtual SPArticleSet Select(const SPAData &data);
-
-    /// Provide data sample for fitting
-    virtual void Fill(const SPAData &data);
+    virtual SPArticleSet Reconstruct(const SPAData &data);
 
   };
 }

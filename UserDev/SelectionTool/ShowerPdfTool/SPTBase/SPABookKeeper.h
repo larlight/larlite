@@ -36,7 +36,6 @@ namespace sptool {
 	      const SPAComb_t& comb)
     { _list.insert(std::make_pair(score,comb)); }
 
-    
     const std::multimap<double,sptool::SPAComb_t>& list() const
     { return _list; }
 

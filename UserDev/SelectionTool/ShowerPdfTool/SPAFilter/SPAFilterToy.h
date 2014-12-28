@@ -1,43 +1,40 @@
 /**
- * \file SPFilterToy.h
+ * \file SPAFilterToy.h
  *
- * \ingroup SPFilter
+ * \ingroup SPAFilter
  * 
- * \brief Class def header for a class SPFilterToy
+ * \brief Class def header for a class SPAFilterToy
  *
  * @author kazuhiro
  */
 
-/** \addtogroup SPFilter
+/** \addtogroup SPAFilter
 
     @{*/
 
-#ifndef SELECTIONTOOL_SPFILTERTOY_H
-#define SELECTIONTOOL_SPFILTERTOY_H
+#ifndef SELECTIONTOOL_SPAFILTERTOY_H
+#define SELECTIONTOOL_SPAFILTERTOY_H
 
-#include "SPTBase/SPFilterBase.h"
+#include "SPTBase/SPAFilterBase.h"
 
 namespace sptool {
 
   /**
-     \class SPFilterToy
+     \class SPAFilterToy
      User custom SPAFilter class made by kazuhiro
    */
-  class SPFilterToy : public SPFilterBase {
+  class SPAFilterToy : public SPAFilterBase {
   
   public:
 
     /// Default constructor
-    SPFilterToy();
+    SPAFilterToy();
 
     /// Default destructor
-    virtual ~SPFilterToy(){};
+    virtual ~SPAFilterToy(){};
 
     /// Select function
     virtual SPAOrder Select (const SPAData &data);
-
-    /// Fill function
-    virtual void Fill(const SPAData &data) {}
 
   };
 }
