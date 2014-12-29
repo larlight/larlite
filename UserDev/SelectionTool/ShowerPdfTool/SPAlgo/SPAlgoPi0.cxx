@@ -4,6 +4,7 @@
 #include "SPAlgoPi0.h"
 #include "SPTBase/SPABookKeeper.h"
 #include "GeoAlgo/GeoAlgo.h"
+#include "EMShowerTools/EMShowerProfile.h"
 
 namespace sptool {
 
@@ -81,7 +82,7 @@ namespace sptool {
     delete _pi0_massPdf;
 
     double mass_min = _pi0_mean - _pi0_sigma_max * 5.;
-    if(mass_min<0) mass_min = 0;
+    if(mass_min<50) mass_min = 50;
     double mass_max = _pi0_mean + _pi0_sigma_max * 5.;
     _pi0_massVar  = new RooRealVar("_pi0_massVar","Pi0 Mass Range [MeV]",
 				   mass_min, mass_max);
@@ -122,8 +123,20 @@ namespace sptool {
     double angle = shower_a.Dir().Angle(shower_b.Dir());
     if(angle > 3.14159265358979323846/2.) return;
 
+    // Corrected energies
+    ::EMShowerProfile shower_prof;
+    ::geoalgo::AABox  volume(0,-116.5,0,256.35,116.5,1036.8);
+
+    auto xs_a = geo_alg.Intersection(volume, ::geoalgo::HalfLine_t(shower_a.Start(),shower_a.Dir()));
+    auto xs_b = geo_alg.Intersection(volume, ::geoalgo::HalfLine_t(shower_b.Start(),shower_b.Dir()));
+
+    if(!xs_a.size() || !xs_b.size()) return;
+
+    double energy_a = shower_a._energy / shower_prof.EnergyContainment( shower_a.Start().Dist(xs_a[0]) );
+    double energy_b = shower_b._energy / shower_prof.EnergyContainment( shower_b.Start().Dist(xs_b[0]) );
+
     // Compute mass
-    mass = sqrt(4 * shower_a._energy * shower_b._energy * pow(sin(angle/2.),2));
+    mass = sqrt(4 * energy_a * energy_b * pow(sin(angle/2.),2));
 
     _pi0_massVar->setVal(mass);
     auto vtx = pt_a + ((pt_b - pt_a) / 2.);
@@ -153,11 +166,12 @@ namespace sptool {
       
       bk.book(likelihood,comb);
       if( 0 < mass &&
+	  50 < mass &&
 	  (_pi0_mean - _pi0_sigma_max * 5.) < mass &&
 	  mass < (_pi0_mean + _pi0_sigma_max * 5.) ) {
 	_pi0_massVar->setVal(mass);
 	_pi0_massData->add(RooArgSet(*_pi0_massVar));
-	std::cout<<_pi0_massData->sumEntries()<<" entries... last: "<<_pi0_massData->get(_pi0_massData->sumEntries()-1)->getRealValue("_pi0_massVar")<<std::endl;
+	//std::cout<<_pi0_massData->sumEntries()<<" entries... last: "<<_pi0_massData->get(_pi0_massData->sumEntries()-1)->getRealValue("_pi0_massVar")<<std::endl;
       }
     }
 

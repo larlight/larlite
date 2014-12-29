@@ -32,16 +32,20 @@ namespace sptool {
       if(mcs.DetProfile().Momentum().E()<1) continue;
       if(isnan(mcs.DetProfile().Momentum().E())) continue;
       if(isnan(mcs.DetProfile().Momentum().Px())) continue;
-      //std::cout<<"SPAShower Creation... "<<mcs.DetProfile().Px()<<" : "<<mcs.DetProfile().Py()<<" : "<<mcs.DetProfile().Pz()<<" : "<<mcs.DetProfile().Momentum().E()<<std::endl;
       res._showers.push_back(SPAShower(mcs.DetProfile().Position(),
 				       mcs.DetProfile().Momentum())
 			     );
-
+      /*
+      res._showers.push_back(SPAShower(mcs.Start().Position(),
+				       mcs.Start().Momentum()));
+      */
       auto& s = (*res._showers.rbegin());
-
       s._energy     = mcs.DetProfile().Momentum().E();
+      //s._energy = mcs.Start().Momentum().E();
       s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.3) : gRandom->Gaus(2,2*0.3));
       s._cosmogenic = (double)(mcs.Origin() == ::larlite::simb::kCosmicRay);
+
+
       //double _radius;
       //double _cone_angle;
     }

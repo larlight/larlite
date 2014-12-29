@@ -18,6 +18,7 @@
 #include <RooRealVar.h>
 #include <RooExponential.h>
 #include <RooGaussian.h>
+#include <RooArgusBG.h>
 #include <RooGenericPdf.h>
 #include <RooAddPdf.h>
 #include <RooAbsPdf.h>
@@ -64,9 +65,10 @@ namespace sptool {
     RooExponential*  EvsAngPdf(RooRealVars_t &vars) const;
 
     /// Pi0 mass peak PDF
-    RooGaussian* Pi0Mass(RooRealVar& x,
-			 RooRealVar& mu,
-			 RooRealVar& sigma) const;
+    //RooGaussian* Pi0Mass(RooRealVar& x,
+    RooAbsPdf* Pi0Mass(RooRealVar& x,
+		       RooRealVar& mu,
+		       RooRealVar& sigma) const;
 
   };
 }

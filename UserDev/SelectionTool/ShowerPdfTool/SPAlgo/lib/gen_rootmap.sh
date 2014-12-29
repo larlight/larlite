@@ -18,6 +18,7 @@ rootlibmap() {
 # ShowerPdfTool
 rootlibmap libSelectionTool_SPAlgo.rootmap libSelectionTool_SPAlgo.so \
     $LARLITE_USERDEVDIR/SelectionTool/ShowerPdfTool/SPAlgo/LinkDef.h \
+    libBasicTool_EMShowerTools.so \
     libSelectionTool_SPTBase.so \
     libGpad.so \
     libHist.so

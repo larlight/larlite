@@ -54,7 +54,8 @@ namespace sptool {
   protected:
 
     SPAlgoEMPart  _alg_emp;
-    RooGaussian *_pi0_pdf;
+    //RooGaussian *_pi0_pdf;
+    RooAbsPdf *_pi0_pdf;
     RooRealVar  *_pi0_massVar, *_pi0_massMean, *_pi0_massSigma;
     RooDataSet  *_pi0_massData;
     RooGaussian *_pi0_massPdf;

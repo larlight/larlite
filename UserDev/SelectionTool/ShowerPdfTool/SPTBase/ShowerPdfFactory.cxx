@@ -41,11 +41,20 @@ namespace sptool {
     return new RooExponential("_EvsAngPDF","Opening Angle PDF",vars[0],vars[1]);
   }
 
-  RooGaussian* ShowerPdfFactory::Pi0Mass(RooRealVar& x,
-					 RooRealVar& mu,
-					 RooRealVar& sigma) const
+  //RooGaussian* ShowerPdfFactory::Pi0Mass(RooRealVar& x,
+  RooAbsPdf* ShowerPdfFactory::Pi0Mass(RooRealVar& x,
+				       RooRealVar& mu,
+				       RooRealVar& sigma) const
   {
     return new RooGaussian("_Pi0MassPdf","#Pi0 Mass Pdf",x,mu,sigma);
+    /*
+    RooGaussian gauss("_Pi0Gauss","pi0 mass gaussian",x,mu,sigma);
+    RooRealVar argpar("_Pi0ArgusPar","Argus parameter",-20.,-100.,0.);
+    RooArgusBG argus("_Pi0Argus","pi0 mass bg argus",x,RooFit::RooConst(134.9766/2.),argpar);
+    RooRealVar nsig("nsig","",200.,0.,10000.);
+    RooRealVar nbkg("nbkg","",800.,0.,10000.);
+    return new RooAddPdf("_Pi0MassPdf","Pi0 Mass Pdf",RooArgList(gauss,argus),RooArgList(nsig,nbkg));
+    */
   }
 
 }
