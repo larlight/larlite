@@ -15,6 +15,8 @@ namespace sptool {
     , _pi0_massMean(nullptr)
     , _pi0_massSigma(nullptr)
     , _pi0_massData(nullptr)
+    , _hMass_vs_LL(nullptr)
+    , _hMass(nullptr)
   {
     _name     = "SPAlgoPi0";
     _energy_min = 40.;
@@ -97,17 +99,22 @@ namespace sptool {
 
     ShowerPdfFactory factory;
     _pi0_pdf = factory.Pi0Mass(*_pi0_massVar, *_pi0_massMean, *_pi0_massSigma);
-    
+
+    delete _hMass_vs_LL;
+    delete _hMass;
+
+    _hMass_vs_LL = new TH2D("hMass_vs_LL","Mass vs. Likelihood",100,0,200,100,-100,10);
+    _hMass = new TH1D("hMass","Mass",100,0,200);
   }
   
-  void SPAlgoPi0::Likelihood(const SPAShower& shower_a,
-			     const SPAShower& shower_b,
-			     double& likelihood,
-			     double& mass)
+  void SPAlgoPi0::LL(const SPAShower& shower_a,
+		     const SPAShower& shower_b,
+		     double& ll,
+		     double& mass)
   {
-    likelihood = 1.e-10;
-    mass       = -1.;
-
+    ll   = -1.e-10;
+    mass = -1.;
+    
     // Sanity check
     if(shower_a._energy<0 || shower_b._energy<0) return;
 
@@ -140,9 +147,13 @@ namespace sptool {
 
     _pi0_massVar->setVal(mass);
     auto vtx = pt_a + ((pt_b - pt_a) / 2.);
-    likelihood  = _pi0_pdf->getVal(*_pi0_massVar);
-    likelihood *= _alg_emp.Likelihood(false,shower_a._dedx,vtx.Dist(shower_a.Start()));
-    likelihood *= _alg_emp.Likelihood(false,shower_b._dedx,vtx.Dist(shower_b.Start()));
+    ll  = log(_pi0_pdf->getVal(*_pi0_massVar));
+    ll += _alg_emp.LL(false,shower_a._dedx,vtx.Dist(shower_a.Start()));
+    ll += _alg_emp.LL(false,shower_b._dedx,vtx.Dist(shower_b.Start()));
+    
+    std::cout<< log(_pi0_pdf->getVal(*_pi0_massVar))<<" : "
+	     <<_alg_emp.LL(false,shower_a._dedx,vtx.Dist(shower_a.Start()))<<" : "
+	     <<_alg_emp.LL(false,shower_b._dedx,vtx.Dist(shower_b.Start()))<<std::endl;
 
     return;
   }
@@ -159,12 +170,16 @@ namespace sptool {
 
       double likelihood = 0.;
       double mass       = -1.;
-      Likelihood(data._showers[comb[0]],
-		 data._showers[comb[1]],
-		 likelihood,
-		 mass);
+      LL(data._showers[comb[0]],
+	 data._showers[comb[1]],
+	 likelihood,
+	 mass);
       
       bk.book(likelihood,comb);
+
+      _hMass_vs_LL->Fill(mass,likelihood);
+      _hMass->Fill(mass);
+
       if( 0 < mass &&
 	  50 < mass &&
 	  (_pi0_mean - _pi0_sigma_max * 5.) < mass &&
@@ -193,6 +208,15 @@ namespace sptool {
       frame_mass->Draw();
       c->SaveAs("pi0_mass.png");
       delete c;
+    }
+
+    if(fout) {
+      fout->cd();
+      _hMass_vs_LL->Write();
+      _hMass->Write();
+    }else{
+      delete _hMass_vs_LL;
+      delete _hMass;
     }
 
     return;

@@ -158,7 +158,7 @@ namespace sptool {
 
   }
 
-  double SPAlgoEMPart::Likelihood(bool is_electron, double dedx, double rad_length)
+  double SPAlgoEMPart::LL(bool is_electron, double dedx, double rad_length)
   {
 
     _g_dEdxVar->setVal(dedx);
@@ -168,11 +168,11 @@ namespace sptool {
 
       if(is_electron)
 
-	return _e_dEdxPdf->getVal(*_e_dEdxVar)/ ( _g_dEdxPdf->getVal(*_g_dEdxVar) + _e_dEdxPdf->getVal(*_e_dEdxVar) );
+	return log(_e_dEdxPdf->getVal(*_e_dEdxVar)/ ( _g_dEdxPdf->getVal(*_g_dEdxVar) + _e_dEdxPdf->getVal(*_e_dEdxVar) ));
 
       else
 
-	return _g_dEdxPdf->getVal(*_g_dEdxVar)/ ( _g_dEdxPdf->getVal(*_g_dEdxVar) + _e_dEdxPdf->getVal(*_e_dEdxVar) );
+	return log(_g_dEdxPdf->getVal(*_g_dEdxVar)/ ( _g_dEdxPdf->getVal(*_g_dEdxVar) + _e_dEdxPdf->getVal(*_e_dEdxVar) ));
 
     }else{
 
@@ -181,15 +181,15 @@ namespace sptool {
       
       if(is_electron)
 	
-	return (_e_dEdxPdf->getVal(*_e_dEdxVar) * _e_radLenPdf->getVal(*_e_radLenVar) ) / 
-	  ( _g_dEdxPdf->getVal(*_g_dEdxVar) * _g_radLenPdf->getVal(*_g_radLenVar) + 
-	    _e_dEdxPdf->getVal(*_e_dEdxVar) * _e_radLenPdf->getVal(*_e_radLenVar) );
+	return log((_e_dEdxPdf->getVal(*_e_dEdxVar) * _e_radLenPdf->getVal(*_e_radLenVar) ) / 
+		   ( _g_dEdxPdf->getVal(*_g_dEdxVar) * _g_radLenPdf->getVal(*_g_radLenVar) + 
+		     _e_dEdxPdf->getVal(*_e_dEdxVar) * _e_radLenPdf->getVal(*_e_radLenVar) ));
       
       else
 	
-	return (_g_dEdxPdf->getVal(*_g_dEdxVar) * _g_radLenPdf->getVal(*_g_radLenVar) ) / 
-	  ( _g_dEdxPdf->getVal(*_g_dEdxVar) * _g_radLenPdf->getVal(*_g_radLenVar) + 
-	    _e_dEdxPdf->getVal(*_e_dEdxVar) * _e_radLenPdf->getVal(*_e_radLenVar) );
+	return log((_g_dEdxPdf->getVal(*_g_dEdxVar) * _g_radLenPdf->getVal(*_g_radLenVar) ) / 
+		   ( _g_dEdxPdf->getVal(*_g_dEdxVar) * _g_radLenPdf->getVal(*_g_radLenVar) + 
+		     _e_dEdxPdf->getVal(*_e_dEdxVar) * _e_radLenPdf->getVal(*_e_radLenVar) ));
     }
   }
 
@@ -206,8 +206,8 @@ namespace sptool {
       if(data._vtxs.size())
 	dist = s.Start().Dist(data._vtxs[0]);
 
-      double e_like = Likelihood(true,  dEdx, dist);
-      double g_like = Likelihood(false, dEdx, dist);
+      double e_like = LL(true,  dEdx, dist);
+      double g_like = LL(false, dEdx, dist);
 
       SPArticle p;
       p.pdg_code( ( g_like > e_like ? 22 : 11 ) );

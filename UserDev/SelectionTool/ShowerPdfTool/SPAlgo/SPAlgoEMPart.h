@@ -58,7 +58,7 @@ namespace sptool {
     virtual void ProcessEnd(TFile* fout);
 
     /// Likelihood for a particle being gamma/electron
-    double Likelihood(bool is_electron, double dedx, double rad_length = -1.);
+    double LL(bool is_electron, double dedx, double rad_length = -1.);
 
   protected:
 
@@ -88,30 +88,30 @@ namespace sptool {
     double _g_dedxmax; ///< gamma dEdx param range max [MeV]
 
     // e- RadLen PDF 
-    RooExponential* _e_radLenPdf; ///< e- RadLen PDF
-    RooDataSet*     _e_radLenData;      ///< e- pdf data set
-    RooRealVar*     _e_radLenVar;      ///< e- pdf cariable set
-    RooRealVar*     _e_radLenVal;
+    RooAbsPdf*  _e_radLenPdf; ///< e- RadLen PDF
+    RooDataSet* _e_radLenData;      ///< e- pdf data set
+    RooRealVar* _e_radLenVar;      ///< e- pdf cariable set
+    RooRealVar* _e_radLenVal;
 
     // e- dEdx PDF
-    RooGaussian*    _e_dEdxPdf;   ///< e- dEdx PDF
-    RooDataSet*     _e_dEdxData;
-    RooRealVar*     _e_dEdxVar;
-    RooRealVar*     _e_dEdxMu;
-    RooRealVar*     _e_dEdxSigma;
+    RooAbsPdf*  _e_dEdxPdf;   ///< e- dEdx PDF
+    RooDataSet* _e_dEdxData;
+    RooRealVar* _e_dEdxVar;
+    RooRealVar* _e_dEdxMu;
+    RooRealVar* _e_dEdxSigma;
 
     // gamma RadLen PDF
-    RooExponential* _g_radLenPdf;     ///< gamma RadLen Pdf
-    RooDataSet*     _g_radLenData;    ///< gamma pdf data set
-    RooRealVar*     _g_radLenVar;    ///< gamma pdf cariable set
-    RooRealVar*     _g_radLenVal;
+    RooAbsPdf*  _g_radLenPdf;     ///< gamma RadLen Pdf
+    RooDataSet* _g_radLenData;    ///< gamma pdf data set
+    RooRealVar* _g_radLenVar;    ///< gamma pdf cariable set
+    RooRealVar* _g_radLenVal;
 
     // gamma dEdx PDF
-    RooGaussian*    _g_dEdxPdf; ///< gamma dEdx Pdf
-    RooDataSet*     _g_dEdxData;
-    RooRealVar*     _g_dEdxVar;
-    RooRealVar*     _g_dEdxMu;
-    RooRealVar*     _g_dEdxSigma;
+    RooAbsPdf*  _g_dEdxPdf; ///< gamma dEdx Pdf
+    RooDataSet* _g_dEdxData;
+    RooRealVar* _g_dEdxVar;
+    RooRealVar* _g_dEdxMu;
+    RooRealVar* _g_dEdxSigma;
 
   };
 }

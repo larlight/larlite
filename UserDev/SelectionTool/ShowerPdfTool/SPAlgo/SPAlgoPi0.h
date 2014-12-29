@@ -16,7 +16,8 @@
 #define SELECTIONTOOL_SPALGOPI0_H
 
 #include "SPAlgo/SPAlgoEMPart.h"
-
+#include <TH1D.h>
+#include <TH2D.h>
 namespace sptool {
 
   /**
@@ -46,16 +47,15 @@ namespace sptool {
     virtual void ProcessEnd(TFile* fout);
 
     /// Likelihood of two showers being pi0 daughters
-    void Likelihood(const SPAShower& shower_a,
-		    const SPAShower& shower_b,
-		    double& likelihood,
-		    double& mass);
+    void LL(const SPAShower& shower_a,
+	    const SPAShower& shower_b,
+	    double& ll,
+	    double& mass);
 
   protected:
 
     SPAlgoEMPart  _alg_emp;
-    //RooGaussian *_pi0_pdf;
-    RooAbsPdf *_pi0_pdf;
+    RooAbsPdf   *_pi0_pdf;
     RooRealVar  *_pi0_massVar, *_pi0_massMean, *_pi0_massSigma;
     RooDataSet  *_pi0_massData;
     RooGaussian *_pi0_massPdf;
@@ -65,6 +65,10 @@ namespace sptool {
     double _vtx_dist_max;
     double _pi0_mean, _pi0_mean_min, _pi0_mean_max;
     double _pi0_sigma, _pi0_sigma_min, _pi0_sigma_max;
+
+    TH2D *_hMass_vs_LL;
+    TH1D *_hMass;
+
   };
 }
 #endif
