@@ -16,6 +16,7 @@
 #define LARLITE_CALORIMETRY_H
 
 #include "data_base.h"
+#include "Base/GeoTypes.h"
 
 namespace larlite{
   /**
@@ -53,6 +54,7 @@ namespace larlite{
     void set_kinetic_energy(const double v)               { fKineticEnergy = v; }
     void set_range(const double v)                        { fRange = v;         }
     void set_track_pitch(const std::vector<double> &v)    { fTrkPitch = v;      }
+    void set_plane_id(const geo::PlaneID& id)             { fPlaneID = id;      }
 
     // Get Methods 
     inline const std::vector<double>& dEdx()          const { return fdEdx; }
@@ -68,7 +70,7 @@ namespace larlite{
 	return fTrkPitch[0];
       else return 0;
     }
-
+    inline const geo::PlaneID& PlaneID() const { return fPlaneID;}
   protected:
 
     double              fKineticEnergy;   ///< determined kinetic energy
@@ -78,11 +80,12 @@ namespace larlite{
     std::vector<double> fDeadWireResR;    ///< dead wire residual range, collection plane
     double              fRange;           ///< total range of track
     std::vector<double> fTrkPitch;        ///< track pitch on collection plane
-    
+    geo::PlaneID        fPlaneID;
+
   private:
     
     ////////////////////////
-    ClassDef(calorimetry,1)
+    ClassDef(calorimetry,2)
     ////////////////////////
       
   };
@@ -113,7 +116,7 @@ namespace larlite{
   private:
     
     ////////////////////////
-    ClassDef(event_calorimetry,2)
+    ClassDef(event_calorimetry,3)
     ////////////////////////
   };
 }
