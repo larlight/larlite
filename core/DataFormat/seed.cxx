@@ -6,13 +6,13 @@
 namespace larlite {
 
   //----------------------------------------------------------------------------
-  seed::seed()
+  seed::seed() : data_base(data::kSeed)
   {
     fIsValid=false;
   }
 
   //----------------------------------------------------------------------------
-  seed::seed(double* Pt, double* Dir)
+  seed::seed(double* Pt, double* Dir) : data_base(data::kSeed)
   {
     for(int i=0; i!=3; i++)
       {
@@ -25,7 +25,7 @@ namespace larlite {
   }
 
   //----------------------------------------------------------------------------
-  seed::seed(double* Pt, double* Dir, double* PtErr, double* DirErr)
+  seed::seed(double* Pt, double* Dir, double* PtErr, double* DirErr) : data_base(data::kSeed)
   {
     for(int i=0; i!=3; i++)
       {
