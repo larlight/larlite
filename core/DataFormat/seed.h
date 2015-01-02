@@ -41,7 +41,9 @@ namespace larlite{
     /// Default destructor
     virtual ~seed(){}
 
-    void clear_data() { data_base::clear_data(); }
+    void clear_data() { 
+      data_base::clear_data(); 
+    }
 
   private:
     double fSeedPoint[3];
