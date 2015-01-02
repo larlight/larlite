@@ -38,7 +38,8 @@ namespace larlite{
 					       fResidualRange(original.fResidualRange),
 					       fDeadWireResR(original.fDeadWireResR),
 					       fRange(original.fRange),
-					       fTrkPitch(original.fTrkPitch)
+					       fTrkPitch(original.fTrkPitch),
+					       fPlaneID(original.fPlaneID)
     {}
     
     /// Default destructor
