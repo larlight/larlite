@@ -12,10 +12,6 @@ namespace larlite {
 
   bool ExampleSPSelection::initialize() {
 
-    //use SPTAnaBase.h _useMC to decide if to load MC or Reco info
-    if (!_useMC)
-      RecoProducer("","");
-
     _mgr.Initialize();
     return SPTAnaBase::initialize();
 

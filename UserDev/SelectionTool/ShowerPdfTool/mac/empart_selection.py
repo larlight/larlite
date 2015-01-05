@@ -28,7 +28,6 @@ my_algo = sptool.SPAlgoEMPart()
 my_algo.LoadParams()
 my_algo.Reset()
 my_ana = fmwk.ExampleSPSelection()
-my_ana.SetUseMC(True) # True = use MC info. False = use Reco info.
 my_ana._mgr.SetSPAlgo(my_algo)
 my_ana._mode =True # True = Select. False = Fill mode
 my_proc.add_process(my_ana)
