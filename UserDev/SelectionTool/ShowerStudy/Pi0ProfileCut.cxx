@@ -31,8 +31,19 @@ namespace showerana {
 
     }
 
-    _vtx = ::geoalgo::TwoLineIntersection().Intersection3D(a_vtx, b_vtx,
-							   a_dir, b_dir);
+
+    ///Make _vtx be the midpoint of the line representing the closest approach of two infinite lines
+    // Kaleko wrote this and hasn't tested it yet.
+    // Using constructor that takes in x0, y0, z0, x1, y1, z1
+    geoalgo::Line_t line1(a_vtx[0],a_vtx[1],a_vtx[2],a_vtx[0]+a_dir[0],a_vtx[1]+a_dir[1],a_vtx[2]+a_dir[2]);
+    geoalgo::Line_t line2(b_vtx[0],b_vtx[1],b_vtx[2],b_vtx[0]+b_dir[0],b_vtx[1]+b_dir[1],b_vtx[2]+b_dir[2]);
+    //These points will be filled w/ points on each line corresponding
+    //to the point of closest approach w/ the other line
+    geoalgo::Point_t pt1(3);
+    geoalgo::Point_t pt2(3);
+    _myGeoAlgo.SqDist(line1,line2,pt1,pt2);
+    _vtx = (pt2+pt1)/2;
+
   }
 
   void Pi0ProfileCut::Reset() {

@@ -17,7 +17,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
-#include "BasicTool/GeoAlgo/TwoLineIntersection.h"
+#include "BasicTool/GeoAlgo/GeoAlgo.h"
 #include "ShowerAnaException.h"
 
 namespace showerana {
@@ -54,7 +54,11 @@ namespace showerana {
     
     std::vector<double> _a_dir; ///< Daughter A's dir 
     std::vector<double> _b_dir; ///< Daughter B's dir
-  
+
+
+    //Geometry algo instance
+    geoalgo::GeoAlgo _myGeoAlgo;
+
   };
 }
 
