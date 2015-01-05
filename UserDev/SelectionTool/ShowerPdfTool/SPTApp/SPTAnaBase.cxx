@@ -84,13 +84,16 @@ namespace larlite {
 	auto ev_trk      = storage->get_data<event_track>       (_name_track);
 	auto ev_ctag_trk = storage->get_data<event_cosmictag>   (Form("%stag",  _name_track.c_str()));
 	auto ev_calo_trk = storage->get_data<event_calorimetry> (Form("%scalo", _name_track.c_str()));
+	auto ev_pid_trk  = storage->get_data<event_partid>      (Form("%spid",  _name_track.c_str()));
 	if(!ev_trk)
 	  throw ::sptool::SPAException(Form("Track info (\"%s\" not found in the event!",_name_track.c_str()));
 	if(!ev_ctag_trk)
 	  throw ::sptool::SPAException(Form("Track cosmictag info (\"%stag\" not found in the event!",_name_track.c_str()));
 	if(!ev_calo_trk)
 	  throw ::sptool::SPAException(Form("Track calorimetry info (\"%scalo\" not found in the event!",_name_track.c_str()));
-	_helper.Append(*ev_trk, *ev_ctag_trk, *ev_calo_trk, _data);
+	if(!ev_pid_trk)
+	  throw ::sptool::SPAException(Form("Track partid info (\"%spid\" not found in the event!",_name_track.c_str()));
+	_helper.Append(*ev_trk, *ev_ctag_trk, *ev_calo_trk, *ev_pid_trk, _data);
       }
     }
 
