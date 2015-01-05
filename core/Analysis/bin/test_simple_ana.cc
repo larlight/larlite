@@ -4,7 +4,7 @@
 //
 
 #include <TSystem.h>
-#include <Analysis/Analysis-TypeDef.hh>
+#include <Analysis/Analysis-TypeDef.h>
 
 int main(int argc, char** argv){
 
