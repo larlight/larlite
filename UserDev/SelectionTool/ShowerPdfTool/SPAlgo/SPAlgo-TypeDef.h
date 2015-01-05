@@ -4,16 +4,20 @@
 // Header files included here
 #include "SPAlgoPi0.h"
 #include "SPAlgoEMPart.h"
+#include "SPAlgoPE.h"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
 namespace sptool {
   class SPAlgoPi0;
   class SPAlgoEMPart;
+  class SPAlgoPE;
   //ADD_SPALGO_CLASS ... do not change this comment line
 }
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
+
 
 
 

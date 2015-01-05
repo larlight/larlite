@@ -11,9 +11,12 @@
 
 #pragma link C++ class sptool::SPAlgoPi0+;
 #pragma link C++ class sptool::SPAlgoEMPart+;
+#pragma link C++ class sptool::SPAlgoPE+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
+
 
 
 

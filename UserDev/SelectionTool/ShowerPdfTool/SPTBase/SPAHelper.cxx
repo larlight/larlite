@@ -29,7 +29,8 @@ namespace sptool {
       if(mct.PdgCode() == 321 || mct.PdgCode() == -321) t._pid = SPATrack::kKaon;
       if(mct.PdgCode() == 211 || mct.PdgCode() == -211) t._pid = SPATrack::kPion;
       for(auto& v : t._pid_score) v = 100;
-      t._pid_score[t._pid] = 0.1;
+      if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
+	
     }
     // Fill showers
     res._showers.clear();
