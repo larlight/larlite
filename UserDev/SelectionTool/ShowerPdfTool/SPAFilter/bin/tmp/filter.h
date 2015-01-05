@@ -15,7 +15,7 @@
 #ifndef SELECTIONTOOL_FILTER_CLASS_NAME_H
 #define SELECTIONTOOL_FILTER_CLASS_NAME_H
 
-#include "SPTBase/SPFilterBase.h"
+#include "SPTBase/SPAFilterBase.h"
 
 namespace sptool {
 
@@ -23,7 +23,7 @@ namespace sptool {
      \class Filter_Class_Name
      User custom SPAFilter class made by kazuhiro
    */
-  class Filter_Class_Name : public SPFilterBase {
+  class Filter_Class_Name : public SPAFilterBase {
   
   public:
 

@@ -5,7 +5,7 @@
 
 namespace sptool {
 
-  Filter_Class_Name::Filter_Class_Name() : SPFilterBase()
+  Filter_Class_Name::Filter_Class_Name() : SPAFilterBase()
   {
     _name = "Filter_Class_Name";
   }
