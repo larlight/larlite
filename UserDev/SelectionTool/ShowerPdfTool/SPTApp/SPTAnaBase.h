@@ -62,16 +62,25 @@ namespace larlite {
     */
     void RecoProducer(const std::string track, const std::string shower);
 
+    /**
+       Set whether to use MC info or Reco info
+     */
+    void SetUseMC(bool on) { _useMC = on; }
+
   protected:
 
     ::sptool::SPAData   _data;   ///< Data to be filled by this module (main purpose!)
     ::sptool::SPAHelper _helper; ///< SPAHelper helps generating SPAData
+
+    bool _useMC; ///< boolean to decide if to load MC or Reco data
 
   private:
     std::string _name_generator; ///< Generator's producer name
     std::string _name_mcreco;    ///< MCShower/MCTrack producer name
     std::string _name_track;     ///< 3D track producer name
     std::string _name_shower;    ///< 3D shower producer name
+
+
 
   };
 }
