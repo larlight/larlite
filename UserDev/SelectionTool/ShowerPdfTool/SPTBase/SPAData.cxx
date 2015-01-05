@@ -28,6 +28,8 @@ namespace sptool {
     Trajectory::clear();
     _energy     = kINVALID_DOUBLE;
     _cosmogenic = kINVALID_DOUBLE;
+    for(auto& v : _pid_score) v = -1;
+    _pid = SPATrack::kUnknown;
   }
 
   SPAData::SPAData()

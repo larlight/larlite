@@ -23,6 +23,13 @@ namespace sptool {
 	t += step.Position();
       t._energy     = (*mct.rbegin()).Momentum().E() - (*mct.begin()).Momentum().E();
       t._cosmogenic = (double)(mct.Origin() == ::larlite::simb::kCosmicRay);
+
+      if(mct.PdgCode() == 13  || mct.PdgCode() == -13 ) t._pid = SPATrack::kMuon;
+      if(mct.PdgCode() == 2212                        ) t._pid = SPATrack::kProton;
+      if(mct.PdgCode() == 321 || mct.PdgCode() == -321) t._pid = SPATrack::kKaon;
+      if(mct.PdgCode() == 211 || mct.PdgCode() == -211) t._pid = SPATrack::kPion;
+      for(auto& v : t._pid_score) v = 100;
+      t._pid_score[t._pid] = 0.1;
     }
     // Fill showers
     res._showers.clear();
@@ -94,6 +101,7 @@ namespace sptool {
   void SPAHelper::Append ( const ::larlite::event_track&  trk_v,
 			   const ::larlite::event_cosmictag& ctag_trk_v,
 			   const ::larlite::event_calorimetry& calo_trk_v,
+			   const ::larlite::event_partid& pid_trk_v,
 			   SPAData& res) const
   {
     // Fill tracks
@@ -128,6 +136,31 @@ namespace sptool {
 	for(auto const& trk_index : calo_trk_ass[calo_index])
 	  res._tracks.at(trk_index)._energy = calo.KineticEnergy();
 	
+      }
+    }
+    // Revise track part id
+    auto const& pid_trk_ass = pid_trk_v.association(trk_v.id());
+    if(pid_trk_ass.size()) {
+      for(size_t pid_index=0; pid_index<pid_trk_v.size(); ++pid_index) {
+
+	auto const &pid = pid_trk_v[pid_index];
+	// pick the one w/ minimum chi2
+	for(auto const& trk_index : pid_trk_ass[pid_index]) {
+
+	  auto& spa_trk = res._tracks.at(trk_index);
+	  std::map<double,SPATrack::TrackPartID_t> score_map;
+	  if(spa_trk._pid==SPATrack::kUnknown ||
+	     spa_trk._pid_score[spa_trk._pid] > pid.MinChi2()) {
+	    score_map.insert(std::make_pair(pid.Chi2Proton(),SPATrack::kProton));
+	    score_map.insert(std::make_pair(pid.Chi2Kaon(),SPATrack::kKaon));
+	    score_map.insert(std::make_pair(pid.Chi2Pion(),SPATrack::kPion));
+	    score_map.insert(std::make_pair(pid.Chi2Muon(),SPATrack::kMuon));
+	    for(auto const& score_pid : score_map)
+	      spa_trk._pid_score[score_pid.second] = score_pid.first;
+	    spa_trk._pid = (*score_map.begin()).second;
+	    spa_trk._pid_score[SPATrack::kPIDA] = pid.PIDA();
+	  }
+	}
       }
     }
   }
@@ -180,11 +213,12 @@ namespace sptool {
 				const ::larlite::event_shower& shw_v,
 				const ::larlite::event_cosmictag& ctag_trk_v,
 				const ::larlite::event_cosmictag& ctag_shw_v,
-				const ::larlite::event_calorimetry& calo_trk_v) const
+				const ::larlite::event_calorimetry& calo_trk_v,
+				const ::larlite::event_partid& pid_trk_v) const
   {
     auto res = Generate(shw_v,ctag_shw_v);
     Append(vtx_v,res);
-    Append(trk_v,ctag_trk_v,calo_trk_v,res);
+    Append(trk_v,ctag_trk_v,calo_trk_v,pid_trk_v,res);
     return res;
   }
 

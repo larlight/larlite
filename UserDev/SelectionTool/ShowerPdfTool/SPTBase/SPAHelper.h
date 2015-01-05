@@ -15,6 +15,7 @@
 #define SELECTIONTOOL_SPAHELPER_H
 
 #include <iostream>
+#include <map>
 #include <TRandom.h>
 
 #include "DataFormat/mctruth.h"
@@ -26,6 +27,7 @@
 #include "DataFormat/vertex.h"
 #include "DataFormat/cosmictag.h"
 #include "DataFormat/calorimetry.h"
+#include "DataFormat/partid.h"
 #include "SPAData.h"
 
 namespace sptool {
@@ -66,7 +68,8 @@ namespace sptool {
 		       const ::larlite::event_shower&      shw_v,
 		       const ::larlite::event_cosmictag&   cos_trk_v,
 		       const ::larlite::event_cosmictag&   cos_shw_v,
-		       const ::larlite::event_calorimetry& calo_trk_v) const;
+		       const ::larlite::event_calorimetry& calo_trk_v,
+		       const ::larlite::event_partid&      pid_trk_v) const;
 
     /// Append vertex information to input SPAData
     void Append ( const ::larlite::event_vertex& vtx_v, 
@@ -81,6 +84,7 @@ namespace sptool {
     void Append ( const ::larlite::event_track&       trk_v,
 		  const ::larlite::event_cosmictag&   cos_trk_v,
 		  const ::larlite::event_calorimetry& calo_trk_v,
+		  const ::larlite::event_partid&      pid_trk_v,
 		  SPAData& res ) const;
     
   };

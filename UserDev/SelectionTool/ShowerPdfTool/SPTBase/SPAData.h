@@ -77,12 +77,22 @@ namespace sptool {
     
   public:
     
+    enum TrackPartID_t {
+      kUnknown,
+      kProton,
+      kKaon,
+      kPion,
+      kMuon,
+      kPIDA,
+      kTrackPartIDMax
+    };
+
     /// Default ctor
     SPATrack();
 
     /// Alternative ctor
     template <class T>
-    SPATrack(const std::vector<T>& trk)
+    SPATrack(const std::vector<T>& trk) : _pid_score(kTrackPartIDMax,0)
     {
       Reset();
       for(auto const& p : trk) Trajectory::push_back<T>(p);
@@ -102,6 +112,12 @@ namespace sptool {
     /// Cosmic score
     double _cosmogenic;
 
+    /// Particle id
+    TrackPartID_t _pid;
+
+    /// Score for particle id
+    std::vector<double> _pid_score;
+    
     ClassDef(SPATrack,1)
   };
 
