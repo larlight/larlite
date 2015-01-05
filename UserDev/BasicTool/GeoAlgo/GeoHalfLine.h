@@ -97,8 +97,10 @@ namespace geoalgo {
       auto l = _dir.Length();
       if(!l)
 	throw GeoAlgoException("<<Normalize>> cannot normalize 0-length direction vector!");
-      if(isnan(l))
-	throw GeoAlgoException("<<Normalize>> cannot normalize inf-length direction vector!");
+
+      // inf check commented out till compatible solution found... --kazu
+      //if(isnan(l))
+      //throw GeoAlgoException("<<Normalize>> cannot normalize inf-length direction vector!");
       _dir /= l;
     }
 
