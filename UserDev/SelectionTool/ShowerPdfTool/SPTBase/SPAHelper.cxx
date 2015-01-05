@@ -189,13 +189,16 @@ namespace sptool {
       s._cosmogenic = -1;
     }
     // Revise shower cosmogenic score
-    auto const& ctag_shw_ass = ctag_shw_v.association(shw_v.id());
-    if(ctag_shw_ass.size()) {
-      for(size_t cos_index=0; cos_index<ctag_shw_v.size(); ++cos_index) {
-	
-	auto const& ctag = ctag_shw_v[cos_index];
-	for(auto const& shw_index : ctag_shw_ass[cos_index])  
-	  res._showers.at(shw_index)._cosmogenic = ctag.fCosmicScore;
+    // make sure ctag_shr_v is not empty
+    if ( ctag_shw_v.size() ){
+      auto const& ctag_shw_ass = ctag_shw_v.association(shw_v.id());
+      if(ctag_shw_ass.size()) {
+	for(size_t cos_index=0; cos_index<ctag_shw_v.size(); ++cos_index) {
+	  
+	  auto const& ctag = ctag_shw_v[cos_index];
+	  for(auto const& shw_index : ctag_shw_ass[cos_index])  
+	    res._showers.at(shw_index)._cosmogenic = ctag.fCosmicScore;
+	}
       }
     }
 
