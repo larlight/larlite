@@ -77,11 +77,11 @@ namespace sptool {
   void SPAlgoPi0::ProcessBegin()
   {
     _alg_emp.ProcessBegin();
+    delete _pi0_pdf;
     delete _pi0_massVar;
     delete _pi0_massMean;
     delete _pi0_massSigma;
     delete _pi0_massData;
-    delete _pi0_massPdf;
 
     double mass_min = _pi0_mean - _pi0_sigma_max * 5.;
     if(mass_min<50) mass_min = 50;
@@ -151,9 +151,9 @@ namespace sptool {
     ll += _alg_emp.LL(false,shower_a._dedx,vtx.Dist(shower_a.Start()));
     ll += _alg_emp.LL(false,shower_b._dedx,vtx.Dist(shower_b.Start()));
     
-    std::cout<< log(_pi0_pdf->getVal(*_pi0_massVar))<<" : "
-	     <<_alg_emp.LL(false,shower_a._dedx,vtx.Dist(shower_a.Start()))<<" : "
-	     <<_alg_emp.LL(false,shower_b._dedx,vtx.Dist(shower_b.Start()))<<std::endl;
+    //std::cout<< log(_pi0_pdf->getVal(*_pi0_massVar))<<" : "
+	     //<<_alg_emp.LL(false,shower_a._dedx,vtx.Dist(shower_a.Start()))<<" : "
+	     //<<_alg_emp.LL(false,shower_b._dedx,vtx.Dist(shower_b.Start()))<<std::endl;
 
     return;
   }
