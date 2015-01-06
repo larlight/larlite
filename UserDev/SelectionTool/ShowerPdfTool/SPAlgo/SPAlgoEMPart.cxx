@@ -40,7 +40,7 @@ namespace sptool {
     _e_dedx_fitMax = _dedxmax;
     _g_dedx_fitMin = _dedxmin;
     _g_dedx_fitMax = _dedxmax;
-    _e_lval = -1000;
+    _e_lval = -2000;
     _e_lmin = -10000;
     _e_lmax = -100;
     _e_dedxmu = 2.;
@@ -252,6 +252,7 @@ namespace sptool {
   void SPAlgoEMPart::ProcessEnd(TFile* fout)
   {
 
+    TCanvas *c = new TCanvas("c","",1000,500);
 
 
     // Plot a bunch of stuff!
@@ -267,9 +268,12 @@ namespace sptool {
     if(_mode) {
       frame_radLen = _g_radLenVar->frame();
       frame_dEdx   = _g_dEdxVar->frame();
+      _g_radLenData->plotOn(frame_radLen);
+      _g_dEdxData->plotOn(frame_dEdx);
       // Fit only if in traning mode.
       if (_training_mode) {
 	fit_res_radLen = _g_radLenPdf->fitTo(*_g_radLenData,RooFit::Save(),RooFit::PrintLevel(-1));
+	std::cout << "Fit results for gamma radLength." << std::endl;
 	fit_res_radLen->Print();
 	fit_res_dEdx   = _g_dEdxPdf->fitTo(*_g_dEdxData, RooFit::Range(_g_dedx_fitMin, _g_dedx_fitMax), RooFit::Save(),RooFit::PrintLevel(-1));
 	fit_res_dEdx->Print();
@@ -277,18 +281,16 @@ namespace sptool {
 	_g_dEdxPdf->plotOn(frame_dEdx);
       }
       // if not overlay loaded fit results normalized to integral of events
-      {
-	double num = _g_dEdxData->sumEntries();
-	std::cout << "Num of Photon entries: " << num << std::endl;
-	_g_dEdxPdf->plotOn(frame_dEdx,RooFit::Normalization(num));
+      else{
+	_g_dEdxPdf->plotOn(frame_dEdx,RooFit::Normalization(_g_dEdxData->sumEntries()));
       }
-      _g_radLenData->plotOn(frame_radLen);
-      _g_dEdxData->plotOn(frame_dEdx);
     }
     else{
       part_name = "electron";
       frame_radLen = _e_radLenVar->frame();
       frame_dEdx   = _e_dEdxVar->frame();
+      _e_radLenData->plotOn(frame_radLen);
+      _e_dEdxData->plotOn(frame_dEdx);
       // Fit only if in training mode
       if (_training_mode) {
 	fit_res_radLen = _e_radLenPdf->fitTo(*_e_radLenData,RooFit::Save(),RooFit::PrintLevel(-1));
@@ -299,16 +301,12 @@ namespace sptool {
 	_e_dEdxPdf->plotOn(frame_dEdx);
       }
       // if not overlay loaded fit results normalized to integral of events
-      {
-	double num = _e_dEdxData->sumEntries();
-	std::cout << "Num of Electron entries: " << num << std::endl;
-	_e_dEdxPdf->plotOn(frame_dEdx,RooFit::Normalization(num));
+      else {
+	_e_dEdxPdf->plotOn(frame_dEdx,RooFit::Normalization(_e_dEdxData->sumEntries()));
       }
-      _e_radLenData->plotOn(frame_radLen);
-      _e_dEdxData->plotOn(frame_dEdx);
     }
     
-    TCanvas *c = new TCanvas("c","",1000,500);
+
 
     c->SetTitle(Form("Distance PDF for %s",part_name.c_str()));
     frame_radLen->Draw();
@@ -317,6 +315,7 @@ namespace sptool {
     c->SetTitle("Selection Likelihood");
     frame_dEdx->Draw();
     c->SaveAs(Form("dEdx_%s.png",part_name.c_str()));
+
 
     if (!_training_mode) return;
 
@@ -354,34 +353,68 @@ namespace sptool {
       _params.get_darray("dedx_range")->clear();
     _params.append("dedx_range",_dedxmin);
     _params.append("dedx_range",_dedxmax);
-  
-    TH1D *h11 = new TH1D("h11","Electron vs. Gamma Likelihood; Rad. Length [cm]; Likelihood",200,0,0.5);
-    TH1D *h22 = new TH1D("h22","Electron vs. Gamma Likelihood; Rad. Length [cm]; Likelihood",200,0,0.5);
+
+    // Rad Length likelyhood
+    TH1D *h11_radLen = new TH1D("h11_radLen","Electron vs. Gamma Likelihood; Rad. Length [cm]; Likelihood",100,0,0.1);
+    TH1D *h22_radLen = new TH1D("h22_radLen","Electron vs. Gamma Likelihood; Rad. Length [cm]; Likelihood",100,0,0.1);
     
-    for(size_t i=1; i<=100; ++i) {
-      _e_radLenVar->setVal(0.5/200.*i);
-      _g_radLenVar->setVal(0.5/200.*i);
-      
-      h11->SetBinContent(i,_e_radLenPdf->getVal(*_e_radLenVar) / (_e_radLenPdf->getVal(*_e_radLenVar) + _g_radLenPdf->getVal(*_g_radLenVar)));
-      h22->SetBinContent(i,_g_radLenPdf->getVal(*_g_radLenVar) / (_e_radLenPdf->getVal(*_e_radLenVar) + _g_radLenPdf->getVal(*_g_radLenVar)));
+    for(size_t i=0; i<100; ++i) {
+      _e_radLenVar->setVal(0.1*i/100.);
+      _g_radLenVar->setVal(0.1*i/100.);
+
+      h11_radLen->SetBinContent(i,_e_radLenPdf->getVal(*_e_radLenVar) / (_e_radLenPdf->getVal(*_e_radLenVar) + _g_radLenPdf->getVal(*_g_radLenVar)));
+      h22_radLen->SetBinContent(i,_g_radLenPdf->getVal(*_g_radLenVar) / (_e_radLenPdf->getVal(*_e_radLenVar) + _g_radLenPdf->getVal(*_g_radLenVar)));
     }
     
-    h11->SetLineWidth(2);
-    h11->SetLineColor(kBlue);
-    h11->SetFillStyle(3004);
-    h11->SetFillColor(kBlue);
-    h22->SetLineWidth(2);
-    h22->SetLineColor(kRed);
-    h22->SetFillStyle(3003);
-    h22->SetFillColor(kRed);
+    h11_radLen->SetLineWidth(2);
+    h11_radLen->SetLineColor(kBlue);
+    h11_radLen->SetFillStyle(3004);
+    h11_radLen->SetFillColor(kBlue);
+    h11_radLen->GetYaxis()->SetRangeUser(0.,1.);
+    h22_radLen->SetLineWidth(2);
+    h22_radLen->SetLineColor(kRed);
+    h22_radLen->SetFillStyle(3003);
+    h22_radLen->SetFillColor(kRed);
+    h22_radLen->GetYaxis()->SetRangeUser(0.,1.);
     
-    h11->Draw();
-    h22->Draw("sames");
-    c->SaveAs("Likelihood.png");
+    h11_radLen->Draw();
+    h22_radLen->Draw("sames");
+    c->SaveAs("Likelihood_radLen.png");
+
+
+    TH1D *h11_dEdx = new TH1D("h11_dEdx","Electron vs. Gamma Likelihood; dEdx [MeV/cm]; Likelihood",100,0,8);
+    TH1D *h22_dEdx = new TH1D("h22_dEdx","Electron vs. Gamma Likelihood; dEdx [MeV/cm]; Likelihood",100,0,8);
     
-    delete h11;
-    delete h22;
+    for(size_t i=0; i<100; ++i) {
+      _e_dEdxVar->setVal(8*i/100.);
+      _g_dEdxVar->setVal(8*i/100.);
+
+      h11_dEdx->SetBinContent(i,_e_dEdxPdf->getVal(*_e_dEdxVar) / (_e_dEdxPdf->getVal(*_e_dEdxVar) + _g_dEdxPdf->getVal(*_g_dEdxVar)));
+      h22_dEdx->SetBinContent(i,_g_dEdxPdf->getVal(*_g_dEdxVar) / (_e_dEdxPdf->getVal(*_e_dEdxVar) + _g_dEdxPdf->getVal(*_g_dEdxVar)));
+    }
+    
+    h11_dEdx->SetLineWidth(2);
+    h11_dEdx->SetLineColor(kBlue);
+    h11_dEdx->SetFillStyle(3004);
+    h11_dEdx->SetFillColor(kBlue);
+    h11_dEdx->GetYaxis()->SetRangeUser(0.,1.);
+    h22_dEdx->SetLineWidth(2);
+    h22_dEdx->SetLineColor(kRed);
+    h22_dEdx->SetFillStyle(3003);
+    h22_dEdx->SetFillColor(kRed);
+    h22_dEdx->GetYaxis()->SetRangeUser(0.,1.);
+    
+    h11_dEdx->Draw();
+    h22_dEdx->Draw("sames");
+    c->SaveAs("Likelihood_dEdx.png");
+    
+    delete h11_dEdx;
+    delete h22_dEdx;
+
+
     delete c;
+
+  
   }
   
 }
