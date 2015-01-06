@@ -85,7 +85,7 @@ namespace larlite {
     mcpart   fLepton;          ///< the outgoing lepton
     int    fMode;            ///< Interaction mode (QE/1-pi/DIS...) see enum list
     int    fInteractionType; ///< More detailed interaction type, see enum list below kNuanceOffset
-    int    fCCNC;            ///< CC or NC interaction? see enum list
+    int    fCCNC;            ///< CC or NC interaction? 0 means CC, 1 means NC
     int    fTarget;          ///< Nuclear target, as PDG code
     int    fHitNuc;          ///< Hit nucleon (2212 (proton) or 2112 (neutron))
     int    fHitQuark;        ///< For DIS events only, as PDG code
