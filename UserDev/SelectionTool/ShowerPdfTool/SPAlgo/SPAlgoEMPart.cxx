@@ -412,6 +412,29 @@ namespace sptool {
     delete h22_dEdx;
 
 
+    // for fun make a ProdPdf to plot 2D Pdf surface
+    RooProdPdf ePDF("ePDF","ePDF",RooArgSet(*_e_radLenPdf,*_e_dEdxPdf));
+    RooProdPdf gPDF("gPDF","gPDF",RooArgSet(*_g_radLenPdf,*_g_dEdxPdf));
+
+    // data set
+    //RooDataSet* data2D = gPDF.generate(RooArgSet(*_g_radLenVar,*_g_dEdxVar),10000);
+    // Histo
+    //TH1* hh_data = data2D->createHistogram("hh_data",*_g_radLenVar,RooFit::Binning(100,0,1000),
+    //					   RooFit::YVar(*_g_dEdxVar,RooFit::Binning(100,0,8)) );
+
+    TH1* h_2D = gPDF.createHistogram("gamma radLen vs. dEdx",*_g_radLenVar,RooFit::Binning(100,0,100),
+				    RooFit::YVar(*_g_dEdxVar,RooFit::Binning(100,0,8)) ); 
+    h_2D->Draw("surf");
+    c->SaveAs("radLen_vs_dEdx_2DPDF_gamma.png");
+
+    delete h_2D;
+
+    h_2D = ePDF.createHistogram("electron radLen vs. dEdx",*_e_radLenVar,RooFit::Binning(100,0,0.002),
+				    RooFit::YVar(*_e_dEdxVar,RooFit::Binning(100,0,8)) ); 
+    h_2D->Draw("surf");
+    c->SaveAs("radLen_vs_dEdx_2DPDF_electron.png");
+
+    delete h_2D;
     delete c;
 
   

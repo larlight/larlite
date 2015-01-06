@@ -18,8 +18,10 @@
 #include "SPTBase/SPAlgoBase.h"
 #include "SPTBase/ShowerPdfFactory.h"
 #include <RooPlot.h>
+#include <RooProdPdf.h>
 #include <TCanvas.h>
 #include <TH1D.h>
+#include <TH2D.h>
 #include <cstdlib>
 #include <ctime>
 
