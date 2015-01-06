@@ -79,7 +79,7 @@ namespace larlite {
 		);
       }else
 	_data = _helper.Generate(*ev_shw,*ev_ctag_shw);
-      
+
       if(!_name_track.empty()) {
 	auto ev_trk      = storage->get_data<event_track>       (_name_track);
 	auto ev_ctag_trk = storage->get_data<event_cosmictag>   (Form("%stag",  _name_track.c_str()));
@@ -96,7 +96,6 @@ namespace larlite {
 	_helper.Append(*ev_trk, *ev_ctag_trk, *ev_calo_trk, *ev_pid_trk, _data);
       }
     }
-
     one_time_warning = false;
     return true;
   }

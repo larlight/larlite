@@ -60,6 +60,11 @@ namespace sptool {
     /// Likelihood for a particle being gamma/electron
     double LL(bool is_electron, double dedx, double rad_length = -1.);
 
+    /// Set bounds for dEdx PDF fitting - Electron
+    void set_e_dEdxFitRange(double min, double max) { _e_dedx_fitMin = min; _e_dedx_fitMax = max; }
+    /// Set bounds for dEdx PDF fitting - Gamma
+    void set_g_dEdxFitRange(double min, double max) { _g_dedx_fitMin = min; _g_dedx_fitMax = max; }
+
   protected:
 
     bool _mode; ///< e-/gamma mode (true: gamma, false: e-)
@@ -74,18 +79,22 @@ namespace sptool {
     double _e_lval;    ///< electron rad length param mean [cm]
     double _e_lmin;    ///< electron rad length param range min [cm]
     double _e_lmax;    ///< electron rad length param range max [cm]
-    double _e_dedxmu; ///< electron dEdx param mean [MeV]
-    double _e_dedxsigma; ///< electron dEdx param sigma [MeV]
-    double _e_dedxmin; ///< electron dEdx param range min [MeV]
-    double _e_dedxmax; ///< electron dEdx param range max [MeV]
+    double _e_dedxmu; ///< electron dEdx param mean [MeV/cm]
+    double _e_dedxsigma; ///< electron dEdx param sigma [MeV/cm]
+    double _e_dedxmin; ///< electron dEdx param range min [MeV/cm]
+    double _e_dedxmax; ///< electron dEdx param range max [MeV/cm]
+    double _e_dedx_fitMin; ///< where to start fitting [MeV/cm]
+    double _e_dedx_fitMax; ///< where to end fitting [MeV/cm]
 
     double _g_lval;    ///< gamma rad length param mean [cm]
     double _g_lmin;    ///< gamma rad length param range min [cm]
     double _g_lmax;    ///< gamma rad length param range max [cm]
-    double _g_dedxmu; ///< gamma dEdx param mean [MeV]
-    double _g_dedxsigma; ///< gamma dEdx param sigma [MeV]
-    double _g_dedxmin; ///< gamma dEdx param range min [MeV]
-    double _g_dedxmax; ///< gamma dEdx param range max [MeV]
+    double _g_dedxmu; ///< gamma dEdx param mean [MeV/cm]
+    double _g_dedxsigma; ///< gamma dEdx param sigma [MeV/cm]
+    double _g_dedxmin; ///< gamma dEdx param range min [MeV/cm]
+    double _g_dedxmax; ///< gamma dEdx param range max [MeV/cm]
+    double _g_dedx_fitMin; ///< where to start fitting [MeV/cm]
+    double _g_dedx_fitMax; ///< where to end fitting [MeV/cm]
 
     // e- RadLen PDF 
     RooAbsPdf*  _e_radLenPdf; ///< e- RadLen PDF

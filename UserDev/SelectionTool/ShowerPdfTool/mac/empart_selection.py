@@ -27,7 +27,9 @@ my_proc.set_ana_output_file("EMselectionPDF.root")
 my_algo = sptool.SPAlgoEMPart()
 my_algo.LoadParams()
 my_algo.Reset()
+my_algo.SetMode(False) # True = Gamma. False = Electron.
 my_ana = fmwk.ExampleSPSelection()
+#my_ana.RecoProducer("","showerreco") # call if using Reco objects
 my_ana._mgr.SetSPAlgo(my_algo)
 my_ana._mode =True # True = Select. False = Fill mode
 my_proc.add_process(my_ana)

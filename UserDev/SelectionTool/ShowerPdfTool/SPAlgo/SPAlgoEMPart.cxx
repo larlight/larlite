@@ -35,7 +35,11 @@ namespace sptool {
     _xmin = 0.;
     _xmax = 100.;
     _dedxmin = 0.;
-    _dedxmax = 10.;
+    _dedxmax = 8.;
+    _e_dedx_fitMin = _dedxmin;
+    _e_dedx_fitMax = _dedxmax;
+    _g_dedx_fitMin = _dedxmin;
+    _g_dedx_fitMax = _dedxmax;
     _e_lval = -1000;
     _e_lmin = -10000;
     _e_lmax = -100;
@@ -47,10 +51,10 @@ namespace sptool {
     _g_lmin = -1./10.;
     _g_lmax = -1./100.;
     _g_dedxmu = 4.;
-    _g_dedxsigma = _g_dedxmu*0.3;
+    _g_dedxsigma = _g_dedxmu*0.2;
     _g_dedxmin = _dedxmin;
     _g_dedxmax = _dedxmax;
-    std::srand(std::time(0));
+
   }
 
   void SPAlgoEMPart::LoadParams(std::string fname,size_t version)
@@ -196,12 +200,19 @@ namespace sptool {
   SPArticleSet SPAlgoEMPart::Reconstruct(const SPAData &data)
   {
     SPArticleSet res;
-    if(!data._vtxs.size()) return res;
+
+    // No! -> Reconstructed quantities might not have vertex at this stage
+    // LL function automatically takes care of case in which dist < 0 (only uses dEdx for LL calculation)
+    // if(!data._vtxs.size()) return res;
+    // David Caratelli
 
     for(auto const& s : data._showers) {
 
       double dist   = -1.;
       double dEdx   = s._dedx;
+
+      // skip if dEdx out of bounds
+      if ( (dEdx <= _dedxmin) or (dEdx >= _dedxmax) ) return res;
 
       if(data._vtxs.size())
 	dist = s.Start().Dist(data._vtxs[0]);
@@ -241,7 +252,7 @@ namespace sptool {
   void SPAlgoEMPart::ProcessEnd(TFile* fout)
   {
 
-    if (!_training_mode) return;
+
 
     // Plot a bunch of stuff!
     RooPlot* frame_radLen = nullptr;
@@ -254,15 +265,9 @@ namespace sptool {
     RooMsgService::instance().setSilentMode(true);
     
     if(_mode) {
-      fit_res_radLen = _g_radLenPdf->fitTo(*_g_radLenData,
-					   RooFit::Save(),
-					   RooFit::PrintLevel(-1),
-					   RooFit::PrintEvalErrors(-1));
+      fit_res_radLen = _g_radLenPdf->fitTo(*_g_radLenData,RooFit::Save(),RooFit::PrintLevel(-1));
       fit_res_radLen->Print();
-      fit_res_dEdx   = _g_dEdxPdf->fitTo(*_g_dEdxData,
-					 RooFit::Save(),
-					 RooFit::PrintLevel(-1),
-					 RooFit::PrintEvalErrors(-1));
+      fit_res_dEdx   = _g_dEdxPdf->fitTo(*_g_dEdxData, RooFit::Range(_g_dedx_fitMin, _g_dedx_fitMax), RooFit::Save(),RooFit::PrintLevel(-1));
       fit_res_dEdx->Print();
       frame_radLen = _g_radLenVar->frame();
       frame_dEdx   = _g_dEdxVar->frame();
@@ -275,7 +280,7 @@ namespace sptool {
       part_name = "electron";
       fit_res_radLen = _e_radLenPdf->fitTo(*_e_radLenData,RooFit::Save(),RooFit::PrintLevel(-1));
       fit_res_radLen->Print();
-      fit_res_dEdx   = _e_dEdxPdf->fitTo(*_e_dEdxData,RooFit::Save(),RooFit::PrintLevel(-1));
+      fit_res_dEdx   = _e_dEdxPdf->fitTo(*_e_dEdxData, RooFit::Range(_e_dedx_fitMin, _e_dedx_fitMax), RooFit::Save(),RooFit::PrintLevel(-1));
       fit_res_dEdx->Print();
       frame_radLen = _e_radLenVar->frame();
       frame_dEdx   = _e_dEdxVar->frame();
@@ -295,6 +300,8 @@ namespace sptool {
     frame_dEdx->Draw();
     c->SaveAs(Form("dEdx_%s.png",part_name.c_str()));
 
+    if (!_training_mode) return;
+
     RooRealVar* res_value_radLen = nullptr;
     RooRealVar* res_value_dEdxMu = nullptr;
     RooRealVar* res_value_dEdxSigma = nullptr;
@@ -313,7 +320,7 @@ namespace sptool {
 	      << "RadLen: "<< res_value_radLen->getVal() << " [" << res_value_radLen->getErrorLo() + res_value_radLen->getVal()
 	      << " => " << res_value_radLen->getErrorHi() + res_value_radLen->getVal() << "]" << std::endl;
     std::cout << "["<<__FUNCTION__<<"] "
-	      << "dEdx: Mu: " << res_value_dEdxMu->getVal() << " Sigma: " << res_value_dEdxSigma << std::endl;
+	      << "dEdx: Mu: " << res_value_dEdxMu->getVal() << " Sigma: " << res_value_dEdxSigma->getVal() << std::endl;
     _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal());
     _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorLo());
     _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorHi());
