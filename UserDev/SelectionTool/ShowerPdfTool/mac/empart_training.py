@@ -35,7 +35,7 @@ def main():
     # my_algo.set_g_dEdxFitRange(1.5,3.5);
     # Create analysis unit
     my_ana = fmwk.ExampleSPSelection()
-    my_ana.RecoProducer("","showerreco") # call if using Reco objects
+#my_ana.RecoProducer("","showerreco") # call if using Reco objects
     my_ana._mgr.SetSPAlgo(my_algo)
     my_ana._mgr._training_mode =True
 
