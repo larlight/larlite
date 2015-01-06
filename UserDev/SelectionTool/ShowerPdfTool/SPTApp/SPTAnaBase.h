@@ -62,6 +62,13 @@ namespace larlite {
     */
     void RecoProducer(const std::string track, const std::string shower);
 
+    /**
+       @brief Add a generator producer name.
+       To be used if one wants to access MC info (like MC vertex information) even if Reco      \n
+       objects are being used.                                                                  \n
+     */
+    void AddGeneratorProducer(const std::string gen) { _name_generator = gen; }
+
   protected:
 
     ::sptool::SPAData   _data;   ///< Data to be filled by this module (main purpose!)

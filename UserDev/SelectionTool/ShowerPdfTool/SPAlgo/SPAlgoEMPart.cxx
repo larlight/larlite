@@ -265,29 +265,47 @@ namespace sptool {
     RooMsgService::instance().setSilentMode(true);
     
     if(_mode) {
-      fit_res_radLen = _g_radLenPdf->fitTo(*_g_radLenData,RooFit::Save(),RooFit::PrintLevel(-1));
-      fit_res_radLen->Print();
-      fit_res_dEdx   = _g_dEdxPdf->fitTo(*_g_dEdxData, RooFit::Range(_g_dedx_fitMin, _g_dedx_fitMax), RooFit::Save(),RooFit::PrintLevel(-1));
-      fit_res_dEdx->Print();
       frame_radLen = _g_radLenVar->frame();
       frame_dEdx   = _g_dEdxVar->frame();
+      // Fit only if in traning mode.
+      if (_training_mode) {
+	fit_res_radLen = _g_radLenPdf->fitTo(*_g_radLenData,RooFit::Save(),RooFit::PrintLevel(-1));
+	fit_res_radLen->Print();
+	fit_res_dEdx   = _g_dEdxPdf->fitTo(*_g_dEdxData, RooFit::Range(_g_dedx_fitMin, _g_dedx_fitMax), RooFit::Save(),RooFit::PrintLevel(-1));
+	fit_res_dEdx->Print();
+	_g_radLenPdf->plotOn(frame_radLen);
+	_g_dEdxPdf->plotOn(frame_dEdx);
+      }
+      // if not overlay loaded fit results normalized to integral of events
+      {
+	double num = _g_dEdxData->sumEntries();
+	std::cout << "Num of Photon entries: " << num << std::endl;
+	_g_dEdxPdf->plotOn(frame_dEdx,RooFit::Normalization(num));
+      }
       _g_radLenData->plotOn(frame_radLen);
-      _g_radLenPdf->plotOn(frame_radLen);
       _g_dEdxData->plotOn(frame_dEdx);
-      _g_dEdxPdf->plotOn(frame_dEdx);
     }
     else{
       part_name = "electron";
-      fit_res_radLen = _e_radLenPdf->fitTo(*_e_radLenData,RooFit::Save(),RooFit::PrintLevel(-1));
-      fit_res_radLen->Print();
-      fit_res_dEdx   = _e_dEdxPdf->fitTo(*_e_dEdxData, RooFit::Range(_e_dedx_fitMin, _e_dedx_fitMax), RooFit::Save(),RooFit::PrintLevel(-1));
-      fit_res_dEdx->Print();
       frame_radLen = _e_radLenVar->frame();
       frame_dEdx   = _e_dEdxVar->frame();
+      // Fit only if in training mode
+      if (_training_mode) {
+	fit_res_radLen = _e_radLenPdf->fitTo(*_e_radLenData,RooFit::Save(),RooFit::PrintLevel(-1));
+	fit_res_radLen->Print();
+	fit_res_dEdx   = _e_dEdxPdf->fitTo(*_e_dEdxData, RooFit::Range(_e_dedx_fitMin, _e_dedx_fitMax), RooFit::Save(),RooFit::PrintLevel(-1));
+	fit_res_dEdx->Print();
+	_e_radLenPdf->plotOn(frame_radLen);
+	_e_dEdxPdf->plotOn(frame_dEdx);
+      }
+      // if not overlay loaded fit results normalized to integral of events
+      {
+	double num = _e_dEdxData->sumEntries();
+	std::cout << "Num of Electron entries: " << num << std::endl;
+	_e_dEdxPdf->plotOn(frame_dEdx,RooFit::Normalization(num));
+      }
       _e_radLenData->plotOn(frame_radLen);
-      _e_radLenPdf->plotOn(frame_radLen);
       _e_dEdxData->plotOn(frame_dEdx);
-      _e_dEdxPdf->plotOn(frame_dEdx);
     }
     
     TCanvas *c = new TCanvas("c","",1000,500);

@@ -64,12 +64,14 @@ namespace larlite {
 	_helper.Append(*ev_mci,_data);
       }	
 
-    }else{
+    }
+    else{
       // Use Reco info
       auto ev_shw      = storage->get_data<event_shower>    (_name_shower);
       auto ev_ctag_shw = storage->get_data<event_cosmictag> (Form("%stag",_name_shower.c_str()));
       if(!ev_shw)
 	throw ::sptool::SPAException(Form("Shower info (\"%s\") not found in the event!",_name_shower.c_str()));
+      // if no cosmic tag info available
       if(!ev_ctag_shw){
 	event_cosmictag tmp;
 	_data = _helper.Generate(*ev_shw,tmp);
@@ -77,9 +79,11 @@ namespace larlite {
 	  print(msg::kWARNING,__FUNCTION__,
 		Form("One-Time-Warning: No cosmictag for shower available (\"%stag\")",_name_shower.c_str())
 		);
-      }else
+      }
+      // if cosmic tag info is available
+      else
 	_data = _helper.Generate(*ev_shw,*ev_ctag_shw);
-
+      // if track information exists
       if(!_name_track.empty()) {
 	auto ev_trk      = storage->get_data<event_track>       (_name_track);
 	auto ev_ctag_trk = storage->get_data<event_cosmictag>   (Form("%stag",  _name_track.c_str()));
@@ -95,6 +99,16 @@ namespace larlite {
 	  throw ::sptool::SPAException(Form("Track partid info (\"%spid\" not found in the event!",_name_track.c_str()));
 	_helper.Append(*ev_trk, *ev_ctag_trk, *ev_calo_trk, *ev_pid_trk, _data);
       }
+      // if track information exists
+      if(!_name_generator.empty()){
+	
+	auto ev_mci = storage->get_data<event_mctruth> (_name_generator);
+	if(!ev_mci)
+	  throw ::sptool::SPAException("MCTruth info not found in the event!");
+	
+	_helper.Append(*ev_mci,_data);
+      }	
+
     }
     one_time_warning = false;
     return true;
