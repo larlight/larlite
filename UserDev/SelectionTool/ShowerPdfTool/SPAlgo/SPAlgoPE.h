@@ -15,6 +15,7 @@
 #ifndef SELECTIONTOOL_SPALGOPE_H
 #define SELECTIONTOOL_SPALGOPE_H
 
+#include "SPAlgo/SPAlgoEMPart.h"
 #include "SPTBase/SPAlgoBase.h"
 
 namespace sptool {
@@ -36,9 +37,19 @@ namespace sptool {
     /// Reset function
     virtual void Reset();
 
+    /// What to do before event-loop begins
+    virtual void ProcessBegin();
+
+    /// Override the sptool::SPTBase::LoadParams function
+    virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
+
     /// Function to evaluate input showers and determine a score
     virtual SPArticleSet Reconstruct(const SPAData &data);
 
+    
+  protected:
+
+    SPAlgoEMPart _alg_emp;
   };
 }
 #endif
