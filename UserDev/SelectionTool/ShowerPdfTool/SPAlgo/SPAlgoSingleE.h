@@ -46,14 +46,15 @@ namespace sptool {
     /// Function to evaluate input showers and determine a score
     virtual SPArticleSet Reconstruct(const SPAData &data);
 
+  private:
     /// Function that takes in shower and decides if it is likely electron
     /// (it uses SPAlgoEMParticle)
     bool IsShowerElectron(const sptool::SPAShower &shower);
 
-    /*
-    /// Function to decide if a proton track is matched with an electron shower
-    bool DoesProtonMatchElectron(const sptool::SPATrack &track, const sptool::SPAShower &shower);
-    */
+    /// Function to decide if two showers are correlated
+    bool AreTwoShowersCorrelated(const sptool::SPAShower &s1, const sptool::SPAShower &s2);
+
+    std::vector<size_t> ListIndependentShowersIdxs(const std::vector<sptool::SPAShower> &e_showers);
 
   protected:
 

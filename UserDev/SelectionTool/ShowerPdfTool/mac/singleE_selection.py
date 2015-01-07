@@ -27,7 +27,9 @@ my_proc.set_ana_output_file("PEselection_ana_out.root")
 
 # Possible filter to select true events
 #my_proc.enable_filter(True)
-#my_proc.add_process(fmwk.MC_1P1E_Filter())
+#pdgsel = fmwk.PDGSelection()
+#pdgsel.Select(11,pdgsel.kGENERATOR,1)
+#my_proc.add_process(pdgsel)
 
 my_algo = sptool.SPAlgoSingleE()
 my_algo.LoadParams()
