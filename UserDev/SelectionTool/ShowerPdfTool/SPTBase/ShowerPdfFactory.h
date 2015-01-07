@@ -25,6 +25,7 @@
 #include <RooAbsData.h>
 #include <RooDataSet.h>
 #include <RooFitResult.h>
+#include "RooClassFactory.h"
 #include "SPAException.h"
 #include "SPTEnv.h"
 namespace sptool {
@@ -60,6 +61,11 @@ namespace sptool {
 
     /// Instantiate dEdx PDF
     RooAbsPdf* dEdxPdf(RooRealVar &x, RooRealVar &mu, RooRealVar &sigma) const;
+
+    /// Instantiate dEdx PDF for gammas
+    RooAbsPdf* dEdxPdf_gamma(RooRealVar &_g_dEdxVar, RooRealVar &f,
+			     RooRealVar &mu1, RooRealVar &sigma1,
+			     RooRealVar &mu2, RooRealVar &sigma2) const;
 
     /// Instantiate Angle-vs-Energy PDF
     RooAbsPdf* EvsAngPdf(RooRealVars_t &vars) const;

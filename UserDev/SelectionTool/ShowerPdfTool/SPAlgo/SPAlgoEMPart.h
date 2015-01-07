@@ -91,8 +91,11 @@ namespace sptool {
     double _g_lval;    ///< gamma rad length param mean [cm]
     double _g_lmin;    ///< gamma rad length param range min [cm]
     double _g_lmax;    ///< gamma rad length param range max [cm]
-    double _g_dedxmu; ///< gamma dEdx param mean [MeV/cm]
-    double _g_dedxsigma; ///< gamma dEdx param sigma [MeV/cm]
+    double _g_dedxfrac; ///< gamma frac that has e dEdx
+    double _g_dedxmu1; ///< gamma dEdx param mean [MeV/cm]
+    double _g_dedxsigma1; ///< gamma dEdx param sigma [MeV/cm]
+    double _g_dedxmu2; ///< gamma dEdx param mean [MeV/cm]
+    double _g_dedxsigma2; ///< gamma dEdx param sigma [MeV/cm]
     double _g_dedxmin; ///< gamma dEdx param range min [MeV/cm]
     double _g_dedxmax; ///< gamma dEdx param range max [MeV/cm]
     double _g_dedx_fitMin; ///< where to start fitting [MeV/cm]
@@ -121,8 +124,11 @@ namespace sptool {
     RooAbsPdf*  _g_dEdxPdf; ///< gamma dEdx Pdf
     RooDataSet* _g_dEdxData;
     RooRealVar* _g_dEdxVar;
-    RooRealVar* _g_dEdxMu;
-    RooRealVar* _g_dEdxSigma;
+    RooRealVar* _g_dEdxFrac;
+    RooRealVar* _g_dEdxMu1;
+    RooRealVar* _g_dEdxSigma1;
+    RooRealVar* _g_dEdxMu2;
+    RooRealVar* _g_dEdxSigma2;
 
   };
 }

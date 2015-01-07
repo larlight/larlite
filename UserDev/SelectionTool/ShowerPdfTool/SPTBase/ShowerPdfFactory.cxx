@@ -20,8 +20,25 @@ namespace sptool {
   
   RooAbsPdf* ShowerPdfFactory::dEdxPdf(RooRealVar &x, RooRealVar &mu, RooRealVar &sigma) const
   {
-    // vars[0] is the mean. vars[1] the spread
     return new RooGaussian("_dEdxPdf","dEdx Pdf", x, mu, sigma);
+  }
+
+  RooAbsPdf* ShowerPdfFactory::dEdxPdf_gamma(RooRealVar &x, RooRealVar &f,
+					     RooRealVar &mu1, RooRealVar &sigma1,
+					     RooRealVar &mu2, RooRealVar &sigma2) const
+  {
+    //RooGaussian* _g1 = new RooGaussian("_dEdxPdf","dEdx Pdf", x, mu1, sigma1);
+    //RooGaussian* _g2 = new RooGaussian("_dEdxPdf","dEdx Pdf", x, mu2, sigma2);
+
+    // weird error when doing RooAddPdf: 
+    // [#0] ERROR:LinkStateMgmt -- RooAbsArg::recursiveCheckObservables(_dEdxPdf_gamma):
+    // ERROR: one or more servers of node _dEdxPdf_gamma no longer exists!
+    //return new RooAddPdf("_dEdxPdf_gamma","dEdx PDF Gamma",RooArgList(*_g1,*_g2),f);
+    RooAbsPdf* genpdf = RooClassFactory::makePdfInstance("dEdxGamma",
+							 "_g_dedxfrac * 1./(sqrt(2*3.14*pow(_g_dedxsigma1,2)))*exp(-(pow((_g_dEdx-_g_dedxmu1),2))/(2*pow(_g_dedxsigma1,2))) + (1-_g_dedxfrac) * 1./(sqrt(2*3.14*pow(_g_dedxsigma2,2)))*exp(-(pow((_g_dEdx-_g_dedxmu2),2))/(2*pow(_g_dedxsigma2,2)))",
+							 RooArgSet(x,mu1,sigma1,mu2,sigma2,f));
+    
+    return genpdf;
   }
 
 
