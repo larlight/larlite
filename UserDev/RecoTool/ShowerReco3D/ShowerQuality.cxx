@@ -280,7 +280,10 @@ namespace larlite {
       }
 
       fTreeParams.reco_energy = reco_shower.Energy().at(best_plane_index);
-      fTreeParams.reco_dedx   = reco_shower.dEdx().at(best_plane_index);
+      fTreeParams.reco_dedx_U   = reco_shower.dEdx().at(0);
+      fTreeParams.reco_dedx_V   = reco_shower.dEdx().at(1);
+      fTreeParams.reco_dedx_Y   = reco_shower.dEdx().at(2);
+      fTreeParams.reco_dedx     = reco_shower.dEdx().at(best_plane_index);
 
       // Fill Tree
       fTree->Fill();
@@ -396,7 +399,10 @@ namespace larlite {
     fTree->Branch("mc_dcosz",&fTreeParams.mc_dcosz,"mc_dcosz/D");
     fTree->Branch("mc_energy",&fTreeParams.mc_energy,"mc_energy/D");
 
-    fTree->Branch("reco_dedx",&fTreeParams.reco_dedx,"reco_dedx/D");
+    fTree->Branch("reco_dedx",&fTreeParams.reco_dedx,"reco_dedx_/D");
+    fTree->Branch("reco_dedx_U",&fTreeParams.reco_dedx_U,"reco_dedx_U/D");
+    fTree->Branch("reco_dedx_V",&fTreeParams.reco_dedx_V,"reco_dedx_V/D");
+    fTree->Branch("reco_dedx_Y",&fTreeParams.reco_dedx_Y,"reco_dedx_Y/D");
     fTree->Branch("mc_pdgid",&fTreeParams.mc_pdgid,"mc_pdgid/i");
 
     fTree->Branch("mc_reco_anglediff",&fTreeParams.mc_reco_anglediff,"mc_reco_anglediff/D");
