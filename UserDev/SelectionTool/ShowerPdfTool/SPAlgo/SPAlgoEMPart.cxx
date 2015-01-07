@@ -23,8 +23,11 @@ namespace sptool {
     , _g_dEdxPdf(nullptr)
     , _g_dEdxData(nullptr)
     , _g_dEdxVar(nullptr)
-    , _g_dEdxMu(nullptr)
-    , _g_dEdxSigma(nullptr)
+    , _g_dEdxFrac(nullptr)
+    , _g_dEdxMu1(nullptr)
+    , _g_dEdxSigma1(nullptr)
+    , _g_dEdxMu2(nullptr)
+    , _g_dEdxSigma2(nullptr)
   { 
     _name = "SPAlgoEMPart"; 
     Init();
@@ -50,8 +53,11 @@ namespace sptool {
     _g_lval = -1./20;
     _g_lmin = -1./10.;
     _g_lmax = -1./100.;
-    _g_dedxmu = 4.;
-    _g_dedxsigma = _g_dedxmu*0.2;
+    _g_dedxfrac = 0.05;
+    _g_dedxmu1 = 1.;
+    _g_dedxsigma1 = _g_dedxmu1*0.2;
+    _g_dedxmu2 = 2.;
+    _g_dedxsigma2 = _g_dedxmu2*0.2;
     _g_dedxmin = _dedxmin;
     _g_dedxmax = _dedxmax;
 
@@ -85,15 +91,21 @@ namespace sptool {
       _g_lval = (*darray)[0];
       _g_lmin = (*darray)[1];
       _g_lmax = (*darray)[2];
-      _g_dedxmu = (*darray)[3];
-      _g_dedxsigma = (*darray)[4];
+      _g_dedxmu1 = (*darray)[3];
+      _g_dedxmu2 = (*darray)[5];
+      _g_dedxsigma1 = (*darray)[4];
+      _g_dedxsigma2 = (*darray)[6];
+      _g_dedxfrac   = (*darray)[7];
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"Loaded gamma parameters..." << std::endl;
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"Rad Length: " << _g_lval << " ["<<_g_lmin<<" => "<<_g_lmax<<"]" << std:: endl;
       std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"dEdx: Mean: " << _g_dedxmu << " Sigma: " << _g_dedxsigma
-	       <<std::endl;
+	       <<"dEdx: Mean1: " << _g_dedxmu1 << " Sigma1: " << _g_dedxsigma1 << std::endl
+	       <<"["<<__FUNCTION__<<"] "
+	       <<"dEdx: Mean2: " << _g_dedxmu2 << " Sigma2: " << _g_dedxsigma2 << std::endl
+	       <<"["<<__FUNCTION__<<"] "
+	       <<"Frac: " << _g_dedxfrac <<std::endl;
     }
     if(_params.exist_darray("electron_params")) {
       auto darray = _params.get_darray("electron_params");
@@ -145,10 +157,16 @@ namespace sptool {
     delete _g_radLenVar;
     _g_radLenVar   = new RooRealVar("_g_rl","g Radiation length [cm]", _xmin, _xmax);
     // gamma dEdx vars
-    delete _g_dEdxMu;
-    _g_dEdxMu    = new RooRealVar("_g_dEdxMu","g dEdx Mean",_g_dedxmu,_g_dedxmin,_g_dedxmax);
-    delete _g_dEdxSigma;
-    _g_dEdxSigma = new RooRealVar("_g_dEdxSigma","g dEdx Sigma",_g_dedxsigma,0.,_g_dedxmax);
+    delete _g_dEdxFrac;
+    _g_dEdxFrac = new RooRealVar("_g_dedxfrac","g dEdx frac",_g_dedxfrac,0.,1.0);
+    delete _g_dEdxMu1;
+    _g_dEdxMu1    = new RooRealVar("_g_dedxmu1","g dEdx Mean",_g_dedxmu1,_g_dedxmin,_g_dedxmax);
+    delete _g_dEdxSigma1;
+    _g_dEdxSigma1 = new RooRealVar("_g_dedxsigma1","g dEdx Sigma",_g_dedxsigma1,0.,_g_dedxmax);
+    delete _g_dEdxMu2;
+    _g_dEdxMu2    = new RooRealVar("_g_dedxmu2","g dEdx Mean",_g_dedxmu2,_g_dedxmin,_g_dedxmax);
+    delete _g_dEdxSigma2;
+    _g_dEdxSigma2 = new RooRealVar("_g_dedxsigma2","g dEdx Sigma",_g_dedxsigma2,0.,_g_dedxmax);
     delete _g_dEdxVar;
     _g_dEdxVar = new RooRealVar("_g_dEdx","g dEdx", _g_dedxmin, _g_dedxmax);
     delete _g_radLenPdf;
@@ -156,7 +174,8 @@ namespace sptool {
     delete _g_radLenData;
     _g_radLenData = new RooDataSet(Form("%s_radLenData",part_name.c_str()),"RooFit distance data set",RooArgSet(*_g_radLenVar));
     delete _g_dEdxPdf;
-    _g_dEdxPdf = factory.dEdxPdf(*_g_dEdxVar, *_g_dEdxMu, *_g_dEdxSigma);
+    _g_dEdxPdf = factory.dEdxPdf_gamma(*_g_dEdxVar, *_g_dEdxFrac, *_g_dEdxMu1, *_g_dEdxSigma1, *_g_dEdxMu2, *_g_dEdxSigma2);
+    
     delete _g_dEdxData;
     _g_dEdxData = new RooDataSet(Form("%s_dEdxData",part_name.c_str()),"RooFit dEdx set",RooArgSet(*_g_dEdxVar));
 
@@ -282,7 +301,7 @@ namespace sptool {
       }
       // if not overlay loaded fit results normalized to integral of events
       else{
-	_g_dEdxPdf->plotOn(frame_dEdx,RooFit::Normalization(_g_dEdxData->sumEntries()));
+	_g_dEdxPdf->plotOn(frame_dEdx);//,RooFit::Normalization(_g_dEdxData->sumEntries()));
       }
     }
     else{
@@ -302,7 +321,7 @@ namespace sptool {
       }
       // if not overlay loaded fit results normalized to integral of events
       else {
-	_e_dEdxPdf->plotOn(frame_dEdx,RooFit::Normalization(_e_dEdxData->sumEntries()));
+	_e_dEdxPdf->plotOn(frame_dEdx);//,RooFit::Normalization(_e_dEdxData->sumEntries()));
       }
     }
     
@@ -320,29 +339,55 @@ namespace sptool {
     if (!_training_mode) return;
 
     RooRealVar* res_value_radLen = nullptr;
+    RooRealVar* res_value_dEdxFrac = nullptr;
     RooRealVar* res_value_dEdxMu = nullptr;
     RooRealVar* res_value_dEdxSigma = nullptr;
+    RooRealVar* res_value_dEdxMu1 = nullptr;
+    RooRealVar* res_value_dEdxSigma1 = nullptr;
+    RooRealVar* res_value_dEdxMu2 = nullptr;
+    RooRealVar* res_value_dEdxSigma2 = nullptr;
     if(_mode){
       res_value_radLen = (RooRealVar*)(fit_res_radLen->floatParsFinal().find("_g_l"));
-      res_value_dEdxMu   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_g_dEdxMu"));
-      res_value_dEdxSigma   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_g_dEdxSigma"));
+      res_value_dEdxFrac   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_g_dedxfrac"));
+      res_value_dEdxMu1   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_g_dedxmu1"));
+      res_value_dEdxSigma1   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_g_dedxsigma1"));
+      res_value_dEdxMu2   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_g_dedxmu2"));
+      res_value_dEdxSigma2   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_g_dedxsigma2"));
+      std::cout << "["<<__FUNCTION__<<"] " << Form("Extracted %s_params... ",part_name.c_str()) << std::endl;
+      std::cout << "["<<__FUNCTION__<<"] "
+		<< "RadLen: "<< res_value_radLen->getVal() << " [" << res_value_radLen->getErrorLo() + res_value_radLen->getVal()
+		<< " => " << res_value_radLen->getErrorHi() + res_value_radLen->getVal() << "]" << std::endl;
+      std::cout << "["<<__FUNCTION__<<"] "
+		<< "dEdx: Mu1: " << res_value_dEdxMu1->getVal() << " Sigma1: " << res_value_dEdxSigma1->getVal() << std::endl
+		<< "["<<__FUNCTION__<<"] "
+		<< "dEdx: Mu2: " << res_value_dEdxMu2->getVal() << " Sigma2: " << res_value_dEdxSigma2->getVal() << std::endl
+		<< "["<<__FUNCTION__<<"] "
+		<< "Frac: " << res_value_dEdxFrac->getVal() << std::endl;
+      _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorLo());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorHi());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_dEdxMu1->getVal());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_dEdxSigma1->getVal());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_dEdxMu2->getVal());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_dEdxSigma2->getVal());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_dEdxFrac->getVal());
     }
     else{
       res_value_radLen = (RooRealVar*)(fit_res_radLen->floatParsFinal().find("_e_l"));
       res_value_dEdxMu   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_e_dEdxMu"));
       res_value_dEdxSigma   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_e_dEdxSigma"));
+      std::cout << "["<<__FUNCTION__<<"] " << Form("Extracted %s_params... ",part_name.c_str()) << std::endl;
+      std::cout << "["<<__FUNCTION__<<"] "
+		<< "RadLen: "<< res_value_radLen->getVal() << " [" << res_value_radLen->getErrorLo() + res_value_radLen->getVal()
+		<< " => " << res_value_radLen->getErrorHi() + res_value_radLen->getVal() << "]" << std::endl;
+      std::cout << "["<<__FUNCTION__<<"] "
+		<< "dEdx: Mu: " << res_value_dEdxMu->getVal() << " Sigma: " << res_value_dEdxSigma->getVal() << std::endl;
+      _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorLo());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorHi());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_dEdxMu->getVal());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_dEdxSigma->getVal());
     }
-    std::cout << "["<<__FUNCTION__<<"] " << Form("Extracted %s_params... ",part_name.c_str()) << std::endl;
-    std::cout << "["<<__FUNCTION__<<"] "
-	      << "RadLen: "<< res_value_radLen->getVal() << " [" << res_value_radLen->getErrorLo() + res_value_radLen->getVal()
-	      << " => " << res_value_radLen->getErrorHi() + res_value_radLen->getVal() << "]" << std::endl;
-    std::cout << "["<<__FUNCTION__<<"] "
-	      << "dEdx: Mu: " << res_value_dEdxMu->getVal() << " Sigma: " << res_value_dEdxSigma->getVal() << std::endl;
-    _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal());
-    _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorLo());
-    _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorHi());
-    _params.append(Form("%s_params",part_name.c_str()),res_value_dEdxMu->getVal());
-    _params.append(Form("%s_params",part_name.c_str()),res_value_dEdxSigma->getVal());
     
     //_params.dump_contents();
     if(_params.exist_darray("rad_range"))
@@ -422,16 +467,16 @@ namespace sptool {
     //TH1* hh_data = data2D->createHistogram("hh_data",*_g_radLenVar,RooFit::Binning(100,0,1000),
     //					   RooFit::YVar(*_g_dEdxVar,RooFit::Binning(100,0,8)) );
 
-    TH1* h_2D = gPDF.createHistogram("gamma radLen vs. dEdx",*_g_radLenVar,RooFit::Binning(100,0,100),
+    TH1* h_2D = gPDF.createHistogram("gamma radLen vs. dEdx",*_g_radLenVar,RooFit::Binning(100,0,30),
 				    RooFit::YVar(*_g_dEdxVar,RooFit::Binning(100,0,8)) ); 
-    h_2D->Draw("surf");
+    h_2D->Draw("SURF3");
     c->SaveAs("radLen_vs_dEdx_2DPDF_gamma.png");
 
     delete h_2D;
 
     h_2D = ePDF.createHistogram("electron radLen vs. dEdx",*_e_radLenVar,RooFit::Binning(100,0,0.002),
 				    RooFit::YVar(*_e_dEdxVar,RooFit::Binning(100,0,8)) ); 
-    h_2D->Draw("surf");
+    h_2D->Draw("SURF3");
     c->SaveAs("radLen_vs_dEdx_2DPDF_electron.png");
 
     delete h_2D;
