@@ -12,6 +12,7 @@ import time
 gSystem.Load("libLArLite_Base")
 gSystem.Load("libLArLite_Analysis")
 gSystem.Load("libLArLite_LArUtil")
+gSystem.Load("libBasicTool_GeoAlgo")
 
 # Now import ana_processor & your class. For this example, ana_base.
 from ROOT import larlite as fmwk
@@ -38,7 +39,8 @@ my_proc.set_output_file("taggedShowers.root")
 # To show how one can run multiple analysis modules at once,
 # we make multiple ana_base instance.
 
-tagger = fmwk.MCTag()
+#tagger = fmwk.MCTag()
+tagger = fmwk.MCShowerTagger()
 tagger.SetDataType("mcreco")
 
 my_proc.add_process(tagger)
