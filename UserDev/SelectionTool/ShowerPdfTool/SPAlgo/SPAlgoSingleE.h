@@ -1,9 +1,9 @@
 /**
- * \file SPAlgoPE.h
+ * \file SPAlgoSingleE.h
  *
  * \ingroup SPAlgo
  * 
- * \brief Class def header for a class SPAlgoPE
+ * \brief Class def header for a class SPAlgoSingleE
  *
  * @author kazuhiro
  */
@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef SELECTIONTOOL_SPALGOPE_H
-#define SELECTIONTOOL_SPALGOPE_H
+#ifndef SELECTIONTOOL_SPALGOSINGLEE_H
+#define SELECTIONTOOL_SPALGOSINGLEE_H
 
 #include "SPAlgo/SPAlgoEMPart.h"
 #include "SPTBase/SPAlgoBase.h"
@@ -21,18 +21,18 @@
 namespace sptool {
 
   /**
-     \class SPAlgoPE
+     \class SPAlgoSingleE
      User custom SPAFilter class made by kazuhiro
    */
-  class SPAlgoPE : public SPAlgoBase {
+  class SPAlgoSingleE : public SPAlgoBase {
   
   public:
 
     /// Default constructor
-    SPAlgoPE();
+    SPAlgoSingleE();
 
     /// Default destructor
-    virtual ~SPAlgoPE(){};
+    virtual ~SPAlgoSingleE(){};
 
     /// Reset function
     virtual void Reset();
@@ -46,7 +46,15 @@ namespace sptool {
     /// Function to evaluate input showers and determine a score
     virtual SPArticleSet Reconstruct(const SPAData &data);
 
-    
+    /// Function that takes in shower and decides if it is likely electron
+    /// (it uses SPAlgoEMParticle)
+    bool IsShowerElectron(const sptool::SPAShower &shower);
+
+    /*
+    /// Function to decide if a proton track is matched with an electron shower
+    bool DoesProtonMatchElectron(const sptool::SPATrack &track, const sptool::SPAShower &shower);
+    */
+
   protected:
 
     SPAlgoEMPart _alg_emp;

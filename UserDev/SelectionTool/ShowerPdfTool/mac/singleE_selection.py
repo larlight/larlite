@@ -24,7 +24,12 @@ my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 # Specify output root file name
 my_proc.set_ana_output_file("PEselection_ana_out.root")
 
-my_algo = sptool.SPAlgoPE()
+
+# Possible filter to select true events
+#my_proc.enable_filter(True)
+#my_proc.add_process(fmwk.MC_1P1E_Filter())
+
+my_algo = sptool.SPAlgoSingleE()
 my_algo.LoadParams()
 my_algo.Reset()
 my_ana = fmwk.ExampleSPSelection()
