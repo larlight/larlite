@@ -49,12 +49,16 @@ namespace sptool {
   private:
     /// Function that takes in shower and decides if it is likely electron
     /// (it uses SPAlgoEMParticle)
-    bool IsShowerElectron(const sptool::SPAShower &shower);
+    bool IsShowerElectron(const sptool::SPAShower shower);
 
     /// Function to decide if two showers are correlated
-    bool AreTwoShowersCorrelated(const sptool::SPAShower &s1, const sptool::SPAShower &s2);
+    bool AreShowersStartPtCorrelated(const sptool::SPAShower s1, const sptool::SPAShower s2);
 
-    std::vector<size_t> ListIndependentShowersIdxs(const std::vector<sptool::SPAShower> &e_showers);
+    /// Function to return a list of electron-like showers, given a list of showers
+    const std::vector<sptool::SPAShower> ElectronLikeShowers(const std::vector<sptool::SPAShower> showers);
+
+    /// Function to return a list of start-point-isolated showers, given a list of showers
+    const std::vector<sptool::SPAShower> IsolatedStartPtShowers(const std::vector<sptool::SPAShower> showers);
 
   protected:
 
