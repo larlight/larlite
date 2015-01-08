@@ -23,21 +23,3 @@ namespace sptool {
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<<<<<<< HEAD
-
-=======
->>>>>>> e05075df67958daefdfd65af3cf052181b73dd2f
