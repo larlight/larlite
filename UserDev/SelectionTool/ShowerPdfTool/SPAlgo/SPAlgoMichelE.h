@@ -15,7 +15,7 @@
 #ifndef SELECTIONTOOL_SPALGOMICHELE_H
 #define SELECTIONTOOL_SPALGOMICHELE_H
 
-#include "SPAlgo/SPAlgoEMPart.h"
+#include "SPAlgo/SPAlgoSingleE.h"
 #include "SPTBase/SPAlgoBase.h"
 
 namespace sptool {
@@ -51,19 +51,13 @@ namespace sptool {
     /// Function to evaluate input showers and determine a score
     virtual SPArticleSet Reconstruct(const SPAData &data);
     
-  private:
-    
-    /// Function that takes in shower and decides if it is likely electron
-    /// (it uses SPAlgoEMParticle)
-    bool IsShowerElectron(const sptool::SPAShower &shower);
-    
     
   protected:
     
-    SPAlgoEMPart _alg_emp;
+    SPAlgoSingleE _alg_singleE;
 
     TH1F* michel_energy;
-    TH1F* dist_shower_to_trackend;
+
   };
 }
 #endif
