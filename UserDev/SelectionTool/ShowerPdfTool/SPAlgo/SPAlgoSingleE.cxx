@@ -5,8 +5,6 @@
 
 namespace sptool {
 
-  size_t single_e_shower_events = 0;
-  
   SPAlgoSingleE::SPAlgoSingleE() : SPAlgoBase()
   {
     _name     = "SPAlgoSingleE";
@@ -14,7 +12,6 @@ namespace sptool {
 
   void SPAlgoSingleE::Reset()
   {
-    std::cout<<"Number of (independent) single electron shower events found by SPAlgoSingleE = "<<single_e_shower_events<<std::endl;
   }
   
   void SPAlgoSingleE::ProcessBegin()
@@ -37,32 +34,10 @@ namespace sptool {
     SPArticleSet res;
     
     /// Get a list of the event showers that are electron like
-    const std::vector<sptool::SPAShower> e_showers = ElectronLikeShowers( data._showers );
+    auto e_showers = ElectronLikeShowers( data._showers );
 
     /// Get a list of the electron showers that are start-point-isolated
-    const std::vector<sptool::SPAShower> isolated_e_showers = IsolatedStartPtShowers( e_showers );
-
-
-    ///----------------------------------------------------------------------------//
-    ///Here is where to check that each shower is not correlated with              //
-    ///anything *else* in the event (tracks pointing towards it, etc)              //
-    ///                                                                            //
-    ///                                                                            //
-    ///                                                                            //
-    ///                                                                            //
-    ///                                                                            //
-    ///                                                                            //
-    ///                                                                            //
-    ///                                                                            //
-    ///                                                                            //
-    ///----------------------------------------------------------------------------//
-
-
-    
-
-    if(isolated_e_showers.size() == 1)
-      single_e_shower_events++;
-    
+    auto isolated_e_showers = IsolatedStartPtShowers( e_showers );
 
     /// Make an electron SPArticle for each independent shower and add it to the set
     for(auto const& isol_shower : isolated_e_showers){
