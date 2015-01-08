@@ -30,31 +30,37 @@ namespace sptool {
 
   double SPAlgoLonelyE::LL(const SPArticle shr, const SPAData &data){
 
-    // calculate score that this shower does not have anything nearby
+    // select showers that do not originate from another track/shower
     
     // do this by checking that:
-    // 1) shower & other tracks+showers don't point back to the "same" point
-    // 2) shower does not start near another shower+track
+    // 1) shower does not point backwards to the end of a track/shower
+    // 2) shower does not start near another track
     
-    double alone = 1.;
+    double minDist = 1036.; // detector length
 
     for (auto const& t : data._tracks) {
     
-      geoalgo::Point_t int1(3);
-      geoalgo::Point_t int2(3);
-      geoalgo::HalfLine_t track(t[0],t[0]-t[1]); // line pointing backwards from track start
+      geoalgo::LineSegment_t track(t[0],t.at(t.size()-1)); // segment pointing from track start to track end
+      geoalgo::Vector_t trackDir(t.at(t.size()-1)-t[0]);   // direction vector of track (normalized)
+      geoalgo::Point_t trackEnd(t.at(t.size()-1));         // track end point
       geoalgo::HalfLine_t shower(shr.pos(),shr.mom()*(-1)); // line pointing backwards from shower start
-      double distBack = _geoAlgo.SqDist(shower,track,int1,int2);
-      // int1 & int2 are the PoCA points on the shr & track lines respectively
-      std::cout << "distance between track line & shower line is: " << distBack << std::endl;
+      geoalgo::Vector_t shrDir(shr.mom()/shr.mom().Length());     // direction vector of track  (momentum but normalized)
+      // Case 1)
+      // shower & track/shower direction must agree to some extent and
+      // distance between shower start and shr/trk end should not be large
+      if ((180/3.14)*acos(trackDir.Dot(shrDir)) < 5.){
+	// shower and track directions are within 5 degrees
+	double d = trackEnd.Dist(shr.pos());
+	if ( d < minDist ) { minDist = d; }
+      }
+      // Case 2)
       double distNext = _geoAlgo.SqDist(shr.pos(),track);
-      std::cout << "distance between track and shower start: " << distNext << std::endl;
-      
-      
-      return alone;
+      if (distNext < minDist) { minDist = distNext; }
     }
 
-    return -1.;
+    std::cout << "min Dist between shower and other stuff: " << minDist << std::endl;
+
+    return -minDist;
   }
 
   SPArticleSet SPAlgoLonelyE::Reconstruct(const SPAData &data)
@@ -63,16 +69,19 @@ namespace sptool {
     //Get a list of single (start point isolated) electron showers
     //from the SPAlgoSingleE instance
     SPArticleSet single_es = _alg_singleE.Reconstruct(data);
-
+    
+    // create empty SPArticleSet for the products
+    SPArticleSet lonely_es;
+    
     // loop over showers
     for(auto const& s : single_es) {
 
-      LL(s,data);
+      if (LL(s,data) > 10){ // if more than 10 cm from anything else
+	lonely_es.push_back(s);
+      }
 
-    }
-
-
-    return SPArticleSet(); 
+    }// for all input showers from SPAlgoSingleE
+    return lonely_es; 
   }
 
 }
