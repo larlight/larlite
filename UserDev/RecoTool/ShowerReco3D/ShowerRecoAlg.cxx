@@ -166,7 +166,7 @@ namespace showerreco {
 	    }
 
 	  hitElectrons *= fCaloAlg.LifetimeCorrection(theHit.t);
-
+	  
 	  totEnergy += hitElectrons * 1.e3 / (::larutil::kGeVToElectrons);
 	  
 

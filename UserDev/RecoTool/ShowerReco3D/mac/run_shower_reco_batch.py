@@ -39,10 +39,11 @@ ana_unit = fmwk.ShowerReco3D()
 sralg = showerreco.ShowerRecoAlg()
 sralg.Verbose(False)
 sralg.SetUseArea(True)
+#sralg.SetUseModBox(True)
 ana_unit.SetShowerAlgo(sralg)
 
 # Specify cluster type
-ana_unit.SetClusterProducer("mergedfuzzycluster")
+ana_unit.SetClusterProducer("mergedmergedfuzzycluster")
 
 # 
 # Attach Matching algorithm
@@ -75,7 +76,7 @@ print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
-my_proc.run(0)
+my_proc.run()
 
-sys.exit(0)
+sys.exit()
 

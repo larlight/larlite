@@ -106,6 +106,9 @@ namespace larlite {
       double reco_dcosx, reco_dcosy, reco_dcosz;
       double reco_energy;
       double reco_dedx;
+      double reco_dedx_U;
+      double reco_dedx_V;
+      double reco_dedx_Y;
       int    best_plane_id;
 
       double mc_x, mc_y, mc_z;

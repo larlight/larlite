@@ -54,6 +54,8 @@ namespace calo{
     double ElectronsFromADCArea(double area, unsigned short plane) const
     { return area / fCalAreaConstants[plane]; }
 
+    void setUseModBox(bool on) { fUseModBox = on; }
+
   private:
     
     //art::ServiceHandle<geo::Geometry> geom; 

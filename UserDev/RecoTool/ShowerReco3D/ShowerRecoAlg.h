@@ -40,6 +40,9 @@ namespace showerreco {
     /// Function to decide if to use Area or Pulse Amplitude for calculations
     void SetUseArea(bool on) { fUseArea = on; }
 
+    /// Function to decide if to use ModBox (True) or Birks (False) for calorimetry
+    void SetUseModBox(bool on) { fCaloAlg.setUseModBox(on); }
+
   protected:
 
     /// Function to reconstruct a shower
@@ -56,8 +59,7 @@ namespace showerreco {
    double fcalodEdxlength;
    double fdEdxlength;
    bool fUseArea;
-   
-   
+
   };
 }
 

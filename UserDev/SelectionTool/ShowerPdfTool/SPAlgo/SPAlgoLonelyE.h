@@ -1,38 +1,41 @@
 /**
- * \file SPAlgoPE.h
+ * \file SPAlgoLonelyE.h
  *
  * \ingroup SPAlgo
  * 
- * \brief Class def header for a class SPAlgoPE
+ * \brief Class def header for a class SPAlgoLonelyE
  *
- * @author kazuhiro
+ * @author david
  */
 
 /** \addtogroup SPAlgo
 
     @{*/
 
-#ifndef SELECTIONTOOL_SPALGOPE_H
-#define SELECTIONTOOL_SPALGOPE_H
+#ifndef SELECTIONTOOL_SPALGOLONELYE_H
+#define SELECTIONTOOL_SPALGOLONELYE_H
 
-#include "SPAlgo/SPAlgoEMPart.h"
 #include "SPTBase/SPAlgoBase.h"
+#include "SPAlgo/SPAlgoSingleE.h"
+// include GeoAlgo functions
+#include "GeoAlgo/GeoAlgoConstants.h"
+#include "GeoAlgo/GeoAlgo.h"
 
 namespace sptool {
-
-  /**
-     \class SPAlgoPE
-     User custom SPAFilter class made by kazuhiro
-   */
-  class SPAlgoPE : public SPAlgoBase {
   
+  /**
+     \class SPAlgoLonelyE
+     User custom SPAFilter class made by david
+  */
+  class SPAlgoLonelyE : public SPAlgoBase {
+    
   public:
-
+    
     /// Default constructor
-    SPAlgoPE();
+    SPAlgoLonelyE();
 
     /// Default destructor
-    virtual ~SPAlgoPE(){};
+    virtual ~SPAlgoLonelyE(){};
 
     /// Reset function
     virtual void Reset();
@@ -45,11 +48,17 @@ namespace sptool {
 
     /// Function to evaluate input showers and determine a score
     virtual SPArticleSet Reconstruct(const SPAData &data);
-
     
-  protected:
+    /// Likelyhood function where to figure out if shower is lonely
+    double LL(const SPArticle shr, const SPAData &data);
 
-    SPAlgoEMPart _alg_emp;
+  private:
+
+    geoalgo::GeoAlgo _geoAlgo;
+
+    // instance of SPAlgoSingleE
+    SPAlgoSingleE _alg_singleE;
+    
   };
 }
 #endif
