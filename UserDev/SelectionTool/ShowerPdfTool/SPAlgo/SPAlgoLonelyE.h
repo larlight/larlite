@@ -52,8 +52,15 @@ namespace sptool {
     /// Likelyhood function where to figure out if shower is lonely
     double LL(const SPArticle shr, const SPAData &data);
 
+    /// Function to set debug mode on or off
+    void setDebug(bool on) { _debug = on; }
+
   private:
 
+    // debug mode
+    bool _debug;
+
+    // instance of GeoAlgo
     geoalgo::GeoAlgo _geoAlgo;
 
     // instance of SPAlgoSingleE
