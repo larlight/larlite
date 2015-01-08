@@ -14,9 +14,6 @@ namespace showerreco {
     fdEdxlength=2.4;
     fUseArea=true;
     fVerbosity = true;
-    
-    _hit_tree = new TTree("_hit_tree","Hit Tree");
-    _hit_tree->Branch("_hitQ",&_hitQ,"hitQ/D");
   }
 
 
