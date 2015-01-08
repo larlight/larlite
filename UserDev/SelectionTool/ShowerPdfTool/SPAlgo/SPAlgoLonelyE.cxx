@@ -33,6 +33,7 @@ namespace sptool {
       return alone;
     }
 
+    return -1.;
   }
 
   SPArticleSet SPAlgoLonelyE::Reconstruct(const SPAData &data)

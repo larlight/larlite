@@ -1,19 +1,19 @@
 /**
- * \file SPAlgoSingleE.h
+ * \file SPAlgoMichelE.h
  *
  * \ingroup SPAlgo
  * 
- * \brief Class def header for a class SPAlgoSingleE
+ * \brief Class def header for a class SPAlgoMichelE
  *
- * @author kazuhiro
+ * @author davidkaleko
  */
 
 /** \addtogroup SPAlgo
 
     @{*/
 
-#ifndef SELECTIONTOOL_SPALGOSINGLEE_H
-#define SELECTIONTOOL_SPALGOSINGLEE_H
+#ifndef SELECTIONTOOL_SPALGOMICHELE_H
+#define SELECTIONTOOL_SPALGOMICHELE_H
 
 #include "SPAlgo/SPAlgoEMPart.h"
 #include "SPTBase/SPAlgoBase.h"
@@ -21,48 +21,49 @@
 namespace sptool {
 
   /**
-     \class SPAlgoSingleE
-     User custom SPAFilter class made by kazuhiro
+     \class SPAlgoMichelE
+     User custom SPAFilter class made by davidkaleko
    */
-  class SPAlgoSingleE : public SPAlgoBase {
+  class SPAlgoMichelE : public SPAlgoBase {
   
   public:
 
     /// Default constructor
-    SPAlgoSingleE();
+    SPAlgoMichelE();
 
     /// Default destructor
-    virtual ~SPAlgoSingleE(){};
+    virtual ~SPAlgoMichelE(){};
 
     /// Reset function
-    virtual void Reset();
+    virtual void Finalize();
 
     /// What to do before event-loop begins
     virtual void ProcessBegin();
+
+    /// What to do once event-loop is over
+    virtual void ProcessEnd(TFile* fout);
+
+    void InitializeHistos();
 
     /// Override the sptool::SPTBase::LoadParams function
     virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
 
     /// Function to evaluate input showers and determine a score
     virtual SPArticleSet Reconstruct(const SPAData &data);
-
+    
   private:
+    
     /// Function that takes in shower and decides if it is likely electron
     /// (it uses SPAlgoEMParticle)
-    bool IsShowerElectron(const sptool::SPAShower shower);
-
-    /// Function to decide if two showers are correlated
-    bool AreShowersStartPtCorrelated(const sptool::SPAShower s1, const sptool::SPAShower s2);
-
-    /// Function to return a list of electron-like showers, given a list of showers
-    const std::vector<sptool::SPAShower> ElectronLikeShowers(const std::vector<sptool::SPAShower> showers);
-
-    /// Function to return a list of start-point-isolated showers, given a list of showers
-    const std::vector<sptool::SPAShower> IsolatedStartPtShowers(const std::vector<sptool::SPAShower> showers);
-
+    bool IsShowerElectron(const sptool::SPAShower &shower);
+    
+    
   protected:
-
+    
     SPAlgoEMPart _alg_emp;
+
+    TH1F* michel_energy;
+    TH1F* dist_shower_to_trackend;
   };
 }
 #endif
