@@ -929,8 +929,17 @@ namespace larutil{
     pos[2]=xyz[2];
 
     ///\todo: this should use the cryostat and tpc as well in the NearestWire method
-    
-    pN.w = geom->NearestWire(pos, plane)*fWiretoCm;
+
+    try{
+      pN.w = geom->NearestWire(pos, plane)*fWiretoCm;
+    }
+    catch (larutil::LArUtilException s){
+      std::cout << "exception called in GeometryUtilities::Get2DPointProjectionCM: " << s.what() << std::endl;
+      // determine cm value of wire based on: if z pos < 0 -> first wire on plane
+      // if z pos > detLength -> last wire
+      if ( pos[2] > geom->DetLength() ) { pN.w = geom->DetLength(); }
+      if ( pos[2] < 0. ) { pN.w = 0.; }
+    }
     pN.t=xyz[0];  
     pN.plane=plane;
     
