@@ -13,7 +13,22 @@ namespace sptool {
   void SPAlgoLonelyE::Reset()
   {}
 
-  double SPAlgoLonelyE::LL(const geoalgo::HalfLine_t shr, const SPAData &data){
+
+  void SPAlgoLonelyE::ProcessBegin()
+  {
+
+    _alg_singleE.ProcessBegin();
+    
+    return;
+  }
+
+  void SPAlgoLonelyE::LoadParams(std::string fname, size_t version){
+
+    _alg_singleE.LoadParams(fname,version);
+    return;
+  }
+
+  double SPAlgoLonelyE::LL(const SPArticle shr, const SPAData &data){
 
     // calculate score that this shower does not have anything nearby
     
@@ -27,8 +42,14 @@ namespace sptool {
     
       geoalgo::Point_t int1(3);
       geoalgo::Point_t int2(3);
-      geoalgo::HalfLine_t track(t[0],t[1]-t[0]);
-      //double distBack = _geoAlgo.SqDist(shr,track);
+      geoalgo::HalfLine_t track(t[0],t[0]-t[1]); // line pointing backwards from track start
+      geoalgo::HalfLine_t shower(shr.pos(),shr.mom()*(-1)); // line pointing backwards from shower start
+      double distBack = _geoAlgo.SqDist(shower,track,int1,int2);
+      // int1 & int2 are the PoCA points on the shr & track lines respectively
+      std::cout << "distance between track line & shower line is: " << distBack << std::endl;
+      double distNext = _geoAlgo.SqDist(shr.pos(),track);
+      std::cout << "distance between track and shower start: " << distNext << std::endl;
+      
       
       return alone;
     }
@@ -39,8 +60,12 @@ namespace sptool {
   SPArticleSet SPAlgoLonelyE::Reconstruct(const SPAData &data)
   { 
 
+    //Get a list of single (start point isolated) electron showers
+    //from the SPAlgoSingleE instance
+    SPArticleSet single_es = _alg_singleE.Reconstruct(data);
+
     // loop over showers
-    for(auto const& s : data._showers) {
+    for(auto const& s : single_es) {
 
       LL(s,data);
 
