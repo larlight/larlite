@@ -6,6 +6,8 @@
 #include "SPAlgoEMPart.h"
 #include "SPAlgoSingleE.h"
 #include "SPAlgoMichelE.h"
+#include "SPAlgoLonelyE.h"
+
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -14,6 +16,8 @@ namespace sptool {
   class SPAlgoEMPart;
   class SPAlgoSingleE;
   class SPAlgoMichelE;
+  class SPAlgoLonelyE;
+
   //ADD_SPALGO_CLASS ... do not change this comment line
 }
 //ADD_EMPTY_CLASS ... do not change this comment line
@@ -33,4 +37,7 @@ namespace sptool {
 
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> e05075df67958daefdfd65af3cf052181b73dd2f

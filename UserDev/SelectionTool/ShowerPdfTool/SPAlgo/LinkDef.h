@@ -13,6 +13,7 @@
 #pragma link C++ class sptool::SPAlgoEMPart+;
 #pragma link C++ class sptool::SPAlgoSingleE+;
 #pragma link C++ class sptool::SPAlgoMichelE+;
+#pragma link C++ class sptool::SPAlgoLonelyE+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
@@ -33,4 +34,7 @@
 
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> e05075df67958daefdfd65af3cf052181b73dd2f
