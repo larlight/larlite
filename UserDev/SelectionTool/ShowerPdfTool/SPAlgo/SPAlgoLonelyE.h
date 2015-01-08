@@ -16,6 +16,7 @@
 #define SELECTIONTOOL_SPALGOLONELYE_H
 
 #include "SPTBase/SPAlgoBase.h"
+#include "SPAlgo/SPAlgoSingleE.h"
 // include GeoAlgo functions
 #include "GeoAlgo/GeoAlgoConstants.h"
 #include "GeoAlgo/GeoAlgo.h"
@@ -39,15 +40,24 @@ namespace sptool {
     /// Reset function
     virtual void Reset();
 
+    /// What to do before event-loop begins
+    virtual void ProcessBegin();
+
+    /// Override the sptool::SPTBase::LoadParams function
+    virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
+
     /// Function to evaluate input showers and determine a score
     virtual SPArticleSet Reconstruct(const SPAData &data);
     
     /// Likelyhood function where to figure out if shower is lonely
-    double LL(const geoalgo::HalfLine_t shr, const SPAData &data);
+    double LL(const SPArticle shr, const SPAData &data);
 
   private:
 
     geoalgo::GeoAlgo _geoAlgo;
+
+    // instance of SPAlgoSingleE
+    SPAlgoSingleE _alg_singleE;
     
   };
 }
