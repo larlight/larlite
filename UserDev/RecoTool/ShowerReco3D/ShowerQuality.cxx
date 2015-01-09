@@ -160,7 +160,8 @@ namespace larlite {
 	    );
       return false;
     }
-    
+    if(!ev_shower->size()) return false;
+
     auto ass_keys = ev_shower->association_keys(data::kCluster);
     
     if(!(ass_keys.size())) {
@@ -266,7 +267,7 @@ namespace larlite {
       for(size_t i=0; i < ass_cluster_v[shower_index].size(); ++i) {
 
 	size_t cluster_index = ass_cluster_v[shower_index][i];
-
+	//std::cout<<best_plane_index<<" : "<<ev_cluster->at(cluster_index).View()<<std::endl;
 	if( ev_cluster->at(cluster_index).View() == reco_shower.best_plane() ) {
 	  best_plane_index = i;
 	  break;
@@ -275,8 +276,8 @@ namespace larlite {
 
       if(best_plane_index < 0) {
 	throw ::showerreco::ShowerRecoException(Form("Failed to identify the best plane for shower %zu",
-				       shower_index)
-				  );
+						     shower_index)
+						);
       }
 
       fTreeParams.reco_energy = reco_shower.Energy().at(best_plane_index);
