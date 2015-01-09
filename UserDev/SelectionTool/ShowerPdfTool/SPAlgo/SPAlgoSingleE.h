@@ -3,9 +3,10 @@
  *
  * \ingroup SPAlgo
  * 
- * \brief Class def header for a class SPAlgoSingleE
+ * \brief This SPAlgo returns a SPArticleSet of single electrons that are \n
+          start-point isolated from other single electrons.
  *
- * @author kazuhiro
+ * @author kazuhiro + davidkaleko
  */
 
 /** \addtogroup SPAlgo
@@ -43,18 +44,25 @@ namespace sptool {
     /// Override the sptool::SPTBase::LoadParams function
     virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
 
-    /// Function to evaluate input showers and determine a score
+    /// Function to reconstruct the start-point isolated electrons
     virtual SPArticleSet Reconstruct(const SPAData &data);
 
+
+
   private:
+
     /// Function that takes in shower and decides if it is likely electron
     /// (it uses SPAlgoEMParticle)
-    bool IsShowerElectron(const sptool::SPAShower &shower);
+    bool IsShowerElectron(const sptool::SPAShower shower);
 
     /// Function to decide if two showers are correlated
-    bool AreTwoShowersCorrelated(const sptool::SPAShower &s1, const sptool::SPAShower &s2);
+    bool AreShowersStartPtCorrelated(const sptool::SPAShower s1, const sptool::SPAShower s2);
 
-    std::vector<size_t> ListIndependentShowersIdxs(const std::vector<sptool::SPAShower> &e_showers);
+    /// Function to return a list of electron-like showers, given a list of showers
+    const std::vector<sptool::SPAShower> ElectronLikeShowers(const std::vector<sptool::SPAShower> showers);
+
+    /// Function to return a list of start-point-isolated showers, given a list of showers
+    const std::vector<sptool::SPAShower> IsolatedStartPtShowers(const std::vector<sptool::SPAShower> showers);
 
   protected:
 

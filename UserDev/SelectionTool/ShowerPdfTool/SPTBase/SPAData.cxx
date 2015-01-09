@@ -28,7 +28,13 @@ namespace sptool {
     Trajectory::clear();
     _energy     = kINVALID_DOUBLE;
     _cosmogenic = kINVALID_DOUBLE;
-    for(auto& v : _pid_score) v = -1;
+
+    _pid_score.clear();
+    for(size_t i = 0; i < kTrackPartIDMax; ++i)
+      _pid_score.push_back(-1);
+    //    for(auto& v : _pid_score) v = -1;
+
+
     _pid = SPATrack::kUnknown;
   }
 
