@@ -224,8 +224,8 @@ namespace larlite {
       //fTreeParams.mc_dcosy = mc_shower.DetProfile().Py() / fTreeParams.mc_energy;
       //fTreeParams.mc_dcosz = mc_shower.DetProfile().Pz() / fTreeParams.mc_energy;
       fTreeParams.mc_dcosx = mc_shower.Start().Px() / mc_shower.Start().E();
-      fTreeParams.mc_dcosx = mc_shower.Start().Py() / mc_shower.Start().E();
-      fTreeParams.mc_dcosx = mc_shower.Start().Pz() / mc_shower.Start().E();
+      fTreeParams.mc_dcosy = mc_shower.Start().Py() / mc_shower.Start().E();
+      fTreeParams.mc_dcosz = mc_shower.Start().Pz() / mc_shower.Start().E();
 
       // Reco vtx
       fTreeParams.reco_x = reco_shower.ShowerStart()[0];
