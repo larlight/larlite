@@ -101,29 +101,30 @@ namespace sptool {
     double _g_dedx_fitMin; ///< where to start fitting [MeV/cm]
     double _g_dedx_fitMax; ///< where to end fitting [MeV/cm]
 
+    // Variables
+    RooRealVar* _dEdxVar;
+    RooRealVar* _radLenVar;
+    
+
     // e- RadLen PDF 
     RooAbsPdf*  _e_radLenPdf; ///< e- RadLen PDF
     RooDataSet* _e_radLenData;      ///< e- pdf data set
-    RooRealVar* _e_radLenVar;      ///< e- pdf cariable set
     RooRealVar* _e_radLenVal;
 
     // e- dEdx PDF
     RooAbsPdf*  _e_dEdxPdf;   ///< e- dEdx PDF
     RooDataSet* _e_dEdxData;
-    RooRealVar* _e_dEdxVar;
     RooRealVar* _e_dEdxMu;
     RooRealVar* _e_dEdxSigma;
 
     // gamma RadLen PDF
     RooAbsPdf*  _g_radLenPdf;     ///< gamma RadLen Pdf
     RooDataSet* _g_radLenData;    ///< gamma pdf data set
-    RooRealVar* _g_radLenVar;    ///< gamma pdf cariable set
     RooRealVar* _g_radLenVal;
 
     // gamma dEdx PDF
     RooAbsPdf*  _g_dEdxPdf; ///< gamma dEdx Pdf
     RooDataSet* _g_dEdxData;
-    RooRealVar* _g_dEdxVar;
     RooRealVar* _g_dEdxFrac;
     RooRealVar* _g_dEdxMu1;
     RooRealVar* _g_dEdxSigma1;
