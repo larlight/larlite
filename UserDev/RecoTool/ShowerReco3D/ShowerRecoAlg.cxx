@@ -108,7 +108,8 @@ namespace showerreco {
     double xyz[3];
     // calculate start point here?
     
-    
+    std::cout<<index_to_use[0]<<" and "<<index_to_use[1]<<std::endl;
+    std::cout<<(int)(fStartPoint[index_to_use[0]].plane)<<" and "<<(int)(fStartPoint[index_to_use[1]].plane)<<std::endl;
     fGSer-> GetXYZ(&(fStartPoint[index_to_use[0]]),&(fStartPoint[index_to_use[1]]),xyz);
     
     if(fVerbosity)

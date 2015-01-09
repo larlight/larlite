@@ -61,12 +61,15 @@ namespace larlite {
       // Generate the ClusterParamsAlg vector
       std::vector< ::cluster::ClusterParamsAlg > cpans;
       fCRUHelper.GenerateCPAN( storage, fClusterProducer, cpans );
+      // FIX ME: temporarily forcing the cluster plane type (by default it's set from hits, but seems there's an issue for stored value there)
+      for(size_t i=0; i<clusters->size(); ++i)
+	cpans[i].SetPlane((*clusters)[i].View());
 
       // Calculate total hit charges
       std::map< larlite::geo::View_t, double > TotalHitCharges;
       for ( auto const& iview : fViews ) TotalHitCharges[iview] = 0.;
       CalculateTotalHitCharge( hits, TotalHitCharges );
-
+      bool process = false;
       for ( size_t ipart = 0; ipart < pfparts->size(); ipart++ ) {
          if ( std::abs( pfparts->at(ipart).PdgCode() ) != 11 ) break;
          // std::cout << "PF particle " << ipart << " is associated with ..." << std::endl;
@@ -84,7 +87,7 @@ namespace larlite {
             //           << iview << ", charge = "
             //           << clusters->at(c_index).Charge() << std::endl;
             TotalClusterCharges[iview] += clusters->at(c_index).Charge();
-
+	    std::cout<<iview<<std::endl;
             // Fill the clusters associated to a certain PF particle
             cpan_holder.push_back( cpans.at(c_index) );
          }
@@ -100,8 +103,9 @@ namespace larlite {
          // For each PF particle, fill the associated clusters into the
          // input object of the shower reconstruction
          fShowerAlgo->AppendInputClusters( cpan_holder );
+	 process = true;
       }
-
+      if(!process) return false;
       // Call the shower reconstruction
       auto results = fShowerAlgo->Reconstruct();
 
