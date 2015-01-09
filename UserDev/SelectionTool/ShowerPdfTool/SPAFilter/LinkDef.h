@@ -11,9 +11,11 @@
 
 #pragma link C++ class sptool::SPAFilterToy+;
 #pragma link C++ class sptool::SPAFilterCosmic+;
+#pragma link C++ class sptool::SPAFilterECut+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 
 
 
