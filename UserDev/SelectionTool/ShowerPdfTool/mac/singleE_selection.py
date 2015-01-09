@@ -22,7 +22,7 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
-my_proc.set_ana_output_file("PEselection_ana_out.root")
+my_proc.set_ana_output_file("singleE_selection_ana_out.root")
 
 
 # Possible filter to select true events
@@ -32,12 +32,10 @@ my_proc.set_ana_output_file("PEselection_ana_out.root")
 #my_proc.add_process(pdgsel)
 
 my_algo = sptool.SPAlgoSingleE()
-my_algo.LoadParams()
 my_algo.Reset()
 my_ana = fmwk.ExampleSPSelection()
 # OPTIONAL:
-#my_ana.RecoProducer("","showerreco") # call if using Reco objects
-#my_ana.AddGeneratorProducer("generator") # call if MC vertex info should be used (for rad-length to be used w/ Reco, for example)
+my_ana.RecoProducer("","showerreco") # call if using Reco objects
 my_ana._mgr.SetSPAlgo(my_algo)
 my_ana._mode =True # True = Select. False = Fill mode
 my_proc.add_process(my_ana)

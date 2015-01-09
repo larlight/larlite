@@ -45,7 +45,8 @@ namespace sptool {
     geoalgo::Vector_t shrDir(shr.mom()/shr.mom().Length());     // direction vector of track  (momentum but normalized)
     
     for (auto const& t : data._tracks) {
-    
+
+      if (_debug) { std::cout << "Track energy: " << t._energy << std::endl; }
       geoalgo::LineSegment_t track(t[0],t.at(t.size()-1)); // segment pointing from track start to track end
       // Case 1)
       // loop over all track segments.
@@ -63,6 +64,7 @@ namespace sptool {
 
     for (auto const& s : data._showers) {
 
+      if (_debug) { std::cout << "Shower energy: " << s._energy << std::endl; }
       // Case 4)
       // first make sure we are not looping over the same shower we are studying in this function
       if (s.Start() == shr.pos()) { continue; }

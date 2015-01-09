@@ -21,7 +21,7 @@ namespace sptool {
       t.reserve(mct.size());
       for(auto const& step : mct)
 	t += step.Position();
-      t._energy     = (*mct.rbegin()).Momentum().E() - (*mct.begin()).Momentum().E();
+      t._energy     = (*mct.begin()).Momentum().E() - (*mct.rbegin()).Momentum().E();
       t._cosmogenic = (double)(mct.Origin() == ::larlite::simb::kCosmicRay);
 
       if(mct.PdgCode() == 13  || mct.PdgCode() == -13 ) t._pid = SPATrack::kMuon;
