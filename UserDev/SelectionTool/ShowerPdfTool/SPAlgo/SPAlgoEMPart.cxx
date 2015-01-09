@@ -331,6 +331,12 @@ namespace sptool {
       c->SetTitle("Selection Likelihood");
       frame_dEdx->Draw();
       c->SaveAs(Form("dEdx_%s.png",part_name.c_str()));
+
+      // Start saving fit values
+      // Before doing so clear the _params to be stored
+      _params.clear_data();
+      // Now load params (the ones that will actually be stores will be over-written
+      LoadParams();
       
       RooRealVar* res_value_radLen = nullptr;
       RooRealVar* res_value_dEdxFrac = nullptr;
