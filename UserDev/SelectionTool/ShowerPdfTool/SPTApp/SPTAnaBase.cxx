@@ -53,6 +53,7 @@ namespace larlite {
       if(!ev_mct || !ev_mcs)
 	throw ::sptool::SPAException("MCShower/MCTrack info not found in the event!");
 
+      // Generate SPAData w/ MCTrack and MCShower
       _data = _helper.Generate(*ev_mct, *ev_mcs);
 
       if(!_name_generator.empty()){
@@ -60,7 +61,8 @@ namespace larlite {
 	auto ev_mci = storage->get_data<event_mctruth> (_name_generator);
 	if(!ev_mci)
 	  throw ::sptool::SPAException("MCTruth info not found in the event!");
-	
+
+	// Append MCTruth for vtx
 	_helper.Append(*ev_mci,_data);
       }	
 
@@ -72,7 +74,7 @@ namespace larlite {
       if(!ev_shw)
 	throw ::sptool::SPAException(Form("Shower info (\"%s\") not found in the event!",_name_shower.c_str()));
       // if no cosmic tag info available
-      if(!ev_ctag_shw){
+      if(!ev_ctag_shw && ev_shw->size()){
 	event_cosmictag tmp;
 	_data = _helper.Generate(*ev_shw,tmp);
 	if(one_time_warning)
@@ -81,7 +83,7 @@ namespace larlite {
 		);
       }
       // if cosmic tag info is available
-      else
+      else if(ev_shw->size()) 
 	_data = _helper.Generate(*ev_shw,*ev_ctag_shw);
       // if track information exists
       if(!_name_track.empty()) {
@@ -91,24 +93,17 @@ namespace larlite {
 	auto ev_pid_trk  = storage->get_data<event_partid>      (Form("%spid",  _name_track.c_str()));
 	if(!ev_trk)
 	  throw ::sptool::SPAException(Form("Track info (\"%s\" not found in the event!",_name_track.c_str()));
-	if(!ev_ctag_trk)
-	  throw ::sptool::SPAException(Form("Track cosmictag info (\"%stag\" not found in the event!",_name_track.c_str()));
-	if(!ev_calo_trk)
-	  throw ::sptool::SPAException(Form("Track calorimetry info (\"%scalo\" not found in the event!",_name_track.c_str()));
-	if(!ev_pid_trk)
-	  throw ::sptool::SPAException(Form("Track partid info (\"%spid\" not found in the event!",_name_track.c_str()));
-	_helper.Append(*ev_trk, *ev_ctag_trk, *ev_calo_trk, *ev_pid_trk, _data);
+	if(ev_trk->size()) {
+	  if(!ev_ctag_trk)
+	    throw ::sptool::SPAException(Form("Track cosmictag info (\"%stag\" not found in the event!",_name_track.c_str()));
+	  if(!ev_calo_trk)
+	    throw ::sptool::SPAException(Form("Track calorimetry info (\"%scalo\" not found in the event!",_name_track.c_str()));
+	  if(!ev_pid_trk)
+	    throw ::sptool::SPAException(Form("Track partid info (\"%spid\" not found in the event!",_name_track.c_str()));
+	  if(ev_trk->size())
+	    _helper.Append(*ev_trk, *ev_ctag_trk, *ev_calo_trk, *ev_pid_trk, _data);
+	}
       }
-      // if track information exists
-      if(!_name_generator.empty()){
-	
-	auto ev_mci = storage->get_data<event_mctruth> (_name_generator);
-	if(!ev_mci)
-	  throw ::sptool::SPAException("MCTruth info not found in the event!");
-	
-	_helper.Append(*ev_mci,_data);
-      }	
-
     }
     one_time_warning = false;
     return true;
