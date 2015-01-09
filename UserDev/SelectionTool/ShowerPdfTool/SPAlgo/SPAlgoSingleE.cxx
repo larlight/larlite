@@ -5,18 +5,41 @@
 
 namespace sptool {
 
+  size_t single_e_counter = 0;
+  size_t total_e_showers = 0;
+  size_t total_g_showers = 0;
+  size_t nonzero_dedx_counter = 0;
+
+  
   SPAlgoSingleE::SPAlgoSingleE() : SPAlgoBase()
   {
+
     _name     = "SPAlgoSingleE";
+    e_ll_values = 0;
+    dedx_values = 0;
   }
 
   void SPAlgoSingleE::Reset()
   {
+    std::cout<<__FUNCTION__<<" found "<<single_e_counter<<" events with a single electron in it."<<std::endl;
+    std::cout<<"and "<<nonzero_dedx_counter<<" nonzero dedx showers"<<std::endl;
+    std::cout<<"Found "<<total_e_showers<<" total e showers"<<std::endl;
+    std::cout<<"Found "<<total_g_showers<<" total g showers"<<std::endl;
   }
   
   void SPAlgoSingleE::ProcessBegin()
   {
     _alg_emp.ProcessBegin();
+    _alg_emp.LoadParams();
+
+    //kaleko
+    _alg_emp.SetMode(true);
+
+    if(!e_ll_values)
+      e_ll_values = new TH1F("e_ll_values","e_ll_values",1000,-1,0);
+
+    if(!dedx_values)
+      dedx_values = new TH1F("dedx_values","dedx_values",1000,0,8);
 
     return;
   }
@@ -30,6 +53,9 @@ namespace sptool {
   }
 
   SPArticleSet SPAlgoSingleE::Reconstruct(const SPAData &data){
+    //kaleko
+    _alg_emp.Reconstruct(data);
+
 
     SPArticleSet res;
     
@@ -38,6 +64,8 @@ namespace sptool {
 
     /// Get a list of the electron showers that are start-point-isolated
     auto isolated_e_showers = IsolatedStartPtShowers( e_showers );
+
+    if(isolated_e_showers.size() == 1) single_e_counter++;
 
     /// Make an electron SPArticle for each independent shower and add it to the set
     for(auto const& isol_shower : isolated_e_showers){
@@ -61,11 +89,27 @@ namespace sptool {
     //(LL uses only dEdX data if "dist" is plugged in negative)
     //If likelihood its gamma is more than electron, skip
     
+    //if dedx value == 0, we don't know whether this is electron,
+    //so let's assume it isn't.
+    if(shower._dedx < 0.02 || shower._dedx > 10.) return false;
+    dedx_values->Fill(shower._dedx);
+    
+
+    
+    nonzero_dedx_counter++;
+    
+    e_ll_values->Fill(
+      _alg_emp.LL(true,shower._dedx,-1.));
+
+    
     bool e_like = (
       _alg_emp.LL(true, shower._dedx, -1.) >
       _alg_emp.LL(false,shower._dedx, -1.)) ?
       true : false;
     
+    if(e_like) total_e_showers++;
+    else total_g_showers++;
+
     return e_like;
     
   }
@@ -145,6 +189,22 @@ namespace sptool {
     
 
     return e_showers;
+
+  }
+
+  void SPAlgoSingleE::ProcessEnd(TFile* fout){
+    
+    _alg_emp.ProcessEnd(fout);
+    
+    if(fout){
+      fout->cd();
+      
+      if(e_ll_values)
+	e_ll_values->Write();
+
+      if(dedx_values)
+	dedx_values->Write();
+    }
 
   }
 }
