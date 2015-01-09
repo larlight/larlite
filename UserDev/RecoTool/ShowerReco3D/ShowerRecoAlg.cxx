@@ -64,7 +64,7 @@ namespace showerreco {
 	    min_length=fabs( fEndPoint[ip].w - fStartPoint[ip].w );
 	    worst_plane=fPlaneID.at(ip);
 	  }
-	
+
 	if(fabs( fEndPoint[ip].w - fStartPoint[ip].w ) > max_length )
 	  {
 	    max_length=fabs( fEndPoint[ip].w - fStartPoint[ip].w );
@@ -107,8 +107,6 @@ namespace showerreco {
     
     double xyz[3];
     // calculate start point here?
-    
-    
     fGSer-> GetXYZ(&(fStartPoint[index_to_use[0]]),&(fStartPoint[index_to_use[1]]),xyz);
     
     if(fVerbosity)
@@ -347,7 +345,6 @@ namespace showerreco {
 
     result.set_total_MIPenergy(fMIPEnergy);
     result.set_total_best_plane(best_plane);
-    
     result.set_total_energy  (fEnergy );
     //result.set_total_energy_err  (std::vector< Double_t > q)            { fSigmaTotalEnergy = q;        }
     
