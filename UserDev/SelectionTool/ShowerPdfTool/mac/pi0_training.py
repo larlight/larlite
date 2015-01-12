@@ -32,6 +32,17 @@ def main():
     my_algo = sptool.SPAlgoPi0()
     # Create analysis unit
     my_ana = fmwk.ExampleSPSelection()
+
+    # Set Producers
+    # First Argument: True = MC, False = Reco
+    #my_ana.SetShowerProducer(True,"mcreco");
+    #my_ana.SetTrackProducer(True,"mcreco");
+    #my_ana.SetVtxProducer(True,"generator");
+    
+    my_ana.SetShowerProducer(False,"showerreco");
+    my_ana.SetTrackProducer(False,"");
+    my_ana.SetVtxProducer(False,"");
+
     my_ana._mgr.SetSPAlgo(my_algo)
     my_ana._mgr._training_mode =True
 

@@ -34,9 +34,17 @@ my_proc.set_ana_output_file("singleE_selection_ana_out.root")
 my_algo = sptool.SPAlgoSingleE()
 my_algo.Reset()
 my_ana = fmwk.ExampleSPSelection()
-# OPTIONAL:
-my_ana.RecoProducer("","showerreco") # call if using Reco objects
-my_ana._mgr.SetSPAlgo(my_algo)
+
+# Set Producers
+# First Argument: True = MC, False = Reco
+#my_ana.SetShowerProducer(True,"mcreco");
+#my_ana.SetTrackProducer(True,"mcreco");
+#my_ana.SetVtxProducer(True,"generator");
+
+my_ana.SetShowerProducer(False,"showerreco");
+my_ana.SetTrackProducer(False,"");
+my_ana.SetVtxProducer(False,"");
+
 my_ana._mode =True # True = Select. False = Fill mode
 my_proc.add_process(my_ana)
 my_proc.run()
