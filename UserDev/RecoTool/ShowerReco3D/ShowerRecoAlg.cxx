@@ -14,6 +14,7 @@ namespace showerreco {
     fdEdxlength=2.4;
     fUseArea = true;
     fVerbosity = true;
+    _Ecorrection = false;
   }
 
 
@@ -275,7 +276,6 @@ namespace showerreco {
 	
 	//loop only on subset of hits
 	for(auto const & theHit : local_hitlist){
-
 	  double dEdx=0;
 	  if(fUseArea)
 	    { 
@@ -302,7 +302,7 @@ namespace showerreco {
 	
 	/// third loop to get only points inside of 1RMS of value.      
 	//loop only on subset of hits
-	
+
 	for(auto const & theHit : local_hitlist){
 	  double dEdx=0;
 	  if(fUseArea)
@@ -336,6 +336,9 @@ namespace showerreco {
 		    << " Energy:  lo:" << totLowEnergy << " hi: " << totHighEnergy 
 		    << " MIP corrected " << totMIPEnergy << std::endl;
 	}
+	// if Energy correction factor to be used
+	// then get it from ShowerCalo.h
+	if (_Ecorrection) { totEnergy *= showerreco::energy::DEFAULT_ECorr; }
 	fEnergy.push_back(totEnergy);    // for each plane
 	fMIPEnergy.push_back(totMIPEnergy);
 	fdEdx.push_back(dedx_final); 
@@ -345,7 +348,7 @@ namespace showerreco {
 
     result.set_total_MIPenergy(fMIPEnergy);
     result.set_total_best_plane(best_plane);
-    result.set_total_energy  (fEnergy );
+    result.set_total_energy(fEnergy);
     //result.set_total_energy_err  (std::vector< Double_t > q)            { fSigmaTotalEnergy = q;        }
     
     double dirs[3]={0};
