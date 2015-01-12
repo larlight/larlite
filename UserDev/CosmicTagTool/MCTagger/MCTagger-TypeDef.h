@@ -9,6 +9,7 @@
 #include "MCTag.h"
 #include "MCShowerTagger.h"
 #include "testCosmicTag.h"
+#include "CosmicTagAlgo.h"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -21,8 +22,10 @@ namespace larlite {
 
 }
 
+  class CosmicTagAlgo;
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
 
 
 

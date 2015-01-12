@@ -12,9 +12,11 @@
 #pragma link C++ class larlite::MCTag+;
 #pragma link C++ class larlite::MCShowerTagger+;
 #pragma link C++ class larlite::testCosmicTag+;
+#pragma link C++ class CosmicTagAlgo+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 
 
 
