@@ -12,7 +12,7 @@ namespace showerreco {
     
     fcalodEdxlength=1000;
     fdEdxlength=2.4;
-    fUseArea=true;
+    fUseArea = true;
     fVerbosity = true;
   }
 
@@ -154,20 +154,18 @@ namespace showerreco {
 	  // dEdx_MIP = fCaloAlg.dEdx_AREA_forceMIP(theHit, newpitch ); 
 	  if(!fUseArea)
 	    {
-	      dEdx_new = fCaloAlg.dEdx_AMP(&theHit , newpitch ); 
+	      dEdx_new = fCaloAlg.dEdx_AMP(theHit.peak / newpitch, theHit.t / fGSer->TimeToCm(), theHit.plane);
 	      hitElectrons = fCaloAlg.ElectronsFromADCPeak(theHit.peak, plane);
 	    }
 	  else
 	    {
-	      dEdx_new = fCaloAlg.dEdx_AREA(&theHit , newpitch ); 
+	      dEdx_new = fCaloAlg.dEdx_AREA(theHit.charge / newpitch, theHit.t / fGSer->TimeToCm(), theHit.plane);
 	      hitElectrons = fCaloAlg.ElectronsFromADCArea(theHit.charge, plane);
 	    }
 
-	  hitElectrons *= fCaloAlg.LifetimeCorrection(theHit.t);
+	  hitElectrons *= fCaloAlg.LifetimeCorrection(theHit.t / fGSer->TimeToCm());
 	  
 	  totEnergy += hitElectrons * 1.e3 / (::larutil::kGeVToElectrons);
-	  
-
 
 	  //totNewCnrg+=dEdx_MIP;
 	//  if(dEdx_new < 3.5 && dEdx_new >0 )
@@ -277,14 +275,15 @@ namespace showerreco {
 	
 	//loop only on subset of hits
 	for(auto const & theHit : local_hitlist){
-	  
+
 	  double dEdx=0;
 	  if(fUseArea)
-	    { dEdx = fCaloAlg.dEdx_AREA((&theHit), newpitch ); 
+	    { 
+	      dEdx = fCaloAlg.dEdx_AREA(theHit.charge / newpitch, theHit.t / fGSer->TimeToCm(), theHit.plane);
 	    }
 	  else  //this will hopefully go away, once all of the calibration factors are calculated.
 	    {
-	      dEdx = fCaloAlg.dEdx_AMP((&theHit), newpitch ); 
+	      dEdx = fCaloAlg.dEdx_AMP(theHit.peak / newpitch, theHit.t / fGSer->TimeToCm(), theHit.plane);
 	    }
 	  //fDistribAfterMin[set].push_back(MinBefore);
 	  //fDistribBeforeMin[set].push_back(MinAfter);
@@ -307,11 +306,12 @@ namespace showerreco {
 	for(auto const & theHit : local_hitlist){
 	  double dEdx=0;
 	  if(fUseArea)
-	    { dEdx = fCaloAlg.dEdx_AREA((&theHit), newpitch ); 
+	    { 
+	      dEdx = fCaloAlg.dEdx_AREA(theHit.charge / newpitch, theHit.t / fGSer->TimeToCm(), theHit.plane);
 	    }
 	  else  //this will hopefully go away, once all of the calibration factors are calculated.
 	    {
-	      dEdx = fCaloAlg.dEdx_AMP((&theHit), newpitch ); 
+	      dEdx = fCaloAlg.dEdx_AMP(theHit.peak / newpitch, theHit.t / fGSer->TimeToCm(), theHit.plane);
 	    }
 	  //fDistribAfterMin[set].push_back(MinBefore);
 	  //fDistribBeforeMin[set].push_back(MinAfter);
