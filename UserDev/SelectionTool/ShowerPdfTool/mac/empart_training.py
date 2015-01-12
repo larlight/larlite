@@ -31,11 +31,21 @@ def main():
     my_proc = fmwk.ana_processor()
     # Create algorithm
     my_algo = sptool.SPAlgoEMPart()
-    # my_algo.set_e_dEdxFitRange(0.6,1.6); // To set range for fitting for dEdx
-    # my_algo.set_g_dEdxFitRange(1.5,3.5);
+    my_algo.set_e_dEdxFitRange(0.6,1.6); # To set range for fitting for dEdx
+    my_algo.set_g_dEdxFitRange(0.6,3.5);
     # Create analysis unit
     my_ana = fmwk.ExampleSPSelection()
-#my_ana.RecoProducer("","showerreco") # call if using Reco objects
+
+    # Set Producers
+    # First Argument: True = MC, False = Reco
+    #my_ana.SetShowerProducer(True,"mcreco");
+    #my_ana.SetTrackProducer(True,"mcreco");
+    #my_ana.SetVtxProducer(True,"generator");
+
+    my_ana.SetShowerProducer(False,"showerreco");
+    my_ana.SetTrackProducer(False,"");
+    my_ana.SetVtxProducer(False,"");
+
     my_ana._mgr.SetSPAlgo(my_algo)
     my_ana._mgr._training_mode =True
 
