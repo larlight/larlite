@@ -45,6 +45,34 @@ namespace sptool {
     /// Default destructor
     virtual ~SPAHelper(){};
 
+    /// Fill Track Info from MC
+    void FillTracks( const ::larlite::event_mctrack& mct_v,
+		     SPAData& res ) const;
+    
+    /// Fill Track Info from RECO
+    void FillTracks ( const ::larlite::event_track&       trk_v,
+		      const ::larlite::event_cosmictag&   cos_trk_v,
+		      const ::larlite::event_calorimetry& calo_trk_v,
+		      const ::larlite::event_partid&      pid_trk_v,
+		      SPAData& res ) const;
+
+    /// Fill Shower Info from MC
+    void FillShowers ( const ::larlite::event_mcshower& mcs_v,
+		       SPAData& res ) const;
+
+    /// Fill Shower Info from RECO
+    void FillShowers ( const ::larlite::event_shower& shw_v,
+		       const ::larlite::event_cosmictag& ctag_shw_v,
+		       SPAData& res ) const;
+
+    /// Fill Vertex Info from MC
+    void FillVertices ( const ::larlite::event_vertex& vtx_v, 
+			SPAData& res ) const;
+    
+    /// Fill Vertex Info from RECO
+    void FillVertices ( const ::larlite::event_mctruth& mci_v,
+			SPAData& res) const;
+
     /// Generate SPAData for full MC information
     SPAData Generate ( const ::larlite::event_mctruth&  mci_v,
 		       const ::larlite::event_mctrack&  mct_v,

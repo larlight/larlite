@@ -160,7 +160,8 @@ namespace larlite {
 	    );
       return false;
     }
-    
+    if(!ev_shower->size()) return false;
+
     auto ass_keys = ev_shower->association_keys(data::kCluster);
     
     if(!(ass_keys.size())) {
@@ -219,9 +220,12 @@ namespace larlite {
       fTreeParams.mc_pdgid  = mc_shower.PdgCode();
       fTreeParams.mc_containment = mc_shower.DetProfile().E() / mc_shower.Start().E();
 
-      fTreeParams.mc_dcosx = mc_shower.DetProfile().Px() / fTreeParams.mc_energy;
-      fTreeParams.mc_dcosy = mc_shower.DetProfile().Py() / fTreeParams.mc_energy;
-      fTreeParams.mc_dcosz = mc_shower.DetProfile().Pz() / fTreeParams.mc_energy;
+      //fTreeParams.mc_dcosx = mc_shower.DetProfile().Px() / fTreeParams.mc_energy;
+      //fTreeParams.mc_dcosy = mc_shower.DetProfile().Py() / fTreeParams.mc_energy;
+      //fTreeParams.mc_dcosz = mc_shower.DetProfile().Pz() / fTreeParams.mc_energy;
+      fTreeParams.mc_dcosx = mc_shower.Start().Px() / mc_shower.Start().E();
+      fTreeParams.mc_dcosy = mc_shower.Start().Py() / mc_shower.Start().E();
+      fTreeParams.mc_dcosz = mc_shower.Start().Pz() / mc_shower.Start().E();
 
       // Reco vtx
       fTreeParams.reco_x = reco_shower.ShowerStart()[0];
@@ -266,7 +270,7 @@ namespace larlite {
       for(size_t i=0; i < ass_cluster_v[shower_index].size(); ++i) {
 
 	size_t cluster_index = ass_cluster_v[shower_index][i];
-
+	//std::cout<<best_plane_index<<" : "<<ev_cluster->at(cluster_index).View()<<std::endl;
 	if( ev_cluster->at(cluster_index).View() == reco_shower.best_plane() ) {
 	  best_plane_index = i;
 	  break;
@@ -275,8 +279,8 @@ namespace larlite {
 
       if(best_plane_index < 0) {
 	throw ::showerreco::ShowerRecoException(Form("Failed to identify the best plane for shower %zu",
-				       shower_index)
-				  );
+						     shower_index)
+						);
       }
 
       fTreeParams.reco_energy = reco_shower.Energy().at(best_plane_index);

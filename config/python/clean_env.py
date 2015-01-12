@@ -15,10 +15,7 @@ else:
             replace = v[start:end+1]
         else:
             replace = v[start:len(v)]
-        print
-        print v
-        print
-        
+
         cmd = 'export %s=%s' % (e,v.replace(replace,''))
         while cmd.find('::') >= 0:
             cmd = cmd.replace('::',':')

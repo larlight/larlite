@@ -41,6 +41,8 @@ namespace larlite {
       auto clusters = ( event_cluster* )( storage->get_data( data::kCluster, fClusterProducer ) );
       auto pfparts = ( event_pfpart* )( storage->get_data( data::kPFParticle, fPFParticleProducer ) );
 
+      if ( !hits->size() || !clusters->size() || !pfparts->size() ) return true;
+
       // Prepare output storage
       auto showers = storage->get_data<event_shower>("pandorashower");
       showers->clear();
@@ -48,30 +50,99 @@ namespace larlite {
       showers->set_event_id( pfparts->event_id() );
       showers->set_run( pfparts->run() );
       showers->set_subrun( pfparts->subrun() );
+      //std::cout << "Event " << pfparts->event_id() << ": " << std::endl;
+      // if ( pfparts->event_id() < 304 || pfparts->event_id() > 304 ) return true;
 
       // Associate PF particles and clusters
       AssSet_t ass_clusters;
       ass_clusters.reserve( pfparts->size() );
       ass_clusters = pfparts->association( clusters->id() );
 
-      for ( size_t ipart = 0; ipart < pfparts->size(); ipart++ ) {
-         if ( std::abs( pfparts->at(ipart).PdgCode() ) != 11 ) break;
-
-         std::map< larlite::geo::View_t, double > TotalClusterCharges;
-         for ( auto const& iview : fViews ) TotalClusterCharges[iview] = 0.;
-
-         for ( auto const& c_index : ass_clusters[ipart] ) {
-            auto iview = clusters->at(c_index).View();
-            TotalClusterCharges[iview] += clusters->at(c_index).Charge();
-         }
-
+      // Generate the ClusterParamsAlg vector
+      std::vector< ::cluster::ClusterParamsAlg > cpans;
+      fCRUHelper.GenerateCPAN( storage, fClusterProducer, cpans );
+      // FIX ME: temporarily forcing the cluster plane type (by default it's set from hits, but seems there's an issue for stored value there)
+      for(size_t i=0; i<clusters->size(); ++i) {
+	cpans[i].SetVerbose(false);
+	cpans[i].SetPlane((*clusters)[i].View());
+	cpans[i].DisableFANN();
+	cpans[i].FillParams(false,false,false,false,false,false);
+	cpans[i].FillPolygon();
       }
+      // Create association holder
+      AssSet_t iassociations;
+      iassociations.reserve( pfparts->size() );
 
       // Calculate total hit charges
       std::map< larlite::geo::View_t, double > TotalHitCharges;
       for ( auto const& iview : fViews ) TotalHitCharges[iview] = 0.;
       CalculateTotalHitCharge( hits, TotalHitCharges );
+      bool process = false;
 
+      for ( size_t ipart = 0; ipart < pfparts->size(); ipart++ ) {
+         if ( std::abs( pfparts->at(ipart).PdgCode() ) != 11 ) break;
+         // std::cout << "PF particle " << ipart << " is associated with ..." << std::endl;
+
+         std::map< larlite::geo::View_t, double > TotalClusterCharges;
+         for ( auto const& iview : fViews ) TotalClusterCharges[iview] = 0.;
+
+         // Create a cpan holder
+         std::vector< ::cluster::ClusterParamsAlg > cpan_holder;
+         cpan_holder.reserve( ass_clusters[ipart].size() );
+
+         // Create an association holder
+         AssUnit_t iass;
+         iass.reserve( ass_clusters[ipart].size() );
+
+         for ( auto const& c_index : ass_clusters[ipart] ) {
+            auto iview = clusters->at(c_index).View();
+            // std::cout << "   cluster " << c_index << " in Plane " 
+            //           << iview << ", charge = "
+            //           << clusters->at(c_index).Charge() << std::endl;
+            TotalClusterCharges[iview] += clusters->at(c_index).Charge();
+	    //std::cout<<iview<<std::endl;
+            // Fill the clusters associated to a certain PF particle
+            cpan_holder.push_back( cpans.at(c_index) );
+            iass.push_back( c_index );
+         }
+
+         // Simple check
+         // for ( auto const& iview : fViews ) {
+         //    std::cout << "   in Plane " << iview << ", total cluster charge = "
+         //              << TotalClusterCharges[iview] << ", total hit charge = "
+         //              << TotalHitCharges[iview] << ", efficiency = "
+         //              << TotalClusterCharges[iview]/TotalHitCharges[iview] << std::endl;
+         // }
+
+         // For each PF particle, fill the associated clusters into the
+         // input object of the shower reconstruction
+         fShowerAlgo->AppendInputClusters( cpan_holder );
+         iassociations.push_back( iass );
+	 process = true;
+      }
+
+      if(!process) return false;
+      // Call the shower reconstruction
+      auto results = fShowerAlgo->Reconstruct();
+
+      // Make sure result has the same size
+      if ( results.size() != iassociations.size() )
+         throw ::showerreco::ShowerRecoException("Mismatch in # of showers from algorithm's return!");
+
+      for ( size_t ires = 0; ires < results.size(); ires++ ) {
+
+         auto& result = results.at( ires );
+
+         // Set ID
+         result.set_id( showers->size() );
+
+         // Store
+         showers->push_back( result );
+
+      } // done looping over matched cluster pairs
+
+      showers->set_association( data::kCluster, fClusterProducer, iassociations );
+      return true;
    }
 
    bool PandoraShower::finalize() {

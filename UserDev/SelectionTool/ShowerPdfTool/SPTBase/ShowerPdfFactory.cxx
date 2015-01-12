@@ -35,7 +35,7 @@ namespace sptool {
     // ERROR: one or more servers of node _dEdxPdf_gamma no longer exists!
     //return new RooAddPdf("_dEdxPdf_gamma","dEdx PDF Gamma",RooArgList(*_g1,*_g2),f);
     RooAbsPdf* genpdf = RooClassFactory::makePdfInstance("dEdxGamma",
-							 "_g_dedxfrac * 1./(sqrt(2*3.14*pow(_g_dedxsigma1,2)))*exp(-(pow((_g_dEdx-_g_dedxmu1),2))/(2*pow(_g_dedxsigma1,2))) + (1-_g_dedxfrac) * 1./(sqrt(2*3.14*pow(_g_dedxsigma2,2)))*exp(-(pow((_g_dEdx-_g_dedxmu2),2))/(2*pow(_g_dedxsigma2,2)))",
+							 "_g_dedxfrac * 1./(sqrt(2*3.14*pow(_g_dedxsigma1,2)))*exp(-(pow((_dEdx-_g_dedxmu1),2))/(2*pow(_g_dedxsigma1,2))) + (1-_g_dedxfrac) * 1./(sqrt(2*3.14*pow(_g_dedxsigma2,2)))*exp(-(pow((_dEdx-_g_dedxmu2),2))/(2*pow(_g_dedxsigma2,2)))",
 							 RooArgSet(x,mu1,sigma1,mu2,sigma2,f));
     
     return genpdf;

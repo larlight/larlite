@@ -41,6 +41,8 @@ namespace sptool {
     /// What to do before event-loop begins
     virtual void ProcessBegin();
 
+    virtual void ProcessEnd(TFile* fout);
+
     /// Override the sptool::SPTBase::LoadParams function
     virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
 
@@ -67,6 +69,11 @@ namespace sptool {
   protected:
 
     SPAlgoEMPart _alg_emp;
+
+
+    //debug histos
+    TH1F* e_ll_values;
+    TH1F* dedx_values;
   };
 }
 #endif

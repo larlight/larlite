@@ -117,6 +117,13 @@ namespace cluster{
     
   }
 
+  void ClusterParamsAlg::SetPlane(int p) {
+    fPlane = p;
+    for(auto& h : fHitVector) h.plane = p;
+    fRoughBeginPoint.plane = fRoughEndPoint.plane = p;
+    fParams.start_point.plane = fParams.end_point.plane = p;
+  }
+
   void  ClusterParamsAlg::GetFANNVector(std::vector<float> & data){
     unsigned int length = 13;
     if (data.size() != length) 

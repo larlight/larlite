@@ -12,7 +12,7 @@ namespace showerreco {
     
     fcalodEdxlength=1000;
     fdEdxlength=2.4;
-    fUseArea=true;
+    fUseArea = true;
     fVerbosity = true;
   }
 
@@ -64,7 +64,7 @@ namespace showerreco {
 	    min_length=fabs( fEndPoint[ip].w - fStartPoint[ip].w );
 	    worst_plane=fPlaneID.at(ip);
 	  }
-	
+
 	if(fabs( fEndPoint[ip].w - fStartPoint[ip].w ) > max_length )
 	  {
 	    max_length=fabs( fEndPoint[ip].w - fStartPoint[ip].w );
@@ -107,8 +107,6 @@ namespace showerreco {
     
     double xyz[3];
     // calculate start point here?
-    
-    
     fGSer-> GetXYZ(&(fStartPoint[index_to_use[0]]),&(fStartPoint[index_to_use[1]]),xyz);
     
     if(fVerbosity)
@@ -156,20 +154,18 @@ namespace showerreco {
 	  // dEdx_MIP = fCaloAlg.dEdx_AREA_forceMIP(theHit, newpitch ); 
 	  if(!fUseArea)
 	    {
-	      dEdx_new = fCaloAlg.dEdx_AMP(&theHit , newpitch ); 
+	      dEdx_new = fCaloAlg.dEdx_AMP(theHit.peak / newpitch, theHit.t / fGSer->TimeToCm(), theHit.plane);
 	      hitElectrons = fCaloAlg.ElectronsFromADCPeak(theHit.peak, plane);
 	    }
 	  else
 	    {
-	      dEdx_new = fCaloAlg.dEdx_AREA(&theHit , newpitch ); 
+	      dEdx_new = fCaloAlg.dEdx_AREA(theHit.charge / newpitch, theHit.t / fGSer->TimeToCm(), theHit.plane);
 	      hitElectrons = fCaloAlg.ElectronsFromADCArea(theHit.charge, plane);
 	    }
 
-	  hitElectrons *= fCaloAlg.LifetimeCorrection(theHit.t);
+	  hitElectrons *= fCaloAlg.LifetimeCorrection(theHit.t / fGSer->TimeToCm());
 	  
 	  totEnergy += hitElectrons * 1.e3 / (::larutil::kGeVToElectrons);
-	  
-
 
 	  //totNewCnrg+=dEdx_MIP;
 	//  if(dEdx_new < 3.5 && dEdx_new >0 )
@@ -279,14 +275,15 @@ namespace showerreco {
 	
 	//loop only on subset of hits
 	for(auto const & theHit : local_hitlist){
-	  
+
 	  double dEdx=0;
 	  if(fUseArea)
-	    { dEdx = fCaloAlg.dEdx_AREA((&theHit), newpitch ); 
+	    { 
+	      dEdx = fCaloAlg.dEdx_AREA(theHit.charge / newpitch, theHit.t / fGSer->TimeToCm(), theHit.plane);
 	    }
 	  else  //this will hopefully go away, once all of the calibration factors are calculated.
 	    {
-	      dEdx = fCaloAlg.dEdx_AMP((&theHit), newpitch ); 
+	      dEdx = fCaloAlg.dEdx_AMP(theHit.peak / newpitch, theHit.t / fGSer->TimeToCm(), theHit.plane);
 	    }
 	  //fDistribAfterMin[set].push_back(MinBefore);
 	  //fDistribBeforeMin[set].push_back(MinAfter);
@@ -309,11 +306,12 @@ namespace showerreco {
 	for(auto const & theHit : local_hitlist){
 	  double dEdx=0;
 	  if(fUseArea)
-	    { dEdx = fCaloAlg.dEdx_AREA((&theHit), newpitch ); 
+	    { 
+	      dEdx = fCaloAlg.dEdx_AREA(theHit.charge / newpitch, theHit.t / fGSer->TimeToCm(), theHit.plane);
 	    }
 	  else  //this will hopefully go away, once all of the calibration factors are calculated.
 	    {
-	      dEdx = fCaloAlg.dEdx_AMP((&theHit), newpitch ); 
+	      dEdx = fCaloAlg.dEdx_AMP(theHit.peak / newpitch, theHit.t / fGSer->TimeToCm(), theHit.plane);
 	    }
 	  //fDistribAfterMin[set].push_back(MinBefore);
 	  //fDistribBeforeMin[set].push_back(MinAfter);
@@ -347,7 +345,6 @@ namespace showerreco {
 
     result.set_total_MIPenergy(fMIPEnergy);
     result.set_total_best_plane(best_plane);
-    
     result.set_total_energy  (fEnergy );
     //result.set_total_energy_err  (std::vector< Double_t > q)            { fSigmaTotalEnergy = q;        }
     
