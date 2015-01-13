@@ -31,8 +31,8 @@ def main():
     my_proc = fmwk.ana_processor()
     # Create algorithm
     my_algo = sptool.SPAlgoEMPart()
-    my_algo.set_e_dEdxFitRange(0.6,1.6); # To set range for fitting for dEdx
-    my_algo.set_g_dEdxFitRange(0.6,3.5);
+    my_algo.set_e_dEdxFitRange(1.2,2); # To set range for fitting for dEdx
+    my_algo.set_g_dEdxFitRange(3,4.5);
     # Create analysis unit
     my_ana = fmwk.ExampleSPSelection()
 
