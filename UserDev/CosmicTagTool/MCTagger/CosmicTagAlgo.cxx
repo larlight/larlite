@@ -5,7 +5,7 @@
 
 //tracks is list of cosmic-tagged tracks; shr is simplified mcshower
 //With some code from David Caratelli's ShowerCalculator.cxx
-float ShowerTrackScore(std::vector<::geoalgo::Trajectory> &tracks,::geoalgo::HalfLine_t shr )
+float CosmicTagAlgo::ShowerTrackScore(std::vector<::geoalgo::Trajectory> &tracks,::geoalgo::HalfLine_t &shr )
 {
 	double minDist = std::numeric_limits<double>::max();
 	double minIP   = std::numeric_limits<double>::max();  

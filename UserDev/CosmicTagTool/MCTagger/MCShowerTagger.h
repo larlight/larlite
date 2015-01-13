@@ -17,7 +17,6 @@
 
 #include "Analysis/ana_base.h"
 #include "LArUtil/Geometry.h"
-#include "MCPartInfo/MCPartGetter/ShowerCutCalculator.h"
 #include "CosmicTagAlgo.h"
 #include <vector>
 #include <string>
