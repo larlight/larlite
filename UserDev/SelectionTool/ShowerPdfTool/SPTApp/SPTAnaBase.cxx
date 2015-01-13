@@ -104,8 +104,9 @@ namespace larlite {
     
     // Fill showers
     if (_mcshowers){
-      if (!_name_mcvtx.empty()){
+      if (!_name_mcshr.empty()){
 	auto ev_mcs = storage->get_data<event_mcshower> (_name_mcshr);
+	std::cout << "***************************\nmcshowers: " << ev_mcs->size() << std::endl;
 	if (!ev_mcs)
 	  throw ::sptool::SPAException("MCShower info not found in the event!");
 	_helper.FillShowers(*ev_mcs, _data);
