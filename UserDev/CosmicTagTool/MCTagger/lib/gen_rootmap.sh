@@ -17,7 +17,7 @@ rootlibmap() {
 ######################################################
 # MCTagger
 rootlibmap libCosmicTagTool_MCTagger.rootmap libCosmicTagTool_MCTagger.so $LARLITE_USERDEVDIR/CosmicTagTool/MCTagger/LinkDef.h \
-    libBasicTool_GeoAlgo.so libLArLite_Analysis.so libMCPartInfo_MCPartGetter.so 
+    libBasicTool_GeoAlgo.so libLArLite_Analysis.so 
 
 
 

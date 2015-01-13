@@ -68,11 +68,13 @@ namespace larlite {
 	   cosmicScoreShrBox = _tagger.ShowerBoxScore(shower, tpcBox) ;
   	   cosmicScoreShrTrk = _tagger.ShowerTrackScore(_allMCTracks,shower);	
 
+	   //Adding cosmic tag for showers with respect to all tracks
   	   cosmictag thistag0(cosmicScoreShrTrk);
   	   shower_tag->push_back(thistag0);
   	   ass.push_back(shower_tag->size()-1);
   	   mcshr_to_cosmictag.push_back(ass);
 
+	   //Adding cosmic tag for showers with respect to box 
   	   cosmictag thistag1(cosmicScoreShrBox);
   	   shower_tag->push_back(thistag1);
   	   ass.push_back(shower_tag->size()-1);

@@ -38,7 +38,7 @@ public:
   virtual ~CosmicTagAlgo(){};
 
   //Compute score given simplified shower and box
-  float ShowerBoxScore(const ::geoalgo::HalfLine&,const ::geoalgo::AABox& ) const;
+  float ShowerBoxScore(const ::geoalgo::HalfLine&,const ::geoalgo::AABox& );
 
   //Compute score given simplified shower and cosmic-tagged track
   float ShowerTrackScore(std::vector<::geoalgo::Trajectory>&,::geoalgo::HalfLine_t & );

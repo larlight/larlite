@@ -49,7 +49,7 @@ float ShowerTrackScore(std::vector<::geoalgo::Trajectory> &tracks,::geoalgo::Hal
 
 
 float CosmicTagAlgo::ShowerBoxScore(const ::geoalgo::HalfLine& shr,
-									const ::geoalgo::AABox& box) const
+									const ::geoalgo::AABox& box) 
 {
 
   geoalgo::GeoAlgo geoObj ;
