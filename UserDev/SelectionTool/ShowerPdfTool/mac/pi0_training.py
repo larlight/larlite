@@ -30,6 +30,13 @@ def main():
     my_proc = fmwk.ana_processor()
     # Create algorithm
     my_algo = sptool.SPAlgoPi0()
+    my_algo.setVerbose(False)
+    my_algo.setMinShrEnergy(10)
+    my_algo.setMaxShrEnergy(1000)
+    my_algo.setIPMax(10)
+    my_algo.setMinFitMass(50)
+    my_algo.setMaxFitMass(200)
+    my_algo.setAngleMax(3.14)
     # Create analysis unit
     my_ana = fmwk.ExampleSPSelection()
 

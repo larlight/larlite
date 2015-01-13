@@ -25,6 +25,7 @@
 #include <RooAbsData.h>
 #include <RooDataSet.h>
 #include <RooFitResult.h>
+#include <RooProdPdf.h>
 #include "RooClassFactory.h"
 #include "SPAException.h"
 #include "SPTEnv.h"
@@ -75,6 +76,10 @@ namespace sptool {
     RooAbsPdf* Pi0Mass(RooRealVar& x,
 		       RooRealVar& mu,
 		       RooRealVar& sigma) const;
+
+    /// Pi0 correlation between 2 shower distance from pi0 decay
+    RooAbsPdf* Pi0ShrCorrelation(RooRealVar& x,
+				 RooRealVar& l) const;
 
   };
 }
