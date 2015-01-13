@@ -17,7 +17,6 @@
 
 #include "Analysis/ana_base.h"
 #include "LArUtil/Geometry.h"
-#include "MCPartInfo/MCPartGetter/ShowerCutCalculator.h"
 #include "CosmicTagAlgo.h"
 #include <vector>
 #include <string>
@@ -32,7 +31,7 @@ namespace larlite {
   public:
 
 /// Default constructor
-    MCShowerTagger(){ _name="MCShowerTagger"; _fout=0; _verbose=false; };
+    MCShowerTagger(){ _name="MCShowerTagger"; _fout=0; };
 
     /// Default destructor
     virtual ~MCShowerTagger(){};
@@ -43,8 +42,6 @@ namespace larlite {
 
     virtual bool finalize();
 
-    void SetVerbose(bool on) { _verbose = on; }
-
     void addTrack(const mctrack& track);
 
     void addTrack(const track& track);
@@ -54,12 +51,6 @@ namespace larlite {
     protected:
 
     std::string _dataType;
-
-    /// verbose
-    bool _verbose;
-
-    /// double Energy cut
-    double _Ecut;
 
     /// Event number
     int _evtN;
@@ -78,9 +69,6 @@ namespace larlite {
     double _minMuDist;
     double _minMuIP;
     
-    // evaluate time-performance
-    clock_t t;
-
 	CosmicTagAlgo _tagger;
      
 
