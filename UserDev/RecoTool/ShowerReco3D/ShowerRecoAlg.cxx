@@ -14,7 +14,7 @@ namespace showerreco {
     fdEdxlength=2.4;
     fUseArea = true;
     fVerbosity = true;
-    _Ecorrection = false;
+    _Ecorrection = true;
   }
 
 
