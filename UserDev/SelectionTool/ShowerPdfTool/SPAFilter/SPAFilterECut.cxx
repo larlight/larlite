@@ -26,7 +26,7 @@ namespace sptool {
       if (data._tracks.at(t)._energy < _ECut) { rm._rm_tracks.insert(t); }
     }
 	
-    return SPAOrder();
+    return rm;
   }
 
 }
