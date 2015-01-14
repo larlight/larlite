@@ -10,7 +10,7 @@ if len(sys.argv) < 2:
 
 from ROOT import gSystem,TMath
 from ROOT import larlite as fmwk, cmtool, showerreco, larutil
-from shower_config import DefaultShowerReco3D
+from recotool.showerDef import DefaultShowerReco3D, PandoraShowerReco3D
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
