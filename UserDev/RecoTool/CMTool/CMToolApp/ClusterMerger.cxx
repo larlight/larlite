@@ -40,7 +40,7 @@ namespace larlite {
 
     // Initialize the output cluster data product
     if(_output_producer.empty()) _output_producer = Form("merged%s",_input_producer.c_str());
-    auto out_cluster_v = storage->get_data<event_cluster>(Form("merged%s",_input_producer.c_str()));
+    auto out_cluster_v = storage->get_data<event_cluster>(_output_producer);
     out_cluster_v->clear();
     out_cluster_v->set_event_id(ev_cluster->event_id());
     out_cluster_v->set_run(ev_cluster->run());
