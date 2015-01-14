@@ -5,7 +5,7 @@
 
 //tracks is list of cosmic-tagged tracks; shr is simplified mcshower
 //With some code from David Caratelli's ShowerCalculator.cxx
-float ShowerTrackScore(std::vector<::geoalgo::Trajectory> &tracks,::geoalgo::HalfLine_t shr )
+float CosmicTagAlgo::ShowerTrackScore(std::vector<::geoalgo::Trajectory> &tracks,::geoalgo::HalfLine_t& shr )
 {
 	double minDist = std::numeric_limits<double>::max();
 	double minIP   = std::numeric_limits<double>::max();  
@@ -54,18 +54,20 @@ float CosmicTagAlgo::ShowerBoxScore(const ::geoalgo::HalfLine& shr,
 
   geoalgo::GeoAlgo geoObj ;
   float score = 0 ;
-  double distBackAlongTraj, distToWall, distToTopWall ;
+//  double distBackAlongTraj, distToWall; 
+  double distToTopWall ;
   double detHalfHeight = larutil::Geometry::GetME()->DetHalfHeight();
 
-  distBackAlongTraj = sqrt(shr.Start().SqDist(geoObj.Intersection(box,shr,true)[0])) ;
-  distToWall		= sqrt(geoObj.SqDist(shr.Start(),box)) ;
-  distToTopWall	 	= (detHalfHeight - shr.Start()[1])* shr.Dir().Length() ;
+ // distBackAlongTraj = sqrt(shr.Start().SqDist(geoObj.Intersection(box,shr,true)[0])) ;
+ // distToWall		= sqrt(geoObj.SqDist(shr.Start(),box)) ;
+  distToTopWall	 	= (detHalfHeight - shr.Start()[1])* shr.Dir().Length()/(-1*shr.Dir()[1]) ;
 
-  score = exp(-1*distToTopWall);
 
-  //temporarily add a smallness factor for showerers pointing upwards
-  if( shr.Dir()[1] > 0 )
-  	score *= 0.1 ;
+  if(distToTopWall >= 0)
+	score = exp(-1*distToTopWall);
+  //Very unlikely to be a cosmic shower if it is pointing upwards
+  else 
+  	score *= 0.01 ;
   
   return score;
 }
