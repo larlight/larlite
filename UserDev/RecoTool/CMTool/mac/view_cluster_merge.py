@@ -95,11 +95,11 @@ if args.display == None:
 else:
 
     raw_viewer = larlite.ClusterViewer()
-    raw_viewer.SetClusterProducer(str(args.cluster))
+    raw_viewer.SetInputProducer(str(args.cluster))
     first_viewer = larlite.ClusterViewer()
-    first_viewer.SetClusterProducer(str("merged"+args.cluster))
+    first_viewer.SetInputProducer(str("merged"+args.cluster))
     second_viewer = larlite.ClusterViewer()
-    second_viewer.SetClusterProducer(str("mergedmerged"+args.cluster))
+    second_viewer.SetInputProducer(str("mergedmerged"+args.cluster))
 
     ana_proc.add_process(raw_viewer)
     ana_proc.add_process(first_viewer)

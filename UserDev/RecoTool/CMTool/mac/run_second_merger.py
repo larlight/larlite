@@ -4,11 +4,18 @@ from ROOT import larlite as fmwk
 
 mgr = fmwk.ana_processor()
 
-#arg1 should be input file name
-mgr.add_input_file(sys.argv[1])
+#args should be input file name
+for x in xrange(len(sys.argv)-2):
 
-#arg2 should be output file name
-mgr.set_output_file(sys.argv[2])
+    mgr.add_input_file(sys.argv[x+1])
+
+#last arg should be output file name
+out_file = sys.argv[-1]
+if os.path.isfile(out_file):
+    print
+    print 'ERROR: output file already exist...'
+    print
+    sys.exit(0)
 
 mgr.set_io_mode(fmwk.storage_manager.kBOTH)
 

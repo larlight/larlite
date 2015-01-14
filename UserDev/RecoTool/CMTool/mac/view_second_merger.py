@@ -115,9 +115,8 @@ my_proc.add_process(raw_viewer)
 
 my_proc.add_process(merge_viewer)
 
-raw_viewer.SetClusterType(larlight.DATA.Cluster)
-
-merge_viewer.SetClusterType(larlight.DATA.Cluster)
+raw_viewer.SetInputProducer("mergedfuzzycluster")
+merge_viewer.SetInputProducer("mergedfuzzycluster")
 
 gStyle.SetOptStat(0)
 

@@ -1,4 +1,4 @@
-import ROOT,sys
+import ROOT,sys,os
 from mergeDef import *
 from ROOT import larlite as fmwk
 
@@ -17,15 +17,20 @@ if os.path.isfile(out_file):
     print
     sys.exit(0)
 
+mgr.set_output_file(out_file)
+
 mgr.set_io_mode(fmwk.storage_manager.kBOTH)
 
 mgr.set_ana_output_file("")
 
-prelimMerger = GetPrelimMergerInstance()
-# prelimMerger = GetPrelimMergerInstance(producer="fuzzycluster",saveOutput=True)
+mgr.add_process(GetPrelimMergerInstance())
+mgr.add_process(GetSecondMergerInstance())
 
-mgr.add_process(prelimMerger)
+merge_all = GetMergeAllInstance()
+merge_all.SetOutputProducer("mergeall")
+#mgr.add_process(merge_all)
 
+mgr.add_process(Get
 mgr.run()
 
 
