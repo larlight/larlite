@@ -63,9 +63,9 @@ namespace larlite {
 
     ::cmtool::CMergeManager _mgr;
 
-    std::string _input_label;
+    std::string _input_producer;
 
-    std::string _output_label;
+    std::string _output_producer;
 
     ::cluster::CRUHelper _cru_helper;
 

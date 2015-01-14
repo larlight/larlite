@@ -46,10 +46,10 @@ namespace larlite {
     //
     // Obtain event-wise data object pointers
     //
-    auto ev_clus = storage->get_data<event_cluster>(_cluster_producer);
+    auto ev_clus = storage->get_data<event_cluster>(_input_producer);
     if(!ev_clus)
       throw ::cluster::ViewerException(Form("Did not find cluster data product by %s!",
-					    _cluster_producer.c_str()
+					    _input_producer.c_str()
 					    )
 				       );
 
