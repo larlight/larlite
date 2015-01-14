@@ -29,8 +29,9 @@ namespace sptool {
   
   void SPAlgoSingleE::ProcessBegin()
   {
-    _alg_emp.ProcessBegin();
+
     _alg_emp.LoadParams();
+    _alg_emp.ProcessBegin();
 
     //kaleko
     _alg_emp.SetMode(true);
@@ -72,6 +73,7 @@ namespace sptool {
       SPArticle p_e;
       p_e.pdg_code(11);
       p_e.pos(isol_shower.Start());
+      p_e.mom(isol_shower.Dir()); // for now fill with direction - unit vector
       p_e.energy(isol_shower._energy);
       	
       res.push_back(p_e);
@@ -83,7 +85,7 @@ namespace sptool {
   
 
   bool SPAlgoSingleE::IsShowerElectron(const sptool::SPAShower shower){
-    
+
     //Make sure the shower is likely an electron
     //by using LL function from an SPAlgoEMPart instance
     //(LL uses only dEdX data if "dist" is plugged in negative)
