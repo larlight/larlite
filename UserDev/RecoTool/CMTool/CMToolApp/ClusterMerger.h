@@ -29,7 +29,7 @@ namespace larlite {
   public:
 
     /// Default constructor
-    ClusterMerger(){ _name="ClusterMerger"; _fout=0; _cluster_producer="fuzzycluster"; _write_output=false;}
+    ClusterMerger();
 
     /// Default destructor
     virtual ~ClusterMerger(){}
@@ -49,7 +49,9 @@ namespace larlite {
     */
     virtual bool finalize();
 
-    void SetClusterProducer(std::string name) {_cluster_producer = name;}
+    void SetInputProducer(std::string name) {_input_producer = name;}
+
+    void SetOutputProducer(std::string name) {_output_producer = name;}
 
     ::cmtool::CMergeManager& GetManager() { return _mgr; }
 
@@ -61,7 +63,9 @@ namespace larlite {
 
     ::cmtool::CMergeManager _mgr;
 
-    std::string _cluster_producer;
+    std::string _input_label;
+
+    std::string _output_label;
 
     ::cluster::CRUHelper _cru_helper;
 

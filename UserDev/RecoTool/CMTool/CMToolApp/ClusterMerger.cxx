@@ -5,6 +5,15 @@
 
 namespace larlite {
 
+  ClusterMerger::ClusterMerger()
+  {
+    _name="ClusterMerger"; 
+    _fout=0; 
+    _input_producer="fuzzycluster"; 
+    _output_producer="";
+    _write_output=false;
+  }
+
   bool ClusterMerger::initialize() {
 
     if(_fout) _mgr.SetAnaFile(_fout);
@@ -16,7 +25,7 @@ namespace larlite {
 
     std::vector<std::vector<larutil::PxHit> > local_clusters;
 
-    _cru_helper.GeneratePxHit(storage,_cluster_producer,local_clusters);
+    _cru_helper.GeneratePxHit(storage,_input_producer,local_clusters);
 
     _mgr.Reset();
 
@@ -27,10 +36,11 @@ namespace larlite {
     if(!_write_output) return true;
 
     // To write an output, get input cluster data
-    auto ev_cluster = storage->get_data<event_cluster>(_cluster_producer);
+    auto ev_cluster = storage->get_data<event_cluster>(_input_producer);
 
     // Initialize the output cluster data product
-    auto out_cluster_v = storage->get_data<event_cluster>(Form("merged%s",_cluster_producer.c_str()));
+    if(output_producer.empty()) output_producer = Form("merged%s",_input_producer.c_str());
+    auto out_cluster_v = storage->get_data<event_cluster>(Form("merged%s",_input_producer.c_str()));
     out_cluster_v->clear();
     out_cluster_v->set_event_id(ev_cluster->event_id());
     out_cluster_v->set_run(ev_cluster->run());
