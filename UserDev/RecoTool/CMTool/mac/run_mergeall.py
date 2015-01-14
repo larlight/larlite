@@ -1,5 +1,5 @@
 import ROOT,sys
-from mergeDef import *
+from recotool.mergeDef import *
 from ROOT import larlite as fmwk
 
 mgr = fmwk.ana_processor()

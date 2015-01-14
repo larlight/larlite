@@ -1,5 +1,5 @@
 from ROOT import *
-from mergeDef import *
+from recotool.mergeDef import *
 import sys
 
 import argparse
