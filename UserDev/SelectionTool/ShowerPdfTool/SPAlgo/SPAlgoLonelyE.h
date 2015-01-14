@@ -49,13 +49,22 @@ namespace sptool {
     /// Function to evaluate input showers and determine a score
     virtual SPArticleSet Reconstruct(const SPAData &data);
     
-    /// Likelyhood function where to figure out if shower is lonely
-    double LL(const SPArticle shr, const SPAData &data);
-
     /// Function to set debug mode on or off
     void setDebug(bool on) { _debug = on; }
 
   private:
+
+    /* 
+       Function where shower is compared to other objects in evt
+       to decide if the shower originates from other trks/shrs
+    */
+    bool isLonely(const SPArticle s, const SPAData data) const;
+
+    /// Check if the shower likely comes from a track
+    double isShowerFromTrack(const geoalgo::HalfLine_t shr, const geoalgo::Trajectory_t trk) const;
+
+    /// Check if the shower likely comes from another shower
+    double isShowerFromShower(const geoalgo::HalfLine_t islonely, const geoalgo::HalfLine_t isparent) const;
 
     // debug mode
     bool _debug;
