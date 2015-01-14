@@ -64,7 +64,7 @@ namespace larlite {
       // Loop over pfparticles
       for(size_t pfpart_index=0; pfpart_index<pfpart_v->size(); ++pfpart_index) {
 
-	auto const& pfp = pfpart_v[pfpart_index];
+	auto const& pfp = (*pfpart_v)[pfpart_index];
 
 	// If this is not pdg=11 pfparticle, ignore
 	if(pfp.PdgCode()!=11) continue;
@@ -74,7 +74,7 @@ namespace larlite {
 
 	auto& last_pair = (*matched_pairs.rbegin());
 
-	last_pair.reserve(ass.size());
+	last_pair.reserve(ass_clusters[pfpart_index].size());
 
 	// Loop over associated index for *this* pfparticle
 	for(auto const& ass_index : ass_clusters[pfpart_index]) 
