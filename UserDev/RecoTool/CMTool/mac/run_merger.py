@@ -30,7 +30,6 @@ merge_all = GetMergeAllInstance()
 merge_all.SetOutputProducer("mergeall")
 #mgr.add_process(merge_all)
 
-mgr.add_process(Get
 mgr.run()
 
 
