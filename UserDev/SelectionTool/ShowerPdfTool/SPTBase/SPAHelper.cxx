@@ -57,51 +57,56 @@ namespace sptool {
       t._energy     = -1;
     }
     // Revise track cosmogenic score
-    auto const& ctag_trk_ass = ctag_trk_v.association(trk_v.id());
-    if(ctag_trk_ass.size()) {
-      for(size_t cos_index=0; cos_index<ctag_trk_v.size(); ++cos_index) {
-	
-	auto const& ctag = ctag_trk_v[cos_index];
-	for(auto const& trk_index : ctag_trk_ass[cos_index])  
-	  res._tracks.at(trk_index)._cosmogenic = ctag.fCosmicScore;
-      }
-    }
+    if (ctag_trk_v.size()){
+      auto const& ctag_trk_ass = ctag_trk_v.association(trk_v.id());
+      if(ctag_trk_ass.size()) {
+	for(size_t cos_index=0; cos_index<ctag_trk_v.size(); ++cos_index) {
+	  
+	  auto const& ctag = ctag_trk_v[cos_index];
+	  for(auto const& trk_index : ctag_trk_ass[cos_index])  
+	    res._tracks.at(trk_index)._cosmogenic = ctag.fCosmicScore;
+	}// for all associations
+      }// if association is found
+    }// if ctag exists
     // Revise track energy
-    auto const& calo_trk_ass = calo_trk_v.association(trk_v.id());
-    if(calo_trk_ass.size()) {
-      for(size_t calo_index=0; calo_index<calo_trk_v.size(); ++calo_index) {
-
-	auto const& calo = calo_trk_v[calo_index];
-	for(auto const& trk_index : calo_trk_ass[calo_index])
-	  res._tracks.at(trk_index)._energy = calo.KineticEnergy();
-	
-      }
-    }
+    if (calo_trk_v.size()){
+      auto const& calo_trk_ass = calo_trk_v.association(trk_v.id());
+      if(calo_trk_ass.size()) {
+	for(size_t calo_index=0; calo_index<calo_trk_v.size(); ++calo_index) {
+	  
+	  auto const& calo = calo_trk_v[calo_index];
+	  for(auto const& trk_index : calo_trk_ass[calo_index])
+	    res._tracks.at(trk_index)._energy = calo.KineticEnergy();
+	}// for all associations
+      }// if association is found
+    }// if calo exists
     // Revise track part id
-    auto const& pid_trk_ass = pid_trk_v.association(trk_v.id());
-    if(pid_trk_ass.size()) {
-      for(size_t pid_index=0; pid_index<pid_trk_v.size(); ++pid_index) {
-
-	auto const &pid = pid_trk_v[pid_index];
-	// pick the one w/ minimum chi2
-	for(auto const& trk_index : pid_trk_ass[pid_index]) {
-
-	  auto& spa_trk = res._tracks.at(trk_index);
-	  std::map<double,SPATrack::TrackPartID_t> score_map;
-	  if(spa_trk._pid==SPATrack::kUnknown ||
-	     spa_trk._pid_score[spa_trk._pid] > pid.MinChi2()) {
-	    score_map.insert(std::make_pair(pid.Chi2Proton(),SPATrack::kProton));
-	    score_map.insert(std::make_pair(pid.Chi2Kaon(),SPATrack::kKaon));
-	    score_map.insert(std::make_pair(pid.Chi2Pion(),SPATrack::kPion));
-	    score_map.insert(std::make_pair(pid.Chi2Muon(),SPATrack::kMuon));
-	    for(auto const& score_pid : score_map)
-	      spa_trk._pid_score[score_pid.second] = score_pid.first;
-	    spa_trk._pid = (*score_map.begin()).second;
-	    spa_trk._pid_score[SPATrack::kPIDA] = pid.PIDA();
-	  }
-	}
-      }
-    }
+    if (pid_trk_v.size()){
+      auto const& pid_trk_ass = pid_trk_v.association(trk_v.id());
+      if(pid_trk_ass.size()) {
+	for(size_t pid_index=0; pid_index<pid_trk_v.size(); ++pid_index) {
+	  
+	  auto const &pid = pid_trk_v[pid_index];
+	  // pick the one w/ minimum chi2
+	  for(auto const& trk_index : pid_trk_ass[pid_index]) {
+	    
+	    auto& spa_trk = res._tracks.at(trk_index);
+	    std::map<double,SPATrack::TrackPartID_t> score_map;
+	    if(spa_trk._pid==SPATrack::kUnknown ||
+	       spa_trk._pid_score[spa_trk._pid] > pid.MinChi2()) {
+	      score_map.insert(std::make_pair(pid.Chi2Proton(),SPATrack::kProton));
+	      score_map.insert(std::make_pair(pid.Chi2Kaon(),SPATrack::kKaon));
+	      score_map.insert(std::make_pair(pid.Chi2Pion(),SPATrack::kPion));
+	      score_map.insert(std::make_pair(pid.Chi2Muon(),SPATrack::kMuon));
+	      for(auto const& score_pid : score_map)
+		spa_trk._pid_score[score_pid.second] = score_pid.first;
+	      spa_trk._pid = (*score_map.begin()).second;
+	      spa_trk._pid_score[SPATrack::kPIDA] = pid.PIDA();
+	    }
+	  }// for all associations
+	}// for pid indices
+      } // if association is found
+    }// if pid exists
   }
   
   

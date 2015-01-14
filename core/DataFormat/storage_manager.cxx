@@ -59,7 +59,8 @@ namespace larlite {
 	else if( (int)((*data_ptr_iter).second->event_id()) != _current_event_id) {
 	  
 	  print(msg::kERROR,__FUNCTION__,
-		Form("Detected event-alignment mismatch! (%d != %d)",
+		Form("Detected event-alignment mismatch for data type %s by %s! (%d != %d)",
+		     data::kDATA_TREE_NAME[type].c_str(), name.c_str(),
 		     (*data_ptr_iter).second->event_id(), _current_event_id)
 		);
 	  
@@ -846,11 +847,11 @@ namespace larlite {
       for(auto& name_ptr : _out_ch[i]) {
       
 	if(!(name_ptr.second)) continue;
-	if( _use_write_bool && 
-	    _write_data_array[i].find((name_ptr.first)) == _write_data_array[i].end()) 
-	  continue;
 
-	name_ptr.second->Fill();
+	if( !_use_write_bool ||
+	    _write_data_array[i].find((name_ptr.first)) != _write_data_array[i].end())
+	  name_ptr.second->Fill();
+	
 	_ptr_data_array[i][name_ptr.first]->clear_data();
 	
       }

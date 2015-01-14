@@ -58,16 +58,26 @@ namespace larlite {
     /// hack! remove me later
     storage_manager* GetCurrentData() {return _mgr;};
     
-    /// Function to set an input cluster type to work with
-    void SetClusterProducer(std::string name) { fClusterProducer = name; }
+    /// Function to set an input cluster/pfparticle producer name to work with
+    void SetInputProducer(std::string name, bool use_pfpart=false) 
+    { fInputProducer = name; fUsePFParticle = use_pfpart; }
+
+    /// Function to set an output shower producer label
+    void SetOutputProducer(std::string name) { fOutputProducer = name; }
 
     /// Getter for MatchManager instance, to attach algorithms
     ::cmtool::CMatchManager& GetManager() { return *fMatchMgr; }
 
   protected:
 
-    /// Cluster producer name
-    std::string fClusterProducer;
+    /// Input producer name
+    std::string fInputProducer;
+
+    /// Output producer name
+    std::string fOutputProducer;
+
+    /// Boolean flag to use PFParticle as an input or not
+    bool fUsePFParticle;
 
     /// CRUHelper converts framework dependent data product to PxUtil
     ::cluster::CRUHelper fCRUHelper;

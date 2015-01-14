@@ -21,10 +21,11 @@ mgr.set_io_mode(fmwk.storage_manager.kBOTH)
 
 mgr.set_ana_output_file("")
 
-prelimMerger = GetPrelimMergerInstance()
-# prelimMerger = GetPrelimMergerInstance(producer="fuzzycluster",saveOutput=True)
+merger = GetMergeAllInstance()
 
-mgr.add_process(prelimMerger)
+merger.SetOutputProducer("mergeall")
+
+mgr.add_process(merger)
 
 mgr.run()
 

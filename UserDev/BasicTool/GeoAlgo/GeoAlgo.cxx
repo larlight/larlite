@@ -571,7 +571,7 @@ namespace geoalgo {
   // Loop over segments that make up the trajectory and keep track
   // of shortest distance between any of them and the point
   // For the shortest distance find the point at which it is found
-  Point_t GeoAlgo::ClosestPt(const Point_t& pt, const Trajectory_t& trj) const
+  Point_t GeoAlgo::ClosestPt(const Point_t& pt, const Trajectory_t& trj, int &idx) const
   {
 
     // Make sure trajectory object is properly defined
@@ -584,15 +584,14 @@ namespace geoalgo {
     // Now keep track of smallest distance and loop over traj segments
     double distMin = kINVALID_DOUBLE;
     // For that smallest distance, keep track of the segment for which it was found
-    int pos = 0;
     for (size_t l=0; l < trj.size()-1; l++){
       double distTmp = _SqDist_(pt,trj[l],trj[l+1]);
-      if (distTmp < distMin) { distMin = distTmp; pos = l; }
+      if (distTmp < distMin) { distMin = distTmp; idx = l; }
     }
 
     // Now that we have the segment for the closest approach
     // Use it to find the closest point on that segment
-    LineSegment_t segMin(trj[pos], trj[pos+1]);
+    LineSegment_t segMin(trj[idx], trj[idx+1]);
     return _ClosestPt_(pt,segMin);
   }
   
@@ -650,6 +649,40 @@ namespace geoalgo {
     for (size_t l=0; l < trj.size()-1; l++){
       LineSegment_t segTmp(trj[l], trj[l+1]);
       double distTmp = _SqDist_(segTmp, seg, c1min, c2min);
+      if ( distTmp < distMin ){
+	c1 = c1min;
+	c2 = c2min;
+	distMin = distTmp;
+      }
+    }//for all segments in the track
+
+    return distMin;
+  }
+
+
+
+  // Closest Approach between a HalfLine and a Trajectory
+  // loop over segments in trajectory and find the one that
+  // is closest. Then find distance
+  double GeoAlgo::SqDist(const HalfLine_t& hline, const Trajectory_t& trj, Point_t& c1, Point_t& c2) const
+  {
+
+    // Make sure trajectory object is properly defined
+    if (!trj.size())
+      throw GeoAlgoException("Trajectory object not properly set...");
+    
+    // Check dimensionality compatibility between point and trajectory
+    trj.compat(hline.Start());
+
+    // keep track of c1 & c2
+    Point_t c1min;
+    Point_t c2min;
+    // Now keep track of smallest distance and loop over traj segments
+    double distMin = kMAX_DOUBLE;
+
+    for (size_t l=0; l < trj.size()-1; l++){
+      LineSegment_t segTmp(trj[l], trj[l+1]);
+      double distTmp = _SqDist_(hline, segTmp, c1min, c2min);
       if ( distTmp < distMin ){
 	c1 = c1min;
 	c2 = c2min;

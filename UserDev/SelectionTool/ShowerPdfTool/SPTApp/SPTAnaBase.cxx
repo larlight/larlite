@@ -97,14 +97,14 @@ namespace larlite {
   
   bool SPTAnaBase::analyze(storage_manager* storage) {
 
-    static bool one_time_warning = false;
+    static bool one_time_warning = true;
 
     //------------------------------
     // Start filling SPAData object!
     
     // Fill showers
     if (_mcshowers){
-      if (!_name_mcvtx.empty()){
+      if (!_name_mcshr.empty()){
 	auto ev_mcs = storage->get_data<event_mcshower> (_name_mcshr);
 	if (!ev_mcs)
 	  throw ::sptool::SPAException("MCShower info not found in the event!");
@@ -145,13 +145,25 @@ namespace larlite {
 	auto ev_calo_trk = storage->get_data<event_calorimetry> (Form("%scalo", _name_track.c_str()));
 	auto ev_pid_trk  = storage->get_data<event_partid>      (Form("%spid",  _name_track.c_str()));
 	if (!ev_trk)
-	  throw ::sptool::SPAException("RECO Track info not found in the event!");
-	if(!ev_ctag_trk)
-	  throw ::sptool::SPAException(Form("Track cosmictag info (\"%stag\" not found in the event!",_name_track.c_str()));
-	if(!ev_calo_trk)
-	  throw ::sptool::SPAException(Form("Track calorimetry info (\"%scalo\" not found in the event!",_name_track.c_str()));
-	if(!ev_pid_trk)
-	  throw ::sptool::SPAException(Form("Track partid info (\"%spid\" not found in the event!",_name_track.c_str()));
+	  throw ::sptool::SPAException(Form(" Track \"%s\" not found in the event!",_name_track.c_str()));
+	if(!ev_ctag_trk){
+	  if(one_time_warning)
+	    print(msg::kWARNING,__FUNCTION__,Form("One-Time-Warning: No cosmictag for track available (\"%stag\")",_name_track.c_str()) );
+	  delete ev_ctag_trk;
+	  ev_ctag_trk = new event_cosmictag();
+	}
+	if(!ev_calo_trk){
+	  if(one_time_warning)
+	    print(msg::kWARNING,__FUNCTION__,Form("One-Time-Warning: No calorimetry for track available (\"%stag\")",_name_track.c_str()) );
+	  delete ev_calo_trk;
+	  ev_calo_trk = new event_calorimetry();
+	}
+	if(!ev_pid_trk){
+	  if(one_time_warning)
+	    print(msg::kWARNING,__FUNCTION__,Form("One-Time-Warning: No PID for track available (\"%stag\")",_name_track.c_str()) );
+	  delete ev_pid_trk;
+	  ev_pid_trk = new event_partid();
+	}
 	_helper.FillTracks( *ev_trk, *ev_ctag_trk, *ev_calo_trk, *ev_pid_trk, _data );
       }
     }

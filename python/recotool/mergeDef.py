@@ -6,6 +6,18 @@
 
 from ROOT import larlite as fmwk,cmtool
 
+def GetMergeAllInstance(producer="fuzzycluster",saveOutput=True):
+    
+    result = fmwk.ClusterMerger()
+
+    result.GetManager().AddMergeAlgo(cmtool.CBAlgoMergeAll())
+    result.GetManager().MergeTillConverge(True)
+    result.SetInputProducer(producer)
+    result.SaveOutputCluster(saveOutput)
+
+    return result
+
+
 def GetPrelimMergerInstance(producer="fuzzycluster",saveOutput=True):
     
     result = fmwk.ClusterMerger()
@@ -45,7 +57,7 @@ def GetPrelimMergerInstance(producer="fuzzycluster",saveOutput=True):
 
     result.GetManager().MergeTillConverge(True)
 
-    result.SetClusterProducer(producer)
+    result.SetInputProducer(producer)
     result.SaveOutputCluster(saveOutput)
 
     return result
@@ -53,7 +65,7 @@ def GetPrelimMergerInstance(producer="fuzzycluster",saveOutput=True):
 def GetSecondMergerInstance(producer="mergedfuzzycluster",saveOutput=True):
     
     result = fmwk.ClusterMerger()
-    result.SetClusterProducer(producer)
+    result.SetInputProducer(producer)
     result.SaveOutputCluster(saveOutput)
 
 

@@ -162,6 +162,22 @@ namespace geoalgo {
     { Point_t c1; Point_t c2; int trackIdx; return SqDist(seg, trj, c1, c2, trackIdx); }
 
 
+    //*******************************************
+    //CLOSEST APPROACH BETWEEN HALFLINE AND TRACK
+    //*******************************************
+    /// HalfLine & Trajectory, keep track of points
+    double SqDist(const HalfLine_t& hline, const Trajectory_t& trj, Point_t& c1, Point_t& c2) const;
+    /// HalfLine & Trajectory, keep track of points
+    double SqDist(const Trajectory_t& trj, const HalfLine_t& hline, Point_t& c1, Point_t& c2) const
+    { return SqDist(hline, trj, c1, c2); }
+    /// HalfLine & Trajectory, don't keep track of points
+    double SqDist(const Trajectory_t& trj, const HalfLine_t& hline) const
+    { Point_t c1; Point_t c2; return SqDist(hline, trj, c1, c2); }
+    /// HalfLine & Trajectory, don't keep track of points
+    double SqDist(const HalfLine_t& hline, const Trajectory_t& trj) const
+    { Point_t c1; Point_t c2; return SqDist(hline, trj, c1, c2); }
+
+
     //****************************************
     //CLOSEST APPROACH BETWEEN POINT AND TRACK
     //****************************************
@@ -171,10 +187,16 @@ namespace geoalgo {
     double SqDist(const Trajectory_t& trj, const Point_t& pt) const
     { return SqDist(pt,trj); }
     /// Point_t & Trajectory_t closest point
-    Point_t ClosestPt(const Point_t& pt, const Trajectory_t& trj) const;
+    Point_t ClosestPt(const Point_t& pt, const Trajectory_t& trj) const
+    { int idx=0; return ClosestPt(pt,trj,idx); }
     /// Point_t & Trajectory_t closest point
     Point_t ClosestPt(const Trajectory_t& trj, const Point_t& pt) const
-    { return ClosestPt(pt,trj); }
+    { int idx=0; return ClosestPt(pt,trj,idx); }
+    /// Point_t & Trajectory_t closest point. Keep track of index of segment
+    Point_t ClosestPt(const Point_t& pt, const Trajectory_t& trj, int& idx) const;
+    /// Point_t & Trajectory_t closest point. Keep track of index of segment
+    Point_t ClosestPt(const Trajectory_t& trj, const Point_t& pt, int& idx) const
+    { return ClosestPt(pt,trj,idx); }
 
 
     //***************************************************
