@@ -59,30 +59,32 @@ namespace larlite {
 
       auto pfpart_v = storage->get_data<event_pfpart>(fInputProducer);
 
-      auto const& ass_clusters = pfpart_v->association(data::kCluster,
-						       fInputProducer);
-      // Loop over pfparticles
-      for(size_t pfpart_index=0; pfpart_index<pfpart_v->size(); ++pfpart_index) {
-
-	auto const& pfp = (*pfpart_v)[pfpart_index];
-
-	// If this is not pdg=11 pfparticle, ignore
-	if(pfp.PdgCode()!=11) continue;
-
-	// Otherwise we store the association information in matched_pair
-	matched_pairs.push_back(std::vector<unsigned int>());
-
-	auto& last_pair = (*matched_pairs.rbegin());
-
-	last_pair.reserve(ass_clusters[pfpart_index].size());
-
-	// Loop over associated index for *this* pfparticle
-	for(auto const& ass_index : ass_clusters[pfpart_index]) 
-	  last_pair.push_back(ass_index);
-	
+      if(pfpart_v && pfpart_v->size()) {
+      
+	auto const& ass_clusters = pfpart_v->association(data::kCluster,
+							 fInputProducer);
+	// Loop over pfparticles
+	for(size_t pfpart_index=0; pfpart_index<pfpart_v->size(); ++pfpart_index) {
+	  
+	  auto const& pfp = (*pfpart_v)[pfpart_index];
+	  
+	  // If this is not pdg=11 pfparticle, ignore
+	  if(pfp.PdgCode()!=11) continue;
+	  
+	  // Otherwise we store the association information in matched_pair
+	  matched_pairs.push_back(std::vector<unsigned int>());
+	  
+	  auto& last_pair = (*matched_pairs.rbegin());
+	  
+	  last_pair.reserve(ass_clusters[pfpart_index].size());
+	  
+	  // Loop over associated index for *this* pfparticle
+	  for(auto const& ass_index : ass_clusters[pfpart_index]) 
+	    last_pair.push_back(ass_index);
+	}
       }
     }
-
+    
     // Create output data product holder
     auto shower_v = storage->get_data<event_shower>(fOutputProducer);
     shower_v->clear();
@@ -134,10 +136,12 @@ namespace larlite {
       }
 
       ass_index_v.push_back(ass_index);
+      /*
       std::cout << "cpans.size(): " << cpans.size() << std::endl;
       for ( auto const& cpan : cpans ) {
         std::cout << "NHits: " << cpan.GetNHits() << std::endl;
       }
+      */
       fShowerAlgo->AppendInputClusters(cpans);
     }
 
