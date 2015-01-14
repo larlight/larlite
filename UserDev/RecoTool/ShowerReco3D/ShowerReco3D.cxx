@@ -59,7 +59,7 @@ namespace larlite {
 
       auto pfpart_v = storage->get_data<event_pfpart>(fInputProducer);
 
-      auto const& ass_clusters = pfpart_v->association(data::kPFParticle,
+      auto const& ass_clusters = pfpart_v->association(data::kCluster,
 						       fInputProducer);
       
       for(auto const& ass : ass_clusters) {
@@ -126,6 +126,10 @@ namespace larlite {
       }
 
       ass_index_v.push_back(ass_index);
+      std::cout << "cpans.size(): " << cpans.size() << std::endl;
+      for ( auto const& cpan : cpans ) {
+        std::cout << "NHits: " << cpan.GetNHits() << std::endl;
+      }
       fShowerAlgo->AppendInputClusters(cpans);
     }
 
