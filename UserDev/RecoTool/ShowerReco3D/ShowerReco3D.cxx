@@ -61,17 +61,25 @@ namespace larlite {
 
       auto const& ass_clusters = pfpart_v->association(data::kPFParticle,
 						       fInputProducer);
-      
-      for(auto const& ass : ass_clusters) {
+      // Loop over pfparticles
+      for(size_t pfpart_index=0; pfpart_index<pfpart_v->size(); ++pfpart_index) {
 
+	auto const& pfp = pfpart_v[pfpart_index];
+
+	// If this is not pdg=11 pfparticle, ignore
+	if(pfp.PdgCode()!=11) continue;
+
+	// Otherwise we store the association information in matched_pair
 	matched_pairs.push_back(std::vector<unsigned int>());
 
 	auto& last_pair = (*matched_pairs.rbegin());
 
 	last_pair.reserve(ass.size());
 
-	for(auto const& index : ass) last_pair.push_back(index);
-
+	// Loop over associated index for *this* pfparticle
+	for(auto const& ass_index : ass_clusters[pfpart_index]) 
+	  last_pair.push_back(ass_index);
+	
       }
     }
 
