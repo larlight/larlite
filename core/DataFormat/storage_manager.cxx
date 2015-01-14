@@ -59,7 +59,8 @@ namespace larlite {
 	else if( (int)((*data_ptr_iter).second->event_id()) != _current_event_id) {
 	  
 	  print(msg::kERROR,__FUNCTION__,
-		Form("Detected event-alignment mismatch! (%d != %d)",
+		Form("Detected event-alignment mismatch for data type %s by %s! (%d != %d)",
+		     data::kDATA_TREE_NAME[type].c_str(), name.c_str(),
 		     (*data_ptr_iter).second->event_id(), _current_event_id)
 		);
 	  
