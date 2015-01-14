@@ -16,6 +16,7 @@
 
 #include "ShowerRecoAlgBase.h"
 #include "AnalysisAlg/CalorimetryAlg.h"
+#include "ShowerCalo.h"
 
 namespace showerreco {
   
@@ -43,6 +44,9 @@ namespace showerreco {
     /// Function to decide if to use ModBox (True) or Birks (False) for calorimetry
     void SetUseModBox(bool on) { fCaloAlg.setUseModBox(on); }
 
+    /// Function to set whether to use E correction
+    void setEcorrection(bool on) { _Ecorrection = on; }
+
   protected:
 
     /// Function to reconstruct a shower
@@ -55,10 +59,13 @@ namespace showerreco {
     larutil::GeometryUtilities  *fGSer;
    
   private:
+
+    /// Boolean -> decide if to use energy correction or not
+    bool _Ecorrection;
     
-   double fcalodEdxlength;
-   double fdEdxlength;
-   bool fUseArea;
+    double fcalodEdxlength;
+    double fdEdxlength;
+    bool fUseArea;
 
   };
 }

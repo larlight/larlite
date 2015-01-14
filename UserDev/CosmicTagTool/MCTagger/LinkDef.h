@@ -12,9 +12,13 @@
 #pragma link C++ class larlite::MCTag+;
 #pragma link C++ class larlite::MCShowerTagger+;
 #pragma link C++ class larlite::testCosmicTag+;
+#pragma link C++ class CosmicTagAlgo+;
+#pragma link C++ class std::vector<geoalgo::Trajectory>+;
+
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 
 
 

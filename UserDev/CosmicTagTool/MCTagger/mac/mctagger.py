@@ -35,10 +35,6 @@ for x in xrange(len(sys.argv)-1):
 # analysis module can store anything such as histograms, your own TTree, etc.
 my_proc.set_output_file("taggedShowers.root")
 
-# Create analysis class instance. For this example, ana_base.
-# To show how one can run multiple analysis modules at once,
-# we make multiple ana_base instance.
-
 #tagger = fmwk.MCTag()
 tagger = fmwk.MCShowerTagger()
 tagger.SetDataType("mcreco")

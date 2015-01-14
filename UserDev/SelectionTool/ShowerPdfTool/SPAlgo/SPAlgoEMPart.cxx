@@ -36,7 +36,7 @@ namespace sptool {
     _xmin = 0.;
     _xmax = 100.;
     _dedxmin = 0.01;
-    _dedxmax = 8.;
+    _dedxmax = 20.;
     _e_dedx_fitMin = _dedxmin;
     _e_dedx_fitMax = _dedxmax;
     _g_dedx_fitMin = _dedxmin;
@@ -51,7 +51,7 @@ namespace sptool {
     _g_lval = -1./20;
     _g_lmin = -1./10.;
     _g_lmax = -1./100.;
-    _g_dedxfrac = 0.05;
+    _g_dedxfrac = 0.0;
     _g_dedxmu1 = 1.;
     _g_dedxsigma1 = _g_dedxmu1*0.2;
     _g_dedxmu2 = 2.;
@@ -158,7 +158,7 @@ namespace sptool {
     _g_radLenVal   = new RooRealVar("_g_l","g Radiation length [cm]",_g_lval,_g_lmin,_g_lmax);
     // gamma dEdx vars
     delete _g_dEdxFrac;
-    _g_dEdxFrac = new RooRealVar("_g_dedxfrac","g dEdx frac",_g_dedxfrac,0.,1.0);
+    _g_dEdxFrac = new RooRealVar("_g_dedxfrac","g dEdx frac",_g_dedxfrac,0.,0.0);
     delete _g_dEdxMu1;
     _g_dEdxMu1    = new RooRealVar("_g_dedxmu1","g dEdx Mean",_g_dedxmu1,_g_dedxmin,_g_dedxmax);
     delete _g_dEdxSigma1;
@@ -334,9 +334,9 @@ namespace sptool {
 
       // Start saving fit values
       // Before doing so clear the _params to be stored
-      _params.clear_data();
+      //_params.clear_data();
       // Now load params (the ones that will actually be stores will be over-written
-      LoadParams();
+      //LoadParams();
       
       RooRealVar* res_value_radLen = nullptr;
       RooRealVar* res_value_dEdxFrac = nullptr;
