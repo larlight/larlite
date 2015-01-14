@@ -8,8 +8,9 @@ namespace larlite {
   ShowerReco3D::ShowerReco3D() : ana_base(), fShowerAlgo(nullptr), fMatchMgr(nullptr)
   {
     _name="ShowerReco3D";
-    fClusterProducer = "fuzzycluster";
-
+    fInputProducer  = "fuzzycluster";
+    fOutputProducer = "showerreco";
+    fUsePFParticle  = false;
     auto geom = ::larutil::Geometry::GetME();
     if(!fMatchMgr) fMatchMgr = new ::cmtool::CMatchManager(geom->Nplanes());
   }
@@ -36,63 +37,96 @@ namespace larlite {
     // Retrieve clusters and fed into the algorithm
     std::vector<std::vector<larutil::PxHit> > local_clusters;
 
-    fCRUHelper.GeneratePxHit(storage,fClusterProducer,local_clusters);
-    
-    fMatchMgr->SetClusters(local_clusters);
+    fCRUHelper.GeneratePxHit(storage,fInputProducer,local_clusters);
 
-    local_clusters.clear();
+    // Run matching
+    std::vector<std::vector<unsigned int> > matched_pairs;
+    if(!fUsePFParticle) {
 
-    // Run matching & retrieve matched cluster indices
-    try{
-      fMatchMgr->Process();
-    }catch( ::cmtool::CMTException &e){
-      e.what();
-      return false;
+      fMatchMgr->SetClusters(local_clusters);
+      
+      // Run matching & retrieve matched cluster indices
+      try{
+	fMatchMgr->Process();
+      }catch( ::cmtool::CMTException &e){
+	e.what();
+	return false;
+      }
+
+      matched_pairs = fMatchMgr->GetBookKeeper().GetResult();
+
+    }else{
+
+      auto pfpart_v = storage->get_data<event_pfpart>(fInputProducer);
+
+      auto const& ass_clusters = pfpart_v->association(data::kPFParticle,
+						       fInputProducer);
+      
+      for(auto const& ass : ass_clusters) {
+
+	matched_pairs.push_back(std::vector<unsigned int>());
+
+	auto& last_pair = (*matched_pairs.rbegin());
+
+	last_pair.reserve(ass.size());
+
+	for(auto const& index : ass) last_pair.push_back(index);
+
+      }
     }
 
-    auto const& matched_pairs = fMatchMgr->GetBookKeeper().GetResult();
-
-    //
-    // Run shower reco algorithm and store output
-    //
-
-    // Prepare output storage
-    auto shower_v = storage->get_data<event_shower>("showerreco");
+    // Create output data product holder
+    auto shower_v = storage->get_data<event_shower>(fOutputProducer);
     shower_v->clear();
     shower_v->reserve(matched_pairs.size());
-    shower_v->set_event_id(storage->get_data<event_cluster>(fClusterProducer)->event_id());
-    shower_v->set_run(storage->get_data<event_cluster>(fClusterProducer)->run());
-    shower_v->set_subrun(storage->get_data<event_cluster>(fClusterProducer)->subrun());
+    shower_v->set_event_id(storage->get_data<event_cluster>(fInputProducer)->event_id());
+    shower_v->set_run(storage->get_data<event_cluster>(fInputProducer)->run());
+    shower_v->set_subrun(storage->get_data<event_cluster>(fInputProducer)->subrun());
+    if(!matched_pairs.size()) return true;
 
-    // Create association holder
+    //
+    // Reaching this point means there's some showers to reconstruct!
+    // 1) Create association to be stored in an output
+    // 2) Append input clusters to shower algo based on matched_pairs vector
+    //
     AssSet_t ass_index_v;
     ass_index_v.reserve(matched_pairs.size());
-    
-    // Loop over matched pairs
     for(auto const& pair : matched_pairs) {
       
-      // Create an input data holder
-      std::vector< ::cluster::ClusterParamsAlg> clusters;
-      clusters.reserve(pair.size());      
+      std::vector< ::cluster::ClusterParamsAlg> cpans;
+      
+      cpans.reserve(pair.size());
 
       // Create an association vector
       AssUnit_t ass_index;
       ass_index.reserve(pair.size());
+      
+      for(auto const& index : pair) {
 
-      for(auto const& cluster_index : pair) {
+	ass_index.push_back(index);
 
-	ass_index.push_back(cluster_index);
-	
-	clusters.push_back(fMatchMgr->GetInputClusters().at(cluster_index));
-	
+	if(fUsePFParticle) {
+	  
+	  auto cluster_v = storage->get_data<event_cluster>(fInputProducer);
+
+	  if(!cluster_v) 
+	    throw ::showerreco::ShowerRecoException("Cannot find input cluster data!");
+	  
+	  ::cluster::ClusterParamsAlg cpan(local_clusters[index]);
+	  cpan.SetVerbose(false);
+	  cpan.SetPlane((*cluster_v)[index].View());
+	  cpan.DisableFANN();
+	  cpan.FillParams(false,false,false,false,false,false);
+	  cpan.FillPolygon();
+	  cpans.push_back(cpan);
+
+	}else 
+	  
+	  cpans.push_back(fMatchMgr->GetInputClusters()[index]);
       }
 
-      // Temporarily store association
       ass_index_v.push_back(ass_index);
-
-      // Append input to shower reco algorithm
-      fShowerAlgo->AppendInputClusters(clusters);
-
+      fShowerAlgo->AppendInputClusters(cpans);
     }
 
     // Run shower reco
@@ -114,7 +148,7 @@ namespace larlite {
 
     } // done looping over matched cluster pairs
     
-    shower_v->set_association(data::kCluster,fClusterProducer,ass_index_v);
+    shower_v->set_association(data::kCluster,fInputProducer,ass_index_v);
     return true;
   }
   
