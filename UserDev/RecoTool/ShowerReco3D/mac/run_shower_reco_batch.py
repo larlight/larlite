@@ -38,13 +38,13 @@ ana_unit = fmwk.ShowerReco3D()
 # Attach shower reco alg
 sralg = showerreco.ShowerRecoAlg()
 sralg.Verbose(False)
-#sralg.Verbose(True)
+# sralg.Verbose(True)
 sralg.SetUseArea(True)
 #sralg.SetUseModBox(True)
 ana_unit.SetShowerAlgo(sralg)
 
 # Specify cluster type
-ana_unit.SetInputProducer("mergedfuzzycluster")
+ana_unit.SetInputProducer("fuzzycluster")
 #ana_unit.SetClusterProducer("pandoraNu")
 
 # 
