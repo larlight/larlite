@@ -41,7 +41,7 @@ public:
   float ShowerBoxScore(const ::geoalgo::HalfLine&,const ::geoalgo::AABox& );
 
   //Compute score given simplified shower and cosmic-tagged track
-  float ShowerTrackScore(std::vector<::geoalgo::Trajectory>&,::geoalgo::HalfLine_t & );
+  float ShowerTrackScore(std::vector<::geoalgo::Trajectory>&,::geoalgo::HalfLine_t &, float & distance );
 
 };
 

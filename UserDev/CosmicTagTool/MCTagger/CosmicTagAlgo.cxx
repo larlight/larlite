@@ -5,11 +5,11 @@
 
 //tracks is list of cosmic-tagged tracks; shr is simplified mcshower
 //With some code from David Caratelli's ShowerCalculator.cxx
-float CosmicTagAlgo::ShowerTrackScore(std::vector<::geoalgo::Trajectory> &tracks,::geoalgo::HalfLine_t &shr )
+float CosmicTagAlgo::ShowerTrackScore(std::vector<::geoalgo::Trajectory> &tracks,::geoalgo::HalfLine_t &shr, float & Dist )
 {
 	double minDist = std::numeric_limits<double>::max();
 	double minIP   = std::numeric_limits<double>::max();  
-	double Dist 	= -999;
+	Dist 	= -999;
 	double IP 		= -999;
 
 	geoalgo::Vector_t c1(3);
@@ -71,7 +71,7 @@ float CosmicTagAlgo::ShowerBoxScore(const ::geoalgo::HalfLine& shr,
   //else, if the shower is pointing downwards but is very far from the 
   //top wall, assign it a low score
   else 
-  	score *= 0.001
+  	score *= 0.001;
   
   return score;
 }

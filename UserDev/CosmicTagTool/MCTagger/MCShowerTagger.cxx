@@ -20,7 +20,7 @@ namespace larlite {
     auto evt_mctracks = storage->get_data<event_mctrack>("mcreco");
 
     // create new cosmictag for showers 
-    auto track_tag    = storage->get_data<event_cosmictag>("mctrackmctag");
+  //  auto track_tag    = storage->get_data<event_cosmictag>("mctrackmctag");
     auto shower_tag   = storage->get_data<event_cosmictag>("mcshowermctag");
 
     // Associations:
@@ -32,7 +32,7 @@ namespace larlite {
     // Single Association Holder
     AssUnit_t ass;
     
-    //make vector of all tracks. Do this only once
+    //make vector of all mc tracks. Do this only once
     _allMCTracks.clear();
     for (size_t m=0; m < evt_mctracks->size(); m++){
       //time-selection (only if in-frame)
@@ -42,13 +42,22 @@ namespace larlite {
          }
       }
 
+    _allRecoTracks.clear();
+ //   for (size_t m=0; m < evt_tracks->size(); m++){
+ //     //time-selection (only if in-frame)
+ //     //if( (evt_tracks->at(m).vertex_at(0).T() > -0.8E6) and (evt_tracks->at(m).Start().T() < 0.8E6) ){
+ //   	 if( evt_tracks->at(m).n_points() > 1) 
+ //   	   addTrack(evt_tracks->at(m));
+ //       // }
+ //     }
+
 
 	geoalgo::AABox tpcBox(0,-1*larutil::Geometry::GetME()->DetHalfHeight(),0,
 						 2*larutil::Geometry::GetME()->DetHalfWidth(),
 						 larutil::Geometry::GetME()->DetHalfHeight(),
 						 larutil::Geometry::GetME()->DetLength() );
 
-
+std::cout<<"New Event: "<<std::endl;
     for (size_t s=0; s < evt_mcshower->size(); s++){
 
   	  	mcshower shr = evt_mcshower->at(s);
@@ -64,9 +73,10 @@ namespace larlite {
   	   geoalgo::HalfLine shower(_X,_Y,_Z,_Px,_Py,_Pz);
 
   	   float cosmicScoreShrBox, cosmicScoreShrTrk;
-
+	   float minDist =0; 
+	   
+  	   cosmicScoreShrTrk = _tagger.ShowerTrackScore(_allMCTracks,shower,minDist);	
 	   cosmicScoreShrBox = _tagger.ShowerBoxScore(shower, tpcBox) ;
-  	   cosmicScoreShrTrk = _tagger.ShowerTrackScore(_allMCTracks,shower);	
 
 	   //Adding cosmic tag for showers with respect to all tracks
   	   cosmictag thistag0(cosmicScoreShrTrk);
@@ -74,12 +84,20 @@ namespace larlite {
   	   ass.push_back(shower_tag->size()-1);
   	   mcshr_to_cosmictag.push_back(ass);
 
+
+
 	   //Adding cosmic tag for showers with respect to box 
   	   cosmictag thistag1(cosmicScoreShrBox);
   	   shower_tag->push_back(thistag1);
   	   ass.push_back(shower_tag->size()-1);
   	   mcshr_to_cosmictag.push_back(ass);
 
+	  if(thistag0.fCosmicScore != 0){
+	   std::cout<<"\nCyl dist: "<<minDist <<std::endl;
+	   std::cout<<"ShowerID: "<<shr.TrackID()<<std::endl;
+	   std::cout<<"First tag: "<<thistag0.fCosmicScore <<std::endl;
+	   std::cout<<"Second tag: "<<thistag1.fCosmicScore <<std::endl;
+	   }
   	   }//for all showers 
    
     evt_mcshower->set_association(shower_tag->id(),mcshr_to_cosmictag);
