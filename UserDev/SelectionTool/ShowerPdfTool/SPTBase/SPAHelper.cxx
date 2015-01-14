@@ -54,7 +54,7 @@ namespace sptool {
 	t += trk.vertex_at(i);
       
       t._cosmogenic = -1;
-      t._energy     = -1;
+      t._energy     = trk.momentum_at(0);
     }
     // Revise track cosmogenic score
     if (ctag_trk_v.size()){
@@ -142,7 +142,6 @@ namespace sptool {
     res._showers.clear();
     res._showers.reserve(res._showers.size() + shw_v.size());
     for(auto const& shw : shw_v) {
-      
       res._showers.push_back(SPAShower(shw.ShowerStart(),
 				       shw.Direction())
 			     );
