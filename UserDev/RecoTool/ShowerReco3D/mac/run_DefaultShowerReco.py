@@ -9,8 +9,8 @@ if len(sys.argv) < 2:
 
 
 from ROOT import gSystem,TMath
-from ROOT import larlite as fmwk, showerreco, larutil
-
+from ROOT import larlite as fmwk, cmtool, showerreco, larutil
+from shower_config import DefaultShowerReco3D
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
@@ -26,25 +26,11 @@ my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 my_proc.set_ana_output_file("");
 
 # Specify data output root file name
-my_proc.set_output_file("showerreco_batch_out_pandora.root")
+my_proc.set_output_file("showerreco_batch_out.root")
 
-#
-# Kazu disables to read-in shower data product from input (only speeds up)
-#
+ana_unit=DefaultShowerReco3D()
 
-# Create analysis unit
-ana_unit = fmwk.ShowerReco3D()
-
-# Attach shower reco alg
-sralg = showerreco.ShowerRecoAlg()
-sralg.Verbose(False)
-#sralg.Verbose(True)
-sralg.SetUseArea(True)
-#sralg.SetUseModBox(True)
-ana_unit.SetShowerAlgo(sralg)
-
-# Specify cluster type
-ana_unit.SetInputProducer("pandoraNu",True)
+ana_unit.SetInputProducer("fuzzycluster")
 
 my_proc.add_process(ana_unit)
 
@@ -52,6 +38,7 @@ print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
+#my_proc.run(0,5)
 my_proc.run()
 
 sys.exit()

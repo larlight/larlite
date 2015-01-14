@@ -13,7 +13,7 @@ def PandoraShowerReco3D():
     #sralg.SetUseModBox(True)
     ana_unit.SetShowerAlgo(sralg)
 
-def DefaultShowerReco3D():
+def ShowerReco3D():
     # Create analysis unit
     ana_unit = fmwk.ShowerReco3D()
     
