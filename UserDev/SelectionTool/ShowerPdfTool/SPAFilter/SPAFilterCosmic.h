@@ -36,6 +36,12 @@ namespace sptool {
     /// Select function
     virtual SPAOrder Select (const SPAData &data);
 
+	void SetCosmicScoreCut (double score) { _score = score ; }	
+
+   private:
+   	
+	double _score ;
+
   };
 }
 #endif

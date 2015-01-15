@@ -5,16 +5,19 @@
 
 //tracks is list of cosmic-tagged tracks; shr is simplified mcshower
 //With some code from David Caratelli's ShowerCalculator.cxx
-float CosmicTagAlgo::ShowerTrackScore(std::vector<::geoalgo::Trajectory> &tracks,::geoalgo::HalfLine_t &shr, float & Dist )
+float CosmicTagAlgo::ShowerTrackScore(std::vector<::geoalgo::Trajectory> &tracks,::geoalgo::HalfLine_t &shr )
 {
 	double minDist = std::numeric_limits<double>::max();
 	double minIP   = std::numeric_limits<double>::max();  
-	Dist 	= -999;
+	double Dist 	= -999;
 	double IP 		= -999;
 
 	geoalgo::Vector_t c1(3);
 	geoalgo::Vector_t c2(3);
 	geoalgo::GeoAlgo geoObj ;
+
+  if(shr.Start()[0] < 0 || shr.Start()[0] > 256.35 || shr.Start()[1] <-116.5 || shr.Start()[1] >116.5 || shr.Start()[2] <0 || shr.Start()[2] > 1037.)
+		return -9. ;
 
     // shr segment starts 3 meters before start point,
     // ends 10 cm after start point aligned with shr momentum. Use for Impact Parameter calc
@@ -36,9 +39,9 @@ float CosmicTagAlgo::ShowerTrackScore(std::vector<::geoalgo::Trajectory> &tracks
 
 	float score=1;
 
-	if(Dist < 100 && IP < 100){
+	if(Dist >= 0 && Dist < 100 ){//&& IP >=0 && IP < 100){
 		score *= 1 - (Dist/100) ;
-		score *= 1 - (IP/100) ;
+	//	score *= 1 - (IP/100) ;
 		}
 	else
 		score = 0 ;
@@ -57,6 +60,9 @@ float CosmicTagAlgo::ShowerBoxScore(const ::geoalgo::HalfLine& shr,
   double distBackAlongTraj, distToWall; 
   double distToTopWall ;
   double detHalfHeight = larutil::Geometry::GetME()->DetHalfHeight();
+
+  if(shr.Start()[0] < 0 || shr.Start()[0] > 256.35 || shr.Start()[1] <-116.5 || shr.Start()[1] >116.5 || shr.Start()[2] <0 || shr.Start()[2] > 1037.)
+		return -9. ;
 
   distBackAlongTraj = sqrt(shr.Start().SqDist(geoObj.Intersection(box,shr,true)[0])) ;
  // distToWall		= sqrt(geoObj.SqDist(shr.Start(),box)) ;
