@@ -41,6 +41,17 @@ namespace sptool {
     return genpdf;
   }
 
+  RooAbsPdf* ShowerPdfFactory::dEdxConv(RooRealVar &x,
+					RooRealVar &meang, RooRealVar &sigmag,
+					RooRealVar &meanl, RooRealVar &sigmal) const
+  {
+    
+    RooLandau* landau = new RooLandau("landau","landau", x, meanl, sigmal);
+    RooGaussian* gauss = new RooGaussian("gaussian","gaussian", x, meang, sigmag);
+
+    return new RooNumConvPdf("model", "model", x, *landau, *gauss);
+  }
+
 
   RooAbsPdf*  ShowerPdfFactory::EvsAngPdf(RooRealVars_t &vars) const
   {

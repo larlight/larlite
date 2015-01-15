@@ -117,6 +117,26 @@ namespace sptool {
     RooRealVar* _e_dEdxMu;
     RooRealVar* _e_dEdxSigma;
 
+    // e- dEdx Conv Pdf
+    RooRealVar* _e_gaussMu;
+    RooRealVar* _e_gaussSigma;
+    RooRealVar* _e_landauMu;
+    RooRealVar* _e_landauSigma;
+    RooAbsPdf*  _e_dEdxConvPdf;
+    // variables
+    double _e_landauMu_val;
+    double _e_landauMu_min;
+    double _e_landauMu_max;
+    double _e_landauSigma_val;
+    double _e_landauSigma_min;
+    double _e_landauSigma_max;
+    double _e_gaussMu_val;
+    double _e_gaussMu_min;
+    double _e_gaussMu_max;
+    double _e_gaussSigma_val;
+    double _e_gaussSigma_min;
+    double _e_gaussSigma_max;
+
     // gamma RadLen PDF
     RooAbsPdf*  _g_radLenPdf;     ///< gamma RadLen Pdf
     RooDataSet* _g_radLenData;    ///< gamma pdf data set
@@ -130,6 +150,26 @@ namespace sptool {
     RooRealVar* _g_dEdxSigma1;
     RooRealVar* _g_dEdxMu2;
     RooRealVar* _g_dEdxSigma2;
+
+    // gamma dEdx Conv Pdf
+    RooRealVar* _g_gaussMu;
+    RooRealVar* _g_gaussSigma;
+    RooRealVar* _g_landauMu;
+    RooRealVar* _g_landauSigma;
+    RooAbsPdf*  _g_dEdxConvPdf;
+    // variables
+    double _g_landauMu_val;
+    double _g_landauMu_min;
+    double _g_landauMu_max;
+    double _g_landauSigma_val;
+    double _g_landauSigma_min;
+    double _g_landauSigma_max;
+    double _g_gaussMu_val;
+    double _g_gaussMu_min;
+    double _g_gaussMu_max;
+    double _g_gaussSigma_val;
+    double _g_gaussSigma_min;
+    double _g_gaussSigma_max;
 
   };
 }

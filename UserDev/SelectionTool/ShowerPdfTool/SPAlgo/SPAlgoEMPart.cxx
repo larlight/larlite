@@ -16,6 +16,11 @@ namespace sptool {
     , _e_dEdxData(nullptr)
     , _e_dEdxMu(nullptr)
     , _e_dEdxSigma(nullptr)
+    , _e_dEdxConvPdf(nullptr)
+    , _e_gaussMu(nullptr)
+    , _e_gaussSigma(nullptr)
+    , _e_landauMu(nullptr)
+    , _e_landauSigma(nullptr)
     , _g_radLenPdf(nullptr)
     , _g_radLenData(nullptr)
     , _g_radLenVal(nullptr)
@@ -26,6 +31,11 @@ namespace sptool {
     , _g_dEdxSigma1(nullptr)
     , _g_dEdxMu2(nullptr)
     , _g_dEdxSigma2(nullptr)
+    , _g_dEdxConvPdf(nullptr)
+    , _g_gaussMu(nullptr)
+    , _g_gaussSigma(nullptr)
+    , _g_landauMu(nullptr)
+    , _g_landauSigma(nullptr)
   { 
     _name = "SPAlgoEMPart"; 
     Init();
@@ -48,6 +58,18 @@ namespace sptool {
     _e_dedxsigma = _e_dedxmu*0.3;
     _e_dedxmin = _dedxmin;
     _e_dedxmax = _dedxmax;
+    _e_landauMu_val = 2;
+    _e_landauMu_min = _dedxmin;
+    _e_landauMu_max = _dedxmax;
+    _e_landauSigma_val = 0.2;
+    _e_landauSigma_min = 0.0;
+    _e_landauSigma_max = 2.0;
+    _e_gaussMu_val = 2;
+    _e_gaussMu_min = _dedxmin;
+    _e_gaussMu_max = _dedxmax;
+    _e_gaussSigma_val = 0.4;
+    _e_gaussSigma_min = 0.0;
+    _e_gaussSigma_max = 2.0;
     _g_lval = -1./20;
     _g_lmin = -1./10.;
     _g_lmax = -1./100.;
@@ -58,6 +80,18 @@ namespace sptool {
     _g_dedxsigma2 = _g_dedxmu2*0.2;
     _g_dedxmin = _dedxmin;
     _g_dedxmax = _dedxmax;
+    _g_landauMu_val = 4;
+    _g_landauMu_min = _dedxmin;
+    _g_landauMu_max = _dedxmax;
+    _g_landauSigma_val = 0.4;
+    _g_landauSigma_min = 0.0;
+    _g_landauSigma_max = 4.0;
+    _g_gaussMu_val = 4;
+    _g_gaussMu_min = _dedxmin;
+    _g_gaussMu_max = _dedxmax;
+    _g_gaussSigma_val = 0.4;
+    _g_gaussSigma_min = 0.0;
+    _g_gaussSigma_max = 4.0;
 
   }
 
@@ -153,6 +187,18 @@ namespace sptool {
     delete _e_dEdxData;
     _e_dEdxData = new RooDataSet(Form("%s_dEdxData",part_name.c_str()),"RooFit dEdx set",RooArgSet(*_dEdxVar));
 
+    // electron dEdx Conv stuff
+    delete _e_gaussMu;
+    _e_gaussMu = new RooRealVar("_e_gaussMu","_e_gaussMu",_e_gaussMu_val,_e_gaussMu_min,_e_gaussMu_max);
+    delete _e_gaussSigma;
+    _e_gaussSigma = new RooRealVar("_e_gaussSigma","_e_gaussSigma",_e_gaussSigma_val,_e_gaussSigma_min,_e_gaussSigma_max);
+    delete _e_landauMu;
+    _e_landauMu = new RooRealVar("_e_landauMu","_e_landauMu",_e_landauMu_val,_e_landauMu_min,_e_landauMu_max);
+    delete _e_landauMu;
+    _e_landauSigma = new RooRealVar("_e_landauSigma","_e_landauSigma",_e_landauSigma_val,_e_landauSigma_min,_e_landauSigma_max);
+    delete _e_dEdxConvPdf;
+    _e_dEdxConvPdf = factory.dEdxConv(*_dEdxVar,*_e_gaussMu,*_e_gaussSigma,*_e_landauMu,*_e_landauSigma);
+
     // gamma RadLen vars
     delete _g_radLenVal;
     _g_radLenVal   = new RooRealVar("_g_l","g Radiation length [cm]",_g_lval,_g_lmin,_g_lmax);
@@ -176,6 +222,18 @@ namespace sptool {
     _g_dEdxPdf = factory.dEdxPdf_gamma(*_dEdxVar, *_g_dEdxFrac, *_g_dEdxMu1, *_g_dEdxSigma1, *_g_dEdxMu2, *_g_dEdxSigma2);
     delete _g_dEdxData;
     _g_dEdxData = new RooDataSet(Form("%s_dEdxData",part_name.c_str()),"RooFit dEdx set",RooArgSet(*_dEdxVar));
+
+    // gamma dEdx Conv stuff
+    delete _g_gaussMu;
+    _g_gaussMu = new RooRealVar("_g_gaussMu","_g_gaussMu",_g_gaussMu_val,_g_gaussMu_min,_g_gaussMu_max);
+    delete _g_gaussSigma;
+    _g_gaussSigma = new RooRealVar("_g_gaussSigma","_g_gaussSigma",_g_gaussSigma_val,_g_gaussSigma_min,_g_gaussSigma_max);
+    delete _g_landauMu;
+    _g_landauMu = new RooRealVar("_g_landauMu","_g_landauMu",_g_landauMu_val,_g_landauMu_min,_g_landauMu_max);
+    delete _g_landauMu;
+    _g_landauSigma = new RooRealVar("_g_landauSigma","_g_landauSigma",_g_landauSigma_val,_g_landauSigma_min,_g_landauSigma_max);
+    delete _g_dEdxConvPdf;
+    _g_dEdxConvPdf = factory.dEdxConv(*_dEdxVar,*_g_gaussMu,*_g_gaussSigma,*_g_landauMu,*_g_landauSigma);
 
   }
 
@@ -303,6 +361,7 @@ namespace sptool {
 	fit_res_radLen = _g_radLenPdf->fitTo(*_g_radLenData,RooFit::Save(),RooFit::PrintLevel(-1));
 	std::cout << "Fit results for gamma radLength." << std::endl;
 	fit_res_radLen->Print();
+	//fit_res_dEdx   = _g_dEdxPdf->fitTo(*_g_dEdxData, RooFit::Range(_g_dedx_fitMin, _g_dedx_fitMax), RooFit::Save(),RooFit::PrintLevel(-1));
 	fit_res_dEdx   = _g_dEdxPdf->fitTo(*_g_dEdxData, RooFit::Range(_g_dedx_fitMin, _g_dedx_fitMax), RooFit::Save(),RooFit::PrintLevel(-1));
 	fit_res_dEdx->Print();
 	_g_radLenPdf->plotOn(frame_radLen);
@@ -318,6 +377,7 @@ namespace sptool {
 	fit_res_radLen = _e_radLenPdf->fitTo(*_e_radLenData,RooFit::Save(),RooFit::PrintLevel(-1));
 	std::cout << "Fit results for electron radLength." << std::endl;
 	fit_res_radLen->Print();
+	//fit_res_dEdx   = _e_dEdxPdf->fitTo(*_e_dEdxData, RooFit::Range(_e_dedx_fitMin, _e_dedx_fitMax), RooFit::Save(),RooFit::PrintLevel(-1));
 	fit_res_dEdx   = _e_dEdxPdf->fitTo(*_e_dEdxData, RooFit::Range(_e_dedx_fitMin, _e_dedx_fitMax), RooFit::Save(),RooFit::PrintLevel(-1));
 	fit_res_dEdx->Print();
 	_e_radLenPdf->plotOn(frame_radLen);
@@ -337,7 +397,7 @@ namespace sptool {
       //_params.clear_data();
       // Now load params (the ones that will actually be stores will be over-written
       //LoadParams();
-      
+      /*      
       RooRealVar* res_value_radLen = nullptr;
       RooRealVar* res_value_dEdxFrac = nullptr;
       RooRealVar* res_value_dEdxMu = nullptr;
@@ -398,7 +458,7 @@ namespace sptool {
       _params.get_darray("dedx_range")->clear();
       _params.append("dedx_range",_dedxmin);
       _params.append("dedx_range",_dedxmax);
-      
+      */      
       // Rad Length likelyhood
       TH1D *h11_radLen = new TH1D("h11_radLen","Electron vs. Gamma Likelihood; Rad. Length [cm]; Likelihood",100,0,0.1);
       TH1D *h22_radLen = new TH1D("h22_radLen","Electron vs. Gamma Likelihood; Rad. Length [cm]; Likelihood",100,0,0.1);
@@ -409,7 +469,7 @@ namespace sptool {
 	h11_radLen->SetBinContent(i,_e_radLenPdf->getVal(*_radLenVar) / (_e_radLenPdf->getVal(*_radLenVar) + _g_radLenPdf->getVal(*_radLenVar)));
 	h22_radLen->SetBinContent(i,_g_radLenPdf->getVal(*_radLenVar) / (_e_radLenPdf->getVal(*_radLenVar) + _g_radLenPdf->getVal(*_radLenVar)));
       }
-      
+
       h11_radLen->SetLineWidth(2);
       h11_radLen->SetLineColor(kBlue);
       h11_radLen->SetFillStyle(3004);

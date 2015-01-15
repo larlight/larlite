@@ -26,6 +26,8 @@
 #include <RooDataSet.h>
 #include <RooFitResult.h>
 #include <RooProdPdf.h>
+#include <RooLandau.h>
+#include <RooNumConvPdf.h>
 #include "RooClassFactory.h"
 #include "SPAException.h"
 #include "SPTEnv.h"
@@ -67,6 +69,11 @@ namespace sptool {
     RooAbsPdf* dEdxPdf_gamma(RooRealVar &_g_dEdxVar, RooRealVar &f,
 			     RooRealVar &mu1, RooRealVar &sigma1,
 			     RooRealVar &mu2, RooRealVar &sigma2) const;
+    
+    /// Instantiate dEdx PDF for gauss convolved with landau
+    RooAbsPdf* dEdxConv(RooRealVar &x,
+			RooRealVar &meang, RooRealVar &sigmag,
+			RooRealVar &meanl, RooRealVar &sigmal) const;
 
     /// Instantiate Angle-vs-Energy PDF
     RooAbsPdf* EvsAngPdf(RooRealVars_t &vars) const;
