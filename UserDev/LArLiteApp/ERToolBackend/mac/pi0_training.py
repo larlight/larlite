@@ -1,7 +1,7 @@
 import sys
 from ROOT import gSystem
 from ROOT import larlite as fmwk
-from ROOT import sptool
+from ROOT import ertool
 
 def ask_binary(msg='Proceed? [y/n]:'):
     
@@ -29,7 +29,7 @@ def main():
     # Create ana_processor instance
     my_proc = fmwk.ana_processor()
     # Create algorithm
-    my_algo = sptool.SPAlgoPi0()
+    my_algo = ertool.AlgoPi0()
     my_algo.setVerbose(False)
     my_algo.setMinShrEnergy(10)
     my_algo.setMaxShrEnergy(1000)
@@ -38,7 +38,7 @@ def main():
     my_algo.setMaxFitMass(200)
     my_algo.setAngleMax(3.14)
     # Create analysis unit
-    my_ana = fmwk.ExampleSPSelection()
+    my_ana = fmwk.ExampleERSelection()
 
     # Set Producers
     # First Argument: True = MC, False = Reco
@@ -50,7 +50,7 @@ def main():
     my_ana.SetTrackProducer(False,"");
     my_ana.SetVtxProducer(False,"");
 
-    my_ana._mgr.SetSPAlgo(my_algo)
+    my_ana._mgr.SetAlgo(my_algo)
     my_ana._mgr._training_mode =True
 
     # Obtain input root files
@@ -61,7 +61,7 @@ def main():
             files.append(fname)
 
     print
-    print '  Running SPAlgoPi0 training script...'
+    print '  Running AlgoPi0 training script...'
     print
     print '  Identified %2d input files' % len(files)
     if not ask_binary('  Proceed? [y/n]:'): return False

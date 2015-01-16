@@ -1,37 +1,37 @@
 /**
- * \file SPAnaPi0Quality.h
+ * \file ERAnaPi0Quality.h
  *
- * \ingroup SPTApp
+ * \ingroup LArLite_ERTool
  * 
- * \brief Class def header for a class SPAnaPi0Quality
+ * \brief Class def header for a class ERAnaPi0Quality
  *
  * @author david
  */
 
-/** \addtogroup SPTApp
+/** \addtogroup LArLite_ERTool
 
     @{*/
 
-#ifndef LARLITE_SPANAPI0QUALITY_H
-#define LARLITE_SPANAPI0QUALITY_H
+#ifndef LARLITE_ERANAPI0QUALITY_H
+#define LARLITE_ERANAPI0QUALITY_H
 
 #include "Analysis/ana_base.h"
-#include "SPTBase/SPAManager.h"
-#include "SPTAnaBase.h"
+#include "ERTool/Base/Manager.h"
+#include "ERToolAnaBase.h"
 namespace larlite {
   /**
-     \class SPAnaPi0Quality
+     \class ERAnaPi0Quality
      User custom analysis class made by david
    */
-  class SPAnaPi0Quality : public SPTAnaBase {
+  class ERAnaPi0Quality : public ERToolAnaBase {
   
   public:
 
     /// Default constructor
-    SPAnaPi0Quality();
+    ERAnaPi0Quality();
 
     /// Default destructor
-    virtual ~SPAnaPi0Quality(){};
+    virtual ~ERAnaPi0Quality(){};
 
     virtual bool initialize();
 
@@ -40,7 +40,7 @@ namespace larlite {
     virtual bool finalize();
 
     /// Selection manager class instance
-    ::sptool::SPAManager _mgr;
+    ::ertool::Manager _mgr;
     
     /// Tree info
     TTree* _pi0_tree;

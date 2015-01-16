@@ -1,20 +1,23 @@
-#ifndef SPTANABASE_CXX
-#define SPTANABASE_CXX
+#ifndef ERToolANABASE_CXX
+#define ERToolANABASE_CXX
 
-#include "SPTAnaBase.h"
+#include "ERToolAnaBase.h"
 
 namespace larlite {
 
-  SPTAnaBase::SPTAnaBase() : ana_base()
+  ERToolAnaBase::ERToolAnaBase() : ana_base()
   { 
-    _name="SPTAnaBase";
+    _name="ERToolAnaBase";
     MCProducer("generator","mcreco");
   }
 
-  void SPTAnaBase::MCProducer(const std::string gen, const std::string mcst) 
+  void ERToolAnaBase::MCProducer(const std::string gen, const std::string mcst) 
   { 
-    if(mcst.empty())
-      throw ::sptool::SPAException("<<RecoProducer>> Cannot leave second argument an empty string!");
+    if(mcst.empty()){
+      print(msg::kERROR,__FUNCTION__,
+	    "Cannot leave second argument an empty string!");	
+      throw std::exception();
+    }
     _name_generator = gen; 
     _name_mcshr    = mcst; 
     _name_mctrk    = mcst; 
@@ -22,7 +25,7 @@ namespace larlite {
     _name_shower    = "";
   }
 
-  void SPTAnaBase::SetShowerProducer(const bool mc, const std::string prod)
+  void ERToolAnaBase::SetShowerProducer(const bool mc, const std::string prod)
   {
     if (mc){
       _mcshowers   = true;
@@ -38,7 +41,7 @@ namespace larlite {
   return;
   }
 
-  void SPTAnaBase::SetTrackProducer(const bool mc, const std::string prod)
+  void ERToolAnaBase::SetTrackProducer(const bool mc, const std::string prod)
   {
     if (mc){
       _mctracks   = true;
@@ -54,7 +57,7 @@ namespace larlite {
   return;
   }
 
-  void SPTAnaBase::SetVtxProducer(const bool mc, const std::string prod)
+  void ERToolAnaBase::SetVtxProducer(const bool mc, const std::string prod)
   {
     if (mc){
       _mcvtx = true;
@@ -71,10 +74,13 @@ namespace larlite {
   }
       
 
-  void SPTAnaBase::RecoProducer(const std::string track, const std::string shower)
+  void ERToolAnaBase::RecoProducer(const std::string track, const std::string shower)
   {
-    if(shower.empty())
-      throw ::sptool::SPAException("<<RecoProducer>> Cannot leave second argument an empty string!");
+    if(shower.empty()) {
+      print(msg::kERROR,__FUNCTION__,
+	    "Cannot leave second argument an empty string!");	
+      throw std::exception();
+    }
     _name_generator = "";
     _name_mctrk    = "";
     _name_mcshr    = "";
@@ -82,7 +88,7 @@ namespace larlite {
     _name_shower    = shower; 
   }
 
-  bool SPTAnaBase::initialize() {
+  bool ERToolAnaBase::initialize() {
     // Nothing provided...
     if( _name_generator.empty() &&
 	_name_mctrk.empty()    &&
@@ -95,7 +101,7 @@ namespace larlite {
     return true;
   }
   
-  bool SPTAnaBase::analyze(storage_manager* storage) {
+  bool ERToolAnaBase::analyze(storage_manager* storage) {
 
     static bool one_time_warning = true;
 
@@ -106,8 +112,11 @@ namespace larlite {
     if (_mcshowers){
       if (!_name_mcshr.empty()){
 	auto ev_mcs = storage->get_data<event_mcshower> (_name_mcshr);
-	if (!ev_mcs)
-	  throw ::sptool::SPAException("MCShower info not found in the event!");
+	if (!ev_mcs){
+	  print(msg::kERROR,__FUNCTION__,
+		"MCShower info not found in the event!");
+	  throw std::exception();
+	}
 	_helper.FillShowers(*ev_mcs, _data);
       }
     }
@@ -115,8 +124,11 @@ namespace larlite {
       if (!_name_shower.empty()){
 	auto ev_shw      = storage->get_data<event_shower>    (_name_shower);
 	auto ev_ctag_shw = storage->get_data<event_cosmictag> (Form("%stag",_name_shower.c_str()));
-	if (!ev_shw)
-	  throw ::sptool::SPAException("RecoShower info not found in the event!");
+	if (!ev_shw) {
+	  print(msg::kERROR,__FUNCTION__,
+		"RecoShower info not found in the event!");
+	  throw std::exception();
+	}
 	if(!ev_ctag_shw){
 	  if(one_time_warning)
 	    print(msg::kWARNING,__FUNCTION__,
@@ -133,8 +145,10 @@ namespace larlite {
     if (_mctracks){
       if (!_name_mctrk.empty()){
 	auto ev_mct = storage->get_data<event_mctrack>  (_name_mctrk);
-	if (!ev_mct)
-	  throw ::sptool::SPAException("MCTrack info not found in the event!");
+	if (!ev_mct) {
+	  print(msg::kERROR,__FUNCTION__,
+		"MCTrack info not found in the event!");
+	}
 	_helper.FillTracks(*ev_mct, _data);
       }
     }
@@ -144,8 +158,11 @@ namespace larlite {
 	auto ev_ctag_trk = storage->get_data<event_cosmictag>   (Form("%stag",  _name_track.c_str()));
 	auto ev_calo_trk = storage->get_data<event_calorimetry> (Form("%scalo", _name_track.c_str()));
 	auto ev_pid_trk  = storage->get_data<event_partid>      (Form("%spid",  _name_track.c_str()));
-	if (!ev_trk)
-	  throw ::sptool::SPAException(Form(" Track \"%s\" not found in the event!",_name_track.c_str()));
+	if (!ev_trk) {
+	  print(msg::kERROR,__FUNCTION__,
+		Form(" Track \"%s\" not found in the event!",_name_track.c_str()));
+	  throw std::exception();
+	}
 	if(!ev_ctag_trk){
 	  if(one_time_warning)
 	    print(msg::kWARNING,__FUNCTION__,Form("One-Time-Warning: No cosmictag for track available (\"%stag\")",_name_track.c_str()) );
@@ -172,8 +189,11 @@ namespace larlite {
     if (_mcvtx){
       if (!_name_mcvtx.empty()){
 	auto ev_mci = storage->get_data<event_mctruth> (_name_generator);
-	if (!ev_mci)
-	  throw ::sptool::SPAException("MCTruth info not found in the event!");
+	if (!ev_mci) {
+	  print(msg::kERROR,__FUNCTION__,
+		"MCTruth info not found in the event!");
+	  throw std::exception();
+	}
 	_helper.FillVertices(*ev_mci, _data);
       }
     }
@@ -248,7 +268,7 @@ namespace larlite {
     return true;
   }
 
-  bool SPTAnaBase::finalize() {
+  bool ERToolAnaBase::finalize() {
 
     return true;
   }

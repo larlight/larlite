@@ -9,7 +9,7 @@ if len(sys.argv) < 2:
 
 from ROOT import gSystem
 from ROOT import larlite as fmwk
-from ROOT import sptool
+from ROOT import ertool
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
@@ -23,9 +23,8 @@ my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 # Specify output root file name
 my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root")
 
-ana_unit = fmwk.ExampleSPSelection()
-ana_unit._mgr.SetSPAlgo(sptool.SPAlgoPi0())
-ana_unit._mgr.SetFilter(sptool.SPFilterToy())
+ana_unit = fmwk.ExampleERSelection()
+ana_unit._mgr.SetAlgo(ertool.AlgoPi0())
 
 # Attach a template process
 my_proc.add_process(ana_unit)

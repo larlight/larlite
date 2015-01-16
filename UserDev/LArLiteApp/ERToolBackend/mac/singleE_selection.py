@@ -9,7 +9,7 @@ if len(sys.argv) < 2:
 
 from ROOT import gSystem
 from ROOT import larlite as fmwk
-from ROOT import sptool
+from ROOT import ertool
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
@@ -22,13 +22,18 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
-my_proc.set_ana_output_file("EMselectionPDF.root")
+my_proc.set_ana_output_file("singleE_selection_ana_out.root")
 
-my_algo = sptool.SPAlgoEMPart()
-my_algo.LoadParams()
+
+# Possible filter to select true events
+#my_proc.enable_filter(True)
+#pdgsel = fmwk.PDGSelection()
+#pdgsel.Select(11,pdgsel.kGENERATOR,1)
+#my_proc.add_process(pdgsel)
+
+my_algo = ertool.AlgoSingleE()
 my_algo.Reset()
-my_algo.SetMode(False) # True = Gamma. False = Electron.
-my_ana = fmwk.ExampleSPSelection()
+my_ana = fmwk.ExampleERSelection()
 
 # Set Producers
 # First Argument: True = MC, False = Reco
@@ -40,10 +45,14 @@ my_ana.SetShowerProducer(False,"showerreco");
 my_ana.SetTrackProducer(False,"");
 my_ana.SetVtxProducer(False,"");
 
-my_ana._mgr.SetSPAlgo(my_algo)
 my_ana._mode =True # True = Select. False = Fill mode
 my_proc.add_process(my_ana)
 my_proc.run()
+
+
+my_algo.Reset()
+
+
 
 # done!
 print

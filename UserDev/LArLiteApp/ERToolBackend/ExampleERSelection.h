@@ -1,9 +1,9 @@
 /**
- * \file ExampleSPSelection.h
+ * \file ExampleERSelection.h
  *
  * \ingroup ShowerPdfTool
  * 
- * \brief Class def header for a class ExampleSPSelection
+ * \brief Class def header for a class ExampleERSelection
  *
  * @author kazuhiro
  */
@@ -12,26 +12,26 @@
 
     @{*/
 
-#ifndef LARLITE_EXAMPLESPSELECTION_H
-#define LARLITE_EXAMPLESPSELECTION_H
+#ifndef LARLITE_EXAMPLEERSELECTION_H
+#define LARLITE_EXAMPLEERSELECTION_H
 
 #include "Analysis/ana_base.h"
-#include "SPTBase/SPAManager.h"
-#include "SPTAnaBase.h"
+#include "ERTool/Base/Manager.h"
+#include "ERToolAnaBase.h"
 namespace larlite {
   /**
-     \class ExampleSPSelection
+     \class ExampleERSelection
      Example analysis unit for running SPAManager
    */
-  class ExampleSPSelection : public SPTAnaBase {
+  class ExampleERSelection : public ERToolAnaBase {
   
   public:
 
     /// Default constructor
-    ExampleSPSelection();
+    ExampleERSelection();
 
     /// Default destructor
-    virtual ~ExampleSPSelection(){}
+    virtual ~ExampleERSelection(){}
 
     /**
         Initialization method to be called before the analysis event loop.
@@ -49,7 +49,7 @@ namespace larlite {
     virtual bool finalize();
 
     /// Selection manager class instance
-    ::sptool::SPAManager _mgr;
+    ::ertool::Manager _mgr;
 
   };
 }

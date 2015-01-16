@@ -1,7 +1,7 @@
 import sys
 from ROOT import gSystem
 from ROOT import larlite as fmwk
-from ROOT import sptool
+from ROOT import ertool
 
 def ask_binary(msg='Proceed? [y/n]:'):
     
@@ -22,7 +22,7 @@ def main():
     if len(sys.argv) < 2:
         msg  = '\n'
         msg += "Usage: %s $INPUT_ROOT_FILE\n" % sys.argv[0]
-        msg += "$INPUT_ROOT_FILE containing 'gamma' ('electron') is used for training SPAlgoEMPart gamma (electron) mode.\n"
+        msg += "$INPUT_ROOT_FILE containing 'gamma' ('electron') is used for training AlgoEMPart gamma (electron) mode.\n"
         msg += '\n'
         sys.stderr.write(msg)
         sys.exit(1)
@@ -30,11 +30,11 @@ def main():
     # Create ana_processor instance
     my_proc = fmwk.ana_processor()
     # Create algorithm
-    my_algo = sptool.SPAlgoEMPart()
+    my_algo = ertool.AlgoEMPart()
     my_algo.set_e_dEdxFitRange(1.2,2); # To set range for fitting for dEdx
     my_algo.set_g_dEdxFitRange(3,4.5);
     # Create analysis unit
-    my_ana = fmwk.ExampleSPSelection()
+    my_ana = fmwk.ExampleERSelection()
 
     # Set Producers
     # First Argument: True = MC, False = Reco
@@ -46,7 +46,7 @@ def main():
     my_ana.SetTrackProducer(False,"");
     my_ana.SetVtxProducer(False,"");
 
-    my_ana._mgr.SetSPAlgo(my_algo)
+    my_ana._mgr.SetAlgo(my_algo)
     my_ana._mgr._training_mode =True
 
     # Check if gamma/electron files are provided:
@@ -60,7 +60,7 @@ def main():
             electron_files.append(fname)
 
     print
-    print '  Running SPAlgoEMPart training script...'
+    print '  Running AlgoEMPart training script...'
     print
     print '  Identified %2d input files for gamma' % len(gamma_files)
     print '  Identified %2d input files for electron' % len(electron_files)

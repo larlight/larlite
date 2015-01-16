@@ -9,7 +9,7 @@ if len(sys.argv) < 2:
 
 from ROOT import gSystem
 from ROOT import larlite as fmwk
-from ROOT import sptool
+from ROOT import ertool
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
@@ -22,7 +22,7 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
-my_proc.set_ana_output_file("singleE_selection_ana_out.root")
+my_proc.set_ana_output_file("PEselection_ana_out.root")
 
 
 # Possible filter to select true events
@@ -31,20 +31,25 @@ my_proc.set_ana_output_file("singleE_selection_ana_out.root")
 #pdgsel.Select(11,pdgsel.kGENERATOR,1)
 #my_proc.add_process(pdgsel)
 
-my_algo = sptool.SPAlgoSingleE()
+my_algo = ertool.AlgoLonelyE()
+my_algo.LoadParams()
 my_algo.Reset()
-my_ana = fmwk.ExampleSPSelection()
+my_algo.setDebug(True)
 
-# Set Producers
-# First Argument: True = MC, False = Reco
+my_filter = ertool.AFilterECut()
+my_filter.SetECut(40.) # MeV
+
+my_ana = fmwk.ExampleERSelection()
+# OPTIONAL:
+my_ana.SetShowerProducer(False,"showerreco");
+my_ana.SetTrackProducer(False,"stitchkalmanhit");
 #my_ana.SetShowerProducer(True,"mcreco");
 #my_ana.SetTrackProducer(True,"mcreco");
-#my_ana.SetVtxProducer(True,"generator");
-
-my_ana.SetShowerProducer(False,"showerreco");
-my_ana.SetTrackProducer(False,"");
 my_ana.SetVtxProducer(False,"");
-
+#my_ana.RecoProducer("","showerreco") # call if using Reco objects
+#my_ana.AddGeneratorProducer("generator") # call if MC vertex info should be used (for rad-length to be used w/ Reco, for example)
+my_ana._mgr.SetAlgo(my_algo)
+my_ana._mgr.SetFilter(my_filter)
 my_ana._mode =True # True = Select. False = Fill mode
 my_proc.add_process(my_ana)
 my_proc.run()

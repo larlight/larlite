@@ -1,39 +1,39 @@
 /**
- * \file SPTAnaBase.h
+ * \file ERToolAnaBase.h
  *
- * \ingroup ShowerPdfTool
+ * \ingroup LArLite_ERTool
  * 
- * \brief Class def header for a class SPTAnaBase
+ * \brief Class def header for a class ERToolAnaBase
  *
  * @author kazuhiro
  */
 
-/** \addtogroup ShowerPdfTool
+/** \addtogroup LArLite_ERTool
 
     @{*/
 
-#ifndef SELECTIONTOOL_SPTANABASE_H
-#define SELECTIONTOOL_SPTANABASE_H
+#ifndef LARLITE_ERTOOLANABASE_H
+#define LARLITE_ERTOOLANABASE_H
 
 #include "Analysis/ana_base.h"
-#include "SPTBase/SPAHelper.h"
+#include "ERToolHelper.h"
 
 namespace larlite {
   /**
-     \class SPTAnaBase
+     \class ERToolAnaBase
      @brief Base analysis unit class for SPT fmwk. It has features to make SPAData.
      This class implements features to generate SPAData. More elaborate analysis       \n
-     unit class may be derived from this class. See sptool::ExampleSPFit for instance. \n
+     unit class may be derived from this class. See ertool::ExampleSPFit for instance. \n
    */
-  class SPTAnaBase : public ana_base{
+  class ERToolAnaBase : public ana_base{
   
   public:
 
     /// Default constructor
-    SPTAnaBase();
+    ERToolAnaBase();
 
     /// Default destructor
-    virtual ~SPTAnaBase(){};
+    virtual ~ERToolAnaBase(){};
 
     /// Initialization method to be called before the analysis event loop.
     virtual bool initialize();
@@ -87,8 +87,8 @@ namespace larlite {
 
   protected:
 
-    ::sptool::SPAData   _data;   ///< Data to be filled by this module (main purpose!)
-    ::sptool::SPAHelper _helper; ///< SPAHelper helps generating SPAData
+    ::ertool::EventData _data; ///< Data to be filled by this module (main purpose!)
+    ERToolHelper _helper; ///< SPAHelper helps generating SPAData
 
   private:
     std::string _name_generator; ///< Generator's producer name

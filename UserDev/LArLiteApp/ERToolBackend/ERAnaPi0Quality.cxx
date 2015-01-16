@@ -1,20 +1,19 @@
-#ifndef SPANAPI0QUALITY_CXX
-#define SPANAPI0QUALITY_CXX
+#ifndef ERANAPI0QUALITY_CXX
+#define ERANAPI0QUALITY_CXX
 
-#include "SPAnaPi0Quality.h"
+#include "ERAnaPi0Quality.h"
 
 namespace larlite {
 
-
-  SPAnaPi0Quality::SPAnaPi0Quality()
-    : SPTAnaBase()
+  ERAnaPi0Quality::ERAnaPi0Quality()
+    : ERToolAnaBase()
     , _pi0_tree(nullptr) 
   { 
-    _name="SPAnaPi0Quality"; 
+    _name="ERAnaPi0Quality"; 
 
   }
 
-  bool SPAnaPi0Quality::initialize() {
+  bool ERAnaPi0Quality::initialize() {
 
     // Setup Tree to hold Quality Check information
     if (_pi0_tree) { delete _pi0_tree; }
@@ -29,10 +28,10 @@ namespace larlite {
     _pi0_tree->Branch("_reco_z",&_reco_z,"reco_z/D");
 
     _mgr.Initialize();
-    return SPTAnaBase::initialize();
+    return ERToolAnaBase::initialize();
   }
   
-  bool SPAnaPi0Quality::analyze(storage_manager* storage) {
+  bool ERAnaPi0Quality::analyze(storage_manager* storage) {
 
     // get MCTruth to find Pi0
     auto ev_mctruth  = storage->get_data<event_mctruth>("generator");
@@ -41,10 +40,10 @@ namespace larlite {
       return false;
     }
   
-    auto status = SPTAnaBase::analyze(storage);
+    auto status = ERToolAnaBase::analyze(storage);
     if(!status) return status;
 
-    sptool::SPArticleSet particles = _mgr.Process(_data);
+    ertool::ParticleSet particles = _mgr.Process(_data);
 
     int n_pi0 = 0;
     larlite::mcpart pion;
@@ -71,30 +70,28 @@ namespace larlite {
     // fill an entry per pi0 returned by _data
     for (auto const& part : particles){
 
-      if (part.pdg_code() == 111){ // pi0!
+      if (part.PdgCode() == 111){ // pi0!
 	
-	_reco_E = part.energy();
-	_reco_x = part.pos()[0];
-	_reco_y = part.pos()[1];
-	_reco_z = part.pos()[2];
+	_reco_E = part.Energy();
+	_reco_x = part.Vertex()[0];
+	_reco_y = part.Vertex()[1];
+	_reco_z = part.Vertex()[2];
 	
 	_pi0_tree->Fill();
 
       }// if pi0
 
     }// for all returned particles
-
-
     
     return true;  
   }
     
-  bool SPAnaPi0Quality::finalize() {
+  bool ERAnaPi0Quality::finalize() {
 
     _pi0_tree->Write();
 
     _mgr.Finalize(_fout);
-    return SPTAnaBase::finalize();
+    return ERToolAnaBase::finalize();
   }
 
 }
