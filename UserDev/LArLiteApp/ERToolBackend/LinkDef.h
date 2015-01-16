@@ -11,9 +11,11 @@
 
 #pragma link C++ class larlite::SPTAnaBase+;
 #pragma link C++ class larlite::ExampleSPSelection+;
+#pragma link C++ class larlite::SPAnaPi0Quality+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 
 
 
