@@ -18,6 +18,7 @@
 #include "Track.h"
 #include "Shower.h"
 #include "Vertex.h"
+#include "UtilFunc.h"
 //#include "BookKeeper.h"
 namespace ertool {
 
@@ -50,13 +51,15 @@ namespace ertool {
     const std::vector< ::ertool::Shower > AllShower() const { return _shower_v; }
     const std::vector< ::ertool::Track  > AllTrack()  const { return _track_v;  }
     const std::vector< ::ertool::Vertex > AllVertex() const { return _vertex_v; }
-
+    std::vector<std::vector< const ::ertool::Shower* > > ShowerCombination (size_t n) const;
+    std::vector<std::vector< const ::ertool::Track*  > > TrackCombination  (size_t n)  const;
+    std::vector<std::vector< const ::ertool::Vertex* > > VertexCombination (size_t n) const;
     //
     // Setters
     //
-    void Add(const ::ertool::Shower& obj) { _shower_v.push_back(obj); }
-    void Add(const ::ertool::Track&  obj) { _track_v.push_back(obj);  }
-    void Add(const ::ertool::Vertex& obj) { _vertex_v.push_back(obj); }
+    void Add(const ::ertool::Shower& obj);
+    void Add(const ::ertool::Track&  obj);
+    void Add(const ::ertool::Vertex& obj);
 
     void FilterShower (size_t id, bool filter=true);
     void FilterTrack  (size_t id, bool filter=true);

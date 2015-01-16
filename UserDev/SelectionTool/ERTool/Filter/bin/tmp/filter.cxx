@@ -1,17 +1,17 @@
-#ifndef SELECTIONTOOL_FILTER_CLASS_NAME_CXX
-#define SELECTIONTOOL_FILTER_CLASS_NAME_CXX
+#ifndef ERTOOL_FILTER_CLASS_NAME_CXX
+#define ERTOOL_FILTER_CLASS_NAME_CXX
 
 #include "Filter_Class_Name.h"
 
-namespace sptool {
+namespace ertool {
 
-  Filter_Class_Name::Filter_Class_Name() : SPAFilterBase()
+  Filter_Class_Name::Filter_Class_Name() : FilterBase()
   {
     _name = "Filter_Class_Name";
   }
 
-  SPAOrder Filter_Class_Name::Select(const SPAData &data)
-  { return SPAOrder(); }
+  void Filter_Class_Name::Filter(EventData& data)
+  { }
 
 }
 

@@ -9,7 +9,7 @@ if not 'LARLITE_USERDEVDIR' in os.environ.keys():
    sys.exit(1)
 
 name=sys.argv[1]
-working_package='Base'
+working_package='ERTool'
 target_dir='%s/%s/ERTool/Base' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
 source_dir='%s/%s/ERTool/Base/bin/tmp' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
 

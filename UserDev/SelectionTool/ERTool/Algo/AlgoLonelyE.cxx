@@ -1,21 +1,21 @@
-#ifndef SELECTIONTOOL_SPALGOLONELYE_CXX
-#define SELECTIONTOOL_SPALGOLONELYE_CXX
+#ifndef ERTOOL_ALGOLONELYE_CXX
+#define ERTOOL_ALGOLONELYE_CXX
 
-#include "SPAlgoLonelyE.h"
+#include "AlgoLonelyE.h"
 
-namespace sptool {
+namespace ertool {
 
-  SPAlgoLonelyE::SPAlgoLonelyE() : SPAlgoBase()
+  AlgoLonelyE::AlgoLonelyE() : AlgoBase()
   {
-    _name     = "SPAlgoLonelyE";
+    _name     = "AlgoLonelyE";
     _debug    = false;
   }
 
-  void SPAlgoLonelyE::Reset()
+  void AlgoLonelyE::Reset()
   {}
 
 
-  void SPAlgoLonelyE::ProcessBegin()
+  void AlgoLonelyE::ProcessBegin()
   {
 
     _alg_singleE.ProcessBegin();
@@ -23,36 +23,36 @@ namespace sptool {
     return;
   }
 
-  void SPAlgoLonelyE::LoadParams(std::string fname, size_t version){
+  void AlgoLonelyE::LoadParams(std::string fname, size_t version){
 
     _alg_singleE.LoadParams(fname,version);
     return;
   }
 
-  SPArticleSet SPAlgoLonelyE::Reconstruct(const SPAData &data)
+  ParticleSet AlgoLonelyE::Reconstruct(const EventData &data)
   { 
 
     // What is in this event?
     if (_debug){
-      std::cout << "There are " << data._showers.size() << " showers." << std::endl;
-      std::cout << "There are " << data._tracks.size() << " tracks." << std::endl << std::endl;
+      std::cout << "There are " << data.Shower().size() << " showers." << std::endl;
+      std::cout << "There are " << data.Track().size() << " tracks." << std::endl << std::endl;
     }
 
     //Get a list of single (start point isolated) electron showers
-    //from the SPAlgoSingleE instance
-    SPArticleSet single_es = _alg_singleE.Reconstruct(data);
+    //from the AlgoSingleE instance
+    ParticleSet single_es = _alg_singleE.Reconstruct(data);
     
-    // create empty SPArticleSet for the products
-    SPArticleSet lonely_es;
+    // create empty ParticleSet for the products
+    ParticleSet lonely_es;
     
     // Run filter for every "single electron" found by previous step
     for(auto const& s : single_es) {
 
       // Convert shower into HalfLine
-      if (_debug) { std::cout << "Shower Energy: " << s.energy() << std::endl; }
+      if (_debug) { std::cout << "Shower Energy: " << s.Energy() << std::endl; }
 
-      if ( isLonely(s, data) ) { lonely_es.push_back(s); }
-    }// for all input showers from SPAlgoSingleE
+      if ( isLonely(data.Shower(s.RecoObjID()), data) ) { lonely_es.push_back(s); }
+    }// for all input showers from AlgoSingleE
 
     if (_debug) { std::cout << std::endl; }
 
@@ -60,40 +60,35 @@ namespace sptool {
   }
 
 
-  bool SPAlgoLonelyE::isLonely(const SPArticle s, const SPAData data) const
+  bool AlgoLonelyE::isLonely(const Shower& s, const EventData& data) const
   {
     // holder to keep track of decision:
     // is this shower lonely?
     bool lonely = false;
 
-    geoalgo::HalfLine_t shr(s.pos(),s.mom()*(-1)); // line pointing backwards from shower start
-
     // flip the shower (we are interested in the direction bakwards
-    geoalgo::HalfLine_t shrBack(shr.Start(), shr.Dir()*(-1));
+    geoalgo::HalfLine_t shrBack(s.Start(), s.Dir()*(-1));
     // Loop over tracks
-    for (auto const& t : data._tracks) {
-      if (_debug) { std::cout << "Track Energy: " << t._energy << std::endl; }
-      double distToTrack  = isShowerFromTrack( shrBack, t);
+    for (auto const& t : data.Track()) {
+      if (_debug) { std::cout << "Track Energy: " << t->_energy << std::endl; }
+      double distToTrack  = isShowerFromTrack( shrBack, *t );
     }
 
     // Loop over showers
-    for (auto const& s2 : data._showers) {
-      // if shower's energy the same as the one currently being examined ("shr") 
-      // then don't look at it. It is the same shower
-      // *** This is messy: data contains all objects, including the one
-      //     returned from previous SPAlgo.                          ***
-      if ( s2._energy == s.energy() ) { continue; }
-      if (_debug) { std::cout << "Shower Energy: " << s2._energy << std::endl; }
+    for (auto const& s2 : data.Shower()) {
+      if( s.ID() == s2->ID() ) continue;
+      if (_debug) { std::cout << "Shower Energy: " << s2->_energy << std::endl; }
     // flip the other shower (we are interested in the direction bakwards
-    geoalgo::HalfLine_t sBack(s2.Start(), s2.Dir()*(-1));
-    double distToShower = isShowerFromShower( shrBack, sBack);
+      geoalgo::HalfLine_t sBack(s2->Start(), s2->Dir()*(-1));
+      double distToShower = isShowerFromShower( shrBack, sBack);
     }
-
+    
     return lonely;
   }
 
 
-  double SPAlgoLonelyE::isShowerFromTrack(const geoalgo::HalfLine_t shr, const geoalgo::Trajectory_t trk) const
+  double AlgoLonelyE::isShowerFromTrack(const geoalgo::HalfLine_t& shr, 
+					const geoalgo::Trajectory_t& trk) const
   {
 
     // try and find showers that originate from tracks
@@ -140,7 +135,8 @@ namespace sptool {
   }
 
 
-  double SPAlgoLonelyE::isShowerFromShower(const geoalgo::HalfLine_t islonely, const geoalgo::HalfLine_t isparent) const
+  double AlgoLonelyE::isShowerFromShower(const geoalgo::HalfLine_t& islonely, 
+					 const geoalgo::HalfLine_t& isparent) const
   {
 
     // Try and determine if the shower under examination ("islonely")

@@ -9,9 +9,8 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class sptool::SPAFilterToy+;
-#pragma link C++ class sptool::SPAFilterCosmic+;
-#pragma link C++ class sptool::SPAFilterECut+;
+#pragma link C++ class ertool::FilterCosmic+;
+#pragma link C++ class ertool::FilterECut+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif

@@ -8,6 +8,7 @@ namespace ertool {
   void RecoObjBase::Reset() {
     _exclude    = false;
     _cosmogenic = kINVALID_DOUBLE;
+    _id         = kINVALID_SIZE;
   }
 
 }

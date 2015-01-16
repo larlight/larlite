@@ -1,15 +1,15 @@
-#ifndef SELECTIONTOOL_SPALGOPI0_CXX
-#define SELECTIONTOOL_SPALGOPI0_CXX
+#ifndef ERTOOL_ALGOPI0_CXX
+#define ERTOOL_ALGOPI0_CXX
 
-#include "SPAlgoPi0.h"
-#include "SPTBase/SPABookKeeper.h"
+#include "AlgoPi0.h"
+#include "Base/BookKeeper.h"
 #include "GeoAlgo/GeoAlgo.h"
 #include "EMShowerTools/EMShowerProfile.h"
 
-namespace sptool {
+namespace ertool {
 
-  SPAlgoPi0::SPAlgoPi0() 
-    : SPAlgoBase()
+  AlgoPi0::AlgoPi0() 
+    : AlgoBase()
     , _pi0_pdf(nullptr)
     , _pi0_massVar(nullptr)
     , _pi0_massMean(nullptr)
@@ -24,7 +24,7 @@ namespace sptool {
     , _hBestMass(nullptr)
     , _candidate_tree(nullptr)
   {
-    _name     = "SPAlgoPi0";
+    _name     = "AlgoPi0";
     _energy_min = 40.;
     _energy_max = 1200.;
     _fit_min    = 10;
@@ -43,13 +43,13 @@ namespace sptool {
     _radLen_max    = 0.01; //[ CM-1 ]
   }
 
-  void SPAlgoPi0::LoadParams(std::string fname, size_t version){
+  void AlgoPi0::LoadParams(std::string fname, size_t version){
 
     // Load EMPart params
     _alg_emp.LoadParams(fname,version);
 
     //Load user_info
-    SPTBase::LoadParams(fname,version);
+    Record::LoadParams(fname,version);
 
     // Extract if parameters found
 
@@ -85,7 +85,7 @@ namespace sptool {
     return;
   }
 
-  void SPAlgoPi0::ProcessBegin()
+  void AlgoPi0::ProcessBegin()
   {
     _alg_emp.ProcessBegin();
     delete _pi0_pdf;
@@ -113,7 +113,7 @@ namespace sptool {
 
     _pi0_massData = new RooDataSet("_pi0_massData", "Pi0 Mass Fit Data", RooArgSet(*_pi0_massVar));
 
-    ShowerPdfFactory factory;
+    PdfFactory factory;
     _pi0_pdf = factory.Pi0Mass(*_pi0_massVar, *_pi0_massMean, *_pi0_massSigma);
 
 
@@ -147,10 +147,10 @@ namespace sptool {
     _candidate_tree->Branch("_ll",&_ll,"_ll/D");
   }
   
-  void SPAlgoPi0::LL(const SPAShower& shower_a,
-		     const SPAShower& shower_b,
-		     double& ll,
-		     double& mass)
+  void AlgoPi0::LL(const Shower& shower_a,
+		   const Shower& shower_b,
+		   double& ll,
+		   double& mass)
   {
     ll   = -1.e-10;
     mass = -1.;
@@ -213,33 +213,34 @@ namespace sptool {
     return;
   }
   
-  SPArticleSet SPAlgoPi0::Reconstruct(const SPAData &data)
+  ParticleSet AlgoPi0::Reconstruct(const EventData &data)
   { 
 
     if (_verbose) {
-      std::cout << "showers in event: " << data._showers.size() << std::endl;
+      std::cout << "showers in event: " << data.Shower().size() << std::endl;
     }
-    SPArticleSet res;
+    ParticleSet res;
     //    if(!data._vtxs.size() || data._showers.size()<2) return res;
-    if(data._showers.size()<2) return res;
+    if(data.Shower().size()<2) return res;
 
-    auto shower_combinations = data.Combination(data._showers.size(),2);
-
-    SPABookKeeper bk;
+    BookKeeper bk;
+    Combination_t comb(2);
 
     double best_ll = -1.e10;
     double best_mass = 0.;
 
-    for(size_t c=0; c < shower_combinations.size(); c++){ //auto const& comb : shower_combinations) {
+    for(auto const& shower_v : data.ShowerCombination(2)) {
 
-      auto comb = shower_combinations.at(c);
+      comb[0] = shower_v[0]->ID();
+      comb[1] = shower_v[1]->ID();
+
       double likelihood = 0.;
       double mass       = -1.;
       
       _angle = 0;
       
-      LL(data._showers[comb[0]],
-	 data._showers[comb[1]],
+      LL(*(shower_v[0]),
+	 *(shower_v[1]),
 	 likelihood,
 	 mass);
 
@@ -252,10 +253,10 @@ namespace sptool {
 
       _ll = likelihood;
       _mass = mass;
-      _shr1_E = data._showers[comb[0]]._energy;
-      _shr2_E = data._showers[comb[1]]._energy;
-      _shr1_dEdx = data._showers[comb[0]]._dedx;
-      _shr2_dEdx = data._showers[comb[1]]._dedx;
+      _shr1_E = shower_v[0]->_energy;
+      _shr2_E = shower_v[1]->_energy;
+      _shr1_dEdx = shower_v[0]->_dedx;
+      _shr2_dEdx = shower_v[1]->_dedx;
       _candidate_tree->Fill();
 
       if( 0 < mass &&
@@ -273,7 +274,7 @@ namespace sptool {
     return res;
   }
 
-  void SPAlgoPi0::ProcessEnd(TFile* fout)
+  void AlgoPi0::ProcessEnd(TFile* fout)
   {
 
     if(_training_mode) {

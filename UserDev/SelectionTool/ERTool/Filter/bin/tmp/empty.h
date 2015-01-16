@@ -11,28 +11,29 @@
 /** \addtogroup Working_Package
 
     @{*/
-#ifndef SELECTIONTOOL_EMPTY_CLASS_NAME_H
-#define SELECTIONTOOL_EMPTY_CLASS_NAME_H
+#ifndef ERTOOL_EMPTY_CLASS_NAME_H
+#define ERTOOL_EMPTY_CLASS_NAME_H
 
 #include <iostream>
 
-/**
-   \class Empty_Class_Name
-   User defined class Empty_Class_Name ... these comments are used to generate
-   doxygen documentation!
- */
-class Empty_Class_Name{
-
-public:
-
-  /// Default constructor
-  Empty_Class_Name(){};
-
-  /// Default destructor
-  virtual ~Empty_Class_Name(){};
-
-};
-
+namespace ertool {
+  /**
+     \class Empty_Class_Name
+     User defined class Empty_Class_Name ... these comments are used to generate
+     doxygen documentation!
+  */
+  class Empty_Class_Name{
+    
+  public:
+    
+    /// Default constructor
+    Empty_Class_Name(){}
+    
+    /// Default destructor
+    virtual ~Empty_Class_Name(){}
+    
+  };
+}
 #endif
 /** @} */ // end of doxygen group 
 

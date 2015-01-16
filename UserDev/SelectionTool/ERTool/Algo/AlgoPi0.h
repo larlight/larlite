@@ -1,38 +1,38 @@
 /**
- * \file SPAlgoPi0.h
+ * \file AlgoPi0.h
  *
- * \ingroup ShowerPdfTool
+ * \ingroup ERTool
  * 
- * \brief Class def header for a class SPAlgoPi0
+ * \brief Class def header for a class AlgoPi0
  *
  * @author kazuhiro
  */
 
-/** \addtogroup ShowerPdfTool
+/** \addtogroup ERTool
 
     @{*/
 
-#ifndef SELECTIONTOOL_SPALGOPI0_H
-#define SELECTIONTOOL_SPALGOPI0_H
+#ifndef ERTOOL_ALGOPI0_H
+#define ERTOOL_ALGOPI0_H
 
-#include "SPAlgo/SPAlgoEMPart.h"
+#include "Algo/AlgoEMPart.h"
 #include <TH1D.h>
 #include <TH2D.h>
-namespace sptool {
+namespace ertool {
 
   /**
-     \class SPAlgoPi0
-     User custom SPAFilter class made by kazuhiro
+     \class AlgoPi0
+     User custom Algorithm class made by kazuhiro
    */
-  class SPAlgoPi0 : public SPAlgoBase {
+  class AlgoPi0 : public AlgoBase {
   
   public:
 
     /// Default constructor
-    SPAlgoPi0();
+    AlgoPi0();
 
     /// Default destructor
-    virtual ~SPAlgoPi0(){}
+    virtual ~AlgoPi0(){}
 
     /// What to do before event-loop begins
     virtual void ProcessBegin();
@@ -41,14 +41,14 @@ namespace sptool {
     virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
 
     /// Function to evaluate input showers and determine a score
-    virtual SPArticleSet Reconstruct(const SPAData &data);
+    virtual ParticleSet Reconstruct(const EventData &data);
 
     /// Function executed at end of process
     virtual void ProcessEnd(TFile* fout);
 
     /// Likelihood of two showers being pi0 daughters
-    void LL(const SPAShower& shower_a,
-	    const SPAShower& shower_b,
+    void LL(const Shower& shower_a,
+	    const Shower& shower_b,
 	    double& ll,
 	    double& mass);
 
@@ -81,7 +81,7 @@ namespace sptool {
     // Variables for Fit range [MeV/c]
     double _fit_min, _fit_max;
 
-    SPAlgoEMPart  _alg_emp;
+    AlgoEMPart  _alg_emp;
     // Info for Mass Peak PDF
     RooAbsPdf   *_pi0_pdf;
     RooRealVar  *_pi0_massVar, *_pi0_massMean, *_pi0_massSigma;
@@ -122,13 +122,5 @@ namespace sptool {
   };
 }
 #endif
-
-//**************************************************************************
-// 
-// For Analysis framework documentation, read Manual.pdf here:
-//
-// http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
-//
-//**************************************************************************
 
 /** @} */ // end of doxygen group 

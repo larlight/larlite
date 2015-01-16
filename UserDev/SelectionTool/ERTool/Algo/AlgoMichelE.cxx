@@ -1,19 +1,19 @@
-#ifndef SELECTIONTOOL_SPALGOMICHELE_CXX
-#define SELECTIONTOOL_SPALGOMICHELE_CXX
+#ifndef ERTOOL_ALGOMICHELE_CXX
+#define ERTOOL_ALGOMICHELE_CXX
 
-#include "SPAlgoMichelE.h"
+#include "AlgoMichelE.h"
 
-namespace sptool {
+namespace ertool {
 
   size_t n_michel_e = 0;
 
-  SPAlgoMichelE::SPAlgoMichelE() : SPAlgoBase()
+  AlgoMichelE::AlgoMichelE() : AlgoBase()
   {
-    _name     = "SPAlgoMichelE";
+    _name     = "AlgoMichelE";
     michel_energy = 0;
   }
 
-  void SPAlgoMichelE::ProcessEnd(TFile* fout){
+  void AlgoMichelE::ProcessEnd(TFile* fout){
  
     if(fout){
       fout->cd();
@@ -24,12 +24,12 @@ namespace sptool {
 
   }
 
-  void SPAlgoMichelE::Finalize()
+  void AlgoMichelE::Finalize()
   {
     std::cout<<"Number of michel E's found is "<<n_michel_e<<std::endl;
   }
 
-  void SPAlgoMichelE::ProcessBegin()
+  void AlgoMichelE::ProcessBegin()
   {
     _alg_singleE.ProcessBegin();
 
@@ -38,7 +38,7 @@ namespace sptool {
     return;
   }
 
-  void SPAlgoMichelE::InitializeHistos(){
+  void AlgoMichelE::InitializeHistos(){
     
     if(!michel_energy)
       michel_energy = new TH1F("michel_energy","michel_energy",100,0,100);
@@ -46,7 +46,7 @@ namespace sptool {
   }
   
 
-  void SPAlgoMichelE::LoadParams(std::string fname, size_t version){
+  void AlgoMichelE::LoadParams(std::string fname, size_t version){
     
     // Load singleE params
     _alg_singleE.LoadParams(fname,version);
@@ -54,26 +54,26 @@ namespace sptool {
     return;
   }
 
-  SPArticleSet SPAlgoMichelE::Reconstruct(const SPAData &data)
+  ParticleSet AlgoMichelE::Reconstruct(const EventData &data)
   { 
     
-    SPArticleSet res;
+    ParticleSet res;
 
     //Get a list of single (start point isolated) electron showers
-    //from the SPAlgoSingleE instance
-    SPArticleSet single_es = _alg_singleE.Reconstruct(data);
+    //from the AlgoSingleE instance
+    ParticleSet single_es = _alg_singleE.Reconstruct(data);
     
     //Loop over all isolated electrons in the event
     //Are any of the electrons located at the endpoint (1cm) of a long track?
     for(auto const& electron : single_es){
 
-      for(auto const& track : data._tracks){
+      for(auto const& track : data.Track()){
 
-	if(electron.pos().Dist(*(track.end()-1)) < 1.){
+	if(electron.Vertex().Dist(track->back()) < 1.){
 	  n_michel_e++;
 	  
 	  if(michel_energy)
-	    michel_energy->Fill(electron.energy());
+	    michel_energy->Fill(electron.Energy());
 	  
 	}
       }

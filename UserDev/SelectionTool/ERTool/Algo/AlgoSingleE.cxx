@@ -1,25 +1,24 @@
-#ifndef SELECTIONTOOL_SPALGOSINGLEE_CXX
-#define SELECTIONTOOL_SPALGOSINGLEE_CXX
+#ifndef ERTOOL_ALGOSINGLEE_CXX
+#define ERTOOL_ALGOSINGLEE_CXX
 
-#include "SPAlgoSingleE.h"
+#include "AlgoSingleE.h"
 
-namespace sptool {
+namespace ertool {
 
   size_t single_e_counter = 0;
   size_t total_e_showers = 0;
   size_t total_g_showers = 0;
   size_t nonzero_dedx_counter = 0;
-
   
-  SPAlgoSingleE::SPAlgoSingleE() : SPAlgoBase()
+  AlgoSingleE::AlgoSingleE() : AlgoBase()
   {
 
-    _name     = "SPAlgoSingleE";
+    _name     = "AlgoSingleE";
     e_ll_values = 0;
     dedx_values = 0;
   }
 
-  void SPAlgoSingleE::Reset()
+  void AlgoSingleE::Reset()
   {
     std::cout<<__FUNCTION__<<" found "<<single_e_counter<<" events with a single electron in it."<<std::endl;
     std::cout<<"and "<<nonzero_dedx_counter<<" nonzero dedx showers"<<std::endl;
@@ -27,7 +26,7 @@ namespace sptool {
     std::cout<<"Found "<<total_g_showers<<" total g showers"<<std::endl;
   }
   
-  void SPAlgoSingleE::ProcessBegin()
+  void AlgoSingleE::ProcessBegin()
   {
 
     _alg_emp.LoadParams();
@@ -45,7 +44,7 @@ namespace sptool {
     return;
   }
 
-  void SPAlgoSingleE::LoadParams(std::string fname, size_t version){
+  void AlgoSingleE::LoadParams(std::string fname, size_t version){
     
     // Load EMPart params
     _alg_emp.LoadParams(fname,version);
@@ -53,60 +52,56 @@ namespace sptool {
     return;
   }
 
-  SPArticleSet SPAlgoSingleE::Reconstruct(const SPAData &data){
+  ParticleSet AlgoSingleE::Reconstruct(const EventData &data){
     //kaleko
     _alg_emp.Reconstruct(data);
 
-
-    SPArticleSet res;
+    ParticleSet res;
     
     /// Get a list of the event showers that are electron like
-    auto e_showers = ElectronLikeShowers( data._showers );
+    auto e_showers = ElectronLikeShowers( data.Shower() );
 
     /// Get a list of the electron showers that are start-point-isolated
     auto isolated_e_showers = IsolatedStartPtShowers( e_showers );
 
     if(isolated_e_showers.size() == 1) single_e_counter++;
 
-    /// Make an electron SPArticle for each independent shower and add it to the set
+    /// Make an electron Particle for each independent shower and add it to the set
     for(auto const& isol_shower : isolated_e_showers){
-      SPArticle p_e;
-      p_e.pdg_code(11);
-      p_e.pos(isol_shower.Start());
-      p_e.mom(isol_shower.Dir()); // for now fill with direction - unit vector
-      p_e.energy(isol_shower._energy);
-      	
+      Particle p_e(11);
+      p_e.Vertex(isol_shower->Start());
+      p_e.Momentum(isol_shower->Dir() * (isol_shower->_energy - p_e.Mass())); // for now fill with direction - unit vector
+      p_e.RecoObjInfo(isol_shower->ID(), Particle::RecoObjType_t::kShower);
       res.push_back(p_e);
-
     }
      
     return res;
   }
   
 
-  bool SPAlgoSingleE::IsShowerElectron(const sptool::SPAShower shower){
+  bool AlgoSingleE::IsShowerElectron(const ertool::Shower* shower){
 
     //Make sure the shower is likely an electron
-    //by using LL function from an SPAlgoEMPart instance
+    //by using LL function from an AlgoEMPart instance
     //(LL uses only dEdX data if "dist" is plugged in negative)
     //If likelihood its gamma is more than electron, skip
     
     //if dedx value == 0, we don't know whether this is electron,
     //so let's assume it isn't.
-    if(shower._dedx < 0.02 || shower._dedx > 10.) return false;
-    dedx_values->Fill(shower._dedx);
+    if(shower->_dedx < 0.02 || shower->_dedx > 10.) return false;
+    dedx_values->Fill(shower->_dedx);
     
 
     
     nonzero_dedx_counter++;
     
     e_ll_values->Fill(
-      _alg_emp.LL(true,shower._dedx,-1.));
+      _alg_emp.LL(true,shower->_dedx,-1.));
 
     
     bool e_like = (
-      _alg_emp.LL(true, shower._dedx, -1.) >
-      _alg_emp.LL(false,shower._dedx, -1.)) ?
+      _alg_emp.LL(true, shower->_dedx, -1.) >
+      _alg_emp.LL(false,shower->_dedx, -1.)) ?
       true : false;
     
     if(e_like) total_e_showers++;
@@ -116,21 +111,21 @@ namespace sptool {
     
   }
 
-  bool SPAlgoSingleE::AreShowersStartPtCorrelated(const sptool::SPAShower s1, const sptool::SPAShower s2){
+  bool AlgoSingleE::AreShowersStartPtCorrelated(const ertool::Shower* s1, const ertool::Shower* s2){
 
     //Is the start point of s1 close to start point of s2?
-    double dist = s1.Start().Dist(s2.Start());
+    double dist = s1->Start().Dist(s2->Start());
     //Hard cut on 1cm for now. This value chosen after viewing some std::couts.
     //Later: use a PDF to determine the likelihood "dist" is small enough
     return  (dist < 1.) ? true : false;
 
   }
 
-  const std::vector<sptool::SPAShower> SPAlgoSingleE::IsolatedStartPtShowers(const std::vector<sptool::SPAShower> showers){
+  const std::vector<const ertool::Shower*> AlgoSingleE::IsolatedStartPtShowers(const std::vector< const ::ertool::Shower*>& showers){
 
     //Function purpose: loop over electron showers, make sure they aren't
     //correlated (start points are close) w/ other electron showers
-    std::vector<sptool::SPAShower> isolated_showers;
+    std::vector<const ::ertool::Shower*> isolated_showers;
     isolated_showers.clear();
 
     //Save some time if the list of showers is length 0
@@ -179,22 +174,19 @@ namespace sptool {
   }
 
 
-  const std::vector<sptool::SPAShower> SPAlgoSingleE::ElectronLikeShowers(const std::vector<sptool::SPAShower> showers){
+  const std::vector<const ertool::Shower*> AlgoSingleE::ElectronLikeShowers(const std::vector< const ::ertool::Shower*>& showers){
 
-
-    std::vector<sptool::SPAShower> e_showers;
+    std::vector< const ::ertool::Shower*> e_showers;
     e_showers.clear();
 
     //Loop over all showers in the event, store ones that are electron-like
     for(auto const& shower : showers) 
       if(IsShowerElectron(shower)) e_showers.push_back(shower);
-    
 
     return e_showers;
-
   }
 
-  void SPAlgoSingleE::ProcessEnd(TFile* fout){
+  void AlgoSingleE::ProcessEnd(TFile* fout){
     
     _alg_emp.ProcessEnd(fout);
     

@@ -63,6 +63,70 @@ namespace ertool {
     return res;
   }
 
+  std::vector<std::vector< const ::ertool::Shower* > > EventData::ShowerCombination(const size_t n) const
+  {
+    std::vector<std::vector< const ::ertool::Shower*> > res;
+    if(n<_shower_v.size()) return res;
+    
+    auto const comb_v = Combination(_shower_v.size(),n);
+    for(auto const& comb : comb_v) {
+      res.push_back(std::vector< const ::ertool::Shower*>());
+      res.back().reserve(n);
+      for(auto const& id : comb) {
+	res.back().push_back(&(_shower_v[id]));
+      }
+    }
+    return res;
+  }
+
+  std::vector<std::vector< const ::ertool::Track* > > EventData::TrackCombination(const size_t n) const
+  {
+    std::vector<std::vector< const ::ertool::Track*> > res;
+    if(n<_shower_v.size()) return res;
+    
+    auto const comb_v = Combination(_shower_v.size(),n);
+    for(auto const& comb : comb_v) {
+      res.push_back(std::vector< const ::ertool::Track*>());
+      res.back().reserve(n);
+      for(auto const& id : comb) {
+	res.back().push_back(&(_track_v[id]));
+      }
+    }
+    return res;
+  }
+
+  std::vector<std::vector< const ::ertool::Vertex* > > EventData::VertexCombination(const size_t n) const
+  {
+    std::vector<std::vector< const ::ertool::Vertex*> > res;
+    if(n<_shower_v.size()) return res;
+    
+    auto const comb_v = Combination(_shower_v.size(),n);
+    for(auto const& comb : comb_v) {
+      res.push_back(std::vector< const ::ertool::Vertex*>());
+      res.back().reserve(n);
+      for(auto const& id : comb) {
+	res.back().push_back(&(_vertex_v[id]));
+      }
+    }
+    return res;
+  }
+
+  void EventData::Add(const ::ertool::Shower& obj) 
+  { 
+    _shower_v.push_back(obj); 
+    _shower_v.back().ID(_shower_v.size()-1);
+  }
+  void EventData::Add(const ::ertool::Track&  obj) 
+  { 
+    _track_v.push_back(obj);  
+    _track_v.back().ID(_track_v.size()-1);
+  }
+  void EventData::Add(const ::ertool::Vertex& obj) 
+  { 
+    _vertex_v.push_back(obj); 
+    _vertex_v.back().ID(_vertex_v.size()-1);
+  }
+
   void EventData::FilterShower (size_t id, bool filter)
   {
     if(id >= _shower_v.size()) 

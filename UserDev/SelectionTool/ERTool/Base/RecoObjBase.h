@@ -47,14 +47,22 @@ namespace ertool {
     /// Function to ask if this object is filtered
     bool IsFiltered() const { return _exclude; }
 
+    /// ID query
+    size_t ID() const { return _id; }
+
   protected:
 
     /// Function to set a filter flag
     void Filter(bool doit=true) { _exclude = doit; }
 
+    /// Function to set an id
+    void ID(size_t id) { _id = id; }
+
     /// Filter flag
     bool _exclude;
-
+    /// ID integer
+    size_t _id;
+    
     ClassDef(RecoObjBase,1)
   };
 }

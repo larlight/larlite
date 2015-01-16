@@ -1,39 +1,39 @@
 /**
- * \file SPAlgoSingleE.h
+ * \file AlgoSingleE.h
  *
- * \ingroup SPAlgo
+ * \ingroup ERTool
  * 
- * \brief This SPAlgo returns a SPArticleSet of single electrons that are \n
+ * \brief This Algo returns a SPArticleSet of single electrons that are \n
           start-point isolated from other single electrons.
  *
  * @author kazuhiro + davidkaleko
  */
 
-/** \addtogroup SPAlgo
+/** \addtogroup ERTool
 
     @{*/
 
-#ifndef SELECTIONTOOL_SPALGOSINGLEE_H
-#define SELECTIONTOOL_SPALGOSINGLEE_H
+#ifndef ERTOOL_ALGOSINGLEE_H
+#define ERTOOL_ALGOSINGLEE_H
 
-#include "SPAlgo/SPAlgoEMPart.h"
-#include "SPTBase/SPAlgoBase.h"
+#include "Algo/AlgoEMPart.h"
+#include "Base/AlgoBase.h"
 
-namespace sptool {
+namespace ertool {
 
   /**
-     \class SPAlgoSingleE
-     User custom SPAFilter class made by kazuhiro
+     \class AlgoSingleE
+     User custom Algorithm class made by kazuhiro
    */
-  class SPAlgoSingleE : public SPAlgoBase {
+  class AlgoSingleE : public AlgoBase {
   
   public:
 
     /// Default constructor
-    SPAlgoSingleE();
+    AlgoSingleE();
 
     /// Default destructor
-    virtual ~SPAlgoSingleE(){};
+    virtual ~AlgoSingleE(){};
 
     /// Reset function
     virtual void Reset();
@@ -43,32 +43,32 @@ namespace sptool {
 
     virtual void ProcessEnd(TFile* fout);
 
-    /// Override the sptool::SPTBase::LoadParams function
+    /// Override the ertool::SPTBase::LoadParams function
     virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
 
     /// Function to reconstruct the start-point isolated electrons
-    virtual SPArticleSet Reconstruct(const SPAData &data);
+    virtual ParticleSet Reconstruct(const EventData &data);
 
 
 
   private:
 
     /// Function that takes in shower and decides if it is likely electron
-    /// (it uses SPAlgoEMParticle)
-    bool IsShowerElectron(const sptool::SPAShower shower);
+    /// (it uses AlgoEMParticle)
+    bool IsShowerElectron(const ertool::Shower* shower);
 
     /// Function to decide if two showers are correlated
-    bool AreShowersStartPtCorrelated(const sptool::SPAShower s1, const sptool::SPAShower s2);
+    bool AreShowersStartPtCorrelated(const ertool::Shower* s1, const ertool::Shower* s2);
 
     /// Function to return a list of electron-like showers, given a list of showers
-    const std::vector<sptool::SPAShower> ElectronLikeShowers(const std::vector<sptool::SPAShower> showers);
+    const std::vector<const ertool::Shower*> ElectronLikeShowers(const std::vector< const ::ertool::Shower*>& showers);
 
     /// Function to return a list of start-point-isolated showers, given a list of showers
-    const std::vector<sptool::SPAShower> IsolatedStartPtShowers(const std::vector<sptool::SPAShower> showers);
+    const std::vector<const ertool::Shower*> IsolatedStartPtShowers(const std::vector<const ::ertool::Shower*>& showers);
 
   protected:
 
-    SPAlgoEMPart _alg_emp;
+    AlgoEMPart _alg_emp;
 
 
     //debug histos

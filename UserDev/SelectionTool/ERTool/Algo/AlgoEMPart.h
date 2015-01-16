@@ -1,22 +1,22 @@
 /**
- * \file SPAlgoEMPart.h
+ * \file AlgoEMPart.h
  *
- * \ingroup SPAlgo
+ * \ingroup ERTool
  * 
- * \brief Class def header for a class SPAlgoEMPart
+ * \brief Class def header for a class AlgoEMPart
  *
  * @author jhewes15
  */
 
-/** \addtogroup SPAlgo
+/** \addtogroup ERTool
 
     @{*/
 
-#ifndef SELECTIONTOOL_SPALGOGAMMASELECTION_H
-#define SELECTIONTOOL_SPALGOGAMMASELECTION_H
+#ifndef ERTOOL_ALGOGAMMASELECTION_H
+#define ERTOOL_ALGOGAMMASELECTION_H
 
-#include "SPTBase/SPAlgoBase.h"
-#include "SPTBase/ShowerPdfFactory.h"
+#include "Base/AlgoBase.h"
+#include "Base/PdfFactory.h"
 #include <RooPlot.h>
 #include <RooProdPdf.h>
 #include <TCanvas.h>
@@ -25,21 +25,21 @@
 #include <cstdlib>
 #include <ctime>
 
-namespace sptool {
+namespace ertool {
 
   /**
-     \class SPAlgoEMPart
+     \class AlgoEMPart
      User custom SPAFilter class made by jhewes15
    */
-  class SPAlgoEMPart : public SPAlgoBase {
+  class AlgoEMPart : public AlgoBase {
   
   public:
 
     /// Default constructor
-    SPAlgoEMPart();
+    AlgoEMPart();
 
     /// Default destructor
-    virtual ~SPAlgoEMPart(){}
+    virtual ~AlgoEMPart(){}
 
     /// Called only once by the constructor in its lifespan
     void Init();
@@ -54,7 +54,7 @@ namespace sptool {
     virtual void ProcessBegin();
 
     /// Function to evaluate input showers and determine a score
-    virtual SPArticleSet Reconstruct(const SPAData &data);
+    virtual ParticleSet Reconstruct(const EventData &data);
 
     /// What to do once event-loop is over
     virtual void ProcessEnd(TFile* fout);
@@ -174,13 +174,5 @@ namespace sptool {
   };
 }
 #endif
-
-//**************************************************************************
-// 
-// For Analysis framework documentation, read Manual.pdf here:
-//
-// http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
-//
-//**************************************************************************
 
 /** @} */ // end of doxygen group 

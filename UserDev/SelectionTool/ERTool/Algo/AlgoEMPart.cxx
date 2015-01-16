@@ -1,12 +1,12 @@
-#ifndef SELECTIONTOOL_SPALGOEMPART_CXX
-#define SELECTIONTOOL_SPALGOEMPART_CXX
+#ifndef ERTOOL_ALGOEMPART_CXX
+#define ERTOOL_ALGOEMPART_CXX
 
-#include "SPAlgoEMPart.h"
+#include "AlgoEMPart.h"
 
-namespace sptool {
+namespace ertool {
 
-  SPAlgoEMPart::SPAlgoEMPart() 
-    : SPAlgoBase()
+  AlgoEMPart::AlgoEMPart() 
+    : AlgoBase()
     , _dEdxVar(nullptr)
     , _radLenVar(nullptr)
     , _e_radLenPdf(nullptr)
@@ -16,11 +16,11 @@ namespace sptool {
     , _e_dEdxData(nullptr)
     , _e_dEdxMu(nullptr)
     , _e_dEdxSigma(nullptr)
-    , _e_dEdxConvPdf(nullptr)
     , _e_gaussMu(nullptr)
     , _e_gaussSigma(nullptr)
     , _e_landauMu(nullptr)
     , _e_landauSigma(nullptr)
+    , _e_dEdxConvPdf(nullptr)
     , _g_radLenPdf(nullptr)
     , _g_radLenData(nullptr)
     , _g_radLenVal(nullptr)
@@ -31,17 +31,17 @@ namespace sptool {
     , _g_dEdxSigma1(nullptr)
     , _g_dEdxMu2(nullptr)
     , _g_dEdxSigma2(nullptr)
-    , _g_dEdxConvPdf(nullptr)
     , _g_gaussMu(nullptr)
     , _g_gaussSigma(nullptr)
     , _g_landauMu(nullptr)
     , _g_landauSigma(nullptr)
+    , _g_dEdxConvPdf(nullptr)
   { 
-    _name = "SPAlgoEMPart"; 
+    _name = "AlgoEMPart"; 
     Init();
   }
 
-  void SPAlgoEMPart::Init()
+  void AlgoEMPart::Init()
   {
     _xmin = 0.;
     _xmax = 100.;
@@ -95,10 +95,10 @@ namespace sptool {
 
   }
 
-  void SPAlgoEMPart::LoadParams(std::string fname,size_t version)
+  void AlgoEMPart::LoadParams(std::string fname,size_t version)
   {
     // Load user_info
-    SPTBase::LoadParams(fname,version);
+    Record::LoadParams(fname,version);
     // Extract if parameters found
     if(_params.exist_darray("rad_range")) {
       auto darray = _params.get_darray("rad_range");
@@ -156,9 +156,9 @@ namespace sptool {
     }
   }
 
-  void SPAlgoEMPart::ProcessBegin()
+  void AlgoEMPart::ProcessBegin()
   {
-    ShowerPdfFactory factory;
+    PdfFactory factory;
     std::string part_name = "gamma";
     if(!_mode) part_name = "electron";
 
@@ -237,7 +237,7 @@ namespace sptool {
 
   }
 
-  double SPAlgoEMPart::LL(bool is_electron, double dedx, double rad_length)
+  double AlgoEMPart::LL(bool is_electron, double dedx, double rad_length)
   {
 
     _dEdxVar->setVal(dedx);
@@ -270,31 +270,30 @@ namespace sptool {
     }
   }
 
-  SPArticleSet SPAlgoEMPart::Reconstruct(const SPAData &data)
+  ParticleSet AlgoEMPart::Reconstruct(const EventData &data)
   {
-    SPArticleSet res;
+    ParticleSet res;
 
-    for(auto const& s : data._showers) {
+    for(auto const& s : data.Shower()) {
 
       double dist   = -1.;
-      double dEdx   = s._dedx;
+      double dEdx   = s->_dedx;
 
       // skip if dEdx out of bounds
       if ( (dEdx <= _dedxmin) or (dEdx >= _dedxmax) ) return res;
 
-      if(data._vtxs.size())
-	dist = s.Start().Dist(data._vtxs[0]);
+      if(data.Vertex().size())
+	dist = s->Start().Dist((*data.Vertex()[0]));
 
       double e_like = LL(true,  dEdx, dist);
       double g_like = LL(false, dEdx, dist);
 
-      SPArticle p;
-      p.pdg_code( ( g_like > e_like ? 22 : 11 ) );
-      p.pos(s.Start());
-      p.mom(s.Dir() * s._energy);
-      p.energy(s._energy);      
+      Particle p(( g_like > e_like ? 22 : 11 ) );
+      p.Vertex(s->Start());
+      p.Momentum(s->Dir() * (s->_energy - p.Mass()));
+      p.RecoObjInfo(s->ID(),Particle::RecoObjType_t::kShower);
       res.push_back(p);
-
+      
       _dEdxVar->setVal(dEdx);
       if (!(dist<0)) { _radLenVar->setVal(dist); }
 
@@ -329,7 +328,7 @@ namespace sptool {
     return res;
   }
 
-  void SPAlgoEMPart::ProcessEnd(TFile* fout)
+  void AlgoEMPart::ProcessEnd(TFile* fout)
   {
 
     TCanvas *c = new TCanvas("c","",1000,500);

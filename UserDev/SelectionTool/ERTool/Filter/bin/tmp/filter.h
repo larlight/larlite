@@ -12,18 +12,18 @@
 
     @{*/
 
-#ifndef SELECTIONTOOL_FILTER_CLASS_NAME_H
-#define SELECTIONTOOL_FILTER_CLASS_NAME_H
+#ifndef ERTOOL_FILTER_CLASS_NAME_H
+#define ERTOOL_FILTER_CLASS_NAME_H
 
-#include "SPTBase/SPAFilterBase.h"
+#include "Base/FilterBase.h"
 
-namespace sptool {
+namespace ertool {
 
   /**
      \class Filter_Class_Name
      User custom SPAFilter class made by kazuhiro
    */
-  class Filter_Class_Name : public SPAFilterBase {
+  class Filter_Class_Name : public FilterBase {
   
   public:
 
@@ -34,7 +34,7 @@ namespace sptool {
     virtual ~Filter_Class_Name(){};
 
     /// Select function
-    virtual SPAOrder Select (const SPAData &data);
+    virtual void Filter (EventData& data);
 
   };
 }

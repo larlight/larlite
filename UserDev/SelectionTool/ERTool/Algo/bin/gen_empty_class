@@ -9,9 +9,9 @@ if not 'LARLITE_USERDEVDIR' in os.environ.keys():
    sys.exit(1)
 
 name=sys.argv[1]
-working_package='SPAlgo'
-target_dir='%s/%s/ShowerPdfTool/SPAlgo' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
-source_dir='%s/%s/ShowerPdfTool/SPAlgo/bin/tmp' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
+working_package='ERTool'
+target_dir='%s/%s/ERTool/Algo' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
+source_dir='%s/%s/ERTool/Algo/bin/tmp' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
 
 in_source='%s/empty.cxx' % source_dir
 in_header='%s/empty.h' % source_dir
@@ -44,17 +44,6 @@ for line in contents:
       line='#pragma link C++ class %s+;\n%s' % (name,line)
    fout.write(line)
 
-# modify TypeDef
-contents=open('%s/SPAlgo-TypeDef.h' % target_dir, 'r').read().split('\n')
-fout=open('%s/SPAlgo-TypeDef.h' % target_dir,'w')
-for line in contents:
-   line=line + '\n'
-   if line.find('ADD_EMPTY_CLASS')>=0:
-      line='  class %s;\n%s' % (name,line)
-   if line.find('ADD_NEW_HEADER')>=0:
-      line='#include \"%s.h\"\n%s' % (name,line)
-   fout.write(line)
-
 print
 print 'Generated the followings under %s.' % target_dir
 for key in src_list.keys():
@@ -66,15 +55,12 @@ print ' OR'
 print '    > cd %s; make;' % target_dir
 print
 print 'If needed, make sure you define linked libraries in rootmap generation script.'
-print 'The script is: %s/gen_rootmap.sh' % os.environ['LARLITE_LIBDIR']
+print 'The script is: %s/gen_rootmap.sh' % target_dir
 print 'If you have no idea what this means, just ignore it!'
 print
 print 'To remove your analysis code, you should remove:'
 print '%s/%s.h' % (target_dir,name)
 print '%s/%s.cxx' % (target_dir,name)
-print
-print 'Then also remove relevant #include, class definition lines from'
-print '%s/ShowerPdfTool-TypeDef.h' % target_dir
 print
 print 'Finally remove #pragma statement for your class from'
 print '%s/LinkDef.h' % target_dir
