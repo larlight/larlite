@@ -3,9 +3,11 @@
 
 #include <vector>
 #include <iostream>
+#include <algorithm>
 #include <sstream>
 #include "Env.h"
 #include "ERException.h"
+
 namespace ertool {
 
   /// Utility to make a combination of m-elements from the full set of n-elements

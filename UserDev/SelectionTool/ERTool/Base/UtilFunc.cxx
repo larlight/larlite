@@ -27,7 +27,7 @@ namespace ertool {
       Combination_t index_v;
       index_v.reserve(m);
 
-      for (int i = 0; i < comb_index_v.size(); ++i)
+      for (size_t i = 0; i < comb_index_v.size(); ++i)
 
 	if (!comb_index_v[i]) index_v.push_back(i);
       
