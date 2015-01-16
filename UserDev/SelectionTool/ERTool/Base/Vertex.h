@@ -35,6 +35,9 @@ namespace ertool {
 	   double y=kINVALID_DOUBLE,
 	   double z=kINVALID_DOUBLE);
 
+    /// Alternative ctor
+    Vertex(::geoalgo::Vector pos);
+
     /// default dtor
     virtual ~Vertex(){}
 

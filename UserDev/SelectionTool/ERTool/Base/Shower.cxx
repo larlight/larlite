@@ -8,6 +8,15 @@ namespace ertool {
   Shower::Shower() : RecoObjBase()
   { Reset(); }
 
+  Shower::Shower(const ::geoalgo::Vector& start,
+		 const ::geoalgo::Vector& dir)
+  {
+    Reset();
+    ::geoalgo::HalfLine::Start(start);
+    ::geoalgo::HalfLine::Dir(dir);
+  }
+
+
   void Shower::Reset() 
   {
     ::geoalgo::HalfLine::Start(::geoalgo::Point_t(3));

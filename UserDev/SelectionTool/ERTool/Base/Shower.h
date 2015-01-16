@@ -33,6 +33,10 @@ namespace ertool {
     /// default ctor
     Shower();
 
+    /// alternative ctor
+    Shower(const ::geoalgo::Vector& start,
+	   const ::geoalgo::Vector& dir);
+
     /// default dtor
     virtual ~Shower(){}
 
