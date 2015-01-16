@@ -20,17 +20,5 @@ rootlibmap libLArLite_ERToolBackend.rootmap libLArLite_ERToolBackend.so \
     $LARLITE_USERDEVDIR/LArLiteApp/ERToolBackend/LinkDef.h \
     libLArLite_Analysis.so \
     libSelectionTool_ERFilter.so \
-    libSelectionTool_ERAlgo.so
-
-
-
-
-
-
-
-
-
-
-
-
+    libSelectionTool_ERAlgo.so \
 
