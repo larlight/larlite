@@ -39,29 +39,9 @@ namespace cluster {
 
     if(!(hit_index.size())) throw CRUException(Form("Hit list empty! (%s)",__FUNCTION__));
     
-    pxhits.clear();
-    pxhits.reserve(hit_index.size());
-
-    auto geo  = ::larutil::Geometry::GetME();
-    auto geou = ::larutil::GeometryUtilities::GetME();
-
-    UChar_t plane = geo->ChannelToPlane(hits->at(hit_index.at(0)).Channel());
-
-    for(auto const& index : hit_index) {
-      
-      auto const& hit = hits->at(index);
-
-      ::larutil::PxHit h;
-
-      h.t = hit.PeakTime() * geou->TimeToCm();
-      h.w = hit.Wire()     * geou->WireToCm();
-
-      h.charge = hit.Charge();
-      h.peak   = hit.Charge(true);
-      h.plane  = plane;
-
-      pxhits.push_back(h);
-    }      
+   larutil::PxHitConverter pxHC; 
+   pxHC.GeneratePxHit(hit_index,*hits,pxhits);
+   
 
   }
   

@@ -188,6 +188,73 @@ namespace larutil{
 			    Double_t& lineslopetest,
 			    larutil::PxHit &averageHit);
 
+/*        art::Ptr< recob::Hit > FindClosestHitPtr(std::vector<art::Ptr< recob::Hit > > hitlist,
+                                                 unsigned int wirein,
+                                                 double timein) const;   */                         
+
+                                                 
+
+//     recob::Hit * FindClosestHit(std::vector<art::Ptr< recob::Hit > > hitlist,
+//                                                  unsigned int wirein,
+//                                                  double timein) const;                                              
+
+        
+
+    larutil::PxHit  FindClosestHit(std::vector<larutil::PxHit >  hitlist,
+                                                 unsigned int wirein,
+                                                 double timein) const;                
+
+        
+
+    unsigned int FindClosestHitIndex(std::vector<larutil::PxHit >  hitlist,
+                                                 unsigned int wirein,
+                                                 double timein) const;                                                 
+
+                                                 
+
+                                                 
+
+//     void SelectLocalHitlist(std::vector< art::Ptr < recob::Hit> > hitlist, 
+//                                              std::vector < art::Ptr<recob::Hit> > &hitlistlocal, 
+//                                              double  wire_start,
+//                                              double time_start, 
+//                                              double linearlimit,   
+//                                              double ortlimit, 
+//                                              double lineslopetest);
+
+                                         
+
+/*    void SelectLocalHitlist(std::vector< util::PxHit > hitlist, 
+                                             std::vector < util::PxHit > &hitlistlocal, 
+                                             double  wire_start,
+                                             double time_start, 
+                                             double linearlimit,   
+                                             double ortlimit, 
+                                             double lineslopetest);        */                                         
+
+                                                 
+
+   //interface without average Hit                             
+
+    void SelectLocalHitlist(const std::vector<larutil::PxHit> &hitlist, 
+                            std::vector <const larutil::PxHit*> &hitlistlocal,
+                            larutil::PxPoint &startHit,
+                            Double_t& linearlimit,   
+                            Double_t& ortlimit, 
+                            Double_t& lineslopetest);                             
+
+                             
+
+   void SelectLocalHitlistIndex(const std::vector<larutil::PxHit> &hitlist, 
+                            std::vector <unsigned int> &hitlistlocal_index,
+                            larutil::PxPoint &startHit,
+                            Double_t& linearlimit,   
+                            Double_t& ortlimit, 
+                            Double_t& lineslopetest);
+
+    
+    
+    
     void SelectPolygonHitList(const std::vector<larutil::PxHit> &hitlist,
 			      std::vector <const larutil::PxHit*> &hitlistlocal);
 

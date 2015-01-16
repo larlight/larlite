@@ -17,6 +17,8 @@
 #include <iostream>
 #include "DataFormat/storage_manager.h"
 #include "ClusterParamsAlg.h"
+#include "LArUtil/PxHitConverter.h"
+
 
 namespace cluster {
 
