@@ -109,6 +109,7 @@ else
 	export DYLD_LIBRARY_PATH=$LARLITE_LIBDIR:$DYLD_LIBRARY_PATH
     fi
     export PATH=$LARLITE_BASEDIR/bin:$PATH
+    alias maketop="make --directory=$LARLITE_BASEDIR"
     echo
     echo "Finish configuration. To build, type:"
     echo "> cd \$LARLITE_BASEDIR"
