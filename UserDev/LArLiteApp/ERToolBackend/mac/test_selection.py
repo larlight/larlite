@@ -10,6 +10,7 @@ if len(sys.argv) < 2:
 from ROOT import gSystem
 from ROOT import larlite as fmwk
 from ROOT import ertool
+ertool.Manager
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()

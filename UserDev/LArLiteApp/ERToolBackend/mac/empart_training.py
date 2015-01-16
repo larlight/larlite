@@ -2,7 +2,7 @@ import sys
 from ROOT import gSystem
 from ROOT import larlite as fmwk
 from ROOT import ertool
-
+ertool.Manager
 def ask_binary(msg='Proceed? [y/n]:'):
     
     user_input=''
