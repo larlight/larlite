@@ -289,9 +289,6 @@ namespace larlite {
       fTreeParams.reco_dedx_Y   = reco_shower.dEdx().at(2);
       fTreeParams.reco_dedx     = reco_shower.dEdx().at(best_plane_index);
 
-      // Fill Tree
-      fTree->Fill();
-
       //
       // Fill histograms
       //
@@ -331,6 +328,7 @@ namespace larlite {
 
       hBestPlane->Fill(fTreeParams.best_plane_id);
 
+      // Fill Tree
       fTree->Fill();
 
     }
