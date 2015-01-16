@@ -14,6 +14,7 @@
 #include "ShowerCalo.h"
 #include "ShowerRecoAlgBase.h"
 #include "ShowerRecoAlg.h"
+#include "ShowerRecoTest.h"
 #include "Pi0ShowerRecoAlg.h"
 
 //ADD_NEW_ALG_HEADER
@@ -22,6 +23,7 @@ namespace showerreco {
   class ShowerRecoAlgBase;
   class ShowerCalo;
   class ShowerRecoAlg;
+  class ShowerRecoTest;
   class Pi0ShowerRecoAlg;
   //ADD_NEW_ALG_CLASS
 }

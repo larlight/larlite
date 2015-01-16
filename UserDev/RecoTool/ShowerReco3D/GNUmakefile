@@ -13,6 +13,7 @@ OBJECTS = $(SOURCES:.cxx=.o)
 # include options for this package
 INCFLAGS = -I.                       #Include itself
 INCFLAGS += -I$(LARLITE_COREDIR)
+INCFLAGS += -I$(LARLITE_USERDEVDIR)/BasicTool
 INCFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool
 INCFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool/FANN/include
 
