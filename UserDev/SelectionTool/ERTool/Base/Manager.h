@@ -20,7 +20,7 @@
 #include <algorithm>
 #include "AlgoBase.h"
 #include "FilterBase.h"
-
+#include <TStopwatch.h>
 namespace ertool {
 
   /**
@@ -98,6 +98,8 @@ namespace ertool {
     bool _training_mode;
 
   protected:
+
+    TStopwatch fWatch;
 
     ManagerStatus_t _status;
 

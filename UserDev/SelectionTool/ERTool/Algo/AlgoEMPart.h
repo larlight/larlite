@@ -104,7 +104,6 @@ namespace ertool {
     // Variables
     RooRealVar* _dEdxVar;
     RooRealVar* _radLenVar;
-    
 
     // e- RadLen PDF 
     RooAbsPdf*  _e_radLenPdf; ///< e- RadLen PDF

@@ -44,6 +44,7 @@ namespace ertool {
   
   void Manager::Initialize()
   {
+    //fWatch.Start();
     if(_status != kIDLE) {
       std::ostringstream msg;
       msg <<"Cannot call Initialize() while status ("
@@ -66,6 +67,7 @@ namespace ertool {
       _algo->ProcessBegin();
     }
     _status = kINIT;
+    //std::cout<<"Initialize: "<<fWatch.RealTime()<<std::endl;
   }
   
   void Manager::Finalize(TFile* fout)
@@ -102,6 +104,7 @@ namespace ertool {
 	  << ")!";
       throw ERException(msg.str());
     }
+    //fWatch.Start();
     _status = kPROCESSING;
     if(_filter) {
       _filter->_training_mode = this->_training_mode;
@@ -111,14 +114,21 @@ namespace ertool {
       _algo->_training_mode = this->_training_mode;
       _algo->EventBegin();
     }
+    //std::cout<<"EventBegin: "<<fWatch.RealTime()<<std::endl;
 
+    //fWatch.Start();
     if(_filter) _filter->Filter(data);
+    //std::cout<<"Filter: "<<fWatch.RealTime()<<std::endl;
 
-    if(_algo)
-      res = _algo->Reconstruct(data);
+    //fWatch.Start();
+    if(_algo) res = _algo->Reconstruct(data);
+    //std::cout<<"Reconstruct: "<<fWatch.RealTime()<<std::endl;
 
+    //fWatch.Start();
     if(_filter) _filter->EventEnd();
     if(_algo) _algo->EventEnd();
+    //std::cout<<"EventEnd: "<<fWatch.RealTime()<<std::endl;
+
     return res;
   }
 

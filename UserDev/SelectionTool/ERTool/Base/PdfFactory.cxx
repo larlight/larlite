@@ -24,30 +24,34 @@ namespace ertool {
   }
 
   RooAbsPdf* PdfFactory::dEdxPdf_gamma(RooRealVar &x, RooRealVar &f,
-					     RooRealVar &mu1, RooRealVar &sigma1,
-					     RooRealVar &mu2, RooRealVar &sigma2) const
+				       RooRealVar &mu1, RooRealVar &sigma1,
+				       RooRealVar &mu2, RooRealVar &sigma2) const
   {
-    //RooGaussian* _g1 = new RooGaussian("_dEdxPdf","dEdx Pdf", x, mu1, sigma1);
-    //RooGaussian* _g2 = new RooGaussian("_dEdxPdf","dEdx Pdf", x, mu2, sigma2);
+    RooGaussian* _g1 = new RooGaussian("_dEdxPdf_gamma1","dEdx Pdf", x, mu1, sigma1);
+    RooGaussian* _g2 = new RooGaussian("_dEdxPdf_gamma2","dEdx Pdf", x, mu2, sigma2);
 
     // weird error when doing RooAddPdf: 
     // [#0] ERROR:LinkStateMgmt -- RooAbsArg::recursiveCheckObservables(_dEdxPdf_gamma):
     // ERROR: one or more servers of node _dEdxPdf_gamma no longer exists!
     //return new RooAddPdf("_dEdxPdf_gamma","dEdx PDF Gamma",RooArgList(*_g1,*_g2),f);
+    return new RooAddPdf("_dEdxPdf_gamma","dEdx PDF Gamma",*_g1,*_g2,f);
+    /*
     RooAbsPdf* genpdf = RooClassFactory::makePdfInstance("dEdxGamma",
 							 "_g_dedxfrac * 1./(sqrt(2*3.14*pow(_g_dedxsigma1,2)))*exp(-(pow((_dEdx-_g_dedxmu1),2))/(2*pow(_g_dedxsigma1,2))) + (1-_g_dedxfrac) * 1./(sqrt(2*3.14*pow(_g_dedxsigma2,2)))*exp(-(pow((_dEdx-_g_dedxmu2),2))/(2*pow(_g_dedxsigma2,2)))",
 							 RooArgSet(x,mu1,sigma1,mu2,sigma2,f));
-    
-    return genpdf;
+    */    
+    //return genpdf;
   }
 
   RooAbsPdf* PdfFactory::dEdxConv(RooRealVar &x,
-					RooRealVar &meang, RooRealVar &sigmag,
-					RooRealVar &meanl, RooRealVar &sigmal) const
+				  RooRealVar &meang, RooRealVar &sigmag,
+				  RooRealVar &meanl, RooRealVar &sigmal) const
   {
-    
-    RooLandau* landau = new RooLandau("landau","landau", x, meanl, sigmal);
-    RooGaussian* gauss = new RooGaussian("gaussian","gaussian", x, meang, sigmag);
+    std::cout<<"called dEdxConv"<<std::endl; 
+    static size_t ctr=0;
+    ctr++;
+    RooLandau* landau = new RooLandau(Form("landau_%zu",ctr),"landau", x, meanl, sigmal);
+    RooGaussian* gauss = new RooGaussian(Form("gaussian_%zu",ctr),"gaussian", x, meang, sigmag);
 
     return new RooNumConvPdf("model", "model", x, *landau, *gauss);
   }
@@ -71,8 +75,8 @@ namespace ertool {
 
   //RooGaussian* PdfFactory::Pi0Mass(RooRealVar& x,
   RooAbsPdf* PdfFactory::Pi0Mass(RooRealVar& x,
-				       RooRealVar& mu,
-				       RooRealVar& sigma) const
+				 RooRealVar& mu,
+				 RooRealVar& sigma) const
   {
     return new RooGaussian("_Pi0MassPdf","#Pi0 Mass Pdf",x,mu,sigma);
     /*

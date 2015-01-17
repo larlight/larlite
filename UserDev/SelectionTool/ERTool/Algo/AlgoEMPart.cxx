@@ -9,6 +9,7 @@ namespace ertool {
     : AlgoBase()
     , _dEdxVar(nullptr)
     , _radLenVar(nullptr)
+
     , _e_radLenPdf(nullptr)
     , _e_radLenData(nullptr)
     , _e_radLenVal(nullptr)
@@ -21,6 +22,7 @@ namespace ertool {
     , _e_landauMu(nullptr)
     , _e_landauSigma(nullptr)
     , _e_dEdxConvPdf(nullptr)
+
     , _g_radLenPdf(nullptr)
     , _g_radLenData(nullptr)
     , _g_radLenVal(nullptr)
@@ -197,7 +199,7 @@ namespace ertool {
     delete _e_landauMu;
     _e_landauSigma = new RooRealVar("_e_landauSigma","_e_landauSigma",_e_landauSigma_val,_e_landauSigma_min,_e_landauSigma_max);
     delete _e_dEdxConvPdf;
-    _e_dEdxConvPdf = factory.dEdxConv(*_dEdxVar,*_e_gaussMu,*_e_gaussSigma,*_e_landauMu,*_e_landauSigma);
+    //_e_dEdxConvPdf = factory.dEdxConv(*_dEdxVar,*_e_gaussMu,*_e_gaussSigma,*_e_landauMu,*_e_landauSigma);
 
     // gamma RadLen vars
     delete _g_radLenVal;
@@ -233,7 +235,7 @@ namespace ertool {
     delete _g_landauMu;
     _g_landauSigma = new RooRealVar("_g_landauSigma","_g_landauSigma",_g_landauSigma_val,_g_landauSigma_min,_g_landauSigma_max);
     delete _g_dEdxConvPdf;
-    _g_dEdxConvPdf = factory.dEdxConv(*_dEdxVar,*_g_gaussMu,*_g_gaussSigma,*_g_landauMu,*_g_landauSigma);
+    //_g_dEdxConvPdf = factory.dEdxConv(*_dEdxVar,*_g_gaussMu,*_g_gaussSigma,*_g_landauMu,*_g_landauSigma);
 
   }
 
@@ -273,14 +275,14 @@ namespace ertool {
   ParticleSet AlgoEMPart::Reconstruct(const EventData &data)
   {
     ParticleSet res;
-
+    
     for(auto const& s : data.Shower()) {
 
       double dist   = -1.;
       double dEdx   = s->_dedx;
 
       // skip if dEdx out of bounds
-      if ( (dEdx <= _dedxmin) or (dEdx >= _dedxmax) ) return res;
+      if ( (dEdx <= _dedxmin) or (dEdx >= _dedxmax) ) continue;
 
       if(data.Vertex().size())
 	dist = s->Start().Dist((*data.Vertex()[0]));
@@ -293,7 +295,7 @@ namespace ertool {
       p.Momentum(s->Dir() * (s->_energy - p.Mass()));
       p.RecoObjInfo(s->ID(),Particle::RecoObjType_t::kShower);
       res.push_back(p);
-      
+
       _dEdxVar->setVal(dEdx);
       if (!(dist<0)) { _radLenVar->setVal(dist); }
 
