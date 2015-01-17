@@ -102,6 +102,9 @@ namespace larlite {
   }
   
   bool ERToolAnaBase::analyze(storage_manager* storage) {
+    _data.Reset();
+    TStopwatch fWatch;
+    fWatch.Start();
 
     static bool one_time_warning = true;
 
@@ -263,8 +266,11 @@ namespace larlite {
       }
     }
     */
-
     one_time_warning = false;
+
+    //print(msg::kWARNING,__FUNCTION__,
+    //Form("Time filling SPAData: %g",fWatch.RealTime()));
+
     return true;
   }
 

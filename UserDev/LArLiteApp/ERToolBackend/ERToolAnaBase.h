@@ -15,6 +15,7 @@
 #ifndef LARLITE_ERTOOLANABASE_H
 #define LARLITE_ERTOOLANABASE_H
 
+#include <TStopwatch.h>
 #include "Analysis/ana_base.h"
 #include "ERToolHelper.h"
 
