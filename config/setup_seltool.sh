@@ -1,5 +1,5 @@
 
-export USER_MODULE="BasicTool SelectionTool"
+export USER_MODULE="BasicTool SelectionTool LArLiteApp"
 # Find the location of this script:
 me="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Find the directory one above.
