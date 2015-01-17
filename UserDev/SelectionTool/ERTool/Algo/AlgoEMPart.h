@@ -67,7 +67,12 @@ namespace ertool {
     /// Set bounds for dEdx PDF fitting - Gamma
     void set_g_dEdxFitRange(double min, double max) { _g_dedx_fitMin = min; _g_dedx_fitMax = max; }
 
+    /// Set verbosity mode
+    void setVerbose(bool on) { _verbose = on; }
+
   protected:
+
+    bool _verbose; /// verbosity mode for debug
 
     bool _mode; ///< e-/gamma mode (true: gamma, false: e-)
     
@@ -91,11 +96,8 @@ namespace ertool {
     double _g_lval;    ///< gamma rad length param mean [cm]
     double _g_lmin;    ///< gamma rad length param range min [cm]
     double _g_lmax;    ///< gamma rad length param range max [cm]
-    double _g_dedxfrac; ///< gamma frac that has e dEdx
-    double _g_dedxmu1; ///< gamma dEdx param mean [MeV/cm]
-    double _g_dedxsigma1; ///< gamma dEdx param sigma [MeV/cm]
-    double _g_dedxmu2; ///< gamma dEdx param mean [MeV/cm]
-    double _g_dedxsigma2; ///< gamma dEdx param sigma [MeV/cm]
+    double _g_dedxmu;  ///< gamma dEdx param mean [MeV/cm]
+    double _g_dedxsigma; ///< gamma dEdx param sigma [MeV/cm]
     double _g_dedxmin; ///< gamma dEdx param range min [MeV/cm]
     double _g_dedxmax; ///< gamma dEdx param range max [MeV/cm]
     double _g_dedx_fitMin; ///< where to start fitting [MeV/cm]
@@ -104,6 +106,7 @@ namespace ertool {
     // Variables
     RooRealVar* _dEdxVar;
     RooRealVar* _radLenVar;
+    
 
     // e- RadLen PDF 
     RooAbsPdf*  _e_radLenPdf; ///< e- RadLen PDF
@@ -116,26 +119,6 @@ namespace ertool {
     RooRealVar* _e_dEdxMu;
     RooRealVar* _e_dEdxSigma;
 
-    // e- dEdx Conv Pdf
-    RooRealVar* _e_gaussMu;
-    RooRealVar* _e_gaussSigma;
-    RooRealVar* _e_landauMu;
-    RooRealVar* _e_landauSigma;
-    RooAbsPdf*  _e_dEdxConvPdf;
-    // variables
-    double _e_landauMu_val;
-    double _e_landauMu_min;
-    double _e_landauMu_max;
-    double _e_landauSigma_val;
-    double _e_landauSigma_min;
-    double _e_landauSigma_max;
-    double _e_gaussMu_val;
-    double _e_gaussMu_min;
-    double _e_gaussMu_max;
-    double _e_gaussSigma_val;
-    double _e_gaussSigma_min;
-    double _e_gaussSigma_max;
-
     // gamma RadLen PDF
     RooAbsPdf*  _g_radLenPdf;     ///< gamma RadLen Pdf
     RooDataSet* _g_radLenData;    ///< gamma pdf data set
@@ -144,32 +127,8 @@ namespace ertool {
     // gamma dEdx PDF
     RooAbsPdf*  _g_dEdxPdf; ///< gamma dEdx Pdf
     RooDataSet* _g_dEdxData;
-    RooRealVar* _g_dEdxFrac;
-    RooRealVar* _g_dEdxMu1;
-    RooRealVar* _g_dEdxSigma1;
-    RooRealVar* _g_dEdxMu2;
-    RooRealVar* _g_dEdxSigma2;
-
-    // gamma dEdx Conv Pdf
-    RooRealVar* _g_gaussMu;
-    RooRealVar* _g_gaussSigma;
-    RooRealVar* _g_landauMu;
-    RooRealVar* _g_landauSigma;
-    RooAbsPdf*  _g_dEdxConvPdf;
-    // variables
-    double _g_landauMu_val;
-    double _g_landauMu_min;
-    double _g_landauMu_max;
-    double _g_landauSigma_val;
-    double _g_landauSigma_min;
-    double _g_landauSigma_max;
-    double _g_gaussMu_val;
-    double _g_gaussMu_min;
-    double _g_gaussMu_max;
-    double _g_gaussSigma_val;
-    double _g_gaussSigma_min;
-    double _g_gaussSigma_max;
-
+    RooRealVar* _g_dEdxMu;
+    RooRealVar* _g_dEdxSigma;
   };
 }
 #endif
