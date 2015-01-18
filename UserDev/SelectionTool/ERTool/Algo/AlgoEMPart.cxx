@@ -199,12 +199,14 @@ namespace ertool {
       double e_like = LL(true,  dEdx, dist);
       double g_like = LL(false, dEdx, dist);
 
+      /*
       Particle p(( g_like > e_like ? 22 : 11 ) );
       p.Vertex(s->Start());
       p.Momentum(s->Dir() * (s->_energy - p.Mass()));
       p.RecoObjInfo(s->ID(),Particle::RecoObjType_t::kShower);
       res.push_back(p);
-      
+      */
+
       _dEdxVar->setVal(dEdx);
       if (!(dist<0)) { _radLenVar->setVal(dist); }
 
@@ -259,7 +261,11 @@ namespace ertool {
 
       // Fit and maybe save parameters
       std::string part_name = "gamma";
-      if(!_mode) part_name  = "electron";
+      std::string part_letter = "g";
+      if(!_mode){
+	part_name  = "electron";
+	part_letter = "e";
+      }
 
       if(_mode) {
 	fit_res_radLen = _g_radLenPdf->fitTo(*_g_radLenData,RooFit::Save(),RooFit::PrintLevel(-1));
@@ -273,7 +279,29 @@ namespace ertool {
 	if (_verbose) { fit_res_radLen->Print(); }
 	fit_res_dEdx   = _e_dEdxPdf->fitTo(*_e_dEdxData, RooFit::Range(_e_dedx_fitMin, _e_dedx_fitMax), RooFit::Save(),RooFit::PrintLevel(-1));
 	if (_verbose) { fit_res_dEdx->Print(); }
+
       }
+
+      // Save parameters
+      RooRealVar* res_value_radLen = nullptr;
+      RooRealVar* res_value_dEdxMu = nullptr;
+      RooRealVar* res_value_dEdxSigma = nullptr;
+      res_value_radLen = (RooRealVar*)(fit_res_radLen->floatParsFinal().find(Form("_%s_l",part_letter.c_str())));
+      res_value_dEdxMu   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("_%s_dEdxMu",part_letter.c_str())));
+      res_value_dEdxSigma   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("_%s_dEdxSigma",part_letter.c_str())));
+      std::cout << "["<<__FUNCTION__<<"] " << Form("Extracted %s_params... ",part_name.c_str()) << std::endl;
+      std::cout << "["<<__FUNCTION__<<"] "
+		<< "RadLen: "<< res_value_radLen->getVal() << " [" << res_value_radLen->getErrorLo() + res_value_radLen->getVal()
+		<< " => " << res_value_radLen->getErrorHi() + res_value_radLen->getVal() << "]" << std::endl;
+      std::cout << "["<<__FUNCTION__<<"] "
+		<< "dEdx: Mu: " << res_value_dEdxMu->getVal() << " Sigma: " << res_value_dEdxSigma->getVal() << std::endl;
+      _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorLo());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorHi());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_dEdxMu->getVal());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_dEdxSigma->getVal());
+
+
 
     }// if in traning mode
       
