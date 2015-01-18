@@ -9,91 +9,73 @@ namespace ertool {
     : AlgoBase()
     , _dEdxVar(nullptr)
     , _radLenVar(nullptr)
-
     , _e_radLenPdf(nullptr)
     , _e_radLenData(nullptr)
     , _e_radLenVal(nullptr)
-    , _e_dEdxPdf(nullptr)
-    , _e_dEdxData(nullptr)
-    , _e_dEdxMu(nullptr)
-    , _e_dEdxSigma(nullptr)
-    , _e_gaussMu(nullptr)
-    , _e_gaussSigma(nullptr)
     , _e_landauMu(nullptr)
     , _e_landauSigma(nullptr)
     , _e_dEdxConvPdf(nullptr)
-
-    , _g_radLenPdf(nullptr)
-    , _g_radLenData(nullptr)
-    , _g_radLenVal(nullptr)
-    , _g_dEdxPdf(nullptr)
-    , _g_dEdxData(nullptr)
-    , _g_dEdxFrac(nullptr)
-    , _g_dEdxMu1(nullptr)
-    , _g_dEdxSigma1(nullptr)
-    , _g_dEdxMu2(nullptr)
-    , _g_dEdxSigma2(nullptr)
-    , _g_gaussMu(nullptr)
-    , _g_gaussSigma(nullptr)
     , _g_landauMu(nullptr)
     , _g_landauSigma(nullptr)
     , _g_dEdxConvPdf(nullptr)
   { 
-    _name = "AlgoEMPart"; 
-    Init();
+
+    _name = "AlgoEMPart";
+
+    _dEdxVar   = new RooRealVar("empart_dedx","dE/dx [MeV/cm] Variable",0,50);
+    _radLenVar = new RooRealVar("empart_radlen","Radiation Length [cm] Variable",-10000,0);
+
+    PdfFactory factory;
+
+    std::string part_name;
+
+    part_name = "electron";
+    _e_dEdxPdf    = factory.dEdxGaus(part_name,*_dEdxVar);
+    _e_radLenPdf  = factory.RadiationLength(part_name,*_radLenVar);
+
+    part_name = "gamma";
+    _g_dEdxPdf    = factory.dEdxDoubleGaus(part_name,*_dEdxVar);
+    _g_radLenPdf  = factory.RadiationLength(part_name,*_radLenVar);
+
+    SetDefaultParams();
   }
 
-  void AlgoEMPart::Init()
+  void AlgoEMPart::SetDefaultParams()
   {
-    _xmin = 0.;
-    _xmax = 100.;
-    _dedxmin = 0.01;
-    _dedxmax = 20.;
-    _e_dedx_fitMin = _dedxmin;
-    _e_dedx_fitMax = _dedxmax;
-    _g_dedx_fitMin = _dedxmin;
-    _g_dedx_fitMax = _dedxmax;
-    _e_lval = -2000;
-    _e_lmin = -10000;
-    _e_lmax = -100;
-    _e_dedxmu = 2.;
-    _e_dedxsigma = _e_dedxmu*0.3;
-    _e_dedxmin = _dedxmin;
-    _e_dedxmax = _dedxmax;
-    _e_landauMu_val = 2;
-    _e_landauMu_min = _dedxmin;
-    _e_landauMu_max = _dedxmax;
-    _e_landauSigma_val = 0.2;
-    _e_landauSigma_min = 0.0;
-    _e_landauSigma_max = 2.0;
-    _e_gaussMu_val = 2;
-    _e_gaussMu_min = _dedxmin;
-    _e_gaussMu_max = _dedxmax;
-    _e_gaussSigma_val = 0.4;
-    _e_gaussSigma_min = 0.0;
-    _e_gaussSigma_max = 2.0;
-    _g_lval = -1./20;
-    _g_lmin = -1./10.;
-    _g_lmax = -1./100.;
-    _g_dedxfrac = 0.0;
-    _g_dedxmu1 = 1.;
-    _g_dedxsigma1 = _g_dedxmu1*0.2;
-    _g_dedxmu2 = 2.;
-    _g_dedxsigma2 = _g_dedxmu2*0.2;
-    _g_dedxmin = _dedxmin;
-    _g_dedxmax = _dedxmax;
-    _g_landauMu_val = 4;
-    _g_landauMu_min = _dedxmin;
-    _g_landauMu_max = _dedxmax;
-    _g_landauSigma_val = 0.4;
-    _g_landauSigma_min = 0.0;
-    _g_landauSigma_max = 4.0;
-    _g_gaussMu_val = 4;
-    _g_gaussMu_min = _dedxmin;
-    _g_gaussMu_max = _dedxmax;
-    _g_gaussSigma_val = 0.4;
-    _g_gaussSigma_min = 0.0;
-    _g_gaussSigma_max = 4.0;
+    RooRealVar *var;
+    // Electron PDFs
+    var = (RooRealVar*)(_e_radLenPdf->getVariables()->find("electron_radLen"));
+    var->setVal   ( -2.e3        );
+    var->setRange ( -1.e4, -1.e2 );
+
+    var  = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("electron_dEdxGaus_mean"));
+    var->setVal   ( 2.0      );
+    var->setRange ( 1.0, 3.0 );
+
+    var = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("electron_dEdxGaus_sigma"));
+    var->setVal   ( 1.0      );
+    var->setRange ( 0.0, 2.0 );
+
+    // Gamma PDFs
+    var = (RooRealVar*)(_e_radLenPdf->getVariables()->find("gamma_radLen"));
+    var->setVal   ( -0.05        );
+    var->setRange ( -0.10, -0.01 );
+
+    var = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("gamma_dEdxGaus_hiMean"));
+    var->setVal   ( 4.0      );
+    var->setRange ( 3.0, 5.0 );
+
+    var = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("gamma_dEdxGaus_lowMean"));
+    var->setVal   ( 2.0      );
+    var->setRange ( 1.0, 3.0 );
+
+    var = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("gamma_dEdxGaus_hiSigma"));
+    var->setVal   ( 1.0      );
+    var->setRange ( 0.0, 2.0 );
+
+    var = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("gamma_dEdxGaus_lowSigma"));
+    var->setVal   ( 1.0      );
+    var->setRange ( 0.0, 2.0 );
 
   }
 
@@ -104,138 +86,100 @@ namespace ertool {
     // Extract if parameters found
     if(_params.exist_darray("rad_range")) {
       auto darray = _params.get_darray("rad_range");
-      _xmin = (*darray)[0];
-      _xmax = (*darray)[1];
+      _dEdxVar->setRange( (*darray)[0], (*darray)[1] );
       std::cout<<"["<<__FUNCTION__<<"] "
 	       << "Loaded distance fit range : "
-	       << _xmin << " => " << _xmax
+	       << _dEdxVar->getMin() << " => " << _dEdxVar->getMax()
 	       << std::endl;
     }
+
     if(_params.exist_darray("dedx_range")) {
       auto darray = _params.get_darray("dedx_range");
-      _dedxmin = (*darray)[0];
-      _dedxmax = (*darray)[1];
+      _radLenVar->setRange( (*darray)[0], (*darray)[1] );
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"Loaded dEdx range : "
-	       << _dedxmin << " => " << _dedxmax
-		       << std::endl;
+	       << _dEdxVar->getMin() << " => " << _dEdxVar->getMax()
+	       << std::endl;
     }
+
     if(_params.exist_darray("gamma_params")) {
       auto darray = _params.get_darray("gamma_params");
-      _g_lval = (*darray)[0];
-      _g_lmin = (*darray)[1];
-      _g_lmax = (*darray)[2];
-      _g_dedxmu1 = (*darray)[3];
-      _g_dedxmu2 = (*darray)[5];
-      _g_dedxsigma1 = (*darray)[4];
-      _g_dedxsigma2 = (*darray)[6];
-      _g_dedxfrac   = (*darray)[7];
+      RooRealVar *tau, *mean1, *mean2, *sigma1, *sigma2, *frac;
+      tau = (RooRealVar*)(_e_radLenPdf->getVariables()->find("gamma_radLen"));
+      tau->setVal   ( (*darray)[0]               );
+      tau->setRange ( (*darray)[1], (*darray)[2] );
+
+      mean1  = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("gamma_dEdxGaus_lowMean"));
+      mean1->setVal  ( (*darray)[3] );
+      sigma1 = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("gamma_dEdxGaus_lowSigma"));
+      sigma1->setVal ( (*darray)[4] );
+
+      mean2  = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("gamma_dEdxGaus_hiMean"));
+      mean2->setVal  ( (*darray)[5] );
+      sigma2 = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("gamma_dEdxGaus_hiSigma"));
+      sigma2->setVal ( (*darray)[6] );
+
+      frac = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("gamma_dEdxGaus_Fraction"));
+      frac->setVal ( (*darray)[7] );
+      
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"Loaded gamma parameters..." << std::endl;
       std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"Rad Length: " << _g_lval << " ["<<_g_lmin<<" => "<<_g_lmax<<"]" << std:: endl;
+	       <<"Rad Length: " << tau->getVal() << " ["<< tau->getMin() <<" => "<< gau->getMax() <<"]" << std:: endl;
       std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"dEdx: Mean1: " << _g_dedxmu1 << " Sigma1: " << _g_dedxsigma1 << std::endl
+	       <<"dEdx: Mean1: " << mean1->getVal() << " Sigma1: " << sigma1->getVal() << std::endl
 	       <<"["<<__FUNCTION__<<"] "
-	       <<"dEdx: Mean2: " << _g_dedxmu2 << " Sigma2: " << _g_dedxsigma2 << std::endl
+	       <<"dEdx: Mean2: " << mean2->getVal() << " Sigma2: " << sigma2->getVal() << std::endl
 	       <<"["<<__FUNCTION__<<"] "
-	       <<"Frac: " << _g_dedxfrac <<std::endl;
+	       <<"Frac: " << frac->getVal() <<std::endl;
     }
+
     if(_params.exist_darray("electron_params")) {
       auto darray = _params.get_darray("electron_params");
-      _e_lval = (*darray)[0];
-      _e_lmin = (*darray)[1];
-      _e_lmax = (*darray)[2];
-      _e_dedxmu = (*darray)[3];
-      _e_dedxsigma = (*darray)[4];
+      RooRealVar *tau, *mean, *sigma;
+      tau = (RooRealVar*)(_e_radLenPdf->getVariables()->find("electron_radLen"));
+      tau->setVal   ( (*darray)[0]               );
+      tau->setRange ( (*darray)[1], (*darray)[2] );
+
+      mean  = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("electron_dEdxGaus_lowMean"));
+      mean->setVal  ( (*darray)[3] );
+      sigma = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("electron_dEdxGaus_lowSigma"));
+      sigma->setVal ( (*darray)[4] );
+
       std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"Loaded electron parameters... " << std::endl;
+	       <<"Loaded electron parameters..." << std::endl;
       std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"Rad Length: " << _e_lval << " ["<<_e_lmin<<" => "<<_e_lmax<<"]" << std:: endl;
+	       <<"Rad Length: " << tau->getVal() << " ["<< tau->getMin() <<" => "<< gau->getMax() <<"]" << std:: endl;
       std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"dEdx: Mu:" << _e_dedxmu << " Sigma: "<<_e_dedxsigma
-	       <<std::endl;
+	       <<"dEdx: Mean1: " << mean1->getVal() << " Sigma1: " << sigma1->getVal() << std::endl;
     }
   }
 
   void AlgoEMPart::ProcessBegin()
   {
-    PdfFactory factory;
-    std::string part_name = "gamma";
-    if(!_mode) part_name = "electron";
-
-    // Variables used: dEdx & radLen
-    delete _dEdxVar;
-    _dEdxVar = new RooRealVar("_dEdx","dEdx", _dedxmin, _dedxmax);
-    delete _radLenVar;
-    _radLenVar   = new RooRealVar("_rl","Radiation length [cm]", _xmin, _xmax);
 
 
-
-    // electron RadLen vars
-    delete _e_radLenVal;
-    _e_radLenVal   = new RooRealVar("_e_l","e Radiation length [cm]",_e_lval,_e_lmin,_e_lmax);
-    // electron dEdx vars
-    delete _e_dEdxMu;
-    _e_dEdxMu    = new RooRealVar("_e_dEdxMu","e dEdx Mean",_e_dedxmu,_e_dedxmin,_e_dedxmax);
-    delete _e_dEdxSigma;
-    _e_dEdxSigma = new RooRealVar("_e_dEdxSigma","e dEdx Sigma",_e_dedxsigma,0.,_e_dedxmax);
-    delete _e_radLenPdf;
-    _e_radLenPdf = factory.RadLenPdf(*_radLenVar, *_e_radLenVal);
-    delete _e_radLenData;
-    _e_radLenData = new RooDataSet(Form("%s_radLenData",part_name.c_str()),"RooFit distance data set",RooArgSet(*_radLenVar));
-    delete _e_dEdxPdf;
-    _e_dEdxPdf = factory.dEdxPdf(*_dEdxVar, *_e_dEdxMu, *_e_dEdxSigma);
+    std::string part_name;
+    
+    part_name = "electron";
     delete _e_dEdxData;
-    _e_dEdxData = new RooDataSet(Form("%s_dEdxData",part_name.c_str()),"RooFit dEdx set",RooArgSet(*_dEdxVar));
+    delete _e_radLenData;
+    _e_dEdxData   = new RooDataSet(Form("%s_dEdxData",part_name.c_str()),
+				   "EMPart dE/dx data sample",
+				   RooArgSet(*_dEdxVar));
+    _e_radLenData = new RooDataSet(Form("%s_radLenData",part_name.c_str()),
+				   "EMPart radiation length data sample",
+				   RooArgSet(*_radLenVar));
 
-    // electron dEdx Conv stuff
-    delete _e_gaussMu;
-    _e_gaussMu = new RooRealVar("_e_gaussMu","_e_gaussMu",_e_gaussMu_val,_e_gaussMu_min,_e_gaussMu_max);
-    delete _e_gaussSigma;
-    _e_gaussSigma = new RooRealVar("_e_gaussSigma","_e_gaussSigma",_e_gaussSigma_val,_e_gaussSigma_min,_e_gaussSigma_max);
-    delete _e_landauMu;
-    _e_landauMu = new RooRealVar("_e_landauMu","_e_landauMu",_e_landauMu_val,_e_landauMu_min,_e_landauMu_max);
-    delete _e_landauMu;
-    _e_landauSigma = new RooRealVar("_e_landauSigma","_e_landauSigma",_e_landauSigma_val,_e_landauSigma_min,_e_landauSigma_max);
-    delete _e_dEdxConvPdf;
-    //_e_dEdxConvPdf = factory.dEdxConv(*_dEdxVar,*_e_gaussMu,*_e_gaussSigma,*_e_landauMu,*_e_landauSigma);
-
-    // gamma RadLen vars
-    delete _g_radLenVal;
-    _g_radLenVal   = new RooRealVar("_g_l","g Radiation length [cm]",_g_lval,_g_lmin,_g_lmax);
-    // gamma dEdx vars
-    delete _g_dEdxFrac;
-    _g_dEdxFrac = new RooRealVar("_g_dedxfrac","g dEdx frac",_g_dedxfrac,0.,0.0);
-    delete _g_dEdxMu1;
-    _g_dEdxMu1    = new RooRealVar("_g_dedxmu1","g dEdx Mean",_g_dedxmu1,_g_dedxmin,_g_dedxmax);
-    delete _g_dEdxSigma1;
-    _g_dEdxSigma1 = new RooRealVar("_g_dedxsigma1","g dEdx Sigma",_g_dedxsigma1,0.,_g_dedxmax);
-    delete _g_dEdxMu2;
-    _g_dEdxMu2    = new RooRealVar("_g_dedxmu2","g dEdx Mean",_g_dedxmu2,_g_dedxmin,_g_dedxmax);
-    delete _g_dEdxSigma2;
-    _g_dEdxSigma2 = new RooRealVar("_g_dedxsigma2","g dEdx Sigma",_g_dedxsigma2,0.,_g_dedxmax);
-
-    delete _g_radLenPdf;
-    _g_radLenPdf = factory.RadLenPdf(*_radLenVar, *_g_radLenVal);
-    delete _g_radLenData;
-    _g_radLenData = new RooDataSet(Form("%s_radLenData",part_name.c_str()),"RooFit distance data set",RooArgSet(*_radLenVar));
-    delete _g_dEdxPdf;
-    _g_dEdxPdf = factory.dEdxPdf_gamma(*_dEdxVar, *_g_dEdxFrac, *_g_dEdxMu1, *_g_dEdxSigma1, *_g_dEdxMu2, *_g_dEdxSigma2);
+    part_name = "gamma";
     delete _g_dEdxData;
-    _g_dEdxData = new RooDataSet(Form("%s_dEdxData",part_name.c_str()),"RooFit dEdx set",RooArgSet(*_dEdxVar));
-
-    // gamma dEdx Conv stuff
-    delete _g_gaussMu;
-    _g_gaussMu = new RooRealVar("_g_gaussMu","_g_gaussMu",_g_gaussMu_val,_g_gaussMu_min,_g_gaussMu_max);
-    delete _g_gaussSigma;
-    _g_gaussSigma = new RooRealVar("_g_gaussSigma","_g_gaussSigma",_g_gaussSigma_val,_g_gaussSigma_min,_g_gaussSigma_max);
-    delete _g_landauMu;
-    _g_landauMu = new RooRealVar("_g_landauMu","_g_landauMu",_g_landauMu_val,_g_landauMu_min,_g_landauMu_max);
-    delete _g_landauMu;
-    _g_landauSigma = new RooRealVar("_g_landauSigma","_g_landauSigma",_g_landauSigma_val,_g_landauSigma_min,_g_landauSigma_max);
-    delete _g_dEdxConvPdf;
-    //_g_dEdxConvPdf = factory.dEdxConv(*_dEdxVar,*_g_gaussMu,*_g_gaussSigma,*_g_landauMu,*_g_landauSigma);
+    delete _g_radLenData;
+    _g_dEdxData   = new RooDataSet(Form("%s_dEdxData",part_name.c_str()),
+				   "EMPart dE/dx data sample",
+				   RooArgSet(*_dEdxVar));
+    _g_radLenData = new RooDataSet(Form("%s_radLenData",part_name.c_str()),
+				   "EMPart radiation length data sample",
+				   RooArgSet(*_radLenVar));
 
   }
 
@@ -282,11 +226,11 @@ namespace ertool {
       double dEdx   = s->_dedx;
 
       // skip if dEdx out of bounds
-      if ( (dEdx <= _dedxmin) or (dEdx >= _dedxmax) ) continue;
-
+      if ( !_dEdxVar->inRange( dEdx, 0 ) ) continue;
+      
       if(data.Vertex().size())
 	dist = s->Start().Dist((*data.Vertex()[0]));
-
+      
       double e_like = LL(true,  dEdx, dist);
       double g_like = LL(false, dEdx, dist);
 

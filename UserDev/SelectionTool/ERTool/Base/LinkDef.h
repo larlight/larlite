@@ -38,9 +38,11 @@
 #pragma link C++ function ertool::Combination(const size_t,const size_t)+;
 
 #pragma link C++ class ertool::RecoObjBase+;
+#pragma link C++ class ertool::RangeVar+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 
 
 
