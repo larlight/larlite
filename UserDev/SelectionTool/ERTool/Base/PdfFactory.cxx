@@ -144,13 +144,20 @@ namespace ertool {
 
   //
   RooAbsPdf* PdfFactory::Pi0ShrCorrelation(RooRealVar& x,
-						 RooRealVar& l) const
+					   RooRealVar& l) const
   {
     
     RooExponential* shr1 = new RooExponential("_radLenShr1","Rad. Length 1st Shower", x, l);
     RooExponential* shr2 = new RooExponential("_radLenShr2","Rad. Length 2nd Shower", x, l);
 
     return new RooProdPdf("radLenCorrelation","Correlation Rad length",RooArgSet(*shr1,*shr2));
+  }
+
+
+  RooAbsPdf* PdfFactory::UniformDistrib(RooRealVar& x) const
+  {
+
+    return new RooPolynomial("uniform","Uniform Distribution", x);
   }
 
 }

@@ -19,10 +19,16 @@ namespace ertool {
     , _radLenVar(nullptr)
     , _radLenVal(nullptr)
     , _radLenData(nullptr)
+    , _vtxVar(nullptr)
+    , _vtxErr(nullptr)
+    , _vtxMu(nullptr)
+    , _vtxErrSigl(nullptr)
+    , _vtxErrBkgd(nullptr)
     , _hMass_vs_LL(nullptr)
     , _hMass(nullptr)
     , _hBestMass(nullptr)
     , _candidate_tree(nullptr)
+    , _ll_tree(nullptr)
   {
     _name     = "AlgoPi0";
     _energy_min = 40.;
@@ -31,7 +37,7 @@ namespace ertool {
     _fit_max    = 200;
     _angle_min  = 0.;
     _angle_max  = 3.141592653589793;
-    _ip_max  = 10.;
+    _ip_max  = 300.;
     _pi0_mean      = 130.;
     _pi0_mean_min  = 100.;
     _pi0_mean_max  = 160.;
@@ -41,6 +47,7 @@ namespace ertool {
     _radLen        = 0.1; //[ CM-1 ]
     _radLen_min    = 1; //[ CM-1 ]
     _radLen_max    = 0.01; //[ CM-1 ]
+    _vtx_err       = 2; //[ CM ]
   }
 
   void AlgoPi0::LoadParams(std::string fname, size_t version){
@@ -122,17 +129,40 @@ namespace ertool {
     _radLenData = new RooDataSet("_radLenData","Distance from Vertex Data [cm]",RooArgSet(*_radLenVar));
     _shrCorrelation_pdf = factory.Pi0ShrCorrelation(*_radLenVar,*_radLenVal);
 
+    /// Create PDF for vertex uncertainty (Impact Parameter of two shower directions)
+    /// for signal and background
+    delete _vtxVar;
+    delete _vtxErr;
+    delete _vtxMu;
+    delete _vtxErrSigl;
+    delete _vtxErrBkgd;
+
+    _vtxVar = new RooRealVar("_vtxVar","Vtx Dist. [cm]",0,_ip_max);
+    _vtxErr = new RooRealVar("_vtxErr", "Vtx. Err. [cm]",_vtx_err,0.,100.);
+    _vtxMu  = new RooRealVar("_vtxMu", "Vtx. Mean Separation",0.,0.,10.);
+    _vtxErrSigl = new RooGaussian("_vtxErrSigl","Vtx Err. Signal PDF", *_vtxVar, *_vtxMu, *_vtxErr);
+    _vtxErrBkgd = factory.UniformDistrib(*_vtxVar);
+
+    // Initialize Histograms
     delete _hMass_vs_LL;
     delete _hMass;
     delete _hBestMass;
-
-
-    // Initialize Histograms
-    _hMass_vs_LL = new TH2D("hMass_vs_LL","Mass vs. Likelihood",100,0,200,100,-100,10);
+    _hMass_vs_LL = new TH2D("hMass_vs_LL","Mass vs. Likelihood",100,0,200,100,-20,2);
     _hMass = new TH1D("hMass","Mass",100,0,300);
     _hBestMass = new TH1D("hBestMass","BestMass",100,0,300);
 
-    // Initialize TTree
+    // Initialize LL Tree
+    delete _ll_tree;
+    _ll_tree = new TTree("_ll_tree","LL Tree");
+    _ll_tree->Branch("_ll_vtx",&_ll_vtx,"ll_vtx/D");
+    _ll_tree->Branch("_vtx_IP",&_vtx_IP,"vtx_IP/D");
+    _ll_tree->Branch("_ll_dedx_A",&_ll_dedx_A,"ll_dedx_A/D");
+    _ll_tree->Branch("_dedx_A",&_dedx_A,"dedx_A/D");
+    _ll_tree->Branch("_ll_dedx_B",&_ll_dedx_B,"ll_dedx_B/D");
+    _ll_tree->Branch("_dedx_B",&_dedx_B,"dedx_B/D");
+    _ll_tree->Branch("_m",&_m,"m/D");
+
+    // Initialize Pi0 TTree
     if (_candidate_tree) { delete _candidate_tree; }
     _candidate_tree = new TTree("candidate_tree","Candidate Pi0 Tree");
     _candidate_tree->Branch("_shr1_E",&_shr1_E,"shr1_E/D");
@@ -160,7 +190,7 @@ namespace ertool {
     // Sanity check
     if(shower_a._energy<0 || shower_b._energy<0) return;
 
-    if (_verbose) { std::cout << "Energy. Shr A: " << shower_a._energy << "\tShr B: " << shower_b._energy << std::endl; }
+
 
     // Pi0 Vtx point
     ::geoalgo::GeoAlgo geo_alg;
@@ -173,7 +203,17 @@ namespace ertool {
     auto vtx = pt_a + ((pt_b - pt_a) / 2.);
     _dist_1 = vtx.Dist(shower_a.Start());
     _dist_2 = vtx.Dist(shower_b.Start());
-    if (_verbose) { std::cout << "Max distance between Shower direction lines: " << _vtx_dist << std::endl; }
+    if (_verbose) {
+      std::cout << "Shr A: " << std::endl 
+		<< "\tEnergy: " << shower_a._energy << std::endl
+		<< "\tdEdx:   " << shower_a._dedx << std::endl
+		<< "\tVtx D : " << _dist_1 << std::endl
+		<< "Shr B: " << std::endl 
+		<< "\tEnergy: " << shower_b._energy << std::endl
+		<< "\tdEdx:   " << shower_b._dedx << std::endl 
+		<< "\tVtx D : " << _dist_2 << std::endl << std::endl;
+    }
+
     if(_vtx_dist > _ip_max) return;
 
     // Opening angle
@@ -201,14 +241,34 @@ namespace ertool {
     if (_verbose) { std::cout << "reconstructed mass: " << mass << std::endl; }
 
     _pi0_massVar->setVal(mass);
+    _m = mass;
 
-    ll  = log(_pi0_pdf->getVal(*_pi0_massVar));
-    ll += _alg_emp.LL(false,shower_a._dedx,vtx.Dist(shower_a.Start()));
-    ll += _alg_emp.LL(false,shower_b._dedx,vtx.Dist(shower_b.Start()));
+    // likelihood of each shower of being more e-like or g-like:
+    double e_like_a = _alg_emp.LL(true,shower_a._dedx,-1);//vtx.Dist(shower_a.Start()));
+    _dedx_A = shower_a._dedx;
+    _ll_dedx_A = _alg_emp.LL(false,shower_a._dedx,-1);//vtx.Dist(shower_a.Start()));
+    double e_like_b = _alg_emp.LL(true,shower_b._dedx,-1);//vtx.Dist(shower_b.Start()));
+    _dedx_B = shower_b._dedx;
+    _ll_dedx_B = _alg_emp.LL(false,shower_b._dedx,-1);//vtx.Dist(shower_b.Start()));
     
-    //std::cout<< log(_pi0_pdf->getVal(*_pi0_massVar))<<" : "
-	     //<<_alg_emp.LL(false,shower_a._dedx,vtx.Dist(shower_a.Start()))<<" : "
-	     //<<_alg_emp.LL(false,shower_b._dedx,vtx.Dist(shower_b.Start()))<<std::endl;
+    if (_verbose){
+      std::cout << "likelihood shower A is e-like: " << e_like_a << "\tg-like: " << _ll_dedx_A << std::endl;
+      std::cout << "likelihood shower B is e-like: " << e_like_b << "\tg-like: " << _ll_dedx_B << std::endl;
+    }
+     
+    // get lilelyhood for vertex reconstruction:
+    _vtxVar->setVal(_vtx_dist);
+    _vtx_IP = _vtx_dist;
+    _ll_vtx = log( _vtxErrSigl->getVal(*_vtxVar) / ( _vtxErrSigl->getVal(*_vtxVar) + _vtxErrBkgd->getVal(*_vtxVar) ) ); 
+    if (_verbose) {
+      std::cout << "IP for Showers: " << _vtx_dist 
+		<< "\tLL: "<< _ll_vtx << std::endl;
+    }
+    ll += _ll_vtx;
+    ll += _ll_dedx_A;
+    ll += _ll_dedx_B;
+
+    _ll_tree->Fill();
 
     return;
   }
@@ -248,7 +308,8 @@ namespace ertool {
       
       bk.book(likelihood,comb);
 
-      _hMass_vs_LL->Fill(mass,likelihood);
+      if (likelihood != -1.e-10)
+	_hMass_vs_LL->Fill(mass,likelihood);
       _hMass->Fill(mass);
 
       _ll = likelihood;
@@ -297,6 +358,7 @@ namespace ertool {
       _hMass->Write();
       _hBestMass->Write();
       _candidate_tree->Write();
+      _ll_tree->Write();
     }else{
       delete _hMass_vs_LL;
       delete _hMass;

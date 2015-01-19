@@ -18,6 +18,7 @@
 #include <RooRealVar.h>
 #include <RooExponential.h>
 #include <RooGaussian.h>
+#include <RooPolynomial.h>
 #include <RooArgusBG.h>
 #include <RooGenericPdf.h>
 #include <RooAddPdf.h>
@@ -85,12 +86,16 @@ namespace ertool {
     RooAbsPdf* Pi0ShrCorrelation(RooRealVar& x,
 				 RooRealVar& l) const;
 
+    /// Uniform distribution PDF : a 0th order polynomial
+    RooAbsPdf* UniformDistrib(RooRealVar& x) const;
+
   private:
     void Register(RooRealVar* var);
     void Register(RooAbsPdf* pdf);
 
     std::map<std::string,RooRealVar*> _vars;
     std::map<std::string,RooAbsPdf*>  _pdfs;
+
   };
 }
 
