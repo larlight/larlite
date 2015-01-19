@@ -18,6 +18,8 @@
 #include "Algo/AlgoEMPart.h"
 #include <TH1D.h>
 #include <TH2D.h>
+#include <RooGaussian.h>
+
 namespace ertool {
 
   /**
@@ -82,6 +84,7 @@ namespace ertool {
     double _fit_min, _fit_max;
 
     AlgoEMPart  _alg_emp;
+
     // Info for Mass Peak PDF
     RooAbsPdf   *_pi0_pdf;
     RooRealVar  *_pi0_massVar, *_pi0_massMean, *_pi0_massSigma;
@@ -95,16 +98,28 @@ namespace ertool {
     RooDataSet  *_radLenData;
     double _x, _x_min, _x_max; // [CM]
     double _radLen, _radLen_min, _radLen_max; // [ CM-1]
-    
+    // Info for Vertex Impact Parameter PDF
+    RooRealVar *_vtxVar;
+    RooRealVar *_vtxErr;
+    RooRealVar *_vtxMu;
+    RooAbsPdf  *_vtxErrSigl;
+    RooAbsPdf  *_vtxErrBkgd;
+    double     _vtx_err;
 
     double _energy_min,   _energy_max;
     double _angle_min,    _angle_max;
     double _ip_max;
  
-
+    // Histograms
     TH2D *_hMass_vs_LL;
     TH1D *_hMass;
     TH1D *_hBestMass;
+
+    // Tree for LL return values
+    TTree *_ll_tree;
+    double _ll_vtx, _ll_dedx_A, _ll_dedx_B;
+    double _vtx_IP, _dedx_A, _dedx_B;
+    double _m;
 
     // Tree for candidate pi0 events
     TTree* _candidate_tree;

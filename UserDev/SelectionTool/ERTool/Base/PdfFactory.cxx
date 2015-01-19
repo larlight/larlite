@@ -100,6 +100,13 @@ namespace ertool {
     return new RooProdPdf("radLenCorrelation","Correlation Rad length",RooArgSet(*shr1,*shr2));
   }
 
+
+  RooAbsPdf* PdfFactory::UniformDistrib(RooRealVar& x) const
+  {
+
+    return new RooPolynomial("uniform","Uniform Distribution", x);
+  }
+
 }
 
 #endif

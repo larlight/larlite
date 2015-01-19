@@ -18,6 +18,7 @@
 #include <RooRealVar.h>
 #include <RooExponential.h>
 #include <RooGaussian.h>
+#include <RooPolynomial.h>
 #include <RooArgusBG.h>
 #include <RooGenericPdf.h>
 #include <RooAddPdf.h>
@@ -88,6 +89,9 @@ namespace ertool {
     /// Pi0 correlation between 2 shower distance from pi0 decay
     RooAbsPdf* Pi0ShrCorrelation(RooRealVar& x,
 				 RooRealVar& l) const;
+
+    /// Uniform distribution PDF : a 0th order polynomial
+    RooAbsPdf* UniformDistrib(RooRealVar& x) const;
 
   };
 }
