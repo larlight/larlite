@@ -11,7 +11,7 @@ namespace ertool {
     // If file name is empty, use the default
     if(fname.empty())
       
-      fname = Form("%s/SelectionTool/ShowerPdfTool/dat/%s",getenv("LARLITE_USERDEVDIR"),kDataFileName.c_str());
+      fname = Form("%s/SelectionTool/ERTool/dat/%s",getenv("LARLITE_USERDEVDIR"),kDataFileName.c_str());
 
     // Create data receivers
     TChain* ch = new TChain(Form("ertool_data_%s",_name.c_str()));
