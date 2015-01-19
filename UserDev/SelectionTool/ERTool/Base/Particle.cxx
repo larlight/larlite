@@ -5,17 +5,21 @@
 
 namespace ertool {
 
-  Particle::Particle(int pdg_code)
-    : _vtx(3)
+  Particle::Particle(int pdg_code, double mass)
+    : _pdg_code(pdg_code)
+    , _mass(mass)
+    , _vtx(3)
     , _mom(3)
-  { Init(pdg_code); }
-
-  void Particle::Init(int pdg_code) {
-
+  { 
+    if(mass<0)    throw ERException("Must specify mass!");
+    if(!pdg_code) throw ERException("Invalid PdgCode!");
     _pdg_code = pdg_code;
-    _mass     = TDatabasePDG().GetParticle(pdg_code)->Mass();
-    if(_pdg_code != 22 && !(_mass>0))
-      throw ERException(Form("Invalid PdgCode %d given!",pdg_code));
+    _mass     = mass;
+
+    Reset();
+  }
+
+  void Particle::Reset() {
 
     for(size_t i=0; i<3; ++i) {
       _vtx[i] = kINVALID_DOUBLE;

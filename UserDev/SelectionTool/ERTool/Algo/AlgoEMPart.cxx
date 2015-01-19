@@ -17,6 +17,9 @@ namespace ertool {
     _dEdxVar   = new RooRealVar("empart_dedx","dE/dx [MeV/cm] Variable",0.,10.);
     _radLenVar = new RooRealVar("empart_radlen","Radiation Length [cm] Variable",0,100);
 
+    _e_mass = TDatabasePDG().GetParticle(11)->Mass();
+    _g_mass = TDatabasePDG().GetParticle(22)->Mass();
+
     std::string part_name;
 
     //
@@ -248,13 +251,13 @@ namespace ertool {
       double e_like = LL(true,  dEdx, dist);
       double g_like = LL(false, dEdx, dist);
 
-      /*
-      Particle p(( g_like > e_like ? 22 : 11 ) );
+      int pdg_code = ( g_like > e_like ? 22 : 11 );
+      double mass  = ( pdg_code == 11 ? _e_mass : _g_mass );
+      Particle p(pdg_code,mass);
       p.Vertex(s->Start());
       p.Momentum(s->Dir() * (s->_energy - p.Mass()));
       p.RecoObjInfo(s->ID(),Particle::RecoObjType_t::kShower);
       res.push_back(p);
-      */
 
       _dEdxVar->setVal(dEdx);
       if (!(dist<0)) { _radLenVar->setVal(dist); }

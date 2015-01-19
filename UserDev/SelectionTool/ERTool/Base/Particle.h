@@ -19,7 +19,7 @@
 #include "Env.h"
 #include "GeoAlgo/GeoVector.h"
 #include "ERException.h"
-#include "TDatabasePDG.h"
+
 namespace ertool {
   class Particle;
   /**
@@ -37,7 +37,7 @@ namespace ertool {
   public:
     
     /// Default constructor
-    Particle(int pdg_code=0);
+    Particle(int pdg_code=0,double mass=-1);
 
     /// Default destructor
     virtual ~Particle(){}
@@ -51,7 +51,7 @@ namespace ertool {
     };
 
     /// Initializer
-    void Init(int pdg_code);
+    void Reset();
 
     //
     // Getters

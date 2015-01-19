@@ -49,8 +49,6 @@ namespace ertool {
     /// Function to reconstruct the start-point isolated electrons
     virtual ParticleSet Reconstruct(const EventData &data);
 
-
-
   private:
 
     /// Function that takes in shower and decides if it is likely electron
@@ -68,12 +66,13 @@ namespace ertool {
 
   protected:
 
+    double _e_mass;
+
     AlgoEMPart _alg_emp;
 
-
     //debug histos
-    TH1F* e_ll_values;
-    TH1F* dedx_values;
+    TH1F* _e_ll_values;
+    TH1F* _dedx_values;
   };
 }
 #endif

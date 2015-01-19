@@ -18,6 +18,7 @@
 #include "Base/AlgoBase.h"
 #include "Base/PdfFactory.h"
 #include "Base/RangeVar.h"
+#include "TDatabasePDG.h"
 #include <RooPlot.h>
 #include <RooProdPdf.h>
 #include <TCanvas.h>
@@ -74,16 +75,19 @@ namespace ertool {
 
   protected:
 
-    PdfFactory _factory;
+    PdfFactory _factory; ///< P.D.F. factory class instance
 
-    bool _verbose; /// verbosity mode for debug
+    double _e_mass; ///< Electron's mass
+    double _g_mass; ///< Gamma's mass
+
+    bool _verbose; ///< verbosity mode for debug
     bool _mode;    ///< e-/gamma mode (true: gamma, false: e-)
     
     // Variables
-    RangeVar _e_dedx_fit_range;  ///< electron dE/dx [MeV/cm] range for fit
-    RangeVar _e_radlen_fit_range;  ///< electron radiation length [cm] range for fit
-    RangeVar _g_dedx_fit_range;  ///< gamma dE/dx [MeV/cm] range for fit
-    RangeVar _g_radlen_fit_range;  ///< gamma radiation length [cm] range for fit
+    RangeVar _e_dedx_fit_range;   ///< electron dE/dx [MeV/cm] range for fit
+    RangeVar _e_radlen_fit_range; ///< electron radiation length [cm] range for fit
+    RangeVar _g_dedx_fit_range;   ///< gamma dE/dx [MeV/cm] range for fit
+    RangeVar _g_radlen_fit_range; ///< gamma radiation length [cm] range for fit
 
     // Variables
     RooRealVar* _dEdxVar;      ///< dE/dx [MeV/cm] range

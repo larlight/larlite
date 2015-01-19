@@ -13,9 +13,11 @@ namespace ertool {
   AlgoSingleE::AlgoSingleE() : AlgoBase()
   {
 
-    _name     = "AlgoSingleE";
-    e_ll_values = 0;
-    dedx_values = 0;
+    _name       = "AlgoSingleE";
+    _e_mass     = TDatabasePDG().GetParticle(11)->Mass();
+    _e_ll_values = 0;
+    _dedx_values = 0;
+
   }
 
   void AlgoSingleE::Reset()
@@ -35,11 +37,11 @@ namespace ertool {
     //kaleko
     _alg_emp.SetMode(true);
 
-    if(!e_ll_values)
-      e_ll_values = new TH1F("e_ll_values","e_ll_values",1000,-1,0);
+    if(!_e_ll_values)
+      _e_ll_values = new TH1F("e_ll_values","e_ll_values",1000,-1,0);
 
-    if(!dedx_values)
-      dedx_values = new TH1F("dedx_values","dedx_values",1000,0,8);
+    if(!_dedx_values)
+      _dedx_values = new TH1F("dedx_values","dedx_values",1000,0,8);
 
     return;
   }
@@ -89,13 +91,13 @@ namespace ertool {
     //if dedx value == 0, we don't know whether this is electron,
     //so let's assume it isn't.
     if(shower->_dedx < 0.02 || shower->_dedx > 10.) return false;
-    dedx_values->Fill(shower->_dedx);
+    _dedx_values->Fill(shower->_dedx);
     
 
     
     nonzero_dedx_counter++;
     
-    e_ll_values->Fill(
+    _e_ll_values->Fill(
       _alg_emp.LL(true,shower->_dedx,-1.));
 
     
@@ -193,11 +195,11 @@ namespace ertool {
     if(fout){
       fout->cd();
       
-      if(e_ll_values)
-	e_ll_values->Write();
+      if(_e_ll_values)
+	_e_ll_values->Write();
 
-      if(dedx_values)
-	dedx_values->Write();
+      if(_dedx_values)
+	_dedx_values->Write();
     }
 
   }
