@@ -31,7 +31,7 @@
 #include "RooClassFactory.h"
 #include "ERException.h"
 #include "Env.h"
-
+#include <map>
 namespace ertool {
 
   typedef std::vector<RooRealVar> RooRealVars_t;
@@ -59,17 +59,13 @@ namespace ertool {
     virtual ~PdfFactory(){};
     
     /// Instantiate radiation-length PDF
-    RooAbsPdf* RadLenPdf(RooRealVar &x, RooRealVar &l) const;
-
-    RooAbsPdf* RadLenPdfMod(RooRealVar &t, RooRealVar &tau) const;
-
+    RooAbsPdf* RadiationLength(const std::string& name, RooRealVar& x);
+    
     /// Instantiate dEdx PDF
-    RooAbsPdf* dEdxPdf(RooRealVar &x, RooRealVar &mu, RooRealVar &sigma) const;
+    RooAbsPdf* dEdxGaus(const std::string& name, RooRealVar& x);
 
     /// Instantiate dEdx PDF for gammas
-    RooAbsPdf* dEdxPdf_gamma(RooRealVar &_g_dEdxVar, RooRealVar &f,
-			     RooRealVar &mu1, RooRealVar &sigma1,
-			     RooRealVar &mu2, RooRealVar &sigma2) const;
+    RooAbsPdf* dEdxDGaus(const std::string& name, RooRealVar& x);
     
     /// Instantiate dEdx PDF for gauss convolved with landau
     RooAbsPdf* dEdxConv(RooRealVar &x,
@@ -89,6 +85,12 @@ namespace ertool {
     RooAbsPdf* Pi0ShrCorrelation(RooRealVar& x,
 				 RooRealVar& l) const;
 
+  private:
+    void Register(RooRealVar* var);
+    void Register(RooAbsPdf* pdf);
+
+    std::map<std::string,RooRealVar*> _vars;
+    std::map<std::string,RooAbsPdf*>  _pdfs;
   };
 }
 

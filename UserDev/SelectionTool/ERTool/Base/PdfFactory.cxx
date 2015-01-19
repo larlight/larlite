@@ -5,42 +5,95 @@
 
 namespace ertool {
 
-  RooAbsPdf*  PdfFactory::RadLenPdf(RooRealVar &x, RooRealVar &l) const
-  {
-    // Instantiate pdf and return
-    return new RooExponential("_RadLenPDF","Radiation Length",x,l);
+  void PdfFactory::Register(RooRealVar* var) {
+
+    if( _vars.find(var->GetName()) != _vars.end() )
+      throw ERException(Form("RooRealVar with a name \"%s\" already created!",var->GetName()));
+    _vars[var->GetName()] = var;
+
   }
 
-  RooAbsPdf*  PdfFactory::RadLenPdfMod(RooRealVar &t, RooRealVar &tau) const
-  {
-    // Instantiate pdf and return
-    return new RooExponential("_RadLenPDF","Radiation Length",t,tau);
+  void PdfFactory::Register(RooAbsPdf* pdf) {
+
+    if( _pdfs.find(pdf->GetName()) != _pdfs.end() )
+      throw ERException(Form("RooAbsPdf with a name \"%s\" already created!",pdf->GetName()));
+    _pdfs[pdf->GetName()] = pdf;
+
   }
 
-  
-  RooAbsPdf* PdfFactory::dEdxPdf(RooRealVar &x, RooRealVar &mu, RooRealVar &sigma) const
+  RooAbsPdf*  PdfFactory::RadiationLength(const std::string& name,
+					  RooRealVar &x)
   {
-    return new RooGaussian("_dEdxPdf","dEdx Pdf", x, mu, sigma);
+
+    auto tau = new RooRealVar(Form("%s_radLen_tau",name.c_str()),
+			      Form("Radiation length [cm] for %s", name.c_str()),
+			      -2000.,-1.e4,0.);
+    Register(tau);
+    std::cout<<"tau ptr: "<<tau<<std::endl;
+    auto res = new RooExponential(Form("%s_radLen_pdf",name.c_str()),
+				  Form("Radiation length PDF for %s",name.c_str()),
+				  x,*tau);
+    Register(res);
+    return res;
   }
 
-  RooAbsPdf* PdfFactory::dEdxPdf_gamma(RooRealVar &x, RooRealVar &f,
-				       RooRealVar &mu1, RooRealVar &sigma1,
-				       RooRealVar &mu2, RooRealVar &sigma2) const
+  RooAbsPdf* PdfFactory::dEdxGaus(const std::string& name,
+				  RooRealVar &x)
   {
-    RooGaussian* _g1 = new RooGaussian("_dEdxPdf_gamma1","dEdx Pdf", x, mu1, sigma1);
-    RooGaussian* _g2 = new RooGaussian("_dEdxPdf_gamma2","dEdx Pdf", x, mu2, sigma2);
+    auto mean = new RooRealVar(Form("%s_dEdxGaus_mean",  name.c_str()),
+			       Form("Single gaussian dE/dx mean [MeV/cm] for %s",name.c_str()),
+			       2.,1.,3.);
+    Register(mean);
 
-    // weird error when doing RooAddPdf: 
-    // [#0] ERROR:LinkStateMgmt -- RooAbsArg::recursiveCheckObservables(_dEdxPdf_gamma):
-    // ERROR: one or more servers of node _dEdxPdf_gamma no longer exists!
-    //return new RooAddPdf("_dEdxPdf_gamma","dEdx PDF Gamma",RooArgList(*_g1,*_g2),f);
-    return new RooAddPdf("_dEdxPdf_gamma","dEdx PDF Gamma",*_g1,*_g2,f);
-    /*
-    RooAbsPdf* genpdf = RooClassFactory::makePdfInstance("dEdxGamma",
-							 "_g_dedxfrac * 1./(sqrt(2*3.14*pow(_g_dedxsigma1,2)))*exp(-(pow((_dEdx-_g_dedxmu1),2))/(2*pow(_g_dedxsigma1,2))) + (1-_g_dedxfrac) * 1./(sqrt(2*3.14*pow(_g_dedxsigma2,2)))*exp(-(pow((_dEdx-_g_dedxmu2),2))/(2*pow(_g_dedxsigma2,2)))",
-							 RooArgSet(x,mu1,sigma1,mu2,sigma2,f));
-    */    
-    //return genpdf;
+    auto sigma = new RooRealVar(Form("%s_dEdxGaus_sigma", name.c_str()),
+				Form("Single gaussian dE/dx sigma [MeV/cm] for %s",name.c_str()),
+				0.6,0.,2.);
+    Register(sigma);
+
+    auto res = new RooGaussian(Form("%s_dEdxGaus_pdf",   name.c_str()),
+			       Form("dE/dx Pdf for %s",name.c_str()),
+			       x, *mean, *sigma);
+
+    Register(res);
+
+    return res;
+  }
+
+  RooAbsPdf* PdfFactory::dEdxDGaus(const std::string& name,
+				   RooRealVar &x)
+  {
+    auto himean = new RooRealVar(Form("%s_dEdxGaus_mean",name.c_str()),
+				 Form("Double gaussian dE/dx hi mean [MeV/cm] for %s",name.c_str()),
+				 4.,3.,5.);
+    Register(himean);
+    auto hisigma = new RooRealVar(Form("%s_dEdxGaus_sigma",name.c_str()),
+				  Form("Double gaussian dE/dx hi mean sigma [MeV/cm] for %s",name.c_str()),
+				  1.,0.,2.);
+    Register(hisigma);
+    auto lowmean = new RooRealVar(Form("%s_dEdxGaus_mean_low",name.c_str()),
+				  Form("Double gaussian dE/dx low mean [MeV/cm] for %s",name.c_str()),
+				  2.,1.,3.);
+    Register(lowmean);
+    auto lowsigma = new RooRealVar(Form("%s_dEdxGaus_sigma_low",name.c_str()),
+				   Form("Double gaussian dE/dx low mean sigma [MeV/cm] for %s",name.c_str()),
+				   1.,0.,2.);
+    Register(lowsigma);
+    auto frac = new RooRealVar(Form("%s_dEdxGaus_fraction",name.c_str()),
+			       "Fractional amplitude of a higher gaussian peak",
+			       1.0,0.0,1.0);
+    Register(frac);
+
+    auto res = new RooAddPdf(Form("%s_dEdxDoubleGaus_pdf",name.c_str()),
+			     Form("dE/dx Pdf for %s",name.c_str()),
+			     *(new RooGaussian(Form("%s_dEdxPdf_lowGaus",name.c_str()),
+					       Form("Lower peak gaussian for %s",name.c_str()),
+					       x, *lowmean, *lowsigma)),
+			     *(new RooGaussian(Form("%s_dEdxPdf_hiGaus",name.c_str()),
+					       Form("Higher peak gaussian for %s",name.c_str()),
+					   x, *himean, *hisigma)),
+			     *frac);
+    Register(res);
+    return res;
   }
 
   RooAbsPdf* PdfFactory::dEdxConv(RooRealVar &x,

@@ -64,24 +64,26 @@ namespace ertool {
     double LL(bool is_electron, double dedx, double rad_length = -1.);
 
     /// Set bounds for dEdx PDF fitting
-    void SetFitRange_dEdx   (double min, double max, bool electron=true);
+    void SetFitRange_dEdx   (double min, double max, bool gamma=true);
 
     /// Set bounds for radiation length PDF fitting
-    void SetFitRange_RadLen (double min, double max, bool electron=true);
+    void SetFitRange_RadLen (double min, double max, bool gamma=true);
 
     /// Set verbosity mode
     void setVerbose(bool on) { _verbose = on; }
 
   protected:
 
+    PdfFactory _factory;
+
     bool _verbose; /// verbosity mode for debug
     bool _mode;    ///< e-/gamma mode (true: gamma, false: e-)
     
     // Variables
     RangeVar _e_dedx_fit_range;  ///< electron dE/dx [MeV/cm] range for fit
-    RangeVar _e_radl_fit_range;  ///< electron radiation length [cm] range for fit
+    RangeVar _e_radlen_fit_range;  ///< electron radiation length [cm] range for fit
     RangeVar _g_dedx_fit_range;  ///< gamma dE/dx [MeV/cm] range for fit
-    RangeVar _g_radl_fit_range;  ///< gamma radiation length [cm] range for fit
+    RangeVar _g_radlen_fit_range;  ///< gamma radiation length [cm] range for fit
 
     // Variables
     RooRealVar* _dEdxVar;      ///< dE/dx [MeV/cm] range
@@ -102,6 +104,8 @@ namespace ertool {
     // gamma dEdx PDF
     RooAbsPdf*  _g_dEdxPdf;    ///< gamma dEdx Pdf
     RooDataSet* _g_dEdxData;   ///< gamma dEdx data set
+
+    RooRealVar *_tmp_mean, *_tmp_sigma;
 
   };
 }
