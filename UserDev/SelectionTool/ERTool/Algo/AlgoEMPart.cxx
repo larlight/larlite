@@ -125,7 +125,7 @@ namespace ertool {
     if(_params.exist_darray("g_params")) {
       auto darray = _params.get_darray("g_params");
       RooRealVar *tau, *mean1, *mean2, *sigma1, *sigma2, *frac;
-      tau = (RooRealVar*)(_e_radLenPdf->getVariables()->find("g_radLen"));
+      tau = (RooRealVar*)(_g_radLenPdf->getVariables()->find("g_radLen_tau"));
       tau->setVal   ( (*darray)[0]               );
       tau->setRange ( (*darray)[1], (*darray)[2] );
 
@@ -157,13 +157,13 @@ namespace ertool {
     if(_params.exist_darray("e_params")) {
       auto darray = _params.get_darray("e_params");
       RooRealVar *tau, *mean, *sigma;
-      tau = (RooRealVar*)(_e_radLenPdf->getVariables()->find("e_radLen"));
+      tau = (RooRealVar*)(_e_radLenPdf->getVariables()->find("e_radLen_tau"));
       tau->setVal   ( (*darray)[0]               );
       tau->setRange ( (*darray)[1], (*darray)[2] );
 
-      mean  = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("e_dEdxGaus_mean"));
+      mean  = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_dEdxGaus_mean"));
       mean->setVal  ( (*darray)[3] );
-      sigma = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("e_dEdxGaus_sigma"));
+      sigma = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_dEdxGaus_sigma"));
       sigma->setVal ( (*darray)[4] );
 
       std::cout<<"["<<__FUNCTION__<<"] "
