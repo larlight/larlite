@@ -21,4 +21,5 @@ rootlibmap libSelectionTool_ERAlgo.rootmap libSelectionTool_ERAlgo.so \
     libBasicTool_EMShowerTools.so \
     libSelectionTool_ERBase.so \
     libGpad.so \
+    libEG.so  \
     libHist.so

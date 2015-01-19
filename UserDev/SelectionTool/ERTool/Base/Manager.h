@@ -97,7 +97,14 @@ namespace ertool {
     /// Training mode
     bool _training_mode;
 
+    /// Profile mode
+    bool _profile_mode;
+
   protected:
+
+    std::pair<double,double> _tprof_algo, _tprof_filter;
+    double _time_algo_init, _time_filter_init;
+    double _time_algo_finalize, _time_filter_finalize;
 
     TStopwatch fWatch;
 
