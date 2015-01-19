@@ -33,6 +33,7 @@ def main():
     my_algo = ertool.AlgoEMPart()
     my_algo.set_e_dEdxFitRange(1.2,2); # To set range for fitting for dEdx
     my_algo.set_g_dEdxFitRange(3,4.5);
+    my_algo.setVerbose(False)
     # Create analysis unit
     my_ana = fmwk.ExampleERSelection()
 

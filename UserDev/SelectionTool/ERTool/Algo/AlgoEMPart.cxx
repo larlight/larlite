@@ -7,23 +7,16 @@ namespace ertool {
 
   AlgoEMPart::AlgoEMPart() 
     : AlgoBase()
-    , _dEdxVar(nullptr)
-    , _radLenVar(nullptr)
-    , _e_radLenPdf(nullptr)
     , _e_radLenData(nullptr)
-    , _e_radLenVal(nullptr)
-    , _e_landauMu(nullptr)
-    , _e_landauSigma(nullptr)
-    , _e_dEdxConvPdf(nullptr)
-    , _g_landauMu(nullptr)
-    , _g_landauSigma(nullptr)
-    , _g_dEdxConvPdf(nullptr)
+    , _e_dEdxData(nullptr)
+    , _g_radLenData(nullptr)
+    , _g_dEdxData(nullptr)
   { 
 
     _name = "AlgoEMPart";
 
-    _dEdxVar   = new RooRealVar("empart_dedx","dE/dx [MeV/cm] Variable",0,50);
-    _radLenVar = new RooRealVar("empart_radlen","Radiation Length [cm] Variable",-10000,0);
+    _dEdxVar   = new RooRealVar("empart_dedx","dE/dx [MeV/cm] Variable",0.,50.);
+    _radLenVar = new RooRealVar("empart_radlen","Radiation Length [cm] Variable",-10000.,0.);
 
     PdfFactory factory;
 
@@ -40,8 +33,25 @@ namespace ertool {
     SetDefaultParams();
   }
 
+  void AlgoEMPart::SetFitRange_dEdx(double min, double max, bool electron)
+  {
+    if(electron)
+      _e_dedx_fit_range.Set((max-min)/2.,min,max);
+    else
+      _g_dedx_fit_range.Set((max-min)/2.,min,max);
+  }
+
+  void AlgoEMPart::SetFitRange_RadLen(double min, double max, bool electron)
+  {
+    if(electron)
+      _e_radlen_fit_range.Set((max-min)/2.,min,max);
+    else
+      _g_radlen_fit_range.Set((max-min)/2.,min,max);
+  }
+
   void AlgoEMPart::SetDefaultParams()
   {
+
     RooRealVar *var;
     // Electron PDFs
     var = (RooRealVar*)(_e_radLenPdf->getVariables()->find("electron_radLen"));
@@ -158,7 +168,6 @@ namespace ertool {
   void AlgoEMPart::ProcessBegin()
   {
 
-
     std::string part_name;
     
     part_name = "electron";
@@ -180,7 +189,6 @@ namespace ertool {
     _g_radLenData = new RooDataSet(Form("%s_radLenData",part_name.c_str()),
 				   "EMPart radiation length data sample",
 				   RooArgSet(*_radLenVar));
-
   }
 
   double AlgoEMPart::LL(bool is_electron, double dedx, double rad_length)
@@ -219,7 +227,7 @@ namespace ertool {
   ParticleSet AlgoEMPart::Reconstruct(const EventData &data)
   {
     ParticleSet res;
-    
+
     for(auto const& s : data.Shower()) {
 
       double dist   = -1.;
@@ -227,7 +235,7 @@ namespace ertool {
 
       // skip if dEdx out of bounds
       if ( !_dEdxVar->inRange( dEdx, 0 ) ) continue;
-      
+
       if(data.Vertex().size())
 	dist = s->Start().Dist((*data.Vertex()[0]));
       
@@ -277,8 +285,6 @@ namespace ertool {
   void AlgoEMPart::ProcessEnd(TFile* fout)
   {
 
-    TCanvas *c = new TCanvas("c","",1000,500);
-
     RooMsgService::instance().setSilentMode(true);
 
     // if in training mode make a plot of dEdx & radLen
@@ -287,123 +293,77 @@ namespace ertool {
     // and gammas, with the RooDataSets of both that were
     // produced during the selection process.
     
+    RooFitResult* fit_res_radLen = nullptr;
+    RooFitResult* fit_res_dEdx   = nullptr;
+    
     if (_training_mode){
 
-      // Plot a bunch of stuff!
-      RooPlot* frame_radLen = nullptr;
-      RooPlot* frame_dEdx   = nullptr;
-      RooFitResult* fit_res_radLen = nullptr;
-      RooFitResult* fit_res_dEdx   = nullptr;
-      std::string part_name = "gamma";
-      if(!_mode) part_name = "electron";
+      // Fit and maybe save parameters
+      std::string part_name   = "gamma";
+      std::string part_letter = "g";
+      if(!_mode){
+	part_name  = "electron";
+	part_letter = "e";
+      }
 
       if(_mode) {
-	frame_radLen = _radLenVar->frame();
-	frame_dEdx   = _dEdxVar->frame();
-	_g_radLenData->plotOn(frame_radLen);
-	_g_dEdxData->plotOn(frame_dEdx);
-
-	fit_res_radLen = _g_radLenPdf->fitTo(*_g_radLenData,RooFit::Save(),RooFit::PrintLevel(-1));
-	std::cout << "Fit results for gamma radLength." << std::endl;
-	fit_res_radLen->Print();
-	//fit_res_dEdx   = _g_dEdxPdf->fitTo(*_g_dEdxData, RooFit::Range(_g_dedx_fitMin, _g_dedx_fitMax), RooFit::Save(),RooFit::PrintLevel(-1));
-	fit_res_dEdx   = _g_dEdxPdf->fitTo(*_g_dEdxData, RooFit::Range(_g_dedx_fitMin, _g_dedx_fitMax), RooFit::Save(),RooFit::PrintLevel(-1));
-	fit_res_dEdx->Print();
-	_g_radLenPdf->plotOn(frame_radLen);
-	_g_dEdxPdf->plotOn(frame_dEdx);
+	fit_res_radLen = _g_radLenPdf->fitTo(*_g_radLenData,
+					     RooFit::Range(_g_radlen_fit_range.Min(),_g_radlen_fit_range.Max()),
+					     RooFit::Save(),
+					     RooFit::PrintLevel(-1)
+					     );
+	if (_verbose) { fit_res_radLen->Print(); }
+	fit_res_dEdx   = _g_dEdxPdf->fitTo(*_g_dEdxData, 
+					   RooFit::Range(_g_dedx_fit_range.Min(), _g_dedx_fit_range.Max()), 
+					   RooFit::Save(),
+					   RooFit::PrintLevel(-1)
+					   );
+	if (_verbose) { fit_res_dEdx->Print(); }
       }
       else{
-	part_name = "electron";
-	frame_radLen = _radLenVar->frame();
-	frame_dEdx   = _dEdxVar->frame();
-	_e_radLenData->plotOn(frame_radLen);
-	_e_dEdxData->plotOn(frame_dEdx);
+	fit_res_radLen = _e_radLenPdf->fitTo(*_e_radLenData,
+					     RooFit::Range(_e_dedx_fit_range.Min(), _e_dedx_fit_range.Max()),
+					     RooFit::Save(),
+					     RooFit::PrintLevel(-1)
+					     );
+	if (_verbose) { fit_res_radLen->Print(); }
+	fit_res_dEdx   = _e_dEdxPdf->fitTo(*_e_dEdxData, 
+					   RooFit::Range(_e_dedx_fit_range.Min(), _e_dedx_fit_range.Max()), 
+					   RooFit::Save(),
+					   RooFit::PrintLevel(-1)
+					   );
+	if (_verbose) { fit_res_dEdx->Print(); }
 
-	fit_res_radLen = _e_radLenPdf->fitTo(*_e_radLenData,RooFit::Save(),RooFit::PrintLevel(-1));
-	std::cout << "Fit results for electron radLength." << std::endl;
-	fit_res_radLen->Print();
-	//fit_res_dEdx   = _e_dEdxPdf->fitTo(*_e_dEdxData, RooFit::Range(_e_dedx_fitMin, _e_dedx_fitMax), RooFit::Save(),RooFit::PrintLevel(-1));
-	fit_res_dEdx   = _e_dEdxPdf->fitTo(*_e_dEdxData, RooFit::Range(_e_dedx_fitMin, _e_dedx_fitMax), RooFit::Save(),RooFit::PrintLevel(-1));
-	fit_res_dEdx->Print();
-	_e_radLenPdf->plotOn(frame_radLen);
-	_e_dEdxPdf->plotOn(frame_dEdx);
       }
-      
-      c->SetTitle(Form("Distance PDF for %s",part_name.c_str()));
-      frame_radLen->Draw();
-      c->SaveAs(Form("RadLength_%s.png",part_name.c_str()));
-      
-      c->SetTitle("Selection Likelihood");
-      frame_dEdx->Draw();
-      c->SaveAs(Form("dEdx_%s.png",part_name.c_str()));
 
-      // Start saving fit values
-      // Before doing so clear the _params to be stored
-      //_params.clear_data();
-      // Now load params (the ones that will actually be stores will be over-written
-      //LoadParams();
-      /*      
+      // Save parameters
       RooRealVar* res_value_radLen = nullptr;
-      RooRealVar* res_value_dEdxFrac = nullptr;
       RooRealVar* res_value_dEdxMu = nullptr;
       RooRealVar* res_value_dEdxSigma = nullptr;
-      RooRealVar* res_value_dEdxMu1 = nullptr;
-      RooRealVar* res_value_dEdxSigma1 = nullptr;
-      RooRealVar* res_value_dEdxMu2 = nullptr;
-      RooRealVar* res_value_dEdxSigma2 = nullptr;
-      if(_mode){
-	res_value_radLen = (RooRealVar*)(fit_res_radLen->floatParsFinal().find("_g_l"));
-	res_value_dEdxFrac   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_g_dedxfrac"));
-	res_value_dEdxMu1   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_g_dedxmu1"));
-	res_value_dEdxSigma1   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_g_dedxsigma1"));
-	res_value_dEdxMu2   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_g_dedxmu2"));
-	res_value_dEdxSigma2   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_g_dedxsigma2"));
-	std::cout << "["<<__FUNCTION__<<"] " << Form("Extracted %s_params... ",part_name.c_str()) << std::endl;
-	std::cout << "["<<__FUNCTION__<<"] "
-		  << "RadLen: "<< res_value_radLen->getVal() << " [" << res_value_radLen->getErrorLo() + res_value_radLen->getVal()
-		  << " => " << res_value_radLen->getErrorHi() + res_value_radLen->getVal() << "]" << std::endl;
-	std::cout << "["<<__FUNCTION__<<"] "
-		  << "dEdx: Mu1: " << res_value_dEdxMu1->getVal() << " Sigma1: " << res_value_dEdxSigma1->getVal() << std::endl
-		  << "["<<__FUNCTION__<<"] "
-		  << "dEdx: Mu2: " << res_value_dEdxMu2->getVal() << " Sigma2: " << res_value_dEdxSigma2->getVal() << std::endl
-		  << "["<<__FUNCTION__<<"] "
-		  << "Frac: " << res_value_dEdxFrac->getVal() << std::endl;
-	_params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal());
-	_params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorLo());
-	_params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorHi());
-	_params.append(Form("%s_params",part_name.c_str()),res_value_dEdxMu1->getVal());
-	_params.append(Form("%s_params",part_name.c_str()),res_value_dEdxSigma1->getVal());
-	_params.append(Form("%s_params",part_name.c_str()),res_value_dEdxMu2->getVal());
-	_params.append(Form("%s_params",part_name.c_str()),res_value_dEdxSigma2->getVal());
-	_params.append(Form("%s_params",part_name.c_str()),res_value_dEdxFrac->getVal());
-      }
-      else{
-	res_value_radLen = (RooRealVar*)(fit_res_radLen->floatParsFinal().find("_e_l"));
-	res_value_dEdxMu   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_e_dEdxMu"));
-	res_value_dEdxSigma   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find("_e_dEdxSigma"));
-	std::cout << "["<<__FUNCTION__<<"] " << Form("Extracted %s_params... ",part_name.c_str()) << std::endl;
-	std::cout << "["<<__FUNCTION__<<"] "
-		  << "RadLen: "<< res_value_radLen->getVal() << " [" << res_value_radLen->getErrorLo() + res_value_radLen->getVal()
-		  << " => " << res_value_radLen->getErrorHi() + res_value_radLen->getVal() << "]" << std::endl;
-	std::cout << "["<<__FUNCTION__<<"] "
-		  << "dEdx: Mu: " << res_value_dEdxMu->getVal() << " Sigma: " << res_value_dEdxSigma->getVal() << std::endl;
-	_params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal());
-	_params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorLo());
-	_params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorHi());
-	_params.append(Form("%s_params",part_name.c_str()),res_value_dEdxMu->getVal());
-	_params.append(Form("%s_params",part_name.c_str()),res_value_dEdxSigma->getVal());
-      }
+      res_value_radLen = (RooRealVar*)(fit_res_radLen->floatParsFinal().find(Form("_%s_l",part_letter.c_str())));
+      res_value_dEdxMu   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("_%s_dEdxMu",part_letter.c_str())));
+      res_value_dEdxSigma   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("_%s_dEdxSigma",part_letter.c_str())));
+      std::cout << "["<<__FUNCTION__<<"] " << Form("Extracted %s_params... ",part_name.c_str()) << std::endl;
+      std::cout << "["<<__FUNCTION__<<"] "
+		<< "RadLen: "<< res_value_radLen->getVal() << " [" << res_value_radLen->getErrorLo() + res_value_radLen->getVal()
+		<< " => " << res_value_radLen->getErrorHi() + res_value_radLen->getVal() << "]" << std::endl;
+      std::cout << "["<<__FUNCTION__<<"] "
+		<< "dEdx: Mu: " << res_value_dEdxMu->getVal() << " Sigma: " << res_value_dEdxSigma->getVal() << std::endl;
+      _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorLo());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_radLen->getVal()+res_value_radLen->getErrorHi());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_dEdxMu->getVal());
+      _params.append(Form("%s_params",part_name.c_str()),res_value_dEdxSigma->getVal());
+
+
+
+    }// if in traning mode
       
-      //_params.dump_contents();
-      if(_params.exist_darray("rad_range"))
-	_params.get_darray("rad_range")->clear();
-      _params.append("rad_range",_xmin);
-      _params.append("rad_range",_xmax);
-      if(_params.exist_darray("dedx_range"))
-      _params.get_darray("dedx_range")->clear();
-      _params.append("dedx_range",_dedxmin);
-      _params.append("dedx_range",_dedxmax);
-      */      
+    // Plot the likelyhoods if in verbose mode
+    if (_verbose){
+
+      TCanvas *c = new TCanvas("c","",1000,500);
+      
       // Rad Length likelyhood
       TH1D *h11_radLen = new TH1D("h11_radLen","Electron vs. Gamma Likelihood; Rad. Length [cm]; Likelihood",100,0,0.1);
       TH1D *h22_radLen = new TH1D("h22_radLen","Electron vs. Gamma Likelihood; Rad. Length [cm]; Likelihood",100,0,0.1);
@@ -411,10 +371,10 @@ namespace ertool {
       for(size_t i=0; i<100; ++i) {
 	_radLenVar->setVal(0.1*i/100.);
 	
-	h11_radLen->SetBinContent(i,_e_radLenPdf->getVal(*_radLenVar) / (_e_radLenPdf->getVal(*_radLenVar) + _g_radLenPdf->getVal(*_radLenVar)));
-	h22_radLen->SetBinContent(i,_g_radLenPdf->getVal(*_radLenVar) / (_e_radLenPdf->getVal(*_radLenVar) + _g_radLenPdf->getVal(*_radLenVar)));
+	h11_radLen->SetBinContent(i,_e_radLenPdf->getVal(*_radLenVar)/(_e_radLenPdf->getVal(*_radLenVar)+_g_radLenPdf->getVal(*_radLenVar)));
+	h22_radLen->SetBinContent(i,_g_radLenPdf->getVal(*_radLenVar)/(_e_radLenPdf->getVal(*_radLenVar)+_g_radLenPdf->getVal(*_radLenVar)));
       }
-
+      
       h11_radLen->SetLineWidth(2);
       h11_radLen->SetLineColor(kBlue);
       h11_radLen->SetFillStyle(3004);
@@ -429,7 +389,6 @@ namespace ertool {
       h11_radLen->Draw();
       h22_radLen->Draw("sames");
       c->SaveAs("Likelihood_radLen.png");
-      
       
       TH1D *h11_dEdx = new TH1D("h11_dEdx","Electron vs. Gamma Likelihood; dEdx [MeV/cm]; Likelihood",100,0,8);
       TH1D *h22_dEdx = new TH1D("h22_dEdx","Electron vs. Gamma Likelihood; dEdx [MeV/cm]; Likelihood",100,0,8);
@@ -456,47 +415,32 @@ namespace ertool {
       h22_dEdx->Draw("sames");
       c->SaveAs("Likelihood_dEdx.png");
       
+      
       delete h11_dEdx;
       delete h22_dEdx;
-      
       
       // for fun make a ProdPdf to plot 2D Pdf surface
       RooProdPdf ePDF("ePDF","ePDF",RooArgSet(*_e_radLenPdf,*_e_dEdxPdf));
       RooProdPdf gPDF("gPDF","gPDF",RooArgSet(*_g_radLenPdf,*_g_dEdxPdf));
-      
-      // data set
-      //RooDataSet* data2D = gPDF.generate(RooArgSet(*_radLenVar,*_dEdxVar),10000);
-      // Histo
-      //TH1* hh_data = data2D->createHistogram("hh_data",*_radLenVar,RooFit::Binning(100,0,1000),
-      //					   RooFit::YVar(*_dEdxVar,RooFit::Binning(100,0,8)) );
-      
       TH1* h_2D = gPDF.createHistogram("gamma radLen vs. dEdx",*_radLenVar,RooFit::Binning(100,0,30),
 				       RooFit::YVar(*_dEdxVar,RooFit::Binning(100,0,8)) ); 
       h_2D->Draw("SURF3");
       c->SaveAs("radLen_vs_dEdx_2DPDF_gamma.png");
-      
       delete h_2D;
-      
       h_2D = ePDF.createHistogram("electron radLen vs. dEdx",*_radLenVar,RooFit::Binning(100,0,0.002),
 				  RooFit::YVar(*_dEdxVar,RooFit::Binning(100,0,8)) ); 
       h_2D->Draw("SURF3");
       c->SaveAs("radLen_vs_dEdx_2DPDF_electron.png");
-      
       delete h_2D;
       
-      
-    }// if in training mode
-    
-    // if in selection mode
-    else {
       
       // Plot a bunch of stuff!
       RooPlot* frame_radLen = nullptr;
       RooPlot* frame_dEdx   = nullptr;
-
+      
       frame_radLen = _radLenVar->frame();
       frame_dEdx   = _dEdxVar->frame();
-
+      
       _g_radLenData->plotOn(frame_radLen,RooFit::MarkerColor(kRed),RooFit::LineColor(kRed));
       _g_dEdxData->plotOn(frame_dEdx,RooFit::MarkerColor(kRed),RooFit::LineColor(kRed));
       _g_dEdxPdf->plotOn(frame_dEdx,RooFit::LineColor(kRed));
@@ -514,17 +458,19 @@ namespace ertool {
       frame_dEdx->Draw();
       c->SaveAs("dEdx_Selected.png");
 
-    }// if in selection mode
+      delete c;
+	
+    } // if verbose then plot the likelyhoods
     
-    delete c;
-
     // Print How many of each kind were found
-    std::cout << "******************************************" << std::endl
-	      << "Total Showers scanned            : " << _e_dEdxData->numEntries() + _g_dEdxData->numEntries() << std::endl
-	      << "Total Electron Showers identified: " << _e_dEdxData->numEntries() << std::endl
-	      << "Total Photon Showers identified  : " << _g_dEdxData->numEntries() << std::endl
-	      << "******************************************" << std::endl;
-  
+    if (_verbose) {
+      std::cout << "******************************************" << std::endl
+		<< "Total Showers scanned            : " << _e_dEdxData->numEntries() + _g_dEdxData->numEntries() << std::endl
+		<< "Total Electron Showers identified: " << _e_dEdxData->numEntries() << std::endl
+		<< "Total Photon Showers identified  : " << _g_dEdxData->numEntries() << std::endl
+		<< "******************************************" << std::endl;
+    }
+    
   }
   
 }
