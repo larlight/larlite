@@ -62,6 +62,9 @@ namespace ertool {
     /// Instantiate radiation-length PDF
     RooAbsPdf* RadiationLength(const std::string& name, RooRealVar& x);
     
+    /// Instantiate generic Gaussian PDF
+    RooAbsPdf* Gaus(const std::string& name, RooRealVar& x);
+
     /// Instantiate dEdx PDF
     RooAbsPdf* dEdxGaus(const std::string& name, RooRealVar& x);
 
@@ -87,7 +90,7 @@ namespace ertool {
 				 RooRealVar& l) const;
 
     /// Uniform distribution PDF : a 0th order polynomial
-    RooAbsPdf* UniformDistrib(RooRealVar& x) const;
+    RooAbsPdf* UniformDistrib(const std::string& name, RooRealVar& x);
 
   private:
     void Register(RooRealVar* var);
