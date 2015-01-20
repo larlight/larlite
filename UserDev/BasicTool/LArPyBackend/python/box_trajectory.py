@@ -1,5 +1,7 @@
 from larpy import GeoViewer
 from ROOT import geoalgo
+import matplotlib.pyplot as plt
+import random
 
 k=GeoViewer()
 
@@ -12,11 +14,21 @@ for x in xrange(10):
             pt[y] = x
         elif y>=1:
             pt[y] = 5
-    print 'Adding trajectory point:',x,' ... ',pt[0],pt[1],pt[2]
+    #print 'Adding trajectory point:',x,' ... ',pt[0],pt[1],pt[2]
     trj += pt
 
 box=geoalgo.AABox(0,0,0,7,7,7)
 
-k.add(box)
-k.add(trj)
-k.show()
+
+
+# set interactive mode on
+plt.ion()
+
+for x in xrange(10):
+    line = geoalgo.LineSegment(random.random(),random.random(),random.random(),random.random(),random.random(),random.random())
+    k.add(line,"shower","green")
+    k.show()
+    counter = input('Hit Enter for next event')
+    k.clear()
+
+print "done."

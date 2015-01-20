@@ -14,8 +14,7 @@ namespace geoalgo {
     _labels.clear();
   }
 
-  void GeoObjCollection::_AddLabel_(const Point_t& pt,
-				    std::string label)
+  void GeoObjCollection::_AddLabel_(const Point_t& pt, std::string label)
   {
     auto const iter = _labels.find(pt);
     if(iter==_labels.end()) 
@@ -30,40 +29,32 @@ namespace geoalgo {
     }
   }
 
-  void GeoObjCollection::Add(const Point_t& pt,
-			     std::string name)
+  void GeoObjCollection::Add(const Point_t& pt, std::string name, std::string c)
   {
     if(name.empty()) name = Form("Pt (%zu)",_pt_v.size());
-    else name = Form("Pt (%zu): %s",_pt_v.size(),name.c_str());
     _AddLabel_(pt,name);
     _pt_v.push_back(pt);
   }
 
-  void GeoObjCollection::Add(const AABox_t& box,
-			     std::string name)
+  void GeoObjCollection::Add(const AABox_t& box, std::string name, std::string c)
   {
     if(name.empty()) name = Form("AABox (%zu)",_box_v.size());
-    else name = Form("AABox (%zu): %s",_box_v.size(),name.c_str());
     _AddLabel_(box.Min() + (box.Max() - box.Min())/2.,name);
     _box_v.push_back(box);
   }
 
-  void GeoObjCollection::Add(const LineSegment_t& seg,
-			     std::string name)
+  void GeoObjCollection::Add(const LineSegment_t& seg, std::string name, std::string c)
   {
     if(name.empty()) name = Form("LSeg (%zu)",_seg_v.size());
-    else name = Form("LSeg (%zu): %s",_seg_v.size(),name.c_str());
     _AddLabel_(seg.Start(),name);
     _seg_v.push_back(seg);
   }
 
-  void GeoObjCollection::Add(const Trajectory_t& trj,
-			     std::string name)
+  void GeoObjCollection::Add(const Trajectory_t& trj, std::string name, std::string c)
   {
     if(trj.size()<=2)
       throw GeoAlgoException("Trajectory size cannot be smaller than 2!");
     if(name.empty()) name = Form("Trj (%zu)",_trj_v.size());
-    else name = Form("Trj (%zu): %s",_trj_v.size(),name.c_str());
     _AddLabel_(trj[0],name);
     _trj_v.push_back(trj);
   }
