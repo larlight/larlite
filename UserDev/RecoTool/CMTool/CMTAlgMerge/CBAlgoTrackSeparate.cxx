@@ -56,8 +56,8 @@ namespace cmtool {
       
       size_t N_Hits1 = cluster1.GetHitVector().size();
       size_t N_Hits2 = cluster2.GetHitVector().size();
-      larutil::PxPoint start_point1 = cluster1.GetParams().start_point;
-      larutil::PxPoint start_point2 = cluster2.GetParams().start_point;
+      auto start_point1 = cluster1.GetParams().start_point;
+      auto start_point2 = cluster2.GetParams().start_point;
       double angle_2d1 = cluster1.GetParams().angle_2d;
       double angle_2d2 = cluster2.GetParams().angle_2d;
       double opening_angle1 = cluster1.GetParams().opening_angle;
