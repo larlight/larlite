@@ -83,14 +83,9 @@ namespace larlite {
     if(shower_v->size() != matched_pairs.size())
       throw ::showerreco::ShowerRecoException("Mismatch in # of showers from algorithm's return!");
 
-    for(size_t index = 0; index < shower_v->size(); ++index) {
+    for(size_t index = 0; index < shower_v->size(); ++index)
 
-      auto& result = shower_v->at(index);
-
-      // Set ID
-      result.set_id(shower_v->size());
-
-    } // done looping over matched cluster pairs
+      shower_v[i]->set_id(i);
     
     shower_v->set_association(data::kCluster,fInputProducer,matched_pairs);
     return true;
