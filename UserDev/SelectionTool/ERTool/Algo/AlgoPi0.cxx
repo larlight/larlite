@@ -203,6 +203,12 @@ namespace ertool {
     _mass = sqrt(4 * energy_a * energy_b * pow(sin(_angle/2.),2));
     mass = _mass;
 
+    // calculate momentum:
+    // add direction vectors scaled by shower energies and subtract mass
+    geoalgo::Vector_t energy(shower_a.Dir() * energy_a + shower_b.Dir() * energy_b);
+    energy *= (energy.Length() - _mass) / energy.Length();
+    mom = energy;
+
     if (_verbose) { std::cout << "reconstructed mass: " << _mass << std::endl; }
 
     // likelihood of each shower of being more e-like or g-like:
@@ -266,10 +272,7 @@ namespace ertool {
       
       LL(*(shower_v[0]),
 	 *(shower_v[1]),
-	 likelihood,
-	 mass,
-	 vertex,
-	 momentum);
+	 likelihood, mass, vertex, momentum);
       if (likelihood > best_ll) { best_ll = likelihood; best_mass = mass; }
       
       bk.book(likelihood,comb);

@@ -9,6 +9,11 @@ namespace ertool {
   {
     _name     = "AlgoLonelyE";
     _debug    = false;
+    _minDistFromTrkStart = 3;
+    _radLenCut = 30;
+    _minIPShrTrk = 3;
+    _cutDistToTrk = 10;
+    _cutDistToShr = 10;
   }
 
   void AlgoLonelyE::Reset()
@@ -34,6 +39,7 @@ namespace ertool {
 
     // What is in this event?
     if (_debug){
+      std::cout << std::endl;
       std::cout << "There are " << data.Shower().size() << " showers." << std::endl;
       std::cout << "There are " << data.Track().size() << " tracks." << std::endl << std::endl;
     }
@@ -49,7 +55,7 @@ namespace ertool {
     for(auto const& s : single_es) {
 
       // Convert shower into HalfLine
-      if (_debug) { std::cout << "Shower Energy: " << s.Energy() << std::endl; }
+      if (_debug) { std::cout << "Shower Energy: " << s.Energy() << std::endl << std::endl; }
 
       if ( isLonely(data.Shower(s.RecoObjID()), data) ) { lonely_es.push_back(s); }
     }// for all input showers from AlgoSingleE
@@ -70,6 +76,7 @@ namespace ertool {
       if (_debug) { std::cout << "Track Energy: " << t->_energy << std::endl; }
       double distToTrack  = isShowerFromTrack( shrBack, *t );
       if (distToTrack < _cutDistToTrk) { return false; }
+      if (_debug) { std::cout << std::endl; }
     }
 
     // Loop over showers
@@ -80,6 +87,7 @@ namespace ertool {
       geoalgo::HalfLine_t sBack(s2->Start(), s2->Dir()*(-1));
       double distToShower = isShowerFromShower( shrBack, sBack);
       if (distToShower < _cutDistToShr) { return false; }
+      if (_debug) { std::cout << std::endl; }
     }
     
     return true;
@@ -129,6 +137,11 @@ namespace ertool {
     // Also, require that the IP on shr to shr start be reasonable. Reasonable related to radiation lenth (even though we already should have filtered out gamma-showers
     double IP_to_Trk = trk.front().Dist(t_pt); // distance from Track Start to IP point on track
     double IP_to_Shr = shr.Start().Dist(s_pt); // distance from Shower Start to IP point on shower
+    if (_debug) {
+      std::cout << "Impact Param between Shr Backwards & Trk: " << distTrk << std::endl;
+      std::cout << "IP dist to Track: " << IP_to_Trk << std::endl;
+      std::cout << "IP dist to Shower:  " << IP_to_Shr << std::endl;
+    }
     if ( (IP_to_Trk > _minDistFromTrkStart) && (IP_to_Shr < _radLenCut) && (IP_to_Trk < _radLenCut) ){
       geoalgo::Vector_t trkDir(trk.back()-trk.front());
       trkDir.Normalize();
@@ -136,18 +149,13 @@ namespace ertool {
       shrDir.Normalize();
       // dot product
       double dotdir = shrDir.Dot(trkDir);
+      if (_debug) { std::cout << "Dot product between TrkIP-trkStart and trk Direction: " << dotdir << std::endl; }
       if (dotdir > 0){
 	// Ok, finally check IP to make sure not too large
 	if ( (distTrk < _minIPShrTrk) && (distTrk < distMin) )
 	  distMin = distTrk;
       }// if dot-product > 0
     }// if far away enough from trk start & shr start not too far from IP.
-    
-    if (_debug) {
-      std::cout << "Impact Param between Shr Backwards & Trk: " << distTrk << std::endl;
-      std::cout << "IP dist to Shower: " << IP_to_Trk << std::endl;
-      std::cout << "IP dist to Track:  " << IP_to_Shr << std::endl;
-    }
     
     return distMin;
   }
