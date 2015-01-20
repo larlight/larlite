@@ -26,8 +26,8 @@ namespace ertool {
     _fit_max    = 200;
     _angle_min  = 0.;
     _angle_max  = 3.141592653589793;
-    _IPMax  = 300.;
-    _vtxDistMax  = 1036.;
+    _IPMax  = 30000.;
+    _vtxDistMax  = 100036.;
     _vtx_err       = 2; //[ CM ]
 
     // Get PDFs
@@ -104,8 +104,8 @@ namespace ertool {
     delete _hMass;
     delete _hBestMass;
     _hMass_vs_LL = new TH2D("hMass_vs_LL","Mass vs. Likelihood",100,0,200,100,-20,2);
-    _hMass = new TH1D("hMass","Mass",100,0,300);
-    _hBestMass = new TH1D("hBestMass","BestMass",100,0,300);
+    _hMass = new TH1D("hMass","Mass",100,0,500);
+    _hBestMass = new TH1D("hBestMass","BestMass",100,0,500);
 
     // Initialize LL Tree
     delete _ll_tree;
@@ -133,7 +133,7 @@ namespace ertool {
   void AlgoPi0::LL(const Shower& shower_a,
 		   const Shower& shower_b,
 		   double& ll,
-		   double& _mass,
+		   double& mass,
 		   geoalgo::Point_t& vtx,
 		   geoalgo::Vector_t& mom)
   {
@@ -149,7 +149,7 @@ namespace ertool {
     if( (_E_A < 0) || (_E_B < 0) ) return;
 
     // dEdx should be > 1 MeV/cm (PDF for gamma is > PDF e- near 0! )
-    if( (_dedx_A < 1) || (_dedx_B < 1) ) return;
+    //if( (_dedx_A < 0.5) || (_dedx_B < 0.5) ) return;
 
     // Pi0 Vtx point
     ::geoalgo::GeoAlgo geo_alg;
@@ -163,7 +163,7 @@ namespace ertool {
     _vtxDist_A = vtx.Dist(shower_a.Start());
     _vtxDist_B = vtx.Dist(shower_b.Start());
     // Make sure distance from vtx & IP not out of bounds
-    if ( (_vtxDist_A > _vtxDistMax) or (_vtxDist_B > _vtxDistMax) or (_vtx_IP > _IPMax) ) return;
+    //    if ( (_vtxDist_A > _vtxDistMax) or (_vtxDist_B > _vtxDistMax) or (_vtx_IP > _IPMax) ) return;
 
     _radLenVar->setVal(_vtxDist_A);
     _ll_vtxDist_A = log( _radLenSigl->getVal(*_radLenVar) / (_radLenSigl->getVal(*_radLenVar) + _radLenBkgd->getVal(*_radLenVar)) );
@@ -184,6 +184,7 @@ namespace ertool {
 
     // Opening angle
     _angle = shower_a.Dir().Angle(shower_b.Dir());
+    //if (_angle > _angle_max) return;
     if (_verbose) { std::cout << "Opening angle:" << _angle << std::endl; }
 
     // Corrected energies
@@ -200,6 +201,7 @@ namespace ertool {
 
     // Compute mass
     _mass = sqrt(4 * energy_a * energy_b * pow(sin(_angle/2.),2));
+    mass = _mass;
 
     if (_verbose) { std::cout << "reconstructed mass: " << _mass << std::endl; }
 
@@ -268,9 +270,6 @@ namespace ertool {
 	 mass,
 	 vertex,
 	 momentum);
-
-      std::cout << "Mass: " << mass << std::endl;
-
       if (likelihood > best_ll) { best_ll = likelihood; best_mass = mass; }
       
       bk.book(likelihood,comb);
@@ -283,13 +282,11 @@ namespace ertool {
 	p.Momentum(momentum);
 	res.push_back(p);
       }
-      _hMass->Fill(mass);
+      _hMass->Fill(_mass);
 
     } // for all shower combinations
 
     if (best_mass != 0) { _hBestMass->Fill(best_mass); }
-
-    std::cout << "pi0s found: " << res.size() << std::endl;
 
     return res;
   }
