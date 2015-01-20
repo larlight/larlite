@@ -50,7 +50,7 @@ namespace ertool {
     virtual ParticleSet Reconstruct(const EventData &data);
     
     /// Function to set debug mode on or off
-    void setDebug(bool on) { _debug = on; }
+    void setDebug(bool on) { _debug = on; _alg_singleE.setVerbose(on); }
 
   private:
 
@@ -74,6 +74,18 @@ namespace ertool {
 
     // instance of AlgoSingleE
     AlgoSingleE _alg_singleE;
+
+    // Constants to keep track of
+    // min distance that the IP on a trk needs to be from the trk start
+    double _minDistFromTrkStart;
+    // distance the shower start point can be from it is supposed origin (calculated with an Impact Parameter, for example)
+    double _radLenCut;
+    // minimum IP between shower and track
+    double _minIPShrTrk;
+    // shower-trak cut distance
+    double _cutDistToTrk;
+    // shower-shower cut distance
+    double _cutDistToShr;
     
   };
 }

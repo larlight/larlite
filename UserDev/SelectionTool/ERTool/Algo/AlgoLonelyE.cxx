@@ -62,9 +62,6 @@ namespace ertool {
 
   bool AlgoLonelyE::isLonely(const Shower& s, const EventData& data) const
   {
-    // holder to keep track of decision:
-    // is this shower lonely?
-    bool lonely = false;
 
     // flip the shower (we are interested in the direction bakwards
     geoalgo::HalfLine_t shrBack(s.Start(), s.Dir()*(-1));
@@ -72,6 +69,7 @@ namespace ertool {
     for (auto const& t : data.Track()) {
       if (_debug) { std::cout << "Track Energy: " << t->_energy << std::endl; }
       double distToTrack  = isShowerFromTrack( shrBack, *t );
+      if (distToTrack < _cutDistToTrk) { return false; }
     }
 
     // Loop over showers
@@ -81,9 +79,10 @@ namespace ertool {
     // flip the other shower (we are interested in the direction bakwards
       geoalgo::HalfLine_t sBack(s2->Start(), s2->Dir()*(-1));
       double distToShower = isShowerFromShower( shrBack, sBack);
+      if (distToShower < _cutDistToShr) { return false; }
     }
     
-    return lonely;
+    return true;
   }
 
 
@@ -120,10 +119,29 @@ namespace ertool {
     geoalgo::Point_t s_pt(3);
     geoalgo::Point_t t_pt(3);
     double distTrk = sqrt( _geoAlgo.SqDist( shr, trk, s_pt, t_pt) );
+    // Before deciding 
+    // Require that the closest approach point is forward w.r.t. the track. This should ensure
+    // that the shower was produced by the track, and not that both the shower and track were
+    // produced by, for example, a neutrino.
+    // Two constraints:
+    // 1) dot product between IP on track to trk start & trk direction vectors positive (same direction)
+    // 2) regardless, IP on trk distance from trk start point > some minimum threshold
+    // Also, require that the IP on shr to shr start be reasonable. Reasonable related to radiation lenth (even though we already should have filtered out gamma-showers
     double IP_to_Trk = trk.front().Dist(t_pt); // distance from Track Start to IP point on track
     double IP_to_Shr = shr.Start().Dist(s_pt); // distance from Shower Start to IP point on shower
-    // Before deciding 
-    // Require that the closest approach point is > 10 cm away from the track start point
+    if ( (IP_to_Trk > _minDistFromTrkStart) && (IP_to_Shr < _radLenCut) && (IP_to_Trk < _radLenCut) ){
+      geoalgo::Vector_t trkDir(trk.back()-trk.front());
+      trkDir.Normalize();
+      geoalgo::Vector_t shrDir(shr.Dir());
+      shrDir.Normalize();
+      // dot product
+      double dotdir = shrDir.Dot(trkDir);
+      if (dotdir > 0){
+	// Ok, finally check IP to make sure not too large
+	if ( (distTrk < _minIPShrTrk) && (distTrk < distMin) )
+	  distMin = distTrk;
+      }// if dot-product > 0
+    }// if far away enough from trk start & shr start not too far from IP.
     
     if (_debug) {
       std::cout << "Impact Param between Shr Backwards & Trk: " << distTrk << std::endl;
