@@ -150,16 +150,16 @@ namespace showerreco {
 	  //double dEdx_sub;
 	  // double dEdx_MIP;
 	  
-	  //    dEdx_new = fCaloAlg.dEdx_AREA(theHit, newpitch );
-	  //Bcorr_half = 2.*fCaloAlg.dEdx_AREA(theHit->Charge()/2.,theHit->PeakTime(), newpitch, plane); ; 
-	  //dEdx_sub = fCaloAlg.dEdx_AREA(theHit->Charge()-PION_CORR,theHit->PeakTime(), newpitch, plane); ; 
-	  // dEdx_MIP = fCaloAlg.dEdx_AREA_forceMIP(theHit, newpitch ); 
+	  //    dEdx_new = fCaloAlg->dEdx_AREA(theHit, newpitch );
+	  //Bcorr_half = 2.*fCaloAlg->dEdx_AREA(theHit->Charge()/2.,theHit->PeakTime(), newpitch, plane); ; 
+	  //dEdx_sub = fCaloAlg->dEdx_AREA(theHit->Charge()-PION_CORR,theHit->PeakTime(), newpitch, plane); ; 
+	  // dEdx_MIP = fCaloAlg->dEdx_AREA_forceMIP(theHit, newpitch ); 
 	  if(!fUseArea)
 	    {
-	      dEdx_new = fCaloAlg.dEdx_AMP(&theHit , newpitch ); 
+	      dEdx_new = fCaloAlg->dEdx_AMP(&theHit , newpitch ); 
 	    }
 	  else
-	    dEdx_new = fCaloAlg.dEdx_AREA(&theHit , newpitch ); 
+	    dEdx_new = fCaloAlg->dEdx_AREA(&theHit , newpitch ); 
 	  //
 	  if(fVerbosity && dEdx_new >1.9 && dEdx_new <2.1)
 	    std::cout << "dEdx_new " << dEdx_new << " " <<dEdx_new/theHit.charge*newpitch << " "<< theHit.charge *0.0061/newpitch << std::endl;
@@ -272,11 +272,11 @@ namespace showerreco {
 	  
 	  double dEdx=0;
 	  if(fUseArea)
-	    { dEdx = fCaloAlg.dEdx_AREA((&theHit), newpitch ); 
+	    { dEdx = fCaloAlg->dEdx_AREA((&theHit), newpitch ); 
 	    }
 	  else  //this will hopefully go away, once all of the calibration factors are calculated.
 	    {
-	      dEdx = fCaloAlg.dEdx_AMP((&theHit), newpitch ); 
+	      dEdx = fCaloAlg->dEdx_AMP((&theHit), newpitch ); 
 	    }
 	  //fDistribAfterMin[set].push_back(MinBefore);
 	  //fDistribBeforeMin[set].push_back(MinAfter);
@@ -299,11 +299,11 @@ namespace showerreco {
 	for(auto const & theHit : local_hitlist){
 	  double dEdx=0;
 	  if(fUseArea)
-	    { dEdx = fCaloAlg.dEdx_AREA((&theHit), newpitch ); 
+	    { dEdx = fCaloAlg->dEdx_AREA((&theHit), newpitch ); 
 	    }
 	  else  //this will hopefully go away, once all of the calibration factors are calculated.
 	    {
-	      dEdx = fCaloAlg.dEdx_AMP((&theHit), newpitch ); 
+	      dEdx = fCaloAlg->dEdx_AMP((&theHit), newpitch ); 
 	    }
 	  //fDistribAfterMin[set].push_back(MinBefore);
 	  //fDistribBeforeMin[set].push_back(MinAfter);

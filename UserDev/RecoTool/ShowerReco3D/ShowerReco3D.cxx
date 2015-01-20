@@ -85,7 +85,7 @@ namespace larlite {
 
     for(size_t index = 0; index < shower_v->size(); ++index)
 
-      shower_v[i]->set_id(i);
+      (*shower_v)[index].set_id(index);
     
     shower_v->set_association(data::kCluster,fInputProducer,matched_pairs);
     return true;

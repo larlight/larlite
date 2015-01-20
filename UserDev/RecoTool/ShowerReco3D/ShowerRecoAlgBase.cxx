@@ -7,6 +7,7 @@ namespace showerreco {
   
   ShowerRecoAlgBase::ShowerRecoAlgBase() : fInputClusters()
   {
+    fCaloAlg   = nullptr;
     fVerbosity = false;
   }
 
@@ -38,6 +39,8 @@ namespace showerreco {
 
   std::vector< ::larlite::shower> ShowerRecoAlgBase::Reconstruct()
   {
+
+    if(!fCaloAlg) throw ShowerRecoException("Calorimetry algorithm must be provided!");
 
     ProcessInputClusters();
 

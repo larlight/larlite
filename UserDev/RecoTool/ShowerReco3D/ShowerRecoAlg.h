@@ -15,7 +15,6 @@
 #define RECOTOOL_SHOWERRECOALG_H
 
 #include "ShowerRecoAlgBase.h"
-#include "AnalysisAlg/CalorimetryAlg.h"
 #include "ShowerCalo.h"
 
 namespace showerreco {
@@ -42,7 +41,7 @@ namespace showerreco {
     void SetUseArea(bool on) { fUseArea = on; }
 
     /// Function to decide if to use ModBox (True) or Birks (False) for calorimetry
-    void SetUseModBox(bool on) { fCaloAlg.setUseModBox(on); }
+    void SetUseModBox(bool on) { fCaloAlg->setUseModBox(on); }
 
     /// Function to set whether to use E correction
     void setEcorrection(bool on) { _Ecorrection = on; }
@@ -53,8 +52,6 @@ namespace showerreco {
     virtual ::larlite::shower RecoOneShower(const std::vector< ::showerreco::ShowerCluster_t>& );
 
   protected:
-
-   ::calo::CalorimetryAlg fCaloAlg;
 
     larutil::GeometryUtilities  *fGSer;
    

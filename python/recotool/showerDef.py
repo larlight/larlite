@@ -1,6 +1,6 @@
 import sys
 from ROOT import gSystem,TMath
-from ROOT import larlite as fmwk, cmtool, showerreco, larutil
+from ROOT import larlite as fmwk, cmtool, showerreco, larutil, calo
 
 def PandoraShowerReco3D():
     # Create analysis unit
@@ -10,6 +10,9 @@ def PandoraShowerReco3D():
     sralg.Verbose(False)
     #sralg.Verbose(True)
     sralg.SetUseArea(True)
+    # Attach calo alg
+    calg = calo.CalorimetryAlg()
+    sarg.CaloAlgo(calg)
     #sralg.SetUseModBox(True)
     ana_unit.SetShowerAlgo(sralg)
 
@@ -24,6 +27,9 @@ def DefaultShowerReco3D():
     sralg.Verbose(False)
     # sralg.Verbose(True)
     sralg.SetUseArea(True)
+    # Attach calo alg
+    calg = calo.CalorimetryAlg()
+    sarg.CaloAlgo(calg)
     #sralg.SetUseModBox(True)
     ana_unit.SetShowerAlgo(sralg)
 

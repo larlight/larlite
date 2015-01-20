@@ -41,8 +41,6 @@ namespace showerreco {
 
   protected:
 
-   ::calo::CalorimetryAlg fCaloAlg;
-
     larutil::GeometryUtilities  *fGSer;
    
   private:

@@ -16,7 +16,9 @@
 
 #include <iostream>
 #include "DataFormat/shower.h"
+#include "AnalysisAlg/CalorimetryAlg.h"
 #include "ClusterRecoUtil/ClusterParamsAlg.h"
+#include "ShowerRecoException.h"
 #include <limits>
 #include <climits>
 namespace showerreco {
@@ -61,6 +63,9 @@ namespace showerreco {
     /// Verbosity switch
     virtual void Verbose(bool on=true) { fVerbosity=on; }
 
+    /// Calorimetry algorithm setter
+    void CaloAlgo(::calo::CalorimetryAlg* alg) { fCaloAlg = alg; }
+
   protected:
 
     /// Function to reorganize input cluster information
@@ -71,9 +76,12 @@ namespace showerreco {
     virtual ::larlite::shower RecoOneShower(const std::vector<showerreco::ShowerCluster_t>& clusters) = 0;
     
   protected:
-    
+
     /// Verbosity flag
     bool fVerbosity;
+
+    /// Calorimetry algorithm
+    ::calo::CalorimetryAlg *fCaloAlg;
 
     /// Input clusters
     std::vector<std::vector<showerreco::ShowerCluster_t> > fInputClusters;
