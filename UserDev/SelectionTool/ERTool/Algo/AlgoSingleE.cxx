@@ -17,6 +17,7 @@ namespace ertool {
     _e_mass     = TDatabasePDG().GetParticle(11)->Mass();
     _e_ll_values = 0;
     _dedx_values = 0;
+    _verbose = false;
 
   }
 
@@ -59,18 +60,24 @@ namespace ertool {
     _alg_emp.Reconstruct(data);
 
     ParticleSet res;
+
+    if (_verbose) { std::cout << "Showers in event: " << data.Shower().size() << std::endl; }
     
     /// Get a list of the event showers that are electron like
     auto e_showers = ElectronLikeShowers( data.Shower() );
 
+    if (_verbose) { std::cout << "e-like showers  : " << e_showers.size() << std::endl; }
+
     /// Get a list of the electron showers that are start-point-isolated
     auto isolated_e_showers = IsolatedStartPtShowers( e_showers );
+
+    if (_verbose) { std::cout << "isolated showers: " << isolated_e_showers.size() << std::endl; }
 
     if(isolated_e_showers.size() == 1) single_e_counter++;
 
     /// Make an electron Particle for each independent shower and add it to the set
     for(auto const& isol_shower : isolated_e_showers){
-      Particle p_e(11);
+      Particle p_e(11,_e_mass);
       p_e.Vertex(isol_shower->Start());
       p_e.Momentum(isol_shower->Dir() * (isol_shower->_energy - p_e.Mass())); // for now fill with direction - unit vector
       p_e.RecoObjInfo(isol_shower->ID(), Particle::RecoObjType_t::kShower);
