@@ -37,6 +37,29 @@ namespace ertool {
     return res;
   }
 
+
+  RooAbsPdf* PdfFactory::Gaus(const std::string& name,
+			      RooRealVar &x)
+  {
+    auto mean = new RooRealVar(Form("%s_Gaus_mean",  name.c_str()),
+			       Form("Single gaussian mean for %s",name.c_str()),
+			       1.,0.,10.);
+    Register(mean);
+
+    auto sigma = new RooRealVar(Form("%s_Gaus_sigma", name.c_str()),
+				Form("Single gaussian sigma for %s",name.c_str()),
+				0.1,0.,1.);
+    Register(sigma);
+
+    auto res = new RooGaussian(Form("%s_Gaus_pdf",   name.c_str()),
+			       Form("Gauss Pdf for %s",name.c_str()),
+			       x, *mean, *sigma);
+
+    Register(res);
+    
+    return res;
+  }
+
   RooAbsPdf* PdfFactory::dEdxGaus(const std::string& name,
 				  RooRealVar &x)
   {
@@ -154,10 +177,10 @@ namespace ertool {
   }
 
 
-  RooAbsPdf* PdfFactory::UniformDistrib(RooRealVar& x) const
+  RooAbsPdf* PdfFactory::UniformDistrib(const std::string& name,
+					RooRealVar &x)
   {
-
-    return new RooPolynomial("uniform","Uniform Distribution", x);
+    return new RooPolynomial("uniform_Pdf","Uniform Distribution", x);
   }
 
 }

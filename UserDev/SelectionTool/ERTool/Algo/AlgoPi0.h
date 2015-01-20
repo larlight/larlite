@@ -36,6 +36,9 @@ namespace ertool {
     /// Default destructor
     virtual ~AlgoPi0(){}
 
+    /// Called only once by the constructor in its lifespan
+    void SetDefaultParams();
+
     /// What to do before event-loop begins
     virtual void ProcessBegin();
 
@@ -52,13 +55,15 @@ namespace ertool {
     void LL(const Shower& shower_a,
 	    const Shower& shower_b,
 	    double& ll,
-	    double& mass);
+	    double& mass,
+	    geoalgo::Point_t& vertex,
+	    geoalgo::Vector_t& momentum);
 
     /// Select verbosity mode
     void setVerbose(bool on) { _verbose = on; }
 
     /// Set maximum Impact Parameter for two showers
-    void setIPMax(double ip) { _ip_max = ip; }
+    void setIPMax(double ip) { _IPMax = ip; }
 
     /// Set maximum Opening Angle for two showers
     void setAngleMax(double angle) { _angle_max = angle; }
@@ -77,6 +82,8 @@ namespace ertool {
 
   protected:
 
+    PdfFactory _factory; ///< P.D.F. factory class instance
+
     /// verobsity boolean for couts
     bool _verbose;
 
@@ -85,30 +92,23 @@ namespace ertool {
 
     AlgoEMPart  _alg_emp;
 
-    // Info for Mass Peak PDF
-    RooAbsPdf   *_pi0_pdf;
-    RooRealVar  *_pi0_massVar, *_pi0_massMean, *_pi0_massSigma;
-    RooDataSet  *_pi0_massData;
-    RooGaussian *_pi0_massPdf;
-    double _pi0_mean, _pi0_mean_min, _pi0_mean_max; // [MeV/c]
-    double _pi0_sigma, _pi0_sigma_min, _pi0_sigma_max; // [MeV/c]
     // Info for RadLen Correlation PDF
-    RooAbsPdf   *_shrCorrelation_pdf;
-    RooRealVar  *_radLenVar, *_radLenVal;
+    RooRealVar  *_radLenVar;
+    RooAbsPdf   *_radLenSigl;
+    RooAbsPdf   *_radLenBkgd;
     RooDataSet  *_radLenData;
     double _x, _x_min, _x_max; // [CM]
-    double _radLen, _radLen_min, _radLen_max; // [ CM-1]
+
     // Info for Vertex Impact Parameter PDF
     RooRealVar *_vtxVar;
-    RooRealVar *_vtxErr;
-    RooRealVar *_vtxMu;
-    RooAbsPdf  *_vtxErrSigl;
-    RooAbsPdf  *_vtxErrBkgd;
+    RooAbsPdf  *_vtxSigl;
+    RooAbsPdf  *_vtxBkgd;
     double     _vtx_err;
 
     double _energy_min,   _energy_max;
     double _angle_min,    _angle_max;
-    double _ip_max;
+    double _vtxDistMax;
+    double _IPMax;
  
     // Histograms
     TH2D *_hMass_vs_LL;
@@ -117,22 +117,14 @@ namespace ertool {
 
     // Tree for LL return values
     TTree *_ll_tree;
+    double _dedx_A, _dedx_B;
     double _ll_vtx, _ll_dedx_A, _ll_dedx_B;
-    double _vtx_IP, _dedx_A, _dedx_B;
-    double _m;
-
-    // Tree for candidate pi0 events
-    TTree* _candidate_tree;
-    double _shr1_E;
-    double _shr2_E;
-    double _angle;
-    double _mass;
-    double _shr1_dEdx;
-    double _shr2_dEdx;
-    double _dist_1;   // distance between the vertex candidate & shr1 start
-    double _dist_2;   // distance between the vertex candidate & shr2 start
-    double _vtx_dist; // Distance between two points on shr1 & shr2 axes that define the IP
+    double _vtx_IP;
+    double _vtxDist_A, _vtxDist_B, _ll_vtxDist_A, _ll_vtxDist_B;
     double _ll;
+    double _angle;
+    double _E_A, _E_B;
+    double _mass;
 
   };
 }
