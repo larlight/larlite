@@ -18,9 +18,7 @@
 #include "Analysis/ana_base.h"
 #include "DataFormat/DataFormat-TypeDef.h"
 #include "ClusterRecoUtil/CRUHelper.h"
-#include "CMTool/CMToolBase/CMatchManager.h"
-#include "ShowerRecoException.h"
-#include "ShowerRecoAlgBase.h"
+#include "ShowerRecoManager.h"
 
 namespace larlite {
   /**
@@ -35,7 +33,7 @@ namespace larlite {
     ShowerReco3D();
 
     /// Default destructor
-    virtual ~ShowerReco3D(){ delete fMatchMgr; }
+    virtual ~ShowerReco3D(){}
 
     /** IMPLEMENT in ShowerReco3D.cc!
         Initialization method to be called before the analysis event loop.
@@ -53,11 +51,8 @@ namespace larlite {
     virtual bool finalize();
 
     /// Attach algo
-    void SetShowerAlgo(::showerreco::ShowerRecoAlgBase *alg) { fShowerAlgo = alg;}
+    void SetShowerAlgo(::showerreco::ShowerRecoAlgBase *alg) { fManager.Algo(alg); }
 
-    /// hack! remove me later
-    storage_manager* GetCurrentData() {return _mgr;};
-    
     /// Function to set an input cluster/pfparticle producer name to work with
     void SetInputProducer(std::string name, bool use_pfpart=false) 
     { fInputProducer = name; fUsePFParticle = use_pfpart; }
@@ -66,7 +61,7 @@ namespace larlite {
     void SetOutputProducer(std::string name) { fOutputProducer = name; }
 
     /// Getter for MatchManager instance, to attach algorithms
-    ::cmtool::CMatchManager& GetManager() { return *fMatchMgr; }
+    ::cmtool::CMatchManager& GetManager() { return fManager.MatchManager(); }
 
   protected:
 
@@ -79,17 +74,12 @@ namespace larlite {
     /// Boolean flag to use PFParticle as an input or not
     bool fUsePFParticle;
 
+    /// Shower reco core class instance
+    ::showerreco::ShowerRecoManager fManager;
+
     /// CRUHelper converts framework dependent data product to PxUtil
     ::cluster::CRUHelper fCRUHelper;
 
-    /// Shower reconstruction algorithm
-    ::showerreco::ShowerRecoAlgBase *fShowerAlgo;
-
-    /// Cluster matching code
-    ::cmtool::CMatchManager *fMatchMgr;
-
-    /// hack! remove me later
-    storage_manager* _mgr;
   };
 }
 #endif

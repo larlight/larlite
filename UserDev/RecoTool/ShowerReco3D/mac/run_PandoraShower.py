@@ -32,6 +32,8 @@ ana_unit=PandoraShowerReco3D()
 
 ana_unit.SetInputProducer("pandoraNu",True)
 
+ana_unit.SetOutputProducer("pandoraShower",True)
+
 my_proc.add_process(ana_unit)
 
 print

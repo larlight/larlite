@@ -9,6 +9,7 @@
 #include "ShowerReco3D.h"
 #include "ComputePi0Mass.h"
 #include "ShowerQuality.h"
+#include "ShowerRecoManager.h"
 //ADD_NEW_HEADER ... do not change this comment line
 #include "ShowerRecoException.h"
 #include "ShowerCalo.h"
@@ -21,6 +22,7 @@
 namespace showerreco {
   class ShowerRecoException;
   class ShowerRecoAlgBase;
+  class ShowerRecoManager;
   class ShowerCalo;
   class ShowerRecoAlg;
   class ShowerRecoTest;
@@ -37,3 +39,4 @@ namespace larlite {
 
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+

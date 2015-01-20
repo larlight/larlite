@@ -5,55 +5,45 @@
 
 namespace larlite {
 
-  ShowerReco3D::ShowerReco3D() : ana_base(), fShowerAlgo(nullptr), fMatchMgr(nullptr)
+  ShowerReco3D::ShowerReco3D() : ana_base()
   {
     _name="ShowerReco3D";
     fInputProducer  = "fuzzycluster";
     fOutputProducer = "showerreco";
     fUsePFParticle  = false;
-    auto geom = ::larutil::Geometry::GetME();
-    if(!fMatchMgr) fMatchMgr = new ::cmtool::CMatchManager(geom->Nplanes());
   }
   
   bool ShowerReco3D::initialize() {
-    _mgr = 0;
-    if(!fShowerAlgo) {
+    if(!fManager.Algo()) {
       
       throw ::cluster::CRUException("Shower reco algorithm not attached... aborting.");
       return false;
 
     }
-    
     return true;
   }
   
   bool ShowerReco3D::analyze(storage_manager* storage) {
 
-    _mgr = storage;
     // Re-initialize tools
-    fShowerAlgo->Reset();
-    fMatchMgr->Reset();
+    fManager.Reset();
 
     // Retrieve clusters and fed into the algorithm
     std::vector<std::vector<larutil::PxHit> > local_clusters;
-
     fCRUHelper.GeneratePxHit(storage,fInputProducer,local_clusters);
+
+    // Create output data product holder
+    auto shower_v = storage->get_data<event_shower>(fOutputProducer);
+    shower_v->clear();
+    shower_v->set_event_id(storage->get_data<event_cluster>(fInputProducer)->event_id());
+    shower_v->set_run(storage->get_data<event_cluster>(fInputProducer)->run());
+    shower_v->set_subrun(storage->get_data<event_cluster>(fInputProducer)->subrun());
 
     // Run matching
     std::vector<std::vector<unsigned int> > matched_pairs;
     if(!fUsePFParticle) {
 
-      fMatchMgr->SetClusters(local_clusters);
-      
-      // Run matching & retrieve matched cluster indices
-      try{
-	fMatchMgr->Process();
-      }catch( ::cmtool::CMTException &e){
-	e.what();
-	return false;
-      }
-
-      matched_pairs = fMatchMgr->GetBookKeeper().GetResult();
+      matched_pairs = fManager.Reconstruct(local_clusters,*shower_v);
 
     }else{
 
@@ -83,88 +73,26 @@ namespace larlite {
 	    last_pair.push_back(ass_index);
 	}
       }
+
+      fManager.Reconstruct(local_clusters,
+			   matched_pairs,
+			   *shower_v);
     }
-    
-    // Create output data product holder
-    auto shower_v = storage->get_data<event_shower>(fOutputProducer);
-    shower_v->clear();
-    shower_v->reserve(matched_pairs.size());
-    shower_v->set_event_id(storage->get_data<event_cluster>(fInputProducer)->event_id());
-    shower_v->set_run(storage->get_data<event_cluster>(fInputProducer)->run());
-    shower_v->set_subrun(storage->get_data<event_cluster>(fInputProducer)->subrun());
-    if(!matched_pairs.size()) return true;
-
-    //
-    // Reaching this point means there's some showers to reconstruct!
-    // 1) Create association to be stored in an output
-    // 2) Append input clusters to shower algo based on matched_pairs vector
-    //
-    AssSet_t ass_index_v;
-    ass_index_v.reserve(matched_pairs.size());
-    for(auto const& pair : matched_pairs) {
-      
-      std::vector< ::cluster::ClusterParamsAlg> cpans;
-      
-      cpans.reserve(pair.size());
-
-      // Create an association vector
-      AssUnit_t ass_index;
-      ass_index.reserve(pair.size());
-      
-      for(auto const& index : pair) {
-
-	ass_index.push_back(index);
-
-	if(fUsePFParticle) {
-	  
-	  auto cluster_v = storage->get_data<event_cluster>(fInputProducer);
-
-	  if(!cluster_v) 
-	    throw ::showerreco::ShowerRecoException("Cannot find input cluster data!");
-	  
-	  ::cluster::ClusterParamsAlg cpan(local_clusters[index]);
-	  cpan.SetVerbose(false);
-	  cpan.SetPlane((*cluster_v)[index].View());
-	  cpan.DisableFANN();
-	  cpan.FillParams(false,false,false,false,false,false);
-	  cpan.FillPolygon();
-	  cpans.push_back(cpan);
-
-	}else 
-	  
-	  cpans.push_back(fMatchMgr->GetInputClusters()[index]);
-      }
-
-      ass_index_v.push_back(ass_index);
-      /*
-      std::cout << "cpans.size(): " << cpans.size() << std::endl;
-      for ( auto const& cpan : cpans ) {
-        std::cout << "NHits: " << cpan.GetNHits() << std::endl;
-      }
-      */
-      fShowerAlgo->AppendInputClusters(cpans);
-    }
-
-    // Run shower reco
-    auto result_v = fShowerAlgo->Reconstruct();
-
+	
     // Make sure result has the same size 
-    if(result_v.size() != ass_index_v.size())
+    if(shower_v->size() != matched_pairs.size())
       throw ::showerreco::ShowerRecoException("Mismatch in # of showers from algorithm's return!");
 
-    for(size_t index = 0; index < result_v.size(); ++index) {
+    for(size_t index = 0; index < shower_v->size(); ++index) {
 
-      auto& result = result_v.at(index);
+      auto& result = shower_v->at(index);
 
       // Set ID
       result.set_id(shower_v->size());
 
-      // Store
-      shower_v->push_back(result);
-
     } // done looping over matched cluster pairs
     
-    shower_v->set_association(data::kCluster,fInputProducer,ass_index_v);
+    shower_v->set_association(data::kCluster,fInputProducer,matched_pairs);
     return true;
   }
   
