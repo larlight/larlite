@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import sys, os
-REPO_NAME="SelectionTool"
+REPO_NAME="LArLiteApp"
 if len(sys.argv)<2:
    sys.stderr.write('Usage: %s CLASS_NAME\n\n' % sys.argv[0])
    sys.exit(1)
@@ -10,8 +10,8 @@ if not 'LARLITE_USERDEVDIR' in os.environ.keys():
 
 name=sys.argv[1]
 working_package='SPTApp'
-target_dir='%s/%s/ShowerPdfTool/SPTApp' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
-source_dir='%s/%s/ShowerPdfTool/SPTApp/bin/tmp' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
+target_dir='%s/%s/ERToolBackend' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
+source_dir='%s/%s/ERToolBackend/bin/tmp' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
 
 in_source='%s/empty.cxx' % source_dir
 in_header='%s/empty.h' % source_dir
@@ -45,6 +45,7 @@ for line in contents:
    fout.write(line)
 
 # modify TypeDef
+'''
 contents=open('%s/SPTApp-TypeDef.h' % target_dir, 'r').read().split('\n')
 fout=open('%s/SPTApp-TypeDef.h' % target_dir,'w')
 for line in contents:
@@ -54,6 +55,7 @@ for line in contents:
    if line.find('ADD_NEW_HEADER')>=0:
       line='#include \"%s.h\"\n%s' % (name,line)
    fout.write(line)
+'''
 
 print
 print 'Generated the followings under %s.' % target_dir
