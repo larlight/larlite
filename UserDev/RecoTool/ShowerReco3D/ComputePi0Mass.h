@@ -16,7 +16,7 @@
 #define RECOTOOL_COMPUTEPI0MASS_H
 
 #include "Analysis/ana_base.h"
-#include "MCShowerBT/MCShowerMatchAlg.h"
+#include "MCComp/MCMatchAlg.h"
 #include "ShowerCalo.h"
 #include "ShowerRecoException.h"
 namespace larlite {
@@ -69,7 +69,7 @@ namespace larlite {
 
   protected:
 
-    MCShowerMatchAlg fBTAlg;
+    ::btutil::MCMatchAlg fBTAlg;
 
     ::showerreco::ShowerCalo fSECaloAlg;
 

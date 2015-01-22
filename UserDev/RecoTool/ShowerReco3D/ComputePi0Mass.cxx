@@ -33,6 +33,21 @@ namespace larlite {
 
     _mass = -99999.;
 
+    // Retrieve mcshower data product
+    auto ev_mcs = storage->get_data<event_mcshower>("mcreco");
+    
+    if(!ev_mcs || !(ev_mcs->size())) {
+      print(msg::kERROR,__FUNCTION__,"MCShower data product not found!");
+      return false;
+    }
+
+    // Retrieve simch data product
+    auto ev_simch = storage->get_data<event_simch>("largeant");
+    if(!ev_simch || !(ev_simch->size())) {
+      print(msg::kERROR,__FUNCTION__,"SimChannel data product not found!");
+      return false;
+    }
+
     // Load the Showers... need to run shower reconstruction first!
     auto ev_shower  = storage->get_data<event_shower>(_shower_producer);
 
@@ -70,6 +85,39 @@ namespace larlite {
 
     auto cluster_ass = ev_shower->association(ev_cluster->id());
 
+    // Get hits
+    auto cluster_hit_ass_keys = ev_cluster->association_keys(data::kHit);
+    if(!(cluster_hit_ass_keys.size())) {
+      print(msg::kERROR,__FUNCTION__,
+	    Form("No cluster=>hit association found for \"%s\"!",ev_cluster->name().c_str())
+	    );
+      return false;
+    }
+
+    auto ev_hit = storage->get_data<event_hit>(cluster_hit_ass_keys[0]);
+    if(!ev_hit || !(ev_hit->size())) {
+      print(msg::kERROR,__FUNCTION__,"Could not retrieve a reconstructed hit!");
+      return false;
+    }
+
+    // Retrieve cluster=>hit association
+    auto ass_hit_v = ev_cluster->association(ev_hit->id());
+
+    // Create G4 track ID vector for which we are interested in
+    std::vector<unsigned int> g4_trackid_v;
+    std::vector<unsigned int> mc_index_v;
+    g4_trackid_v.reserve(ev_mcs->size());
+    for(size_t mc_index=0; mc_index<ev_mcs->size(); ++mc_index) {
+      auto const& mcs = (*ev_mcs)[mc_index];
+      g4_trackid_v.push_back(mcs.TrackID());
+      mc_index_v.push_back(mc_index);
+    }
+
+    if(!fBTAlg.BuildMap(g4_trackid_v, *ev_simch, *ev_hit, ass_hit_v)) {
+      print(msg::kERROR,__FUNCTION__,"Failed to build back-tracking map for MC...");
+      return false;
+    }
+
     size_t best_cluster1 = 0;
     for(auto const& index : cluster_ass[0]){
       if(ev_shower->at(0).best_plane() == ev_cluster->at(index).View()) break;
@@ -89,15 +137,6 @@ namespace larlite {
     
     hPi0MassPeak->Fill(_mass);
 
-    // Now let's find corresponding MCShower (if MC info is available)
-    auto ev_mcshower = storage->get_data<event_mcshower>("mcshower");
-    auto ev_simch    = storage->get_data<event_simch>("largeant");
-
-    if(!ev_mcshower || !ev_simch) return true;
-    
-    // For a given Shower, compute corresponding MCShower
-    fBTAlg.BuildMap(storage,cluster_producers[0]);
-    
     for(size_t shower_index=0; shower_index < ev_shower->size(); ++shower_index) {
 
       auto const& s = ev_shower->at(shower_index);
@@ -108,7 +147,7 @@ namespace larlite {
 
       if(correctness) {
 
-	auto const& mcs = ev_mcshower->at(mcs_index);
+	auto const& mcs = ev_mcs->at(mcs_index);
 	auto reco_dir = s.Direction();
 	auto reco_vtx = s.ShowerStart();
 
