@@ -1,9 +1,9 @@
 #ifndef ANA_CLASS_NAME_CXX
 #define ANA_CLASS_NAME_CXX
 
-#include "Ana_Class_Name.hh"
+#include "Ana_Class_Name.h"
 
-namespace larlight {
+namespace larlite {
 
   bool Ana_Class_Name::initialize() {
 

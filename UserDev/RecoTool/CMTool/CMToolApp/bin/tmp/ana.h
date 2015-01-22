@@ -1,5 +1,5 @@
 /**
- * \file Ana_Class_Name.hh
+ * \file Ana_Class_Name.h
  *
  * \ingroup Working_Package
  * 
@@ -12,12 +12,12 @@
 
     @{*/
 
-#ifndef ANA_CLASS_NAME_HH
-#define ANA_CLASS_NAME_HH
+#ifndef ANA_CLASS_NAME_H
+#define ANA_CLASS_NAME_H
 
 #include "ana_base.hh"
 
-namespace larlight {
+namespace larlite {
   /**
      \class Ana_Class_Name
      User custom analysis class made by andrzej

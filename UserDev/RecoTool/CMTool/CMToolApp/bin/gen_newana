@@ -4,20 +4,20 @@ import sys, os
 if len(sys.argv)<2:
    sys.stderr.write('Usage: %s CLASS_NAME\n\n' % sys.argv[0])
    sys.exit(1)
-if not 'USER_DEV_DIR' in os.environ.keys():
-   sys.stderr.write('$USER_DEV_DIR not defined!\n\n')
+if not 'LARLITE_USERDEVDIR' in os.environ.keys():
+   sys.stderr.write('$LARLITE_USERDEVDIR not defined!\n\n')
    sys.exit(1)
 
 name=sys.argv[1]
 working_package='CMToolApp'
-target_dir='%s/CMTool/CMToolApp' % os.environ['USER_DEV_DIR']
-source_dir='%s/CMTool/CMToolApp/bin/tmp' % os.environ['USER_DEV_DIR']
+target_dir='%s/RecoTool/CMTool/CMToolApp' % os.environ['LARLITE_USERDEVDIR']
+source_dir='%s/RecoTool/CMTool/CMToolApp/bin/tmp' % os.environ['LARLITE_USERDEVDIR']
 
-in_source='%s/ana.cc' % source_dir
-in_header='%s/ana.hh' % source_dir
+in_source='%s/ana.c' % source_dir
+in_header='%s/ana.h' % source_dir
 
-src_list = { in_source   : '%s/%s.cc'         % (target_dir,name),
-             in_header   : '%s/%s.hh'         % (target_dir,name) }
+src_list = { in_source   : '%s/%s.c'         % (target_dir,name),
+             in_header   : '%s/%s.h'         % (target_dir,name) }
 
 for src in src_list.keys():
    if os.path.isfile(src_list[src]):
@@ -41,18 +41,18 @@ fout=open('%s/LinkDef.h' % target_dir,'w')
 for line in contents:
    line=line + '\n'
    if line.find('ADD_NEW_CLASS')>=0:
-      line='#pragma link C++ class larlight::%s+;\n%s' % (name,line)
+      line='#pragma link C++ class larlite::%s+;\n%s' % (name,line)
    fout.write(line)
 
 # modify TypeDef
-contents=open('%s/CMToolApp-TypeDef.hh' % target_dir, 'r').read().split('\n')
-fout=open('%s/CMToolApp-TypeDef.hh' % target_dir,'w')
+contents=open('%s/CMToolApp-TypeDef.h' % target_dir, 'r').read().split('\n')
+fout=open('%s/CMToolApp-TypeDef.h' % target_dir,'w')
 for line in contents:
    line=line + '\n'
    if line.find('ADD_ANA_CLASS')>=0:
       line='  class %s;\n%s' % (name,line)
    if line.find('ADD_NEW_HEADER')>=0:
-      line='#include \"%s.hh\"\n%s' % (name,line)
+      line='#include \"%s.h\"\n%s' % (name,line)
    fout.write(line)
 
 print
@@ -66,7 +66,7 @@ print ' OR'
 print '    > cd %s; make;' % target_dir
 print
 print 'If needed, make sure you define linked libraries in rootmap generation script.'
-print 'The script is: %s/gen_rootmap.sh' % os.environ['LARLIGHT_LIBDIR']
+print 'The script is: %s/gen_rootmap.sh' % target_dir
 print 'If you have no idea what this means, just ignore it!'
 print
 print 'To remove your analysis code, you should remove:'

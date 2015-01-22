@@ -1,5 +1,5 @@
 /**
- * \file Empty_Class_Name.hh
+ * \file Empty_Class_Name.h
  *
  * \ingroup Working_Package
  * 
@@ -11,8 +11,8 @@
 /** \addtogroup Working_Package
 
     @{*/
-#ifndef EMPTY_CLASS_NAME_HH
-#define EMPTY_CLASS_NAME_HH
+#ifndef EMPTY_CLASS_NAME_H
+#define EMPTY_CLASS_NAME_H
 
 #include <iostream>
 
