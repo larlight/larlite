@@ -19,6 +19,8 @@
 #include "Analysis/ana_base.h"
 #include "ERToolHelper.h"
 
+#include "ERTool/Base/Manager.h"
+
 namespace larlite {
   /**
      \class ERToolAnaBase
@@ -86,9 +88,23 @@ namespace larlite {
      */
     void SetVtxProducer(const bool mc, const std::string prod);
 
+    /**
+       @brief get EventData that is used by the manager
+     */
+    ::ertool::EventData GetData() const { return _data; }
+
+    /**
+       @brief get Particles produced by Algorithm.
+     */
+    ::ertool::ParticleSet GetParticles() const { return _particles; }
+
+    /// Selection manager class instance
+    ::ertool::Manager _mgr;
+
   protected:
 
     ::ertool::EventData _data; ///< Data to be filled by this module (main purpose!)
+    ::ertool::ParticleSet _particles; ////<Particles Produced by Algorithm
     ERToolHelper _helper; ///< SPAHelper helps generating SPAData
 
   private:

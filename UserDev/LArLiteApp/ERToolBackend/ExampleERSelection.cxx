@@ -22,7 +22,7 @@ namespace larlite {
     auto status = ERToolAnaBase::analyze(storage);
     if(!status) return status;
 
-    _mgr.Process(_data);
+    _particles = _mgr.Process(_data);
   
     return true;
   }

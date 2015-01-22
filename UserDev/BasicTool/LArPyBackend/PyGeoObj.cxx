@@ -20,6 +20,22 @@ namespace larpy {
     return pvec;
   }
 
+
+  PyObject* PyGeoObj::Convert(const std::string& col  ) const
+  {
+    PyObject* pvec = PyList_New(col.size());
+
+    for(size_t i=0; i<col.size(); ++i) {
+
+      if( PyList_SetItem(pvec, i, col[i]) ) {
+
+	Py_DECREF(pvec);
+	throw ::geoalgo::GeoAlgoException("<<Convert>> failed!");
+      }
+    }
+    return pvec;
+  }
+
   PyObject* PyGeoObj::Convert(const ::geoalgo::LineSegment_t& pt ) const
   {
     PyObject* pres = PyList_New(3);
@@ -53,6 +69,42 @@ namespace larpy {
     
     return pres;
   }
+
+
+  PyObject* PyGeoObj::Convert(const ::geoalgo::HalfLine_t& pt ) const
+  {
+    PyObject* pres = PyList_New(3);
+
+    PyObject* x = PyList_New(2);
+    if( PyList_SetItem(x,0,PyFloat_FromDouble(pt.Start()[0])) ||
+	PyList_SetItem(x,1,PyFloat_FromDouble(pt.Start()[0] + (pt.Dir()[0]*70)  )) ||
+	PyList_SetItem(pres,0,x) ) {
+      Py_DECREF(pres);
+      Py_DECREF(x);
+      throw ::geoalgo::GeoAlgoException("<<Convert>> failed!");
+    }
+
+    PyObject* y = PyList_New(2);
+    if( PyList_SetItem(y,0,PyFloat_FromDouble(pt.Start()[1])) ||
+	PyList_SetItem(y,1,PyFloat_FromDouble(pt.Start()[1] + (pt.Dir()[1]*70)  )) ||
+	PyList_SetItem(pres,1,y) ) {
+      Py_DECREF(pres);
+      Py_DECREF(y);
+      throw ::geoalgo::GeoAlgoException("<<Convert>> failed!");
+    }
+
+    PyObject* z = PyList_New(2);
+    if( PyList_SetItem(z,0,PyFloat_FromDouble(pt.Start()[2])) || 
+	PyList_SetItem(z,1,PyFloat_FromDouble(pt.Start()[2] + (pt.Dir()[2]*70)  )) ||
+	PyList_SetItem(pres,2,z) ) {
+      Py_DECREF(pres);
+      Py_DECREF(z);
+      throw ::geoalgo::GeoAlgoException("<<Convert>> failed!");
+    }
+    
+    return pres;
+  }
+
 
   PyObject* PyGeoObj::Convert(const ::geoalgo::AABox_t& box) const
   {

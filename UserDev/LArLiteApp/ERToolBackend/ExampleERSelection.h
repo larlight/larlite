@@ -15,8 +15,7 @@
 #ifndef LARLITE_EXAMPLEERSELECTION_H
 #define LARLITE_EXAMPLEERSELECTION_H
 
-#include "Analysis/ana_base.h"
-#include "ERTool/Base/Manager.h"
+
 #include "ERToolAnaBase.h"
 namespace larlite {
   /**
@@ -48,8 +47,7 @@ namespace larlite {
     */
     virtual bool finalize();
 
-    /// Selection manager class instance
-    ::ertool::Manager _mgr;
+
 
   };
 }

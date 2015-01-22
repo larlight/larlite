@@ -306,13 +306,13 @@ namespace ertool {
     
     RooFitResult* fit_res_radLen = nullptr;
     RooFitResult* fit_res_dEdx   = nullptr;
+
+    std::string part_letter = "g";
+    if(!_mode) part_letter = "e";
     
     if (_training_mode){
-
       // Fit and maybe save parameters
-      std::string part_letter = "g";
-      if(!_mode) part_letter = "e";
-
+      
       if(_mode) {
 	fit_res_radLen = _g_radLenPdf->fitTo(*_g_radLenData,
 					     RooFit::Range(_g_radlen_fit_range.Min(),_g_radlen_fit_range.Max()),
@@ -472,10 +472,10 @@ namespace ertool {
 
       c->SetTitle("Distance PDF");
       frame_radLen->Draw();
-      c->SaveAs("RadLength_Selected.png");
+      c->SaveAs(Form("RadLength_Selected_%s.png", part_letter.c_str()));
       c->SetTitle("dEdx Selection");
       frame_dEdx->Draw();
-      c->SaveAs("dEdx_Selected.png");
+      c->SaveAs(Form("dEdx_Selected_%s.png", part_letter.c_str()));
 
       delete c;
 	
