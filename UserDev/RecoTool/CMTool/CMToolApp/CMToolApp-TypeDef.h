@@ -12,6 +12,8 @@
 #include "ClusterViewerAlgo.h"
 #include "ClusterViewer.h"
 #include "ClusterMerger.h"
+#include "ClusterMergerArray.h"
+#include "FuzzyClusterShower.h"
 #include "ClusterMatcher.h"
 #include "MergeViewer.h"
 //ADD_NEW_HEADER ... do not change this comment line
@@ -24,6 +26,8 @@ namespace cluster {
 
 namespace larlite {
   class ClusterMerger;
+  class ClusterMergerArray;
+  class FuzzyClusterShower;
   class ClusterMatcher;
   class ClusterViewer;
   class MergeViewer;

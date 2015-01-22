@@ -124,15 +124,16 @@ namespace cmtool {
 					 localWatch.RealTime())
 				 << std::endl;
 
-      if(!_merge_till_converge)
+      if(!_merge_till_converge) {
+
+	if(_debug_mode <= kPerIteration)
+
+	  std::cout << "\033[93m  Iterative approach = OFF ... exiting from iteration loop. \033[00m" << std::endl;
 	
 	break;
+      }
     }
 
-    if(!keep_going && _debug_mode <= kPerIteration)
-      
-      std::cout << "\033[93m  Iterative approach = OFF ... exiting from iteration loop. \033[00m" << std::endl;
-    
     localWatch.Start();
 
     EventEnd();

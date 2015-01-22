@@ -86,7 +86,6 @@ namespace cmtool {
     /**
        Method to combine with another CMergeBookKeeper instance.
      */
-    
     void Combine(const CMergeBookKeeper &another);
 
     void Report() const;

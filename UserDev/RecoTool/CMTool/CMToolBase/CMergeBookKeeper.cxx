@@ -280,9 +280,9 @@ namespace cmtool {
     this->PassResult(my_result);
     if(my_result.size() != another.size()) {
       throw CMTException(Form("Input has an incompatible size (%zu != %zu)",
-				   my_result.size(),
-				   another.size())
-			      );
+			      my_result.size(),
+			      another.size())
+			 );
       return;
     }
 
@@ -291,9 +291,9 @@ namespace cmtool {
     another.PassResult(another_result);
     if(another_result.size() >= my_result.size())
       throw CMTException(Form("The input has equal or more number of output clusters (%zu>=%zu)",
-				   another_result.size(),
-				   my_result.size())
-			      );
+			      another_result.size(),
+			      my_result.size())
+			 );
 
     // Combine
     for(auto const& ares : another_result) {

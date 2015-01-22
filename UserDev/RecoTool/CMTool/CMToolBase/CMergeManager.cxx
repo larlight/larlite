@@ -228,7 +228,7 @@ namespace cmtool {
     if(_out_clusters.size() == _planes.size())
 
       return false;
-
+    
     return true;
   }
 
