@@ -113,7 +113,7 @@ namespace ertool {
     AlgoBase* _algo;
 
     FilterBase* _filter;
-    
+
   };
 }
 #endif

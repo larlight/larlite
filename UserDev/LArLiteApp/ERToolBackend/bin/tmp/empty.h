@@ -11,8 +11,8 @@
 /** \addtogroup Working_Package
 
     @{*/
-#ifndef SELECTIONTOOL_EMPTY_CLASS_NAME_H
-#define SELECTIONTOOL_EMPTY_CLASS_NAME_H
+#ifndef EMPTY_CLASS_NAME_H
+#define EMPTY_CLASS_NAME_H
 
 #include <iostream>
 

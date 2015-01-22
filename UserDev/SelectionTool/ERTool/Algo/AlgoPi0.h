@@ -160,6 +160,7 @@ namespace ertool {
     double _angle;
     double _E_A, _E_B;
     double _mass;
+    double _dot; ///< vtx = reco vertex. sA, sB = start points of showers. dA, dB direction of showers. _dot = [(sA-vtx)*dA] x [(sB-vtx)*dB] 
 
   };
 }

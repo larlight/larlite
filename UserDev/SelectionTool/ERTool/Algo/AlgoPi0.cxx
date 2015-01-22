@@ -127,6 +127,7 @@ namespace ertool {
     _ll_tree->Branch("_dedx_B",&_dedx_B,"E_B/D");
     _ll_tree->Branch("_E_A",&_E_A,"E_A/D");
     _ll_tree->Branch("_E_B",&_E_B,"E_B/D");
+    _ll_tree->Branch("_dot",&_dot,"dot/D");
 
   }
   
@@ -153,13 +154,25 @@ namespace ertool {
 
     // Pi0 Vtx point
     ::geoalgo::GeoAlgo geo_alg;
-    ::geoalgo::Line_t   line_a( shower_a.Start(), shower_a.Start() + shower_a.Dir() );
-    ::geoalgo::Line_t   line_b( shower_b.Start(), shower_b.Start() + shower_b.Dir() );
+    ::geoalgo::HalfLine_t   line_a( shower_a.Start(), shower_a.Dir()*(-1) );
+    ::geoalgo::HalfLine_t   line_b( shower_b.Start(), shower_b.Dir()*(-1) );
     // pt_a is the point on line_a from where the minimum IP is found. Analogous for pt_b
     ::geoalgo::Vector_t pt_a(3), pt_b(3);
     _vtx_IP = sqrt(geo_alg.SqDist(line_a, line_b, pt_a, pt_b));
     // let the candidate vertex be the midpoint between pt_a & pt_b
     vtx = pt_a + ((pt_b - pt_a) / 2.);
+    // make sure vertex reconstructed backwards of 
+    ::geoalgo::Vector_t vtx_A(shower_a.Start()-vtx);
+    vtx_A.Normalize();
+    double dotA = vtx_A.Dot(shower_a.Dir());
+    ::geoalgo::Vector_t vtx_B(shower_b.Start()-vtx);
+    vtx_B.Normalize();
+    double dotB = vtx_B.Dot(shower_b.Dir());
+    _dot = dotA*dotB;
+    if (_verbose) {
+      std::cout << "Vtx to Shr A and Shr A Direction dot product: " << dotA << std::endl;
+      std::cout << "Vtx to Shr B and Shr B Direction dot product: " << dotB << std::endl;
+    }
     _vtxDist_A = vtx.Dist(shower_a.Start());
     _vtxDist_B = vtx.Dist(shower_b.Start());
     // Make sure distance from vtx & IP not out of bounds
@@ -279,11 +292,23 @@ namespace ertool {
 
       if ( (likelihood != -1.e-10) && (mass > 0) ){
 	_hMass_vs_LL->Fill(mass,likelihood);
-	// create new particle
-	Particle p(111,mass);
-	p.Vertex(vertex);
-	p.Momentum(momentum);
-	res.push_back(p);
+	// create a Pi0 and two gamma showers!
+	Particle gamma1(22,0.);
+	gamma1.Vertex(shower_v[0]->Start());
+	gamma1.Momentum(shower_v[0]->Dir()*shower_v[0]->_energy);
+	gamma1.RecoObjInfo(comb[0],Particle::RecoObjType_t::kShower);
+	res.push_back(gamma1);
+	Particle gamma2(22,0.);
+	gamma2.Vertex(shower_v[1]->Start());
+	gamma2.Momentum(shower_v[1]->Dir()*shower_v[1]->_energy);
+	gamma2.RecoObjInfo(comb[1],Particle::RecoObjType_t::kShower);
+	res.push_back(gamma2);
+	Particle pi0(111,mass);
+	pi0.Vertex(vertex);
+	pi0.Momentum(momentum);
+	pi0.AddDaughter(gamma1);
+	pi0.AddDaughter(gamma2);
+	res.push_back(pi0);
       }
       _hMass->Fill(_mass);
 
