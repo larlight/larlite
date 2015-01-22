@@ -20,7 +20,7 @@ namespace larpy {
     return pvec;
   }
 
-
+  /*
   PyObject* PyGeoObj::Convert(const std::string& col  ) const
   {
     PyObject* pvec = PyList_New(col.size());
@@ -35,7 +35,7 @@ namespace larpy {
     }
     return pvec;
   }
-
+  */
   PyObject* PyGeoObj::Convert(const ::geoalgo::LineSegment_t& pt ) const
   {
     PyObject* pres = PyList_New(3);

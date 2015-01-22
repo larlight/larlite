@@ -43,7 +43,7 @@ namespace larpy {
     virtual ~PyGeoObj(){};
 
     PyObject* Convert(const ::geoalgo::Point_t& pt        ) const;
-    PyObject* Convert(const std::string& col              ) const;
+    //PyObject* Convert(const std::string& col              ) const;
     PyObject* Convert(const ::geoalgo::LineSegment_t& seg ) const;
     PyObject* Convert(const ::geoalgo::HalfLine_t& seg    ) const;
     PyObject* Convert(const ::geoalgo::Trajectory_t& trj  ) const;
