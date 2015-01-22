@@ -24,6 +24,6 @@ mgr.set_output_file(out_file)
 
 mgr.add_process(fmwk.FuzzyClusterShower())
 
-mgr.run(0,5)
+mgr.run()
 
 
