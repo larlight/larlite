@@ -72,6 +72,23 @@ namespace larlite {
   
   bool MMQuality::analyze(storage_manager* storage) {
 
+    event_shower* ev_shower = nullptr;
+
+    // Retrieve mcshower data product
+    auto ev_mcs = storage->get_data<event_mcshower>("mcreco");
+    
+    if(!ev_mcs || !(ev_mcs->size())) {
+      print(msg::kERROR,__FUNCTION__,"MCShower data product not found!");
+      return false;
+    }
+    
+    // Retrieve simch data product
+    auto ev_simch = storage->get_data<event_simch>("largeant");
+    if(!ev_simch || !(ev_simch->size())) {
+      print(msg::kERROR,__FUNCTION__,"SimChannel data product not found!");
+      return false;
+    }      
+    
     if(fClusterProducer.empty()) {
 
       auto ev_shower = storage->get_data<event_shower>(fShowerProducer);
@@ -91,21 +108,58 @@ namespace larlite {
 		   fShowerProducer.c_str())
 	      );
       }
-
       fClusterProducer = ass_keys[0];
     }
 
-    if(!fBTAlg.BuildMap(storage, fClusterProducer)) {
+    auto ev_cluster = storage->get_data<event_cluster>(fClusterProducer);
+    if(!ev_cluster || !(ev_cluster->size())) {
+      print(msg::kERROR,__FUNCTION__,"Could not retrieve a reconstructed cluster!");
+      return false;
+    }
+
+    // Retrieve shower => cluster association
+    auto ass_cluster_v = ev_shower->association(ev_cluster->id());
+
+    // Get hits
+    auto cluster_hit_ass_keys = ev_cluster->association_keys(data::kHit);
+    if(!(cluster_hit_ass_keys.size())) {
+      print(msg::kERROR,__FUNCTION__,
+	    Form("No cluster=>hit association found for \"%s\"!",ev_cluster->name().c_str())
+	    );
+      return false;
+    }
+
+    auto ev_hit = storage->get_data<event_hit>(cluster_hit_ass_keys[0]);
+    if(!ev_hit || !(ev_hit->size())) {
+      print(msg::kERROR,__FUNCTION__,"Could not retrieve a reconstructed hit!");
+      return false;
+    }
+
+    // Retrieve cluster=>hit association
+    auto ass_hit_v = ev_cluster->association(ev_hit->id());
+
+    // Create G4 track ID vector for which we are interested in
+    std::vector<unsigned int> g4_trackid_v;
+    std::vector<unsigned int> mc_index_v;
+    g4_trackid_v.reserve(ev_mcs->size());
+    for(size_t mc_index=0; mc_index<ev_mcs->size(); ++mc_index) {
+      auto const& mcs = (*ev_mcs)[mc_index];
+      auto energy = mcs.DetProfile().E();
+      if( _mc_energy_min < energy && energy < _mc_energy_max ) {
+	g4_trackid_v.push_back(mcs.TrackID());
+	mc_index_v.push_back(mc_index);
+      }
+    }
+
+    if(!fBTAlg.BuildMap(g4_trackid_v, *ev_simch, *ev_hit, ass_hit_v)) {
       print(msg::kERROR,__FUNCTION__,"Failed to build back-tracking map for MC...");
       return false;
     }
 
-    auto mcshower_index_v = fBTAlg.BTAlg().UniqueShowerID();
-
     auto geo = larutil::Geometry::GetME();
 
     // Fill cluster quality plots
-    for(auto const& mcs_index : mcshower_index_v) {
+    for(size_t mcs_index=0; mcs_index<ev_mcs->size(); ++mcs_index) {
 
       for(size_t plane = 0; plane < geo->Nplanes(); ++plane) {
 
@@ -122,12 +176,6 @@ namespace larlite {
 
     // If this is not for 3D shower comparison, return
     if(fShowerProducer.empty()) return true;
-
-    // Retrieve shower data product
-    auto ev_shower = storage->get_data<event_shower>(fShowerProducer);
-    
-    // Retrieve associated cluster indices
-    auto ass_cluster_v = ev_shower->association(data::kCluster,fClusterProducer);
 
     for(size_t shower_index=0; shower_index < ass_cluster_v.size(); ++shower_index) {
 
