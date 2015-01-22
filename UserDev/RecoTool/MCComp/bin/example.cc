@@ -2,7 +2,7 @@
 // Example C++ routine to run instantiate your sample class
 //
 
-#include "MCShowerBT/MCShowerBT-TypeDef.h"
+#include "MCSTBackTracker/MCSTBackTracker-TypeDef.h"
 #include <iostream>
 
 int main(int argc, char** argv){

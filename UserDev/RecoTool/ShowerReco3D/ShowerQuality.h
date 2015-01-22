@@ -19,7 +19,7 @@
 #include <TH2D.h>
 #include <map>
 #include "Analysis/ana_base.h"
-#include "MCShowerBT/MCShowerMatchAlg.h"
+#include "MCComp/MCMatchAlg.h"
 #include "ShowerRecoException.h"
 
 namespace larlite {
@@ -44,10 +44,10 @@ namespace larlite {
     { fShowerProducer = name; }
 
     /// Set maximum energy for MCShowers to be considered
-    void SetMaxEnergyCut(const double energy) { fBTAlg.SetMaxEnergyCut(energy); }
+    void SetMaxEnergyCut(const double energy) { _mc_energy_max = energy; }
 
     /// Set minimum energy for MCShowers to be considered
-    void SetMinEnergyCut(const double energy) { fBTAlg.SetMinEnergyCut(energy); }
+    void SetMinEnergyCut(const double energy) { _mc_energy_min = energy; }
 
     /** IMPLEMENT in ShowerQuality.cc!
         Initialization method to be called before the analysis event loop.
@@ -67,7 +67,13 @@ namespace larlite {
   protected:
 
     /// Shower back tracking algorithm
-    MCShowerMatchAlg fBTAlg;
+    ::btutil::MCMatchAlg fBTAlg;
+
+    /// Minimum MC shower energy cut
+    double _mc_energy_min;
+
+    /// Maximum MC shower energy cut
+    double _mc_energy_max;
 
     /// Shower Producer's Name
     std::string fShowerProducer;

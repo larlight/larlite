@@ -152,6 +152,22 @@ namespace larlite {
   
   bool ShowerQuality::analyze(storage_manager* storage) {
 
+    // Retrieve mcshower data product
+    auto ev_mcs = storage->get_data<event_mcshower>("mcreco");
+    
+    if(!ev_mcs || !(ev_mcs->size())) {
+      print(msg::kERROR,__FUNCTION__,"MCShower data product not found!");
+      return false;
+    }
+
+    // Retrieve simch data product
+    auto ev_simch = storage->get_data<event_simch>("largeant");
+    if(!ev_simch || !(ev_simch->size())) {
+      print(msg::kERROR,__FUNCTION__,"SimChannel data product not found!");
+      return false;
+    }
+
+    // Get shower
     auto ev_shower = storage->get_data<event_shower>(fShowerProducer);
     
     if(!ev_shower) {
@@ -162,35 +178,59 @@ namespace larlite {
     }
     if(!ev_shower->size()) return false;
 
-    auto ass_keys = ev_shower->association_keys(data::kCluster);
-    
-    if(!(ass_keys.size())) {
+    // Get cluster
+    auto shower_cluster_ass_keys = ev_shower->association_keys(data::kCluster);
+    if(!(shower_cluster_ass_keys.size())) {
       print(msg::kERROR,__FUNCTION__,
 	    Form("No associated cluster found to a shower produced by \"%s\"",
 		 fShowerProducer.c_str())
 	    );
     }
-    
-    if(!fBTAlg.BuildMap(storage, ass_keys[0])) {
+
+    auto ev_cluster = storage->get_data<event_cluster>(shower_cluster_ass_keys[0]);
+    if(!ev_cluster || !(ev_cluster->size())) {
+      print(msg::kERROR,__FUNCTION__,"Could not retrieve a reconstructed cluster!");
+      return false;
+    }
+
+    // Retrieve shower => cluster association
+    auto ass_cluster_v = ev_shower->association(ev_cluster->id());
+
+    // Get hits
+    auto cluster_hit_ass_keys = ev_cluster->association_keys(data::kHit);
+    if(!(cluster_hit_ass_keys.size())) {
+      print(msg::kERROR,__FUNCTION__,
+	    Form("No cluster=>hit association found for \"%s\"!",ev_cluster->name().c_str())
+	    );
+      return false;
+    }
+
+    auto ev_hit = storage->get_data<event_hit>(cluster_hit_ass_keys[0]);
+    if(!ev_hit || !(ev_hit->size())) {
+      print(msg::kERROR,__FUNCTION__,"Could not retrieve a reconstructed hit!");
+      return false;
+    }
+
+    // Retrieve cluster=>hit association
+    auto ass_hit_v = ev_cluster->association(ev_hit->id());
+
+    // Create G4 track ID vector for which we are interested in
+    std::vector<unsigned int> g4_trackid_v;
+    std::vector<unsigned int> mc_index_v;
+    g4_trackid_v.reserve(ev_mcs->size());
+    for(size_t mc_index=0; mc_index<ev_mcs->size(); ++mc_index) {
+      auto const& mcs = (*ev_mcs)[mc_index];
+      double energy = mcs.DetProfile().E();
+      if( _mc_energy_min < energy && energy < _mc_energy_max ) {
+	g4_trackid_v.push_back(mcs.TrackID());
+	mc_index_v.push_back(mc_index);
+      }
+    }
+
+    if(!fBTAlg.BuildMap(g4_trackid_v, *ev_simch, *ev_hit, ass_hit_v)) {
       print(msg::kERROR,__FUNCTION__,"Failed to build back-tracking map for MC...");
       return false;
     }
-
-    // Retrieve mcshower data product
-    auto ev_mcs = storage->get_data<event_mcshower>("mcreco");
-    
-    if(!ev_mcs) {
-      print(msg::kERROR,__FUNCTION__,"ShowerQuality: MCShower data product not found!");
-      return false;
-    }
-    if(ev_mcs->size()<1) {
-      print(msg::kERROR,__FUNCTION__,"ShowerQuality: MCShower product found, but there are no mcshowers in this event!");
-      return false;
-    }
-
-
-    // Retrieve associated cluster indices
-    auto ass_cluster_v = ev_shower->association(data::kCluster,ass_keys[0]);
 
     for(size_t shower_index=0; shower_index < ass_cluster_v.size(); ++shower_index) {
 
@@ -209,7 +249,7 @@ namespace larlite {
 	continue;
       }
 
-      auto const& mc_shower = ev_mcs->at(mcs_index);
+      auto const& mc_shower = ev_mcs->at(mc_index_v[mcs_index]);
 
       // MC Info
       fTreeParams.mc_x = mc_shower.DetProfile().X();
@@ -264,8 +304,6 @@ namespace larlite {
       fTreeParams.best_plane_id = reco_shower.best_plane();
 
       int best_plane_index = -1;
-      
-      auto ev_cluster = storage->get_data<event_cluster>(ass_keys[0]);
 
       for(size_t i=0; i < ass_cluster_v[shower_index].size(); ++i) {
 

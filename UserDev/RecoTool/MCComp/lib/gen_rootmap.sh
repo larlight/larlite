@@ -15,8 +15,5 @@ rootlibmap() {
 }
 
 ######################################################
-# MCShowerBT
-rootlibmap libRecoTool_MCShowerBT.rootmap libRecoTool_MCShowerBT.so \
-    $LARLITE_USERDEVDIR/RecoTool/MCShowerBT/LinkDef.h \
-    libLArLite_DataFormat.so \
-    libLArLite_LArUtil.so
+# MCComp
+rootlibmap libRecoTool_MCComp.rootmap libRecoTool_MCComp.so $LARLITE_USERDEVDIR/RecoTool/MCComp/LinkDef.h 

@@ -9,9 +9,10 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class larlite::MCShowerBTException+;
-#pragma link C++ class larlite::MCShowerBTAlg+;
-#pragma link C++ class larlite::MCShowerMatchAlg+;
+#pragma link C++ namespace btutil+;
+#pragma link C++ struct btutil::WireRange_t+;
+#pragma link C++ class btutil::MCBTException+;
+#pragma link C++ class btutil::MCBTAlg+;
+#pragma link C++ class btutil::MCMatchAlg+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
-

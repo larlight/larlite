@@ -3,7 +3,7 @@ CXXFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool
 CXXFLAGS += -I. $(shell root-config --cflags) -g
 
 # Include your shared object lib location
-LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_MCShowerBT 
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_MCSTBackTracker 
 LDFLAGS += $(shell root-config --libs) -lPhysics -lMatrix -g
 
 # platform-specific options

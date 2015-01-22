@@ -7,7 +7,7 @@ try:
 
 except NameError:
 
-    print "Failed importing MCShowerBT..."
+    print "Failed importing MCSTBackTracker..."
 
 sys.exit(0)
 
