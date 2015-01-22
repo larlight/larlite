@@ -18,13 +18,13 @@ class GeoViewer:
     def __init__(self):
 
         self._fig = plt.figure(#num=None,
-                               figsize=(8,6),
+                               figsize=(10,5),
                                dpi=120,
                                facecolor="w",
                                edgecolor='k')
         self._fig.patch.set_alpha(0.5)
-        self._fig.set_size_inches(18,10)
-        self._fig.set_size_inches(18.5,10.5,forward=True)
+        #self._fig.set_size_inches(10,5)
+        self._fig.set_size_inches(10.5,5.5,forward=True)
         self._fig.subplots_adjust(left=0.01,
                                   right=0.42,
                                   top=0.55,
@@ -40,42 +40,58 @@ class GeoViewer:
         Gray = c[0] * 0.3 + c[1] * 0.59 + c[2] * 0.11
         return c
 
-    def add(self,arg,label=''):
-        self._holder.Add(arg,label)
-
-    def _add_point(self,arg,c='black'):
-        data = self._converter.Convert(arg)
-        if not c: c = self.rand_color()
-        self._ax.scatter(*data,color=c,marker='*',s=100)
+    def add(self,arg,label='',c=''):
+        self._holder.Add(arg,label,c)
 
     def _add_label(self,args):
         #data = self._converter.Convert(arg)
         self._ax.text(*args, fontsize=10, alpha=0.5)
 
-    def _add_trajectory(self,arg):
-        c = self.rand_color()
+    def _add_point(self,arg,c='black'):
+        data = self._converter.Convert(arg)
+        if not c: c = self.rand_color()
+        
+        # update boundaries
+        for i in xrange(3):
+            if data[i] < self._range_min[i]: self._range_min[i] = data[i]
+            if data[i] > self._range_max[i]: self._range_max[i] = data[i]
+
+        self._ax.scatter(*data,color=c,marker='*',s=100)
+
+    def _add_trajectory(self,arg,c='red'):
+        if not c: c = self.rand_color()
         data = self._converter.Convert(arg) 
+        
+        # update boundaries
         for i in xrange(3):
             for j in xrange(len(data[i])):
                 if data[i][j] < self._range_min[i]: self._range_min[i] = data[i][j]
-        self._ax.plot(data[0],data[1],data[2],color=c)
-        self._ax.scatter(data[0],data[1],data[2],color=c,marker='o')
+                if data[i][j] > self._range_max[i]: self._range_max[i] = data[i][j]
 
-    def _add_linesegment(self,arg):
-        c = self.rand_color()
-        data=_converter.Convert(arg)
+        self._ax.plot(data[0],data[1],data[2],color=c)
+        self._ax.scatter(data[0][0],data[1][0],data[2][0],color=c,marker='x')
+        self._ax.scatter(data[0][-1],data[1][-1],data[2][-1],color=c,marker='>')
+        self._ax.scatter(data[0][1:-2],data[1][1:-2],data[2][1:-2],color=c,marker='o')
+
+    def _add_linesegment(self,arg,c='blue'):
+        if not c: c = self.rand_color()
+        data = self._converter.Convert(arg)
+
         s = arg.Start()
         e = arg.End()
 
+        # update boundaries
         for i in xrange(3):
             for j in xrange(len(data[i])):
                 if data[i][j] < self._range_min[i]: self._range_min[i] = data[i][j]
+                if data[i][j] > self._range_max[i]: self._range_max[i] = data[i][j]
 
         self._ax.plot(data[0],data[1],data[2],color=c)
-        self._ax.scatter(data[0],data[1],data[2],color=c,marker='o')
+        self._ax.scatter(s[0],s[1],s[2],color=c,marker='x')
+        self._ax.scatter(e[0],e[1],e[2],color=c,marker='>')
 
-    def _add_box(self,arg):
-        c = self.rand_color()
+    def _add_box(self,arg, c='gray'):
+        if not c: c = self.rand_color()
         data = self._converter.Convert(arg);
         for x in data:
             self._ax.plot3D(*x,color=c)
@@ -91,11 +107,20 @@ class GeoViewer:
             if pt_max[x] < self._range_min[x]: self._range_min[x] = pt_max[x]
             if pt_max[x] > self._range_max[x]: self._range_max[x] = pt_max[x]        
 
+            
+    def clear(self):
+
+        plt.cla()
+        self._holder.Clear()
+
+
     def show(self):
 
         # Process GeoObj
+        points = self._holder.Point()
+        np = points.size()
         for x in self._holder.Point():
-            print x[0],x[1],x[2]
+            #print x[0],x[1],x[2]
             self._add_point(x)
         for x in self._holder.LineSegment():
             self._add_linesegment(x)
@@ -131,5 +156,5 @@ class GeoViewer:
         self._ax.set_ylabel('Y [cm]')
         self._ax.set_zlabel('Z [cm]')
         
-        plt.show()
+        self._fig.canvas.draw()#plt.show()
         

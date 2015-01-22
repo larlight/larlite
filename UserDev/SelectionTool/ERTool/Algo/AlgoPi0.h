@@ -24,7 +24,42 @@ namespace ertool {
 
   /**
      \class AlgoPi0
-     User custom Algorithm class made by kazuhiro
+     @brief Algorithm to reconstruct Pi0 events using a Log-Likelihood function.
+     ertool::AlgoPi0 aims at finding Pi0 events. Given a list of showers and tracks, \n
+     the algorithm takes every combination of shower-pairs and calculates a          \n
+     Log-Likelihood that the two showers come from a Pi0. If this is succesfull a Pi0\n
+     ertool::Particle object is created.                                             \n
+     The LL value is calculated as follows:                                          \n
+     1) LL += likelihood shower A is gamma-like                                      \n
+     2) LL += likelihood shower B is gamma-like                                      \n
+     3) LL += likelihood Pi0 vertex is "correct"                                     \n
+     4) LL += likelyhood distance between vertex and shower A start comes from an    \n
+        exponential distribution with decay constant = radiation length              \n
+     5) LL += likelyhood distance between vertex and shower B start comes from an    \n
+        exponential distribution with decay constant = radiation length              \n
+                                                                                     \n
+     1) & 2) AlgoEMPart is used to calculate the likelyhood.                         \n
+                                                                                     \n
+     3) the Pi0 vertex is found by tracing back the two shower direction from their  \n
+     start point and finding the Impact Parameter between these two lines. This is   \n
+     the closest distance between the two segments. Because we are working with      \n
+     reconstructed quantities we do not expect these two lines to perfectly          \n
+     intersect, but, if we are dealing with an actual Pi0 event, they will come      \n
+     within a few cm of each other. What that number actually is (and the statistical\n
+     distribution followed by this reconstructed quantity for many events) depends on\n
+     our reconstruction capabilities and position/angular resolution. Currently this \n
+     distribution is modeled to be a gaussian with a few-cm width. Background events \n
+     are modeled to follow a flat distribution. For low values of the Impact         \n
+     Parameter the signal PDF is larger than that of the Background, and vice-versa  \n
+     for large values. This model can definitely be improved but for now it          \n
+     accomplishes the basic goal: the smaller the impact parameter the greater the   \n
+     likelyhood we assign to the event being a Pi0.                                  \n
+                                                                                     \n
+    4) & 5) Done similarly to point 3). The signal here is modeled by an exponential \n
+    decay with decay constant equal to the radiation length. The background is a     \n
+    flat distribution. The goal of these two steps is to recognize that a shower that\n
+    is found to be 5 meters from the reconstructed vertex is probably not from a Pi0.\n
+    As above, the moel - especially for background - can be improved.                \n
    */
   class AlgoPi0 : public AlgoBase {
   

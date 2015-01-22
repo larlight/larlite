@@ -49,6 +49,9 @@ namespace ertool {
     /// Function to reconstruct the start-point isolated electrons
     virtual ParticleSet Reconstruct(const EventData &data);
 
+    /// Set verbosity
+    void setVerbose(bool on) { _verbose = on; }
+
   private:
 
     /// Function that takes in shower and decides if it is likely electron
@@ -64,7 +67,11 @@ namespace ertool {
     /// Function to return a list of start-point-isolated showers, given a list of showers
     const std::vector<const ertool::Shower*> IsolatedStartPtShowers(const std::vector<const ::ertool::Shower*>& showers);
 
+
   protected:
+
+    // verbose flag
+    bool _verbose;
 
     double _e_mass;
 

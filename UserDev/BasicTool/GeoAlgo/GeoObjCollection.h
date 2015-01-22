@@ -37,24 +37,24 @@ namespace geoalgo {
 
     void Clear();
     
-    void Add(const Point_t& pt, std::string label="");
+    void Add(const Point_t& pt, std::string label="", std::string c="");
 	     
-    void Add(const AABox_t& box, std::string label="");
+    void Add(const AABox_t& box, std::string label="", std::string c="");
 	     
-    void Add(const LineSegment_t& seg, std::string label="");
+    void Add(const LineSegment_t& seg, std::string label="", std::string c="");
 	     
-    void Add(const Trajectory_t& trj, std::string label="");
+    void Add(const Trajectory_t& trj, std::string label="", std::string c="");
 
-    const std::vector<geoalgo::Point_t>& Point() const
+    const std::vector< geoalgo::Point_t >& Point() const
     { return _pt_v; }
 
-    const std::vector<geoalgo::AABox_t>& AABox() const
+    const std::vector< geoalgo::AABox_t >& AABox() const
     { return _box_v; }
 
-    const std::vector<geoalgo::LineSegment_t>& LineSegment() const
+    const std::vector< geoalgo::LineSegment_t >& LineSegment() const
     { return _seg_v; }
 
-    const std::vector<geoalgo::Trajectory_t>& Trajectory() const
+    const std::vector< geoalgo::Trajectory_t >& Trajectory() const
     { return _trj_v; }
 
     const std::map<geoalgo::Point_t,std::string>& Labels() const 
@@ -77,10 +77,10 @@ namespace geoalgo {
     void _AddLabel_(const Point_t& pt,
 		    std::string label);
 
-    std::vector< geoalgo::Point_t         > _pt_v;
-    std::vector< geoalgo::AABox_t         > _box_v;
-    std::vector< geoalgo::LineSegment_t   > _seg_v;
-    std::vector< geoalgo::Trajectory_t    > _trj_v;
+    std::vector< geoalgo::Point_t       > _pt_v;
+    std::vector< geoalgo::AABox_t       > _box_v;
+    std::vector< geoalgo::LineSegment_t > _seg_v;
+    std::vector< geoalgo::Trajectory_t  > _trj_v;
     std::map<geoalgo::Point_t,std::string > _labels;
 
   };

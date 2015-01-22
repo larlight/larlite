@@ -46,6 +46,7 @@ namespace larlite {
     TTree* _pi0_tree;
     double _mc_E, _reco_E;
     double _mc_x, _mc_y, _mc_z, _reco_x, _reco_y, _reco_z;
+    double _start_res;
 
   };
 }

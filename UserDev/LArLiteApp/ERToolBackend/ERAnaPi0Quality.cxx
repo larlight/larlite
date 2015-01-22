@@ -26,6 +26,7 @@ namespace larlite {
     _pi0_tree->Branch("_reco_y",&_reco_y,"reco_y/D");
     _pi0_tree->Branch("_mc_z",&_mc_z,"mc_z/D");
     _pi0_tree->Branch("_reco_z",&_reco_z,"reco_z/D");
+    _pi0_tree->Branch("_start_res",&_start_res,"start_res/D");
 
     _mgr.Initialize();
     return ERToolAnaBase::initialize();
@@ -76,6 +77,10 @@ namespace larlite {
 	_reco_x = part.Vertex()[0];
 	_reco_y = part.Vertex()[1];
 	_reco_z = part.Vertex()[2];
+
+	_start_res = sqrt( (_reco_x-_mc_x)*(_reco_x-_mc_x) + 
+			   (_reco_y-_mc_y)*(_reco_y-_mc_y) + 
+			   (_reco_z-_mc_z)*(_reco_z-_mc_z) );
 	
 	_pi0_tree->Fill();
 
