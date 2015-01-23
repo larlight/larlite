@@ -110,6 +110,7 @@ else
     fi
     export PATH=$LARLITE_BASEDIR/bin:$PATH
     alias maketop="make --directory=$LARLITE_BASEDIR"
+    alias cdtop="cd $LARLITE_BASEDIR"
     echo
     echo "Finish configuration. To build, type:"
     echo "> cd \$LARLITE_BASEDIR"
