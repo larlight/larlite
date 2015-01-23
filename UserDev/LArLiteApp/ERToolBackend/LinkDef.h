@@ -14,9 +14,11 @@
 #pragma link C++ class larlite::ExampleERSelection+;
 #pragma link C++ class larlite::ERAnaPi0Quality+;
 #pragma link C++ class larlite::ParticleViewer+;
+#pragma link C++ class larlite::ParticleConverter+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 
 
 

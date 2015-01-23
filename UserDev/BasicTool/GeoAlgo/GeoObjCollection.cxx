@@ -49,7 +49,7 @@ namespace geoalgo {
   void GeoObjCollection::Add(const LineSegment_t& seg, std::string name, std::string c)
   {
     if(name.empty()) name = Form("LSeg (%zu)",_seg_v.size());
-    _AddLabel_(seg.Start(),name);
+    _AddLabel_(seg.End(),name);
     _seg_v.push_back(seg);
     _seg_col.push_back(c);
   }
@@ -58,7 +58,7 @@ namespace geoalgo {
   void GeoObjCollection::Add(const HalfLine_t& lin, std::string name, std::string c)
   {
     if(name.empty()) name = Form("Line (%zu)",_lin_v.size());
-    _AddLabel_(lin.Start(),name);
+    _AddLabel_(lin.Start()+lin.Start()*10,name);
     _lin_v.push_back(lin);
     _lin_col.push_back(c);
   }
@@ -68,7 +68,7 @@ namespace geoalgo {
     if(trj.size()<=2)
       throw GeoAlgoException("Trajectory size cannot be smaller than 2!");
     if(name.empty()) name = Form("Trj (%zu)",_trj_v.size());
-    _AddLabel_(trj[0],name);
+    _AddLabel_(trj.back(),name);
     _trj_v.push_back(trj);
     _trj_col.push_back(c);
   }

@@ -14,6 +14,7 @@ namespace larlite {
     // Make them into a LineSegments
     // give them to the collection
     for (auto &p : particles){
+      // Different types of particles should be represented differently
       geoalgo::LineSegment_t part( p.Vertex(), p.Vertex() + (p.Momentum() * (30./p.Momentum().Length())) );
       collection.Add( part, std::to_string(p.PdgCode() ) );
     }
@@ -57,8 +58,8 @@ namespace larlite {
     // Get showers
     auto shrs = eventData.getShowers();
     auto trks = eventData.getTracks();
-    //    for (auto& s: shrs)
-    //      collection.Add( s, "SHOWER");
+    for (auto& s: shrs)
+      collection.Add( s, "SHOWER");
     for (auto& t: trks){
       if (t.size() >2)
 	collection.Add( t, "TRACK", "black");

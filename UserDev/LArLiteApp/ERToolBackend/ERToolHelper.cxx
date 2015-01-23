@@ -6,6 +6,26 @@
 #include <climits>
 namespace larlite {
 
+
+  void ERToolHelper::FillMCParticles ( const event_mctruth&  mci_v,
+				       ::ertool::ParticleSet& pset ) const
+  {
+
+    for(auto const& mci : mci_v) {
+      
+      for(auto const& mcp : mci.GetParticles()) {
+
+	::ertool::Particle p(mcp.PdgCode(),mcp.Mass());
+	p.Vertex(mcp.Trajectory().at(0).Position());
+	p.Momentum(mcp.Trajectory().at(0).Momentum());
+	pset.push_back(p);
+      }
+    }
+    
+    return;
+  }
+
+
   void ERToolHelper::FillTracks ( const event_mctrack&  mct_v,
 				  ::ertool::EventData& res ) const
   {
@@ -191,7 +211,6 @@ namespace larlite {
     for(auto const& mci : mci_v) {
       
       for(auto const& mcp : mci.GetParticles()) {
-	
 	::geoalgo::Point_t vtx(mcp.Trajectory()[0].Position());
 	
 	if(vtxs.find(vtx) == vtxs.end()) {
@@ -255,7 +274,7 @@ namespace larlite {
     for(auto const& mci : mci_v) {
       
       for(auto const& mcp : mci.GetParticles()) {
-
+	
 	::geoalgo::Point_t vtx(mcp.Trajectory()[0].Position());
 
 	if(vtxs.find(vtx) == vtxs.end()) {
