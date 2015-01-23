@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 
-class GeoViewer:
+class GeoViewer(object):
 
     _type_vec  = geoalgo.Vector()
     _type_box  = geoalgo.AABox()
@@ -164,7 +164,6 @@ class GeoViewer:
         self._range_min = [ 1e12, 1e12, 1e12]
         self._range_max = [-1e12,-1e12,-1e12]
         self._holder.Clear()
-
 
     def show(self):
 

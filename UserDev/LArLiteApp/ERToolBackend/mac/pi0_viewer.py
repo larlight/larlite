@@ -1,11 +1,13 @@
 import sys, os
 from ROOT import gSystem
-from ROOT import larlite as fmwk
 from ROOT import ertool
-from ROOT import geoalgo
-from larpy import GeoViewer
+ertool.Manager()
+from ROOT import larlite as fmwk
+fmwk.geo.PlaneID
+
+#from basictool import GeoViewer, geoalgo
+from seltool import ERViewer
 import matplotlib.pyplot as plt
-ertool.Manager
 
 def ask_binary(msg='Proceed? [y/n]:'):
     
@@ -30,9 +32,12 @@ def main():
         sys.stderr.write(msg)
         sys.exit(1)
 
+    ertool.Manager()
+
     #viewer
     plt.ion()
-    display = GeoViewer()
+    #display = GeoViewer()
+    display = ERViewer()
     display.show()
 
     # Create ana_processor instance
@@ -50,9 +55,6 @@ def main():
     # Create analysis unit
     my_ana = fmwk.ExampleERSelection()
 
-    # Create Particle Viewer
-    my_part = fmwk.ParticleViewer()
-
     # ************Set Producers**************
     # First Argument: True = MC, False = Reco
     #my_ana.SetShowerProducer(True,"mcreco");
@@ -63,6 +65,7 @@ def main():
     my_ana.SetVtxProducer(False,"");
     # ************Set Producers**************
 
+    #help(my_ana._mgr)
     my_ana._mgr.SetAlgo(my_algo)
     my_ana._mgr._training_mode =True
 
@@ -101,12 +104,12 @@ def main():
         my_proc.process_event(counter)
         # get objets and display
         display.clear()
-        my_part.addParticles( my_ana.GetParticles(),
-                              my_ana.GetData(),
-                              display.GetObjCollection() )
-        my_part.addEventData( my_ana.GetData(),
-                              display.GetObjCollection() )
+        
+        display.add(my_ana.GetParticles(),
+                    my_ana.GetData())
+
         display.show()
+
     #my_proc.run()
 
     print
