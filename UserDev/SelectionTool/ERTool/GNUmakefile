@@ -2,7 +2,7 @@
 # This is an example GNUmakefile for ShowerPdfTool package
 #
 
-SUBDIRS := Base Filter Algo
+SUBDIRS := Base Filter Algo App
 
 .phony: all clean
 
