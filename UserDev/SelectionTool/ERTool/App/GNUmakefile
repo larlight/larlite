@@ -3,7 +3,7 @@
 #
 
 # specific names for this package
-DICT  = BaseCint
+DICT  = AppCint
 SHLIB = libSelectionTool_ERApp.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h

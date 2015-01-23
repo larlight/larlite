@@ -1,56 +1,44 @@
 /**
- * \file ParticleViewer.h
+ * \file GeoViewerERToolBackend.h
  *
- * \ingroup SPTApp
+ * \ingroup ERTool
  * 
- * \brief Class def header for a class ParticleViewer
+ * \brief Class def header for a class GeoViewerERToolBackend
  *
- * @author david
+ * @author david C., kazu T.
  */
 
-/** \addtogroup SPTApp
+/** \addtogroup ERTool
 
     @{*/
-#ifndef PARTICLEVIEWER_H
-#define PARTICLEVIEWER_H
+#ifndef ERTOOL_GEOVIEWERERTOOLBACKEND_H
+#define ERTOOL_GEOVIEWERERTOOLBACKEND_H
 
 #include <iostream>
+#include <map>
+#include <TDatabasePDG.h>
 #include "GeoAlgo/GeoObjCollection.h"
 #include "ERTool/Base/Particle.h"
 #include "ERTool/Base/EventData.h"
 
-namespace larlite {
+namespace ertool {
 
-  class ParticleViewer{
-    /**
-       \class ParticleViewer
-       User defined class ParticleViewer ... these comments are used to generate
-       doxygen documentation!
-    */
-    
+  class GeoViewerERToolBackend : public ::geoalgo::GeoObjCollection {
+  /**
+     \class GeoViewerERToolBackend
+  */
     
   public:
     
     /// Default constructor
-    ParticleViewer(){};
+    GeoViewerERToolBackend();
     
     /// Default destructor
-    virtual ~ParticleViewer(){};
-    
-    void addParticles( const ::ertool::ParticleSet& particles,
-		       geoalgo::GeoObjCollection& collection) const;
+    virtual ~GeoViewerERToolBackend(){}
 
-    void addParticles( const ::ertool::ParticleSet& particles,
-		       const ::ertool::EventData& eventData,
-		       geoalgo::GeoObjCollection& collection) const;
-
-    void addEventData( const ::ertool::EventData& eventData,
-		       geoalgo::GeoObjCollection& collection) const;
+    void Add(const ParticleSet& particles,
+	     const EventData& data);
     
-  private:
-    
-    ::ertool::EventData _data;
-
   };
 }
 

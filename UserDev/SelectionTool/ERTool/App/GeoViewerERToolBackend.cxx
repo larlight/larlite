@@ -1,72 +1,74 @@
-#ifndef PARTICLEVIEWER_CXX
-#define PARTICLEVIEWER_CXX
+#ifndef ERTOOL_GEOVIEWERERTOOLBACKEND_CXX
+#define ERTOOL_GEOVIEWERERTOOLBACKEND_CXX
 
-#include "ParticleViewer.h"
+#include "GeoViewerERToolBackend.h"
 
-namespace larlite {
+namespace ertool {
 
-  void ParticleViewer::addParticles( const ::ertool::ParticleSet& particles,
-				     geoalgo::GeoObjCollection& collection) const
+  GeoViewerERToolBackend::GeoViewerERToolBackend()
+    : ::geoalgo::GeoObjCollection()
+  {}
 
+  void GeoViewerERToolBackend::Add( const ::ertool::ParticleSet& particles,
+				    const ::ertool::EventData& data) 
   {
-
     // Take particles, loop over them.
     // Make them into a LineSegments
     // give them to the collection
+
+    static TDatabasePDG db_s;
+    static std::map<int,std::string> part_name_s;
+
+    std::vector<std::vector<bool> > used_obj(Particle::kTypeMax, std::vector<bool>());
+    used_obj[ Particle::kTrack  ].resize( data.Track().size(),  false );
+    used_obj[ Particle::kShower ].resize( data.Shower().size(), false );
+
     for (auto &p : particles){
       geoalgo::LineSegment_t part( p.Vertex(), p.Vertex() + (p.Momentum() * (30./p.Momentum().Length())) );
-      collection.Add( part, std::to_string(p.PdgCode() ) );
-    }
-    return;
-  }
-
-
-  void ParticleViewer::addParticles( const ::ertool::ParticleSet& particles,
-				     const ::ertool::EventData& eventData,
-				     geoalgo::GeoObjCollection& collection) const
-    
-  {
-    
-    
-    // Take particles, loop over them.
-    // Make them into a LineSegments
-    // give them to the collection
-    for (auto &p : particles){
-      geoalgo::LineSegment_t part( p.Vertex(), p.Vertex() + (p.Momentum() * (30./p.Momentum().Length())) );
-      collection.Add( part, std::to_string(p.PdgCode() ), "red" );
+      if(part_name_s.find(p.PdgCode()) == part_name_s.end())
+	part_name_s[p.PdgCode()] = db_s.GetParticle(p.PdgCode())->GetName();
+      //Add( part, std::to_string(p.PdgCode() ), "black" );
+      GeoObjCollection::Add( part, part_name_s[p.PdgCode()], "black" );
       // If this particle has associated EventData, show it as well
       if (p.RecoObjID() != -1){
-	if (p.Type() == ::ertool::Particle::RecoObjType_t::kShower)
-	  collection.Add( eventData.getShowers().at(p.RecoObjID()), "Shower", "blue");
-	if (p.Type() == ::ertool::Particle::RecoObjType_t::kTrack){
-	  if (eventData.getTracks().at(p.RecoObjID()).size() > 2)
-	    collection.Add( eventData.getTracks().at(p.RecoObjID()), "track", "red");
+	if (p.Type() == ::ertool::Particle::kShower)
+	  GeoObjCollection::Add( data.Shower(p.RecoObjID()), "", "blue");
+	if (p.Type() == ::ertool::Particle::kTrack){
+	  if (data.Track(p.RecoObjID()).size() >= 2)
+	    GeoObjCollection::Add( data.Track(p.RecoObjID()), "", "red");
 	}
+	used_obj[ p.Type() ][ p.RecoObjID() ] = true;
       }
     }
-    return;
-  }
 
+    // Process all unassociated objects
+    for(size_t trk_index = 0; trk_index < data.Track().size(); ++trk_index) {
+      
+      if( used_obj[ Particle::kTrack ][ trk_index ] ) continue;
 
-  void ParticleViewer::addEventData( const ::ertool::EventData& eventData,
-				     geoalgo::GeoObjCollection& collection) const
+      if( data.Track( trk_index ).size() < 2 ) continue;
 
-  {
-
-
-    // Get showers
-    auto shrs = eventData.getShowers();
-    auto trks = eventData.getTracks();
-    //    for (auto& s: shrs)
-    //      collection.Add( s, "SHOWER");
-    for (auto& t: trks){
-      if (t.size() >2)
-	collection.Add( t, "TRACK", "black");
+      GeoObjCollection::Add( data.Track( trk_index ), "un-tagged", "black" );
+      
     }
-    
+
+    for(size_t shr_index = 0; shr_index < data.Shower().size(); ++shr_index) {
+      
+      if( used_obj[ Particle::kShower ][ shr_index ] ) continue;
+
+      GeoObjCollection::Add( data.Shower( shr_index ), "un-tagged", "black" );
+      
+    }
+
+    for(size_t vtx_index = 0; vtx_index < data.Vertex().size(); ++vtx_index) {
+      
+      GeoObjCollection::Add( data.Vertex( vtx_index ), "Vertex", "black" );
+      
+    }
+
     return;
   }
-    
+
 }
 
 #endif
