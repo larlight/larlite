@@ -30,6 +30,8 @@ namespace ertool {
     _vtxDistMax  = 100036.;
     _vtx_err       = 2; //[ CM ]
 
+    _tau = 8.4e-17;
+
     // Get PDFs
     _radLenVar = new RooRealVar("_radLenVar","Distance from Vertex [cm]",0,_vtxDistMax);
     _radLenBkgd = _factory.UniformDistrib("pi0_radLen", *_radLenVar);
@@ -303,7 +305,12 @@ namespace ertool {
 	gamma2.Momentum(shower_v[1]->Dir()*shower_v[1]->_energy);
 	gamma2.RecoObjInfo(comb[1],Particle::RecoObjType_t::kShower);
 	res.push_back(gamma2);
+
 	Particle pi0(111,mass);
+	// Approximate vtx using lifetime
+	auto dir = momentum.Dir();
+	dir *= sqrt( 1 - pow( mass / (mass + momentum.Length()), 2)) * 2.998e10 * _tau;
+	vertex -= dir;
 	pi0.Vertex(vertex);
 	pi0.Momentum(momentum);
 	pi0.AddDaughter(gamma1);

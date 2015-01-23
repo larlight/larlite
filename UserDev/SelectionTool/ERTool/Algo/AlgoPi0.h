@@ -122,6 +122,9 @@ namespace ertool {
     /// verobsity boolean for couts
     bool _verbose;
 
+    /// pi0 lifetime constant
+    double _tau;
+
     // Variables for Fit range [MeV/c]
     double _fit_min, _fit_max;
 
