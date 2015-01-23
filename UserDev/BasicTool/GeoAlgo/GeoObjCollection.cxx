@@ -12,6 +12,11 @@ namespace geoalgo {
     _seg_v.clear();
     _trj_v.clear();
     _lin_v.clear();
+    _pt_col.clear();
+    _box_col.clear();
+    _seg_col.clear();
+    _trj_col.clear();
+    _lin_col.clear();
     _labels.clear();
   }
 

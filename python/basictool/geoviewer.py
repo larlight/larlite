@@ -97,7 +97,7 @@ class GeoViewer(object):
 
     def _add_halfline(self,arg,c='blue'):
         if not c: c = self.rand_color()
-
+        
         s = arg.Start()
         d = arg.Dir()
 
@@ -172,7 +172,6 @@ class GeoViewer(object):
         np = points.size()
 
         # Draw axis
-        
 
         for x in xrange(len(self._holder.Point())):
             #print x[0],x[1],x[2]

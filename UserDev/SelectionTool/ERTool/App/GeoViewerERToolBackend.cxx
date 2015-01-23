@@ -31,9 +31,9 @@ namespace ertool {
       GeoObjCollection::Add( part, part_name_s[p.PdgCode()], "black" );
       // If this particle has associated EventData, show it as well
       if (p.RecoObjID() != -1){
-	if (p.Type() == ::ertool::Particle::kShower)
-	  GeoObjCollection::Add( data.Shower(p.RecoObjID()), "", "blue");
-	if (p.Type() == ::ertool::Particle::kTrack){
+	if (p.Type() == Particle::RecoObjType_t::kShower)
+	  GeoObjCollection::Add( data.Shower(p.RecoObjID()), "" , "blue");
+	if (p.Type() == Particle::RecoObjType_t::kTrack){
 	  if (data.Track(p.RecoObjID()).size() >= 2)
 	    GeoObjCollection::Add( data.Track(p.RecoObjID()), "", "red");
 	}
@@ -42,28 +42,22 @@ namespace ertool {
     }
 
     // Process all unassociated objects
+    // Tracks
+
     for(size_t trk_index = 0; trk_index < data.Track().size(); ++trk_index) {
-      
-      if( used_obj[ Particle::kTrack ][ trk_index ] ) continue;
-
-      if( data.Track( trk_index ).size() < 2 ) continue;
-
-      GeoObjCollection::Add( data.Track( trk_index ), "un-tagged", "black" );
-      
+      if( !(used_obj[ Particle::RecoObjType_t::kTrack ][ trk_index ]) ){
+	if( data.Track( trk_index ).size() > 2 )
+	  GeoObjCollection::Add( data.Track( trk_index ), "un-tagged", "grey" );
+      }
     }
-
+    // Showers
     for(size_t shr_index = 0; shr_index < data.Shower().size(); ++shr_index) {
-      
-      if( used_obj[ Particle::kShower ][ shr_index ] ) continue;
-
-      GeoObjCollection::Add( data.Shower( shr_index ), "un-tagged", "black" );
-      
+      if( !(used_obj[ Particle::RecoObjType_t::kShower ][ shr_index ]) )
+	GeoObjCollection::Add( data.Shower( shr_index ), "un-tagged", "grey" );
     }
-
+    // Vertices
     for(size_t vtx_index = 0; vtx_index < data.Vertex().size(); ++vtx_index) {
-      
-      GeoObjCollection::Add( data.Vertex( vtx_index ), "Vertex", "black" );
-      
+      GeoObjCollection::Add( data.Vertex( vtx_index ), "Vertex", "grey" );
     }
 
     return;
