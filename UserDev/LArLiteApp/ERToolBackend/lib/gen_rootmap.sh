@@ -21,4 +21,5 @@ rootlibmap libLArLite_ERToolBackend.rootmap libLArLite_ERToolBackend.so \
     libLArLite_Analysis.so \
     libSelectionTool_ERFilter.so \
     libSelectionTool_ERAlgo.so \
+    libSelectionTool_ERBase.so
 
