@@ -65,11 +65,6 @@ namespace ertool {
     void FilterTrack  (size_t id, bool filter=true);
     void FilterVertex (size_t id, bool filter=true);
 
-    // Getters (for plotting)
-    std::vector<ertool::Shower> getShowers()  const { return _shower_v; }
-    std::vector<ertool::Track>  getTracks()   const { return _track_v; }
-    std::vector<ertool::Vertex> getVertices() const { return _vertex_v; }
-
     /// Reset function
     void Reset();
 
