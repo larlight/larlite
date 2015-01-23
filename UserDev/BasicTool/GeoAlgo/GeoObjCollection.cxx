@@ -65,7 +65,7 @@ namespace geoalgo {
 
   void GeoObjCollection::Add(const Trajectory_t& trj, std::string name, std::string c)
   {
-    if(trj.size()<=2)
+    if(trj.size()<2)
       throw GeoAlgoException("Trajectory size cannot be smaller than 2!");
     if(name.empty()) name = Form("Trj (%zu)",_trj_v.size());
     _AddLabel_(trj[0],name);
