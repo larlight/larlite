@@ -96,7 +96,7 @@ namespace larlite {
     /**
        @brief get Particles produced by Algorithm.
      */
-    ::ertool::ParticleSet GetParticles() const { return _particles; }
+    ::ertool::ParticleSet GetParticles(bool mc=false) const { return mc ? _McParticles : _RecoParticles; }
 
     /// Selection manager class instance
     ::ertool::Manager _mgr;
@@ -104,7 +104,8 @@ namespace larlite {
   protected:
 
     ::ertool::EventData _data; ///< Data to be filled by this module (main purpose!)
-    ::ertool::ParticleSet _particles; ////<Particles Produced by Algorithm
+    ::ertool::ParticleSet _RecoParticles; ////<Particles Produced by Algorithm
+    ::ertool::ParticleSet _McParticles; ////<Particles from MC file, if available
     ERToolHelper _helper; ///< SPAHelper helps generating SPAData
 
   private:

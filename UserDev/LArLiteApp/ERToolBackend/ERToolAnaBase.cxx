@@ -108,6 +108,12 @@ namespace larlite {
 
     static bool one_time_warning = true;
 
+    // If MC info is found, fill MCParticles into a ParticleSet
+    auto ev_mci = storage->get_data<event_mctruth> ("generator");
+    _McParticles.clear();
+    if (ev_mci)
+      _helper.FillMCParticles(*ev_mci, _McParticles);
+
     //------------------------------
     // Start filling SPAData object!
     

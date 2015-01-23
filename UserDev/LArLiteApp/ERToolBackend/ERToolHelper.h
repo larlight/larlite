@@ -28,7 +28,9 @@
 #include "DataFormat/cosmictag.h"
 #include "DataFormat/calorimetry.h"
 #include "DataFormat/partid.h"
+
 #include "ERTool/Base/EventData.h"
+#include "ERTool/Base/Particle.h"
 
 namespace larlite {
   /**
@@ -44,6 +46,10 @@ namespace larlite {
     
     /// Default destructor
     virtual ~ERToolHelper(){};
+
+    /// Fill MC Particle Info
+    void FillMCParticles ( const event_mctruth&  mci_v,
+			   ::ertool::ParticleSet& pset ) const;
 
     /// Fill Track Info from MC
     void FillTracks( const event_mctrack& mct_v,
