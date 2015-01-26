@@ -47,9 +47,12 @@ namespace larlite {
     /// Default destructor
     virtual ~ERToolHelper(){};
 
-    /// Fill MC Particle Info
-    void FillMCParticles ( const event_mctruth&  mci_v,
-			   ::ertool::ParticleSet& pset ) const;
+    /// Create MC EventData and ParticleSet
+    void FillMCInfo( const event_mctruth&   mci_v,
+		     const event_mcshower&  mcs_v,
+		     const event_mctrack&   mct_v,
+		     ::ertool::EventData&   event_data,
+		     ::ertool::ParticleSet& particle_set) const;
 
     /// Fill Track Info from MC
     void FillTracks( const event_mctrack& mct_v,
@@ -79,48 +82,6 @@ namespace larlite {
     void FillVertices ( const event_mctruth& mci_v,
 			::ertool::EventData& res) const;
 
-    /// Generate ::ertool::EventData for full MC information
-    ::ertool::EventData Generate ( const event_mctruth&  mci_v,
-				   const event_mctrack&  mct_v,
-				   const event_mcshower& mcs_v ) const;
-
-    /// Generate ::ertool::EventData for MCShower/MCTrack information
-    ::ertool::EventData Generate ( const event_mctrack&  mct_v,
-				   const event_mcshower& mcs_v ) const;
-
-    /// Append MCTruth to input ::ertool::EventData
-    void Append ( const event_mctruth& mci_v,
-		  ::ertool::EventData& res) const;
-
-    /// Generate ::ertool::EventData only using shower information
-    ::ertool::EventData Generate ( const event_shower&    shw_v,
-				   const event_cosmictag& cos_shw_v ) const;
-
-    /// Generate ::ertool::EventData using shower + track + vertex information
-    ::ertool::EventData Generate ( const event_vertex&      vtx_v,
-				   const event_track&       trk_v,
-				   const event_shower&      shw_v,
-				   const event_cosmictag&   cos_trk_v,
-				   const event_cosmictag&   cos_shw_v,
-				   const event_calorimetry& calo_trk_v,
-				   const event_partid&      pid_trk_v) const;
-
-    /// Append vertex information to input ::ertool::EventData
-    void Append ( const event_vertex& vtx_v, 
-		  ::ertool::EventData& res) const;
-
-    /// Append shower information to input ::ertool::EventData
-    void Append ( const event_shower&    shw_v,
-		  const event_cosmictag& cos_shw_v,
-		  ::ertool::EventData& res) const;
-
-    /// Append track information to input ::ertool::EventData
-    void Append ( const event_track&       trk_v,
-		  const event_cosmictag&   cos_trk_v,
-		  const event_calorimetry& calo_trk_v,
-		  const event_partid&      pid_trk_v,
-		  ::ertool::EventData& res ) const;
-    
   };
 }
 

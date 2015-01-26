@@ -62,7 +62,7 @@ namespace ertool {
     double Energy()  const;
     const ::geoalgo::Vector& Vertex()   const { return _vtx; }
     const ::geoalgo::Vector& Momentum() const { return _mom; }
-    const std::vector<ertool::Particle>& Daughters() { return _daughters; }
+    const std::vector<ertool::Particle>& Daughters() const { return _daughters; }
     int RecoObjID() const  { return _reco_obj_id; }
     RecoObjType_t Type() const { return _reco_obj_type; }
     double DaughterEnergySum() const;
@@ -82,6 +82,12 @@ namespace ertool {
     void AddDaughter(const Particle& s);
     void RecoObjInfo(const int id, const RecoObjType_t type);
 
+    //
+    // Utility function
+    //
+    bool Match(const Particle& p, bool exclusive=false) const;
+    std::string Diagram() const;
+
   protected:
 
     int _pdg_code;            ///< PDG code
@@ -95,6 +101,8 @@ namespace ertool {
     int  _reco_obj_id;  
     /// Type of reconstructed object in EventData
     RecoObjType_t _reco_obj_type;
+
+    void Diagram(std::string& res,std::string prefix="") const;
 
   private:
 
@@ -117,6 +125,7 @@ namespace ertool {
 
     virtual ~ParticleSet(){}
 
+    ClassDef(ParticleSet,1)
   };
   
 }

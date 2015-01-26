@@ -48,24 +48,6 @@ namespace larlite {
     virtual bool finalize();
 
     /**
-       @brief Setter for MC info producer names.
-       First argument is the generator's name, and the second is MCShower/MCTrack producer name. \n
-       It's ok to provide an empty generator name (you will lose vertex MC info as a cost), but  \n
-       providing an empty MCShower/MCTrack producer name will result in exception throw.         \n
-       Calling this function automatically disables the usage of reco info.
-    */
-    void MCProducer(const std::string gen, const std::string mcst);
-
-    /**
-       @brief Setter for reco info producer names.
-       First argument is track producer's name, and the second is shower producer's name.        \n
-       It is OK to set an empty string for the track producer's name, but doing so for the shower\n
-       producer name will cause an exception throw. Calling this function automatically disables \n
-       the usage of mc info.
-    */
-    void RecoProducer(const std::string track, const std::string shower);
-
-    /**
        @brief Add a generator producer name.
        To be used if one wants to access MC info (like MC vertex information) even if Reco      \n
        objects are being used.                                                                  \n
@@ -91,7 +73,7 @@ namespace larlite {
     /**
        @brief get EventData that is used by the manager
      */
-    ::ertool::EventData GetData() const { return _data; }
+    ::ertool::EventData GetData(bool mc=false) const { return mc ? _mc_data : _data; }
 
     /**
        @brief get Particles produced by Algorithm.
@@ -103,9 +85,10 @@ namespace larlite {
 
   protected:
 
-    ::ertool::EventData _data; ///< Data to be filled by this module (main purpose!)
-    ::ertool::ParticleSet _RecoParticles; ////<Particles Produced by Algorithm
-    ::ertool::ParticleSet _McParticles; ////<Particles from MC file, if available
+    ::ertool::EventData _data;           ///< Data to be filled by this module (main purpose!)
+    ::ertool::EventData _mc_data;        ///< Data to be filled by this module (main purpose!)
+    ::ertool::ParticleSet _RecoParticles;////<Particles Produced by Algorithm
+    ::ertool::ParticleSet _McParticles;  ////<Particles from MC file, if available
     ERToolHelper _helper; ///< SPAHelper helps generating SPAData
 
   private:

@@ -63,6 +63,49 @@ namespace ertool {
   void Particle::RecoObjInfo(const int id, const RecoObjType_t type)
   { _reco_obj_id = id; _reco_obj_type = type; }
 
+
+  bool Particle::Match(const Particle& p, bool exclusive) const
+  {
+    if(exclusive) return (Match(p,false) && p.Match(*this,false));
+
+    if(p._pdg_code && _pdg_code && _pdg_code != p._pdg_code) return false;
+
+    std::vector<bool> used_v(_daughters.size(),false);
+    for(auto const& p_daughter : p.Daughters()) {
+
+      bool found=false;
+      for(size_t i=0; i<_daughters.size(); ++i) {
+
+	if(used_v[i]) continue;
+
+	auto const& my_daughter = _daughters[i];
+
+	if(my_daughter.Match(p_daughter)) {
+	  found = true;
+	  used_v[i] = true;
+	  break;
+	}
+	
+      }
+      if(!found) return false;
+    }
+    return true;
+  }
+
+  std::string Particle::Diagram() const
+  {
+    std::string res;
+    Diagram(res);
+    return res;
+  }
+
+  void Particle::Diagram(std::string& res,std::string prefix) const
+  {
+    res += prefix + std::to_string(_pdg_code) + "\n";
+    prefix += "  ";
+    for(auto const& d : _daughters) d.Diagram(res,prefix);
+  }
+
 }
 
 #endif

@@ -47,8 +47,6 @@ namespace larlite {
     */
     virtual bool finalize();
 
-
-
   };
 }
 #endif
