@@ -36,7 +36,7 @@ namespace ertool {
     /// alternative ctor
     Shower(const ::geoalgo::Vector& start,
 	   const ::geoalgo::Vector& dir,
-	   double height,double radius);
+	   double length,double radius);
 
     /// default dtor
     virtual ~Shower(){}

@@ -15,48 +15,59 @@
 #define BASICTOOL_GEOCONE_H
 
 #include "GeoVector.h"
+#include "GeoHalfLine.h"
 namespace geoalgo {
   /**
      \class Cone
      @brief Representation of a 3D semi-infinite line.
      Defines a 3D cone with the following properties:                                           \n
-     Start point (or vertex), Direction, Height (or Length), Radius, opening angle              \n
-     When 2 of Height, Radius, opening angle are defined the third is automatically set         
+     Start point (or vertex), Direction, Length (or Length), Radius, opening angle              \n
+     When 2 of Length, Radius, opening angle are defined the third is automatically set         
   */
-  class Cone {
+  class Cone : public HalfLine {
     
   public:
     
     /// Default constructor
-    Cone() 
-      : _start(3)
-      , _dir(3)
-    {Normalize();}
-
-    /// Alternative ctor (1)
-    Cone(const double x,    const double y,    const double z,
-	 const double dirx, const double diry, const double dirz,
-	 const double height, const double radius)
-      : _start (x,    y,    z   )
-      , _dir   (dirx, diry, dirz)
+  Cone() : HalfLine()
       {
-	_height = height; 
+	_length=1; _radius=1; 
+      }
+    
+    /// Alternative ctor (1)
+  Cone(const double x,    const double y,    const double z,
+       const double dirx, const double diry, const double dirz,
+       const double length, const double radius)
+    : HalfLine(x, y, z, dirx, diry, dirz)
+      {
+	if (length == 0){
+	  std::ostringstream msg;
+	  msg << "<<" << __FUNCTION__ << ">>"
+	      << " Cone Length cannot be 0." << std::endl;
+	  throw GeoAlgoException(msg.str());
+	}
+	_length = length; 
 	_radius = radius;
-	_angle = atan(_radius/_height);
+	_angle = atan(_radius/_length);
 	Normalize();
       }
-
+    
     /// Altenartive ctor (2)
   Cone(const Point_t& start, const Vector_t& dir,
-       const double height, const double radius)
-      : _start ( start )
-      , _dir   ( dir   )
-    { 
+       const double length, const double radius)
+    : HalfLine( start,  dir )
+      { 
       if(start.size()!=3 || dir.size()!=3)
 	throw GeoAlgoException("Cone ctor accepts only 3D Point!");
-      _height = height;
+      if (length == 0){
+	std::ostringstream msg;
+	msg << "<<" << __FUNCTION__ << ">>"
+	    << " Cone Length cannot be 0." << std::endl;
+	throw GeoAlgoException(msg.str());
+      }
+      _length = length;
       _radius = radius;
-      _angle  = atan(_radius/_height);
+      _angle  = atan(_radius/_length);
       Normalize();
     }
 
@@ -74,8 +85,8 @@ namespace geoalgo {
     /// Direction getter
     const Vector_t& Dir() const { return _dir; }
 
-    /// Height getter
-    const double Height() const { return _height; }
+    /// Length getter
+    const double Length() const { return _length; }
 
     /// Length getter
     const double Radius() const { return _radius; }
@@ -91,14 +102,21 @@ namespace geoalgo {
     void Dir(const double x, const double y, const double z)
     { _dir[0] = x; _dir[1] = y; _dir[2] = z; Normalize(); }
 
-    /// Height setter
-    void Height(const double h) { _height = h; }
+    /// Length setter
+    void Length(const double l) 
+    { 
+      if (l == 0){
+	std::ostringstream msg;
+	msg << "<<" << __FUNCTION__ << ">>"
+	    << " Cone Length cannot be 0." << std::endl;
+	throw GeoAlgoException(msg.str());
+      }
+      _length = l; 
+      _angle = atan(_radius/_length);
+    }
 
     /// Length setter
-    void Radius(const double r) { _radius = r; }
-
-    /// Angle setter
-    void Angle(const double a) { _angle = a; }
+    void Radius(const double r) { _radius = r; _angle = atan(_radius/_length); }
 
     /// Start setter template
     template<class T>
@@ -139,7 +157,7 @@ namespace geoalgo {
     Vector_t _dir;
 
     /// Helight (length) of the cone
-    double _height;
+    double _length;
     
     /// Radius of the cone at the base
     double _radius;

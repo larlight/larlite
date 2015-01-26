@@ -85,7 +85,7 @@ namespace geoalgo {
   void GeoObjCollection::Add(const Cone_t& cone, std::string name, std::string c)
   {
     if(name.empty()) name = Form("Cone (%zu)",_cone_v.size());
-    _AddLabel_(cone.Start()+cone.Dir()*cone.Height(),name);
+    _AddLabel_(cone.Start()+cone.Dir()*cone.Length(),name);
     _cone_v.push_back(cone);
     _cone_col.push_back(c);
   }

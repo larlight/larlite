@@ -59,17 +59,17 @@ namespace ertool {
     for(size_t trk_index = 0; trk_index < data.Track().size(); ++trk_index) {
       if( !(used_obj[ Particle::RecoObjType_t::kTrack ][ trk_index ]) ){
 	if( data.Track( trk_index ).size() > 2 )
-	  GeoObjCollection::Add( data.Track( trk_index ), "un-tagged", shr_col.c_str() );
+	  GeoObjCollection::Add( data.Track( trk_index ), Form("un-tagged (%zu)",trk_index), shr_col.c_str() );
       }
     }
     // Showers
     for(size_t shr_index = 0; shr_index < data.Shower().size(); ++shr_index) {
       if( !(used_obj[ Particle::RecoObjType_t::kShower ][ shr_index ]) )
-	GeoObjCollection::Add( data.Shower( shr_index ), "un-tagged", trk_col.c_str() );
+	GeoObjCollection::Add( data.Shower( shr_index ), Form("un-tagged (%zu)",shr_index), shr_col.c_str() );
     }
     // Vertices
     for(size_t vtx_index = 0; vtx_index < data.Vertex().size(); ++vtx_index) {
-      GeoObjCollection::Add( data.Vertex( vtx_index ), "Vertex", vtx_col.c_str() );
+      GeoObjCollection::Add( data.Vertex( vtx_index ), Form("Vertex (%zu)",vtx_index), vtx_col.c_str() );
     }
 
     return;
