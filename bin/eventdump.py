@@ -8,12 +8,13 @@ except ImportError:
     print
     sys.exit(1)
 
-if not len(sys.argv) == 2:
-
-    print
-    print 'Usage: %s $INPUT_ROOT_FILE', sys.argv[0]
-    print
-    sys.exit(1)
+user_ctr = -1
+if len(sys.argv) == 3:
+    try:
+        user_ctr = int(sys.argv[2])
+    except ValueError:
+        print 'Error: 2nd argument must be an integer!'
+        sys.exit(1)
 
 mgr = fmwk.storage_manager()
 mgr.add_in_filename(sys.argv[1])
@@ -45,3 +46,4 @@ while mgr.next_event():
                 print FORMAT % (mgr.product_name(product_id.first),product_id.first,product_id.second)
     print
     ctr+=1
+    if user_ctr > 0 and user_ctr < ctr: break
