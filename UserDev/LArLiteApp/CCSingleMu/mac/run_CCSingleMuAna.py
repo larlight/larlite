@@ -14,9 +14,8 @@ from ROOT import larlite as fmwk
 my_proc = fmwk.ana_processor()
 
 # Set input root file
-#my_proc.add_input_file(sys.argv[1])
-my_proc.add_input_file("~/LArLite_Files/bnb_nu/larlite_reco3d_000.root")
-my_proc.add_input_file("~/LArLite_Files/bnb_nu/larlite_anadata_000.root")
+for x in xrange(len(sys.argv)-1):
+    my_proc.add_input_file(sys.argv[x+1])
 
 # Specify IO mode
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
@@ -25,7 +24,7 @@ my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 
 # Attach a template process
-my_proc.add_process(fmwk.sample_ana());
+my_proc.add_process(fmwk.CCSingleMuAna())
 
 print
 print  "Finished configuring ana_processor. Start event loop!"

@@ -10,6 +10,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class larlite::CCSingleMuFilter+;
+#pragma link C++ class larlite::CCSingleMuAna+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
