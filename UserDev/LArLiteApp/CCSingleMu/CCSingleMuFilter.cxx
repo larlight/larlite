@@ -9,6 +9,7 @@ namespace larlite {
     : hMuEnergy(nullptr)
     , hMuCount(nullptr)
   {
+    _name = "CCSingleMuFilter";
   }
 
   bool CCSingleMuFilter::initialize() {
@@ -17,7 +18,7 @@ namespace larlite {
 			 100,0,2000);
     hMuCount  = new TH1D("hMuCount","Muon Count; Count; Events",
 			 10,-0.5,9.5);
-    return false;
+    return true;
   }
   
   bool CCSingleMuFilter::analyze(storage_manager* storage) {
@@ -63,6 +64,12 @@ namespace larlite {
   }
 
   bool CCSingleMuFilter::finalize() {
+
+    if(_fout) {
+      _fout->cd();
+      hMuCount->Write();
+      hMuEnergy->Write();
+    }
 
     return true;
   }
