@@ -14,7 +14,7 @@
 #ifndef ERTOOL_SHOWER_H
 #define ERTOOL_SHOWER_H
 
-#include "GeoAlgo/GeoHalfLine.h"
+#include "GeoAlgo/GeoCone.h"
 #include "RecoObjBase.h"
 #include "ERException.h"
 namespace ertool {
@@ -26,7 +26,7 @@ namespace ertool {
      AlgoX and FilterX will use ertool::EventData instance for evaluation.
   */
   class Shower : public RecoObjBase
-	       , public ::geoalgo::HalfLine {
+	       , public ::geoalgo::Cone {
 
   public:
 
@@ -35,7 +35,8 @@ namespace ertool {
 
     /// alternative ctor
     Shower(const ::geoalgo::Vector& start,
-	   const ::geoalgo::Vector& dir);
+	   const ::geoalgo::Vector& dir,
+	   double height,double radius);
 
     /// default dtor
     virtual ~Shower(){}
@@ -48,12 +49,6 @@ namespace ertool {
     */
     /// Reset function
     void Reset();
-
-    /// Radius of shower, either read from data product or computed
-    double _radius;
-
-    /// Opening angle of a shower cone, either read from data product or computed
-    double _cone_angle;
 
     /// dE/dX @ shower start
     double _dedx;

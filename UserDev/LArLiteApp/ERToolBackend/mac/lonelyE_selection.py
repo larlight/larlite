@@ -37,8 +37,8 @@ my_algo.LoadParams()
 my_algo.Reset()
 my_algo.setDebug(True)
 
-my_filter = ertool.AFilterECut()
-my_filter.SetECut(40.) # MeV
+my_filter = ertool.FilterECut()
+my_filter.SetECut(30.) # MeV
 
 my_ana = fmwk.ExampleERSelection()
 # OPTIONAL:
@@ -53,7 +53,15 @@ my_ana._mgr.SetAlgo(my_algo)
 my_ana._mgr.SetFilter(my_filter)
 my_ana._mode =True # True = Select. False = Fill mode
 my_proc.add_process(my_ana)
-my_proc.run()
+
+counter = 0
+while (counter < 1000):
+    try:
+        counter = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
+    except SyntaxError:
+        counter += 1
+    my_proc.process_event(counter)
+#my_proc.run()
 
 
 my_algo.Reset()

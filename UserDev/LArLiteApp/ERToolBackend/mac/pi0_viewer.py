@@ -61,7 +61,7 @@ def main():
     #my_ana.SetTrackProducer(True,"mcreco");
     #my_ana.SetVtxProducer(True,"generator");
     my_ana.SetShowerProducer(False,"showerreco");
-    my_ana.SetTrackProducer(False,"stitchkalmanhit");
+    my_ana.SetTrackProducer(False,"");
     my_ana.SetVtxProducer(False,"");
     # ************Set Producers**************
 

@@ -11,7 +11,9 @@ namespace larlite {
     if ( (part.PdgCode() == 11) || (part.PdgCode() == -11) ){
       ::geoalgo::Vector_t mom(part.Trajectory().at(0).Momentum());
       mom.Normalize();
-      ::ertool::Shower s(part.Trajectory().at(0).Position(), mom);
+      ::ertool::Shower s(part.Trajectory().at(0).Position(), mom,
+			 _shrProfiler.Length(part.Trajectory().at(0).E()),
+			 _shrProfiler.ShowerRadius() );
       return s;
     }// if shower
 

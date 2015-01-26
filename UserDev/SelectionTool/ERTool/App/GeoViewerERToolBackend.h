@@ -18,6 +18,7 @@
 #include <map>
 #include <TDatabasePDG.h>
 #include "GeoAlgo/GeoObjCollection.h"
+#include "EMShowerTools/EMShowerProfile.h"
 #include "ERTool/Base/Particle.h"
 #include "ERTool/Base/EventData.h"
 
@@ -39,6 +40,10 @@ namespace ertool {
     void Add(const ParticleSet& particles,
 	     const EventData& data,
 	     bool randColors);
+
+  private:
+    
+    EMShowerProfile _shrProfiler;
     
   };
 }

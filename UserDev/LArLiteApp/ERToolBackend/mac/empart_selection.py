@@ -29,6 +29,7 @@ my_algo = ertool.AlgoEMPart()
 my_algo.LoadParams()
 my_algo.Reset()
 my_algo.SetMode(False) # True = Gamma. False = Electron.
+my_algo.setVerbose(True)
 my_ana = fmwk.ExampleERSelection()
 
 # Set Producers

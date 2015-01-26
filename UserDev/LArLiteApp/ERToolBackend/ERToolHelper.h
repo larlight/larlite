@@ -32,6 +32,9 @@
 #include "ERTool/Base/EventData.h"
 #include "ERTool/Base/Particle.h"
 
+//Use ShowerProfile to calculate Height & Radius from Energy
+#include "EMShowerTools/EMShowerProfile.h"
+
 namespace larlite {
   /**
      \class ERToolHelper
@@ -81,6 +84,10 @@ namespace larlite {
     /// Fill Vertex Info from RECO
     void FillVertices ( const event_mctruth& mci_v,
 			::ertool::EventData& res) const;
+
+  private:
+    
+    EMShowerProfile _shrProfiler;
 
   };
 }

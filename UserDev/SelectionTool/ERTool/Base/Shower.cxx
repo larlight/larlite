@@ -9,21 +9,25 @@ namespace ertool {
   { Reset(); }
 
   Shower::Shower(const ::geoalgo::Vector& start,
-		 const ::geoalgo::Vector& dir)
+		 const ::geoalgo::Vector& dir,
+		 double height, double radius)
   {
     Reset();
-    ::geoalgo::HalfLine::Start(start);
-    ::geoalgo::HalfLine::Dir(dir);
+    ::geoalgo::Cone::Start(start);
+    ::geoalgo::Cone::Dir(dir);
+    ::geoalgo::Cone::Height(height);
+    ::geoalgo::Cone::Radius(radius);
   }
 
 
   void Shower::Reset() 
   {
-    ::geoalgo::HalfLine::Start(::geoalgo::Point_t(3));
-    ::geoalgo::HalfLine::Dir(::geoalgo::Point_t(3));
+    ::geoalgo::Cone::Start(::geoalgo::Point_t(3));
+    ::geoalgo::Cone::Dir(::geoalgo::Point_t(3));
+    ::geoalgo::Cone::Height(0.);
+    ::geoalgo::Cone::Radius(0.);
+    ::geoalgo::Cone::Angle(0.);
     RecoObjBase::Reset();
-    _radius     = kINVALID_DOUBLE;
-    _cone_angle = kINVALID_DOUBLE;
     _dedx       = kINVALID_DOUBLE;
     _energy     = kINVALID_DOUBLE;
   }

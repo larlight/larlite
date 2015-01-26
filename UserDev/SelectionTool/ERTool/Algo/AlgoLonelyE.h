@@ -52,6 +52,9 @@ namespace ertool {
     /// Function to set debug mode on or off
     void setDebug(bool on) { _debug = on; _alg_singleE.setVerbose(on); }
 
+    /// Function to set whether to use the particle set or event data
+    void useParticleSet(bool on) { _useParticleSet = on; }
+
   private:
 
     /* 
@@ -68,6 +71,9 @@ namespace ertool {
 
     // debug mode
     bool _debug;
+
+    // boolean to decide if to use ParticleSet from SingleE or if to just loop through all showers
+    bool _useParticleSet;
 
     // instance of GeoAlgo
     geoalgo::GeoAlgo _geoAlgo;

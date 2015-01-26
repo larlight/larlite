@@ -9,6 +9,7 @@ namespace ertool {
   {
     _name     = "AlgoLonelyE";
     _debug    = false;
+    _useParticleSet = false;
     _minDistFromTrkStart = 3;
     _radLenCut = 30;
     _minIPShrTrk = 3;
@@ -43,29 +44,42 @@ namespace ertool {
       std::cout << "There are " << data.Shower().size() << " showers." << std::endl;
       std::cout << "There are " << data.Track().size() << " tracks." << std::endl << std::endl;
     }
-
-    //Get a list of single (start point isolated) electron showers
-    //from the AlgoSingleE instance
-    ParticleSet single_es = _alg_singleE.Reconstruct(data);
     
     // create empty ParticleSet for the products
     ParticleSet lonely_es;
     
-    // Run filter for every "single electron" found by previous step
-    for(auto const& s : single_es) {
+    // Run in two modes:
+    // 1) Take a ParticleSet as input
+    // 2) Take EventData as input
+    
+    // If input is ParticleSet
+    if (_useParticleSet){
+      //Get a list of single (start point isolated) electron showers
+      //from the AlgoSingleE instance
+      ParticleSet single_es = _alg_singleE.Reconstruct(data);
+      // Run filter for every "single electron" found by previous step
+      for(auto const& s : single_es) {
+	// Convert shower into HalfLine
+	if (_debug) { std::cout << "Shower Energy: " << s.Energy() << std::endl << std::endl; }
+	if ( isLonely(data.Shower(s.RecoObjID()), data) ) { lonely_es.push_back(s); }
+      }// for all input showers from AlgoSingleE
+      if (_debug) { std::cout << std::endl; }
+    }
 
-      // Convert shower into HalfLine
-      if (_debug) { std::cout << "Shower Energy: " << s.Energy() << std::endl << std::endl; }
-
-      if ( isLonely(data.Shower(s.RecoObjID()), data) ) { lonely_es.push_back(s); }
-    }// for all input showers from AlgoSingleE
-
-    if (_debug) { std::cout << std::endl; }
-
+    // If input is EventData
+    else{
+      // Run filter for every showerd in EventData
+      for(auto const& s : data.Shower()) {
+	// Convert shower into HalfLine
+	if ( isLonely(*s, data) ){
+	  if (_debug) { std::cout << "Shower is Lonely!" << std::endl << std::endl; }
+	}
+      }
+    }      
     return lonely_es; 
   }
-
-
+  
+  
   bool AlgoLonelyE::isLonely(const Shower& s, const EventData& data) const
   {
 
@@ -139,8 +153,8 @@ namespace ertool {
     double IP_to_Shr = shr.Start().Dist(s_pt); // distance from Shower Start to IP point on shower
     if (_debug) {
       std::cout << "Impact Param between Shr Backwards & Trk: " << distTrk << std::endl;
-      std::cout << "IP dist to Track: " << IP_to_Trk << std::endl;
-      std::cout << "IP dist to Shower:  " << IP_to_Shr << std::endl;
+      std::cout << "IP point to Track start: " << IP_to_Trk << std::endl;
+      std::cout << "IP point to Shower start:  " << IP_to_Shr << std::endl;
     }
     if ( (IP_to_Trk > _minDistFromTrkStart) && (IP_to_Shr < _radLenCut) && (IP_to_Trk < _radLenCut) ){
       geoalgo::Vector_t trkDir(trk.back()-trk.front());

@@ -175,11 +175,13 @@ namespace larlite {
       auto ev_mct = storage->get_data<event_mctrack>  (_name_mctrk);
       _McParticles.clear();
       _mc_data.Reset();
-      _helper.FillMCInfo(*ev_mci,
-			 *ev_mcs,
-			 *ev_mct,
-			 _mc_data,
-			 _McParticles);
+      // Make sure the data is there
+      if (ev_mci && ev_mcs && ev_mct)
+	_helper.FillMCInfo(*ev_mci,
+			   *ev_mcs,
+			   *ev_mct,
+			   _mc_data,
+			   _McParticles);
     }
       
     one_time_warning = false;

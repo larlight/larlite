@@ -19,6 +19,7 @@
 #include "GeoAABox.h"
 #include "GeoLineSegment.h"
 #include "GeoHalfLine.h"
+#include "GeoCone.h"
 #include "GeoAlgoException.h"
 #include <map>
 namespace geoalgo {
@@ -48,6 +49,8 @@ namespace geoalgo {
 	     
     void Add(const Trajectory_t& trj, std::string label="", std::string c="");
 
+    void Add(const Cone_t& cone, std::string label="", std::string c="");
+
     const std::vector< geoalgo::Point_t >& Point() const { return _pt_v; }
     const std::vector< std::string >& PointColor() const { return _pt_col; }
 
@@ -62,6 +65,9 @@ namespace geoalgo {
 
     const std::vector< geoalgo::Trajectory_t >& Trajectory() const { return _trj_v; }
     const std::vector< std::string >& TrajectoryColor() const { return _trj_col; }
+
+    const std::vector< geoalgo::Cone_t >& Cone() const { return _cone_v; }
+    const std::vector< std::string >& ConeColor() const { return _cone_col; }
 
     const std::map<geoalgo::Point_t,std::string>& Labels() const  { return _labels;}
 
@@ -79,6 +85,9 @@ namespace geoalgo {
     const Trajectory_t& _Trajectory_(size_t i) const
     { return _trj_v[i]; }
 
+    const Cone_t& _Cone_(size_t i) const
+    { return _cone_v[i]; }
+
     void _AddLabel_(const Point_t& pt,
 		    std::string label);
 
@@ -92,6 +101,8 @@ namespace geoalgo {
     std::vector< std::string            > _lin_col; 
     std::vector< geoalgo::Trajectory_t  > _trj_v;
     std::vector< std::string            > _trj_col; 
+    std::vector< geoalgo::Cone_t        > _cone_v;
+    std::vector< std::string            > _cone_col; 
     std::map<geoalgo::Point_t,std::string > _labels;
 
   };

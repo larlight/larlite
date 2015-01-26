@@ -1,4 +1,4 @@
-import sys
+import sys, os
 
 if len(sys.argv) < 2:
     msg  = '\n'
@@ -34,7 +34,9 @@ my_proc.set_ana_output_file("singleE_selection_ana_out.root")
 
 my_algo = ertool.AlgoSingleE()
 my_algo.Reset()
+my_algo.setVerbose(True)
 my_ana = fmwk.ExampleERSelection()
+
 
 # Set Producers
 # First Argument: True = MC, False = Reco
@@ -42,13 +44,25 @@ my_ana = fmwk.ExampleERSelection()
 #my_ana.SetTrackProducer(True,"mcreco");
 #my_ana.SetVtxProducer(True,"generator");
 
+#my_ana.SetShowerProducer(False,"mergeall");
 my_ana.SetShowerProducer(False,"showerreco");
 my_ana.SetTrackProducer(False,"");
 my_ana.SetVtxProducer(False,"");
 
+my_ana._mgr.SetAlgo(my_algo)
+
 my_ana._mode =True # True = Select. False = Fill mode
 my_proc.add_process(my_ana)
-my_proc.run()
+
+counter = 0
+while (counter < 1000):
+    try:
+        counter = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
+    except SyntaxError:
+        counter += 1
+    my_proc.process_event(counter)
+
+#my_proc.run()
 
 
 my_algo.Reset()

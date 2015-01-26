@@ -14,6 +14,7 @@ class GeoViewer(object):
     _type_trk  = geoalgo.Trajectory()
     _type_seg  = geoalgo.LineSegment()
     _type_lin  = geoalgo.HalfLine()
+    _type_con  = geoalgo.Cone()
     _holder    = geoalgo.GeoObjCollection()
     _converter = larpy.PyGeoObj()
 
@@ -140,6 +141,54 @@ class GeoViewer(object):
         self._ax.plot(xp,yp,zp,color=c)
 
 
+
+    def _add_cone(self,arg,c=''):
+
+        print "ADDING CONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        if not c: c = self.rand_color()
+        
+        s = arg.Start()
+        d = arg.Dir()
+
+        u = np.linspace(0,2*np.pi,50)
+        r0 = arg.Radius() # maximum radius of cone
+        h0 = arg.Height() # height of cone
+        num_levels = 30
+
+
+        # Take direction and find Euler Angles for cone rotation
+        phi = np.arccos(d[0]/np.sqrt(d[0]*d[0]+d[1]*d[1]))
+        if ( d[1] < 0 ):
+            phi *= -1
+        theta  = np.arccos(d[2]/np.sqrt(d[0]*d[0]+d[1]*d[1]+d[2]*d[2]))
+
+        x = np.hstack([r0*(1-h)*np.cos(u) for h in np.linspace(0,1,num_levels)])
+        y = np.hstack([r0*(1-h)*np.sin(u) for h in np.linspace(0,1,num_levels)])
+        z = np.hstack([np.ones(len(u))*h0*(1-h) for h in np.linspace(0,1,num_levels)])
+        XYZ = np.vstack([x,y,z])
+
+        xp,yp,zp = rot(XYZ,theta,phi) 
+
+        for i in xrange(len(xp)):
+            xp[i] += s[0]
+            yp[i] += s[1]
+            zp[i] += s[2]
+
+        # update boundaries
+        for j in xrange(len(xp)):
+                if xp[j] < self._range_min[0]: self._range_min[0] = xp[j]
+                if xp[j] > self._range_max[0]: self._range_max[0] = xp[j]
+        for j in xrange(len(yp)):
+                if yp[j] < self._range_min[1]: self._range_min[1] = yp[j]
+                if yp[j] > self._range_max[1]: self._range_max[1] = yp[j]
+        for j in xrange(len(zp)):
+                if zp[j] < self._range_min[2]: self._range_min[2] = zp[j]
+                if zp[j] > self._range_max[2]: self._range_max[2] = zp[j]
+
+
+        self._ax.plot(xp,yp,zp,color=c)
+
+
     def _add_box(self,arg, c=''):
         if not c: c = self.rand_color()
         data = self._converter.Convert(arg);
@@ -184,6 +233,8 @@ class GeoViewer(object):
             self._add_box(self._holder.AABox()[x], self._holder.AABoxColor()[x])
         for x in xrange(len(self._holder.Trajectory())):
             self._add_trajectory(self._holder.Trajectory()[x], self._holder.TrajectoryColor()[x])
+        for x in xrange(len(self._holder.Cone())):
+            self._add_cone(self._holder.Cone()[x], self._holder.ConeColor()[x])
         for x in self._converter.Convert(self._holder.Labels()):
             self._add_label(x)
 

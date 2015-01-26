@@ -26,6 +26,8 @@
 #pragma link C++ class std::vector<geoalgo::LineSegment>+;
 #pragma link C++ class geoalgo::AABox+;
 #pragma link C++ class std::vector<geoalgo::AABox>+;
+#pragma link C++ class geoalgo::Cone+;
+#pragma link C++ class std::vector<geoalgo::Cone>+;
 
 #pragma link C++ class geoalgo::GeoAlgo+;
 #pragma link C++ class geoalgo::GeoObjCollection+;

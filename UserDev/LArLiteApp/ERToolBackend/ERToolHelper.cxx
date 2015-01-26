@@ -173,7 +173,9 @@ namespace larlite {
       if(isnan(mcs.DetProfile().Momentum().Px())) continue;
 
       ::ertool::Shower s( mcs.DetProfile().Position(),
-			  mcs.DetProfile().Momentum() );
+			  mcs.DetProfile().Momentum(),
+			  _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
+			  _shrProfiler.ShowerRadius() );
       s._energy     = mcs.DetProfile().Momentum().E();
       //s._energy = mcs.Start().Momentum().E();
       s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.3) : gRandom->Gaus(2,2*0.3));
@@ -193,8 +195,9 @@ namespace larlite {
     s_v.reserve(shw_v.size());
     for(auto const& shw : shw_v) {
       s_v.push_back( ::ertool::Shower(shw.ShowerStart(),
-				      shw.Direction())
-		     );
+				      shw.Direction(),
+				      _shrProfiler.Length(*(shw.Energy().rbegin())),
+				      _shrProfiler.ShowerRadius()) );
       auto& s = (*s_v.rbegin());
       if(shw.best_plane()){
 	s._energy = (*(shw.Energy().rbegin()));

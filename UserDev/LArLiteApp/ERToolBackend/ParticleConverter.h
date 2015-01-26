@@ -21,6 +21,7 @@
 #include "ERTool/Base/Particle.h"
 #include "ERTool/Base/EventData.h"
 #include "DataFormat/mcpart.h"
+#include "EMShowerTools/EMShowerProfile.h"
 
 namespace larlite {
   /**
@@ -41,6 +42,10 @@ namespace larlite {
     
     /// Transformer function
     ::ertool::RecoObjBase Convert(const mcpart part) const;
+
+  private:
+
+    EMShowerProfile _shrProfiler;
     
   };
 }

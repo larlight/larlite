@@ -31,9 +31,9 @@ def main():
     my_proc = fmwk.ana_processor()
     # Create algorithm
     my_algo = ertool.AlgoEMPart()
-    my_algo.set_e_dEdxFitRange(1.2,2); # To set range for fitting for dEdx
-    my_algo.set_g_dEdxFitRange(3,4.5);
-    my_algo.setVerbose(False)
+    my_algo.SetFitRange_dEdx(1.2,2,False); # False = e- / True = gamma
+    my_algo.SetFitRange_dEdx(3,4.5,True);
+    my_algo.setVerbose(True)
     # Create analysis unit
     my_ana = fmwk.ExampleERSelection()
 
@@ -41,11 +41,11 @@ def main():
     # First Argument: True = MC, False = Reco
     #my_ana.SetShowerProducer(True,"mcreco");
     #my_ana.SetTrackProducer(True,"mcreco");
-    #my_ana.SetVtxProducer(True,"generator");
+    my_ana.SetVtxProducer(True,"generator");
 
     my_ana.SetShowerProducer(False,"showerreco");
     my_ana.SetTrackProducer(False,"");
-    my_ana.SetVtxProducer(False,"");
+    #my_ana.SetVtxProducer(False,"");
 
     my_ana._mgr.SetAlgo(my_algo)
     my_ana._mgr._training_mode =True
