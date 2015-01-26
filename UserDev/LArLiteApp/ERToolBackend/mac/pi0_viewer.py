@@ -36,9 +36,10 @@ def main():
 
     #viewer
     plt.ion()
-    #display = GeoViewer()
-    display = ERViewer()
-    display.show()
+    display_reco = ERViewer()
+    display_mc   = ERViewer()
+    display_reco.show()
+    display_mc.show()
 
     # Create ana_processor instance
     my_proc = fmwk.ana_processor()
@@ -103,12 +104,25 @@ def main():
             counter = counter + 1
         my_proc.process_event(counter)
         # get objets and display
-        display.clear()
-        
-        display.add(my_ana.GetParticles(False),
-                    my_ana.GetData(), False)  #Last argument decides if un-taggeg showers/tracks should have random color (True) or grey (False)
+        display_reco.clear()
+        display_mc.clear()
 
-        display.show()
+        data_reco = my_ana.GetData()
+        part_reco = my_ana.GetParticles()
+        data_mc   = my_ana.GetData(True)
+        part_mc   = my_ana.GetParticles(True)
+        
+        display_reco.add(part_reco, data_reco, False)
+        display_mc.add(part_mc, data_mc, False)
+
+        for x in xrange(part_mc.size()):
+            print part_mc[x].Diagram
+        for x in xrange(part_reco.size()):
+            print part_reco[x].Diagram
+        #Last argument decides if un-taggeg showers/tracks should have random color (True) or grey (False)
+
+        display_reco.show()
+        display_mc.show()
 
     #my_proc.run()
 

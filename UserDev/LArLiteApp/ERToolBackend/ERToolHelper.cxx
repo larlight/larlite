@@ -16,7 +16,7 @@ namespace larlite {
     FillTracks  (mct_v, event_data);
     FillShowers (mcs_v, event_data);
     FillVertices(mci_v, event_data);
-    return;
+
     // To be updated: need a complete particle tree structure here
     for(auto const& mci : mci_v) {
 
@@ -55,8 +55,7 @@ namespace larlite {
 	  particle_set.back().AddDaughter(p);
 	}
       }
-    }
-    
+    }    
   }
 
 
