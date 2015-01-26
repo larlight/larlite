@@ -144,7 +144,6 @@ class GeoViewer(object):
 
     def _add_cone(self,arg,c=''):
 
-        print "ADDING CONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
         if not c: c = self.rand_color()
         
         s = arg.Start()
@@ -152,7 +151,7 @@ class GeoViewer(object):
 
         u = np.linspace(0,2*np.pi,50)
         r0 = arg.Radius() # maximum radius of cone
-        h0 = arg.Height() # height of cone
+        h0 = arg.Length() # height of cone
         num_levels = 30
 
 
@@ -234,6 +233,7 @@ class GeoViewer(object):
         for x in xrange(len(self._holder.Trajectory())):
             self._add_trajectory(self._holder.Trajectory()[x], self._holder.TrajectoryColor()[x])
         for x in xrange(len(self._holder.Cone())):
+            print "Add cone!"
             self._add_cone(self._holder.Cone()[x], self._holder.ConeColor()[x])
         for x in self._converter.Convert(self._holder.Labels()):
             self._add_label(x)

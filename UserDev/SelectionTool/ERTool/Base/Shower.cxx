@@ -6,16 +6,18 @@
 namespace ertool {
 
   Shower::Shower() : RecoObjBase()
-  { Reset(); }
+  { 
+    Reset(); 
+  }
 
   Shower::Shower(const ::geoalgo::Vector& start,
 		 const ::geoalgo::Vector& dir,
-		 double height, double radius)
+		 double length, double radius)
   {
     Reset();
     ::geoalgo::Cone::Start(start);
     ::geoalgo::Cone::Dir(dir);
-    ::geoalgo::Cone::Height(height);
+    ::geoalgo::Cone::Length(length);
     ::geoalgo::Cone::Radius(radius);
   }
 
@@ -24,9 +26,8 @@ namespace ertool {
   {
     ::geoalgo::Cone::Start(::geoalgo::Point_t(3));
     ::geoalgo::Cone::Dir(::geoalgo::Point_t(3));
-    ::geoalgo::Cone::Height(0.);
-    ::geoalgo::Cone::Radius(0.);
-    ::geoalgo::Cone::Angle(0.);
+    ::geoalgo::Cone::Length(1.);
+    ::geoalgo::Cone::Radius(1.);
     RecoObjBase::Reset();
     _dedx       = kINVALID_DOUBLE;
     _energy     = kINVALID_DOUBLE;
