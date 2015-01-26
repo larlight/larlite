@@ -34,7 +34,7 @@ namespace ertool {
     virtual ~FilterECut(){};
 
     /// Select function
-    virtual void Filter(EventData& data);
+    void Filter(EventData& data);
 
     /// Set Energy Cut for this Filter
     void SetECut(double ecut) { _ECut = ecut; }

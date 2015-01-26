@@ -145,7 +145,7 @@ namespace ertool {
     }
 
     if(_profile_mode) fWatch.Start();
-    if(_filter)       _filter->Filter(data);
+    if(_filter) _filter->Filter(data);
     if(_profile_mode) _tprof_filter.second += fWatch.RealTime();
 
     if(_profile_mode) fWatch.Start();

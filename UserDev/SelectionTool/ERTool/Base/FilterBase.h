@@ -47,7 +47,7 @@ namespace ertool {
 
     /// Select function
     //virtual SPAOrder Select (const EventData &data){ return SPAOrder(); }
-    void Filter(EventData& data) { return; }
+    virtual void Filter(EventData& data) { return; }
 
   };
 }
