@@ -5,7 +5,7 @@ ertool.Manager()
 from ROOT import larlite as fmwk
 fmwk.geo.PlaneID
 
-#from basictool import GeoViewer, geoalgo
+from basictool import GeoViewer, geoalgo
 from seltool import ERViewer
 import matplotlib.pyplot as plt
 
@@ -105,8 +105,8 @@ def main():
         # get objets and display
         display.clear()
         
-        display.add(my_ana.GetParticles(),
-                    my_ana.GetData())
+        display.add(my_ana.GetParticles(False),
+                    my_ana.GetData(), False)  #Last argument decides if un-taggeg showers/tracks should have random color (True) or grey (False)
 
         display.show()
 

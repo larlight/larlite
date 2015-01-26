@@ -52,7 +52,7 @@ class GeoViewer(object):
         #data = self._converter.Convert(arg)
         self._ax.text(*args, fontsize=10, color='black')
 
-    def _add_point(self,arg,c='black'):
+    def _add_point(self,arg,c=''):
         data = self._converter.Convert(arg)
         if not c: c = self.rand_color()
         
@@ -63,7 +63,7 @@ class GeoViewer(object):
 
         self._ax.scatter(*data,color=c,marker='*',s=100)
 
-    def _add_trajectory(self,arg,c='red'):
+    def _add_trajectory(self,arg,c=''):
         if not c: c = self.rand_color()
         data = self._converter.Convert(arg) 
         
@@ -78,7 +78,7 @@ class GeoViewer(object):
         self._ax.scatter(data[0][-1],data[1][-1],data[2][-1],color=c,marker='>')
         self._ax.scatter(data[0][1:-2],data[1][1:-2],data[2][1:-2],color=c,marker='o')
 
-    def _add_linesegment(self,arg,c='red'):
+    def _add_linesegment(self,arg,c=''):
         if not c: c = self.rand_color()
         data = self._converter.Convert(arg)
 
@@ -95,7 +95,7 @@ class GeoViewer(object):
         self._ax.scatter(s[0],s[1],s[2],color=c,marker='x')
         self._ax.scatter(e[0],e[1],e[2],color=c,marker='o')
 
-    def _add_halfline(self,arg,c='blue'):
+    def _add_halfline(self,arg,c=''):
         if not c: c = self.rand_color()
         
         s = arg.Start()
@@ -140,7 +140,7 @@ class GeoViewer(object):
         self._ax.plot(xp,yp,zp,color=c)
 
 
-    def _add_box(self,arg, c='gray'):
+    def _add_box(self,arg, c=''):
         if not c: c = self.rand_color()
         data = self._converter.Convert(arg);
         for x in data:
