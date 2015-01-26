@@ -13,6 +13,8 @@ from ROOT import larlite as fmwk
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
 
+my_proc.enable_filter(True)
+
 # Set input root file
 for x in xrange(len(sys.argv)-1):
     my_proc.add_input_file(sys.argv[x+1])
@@ -25,6 +27,7 @@ my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 
 # Attach a template process
 my_proc.add_process(fmwk.CCSingleMuFilter())
+my_proc.add_process(fmwk.CCSingleMuAna())
 
 print
 print  "Finished configuring ana_processor. Start event loop!"

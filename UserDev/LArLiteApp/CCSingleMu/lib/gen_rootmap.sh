@@ -17,8 +17,11 @@ rootlibmap() {
 ######################################################
 # CCSingleMu
 rootlibmap libLArLiteApp_CCSingleMu.rootmap libLArLiteApp_CCSingleMu.so $LARLITE_USERDEVDIR/LArLiteApp/CCSingleMu/LinkDef.h \
-    libLArLite_Analysis.so
-
+    libLArLite_Analysis.so \
+    libSelectionTool_ERFilter.so \
+    libSelectionTool_ERAlgo.so \
+    libSelectionTool_ERBase.so \
+    libLArLite_ERToolBackend.so
 
 
 

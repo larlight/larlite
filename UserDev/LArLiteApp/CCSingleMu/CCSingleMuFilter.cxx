@@ -51,7 +51,7 @@ namespace larlite {
 	    mcp.PdgCode() == 13   && 
 	    mcp.Mother() == numu_trackid ) {
 	  ++mu_count;
-	  hMuEnergy->Fill(mcp.Trajectory()[0].Momentum().E());
+	  hMuEnergy->Fill(mcp.Trajectory()[0].Momentum().E()*1.e3);
 	}
       }
     }
