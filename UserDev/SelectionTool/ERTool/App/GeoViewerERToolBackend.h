@@ -37,7 +37,8 @@ namespace ertool {
     virtual ~GeoViewerERToolBackend(){}
 
     void Add(const ParticleSet& particles,
-	     const EventData& data);
+	     const EventData& data,
+	     bool randColors);
     
   };
 }

@@ -10,11 +10,23 @@ namespace ertool {
   {}
 
   void GeoViewerERToolBackend::Add( const ::ertool::ParticleSet& particles,
-				    const ::ertool::EventData& data) 
+				    const ::ertool::EventData& data,
+				    bool randColors) 
   {
     // Take particles, loop over them.
     // Make them into a LineSegments
     // give them to the collection
+
+    // If randColors is tue, then don't pre-define color type ofr EventData objects
+    // that have not yet been matched with particles
+    std::string shr_col = "";
+    std::string trk_col = "";
+    std::string vtx_col = "";
+    if (!randColors){
+      shr_col = "grey";
+      trk_col = "grey";
+      vtx_col = "grey";
+    }
 
     static TDatabasePDG db_s;
     static std::map<int,std::string> part_name_s;
@@ -47,17 +59,17 @@ namespace ertool {
     for(size_t trk_index = 0; trk_index < data.Track().size(); ++trk_index) {
       if( !(used_obj[ Particle::RecoObjType_t::kTrack ][ trk_index ]) ){
 	if( data.Track( trk_index ).size() > 2 )
-	  GeoObjCollection::Add( data.Track( trk_index ), "un-tagged", "grey" );
+	  GeoObjCollection::Add( data.Track( trk_index ), "un-tagged", shr_col.c_str() );
       }
     }
     // Showers
     for(size_t shr_index = 0; shr_index < data.Shower().size(); ++shr_index) {
       if( !(used_obj[ Particle::RecoObjType_t::kShower ][ shr_index ]) )
-	GeoObjCollection::Add( data.Shower( shr_index ), "un-tagged", "grey" );
+	GeoObjCollection::Add( data.Shower( shr_index ), "un-tagged", trk_col.c_str() );
     }
     // Vertices
     for(size_t vtx_index = 0; vtx_index < data.Vertex().size(); ++vtx_index) {
-      GeoObjCollection::Add( data.Vertex( vtx_index ), "Vertex", "grey" );
+      GeoObjCollection::Add( data.Vertex( vtx_index ), "Vertex", vtx_col.c_str() );
     }
 
     return;

@@ -21,10 +21,11 @@ namespace ertool {
     
     // loop over tracks
     for (size_t t=0; t < data.AllTrack().size(); t++) {
-      if (data.AllShower()[t]._energy < _ECut) 
+      if (data.AllTrack()[t]._energy < _ECut)
 	data.FilterTrack(t);
     }	
-
+   
+    return;
   }
 
 }
