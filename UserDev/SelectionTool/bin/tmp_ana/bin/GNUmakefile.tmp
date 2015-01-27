@@ -4,7 +4,7 @@ CXXFLAGS += -I$(LARLITE_USERDEVDIR)/SelectionTool
 CXXFLAGS += -I. $(shell root-config --cflags) -g
 
 # Include your shared object lib location
-LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_Package_Name -lAnalysis -lDataFormat -lBase 
+LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_Package_Name -lLArLite_Analysis -lLArLite_DataFormat -lLArLite_Base 
 LDFLAGS += $(shell root-config --libs) -lPhysics -lMatrix -g
 
 # platform-specific options
