@@ -73,12 +73,12 @@ namespace larlite {
     /**
        @brief get EventData that is used by the manager
      */
-    ::ertool::EventData GetData(bool mc=false) const { return mc ? _mc_data : _data; }
+    const ::ertool::EventData& GetData(bool mc=false) const { return mc ? _mc_data : _data; }
 
     /**
        @brief get Particles produced by Algorithm.
      */
-    ::ertool::ParticleSet GetParticles(bool mc=false) const { return mc ? _McParticles : _RecoParticles; }
+    const ::ertool::ParticleSet& GetParticles(bool mc=false) const { return mc ? _McParticles : _RecoParticles; }
 
     /// Selection manager class instance
     ::ertool::Manager _mgr;

@@ -102,7 +102,10 @@ namespace larlite {
 	: _pos(pos), _mom(mom), _pdg(pdg)
       { 
 	for(auto& v : _mom) {
-	  v = double(int(v*1.e9));
+	  v = double(int(v*1.e9))/1.e9;
+	}
+	for(auto& v : _pos) {
+	  v = double(int(v*1.e9))/1.e9;
 	}
       }
 

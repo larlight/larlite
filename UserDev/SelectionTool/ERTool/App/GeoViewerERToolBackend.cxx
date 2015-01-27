@@ -37,8 +37,11 @@ namespace ertool {
 
     for (auto &p : particles){
       geoalgo::LineSegment_t part( p.Vertex(), p.Vertex() + (p.Momentum() * (30./p.Momentum().Length())) );
-      if(part_name_s.find(p.PdgCode()) == part_name_s.end())
-	part_name_s[p.PdgCode()] = db_s.GetParticle(p.PdgCode())->GetName();
+
+      if(part_name_s.find(p.PdgCode()) == part_name_s.end()){
+	if(p.PdgCode()>=1000000000) part_name_s[p.PdgCode()] = std::to_string(p.PdgCode());
+	else part_name_s[p.PdgCode()]=db_s.GetParticle(p.PdgCode())->GetName();
+      }
       //Add( part, std::to_string(p.PdgCode() ), "black" );
       GeoObjCollection::Add( part, part_name_s[p.PdgCode()], "black" );
       // If this particle has associated EventData, show it as well

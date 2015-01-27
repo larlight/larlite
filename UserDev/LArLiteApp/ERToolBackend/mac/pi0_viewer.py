@@ -58,12 +58,15 @@ def main():
 
     # ************Set Producers**************
     # First Argument: True = MC, False = Reco
+    my_ana.SetShowerProducer(True,"mcreco");
+    my_ana.SetTrackProducer(True,"mcreco");
+    my_ana.SetVtxProducer(True,"generator");
+    #my_ana.SetShowerProducer(False,"pandoraNuShower")
+    #my_ana.SetTrackProducer(False,"");
+    #my_ana.SetVtxProducer(False,"");
     #my_ana.SetShowerProducer(True,"mcreco");
     #my_ana.SetTrackProducer(True,"mcreco");
-    #my_ana.SetVtxProducer(True,"generator");
-    my_ana.SetShowerProducer(False,"showerreco");
-    my_ana.SetTrackProducer(False,"");
-    my_ana.SetVtxProducer(False,"");
+    #my_ana.SetVtxProducer(False,"");
     # ************Set Producers**************
 
     #help(my_ana._mgr)
@@ -112,13 +115,14 @@ def main():
         data_mc   = my_ana.GetData(True)
         part_mc   = my_ana.GetParticles(True)
         
-        display_reco.add(part_reco, data_reco, False)
+        #display_reco.add(part_reco, data_reco, False)
         display_mc.add(part_mc, data_mc, False)
+        display_reco.add(part_reco, data_reco, False)
 
         for x in xrange(part_mc.size()):
-            print part_mc[x].Diagram
-        for x in xrange(part_reco.size()):
-            print part_reco[x].Diagram
+            print part_mc[x].Diagram()
+        #for x in xrange(part_reco.size()):
+        #    print part_reco[x].Diagram()
         #Last argument decides if un-taggeg showers/tracks should have random color (True) or grey (False)
 
         display_reco.show()

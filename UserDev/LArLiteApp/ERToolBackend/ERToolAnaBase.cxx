@@ -74,7 +74,9 @@ namespace larlite {
   
   bool ERToolAnaBase::analyze(storage_manager* storage) {
     _data.Reset();
+    _mc_data.Reset();
     _RecoParticles.clear();
+    _McParticles.clear();
     TStopwatch fWatch;
     fWatch.Start();
 
@@ -174,8 +176,6 @@ namespace larlite {
       auto ev_mci = storage->get_data<event_mctruth>  (_name_generator);
       auto ev_mcs = storage->get_data<event_mcshower> (_name_mcshr);
       auto ev_mct = storage->get_data<event_mctrack>  (_name_mctrk);
-      _McParticles.clear();
-      _mc_data.Reset();
       // Make sure the data is there
       if (ev_mci && ev_mcs && ev_mct)
 	_helper.FillMCInfo(*ev_mci,
