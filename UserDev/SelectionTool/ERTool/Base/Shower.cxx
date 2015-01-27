@@ -12,20 +12,15 @@ namespace ertool {
 
   Shower::Shower(const ::geoalgo::Vector& start,
 		 const ::geoalgo::Vector& dir,
-		 double length, double radius)
-  {
-    Reset();
-    ::geoalgo::Cone::Start(start);
-    ::geoalgo::Cone::Dir(dir);
-    ::geoalgo::Cone::Length(length);
-    ::geoalgo::Cone::Radius(radius);
-  }
+		 double length, double radius) :
+    ::geoalgo::Cone(start,dir,length,radius)
+  { }
 
 
   void Shower::Reset() 
   {
     ::geoalgo::Cone::Start(::geoalgo::Point_t(3));
-    ::geoalgo::Cone::Dir(::geoalgo::Point_t(3));
+    ::geoalgo::Cone::Dir(::geoalgo::Point_t(1,1,1));
     ::geoalgo::Cone::Length(1.);
     ::geoalgo::Cone::Radius(1.);
     RecoObjBase::Reset();

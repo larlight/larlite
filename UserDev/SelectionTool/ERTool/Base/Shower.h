@@ -39,7 +39,7 @@ namespace ertool {
 	   double length,double radius);
 
     /// default dtor
-    virtual ~Shower(){}
+    virtual ~Shower(){};
 
     /// alternative ctor
     /*

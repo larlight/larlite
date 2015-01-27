@@ -813,6 +813,106 @@ namespace geoalgo {
     if (n > max) { return max; }
     return n;
   }
+
+
+  /// Common origin: Half Line & Half Line. Keep track of origin
+  double GeoAlgo::_commonOrigin_(const HalfLine_t& lin1, const HalfLine_t& lin2, Point_t& origin) const
+  {
+
+    // Function Description:
+    // Given two HalfLine objects, project them backwards
+    // and find the point of closest approach on both
+    // lines.
+    // The half-point between these two is considered the
+    // candidate origin or vertex of the two lines
+    // Then make segments uniting this vertex and
+    // the start point of both half lines.
+    // Take the dot product of the segment uniting
+    // the vertex with the start of lin1, and the direction
+    // of lin1. Similarly for lin2.
+    // These dot-products will be close to 1 if the lines,
+    // traced backwards, indeed point to the reconstructed
+    // vertex.
+    // return the sum of these dot products, which
+    // is bound between -2 and +2.
+    // other values of this return (1, 0, -1, -2)
+    // will give insight on other possible topologies.
+
+    // Flip the HalfLines: want to project backwards
+    HalfLine_t lin1Back(lin1.Start(), lin1.Dir()*(-1));
+    HalfLine_t lin2Back(lin2.Start(), lin2.Dir()*(-1));
+    // Closest approach points on the two lines
+    Point_t pt1(lin1.Start().size());
+    Point_t pt2(lin2.Start().size());
+
+    double IP = _SqDist_(lin1Back, lin2Back, pt1, pt2);
+    origin = (pt1+pt2)/2.;
+
+    // If origin coincides with lin1 start
+    // -> vec1 should be in same direction of lin1
+    Vector_t vec1(lin1.Dir());
+    if (lin1.Start() != origin)
+      vec1 = lin1.Start()-origin;
+    vec1.Normalize();
+    // similarly for vec1
+    Vector_t vec2(lin2.Dir());
+    if (lin2.Start() != origin)
+      vec2 = lin2.Start()-origin;
+    vec2.Normalize();
+
+    double dot = vec1.Dot(lin1.Dir()) + vec2.Dot(lin2.Dir());
+    if ( (dot > 2) || (dot < -2) )
+      throw GeoAlgoException("commonOrigin failed. Sum of two dot-products must be bound by [-2,2]");
+
+    return dot;
+  }
+  /// Common origin: Line Segment & Half Line. Keep track of origin
+  double GeoAlgo::_commonOrigin_(const HalfLine_t& lin, const LineSegment_t& seg, Point_t& origin) const
+  {
+    // Make a Half-line out of the line-segment
+    // we want to project backwards to a common origin
+    // not limit ourselves to an origin that must be on the segment
+    HalfLine_t lin2(seg.Start(), seg.Dir());
+    return _commonOrigin_(lin, lin2, origin);
+  }
+  /// Common origin: Line Segment & Line Segment. Keep track of origin
+  double GeoAlgo::_commonOrigin_(const LineSegment_t& seg1, const LineSegment_t& seg2, Point_t& origin) const
+  {
+    // Make a Half-line out of the line-segments
+    // we want to project backwards to a common origin
+    // not limit ourselves to an origin that must be on the segment
+    HalfLine_t lin1(seg1.Start(), seg1.Dir());
+    HalfLine_t lin2(seg2.Start(), seg2.Dir());
+    return _commonOrigin_(lin1, lin2, origin);
+  }
+
+  /// Common origin: Trajectory & Trajectory/ Keep track of origin
+  double GeoAlgo::_commonOrigin_(const Trajectory_t& trj1, const Trajectory_t& trj2, Point_t& origin) const
+  {
+    // Turn the trajectory into half-line that connect start -> end
+    HalfLine_t lin1(trj1.front(),trj1.back()-trj1.front());
+    // Turn the segment into half-line
+    HalfLine_t lin2(trj2.front(),trj2.back()-trj2.front());
+    return _commonOrigin_(lin2, lin2, origin);
+  }
+
+  /// Common origin: Trajectory & Line Segment. Keep track of origin
+  double GeoAlgo::_commonOrigin_(const Trajectory_t& trj, const LineSegment_t& seg, Point_t& origin) const
+  {
+    // Turn the trajectory into half-line that connect start -> end
+    HalfLine_t lin1(trj.front(),trj.back()-trj.front());
+    // Turn the segment into half-line
+    HalfLine_t lin2(seg.Start(), seg.Dir());
+    return _commonOrigin_(lin2, lin2, origin);
+  }
+  
+  /// Common origin: Trajectory & Half Line. Keep track of origin
+  double GeoAlgo::_commonOrigin_(const Trajectory_t& trj, const HalfLine_t& lin, Point_t& origin) const
+  {
+    // Turn the trajectory into half-line that connect start -> end
+    HalfLine_t lin2(trj.front(),trj.back()-trj.front());
+    return _commonOrigin_(lin, lin2, origin);
+  }
   
 }
 #endif

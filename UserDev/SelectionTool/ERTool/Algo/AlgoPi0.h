@@ -19,6 +19,7 @@
 #include <TH1D.h>
 #include <TH2D.h>
 #include <RooGaussian.h>
+#include "GeoAlgo/GeoAlgo.h"
 
 namespace ertool {
 
@@ -118,6 +119,9 @@ namespace ertool {
   protected:
 
     PdfFactory _factory; ///< P.D.F. factory class instance
+
+    /// GeoAlgo instance for geometric computations
+    geoalgo::GeoAlgo _geoAlgo;
 
     /// verobsity boolean for couts
     bool _verbose;

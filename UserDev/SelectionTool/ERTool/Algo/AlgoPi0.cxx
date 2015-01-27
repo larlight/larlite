@@ -154,31 +154,15 @@ namespace ertool {
     // dEdx should be > 1 MeV/cm (PDF for gamma is > PDF e- near 0! )
     //if( (_dedx_A < 0.5) || (_dedx_B < 0.5) ) return;
 
-    // Pi0 Vtx point
-    ::geoalgo::GeoAlgo geo_alg;
-    ::geoalgo::HalfLine_t   line_a( shower_a.Start(), shower_a.Dir()*(-1) );
-    ::geoalgo::HalfLine_t   line_b( shower_b.Start(), shower_b.Dir()*(-1) );
-    // pt_a is the point on line_a from where the minimum IP is found. Analogous for pt_b
-    ::geoalgo::Vector_t pt_a(3), pt_b(3);
-    _vtx_IP = sqrt(geo_alg.SqDist(line_a, line_b, pt_a, pt_b));
-    // let the candidate vertex be the midpoint between pt_a & pt_b
-    vtx = pt_a + ((pt_b - pt_a) / 2.);
-    // make sure vertex reconstructed backwards of 
-    ::geoalgo::Vector_t vtx_A(shower_a.Start()-vtx);
-    vtx_A.Normalize();
-    double dotA = vtx_A.Dot(shower_a.Dir());
-    ::geoalgo::Vector_t vtx_B(shower_b.Start()-vtx);
-    vtx_B.Normalize();
-    double dotB = vtx_B.Dot(shower_b.Dir());
-    _dot = dotA*dotB;
+    // Find the common origin, along with
+    if (  (shower_a.Dir().Length() != 1) || (shower_b.Dir().Length() != 1) )
+      return;
+    _dot = _geoAlgo.commonOrigin(shower_a, shower_b, vtx);
     if (_verbose) {
-      std::cout << "Vtx to Shr A and Shr A Direction dot product: " << dotA << std::endl;
-      std::cout << "Vtx to Shr B and Shr B Direction dot product: " << dotB << std::endl;
+      std::cout << "Sum of dot-products for direction-matching: " << _dot << std::endl;
     }
     _vtxDist_A = vtx.Dist(shower_a.Start());
     _vtxDist_B = vtx.Dist(shower_b.Start());
-    // Make sure distance from vtx & IP not out of bounds
-    //    if ( (_vtxDist_A > _vtxDistMax) or (_vtxDist_B > _vtxDistMax) or (_vtx_IP > _IPMax) ) return;
 
     _radLenVar->setVal(_vtxDist_A);
     _ll_vtxDist_A = log( _radLenSigl->getVal(*_radLenVar) / (_radLenSigl->getVal(*_radLenVar) + _radLenBkgd->getVal(*_radLenVar)) );
@@ -206,8 +190,8 @@ namespace ertool {
     ::EMShowerProfile shower_prof;
     ::geoalgo::AABox  volume(0,-116.5,0,256.35,116.5,1036.8);
 
-    auto xs_a = geo_alg.Intersection(volume, ::geoalgo::HalfLine_t(shower_a.Start(),shower_a.Dir()));
-    auto xs_b = geo_alg.Intersection(volume, ::geoalgo::HalfLine_t(shower_b.Start(),shower_b.Dir()));
+    auto xs_a = _geoAlgo.Intersection(volume, ::geoalgo::HalfLine_t(shower_a.Start(),shower_a.Dir()));
+    auto xs_b = _geoAlgo.Intersection(volume, ::geoalgo::HalfLine_t(shower_b.Start(),shower_b.Dir()));
 
     if(!xs_a.size() || !xs_b.size()) return;
 

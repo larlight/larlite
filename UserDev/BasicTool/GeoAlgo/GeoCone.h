@@ -31,7 +31,9 @@ namespace geoalgo {
     /// Default constructor
   Cone() : HalfLine()
       {
-	_length=1; _radius=1; 
+	_length = 1;
+	_radius = 1;
+	_angle = atan(_radius/_length);
       }
     
     /// Alternative ctor (1)
@@ -46,10 +48,9 @@ namespace geoalgo {
 	      << " Cone Length cannot be 0." << std::endl;
 	  throw GeoAlgoException(msg.str());
 	}
-	_length = length; 
+	_length = length;
 	_radius = radius;
 	_angle = atan(_radius/_length);
-	Normalize();
       }
     
     /// Altenartive ctor (2)
@@ -57,8 +58,6 @@ namespace geoalgo {
        const double length, const double radius)
     : HalfLine( start,  dir )
       { 
-      if(start.size()!=3 || dir.size()!=3)
-	throw GeoAlgoException("Cone ctor accepts only 3D Point!");
       if (length == 0){
 	std::ostringstream msg;
 	msg << "<<" << __FUNCTION__ << ">>"
@@ -68,7 +67,6 @@ namespace geoalgo {
       _length = length;
       _radius = radius;
       _angle  = atan(_radius/_length);
-      Normalize();
     }
 
     /// Alternative ctor using template (3)
@@ -79,12 +77,6 @@ namespace geoalgo {
     /// Default destructor
     virtual ~Cone(){};
 
-    /// Start getter
-    const Point_t& Start() const { return _start; }
-
-    /// Direction getter
-    const Vector_t& Dir() const { return _dir; }
-
     /// Length getter
     const double Length() const { return _length; }
 
@@ -94,14 +86,6 @@ namespace geoalgo {
     /// Angle getter
     const double Angle() const { return _angle; }
     
-    /// Start setter
-    void Start(const double x, const double y, const double z)
-    { _start[0] = x; _start[1] = y; _start[2] = z; }
-
-    /// Dir setter
-    void Dir(const double x, const double y, const double z)
-    { _dir[0] = x; _dir[1] = y; _dir[2] = z; Normalize(); }
-
     /// Length setter
     void Length(const double l) 
     { 
@@ -118,43 +102,7 @@ namespace geoalgo {
     /// Length setter
     void Radius(const double r) { _radius = r; _angle = atan(_radius/_length); }
 
-    /// Start setter template
-    template<class T>
-    void Start(const T& pos)
-    { 
-      _start = Point_t(pos); 
-      if(_start.size()!=3) throw GeoAlgoException("<<Start>> Only 3 dimensional start point allowed!"); 
-    }
-    
-    /// Dir setter template
-    template<class T>
-    void Dir(const T& dir)
-    { 
-      _dir = Vector_t(dir);
-      if(_dir.size()!=3) throw GeoAlgoException("<<Start>> Only 3 dimensional start point allowed!"); 
-      Normalize();
-    }
-
   protected:
-
-    /// Normalize direction
-    void Normalize()
-    {
-      auto l = _dir.Length();
-      if(!l)
-	throw GeoAlgoException("<<Normalize>> cannot normalize 0-length direction vector!");
-
-      // inf check commented out till compatible solution found... --kazu
-      //if(isnan(l))
-      //throw GeoAlgoException("<<Normalize>> cannot normalize inf-length direction vector!");
-      _dir /= l;
-    }
-
-    /// Beginning of the cone
-    Point_t  _start;
-
-    /// Direction of the cone
-    Vector_t _dir;
 
     /// Helight (length) of the cone
     double _length;
