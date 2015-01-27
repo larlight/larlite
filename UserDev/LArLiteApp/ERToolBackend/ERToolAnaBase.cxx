@@ -74,6 +74,7 @@ namespace larlite {
   
   bool ERToolAnaBase::analyze(storage_manager* storage) {
     _data.Reset();
+    _RecoParticles.clear();
     TStopwatch fWatch;
     fWatch.Start();
 

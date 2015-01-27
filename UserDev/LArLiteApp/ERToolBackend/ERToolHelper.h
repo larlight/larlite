@@ -89,6 +89,28 @@ namespace larlite {
     
     EMShowerProfile _shrProfiler;
 
+    struct PartID_t {
+      ::geoalgo::Vector _pos, _mom;
+      int _pdg;
+
+      PartID_t() : _pos(3), _mom(3), _pdg(0) 
+      {}
+
+      PartID_t(const ::geoalgo::Vector& pos,
+	       const ::geoalgo::Vector& mom,
+	       int pdg)
+	: _pos(pos), _mom(mom), _pdg(pdg)
+      { 
+	for(auto& v : _mom) {
+	  v = double(int(v*1.e9));
+	}
+      }
+
+      bool same(const PartID_t& obj)
+      { return (_pdg == obj._pdg && _pos == obj._pos && _mom == obj._mom); }
+
+    };
+
   };
 }
 

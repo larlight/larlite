@@ -84,7 +84,6 @@ namespace larlite {
     ::ertool::Manager _mgr;
 
   protected:
-
     ::ertool::EventData _data;           ///< Data to be filled by this module (main purpose!)
     ::ertool::EventData _mc_data;        ///< Data to be filled by this module (main purpose!)
     ::ertool::ParticleSet _RecoParticles;////<Particles Produced by Algorithm
