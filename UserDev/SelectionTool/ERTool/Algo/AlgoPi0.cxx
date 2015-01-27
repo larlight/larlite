@@ -157,7 +157,7 @@ namespace ertool {
     // Find the common origin, along with
     if (  (shower_a.Dir().Length() != 1) || (shower_b.Dir().Length() != 1) )
       return;
-    _dot = _geoAlgo.commonOrigin(shower_a, shower_b, vtx);
+    _dot = _geoAlgo.commonOrigin(shower_a, shower_b, vtx, true);
     if (_verbose) {
       std::cout << "Sum of dot-products for direction-matching: " << _dot << std::endl;
     }
