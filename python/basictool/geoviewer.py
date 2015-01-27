@@ -19,7 +19,6 @@ class GeoViewer(object):
     _converter = larpy.PyGeoObj()
 
     def __init__(self):
-
         self._fig = plt.figure(#num=None,
                                figsize=(10,5),
                                dpi=120,
@@ -187,7 +186,6 @@ class GeoViewer(object):
 
         self._ax.plot(xp,yp,zp,color=c)
 
-
     def _add_box(self,arg, c=''):
         if not c: c = self.rand_color()
         data = self._converter.Convert(arg);
@@ -208,7 +206,10 @@ class GeoViewer(object):
             
     def clear(self):
 
-        plt.cla()
+        #plt.cla()
+        self._fig.clear()
+        self._ax  = self._fig.gca(projection='3d')
+        self._fig.show()
         self._range_min = [ 1e12, 1e12, 1e12]
         self._range_max = [-1e12,-1e12,-1e12]
         self._holder.Clear()
@@ -233,7 +234,7 @@ class GeoViewer(object):
         for x in xrange(len(self._holder.Trajectory())):
             self._add_trajectory(self._holder.Trajectory()[x], self._holder.TrajectoryColor()[x])
         for x in xrange(len(self._holder.Cone())):
-            print "Add cone!"
+            print "CONE"
             self._add_cone(self._holder.Cone()[x], self._holder.ConeColor()[x])
         for x in self._converter.Convert(self._holder.Labels()):
             self._add_label(x)
@@ -267,6 +268,10 @@ class GeoViewer(object):
         self._ax.set_xlabel('X [cm]')
         self._ax.set_ylabel('Y [cm]')
         self._ax.set_zlabel('Z [cm]')
-        
+
+        print self._fig
+        self._fig.canvas
         self._fig.canvas.draw()#plt.show()
-        
+        #self._fig.show()
+        #help(self._fig.canvas)
+        #help(self._fig)
