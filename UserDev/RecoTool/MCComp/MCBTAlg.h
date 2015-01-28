@@ -60,6 +60,9 @@ namespace btutil {
     void Reset(const std::vector<unsigned int>& g4_trackid_v,
 	       const std::vector<larlite::simch>& simch_v);
 
+    void Reset(const std::vector<std::vector<unsigned int> >& g4_trackid_v,
+	       const std::vector<larlite::simch>& simch_v);
+
     /**
        Returns MC charge sum per MCX for a specified plane
      */
@@ -102,10 +105,16 @@ namespace btutil {
     std::vector<double> MCQFrac(const std::vector<btutil::WireRange_t>& hit_v) const;
       
     size_t Index(const unsigned int g4_track_id) const;
+
+    size_t NumParts() const { return _num_parts-1; }
     
   protected:
       
-    void Register(unsigned int g4_track_id);
+    void Register(const unsigned int& g4_track_id);
+
+    void Register(const std::vector<unsigned int>& g4_track_id);
+
+    void ProcessSimChannel(const std::vector<larlite::simch>& simch_v);
 
     std::vector<ch_info_t> _event_info;
     std::vector<size_t> _trkid_to_index;

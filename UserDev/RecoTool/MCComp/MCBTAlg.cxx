@@ -21,11 +21,31 @@ namespace btutil {
     // 
     for(auto const& id : g4_trackid_v)
       Register(id);
+    _num_parts++;
+    ProcessSimChannel(simch_v);
+
+  }
+
+  void MCBTAlg::Reset(const std::vector<std::vector<unsigned int> >& g4_trackid_v,
+		      const std::vector<larlite::simch>& simch_v)
+  {
+    _num_parts = 0;
+    _sum_mcq.clear();
+    _trkid_to_index.clear();
+    _event_info.clear();
+    // 
+    for(auto const& id : g4_trackid_v)
+      Register(id);
+    _num_parts++;
+    ProcessSimChannel(simch_v);
+
+  }
+
+  void MCBTAlg::ProcessSimChannel(const std::vector<larlite::simch>& simch_v)
+  {
 
     //art::ServiceHandle<geo::Geometry> geo;
     auto geo = ::larutil::Geometry::GetME();
-
-    _num_parts = g4_trackid_v.size() + 1;
     _sum_mcq.resize(geo->Nplanes(),std::vector<double>(_num_parts,0));
 
     for(auto const& sch : simch_v) {
@@ -145,7 +165,7 @@ namespace btutil {
     return _trkid_to_index[g4_track_id];
   }
 
-  void MCBTAlg::Register(unsigned int g4_track_id)
+  void MCBTAlg::Register(const unsigned int& g4_track_id)
   { 
     if(_trkid_to_index.size() <= g4_track_id)
       _trkid_to_index.resize(g4_track_id+1,kINVALID_INDEX);
@@ -154,8 +174,27 @@ namespace btutil {
       _trkid_to_index[g4_track_id] = _num_parts;
       ++_num_parts;
     }
-    std::cout<<"Registered: "<<g4_track_id<<" => "<<_trkid_to_index[g4_track_id]<<std::endl;
-    return;
+  }
+
+  void MCBTAlg::Register(const std::vector<unsigned int>& track_id_v)
+  { 
+    unsigned int max_id = 0;
+    for(auto const& id : track_id_v) if(max_id < id) max_id = id;
+    if(_trkid_to_index.size() <= max_id)
+      _trkid_to_index.resize(max_id+1,kINVALID_INDEX);
+
+    for(auto const& id : track_id_v) {
+
+      if(_trkid_to_index[id] == kINVALID_INDEX)
+
+	_trkid_to_index[id] = _num_parts;
+
+      else
+
+	throw MCBTException(Form("Doubly used TrackID: %d",id));
+
+    }
+    ++_num_parts;
   }
 
 }

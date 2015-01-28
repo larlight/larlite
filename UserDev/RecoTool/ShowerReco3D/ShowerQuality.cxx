@@ -215,14 +215,21 @@ namespace larlite {
     auto ass_hit_v = ev_cluster->association(ev_hit->id());
 
     // Create G4 track ID vector for which we are interested in
-    std::vector<unsigned int> g4_trackid_v;
+    std::vector<std::vector<unsigned int> > g4_trackid_v;
     std::vector<unsigned int> mc_index_v;
     g4_trackid_v.reserve(ev_mcs->size());
     for(size_t mc_index=0; mc_index<ev_mcs->size(); ++mc_index) {
       auto const& mcs = (*ev_mcs)[mc_index];
       double energy = mcs.DetProfile().E();
+      std::vector<unsigned int> id_v;
+      id_v.reserve(mcs.DaughterTrackID().size());
       if( _mc_energy_min < energy && energy < _mc_energy_max ) {
-	g4_trackid_v.push_back(mcs.TrackID());
+	for(auto const& id : mcs.DaughterTrackID()) {
+	  if(id == mcs.TrackID()) continue;
+	  id_v.push_back(id);
+	}
+	id_v.push_back(mcs.TrackID());
+	g4_trackid_v.push_back(id_v);
 	mc_index_v.push_back(mc_index);
       }
     }
