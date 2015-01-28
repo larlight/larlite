@@ -6,7 +6,7 @@
 namespace larlite {
 
   FuzzyClusterShower::FuzzyClusterShower() 
-    : ClusterMergerArray() 
+    : ClusterMerger()
   { 
     _name="FuzzyClusterShower"; 
 
@@ -127,19 +127,19 @@ namespace larlite {
 
   bool FuzzyClusterShower::initialize() {
 
-    return ClusterMergerArray::initialize();
+    return ClusterMerger::initialize();
 
   }
   
   bool FuzzyClusterShower::analyze(storage_manager* storage) {
   
-    return ClusterMergerArray::analyze(storage);
+    return ClusterMerger::analyze(storage);
     
   }
 
   bool FuzzyClusterShower::finalize() {
 
-    return ClusterMergerArray::finalize();
+    return ClusterMerger::finalize();
   }
 
 }

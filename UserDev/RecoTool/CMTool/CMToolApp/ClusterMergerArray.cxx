@@ -16,20 +16,18 @@ namespace larlite {
 
   ::cmtool::CMergeManager& ClusterMergerArray::GetManager(size_t mgr_id)
   {
-    if(_mgr_v.size() <= mgr_id) _mgr_v.resize(mgr_id+1);
-    return _mgr_v[mgr_id];
+    return _merge_helper.GetManager(mgr_id);
   }
 
   bool ClusterMergerArray::initialize() {
 
-    if(!_mgr_v.size()) {
+    if(!_merge_helper.size()) {
       print(msg::kERROR,__FUNCTION__,
 	    "No manager is set ro run!");
       return false;
     }
 
-    if(_fout) 
-      for(auto& mgr : _mgr_v) mgr.SetAnaFile(_fout);
+    if(_fout) _merge_helper.SetAnaFile(_fout);
 
     return true;
   }
@@ -40,27 +38,9 @@ namespace larlite {
 
     _cru_helper.GeneratePxHit(storage,_input_producer,local_clusters);
 
-    ::cmtool::CMergeBookKeeper bk;
+    _merge_helper.Process(local_clusters);
 
-    for(size_t i=0; i<_mgr_v.size(); ++i) {
-
-      auto& mgr = _mgr_v[i];
-
-      mgr.Reset();
-      
-      if(!i) mgr.SetClusters(local_clusters);
-      else mgr.SetClusters( _mgr_v[i-1].GetClusters() );
-
-      mgr.Process();
-
-      auto const& new_bk = mgr.GetBookKeeper();
-
-      if(!i) bk = new_bk;
-      else if(new_bk.GetResult().size() < new_bk.size())
-	bk.Combine(new_bk);
-
-      //bk.Report();
-    }
+    auto const& bk = _merge_helper.GetResult();
 
     if(!_write_output) return true;
 

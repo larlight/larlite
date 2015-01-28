@@ -16,7 +16,7 @@
 #define RECOTOOL_CLUSTERMERGERARRAY_H
 
 #include "Analysis/ana_base.h"
-#include "CMTool/CMToolBase/CMergeManager.h"
+#include "CMergeHelper.h"
 #include "ClusterRecoUtil/CRUHelper.h"
 
 namespace larlite {
@@ -53,7 +53,7 @@ namespace larlite {
 
     void SetOutputProducer(std::string name) {_output_producer = name;}
 
-    ::cmtool::CMergeManager& GetManager(size_t mgr_id);
+    ::cmtool::CMergeManager& GetManager(size_t mgr_id=0);
 
     void SaveOutputCluster(bool doit=true) { _write_output = doit; }
     
@@ -61,11 +61,11 @@ namespace larlite {
 
     bool _write_output;
 
-    std::vector< ::cmtool::CMergeManager> _mgr_v;
-
     std::string _input_producer;
 
     std::string _output_producer;
+
+    ::cmtool::CMergeHelper _merge_helper;
 
     ::cluster::CRUHelper _cru_helper;
 

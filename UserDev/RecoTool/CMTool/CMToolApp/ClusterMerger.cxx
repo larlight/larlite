@@ -16,7 +16,7 @@ namespace larlite {
 
   bool ClusterMerger::initialize() {
 
-    if(_fout) _mgr.SetAnaFile(_fout);
+    _merge_helper.SetAnaFile(_fout);
 
     return true;
   }
@@ -27,11 +27,9 @@ namespace larlite {
 
     _cru_helper.GeneratePxHit(storage,_input_producer,local_clusters);
 
-    _mgr.Reset();
+    _merge_helper.Process(local_clusters);
 
-    _mgr.SetClusters(local_clusters);
-
-    _mgr.Process();
+    auto const& bk = _merge_helper.GetResult();
 
     if(!_write_output) return true;
 
@@ -65,7 +63,7 @@ namespace larlite {
     auto hit_producer = hit_producer_v[0];
 
     std::vector<std::vector<unsigned short> > merged_indexes;
-    _mgr.GetBookKeeper().PassResult(merged_indexes);
+    bk.PassResult(merged_indexes);
 
     // Reserve output vector size for faster push_back
     out_cluster_v->reserve(merged_indexes.size());

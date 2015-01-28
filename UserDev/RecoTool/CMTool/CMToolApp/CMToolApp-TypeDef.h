@@ -16,6 +16,7 @@
 #include "FuzzyClusterShower.h"
 #include "ClusterMatcher.h"
 #include "MergeViewer.h"
+#include "CMergeHelper.h"
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
@@ -34,35 +35,9 @@ namespace larlite {
   class MatchViewer;
 //ADD_ANA_CLASS ... do not change this comment line
 }
+
+namespace cmtool {
+  class CMergeHelper;
+}
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

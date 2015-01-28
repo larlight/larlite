@@ -15,7 +15,7 @@
 #ifndef FUZZYCLUSTERSHOWER_H
 #define FUZZYCLUSTERSHOWER_H
 
-#include "ClusterMergerArray.h"
+#include "ClusterMerger.h"
 #include "CMTool/CMTAlgPriority/CPAlgoIgnoreTracks.h"
 #include "CMTool/CMTAlgMerge/CBAlgoShortestDist.h"
 #include "CMTool/CMTAlgMerge/CBAlgoStartTrack.h"
@@ -32,7 +32,7 @@ namespace larlite {
      \class FuzzyClusterShower
      User custom analysis class made by kazuhiro
    */
-  class FuzzyClusterShower : public ClusterMergerArray {
+  class FuzzyClusterShower : public ClusterMerger {
   
   public:
 
