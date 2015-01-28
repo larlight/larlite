@@ -17,7 +17,7 @@
 
 #include "Analysis/ana_base.h"
 #include "ERTool/Base/Manager.h"
-#include "ERToolAnaBase.h"
+#include "ERToolBackend/ERToolAnaBase.h"
 namespace larlite {
   /**
      \class ERAnaPi0Quality

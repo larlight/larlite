@@ -1,0 +1,6 @@
+#ifndef LARLITE_PACKAGE_NAME_SAMPLE_CXX
+#define LARLITE_PACKAGE_NAME_SAMPLE_CXX
+
+#include "sample.h"
+
+#endif
