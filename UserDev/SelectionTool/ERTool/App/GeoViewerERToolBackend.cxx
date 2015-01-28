@@ -29,36 +29,46 @@ namespace ertool {
     }
 
     static TDatabasePDG db_s;
-    static std::map<int,std::string> part_name_s;
+    //static std::map<int,std::string> part_name_s;
+    static std::map<int,TParticlePDG*> part_map_s;
 
     std::vector<std::vector<bool> > used_obj(Particle::kTypeMax, std::vector<bool>());
     used_obj[ Particle::kTrack  ].resize( data.Track().size(),  false );
     used_obj[ Particle::kShower ].resize( data.Shower().size(), false );
 
     for (auto &p : particles){
-      geoalgo::LineSegment_t part( p.Vertex(), p.Vertex() + (p.Momentum() * (30./p.Momentum().Length())) );
 
-      if(part_name_s.find(p.PdgCode()) == part_name_s.end()){
-	if(p.PdgCode()>=1000000000) part_name_s[p.PdgCode()] = std::to_string(p.PdgCode());
-	else part_name_s[p.PdgCode()]=db_s.GetParticle(p.PdgCode())->GetName();
-      }
-      //Add( part, std::to_string(p.PdgCode() ), "black" );
-      GeoObjCollection::Add( part, part_name_s[p.PdgCode()], "black" );
-      // If this particle has associated EventData, show it as well
-      if (p.RecoObjID() != -1){
-	if (p.Type() == Particle::RecoObjType_t::kShower)
-	  GeoObjCollection::Add( data.Shower(p.RecoObjID()), "" , "blue");
-	if (p.Type() == Particle::RecoObjType_t::kTrack){
-	  if (data.Track(p.RecoObjID()).size() >= 2)
-	    GeoObjCollection::Add( data.Track(p.RecoObjID()), "", "red");
+      auto const& daughter_v = p.AllDaughters();
+
+      for(auto const& daughter : daughter_v) {
+
+	if(part_map_s.find(daughter->PdgCode()) == part_map_s.end()) 
+	  part_map_s.insert(std::make_pair(daughter->PdgCode(),db_s.GetParticle(daughter->PdgCode())));
+
+	std::string name="";
+	if(part_map_s[daughter->PdgCode()]) name = part_map_s[daughter->PdgCode()]->GetName();
+
+	// If this particle has associated EventData, show it as well (if name is non-empty)
+	if (daughter->RecoObjID() != -1){
+	  if(!name.empty()) {
+	    if (daughter->Type() == Particle::RecoObjType_t::kShower)
+	      GeoObjCollection::Add( data.Shower(daughter->RecoObjID()), name , "blue");
+	    if (daughter->Type() == Particle::RecoObjType_t::kTrack){
+	      if (data.Track(daughter->RecoObjID()).size() >= 2)
+	      GeoObjCollection::Add( data.Track(daughter->RecoObjID()), name, "red");
+	    }
+	  }
+	  used_obj[ daughter->Type() ][ daughter->RecoObjID() ] = true;
+	}else if(!name.empty()) {
+	  //geoalgo::LineSegment_t part( daughter->Vertex(), daughter->Vertex() + (daughter->Momentum() * (30./daughter->Momentum().Length())) );
+	  geoalgo::Vector_t part( daughter->Vertex() );
+	  GeoObjCollection::Add( part, name, "black" );
 	}
-	used_obj[ p.Type() ][ p.RecoObjID() ] = true;
       }
     }
 
     // Process all unassociated objects
     // Tracks
-
     for(size_t trk_index = 0; trk_index < data.Track().size(); ++trk_index) {
       if( !(used_obj[ Particle::RecoObjType_t::kTrack ][ trk_index ]) ){
 	if( data.Track( trk_index ).size() > 2 )

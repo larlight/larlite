@@ -21,7 +21,7 @@ namespace larlite {
 
     FillTracks  (mct_v, event_data);
     FillShowers (mcs_v, event_data);
-    FillVertices(mci_v, event_data);
+    //FillVertices(mci_v, event_data);
 
     std::map<unsigned int, ::ertool::Particle> g4_mother_parts;
     std::map<unsigned int, PartID_t> g4_mother_id;
@@ -32,7 +32,13 @@ namespace larlite {
 
       if(mcs.DetProfile().E()<1) continue;
       reco_obj_index++;
-
+      std::cout<<"MCShower: "
+	       << mcs.PdgCode()
+	       << " => "
+	       << mcs.MotherPdgCode()
+	       << " => "
+	       << mcs.AncestorPdgCode()
+	       << " ... " << std::endl;
       if( mcs.MotherTrackID() != mcs.AncestorTrackID() ) continue;
       
       unsigned int trkid_mom = mcs.AncestorTrackID();
@@ -491,6 +497,9 @@ namespace larlite {
     for(auto const& mci : mci_v) {
       
       for(auto const& mcp : mci.GetParticles()) {
+
+	if(mcp.StatusCode()!=1) continue;
+
 	::geoalgo::Point_t vtx(mcp.Trajectory()[0].Position());
 	
 	if(vtxs.find(vtx) == vtxs.end()) {

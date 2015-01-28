@@ -60,7 +60,7 @@ def main():
     # First Argument: True = MC, False = Reco
     my_ana.SetShowerProducer(True,"mcreco");
     my_ana.SetTrackProducer(True,"mcreco");
-    my_ana.SetVtxProducer(True,"generator");
+    my_ana.SetVtxProducer(False,"");
     #my_ana.SetShowerProducer(False,"pandoraNuShower")
     #my_ana.SetTrackProducer(False,"");
     #my_ana.SetVtxProducer(False,"");

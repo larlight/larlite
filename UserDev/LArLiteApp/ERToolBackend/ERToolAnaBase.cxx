@@ -12,8 +12,10 @@ namespace larlite {
     _name_generator = "generator";
     _name_mcshr     = "mcreco";
     _name_mctrk     = "mcreco";
+    _name_mcvtx     = "generator";
     _name_track     = "";
     _name_shower    = "";
+    _name_vertex    = "";
   }
 
   void ERToolAnaBase::SetShowerProducer(const bool mc, const std::string prod)

@@ -87,6 +87,7 @@ namespace ertool {
     //
     bool Match(const Particle& p, bool exclusive=false) const;
     std::string Diagram() const;
+    const std::vector<const ::ertool::Particle*> AllDaughters() const;
 
   protected:
 
@@ -103,7 +104,7 @@ namespace ertool {
     RecoObjType_t _reco_obj_type;
 
     void Diagram(std::string& res,std::string prefix="") const;
-
+    void AllDaughters(std::vector<const ::ertool::Particle*>& part_v) const;
   private:
 
     ClassDef(Particle,1)

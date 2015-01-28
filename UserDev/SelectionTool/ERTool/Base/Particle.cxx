@@ -106,6 +106,18 @@ namespace ertool {
     for(auto const& d : _daughters) d.Diagram(res,prefix);
   }
 
+  const std::vector<const ::ertool::Particle*> Particle::AllDaughters() const
+  {
+    std::vector<const ::ertool::Particle*> res;
+    this->AllDaughters(res);
+    return res;
+  }
+  void Particle::AllDaughters(std::vector<const ::ertool::Particle*>& part_v) const
+  {
+    part_v.push_back(this);
+    for(auto const& daughter : _daughters) daughter.AllDaughters(part_v);
+  }
+
 }
 
 #endif
