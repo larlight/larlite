@@ -17,6 +17,7 @@
 #define ERTOOL_ALGOSINGLEE_H
 
 #include "Algo/AlgoEMPart.h"
+#include "Algo/AlgoFindRelationship.h"
 #include "Base/AlgoBase.h"
 
 namespace ertool {
@@ -50,7 +51,7 @@ namespace ertool {
     virtual ParticleSet Reconstruct(const EventData &data);
 
     /// Set verbosity
-    void setVerbose(bool on) { _verbose = on; }
+    void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); }
 
   private:
 
@@ -76,6 +77,7 @@ namespace ertool {
     double _e_mass;
 
     AlgoEMPart _alg_emp;
+    AlgoFindRelationship _findRel;
 
     //debug histos
     TH1F* _e_ll_values;
