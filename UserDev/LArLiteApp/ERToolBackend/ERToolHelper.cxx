@@ -32,6 +32,7 @@ namespace larlite {
 
       if(mcs.DetProfile().E()<_minEDep) continue;
       reco_obj_index++;
+      /*
       std::cout<<"MCShower: "
 	       << mcs.PdgCode()
 	       << " => "
@@ -39,6 +40,7 @@ namespace larlite {
 	       << " => "
 	       << mcs.AncestorPdgCode()
 	       << " ... " << std::endl;
+      */
       if( mcs.MotherTrackID() != mcs.AncestorTrackID() ) continue;
       
       unsigned int trkid_mom = mcs.AncestorTrackID();
@@ -77,6 +79,7 @@ namespace larlite {
 	p.Momentum( ::geoalgo::Vector(mcs.DetProfile().Momentum()) );
 	p.RecoObjInfo(reco_obj_index-1, ::ertool::Particle::kShower);
 	g4_mother_parts[trkid_mom].AddDaughter(p);
+	/*std::cout<<p.PdgCode()<<" : Shower ID "<<p.RecoObjID()<<std::endl;*/
       }
     }
 
