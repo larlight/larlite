@@ -234,7 +234,6 @@ class GeoViewer(object):
         for x in xrange(len(self._holder.Trajectory())):
             self._add_trajectory(self._holder.Trajectory()[x], self._holder.TrajectoryColor()[x])
         for x in xrange(len(self._holder.Cone())):
-            print "CONE"
             self._add_cone(self._holder.Cone()[x], self._holder.ConeColor()[x])
         for x in self._converter.Convert(self._holder.Labels()):
             self._add_label(x)
