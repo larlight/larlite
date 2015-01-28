@@ -12,7 +12,6 @@
 #include "ClusterViewerAlgo.h"
 #include "ClusterViewer.h"
 #include "ClusterMerger.h"
-#include "ClusterMergerArray.h"
 #include "FuzzyClusterShower.h"
 #include "ClusterMatcher.h"
 #include "MergeViewer.h"
