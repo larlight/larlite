@@ -17,12 +17,8 @@ rootlibmap() {
 ######################################################
 # Pi0Ana
 rootlibmap libLArLiteApp_Pi0Ana.rootmap libLArLiteApp_Pi0Ana.so $LARLITE_USERDEVDIR/LArLiteApp/Pi0Ana/LinkDef.h \
-    libLArLite_Analysis.so
-    libSelectionTool_ERFilter.so \
-    libSelectionTool_ERAlgo.so \
-    libSelectionTool_ERBase.so \
+    libLArLite_Analysis.so \
     libLArLite_ERToolBackend.so
-
 
 
 
