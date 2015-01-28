@@ -25,26 +25,34 @@ namespace larlite {
      doxygen documentation!
   */
   class MakeParticleTree{
-    
-    
-    void setParticleMap(event_mctree *event_tree, event_mcpart *event_part);
-    
-    int searchParticleMap(std::set<int>::iterator it){ return _ParticleMap.find(*it)->second; }
-    
-    int searchParticleMap(const int trackID);
-    
-    void setTrees(event_mctree *event_tree, event_mcpart *event_part);
-    
-    void AddNodes(mcpart part, treenode& parentnode, int ancestor, event_mcpart *event_part);
-    
+
   public:
-    
+
     /// Default constructor
     MakeParticleTree(){};
     
     /// Default destructor
     virtual ~MakeParticleTree(){};
 
+    void MakeTree(const event_mcpart& evt_part,
+		  event_mctree& evt_tree);
+    
+    void setParticleMap(event_mctree& event_tree,
+			const event_mcpart& event_part);
+    
+    int searchParticleMap(std::set<int>::iterator it)
+    { return _ParticleMap.find(*it)->second; }
+    
+    int searchParticleMap(const int trackID);
+    
+    void setTrees(event_mctree& event_tree,
+		  const event_mcpart& event_part);
+    
+    void AddNodes(mcpart part,
+		  treenode& parentnode,
+		  int ancestor,
+		  const event_mcpart& event_part);
+    
   private:
     
     std::map<int, int> _ParticleMap;
