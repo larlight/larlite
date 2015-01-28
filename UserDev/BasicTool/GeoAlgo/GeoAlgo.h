@@ -297,59 +297,65 @@ namespace geoalgo {
     //COMMON ORIGIN ALGORITHMS: DETERMINE IF TWO GEO-OBJECTS HAVE A COMMON ORIGIN
     //***************************************************************************
     /// Common origin: Line Segment & Line Segment. Do not keep track of origin
-    double commonOrigin(const LineSegment_t& seg1, const LineSegment_t& seg2) const
-    { Point_t origin(seg1.Start().size()); return commonOrigin(seg1,seg2, origin); }
+    double commonOrigin(const Line_t& lin1, const Line_t& lin2) const
+    { Point_t origin(lin1.Pt1().size()); return commonOrigin(lin1,lin2, origin); }
     /// Common origin: Line Segment & Line Segment. Keep track of origin
-    double commonOrigin(const LineSegment_t& seg1, const LineSegment_t& seg2, Point_t& origin) const
-    { seg1.Start().compat(seg2.Start()); return _commonOrigin_(seg1, seg2, origin); }
+    double commonOrigin(const Line_t& lin1, const Line_t& lin2, Point_t& origin) const
+    { lin1.Pt1().compat(lin2.Pt1()); return _commonOrigin_(lin1, lin2, origin); }
+    /// Common origin: Line Segment & Line Segment. Do not keep track of origin
+    double commonOrigin(const LineSegment_t& seg1, const LineSegment_t& seg2, bool backwards=false) const
+    { Point_t origin(seg1.Start().size()); return commonOrigin(seg1,seg2, origin, backwards); }
+    /// Common origin: Line Segment & Line Segment. Keep track of origin
+    double commonOrigin(const LineSegment_t& seg1, const LineSegment_t& seg2, Point_t& origin, bool backwards=false) const
+    { seg1.Start().compat(seg2.Start()); return _commonOrigin_(seg1, seg2, origin, backwards); }
     /// Common origin: Line Segment & Half Line. Do not keep track of origin
-    double commonOrigin(const HalfLine_t& lin, const LineSegment_t& seg) const
-    { Point_t origin(lin.Start().size()); return commonOrigin(lin, seg, origin); }
+    double commonOrigin(const HalfLine_t& lin, const LineSegment_t& seg, bool backwards=false) const
+    { Point_t origin(lin.Start().size()); return commonOrigin(lin, seg, origin, backwards); }
     /// Common origin: Line Segment & Line Segment. Keep track of origin
-    double commonOrigin(const HalfLine_t& lin, const LineSegment_t& seg, Point_t& origin) const
-    { lin.Start().compat(seg.Start()); return _commonOrigin_(lin, seg, origin); }
+    double commonOrigin(const HalfLine_t& lin, const LineSegment_t& seg, Point_t& origin, bool backwards=false) const
+    { lin.Start().compat(seg.Start()); return _commonOrigin_(lin, seg, origin, backwards); }
     /// Common origin: Line Segment & Half Line. Do not keep track of origin
-    double commonOrigin(const LineSegment_t& seg, const HalfLine_t& lin) const
-    { Point_t origin(lin.Start().size()); return commonOrigin(lin, seg, origin); }
+    double commonOrigin(const LineSegment_t& seg, const HalfLine_t& lin, bool backwards=false) const
+    { Point_t origin(lin.Start().size()); return commonOrigin(lin, seg, origin, backwards); }
     /// Common origin: Line Segment & Line Segment. Keep track of origin
-    double commonOrigin(const LineSegment_t& seg, const HalfLine_t& lin, Point_t& origin) const
-    { lin.Start().compat(seg.Start()); return _commonOrigin_(lin, seg, origin); }
+    double commonOrigin(const LineSegment_t& seg, const HalfLine_t& lin, Point_t& origin, bool backwards=false) const
+    { lin.Start().compat(seg.Start()); return _commonOrigin_(lin, seg, origin, backwards); }
     /// Common origin: Half Line & Half Line. Do not keep track of origin
-    double commonOrigin(const HalfLine_t& lin1, const HalfLine_t& lin2) const
-    { Point_t origin(lin1.Start().size()); return commonOrigin(lin1,lin2, origin); }
+    double commonOrigin(const HalfLine_t& lin1, const HalfLine_t& lin2, bool backwards=false) const
+    { Point_t origin(lin1.Start().size()); return commonOrigin(lin1,lin2, origin, backwards); }
     /// Common origin: Half Line & Half Line. Keep track of origin
-    double commonOrigin(const HalfLine_t& lin1, const HalfLine_t& lin2, Point_t& origin) const
-    { lin1.Start().compat(lin2.Start()); return _commonOrigin_(lin1, lin2, origin); }
+    double commonOrigin(const HalfLine_t& lin1, const HalfLine_t& lin2, Point_t& origin, bool backwards=false) const
+    { lin1.Start().compat(lin2.Start()); return _commonOrigin_(lin1, lin2, origin, backwards); }
     /// Common origin: Trajectory & Trajectory. Do not keep track of origin
-    double commonOrigin(const Trajectory_t& trj1, const Trajectory_t& trj2) const
-    { Point_t origin(trj1.front().size()); return commonOrigin(trj1,trj2, origin); }
+    double commonOrigin(const Trajectory_t& trj1, const Trajectory_t& trj2, bool backwards=false) const
+    { Point_t origin(trj1.front().size()); return commonOrigin(trj1,trj2, origin, backwards); }
     /// Common origin: Trajectory & Trajectory. Keep track of origin
-    double commonOrigin(const Trajectory_t& trj1, const Trajectory_t& trj2, Point_t& origin) const
-    { trj1.front().compat(trj2.front()); return _commonOrigin_(trj1, trj2, origin); }
+    double commonOrigin(const Trajectory_t& trj1, const Trajectory_t& trj2, Point_t& origin, bool backwards=false) const
+    { trj1.front().compat(trj2.front()); return _commonOrigin_(trj1, trj2, origin, backwards); }
     /// Common origin: Trajectory & Half Line. Do not keep track of origin
-    double commonOrigin(const Trajectory_t& trj, const HalfLine_t& lin) const
-    { Point_t origin(trj.front().size()); return commonOrigin(trj,lin, origin); }
+    double commonOrigin(const Trajectory_t& trj, const HalfLine_t& lin, bool backwards=false) const
+    { Point_t origin(trj.front().size()); return commonOrigin(trj,lin, origin, backwards); }
     /// Common origin: Trajectory & Half Line. Keep track of origin
-    double commonOrigin(const Trajectory_t& trj, const HalfLine_t& lin, Point_t& origin) const
-    { trj.front().compat(lin.Start()); return _commonOrigin_(trj, lin, origin); }
+    double commonOrigin(const Trajectory_t& trj, const HalfLine_t& lin, Point_t& origin, bool backwards=false) const
+    { trj.front().compat(lin.Start()); return _commonOrigin_(trj, lin, origin, backwards); }
     /// Common origin: Trajectory & Half Line. Do not keep track of origin
-    double commonOrigin(const HalfLine_t& lin, const Trajectory_t& trj) const
-    { Point_t origin(trj.front().size()); return commonOrigin(trj,lin, origin); }
+    double commonOrigin(const HalfLine_t& lin, const Trajectory_t& trj, bool backwards=false) const
+    { Point_t origin(trj.front().size()); return commonOrigin(trj,lin, origin, backwards); }
     /// Common origin: Trajectory & Half Line. Keep track of origin
-    double commonOrigin(const HalfLine_t& lin, const Trajectory_t& trj, Point_t& origin) const
-    { trj.front().compat(lin.Start()); return _commonOrigin_(trj, lin, origin); }
+    double commonOrigin(const HalfLine_t& lin, const Trajectory_t& trj, Point_t& origin, bool backwards=false) const
+    { trj.front().compat(lin.Start()); return _commonOrigin_(trj, lin, origin, backwards); }
     /// Common origin: Trajectory & Line Segment. Do not keep track of origin
-    double commonOrigin(const Trajectory_t& trj, const LineSegment_t& seg) const
-    { Point_t origin(trj.front().size()); return commonOrigin(trj, seg, origin); }
+    double commonOrigin(const Trajectory_t& trj, const LineSegment_t& seg, bool backwards=false) const
+    { Point_t origin(trj.front().size()); return commonOrigin(trj, seg, origin, backwards); }
     /// Common origin: Trajectory & Line Segment. Keep track of origin
-    double commonOrigin(const Trajectory_t& trj, const LineSegment_t& seg, Point_t& origin) const
-    { trj.front().compat(seg.Start()); return _commonOrigin_(trj, seg, origin); }
+    double commonOrigin(const Trajectory_t& trj, const LineSegment_t& seg, Point_t& origin, bool backwards=false) const
+    { trj.front().compat(seg.Start()); return _commonOrigin_(trj, seg, origin, backwards); }
     /// Common origin: Trajectory & Line Segment. Do not keep track of origin
-    double commonOrigin(const LineSegment_t& seg, const Trajectory_t& trj) const
-    { Point_t origin(trj.front().size()); return commonOrigin(trj, seg, origin); }
+    double commonOrigin(const LineSegment_t& seg, const Trajectory_t& trj, bool backwards=false) const
+    { Point_t origin(trj.front().size()); return commonOrigin(trj, seg, origin, backwards); }
     /// Common origin: Trajectory & Line Segment. Keep track of origin
-    double commonOrigin(const LineSegment_t& seg, const Trajectory_t& trj, Point_t& origin) const
-    { trj.front().compat(seg.Start()); return _commonOrigin_(trj, seg, origin); }
+    double commonOrigin(const LineSegment_t& seg, const Trajectory_t& trj, Point_t& origin, bool backwards=false) const
+    { trj.front().compat(seg.Start()); return _commonOrigin_(trj, seg, origin, backwards); }
 
 
   protected:
@@ -417,18 +423,20 @@ namespace geoalgo {
     Point_t _ClosestPt_(const AABox_t& box, const Point_t& pt) const
     { return _ClosestPt_(pt,box); }
 
+    /// Common origin: Line & Line. Keep track of origin
+    double _commonOrigin_(const Line_t& lin1, const Line_t& lin2, Point_t& origin) const;
     /// Common origin: Half Line & Half Line. Keep track of origin
-    double _commonOrigin_(const HalfLine_t& lin1, const HalfLine_t& lin2, Point_t& origin) const;
+    double _commonOrigin_(const HalfLine_t& lin1, const HalfLine_t& lin2, Point_t& origin, bool backwards) const;
     /// Common origin: Line Segment & Half Line. Keep track of origin
-    double _commonOrigin_(const HalfLine_t& lin, const LineSegment_t& seg, Point_t& origin) const;
+    double _commonOrigin_(const HalfLine_t& lin, const LineSegment_t& seg, Point_t& origin, bool backwards) const;
     /// Common origin: Line Segment & Line Segment. Keep track of origin
-    double _commonOrigin_(const LineSegment_t& seg1, const LineSegment_t& seg2, Point_t& origin) const;
+    double _commonOrigin_(const LineSegment_t& seg1, const LineSegment_t& seg2, Point_t& origin, bool backwards) const;
     /// Common origin: Trajectory & Trajectory. Keep track of origin
-    double _commonOrigin_(const Trajectory_t& trj1, const Trajectory_t& trj2, Point_t& origin) const;
+    double _commonOrigin_(const Trajectory_t& trj1, const Trajectory_t& trj2, Point_t& origin, bool backwards) const;
     /// Common origin: Trajectory & Line Segment. Keep track of origin
-    double _commonOrigin_(const Trajectory_t& trj, const LineSegment_t& seg, Point_t& origin) const;
+    double _commonOrigin_(const Trajectory_t& trj, const LineSegment_t& seg, Point_t& origin, bool backwards) const;
     /// Common origin: Trajectory & Half Line. Keep track of origin
-    double _commonOrigin_(const Trajectory_t& trj, const HalfLine_t& lin, Point_t& origin) const;
+    double _commonOrigin_(const Trajectory_t& trj, const HalfLine_t& lin, Point_t& origin, bool backwards) const;
 
     /// Clamp function: checks if value out of bounds
     double _Clamp_(const double n, const double min, const double max) const;
