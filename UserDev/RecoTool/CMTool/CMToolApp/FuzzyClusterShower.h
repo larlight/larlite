@@ -22,7 +22,7 @@
 #include "CMTool/CMTAlgMerge/CBAlgoPolyContain.h"
 #include "CMTool/CMTAlgMerge/CBAlgoCenterOfMass.h"
 #include "CMTool/CMTAlgMerge/CBAlgoPolyOverlap.h"
-#include "CMTool/CMTAlgMerge/CBAlgoPolySHortestDist.h"
+#include "CMTool/CMTAlgMerge/CBAlgoPolyShortestDist.h"
 #include "CMTool/CMTAlgMerge/CBAlgoTrackSeparate.h"
 #include "CMTool/CMTAlgMerge/CBAlgoOutOfConeSeparate.h"
 #include "CMTool/CMTAlgMerge/CBAlgoAngleIncompat.h"
