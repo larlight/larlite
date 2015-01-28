@@ -46,7 +46,7 @@ namespace btutil {
 
   typedef std::vector<double> edep_info_t; // vector of energy deposition
   
-  typedef std::vector<edep_info_t> ch_info_t; // vector of time (index) for each edep (value)
+  typedef std::map<unsigned int, ::btutil::edep_info_t > ch_info_t; // vector of time (index) for each edep (value)
   
   class MCBTAlg {
     
@@ -116,7 +116,7 @@ namespace btutil {
 
     void ProcessSimChannel(const std::vector<larlite::simch>& simch_v);
 
-    std::vector<ch_info_t> _event_info;
+    std::vector< ::btutil::ch_info_t> _event_info;
     std::vector<size_t> _trkid_to_index;
     std::vector<std::vector<double> > _sum_mcq;
     size_t _num_parts;

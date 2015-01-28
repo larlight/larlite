@@ -2,7 +2,7 @@
 #define MCBTALG_CXX
 
 #include "MCBTAlg.h"
-
+#include <TStopwatch.h>
 namespace btutil {
 
   MCBTAlg::MCBTAlg(const std::vector<unsigned int>& g4_trackid_v,
@@ -38,7 +38,6 @@ namespace btutil {
       Register(id);
     _num_parts++;
     ProcessSimChannel(simch_v);
-
   }
 
   void MCBTAlg::ProcessSimChannel(const std::vector<larlite::simch>& simch_v)
@@ -47,7 +46,7 @@ namespace btutil {
     //art::ServiceHandle<geo::Geometry> geo;
     auto geo = ::larutil::Geometry::GetME();
     _sum_mcq.resize(geo->Nplanes(),std::vector<double>(_num_parts,0));
-
+    
     for(auto const& sch : simch_v) {
       
       auto const ch = sch.Channel();
@@ -62,13 +61,11 @@ namespace btutil {
 	
 	auto const& time  = time_ide.first;
 	auto const& ide_v = time_ide.second;
-	
-	if(ch_info.size() <= time) ch_info.resize(time+1);
-	
+
 	auto& edep_info = ch_info[time];
-	
-	edep_info.resize(_num_parts,0);
-	
+
+	if(!edep_info.size()) edep_info.resize(_num_parts,0);
+
 	for(auto const& ide : ide_v) {
 	  
 	  size_t index = kINVALID_INDEX;
@@ -106,18 +103,18 @@ namespace btutil {
     //art::ServiceHandle<util::TimeService> ts;
     auto ts = ::larutil::TimeService::GetME();
 
-    size_t start = (size_t)(ts->TPCTick2TDC(hit.start));
-    size_t end   = (size_t)(ts->TPCTick2TDC(hit.end))+1;
-    for(size_t tick=start; tick<end && tick<ch_info.size(); ++tick) {
+    auto itlow = ch_info.lower_bound((unsigned int)(ts->TPCTick2TDC(hit.start)));
+    auto itup  = ch_info.upper_bound((unsigned int)(ts->TPCTick2TDC(hit.end))+1);
+
+    while(itlow != ch_info.end() && itlow != itup) {
       
-      auto const& edep_info = ch_info[tick];
-      
-      if(!edep_info.size()) continue;
+      auto const& edep_info = (*itlow).second;
       
       for(size_t part_index = 0; part_index<_num_parts; ++part_index)
 	
 	res[part_index] += edep_info[part_index];
       
+      ++itlow;
     }
     return res;
   }
