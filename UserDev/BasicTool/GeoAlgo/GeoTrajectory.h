@@ -59,7 +59,7 @@ namespace geoalgo {
 
 	length += _Dir_(i).Length();
       
-      return sqrt(length);
+      return length;
     }
 
     /// push_back overrie w/ dimensionality check 
