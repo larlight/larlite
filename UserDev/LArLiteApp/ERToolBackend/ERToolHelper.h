@@ -45,7 +45,7 @@ namespace larlite {
   public:
     
     /// Default constructor
-    ERToolHelper(){};
+    ERToolHelper(){ _minEDep = 10; };
     
     /// Default destructor
     virtual ~ERToolHelper(){};
@@ -85,7 +85,14 @@ namespace larlite {
     void FillVertices ( const event_mctruth& mci_v,
 			::ertool::EventData& res) const;
 
+    /// Set minimum EDep amount for shower to be added to EventData
+    void SetMinEDep(double E) { _minEDep = E; }
+
   private:
+
+    // Minimum deposited energy for showers in order to
+    // be added to EventData
+    double _minEDep;
     
     EMShowerProfile _shrProfiler;
 

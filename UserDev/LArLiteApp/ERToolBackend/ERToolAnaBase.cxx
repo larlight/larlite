@@ -71,6 +71,10 @@ namespace larlite {
       print(msg::kERROR,__FUNCTION__,"No producer name provided!");
       return false;
     }
+
+    // Set minimum Energy Deposited for Helper
+    _helper.SetMinEDep(10);
+
     return true;
   }
   

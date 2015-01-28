@@ -30,7 +30,7 @@ namespace larlite {
 
       auto const& mcs = mcs_v[i];
 
-      if(mcs.DetProfile().E()<1) continue;
+      if(mcs.DetProfile().E()<_minEDep) continue;
       reco_obj_index++;
       std::cout<<"MCShower: "
 	       << mcs.PdgCode()
@@ -147,7 +147,7 @@ namespace larlite {
     for(size_t i=0; i<mcs_v.size(); ++i) {
 
       auto const& mcs = mcs_v[i];
-      if(mcs.DetProfile().E()<1) continue;
+      if(mcs.DetProfile().E()<_minEDep) continue;
       reco_obj_index++;
 
       unsigned int trkid = mcs.TrackID();
@@ -417,7 +417,7 @@ namespace larlite {
   {
     for(auto const& mcs : mcs_v) {
 
-      if(mcs.DetProfile().Momentum().E()<10) continue;
+      if(mcs.DetProfile().Momentum().E()<_minEDep) continue;
       //if(isnan(mcs.DetProfile().Momentum().E())) continue;
       //if(isnan(mcs.DetProfile().Momentum().Px())) continue;
 
