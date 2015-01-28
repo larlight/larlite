@@ -62,6 +62,7 @@ namespace ertool {
     // Particles created in EM selection (photon/gamma separation)
     ParticleSet emParticles = _alg_emp.Reconstruct(data);
 
+    res = emParticles;
 
     if (_verbose) { 
       std::cout << "***********BEGIN RECONSTRUCTION************" << std::endl;
@@ -122,7 +123,11 @@ namespace ertool {
 	// created, simply add it to the result vector
 	if (single){
 	  std::cout << "Shower is Single!" << std::endl;
-	  res.push_back(p);
+	  // Create an "unknown" particle that gave
+	  // birth to this electron shower
+	  Particle unknown;
+	  unknown.AddDaughter(p);
+	  res.push_back(unknown);
 	}
 	else
 	  std::cout << "Shower is not single." << std::endl;
