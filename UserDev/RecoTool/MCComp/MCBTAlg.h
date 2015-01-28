@@ -46,7 +46,7 @@ namespace btutil {
 
   typedef std::vector<double> edep_info_t; // vector of energy deposition
   
-  typedef std::vector<edep_info_t> ch_info_t; // vector of time (index) for each edep (value)
+  typedef std::map<unsigned int, ::btutil::edep_info_t > ch_info_t; // vector of time (index) for each edep (value)
   
   class MCBTAlg {
     
@@ -58,6 +58,9 @@ namespace btutil {
 	    const std::vector<larlite::simch>& simch_v);
 
     void Reset(const std::vector<unsigned int>& g4_trackid_v,
+	       const std::vector<larlite::simch>& simch_v);
+
+    void Reset(const std::vector<std::vector<unsigned int> >& g4_trackid_v,
 	       const std::vector<larlite::simch>& simch_v);
 
     /**
@@ -102,12 +105,18 @@ namespace btutil {
     std::vector<double> MCQFrac(const std::vector<btutil::WireRange_t>& hit_v) const;
       
     size_t Index(const unsigned int g4_track_id) const;
+
+    size_t NumParts() const { return _num_parts-1; }
     
   protected:
       
-    void Register(unsigned int g4_track_id);
+    void Register(const unsigned int& g4_track_id);
 
-    std::vector<ch_info_t> _event_info;
+    void Register(const std::vector<unsigned int>& g4_track_id);
+
+    void ProcessSimChannel(const std::vector<larlite::simch>& simch_v);
+
+    std::vector< ::btutil::ch_info_t> _event_info;
     std::vector<size_t> _trkid_to_index;
     std::vector<std::vector<double> > _sum_mcq;
     size_t _num_parts;

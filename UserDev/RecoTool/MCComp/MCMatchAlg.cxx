@@ -15,12 +15,28 @@ namespace btutil {
 			    const std::vector<std::vector<unsigned int> > &cluster_hit_association
 			    )
   {
+    fBTAlgo.Reset(g4_trackid_v,simch_v);
+    
+    return BuildMap(hit_v, cluster_hit_association);
+  }
 
-    size_t num_cluster = cluster_hit_association.size();
-    size_t num_mcobj   = g4_trackid_v.size();
+  bool MCMatchAlg::BuildMap(const std::vector<std::vector< unsigned int> > &g4_trackid_v,
+			    const std::vector< ::larlite::simch> &simch_v,
+			    const std::vector< ::larlite::hit>   &hit_v,
+			    const std::vector<std::vector<unsigned int> > &cluster_hit_association
+			    )
+  {
 
     fBTAlgo.Reset(g4_trackid_v,simch_v);
 
+    return BuildMap(hit_v, cluster_hit_association);
+  }
+
+  bool MCMatchAlg::BuildMap(const std::vector< ::larlite::hit>   &hit_v,
+			    const std::vector<std::vector<unsigned int> > &cluster_hit_association)
+  {
+    size_t num_mcobj = fBTAlgo.NumParts();
+    size_t num_cluster = cluster_hit_association.size();
     auto geo = ::larutil::Geometry::GetME();
     //art::ServiceHandle<geo::Geometry> geo;
 
@@ -64,8 +80,10 @@ namespace btutil {
 
       auto mcq_v = fBTAlgo.MCQ(wr_v);
 
+
       for(size_t i=0; i<mcq_v.size(); ++i)
-	_summed_mcq[i][plane] += mcq_v[i];
+
+	_summed_mcq[i][plane] += mcq_v[i]; 
 
       _cluster_mcq_v.push_back(mcq_v);
 
@@ -123,7 +141,9 @@ namespace btutil {
     auto plane = _cluster_plane_id.at(cluster_index);
 
     auto best_cluster_index = _bmatch_id.at(mc_index).at(plane);
-    
+
+    if(best_cluster_index < 0) return -1;
+
     return _cluster_mcq_v.at(cluster_index).at(mc_index) / _cluster_mcq_v.at(best_cluster_index).at(mc_index);
 
   }
@@ -134,7 +154,7 @@ namespace btutil {
     if(!_bmatch_id.size()) 
       throw MCBTException("Preparation not done yet!");
 
-    if( cluster_indices.size() >= _cluster_mcq_v.size()) 
+    if( cluster_indices.size() > _cluster_mcq_v.size()) 
       throw MCBTException(Form("Input cluster indices length (%zu) > # of registered clusters (%zu)!",
 			       cluster_indices.size(),
 			       _cluster_mcq_v.size())
@@ -147,9 +167,14 @@ namespace btutil {
     
     for(auto const& cluster_index : cluster_indices) {
 
-      for(size_t mc_index=0; mc_index < _bmatch_id.size(); ++mc_index)
+      for(size_t mc_index=0; mc_index < _bmatch_id.size(); ++mc_index) {
 
-	match_eff.at(mc_index) *= ClusterCorrectness(cluster_index, mc_index);
+	double correctness = ClusterCorrectness(cluster_index, mc_index);
+	
+	if(correctness>=0)
+	  match_eff.at(mc_index) *= correctness;
+	
+      }
     }
 
     std::pair<size_t,double> result(0,-1);

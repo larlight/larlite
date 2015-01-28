@@ -44,6 +44,13 @@ namespace btutil {
 		  const std::vector< ::larlite::hit>   &hit_v,
 		  const std::vector<std::vector<unsigned int> > &cluster_hit_association
 		  );
+
+    /// Constructs needed information for Reco=>MC matching
+    bool BuildMap(const std::vector<std::vector< unsigned int> > &g4_trackid_v,
+		  const std::vector< ::larlite::simch> &simch_v,
+		  const std::vector< ::larlite::hit>   &hit_v,
+		  const std::vector<std::vector<unsigned int> > &cluster_hit_association
+		  );
       
     /**
        For a specified MC object (via index in MCShower/MCTrack), returns best-matched clusters 
@@ -84,6 +91,9 @@ namespace btutil {
     const MCBTAlg& BTAlg() const { return fBTAlgo; }
 
   protected:
+
+    bool BuildMap(const std::vector< ::larlite::hit>   &hit_v,
+		  const std::vector<std::vector<unsigned int> > &cluster_hit_association);
 
     /// MCBTAlg instance 
     MCBTAlg fBTAlgo;

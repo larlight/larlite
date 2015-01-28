@@ -16,4 +16,7 @@ rootlibmap() {
 
 ######################################################
 # MCComp
-rootlibmap libRecoTool_MCComp.rootmap libRecoTool_MCComp.so $LARLITE_USERDEVDIR/RecoTool/MCComp/LinkDef.h 
+rootlibmap libRecoTool_MCComp.rootmap libRecoTool_MCComp.so $LARLITE_USERDEVDIR/RecoTool/MCComp/LinkDef.h \
+    libLArLite_Base.so \
+    libLArLite_LArUtil.so 
+    

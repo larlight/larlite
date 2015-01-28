@@ -39,6 +39,12 @@ namespace cmtool {
       
     }
   }
+
+  const std::vector< ::cluster::ClusterParamsAlg>& CMergeHelper::GetClusters() const
+  {
+    if(!(_mgr_v.size())) throw CMTException("No manager = no output clusters...");
+    return _mgr_v.back().GetClusters();
+  }
 }
 
 #endif
