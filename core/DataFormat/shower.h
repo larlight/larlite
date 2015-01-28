@@ -48,7 +48,7 @@ namespace larlite{
     void set_start_point_err (const TVector3& xyz_e)      { fSigmaXYZstart = xyz_e; }
     void set_dedx      (const std::vector< double >& q) { fdEdx = q;        }
     void set_dedx_err  (const std::vector< double >& q) { fSigmadEdx = q;        }
-   
+    void set_length(const double& l) { fLength = l; }
     
 //     void set_max_width     (double x, double y) 
 //     { fMaxWidthX=x; fMaxWidthY=y; }
@@ -72,7 +72,7 @@ namespace larlite{
     inline const std::vector< double >& MIPEnergy()    const { return fTotalMIPEnergy;          }
     inline const std::vector< double >& MIPEnergyErr() const { return fSigmaTotalMIPEnergy;     }
     inline int    best_plane()               const { return fBestPlane;               }
-    
+    inline double Length() const { return fLength; }
     inline const std::vector< double >& dEdx()    const { return fdEdx;          }
     inline const std::vector< double >& dEdxErr() const { return fSigmadEdx;     }
     
@@ -91,15 +91,16 @@ namespace larlite{
     std::vector< double > fTotalMIPEnergy;           ///< Calculated Energy per each plane
     std::vector< double > fSigmaTotalMIPEnergy;           ///< Calculated Energy per each plane
     int fBestPlane;
-  //  double fMaxWidthX;             ///< maximum width of the prong in the x(0)
-  //  double fMaxWidthY;             ///< maximum width of the prong in the y(0)
-  //  double fDistanceMaxWidth;      ///< distance from the start of the prong to its maximum width
-  //  double fTotalCharge;           ///< total charge of hits in the shower
-
+    double fLength;
+    //  double fMaxWidthX;             ///< maximum width of the prong in the x(0)
+    //  double fMaxWidthY;             ///< maximum width of the prong in the y(0)
+    //  double fDistanceMaxWidth;      ///< distance from the start of the prong to its maximum width
+    //  double fTotalCharge;           ///< total charge of hits in the shower
+    
   private:
     
     ////////////////////////
-    ClassDef(shower,6)
+    ClassDef(shower,7)
     ////////////////////////
       
   };
@@ -130,7 +131,7 @@ namespace larlite{
   private:
     
     ////////////////////////
-    ClassDef(event_shower,4)
+    ClassDef(event_shower,5)
     ////////////////////////
   };
 }

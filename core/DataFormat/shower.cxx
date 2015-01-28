@@ -18,6 +18,8 @@ namespace larlite {
     fSigmaTotalEnergy.clear();           ///< Calculated Energy per each plane
     fdEdx.clear();           ///< Calculated dEdx per each plane
     fSigmadEdx.clear();           ///< Calculated dEdx per each plane
+    fLength = -1;
+    fBestPlane = -1;
  //   fMaxWidthX = fMaxWidthY = -1;
  //   fDistanceMaxWidth=-1;
  //   fTotalCharge=-1;

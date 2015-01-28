@@ -60,16 +60,17 @@ namespace showerreco {
     double max_length=0;
     for (size_t ip=0;ip<fPlaneID.size();ip++)
       {
-	if(fabs( fEndPoint[ip].w - fStartPoint[ip].w ) < min_length )
+	double dist = fabs( fEndPoint[ip].w - fStartPoint[ip].w );
+	if(dist < min_length)
 	  {
-	    min_length=fabs( fEndPoint[ip].w - fStartPoint[ip].w );
-	    worst_plane=fPlaneID.at(ip);
+	    min_length  = dist;
+	    worst_plane = fPlaneID.at(ip);
 	  }
 
-	if(fabs( fEndPoint[ip].w - fStartPoint[ip].w ) > max_length )
+	if(dist > max_length )
 	  {
-	    max_length=fabs( fEndPoint[ip].w - fStartPoint[ip].w );
-	    best_plane=fPlaneID.at(ip);
+	    max_length = dist;
+	    best_plane = fPlaneID.at(ip);
 	  }      
       }
     
@@ -119,7 +120,8 @@ namespace showerreco {
       {
 	int plane = fPlaneID.at(cl_index);
 	double newpitch=fGSer->PitchInView(plane,xphi,xtheta);
-	
+	if(plane == best_plane) max_length *= newpitch;
+
 	if(fVerbosity)
 	  std::cout << std::endl << " Plane: " << plane << std::endl;
 	
@@ -348,6 +350,7 @@ namespace showerreco {
 
     result.set_total_MIPenergy(fMIPEnergy);
     result.set_total_best_plane(best_plane);
+    result.set_length(max_length);
     result.set_total_energy(fEnergy);
     //result.set_total_energy_err  (std::vector< Double_t > q)            { fSigmaTotalEnergy = q;        }
     
