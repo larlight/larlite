@@ -1,9 +1,9 @@
 /**
- * \file sample.h
+ * \file empty.h
  *
  * \ingroup Package_Name
  * 
- * \brief Class def header for a class sample
+ * \brief Class def header for a class empty
  *
  * @author SHELL_USER_NAME
  */
@@ -11,25 +11,25 @@
 /** \addtogroup Package_Name
 
     @{*/
-#ifndef REPOSITORYNAME_PACKAGE_NAME_SAMPLE_H
-#define REPOSITORYNAME_PACKAGE_NAME_SAMPLE_H
+#ifndef REPOSITORYNAME_PACKAGE_NAME_EMPTY_H
+#define REPOSITORYNAME_PACKAGE_NAME_EMPTY_H
 
 #include <iostream>
 
 /**
-   \class sample
+   \class empty
    User defined class Package_Name ... these comments are used to generate
    doxygen documentation!
  */
-class sample{
+class empty{
 
 public:
 
   /// Default constructor
-  sample(){}
+  empty(){}
 
   /// Default destructor
-  virtual ~sample(){};
+  virtual ~empty(){};
 
 };
 

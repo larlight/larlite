@@ -2,7 +2,7 @@
 // Example C++ routine to run instantiate your sample class
 //
 
-#include "Package_Name/Package_Name-TypeDef.h"
+#include "Package_Name/sample.h"
 #include <iostream>
 
 int main(int argc, char** argv){

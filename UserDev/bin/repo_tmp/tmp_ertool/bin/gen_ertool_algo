@@ -8,13 +8,13 @@ if not 'LARLITE_USERDEVDIR' in os.environ.keys():
    sys.stderr.write('$LARLITE_USERDEVDIR not defined!\n\n')
    sys.exit(1)
 
-name=sys.argv[1]
+name='Algo' + sys.argv[1]
 working_package='Package_Name'
 target_dir='%s/%s/Package_Name' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
 source_dir='%s/%s/Package_Name/bin/tmp' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
 
-in_source='%s/ana.cxx' % source_dir
-in_header='%s/ana.h' % source_dir
+in_source='%s/algo.cxx' % source_dir
+in_header='%s/algo.h' % source_dir
 
 src_list = { in_source   : '%s/%s.cxx'         % (target_dir,name),
              in_header   : '%s/%s.h'         % (target_dir,name) }
@@ -26,10 +26,10 @@ for src in src_list.keys():
       
 for src in src_list.keys():
    contents=open(src,'r').read()
-   contents=contents.replace('ANA_CLASS_NAME',name.upper())
-   contents=contents.replace('ana_class_name',name.lower())
-   contents=contents.replace('Ana_Class_Name',name)
-   contents=contents.replace('SHELL_USER_NAME',os.environ['USER'])
+   contents=contents.replace('ALGO_CLASS_NAME',name.upper())
+   contents=contents.replace('algo_class_name',name.lower())
+   contents=contents.replace('Algo_Class_Name',name)
+   contents=contents.replace('kazuhiro',os.environ['USER'])
    contents=contents.replace('Working_Package',working_package)
    fout=open(src_list[src],'w')
    fout.write(contents)
@@ -41,7 +41,7 @@ fout=open('%s/LinkDef.h' % target_dir,'w')
 for line in contents:
    line=line + '\n'
    if line.find('ADD_NEW_CLASS')>=0:
-      line='#pragma link C++ class larlite::%s+;\n%s' % (name,line)
+      line='#pragma link C++ class ertool::%s+;\n%s' % (name,line)
    fout.write(line)
 
 print
@@ -55,10 +55,10 @@ print ' OR'
 print '    > cd %s; make;' % target_dir
 print
 print 'If needed, make sure you define linked libraries in rootmap generation script.'
-print 'The script is: %s/gen_rootmap.sh' % os.environ['LARLITE_LIBDIR']
+print 'The script is: %s/gen_rootmap.sh' % target_dir
 print 'If you have no idea what this means, just ignore it!'
 print
-print 'To remove your analysis code, you should remove:'
+print 'To remove your spalgo code, you should remove:'
 print '%s/%s.h' % (target_dir,name)
 print '%s/%s.cxx' % (target_dir,name)
 print

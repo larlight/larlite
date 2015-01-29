@@ -10,7 +10,7 @@ if not 'LARLITE_USERDEVDIR' in os.environ.keys():
 
 name=sys.argv[1]
 target_dir='%s/%s/%s' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME,name)
-source_dir='%s/%s/bin/tmp_ana' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
+source_dir='%s/%s/bin/tmp_ertool' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
 
 if not os.path.exists(target_dir):
    try:
@@ -18,7 +18,7 @@ if not os.path.exists(target_dir):
       os.makedirs('%s/bin' % target_dir)
       os.makedirs('%s/mac' % target_dir)
       os.makedirs('%s/lib' % target_dir)
-      # Copy analysis code generator
+      # Copy ertool code generator
       os.system("scp -r %s/bin/tmp %s/bin/" % (source_dir,target_dir))
 
    except OSError:
@@ -39,21 +39,25 @@ in_tmp_script_ana='%s/bin/gen_newana' % source_dir
 in_tmp_header_ana='%s/bin/tmp/ana.h' % source_dir
 in_tmp_script_empty='%s/bin/gen_empty_class' % source_dir
 in_tmp_header_empty='%s/bin/tmp/empty.h' % source_dir
-in_bin_makefile='%s/bin/GNUmakefile.tmp' % source_dir
-in_bin_source='%s/bin/example.tmp' % source_dir
+in_tmp_script_eralgo='%s/bin/gen_ertool_algo' % source_dir
+in_tmp_header_eralgo='%s/bin/tmp/algo.h' % source_dir
+in_tmp_script_erfilter='%s/bin/gen_ertool_filter' % source_dir
+in_tmp_header_erfilter='%s/bin/tmp/filter.h' % source_dir
 in_mac_script='%s/mac/tmp.py' % source_dir
 
 src_list = { in_makefile : '%s/GNUmakefile'     % target_dir,
              in_linkdef  : '%s/LinkDef.h'       % target_dir,
-             in_source   : '%s/sample_ana.cxx'      % target_dir,
-             in_header   : '%s/sample_ana.h'        % target_dir,
+             in_source   : '%s/empty.cxx'      % target_dir,
+             in_header   : '%s/empty.h'        % target_dir,
              in_rootmap  : '%s/lib/gen_rootmap.sh'    % target_dir,
              in_tmp_script_ana : '%s/bin/gen_newana'  % target_dir,
              in_tmp_header_ana : '%s/bin/tmp/ana.h'  % target_dir,
              in_tmp_script_empty : '%s/bin/gen_empty_class' % target_dir,
              in_tmp_header_empty : '%s/bin/tmp/empty.h'    % target_dir,
-             in_bin_makefile   : '%s/bin/GNUmakefile' % target_dir,
-             in_bin_source     : '%s/bin/example.cc'  % target_dir,
+             in_tmp_script_eralgo : '%s/bin/gen_ertool_algo' % target_dir,
+             in_tmp_header_eralgo : '%s/bin/tmp/algo.h'    % target_dir,
+             in_tmp_script_erfilter : '%s/bin/gen_ertool_filter' % target_dir,
+             in_tmp_header_erfilter : '%s/bin/tmp/filter.h'    % target_dir,
              in_mac_script     : '%s/mac/example.py'  % target_dir  }
 
 for src in src_list.keys():
