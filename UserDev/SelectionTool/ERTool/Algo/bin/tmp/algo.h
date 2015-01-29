@@ -37,7 +37,7 @@ namespace ertool {
     virtual void Reset();
 
     /// Function to evaluate input showers and determine a score
-    virtual PrticleSet Reconstruct(const EventData &data);
+    virtual ParticleSet Reconstruct(const EventData &data);
 
   };
 }
