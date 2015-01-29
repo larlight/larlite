@@ -17,7 +17,7 @@
 
 #include "Base/AlgoBase.h"
 
-namespace sptool {
+namespace ertool {
 
   /**
      \class Algo_Class_Name
