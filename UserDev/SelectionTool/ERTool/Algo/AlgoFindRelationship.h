@@ -34,7 +34,20 @@ namespace ertool {
     virtual ~AlgoFindRelationship(){ _debug=false; };
     
     virtual void Reset();
-    
+
+
+    double FindClosestApproach(const geoalgo::HalfLine_t& shr1,
+			       const geoalgo::HalfLine_t& shr2,
+			       geoalgo::Point_t& vtx) const;
+
+    double FindClosestApproach(const geoalgo::HalfLine_t& shr,
+			       const geoalgo::Trajectory_t& trk,
+			       geoalgo::Point_t& vtx) const;
+      
+    double FindClosestApproach(const geoalgo::Trajectory_t& trk2,
+			       const geoalgo::Trajectory_t& trk1,
+			       geoalgo::Point_t& vtx) const;
+      
     bool isShowerFromTrack(const geoalgo::HalfLine_t& shr, 
 			   const geoalgo::Trajectory_t& trk,
 			   geoalgo::Point_t& vtx) const;
@@ -65,6 +78,8 @@ namespace ertool {
   private:
 
     bool _debug;
+
+    double _minLength; // track length after which to stop and calculate direction
 
     geoalgo::GeoAlgo _geoAlgo;
     
