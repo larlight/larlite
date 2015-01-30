@@ -17,7 +17,7 @@
 
 #include "Base/AlgoBase.h"
 
-namespace sptool {
+namespace ertool {
 
   /**
      \class Algo_Class_Name
@@ -37,7 +37,7 @@ namespace sptool {
     virtual void Reset();
 
     /// Function to evaluate input showers and determine a score
-    virtual PrticleSet Reconstruct(const EventData &data);
+    virtual ParticleSet Reconstruct(const EventData &data);
 
   };
 }

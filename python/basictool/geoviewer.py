@@ -74,8 +74,8 @@ class GeoViewer(object):
                 if data[i][j] > self._range_max[i]: self._range_max[i] = data[i][j]
 
         self._ax.plot(data[0],data[1],data[2],color=c)
-        self._ax.scatter(data[0][0],data[1][0],data[2][0],color=c,marker='x')
-        self._ax.scatter(data[0][-1],data[1][-1],data[2][-1],color=c,marker='>')
+        self._ax.scatter(data[0][0],data[1][0],data[2][0],s=50,color=c,marker='x')
+        self._ax.scatter(data[0][-1],data[1][-1],data[2][-1],s=50,color=c,marker='>')
         self._ax.scatter(data[0][1:-2],data[1][1:-2],data[2][1:-2],color=c,marker='o')
 
     def _add_linesegment(self,arg,c=''):
@@ -92,8 +92,8 @@ class GeoViewer(object):
                 if data[i][j] > self._range_max[i]: self._range_max[i] = data[i][j]
 
         self._ax.plot(data[0],data[1],data[2],color=c)
-        self._ax.scatter(s[0],s[1],s[2],color=c,marker='x')
-        self._ax.scatter(e[0],e[1],e[2],color=c,marker='o')
+        self._ax.scatter(s[0],s[1],s[2],s=50, color=c,marker='x')
+        self._ax.scatter(e[0],e[1],e[2],s=50, color=c,marker='o')
 
     def _add_halfline(self,arg,c=''):
         if not c: c = self.rand_color()
@@ -183,7 +183,7 @@ class GeoViewer(object):
                 if zp[j] < self._range_min[2]: self._range_min[2] = zp[j]
                 if zp[j] > self._range_max[2]: self._range_max[2] = zp[j]
 
-
+        self._ax.scatter(s[0],s[1],s[2],s=50,color=c,marker='x')
         self._ax.plot(xp,yp,zp,color=c)
 
     def _add_box(self,arg, c=''):

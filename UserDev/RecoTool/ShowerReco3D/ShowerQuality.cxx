@@ -152,6 +152,8 @@ namespace larlite {
   
   bool ShowerQuality::analyze(storage_manager* storage) {
 
+    auto geo = larutil::Geometry::GetME();
+
     // Retrieve mcshower data product
     auto ev_mcs = storage->get_data<event_mcshower>("mcreco");
     
@@ -239,24 +241,76 @@ namespace larlite {
       return false;
     }
 
+    // Find the best-representative reco-ed Shower given an MCShower
+    std::vector<std::vector<double> > shower_mcq_vv(ev_shower->size(),std::vector<double>(mc_index_v.size(),0));
+
     for(size_t shower_index=0; shower_index < ass_cluster_v.size(); ++shower_index) {
 
-      auto const& reco_shower = ev_shower->at(shower_index);
+      auto const& ass_cluster = ass_cluster_v[shower_index];
 
-      auto res = fBTAlg.ShowerCorrectness(ass_cluster_v[shower_index]);
+      std::vector< ::btutil::WireRange_t> w_v;
+      
+      for(auto const& cluster_index : ass_cluster) {
 
-      size_t mcs_index = res.first;
+	auto const& ass_hit = ass_hit_v[cluster_index];
+
+	w_v.reserve(ass_hit.size()+w_v.size());
+
+	for(auto const& hit_index : ass_hit) {
+
+	  auto const& h = (*ev_hit)[hit_index];
+
+	  w_v.push_back( ::btutil::WireRange_t( h.Channel(),
+						h.StartTime(),
+						h.EndTime() ) 
+			 );
+	}
+      }
+      
+      auto mcq_v = fBTAlg.BTAlg().MCQ(w_v);
+
+      auto& shower_mcq_v = shower_mcq_vv[shower_index];
+
+      for(size_t mcs_index = 0; mcs_index < (mcq_v.size()-1); ++mcs_index) {
+
+	shower_mcq_v[mcs_index] = mcq_v[mcs_index];
+
+      }      
+    }
+
+    // Loop over MCShower and inspect corresponding shower quality
+    for(size_t mcs_index = 0; mcs_index < mc_index_v.size(); ++mcs_index) {
+
+      auto const& mc_shower = (*ev_mcs)[mc_index_v[mcs_index]];
+
+      // Search for the best representative shower
+      size_t best_shower_index = shower_mcq_vv.size();
+      double max_mcq=0;
+      for(size_t shower_index = 0; shower_index < shower_mcq_vv.size(); ++shower_index) {
+
+	if( shower_mcq_vv[shower_index][mcs_index] > max_mcq)
+	  best_shower_index = shower_index;
+      }
+
+      if(best_shower_index == shower_mcq_vv.size()) {
+	print(msg::kERROR,__FUNCTION__,
+	      Form("Failed to find a corresponding shower for MCShower %d",mc_index_v[mcs_index])
+	      );
+	continue;
+      }
+
+      auto const& reco_shower = (*ev_shower)[best_shower_index];
+
+      auto res = fBTAlg.ShowerCorrectness(ass_cluster_v[best_shower_index]);
 
       fTreeParams.match_correctness = res.second;
 
       if(fTreeParams.match_correctness < 0) {
 	print(msg::kERROR,__FUNCTION__,
-	      Form("Failed to find a corresponding MCShower for shower %zu",shower_index)
+	      Form("Failed to find a corresponding MCShower for shower %zu",best_shower_index)
 	      );
 	continue;
       }
-
-      auto const& mc_shower = ev_mcs->at(mc_index_v[mcs_index]);
 
       // MC Info
       fTreeParams.mc_x = mc_shower.DetProfile().X();
@@ -296,15 +350,11 @@ namespace larlite {
       // Reco cluster efficiency & purity
       fTreeParams.cluster_eff = 1.;
       fTreeParams.cluster_pur = 1.;
-      for(auto const& cluster_index : ass_cluster_v[shower_index]) {
-
+      for(auto const& cluster_index : ass_cluster_v[best_shower_index]) {
 	auto ep = fBTAlg.ClusterEP(cluster_index, mcs_index);
-
 	if(ep.first==0 && ep.second==0) continue;
-
 	fTreeParams.cluster_eff *= ep.first;
 	fTreeParams.cluster_pur *= ep.second;
-
       }
 
       // Reco energy & dedx info
@@ -312,9 +362,9 @@ namespace larlite {
 
       int best_plane_index = -1;
 
-      for(size_t i=0; i < ass_cluster_v[shower_index].size(); ++i) {
+      for(size_t i=0; i < ass_cluster_v[best_shower_index].size(); ++i) {
 
-	size_t cluster_index = ass_cluster_v[shower_index][i];
+	size_t cluster_index = ass_cluster_v[best_shower_index][i];
 	//std::cout<<best_plane_index<<" : "<<ev_cluster->at(cluster_index).View()<<std::endl;
 	if( ev_cluster->at(cluster_index).View() == reco_shower.best_plane() ) {
 	  best_plane_index = i;
@@ -324,7 +374,7 @@ namespace larlite {
 
       if(best_plane_index < 0) {
 	throw ::showerreco::ShowerRecoException(Form("Failed to identify the best plane for shower %zu",
-						     shower_index)
+						     best_shower_index)
 						);
       }
 

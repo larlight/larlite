@@ -32,7 +32,6 @@ else:
 
 in_makefile='%s/GNUmakefile.tmp' % source_dir
 in_linkdef='%s/LinkDef.tmp' % source_dir
-in_typedef='%s/TypeDef.tmp' % source_dir
 in_source='%s/cxx.tmp' % source_dir
 in_header='%s/h.tmp' % source_dir
 in_rootmap='%s/lib/gen_rootmap.sh' % source_dir
@@ -44,7 +43,6 @@ in_mac_script='%s/mac/tmp.py' % source_dir
 
 src_list = { in_makefile : '%s/GNUmakefile'   % target_dir,
              in_linkdef  : '%s/LinkDef.h'     % target_dir,
-             in_typedef  : '%s/%s-TypeDef.h' % (target_dir,name),
              in_source   : '%s/sample.cxx'         % target_dir,
              in_header   : '%s/sample.h'         % target_dir,
              in_rootmap  : '%s/lib/gen_rootmap.sh' % target_dir,

@@ -1,0 +1,6 @@
+#ifndef PACKAGE_NAME_EMPTY_CXX
+#define PACKAGE_NAME_EMPTY_CXX
+
+#include "empty.h"
+
+#endif

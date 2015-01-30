@@ -11,8 +11,8 @@
 /** \addtogroup Package_Name
 
     @{*/
-#ifndef LARLITE_PACKAGE_NAME_SAMPLE_H
-#define LARLITE_PACKAGE_NAME_SAMPLE_H
+#ifndef REPOSITORYNAME_PACKAGE_NAME_SAMPLE_H
+#define REPOSITORYNAME_PACKAGE_NAME_SAMPLE_H
 
 #include <iostream>
 

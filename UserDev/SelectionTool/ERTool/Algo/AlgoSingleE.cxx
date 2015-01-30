@@ -56,11 +56,86 @@ namespace ertool {
   }
 
   ParticleSet AlgoSingleE::Reconstruct(const EventData &data){
-    //kaleko
-    _alg_emp.Reconstruct(data);
 
+    // ParticleSet where to store single electrons
     ParticleSet res;
+    // Particles created in EM selection (photon/gamma separation)
+    ParticleSet emParticles = _alg_emp.Reconstruct(data);
 
+    res = emParticles;
+
+    if (_verbose) { 
+      std::cout << "***********BEGIN RECONSTRUCTION************" << std::endl;
+      std::cout << "Showers in event: " << data.Shower().size() << std::endl;
+    }
+
+    // We are only interested in electron-like showers
+    // loop over emParticles and select only the PDG==11 ones
+    for (auto &p : emParticles){
+      if (p.PdgCode() == 11){
+	// Ok, we have an electron. Get the associated shower
+	// and make sure it does not:
+	// NOTE: IN 1) IMPLEMENT EXCLUSION ONLY OF e-like showers
+	// 1) share a vertex with another e- shower (gamma-like one could be from Pi0: OK)
+	// 2) come from another shower
+	// 3) come from a track
+	// 2) & 3) because we are interested in showers from
+	// the neutrino interaction
+	std::cout << "This shower: (" << p.RecoObjID() << ")" << std::endl;
+	Shower thisShower = data.Shower( p.RecoObjID() );
+	bool single = true;
+	// loop over other showers and check 1) and 2)
+	for (size_t s=0; s < data.Shower().size(); s++){
+	  Shower thatShower(data.Shower(s));
+	  geoalgo::Point_t vtx(3);
+	  // make sure we don't use thisShower in the loop
+	  if (thatShower._energy != thisShower._energy){
+	    std::cout << "Comparing with shower (" << s << ")" << std::endl;
+	    // check 1
+	    if ( _findRel.haveCommonOrigin(thisShower,thatShower,vtx) ){
+	      // showers have common origin -> not interested
+	      single = false; 
+	      break;
+	    }
+	    if ( _findRel.isShowerFromShower(thisShower,thatShower,vtx) ){
+	      // our shower comes from s -> not interested
+	      single = false;
+	      break;
+	    }
+	  }
+	}// for all showers
+	// loop over tracks if still single
+	if (single){
+	  for (size_t t=0; t < data.Track().size(); t++){
+	    Track thatTrack(data.Track(t));
+	    std::cout << "Comparing with track (" << t << ")" << std::endl;
+	    geoalgo::Point_t vtx(3);
+	    if ( _findRel.isShowerFromTrack(thisShower,thatTrack,vtx) ){
+	      // our shower comes from t -> not interested
+	      single = false;
+	      break;
+	    }
+	  }// for all tracks
+	}// if single
+	
+	//If single still true -> we found it! Proceed!
+	// the particle with all it's info was already
+	// created, simply add it to the result vector
+	if (single){
+	  std::cout << "Shower is Single!" << std::endl;
+	  // Create an "unknown" particle that gave
+	  // birth to this electron shower
+	  Particle unknown;
+	  unknown.AddDaughter(p);
+	  res.push_back(unknown);
+	}
+	else
+	  std::cout << "Shower is not single." << std::endl;
+	
+      }// if the PDG is 11
+    }// for all particles from EMPart
+
+    /*
     if (_verbose) { std::cout << "Showers in event: " << data.Shower().size() << std::endl; }
     
     /// Get a list of the event showers that are electron like
@@ -83,7 +158,8 @@ namespace ertool {
       p_e.RecoObjInfo(isol_shower->ID(), Particle::RecoObjType_t::kShower);
       res.push_back(p_e);
     }
-     
+    */
+    std::cout << std::endl;
     return res;
   }
   
