@@ -25,7 +25,10 @@ namespace larlite {
 
     total_events++;
     
-    //Enforce that there is exactly 1 electron and 1 proton, each above 20MeV kinetic energy
+    //Enforce CC interaction channel
+    if( ev_mctruth->at(0).GetNeutrino().CCNC() != 0 ) return false;
+
+    //Enforce that there is exactly 1 electron, above 20MeV kinetic energy
     //I don't care about neutrons, weird quarks, the neutrino, etc.
     size_t n_electrons = 0;
     
