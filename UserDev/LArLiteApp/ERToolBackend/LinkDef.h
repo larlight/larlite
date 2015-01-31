@@ -13,6 +13,7 @@
 #pragma link C++ class larlite::ERToolAnaBase+;
 #pragma link C++ class larlite::ExampleERSelection+;
 #pragma link C++ class larlite::ERAnaFindRelationship+;
+#pragma link C++ class larlite::ERAnaSingleE+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif

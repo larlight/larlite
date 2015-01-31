@@ -154,7 +154,7 @@ namespace geoalgo {
     double SqDist(const LineSegment_t& seg, const std::vector<geoalgo::Trajectory_t> &trj, Point_t& c1, Point_t& c2, int& trackIdx) const;
     /// LineSegment & vector of Trajectories, keep track of points
     double SqDist(const std::vector<geoalgo::Trajectory_t> &trj, const LineSegment_t& seg, Point_t& c1, Point_t& c2, int& trackIdx) const
-    { return SqDist(seg, trj, c1, c2, trackIdx); }
+    { return SqDist(seg, trj, c2, c1, trackIdx); }
     /// LineSegment & vector of Trajectories, don't keep track of points
     double SqDist(const std::vector<geoalgo::Trajectory_t> &trj, const LineSegment_t& seg) const
     { Point_t c1; Point_t c2; int trackIdx; return SqDist(seg, trj, c1, c2, trackIdx); }
@@ -170,7 +170,7 @@ namespace geoalgo {
     double SqDist(const HalfLine_t& hline, const Trajectory_t& trj, Point_t& c1, Point_t& c2) const;
     /// HalfLine & Trajectory, keep track of points
     double SqDist(const Trajectory_t& trj, const HalfLine_t& hline, Point_t& c1, Point_t& c2) const
-    { return SqDist(hline, trj, c1, c2); }
+    { return SqDist(hline, trj, c2, c1); }
     /// HalfLine & Trajectory, don't keep track of points
     double SqDist(const Trajectory_t& trj, const HalfLine_t& hline) const
     { Point_t c1; Point_t c2; return SqDist(hline, trj, c1, c2); }

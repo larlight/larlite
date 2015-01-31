@@ -19,6 +19,7 @@
 #include "Algo/AlgoEMPart.h"
 #include "Algo/AlgoFindRelationship.h"
 #include "Base/AlgoBase.h"
+#include "GeoAlgo/GeoAlgo.h"
 
 namespace ertool {
 
@@ -53,6 +54,11 @@ namespace ertool {
     /// Set verbosity
     void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); }
 
+    void setVtxToTrkStartDist(double d) { _vtxToTrkStartDist = d; }
+    void setVtxToTrkDist(double d) { _vtxToTrkDist = d; }
+    void setVtxToShrDist(double d) { _vtxToShrDist = d; }
+    void setMaxIP(double d) { _maxIP = d; }
+
   private:
 
     /// Function that takes in shower and decides if it is likely electron
@@ -73,11 +79,20 @@ namespace ertool {
 
     // verbose flag
     bool _verbose;
-
+    // electron mass
     double _e_mass;
 
+    // constants to be used for decision-making
+    double _vtxToTrkStartDist;
+    double _vtxToTrkDist;
+    double _vtxToShrDist;
+    double _maxIP;
+
+    // Other algorithms to use
     AlgoEMPart _alg_emp;
     AlgoFindRelationship _findRel;
+    // GeoAlgo Tool
+    ::geoalgo::GeoAlgo _geoAlgo;
 
     //debug histos
     TH1F* _e_ll_values;
