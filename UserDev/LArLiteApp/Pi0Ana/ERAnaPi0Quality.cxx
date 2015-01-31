@@ -44,7 +44,9 @@ namespace larlite {
     auto status = ERToolAnaBase::analyze(storage);
     if(!status) return status;
 
-    ertool::ParticleSet particles = _mgr.Process(_data);
+    if(!_mgr.Process()) return false;
+
+    auto const& particles = _mgr.ParticleSet();
 
     int n_pi0 = 0;
     larlite::mcpart pion;
