@@ -27,25 +27,29 @@ my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 # Specify output root file name
 my_proc.set_ana_output_file("ertool_hist.root")
 
-# Create an empty (baseclass) algorithm
-my_algo = ertool.AlgoBase()
-
 # Create an empty (baseclass) filter
 my_filter = ertool.FilterBase()
 
+# Create an empty (baseclass) algorithm
+my_algo = ertool.AlgoBase()
+
+# Create an empty (baseclass) analysis
+my_ana = ertool.AnaBase()
+
 # Create an analysis unit ... ExampleERSelection is LArLite interface
-my_ana = fmwk.ExampleERSelection()
+my_unit = fmwk.ExampleERSelection()
 
 # Set Producers ... First Argument: True = MC, False = Reco
-my_ana.SetShowerProducer(True,"mcreco");
-my_ana.SetTrackProducer(True,"mcreco");
-my_ana.SetVtxProducer(True,"generator");
+my_unit.SetShowerProducer(True,"mcreco");
+my_unit.SetTrackProducer(True,"mcreco");
+my_unit.SetVtxProducer(True,"generator");
 
 # Attach algorithm & filter to ERTool manager 
-my_ana._mgr.SetAlgo(my_algo)
-my_ana._mgr.SetFilter(my_filter)
+my_unit._mgr.SetAlgo(my_algo)
+my_unit._mgr.SetFilter(my_filter)
+my_unit._mgr.SetAna(my_ana)
 
-my_proc.add_process(my_ana)
+my_proc.add_process(my_unit)
 my_proc.run()
 
 # done!

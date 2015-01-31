@@ -43,6 +43,8 @@ in_tmp_script_eralgo='%s/bin/gen_ertool_algo' % source_dir
 in_tmp_header_eralgo='%s/bin/tmp/algo.h' % source_dir
 in_tmp_script_erfilter='%s/bin/gen_ertool_filter' % source_dir
 in_tmp_header_erfilter='%s/bin/tmp/filter.h' % source_dir
+in_tmp_script_erana='%s/bin/gen_ertool_ana' % source_dir
+in_tmp_header_erana='%s/bin/tmp/erana.h' % source_dir
 in_mac_script='%s/mac/tmp.py' % source_dir
 
 src_list = { in_makefile : '%s/GNUmakefile'     % target_dir,
@@ -58,6 +60,8 @@ src_list = { in_makefile : '%s/GNUmakefile'     % target_dir,
              in_tmp_header_eralgo : '%s/bin/tmp/algo.h'    % target_dir,
              in_tmp_script_erfilter : '%s/bin/gen_ertool_filter' % target_dir,
              in_tmp_header_erfilter : '%s/bin/tmp/filter.h'    % target_dir,
+             in_tmp_script_erana : '%s/bin/gen_ertool_ana' % target_dir,
+             in_tmp_header_erana : '%s/bin/tmp/erana.h'    % target_dir,
              in_mac_script     : '%s/mac/example.py'  % target_dir  }
 
 for src in src_list.keys():
