@@ -14,6 +14,20 @@ ertool.Manager
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
+#my_proc.enable_filter(True)
+
+# Create algorithm
+my_algo = ertool.AlgoSingleE()
+my_algo.setVerbose(False)
+my_algo.setVtxToTrkStartDist(3)
+my_algo.setVtxToTrkDist(5)
+my_algo.setVtxToShrDist(50)
+my_algo.setMaxIP(3)
+#my_algo.setVerbose(True)
+
+# Create Filter
+MCfilter = fmwk.MC_CC1E_Filter();
+
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):
@@ -23,7 +37,7 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
-my_proc.set_ana_output_file("singleE_selection_ana_out.root")
+my_proc.set_ana_output_file("singleE_selection.root")
 
 
 # Possible filter to select true events
@@ -32,41 +46,21 @@ my_proc.set_ana_output_file("singleE_selection_ana_out.root")
 #pdgsel.Select(11,pdgsel.kGENERATOR,1)
 #my_proc.add_process(pdgsel)
 
-my_algo = ertool.AlgoSingleE()
-my_algo.Reset()
-my_algo.setVerbose(True)
-my_ana = fmwk.ExampleERSelection()
-
-
-# Set Producers
-# First Argument: True = MC, False = Reco
-#my_ana.SetShowerProducer(True,"mcreco");
-#my_ana.SetTrackProducer(True,"mcreco");
-#my_ana.SetVtxProducer(True,"generator");
-
-#my_ana.SetShowerProducer(False,"mergeall");
-my_ana.SetShowerProducer(False,"showerreco");
-my_ana.SetTrackProducer(False,"");
-my_ana.SetVtxProducer(False,"");
-
+my_ana = fmwk.ERAnaSingleE()
 my_ana._mgr.SetAlgo(my_algo)
-
-my_ana._mode =True # True = Select. False = Fill mode
+# ***************  Set Producers  ****************
+# First Argument: True = MC, False = Reco
+my_ana.SetShowerProducer(True,"mcreco");
+my_ana.SetTrackProducer(True,"mcreco");
+#my_ana.SetVtxProducer(True,"generator");
+#my_ana.SetShowerProducer(False,"mergeall");
+#my_ana.SetShowerProducer(False,"showerreco");
+#my_ana.SetTrackProducer(False,"stitchkalmanhit");
+# ************************************************
+#my_proc.add_process(MCfilter)
 my_proc.add_process(my_ana)
 
-counter = 0
-while (counter < 1000):
-    try:
-        counter = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
-    except SyntaxError:
-        counter += 1
-    my_proc.process_event(counter)
-
-#my_proc.run()
-
-
-my_algo.Reset()
-
+my_proc.run()
 
 
 # done!

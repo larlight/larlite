@@ -56,19 +56,19 @@ namespace ertool {
   }
 
   ParticleSet AlgoSingleE::Reconstruct(const EventData &data){
-
+    
     // ParticleSet where to store single electrons
     ParticleSet res;
     // Particles created in EM selection (photon/gamma separation)
     ParticleSet emParticles = _alg_emp.Reconstruct(data);
-
+    
     res = emParticles;
 
     if (_verbose) { 
       std::cout << "***********BEGIN RECONSTRUCTION************" << std::endl;
       std::cout << "Showers in event: " << data.Shower().size() << std::endl;
     }
-
+    
     // We are only interested in electron-like showers
     // loop over emParticles and select only the PDG==11 ones
     for (auto &p : emParticles){
@@ -77,11 +77,11 @@ namespace ertool {
 	// and make sure it does not:
 	// NOTE: IN 1) IMPLEMENT EXCLUSION ONLY OF e-like showers
 	// 1) share a vertex with another e- shower (gamma-like one could be from Pi0: OK)
-	// 2) come from another shower
+	// 2) come from another shower - NOT DONE AS OF YET
 	// 3) come from a track
 	// 2) & 3) because we are interested in showers from
 	// the neutrino interaction
-	std::cout << "This shower: (" << p.RecoObjID() << ")" << std::endl;
+	if (_verbose) { std::cout << "This shower: (" << p.RecoObjID() << ")" << std::endl; }
 	Shower thisShower = data.Shower( p.RecoObjID() );
 	bool single = true;
 	// loop over other showers and check 1) and 2)
@@ -90,27 +90,39 @@ namespace ertool {
 	  geoalgo::Point_t vtx(3);
 	  // make sure we don't use thisShower in the loop
 	  if (thatShower._energy != thisShower._energy){
-	    std::cout << "Comparing with shower (" << s << ")" << std::endl;
-	    // check 1
-	    if ( _findRel.haveCommonOrigin(thisShower,thatShower,vtx) ){
-	      // showers have common origin -> not interested
-	      single = false; 
-	      break;
-	    }
-	    if ( _findRel.isShowerFromShower(thisShower,thatShower,vtx) ){
-	      // our shower comes from s -> not interested
+	  // is this shower gamma or e-like?
+	  // if gamma-like maybe a nearby pi0 -> ok if close
+	    if ( _alg_emp.LL(true, thatShower._dedx, -1) < _alg_emp.LL(false, thatShower._dedx, -1) )
+	      {
+		if (_verbose) {
+		  std::cout << "2nd shower has dEdx = " << thatShower._dedx
+			    << "\tIgnore for comparison." << std::endl;
+		}
+		break;
+	      }
+	    if (_verbose) { std::cout << "Comparing with shower (" << s << ")" << std::endl; }
+	    // compare the two showers
+	    double IP = _findRel.FindClosestApproach(thisShower,thatShower,vtx);
+	    if ( (IP < _maxIP) && ( vtx.Dist(thisShower.Start()) < _vtxToShrDist) && ( vtx.Dist(thatShower.Start()) < _vtxToShrDist) ){
 	      single = false;
 	      break;
 	    }
-	  }
-	}// for all showers
+	  }// if not the same showers
+	}//loop over showers
 	// loop over tracks if still single
 	if (single){
 	  for (size_t t=0; t < data.Track().size(); t++){
 	    Track thatTrack(data.Track(t));
-	    std::cout << "Comparing with track (" << t << ")" << std::endl;
+	    if (thatTrack.size() < 2)
+	      continue;
+	    if (_verbose) { std::cout << "Comparing with track (" << t << ")" << std::endl; }
 	    geoalgo::Point_t vtx(3);
-	    if ( _findRel.isShowerFromTrack(thisShower,thatTrack,vtx) ){
+	    // compare the two tracks
+	    double IP =  _findRel.FindClosestApproach(thisShower,thatTrack,vtx);
+	    if ( (IP < _maxIP) // good correlation
+		 && (vtx.Dist(thatTrack.front()) > _vtxToTrkStartDist) // vertex far enough away from track start
+		 && (_geoAlgo.SqDist(vtx,thatTrack) < _vtxToTrkDist)   // vertex close to track body
+		 && (vtx.Dist(thisShower.Start()) < _vtxToShrDist) ) { // vertex not unreasonably far from shower start
 	      // our shower comes from t -> not interested
 	      single = false;
 	      break;
@@ -122,44 +134,43 @@ namespace ertool {
 	// the particle with all it's info was already
 	// created, simply add it to the result vector
 	if (single){
-	  std::cout << "Shower is Single!" << std::endl;
+	  if (_verbose) { std::cout << "Shower is Single!" << std::endl; }
 	  // Create an "unknown" particle that gave
 	  // birth to this electron shower
-	  Particle unknown;
+	  Particle unknown(14,0.000001);
 	  unknown.AddDaughter(p);
 	  res.push_back(unknown);
 	}
 	else
-	  std::cout << "Shower is not single." << std::endl;
+	  if (_verbose) { std::cout << "Shower is not single." << std::endl; }
 	
       }// if the PDG is 11
     }// for all particles from EMPart
-
-    /*
-    if (_verbose) { std::cout << "Showers in event: " << data.Shower().size() << std::endl; }
     
-    /// Get a list of the event showers that are electron like
-    auto e_showers = ElectronLikeShowers( data.Shower() );
-
-    if (_verbose) { std::cout << "e-like showers  : " << e_showers.size() << std::endl; }
-
-    /// Get a list of the electron showers that are start-point-isolated
-    auto isolated_e_showers = IsolatedStartPtShowers( e_showers );
-
-    if (_verbose) { std::cout << "isolated showers: " << isolated_e_showers.size() << std::endl; }
-
-    if(isolated_e_showers.size() == 1) single_e_counter++;
-
-    /// Make an electron Particle for each independent shower and add it to the set
-    for(auto const& isol_shower : isolated_e_showers){
+    /*
+      if (_verbose) { std::cout << "Showers in event: " << data.Shower().size() << std::endl; }
+      
+      /// Get a list of the event showers that are electron like
+      auto e_showers = ElectronLikeShowers( data.Shower() );
+      
+      if (_verbose) { std::cout << "e-like showers  : " << e_showers.size() << std::endl; }
+      
+      /// Get a list of the electron showers that are start-point-isolated
+      auto isolated_e_showers = IsolatedStartPtShowers( e_showers );
+      
+      if (_verbose) { std::cout << "isolated showers: " << isolated_e_showers.size() << std::endl; }
+      
+      if(isolated_e_showers.size() == 1) single_e_counter++;
+      
+      /// Make an electron Particle for each independent shower and add it to the set
+      for(auto const& isol_shower : isolated_e_showers){
       Particle p_e(11,_e_mass);
       p_e.Vertex(isol_shower->Start());
       p_e.Momentum(isol_shower->Dir() * (isol_shower->_energy - p_e.Mass())); // for now fill with direction - unit vector
       p_e.RecoObjInfo(isol_shower->ID(), Particle::RecoObjType_t::kShower);
       res.push_back(p_e);
-    }
+      }
     */
-    std::cout << std::endl;
     return res;
   }
   
