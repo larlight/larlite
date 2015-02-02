@@ -9,21 +9,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class larlite::ana_base+;
-#pragma link C++ class std::vector<larlite::ana_base*>+;
-#pragma link C++ class larlite::ana_processor+;
+#pragma link C++ class empty+;
 //ADD_NEW_CLASS ... do not change this line
+
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -3,7 +3,9 @@
 
 #include "CCSingleMuAna.h"
 #include <sstream>
-
+#include "DataFormat/cosmictag.h"
+#include "DataFormat/track.h"
+#include "DataFormat/cosmictag.h"
 namespace larlite {
 
   bool CCSingleMuAna::initialize() {

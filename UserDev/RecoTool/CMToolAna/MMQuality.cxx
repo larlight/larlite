@@ -2,7 +2,11 @@
 #define RECOTOOL_MMQUALITY_CXX
 
 #include "MMQuality.h"
-
+#include "DataFormat/mcshower.h"
+#include "DataFormat/simch.h"
+#include "DataFormat/shower.h"
+#include "DataFormat/cluster.h"
+#include "DataFormat/hit.h"
 namespace larlite {
   MMQuality::MMQuality() {
     

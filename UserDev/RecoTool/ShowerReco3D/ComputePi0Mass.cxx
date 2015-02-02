@@ -2,7 +2,11 @@
 #define RECOTOOL_COMPUTEPI0MASS_CXX
 
 #include "ComputePi0Mass.h"
-
+#include "DataFormat/mcshower.h"
+#include "DataFormat/simch.h"
+#include "DataFormat/shower.h"
+#include "DataFormat/cluster.h"
+#include "DataFormat/hit.h"
 namespace larlite {
   
   ComputePi0Mass* ComputePi0Mass::me = 0;

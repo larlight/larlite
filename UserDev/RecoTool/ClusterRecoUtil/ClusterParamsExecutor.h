@@ -16,6 +16,8 @@
 
 #include "ClusterParamsAlg.h"
 #include "DataFormat/storage_manager.h"
+#include "DataFormat/hit.h"
+#include "DataFormat/cluster.h"
 #include "LArUtil/Geometry.h"
 #include <TH2D.h>
 #include <TF1.h>

@@ -2,7 +2,11 @@
 #define SHOWERQUALITY_CXX
 
 #include "ShowerQuality.h"
-
+#include "DataFormat/mcshower.h"
+#include "DataFormat/simch.h"
+#include "DataFormat/shower.h"
+#include "DataFormat/cluster.h"
+#include "DataFormat/hit.h"
 namespace larlite {
   ShowerQuality::ShowerQuality() {
 

@@ -16,7 +16,7 @@
 #define LARLITE_MYANA_CCSingleMuAna_H
 
 #include "Analysis/ana_base.h"
-
+#include <TH1D.h>
 namespace larlite {
   /**
      \class CCSingleMuAna

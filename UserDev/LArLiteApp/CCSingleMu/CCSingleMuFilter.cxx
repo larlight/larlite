@@ -2,6 +2,7 @@
 #define CCSINGLEMUFILTER_CXX
 
 #include "CCSingleMuFilter.h"
+#include "DataFormat/mctruth.h"
 
 namespace larlite {
 

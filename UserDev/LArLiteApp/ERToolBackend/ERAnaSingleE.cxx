@@ -15,7 +15,6 @@ namespace larlite {
     _numEvts = 0;
     _singleE = 0;
     
-    _mgr.Initialize();
     return ERToolAnaBase::initialize();
   }
   
@@ -23,13 +22,14 @@ namespace larlite {
 
     auto status = ERToolAnaBase::analyze(storage);
     if(!status) return status;
+    _mgr.Process();
 
     _numEvts += 1;
 
-    _RecoParticles = _mgr.Process(_data);
+    auto const& particles = _mgr.ParticleSet();
     // Search for an unknown particle in particle Set
     int singles = 0;
-    for (auto& p : _RecoParticles)
+    for (auto& p : particles)
       if (p.PdgCode() == 14) { singles += 1; }
     if (singles == 1)
       _singleE += 1;
@@ -44,8 +44,6 @@ namespace larlite {
 	      << "Tot Events    : " << _numEvts << std::endl
 	      << "SingleE Events: " << _singleE << std::endl;
 
-
-    _mgr.Finalize(_fout);
     return ERToolAnaBase::finalize();
   }
 
