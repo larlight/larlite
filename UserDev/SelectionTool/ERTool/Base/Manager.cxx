@@ -139,11 +139,16 @@ namespace ertool {
       _algo->ProcessEnd(fout);
       _time_algo_finalize = fWatch.RealTime();
     }
+    if(_ana) {
+      fWatch.Start();
+      _ana->ProcessEnd(fout);
+      _time_ana_finalize = fWatch.RealTime();
+    }
 
     if(_profile_mode) {
       std::cout << "  \033[95m<<" << __FUNCTION__ << ">>\033[00m Time Profile Report 4 Filter"    << std::endl
 		<< "    ProcessBegin : " << _time_filter_init     << " [s] " << std::endl
-		<< "    Reconstruct  : " << _tprof_filter.second  << " [s] ... or " 
+		<< "    Filter       : " << _tprof_filter.second  << " [s] ... or " 
 		<< _tprof_filter.second/_tprof_filter.first << " [s/event]" << std::endl
 		<< "    ProcessEnd   : " << _time_filter_finalize << " [s] " << std::endl;
       std::cout << "  \033[95m<<" << __FUNCTION__ << ">>\033[00m Time Profile Report 4 Algo"    << std::endl
@@ -151,6 +156,11 @@ namespace ertool {
 		<< "    Reconstruct  : " << _tprof_algo.second  << " [s] ... or " 
 		<< _tprof_algo.second/_tprof_algo.first << " [s/event]" << std::endl
 		<< "    ProcessEnd   : " << _time_algo_finalize << " [s] " << std::endl;
+      std::cout << "  \033[95m<<" << __FUNCTION__ << ">>\033[00m Time Profile Report 4 Analysis"    << std::endl
+		<< "    ProcessBegin : " << _time_ana_init     << " [s] " << std::endl
+		<< "    Analyze      : " << _tprof_ana.second  << " [s] ... or " 
+		<< _tprof_ana.second/_tprof_algo.first << " [s/event]" << std::endl
+		<< "    ProcessEnd   : " << _time_ana_finalize << " [s] " << std::endl;
     }
     _status = kFINISHED;
   }  

@@ -17,7 +17,6 @@
 
 #include "data_base.h"
 #include "Base/GeoTypes.h"
-
 namespace larlite{
   /**
      \class calorimetry

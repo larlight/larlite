@@ -16,7 +16,7 @@
 #define LARLITE_ENDPOINT2D_H
 
 #include "data_base.h"
-
+#include "Base/GeoConstants.h"
 namespace larlite {
   /**
      \class endpoint2d

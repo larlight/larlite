@@ -62,6 +62,7 @@ namespace ertool {
     double Energy()  const;
     const ::geoalgo::Vector& Vertex()   const { return _vtx; }
     const ::geoalgo::Vector& Momentum() const { return _mom; }
+    const double& Time() const { return _time; }
     const std::vector<ertool::Particle>& Daughters() const { return _daughters; }
     int RecoObjID() const  { return _reco_obj_id; }
     RecoObjType_t Type() const { return _reco_obj_type; }
@@ -74,6 +75,7 @@ namespace ertool {
     void Vertex(const double& x,
 		const double& y,
 		const double& z);
+    void Time(const double& t) {_time = t;}
     void Momentum(const ::geoalgo::Vector_t& mom);
     void Momentum(const double& px,
 		  const double& py,
@@ -96,6 +98,7 @@ namespace ertool {
     double _mass;             ///< Particle mass
     ::geoalgo::Point_t _vtx;  ///< Creation Vertex [cm]
     ::geoalgo::Vector_t _mom; ///< Momentum [MeV/c]
+    double _time;             ///< Creation Time [ns] ... pretty much only for MC
     std::vector<ertool::Particle> _daughters; ///< List of daughters
 
     /// Index of a Track/Shower stored in EventData
@@ -125,6 +128,13 @@ namespace ertool {
     ParticleSet(){}
 
     virtual ~ParticleSet(){}
+
+    std::string Diagram() const;
+
+    void Collapse();
+
+    const std::vector<ertool::Particle>::iterator Find(const ::ertool::Particle& p,
+						       bool exclusive=false);
 
     ClassDef(ParticleSet,1)
   };

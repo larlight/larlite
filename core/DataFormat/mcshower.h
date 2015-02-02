@@ -16,7 +16,7 @@
 #define LARLITE_MCSHOWER_H
 
 #include "mctrajectory.h"
-
+#include "Base/MCConstants.h"
 namespace larlite {
   /**
      \class mcshower

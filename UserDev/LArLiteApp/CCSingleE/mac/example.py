@@ -7,7 +7,7 @@ try:
 
 except NameError:
 
-    print "Failed importing CCSingleE..."
+    print "Failed importing Package_Name..."
 
 sys.exit(0)
 

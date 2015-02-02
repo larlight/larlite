@@ -31,13 +31,19 @@ namespace ertool {
     Ana_Class_Name();
 
     /// Default destructor
-    virtual ~Ana_Class_Name(){};
+    virtual ~Ana_Class_Name(){}
 
     /// Reset function
     virtual void Reset();
 
+    /// Called @ before processing the first event sample
+    virtual void ProcessBegin(){}
+
     /// Function to evaluate input showers and determine a score
     virtual bool Analyze(const EventData &data, const ParticleSet &ps);
+
+    /// Called after processing the last event sample
+    virtual void ProcessEnd(TFile* fout=nullptr) {}
 
   };
 }
