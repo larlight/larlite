@@ -12,7 +12,7 @@ def PandoraShowerReco3D():
     sralg.SetUseArea(True)
     # Attach calo alg
     calg = calo.CalorimetryAlg()
-    sarg.CaloAlgo(calg)
+    sralg.CaloAlgo(calg)
     #sralg.SetUseModBox(True)
     ana_unit.SetShowerAlgo(sralg)
 
@@ -29,7 +29,7 @@ def DefaultShowerReco3D():
     sralg.SetUseArea(True)
     # Attach calo alg
     calg = calo.CalorimetryAlg()
-    sarg.CaloAlgo(calg)
+    sralg.CaloAlgo(calg)
     #sralg.SetUseModBox(True)
     ana_unit.SetShowerAlgo(sralg)
 
