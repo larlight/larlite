@@ -103,7 +103,7 @@ namespace ertool {
 	    if (_verbose) { std::cout << "Comparing with shower (" << s << ")" << std::endl; }
 	    // compare the two showers
 	    double IP = _findRel.FindClosestApproach(thisShower,thatShower,vtx);
-	    if ( (IP < _maxIP) && ( vtx.Dist(thisShower.Start()) < _vtxToShrDist) && ( vtx.Dist(thatShower.Start()) < _vtxToShrDist) ){
+	    if ( (IP < _maxIP) && ( vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) && ( vtx.Dist(thatShower.Start()) < _vtxToShrStartDist) ){
 	      single = false;
 	      break;
 	    }
@@ -122,7 +122,7 @@ namespace ertool {
 	    if ( (IP < _maxIP) // good correlation
 		 && (vtx.Dist(thatTrack.front()) > _vtxToTrkStartDist) // vertex far enough away from track start
 		 && (_geoAlgo.SqDist(vtx,thatTrack) < _vtxToTrkDist)   // vertex close to track body
-		 && (vtx.Dist(thisShower.Start()) < _vtxToShrDist) ) { // vertex not unreasonably far from shower start
+		 && (vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) ) { // vertex not unreasonably far from shower start
 	      // our shower comes from t -> not interested
 	      single = false;
 	      break;

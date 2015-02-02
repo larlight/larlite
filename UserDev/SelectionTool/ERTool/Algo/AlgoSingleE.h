@@ -56,7 +56,7 @@ namespace ertool {
 
     void setVtxToTrkStartDist(double d) { _vtxToTrkStartDist = d; }
     void setVtxToTrkDist(double d) { _vtxToTrkDist = d; }
-    void setVtxToShrDist(double d) { _vtxToShrDist = d; }
+    void setVtxToShrStartDist(double d) { _vtxToShrStartDist = d; }
     void setMaxIP(double d) { _maxIP = d; }
 
   private:
@@ -83,9 +83,24 @@ namespace ertool {
     double _e_mass;
 
     // constants to be used for decision-making
+    // minimum distance that a reco-vertex must be away from the
+    // start of a track for the vtx to be considered "on the track"
+    // and the shower to come from the track, instead of the shower
+    // and track being siblings.
     double _vtxToTrkStartDist;
+    // maximum distance from the entire track for the reco-vertex
+    // for the vertex to be considered on the track and the shower
+    // to be considered as coming from the track
     double _vtxToTrkDist;
-    double _vtxToShrDist;
+    // Max distance from shower start that the vertex can be
+    // this value should be a few radiation lengths: the cut 
+    // is placed to remove cases where the shower is meters
+    // away from the vertex. Probably an accidental correlation
+    double _vtxToShrStartDist;
+    // Maximum impact parameter allowed between the two objects
+    // if larger it means that the two lines/segments do not come
+    // within this value at any point and they therefore are 
+    // assumed to not be correlated
     double _maxIP;
 
     // Other algorithms to use
