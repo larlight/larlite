@@ -5,7 +5,7 @@
  * 
  * \brief Class def header for a class Filter_Class_Name
  *
- * @author kazuhiro
+ * @author Shell_User_Name
  */
 
 /** \addtogroup Working_Package
@@ -15,7 +15,7 @@
 #ifndef ERTOOL_FILTER_CLASS_NAME_H
 #define ERTOOL_FILTER_CLASS_NAME_H
 
-#include "Base/FilterBase.h"
+#include "ERTool/Base/FilterBase.h"
 
 namespace ertool {
 

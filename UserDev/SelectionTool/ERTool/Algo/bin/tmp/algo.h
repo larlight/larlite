@@ -5,7 +5,7 @@
  * 
  * \brief Class def header for a class Algo_Class_Name
  *
- * @author USER
+ * @author Shell_User_Name
  */
 
 /** \addtogroup Working_Package

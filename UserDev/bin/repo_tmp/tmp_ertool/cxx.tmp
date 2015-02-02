@@ -1,6 +1,0 @@
-#ifndef REPOSITORYNAME_PACKAGE_NAME_EMPTY_CXX
-#define REPOSITORYNAME_PACKAGE_NAME_EMPTY_CXX
-
-#include "empty.h"
-
-#endif
