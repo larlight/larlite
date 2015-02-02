@@ -46,7 +46,7 @@ my_proc.set_ana_output_file("singleE_selection.root")
 #pdgsel.Select(11,pdgsel.kGENERATOR,1)
 #my_proc.add_process(pdgsel)
 
-my_ana = fmwk.ERAnaSingleE()
+my_ana = fmwk.SingleEAna()
 my_ana._mgr.SetAlgo(my_algo)
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco

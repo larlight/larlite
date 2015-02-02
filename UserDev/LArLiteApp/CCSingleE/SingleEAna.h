@@ -1,9 +1,9 @@
 /**
- * \file ERAnaSingleE.h
+ * \file SingleEAna.h
  *
  * \ingroup ShowerPdfTool
  * 
- * \brief Class def header for a class ERAnaSingleE
+ * \brief Class def header for a class SingleEAna
  *
  * @author David C.
  */
@@ -12,25 +12,25 @@
 
     @{*/
 
-#ifndef LARLITE_ERANASINGLEE_H
-#define LARLITE_ERANASINGLEE_H
+#ifndef LARLITE_SINGLEEANA_H
+#define LARLITE_SINGLEEANA_H
 
 
 #include "ERToolAnaBase.h"
 namespace larlite {
   /**
-     \class ERAnaSingleE
+     \class SingleEAna
      Example analysis unit for running SPAManager
    */
-  class ERAnaSingleE : public ERToolAnaBase {
+  class SingleEAna : public ERToolAnaBase {
   
   public:
 
     /// Default constructor
-    ERAnaSingleE();
+    SingleEAna();
 
     /// Default destructor
-    virtual ~ERAnaSingleE(){}
+    virtual ~SingleEAna(){}
 
     /**
         Initialization method to be called before the analysis event loop.

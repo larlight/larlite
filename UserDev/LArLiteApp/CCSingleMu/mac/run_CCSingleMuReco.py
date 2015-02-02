@@ -6,13 +6,8 @@ if len(sys.argv) < 2:
     msg += '\n'
     sys.stderr.write(msg)
     sys.exit(1)
-
-from ROOT import gSystem
-from ROOT import ertool
-ertool.Manager()
-from ROOT import larlite as fmwk
-fmwk.geo.PlaneID
-
+from seltool import ertool
+from larlite import larlite as fmwk
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()

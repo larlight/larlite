@@ -1,16 +1,16 @@
-#ifndef LARLITE_ERANASINGLEE_CXX
-#define LARLITE_ERANASINGLEE_CXX
+#ifndef LARLITE_SINGLEEANA_CXX
+#define LARLITE_SINGLEEANA_CXX
 
-#include "ERAnaSingleE.h"
+#include "SingleEAna.h"
 
 namespace larlite {
 
-  ERAnaSingleE::ERAnaSingleE() : ERToolAnaBase()
+  SingleEAna::SingleEAna() : ERToolAnaBase()
   { 
-    _name="ERAnaSingleE"; 
+    _name="SingleEAna"; 
   }
 
-  bool ERAnaSingleE::initialize() {
+  bool SingleEAna::initialize() {
     
     _numEvts = 0;
     _singleE = 0;
@@ -18,7 +18,7 @@ namespace larlite {
     return ERToolAnaBase::initialize();
   }
   
-  bool ERAnaSingleE::analyze(storage_manager* storage) {
+  bool SingleEAna::analyze(storage_manager* storage) {
 
     auto status = ERToolAnaBase::analyze(storage);
     if(!status) return status;
@@ -38,7 +38,7 @@ namespace larlite {
     return true;
   }
 
-  bool ERAnaSingleE::finalize() {
+  bool SingleEAna::finalize() {
 
     std::cout << "RESULTS: " << std::endl
 	      << "Tot Events    : " << _numEvts << std::endl

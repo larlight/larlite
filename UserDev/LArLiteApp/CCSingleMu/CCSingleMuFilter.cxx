@@ -26,12 +26,12 @@ namespace larlite {
 
     auto ev_mci = storage->get_data<event_mctruth>("generator");
 
-    if(!ev_mci || ev_mci->size() < 0) {
+    if(!ev_mci || !(ev_mci->size())) {
       print(msg::kERROR,__FUNCTION__,"MCTruth not found...");
       throw std::exception();
     }  
 
-    int numu_count   = 0;
+    //int numu_count   = 0;
     int numu_trackid = -1;
     int mu_count = 0;
     for(auto const& mci : *ev_mci) {
