@@ -14,7 +14,7 @@ OBJECTS = $(SOURCES:.cxx=.o)
 INCFLAGS  = -I.                       #Include itself
 INCFLAGS += -I$(LARLITE_COREDIR)
 INCFLAGS += -I$(LARLITE_USERDEVDIR)/BasicTool
-INCFLAGS += -I$(LARLITE_USERDEVDIR)/SelectionTool/ERTool
+INCFLAGS += -I$(LARLITE_USERDEVDIR)/SelectionTool
 
 # platform-specific options
 OSNAME          = $(shell uname -s)

@@ -14,7 +14,7 @@
 #ifndef ERTOOL_ALGOFINDRELATIONSHIP_H
 #define ERTOOL_ALGOFINDRELATIONSHIP_H
 
-#include "Base/AlgoBase.h"
+#include "ERTool/Base/AlgoBase.h"
 #include "GeoAlgo/GeoAlgo.h"
 
 namespace ertool {

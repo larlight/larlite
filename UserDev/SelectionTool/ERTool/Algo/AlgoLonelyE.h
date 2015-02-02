@@ -15,8 +15,8 @@
 #ifndef ERTOOL_ALGOLONELYE_H
 #define ERTOOL_ALGOLONELYE_H
 
-#include "Base/AlgoBase.h"
-#include "Algo/AlgoSingleE.h"
+#include "ERTool/Base/AlgoBase.h"
+#include "ERTool/Algo/AlgoSingleE.h"
 // include GeoAlgo functions
 #include "GeoAlgo/GeoAlgoConstants.h"
 #include "GeoAlgo/GeoAlgo.h"

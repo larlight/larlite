@@ -15,9 +15,9 @@
 #ifndef ERTOOL_ALGOGAMMASELECTION_H
 #define ERTOOL_ALGOGAMMASELECTION_H
 
-#include "Base/AlgoBase.h"
-#include "Base/PdfFactory.h"
-#include "Base/RangeVar.h"
+#include "ERTool/Base/AlgoBase.h"
+#include "ERTool/Base/PdfFactory.h"
+#include "ERTool/Base/RangeVar.h"
 #include "TDatabasePDG.h"
 #include <RooPlot.h>
 #include <RooProdPdf.h>

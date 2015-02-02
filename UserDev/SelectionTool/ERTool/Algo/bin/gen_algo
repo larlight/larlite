@@ -8,7 +8,7 @@ if not 'LARLITE_USERDEVDIR' in os.environ.keys():
    sys.stderr.write('$LARLITE_USERDEVDIR not defined!\n\n')
    sys.exit(1)
 
-name='Algo' + sys.argv[1]
+name='ERAlgo' + sys.argv[1]
 working_package='ERTool'
 target_dir='%s/%s/ERTool/Algo' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
 source_dir='%s/%s/ERTool/Algo/bin/tmp' % (os.environ['LARLITE_USERDEVDIR'],REPO_NAME)
@@ -29,7 +29,7 @@ for src in src_list.keys():
    contents=contents.replace('ALGO_CLASS_NAME',name.upper())
    contents=contents.replace('algo_class_name',name.lower())
    contents=contents.replace('Algo_Class_Name',name)
-   contents=contents.replace('kazuhiro',os.environ['USER'])
+   contents=contents.replace('USER',os.environ['USER'])
    contents=contents.replace('Working_Package',working_package)
    fout=open(src_list[src],'w')
    fout.write(contents)

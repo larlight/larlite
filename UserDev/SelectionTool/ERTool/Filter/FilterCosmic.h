@@ -15,7 +15,7 @@
 #ifndef ERTOOL_FILTERCOSMIC_H
 #define ERTOOL_FILTERCOSMIC_H
 
-#include "Base/FilterBase.h"
+#include "ERTool/Base/FilterBase.h"
 
 namespace ertool {
 

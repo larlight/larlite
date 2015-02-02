@@ -6,7 +6,7 @@
  * \brief This Algo returns a SPArticleSet of single electrons that are \n
           start-point isolated from other single electrons.
  *
- * @author kazuhiro + davidkaleko
+ * @author kazuhiro + davidkaleko + davidc
  */
 
 /** \addtogroup ERTool
@@ -16,9 +16,9 @@
 #ifndef ERTOOL_ALGOSINGLEE_H
 #define ERTOOL_ALGOSINGLEE_H
 
-#include "Algo/AlgoEMPart.h"
-#include "Algo/AlgoFindRelationship.h"
-#include "Base/AlgoBase.h"
+#include "ERTool/Algo/AlgoEMPart.h"
+#include "ERTool/Algo/AlgoFindRelationship.h"
+#include "ERTool/Base/AlgoBase.h"
 #include "GeoAlgo/GeoAlgo.h"
 
 namespace ertool {

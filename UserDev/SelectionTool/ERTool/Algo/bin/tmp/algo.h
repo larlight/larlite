@@ -5,7 +5,7 @@
  * 
  * \brief Class def header for a class Algo_Class_Name
  *
- * @author kazuhiro
+ * @author USER
  */
 
 /** \addtogroup Working_Package
@@ -15,7 +15,7 @@
 #ifndef ERTOOL_ALGO_CLASS_NAME_H
 #define ERTOOL_ALGO_CLASS_NAME_H
 
-#include "Base/AlgoBase.h"
+#include "ERTool/Base/AlgoBase.h"
 
 namespace ertool {
 
