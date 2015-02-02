@@ -5,7 +5,7 @@
  * 
  * \brief Class def header for a class Ana_Class_Name
  *
- * @author SHELL_USER_NAME
+ * @author Shell_User_Name
  */
 
 /** \addtogroup Working_Package
@@ -27,10 +27,10 @@ namespace larlite {
   public:
 
     /// Default constructor
-    Ana_Class_Name(){ _name="Ana_Class_Name"; _fout=0;};
+    Ana_Class_Name(){ _name="Ana_Class_Name"; _fout=0;}
 
     /// Default destructor
-    virtual ~Ana_Class_Name(){};
+    virtual ~Ana_Class_Name(){}
 
     /** IMPLEMENT in Ana_Class_Name.cc!
         Initialization method to be called before the analysis event loop.
@@ -47,8 +47,8 @@ namespace larlite {
     */
     virtual bool finalize();
 
-    protected:
-
+  protected:
+    
   };
 }
 #endif
