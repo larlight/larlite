@@ -16,7 +16,7 @@
 #define LARLITE_SINGLEEANA_H
 
 
-#include "ERToolAnaBase.h"
+#include "ERToolBackend/ERToolAnaBase.h"
 namespace larlite {
   /**
      \class SingleEAna

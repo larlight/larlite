@@ -18,10 +18,7 @@ rootlibmap() {
 # CCSingleE
 rootlibmap libLArLiteApp_CCSingleE.rootmap libLArLiteApp_CCSingleE.so $LARLITE_USERDEVDIR/LArLiteApp/CCSingleE/LinkDef.h \
     libLArLite_Analysis.so \
-    libBasicTool_GeoAlgo.so \
-    libSelectionTool_ERBase.so \
-    libSelectionTool_ERApp.so
-
+    libLArLite_ERToolBackend.so
 
 
 
