@@ -13,11 +13,11 @@ for f in ['GNUmakefile','lib','LinkDef.h']:
 
 target_dir = os.getcwd()
 working_package = target_dir.replace(target_dir[0:target_dir.rfind('/')+1],'')
-name='ERAna' + sys.argv[1]
-source_dir='%s/SelectionTool/ERTool/Ana/bin/tmp' % os.environ['LARLITE_USERDEVDIR']
+name='ERAlgo' + sys.argv[1]
+source_dir='%s/SelectionTool/ERTool/Algo/bin/tmp' % os.environ['LARLITE_USERDEVDIR']
 
-in_source='%s/ana.cxx' % source_dir
-in_header='%s/ana.h' % source_dir
+in_source='%s/algo.cxx' % source_dir
+in_header='%s/algo.h' % source_dir
 
 src_list = { in_source   : '%s/%s.cxx' % (target_dir,name),
              in_header   : '%s/%s.h'   % (target_dir,name) }
@@ -29,9 +29,9 @@ for src in src_list.keys():
       
 for src in src_list.keys():
    contents=open(src,'r').read()
-   contents=contents.replace('ANA_CLASS_NAME',name.upper())
-   contents=contents.replace('ana_class_name',name.lower())
-   contents=contents.replace('Ana_Class_Name',name)
+   contents=contents.replace('ALGO_CLASS_NAME',name.upper())
+   contents=contents.replace('algo_class_name',name.lower())
+   contents=contents.replace('Algo_Class_Name',name)
    contents=contents.replace('Shell_User_Name',os.environ['USER'])
    contents=contents.replace('Working_Package',working_package)
    fout=open(src_list[src],'w')
@@ -48,9 +48,9 @@ for line in contents:
    fout.write(line)
 
 # modify GNUmakefile (if necessary)
-contents=open('%s/GNUmakefile' % target_dir, 'r').read()
 deps=['SelectionTool','BasicTool']
 for d in deps:
+   contents=open('%s/GNUmakefile' % target_dir, 'r').read()
    if contents.find('-I$(LARLITE_USERDEVDIR)/%s' % d) < 0:
       contents = contents.split('\n')
       new_contents=''
@@ -65,22 +65,24 @@ for d in deps:
       fout.write(new_contents)
       fout.close()
 
-# modify lib/gen_rootmap.sh
-contents=open('%s/lib/gen_rootmap.sh' % target_dir,'r').read()
-if contents.find('libSelectionTool_ERBase.so') < 0:
-   contents = contents.split('\n')
-   new_contents=''
-   inserted=False
-   for l in contents:
-      if not inserted and not l.find('LinkDef.h') < 0:
-         if not l.split()[-1] == '\\':
-            l += '\\'
-         l += '\n'
-         l += '    libSelectionTool_ERBase.so \\'
-      new_contents += '%s\n' % l
-   fout=open('%s/lib/gen_rootmap.sh' % target_dir,'w')
-   fout.write(new_contents)
-   fout.close()
+# modify lib/gen_rootmap.sh (if necessary)
+deps=['libBasicTool_GeoAlgo.so','libSelectionTool_ERBase.so']
+for d in deps:
+   contents=open('%s/lib/gen_rootmap.sh' % target_dir,'r').read()
+   if contents.find('libSelectionTool_ERBase.so') < 0:
+      contents = contents.split('\n')
+      new_contents=''
+      inserted=False
+      for l in contents:
+         if not inserted and not l.find('LinkDef.h') < 0:
+            if not l.split()[-1] == '\\':
+               l += '\\'
+            l += '\n'
+            l += '    libSelectionTool_ERBase.so \\'
+         new_contents += '%s\n' % l
+      fout=open('%s/lib/gen_rootmap.sh' % target_dir,'w')
+      fout.write(new_contents)
+      fout.close()
 
 print
 print 'Generated the followings under %s.' % target_dir
@@ -96,7 +98,7 @@ print 'If needed, make sure you define linked libraries in rootmap generation sc
 print 'The script is: %s/gen_rootmap.sh' % target_dir
 print 'If you have no idea what this means, just ignore it!'
 print
-print 'To remove your analysis code, you should remove:'
+print 'To remove your algo code, you should remove:'
 print '%s/%s.h' % (target_dir,name)
 print '%s/%s.cxx' % (target_dir,name)
 print

@@ -25,6 +25,3 @@ CXXFLAGS +=  `root-config --cflags`
 
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE
-
-
-

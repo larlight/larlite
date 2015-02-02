@@ -53,7 +53,9 @@ in_header='%s/h.tmp' % source_dir
 in_rootmap='%s/lib/gen_rootmap.sh' % source_dir
 in_bin_makefile='%s/bin/GNUmakefile.tmp' % source_dir
 in_bin_source='%s/bin/example.tmp' % source_dir
-in_mac_script='%s/mac/tmp.py' % source_dir
+in_mac_example='%s/mac/example.py' % source_dir
+in_mac_example_anaunit='%s/mac/example_anaunit.py' % source_dir
+in_mac_example_ertool='%s/mac/example_ertool.py' % source_dir
 
 src_list = { in_makefile : '%s/GNUmakefile'   % target_dir,
              in_linkdef  : '%s/LinkDef.h'     % target_dir,
@@ -62,7 +64,9 @@ src_list = { in_makefile : '%s/GNUmakefile'   % target_dir,
              in_rootmap  : '%s/lib/gen_rootmap.sh' % target_dir,
              in_bin_makefile   : '%s/bin/GNUmakefile' % target_dir,
              in_bin_source     : '%s/bin/example.cc'  % target_dir,
-             in_mac_script     : '%s/mac/example.py'  % target_dir  }
+             in_mac_example    : '%s/mac/example.py'  % target_dir,
+             in_mac_example_anaunit : '%s/mac/example_anaunit.py'  % target_dir,
+             in_mac_example_ertool  : '%s/mac/example_ertool.py'  % target_dir }
 
 for src in src_list.keys():
    contents=open(src,'r').read()

@@ -18,6 +18,4 @@ rootlibmap() {
 # ERTool_App
 rootlibmap libSelectionTool_ERApp.rootmap libSelectionTool_ERApp.so \
     $LARLITE_USERDEVDIR/SelectionTool/ERTool/App/LinkDef.h \
-    libBasicTool_GeoAlgo.so \
-    libRooFit.so \
-    libEG.so
+    libSelectionTool_ERBase.so 
