@@ -9,6 +9,8 @@ namespace ertool {
   {
     _name     = "ERAnaCCSingleMu";
     _primary_cut_dist = 5;
+    _primary_range    = 5;
+    _min_trk_length   = 10;
   }
 
   void ERAnaCCSingleMu::Reset()
@@ -39,29 +41,35 @@ namespace ertool {
 
     std::vector<bool> primary_flag(mc_data.AllTrack().size(),false);
     for(auto const& trk : mc_data.Track())
-      primary_flag[trk->ID()] = true;
-    
+      //Accept if it has some length
+      if(trk->Length() > _min_trk_length) primary_flag[trk->ID()] = true;
+
+    // Find primary candidate tracks
     if(primary_flag.size()>1) {
       for(auto const& pair : mc_data.TrackCombination(2)) {
-	
+
 	auto const& trk1 = pair[0];
 	auto const& trk2 = pair[1];
 
-	// Don't bother a short track
-	if(trk1->Length()<5) primary_flag[trk1->ID()] = false;
-	else{
+	// First check if two tracks have start points close enough
+	double dist0 = trk1->front().Dist(trk2->front());
+	if(dist0 < _primary_range) continue;
+
+	// Is trk1 from trk2?
+	if(primary_flag[trk1->ID()]) {
 	  double dist1 = geo_alg.SqDist(trk1->front(),*trk2);
-	  if(dist1 < _primary_cut_dist) primary_flag[trk1->ID()]=false;
+	  if(dist1 < _primary_cut_dist) 
+	    primary_flag[trk1->ID()]=false;	  
 	}
 	
-	if(trk2->Length()<5) primary_flag[trk2->ID()] = false;
-	else{
+	// Is trk2 from trk1?
+	if(primary_flag[trk2->ID()]) {
 	  double dist2 = geo_alg.SqDist(trk2->front(),*trk1);
 	  if(dist2 < _primary_cut_dist) primary_flag[trk2->ID()]=false;
 	}
       }
     }
-
+    
     double ctr=0;
     for(auto const& v : primary_flag) if(v) ctr++;
     hPrimaryCtr->Fill(ctr);

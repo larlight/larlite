@@ -46,7 +46,8 @@ namespace ertool {
     virtual void ProcessEnd(TFile* fout=nullptr);
 
     double _primary_cut_dist;
-
+    double _primary_range;
+    double _min_trk_length;
   private:
     TH1D* hPrimaryCtr;
     TH1D* hPrimaryPID;

@@ -40,11 +40,18 @@ my_anaunit.SetVtxProducer(True,"generator");
 #my_anaunit.SetTrackProducer(False,"");
 #my_anaunit.SetVtxProducer(False,"");
 
+# Enable filter mode & attach signal filter
+my_proc.enable_filter(True)
+my_proc.add_process(fmwk.CCSingleMuFilter())
+
+# Attach ERTool wrapper
 my_anaunit._mgr.SetAlgo(my_algo)
 my_anaunit._mgr.SetFilter(my_filter)
 my_anaunit._mgr.SetAna(my_ana)
 my_anaunit._mgr._mc_for_ana=True
 my_proc.add_process(my_anaunit)
+
+# run
 my_proc.run()
 
 # done!
