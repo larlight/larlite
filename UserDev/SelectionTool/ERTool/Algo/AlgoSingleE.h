@@ -53,11 +53,17 @@ namespace ertool {
 
     /// Set verbosity
     void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); }
+    
+    /// Use EMPart
+    void useEMPart(bool on) { _useEMPart = on; }
 
     void setVtxToTrkStartDist(double d) { _vtxToTrkStartDist = d; }
     void setVtxToTrkDist(double d) { _vtxToTrkDist = d; }
     void setVtxToShrStartDist(double d) { _vtxToShrStartDist = d; }
     void setMaxIP(double d) { _maxIP = d; }
+
+    /// clear tree
+    void ClearTree();
 
   private:
 
@@ -81,6 +87,10 @@ namespace ertool {
     bool _verbose;
     // electron mass
     double _e_mass;
+    // flag to decide whether to use EMPart or not
+    // if True -> use only showers reco as PDG == 11
+    // if False -> use all showers
+    bool _useEMPart;
 
     // constants to be used for decision-making
     // minimum distance that a reco-vertex must be away from the
@@ -112,6 +122,19 @@ namespace ertool {
     //debug histos
     TH1F* _e_ll_values;
     TH1F* _dedx_values;
+
+    //Tree -> one entry per shower-other comparison
+    // therefore possibly multiple entries for each shower
+    TTree* _alg_tree;
+    double _E; // energy of shower
+    int    _PDG; // PDG code assigned by AlgoEMPart
+    int    _VsTrack; // comparing vs track (==1)
+    double _thatE; // Energy of other shower/track
+    double _dEdx;
+    double _IP; // Impact Paramter with other object
+    double _IPthisStart; // distance from IP to this shower start point
+    double _IPthatStart; // distance from IP to that shower/track start point
+    double _IPtrkBody; // distance from IP to body of track (if comparing with track)
   };
 }
 #endif
