@@ -151,38 +151,29 @@ namespace ertool{
     // Track 1
     // holder for track direction
     geoalgo::Vector_t trk1Dir(3);
-    if (trk1.Length() > _minLength){
-      double sumLength = 0; //keep track of added sum
-      for (size_t i=0; i < (trk1.size()-1); i++){
-	sumLength += trk1.at(i).Dist(trk1.at(i+1));
-	if (sumLength > _minLength){
-	  trk1Dir = trk1.at(i+1)-trk1.front();
-	  break; // got our direction -> get out of here!
-	}
+    double sumLength = 0; //keep track of added sum
+    for (size_t i=0; i < (trk1.size()-1); i++){
+      sumLength += trk1.at(i).Dist(trk1.at(i+1));
+      if (sumLength > _minLength){
+	trk1Dir = trk1.at(i+1)-trk1.front();
+	break; // got our direction -> get out of here!
       }
     }
-    // well, the track is really short: go with the full length
-    else
-      trk1Dir = trk1.back()-trk1.front();
-    //create backwards-pointing half-line
+    if(sumLength <= _minLength) trk1Dir = trk1.back()-trk1.front();
     geoalgo::HalfLine_t trk1Bkwd(trk1.front(),trk1Dir*(-1));
 
     // Track 2
     // holder for track direction
     geoalgo::Vector_t trk2Dir(3);
-    if (trk2.Length() > _minLength){
-      double sumLength = 0; //keep track of added sum
-      for (size_t i=0; i < (trk2.size()-1); i++){
-	sumLength += trk2.at(i).Dist(trk2.at(i+1));
-	if (sumLength > _minLength){
-	  trk2Dir = trk2.at(i+1)-trk2.front();
-	  break; // got our direction -> get out of here!
-	}
+    sumLength = 0; //keep track of added sum
+    for (size_t i=0; i < (trk2.size()-1); i++){
+      sumLength += trk2.at(i).Dist(trk2.at(i+1));
+      if (sumLength > _minLength){
+	trk2Dir = trk2.at(i+1)-trk2.front();
+	break; // got our direction -> get out of here!
       }
     }
-    // well, the track is really short: go with the full length
-    else
-      trk2Dir = trk2.back()-trk2.front();
+    if(sumLength <= _minLength) trk2Dir = trk2.back()-trk2.front();
     geoalgo::HalfLine_t trk2Bkwd(trk2.front(),trk2Dir*(-1));
 
     // keep track of smallest quantity
