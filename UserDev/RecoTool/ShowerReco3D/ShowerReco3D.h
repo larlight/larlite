@@ -16,7 +16,6 @@
 #define RECOTOOL_SHOWERRECO3D_H
 
 #include "Analysis/ana_base.h"
-#include "DataFormat/DataFormat-TypeDef.h"
 #include "ClusterRecoUtil/CRUHelper.h"
 #include "ShowerRecoManager.h"
 

@@ -2,6 +2,7 @@
 #define SHOWERQUALITY_CXX
 
 #include "ShowerQuality.h"
+#include "LArUtil/Geometry.h"
 #include "DataFormat/mcshower.h"
 #include "DataFormat/simch.h"
 #include "DataFormat/shower.h"
@@ -156,7 +157,7 @@ namespace larlite {
   
   bool ShowerQuality::analyze(storage_manager* storage) {
 
-    auto geo = larutil::Geometry::GetME();
+    //auto geo = larutil::Geometry::GetME();
 
     // Retrieve mcshower data product
     auto ev_mcs = storage->get_data<event_mcshower>("mcreco");

@@ -14,9 +14,12 @@
 #pragma link C++ class larlite::CCSingleMuFilter+;
 #pragma link C++ class larlite::CCSingleMuAna+;
 #pragma link C++ class larlite::CCSingleMuReco+;
+#pragma link C++ class ertool::ERAnaCCSingleMu+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
+
 
 
 

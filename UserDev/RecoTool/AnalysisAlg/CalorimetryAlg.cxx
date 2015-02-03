@@ -17,7 +17,7 @@
 
 // LArSoft includes
 //#include "RecoBase/Hit.h"
-//#include "AnalysisAlg/CalorimetryAlg.h"
+#include "LArUtil/Geometry.h"
 
 #include "CalorimetryAlg.h"
 
