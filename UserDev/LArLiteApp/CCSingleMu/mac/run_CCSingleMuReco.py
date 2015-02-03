@@ -36,8 +36,12 @@ my_ana = fmwk.CCSingleMuReco()
 # Set Producers
 # First Argument: True = MC, False = Reco
 my_ana.SetShowerProducer(True,"mcreco");
-my_ana.SetTrackProducer(True,"mcreco");
+#my_ana.SetTrackProducer(True,"mcreco");
+#my_ana.SetTrackProducer(False,"pandoraNuKHit");
+my_ana.SetTrackProducer(False,"pandoraCosmicKHit");
 my_ana.SetVtxProducer(True,"generator");
+
+
 
 #my_ana.SetShowerProducer(False,"showerreco");
 #my_ana.SetTrackProducer(False,"");
