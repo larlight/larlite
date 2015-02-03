@@ -69,6 +69,6 @@ for f in flist:
 print
 print 'Generated a new repository dir:', target_dir
 print
-print 'You can use gen scripts under bin sub-directory to generate your packages in the new repo'
+print 'You can use bin/gen_package script (or llgen_package alias) to generate your packages in the new repo'
 print
 sys.exit(0)

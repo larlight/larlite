@@ -100,7 +100,4 @@ print '    > make --directory=%s' % target_dir
 print ' OR'
 print '    > cd %s; make;' % target_dir
 print
-print 'If needed, make sure you define linked libraries in rootmap generation script.'
-print 'The script is: %s/make_rootmap.sh' % os.environ['LARLITE_LIBDIR']
-print
 sys.exit(0)
