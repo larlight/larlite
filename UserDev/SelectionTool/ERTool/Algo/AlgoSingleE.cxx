@@ -11,6 +11,7 @@ namespace ertool {
   size_t nonzero_dedx_counter = 0;
   
   AlgoSingleE::AlgoSingleE() : AlgoBase()
+			     , _alg_tree(nullptr)
   {
 
     _name       = "AlgoSingleE";
@@ -18,6 +19,7 @@ namespace ertool {
     _e_ll_values = 0;
     _dedx_values = 0;
     _verbose = false;
+    _useEMPart = false;
 
   }
 
@@ -43,7 +45,19 @@ namespace ertool {
 
     if(!_dedx_values)
       _dedx_values = new TH1F("dedx_values","dedx_values",1000,0,8);
-
+    
+    if (_alg_tree) { delete _alg_tree; }
+    _alg_tree = new TTree("_alg_tree","Algo SingleE Tree");
+    _alg_tree->Branch("_E",&_E,"_E/D");
+    _alg_tree->Branch("_PDG",&_PDG,"PDG/I");
+    _alg_tree->Branch("_VsTrack",&_VsTrack,"_VsTrack/I");
+    _alg_tree->Branch("_thatE",&_thatE,"thatE/D");
+    _alg_tree->Branch("_dEdx",&_dEdx,"_dEdx/D");
+    _alg_tree->Branch("_IP",&_IP,"_IP/D");
+    _alg_tree->Branch("_IPthisStart",&_IPthisStart,"_IPthisStart/D");
+    _alg_tree->Branch("_IPthatStart",&_IPthatStart,"_IPthatStart/D");
+    _alg_tree->Branch("_IPtrkBody",&_IPtrkBody,"_IPtrkBody/D");
+    
     return;
   }
 
@@ -62,7 +76,7 @@ namespace ertool {
     // Particles created in EM selection (photon/gamma separation)
     ParticleSet emParticles = _alg_emp.Reconstruct(data);
     
-    res = emParticles;
+    //res = emParticles;
 
     if (_verbose) { 
       std::cout << "***********BEGIN RECONSTRUCTION************" << std::endl;
@@ -72,7 +86,11 @@ namespace ertool {
     // We are only interested in electron-like showers
     // loop over emParticles and select only the PDG==11 ones
     for (auto &p : emParticles){
-      if (p.PdgCode() == 11){
+      if ( (_useEMPart && (p.PdgCode() == 11) ) || (!_useEMPart) ){
+	ClearTree();
+	_PDG = p.PdgCode();
+	_E   = p.Energy();
+	_IPtrkBody = 0;
 	// Ok, we have an electron. Get the associated shower
 	// and make sure it does not:
 	// NOTE: IN 1) IMPLEMENT EXCLUSION ONLY OF e-like showers
@@ -103,14 +121,25 @@ namespace ertool {
 	    if (_verbose) { std::cout << "Comparing with shower (" << s << ")" << std::endl; }
 	    // compare the two showers
 	    double IP = _findRel.FindClosestApproach(thisShower,thatShower,vtx);
+	    _VsTrack = 0;
+	    _thatE   = thatShower._energy;
+	    _IP = IP;
+	    _IPthisStart = vtx.Dist(thisShower.Start());
+	    _IPthatStart = vtx.Dist(thatShower.Start());
+	    _alg_tree->Fill();
+	    if (_verbose)
+	      std::cout << "\tImpact Parameter      : " << _IP << std::endl
+			<< "\tIP to other Shr Start : " << _IPthatStart << std::endl
+			<< "\tIP to this Shr Start  : " << _IPthisStart << std::endl;
 	    if ( (IP < _maxIP) && ( vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) && ( vtx.Dist(thatShower.Start()) < _vtxToShrStartDist) ){
 	      single = false;
+	      if (_verbose) { std::cout << "NOT single" << std::endl; }
 	      break;
 	    }
 	  }// if not the same showers
 	}//loop over showers
 	// loop over tracks if still single
-	if (single){
+	if (single || !single){
 	  for (size_t t=0; t < data.Track().size(); t++){
 	    Track thatTrack(data.Track(t));
 	    if (thatTrack.size() < 2)
@@ -119,12 +148,26 @@ namespace ertool {
 	    geoalgo::Point_t vtx(3);
 	    // compare the two tracks
 	    double IP =  _findRel.FindClosestApproach(thisShower,thatTrack,vtx);
+	    _VsTrack = 1;
+	    _thatE   = thatTrack._energy;
+	    _IP = IP;
+	    _IPthisStart = vtx.Dist(thisShower.Start());
+	    _IPthatStart = vtx.Dist(thatTrack.front());
+	    _IPtrkBody = sqrt(_geoAlgo.SqDist(vtx,thatTrack));
+	    _alg_tree->Fill();
+	    if (_verbose)
+	      std::cout << "\tImpact Parameter: " << _IP << std::endl
+			<< "\tIP to Trk Start : " << _IPthatStart << std::endl
+			<< "\tIP to Trk Body  : " << _IPtrkBody << std::endl
+			<< "\tIP to Shr Start : " << _IPthisStart << std::endl;
+	    single = true;
 	    if ( (IP < _maxIP) // good correlation
 		 && (vtx.Dist(thatTrack.front()) > _vtxToTrkStartDist) // vertex far enough away from track start
-		 && (_geoAlgo.SqDist(vtx,thatTrack) < _vtxToTrkDist)   // vertex close to track body
+		 && (sqrt(_geoAlgo.SqDist(vtx,thatTrack)) < _vtxToTrkDist)   // vertex close to track body
 		 && (vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) ) { // vertex not unreasonably far from shower start
 	      // our shower comes from t -> not interested
 	      single = false;
+	      if (_verbose) { std::cout << "NOT single" << std::endl; }
 	      break;
 	    }
 	  }// for all tracks
@@ -137,13 +180,17 @@ namespace ertool {
 	  if (_verbose) { std::cout << "Shower is Single!" << std::endl; }
 	  // Create an "unknown" particle that gave
 	  // birth to this electron shower
-	  Particle unknown(14,0.000001);
+	  Particle unknown(12,0);
+	  unknown.Vertex(thisShower.Start());
+	  unknown.Momentum(thisShower.Dir());
 	  unknown.AddDaughter(p);
 	  res.push_back(unknown);
+	  //res.push_back(p);
 	}
 	else
 	  if (_verbose) { std::cout << "Shower is not single." << std::endl; }
 	
+
       }// if the PDG is 11
     }// for all particles from EMPart
     
@@ -294,9 +341,32 @@ namespace ertool {
 
       if(_dedx_values)
 	_dedx_values->Write();
+
+      if (_alg_tree)
+	_alg_tree->Write();
     }
 
+    return;
   }
+
+
+
+  void AlgoSingleE::ClearTree(){
+
+    _E = -1;
+    _PDG = -1;
+    _VsTrack = -1;
+    _thatE = -1;
+    _dEdx = -1;
+    _IP = -1;
+    _IPthisStart = -1;
+    _IPthatStart = -1;
+    _IPtrkBody = -1;
+
+    return;
+  }
+
+
 }
 
 #endif
