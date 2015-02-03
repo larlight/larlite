@@ -21,8 +21,8 @@
 #ifndef ERTOOL_ALGOCCSIGNALE_H
 #define ERTOOL_ALGOCCSIGNALE_H
 
-#include "Algo/AlgoSingleE.h"
-#include "Base/AlgoBase.h"
+#include "ERTool/Algo/AlgoSingleE.h"
+#include "ERTool/Base/AlgoBase.h"
 
 namespace ertool {
 

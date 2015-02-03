@@ -16,6 +16,7 @@
 #define LARLITE_RAWDIGIT_H
 
 #include "data_base.h"
+#include "Base/RawConstants.h"
 #include <vector>
 #include <exception>
 namespace larlite{

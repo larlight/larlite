@@ -19,6 +19,7 @@
 #include "MCComp/MCMatchAlg.h"
 #include "ShowerCalo.h"
 #include "ShowerRecoException.h"
+#include <TH1D.h>
 namespace larlite {
   /**
      \class ComputePi0Mass

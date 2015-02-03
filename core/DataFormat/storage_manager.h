@@ -19,6 +19,7 @@
 #include <TError.h>
 #include "Base/larlite_base.h"
 #include "data_base.h"
+/*
 #include "trigger.h"
 #include "potsummary.h"
 #include "hit.h"
@@ -46,6 +47,39 @@
 #include "pfpart.h"
 #include "partid.h"
 #include "gtruth.h"
+*/
+namespace larlite {
+  class trigger;
+  class potsummary;
+  class event_hit;
+  class event_track;
+  class event_mctruth;
+  class event_gtruth;
+  class event_mcpart;
+  class event_mctree;
+  class event_user;
+  class event_spacepoint;
+  class event_rawdigit;
+  class event_wire;
+  class event_hit;
+  class event_cluster;
+  class event_shower;
+  class event_mcshower;
+  class event_mctrack;
+  class event_simch;
+  class event_calorimetry;
+  class event_vertex;
+  class event_endpoint2d;
+  class event_seed;
+  class event_cosmictag;
+  class event_opflash;
+  class event_ophit;
+  class event_mcflux;
+  class event_pfpart;
+  class event_partid;
+  class event_gtruth;
+}
+
 namespace larlite {
   /**
      \class storage_manager

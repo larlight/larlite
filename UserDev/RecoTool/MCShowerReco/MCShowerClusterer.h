@@ -79,13 +79,4 @@ namespace larlite {
   };
 }
 #endif
-
-//**************************************************************************
-// 
-// For Analysis framework documentation, read Manual.pdf here:
-//
-// http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
-//
-//**************************************************************************
-
 /** @} */ // end of doxygen group 

@@ -2,6 +2,10 @@
 #define RECOTOOL_MCSHOWERCLUSTERER_CXX
 
 #include "MCShowerClusterer.h"
+#include "DataFormat/mcshower.h"
+#include "DataFormat/simch.h"
+#include "DataFormat/cluster.h"
+#include "DataFormat/hit.h"
 //tmp debug
 #include <algorithm>
 

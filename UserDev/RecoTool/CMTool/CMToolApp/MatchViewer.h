@@ -17,7 +17,7 @@
 
 #include "ClusterViewerAlgo.h"
 #include "ClusterMatcher.h"
-//#include "McshowerLookback.h"
+#include "DataFormat/simch.h"
 
 namespace larlite{
   /**

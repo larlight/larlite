@@ -10,6 +10,7 @@
 #include "ComputePi0Mass.h"
 #include "ShowerQuality.h"
 #include "ShowerRecoManager.h"
+#include "HitCalibration.h"
 //ADD_NEW_HEADER ... do not change this comment line
 #include "ShowerRecoException.h"
 #include "ShowerCalo.h"
@@ -34,6 +35,7 @@ namespace larlite {
   class ShowerReco3D;
   class ComputePi0Mass;
   class ShowerQuality;
+  class HitCalibration;
 //ADD_ANA_CLASS ... do not change this comment line
 }
 

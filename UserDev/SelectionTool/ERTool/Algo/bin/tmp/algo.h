@@ -5,7 +5,7 @@
  * 
  * \brief Class def header for a class Algo_Class_Name
  *
- * @author kazuhiro
+ * @author Shell_User_Name
  */
 
 /** \addtogroup Working_Package
@@ -15,9 +15,9 @@
 #ifndef ERTOOL_ALGO_CLASS_NAME_H
 #define ERTOOL_ALGO_CLASS_NAME_H
 
-#include "Base/AlgoBase.h"
+#include "ERTool/Base/AlgoBase.h"
 
-namespace sptool {
+namespace ertool {
 
   /**
      \class Algo_Class_Name
@@ -37,7 +37,7 @@ namespace sptool {
     virtual void Reset();
 
     /// Function to evaluate input showers and determine a score
-    virtual PrticleSet Reconstruct(const EventData &data);
+    virtual ParticleSet Reconstruct(const EventData &data);
 
   };
 }

@@ -2,7 +2,8 @@
 #define RECOTOOL_SHOWERRECO3D_CXX
 
 #include "ShowerReco3D.h"
-
+#include "DataFormat/pfpart.h"
+#include "DataFormat/DataFormat-TypeDef.h"
 namespace larlite {
 
   ShowerReco3D::ShowerReco3D() : ana_base()

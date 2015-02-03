@@ -20,6 +20,7 @@
 #include <algorithm>
 #include "AlgoBase.h"
 #include "FilterBase.h"
+#include "AnaBase.h"
 #include <TStopwatch.h>
 namespace ertool {
 
@@ -79,8 +80,11 @@ namespace ertool {
     /// Filter setter
     void SetFilter(FilterBase* f);
 
+    /// Ana setter
+    void SetAna(AnaBase* a);
+
     /// Process input data
-    ParticleSet Process(EventData& data);
+    bool Process();
 
     /// Function to be called before Process()
     void Initialize();
@@ -91,6 +95,19 @@ namespace ertool {
     /// Function to reset things
     void Reset();
 
+    /// Function to clear data
+    void ClearData();
+
+    const ertool::EventData&   EventData     () const;
+    const ertool::EventData&   MCEventData   () const;
+    const ertool::ParticleSet& ParticleSet   () const;
+    const ertool::ParticleSet& MCParticleSet () const;
+
+    ertool::EventData&   EventDataWriteable     ();
+    ertool::ParticleSet& ParticleSetWriteable   ();
+    ertool::EventData&   MCEventDataWriteable   ();
+    ertool::ParticleSet& MCParticleSetWriteable ();
+
     /// Status getter
     ManagerStatus_t Status() const { return _status; }
 
@@ -100,19 +117,29 @@ namespace ertool {
     /// Profile mode
     bool _profile_mode;
 
+    /// Make MC info available to ana
+    bool _mc_for_ana;
+
   protected:
 
-    std::pair<double,double> _tprof_algo, _tprof_filter;
-    double _time_algo_init, _time_filter_init;
-    double _time_algo_finalize, _time_filter_finalize;
+    std::pair<double,double> _tprof_algo, _tprof_filter, _tprof_ana;
+    double _time_algo_init, _time_filter_init, _time_ana_init;
+    double _time_algo_finalize, _time_filter_finalize, _time_ana_finalize;
+
+    ertool::EventData _data;
+    ertool::EventData _mc_data;
+    ertool::ParticleSet _ps;
+    ertool::ParticleSet _mc_ps;
 
     TStopwatch fWatch;
 
     ManagerStatus_t _status;
 
+    FilterBase* _filter;
+
     AlgoBase* _algo;
 
-    FilterBase* _filter;
+    AnaBase* _ana;
 
   };
 }

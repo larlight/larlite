@@ -6,13 +6,8 @@ if len(sys.argv) < 2:
     msg += '\n'
     sys.stderr.write(msg)
     sys.exit(1)
-
-from ROOT import gSystem
-from ROOT import ertool
-ertool.Manager()
-from ROOT import larlite as fmwk
-fmwk.geo.PlaneID
-
+from seltool import ertool
+from larlite import larlite as fmwk
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
@@ -32,7 +27,9 @@ my_algo.Reset()
 
 my_filter = ertool.FilterFidVolume()
 
-my_ana = fmwk.CCSingleMuReco()
+my_ana = ertool.ERAnaCCSingleMu()
+
+my_anaunit = fmwk.CCSingleMuReco()
 # Set Producers
 # First Argument: True = MC, False = Reco
 my_ana.SetShowerProducer(True,"mcreco");
@@ -47,9 +44,14 @@ my_ana.SetVtxProducer(True,"generator");
 #my_ana.SetTrackProducer(False,"");
 #my_ana.SetVtxProducer(False,"");
 
-my_ana._mgr.SetAlgo(my_algo)
-my_ana._mgr.SetFilter(my_filter)
-my_proc.add_process(my_ana)
+# Attach ERTool wrapper
+my_anaunit._mgr.SetAlgo(my_algo)
+my_anaunit._mgr.SetFilter(my_filter)
+my_anaunit._mgr.SetAna(my_ana)
+my_anaunit._mgr._mc_for_ana=True
+my_proc.add_process(my_anaunit)
+
+# run
 my_proc.run()
 
 # done!

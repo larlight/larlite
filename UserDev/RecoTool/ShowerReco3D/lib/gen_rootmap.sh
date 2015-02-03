@@ -21,7 +21,7 @@ rootlibmap libRecoTool_ShowerReco3D.rootmap libRecoTool_ShowerReco3D.so $LARLITE
     libRecoTool_FANN.so \
     libRecoTool_CMToolApp.so \
     libRecoTool_AnalysisAlg.so \
-    libRecoTool_MCShowerBT.so \
+    libRecoTool_MCComp.so \
     libLArLite_Analysis.so
 
 

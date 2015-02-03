@@ -15,7 +15,7 @@
 #ifndef ERTOOL_ALGOPI0_H
 #define ERTOOL_ALGOPI0_H
 
-#include "Algo/AlgoEMPart.h"
+#include "ERTool/Algo/AlgoEMPart.h"
 #include <TH1D.h>
 #include <TH2D.h>
 #include <RooGaussian.h>

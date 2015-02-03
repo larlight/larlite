@@ -2,6 +2,7 @@
 #define MCBTALGCONSTANTS_H
 
 #include <limits>
+#include <climits>
 namespace btutil {
 
   /// Signifies invalid MCX index number

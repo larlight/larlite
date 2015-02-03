@@ -18,7 +18,9 @@
 #include <sstream>
 #include <TChain.h>
 #include <Base/Base-TypeDef.h>
-
+#include "Base/DataFormatConstants.h"
+#include "Base/FrameworkConstants.h"
+#include "Base/larlite_base.h"
 #include "LArUtilException.h"
 #include "LArUtilConstants.h"
 #include "LArUtilConfig.h"

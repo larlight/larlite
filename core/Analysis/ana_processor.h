@@ -14,10 +14,8 @@
 #ifndef LARLITE_ANA_PROCESSOR_H
 #define LARLITE_ANA_PROCESSOR_H
 
-#include <TFile.h>
 #include <vector>
 #include "ana_base.h"
-#include "DataFormat/storage_manager.h"
 
 namespace larlite {
   /**

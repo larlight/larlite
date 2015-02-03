@@ -5,7 +5,7 @@
  * 
  * \brief Class def header for a class Filter_Class_Name
  *
- * @author kazuhiro
+ * @author Shell_User_Name
  */
 
 /** \addtogroup Working_Package
@@ -15,7 +15,7 @@
 #ifndef ERTOOL_FILTER_CLASS_NAME_H
 #define ERTOOL_FILTER_CLASS_NAME_H
 
-#include "Base/FilterBase.h"
+#include "ERTool/Base/FilterBase.h"
 
 namespace ertool {
 
@@ -39,13 +39,5 @@ namespace ertool {
   };
 }
 #endif
-
-//**************************************************************************
-// 
-// For Analysis framework documentation, read Manual.pdf here:
-//
-// http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
-//
-//**************************************************************************
 
 /** @} */ // end of doxygen group 

@@ -15,15 +15,9 @@
 #ifndef LARLITE_ANA_BASE_H
 #define LARLITE_ANA_BASE_H
 
-#include <TFile.h>
-#include <TGraph.h>
-#include <TH1D.h>
-#include <TH2D.h>
-#include <TH3D.h>
-#include <TGraphErrors.h>
-
 #include "Base/larlite_base.h"
-#include "DataFormat/DataFormat-TypeDef.h"
+#include "DataFormat/storage_manager.h"
+//#include "DataFormat/DataFormat-TypeDef.h"
 
 namespace larlite {
   /**

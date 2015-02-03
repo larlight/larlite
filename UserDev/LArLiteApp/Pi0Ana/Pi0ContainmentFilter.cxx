@@ -2,7 +2,8 @@
 #define PI0CONTAINMENTFILTER_CXX
 
 #include "Pi0ContainmentFilter.h"
-
+#include "DataFormat/mctruth.h"
+#include "DataFormat/mcshower.h"
 namespace larlite {
 
   bool Pi0ContainmentFilter::initialize() {

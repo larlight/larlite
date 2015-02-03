@@ -15,7 +15,7 @@
 #ifndef ERTOOL_FILTERFIDVOLUME_H
 #define ERTOOL_FILTERFIDVOLUME_H
 
-#include "Base/FilterBase.h"
+#include "ERTool/Base/FilterBase.h"
 #include "GeoAlgo/GeoAABox.h"
 #include "GeoAlgo/GeoAlgo.h"
 #include "GeoAlgo/GeoHalfLine.h"

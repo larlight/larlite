@@ -5,53 +5,6 @@
 #ifndef DATAFORMAT_TYPEDEF_H
 #define DATAFORMAT_TYPEDEF_H
 
-// Header files included here
-#include <TVector3.h>
-#include <TMatrixD.h>
-#include <TLorentzVector.h>
-
-#include "DataFormatException.h"
-#include "larlite_dataformat_utils.h"
-#include "data_base.h"
-//#include "larlite_association.h"
-
-#include "potsummary.h"
-
-#include "rawdigit.h"
-
-#include "wire.h"
-#include "hit.h"
-#include "cluster.h"
-#include "cosmictag.h"
-#include "opflash.h"
-#include "ophit.h"
-#include "seed.h"
-#include "endpoint2d.h"
-#include "spacepoint.h"
-#include "track.h"
-#include "shower.h"
-#include "vertex.h"
-#include "calorimetry.h"
-#include "partid.h"
-#include "pfpart.h"
-
-#include "user_info.h"
-
-#include "gtruth.h"
-#include "mcshower.h"
-#include "mctrack.h"
-#include "mctrajectory.h"
-#include "mcpart.h"
-#include "mctree.h"
-#include "mcflux.h"
-#include "mcnu.h"
-#include "mctruth.h"
-#include "simch.h"
-
-#include "treenode.h"
-#include "trigger.h"
-
-#include "storage_manager.h"
 // Class forward declaration here
 
 namespace larlite{

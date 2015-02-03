@@ -1,0 +1,6 @@
+#ifndef REPOSITORYNAME_PACKAGE_NAME_SAMPLE_CXX
+#define REPOSITORYNAME_PACKAGE_NAME_SAMPLE_CXX
+
+#include "sample.h"
+
+#endif

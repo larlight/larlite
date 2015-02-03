@@ -6,7 +6,7 @@
  * \brief This Algo returns a SPArticleSet of single electrons that are \n
           start-point isolated from other single electrons.
  *
- * @author kazuhiro + davidkaleko
+ * @author kazuhiro + davidkaleko + davidc
  */
 
 /** \addtogroup ERTool
@@ -16,9 +16,10 @@
 #ifndef ERTOOL_ALGOSINGLEE_H
 #define ERTOOL_ALGOSINGLEE_H
 
-#include "Algo/AlgoEMPart.h"
-#include "Algo/AlgoFindRelationship.h"
-#include "Base/AlgoBase.h"
+#include "ERTool/Algo/AlgoEMPart.h"
+#include "ERTool/Algo/AlgoFindRelationship.h"
+#include "ERTool/Base/AlgoBase.h"
+#include "GeoAlgo/GeoAlgo.h"
 
 namespace ertool {
 
@@ -52,6 +53,17 @@ namespace ertool {
 
     /// Set verbosity
     void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); }
+    
+    /// Use EMPart
+    void useEMPart(bool on) { _useEMPart = on; }
+
+    void setVtxToTrkStartDist(double d) { _vtxToTrkStartDist = d; }
+    void setVtxToTrkDist(double d) { _vtxToTrkDist = d; }
+    void setVtxToShrStartDist(double d) { _vtxToShrStartDist = d; }
+    void setMaxIP(double d) { _maxIP = d; }
+
+    /// clear tree
+    void ClearTree();
 
   private:
 
@@ -73,15 +85,56 @@ namespace ertool {
 
     // verbose flag
     bool _verbose;
-
+    // electron mass
     double _e_mass;
+    // flag to decide whether to use EMPart or not
+    // if True -> use only showers reco as PDG == 11
+    // if False -> use all showers
+    bool _useEMPart;
 
+    // constants to be used for decision-making
+    // minimum distance that a reco-vertex must be away from the
+    // start of a track for the vtx to be considered "on the track"
+    // and the shower to come from the track, instead of the shower
+    // and track being siblings.
+    double _vtxToTrkStartDist;
+    // maximum distance from the entire track for the reco-vertex
+    // for the vertex to be considered on the track and the shower
+    // to be considered as coming from the track
+    double _vtxToTrkDist;
+    // Max distance from shower start that the vertex can be
+    // this value should be a few radiation lengths: the cut 
+    // is placed to remove cases where the shower is meters
+    // away from the vertex. Probably an accidental correlation
+    double _vtxToShrStartDist;
+    // Maximum impact parameter allowed between the two objects
+    // if larger it means that the two lines/segments do not come
+    // within this value at any point and they therefore are 
+    // assumed to not be correlated
+    double _maxIP;
+
+    // Other algorithms to use
     AlgoEMPart _alg_emp;
     AlgoFindRelationship _findRel;
+    // GeoAlgo Tool
+    ::geoalgo::GeoAlgo _geoAlgo;
 
     //debug histos
     TH1F* _e_ll_values;
     TH1F* _dedx_values;
+
+    //Tree -> one entry per shower-other comparison
+    // therefore possibly multiple entries for each shower
+    TTree* _alg_tree;
+    double _E; // energy of shower
+    int    _PDG; // PDG code assigned by AlgoEMPart
+    int    _VsTrack; // comparing vs track (==1)
+    double _thatE; // Energy of other shower/track
+    double _dEdx;
+    double _IP; // Impact Paramter with other object
+    double _IPthisStart; // distance from IP to this shower start point
+    double _IPthatStart; // distance from IP to that shower/track start point
+    double _IPtrkBody; // distance from IP to body of track (if comparing with track)
   };
 }
 #endif

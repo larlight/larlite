@@ -20,6 +20,10 @@ namespace ertool {
     _e_mass = TDatabasePDG().GetParticle(11)->Mass();
     _g_mass = TDatabasePDG().GetParticle(22)->Mass();
 
+    //if training mode clear params
+    //if (_training_mode)
+    //  _params.clear_data();
+
     std::string part_name;
 
     //
@@ -64,39 +68,45 @@ namespace ertool {
     SetFitRange_dEdx(0,10,false);
 
     // Electron PDFs
-    var = (RooRealVar*)(_e_radLenPdf->getVariables()->find("e_radLen_tau"));
-    var->setVal   ( -2.e3        );
-    var->setRange ( -1.e4, -1.e2 );
-
-    var  = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_dEdxGaus_mean"));
-    var->setVal   ( 2.0      );
-    var->setRange ( 1.0, 3.0 );
-
-    var = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_dEdxGaus_sigma"));
-    var->setVal   ( 1.0      );
-    var->setRange ( 0.0, 2.0 );
-
-    // Gamma PDFs
-    var = (RooRealVar*)(_g_radLenPdf->getVariables()->find("g_radLen_tau"));
-    var->setVal   ( -0.05        );
-    var->setRange ( -0.10, -0.01 );
-
-    var = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_mean"));
-    var->setVal   ( 4.0      );
-    var->setRange ( 3.0, 5.0 );
-
-    var = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_mean_low"));
-    var->setVal   ( 2.0      );
-    var->setRange ( 1.0, 3.0 );
-
-    var = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_sigma"));
-    var->setVal   ( 1.0      );
-    var->setRange ( 0.0, 2.0 );
-
-    var = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_sigma_low"));
-    var->setVal   ( 1.0      );
-    var->setRange ( 0.0, 2.0 );
-
+    if (!_mode){
+      var = (RooRealVar*)(_e_radLenPdf->getVariables()->find("e_radLen_tau"));
+      var->setVal   ( -2.e3        );
+      var->setRange ( -1.e4, -1.e2 );
+      
+      var  = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_dEdxGaus_mean"));
+      var->setVal   ( 2.0      );
+      var->setRange ( 1.0, 3.0 );
+      
+      var = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_dEdxGaus_sigma"));
+      var->setVal   ( 1.0      );
+      var->setRange ( 0.0, 2.0 );
+    }
+    if (_mode){
+      // Gamma PDFs
+      var = (RooRealVar*)(_g_radLenPdf->getVariables()->find("g_radLen_tau"));
+      var->setVal   ( -0.05        );
+      var->setRange ( -0.10, -0.01 );
+      
+      var = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_mean"));
+      var->setVal   ( 4.0      );
+      var->setRange ( 3.0, 5.0 );
+      
+      var = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_mean_low"));
+      var->setVal   ( 4.0      );
+      var->setRange ( 3.0, 5.0 );
+      
+      var = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_sigma"));
+      var->setVal   ( 1.0      );
+      var->setRange ( 0.0, 2.0 );
+      
+      var = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_sigma_low"));
+      var->setVal   ( 1.0      );
+      var->setRange ( 0.0, 2.0 );
+      
+      var = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_fraction"));
+      var->setVal   ( 0.0      );
+      var->setRange ( 0.0, 0.0 );
+    }
   }
 
   void AlgoEMPart::LoadParams(std::string fname,size_t version)
@@ -361,19 +371,20 @@ namespace ertool {
       _params.append(Form("%s_params",part_letter.c_str()),sigma->getVal());
       std::cout << "["<<__FUNCTION__<<"] "
 		<< "dEdx: Mean: " << mean->getVal() << " Sigma: " << sigma->getVal() << std::endl;
-
-      // in case od double-gaussian
-      mean  = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_dEdxGaus_mean_low",part_letter.c_str())));
-      sigma = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_dEdxGaus_sigma_low",part_letter.c_str())));
-      if(mean) {
-	RooRealVar* frac = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_dEdxGaus_fraction",part_letter.c_str())));
-	_params.append(Form("%s_params",part_letter.c_str()),mean->getVal());
-	_params.append(Form("%s_params",part_letter.c_str()),sigma->getVal());
-	_params.append(Form("%s_params",part_letter.c_str()),frac->getVal());
-	std::cout << "["<<__FUNCTION__<<"] "
-		  << "dEdx: Low Mean: " << mean->getVal() 
-		  << " Low Sigma: "     << sigma->getVal() 
-		  << " ... Fraction = " << 1. - frac->getVal() << std::endl;
+      if (_mode){
+	// in case od double-gaussian
+	mean  = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_dEdxGaus_mean_low",part_letter.c_str())));
+	sigma = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_dEdxGaus_sigma_low",part_letter.c_str())));
+	if(mean) {
+	  RooRealVar* frac = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_dEdxGaus_fraction",part_letter.c_str())));
+	  _params.append(Form("%s_params",part_letter.c_str()),mean->getVal());
+	  _params.append(Form("%s_params",part_letter.c_str()),sigma->getVal());
+	  _params.append(Form("%s_params",part_letter.c_str()),frac->getVal());
+	  std::cout << "["<<__FUNCTION__<<"] "
+		    << "dEdx: Low Mean: " << mean->getVal() 
+		    << " Low Sigma: "     << sigma->getVal() 
+		    << " ... Fraction = " << 1. - frac->getVal() << std::endl;
+	}
       }
 
     }// if in traning mode
