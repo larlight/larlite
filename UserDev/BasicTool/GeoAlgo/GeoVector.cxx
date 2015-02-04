@@ -60,6 +60,10 @@ namespace geoalgo {
     return _Cross_(obj);
   }
 
+  double Vector::Phi() const {
+    return (*this)[0] == 0.0 && (*this)[1] == 0.0 ? 0.0 : atan2((*this)[1],(*this)[0]);
+  }
+  
   double Vector::Angle(const Vector &obj) const {
     compat(obj);
     if(size()!=2 && size()!=3)
