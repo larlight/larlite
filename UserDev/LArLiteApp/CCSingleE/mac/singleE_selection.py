@@ -18,7 +18,7 @@ my_proc.enable_filter(True)
 
 # Create algorithm
 my_algo = ertool.AlgoSingleE()
-my_algo.useEMPart(False)
+my_algo.useEMPart(True)
 my_algo.setVerbose(False)
 my_algo.setVtxToTrkStartDist(3)
 my_algo.setVtxToTrkDist(5)
@@ -28,7 +28,7 @@ my_algo.setMaxIP(3)
 
 # Create Filter
 MCfilter = fmwk.MC_CC1E_Filter();
-
+MCfilter.flip(True)
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):

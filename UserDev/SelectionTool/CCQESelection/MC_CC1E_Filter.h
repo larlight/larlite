@@ -16,7 +16,7 @@
 #define LARLITE_MC_CC1E_FILTER_H
 
 #include "Analysis/ana_base.h"
-
+#include "DataFormat/mctruth.h"
 namespace larlite {
   /**
      \class MC_CC1E_Filter
@@ -27,7 +27,7 @@ namespace larlite {
   public:
 
     /// Default constructor
-    MC_CC1E_Filter(){ _name="MC_CC1E_Filter"; _fout=0;};
+    MC_CC1E_Filter(){ _name="MC_CC1E_Filter"; _fout=0; _flip=false;};
 
     /// Default destructor
     virtual ~MC_CC1E_Filter(){};
@@ -47,10 +47,15 @@ namespace larlite {
     */
     virtual bool finalize();
 
+    void flip(bool on) { _flip = on; }
+
     protected:
 
     size_t total_events;
     size_t kept_events;
+
+    // boolean to flip logical operation of algorithm
+    bool _flip;
     
   };
 }

@@ -69,11 +69,11 @@ my_anaunit._mgr.SetAna(my_ana)
 my_anaunit._mgr._mc_for_ana = True
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
-#my_anaunit.SetShowerProducer(True,"mcreco");
+my_anaunit.SetShowerProducer(True,"mcreco");
 my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetVtxProducer(True,"generator");
 #my_anaunit.SetShowerProducer(False,"mergeall");
-my_anaunit.SetShowerProducer(False,"showerreco");
+#my_anaunit.SetShowerProducer(False,"showerreco");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 # ************************************************
 my_proc.add_process(MCfilter)
@@ -98,6 +98,9 @@ while (counter < 1000):
     data_mc   = my_anaunit.GetData(True)
     part_mc   = my_anaunit.GetParticles(True)
     display_mc.add(part_mc, data_mc, False)
+
+    for x in xrange(part_mc.size()):
+        print part_mc[x].Diagram()
 
     display_reco.show()
     display_mc.show()

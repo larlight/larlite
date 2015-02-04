@@ -9,8 +9,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class ertool::ERAnaSingleE+;
-#pragma link C++ class ertool::ERAnaToy+;
+#pragma link C++ class larlite::MC_CCnumu_Filter+;
 //ADD_NEW_CLASS ... do not change this line
-
 #endif
+

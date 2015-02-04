@@ -47,6 +47,11 @@ namespace ertool {
 
     TTree* _ana_tree;
     int _singleRECO, _singleMC;
+    int _RECOshowers, _RECOtracks;
+    int _MCelectrons, _MCgammas;
+
+    int _numEvts;
+    int _singleE;
 
   };
 }

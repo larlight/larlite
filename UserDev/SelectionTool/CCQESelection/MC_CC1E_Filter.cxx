@@ -24,10 +24,13 @@ namespace larlite {
     }
 
     total_events++;
+
+    bool ret = true;
     
     //Enforce CC interaction channel
-    if( ev_mctruth->at(0).GetNeutrino().CCNC() != 0 ) return false;
-
+    if( ev_mctruth->at(0).GetNeutrino().CCNC() != 0 )
+      ret = false;
+    
     //Enforce that there is exactly 1 electron, above 20MeV kinetic energy
     //I don't care about neutrons, weird quarks, the neutrino, etc.
     size_t n_electrons = 0;
@@ -45,12 +48,17 @@ namespace larlite {
     }
 
     if( n_electrons != 1 )
-      return false;
+      ret = false;
 
     
-    //If you get here, the event has 1 good electron and 1 good proton.
-    kept_events++;
-    return true;  
+    //check the status of the ret variable
+    if (ret && !_flip)
+      kept_events++;
+    if (!ret && _flip)
+      kept_events++;
+    if (_flip)
+      return (!ret);
+    return ret;  
   }
 
   bool MC_CC1E_Filter::finalize() {
