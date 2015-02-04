@@ -20,6 +20,7 @@
 #include "GeoAlgo/GeoAlgo.h"
 #include "GeoAlgo/GeoHalfLine.h"
 #include <TH1D.h>
+#include <TH2D.h>
 namespace ertool {
 
   /**
@@ -45,7 +46,8 @@ namespace ertool {
     
   protected:
 
-    TH1D *hPerpDist, *hProjDist;
+    TH1D *hPerpDist, *hProjDist, *hPerpDistXBoundary, *hPerpDistYBoundary, *hPerpDistZBoundary, *hTrackLength, *hTrackPhi, *hTrackTheta, *hLongestTrackLength, *hMuonTrackLength, *hMuonTrackPhi;
+    TH2D *hPerpDistVsTrackLength, *hProjDistVsTrackLength;
     ::geoalgo::AABox fTPC;
     ::geoalgo::GeoAlgo fGeoAlgo;
   };

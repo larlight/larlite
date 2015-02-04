@@ -32,17 +32,17 @@ my_ana = ertool.ERAnaCCSingleMu()
 my_anaunit = fmwk.CCSingleMuReco()
 # Set Producers
 # First Argument: True = MC, False = Reco
-my_anaunit.SetShowerProducer(True,"mcreco");
-my_anaunit.SetTrackProducer(True,"mcreco");
-my_anaunit.SetVtxProducer(True,"generator");
+my_ana.SetShowerProducer(True,"mcreco");
+#my_ana.SetTrackProducer(True,"mcreco");
+#my_ana.SetTrackProducer(False,"pandoraNuKHit");
+my_ana.SetTrackProducer(False,"pandoraCosmicKHit");
+my_ana.SetVtxProducer(True,"generator");
 
-#my_anaunit.SetShowerProducer(False,"showerreco");
-#my_anaunit.SetTrackProducer(False,"");
-#my_anaunit.SetVtxProducer(False,"");
 
-# Enable filter mode & attach signal filter
-my_proc.enable_filter(True)
-my_proc.add_process(fmwk.CCSingleMuFilter())
+
+#my_ana.SetShowerProducer(False,"showerreco");
+#my_ana.SetTrackProducer(False,"");
+#my_ana.SetVtxProducer(False,"");
 
 # Attach ERTool wrapper
 my_anaunit._mgr.SetAlgo(my_algo)
