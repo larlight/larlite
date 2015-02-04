@@ -973,6 +973,45 @@ namespace geoalgo {
     HalfLine_t lin2(trj.front(),trj.back()-trj.front());
     return _commonOrigin_(lin, lin2, origin, backwards);
   }
+
+
+  /// Bounding Sphere problem
+  /// Real-Time Collision Analysis 4.3.5 (Pg. 100) - WelzlSphere
+  Sphere_t GeoAlgo::_boundingSphere_(const std::vector<Point_t>& pts) const
+  {
+    // if 4 or less points call appropriate constructor
+    if (pts.size() < 5)
+      return Sphere_t(pts);
+    
+    // too many points to call simple constructor! find minimally bounding sphere
+    // compute sphere for first 4 points
+    //Sphere_t tmpSphere(pts[0],pts[1],pts[2],pts[3]);
+    std::vector<Point_t> sosPoints;
+    sosPoints.clear();
+
+    return _WelzlSphere_(pts,pts.size(),sosPoints);
+  }
+
+
+  Sphere_t GeoAlgo::_WelzlSphere_(const std::vector<Point_t>& pts,
+				  int numPts,
+				  std::vector<Point_t> sosPts) const
+  {
+
+    if (numPts == 0){
+      return Sphere_t(sosPts);
+    }
+    // choose last point in the input set as the one to test (if it fits in current sphere or not)
+    int index = numPts-1;
+    // recursively compute the smallest bounding sphere of the remaining points
+    Sphere_t smallestSphere = _WelzlSphere_(pts, numPts-1, sosPts);
+    // if the selected point lies inside this sphere, it is indeed the smallest
+    if ( smallestSphere.Contain(pts[index]) )
+      return smallestSphere;
+    // otherwise, update the set-of-support to additionally contain the new point
+    sosPts.push_back(pts[index]);
+    return _WelzlSphere_(pts, numPts-1, sosPts);
+  }
   
 }
 #endif

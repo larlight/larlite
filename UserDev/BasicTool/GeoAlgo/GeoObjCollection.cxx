@@ -13,12 +13,14 @@ namespace geoalgo {
     _trj_v.clear();
     _lin_v.clear();
     _cone_v.clear();
+    _sphere_v.clear();
     _pt_col.clear();
     _box_col.clear();
     _seg_col.clear();
     _trj_col.clear();
     _lin_col.clear();
     _cone_col.clear();
+    _sphere_col.clear();
     _labels.clear();
   }
 
@@ -88,6 +90,15 @@ namespace geoalgo {
     _AddLabel_(cone.Start()+cone.Dir()*cone.Length(),name);
     _cone_v.push_back(cone);
     _cone_col.push_back(c);
+  }
+
+
+  void GeoObjCollection::Add(const Sphere_t& sphere, std::string name, std::string c)
+  {
+    if(name.empty()) name = Form("Sphere (%zu)",_sphere_v.size());
+    _AddLabel_(sphere.Origin(),name);
+    _sphere_v.push_back(sphere);
+    _sphere_col.push_back(c);
   }
 
 }

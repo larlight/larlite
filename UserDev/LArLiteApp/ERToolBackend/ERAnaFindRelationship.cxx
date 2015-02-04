@@ -59,8 +59,8 @@ namespace larlite {
 	if (!isPi0){
 	  ::ertool::Shower shower1 = data.Shower(s1);
 	  ::ertool::Shower shower2 = data.Shower(s2);
-	  isPi0 = _findRel.haveCommonOrigin(shower1,shower2,Pi0Vtx);
-	  if (isPi0){
+	  //isPi0 = _findRel.haveCommonOrigin(shower1,shower2,Pi0Vtx);
+	  if (1){
 	    ::ertool::Particle gamma1(22,0.);
 	    gamma1.Vertex(shower1.Start());
 	    gamma1.Momentum(shower1.Dir()*shower1._energy);
@@ -95,11 +95,13 @@ namespace larlite {
       // compare tracks with Pi0 and find common matches
       // only find one...we want one muon + Pi0 only!
       ::ertool::Track track = data.Track(t1);
+      /*
       if (_findRel.haveCommonOrigin(track,pi0Segment,EvtVtx)){
 	muons += 1;
 	muonIdx = t1;
 	muonTrk = track;
       }
+      */
     }//first loop
 
     if (muons == 1){
