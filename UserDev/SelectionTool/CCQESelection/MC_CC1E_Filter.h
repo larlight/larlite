@@ -47,7 +47,7 @@ namespace larlite {
     */
     virtual bool finalize();
 
-    void Fil(bool on) { _flip = on; }
+    void flip(bool on) { _flip = on; }
 
     protected:
 

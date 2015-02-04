@@ -51,8 +51,11 @@ namespace larlite {
       ret = false;
 
     
-    //If you get here, the event has 1 good electron and 1 good proton.
-    kept_events++;
+    //check the status of the ret variable
+    if (ret && !_flip)
+      kept_events++;
+    if (!ret && _flip)
+      kept_events++;
     if (_flip)
       return (!ret);
     return ret;  
