@@ -267,8 +267,8 @@ class GeoViewer(object):
             self._add_trajectory(self._holder.Trajectory()[x], self._holder.TrajectoryColor()[x])
         for x in xrange(len(self._holder.Cone())):
             self._add_cone(self._holder.Cone()[x], self._holder.ConeColor()[x])
-        for x in xrange(len(self._holder.Sphere())):
-            self._add_sphere(self._holder.Sphere()[x], self._holder.SphereColor()[x])
+        #for x in xrange(len(self._holder.Sphere())):
+        #    self._add_sphere(self._holder.Sphere()[x], self._holder.SphereColor()[x])
         for x in self._converter.Convert(self._holder.Labels()):
             self._add_label(x)
 

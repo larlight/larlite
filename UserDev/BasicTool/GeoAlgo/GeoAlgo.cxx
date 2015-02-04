@@ -848,7 +848,7 @@ namespace geoalgo {
     Point_t pt1(lin1.Pt1().size());
     Point_t pt2(lin2.Pt1().size());
 
-    double IP = _SqDist_(lin1, lin2, pt1, pt2);
+    //double IP = _SqDist_(lin1, lin2, pt1, pt2);
     origin = (pt1+pt2)/2.;
 
     // If origin coincides with lin1 start
@@ -904,7 +904,7 @@ namespace geoalgo {
     Point_t pt1(lin1.Start().size());
     Point_t pt2(lin2.Start().size());
 
-    double IP = _SqDist_(lin1Back, lin2Back, pt1, pt2);
+    //double IP = _SqDist_(lin1Back, lin2Back, pt1, pt2);
     origin = (pt1+pt2)/2.;
 
     // If origin coincides with lin1 start
@@ -991,7 +991,6 @@ namespace geoalgo {
 
     return _WelzlSphere_(pts,pts.size(),sosPoints);
   }
-
 
   Sphere_t GeoAlgo::_WelzlSphere_(const std::vector<Point_t>& pts,
 				  int numPts,

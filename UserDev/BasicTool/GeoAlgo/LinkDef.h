@@ -30,6 +30,8 @@
 #pragma link C++ class std::vector<geoalgo::Cone>+;
 #pragma link C++ class geoalgo::Sphere+;
 #pragma link C++ class std::vector<geoalgo::Sphere>+;
+#pragma link C++ class std::pair<geoalgo::Vector,string>+;
+#pragma link C++ class std::map<geoalgo::Vector,string>+;
 
 #pragma link C++ class geoalgo::GeoAlgo+;
 #pragma link C++ class geoalgo::GeoObjCollection+;
