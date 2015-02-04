@@ -79,112 +79,67 @@ namespace geoalgo {
 	// at the sphere's origin
 	
 	// check if collinear. If so return exception
-	Vector_t AB(A-B);
-	Vector_t AC(A-C);
-	Vector_t BC(B-C);
+	Vector_t AB(B-A);
+	Vector_t AC(C-A);
+	Vector_t BC(C-B);
+
+	double dABAB = AB.Dot(AB);
+	double dACAC = AC.Dot(AC);
+	double dABAC = AB.Dot(AC);
+
+	double d = dABAB * dACAC - dABAC * dABAC;
+	double s,t;
 	
-	// first try simple way. If longest segment can be taken as diameter
-	double lenAB = AB.Length();
-	double lenAC = AC.Length();
-	double lenBC = BC.Length();
-	
-	bool success = false;
-	if ( (lenAB > lenAC) && (lenAB > lenBC) ){
-	  // lenAB -> try with AB the diameter
-	  // try and see if midpoint closer to point C then 1/2 of lenAB.
-	  // if so midpoint origin & 1/2 lenAB is radius
-	  Point_t midAB((A+B)/2.);
-	  if ( midAB.Dist(C) < 0.5*lenAB ){
-	    _origin = midAB;
-	    _radius = 0.5*lenAB;
-	    success = true;
+	// if d == 0 they lie on one line
+	if (d == 0){
+	  std::cout << "d is 0!" << std::endl;
+	  double lenAB = AB.Length();
+	  double lenAC = AC.Length();
+	  double lenBC = BC.Length();
+	  // which segment is longest?
+	  if ( (lenAB > lenAC) && (lenAB > lenBC) ){
+	    _origin = (A+B)/2.;
+	    _radius = _origin.Dist(A);
 	  }
-	}
-	else if (lenAC > lenBC){
-	  // try with AC the diameter
-	  Point_t midAC((A+C)/2.);
-	  if ( midAC.Dist(B) < 0.5*lenAC ){
-	    _origin = midAC;
-	    _radius = 0.5*lenAC;
-	    success = true;
+	  else if( lenAC > lenBC ){
+	    _origin = (A+C)/2.;
+	    _radius = _origin.Dist(A);
 	  }
-	}
+	  else{
+	    _origin = (B+C)/2;
+	    _radius = _origin.Dist(B);
+	  }
+	}// if d == 0
+	    
 	else{
-	  // try with BC the diameter
-	  Point_t midBC((B+C)/2.);
-	  if ( midBC.Dist(A) < 0.5*lenBC ){
-	    _origin = midBC;
-	    _radius = 0.5*lenBC;
-	    success = true;
+	  std::cout << "d not == 0!" << std::endl;
+	  s = 0.5 * ( dABAB * dACAC - dACAC * dABAC ) / d;
+	  t = 0.5 * ( dACAC * dABAB - dABAB * dABAC ) / d;
+	  
+	  // if s & t both > 0 && 1-s-t also > 0 then P = A + s*(B-A) + t*(C-A) is the origin
+	  if ( (s > 0) && (t > 0) && ((1-s-t) > 0) ){
+	    _origin = A+(B-A)*s+(C-A)*t;
+	    _radius = _origin.Dist(A);
 	  }
-	}
-	
-	if (!success){
-	  
-	  
-	  if ( ((AB.Dot(AC))/(AB.Length()*AC.Length()) == 1) || ((AB.Dot(AC))/(AB.Length()*AC.Length()) == -1) )
-	    throw GeoAlgoException("Thre points are collinear: cannot construct a sphere!");
-	  
-	  // Find vectors normal to AB and AC passing through
-	  // midpoints of AB and AC.
-	  // Given AB the bi-sector of interest needs to lie
-	  // in the plane of the triangle
-	  // first find vector perpendicular to AB (1 constraint, still inifite number)
-	  // this vector has to be perpendicular to the AB X AC cross-product
-	  // second constraint. Then we have our direction (normalizing imposes 3rd constraint)
-	  Vector_t Cross = AB.Cross(AC); // cross-product vector
-	  Cross.Normalize();
-	  // find X, Y, Z of the perpendicualr bi-sector to AB
-	  // choose x randomly
-	  double x = 1;
-	  double y,z;
-	  // Solve for Bisector.y and Bisector.z
-	  // AB.x * Bisector.x + AB.y * Bisectory.y + AB.z * Bisector.z = 0
-	  // cross.x * Bisector.x + cross.y * Bisectory.y + cross.z * Bisector.z = 0
-	  double denom = (AB[1] * Cross[2]) - (Cross[1] * AB[2]);
-	  if (denom == 0)
-	    throw GeoAlgoException("divide by 0 in GeoSphere! Fix Me!");
-	  z = x * ( (AB[0] * Cross[1]) - (AB[1] * Cross[0]) ) / denom;
-	  if (AB[1] ==0)
-	    throw GeoAlgoException("divide by 0 in GeoSphere! Fix Me!");
-	  y = ((AB[0] * x) + (AB[2] * z))/(-AB[1]);
-	  // get bi-sector direction for AB
-	  Vector_t ABbisector(x,y,z);
-	  ABbisector.Normalize();
-	  Vector_t ABnorm = AB/AB.Length();
-	  // Do the same for the AC bisector
-	  denom = ( (AC[2] * Cross[1]) - (Cross[2] * AC[1]) );
-	  if (denom == 0)
-	    throw GeoAlgoException("divide by 0 in GeoSphere! Fix Me!");
-	  z = x * ( (AC[1] * Cross[0]) - (AC[0] * Cross[1]) ) / denom;
-	  if (AC[1] == 0)
-	    throw GeoAlgoException("divide by 0 in GeoSphere! Fix Me!");
-	  y = ((AC[0] * x) + (AC[2] * z))/(-AC[1]);
-	  // get bi-sector direction for AB
-	  Vector_t ACbisector(x,y,z);
-	  ACbisector.Normalize();
-	  Vector_t ACnorm = AC/AC.Length();
-	  // Find the intersection of the bisectors - This is the circle origin
-	  // Midpoints on two segments:
-	  Point_t ABmidpoint = (A+B)/2.;
-	  Point_t ACmidpoint = (A+C)/2.;
-	  // O = ABmidpoint + ABbisector * t1 ;
-	  // O = ACmidpoint + ACbisector * t2 ;
-	  // 6 eqations -> solve
-	  denom = (ACbisector[1]*ABbisector[0]-ABbisector[1]*ACbisector[0]);
-	  if (denom == 0)
-	    throw GeoAlgoException("divide by 0 in GeoSphere! Fix Me!");
-	  double t2 = ( (ABbisector[0] * (ABmidpoint[1]-ACmidpoint[1]))
-			+ (ABbisector[1] * (ACmidpoint[0]-ABmidpoint[0])) ) / denom;
-	  Point_t O = ACmidpoint + ACbisector*t2;
-	  _origin = O;
-	  // radius is distance from O to any of the points
-	  _radius = _origin.Dist(A);
-	  // to debug cout all distances
-	  //std::cout << "Dist OA: " << _origin.Dist(A) << "\tDist OB: " << _origin.Dist(B) << "\tDist OC: " << _origin.Dist(C) << std::endl;
-	  
-	}// if no success
-	
+
+	  // otherwise only one will be negative. The side it belongs on will be
+	  // the longest side and will determine the side to take as diameter
+	  else if (s <= 0){
+	    // side AB is the one
+	    _origin = (A+C)/2.;
+	    _radius = _origin.Dist(A);
+	  }
+	  else if (t <= 0){
+	    // AC is the side
+	    _origin = (A+B)/2.;
+	    _radius = _origin.Dist(A);
+	  }
+	  else{
+	    _origin = (B+C)/2;
+	    _radius = _origin.Dist(B);
+	  }
+	}// else (if d not equal to 0)
+
       }
 
 
