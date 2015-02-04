@@ -33,7 +33,7 @@ namespace geoalgo {
   public:
     
     /// Default constructor
-    GeoObjCollection(){ Clear(); }
+    GeoObjCollection();
     
     /// Default destructor
     virtual ~GeoObjCollection(){}

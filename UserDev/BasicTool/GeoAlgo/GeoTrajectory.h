@@ -28,96 +28,52 @@ namespace geoalgo {
 
   public:
     
-    /// Ctor to specify # points and dimension of each point
-    Trajectory(size_t npoints=0, size_t ndimension=0) : std::vector<geoalgo::Point_t>(npoints, Point_t(ndimension))
-    {}
-
-    /// Ctor using a vector of mere vector point expression
-    Trajectory(const std::vector<std::vector<double> > &obj)
-    {
-      this->reserve(obj.size());
-      for(auto const& p : obj) this->push_back(Point_t(p));
-    }
-
-    /// Ctor using a vector of point
-    Trajectory(const std::vector<geoalgo::Point_t> &obj)
-    {
-      this->reserve(obj.size());
-      for(auto const& p : obj) this->push_back(p);
-    }
+    /// Default ctor to specify # points and dimension of each point
+    Trajectory(size_t npoints=0, size_t ndimension=0);
 
     /// Default dtor
     virtual ~Trajectory(){}
 
-    /// Returns the cumulative distance along all trajectory points
-    double Length() const {
+    /// Alternative ctor (0) using a vector of mere vector point expression
+    Trajectory(const std::vector<std::vector<double> > &obj);
 
-      if(size()<2) return 0;
+    /// Alternative ctor (1) using a vector of point
+    Trajectory(const std::vector<geoalgo::Point_t> &obj);
 
-      double length = 0;
-      for(size_t i=0; i<size()-1; ++i) 
+    //
+    // Getters
+    //
+    double Length()        const; ///< The summed-length along all trajectory points
+    Vector Dir(size_t i=0) const; ///< The direction at a specified trajectory point
 
-	length += _Dir_(i).Length();
-      
-      return length;
-    }
+    //
+    // Setters
+    //
+    void push_back(const Point_t& obj); ///< push_back overrie w/ dimensionality check 
 
-    /// push_back overrie w/ dimensionality check 
-    void push_back(const Point_t& obj) {
-      compat(obj); 
-      if (!(size() && obj == (*rbegin())))
-	std::vector<geoalgo::Point_t>::push_back(obj);
-    }
+    inline Trajectory& operator+=(const Point_t& rhs)
+    { push_back(rhs); return *this; }
 
+    //
+    // utility
+    //
+    void compat(const Point_t& obj)    const; ///< Dimensionality check function w/ Trajectory
+    void compat(const Trajectory &obj) const; ///< Dimensionality check function w/ Point_t
+
+  protected:
+
+    /// Returns a direction vector at a specified trajectory point w/o size check
+    Vector _Dir_(size_t i) const;
+
+  public:
+
+    //
+    // templates
+    //
     /// push_back template
     template <class T>
     void push_back(const T& obj) 
     { Point_t pt(obj); push_back(pt); }
-
-    /// Dimensionality check function w/ Trajectory
-    void compat(const Point_t& obj) const {
-
-      if(!size()) return;
-      if( (*(this->begin())).size() != obj.size() ) {
-
-	std::ostringstream msg;
-	msg << "<<" << __FUNCTION__ << ">>"
-	    << " size mismatch: "
-	    << (*(this->begin())).size() << " != " << obj.size() << std::endl;
-	throw GeoAlgoException(msg.str());
-      }
-    }
-
-    /// Dimensionality check function w/ Point_t
-    void compat(const Trajectory &obj) const {
-
-      if(!size() || !(obj.size())) return;
-
-      if( (*(this->begin())).size() != (*obj.begin()).size() ) {
-
-	std::ostringstream msg;
-	msg << "<<" << __FUNCTION__ << ">>"
-	    << " size mismatch: "
-	    << (*(this->begin())).size() << " != " << (*obj.begin()).size() << std::endl;
-	throw GeoAlgoException(msg.str());
-
-      }
-    }
-
-    /// Returns a direction vector at a specified trajectory point
-    Vector Dir(size_t i=0) const {
-
-      if(size() < (i+2)) {
-	std::ostringstream msg;
-	msg << "<<" << __FUNCTION__ << ">>"
-	    << " length=" << size() << " is too short to find a direction @ index=" << i << std::endl;
-	throw GeoAlgoException(msg.str());
-      }
-      return _Dir_(i);
-    }
-
-    Trajectory& operator+=(const Point_t& rhs)
-    { push_back(rhs); return *this; }
 
   public:
 
@@ -130,13 +86,7 @@ namespace geoalgo {
       return o;
     }
 #endif
-    
-    /// Returns a direction vector at a specified trajectory point w/o size check
-    Vector _Dir_(size_t i) const {
 
-      return ((*this)[i+1] - (*this)[i]);
-      
-    }
   };
 
   typedef Trajectory Trajectory_t;

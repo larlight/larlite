@@ -29,89 +29,47 @@ namespace geoalgo {
   public:
     
     /// Default constructor
-  Cone() : HalfLine()
-      {
-	_length = 1;
-	_radius = 1;
-	_angle = atan(_radius/_length);
-      }
-    
-    /// Alternative ctor (1)
-  Cone(const double x,    const double y,    const double z,
-       const double dirx, const double diry, const double dirz,
-       const double length, const double radius)
-    : HalfLine(x, y, z, dirx, diry, dirz)
-      {
-	if (length == 0){
-	  std::ostringstream msg;
-	  msg << "<<" << __FUNCTION__ << ">>"
-	      << " Cone Length cannot be 0." << std::endl;
-	  throw GeoAlgoException(msg.str());
-	}
-	_length = length;
-	_radius = radius;
-	_angle = atan(_radius/_length);
-      }
-    
-    /// Altenartive ctor (2)
-  Cone(const Point_t& start, const Vector_t& dir,
-       const double length, const double radius)
-    : HalfLine( start,  dir )
-      { 
-      if (length == 0){
-	std::ostringstream msg;
-	msg << "<<" << __FUNCTION__ << ">>"
-	    << " Cone Length cannot be 0." << std::endl;
-	throw GeoAlgoException(msg.str());
-      }
-      _length = length;
-      _radius = radius;
-      _angle  = atan(_radius/_length);
-    }
-
-    /// Alternative ctor using template (3)
-    template <class T, class U> Cone(const T& start, const U& dir)
-      : Cone(Point_t(start), Vector_t(dir))
-    {}
+    Cone();
 
     /// Default destructor
     virtual ~Cone(){};
 
-    /// Length getter
-    const double Length() const { return _length; }
+    /// Alternative ctor (1)
+    Cone(const double x,    const double y,    const double z,
+	 const double dirx, const double diry, const double dirz,
+	 const double length, const double radius);
 
-    /// Length getter
-    const double Radius() const { return _radius; }
+    /// Alternative ctor (2)
+    Cone(const Point_t& start, const Vector_t& dir,
+	 const double length, const double radius);
 
-    /// Angle getter
-    const double Angle() const { return _angle; }
-    
-    /// Length setter
-    void Length(const double l) 
-    { 
-      if (l == 0){
-	std::ostringstream msg;
-	msg << "<<" << __FUNCTION__ << ">>"
-	    << " Cone Length cannot be 0." << std::endl;
-	throw GeoAlgoException(msg.str());
-      }
-      _length = l; 
-      _angle = atan(_radius/_length);
-    }
+    //
+    // Getters
+    //
+    const double Length() const; ///< Length getter
+    const double Radius() const; ///< Length getter
+    const double Angle () const; ///< Angle getter
 
-    /// Length setter
-    void Radius(const double r) { _radius = r; _angle = atan(_radius/_length); }
+    //
+    // Setters
+    //
+    void Length(const double l); ///< Length setter
+    void Radius(const double r); ///< Radius setter
 
   protected:
 
-    /// Helight (length) of the cone
-    double _length;
-    
-    /// Radius of the cone at the base
-    double _radius;
+    double _length; ///< Helight (length) of the cone
+    double _radius; ///< Radius of the cone at the base
+    double _angle;  ///< Opening Angle
 
-    /// Opening Angle
-    double _angle;
+  public:
+    //
+    // Template
+    //
+    /// Alternative ctor using template (3)
+    template <class T, class U> Cone(const T& start, const U& dir)
+      : Cone(Point_t(start), Vector_t(dir))
+    {}
 
   };
   

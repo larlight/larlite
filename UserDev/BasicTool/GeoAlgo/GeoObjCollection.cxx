@@ -5,6 +5,9 @@
 
 namespace geoalgo {
 
+  GeoObjCollection::GeoObjCollection() 
+  {}
+
   void GeoObjCollection::Clear()
   {
     _pt_v.clear();

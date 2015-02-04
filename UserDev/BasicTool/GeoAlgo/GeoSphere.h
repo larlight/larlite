@@ -81,13 +81,13 @@ namespace geoalgo {
     // 
     // Templates
     // 
-
+    /*
 #ifndef __CINT__ // Not sure why but CINT has a problem with this ctor. FIXME
     template <class T> Sphere(const T& center, const double r=0)
       : Sphere(Point_t(center),r)
     {}
 #endif
-
+    */
     template <class T> Sphere(const T& pt1, const T& pt2)
       : Sphere(Point_t(pt1), Point_t(pt2))
     {}

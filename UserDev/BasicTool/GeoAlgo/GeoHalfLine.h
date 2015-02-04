@@ -28,49 +28,40 @@ namespace geoalgo {
   public:
     
     /// Default constructor
-    HalfLine() 
-      : _start(3)
-      , _dir(3)
-    {Normalize();}
+    HalfLine();
+
+    /// Default destructor
+    virtual ~HalfLine(){};
 
     /// Alternative ctor (1)
     HalfLine(const double x,    const double y,    const double z,
-	     const double dirx, const double diry, const double dirz)
-      : _start (x,    y,    z   )
-      , _dir   (dirx, diry, dirz)
-    {Normalize();}
+	     const double dirx, const double diry, const double dirz);
 
     /// Altenartive ctor (2)
-    HalfLine(const Point_t& start, const Vector_t& dir)
-      : _start ( start )
-      , _dir   ( dir   )
-    { 
-      if(start.size()!=3 || dir.size()!=3)
-	throw GeoAlgoException("HalfLine ctor accepts only 3D Point!");
-      Normalize();
-    }
+    HalfLine(const Point_t& start, const Vector_t& dir);
+    
+    const Point_t&  Start () const; ///< Start getter
+    const Vector_t& Dir   () const; ///< Direction getter
+    
+    void Start(const double x, const double y, const double z); ///< Start setter
+    void Dir  (const double x, const double y, const double z); ///< Dir setter
+
+  protected:
+
+    void Normalize(); ///< Normalize direction
+    Point_t  _start;  ///< Beginning of the half line
+    Vector_t _dir;    ///< Direction of the half line from _start
+
+  public:
+
+    //
+    // Template
+    // 
 
     /// Alternative ctor using template (3)
     template <class T, class U> HalfLine(const T& start, const U& dir)
       : HalfLine(Point_t(start), Vector_t(dir))
     {}
-
-    /// Default destructor
-    virtual ~HalfLine(){};
-
-    /// Start getter
-    const Point_t& Start() const { return _start; }
-
-    /// Direction getter
-    const Vector_t& Dir() const { return _dir; }
-    
-    /// Start setter
-    void Start(const double x, const double y, const double z)
-    { _start[0] = x; _start[1] = y; _start[2] = z; }
-
-    /// Dir setter
-    void Dir(const double x, const double y, const double z)
-    { _dir[0] = x; _dir[1] = y; _dir[2] = z; Normalize(); }
 
     /// Start setter template
     template<class T>
@@ -88,27 +79,6 @@ namespace geoalgo {
       if(_dir.size()!=3) throw GeoAlgoException("<<Start>> Only 3 dimensional start point allowed!"); 
       Normalize();
     }
-
-  protected:
-
-    /// Normalize direction
-    void Normalize()
-    {
-      auto l = _dir.Length();
-      if(!l)
-	throw GeoAlgoException("<<Normalize>> cannot normalize 0-length direction vector!");
-
-      // inf check commented out till compatible solution found... --kazu
-      //if(isnan(l))
-      //throw GeoAlgoException("<<Normalize>> cannot normalize inf-length direction vector!");
-      _dir /= l;
-    }
-
-    /// Beginning of the half line
-    Point_t  _start;
-
-    /// Direction of the half line from _start
-    Vector_t _dir;
 
   };
   

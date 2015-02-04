@@ -2,6 +2,12 @@
 #define BASICTOOL_GEOVECTOR_CXX
 
 #include "GeoVector.h"
+#include <iostream>
+#include <iomanip>
+#include <vector>
+#include <sstream>
+#include <cmath>
+#include <limits>
 
 namespace geoalgo {
 

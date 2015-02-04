@@ -18,12 +18,7 @@
 #include "GeoAlgoException.h"
 #include <TVector3.h>
 #include <TLorentzVector.h>
-#include <iostream>
-#include <iomanip>
-#include <vector>
-#include <sstream>
-#include <cmath>
-#include <limits>
+
 namespace geoalgo {
 
   // Forward declaration (don't worry)
