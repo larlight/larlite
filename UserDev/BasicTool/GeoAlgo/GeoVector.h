@@ -70,13 +70,15 @@ namespace geoalgo {
     double SqLength() const; ///< Compute the squared length of the vector
     double Length  () const; ///< Compute the length of the vector
     Vector Dir     () const; ///< Return a direction unit vector
+    double Phi	   () const; ///< Compute the angle Phi
 
     double SqDist(const Vector &obj) const; ///< Compute the squared distance to another vector
     double Dist  (const Vector& obj) const; ///< Compute the distance to another vector
     double Dot   (const Vector &obj) const; /// Compute a dot product of two vectors
     Vector Cross (const Vector &obj) const; /// Compute a cross product of two vectors
     double Angle (const Vector &obj) const; /// Compute an opening angle w.r.t. the given vector
-      
+
+
     /// Dimensional check for a compatibility
     void compat(const Vector& obj) const;
 
