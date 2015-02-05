@@ -372,8 +372,6 @@ namespace ertool {
 
   void AlgoSingleE::ProcessEnd(TFile* fout){
     
-    _alg_emp.ProcessEnd(fout);
-    
     if(fout){
       fout->cd();
       
