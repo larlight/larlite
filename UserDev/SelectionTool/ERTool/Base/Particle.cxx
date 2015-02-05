@@ -37,6 +37,10 @@ namespace ertool {
   //
   double Particle::Energy() const 
   { return sqrt(_mom.SqLength() + _mass * _mass ); }
+
+  double Particle::KineticEnergy() const
+  { return (this->Energy() - this->Mass()); }
+
   double Particle::DaughterEnergySum() const
   { 
     double energy=0;
@@ -104,6 +108,7 @@ namespace ertool {
   {
     res += prefix + std::to_string(_pdg_code) + " ... ";
     res += std::to_string(Vertex()[0]) + " : " + std::to_string(Vertex()[1]) + " : " + std::to_string(Vertex()[2]);
+    res += " --> " + std::to_string( KineticEnergy() );
     res += "\n";
     prefix += "  ";
     for(auto const& d : _daughters) d.Diagram(res,prefix);
