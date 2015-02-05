@@ -20,10 +20,10 @@ my_proc.enable_filter(True)
 my_algo = ertool.AlgoSingleE()
 my_algo.useEMPart(True)
 my_algo.setVerbose(False)
-my_algo.setVtxToTrkStartDist(3)
-my_algo.setVtxToTrkDist(5)
+my_algo.setVtxToTrkStartDist(1)
+my_algo.setVtxToTrkDist(1)
 my_algo.setVtxToShrStartDist(50)
-my_algo.setMaxIP(3)
+my_algo.setMaxIP(1)
 #my_algo.setVerbose(True)
 
 # Create Filter
