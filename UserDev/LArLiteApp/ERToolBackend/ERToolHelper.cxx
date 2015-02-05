@@ -14,6 +14,9 @@ namespace larlite {
 				 ::ertool::EventData&   event_data,
 				 ::ertool::ParticleSet& particle_set) const
   {
+    
+    //std::cout << "************ EVENT: " << mci_v.event_id() << "  *****" << std::endl;
+
     event_data.Reset();
     particle_set.clear();
     static TDatabasePDG pdgdb_s;
@@ -218,7 +221,7 @@ namespace larlite {
 		  grand_mother_to_res_index[i]=particle_set.size();
 		  ::ertool::Particle p(mom_cand.PdgCode(),mom_cand.Mass());
 		  p.Vertex( ::geoalgo::Vector(mom_cand.Trajectory()[0].Position()) );
-		  p.Momentum( ::geoalgo::Vector(mom_cand.Trajectory()[0].Position()) );
+		  p.Momentum( ::geoalgo::Vector(mom_cand.Trajectory()[0].Momentum()) );
 		  particle_set.push_back(p);
 		}		
 	      }	      
@@ -430,7 +433,7 @@ namespace larlite {
 			  _shrProfiler.ShowerRadius() );
       s._energy     = mcs.DetProfile().Momentum().E();
       //s._energy = mcs.Start().Momentum().E();
-      s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
+      s._dedx       = (mcs.PdgCode() == 22 ? 4.0 : 2.0);//gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
       s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
       res.Add(s);
     }
