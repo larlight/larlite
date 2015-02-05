@@ -18,6 +18,8 @@
 #include "ERTool/Base/AnaBase.h"
 #include "TTree.h"
 
+#include "DataFormat/mctruth.h"
+
 namespace ertool {
 
   /**
@@ -40,15 +42,29 @@ namespace ertool {
     /// Function to evaluate input showers and determine a score
     virtual bool Analyze(const EventData &data, const ParticleSet &ps);
 
-    
+    void SetDebug(bool on) { _debug = on; }
+
     void ProcessEnd(TFile* fout);
 
   private:
 
+    bool _debug;
+
+    // Analysis tree with MC level info comparison
+    // between EventData and ParticleSet
     TTree* _ana_tree;
     int _singleRECO, _singleMC;
     int _RECOshowers, _RECOtracks;
     int _MCelectrons, _MCgammas;
+
+    // Result tree comparison for reconstructed events
+    TTree* _result_tree;
+    double _E;     /// Energy of electron shower found to be SingleE
+    int    _misID; /// if ==0 -> we found a SingleE when there is one
+    double _Enu;   /// Neutrino energy
+    int _Pdgnu;    /// Neutrino PDG
+    double _Elep;  /// lepton from neutrino Energy
+    int _Pdglep;   /// lepton from neutrino Pdg
 
     int _numEvts;
     int _singleE;
