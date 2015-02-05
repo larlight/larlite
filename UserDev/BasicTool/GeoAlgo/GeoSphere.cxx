@@ -25,6 +25,9 @@ namespace geoalgo {
     _radius = pt1.Dist(pt2)/2.;
   }
 
+  //  3-Point Constructor
+  //  Real-Time Collision Blog
+  //  http://realtimecollisiondetection.net/blog/?p=20
   Sphere::Sphere(const Point_t& A, const Point_t& B, const Point_t& C)
   {
     compat(A);
@@ -71,7 +74,6 @@ namespace geoalgo {
     }// if d == 0
     
     else{
-      std::cout << "d not == 0!" << std::endl;
       s = 0.5 * ( dABAB * dACAC - dACAC * dABAC ) / d;
       t = 0.5 * ( dACAC * dABAB - dABAB * dABAC ) / d;
       
@@ -102,7 +104,8 @@ namespace geoalgo {
   }
   
   //  Alternative ctor (4) - 4 Points
-  //  http://steve.hollasch.net/cgindex/geometry/sphere4pts.html (TOP)
+  //  Real-Time Collision Blog
+  //  http://realtimecollisiondetection.net/blog/?p=20
   Sphere::Sphere(const Point_t& A, const Point_t& B, const Point_t& C, const Point_t& D){
     compat(A);
     compat(B);
@@ -110,63 +113,63 @@ namespace geoalgo {
     compat(D);
     
     // get sphere from 3 points (A,B,C)
-    Vector_t AB(A-B);
-    Vector_t AC(A-C);
-    Sphere S(A,B,C);
-    Point_t P = S.Center();
-    // get the direction perpendicular to plane in which ABC lie (simply cross product of any two segments)
-    Vector_t d = AB.Cross(AC);
-    d.Normalize();
-    // Find E: point on circle ABC that lies on plane passing through direction d and point D
-    // to do this from P (center of circle) go in the direction of the PD vector a length = to circle radius
-    Vector_t PD(D-P);
-    PD.Normalize();
-    Vector_t PDcrossd = PD.Cross(d);
-    // find vector perpendicular to both d and PDcrossd
-    double denom = (d[1] * PDcrossd[2]) - (PDcrossd[1] * d[2]);
-    if (denom == 0)
-      throw GeoAlgoException("divide by 0 in GeoSphere! Fix Me!");
-    double x=1;
-    double y,z;
-    z = x * ( (d[0] * PDcrossd[1]) - (d[1] * PDcrossd[0]) ) / denom;
-    if (d[1] ==0)
-      throw GeoAlgoException("divide by 0 in GeoSphere! Fix Me!");
-    y = ((d[0] * x) + (d[2] * z))/(-d[1]);
-    // get bi-sector direction for AB
-    Vector_t EP(x,y,z);
-    EP.Normalize();
-    Point_t E(P+EP*S.Radius());
-    // The circle center will be the point on the line d passing through P that is half-way through E and D
-    // this is the intersection of the ED bisector and the line passing through P with direction d
-    // Midpoint between E and D is M:
-    Point_t M((E+D)/2.);
-    // direction of ED line:
-    Vector_t ED(E-D);
-    ED.Normalize();
-    // bi-sector direction trhough M that intersects OP is perpendicular to ED and PDcrossd
-    denom = (ED[1] * PDcrossd[2]) - (PDcrossd[1] * ED[2]);
-    if (denom == 0)
-      throw GeoAlgoException("divide by 0 in GeoSphere! Fix Me!");
-    z = x * ( (ED[0] * PDcrossd[1]) - (ED[1] * PDcrossd[0]) ) / denom;
-    if (ED[1] ==0)
-      throw GeoAlgoException("divide by 0 in GeoSphere! Fix Me!");
-    y = ((ED[0] * x) + (ED[2] * z))/(-ED[1]);
-    // get bi-sector direction for AB
-    Vector_t EDbisector(x,y,z);
-    EDbisector.Normalize();
-    // now find intersection between line passing through P with direction d
-    // and line passing through M with direction EDbisector
-    denom = (EDbisector[1]*d[0]-d[1]*EDbisector[0]);
-    if (denom == 0)
-      throw GeoAlgoException("divide by 0 in GeoSphere! Fix Me!");
-    double t2 = ( (d[0] * (P[1]-M[1]))
-		  + (d[1] * (M[0]-P[0])) ) / denom;
-    Point_t O = M + EDbisector*t2;
-    _center = O;
-    // radius is distance to any of the 4 points
-    _radius = _center.Dist(A);
-    //cout distances to check
-    //std::cout << "dist to A: " << _center.Dist(A) << "\tB: " << _center.Dist(B) << "\tC: " << _center.Dist(C) << "\tD: " << _center.Dist(D) << std::endl;
+    Vector_t AB(B-A);
+    Vector_t AC(C-A);
+    Vector_t AD(D-A);
+    
+    double dABAB = AB.Dot(AB);
+    double dACAC = AC.Dot(AC);
+    double dADAD = AD.Dot(AD);
+    double dABAC = AB.Dot(AC);
+    double dABAD = AB.Dot(AD);
+    double dACAD = AC.Dot(AD);
+    
+    double d = 4*dABAC*dABAD*dACAD;
+    
+    if (d==0)
+      throw GeoAlgoException("GeoSphere Exception: I think it means 3 points collinear. Find out which and call 3 point constructor - TO DO");
+    
+    double s = (dABAC*dACAD*dADAD + dABAD*dACAC*dACAD - dABAB*dACAD*dACAD)/d;
+    double t = (dABAB*dACAD*dABAD + dABAD*dABAC*dADAD - dABAD*dABAD*dACAC)/d;
+    double u = (dABAB*dABAC*dACAD + dABAC*dABAD*dACAC - dABAC*dABAC*dADAD)/d;
+    
+    // if everything positive! P = A + s(B-A) + t(C-A) + u(D-A)
+    if ( (s > 0) && (t > 0) && (u > 0) && ((1-s-t-u) > 0) ){
+      _center = A + AB*s + AC*t + AD*u;
+      _radius = _center.Dist(A);
+    }
+    // TEMPORARY
+    // otherwise find the 4 possible sphere combinations,
+    // which contains the 4th point,
+    // and if multiple ones choose the one with the smallest radius
+    Sphere tmp;
+    tmp = Sphere(A,B,C);
+    _radius = kINVALID_DOUBLE;
+    if (tmp.Contain(D)){
+      _radius = tmp.Radius();
+      _radius = tmp.Radius();
+    }
+    tmp = Sphere(A,B,D);
+    if (tmp.Contain(C)){
+      if (tmp.Radius() < _radius){
+	_center = tmp.Center();
+	_radius = tmp.Radius();
+      }
+    }
+    tmp = Sphere(A,C,D);
+    if (tmp.Contain(B)){
+	if (tmp.Radius() < _radius){
+	  _center = tmp.Center();
+	  _radius = tmp.Radius();
+	}
+    }
+    tmp = Sphere(B,C,D);
+    if (tmp.Contain(A)){
+      if (tmp.Radius() < _radius){
+	_center = tmp.Center();
+	_radius = tmp.Radius();
+      }
+    }
   }
   
   
