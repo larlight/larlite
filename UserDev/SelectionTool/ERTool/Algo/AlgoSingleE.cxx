@@ -36,8 +36,6 @@ namespace ertool {
 
     _alg_emp.LoadParams();
     _alg_emp.ProcessBegin();
-
-    //kaleko
     _alg_emp.SetMode(true);
 
     if(!_e_ll_values)
@@ -80,9 +78,37 @@ namespace ertool {
 
     if (_verbose) { 
       std::cout << "***********BEGIN RECONSTRUCTION************" << std::endl;
-      std::cout << "Showers in event: " << data.Shower().size() << std::endl;
+      std::cout << "Showers in event  : " << data.Shower().size() << std::endl;
+      std::cout << "Particles in event: " << emParticles.size() << std::endl;
+      std::cout << "dEdx: [";
+      for (auto &s : emParticles)
+	std::cout << s.PdgCode() << ", ";
+      std::cout << "]" << std::endl;
     }
     
+    // First, figure out if any tracks are coming from another track
+    // if so, label them as secondary.
+    // If a shower appears to have a common origin with a secondary
+    // then it also will be secondary.
+    // Vector where to keep track of track indices for secondarie
+    std::vector<int> secondaryTracks;
+    for (size_t u=0; u < data.Track().size(); u++){
+      for (size_t v=0; v < data.Track().size(); v++){
+	// check if u comes from v
+	geoalgo::Point_t vtx(3);
+	// make sure both tracks have more than 2 points
+	if ( (data.Track(u).size() < 2) || (data.Track(v).size() < 2) ) continue;
+	double IP = _findRel.FindClosestApproach(data.Track(u),data.Track(v),vtx);
+	// if the vertex is close to u's start
+	// and close to v's body (but not its start)
+	// -> Then u is secondary to v
+	if ( (vtx.Dist(data.Track(u).front()) < _vtxToTrkStartDist) && // vertex close to track U's start
+	     (vtx.Dist(data.Track(v).front()) > _vtxToTrkStartDist) && // vertex far from track V's start
+	     (sqrt(_geoAlgo.SqDist(vtx,data.Track(v))) < _vtxToTrkDist) )    // vertex close to track V's body
+	  secondaryTracks.push_back(int(u));
+      } // for V tracks
+    } // for U tracks
+
     // We are only interested in electron-like showers
     // loop over emParticles and select only the PDG==11 ones
     for (auto &p : emParticles){
@@ -99,8 +125,8 @@ namespace ertool {
 	// 3) come from a track
 	// 2) & 3) because we are interested in showers from
 	// the neutrino interaction
-	if (_verbose) { std::cout << "This shower: (" << p.RecoObjID() << ")" << std::endl; }
 	Shower thisShower = data.Shower( p.RecoObjID() );
+	if (_verbose) { std::cout << "This shower: (" << p.RecoObjID() << ")" << "\tE: " << thisShower._energy << std::endl; }
 	bool single = true;
 	// loop over other showers and check 1) and 2)
 	for (size_t s=0; s < data.Shower().size(); s++){
@@ -139,7 +165,7 @@ namespace ertool {
 	  }// if not the same showers
 	}//loop over showers
 	// loop over tracks if still single
-	if (single || !single){
+	if (single){
 	  for (size_t t=0; t < data.Track().size(); t++){
 	    Track thatTrack(data.Track(t));
 	    if (thatTrack.size() < 2)
@@ -161,15 +187,30 @@ namespace ertool {
 			<< "\tIP to Trk Body  : " << _IPtrkBody << std::endl
 			<< "\tIP to Shr Start : " << _IPthisStart << std::endl;
 	    single = true;
-	    if ( (IP < _maxIP) // good correlation
-		 && (vtx.Dist(thatTrack.front()) > _vtxToTrkStartDist) // vertex far enough away from track start
-		 && (sqrt(_geoAlgo.SqDist(vtx,thatTrack)) < _vtxToTrkDist)   // vertex close to track body
-		 && (vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) ) { // vertex not unreasonably far from shower start
-	      // our shower comes from t -> not interested
-	      single = false;
-	      if (_verbose) { std::cout << "NOT single" << std::endl; }
-	      break;
-	    }
+	    if ( (IP < _maxIP)                                              // good correlation
+		 && (vtx.Dist(thatTrack.front()) > _vtxToTrkStartDist)      // vertex far enough away from track start
+		 && (sqrt(_geoAlgo.SqDist(vtx,thatTrack)) < _vtxToTrkDist)  // vertex close to track body
+		 && (vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) )   // vertex not unreasonably far from shower start
+	      {
+		// our shower comes from t -> not interested
+		single = false;
+		if (_verbose) { std::cout << "NOT single" << std::endl; }
+		break;
+	      }
+	    else if ( (IP < _maxIP)                                              // good correlation
+		      && (vtx.Dist(thatTrack.front()) < _vtxToTrkStartDist)      // vertex close to track start
+		      && (vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) )   // vertex not unreasonably far from shower start
+	      {
+		// our shower has a common origin with this track
+		// if the track is secondary (we investigated this before)
+		// then this shower should also be labeled as secondary -> not single
+		auto it = std::find(secondaryTracks.begin(), secondaryTracks.end(), t );
+		if ( it != secondaryTracks.end() ){
+		  if (_verbose) { std::cout << "common origin w/ secondary track -> not Single" << std::endl; }
+		  single = false;
+		  break;
+		}
+	      }
 	  }// for all tracks
 	}// if single
 	
@@ -193,7 +234,7 @@ namespace ertool {
 
       }// if the PDG is 11
     }// for all particles from EMPart
-    
+
     /*
       if (_verbose) { std::cout << "Showers in event: " << data.Shower().size() << std::endl; }
       

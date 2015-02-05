@@ -20,6 +20,7 @@
 #include "ERTool/Algo/AlgoFindRelationship.h"
 #include "ERTool/Base/AlgoBase.h"
 #include "GeoAlgo/GeoAlgo.h"
+#include <algorithm> // for std::find
 
 namespace ertool {
 
