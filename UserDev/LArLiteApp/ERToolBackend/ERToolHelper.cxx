@@ -221,7 +221,7 @@ namespace larlite {
 		  grand_mother_to_res_index[i]=particle_set.size();
 		  ::ertool::Particle p(mom_cand.PdgCode(),mom_cand.Mass());
 		  p.Vertex( ::geoalgo::Vector(mom_cand.Trajectory()[0].Position()) );
-		  p.Momentum( ::geoalgo::Vector(mom_cand.Trajectory()[0].Momentum()) );
+		  p.Momentum( ::geoalgo::Vector(mom_cand.Trajectory()[0].Momentum())*1.e3 );
 		  particle_set.push_back(p);
 		}		
 	      }	      
