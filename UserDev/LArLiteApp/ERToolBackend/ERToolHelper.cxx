@@ -55,7 +55,7 @@ namespace larlite {
 	  if(pdg_mom>1000000000)
 	    mass = (double)((int(pdg_mom/10))%1000);
 	  else
-	    mass = pdgdb_s.GetParticle(pdg_mom)->Mass();
+	    mass = pdgdb_s.GetParticle(pdg_mom)->Mass() * 1.e3; //Mass is now in MEV
 	  partmass_s[pdg_mom] = mass;
 	}
 
@@ -73,7 +73,7 @@ namespace larlite {
 	  if(pdg>1000000000)
 	    mass = (double)((int(pdg/10))%1000);
 	  else
-	    mass = pdgdb_s.GetParticle(pdg)->Mass();
+	    mass = pdgdb_s.GetParticle(pdg)->Mass() * 1.e3; //Mass is now in MEV
 	  partmass_s[pdg] = mass;
 	}
 	
@@ -117,7 +117,7 @@ namespace larlite {
 	  if(pdg_mom>1000000000)
 	    mass = (double)((int(pdg_mom/10))%1000);
 	  else
-	    mass = pdgdb_s.GetParticle(pdg_mom)->Mass();
+	    mass = pdgdb_s.GetParticle(pdg_mom)->Mass() * 1.e3; //Mass is now in MEV
 	  partmass_s[pdg_mom] = mass;
 	}
 
@@ -134,7 +134,7 @@ namespace larlite {
 	  if(pdg>1000000000)
 	    mass = (double)((int(pdg/10))%1000);
 	  else
-	    mass = pdgdb_s.GetParticle(pdg)->Mass();
+	    mass = pdgdb_s.GetParticle(pdg)->Mass() * 1.e3; //Mass is now in MEV
 	  partmass_s[pdg] = mass;
 	}
 	
