@@ -293,7 +293,7 @@ namespace larlite {
 	  */
 	  ::ertool::Particle p(pdg,mcp.Mass());
 	  p.Vertex(::geoalgo::Vector(mcp.Trajectory()[0].Position()));
-	  p.Momentum(::geoalgo::Vector(mcp.Trajectory()[0].Momentum()));
+	  p.Momentum(::geoalgo::Vector(mcp.Trajectory()[0].Momentum())*1.e3); //MCParticle units are converted into MEV here
 	  if(trkid_to_grand_mother.find(mcp.TrackId())==trkid_to_grand_mother.end())  
 	    particle_set.push_back(p);
 	  else
