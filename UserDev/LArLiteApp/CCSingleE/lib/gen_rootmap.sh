@@ -17,8 +17,10 @@ rootlibmap() {
 ######################################################
 # CCSingleE
 rootlibmap libLArLiteApp_CCSingleE.rootmap libLArLiteApp_CCSingleE.so $LARLITE_USERDEVDIR/LArLiteApp/CCSingleE/LinkDef.h \
+    libSelectionTool_ERBase.so \
     libLArLite_Analysis.so \
     libLArLite_ERToolBackend.so
+
 
 
 

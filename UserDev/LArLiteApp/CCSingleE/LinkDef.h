@@ -11,6 +11,8 @@
 
 #pragma link C++ class ertool::ERAnaSingleE+;
 #pragma link C++ class ertool::ERAnaToy+;
+#pragma link C++ class ertool::ERAnanumuCC_MisID+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
