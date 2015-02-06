@@ -14,6 +14,9 @@ namespace larlite {
 				 ::ertool::EventData&   event_data,
 				 ::ertool::ParticleSet& particle_set) const
   {
+    
+    //std::cout << "************ EVENT: " << mci_v.event_id() << "  *****" << std::endl;
+
     event_data.Reset();
     particle_set.clear();
     static TDatabasePDG pdgdb_s;
@@ -52,7 +55,7 @@ namespace larlite {
 	  if(pdg_mom>1000000000)
 	    mass = (double)((int(pdg_mom/10))%1000);
 	  else
-	    mass = pdgdb_s.GetParticle(pdg_mom)->Mass();
+	    mass = pdgdb_s.GetParticle(pdg_mom)->Mass() * 1.e3; //Mass is now in MEV
 	  partmass_s[pdg_mom] = mass;
 	}
 
@@ -70,7 +73,7 @@ namespace larlite {
 	  if(pdg>1000000000)
 	    mass = (double)((int(pdg/10))%1000);
 	  else
-	    mass = pdgdb_s.GetParticle(pdg)->Mass();
+	    mass = pdgdb_s.GetParticle(pdg)->Mass() * 1.e3; //Mass is now in MEV
 	  partmass_s[pdg] = mass;
 	}
 	
@@ -114,7 +117,7 @@ namespace larlite {
 	  if(pdg_mom>1000000000)
 	    mass = (double)((int(pdg_mom/10))%1000);
 	  else
-	    mass = pdgdb_s.GetParticle(pdg_mom)->Mass();
+	    mass = pdgdb_s.GetParticle(pdg_mom)->Mass() * 1.e3; //Mass is now in MEV
 	  partmass_s[pdg_mom] = mass;
 	}
 
@@ -131,7 +134,7 @@ namespace larlite {
 	  if(pdg>1000000000)
 	    mass = (double)((int(pdg/10))%1000);
 	  else
-	    mass = pdgdb_s.GetParticle(pdg)->Mass();
+	    mass = pdgdb_s.GetParticle(pdg)->Mass() * 1.e3; //Mass is now in MEV
 	  partmass_s[pdg] = mass;
 	}
 	
@@ -218,7 +221,7 @@ namespace larlite {
 		  grand_mother_to_res_index[i]=particle_set.size();
 		  ::ertool::Particle p(mom_cand.PdgCode(),mom_cand.Mass());
 		  p.Vertex( ::geoalgo::Vector(mom_cand.Trajectory()[0].Position()) );
-		  p.Momentum( ::geoalgo::Vector(mom_cand.Trajectory()[0].Position()) );
+		  p.Momentum( ::geoalgo::Vector(mom_cand.Trajectory()[0].Momentum())*1.e3 );
 		  particle_set.push_back(p);
 		}		
 	      }	      
@@ -290,7 +293,7 @@ namespace larlite {
 	  */
 	  ::ertool::Particle p(pdg,mcp.Mass());
 	  p.Vertex(::geoalgo::Vector(mcp.Trajectory()[0].Position()));
-	  p.Momentum(::geoalgo::Vector(mcp.Trajectory()[0].Momentum()));
+	  p.Momentum(::geoalgo::Vector(mcp.Trajectory()[0].Momentum())*1.e3); //MCParticle units are converted into MEV here
 	  if(trkid_to_grand_mother.find(mcp.TrackId())==trkid_to_grand_mother.end())  
 	    particle_set.push_back(p);
 	  else
@@ -430,7 +433,7 @@ namespace larlite {
 			  _shrProfiler.ShowerRadius() );
       s._energy     = mcs.DetProfile().Momentum().E();
       //s._energy = mcs.Start().Momentum().E();
-      s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
+      s._dedx       = (mcs.PdgCode() == 22 ? 4.0 : 2.0);//gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
       s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
       res.Add(s);
     }
