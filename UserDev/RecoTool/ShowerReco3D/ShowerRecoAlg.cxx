@@ -84,8 +84,8 @@ namespace showerreco {
     double xphi=0,xtheta=0;
     
     
-    fGSer->Get3DaxisN(index_to_use[0],
-		      index_to_use[1],
+    fGSer->Get3DaxisN(fPlaneID[index_to_use[0]],
+		      fPlaneID[index_to_use[1]],
 		      fOmega2D[index_to_use[0]]*TMath::Pi()/180.,
 		      fOmega2D[index_to_use[1]]*TMath::Pi()/180.,
 		      xphi,
