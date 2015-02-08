@@ -37,6 +37,7 @@ namespace larlite {
     
     for(auto const& particle : ev_mctruth->at(0).GetParticles()){
 
+      //Note: this KE is in units of GEV!
       double KE = particle.Trajectory().at(0).E()-particle.Mass();
 
       if( abs(particle.PdgCode()) == 11 && 

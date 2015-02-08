@@ -60,6 +60,7 @@ namespace ertool {
     double Score()   const { return _score;    }
     double Mass()    const { return _mass;     }
     double Energy()  const;
+    double KineticEnergy()  const;
     const ::geoalgo::Vector& Vertex()   const { return _vtx; }
     const ::geoalgo::Vector& Momentum() const { return _mom; }
     const double& Time() const { return _time; }
