@@ -54,44 +54,33 @@ namespace showerreco {
     
     
     //decide best two planes. for now, using length in wires - flatter is better.
-    
-    int worst_plane=-1,best_plane=-1;
-    double min_length=9999999;
-    double max_length=0;
+    int index_to_use[2]={0,1}; 
+    int best_plane=-1;
+    int good_plane=-1;
+    double best_length=0;
+    double good_length=0;
     for (size_t ip=0;ip<fPlaneID.size();ip++)
       {
 	double dist = fabs( fEndPoint[ip].w - fStartPoint[ip].w );
-	if(dist < min_length)
+	if(dist > best_length )
 	  {
-	    min_length  = dist;
-	    worst_plane = fPlaneID.at(ip);
-	  }
+	    good_length = best_length;
+	    good_plane  = best_plane;
+	    index_to_use[1] = index_to_use[0];
 
-	if(dist > max_length )
-	  {
-	    max_length = dist;
+	    best_length = dist;
 	    best_plane = fPlaneID.at(ip);
-	  }      
-      }
-    
-    if(fVerbosity)
-      std::cout << " worst plane is : " << worst_plane << " best: "<< best_plane   << std::endl;
-    
-    int index_to_use[2]={0,1};  // for a two plane detector we have no choice.
-    if(fPlaneID.size()>2)
-      {
-	int local_index=0;
-	for(size_t ip=0;ip<fPlaneID.size();ip++) 
-	  {
-	    if(fStartPoint[ip].plane!=worst_plane) 
-	      index_to_use[local_index++]=ip;
+	    index_to_use[0] = ip;
 	  }
-	
+	else if(dist > good_length)
+	  {
+	    good_length = dist;
+	    good_plane  = fPlaneID.at(ip);
+	    index_to_use[1] = ip;
+	  }
       }
-               
-    
+
     // Second Calculate 3D angle and effective pitch and start point 
-    
     double xphi=0,xtheta=0;
     
     
@@ -120,7 +109,7 @@ namespace showerreco {
       {
 	int plane = fPlaneID.at(cl_index);
 	double newpitch=fGSer->PitchInView(plane,xphi,xtheta);
-	if(plane == best_plane) max_length *= newpitch;
+	if(plane == best_plane) best_length *= newpitch;
 
 	if(fVerbosity)
 	  std::cout << std::endl << " Plane: " << plane << std::endl;
@@ -350,7 +339,7 @@ namespace showerreco {
 
     result.set_total_MIPenergy(fMIPEnergy);
     result.set_total_best_plane(best_plane);
-    result.set_length(max_length);
+    result.set_length(best_length);
     result.set_total_energy(fEnergy);
     //result.set_total_energy_err  (std::vector< Double_t > q)            { fSigmaTotalEnergy = q;        }
     
