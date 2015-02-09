@@ -18,7 +18,7 @@ if len(sys.argv) < 2:
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
-my_proc.enable_filter(True)
+my_proc.enable_filter(False)
 
 # Create algorithm
 my_algo = ertool.AlgoSingleE()
@@ -57,6 +57,7 @@ my_ana.SetDebug(True)
 my_anaunit = fmwk.ExampleERSelection()
 my_anaunit._mgr.SetAlgo(my_algo)
 my_anaunit._mgr.SetAna(my_ana)
+my_anaunit.SetMinEDep(400)
 my_anaunit._mgr._mc_for_ana = True
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
@@ -64,8 +65,8 @@ my_anaunit._mgr._mc_for_ana = True
 my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetVtxProducer(True,"generator");
 #my_anaunit.SetShowerProducer(False,"mergeall");
-#my_anaunit.SetShowerProducer(False,"showerreco");
-my_anaunit.SetShowerProducer(False,"pandoraNuShower");
+my_anaunit.SetShowerProducer(False,"showerreco");
+#my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 # ************************************************
 my_proc.add_process(MCfilter)

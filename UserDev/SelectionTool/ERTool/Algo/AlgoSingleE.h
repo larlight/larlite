@@ -62,6 +62,8 @@ namespace ertool {
     void setVtxToTrkDist(double d) { _vtxToTrkDist = d; }
     void setVtxToShrStartDist(double d) { _vtxToShrStartDist = d; }
     void setMaxIP(double d) { _maxIP = d; }
+    
+    void setEThreshold(double E) { _Ethreshold = E; }
 
     /// clear tree
     void ClearTree();
@@ -92,6 +94,9 @@ namespace ertool {
     // if True -> use only showers reco as PDG == 11
     // if False -> use all showers
     bool _useEMPart;
+
+    // Energy thershold. If shower has < _Ethreshold -> don't consider
+    double _Ethreshold;
 
     // constants to be used for decision-making
     // minimum distance that a reco-vertex must be away from the

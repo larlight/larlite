@@ -21,7 +21,6 @@ namespace larlite {
     particle_set.clear();
     static TDatabasePDG pdgdb_s;
     static std::map<int,double> partmass_s;
-
     FillTracks  (mct_v, event_data);
     FillShowers (mcs_v, event_data);
     //FillVertices(mci_v, event_data);

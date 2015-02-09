@@ -80,6 +80,11 @@ namespace larlite {
      */
     const ::ertool::ParticleSet& GetParticles(bool mc=false) const;
 
+    /**
+       @brief set Min E Dep for Helper
+    */
+    void SetMinEDep(double E) { _helper.SetMinEDep(E); }
+
     /// Selection manager class instance
     ::ertool::Manager _mgr;
 

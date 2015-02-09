@@ -18,6 +18,7 @@ namespace ertool {
     _e_mass     = TDatabasePDG().GetParticle(11)->Mass();
     _e_ll_values = 0;
     _dedx_values = 0;
+    _Ethreshold = 0;
     _verbose = false;
     _useEMPart = false;
 
@@ -126,6 +127,9 @@ namespace ertool {
 	// 2) & 3) because we are interested in showers from
 	// the neutrino interaction
 	Shower thisShower = data.Shower( p.RecoObjID() );
+
+	if (thisShower._energy < _Ethreshold ) continue;
+
 	if (_verbose) { std::cout << "This shower: (" << p.RecoObjID() << ")" << "\tE: " << thisShower._energy << std::endl; }
 	bool single = true;
 	// loop over other showers and check 1) and 2)
