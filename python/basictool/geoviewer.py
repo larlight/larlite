@@ -44,6 +44,30 @@ class GeoViewer(object):
         Gray = c[0] * 0.3 + c[1] * 0.59 + c[2] * 0.11
         return c
 
+    def set_ax_range(self,range_min,range_max):
+
+        self._ax.set_xlim(range_min[0],range_max[0])
+        self._ax.set_ylim(range_min[1],range_max[1])
+        self._ax.set_zlim(range_min[2],range_max[2])
+
+        self._fig.canvas
+        self._fig.canvas.draw()#plt.show()
+
+    def get_ax_range(self):
+
+        range_min = [0,0,0]
+        range_max = [0,0,0]
+        range_min[0] = self._ax.get_xlim()[0]
+        range_min[1] = self._ax.get_ylim()[0]
+        range_min[2] = self._ax.get_zlim()[0]
+        range_max[0] = self._ax.get_xlim()[1]
+        range_max[1] = self._ax.get_ylim()[1]
+        range_max[2] = self._ax.get_zlim()[1]
+        return [range_min,range_max]
+
+    def set_window_title(self,tit):
+        self._fig.canvas.set_window_title(tit)
+
     def GetObjCollection(self):
         return self._holder
 
@@ -302,7 +326,6 @@ class GeoViewer(object):
         self._ax.set_ylabel('Y [cm]')
         self._ax.set_zlabel('Z [cm]')
 
-        print self._fig
         self._fig.canvas
         self._fig.canvas.draw()#plt.show()
         #self._fig.show()
