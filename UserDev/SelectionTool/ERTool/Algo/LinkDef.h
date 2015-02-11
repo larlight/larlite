@@ -13,7 +13,6 @@
 #pragma link C++ class ertool::AlgoEMPart+;
 #pragma link C++ class ertool::AlgoSingleE+;
 #pragma link C++ class ertool::AlgoMichelE+;
-#pragma link C++ class ertool::AlgoLonelyE+;
 #pragma link C++ class ertool::AlgoCCSignalE+;
 #pragma link C++ class ertool::AlgoFindRelationship+;
 //ADD_NEW_CLASS ... do not change this line
