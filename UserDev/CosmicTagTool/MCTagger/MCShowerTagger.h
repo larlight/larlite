@@ -42,6 +42,10 @@ namespace larlite {
 
     virtual bool finalize();
 
+	void PrepareTTree();
+
+	void Reset();
+
     void addTrack(const mctrack& track);
 
     void addTrack(const track& track);
@@ -52,6 +56,8 @@ namespace larlite {
 
     std::string _dataType;
 
+	TTree * _tag_tree ;
+
     /// Event number
     int _evtN;
 
@@ -59,17 +65,30 @@ namespace larlite {
     std::vector<geoalgo::Trajectory_t> _allMCTracks;
     std::vector<geoalgo::Trajectory_t> _allRecoTracks;
 
+	int _run ;
+	int _subrun ;
+	int _event ;
+
     double _X ;
     double _Y ;
     double _Z ;
     double _Px ;
     double _Py ;
     double _Pz ;
+	double _E ;
+	double _PDG ;
     
     double _minMuDist;
     double _minMuIP;
+	double _distToTopWall ;
+
+	double _showerScore ; 
+	double _trackScore ;
     
 	CosmicTagAlgo _tagger;
+
+	TH1D* _numberOfEvents;
+	TH1D* _numberOfShowers;
      
 
   };
