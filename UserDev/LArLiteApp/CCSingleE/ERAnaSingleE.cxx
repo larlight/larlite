@@ -13,7 +13,6 @@ namespace ertool {
     if (_ana_tree) { delete _ana_tree; }
     _ana_tree = new TTree("_ana_tree","Single EAnalysis Tree");
     _ana_tree->Branch("_singleRECO",&_singleRECO,"singleRECO/I");
-    _ana_tree->Branch("_singleMC",&_singleMC,"singleMC/I");
     _ana_tree->Branch("_RECOshowers",&_RECOshowers,"RECOshowers/I");
     _ana_tree->Branch("_RECOtracks",&_RECOtracks,"RECOtracks/I");
     _ana_tree->Branch("_MCelectrons",&_MCelectrons,"_MCelectrons/I");
@@ -29,7 +28,7 @@ namespace ertool {
     _result_tree->Branch("_misID",&_misID,"misID/I");
 
     _numEvts = 0;
-    _singleE = 0;
+    _singleE_ctr = 0;
 
     _debug = false;
   }
@@ -39,7 +38,6 @@ namespace ertool {
 
   bool ERAnaSingleE::Analyze(const EventData &data, const ParticleSet &ps)
   { 
-    
     // Reset tree variables
     // Assume we will mis-ID
     _misID = 1;
@@ -53,17 +51,20 @@ namespace ertool {
     // count number of showers in event
     _MCelectrons = 0;
     _MCgammas    = 0;
-    _singleMC    = 0;
 
     // Get MC particle set
     auto mc_ps = MCParticleSet();
     for (auto &p : mc_ps){
       // Find the Lepton and store its energy
-      if (p.PdgCode() == 12 || p.PdgCode() == -12 || p.PdgCode() == 14 || p.PdgCode() == -14){
+      if (abs(p.PdgCode()) == 12 || abs(p.PdgCode()) == 14){
 	_Enu = p.Energy();
 	_Pdgnu = p.PdgCode();
+	bool found_lepton_daughter = false;
 	for (auto &nud : p.Daughters()){
-	  if ( nud.PdgCode() == 11 || nud.PdgCode() == -11 || nud.PdgCode() == 13 || nud.PdgCode() == -13){
+	  if (abs(nud.PdgCode()) == 11 || abs(nud.PdgCode()) == 13){
+	    if(found_lepton_daughter) 
+	      std::cout<<"wtf already found daughter? overwriting variables..."<<std::endl;
+	    found_lepton_daughter = true;
 	    _Elep = nud.Energy();
 	    _Pdglep = nud.PdgCode();
 	  }
@@ -72,35 +73,28 @@ namespace ertool {
       // now keep track of all showers and tracks
       if (p.PdgCode() == 22)
 	_MCgammas += 1;
-      if ((p.PdgCode() == 11) || (p.PdgCode() == -11)){
-	_singleMC += 1;
+      if (abs(p.PdgCode()) == 11){
 	_MCelectrons += 1;
       }
       for (auto &d : p.AllDaughters()){
 	if (d->PdgCode() == 22)
 	  _MCgammas += 1;
-	if ((d->PdgCode() == 11) || (d->PdgCode() == -11)){
-	  _singleMC += 1;
+	if (abs(d->PdgCode()) == 11)
 	  _MCelectrons += 1;
-	}
       }
     }
-    
-    
-    // get data to fill number of RECO tracks & RECO showers
+        
     _RECOshowers = data.AllShower().size();
     _RECOtracks  = data.AllTrack().size();
 
-
     // ps is the reconstructed ParticleSet
     
-    // size of ParticleSet should be the number of
-    // single E showers found
+    // size of ParticleSet should be the number of single electrons found
     _singleRECO = ps.size();
-    if (_singleRECO ==1 ){
+    if ( _singleRECO == 1 ){
       _E = ps[0].Daughters()[0].Energy();
       _misID = 0;
-      _singleE += 1;
+      _singleE_ctr += 1;
     }
 
     _result_tree->Fill();
@@ -124,7 +118,7 @@ namespace ertool {
 
     std::cout << "RESULTS: " << std::endl
 	      << "Tot Events    : " << _numEvts << std::endl
-	      << "SingleE Events: " << _singleE << std::endl;
+	      << "SingleE Events: " << _singleE_ctr << std::endl;
     
     if (fout){
       fout->cd();

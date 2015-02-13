@@ -53,21 +53,36 @@ namespace ertool {
     // Analysis tree with MC level info comparison
     // between EventData and ParticleSet
     TTree* _ana_tree;
-    int _singleRECO, _singleMC;
-    int _RECOshowers, _RECOtracks;
-    int _MCelectrons, _MCgammas;
+
+    //Number of reconstructed *particles* in the output PSet
+    //(this is 1-to-1 with number of single electrons reconstructed)
+    int _singleRECO;
+    //Total number of MC electron/positron particles in the event
+    int _MCelectrons;
+    //Total number of MC gamma particles in the event
+    int _MCgammas;
+    //Number of reconstructed *showers* in the event data (could be e or g, etc)
+    //Note: if running on MC, this is = # of MCShowers in the event 
+    int _RECOshowers;
+    //Number of reconstructed *tracks* in the event data
+    int _RECOtracks;
 
     // Result tree comparison for reconstructed events
     TTree* _result_tree;
-    double _E;     /// Energy of electron shower found to be SingleE
-    int    _misID; /// if ==0 -> we found a SingleE when there is one
+    /// Energy of electron found to be SingleE, if only one exists in event
+    /// otherwise, variable is set to 0
+    double _E;    
+    /// Whether this event was MID'd (if == 0: we found ==1 single electron)
+    /// Note: this is 0 if _E is filled, otherwise this is 1 (redundant)
+    int    _misID;
     double _Enu;   /// Neutrino energy
     int _Pdgnu;    /// Neutrino PDG
     double _Elep;  /// lepton from neutrino Energy
     int _Pdglep;   /// lepton from neutrino Pdg
 
+    /// counters to cout to screen after running
     int _numEvts;
-    int _singleE;
+    int _singleE_ctr;
 
   };
 }
