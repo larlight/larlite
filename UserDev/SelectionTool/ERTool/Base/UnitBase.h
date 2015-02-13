@@ -44,12 +44,6 @@ namespace ertool {
     /// Called @ before processing the first event sample
     virtual void ProcessBegin(){}
 
-    /// Called @ beginning of each event
-    virtual void EventBegin(){}
-
-    /// Called @ end of each event
-    virtual void EventEnd(){}
-
     /// Called after processing the last event sample
     virtual void ProcessEnd(TFile* fout=nullptr) {}
 

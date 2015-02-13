@@ -12,7 +12,6 @@ namespace larlite {
 
   bool ERAnaPi0Reco::initialize() {
 
-    _mgr.Initialize();
     return ERToolAnaBase::initialize();
 
   }
@@ -22,14 +21,13 @@ namespace larlite {
     auto status = ERToolAnaBase::analyze(storage);
     if(!status) return status;
 
-    _RecoParticles = _mgr.Process(_data);
+    return _mgr.Process();
   
     return true;
   }
 
   bool ERAnaPi0Reco::finalize() {
 
-    _mgr.Finalize(_fout);
     return ERToolAnaBase::finalize();
 
   }

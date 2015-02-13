@@ -16,6 +16,8 @@
 
 #include <iostream>
 #include "DataFormat/storage_manager.h"
+#include "DataFormat/cluster.h"
+#include "DataFormat/hit.h"
 #include "ClusterParamsAlg.h"
 
 namespace cluster {

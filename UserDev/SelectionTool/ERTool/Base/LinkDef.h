@@ -33,6 +33,7 @@
 #pragma link C++ class ertool::UnitBase+;
 #pragma link C++ class ertool::AlgoBase+;
 #pragma link C++ class ertool::FilterBase+;
+#pragma link C++ class ertool::AnaBase+;
 
 #pragma link C++ class ertool::Manager+;
 #pragma link C++ class ertool::PdfFactory+;
@@ -44,6 +45,7 @@
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 
 
 

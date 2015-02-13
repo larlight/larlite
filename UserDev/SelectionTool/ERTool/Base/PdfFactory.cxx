@@ -85,17 +85,17 @@ namespace ertool {
   RooAbsPdf* PdfFactory::dEdxDGaus(const std::string& name,
 				   RooRealVar &x)
   {
-    auto himean = new RooRealVar(Form("%s_dEdxGaus_mean",name.c_str()),
+    auto himean = new RooRealVar(Form("%s_dEdxGaus_mean_high",name.c_str()),
 				 Form("Double gaussian dE/dx hi mean [MeV/cm] for %s",name.c_str()),
-				 4.,3.,5.);
+				 4.,1.,6.);
     Register(himean);
-    auto hisigma = new RooRealVar(Form("%s_dEdxGaus_sigma",name.c_str()),
+    auto hisigma = new RooRealVar(Form("%s_dEdxGaus_sigma_high",name.c_str()),
 				  Form("Double gaussian dE/dx hi mean sigma [MeV/cm] for %s",name.c_str()),
 				  1.,0.,2.);
     Register(hisigma);
     auto lowmean = new RooRealVar(Form("%s_dEdxGaus_mean_low",name.c_str()),
 				  Form("Double gaussian dE/dx low mean [MeV/cm] for %s",name.c_str()),
-				  2.,1.,3.);
+				  4.,1.,6.);
     Register(lowmean);
     auto lowsigma = new RooRealVar(Form("%s_dEdxGaus_sigma_low",name.c_str()),
 				   Form("Double gaussian dE/dx low mean sigma [MeV/cm] for %s",name.c_str()),

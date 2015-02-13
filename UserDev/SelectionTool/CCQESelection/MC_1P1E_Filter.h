@@ -16,7 +16,7 @@
 #define LARLITE_MC_1P1E_FILTER_H
 
 #include "Analysis/ana_base.h"
-
+#include "DataFormat/mctruth.h"
 namespace larlite {
   /**
      \class MC_1P1E_Filter

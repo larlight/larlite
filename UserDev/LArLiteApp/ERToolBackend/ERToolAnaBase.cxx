@@ -18,6 +18,16 @@ namespace larlite {
     _name_vertex    = "";
   }
 
+  const ::ertool::EventData& ERToolAnaBase::GetData(bool mc) const
+  {
+    return (mc ? _mgr.MCEventData() : _mgr.EventData());
+  }
+
+  const ::ertool::ParticleSet& ERToolAnaBase::GetParticles(bool mc) const
+  {
+    return (mc ? _mgr.MCParticleSet() : _mgr.ParticleSet());
+  }
+
   void ERToolAnaBase::SetShowerProducer(const bool mc, const std::string prod)
   {
     if (mc){
@@ -72,17 +82,14 @@ namespace larlite {
       return false;
     }
 
-    // Set minimum Energy Deposited for Helper
-    _helper.SetMinEDep(10);
+    _mgr.Initialize();
 
     return true;
   }
   
   bool ERToolAnaBase::analyze(storage_manager* storage) {
-    _data.Reset();
-    _mc_data.Reset();
-    _RecoParticles.clear();
-    _McParticles.clear();
+    _mgr.ClearData();
+
     TStopwatch fWatch;
     fWatch.Start();
 
@@ -99,7 +106,7 @@ namespace larlite {
 	      "MCShower info not found in the event!");
 	throw std::exception();
       }
-	_helper.FillShowers(*ev_mcs, _data);
+	_helper.FillShowers(*ev_mcs, _mgr.EventDataWriteable());
     }
     else if(!_mcshowers && !_name_shower.empty()){
       auto ev_shw      = storage->get_data<event_shower>    (_name_shower);
@@ -114,10 +121,10 @@ namespace larlite {
 	  print(msg::kWARNING,__FUNCTION__,
 		Form("One-Time-Warning: No cosmictag for shower available (\"%stag\")",_name_shower.c_str()) );
 	event_cosmictag tmp;
-	_helper.FillShowers(*ev_shw, tmp, _data);	  
+	_helper.FillShowers(*ev_shw, tmp, _mgr.EventDataWriteable());	  
       }
       else
-	_helper.FillShowers(*ev_shw, *ev_ctag_shw, _data);
+	_helper.FillShowers(*ev_shw, *ev_ctag_shw, _mgr.EventDataWriteable());
     }
 
     // Fill tracks
@@ -127,7 +134,7 @@ namespace larlite {
 	print(msg::kERROR,__FUNCTION__,
 	      "MCTrack info not found in the event!");
       }
-      _helper.FillTracks(*ev_mct, _data);
+      _helper.FillTracks(*ev_mct, _mgr.EventDataWriteable());
     }
     else if(!_mctracks && !_name_track.empty()) {
 
@@ -158,7 +165,7 @@ namespace larlite {
 	delete ev_pid_trk;
 	ev_pid_trk = new event_partid();
       }
-      _helper.FillTracks( *ev_trk, *ev_ctag_trk, *ev_calo_trk, *ev_pid_trk, _data );
+      _helper.FillTracks( *ev_trk, *ev_ctag_trk, *ev_calo_trk, *ev_pid_trk, _mgr.EventDataWriteable() );
     }
 
     // Fill Vertices
@@ -169,7 +176,7 @@ namespace larlite {
 	      "MCTruth info not found in the event!");
 	throw std::exception();
       }
-      _helper.FillVertices(*ev_mci, _data);
+      _helper.FillVertices(*ev_mci, _mgr.EventDataWriteable());
     }
 
     // Done filling SPAData Object!
@@ -182,25 +189,23 @@ namespace larlite {
       auto ev_mci = storage->get_data<event_mctruth>  (_name_generator);
       auto ev_mcs = storage->get_data<event_mcshower> (_name_mcshr);
       auto ev_mct = storage->get_data<event_mctrack>  (_name_mctrk);
+
       // Make sure the data is there
       if (ev_mci && ev_mcs && ev_mct)
 	_helper.FillMCInfo(*ev_mci,
 			   *ev_mcs,
 			   *ev_mct,
-			   _mc_data,
-			   _McParticles);
+			   _mgr.MCEventDataWriteable(),
+			   _mgr.MCParticleSetWriteable());
     }
       
     one_time_warning = false;
-
-    //print(msg::kWARNING,__FUNCTION__,
-    //Form("Time filling SPAData: %g",fWatch.RealTime()));
 
     return true;
   }
 
   bool ERToolAnaBase::finalize() {
-
+    _mgr.Finalize(_fout);
     return true;
   }
 

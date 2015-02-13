@@ -51,6 +51,8 @@ namespace larlite {
     int _thisID, _thatID;
     std::string _thisProcess;
 
+    geoalgo::GeoAlgo _geoAlg;
+
     ertool::AlgoFindRelationship _findRel;
 
   };

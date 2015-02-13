@@ -3,7 +3,9 @@
 
 #include "PandoraShower.h"
 #include <map>
-
+#include "DataFormat/hit.h"
+#include "DataFormat/cluster.h"
+#include "DataFormat/pfpart.h"
 namespace larlite {
 
    PandoraShower::PandoraShower() : ana_base(), fShowerAlgo( nullptr ) {

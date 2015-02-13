@@ -45,7 +45,7 @@ namespace larlite {
   public:
     
     /// Default constructor
-    ERToolHelper(){ _minEDep = 10; };
+    ERToolHelper(){ _minEDep = 0.; };
     
     /// Default destructor
     virtual ~ERToolHelper(){};

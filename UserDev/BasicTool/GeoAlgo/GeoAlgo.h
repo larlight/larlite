@@ -19,6 +19,7 @@
 #include "GeoLineSegment.h"
 #include "GeoTrajectory.h"
 #include "GeoAABox.h"
+#include "GeoSphere.h"
 
 namespace geoalgo {
 
@@ -31,6 +32,7 @@ namespace geoalgo {
      2) Intersection points                  \n
      3) Containment/Overlap of objects       \n
      4) Common Origin functions              \n
+     5) Bounding Sphere functions            \n
 
      Most functions are taken from the reference Real-Time-Collision-Detection (RTCD):
      Ref: http://realtimecollisiondetection.net
@@ -358,6 +360,10 @@ namespace geoalgo {
     { trj.front().compat(seg.Start()); return _commonOrigin_(trj, seg, origin, backwards); }
 
 
+    // Bounding Sphere problem given a vector of 3D points
+    Sphere_t boundingSphere(const std::vector<Point_t>& pts) const
+    { for(auto &p : pts) { pts.front().compat(p); } return _boundingSphere_(pts); }
+
   protected:
 
     /// Line & Line distance w/o dimensionality check
@@ -437,6 +443,11 @@ namespace geoalgo {
     double _commonOrigin_(const Trajectory_t& trj, const LineSegment_t& seg, Point_t& origin, bool backwards) const;
     /// Common origin: Trajectory & Half Line. Keep track of origin
     double _commonOrigin_(const Trajectory_t& trj, const HalfLine_t& lin, Point_t& origin, bool backwards) const;
+
+
+    // Bounding Sphere given a vector of points
+    Sphere_t _boundingSphere_(const std::vector<Point_t>& pts) const;
+    Sphere_t _WelzlSphere_(const std::vector<Point_t>& pts, int numPts, std::vector<Point_t> sosPts) const;
 
     /// Clamp function: checks if value out of bounds
     double _Clamp_(const double n, const double min, const double max) const;

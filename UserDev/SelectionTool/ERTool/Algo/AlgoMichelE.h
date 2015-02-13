@@ -15,8 +15,8 @@
 #ifndef ERTOOL_ALGOMICHELE_H
 #define ERTOOL_ALGOMICHELE_H
 
-#include "Algo/AlgoSingleE.h"
-#include "Base/AlgoBase.h"
+#include "ERTool/Algo/AlgoSingleE.h"
+#include "ERTool/Base/AlgoBase.h"
 
 namespace ertool {
 

@@ -16,7 +16,8 @@
 //#include "Utilities/DetectorProperties.h"
 #include <vector>
 
-#include "LArUtil/LArUtil-TypeDef.h"
+#include "LArUtil/LArProperties.h"
+#include "LArUtil/DetectorProperties.h"
 #include "LArUtil/PxUtils.h"
 #include "AnalysisAlgConstants.h"
 

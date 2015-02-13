@@ -50,30 +50,33 @@ namespace larlite {
     // Search data
     
     // First search for a Pi0 amongst the showers
-    for (size_t s1=0; s1 < _data.Shower().size(); s1++){
-      for (size_t s2=s1+1; s2 < _data.Shower().size(); s2++){
+    auto const& data = _mgr.EventData();
+    auto& ps = _mgr.ParticleSetWriteable();
+
+    for (size_t s1=0; s1 < data.Shower().size(); s1++){
+      for (size_t s2=s1+1; s2 < data.Shower().size(); s2++){
 	// only search for pi0 if not found yet
 	if (!isPi0){
-	  ::ertool::Shower shower1 = _data.Shower(s1);
-	  ::ertool::Shower shower2 = _data.Shower(s2);
-	  isPi0 = _findRel.haveCommonOrigin(shower1,shower2,Pi0Vtx);
-	  if (isPi0){
+	  ::ertool::Shower shower1 = data.Shower(s1);
+	  ::ertool::Shower shower2 = data.Shower(s2);
+	  //isPi0 = _findRel.haveCommonOrigin(shower1,shower2,Pi0Vtx);
+	  if (1){
 	    ::ertool::Particle gamma1(22,0.);
 	    gamma1.Vertex(shower1.Start());
 	    gamma1.Momentum(shower1.Dir()*shower1._energy);
 	    gamma1.RecoObjInfo(s1,::ertool::Particle::RecoObjType_t::kShower);
-	    _RecoParticles.push_back(gamma1);
+	    ps.push_back(gamma1);
 	    ::ertool::Particle gamma2(22,0.);
 	    gamma2.Vertex(shower2.Start());
 	    gamma2.Momentum(shower2.Dir()*shower2._energy);
 	    gamma2.RecoObjInfo(s2,::ertool::Particle::RecoObjType_t::kShower);
-	    _RecoParticles.push_back(gamma2);
+	    ps.push_back(gamma2);
 	    ::ertool::Particle Pi0(111,134.97);
 	    Pi0.Vertex(Pi0Vtx);
 	    Pi0.Momentum(shower1.Dir()*shower1._energy+shower2.Dir()*shower2._energy);
 	    Pi0.AddDaughter(gamma1);
 	    Pi0.AddDaughter(gamma2);
-	    _RecoParticles.push_back(Pi0);
+	    ps.push_back(Pi0);
 	    pi0Segment.Start(Pi0Vtx);
 	    std::cout << "1" << std::endl;
 	    pi0Segment.Dir(Pi0.Momentum());
@@ -88,15 +91,17 @@ namespace larlite {
     int muons = 0;
     int muonIdx = 0;
     ::ertool::Track muonTrk;
-    for (size_t t1=0; t1 < _data.Track().size(); t1++){
+    for (size_t t1=0; t1 < data.Track().size(); t1++){
       // compare tracks with Pi0 and find common matches
       // only find one...we want one muon + Pi0 only!
-      ::ertool::Track track = _data.Track(t1);
+      ::ertool::Track track = data.Track(t1);
+      /*
       if (_findRel.haveCommonOrigin(track,pi0Segment,EvtVtx)){
 	muons += 1;
 	muonIdx = t1;
 	muonTrk = track;
       }
+      */
     }//first loop
 
     if (muons == 1){
@@ -106,7 +111,7 @@ namespace larlite {
       muonMom.Normalize();
       muon.Momentum(muonMom*muonTrk._energy);
       muon.RecoObjInfo(muonIdx,::ertool::Particle::RecoObjType_t::kTrack);
-      _RecoParticles.push_back(muon);
+      ps.push_back(muon);
       std::cout << std::endl << "Muon Created!" << std::endl;
     }
 

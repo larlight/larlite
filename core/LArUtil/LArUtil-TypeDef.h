@@ -5,17 +5,6 @@
 #ifndef LARUTIL_TYPEDEF_H
 #define LARUTIL_TYPEDEF_H
 
-// Header files included here
-#include "LArUtilException.h"
-#include "LArUtilBase.h"
-#include "Geometry.h"
-#include "LArProperties.h"
-#include "DetectorProperties.h"
-#include "ElecClock.h"
-#include "TimeService.h"
-#include "GeometryUtilities.h"
-#include "LArUtilConfig.h"
-
 // Class forward declaration here
 namespace larutil {
   class LArUtilException;

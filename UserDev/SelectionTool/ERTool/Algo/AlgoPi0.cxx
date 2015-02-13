@@ -2,7 +2,7 @@
 #define ERTOOL_ALGOPI0_CXX
 
 #include "AlgoPi0.h"
-#include "Base/BookKeeper.h"
+#include "ERTool/Base/BookKeeper.h"
 #include "GeoAlgo/GeoAlgo.h"
 #include "EMShowerTools/EMShowerProfile.h"
 

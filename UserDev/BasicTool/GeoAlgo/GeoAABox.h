@@ -1,5 +1,5 @@
 /**
- * \file GeoSimpleBox.h
+ * \file GeoAABox.h
  *
  * \ingroup GeoAlgo
  * 
@@ -11,8 +11,8 @@
 /** \addtogroup GeoAlgo
 
     @{*/
-#ifndef BASICTOOL_GEOAABox_H
-#define BASICTOOL_GEOAABox_H
+#ifndef BASICTOOL_GEOAABOX_H
+#define BASICTOOL_GEOAABOX_H
 
 #include "GeoHalfLine.h"
 
@@ -36,64 +36,41 @@ namespace geoalgo {
   public:
     
     /// Default constructor
-    AABox() 
-      : _min(3)
-      , _max(3)
-    {}
-    
-    /// Alternative ctor (1)
-    AABox(const double x_min, const double y_min, const double z_min,
-	 const double x_max, const double y_max, const double z_max)
-      : _min ( x_min, y_min, z_min )
-      , _max ( x_max, y_max, z_max )
-    {}
-    
-    /// Altenartive ctor (2)
-    AABox(const Point_t& min, const Vector_t& max)
-      : _min ( min )
-      , _max ( max   )
-    { 
-      if(min.size()!=3 || max.size()!=3)
-	throw GeoAlgoException("AABox ctor accepts only 3D Point!");
-    }
-
-    /// Alternative ctor using template (3)
-    template <class T, class U> AABox(const T& min, const U& max)
-      : AABox(Point_t(min), Point_t(max))
-    {}
+    AABox();
 
     /// Default destructor
     virtual ~AABox(){};
+    
+    /// Alternative ctor (0)
+    AABox(const double x_min, const double y_min, const double z_min,
+	  const double x_max, const double y_max, const double z_max);
+    
+    /// Altenartive ctor (1)
+    AABox(const Point_t& min, const Vector_t& max);
 
     //
     // Attribute accessor
     //
-    /// Minimum point getter
-    const Point_t& Min() const { return _min; }
-    /// Maximum point getter
-    const Point_t& Max() const { return _max; }
-    /// Minimum point setter
-    void Min(const double x, const double y, const double z)
-    { _min[0] = x; _min[1] = y; _min[2] = z; }
-    /// Maximum point setter
-    void Max(const double x, const double y, const double z)
-    { _max[0] = x; _max[1] = y; _max[2] = z; }
-
-    /// Test if a point is contained within the box ... so simple that this is a class attribute
-    bool Contain(const Point_t &pt) const {
-      return !( (pt[0] < _min[0] || _max[0] < pt[0]) || // point is outside X boundaries OR
-		(pt[1] < _min[1] || _max[1] < pt[1]) || // point is outside Y boundaries OR
-		(pt[2] < _min[2] || _max[2] < pt[2])    // point is outside Z boundaries
-		);
-    }
+    const Point_t& Min() const; ///< Minimum point getter
+    const Point_t& Max() const; ///< Maximum point getter
+    void Min(const double x, const double y, const double z); ///< Minimum point setter
+    void Max(const double x, const double y, const double z); ///< Maximum point setter
+    bool Contain(const Point_t &pt) const; ///< Test if a point is contained within the box
     
   protected:
+    
+    Point_t _min; ///< Minimum point
+    Point_t _max; ///< Maximum point
 
-    /// Minimum point
-    Point_t _min;
+  public:
 
-    /// Maximum point
-    Point_t _max;
+    //
+    // Template
+    //
+    /// Alternative ctor using template (3)
+    template <class T, class U> AABox(const T& min, const U& max)
+      : AABox(Point_t(min), Point_t(max))
+    {}
     
   };
 

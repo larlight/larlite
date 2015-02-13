@@ -12,7 +12,7 @@ namespace ertool {
     , _mom(3)
   { 
     if(mass<0)    throw ERException("Must specify mass!");
-    if(!pdg_code) throw ERException("Invalid PdgCode!");
+    //if(!pdg_code) throw ERException("Invalid PdgCode!");
     _pdg_code = pdg_code;
     _mass     = mass;
 
@@ -29,6 +29,7 @@ namespace ertool {
     _daughters.clear();
     _reco_obj_id = -1;
     _reco_obj_type = kUnknown;
+    _time = -1;
   }
 
   //
@@ -36,6 +37,10 @@ namespace ertool {
   //
   double Particle::Energy() const 
   { return sqrt(_mom.SqLength() + _mass * _mass ); }
+
+  double Particle::KineticEnergy() const
+  { return (this->Energy() - this->Mass()); }
+
   double Particle::DaughterEnergySum() const
   { 
     double energy=0;
@@ -101,7 +106,10 @@ namespace ertool {
 
   void Particle::Diagram(std::string& res,std::string prefix) const
   {
-    res += prefix + std::to_string(_pdg_code) + "\n";
+    res += prefix + std::to_string(_pdg_code) + " ... ";
+    res += std::to_string(Vertex()[0]) + " : " + std::to_string(Vertex()[1]) + " : " + std::to_string(Vertex()[2]);
+    res += " --> " + std::to_string( KineticEnergy() );
+    res += "\n";
     prefix += "  ";
     for(auto const& d : _daughters) d.Diagram(res,prefix);
   }
@@ -112,10 +120,63 @@ namespace ertool {
     this->AllDaughters(res);
     return res;
   }
+
   void Particle::AllDaughters(std::vector<const ::ertool::Particle*>& part_v) const
   {
     part_v.push_back(this);
     for(auto const& daughter : _daughters) daughter.AllDaughters(part_v);
+  }
+
+  std::string ParticleSet::Diagram() const
+  {
+    std::string res;
+    for(auto const& p : (*this)) res += p.Diagram() + "\n";
+    return res;
+  }
+
+  const std::vector< ::ertool::Particle>::iterator ParticleSet::Find(const ::ertool::Particle& p,bool exclusive)
+  {
+    std::vector< ::ertool::Particle>::iterator iter;
+    for(iter = this->begin(); iter != this->end(); ++iter) 
+      if((*iter).Match(p,exclusive)) return iter;
+    return iter;
+  }
+
+  void ParticleSet::Collapse()
+  {
+    ParticleSet ps;
+
+    for(auto const& p1 : (*this)) {
+
+      bool found=false;
+      for(auto& p2 : ps) {
+
+	::geoalgo::Point_t v1(p1.Vertex());
+	::geoalgo::Point_t v2(p2.Vertex());
+	for(size_t i=0; i<v1.size(); ++i) {
+	  v1[i] = (double)((int)(v1[i]*1.e9));
+	  v2[i] = (double)((int)(v2[i]*1.e9));
+	}
+
+	if(v1 == v2 && p1.Time() == p2.Time()) {
+
+	  for(auto const& d : p1.Daughters()) p2.AddDaughter(d);
+
+	  found=true;
+	  
+	  break;
+	}
+      }
+      if(!found) {
+	Particle p(0,0);
+	p.Vertex(p1.Vertex());
+	p.Time(p1.Time());
+	for(auto const& d : p1.Daughters())
+	  p.AddDaughter(d);
+	ps.push_back(p);
+      }
+    }
+    (*this) = ps;
   }
 
 }

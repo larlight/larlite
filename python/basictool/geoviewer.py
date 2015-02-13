@@ -3,6 +3,7 @@ from matplotlib.collections import PolyCollection
 #from matplotlib.colors import colorConverter
 from mpl_toolkits.mplot3d import Axes3D
 from drawcone import  rot
+from drawsphere import sphere
 import matplotlib.pyplot as plt
 import numpy as np
 import random
@@ -15,6 +16,7 @@ class GeoViewer(object):
     _type_seg  = geoalgo.LineSegment()
     _type_lin  = geoalgo.HalfLine()
     _type_con  = geoalgo.Cone()
+    _type_sph  = geoalgo.Sphere()
     _holder    = geoalgo.GeoObjCollection()
     _converter = larpy.PyGeoObj()
 
@@ -41,6 +43,30 @@ class GeoViewer(object):
         c = np.random.rand(3,1)
         Gray = c[0] * 0.3 + c[1] * 0.59 + c[2] * 0.11
         return c
+
+    def set_ax_range(self,range_min,range_max):
+
+        self._ax.set_xlim(range_min[0],range_max[0])
+        self._ax.set_ylim(range_min[1],range_max[1])
+        self._ax.set_zlim(range_min[2],range_max[2])
+
+        self._fig.canvas
+        self._fig.canvas.draw()#plt.show()
+
+    def get_ax_range(self):
+
+        range_min = [0,0,0]
+        range_max = [0,0,0]
+        range_min[0] = self._ax.get_xlim()[0]
+        range_min[1] = self._ax.get_ylim()[0]
+        range_min[2] = self._ax.get_zlim()[0]
+        range_max[0] = self._ax.get_xlim()[1]
+        range_max[1] = self._ax.get_ylim()[1]
+        range_max[2] = self._ax.get_zlim()[1]
+        return [range_min,range_max]
+
+    def set_window_title(self,tit):
+        self._fig.canvas.set_window_title(tit)
 
     def GetObjCollection(self):
         return self._holder
@@ -186,6 +212,36 @@ class GeoViewer(object):
         self._ax.scatter(s[0],s[1],s[2],s=50,color=c,marker='x')
         self._ax.plot(xp,yp,zp,color=c)
 
+
+    def _add_sphere(self,arg,c=''):
+
+        if not c: c = self.rand_color()
+        
+        o = arg.Origin()
+        r = arg.Radius()
+
+        xp,yp,zp = sphere(o,r)
+
+        # update boundaries
+
+        for j in xrange(len(xp)):
+            for j1 in xrange(len(xp[j])):
+                if xp[j][j1] < self._range_min[0]: self._range_min[0] = xp[j][j1]
+                if xp[j][j1] > self._range_max[0]: self._range_max[0] = xp[j][j1]
+        for j in xrange(len(yp)):
+            for j1 in xrange(len(yp[j])):
+                if yp[j][j1] < self._range_min[1]: self._range_min[1] = yp[j][j1]
+                if yp[j][j1] > self._range_max[1]: self._range_max[1] = yp[j][j1]
+        for j in xrange(len(zp)):
+            for j1 in xrange(len(zp[j])):
+                if zp[j][j1] < self._range_min[2]: self._range_min[2] = zp[j][j1]
+                if zp[j][j1] > self._range_max[2]: self._range_max[2] = zp[j][j1]
+
+        #self._ax.scatter(s[0],s[1],s[2],s=50,color=c,marker='x')
+        self._ax.plot_wireframe(xp,yp,zp,color=c)
+
+
+
     def _add_box(self,arg, c=''):
         if not c: c = self.rand_color()
         data = self._converter.Convert(arg);
@@ -235,6 +291,8 @@ class GeoViewer(object):
             self._add_trajectory(self._holder.Trajectory()[x], self._holder.TrajectoryColor()[x])
         for x in xrange(len(self._holder.Cone())):
             self._add_cone(self._holder.Cone()[x], self._holder.ConeColor()[x])
+        #for x in xrange(len(self._holder.Sphere())):
+        #    self._add_sphere(self._holder.Sphere()[x], self._holder.SphereColor()[x])
         for x in self._converter.Convert(self._holder.Labels()):
             self._add_label(x)
 
@@ -268,7 +326,6 @@ class GeoViewer(object):
         self._ax.set_ylabel('Y [cm]')
         self._ax.set_zlabel('Z [cm]')
 
-        print self._fig
         self._fig.canvas
         self._fig.canvas.draw()#plt.show()
         #self._fig.show()

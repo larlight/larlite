@@ -82,9 +82,9 @@ namespace ertool {
   std::vector<std::vector< const ::ertool::Track* > > EventData::TrackCombination(const size_t n) const
   {
     std::vector<std::vector< const ::ertool::Track*> > res;
-    if(n<_shower_v.size()) return res;
+    if(n<_track_v.size()) return res;
     
-    auto const comb_v = Combination(_shower_v.size(),n);
+    auto const comb_v = Combination(_track_v.size(),n);
     for(auto const& comb : comb_v) {
       res.push_back(std::vector< const ::ertool::Track*>());
       res.back().reserve(n);
@@ -98,9 +98,9 @@ namespace ertool {
   std::vector<std::vector< const ::ertool::Vertex* > > EventData::VertexCombination(const size_t n) const
   {
     std::vector<std::vector< const ::ertool::Vertex*> > res;
-    if(n<_shower_v.size()) return res;
+    if(n<_vertex_v.size()) return res;
     
-    auto const comb_v = Combination(_shower_v.size(),n);
+    auto const comb_v = Combination(_vertex_v.size(),n);
     for(auto const& comb : comb_v) {
       res.push_back(std::vector< const ::ertool::Vertex*>());
       res.back().reserve(n);

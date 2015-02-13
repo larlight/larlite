@@ -1,0 +1,74 @@
+#!/usr/bin/python
+import sys, os
+
+if len(sys.argv)<2:
+   sys.stderr.write('Usage: %s REPOSITORY_NAME\n\n' % sys.argv[0])
+   sys.exit(1)
+if not 'LARLITE_USERDEVDIR' in os.environ.keys():
+   sys.stderr.write('$LARLITE_USERDEVDIR not defined!\n\n')
+   sys.exit(1)
+
+name=sys.argv[1].rstrip('/')
+target_dir='%s/%s' % (os.environ['LARLITE_USERDEVDIR'],name)
+source_dir='%s/bin/repo_tmp' % os.environ['LARLITE_BASEDIR']
+
+# Check if new repo is good to be generated
+if os.path.exists(target_dir):
+   items = os.listdir(target_dir)
+   bad_items = [ '.git', 'doc',
+                 'GNUmakefile', 
+                 'Makefile', 'makefile' ]
+   good_status=True
+   for item in items:
+      if item in bad_items: 
+         good_status=False 
+         break
+   
+   if not good_status:
+      sys.stderr.write('Package \"%s\" already exists (%s) w/ followings:\n' % (name,target_dir))
+      for item in items:
+         if item in bad_items:
+            sys.stderr.write('  %s\n' % item)
+      sys.stderr.write('Please remove before running this script.\n\n')
+      sys.exit(1)
+
+try:
+   if not os.path.exists(target_dir):
+      os.makedirs(target_dir)
+   if not os.path.exists('%s/bin' % target_dir):
+      os.makedirs('%s/bin' % target_dir)
+   # Copy templates
+   os.system("scp -r %s/* %s/bin/" % (source_dir,target_dir))
+   os.system("rm %s/bin/GNUmakefile.tmp" % target_dir)
+   os.system("rm -r %s/bin/doc" % target_dir)
+   os.system("rm -r %s/bin/gitignore" % target_dir)
+   os.system("scp %s/GNUmakefile.tmp %s/GNUmakefile" % (source_dir,target_dir))
+   os.system("scp -r %s/doc %s/" % (source_dir,target_dir))
+   os.system("scp  %s/gitignore %s/.gitignore" % (source_dir,target_dir))
+
+except OSError:
+   sys.stderr.write('Failed to create a dir: %s\n' % target_dir)
+   sys.stderr.write('Maybe lacking a permission?\n\n')
+   sys.exit(1)
+
+flist = [ 'GNUmakefile',
+          'doc/doxygenMyProject.script',
+          'doc/doxygenMyProject+.script']
+
+for f in flist:
+
+   full_path = '%s/%s' % (target_dir,f)
+   contents  = open(full_path,'r').read()
+   contents  = contents.replace('RepositoryName',name)
+   contents  = contents.replace('REPOSITORYNAME',name.upper())
+   contents  = contents.replace('repositoryname',name.lower())
+   fout = open(full_path,'w')
+   fout.write(contents)
+   fout.close()
+
+print
+print 'Generated a new repository dir:', target_dir
+print
+print 'You can use bin/gen_package script (or llgen_package alias) to generate your packages in the new repo'
+print
+sys.exit(0)

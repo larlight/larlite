@@ -12,11 +12,6 @@
 #pragma link C++ class larlite::ana_base+;
 #pragma link C++ class std::vector<larlite::ana_base*>+;
 #pragma link C++ class larlite::ana_processor+;
-#pragma link C++ class std::vector<TH3D*>+;
-#pragma link C++ class std::vector<TH2D*>+;
-#pragma link C++ class std::vector<TH1D*>+;
-#pragma link C++ class std::vector<TGraph*>+;
-#pragma link C++ class std::vector<TGraphErrors*>+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 

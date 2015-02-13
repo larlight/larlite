@@ -17,6 +17,10 @@ else
 fi
 unset me;
 
+if [[ -z $ENABLE_LARLITE_ALIAS ]]; then
+    export ENABLE_LARLITE_ALIAS=1
+fi
+
 echo "LARLITE_BASEDIR = $LARLITE_BASEDIR"
 if [[ -z $LARLITE_BASEDIR ]]; then
     echo \$LARLITE_BASEDIR not set! 
@@ -109,8 +113,17 @@ else
 	export DYLD_LIBRARY_PATH=$LARLITE_LIBDIR:$DYLD_LIBRARY_PATH
     fi
     export PATH=$LARLITE_BASEDIR/bin:$PATH
-    alias maketop="make --directory=$LARLITE_BASEDIR"
-    alias cdtop="cd $LARLITE_BASEDIR"
+    if [ $ENABLE_LARLITE_ALIAS ]; then
+	alias maketop="make --directory=$LARLITE_BASEDIR"
+	alias cdtop="cd $LARLITE_BASEDIR"
+	alias llgen_package="python $LARLITE_BASEDIR/bin/gen_package"
+	alias llgen_repository="python $LARLITE_BASEDIR/bin/gen_repository"
+	alias llgen_class_empty="python $LARLITE_BASEDIR/bin/gen_class_empty"
+	alias llgen_class_anaunit="python $LARLITE_BASEDIR/bin/gen_class_anaunit"
+	alias llgen_class_erana="python $LARLITE_BASEDIR/bin/gen_class_erana"
+	alias llgen_class_eralgo="python $LARLITE_BASEDIR/bin/gen_class_eralgo"
+	alias llgen_class_erfilter="python $LARLITE_BASEDIR/bin/gen_class_erfilter"
+    fi
     echo
     echo "Finish configuration. To build, type:"
     echo "> cd \$LARLITE_BASEDIR"

@@ -16,7 +16,7 @@
 #define LARLITE_WIRE_H
 
 #include "data_base.h"
-
+#include "Base/GeoConstants.h"
 namespace larlite {
   /**
      \class wire

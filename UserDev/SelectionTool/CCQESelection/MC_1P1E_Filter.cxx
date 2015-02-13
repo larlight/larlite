@@ -17,6 +17,7 @@ namespace larlite {
   
   bool MC_1P1E_Filter::analyze(storage_manager* storage) {
   
+
     //Grab the MCTruth
     auto ev_mctruth = storage->get_data<event_mctruth>("generator");
     if(!ev_mctruth) {
@@ -30,8 +31,8 @@ namespace larlite {
     //I don't care about neutrons, weird quarks, the neutrino, etc.
     size_t n_electrons = 0;
     size_t n_protons = 0;
-    
-    for(auto const& particle : ev_mctruth->at(0).GetParticles()){
+
+    for(auto const& particle : ev_mctruth->at(0).GetParticles()){    
 
       double KE = particle.Trajectory().at(0).E()-particle.Mass();
 

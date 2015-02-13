@@ -105,7 +105,7 @@ namespace showerreco {
     if(fVerbosity)
       std::cout << " new angles: " << xphi << " " << xtheta << std::endl; 
     */
-    std::cout << std::setprecision(2) << std::fixed;    
+    //std::cout << std::setprecision(2) << std::fixed;    
     
     double xyz[3];
     // calculate start point here?
