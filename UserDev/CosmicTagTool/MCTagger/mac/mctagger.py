@@ -21,21 +21,19 @@ from ROOT import larlite as fmwk
 my_proc=fmwk.ana_processor()
 
 # Specify IO mode
-my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
+my_proc.set_io_mode(fmwk.storage_manager.kREAD) #BOTH)
 
-my_proc.enable_event_alignment(False)
+#my_proc.enable_event_alignment(False)
 # Set input root file: this is decoder output root file.
 # This time, we use a sample file prepared.
-#my_proc.add_input_file("./../../../NevisDecoder/Decoder/mac/xmit_subrun_2014_01_13_1_dma_no_1.root")
-#my_proc.add_input_file("./../../../NevisDecoder/Decoder/mac/xmit_subrun_2014_01_13_1_trigger.root")
 for x in xrange(len(sys.argv)-1):
+    print "In file loop..."
     my_proc.add_input_file(sys.argv[x+1])
 
 # Set output root file: this is a separate root file in which your
 # analysis module can store anything such as histograms, your own TTree, etc.
-my_proc.set_output_file("taggedShowers.root")
+my_proc.set_ana_output_file("tagShowers.root")
 
-#tagger = fmwk.MCTag()
 tagger = fmwk.MCShowerTagger()
 tagger.SetDataType("mcreco")
 
