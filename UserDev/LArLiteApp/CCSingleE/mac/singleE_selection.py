@@ -24,13 +24,13 @@ my_algo.setVtxToTrkStartDist(1)
 my_algo.setVtxToTrkDist(1)
 my_algo.setVtxToShrStartDist(50)
 my_algo.setMaxIP(1)
-my_algo.setEThreshold(100)
+my_algo.setEThreshold(0)
 #my_algo.setVerbose(True)
 
 # Create Filter
 MCfilter = fmwk.MC_CC1E_Filter();
-#MCfilter.flip(False)
-MCfilter.flip(True)
+MCfilter.flip(False)
+#MCfilter.flip(True)
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):
@@ -55,15 +55,15 @@ my_ana = ertool.ERAnaSingleE()
 my_anaunit = fmwk.ExampleERSelection()
 my_anaunit._mgr.SetAlgo(my_algo)
 my_anaunit._mgr.SetAna(my_ana)
-my_anaunit.SetMinEDep(100)
+my_anaunit.SetMinEDep(20)
 my_anaunit._mgr._mc_for_ana = True
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
-#my_anaunit.SetShowerProducer(True,"mcreco");
+my_anaunit.SetShowerProducer(True,"mcreco");
 my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetVtxProducer(True,"generator");
 #my_anaunit.SetShowerProducer(False,"mergeall");
-my_anaunit.SetShowerProducer(False,"showerreco");
+#my_anaunit.SetShowerProducer(False,"showerreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 # ************************************************
