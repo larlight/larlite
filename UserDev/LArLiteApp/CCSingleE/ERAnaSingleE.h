@@ -17,6 +17,7 @@
 
 #include "ERTool/Base/AnaBase.h"
 #include "TTree.h"
+#include "TH1D.h"
 
 #include "DataFormat/mctruth.h"
 
@@ -46,13 +47,17 @@ namespace ertool {
 
     void ProcessEnd(TFile* fout);
 
+    /// Function to save efficiency vs. variable to histogram
+    void MakeEffPlot(std::string varname,
+		     int nbins, double xmin, double xmax);
+
   private:
 
     bool _debug;
 
-    // Analysis tree with MC level info comparison
-    // between EventData and ParticleSet
-    TTree* _ana_tree;
+
+    // Result tree comparison for reconstructed events
+    TTree* _result_tree;
 
     //Number of reconstructed *particles* in the output PSet
     //(this is 1-to-1 with number of single electrons reconstructed)
@@ -67,8 +72,6 @@ namespace ertool {
     //Number of reconstructed *tracks* in the event data
     int _RECOtracks;
 
-    // Result tree comparison for reconstructed events
-    TTree* _result_tree;
     /// Energy of electron found to be SingleE, if only one exists in event
     /// otherwise, variable is set to 0
     double _E;    
@@ -79,6 +82,10 @@ namespace ertool {
     int _Pdgnu;    /// Neutrino PDG
     double _Elep;  /// lepton from neutrino Energy
     int _Pdglep;   /// lepton from neutrino Pdg
+    int _nProtons; /// number of protons ( E > 20 MeV)
+    int _nNeutrons;/// number of neutrons (E > 20 MeV)
+    int _nPiplus;  /// number of pi+ (E > 20 MeV)
+    int _nPi0;     /// number of pi0 (E > 20 MeV)
 
     /// counters to cout to screen after running
     int _numEvts;
