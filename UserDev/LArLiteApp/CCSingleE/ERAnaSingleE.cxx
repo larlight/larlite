@@ -28,11 +28,17 @@ namespace ertool {
     _result_tree->Branch("_pdg_nu",&_pdg_nu,"pdg_nu/I");
     _result_tree->Branch("_e_lep",&_e_lep,"e_lep/D");
     _result_tree->Branch("_pdg_lep",&_pdg_lep,"pdg_lep/I");
+    _result_tree->Branch("_x_lep",&_x_lep,"x_lep/D");
+    _result_tree->Branch("_y_lep",&_y_lep,"y_lep/D");
+    _result_tree->Branch("_z_lep",&_z_lep,"z_lep/D");
     _result_tree->Branch("_theta_lep",&_theta_lep,"theta_lep/D");
     _result_tree->Branch("_phi_lep",&_phi_lep,"phi_lep/D");
     _result_tree->Branch("_e_lepReco",&_e_lepReco,"e_lepReco/D");
     _result_tree->Branch("_theta_lepReco",&_theta_lepReco,"theta_lepReco/D");
     _result_tree->Branch("_phi_lepReco",&_phi_lepReco,"phi_lepReco/D");
+    _result_tree->Branch("_x_lepReco",&_x_lepReco,"x_lepReco/D");
+    _result_tree->Branch("_y_lepReco",&_y_lepReco,"y_lepReco/D");
+    _result_tree->Branch("_z_lepReco",&_z_lepReco,"z_lepReco/D");
     _result_tree->Branch("_misID",&_misID,"misID/I");
 
     _numEvts = 0;
@@ -80,6 +86,9 @@ namespace ertool {
 	      std::cout<<"wtf already found daughter? overwriting variables..."<<std::endl;
 	    found_lepton_daughter = true;
 	    _e_lep = nud.Energy();
+	    _x_lep = nud.Vertex()[0];
+	    _y_lep = nud.Vertex()[0];
+	    _z_lep = nud.Vertex()[0];
 	    _theta_lep = (180./3.14) * acos( nud.Momentum()[2] / sqrt( nud.Momentum()[0]*nud.Momentum()[0] +
 								       nud.Momentum()[1]*nud.Momentum()[1] +
 								       nud.Momentum()[2]*nud.Momentum()[2] ) );
@@ -122,6 +131,9 @@ namespace ertool {
     if ( _n_singleReco == 1 ){
       Particle se = ps[0].Daughters()[0];
       _e_lepReco = se.Energy();
+      _x_lepReco = se.Vertex()[0];
+      _y_lepReco = se.Vertex()[0];
+      _z_lepReco = se.Vertex()[0];
       _theta_lepReco = (180./3.14) * acos( se.Momentum()[2] / sqrt( se.Momentum()[0]*se.Momentum()[0] +
 								    se.Momentum()[1]*se.Momentum()[1] +
 								    se.Momentum()[2]*se.Momentum()[2] ) );
@@ -137,6 +149,9 @@ namespace ertool {
       std::cout << "Ana results:" << std::endl
 		<< "Mis-ID                 : " << _misID << std::endl           
 		<< "Lepton E  [Mc,Reco]    : [" << _e_lep << ", " << _e_lepReco << "]" <<  std::endl
+		<< "Lepton Vtx dist Mc-Reco:  " << sqrt( (_x_lep-_x_lepReco)*(_x_lep-_x_lepReco) +
+							 (_y_lep-_y_lepReco)*(_y_lep-_y_lepReco) +
+							 (_z_lep-_z_lepReco)*(_z_lep-_z_lepReco) ) << std::endl
 		<< "Lepton theta [Mc,Reco] : [" << _theta_lep << ", " << _theta_lepReco << "]" <<  std::endl
 		<< "Lepton phi [Mc,Reco]   : [" << _phi_lep << ", " << _phi_lepReco << "]" <<  std::endl;
     }
@@ -211,10 +226,16 @@ namespace ertool {
     _e_nu          = -1000;
     _pdg_nu        = -1;
     _e_lep         = -1000;
+    _x_lep         = -1000;
+    _y_lep         = -1000;
+    _z_lep         = -1000;
     _pdg_lep       = -1;
     _theta_lep     = -360;
     _phi_lep       = -360;
     _e_lepReco     = -1000;
+    _x_lepReco     = -1000;
+    _y_lepReco     = -1000;
+    _z_lepReco     = -1000;
     _theta_lepReco = -360;
     _phi_lepReco   = -360;
 

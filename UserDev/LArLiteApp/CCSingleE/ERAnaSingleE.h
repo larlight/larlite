@@ -65,10 +65,8 @@ namespace ertool {
     //Number of reconstructed *particles* in the output PSet
     //(this is 1-to-1 with number of single electrons reconstructed)
     int _n_singleReco;
-    //Total number of MC electron/positron particles in the event
-    int _n_electrons;
-    //Total number of MC gamma particles in the event
-    int _n_gammas;
+    int _n_electrons;  ///Total number of MC electron/positron particles in the event
+    int _n_gammas;     ///Total number of MC gamma particles in the event
     int _n_showers;    ///Number of mc *showers*
     int _n_showersReco;/// Number of reconstructed *showers* in the event data (could be e or g, etc)
     int _n_tracks;     /// Number of mc *tracks*
@@ -83,10 +81,12 @@ namespace ertool {
     double _e_nu;      /// Neutrino energy
     int _pdg_nu;       /// Neutrino PDG
     double _e_lep;     /// lepton from neutrino Energy
+    double _x_lep, _y_lep, _z_lep; /// lepton x,y,z start point
     int _pdg_lep;      /// lepton from neutrino Pdg
     double _theta_lep; /// lepton angle w.r.t. beam direction
     double _phi_lep;   /// lepton angle w.r.t. x on xy plane
     double _e_lepReco; /// lepton E from reconstruction (i.e. SingleE energy if found)
+    double _x_lepReco, _y_lepReco, _z_lepReco; /// lepton x,y,z start point
     double _theta_lepReco; /// lepton angle w.r.t. beam direction (from reco. i.e. SingleE if found)
     double _phi_lepReco;   /// lepton angle w.r.t. x on xy plane (from reco. i.e. SingleE if found)
 
