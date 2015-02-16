@@ -335,7 +335,6 @@ namespace larlite {
 
       res.Add(t);
     }
-
     return;
   }
 
@@ -425,7 +424,7 @@ namespace larlite {
       if(mcs.DetProfile().Momentum().E()<_minEDep) continue;
       //if(isnan(mcs.DetProfile().Momentum().E())) continue;
       //if(isnan(mcs.DetProfile().Momentum().Px())) continue;
-
+      if(mcs.DetProfile().Momentum().Mag2() == 0) continue;
       ::ertool::Shower s( mcs.DetProfile().Position(),
 			  mcs.DetProfile().Momentum(),
 			  _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
