@@ -47,6 +47,9 @@ namespace ertool {
 
     void ProcessEnd(TFile* fout);
 
+    /// Function to re-set TTree variables
+    void ResetTreeVariables();
+
     /// Function to save efficiency vs. variable to histogram
     void MakeEffPlot(std::string varname,
 		     int nbins, double xmin, double xmax);
@@ -61,31 +64,33 @@ namespace ertool {
 
     //Number of reconstructed *particles* in the output PSet
     //(this is 1-to-1 with number of single electrons reconstructed)
-    int _singleRECO;
+    int _n_singleReco;
     //Total number of MC electron/positron particles in the event
-    int _MCelectrons;
+    int _n_electrons;
     //Total number of MC gamma particles in the event
-    int _MCgammas;
-    //Number of reconstructed *showers* in the event data (could be e or g, etc)
-    //Note: if running on MC, this is = # of MCShowers in the event 
-    int _RECOshowers;
-    //Number of reconstructed *tracks* in the event data
-    int _RECOtracks;
-
-    /// Energy of electron found to be SingleE, if only one exists in event
-    /// otherwise, variable is set to 0
-    double _E;    
+    int _n_gammas;
+    int _n_showers;    ///Number of mc *showers*
+    int _n_showersReco;/// Number of reconstructed *showers* in the event data (could be e or g, etc)
+    int _n_tracks;     /// Number of mc *tracks*
+    int _n_tracksReco; /// Number of reconstructed *tracks* in the event data
+    int _n_protons;    /// number of protons ( E > 20 MeV)
+    int _n_neutrons;   /// number of neutrons (E > 20 MeV)
+    int _n_piplus;     /// number of pi+ (E > 20 MeV)
+    int _n_pi0;        /// number of pi0 (E > 20 MeV)
     /// Whether this event was MID'd (if == 0: we found ==1 single electron)
     /// Note: this is 0 if _E is filled, otherwise this is 1 (redundant)
     int    _misID;
-    double _Enu;   /// Neutrino energy
-    int _Pdgnu;    /// Neutrino PDG
-    double _Elep;  /// lepton from neutrino Energy
-    int _Pdglep;   /// lepton from neutrino Pdg
-    int _nProtons; /// number of protons ( E > 20 MeV)
-    int _nNeutrons;/// number of neutrons (E > 20 MeV)
-    int _nPiplus;  /// number of pi+ (E > 20 MeV)
-    int _nPi0;     /// number of pi0 (E > 20 MeV)
+    double _e_nu;      /// Neutrino energy
+    int _pdg_nu;       /// Neutrino PDG
+    double _e_lep;     /// lepton from neutrino Energy
+    int _pdg_lep;      /// lepton from neutrino Pdg
+    double _theta_lep; /// lepton angle w.r.t. beam direction
+    double _phi_lep;   /// lepton angle w.r.t. x on xy plane
+    double _e_lepReco; /// lepton E from reconstruction (i.e. SingleE energy if found)
+    double _theta_lepReco; /// lepton angle w.r.t. beam direction (from reco. i.e. SingleE if found)
+    double _phi_lepReco;   /// lepton angle w.r.t. x on xy plane (from reco. i.e. SingleE if found)
+
+
 
     /// counters to cout to screen after running
     int _numEvts;

@@ -13,20 +13,26 @@ namespace ertool {
     if (_result_tree) { delete _result_tree; }
     _result_tree = new TTree("_result_tree","Result Tree");
 
-    _result_tree->Branch("_singleRECO",&_singleRECO,"singleRECO/I");
-    _result_tree->Branch("_RECOshowers",&_RECOshowers,"RECOshowers/I");
-    _result_tree->Branch("_RECOtracks",&_RECOtracks,"RECOtracks/I");
-    _result_tree->Branch("_MCelectrons",&_MCelectrons,"_MCelectrons/I");
-    _result_tree->Branch("_MCgammas",&_MCgammas,"_MCgammas/I");
-    _result_tree->Branch("_Enu",&_Enu,"Enu/D");
-    _result_tree->Branch("_Pdgnu",&_Pdgnu,"Pdgnu/I");
-    _result_tree->Branch("_Elep",&_Elep,"Elep/D");
-    _result_tree->Branch("_Pdglep",&_Pdglep,"Pdglep/I");
-    _result_tree->Branch("_E",&_E,"E/D");
-    _result_tree->Branch("_nProtons",&_nProtons,"nProtons/I");
-    _result_tree->Branch("_nNeutrons",&_nNeutrons,"nNeutrons/I");
-    _result_tree->Branch("_nPiplus",&_nPiplus,"nPiplus/I");
-    _result_tree->Branch("_nPi0",&_nPi0,"nPi0/I");
+    _result_tree->Branch("_n_singleReco",&_n_singleReco,"n_singleReco/I");
+    _result_tree->Branch("_n_showers",&_n_showers,"n_showers/I");
+    _result_tree->Branch("_n_showersReco",&_n_showersReco,"n_showersReco/I");
+    _result_tree->Branch("_n_tracks",&_n_tracks,"n_tracks/I");
+    _result_tree->Branch("_n_tracksReco",&_n_tracksReco,"n_tracksReco/I");
+    _result_tree->Branch("_n_electrons",&_n_electrons,"n_electrons/I");
+    _result_tree->Branch("_n_gammas",&_n_gammas,"n_gammas/I");
+    _result_tree->Branch("_e_nu",&_e_nu,"e_nu/D");
+    _result_tree->Branch("_n_protons",&_n_protons,"n_protons/I");
+    _result_tree->Branch("_n_neutrons",&_n_neutrons,"n_neutrons/I");
+    _result_tree->Branch("_n_piplus",&_n_piplus,"n_piplus/I");
+    _result_tree->Branch("_n_pi0",&_n_pi0,"n_pi0/I");
+    _result_tree->Branch("_pdg_nu",&_pdg_nu,"pdg_nu/I");
+    _result_tree->Branch("_e_lep",&_e_lep,"e_lep/D");
+    _result_tree->Branch("_pdg_lep",&_pdg_lep,"pdg_lep/I");
+    _result_tree->Branch("_theta_lep",&_theta_lep,"theta_lep/D");
+    _result_tree->Branch("_phi_lep",&_phi_lep,"phi_lep/D");
+    _result_tree->Branch("_e_lepReco",&_e_lepReco,"e_lepReco/D");
+    _result_tree->Branch("_theta_lepReco",&_theta_lepReco,"theta_lepReco/D");
+    _result_tree->Branch("_phi_lepReco",&_phi_lepReco,"phi_lepReco/D");
     _result_tree->Branch("_misID",&_misID,"misID/I");
 
     _numEvts = 0;
@@ -42,71 +48,85 @@ namespace ertool {
   { 
     // Reset tree variables
     // Assume we will mis-ID
-    _misID = 1;
-    _E = 0;
-    _Elep = -0;
-    _Pdglep = 0;
-    _Enu = 0;
-    _Pdgnu = 0;
-    _nProtons = 0;
-    _nNeutrons = 0;
-    _nPiplus = 0;
-    _nPi0 = 0;
+    ResetTreeVariables();
+
 
     _numEvts += 1;
     // count number of showers in event
-    _MCelectrons = 0;
-    _MCgammas    = 0;
+    _n_electrons = 0;
+    _n_gammas    = 0;
+
+    // Get MC EventData (showers/tracks...)
+    auto mc_data = MCEventData();
+    // Count number of MC tracks and showers with E > 20 MeV
+    _n_showers = 0;
+    _n_tracks  = 0;
+    for (auto &s : data.AllShower())
+      if (s._energy > 20) { _n_showers += 1; }
+    for (auto &t : data.AllTrack())
+      if (t._energy > 20) { _n_tracks += 1; }
 
     // Get MC particle set
     auto mc_ps = MCParticleSet();
     for (auto &p : mc_ps){
       // Find the Lepton and store its energy
       if (abs(p.PdgCode()) == 12 || abs(p.PdgCode()) == 14){
-	_Enu = p.Energy();
-	_Pdgnu = p.PdgCode();
+	_e_nu = p.Energy();
+	_pdg_nu = p.PdgCode();
 	bool found_lepton_daughter = false;
 	for (auto &nud : p.Daughters()){
 	  if (abs(nud.PdgCode()) == 11 || abs(nud.PdgCode()) == 13){
 	    if(found_lepton_daughter) 
 	      std::cout<<"wtf already found daughter? overwriting variables..."<<std::endl;
 	    found_lepton_daughter = true;
-	    _Elep = nud.Energy();
-	    _Pdglep = nud.PdgCode();
+	    _e_lep = nud.Energy();
+	    _theta_lep = (180./3.14) * acos( nud.Momentum()[2] / sqrt( nud.Momentum()[0]*nud.Momentum()[0] +
+								       nud.Momentum()[1]*nud.Momentum()[1] +
+								       nud.Momentum()[2]*nud.Momentum()[2] ) );
+	    _phi_lep = (180./3.14) * acos( nud.Momentum()[0] / sqrt( nud.Momentum()[0]*nud.Momentum()[0] +
+								     nud.Momentum()[1]*nud.Momentum()[1] ) );
+					     
+	    _pdg_lep = nud.PdgCode();
 	  }
 	}
       }
       // now keep track of all showers and tracks
       for (auto &d : p.AllDaughters()){
 	if ( (d->PdgCode() == 22) && (d->Energy() > 20) )
-	  _MCgammas += 1;
+	  _n_gammas += 1;
 	else if ( (abs(d->PdgCode()) == 11) && (d->Energy() > 20) )
-	  _MCelectrons += 1;
+	  _n_electrons += 1;
 	else if ( (d->PdgCode() == 111) && (d->Energy() > 20) )
-	  _nPi0 += 1;
+	  _n_pi0 += 1;
 	else if ( (d->PdgCode() == 211) && (d->Energy() > 20) )
-	  _nPiplus += 1;
+	  _n_piplus += 1;
 	else if ( (d->PdgCode() == 2112) && (d->Energy() > 20) )
-	  _nNeutrons += 1;
+	  _n_neutrons += 1;
 	else if ( (d->PdgCode() == 2212) && (d->Energy() > 20) )
-	  _nProtons += 1;
+	  _n_protons += 1;
       }
     }
     
     // Count number of tracks and showers with E > 20 MeV
-    _RECOshowers = 0;
-    _RECOtracks  = 0;
+    _n_showersReco = 0;
+    _n_tracksReco  = 0;
     for (auto &s : data.AllShower())
-      if (s._energy > 20) { _RECOshowers += 1; }
+      if (s._energy > 20) { _n_showersReco += 1; }
     for (auto &t : data.AllTrack())
-      if (t._energy > 20) { _RECOtracks += 1; }
+      if (t._energy > 20) { _n_tracksReco += 1; }
 
 
     // size of ParticleSet should be the number of single electrons found
     //ps is the reco particle set
-    _singleRECO = ps.size();
-    if ( _singleRECO == 1 ){
-      _E = ps[0].Daughters()[0].Energy();
+    _n_singleReco = ps.size();
+    if ( _n_singleReco == 1 ){
+      Particle se = ps[0].Daughters()[0];
+      _e_lepReco = se.Energy();
+      _theta_lepReco = (180./3.14) * acos( se.Momentum()[2] / sqrt( se.Momentum()[0]*se.Momentum()[0] +
+								    se.Momentum()[1]*se.Momentum()[1] +
+								    se.Momentum()[2]*se.Momentum()[2] ) );
+      _phi_lepReco = (180./3.14) * acos( se.Momentum()[0] / sqrt( se.Momentum()[0]*se.Momentum()[0] +
+								  se.Momentum()[1]*se.Momentum()[1] ) );
       _misID = 0;
       _singleE_ctr += 1;
     }
@@ -115,11 +135,10 @@ namespace ertool {
 
     if (_debug){
       std::cout << "Ana results:" << std::endl
-		<< "Showers reconstructed: " << _RECOshowers << std::endl
-		<< "Tracks reconstructed : " << _RECOtracks << std::endl
-		<< "MCelectrons          : " << _MCelectrons << std::endl
-		<< "MCgammas             : " << _MCgammas << std::endl
-		<< "SingleE Reconstructed: " << _singleRECO << std::endl << std::endl;
+		<< "Mis-ID                 : " << _misID << std::endl           
+		<< "Lepton E  [Mc,Reco]    : [" << _e_lep << ", " << _e_lepReco << "]" <<  std::endl
+		<< "Lepton theta [Mc,Reco] : [" << _theta_lep << ", " << _theta_lepReco << "]" <<  std::endl
+		<< "Lepton phi [Mc,Reco]   : [" << _phi_lep << ", " << _phi_lepReco << "]" <<  std::endl;
     }
 
     return true;
@@ -132,9 +151,9 @@ namespace ertool {
 	      << "Tot Events    : " << _numEvts << std::endl
 	      << "SingleE Events: " << _singleE_ctr << std::endl;
 
-    MakeEffPlot("Elep",10,0,2000);
-    MakeEffPlot("Enu",10,0,2000);
-    MakeEffPlot("RECOtracks",10,0,10);
+    MakeEffPlot("e_lep",10,0,2000);
+    MakeEffPlot("e_nu",10,0,2000);
+    MakeEffPlot("n_tracks",10,0,10);
 
     if (fout){
       fout->cd();
@@ -169,6 +188,35 @@ namespace ertool {
     delete All;
     delete Ok;
     hist->Write();
+
+    return;
+  }
+
+  void ERAnaSingleE::ResetTreeVariables(){
+    
+    _misID = 1;
+
+    _n_singleReco  = -1;
+    _n_electrons   = -1;
+    _n_gammas      = -1;
+    _n_showers     = -1;
+    _n_showersReco = -1;
+    _n_tracks      = -1;
+    _n_tracksReco  = -1;
+    _n_protons     = -1;
+    _n_neutrons    = -1;
+    _n_piplus      = -1;
+    _n_pi0         = -1;
+
+    _e_nu          = -1000;
+    _pdg_nu        = -1;
+    _e_lep         = -1000;
+    _pdg_lep       = -1;
+    _theta_lep     = -360;
+    _phi_lep       = -360;
+    _e_lepReco     = -1000;
+    _theta_lepReco = -360;
+    _phi_lepReco   = -360;
 
     return;
   }
