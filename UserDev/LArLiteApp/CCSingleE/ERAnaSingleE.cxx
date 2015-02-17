@@ -183,7 +183,8 @@ namespace ertool {
 
     MakeEffPlot("e_lep",10,0,2000);
     MakeEffPlot("e_nu",10,0,2000);
-    MakeEffPlot("n_tracks",10,0,10);
+    MakeEffPlot("n_tracks",10,-0.5,9.5);
+    MakeEffPlot("n_tracksReco",10,-0.5,9.5);
 
     if (fout){
       fout->cd();
