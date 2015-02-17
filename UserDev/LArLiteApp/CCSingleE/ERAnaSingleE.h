@@ -82,13 +82,17 @@ namespace ertool {
     int _pdg_nu;       /// Neutrino PDG
     double _e_lep;     /// lepton from neutrino Energy
     double _x_lep, _y_lep, _z_lep; /// lepton x,y,z start point
+    double _px_lep, _py_lep, _pz_lep; /// lepton x,y,z momentum point
     int _pdg_lep;      /// lepton from neutrino Pdg
     double _theta_lep; /// lepton angle w.r.t. beam direction
     double _phi_lep;   /// lepton angle w.r.t. x on xy plane
     double _e_lepReco; /// lepton E from reconstruction (i.e. SingleE energy if found)
     double _x_lepReco, _y_lepReco, _z_lepReco; /// lepton x,y,z start point
+    double _px_lepReco, _py_lepReco, _pz_lepReco; /// lepton x,y,z momentum
     double _theta_lepReco; /// lepton angle w.r.t. beam direction (from reco. i.e. SingleE if found)
     double _phi_lepReco;   /// lepton angle w.r.t. x on xy plane (from reco. i.e. SingleE if found)
+    double _lep_dot;  /// Dot product between direction vector of MC SingleE shower and Reco SingleE shower
+    double _lep_vtxdist; /// Distance [cm] between MC and Reco SingleE showers
 
 
 

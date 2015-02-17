@@ -31,6 +31,9 @@ namespace ertool {
     _result_tree->Branch("_x_lep",&_x_lep,"x_lep/D");
     _result_tree->Branch("_y_lep",&_y_lep,"y_lep/D");
     _result_tree->Branch("_z_lep",&_z_lep,"z_lep/D");
+    _result_tree->Branch("_px_lep",&_px_lep,"px_lep/D");
+    _result_tree->Branch("_py_lep",&_py_lep,"py_lep/D");
+    _result_tree->Branch("_pz_lep",&_pz_lep,"pz_lep/D");
     _result_tree->Branch("_theta_lep",&_theta_lep,"theta_lep/D");
     _result_tree->Branch("_phi_lep",&_phi_lep,"phi_lep/D");
     _result_tree->Branch("_e_lepReco",&_e_lepReco,"e_lepReco/D");
@@ -39,6 +42,11 @@ namespace ertool {
     _result_tree->Branch("_x_lepReco",&_x_lepReco,"x_lepReco/D");
     _result_tree->Branch("_y_lepReco",&_y_lepReco,"y_lepReco/D");
     _result_tree->Branch("_z_lepReco",&_z_lepReco,"z_lepReco/D");
+    _result_tree->Branch("_px_lepReco",&_px_lepReco,"px_lepReco/D");
+    _result_tree->Branch("_py_lepReco",&_py_lepReco,"py_lepReco/D");
+    _result_tree->Branch("_pz_lepReco",&_pz_lepReco,"pz_lepReco/D");
+    _result_tree->Branch("_lep_dot",&_lep_dot,"_lep_dot/D");
+    _result_tree->Branch("_lep_vtxdist",&_lep_vtxdist,"_lep_vtxdist/D");
     _result_tree->Branch("_misID",&_misID,"misID/I");
 
     _numEvts = 0;
@@ -87,13 +95,13 @@ namespace ertool {
 	    found_lepton_daughter = true;
 	    _e_lep = nud.Energy();
 	    _x_lep = nud.Vertex()[0];
-	    _y_lep = nud.Vertex()[0];
-	    _z_lep = nud.Vertex()[0];
-	    _theta_lep = (180./3.14) * acos( nud.Momentum()[2] / sqrt( nud.Momentum()[0]*nud.Momentum()[0] +
-								       nud.Momentum()[1]*nud.Momentum()[1] +
-								       nud.Momentum()[2]*nud.Momentum()[2] ) );
-	    _phi_lep = (180./3.14) * acos( nud.Momentum()[0] / sqrt( nud.Momentum()[0]*nud.Momentum()[0] +
-								     nud.Momentum()[1]*nud.Momentum()[1] ) );
+	    _y_lep = nud.Vertex()[1];
+	    _z_lep = nud.Vertex()[2];
+	    _px_lep = nud.Momentum()[0];
+	    _py_lep = nud.Momentum()[1];
+	    _pz_lep = nud.Momentum()[2];
+	    _theta_lep = (180./3.14) * acos( _pz_lep / sqrt( _px_lep*_px_lep + _py_lep*_py_lep + _pz_lep*_pz_lep ) );
+	    _phi_lep   = (180./3.14) * asin( _py_lep / sqrt( _px_lep*_px_lep + _py_lep*_py_lep ) );
 					     
 	    _pdg_lep = nud.PdgCode();
 	  }
@@ -132,13 +140,20 @@ namespace ertool {
       Particle se = ps[0].Daughters()[0];
       _e_lepReco = se.Energy();
       _x_lepReco = se.Vertex()[0];
-      _y_lepReco = se.Vertex()[0];
-      _z_lepReco = se.Vertex()[0];
-      _theta_lepReco = (180./3.14) * acos( se.Momentum()[2] / sqrt( se.Momentum()[0]*se.Momentum()[0] +
-								    se.Momentum()[1]*se.Momentum()[1] +
-								    se.Momentum()[2]*se.Momentum()[2] ) );
-      _phi_lepReco = (180./3.14) * acos( se.Momentum()[0] / sqrt( se.Momentum()[0]*se.Momentum()[0] +
-								  se.Momentum()[1]*se.Momentum()[1] ) );
+      _y_lepReco = se.Vertex()[1];
+      _z_lepReco = se.Vertex()[2];
+      _px_lepReco = se.Momentum()[0];
+      _py_lepReco = se.Momentum()[1];
+      _pz_lepReco = se.Momentum()[2];
+      _theta_lepReco = (180./3.14) * acos( _pz_lepReco / sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco + _pz_lepReco*_pz_lepReco ) );
+      _phi_lepReco   = (180./3.14) * asin( _py_lepReco / sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco ) );
+      _lep_vtxdist = sqrt( (_x_lep-_x_lepReco)*(_x_lep-_x_lepReco) +
+			   (_y_lep-_y_lepReco)*(_y_lep-_y_lepReco) + 
+			   (_z_lep-_z_lepReco)*(_z_lep-_z_lepReco) );
+      _lep_dot = ( ( _px_lep*_px_lepReco + _py_lep*_py_lepReco + _pz_lep*_pz_lepReco ) / 
+		   ( sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco + _pz_lepReco*_pz_lepReco ) * 
+		     sqrt( _px_lep*_px_lep + _py_lep*_py_lep + _pz_lep*_pz_lep ) ) );
+	
       _misID = 0;
       _singleE_ctr += 1;
     }
@@ -238,6 +253,8 @@ namespace ertool {
     _z_lepReco     = -1000;
     _theta_lepReco = -360;
     _phi_lepReco   = -360;
+    _lep_dot       = -2;
+    _lep_vtxdist   = -1000;
 
     return;
   }
