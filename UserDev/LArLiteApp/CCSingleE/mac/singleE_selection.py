@@ -11,6 +11,7 @@ from ROOT import gSystem
 from ROOT import larlite as fmwk
 from ROOT import ertool
 ertool.Manager
+fmwk.geo.PlaneID
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
