@@ -87,6 +87,7 @@ namespace ertool {
     double _theta_lep; /// lepton angle w.r.t. beam direction
     double _phi_lep;   /// lepton angle w.r.t. x on xy plane
     double _e_lepReco; /// lepton E from reconstruction (i.e. SingleE energy if found)
+    double _showerlength_lepReco; /// length of the reconstructed shower associated with the singleE electron (if found)
     double _x_lepReco, _y_lepReco, _z_lepReco; /// lepton x,y,z start point
     double _px_lepReco, _py_lepReco, _pz_lepReco; /// lepton x,y,z momentum
     double _theta_lepReco; /// lepton angle w.r.t. beam direction (from reco. i.e. SingleE if found)

@@ -37,6 +37,7 @@ namespace ertool {
     _result_tree->Branch("_theta_lep",&_theta_lep,"theta_lep/D");
     _result_tree->Branch("_phi_lep",&_phi_lep,"phi_lep/D");
     _result_tree->Branch("_e_lepReco",&_e_lepReco,"e_lepReco/D");
+    _result_tree->Branch("_showerlength_lepReco",&_showerlength_lepReco,"showerlength_lepReco/D");
     _result_tree->Branch("_theta_lepReco",&_theta_lepReco,"theta_lepReco/D");
     _result_tree->Branch("_phi_lepReco",&_phi_lepReco,"phi_lepReco/D");
     _result_tree->Branch("_x_lepReco",&_x_lepReco,"x_lepReco/D");
@@ -79,6 +80,7 @@ namespace ertool {
       if (s._energy > 20) { _n_showers += 1; }
     for (auto &t : data.AllTrack())
       if (t._energy > 20) { _n_tracks += 1; }
+
 
     // Get MC particle set
     auto mc_ps = MCParticleSet();
@@ -136,9 +138,12 @@ namespace ertool {
     // size of ParticleSet should be the number of single electrons found
     //ps is the reco particle set
     _n_singleReco = ps.size();
+    // If exactly one single electron was found in this event:
     if ( _n_singleReco == 1 ){
       Particle se = ps[0].Daughters()[0];
       _e_lepReco = se.Energy();
+      //length of shower (geoalgo cone) associated with the electron
+      _showerlength_lepReco = data.AllShower().at(se.RecoObjID()).Length(); //kaleko
       _x_lepReco = se.Vertex()[0];
       _y_lepReco = se.Vertex()[1];
       _z_lepReco = se.Vertex()[2];
@@ -249,6 +254,7 @@ namespace ertool {
     _theta_lep     = -360;
     _phi_lep       = -360;
     _e_lepReco     = -1000;
+    _showerlength_lepReco     = -1000;
     _x_lepReco     = -1000;
     _y_lepReco     = -1000;
     _z_lepReco     = -1000;
