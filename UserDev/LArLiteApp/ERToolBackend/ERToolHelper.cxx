@@ -449,7 +449,7 @@ namespace larlite {
     for(auto const& shw : shw_v) {
       s_v.push_back( ::ertool::Shower(shw.ShowerStart(),
 				      shw.Direction(),
-				      _shrProfiler.Length(*(shw.Energy().rbegin())),
+				      shw.Length(),
 				      _shrProfiler.ShowerRadius()) );
       auto& s = (*s_v.rbegin());
       if(shw.best_plane()){
