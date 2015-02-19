@@ -31,20 +31,29 @@ def main():
     my_proc = fmwk.ana_processor()
     # Create algorithm
     my_algo = ertool.AlgoEMPart()
+    # ******* Set Fit ranges **********
+    # Fit ranges for Reconstructed Info
     my_algo.SetFitRange_dEdx(1.2,2,False); # False = e- / True = gamma
-    my_algo.SetFitRange_dEdx(3,4.5,True);
+    my_algo.SetFitRange_dEdx(3.0,4.5,True);
+    my_algo.SetFitRange_RadLen(0.,50.,True);
+    my_algo.SetFitRange_RadLen(0.,10.,False);
+    # Fit ranges for MC Info:
     #my_algo.SetFitRange_dEdx(0.5,6,False); # False = e- / True = gamma
     #my_algo.SetFitRange_dEdx(0.5,6,True);
+    #my_algo.SetFitRange_RadLen(0.,50.,True);
+    #my_algo.SetFitRange_RadLen(0.,10.,False);
+    # ******* End Set Fit Ranges *******
     my_algo.setVerbose(True)
     # Create analysis unit
     my_ana = fmwk.ExampleERSelection()
+    my_ana.SetMinEDep(10)
 
     # Set Producers
     # First Argument: True = MC, False = Reco
     my_ana.SetShowerProducer(True,"mcreco");
     #my_ana.SetTrackProducer(True,"mcreco");
-    #my_ana.SetVtxProducer(True,"generator");
-
+    my_ana.SetVtxProducer(True,"generator");
+    #my_ana.SetShowerProducer(False,"pandoraNuShower");
     #my_ana.SetShowerProducer(False,"showerreco");
     my_ana.SetTrackProducer(False,"");
     #my_ana.SetVtxProducer(False,"");

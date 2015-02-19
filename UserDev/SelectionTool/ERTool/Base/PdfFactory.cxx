@@ -27,7 +27,7 @@ namespace ertool {
 
     auto tau = new RooRealVar(Form("%s_radLen_tau",name.c_str()),
 			      Form("Radiation length [cm] for %s", name.c_str()),
-			      -2000.,-1.e4,0.);
+			      -20.,-1.e2,0.);
     Register(tau);
     std::cout<<"tau ptr: "<<tau<<std::endl;
     auto res = new RooExponential(Form("%s_radLen_pdf",name.c_str()),

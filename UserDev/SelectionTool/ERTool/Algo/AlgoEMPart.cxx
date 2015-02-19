@@ -20,6 +20,11 @@ namespace ertool {
     _e_mass = TDatabasePDG().GetParticle(11)->Mass();
     _g_mass = TDatabasePDG().GetParticle(22)->Mass();
 
+    srand (time(NULL));
+
+    _hradLen_e = new TH1D("_hradLen_e","rad len electrons",100,0,100);
+    _hradLen_g = new TH1D("_hradLen_g","rad len gammas",100,0,100);
+
     //if training mode clear params
     //if (_training_mode)
     //  _params.clear_data();
@@ -70,8 +75,8 @@ namespace ertool {
     // Electron PDFs
     if (!_mode){
       var = (RooRealVar*)(_e_radLenPdf->getVariables()->find("e_radLen_tau"));
-      var->setVal   ( -2.e3        );
-      var->setRange ( -1.e4, -1.e2 );
+      var->setVal   ( -2        );
+      var->setRange ( -10, -0.1 );
       
       var  = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_dEdxGaus_mean"));
       var->setVal   ( 2.0      );
@@ -116,16 +121,16 @@ namespace ertool {
     // Extract if parameters found
     if(_params.exist_darray("rad_range")) {
       auto darray = _params.get_darray("rad_range");
-      _dEdxVar->setRange( (*darray)[0], (*darray)[1] );
+      _radLenVar->setRange( (*darray)[0], (*darray)[1] );
       std::cout<<"["<<__FUNCTION__<<"] "
 	       << "Loaded distance fit range : "
-	       << _dEdxVar->getMin() << " => " << _dEdxVar->getMax()
+	       << _radLenVar->getMin() << " => " << _radLenVar->getMax()
 	       << std::endl;
     }
 
     if(_params.exist_darray("dedx_range")) {
       auto darray = _params.get_darray("dedx_range");
-      _radLenVar->setRange( (*darray)[0], (*darray)[1] );
+      _dEdxVar->setRange( (*darray)[0], (*darray)[1] );
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"Loaded dEdx range : "
 	       << _dEdxVar->getMin() << " => " << _dEdxVar->getMax()
@@ -142,17 +147,13 @@ namespace ertool {
 
       meanhigh  = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_mean_high"));
       meanhigh->setVal  ( (*darray)[3] );
-      std::cout << "Mean high: " << meanhigh->getVal() << std::endl;
       sigmahigh = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_sigma_high"));
       sigmahigh->setVal ( (*darray)[4] );
-      std::cout << "Sigma high: " << sigmahigh->getVal() << std::endl;
 
       meanlow  = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_mean_low"));
       meanlow->setVal  ( (*darray)[5] );
-      std::cout << "Mean low: " << meanlow->getVal() << std::endl;
       sigmalow = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_sigma_low"));
       sigmalow->setVal ( (*darray)[6] );
-      std::cout << "Sigma low: " << sigmalow->getVal() << std::endl;
 
       frac = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_fraction"));
       frac->setVal ( (*darray)[7] );
@@ -262,7 +263,7 @@ namespace ertool {
 
       if(data.Vertex().size())
 	dist = s->Start().Dist((*data.Vertex()[0]));
-      
+
       double e_like = LL(true,  dEdx, dist);
       double g_like = LL(false, dEdx, dist);
 
@@ -275,8 +276,8 @@ namespace ertool {
       res.push_back(p);
 
       _dEdxVar->setVal(dEdx);
-      if (!(dist<0)) { _radLenVar->setVal(dist); }
 
+      if (!(dist<0)) { _radLenVar->setVal(dist); }
       // If in training mode, fill RooDataSet
       // of the particle we are training
       // If in Selection mode, fill RooDataSet
@@ -297,9 +298,11 @@ namespace ertool {
 	if(_mode) {
 	  if(!(dist<0)) { _g_radLenData->add(RooArgSet(*_radLenVar)); }
 	  _g_dEdxData->add(RooArgSet(*_dEdxVar));
+	  _hradLen_g->Fill(dist);
 	}else {
 	  if(!(dist<0)) { _e_radLenData->add(RooArgSet(*_radLenVar)); }
 	  _e_dEdxData->add(RooArgSet(*_dEdxVar));
+	  _hradLen_e->Fill(dist);
 	}
       }// if training mode
 
@@ -310,6 +313,9 @@ namespace ertool {
 
   void AlgoEMPart::ProcessEnd(TFile* fout)
   {
+
+    _hradLen_e->Write();
+    _hradLen_g->Write();
     
     RooMsgService::instance().setSilentMode(true);
 
@@ -413,13 +419,13 @@ namespace ertool {
     if (_verbose){
 
       TCanvas *c = new TCanvas("c","",1000,500);
-      
+
       // Rad Length likelyhood
-      TH1D *h11_radLen = new TH1D("h11_radLen","Electron vs. Gamma Likelihood; Rad. Length [cm]; Likelihood",100,0,0.1);
-      TH1D *h22_radLen = new TH1D("h22_radLen","Electron vs. Gamma Likelihood; Rad. Length [cm]; Likelihood",100,0,0.1);
+      TH1D *h11_radLen = new TH1D("h11_radLen","Electron vs. Gamma Likelihood; Rad. Length [cm]; Likelihood",100,0,20);
+      TH1D *h22_radLen = new TH1D("h22_radLen","Electron vs. Gamma Likelihood; Rad. Length [cm]; Likelihood",100,0,20);
       
       for(size_t i=0; i<100; ++i) {
-	_radLenVar->setVal(0.1*i/100.);
+	_radLenVar->setVal(20*i/100.);
 	
 	h11_radLen->SetBinContent(i,_e_radLenPdf->getVal(*_radLenVar)/(_e_radLenPdf->getVal(*_radLenVar)+_g_radLenPdf->getVal(*_radLenVar)));
 	h22_radLen->SetBinContent(i,_g_radLenPdf->getVal(*_radLenVar)/(_e_radLenPdf->getVal(*_radLenVar)+_g_radLenPdf->getVal(*_radLenVar)));
@@ -449,7 +455,7 @@ namespace ertool {
 	h11_dEdx->SetBinContent(i,_e_dEdxPdf->getVal(*_dEdxVar) / (_e_dEdxPdf->getVal(*_dEdxVar) + _g_dEdxPdf->getVal(*_dEdxVar)));
 	h22_dEdx->SetBinContent(i,_g_dEdxPdf->getVal(*_dEdxVar) / (_e_dEdxPdf->getVal(*_dEdxVar) + _g_dEdxPdf->getVal(*_dEdxVar)));
       }
-      
+
       h11_dEdx->SetLineWidth(2);
       h11_dEdx->SetLineColor(kBlue);
       h11_dEdx->SetFillStyle(3004);
@@ -468,7 +474,7 @@ namespace ertool {
       
       delete h11_dEdx;
       delete h22_dEdx;
-      
+
       // for fun make a ProdPdf to plot 2D Pdf surface
       RooProdPdf ePDF("ePDF","ePDF",RooArgSet(*_e_radLenPdf,*_e_dEdxPdf));
       RooProdPdf gPDF("gPDF","gPDF",RooArgSet(*_g_radLenPdf,*_g_dEdxPdf));
@@ -491,15 +497,18 @@ namespace ertool {
       frame_radLen = _radLenVar->frame();
       frame_dEdx   = _dEdxVar->frame();
       
-      _g_radLenData->plotOn(frame_radLen,RooFit::MarkerColor(kRed),RooFit::LineColor(kRed));
-      _g_dEdxData->plotOn(frame_dEdx,RooFit::MarkerColor(kRed),RooFit::LineColor(kRed));
-      _g_dEdxPdf->plotOn(frame_dEdx,RooFit::LineColor(kRed));
-      _g_radLenPdf->plotOn(frame_radLen,RooFit::LineColor(kRed));
-
-      _e_radLenData->plotOn(frame_radLen,RooFit::MarkerColor(kBlue),RooFit::LineColor(kBlue));
-      _e_dEdxData->plotOn(frame_dEdx,RooFit::MarkerColor(kBlue),RooFit::LineColor(kBlue));
-      _e_dEdxPdf->plotOn(frame_dEdx,RooFit::LineColor(kBlue));
-      _e_radLenPdf->plotOn(frame_radLen,RooFit::LineColor(kBlue));
+      if(_mode){
+	_g_radLenData->plotOn(frame_radLen,RooFit::MarkerColor(kRed),RooFit::LineColor(kRed));
+	_g_dEdxData->plotOn(frame_dEdx,RooFit::MarkerColor(kRed),RooFit::LineColor(kRed));
+	_g_dEdxPdf->plotOn(frame_dEdx,RooFit::LineColor(kRed));
+	_g_radLenPdf->plotOn(frame_radLen,RooFit::LineColor(kRed));
+      }
+      else{
+	_e_radLenData->plotOn(frame_radLen,RooFit::MarkerColor(kBlue),RooFit::LineColor(kBlue));
+	_e_dEdxData->plotOn(frame_dEdx,RooFit::MarkerColor(kBlue),RooFit::LineColor(kBlue));
+	_e_dEdxPdf->plotOn(frame_dEdx,RooFit::LineColor(kBlue));
+	_e_radLenPdf->plotOn(frame_radLen,RooFit::LineColor(kBlue));
+      }
 
       c->SetTitle("Distance PDF");
       frame_radLen->Draw();

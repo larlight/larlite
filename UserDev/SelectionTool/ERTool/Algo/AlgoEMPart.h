@@ -5,7 +5,7 @@
  * 
  * \brief Class def header for a class AlgoEMPart
  *
- * @author jhewes15
+ * @author jhewes15 + davidc1
  */
 
 /** \addtogroup ERTool
@@ -26,6 +26,9 @@
 #include <TH2D.h>
 #include <cstdlib>
 #include <ctime>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 namespace ertool {
 
@@ -110,6 +113,9 @@ namespace ertool {
     RooDataSet* _g_dEdxData;   ///< gamma dEdx data set
 
     RooRealVar *_tmp_mean, *_tmp_sigma;
+
+    TH1D* _hradLen_e;
+    TH1D* _hradLen_g;
 
   };
 }
