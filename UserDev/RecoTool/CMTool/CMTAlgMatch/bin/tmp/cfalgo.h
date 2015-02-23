@@ -1,5 +1,5 @@
 /**
- * \file CFAlgo_Class_Name.hh
+ * \file CFAlgo_Class_Name.h
  *
  * \ingroup Working_Package
  * 
@@ -14,7 +14,7 @@
 #ifndef CFALGO_CLASS_NAME_HH
 #define CFALGO_CLASS_NAME_HH
 
-#include "CFloatAlgoBase.hh"
+#include "CMTool/CMToolBase/CFloatAlgoBase.h"
 
 namespace cmtool {
   /**
