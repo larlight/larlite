@@ -46,8 +46,8 @@ namespace ertool {
     
   protected:
 
-    TH1D *hPerpDist, *hProjDist, *hPerpDistXBoundary, *hPerpDistYBoundary, *hPerpDistZBoundary, *hTrackLength, *hTrackPhi, *hTrackTheta, *hLongestTrackLength, *hMuonTrackLength, *hMuonTrackPhi;
-    TH2D *hPerpDistVsTrackLength, *hProjDistVsTrackLength;
+    TH1D *hPerpDist, *hProjDist, *hPerpDistXBoundary, *hPerpDistYBoundary, *hPerpDistZBoundary, *hTrackLength, *hTrackPhi, *hTrackTheta, *hLongestTrackLength, *hMuonTrackLength, *hMuonTrackPhi, *hTaggedUntaggedDist, *hPerpDistToABoundary;
+    TH2D *hPerpDistVsTrackLength, *hProjDistVsTrackLength, *hTaggedUntaggedDistVsUntaggedTrackLength;
     ::geoalgo::AABox fTPC;
     ::geoalgo::GeoAlgo fGeoAlgo;
   };

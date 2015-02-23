@@ -32,11 +32,12 @@ my_ana = ertool.ERAnaCCSingleMu()
 my_anaunit = fmwk.CCSingleMuReco()
 # Set Producers
 # First Argument: True = MC, False = Reco
-my_ana.SetShowerProducer(True,"mcreco");
+my_anaunit.SetShowerProducer(True,"mcreco");
 #my_ana.SetTrackProducer(True,"mcreco");
+# my_anaunit.SetTrackProducer(False,"trackkalmanhit");
 #my_ana.SetTrackProducer(False,"pandoraNuKHit");
-my_ana.SetTrackProducer(False,"pandoraCosmicKHit");
-my_ana.SetVtxProducer(True,"generator");
+my_anaunit.SetTrackProducer(False,"pandoraCosmicKHit");
+my_anaunit.SetVtxProducer(True,"generator");
 
 
 
