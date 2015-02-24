@@ -62,6 +62,9 @@ namespace larlite {
     /// Getter for MatchManager instance, to attach algorithms
     ::cmtool::CMatchManager& GetManager() { return fManager.MatchManager(); }
 
+    /// Set whethet to save Cluster TTree info from Manager
+    void SaveClusterTree(bool on) { fManager.SaveClusterTree(on); }
+
   protected:
 
     /// Input producer name
