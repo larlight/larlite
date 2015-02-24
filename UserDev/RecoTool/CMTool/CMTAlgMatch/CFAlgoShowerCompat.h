@@ -59,14 +59,14 @@ namespace cmtool {
     virtual void Reset();
 
     void PrintClusterInfo(const cluster::ClusterParamsAlg &c);
-    /*
+    
    void WriteHaxFile()
     {
       _fout_hax->cd();
       _ana_tree->Write();
       _fout_hax->Close();
     };
-    */
+    
 
     /**
        Optional function: called at the beginning of 1st iteration. This is called per event.
@@ -92,10 +92,18 @@ namespace cmtool {
 
   private:
 
-    //    TTree* _ana_tree;
+    TTree* _ana_tree;
     double _o_ang_avg;
     double _o_ang_rms;
-    //    TFile* _fout_hax;
+    double _o_ang_wt_avg;
+    double _o_ang_wt_rms;
+    double _max_trackness;
+    double _max_len_over_width;
+    double _min_oa_over_len;
+    double _max_poly_perim_over_A;
+    double _min_modhitdens;
+
+    TFile* _fout_hax;
 
   };
 }
