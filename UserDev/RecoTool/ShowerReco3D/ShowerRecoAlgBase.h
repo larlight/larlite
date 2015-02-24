@@ -66,6 +66,7 @@ namespace showerreco {
     /// Calorimetry algorithm setter
     void CaloAlgo(::calo::CalorimetryAlg* alg) { fCaloAlg = alg; }
 
+
   protected:
 
     /// Function to reorganize input cluster information
@@ -85,6 +86,7 @@ namespace showerreco {
 
     /// Input clusters
     std::vector<std::vector<showerreco::ShowerCluster_t> > fInputClusters;
+
   };
 }
 
