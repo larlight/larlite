@@ -109,6 +109,28 @@ float Polygon2D::Area() const
   return area;
 }
 
+//--------------------------------
+float Polygon2D::Perimeter() const
+{
+
+  float perimeter = 0.;
+
+  for (unsigned int i=0; i<vertices.size(); i++){
+    if ( i < (vertices.size()-1) )
+      perimeter += ( (vertices.at(i).second-vertices.at(i+1).second)*
+		     (vertices.at(i).second-vertices.at(i+1).second) +
+		     (vertices.at(i).first-vertices.at(i+1).first)*
+		     (vertices.at(i).first-vertices.at(i+1).first) );
+    if ( i == (vertices.size()-1) )
+      perimeter += ( (vertices.at(i).second-vertices.at(0).second)*
+		     (vertices.at(i).second-vertices.at(0).second) +
+		     (vertices.at(i).first-vertices.at(0).first)*
+		     (vertices.at(i).first-vertices.at(0).first) );
+  }
+
+  return sqrt(perimeter);
+}
+
 //------------------------------------------------------------------
 const std::pair<float,float>& Polygon2D::Point(unsigned int p) const
 {
