@@ -18,6 +18,7 @@
 #include "CFAlgoVolumeOverlap.h"
 #include "CFAlgoTimeProf.h"
 #include "CFAlgoChargeDistrib.h"
+#include "CFAlgoShowerCompat.h"
 //ADD_CFALGO_HEADER
 //ADD_NEW_HEADER ... do not change this comment line
 
@@ -35,10 +36,14 @@ namespace cmtool {
   class CFAlgoVolumeOverlap;
   class CFAlgoTimeProf;
   class CFAlgoChargeDistrib;
+  class CFAlgoShowerCompat;
 //ADD_CFALGO_CLASS ... do not change this comment line
 }
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
+
+
+
 
 
 

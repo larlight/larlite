@@ -160,6 +160,10 @@
 
 #pragma link C++ class larlite::trigger+;
 
+#pragma link C++ class larlite::minos+;
+#pragma link C++ class std::vector<larlite::minos>+;
+#pragma link C++ class larlite::event_minos+;
+
 #pragma link C++ class larlite::storage_manager+;
 
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_gtruth>();
@@ -184,6 +188,7 @@
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_partid>();
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_pfpart>();
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_user>();
+#pragma link C++ function larlite::storage_manager::data_type<larlite::event_minos>();
 
 #pragma link C++ function larlite::storage_manager::get_data<larlite::event_gtruth>(string);
 #pragma link C++ function larlite::storage_manager::get_data<larlite::event_mctruth>(string);
@@ -207,6 +212,6 @@
 #pragma link C++ function larlite::storage_manager::get_data<larlite::event_partid>(string);
 #pragma link C++ function larlite::storage_manager::get_data<larlite::event_pfpart>(string);
 #pragma link C++ function larlite::storage_manager::get_data<larlite::event_user>(string);
-//#pragma link C++ function larlite::storage_manager::get_data<larlite::event_track>(string);
+#pragma link C++ function larlite::storage_manager::get_data<larlite::event_minos>(string);
 
 #endif

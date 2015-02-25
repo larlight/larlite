@@ -4,7 +4,7 @@
 //
 
 #include <TSystem.h>
-#include <Analysis/Analysis-TypeDef.h>
+#include "Analysis/ana_processor.h"
 
 int main(int argc, char** argv){
 

@@ -2,7 +2,7 @@
 // Example C++ routine to run your analysis module, LArUtil.
 //
 
-#include "LArUtil/LArUtil-TypeDef.h"
+#include "LArUtil/Geometry.h"
 #include <iostream>
 #include <TTree.h>
 #include <TFile.h>
@@ -36,15 +36,15 @@ int main(int argc, char** argv){
   tree->Branch("fPlaneWireToChannelMap","std::vector<std::vector<UShort_t> >",&fPlaneWireToChannelMap);
   
   // Vectors with length = # planes
-  std::vector<larlight::geo::SigType_t> fSignalType;
-  std::vector<larlight::geo::View_t> fViewType;
+  std::vector<larlite::geo::SigType_t> fSignalType;
+  std::vector<larlite::geo::View_t> fViewType;
   std::vector<Double_t> fPlanePitch;
   std::vector<std::vector<Double_t> > fFirstWireStartVtx;
   std::vector<std::vector<Double_t> > fFirstWireEndVtx;
   tree->Branch("fFirstWireStartVtx","std::vector<std::vector<Double_t> >",&fFirstWireStartVtx);
   tree->Branch("fFirstWireEndVtx","std::vector<std::vector<Double_t> >",&fFirstWireEndVtx);
-  tree->Branch("fSignalType","std::vector<larlight::geo::SigType_t>",&fSignalType);
-  tree->Branch("fViewType","std::vector<larlight::geo::View_t>",&fViewType);
+  tree->Branch("fSignalType","std::vector<larlite::geo::SigType_t>",&fSignalType);
+  tree->Branch("fViewType","std::vector<larlite::geo::View_t>",&fViewType);
   tree->Branch("fPlanePitch","std::vector<Double_t>",&fPlanePitch);
   
   // Vectors with length = view
