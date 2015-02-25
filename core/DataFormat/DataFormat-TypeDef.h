@@ -100,6 +100,8 @@ namespace larlite{
   class trigger;
   class storage_manager;
 
+  class minos;
+
 }
 
 class treenode;
