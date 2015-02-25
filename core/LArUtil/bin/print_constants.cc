@@ -2,7 +2,9 @@
 // Example C++ routine to run your analysis module, LArUtil.
 //
 
-#include "LArUtil/LArUtil-TypeDef.h"
+#include "LArUtil/Geometry.h"
+#include "LArUtil/DetectorProperties.h"
+#include "LArUtil/LArProperties.h"
 #include <iostream>
 
 int main(int argc, char** argv){
