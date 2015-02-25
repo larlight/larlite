@@ -2,6 +2,9 @@
 #define MCTAG_CXX
 
 #include "MCTag.h"
+#include "DataFormat/mcshower.h"
+#include "DataFormat/mctrack.h"
+#include "DataFormat/cosmictag.h"
 
 namespace larlite {
 

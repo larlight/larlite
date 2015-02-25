@@ -11,6 +11,7 @@ float CosmicTagAlgo::ShowerTrackScore(std::vector<::geoalgo::Trajectory> &tracks
 	double minIP   = std::numeric_limits<double>::max();  
 	double Dist 	= -999;
 	double IP 		= -999;
+	float score = 1;
 
 	geoalgo::Vector_t c1(3);
 	geoalgo::Vector_t c2(3);
@@ -31,6 +32,11 @@ float CosmicTagAlgo::ShowerTrackScore(std::vector<::geoalgo::Trajectory> &tracks
 	//		std::cout<<"track at x,y,z : "<<tracks.at(i).X()<<", "<<tracks.at(i).Y()<<", "<<tracks.at(i).Z()<<std::endl;
 		if(tmpIP < minIP) minIP = tmpIP ;
       	   
+	    if(tracks.at(i).size()==0 ){
+	 		score=0;
+			std::cout<<"Seriously, how"<<std::endl;
+			}
+		
   	   } //for all tracks
 
 	if (minDist != std::numeric_limits<double>::max()){
@@ -38,25 +44,23 @@ float CosmicTagAlgo::ShowerTrackScore(std::vector<::geoalgo::Trajectory> &tracks
     	IP = sqrt(minIP);
 		}
 	
-	float score = 1;
+	score = 1;
+	
+	//Add info from minMuDist fit
 //	float amp = 0.01754;
 	float mean = 93.284;
 	float sigma = 56.277;
 	float gaus = 0.5*exp(-1*(pow((Dist - mean)/sigma,2))); 
 
-//	if(Dist==-999)
-//		score = -9;
+	//Add info from minIP fit
+	float IPexp = exp(-.0129968*IP) ;
 
-	if(tracks.size()==0 ){
-		score=0;
-//	std::cout<<"Dist is: "<<Dist<<std::endl;
 
-		}
-	else if(Dist >=0 && Dist < mean ){//&& IP >=0 && IP < 100){
-		score = 1 - gaus  ;
+	if(Dist >=0 && Dist < mean ){
+		score = (1 - gaus); //*IPexp  ;
 		}
 	else
-		score = gaus ;
+		score = gaus ; //*IPexp;
 
 	return score;  
 }
@@ -69,21 +73,19 @@ float CosmicTagAlgo::ShowerBoxScore(const ::geoalgo::HalfLine& shr,
 
   geoalgo::GeoAlgo geoObj ;
   float score = 1 ;
-  double distBackAlongTraj, distToWall; 
+//  double distBackAlongTraj, distToWall; 
   double detHalfHeight = larutil::Geometry::GetME()->DetHalfHeight();
   double distToTopWall;
 
   if(shr.Start()[0] < 0 || shr.Start()[0] > 256.35 || shr.Start()[1] <-116.5 || shr.Start()[1] >116.5 || shr.Start()[2] <0 || shr.Start()[2] > 1037.)
 		return -99. ;
 
-  distBackAlongTraj = sqrt(shr.Start().SqDist(geoObj.Intersection(box,shr,true)[0])) ;
+//  distBackAlongTraj = sqrt(shr.Start().SqDist(geoObj.Intersection(box,shr,true)[0])) ;
  // distToWall		= sqrt(geoObj.SqDist(shr.Start(),box)) ;
   distToTopWall	 	= (shr.Start()[1] - detHalfHeight)*shr.Dir().Length()/(shr.Dir()[1]) ;
- // std::cout<<"Det half Height: "<<(shr.Start()[1]-detHalfHeight)*shr.Dir().Length()/shr.Dir()[1]<<std::endl;
 
 
-
- if(distToTopWall > 0 && distToTopWall < 5000 && distBackAlongTraj >=0 )//&& distBackAlongTraj < 250 )
+ if(distToTopWall > 0 && distToTopWall < 5000 )//&& distBackAlongTraj >=0 )//&& distBackAlongTraj < 250 )
  	score = 1 - distToTopWall/5000;
   //Very unlikely to be a cosmic shower if it is pointing upwards
   else //if(distToTopWall < 0 ) 
