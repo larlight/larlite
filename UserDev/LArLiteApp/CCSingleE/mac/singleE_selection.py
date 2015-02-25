@@ -26,6 +26,7 @@ my_algo.setVtxToTrkDist(1)
 my_algo.setVtxToShrStartDist(50)
 my_algo.setMaxIP(1)
 my_algo.setEThreshold(0)
+my_algo.LoadParams()
 #my_algo.setVerbose(True)
 
 # Create Filter
@@ -60,11 +61,11 @@ my_anaunit.SetMinEDep(20)
 my_anaunit._mgr._mc_for_ana = True
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
-my_anaunit.SetShowerProducer(True,"mcreco");
+#my_anaunit.SetShowerProducer(True,"mcreco");
 my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetVtxProducer(True,"generator");
 #my_anaunit.SetShowerProducer(False,"mergeall");
-#my_anaunit.SetShowerProducer(False,"showerreco");
+my_anaunit.SetShowerProducer(False,"showerreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 # ************************************************
