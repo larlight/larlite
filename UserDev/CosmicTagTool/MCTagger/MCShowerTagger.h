@@ -18,6 +18,9 @@
 #include "Analysis/ana_base.h"
 #include "LArUtil/Geometry.h"
 #include "CosmicTagAlgo.h"
+#include "DataFormat/mctrack.h"
+#include "DataFormat/track.h"
+#include <TH1D.h>
 #include <vector>
 #include <string>
 
@@ -77,13 +80,29 @@ namespace larlite {
     double _Pz ;
 	double _E ;
 	double _PDG ;
+	std::string _process; 
+
+  //Save info about parent as well
+    int _parentPDG ;
+    double _parentX ;
+    double _parentY ;
+    double _parentZ ;
+    double _parentT ;
+
+    double _parentPx;
+    double _parentPy;
+    double _parentPz ;
+    double _parentE ;
     
     double _minMuDist;
     double _minMuIP;
 	double _distToTopWall ;
+	bool _inFV ;
 
 	double _showerScore ; 
 	double _trackScore ;
+
+	double _containedE ;
     
 	CosmicTagAlgo _tagger;
 
