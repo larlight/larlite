@@ -22,12 +22,12 @@ my_proc.enable_filter(False)
 
 # Create algorithm
 my_algo = ertool.AlgoSingleE()
-my_algo.useEMPart(True)
+my_algo.useRadLength(True)
 my_algo.setVerbose(True)
-my_algo.setVtxToTrkStartDist(1)
-my_algo.setVtxToTrkDist(1)
+my_algo.setVtxToTrkStartDist(5)
+my_algo.setVtxToTrkDist(5)
 my_algo.setVtxToShrStartDist(50)
-my_algo.setMaxIP(1)
+my_algo.setMaxIP(5)
 #my_algo.setVerbose(True)
 
 # Create Filter

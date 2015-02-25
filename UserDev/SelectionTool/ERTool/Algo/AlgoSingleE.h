@@ -56,33 +56,18 @@ namespace ertool {
     void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); }
     
     /// Use EMPart
-    void useEMPart(bool on) { _useEMPart = on; }
+    void useRadLength(bool on) { _useRadLength = on; }
 
     void setVtxToTrkStartDist(double d) { _vtxToTrkStartDist = d; }
     void setVtxToTrkDist(double d) { _vtxToTrkDist = d; }
     void setVtxToShrStartDist(double d) { _vtxToShrStartDist = d; }
     void setMaxIP(double d) { _maxIP = d; }
-    
     void setEThreshold(double E) { _Ethreshold = E; }
-
-    /// clear tree
-    void ClearTree();
 
   private:
 
-    /// Function that takes in shower and decides if it is likely electron
-    /// (it uses AlgoEMParticle)
-    bool IsShowerElectron(const ertool::Shower* shower);
-
-    /// Function to decide if two showers are correlated
-    bool AreShowersStartPtCorrelated(const ertool::Shower* s1, const ertool::Shower* s2);
-
-    /// Function to return a list of electron-like showers, given a list of showers
-    const std::vector<const ertool::Shower*> ElectronLikeShowers(const std::vector< const ::ertool::Shower*>& showers);
-
-    /// Function to return a list of start-point-isolated showers, given a list of showers
-    const std::vector<const ertool::Shower*> IsolatedStartPtShowers(const std::vector<const ::ertool::Shower*>& showers);
-
+    /// clear tree
+    void ClearTree();
 
   protected:
 
@@ -91,9 +76,9 @@ namespace ertool {
     // electron mass
     double _e_mass;
     // flag to decide whether to use EMPart or not
-    // if True -> use only showers reco as PDG == 11
-    // if False -> use all showers
-    bool _useEMPart;
+    // if True -> use radiation length to calculate LL
+    // if False -> use only dEdx
+    bool _useRadLength;
 
     // Energy thershold. If shower has < _Ethreshold -> don't consider
     double _Ethreshold;
@@ -118,6 +103,10 @@ namespace ertool {
     // within this value at any point and they therefore are 
     // assumed to not be correlated
     double _maxIP;
+
+    // Keep track of whether a sister track to the shower has
+    // been found
+    bool _hassister;
 
     // Other algorithms to use
     AlgoEMPart _alg_emp;

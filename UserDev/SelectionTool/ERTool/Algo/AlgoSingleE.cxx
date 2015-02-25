@@ -20,7 +20,8 @@ namespace ertool {
     _dedx_values = 0;
     _Ethreshold = 0;
     _verbose = false;
-    _useEMPart = false;
+    _useRadLength = false;
+    _hassister = false;
 
   }
 
@@ -72,19 +73,12 @@ namespace ertool {
     
     // ParticleSet where to store single electrons
     ParticleSet res;
-    // Particles created in EM selection (photon/gamma separation)
-    ParticleSet emParticles = _alg_emp.Reconstruct(data);
     
     //res = emParticles;
 
     if (_verbose) { 
       std::cout << "***********BEGIN RECONSTRUCTION************" << std::endl;
       std::cout << "Showers in event  : " << data.Shower().size() << std::endl;
-      std::cout << "Particles in event: " << emParticles.size() << std::endl;
-      std::cout << "dEdx: [";
-      for (auto &s : emParticles)
-	std::cout << s.PdgCode() << ", ";
-      std::cout << "]" << std::endl;
     }
     
     // First, figure out if any tracks are coming from another track
@@ -111,269 +105,165 @@ namespace ertool {
     } // for U tracks
 
     // We are only interested in electron-like showers
-    // loop over emParticles and select only the PDG==11 ones
-    for (auto &p : emParticles){
-      if ( (_useEMPart && (p.PdgCode() == 11) ) || (!_useEMPart) ){
-	ClearTree();
-	_PDG = p.PdgCode();
-	_E   = p.Energy();
-	_IPtrkBody = 0;
-	// Ok, we have an electron. Get the associated shower
-	// and make sure it does not:
-	// NOTE: IN 1) IMPLEMENT EXCLUSION ONLY OF e-like showers
-	// 1) share a vertex with another e- shower (gamma-like one could be from Pi0: OK)
-	// 2) come from another shower - NOT DONE AS OF YET
-	// 3) come from a track
-	// 2) & 3) because we are interested in showers from
-	// the neutrino interaction
-	Shower thisShower = data.Shower( p.RecoObjID() );
-
-	if (thisShower._energy < _Ethreshold ) continue;
-
-	if (_verbose) { std::cout << "This shower: (" << p.RecoObjID() << ")" << "\tE: " << thisShower._energy << std::endl; }
-	bool single = true;
-	// loop over other showers and check 1) and 2)
-	for (size_t s=0; s < data.Shower().size(); s++){
-	  Shower thatShower(data.Shower(s));
-	  geoalgo::Point_t vtx(3);
-	  // make sure we don't use thisShower in the loop
-	  if (thatShower._energy != thisShower._energy){
+    // loop over showers
+    for (size_t sh=0; sh < data.Shower().size(); sh++){
+      
+      // Ok, we have an electron. Get the associated shower
+      // and make sure it does not:
+      // NOTE: IN 1) IMPLEMENT EXCLUSION ONLY OF e-like showers
+      // 1) share a vertex with another e- shower (gamma-like one could be from Pi0: OK)
+      // 2) come from another shower - NOT DONE AS OF YET
+      // 3) come from a track
+      // 2) & 3) because we are interested in showers from
+      // the neutrino interaction
+      
+      Shower thisShower = data.Shower(sh);
+      
+      if (thisShower._energy < _Ethreshold ) continue;
+      
+      if (_verbose) { std::cout << "This shower: (" << sh << ")" << "\tE: " << thisShower._energy << std::endl; }
+      bool single = true;
+      // loop over other showers and check 1) and 2)
+      for (size_t s=0; s < data.Shower().size(); s++){
+	Shower thatShower(data.Shower(s));
+	geoalgo::Point_t vtx(3);
+	// make sure we don't use thisShower in the loop
+	if (thatShower._energy != thisShower._energy){
 	  // is this shower gamma or e-like?
 	  // if gamma-like maybe a nearby pi0 -> ok if close
-	    if ( _alg_emp.LL(true, thatShower._dedx, -1) < _alg_emp.LL(false, thatShower._dedx, -1) )
-	      {
-		if (_verbose) {
-		  std::cout << "2nd shower has dEdx = " << thatShower._dedx
-			    << "\tIgnore for comparison." << std::endl;
-		}
-		break;
+	  if ( _alg_emp.LL(true, thatShower._dedx, -1) < _alg_emp.LL(false, thatShower._dedx, -1) )
+	    {
+	      if (_verbose) {
+		std::cout << "2nd shower has dEdx = " << thatShower._dedx
+			  << "\tIgnore for comparison." << std::endl;
 	      }
-	    if (_verbose) { std::cout << "Comparing with shower (" << s << ")" << std::endl; }
-	    // compare the two showers
-	    double IP = _findRel.FindClosestApproach(thisShower,thatShower,vtx);
-	    _VsTrack = 0;
-	    _thatE   = thatShower._energy;
-	    _IP = IP;
-	    _IPthisStart = vtx.Dist(thisShower.Start());
-	    _IPthatStart = vtx.Dist(thatShower.Start());
-	    _alg_tree->Fill();
-	    if (_verbose)
-	      std::cout << "\tImpact Parameter      : " << _IP << std::endl
-			<< "\tIP to other Shr Start : " << _IPthatStart << std::endl
-			<< "\tIP to this Shr Start  : " << _IPthisStart << std::endl;
-	    if ( (IP < _maxIP) && ( vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) && ( vtx.Dist(thatShower.Start()) < _vtxToShrStartDist) ){
+	      break;
+	    }
+	  if (_verbose) { std::cout << "Comparing with shower (" << s << ")" << std::endl; }
+	  // compare the two showers
+	  double IP = _findRel.FindClosestApproach(thisShower,thatShower,vtx);
+	  _VsTrack = 0;
+	  _thatE   = thatShower._energy;
+	  _IP = IP;
+	  _IPthisStart = vtx.Dist(thisShower.Start());
+	  _IPthatStart = vtx.Dist(thatShower.Start());
+	  _alg_tree->Fill();
+	  if (_verbose)
+	    std::cout << "\tImpact Parameter      : " << _IP << std::endl
+		      << "\tIP to other Shr Start : " << _IPthatStart << std::endl
+		      << "\tIP to this Shr Start  : " << _IPthisStart << std::endl;
+	  if ( (IP < _maxIP) && ( vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) && ( vtx.Dist(thatShower.Start()) < _vtxToShrStartDist) ){
+	    single = false;
+	    if (_verbose) { std::cout << "NOT single" << std::endl; }
+	    break;
+	  }
+	}// if not the same showers
+      }//loop over showers
+      // loop over tracks if still single
+      if (single){
+	for (size_t t=0; t < data.Track().size(); t++){
+	  Track thatTrack(data.Track(t));
+	  if (thatTrack.size() < 2)
+	    continue;
+	  if (_verbose) { std::cout << "Comparing with track (" << t << ")" << std::endl; }
+	  geoalgo::Point_t vtx(3);
+	  // compare the two tracks
+	  double IP =  _findRel.FindClosestApproach(thisShower,thatTrack,vtx);
+	  _VsTrack = 1;
+	  _thatE   = thatTrack._energy;
+	  _IP = IP;
+	  _IPthisStart = vtx.Dist(thisShower.Start());
+	  _IPthatStart = vtx.Dist(thatTrack.front());
+	  _IPtrkBody = sqrt(_geoAlgo.SqDist(vtx,thatTrack));
+	  _alg_tree->Fill();
+	  if (_verbose)
+	    std::cout << "\tImpact Parameter: " << _IP << std::endl
+		      << "\tIP to Trk Start : " << _IPthatStart << std::endl
+		      << "\tIP to Trk Body  : " << _IPtrkBody << std::endl
+		      << "\tIP to Shr Start : " << _IPthisStart << std::endl;
+	  single = true;
+	  if ( (IP < _maxIP)                                              // good correlation
+	       && (vtx.Dist(thatTrack.front()) > _vtxToTrkStartDist)      // vertex far enough away from track start
+	       && (sqrt(_geoAlgo.SqDist(vtx,thatTrack)) < _vtxToTrkDist)  // vertex close to track body
+	       && (vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) )   // vertex not unreasonably far from shower start
+	    {
+	      // our shower comes from t -> not interested
 	      single = false;
 	      if (_verbose) { std::cout << "NOT single" << std::endl; }
 	      break;
 	    }
-	  }// if not the same showers
-	}//loop over showers
-	// loop over tracks if still single
-	if (single){
-	  for (size_t t=0; t < data.Track().size(); t++){
-	    Track thatTrack(data.Track(t));
-	    if (thatTrack.size() < 2)
-	      continue;
-	    if (_verbose) { std::cout << "Comparing with track (" << t << ")" << std::endl; }
-	    geoalgo::Point_t vtx(3);
-	    // compare the two tracks
-	    double IP =  _findRel.FindClosestApproach(thisShower,thatTrack,vtx);
-	    _VsTrack = 1;
-	    _thatE   = thatTrack._energy;
-	    _IP = IP;
-	    _IPthisStart = vtx.Dist(thisShower.Start());
-	    _IPthatStart = vtx.Dist(thatTrack.front());
-	    _IPtrkBody = sqrt(_geoAlgo.SqDist(vtx,thatTrack));
-	    _alg_tree->Fill();
-	    if (_verbose)
-	      std::cout << "\tImpact Parameter: " << _IP << std::endl
-			<< "\tIP to Trk Start : " << _IPthatStart << std::endl
-			<< "\tIP to Trk Body  : " << _IPtrkBody << std::endl
-			<< "\tIP to Shr Start : " << _IPthisStart << std::endl;
-	    single = true;
-	    if ( (IP < _maxIP)                                              // good correlation
-		 && (vtx.Dist(thatTrack.front()) > _vtxToTrkStartDist)      // vertex far enough away from track start
-		 && (sqrt(_geoAlgo.SqDist(vtx,thatTrack)) < _vtxToTrkDist)  // vertex close to track body
-		 && (vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) )   // vertex not unreasonably far from shower start
-	      {
-		// our shower comes from t -> not interested
+	  else if ( (IP < _maxIP)                                              // good correlation
+		    && (vtx.Dist(thatTrack.front()) < _vtxToTrkStartDist)      // vertex close to track start
+		    && (vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) )   // vertex not unreasonably far from shower start
+	    {
+	      // our shower has a common origin with this track
+	      // save vertex position
+	      _hassister = true;
+	      // if the track is secondary (we investigated this before)
+	      // then this shower should also be labeled as secondary -> not single
+	      auto it = std::find(secondaryTracks.begin(), secondaryTracks.end(), t );
+	      if ( it != secondaryTracks.end() ){
+		if (_verbose) { std::cout << "common origin w/ secondary track -> not Single" << std::endl; }
 		single = false;
-		if (_verbose) { std::cout << "NOT single" << std::endl; }
 		break;
-	      }
-	    else if ( (IP < _maxIP)                                              // good correlation
-		      && (vtx.Dist(thatTrack.front()) < _vtxToTrkStartDist)      // vertex close to track start
-		      && (vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) )   // vertex not unreasonably far from shower start
-	      {
-		// our shower has a common origin with this track
-		// if the track is secondary (we investigated this before)
-		// then this shower should also be labeled as secondary -> not single
-		auto it = std::find(secondaryTracks.begin(), secondaryTracks.end(), t );
-		if ( it != secondaryTracks.end() ){
-		  if (_verbose) { std::cout << "common origin w/ secondary track -> not Single" << std::endl; }
-		  single = false;
-		  break;
-		}
-	      }
-	  }// for all tracks
-	}// if single
-	
-	//If single still true -> we found it! Proceed!
-	// the particle with all it's info was already
-	// created, simply add it to the result vector
-	if (single){
-	  if (_verbose) { std::cout << "Shower is Single!" << std::endl; }
-	  // Create an "unknown" particle that gave
-	  // birth to this electron shower
-	  Particle unknown(12,0);
-	  unknown.Vertex(thisShower.Start());
-	  unknown.Momentum(thisShower.Dir());
-	  unknown.AddDaughter(p);
-	  res.push_back(unknown);
-	  //res.push_back(p);
+	      } // if common with secondary
+	      else{
+		if (_useRadLength){
+		  double vtxtostart = vtx.Dist(thisShower.Start());
+		  if (_verbose) { std::cout << "common origin w/ primary! dEdx: " << thisShower._dedx
+					    << "vtx-start: " << vtxtostart << std::endl; }
+		  // Use Log-Likelihood for single-E w/ rad length info
+		  if ( _alg_emp.LL(true, thisShower._dedx, vtxtostart) < _alg_emp.LL(false, thisShower._dedx, vtxtostart) ){
+		    if (_verbose) { std::cout << "Shower is gamma-like. Ignore " << std::endl;
+		      single = false;
+		    }
+		  }
+		  else{
+		    if (_verbose) { std::cout << "Shower is e-like. yay!" << std::endl; }
+		    single = true;
+		  }
+		}// if use radLength
+	      }// if common origin with primary!
+	    }
+	}// for all tracks
+      }// if single
+      
+      // if still single (and no sister track) look at
+      // dEdx to determine if e-like
+      if (single && !_hassister){
+	if ( ( _alg_emp.LL(true, thisShower._dedx, -1) < _alg_emp.LL(false, thisShower._dedx, -1) ) || 
+	     (thisShower._dedx <= 0) || (thisShower._dedx > 10.) ){
+	  if (_verbose) { std::cout << "Shower is single but gamma-like -> reject" << std::endl; }
+	  single = false;
 	}
-	else
-	  if (_verbose) { std::cout << "Shower is not single." << std::endl; }
-	
-
-      }// if the PDG is 11
-    }// for all particles from EMPart
-
-    /*
-      if (_verbose) { std::cout << "Showers in event: " << data.Shower().size() << std::endl; }
-      
-      /// Get a list of the event showers that are electron like
-      auto e_showers = ElectronLikeShowers( data.Shower() );
-      
-      if (_verbose) { std::cout << "e-like showers  : " << e_showers.size() << std::endl; }
-      
-      /// Get a list of the electron showers that are start-point-isolated
-      auto isolated_e_showers = IsolatedStartPtShowers( e_showers );
-      
-      if (_verbose) { std::cout << "isolated showers: " << isolated_e_showers.size() << std::endl; }
-      
-      if(isolated_e_showers.size() == 1) single_e_counter++;
-      
-      /// Make an electron Particle for each independent shower and add it to the set
-      for(auto const& isol_shower : isolated_e_showers){
-      Particle p_e(11,_e_mass);
-      p_e.Vertex(isol_shower->Start());
-      p_e.Momentum(isol_shower->Dir() * (isol_shower->_energy - p_e.Mass())); // for now fill with direction - unit vector
-      p_e.RecoObjInfo(isol_shower->ID(), Particle::RecoObjType_t::kShower);
-      res.push_back(p_e);
       }
-    */
+      //If single still true -> we found it! Proceed!
+      // the particle with all it's info was already
+      // created, simply add it to the result vector
+      if (single){
+	if (_verbose) { std::cout << "Shower is Single!" << std::endl; }
+	// Create an "unknown" particle that gave
+	// birth to this electron shower
+	Particle electron(11,0.0005);
+	electron.Vertex(thisShower.Start());
+	electron.Momentum(thisShower.Dir());
+	electron.RecoObjInfo(sh,Particle::RecoObjType_t::kShower);
+	Particle unknown(12,0);
+	unknown.Vertex(thisShower.Start());
+	unknown.Momentum(thisShower.Dir());
+	unknown.AddDaughter(electron);
+	res.push_back(unknown);
+	//res.push_back(p);
+      }
+      else
+	if (_verbose) { std::cout << "Shower is not single." << std::endl; }
+      
+      
+    }// for all showers
+
     return res;
   }
   
-
-  bool AlgoSingleE::IsShowerElectron(const ertool::Shower* shower){
-
-    //Make sure the shower is likely an electron
-    //by using LL function from an AlgoEMPart instance
-    //(LL uses only dEdX data if "dist" is plugged in negative)
-    //If likelihood its gamma is more than electron, skip
-    
-    //if dedx value == 0, we don't know whether this is electron,
-    //so let's assume it isn't.
-    if(shower->_dedx < 0.02 || shower->_dedx > 10.) return false;
-    _dedx_values->Fill(shower->_dedx);
-    
-
-    
-    nonzero_dedx_counter++;
-    
-    _e_ll_values->Fill(
-      _alg_emp.LL(true,shower->_dedx,-1.));
-
-    
-    bool e_like = (
-      _alg_emp.LL(true, shower->_dedx, -1.) >
-      _alg_emp.LL(false,shower->_dedx, -1.)) ?
-      true : false;
-    
-    if(e_like) total_e_showers++;
-    else total_g_showers++;
-
-    return e_like;
-    
-  }
-
-  bool AlgoSingleE::AreShowersStartPtCorrelated(const ertool::Shower* s1, const ertool::Shower* s2){
-
-    //Is the start point of s1 close to start point of s2?
-    double dist = s1->Start().Dist(s2->Start());
-    //Hard cut on 1cm for now. This value chosen after viewing some std::couts.
-    //Later: use a PDF to determine the likelihood "dist" is small enough
-    return  (dist < 1.) ? true : false;
-
-  }
-
-  const std::vector<const ertool::Shower*> AlgoSingleE::IsolatedStartPtShowers(const std::vector< const ::ertool::Shower*>& showers){
-
-    //Function purpose: loop over electron showers, make sure they aren't
-    //correlated (start points are close) w/ other electron showers
-    std::vector<const ::ertool::Shower*> isolated_showers;
-    isolated_showers.clear();
-
-    //Save some time if the list of showers is length 0
-    //(return empty vector)
-    if(showers.size() == 0) return isolated_showers;
-
-    //Save some time if the list of showers is length 1
-    //(return a vector with just the index "0" in it)
-    if(showers.size() == 1){
-      isolated_showers.push_back(showers.at(0));
-      return isolated_showers;
-    }
-
-    //For more than 1 electron showers, need to do some combinatorics
-    //Strategy: Make a list of the shower indices that are bad (E.G. are close to other showers)
-    //Then use that list to return only the good showers.
-    std::vector<size_t> bad_shower_indices;
-
-    for(size_t i = 0; i < showers.size()-1; ++i){
-      for(size_t j = i+1; j < showers.size(); ++j){
-	
-	if(AreShowersStartPtCorrelated(showers.at(i),showers.at(j))){
-	  //if list of showers that aren't independent doesn't already contain "i"
-	  //add "i" to the list of showers
-	  if( !(std::find(bad_shower_indices.begin(),bad_shower_indices.end(),i) != bad_shower_indices.end()) )
-	    bad_shower_indices.push_back(i);
-
-	  //if list of showers that aren't independent doesn't already contain "j"
-	  //add "j" to the list of showers
-	  if( !(std::find(bad_shower_indices.begin(),bad_shower_indices.end(),j) != bad_shower_indices.end()) )
-	    bad_shower_indices.push_back(j);
-	}
-      }
-    }
-
-
-    //Now that we have a list of *bad* shower indices
-    //Return a vector of *good* showers
-    for(size_t idx = 0; idx < showers.size(); idx++)
-      //if shower index is not in "bad showers", it is a good shower
-      if( !(std::find(bad_shower_indices.begin(),bad_shower_indices.end(),idx) != bad_shower_indices.end()) )
-	isolated_showers.push_back( showers.at(idx) );
-    
-    return isolated_showers;
-
-  }
-
-
-  const std::vector<const ertool::Shower*> AlgoSingleE::ElectronLikeShowers(const std::vector< const ::ertool::Shower*>& showers){
-
-    std::vector< const ::ertool::Shower*> e_showers;
-    e_showers.clear();
-
-    //Loop over all showers in the event, store ones that are electron-like
-    for(auto const& shower : showers) 
-      if(IsShowerElectron(shower)) e_showers.push_back(shower);
-
-    return e_showers;
-  }
-
   void AlgoSingleE::ProcessEnd(TFile* fout){
     
     if(fout){

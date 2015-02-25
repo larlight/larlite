@@ -51,9 +51,9 @@ namespace cmtool {
     double fPrincipal = TMath::Log(1-cluster.GetParams().eigenvalue_principal);
 
     bool isTrack = false;
-    if(cluster.GetNHits() > _min_hits &&
-       cluster.GetParams().modified_hit_density < _min_mod_hit_dens &&
-       cluster.GetParams().multi_hit_wires < _min_multihit_wires &&
+    if(//cluster.GetNHits() > _min_hits &&
+       cluster.GetParams().modified_hit_density < _min_mod_hit_dens ||
+       cluster.GetParams().multi_hit_wires < _min_multihit_wires ||
        fPrincipal < _min_principal)
       isTrack = true;
 
