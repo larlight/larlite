@@ -118,7 +118,7 @@ namespace ertool {
       // the neutrino interaction
       
       Shower thisShower = data.Shower(sh);
-      
+      _hassister = false;
       if (thisShower._energy < _Ethreshold ) continue;
       
       if (_verbose) { std::cout << "This shower: (" << sh << ")" << "\tE: " << thisShower._energy << std::endl; }
@@ -208,21 +208,21 @@ namespace ertool {
 		break;
 	      } // if common with secondary
 	      else{
-		if (_useRadLength){
-		  double vtxtostart = vtx.Dist(thisShower.Start());
-		  if (_verbose) { std::cout << "common origin w/ primary! dEdx: " << thisShower._dedx
-					    << "vtx-start: " << vtxtostart << std::endl; }
-		  // Use Log-Likelihood for single-E w/ rad length info
-		  if ( _alg_emp.LL(true, thisShower._dedx, vtxtostart) < _alg_emp.LL(false, thisShower._dedx, vtxtostart) ){
-		    if (_verbose) { std::cout << "Shower is gamma-like. Ignore " << std::endl;
-		      single = false;
-		    }
-		  }
-		  else{
-		    if (_verbose) { std::cout << "Shower is e-like. yay!" << std::endl; }
-		    single = true;
-		  }
-		}// if use radLength
+		double vtxtostart = vtx.Dist(thisShower.Start());
+		if (!_useRadLength)
+		  vtxtostart = -1;
+		if (_verbose) { std::cout << "common origin w/ primary! dEdx: " << thisShower._dedx
+					  << "vtx-start: " << vtxtostart << std::endl; }
+		// Use Log-Likelihood for single-E w/ rad length info
+		if ( _alg_emp.LL(true, thisShower._dedx, vtxtostart) < _alg_emp.LL(false, thisShower._dedx, vtxtostart) ){
+		  if (_verbose) { std::cout << "Shower is gamma-like. Ignore " << std::endl; }
+		  single = false;
+		  break;
+		}
+		else{
+		  if (_verbose) { std::cout << "Shower is e-like. yay!" << std::endl; }
+		  single = true;
+		}
 	      }// if common origin with primary!
 	    }
 	}// for all tracks
