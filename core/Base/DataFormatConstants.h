@@ -70,6 +70,7 @@ namespace larlite{
       kPOTSummary,         ///< sumdata::POTSummary 
       kMCTrack,            ///< sim::MCTrack
       kMCTree,             ///< sim::MCTree
+      kMinos,              ///< t962::Minos
       kDATA_TYPE_MAX
     };
 
@@ -104,7 +105,8 @@ namespace larlite{
       "trigger",
       "potsummary",
       "mctrack",
-      "mctree"
+      "mctree",
+      "minos"
     };
     
   }

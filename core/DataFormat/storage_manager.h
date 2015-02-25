@@ -47,6 +47,7 @@
 #include "pfpart.h"
 #include "partid.h"
 #include "gtruth.h"
+#include "minos.h"
 */
 namespace larlite {
   class trigger;
@@ -78,6 +79,7 @@ namespace larlite {
   class event_pfpart;
   class event_partid;
   class event_gtruth;
+  class event_minos;
 }
 
 namespace larlite {
@@ -328,6 +330,7 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_user> () const;
   template<> data::DataType_t storage_manager::data_type<event_mctrack> () const;
   template<> data::DataType_t storage_manager::data_type<event_mctree> () const;
+  template<> data::DataType_t storage_manager::data_type<event_minos> () const;
   template<> data::DataType_t storage_manager::data_type<event_cosmictag>() const;
 }
 #endif
