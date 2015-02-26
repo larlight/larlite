@@ -21,6 +21,7 @@ my_proc.enable_filter(True)
 my_algo = ertool.AlgoSingleE()
 my_algo.useRadLength(True)
 my_algo.setVerbose(False)
+my_algo.setRejectLongTracks(True)
 my_algo.setVtxToTrkStartDist(1)
 my_algo.setVtxToTrkDist(1)
 my_algo.setVtxToShrStartDist(50)
@@ -31,8 +32,8 @@ my_algo.LoadParams()
 
 # Create Filter
 MCfilter = fmwk.MC_CC1E_Filter();
-MCfilter.flip(False)
-#MCfilter.flip(True)
+#MCfilter.flip(False)
+MCfilter.flip(True)
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):
@@ -62,7 +63,8 @@ my_anaunit._mgr._mc_for_ana = True
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
 #my_anaunit.SetShowerProducer(True,"mcreco");
-my_anaunit.SetShowerProducer(False,"showerreco");
+#my_anaunit.SetShowerProducer(False,"davidreco");
+my_anaunit.SetShowerProducer(False,"newdefaultreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetShowerProducer(False,"mergeall");
 
