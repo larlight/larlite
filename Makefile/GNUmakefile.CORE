@@ -4,50 +4,55 @@
 
 all: pre_build main_build 
 
+ROOTMAP=$(SHLIB:.so=.rootmap)
+
 pre_build:
 
-ifndef NO_ROOTMAP
-LOCAL_ROOTMAP=lib/$(SHLIB:.so=.rootmap)
-ROOTMAP=$(LARLITE_LIBDIR)/$(SHLIB:.so=.rootmap)
-main_build: .depend $(DICT).cxx lib/$(SHLIB) $(ROOTMAP) $(LARLITE_LIBDIR)/$(SHLIB)
-else
-main_build: .depend $(DICT).cxx lib/$(SHLIB)  $(LARLITE_LIBDIR)/$(SHLIB)
-endif
-
-# root class dictionary
-$(DICT).cxx: $(HEADERS) LinkDef.h
-	@echo '<< generating CINT >>'
-	@rootcint -f $(DICT).cxx -c $(CINTFLAGS) $(INCFLAGS) $(HEADERS) LinkDef.h
+main_build: .depend $(DICT).cxx $(LARLITE_LIBDIR)/$(SHLIB) $(LARLITE_LIBDIR)/$(ROOTMAP) 
 
 # default rule for making .o files from .cxx files
 %.o: %.cxx
 	@echo '<< compiling' $< '>>'
 	@$(CXX) $(CXXFLAGS) $(INCFLAGS) -c $<
 
+ifdef LARLITE_ROOT6
+
+# root class dictionary
+$(DICT).cxx: $(HEADERS) LinkDef.h
+	@echo '<< generating CINT >>'
+	@rootcling -f $(DICT).cxx -s $(LARLITE_LIBDIR)/$(SHLIB) -rmf $(LARLITE_LIBDIR)/$(ROOTMAP) -c $(CINTFLAGS) $(INCFLAGS) $(HEADERS) LinkDef.h
+
 # rule for making shareable library
-lib/$(SHLIB): $(OBJECTS) $(DICT).o
+$(LARLITE_LIBDIR)/$(SHLIB): $(OBJECTS) $(DICT).cxx $(DICT).o
+	@echo '<< generating $(SHLIB) >>'
+	@$(SOMAKER) $(SOFLAGS) $(LDFLAGS) -o $(LARLITE_LIBDIR)/$(SHLIB) $(filter-out $(DICT).o, $(OBJECTS)) $(DICT).o
+
+# if ROOTMAP defined, define rule for making it
+$(LARLITE_LIBDIR)/$(ROOTMAP): $(LARLITE_LIBDIR)/$(SHLIB)
+
+else
+
+# root class dictionary
+$(DICT).cxx: $(HEADERS) LinkDef.h
+	@echo '<< generating CINT >>'
+	@rootcint -f $(DICT).cxx -c $(CINTFLAGS) $(INCFLAGS) $(HEADERS) LinkDef.h
+
+# rule for making shareable library
+$(LARLITE_LIBDIR)/$(SHLIB): $(OBJECTS) $(DICT).cxx $(DICT).o
 	@echo '<< generating $(SHLIB) >>'
 	@mkdir -p lib
 	@$(SOMAKER) $(SOFLAGS) -o lib/$(SHLIB) $(filter-out $(DICT).o, $(OBJECTS)) $(DICT).o
-
-# rule for making symlink in $(LARLITE_LIBDIR)
-$(LARLITE_LIBDIR)/$(SHLIB): lib/$(SHLIB)
 	@echo '<< installing $(SHLIB) >>'
 	@ln -sf $(PWD)/lib/$(SHLIB) $(LARLITE_LIBDIR)
 
 # if ROOTMAP defined, define rule for making it
-ifndef NO_ROOTMAP
-#ERROR_MESSAGE := $(error Executed)
-$(ROOTMAP): $(LOCAL_ROOTMAP)
+$(LARLITE_LIBDIR)/$(ROOTMAP): $(LARLITE_LIBDIR)/$(SHLIB)
+	@echo "<< generating rootmap >>"
+	@cd lib && ./gen_rootmap.sh
 	@echo "<< installing rootmap >>"
 	@ln -sf $(PWD)/lib/$(SHLIB:.so=.rootmap) $(LARLITE_LIBDIR)
 
-$(LOCAL_ROOTMAP): lib/$(SHLIB)
-	@echo "<< generating rootmap >>"
-	@cd lib && ./gen_rootmap.sh
-
 endif
-
 ###################################################
 
 # "make clean" target

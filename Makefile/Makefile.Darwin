@@ -1,8 +1,10 @@
 #COMPILER:
 CC              = gcc
 CXX             = $(LARLITE_CXX)
-LINKER          = libtool
-SOMAKER         = libtool 
+#LINKER          = libtool
+#SOMAKER         = libtool 
+LINKER          = g++
+SOMAKER         = g++
 
 #######"-O" FLAG: (not always ideal with debugging info)
 CFLAGS          += -O3
@@ -45,7 +47,7 @@ DLLFLAGS        += -Wall
 CFLAGS          += -fPIC
 CXXFLAGS        += -fPIC
 #AFLAGS          += -fPIC
-#SOFLAGS         += -fPIC
+SOFLAGS         += -fPIC
 DLLFLAGS        += -fPIC
 
 
@@ -66,10 +68,11 @@ DLLFLAGS        += -dynamiclib -single_module -undefined dynamic_lookup
 #STATIC LIBRARY
 AFLAGS          += -static 
 #LOADABLE LIBRARY
-SOFLAGS         += -dynamic
+#SOFLAGS         += -dynamic
 #ALTERNATIVE: checks symbols at run-time only -> disable for debugging
-SOFLAGS         += -undefined dynamic_lookup 
+#SOFLAGS         += -undefined dynamic_lookup 
 
+SOFLAGS         = -g -shared 
 
 #######FLAT NAMESPACE:
 #SOFLAGS         += -flat_namespace 
