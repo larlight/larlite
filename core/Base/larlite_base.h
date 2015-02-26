@@ -57,7 +57,7 @@ namespace larlite{
     {if(_verbosity.at(level)) Message::send(level,msg);};
     
   protected:
-    
+
     char _buf[200];                ///< char buffer for message manipulation
     std::vector<bool> _verbosity;  ///< holder for enabled message levels
     msg::Level _verbosity_level;   ///< holder for specified verbosity level

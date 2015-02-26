@@ -24,6 +24,10 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 # set compiler options for ROOT
 CXXFLAGS +=  `root-config --cflags`
 
+# set linker flags
+LDFLAGS += -L$(LARLITE_LIBDIR) -lLArLite_Base
+LDFLAGS += -L$(shell root-config --libdir) -lCore -lPhysics -lTree -lHist
+
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE
 

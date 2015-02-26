@@ -8,26 +8,14 @@ rootlibmap() {
  LINKDEF=$3
  shift 3
  DEPS=$*
+ echo boke
  if [[ -e $SOFILE && -e $LINKDEF ]]; then
-     rlibmap -f -o $ROOTMAP -l $SOFILE -d $DEPS -c $LINKDEF 2>> $temp
+     echo rlibmap -f -o $ROOTMAP -l $SOFILE -d $DEPS -c $LINKDEF 
      rm -f $temp
  fi
 }
 
 ######################################################
 # Base
-rootlibmap libLArLite_Base.rootmap libLArLite_Base.so $LARLITE_COREDIR/Base/LinkDef.h
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+echo ahoaho
+rootlibmap libLArLite_Base.rootmap libLArLite_Base.so $LARLITE_COREDIR/Base/LinkDef.h libCore
