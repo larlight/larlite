@@ -48,9 +48,7 @@ $(LARLITE_LIBDIR)/$(SHLIB): $(OBJECTS) $(DICT).cxx $(DICT).o
 # if ROOTMAP defined, define rule for making it
 $(LARLITE_LIBDIR)/$(ROOTMAP): $(LARLITE_LIBDIR)/$(SHLIB)
 	@echo "<< generating rootmap >>"
-	@cd lib && ./gen_rootmap.sh
-	@echo "<< installing rootmap >>"
-	@ln -sf $(PWD)/lib/$(SHLIB:.so=.rootmap) $(LARLITE_LIBDIR)
+	@rlibmap -f  -o $(LARLITE_LIBDIR)/$(ROOTMAP) -l $(LARLITE_LIBDIR)/$(SHLIB) -c LinkDef.h
 
 endif
 ###################################################
