@@ -1,6 +1,6 @@
 import sys
+from larlite import larlite as fmwk
 from ROOT import *
-from ROOT import larlite as fmwk
 
 man=fmwk.storage_manager()
 man.set_io_mode(man.kWRITE)

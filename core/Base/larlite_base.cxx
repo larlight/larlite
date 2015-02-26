@@ -2,6 +2,13 @@
 #define LARLITE_BASE_CXX
 
 #include "larlite_base.h"
+#include "AnalysisConstants.h"
+#include "GeoTypes.h"
+#include "FrameworkConstants.h"
+#include "RawConstants.h"
+#include "DataFormatConstants.h"
+#include "GeoConstants.h"
+#include "MCConstants.h"
 
 namespace larlite {
   //#####################################################

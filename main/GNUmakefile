@@ -17,7 +17,7 @@ all: ../bin/larlite
 ../bin/larlite:
 	@echo '<<compiling' $@'>>'
 	@mkdir -p ../bin
-	$(CXX) larlite.cc -o ../bin/$@ $(CXXFLAGS) $(LDFLAGS)
+	@$(CXX) larlite.cc -o ../bin/$@ $(CXXFLAGS) $(LDFLAGS)
 	@rm -rf ../bin/*.dSYM
 
 clean:	

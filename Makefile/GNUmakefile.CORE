@@ -1,10 +1,10 @@
 ###################################################
 
 # default target list
+ROOTMAP=$(SHLIB:.so=.rootmap)
+LARLITE_BASIC_ROOTLIBS = $(shell root-config --libs)
 
 all: pre_build main_build 
-
-ROOTMAP=$(SHLIB:.so=.rootmap)
 
 pre_build:
 
@@ -25,7 +25,7 @@ $(DICT).cxx: $(HEADERS) LinkDef.h
 # rule for making shareable library
 $(LARLITE_LIBDIR)/$(SHLIB): $(OBJECTS) $(DICT).cxx $(DICT).o
 	@echo '<< generating $(SHLIB) >>'
-	@$(SOMAKER) $(SOFLAGS) $(LDFLAGS) -o $(LARLITE_LIBDIR)/$(SHLIB) $(filter-out $(DICT).o, $(OBJECTS)) $(DICT).o
+	@$(SOMAKER) $(SOFLAGS) $(LDFLAGS) $(LARLITE_BASIC_ROOTLIBS) -o $(LARLITE_LIBDIR)/$(SHLIB) $(filter-out $(DICT).o, $(OBJECTS)) $(DICT).o
 
 # if ROOTMAP defined, define rule for making it
 $(LARLITE_LIBDIR)/$(ROOTMAP): $(LARLITE_LIBDIR)/$(SHLIB)
@@ -41,7 +41,7 @@ $(DICT).cxx: $(HEADERS) LinkDef.h
 $(LARLITE_LIBDIR)/$(SHLIB): $(OBJECTS) $(DICT).cxx $(DICT).o
 	@echo '<< generating $(SHLIB) >>'
 	@mkdir -p lib
-	@$(SOMAKER) $(SOFLAGS) -o lib/$(SHLIB) $(filter-out $(DICT).o, $(OBJECTS)) $(DICT).o
+	@$(SOMAKER) $(SOFLAGS) $(LDFLAGS) $(LARLITE_BASIC_ROOTLIBS) -o lib/$(SHLIB) $(filter-out $(DICT).o, $(OBJECTS)) $(DICT).o 
 	@echo '<< installing $(SHLIB) >>'
 	@ln -sf $(PWD)/lib/$(SHLIB) $(LARLITE_LIBDIR)
 
@@ -58,13 +58,16 @@ endif
 # "make clean" target
 clean: pre_clean
 	@echo '<< cleaning all >>'
-	@rm -f $(DICT).* *.o lib*.so *~ .depend ./lib/*.o lib/lib*.so lib/lib*.rootmap $(LARLITE_LIBDIR)/$(SHLIB) $(LARLITE_LIBDIR)/$(SHLIB:.so=.rootmap)
+	@rm -f .depend
+	@rm -f $(DICT).* *.o 
+	@rm -f lib/*.o lib/lib*.so lib/lib*.rootmap lib/lib*.pcm
+	@rm -f $(LARLITE_LIBDIR)/$(SHLIB) $(LARLITE_LIBDIR)/$(SHLIB:.so=.rootmap) $(LARLITE_LIBDIR)/$(SHLIB:.so=_rdict.pcm)
 
 pre_clean: 
 
 ###################################################
 libclean:
-	@echo '<< clearning lib directory >>'
+	@echo '<< cleaning lib directory >>'
 	@rm -f $(LARLITE_LIBDIR)/$(SHLIB) 
 	@rm -f lib/$(SHLIB) 
 
