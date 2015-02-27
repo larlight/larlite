@@ -57,8 +57,14 @@ namespace larlite {
 					    )
 				       );
 
+    if(!ev_clus->size()) {
+      print(msg::kWARNING,__FUNCTION__,
+	    Form("Skipping event %d since no cluster found...",ev_clus->event_id()));
+      return false;
+    }
+
     auto associated_hit_producers = ev_clus->association_keys(data::kHit);
-    
+
     if(!(associated_hit_producers.size()))
 
       throw ::cluster::ViewerException("Did not find associated hits!");

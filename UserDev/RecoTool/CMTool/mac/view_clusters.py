@@ -4,19 +4,21 @@ from ROOT import *
 
 # Now import ana_processor & your class. For this example, ana_base.
 from ROOT import *
-if len(sys.argv) != 2:
+if len(sys.argv) < 2:
     print
     print "*** Improper usage. Usage: python viewclusters.py /path/to/input/file.root ***"
     print
 
 
-filename = sys.argv[1]
 my_proc = larlite.ana_processor()
 my_proc.set_verbosity(larlite.msg.kDEBUG)
 
 my_proc.set_io_mode(larlite.storage_manager.kREAD)
 
-my_proc.add_input_file(filename)
+#args should be input file name
+for x in xrange(len(sys.argv)-1):
+
+    my_proc.add_input_file(sys.argv[x+1])
 
 my_proc.set_ana_output_file("")
 
@@ -31,8 +33,8 @@ raw_viewer   = larlite.ClusterViewer()
 my_proc.add_process(raw_viewer)
 
 #raw_viewer.SetInputProducer("pandora")
-#raw_viewer.SetInputProducer("mergedfuzzycluster")
-raw_viewer.SetInputProducer("pandoraNu")
+raw_viewer.SetClusterProducer("mergedfuzzy")
+#raw_viewer.SetClusterProducer("mergeall")
 
 gStyle.SetOptStat(0)
 

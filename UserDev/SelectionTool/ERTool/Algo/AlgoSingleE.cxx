@@ -22,6 +22,7 @@ namespace ertool {
     _verbose = false;
     _useRadLength = false;
     _hassister = false;
+    _rejectLongTracks = true;
 
   }
 
@@ -87,12 +88,13 @@ namespace ertool {
     // then it also will be secondary.
     // Vector where to keep track of track indices for secondarie
     std::vector<int> secondaryTracks;
+
     for (size_t u=0; u < data.Track().size(); u++){
       for (size_t v=0; v < data.Track().size(); v++){
 	// check if u comes from v
 	geoalgo::Point_t vtx(3);
 	// make sure both tracks have more than 2 points
-	if ( (data.Track(u).size() < 2) || (data.Track(v).size() < 2) ) continue;
+	if ( (data.Track(u).Length() < 3) || (data.Track(v).Length() < 3) ) continue;
 	double IP = _findRel.FindClosestApproach(data.Track(u),data.Track(v),vtx);
 	// if the vertex is close to u's start
 	// and close to v's body (but not its start)
@@ -104,7 +106,12 @@ namespace ertool {
       } // for V tracks
     } // for U tracks
 
-    // We are only interested in electron-like showers
+    // Check that no primary tracks are > 1 meter long (muons i.e. NuMu event)
+    if (_rejectLongTracks){
+      if ( filterMuons(data, secondaryTracks) )
+	return res;
+    }
+
     // loop over showers
     for (size_t sh=0; sh < data.Shower().size(); sh++){
       
@@ -280,6 +287,24 @@ namespace ertool {
     }
 
     return;
+  }
+
+  
+  bool AlgoSingleE::filterMuons(const EventData &data, const std::vector<int> &secondaryTracks){
+
+    for(size_t t=0; t < data.Track().size(); t++){
+
+      auto it = std::find(secondaryTracks.begin(), secondaryTracks.end(), t );
+      if ( it == secondaryTracks.end() ){      
+	// then it's a primary
+	// check track length
+	double len = data.Track().at(t)->Length();
+	if (len > 100.)
+	  return true;
+      }
+    }
+    
+    return false;
   }
 
 
