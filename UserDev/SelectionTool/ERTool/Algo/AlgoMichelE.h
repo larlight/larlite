@@ -54,7 +54,7 @@ namespace ertool {
     
   protected:
     
-    //    AlgoEMPart _alg_emp;
+    AlgoEMPart _alg_emp;
 
     TH1F* michel_energy;
 
