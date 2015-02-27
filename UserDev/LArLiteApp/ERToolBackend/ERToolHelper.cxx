@@ -15,7 +15,7 @@ namespace larlite {
 				 ::ertool::ParticleSet& particle_set) const
   {
     
-    //std::cout << "************ EVENT: " << mci_v.event_id() << "  *****" << std::endl;
+    std::cout << "************ EVENT: " << mci_v.event_id() << "  *****" << std::endl;
 
     event_data.Reset();
     particle_set.clear();
@@ -241,14 +241,14 @@ namespace larlite {
 			 ::geoalgo::Vector(mcp.Trajectory()[0].Momentum())*1.e3,
 			 mcp.PdgCode() );
 	bool g4_mother_found = false;
-	/*
+
 	std::cout<<"Inspect: " << mcp_id._pdg
 		 <<" ... "
 		 << mcp_id._pos[0] << " : " << mcp_id._pos[1] << " : " << mcp_id._pos[2]
 		 <<" ... "
 		 << mcp_id._mom[0] << " : " << mcp_id._mom[1] << " : " << mcp_id._mom[2]
 		 << std::endl;
-	*/
+
 	for(auto const& mom_pair : g4_mother_id) {
 
 	  if( mcp_id.same(mom_pair.second) && g4_mother_used.find(mom_pair.first) == g4_mother_used.end() ) {
@@ -443,6 +443,7 @@ namespace larlite {
 				 const event_cosmictag& ctag_shw_v,
 				 ::ertool::EventData& res ) const
   {
+    
     // Fill shower
     std::vector< ::ertool::Shower> s_v;
     s_v.reserve(shw_v.size());

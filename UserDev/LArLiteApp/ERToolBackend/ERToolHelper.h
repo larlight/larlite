@@ -36,6 +36,7 @@
 #include "EMShowerTools/EMShowerProfile.h"
 
 namespace larlite {
+
   /**
      \class ERToolHelper
      @brief A collection of helper functions to generate SPAData to be used in SPT fmwk.
@@ -45,7 +46,7 @@ namespace larlite {
   public:
     
     /// Default constructor
-    ERToolHelper(){ _minEDep = 0.; };
+    ERToolHelper(){ _minEDep = 1.e-10; };
     
     /// Default destructor
     virtual ~ERToolHelper(){};
@@ -86,7 +87,7 @@ namespace larlite {
 			::ertool::EventData& res) const;
 
     /// Set minimum EDep amount for shower to be added to EventData
-    void SetMinEDep(double E) { _minEDep = E; }
+    void SetMinEDep(double E) { if(E<1.e-10) E=1.e-10; _minEDep = E; }
 
   private:
 
