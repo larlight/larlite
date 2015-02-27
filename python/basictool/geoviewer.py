@@ -1,4 +1,4 @@
-from ROOT import geoalgo, larpy
+from cpp_classes import geoalgo, larpy
 from matplotlib.collections import PolyCollection
 #from matplotlib.colors import colorConverter
 from mpl_toolkits.mplot3d import Axes3D

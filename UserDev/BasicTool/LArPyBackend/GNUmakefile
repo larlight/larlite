@@ -25,6 +25,9 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 # set compiler options for ROOT
 CXXFLAGS +=  `root-config --cflags`
 CINTFLAGS += -p
+
+LDFLAGS += -L$(LARLITE_LIBDIR) -lBasicTool_GeoAlgo
+
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE
 

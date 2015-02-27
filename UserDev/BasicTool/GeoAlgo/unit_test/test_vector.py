@@ -1,5 +1,7 @@
 from test_msg import debug, info, error, warning
 import traceback,sys
+from test_import import test_import
+test_import()
 from ROOT import geoalgo
 
 def test_vector():
@@ -44,9 +46,7 @@ def test_vector():
         debug('Testing compatibility check')
         error=False
         try:
-            j.resize(3)
             k.compat(j)
-            error=True
         except Exception:
             pass
         if error: raise Exception
