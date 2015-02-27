@@ -117,7 +117,7 @@ namespace ertool {
       // 2) & 3) because we are interested in showers from
       // the neutrino interaction
       
-      Shower thisShower = data.Shower(sh);
+      auto const& thisShower = data.Shower(sh);
       
       if (thisShower._energy < _Ethreshold ) continue;
       
@@ -125,10 +125,10 @@ namespace ertool {
       bool single = true;
       // loop over other showers and check 1) and 2)
       for (size_t s=0; s < data.Shower().size(); s++){
-	Shower thatShower(data.Shower(s));
+	auto const& thatShower(data.Shower(s));
 	geoalgo::Point_t vtx(3);
 	// make sure we don't use thisShower in the loop
-	if (thatShower._energy != thisShower._energy){
+	if (thatShower.ID() != thisShower.ID()) {
 	  // is this shower gamma or e-like?
 	  // if gamma-like maybe a nearby pi0 -> ok if close
 	  if ( _alg_emp.LL(true, thatShower._dedx, -1) < _alg_emp.LL(false, thatShower._dedx, -1) )
@@ -162,7 +162,7 @@ namespace ertool {
       // loop over tracks if still single
       if (single){
 	for (size_t t=0; t < data.Track().size(); t++){
-	  Track thatTrack(data.Track(t));
+	  auto const& thatTrack(data.Track(t));
 	  if (thatTrack.size() < 2)
 	    continue;
 	  if (_verbose) { std::cout << "Comparing with track (" << t << ")" << std::endl; }
