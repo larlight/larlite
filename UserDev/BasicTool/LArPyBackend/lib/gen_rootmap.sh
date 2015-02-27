@@ -16,4 +16,5 @@ rootlibmap() {
 
 ######################################################
 # LArPyBackend
-rootlibmap libBasicTool_LArPyBackend.rootmap libBasicTool_LArPyBackend.so $LARLITE_USERDEVDIR/BasicTool/LArPyBackend/LinkDef.h 
+rootlibmap libBasicTool_LArPyBackend.rootmap libBasicTool_LArPyBackend.so $LARLITE_USERDEVDIR/BasicTool/LArPyBackend/LinkDef.h \
+    libGeoAlgo.so

@@ -4,7 +4,9 @@ def test_import():
 
     try:
         debug('Attempting to import geoalgo')
-        from ROOT import geoalgo
+        import ROOT
+        ROOT.gSystem.Load("libBasicTool_GeoAlgo")
+        from ROOT import geoalgo    
     except Exception:
         error('Import geoalgo unit test failed.')
         return 1

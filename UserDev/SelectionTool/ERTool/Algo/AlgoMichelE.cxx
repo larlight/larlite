@@ -31,8 +31,8 @@ namespace ertool {
 
   void AlgoMichelE::ProcessBegin()
   {
-    _alg_singleE.ProcessBegin();
-
+    //    _alg_emp.LoadParams();
+    //    _alg_emp.ProcessBegin();
     InitializeHistos();
 
     return;
@@ -49,41 +49,67 @@ namespace ertool {
   void AlgoMichelE::LoadParams(std::string fname, size_t version){
     
     // Load singleE params
-    _alg_singleE.LoadParams(fname,version);
+    //    _alg_emp.LoadParams(fname,version);
     
     return;
   }
 
   ParticleSet AlgoMichelE::Reconstruct(const EventData &data)
   { 
+    ParticleSet res;    
+/*
+    std::cout<<"start of reconstruct"<<std::endl;
     
-    ParticleSet res;
-
-    //Get a list of single (start point isolated) electron showers
-    //from the AlgoSingleE instance
-    ParticleSet single_es = _alg_singleE.Reconstruct(data);
     
-    //Loop over all isolated electrons in the event
-    //Are any of the electrons located at the endpoint (1cm) of a long track?
-    for(auto const& electron : single_es){
+    //Loop over all showers in the event
+    
+    for(size_t is = 0; is < data.Shower().size(); is++){
+      
+      Shower shower(data.Shower(is));
+      std::cout<<"start of shower loop"<<std::endl;
+      //Ask EMP if shower is electron, using only de/dx
 
-      for(auto const& track : data.Track()){
+      if( _alg_emp.LL(true, shower._dedx, -1) > _alg_emp.LL(false, shower._dedx, -1)){
+	//Loop over all tracks and ask if this shower is at the end
+	//(w/in 1cm) of any tracks,
+	//Making sure the track is at least 50cm long
+	for(size_t it = 0; it < data.Track().size(); it++){
+	  Track track(data.Track(it));
 
-	if(electron.Vertex().Dist(track->back()) < 1.){
-	  n_michel_e++;
-	  
-	  if(michel_energy)
-	    michel_energy->Fill(electron.Energy());
-	  
-	}
-      }
-
-    }
+	  //Making sure track has at least 2 points (otherwise geoalgo
+	  // throws exceptions)
+	  std::cout<<"before"<<std::endl;
+	  std::cout<<"size is "<<track.size()<<std::endl;
+	  if(track.size() < 2) continue;
+	  std::cout<<"after"<<std::endl;
+	  std::cout<<shower.Start().Dist(track.back())<<std::endl;
+	  std::cout<<track.Length()<<std::endl;
+	  if(shower.Start().Dist(track.back()) < 1.
+	     && track.Length() > 50.){
+	    std::cout<<"here"<<std::endl;
+	    n_michel_e++;
+	    
+	    if(michel_energy)
+	      michel_energy->Fill(shower._energy);
+	    
+	    break;
+	  }//End if michel was found
+	  std::cout<<"end if michel was found"<<std::endl;
+	}//End loop over tracks
+	std::cout<<"end loop over tracks"<<std::endl;
+      }//End if shower is likely an electron
+      
+      std::cout<<"end if shower is likely electron"<<std::endl;
+      
+    }//End loop over showers
+      
+    std::cout<<"end of routine"<<std::endl;
+*/
 
     return res;
-
+    
   }
-
+  
 }
 
 #endif
