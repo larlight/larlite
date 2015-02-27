@@ -3,6 +3,8 @@ import traceback,sys
 from random import *
 import numpy as np
 from time import *
+from test_import import test_import
+test_import()
 from ROOT import geoalgo
 
 _epsilon = 1E-7
