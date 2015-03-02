@@ -26,7 +26,6 @@ namespace larlite {
   bool ClusterMatcher::analyze(storage_manager* storage) {
 
     std::vector<std::vector<larutil::PxHit> > local_clusters;
-
     _cru_helper.GeneratePxHit(storage,_cluster_producer,local_clusters);
 
     _mgr->Reset();

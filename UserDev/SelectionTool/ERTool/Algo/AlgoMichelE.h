@@ -15,7 +15,7 @@
 #ifndef ERTOOL_ALGOMICHELE_H
 #define ERTOOL_ALGOMICHELE_H
 
-#include "ERTool/Algo/AlgoSingleE.h"
+#include "ERTool/Algo/AlgoEMPart.h"
 #include "ERTool/Base/AlgoBase.h"
 
 namespace ertool {
@@ -54,7 +54,7 @@ namespace ertool {
     
   protected:
     
-    AlgoSingleE _alg_singleE;
+    AlgoEMPart _alg_emp;
 
     TH1F* michel_energy;
 

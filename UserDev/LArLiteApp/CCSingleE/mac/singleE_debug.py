@@ -1,4 +1,11 @@
 import sys, os
+from ROOT import gSystem
+from ROOT import ertool
+ertool.Manager()
+from ROOT import larlite as fmwk
+fmwk.geo.PlaneID
+
+ertool.Manager()
 
 if len(sys.argv) < 2:
     msg  = '\n'
@@ -7,12 +14,6 @@ if len(sys.argv) < 2:
     sys.stderr.write(msg)
     sys.exit(1)
 
-from ROOT import gSystem
-from ROOT import larlite as fmwk
-from ROOT import ertool
-ertool.Manager
-fmwk.geo.PlaneID
-
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
 my_proc.enable_filter(True)
@@ -20,10 +21,10 @@ my_proc.enable_filter(True)
 # Create algorithm
 my_algo = ertool.AlgoSingleE()
 my_algo.useRadLength(True)
-my_algo.setVerbose(False)
+my_algo.setVerbose(True)
 my_algo.setRejectLongTracks(True)
-my_algo.setVtxToTrkStartDist(1)
-my_algo.setVtxToTrkDist(1)
+my_algo.setVtxToTrkStartDist(4)
+my_algo.setVtxToTrkDist(2)
 my_algo.setVtxToShrStartDist(50)
 my_algo.setMaxIP(1)
 my_algo.setEThreshold(0)
@@ -32,8 +33,7 @@ my_algo.LoadParams()
 
 # Create Filter
 MCfilter = fmwk.MC_CC1E_Filter();
-#MCfilter.flip(False)
-MCfilter.flip(True)
+MCfilter.flip(False)
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):
@@ -62,22 +62,25 @@ my_anaunit.SetMinEDep(20)
 my_anaunit._mgr._mc_for_ana = True
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
-#my_anaunit.SetShowerProducer(True,"mcreco");
-#my_anaunit.SetShowerProducer(False,"davidreco");
-my_anaunit.SetShowerProducer(False,"newdefaultreco");
-#my_anaunit.SetShowerProducer(False,"pandoraNuShower");
-#my_anaunit.SetShowerProducer(False,"mergeall");
-
+my_anaunit.SetShowerProducer(True,"mcreco");
 my_anaunit.SetTrackProducer(True,"mcreco");
-#my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
-
 #my_anaunit.SetVtxProducer(True,"generator");
+#my_anaunit.SetShowerProducer(False,"mergeall");
+#my_anaunit.SetShowerProducer(False,"showerreco");
+#my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 # ************************************************
 my_proc.add_process(MCfilter)
 my_proc.add_process(my_anaunit)
 
-my_proc.run()
 
+# Start event-by-event loop
+counter = 0
+while (counter < 1000):
+    try:
+        counter = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
+    except SyntaxError:
+        counter = counter + 1
+    my_proc.process_event(counter)
 
 # done!
 print

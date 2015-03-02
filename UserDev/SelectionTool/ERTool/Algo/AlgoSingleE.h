@@ -58,11 +58,14 @@ namespace ertool {
     /// Use EMPart
     void useRadLength(bool on) { _useRadLength = on; }
 
+    void setRejectLongTracks(bool on) { _rejectLongTracks = on; }
+
     void setVtxToTrkStartDist(double d) { _vtxToTrkStartDist = d; }
     void setVtxToTrkDist(double d) { _vtxToTrkDist = d; }
     void setVtxToShrStartDist(double d) { _vtxToShrStartDist = d; }
     void setMaxIP(double d) { _maxIP = d; }
     void setEThreshold(double E) { _Ethreshold = E; }
+
 
   private:
 
@@ -70,6 +73,11 @@ namespace ertool {
     void ClearTree();
 
   protected:
+
+
+    /// Function to filter out events with long primary tracks 
+    /// return true if a muon is found
+    bool filterMuons(const EventData &data, const std::vector<int> &secondaryTracks);
 
     // verbose flag
     bool _verbose;
@@ -82,6 +90,9 @@ namespace ertool {
 
     // Energy thershold. If shower has < _Ethreshold -> don't consider
     double _Ethreshold;
+
+    // Reject events with long primary tracks
+    bool _rejectLongTracks;
 
     // constants to be used for decision-making
     // minimum distance that a reco-vertex must be away from the

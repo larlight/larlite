@@ -78,6 +78,7 @@ def main():
     print
     if ask_binary('  Load previously extracted fit parameters? [y/n]:'):
         my_algo.LoadParams()    
+        my_algo.LoadParams()    
 
     my_proc.set_io_mode(fmwk.storage_manager.kREAD)
     #my_proc.add_process(pi0_filter);
