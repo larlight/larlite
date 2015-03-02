@@ -1,10 +1,6 @@
 import sys, os
-from ROOT import gSystem
-from ROOT import ertool
-ertool.Manager()
-from ROOT import larlite as fmwk
-fmwk.geo.PlaneID
-
+from seltool import ertool
+from larlite import larlite as fmwk
 from basictool import GeoViewer, geoalgo
 from seltool import ERViewer
 import matplotlib.pyplot as plt
@@ -61,9 +57,9 @@ def main():
     my_ana.SetShowerProducer(True,"mcreco");
     my_ana.SetTrackProducer(True,"mcreco");
     my_ana.SetVtxProducer(False,"");
-    #my_ana.SetShowerProducer(False,"pandoraNuShower")
-    #my_ana.SetTrackProducer(False,"");
-    #my_ana.SetVtxProducer(False,"");
+    my_ana.SetShowerProducer(False,"showerreco")
+    my_ana.SetTrackProducer(False,"");
+    my_ana.SetVtxProducer(False,"");
     #my_ana.SetShowerProducer(True,"mcreco");
     #my_ana.SetTrackProducer(True,"mcreco");
     #my_ana.SetVtxProducer(False,"");
