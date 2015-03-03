@@ -365,6 +365,7 @@ namespace larlite {
       // Reco energy & dedx info
       fTreeParams.best_plane_id = reco_shower.best_plane();
 
+      /*
       int best_plane_index = -1;
 
       for(size_t i=0; i < ass_cluster_v[best_shower_index].size(); ++i) {
@@ -382,12 +383,13 @@ namespace larlite {
 						     best_shower_index)
 						);
       }
+      */
 
-      fTreeParams.reco_energy = reco_shower.Energy().at(best_plane_index);
-      fTreeParams.reco_dedx_U   = reco_shower.dEdx().at(0);
-      fTreeParams.reco_dedx_V   = reco_shower.dEdx().at(1);
-      fTreeParams.reco_dedx_Y   = reco_shower.dEdx().at(2);
-      fTreeParams.reco_dedx     = reco_shower.dEdx().at(best_plane_index);
+      fTreeParams.reco_energy = reco_shower.Energy().at(reco_shower.best_plane());
+      //fTreeParams.reco_dedx_U   = reco_shower.dEdx().at(0);
+      //fTreeParams.reco_dedx_V   = reco_shower.dEdx().at(1);
+      //fTreeParams.reco_dedx_Y   = reco_shower.dEdx().at(2);
+      fTreeParams.reco_dedx     = reco_shower.dEdx().at(reco_shower.best_plane());
 
       //
       // Fill histograms
