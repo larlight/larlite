@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import sys, os
 if len(sys.argv)<2:
    sys.stderr.write('Usage: %s CLASS_NAME\n\n' % sys.argv[0])
@@ -49,34 +49,22 @@ for line in contents:
 
 # modify GNUmakefile (if necessary)
 contents=open('%s/GNUmakefile' % target_dir, 'r').read()
-if contents.find('-I$(LARLITE_COREDIR)') < 0:
+inc_inserted = (contents.find('larlite-config --includes') >= 0)
+lib_inserted = (contents.find('larlite-config --libs') >= 0)
+if not inc_inserted or not lib_inserted:
    contents = contents.split('\n')
    new_contents=''
-   inserted=False
    for l in contents:
-      if not inserted and not l.find('INCFLAG') < 0:
+      if not inc_inserted and not l.find('INCFLAG') < 0:
          l += '\n'
-         l += 'INCFLAGS += -I$(LARLITE_COREDIR)'
-         inserted=True
+         l += 'INCFLAGS += $(shell larlite-config --includes)'
+         inc_inserted=True
+      if not lib_inserted and not l.find('LDFLAGS') < 0:
+         l += '\n'
+         l += 'LDFLAGS += $(shell larlite-config --libs)'
+         lib_inserted=True
       new_contents += '%s\n' % l
    fout=open('%s/GNUmakefile' % target_dir,'w')
-   fout.write(new_contents)
-   fout.close()
-
-# modify lib/gen_rootmap.sh
-contents=open('%s/lib/gen_rootmap.sh' % target_dir,'r').read()
-if contents.find('libLArLite_Analysis.so') < 0:
-   contents = contents.split('\n')
-   new_contents=''
-   inserted=False
-   for l in contents:
-      if not inserted and l.find('LinkDef.h') >= 0:
-         if not l.split()[-1] == '\\':
-            l += '\\'
-         l += '\n'
-         l += '    libLArLite_Analysis.so \\'
-      new_contents += '%s\n' % l
-   fout=open('%s/lib/gen_rootmap.sh' % target_dir,'w')
    fout.write(new_contents)
    fout.close()
 

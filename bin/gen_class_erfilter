@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import sys, os
 if len(sys.argv)<2:
    sys.stderr.write('Usage: %s CLASS_NAME\n\n' % sys.argv[0])
@@ -48,41 +48,25 @@ for line in contents:
    fout.write(line)
 
 # modify GNUmakefile (if necessary)
-deps=['SelectionTool','BasicTool']
-for d in deps:
-   contents=open('%s/GNUmakefile' % target_dir, 'r').read()
-   if contents.find('-I$(LARLITE_USERDEVDIR)/%s' % d) < 0:
-      contents = contents.split('\n')
-      new_contents=''
-      inserted=False
-      for l in contents:
-         if not inserted and not l.find('INCFLAG') < 0:
-            l += '\n'
-            l += 'INCFLAGS += -I$(LARLITE_USERDEVDIR)/%s' % d
-            inserted=True
-         new_contents += '%s\n' % l
-      fout=open('%s/GNUmakefile' % target_dir,'w')
-      fout.write(new_contents)
-      fout.close()
-
-# modify lib/gen_rootmap.sh (if necessary)
-deps=['libBasicTool_GeoAlgo.so','libSelectionTool_ERBase.so']
-for d in deps:
-   contents=open('%s/lib/gen_rootmap.sh' % target_dir,'r').read()
-   if contents.find('libSelectionTool_ERBase.so') < 0:
-      contents = contents.split('\n')
-      new_contents=''
-      inserted=False
-      for l in contents:
-         if not inserted and not l.find('LinkDef.h') < 0:
-            if not l.split()[-1] == '\\':
-               l += '\\'
-            l += '\n'
-            l += '    libSelectionTool_ERBase.so \\'
-         new_contents += '%s\n' % l
-      fout=open('%s/lib/gen_rootmap.sh' % target_dir,'w')
-      fout.write(new_contents)
-      fout.close()
+contents=open('%s/GNUmakefile' % target_dir, 'r').read()
+inc_inserted = (contents.find('seltool-config --includes') >= 0)
+lib_inserted = (contents.find('seltool-config --libs') >= 0)
+if not inc_inserted or not lib_inserted:
+   contents = contents.split('\n')
+   new_contents=''
+   for l in contents:
+      if not inc_inserted and not l.find('INCFLAG') < 0:
+         l += '\n'
+         l += 'INCFLAGS += $(shell seltool-config --includes)'
+         inc_inserted=True
+      if not lib_inserted and not l.find('LDFLAGS') < 0:
+         l += '\n'
+         l += 'LDFLAGS += $(shell seltool-config --libs)'
+         lib_inserted=True
+      new_contents += '%s\n' % l
+   fout=open('%s/GNUmakefile' % target_dir,'w')
+   fout.write(new_contents)
+   fout.close()
 
 print
 print 'Generated the followings under %s.' % target_dir

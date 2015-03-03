@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys
 try:
     from ROOT import larlite as fmwk
