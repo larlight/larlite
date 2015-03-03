@@ -904,7 +904,7 @@ namespace geoalgo {
     Point_t pt1(lin1.Start().size());
     Point_t pt2(lin2.Start().size());
 
-    //double IP = _SqDist_(lin1Back, lin2Back, pt1, pt2);
+    double IP = _SqDist_(lin1Back, lin2Back, pt1, pt2);
     origin = (pt1+pt2)/2.;
 
     // If origin coincides with lin1 start
@@ -979,17 +979,30 @@ namespace geoalgo {
   /// Real-Time Collision Analysis 4.3.5 (Pg. 100) - WelzlSphere
   Sphere_t GeoAlgo::_boundingSphere_(const std::vector<Point_t>& pts) const
   {
+
+    // Remove any duplicate points
+    std::vector<Point_t> copyPts;
+    for(size_t p1=0; p1 < pts.size(); p1++){
+      bool unique = true;
+      for(size_t p2=p1+1; p2 < pts.size(); p2++){
+	if (pts[p1] == pts[p2])
+	  unique = false;
+      }
+      if (unique)
+	copyPts.push_back(pts[p1]);
+    }
+
     // if 4 or less points call appropriate constructor
-    if (pts.size() < 5)
-      return Sphere_t(pts);
+    if (copyPts.size() < 5)
+      return Sphere_t(copyPts);
     
     // too many points to call simple constructor! find minimally bounding sphere
     // compute sphere for first 4 points
-    //Sphere_t tmpSphere(pts[0],pts[1],pts[2],pts[3]);
+    //Sphere_t tmpSphere(copyPts[0],copyPts[1],copyPts[2],copyPts[3]);
     std::vector<Point_t> sosPoints;
     sosPoints.clear();
 
-    return _WelzlSphere_(pts,pts.size(),sosPoints);
+    return _WelzlSphere_(copyPts,copyPts.size(),sosPoints);
   }
 
   Sphere_t GeoAlgo::_WelzlSphere_(const std::vector<Point_t>& pts,
