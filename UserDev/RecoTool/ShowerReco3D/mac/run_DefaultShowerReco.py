@@ -9,7 +9,9 @@ if len(sys.argv) < 2:
 
 
 from ROOT import gSystem,TMath
-from ROOT import larlite as fmwk, cmtool, showerreco, larutil
+from larlite import larlite as fmwk
+from larlite import larutil
+from recotool import cmtool, showerreco
 from recotool.showerDef import DefaultShowerReco3D, PandoraShowerReco3D
 
 # Create ana_processor instance

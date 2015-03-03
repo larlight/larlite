@@ -3,7 +3,7 @@
 #
 
 # specific names for this package
-DICT  = MCShowerRecoCint
+DICT  = RecoTool_MCShowerRecoDict
 SHLIB = libRecoTool_MCShowerReco.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
@@ -12,17 +12,16 @@ OBJECTS = $(SOURCES:.cxx=.o)
 
 # include options for this package
 INCFLAGS = -I.                       #Include itself
-INCFLAGS += -I$(LARLITE_COREDIR)
+INCFLAGS += $(shell larlite-config --includes)
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
 HOST            = $(shell uname -n)
 OSNAMEMODE      = $(OSNAME)
 
-include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
+LDFLAGS += $(shell larlite-config --libs)
 
-# set compiler options for ROOT
-CXXFLAGS +=  `root-config --cflags`
+include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE

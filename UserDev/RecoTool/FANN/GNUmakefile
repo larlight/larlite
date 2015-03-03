@@ -3,7 +3,7 @@
 #
 
 # specific names for this package
-DICT  = FANNCint
+DICT  = RecoTool_FANNDict
 SHLIB = libRecoTool_FANN.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
@@ -13,7 +13,7 @@ OBJECTS = $(SOURCES:.cxx=.o)
 # include options for this package
 INCFLAGS  = -I.                       #Include itself
 INCFLAGS += -I./include
-INCFLAGS += -I$(LARLITE_COREDIR)
+INCFLAGS += $(shell larlite-config --includes)
 
 # Add -p flag to CINT compilation
 CINTFLAGS += -p
@@ -28,12 +28,11 @@ OSNAMEMODE      = $(OSNAME)
 
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
-# set compiler options for ROOT
-CXXFLAGS +=  `root-config --cflags`
-
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE
 
+LDFLAGS += $(shell larlite-config --libs)
+LDFLAGS += -L$(LARLITE_LIBDIR) -lfloatfann
 pre_build:
 	@python bin/fann_build.py
 

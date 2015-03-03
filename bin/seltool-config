@@ -16,7 +16,7 @@ while test $# -gt 0; do
 	  out=`basictool-config --libs`
 	  out+=" -L${LARLITE_LIBDIR} -lSelectionTool_ERApp -lSelectionTool_ERAlgo -lSelectionTool_ERFilter -lSelectionTool_ERBase "
 	  out+=-L`root-config --libdir` 
-	  out+=" -lEG -lRooFit -lRooFitCore -lRooStats"
+	  out+=" -lEG -lRooFit -lRooFitCore -lRooStats "
 	  ;;
       --help)
 	  ### Print a help message

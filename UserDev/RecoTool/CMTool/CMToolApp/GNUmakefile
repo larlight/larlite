@@ -12,19 +12,26 @@ OBJECTS = $(SOURCES:.cxx=.o)
 
 # include options for this package
 INCFLAGS  = -I.                       #Include itself
-INCFLAGS += -I$(LARLITE_COREDIR)
-INCFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool
-INCFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool/FANN/include
+INCFLAGS += $(shell larlite-config --includes)
+INCFLAGS += $(shell recotool-config --includes)
+
 # platform-specific options
 OSNAME          = $(shell uname -s)
 HOST            = $(shell uname -n)
 OSNAMEMODE      = $(OSNAME)
 
 CINTFLAGS += -p
-include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
-# set compiler options for ROOT
-CXXFLAGS +=  `root-config --cflags`
+LDFLAGS += $(shell larlite-config --libs)
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_CMTAlgMerge
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_CMTAlgMatch
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_CMTAlgPriority
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_CMToolBase
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtil
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_FANN
+LDFLAGS += -L$(LARLITE_LIBDIR) -lfloatfann
+
+include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE

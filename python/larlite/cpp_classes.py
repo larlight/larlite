@@ -17,9 +17,10 @@ ROOT.gErrorIgnoreLevel = orig_level
 
 try:
     ROOT.larlite
+    ROOT.larutil
 except AttributeError:
     error('No LArLite core library loaded!')
     raise
-from ROOT import larlite
+from ROOT import larlite,larutil
 
 

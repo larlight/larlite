@@ -9,10 +9,10 @@ while test $# -gt 0; do
 
   case $1 in
       --includes)
-	  out="-I${LARLITE_COREDIR} "
+	  out="-I${LARLITE_USERDEVDIR}/RecoTool -I${LARLITE_USERDEVDIR}/RecoTool/FANN/include"
 	  ;;
       --libs)
-	  out="-L${LARLITE_LIBDIR} -lLArLite_Analysis -lLArLite_LArUtil -lLArLite_DataFormat -lLArLite_Base "
+	  #out="-L${LARLITE_LIBDIR} -lLArLite_Analysis -lLArLite_LArUtil -lLArLite_DataFormat -lLArLite_Base "
 	  ;;
       --help)
 	  ### Print a help message

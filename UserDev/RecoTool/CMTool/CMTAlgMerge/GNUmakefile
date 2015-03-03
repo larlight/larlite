@@ -3,7 +3,7 @@
 #
 
 # specific names for this package
-DICT  = CMTAlgMergeCint
+DICT  = RecoTool_CMTAlgMergeDict
 SHLIB = libRecoTool_CMTAlgMerge.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
@@ -12,9 +12,9 @@ OBJECTS = $(SOURCES:.cxx=.o)
 
 # include options for this package
 INCFLAGS  = -I.                       #Include itself
-INCFLAGS += -I$(LARLITE_COREDIR)
-INCFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool
-INCFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool/FANN/include
+INCFLAGS += $(shell larlite-config --includes)
+INCFLAGS += $(shell recotool-config --includes)
+
 # platform-specific options
 OSNAME          = $(shell uname -s)
 HOST            = $(shell uname -n)
@@ -23,8 +23,11 @@ OSNAMEMODE      = $(OSNAME)
 CINTFLAGS += -p
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
-# set compiler options for ROOT
-CXXFLAGS +=  `root-config --cflags`
+LDFLAGS += $(shell larlite-config --libs)
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_CMToolBase
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtil
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_FANN
+LDFLAGS += -L$(LARLITE_LIBDIR) -lfloatfann
 
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE

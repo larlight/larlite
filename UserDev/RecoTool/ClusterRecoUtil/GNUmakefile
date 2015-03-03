@@ -3,7 +3,7 @@
 #
 
 # specific names for this package
-DICT  = ClusterRecoUtilCint
+DICT  = RecoTool_ClusterRecoUtilDict
 SHLIB = libRecoTool_ClusterRecoUtil.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
@@ -12,9 +12,8 @@ OBJECTS = $(SOURCES:.cxx=.o)
 
 # include options for this package
 INCFLAGS  = -I.                       #Include itself
-INCFLAGS += -I$(LARLITE_COREDIR)
-INCFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool
-INCFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool/FANN/include
+INCFLAGS += $(shell larlite-config --includes)
+INCFLAGS += $(shell recotool-config --includes)
 
 # Add -p flag to CINT compilation
 CINTFLAGS += -p
@@ -24,10 +23,12 @@ OSNAME          = $(shell uname -s)
 HOST            = $(shell uname -n)
 OSNAMEMODE      = $(OSNAME)
 
-include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
+# linker flags
+LDFLAGS += $(shell larlite-config --libs)
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_FANN
+LDFLAGS += -L$(LARLITE_LIBDIR) -lfloatfann
 
-# set compiler options for ROOT
-CXXFLAGS +=  `root-config --cflags`
+include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE

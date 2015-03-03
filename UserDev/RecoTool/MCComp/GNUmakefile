@@ -3,7 +3,7 @@
 #
 
 # specific names for this package
-DICT  = MCCompCint
+DICT  = RecoTool_MCCompDict
 SHLIB = libRecoTool_MCComp.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
@@ -18,10 +18,9 @@ OSNAME          = $(shell uname -s)
 HOST            = $(shell uname -n)
 OSNAMEMODE      = $(OSNAME)
 
-include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
+LDFLAGS += $(shell larlite-config --libs)
 
-# set compiler options for ROOT
-CXXFLAGS +=  `root-config --cflags`
+include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE
