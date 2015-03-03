@@ -1,4 +1,4 @@
-from colored_msg import error, warning
+from colored_msg import error, warning, info
 import ROOT
 
 orig_level = ROOT.gErrorIgnoreLevel
