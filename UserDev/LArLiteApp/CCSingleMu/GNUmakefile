@@ -3,7 +3,7 @@
 #
 
 # specific names for this package
-DICT  = CCSingleMuCint
+DICT  = LArLiteApp_CCSingleMuDict
 SHLIB = libLArLiteApp_CCSingleMu.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h

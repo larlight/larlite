@@ -3,7 +3,7 @@
 #
 
 # specific names for this package
-DICT  = Pi0AnaCint
+DICT  = LArLiteApp_Pi0AnaDict
 SHLIB = libLArLiteApp_Pi0Ana.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h

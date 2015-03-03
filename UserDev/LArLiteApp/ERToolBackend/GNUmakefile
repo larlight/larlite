@@ -3,8 +3,8 @@
 #
 
 # specific names for this package
-DICT  = ERToolBackendCint
-SHLIB = libLArLite_ERToolBackend.so
+DICT  = LArLiteApp_ERToolBackendDict
+SHLIB = libLArLiteApp_ERToolBackend.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
 HEADERS = $(filter-out $(FMWK_HEADERS), $(wildcard *.h))

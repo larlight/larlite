@@ -3,7 +3,7 @@
 #
 
 # specific names for this package
-DICT  = CCSingleECint
+DICT  = LArLiteAPp_CCSingleEDict
 SHLIB = libLArLiteApp_CCSingleE.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h

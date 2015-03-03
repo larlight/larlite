@@ -1,6 +1,8 @@
-import sys
-from ROOT import larlite as fmwk
-from ROOT import ertool
+import sys, ROOT
+ROOT.gSystem.Load("libLArLite_ERToolBackend")
+from larlite import larlite as fmwk
+from seltool import ertool
+
 def ask_binary(msg='Proceed? [y/n]:'):
     
     user_input=''
