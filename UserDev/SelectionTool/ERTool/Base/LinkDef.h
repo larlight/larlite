@@ -28,6 +28,7 @@
 #pragma link C++ class ertool::Particle+;
 #pragma link C++ class std::vector<ertool::Particle>+;
 #pragma link C++ class ertool::ParticleSet+;
+
 #pragma link C++ class ertool::BookKeeper+;
 
 #pragma link C++ class ertool::UnitBase+;
@@ -43,7 +44,6 @@
 #pragma link C++ class ertool::RecoObjBase+;
 #pragma link C++ class ertool::RangeVar+;
 //ADD_NEW_CLASS ... do not change this line
-
 #endif
 
 

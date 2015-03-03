@@ -51,7 +51,6 @@ namespace larlite{
         else if(      TPC != tpcid.TPC      ) return TPC      < tpcid.TPC;
         else return false;
       }
-
     };
 
     /**
@@ -155,7 +154,6 @@ namespace larlite{
 	else if(     Wire != wid.Wire     ) return Wire     < wid.Wire;
 	else return false;
       }
-      
     };
   }
 }

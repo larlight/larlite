@@ -12,10 +12,9 @@ OBJECTS = $(SOURCES:.cxx=.o)
 
 # include options for this package
 INCFLAGS = -I.                       #Include itself
-INCFLAGS += -I$(LARLITE_COREDIR)
-INCFLAGS += -I$(LARLITE_USERDEVDIR)/BasicTool
-INCFLAGS += -I$(LARLITE_USERDEVDIR)/SelectionTool
-INCFLAGS += -I$(LARLITE_USERDEVDIR)/LArLiteApp
+INCFLAGS += $(shell larlite-config --includes)
+INCFLAGS += $(shell seltool-config --includes)
+INCFLAGS += $(shell larliteapp-config --includes)
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
@@ -24,8 +23,9 @@ OSNAMEMODE      = $(OSNAME)
 
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
-# set compiler options for ROOT
-CXXFLAGS +=  `root-config --cflags`
+LDFLAGS += $(shell larlite-config --libs)
+LDFLAGS += $(shell seltool-config --libs)
+LDFLAGS += -L$(LARLITE_LIBDIR) -lLArLite_ERToolBackend
 
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE

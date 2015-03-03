@@ -3,7 +3,7 @@
 #
 
 # specific names for this package
-DICT  = BaseCint
+DICT  = LArLite_BaseDict
 SHLIB = libLArLite_Base.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
@@ -22,9 +22,6 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
 # set compiler options for ROOT
 CXXFLAGS +=  `root-config --cflags`
-
-# set linker flag for dictionary
-LDFLAGS += -L$(shell root-config --libdir) -lCore
 
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE

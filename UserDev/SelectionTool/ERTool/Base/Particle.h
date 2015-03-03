@@ -21,7 +21,7 @@
 #include "ERException.h"
 
 namespace ertool {
-  class Particle;
+  //class Particle;
   /**
      \class Particle
      @brief Tree-structured data holder to represent a reconstructed particle

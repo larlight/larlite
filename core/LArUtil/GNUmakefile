@@ -3,7 +3,7 @@
 #
 
 # specific names for this package
-DICT  = LArUtilCint
+DICT  = LArLite_LArUtilDict
 SHLIB = libLArLite_LArUtil.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
@@ -26,7 +26,6 @@ CXXFLAGS +=  `root-config --cflags`
 
 # set linker flags
 LDFLAGS += -L$(LARLITE_LIBDIR) -lLArLite_Base
-LDFLAGS += -L$(shell root-config --libdir) -lCore -lPhysics -lTree -lHist
 
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE

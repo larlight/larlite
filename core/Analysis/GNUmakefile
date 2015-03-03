@@ -3,7 +3,7 @@
 #
 
 # specific names for this package
-DICT  = AnalysisCint
+DICT  = LArLite_AnalysisDict
 SHLIB = libLArLite_Analysis.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
@@ -21,13 +21,9 @@ OSNAMEMODE      = $(OSNAME)
 
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
-# set compiler options for ROOT
-CXXFLAGS +=  `root-config --cflags`
-
 # set linker flags
-LDFLAGS += -L$(LARLITE_LIBDIR) -lLArLite_Base
 LDFLAGS += -L$(LARLITE_LIBDIR) -lLArLite_DataFormat
-LDFLAGS += -L$(shell root-config --libdir) -lCore -lRIO
+LDFLAGS += -L$(LARLITE_LIBDIR) -lLArLite_Base
 
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE

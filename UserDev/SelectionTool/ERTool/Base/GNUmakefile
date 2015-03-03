@@ -3,7 +3,7 @@
 #
 
 # specific names for this package
-DICT  = BaseCint
+DICT  = SelectionTool_ERBaseDict
 SHLIB = libSelectionTool_ERBase.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
@@ -12,8 +12,7 @@ OBJECTS = $(SOURCES:.cxx=.o)
 
 # include options for this package
 INCFLAGS = -I.                       #Include itself
-INCFLAGS += -I$(LARLITE_COREDIR)
-INCFLAGS += -I$(LARLITE_USERDEVDIR)/BasicTool
+INCFLAGS += $(shell basictool-config --includes)
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
@@ -22,8 +21,9 @@ OSNAMEMODE      = $(OSNAME)
 
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
-# set compiler options for ROOT
-CXXFLAGS +=  `root-config --cflags`
+# set linker flags
+LDFLAGS += -L$(shell root-config --libdir) -lEG -lRooFit -lRooFitCore -lRooStats
+LDFLAGS += $(shell basictool-config --libs)
 
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE

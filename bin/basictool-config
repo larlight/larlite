@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+out=""
+while test $# -gt 0; do
+  case "$1" in
+  -*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
+  *)    optarg= ;;
+  esac
+
+  case $1 in
+      --includes)
+	  out="-I${LARLITE_USERDEVDIR}/BasicTool "
+	  ;;
+      --libs)
+	  out="-L${LARLITE_LIBDIR} -lBasicTool_LArPyBackend -lBasicTool_EMShowerTools -lBasicTool_GeoAlgo"
+	  ;;
+      --help)
+	  ### Print a help message
+          echo "Usage: `basename $0` [options]"
+	  echo ""
+	  echo "  --includes ... print out includes"
+	  echo "  --libs     ... print out libraries"
+	  exit 0
+	  ;;
+      *)
+	  ### Give an error
+          echo "Unknown argument \"$1\"!" 1>&2
+	  echo "${usage}" 1>&2
+	  exit 1
+	  ;;
+  esac
+  shift
+done
+echo $out

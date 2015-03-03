@@ -3,7 +3,7 @@
 #
 
 # specific names for this package
-DICT  = LArPyBackendCint
+DICT  = BasicTool_LArPyBackendDict
 SHLIB = libBasicTool_LArPyBackend.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
@@ -12,7 +12,7 @@ OBJECTS = $(SOURCES:.cxx=.o)
 
 # include options for this package
 INCFLAGS  = -I.                       #Include itself
-INCFLAGS += -I$(LARLITE_USERDEVDIR)/BasicTool
+INCFLAGS += $(shell basictool-config --includes)
 INCFLAGS += $(shell python-config --includes)
 
 # platform-specific options
@@ -22,10 +22,10 @@ OSNAMEMODE      = $(OSNAME)
 
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
-# set compiler options for ROOT
-CXXFLAGS +=  `root-config --cflags`
+# Use build compiler to pre-process macros instead of rootcint
 CINTFLAGS += -p
 
+LDFLAGS += $(shell python-config --ldflags)
 LDFLAGS += -L$(LARLITE_LIBDIR) -lBasicTool_GeoAlgo
 
 # call the common GNUmakefile

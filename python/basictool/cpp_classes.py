@@ -3,14 +3,18 @@ import ROOT
 
 orig_level = ROOT.gErrorIgnoreLevel
 
-libs = [ 'libBasicTool_GeoAlgo',
-         'libBasicTool_EMShowerTools',
-         'libBasicTool_LArPyBackend']
+libs = [ 'libBasicTool_LArPyBackend',
+         'libBasicTool_GeoAlgo',
+         'libBasicTool_EMShowerTools']
+         
 
 ROOT.gErrorIgnoreLevel = ROOT.kFatal
 for l in libs:
-    if ROOT.gSystem.Load(l) < 0:
+    val = ROOT.gSystem.Load(l)
+    if val < 0:
         warning('Skipping %s' % l)
+    else:
+        info('%s %s' % (val,l))
 ROOT.gErrorIgnoreLevel = orig_level
 
 names=['geoalgo','larpy']

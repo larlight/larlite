@@ -3,7 +3,7 @@
 #
 
 # specific names for this package
-DICT  = EMShowerToolsCint
+DICT  = BasicTool_EMShowerToolsDict
 SHLIB = libBasicTool_EMShowerTools.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h

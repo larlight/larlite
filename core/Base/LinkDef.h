@@ -19,9 +19,9 @@
 #pragma link C++ enum larlite::geo::SigType_t+;
 #pragma link C++ enum larlite::geo::View_t+;
 
-#pragma link C++ class larlite::geo::TPCID+;
-#pragma link C++ class larlite::geo::PlaneID+;
-#pragma link C++ class larlite::geo::WireID+;
+#pragma link C++ struct larlite::geo::TPCID+;
+#pragma link C++ struct larlite::geo::PlaneID+;
+#pragma link C++ struct larlite::geo::WireID+;
 
 #pragma link C++ class std::vector<larlite::geo::SigType_t>+;
 #pragma link C++ class std::vector<larlite::geo::View_t>+;

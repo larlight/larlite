@@ -3,6 +3,7 @@
 # default target list
 ROOTMAP=$(SHLIB:.so=.rootmap)
 LARLITE_BASIC_ROOTLIBS = $(shell root-config --libs)
+LARLITE_BASIC_ROOTINC  = $(shell root-config --cflags)
 
 all: pre_build main_build 
 
@@ -13,13 +14,13 @@ main_build: .depend $(DICT).cxx $(LARLITE_LIBDIR)/$(SHLIB) $(LARLITE_LIBDIR)/$(R
 # default rule for making .o files from .cxx files
 %.o: %.cxx
 	@echo '<< compiling' $< '>>'
-	@$(CXX) $(CXXFLAGS) $(INCFLAGS) -c $<
+	@$(CXX) $(LARLITE_BASIC_ROOTINC) $(INCFLAGS) -c $<
 
 ifdef LARLITE_ROOT6
 
 # root class dictionary
 $(DICT).cxx: $(HEADERS) LinkDef.h
-	@echo '<< generating CINT >>'
+	@echo '<< generating dict >>'
 	@rootcling -f $(DICT).cxx -s $(LARLITE_LIBDIR)/$(SHLIB) -rmf $(LARLITE_LIBDIR)/$(ROOTMAP) -c $(CINTFLAGS) $(INCFLAGS) $(HEADERS) LinkDef.h
 
 # rule for making shareable library
@@ -34,7 +35,7 @@ else
 
 # root class dictionary
 $(DICT).cxx: $(HEADERS) LinkDef.h
-	@echo '<< generating CINT >>'
+	@echo '<< generating dict >>'
 	@rootcint -f $(DICT).cxx -c $(CINTFLAGS) $(INCFLAGS) $(HEADERS) LinkDef.h
 
 # rule for making shareable library
@@ -79,7 +80,7 @@ clearCINT:
 .depend: $(SOURCES) $(HEADERS)
 	@#rm .depend
 	@echo '<< checking dependencies >>'
-	@$(CXX) -M $(CXXFLAGS) $(INCFLAGS) $(SOURCES) > .depend
+	@$(CXX) -M $(CXXFLAGS) $(LARLITE_BASIC_ROOTINC) $(INCFLAGS) $(SOURCES) > .depend
 
 -include .depend
 
