@@ -1,6 +1,8 @@
 import sys
 from ROOT import gSystem,TMath
-from ROOT import larlite as fmwk, cmtool, showerreco, larutil, calo
+from larlite import larlite as fmwk
+from larlite import larutil
+from cpp_classes import cmtool, showerreco, calo
 
 def PandoraShowerReco3D():
     # Create analysis unit

@@ -30,9 +30,10 @@ try:
     ROOT.cluster
     ROOT.cmtool
     ROOT.showerreco
+    ROOT.calo
 except AttributeError:
     error('No LArLite core library loaded!')
     raise
-from ROOT import cluster, cmtool, showerreco
+from ROOT import cluster, cmtool, showerreco, calo
 
 

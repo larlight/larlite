@@ -4,7 +4,8 @@
 # Not meant to be run as a stand alone script, instead mean to be imported
 ########################################################################
 
-from ROOT import larlite as fmwk,cmtool
+from larlite import larlite as fmwk
+from cpp_classes import cmtool
 
 def GetMergeAllInstance(producer="fuzzycluster",saveOutput=True):
     
