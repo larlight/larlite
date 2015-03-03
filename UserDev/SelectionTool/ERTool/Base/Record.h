@@ -59,7 +59,7 @@ namespace ertool {
     virtual ~Record(){}
     
     /// Parameter (Record) getter
-    const Params& Params() { return _params; }
+    const ::ertool::Params& Params() { return _params; }
 
     /// Parameter (larlite::user_info) getter
     ::ertool::Params& WriteableParams() { return _params; }

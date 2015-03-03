@@ -29,9 +29,9 @@ namespace showerreco {
     std::vector < larutil::PxPoint > fEndPoint;    // for each plane
     std::vector < double > fOmega2D;    // for each plane
     
-    std::vector < double > fEnergy;    // for each plane
-    std::vector < double > fMIPEnergy;    // for each plane
-    std::vector < double > fdEdx;      
+    std::vector < double > fEnergy   (fGSer->Nplanes(),-1);    // for each plane
+    std::vector < double > fMIPEnergy(fGSer->Nplanes(),-1);    // for each plane
+    std::vector < double > fdEdx     (fGSer->Nplanes(),-1);      
     std::vector <unsigned char> fPlaneID;
     
     // First Get Start Points
@@ -109,7 +109,7 @@ namespace showerreco {
       {
 	int plane = fPlaneID.at(cl_index);
 	double newpitch=fGSer->PitchInView(plane,xphi,xtheta);
-	if(plane == best_plane) best_length *= newpitch;
+	if(plane == best_plane) best_length *= newpitch / fGSer->WireToCm();
 
 	if(fVerbosity)
 	  std::cout << std::endl << " Plane: " << plane << std::endl;
@@ -330,9 +330,9 @@ namespace showerreco {
 	// if Energy correction factor to be used
 	// then get it from ShowerCalo.h
 	if (_Ecorrection) { totEnergy *= showerreco::energy::DEFAULT_ECorr; }
-	fEnergy.push_back(totEnergy);    // for each plane
-	fMIPEnergy.push_back(totMIPEnergy);
-	fdEdx.push_back(dedx_final); 
+	fEnergy[plane]    = totEnergy;    // for each plane
+	fMIPEnergy[plane] = totMIPEnergy;
+	fdEdx[plane]      = dedx_final; 
     
 	// break;
       } // end loop on clusters

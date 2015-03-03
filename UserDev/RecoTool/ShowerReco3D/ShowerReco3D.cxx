@@ -94,7 +94,6 @@ namespace larlite {
   
   bool ShowerReco3D::finalize() {
 
-    _fout->cd();
     fManager.Finalize();
 
     return true;
