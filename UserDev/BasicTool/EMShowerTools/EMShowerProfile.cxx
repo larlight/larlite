@@ -6,6 +6,7 @@
 
 double EMShowerProfile::Length(const double energy) const {
 
+  /*
   /// This formula taken from Andrzej
 
   double rad_length_cm = 48.; //Assumed energy independent (roughly correct)
@@ -15,6 +16,22 @@ double EMShowerProfile::Length(const double energy) const {
   double epsilon_mev = 5715.; //Parameter fit from geant4 output apparently
   
   double shower_length = rad_length_cm * ( log( energy/epsilon_mev ) - 1 + (0.08*18) + 9.6 );
+  */
+
+  /// This formula from fitting single electron merge-all plot of reco shower energy vs. mcshower
+  /// DetProfile energy, assuming >95% energy containment, fit from 100 MEV --> 1000 MEV
+  /// Fit results for pol2 fit:
+  /// Chi2                      =      129.971
+  /// NDf                       =           93
+  /// p0                        =      13.8874   +/-   0.713199    
+  /// p1                        =     0.121734   +/-   0.00356722  
+  /// p2                        = -3.75571e-05   +/-   3.80609e-06 
+
+  ///Note: this formula only valid up to ~1.5 GEV. After that, shower length actually
+  /// decreases as a function of shower energy.
+  double shower_length = 13.8874 + 0.121734*energy - (3.75571e-05)*energy*energy;
+
+  if(shower_length < 5) return 5.;
 
   return shower_length;
 }
@@ -29,9 +46,8 @@ double EMShowerProfile::EnergyContainment(const double dist) const {
   // Ex: plug in d = inf: All of initial energy E_o is deposited
   // Ex: plug in d = X: All but 1/e of energy E_o is deposited
 
-  double rad_length_cm = 48.; //Assumed energy independent (roughly correct)
-  //this should be 14cm, but studying mcshowers tells me g4 is using 
-  //47cm (fit)
+  double rad_length_cm = 20.; //Assumed energy independent (roughly correct)
+  /// 20 comes from fitting single gamma radiation lengths with MCShowers.
   
   // If you're outside of the TPC, no energy is contained
   if(dist < 0) return 0;
