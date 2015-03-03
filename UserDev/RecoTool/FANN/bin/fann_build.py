@@ -26,7 +26,9 @@ cmd = "cd %s; cmake .; make" % FANN_DIR
 os.system(cmd)
 
 # Copy libraries
-libs = [x for x in os.listdir("%s/src" % FANN_DIR) if x.endswith(".so") or x.endswith(".dylib")]
+libs = [x for x in os.listdir("%s/src" % FANN_DIR) if (x.find("fann.so")>=0 or 
+                                                       x.endswith(".dylib") or
+                                                       x.endswith(".so"))]
 
 if not len(libs):
     print
