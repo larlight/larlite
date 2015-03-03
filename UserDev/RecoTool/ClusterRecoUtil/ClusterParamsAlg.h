@@ -184,7 +184,7 @@ namespace cluster {
 
     void FillPolygon();
 
-    void GetOpeningAngle();
+    //void GetOpeningAngle();
 
     const larutil::PxPoint& RoughStartPoint() {return fRoughBeginPoint;}
     const larutil::PxPoint& RoughEndPoint() {return fRoughEndPoint;}
