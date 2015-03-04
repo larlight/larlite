@@ -26,7 +26,7 @@ $(DICT).cxx: $(HEADERS) LinkDef.h
 # rule for making shareable library
 $(LARLITE_LIBDIR)/$(SHLIB): $(OBJECTS) $(DICT).cxx $(DICT).o
 	@echo '<< generating $(SHLIB) >>'
-	@$(SOMAKER) $(SOFLAGS) $(LDFLAGS) $(LARLITE_BASIC_ROOTLIBS) -o $(LARLITE_LIBDIR)/$(SHLIB) $(filter-out $(DICT).o, $(OBJECTS)) $(DICT).o
+	@$(SOMAKER) -o $(LARLITE_LIBDIR)/$(SHLIB) $(filter-out $(DICT).o, $(OBJECTS)) $(DICT).o $(SOFLAGS) $(LDFLAGS) $(LARLITE_BASIC_ROOTLIBS) 
 
 # if ROOTMAP defined, define rule for making it
 $(LARLITE_LIBDIR)/$(ROOTMAP): $(LARLITE_LIBDIR)/$(SHLIB)
@@ -42,7 +42,7 @@ $(DICT).cxx: $(HEADERS) LinkDef.h
 $(LARLITE_LIBDIR)/$(SHLIB): $(OBJECTS) $(DICT).cxx $(DICT).o
 	@echo '<< generating $(SHLIB) >>'
 	@mkdir -p lib
-	@$(SOMAKER) $(SOFLAGS) $(LDFLAGS) $(LARLITE_BASIC_ROOTLIBS) -o $(LARLITE_LIBDIR)/$(SHLIB) $(filter-out $(DICT).o, $(OBJECTS)) $(DICT).o 
+	@$(SOMAKER) $(SOFLAGS) -o $(LARLITE_LIBDIR)/$(SHLIB) $(filter-out $(DICT).o, $(OBJECTS)) $(DICT).o $(LDFLAGS) $(LARLITE_BASIC_ROOTLIBS) 
 	@echo '<< installing $(SHLIB) >>'
 
 # if ROOTMAP defined, define rule for making it

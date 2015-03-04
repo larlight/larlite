@@ -14,8 +14,6 @@
 #ifndef REPOSITORYNAME_PACKAGE_NAME_SAMPLE_H
 #define REPOSITORYNAME_PACKAGE_NAME_SAMPLE_H
 
-#include <iostream>
-
 /**
    \class sample
    User defined class Package_Name ... these comments are used to generate
