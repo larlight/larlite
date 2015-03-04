@@ -25,7 +25,7 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
 LDFLAGS += $(shell larlite-config --libs)
 LDFLAGS += $(shell seltool-config --libs)
-LDFLAGS += -L$(LARLITE_LIBDIR) -lLArLite_ERToolBackend
+LDFLAGS += -L$(LARLITE_LIBDIR) -lLArLiteApp_ERToolBackend
 
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE
