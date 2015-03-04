@@ -1,5 +1,7 @@
 import sys
-from ROOT import *
+from ROOT import gSystem
+gSystem.Load("libRepositoryName_Package_Name")
+from ROOT import sample
 
 try:
 

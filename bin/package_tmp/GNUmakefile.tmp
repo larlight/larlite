@@ -3,7 +3,7 @@
 #
 
 # specific names for this package
-DICT  = Package_NameCint
+DICT  = RepositoryName_Package_NameCint
 SHLIB = libRepositoryName_Package_Name.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
