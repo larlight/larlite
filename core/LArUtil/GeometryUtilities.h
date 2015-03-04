@@ -200,6 +200,7 @@ namespace larutil{
     Double_t TimeToCm() const {return fTimetoCm;}
     Double_t WireToCm() const {return fWiretoCm;}
     Double_t WireTimeToCmCm() const {return fWireTimetoCmCm;}
+    size_t Nplanes() const { return fNPlanes; }
 
   private:
 
