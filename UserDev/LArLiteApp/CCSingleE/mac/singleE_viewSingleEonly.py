@@ -5,10 +5,7 @@ ertool.Manager()
 from ROOT import larlite as fmwk
 fmwk.geo.PlaneID
 
-from algoviewer import viewAll
-
-ertool.Manager()
-
+from algoviewer import viewAll, view
 if len(sys.argv) < 2:
     msg  = '\n'
     msg += "Usage 1: %s $INPUT_ROOT_FILE\n" % sys.argv[0]
@@ -24,13 +21,18 @@ my_proc.enable_filter(True)
 my_algo = ertool.AlgoSingleE()
 my_algo.useRadLength(True)
 my_algo.setVerbose(True)
+my_algo.setRejectLongTracks(True)
 my_algo.setVtxToTrkStartDist(1)
 my_algo.setVtxToTrkDist(1)
 my_algo.setVtxToShrStartDist(50)
 my_algo.setMaxIP(1)
-#my_algo.setVerbose(True)
+my_algo.setVtxProximityCut(5)
+my_algo.setEThreshold(0)
+my_algo.LoadParams()
+# Create ERTool filter
+my_filter = ertool.FilterTrackLength()
 
-# Create Filter
+# Create MC Filter
 MCfilter = fmwk.MC_CC1E_Filter();
 MCfilter.flip(False)
 
@@ -44,29 +46,30 @@ my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 # Specify output root file name
 my_proc.set_ana_output_file("singleE_selection.root")
 
-
-# Possible filter to select true events
-#my_proc.enable_filter(True)
-#pdgsel = fmwk.PDGSelection()
-#pdgsel.Select(11,pdgsel.kGENERATOR,1)
-#my_proc.add_process(pdgsel)
-
 my_ana = ertool.ERAnaSingleE()
 my_ana.SetDebug(True)
 
+my_ana = ertool.ERAnaSingleE()
+my_ana.SetDebug(False)
+
 my_anaunit = fmwk.ExampleERSelection()
-my_anaunit.SetMinEDep(10)
 my_anaunit._mgr.SetAlgo(my_algo)
+my_anaunit._mgr.SetFilter(my_filter)
 my_anaunit._mgr.SetAna(my_ana)
+my_anaunit.SetMinEDep(20)
 my_anaunit._mgr._mc_for_ana = True
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
-#my_anaunit.SetShowerProducer(True,"mcreco");
-my_anaunit.SetTrackProducer(True,"mcreco");
-#my_anaunit.SetVtxProducer(True,"generator");
+my_anaunit.SetShowerProducer(True,"mcreco");
+#my_anaunit.SetShowerProducer(False,"davidreco");
+#my_anaunit.SetShowerProducer(False,"newdefaultreco");
+#my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetShowerProducer(False,"mergeall");
-my_anaunit.SetShowerProducer(False,"showerreco");
+
+my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
+
+#my_anaunit.SetVtxProducer(True,"generator");
 # ************************************************
 my_proc.add_process(MCfilter)
 my_proc.add_process(my_anaunit)
@@ -81,8 +84,10 @@ while (counter < 20000):
 
     data_reco = my_anaunit.GetData()
     part_reco = my_anaunit.GetParticles()
-
-    if (part_reco.size() > 0):
+    
+    print "Particles: {0}".format(part_reco.size())
+    
+    if (part_reco.size() != 1):
         # we found something...lets plot it
         data_mc   = my_anaunit.GetData(True)
         part_mc   = my_anaunit.GetParticles(True)
@@ -96,7 +101,7 @@ while (counter < 20000):
         try:
             counter = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
         except SyntaxError:
-            counter = counter + 1
+            counter = counter
 
 # done!
 print

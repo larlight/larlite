@@ -11,6 +11,7 @@
 
 #pragma link C++ class ertool::FilterCosmic+;
 #pragma link C++ class ertool::FilterECut+;
+#pragma link C++ class ertool::FilterTrackLength+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif

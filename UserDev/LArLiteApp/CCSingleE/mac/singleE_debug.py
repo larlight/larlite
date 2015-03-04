@@ -21,15 +21,17 @@ my_proc.enable_filter(True)
 # Create algorithm
 my_algo = ertool.AlgoSingleE()
 my_algo.useRadLength(True)
-my_algo.setVerbose(True)
+my_algo.setVerbose(False)
 my_algo.setRejectLongTracks(True)
-my_algo.setVtxToTrkStartDist(4)
-my_algo.setVtxToTrkDist(2)
+my_algo.setVtxToTrkStartDist(1)
+my_algo.setVtxToTrkDist(1)
 my_algo.setVtxToShrStartDist(50)
 my_algo.setMaxIP(1)
+my_algo.setVtxProximityCut(5)
 my_algo.setEThreshold(0)
 my_algo.LoadParams()
-#my_algo.setVerbose(True)
+# Create ERTool filter
+my_filter = ertool.FilterTrackLength()
 
 # Create Filter
 MCfilter = fmwk.MC_CC1E_Filter();
@@ -57,6 +59,7 @@ my_ana = ertool.ERAnaSingleE()
 
 my_anaunit = fmwk.ExampleERSelection()
 my_anaunit._mgr.SetAlgo(my_algo)
+my_anaunit._mgr.SetFilter(my_filter)
 my_anaunit._mgr.SetAna(my_ana)
 my_anaunit.SetMinEDep(20)
 my_anaunit._mgr._mc_for_ana = True

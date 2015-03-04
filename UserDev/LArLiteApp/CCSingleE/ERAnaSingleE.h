@@ -71,6 +71,8 @@ namespace ertool {
     int _n_showersReco;/// Number of reconstructed *showers* in the event data (could be e or g, etc)
     int _n_tracks;     /// Number of mc *tracks*
     int _n_tracksReco; /// Number of reconstructed *tracks* in the event data
+    int _n_tracksInt;     /// Number of mc *tracks* from interaction
+    int _n_tracksIntReco; /// Number of reconstructed *tracks* from interaction in the return ParticleSet
     int _n_protons;    /// number of protons ( E > 20 MeV)
     int _n_neutrons;   /// number of neutrons (E > 20 MeV)
     int _n_piplus;     /// number of pi+ (E > 20 MeV)
@@ -78,7 +80,11 @@ namespace ertool {
     /// Whether this event was MID'd (if == 0: we found ==1 single electron)
     /// Note: this is 0 if _E is filled, otherwise this is 1 (redundant)
     int    _misID;
-    double _e_nu;      /// Neutrino energy
+    double _e_nu, _e_nuReco;     /// Neutrino energy
+    double _x_nu, _y_nu, _z_nu; /// Neutrino position
+    double _x_nuReco, _y_nuReco, _z_nuReco; /// Neutrino position
+    double _px_nu, _py_nu, _pz_nu; /// Neutrino momentum
+    double _px_nuReco, _py_nuReco, _pz_nuReco; /// Neutrino position
     int _pdg_nu;       /// Neutrino PDG
     double _e_lep;     /// lepton from neutrino Energy
     double _x_lep, _y_lep, _z_lep; /// lepton x,y,z start point
