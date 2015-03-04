@@ -21,6 +21,7 @@
 #include "ERTool/Base/AlgoBase.h"
 #include "GeoAlgo/GeoAlgo.h"
 #include <algorithm> // for std::find
+#include <utility>
 
 namespace ertool {
 
@@ -65,6 +66,7 @@ namespace ertool {
     void setVtxToShrStartDist(double d) { _vtxToShrStartDist = d; }
     void setMaxIP(double d) { _maxIP = d; }
     void setEThreshold(double E) { _Ethreshold = E; }
+    void setVtxProximityCut(double d) { _vtxProximityCut = d; }
 
 
   private:
@@ -78,6 +80,10 @@ namespace ertool {
     /// Function to filter out events with long primary tracks 
     /// return true if a muon is found
     bool filterMuons(const EventData &data, const std::vector<int> &secondaryTracks);
+
+    /// Function to check wether a shower is e- or gamma-like
+    /// Returns true if gamma-like
+    bool isGammaLike(const double dedx, double radlen,bool forceRadLen=false);
 
     // verbose flag
     bool _verbose;
@@ -114,6 +120,12 @@ namespace ertool {
     // within this value at any point and they therefore are 
     // assumed to not be correlated
     double _maxIP;
+    // Vertex Proximity Cut:
+    // if "candidate vertices" from the tracks are found
+    // (needs to be a vertex in common to 2+ tracks in event)
+    // require that a shower be within this distance to the
+    // closest candidate vertex
+    double _vtxProximityCut;
 
     // Keep track of whether a sister track to the shower has
     // been found

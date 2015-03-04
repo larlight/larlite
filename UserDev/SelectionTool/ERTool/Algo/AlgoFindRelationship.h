@@ -14,11 +14,12 @@
 #ifndef ERTOOL_ALGOFINDRELATIONSHIP_H
 #define ERTOOL_ALGOFINDRELATIONSHIP_H
 
+#include "TDatabasePDG.h"
 #include "ERTool/Base/AlgoBase.h"
 #include "GeoAlgo/GeoAlgo.h"
 
 namespace ertool {
-  /**
+   /**
      \class AlgoFindRelationship
      User defined class ertool::AlgoFindRelationship ... these comments are used to generate
      doxygen documentation!
@@ -52,14 +53,22 @@ namespace ertool {
 
     void setMinLength(double l) { _minLength = l; }
 
+    ParticleSet FindTrackHierarchy(const std::vector<const ertool::Track*> &tracks);
+      
 
   private:
+
+    // Get PDG Code given track type
+    Particle GetPDG(const Track &trk);
 
     bool _debug;
 
     double _minLength; // track length after which to stop and calculate direction
 
     geoalgo::GeoAlgo _geoAlgo;
+
+    // Partile masses
+    double _pi_mass, _pr_mass, _mu_mass, _ka_mass, _uk_mass;
     
   };
 }

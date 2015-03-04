@@ -23,6 +23,7 @@ namespace ertool {
     _useRadLength = false;
     _hassister = false;
     _rejectLongTracks = true;
+    _vtxProximityCut = 0;
 
   }
 
@@ -74,59 +75,34 @@ namespace ertool {
     
     // ParticleSet where to store single electrons
     ParticleSet res;
-    
+
     //res = emParticles;
 
     if (_verbose) { 
       std::cout << "***********BEGIN RECONSTRUCTION************" << std::endl;
       std::cout << "Showers in event  : " << data.Shower().size() << std::endl;
     }
+
+    // Reconstruct Track Hierarchy
+    ParticleSet trackHierarchy;
+    trackHierarchy = _findRel.FindTrackHierarchy(data.Track());
+    //std::cout << "Primary Tracks found: " << trackHierarchy.size() << std::endl;
     
-    // First, figure out if any tracks are coming from another track
-    // if so, label them as secondary.
-    // If a shower appears to have a common origin with a secondary
-    // then it also will be secondary.
-    // Vector where to keep track of track indices for secondarie
-    std::vector<int> secondaryTracks;
-
-    for (size_t u=0; u < data.Track().size(); u++){
-      for (size_t v=0; v < data.Track().size(); v++){
-	// check if u comes from v
-	geoalgo::Point_t vtx(3);
-	// make sure both tracks have more than 2 points
-	if ( (data.Track(u).Length() < 3) || (data.Track(v).Length() < 3) ) continue;
-	double IP = _findRel.FindClosestApproach(data.Track(u),data.Track(v),vtx);
-	// if the vertex is close to u's start
-	// and close to v's body (but not its start)
-	// -> Then u is secondary to v
-	if ( (vtx.Dist(data.Track(u).front()) < _vtxToTrkStartDist) && // vertex close to track U's start
-	     (vtx.Dist(data.Track(v).front()) > _vtxToTrkStartDist) && // vertex far from track V's start
-	     (sqrt(_geoAlgo.SqDist(vtx,data.Track(v))) < _vtxToTrkDist) )    // vertex close to track V's body
-	  secondaryTracks.push_back(int(u));
-      } // for V tracks
-    } // for U tracks
-
-    // Check that no primary tracks are > 1 meter long (muons i.e. NuMu event)
-    if (_rejectLongTracks){
-      if ( filterMuons(data, secondaryTracks) )
-	return res;
-    }
-
     // loop over showers
     for (size_t sh=0; sh < data.Shower().size(); sh++){
       
-      // Ok, we have an electron. Get the associated shower
-      // and make sure it does not:
-      // NOTE: IN 1) IMPLEMENT EXCLUSION ONLY OF e-like showers
+      // Ok, we have a shower.
+      // make sure it does not:
       // 1) share a vertex with another e- shower (gamma-like one could be from Pi0: OK)
       // 2) come from another shower - NOT DONE AS OF YET
       // 3) come from a track
-      // 2) & 3) because we are interested in showers from
-      // the neutrino interaction
+      // 2) & 3) because we are interested in showers from the neutrino interaction
       
       auto const& thisShower = data.Shower(sh);
+      // if we find that this shower shares a vertex with a track -> change "_hassister" to true.
       _hassister = false;
 
+      // Apply energy threshold (separate from the ERToolHelper threshold. Only used in this algorithm)
       if (thisShower._energy < _Ethreshold ) continue;
       
       if (_verbose) { std::cout << "This shower: (" << sh << ")" << "\tE: " << thisShower._energy << std::endl; }
@@ -137,17 +113,11 @@ namespace ertool {
 	geoalgo::Point_t vtx(3);
 	// make sure we don't use thisShower in the loop
 	if (thatShower.ID() != thisShower.ID()) {
+	  if (_verbose) { std::cout << "Comparing with shower (" << s << ")" << std::endl; }
 	  // is this shower gamma or e-like?
 	  // if gamma-like maybe a nearby pi0 -> ok if close
-	  if ( _alg_emp.LL(true, thatShower._dedx, -1) < _alg_emp.LL(false, thatShower._dedx, -1) )
-	    {
-	      if (_verbose) {
-		std::cout << "2nd shower has dEdx = " << thatShower._dedx
-			  << "\tIgnore for comparison." << std::endl;
-	      }
-	      break;
-	    }
-	  if (_verbose) { std::cout << "Comparing with shower (" << s << ")" << std::endl; }
+	  if (isGammaLike(thatShower._dedx,-1))
+	    continue;
 	  // compare the two showers
 	  double IP = _findRel.FindClosestApproach(thisShower,thatShower,vtx);
 	  _VsTrack = 0;
@@ -206,45 +176,48 @@ namespace ertool {
 	    {
 	      // our shower has a common origin with this track
 	      // save vertex position
+	      if (_verbose) { std::cout << "common origin w/ track!" << std::endl; }
 	      _hassister = true;
-	      // if the track is secondary (we investigated this before)
-	      // then this shower should also be labeled as secondary -> not single
-	      auto it = std::find(secondaryTracks.begin(), secondaryTracks.end(), t );
-	      if ( it != secondaryTracks.end() ){
-		if (_verbose) { std::cout << "common origin w/ secondary track -> not Single" << std::endl; }
+	      if (isGammaLike(thisShower._dedx,vtx.Dist(thisShower.Start()))){
+		if (_verbose) { std::cout << "Shower is gamma-like. Ignore " << std::endl; }
 		single = false;
 		break;
-	      } // if common with secondary
+	      }
 	      else{
-		double vtxtostart = vtx.Dist(thisShower.Start());
-		if (!_useRadLength)
-		  vtxtostart = -1;
-		if (_verbose) { std::cout << "common origin w/ primary! dEdx: " << thisShower._dedx
-					  << "vtx-start: " << vtxtostart << std::endl; }
-		// Use Log-Likelihood for single-E w/ rad length info
-		if ( _alg_emp.LL(true, thisShower._dedx, vtxtostart) < _alg_emp.LL(false, thisShower._dedx, vtxtostart) ){
-		  if (_verbose) { std::cout << "Shower is gamma-like. Ignore " << std::endl; }
-		  single = false;
-		  break;
-		}
-		else{
-		  if (_verbose) { std::cout << "Shower is e-like. yay!" << std::endl; }
-		  single = true;
-		}
-	      }// if common origin with primary!
-	    }
+		single = true;
+	      }
+	    }// if common origin with primary!
 	}// for all tracks
       }// if single
-      
+
+      // If single and there are "track-candidate-vertices" formed by 2 or more tracks
+      // compare shower start distance to these vertices.
+      // if more than some threshold not single
+      double distmin = 1036;
+      for (size_t v = 0; v < trackHierarchy.size(); v++){
+	if (trackHierarchy[v].Daughters().size() > 1){
+	  // more than one tracks for this vertex. -> reliable!
+	  double thisdist = thisShower.Start().Dist(trackHierarchy[v].Vertex());
+	  if ( thisdist < distmin)
+	    distmin = thisdist;
+	}
+      }
+      if ( single and !_hassister and (_vtxProximityCut != 0) ){
+	if ( (distmin != 1036) and (distmin > _vtxProximityCut) ){
+	  if(_verbose) { std::cout << "Trk-Vtx found @ distance of " << distmin << ". Shower not single!" << std::endl; }
+	  single = false;
+	}
+      }
+
       // if still single (and no sister track) look at
       // dEdx to determine if e-like
       if (single && !_hassister){
-	if ( ( _alg_emp.LL(true, thisShower._dedx, -1) < _alg_emp.LL(false, thisShower._dedx, -1) ) || 
-	     (thisShower._dedx <= 0) || (thisShower._dedx > 10.) ){
+	if ( isGammaLike(thisShower._dedx,-1) || (thisShower._dedx <= 0) || (thisShower._dedx > 10.) ){
 	  if (_verbose) { std::cout << "Shower is single but gamma-like -> reject" << std::endl; }
 	  single = false;
 	}
       }
+      
       //If single still true -> we found it! Proceed!
       // the particle with all it's info was already
       // created, simply add it to the result vector
@@ -252,13 +225,15 @@ namespace ertool {
 	if (_verbose) { std::cout << "Shower is Single!" << std::endl; }
 	// Create an "unknown" particle that gave
 	// birth to this electron shower
-	Particle electron(11,0.0005);
+	Particle electron(11,_e_mass);
 	electron.Vertex(thisShower.Start());
-	electron.Momentum(thisShower.Dir());
+	double mom = thisShower._energy - _e_mass;
+	if (mom < 0) { mom = 1; }
+	electron.Momentum(thisShower.Dir()*mom);
 	electron.RecoObjInfo(sh,Particle::RecoObjType_t::kShower);
 	Particle unknown(12,0);
 	unknown.Vertex(thisShower.Start());
-	unknown.Momentum(thisShower.Dir());
+	unknown.Momentum(thisShower.Dir()*mom);
 	unknown.AddDaughter(electron);
 	res.push_back(unknown);
 	//res.push_back(p);
@@ -268,7 +243,7 @@ namespace ertool {
       
       
     }// for all showers
-
+    
     return res;
   }
   
@@ -304,6 +279,24 @@ namespace ertool {
 	  return true;
       }
     }
+    
+    return false;
+  }
+
+
+  bool AlgoSingleE::isGammaLike(const double dedx, double radlen, bool forceRadLen)
+  {
+    if ( !_useRadLength && !forceRadLen )
+      radlen = -1;
+    if ( _alg_emp.LL(true, dedx, radlen) < _alg_emp.LL(false, dedx, radlen) )
+      {
+	if (_verbose) {
+	  std::cout << "Shower has dEdx = " << dedx
+		    << "\tRadLen = " << radlen
+		    << "\tIgnore for comparison." << std::endl;
+	}
+	return true;
+      }
     
     return false;
   }

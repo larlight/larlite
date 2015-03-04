@@ -20,17 +20,23 @@ if len(sys.argv) < 2:
 my_proc = fmwk.ana_processor()
 my_proc.enable_filter(False)
 
+
 # Create algorithm
 my_algo = ertool.AlgoSingleE()
 my_algo.useRadLength(True)
-my_algo.setVerbose(True)
-my_algo.setVtxToTrkStartDist(5)
-my_algo.setVtxToTrkDist(5)
+my_algo.setVerbose(False)
+my_algo.setRejectLongTracks(True)
+my_algo.setVtxToTrkStartDist(1)
+my_algo.setVtxToTrkDist(1)
 my_algo.setVtxToShrStartDist(50)
-my_algo.setMaxIP(5)
-#my_algo.setVerbose(True)
+my_algo.setMaxIP(1)
+my_algo.setVtxProximityCut(5)
+my_algo.setEThreshold(0)
+my_algo.LoadParams()
+# Create ERTool filter
+my_filter = ertool.FilterTrackLength()
 
-# Create Filter
+# Create MC Filter
 MCfilter = fmwk.MC_CC1E_Filter();
 MCfilter.flip(False)
 
@@ -65,7 +71,7 @@ my_anaunit._mgr._mc_for_ana = True
 my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetVtxProducer(True,"generator");
 #my_anaunit.SetShowerProducer(False,"mergeall");
-my_anaunit.SetShowerProducer(False,"showerreco");
+my_anaunit.SetShowerProducer(False,"newdefaultreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 # ************************************************

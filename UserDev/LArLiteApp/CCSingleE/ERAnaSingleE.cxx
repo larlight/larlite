@@ -18,9 +18,24 @@ namespace ertool {
     _result_tree->Branch("_n_showersReco",&_n_showersReco,"n_showersReco/I");
     _result_tree->Branch("_n_tracks",&_n_tracks,"n_tracks/I");
     _result_tree->Branch("_n_tracksReco",&_n_tracksReco,"n_tracksReco/I");
+    _result_tree->Branch("_n_tracksInt",&_n_tracksInt,"n_tracksInt/I");
+    _result_tree->Branch("_n_tracksIntReco",&_n_tracksIntReco,"n_tracksIntReco/I");
     _result_tree->Branch("_n_electrons",&_n_electrons,"n_electrons/I");
     _result_tree->Branch("_n_gammas",&_n_gammas,"n_gammas/I");
     _result_tree->Branch("_e_nu",&_e_nu,"e_nu/D");
+    _result_tree->Branch("_e_nuReco",&_e_nuReco,"e_nuReco/D");
+    _result_tree->Branch("_x_nu",&_x_nu,"x_nu/D");
+    _result_tree->Branch("_y_nu",&_y_nu,"y_nu/D");
+    _result_tree->Branch("_z_nu",&_z_nu,"z_nu/D");
+    _result_tree->Branch("_px_nu",&_px_nu,"px_nu/D");
+    _result_tree->Branch("_py_nu",&_py_nu,"py_nu/D");
+    _result_tree->Branch("_pz_nu",&_pz_nu,"pz_nu/D");
+    _result_tree->Branch("_x_nuReco",&_x_nuReco,"x_nuReco/D");
+    _result_tree->Branch("_y_nuReco",&_y_nuReco,"y_nuReco/D");
+    _result_tree->Branch("_z_nuReco",&_z_nuReco,"z_nuReco/D");
+    _result_tree->Branch("_px_nuReco",&_px_nuReco,"px_nuReco/D");
+    _result_tree->Branch("_py_nuReco",&_py_nuReco,"py_nuReco/D");
+    _result_tree->Branch("_pz_nuReco",&_pz_nuReco,"pz_nuReco/D");
     _result_tree->Branch("_n_protons",&_n_protons,"n_protons/I");
     _result_tree->Branch("_n_neutrons",&_n_neutrons,"n_neutrons/I");
     _result_tree->Branch("_n_piplus",&_n_piplus,"n_piplus/I");
@@ -61,6 +76,10 @@ namespace ertool {
 
   bool ERAnaSingleE::Analyze(const EventData &data, const ParticleSet &ps)
   { 
+
+    // Get MC particle set
+    auto mc_ps = MCParticleSet();
+
     // Reset tree variables
     // Assume we will mis-ID
     ResetTreeVariables();
@@ -82,14 +101,26 @@ namespace ertool {
       if (t._energy > 20) { _n_tracks += 1; }
 
 
-    // Get MC particle set
-    auto mc_ps = MCParticleSet();
+
     for (auto &p : mc_ps){
       // Find the Lepton and store its energy
       if (abs(p.PdgCode()) == 12 || abs(p.PdgCode()) == 14){
 	_e_nu = p.Energy();
+	_x_nu = p.Vertex()[0];
+	_y_nu = p.Vertex()[1];
+	_z_nu = p.Vertex()[2];
+	_px_nu = p.Momentum()[0];
+	_py_nu = p.Momentum()[1];
+	_pz_nu = p.Momentum()[2];
 	_pdg_nu = p.PdgCode();
+	_n_tracksInt = 0;
 	bool found_lepton_daughter = false;
+	for (auto &nut : p.AllDaughters()){
+	  if (abs(nut->PdgCode()) == 13 || abs(nut->PdgCode()) == 211 || abs(nut->PdgCode()) == 2212 ){
+	    if ( nut->Vertex().Dist(p.Vertex()) < 1)
+	      _n_tracksInt += 1;
+	  }
+	}
 	for (auto &nud : p.Daughters()){
 	  if (abs(nud.PdgCode()) == 11 || abs(nud.PdgCode()) == 13){
 	    if(found_lepton_daughter) 
@@ -131,8 +162,7 @@ namespace ertool {
     _n_tracksReco  = 0;
     for (auto &s : data.AllShower())
       if (s._energy > 20) { _n_showersReco += 1; }
-    for (auto &t : data.AllTrack())
-      if (t._energy > 20) { _n_tracksReco += 1; }
+    _n_tracksReco = data.Track().size();
 
 
     // size of ParticleSet should be the number of single electrons found
@@ -140,6 +170,15 @@ namespace ertool {
     _n_singleReco = ps.size();
     // If exactly one single electron was found in this event:
     if ( _n_singleReco == 1 ){
+      Particle neutrino = ps[0];
+      _e_nuReco = neutrino.Energy();
+      _x_nuReco = neutrino.Vertex()[0];
+      _y_nuReco = neutrino.Vertex()[1];
+      _z_nuReco = neutrino.Vertex()[2];
+      _px_nuReco = neutrino.Momentum()[0];
+      _py_nuReco = neutrino.Momentum()[1];
+      _pz_nuReco = neutrino.Momentum()[2];
+      _n_tracksIntReco = ps[0].Daughters().size()-1;
       Particle se = ps[0].Daughters()[0];
       _e_lepReco = se.Energy();
       //length of shower (geoalgo cone) associated with the electron
@@ -175,7 +214,7 @@ namespace ertool {
 		<< "Lepton theta [Mc,Reco] : [" << _theta_lep << ", " << _theta_lepReco << "]" <<  std::endl
 		<< "Lepton phi [Mc,Reco]   : [" << _phi_lep << ", " << _phi_lepReco << "]" <<  std::endl;
     }
-
+    
     return true;
   }
   
@@ -184,7 +223,8 @@ namespace ertool {
 
     std::cout << "RESULTS: " << std::endl
 	      << "Tot Events    : " << _numEvts << std::endl
-	      << "SingleE Events: " << _singleE_ctr << std::endl;
+	      << "SingleE Events: " << _singleE_ctr << std::endl
+	      << "Eff           : " << 100*_singleE_ctr/float(_numEvts) << " %" << std::endl;
 
     MakeEffPlot("e_lep",10,0,2000);
     MakeEffPlot("e_nu",10,0,2000);
@@ -239,12 +279,27 @@ namespace ertool {
     _n_showersReco = -1;
     _n_tracks      = -1;
     _n_tracksReco  = -1;
+    _n_tracksInt   = -1;
+    _n_tracksIntReco = -1;
     _n_protons     = -1;
     _n_neutrons    = -1;
     _n_piplus      = -1;
     _n_pi0         = -1;
 
     _e_nu          = -1000;
+    _e_nuReco      = -1000;
+    _x_nu         = -1000;
+    _y_nu         = -1000;
+    _z_nu         = -1000;
+    _x_nuReco     = -1000;
+    _y_nuReco     = -1000;
+    _z_nuReco     = -1000;
+    _px_nu         = -1000;
+    _py_nu         = -1000;
+    _pz_nu         = -1000;
+    _px_nuReco     = -1000;
+    _py_nuReco     = -1000;
+    _pz_nuReco     = -1000;
     _pdg_nu        = -1;
     _e_lep         = -1000;
     _x_lep         = -1000;
@@ -266,6 +321,6 @@ namespace ertool {
     return;
   }
 
-}
+  }
 
 #endif

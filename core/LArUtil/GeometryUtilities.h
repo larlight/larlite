@@ -201,6 +201,7 @@ namespace larutil{
     Double_t WireToCm() const {return fWiretoCm;}
     Double_t WireTimeToCmCm() const {return fWireTimetoCmCm;}
     UInt_t   Nplanes() const { return fNPlanes; }
+
   private:
 
     larutil::Geometry* geom;
