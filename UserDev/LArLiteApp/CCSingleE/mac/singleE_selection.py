@@ -10,8 +10,7 @@ if len(sys.argv) < 2:
 from ROOT import gSystem
 from ROOT import larlite as fmwk
 from ROOT import ertool
-ertool.Manager
-fmwk.geo.PlaneID
+#ertool.Manager
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
@@ -35,8 +34,9 @@ my_filter.setLengthCut(0.3)
 
 # Creat MC Filter
 MCfilter = fmwk.MC_CC1E_Filter();
-#MCfilter.flip(False)
-MCfilter.flip(True)
+#Set flip to FALSE if you are looking for efficiency, TRUE if you are looking for MID efficiency
+MCfilter.flip(False)
+#MCfilter.flip(True)
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):
