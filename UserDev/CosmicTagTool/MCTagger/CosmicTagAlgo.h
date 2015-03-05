@@ -15,8 +15,8 @@
 #define LARLITE_COSMICTAGALGO_H
 
 #include <iostream>
-#include "BasicTool/GeoAlgo/GeoAlgo.h"
-#include "BasicTool/GeoAlgo/GeoAlgoConstants.h"
+#include "GeoAlgo/GeoAlgo.h"
+#include "GeoAlgo/GeoAlgoConstants.h"
 #include "LArUtil/Geometry.h"
 
 /**
