@@ -54,8 +54,6 @@ namespace ertool {
     bool   _use_perpdist_trk_shr;
 
     std::set<size_t>   _seed_trk_s;
-    std::deque<size_t> _remaining_trk_v;
-    std::deque<size_t> _remaining_shr_v;
     std::vector<std::set<size_t> > _removed_trk_v;
 
   };

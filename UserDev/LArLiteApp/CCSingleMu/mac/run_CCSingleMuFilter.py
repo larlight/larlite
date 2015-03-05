@@ -6,7 +6,8 @@ if len(sys.argv) < 2:
     msg += '\n'
     sys.stderr.write(msg)
     sys.exit(1)
-
+from ROOT import gSystem
+gSystem.Load("libLArLiteApp_CCSingleMu")
 from larlite import larlite as fmwk
 
 # Create ana_processor instance
