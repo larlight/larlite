@@ -63,6 +63,30 @@ namespace ertool {
     return res;
   }
 
+  std::vector< const ::ertool::Shower* > EventData::FilteredShower() const
+  {
+    std::vector< const ::ertool::Shower* > res;
+    for(size_t i=0; i<_shower_v.size(); ++i)
+      if((_shower_v[i].IsFiltered())) res.push_back( &(_shower_v[i]) );
+    return res;
+  }
+
+  std::vector< const ::ertool::Track* > EventData::FilteredTrack() const
+  {
+    std::vector< const ::ertool::Track* > res;
+    for(size_t i=0; i<_track_v.size(); ++i)
+      if((_track_v[i].IsFiltered())) res.push_back( &(_track_v[i]) );
+    return res;
+  }
+
+  std::vector< const ::ertool::Vertex* > EventData::FilteredVertex() const
+  {
+    std::vector< const ::ertool::Vertex* > res;
+    for(size_t i=0; i<_vertex_v.size(); ++i)
+      if((_vertex_v[i].IsFiltered())) res.push_back( &(_vertex_v[i]) );
+    return res;
+  }
+
   std::vector<std::vector< const ::ertool::Shower* > > EventData::ShowerCombination(const size_t n) const
   {
     std::vector<std::vector< const ::ertool::Shower*> > res;

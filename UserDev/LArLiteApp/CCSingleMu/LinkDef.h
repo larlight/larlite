@@ -15,9 +15,13 @@
 #pragma link C++ class larlite::CCSingleMuAna+;
 #pragma link C++ class larlite::CCSingleMuReco+;
 #pragma link C++ class ertool::ERAnaCCSingleMu+;
+#pragma link C++ class ertool::ERFilterSecondaries+;
+#pragma link C++ class ertool::ERFilterToyCosmicRemover+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
+
 
 
 
