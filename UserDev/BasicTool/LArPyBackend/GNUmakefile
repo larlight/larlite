@@ -25,7 +25,8 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 # Use build compiler to pre-process macros instead of rootcint
 CINTFLAGS += -p
 
-LDFLAGS += $(shell python-config --ldflags)
+LDFLAGS += -L$(shell python-config --prefix)/lib 
+LDFLAGS += $(shell python-config --libs)
 LDFLAGS += -L$(LARLITE_LIBDIR) -lBasicTool_GeoAlgo
 
 # call the common GNUmakefile
