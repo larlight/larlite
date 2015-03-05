@@ -1,5 +1,5 @@
 import sys, ROOT
-ROOT.gSystem.Load("libLArLite_ERToolBackend")
+ROOT.gSystem.Load("libLArLiteApp_ERToolBackend")
 from larlite import larlite as fmwk
 from seltool import ertool
 
