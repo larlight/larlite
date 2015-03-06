@@ -35,8 +35,8 @@ my_filter.setLengthCut(0.3)
 # Creat MC Filter
 MCfilter = fmwk.MC_CC1E_Filter();
 #Set flip to FALSE if you are looking for efficiency, TRUE if you are looking for MID efficiency
-MCfilter.flip(False)
-#MCfilter.flip(True)
+#MCfilter.flip(False)
+MCfilter.flip(True)
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):
@@ -59,8 +59,8 @@ my_anaunit.SetMinEDep(20)
 my_anaunit._mgr._mc_for_ana = True
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
-my_anaunit.SetShowerProducer(True,"mcreco");
-#my_anaunit.SetShowerProducer(False,"davidreco");
+#my_anaunit.SetShowerProducer(True,"mcreco");
+my_anaunit.SetShowerProducer(False,"showerreco");
 #my_anaunit.SetShowerProducer(False,"newdefaultreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetShowerProducer(False,"mergeall");
