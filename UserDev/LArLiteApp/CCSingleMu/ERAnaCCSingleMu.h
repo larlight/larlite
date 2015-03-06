@@ -42,7 +42,7 @@ namespace ertool {
     /// Function to evaluate input showers and determine a score
     virtual bool Analyze(const EventData &data, const ParticleSet &ps);
 
-    bool AnalyzeEventData(const EventData &data, const ParticleSet& ps);
+ //   bool AnalyzeEventData(const EventData &data, const ParticleSet& ps);
 
     /// Called after processing the last event sample
     virtual void ProcessEnd(TFile* fout=nullptr);
