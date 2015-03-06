@@ -2,6 +2,7 @@
 #define ERTOOL_ERALGOCCSINGLEMU_CXX
 
 #include "ERAlgoCCSingleMu.h"
+#include <set>
 
 namespace ertool {
 
