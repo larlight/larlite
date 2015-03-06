@@ -32,8 +32,10 @@ my_proc.set_output_file("showerreco_batch_out.root")
 
 ana_unit=DefaultShowerReco3D()
 
-ana_unit.SetInputProducer("fuzzycluster")
+ana_unit.SetInputProducer("mergedfuzzy")
+ana_unit.SetOutputProducer("showerreco")
 
+my_proc.set_data_to_write(fmwk.data.kShower,"showerreco")
 my_proc.add_process(ana_unit)
 
 print
