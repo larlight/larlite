@@ -1,13 +1,8 @@
 import sys, os
 from ROOT import gSystem
 from ROOT import ertool
-ertool.Manager()
 from ROOT import larlite as fmwk
-fmwk.geo.PlaneID
-
 from algoviewer import viewAll, view
-
-ertool.Manager()
 
 if len(sys.argv) < 2:
     msg  = '\n'

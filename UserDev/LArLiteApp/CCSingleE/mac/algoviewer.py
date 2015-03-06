@@ -2,7 +2,6 @@ import sys, os
 from ROOT import gSystem
 from ROOT import ertool
 from ROOT import larlite as fmwk
-fmwk.geo.PlaneID
 from basictool import GeoViewer, geoalgo
 from seltool import ERViewer
 import matplotlib.pyplot as plt
