@@ -18,6 +18,7 @@
 #include "ERTool/Base/FilterBase.h"
 #include "ERFilterSecondaries.h"
 #include "GeoAlgo/GeoAABox.h"
+#include <TH1D.h>
 namespace ertool {
 
   /**
@@ -37,10 +38,22 @@ namespace ertool {
     /// Select function
     virtual void Filter (EventData& data);
 
+    void ProcessBegin();
+
+    void ProcessEnd(TFile* fout=nullptr);
+
   private:
 
     ::ertool::ERFilterSecondaries _sec_filter;
     ::geoalgo::AABox fTPC;
+    TH1D* hFilterAllTrackCtr;
+    TH1D* hFilteredTrackCtr;
+    TH1D* hTrackRejectionRate;
+    TH1D* hFilterAllShowerCtr;
+    TH1D* hFilteredShowerCtr;
+    TH1D* hShowerRejectionRate;
+    TH1D* hUnfilteredTrackLength;
+    TH1D* hFilteredTrackLength;
   };
 }
 #endif

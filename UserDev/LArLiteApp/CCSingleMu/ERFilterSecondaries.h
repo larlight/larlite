@@ -48,6 +48,8 @@ namespace ertool {
 
     ::ertool::AlgoFindRelationship _relalg;
 
+    double _min_dist_common_origin;
+    double _min_dist_trk_def;
     double _min_dist_trk_trk;
     bool   _use_perpdist_trk_trk;
     double _min_dist_trk_shr;

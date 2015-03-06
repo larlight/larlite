@@ -11,6 +11,7 @@ namespace ertool {
     _primary_cut_dist = 5;
     _primary_range    = 5;
     _min_trk_length   = 10;
+    _use_mc = false;
   }
 
   void ERAnaCCSingleMu::Reset()
@@ -35,18 +36,28 @@ namespace ertool {
 
   bool ERAnaCCSingleMu::Analyze(const EventData &data, const ParticleSet &ps)
   { 
-    ::geoalgo::GeoAlgo geo_alg;
-    auto const& mc_data = MCEventData();
-    auto const& mc_ps = MCParticleSet();
 
-    std::vector<bool> primary_flag(mc_data.AllTrack().size(),false);
-    for(auto const& trk : mc_data.Track())
+    if(_use_mc) {
+      auto const& mc_data = MCEventData();
+      auto const& mc_ps = MCParticleSet();
+      return AnalyzeEventData(mc_data,mc_ps);
+    }else
+      return AnalyzeEventData(data,ps);
+
+  }
+
+  bool ERAnaCCSingleMu::AnalyzeEventData(const EventData &data, const ParticleSet& ps)
+  {
+    
+    ::geoalgo::GeoAlgo geo_alg;
+    std::vector<bool> primary_flag(data.AllTrack().size(),false);
+    for(auto const& trk : data.Track())
       //Accept if it has some length
       if(trk->Length() > _min_trk_length) primary_flag[trk->ID()] = true;
 
     // Find primary candidate tracks
     if(primary_flag.size()>1) {
-      for(auto const& pair : mc_data.TrackCombination(2)) {
+      for(auto const& pair : data.TrackCombination(2)) {
 
 	auto const& trk1 = pair[0];
 	auto const& trk2 = pair[1];
@@ -76,7 +87,7 @@ namespace ertool {
     
     for(size_t i=0; i<primary_flag.size(); ++i) {
       if(!primary_flag[i]) continue;
-      hPrimaryPID->Fill(mc_data.Track(i)._pid);
+      hPrimaryPID->Fill(data.Track(i)._pid);
     }
 
     return true; 
