@@ -9,12 +9,16 @@ namespace ertool {
 						       , fTPC(10.,-100.,10.,240.,100.,1050.)
   {
     _name = "ERFilterToyCosmicRemover";
+
     hFilterAllTrackCtr  = nullptr;
     hFilteredTrackCtr   = nullptr;
     hTrackRejectionRate = nullptr;
+
     hFilterAllShowerCtr  = nullptr;
     hFilteredShowerCtr   = nullptr;
     hShowerRejectionRate = nullptr;
+
+    hFilteredTrackLength = nullptr;
     hUnfilteredTrackLength = nullptr;
   }
 
@@ -78,9 +82,9 @@ namespace ertool {
       if(trk->size()<2) data.FilterTrack(trk->ID());
 
       auto const& start = trk->front();
-      //auto const& end   = trk->back();
+      auto const& end   = trk->back();
 
-      if(!fTPC.Contain(start)) {
+      if(!fTPC.Contain(start) || !fTPC.Contain(end)) {
 	data.FilterTrack(trk->ID());
 	_sec_filter.RegisterSeed(trk->ID());
       }

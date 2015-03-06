@@ -9,11 +9,11 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class ertool::AlgoCCSingleMu+;
 #pragma link C++ class ertool::FilterFidVolume+;
 #pragma link C++ class larlite::CCSingleMuFilter+;
 #pragma link C++ class larlite::CCSingleMuAna+;
 #pragma link C++ class larlite::CCSingleMuReco+;
+#pragma link C++ class ertool::ERAlgoCCSingleMu+;
 #pragma link C++ class ertool::ERAnaCCSingleMu+;
 #pragma link C++ class ertool::ERFilterSecondaries+;
 #pragma link C++ class ertool::ERFilterToyCosmicRemover+;

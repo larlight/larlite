@@ -24,7 +24,7 @@ my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 # Specify output root file name
 my_proc.set_ana_output_file("CCSingleMuReco_hist.root")
 
-my_algo = ertool.AlgoCCSingleMu()
+my_algo = ertool.ERAlgoCCSingleMu()
 my_algo.Reset()
 
 my_filter = ertool.FilterFidVolume()

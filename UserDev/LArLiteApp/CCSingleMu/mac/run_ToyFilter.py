@@ -24,7 +24,7 @@ my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 # Specify output root file name
 my_proc.set_ana_output_file("CCSingleMuReco_hist.root")
 
-my_algo = ertool.AlgoCCSingleMu()
+my_algo = ertool.ERAlgoCCSingleMu()
 my_algo.Reset()
 
 my_filter = ertool.ERFilterToyCosmicRemover()
@@ -35,8 +35,8 @@ my_anaunit = fmwk.CCSingleMuReco()
 # Set Producers
 # First Argument: True = MC, False = Reco
 my_anaunit.SetShowerProducer(True,"mcreco");
-my_anaunit.SetTrackProducer(True,"mcreco");
-# my_anaunit.SetTrackProducer(False,"trackkalmanhit");
+#my_anaunit.SetTrackProducer(True,"mcreco");
+my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 #my_ana.SetTrackProducer(False,"pandoraNuKHit");
 #my_anaunit.SetTrackProducer(False,"pandoraCosmicKHit");
 my_anaunit.SetVtxProducer(True,"generator");
@@ -55,7 +55,7 @@ my_anaunit._mgr._mc_for_ana=True
 my_proc.add_process(my_anaunit)
 
 # run
-my_proc.run(0,5)
+my_proc.run()
 
 # done!
 print
