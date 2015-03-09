@@ -202,9 +202,9 @@ namespace ertool{
 	double vtx_t1B = sqrt(_geoAlgo.SqDist(vtx,tr1));
 	double vtx_t2B = sqrt(_geoAlgo.SqDist(vtx,tr2));
 	//std::cout << "\t\tVtx-1 Start: " << vtx_t1S
-	//	  << "\t\tVtx-2 Start: " << vtx_t2S
-	//	  << "\t\tVtx-1 Body : " << vtx_t1B
-	//	  << "\t\tVtx-2 Body : " << vtx_t2B << std::endl;
+	//	    << "\t\tVtx-2 Start: " << vtx_t2S
+	//	    << "\t\tVtx-1 Body : " << vtx_t1B
+	//	    << "\t\tVtx-2 Body : " << vtx_t2B << std::endl;
 	// check if 2 comes form 1
 	if ( (vtx_t1B < 1) && (vtx_t1S > 1) && (vtx_t2S < 1) ){
 	  trackParts.at(t1).AddDaughter(trackParts.at(t2));
@@ -228,7 +228,7 @@ namespace ertool{
     }
 
     int primary = 0;
-    for (int n=0; n < trackPrimary.size(); n++){
+    for (size_t n=0; n < trackPrimary.size(); n++){
       if (trackPrimary[n] == 1)
 	primary += 1;
     }
@@ -271,12 +271,99 @@ namespace ertool{
 
     return thisset;
   }
+
+
+  ParticleSet AlgoFindRelationship::FindHierarchy(const std::vector<const ertool::Track*>  &tracks,
+						  const std::vector<const ertool::Shower*> &showers)
+  {
+    
+    // First, find the hierarchy of all tracks
+    ParticleSet trackHierarchy = FindTrackHierarchy(tracks);
+
+    // Compare showers with tracks. First with vertices of each primary
+    // group of tracks, then with all the tracks themselves
+    for (size_t s=0; s < showers.size(); s++){
+      Shower shr = *(showers.at(s));
+      Particle unknownShower(0,0);
+      // boolean to know if this shower was added as daughter somewhere
+      bool daughter = false;
       
+      // loop over trackHierarchy vector
+      for (size_t i=0; i < trackHierarchy.size(); i++){
+	
+	// if the shower start point is close to the vertex
+	if (trackHierarchy.at(i).Vertex().Dist(shr.Start()) < 1.){
+
+	  trackHierarchy.at(i).AddDaughter(unknownShower);
+	  daughter = true;
+	}
+
+	// assigned to a vertex? good! we are done with this shower!
+	if (daughter)
+	  continue;
+
+	// otherwise, compare track-by-track (including daughters of tracks)
+	//CompareShrWithPartBranch(shr, tracks, trackHierarchy.at(i) );
+	
+      }// for all "vertices"
+
+      // if shower was not assigned somewhere -> Add as independent
+      if (!daughter)
+	trackHierarchy.push_back(unknownShower);
+      
+    }// for all showers
+		
+    return trackHierarchy;
+  }
+
+  /*
+    bool AlgoFindRelationship::CompareShrWithPartBranch(const Shower& shr,
+    const std::vector<const ertool::Track*>  &tracks,
+    Particle& part)
+    {
+    
+    for (auto &p : part._daughters){
+    
+    Track tr = *tracks.at(p.RecoObjID());
+    
+    geoalgo::Point_t vtx(3);
+    double IP = FindClosestApproach(shr, tr, vtx);
+      
+      // if IP small enough
+      if (IP < 1.){
+	
+	// if vtx close enough to both objects
+	if ( (vtx.Dist(shr.Start()) < 50.) &&
+	     (sqrt(_geoAlgo.SqDist(vtx,tr)) < 1.) ){
+	  
+	  // if close to track start:
+	  // should this ever happen?
+	  // in theory we checked this already...
+	  // this CAN happen...but do we want to handle
+	  // this case in a special way????
+	  if ( vtx.Dist(tr[0]) < 1.)
+	    part.AddDaughter(unknownShower);
+	  // otherwise shower comes from track
+	  else
+	    p.AddDaughter(unknownShower);
+	  
+	  daughter = true;
+	  return true;
+	  
+	}// if close enough to track body & shower start
+      }// if IP is small enough
+
+      }// for all particles at this "vertex"
+    
+    return false;
+  }
+  */  
   Particle AlgoFindRelationship::GetPDG(const Track &trk)
   {
 
     switch(trk._pid){
     case Track::TrackPartID_t::kUnknown : return Particle(999,_uk_mass);
+    case Track::TrackPartID_t::kPIDA    : return Particle(999,_uk_mass);
     case Track::TrackPartID_t::kProton  : return Particle(2122,_pr_mass);
     case Track::TrackPartID_t::kKaon    : return Particle(311,_ka_mass);
     case Track::TrackPartID_t::kPion    : return Particle(211,_pi_mass);

@@ -87,7 +87,7 @@ namespace ertool {
     ParticleSet trackHierarchy;
     trackHierarchy = _findRel.FindTrackHierarchy(data.Track());
     //std::cout << "Primary Tracks found: " << trackHierarchy.size() << std::endl;
-    
+
     // loop over showers
     for (size_t sh=0; sh < data.Shower().size(); sh++){
       
@@ -97,6 +97,9 @@ namespace ertool {
       // 2) come from another shower - NOT DONE AS OF YET
       // 3) come from a track
       // 2) & 3) because we are interested in showers from the neutrino interaction
+
+      // Keep track of list of siblings found for the shower (will be used to reconstruct full neutrino interaction)
+      std::vector<int> siblings;
       
       auto const& thisShower = data.Shower(sh);
       // if we find that this shower shares a vertex with a track -> change "_hassister" to true.
@@ -178,6 +181,7 @@ namespace ertool {
 	      // save vertex position
 	      if (_verbose) { std::cout << "common origin w/ track!" << std::endl; }
 	      _hassister = true;
+	      siblings.push_back(t);
 	      if (isGammaLike(thisShower._dedx,vtx.Dist(thisShower.Start()))){
 		if (_verbose) { std::cout << "Shower is gamma-like. Ignore " << std::endl; }
 		single = false;
@@ -217,26 +221,47 @@ namespace ertool {
 	  single = false;
 	}
       }
-      
+
       //If single still true -> we found it! Proceed!
       // the particle with all it's info was already
       // created, simply add it to the result vector
       if (single){
 	if (_verbose) { std::cout << "Shower is Single!" << std::endl; }
-	// Create an "unknown" particle that gave
+	// Create an "neutrino" particle that gave
 	// birth to this electron shower
+	Particle neutrino(12,0);
+	neutrino.Vertex(thisShower.Start());
+	//neutrino.Momentum(thisShower.Dir()*mom);
+
+	// momentum to be decided later (after summing momenta from all daughters)
+	geoalgo::Vector_t neutrinoMomentum(0.,0.,0.);
+	// Create electron!
 	Particle electron(11,_e_mass);
 	electron.Vertex(thisShower.Start());
 	double mom = thisShower._energy - _e_mass;
 	if (mom < 0) { mom = 1; }
 	electron.Momentum(thisShower.Dir()*mom);
+	neutrinoMomentum += electron.Momentum();
 	electron.RecoObjInfo(sh,Particle::RecoObjType_t::kShower);
-	Particle unknown(12,0);
-	unknown.Vertex(thisShower.Start());
-	unknown.Momentum(thisShower.Dir()*mom);
-	unknown.AddDaughter(electron);
-	res.push_back(unknown);
-	//res.push_back(p);
+	neutrino.AddDaughter(electron);
+	// if hassister loop over all siblings found before
+	// and add as children of neutrino
+	if (_hassister){
+	  // loop over primary vertices
+	  for (auto &sibling : siblings){
+	    auto const& sibTrack(data.Track(sibling));
+	    Particle sib = _findRel.GetPDG(sibTrack);
+	    sib.Vertex(sibTrack[0]);
+	    double Tmom = sibTrack._energy - sib.Mass();
+	    if (Tmom < 0) { Tmom = 1.; }
+	    sib.Momentum((sibTrack[1]-sibTrack[0])*Tmom);
+	    neutrinoMomentum += sib.Momentum();
+	    sib.RecoObjInfo(sibling,Particle::RecoObjType_t::kTrack);
+	    neutrino.AddDaughter(sib);
+	  }// for all sister tracks
+	}// if hassister
+	neutrino.Momentum(neutrinoMomentum);
+	res.push_back(neutrino);
       }
       else
 	if (_verbose) { std::cout << "Shower is not single." << std::endl; }

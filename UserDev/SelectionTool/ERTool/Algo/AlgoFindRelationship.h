@@ -54,12 +54,19 @@ namespace ertool {
     void setMinLength(double l) { _minLength = l; }
 
     ParticleSet FindTrackHierarchy(const std::vector<const ertool::Track*> &tracks);
-      
 
-  private:
+    ParticleSet FindHierarchy(const std::vector<const ertool::Track*> &tracks,
+			      const std::vector<const ertool::Shower*> &showers);
 
     // Get PDG Code given track type
     Particle GetPDG(const Track &trk);
+
+  private:
+
+    /// Compare shower with particles (and daughters of such particles)
+    //bool CompareShrWithPartBranch(const Shower& shr,
+    //				  const std::vector<const ertool::Track*>  &tracks,
+    //				  Particle& part);
 
     bool _debug;
 

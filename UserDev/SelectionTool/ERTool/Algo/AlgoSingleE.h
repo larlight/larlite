@@ -153,6 +153,7 @@ namespace ertool {
     double _IPthisStart; // distance from IP to this shower start point
     double _IPthatStart; // distance from IP to that shower/track start point
     double _IPtrkBody; // distance from IP to body of track (if comparing with track)
+
   };
 }
 #endif
