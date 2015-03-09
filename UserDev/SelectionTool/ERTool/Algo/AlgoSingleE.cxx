@@ -244,10 +244,9 @@ namespace ertool {
 	neutrinoMomentum += electron.Momentum();
 	electron.RecoObjInfo(sh,Particle::RecoObjType_t::kShower);
 	neutrino.AddDaughter(electron);
-	// if hassister loop over all siblings found before
-	// and add as children of neutrino
+	// if the shower has siblings associated with it
 	if (_hassister){
-	  // loop over primary vertices
+	  // loop over siblings found
 	  for (auto &sibling : siblings){
 	    auto const& sibTrack(data.Track(sibling));
 	    Particle sib = _findRel.GetPDG(sibTrack);
@@ -258,7 +257,7 @@ namespace ertool {
 	    neutrinoMomentum += sib.Momentum();
 	    sib.RecoObjInfo(sibling,Particle::RecoObjType_t::kTrack);
 	    neutrino.AddDaughter(sib);
-	  }// for all sister tracks
+	  }// for all sibling tracks
 	}// if hassister
 	neutrino.Momentum(neutrinoMomentum);
 	res.push_back(neutrino);
