@@ -50,11 +50,11 @@ def main():
 
     # Set Producers
     # First Argument: True = MC, False = Reco
-    #my_ana.SetShowerProducer(True,"mcreco");
+    my_ana.SetShowerProducer(True,"mcreco");
     #my_ana.SetTrackProducer(True,"mcreco");
-    #my_ana.SetVtxProducer(True,"generator");
+    my_ana.SetVtxProducer(True,"generator");
     #my_ana.SetShowerProducer(False,"pandoraNuShower");
-    my_ana.SetShowerProducer(False,"showerreco");
+    #my_ana.SetShowerProducer(False,"showerreco");
     my_ana.SetTrackProducer(False,"");
     #my_ana.SetVtxProducer(False,"");
 
