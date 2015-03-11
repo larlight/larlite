@@ -64,9 +64,10 @@ namespace larlite {
 
     inline void AddDaughter     (const int trackID)   { fdaughters.insert(trackID);  }
     inline void SetPolarization (TVector3 const& p)   { fpolarization = p;           }
-    inline void SetRescatter    (int code)          { frescatter    = code;        }
-    inline void SetWeight       (double wt)         { fWeight       = wt;          }
-    inline void SetTrajectory   (const mctrajectory steps) { ftrajectory   = steps;       }
+    inline void SetRescatter    (int code)            { frescatter    = code;        }
+    inline void SetWeight       (double wt)           { fWeight       = wt;          }
+    inline void SetEndProcess   (std::string s)       { fendprocess   = s;           }
+    inline void SetTrajectory   (const mctrajectory steps) { ftrajectory   = steps;  }
     inline void AddTrajectory   (const mcstep step)   { ftrajectory.push_back(step); }
     inline void AddTrajectory   (const TLorentzVector& position,
 				 const TLorentzVector& momentum)
@@ -84,13 +85,15 @@ namespace larlite {
     int                  TrackId()      const { return ftrackId;      }
     int                  PdgCode()      const { return fpdgCode;      }
     int                  Mother()       const { return fmother;       }
-    const std::string      Process()      const { return fprocess;      }
-    const mctrajectory&    Trajectory()   const { return ftrajectory;   }
+    const std::string    Process()      const { return fprocess;      }
+    const std::string    EndProcess()   const { return fendprocess;   }
+
+    const mctrajectory&  Trajectory()   const { return ftrajectory;   }
     double               Mass()         const { return fmass;         }
-    const TVector3&        Polarization() const { return fpolarization; }
+    const TVector3&      Polarization() const { return fpolarization; }
     const std::set<int>& Daughters()    const { return fdaughters;    } 
     double               Weight()       const { return fWeight;       }
-    TLorentzVector         GetGvtx()      const { return fGvtx;         }
+    TLorentzVector       GetGvtx()      const { return fGvtx;         }
     int                  Rescatter()    const { return frescatter;    }
 
     const std::vector<std::pair<size_t,size_t> >& FiducialTrack() const 
@@ -98,23 +101,24 @@ namespace larlite {
 
   private:
 
-    int           fstatus;       ///< Status code from generator, geant, etc
-    int           ftrackId;      ///< TrackId
-    int           fpdgCode;      ///< PDG code
-    int           fmother;       ///< Mother
-    std::string     fprocess;      ///< Detector-simulation physics process that created the particle
-    mctrajectory    ftrajectory;   ///< particle trajectory (position,momentum)
-    double        fmass;         ///< Mass; from PDG unless overridden Should be in GeV
-    TVector3        fpolarization; ///< Polarization
-    std::set<int> fdaughters;    ///< Sorted list of daughters of this particle.
-    double        fWeight;       ///< Assigned weight to this particle for MC tests
-    TLorentzVector  fGvtx;         ///< Vertex needed by generater (genie) to rebuild. genie::EventRecord for event reweighting
-    int           frescatter;    ///< rescatter code
+    int            fstatus;       ///< Status code from generator, geant, etc
+    int            ftrackId;      ///< TrackId
+    int            fpdgCode;      ///< PDG code
+    int            fmother;       ///< Mother
+    std::string    fprocess;      ///< Detector-simulation physics process that created the particle
+    std::string    fendprocess;   ///< end process for the particle  
+    mctrajectory   ftrajectory;   ///< particle trajectory (position,momentum)
+    double         fmass;         ///< Mass; from PDG unless overridden Should be in GeV
+    TVector3       fpolarization; ///< Polarization
+    std::set<int>  fdaughters;    ///< Sorted list of daughters of this particle.
+    double         fWeight;       ///< Assigned weight to this particle for MC tests
+    TLorentzVector fGvtx;         ///< Vertex needed by generater (genie) to rebuild. genie::EventRecord for event reweighting
+    int            frescatter;    ///< rescatter code
 
     std::vector<std::pair<size_t,size_t> > ftrackFiducial; ///< mctrajectory indexes for a trajectory inside fiducial volume
    
     ////////////////////////
-    ClassDef(mcpart,1)
+    ClassDef(mcpart,2)
     ////////////////////////
       
   };
@@ -146,7 +150,7 @@ namespace larlite {
   private:
     
     ////////////////////////
-    ClassDef(event_mcpart,1)
+    ClassDef(event_mcpart,2)
     ////////////////////////
       
   };

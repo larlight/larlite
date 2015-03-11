@@ -17,9 +17,12 @@
 
 #include "data_base.h"
 #include "Base/RawConstants.h"
+#include "Base/GeoTypes.h"
 #include <vector>
 #include <exception>
 namespace larlite{
+
+  typedef std::vector<short> ADCvector_t;
   /**
      \class rawdigit
      LArSoft rawdigit class equivalent data container
@@ -28,31 +31,28 @@ namespace larlite{
     
   public:
 
-    /// How interesting: public adc vector. Awesome design LArSoft :D
-    std::vector<short> fADC;
-
     /// Default constructor
     inline rawdigit()
       : data_base(data::kRawDigit)
-      , fADC(0)
       , fChannel(0) 
       , fSamples(0) 
       , fPedestal(0.) 
       , fSigma(0.)
+      , fADC(0)
       , fCompression(raw::kNone)
     {clear_data();}
     
-    inline rawdigit(unsigned int              channel,
+    inline rawdigit(raw::ChannelID_t          channel,
 		    unsigned short            samples,
 		    const std::vector<short>& adclist,
 		    raw::Compress_t           compression
 		    )
       : data_base(data::kRawDigit)
-      , fADC(adclist) 
       , fChannel(channel) 
       , fSamples(samples)
       , fPedestal(0.) 
       , fSigma(0.)
+      , fADC(adclist) 
       , fCompression(compression)
     {clear_data();}
     /*
@@ -69,30 +69,29 @@ namespace larlite{
     void clear_data() {data_base::clear_data();}
 
     // Set Methods
-    void             SetPedestal(double ped);
+    void             SetPedestal(float ped);
 
-    inline unsigned int    NADC()        const { return fADC.size();  }
-    short                  ADC(int i)    const;
-    inline unsigned int    Channel()     const { return fChannel;     }
-    inline unsigned short  Samples()     const { return fSamples;     }
-    inline double          GetPedestal() const { return fPedestal;    } 
-    inline double          GetSigma()    const { return fSigma;       } 
-    inline raw::Compress_t Compression() const { return fCompression; }
-    
+    inline size_t           NADC()        const { return fADC.size();  }
+    short                   ADC(int i)    const;
+    inline raw::ChannelID_t Channel()     const { return fChannel;     }
+    inline unsigned short   Samples()     const { return fSamples;     }
+    inline float            GetPedestal() const { return fPedestal;    } 
+    inline float            GetSigma()    const { return fSigma;       } 
+    inline raw::Compress_t  Compression() const { return fCompression; }
+
   protected:
 
-    unsigned int    fChannel;     ///< channel in the readout
-    unsigned short  fSamples;     ///< number of ticks of the clock
-    
-    double          fPedestal;    ///< pedestal for this channel
-    double          fSigma;       ///< sigma of the pedestal counts for this channel
-
-    raw::Compress_t fCompression; ///< compression scheme used for the ADC vector
+    raw::ChannelID_t fChannel;     ///< channel in the readout
+    unsigned short   fSamples;     ///< number of ticks of the clock
+    float            fPedestal;    ///< pedestal for this channel
+    float            fSigma;       ///< sigma of the pedestal counts for this channel
+    ADCvector_t fADC;         ///< ADC readout per tick, before pedestal subtraction 
+    raw::Compress_t  fCompression; ///< compression scheme used for the ADC vector
 
   private:
     
     ////////////////////////
-    ClassDef(rawdigit,1)
+    ClassDef(rawdigit,2)
     ////////////////////////
       
   };
@@ -122,7 +121,7 @@ namespace larlite{
   private:
     
     ////////////////////////
-    ClassDef(event_rawdigit,1)
+    ClassDef(event_rawdigit,2)
     ////////////////////////
   };
 }

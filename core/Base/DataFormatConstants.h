@@ -32,13 +32,25 @@ namespace larlite{
     const short          kINVALID_SHORT  = std::numeric_limits<short>::max();
     const unsigned int   kINVALID_UINT   = std::numeric_limits<unsigned int>::max();
     const int            kINVALID_INT    = std::numeric_limits<int>::max();
+    const size_t         kINVALID_SIZE   = std::numeric_limits<size_t>::max();
 
     const double kINVALID_DOUBLE = std::numeric_limits<double>::max();
     const float  kINVALID_FLOAT  = std::numeric_limits<float>::max();
+
+    /// Category of data types
+    enum DataTypeCategory_t {
+      kEventData,
+      kRunData,
+      kSubRunData,
+      kDATA_TYPE_CATEGORY_MAX
+    };
     
-    /// Define data product type identifiers
-    /// Defines a type of data product class
+    /**
+       Define event-wise data product type identifiers.\n
+       What appears here must have a corresponding entry in larlite::data::kDATA_TREE_NAME.
+    */
     enum DataType_t {
+      // Event-data types
       kUndefined=0,
       kEvent,
       kGTruth,             ///< simb::GTruth
@@ -67,11 +79,22 @@ namespace larlite{
       kPFParticle,         ///< recob::PFParticle
       kUserInfo,           ///< dynamic data container (LArLite original)
       kTrigger,            ///< Trigger data (LArLite original)
-      kPOTSummary,         ///< sumdata::POTSummary 
       kMCTrack,            ///< sim::MCTrack
       kMCTree,             ///< sim::MCTree
       kMinos,              ///< t962::Minos
-      kDATA_TYPE_MAX
+      kAssociation,        ///< Association data product
+      kDATA_TYPE_MAX       ///< Event-wise enum boundary
+    };
+
+    enum RunDataType_t {
+      // Run-data types
+      kRUNDATA_TYPE_MAX   ///< Run-data type enum boundary
+    };
+
+    enum SubRunDataType_t {
+      // SubRun-data types
+      kPOTSummary,         ///< sumdata::POTSummary 
+      kSUBRUNDATA_TYPE_MAX ///< SubRun-data type enum boundary
     };
 
     const std::string kDATA_TREE_NAME[kDATA_TYPE_MAX] = {
@@ -103,12 +126,21 @@ namespace larlite{
       "pfpart",
       "user",
       "trigger",
-      "potsummary",
       "mctrack",
       "mctree",
-      "minos"
+      "minos",
+      "ass"
+    };
+
+    const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {
+      
     };
     
+    const std::string kSUBRUNDATA_TREE_NAME[kSUBRUNDATA_TYPE_MAX] = {
+      "potsummary"
+    };
+
+    const std::string kEVENT_ID_TREE = "larlite_id_tree";
   }
   
 }

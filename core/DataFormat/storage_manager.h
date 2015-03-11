@@ -19,36 +19,7 @@
 #include <TError.h>
 #include "Base/larlite_base.h"
 #include "data_base.h"
-/*
-#include "trigger.h"
-#include "potsummary.h"
-#include "hit.h"
-#include "track.h"
-#include "mctruth.h"
-#include "mctree.h"
-#include "user_info.h"
-#include "spacepoint.h"
-#include "rawdigit.h"
-#include "wire.h"
-#include "hit.h"
-#include "cluster.h"
-#include "shower.h"
-#include "mcshower.h"
-#include "mctrack.h"
-#include "simch.h"
-#include "calorimetry.h"
-#include "vertex.h"
-#include "endpoint2d.h"
-#include "seed.h"
-#include "cosmictag.h"
-#include "opflash.h"
-#include "ophit.h"
-#include "mcflux.h"
-#include "pfpart.h"
-#include "partid.h"
-#include "gtruth.h"
-#include "minos.h"
-*/
+
 namespace larlite {
   class trigger;
   class potsummary;
@@ -80,6 +51,7 @@ namespace larlite {
   class event_partid;
   class event_gtruth;
   class event_minos;
+  class event_ass;
 }
 
 namespace larlite {
@@ -131,10 +103,9 @@ namespace larlite {
     }
     
     /// Setter for I/O mode.
-    void set_io_mode(IOMode_t mode)         {_mode=mode;}
+    void set_io_mode(IOMode_t mode) {_mode=mode;}
     
     /// Setter for input filename
-    //void set_in_filename(std::string name) {_in_fname=name;}
     void add_in_filename(std::string name) {_in_fnames.push_back(name);}
     
     /// Setter for input file's TDirectory name
@@ -188,8 +159,16 @@ namespace larlite {
     /// Function to list product ID loaded or created
     const std::vector<larlite::product_id>& list_input_product() const { return _input_product_id; }
     
-    /// Universal data pointer getter to return data_base* pointer for specified data type.
-    event_base* get_data(data::DataType_t const type, std::string const name);
+    /// Universal event data pointer getter to return event_base* pointer for specified event-data type.
+    event_base* get_data(const data::DataType_t type, const std::string& name);
+
+    /// Universal run data pointer getter to return run_base* pointer for specified run-data type w/ run number
+    run_base* get_rundata(const data::RunDataType_t type, 
+			  const std::string& name);
+
+    /// Universal sub-run data pointer getter to return run_base* pointer for specified run-data type w/ run number
+    subrun_base* get_subrundata(const data::SubRunDataType_t type, 
+				const std::string& name);    
 
     /** 
 	Type specific data product getter.
@@ -202,6 +181,35 @@ namespace larlite {
     {
       auto type = data_type<T>();
       return (T*)(get_data(type,name));
+    }
+
+    /** 
+	Type specific run data product getter.
+	Specialize the template to the run data product of your choice, and it cast the
+	pointer + return reference for you.
+    */
+    //T* get_data(std::string const name);
+    template <class T>
+    T* get_rundata(const std::string& name,
+		   const unsigned int& run)
+    {
+      auto type = data_type<T>();
+      return (T*)(get_rundata(type,name,run));
+    }
+
+    /** 
+	Type specific sub-run data product getter.
+	Specialize the template to the sub-run data product of your choice, and it cast the
+	pointer + return reference for you.
+    */
+    //T* get_data(std::string const name);
+    template <class T>
+    T* get_subrundata(const std::string& name,
+		      const unsigned int& run,
+		      const unsigned int& subrun)
+    {
+      auto type = data_type<T>();
+      return (T*)(get_subrundata(type,name,run,subrun));
     }
     
     /// Getter for a shared object instance pointer. Not limited to be a singleton.
@@ -234,11 +242,13 @@ namespace larlite {
     
     static storage_manager* me; ///< shared object instance pointer
     
-    /// 
     void create_data_ptr(data::DataType_t const type, std::string const& name);
-    
     void delete_data_ptr(data::DataType_t const type, std::string const& name);
-    
+    void create_rundata_ptr(data::RunDataType_t const type, std::string const& name);
+    void delete_rundata_ptr(data::RunDataType_t const type, std::string const& name);
+    void create_subrundata_ptr(data::SubRunDataType_t const type, std::string const& name);
+    void delete_subrundata_ptr(data::SubRunDataType_t const type, std::string const& name);
+
     /// Load next event from imput  
     bool read_event();
     
@@ -253,9 +263,13 @@ namespace larlite {
     
     /// number of events read/written
     UInt_t _nevents, _nevents_read, _nevents_written;
+    
+    unsigned int _event_id;  ///< Current event ID (used for alignment check)
+    unsigned int _run_id;    ///< Current run ID (used for alignment check)
+    unsigned int _subrun_id; ///< Current sub-run ID (used for alignment check)
 
-    /// Current event ID (used for alignment check)
-    Int_t _current_event_id;
+    unsigned int _last_run_id;    ///< Last processed run ID
+    unsigned int _last_subrun_id; ///< Last processed sub-run ID
     
     /// status control stamp
     IOStatus_t _status;
@@ -263,38 +277,55 @@ namespace larlite {
     /// I/O mode 
     IOMode_t _mode;
 
-    /// Array of product_id 
+    /// Array of event-data product_id 
     std::vector<larlite::product_id> _input_product_id;
     
     /// Boolean to enable event alignment check
     bool _check_alignment;
     
-    /// Data pointer array for reading
-    //std::vector<std::map<std::string,event_base*> > _ptr_data_array;
+    /// Data pointer array for reading event-wise data
     std::vector<std::map<std::string,larlite::event_base*> > _ptr_data_array;
+    /// Data pointer array for reading run-wise data
+    std::vector<std::map<std::string,larlite::run_base*> > _ptr_rundata_array;
+    /// Data pointer array for reading subrun-wise data
+    std::vector<std::map<std::string,larlite::subrun_base*> > _ptr_subrundata_array;
     
-    /// I/O filename
-    std::string _out_fname;
-    std::vector<std::string> _in_fnames;
-    std::string _name_in_tdirectory;
-    std::string _name_out_tdirectory;
-    
+    // I/O filename
+    std::string _out_fname; ///< output data file name
+    std::vector<std::string> _in_fnames; ///< input data file name array
+    std::string _name_in_tdirectory; ///< input files' TDirectory name (if needed) 
+    std::string _name_out_tdirectory; ///< output file's TDirectory name (if needed)
+     
     /// ROOT file instance
     TFile *_fout;
     
-    /// TTree instance
-    std::vector<std::map<std::string,TChain*> > _in_ch;
-    std::vector<std::map<std::string,TTree*>  > _out_ch;
+    // TTree instance
+    TChain* _in_id_ch;  ///< Event ID input TTree
+    TTree*  _out_id_ch; ///< Event ID output TTree
+    std::vector<std::map<std::string,TChain*> > _in_ch;  ///< Array of event-data input TChains
+    std::vector<std::map<std::string,TTree*>  > _out_ch; ///< Array of event-data output TChains
+    std::vector<std::map<std::string,TChain*> > _in_rundata_ch;  ///< Array of run-data input TChains
+    std::vector<std::map<std::string,TTree*>  > _out_rundata_ch; ///< Array of run-data output TChains
+    std::vector<std::map<std::string,TChain*> > _in_subrundata_ch;  ///< Array of input sub-run data TChains
+    std::vector<std::map<std::string,TTree*>  > _out_subrundata_ch; ///< Array of output sub-run data TChains
 
     /// Boolean for whether or not to use _out_write_bool
     bool _use_read_bool;    
-    /// Boolean to record what data to be read out from a file
+    /// Boolean to record what event-data to be read out from a file
     std::vector<std::map<std::string,bool> > _read_data_array;
+    /// Boolean to record what run-data to be read out from a file
+    std::vector<std::map<std::string,bool> > _read_rundata_array;
+    /// Boolean to record what subrun-data to be read out from a file
+    std::vector<std::map<std::string,bool> > _read_subrundata_array;
 
     /// Boolean for whether or not to use _out_write_bool
     bool _use_write_bool;    
-    /// Boolean to record what data to be written out from a file
+    /// Boolean to record what event-data to be written out from a file
     std::vector<std::map<std::string,bool> > _write_data_array;
+    /// Boolean to record what run-data to be written out from a file
+    std::vector<std::map<std::string,bool> > _write_rundata_array;
+    /// Boolean to record what subrun-data to be written out from a file
+    std::vector<std::map<std::string,bool> > _write_subrundata_array;
 
   };
 
@@ -304,7 +335,6 @@ namespace larlite {
 #ifndef __CINT__
 //#include "storage_manager.template.hh"
 namespace larlite {
-  template<> data::DataType_t storage_manager::data_type<potsummary> () const;
   template<> data::DataType_t storage_manager::data_type<trigger> () const;
   template<> data::DataType_t storage_manager::data_type<event_gtruth> () const;
   template<> data::DataType_t storage_manager::data_type<event_mctruth> () const;
@@ -332,6 +362,7 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_mctree> () const;
   template<> data::DataType_t storage_manager::data_type<event_minos> () const;
   template<> data::DataType_t storage_manager::data_type<event_cosmictag>() const;
+  template<> data::DataType_t storage_manager::data_type<event_ass>() const;
 }
 #endif
 

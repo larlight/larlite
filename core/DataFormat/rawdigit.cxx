@@ -21,7 +21,7 @@ namespace larlite {
 
 
   //----------------------------------------------------------------------
-  void rawdigit::SetPedestal(double ped)
+  void rawdigit::SetPedestal(float ped)
   {
 
     fPedestal = ped;

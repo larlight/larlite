@@ -14,7 +14,7 @@
 
 #ifndef LARLITE_PARTID_H
 #define LARLITE_PARTID_H
-
+#include "Base/GeoTypes.h"
 #include "data_base.h"
 #include <vector>
 namespace larlite{
@@ -40,7 +40,8 @@ namespace larlite{
 	   double Chi2Muon,
 	   double MissingE,
 	   double MissingEavg,
-	   double PIDA);
+	   double PIDA,
+	   geo::PlaneID planeID);
 
     /// self-description to the stream output 
     friend std::ostream& operator << (std::ostream &o, partid const& a);
@@ -50,18 +51,18 @@ namespace larlite{
 
     void clear_data();
 
-    const int&    Pdg()         const { return fPdg;         }
-    const int&    Ndf()         const { return fNdf;         }
-    const double& MinChi2()     const { return fMinChi2;     }
-    const double& DeltaChi2()   const { return fDeltaChi2;   }
-    const double& Chi2Proton()  const { return fChi2Proton;  }
-    const double& Chi2Kaon()    const { return fChi2Kaon;    }
-    const double& Chi2Pion()    const { return fChi2Pion;    }
-    const double& Chi2Muon()    const { return fChi2Muon;    }
-    const double& MissingE()    const { return fMissingE;    }
-    const double& MissingEavg() const { return fMissingEavg; }
-    const double& PIDA()        const { return fPIDA; }
-
+    const int&    Pdg()           const { return fPdg;         }
+    const int&    Ndf()           const { return fNdf;         }
+    const double& MinChi2()       const { return fMinChi2;     }
+    const double& DeltaChi2()     const { return fDeltaChi2;   }
+    const double& Chi2Proton()    const { return fChi2Proton;  }
+    const double& Chi2Kaon()      const { return fChi2Kaon;    }
+    const double& Chi2Pion()      const { return fChi2Pion;    }
+    const double& Chi2Muon()      const { return fChi2Muon;    }
+    const double& MissingE()      const { return fMissingE;    }
+    const double& MissingEavg()   const { return fMissingEavg; }
+    const double& PIDA()          const { return fPIDA;        }
+    const geo::PlaneID& PlaneID() const { return fPlaneID;     }
   protected:
 
     int    fPdg;             ///< determined particle ID                                                                                          
@@ -75,11 +76,11 @@ namespace larlite{
     double fMissingE;        ///< missing energy from dead wires for contained particle                                                           
     double fMissingEavg;     ///< missing energy from dead wires using average dEdx                                                               
     double fPIDA;            ///< PID developed by Bruce Baller      
-
+    geo::PlaneID fPlaneID;   ///< Plane ID
   private:
     
     ////////////////////////
-    ClassDef(partid,1)
+    ClassDef(partid,2)
     ////////////////////////
       
   };
@@ -109,7 +110,7 @@ namespace larlite{
   private:
     
     ////////////////////////
-    ClassDef(event_partid,1)
+    ClassDef(event_partid,2)
     ////////////////////////
   };
 }

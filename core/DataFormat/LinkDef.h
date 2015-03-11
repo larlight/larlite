@@ -35,6 +35,8 @@
 #pragma link C++ class std::pair<larlite::data::DataType_t,string>+;
 #pragma link C++ class larlite::product_id+;
 #pragma link C++ class std::vector<larlite::product_id>+;
+#pragma link C++ class std::pair<larlite::product_id,larlite::product_id>+;
+#pragma link C++ class std::vector<std::pair<larlite::product_id,larlite::product_id> >+;
 
 #pragma link C++ class larlite::DataFormatException+;
 
@@ -164,6 +166,8 @@
 #pragma link C++ class std::vector<larlite::minos>+;
 #pragma link C++ class larlite::event_minos+;
 
+#pragma link C++ class larlite::event_ass+;
+
 #pragma link C++ class larlite::storage_manager+;
 
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_gtruth>();
@@ -189,6 +193,7 @@
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_pfpart>();
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_user>();
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_minos>();
+#pragma link C++ function larlite::storage_manager::data_type<larlite::event_ass>();
 
 #pragma link C++ function larlite::storage_manager::get_data<larlite::event_gtruth>(string);
 #pragma link C++ function larlite::storage_manager::get_data<larlite::event_mctruth>(string);
@@ -213,5 +218,6 @@
 #pragma link C++ function larlite::storage_manager::get_data<larlite::event_pfpart>(string);
 #pragma link C++ function larlite::storage_manager::get_data<larlite::event_user>(string);
 #pragma link C++ function larlite::storage_manager::get_data<larlite::event_minos>(string);
+#pragma link C++ function larlite::storage_manager::get_data<larlite::event_ass>(string);
 
 #endif

@@ -21,6 +21,7 @@ namespace larlite {
     , fMissingE(0.)
     , fMissingEavg(0.)
     , fPIDA(0.)
+    , fPlaneID()
   {
     clear_data();
   }
@@ -35,7 +36,8 @@ namespace larlite {
 		 double Chi2Muon,
 		 double MissingE,
 		 double MissingEavg,
-		 double PIDA)
+		 double PIDA,
+		 geo::PlaneID planeid)
     : fPdg(Pdg)
     , fNdf(Ndf)
     , fMinChi2(MinChi2)
@@ -47,6 +49,7 @@ namespace larlite {
     , fMissingE(MissingE)
     , fMissingEavg(MissingEavg)
     , fPIDA(PIDA)
+    , fPlaneID(planeid)
   {}
 
   std::ostream& operator<< (std::ostream & o, partid const& a)

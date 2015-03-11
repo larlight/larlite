@@ -17,6 +17,7 @@
 
 #include "data_base.h"
 #include "Base/GeoConstants.h"
+#include "Base/RawConstants.h"
 namespace larlite {
   /**
      \class wire
@@ -50,16 +51,16 @@ namespace larlite {
     {};
     
     /// Default destructor
-    virtual ~wire(){};
+    virtual ~wire(){}
     
     void clear_data();
     
     /// Setter for an waveform
     void set_signal(const std::vector<float> wf) { fSignal=wf; }
     /// Setter for a channel number
-    void set_channel(unsigned int    ch)   { fChannel = ch;   }
+    void set_channel(raw::ChannelID_t ch) { fChannel = ch;   }
     /// Setter for view type
-    void set_view   (geo::View_t v)    { fView = v;       }
+    void set_view   (geo::View_t v) { fView = v;       }
     /// Setter for signal type
     void set_sigtype(geo::SigType_t s) { fSignalType = s; }
     
@@ -71,14 +72,17 @@ namespace larlite {
     /// Getter for signal type
     geo::SigType_t             SignalType() const { return fSignalType;    }
     /// Getter for channel number
-    unsigned int                   Channel()    const { return fChannel;       }
+    raw::ChannelID_t           Channel()    const { return fChannel;       }
+
+    inline bool operator< (const wire& than) const
+    { return fChannel < than.Channel(); }
     
   protected:
     
     std::vector<float> fSignal;     ///< the calibrated signal waveform
     geo::View_t        fView;       ///< view corresponding to the plane of this wire
     geo::SigType_t     fSignalType; ///< signal type of the plane for this wire
-    unsigned int             fChannel;    ///< channel number
+    raw::ChannelID_t   fChannel;    ///< channel number
     
   private:
     

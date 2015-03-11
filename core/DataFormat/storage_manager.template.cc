@@ -5,9 +5,6 @@
 
 namespace larlite {
 
-  template<> data::DataType_t storage_manager::data_type<potsummary> () const
-  { return data::kPOTSummary; }
-
   template<> data::DataType_t storage_manager::data_type<trigger> () const
   { return data::kTrigger; }
 
@@ -88,6 +85,9 @@ namespace larlite {
 
   template<> data::DataType_t storage_manager::data_type<event_minos> () const
   { return data::kMinos; }
+
+  template<> data::DataType_t storage_manager::data_type<event_ass> () const
+  { return data::kAssociation; }
 
   template <class T>
   data::DataType_t storage_manager::data_type() const

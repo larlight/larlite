@@ -22,16 +22,16 @@ namespace larlite{
      \class potsummary
      LArSoft Potsummary class equivalent data container
   */
-  class potsummary : public event_base {
+  class potsummary : public subrun_base {
     
   public:
 
     /// Default constructor
-    potsummary(std::string name="noname") : event_base(data::kPOTSummary,name) 
+    potsummary(std::string name="noname") : subrun_base(data::kPOTSummary,name) 
     { clear_data(); }
     
     /// Default copy constructor
-    potsummary(const potsummary& original) : event_base(original),
+    potsummary(const potsummary& original) : subrun_base(original),
 					     totpot(original.totpot),
 					     totgoodpot(original.totgoodpot),
 					     totspills(original.totspills),
@@ -52,7 +52,7 @@ namespace larlite{
   private:
     
     ////////////////////////
-    ClassDef(potsummary,3)
+    ClassDef(potsummary,4)
     ////////////////////////
       
   };

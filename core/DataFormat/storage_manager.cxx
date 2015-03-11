@@ -31,6 +31,7 @@
 #include "partid.h"
 #include "gtruth.h"
 #include "minos.h"
+#include "event_ass.h"
 
 namespace larlite {
 
@@ -39,10 +40,21 @@ namespace larlite {
   storage_manager::storage_manager(storage_manager::IOMode_t mode)
     : larlite_base()
     , _ptr_data_array (data::kDATA_TYPE_MAX,std::map<std::string,larlite::event_base*>())
+    , _in_id_ch  (nullptr)
+    , _out_id_ch (nullptr)
     , _in_ch  (data::kDATA_TYPE_MAX,std::map<std::string,TChain*>())
     , _out_ch (data::kDATA_TYPE_MAX,std::map<std::string,TTree*>() )
+    , _in_rundata_ch  (data::kRUNDATA_TYPE_MAX,std::map<std::string,TChain*>())
+    , _out_rundata_ch (data::kRUNDATA_TYPE_MAX,std::map<std::string,TTree*>() )
+    , _in_subrundata_ch  (data::kSUBRUNDATA_TYPE_MAX,std::map<std::string,TChain*>())
+    , _out_subrundata_ch (data::kSUBRUNDATA_TYPE_MAX,std::map<std::string,TTree*>())
     , _read_data_array(data::kDATA_TYPE_MAX,std::map<std::string,bool>())
+    , _read_rundata_array(data::kRUNDATA_TYPE_MAX,std::map<std::string,bool>())
+    , _read_subrundata_array(data::kSUBRUNDATA_TYPE_MAX,std::map<std::string,bool>())
     , _write_data_array(data::kDATA_TYPE_MAX,std::map<std::string,bool>())
+    , _write_rundata_array(data::kRUNDATA_TYPE_MAX,std::map<std::string,bool>())
+    , _write_subrundata_array(data::kSUBRUNDATA_TYPE_MAX,std::map<std::string,bool>())
+
   {
     _name="storage_manager";
     //_event_wf=0;
@@ -57,7 +69,193 @@ namespace larlite {
     
   };
 
-  event_base* storage_manager::get_data(data::DataType_t const type, std::string const name)
+  run_base* storage_manager::get_rundata(const data::RunDataType_t type, 
+					 const std::string& name)
+  {
+    if(!_index && _mode != kWRITE) {
+
+      Message::send(msg::kERROR,__FUNCTION__,
+		    Form("Call next_event() before calling %s", __FUNCTION__));
+
+      return 0;
+    }
+    run_base* result_ptr = nullptr;    
+    auto inch_ptr_iter = _in_rundata_ch[type].find(name);
+    auto data_ptr_iter = _ptr_rundata_array[type].find(name);
+    if(data_ptr_iter != _ptr_rundata_array[type].end())
+      result_ptr = (*data_ptr_iter).second;
+
+    // If in kREAD mode, here is where we read in data product
+    if( inch_ptr_iter != _in_rundata_ch[type].end() && _mode == kREAD) {
+
+      long current_entry = (*inch_ptr_iter).second->GetReadEntry();
+      while( (*data_ptr_iter).second->run() != _run_id &&
+	     current_entry < (*inch_ptr_iter).second->GetEntries() ) {
+	++current_entry;
+	(*inch_ptr_iter).second->GetEntry(current_entry);
+      }
+      
+      if((*data_ptr_iter).second->run() != _run_id)
+	throw DataFormatException(Form("Could not find run data (%s by %s) for run %d",
+				       data::kRUNDATA_TREE_NAME[type].c_str(),
+				       name.c_str(),
+				       _run_id)
+				  );
+
+      result_ptr = (*data_ptr_iter).second;
+    }
+
+    // If data class object does not exist, and if it's either kWRITE or kBOTH mode, create it.
+    if( (data_ptr_iter == _ptr_rundata_array[type].end() || !((*data_ptr_iter).second)) && 
+       _mode != kREAD) {
+
+      create_rundata_ptr(type,name);
+
+      data_ptr_iter = _ptr_rundata_array[type].find(name);
+
+      if(data_ptr_iter!=_ptr_rundata_array[type].end() && (*data_ptr_iter).second) {
+
+	result_ptr = (*data_ptr_iter).second;
+
+	result_ptr->set_run(_run_id);
+
+	if(!_name_out_tdirectory.empty())
+	  _fout->cd(_name_out_tdirectory.c_str());
+
+	auto out_ch_iter = _out_rundata_ch[type].find(name);
+	if(out_ch_iter == _out_rundata_ch[type].end()) {
+	  _out_rundata_ch[type][name]=nullptr;
+	  out_ch_iter = _out_rundata_ch[type].find(name);
+	}
+
+	if(!(*out_ch_iter).second) {
+
+	  _fout->cd(_name_out_tdirectory.c_str());
+
+	  (*out_ch_iter).second=new TTree(Form("%s_%s_tree",
+					       data::kRUNDATA_TREE_NAME[(data::RunDataType_t)type].c_str(),
+					       name.c_str()),
+					  Form("%s Tree by %s",
+					       data::kRUNDATA_TREE_NAME[(data::RunDataType_t)type].c_str(),
+					       name.c_str())
+					  );
+	  
+	  (*out_ch_iter).second->SetMaxTreeSize    (1024*1024*1024);
+	  (*out_ch_iter).second->SetMaxVirtualSize (1024*1024*1024);
+	  
+	  (*out_ch_iter).second->Branch(Form("%s_%s_branch",
+					     data::kRUNDATA_TREE_NAME[(data::RunDataType_t)type].c_str(),
+					     name.c_str()),
+					result_ptr->GetName(),
+					&(_ptr_rundata_array[type][name]));
+	  
+	  Message::send(msg::kWARNING,__FUNCTION__,
+			Form("Requested tree %s by %s which does not exists yet. Created a new one.", 
+			     result_ptr->GetName(),
+			     name.c_str())
+			);
+	}
+      }
+    }
+    return result_ptr;
+  }
+
+  subrun_base* storage_manager::get_subrundata(const data::SubRunDataType_t type, 
+					       const std::string& name)
+  {
+    if(!_index && _mode != kWRITE) {
+
+      Message::send(msg::kERROR,__FUNCTION__,
+		    Form("Call next_event() before calling %s", __FUNCTION__));
+
+      return 0;
+    }
+    subrun_base* result_ptr = nullptr;    
+    auto inch_ptr_iter = _in_subrundata_ch[type].find(name);
+    auto data_ptr_iter = _ptr_subrundata_array[type].find(name);
+    if(data_ptr_iter != _ptr_subrundata_array[type].end())
+      result_ptr = (*data_ptr_iter).second;
+
+    // If in kREAD mode, here is where we read in data product
+    if( inch_ptr_iter != _in_subrundata_ch[type].end() && _mode == kREAD) {
+
+      long current_entry = (*inch_ptr_iter).second->GetReadEntry();
+      while( ((*data_ptr_iter).second->run() != _run_id ||
+	      (*data_ptr_iter).second->subrun() != _subrun_id) &&
+	     current_entry < (*inch_ptr_iter).second->GetEntries() ) {
+	++current_entry;
+	(*inch_ptr_iter).second->GetEntry(current_entry);
+      }
+      
+      if( (*data_ptr_iter).second->run() != _run_id ||
+	  (*data_ptr_iter).second->subrun() != _subrun_id )
+	throw DataFormatException(Form("Could not find sub-run data (%s by %s) for run/subrun %d/%d",
+				       data::kSUBRUNDATA_TREE_NAME[type].c_str(),
+				       name.c_str(),
+				       _run_id,
+				       _subrun_id)
+				  );
+
+      result_ptr = (*data_ptr_iter).second;
+    }
+
+    // If data class object does not exist, and if it's either kWRITE or kBOTH mode, create it.
+    if( (data_ptr_iter == _ptr_subrundata_array[type].end() || !((*data_ptr_iter).second)) && 
+       _mode != kREAD) {
+
+      create_subrundata_ptr(type,name);
+
+      data_ptr_iter = _ptr_subrundata_array[type].find(name);
+
+      if(data_ptr_iter!=_ptr_subrundata_array[type].end() && (*data_ptr_iter).second) {
+
+	result_ptr = (*data_ptr_iter).second;
+
+	result_ptr->set_run(_run_id);
+	result_ptr->set_subrun(_subrun_id);
+
+	if(!_name_out_tdirectory.empty())
+	  _fout->cd(_name_out_tdirectory.c_str());
+
+	auto out_ch_iter = _out_subrundata_ch[type].find(name);
+	if(out_ch_iter == _out_subrundata_ch[type].end()) {
+	  _out_subrundata_ch[type][name]=nullptr;
+	  out_ch_iter = _out_subrundata_ch[type].find(name);
+	}
+
+	if(!(*out_ch_iter).second) {
+
+	  _fout->cd(_name_out_tdirectory.c_str());
+
+	  (*out_ch_iter).second=new TTree(Form("%s_%s_tree",
+					       data::kSUBRUNDATA_TREE_NAME[(data::SubRunDataType_t)type].c_str(),
+					       name.c_str()),
+					  Form("%s Tree by %s",
+					       data::kSUBRUNDATA_TREE_NAME[(data::SubRunDataType_t)type].c_str(),
+					       name.c_str())
+					  );
+	  
+	  (*out_ch_iter).second->SetMaxTreeSize    (1024*1024*1024);
+	  (*out_ch_iter).second->SetMaxVirtualSize (1024*1024*1024);
+	  
+	  (*out_ch_iter).second->Branch(Form("%s_%s_branch",
+					     data::kSUBRUNDATA_TREE_NAME[(data::SubRunDataType_t)type].c_str(),
+					     name.c_str()),
+					result_ptr->GetName(),
+					&(_ptr_subrundata_array[type][name]));
+	  
+	  Message::send(msg::kWARNING,__FUNCTION__,
+			Form("Requested tree %s by %s which does not exists yet. Created a new one.", 
+			     result_ptr->GetName(),
+			     name.c_str())
+			);
+	}
+      }
+    }
+    return result_ptr;
+  }
+
+  event_base* storage_manager::get_data(const data::DataType_t type, const std::string& name)
   {
 
     // Read entry _index-1
@@ -68,6 +266,7 @@ namespace larlite {
 
       return 0;
     }
+
     event_base* result_ptr = nullptr;
     auto inch_ptr_iter = _in_ch[type].find(name);
     auto data_ptr_iter = _ptr_data_array[type].find(name);
@@ -80,21 +279,23 @@ namespace larlite {
       (*inch_ptr_iter).second->GetEntry(_index-1);
 
       if( _check_alignment ) {
+	
+	if(_event_id==data::kINVALID_UINT) 
 
-	if(_current_event_id==data::kINVALID_INT) 
+	  _event_id = (*data_ptr_iter).second->event_id();
 
-	  _current_event_id = (*data_ptr_iter).second->event_id();
-
-	else if( (int)((*data_ptr_iter).second->event_id()) != _current_event_id) {
+	else if( (*data_ptr_iter).second->event_id() != _event_id) {
 	  
 	  print(msg::kERROR,__FUNCTION__,
-		Form("Detected event-alignment mismatch for data type %s by %s! (%d != %d)",
+		Form("Detected event-alignment mismatch for data type %s by %s! %d (ref) != %d (%s by %s)",
 		     data::kDATA_TREE_NAME[type].c_str(), name.c_str(),
-		     (*data_ptr_iter).second->event_id(), _current_event_id)
+		     _event_id,
+		     (*data_ptr_iter).second->event_id(),
+		     data::kDATA_TREE_NAME[type].c_str(),
+		     (*data_ptr_iter).first.c_str())
 		);
-	  
+	  throw DataFormatException("Aborting event processing...");
 	  return 0;
-	  
 	}
       }
     }
@@ -110,6 +311,10 @@ namespace larlite {
       if(data_ptr_iter!=_ptr_data_array[type].end() && (*data_ptr_iter).second) {
 
 	result_ptr = (*data_ptr_iter).second;
+	
+	result_ptr->set_run(_run_id);
+	result_ptr->set_subrun(_subrun_id);
+	result_ptr->set_event_id(_event_id);
 
 	if(!_name_out_tdirectory.empty())
 	  _fout->cd(_name_out_tdirectory.c_str());
@@ -169,7 +374,11 @@ namespace larlite {
       break;
     }
     
-    _current_event_id = data::kINVALID_INT;
+    _event_id  = data::kINVALID_UINT;
+    _run_id    = data::kINVALID_UINT;
+    _subrun_id = data::kINVALID_UINT;
+    _last_run_id = data::kINVALID_UINT;
+    _last_subrun_id = data::kINVALID_UINT;
     _index=0;
     _nevents=0;
     _nevents_written=0;
@@ -180,12 +389,28 @@ namespace larlite {
     _input_product_id.clear();
     _use_read_bool = false;
     _use_write_bool = false;
-    for(size_t i=0; i<data::kDATA_TYPE_MAX; ++i) {
+    delete _in_id_ch;
+    delete _out_id_ch;
+    for(int i=0; i<data::kDATA_TYPE_MAX; ++i) {
       _in_ch[i].clear();
       _out_ch[i].clear();
       _ptr_data_array[i].clear();
       _write_data_array[i].clear();      
       _read_data_array[i].clear();      
+    }
+    for(int i=0; i<data::kRUNDATA_TYPE_MAX; ++i) {
+      _in_rundata_ch[i].clear();
+      _out_rundata_ch[i].clear();
+      _ptr_rundata_array[i].clear();
+      _write_rundata_array[i].clear();      
+      _read_rundata_array[i].clear();      
+    }
+    for(int i=0; i<data::kSUBRUNDATA_TYPE_MAX; ++i) {
+      _in_subrundata_ch[i].clear();
+      _out_subrundata_ch[i].clear();
+      _ptr_subrundata_array[i].clear();
+      _write_subrundata_array[i].clear();      
+      _read_subrundata_array[i].clear();      
     }
     
     if(_verbosity[msg::kDEBUG])
@@ -278,7 +503,7 @@ namespace larlite {
 	    TObject* obj = nullptr;
 	    std::set<std::string> name_candidates;
 	    if(_use_read_bool) {
-	      for(size_t i=0; i<data::kDATA_TYPE_MAX; ++i) {
+	      for(int i=0; i<data::kDATA_TYPE_MAX; ++i) {
 		
 		for(auto const& name_bool : _read_data_array[i]) {
 		  
@@ -289,18 +514,49 @@ namespace larlite {
 						(name_bool.first).c_str()));
 		}
 	      }
+	      for(int i=0; i<data::kRUNDATA_TYPE_MAX; ++i) {
+		
+		for(auto const& name_bool : _read_rundata_array[i]) {
+		  
+		  if(name_bool.second)
+
+		    name_candidates.insert(Form("%s_%s_tree",
+						data::kRUNDATA_TREE_NAME[i].c_str(),
+						(name_bool.first).c_str()));
+		}
+	      }
+	      for(int i=0; i<data::kSUBRUNDATA_TYPE_MAX; ++i) {
+		
+		for(auto const& name_bool : _read_subrundata_array[i]) {
+		  
+		  if(name_bool.second)
+
+		    name_candidates.insert(Form("%s_%s_tree",
+						data::kSUBRUNDATA_TREE_NAME[i].c_str(),
+						(name_bool.first).c_str()));
+		}
+	      }
 	    }
 	    while(1) {
 	      obj = key_iter.Next();			    
 	      if(!obj) break;
 	      if(name_candidates.size() && name_candidates.find(obj->GetName()) == name_candidates.end()) continue;
 	      obj = fin_dir->Get(obj->GetName());
-	      print(msg::kINFO,__FUNCTION__,Form("Found object %s (type=%s)",obj->GetName(),obj->ClassName()));
+	      print(msg::kDEBUG,__FUNCTION__,Form("Found object %s (type=%s)",obj->GetName(),obj->ClassName()));
 	      if(std::string(obj->ClassName())!="TTree") {
-		print(msg::kINFO,__FUNCTION__,Form("Skipping %s ... (not TTree)",obj->GetName()));
+		print(msg::kDEBUG,__FUNCTION__,Form("Skipping %s ... (not TTree)",obj->GetName()));
 		continue;
 	      }
 	      std::string obj_name = obj->GetName();
+	      if(obj_name == data::kEVENT_ID_TREE) {
+		if(!_in_id_ch) {
+		  if(!_name_in_tdirectory.empty())
+		    _in_id_ch = new TChain(Form("%s/%s",_name_in_tdirectory.c_str(),data::kEVENT_ID_TREE.c_str()),"");
+		  else
+		    _in_id_ch = new TChain(data::kEVENT_ID_TREE.c_str(),"");
+		}
+		continue;
+	      }
 	      char c[2] = "_";
 	      if(obj_name.find_first_of(c) > obj_name.size() ||
 		 obj_name.find_first_of(c) == obj_name.find_last_of(c)) {
@@ -314,13 +570,31 @@ namespace larlite {
 		print(msg::kINFO,__FUNCTION__,Form("Skipping %s ... (not LArLite TTree)",obj->GetName()));
 		continue;
 	      }
-	      for(size_t i=0; i<data::kDATA_TYPE_MAX; ++i)
+	      bool matched=false;
+	      for(int i=0; i<data::kDATA_TYPE_MAX && !matched; ++i) {
 		if(data::kDATA_TREE_NAME[i] == type_name) {
 		  _in_ch[(data::DataType_t)i].insert(std::make_pair(producer_name.c_str(),(TChain*)nullptr));
 		  print(msg::kINFO,__FUNCTION__,Form("Found %s tree made by %s...",type_name.c_str(),producer_name.c_str()));
 		  _input_product_id.push_back(product_id((data::DataType_t)i,producer_name.c_str()));
-		  break;
+		  matched=true;
 		}
+	      }
+	      for(int i=0; i<data::kRUNDATA_TYPE_MAX && !matched; ++i) {
+		if(data::kRUNDATA_TREE_NAME[i] == type_name) {
+		  _in_ch[(data::RunDataType_t)i].insert(std::make_pair(producer_name.c_str(),(TChain*)nullptr));
+		  print(msg::kINFO,__FUNCTION__,Form("Found %s tree made by %s...",type_name.c_str(),producer_name.c_str()));
+		  //_input_run_product_id.push_back(product_id((data::SubRunDataType_t)i,producer_name.c_str()));
+		  matched=true;
+		}
+	      }
+	      for(int i=0; i<data::kDATA_TYPE_MAX && !matched; ++i) {
+		if(data::kSUBRUNDATA_TREE_NAME[i] == type_name) {
+		  _in_ch[(data::SubRunDataType_t)i].insert(std::make_pair(producer_name.c_str(),(TChain*)nullptr));
+		  print(msg::kINFO,__FUNCTION__,Form("Found %s tree made by %s...",type_name.c_str(),producer_name.c_str()));
+		  //_input_subrun_product_id.push_back(product_id((data::SubRunDataType_t)i,producer_name.c_str()));
+		  matched=true;
+		}
+	      }
 	    }
 	  }
 	  fin->Close();
@@ -383,47 +657,69 @@ namespace larlite {
       print(msg::kERROR,__FUNCTION__,_buf);
       status=false;
     }
+
+    if(!status) return status;
     
-    for(size_t i=0; i<data::kDATA_TYPE_MAX; ++i){
-      
-      if(!_status) break;
-      
-      if(_mode!=kWRITE && _in_ch[i].size()) {
+    if(_mode!=kWRITE) {
 
+      // For event id tree
+      if(_in_id_ch) {
+
+	for(size_t j=0; j<_in_fnames.size(); ++j)
+	    
+	  _in_id_ch->AddFile(_in_fnames[j].c_str());
+
+	gErrorIgnoreLevel = kBreak;
+	_nevents = _in_id_ch->GetEntries();
+	gErrorIgnoreLevel = kWarning;
+	
+	if(_nevents <=0 ) {
+	  print(msg::kWARNING,__FUNCTION__,
+		"Failed to read larlite_id_tree ... removing read pointer...");
+	  delete _in_id_ch;
+	  _in_id_ch=nullptr;
+	}else{
+	  if( !_in_id_ch->GetBranch( "_run_id"    ) ||
+	      !_in_id_ch->GetBranch( "_subrun_id" ) ||
+	      !_in_id_ch->GetBranch( "_event_id"  ) )
+	    throw DataFormatException("larlite_id_tree in an wrong format. Cannot process this file!");
+	  _in_id_ch->SetBranchAddress("_run_id",    &_run_id    );
+	  _in_id_ch->SetBranchAddress("_subrun_id", &_subrun_id );
+	  _in_id_ch->SetBranchAddress("_event_id",  &_event_id  );
+	}
+      }
+      // For event data tree
+      for(size_t i=0; i<data::kDATA_TYPE_MAX; ++i){
+      
 	for(auto& name_ptr : _in_ch[i]) {
-
+	  
 	  std::string tree_name(Form("%s_%s_tree",
 				     data::kDATA_TREE_NAME[(data::DataType_t)i].c_str(),
 				     name_ptr.first.c_str())
 				);
-	
-	  if(_name_in_tdirectory.size()>0)
-	    name_ptr.second=new TChain(Form("%s/%s",_name_in_tdirectory.c_str(),tree_name.c_str()),
-				       Form("%s Tree by %s",
-					    data::kDATA_TREE_NAME[(data::DataType_t)i].c_str(),
-					    name_ptr.first.c_str())
-				       );
-	  else
-	    name_ptr.second=new TChain(tree_name.c_str(),
-				       Form("%s Tree by %s",
-					    data::kDATA_TREE_NAME[(data::DataType_t)i].c_str(),
-					    name_ptr.first.c_str())
-				       );
-	
+	  if(!_name_in_tdirectory.empty())
+	    tree_name = Form("%s/%s",_name_in_tdirectory.c_str(),tree_name.c_str());
+	  
+	  name_ptr.second=new TChain(tree_name.c_str(),
+				     Form("%s Tree by %s",
+					  data::kDATA_TREE_NAME[(data::DataType_t)i].c_str(),
+					  name_ptr.first.c_str())
+				     );
+	  
 	  for(size_t j=0; j<_in_fnames.size(); ++j)
 	    
 	    name_ptr.second->AddFile(_in_fnames[j].c_str());
-
+	  
 	  // Ignore ROOT error message due to not finding a TTree 
 	  gErrorIgnoreLevel = kBreak;
 	  nevents_array[i][name_ptr.first] += name_ptr.second->GetEntries();
 	  gErrorIgnoreLevel = kWarning;
 	  
 	  if(nevents_array[i][name_ptr.first]) { 
-	  
+	    
 	    print(msg::kDEBUG,__FUNCTION__,
 		  Form("Found %zu events found in TTree %s ...",nevents_array[i][name_ptr.first],tree_name.c_str()));
-
+	    
 	    create_data_ptr((data::DataType_t)i,name_ptr.first);
 	    name_ptr.second->SetBranchAddress(Form("%s_%s_branch",
 						   data::kDATA_TREE_NAME[(data::DataType_t)i].c_str(),
@@ -432,8 +728,8 @@ namespace larlite {
 					      &(_ptr_data_array[i][name_ptr.first])
 					      );
 	    
-	  if(!_nevents) _nevents = nevents_array[i][name_ptr.first];
-	  
+	    if(!_nevents) _nevents = nevents_array[i][name_ptr.first];
+	    
 	  }else{
 	    print(msg::kWARNING,__FUNCTION__,
 		  Form("TTree %s contains no event... removing read pointer...",tree_name.c_str()));
@@ -442,45 +738,214 @@ namespace larlite {
 	  }
 	}
       }
-
-      // In BOTH mode, write all that is read in
-      if(_mode==kBOTH) {
-	
-	_fout->cd(_name_out_tdirectory.c_str());
-
-	for(size_t i=0; i<data::kDATA_TYPE_MAX; ++i) {
-
-	  for(auto& name_ptr : _in_ch[i]) {
-
-	    if(!_ptr_data_array[i][name_ptr.first]) continue;
-
-	    _fout->cd(_name_out_tdirectory.c_str());
-
-	    _out_ch[i][name_ptr.first]=new TTree(Form("%s_%s_tree",
-						      data::kDATA_TREE_NAME[(data::DataType_t)i].c_str(),
-						      name_ptr.first.c_str()),
-						 Form("%s Tree by %s",
-						      data::kDATA_TREE_NAME[(data::DataType_t)i].c_str(),
-						      name_ptr.first.c_str())
-						 );
-
-	    _out_ch[i][name_ptr.first]->SetMaxTreeSize    (1024*1024*1024);
-	    _out_ch[i][name_ptr.first]->SetMaxVirtualSize (1024*1024*1024);
-
-	    _out_ch[i][name_ptr.first]->Branch(Form("%s_%s_branch",
-						    data::kDATA_TREE_NAME[(data::DataType_t)i].c_str(),
-						    name_ptr.first.c_str()),
-					       _ptr_data_array[i][name_ptr.first]->GetName(),
-					       &(_ptr_data_array[i][name_ptr.first]));
+      // For run data tree
+      for(int i=0; i<data::kRUNDATA_TYPE_MAX; ++i){
+      
+	for(auto& name_ptr : _in_rundata_ch[i]) {
+	  
+	  std::string tree_name(Form("%s_%s_tree",
+				     data::kRUNDATA_TREE_NAME[(data::RunDataType_t)i].c_str(),
+				     name_ptr.first.c_str())
+				);
+	  if(!_name_in_tdirectory.empty())
+	    tree_name = Form("%s/%s",_name_in_tdirectory.c_str(),tree_name.c_str());
+	  
+	  name_ptr.second=new TChain(tree_name.c_str(),
+				     Form("%s Tree by %s",
+					  data::kRUNDATA_TREE_NAME[(data::RunDataType_t)i].c_str(),
+					  name_ptr.first.c_str())
+				     );
+	  
+	  for(size_t j=0; j<_in_fnames.size(); ++j)
+	    
+	    name_ptr.second->AddFile(_in_fnames[j].c_str());
+	  
+	  // Ignore ROOT error message due to not finding a TTree 
+	  gErrorIgnoreLevel = kBreak;
+	  nevents_array[i][name_ptr.first] += name_ptr.second->GetEntries();
+	  gErrorIgnoreLevel = kWarning;
+	  
+	  if(nevents_array[i][name_ptr.first]) { 
+	    
+	    print(msg::kDEBUG,__FUNCTION__,
+		  Form("Found %zu runs found in TTree %s ...",nevents_array[i][name_ptr.first],tree_name.c_str()));
+	    
+	    create_rundata_ptr((data::RunDataType_t)i,name_ptr.first);
+	    name_ptr.second->SetBranchAddress(Form("%s_%s_branch",
+						   data::kRUNDATA_TREE_NAME[(data::RunDataType_t)i].c_str(),
+						   name_ptr.first.c_str()
+						   ),
+					      &(_ptr_rundata_array[i][name_ptr.first])
+					      );
+	    
+	  }else{
+	    print(msg::kWARNING,__FUNCTION__,
+		  Form("TTree %s contains no run... removing read pointer...",tree_name.c_str()));
+	    delete name_ptr.second;
+	    name_ptr.second=nullptr;
 	  }
 	}
       }
+
+      // For sub-run data tree
+      for(int i=0; i<data::kSUBRUNDATA_TYPE_MAX; ++i){
       
-      _nevents_written=0;
-      _nevents_read=0;
-      _index=0;
-      
+	for(auto& name_ptr : _in_subrundata_ch[i]) {
+	  
+	  std::string tree_name(Form("%s_%s_tree",
+				     data::kSUBRUNDATA_TREE_NAME[(data::SubRunDataType_t)i].c_str(),
+				     name_ptr.first.c_str())
+				);
+	  if(!_name_in_tdirectory.empty())
+	    tree_name = Form("%s/%s",_name_in_tdirectory.c_str(),tree_name.c_str());
+	  
+	  name_ptr.second=new TChain(tree_name.c_str(),
+				     Form("%s Tree by %s",
+					  data::kSUBRUNDATA_TREE_NAME[(data::SubRunDataType_t)i].c_str(),
+					  name_ptr.first.c_str())
+				     );
+	  
+	  for(size_t j=0; j<_in_fnames.size(); ++j)
+	    
+	    name_ptr.second->AddFile(_in_fnames[j].c_str());
+	  
+	  // Ignore ROOT error message due to not finding a TTree 
+	  gErrorIgnoreLevel = kBreak;
+	  nevents_array[i][name_ptr.first] += name_ptr.second->GetEntries();
+	  gErrorIgnoreLevel = kWarning;
+	  
+	  if(nevents_array[i][name_ptr.first]) { 
+	    
+	    print(msg::kDEBUG,__FUNCTION__,
+		  Form("Found %zu sub-runs found in TTree %s ...",nevents_array[i][name_ptr.first],tree_name.c_str()));
+	    
+	    create_subrundata_ptr((data::SubRunDataType_t)i,name_ptr.first);
+	    name_ptr.second->SetBranchAddress(Form("%s_%s_branch",
+						   data::kSUBRUNDATA_TREE_NAME[(data::SubRunDataType_t)i].c_str(),
+						   name_ptr.first.c_str()
+						   ),
+					      &(_ptr_data_array[i][name_ptr.first])
+					      );
+	    
+	  }else{
+	    print(msg::kWARNING,__FUNCTION__,
+		  Form("TTree %s contains no subrun... removing read pointer...",tree_name.c_str()));
+	    delete name_ptr.second;
+	    name_ptr.second=nullptr;
+	  }
+	}
+      }
     }
+
+    if(_mode==kWRITE) {
+
+      _fout->cd(_name_out_tdirectory.c_str());
+
+      // For event id tree
+      _out_id_ch = new TTree(data::kEVENT_ID_TREE.c_str(),"LArLite Event ID Tree");
+      _out_id_ch->Branch( "_run_id",    &_run_id,    "_run_id/i"    );
+      _out_id_ch->Branch( "_subrun_id", &_subrun_id, "_subrun_id/i" );
+      _out_id_ch->Branch( "_event_id",  &_event_id,  "_event_id/i"  );
+
+      _run_id = _subrun_id = _event_id = 0;
+    }
+    // In BOTH mode, write all that is read in
+    else if(_mode==kBOTH) {
+	
+      _fout->cd(_name_out_tdirectory.c_str());
+
+      // For event id tree
+      _out_id_ch = new TTree(data::kEVENT_ID_TREE.c_str(),"LArLite Event ID Tree");
+      _out_id_ch->Branch( "_run_id",    &_run_id,    "_run_id/i"    );
+      _out_id_ch->Branch( "_subrun_id", &_subrun_id, "_subrun_id/i" );
+      _out_id_ch->Branch( "_event_id",  &_event_id,  "_event_id/i"  );
+
+      // For event data tree
+      for(int i=0; i<data::kDATA_TYPE_MAX; ++i) {
+	
+	for(auto& name_ptr : _in_ch[i]) {
+	  
+	  if(!_ptr_data_array[i][name_ptr.first]) continue;
+	  
+	  _fout->cd(_name_out_tdirectory.c_str());
+	  
+	  _out_ch[i][name_ptr.first]=new TTree(Form("%s_%s_tree",
+						    data::kDATA_TREE_NAME[(data::DataType_t)i].c_str(),
+						    name_ptr.first.c_str()),
+					       Form("%s Tree by %s",
+						    data::kDATA_TREE_NAME[(data::DataType_t)i].c_str(),
+						    name_ptr.first.c_str())
+					       );
+	  
+	  _out_ch[i][name_ptr.first]->SetMaxTreeSize    (1024*1024*1024);
+	  _out_ch[i][name_ptr.first]->SetMaxVirtualSize (1024*1024*1024);
+	  
+	  _out_ch[i][name_ptr.first]->Branch(Form("%s_%s_branch",
+						  data::kDATA_TREE_NAME[(data::DataType_t)i].c_str(),
+						  name_ptr.first.c_str()),
+					     _ptr_data_array[i][name_ptr.first]->GetName(),
+					     &(_ptr_data_array[i][name_ptr.first]));
+	}
+      }
+
+      for(int i=0; i<data::kRUNDATA_TYPE_MAX; ++i) {
+
+	for(auto& name_ptr : _in_rundata_ch[i]) {
+	  
+	  if(!_ptr_rundata_array[i][name_ptr.first]) continue;
+	  
+	  _fout->cd(_name_out_tdirectory.c_str());
+	  
+	  _out_rundata_ch[i][name_ptr.first]=new TTree(Form("%s_%s_tree",
+							    data::kRUNDATA_TREE_NAME[(data::RunDataType_t)i].c_str(),
+							    name_ptr.first.c_str()),
+						       Form("%s Tree by %s",
+							    data::kRUNDATA_TREE_NAME[(data::RunDataType_t)i].c_str(),
+							    name_ptr.first.c_str())
+						       );
+	  
+	  _out_rundata_ch[i][name_ptr.first]->SetMaxTreeSize    (1024*1024*1024);
+	  _out_rundata_ch[i][name_ptr.first]->SetMaxVirtualSize (1024*1024*1024);
+	  
+	  _out_rundata_ch[i][name_ptr.first]->Branch(Form("%s_%s_branch",
+							  data::kRUNDATA_TREE_NAME[i].c_str(),
+							  name_ptr.first.c_str()),
+						     _ptr_rundata_array[i][name_ptr.first]->GetName(),
+						     &(_ptr_rundata_array[i][name_ptr.first]));
+	}
+      }
+
+      for(int i=0; i<data::kSUBRUNDATA_TYPE_MAX; ++i) {
+	
+	for(auto& name_ptr : _in_subrundata_ch[i]) {
+	  
+	  if(!_ptr_subrundata_array[i][name_ptr.first]) continue;
+	  
+	  _fout->cd(_name_out_tdirectory.c_str());
+	  
+	  _out_subrundata_ch[i][name_ptr.first]=new TTree(Form("%s_%s_tree",
+						    data::kSUBRUNDATA_TREE_NAME[(data::SubRunDataType_t)i].c_str(),
+						    name_ptr.first.c_str()),
+					       Form("%s Tree by %s",
+						    data::kSUBRUNDATA_TREE_NAME[(data::SubRunDataType_t)i].c_str(),
+						    name_ptr.first.c_str())
+					       );
+	  
+	  _out_subrundata_ch[i][name_ptr.first]->SetMaxTreeSize    (1024*1024*1024);
+	  _out_subrundata_ch[i][name_ptr.first]->SetMaxVirtualSize (1024*1024*1024);
+	  
+	  _out_subrundata_ch[i][name_ptr.first]->Branch(Form("%s_%s_branch",
+							     data::kSUBRUNDATA_TREE_NAME[(data::SubRunDataType_t)i].c_str(),
+							     name_ptr.first.c_str()),
+							_ptr_subrundata_array[i][name_ptr.first]->GetName(),
+							&(_ptr_subrundata_array[i][name_ptr.first]));
+	}
+      }
+    }
+      
+    _nevents_written=0;
+    _nevents_read=0;
+    _index=0;
     
     if( _mode!=kWRITE && _nevents==0) {
       Message::send(msg::kERROR,__FUNCTION__,"Did not find any relevant data tree!");
@@ -489,7 +954,7 @@ namespace larlite {
   
     size_t min_nevents=_nevents;
     
-    for(size_t i=0; i<data::kDATA_TYPE_MAX; ++i) {
+    for(int i=0; i<data::kDATA_TYPE_MAX; ++i) {
 
       for(auto const& name_ctr : nevents_array[i]) {
 
@@ -534,7 +999,7 @@ namespace larlite {
     if(get_verbosity() <= msg::kINFO)
 
       Message::send(msg::kINFO,__FUNCTION__,
-		    Form("Requested a new data pointer of type %s (=%d) by %s",
+		    Form("Requested a new event-data pointer of type %s (=%d) by %s",
 			 data::kDATA_TREE_NAME[type].c_str(),
 			 type,
 			 name.c_str())
@@ -549,67 +1014,64 @@ namespace larlite {
     
     switch(type){
     case data::kTrigger:
-      _ptr_data_array[type][name]=(event_base*)(new trigger(name));
-      break;
-    case data::kPOTSummary:
-      _ptr_data_array[type][name]=(event_base*)(new potsummary(name));
+      _ptr_data_array[type][name]=new trigger(name);
       break;
     case data::kGTruth:
-      _ptr_data_array[type][name]=(event_base*)(new event_gtruth(name));
+      _ptr_data_array[type][name]=new event_gtruth(name);
       break;
     case data::kEvent:
-      _ptr_data_array[type][name]=(event_base*)(new event_base(type,name));
+      _ptr_data_array[type][name]=new event_base(type,name);
       break;
     case data::kRawDigit:
-      _ptr_data_array[type][name]=(event_base*)(new event_rawdigit(name));
+      _ptr_data_array[type][name]=new event_rawdigit(name);
       break;
     case data::kSimChannel:
-      _ptr_data_array[type][name]=(event_base*)(new event_simch(name));
+      _ptr_data_array[type][name]=new event_simch(name);
       break;
     case data::kMCShower:
-      _ptr_data_array[type][name]=(event_base*)(new event_mcshower(name));
+      _ptr_data_array[type][name]=new event_mcshower(name);
       break;
     case data::kTrack:
-      _ptr_data_array[type][name]=(event_base*)(new event_track(name));
+      _ptr_data_array[type][name]=new event_track(name);
       break;
     case data::kMCTruth:
-      _ptr_data_array[type][name]=(event_base*)(new event_mctruth(name));
+      _ptr_data_array[type][name]=new event_mctruth(name);
       break;
     case data::kMCParticle:
-      _ptr_data_array[type][name]=(event_base*)(new event_mcpart(name));
+      _ptr_data_array[type][name]=new event_mcpart(name);
       break;
     case data::kMCFlux:
-      _ptr_data_array[type][name]=(event_base*)(new event_mcflux(name));
+      _ptr_data_array[type][name]=new event_mcflux(name);
       break;
     case data::kSpacePoint:
-      _ptr_data_array[type][name]=(event_base*)(new event_spacepoint(name));
+      _ptr_data_array[type][name]=new event_spacepoint(name);
       break;
     case data::kUserInfo:
-      _ptr_data_array[type][name]=(event_base*)(new event_user(name));
+      _ptr_data_array[type][name]=new event_user(name);
       break;
     case data::kWire:
-      _ptr_data_array[type][name]=(event_base*)(new event_wire(name));
+      _ptr_data_array[type][name]=new event_wire(name);
       break;
     case data::kHit:
-      _ptr_data_array[type][name]=(event_base*)(new event_hit(name));
+      _ptr_data_array[type][name]=new event_hit(name);
       break;
     case data::kCluster:
-      _ptr_data_array[type][name]=(event_base*)(new event_cluster(name));
+      _ptr_data_array[type][name]=new event_cluster(name);
       break;
     case data::kShower:
-      _ptr_data_array[type][name]=(event_base*)(new event_shower(name));
+      _ptr_data_array[type][name]=new event_shower(name);
       break;
     case data::kVertex:
-      _ptr_data_array[type][name]=(event_base*)(new event_vertex(name));
+      _ptr_data_array[type][name]=new event_vertex(name);
       break;
     case data::kEndPoint2D:
-      _ptr_data_array[type][name]=(event_base*)(new event_endpoint2d(name));
+      _ptr_data_array[type][name]=new event_endpoint2d(name);
       break;
     case data::kSeed:
-      _ptr_data_array[type][name]=(event_base*)(new event_seed(name));
+      _ptr_data_array[type][name]=new event_seed(name);
       break;
     case data::kCalorimetry:
-      _ptr_data_array[type][name]=(event_base*)(new event_calorimetry(name));
+      _ptr_data_array[type][name]=new event_calorimetry(name);
       break;
     case data::kMCNeutrino:
       print(msg::kERROR,__FUNCTION__,Form("MCNeutrino is stored within MCTruth! Retrieve MCTruth instead."));
@@ -618,31 +1080,34 @@ namespace larlite {
       print(msg::kERROR,__FUNCTION__,Form("MCTrajectory is stored within MCParticle! Retrieve MCParticle instead."));
       break;
     case data::kCosmicTag:
-      _ptr_data_array[type][name]=(event_base*)(new event_cosmictag(name));
+      _ptr_data_array[type][name]=new event_cosmictag(name);
       break;
     case data::kOpFlash:
-      _ptr_data_array[type][name]=(event_base*)(new event_opflash(name));
+      _ptr_data_array[type][name]=new event_opflash(name);
       break;
     case data::kOpHit:
-      _ptr_data_array[type][name]=(event_base*)(new event_ophit(name));
+      _ptr_data_array[type][name]=new event_ophit(name);
       break;
     case data::kPFParticle:
-      _ptr_data_array[type][name]=(event_base*)(new event_pfpart(name));
+      _ptr_data_array[type][name]=new event_pfpart(name);
       break;
     case data::kParticleID:
-      _ptr_data_array[type][name]=(event_base*)(new event_partid(name));
+      _ptr_data_array[type][name]=new event_partid(name);
       break;
     case data::kMCTrack:
-      _ptr_data_array[type][name]=(event_mctrack*)(new event_mctrack(name));
+      _ptr_data_array[type][name]=new event_mctrack(name);
       break;
     case data::kMCTree:
-      _ptr_data_array[type][name]=(event_mctree*)(new event_mctree(name));
+      _ptr_data_array[type][name]=new event_mctree(name);
       break;
     case data::kMinos:
-      _ptr_data_array[type][name]=(event_minos*)(new event_minos(name));
+      _ptr_data_array[type][name]=new event_minos(name);
+      break;
+    case data::kAssociation:
+      _ptr_data_array[type][name]=new event_ass(name);
       break;
     default:
-      print(msg::kERROR,__FUNCTION__,Form("Data identifier not supported: %d",(int)type));
+      print(msg::kERROR,__FUNCTION__,Form("Event-data identifier not supported: %d",(int)type));
       break;
     }
     
@@ -654,6 +1119,93 @@ namespace larlite {
     auto name_ptr = _ptr_data_array[type].find(name);
 
     if(name_ptr == _ptr_data_array[type].end()) return;
+
+    if(!((*name_ptr).second)) return;
+    
+    delete ((*name_ptr).second);
+
+    (*name_ptr).second = nullptr;
+
+    return;
+  }
+
+  void storage_manager::create_rundata_ptr(data::RunDataType_t const type, std::string const& name){
+
+    if(get_verbosity() <= msg::kINFO)
+
+      Message::send(msg::kINFO,__FUNCTION__,
+		    Form("Requested a new run-data pointer of type %s (=%d) by %s",
+			 data::kRUNDATA_TREE_NAME[type].c_str(),
+			 type,
+			 name.c_str())
+		    );
+
+    auto name_ptr = _ptr_rundata_array[type].find(name);
+    if(name_ptr == _ptr_rundata_array[type].end()) {
+      _ptr_rundata_array[type][name]=nullptr;
+      name_ptr = _ptr_rundata_array[type].find(name);
+    }
+    if((*name_ptr).second) return;
+    
+    switch(type){
+    default:
+      print(msg::kERROR,__FUNCTION__,Form("Run-data identifier not supported: %d",(int)type));
+      break;
+    }
+    
+    return;
+  }
+  
+  void storage_manager::delete_rundata_ptr(data::RunDataType_t const type,std::string const& name){
+    
+    auto name_ptr = _ptr_rundata_array[type].find(name);
+
+    if(name_ptr == _ptr_rundata_array[type].end()) return;
+
+    if(!((*name_ptr).second)) return;
+    
+    delete ((*name_ptr).second);
+
+    (*name_ptr).second = nullptr;
+
+    return;
+  }
+
+  void storage_manager::create_subrundata_ptr(data::SubRunDataType_t const type, std::string const& name){
+
+    if(get_verbosity() <= msg::kINFO)
+
+      Message::send(msg::kINFO,__FUNCTION__,
+		    Form("Requested a new subrun-data pointer of type %s (=%d) by %s",
+			 data::kSUBRUNDATA_TREE_NAME[type].c_str(),
+			 type,
+			 name.c_str())
+		    );
+
+    auto name_ptr = _ptr_subrundata_array[type].find(name);
+    if(name_ptr == _ptr_subrundata_array[type].end()) {
+      _ptr_subrundata_array[type][name]=nullptr;
+      name_ptr = _ptr_subrundata_array[type].find(name);
+    }
+    if((*name_ptr).second) return;
+    
+    switch(type){
+    case data::kPOTSummary:
+      _ptr_subrundata_array[type][name]=new potsummary(name);
+      break;
+    default:
+      print(msg::kERROR,__FUNCTION__,Form("SubRun-data identifier not supported: %d",(int)type));
+      break;
+    }
+    
+    return;
+  }
+  
+  void storage_manager::delete_subrundata_ptr(data::SubRunDataType_t const type,std::string const& name){
+    
+    auto name_ptr = _ptr_subrundata_array[type].find(name);
+
+    if(name_ptr == _ptr_subrundata_array[type].end()) return;
 
     if(!((*name_ptr).second)) return;
     
@@ -682,10 +1234,17 @@ namespace larlite {
       break;
     case kOPERATING:
       if(_mode!=kREAD){
-	
-	//_fout->cd();
-	
-	for(size_t i=0; i<data::kDATA_TYPE_MAX; i++) {
+
+	if(_out_id_ch) {
+	  if(_verbosity[msg::kINFO])
+	    Message::send(msg::kINFO,__FUNCTION__,Form("Writing TTree: %s",data::kEVENT_ID_TREE.c_str()));
+						       
+	  _fout = _out_id_ch->GetCurrentFile();
+	  _fout->cd(_name_out_tdirectory.c_str());
+	  _out_id_ch->Write();
+	}
+
+	for(int i=0; i<data::kDATA_TYPE_MAX; i++) {
 	  
 	  if(!_out_ch[i].size()) continue;
 
@@ -695,6 +1254,62 @@ namespace larlite {
 
 	    if(_use_write_bool && 
 	       _write_data_array[i].find(name_ptr.first) == _write_data_array[i].end())
+	      continue;
+
+	    if(_verbosity[msg::kINFO])
+	    
+	      Message::send(msg::kINFO,__FUNCTION__,Form("Writing TTree: %s",
+							 name_ptr.second->GetName()));
+	    
+	    _fout = name_ptr.second->GetCurrentFile();
+	    _fout->cd(_name_out_tdirectory.c_str());
+	    name_ptr.second->Write();
+	  
+	    Message::send(msg::kNORMAL,__FUNCTION__,
+			  Form("TTree \"%s\" written with %lld events...",
+			       name_ptr.second->GetName(),
+			       name_ptr.second->GetEntries())
+			  );
+	  }
+	}
+	for(int i=0; i<data::kRUNDATA_TYPE_MAX; i++) {
+	  
+	  if(!_out_rundata_ch[i].size()) continue;
+
+	  if(_use_write_bool && !_write_rundata_array[i].size()) continue;
+
+	  for(auto& name_ptr : _out_rundata_ch[i]) {
+
+	    if(_use_write_bool && 
+	       _write_rundata_array[i].find(name_ptr.first) == _write_rundata_array[i].end())
+	      continue;
+	    
+	    if(_verbosity[msg::kINFO])
+	    
+	      Message::send(msg::kINFO,__FUNCTION__,Form("Writing TTree: %s",
+							 name_ptr.second->GetName()));
+	    
+	    _fout = name_ptr.second->GetCurrentFile();
+	    _fout->cd(_name_out_tdirectory.c_str());
+	    name_ptr.second->Write();
+	  
+	    Message::send(msg::kNORMAL,__FUNCTION__,
+			  Form("TTree \"%s\" written with %lld events...",
+			       name_ptr.second->GetName(),
+			       name_ptr.second->GetEntries())
+			  );
+	  }
+	}
+	for(int i=0; i<data::kSUBRUNDATA_TYPE_MAX; i++) {
+	  
+	  if(!_out_subrundata_ch[i].size()) continue;
+
+	  if(_use_write_bool && !_write_subrundata_array[i].size()) continue;
+
+	  for(auto& name_ptr : _out_subrundata_ch[i]) {
+
+	    if(_use_write_bool && 
+	       _write_subrundata_array[i].find(name_ptr.first) == _write_subrundata_array[i].end())
 	      continue;
 
 	    if(_verbosity[msg::kINFO])
@@ -727,13 +1342,28 @@ namespace larlite {
       }
       _fout=0;
       
-      for(size_t i=0; i<data::kDATA_TYPE_MAX; ++i) {
-	
+      for(int i=0; i<data::kDATA_TYPE_MAX; ++i) {
 	if(_in_ch[i].size())  { _in_ch[i].clear(); }
 	if(_out_ch[i].size()) { _out_ch[i].clear(); }
 	for(auto const& name_ptr : _ptr_data_array[i])
 	  delete_data_ptr((data::DataType_t)i, name_ptr.first);
 	_ptr_data_array[i].clear();
+      }
+
+      for(int i=0; i<data::kRUNDATA_TYPE_MAX; ++i) {
+	if(_in_rundata_ch[i].size())  { _in_rundata_ch[i].clear(); }
+	if(_out_rundata_ch[i].size()) { _out_rundata_ch[i].clear(); }
+	for(auto const& name_ptr : _ptr_rundata_array[i])
+	  delete_rundata_ptr((data::RunDataType_t)i, name_ptr.first);
+	_ptr_rundata_array[i].clear();
+      }
+
+      for(int i=0; i<data::kSUBRUNDATA_TYPE_MAX; ++i) {
+	if(_in_subrundata_ch[i].size())  { _in_subrundata_ch[i].clear(); }
+	if(_out_subrundata_ch[i].size()) { _out_subrundata_ch[i].clear(); }
+	for(auto const& name_ptr : _ptr_subrundata_array[i])
+	  delete_subrundata_ptr((data::SubRunDataType_t)i, name_ptr.first);
+	_ptr_subrundata_array[i].clear();
       }
       
     }
@@ -809,12 +1439,17 @@ namespace larlite {
 
       return false;
 
-    _current_event_id = data::kINVALID_INT;
+    if(_mode == kREAD) {
+      _last_run_id    = _run_id;
+      _last_subrun_id = _subrun_id;
+    }
+
+    if(_in_id_ch) _in_id_ch->GetEntry(_index);
 
     // If this is kBOTH mode, then read all relevant data products & check alignment here
     if( _mode == kBOTH ) {
 
-      for(size_t i=0; i<data::kDATA_TYPE_MAX; ++i) { 
+      for(int i=0; i<data::kDATA_TYPE_MAX; ++i) { 
 
 	if(_use_read_bool && !(_read_data_array[i].size()))
 	  continue;
@@ -830,16 +1465,20 @@ namespace larlite {
 
 	    if( _check_alignment ) {
 	      
-	      if(_current_event_id == data::kINVALID_INT) 
-		
-		_current_event_id = _ptr_data_array[i][name_ptr.first]->event_id();
+	      if(_event_id == data::kINVALID_UINT) {
+		_event_id  = _ptr_data_array[i][name_ptr.first]->event_id();
+		_run_id    = _ptr_data_array[i][name_ptr.first]->run();
+		_subrun_id = _ptr_data_array[i][name_ptr.first]->subrun();
+	      }
 	      
-	      else if(_current_event_id != (int)(_ptr_data_array[i][name_ptr.first]->event_id())) {
+	      else if(_event_id != _ptr_data_array[i][name_ptr.first]->event_id()) {
 		
 		print(msg::kERROR,__FUNCTION__,
-		      Form("Detected event-alignment mismatch! (%d != %d)",
-			   _current_event_id,
-			   _ptr_data_array[i][name_ptr.first]->event_id()));
+		      Form("Detected event-alignment mismatch! %d (ref) != %d (%s by %s)",
+			   _event_id,
+			   _ptr_data_array[i][name_ptr.first]->event_id(),
+			   data::kDATA_TREE_NAME[i].c_str(),
+			   name_ptr.first.c_str()));
 		
 		return false;
 		
@@ -848,23 +1487,105 @@ namespace larlite {
 	  } // ptr exists
 	} // loop over all trees of type i
       } // loop over all types
-    }else if(_mode == kREAD) {
+
+      for(int i=0; i<data::kRUNDATA_TYPE_MAX; ++i) { 
+
+	if(_use_read_bool && !(_read_rundata_array[i].size()))
+	  continue;
+
+	for(auto& name_ptr : _in_rundata_ch[i]) {
       
-      // if data::kEvent is present, use that as absolute check
-      static bool check_main_exist = false;
-      static bool main_exist = false;
-      if(!check_main_exist) {
-	check_main_exist = true;
-	main_exist = ( _in_ch[(size_t)(data::kEvent)].find("main") != _in_ch[(size_t)(data::kEvent)].end() &&
-		       _in_ch[(size_t)(data::kEvent)]["main"] );
-      }
-      if(main_exist) {
-	  
-	_in_ch[(size_t)(data::kEvent)]["main"]->GetEntry(_index);
-	
-	_current_event_id = _ptr_data_array[data::kEvent]["main"]->event_id();
-      }
+	  if((name_ptr.second)) {
+
+	    if(_use_read_bool && _read_rundata_array[i].find(name_ptr.first) == _read_rundata_array[i].end())
+	      continue;
+
+	    auto data_ptr_iter = _ptr_rundata_array[i].find(name_ptr.first);
+
+	    if(_run_id == (*data_ptr_iter).second->run()) continue;
+
+	    while( _run_id != (*data_ptr_iter).second->run() && 
+		   name_ptr.second->GetReadEntry()<name_ptr.second->GetEntries()) {
+
+	      name_ptr.second->GetEntry(name_ptr.second->GetReadEntry()+1);
+
+	      if(_check_alignment && _run_id != (*data_ptr_iter).second->run()) {
+		throw DataFormatException(Form("Detected run-id mis-alignment! %d (ref) != %d (%s by %s) ",
+					       _run_id,
+					       (*data_ptr_iter).second->run(),
+					       data::kRUNDATA_TREE_NAME[i].c_str(),
+					       name_ptr.first.c_str())
+					  );
+		return false;
+	      }
+	    }
+
+	    if(_run_id != (*data_ptr_iter).second->run()) {
+	      throw DataFormatException(Form("Could not find the run-id %d for %s by %s ",
+					     _run_id,
+					     data::kRUNDATA_TREE_NAME[i].c_str(),
+					     name_ptr.first.c_str())
+					);
+	      return false;
+	    } // end checking validity
+	  } // ptr exists
+	} // loop over all trees of type i
+      } // loop over all types
+
+      for(int i=0; i<data::kSUBRUNDATA_TYPE_MAX; ++i) { 
+
+	if(_use_read_bool && !(_read_subrundata_array[i].size()))
+	  continue;
+
+	for(auto& name_ptr : _in_subrundata_ch[i]) {
+      
+	  if((name_ptr.second)) {
+
+	    if(_use_read_bool && _read_subrundata_array[i].find(name_ptr.first) == _read_subrundata_array[i].end())
+	      continue;
+
+	    auto data_ptr_iter = _ptr_subrundata_array[i].find(name_ptr.first);
+
+	    if(_run_id == (*data_ptr_iter).second->run() &&
+	       _subrun_id == (*data_ptr_iter).second->subrun()) continue;
+
+	    while( (_run_id != (*data_ptr_iter).second->run() ||
+		    _subrun_id != (*data_ptr_iter).second->subrun()) &&
+		   name_ptr.second->GetReadEntry()<name_ptr.second->GetEntries()) {
+
+	      name_ptr.second->GetEntry(name_ptr.second->GetReadEntry()+1);
+	      
+	      if(_check_alignment && 
+		 (_run_id != (*data_ptr_iter).second->run() ||
+		  _subrun_id != (*data_ptr_iter).second->subrun()) ) {
+		throw DataFormatException(Form("Detected run/subrun-id mis-alignment! %d:%d (ref) != %d:%d (%s by %s) ",
+					       _run_id,
+					       _subrun_id,
+					       (*data_ptr_iter).second->run(),
+					       (*data_ptr_iter).second->subrun(),
+					       data::kRUNDATA_TREE_NAME[i].c_str(),
+					       name_ptr.first.c_str())
+					  );
+		return false;
+	      }
+	    }
+
+	    if(_run_id != (*data_ptr_iter).second->run() ||
+	       _subrun_id != (*data_ptr_iter).second->subrun()) {
+	      throw DataFormatException(Form("Could not find the run/subrun-id %d:%d for %s by %s ",
+					     _run_id,
+					     _subrun_id,
+					     data::kRUNDATA_TREE_NAME[i].c_str(),
+					     name_ptr.first.c_str())
+					);
+	      return false;
+	    } // end checking validity
+	  } // ptr exists
+	} // loop over all trees of type i
+      } // loop over all types
+
     }
+    
     _index++;
     _nevents_read++;
     return true;
@@ -872,14 +1593,16 @@ namespace larlite {
   
   bool storage_manager::write_event(){
     
-    for(size_t i=0; i<data::kDATA_TYPE_MAX; ++i) {
+    if(_out_id_ch) _out_id_ch->Write();
+
+    for(int i=0; i<data::kDATA_TYPE_MAX; ++i) {
 
       if(_use_write_bool && !(_write_data_array[i].size())) continue;
 
       for(auto& name_ptr : _out_ch[i]) {
       
 	if(!(name_ptr.second)) continue;
-
+	
 	if( !_use_write_bool ||
 	    _write_data_array[i].find((name_ptr.first)) != _write_data_array[i].end())
 	  name_ptr.second->Fill();
@@ -888,9 +1611,52 @@ namespace larlite {
 	
       }
     }
-    
+    if(_run_id != _last_run_id || _subrun_id != _last_subrun_id) {
+
+      for(int i=0; i<data::kSUBRUNDATA_TYPE_MAX; ++i) {
+	
+	if(_use_write_bool && !(_write_subrundata_array[i].size())) continue;
+	
+	for(auto& name_ptr : _out_subrundata_ch[i]) {
+	  
+	  if(!(name_ptr.second)) continue;
+	  
+	  if( !_use_write_bool ||
+	      _write_subrundata_array[i].find((name_ptr.first)) != _write_subrundata_array[i].end())
+	    name_ptr.second->Fill();
+	  
+	  _ptr_subrundata_array[i][name_ptr.first]->clear_data();
+	  
+	}
+      }
+
+      if(_run_id != _last_run_id) {
+	
+	for(int i=0; i<data::kRUNDATA_TYPE_MAX; ++i) {
+	  
+	  if(_use_write_bool && !(_write_rundata_array[i].size())) continue;
+	  
+	  for(auto& name_ptr : _out_rundata_ch[i]) {
+	    
+	    if(!(name_ptr.second)) continue;
+	    
+	    if( !_use_write_bool ||
+		_write_rundata_array[i].find((name_ptr.first)) != _write_rundata_array[i].end())
+	      name_ptr.second->Fill();
+	    
+	    _ptr_rundata_array[i][name_ptr.first]->clear_data();
+	    
+	  }
+	}
+      }
+      
+      _last_run_id    = _run_id;
+      _last_subrun_id = _subrun_id;
+    }
+
     if(_mode==kWRITE)
       _index++;
+
     _nevents_written++;
     //_event_wf->clear_data();
     return true;
