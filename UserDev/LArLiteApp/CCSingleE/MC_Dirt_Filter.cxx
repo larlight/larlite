@@ -34,11 +34,11 @@ namespace larlite {
     
     bool ret = true;
     if(TPC.Contain(ev_mctruth->at(0).GetNeutrino().Nu().Trajectory().back().Position())){
-      std::cout<<"Inside TPC"<<std::endl;
+      //std::cout<<"Inside TPC"<<std::endl;
       ret = false;
     }
     else{ 
-      std::cout<<"Outside TPC"<<std::endl;
+      //std::cout<<"Outside TPC"<<std::endl;
       ret = true;
     }
 
