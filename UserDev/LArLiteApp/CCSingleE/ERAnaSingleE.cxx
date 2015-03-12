@@ -171,6 +171,8 @@ namespace ertool {
     // If exactly one single electron was found in this event:
     if ( _n_singleReco == 1 ){
       Particle neutrino = ps[0];
+      if(abs(neutrino.PdgCode()) != 12  && abs(neutrino.PdgCode()) != 14)
+	std::cout<<"wtf neutrino doesn't have a neutrino pdg code"<<std::endl;
       _e_nuReco = neutrino.Energy();
       _x_nuReco = neutrino.Vertex()[0];
       _y_nuReco = neutrino.Vertex()[1];
@@ -179,25 +181,30 @@ namespace ertool {
       _py_nuReco = neutrino.Momentum()[1];
       _pz_nuReco = neutrino.Momentum()[2];
       _n_tracksIntReco = ps[0].Daughters().size()-1;
-      Particle se = ps[0].Daughters()[0];
-      _e_lepReco = se.Energy();
-      //length of shower (geoalgo cone) associated with the electron
-      _showerlength_lepReco = data.AllShower().at(se.RecoObjID()).Length(); //kaleko
-      _x_lepReco = se.Vertex()[0];
-      _y_lepReco = se.Vertex()[1];
-      _z_lepReco = se.Vertex()[2];
-      _px_lepReco = se.Momentum()[0];
-      _py_lepReco = se.Momentum()[1];
-      _pz_lepReco = se.Momentum()[2];
-      _theta_lepReco = (180./3.14) * acos( _pz_lepReco / sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco + _pz_lepReco*_pz_lepReco ) );
-      _phi_lepReco   = (180./3.14) * asin( _py_lepReco / sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco ) );
-      _lep_vtxdist = sqrt( (_x_lep-_x_lepReco)*(_x_lep-_x_lepReco) +
-			   (_y_lep-_y_lepReco)*(_y_lep-_y_lepReco) + 
-			   (_z_lep-_z_lepReco)*(_z_lep-_z_lepReco) );
-      _lep_dot = ( ( _px_lep*_px_lepReco + _py_lep*_py_lepReco + _pz_lep*_pz_lepReco ) / 
-		   ( sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco + _pz_lepReco*_pz_lepReco ) * 
-		     sqrt( _px_lep*_px_lep + _py_lep*_py_lep + _pz_lep*_pz_lep ) ) );
-	
+
+      //find the neutrino daughter that is a lepton
+      for (auto const& daught : ps[0].Daughters()){
+	if(abs(daught.PdgCode()) == 11 || abs(daught.PdgCode()) == 13){
+	  _e_lepReco = daught.Energy();
+
+	  //length of shower (geoalgo cone) associated with the electron
+	  _showerlength_lepReco = data.AllShower().at(daught.RecoObjID()).Length(); //kaleko
+	  _x_lepReco = daught.Vertex()[0];
+	  _y_lepReco = daught.Vertex()[1];
+	  _z_lepReco = daught.Vertex()[2];
+	  _px_lepReco = daught.Momentum()[0];
+	  _py_lepReco = daught.Momentum()[1];
+	  _pz_lepReco = daught.Momentum()[2];
+	  _theta_lepReco = (180./3.14) * acos( _pz_lepReco / sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco + _pz_lepReco*_pz_lepReco ) );
+	  _phi_lepReco   = (180./3.14) * asin( _py_lepReco / sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco ) );
+	  _lep_vtxdist = sqrt( (_x_lep-_x_lepReco)*(_x_lep-_x_lepReco) +
+			       (_y_lep-_y_lepReco)*(_y_lep-_y_lepReco) + 
+			       (_z_lep-_z_lepReco)*(_z_lep-_z_lepReco) );
+	  _lep_dot = ( ( _px_lep*_px_lepReco + _py_lep*_py_lepReco + _pz_lep*_pz_lepReco ) / 
+		       ( sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco + _pz_lepReco*_pz_lepReco ) * 
+			 sqrt( _px_lep*_px_lep + _py_lep*_py_lep + _pz_lep*_pz_lep ) ) );
+	}
+      }
       _misID = 0;
       _singleE_ctr += 1;
     }

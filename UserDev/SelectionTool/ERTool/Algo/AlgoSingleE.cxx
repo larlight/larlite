@@ -251,9 +251,13 @@ namespace ertool {
 	    auto const& sibTrack(data.Track(sibling));
 	    Particle sib = _findRel.GetPDG(sibTrack);
 	    sib.Vertex(sibTrack[0]);
-	    double Tmom = sibTrack._energy - sib.Mass();
-	    if (Tmom < 0) { Tmom = 1.; }
-	    sib.Momentum((sibTrack[1]-sibTrack[0])*Tmom);
+	    //sib.Mass() is in GEV, sibTrack._energy is in MEV
+	    //I think sibTrack._energy already has mass taken out of it.
+	    double Tmom = sibTrack._energy;
+	    if (Tmom < 0) { Tmom = 0.; }
+	    geoalgo::Vector_t sibUnitDir = (sibTrack[1]-sibTrack[0]);
+	    sibUnitDir /= sibUnitDir.Length();
+	    sib.Momentum(sibUnitDir*Tmom);
 	    neutrinoMomentum += sib.Momentum();
 	    sib.RecoObjInfo(sibling,Particle::RecoObjType_t::kTrack);
 	    neutrino.AddDaughter(sib);
