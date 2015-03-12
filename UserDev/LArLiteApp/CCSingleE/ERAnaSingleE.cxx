@@ -69,6 +69,9 @@ namespace ertool {
     _singleE_ctr = 0;
 
     _debug = false;
+
+    _h_e_nu_correlation = new TH2F("h_eNu_eNuReco","True Neutrino Energy vs. Reconstructed Neutrino Energy;True Neutrino Energy [MEV];Reconstructed Neutrino Energy [MEV]",100,0,3000,100,0,3000);
+
   }
 
   void ERAnaSingleE::Reset()
@@ -209,6 +212,8 @@ namespace ertool {
       _singleE_ctr += 1;
     }
 
+    _h_e_nu_correlation->Fill(_e_nu,_e_nuReco);
+
     _result_tree->Fill();
 
     if (_debug){
@@ -241,6 +246,7 @@ namespace ertool {
     if (fout){
       fout->cd();
       _result_tree->Write();
+      _h_e_nu_correlation->Write();
     }
 
     return;
