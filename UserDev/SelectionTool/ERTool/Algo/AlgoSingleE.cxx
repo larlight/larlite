@@ -12,6 +12,7 @@ namespace ertool {
   
   AlgoSingleE::AlgoSingleE() : AlgoBase()
 			     , _alg_tree(nullptr)
+			     , fTPC(10.,-100.,10.,240.,100.,1050.)
   {
 
     _name       = "AlgoSingleE";
@@ -264,7 +265,11 @@ namespace ertool {
 	  }// for all sibling tracks
 	}// if hassister
 	neutrino.Momentum(neutrinoMomentum);
-	res.push_back(neutrino);
+
+	//Only store the neutrino if lepton is in active volume!
+	if(fTPC.Contain(neutrino.Vertex())){
+	  res.push_back(neutrino);
+	}
       }
       else
 	if (_verbose) { std::cout << "Shower is not single." << std::endl; }

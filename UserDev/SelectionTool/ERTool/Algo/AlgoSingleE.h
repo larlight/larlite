@@ -20,6 +20,7 @@
 #include "ERTool/Algo/AlgoFindRelationship.h"
 #include "ERTool/Base/AlgoBase.h"
 #include "GeoAlgo/GeoAlgo.h"
+#include "GeoAlgo/GeoAABox.h"
 #include <algorithm> // for std::find
 #include <utility>
 
@@ -70,6 +71,8 @@ namespace ertool {
 
 
   private:
+
+    ::geoalgo::AABox fTPC;
 
     /// clear tree
     void ClearTree();
