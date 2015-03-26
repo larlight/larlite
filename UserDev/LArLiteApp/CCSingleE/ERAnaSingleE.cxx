@@ -191,7 +191,7 @@ namespace ertool {
 	  _e_lepReco = daught.Energy();
 
 	  //length of shower (geoalgo cone) associated with the electron
-	  _showerlength_lepReco = data.AllShower().at(daught.RecoObjID()).Length(); //kaleko
+	  //_showerlength_lepReco = data.AllShower().at(daught.RecoObjID()).Length(); //kaleko
 	  _x_lepReco = daught.Vertex()[0];
 	  _y_lepReco = daught.Vertex()[1];
 	  _z_lepReco = daught.Vertex()[2];
