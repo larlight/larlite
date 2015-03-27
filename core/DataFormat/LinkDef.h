@@ -41,6 +41,7 @@
 #pragma link C++ class larlite::DataFormatException+;
 
 #pragma link C++ class larlite::data_base+;
+#pragma link C++ class larlite::output_base+;
 #pragma link C++ class larlite::event_base+;
 //#pragma link C++ class larlite::association+;
 

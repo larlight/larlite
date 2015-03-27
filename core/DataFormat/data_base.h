@@ -91,6 +91,8 @@ namespace larlite{
   private:
 
     std::string _name; ///< Producer's name
+
+    ClassDef(output_base,1)
   };
 
   /**

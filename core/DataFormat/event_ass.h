@@ -24,10 +24,10 @@ namespace larlite{
      \class event_ass
      A base coass for event-wise data holder class
   */
-  class event_ass : public event_base
-  {
-  private:
+  class event_ass : public event_base {
 
+  private:
+    
     std::map<larlite::product_id,std::map<larlite::product_id,size_t> > _ass_map_key;
     std::vector<larlite::AssSet_t> _ass_data;
 

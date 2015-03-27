@@ -140,7 +140,7 @@ namespace larlite{
       "potsummary"
     };
 
-    const std::string kEVENT_ID_TREE = "larlite_id_tree";
+    static const std::string kEVENT_ID_TREE("larlite_id_tree");
   }
   
 }

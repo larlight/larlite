@@ -41,7 +41,7 @@ namespace larlite{
     auto& map_key_b = _ass_map_key[id_b];
     auto iter_b = map_key_b.find(id_b);
     if(iter_b == map_key_b.end()) {
-      iter_b = map_key_b.insert(std::make_pair(id_b,_ass_data.size())).first;
+      iter_b = map_key_b.insert(std::make_pair(id_a,_ass_data.size())).first;
       _ass_data.push_back(larlite::AssSet_t());
     }
     auto& ass_b = _ass_data[(*iter_b).second];

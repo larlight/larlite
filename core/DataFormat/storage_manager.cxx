@@ -40,6 +40,8 @@ namespace larlite {
   storage_manager::storage_manager(storage_manager::IOMode_t mode)
     : larlite_base()
     , _ptr_data_array (data::kDATA_TYPE_MAX,std::map<std::string,larlite::event_base*>())
+    , _ptr_rundata_array (data::kRUNDATA_TYPE_MAX,std::map<std::string,larlite::run_base*>())
+    , _ptr_subrundata_array (data::kSUBRUNDATA_TYPE_MAX,std::map<std::string,larlite::subrun_base*>())
     , _in_id_ch  (nullptr)
     , _out_id_ch (nullptr)
     , _in_ch  (data::kDATA_TYPE_MAX,std::map<std::string,TChain*>())
@@ -1471,7 +1473,9 @@ namespace larlite {
 		_subrun_id = _ptr_data_array[i][name_ptr.first]->subrun();
 	      }
 	      
-	      else if(_event_id != _ptr_data_array[i][name_ptr.first]->event_id()) {
+	      else if(_event_id  != _ptr_data_array[i][name_ptr.first]->event_id() ||
+		      _run_id    != _ptr_data_array[i][name_ptr.first]->run()   ||
+		      _subrun_id != _ptr_data_array[i][name_ptr.first]->subrun() ) {
 		
 		print(msg::kERROR,__FUNCTION__,
 		      Form("Detected event-alignment mismatch! %d (ref) != %d (%s by %s)",
@@ -1593,7 +1597,7 @@ namespace larlite {
   
   bool storage_manager::write_event(){
     
-    if(_out_id_ch) _out_id_ch->Write();
+    if(_out_id_ch) _out_id_ch->Fill();
 
     for(int i=0; i<data::kDATA_TYPE_MAX; ++i) {
 
@@ -1608,7 +1612,9 @@ namespace larlite {
 	  name_ptr.second->Fill();
 	
 	_ptr_data_array[i][name_ptr.first]->clear_data();
-	
+	_ptr_data_array[i][name_ptr.first]->set_run(_run_id);
+	_ptr_data_array[i][name_ptr.first]->set_subrun(_subrun_id);
+	_ptr_data_array[i][name_ptr.first]->set_event_id(_event_id);
       }
     }
     if(_run_id != _last_run_id || _subrun_id != _last_subrun_id) {
@@ -1626,7 +1632,8 @@ namespace larlite {
 	    name_ptr.second->Fill();
 	  
 	  _ptr_subrundata_array[i][name_ptr.first]->clear_data();
-	  
+	  _ptr_subrundata_array[i][name_ptr.first]->set_run(_run_id);
+	  _ptr_subrundata_array[i][name_ptr.first]->set_subrun(_subrun_id);
 	}
       }
 
@@ -1645,7 +1652,7 @@ namespace larlite {
 	      name_ptr.second->Fill();
 	    
 	    _ptr_rundata_array[i][name_ptr.first]->clear_data();
-	    
+	    _ptr_rundata_array[i][name_ptr.first]->set_run(_run_id);
 	  }
 	}
       }
