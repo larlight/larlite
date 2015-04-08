@@ -12,7 +12,7 @@ namespace ertool {
   
   AlgoSingleE::AlgoSingleE() : AlgoBase()
 			     , _alg_tree(nullptr)
-			     , fTPC(10.,-100.,10.,240.,100.,1050.)
+			     , fTPC(-10.,-126.,-10.,292.,136.,1150.)
   {
 
     _name       = "AlgoSingleE";
