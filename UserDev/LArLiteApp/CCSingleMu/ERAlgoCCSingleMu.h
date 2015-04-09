@@ -1,9 +1,9 @@
 /**
- * \file AlgoCCSingleMu.h
+ * \file ERAlgoCCSingleMu.h
  *
  * \ingroup ERTool
  * 
- * \brief Class def header for a class AlgoCCSingleMu
+ * \brief Class def header for a class ERAlgoCCSingleMu
  *
  * @author kazuhiro
  */
@@ -12,26 +12,27 @@
 
     @{*/
 
-#ifndef ERTOOL_ALGOCCSINGLEMU_H
-#define ERTOOL_ALGOCCSINGLEMU_H
+#ifndef ERTOOL_ERALGOCCSINGLEMU_H
+#define ERTOOL_ERALGOCCSINGLEMU_H
 
 #include "ERTool/Base/AlgoBase.h"
+#include "ERTool/Algo/AlgoFindRelationship.h"
 
 namespace ertool {
 
   /**
-     \class AlgoCCSingleMu
+     \class ERAlgoCCSingleMu
      User custom Algorithm class made by kazuhiro
    */
-  class AlgoCCSingleMu : public AlgoBase {
+  class ERAlgoCCSingleMu : public AlgoBase {
   
   public:
 
     /// Default constructor
-    AlgoCCSingleMu();
+    ERAlgoCCSingleMu();
 
     /// Default destructor
-    virtual ~AlgoCCSingleMu(){};
+    virtual ~ERAlgoCCSingleMu(){};
 
     /// Reset function
     virtual void Reset();
@@ -39,6 +40,11 @@ namespace ertool {
     /// Function to evaluate input showers and determine a score
     virtual ParticleSet Reconstruct(const EventData &data);
 
+  private:
+
+    ::ertool::AlgoFindRelationship _relalg;
+    double _min_trk_length;
+    double _min_dist_common_origin;
   };
 }
 #endif

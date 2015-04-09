@@ -78,7 +78,7 @@ namespace ertool {
 
       // If this track (start & end) is NOT contained within a box, filter & continue
       if(!fTPC.Contain(start) || !fTPC.Contain(end)) {
-	//t->Filter();
+	data.FilterTrack(t->ID());
 	continue;
       }
 

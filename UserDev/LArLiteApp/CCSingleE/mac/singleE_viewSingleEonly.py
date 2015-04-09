@@ -1,11 +1,9 @@
 import sys, os
 from ROOT import gSystem
 from ROOT import ertool
-ertool.Manager()
 from ROOT import larlite as fmwk
-fmwk.geo.PlaneID
-
 from algoviewer import viewAll, view
+
 if len(sys.argv) < 2:
     msg  = '\n'
     msg += "Usage 1: %s $INPUT_ROOT_FILE\n" % sys.argv[0]
@@ -31,6 +29,7 @@ my_algo.setEThreshold(0)
 my_algo.LoadParams()
 # Create ERTool filter
 my_filter = ertool.FilterTrackLength()
+my_filter.setLengthCut(0.3)
 
 # Create MC Filter
 MCfilter = fmwk.MC_CC1E_Filter();
@@ -47,9 +46,6 @@ my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 my_proc.set_ana_output_file("singleE_selection.root")
 
 my_ana = ertool.ERAnaSingleE()
-my_ana.SetDebug(True)
-
-my_ana = ertool.ERAnaSingleE()
 my_ana.SetDebug(False)
 
 my_anaunit = fmwk.ExampleERSelection()
@@ -60,11 +56,12 @@ my_anaunit.SetMinEDep(20)
 my_anaunit._mgr._mc_for_ana = True
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
-my_anaunit.SetShowerProducer(True,"mcreco");
+#my_anaunit.SetShowerProducer(True,"mcreco");
 #my_anaunit.SetShowerProducer(False,"davidreco");
 #my_anaunit.SetShowerProducer(False,"newdefaultreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetShowerProducer(False,"mergeall");
+my_anaunit.SetShowerProducer(False,"showerreco");
 
 my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");

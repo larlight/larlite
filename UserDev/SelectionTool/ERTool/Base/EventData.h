@@ -45,6 +45,9 @@ namespace ertool {
     const ::ertool::Shower& Shower (size_t id) const;
     const ::ertool::Track&  Track  (size_t id) const;
     const ::ertool::Vertex& Vertex (size_t id) const;
+    std::vector< const ::ertool::Shower* > FilteredShower() const;
+    std::vector< const ::ertool::Track*  > FilteredTrack() const;
+    std::vector< const ::ertool::Vertex* > FilteredVertex() const;
     std::vector< const ::ertool::Shower* > Shower() const;
     std::vector< const ::ertool::Track*  > Track()  const;
     std::vector< const ::ertool::Vertex* > Vertex() const;

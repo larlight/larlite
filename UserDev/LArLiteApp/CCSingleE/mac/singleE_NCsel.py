@@ -33,7 +33,7 @@ my_filter = ertool.FilterTrackLength()
 my_filter.setLengthCut(0.3)
 
 # Creat MC Filter
-MCfilter = fmwk.MC_CC1E_Filter();
+MCfilter = fmwk.MC_NC_Filter();
 #Set flip to FALSE if you are looking for efficiency, TRUE if you are looking for MID efficiency
 #MCfilter.flip(False)
 MCfilter.flip(True)
@@ -46,7 +46,7 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
-my_proc.set_ana_output_file("singleE_selection.root")
+my_proc.set_ana_output_file("singleE_NCBkgd_selection.root")
 
 my_ana = ertool.ERAnaSingleE()
 my_ana.SetDebug(False)
@@ -55,9 +55,6 @@ my_anaunit = fmwk.ExampleERSelection()
 my_anaunit._mgr.SetAlgo(my_algo)
 my_anaunit._mgr.SetFilter(my_filter)
 my_anaunit._mgr.SetAna(my_ana)
-#This cut is applied in helper... ertool showers are not made if the energy of mcshower or reco shower
-#is below this threshold. This has to be above 0 or else the code may segfault. This is not a "physics cut".
-#Do not change this value unless you know what you are doing.
 my_anaunit.SetMinEDep(20)
 my_anaunit._mgr._mc_for_ana = True
 # ***************  Set Producers  ****************

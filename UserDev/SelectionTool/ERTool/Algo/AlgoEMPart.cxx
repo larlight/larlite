@@ -161,7 +161,7 @@ namespace ertool {
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"Loaded gamma parameters..." << std::endl;
       std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"Rad Length: " << tau->getVal() << " ["<< tau->getMin() <<" => "<< tau->getMax() <<"]" << std:: endl;
+	       <<"Rad Length: " << 1./tau->getVal() << " ["<< 1./tau->getMax() <<" => "<< 1./tau->getMin() <<"]" << std:: endl;
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"dEdx: Mean low: " << meanlow->getVal() << " Sigma high: " << sigmalow->getVal() << std::endl
 	       <<"["<<__FUNCTION__<<"] "
@@ -185,7 +185,7 @@ namespace ertool {
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"Loaded electron parameters..." << std::endl;
       std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"Rad Length: " << tau->getVal() << " ["<< tau->getMin() <<" => "<< tau->getMax() <<"]" << std:: endl;
+	       <<"Rad Length: " << 1./tau->getVal() << " ["<< 1./tau->getMax() <<" => "<< 1./tau->getMin() <<"]" << std:: endl;
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"dEdx: Mean1: " << mean->getVal() << " Sigma1: " << sigma->getVal() << std::endl;
     }

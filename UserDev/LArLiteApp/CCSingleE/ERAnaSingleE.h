@@ -18,6 +18,7 @@
 #include "ERTool/Base/AnaBase.h"
 #include "TTree.h"
 #include "TH1D.h"
+#include "TH2F.h"
 
 #include "DataFormat/mctruth.h"
 
@@ -107,6 +108,8 @@ namespace ertool {
     int _numEvts;
     int _singleE_ctr;
 
+
+    TH2F* _h_e_nu_correlation;
   };
 }
 #endif

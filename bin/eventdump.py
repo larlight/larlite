@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 try:
-    from ROOT import larlite as fmwk
+    from larlite import larlite as fmwk
 except ImportError:
     print
     print "You don't seem to have larlite library available for PyROOT..."

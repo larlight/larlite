@@ -1,4 +1,4 @@
-import ROOT,sys
+import ROOT,sys,os
 from recotool.mergeDef import *
 from ROOT import larlite as fmwk
 
@@ -13,9 +13,11 @@ for x in xrange(len(sys.argv)-2):
 out_file = sys.argv[-1]
 if os.path.isfile(out_file):
     print
-    print 'ERROR: output file already exist...'
+    print 'ERROR: output file already exists...'
     print
     sys.exit(0)
+
+mgr.set_output_file(out_file)
 
 mgr.set_io_mode(fmwk.storage_manager.kBOTH)
 

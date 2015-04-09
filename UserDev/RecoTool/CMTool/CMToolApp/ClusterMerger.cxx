@@ -47,7 +47,7 @@ namespace larlite {
     // Proceed to write an output data product if any cluster data product exists in the input
     if(!ev_cluster->size()) {
       print(msg::kWARNING,__FUNCTION__,
-	    Form("No input clusters! Saving empty event to output ttree..."));
+            Form("No input clusters! Saving empty event to output ttree..."));
       return true;
     }
 
@@ -57,7 +57,7 @@ namespace larlite {
     if(!hit_producer_v.size()) {
 
       print(msg::kERROR,__FUNCTION__,
-	    Form("Non empty cluster has no association to hits!"));
+            Form("Non empty cluster has no association to hits!"));
       return false;
     }
     auto hit_producer = hit_producer_v[0];
@@ -79,14 +79,14 @@ namespace larlite {
 
       for(auto const& cluster_index : indexes) {
 
-	tmp_index = cluster_index;
+        tmp_index = cluster_index;
 
-	merged_association.reserve(merged_association.size() + original_hit_ass[cluster_index].size());
+        merged_association.reserve(merged_association.size() + original_hit_ass[cluster_index].size());
 
-	for(auto const& hit_index : original_hit_ass[cluster_index])
+        for(auto const& hit_index : original_hit_ass[cluster_index])
 
-	  merged_association.push_back(hit_index);
-	
+          merged_association.push_back(hit_index);
+        
       }
 
       cluster out_cluster;

@@ -38,10 +38,21 @@ namespace larlite {
 
     virtual bool finalize();
 
+    void FlipSelection(bool flip) { _flip=flip; }
+    
   protected:
 
-    TH1D* hMuEnergy;
-    TH1D* hMuCount;
+    bool _flip;
+
+    TH1D* hPrimaryMuEnergy;
+    TH1D* hPrimaryMuCount;
+    TH1D* hAllMuEnergy;
+    TH1D* hAllMuCount;
+
+    TH1D* hPrimaryPiEnergy;
+    TH1D* hPrimaryPiCount;
+    TH1D* hAllPiEnergy;
+    TH1D* hAllPiCount;
 
   };
 }

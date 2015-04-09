@@ -42,15 +42,17 @@ namespace ertool {
     /// Function to evaluate input showers and determine a score
     virtual bool Analyze(const EventData &data, const ParticleSet &ps);
 
+ //   bool AnalyzeEventData(const EventData &data, const ParticleSet& ps);
+
     /// Called after processing the last event sample
     virtual void ProcessEnd(TFile* fout=nullptr);
 
-    double _primary_cut_dist;
-    double _primary_range;
-    double _min_trk_length;
   private:
-    TH1D* hPrimaryCtr;
-    TH1D* hPrimaryPID;
+    bool   _use_mc;
+    TH1D* hMCPrimaryCtr;
+    TH1D* hMCPrimaryPID;
+    TH1D* hRecoPrimaryCtr;
+    TH1D* hRecoPrimaryPID;
   };
 }
 #endif

@@ -3,6 +3,7 @@ from ROOT import gSystem,TMath
 from larlite import larlite as fmwk
 from larlite import larutil
 from cpp_classes import cmtool, showerreco, calo
+from recotool.matchDef import *
 
 def PandoraShowerReco3D():
     # Create analysis unit
@@ -38,26 +39,8 @@ def DefaultShowerReco3D():
     # 
     # Attach Matching algorithm
     #
-    palgo_array = cmtool.CPAlgoArray()
-    
-    palgo1 = cmtool.CPAlgoNHits()
-    palgo1.SetMinHits(25)
-    
-    palgo2 = cmtool.CPAlgoIgnoreTracks()
-    
-    palgo_array.AddAlgo(palgo1)
-    palgo_array.AddAlgo(palgo2)
+    palgo_array, algo_array = DefaultMatch()
     ana_unit.GetManager().AddPriorityAlgo(palgo_array)
-
-    #Andrzej: The algorithms below are ranked by their effectiveness-- TimeOverlap is best, 
-    #then 3DAngle, then StartPoint . Right now, only TimeOverlap is called.
-    algo_array = cmtool.CFAlgoArray()
-    #algo_array.SetMode(cmtool.CFAlgoArray.kPositiveAddition)
-    algo_array.AddAlgo(cmtool.CFAlgoTimeOverlap())
-    #algo_array.AddAlgo(cmtool.CFAlgoTimeProf())
-    #algo_array.AddAlgo(cmtool.CFAlgo3DAngle())
-    #algo_array.AddAlgo(cmtool.CFAlgoStartPointMatch())
-
     ana_unit.GetManager().AddMatchAlgo(algo_array)
 
     return ana_unit

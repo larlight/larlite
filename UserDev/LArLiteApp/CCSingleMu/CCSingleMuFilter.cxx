@@ -3,73 +3,112 @@
 
 #include "CCSingleMuFilter.h"
 #include "DataFormat/mctruth.h"
-
+#include "DataFormat/mctrack.h"
 namespace larlite {
 
   CCSingleMuFilter::CCSingleMuFilter()
-    : hMuEnergy(nullptr)
-    , hMuCount(nullptr)
+    : hPrimaryMuEnergy(nullptr)
+    , hPrimaryMuCount(nullptr)
+    , hAllMuEnergy(nullptr)
+    , hAllMuCount(nullptr)
+    , hPrimaryPiEnergy(nullptr)
+    , hPrimaryPiCount(nullptr)
+    , hAllPiEnergy(nullptr)
+    , hAllPiCount(nullptr)
   {
     _name = "CCSingleMuFilter";
+    _flip = false;
   }
 
   bool CCSingleMuFilter::initialize() {
 
-    hMuEnergy = new TH1D("hMuEnergy","Muon Energy; Energy [MeV]; Muon Counts",
-			 100,0,2000);
-    hMuCount  = new TH1D("hMuCount","Muon Count; Count; Events",
-			 10,-0.5,9.5);
+    hPrimaryMuEnergy = new TH1D("hPrimaryMuEnergy","Muon Energy; Energy [MeV]; Muon Counts",
+				100,0,2000);
+    hPrimaryMuCount  = new TH1D("hPrimaryMuCount","Muon Count; Count; Events",
+				10,-0.5,9.5);
+    hAllMuEnergy = new TH1D("hAllMuEnergy","Muon Energy; Energy [MeV]; Muon Counts",
+			    100,0,2000);
+    hAllMuCount  = new TH1D("hAllMuCount","Muon Count; Count; Events",
+			    10,-0.5,9.5);
+
+    hPrimaryPiEnergy = new TH1D("hPrimaryPiEnergy","Pion Energy; Energy [MeV]; Pion Counts",
+				100,0,2000);
+    hPrimaryPiCount  = new TH1D("hPrimaryPiCount","Pion Count; Count; Events",
+				10,-0.5,9.5);
+    hAllPiEnergy = new TH1D("hAllPiEnergy","Pion Energy; Energy [MeV]; Pion Counts",
+			    100,0,2000);
+    hAllPiCount  = new TH1D("hAllPiCount","Pion Count; Count; Events",
+			    10,-0.5,9.5);
     return true;
   }
   
   bool CCSingleMuFilter::analyze(storage_manager* storage) {
 
-    auto ev_mci = storage->get_data<event_mctruth>("generator");
-
-    if(!ev_mci || !(ev_mci->size())) {
-      print(msg::kERROR,__FUNCTION__,"MCTruth not found...");
+    auto ev_mct = storage->get_data<event_mctrack>("mcreco");
+    if(!ev_mct){
+      print(msg::kERROR,__FUNCTION__,"MCTrack not found...");
       throw std::exception();
     }  
 
-    //int numu_count   = 0;
-    int numu_trackid = -1;
-    int mu_count = 0;
-    for(auto const& mci : *ev_mci) {
+    int primary_mu_count = 0;
+    int primary_pi_count = 0;
+    int all_mu_count = 0;
+    int all_pi_count = 0;
 
-      // Look for numu
-      for(auto const& mcp : mci.GetParticles()) {
-	if(mcp.StatusCode() == 0 && mcp.PdgCode() == 14) {
-	  numu_trackid = mcp.TrackId();
-	  break;
-	}
+    // Search for muons in MCTrack
+    for(auto const& mct : *ev_mct) {
+      
+      bool muon = (mct.PdgCode() == 13 || mct.PdgCode() == -13 );
+      bool pion = (mct.PdgCode() == 211 || mct.PdgCode() == -211);
+
+      if(!muon && !pion) continue;
+
+      auto energy = mct.back().E() - mct.front().E();
+
+      if(muon) {
+	hAllMuEnergy->Fill(energy);
+	all_mu_count++;
       }
+      if(pion) {
+	hAllPiEnergy->Fill(energy);
+	all_pi_count++;
+      }
+      
+      if(mct.TrackID() == mct.AncestorTrackID() &&
+	 mct.Origin() == simb::kBeamNeutrino ) {
 
-      if(numu_trackid<0) continue;
-      // Look for a daughter muon
-      for(auto const& mcp : mci.GetParticles()) {
-
-	if( mcp.StatusCode() == 1 && 
-	    mcp.PdgCode() == 13   && 
-	    mcp.Mother() == numu_trackid ) {
-	  ++mu_count;
-	  hMuEnergy->Fill(mcp.Trajectory()[0].Momentum().E()*1.e3);
+	if(muon) {
+	  hPrimaryMuEnergy->Fill(energy);
+	  primary_mu_count++;
+	}
+	if(pion) {
+	  hPrimaryPiEnergy->Fill(energy);
+	  primary_pi_count++;
 	}
       }
     }
 
-    hMuCount->Fill(mu_count);
-    // Check if there's any numu & daughter muon found. If not, return false
-    if(!mu_count) return false;
+    hPrimaryMuCount->Fill(primary_mu_count);
+    hPrimaryPiCount->Fill(primary_pi_count);
+    hAllMuCount->Fill(all_mu_count);
+    hAllPiCount->Fill(all_pi_count);
 
-    return true;
+    if(_flip) return (primary_mu_count != 1);
+    else return (primary_mu_count == 1);
   }
 
   bool CCSingleMuFilter::finalize() {
 
     if(_fout) {
       _fout->cd();
-      hMuCount->Write();
-      hMuEnergy->Write();
+      hPrimaryMuCount->Write();
+      hPrimaryMuEnergy->Write();
+      hAllMuCount->Write();
+      hAllMuEnergy->Write();
+      hPrimaryPiCount->Write();
+      hPrimaryPiEnergy->Write();
+      hAllPiCount->Write();
+      hAllPiEnergy->Write();
     }
 
     return true;

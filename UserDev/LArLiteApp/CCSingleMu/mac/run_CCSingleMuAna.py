@@ -6,7 +6,8 @@ import sys
     #msg += '\n'
     #sys.stderr.write(msg)
     #sys.exit(1)
-
+from ROOT import gSystem
+gSystem.Load("libLArLiteApp_CCSingleMu")
 from ROOT import gSystem
 from ROOT import larlite as fmwk
 

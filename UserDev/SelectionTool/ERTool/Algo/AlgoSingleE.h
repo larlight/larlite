@@ -20,6 +20,7 @@
 #include "ERTool/Algo/AlgoFindRelationship.h"
 #include "ERTool/Base/AlgoBase.h"
 #include "GeoAlgo/GeoAlgo.h"
+#include "GeoAlgo/GeoAABox.h"
 #include <algorithm> // for std::find
 #include <utility>
 
@@ -70,6 +71,8 @@ namespace ertool {
 
 
   private:
+
+    ::geoalgo::AABox fTPC;
 
     /// clear tree
     void ClearTree();
@@ -153,6 +156,7 @@ namespace ertool {
     double _IPthisStart; // distance from IP to this shower start point
     double _IPthatStart; // distance from IP to that shower/track start point
     double _IPtrkBody; // distance from IP to body of track (if comparing with track)
+
   };
 }
 #endif
