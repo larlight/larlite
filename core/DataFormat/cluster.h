@@ -687,10 +687,6 @@ namespace larlite{
     
     geo::PlaneID fPlaneID; ///< Location of the start of the cluster
     
-    ////////////////////////
-    ClassDef(cluster,4)
-      ////////////////////////
-      
   };
   
   /**
@@ -718,10 +714,7 @@ namespace larlite{
 
   private:
     
-    ////////////////////////
-    ClassDef(event_cluster,5)
-      ////////////////////////
-      };
+  };
 }
 #endif
   

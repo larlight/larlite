@@ -115,11 +115,6 @@ namespace larlite {
     
   private:
     
-    
-    ////////////////////////
-    ClassDef(track,3)
-    ////////////////////////
-      
   };
 
   /**
@@ -146,9 +141,6 @@ namespace larlite {
     
   private:
     
-    ////////////////////////
-    ClassDef(event_track,4)
-    ////////////////////////
   };
 }
 #endif

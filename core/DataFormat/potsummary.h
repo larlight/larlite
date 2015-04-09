@@ -51,9 +51,6 @@ namespace larlite{
     
   private:
     
-    ////////////////////////
-    ClassDef(potsummary,4)
-    ////////////////////////
       
   };
 }

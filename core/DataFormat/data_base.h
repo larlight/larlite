@@ -17,7 +17,7 @@
 
 #include "Base/DataFormatConstants.h"
 #include "larlite_dataformat_utils.h"
-#include <TObject.h>
+//#include <TObject.h>
 #include <TString.h>
 #include "DataFormatException.h"
 namespace larlite{
@@ -29,19 +29,17 @@ namespace larlite{
      A base coass for all data objects in LArLight
   */
 
-  class data_base : public TObject {
+  class data_base {
     
   public:
     
     /// Default constructor
     data_base(unsigned short type = data::kDATA_TYPE_MAX)
-      : TObject()
-      , _type(type)
+      : _type(type)
     { clear_data(); }
 
     /// Default copy constructor to avoid memory leak in ROOT streamer
-    data_base(const data_base &original) : TObject(original)
-					 , _type(original._type)
+    data_base(const data_base &original) : _type(original._type)
     {}
     
     /// Default destructor
@@ -59,7 +57,7 @@ namespace larlite{
     unsigned short _type;
 
     ////////////////////////
-    ClassDef(data_base,1)
+    //ClassDef(data_base,1)
     ////////////////////////
       
   };
@@ -92,7 +90,7 @@ namespace larlite{
 
     std::string _name; ///< Producer's name
 
-    ClassDef(output_base,1)
+    //ClassDef(output_base,1)
   };
 
   /**
@@ -229,7 +227,7 @@ namespace larlite{
     void set_event_id (unsigned int id ) { fEventID      = id;  }
 
     ////////////////////////
-    ClassDef(event_base,2)
+    //ClassDef(event_base,2)
     ////////////////////////
       
   };

@@ -60,10 +60,6 @@ namespace larlite {
     geo::View_t fView;         ///< view for this end point
     double    fTotalCharge;  ///< total charge of hits associated with end point 
     
-    ////////////////////////
-    ClassDef(endpoint2d,1)
-    ////////////////////////
-      
   };
   
   /**
@@ -91,9 +87,6 @@ namespace larlite {
     
   private:
     
-    ////////////////////////
-    ClassDef(event_endpoint2d,1)
-    ////////////////////////
   };
 }
 #endif

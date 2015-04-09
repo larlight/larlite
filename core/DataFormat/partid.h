@@ -79,10 +79,6 @@ namespace larlite{
     geo::PlaneID fPlaneID;   ///< Plane ID
   private:
     
-    ////////////////////////
-    ClassDef(partid,2)
-    ////////////////////////
-      
   };
   
   /**
@@ -109,9 +105,6 @@ namespace larlite{
 
   private:
     
-    ////////////////////////
-    ClassDef(event_partid,2)
-    ////////////////////////
   };
 }
 #endif

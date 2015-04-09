@@ -90,10 +90,6 @@ namespace larlite {
     
   private:
     
-    ////////////////////////
-    ClassDef(spacepoint,1)
-    ////////////////////////
-      
   };
   
   /**
@@ -121,9 +117,6 @@ namespace larlite {
     
   private:
     
-    ////////////////////////
-    ClassDef(event_spacepoint,3)
-    ////////////////////////
   };
 }
 #endif

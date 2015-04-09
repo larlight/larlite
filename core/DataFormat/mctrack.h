@@ -118,10 +118,6 @@ namespace larlite{
     mcstep         fAncestorStart;     ///< This particle's ancestor's start position/momentum
     mcstep         fAncestorEnd;       ///< This particle's ancestor's start position/momentum
 
-    ////////////////////////
-    ClassDef(mctrack,1)
-    ////////////////////////
-      
   };
   
   /**
@@ -148,9 +144,6 @@ namespace larlite{
 
   private:
     
-    ////////////////////////
-    ClassDef(event_mctrack,1)
-    ////////////////////////
   };
 }
 #endif

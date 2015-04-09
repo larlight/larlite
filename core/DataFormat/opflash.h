@@ -71,8 +71,6 @@ namespace larlite {
 
   private:
 
-    ClassDef(opflash,1);
-
   };
 
   class event_opflash : public std::vector<larlite::opflash>,
@@ -95,7 +93,6 @@ namespace larlite {
 
   private:
 
-    ClassDef(event_opflash,1)
   };
 
 }

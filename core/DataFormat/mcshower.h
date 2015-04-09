@@ -149,10 +149,6 @@ namespace larlite {
     //---- Charge per plane ----//
     std::vector<double> fPlaneCharge; ///< Charge deposit per plane
 
-    ////////////////////////
-    ClassDef(mcshower,6)
-    ////////////////////////
-      
   };
 
   /**
@@ -180,9 +176,6 @@ namespace larlite {
     
   private:
     
-    //////////////////////////
-    ClassDef(event_mcshower,2)
-    //////////////////////////
   };
   
 }

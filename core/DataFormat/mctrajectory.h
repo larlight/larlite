@@ -64,10 +64,6 @@ namespace larlite {
     TLorentzVector _position;
     TLorentzVector _momentum;
 
-    ////////////////////////
-    ClassDef(mcstep,1)
-    ////////////////////////
-
   };
 
   /**
@@ -96,10 +92,6 @@ namespace larlite {
 
   private:
 
-    ////////////////////////
-    ClassDef(mctrajectory,1)
-    ////////////////////////    
-      
   };
   
 }

@@ -84,10 +84,6 @@ namespace larlite{
     static const double kUndefinedValue;
  
   private:
-    
-    ////////////////////////
-    ClassDef(gtruth,1)
-    ////////////////////////
       
   };
   
@@ -115,9 +111,6 @@ namespace larlite{
 
   private:
     
-    ////////////////////////
-    ClassDef(event_gtruth,1)
-    ////////////////////////
   };
 }
 #endif

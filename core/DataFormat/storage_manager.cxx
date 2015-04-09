@@ -148,12 +148,12 @@ namespace larlite {
 	  (*out_ch_iter).second->Branch(Form("%s_%s_branch",
 					     data::kRUNDATA_TREE_NAME[(data::RunDataType_t)type].c_str(),
 					     name.c_str()),
-					result_ptr->GetName(),
+					//result_ptr->GetName(),
 					&(_ptr_rundata_array[type][name]));
 	  
 	  Message::send(msg::kWARNING,__FUNCTION__,
-			Form("Requested tree %s by %s which does not exists yet. Created a new one.", 
-			     result_ptr->GetName(),
+			Form("Requested tree by %s which does not exists yet. Created a new one.", 
+			     //result_ptr->GetName(),
 			     name.c_str())
 			);
 	}
@@ -243,12 +243,12 @@ namespace larlite {
 	  (*out_ch_iter).second->Branch(Form("%s_%s_branch",
 					     data::kSUBRUNDATA_TREE_NAME[(data::SubRunDataType_t)type].c_str(),
 					     name.c_str()),
-					result_ptr->GetName(),
+					//result_ptr->GetName(),
 					&(_ptr_subrundata_array[type][name]));
 	  
 	  Message::send(msg::kWARNING,__FUNCTION__,
-			Form("Requested tree %s by %s which does not exists yet. Created a new one.", 
-			     result_ptr->GetName(),
+			Form("Requested tree by %s which does not exists yet. Created a new one.", 
+			     //result_ptr->GetName(),
 			     name.c_str())
 			);
 	}
@@ -345,12 +345,12 @@ namespace larlite {
 	  (*out_ch_iter).second->Branch(Form("%s_%s_branch",
 					     data::kDATA_TREE_NAME[(data::DataType_t)type].c_str(),
 					     name.c_str()),
-					result_ptr->GetName(),
+					//result_ptr->GetName(),
 					&(_ptr_data_array[type][name]));
 	  
 	  Message::send(msg::kWARNING,__FUNCTION__,
-			Form("Requested tree %s by %s which does not exists yet. Created a new one.", 
-			     result_ptr->GetName(),
+			Form("Requested tree by %s which does not exists yet. Created a new one.", 
+			     //result_ptr->GetName(),
 			     name.c_str())
 			);
 	}
@@ -885,7 +885,7 @@ namespace larlite {
 	  _out_ch[i][name_ptr.first]->Branch(Form("%s_%s_branch",
 						  data::kDATA_TREE_NAME[(data::DataType_t)i].c_str(),
 						  name_ptr.first.c_str()),
-					     _ptr_data_array[i][name_ptr.first]->GetName(),
+					     //_ptr_data_array[i][name_ptr.first]->GetName(),
 					     &(_ptr_data_array[i][name_ptr.first]));
 	}
       }
@@ -912,7 +912,7 @@ namespace larlite {
 	  _out_rundata_ch[i][name_ptr.first]->Branch(Form("%s_%s_branch",
 							  data::kRUNDATA_TREE_NAME[i].c_str(),
 							  name_ptr.first.c_str()),
-						     _ptr_rundata_array[i][name_ptr.first]->GetName(),
+						     //_ptr_rundata_array[i][name_ptr.first]->GetName(),
 						     &(_ptr_rundata_array[i][name_ptr.first]));
 	}
       }
@@ -939,7 +939,7 @@ namespace larlite {
 	  _out_subrundata_ch[i][name_ptr.first]->Branch(Form("%s_%s_branch",
 							     data::kSUBRUNDATA_TREE_NAME[(data::SubRunDataType_t)i].c_str(),
 							     name_ptr.first.c_str()),
-							_ptr_subrundata_array[i][name_ptr.first]->GetName(),
+							//_ptr_subrundata_array[i][name_ptr.first]->GetName(),
 							&(_ptr_subrundata_array[i][name_ptr.first]));
 	}
       }

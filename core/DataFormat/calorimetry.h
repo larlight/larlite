@@ -89,10 +89,6 @@ namespace larlite{
 
   private:
     
-    ////////////////////////
-    ClassDef(calorimetry,3)
-    ////////////////////////
-      
   };
   
   /**
@@ -120,9 +116,6 @@ namespace larlite{
 
   private:
     
-    ////////////////////////
-    ClassDef(event_calorimetry,4)
-    ////////////////////////
   };
 }
 #endif

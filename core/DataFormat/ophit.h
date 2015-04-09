@@ -59,7 +59,6 @@ namespace larlite {
     friend bool           operator <  (const ophit & a, const ophit & b);
     
   private:
-    ClassDef(ophit,1)
   };
 
   class event_ophit : public std::vector<larlite::ophit>,
@@ -82,7 +81,6 @@ namespace larlite {
 
   private:
 
-    ClassDef(event_ophit,1)
   };
 		      
 }

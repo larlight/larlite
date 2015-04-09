@@ -117,10 +117,6 @@ namespace larlite {
 
     std::vector<std::pair<size_t,size_t> > ftrackFiducial; ///< mctrajectory indexes for a trajectory inside fiducial volume
    
-    ////////////////////////
-    ClassDef(mcpart,2)
-    ////////////////////////
-      
   };
   
   /**
@@ -149,10 +145,6 @@ namespace larlite {
     
   private:
     
-    ////////////////////////
-    ClassDef(event_mcpart,2)
-    ////////////////////////
-      
   };
 }
 #endif

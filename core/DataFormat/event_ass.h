@@ -93,10 +93,6 @@ namespace larlite{
     /// List association
     void list_association() const;
 
-    ////////////////////////
-    ClassDef(event_ass,1)
-    ////////////////////////
-      
   };
 }
 #endif

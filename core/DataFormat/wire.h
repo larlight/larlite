@@ -86,10 +86,6 @@ namespace larlite {
     
   private:
     
-    ////////////////////////
-    ClassDef(wire,1)
-    ////////////////////////
-      
   };
 
   /**
@@ -116,9 +112,6 @@ namespace larlite {
     
   private:
     
-    ////////////////////////
-    ClassDef(event_wire,2)
-    ////////////////////////
   };
 }
 #endif

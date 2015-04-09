@@ -178,11 +178,7 @@ namespace larlite{
     
   private:
     
-    ////////////////////////
-    ClassDef(hit,4)
-      ////////////////////////
-      
-      };
+  };
   
   /**
      \class event_hit
@@ -208,10 +204,7 @@ namespace larlite{
 
   private:
     
-    ////////////////////////
-    ClassDef(event_hit,5)
-      ////////////////////////
-      };
+  };
 }
 #endif
 

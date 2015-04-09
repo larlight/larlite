@@ -90,10 +90,6 @@ namespace larlite{
 
   private:
     
-    ////////////////////////
-    ClassDef(rawdigit,2)
-    ////////////////////////
-      
   };
   
   /**
@@ -120,9 +116,6 @@ namespace larlite{
 
   private:
     
-    ////////////////////////
-    ClassDef(event_rawdigit,2)
-    ////////////////////////
   };
 }
 #endif

@@ -99,10 +99,6 @@ namespace larlite{
     
   private:
     
-    ////////////////////////
-    ClassDef(shower,7)
-    ////////////////////////
-      
   };
   
   /**
@@ -130,9 +126,6 @@ namespace larlite{
     
   private:
     
-    ////////////////////////
-    ClassDef(event_shower,5)
-    ////////////////////////
   };
 }
 #endif

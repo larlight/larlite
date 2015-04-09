@@ -71,10 +71,6 @@ namespace larlite{
 
   private:
     
-    ////////////////////////
-    ClassDef(pfpart,1)
-    ////////////////////////
-      
   };
   
   /**
@@ -102,9 +98,6 @@ namespace larlite{
 
   private:
     
-    ////////////////////////
-    ClassDef(event_pfpart,1)
-    ////////////////////////
   };
 }
 #endif

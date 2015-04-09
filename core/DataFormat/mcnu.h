@@ -94,10 +94,6 @@ namespace larlite {
     double fY;               ///< Inelasticity y=1-(E_lepton/E_neutrino), unitless
     double fQSqr;            ///< Momentum transfer Q^2, in GeV^2
     
-    ////////////////////////
-    ClassDef(mcnu,1)
-    ////////////////////////
-      
   };
   
 }

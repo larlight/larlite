@@ -135,10 +135,6 @@ namespace larlite{
 
   private:
     
-    ////////////////////////
-    ClassDef(mcflux,3)
-    ////////////////////////
-      
   };
   
   /**
@@ -164,10 +160,7 @@ namespace larlite{
     virtual void clear_data(){event_base::clear_data(); clear();}
 
   private:
-    
-    ////////////////////////
-    ClassDef(event_mcflux,4)
-    ////////////////////////
+
   };
 }
 #endif

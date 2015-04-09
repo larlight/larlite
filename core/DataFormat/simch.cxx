@@ -9,7 +9,6 @@ namespace larlite {
   void ide::clear_data()
   //--------------------------------------------------
   {
-    TObject::Clear();
     trackID      = data::kINVALID_INT;
     numElectrons = data::kINVALID_DOUBLE;
     energy       = data::kINVALID_DOUBLE;

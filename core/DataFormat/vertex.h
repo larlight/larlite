@@ -56,10 +56,6 @@ namespace larlite {
     double fXYZ[3];    ///< location of vertex
     int    fID;        ///< id number for vertex
     
-    ////////////////////////
-    ClassDef(vertex,1)
-    ////////////////////////
-      
   };
   
   /**
@@ -87,9 +83,6 @@ namespace larlite {
     
   private:
     
-    ////////////////////////
-    ClassDef(event_vertex,1)
-    ////////////////////////
   };
 }
 #endif

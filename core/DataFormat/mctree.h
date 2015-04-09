@@ -50,10 +50,6 @@ namespace larlite {
 
   private:
 
-    ////////////////////////
-    ClassDef(mctree,1)
-    ////////////////////////
-      
   };
   
   /**
@@ -98,10 +94,6 @@ namespace larlite {
     // one map for the entire event
     std::map<int,int> _particleMap;
     
-    ////////////////////////
-    ClassDef(event_mctree,1)
-    ////////////////////////
-      
   };
 }
 #endif

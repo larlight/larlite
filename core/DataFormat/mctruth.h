@@ -70,10 +70,6 @@ namespace larlite {
     simb::Origin_t                fOrigin;      ///< origin for this event
     Bool_t                        fNeutrinoSet; ///< flag for whether the neutrino information has been set
     
-    ////////////////////////
-    ClassDef(mctruth,1)
-    ////////////////////////
-      
   };
   
   /**
@@ -101,10 +97,6 @@ namespace larlite {
     
   private:
     
-    ////////////////////////
-    ClassDef(event_mctruth,2)
-    ////////////////////////
-      
   };
 }
 #endif

@@ -115,10 +115,6 @@ namespace larlite {
     std::map<std::string,std::vector<std::string> > _sarray_map; ///< var. holder map of std::string array
     std::map<std::string,std::vector<bool> >        _barray_map; ///< var. holder map of bool array
     
-    ////////////////////////
-    ClassDef(user_info,1)
-    ////////////////////////
-      
   };
   
 
@@ -150,9 +146,6 @@ namespace larlite {
     
   private:
     
-    ////////////////////////
-    ClassDef(event_user,4)
-    ////////////////////////
   };
   
 }
