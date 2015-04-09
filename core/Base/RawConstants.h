@@ -1,13 +1,14 @@
-#ifndef LARLITE_RAWTYPES_H
-#define LARLITE_RAWTYPES_H
+#ifndef RAW_TYPES_H
+#define RAW_TYPES_H
 
+//#include <stdint.h> // uint32_t
 #include <limits> // std::numeric_limits<>
 
-namespace larlite {
+namespace larlite{
   namespace raw{
     
     typedef enum _compress {
-      kNone,       ///< no compression 
+      kNone,       ///< no compression
       kHuffman,    ///< Huffman Encoding
       kZeroSuppression,  ///< Zero Suppression algorithm
       kZeroHuffman,  ///< Zero Suppression followed by Huffman Encoding
@@ -26,15 +27,13 @@ namespace larlite {
     
     /// Type representing the ID of a readout channel
     typedef unsigned int ChannelID_t;
-  
-    /// ID of an invalid channel
-    const ChannelID_t InvalidChannelID
-    = std::numeric_limits<ChannelID_t>::max();
     
+    /// ID of an invalid channel
+    const ChannelID_t InvalidChannelID = std::numeric_limits<ChannelID_t>::max();
     
     /// Returns whether the specified channel ID is valid
     /// @note This does not mean that channel exists in the current geometry.
-    inline bool isValidChannelID(raw::ChannelID_t channel)
+    inline const bool isValidChannelID(raw::ChannelID_t channel)
     { return channel != InvalidChannelID; }
     
   } // namespace raw

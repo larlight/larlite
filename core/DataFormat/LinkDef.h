@@ -45,6 +45,9 @@
 #pragma link C++ class larlite::event_base+;
 //#pragma link C++ class larlite::association+;
 
+#pragma link C++ namespace lar+;
+#pragma link C++ class lar::sparse_vector<float>+;
+
 #pragma link C++ class larlite::potsummary+;
 
 #pragma link C++ class larlite::rawdigit+;
