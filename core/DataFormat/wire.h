@@ -14,8 +14,8 @@
  * 
  * ****************************************************************************/
 
-#ifndef WIRE_H
-#define WIRE_H
+#ifndef LARLITE_WIRE_H
+#define LARLITE_WIRE_H
 
 #include "data_base.h"
 #include <vector>
@@ -75,7 +75,7 @@ namespace larlite {
    *     
    * Note that the indexed access is always by absolute tick number.
    * More examples of the use of SignalROI() return value are documented in
-   * lar::sparse_vector .
+   * larlite::sparse_vector .
    * 
    * Each channel is associated with a raw::RawDigit object. These associations
    * should be stored together with larlite::wire by the producer in a art::Assns
@@ -84,7 +84,7 @@ namespace larlite {
   class wire : public data_base {
   public:
     /// a region of interest is a pair (TDC offset, readings)
-    typedef lar::sparse_vector<float> RegionsOfInterest_t;
+    typedef larlite::sparse_vector<float> RegionsOfInterest_t;
 
     /// Default constructor
     wire();

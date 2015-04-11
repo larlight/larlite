@@ -1,5 +1,5 @@
-#ifndef RAW_TYPES_H
-#define RAW_TYPES_H
+#ifndef LARLITE_RAW_TYPES_H
+#define LARLITE_RAW_TYPES_H
 
 //#include <stdint.h> // uint32_t
 #include <limits> // std::numeric_limits<>

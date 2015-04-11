@@ -26,7 +26,7 @@ namespace larlite{
     if(iter_a == map_key_a.end()) {
       iter_a = map_key_a.insert(std::make_pair(id_b,_ass_data.size())).first;
       _ass_data.push_back(ass_a2b);
-    }else{
+    }else if(_ass_data.at((*iter_a).second).size()){
       if(!overwrite)
 	throw DataFormatException("Overwriting the association not allowed!");
       
@@ -36,7 +36,9 @@ namespace larlite{
 	       << "Type: " << id_b.first << " by " << id_b.second.c_str()
 	       << std::endl;
       _ass_data.at((*iter_a).second) = ass_a2b;
-    }
+    }else
+      _ass_data.at((*iter_a).second) = ass_a2b;
+
     // Do a bi-directional insert
     auto& map_key_b = _ass_map_key[id_b];
     auto iter_b = map_key_b.find(id_b);

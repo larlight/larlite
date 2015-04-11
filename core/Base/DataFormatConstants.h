@@ -88,11 +88,13 @@ namespace larlite{
 
     enum RunDataType_t {
       // Run-data types
+      kRUNDATA_Undefined,
       kRUNDATA_TYPE_MAX   ///< Run-data type enum boundary
     };
 
     enum SubRunDataType_t {
       // SubRun-data types
+      kSUBRUNDATA_Undefined,
       kPOTSummary,         ///< sumdata::POTSummary 
       kSUBRUNDATA_TYPE_MAX ///< SubRun-data type enum boundary
     };
@@ -133,10 +135,11 @@ namespace larlite{
     };
 
     const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {
-      
+      "undefined"
     };
     
     const std::string kSUBRUNDATA_TREE_NAME[kSUBRUNDATA_TYPE_MAX] = {
+      "undefined",
       "potsummary"
     };
 

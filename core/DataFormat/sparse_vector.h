@@ -10,8 +10,8 @@
  */
 
 
-#ifndef LARCORE_SPARSE_VECTOR_H
-#define LARCORE_SPARSE_VECTOR_H
+#ifndef LARLITE_SPARSE_VECTOR_H
+#define LARLITE_SPARSE_VECTOR_H
 
 
 // C/C++ standard library
@@ -28,7 +28,7 @@
 
 
 /// Namespace for generic larsoft
-namespace lar {
+namespace larlite {
 
   // -----------------------------------------------------------------------------
   // ---  utility classes for sparse_vector
@@ -179,7 +179,7 @@ namespace lar {
 
 
   //------------------------------------------------------------------------------
-  //---  lar::range_t<SIZE>
+  //---  larlite::range_t<SIZE>
   //---
   /**
    * @brief A range (interval) of integers
@@ -290,7 +290,7 @@ namespace lar {
 
 
   // -----------------------------------------------------------------------------
-  // ---  lar::sparse_vector<T>
+  // ---  larlite::sparse_vector<T>
   // ---
 
   /** ****************************************************************************
@@ -318,7 +318,7 @@ namespace lar {
    * 
    * For the following, let's assume:
    * ~~~
-   *   lar::sparse_vector<double> sv;
+   *   larlite::sparse_vector<double> sv;
    *   std::vector<double> buffer;
    * ~~~
    * 
@@ -329,7 +329,7 @@ namespace lar {
    *   for (const auto& value: sv) std::cout << " " << value;
    * ~~~
    * ~~~
-   * lar::sparse_vector<double>::const_iterator iValue = sv.cbegin(), vend = sv.cend();
+   * larlite::sparse_vector<double>::const_iterator iValue = sv.cbegin(), vend = sv.cend();
    * while (iSV != sv.end()) std::cout << " " << *(iSV++);
    * ~~~
    * ~~~
@@ -404,7 +404,7 @@ namespace lar {
    * ---
    * 
    * ~~~
-   * for (const lar::sparse_vector<double>::datarange_t& range: sv.get_ranges()) {
+   * for (const larlite::sparse_vector<double>::datarange_t& range: sv.get_ranges()) {
    *   size_t first_item = range.begin_index(); // index of the first item
    *   size_t nItems = range.size(); // number of items in this range
    *   for (double value: range) { ... }
@@ -899,8 +899,8 @@ namespace lar {
 	
     /// Returns if merging the two specified ranges would save memory
     static bool should_merge(
-			     const typename lar::sparse_vector<T>::datarange_t::base_t& a,
-			     const typename lar::sparse_vector<T>::datarange_t::base_t& b
+			     const typename larlite::sparse_vector<T>::datarange_t::base_t& a,
+			     const typename larlite::sparse_vector<T>::datarange_t::base_t& b
 			     );
     ///@}
 	
@@ -969,7 +969,7 @@ namespace lar {
  * </pre>
  */
 template <typename T>
-std::ostream& operator<< (std::ostream& out, const lar::sparse_vector<T>& v);
+std::ostream& operator<< (std::ostream& out, const larlite::sparse_vector<T>& v);
 
 
 
@@ -979,7 +979,7 @@ std::ostream& operator<< (std::ostream& out, const lar::sparse_vector<T>& v);
 
 /// Range class, with range and data
 template <typename T>
-class lar::sparse_vector<T>::datarange_t : public ::lar::range_t<size_type> {
+class larlite::sparse_vector<T>::datarange_t : public ::larlite::range_t<size_type> {
  public:
   typedef range_t<size_type> base_t; ///< base class
   
@@ -1089,7 +1089,7 @@ class lar::sparse_vector<T>::datarange_t : public ::lar::range_t<size_type> {
 
 /// Special little box to allow void elements to be treated as references.
 template <typename T>
-class lar::sparse_vector<T>::const_reference {
+class larlite::sparse_vector<T>::const_reference {
  protected:
   const value_type* ptr;
  public:
@@ -1102,7 +1102,7 @@ class lar::sparse_vector<T>::const_reference {
     operator value_type() const { return ptr? *ptr: value_zero; }
   operator const value_type&() const
   { return ptr? *ptr: value_zero; }
-}; // lar::sparse_vector<T>::const_reference
+}; // larlite::sparse_vector<T>::const_reference
 
 
 /**
@@ -1113,7 +1113,7 @@ class lar::sparse_vector<T>::const_reference {
  * dereferencing or assigning will provoke a segmentation fault.
  */
 template <typename T>
-class lar::sparse_vector<T>::reference: public const_reference {
+class larlite::sparse_vector<T>::reference: public const_reference {
   friend class iterator;
 	
   // This object "disappears" when assigned to: either the assignment is not
@@ -1141,13 +1141,13 @@ class lar::sparse_vector<T>::reference: public const_reference {
  protected:
   explicit reference(const const_reference& from): const_reference(from) {}
 	
-}; // lar::sparse_vector<T>::reference
+}; // larlite::sparse_vector<T>::reference
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /// Iterator to the sparse vector values
 template <typename T>
-class lar::sparse_vector<T>::const_iterator {
+class larlite::sparse_vector<T>::const_iterator {
   //
   // This iterator fulfills the traits of an immutable forward iterator.
   //
@@ -1282,7 +1282,7 @@ class lar::sparse_vector<T>::const_iterator {
   /// Reassigns the internal state according to the index
   void refresh_state();
 	
-}; // class lar::sparse_vector<T>::const_iterator
+}; // class larlite::sparse_vector<T>::const_iterator
 
 
 /**
@@ -1296,7 +1296,7 @@ class lar::sparse_vector<T>::const_iterator {
  * (it can be done with some complicate mechanism).
  */
 template <typename T>
-class lar::sparse_vector<T>::iterator: public const_iterator {
+class larlite::sparse_vector<T>::iterator: public const_iterator {
   typedef typename const_iterator::container_t container_t;
   friend typename const_iterator::container_t;
 	
@@ -1356,7 +1356,7 @@ class lar::sparse_vector<T>::iterator: public const_iterator {
   // also worth conversion
  iterator(const_iterator from): const_iterator(from) {}
 	
-}; // class lar::sparse_vector<T>::iterator
+}; // class larlite::sparse_vector<T>::iterator
 
 
 
@@ -1368,12 +1368,12 @@ class lar::sparse_vector<T>::iterator: public const_iterator {
 //--- sparse_vector implementation
 
 template <typename T>
-constexpr typename lar::sparse_vector<T>::value_type
-lar::sparse_vector<T>::value_zero;
+constexpr typename larlite::sparse_vector<T>::value_type
+larlite::sparse_vector<T>::value_zero;
 
 
 template <typename T> 
-void lar::sparse_vector<T>::resize(size_type new_size) {
+void larlite::sparse_vector<T>::resize(size_type new_size) {
   if (new_size >= size()) {
     nominal_size = new_size;
     return;
@@ -1392,11 +1392,11 @@ void lar::sparse_vector<T>::resize(size_type new_size) {
 	
   // formally resize
   nominal_size = new_size;
-} // lar::sparse_vector<T>::resize()
+} // larlite::sparse_vector<T>::resize()
 
 
 template <typename T> 
-void lar::sparse_vector<T>::resize(size_type new_size, value_type def_value) {
+void larlite::sparse_vector<T>::resize(size_type new_size, value_type def_value) {
   if (new_size == size()) return;
   if (new_size > size()) {
 		
@@ -1410,29 +1410,29 @@ void lar::sparse_vector<T>::resize(size_type new_size, value_type def_value) {
   }
   // truncating is the same whether there is a default value or not
   resize(new_size);
-} // lar::sparse_vector<T>::resize()
+} // larlite::sparse_vector<T>::resize()
 
 
 template <typename T>
-inline typename lar::sparse_vector<T>::iterator lar::sparse_vector<T>::begin()
+inline typename larlite::sparse_vector<T>::iterator larlite::sparse_vector<T>::begin()
 { return iterator(*this, typename iterator::special::begin()); }
 
 template <typename T>
-inline typename lar::sparse_vector<T>::iterator lar::sparse_vector<T>::end()
+inline typename larlite::sparse_vector<T>::iterator larlite::sparse_vector<T>::end()
 { return iterator(*this, typename iterator::special::end()); }
 
 template <typename T>
-inline typename lar::sparse_vector<T>::const_iterator
-lar::sparse_vector<T>::begin() const
+inline typename larlite::sparse_vector<T>::const_iterator
+larlite::sparse_vector<T>::begin() const
 { return const_iterator(*this, typename const_iterator::special::begin()); }
 
 template <typename T>
-inline typename lar::sparse_vector<T>::const_iterator
-lar::sparse_vector<T>::end() const
+inline typename larlite::sparse_vector<T>::const_iterator
+larlite::sparse_vector<T>::end() const
 { return const_iterator(*this, typename const_iterator::special::end()); }
 
 template <typename T>
-typename lar::sparse_vector<T>::value_type lar::sparse_vector<T>::operator[]
+typename larlite::sparse_vector<T>::value_type larlite::sparse_vector<T>::operator[]
 (size_type index) const
 {
   // first range not including the index
@@ -1447,11 +1447,11 @@ typename lar::sparse_vector<T>::value_type lar::sparse_vector<T>::operator[]
   // or it precedes it, and our index is in the void: return zero
   const datarange_t& range(*--iNextRange);
   return (index < range.end_index())? range[index]: value_zero;
-} // lar::sparse_vector<T>::operator[]
+} // larlite::sparse_vector<T>::operator[]
 
 
 template <typename T>
-typename lar::sparse_vector<T>::reference lar::sparse_vector<T>::operator[]
+typename larlite::sparse_vector<T>::reference larlite::sparse_vector<T>::operator[]
 (size_type index)
 {
   // first range not including the index
@@ -1466,22 +1466,22 @@ typename lar::sparse_vector<T>::reference lar::sparse_vector<T>::operator[]
   // or it precedes it, and our index is in the void: return zero
   datarange_t& range(*--iNextRange);
   return (index < range.end_index())? reference(range[index]): reference();
-} // lar::sparse_vector<T>::operator[]
+} // larlite::sparse_vector<T>::operator[]
 
 
 template <typename T>
-bool lar::sparse_vector<T>::is_void(size_type index) const {
+bool larlite::sparse_vector<T>::is_void(size_type index) const {
   if (ranges.empty() || (index >= size()))
     throw std::out_of_range("empty sparse vector");
   // range after the index:
   range_const_iterator iNextRange = find_next_range_iter(index);
   return ((iNextRange == ranges.begin()) 
 	  || ((--iNextRange)->end_index() <= index));
-} // lar::sparse_vector<T>::is_void()
+} // larlite::sparse_vector<T>::is_void()
 
 
 template <typename T>
-inline typename lar::sparse_vector<T>::size_type lar::sparse_vector<T>::count()
+inline typename larlite::sparse_vector<T>::size_type larlite::sparse_vector<T>::count()
 const
 {
   return std::accumulate(begin_range(), end_range(), size_type(0),
@@ -1491,7 +1491,7 @@ const
 
 
 template <typename T>
-typename lar::sparse_vector<T>::value_type& lar::sparse_vector<T>::set_at
+typename larlite::sparse_vector<T>::value_type& larlite::sparse_vector<T>::set_at
 (size_type index, value_type value)
 {
   // first range not including the index
@@ -1509,11 +1509,11 @@ typename lar::sparse_vector<T>::value_type& lar::sparse_vector<T>::set_at
   }
   // so we are in the void; add the value as a new range
   return const_cast<datarange_t&>(add_range(index, { value }))[index];
-} // lar::sparse_vector<T>::set_at()
+} // larlite::sparse_vector<T>::set_at()
 
 
 template <typename T>
-void lar::sparse_vector<T>::unset_at(size_type index) {
+void larlite::sparse_vector<T>::unset_at(size_type index) {
   // first range not including the index
   range_iterator iNextRange = find_next_range_iter(index);
 	
@@ -1546,12 +1546,12 @@ void lar::sparse_vector<T>::unset_at(size_type index) {
     // then cut the existing one
     range.move_tail(index);
   }
-} // lar::sparse_vector<T>::unset_at()
+} // larlite::sparse_vector<T>::unset_at()
 
 
 template <typename T>
-typename lar::sparse_vector<T>::range_const_iterator
-lar::sparse_vector<T>::find_range_iterator(size_type index) const
+typename larlite::sparse_vector<T>::range_const_iterator
+larlite::sparse_vector<T>::find_range_iterator(size_type index) const
 {
   if (ranges.empty()) throw std::out_of_range("empty sparse vector");
   // range after the index:
@@ -1559,22 +1559,22 @@ lar::sparse_vector<T>::find_range_iterator(size_type index) const
   return ((iNextRange == ranges.begin()) 
 	  || (index >= (--iNextRange)->end_index()))?
     ranges.end(): iNextRange;
-} // lar::sparse_vector<T>::find_range_iterator() const
+} // larlite::sparse_vector<T>::find_range_iterator() const
 
 
 template <typename T>
-inline typename lar::sparse_vector<T>::range_iterator 
-lar::sparse_vector<T>::find_range_iterator(size_type index)
+inline typename larlite::sparse_vector<T>::range_iterator 
+larlite::sparse_vector<T>::find_range_iterator(size_type index)
 {
   return ranges.begin() + (
 			   (const_cast<const this_t*>(this)->find_range_iterator(index))
 			   - ranges.begin());
-} // lar::sparse_vector<T>::find_range_iterator()
+} // larlite::sparse_vector<T>::find_range_iterator()
 
 
 template <typename T>
-const typename lar::sparse_vector<T>::datarange_t&
-lar::sparse_vector<T>::find_range(size_type index) const
+const typename larlite::sparse_vector<T>::datarange_t&
+larlite::sparse_vector<T>::find_range(size_type index) const
 {
   if (ranges.empty()) throw std::out_of_range("empty sparse vector");
   // range on the index:
@@ -1582,19 +1582,19 @@ lar::sparse_vector<T>::find_range(size_type index) const
   if (iNextRange == ranges.end())
     throw std::out_of_range("index in no range of the sparse vector");
   return *iNextRange;
-} // lar::sparse_vector<T>::find_range() const
+} // larlite::sparse_vector<T>::find_range() const
 
 template <typename T>
-inline typename lar::sparse_vector<T>::datarange_t&
-lar::sparse_vector<T>::find_range(size_type index)
+inline typename larlite::sparse_vector<T>::datarange_t&
+larlite::sparse_vector<T>::find_range(size_type index)
 {
   return const_cast<datarange_t&>
     (const_cast<const this_t*>(this)->find_range(index));
-} // lar::sparse_vector<T>::find_range()
+} // larlite::sparse_vector<T>::find_range()
 
 
 template <typename T>
-void lar::sparse_vector<T>::make_void_around(size_type index) {
+void larlite::sparse_vector<T>::make_void_around(size_type index) {
   if (ranges.empty() || (index >= size()))
     throw std::out_of_range("empty sparse vector");
   // range after the index:
@@ -1605,11 +1605,11 @@ void lar::sparse_vector<T>::make_void_around(size_type index) {
       return;
     }
   ranges.erase(iNextRange);
-} // lar::sparse_vector<T>::make_void_around()
+} // larlite::sparse_vector<T>::make_void_around()
 
 
 template <typename T> template <typename ITER>
-const typename lar::sparse_vector<T>::datarange_t& lar::sparse_vector<T>::add_range
+const typename larlite::sparse_vector<T>::datarange_t& larlite::sparse_vector<T>::add_range
 (size_type offset, ITER first, ITER last)
 {
   // insert the new range before the existing range which starts after offset
@@ -1629,11 +1629,11 @@ const typename lar::sparse_vector<T>::datarange_t& lar::sparse_vector<T>::add_ra
     iInsert = insert_range(iInsert, { offset, first, last });
   }
   return merge_ranges(iInsert);
-} // lar::sparse_vector<T>::add_range<ITER>()
+} // larlite::sparse_vector<T>::add_range<ITER>()
 
 
 template <typename T>
-const typename lar::sparse_vector<T>::datarange_t& lar::sparse_vector<T>::add_range
+const typename larlite::sparse_vector<T>::datarange_t& larlite::sparse_vector<T>::add_range
 (size_type offset, vector_t&& new_data)
 {
   // insert the new range before the existing range which starts after offset
@@ -1656,17 +1656,17 @@ const typename lar::sparse_vector<T>::datarange_t& lar::sparse_vector<T>::add_ra
     iInsert = insert_range(iInsert, { offset, std::move(new_data) });
   }
   return merge_ranges(iInsert);
-} // lar::sparse_vector<T>::add_range(vector)
+} // larlite::sparse_vector<T>::add_range(vector)
 
 
 template <typename T> 
-void lar::sparse_vector<T>::make_void(iterator first, iterator last) {
+void larlite::sparse_vector<T>::make_void(iterator first, iterator last) {
   // iterators have in "currentRange" either the range they point into, 
   // or the range next to the void they point to
 	
   if ((first.cont != this) || (last.cont != this)) {
     throw std::runtime_error
-      ("lar::sparse_vector::make_void(): iterators from alien container");
+      ("larlite::sparse_vector::make_void(): iterators from alien container");
   }
   // if first is after next, no range is identified
   if (first >= last) return;
@@ -1705,11 +1705,11 @@ void lar::sparse_vector<T>::make_void(iterator first, iterator last) {
 	
   // finally, remove entirely the ranges in between
   ranges.erase(first_range, last_range);
-} // lar::sparse_vector<T>::make_void()
+} // larlite::sparse_vector<T>::make_void()
 
 
 template <typename T>
-bool lar::sparse_vector<T>::is_valid() const {
+bool larlite::sparse_vector<T>::is_valid() const {
   // a sparse vector with no non-null elements can't be detected invalid
   if (ranges.empty()) return true;
 	
@@ -1724,15 +1724,15 @@ bool lar::sparse_vector<T>::is_valid() const {
   } // while
   if (nominal_size < ranges.back().end_index()) return false;
   return true;
-} // lar::sparse_vector<T>::is_valid()
+} // larlite::sparse_vector<T>::is_valid()
 
 
 
 // --- private methods
 
 template <typename T> 
-typename lar::sparse_vector<T>::range_iterator
-lar::sparse_vector<T>::find_next_range_iter
+typename larlite::sparse_vector<T>::range_iterator
+larlite::sparse_vector<T>::find_next_range_iter
 (size_type index, range_iterator rbegin)
 {
   // this range has the offset (first index) above the index argument:
@@ -1740,11 +1740,11 @@ lar::sparse_vector<T>::find_next_range_iter
 			  rbegin, ranges.end(), index,
 			  typename datarange_t::less_int_range(datarange_t::less)
 			  );
-} // lar::sparse_vector<T>::find_next_range_iter()
+} // larlite::sparse_vector<T>::find_next_range_iter()
 
 template <typename T> 
-typename lar::sparse_vector<T>::range_const_iterator
-lar::sparse_vector<T>::find_next_range_iter
+typename larlite::sparse_vector<T>::range_const_iterator
+larlite::sparse_vector<T>::find_next_range_iter
 (size_type index, range_const_iterator rbegin) const
 {
   // this range has the offset (first index) above the index argument:
@@ -1752,11 +1752,11 @@ lar::sparse_vector<T>::find_next_range_iter
 			  rbegin, ranges.end(), index,
 			  typename datarange_t::less_int_range(datarange_t::less)
 			  );
-} // lar::sparse_vector<T>::find_next_range_iter() const
+} // larlite::sparse_vector<T>::find_next_range_iter() const
 
 
 template <typename T> 
-typename lar::sparse_vector<T>::datarange_t& lar::sparse_vector<T>::merge_ranges
+typename larlite::sparse_vector<T>::datarange_t& larlite::sparse_vector<T>::merge_ranges
 (range_iterator iRange)
 {
   range_iterator iNext = iRange + 1;
@@ -1772,54 +1772,54 @@ typename lar::sparse_vector<T>::datarange_t& lar::sparse_vector<T>::merge_ranges
   } // while
   fix_size();
   return *iRange;
-} // lar::sparse_vector<T>::merge_ranges()
+} // larlite::sparse_vector<T>::merge_ranges()
 
 
 template <typename T> 
-typename lar::sparse_vector<T>::range_iterator lar::sparse_vector<T>::eat_range_head
+typename larlite::sparse_vector<T>::range_iterator larlite::sparse_vector<T>::eat_range_head
 (range_iterator iRange, size_t index)
 {
   if (index <= iRange->begin_index()) return iRange;
   if (index >= iRange->end_index()) return ranges.erase(iRange);
   iRange->move_head(index);
   return iRange;
-} // lar::sparse_vector<T>::eat_range_head()
+} // larlite::sparse_vector<T>::eat_range_head()
 
 
 template <typename T>
-typename lar::sparse_vector<T>::size_type lar::sparse_vector<T>::fix_size() {
+typename larlite::sparse_vector<T>::size_type larlite::sparse_vector<T>::fix_size() {
   if (!ranges.empty())
     nominal_size = std::max(nominal_size, ranges.back().end_index());
   return nominal_size;
-} // lar::sparse_vector<T>::fix_size()
+} // larlite::sparse_vector<T>::fix_size()
 
 
 // --- static methods
 
 template <typename T>
-inline size_t lar::sparse_vector<T>::expected_vector_size(size_t size) {
+inline size_t larlite::sparse_vector<T>::expected_vector_size(size_t size) {
   // apparently, a chunk of heap memory takes at least 32 bytes;
   // that means that a vector of 1 or 5 32-bit integers takes the same
   // space; the overhead appears to be 8 bytes, which can be allocated
   return sizeof(vector_t)
     + std::max(size_t(32), (alignof(datarange_t)*size + 8));
-} // lar::sparse_vector<T>::expected_vector_size()
+} // larlite::sparse_vector<T>::expected_vector_size()
 
 
 template <typename T>
-inline size_t lar::sparse_vector<T>::min_gap() {
+inline size_t larlite::sparse_vector<T>::min_gap() {
   // we assume here that there is no additional overhead by alignment;
   // the gap adds the space of another datarange_t, including the vector,
   // its data and overhead from heap (apparently, 8 bytes);
   // 
   return (sizeof(datarange_t) + 8) / sizeof(value_type) + 1; // round up
-} // lar::sparse_vector<T>::min_gap()
+} // larlite::sparse_vector<T>::min_gap()
 
 
 template <typename T>
-inline bool lar::sparse_vector<T>::should_merge(
-						const typename lar::sparse_vector<T>::datarange_t::base_t& a,
-						const typename lar::sparse_vector<T>::datarange_t::base_t& b
+inline bool larlite::sparse_vector<T>::should_merge(
+						const typename larlite::sparse_vector<T>::datarange_t::base_t& a,
+						const typename larlite::sparse_vector<T>::datarange_t::base_t& b
 						)
 {
   size_type gap_size = (a < b)?
@@ -1827,22 +1827,22 @@ inline bool lar::sparse_vector<T>::should_merge(
     a.begin_index() - b.begin_index() - b.size();
   return expected_vector_size(a.size() + b.size() + gap_size)
     <= expected_vector_size(a.size()) + expected_vector_size(b.size());
-} // lar::sparse_vector<T>::should_merge()
+} // larlite::sparse_vector<T>::should_merge()
 
 
 
 // --- non-member functions
 template <typename T>
-std::ostream& operator<< (std::ostream& out, const lar::sparse_vector<T>& v) {
+std::ostream& operator<< (std::ostream& out, const larlite::sparse_vector<T>& v) {
 	
   out << "Sparse vector of size " << v.size() << " with "
       << v.get_ranges().size() << " ranges:";
-  typename lar::sparse_vector<T>::range_const_iterator
+  typename larlite::sparse_vector<T>::range_const_iterator
     iRange = v.begin_range(), rend = v.end_range();
   while (iRange != rend) {
     out << "\n  [" << iRange->begin_index() << " - " << iRange->end_index()
 	<< "] (" << iRange->size() << "):";
-    typename lar::sparse_vector<T>::datarange_t::const_iterator
+    typename larlite::sparse_vector<T>::datarange_t::const_iterator
       iValue = iRange->begin(), vend = iRange->end();
     while (iValue != vend) out << " " << (*(iValue++));
     ++iRange;
@@ -1853,10 +1853,10 @@ std::ostream& operator<< (std::ostream& out, const lar::sparse_vector<T>& v) {
 
 
 // -----------------------------------------------------------------------------
-// --- lar::sparse_vector<T>::datarange_t implementation
+// --- larlite::sparse_vector<T>::datarange_t implementation
 // ---
 template <typename T> template <typename ITER>
-typename lar::sparse_vector<T>::datarange_t& lar::sparse_vector<T>::datarange_t::extend
+typename larlite::sparse_vector<T>::datarange_t& larlite::sparse_vector<T>::datarange_t::extend
 (size_type index, ITER first, ITER last)
 {
   size_type new_size = std::max(
@@ -1866,11 +1866,11 @@ typename lar::sparse_vector<T>::datarange_t& lar::sparse_vector<T>::datarange_t:
   values.resize(new_size);
   std::copy(first, last, get_iterator(index));
   return *this;
-} // lar::sparse_vector<T>::datarange_t::extend()
+} // larlite::sparse_vector<T>::datarange_t::extend()
 
 
 template <typename T>
-void lar::sparse_vector<T>::datarange_t::move_head
+void larlite::sparse_vector<T>::datarange_t::move_head
 (size_type to_index, value_type def_value /* = value_zero */)
 {
   difference_type delta = to_index - base_t::begin_index();
@@ -1884,15 +1884,15 @@ void lar::sparse_vector<T>::datarange_t::move_head
 		  value_const_iterator<value_type>(def_value) - delta
 		  );
   }
-} // lar::sparse_vector<T>::datarange_t::move_head()
+} // larlite::sparse_vector<T>::datarange_t::move_head()
 
 
 // -----------------------------------------------------------------------------
-// --- lar::sparse_vector<T>::const_iterator implementation
+// --- larlite::sparse_vector<T>::const_iterator implementation
 // ---
 template <typename T>
-typename lar::sparse_vector<T>::const_iterator&
-lar::sparse_vector<T>::const_iterator::operator++() {
+typename larlite::sparse_vector<T>::const_iterator&
+larlite::sparse_vector<T>::const_iterator::operator++() {
   // no container, not doing anything;
   // index beyond the end: stays there
   if (!cont || (index >= cont->size())) return *this;
@@ -1907,12 +1907,12 @@ lar::sparse_vector<T>::const_iterator::operator++() {
   }
   // if we have no valid range, we are forever in the void
   return *this;
-} // lar::sparse_vector<T>::iterator::operator++()
+} // larlite::sparse_vector<T>::iterator::operator++()
 
 
 template <typename T>
-typename lar::sparse_vector<T>::const_iterator::const_reference
-lar::sparse_vector<T>::const_iterator::operator*() const {
+typename larlite::sparse_vector<T>::const_iterator::const_reference
+larlite::sparse_vector<T>::const_iterator::operator*() const {
   // no container, no idea what to do
   if (!cont) throw std::out_of_range("iterator to no sparse vector");
 	
@@ -1926,12 +1926,12 @@ lar::sparse_vector<T>::const_iterator::operator*() const {
   if (index < currentRange->begin_index()) return value_zero;
 	
   return (*currentRange)[index];
-} // lar::sparse_vector<T>::const_iterator::operator*()
+} // larlite::sparse_vector<T>::const_iterator::operator*()
 
 
 template <typename T>
-typename lar::sparse_vector<T>::const_iterator&
-lar::sparse_vector<T>::const_iterator::operator+= (difference_type delta)
+typename larlite::sparse_vector<T>::const_iterator&
+larlite::sparse_vector<T>::const_iterator::operator+= (difference_type delta)
 {
   if (delta == 1) return this->operator++();
   index += delta;
@@ -1940,17 +1940,17 @@ lar::sparse_vector<T>::const_iterator::operator+= (difference_type delta)
       )
     refresh_state();
   return *this;
-} // lar::sparse_vector<T>::const_iterator::operator+=()
+} // larlite::sparse_vector<T>::const_iterator::operator+=()
 
 template <typename T>
-inline typename lar::sparse_vector<T>::const_iterator&
-lar::sparse_vector<T>::const_iterator::operator-= (difference_type delta)
+inline typename larlite::sparse_vector<T>::const_iterator&
+larlite::sparse_vector<T>::const_iterator::operator-= (difference_type delta)
 { return this->operator+= (-delta); }
 
 
 template <typename T>
-typename lar::sparse_vector<T>::const_iterator
-lar::sparse_vector<T>::const_iterator::operator+ (difference_type delta) const
+typename larlite::sparse_vector<T>::const_iterator
+larlite::sparse_vector<T>::const_iterator::operator+ (difference_type delta) const
 {
   if ((currentRange == cont->ranges.end())
       || !currentRange->includes(index + delta)
@@ -1959,30 +1959,30 @@ lar::sparse_vector<T>::const_iterator::operator+ (difference_type delta) const
   const_iterator iter(*this);
   iter.index += delta;
   return iter;
-} // lar::sparse_vector<T>::const_iterator::operator+()
+} // larlite::sparse_vector<T>::const_iterator::operator+()
 
 template <typename T>
-inline typename lar::sparse_vector<T>::const_iterator
-lar::sparse_vector<T>::const_iterator::operator- (difference_type delta) const
+inline typename larlite::sparse_vector<T>::const_iterator
+larlite::sparse_vector<T>::const_iterator::operator- (difference_type delta) const
 { return this->operator+ (-delta); }
 
 
 /// distance operator
 template <typename T>
-inline typename lar::sparse_vector<T>::const_iterator::difference_type
-lar::sparse_vector<T>::const_iterator::operator-
+inline typename larlite::sparse_vector<T>::const_iterator::difference_type
+larlite::sparse_vector<T>::const_iterator::operator-
 (const const_iterator& iter) const
 {
   if (cont != iter.cont) {
-    throw std::runtime_error("lar::sparse_vector::const_iterator:"
+    throw std::runtime_error("larlite::sparse_vector::const_iterator:"
 			     " difference with alien iterator");
   }
   return index -iter.index;
-} // lar::sparse_vector<T>::const_iterator::operator-(const_iterator)
+} // larlite::sparse_vector<T>::const_iterator::operator-(const_iterator)
 
 
 template <typename T>
-void lar::sparse_vector<T>::const_iterator::refresh_state() {
+void larlite::sparse_vector<T>::const_iterator::refresh_state() {
   // update the currentRange
   // currentRange is the range including the current item, or next to it
   if (cont) {
@@ -1996,11 +1996,11 @@ void lar::sparse_vector<T>::const_iterator::refresh_state() {
   else {
     currentRange = {};
   }
-} // lar::sparse_vector<T>::const_iterator::refresh_state()
+} // larlite::sparse_vector<T>::const_iterator::refresh_state()
 
 
 // -----------------------------------------------------------------------------
-// --- lar::sparse_vector<T>::iterator implementation
+// --- larlite::sparse_vector<T>::iterator implementation
 // ---
 //
 // nothing new so far

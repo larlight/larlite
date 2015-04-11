@@ -38,6 +38,8 @@ namespace larlite{
     void clear_data();
     
     // Set methods
+    void set_rms (float rms)
+    {fRMS = rms; }
     void set_time_range (raw::TDCtick_t start, raw::TDCtick_t end)
     {fStartTick = start; fEndTick = end;}
     void set_time_peak (float peak, float err)

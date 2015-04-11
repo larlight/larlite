@@ -12,6 +12,7 @@
 #pragma link C++ class std::vector<std::vector<float> >+;
 
 #pragma link C++ class std::pair<size_t,size_t>+;
+#pragma link C++ class std::pair<unsigned short,string>+;
 #pragma link C++ class std::pair<string,bool>+;
 #pragma link C++ class std::pair<string,string>+;
 
@@ -45,8 +46,8 @@
 #pragma link C++ class larlite::event_base+;
 //#pragma link C++ class larlite::association+;
 
-#pragma link C++ namespace lar+;
-#pragma link C++ class lar::sparse_vector<float>+;
+//#pragma link C++ namespace lar+;
+#pragma link C++ class larlite::sparse_vector<float>+;
 
 #pragma link C++ class larlite::potsummary+;
 
