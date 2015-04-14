@@ -25,6 +25,7 @@ namespace ertool {
     _hassister = false;
     _rejectLongTracks = true;
     _vtxProximityCut = 0;
+    _BDtW = 0; 
 
   }
 
@@ -60,6 +61,7 @@ namespace ertool {
     _alg_tree->Branch("_IPthisStart",&_IPthisStart,"_IPthisStart/D");
     _alg_tree->Branch("_IPthatStart",&_IPthatStart,"_IPthatStart/D");
     _alg_tree->Branch("_IPtrkBody",&_IPtrkBody,"_IPtrkBody/D");
+    _alg_tree->Branch("_BDtW",&_BDtW,"_BDtW/D");
     
     return;
   }
@@ -139,6 +141,10 @@ namespace ertool {
 	    if (_verbose) { std::cout << "NOT single" << std::endl; }
 	    break;
 	  }
+	::geoalgo::HalfLine shr(thisShower.Start(),thisShower.Dir());
+	_distBackAlongTraj = sqrt(thisShower.Start().SqDist(_geoAlgo.Intersection(fTPC,shr,true)[0])) ;
+
+
 	}// if not the same showers
       }//loop over showers
       // loop over tracks if still single
@@ -214,6 +220,11 @@ namespace ertool {
 	}
       }
 
+      if( single and !_hassister and _BDtW !=0){
+	if(_verbose) { std::cout << "Distance back along trajectory is: "<<_distBackAlongTraj<<". Shower not single!" <<std::endl; }
+	single = false ;
+	}
+
       // if still single (and no sister track) look at
       // dEdx to determine if e-like
       if (single && !_hassister){
@@ -222,6 +233,8 @@ namespace ertool {
 	  single = false;
 	}
       }
+
+
 
       //If single still true -> we found it! Proceed!
       // the particle with all it's info was already

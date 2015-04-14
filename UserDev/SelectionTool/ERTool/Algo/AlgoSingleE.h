@@ -68,6 +68,7 @@ namespace ertool {
     void setMaxIP(double d) { _maxIP = d; }
     void setEThreshold(double E) { _Ethreshold = E; }
     void setVtxProximityCut(double d) { _vtxProximityCut = d; }
+    void setBDtW(double b) { _BDtW = b; }
 
 
   private:
@@ -129,6 +130,11 @@ namespace ertool {
     // require that a shower be within this distance to the
     // closest candidate vertex
     double _vtxProximityCut;
+    // Backwards Distance to Wall Cut:
+    // if "single" shower vertex is near to wall, it is likely due to
+    // cosmic.  This become more important cut with small/no fid
+    // volume cut. Default set off. 
+    double _BDtW ;
 
     // Keep track of whether a sister track to the shower has
     // been found
@@ -156,6 +162,7 @@ namespace ertool {
     double _IPthisStart; // distance from IP to this shower start point
     double _IPthatStart; // distance from IP to that shower/track start point
     double _IPtrkBody; // distance from IP to body of track (if comparing with track)
+    double _distBackAlongTraj;
 
   };
 }
