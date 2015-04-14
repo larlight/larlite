@@ -54,7 +54,7 @@ fi
 # Check compiler availability for clang++ and g++
 LARLITE_CXX=clang++
 if [ `command -v $LARLITE_CXX` ]; then
-    export LARLITE_CXX="clang++ -std=c++11";
+    export LARLITE_CXX="$LARLITE_CXX -std=c++11";
 else
     LARLITE_CXX=g++
     if [[ -z `command -v $LARLITE_CXX` ]]; then
