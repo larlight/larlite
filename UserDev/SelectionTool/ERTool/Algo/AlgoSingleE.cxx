@@ -26,6 +26,7 @@ namespace ertool {
     _rejectLongTracks = true;
     _vtxProximityCut = 0;
     _BDtW = 0; 
+    _BDtTW = 0;
 
   }
 
@@ -62,6 +63,7 @@ namespace ertool {
     _alg_tree->Branch("_IPthatStart",&_IPthatStart,"_IPthatStart/D");
     _alg_tree->Branch("_IPtrkBody",&_IPtrkBody,"_IPtrkBody/D");
     _alg_tree->Branch("_BDtW",&_BDtW,"_BDtW/D");
+    _alg_tree->Branch("_BDtTW",&_BDtTW,"_BDtTW/D");
     
     return;
   }
@@ -144,6 +146,11 @@ namespace ertool {
 	::geoalgo::HalfLine shr(thisShower.Start(),thisShower.Dir());
 	_distBackAlongTraj = sqrt(thisShower.Start().SqDist(_geoAlgo.Intersection(fTPC,shr,true)[0])) ;
 
+	//Distance to Top Wall caluclation from page 19 of cosmics technote
+//	double detHalfHeight = ::larutil::Geometry::GetME()->DetHalfHeight();
+	double detHalfHeight = 116.5 ;
+	_distToTopWall         = (thisShower.Start()[1] - detHalfHeight)*thisShower.Dir().Length()/(thisShower.Dir()[1]) ;
+
 
 	}// if not the same showers
       }//loop over showers
@@ -222,6 +229,11 @@ namespace ertool {
 
       if( single and !_hassister and _BDtW !=0){
 	if(_verbose) { std::cout << "Distance back along trajectory is: "<<_distBackAlongTraj<<". Shower not single!" <<std::endl; }
+	single = false ;
+	}
+
+      if( single and !_hassister and _BDtTW !=0){
+	if(_verbose) { std::cout << "Distance back along trajectory is: "<<_distToTopWall<<". Shower not single!" <<std::endl; }
 	single = false ;
 	}
 
