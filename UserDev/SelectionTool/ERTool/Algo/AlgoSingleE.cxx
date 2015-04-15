@@ -62,8 +62,8 @@ namespace ertool {
     _alg_tree->Branch("_IPthisStart",&_IPthisStart,"_IPthisStart/D");
     _alg_tree->Branch("_IPthatStart",&_IPthatStart,"_IPthatStart/D");
     _alg_tree->Branch("_IPtrkBody",&_IPtrkBody,"_IPtrkBody/D");
-    _alg_tree->Branch("_BDtW",&_BDtW,"_BDtW/D");
-    _alg_tree->Branch("_BDtTW",&_BDtTW,"_BDtTW/D");
+    _alg_tree->Branch("_distBackAlongTraj",&_distBackAlongTraj,"_distBackAlongTraj/D");
+    _alg_tree->Branch("_distToTopWall",&_distToTopWall,"_distToTopWall/D");
     
     return;
   }
@@ -372,6 +372,8 @@ namespace ertool {
     _IPthisStart = -1;
     _IPthatStart = -1;
     _IPtrkBody = -1;
+    _distBackAlongTraj = -1;
+    _distToTopWall  = -999999;
 
     return;
   }
