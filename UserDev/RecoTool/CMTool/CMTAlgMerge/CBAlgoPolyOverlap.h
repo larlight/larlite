@@ -46,6 +46,8 @@ namespace cmtool {
     //both clusters must have > this # of hits to be considered for merging
     void SetMinNumHits(size_t nhits) { _min_hits = nhits; }
 
+    void SetOverlapFraction(float);
+
     /// Method to re-configure the instance
     void reconfigure();
 
@@ -53,6 +55,9 @@ namespace cmtool {
     
     bool _debug;
     size_t _min_hits;
+    float _overlap_fraction;  // if used, the smaller cluster has to be
+                              // more than this percent contained with 
+                              // the larger cluster
   };
 }
 
