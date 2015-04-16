@@ -13,8 +13,13 @@ namespace larlite{
   void event_ass::clear_data()
   {
     event_base::clear_data();
-    for(auto& ass : _ass_data) ass.clear();
+    //for(auto& ass : _ass_data) ass.clear();
+    _ass_map_key.clear();
+    _ass_data.clear();
   }
+
+  size_t event_ass::size() const
+  { return _ass_data.size(); }
 
   void event_ass::set_association(const product_id& id_a,
 				  const product_id& id_b,
@@ -26,6 +31,16 @@ namespace larlite{
     if(iter_a == map_key_a.end()) {
       iter_a = map_key_a.insert(std::make_pair(id_b,_ass_data.size())).first;
       _ass_data.push_back(ass_a2b);
+      /*
+      std::cout<<"Creating a new association by "<<this->name().c_str()
+	       <<" ID="
+	       << (*iter_a).second
+	       <<" ... ("
+	       <<data::kDATA_TREE_NAME[id_a.first].c_str()<<","<<id_a.second.c_str()<<")"
+	       <<" => ("
+	       <<data::kDATA_TREE_NAME[id_b.first].c_str()<<","<<id_b.second.c_str()<<")"
+	       <<" ... current size: " << _ass_data.size()<<std::endl;
+      */
     }else if(_ass_data.at((*iter_a).second).size()){
       if(!overwrite)
 	throw DataFormatException("Overwriting the association not allowed!");
@@ -36,16 +51,50 @@ namespace larlite{
 	       << "Type: " << id_b.first << " by " << id_b.second.c_str()
 	       << std::endl;
       _ass_data.at((*iter_a).second) = ass_a2b;
-    }else
+    }else{
+      /*
+      std::cout<<"Refilling an association by "<<this->name().c_str()
+	       <<" ID="
+	       << (*iter_a).second
+	       <<" ... ("
+	       <<data::kDATA_TREE_NAME[id_a.first].c_str()<<","<<id_a.second.c_str()<<")"
+	       <<" => ("
+	       <<data::kDATA_TREE_NAME[id_b.first].c_str()<<","<<id_b.second.c_str()<<")"
+	       <<" ... current size: " << _ass_data.size()<<std::endl;
+      */
       _ass_data.at((*iter_a).second) = ass_a2b;
+    }
 
     // Do a bi-directional insert
     auto& map_key_b = _ass_map_key[id_b];
-    auto iter_b = map_key_b.find(id_b);
+    auto iter_b = map_key_b.find(id_a);
     if(iter_b == map_key_b.end()) {
       iter_b = map_key_b.insert(std::make_pair(id_a,_ass_data.size())).first;
       _ass_data.push_back(larlite::AssSet_t());
+      /*
+      std::cout<<"Creating a reverse association by "<<this->name().c_str()
+	       <<" ID="
+	       << (*iter_b).second
+	       <<" ... ("
+	       <<data::kDATA_TREE_NAME[id_a.first].c_str()<<","<<id_a.second.c_str()<<")"
+	       <<" => ("
+	       <<data::kDATA_TREE_NAME[id_b.first].c_str()<<","<<id_b.second.c_str()<<")"
+	       <<" ... current size: " << _ass_data.size()<<std::endl;
+      */
     }
+    /*
+    else{
+      std::cout<<"Refilling a reverse association by "<<this->name().c_str()
+	       <<" ID="
+	       << (*iter_b).second
+	       <<" ... ("
+	       <<data::kDATA_TREE_NAME[id_a.first].c_str()<<","<<id_a.second.c_str()<<")"
+	       <<" => ("
+	       <<data::kDATA_TREE_NAME[id_b.first].c_str()<<","<<id_b.second.c_str()<<")"
+	       <<" ... current size: " << _ass_data.size()<<std::endl;
+    }
+    */
+
     auto& ass_b = _ass_data[(*iter_b).second];
     
     int max_val = -1;
@@ -61,6 +110,7 @@ namespace larlite{
 	  ass_b[b_index].push_back(a_index);
       }
     }
+
   }
   
   size_t event_ass::size_association(const product_id& id_a,
@@ -162,7 +212,7 @@ namespace larlite{
       for(auto const& ass : _ass_data[index])
 	b_ctr += ass.size();
       
-      std::cout << "    (" 
+      std::cout << "    Association ID: " << index << "/" << _ass_data.size() << " ... ("
 		<< data::kDATA_TREE_NAME[keys.first.first].c_str() << "," << keys.first.second.c_str()
 		<< ") => ("
 		<< data::kDATA_TREE_NAME[keys.second.first].c_str() << "," << keys.second.second.c_str()

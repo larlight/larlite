@@ -48,6 +48,7 @@
 
 //#pragma link C++ namespace lar+;
 #pragma link C++ class larlite::sparse_vector<float>+;
+//#pragma link C++ class larlite::sparse_vector<float>::datarange_t+;
 
 #pragma link C++ class larlite::potsummary+;
 

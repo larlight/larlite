@@ -52,6 +52,9 @@ namespace larlite{
     //
     // Info getter functions
     //
+    /// Query the total number of association IDs stored
+    size_t size() const;
+
     /// Query the number of associated objects for data product with larlite::product_id == id_a
     size_t size_association(const product_id& id_a,
 			    const product_id& id_b);

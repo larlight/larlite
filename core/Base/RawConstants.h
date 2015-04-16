@@ -33,7 +33,7 @@ namespace larlite{
     
     /// Returns whether the specified channel ID is valid
     /// @note This does not mean that channel exists in the current geometry.
-    inline const bool isValidChannelID(raw::ChannelID_t channel)
+    inline bool isValidChannelID(raw::ChannelID_t channel)
     { return channel != InvalidChannelID; }
     
   } // namespace raw

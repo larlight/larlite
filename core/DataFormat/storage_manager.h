@@ -159,8 +159,12 @@ namespace larlite {
     /// Event ID setter
     void set_id(const unsigned int run_id,
 		const unsigned int subrun_id,
-		const unsigned int event_id)
-    { _run_id = run_id; _subrun_id = subrun_id; _event_id = event_id; }
+		const unsigned int event_id);
+
+    /// Id getter
+    unsigned int event_id() const  { return _event_id;  }
+    unsigned int run_id() const    { return _run_id;    }
+    unsigned int subrun_id() const { return _subrun_id; }
 
     /// Function to list product ID loaded or created
     const std::vector<larlite::product_id>& list_input_product() const { return _input_product_id; }

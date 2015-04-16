@@ -152,7 +152,8 @@ namespace larlite {
 					&(_ptr_rundata_array[type][name]));
 	  
 	  Message::send(msg::kWARNING,__FUNCTION__,
-			Form("Requested tree by %s which does not exists yet. Created a new one.", 
+			Form("Requested tree %s by %s which does not exists yet. Created a new one.", 
+			     data::kRUNDATA_TREE_NAME[type].c_str(),
 			     //result_ptr->GetName(),
 			     name.c_str())
 			);
@@ -247,7 +248,8 @@ namespace larlite {
 					&(_ptr_subrundata_array[type][name]));
 	  
 	  Message::send(msg::kWARNING,__FUNCTION__,
-			Form("Requested tree by %s which does not exists yet. Created a new one.", 
+			Form("Requested %s tree by %s which does not exists yet. Created a new one.", 
+			     data::kSUBRUNDATA_TREE_NAME[type].c_str(),
 			     //result_ptr->GetName(),
 			     name.c_str())
 			);
@@ -349,7 +351,8 @@ namespace larlite {
 					&(_ptr_data_array[type][name]));
 	  
 	  Message::send(msg::kWARNING,__FUNCTION__,
-			Form("Requested tree by %s which does not exists yet. Created a new one.", 
+			Form("Requested %s tree by %s which does not exists yet. Created a new one.", 
+			     data::kDATA_TREE_NAME[type].c_str(),
 			     //result_ptr->GetName(),
 			     name.c_str())
 			);
@@ -574,7 +577,8 @@ namespace larlite {
 	      }
 	      bool matched=false;
 	      for(int i=0; i<data::kDATA_TYPE_MAX && !matched; ++i) {
-		if(data::kDATA_TREE_NAME[i] == type_name) {
+		if(data::kDATA_TREE_NAME[i] == type_name && 
+		   _in_ch[(data::DataType_t)i].find(producer_name) == _in_ch[(data::DataType_t)i].end()) {
 		  _in_ch[(data::DataType_t)i].insert(std::make_pair(producer_name.c_str(),(TChain*)nullptr));
 		  print(msg::kINFO,__FUNCTION__,Form("Found %s tree made by %s...",type_name.c_str(),producer_name.c_str()));
 		  _input_product_id.push_back(product_id((data::DataType_t)i,producer_name.c_str()));
@@ -582,16 +586,18 @@ namespace larlite {
 		}
 	      }
 	      for(int i=0; i<data::kRUNDATA_TYPE_MAX && !matched; ++i) {
-		if(data::kRUNDATA_TREE_NAME[i] == type_name) {
-		  _in_ch[(data::RunDataType_t)i].insert(std::make_pair(producer_name.c_str(),(TChain*)nullptr));
+		if(data::kRUNDATA_TREE_NAME[i] == type_name && 
+		   _in_rundata_ch[(data::RunDataType_t)i].find(producer_name) == _in_rundata_ch[(data::RunDataType_t)i].end()) {
+		  _in_rundata_ch[(data::RunDataType_t)i].insert(std::make_pair(producer_name.c_str(),(TChain*)nullptr));
 		  print(msg::kINFO,__FUNCTION__,Form("Found %s tree made by %s...",type_name.c_str(),producer_name.c_str()));
 		  //_input_run_product_id.push_back(product_id((data::SubRunDataType_t)i,producer_name.c_str()));
 		  matched=true;
 		}
 	      }
 	      for(int i=0; i<data::kDATA_TYPE_MAX && !matched; ++i) {
-		if(data::kSUBRUNDATA_TREE_NAME[i] == type_name) {
-		  _in_ch[(data::SubRunDataType_t)i].insert(std::make_pair(producer_name.c_str(),(TChain*)nullptr));
+		if(data::kSUBRUNDATA_TREE_NAME[i] == type_name && 
+		   _in_subrundata_ch[(data::SubRunDataType_t)i].find(producer_name) == _in_subrundata_ch[(data::SubRunDataType_t)i].end()) {
+		  _in_subrundata_ch[(data::SubRunDataType_t)i].insert(std::make_pair(producer_name.c_str(),(TChain*)nullptr));
 		  print(msg::kINFO,__FUNCTION__,Form("Found %s tree made by %s...",type_name.c_str(),producer_name.c_str()));
 		  //_input_subrun_product_id.push_back(product_id((data::SubRunDataType_t)i,producer_name.c_str()));
 		  matched=true;
@@ -614,10 +620,8 @@ namespace larlite {
 	print(msg::kERROR,__FUNCTION__,_buf);
 	status=false;
       }else if(!_name_out_tdirectory.empty()) {
-	
 	_fout->mkdir(_name_out_tdirectory.c_str());
 	_fout->cd(_name_out_tdirectory.c_str());
-
       }	
       break;
       
@@ -849,7 +853,7 @@ namespace larlite {
       _out_id_ch->Branch( "_subrun_id", &_subrun_id, "_subrun_id/i" );
       _out_id_ch->Branch( "_event_id",  &_event_id,  "_event_id/i"  );
 
-      _run_id = _subrun_id = _event_id = 0;
+      _run_id = _subrun_id = _event_id = ::larlite::data::kINVALID_UINT;
     }
     // In BOTH mode, write all that is read in
     else if(_mode==kBOTH) {
@@ -1268,8 +1272,9 @@ namespace larlite {
 	    name_ptr.second->Write();
 	  
 	    Message::send(msg::kNORMAL,__FUNCTION__,
-			  Form("TTree \"%s\" written with %lld events...",
+			  Form("TTree \"%s\" for %s written with %lld events...",
 			       name_ptr.second->GetName(),
+			       data::kDATA_TREE_NAME[i].c_str(),
 			       name_ptr.second->GetEntries())
 			  );
 	  }
@@ -1296,8 +1301,9 @@ namespace larlite {
 	    name_ptr.second->Write();
 	  
 	    Message::send(msg::kNORMAL,__FUNCTION__,
-			  Form("TTree \"%s\" written with %lld events...",
+			  Form("TTree \"%s\" for %s written with %lld events...",
 			       name_ptr.second->GetName(),
+			       data::kRUNDATA_TREE_NAME[i].c_str(),
 			       name_ptr.second->GetEntries())
 			  );
 	  }
@@ -1324,8 +1330,9 @@ namespace larlite {
 	    name_ptr.second->Write();
 	  
 	    Message::send(msg::kNORMAL,__FUNCTION__,
-			  Form("TTree \"%s\" written with %lld events...",
+			  Form("TTree \"%s\" for %s written with %lld events...",
 			       name_ptr.second->GetName(),
+			       data::kSUBRUNDATA_TREE_NAME[i].c_str(),
 			       name_ptr.second->GetEntries())
 			  );
 	  }
@@ -1594,6 +1601,50 @@ namespace larlite {
     _nevents_read++;
     return true;
   }
+
+  void storage_manager::set_id(const unsigned int run_id,
+			       const unsigned int subrun_id,
+			       const unsigned int event_id)
+  { 
+    if(_run_id == run_id && _subrun_id == subrun_id && _event_id == event_id)
+      return;
+
+    _run_id = run_id; 
+    _subrun_id = subrun_id; 
+    _event_id = event_id; 
+
+    for(int i=0; i<data::kDATA_TYPE_MAX; ++i) {
+
+      for(auto& name_ptr : _out_ch[i]) {
+      
+	if(!(name_ptr.second)) continue;
+	
+	_ptr_data_array[i][name_ptr.first]->set_run(_run_id);
+	_ptr_data_array[i][name_ptr.first]->set_subrun(_subrun_id);
+	_ptr_data_array[i][name_ptr.first]->set_event_id(_event_id);
+      }
+    }
+
+    for(int i=0; i<data::kSUBRUNDATA_TYPE_MAX; ++i) {
+      
+      for(auto& name_ptr : _out_subrundata_ch[i]) {
+	
+	if(!(name_ptr.second)) continue;
+	_ptr_subrundata_array[i][name_ptr.first]->set_run(_run_id);
+	_ptr_subrundata_array[i][name_ptr.first]->set_subrun(_subrun_id);
+      }
+    }
+	
+    for(int i=0; i<data::kRUNDATA_TYPE_MAX; ++i) {
+	  
+      for(auto& name_ptr : _out_rundata_ch[i]) {
+	    
+	if(!(name_ptr.second)) continue;
+	_ptr_rundata_array[i][name_ptr.first]->clear_data();
+	_ptr_rundata_array[i][name_ptr.first]->set_run(_run_id);
+      }
+    }
+  }
   
   bool storage_manager::write_event(){
     
@@ -1617,6 +1668,7 @@ namespace larlite {
 	_ptr_data_array[i][name_ptr.first]->set_event_id(_event_id);
       }
     }
+
     if(_run_id != _last_run_id || _subrun_id != _last_subrun_id) {
 
       for(int i=0; i<data::kSUBRUNDATA_TYPE_MAX; ++i) {
@@ -1656,7 +1708,7 @@ namespace larlite {
 	  }
 	}
       }
-      
+
       _last_run_id    = _run_id;
       _last_subrun_id = _subrun_id;
     }
