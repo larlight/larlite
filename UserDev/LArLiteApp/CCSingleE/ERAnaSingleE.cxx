@@ -7,13 +7,19 @@ namespace ertool {
 
   ERAnaSingleE::ERAnaSingleE() : AnaBase()
 			       , _result_tree(nullptr)
+			       , fTPC(-10.,-126.,-10.,292.,136.,1150.)
   {
     _name     = "ERAnaSingleE";
 
     if (_result_tree) { delete _result_tree; }
     _result_tree = new TTree("_result_tree","Result Tree");
 
+    _result_tree->Branch("_numEvts",&_numEvts,"numEvts/I");
+    _result_tree->Branch("_angle_Norm",&_angle_Norm,"_angle_Norm/D");
+    _result_tree->Branch("_angle_PxPy",&_angle_PxPy,"_angle_PxPy/D");
     _result_tree->Branch("_n_singleReco",&_n_singleReco,"n_singleReco/I");
+    _result_tree->Branch("_distToTopWall",&_distToTopWall,"distToTopWall/D");
+    _result_tree->Branch("_distBackAlongTraj",&_distBackAlongTraj,"distBackAlongTraj/D");
     _result_tree->Branch("_n_showers",&_n_showers,"n_showers/I");
     _result_tree->Branch("_n_showersReco",&_n_showersReco,"n_showersReco/I");
     _result_tree->Branch("_n_tracks",&_n_tracks,"n_tracks/I");
@@ -61,6 +67,9 @@ namespace ertool {
     _result_tree->Branch("_px_lepReco",&_px_lepReco,"px_lepReco/D");
     _result_tree->Branch("_py_lepReco",&_py_lepReco,"py_lepReco/D");
     _result_tree->Branch("_pz_lepReco",&_pz_lepReco,"pz_lepReco/D");
+    _result_tree->Branch("_px_lepNormReco",&_px_lepNormReco,"px_lepNormReco/D");
+    _result_tree->Branch("_py_lepNormReco",&_py_lepNormReco,"py_lepNormReco/D");
+    _result_tree->Branch("_pz_lepNormReco",&_pz_lepNormReco,"pz_lepNormReco/D");
     _result_tree->Branch("_lep_dot",&_lep_dot,"_lep_dot/D");
     _result_tree->Branch("_lep_vtxdist",&_lep_vtxdist,"_lep_vtxdist/D");
     _result_tree->Branch("_misID",&_misID,"misID/I");
@@ -78,15 +87,13 @@ namespace ertool {
   {}
 
   bool ERAnaSingleE::Analyze(const EventData &data, const ParticleSet &ps)
-  { 
-
+{
     // Get MC particle set
     auto mc_ps = MCParticleSet();
 
     // Reset tree variables
     // Assume we will mis-ID
     ResetTreeVariables();
-
 
     _numEvts += 1;
     // count number of showers in event
@@ -163,19 +170,32 @@ namespace ertool {
     // Count number of tracks and showers with E > 20 MeV
     _n_showersReco = 0;
     _n_tracksReco  = 0;
-    for (auto &s : data.AllShower())
-      if (s._energy > 20) { _n_showersReco += 1; }
+    for (auto &s : data.Shower())
+      if (s->_energy > 20) { _n_showersReco += 1; }
     _n_tracksReco = data.Track().size();
 
 
-    // size of ParticleSet should be the number of single electrons found
-    //ps is the reco particle set
+    // size of ParticleSet should be the number of neutrinos found, each associated with a single electron
     _n_singleReco = ps.size();
-    // If exactly one single electron was found in this event:
-    if ( _n_singleReco == 1 ){
-      Particle neutrino = ps[0];
+
+    // If exactly one(or more) single electron(s) was in this event:
+    if ( _n_singleReco >0 ){
+
+//        std::cout<<"\nEvent number : "<<_numEvts
+//		 <<"\nNumber singleE: "<<_n_singleReco<<std::endl;
+    for(int i = 0; i< ps.size(); i++){
+      Particle neutrino = ps[i];
+  //    std::cout<<"'Neutrino' pdg: "<<neutrino.PdgCode()<<std::endl;
       if(abs(neutrino.PdgCode()) != 12  && abs(neutrino.PdgCode()) != 14)
 	std::cout<<"wtf neutrino doesn't have a neutrino pdg code"<<std::endl;
+    
+
+//      auto daughter = neutrino.Daughters().size();
+//   	while(daughter > 0 && _n_singleReco >1) {
+//	    auto d = neutrino.Daughters()[daughter-1];
+//	    std::cout<<"PDG: "<<d.PdgCode()<<std::endl;
+//	    daughter--;
+//		}
       _e_nuReco = neutrino.Energy();
       _x_nuReco = neutrino.Vertex()[0];
       _y_nuReco = neutrino.Vertex()[1];
@@ -183,10 +203,14 @@ namespace ertool {
       _px_nuReco = neutrino.Momentum()[0];
       _py_nuReco = neutrino.Momentum()[1];
       _pz_nuReco = neutrino.Momentum()[2];
-      _n_tracksIntReco = ps[0].Daughters().size()-1;
+      _n_tracksIntReco = ps[i].Daughters().size()-1;
 
+//      std::cout<<"Nue x y z : "<<_x_nuReco<<", "<<_y_nuReco<<", "<<_z_nuReco<<std::endl;
+//      std::cout<<"px py pz : "<<_px_nuReco<<", "<<_py_nuReco<<", "<<_pz_nuReco<<std::endl;
+      double momMag = 0;
+ 
       //find the neutrino daughter that is a lepton
-      for (auto const& daught : ps[0].Daughters()){
+      for (auto const& daught : ps[i].Daughters()){
 	if(abs(daught.PdgCode()) == 11 || abs(daught.PdgCode()) == 13){
 	  _e_lepReco = daught.Energy();
 
@@ -206,15 +230,49 @@ namespace ertool {
 	  _lep_dot = ( ( _px_lep*_px_lepReco + _py_lep*_py_lepReco + _pz_lep*_pz_lepReco ) / 
 		       ( sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco + _pz_lepReco*_pz_lepReco ) * 
 			 sqrt( _px_lep*_px_lep + _py_lep*_py_lep + _pz_lep*_pz_lep ) ) );
+	
+        ::geoalgo::HalfLine shr(daught.Vertex(),daught.Momentum());
+
+	double detHalfHeight = 116.5 ;
+	_distToTopWall = (_y_lepReco - detHalfHeight)*daught.Momentum().Length()/_py_lepReco ;
+	_distBackAlongTraj = sqrt(daught.Vertex().SqDist(_geoAlgo.Intersection(fTPC,shr,true)[0])) ;
+
+	momMag = sqrt(_px_lepReco*_px_lepReco + _py_lepReco *_py_lepReco + _pz_lepReco*_pz_lepReco);
+	_px_lepNormReco = _px_lepReco / momMag ;
+	_py_lepNormReco = _py_lepReco / momMag ;
+	_pz_lepNormReco = _pz_lepReco / momMag ;
+//        std::cout<<"Daughter PDG: "<<daught.PdgCode()
+//		<<"\nDaughter E: "<<_e_lepReco
+//		<<"\n x y z : "<<_x_nuReco<<", "<<_y_nuReco<<", "<<_z_nuReco
+//		<<"\n px py pz : "<<_px_lepNormReco<<", "<<_py_lepNormReco<<", "<<_pz_lepNormReco<<std::endl;
+
+	double py = _py_lepNormReco ;
+	double pz = _pz_lepNormReco ;
+	double convert = 180.0/ 3.1415926525898 ; 
+	double quad = py/pz  ;
+	if(quad < 0)
+	    quad *=-1; 
+
+	_angle_Norm = atan(quad );
+	_angle_Norm*= convert ;
+
+	if(py >=0 && pz <0)
+	    _angle_Norm = 180 - _angle_Norm ; 
+	else if(py <0 && pz <0)
+	    _angle_Norm = 180 + _angle_Norm ;
+	else if(py <0 && pz >=0)
+	    _angle_Norm = 360 - _angle_Norm ;
+
 	}
       }
       _misID = 0;
       _singleE_ctr += 1;
+
+      _result_tree->Fill();
+     }
     }
 
     _h_e_nu_correlation->Fill(_e_nu,_e_nuReco);
-
-    _result_tree->Fill();
 
     if (_debug){
       std::cout << "Ana results:" << std::endl
@@ -330,6 +388,7 @@ namespace ertool {
     _phi_lepReco   = -360;
     _lep_dot       = -2;
     _lep_vtxdist   = -1000;
+    _distToTopWall = -9999;
 
     return;
   }
