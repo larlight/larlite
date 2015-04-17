@@ -64,6 +64,23 @@ if not inc_inserted or not lib_inserted:
          l += 'LDFLAGS += $(shell larlite-config --libs)'
          lib_inserted=True
       new_contents += '%s\n' % l
+
+   # Check if flags are inserted... if not, insert right before GNUMakefile.Core
+   if not inc_inserted or not lib_inserted:
+      if new_contents.find('GNUmakefile.CORE')<0:
+         print 'Failed to update GNUmakefile...'
+         sys.exit(1)
+      contents = new_contents.split('\n')
+      new_contents = ''
+      for l in contents:
+         if not inc_inserted and not l.find('GNUmakefile.CORE') < 0:
+            l = 'INCFLAGS += $(shell larlite-config --includes)\n%s' % l
+            inc_inserted=True
+         if not lib_inserted and not l.find('GNUmakefile.CORE') < 0:
+            l = 'LDFLAGS += $(shell larlite-config --libs)\n%s' % l
+            lib_inserted=True
+         new_contents += '%s\n' % l
+      
    fout=open('%s/GNUmakefile' % target_dir,'w')
    fout.write(new_contents)
    fout.close()

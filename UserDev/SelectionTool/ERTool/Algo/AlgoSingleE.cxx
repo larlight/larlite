@@ -12,6 +12,7 @@ namespace ertool {
   
   AlgoSingleE::AlgoSingleE() : AlgoBase()
 			     , _alg_tree(nullptr)
+			     , fTPC(-10.,-126.,-10.,292.,136.,1150.)
   {
 
     _name       = "AlgoSingleE";
@@ -24,6 +25,8 @@ namespace ertool {
     _hassister = false;
     _rejectLongTracks = true;
     _vtxProximityCut = 0;
+    _BDtW = 0; 
+    _BDtTW = 0;
 
   }
 
@@ -59,6 +62,8 @@ namespace ertool {
     _alg_tree->Branch("_IPthisStart",&_IPthisStart,"_IPthisStart/D");
     _alg_tree->Branch("_IPthatStart",&_IPthatStart,"_IPthatStart/D");
     _alg_tree->Branch("_IPtrkBody",&_IPtrkBody,"_IPtrkBody/D");
+    _alg_tree->Branch("_distBackAlongTraj",&_distBackAlongTraj,"_distBackAlongTraj/D");
+    _alg_tree->Branch("_distToTopWall",&_distToTopWall,"_distToTopWall/D");
     
     return;
   }
@@ -138,6 +143,15 @@ namespace ertool {
 	    if (_verbose) { std::cout << "NOT single" << std::endl; }
 	    break;
 	  }
+	::geoalgo::HalfLine shr(thisShower.Start(),thisShower.Dir());
+	_distBackAlongTraj = sqrt(thisShower.Start().SqDist(_geoAlgo.Intersection(fTPC,shr,true)[0])) ;
+
+	//Distance to Top Wall caluclation from page 19 of cosmics technote
+//	double detHalfHeight = ::larutil::Geometry::GetME()->DetHalfHeight();
+	double detHalfHeight = 116.5 ;
+	_distToTopWall         = (thisShower.Start()[1] - detHalfHeight)*thisShower.Dir().Length()/(thisShower.Dir()[1]) ;
+
+
 	}// if not the same showers
       }//loop over showers
       // loop over tracks if still single
@@ -213,6 +227,16 @@ namespace ertool {
 	}
       }
 
+      if( single and !_hassister and _BDtW !=0){
+	if(_verbose) { std::cout << "Distance back along trajectory is: "<<_distBackAlongTraj<<". Shower not single!" <<std::endl; }
+	single = false ;
+	}
+
+      if( single and !_hassister and _BDtTW !=0){
+	if(_verbose) { std::cout << "Distance back along trajectory is: "<<_distToTopWall<<". Shower not single!" <<std::endl; }
+	single = false ;
+	}
+
       // if still single (and no sister track) look at
       // dEdx to determine if e-like
       if (single && !_hassister){
@@ -221,6 +245,8 @@ namespace ertool {
 	  single = false;
 	}
       }
+
+
 
       //If single still true -> we found it! Proceed!
       // the particle with all it's info was already
@@ -264,7 +290,11 @@ namespace ertool {
 	  }// for all sibling tracks
 	}// if hassister
 	neutrino.Momentum(neutrinoMomentum);
-	res.push_back(neutrino);
+
+	//Only store the neutrino if lepton is in active volume!
+	if(fTPC.Contain(neutrino.Vertex())){
+	  res.push_back(neutrino);
+	}
       }
       else
 	if (_verbose) { std::cout << "Shower is not single." << std::endl; }
@@ -342,6 +372,8 @@ namespace ertool {
     _IPthisStart = -1;
     _IPthatStart = -1;
     _IPtrkBody = -1;
+    _distBackAlongTraj = -1;
+    _distToTopWall  = -999999;
 
     return;
   }

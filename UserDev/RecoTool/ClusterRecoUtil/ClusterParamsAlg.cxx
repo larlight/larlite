@@ -11,7 +11,7 @@ namespace cluster{
 
   ClusterParamsAlg::ClusterParamsAlg()
   {
-    fMinNHits = 10;
+    fMinNHits = 1;
     fGSer=nullptr;
     enableFANN = false;
     verbose=true;
@@ -20,7 +20,7 @@ namespace cluster{
 
   ClusterParamsAlg::ClusterParamsAlg(const std::vector<const larlite::hit*> &inhitlist)
   {
-    fMinNHits = 10;
+    fMinNHits = 1;
     fGSer=nullptr;
     enableFANN = false;
     verbose=true;
@@ -29,7 +29,7 @@ namespace cluster{
 
   ClusterParamsAlg::ClusterParamsAlg(const std::vector<larutil::PxHit> &inhitlist)
   {
-    fMinNHits = 10;
+    fMinNHits = 1;
     fGSer=nullptr;
     enableFANN = false;
     verbose=true;
@@ -91,7 +91,6 @@ namespace cluster{
     }
     
     Initialize();
-
     UChar_t plane = larutil::Geometry::GetME()->ChannelToPlane((*inhitlist.begin())->Channel());
 
     fHitVector.reserve(inhitlist.size());
@@ -105,9 +104,8 @@ namespace cluster{
       (*fHitVector.rbegin()).plane = plane;
     }
     fPlane=fHitVector[0].plane;
-    
         
-    if (fHitVector.size()<10)
+    if (fHitVector.size()<fMinNHits)
     {
       if(verbose) std::cout << " the hitlist is too small. Continuing to run may result in crash!!! " << std::endl;
      return -1;
@@ -313,7 +311,6 @@ namespace cluster{
 
     }
 
-
     fParams.N_Wires = uniquewires;
     fParams.multi_hit_wires = multi_hit_wires;
 
@@ -421,6 +418,8 @@ namespace cluster{
       if (!fFinishedGetRoughAxis) GetRoughAxis(true);
     }
 
+    if (fParams.N_Hits == 1) return;
+
     TStopwatch localWatch;
     localWatch.Start();
 
@@ -474,24 +473,24 @@ namespace cluster{
       
       if(inv_2d_slope!=-999999)   //almost all cases
       {	
-	if(intercept > InterHigh ){
-	  InterHigh=intercept;
-	  }
+        if(intercept > InterHigh ){
+          InterHigh=intercept;
+          }
         
-	if(intercept < InterLow ){
-	  InterLow=intercept;
-	  }  
+        if(intercept < InterLow ){
+          InterLow=intercept;
+          }  
       }
       else    //slope is practically horizontal. Care only about wires.
-	{
-	  if(hit.w > WireHigh ){
-	    WireHigh=hit.w;
-	    }
+        {
+          if(hit.w > WireHigh ){
+            WireHigh=hit.w;
+            }
         
-	  if(hit.w < WireLow ){
-	    WireLow=hit.w;
-	    }
-	}
+          if(hit.w < WireLow ){
+            WireLow=hit.w;
+            }
+        }
     
       if(side_intercept > fInterHigh_side ){
         fInterHigh_side=side_intercept;
@@ -1572,6 +1571,12 @@ namespace cluster{
 
     TStopwatch localWatch;
     localWatch.Start();
+
+    if (fParams.N_Hits == 1){
+      fParams.start_point = fHitVector.front();
+      fParams.end_point = fHitVector.front();
+      return;
+    }
 
     if(verbose) std::cout << " here!!! "  << std::endl;
     

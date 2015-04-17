@@ -10,7 +10,7 @@ namespace cmtool {
     _fout = 0;
     _debug_mode = kNone;
     _priority_algo = nullptr;
-    _min_nhits = 0;
+    _min_nhits = 1;
     _merge_till_converge = false;
     Reset();
     _time_report=false;
@@ -46,7 +46,7 @@ namespace cmtool {
       _in_clusters.push_back(tmp_alg);
       (*_in_clusters.rbegin()).Initialize();
 
-      if((*_in_clusters.rbegin()).SetHits(c) < 3) continue;
+      if((*_in_clusters.rbegin()).SetHits(c) < _min_nhits) continue;
       (*_in_clusters.rbegin()).DisableFANN();
       //(*_in_clusters.rbegin()).FillParams(true,true,true,true,true,false);
       (*_in_clusters.rbegin()).FillParams(false,false,false,false,false,false);

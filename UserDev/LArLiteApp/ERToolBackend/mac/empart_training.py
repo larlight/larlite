@@ -33,15 +33,15 @@ def main():
     my_algo = ertool.AlgoEMPart()
     # ******* Set Fit ranges **********
     # Fit ranges for Reconstructed Info
-    my_algo.SetFitRange_dEdx(1.2,2,False); # False = e- / True = gamma
-    my_algo.SetFitRange_dEdx(3.0,4.5,True);
-    my_algo.SetFitRange_RadLen(0.,50.,True);
-    my_algo.SetFitRange_RadLen(0.,10.,False);
-    # Fit ranges for MC Info:
-    #my_algo.SetFitRange_dEdx(0.5,6,False); # False = e- / True = gamma
-    #my_algo.SetFitRange_dEdx(0.5,6,True);
-    #my_algo.SetFitRange_RadLen(0.,50.,True);
+    #my_algo.SetFitRange_dEdx(1.2,2,False); # False = e- / True = gamma
+    #my_algo.SetFitRange_dEdx(3.0,4.5,True);
+    #my_algo.SetFitRange_RadLen(5.,25.,True);
     #my_algo.SetFitRange_RadLen(0.,10.,False);
+    # Fit ranges for MC Info:
+    my_algo.SetFitRange_dEdx(0.5,6,False); # False = e- / True = gamma
+    my_algo.SetFitRange_dEdx(0.5,6,True);
+    my_algo.SetFitRange_RadLen(5.,25.,True);
+    my_algo.SetFitRange_RadLen(0.,5.,False);
     # ******* End Set Fit Ranges *******
     my_algo.setVerbose(True)
     # Create analysis unit

@@ -33,10 +33,10 @@ my_filter = ertool.FilterTrackLength()
 my_filter.setLengthCut(0.3)
 
 # Creat MC Filter
-MCfilter = fmwk.MC_CC1E_Filter();
+#MCfilter = fmwk.MC_CC1E_Filter();
 #Set flip to FALSE if you are looking for efficiency, TRUE if you are looking for MID efficiency
 #MCfilter.flip(False)
-MCfilter.flip(True)
+#MCfilter.flip(True)
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):
@@ -55,12 +55,15 @@ my_anaunit = fmwk.ExampleERSelection()
 my_anaunit._mgr.SetAlgo(my_algo)
 my_anaunit._mgr.SetFilter(my_filter)
 my_anaunit._mgr.SetAna(my_ana)
+#This cut is applied in helper... ertool showers are not made if the energy of mcshower or reco shower
+#is below this threshold. This has to be above 0 or else the code may segfault. This is not a "physics cut".
+#Do not change this value unless you know what you are doing.
 my_anaunit.SetMinEDep(20)
 my_anaunit._mgr._mc_for_ana = True
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
-#my_anaunit.SetShowerProducer(True,"mcreco");
-my_anaunit.SetShowerProducer(False,"showerreco");
+my_anaunit.SetShowerProducer(True,"mcreco");
+#my_anaunit.SetShowerProducer(False,"showerreco");
 #my_anaunit.SetShowerProducer(False,"newdefaultreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetShowerProducer(False,"mergeall");
@@ -70,7 +73,7 @@ my_anaunit.SetTrackProducer(True,"mcreco");
 
 #my_anaunit.SetVtxProducer(True,"generator");
 # ************************************************
-my_proc.add_process(MCfilter)
+#my_proc.add_process(MCfilter)
 my_proc.add_process(my_anaunit)
 
 my_proc.run()
