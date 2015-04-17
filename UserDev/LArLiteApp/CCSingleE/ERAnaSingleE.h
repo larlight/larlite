@@ -19,7 +19,8 @@
 #include "TTree.h"
 #include "TH1D.h"
 #include "TH2F.h"
-
+#include "GeoAlgo/GeoAlgo.h"
+#include "GeoAlgo/GeoAABox.h"
 #include "DataFormat/mctruth.h"
 
 namespace ertool {
