@@ -7,7 +7,7 @@ namespace ertool {
 
   ERAnaSingleE::ERAnaSingleE() : AnaBase()
 			       , _result_tree(nullptr)
-			       , fTPC(-10.,-126.,-10.,292.,136.,1150.)
+			       , fTPC(0.,-115.5,0.,254.8,117.5,1036.92)
   {
     _name     = "ERAnaSingleE";
 
@@ -19,7 +19,12 @@ namespace ertool {
     _result_tree->Branch("_angle_PxPy",&_angle_PxPy,"_angle_PxPy/D");
     _result_tree->Branch("_n_singleReco",&_n_singleReco,"n_singleReco/I");
     _result_tree->Branch("_distToTopWall",&_distToTopWall,"distToTopWall/D");
+    _result_tree->Branch("_distToWall",&_distToWall,"distToWall/D");
     _result_tree->Branch("_distBackAlongTraj",&_distBackAlongTraj,"distBackAlongTraj/D");
+    _result_tree->Branch("_maxIP",&_maxIP,"maxIP/D");
+    _result_tree->Branch("_vtxToTrkStartDist",&_vtxToTrkStartDist,"vtxToTrkStartDist/D");
+    _result_tree->Branch("_vtxToTrkDist",&_vtxToTrkDist,"vtxToTrkDist/D");
+    _result_tree->Branch("_vtxToShrStartDist",&_vtxToShrStartDist,"vtxToShrStartDist/D");
     _result_tree->Branch("_n_showers",&_n_showers,"n_showers/I");
     _result_tree->Branch("_n_showersReco",&_n_showersReco,"n_showersReco/I");
     _result_tree->Branch("_n_tracks",&_n_tracks,"n_tracks/I");
@@ -233,9 +238,24 @@ namespace ertool {
 	
         ::geoalgo::HalfLine shr(daught.Vertex(),daught.Momentum());
 
+	for (auto &t : data.Track()){
+	    _maxIP =  _findRel.FindClosestApproach(daught,thatTrack,vtx);
+	    _vtxToTrkStartDist = vtx.Dist(thatTrack.front());
+	    _vtxToTrkDist =	sqrt(_geoAlgo.SqDist(vtx,thatTrack));
+		
+		}
 	double detHalfHeight = 116.5 ;
 	_distToTopWall = (_y_lepReco - detHalfHeight)*daught.Momentum().Length()/_py_lepReco ;
-	_distBackAlongTraj = sqrt(daught.Vertex().SqDist(_geoAlgo.Intersection(fTPC,shr,true)[0])) ;
+	if(_geoAlgo.Intersection(fTPC,shr,true).size() >0)
+	   _distBackAlongTraj = sqrt(daught.Vertex().SqDist(_geoAlgo.Intersection(fTPC,shr,true)[0])) ;
+	else 
+	    _distBackAlongTraj = -999;
+	_distToWall = sqrt(_geoAlgo.SqDist(shr.Start(),fTPC)) ;
+
+	//Add _algo_tree cuts in here for optimization
+
+	_vtxToShrStartDist = vtx.Dist(daught.Start()); 
+
 
 	momMag = sqrt(_px_lepReco*_px_lepReco + _py_lepReco *_py_lepReco + _pz_lepReco*_pz_lepReco);
 	_px_lepNormReco = _px_lepReco / momMag ;
@@ -389,6 +409,13 @@ namespace ertool {
     _lep_dot       = -2;
     _lep_vtxdist   = -1000;
     _distToTopWall = -9999;
+    _maxIP =  	   = -999; 
+    _vtxToTrkStartDist = -999; 
+    _vtxToTrkDist = -999;	
+    _vtxToShrStartDist = -999;
+
+
+
 
     return;
   }

@@ -21,13 +21,15 @@ my_algo = ertool.AlgoSingleE()
 my_algo.useRadLength(True)
 my_algo.setVerbose(False)
 my_algo.setRejectLongTracks(True)
-my_algo.setVtxToTrkStartDist(1)
-my_algo.setVtxToTrkDist(1)
-my_algo.setVtxToShrStartDist(50)
-my_algo.setMaxIP(1)
-my_algo.setVtxProximityCut(5)
-my_algo.setEThreshold(0)
-my_algo.LoadParams()
+my_algo.setVtxToTrkStartDist(1)  #1
+my_algo.setVtxToTrkDist(1)	 #1
+my_algo.setVtxToShrStartDist(50) #50
+my_algo.setMaxIP(1)		 #1
+my_algo.setVtxProximityCut(5)	 #5
+my_algo.setEThreshold(100.)	 #100
+#my_algo.setBDtW(10)
+#my_algo.setBDtTW(10)
+#my_algo.LoadParams()
 # Create ERTool filter
 my_filter = ertool.FilterTrackLength()
 my_filter.setLengthCut(0.3)
@@ -37,6 +39,7 @@ my_filter.setLengthCut(0.3)
 #Set flip to FALSE if you are looking for efficiency, TRUE if you are looking for MID efficiency
 #MCfilter.flip(False)
 #MCfilter.flip(True)
+#MCfilter.SetFilterEnergy(.02) 
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):

@@ -20,6 +20,7 @@
 #include "TH1D.h"
 #include "TH2F.h"
 #include "GeoAlgo/GeoAlgo.h"
+#include "ERTool/Algo/AlgoFindRelationship.h"
 #include "DataFormat/mctruth.h"
 
 namespace ertool {
@@ -108,14 +109,26 @@ namespace ertool {
     double _distBackAlongTraj ;
     double _distToWall; 
 
+    double _vtxToTrkStartDist;
+    double _vtxToTrkDist;
+    double _vtxToShrStartDist;
+    double _maxIP;
+    // Vertex Proximity Cut:
+    // if "candidate vertices" from the tracks are found
+    // (needs to be a vertex in common to 2+ tracks in event)
+    // require that a shower be within this distance to the
+    // closest candidate vertex
+    double _vtxProximityCut;
+
 
 
     /// counters to cout to screen after running
     int _numEvts;
     int _singleE_ctr;
 
-::geoalgo::GeoAlgo _geoAlgo;
-::geoalgo::AABox fTPC;
+    ::geoalgo::GeoAlgo _geoAlgo;
+    ::geoalgo::AABox fTPC;
+    AlgoFindRelationship _findRel;
 
     TH2F* _h_e_nu_correlation;
   };
