@@ -290,9 +290,6 @@ namespace ertool {
       }// loop over all CCSingleEs found in event
     }// if at least 1 CCSingleE interaction was reconstructed
 
-
-
-    std::cout << "Single E: " << _n_singleReco << "\tMisID: " << _misID << std::endl;
     _h_e_nu_correlation->Fill(_e_nu,_e_nuReco);
     
     if (_debug){
