@@ -25,7 +25,7 @@ my_algo.setVtxToTrkDist(1)
 my_algo.setVtxToShrStartDist(50)
 my_algo.setMaxIP(1)
 my_algo.setVtxProximityCut(5)
-my_algo.setEThreshold(0)
+my_algo.setEThreshold(100)
 my_algo.LoadParams()
 # Create ERTool filter
 my_filter = ertool.FilterTrackLength()
@@ -68,6 +68,7 @@ my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetVtxProducer(True,"generator");
 #my_anaunit.SetShowerProducer(False,"mergeall");
 #my_anaunit.SetShowerProducer(False,"newdefaultreco");
+my_anaunit.SetShowerProducer(True,"mcreco");
 #my_anaunit.SetShowerProducer(False,"showerreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
@@ -78,11 +79,12 @@ my_proc.add_process(my_anaunit)
 
 # Start event-by-event loop
 counter = 0
-while (counter < 1000):
+while (counter < 11700):
     try:
         counter = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
     except SyntaxError:
         counter = counter + 1
+    print "Event number: ", counter
     my_proc.process_event(counter)
     print "Processing event {0}".format(counter) 
     # get objets and display

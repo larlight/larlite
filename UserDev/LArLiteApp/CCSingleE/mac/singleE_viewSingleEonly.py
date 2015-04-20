@@ -59,7 +59,7 @@ my_anaunit = fmwk.ExampleERSelection()
 my_anaunit._mgr.SetAlgo(my_algo)
 my_anaunit._mgr.SetFilter(my_filter)
 my_anaunit._mgr.SetAna(my_ana)
-my_anaunit.SetMinEDep(Ecut)
+my_anaunit.SetMinEDep(100)
 my_anaunit._mgr._mc_for_ana = True
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
@@ -68,7 +68,8 @@ my_anaunit._mgr._mc_for_ana = True
 #my_anaunit.SetShowerProducer(False,"newdefaultreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetShowerProducer(False,"mergeall");
-my_anaunit.SetShowerProducer(False,"showerreco");
+#my_anaunit.SetShowerProducer(False,"showerreco");
+my_anaunit.SetShowerProducer(True,"mcreco");
 
 my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
@@ -81,17 +82,17 @@ my_proc.add_process(my_anaunit)
 
 # Start event-by-event loop
 counter = 0
-while (counter < 20000):
+while (counter < 1800):
     
     counter = counter + 1
     my_proc.process_event(counter)
-
     data_reco = my_anaunit.GetData()
     part_reco = my_anaunit.GetParticles()
-    
+
     print "Particles: {0}".format(part_reco.size())
+    print "Event: ", counter
     
-    if (part_reco.size() != 1):
+    if (part_reco.size() != 0):
         # we found something...lets plot it
         data_mc   = my_anaunit.GetData(True)
         part_mc   = my_anaunit.GetParticles(True)

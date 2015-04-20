@@ -20,7 +20,7 @@
 #include "TH1D.h"
 #include "TH2F.h"
 #include "GeoAlgo/GeoAlgo.h"
-#include "GeoAlgo/GeoAABox.h"
+#include "ERTool/Algo/AlgoFindRelationship.h"
 #include "DataFormat/mctruth.h"
 
 namespace ertool {
@@ -114,7 +114,7 @@ namespace ertool {
     double _lep_vtxdist; /// Distance [cm] between MC and Reco SingleE showers
     double _distToTopWall;
     double _distBackAlongTraj ;
-    
+    double _distToWall; 
     // value of efficiency measured at the end
     double _eff;
 
@@ -123,8 +123,9 @@ namespace ertool {
     int _numEvts;
     int _singleE_ctr;
 
-::geoalgo::GeoAlgo _geoAlgo;
-::geoalgo::AABox fTPC;
+    ::geoalgo::GeoAlgo _geoAlgo;
+    ::geoalgo::AABox fTPC;
+    AlgoFindRelationship _findRel;
 
     TH2F* _h_e_nu_correlation;
   };
