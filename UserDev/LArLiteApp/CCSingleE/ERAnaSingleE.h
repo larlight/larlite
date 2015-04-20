@@ -19,6 +19,7 @@
 #include "TTree.h"
 #include "TH1D.h"
 #include "TH2F.h"
+#include "GeoAlgo/GeoAlgo.h"
 
 #include "DataFormat/mctruth.h"
 
@@ -106,6 +107,7 @@ namespace ertool {
     double _lep_vtxdist; /// Distance [cm] between MC and Reco SingleE showers
     double _distToTopWall;
     double _distBackAlongTraj ;
+    double _distToWall; 
 
 
 
