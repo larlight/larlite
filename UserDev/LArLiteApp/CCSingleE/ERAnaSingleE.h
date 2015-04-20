@@ -56,10 +56,19 @@ namespace ertool {
     void MakeEffPlot(std::string varname,
 		     int nbins, double xmin, double xmax);
 
+    /// get reported efficiency
+    double getEfficiency() { return _eff; }
+
+    /// set the energy cut to be used when counting particles
+    void SetECut(double c) { _eCut = c; }
+
   private:
 
+    // debug flag
     bool _debug;
 
+    // energy cut for counting particles
+    float _eCut;
 
     // Result tree comparison for reconstructed events
     TTree* _result_tree;
@@ -79,9 +88,7 @@ namespace ertool {
     int _n_neutrons;   /// number of neutrons (E > 20 MeV)
     int _n_piplus;     /// number of pi+ (E > 20 MeV)
     int _n_pi0;        /// number of pi0 (E > 20 MeV)
-    /// Whether this event was MID'd (if == 0: we found ==1 single electron)
-    /// Note: this is 0 if _E is filled, otherwise this is 1 (redundant)
-    int    _misID;
+    int    _misID;     /// Whether this event was MID'd (if == 0: we found == 1 single electron)
     double _e_nu, _e_nuReco;     /// Neutrino energy
     double _x_nu, _y_nu, _z_nu; /// Neutrino position
     double _x_nuReco, _y_nuReco, _z_nuReco; /// Neutrino position
@@ -108,18 +115,8 @@ namespace ertool {
     double _distToTopWall;
     double _distBackAlongTraj ;
     double _distToWall; 
-
-    double _vtxToTrkStartDist;
-    double _vtxToTrkDist;
-    double _vtxToShrStartDist;
-    double _maxIP;
-    // Vertex Proximity Cut:
-    // if "candidate vertices" from the tracks are found
-    // (needs to be a vertex in common to 2+ tracks in event)
-    // require that a shower be within this distance to the
-    // closest candidate vertex
-    double _vtxProximityCut;
-
+    // value of efficiency measured at the end
+    double _eff;
 
 
     /// counters to cout to screen after running
