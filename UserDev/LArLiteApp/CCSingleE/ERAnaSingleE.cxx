@@ -185,6 +185,12 @@ namespace ertool {
 
     // size of ParticleSet should be the number of neutrinos found, each associated with a single electron
     _n_singleReco = ps.size();
+
+    // if only 1 CCSingleE interaction was found -> misID = 0
+    if ( _n_singleReco == 1){
+      _misID = 0;
+      _singleE_ctr += 1;
+    }
     
     // If exactly one(or more) single electron(s) was in this event:
     if ( _n_singleReco > 0 ){
@@ -273,17 +279,17 @@ namespace ertool {
 	    
 	  }// if particle is lepton
 	}// for all daughters
-	
+	/*
+	_misID = 0;
+	_singleE_ctr += 1;
+	*/
 	_result_tree->Fill();
       }// loop over all CCSingleEs found in event
     }// if at least 1 CCSingleE interaction was reconstructed
 
-    // if only 1 CCSingleE interaction was found -> misID = 0
-    if ( _n_singleReco == 1){
-      _misID = 0;
-      _singleE_ctr += 1;
-    }
-    
+
+
+    std::cout << "Single E: " << _n_singleReco << "\tMisID: " << _misID << std::endl;
     _h_e_nu_correlation->Fill(_e_nu,_e_nuReco);
     
     if (_debug){
