@@ -20,7 +20,6 @@
 #include "TH1D.h"
 #include "TH2F.h"
 #include "GeoAlgo/GeoAlgo.h"
-
 #include "DataFormat/mctruth.h"
 
 namespace ertool {
