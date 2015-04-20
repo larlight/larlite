@@ -243,7 +243,10 @@ namespace ertool {
 	    
 	    double detHalfHeight = 116.5 ;
 	    _distToTopWall = (_y_lepReco - detHalfHeight)*daught.Momentum().Length()/_py_lepReco ;
-	    _distBackAlongTraj = sqrt(daught.Vertex().SqDist(_geoAlgo.Intersection(fTPC,shr,true)[0])) ;
+	    if(_geoAlgo.Intersection(fTPC,shr,true).size() > 0)
+		_distBackAlongTraj = sqrt(daught.Vertex().SqDist(_geoAlgo.Intersection(fTPC,shr,true)[0])) ;
+	    else
+		_distBackAlongTraj = -999; 
 	    
 	    momMag = sqrt(_px_lepReco*_px_lepReco + _py_lepReco *_py_lepReco + _pz_lepReco*_pz_lepReco);
 	    _px_lepNormReco = _px_lepReco / momMag ;
