@@ -32,7 +32,7 @@ my_algo.setVtxToTrkDist(1)	 #1
 my_algo.setVtxToShrStartDist(50) #50
 my_algo.setMaxIP(1)		 #1
 my_algo.setVtxProximityCut(5)	 #5
-my_algo.setEThreshold(100.)	 #100
+my_algo.setEThreshold(0.)	 #100
 #my_algo.setBDtW(10)
 #my_algo.setBDtTW(10)
 #my_algo.LoadParams()
