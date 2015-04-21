@@ -44,6 +44,8 @@ namespace ertool {
     _result_tree->Branch("_pz_nuReco",&_pz_nuReco,"pz_nuReco/D");
     _result_tree->Branch("_n_protons",&_n_protons,"n_protons/I");
     _result_tree->Branch("_n_neutrons",&_n_neutrons,"n_neutrons/I");
+    _result_tree->Branch("_e_trkInt",&_e_trkInt,"e_trkInt/D");
+    _result_tree->Branch("_e_trkIntReco",&_e_trkIntReco,"e_trkIntReco/D");
     _result_tree->Branch("_n_piplus",&_n_piplus,"n_piplus/I");
     _result_tree->Branch("_n_pi0",&_n_pi0,"n_pi0/I");
     _result_tree->Branch("_pdg_nu",&_pdg_nu,"pdg_nu/I");
@@ -131,14 +133,16 @@ namespace ertool {
 	_py_nu = p.Momentum()[1];
 	_pz_nu = p.Momentum()[2];
 	_pdg_nu = p.PdgCode();
-	_n_tracksInt = 0;
+	
 	bool found_lepton_daughter = false;
-	for (auto &nut : p.AllDaughters()){
+	/*
+	  for (auto &nut : p.AllDaughters()){
 	  if (abs(nut->PdgCode()) == 13 || abs(nut->PdgCode()) == 211 || abs(nut->PdgCode()) == 2212 ){
-	    if ( nut->Vertex().Dist(p.Vertex()) < 1)
-	      _n_tracksInt += 1;
+	  if ( nut->Vertex().Dist(p.Vertex()) < 1)
+	  _n_tracksInt += 1;
 	  }
-	}
+	  }
+	*/
 	for (auto &nud : p.Daughters()){
 	  if (abs(nud.PdgCode()) == 11 || abs(nud.PdgCode()) == 13){
 	    if(found_lepton_daughter) 
@@ -158,6 +162,7 @@ namespace ertool {
 	  }
 	}
       }
+
       // now keep track of all showers and tracks in the event
       for (auto &d : p.AllDaughters()){
 	if ( (d->PdgCode() == 22) && (d->Energy() > _eCut) )
@@ -175,6 +180,29 @@ namespace ertool {
       }
     }
     
+    // find the number of tracks that start within 1 cm of the neutrino interaction
+    _n_tracksInt = 0;
+    geoalgo::Point_t nu_vtx(_x_nu,_y_nu,_z_nu);
+    for (auto &part : mc_ps){
+      if (abs(part.PdgCode()) == 13 || abs(part.PdgCode()) == 211 || abs(part.PdgCode()) == 2212 ){
+	if ( nu_vtx.Dist(part.Vertex()) < 1){
+	  //	  std::cout << "Adding: " << part.PdgCode() << "\tE: " << part.KineticEnergy() << std::endl;
+	  _n_tracksInt += 1;
+	  _e_trkInt += part.KineticEnergy();
+	}
+      }
+      for (auto &nud : part.Daughters()){
+	if (abs(nud.PdgCode()) == 13 || abs(nud.PdgCode()) == 211 || abs(nud.PdgCode()) == 2212 ){
+	  if ( nu_vtx.Dist(nud.Vertex()) < 1){
+	    //std::cout << "Adding: " << nud.PdgCode() << "\tE: " << nud.KineticEnergy() << std::endl;
+	    _n_tracksInt += 1;
+	    _e_trkInt += nud.KineticEnergy();
+	  }
+	}
+      }
+    }
+    //std::cout << "n Trks Interaction: " << _n_tracksInt << "\t E: " << _e_trkInt << std::endl;
+    
     // Count number of tracks and showers with E > _eCut MeV
     _n_showersReco = 0;
     _n_tracksReco  = 0;
@@ -191,7 +219,7 @@ namespace ertool {
       _misID = 0;
       _singleE_ctr += 1;
     }
-    
+
     // If exactly one(or more) single electron(s) was in this event:
     if ( _n_singleReco > 0 ){
       
@@ -222,9 +250,16 @@ namespace ertool {
 	//      std::cout<<"Nue x y z : "<<_x_nuReco<<", "<<_y_nuReco<<", "<<_z_nuReco<<std::endl;
 	//      std::cout<<"px py pz : "<<_px_nuReco<<", "<<_py_nuReco<<", "<<_pz_nuReco<<std::endl;
 	double momMag = 0;
- 
+
+	_e_trkIntReco = 0;
+
 	//find the neutrino daughter that is a lepton
 	for (auto const& daught : ps[i].Daughters()){
+	  
+	  // if not a lepton, add energy to tracks
+	  if (abs(daught.PdgCode()) != 11)
+	    _e_trkIntReco += daught.KineticEnergy();
+	  
 	  if(abs(daught.PdgCode()) == 11 || abs(daught.PdgCode()) == 13){
 	    _e_lepReco = daught.Energy();
 	    
@@ -282,10 +317,10 @@ namespace ertool {
 	    
 	  }// if particle is lepton
 	}// for all daughters
-	/*
-	_misID = 0;
-	_singleE_ctr += 1;
-	*/
+
+	//_misID = 0;
+	//_singleE_ctr += 1;
+
 	_result_tree->Fill();
       }// loop over all CCSingleEs found in event
     }// if at least 1 CCSingleE interaction was reconstructed
@@ -410,6 +445,8 @@ namespace ertool {
     _lep_vtxdist   = -1000;
     _distToTopWall = -9999;
 
+    _e_trkInt = -1;
+    _e_trkIntReco = -1;
 
     return;
   }
