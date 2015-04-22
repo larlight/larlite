@@ -90,6 +90,8 @@ namespace ertool {
     int _n_pi0;        /// number of pi0 (E > 20 MeV)
     int    _misID;     /// Whether this event was MID'd (if == 0: we found == 1 single electron)
     double _e_trkInt, _e_trkIntReco; /// Energy of tracks @ neutrino vertex
+    double _e_neutrals; /// Energy of all neutral particles
+    double _e_nucleus_diff; /// Energy of final nucleus minus initial Ar nucleus
     double _e_nu, _e_nuReco;     /// Neutrino energy
     double _x_nu, _y_nu, _z_nu; /// Neutrino position
     double _x_nuReco, _y_nuReco, _z_nuReco; /// Neutrino position
@@ -129,6 +131,7 @@ namespace ertool {
     AlgoFindRelationship _findRel;
 
     TH2F* _h_e_nu_correlation;
+   
   };
 }
 #endif

@@ -45,6 +45,8 @@ namespace ertool {
     _result_tree->Branch("_n_protons",&_n_protons,"n_protons/I");
     _result_tree->Branch("_n_neutrons",&_n_neutrons,"n_neutrons/I");
     _result_tree->Branch("_e_trkInt",&_e_trkInt,"e_trkInt/D");
+    _result_tree->Branch("_e_neutrals",&_e_neutrals,"e_neutrals/D");
+    _result_tree->Branch("_e_nucleus_diff",&_e_nucleus_diff,"e_nucleus_diff/D");
     _result_tree->Branch("_e_trkIntReco",&_e_trkIntReco,"e_trkIntReco/D");
     _result_tree->Branch("_n_piplus",&_n_piplus,"n_piplus/I");
     _result_tree->Branch("_n_pi0",&_n_pi0,"n_pi0/I");
@@ -164,6 +166,9 @@ namespace ertool {
       }
 
       // now keep track of all showers and tracks in the event
+      _e_neutrals = 0;
+      _e_nucleus_diff = 0;
+      bool found_parent_nucleus = false;
       for (auto &d : p.AllDaughters()){
 	if ( (d->PdgCode() == 22) && (d->Energy() > _eCut) )
 	  _n_gammas += 1;
@@ -173,10 +178,17 @@ namespace ertool {
 	  _n_pi0 += 1;
 	else if ( (d->PdgCode() == 211) && (d->Energy() > _eCut) )
 	  _n_piplus += 1;
-	else if ( (d->PdgCode() == 2112) && (d->Energy() > _eCut) )
+	else if ( (d->PdgCode() == 2112) && (d->Energy() > _eCut) ){
 	  _n_neutrons += 1;
+	  // Add up neutral particles' energies
+	  _e_neutrals += d->KineticEnergy();
+	}
 	else if ( (d->PdgCode() == 2212) && (d->Energy() > _eCut) )
 	  _n_protons += 1;
+	else if (found_parent_nucleus &&  d->PdgCode() == 1000180400 )
+	  _e_nucleus_diff = d->KineticEnergy();
+	else if ( d->PdgCode() == 1000180400 )
+	  found_parent_nucleus = true;
       }
     }
     
@@ -238,7 +250,7 @@ namespace ertool {
 	//	    std::cout<<"PDG: "<<d.PdgCode()<<std::endl;
 	//	    daughter--;
 	//		}
-	_e_nuReco = neutrino.Energy();
+	//	_e_nuReco = neutrino.Energy();
 	_x_nuReco = neutrino.Vertex()[0];
 	_y_nuReco = neutrino.Vertex()[1];
 	_z_nuReco = neutrino.Vertex()[2];
@@ -252,14 +264,16 @@ namespace ertool {
 	double momMag = 0;
 
 	_e_trkIntReco = 0;
-
+	_e_nuReco = 0;
 	//find the neutrino daughter that is a lepton
 	for (auto const& daught : ps[i].Daughters()){
-	  
+	  _e_nuReco += daught.KineticEnergy();
+
 	  // if not a lepton, add energy to tracks
-	  if (abs(daught.PdgCode()) != 11)
+	  if (abs(daught.PdgCode()) != 11){
 	    _e_trkIntReco += daught.KineticEnergy();
-	  
+	  }
+
 	  if(abs(daught.PdgCode()) == 11 || abs(daught.PdgCode()) == 13){
 	    _e_lepReco = daught.Energy();
 	    

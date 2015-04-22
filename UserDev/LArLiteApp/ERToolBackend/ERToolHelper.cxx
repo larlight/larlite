@@ -323,13 +323,16 @@ namespace larlite {
       t.reserve(mct.size());
       for(auto const& step : mct)
 	t += step.Position();
+
+      //This is the TOTAL energy minus TOTAL energy, so mass is removed.
+      //If you want only initial kinetic energy, remember to subtract off mass.
       t._energy     = (*mct.begin()).Momentum().E() - (*mct.rbegin()).Momentum().E();
       t._cosmogenic = (double)(mct.Origin() == simb::kCosmicRay);
 
-      if(mct.PdgCode() == 13  || mct.PdgCode() == -13 ) t._pid = ::ertool::Track::kMuon;
-      if(mct.PdgCode() == 2212                        ) t._pid = ::ertool::Track::kProton;
-      if(mct.PdgCode() == 321 || mct.PdgCode() == -321) t._pid = ::ertool::Track::kKaon;
-      if(mct.PdgCode() == 211 || mct.PdgCode() == -211) t._pid = ::ertool::Track::kPion;
+      if(abs(mct.PdgCode()) == 13 ) t._pid = ::ertool::Track::kMuon;
+      if(mct.PdgCode() == 2212    ) t._pid = ::ertool::Track::kProton;
+      if(abs(mct.PdgCode()) == 321) t._pid = ::ertool::Track::kKaon;
+      if(abs(mct.PdgCode()) == 211) t._pid = ::ertool::Track::kPion;
       for(auto& v : t._pid_score) v = 100;
       if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
 
