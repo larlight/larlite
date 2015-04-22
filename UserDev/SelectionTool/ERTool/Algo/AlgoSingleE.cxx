@@ -196,6 +196,7 @@ namespace ertool {
 	      if (_verbose) { std::cout << "common origin w/ track!" << std::endl; }
 	      _hassister = true;
 	      siblings.push_back(t);
+
 	      if (isGammaLike(thisShower._dedx,vtx.Dist(thisShower.Start()))){
 		if (_verbose) { std::cout << "Shower is gamma-like. Ignore " << std::endl; }
 		single = false;
@@ -204,6 +205,7 @@ namespace ertool {
 	      else{
 		single = true;
 	      }
+
 	    }// if common origin with primary!
 	}// for all tracks
       }// if single
@@ -246,8 +248,6 @@ namespace ertool {
 	}
       }
 
-
-
       //If single still true -> we found it! Proceed!
       // the particle with all it's info was already
       // created, simply add it to the result vector
@@ -261,12 +261,14 @@ namespace ertool {
 
 	// momentum to be decided later (after summing momenta from all daughters)
 	geoalgo::Vector_t neutrinoMomentum(0.,0.,0.);
+	double neutrinoKineticEnergy = 0;
 	// Create electron!
 	Particle electron(11,_e_mass);
 	electron.Vertex(thisShower.Start());
-	double mom = thisShower._energy - _e_mass;
+	double mom = sqrt( (thisShower._energy)*(thisShower._energy) - (_e_mass*_e_mass) );
 	if (mom < 0) { mom = 1; }
 	electron.Momentum(thisShower.Dir()*mom);
+	neutrinoKineticEnergy += thisShower._energy;
 	neutrinoMomentum += electron.Momentum();
 	electron.RecoObjInfo(sh,Particle::RecoObjType_t::kShower);
 	neutrino.AddDaughter(electron);
@@ -285,11 +287,16 @@ namespace ertool {
 	    sibUnitDir /= sibUnitDir.Length();
 	    sib.Momentum(sibUnitDir*Tmom);
 	    neutrinoMomentum += sib.Momentum();
+	    // make sure energy - mass is positive
+	    if ( (sibTrack._energy - sib.Mass()) > 0)
+	      neutrinoKineticEnergy += sqrt(sibTrack._energy*sibTrack._energy - sib.Mass()*sib.Mass());
 	    sib.RecoObjInfo(sibling,Particle::RecoObjType_t::kTrack);
 	    neutrino.AddDaughter(sib);
 	  }// for all sibling tracks
 	}// if hassister
-	neutrino.Momentum(neutrinoMomentum);
+	// get neutrino momentum direction
+	neutrinoMomentum.Normalize();
+	neutrino.Momentum(neutrinoMomentum*neutrinoKineticEnergy);
 
 	//Only store the neutrino if lepton is in active volume!
 	if(fTPC.Contain(neutrino.Vertex())){
