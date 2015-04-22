@@ -10,11 +10,11 @@ namespace ertool{
     _name   = "AlgoFindRelationship";
     _debug  = false;
 
-    //Track-particle masses
-    _pi_mass = TDatabasePDG().GetParticle(211)->Mass();
-    _pr_mass = TDatabasePDG().GetParticle(2212)->Mass();
-    _mu_mass = TDatabasePDG().GetParticle(13)->Mass();
-    _ka_mass = TDatabasePDG().GetParticle(311)->Mass();
+    //Track-particle masses (convert to MEV)
+    _pi_mass = 1000.* TDatabasePDG().GetParticle(211)->Mass();
+    _pr_mass = 1000.* TDatabasePDG().GetParticle(2212)->Mass();
+    _mu_mass = 1000.* TDatabasePDG().GetParticle(13)->Mass();
+    _ka_mass = 1000.* TDatabasePDG().GetParticle(311)->Mass();
     _uk_mass = 0.;
   }
   
