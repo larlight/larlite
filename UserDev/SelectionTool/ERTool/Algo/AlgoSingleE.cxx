@@ -281,11 +281,11 @@ namespace ertool {
 	    sib.Vertex(sibTrack[0]);
 	    //sib.Mass() is in GEV, sibTrack._energy is in MEV
 	    //I think sibTrack._energy already has mass taken out of it.
-	    double Tmom = sibTrack._energy;
-	    if (Tmom < 0) { Tmom = 0.; }
+	    double Edep = sibTrack._energy;
+	    if (Edep < 0) { Edep = 0.; }
 	    geoalgo::Vector_t sibUnitDir = (sibTrack[1]-sibTrack[0]);
 	    sibUnitDir /= sibUnitDir.Length();
-	    sib.Momentum(sibUnitDir*Tmom);
+	    sib.Momentum(sibUnitDir*( sqrt(Edep*(Edep+2*sib.Mass())) ));
 	    neutrinoMomentum += sib.Momentum();
 	    // make sure energy - mass is positive
 	    if ( (sibTrack._energy - sib.Mass()) > 0)
