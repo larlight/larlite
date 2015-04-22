@@ -75,7 +75,6 @@ namespace larlite {
 	    mass = pdgdb_s.GetParticle(pdg)->Mass() * 1.e3; //Mass is now in MEV
 	  partmass_s[pdg] = mass;
 	}
-	
 	::ertool::Particle p(mcs.PdgCode(),partmass_s[pdg]);
 	p.Vertex( ::geoalgo::Vector(mcs.DetProfile().Position()) );
 	p.Momentum( ::geoalgo::Vector(mcs.DetProfile().Momentum()) );
@@ -136,7 +135,6 @@ namespace larlite {
 	    mass = pdgdb_s.GetParticle(pdg)->Mass() * 1.e3; //Mass is now in MEV
 	  partmass_s[pdg] = mass;
 	}
-	
 	::ertool::Particle p(mct.PdgCode(),partmass_s[pdg]);
 	p.Vertex( ::geoalgo::Vector(mct.front().Position()) );
 	p.Momentum( ::geoalgo::Vector(mct.front().Momentum()) );
@@ -218,7 +216,7 @@ namespace larlite {
 		trkid_to_grand_mother[mcp.TrackId()] = i;
 		if(grand_mother_to_res_index.find(i) == grand_mother_to_res_index.end()) {
 		  grand_mother_to_res_index[i]=particle_set.size();
-		  ::ertool::Particle p(mom_cand.PdgCode(),mom_cand.Mass());
+		  ::ertool::Particle p(mom_cand.PdgCode(),mom_cand.Mass()*1000.);
 		  p.Vertex( ::geoalgo::Vector(mom_cand.Trajectory()[0].Position()) );
 		  p.Momentum( ::geoalgo::Vector(mom_cand.Trajectory()[0].Momentum())*1.e3 );
 		  particle_set.push_back(p);
@@ -290,7 +288,7 @@ namespace larlite {
 		   << mcp.Trajectory()[0].Position().Pz()
 		   <<std::endl;
 	  */
-	  ::ertool::Particle p(pdg,mcp.Mass());
+	  ::ertool::Particle p(pdg,mcp.Mass()*1000.);
 	  p.Vertex(::geoalgo::Vector(mcp.Trajectory()[0].Position()));
 	  p.Momentum(::geoalgo::Vector(mcp.Trajectory()[0].Momentum())*1.e3); //MCParticle units are converted into MEV here
 	  if(trkid_to_grand_mother.find(mcp.TrackId())==trkid_to_grand_mother.end())  
