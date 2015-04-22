@@ -39,7 +39,7 @@ namespace ertool {
   { return sqrt(_mom.SqLength() + _mass * _mass ); }
 
   double Particle::KineticEnergy() const
-  { return sqrt(pow(this->Energy(),2) - pow(this->Mass(),2)); }
+  { return (this->Energy() - this->Mass()); }
 
   double Particle::DaughterEnergySum() const
   { 
