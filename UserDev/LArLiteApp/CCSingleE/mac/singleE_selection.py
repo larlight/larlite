@@ -40,12 +40,22 @@ my_algo.setEThreshold(0.)	 #100
 my_filter = ertool.FilterTrackLength()
 my_filter.setLengthCut(0.3)
 
-# Creat MC Filter
+# Create MC Filter
+
+# This filter is if you want to look at CC1E events
 MCfilter = fmwk.MC_CC1E_Filter();
 #Set flip to FALSE if you are looking for efficiency, TRUE if you are looking for MID efficiency
 MCfilter.flip(False)
 #MCfilter.flip(True)
 #MCfilter.SetFilterEnergy(.02) 
+# Use this filter instead if you want to look at CCQE channel events with specified number of mcshowers and
+# mctracks above specified energies coming from the neutrino
+#MCfilter = fmwk.MC_CCQE_Filter();
+#MCfilter.set_n_mcshowers(1)
+#MCfilter.set_min_mcshower_E(50.)
+#MCfilter.set_n_mctracks(0)
+#MCfilter.set_min_mctrack_E(10.)
+
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):

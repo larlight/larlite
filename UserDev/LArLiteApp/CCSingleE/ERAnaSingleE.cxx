@@ -8,6 +8,7 @@ namespace ertool {
   ERAnaSingleE::ERAnaSingleE() : AnaBase()
 			       , _result_tree(nullptr)
 			       , fTPC(0.,-115.5,0.,254.8,117.5,1036.92)
+
   {
     _name     = "ERAnaSingleE";
 
@@ -298,6 +299,8 @@ namespace ertool {
 	    
 	    double detHalfHeight = 116.5 ;
 	    _distToTopWall = (_y_lepReco - detHalfHeight)*daught.Momentum().Length()/_py_lepReco ;
+	    
+	    _distToWall = sqrt(_geoAlgo.SqDist(daught.Vertex(),fTPC));
 	    if(_geoAlgo.Intersection(fTPC,shr,true).size() > 0)
 		_distBackAlongTraj = sqrt(daught.Vertex().SqDist(_geoAlgo.Intersection(fTPC,shr,true)[0])) ;
 	    else

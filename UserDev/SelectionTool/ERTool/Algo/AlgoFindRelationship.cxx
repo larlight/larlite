@@ -364,7 +364,7 @@ namespace ertool{
     switch(trk._pid){
     case Track::TrackPartID_t::kUnknown : return Particle(999,_uk_mass);
     case Track::TrackPartID_t::kPIDA    : return Particle(999,_uk_mass);
-    case Track::TrackPartID_t::kProton  : return Particle(2122,_pr_mass);
+    case Track::TrackPartID_t::kProton  : return Particle(2212,_pr_mass);
     case Track::TrackPartID_t::kKaon    : return Particle(311,_ka_mass);
     case Track::TrackPartID_t::kPion    : return Particle(211,_pi_mass);
     case Track::TrackPartID_t::kMuon    : return Particle(13,_mu_mass);
