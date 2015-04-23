@@ -116,8 +116,10 @@ namespace ertool {
     // Get MC EventData (showers/tracks...)
     auto mc_data = MCEventData();
     // Count number of MC tracks and showers with E > _eCut MeV
-    _n_showers = 0;
-    _n_tracks  = 0;
+    _n_showers   = 0;
+    _n_tracks    = 0;
+    _n_tracksInt = 0;
+
     for (auto &s : data.AllShower())
       if (s._energy > _eCut) { _n_showers += 1; }
     for (auto &t : data.AllTrack())
@@ -138,14 +140,7 @@ namespace ertool {
 	_pdg_nu = p.PdgCode();
 	
 	bool found_lepton_daughter = false;
-	/*
-	  for (auto &nut : p.AllDaughters()){
-	  if (abs(nut->PdgCode()) == 13 || abs(nut->PdgCode()) == 211 || abs(nut->PdgCode()) == 2212 ){
-	  if ( nut->Vertex().Dist(p.Vertex()) < 1)
-	  _n_tracksInt += 1;
-	  }
-	  }
-	*/
+
 	for (auto &nud : p.Daughters()){
 	  if (abs(nud.PdgCode()) == 11 || abs(nud.PdgCode()) == 13){
 	    if(found_lepton_daughter) 
@@ -199,7 +194,6 @@ namespace ertool {
     for (auto &part : mc_ps){
       if (abs(part.PdgCode()) == 13 || abs(part.PdgCode()) == 211 || abs(part.PdgCode()) == 2212 ){
 	if ( nu_vtx.Dist(part.Vertex()) < 1){
-	  //	  std::cout << "Adding: " << part.PdgCode() << "\tE: " << part.KineticEnergy() << std::endl;
 	  _n_tracksInt += 1;
 	  _e_trkInt += part.KineticEnergy();
 	}
@@ -207,14 +201,12 @@ namespace ertool {
       for (auto &nud : part.Daughters()){
 	if (abs(nud.PdgCode()) == 13 || abs(nud.PdgCode()) == 211 || abs(nud.PdgCode()) == 2212 ){
 	  if ( nu_vtx.Dist(nud.Vertex()) < 1){
-	    //std::cout << "Adding: " << nud.PdgCode() << "\tE: " << nud.KineticEnergy() << std::endl;
 	    _n_tracksInt += 1;
 	    _e_trkInt += nud.KineticEnergy();
 	  }
 	}
       }
     }
-    //std::cout << "n Trks Interaction: " << _n_tracksInt << "\t E: " << _e_trkInt << std::endl;
     
     // Count number of tracks and showers with E > _eCut MeV
     _n_showersReco = 0;
@@ -245,13 +237,6 @@ namespace ertool {
 	  std::cout<<"wtf neutrino doesn't have a neutrino pdg code"<<std::endl;
 	
 	
-	//      auto daughter = neutrino.Daughters().size();
-	//   	while(daughter > 0 && _n_singleReco >1) {
-	//	    auto d = neutrino.Daughters()[daughter-1];
-	//	    std::cout<<"PDG: "<<d.PdgCode()<<std::endl;
-	//	    daughter--;
-	//		}
-	//	_e_nuReco = neutrino.Energy();
 	_x_nuReco = neutrino.Vertex()[0];
 	_y_nuReco = neutrino.Vertex()[1];
 	_z_nuReco = neutrino.Vertex()[2];
@@ -260,8 +245,6 @@ namespace ertool {
 	_pz_nuReco = neutrino.Momentum()[2];
 	_n_tracksIntReco = ps[i].Daughters().size()-1;
 	
-	//      std::cout<<"Nue x y z : "<<_x_nuReco<<", "<<_y_nuReco<<", "<<_z_nuReco<<std::endl;
-	//      std::cout<<"px py pz : "<<_px_nuReco<<", "<<_py_nuReco<<", "<<_pz_nuReco<<std::endl;
 	double momMag = 0;
 
 	_e_trkIntReco = 0;
@@ -310,10 +293,6 @@ namespace ertool {
 	    _px_lepNormReco = _px_lepReco / momMag ;
 	    _py_lepNormReco = _py_lepReco / momMag ;
 	    _pz_lepNormReco = _pz_lepReco / momMag ;
-	    //        std::cout<<"Daughter PDG: "<<daught.PdgCode()
-	    //		<<"\nDaughter E: "<<_e_lepReco
-	    //		<<"\n x y z : "<<_x_nuReco<<", "<<_y_nuReco<<", "<<_z_nuReco
-	    //		<<"\n px py pz : "<<_px_lepNormReco<<", "<<_py_lepNormReco<<", "<<_pz_lepNormReco<<std::endl;
 	    
 	    double py = _py_lepNormReco ;
 	    double pz = _pz_lepNormReco ;
@@ -335,9 +314,6 @@ namespace ertool {
 	  }// if particle is lepton
 	}// for all daughters
 
-	//_misID = 0;
-	//_singleE_ctr += 1;
-
 	_result_tree->Fill();
       }// loop over all CCSingleEs found in event
     }// if at least 1 CCSingleE interaction was reconstructed
@@ -347,7 +323,10 @@ namespace ertool {
     if (_debug){
       std::cout << "Ana results:" << std::endl
 		<< "Mis-ID                 : " << _misID << std::endl           
+		<< "Neutrino E  [Mc,Reco]  : [" << _e_nu << ", " << _e_nuReco << "]" <<  std::endl
 		<< "Lepton E  [Mc,Reco]    : [" << _e_lep << ", " << _e_lepReco << "]" <<  std::endl
+		<< "Neutrals E  [Mc,Reco]  : [" << _e_neutrals << "]" <<  std::endl
+		<< "Nucl dE  [Mc,Reco]     : [" << _e_nucleus_diff << "]" <<  std::endl
 		<< "Lepton Vtx dist Mc-Reco:  " << sqrt( (_x_lep-_x_lepReco)*(_x_lep-_x_lepReco) +
 							 (_y_lep-_y_lepReco)*(_y_lep-_y_lepReco) +
 							 (_z_lep-_z_lepReco)*(_z_lep-_z_lepReco) ) << std::endl
