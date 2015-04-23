@@ -47,10 +47,22 @@ namespace cmtool {
     double t_end2   = cluster2.GetParams().end_point.t;//   * _time_2_cm;
 
     if (_debug){
-      std::cout << "Start point Cluster 1: (" << cluster1.GetParams().start_point.w << ", " << cluster1.GetParams().start_point.t << ")"  << std::endl;
-      std::cout << "End point Cluster 2: (" << cluster1.GetParams().end_point.w << ", " << cluster1.GetParams().end_point.t << ")"  << std::endl;
-      std::cout << "Start point Cluster 1: (" << cluster2.GetParams().start_point.w << ", " << cluster2.GetParams().start_point.t << ")"  << std::endl;
-      std::cout << "End point Cluster 2: (" << cluster2.GetParams().end_point.w << ", " << cluster2.GetParams().end_point.t << ")"  << std::endl;
+      std::cout << "Cluster 1: (" 
+                << cluster1.GetParams().start_point.w << ", " 
+                << cluster1.GetParams().start_point.t << ")"  
+                << "-> ("
+                << cluster1.GetParams().end_point.w << ", " 
+                << cluster1.GetParams().end_point.t << ")"
+                << " (plane " << cluster1.Plane() << ")"  
+                << std::endl;
+      std::cout << "Cluster 1: (" 
+                << cluster1.GetParams().start_point.w << ", " 
+                << cluster1.GetParams().start_point.t << ")"  
+                << "-> ("
+                << cluster1.GetParams().end_point.w << ", " 
+                << cluster1.GetParams().end_point.t << ")"  
+                << " (plane " << cluster2.Plane() << ")"  
+                << std::endl;
     }
     
     //First, pretend the first cluster is a 2D line segment, from its start point to end point
