@@ -45,7 +45,7 @@ namespace cmtool {
          (cluster2.GetParams().PolyObject.Size() < 2) ){
       return false;
     }
-    if (_debug and cluster1.GetParams().N_Hits > 10 and cluster2.GetParams().N_Hits > 10) {
+    if (_debug and cluster1.GetParams().N_Hits > _min_hits and cluster2.GetParams().N_Hits > _min_hits) {
       std::cout << "Cluster 1:" << std::endl;
       std::cout << "\tN_Hits: " << cluster1.GetParams().N_Hits << std::endl;
       std::cout << "\tN Sides:" << cluster1.GetParams().PolyObject.Size() << std::endl;
@@ -66,12 +66,16 @@ namespace cmtool {
     Polygon2D overlap(cluster1.GetParams().PolyObject, 
                       cluster2.GetParams().PolyObject);
 
+    if (_debug){
+      
+    }
+
     // If there is no overlap, return false:
     if (overlap.Size() == 0) return false;
 
     // if the _overlap_fraction parameter is 0, any overlap is sufficient:
     if (_overlap_fraction == 0 && overlap.Size() > 0 ) {
-      if (_verbose) { std::cout << "Overlap...merging!" << std::endl; }
+      if (_debug) { std::cout << "Overlap...merging!" << std::endl; }
       return true;
     }
     else{  // the overlap fraction is bigger than zero.  
