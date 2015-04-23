@@ -98,7 +98,7 @@ namespace larlite {
 
   private:
 
-    int           fstatus;       ///< Status code from generator, geant, etc
+    int           fstatus;       ///< Status code from generator, geant, etc. Status codes summarized in comments below.
     int           ftrackId;      ///< TrackId
     int           fpdgCode;      ///< PDG code
     int           fmother;       ///< Mother
@@ -113,6 +113,20 @@ namespace larlite {
 
     std::vector<std::pair<size_t,size_t> > ftrackFiducial; ///< mctrajectory indexes for a trajectory inside fiducial volume
    
+    /// Status code definitions:
+    /// -1 => Undefined
+    /// 0  => Initial State (generator level)
+    /// 1  => Stable Final State (generator level, particles to be tracked by detector-level MC)
+    /// 2  => Intermediate State
+    /// 3  => Decayed State
+    /// 10 => Correlated Nucleon
+    /// 11 => Nucleon Target
+    /// 12 => DIS Prefragmented Hadronic State
+    /// 13 => Predecay Resonant State
+    /// 14 => Hadron in the Nucleus (marked for hadron transport modules to act on)
+    /// 15 => Final State Nuclear Remnant (low energy nuclear fragments entering the record collectively as a 'hadronic blob' pseudo-particle)
+    /// 16 => Nucleon Cluster Target
+
     ////////////////////////
     ClassDef(mcpart,1)
     ////////////////////////
