@@ -122,7 +122,7 @@ namespace cluster{
     fParams.start_point.plane = fParams.end_point.plane = p;
   }
 
-  void  ClusterParamsAlg::GetFANNVector(std::vector<float> & data){
+  void  ClusterParamsAlg::GetFANNVector(std::vector<float> & data) const{
     unsigned int length = 13;
     if (data.size() != length) 
       data.resize(length);

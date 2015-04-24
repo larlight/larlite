@@ -25,6 +25,8 @@ namespace ertool {
     _hassister = false;
     _rejectLongTracks = true;
     _vtxProximityCut = 0;
+    _BDtW = 0; 
+    _BDtTW = 0;
 
   }
 
@@ -60,6 +62,8 @@ namespace ertool {
     _alg_tree->Branch("_IPthisStart",&_IPthisStart,"_IPthisStart/D");
     _alg_tree->Branch("_IPthatStart",&_IPthatStart,"_IPthatStart/D");
     _alg_tree->Branch("_IPtrkBody",&_IPtrkBody,"_IPtrkBody/D");
+    _alg_tree->Branch("_distBackAlongTraj",&_distBackAlongTraj,"_distBackAlongTraj/D");
+    _alg_tree->Branch("_distToTopWall",&_distToTopWall,"_distToTopWall/D");
     
     return;
   }
@@ -139,6 +143,15 @@ namespace ertool {
 	    if (_verbose) { std::cout << "NOT single" << std::endl; }
 	    break;
 	  }
+	::geoalgo::HalfLine shr(thisShower.Start(),thisShower.Dir());
+	_distBackAlongTraj = sqrt(thisShower.Start().SqDist(_geoAlgo.Intersection(fTPC,shr,true)[0])) ;
+
+	//Distance to Top Wall caluclation from page 19 of cosmics technote
+//	double detHalfHeight = ::larutil::Geometry::GetME()->DetHalfHeight();
+	double detHalfHeight = 116.5 ;
+	_distToTopWall         = (thisShower.Start()[1] - detHalfHeight)*thisShower.Dir().Length()/(thisShower.Dir()[1]) ;
+
+
 	}// if not the same showers
       }//loop over showers
       // loop over tracks if still single
@@ -183,6 +196,7 @@ namespace ertool {
 	      if (_verbose) { std::cout << "common origin w/ track!" << std::endl; }
 	      _hassister = true;
 	      siblings.push_back(t);
+
 	      if (isGammaLike(thisShower._dedx,vtx.Dist(thisShower.Start()))){
 		if (_verbose) { std::cout << "Shower is gamma-like. Ignore " << std::endl; }
 		single = false;
@@ -191,6 +205,7 @@ namespace ertool {
 	      else{
 		single = true;
 	      }
+
 	    }// if common origin with primary!
 	}// for all tracks
       }// if single
@@ -214,6 +229,16 @@ namespace ertool {
 	}
       }
 
+      if( single and !_hassister and _BDtW !=0){
+	if(_verbose) { std::cout << "Distance back along trajectory is: "<<_distBackAlongTraj<<". Shower not single!" <<std::endl; }
+	single = false ;
+	}
+
+      if( single and !_hassister and _BDtTW !=0){
+	if(_verbose) { std::cout << "Distance back along trajectory is: "<<_distToTopWall<<". Shower not single!" <<std::endl; }
+	single = false ;
+	}
+
       // if still single (and no sister track) look at
       // dEdx to determine if e-like
       if (single && !_hassister){
@@ -236,12 +261,14 @@ namespace ertool {
 
 	// momentum to be decided later (after summing momenta from all daughters)
 	geoalgo::Vector_t neutrinoMomentum(0.,0.,0.);
+	double neutrinoKineticEnergy = 0;
 	// Create electron!
 	Particle electron(11,_e_mass);
 	electron.Vertex(thisShower.Start());
-	double mom = thisShower._energy - _e_mass;
+	double mom = sqrt( (thisShower._energy)*(thisShower._energy) - (_e_mass*_e_mass) );
 	if (mom < 0) { mom = 1; }
 	electron.Momentum(thisShower.Dir()*mom);
+	neutrinoKineticEnergy += thisShower._energy;
 	neutrinoMomentum += electron.Momentum();
 	electron.RecoObjInfo(sh,Particle::RecoObjType_t::kShower);
 	neutrino.AddDaughter(electron);
@@ -254,17 +281,22 @@ namespace ertool {
 	    sib.Vertex(sibTrack[0]);
 	    //sib.Mass() is in GEV, sibTrack._energy is in MEV
 	    //I think sibTrack._energy already has mass taken out of it.
-	    double Tmom = sibTrack._energy;
-	    if (Tmom < 0) { Tmom = 0.; }
+	    double Edep = sibTrack._energy;
+	    if (Edep < 0) { Edep = 0.; }
 	    geoalgo::Vector_t sibUnitDir = (sibTrack[1]-sibTrack[0]);
 	    sibUnitDir /= sibUnitDir.Length();
-	    sib.Momentum(sibUnitDir*Tmom);
+	    sib.Momentum(sibUnitDir*( sqrt(Edep*(Edep+2*sib.Mass())) ));
 	    neutrinoMomentum += sib.Momentum();
+	    // make sure energy - mass is positive
+	    if ( (sibTrack._energy - sib.Mass()) > 0)
+	      neutrinoKineticEnergy += sqrt(sibTrack._energy*sibTrack._energy - sib.Mass()*sib.Mass());
 	    sib.RecoObjInfo(sibling,Particle::RecoObjType_t::kTrack);
 	    neutrino.AddDaughter(sib);
 	  }// for all sibling tracks
 	}// if hassister
-	neutrino.Momentum(neutrinoMomentum);
+	// get neutrino momentum direction
+	neutrinoMomentum.Normalize();
+	neutrino.Momentum(neutrinoMomentum*neutrinoKineticEnergy);
 
 	//Only store the neutrino if lepton is in active volume!
 	if(fTPC.Contain(neutrino.Vertex())){
@@ -347,6 +379,8 @@ namespace ertool {
     _IPthisStart = -1;
     _IPthatStart = -1;
     _IPtrkBody = -1;
+    _distBackAlongTraj = -1;
+    _distToTopWall  = -999999;
 
     return;
   }

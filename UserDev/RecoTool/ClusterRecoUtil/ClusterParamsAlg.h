@@ -84,7 +84,7 @@ namespace cluster {
      * clusterParams.hh.   That's why it's here.
      * @param  data  takes a reference to a vector< float>
      */
-    void  GetFANNVector(std::vector<float> & data);
+    void  GetFANNVector(std::vector<float> & data) const;
     // std::vector<float> & GetFANNVector();
 
     /**

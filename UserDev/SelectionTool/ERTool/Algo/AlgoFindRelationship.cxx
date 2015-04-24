@@ -10,11 +10,11 @@ namespace ertool{
     _name   = "AlgoFindRelationship";
     _debug  = false;
 
-    //Track-particle masses
-    _pi_mass = TDatabasePDG().GetParticle(211)->Mass();
-    _pr_mass = TDatabasePDG().GetParticle(2212)->Mass();
-    _mu_mass = TDatabasePDG().GetParticle(13)->Mass();
-    _ka_mass = TDatabasePDG().GetParticle(311)->Mass();
+    //Track-particle masses (convert to MEV)
+    _pi_mass = 1000.* TDatabasePDG().GetParticle(211)->Mass();
+    _pr_mass = 1000.* TDatabasePDG().GetParticle(2212)->Mass();
+    _mu_mass = 1000.* TDatabasePDG().GetParticle(13)->Mass();
+    _ka_mass = 1000.* TDatabasePDG().GetParticle(311)->Mass();
     _uk_mass = 0.;
   }
   
@@ -364,7 +364,7 @@ namespace ertool{
     switch(trk._pid){
     case Track::TrackPartID_t::kUnknown : return Particle(999,_uk_mass);
     case Track::TrackPartID_t::kPIDA    : return Particle(999,_uk_mass);
-    case Track::TrackPartID_t::kProton  : return Particle(2122,_pr_mass);
+    case Track::TrackPartID_t::kProton  : return Particle(2212,_pr_mass);
     case Track::TrackPartID_t::kKaon    : return Particle(311,_ka_mass);
     case Track::TrackPartID_t::kPion    : return Particle(211,_pi_mass);
     case Track::TrackPartID_t::kMuon    : return Particle(13,_mu_mass);
