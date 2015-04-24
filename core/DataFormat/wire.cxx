@@ -45,7 +45,15 @@ namespace larlite{
 
   //----------------------------------------------------------------------
   std::vector<float> wire::Signal() const {
-    return { fSignalROI.begin(), fSignalROI.end() };
+    std::vector<float> res;
+    if(!fSignalROI.size()) return res;
+    auto const& rois = fSignalROI.get_ranges();
+    res.resize(rois.back().begin_index()+rois.back().size()-1);
+    for(auto const& roi : rois) {
+      for(size_t index=0; index<roi.size(); ++index)
+	res[roi.begin_index() + index] = roi.data()[index];
+    }
+    return res;
   } // wire::Signal()
 
   //----------------------------------------------------------------------
