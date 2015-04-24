@@ -101,7 +101,6 @@ namespace larlite {
 
   private:
 
-<<<<<<< HEAD
     int            fstatus;       ///< Status code from generator, geant, etc
     int            ftrackId;      ///< TrackId
     int            fpdgCode;      ///< PDG code
@@ -115,22 +114,6 @@ namespace larlite {
     double         fWeight;       ///< Assigned weight to this particle for MC tests
     TLorentzVector fGvtx;         ///< Vertex needed by generater (genie) to rebuild. genie::EventRecord for event reweighting
     int            frescatter;    ///< rescatter code
-
-    std::vector<std::pair<size_t,size_t> > ftrackFiducial; ///< mctrajectory indexes for a trajectory inside fiducial volume
-   
-=======
-    int           fstatus;       ///< Status code from generator, geant, etc. Status codes summarized in comments below.
-    int           ftrackId;      ///< TrackId
-    int           fpdgCode;      ///< PDG code
-    int           fmother;       ///< Mother
-    std::string     fprocess;      ///< Detector-simulation physics process that created the particle
-    mctrajectory    ftrajectory;   ///< particle trajectory (position,momentum)
-    double        fmass;         ///< Mass; from PDG unless overridden Should be in GeV
-    TVector3        fpolarization; ///< Polarization
-    std::set<int> fdaughters;    ///< Sorted list of daughters of this particle.
-    double        fWeight;       ///< Assigned weight to this particle for MC tests
-    TLorentzVector  fGvtx;         ///< Vertex needed by generater (genie) to rebuild. genie::EventRecord for event reweighting
-    int           frescatter;    ///< rescatter code
 
     std::vector<std::pair<size_t,size_t> > ftrackFiducial; ///< mctrajectory indexes for a trajectory inside fiducial volume
    
@@ -151,8 +134,7 @@ namespace larlite {
     ////////////////////////
     ClassDef(mcpart,1)
     ////////////////////////
-      
->>>>>>> trunk
+
   };
   
   /**
