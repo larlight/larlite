@@ -261,16 +261,20 @@ namespace larlite {
 
   event_base* storage_manager::get_data(const data::DataType_t type, const std::string& name)
   {
-
+    // Make sure io is ready
+    if(!is_ready_io()){
+      Message::send(msg::kERROR,__FUNCTION__,
+		    Form("IO is not ready (file not opened and/or TTree has not read-in yet!"));
+      throw DataFormatException("Cannot retrieve data yet.");
+    }
+    
     // Read entry _index-1
     if(!_index && _mode != kWRITE) {
-
       Message::send(msg::kERROR,__FUNCTION__,
 		    Form("Call next_event() before calling %s", __FUNCTION__));
-
-      return 0;
+      throw DataFormatException("Cannot retrieve data yet.");
     }
-
+    
     event_base* result_ptr = nullptr;
     auto inch_ptr_iter = _in_ch[type].find(name);
     auto data_ptr_iter = _ptr_data_array[type].find(name);
@@ -648,11 +652,28 @@ namespace larlite {
     
     std::vector<std::map<std::string, size_t> > nevents_array(data::kDATA_TYPE_MAX,
 							      std::map<std::string,size_t>());
+    std::vector<std::map<std::string, size_t> > nruns_array(data::kRUNDATA_TYPE_MAX,
+							    std::map<std::string,size_t>());
+    std::vector<std::map<std::string, size_t> > nsubruns_array(data::kSUBRUNDATA_TYPE_MAX,
+							       std::map<std::string,size_t>());
+    
     for(size_t i=0; i<nevents_array.size(); ++i) {
 
       for(auto const& name_ptr : _in_ch[i])
 
 	nevents_array[i].insert(std::make_pair(name_ptr.first,0));
+    }
+    for(size_t i=0; i<nruns_array.size(); ++i) {
+
+      for(auto const& name_ptr : _in_rundata_ch[i])
+
+	nruns_array[i].insert(std::make_pair(name_ptr.first,0));
+    }
+    for(size_t i=0; i<nsubruns_array.size(); ++i) {
+
+      for(auto const& name_ptr : _in_subrundata_ch[i])
+
+	nsubruns_array[i].insert(std::make_pair(name_ptr.first,0));
     }
     
     if(_verbosity[msg::kDEBUG])
@@ -768,13 +789,13 @@ namespace larlite {
 	  
 	  // Ignore ROOT error message due to not finding a TTree 
 	  gErrorIgnoreLevel = kBreak;
-	  nevents_array[i][name_ptr.first] += name_ptr.second->GetEntries();
+	  nruns_array[i][name_ptr.first] += name_ptr.second->GetEntries();
 	  gErrorIgnoreLevel = kWarning;
 	  
-	  if(nevents_array[i][name_ptr.first]) { 
+	  if(nruns_array[i][name_ptr.first]) { 
 	    
 	    print(msg::kDEBUG,__FUNCTION__,
-		  Form("Found %zu runs found in TTree %s ...",nevents_array[i][name_ptr.first],tree_name.c_str()));
+		  Form("Found %zu runs found in TTree %s ...",nruns_array[i][name_ptr.first],tree_name.c_str()));
 	    
 	    create_rundata_ptr((data::RunDataType_t)i,name_ptr.first);
 	    name_ptr.second->SetBranchAddress(Form("%s_%s_branch",
@@ -817,20 +838,20 @@ namespace larlite {
 	  
 	  // Ignore ROOT error message due to not finding a TTree 
 	  gErrorIgnoreLevel = kBreak;
-	  nevents_array[i][name_ptr.first] += name_ptr.second->GetEntries();
+	  nsubruns_array[i][name_ptr.first] += name_ptr.second->GetEntries();
 	  gErrorIgnoreLevel = kWarning;
 	  
-	  if(nevents_array[i][name_ptr.first]) { 
+	  if(nsubruns_array[i][name_ptr.first]) { 
 	    
 	    print(msg::kDEBUG,__FUNCTION__,
-		  Form("Found %zu sub-runs found in TTree %s ...",nevents_array[i][name_ptr.first],tree_name.c_str()));
+		  Form("Found %zu sub-runs found in TTree %s ...",nsubruns_array[i][name_ptr.first],tree_name.c_str()));
 	    
 	    create_subrundata_ptr((data::SubRunDataType_t)i,name_ptr.first);
 	    name_ptr.second->SetBranchAddress(Form("%s_%s_branch",
 						   data::kSUBRUNDATA_TREE_NAME[(data::SubRunDataType_t)i].c_str(),
 						   name_ptr.first.c_str()
 						   ),
-					      &(_ptr_data_array[i][name_ptr.first])
+					      &(_ptr_subrundata_array[i][name_ptr.first])
 					      );
 	    
 	  }else{
@@ -1618,10 +1639,11 @@ namespace larlite {
       for(auto& name_ptr : _out_ch[i]) {
       
 	if(!(name_ptr.second)) continue;
-	
-	_ptr_data_array[i][name_ptr.first]->set_run(_run_id);
-	_ptr_data_array[i][name_ptr.first]->set_subrun(_subrun_id);
-	_ptr_data_array[i][name_ptr.first]->set_event_id(_event_id);
+
+	auto& ptr = _ptr_data_array[i][name_ptr.first];
+	ptr->set_run(_run_id);
+	ptr->set_subrun(_subrun_id);
+	ptr->set_event_id(_event_id);
       }
     }
 
@@ -1630,8 +1652,10 @@ namespace larlite {
       for(auto& name_ptr : _out_subrundata_ch[i]) {
 	
 	if(!(name_ptr.second)) continue;
-	_ptr_subrundata_array[i][name_ptr.first]->set_run(_run_id);
-	_ptr_subrundata_array[i][name_ptr.first]->set_subrun(_subrun_id);
+	
+	auto& ptr = _ptr_subrundata_array[i][name_ptr.first];
+	ptr->set_run(_run_id);
+	ptr->set_subrun(_subrun_id);
       }
     }
 	
@@ -1640,8 +1664,9 @@ namespace larlite {
       for(auto& name_ptr : _out_rundata_ch[i]) {
 	    
 	if(!(name_ptr.second)) continue;
-	_ptr_rundata_array[i][name_ptr.first]->clear_data();
-	_ptr_rundata_array[i][name_ptr.first]->set_run(_run_id);
+
+	auto& ptr = _ptr_rundata_array[i][name_ptr.first];
+	ptr->set_run(_run_id);
       }
     }
   }

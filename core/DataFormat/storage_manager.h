@@ -162,9 +162,11 @@ namespace larlite {
 		const unsigned int event_id);
 
     /// Id getter
-    unsigned int event_id() const  { return _event_id;  }
-    unsigned int run_id() const    { return _run_id;    }
-    unsigned int subrun_id() const { return _subrun_id; }
+    unsigned int event_id()       const { return _event_id;       }
+    unsigned int run_id()         const { return _run_id;         }
+    unsigned int subrun_id()      const { return _subrun_id;      }
+    unsigned int last_run_id()    const { return _last_run_id;    }
+    unsigned int last_subrun_id() const { return _last_subrun_id; }
 
     /// Function to list product ID loaded or created
     const std::vector<larlite::product_id>& list_input_product() const { return _input_product_id; }
@@ -273,6 +275,10 @@ namespace larlite {
     
     /// number of events read/written
     UInt_t _nevents, _nevents_read, _nevents_written;
+    // number of runs read/written
+    //UInt_t _nruns, _nruns_read, _nruns_written;
+    // number of sub-runs read/written
+    //UInt_t _nsubruns, _nsubruns_read, _nsubruns_written;
     
     unsigned int _event_id;  ///< Current event ID (used for alignment check)
     unsigned int _run_id;    ///< Current run ID (used for alignment check)

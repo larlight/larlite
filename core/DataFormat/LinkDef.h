@@ -43,6 +43,8 @@
 
 #pragma link C++ class larlite::data_base+;
 #pragma link C++ class larlite::output_base+;
+#pragma link C++ class larlite::run_base+;
+#pragma link C++ class larlite::subrun_base+;
 #pragma link C++ class larlite::event_base+;
 //#pragma link C++ class larlite::association+;
 
