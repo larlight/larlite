@@ -39,10 +39,10 @@ namespace larlite {
     virtual bool initialize(){return true;}
 
     /// Function to be called when new run is found
-    virtual bool begin_run(storage_manager* data){return true;}
+    virtual bool begin_run(storage_manager* data){return (data);}
 
     /// Function to be called when new sub-run is found
-    virtual bool begin_subrun(storage_manager* data){return true;}
+    virtual bool begin_subrun(storage_manager* data){return (data);}
 
     /// Analyze a data event-by-event  
     virtual bool analyze(storage_manager* data){return (data);}
