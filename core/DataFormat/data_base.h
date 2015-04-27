@@ -33,13 +33,10 @@ namespace larlite{
   public:
     
     /// Default constructor
-    data_base(unsigned short type = data::kDATA_TYPE_MAX)
-      : _type(type)
-    { clear_data(); }
+    data_base(unsigned short type = data::kDATA_TYPE_MAX);
 
     /// Default copy constructor to avoid memory leak in ROOT streamer
-    data_base(const data_base &original) : _type(original._type)
-    {}
+    data_base(const data_base &original) : _type(original._type) {}
     
     /// Default destructor
     virtual ~data_base(){}
@@ -48,17 +45,13 @@ namespace larlite{
     virtual void clear_data(){}
     
     /// data type getter
-    const unsigned short& data_type() const {return _type; }
+    const unsigned short& data_type() const;
 
   protected:
 
     /// Product type
     unsigned short _type;
 
-    ////////////////////////
-    //ClassDef(data_base,1)
-    ////////////////////////
-      
   };
 
   /**
@@ -71,28 +64,23 @@ namespace larlite{
   public:
     /// Default ctor
     output_base(unsigned short type = data::kDATA_TYPE_MAX,
-		const std::string name = "noname")
-      : data_base(type)
-      , _id(_type,name)
-    { clear_data(); }
+		const std::string name = "noname");
+    /// Copy ctor
+    output_base(const output_base& orig);
 
     /// Default dtor
     ~output_base() {}
 
     /// Inherited method to clear
-    virtual void clear_data() { data_base::clear_data(); }
-
+    virtual void clear_data();
     /// producer's name
-    const std::string& name() const { return _id.second; }
-
+    const std::string& name() const;
     /// product_id creator
-    const ::larlite::product_id id() const { return _id; }
+    const ::larlite::product_id id() const;
     
   private:
-
     ::larlite::product_id _id;
 
-    //ClassDef(output_base,1)
   };
 
   /**
@@ -105,30 +93,27 @@ namespace larlite{
   public:
     /// Default ctor
     run_base(const unsigned short type = data::kRUNDATA_TYPE_MAX,
-	     const std::string name = "noname")
-      : output_base(type,name)
-    { clear_data(); }
+	     const std::string name = "noname");
     /// Copy ctor
-    run_base(const run_base& origin) : output_base(origin)
-				     , fRunNumber(origin.fRunNumber)
-    {}
+    run_base(const run_base& origin);
+
     /// Default dtor
     ~run_base() {}
     /// Inherited clear data
-    virtual void clear_data()
-    { output_base::clear_data(); fRunNumber=kINVALID_RUN;}
+    virtual void clear_data();
+
     //
     // Simple type variable getters
     // 
     /// Run number getter
-    const unsigned int& run() const { return fRunNumber; }
+    const unsigned int& run() const;
 
   private:
     unsigned int fRunNumber; ///< run number
 
   private:
     /// run number setter
-    void set_run      (unsigned int run) { fRunNumber    = run; }
+    void set_run (unsigned int run);
   };
 
   /**
@@ -141,29 +126,23 @@ namespace larlite{
   public:
     /// Default ctor
     subrun_base(const unsigned short type = data::kSUBRUNDATA_TYPE_MAX,
-		const std::string name = "noname")
-      : output_base(type,name)
-    { clear_data(); }
+		const std::string name = "noname");
+
     /// Copy ctor
-    subrun_base(const subrun_base& origin) : output_base(origin)
-					   , fRunNumber(origin.fRunNumber)
-					   , fSubRunNumber(origin.fSubRunNumber)
-    {}
+    subrun_base(const subrun_base& origin);
+
     /// Default dtor
     virtual ~subrun_base() {}
     /// Inherited clear method
-    virtual void clear_data()
-    { output_base::clear_data(); 
-      fRunNumber=kINVALID_RUN; 
-      fSubRunNumber=kINVALID_SUBRUN; }
+    virtual void clear_data();
 
     //
     // Simple type variable getters
     // 
     /// Run number getter
-    const unsigned int& run() const { return fRunNumber; }
+    const unsigned int& run() const;
     /// Sub-Run number getter
-    const unsigned int& subrun() const { return fSubRunNumber; }
+    const unsigned int& subrun() const;
 
   private:
     unsigned int fRunNumber; ///< run number
@@ -171,9 +150,9 @@ namespace larlite{
 
   private:
     /// run number setter
-    void set_run      (unsigned int run) { fRunNumber    = run; }
+    void set_run      (unsigned int run);
     /// sub-run number setter
-    void set_subrun   (unsigned int run) { fSubRunNumber = run; }
+    void set_subrun   (unsigned int run);
   };
 
   /**
@@ -187,17 +166,10 @@ namespace larlite{
     
     /// Default constructor
     event_base(unsigned short    type = data::kDATA_TYPE_MAX,
-	       const std::string name = "noname")
-      : output_base(type,name)
-    { clear_data(); }
+	       const std::string name = "noname");
     
     /// Default copy constructor to avoid memory leak in ROOT streamer
-    event_base(const event_base &original) 
-      : output_base(original)
-      , fRunNumber(original.fRunNumber)
-      , fSubRunNumber(original.fSubRunNumber)
-      , fEventID(original.fEventID)
-     {}
+    event_base(const event_base &original);
     
     /// Default destructor
     virtual ~event_base(){}
@@ -209,11 +181,11 @@ namespace larlite{
     // Simple type variable getters
     //     
     /// run number getter
-    unsigned int run      () const { return fRunNumber;    }
+    unsigned int run      () const;
     /// sub-run number getter
-    unsigned int subrun   () const { return fSubRunNumber; }
+    unsigned int subrun   () const;
     /// event-id getter
-    unsigned int event_id () const { return fEventID;      }
+    unsigned int event_id () const;
 
   private:
     unsigned int fRunNumber;    ///< Run number
@@ -222,16 +194,12 @@ namespace larlite{
 
   private:
     /// run number setter
-    void set_run      (unsigned int run) { fRunNumber    = run; }
+    void set_run      (unsigned int run);
     /// sub-run number setter
-    void set_subrun   (unsigned int run) { fSubRunNumber = run; }
+    void set_subrun   (unsigned int run);
     /// event-id setter
-    void set_event_id (unsigned int id ) { fEventID      = id;  }
+    void set_event_id (unsigned int id );
 
-    ////////////////////////
-    //ClassDef(event_base,2)
-    ////////////////////////
-      
   };
 }
 #endif
