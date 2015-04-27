@@ -85,6 +85,9 @@ namespace larlite{
     /// producer's name
     const std::string& name() const { return _name; }
 
+    /// product_id creator
+    const ::larlite::product_id id() const { return ::larlite::product_id(_type,_name); }
+    
   private:
 
     std::string _name; ///< Producer's name

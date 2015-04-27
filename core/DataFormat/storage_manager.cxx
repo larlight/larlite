@@ -697,10 +697,11 @@ namespace larlite {
 	  _in_id_ch->AddFile(_in_fnames[j].c_str());
 
 	gErrorIgnoreLevel = kBreak;
-	_nevents = _in_id_ch->GetEntries();
+	bool exist=( _in_id_ch->GetEntries() > 0 );
+	_in_id_ch->GetEntries();
 	gErrorIgnoreLevel = kWarning;
 	
-	if(_nevents <=0 ) {
+	if(!exist) {
 	  print(msg::kWARNING,__FUNCTION__,
 		"Failed to read larlite_id_tree ... removing read pointer...");
 	  delete _in_id_ch;
