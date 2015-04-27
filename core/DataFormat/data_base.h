@@ -45,7 +45,7 @@ namespace larlite{
     virtual ~data_base(){}
     
     /// Clear method
-    virtual void clear_data() {}
+    virtual void clear_data(){}
     
     /// data type getter
     const unsigned short& data_type() const {return _type; }
@@ -73,7 +73,7 @@ namespace larlite{
     output_base(unsigned short type = data::kDATA_TYPE_MAX,
 		const std::string name = "noname")
       : data_base(type)
-      , _name(name)
+      , _id(_type,name)
     { clear_data(); }
 
     /// Default dtor
@@ -83,14 +83,14 @@ namespace larlite{
     virtual void clear_data() { data_base::clear_data(); }
 
     /// producer's name
-    const std::string& name() const { return _name; }
+    const std::string& name() const { return _id.second; }
 
     /// product_id creator
-    const ::larlite::product_id id() const { return ::larlite::product_id(_type,_name); }
+    const ::larlite::product_id id() const { return _id; }
     
   private:
 
-    std::string _name; ///< Producer's name
+    ::larlite::product_id _id;
 
     //ClassDef(output_base,1)
   };

@@ -149,7 +149,8 @@ namespace larlite{
     }
     return id;
   }
-  
+
+
   const AssSet_t& event_ass::association(const AssID_t id) const 
   { 
     if(id>_ass_data.size()) {
@@ -159,7 +160,7 @@ namespace larlite{
     }
     return _ass_data[id];
   }
-  
+
   const AssSet_t& event_ass::association(const product_id& id_a,
 					 const product_id& id_b) const
   {

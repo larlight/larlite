@@ -80,9 +80,6 @@ namespace larlite{
     AssID_t association_id(const product_id& id_a,
 			   const unsigned short type) const;
     
-    /// larlite::AssSet_t getter given an id
-    const AssSet_t& association(const AssID_t id) const;
-
     /// larlite::AssSet_t getter given an explicit larlite::product_id combination
     const AssSet_t& association(const product_id& id_a,
 				const product_id& id_b) const;
@@ -95,6 +92,10 @@ namespace larlite{
 
     /// List association
     void list_association() const;
+
+  protected:
+    /// larlite::AssSet_t getter given an id
+    const AssSet_t& association(const AssID_t id) const;
 
   };
 }
