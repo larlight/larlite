@@ -40,10 +40,13 @@ my_algo.setEThreshold(0.)	 #100
 my_filter = ertool.FilterTrackLength()
 my_filter.setLengthCut(0.3)
 
-# Create MC Filter
 
+# Create MC Filter
 # This filter is if you want to look at CC1E events
-MCfilter = fmwk.MC_CC1E_Filter();
+#MCfilter = fmwk.MC_CC1E_Filter();
+# Filter for looking at NC1Gamma
+MCfilter = fmwk.MC_NC1Gamma_Filter();
+
 #Set flip to FALSE if you are looking for efficiency, TRUE if you are looking for MID efficiency
 MCfilter.flip(False)
 #MCfilter.flip(True)
@@ -65,7 +68,7 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
-my_proc.set_ana_output_file("singleE_selection.root")
+my_proc.set_ana_output_file("singleGamma_selection.root")
 
 # here set E-cut for Helper & Ana modules
 #This cut is applied in helper... ertool showers are not made if the energy of mcshower or reco shower

@@ -1,6 +1,6 @@
 //
 // cint script to generate libraries
-// Declaire namespace & classes you defined
+// Declare namespace & classes you defined
 // #pragma statement: order matters! Google it ;)
 //
 
@@ -9,6 +9,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-//#pragma link C++ class sample+;
+#pragma link C++ class larlite::MC_NC1Gamma_Filter+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
