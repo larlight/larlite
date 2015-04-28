@@ -26,6 +26,11 @@ namespace larlite {
   
   public:
 
+	  int total_events;
+		int max_events;
+		size_t looped_events;
+		size_t kept_events;
+
     /// Default constructor
     MC_NC1Gamma_Filter(){ _name="MC_NC1Gamma_Filter"; _fout=0;}
 
@@ -41,6 +46,9 @@ namespace larlite {
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
+
+		void setMaxNEvents(int N) { max_events = N; }
+		
 
     /** IMPLEMENT in MC_NC1Gamma_Filter.cc! 
         Finalize method to be called after all events processed.

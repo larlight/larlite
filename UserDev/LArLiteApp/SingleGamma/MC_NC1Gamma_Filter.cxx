@@ -14,6 +14,10 @@ namespace larlite {
     // here is a good place to create one on the heap (i.e. "new TH1D"). 
     //
 
+		total_events  = 0;
+		looped_events = 0;
+		kept_events   = 0;
+
     return true;
   }
   
@@ -35,9 +39,23 @@ namespace larlite {
     //
     //   std::cout << "Event ID: " << my_pmtfifo_v->event_id() << std::endl;
     //
+ 	
+		// By default, we'll keep the MC event.  This will be switched
+		// to "false" below when we decide we don't want it.
+		bool ret = true;
+		total_events++;
+		
+		// If max_events was set to -1, or we haven't reached max_events yet, 
+		// then return the pass/fail flag.  Otherwise, return FALSE.
+		if( max_events < 0 || total_events <= max_events) {
+			looped_events++;
+			if( ret ) kept_events++;
+			return ret;
+		} else {
+			return false;
+		}
   
-    return true;
-  }
+	}
 
   bool MC_NC1Gamma_Filter::finalize() {
 
@@ -53,7 +71,11 @@ namespace larlite {
     // else 
     //   print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
     //
-  
+ 
+		std::cout<<"MC_NC1Gamma_Filter: Total MC events in file   :"<<total_events<<"\n";
+		std::cout<<"MC_NC1Gamma_Filter: Total events looped over  :"<<looped_events<<"\n";
+		std::cout<<"MC_NC1Gamma_Filter: Events kept               :"<<kept_events<<"\n";
+
     return true;
   }
 
