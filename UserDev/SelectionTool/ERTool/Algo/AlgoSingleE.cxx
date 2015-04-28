@@ -287,9 +287,7 @@ namespace ertool {
 	    sibUnitDir /= sibUnitDir.Length();
 	    sib.Momentum(sibUnitDir*( sqrt(Edep*(Edep+2*sib.Mass())) ));
 	    neutrinoMomentum += sib.Momentum();
-	    // make sure energy - mass is positive
-	    if ( (sibTrack._energy - sib.Mass()) > 0)
-	      neutrinoKineticEnergy += sqrt(sibTrack._energy*sibTrack._energy - sib.Mass()*sib.Mass());
+	    neutrinoKineticEnergy += sibTrack._energy;
 	    sib.RecoObjInfo(sibling,Particle::RecoObjType_t::kTrack);
 	    neutrino.AddDaughter(sib);
 	  }// for all sibling tracks
