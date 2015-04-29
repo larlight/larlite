@@ -52,6 +52,9 @@ namespace ertool {
     /// Function to evaluate input showers and determine a score
     virtual ParticleSet Reconstruct(const EventData &data);
 
+		// Set verbosity
+    void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); }
+
   private:
 
     ::geoalgo::AABox fTPC;

@@ -16,7 +16,7 @@ namespace ertool {
 				     , fTPC(-10.,-126.,-10.,292.,136.,1150.)
   {
     _name     = "AlgoSingleGamma";
-    
+    _verbose  = "false"; 
  
   }
 
