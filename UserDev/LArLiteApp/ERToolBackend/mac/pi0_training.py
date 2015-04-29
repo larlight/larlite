@@ -1,9 +1,10 @@
 import sys, os
 from ROOT import gSystem
+gSystem.Load("libLArLiteApp_Pi0Ana")
 from ROOT import larlite as fmwk
 from ROOT import ertool
 from ROOT import geoalgo
-ertool.Manager
+#ertool.Manager
 
 def ask_binary(msg='Proceed? [y/n]:'):
     
@@ -51,13 +52,13 @@ def main():
 
     # Set Producers
     # First Argument: True = MC, False = Reco
-    #my_ana.SetShowerProducer(True,"mcreco");
-    #my_ana.SetTrackProducer(True,"mcreco");
-    #my_ana.SetVtxProducer(True,"generator");
+    my_ana.SetShowerProducer(True,"mcreco");
+    my_ana.SetTrackProducer(True,"mcreco");
+    my_ana.SetVtxProducer(True,"generator");
     
-    my_ana.SetShowerProducer(False,"showerreco");
-    my_ana.SetTrackProducer(False,"");
-    my_ana.SetVtxProducer(False,"");
+    #my_ana.SetShowerProducer(False,"showerreco");
+    #my_ana.SetTrackProducer(False,"");
+    #my_ana.SetVtxProducer(False,"");
 
     my_ana._mgr.SetFilter(my_filter)
     my_ana._mgr.SetAlgo(my_algo)

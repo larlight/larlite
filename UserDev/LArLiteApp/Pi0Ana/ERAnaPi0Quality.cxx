@@ -28,7 +28,6 @@ namespace larlite {
     _pi0_tree->Branch("_reco_z",&_reco_z,"reco_z/D");
     _pi0_tree->Branch("_start_res",&_start_res,"start_res/D");
 
-    _mgr.Initialize();
     return ERToolAnaBase::initialize();
   }
   
@@ -97,7 +96,6 @@ namespace larlite {
 
     _pi0_tree->Write();
 
-    _mgr.Finalize(_fout);
     return ERToolAnaBase::finalize();
   }
 

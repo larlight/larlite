@@ -40,7 +40,7 @@ namespace larlite {
     virtual bool finalize();
 
     /// Selection manager class instance
-    ::ertool::Manager _mgr;
+    //::ertool::Manager _mgr;
     
     /// Tree info
     TTree* _pi0_tree;
