@@ -126,7 +126,7 @@ namespace ertool {
     _ll_tree->Branch("_mass",&_mass,"mass/D");
     _ll_tree->Branch("_angle",&_angle,"angle/D");
     _ll_tree->Branch("_dedx_A",&_dedx_A,"dedx_A/D");
-    _ll_tree->Branch("_dedx_B",&_dedx_B,"E_B/D");
+    _ll_tree->Branch("_dedx_B",&_dedx_B,"dedx_B/D");
     _ll_tree->Branch("_E_A",&_E_A,"E_A/D");
     _ll_tree->Branch("_E_B",&_E_B,"E_B/D");
     _ll_tree->Branch("_dot",&_dot,"dot/D");
@@ -243,7 +243,7 @@ namespace ertool {
   
   ParticleSet AlgoPi0::Reconstruct(const EventData &data)
   { 
-
+	
     if (_verbose) {
       std::cout << "showers in event: " << data.Shower().size() << std::endl;
     }
