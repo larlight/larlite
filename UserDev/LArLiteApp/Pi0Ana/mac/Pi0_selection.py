@@ -33,7 +33,7 @@ my_algo.setMinFitMass(50)
 my_algo.setMaxFitMass(200)
 my_algo.setAngleMax(3.14)
 # Create filter
-my_filter = ertool.FilterECut()
+myFals_filter = ertool.FilterECut()
 my_filter.SetECut(10) #cut on 10 MeV
 # Create analysis unit
 my_anaunit = fmwk.ERAnaPi0Reco()#ExampleERSelection()
@@ -49,7 +49,7 @@ pi0_filter.SetEC(0.5)
 pi0_filter.SetEnergyCut(20.)
 
 my_anaunit._mgr.SetAna(my_ana)
-my_anaunit._mgr.SetFilter(my_filter)
+my_anaunit._mgr.SetFilter(pi0_filter)
 my_anaunit._mgr.SetAlgo(my_algo)
 my_anaunit._mgr._training_mode =False
 
