@@ -228,4 +228,7 @@
 #pragma link C++ function larlite::storage_manager::get_data<larlite::event_minos>(string);
 #pragma link C++ function larlite::storage_manager::get_data<larlite::event_ass>(string);
 
+#pragma link C++ function larlite::storage_manager::subrundata_type<larlite::potsummary>();
+#pragma link C++ function larlite::storage_manager::get_subrundata<larlite::potsummary>(string);
+
 #endif

@@ -31,6 +31,7 @@ namespace larlite{
     if(iter_a == map_key_a.end()) {
       iter_a = map_key_a.insert(std::make_pair(id_b,_ass_data.size())).first;
       _ass_data.push_back(ass_a2b);
+      _ass_ids.push_back(std::make_pair(id_a,id_b));
       /*
       std::cout<<"Creating a new association by "<<this->name().c_str()
 	       <<" ID="
@@ -71,6 +72,7 @@ namespace larlite{
     if(iter_b == map_key_b.end()) {
       iter_b = map_key_b.insert(std::make_pair(id_a,_ass_data.size())).first;
       _ass_data.push_back(larlite::AssSet_t());
+      _ass_ids.push_back(std::make_pair(id_b,id_a));
       /*
       std::cout<<"Creating a reverse association by "<<this->name().c_str()
 	       <<" ID="
@@ -112,48 +114,10 @@ namespace larlite{
     }
 
   }
-  
-  size_t event_ass::size_association(const product_id& id_a,
-				     const product_id& id_b) {
-    auto id = association_id(id_a,id_b);
-    if(id<_ass_data.size()) return _ass_data[id].size();
-    return 0;
-  }
-  
-  AssID_t event_ass::association_id(const product_id& id_a,
-				    const product_id& id_b) const 
-  {
-    AssID_t id = kINVALID_ASS;
-    auto iter_a = _ass_map_key.find(id_a);
-    if(iter_a==_ass_map_key.end()) return id;
-    auto iter_b = (*iter_a).second.find(id_b);
-    if(iter_b == (*iter_a).second.end()) return id;
-    id = (*iter_b).second;
-    return id;
-  }
-  
-  AssID_t event_ass::association_id(const product_id& id_a,
-				    const unsigned short type) const
-  {
-    AssID_t id = kINVALID_ASS;
-    auto iter_a = _ass_map_key.find(id_a);
-    if(iter_a==_ass_map_key.end()) return id;
-    for(auto const& candidate : (*iter_a).second) {
-      auto const& id_b = candidate.first;
-      if(id_b.first == type) {
-	std::cout<<"\033[93m[WARNING]\033[00m Upon request, searched for an association from ("
-		 <<id_a.first<<","<<id_a.second.c_str()<<") => any of type ("<<type<<") ... "
-		 <<" found one by "<<id_b.second.c_str()<<std::endl;
-	id = candidate.second;
-      }
-    }
-    return id;
-  }
-
 
   const AssSet_t& event_ass::association(const AssID_t id) const 
   { 
-    if(id>_ass_data.size()) {
+    if(id>=_ass_data.size()) {
       std::ostringstream msg;
       msg << "Invalid association ID: " << id;
       throw DataFormatException(msg.str());
@@ -164,7 +128,7 @@ namespace larlite{
   const AssSet_t& event_ass::association(const product_id& id_a,
 					 const product_id& id_b) const
   {
-    auto id = association_id(id_a,id_b);
+    auto id = assid(id_a,id_b);
     if(id == kINVALID_ASS) {
       std::ostringstream msg;
       msg << "Associtaion (" << id_a.first << "," << id_a.second.c_str()
@@ -176,7 +140,6 @@ namespace larlite{
     return association(id);
   }
 
-  /// Getter for associated data products' key info (product_id)
   const std::vector<std::pair<larlite::product_id,larlite::product_id> > event_ass::association_keys() const
   {
     std::vector<std::pair<larlite::product_id,larlite::product_id> > result;
@@ -189,7 +152,6 @@ namespace larlite{
     return result;
   }
   
-  /// Getter for associated data products' key info (product_id)
   const std::vector<larlite::product_id> event_ass::association_keys(const larlite::product_id& id) const
   {
     std::vector<larlite::product_id> result;
@@ -200,14 +162,23 @@ namespace larlite{
     return result;
   }
 
-  /// List association
+  const std::pair<larlite::product_id,larlite::product_id>& event_ass::association_keys(const AssID_t id) const
+  {
+    if(id >= _ass_ids.size()) {
+      std::ostringstream msg;
+      msg << "Invalid association ID: " << id;
+      throw DataFormatException(msg.str());
+    }
+    return _ass_ids[id];
+  }
+
   void event_ass::list_association() const
   {
     std::cout << "  Listing associations stored..." << std::endl;
     auto const& ass_keys = association_keys();
     for(auto const& keys : ass_keys) {
       
-      auto const& index = association_id(keys.first,keys.second);
+      auto const& index = assid(keys.first,keys.second);
       
       size_t b_ctr = 0;
       for(auto const& ass : _ass_data[index])
@@ -217,7 +188,7 @@ namespace larlite{
 		<< data::kDATA_TREE_NAME[keys.first.first].c_str() << "," << keys.first.second.c_str()
 		<< ") => ("
 		<< data::kDATA_TREE_NAME[keys.second.first].c_str() << "," << keys.second.second.c_str()
-		<< " ... "
+		<< ") ... "
 		<< _ass_data[index].size()
 		<< " objects associated with "
 		<< b_ctr
@@ -226,6 +197,131 @@ namespace larlite{
     }
     std::cout << "  ... done!" << std::endl;
   }
+
+  AssID_t event_ass::assid(const product_id& id_a,
+			   const product_id& id_b) const 
+  {
+    AssID_t id = kINVALID_ASS;
+    auto iter_a = _ass_map_key.find(id_a);
+    if(iter_a==_ass_map_key.end()) return id;
+    auto iter_b = (*iter_a).second.find(id_b);
+    if(iter_b == (*iter_a).second.end()) return id;
+    id = (*iter_b).second;
+    return id;
+  }
+  
+  AssID_t event_ass::find_one_assid(const data::DataType_t type_a,
+				    const data::DataType_t type_b) const
+  {
+    AssID_t id = kINVALID_ASS;
+    for(auto const& first_pair : _ass_map_key) {
+      if(first_pair.first.first != type_a) continue;
+      for(auto const& second_pair : first_pair.second) {
+	if(second_pair.first.first != type_b) continue;
+	id = second_pair.second;
+      }
+      if(id != kINVALID_ASS) break;
+    }
+    return id;
+  }
+  
+  AssID_t event_ass::find_one_assid(const product_id& id_a,
+				    const data::DataType_t type_b) const
+  {
+    AssID_t id = kINVALID_ASS;
+    auto iter = _ass_map_key.find(id_a);
+    if(iter == _ass_map_key.end()) return id;
+    for(auto const& second_pair : (*iter).second) {
+      if(second_pair.first.first != type_b) continue;
+      id = second_pair.second;
+      break;
+    }
+    return id;
+  }
+  
+  AssID_t event_ass::find_one_assid(const data::DataType_t type_a,
+				    const product_id& id_b) const
+  {
+    AssID_t id = kINVALID_ASS;
+    auto iter = _ass_map_key.find(id_b);
+    if(iter == _ass_map_key.end()) return id;
+    for(auto const& second_pair : (*iter).second) {
+      if(second_pair.first.first != type_a) continue;
+      id = second_pair.second;
+      break;
+    }
+    return id;
+  }
+  
+  AssID_t event_ass::find_unique_assid(const data::DataType_t type_a,
+				       const data::DataType_t type_b) const
+  {
+    AssID_t id = kINVALID_ASS;
+    for(auto const& first_pair : _ass_map_key) {
+      if(first_pair.first.first != type_a) continue;
+      for(auto const& second_pair : first_pair.second) {
+	if(second_pair.first.first != type_b) continue;
+	if(id != kINVALID_ASS) {
+	  std::ostringstream msg;
+	  msg << "Association type: "
+	      << data::kDATA_TREE_NAME[type_a].c_str() << " (" << type_a <<")"
+	      << " => "
+	      << data::kDATA_TREE_NAME[type_b].c_str() << " (" << type_b <<")"
+	      << " is not unique!";
+	  throw DataFormatException(msg.str());
+	}
+	id = second_pair.second;
+      }
+    }
+    return id;
+  }
+  
+  AssID_t event_ass::find_unique_assid(const product_id& id_a,
+				       const data::DataType_t type_b) const
+  {
+    AssID_t id = kINVALID_ASS;
+    auto iter = _ass_map_key.find(id_a);
+    if(iter == _ass_map_key.end()) return id;
+    for(auto const& second_pair : (*iter).second) {
+      if(second_pair.first.first != type_b) continue;
+      if(id != kINVALID_ASS) {
+	std::ostringstream msg;
+	msg << "Association type: "
+	    << data::kDATA_TREE_NAME[id_a.first].c_str() << " (" << id_a.first <<")"
+	    << " by " << id_a.second.c_str()
+	    << " => "
+	    << data::kDATA_TREE_NAME[type_b].c_str() << " (" << type_b <<")"
+	    << " is not unique!";
+	throw DataFormatException(msg.str());
+      }
+      id = second_pair.second;
+    }
+    return id;
+  }
+  
+  AssID_t event_ass::find_unique_assid(const data::DataType_t type_a,
+				       const product_id& id_b) const
+  {
+    AssID_t id = kINVALID_ASS;
+    auto iter = _ass_map_key.find(id_b);
+    if(iter == _ass_map_key.end()) return id;
+    for(auto const& second_pair : (*iter).second) {
+      if(second_pair.first.first != type_a) continue;
+      if(id != kINVALID_ASS) {
+	std::ostringstream msg;
+	msg << "Association type: "
+	    << data::kDATA_TREE_NAME[type_a].c_str() << " (" << type_a <<")"
+	    << " => "
+	    << data::kDATA_TREE_NAME[id_b.first].c_str() << " (" << id_b.first <<")"
+	    << " by " << id_b.second.c_str()
+	    << " is not unique!";
+	throw DataFormatException(msg.str());
+      }
+      id = second_pair.second;
+    }
+    return id;
+  }
+  
 }
 #endif
 

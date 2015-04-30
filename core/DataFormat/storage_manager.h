@@ -60,6 +60,10 @@ namespace larlite {
      A higher level manager class to handle event-wise data and output file.
   */
   class storage_manager : public larlite_base {
+
+  public:
+
+    typedef std::pair<const larlite::event_ass*,AssID_t> AssInfo_t;
     
   public:
     
@@ -187,7 +191,6 @@ namespace larlite {
 	Specialize the template to the data product of your choice, and it cast the
 	pointer + return reference for you.
     */
-    //T* get_data(std::string const name);
     template <class T>
     T* get_data(std::string const name)
     {
@@ -200,13 +203,11 @@ namespace larlite {
 	Specialize the template to the run data product of your choice, and it cast the
 	pointer + return reference for you.
     */
-    //T* get_data(std::string const name);
     template <class T>
-    T* get_rundata(const std::string& name,
-		   const unsigned int& run)
+    T* get_rundata(const std::string& name)
     {
-      auto type = data_type<T>();
-      return (T*)(get_rundata(type,name,run));
+      auto type = rundata_type<T>();
+      return (T*)(get_rundata(type,name));
     }
 
     /** 
@@ -214,16 +215,19 @@ namespace larlite {
 	Specialize the template to the sub-run data product of your choice, and it cast the
 	pointer + return reference for you.
     */
-    //T* get_data(std::string const name);
     template <class T>
-    T* get_subrundata(const std::string& name,
-		      const unsigned int& run,
-		      const unsigned int& subrun)
+    T* get_subrundata(const std::string& name)
     {
-      auto type = data_type<T>();
-      return (T*)(get_subrundata(type,name,run,subrun));
+      auto type = subrundata_type<T>();
+      return (T*)(get_subrundata(type,name));
     }
-    
+
+    template <class T, class U>
+    const AssInfo_t find_one_assid(const T, const U) const;
+
+    template <class T, class U>
+    const AssInfo_t find_unique_assid(const T, const U) const;
+
     /// Getter for a shared object instance pointer. Not limited to be a singleton.
     static storage_manager* get() 
     { if(!me) me= new storage_manager(); return me; }
@@ -244,7 +248,15 @@ namespace larlite {
     /// Getter for a counter of written-out events
     inline UInt_t get_entries_written() const {return _nevents_written;}
 
-    /// Data product class => enum type converter
+    /// Run data product class => enum type converter
+    template <class T>
+    data::RunDataType_t rundata_type() const;
+
+    /// SubRun data product class => enum type converter
+    template <class T>
+    data::SubRunDataType_t subrundata_type() const;
+
+    /// Event data product class => enum type converter
     template <class T>
     data::DataType_t data_type() const;
 
@@ -379,6 +391,19 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_minos> () const;
   template<> data::DataType_t storage_manager::data_type<event_cosmictag>() const;
   template<> data::DataType_t storage_manager::data_type<event_ass>() const;
+  template<> data::SubRunDataType_t storage_manager::subrundata_type<potsummary>() const;
+  template<> const storage_manager::AssInfo_t storage_manager::find_one_assid(const data::DataType_t a,
+									      const data::DataType_t b) const;
+  template<> const storage_manager::AssInfo_t storage_manager::find_one_assid(const product_id& a,
+									      const data::DataType_t b) const;
+  template<> const storage_manager::AssInfo_t storage_manager::find_one_assid(const data::DataType_t a,
+									      const product_id& b     ) const;
+  template<> const storage_manager::AssInfo_t storage_manager::find_unique_assid(const data::DataType_t a,
+										 const data::DataType_t b) const;
+  template<> const storage_manager::AssInfo_t storage_manager::find_unique_assid(const product_id& a,
+										 const data::DataType_t b) const;
+  template<> const storage_manager::AssInfo_t storage_manager::find_unique_assid(const data::DataType_t a,
+										 const product_id& b     ) const;
 }
 #endif
 

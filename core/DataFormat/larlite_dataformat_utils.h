@@ -26,6 +26,9 @@ namespace larlite{
   /// Represents a set of AssUnit_t ... association @ event_X data product level
   typedef std::vector<AssUnit_t > AssSet_t;
 
+  /// Invalid association
+  const AssSet_t kEMPTY_ASS;
+
   /// Invalid run, subrun, and event ID values
   const unsigned int kINVALID_RUN    = data::kINVALID_UINT;
   const unsigned int kINVALID_SUBRUN = data::kINVALID_UINT;

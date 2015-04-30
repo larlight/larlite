@@ -2,7 +2,7 @@
 #define LARLITE_STORAGE_MANAGER_TEMPLATE_CXX
 //#include "storage_manager.h"
 //#include "storage_manager.h"
-
+#include "event_ass.h"
 namespace larlite {
 
   template<> data::DataType_t storage_manager::data_type<trigger> () const
@@ -99,6 +99,29 @@ namespace larlite {
     return data::kUndefined;
   }
 
+  template<> data::SubRunDataType_t storage_manager::subrundata_type<potsummary>() const
+  { return data::kPOTSummary; }
+
+  template <class T>
+  data::SubRunDataType_t storage_manager::subrundata_type() const
+  { 
+    Message::send(msg::kERROR,
+		  __PRETTY_FUNCTION__,
+		  "No corresponding data::SubRunDataType_t enum value found!");
+    throw std::exception();
+    return data::kSUBRUNDATA_Undefined;
+  }
+
+  template <class T>
+  data::RunDataType_t storage_manager::rundata_type() const
+  { 
+    Message::send(msg::kERROR,
+		  __PRETTY_FUNCTION__,
+		  "No corresponding data::RunDataType_t enum value found!");
+    throw std::exception();
+    return data::kRUNDATA_Undefined;
+  }
+
   //template<> data::DataType_t storage_manager::data_type<event_trigger> () const
   //{ return data::kTrigger; }
 
@@ -110,6 +133,39 @@ namespace larlite {
     return (T*)(get_data(type,name));
   }
   */
+
+  template <class T, class U>
+  const storage_manager::AssInfo_t storage_manager::find_one_assid(const T a, const U b) const
+  {
+    auto const& ev_ass_m = _ptr_data_array[data::kAssociation];
+    for(auto const& ev_ass_p : ev_ass_m) {
+      auto const& ev_ass = (larlite::event_ass*)(ev_ass_p.second);
+      auto id = ev_ass->find_one_assid(a,b);
+      if( id != kINVALID_ASS )
+	return std::make_pair((const larlite::event_ass*)(ev_ass),id);
+    }
+    return std::make_pair((const larlite::event_ass*)nullptr,kINVALID_ASS);
+  }
+
+  template <class T, class U>
+  const storage_manager::AssInfo_t storage_manager::find_unique_assid(const T a, const U b) const
+  {
+    auto const& ev_ass_m = _ptr_data_array[data::kAssociation];
+    event_ass* ptr=nullptr;
+    AssID_t id=kINVALID_ASS;
+    
+    for(auto const& ev_ass_p : ev_ass_m) {
+      auto ev_ass = (larlite::event_ass*)(ev_ass_p.second);
+      auto tmp_id = ev_ass->find_unique_assid(a,b);
+      if(tmp_id == kINVALID_ASS) continue;
+      if(id != kINVALID_ASS)
+	throw DataFormatException("Association found but not unique!");
+      id = tmp_id;
+      ptr = ev_ass;
+    }
+    return std::make_pair((const larlite::event_ass*)ptr,id);
+  }
+
 }
 #endif
   

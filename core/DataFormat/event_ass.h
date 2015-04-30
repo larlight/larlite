@@ -30,7 +30,8 @@ namespace larlite{
     
     std::map<larlite::product_id,std::map<larlite::product_id,size_t> > _ass_map_key;
     std::vector<larlite::AssSet_t> _ass_data;
-
+    std::vector<std::pair<larlite::product_id,larlite::product_id> > _ass_ids;
+    
   public:
     
     /// Default constructor
@@ -55,48 +56,54 @@ namespace larlite{
     /// Query the total number of association IDs stored
     size_t size() const;
 
-    /// Query the number of associated objects for data product with larlite::product_id == id_a
-    size_t size_association(const product_id& id_a,
-			    const product_id& id_b);
-
-    /**
-       Query the key for AssSet_t object that maps association of id_a => id_b. \n
-       Note one is encouraged to use this method to query the key only once in  \n
-       the event loop
-    */
-    AssID_t association_id(const product_id& id_a,
-			   const product_id& id_b) const;
-
-    /**
-       Query the key for AssSet_t object that maps association of id_a => one of \n
-       the type specified in "type" argument. If you have more than one association \n
-       of the specified type, then the first in the list is returned. Strictly speaking\n
-       you do not have a control on the "which one". But in return you do not have to bother\n
-       knowing the product id of the associated object. For instance, if you know there is \n
-       only one association between a cluster=>hit, you may use data::kHit type to get this \n
-       association. That way you do not have to have a user input the hit producer label.\n
-       Obviously this is a dirty method but who doesn't like a dirty method? 
-     */
-    AssID_t association_id(const product_id& id_a,
-			   const unsigned short type) const;
-    
-    /// larlite::AssSet_t getter given an explicit larlite::product_id combination
-    const AssSet_t& association(const product_id& id_a,
-				const product_id& id_b) const;
-
     /// Getter for associated data products' key info (product_id)
     const std::vector<std::pair<larlite::product_id,larlite::product_id> > association_keys() const;
 
     /// Getter for associated data products' key info (product_id)
     const std::vector<larlite::product_id> association_keys(const larlite::product_id& id) const;
 
+    /// Getter for associated data products' key info (product_id)
+    const std::pair<larlite::product_id,larlite::product_id>& association_keys(const AssID_t id) const;
+
     /// List association
     void list_association() const;
 
-  protected:
-    /// larlite::AssSet_t getter given an id
+    /**
+       larlite::AssSet_t getter given an explicit larlite::product_id combination. \n
+       larlite::DataFormatException thrown if not found.
+    */
+    const AssSet_t& association(const product_id& id_a,
+				const product_id& id_b) const;
+    /**
+       larlite::AssSet_t getter given an explicit larlite::product_id combination. \n
+       larlite::DataFormatException thrown if not found.
+    */
     const AssSet_t& association(const AssID_t id) const;
 
+    /**
+       Query the key for AssSet_t object that maps association of id_a => id_b. \n
+       If the return is kINVALID_ASS, then there is no proper association found. \n
+    */
+    AssID_t assid(const product_id& id_a, const product_id& id_b) const;
+
+    AssID_t find_one_assid(const data::DataType_t type_a,
+			   const data::DataType_t type_b) const;
+    
+    AssID_t find_one_assid(const product_id& id_a,
+			   const data::DataType_t type_b) const;
+    
+    AssID_t find_one_assid(const data::DataType_t type_a,
+			   const product_id& id_b) const;
+    
+    AssID_t find_unique_assid(const data::DataType_t type_a,
+			      const data::DataType_t type_b) const;
+    
+    AssID_t find_unique_assid(const product_id& id_a,
+			      const data::DataType_t type_b) const;
+    
+    AssID_t find_unique_assid(const data::DataType_t type_a,
+			      const product_id& id_b) const;
+    
   };
 }
 #endif

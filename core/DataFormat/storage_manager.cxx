@@ -1746,7 +1746,21 @@ namespace larlite {
     //_event_wf->clear_data();
     return true;
   }
-
+  /*  
+  const storage_manager::AssInfo_t
+  storage_manager::find_one_assid(const data::DataType_t type_a,
+				  const data::DataType_t type_b) const
+  {
+    auto const& ev_ass_m = _ptr_data_array[data::kAssociation];
+    for(auto const& ev_ass_p : ev_ass_m) {
+      auto const& ev_ass = (larlite::event_ass*)(ev_ass_p.second);
+      auto id = ev_ass->find_one_assid(type_a,type_b);
+      if( id != kINVALID_ASS )
+	return std::make_pair((const larlite::event_ass*)(ev_ass),id);
+    }
+    return std::make_pair((const larlite::event_ass*)nullptr,kINVALID_ASS);
+  }
+  */
 }
 #endif
   
