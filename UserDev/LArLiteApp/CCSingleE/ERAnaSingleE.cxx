@@ -16,6 +16,7 @@ namespace ertool {
     _result_tree = new TTree("_result_tree","Result Tree");
 
     _result_tree->Branch("_numEvts",&_numEvts,"numEvts/I");
+    _result_tree->Branch("_EDep",&_EDep,"EDep/D");
     _result_tree->Branch("_angle_Norm",&_angle_Norm,"_angle_Norm/D");
     _result_tree->Branch("_n_singleReco",&_n_singleReco,"n_singleReco/I");
     _result_tree->Branch("_distToTopWall",&_distToTopWall,"distToTopWall/D");
@@ -101,6 +102,10 @@ namespace ertool {
 
   bool ERAnaSingleE::Analyze(const EventData &data, const ParticleSet &ps)
 {
+
+  if (_debug)
+    std::cout << "******  Begin ERAnaSingleE Analysis  ******" << std::endl;
+
     // Get MC particle set
     auto mc_ps = MCParticleSet();
 
@@ -120,10 +125,25 @@ namespace ertool {
     _n_tracks    = 0;
     _n_tracksInt = 0;
 
-    for (auto &s : data.AllShower())
+    // Keep track of all energy deposited in detector
+    _EDep = 0;
+
+    for (auto &s : data.AllShower()){
+      _EDep += s._energy;
       if (s._energy > _eCut) { _n_showers += 1; }
-    for (auto &t : data.AllTrack())
+    }
+    for (auto &t : data.AllTrack()){
+      _EDep += t._energy;
       if (t._energy > _eCut) { _n_tracks += 1; }
+    }
+    if (_debug) { std::cout << "Total Energy deposited in detector: " << _EDep << std::endl; }
+
+    // If debug -> print out MC particle set
+    if (_debug){
+      std::cout << "MC Particle Tree: " << std::endl;
+      for (auto &p : mc_ps)
+	std::cout << p.Diagram();
+    }
 
 
     // loop over all particles in MC particle set (made by Helper)
@@ -225,99 +245,104 @@ namespace ertool {
       _singleE_ctr += 1;
     }
 
-    // If exactly one(or more) single electron(s) was in this event:
-    if ( _n_singleReco > 0 ){
+    // If debug -> print out RECO particle set
+    if (_debug){
+      std::cout << "Reco Particle Tree: " << std::endl;
+      for (auto &p : ps)
+	std::cout << p.Diagram();
+    }
+
+    // If no single electrons reconstructed -> fill tree anyway with misID info
+    if ( _n_singleReco == 0 )
+      _result_tree->Fill();
+    
+    for(int i = 0; i< ps.size(); i++){
+      Particle neutrino = ps[i];
+
+      if(abs(neutrino.PdgCode()) != 12  && abs(neutrino.PdgCode()) != 14)
+	std::cout<<"wtf neutrino doesn't have a neutrino pdg code"<<std::endl;
       
-      //        std::cout<<"\nEvent number : "<<_numEvts
-      //		 <<"\nNumber singleE: "<<_n_singleReco<<std::endl;
-      for(int i = 0; i< ps.size(); i++){
-	Particle neutrino = ps[i];
-	//    std::cout<<"'Neutrino' pdg: "<<neutrino.PdgCode()<<std::endl;
-	if(abs(neutrino.PdgCode()) != 12  && abs(neutrino.PdgCode()) != 14)
-	  std::cout<<"wtf neutrino doesn't have a neutrino pdg code"<<std::endl;
+      
+      _x_nuReco = neutrino.Vertex()[0];
+      _y_nuReco = neutrino.Vertex()[1];
+      _z_nuReco = neutrino.Vertex()[2];
+      _px_nuReco = neutrino.Momentum()[0];
+      _py_nuReco = neutrino.Momentum()[1];
+      _pz_nuReco = neutrino.Momentum()[2];
+      _n_tracksIntReco = ps[i].Daughters().size()-1;
+      
+      double momMag = 0;
+      
+      _e_trkIntReco = 0;
+      _e_nuReco = 0;
+      //find the neutrino daughter that is a lepton
+      for (auto const& daught : ps[i].Daughters()){
+	_e_nuReco += daught.KineticEnergy();
 	
+	// if not a lepton, add energy to tracks
+	if (abs(daught.PdgCode()) != 11){
+	  _e_trkIntReco += daught.KineticEnergy();
+	}
 	
-	_x_nuReco = neutrino.Vertex()[0];
-	_y_nuReco = neutrino.Vertex()[1];
-	_z_nuReco = neutrino.Vertex()[2];
-	_px_nuReco = neutrino.Momentum()[0];
-	_py_nuReco = neutrino.Momentum()[1];
-	_pz_nuReco = neutrino.Momentum()[2];
-	_n_tracksIntReco = ps[i].Daughters().size()-1;
-	
-	double momMag = 0;
+	if(abs(daught.PdgCode()) == 11 || abs(daught.PdgCode()) == 13){
+	  _e_lepReco = daught.Energy();
+	  
+	  //length of shower (geoalgo cone) associated with the electron
+	  //_showerlength_lepReco = data.AllShower().at(daught.RecoObjID()).Length(); //kaleko
+	  _x_lepReco = daught.Vertex()[0];
+	  _y_lepReco = daught.Vertex()[1];
+	  _z_lepReco = daught.Vertex()[2];
+	  _px_lepReco = daught.Momentum()[0];
+	  _py_lepReco = daught.Momentum()[1];
+	  _pz_lepReco = daught.Momentum()[2];
+	  _theta_lepReco = (180./3.14) * acos( _pz_lepReco / sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco + _pz_lepReco*_pz_lepReco ) );
+	  _phi_lepReco   = (180./3.14) * asin( _py_lepReco / sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco ) );
+	  _lep_vtxdist = sqrt( (_x_lep-_x_lepReco)*(_x_lep-_x_lepReco) +
+			       (_y_lep-_y_lepReco)*(_y_lep-_y_lepReco) + 
+			       (_z_lep-_z_lepReco)*(_z_lep-_z_lepReco) );
+	  _lep_dot = ( ( _px_lep*_px_lepReco + _py_lep*_py_lepReco + _pz_lep*_pz_lepReco ) / 
+		       ( sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco + _pz_lepReco*_pz_lepReco ) * 
+			 sqrt( _px_lep*_px_lep + _py_lep*_py_lep + _pz_lep*_pz_lep ) ) );
+	  
+	  ::geoalgo::HalfLine shr(daught.Vertex(),daught.Momentum());
+	  
+	  double detHalfHeight = 116.5 ;
+	  _distToTopWall = (_y_lepReco - detHalfHeight)*daught.Momentum().Length()/_py_lepReco ;
+	  
+	  _distToWall = sqrt(_geoAlgo.SqDist(daught.Vertex(),fTPC));
+	  if(_geoAlgo.Intersection(fTPC,shr,true).size() > 0)
+	    _distBackAlongTraj = sqrt(daught.Vertex().SqDist(_geoAlgo.Intersection(fTPC,shr,true)[0])) ;
+	  else
+	    _distBackAlongTraj = -999; 
+	  
+	  momMag = sqrt(_px_lepReco*_px_lepReco + _py_lepReco *_py_lepReco + _pz_lepReco*_pz_lepReco);
+	  _px_lepNormReco = _px_lepReco / momMag ;
+	  _py_lepNormReco = _py_lepReco / momMag ;
+	  _pz_lepNormReco = _pz_lepReco / momMag ;
+	  
+	  double py = _py_lepNormReco ;
+	  double pz = _pz_lepNormReco ;
+	  double convert = 180.0/ 3.1415926525898 ; 
+	  double quad = py/pz  ;
+	  if(quad < 0)
+	    quad *=-1; 
+	  
+	  _angle_Norm = atan(quad );
+	  _angle_Norm*= convert ;
+	  
+	  if(py >=0 && pz <0)
+	    _angle_Norm = 180 - _angle_Norm ; 
+	  else if(py <0 && pz <0)
+	    _angle_Norm = 180 + _angle_Norm ;
+	  else if(py <0 && pz >=0)
+	    _angle_Norm = 360 - _angle_Norm ;
+	  
+	}// if particle is lepton
+      }// for all daughters
 
-	_e_trkIntReco = 0;
-	_e_nuReco = 0;
-	//find the neutrino daughter that is a lepton
-	for (auto const& daught : ps[i].Daughters()){
-	  _e_nuReco += daught.KineticEnergy();
-
-	  // if not a lepton, add energy to tracks
-	  if (abs(daught.PdgCode()) != 11){
-	    _e_trkIntReco += daught.KineticEnergy();
-	  }
-
-	  if(abs(daught.PdgCode()) == 11 || abs(daught.PdgCode()) == 13){
-	    _e_lepReco = daught.Energy();
-	    
-	    //length of shower (geoalgo cone) associated with the electron
-	    //_showerlength_lepReco = data.AllShower().at(daught.RecoObjID()).Length(); //kaleko
-	    _x_lepReco = daught.Vertex()[0];
-	    _y_lepReco = daught.Vertex()[1];
-	    _z_lepReco = daught.Vertex()[2];
-	    _px_lepReco = daught.Momentum()[0];
-	    _py_lepReco = daught.Momentum()[1];
-	    _pz_lepReco = daught.Momentum()[2];
-	    _theta_lepReco = (180./3.14) * acos( _pz_lepReco / sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco + _pz_lepReco*_pz_lepReco ) );
-	    _phi_lepReco   = (180./3.14) * asin( _py_lepReco / sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco ) );
-	    _lep_vtxdist = sqrt( (_x_lep-_x_lepReco)*(_x_lep-_x_lepReco) +
-				 (_y_lep-_y_lepReco)*(_y_lep-_y_lepReco) + 
-				 (_z_lep-_z_lepReco)*(_z_lep-_z_lepReco) );
-	    _lep_dot = ( ( _px_lep*_px_lepReco + _py_lep*_py_lepReco + _pz_lep*_pz_lepReco ) / 
-			 ( sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco + _pz_lepReco*_pz_lepReco ) * 
-			   sqrt( _px_lep*_px_lep + _py_lep*_py_lep + _pz_lep*_pz_lep ) ) );
-	    
-	    ::geoalgo::HalfLine shr(daught.Vertex(),daught.Momentum());
-	    
-	    double detHalfHeight = 116.5 ;
-	    _distToTopWall = (_y_lepReco - detHalfHeight)*daught.Momentum().Length()/_py_lepReco ;
-	    
-	    _distToWall = sqrt(_geoAlgo.SqDist(daught.Vertex(),fTPC));
-	    if(_geoAlgo.Intersection(fTPC,shr,true).size() > 0)
-		_distBackAlongTraj = sqrt(daught.Vertex().SqDist(_geoAlgo.Intersection(fTPC,shr,true)[0])) ;
-	    else
-		_distBackAlongTraj = -999; 
-	    
-	    momMag = sqrt(_px_lepReco*_px_lepReco + _py_lepReco *_py_lepReco + _pz_lepReco*_pz_lepReco);
-	    _px_lepNormReco = _px_lepReco / momMag ;
-	    _py_lepNormReco = _py_lepReco / momMag ;
-	    _pz_lepNormReco = _pz_lepReco / momMag ;
-	    
-	    double py = _py_lepNormReco ;
-	    double pz = _pz_lepNormReco ;
-	    double convert = 180.0/ 3.1415926525898 ; 
-	    double quad = py/pz  ;
-	    if(quad < 0)
-	      quad *=-1; 
-	    
-	    _angle_Norm = atan(quad );
-	    _angle_Norm*= convert ;
-	    
-	    if(py >=0 && pz <0)
-	      _angle_Norm = 180 - _angle_Norm ; 
-	    else if(py <0 && pz <0)
-	      _angle_Norm = 180 + _angle_Norm ;
-	    else if(py <0 && pz >=0)
-	      _angle_Norm = 360 - _angle_Norm ;
-	    
-	  }// if particle is lepton
-	}// for all daughters
-
-	_result_tree->Fill();
-      }// loop over all CCSingleEs found in event
-    }// if at least 1 CCSingleE interaction was reconstructed
-
+      _result_tree->Fill();
+    }// loop over all CCSingleEs found in event
+    
     _h_e_nu_correlation->Fill(_e_nu,_e_nuReco);
     
     if (_debug){
@@ -331,7 +356,7 @@ namespace ertool {
 							 (_y_lep-_y_lepReco)*(_y_lep-_y_lepReco) +
 							 (_z_lep-_z_lepReco)*(_z_lep-_z_lepReco) ) << std::endl
 		<< "Lepton theta [Mc,Reco] : [" << _theta_lep << ", " << _theta_lepReco << "]" <<  std::endl
-		<< "Lepton phi [Mc,Reco]   : [" << _phi_lep << ", " << _phi_lepReco << "]" <<  std::endl;
+		<< "Lepton phi [Mc,Reco]   : [" << _phi_lep << ", " << _phi_lepReco << "]" <<  std::endl << std::endl;
     }
     
     return true;

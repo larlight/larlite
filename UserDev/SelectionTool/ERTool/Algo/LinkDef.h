@@ -15,9 +15,11 @@
 #pragma link C++ class ertool::AlgoMichelE+;
 #pragma link C++ class ertool::AlgoCCSignalE+;
 #pragma link C++ class ertool::AlgoFindRelationship+;
+#pragma link C++ class ertool::AlgoSingleGamma+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 
 
 

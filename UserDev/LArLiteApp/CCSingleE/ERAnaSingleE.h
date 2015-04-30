@@ -73,6 +73,8 @@ namespace ertool {
     // Result tree comparison for reconstructed events
     TTree* _result_tree;
 
+    // total energy deposited in detector by tracks & showers
+    double _EDep;
     //Number of reconstructed *particles* in the output PSet
     //(this is 1-to-1 with number of single electrons reconstructed)
     int _n_singleReco;

@@ -111,7 +111,7 @@ namespace geoalgo {
     compat(B);
     compat(C);
     compat(D);
-    
+
     // get sphere from 3 points (A,B,C)
     Vector_t AB(B-A);
     Vector_t AC(C-A);
@@ -125,7 +125,7 @@ namespace geoalgo {
     double dACAD = AC.Dot(AD);
     
     double d = 4*dABAC*dABAD*dACAD;
-    
+
     if (d==0)
       throw GeoAlgoException("GeoSphere Exception: I think it means 3 points collinear. Find out which and call 3 point constructor - TO DO");
     
@@ -138,6 +138,7 @@ namespace geoalgo {
       _center = A + AB*s + AC*t + AD*u;
       _radius = _center.Dist(A);
     }
+
     // TEMPORARY
     // otherwise find the 4 possible sphere combinations,
     // which contains the 4th point,
@@ -146,7 +147,7 @@ namespace geoalgo {
     tmp = Sphere(A,B,C);
     _radius = kINVALID_DOUBLE;
     if (tmp.Contain(D)){
-      _radius = tmp.Radius();
+      _center = tmp.Center();
       _radius = tmp.Radius();
     }
     tmp = Sphere(A,B,D);
@@ -170,6 +171,7 @@ namespace geoalgo {
 	_radius = tmp.Radius();
       }
     }
+
   }
   
   
