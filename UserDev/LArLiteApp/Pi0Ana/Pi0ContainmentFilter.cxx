@@ -15,6 +15,13 @@ namespace larlite {
     _total_events = 0;
     _kept_events = 0;
 
+    _n_single = 0; 
+    _n_E = 0;
+    _n_detProf = 0;
+
+    SetEC(0.75) ;
+    SetEnergyCut(20);
+
     return true;
   }
   
@@ -46,28 +53,34 @@ namespace larlite {
       if(abs(particle.PdgCode()) == 111 && KE > 0.02) //GeV
 	n_pi0++;
     }
-    if (n_pi0 != 1)
+    if (n_pi0 != 1){
+      _n_single++ ;
       return false;
+      }
 
     // Enforce there to be 2 mcshowers both > 95% contained
     event_mcshower selected;
     size_t n_shr = 0;
     for (auto const& shr : *ev_mcshower){
-      if ( shr.Start().E() > 20 ) //MeV
+      if ( shr.Start().E() > _Energy ) //MeV
 	selected.push_back(shr);
+      else
+         _n_E++ ;
     }
     if (selected.size() != 2)
       return false;
 
     for (auto const& sh : selected){
-      if ( (sh.DetProfile().E() / sh.Start().E()) > .75 )
+      if ( (sh.DetProfile().E() / sh.Start().E()) > _EC )
 	n_shr +=1 ;
-    }
+      else 
+	_n_detProf++;
+	}
     if (n_shr != 2)
       return false;
     
 
-    //If you get here, the event has 1 good electron and 1 good proton.
+    //If you get here, the event has 1 pi0 with 2 showers   
     _kept_events++;
     return true;  
 
@@ -75,9 +88,13 @@ namespace larlite {
 
   bool Pi0ContainmentFilter::finalize() {
 
-    std::cout<< "MC_1P1E_Filter: Total events = " << _total_events << std::endl;
-    std::cout<< "MC_1P1E_Filter: Final kept events = " << _kept_events << std::endl;
+    std::cout<< "Pi0 Containment Filter: Total events = " << _total_events << std::endl;
+    std::cout<< "Pi0 Containment Filter: Final kept events = " << _kept_events << std::endl;
   
+    std::cout<<"Here's where we lost em: \nWrong numer pi0s: "<<_n_single
+	     <<"\nPi0 energy < 20MeV: "<<_n_E
+	     <<"\nEC < 0.75: "<<_n_detProf<<std::endl;
+
     return true;
   }
 
