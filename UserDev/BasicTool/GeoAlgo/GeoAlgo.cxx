@@ -982,13 +982,11 @@ namespace geoalgo {
 
     // Remove any duplicate points
     std::vector<Point_t> copyPts;
+    std::vector<Point_t>::iterator it;
     for(size_t p1=0; p1 < pts.size(); p1++){
-      bool unique = true;
-      for(size_t p2=p1+1; p2 < pts.size(); p2++){
-	if (pts[p1] == pts[p2])
-	  unique = false;
-      }
-      if (unique)
+      // if an identical point does not already exist in copyPts -> then add
+      it = find(copyPts.begin(), copyPts.end(), copyPts[p1]);
+      if (it != copyPts.end())
 	copyPts.push_back(pts[p1]);
     }
 
