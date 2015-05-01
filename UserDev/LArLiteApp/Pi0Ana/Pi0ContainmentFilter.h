@@ -47,10 +47,21 @@ namespace larlite {
     */
     virtual bool finalize();
 
+    void SetEC(double EC) { _EC = EC ; }
+
+    void SetEnergyCut(double EnergyCut) { _Energy = EnergyCut; }
+
     protected:
 
     int _kept_events;
     int _total_events;
+
+    int _n_single;
+    int _n_E;
+    int _n_detProf ;
+
+    double _EC ;
+    double _Energy ;
 
   };
 }

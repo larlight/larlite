@@ -14,6 +14,7 @@
 #ifndef BASICTOOL_GEOALGO_H
 #define BASICTOOL_GEOALGO_H
 
+#include <algorithm> // used for std::find
 #include "GeoLine.h"
 #include "GeoHalfLine.h"
 #include "GeoLineSegment.h"
@@ -359,7 +360,9 @@ namespace geoalgo {
     double commonOrigin(const LineSegment_t& seg, const Trajectory_t& trj, Point_t& origin, bool backwards=false) const
     { trj.front().compat(seg.Start()); return _commonOrigin_(trj, seg, origin, backwards); }
 
-
+    //************************************************************************
+    //BOUNDING SPHERE ALGORITHM: RETURN SMALLEST SPHERE THAT BOUNDS ALL POINTS
+    //************************************************************************
     // Bounding Sphere problem given a vector of 3D points
     Sphere_t boundingSphere(const std::vector<Point_t>& pts) const
     { for(auto &p : pts) { pts.front().compat(p); } return _boundingSphere_(pts); }
