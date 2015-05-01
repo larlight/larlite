@@ -299,6 +299,7 @@ namespace ertool {
 	pi0.Momentum(momentum);
 	pi0.AddDaughter(gamma1);
 	pi0.AddDaughter(gamma2);
+	pi0.Score(likelihood);
 	res.push_back(pi0);
       }
       _hMass->Fill(_mass);
