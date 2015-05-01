@@ -60,44 +60,37 @@ namespace larlite {
     ///--- Utility ---///
     virtual void clear_data();
 
-    ///--- Setters ---///
-
-    inline void AddDaughter     (const int trackID)   { fdaughters.insert(trackID);  }
-    inline void SetPolarization (TVector3 const& p)   { fpolarization = p;           }
-    inline void SetRescatter    (int code)            { frescatter    = code;        }
-    inline void SetWeight       (double wt)           { fWeight       = wt;          }
-    inline void SetEndProcess   (std::string s)       { fendprocess   = s;           }
-    inline void SetTrajectory   (const mctrajectory steps) { ftrajectory   = steps;  }
-    inline void AddTrajectory   (const mcstep step)   { ftrajectory.push_back(step); }
-    inline void AddTrajectory   (const TLorentzVector& position,
-				 const TLorentzVector& momentum)
-    { ftrajectory.push_back(position,momentum); }
-
-    inline void AddFiducialTrack(size_t start, size_t end)
-    { ftrackFiducial.push_back(std::pair<size_t,size_t>(start,end)); }
-
-    inline void AddFiducialTrack(const std::pair<size_t,size_t>& step)
-    { ftrackFiducial.push_back(step); }
-
     ///--- Getters ---///
+    int                  StatusCode()   const;
+    int                  TrackId()      const;
+    int                  PdgCode()      const;
+    int                  Mother()       const;
+    const std::string    Process()      const;
+    const std::string    EndProcess()   const;
 
-    int                  StatusCode()   const { return fstatus;       }
-    int                  TrackId()      const { return ftrackId;      }
-    int                  PdgCode()      const { return fpdgCode;      }
-    int                  Mother()       const { return fmother;       }
-    const std::string    Process()      const { return fprocess;      }
-    const std::string    EndProcess()   const { return fendprocess;   }
+    const mctrajectory&  Trajectory()   const;
+    double               Mass()         const;
+    const TVector3&      Polarization() const;
+    const std::set<int>& Daughters()    const;
+    double               Weight()       const;
+    TLorentzVector       GetGvtx()      const;
+    int                  Rescatter()    const;
+    const std::vector<std::pair<size_t,size_t> >& FiducialTrack() const;
 
-    const mctrajectory&  Trajectory()   const { return ftrajectory;   }
-    double               Mass()         const { return fmass;         }
-    const TVector3&      Polarization() const { return fpolarization; }
-    const std::set<int>& Daughters()    const { return fdaughters;    } 
-    double               Weight()       const { return fWeight;       }
-    TLorentzVector       GetGvtx()      const { return fGvtx;         }
-    int                  Rescatter()    const { return frescatter;    }
+#ifndef __CINT__
+    ///--- Setters ---///
+    void AddDaughter     (const int trackID);
+    void SetPolarization (TVector3 const& p);
+    void SetRescatter    (int code);
+    void SetWeight       (double wt);
+    void SetEndProcess   (std::string s);
+    void SetTrajectory   (const mctrajectory steps);
+    void AddTrajectory   (const mcstep step);
+    void AddTrajectory   (const TLorentzVector& position,
+			  const TLorentzVector& momentum);
 
-    const std::vector<std::pair<size_t,size_t> >& FiducialTrack() const 
-    {return ftrackFiducial;}
+    void AddFiducialTrack(size_t start, size_t end);
+    void AddFiducialTrack(const std::pair<size_t,size_t>& step);
 
   private:
 
@@ -130,6 +123,7 @@ namespace larlite {
     /// 14 => Hadron in the Nucleus (marked for hadron transport modules to act on)
     /// 15 => Final State Nuclear Remnant (low energy nuclear fragments entering the record collectively as a 'hadronic blob' pseudo-particle)
     /// 16 => Nucleon Cluster Target
+#endif
 
     ////////////////////////
     ClassDef(mcpart,1)

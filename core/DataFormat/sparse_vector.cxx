@@ -6,6 +6,10 @@
 
 namespace larlite{
 
+  //
+  // sparse_vector
+  //
+  
   template <class T>
   void sparse_vector<T>::add_range(unsigned int start, const std::vector<T>& data)
   {

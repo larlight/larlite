@@ -46,10 +46,10 @@ namespace larlite {
 
     ///--- Getters ---///
     void XYZ(double *xyz) const;
-    int ID() const   { return fID;     }
-    double X() const { return fXYZ[0]; }
-    double Y() const { return fXYZ[1]; }
-    double Z() const { return fXYZ[2]; }
+    int ID() const;
+    double X() const;
+    double Y() const;
+    double Z() const;
     
   private:
 

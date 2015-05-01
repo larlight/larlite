@@ -93,8 +93,7 @@ namespace larlite {
 						   unsigned short endTDC) const;
     
     /// IDE map getter
-    const std::map<unsigned short, std::vector<larlite::ide> >& TDCIDEMap() const
-    { return fTDCIDEs; }
+    const std::map<unsigned short, std::vector<larlite::ide> >& TDCIDEMap() const;
 
     /**
        The number of ionization electrons associated with this channel for the
@@ -110,6 +109,7 @@ namespace larlite {
     /// Comparison operator
     //inline bool operator< (const simch& other) { return fChannel < other.fChannel };
 
+#ifndef __CINT__
   private:
 
     /// electronics channel associated with these sim::Electrons
@@ -117,7 +117,7 @@ namespace larlite {
 
     /// vector of IDE structs for each TDC with signal
     std::map<unsigned short, std::vector< larlite::ide > > fTDCIDEs;
-
+#endif
   };
 
   /**

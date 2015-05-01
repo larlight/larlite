@@ -61,34 +61,35 @@ namespace larlite {
 
     //--- Getters ---//
 
-    simb::Origin_t     Origin    () const { return fOrigin;    }
+    simb::Origin_t     Origin  () const;
 
-    int                PdgCode   () const { return fPDGCode;   }
-    unsigned int       TrackID () const { return fTrackID; } 
-    const std::string& Process   () const { return fProcess;   }
-    const mcstep&      Start   () const { return fStart;   }
-    const mcstep&      End     () const { return fEnd;     }
+    int                PdgCode () const;
+    unsigned int       TrackID () const;
+    const std::string& Process () const;
+    const mcstep&      Start   () const;
+    const mcstep&      End     () const;
 
-    int                MotherPdgCode   () const { return fMotherPDGCode;   }
-    unsigned int       MotherTrackID () const { return fMotherTrackID; }
-    const std::string& MotherProcess   () const { return fMotherProcess;   }
-    const mcstep&      MotherStart   () const { return fMotherStart;   }
-    const mcstep&      MotherEnd     () const { return fMotherEnd;     }
+    int                MotherPdgCode () const;
+    unsigned int       MotherTrackID () const;
+    const std::string& MotherProcess () const;
+    const mcstep&      MotherStart   () const;
+    const mcstep&      MotherEnd     () const;
 
-    int                AncestorPdgCode   () const { return fAncestorPDGCode;   }
-    unsigned int       AncestorTrackID () const { return fAncestorTrackID; }
-    const std::string& AncestorProcess   () const { return fAncestorProcess;   }
-    const mcstep&      AncestorStart   () const { return fAncestorStart;   }
-    const mcstep&      AncestorEnd     () const { return fAncestorEnd;     }
+    int                AncestorPdgCode () const;
+    unsigned int       AncestorTrackID () const;
+    const std::string& AncestorProcess () const;
+    const mcstep&      AncestorStart   () const;
+    const mcstep&      AncestorEnd     () const;
 
-    const mcstep& DetProfile () const { return fDetProfile; }
+    const mcstep& DetProfile () const;
     
-    const std::vector<unsigned int>&  DaughterTrackID() const { return fDaughterTrackID; }
+    const std::vector<unsigned int>&  DaughterTrackID() const;
 
     double Charge(const size_t plane) const;
 
-    const std::vector<double>& Charge() const { return fPlaneCharge; }
+    const std::vector<double>& Charge() const;
 
+#ifndef __CINT__
     //--- Setters ---//
     void Origin  ( simb::Origin_t o ) { fOrigin    = o;    }
 
@@ -148,7 +149,7 @@ namespace larlite {
 
     //---- Charge per plane ----//
     std::vector<double> fPlaneCharge; ///< Charge deposit per plane
-
+#endif
   };
 
   /**

@@ -51,18 +51,19 @@ namespace larlite{
 
     void clear_data();
 
-    const int&    Pdg()           const { return fPdg;         }
-    const int&    Ndf()           const { return fNdf;         }
-    const double& MinChi2()       const { return fMinChi2;     }
-    const double& DeltaChi2()     const { return fDeltaChi2;   }
-    const double& Chi2Proton()    const { return fChi2Proton;  }
-    const double& Chi2Kaon()      const { return fChi2Kaon;    }
-    const double& Chi2Pion()      const { return fChi2Pion;    }
-    const double& Chi2Muon()      const { return fChi2Muon;    }
-    const double& MissingE()      const { return fMissingE;    }
-    const double& MissingEavg()   const { return fMissingEavg; }
-    const double& PIDA()          const { return fPIDA;        }
-    const geo::PlaneID& PlaneID() const { return fPlaneID;     }
+    const int&    Pdg()           const;
+    const int&    Ndf()           const;
+    const double& MinChi2()       const;
+    const double& DeltaChi2()     const;
+    const double& Chi2Proton()    const;
+    const double& Chi2Kaon()      const;
+    const double& Chi2Pion()      const;
+    const double& Chi2Muon()      const;
+    const double& MissingE()      const;
+    const double& MissingEavg()   const;
+    const double& PIDA()          const;
+    const geo::PlaneID& PlaneID() const;
+#ifndef __CINT__    
   protected:
 
     int    fPdg;             ///< determined particle ID                                                                                          
@@ -77,6 +78,7 @@ namespace larlite{
     double fMissingEavg;     ///< missing energy from dead wires using average dEdx                                                               
     double fPIDA;            ///< PID developed by Bruce Baller      
     geo::PlaneID fPlaneID;   ///< Plane ID
+#endif
   private:
     
   };

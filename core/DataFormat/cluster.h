@@ -23,18 +23,18 @@ namespace larlite{
   typedef int ID_t; ///< Cluster ID
 
   typedef enum {
-    clStart,       ///< Represents the most likely start of the cluster                                                                               
-    clEnd,         ///< Represents the end, or the alternative start, of the cluster                                                                  
-    NEnds,         ///< End count                                                                                                                     
-    clFirstEnd = 0 ///< Just an alias for loops                                                                                                       
-  } ClusterEnds_t; ///< Used to decide which end to use                                                                                               
-  
+    clStart,       ///< Represents the most likely start of the cluster
+    clEnd,         ///< Represents the end, or the alternative start, of the cluster
+    NEnds,         ///< End count
+    clFirstEnd = 0 ///< Just an alias for loops
+  } ClusterEnds_t; ///< Used to decide which end to use
+
   typedef enum {
-    cmFit,          ///< Sums from the fitted hit values                                                                                              
-    cmADC,          ///< Sums directly from ADC counts                                                                                                
-    NChargeModes,   ///< End count                                                                                                                    
-    cmFirstMode = 0 ///< Just an alias for loops                                                                                                      
-  } ChargeMode_t; ///< Used to decide which style of charge sum to use
+    cmFit,          ///< Sums from the fitted hit values
+    cmADC,          ///< Sums directly from ADC counts
+    NChargeModes,   ///< End count
+    cmFirstMode = 0 ///< Just an alias for loops
+  } ChargeMode_t; ///< Used to decide which style of charge sum to use  typedef enum {
 
   const ID_t InvalidID = -1;
 
@@ -51,40 +51,8 @@ namespace larlite{
     /// Default destructor
     virtual ~cluster(){}
 
-    /// Default copy ctor
-    /*
-    cluster(const cluster& orig) : data_base(orig)
-				 , fNHits(orig.fNHits)
-				 , fMultipleHitDensity(orig.fMultipleHitDensity)
-				 , fWidth(orig.fWidth)
-				 , fID(orig.fID)
-				 , fView(orig.fView)
-				 , fPlaneID(orig.fPlaneID)
-    {
-      fEndWires[clStart]   = orig.StartWire();
-      fEndTicks[clStart]   = orig.StartTick();
-      fEndCharges[clStart] = orig.StartCharge();
-      fAngles[clStart]     = orig.StartAngle();
-      fOpeningAngles[clStart] = orig.StartOpeningAngle();
-      fSigmaEndWires[clStart] = orig.SigmaStartWire();
-      fSigmaEndTicks[clStart] = orig.SigmaStartTick();
-
-      fEndWires[clEnd]   = orig.EndWire();
-      fEndTicks[clEnd]   = orig.EndTick();
-      fEndCharges[clEnd] = orig.EndCharge();
-      fAngles[clEnd]     = orig.EndAngle();
-      fOpeningAngles[clEnd] = orig.EndOpeningAngle();
-      fSigmaEndWires[clEnd] = orig.SigmaEndWire();
-      fSigmaEndTicks[clEnd] = orig.SigmaEndTick();
-
-      fChargeSum[cmFit] = orig.Integral();
-      fChargeSum[cmADC] = orig.SummedADC();
-      fChargeAverage[cmFit] = orig.IntegralAverage();
-      fChargeAverage[cmADC] = orig.SummedADCaverage();
-      fChargeStdDev[cmFit] = orig.IntegralStdDev();
-      fChargeStdDev[cmADC] = orig.SummedADCstdDev();
-    }
-    */
+    void clear_data();
+    
     /// @{
     /// @name Accessors
     
@@ -569,6 +537,7 @@ namespace larlite{
       
     friend bool operator <  (cluster const& a, cluster const& b);
 
+#ifndef __CINT__
     void set_start_wire(float w,float err);
     void set_start_tick(float t,float err);
     void set_start_charge(float q);
@@ -588,29 +557,6 @@ namespace larlite{
     void set_view(geo::View_t v);
     void set_planeID(const geo::PlaneID& id);
 
-    virtual void clear_data(){
-      data_base::clear_data();
-      fNHits = 0;
-      for(size_t i=0; i<NEnds; ++i) {
-	fSigmaEndWires[i]=0;
-	fEndTicks[i]=0;
-	fSigmaEndTicks[i]=0;
-	fEndCharges[i]=0;
-	fAngles[i]=0;
-	fOpeningAngles[i]=0;
-      }
-      for(size_t i=0; i<NChargeModes; ++i) {
-	fChargeSum[i]=0;
-	fChargeStdDev[i]=0;
-	fChargeAverage[i]=0;
-      }
-      fMultipleHitDensity=0.;
-      fWidth=0.;
-      fID=InvalidID;
-      fView=geo::kUnknown;
-      fPlaneID=geo::PlaneID();
-    }
-    
   private:
 
     unsigned int fNHits; ///< Number of hits in the cluster
@@ -686,7 +632,7 @@ namespace larlite{
     geo::View_t fView; ///< View for this cluster
     
     geo::PlaneID fPlaneID; ///< Location of the start of the cluster
-    
+#endif    
   };
   
   /**
@@ -694,16 +640,16 @@ namespace larlite{
      A collection storage class of multiple clusters.
   */
   class event_cluster : public std::vector<larlite::cluster>,
-    public event_base {
+			public event_base {
     
   public:
     
-      /// Default constructor
-  event_cluster(std::string name="noname") : event_base(data::kCluster,name) {clear_data();}
+    /// Default constructor
+    event_cluster(std::string name="noname") : event_base(data::kCluster,name) {clear_data();}
     
-      /// Default copy constructor
-  event_cluster(const event_cluster& original)
-    : std::vector<larlite::cluster>(original), event_base(original)
+    /// Default copy constructor
+    event_cluster(const event_cluster& original)
+      : std::vector<larlite::cluster>(original), event_base(original)
     {}
     
     /// Method to clear currently held data contents in the buffer

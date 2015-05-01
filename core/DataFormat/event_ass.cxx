@@ -321,7 +321,50 @@ namespace larlite{
     }
     return id;
   }
+
+  std::vector<larlite::AssID_t>
+  event_ass::find_all_assid(const data::DataType_t type_a,
+			    const data::DataType_t type_b) const
+  {
+    std::vector<larlite::AssID_t> id_v;
+    for(auto const& first_pair : _ass_map_key) {
+      if(first_pair.first.first != type_a) continue;
+      for(auto const& second_pair : first_pair.second) {
+	if(second_pair.first.first != type_b) continue;
+	id_v.push_back(second_pair.second);
+      }
+    }
+    return id_v;
+  }
   
+  std::vector<larlite::AssID_t>
+  event_ass::find_all_assid(const product_id& id_a,
+			    const data::DataType_t type_b) const
+  {
+    std::vector<larlite::AssID_t> id_v;
+    auto iter = _ass_map_key.find(id_a);
+    if(iter == _ass_map_key.end()) return id_v;
+    for(auto const& second_pair : (*iter).second) {
+      if(second_pair.first.first != type_b) continue;
+      id_v.push_back(second_pair.second);
+    }
+    return id_v;
+  }
+  
+  std::vector<larlite::AssID_t>
+  event_ass::find_all_assid(const data::DataType_t type_a,
+			    const product_id& id_b) const
+  {
+    std::vector<larlite::AssID_t> id_v;
+    auto iter = _ass_map_key.find(id_b);
+    if(iter == _ass_map_key.end()) return id_v;
+    for(auto const& second_pair : (*iter).second) {
+      if(second_pair.first.first != type_a) continue;
+      id_v.push_back(second_pair.second);
+    }
+    return id_v;
+  }
+
 }
 #endif
 

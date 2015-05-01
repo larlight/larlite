@@ -1,10 +1,34 @@
 
-#ifndef LARLITE_RAEDIGIT_CXX
-#define LARLITE_RAEDIGIT_CXX
+#ifndef LARLITE_RAWDIGIT_CXX
+#define LARLITE_RAWDIGIT_CXX
 
 #include "rawdigit.h"
 
 namespace larlite {
+
+  rawdigit::rawdigit()
+    : data_base(data::kRawDigit)
+    , fChannel(0) 
+    , fSamples(0) 
+    , fPedestal(0.) 
+    , fSigma(0.)
+    , fADC(0)
+    , fCompression(raw::kNone)
+  {clear_data();}
+  
+  rawdigit::rawdigit(raw::ChannelID_t          channel,
+		     unsigned short            samples,
+		     const std::vector<short>& adclist,
+		     raw::Compress_t           compression
+		     )
+    : data_base(data::kRawDigit)
+    , fChannel(channel) 
+    , fSamples(samples)
+    , fPedestal(0.) 
+    , fSigma(0.)
+    , fADC(adclist) 
+    , fCompression(compression)
+  {clear_data();}
 
   //--------------------------------------------------
   short rawdigit::ADC(int i) const
@@ -23,11 +47,16 @@ namespace larlite {
   //----------------------------------------------------------------------
   void rawdigit::SetPedestal(float ped)
   {
-
     fPedestal = ped;
     fSigma = 1.;
-
   }
+
+  size_t           rawdigit::NADC()        const { return fADC.size();  }
+  raw::ChannelID_t rawdigit::Channel()     const { return fChannel;     }
+  unsigned short   rawdigit::Samples()     const { return fSamples;     }
+  float            rawdigit::GetPedestal() const { return fPedestal;    } 
+  float            rawdigit::GetSigma()    const { return fSigma;       } 
+  raw::Compress_t  rawdigit::Compression() const { return fCompression; }
 
 }
 #endif

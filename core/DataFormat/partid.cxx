@@ -52,6 +52,19 @@ namespace larlite {
     , fPlaneID(planeid)
   {}
 
+  const int&    partid::Pdg()           const { return fPdg;         }
+  const int&    partid::Ndf()           const { return fNdf;         }
+  const double& partid::MinChi2()       const { return fMinChi2;     }
+  const double& partid::DeltaChi2()     const { return fDeltaChi2;   }
+  const double& partid::Chi2Proton()    const { return fChi2Proton;  }
+  const double& partid::Chi2Kaon()      const { return fChi2Kaon;    }
+  const double& partid::Chi2Pion()      const { return fChi2Pion;    }
+  const double& partid::Chi2Muon()      const { return fChi2Muon;    }
+  const double& partid::MissingE()      const { return fMissingE;    }
+  const double& partid::MissingEavg()   const { return fMissingEavg; }
+  const double& partid::PIDA()          const { return fPIDA;        }
+  const geo::PlaneID& partid::PlaneID() const { return fPlaneID;     }
+
   std::ostream& operator<< (std::ostream & o, partid const& a)
   {
     o << "Determined particle PDG code: " << a.fPdg

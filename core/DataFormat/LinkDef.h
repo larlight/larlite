@@ -178,6 +178,7 @@
 
 #pragma link C++ class larlite::storage_manager+;
 
+/*
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_gtruth>();
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_mctruth>();
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_mcpart>();
@@ -230,5 +231,5 @@
 
 #pragma link C++ function larlite::storage_manager::subrundata_type<larlite::potsummary>();
 #pragma link C++ function larlite::storage_manager::get_subrundata<larlite::potsummary>(string);
-
+*/
 #endif

@@ -44,20 +44,7 @@ namespace larlite {
 	 double qsqr);
     
     /// Copy constructor
-    mcnu(const mcnu& origin) : data_base(origin),
-			       fNu(origin.fNu),
-			       fLepton(origin.fLepton),
-			       fMode(origin.fMode),
-			       fInteractionType(origin.fInteractionType),
-			       fCCNC(origin.fCCNC),
-			       fTarget(origin.fTarget),
-			       fHitNuc(origin.fHitNuc),
-			       fHitQuark(origin.fHitQuark),
-			       fW(origin.fW),
-			       fX(origin.fX),
-			       fY(origin.fY),
-			       fQSqr(origin.fQSqr)
-    {}
+    mcnu(const mcnu& origin);
 
     /// Default destructor
     virtual ~mcnu(){}
@@ -66,19 +53,21 @@ namespace larlite {
     virtual void clear_data();
 
     ///--- Getters ---///
-    inline const  mcpart&  Nu()              const { return fNu;              }
-    inline const  mcpart&  Lepton()          const { return fLepton;          }
-    inline        int    CCNC()            const { return fCCNC;            }
-    inline        int    Mode()            const { return fMode;            }
-    inline        int    InteractionType() const { return fInteractionType; }
-    inline        int    Target()          const { return fTarget;          }
-    inline        int    HitNuc()          const { return fHitNuc;          }
-    inline        int    HitQuark()        const { return fHitQuark;        }
-    inline        double W()               const { return fW;               }
-    inline        double X()               const { return fX;               }
-    inline        double Y()               const { return fY;               }
-    inline        double QSqr()            const { return fQSqr;            }
 
+    const  mcpart&  Nu()     const;
+    const  mcpart&  Lepton() const;
+    int    CCNC()            const;
+    int    Mode()            const;
+    int    InteractionType() const;
+    int    Target()          const;
+    int    HitNuc()          const;
+    int    HitQuark()        const;
+    double W()               const;
+    double X()               const;
+    double Y()               const;
+    double QSqr()            const;
+
+#ifndef __CINT__
   private:
 
     mcpart   fNu;              ///< the incoming neutrino
@@ -93,7 +82,7 @@ namespace larlite {
     double fX;               ///< Bjorken x=Q^2/(2M*(E_neutrino-E_lepton)), unitless
     double fY;               ///< Inelasticity y=1-(E_lepton/E_neutrino), unitless
     double fQSqr;            ///< Momentum transfer Q^2, in GeV^2
-    
+#endif    
   };
   
 }

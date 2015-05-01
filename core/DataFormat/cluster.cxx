@@ -5,6 +5,31 @@
 
 namespace larlite{
 
+  void cluster::clear_data()
+  {
+    data_base::clear_data();
+    fNHits = 0;
+    for(size_t i=0; i<NEnds; ++i) {
+      fSigmaEndWires[i]=0;
+      fEndTicks[i]=0;
+      fSigmaEndTicks[i]=0;
+      fEndCharges[i]=0;
+      fAngles[i]=0;
+      fOpeningAngles[i]=0;
+    }
+    for(size_t i=0; i<NChargeModes; ++i) {
+      fChargeSum[i]=0;
+      fChargeStdDev[i]=0;
+      fChargeAverage[i]=0;
+    }
+    fMultipleHitDensity=0.;
+    fWidth=0.;
+    fID=InvalidID;
+    fView=geo::kUnknown;
+    fPlaneID=geo::PlaneID();
+  }
+
+  
   void cluster::set_start_wire(float w,float err)
   { fEndWires[clStart] = w; fSigmaEndWires[clStart] = err; }
   void cluster::set_start_tick(float t,float err)

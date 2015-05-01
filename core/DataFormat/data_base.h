@@ -107,13 +107,14 @@ namespace larlite{
     // 
     /// Run number getter
     const unsigned int& run() const;
-
+#ifndef __CINT__
   private:
     unsigned int fRunNumber; ///< run number
 
   private:
     /// run number setter
     void set_run (unsigned int run);
+#endif
   };
 
   /**
@@ -144,6 +145,7 @@ namespace larlite{
     /// Sub-Run number getter
     const unsigned int& subrun() const;
 
+#ifndef __CINT__
   private:
     unsigned int fRunNumber; ///< run number
     unsigned int fSubRunNumber; ///< sub run number
@@ -153,6 +155,7 @@ namespace larlite{
     void set_run      (unsigned int run);
     /// sub-run number setter
     void set_subrun   (unsigned int run);
+#endif
   };
 
   /**
@@ -187,6 +190,7 @@ namespace larlite{
     /// event-id getter
     unsigned int event_id () const;
 
+#ifndef __CINT__
   private:
     unsigned int fRunNumber;    ///< Run number
     unsigned int fSubRunNumber; ///< Sub-Run number
@@ -199,7 +203,7 @@ namespace larlite{
     void set_subrun   (unsigned int run);
     /// event-id setter
     void set_event_id (unsigned int id );
-
+#endif
   };
 }
 #endif

@@ -46,7 +46,7 @@ namespace larlite {
     virtual ~track(){}
 
     virtual void clear_data();
-    
+#ifndef __CINT__
     void set_track_id   (const int id);
     void add_vertex     (const TVector3 v);
     void add_direction  (const TVector3 v);
@@ -54,7 +54,7 @@ namespace larlite {
     void add_covariance (const TMatrixD m);
     void add_dqdx       (const std::vector<double>& v);
     void reserve(size_t n);
-
+#endif 
     void            Extent(std::vector<double> &xyzStart,
 			   std::vector<double> &xyzEnd)        const;
     void            Direction(double *dcosStart,
@@ -99,7 +99,7 @@ namespace larlite {
     void LocalToGlobalRotationAtPoint(unsigned int p, TMatrixD& rot) const;
 
     friend bool     operator <   (const track & a, const track & b);
-
+#ifndef __CINT__
   protected:
 
     std::vector<TVector3>               fXYZ;           ///< position of points along the track
@@ -112,7 +112,7 @@ namespace larlite {
                                                         ///< determined from a fit. Intermediate points
                                                         ///< can be added if desired
     int                                 fID;            ///< track's ID
-    
+#endif    
   private:
     
   };

@@ -24,7 +24,24 @@ namespace larlite {
  //   fDistanceMaxWidth=-1;
  //   fTotalCharge=-1;
   }
-
+  
+  int   shower::ID()                     const { return fID;               }
+  const TVector3& shower::Direction()    const { return fDCosStart;          }
+  const TVector3& shower::DirectionErr() const { return fSigmaDCosStart;     }
+  
+  const TVector3& shower::ShowerStart()    const { return fXYZstart;          }
+  const TVector3& shower::ShowerStartErr() const { return fSigmaXYZstart;     }
+  
+  const std::vector< double >& shower::Energy()    const { return fTotalEnergy;          }
+  const std::vector< double >& shower::EnergyErr() const { return fSigmaTotalEnergy;     }
+  
+  const std::vector< double >& shower::MIPEnergy()    const { return fTotalMIPEnergy;          }
+  const std::vector< double >& shower::MIPEnergyErr() const { return fSigmaTotalMIPEnergy;     }
+  int    shower::best_plane()               const { return fBestPlane;               }
+  double shower::Length() const { return fLength; }
+  const  std::vector< double >& shower::dEdx()    const { return fdEdx;          }
+  const  std::vector< double >& shower::dEdxErr() const { return fSigmadEdx;     }
+  
 }
 
 #endif

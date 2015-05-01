@@ -27,11 +27,11 @@ namespace larlite{
   class event_ass : public event_base {
 
   private:
-    
+#ifndef __CINT__
     std::map<larlite::product_id,std::map<larlite::product_id,size_t> > _ass_map_key;
     std::vector<larlite::AssSet_t> _ass_data;
     std::vector<std::pair<larlite::product_id,larlite::product_id> > _ass_ids;
-    
+#endif    
   public:
     
     /// Default constructor
@@ -94,7 +94,7 @@ namespace larlite{
     
     AssID_t find_one_assid(const data::DataType_t type_a,
 			   const product_id& id_b) const;
-    
+
     AssID_t find_unique_assid(const data::DataType_t type_a,
 			      const data::DataType_t type_b) const;
     
@@ -103,6 +103,15 @@ namespace larlite{
     
     AssID_t find_unique_assid(const data::DataType_t type_a,
 			      const product_id& id_b) const;
+
+    std::vector<AssID_t> find_all_assid(const data::DataType_t type_a,
+					const data::DataType_t type_b) const;
+    
+    std::vector<AssID_t> find_all_assid(const product_id& id_a,
+					const data::DataType_t type_b) const;
+    
+    std::vector<AssID_t> find_all_assid(const data::DataType_t type_a,
+					const product_id& id_b) const;
     
   };
 }

@@ -45,7 +45,8 @@ namespace larlite{
     
     /// Default destructor
     virtual ~calorimetry(){}
-    
+
+#ifndef __CINT__    
     virtual void clear_data();
 
     // Set methods
@@ -58,6 +59,7 @@ namespace larlite{
     void set_track_pitch(const std::vector<double> &v)    { fTrkPitch = v;      }
     void set_plane_id(const geo::PlaneID& id)             { fPlaneID = id;      }
     void set_xyz(const std::vector<TVector3>& xyz)        { fXYZ = xyz;         }
+#endif
 
     // Get Methods 
     inline const std::vector<double>& dEdx()          const { return fdEdx; }
@@ -75,8 +77,10 @@ namespace larlite{
     }
     inline const geo::PlaneID& PlaneID() const { return fPlaneID;}
     inline const std::vector<TVector3>& XYZ() { return fXYZ; }
+
   protected:
 
+#ifndef __CINT__
     double              fKineticEnergy;   ///< determined kinetic energy
     std::vector<double> fdEdx;            ///< dE/dx, should be same size as fResidualRange
     std::vector<double> fdQdx;            ///< dQ/dx
@@ -86,6 +90,7 @@ namespace larlite{
     std::vector<double> fTrkPitch;        ///< track pitch on collection plane
     std::vector<TVector3> fXYZ;           ///< coordinates of space points
     geo::PlaneID        fPlaneID;         ///< plane ID
+#endif
 
   private:
     

@@ -57,6 +57,22 @@ namespace larlite {
   {
     return a.Time() < b.Time();
   }
+  
+  double opflash::Time()              const { return fTime;          }
+  double opflash::TimeWidth()         const { return fTimeWidth;     }
+  double opflash::AbsTime()           const { return fAbsTime;       }
+  unsigned int opflash::Frame()       const { return fFrame;         }
+  double opflash::PE(unsigned int i)  const { return fPEperOpDet[i]; }
+  double opflash::YCenter()           const { return fYCenter;       }
+  double opflash::YWidth()            const { return fYWidth;        }
+  double opflash::ZCenter()           const { return fZCenter;       }
+  double opflash::ZWidth()            const { return fZWidth;        }
+  double opflash::FastToTotal()       const { return fFastToTotal;   }
+  const std::vector<double>& opflash::WireCenters() const { return fWireCenters; }
+  const std::vector<double>& opflash::WireWidths()  const { return fWireWidths;  }
+  bool opflash::InBeamFrame()         const { return fInBeamFrame;   }
+  int  opflash::OnBeamTime()          const { return fOnBeamTime;    }
+  
 
   //----------------------------------------------------------------------
   double opflash::TotalPE() const

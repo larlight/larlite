@@ -36,7 +36,8 @@ namespace larlite{
     virtual ~hit(){}
 
     void clear_data();
-    
+
+#ifndef __CINT__
     // Set methods
     void set_rms (float rms)
     {fRMS = rms; }
@@ -68,7 +69,7 @@ namespace larlite{
     { fSignalType = sid; }
     void set_wire(const geo::WireID& wid)
     { fWireID = wid; }
-
+#endif
     /// @{
     /// @name Accessors
       
@@ -158,7 +159,7 @@ namespace larlite{
     friend bool           operator <  (const hit & a, const hit & b);
     
   protected:
-
+#ifndef __CINT__
     raw::ChannelID_t        fChannel;        ///< ID of the readout channel the hit was extracted from                                                  
     raw::TDCtick_t          fStartTick;      ///< initial tdc tick for hit                                                                              
     raw::TDCtick_t          fEndTick;        ///< final tdc tick for hit                                                                                
@@ -177,7 +178,7 @@ namespace larlite{
     geo::View_t             fView;           ///< view for the plane of the hit                                                                         
     geo::SigType_t          fSignalType;     ///< signal type for the plane of the hit                                                                  
     geo::WireID             fWireID;         ///< WireID for the hit (Cryostat, TPC, Plane, Wire)
-    
+#endif    
   private:
     
   };

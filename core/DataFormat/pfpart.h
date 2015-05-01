@@ -45,26 +45,27 @@ namespace larlite{
     /// Default destructor
     virtual ~pfpart(){}
 
+#ifndef __CINT__
   private:
 
     int                 fPdgCode;   ///< A preliminary estimate of the PFParticle type using the PDG code                                       
     size_t              fSelf;      ///< Self reference                                                                                         
     size_t              fParent;    ///< Index into PFParticle collection for parent                                                            
     std::vector<size_t> fDaughters; ///< Vector of indices into PFParticle Collection for daughters 
-
+#endif
   public:
 
     /// method to clear data member
     virtual void clear_data();
 
     /// Accessors                                                                                                                                 
-    int                        PdgCode()            const {return fPdgCode;}
-    bool                       IsPrimary()          const {return fParent == kPFParticlePrimary;}
-    int                        NumDaughters()       const {return fDaughters.size();}
-    size_t                     Self()               const {return fSelf;}
-    size_t                     Parent()             const {return fParent;}
+    int    PdgCode()      const;
+    bool   IsPrimary()    const;
+    int    NumDaughters() const;
+    size_t Self()         const;
+    size_t Parent()       const;
     //size_t                     Daughter(size_t idx) const;
-    const std::vector<size_t>& Daughters()          const {return fDaughters;}
+    const std::vector<size_t>& Daughters() const;
 
     friend std::ostream& operator << (std::ostream& o, const pfpart& c);
     friend bool          operator <  (const pfpart& a, const pfpart& b);

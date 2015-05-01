@@ -27,6 +27,9 @@ namespace larlite {
     fTDCIDEs.clear();
   }
 
+  const std::map<unsigned short, std::vector<larlite::ide> >& simch::TDCIDEMap() const
+  { return fTDCIDEs; }
+  
   //--------------------------------------------------------------------------
   std::vector<larlite::ide> simch::TrackIDsAndEnergies(unsigned short startTDC,
 						       unsigned short endTDC) const
