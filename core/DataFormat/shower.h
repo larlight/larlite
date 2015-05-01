@@ -53,7 +53,6 @@ namespace larlite{
     const std::vector< double >& dEdx()    const;
     const std::vector< double >& dEdxErr() const;
 
-#ifndef __CINT__
     // Set methods
     void set_id                (const int id)                      { fID = id;                 }
     void set_total_energy      (const std::vector< double >& q)    { fTotalEnergy = q;         }
@@ -86,7 +85,6 @@ namespace larlite{
     std::vector< double > fSigmaTotalMIPEnergy;           ///< Calculated Energy per each plane
     int fBestPlane;
     double fLength;
-#endif    
     
   };
   

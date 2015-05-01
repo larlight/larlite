@@ -45,14 +45,13 @@ namespace larlite{
     /// Default destructor
     virtual ~pfpart(){}
 
-#ifndef __CINT__
   private:
 
     int                 fPdgCode;   ///< A preliminary estimate of the PFParticle type using the PDG code                                       
     size_t              fSelf;      ///< Self reference                                                                                         
     size_t              fParent;    ///< Index into PFParticle collection for parent                                                            
     std::vector<size_t> fDaughters; ///< Vector of indices into PFParticle Collection for daughters 
-#endif
+
   public:
 
     /// method to clear data member

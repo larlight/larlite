@@ -49,14 +49,13 @@ namespace larlite {
     /// Method to clear data member
     void clear_data();
 
-#ifndef __CINT__
   protected:
     
     int    fID;        ///< SpacePoint ID
     double fXYZ[3];    ///< position of SpacePoint in xyz
     double fErrXYZ[6]; ///< Error matrix (triangular).
     double fChisq;     ///< Chisquare. 
-#endif    
+
   };
   
   /**

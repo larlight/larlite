@@ -67,7 +67,6 @@ namespace larlite {
     double Y()               const;
     double QSqr()            const;
 
-#ifndef __CINT__
   private:
 
     mcpart   fNu;              ///< the incoming neutrino
@@ -82,7 +81,7 @@ namespace larlite {
     double fX;               ///< Bjorken x=Q^2/(2M*(E_neutrino-E_lepton)), unitless
     double fY;               ///< Inelasticity y=1-(E_lepton/E_neutrino), unitless
     double fQSqr;            ///< Momentum transfer Q^2, in GeV^2
-#endif    
+
   };
   
 }

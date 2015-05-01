@@ -60,7 +60,6 @@ namespace larlite{
     float            GetSigma()    const;
     raw::Compress_t  Compression() const;
 
-#ifndef __CINT__
     // Set Methods
     void             SetPedestal(float ped);
     
@@ -72,7 +71,6 @@ namespace larlite{
     float            fSigma;       ///< sigma of the pedestal counts for this channel
     ADCvector_t fADC;         ///< ADC readout per tick, before pedestal subtraction 
     raw::Compress_t  fCompression; ///< compression scheme used for the ADC vector
-#endif
     
   };
   

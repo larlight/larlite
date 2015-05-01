@@ -537,7 +537,6 @@ namespace larlite{
       
     friend bool operator <  (cluster const& a, cluster const& b);
 
-#ifndef __CINT__
     void set_start_wire(float w,float err);
     void set_start_tick(float t,float err);
     void set_start_charge(float q);
@@ -632,7 +631,7 @@ namespace larlite{
     geo::View_t fView; ///< View for this cluster
     
     geo::PlaneID fPlaneID; ///< Location of the start of the cluster
-#endif    
+
   };
   
   /**

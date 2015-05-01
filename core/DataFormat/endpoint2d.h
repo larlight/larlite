@@ -51,7 +51,6 @@ namespace larlite {
     int       ID()        const { return fID;          }
     double    Strength()  const { return fStrength;    }
 
-#ifndef __CINT__
   private:
 
     double       fDriftTime;    ///< vertex's drift time
@@ -60,7 +59,7 @@ namespace larlite {
     double       fStrength;     ///< vertex's strength
     geo::View_t  fView;         ///< view for this end point
     double       fTotalCharge;  ///< total charge of hits associated with end point 
-#endif    
+
   };
   
   /**

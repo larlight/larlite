@@ -89,7 +89,6 @@ namespace larlite {
 
     const std::vector<double>& Charge() const;
 
-#ifndef __CINT__
     //--- Setters ---//
     void Origin  ( simb::Origin_t o ) { fOrigin    = o;    }
 
@@ -149,7 +148,6 @@ namespace larlite {
 
     //---- Charge per plane ----//
     std::vector<double> fPlaneCharge; ///< Charge deposit per plane
-#endif
   };
 
   /**

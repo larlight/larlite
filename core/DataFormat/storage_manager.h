@@ -186,7 +186,6 @@ namespace larlite {
     /// Universal sub-run data pointer getter to return run_base* pointer for specified run-data type w/ run number
     subrun_base* get_subrundata(const data::SubRunDataType_t type, 
 				const std::string& name);    
-#ifndef __CINT__
     /** 
 	Type specific data product getter.
 	Specialize the template to the data product of your choice, and it cast the
@@ -248,7 +247,7 @@ namespace larlite {
     template <class T>
     const std::vector<std::vector<const T*> > create_ass_ptr(const product_id& id) const;
     */
-#endif    
+
     /// Getter for a shared object instance pointer. Not limited to be a singleton.
     static storage_manager* get() 
     { if(!me) me= new storage_manager(); return me; }
@@ -286,7 +285,6 @@ namespace larlite {
     { return data::kDATA_TREE_NAME[type]; }
 
   private:
-#ifndef __CINT__
     static storage_manager* me; ///< shared object instance pointer
     
     void create_data_ptr(data::DataType_t const type, std::string const& name);
@@ -377,7 +375,6 @@ namespace larlite {
     std::vector<std::map<std::string,bool> > _write_rundata_array;
     /// Boolean to record what subrun-data to be written out from a file
     std::vector<std::map<std::string,bool> > _write_subrundata_array;
-#endif
   };
 
 }

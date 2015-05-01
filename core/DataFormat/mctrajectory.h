@@ -50,7 +50,6 @@ namespace larlite {
     double Py() const;
     double Pz() const;
     double E()  const;
-#ifndef __CINT__
     void SetPosition(const TLorentzVector& v) { _position=v; };
     void SetMomentum(const TLorentzVector& v) { _momentum=v; };
 
@@ -58,7 +57,7 @@ namespace larlite {
 
     TLorentzVector _position;
     TLorentzVector _momentum;
-#endif
+
   };
 
   /**

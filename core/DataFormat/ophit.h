@@ -20,7 +20,7 @@ namespace larlite {
 
   public:
     ophit(); // Default constructor
-#ifndef __CINT__    
+
   private:
     
     int                   fOpChannel;
@@ -32,7 +32,7 @@ namespace larlite {
     double                fAmplitude;
     double                fPE;
     double                fFastToTotal;
-#endif    
+
   public:
     
     ophit(int opchannel, 

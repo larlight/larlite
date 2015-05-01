@@ -23,7 +23,6 @@ namespace larlite {
 
       opflash(); // Default constructor
 
-#ifndef __CINT__
   private:
  
       double                fTime;         // Time relative to trigger
@@ -40,7 +39,6 @@ namespace larlite {
       double                fFastToTotal;  // Fast to total light ratio
       bool                  fInBeamFrame;  // Is this in the beam frame?
       int                   fOnBeamTime;   // Is this in time with beam?
-#endif
     
   public:
 

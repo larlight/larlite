@@ -43,7 +43,6 @@ namespace larlite {
     simb::Origin_t                       Origin()       const;
     Bool_t                               NeutrinoSet()  const;
 
-#ifndef __CINT__
     ///--- Setters/Adders ---///
     void Add(mcpart part)              { fPartList.push_back(part); }
     void SetOrigin( simb::Origin_t orig) { fOrigin = orig;            }
@@ -64,7 +63,7 @@ namespace larlite {
     mcnu                          fMCNeutrino;  ///< reference to neutrino info - null if not a neutrino
     simb::Origin_t                fOrigin;      ///< origin for this event
     Bool_t                        fNeutrinoSet; ///< flag for whether the neutrino information has been set
-#endif    
+
   };
   
   /**

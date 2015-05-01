@@ -56,12 +56,10 @@ namespace larlite {
 
     size_t size() const { return _ranges.size(); }
 
-#ifndef __CINT__
     void add_range(unsigned int start, const std::vector<T>& data);
 
   protected:
     std::vector< ::larlite::sparse_data<T> > _ranges;
-#endif
 
   };
 }

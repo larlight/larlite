@@ -78,7 +78,6 @@ namespace larlite{
     const mcstep&      AncestorStart   () const;
     const mcstep&      AncestorEnd     () const;
 
-#ifndef __CINT__
     void Origin          ( simb::Origin_t o ) { fOrigin    = o;        }
     void PdgCode         ( int id           ) { fPDGCode   = id;       }
     void TrackID         ( unsigned int id  ) { fTrackID = id;       }
@@ -118,7 +117,7 @@ namespace larlite{
     std::string    fAncestorProcess;   ///< This particle's ancestor's process name
     mcstep         fAncestorStart;     ///< This particle's ancestor's start position/momentum
     mcstep         fAncestorEnd;       ///< This particle's ancestor's start position/momentum
-#endif
+
   };
   
   /**

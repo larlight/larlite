@@ -77,7 +77,6 @@ namespace larlite {
     int                  Rescatter()    const;
     const std::vector<std::pair<size_t,size_t> >& FiducialTrack() const;
 
-#ifndef __CINT__
     ///--- Setters ---///
     void AddDaughter     (const int trackID);
     void SetPolarization (TVector3 const& p);
@@ -123,7 +122,6 @@ namespace larlite {
     /// 14 => Hadron in the Nucleus (marked for hadron transport modules to act on)
     /// 15 => Final State Nuclear Remnant (low energy nuclear fragments entering the record collectively as a 'hadronic blob' pseudo-particle)
     /// 16 => Nucleon Cluster Target
-#endif
 
     ////////////////////////
     ClassDef(mcpart,1)

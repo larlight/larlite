@@ -109,7 +109,6 @@ namespace larlite {
     /// Comparison operator
     //inline bool operator< (const simch& other) { return fChannel < other.fChannel };
 
-#ifndef __CINT__
   private:
 
     /// electronics channel associated with these sim::Electrons
@@ -117,7 +116,7 @@ namespace larlite {
 
     /// vector of IDE structs for each TDC with signal
     std::map<unsigned short, std::vector< larlite::ide > > fTDCIDEs;
-#endif
+
   };
 
   /**

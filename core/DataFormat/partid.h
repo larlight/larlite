@@ -63,7 +63,7 @@ namespace larlite{
     const double& MissingEavg()   const;
     const double& PIDA()          const;
     const geo::PlaneID& PlaneID() const;
-#ifndef __CINT__    
+
   protected:
 
     int    fPdg;             ///< determined particle ID                                                                                          
@@ -78,7 +78,7 @@ namespace larlite{
     double fMissingEavg;     ///< missing energy from dead wires using average dEdx                                                               
     double fPIDA;            ///< PID developed by Bruce Baller      
     geo::PlaneID fPlaneID;   ///< Plane ID
-#endif
+
   private:
     
   };
