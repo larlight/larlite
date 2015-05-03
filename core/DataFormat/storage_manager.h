@@ -24,6 +24,7 @@ namespace larlite {
   class trigger;
   class potsummary;
   class event_hit;
+  class hit;
   class event_track;
   class event_mctruth;
   class event_gtruth;
@@ -63,7 +64,7 @@ namespace larlite {
 
   public:
 
-    typedef std::pair<const larlite::event_ass*,AssID_t> AssInfo_t;
+    typedef std::pair<const event_ass*,AssID_t> AssInfo_t;
     typedef std::vector<AssInfo_t> AssInfoSet_t;
       
   public:
@@ -225,12 +226,13 @@ namespace larlite {
     template <class T, class U>
     const AssInfo_t find_one_assid(const T, const U) const;
     */
+    
     template <class T, class U>
-    const AssInfo_t find_one_assid(const T a, const U b) const
+    const AssInfo_t find_one_assid(const T a, const U b)
     {
-      auto const& ev_ass_m = _ptr_data_array[data::kAssociation];
+      auto const& ev_ass_m = this->_ptr_data_array[data::kAssociation];
       for(auto const& ev_ass_p : ev_ass_m) {
-	auto const& ev_ass = (larlite::event_ass*)(ev_ass_p.second);
+	auto const& ev_ass = this->get_data< ::larlite::event_ass>(ev_ass_p.first);
 	auto id = ev_ass->find_one_assid(a,b);
 	if( id != kINVALID_ASS )
 	  return std::make_pair((const larlite::event_ass*)(ev_ass),id);
@@ -239,15 +241,15 @@ namespace larlite {
     }
     
     template <class T, class U>
-    const AssInfo_t find_unique_assid(const T, const U) const;
+    const AssInfo_t find_unique_assid(const T, const U);
 
     template <class T, class U>
-    const AssInfoSet_t find_all_assid(const T, const U) const;
+    const AssInfoSet_t find_all_assid(const T, const U);
     /*
     template <class T>
     const std::vector<std::vector<const T*> > create_ass_ptr(const product_id& id) const;
     */
-
+    
     /// Getter for a shared object instance pointer. Not limited to be a singleton.
     static storage_manager* get() 
     { if(!me) me= new storage_manager(); return me; }
@@ -415,39 +417,39 @@ namespace larlite {
 
   template<>
   const storage_manager::AssInfo_t
-  storage_manager::find_one_assid(const data::DataType_t a,const data::DataType_t b) const;
+  storage_manager::find_one_assid(const data::DataType_t a,const data::DataType_t b);
 				  
   template<>
   const storage_manager::AssInfo_t
-  storage_manager::find_one_assid(const product_id& a,const data::DataType_t b) const;
+  storage_manager::find_one_assid(const product_id& a,const data::DataType_t b);
 				  
   template<>
   const storage_manager::AssInfo_t
-  storage_manager::find_one_assid(const data::DataType_t a,const product_id& b) const;
+  storage_manager::find_one_assid(const data::DataType_t a,const product_id& b);
 				  
   template<>
   const storage_manager::AssInfo_t
-  storage_manager::find_unique_assid(const data::DataType_t a,const data::DataType_t b) const;
+  storage_manager::find_unique_assid(const data::DataType_t a,const data::DataType_t b);
 				     
   template<>
   const storage_manager::AssInfo_t
-  storage_manager::find_unique_assid(const product_id& a,const data::DataType_t b) const;
+  storage_manager::find_unique_assid(const product_id& a,const data::DataType_t b);
 				     
   template<>
   const storage_manager::AssInfo_t
-  storage_manager::find_unique_assid(const data::DataType_t a,const product_id& b) const;
+  storage_manager::find_unique_assid(const data::DataType_t a,const product_id& b);
 
   template<>
   const storage_manager::AssInfoSet_t
-  storage_manager::find_all_assid(const data::DataType_t a, const data::DataType_t b) const;
+  storage_manager::find_all_assid(const data::DataType_t a, const data::DataType_t b);
 
   template<>
   const storage_manager::AssInfoSet_t
-  storage_manager::find_all_assid(const product_id& a, const data::DataType_t b) const;
+  storage_manager::find_all_assid(const product_id& a, const data::DataType_t b);
 
   template<>
   const storage_manager::AssInfoSet_t
-  storage_manager::find_all_assid(const data::DataType_t a, const product_id& b) const;
+  storage_manager::find_all_assid(const data::DataType_t a, const product_id& b);
 
 }
 #endif
