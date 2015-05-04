@@ -58,7 +58,7 @@ def main():
     my_algo.setAngleMax(3.14)
 
     # Create analysis unit
-    my_ana = fmwk.ERAnaPi0Reco()
+    my_ana = fmwk.Pi0Reco()
 
     # ************Set Producers**************
     # First Argument: True = MC, False = Reco

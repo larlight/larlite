@@ -1,19 +1,19 @@
-#ifndef ERANAPI0QUALITY_CXX
-#define ERANAPI0QUALITY_CXX
+#ifndef PI0QUALITY_CXX
+#define PI0QUALITY_CXX
 
-#include "ERAnaPi0Quality.h"
+#include "Pi0Quality.h"
 
 namespace larlite {
 
-  ERAnaPi0Quality::ERAnaPi0Quality()
+  Pi0Quality::Pi0Quality()
     : ERToolAnaBase()
     , _pi0_tree(nullptr) 
   { 
-    _name="ERAnaPi0Quality"; 
+    _name="Pi0Quality"; 
 
   }
 
-  bool ERAnaPi0Quality::initialize() {
+  bool Pi0Quality::initialize() {
 
     // Setup Tree to hold Quality Check information
     if (_pi0_tree) { delete _pi0_tree; }
@@ -31,7 +31,7 @@ namespace larlite {
     return ERToolAnaBase::initialize();
   }
   
-  bool ERAnaPi0Quality::analyze(storage_manager* storage) {
+  bool Pi0Quality::analyze(storage_manager* storage) {
 
     // get MCTruth to find Pi0
     auto ev_mctruth  = storage->get_data<event_mctruth>("generator");
@@ -92,7 +92,7 @@ namespace larlite {
     return true;  
   }
     
-  bool ERAnaPi0Quality::finalize() {
+  bool Pi0Quality::finalize() {
 
     _pi0_tree->Write();
 
