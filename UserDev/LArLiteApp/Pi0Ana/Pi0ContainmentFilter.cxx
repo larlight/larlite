@@ -19,8 +19,8 @@ namespace larlite {
     _n_E = 0;
     _n_detProf = 0;
 
-    SetEC(0.75) ;
-    SetEnergyCut(20);
+   // SetEC(0.75) ;
+    //SetEnergyCut(20);
 
     return true;
   }
@@ -91,9 +91,9 @@ namespace larlite {
     std::cout<< "Pi0 Containment Filter: Total events = " << _total_events << std::endl;
     std::cout<< "Pi0 Containment Filter: Final kept events = " << _kept_events << std::endl;
   
-    std::cout<<"Here's where we lost em: \nWrong numer pi0s: "<<_n_single
-	     <<"\nPi0 energy < 20MeV: "<<_n_E
-	     <<"\nEC < 0.75: "<<_n_detProf<<std::endl;
+    std::cout<<"Here's where we lost them: \nWrong numer pi0s: "<<_n_single
+	     <<"\nPi0 energy < 20 MeV: "<<_n_E
+	     <<"\nEC <"<<_EC<<"   :"<<_n_detProf<<std::endl;
 
     return true;
   }
