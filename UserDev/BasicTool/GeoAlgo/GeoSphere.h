@@ -51,7 +51,7 @@ namespace geoalgo {
     // Getters
     //
     const Point_t& Center() const; ///< Center getter
-    const double Radius() const;   ///< Radius getter
+    double Radius() const;   ///< Radius getter
 
     //
     // Setters

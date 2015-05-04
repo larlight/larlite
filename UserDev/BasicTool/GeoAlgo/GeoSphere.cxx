@@ -199,7 +199,7 @@ namespace geoalgo {
   
   const Point_t& Sphere::Center() const { return _center; }
   
-  const double Sphere::Radius() const { return _radius; }
+  double Sphere::Radius() const { return _radius; }
   
   void Sphere::Center(const double x, const double y, const double z)
   { _center[0] = x; _center[1] = y; _center[2] = z; }
