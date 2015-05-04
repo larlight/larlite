@@ -83,132 +83,125 @@ namespace ertool {
 
     //res = emParticles;
 
-    if (_verbose) { 
-      std::cout << "***********BEGIN RECONSTRUCTION************" << std::endl;
-      std::cout << "Showers in event  : " << data.Shower().size() << std::endl;
-    }
-
     // Reconstruct Track Hierarchy
     ParticleSet trackHierarchy;
     trackHierarchy = _findRel.FindTrackHierarchy(data.Track());
-    //std::cout << "Primary Tracks found: " << trackHierarchy.size() << std::endl;
 
-    // loop over showers
-    for (size_t sh=0; sh < data.Shower().size(); sh++){
-      
-      // Ok, we have a shower.
-      // make sure it does not:
-      // 1) share a vertex with another e- shower (gamma-like one could be from Pi0: OK)
-      // 2) come from another shower - NOT DONE AS OF YET
-      // 3) come from a track
-      // 2) & 3) because we are interested in showers from the neutrino interaction
+    // Find Primaries
+    ParticleSet primaries;
+    primaries = _primaryFinder.Reconstruct(data);
 
-      // Keep track of list of siblings found for the shower (will be used to reconstruct full neutrino interaction)
-      std::vector<int> siblings;
-      
-      auto const& thisShower = data.Shower(sh);
+    if (_verbose) { 
+      std::cout << "*********** BEGIN SingleE RECONSTRUCTION ************" << std::endl;
+      std::cout << "Showers in event  : " << data.Shower().size() << std::endl;
+    }
+
+    // We have a list of primaries.
+    // Filter them to select single e- showers
+
+
+    // FIND PRIMARY
+    for (size_t pr=0; pr < primaries.size(); pr++){
+
+      // get the associated RecoObject (only care about showers)
+      if (primaries[pr].Type() != Particle::RecoObjType_t::kShower)
+	continue;
+
+      // get primary shower
+      auto const& thisShower = data.Shower(primaries[pr].RecoObjID());
+      // keep track of whether it is single
+      bool single = true;
       // if we find that this shower shares a vertex with a track -> change "_hassister" to true.
       _hassister = false;
+      // Keep track of list of siblings found for the shower (will be used to reconstruct full neutrino interaction)
+      std::vector<int> siblings;
 
-      // Apply energy threshold (separate from the ERToolHelper threshold. Only used in this algorithm)
-      if (thisShower._energy < _Ethreshold ) continue;
-      
-      if (_verbose) { std::cout << "This shower: (" << sh << ")" << "\tE: " << thisShower._energy << std::endl; }
-      bool single = true;
-      // loop over other showers and check 1) and 2)
+      if (_verbose) { std::cout << "This shower: (" << primaries[pr].RecoObjID() << ")" << "\tE: " << thisShower._energy << std::endl; }
+
+      // it is primary. Make sure it satisfies SingleE conditions also
+      // 1) loop over all showers in event
       for (size_t s=0; s < data.Shower().size(); s++){
 	auto const& thatShower(data.Shower(s));
 	geoalgo::Point_t vtx(3);
-	// make sure we don't use thisShower in the loop
-	if (thatShower.ID() != thisShower.ID()) {
-	  if (_verbose) { std::cout << "Comparing with shower (" << s << ")" << std::endl; }
-	  // is this shower gamma or e-like?
-	  // if gamma-like maybe a nearby pi0 -> ok if close
-	  if (isGammaLike(thatShower._dedx,-1))
-	    continue;
-	  // compare the two showers
-	  double IP = _findRel.FindClosestApproach(thisShower,thatShower,vtx);
-	  _VsTrack = 0;
-	  _thatE   = thatShower._energy;
-	  _IP = IP;
-	  _IPthisStart = vtx.Dist(thisShower.Start());
-	  _IPthatStart = vtx.Dist(thatShower.Start());
-	  _alg_tree->Fill();
-	  if (_verbose)
-	    std::cout << "\tImpact Parameter      : " << _IP << std::endl
-		      << "\tIP to other Shr Start : " << _IPthatStart << std::endl
-		      << "\tIP to this Shr Start  : " << _IPthisStart << std::endl;
-	  if ( (IP < _maxIP) && ( vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) && ( vtx.Dist(thatShower.Start()) < _vtxToShrStartDist) ){
-	    single = false;
-	    if (_verbose) { std::cout << "NOT single" << std::endl; }
-	    break;
-	  }
-	::geoalgo::HalfLine shr(thisShower.Start(),thisShower.Dir());
-	_distBackAlongTraj = sqrt(thisShower.Start().SqDist(_geoAlgo.Intersection(fTPC,shr,true)[0])) ;
+	// make sure we don't use "thisShower" in the loop
+	if (thatShower.ID() == thisShower.ID()) 
+	  continue;
+	if (_verbose) { std::cout << "Comparing with shower (" << s << ")" << std::endl; }
+	// is "thatshower" gamma or e-like?
+	// if gamma-like maybe a nearby pi0 -> ok if close
+	if (isGammaLike(thatShower._dedx,-1))
+	  continue;
+	// "thatShower" is e-like. If the two are correlated and siblings
+	// then we have two e-like showers at the vertex -> do not count
+	// "thisShower" as a SingleE
+	// compare the two showers
+	double IP = _findRel.FindClosestApproach(thisShower,thatShower,vtx);
+	_VsTrack = 0;
+	_thatE   = thatShower._energy;
+	_IP = IP;
+	_IPthisStart = vtx.Dist(thisShower.Start());
+	_IPthatStart = vtx.Dist(thatShower.Start());
+	_alg_tree->Fill();
+	if (_verbose)
+	  std::cout << "\tImpact Parameter      : " << _IP << std::endl
+		    << "\tIP to other Shr Start : " << _IPthatStart << std::endl
+		    << "\tIP to this Shr Start  : " << _IPthisStart << std::endl;
+	if ( (IP < _maxIP) && ( vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) && ( vtx.Dist(thatShower.Start()) < _vtxToShrStartDist) ){
+	  single = false;
+	  if (_verbose) { std::cout << "NOT single" << std::endl; }
+	  break;
+	}
+      }// loop over all showers in event
 
-	//Distance to Top Wall caluclation from page 19 of cosmics technote
-//	double detHalfHeight = ::larutil::Geometry::GetME()->DetHalfHeight();
-	double detHalfHeight = 116.5 ;
-	_distToTopWall         = (thisShower.Start()[1] - detHalfHeight)*thisShower.Dir().Length()/(thisShower.Dir()[1]) ;
+      // if still single go over tracks. Find potential siblings
+      if (!single)
+	continue;
 
-
-	}// if not the same showers
-      }//loop over showers
-      // loop over tracks if still single
-      if (single){
-	for (size_t t=0; t < data.Track().size(); t++){
-	  auto const& thatTrack(data.Track(t));
-	  if (thatTrack.size() < 2)
-	    continue;
-	  if (_verbose) { std::cout << "Comparing with track (" << t << ")" << std::endl; }
-	  geoalgo::Point_t vtx(3);
-	  // compare the two tracks
-	  double IP =  _findRel.FindClosestApproach(thisShower,thatTrack,vtx);
-	  _VsTrack = 1;
-	  _thatE   = thatTrack._energy;
-	  _IP = IP;
-	  _IPthisStart = vtx.Dist(thisShower.Start());
-	  _IPthatStart = vtx.Dist(thatTrack.front());
-	  _IPtrkBody = sqrt(_geoAlgo.SqDist(vtx,thatTrack));
-	  _alg_tree->Fill();
-	  if (_verbose)
-	    std::cout << "\tImpact Parameter: " << _IP << std::endl
-		      << "\tIP to Trk Start : " << _IPthatStart << std::endl
-		      << "\tIP to Trk Body  : " << _IPtrkBody << std::endl
-		      << "\tIP to Shr Start : " << _IPthisStart << std::endl;
-	  single = true;
-	  if ( (IP < _maxIP)                                              // good correlation
-	       && (vtx.Dist(thatTrack.front()) > _vtxToTrkStartDist)      // vertex far enough away from track start
-	       && (sqrt(_geoAlgo.SqDist(vtx,thatTrack)) < _vtxToTrkDist)  // vertex close to track body
-	       && (vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) )   // vertex not unreasonably far from shower start
-	    {
-	      // our shower comes from t -> not interested
+      for (size_t t=0; t < data.Track().size(); t++){
+	auto const& thatTrack(data.Track(t));
+	// make sure track has more than 2 points. Otherwise GeoAlgo will get mad!
+	// this is already enforced if TrackLength ERTool::Filter is used with a value
+	// greater than 0
+	if (thatTrack.size() < 2)
+	  continue;
+	if (_verbose) { std::cout << "Comparing with track (" << t << ")" << std::endl; }
+	geoalgo::Point_t vtx(3);
+	// compare the two tracks
+	double IP =  _findRel.FindClosestApproach(thisShower,thatTrack,vtx);
+	_VsTrack = 1;
+	_thatE   = thatTrack._energy;
+	_IP = IP;
+	_IPthisStart = vtx.Dist(thisShower.Start());
+	_IPthatStart = vtx.Dist(thatTrack.front());
+	_IPtrkBody = sqrt(_geoAlgo.SqDist(vtx,thatTrack));
+	_alg_tree->Fill();
+	if (_verbose)
+	std::cout << "\tImpact Parameter: " << _IP << std::endl
+		  << "\tIP to Trk Start : " << _IPthatStart << std::endl
+		  << "\tIP to Trk Body  : " << _IPtrkBody << std::endl
+		  << "\tIP to Shr Start : " << _IPthisStart << std::endl;
+	single = true;
+	if ( (IP < _maxIP)                                              // good correlation
+	     && (vtx.Dist(thatTrack.front()) < _vtxToTrkStartDist)      // vertex close to track start
+	     && (vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) )   // vertex not unreasonably far from shower start
+	  {
+	    // our shower has a common origin with this track
+	    // they are siblings
+	    if (_verbose) { std::cout << "common origin w/ track!" << std::endl; }
+	    _hassister = true;
+	    siblings.push_back(t);
+	    
+	    if (isGammaLike(thisShower._dedx,vtx.Dist(thisShower.Start()))){
+	      if (_verbose) { std::cout << "Shower is gamma-like. Ignore " << std::endl; }
 	      single = false;
-	      if (_verbose) { std::cout << "NOT single" << std::endl; }
 	      break;
 	    }
-	  else if ( (IP < _maxIP)                                              // good correlation
-		    && (vtx.Dist(thatTrack.front()) < _vtxToTrkStartDist)      // vertex close to track start
-		    && (vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) )   // vertex not unreasonably far from shower start
-	    {
-	      // our shower has a common origin with this track
-	      // save vertex position
-	      if (_verbose) { std::cout << "common origin w/ track!" << std::endl; }
-	      _hassister = true;
-	      siblings.push_back(t);
-
-	      if (isGammaLike(thisShower._dedx,vtx.Dist(thisShower.Start()))){
-		if (_verbose) { std::cout << "Shower is gamma-like. Ignore " << std::endl; }
-		single = false;
-		break;
-	      }
-	      else{
+	    else{
 		single = true;
-	      }
-
-	    }// if common origin with primary!
-	}// for all tracks
-      }// if single
+	    }
+	    
+	  }// if common origin with primary!
+      }// for all tracks
 
       // If single and there are "track-candidate-vertices" formed by 2 or more tracks
       // compare shower start distance to these vertices.
@@ -222,23 +215,14 @@ namespace ertool {
 	    distmin = thisdist;
 	}
       }
+
       if ( single and !_hassister and (_vtxProximityCut != 0) ){
 	if ( (distmin != 1036) and (distmin > _vtxProximityCut) ){
 	  if(_verbose) { std::cout << "Trk-Vtx found @ distance of " << distmin << ". Shower not single!" << std::endl; }
 	  single = false;
 	}
       }
-
-      if( single and !_hassister and _BDtW !=0){
-	if(_verbose) { std::cout << "Distance back along trajectory is: "<<_distBackAlongTraj<<". Shower not single!" <<std::endl; }
-	single = false ;
-	}
-
-      if( single and !_hassister and _BDtTW !=0){
-	if(_verbose) { std::cout << "Distance back along trajectory is: "<<_distToTopWall<<". Shower not single!" <<std::endl; }
-	single = false ;
-	}
-
+      
       // if still single (and no sister track) look at
       // dEdx to determine if e-like
       if (single && !_hassister){
@@ -270,7 +254,7 @@ namespace ertool {
 	electron.Momentum(thisShower.Dir()*mom);
 	neutrinoKineticEnergy += thisShower._energy;
 	neutrinoMomentum += electron.Momentum();
-	electron.RecoObjInfo(sh,Particle::RecoObjType_t::kShower);
+	electron.RecoObjInfo(primaries[pr].RecoObjID(),Particle::RecoObjType_t::kShower);
 	neutrino.AddDaughter(electron);
 	// if the shower has siblings associated with it
 	if (_hassister){
@@ -300,12 +284,14 @@ namespace ertool {
 	if(fTPC.Contain(neutrino.Vertex())){
 	  res.push_back(neutrino);
 	}
-      }
+      }// if single
+      // if not single
       else
 	if (_verbose) { std::cout << "Shower is not single." << std::endl; }
+
+
       
-      
-    }// for all showers
+    }// for all primaries found / for all showers
     
     return res;
   }
