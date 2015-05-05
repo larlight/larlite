@@ -174,8 +174,11 @@
 #pragma link C++ class std::vector<larlite::minos>+;
 #pragma link C++ class larlite::event_minos+;
 
-#pragma link C++ class larlite::event_ass+;
+#pragma link C++ class larlite::pcaxis+;
+#pragma link C++ class std::vector<larlite::pcaxis>+;
+#pragma link C++ class larlite::event_pcaxis+;
 
+#pragma link C++ class larlite::event_ass+;
 #pragma link C++ class larlite::storage_manager+;
 
 /*

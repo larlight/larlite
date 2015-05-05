@@ -83,6 +83,7 @@ namespace larlite{
       kMCTree,             ///< sim::MCTree
       kMinos,              ///< t962::Minos
       kAssociation,        ///< Association data product
+      kPCAxis,             ///< recob::PCAxis
       kDATA_TYPE_MAX       ///< Event-wise enum boundary
     };
 
@@ -131,7 +132,8 @@ namespace larlite{
       "mctrack",
       "mctree",
       "minos",
-      "ass"
+      "ass",
+      "pcaxis"
     };
 
     const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {

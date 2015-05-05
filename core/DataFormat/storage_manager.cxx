@@ -31,6 +31,7 @@
 #include "partid.h"
 #include "gtruth.h"
 #include "minos.h"
+#include "pcaxis.h"
 #include "event_ass.h"
 
 namespace larlite {
@@ -1133,6 +1134,9 @@ namespace larlite {
       break;
     case data::kAssociation:
       _ptr_data_array[type][name]=new event_ass(name);
+      break;
+    case data::kPCAxis:
+      _ptr_data_array[type][name]=new event_pcaxis(name);
       break;
     default:
       print(msg::kERROR,__FUNCTION__,Form("Event-data identifier not supported: %d",(int)type));

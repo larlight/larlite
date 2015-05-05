@@ -102,6 +102,8 @@ namespace larlite{
 
   class minos;
 
+  class pcaxis;
+  class event_pcaxis;
 }
 
 class treenode;
