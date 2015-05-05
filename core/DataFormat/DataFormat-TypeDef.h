@@ -104,6 +104,9 @@ namespace larlite{
 
   class pcaxis;
   class event_pcaxis;
+
+  class flashmatch;
+  class event_flashmatch;
 }
 
 class treenode;

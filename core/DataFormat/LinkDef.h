@@ -178,6 +178,10 @@
 #pragma link C++ class std::vector<larlite::pcaxis>+;
 #pragma link C++ class larlite::event_pcaxis+;
 
+#pragma link C++ class larlite::flashmatch+;
+#pragma link C++ class std::vector<larlite::flashmatch>+;
+#pragma link C++ class larlite::event_flashmatch+;
+
 #pragma link C++ class larlite::event_ass+;
 #pragma link C++ class larlite::storage_manager+;
 

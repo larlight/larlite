@@ -92,6 +92,9 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_pcaxis> () const
   { return data::kPCAxis; }
 
+  template<> data::DataType_t storage_manager::data_type<event_flashmatch> () const
+  { return data::kFlashMatch; }
+
   template <class T>
   data::DataType_t storage_manager::data_type() const
   { 
