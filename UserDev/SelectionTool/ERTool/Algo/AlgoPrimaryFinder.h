@@ -114,11 +114,6 @@ namespace ertool {
     ::geoalgo::GeoAlgo _geoAlgo;
 
     // quantities calculated for correlation determination:
-    double _E; // energy of shower
-    int    _PDG; // PDG code assigned by AlgoEMPart
-    int    _VsTrack; // comparing vs track (==1)
-    double _thatE; // Energy of other shower/track
-    double _dEdx;
     double _IP; // Impact Paramter with other object
     double _IPthisStart; // distance from IP to this shower start point
     double _IPthatStart; // distance from IP to that shower/track start point
