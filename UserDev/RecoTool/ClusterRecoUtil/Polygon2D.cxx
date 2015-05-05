@@ -1,6 +1,7 @@
 #include "Polygon2D.h"
 
 //------------------------------------------------
+// returns slope of line uniting points p1 and p2
 float FindSlope( const std::pair<float,float> &p1, 
 		 const std::pair<float,float> &p2 )
 {
@@ -9,12 +10,14 @@ float FindSlope( const std::pair<float,float> &p1,
 }
 
 //-------------------------------------------------------------------------
+// determines if 3 points are arranged in a clock-wire oder or not
 bool Clockwise(double Ax,double Ay,double Bx,double By,double Cx,double Cy)
 {
   return (Cy-Ay)*(Bx-Ax) > (By-Ay)*(Cx-Ax);
 }
 
 //------------------------------------------------------------
+// determine if two segments intersect
 bool SegmentOverlap(double Ax, double Ay, double Bx, double By,
 		    double Cx, double Cy, double Dx, double Dy)
 {
@@ -25,6 +28,7 @@ bool SegmentOverlap(double Ax, double Ay, double Bx, double By,
 }
 
 //---------------------------------------------------------------------------------
+// return intersection point for two segments
 std::pair<float, float> GetIntersection(double Ax, double Ay, double Bx, double By,
 					double Cx, double Cy, double Dx, double Dy)
 {
@@ -46,6 +50,7 @@ std::pair<float, float> GetIntersection(double Ax, double Ay, double Bx, double 
 }
 
 //------------------------------------------------------------------
+// Polygon2D constructor returning intersection of 2 polygons
 Polygon2D::Polygon2D(const Polygon2D &poly1, const Polygon2D &poly2)
 {
 
@@ -150,6 +155,7 @@ const std::pair<float,float>& Polygon2D::Point(unsigned int p) const
 }
 
 //------------------------------------------------------------------------
+// apply translation and rotation to a polygon
 std::pair<float,float> Polygon2D::Project(const std::pair<float,float> &p, 
 					float theta) const
 {

@@ -36,25 +36,44 @@
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 class Polygon2D{
   
-private:
-  std::vector< std::pair<float,float> > vertices;
-  
  public:
 
+  /// default constructor
   Polygon2D() { }
+  /// constructor starting from list of edges for polygon
   Polygon2D(const std::vector< std::pair<float,float> > &points) { vertices = points; }
-  Polygon2D(const Polygon2D &poly1, const Polygon2D &poly2); /// Create Intersection Polygon
+  /// Create Intersection Polygon from 2 polygons
+  Polygon2D(const Polygon2D &poly1, const Polygon2D &poly2); 
+  /// return number of edges in polygon
   unsigned int Size() const { return vertices.size(); } 
+  /// return pair with information for a specific edge
   const std::pair<float,float>& Point(unsigned int p) const; 
-  std::pair<float,float> Project(const std::pair<float,float>&,float) const;
+  /// Project Polygon applying translation and rotation
+  std::pair<float,float> Project(const std::pair<float,float> &p,float theta) const;
+  /// Return Polygon Area
   float Area() const;
+  /// return polygon perimeter
   float Perimeter() const;
-  bool Overlap(float slope, const Polygon2D &poly2, const std::pair<float,float> &origin) const;
+  /// boolean: do these polygons overlap?
   bool PolyOverlap(const Polygon2D &poly2) const;
-  bool PolyOverlapSegments(const Polygon2D &poly2) const;
+  /// boolean: is a point inside the polygon?
   bool PointInside(const std::pair<float,float> &point) const;
-  bool Contained(const Polygon2D &poly2) const; /// check if poly2 is inside poly1
+  /// check if poly2 is fully contained in poly1
+  bool Contained(const Polygon2D &poly2) const; 
+  /// untangle polygon
   void UntanglePolygon();
+
+private:
+
+  /// vector listing the polygon edges
+  std::vector< std::pair<float,float> > vertices;
+
+  /// utility function used by PolyOverlap to determine overlap
+  bool Overlap(float slope, const Polygon2D &poly2, const std::pair<float,float> &origin) const;
+
+  /// utility function used in polygon overlap determination
+  bool PolyOverlapSegments(const Polygon2D &poly2) const;
+
 };
 /** @} */ // end of doxygen group
 
