@@ -65,7 +65,7 @@ namespace ertool {
     _pi0_tree->Branch("_n_psReco",&_n_psReco,"n_psReco/I");
 
     _singlePi0_ctr = 0;
-    _debug = true;
+    _debug = false;
 
     _eCut = 0;
     _eff = 0.;
@@ -116,9 +116,9 @@ namespace ertool {
 	std::cout << p.Diagram();
 	}
 
-    // loop over all particles in MC particle set (made by Helper)
+    // loop over all particles and find the neutrino 
     for (auto &p : mc_ps){
-      // Find the pi0 and store its energy
+      // Find the neutrino and store its energy
       if (abs(p.PdgCode()) == 12 || abs(p.PdgCode() == 14)){
 	_e_nu_MC = p.Energy();
 	_x_nu_MC = p.Vertex()[0];
@@ -128,54 +128,62 @@ namespace ertool {
 	_py_nu_MC = p.Momentum()[1];
 	_pz_nu_MC = p.Momentum()[2];
 	_pdg_nu_MC = p.PdgCode();
-
-	// std::cout<<"\n\nneutrino: "<<p.PdgCode() <<" and size of daughers: "<<p.AllDaughters().size()<<std::endl ;
-	for (auto &pi0 : p.AllDaughters()){
-	  if (pi0->PdgCode() == 111){  //  || gamma->PdgCode() == 22 ) // 
-	    _n_pi0 += 1;
-	    for(int i = 0; i < 2 ; i++){
-	    
-	      _n_gammas += 1;
-	      auto gamma = pi0->Daughters().at(i);
-
-	      _e_gamma_MC = gamma.Energy();
-	      _x_gamma_MC = gamma.Vertex()[0];
-	      _y_gamma_MC = gamma.Vertex()[1];
-	      _z_gamma_MC = gamma.Vertex()[2];
-	      _px_gamma_MC = gamma.Momentum()[0];
-	      _py_gamma_MC = gamma.Momentum()[1];
-	      _pz_gamma_MC = gamma.Momentum()[2];
-	      _theta_gamma_MC = (180./3.14) * acos( _pz_gamma_MC / sqrt( _px_gamma_MC*_px_gamma_MC + _py_gamma_MC*_py_gamma_MC + _pz_gamma_MC*_pz_gamma_MC ) );
-	      _phi_gamma_MC   = (180./3.14) * asin( _py_gamma_MC / sqrt( _px_gamma_MC*_px_gamma_MC + _py_gamma_MC*_py_gamma_MC ) );
-	      _pdg_gamma_MC = gamma.PdgCode();
-	      _gamma_score_MC = gamma.Score();
-
-	      double temp_dist = 0 ;
-
-	      _e_nu_Reco = 0;
-	      for(auto const & reco : ps){
-		if (abs(reco.PdgCode()) == 12 || abs(reco.PdgCode() == 14)){
-		
-		    for (auto &recod : reco.AllDaughters()){
-			_e_nu_Reco += recod->KineticEnergy();
-			if (abs(recod->PdgCode()) == 111){
-			    _misID = 0 ;
-			    _singlePi0_ctr++;
-			    _x_nu_Reco = pi0->Vertex()[0];
-        		    _y_nu_Reco = pi0->Vertex()[1];
-        		    _z_nu_Reco = pi0->Vertex()[2];
-        		    _px_nu_Reco = pi0->Momentum()[0];
-        		    _py_nu_Reco = pi0->Momentum()[1];
-        		    _pz_nu_Reco = pi0->Momentum()[2];
-			    //std::cout<<"vertex of pi0: "<<_x_nu_Reco<<", "<<_y_nu_Reco<<", "<<_z_nu_Reco<<std::endl;
-			    for(int i = 0; i < 2 ; i++){
-			      _n_gammasReco++;
-	    
-			      auto gamma_R = recod->Daughters().at(i);
-			      temp_dist = sqrt( pow(gamma_R.Vertex()[0] - _x_gamma_MC,2) 
+	}// if its a pdg 12,14
+	}//loop over mc_ps looking for the neutrino
+	// Find the outgoing pi0
+	// Events that have only 1 pi0 Easy to understand the match at the moment
+	bool DalitzDecay = false;
+	_n_pi0=0;
+    for (auto &p : mc_ps){
+      if (abs(p.PdgCode()) != 12 && abs(p.PdgCode() != 14)){
+		for(auto &pdaughter: p.Daughters()){ if(pdaughter.PdgCode()==111) _n_pi0+=1;}
+		// Should we keep going if pi0 is >2? 
+		for(auto &pdaughter: p.Daughters()){
+		      if(pdaughter.PdgCode() == 111){
+			// need to worry about dalitz decay?
+			if(pdaughter.Daughters().size()>2){DalitzDecay = true; std::cout<<"WOOT WOOT a Dalitz Decay Pi0"<<std::endl;}
+			// Should we stop if it is a dalitz decay?
+// Maybe Here for the dalits decay
+if(!DalitzDecay && _n_pi0==1){// We don't need to have it like this... just trying to walk through the code
+			for( auto &pi0daughter : pdaughter.Daughters()){
+			_n_gammas++;
+			// INSERT TREE  info of this mcshower
+			auto gamma = pi0daughter;
+			_e_gamma_MC = gamma.Energy();
+			_x_gamma_MC = gamma.Vertex()[0];
+			_y_gamma_MC = gamma.Vertex()[1];
+			_z_gamma_MC = gamma.Vertex()[2];
+			_px_gamma_MC = gamma.Momentum()[0];
+			_py_gamma_MC = gamma.Momentum()[1];
+			_pz_gamma_MC = gamma.Momentum()[2];
+			_theta_gamma_MC = (180./3.14) * acos( _pz_gamma_MC / sqrt( _px_gamma_MC*_px_gamma_MC + _py_gamma_MC*_py_gamma_MC + _pz_gamma_MC*_pz_gamma_MC ) );
+			_phi_gamma_MC   = (180./3.14) * asin( _py_gamma_MC / sqrt( _px_gamma_MC*_px_gamma_MC + _py_gamma_MC*_py_gamma_MC ) );
+			_pdg_gamma_MC = gamma.PdgCode();
+			_gamma_score_MC = gamma.Score();
+			// Next match this mc shower to a reco one if it is there.
+		double temp_dist = 0; 
+			    for (auto &preco : ps){
+				// look to see if we have made a pi0
+				if(preco.PdgCode()==111){ 
+				// INSERT TREE info about the reco pi0
+				auto pi0 = preco;
+				    _misID = 0 ;
+				    _singlePi0_ctr++;
+				    _x_nu_Reco = pi0.Vertex()[0];
+				    _y_nu_Reco = pi0.Vertex()[1];
+				    _z_nu_Reco = pi0.Vertex()[2];
+				    _px_nu_Reco = pi0.Momentum()[0];
+				    _py_nu_Reco = pi0.Momentum()[1];
+				    _pz_nu_Reco = pi0.Momentum()[2];
+					// Now loop over the reco gammas
+					for(auto &pi0dreco: preco.Daughters()){
+				        _n_gammasReco++;
+					// Find the best match if we have anything that is reco
+					auto gamma_R = pi0dreco;
+				        temp_dist = sqrt( pow(gamma_R.Vertex()[0] - _x_gamma_MC,2) 
 					    + pow(gamma_R.Vertex()[1] - _y_gamma_MC,2) 
 				    	    + pow(gamma_R.Vertex()[2] - _z_gamma_MC,2) );
-			    
+					// INSERT TREE info for the match reco gamma
 				    if(_vtx_dist > temp_dist){
 					_vtx_dist = temp_dist;
 					_e_gamma_Reco = gamma_R.Energy(); 
@@ -188,27 +196,23 @@ namespace ertool {
 				        _theta_gamma_Reco = (180./3.14) * acos( _pz_gamma_Reco / sqrt( _px_gamma_Reco*_px_gamma_Reco + _py_gamma_Reco*_py_gamma_Reco + _pz_gamma_Reco*_pz_gamma_Reco ) );
 				        _phi_gamma_Reco   = (180./3.14) * asin( _py_gamma_Reco / sqrt( _px_gamma_Reco*_px_gamma_Reco + _py_gamma_Reco*_py_gamma_Reco ) );
 					_gamma_score_MC = gamma_R.Score();
-
 				        _mom_dot = ( ( _px_gamma_MC*_px_gamma_Reco + _py_gamma_MC*_py_gamma_Reco + _pz_gamma_MC*_pz_gamma_Reco ) / 
 				      	       ( sqrt( _px_gamma_Reco*_px_gamma_Reco + _py_gamma_Reco*_py_gamma_Reco + _pz_gamma_Reco*_pz_gamma_Reco ) * 
 				      		 sqrt( _px_gamma_MC*_px_gamma_MC + _py_gamma_MC*_py_gamma_MC + _pz_gamma_MC*_pz_gamma_MC ) ) );
-			  
-			  
-					}
-				} //Loop over both reco gammas
-			     _pi0_tree->Fill();
-			    }//If daughter of reco particle is a pi0 
-			}//Loop over all reco daughters 
-		    }
-		}//Loop over all reco neutrinos
+							}// if vtx_dist > temp_dist
+						}// for loop over the reco
+				}// if the reco partice is a pi0
+		   	    } // for loop over the reco ps
+			// Fill TREE HERE I THINK?
+			_pi0_tree->Fill();// We want to fill after the gamma is matched correctly
+			}// loop over pi0 daughters ... the gammas
+}// If notDalitz and Pi0 ==1
+	   	   }// if the particle is a pi0
+	        }// loop over neutrino daughters 
+	      }// if neutrino
+       }// loop over mc_ps
 
-	      }
-	    }//If daughter of MC particle is a pi0
-	  }
-	}
-    }//Loop over all MC particles
-    
-    
+
     if (_debug){
       std::cout << "Ana results:" << std::endl
 		<< "Mis-ID                 : " << _misID << std::endl           
@@ -289,7 +293,9 @@ namespace ertool {
     _gamma_score_Reco	= -1000;
 
     _mom_dot       = -2;
-    _vtx_dist   = -1000;
+    //_vtx_dist   = -1000;
+    _vtx_dist   = 10000000;//RG swap match the resets
+
 
 
     return;
@@ -298,3 +304,4 @@ namespace ertool {
   }
 
 #endif
+
