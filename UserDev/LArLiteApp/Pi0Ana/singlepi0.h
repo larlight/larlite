@@ -49,7 +49,7 @@ namespace larlite {
     */
     virtual bool finalize();
 
-    void SetDefaultParams();
+    void SetDefaultParams() { std::cout<< "Fill this is .cxx" <<std::endl ; } 
 
 
 	// change this to string or something as time goes on... or keep a list

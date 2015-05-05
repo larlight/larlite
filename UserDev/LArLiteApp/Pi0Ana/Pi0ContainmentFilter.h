@@ -56,7 +56,7 @@ namespace larlite {
     int _kept_events;
     int _total_events;
 
-    int _n_single;
+    int _n_pi0;
     int _n_E;
     int _n_detProf ;
 
