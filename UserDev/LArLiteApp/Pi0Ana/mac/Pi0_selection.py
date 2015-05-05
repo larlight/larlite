@@ -33,23 +33,23 @@ my_algo.setMinFitMass(50)
 my_algo.setMaxFitMass(200)
 my_algo.setAngleMax(3.14)
 # Create filter
-myFals_filter = ertool.FilterECut()
-my_filter.SetECut(10) #cut on 10 MeV
+#my_filter = ertool.FilterECut()
+#my_filter.SetECut(10) #cut on 10 MeV
 # Create analysis unit
-my_anaunit = fmwk.ERAnaPi0Reco()#ExampleERSelection()
+my_anaunit = fmwk.Pi0Reco()#ExampleERSelection()
 my_proc = fmwk.ana_processor()
 my_proc.enable_filter(True)
 
 my_ana = ertool.ERAnaPi0Selection()#ExampleERSelection()
-my_ana.SetDebug(False)
+my_ana.SetDebug(True)
 
 # Create Pi0 Filter, set energy containment requirement, if you wish
 pi0_filter = fmwk.Pi0ContainmentFilter();
 pi0_filter.SetEC(0.5)
-pi0_filter.SetEnergyCut(20.)
+pi0_filter.SetEnergyCut(0.)
 
 my_anaunit._mgr.SetAna(my_ana)
-my_anaunit._mgr.SetFilter(pi0_filter)
+#my_anaunit._mgr.SetFilter(my_filter)
 my_anaunit._mgr.SetAlgo(my_algo)
 my_anaunit._mgr._training_mode =False
 

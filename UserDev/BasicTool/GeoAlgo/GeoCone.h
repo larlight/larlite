@@ -46,9 +46,9 @@ namespace geoalgo {
     //
     // Getters
     //
-    const double Length() const; ///< Length getter
-    const double Radius() const; ///< Length getter
-    const double Angle () const; ///< Angle getter
+    double Length() const; ///< Length getter
+    double Radius() const; ///< Length getter
+    double Angle () const; ///< Angle getter
 
     //
     // Setters

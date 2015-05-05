@@ -47,7 +47,7 @@ def main():
     my_filter = ertool.FilterECut()
     my_filter.SetECut(10) #cut on 10 MeV
     # Create analysis unit
-    my_ana = fmwk.ERAnaPi0Quality()#ExampleERSelection()
+    my_ana = fmwk.Pi0Quality()#ExampleERSelection()
 
     # Set Producers
     # First Argument: True = MC, False = Reco

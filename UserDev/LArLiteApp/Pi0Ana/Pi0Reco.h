@@ -1,9 +1,9 @@
 /**
- * \file ERAnaPi0Reco.h
+ * \file Pi0Reco.h
  *
  * \ingroup ShowerPdfTool
  * 
- * \brief Class def header for a class ERAnaPi0Reco
+ * \brief Class def header for a class Pi0Reco
  *
  * @author kazuhiro
  */
@@ -12,26 +12,26 @@
 
     @{*/
 
-#ifndef LARLITE_ERANAPI0RECO_H
-#define LARLITE_ERANAPI0RECO_H
+#ifndef LARLITE_PI0RECO_H
+#define LARLITE_PI0RECO_H
 
 
 #include "ERToolBackend/ERToolAnaBase.h"
 
 namespace larlite {
   /**
-     \class ERAnaPi0Reco
+     \class Pi0Reco
      Example analysis unit for running SPAManager
    */
-  class ERAnaPi0Reco : public ERToolAnaBase {
+  class Pi0Reco : public ERToolAnaBase {
   
   public:
 
     /// Default constructor
-    ERAnaPi0Reco();
+    Pi0Reco();
 
     /// Default destructor
-    virtual ~ERAnaPi0Reco(){}
+    virtual ~Pi0Reco(){}
 
     /**
         Initialization method to be called before the analysis event loop.

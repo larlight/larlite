@@ -1,9 +1,9 @@
 /**
- * \file ERAnaPi0Quality.h
+ * \file Pi0Quality.h
  *
  * \ingroup LArLite_ERTool
  * 
- * \brief Class def header for a class ERAnaPi0Quality
+ * \brief Class def header for a class Pi0Quality
  *
  * @author david
  */
@@ -12,26 +12,26 @@
 
     @{*/
 
-#ifndef LARLITE_ERANAPI0QUALITY_H
-#define LARLITE_ERANAPI0QUALITY_H
+#ifndef LARLITE_PI0QUALITY_H
+#define LARLITE_PI0QUALITY_H
 
 #include "Analysis/ana_base.h"
 #include "ERTool/Base/Manager.h"
 #include "ERToolBackend/ERToolAnaBase.h"
 namespace larlite {
   /**
-     \class ERAnaPi0Quality
+     \class Pi0Quality
      User custom analysis class made by david
    */
-  class ERAnaPi0Quality : public ERToolAnaBase {
+  class Pi0Quality : public ERToolAnaBase {
   
   public:
 
     /// Default constructor
-    ERAnaPi0Quality();
+    Pi0Quality();
 
     /// Default destructor
-    virtual ~ERAnaPi0Quality(){};
+    virtual ~Pi0Quality(){};
 
     virtual bool initialize();
 

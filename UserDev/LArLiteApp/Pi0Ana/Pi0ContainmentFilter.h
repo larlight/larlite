@@ -27,7 +27,7 @@ namespace larlite {
   public:
 
     /// Default constructor
-    Pi0ContainmentFilter(){ _name="Pi0ContainmentFilter"; _fout=0;};
+    Pi0ContainmentFilter(){ _name="Pi0ContainmentFilter"; _fout=0; _EC = 0.75; _Energy= 20;};
 
     /// Default destructor
     virtual ~Pi0ContainmentFilter(){};
