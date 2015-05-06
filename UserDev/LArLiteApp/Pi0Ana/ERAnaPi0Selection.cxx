@@ -160,6 +160,7 @@ if(!DalitzDecay && _n_pi0==1){// We don't need to have it like this... just tryi
 			_phi_gamma_MC   = (180./3.14) * asin( _py_gamma_MC / sqrt( _px_gamma_MC*_px_gamma_MC + _py_gamma_MC*_py_gamma_MC ) );
 			_pdg_gamma_MC = gamma.PdgCode();
 			_gamma_score_MC = gamma.Score();
+//			std::cout<<gamma.Score()<<std::endl;
 			// Next match this mc shower to a reco one if it is there.
 		double temp_dist = 0; 
 			    for (auto &preco : ps){
@@ -195,7 +196,7 @@ if(!DalitzDecay && _n_pi0==1){// We don't need to have it like this... just tryi
 				        _pz_gamma_Reco = gamma_R.Momentum()[2];
 				        _theta_gamma_Reco = (180./3.14) * acos( _pz_gamma_Reco / sqrt( _px_gamma_Reco*_px_gamma_Reco + _py_gamma_Reco*_py_gamma_Reco + _pz_gamma_Reco*_pz_gamma_Reco ) );
 				        _phi_gamma_Reco   = (180./3.14) * asin( _py_gamma_Reco / sqrt( _px_gamma_Reco*_px_gamma_Reco + _py_gamma_Reco*_py_gamma_Reco ) );
-					_gamma_score_MC = gamma_R.Score();
+					_gamma_score_Reco = gamma_R.Score();
 				        _mom_dot = ( ( _px_gamma_MC*_px_gamma_Reco + _py_gamma_MC*_py_gamma_Reco + _pz_gamma_MC*_pz_gamma_Reco ) / 
 				      	       ( sqrt( _px_gamma_Reco*_px_gamma_Reco + _py_gamma_Reco*_py_gamma_Reco + _pz_gamma_Reco*_pz_gamma_Reco ) * 
 				      		 sqrt( _px_gamma_MC*_px_gamma_MC + _py_gamma_MC*_py_gamma_MC + _pz_gamma_MC*_pz_gamma_MC ) ) );
@@ -206,7 +207,7 @@ if(!DalitzDecay && _n_pi0==1){// We don't need to have it like this... just tryi
 			// Fill TREE HERE I THINK?
 			_pi0_tree->Fill();// We want to fill after the gamma is matched correctly
 			}// loop over pi0 daughters ... the gammas
-}// If notDalitz and Pi0 ==1
+		      }// If notDalitz and Pi0 ==1
 	   	   }// if the particle is a pi0
 	        }// loop over neutrino daughters 
 	      }// if neutrino
@@ -233,13 +234,10 @@ if(!DalitzDecay && _n_pi0==1){// We don't need to have it like this... just tryi
     
     _eff = 100*_singlePi0_ctr/float(_numEvts);
     
-    std::cout << "RESULTS: " << std::endl
+    std::cout << "\n\nRESULTS: " << std::endl
 	      << "Tot Events    : " << _numEvts << std::endl
 	      << "Pi0 Events    : " << _singlePi0_ctr << std::endl
 	      << "Eff           : " << _eff << " %" << std::endl;
-
-
-	      std::cout<<"NUMBER pi0 ecents: "<<_n_pi0<<std::endl ;
 
     if (fout){
       fout->cd();
