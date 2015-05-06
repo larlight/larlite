@@ -102,7 +102,7 @@ namespace ertool {
 	if (_verbose) { std::cout << "Comparing with track (" << t << ")" << std::endl; }
 	geoalgo::Point_t vtx(3);
 	// compare the two tracks
-	_IP =  _findRel.FindClosestApproach(thisShower,thatTrack,vtx);
+	_IP =  _findRel.FindClosestApproach(thatTrack,thisShower,vtx);
 	_IPthisStart = vtx.Dist(thisShower.Start());
 	_IPthatStart = vtx.Dist(thatTrack.front());
 	_IPtrkBody = sqrt(_geoAlgo.SqDist(vtx,thatTrack));
