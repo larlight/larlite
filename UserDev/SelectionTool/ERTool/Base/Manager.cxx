@@ -123,7 +123,7 @@ namespace ertool {
       msg << "It seems Process() was never called ... (no problem but nothing to formally finalize)..."
 	  << std::endl;
     }
-    if(_status != kPROCESSING) {
+    else if(_status != kPROCESSING) {
       std::ostringstream msg;
       msg <<"Cannot call Finalize() while status ("
 	  << _status
