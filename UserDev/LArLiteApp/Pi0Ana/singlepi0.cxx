@@ -27,21 +27,38 @@ namespace larlite {
 
         size_t totalpi0 =0;
         size_t cmeson =0;
+
+	// This will return a bool for signal events
+if(_Sig){
         //loop over all particles to look topology 1 pi0 and no pi+/-
         for(auto const& p : mcpart){
                  if(p.PdgCode()==111 && p.StatusCode()==1) totalpi0+=1;
                  if(abs(p.PdgCode())==211 && p.StatusCode()==1) cmeson+=1;
                                    }// loop over mcparts
-        if(_Topo == 0){ if(totalpi0!=1) return false;}
+	// Fill in the topo you want to look at 
+        if(_Topo == 0){if(totalpi0!=1) return false;}
 	if(_Topo ==1 ){if(totalpi0!=1 || cmeson!=0) return false;}
-
-        //if(_Topo == 0 && totalpi0!=1) return false;}
-	//if(_Topo ==1 && (totalpi0!=1 || cmeson!=0) return false;}
-        
         _passed_events++;
-
-  
     return true;
+	}
+
+	// Repeat with negatives if !_Sig
+        for(auto const& p : mcpart){
+                 if(p.PdgCode()==111 && p.StatusCode()==1) totalpi0+=1;
+                 if(abs(p.PdgCode())==211 && p.StatusCode()==1) cmeson+=1;
+                                   }// loop over mcparts
+        if(_Topo == 0){if(totalpi0!=1) return true;}
+	if(_Topo ==1 ){if(totalpi0!=1 || cmeson!=0) return true;}
+        _passed_events++;
+    return false;
+
+
+
+
+
+
+
+
   }
 
   bool singlepi0::finalize() {
