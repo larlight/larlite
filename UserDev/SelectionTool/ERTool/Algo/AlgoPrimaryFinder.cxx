@@ -102,7 +102,7 @@ namespace ertool {
 	if (_verbose) { std::cout << "Comparing with track (" << t << ")" << std::endl; }
 	geoalgo::Point_t vtx(3);
 	// compare the two tracks
-	_IP =  _findRel.FindClosestApproach(thatTrack,thisShower,vtx);
+	_IP =  _findRel.FindClosestApproach(thisShower,thatTrack,vtx);
 	_IPthisStart = vtx.Dist(thisShower.Start());
 	_IPthatStart = vtx.Dist(thatTrack.front());
 	_IPtrkBody = sqrt(_geoAlgo.SqDist(vtx,thatTrack));
@@ -158,7 +158,7 @@ namespace ertool {
 	// create a segment starting at thatShower start
 	// and going for the entire length in shower dir
 	::geoalgo::LineSegment_t thatShowerTrunk(thatShower.Start(),thatShower.Start()+thatShower.Dir()*thatShowerLength);
-	_IP = _findRel.FindClosestApproach(thisTrack,thatShower,vtx);
+	_IP = _findRel.FindClosestApproach(thatShower,thisTrack,vtx);
 	_IPthisStart = vtx.Dist(thisTrack.front());
 	_IPthatStart = vtx.Dist(thatShower.Start());
 	_IPthatTrunk = sqrt(_geoAlgo.SqDist(vtx,thatShowerTrunk));
