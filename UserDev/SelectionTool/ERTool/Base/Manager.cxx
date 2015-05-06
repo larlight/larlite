@@ -118,6 +118,11 @@ namespace ertool {
   
   void Manager::Finalize(TFile* fout)
   {
+    if(_status == kINIT) {
+      std::ostringstream msg;
+      msg << "It seems Process() was never called ... (no problem but nothing to formally finalize)..."
+	  << std::endl;
+    }
     if(_status != kPROCESSING) {
       std::ostringstream msg;
       msg <<"Cannot call Finalize() while status ("
@@ -127,6 +132,7 @@ namespace ertool {
 	  << ")!";
       throw ERException(msg.str());
     }
+    
     if(_filter) {
       fWatch.Start();
       _filter->_training_mode = this->_training_mode;
