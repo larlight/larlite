@@ -17,7 +17,6 @@
 #pragma link C++ class cmtool::CBAlgoAngleAlign+;
 #pragma link C++ class cmtool::CBAlgoFake+;
 #pragma link C++ class cmtool::CBAlgoStartInPoly+;
-#pragma link C++ class cmtool::CBAlgoPolyHitOverlap+;
 #pragma link C++ class cmtool::CBAlgoStartInCone+;
 #pragma link C++ class cmtool::CBAlgoArray+;
 #pragma link C++ class cmtool::CBAlgoTrackSeparate+;
