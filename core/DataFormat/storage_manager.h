@@ -183,19 +183,18 @@ namespace larlite {
     event_base* get_data(const data::DataType_t type, const std::string& name);
 
     /// Universal run data pointer getter to return run_base* pointer for specified run-data type w/ run number
-    run_base* get_rundata(const data::RunDataType_t type, 
-			  const std::string& name);
+    run_base* get_rundata(const data::RunDataType_t type, const std::string& name);
 
     /// Universal sub-run data pointer getter to return run_base* pointer for specified run-data type w/ run number
-    subrun_base* get_subrundata(const data::SubRunDataType_t type, 
-				const std::string& name);    
+    subrun_base* get_subrundata(const data::SubRunDataType_t type, const std::string& name);
+
     /** 
 	Type specific data product getter.
 	Specialize the template to the data product of your choice, and it cast the
 	pointer + return reference for you.
     */
     template <class T>
-    T* get_data(std::string const name)
+    T* get_data(const std::string& name)
     {
       auto type = data_type<T>();
       return (T*)(get_data(type,name));
@@ -228,29 +227,137 @@ namespace larlite {
     template <class T, class U>
     const AssInfo_t find_one_assid(const T, const U) const;
     */
-    
+
+#ifndef __CINT__
+    template <class T, class U>
+    const AssInfo_t find_one_assid(const T& a, const U& b,
+				   const std::string& ass_producer)
+    {
+      auto const& ev_ass_m = this->_ptr_data_array[data::kAssociation];
+      if(ev_ass_m.find(ass_producer)==ev_ass_m.end())
+	return std::make_pair((const larlite::event_ass*)nullptr,kINVALID_ASS);	
+
+      auto const& ev_ass = this->get_data< ::larlite::event_ass>(ass_producer);
+      auto id = ev_ass->find_one_assid(a,b);
+      if( id != kINVALID_ASS )
+	return std::make_pair((const larlite::event_ass*)(ev_ass),id);
+
+      return std::make_pair((const larlite::event_ass*)nullptr,kINVALID_ASS);
+    }
+
+    template <class T, class U>
+    const AssInfo_t find_unique_assid(const T& a, const U& b,
+				      const std::string& ass_producer)
+    {
+      auto const& ev_ass_m = this->_ptr_data_array[data::kAssociation];
+      if(ev_ass_m.find(ass_producer)==ev_ass_m.end())
+	return std::make_pair((const larlite::event_ass*)nullptr,kINVALID_ASS);	
+
+      auto const& ev_ass = this->get_data< ::larlite::event_ass>(ass_producer);
+      auto id = ev_ass->find_unique_assid(a,b);
+      if( id != kINVALID_ASS )
+	return std::make_pair((const larlite::event_ass*)(ev_ass),id);
+
+      return std::make_pair((const larlite::event_ass*)nullptr,kINVALID_ASS);
+    }
+      
+    template <class T, class U>
+    const AssInfoSet_t find_all_assid(const T& a, const U& b,
+				      const std::string& ass_producer)
+    {
+      auto const& ev_ass_m = this->_ptr_data_array[data::kAssociation];
+      AssInfoSet_t res;
+      if(ev_ass_m.find(ass_producer)==ev_ass_m.end())
+	return res;
+
+      auto const& ev_ass = this->get_data< ::larlite::event_ass>(ass_producer);
+      auto id_v = ev_ass->find_all_assid(a,b);
+      if( id_v.size() ) {
+	for(auto const& id : id_v) 
+	  res.push_back((const larlite::event_ass*)(ev_ass),id);
+      }
+      return res;
+    }
+
     template <class T, class U>
     const AssInfo_t find_one_assid(const T a, const U b)
     {
       auto const& ev_ass_m = this->_ptr_data_array[data::kAssociation];
       for(auto const& ev_ass_p : ev_ass_m) {
-	auto const& ev_ass = this->get_data< ::larlite::event_ass>(ev_ass_p.first);
-	auto id = ev_ass->find_one_assid(a,b);
-	if( id != kINVALID_ASS )
-	  return std::make_pair((const larlite::event_ass*)(ev_ass),id);
+	auto res = find_one_assid(a,b,ev_ass_p.first);
+	if(res.first) return res;
       }
       return std::make_pair((const larlite::event_ass*)nullptr,kINVALID_ASS);
     }
-    
-    template <class T, class U>
-    const AssInfo_t find_unique_assid(const T, const U);
 
     template <class T, class U>
-    const AssInfoSet_t find_all_assid(const T, const U);
-    /*
-    template <class T>
-    const std::vector<std::vector<const T*> > create_ass_ptr(const product_id& id) const;
-    */
+    const AssInfo_t find_unique_assid(const T a, const U b)
+    {
+      auto const& ev_ass_m = _ptr_data_array[data::kAssociation];
+      event_ass* ptr=nullptr;
+      AssID_t id=kINVALID_ASS;
+      for(auto const& ev_ass_p : ev_ass_m) {
+	auto res = find_unique_assid(a,b,ev_ass_p.first);
+	if(res.first && ptr) throw DataFormatException("Association found but not unique!");
+	id = res.second;
+	ptr = res.first;
+      }
+      return std::make_pair((const larlite::event_ass*)ptr,id);
+    }
+    
+    template <class T, class U>
+    const AssInfoSet_t find_all_assid(const T a, const U b)
+    {
+      auto const& ev_ass_m = _ptr_data_array[data::kAssociation];
+      AssInfoSet_t res;
+      for(auto const& ev_ass_p : ev_ass_m) {
+	auto tmp_res_v = find_all_assid(a,b,ev_ass_p.first);
+	res.reserve(res.size() + tmp_res_v.size());
+	for(auto const& tmp_res : tmp_res_v) res.push_back(tmp_res);
+      }
+      return res;
+    }
+
+    template <class T, class U>
+    const AssSet_t& find_one_ass(const T a, U*& b, const std::string ass_producer="")
+    {
+      if(b) throw DataFormatException("Valid pointer provided (should be nullptr)!");
+
+      auto type_b = this->data_type<U>();
+      AssInfo_t ass_info;
+      if(ass_producer.empty())
+	ass_info = this->find_one_assid(a,type_b);
+      else
+	ass_info = this->find_one_assid(a,type_b,ass_producer);
+      
+      if(!ass_info.first) return kEMPTY_ASS;
+
+      auto id_b = ass_info.first->association_keys(ass_info.second).second;
+      b = this->get_data<U>(id_b.second);
+      
+      return ass_info.first->association(ass_info.second);
+    }
+
+    template <class T, class U>
+    const AssSet_t& find_unique_ass(const T a, U*& b, const std::string ass_producer="")
+    {
+      if(b) throw DataFormatException("Valid pointer provided (should be nullptr)!");
+
+      auto type_b = this->data_type<U>();
+      AssInfo_t ass_info;
+      if(ass_producer.empty())
+	ass_info = this->find_unique_assid(a,type_b);
+      else
+	ass_info = this->find_unique_assid(a,type_b,ass_producer);
+	
+      if(!ass_info.first) return kEMPTY_ASS;
+
+      auto id_b = ass_info.first->association_keys(ass_info.second).second;
+      b = this->get_data<U>(id_b.second);
+      
+      return ass_info.first->association(ass_info.second);
+    }
+#endif
     
     /// Getter for a shared object instance pointer. Not limited to be a singleton.
     static storage_manager* get() 

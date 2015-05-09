@@ -284,8 +284,12 @@ namespace larlite {
       result_ptr = (event_base*)((*data_ptr_iter).second);
 
     // If in kREAD mode, here is where we read in data product
-    if( inch_ptr_iter != _in_ch[type].end() && _mode == kREAD) {
-
+    if( inch_ptr_iter != _in_ch[type].end() &&
+	_mode == kREAD &&
+	!( _event_id == (*data_ptr_iter).second->event_id() &&
+	   _run_id    == (*data_ptr_iter).second->run()      &&
+	   _subrun_id == (*data_ptr_iter).second->subrun()      ) ) {
+      
       (*inch_ptr_iter).second->GetEntry(_index-1);
 
       if( _check_alignment ) {
@@ -1528,7 +1532,7 @@ namespace larlite {
 	  } // ptr exists
 	} // loop over all trees of type i
       } // loop over all types
-
+    
       for(int i=0; i<data::kRUNDATA_TYPE_MAX; ++i) { 
 
 	if(_use_read_bool && !(_read_rundata_array[i].size()))

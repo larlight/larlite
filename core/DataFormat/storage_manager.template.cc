@@ -153,37 +153,7 @@ namespace larlite {
     return std::make_pair((const larlite::event_ass*)nullptr,kINVALID_ASS);
   }
   */
-  template <class T, class U>
-  const storage_manager::AssInfo_t storage_manager::find_unique_assid(const T a, const U b)
-  {
-    auto const& ev_ass_m = _ptr_data_array[data::kAssociation];
-    event_ass* ptr=nullptr;
-    AssID_t id=kINVALID_ASS;
-    for(auto const& ev_ass_p : ev_ass_m) {
-      auto const& ev_ass = this->get_data<event_ass>(ev_ass_p.first);
-      auto tmp_id = ev_ass->find_unique_assid(a,b);
-      if(tmp_id == kINVALID_ASS) continue;
-      if(id != kINVALID_ASS)
-	throw DataFormatException("Association found but not unique!");
-      id = tmp_id;
-      ptr = ev_ass;
-    }
-    return std::make_pair((const larlite::event_ass*)ptr,id);
-  }
 
-  template <class T, class U>
-  const storage_manager::AssInfoSet_t storage_manager::find_all_assid(const T a, const U b)
-  {
-    auto const& ev_ass_m = _ptr_data_array[data::kAssociation];
-    AssInfoSet_t res;
-    for(auto const& ev_ass_p : ev_ass_m) {
-      auto const& ev_ass = this->get_data<event_ass>(ev_ass_p.first);
-      auto id = ev_ass->find_one_assid(a,b);
-      if( id != kINVALID_ASS )
-	res.push_back(std::make_pair((const larlite::event_ass*)(ev_ass),id));
-    }
-    return res;
-  }
   /*
   template <class T>
   const std::vector<std::vector<const T*> >
