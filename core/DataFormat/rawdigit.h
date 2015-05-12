@@ -52,13 +52,14 @@ namespace larlite{
 
     void clear_data() {data_base::clear_data();}
 
-    size_t           NADC()        const;
-    short            ADC(int i)    const;
-    raw::ChannelID_t Channel()     const;
-    unsigned short   Samples()     const;
-    float            GetPedestal() const;
-    float            GetSigma()    const;
-    raw::Compress_t  Compression() const;
+    const std::vector<short>& ADCs()        const;
+    size_t                    NADC()        const;
+    short                     ADC(int i)    const;
+    raw::ChannelID_t          Channel()     const;
+    unsigned short            Samples()     const;
+    float                     GetPedestal() const;
+    float                     GetSigma()    const;
+    raw::Compress_t           Compression() const;
 
     // Set Methods
     void             SetPedestal(float ped);

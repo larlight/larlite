@@ -51,12 +51,13 @@ namespace larlite {
     fSigma = 1.;
   }
 
-  size_t           rawdigit::NADC()        const { return fADC.size();  }
-  raw::ChannelID_t rawdigit::Channel()     const { return fChannel;     }
-  unsigned short   rawdigit::Samples()     const { return fSamples;     }
-  float            rawdigit::GetPedestal() const { return fPedestal;    } 
-  float            rawdigit::GetSigma()    const { return fSigma;       } 
-  raw::Compress_t  rawdigit::Compression() const { return fCompression; }
+  const std::vector<short>&  rawdigit::ADCs()        const { return fADC;         }
+  size_t                     rawdigit::NADC()        const { return fADC.size();  }
+  raw::ChannelID_t           rawdigit::Channel()     const { return fChannel;     }
+  unsigned short             rawdigit::Samples()     const { return fSamples;     }
+  float                      rawdigit::GetPedestal() const { return fPedestal;    } 
+  float                      rawdigit::GetSigma()    const { return fSigma;       } 
+  raw::Compress_t            rawdigit::Compression() const { return fCompression; }
 
 }
 #endif

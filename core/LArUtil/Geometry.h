@@ -66,7 +66,7 @@ namespace larutil {
     UInt_t Nwires(UInt_t p) const;
     
     /// convert channel number to list of possible WireIDs
-    //larlite::geo::WireID ChannelToWire(UInt_t const channel) const; 
+    larlite::geo::WireID ChannelToWireID(const UInt_t channel) const; 
 
     /// return the signal type for a given channel
     larlite::geo::SigType_t SignalType(const UInt_t channel)  const; 
