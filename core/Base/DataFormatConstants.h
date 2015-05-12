@@ -71,6 +71,7 @@ namespace larlite{
       kMCTrack,            ///< sim::MCTrack
       kMCTree,             ///< sim::MCTree
       kMinos,              ///< t962::Minos
+      kFifo,               ///< from larlight::fifo
       kDATA_TYPE_MAX
     };
 
@@ -106,7 +107,8 @@ namespace larlite{
       "potsummary",
       "mctrack",
       "mctree",
-      "minos"
+      "minos",
+      "fifo"
     };
     
   }

@@ -80,6 +80,7 @@ namespace larlite {
   class event_partid;
   class event_gtruth;
   class event_minos;
+  class event_fifo;
 }
 
 namespace larlite {
@@ -332,6 +333,7 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_mctree> () const;
   template<> data::DataType_t storage_manager::data_type<event_minos> () const;
   template<> data::DataType_t storage_manager::data_type<event_cosmictag>() const;
+  template<> data::DataType_t storage_manager::data_type<event_fifo>() const;
 }
 #endif
 

@@ -31,6 +31,7 @@
 #include "partid.h"
 #include "gtruth.h"
 #include "minos.h"
+#include "fifo.h"
 
 namespace larlite {
 
@@ -640,6 +641,9 @@ namespace larlite {
       break;
     case data::kMinos:
       _ptr_data_array[type][name]=(event_minos*)(new event_minos(name));
+      break;
+    case data::kFifo:
+      _ptr_data_array[type][name]=(event_fifo*)(new event_fifo(name));
       break;
     default:
       print(msg::kERROR,__FUNCTION__,Form("Data identifier not supported: %d",(int)type));
