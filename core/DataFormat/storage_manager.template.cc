@@ -89,6 +89,9 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_ass> () const
   { return data::kAssociation; }
 
+  template<> data::DataType_t storage_manager::data_type<event_fifo> () const
+  { return data::kFIFO; }
+
   template<> data::DataType_t storage_manager::data_type<event_pcaxis> () const
   { return data::kPCAxis; }
 

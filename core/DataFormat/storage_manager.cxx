@@ -34,6 +34,7 @@
 #include "pcaxis.h"
 #include "flashmatch.h"
 #include "event_ass.h"
+#include "fifo.h"
 
 namespace larlite {
 
@@ -1145,6 +1146,9 @@ namespace larlite {
       break;
     case data::kFlashMatch:
       _ptr_data_array[type][name]=new event_flashmatch(name);
+      break;
+    case data::kFIFO:
+      _ptr_data_array[type][name]=(event_fifo*)(new event_fifo(name));
       break;
     default:
       print(msg::kERROR,__FUNCTION__,Form("Event-data identifier not supported: %d",(int)type));

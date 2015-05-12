@@ -82,6 +82,7 @@ namespace larlite{
       kMCTrack,            ///< sim::MCTrack
       kMCTree,             ///< sim::MCTree
       kMinos,              ///< t962::Minos
+      kFIFO,               ///< from larlight::fifo
       kAssociation,        ///< Association data product
       kPCAxis,             ///< recob::PCAxis
       kFlashMatch,         ///< anab::FlashMatch
@@ -133,6 +134,7 @@ namespace larlite{
       "mctrack",
       "mctree",
       "minos",
+      "fifo",
       "ass",
       "pcaxis",
       "fmatch"
