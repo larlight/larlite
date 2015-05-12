@@ -23,7 +23,7 @@ namespace cluster {
       int cplane= hits[a].View();
       //if(APP[cplane].first==-999||APP[cplane].second==-999){ std::cout<<" \033[98m GOT A -999"; continue;}
       if(APP[cplane].first==-999||APP[cplane].second==-999) continue;
-      double regionval= (-APP[cplane].first * hits[a].Wire()*W2CM+ hits[a].PeakTime()*T2CM - APP[cplane].second) / sqrt(APP[cplane].first*APP[cplane].first +1);
+      double regionval= (-APP[cplane].first * hits[a].WireID().Wire*W2CM+ hits[a].PeakTime()*T2CM - APP[cplane].second) / sqrt(APP[cplane].first*APP[cplane].first +1);
       // sort into proper places using viewPP
 	      if(regionval>0.0000) vectplanepair[cplane].first.push_back(a);
 	      if(regionval<0.0000) vectplanepair[cplane].second.push_back(a);
@@ -45,8 +45,8 @@ namespace cluster {
       int cplane= hits[a].View();
       //if(APP[cplane].first==-999||APP[cplane].second==-999){ std::cout<<" \033[98m GOT A -999"; continue;}
       if(APP[cplane].first==-999||APP[cplane].second==-999) continue;
-//      double regionval= (-APP[cplane].first * hits[a].Wire()*W2CM+ hits[a].PeakTime()*T2CM - APP[cplane].second) / sqrt(APP[cplane].first*APP[cplane].first +1);
-      double regionval= (-APP[cplane].first * hits[a].PeakTime()*T2CM+ hits[a].Wire()*W2CM - APP[cplane].second) / sqrt(APP[cplane].first*APP[cplane].first +1);
+//      double regionval= (-APP[cplane].first * hits[a].WireID().Wire*W2CM+ hits[a].PeakTime()*T2CM - APP[cplane].second) / sqrt(APP[cplane].first*APP[cplane].first +1);
+      double regionval= (-APP[cplane].first * hits[a].PeakTime()*T2CM+ hits[a].WireID().Wire*W2CM - APP[cplane].second) / sqrt(APP[cplane].first*APP[cplane].first +1);
       // sort into proper places using viewPP
 	      if(regionval>0.0000) vectplanepair[cplane].first.push_back(a);
 	      if(regionval<0.0000) vectplanepair[cplane].second.push_back(a);
@@ -69,7 +69,7 @@ namespace cluster {
      std::vector<double> TotalCharge(nplanes);
         for(unsigned int a= 0 ; a < hits.size();a++) {
                 int CurrentView = hits[a].View();
-                TotalCharge[CurrentView]+=hits[a].Charge();
+                TotalCharge[CurrentView]+=hits[a].Integral();
                                 }// for loop over hits getting the total charge for each plane  
               // now find the center of charge for each plane
         std::vector<double> CenterChargeWire(nplanes);
@@ -77,8 +77,8 @@ namespace cluster {
 
         for(unsigned int a= 0 ; a < hits.size();a++) {
                 int CurrentView = hits[a].View();
-                double tempcw = hits[a].Charge() * hits[a].Wire()*W2CM;
-                double tempct = hits[a].Charge() * hits[a].PeakTime()*T2CM;
+                double tempcw = hits[a].Integral() * hits[a].WireID().Wire*W2CM;
+                double tempct = hits[a].Integral() * hits[a].PeakTime()*T2CM;
                 CenterChargeWire[CurrentView]+=tempcw;
                 CenterChargeTime[CurrentView]+=tempct;
                         }// Looping over the hits summing up all the charge
@@ -108,8 +108,8 @@ namespace cluster {
       int currentplane= hits[a].View();
       //if(APP[currentplane].first==-999||APP[currentplane].second==-999){ std::cout<<" \033[98m GOT A -999"; continue;}
       if(APP[currentplane].first==-999||APP[currentplane].second==-999) continue;
-      double regionval= (-APP[currentplane].first *( (hits[a].Wire()* W2CM - CenterChargeWire[currentplane])*C -(hits[a].PeakTime()* T2CM - CenterChargeTime[currentplane])*S + CenterChargeWire[currentplane]    )     +    ((hits[a].Wire()* W2CM - CenterChargeWire[currentplane])*S + (hits[a].PeakTime()* T2CM - CenterChargeTime[currentplane])*C + CenterChargeTime[currentplane]) - APP[currentplane].second) / sqrt(APP[currentplane].first*APP[currentplane].first +1);
-//      double regionval= (-APP[cplane].first * hits[a].PeakTime()*T2CM+ hits[a].Wire()*W2CM - APP[cplane].second) / sqrt(APP[cplane].first*APP[cplane].first +1);
+      double regionval= (-APP[currentplane].first *( (hits[a].WireID().Wire* W2CM - CenterChargeWire[currentplane])*C -(hits[a].PeakTime()* T2CM - CenterChargeTime[currentplane])*S + CenterChargeWire[currentplane]    )     +    ((hits[a].WireID().Wire* W2CM - CenterChargeWire[currentplane])*S + (hits[a].PeakTime()* T2CM - CenterChargeTime[currentplane])*C + CenterChargeTime[currentplane]) - APP[currentplane].second) / sqrt(APP[currentplane].first*APP[currentplane].first +1);
+//      double regionval= (-APP[cplane].first * hits[a].PeakTime()*T2CM+ hits[a].WireID().Wire*W2CM - APP[cplane].second) / sqrt(APP[cplane].first*APP[cplane].first +1);
       // sort into proper places using viewPP
 	      if(regionval>0.0000) vectplanepair[currentplane].first.push_back(a);
 	      if(regionval<0.0000) vectplanepair[currentplane].second.push_back(a);

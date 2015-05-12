@@ -73,6 +73,14 @@ namespace larlite {
       return false;
     }
 
+    event_hit* ev_hit = nullptr;
+    auto const& ass_hit_v = storage->find_one_ass(ev_clus->id(),ev_hit,ev_clus->name());
+    if (!ev_hit)
+      throw ::cluster::ViewerException("Did not find associated hits!");
+    if (!ass_hit_v.size())
+      throw ::cluster::ViewerException("Did not find associated hits!");
+
+    /*
     auto associated_hit_producers = ev_clus->association_keys(data::kHit);
     
     if(!(associated_hit_producers.size()))
@@ -86,40 +94,11 @@ namespace larlite {
 					    associated_hit_producers[0].c_str()
 					    )
 				       );
-
+    */
     std::vector<float> hit_charge_frac;
     std::vector<UInt_t> MCShower_indices;
     int n_showers = 0;
 
-    //DavidC
-    /*
-    if ( _showerColor ) {
-      
-      //grab the MC showers
-      larlite::event_mcshower* ev_mcshower = (larlite::event_mcshower*) ( storage->get_data(larlite::DATA::MCShower));
-      if(!ev_mcshower) {
-	print(larlite::MSG::ERROR,__FUNCTION__,Form("Did not find specified data product, MCShower!"));
-	return false;
-      }
-      
-      //grab the simchannels
-      larlite::event_simch* ev_simch = (larlite::event_simch*)( storage->get_data(larlite::DATA::SimChannel));
-      if(!ev_simch) {
-	print(larlite::MSG::ERROR,__FUNCTION__,Form("Did not find specified data product, SimChannel!"));
-	return false;
-      }
-
-      _mcslb.SetMinEnergyCut(0.02);
-      _mcslb.SetMaxEnergyCut(10.0);
-      _shower_idmap.clear();
-      _mcslb.FillShowerMap(ev_mcshower,_shower_idmap);
-      _simch_map.clear();
-      _mcslb.FillSimchMap(ev_simch,_simch_map);
-      n_showers = ev_mcshower->size();
-      for(UInt_t i=0; i < ev_mcshower->size(); ++i)
-	MCShower_indices.push_back(i);
-    }
-    */
     // Find hit range & fill all-hits vector
     std::vector<std::pair<double,double> > xrange(nplanes,std::pair<double,double>(1e9,0));
     std::vector<std::pair<double,double> > yrange(nplanes,std::pair<double,double>(1e9,0));
@@ -131,7 +110,7 @@ namespace larlite {
     for(auto const &h : *ev_hit) {
       
       UChar_t plane = geo->ChannelToPlane(h.Channel());
-      double x = h.Wire() * wire2cm;
+      double x = h.WireID().Wire * wire2cm;
       double y = h.PeakTime() * time2cm;
       
       if(xrange.at(plane).first > x ) xrange.at(plane).first = x;
@@ -142,35 +121,7 @@ namespace larlite {
       
       hits_xy.at(plane).push_back(std::pair<double,double>(x,y));
 
-
-      //DavidC
-      /*
-      if ( _showerColor ){
-	hit_charge_frac.clear();
-	
-	hit_charge_frac = 
-	  _mcslb.MatchHitsAll(h,
-			      _simch_map,
-			      _shower_idmap,
-			      MCShower_indices);
-	//find item with largest fraction
-	int   max_item = 0;
-	float max_frac = 0.;
-	for ( size_t i=0; i < hit_charge_frac.size(); i++){
-	  if ( hit_charge_frac.at(i) > max_frac ) { 
-	    max_item = i;
-	    max_frac = hit_charge_frac.at(i);
-	  }
-	}
-	if ( max_item < n_showers ){
-	  shower_xy.at(plane).at(max_item).push_back(std::pair<double,double>(x,y));
-	}
-      }
-      else {
-	hits_charge.at(plane).push_back(h.Charge());
-      }
-      */
-      hits_charge.at(plane).push_back(h.Charge());
+      hits_charge.at(plane).push_back(h.Integral());
 
     }//for all hits
 
@@ -187,11 +138,9 @@ namespace larlite {
       }
       else
 	_algo.AddHits(i,hits_xy.at(i),hits_charge.at(i));
-    //DavidC--placeholder--instead of hits_charge.at(i)
-    //use color dependent on _mcslb return value
 
     // Find hits-per-cluster
-    auto ass_hit_v = ev_clus->association(data::kHit,associated_hit_producers[0]);
+    //auto ass_hit_v = ev_clus->association(data::kHit,associated_hit_producers[0]);
     for(size_t i=0; i<ev_clus->size(); ++i) {
 
       UChar_t plane = nplanes;
@@ -200,7 +149,7 @@ namespace larlite {
       
       for(auto const& index : ass_hit_v[i]) {
 
-	cluster_hits.push_back(std::pair<double,double>( ev_hit->at(index).Wire() * wire2cm,
+	cluster_hits.push_back(std::pair<double,double>( ev_hit->at(index).WireID().Wire * wire2cm,
 							 ev_hit->at(index).PeakTime() * time2cm )
 			       );
 	if(plane == nplanes)

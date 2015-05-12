@@ -69,8 +69,8 @@ namespace btutil {
 	WireRange_t wr;
 	auto const& h = hit_v.at(index);
 	wr.ch    = h.Channel();
-	wr.start = h.StartTime();
-	wr.end   = h.EndTime();
+	wr.start = h.StartTick();
+	wr.end   = h.EndTick();
 	wr_v.push_back(wr);
 	//if(plane==geo->Nplanes()) plane = h.WireID().Plane;
 	if(plane==geo->Nplanes()) plane = h.View();

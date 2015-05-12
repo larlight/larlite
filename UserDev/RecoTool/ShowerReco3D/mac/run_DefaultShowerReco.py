@@ -12,7 +12,7 @@ from ROOT import gSystem,TMath
 from larlite import larlite as fmwk
 from larlite import larutil
 from recotool import cmtool, showerreco
-from recotool.showerDef import DefaultShowerReco3D, PandoraShowerReco3D
+from recotool.showerDef import DefaultShowerReco3D, PandoraShowerReco3D, TwoPlaneShowerReco3D
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
@@ -31,11 +31,12 @@ my_proc.set_ana_output_file("");
 my_proc.set_output_file("showerreco_batch_out.root")
 
 ana_unit=DefaultShowerReco3D()
+#ana_unit=TwoPlaneShowerReco3D()
 
 ana_unit.SetInputProducer("mergedfuzzy")
-ana_unit.SetOutputProducer("showerreco")
+ana_unit.SetOutputProducer("aprilreco")
 
-my_proc.set_data_to_write(fmwk.data.kShower,"showerreco")
+my_proc.set_data_to_write(fmwk.data.kShower,"twoplanereco")
 my_proc.add_process(ana_unit)
 
 print

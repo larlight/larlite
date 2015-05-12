@@ -151,16 +151,16 @@ namespace cluster {
 	// getting the average charge of the cluster and setting the current plane of this cluster
 	for( auto const& thehit : hit_index_array){
 	  currentplane = hits[thehit].View();
-	  totcharge+=hits[thehit].Charge();}
+	  totcharge+=hits[thehit].Integral();}
 	avgcharge=totcharge/hit_index_array.size();
 	// now calculating the average
 	for(auto const& thehit : hit_index_array) {
-	  if(hits[thehit].Charge()>avgcharge){
+	  if(hits[thehit].Integral()>avgcharge){
 	    na+=1;
-	    awiretime += hits[thehit].Wire()* W2CM * hits[thehit].PeakTime()*T2CM;
-	    awire += hits[thehit].Wire()*W2CM;
+	    awiretime += hits[thehit].WireID().Wire* W2CM * hits[thehit].PeakTime()*T2CM;
+	    awire += hits[thehit].WireID().Wire*W2CM;
 	    atime += hits[thehit].PeakTime()*T2CM;
-	    awirewire += hits[thehit].Wire()*W2CM * hits[thehit].Wire()*W2CM;
+	    awirewire += hits[thehit].WireID().Wire*W2CM * hits[thehit].WireID().Wire*W2CM;
 	  }//if charge
 	}//end of loop over the hits
         double aroughslope = (na * awiretime - awire * atime)/(na*awirewire-awire*awire);
@@ -246,14 +246,14 @@ namespace cluster {
 	// getting the average charge of the cluster and setting the current plane of this cluster
 	for( auto const& thehit : hit_index_array){
 	  currentplane = hits[thehit].View();
-	  totcharge+=hits[thehit].Charge();}
+	  totcharge+=hits[thehit].Integral();}
 	avgcharge=totcharge/hit_index_array.size();
 	// now calculating the average
 	for(auto const& thehit : hit_index_array) {
-	  if(hits[thehit].Charge()>avgcharge){
+	  if(hits[thehit].Integral()>avgcharge){
 	    na+=1;
-	    awiretime += hits[thehit].Wire()* W2CM * hits[thehit].PeakTime()*T2CM;
-	    awire += hits[thehit].Wire()*W2CM;
+	    awiretime += hits[thehit].WireID().Wire* W2CM * hits[thehit].PeakTime()*T2CM;
+	    awire += hits[thehit].WireID().Wire*W2CM;
 	    atime += hits[thehit].PeakTime()*T2CM;
 	    atimetime += hits[thehit].PeakTime()*T2CM * hits[thehit].PeakTime()*T2CM;
 	  }//if charge
@@ -325,7 +325,7 @@ namespace cluster {
     std::vector<double> TotalCharge(nplanes);
     for(unsigned int a= 0 ; a < hits.size();a++) {
       int CurrentView = hits[a].View();
-      TotalCharge[CurrentView]+=hits[a].Charge();
+      TotalCharge[CurrentView]+=hits[a].Integral();
     }// for loop over hits getting the total charge for each plane	
     
     // now find the center of charge for each plane
@@ -335,8 +335,8 @@ namespace cluster {
     
     for(unsigned int a= 0 ; a < hits.size();a++) {
       int CurrentView = hits[a].View();
-      double tempcw = hits[a].Charge() * hits[a].Wire()*W2CM;
-      double tempct = hits[a].Charge() * hits[a].PeakTime()*T2CM;
+      double tempcw = hits[a].Integral() * hits[a].WireID().Wire*W2CM;
+      double tempct = hits[a].Integral() * hits[a].PeakTime()*T2CM;
       CenterChargeWire[CurrentView]+=tempcw;
       CenterChargeTime[CurrentView]+=tempct;
     }// Looping over the hits summing up all the charge
@@ -374,16 +374,16 @@ namespace cluster {
 	// getting the average charge of the cluster and setting the current plane of this cluster
 	for( auto const& thehit : hit_index_array){
 	  currentplane = hits[thehit].View();
-	  totcharge+=hits[thehit].Charge();}
+	  totcharge+=hits[thehit].Integral();}
 	avgcharge=totcharge/hit_index_array.size();
 	// now calculating the average
 	for(auto const& thehit : hit_index_array) {
-	  if(hits[thehit].Charge()>avgcharge){
+	  if(hits[thehit].Integral()>avgcharge){
 	    na+=1;
-	    awiretime += (  (hits[thehit].Wire()* W2CM - CenterChargeWire[currentplane])*C -(hits[thehit].PeakTime()* T2CM - CenterChargeTime[currentplane])*S + CenterChargeWire[currentplane])  *   ((hits[thehit].Wire()* W2CM - CenterChargeWire[currentplane])*S + (hits[thehit].PeakTime()* T2CM - CenterChargeTime[currentplane])*C +CenterChargeTime[currentplane]  )            ;
-	    awire += (  (hits[thehit].Wire()* W2CM - CenterChargeWire[currentplane])*C -(hits[thehit].PeakTime()* T2CM - CenterChargeTime[currentplane])*S +CenterChargeWire[currentplane]);
-	    atime += ((hits[thehit].Wire()* W2CM - CenterChargeWire[currentplane])*S + (hits[thehit].PeakTime()* T2CM - CenterChargeTime[currentplane])*C  + CenterChargeTime[currentplane]);
-	    atimetime +=pow( ((hits[thehit].Wire()* W2CM - CenterChargeWire[currentplane])*S + (hits[thehit].PeakTime()* T2CM - CenterChargeTime[currentplane])*C +CenterChargeTime[currentplane] ),2);
+	    awiretime += (  (hits[thehit].WireID().Wire* W2CM - CenterChargeWire[currentplane])*C -(hits[thehit].PeakTime()* T2CM - CenterChargeTime[currentplane])*S + CenterChargeWire[currentplane])  *   ((hits[thehit].WireID().Wire* W2CM - CenterChargeWire[currentplane])*S + (hits[thehit].PeakTime()* T2CM - CenterChargeTime[currentplane])*C +CenterChargeTime[currentplane]  )            ;
+	    awire += (  (hits[thehit].WireID().Wire* W2CM - CenterChargeWire[currentplane])*C -(hits[thehit].PeakTime()* T2CM - CenterChargeTime[currentplane])*S +CenterChargeWire[currentplane]);
+	    atime += ((hits[thehit].WireID().Wire* W2CM - CenterChargeWire[currentplane])*S + (hits[thehit].PeakTime()* T2CM - CenterChargeTime[currentplane])*C  + CenterChargeTime[currentplane]);
+	    atimetime +=pow( ((hits[thehit].WireID().Wire* W2CM - CenterChargeWire[currentplane])*S + (hits[thehit].PeakTime()* T2CM - CenterChargeTime[currentplane])*C +CenterChargeTime[currentplane] ),2);
 	  }//if charge
 	}//end of loop over the hits
         double aroughslope = (na * awiretime - atime * awire)/(na*atimetime-atime*atime);

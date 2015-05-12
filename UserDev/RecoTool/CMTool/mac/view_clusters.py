@@ -33,7 +33,8 @@ raw_viewer   = larlite.ClusterViewer()
 my_proc.add_process(raw_viewer)
 
 #raw_viewer.SetInputProducer("pandora")
-raw_viewer.SetClusterProducer("mergedfuzzy")
+#raw_viewer.SetClusterProducer("mergedfuzzy")
+raw_viewer.SetClusterProducer("fuzzycluster")
 #raw_viewer.SetClusterProducer("mergeall")
 
 gStyle.SetOptStat(0)

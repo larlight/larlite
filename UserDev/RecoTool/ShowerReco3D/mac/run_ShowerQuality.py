@@ -30,7 +30,7 @@ my_proc.set_output_file("outfile.root")
 
 # Create analysis unit
 sq_module = fmwk.ShowerQuality()
-sq_module.SetShowerProducer("showerreco")
+sq_module.SetShowerProducer("twoplanereco")
 
 sq_module.SetMaxEnergyCut(99999999.)
 sq_module.SetMinEnergyCut(0.)

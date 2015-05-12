@@ -53,11 +53,11 @@ namespace cluster {
 
       ::larutil::PxHit h;
 
-      h.t = hit.PeakTime() * geou->TimeToCm();
-      h.w = hit.Wire()     * geou->WireToCm();
+      h.t = hit.PeakTime()    * geou->TimeToCm();
+      h.w = hit.WireID().Wire * geou->WireToCm();
 
-      h.charge = hit.Charge();
-      h.peak   = hit.Charge(true);
+      h.charge = hit.Integral();
+      h.peak   = hit.PeakAmplitude();
       h.plane  = plane;
 
       pxhits.push_back(h);
@@ -76,13 +76,37 @@ namespace cluster {
     auto ev_cluster = storage->get_data< ::larlite::event_cluster>(cluster_producer_name);
     
     if(!ev_cluster)
-      
-      throw CRUException(Form("No cluster data product by %s found!",
-			      cluster_producer_name.c_str())
-			 );
-
+      throw CRUException(Form("No cluster data product by %s found!", cluster_producer_name.c_str()) );
+    
     if(!(ev_cluster->size())) return;
 
+    ::larlite::event_hit* ev_hits = nullptr;
+
+    auto const& hit_index_v = storage->find_one_ass(ev_cluster->id(),ev_hits,cluster_producer_name);
+
+    if (!ev_hits)
+      throw CRUException(Form("No associated hits to clusters by %s!", cluster_producer_name.c_str()) );
+
+    if (!hit_index_v.size())
+      throw CRUException(Form("Size 0 associated hits to clusters by %s!", cluster_producer_name.c_str()) );
+
+    pxhits_v.reserve(ev_cluster->size());
+
+    for(size_t i=0; i<ev_cluster->size(); ++i) {
+
+      if( i >= hit_index_v.size() ) break;
+
+      auto &hit_index = hit_index_v[i];
+
+      std::vector<larutil::PxHit> pxhits;
+
+      GeneratePxHit(hit_index, ev_hits, pxhits);
+
+      pxhits_v.push_back(pxhits);
+
+    }
+
+    /*
     auto hit_producers = ev_cluster->association_keys(::larlite::data::kHit);
 
     if(!hit_producers.size())
@@ -123,6 +147,7 @@ namespace cluster {
       pxhits_v.push_back(pxhits);
 
     }
+    */
   }
 
 }

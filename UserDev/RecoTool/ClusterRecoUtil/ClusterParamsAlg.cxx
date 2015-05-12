@@ -98,9 +98,9 @@ namespace cluster{
       fHitVector.push_back(larutil::PxHit());
 
       (*fHitVector.rbegin()).t = h->PeakTime() * fGSer->TimeToCm();
-      (*fHitVector.rbegin()).w = h->Wire() * fGSer->WireToCm();
-      (*fHitVector.rbegin()).charge = h->Charge();
-      (*fHitVector.rbegin()).peak = h->Charge(true);
+      (*fHitVector.rbegin()).w = h->WireID().Wire * fGSer->WireToCm();
+      (*fHitVector.rbegin()).charge = h->Integral();
+      (*fHitVector.rbegin()).peak = h->PeakAmplitude();
       (*fHitVector.rbegin()).plane = plane;
     }
     fPlane=fHitVector[0].plane;

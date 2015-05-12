@@ -36,9 +36,11 @@ namespace larlite {
     // Create output data product holder
     auto shower_v = storage->get_data<event_shower>(fOutputProducer);
     shower_v->clear();
-    shower_v->set_event_id(storage->get_data<event_cluster>(fInputProducer)->event_id());
-    shower_v->set_run(storage->get_data<event_cluster>(fInputProducer)->run());
-    shower_v->set_subrun(storage->get_data<event_cluster>(fInputProducer)->subrun());
+
+    // set event ID through storage manager
+    storage->set_id(storage->get_data<event_cluster>(fInputProducer)->run(),
+		    storage->get_data<event_cluster>(fInputProducer)->subrun(),
+		    storage->get_data<event_cluster>(fInputProducer)->event_id());
 
     // Run matching
     std::vector<std::vector<unsigned int> > matched_pairs;
@@ -52,8 +54,10 @@ namespace larlite {
 
       if(pfpart_v && pfpart_v->size()) {
       
-	auto const& ass_clusters = pfpart_v->association(data::kCluster,
-							 fInputProducer);
+	//auto const& ass_clusters = pfpart_v->association(data::kCluster, fInputProducer);
+	event_cluster* ev_cluster = nullptr;
+	auto const& ass_clusters = storage->find_one_ass(pfpart_v->id(),ev_cluster,pfpart_v->name());
+
 	// Loop over pfparticles
 	for(size_t pfpart_index=0; pfpart_index<pfpart_v->size(); ++pfpart_index) {
 	  
@@ -87,8 +91,11 @@ namespace larlite {
     for(size_t index = 0; index < shower_v->size(); ++index)
 
       (*shower_v)[index].set_id(index);
-    
-    shower_v->set_association(data::kCluster,fInputProducer,matched_pairs);
+
+    // create association for showers
+    auto shower_ass_v = storage->get_data<event_ass>(shower_v->name());    
+    shower_ass_v->association(shower_v->id(),product_id(data::kCluster,fInputProducer));
+    //shower_v->set_association(data::kCluster,fInputProducer,matched_pairs);
     return true;
   }
   

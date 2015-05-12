@@ -63,6 +63,14 @@ namespace larlite {
       return false;
     }
 
+    event_hit* ev_hit = nullptr;
+    auto const& ass_hit_v = storage->find_one_ass(ev_clus->id(),ev_hit,ev_clus->name());
+    if (!ev_hit)
+      throw ::cluster::ViewerException("Did not find associated hits!");
+    if (!ass_hit_v.size())
+      throw ::cluster::ViewerException("Did not find associated hits!");
+
+    /*
     auto associated_hit_producers = ev_clus->association_keys(data::kHit);
 
     if(!(associated_hit_producers.size()))
@@ -76,6 +84,7 @@ namespace larlite {
 					    associated_hit_producers[0].c_str()
 					    )
 				       );
+    */
 
     //********************DavidC
     //Begin Shower Getter stuff
@@ -122,7 +131,7 @@ namespace larlite {
     for(auto const &h : *ev_hit) {
       
       UChar_t plane = geo->ChannelToPlane(h.Channel());
-      double x = h.Wire() * wire2cm;
+      double x = h.WireID().Wire * wire2cm;
       double y = h.PeakTime() * time2cm;
       
       if(xrange.at(plane).first > x ) xrange.at(plane).first = x;
@@ -145,7 +154,7 @@ namespace larlite {
 
     auto res = GetManager().GetBookKeeper().GetResult();
 
-    auto hit_ass = ev_clus->association(data::kHit,associated_hit_producers[0]);
+    //auto hit_ass = ev_clus->association(data::kHit,associated_hit_producers[0]);
     for(auto const &c_pair : GetManager().GetBookKeeper().GetResult() ) {
 
       for(auto const &c_index : c_pair) {
@@ -155,11 +164,11 @@ namespace larlite {
 	UChar_t plane = cl.Plane();
 
 	// Get associated hits
-	for(auto const& h_index : hit_ass[c_index]) {
+	for(auto const& h_index : ass_hit_v[c_index]) {
 
 	  auto const& h = ev_hit->at(h_index);
 	  
-	  double x = h.Wire() * wire2cm;
+	  double x = h.WireID().Wire * wire2cm;
 	  double y = h.PeakTime() * time2cm;
 	  
 	  if(xrange.at(plane).first > x ) xrange.at(plane).first = x;
@@ -170,34 +179,7 @@ namespace larlite {
 	  
 	  hits_xy.at(plane).push_back(std::pair<double,double>(x,y));
 
-	  //DavidC
-	  /*
-	  if ( _showerColor ){
-	    hit_charge_frac.clear();
-	    
-	    hit_charge_frac = 
-	      _mcslb.MatchHitsAll(h,
-				  _simch_map,
-				  _shower_idmap,
-				  MCShower_indices);
-	    //find item with largest fraction
-	    int   max_item = 0;
-	    float max_frac = 0.;
-	    for ( size_t i=0; i < hit_charge_frac.size(); i++){
-	      if ( hit_charge_frac.at(i) > max_frac ) { 
-		max_item = i;
-		max_frac = hit_charge_frac.at(i);
-	      }
-	    }
-	    if ( max_item < n_showers ){
-	      shower_xy.at(plane).at(max_item).push_back(std::pair<double,double>(x,y));
-	    }
-	  }
-	  else {
-	  hits_charge.at(plane).push_back(h.Charge());
-	  }
-	  */
-	  hits_charge.at(plane).push_back(h.Charge());
+	  hits_charge.at(plane).push_back(h.Integral());
 	}
 	
 	std::vector<std::pair<double,double> > cluster_hits;

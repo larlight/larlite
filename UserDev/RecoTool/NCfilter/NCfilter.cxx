@@ -36,6 +36,9 @@ namespace larlite {
 
     // First of all create an output
     auto Output_cluster = storage->get_data<event_cluster>("ncfilter");
+
+    // Get associations for incoming cluster
+    auto Incoming_ass   = storage->get_data<event_ass>(Incoming_cluster->name());
 /*
   TryFuzzy:
     if(TryFuzzyCluster){
@@ -74,9 +77,9 @@ namespace larlite {
     if(Output_cluster->size())
       print(msg::kWARNING,__FUNCTION__,"DATA::RyanCluster is not empty. Clearing it...");
     Output_cluster->clear_data();
-    Output_cluster->set_event_id(Incoming_cluster->event_id());
-    Output_cluster->set_run(Incoming_cluster->run());
-    Output_cluster->set_subrun(Incoming_cluster->subrun());
+
+    // set event ID through storage manager
+    storage->set_id(Incoming_cluster->run(),Incoming_cluster->subrun(),Incoming_cluster->event_id());
 
     if(!(Incoming_cluster->size())){
       print(msg::kWARNING,__FUNCTION__,Form("Event %d has no DBCluster...",Incoming_cluster->event_id()));
@@ -89,7 +92,8 @@ namespace larlite {
     // make a vector of clusters
     for(auto const& c : *Incoming_cluster) clustervect.push_back(c);
     for(auto const& h : *hits) hitsvect.push_back(h);
-    auto const& cluster_hit_ass = Incoming_cluster->association(hits->id());
+    //auto const& cluster_hit_ass = Incoming_cluster->association(hits->id());
+    auto const& cluster_hit_ass = Incoming_ass->association(Incoming_cluster->id(),hits->id());
     AvgPairSI = fDivReg.SplitLineC(clustervect, cluster_hit_ass, hitsvect);
     //====================Ending with alg===================
 
@@ -328,7 +332,10 @@ namespace larlite {
 	
       }// if FLagGoodPlanes[a]
     }// loop over Best Clusters
-    Output_cluster->set_association(hits->id(),hit_ass_set);
+
+    // Get associations for outgoing cluster
+    auto Output_ass   = storage->get_data<event_ass>(Output_cluster->name());
+    Output_ass->set_association(Output_cluster->id(),hits->id(),hit_ass_set);
     return true;
   }
 

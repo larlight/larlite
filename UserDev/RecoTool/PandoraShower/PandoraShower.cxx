@@ -49,16 +49,18 @@ namespace larlite {
       auto showers = storage->get_data<event_shower>("pandorashower");
       showers->clear();
       showers->reserve( pfparts->size() );
-      showers->set_event_id( pfparts->event_id() );
-      showers->set_run( pfparts->run() );
-      showers->set_subrun( pfparts->subrun() );
+
+      // set event ID through storage manager
+      storage->set_id(pfparts->run(),pfparts->subrun(),pfparts->event_id());
+      
       //std::cout << "Event " << pfparts->event_id() << ": " << std::endl;
       // if ( pfparts->event_id() < 304 || pfparts->event_id() > 304 ) return true;
 
       // Associate PF particles and clusters
       AssSet_t ass_clusters;
       ass_clusters.reserve( pfparts->size() );
-      ass_clusters = pfparts->association( clusters->id() );
+      auto pfparts_ass = storage->get_data<event_ass>(pfparts->name());
+      ass_clusters = pfparts_ass->association( pfparts->id(), clusters->id() );
 
       // Generate the ClusterParamsAlg vector
       std::vector< ::cluster::ClusterParamsAlg > cpans;
@@ -101,7 +103,7 @@ namespace larlite {
             // std::cout << "   cluster " << c_index << " in Plane " 
             //           << iview << ", charge = "
             //           << clusters->at(c_index).Charge() << std::endl;
-            TotalClusterCharges[iview] += clusters->at(c_index).Charge();
+            TotalClusterCharges[iview] += clusters->at(c_index).Integral();
 	    //std::cout<<iview<<std::endl;
             // Fill the clusters associated to a certain PF particle
             cpan_holder.push_back( cpans.at(c_index) );
@@ -143,7 +145,9 @@ namespace larlite {
 
       } // done looping over matched cluster pairs
 
-      showers->set_association( data::kCluster, fClusterProducer, iassociations );
+      auto shower_ass = storage->get_data<event_ass>(showers->name());
+      shower_ass->set_association(showers->id(),product_id(data::kCluster,fClusterProducer),iassociations);
+      //showers->set_association( data::kCluster, fClusterProducer, iassociations );
       return true;
    }
 
@@ -153,7 +157,7 @@ namespace larlite {
 
    void PandoraShower::CalculateTotalHitCharge( larlite::event_hit const* hits, std::map< larlite::geo::View_t, double >& charges ) {
       for ( auto const& hit : ( *hits ) ) {
-         charges[hit.View()] += hit.Charge();
+         charges[hit.View()] += hit.Integral();
       }
       return;
    }

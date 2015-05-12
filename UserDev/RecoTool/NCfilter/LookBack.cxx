@@ -15,7 +15,7 @@ namespace cluster {
         double charge=0;
         double average_charge=0;
         for(unsigned int k =0 ; k<hitindex.size(); k++){
-           charge+=hitsvect[hitindex[k]].Charge();}
+           charge+=hitsvect[hitindex[k]].Integral();}
         average_charge=charge/hitindex.size();
 
         double na = 0;
@@ -24,12 +24,12 @@ namespace cluster {
         double atime = 0;
         double awirewire = 0;
         for(unsigned int z =0 ; z<hitindex.size(); z++){
-                if(hitsvect[hitindex[z]].Charge()>average_charge){
+                if(hitsvect[hitindex[z]].Integral()>average_charge){
                 na+=1;
-                awiretime +=hitsvect[hitindex[z]].Wire()*W2CM  * hitsvect[hitindex[z]].PeakTime()*T2CM;
-                awire += hitsvect[hitindex[z]].Wire()*W2CM;
+                awiretime +=hitsvect[hitindex[z]].WireID().Wire*W2CM  * hitsvect[hitindex[z]].PeakTime()*T2CM;
+                awire += hitsvect[hitindex[z]].WireID().Wire*W2CM;
                 atime += hitsvect[hitindex[z]].PeakTime()*T2CM;
-                awirewire += pow(hitsvect[hitindex[z]].Wire()*W2CM,2);
+                awirewire += pow(hitsvect[hitindex[z]].WireID().Wire*W2CM,2);
                                         }//if charge
                                    }//end of loop over the hits
         double slope = (na * awiretime - awire * atime)/(na*awirewire-awire*awire);
@@ -89,7 +89,7 @@ namespace cluster {
         // This will need to be sorted and starting with hits closest to the PV
 /*     std::vector<std::pair<double,double>> PVertex = fQuality.ProtoVertexCW(BestClusters,hits);
       for(unsigned int i = 0 ; i<inspecting_cluster.size(); i++){
-        double wire = hitsvect[inspecting_cluster[i]].Wire()*W2CM -PVertex[a].first*W2CM;
+        double wire = hitsvect[inspecting_cluster[i]].WireID().Wire*W2CM -PVertex[a].first*W2CM;
         double time = hitsvect[inspecting_cluster[i]].PeakTime()*T2CM-PVertex[a].second*T2CM;
         double tempdist = sqrt(wire*wire + time*time);
         std::pair<unsigned int,double> temppair(inspecting_cluster[i],tempdist);
@@ -109,7 +109,7 @@ namespace cluster {
                // 
                 for(unsigned int j =0 ; j<looping_cluster.size(); j++){
                 // calculate the distance between the two hits
-                double deltawire = hitsvect[inspecting_cluster[b]].Wire()*W2CM - hitsvect[looping_cluster[j]].Wire()*W2CM;
+                double deltawire = hitsvect[inspecting_cluster[b]].WireID().Wire*W2CM - hitsvect[looping_cluster[j]].WireID().Wire*W2CM;
                 double deltatime = hitsvect[inspecting_cluster[b]].PeakTime()*T2CM - hitsvect[looping_cluster[j]].PeakTime()*T2CM;
                 double prox = sqrt( deltawire*deltawire + deltatime*deltatime );
                 // needs to be globally defined _
@@ -119,7 +119,7 @@ namespace cluster {
                         // now we need to add this to the inspecting cluster and remove it from the looping cluster
                         // the question will be where to insert it into the the hits_distance list. 
                         // this should also preserve the hit to being close to the protovertex
-//                        double loop_hit_dist = sqrt( pow( hitsvect[looping_cluster[j]].Wire()*W2CM-PVertex[a].first*W2CM,2) +pow( hitsvect[looping_cluster[j]].PeakTime()*T2CM-PVertex[a].second*T2CM,2));
+//                        double loop_hit_dist = sqrt( pow( hitsvect[looping_cluster[j]].WireID().Wire*W2CM-PVertex[a].first*W2CM,2) +pow( hitsvect[looping_cluster[j]].PeakTime()*T2CM-PVertex[a].second*T2CM,2));
                                         // this can be a push_back because order is not important at point because we are moving it for sure
                                         // RG is this true ? 
                                         inspecting_cluster.push_back(looping_cluster[j]);

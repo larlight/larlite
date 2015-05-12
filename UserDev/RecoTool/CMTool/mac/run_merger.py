@@ -23,13 +23,22 @@ mgr.set_io_mode(fmwk.storage_manager.kBOTH)
 
 mgr.set_ana_output_file("")
 
-mgr.add_process(GetPrelimMergerInstance())
-mgr.add_process(GetSecondMergerInstance())
+prelim = GetPrelimMergerInstance()
+prelim.SetInputProducer("fuzzycluster")
+prelim.SetOutputProducer("mergedfuzzycluster")
+second = GetSecondMergerInstance()
+second.SetInputProducer("mergedfuzzycluster")
+second.SetOutputProducer("mergedfuzzy")
+mgr.add_process(prelim)
+mgr.add_process(second)
 
-merge_all = GetMergeAllInstance()
-merge_all.SetOutputProducer("mergeall")
+#merge_all = GetMergeAllInstance()
+#merge_all.SetOutputProducer("mergedfuzzy")
+mgr.set_data_to_write(fmwk.data.kCluster,"mergedfuzzycluster")
+mgr.set_data_to_write(fmwk.data.kCluster,"mergedfuzzy")
+
 #mgr.add_process(merge_all)
 
-mgr.run()
+mgr.run(0,10)
 
 
