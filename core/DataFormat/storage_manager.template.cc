@@ -89,6 +89,9 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_minos> () const
   { return data::kMinos; }
 
+  template<> data::DataType_t storage_manager::data_type<event_fifo> () const
+  { return data::kFIFO; }
+
   template <class T>
   data::DataType_t storage_manager::data_type() const
   { 

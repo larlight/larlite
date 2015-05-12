@@ -51,7 +51,7 @@ namespace larlite {
 	 UChar_t module_address,
 	 UChar_t module_id,
 	 std::vector<UShort_t> wf) : std::vector<UShort_t>(wf),
-                                     data_base(data::kFifo),
+                                     data_base(data::kFIFO),
                                      _channel_number(ch),
 				     _module_address(module_address),
 				     _module_id(module_id),
@@ -135,7 +135,7 @@ namespace larlite {
   public:
     
     /// Default constructor ... provide an option to set the length of ch-wise data
-  event_fifo(std::string name="noname") : event_base(data::kFifo,name) { clear_data(); }
+  event_fifo(std::string name="noname") : event_base(data::kFIFO,name) { clear_data(); }
     
     /// Default copy constructor needed to avoid memory leak in ROOT streamer
     event_fifo(const event_fifo& original)

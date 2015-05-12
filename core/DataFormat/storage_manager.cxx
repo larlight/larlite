@@ -642,7 +642,7 @@ namespace larlite {
     case data::kMinos:
       _ptr_data_array[type][name]=(event_minos*)(new event_minos(name));
       break;
-    case data::kFifo:
+    case data::kFIFO:
       _ptr_data_array[type][name]=(event_fifo*)(new event_fifo(name));
       break;
     default:
