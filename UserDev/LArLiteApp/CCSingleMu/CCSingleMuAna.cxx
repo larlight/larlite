@@ -6,17 +6,19 @@
 #include "DataFormat/cosmictag.h"
 #include "DataFormat/track.h"
 #include "DataFormat/cosmictag.h"
+#include "DataFormat/event_ass.h"
+
 namespace larlite {
 
   bool CCSingleMuAna::initialize() {
-
+    
     //
     // This function is called in the beggining of event loop
     // Do all variable initialization you wish to do here.
     // If you have a histogram to fill in the event loop, for example,
     // here is a good place to create one on the heap (i.e. "new TH1D"). 
     //
-
+    
     h = new TH1D("h","My Histogram; X-axis; Y-axis",100,0,1000);
     hTrackCosmicScore = new TH1D("hTrackCosmicScore","My Histogram; X-axis; Y-axis",100,-1.5,1.5);
     hLongestTrackCosmicScore = new TH1D("hLongestTrackCosmicScore","My Histogram; X-axis; Y-axis",100,-1.5,1.5);
@@ -25,7 +27,7 @@ namespace larlite {
   }
   
   bool CCSingleMuAna::analyze(storage_manager* storage) {
-  
+    
     //
     // Do your event-by-event analysis here. This function is called for 
     // each event in the loop. You have "storage" pointer which contains 
@@ -49,13 +51,16 @@ namespace larlite {
     double fLongestTrackCosmicScore = -999999;
     double fLongestTrackLength = 0;
 
-    auto ev_track = storage->get_data<event_track>("pandoraNuKHit");
+    auto ev_track  = storage->get_data<event_track>("pandoraNuKHit");
     auto track_tag = storage->get_data<event_cosmictag>("pandoraNuKHittag");
+    auto ev_ass    = storage->get_data<event_ass>("pandoraNuKHit");
 
     if(!ev_track || ev_track->size() < 1)
       return false;
 
-    auto assoc_infor = track_tag->association(ev_track->id());
+
+    //auto assoc_infor = track_tag->association(ev_track->id());   
+    auto assoc_infor = ev_ass->association(ev_track->id(),track_tag->id());
 
 
     if(!ev_track || !track_tag) {
@@ -70,8 +75,8 @@ namespace larlite {
 
     for (size_t i=0; i < ev_track->size(); i++){
 
-      if(ev_track->at(i).n_point() > fLongestTrackLength){
-        fLongestTrackLength = ev_track->at(i).n_point();
+      if(ev_track->at(i).NumberTrajectoryPoints() > fLongestTrackLength){
+        fLongestTrackLength = ev_track->at(i).NumberTrajectoryPoints();
         fLongestTrackCosmicScore = track_tag->at(i).CosmicScore(); 
       }
 
@@ -81,7 +86,7 @@ namespace larlite {
 		   //addTrack(evt_mctracks->at(m));
          //}
     
-      h->Fill(ev_track->at(i).n_point());
+      h->Fill(ev_track->at(i).NumberTrajectoryPoints());
       hTrackCosmicScore->Fill(track_tag->at(i).CosmicScore()); 
 
     }
