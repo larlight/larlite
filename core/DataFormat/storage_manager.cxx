@@ -605,7 +605,7 @@ namespace larlite {
 		  matched=true;
 		}
 	      }
-	      for(int i=0; i<data::kDATA_TYPE_MAX && !matched; ++i) {
+	      for(int i=0; i<data::kSUBRUNDATA_TYPE_MAX && !matched; ++i) {
 		if(data::kSUBRUNDATA_TREE_NAME[i] == type_name && 
 		   _in_subrundata_ch[(data::SubRunDataType_t)i].find(producer_name) == _in_subrundata_ch[(data::SubRunDataType_t)i].end()) {
 		  _in_subrundata_ch[(data::SubRunDataType_t)i].insert(std::make_pair(producer_name.c_str(),(TChain*)nullptr));
