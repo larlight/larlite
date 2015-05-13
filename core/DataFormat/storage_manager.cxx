@@ -405,8 +405,8 @@ namespace larlite {
     _input_product_id.clear();
     _use_read_bool = false;
     _use_write_bool = false;
-    delete _in_id_ch;
-    delete _out_id_ch;
+    //delete _in_id_ch;
+    //delete _out_id_ch;
     for(int i=0; i<data::kDATA_TYPE_MAX; ++i) {
       _in_ch[i].clear();
       _out_ch[i].clear();
@@ -1277,6 +1277,10 @@ namespace larlite {
       Message::send(msg::kWARNING,__FUNCTION__,"Closing a file without any I/O operation done!");
       break;
     case kOPERATING:
+      if(_in_id_ch) {
+	delete _in_id_ch;
+	_in_id_ch = nullptr;
+      }
       if(_mode!=kREAD){
 
 	if(_out_id_ch) {
