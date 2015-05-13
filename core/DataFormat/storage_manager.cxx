@@ -145,8 +145,8 @@ namespace larlite {
 					       name.c_str())
 					  );
 	  
-	  (*out_ch_iter).second->SetMaxTreeSize    (1024*1024*1024);
-	  (*out_ch_iter).second->SetMaxVirtualSize (1024*1024*1024);
+	  //(*out_ch_iter).second->SetMaxTreeSize    (1024*1024*1024);
+	  //(*out_ch_iter).second->SetMaxVirtualSize (1024*1024*1024);
 	  
 	  (*out_ch_iter).second->Branch(Form("%s_%s_branch",
 					     data::kRUNDATA_TREE_NAME[(data::RunDataType_t)type].c_str(),
@@ -241,8 +241,8 @@ namespace larlite {
 					       name.c_str())
 					  );
 	  
-	  (*out_ch_iter).second->SetMaxTreeSize    (1024*1024*1024);
-	  (*out_ch_iter).second->SetMaxVirtualSize (1024*1024*1024);
+	  //(*out_ch_iter).second->SetMaxTreeSize    (1024*1024*1024);
+	  //(*out_ch_iter).second->SetMaxVirtualSize (1024*1024*1024);
 	  
 	  (*out_ch_iter).second->Branch(Form("%s_%s_branch",
 					     data::kSUBRUNDATA_TREE_NAME[(data::SubRunDataType_t)type].c_str(),
@@ -352,8 +352,8 @@ namespace larlite {
 					       name.c_str())
 					  );
 	  
-	  (*out_ch_iter).second->SetMaxTreeSize    (1024*1024*1024);
-	  (*out_ch_iter).second->SetMaxVirtualSize (1024*1024*1024);
+	  //(*out_ch_iter).second->SetMaxTreeSize    (1024*1024*1024);
+	  //(*out_ch_iter).second->SetMaxVirtualSize (1024*1024*1024);
 	  
 	  (*out_ch_iter).second->Branch(Form("%s_%s_branch",
 					     data::kDATA_TREE_NAME[(data::DataType_t)type].c_str(),
@@ -912,8 +912,8 @@ namespace larlite {
 						    name_ptr.first.c_str())
 					       );
 	  
-	  _out_ch[i][name_ptr.first]->SetMaxTreeSize    (1024*1024*1024);
-	  _out_ch[i][name_ptr.first]->SetMaxVirtualSize (1024*1024*1024);
+	  //_out_ch[i][name_ptr.first]->SetMaxTreeSize    (1024*1024*1024);
+	  //_out_ch[i][name_ptr.first]->SetMaxVirtualSize (1024*1024*1024);
 	  
 	  _out_ch[i][name_ptr.first]->Branch(Form("%s_%s_branch",
 						  data::kDATA_TREE_NAME[(data::DataType_t)i].c_str(),
@@ -939,8 +939,8 @@ namespace larlite {
 							    name_ptr.first.c_str())
 						       );
 	  
-	  _out_rundata_ch[i][name_ptr.first]->SetMaxTreeSize    (1024*1024*1024);
-	  _out_rundata_ch[i][name_ptr.first]->SetMaxVirtualSize (1024*1024*1024);
+	  //_out_rundata_ch[i][name_ptr.first]->SetMaxTreeSize    (1024*1024*1024);
+	  //_out_rundata_ch[i][name_ptr.first]->SetMaxVirtualSize (1024*1024*1024);
 	  
 	  _out_rundata_ch[i][name_ptr.first]->Branch(Form("%s_%s_branch",
 							  data::kRUNDATA_TREE_NAME[i].c_str(),
@@ -966,8 +966,8 @@ namespace larlite {
 						    name_ptr.first.c_str())
 					       );
 	  
-	  _out_subrundata_ch[i][name_ptr.first]->SetMaxTreeSize    (1024*1024*1024);
-	  _out_subrundata_ch[i][name_ptr.first]->SetMaxVirtualSize (1024*1024*1024);
+	  //_out_subrundata_ch[i][name_ptr.first]->SetMaxTreeSize    (1024*1024*1024);
+	  //_out_subrundata_ch[i][name_ptr.first]->SetMaxVirtualSize (1024*1024*1024);
 	  
 	  _out_subrundata_ch[i][name_ptr.first]->Branch(Form("%s_%s_branch",
 							     data::kSUBRUNDATA_TREE_NAME[(data::SubRunDataType_t)i].c_str(),
