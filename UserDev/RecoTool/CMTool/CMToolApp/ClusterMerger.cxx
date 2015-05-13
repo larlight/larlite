@@ -100,9 +100,9 @@ namespace larlite {
       hit_ass.push_back(merged_association);
     }
 
-    auto out_event_ass = (event_ass*)(storage->get_data(data::kAssociation,out_cluster_v->name()));
+    auto out_event_ass = storage->get_data<event_ass>(out_cluster_v->name());
     std::cout << "Associations Before: " << out_event_ass->size() << std::endl;
-    out_event_ass->set_association(product_id(data::kCluster,out_cluster_v->name()),product_id(data::kHit,ev_hits->name()),hit_ass);
+    out_event_ass->set_association(out_cluster_v->id(),ev_hits->id(),hit_ass);
     std::cout << "Associations After : " << out_event_ass->size() << std::endl;
     //out_cluster_v->set_association(data::kHit,hit_producer,hit_ass);
     return true;

@@ -1286,6 +1286,7 @@ namespace larlite {
 	  _fout = _out_id_ch->GetCurrentFile();
 	  _fout->cd(_name_out_tdirectory.c_str());
 	  _out_id_ch->Write();
+	  _out_id_ch=nullptr;
 	}
 
 	for(int i=0; i<data::kDATA_TYPE_MAX; i++) {
@@ -1703,11 +1704,13 @@ namespace larlite {
 	if( !_use_write_bool ||
 	    _write_data_array[i].find((name_ptr.first)) != _write_data_array[i].end())
 	  name_ptr.second->Fill();
-	
-	_ptr_data_array[i][name_ptr.first]->clear_data();
-	_ptr_data_array[i][name_ptr.first]->set_run(_run_id);
-	_ptr_data_array[i][name_ptr.first]->set_subrun(_subrun_id);
-	_ptr_data_array[i][name_ptr.first]->set_event_id(_event_id);
+
+	auto& data_ptr = _ptr_data_array[i][name_ptr.first];
+
+	data_ptr->clear_data();
+	data_ptr->set_run(_run_id);
+	data_ptr->set_subrun(_subrun_id);
+	data_ptr->set_event_id(_event_id);
       }
     }
 
@@ -1724,10 +1727,12 @@ namespace larlite {
 	  if( !_use_write_bool ||
 	      _write_subrundata_array[i].find((name_ptr.first)) != _write_subrundata_array[i].end())
 	    name_ptr.second->Fill();
-	  
-	  _ptr_subrundata_array[i][name_ptr.first]->clear_data();
-	  _ptr_subrundata_array[i][name_ptr.first]->set_run(_run_id);
-	  _ptr_subrundata_array[i][name_ptr.first]->set_subrun(_subrun_id);
+
+	  auto& data_ptr = _ptr_subrundata_array[i][name_ptr.first];
+	
+	  data_ptr->clear_data();
+	  data_ptr->set_run(_run_id);
+	  data_ptr->set_subrun(_subrun_id);
 	}
       }
 
@@ -1744,9 +1749,11 @@ namespace larlite {
 	    if( !_use_write_bool ||
 		_write_rundata_array[i].find((name_ptr.first)) != _write_rundata_array[i].end())
 	      name_ptr.second->Fill();
+
+	    auto& data_ptr = _ptr_rundata_array[i][name_ptr.first];
 	    
-	    _ptr_rundata_array[i][name_ptr.first]->clear_data();
-	    _ptr_rundata_array[i][name_ptr.first]->set_run(_run_id);
+	    data_ptr->clear_data();
+	    data_ptr->set_run(_run_id);
 	  }
 	}
       }
