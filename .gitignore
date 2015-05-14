@@ -23,6 +23,7 @@
 /lib/*
 /doc/dOxy*
 /bin/larlite
+/bin/llhadd
 /GNUmakefile
 /UserDev/*
 !/UserDev/bin
