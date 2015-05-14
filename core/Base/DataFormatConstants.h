@@ -83,7 +83,6 @@ namespace larlite{
       kMCTree,             ///< sim::MCTree
       kMinos,              ///< t962::Minos
       kFIFO,               ///< from larlight::fifo
-<<<<<<< HEAD
       kAssociation,        ///< Association data product
       kPCAxis,             ///< recob::PCAxis
       kFlashMatch,         ///< anab::FlashMatch

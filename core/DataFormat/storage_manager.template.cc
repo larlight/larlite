@@ -86,7 +86,6 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_minos> () const
   { return data::kMinos; }
 
-<<<<<<< HEAD
   template<> data::DataType_t storage_manager::data_type<event_ass> () const
   { return data::kAssociation; }
 

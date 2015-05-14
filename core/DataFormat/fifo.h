@@ -50,7 +50,6 @@ namespace larlite {
 	 UInt_t  sample,
 	 UChar_t module_address,
 	 UChar_t module_id,
-<<<<<<< HEAD
 	 std::vector<unsigned short> wf)
       : std::vector<unsigned short>(wf)
       , data_base(data::kFIFO)
