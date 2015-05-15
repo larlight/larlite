@@ -123,10 +123,6 @@ namespace larlite {
     /// 15 => Final State Nuclear Remnant (low energy nuclear fragments entering the record collectively as a 'hadronic blob' pseudo-particle)
     /// 16 => Nucleon Cluster Target
 
-    ////////////////////////
-    ClassDef(mcpart,1)
-    ////////////////////////
-
   };
   
   /**
