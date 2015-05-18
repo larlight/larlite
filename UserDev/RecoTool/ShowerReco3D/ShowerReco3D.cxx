@@ -45,9 +45,7 @@ namespace larlite {
     // Run matching
     std::vector<std::vector<unsigned int> > matched_pairs;
     if(!fUsePFParticle) {
-
       matched_pairs = fManager.Reconstruct(local_clusters,*shower_v);
-
     }else{
 
       auto pfpart_v = storage->get_data<event_pfpart>(fInputProducer);
@@ -57,7 +55,6 @@ namespace larlite {
 	//auto const& ass_clusters = pfpart_v->association(data::kCluster, fInputProducer);
 	event_cluster* ev_cluster = nullptr;
 	auto const& ass_clusters = storage->find_one_ass(pfpart_v->id(),ev_cluster,pfpart_v->name());
-
 	// Loop over pfparticles
 	for(size_t pfpart_index=0; pfpart_index<pfpart_v->size(); ++pfpart_index) {
 	  
@@ -94,7 +91,7 @@ namespace larlite {
 
     // create association for showers
     auto shower_ass_v = storage->get_data<event_ass>(shower_v->name());    
-    shower_ass_v->association(shower_v->id(),product_id(data::kCluster,fInputProducer));
+    shower_ass_v->set_association(shower_v->id(),product_id(data::kCluster,fInputProducer),matched_pairs);
     //shower_v->set_association(data::kCluster,fInputProducer,matched_pairs);
     return true;
   }
