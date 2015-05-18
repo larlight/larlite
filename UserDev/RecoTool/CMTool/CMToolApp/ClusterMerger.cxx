@@ -101,9 +101,7 @@ namespace larlite {
     }
 
     auto out_event_ass = storage->get_data<event_ass>(out_cluster_v->name());
-    std::cout << "Associations Before: " << out_event_ass->size() << std::endl;
     out_event_ass->set_association(out_cluster_v->id(),ev_hits->id(),hit_ass);
-    std::cout << "Associations After : " << out_event_ass->size() << std::endl;
     //out_cluster_v->set_association(data::kHit,hit_producer,hit_ass);
     return true;
   }
