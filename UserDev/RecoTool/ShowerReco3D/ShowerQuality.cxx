@@ -411,10 +411,14 @@ namespace larlite {
       */
 
       fTreeParams.reco_energy = reco_shower.Energy().at(reco_shower.best_plane());
-      //fTreeParams.reco_dedx_U   = reco_shower.dEdx().at(0);
-      //fTreeParams.reco_dedx_V   = reco_shower.dEdx().at(1);
-      //fTreeParams.reco_dedx_Y   = reco_shower.dEdx().at(2);
+      fTreeParams.reco_energy_U = reco_shower.Energy().at(0);
+      fTreeParams.reco_energy_V = reco_shower.Energy().at(1);
+      fTreeParams.reco_energy_Y = reco_shower.Energy().at(2);
+      
       fTreeParams.reco_dedx     = reco_shower.dEdx().at(reco_shower.best_plane());
+      fTreeParams.reco_dedx_U   = reco_shower.dEdx().at(0);
+      fTreeParams.reco_dedx_V   = reco_shower.dEdx().at(1);
+      fTreeParams.reco_dedx_Y   = reco_shower.dEdx().at(2);
 
       //
       // Fill histograms
@@ -517,6 +521,9 @@ namespace larlite {
     fTree->Branch("reco_dcosy",&fTreeParams.reco_dcosy,"reco_dcosy/D");
     fTree->Branch("reco_dcosz",&fTreeParams.reco_dcosz,"reco_dcosz/D");
     fTree->Branch("reco_energy",&fTreeParams.reco_energy,"reco_energy/D");
+    fTree->Branch("reco_energy_U",&fTreeParams.reco_energy_U,"reco_energy_U/D");
+    fTree->Branch("reco_energy_V",&fTreeParams.reco_energy_V,"reco_energy_V/D");
+    fTree->Branch("reco_energy_Y",&fTreeParams.reco_energy_Y,"reco_energy_Y/D");
 
     fTree->Branch("best_plane_id",&fTreeParams.best_plane_id,"best_plane_id/i");
 
