@@ -98,6 +98,8 @@ namespace ertool {
     // is placed to remove cases where the shower is meters
     // away from the vertex. Probably an accidental correlation
     double _vtxToShrStartDist;
+    double _vtxToElecShrStartDist;
+    double _vtxToGammShrStartDist;
     // Maximum impact parameter allowed between the two objects
     // if larger it means that the two lines/segments do not come
     // within this value at any point and they therefore are 
@@ -123,8 +125,13 @@ namespace ertool {
 
     // Keep track of whether a sister track to the shower has
     // been found
-    bool _hassister;
-
+   bool _hassister;
+   bool _track_assister;
+   bool _elec_assister;
+   bool _gam_assister;
+   bool _vtx_assister;
+   bool _muon_assister;
+   
     // Other algorithms to use
     AlgoEMPart _alg_emp;
     AlgoFindRelationship _findRel;
