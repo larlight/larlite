@@ -23,10 +23,10 @@ my_proc = fmwk.ana_processor()
 my_proc.enable_filter(True)
 
 # Create algorithm
-my_algo = ertool.AlgoSingleE()
+my_algo = ertool.AlgoSingleGamma()
 my_algo.useRadLength(True)
-my_algo.setVerbose(False)
-my_algo.setRejectLongTracks(True)
+my_algo.setVerbose(True)
+#my_algo.setRejectLongTracks(False)
 my_algo.setVtxToTrkStartDist(1)  #1
 my_algo.setVtxToTrkDist(1)	 #1
 my_algo.setVtxToShrStartDist(50) #50
@@ -36,19 +36,18 @@ my_algo.setEThreshold(0.)	 #100
 #my_algo.setBDtW(10)
 #my_algo.setBDtTW(10)
 #my_algo.LoadParams()
+
 # Create ERTool filter
-my_filter = ertool.FilterTrackLength()
-my_filter.setLengthCut(0.3)
+#my_filter = ertool.FilterTrackLength()
+#my_filter.setLengthCut(0.3)
 
 
 # Create MC Filter
-# This filter is if you want to look at CC1E events
-#MCfilter = fmwk.MC_CC1E_Filter();
-# Filter for looking at NC1Gamma
 MCfilter = fmwk.MC_NC1Gamma_Filter();
+MCfilter.setMaxNEvents(1000);
 
 #Set flip to FALSE if you are looking for efficiency, TRUE if you are looking for MID efficiency
-MCfilter.flip(False)
+#MCfilter.flip(False)
 #MCfilter.flip(True)
 #MCfilter.SetFilterEnergy(.02) 
 # Use this filter instead if you want to look at CCQE channel events with specified number of mcshowers and
@@ -82,7 +81,7 @@ my_ana.SetECut(Ecut)
 
 my_anaunit = fmwk.ExampleERSelection()
 my_anaunit._mgr.SetAlgo(my_algo)
-my_anaunit._mgr.SetFilter(my_filter)
+#my_anaunit._mgr.SetFilter(my_filter)
 my_anaunit._mgr.SetAna(my_ana)
 #This cut is applied in helper... ertool showers are not made if the energy of mcshower or reco shower
 #is below this threshold. This has to be above 0 or else the code may segfault. This is not a "physics cut".

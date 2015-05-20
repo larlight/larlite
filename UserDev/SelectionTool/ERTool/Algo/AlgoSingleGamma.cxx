@@ -59,7 +59,18 @@ namespace ertool {
 				     , fTPC(-10.,-126.,-10.,292.,136.,1150.)
   {
     _name     = "AlgoSingleGamma";
-    _verbose  = "false"; 
+    _e_mass     = TDatabasePDG().GetParticle(11)->Mass();
+    _e_ll_values = 0;
+    _dedx_values = 0;
+    _Ethreshold = 0;
+    _verbose = false;
+    _useRadLength = false;
+    _hassister = false;
+    _rejectLongTracks = true;
+    _vtxProximityCut = 0;
+    _BDtW = 0; 
+    _BDtTW = 0;
+
  
   }
 
@@ -78,14 +89,14 @@ namespace ertool {
     _alg_emp.ProcessBegin();
     _alg_emp.SetMode(true);
 
-        if(!_e_ll_values)
+    if(!_e_ll_values)
       _e_ll_values = new TH1F("e_ll_values","e_ll_values",1000,-1,0);
-
+    
     if(!_dedx_values)
       _dedx_values = new TH1F("dedx_values","dedx_values",1000,0,8);
     
     if (_alg_tree) { delete _alg_tree; }
-    _alg_tree = new TTree("_alg_tree","Algo SingleE Tree");
+    _alg_tree = new TTree("_alg_tree","Algo SingleGamma Tree");
     _alg_tree->Branch("_E",&_E,"_E/D");
     _alg_tree->Branch("_PDG",&_PDG,"PDG/I");
     _alg_tree->Branch("_VsTrack",&_VsTrack,"_VsTrack/I");
@@ -114,19 +125,23 @@ namespace ertool {
   ParticleSet AlgoSingleGamma::Reconstruct(const EventData &data)
   { 
 
+
+
     //Name a ParticleSet that will contain all the particles 
     //associated with our selected single photon event
     ParticleSet SingleGamEvent;
 
+    if(data.Shower().size() == 0){ std::cout << "No Shower." << std::endl; return SingleGamEvent;}
       
     if (_verbose) { 
       std::cout << "***********BEGIN RECONSTRUCTION************" << std::endl;
-      std::cout << "Showers in event  : " << data.Shower().size() << std::endl;
+      if(data.Shower().size() != 0 or data.Track().size() != 0){
+	std::cout << "Showers in event  : " << data.Shower().size() << std::endl;
+	std::cout << "Showers in event  : " << data.Shower().size() << std::endl;
+      }
     }
   
-    // Reconstruct Track Hierarchy
-    ParticleSet trackHierarchy;
-    trackHierarchy = _findRel.FindTrackHierarchy(data.Track());
+
 
     std::vector<int> showers_counted; 
 
@@ -205,7 +220,8 @@ namespace ertool {
 	_thatE = thatShower->_energy;
 	_IP = IP;
 	_IPthisStart = vtx.Dist(thisShower->Start());
-      
+	_alg_tree->Fill(); 
+
 	if (_verbose)
 	  std::cout << "\tImpact Parameter      : " << _IP << std::endl
 		    << "\tIP to other Shr Start : " << _IPthatStart << std::endl

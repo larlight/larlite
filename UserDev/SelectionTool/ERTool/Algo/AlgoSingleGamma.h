@@ -55,6 +55,31 @@ namespace ertool {
 		// Set verbosity
     void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); }
 
+       /// Use EMPart
+    void useRadLength(bool on) { _useRadLength = on; }
+
+    void setRejectLongTracks(bool on) { _rejectLongTracks = on; }
+
+    void setVtxToTrkStartDist(double d){
+      _vtxToTrkStartDist = d;
+    }
+    void setVtxToTrkDist(double d){
+      _vtxToTrkDist = d;
+    }
+    void setVtxToShrStartDist(double d){
+      _vtxToShrStartDist = d;
+    }
+    void setMaxIP(double d){
+      _maxIP = d;
+    }
+    void setEThreshold(double E){ _Ethreshold = E; }
+
+    void setVtxProximityCut(double d) { _vtxProximityCut = d; }
+    void setBDtW(double b) { _BDtW = b; }
+    void setBDtTW(double bt) { _BDtTW = bt; }
+
+
+
   private:
 
     ::geoalgo::AABox fTPC;
