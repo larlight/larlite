@@ -1,5 +1,4 @@
 /*
-
 AlgoSingleGamma, April 2015
 
 authors : Joseph Zennamo, jzennamo@uchicago.edu
@@ -13,7 +12,6 @@ It will return an ERTools ParticleSet associated with that neutrino interaction
 
 
 To Do list: 
-
 1) Add muon PID
 2) Add second (and so on) generations to the particle set 
       >> Can do this easily with the FindTrackHierarchy
@@ -26,7 +24,6 @@ To Do list:
 
 
 Step-by-step Guide to the code: 
-
 ::  1  :: Start with a shower 
 ::  2  :: Check it is above the energy threshold
 ::  3  :: Make sure it hasn’t been counted before
@@ -70,7 +67,9 @@ namespace ertool {
     _vtxProximityCut = 0;
     _BDtW = 0; 
     _BDtTW = 0;
-
+    _Ngamma = 0;
+    _Ntrks = 0;
+    _Nmu = 0;
  
   }
 
@@ -108,6 +107,9 @@ namespace ertool {
     _alg_tree->Branch("_IPtrkBody",&_IPtrkBody,"_IPtrkBody/D");
     _alg_tree->Branch("_distBackAlongTraj",&_distBackAlongTraj,"_distBackAlongTraj/D");
     _alg_tree->Branch("_distToTopWall",&_distToTopWall,"_distToTopWall/D");
+    _alg_tree->Branch("_Ngamma",&_Ngamma,"_Ngamma/I");
+    _alg_tree->Branch("_Ntrks",&_Ntrks,"_Ntrks/I");
+    _alg_tree->Branch("_Nmu",&_Nmu,"_Nmu/I");
     
     return;
 
@@ -129,15 +131,13 @@ namespace ertool {
 
     //Name a ParticleSet that will contain all the particles 
     //associated with our selected single photon event
-    ParticleSet SingleGamEvent;
-
-    if(data.Shower().size() == 0){ std::cout << "No Shower." << std::endl; return SingleGamEvent;}
-      
+    ParticleSet SingleGamEvent;      
+  
     if (_verbose) { 
       std::cout << "***********BEGIN RECONSTRUCTION************" << std::endl;
       if(data.Shower().size() != 0 or data.Track().size() != 0){
 	std::cout << "Showers in event  : " << data.Shower().size() << std::endl;
-	std::cout << "Showers in event  : " << data.Shower().size() << std::endl;
+	std::cout << " Tracks in event  : " << data.Track().size() << std::endl;
       }
     }
   
@@ -195,8 +195,11 @@ namespace ertool {
       ::  4  ::
       :::::::::
     */
+
       if(isGammaLike(thisShower->_dedx,-1)) elec = false;
-    
+      _E = thisShower->_energy; 
+      if(elec){ _PDG = 11;}
+      else{ _PDG = 22;}
 
     /*
       :::::::::
@@ -231,7 +234,7 @@ namespace ertool {
 
 	if( (IP < _maxIP) and 
 	    ( vtx.Dist(thatShower->Start()) < _vtxToShrStartDist) and
-	    ( vtx.Dist(thisShower->Start()) < _vtxToGammShrStartDist)){
+	    ( vtx.Dist(thisShower->Start()) < _vtxToShrStartDist)){
 
     /*
       :::::::::
@@ -367,7 +370,9 @@ namespace ertool {
 
 	Particle neutrino(0,0);
 	neutrino.Vertex(evt_vtx);
-
+	
+	int nummu = 0;
+	
 	//Define the neutrino energy and momentum
 	geoalgo::Vector_t nuMom(0.,0.,0.);
 	double nuKE = 0;
@@ -402,7 +407,9 @@ namespace ertool {
 
 	  //define your track as a particle 
 	  Particle PiKProMu = _findRel.GetPDG(track);
-
+	  if(PiKProMu.PdgCode() == 13)
+	    {nummu += 1;}
+	  
 	  //it starts where the track starts 
 	  PiKProMu.Vertex(track[0]);
 
@@ -416,6 +423,12 @@ namespace ertool {
 	  neutrino.AddDaughter(PiKProMu);
 	 
 	}
+
+	_Ngamma = shower_kin.size()+1;
+	_Ntrks = track_kin.size();
+	_Nmu = nummu;
+	std::cout << "MUON Number : " << nummu << std::endl; 
+	_alg_tree->Fill();  
 
 	nuMom.Normalize();
 	neutrino.Momentum(nuMom*nuKE);
@@ -431,8 +444,11 @@ namespace ertool {
 	  else if(!_vtx_assister){
 	    std::cout << "Event has no vertex activity! \t\t\t\t ::Possibly Signal...but not counted::" << std::endl; }
 	}}
-    }//Loop over all showers
       
+    }//Loop over all showers
+
+    
+
     return SingleGamEvent; }
 
   void AlgoSingleGamma::ProcessEnd(TFile *fout){
@@ -486,6 +502,9 @@ namespace ertool {
     _IPtrkBody = -1;
     _distBackAlongTraj = -1;
     _distToTopWall  = -999999;
+    _Ngamma = -1;
+    _Ntrks = -1;
+    _Nmu = -1;
 
     return;
     

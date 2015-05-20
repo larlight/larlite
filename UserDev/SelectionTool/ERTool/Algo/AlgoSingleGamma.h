@@ -170,8 +170,12 @@ namespace ertool {
     //Tree -> one entry per shower-other comparison
     // therefore possibly multiple entries for each shower
     TTree* _alg_tree;
+
+    //For every Shower
     double _E; // energy of shower
     int    _PDG; // PDG code assigned by AlgoEMPart
+    
+   
     int    _VsTrack; // comparing vs track (==1)
     double _thatE; // Energy of other shower/track
     double _dEdx;
@@ -181,8 +185,12 @@ namespace ertool {
     double _IPtrkBody; // distance from IP to body of track (if comparing with track)
     double _distBackAlongTraj; // distance backwards from vertex to nearest wall
     double _distToTopWall; // distance backwards along traj from vertex to top wall(extended to infinity)
-
-
+    
+    //At the algo level what is tied to an event
+    int _Ngamma; // Number of photons matched to an event 
+    int _Ntrks; // Number of tracks matched to an event
+    int _Nmu; // Number of muons matched to an event
+    
 
 
   };
