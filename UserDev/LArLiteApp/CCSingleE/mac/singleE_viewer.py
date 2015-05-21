@@ -3,6 +3,7 @@ from ROOT import gSystem
 from ROOT import ertool
 from ROOT import larlite as fmwk
 from algoviewer import viewAll, view
+from seltool.ccsingleeDef import GetCCSingleEInstance
 
 if len(sys.argv) < 2:
     msg  = '\n'
@@ -15,19 +16,21 @@ if len(sys.argv) < 2:
 my_proc = fmwk.ana_processor()
 my_proc.enable_filter(False)
 
-# Create algorithm
-my_algo = ertool.AlgoSingleE()
-my_algo.useRadLength(True)
-my_algo.setVerbose(False)
-my_algo.setRejectLongTracks(True)
-my_algo.setVtxToTrkStartDist(1)
-my_algo.setVtxToTrkDist(1)
-my_algo.setVtxToShrStartDist(50)
-my_algo.setMaxIP(1)
-my_algo.setVtxProximityCut(5)
-my_algo.setEThreshold(100)
-my_algo.LoadParams()
+# Get Default CCSingleE Algorithm instance
+# this sets default parameters
+# this information is loaded from:
+# $LARLITE_BASEDIR/python/seltool/GetCCSingleEInstance
+# and the algorithm instance is the return of the
+# function GetCCSingleEInstance()
+my_algo = GetCCSingleEInstance()
+
 # Create ERTool filter
+# This filter removes any track that
+# is less than 3 mm in length
+# these tracks exist in "perfect reco"
+# but at this stage it is unreasonable
+# to assume we will be able to
+# reconstruct them
 my_filter = ertool.FilterTrackLength()
 my_filter.setLengthCut(0.3)
 
@@ -61,6 +64,7 @@ my_anaunit._mgr.SetFilter(my_filter)
 my_anaunit._mgr.SetAna(my_ana)
 my_anaunit.SetMinEDep(Ecut)
 my_anaunit._mgr._mc_for_ana = True
+
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
 my_anaunit.SetShowerProducer(True,"mcreco");
@@ -68,11 +72,12 @@ my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetVtxProducer(True,"generator");
 #my_anaunit.SetShowerProducer(False,"mergeall");
 #my_anaunit.SetShowerProducer(False,"newdefaultreco");
-my_anaunit.SetShowerProducer(True,"mcreco");
+#my_anaunit.SetShowerProducer(True,"mcreco");
 #my_anaunit.SetShowerProducer(False,"showerreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 # ************************************************
+
 my_proc.add_process(MCfilter)
 my_proc.add_process(my_anaunit)
 
