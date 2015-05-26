@@ -10,11 +10,10 @@ if len(sys.argv) < 2:
 from ROOT import gSystem
 from ROOT import larlite as fmwk
 from ROOT import ertool
-ertool.Manager
-fmwk.geo.PlaneID
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
+my_proc.enable_filter(True)
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):
@@ -27,20 +26,17 @@ my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 my_proc.set_ana_output_file("michel_selection_ana_out.root")
 
 # Possible filter to select true events
-#my_proc.enable_filter(True)
-#pdgsel = fmwk.PDGSelection()
-#pdgsel.Select(11,pdgsel.kGENERATOR,1)
-#my_proc.add_process(pdgsel)
+my_proc.add_process(fmwk.MichelElectronFilter())
 
 my_algo = ertool.AlgoMichelE()
 my_algo.LoadParams()
 my_ana = fmwk.ExampleERSelection()
 my_ana._mgr.SetAlgo(my_algo)
 # OPTIONAL:
-my_ana.SetTrackProducer(False,"stitchkalmanhit")
-my_ana.SetShowerProducer(False,"newdefaultreco")
-#my_ana.SetTrackProducer(True,"mcreco")
-#my_ana.SetShowerProducer(True,"mcreco")
+#my_ana.SetTrackProducer(False,"stitchkalmanhit")
+#my_ana.SetShowerProducer(False,"newdefaultreco")
+my_ana.SetTrackProducer(True,"mcreco")
+my_ana.SetShowerProducer(True,"mcreco")
 
 my_proc.add_process(my_ana)
 my_proc.run()
