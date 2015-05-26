@@ -55,13 +55,18 @@ namespace cmtool {
     void SetQFracCut(double kaleko) { _frac_hits_to_keep = kaleko; }
 
   protected:
+
     /// Function to take a list of pxhits, fit to a line, and return the slope of the line
     double ComputeSlope(const std::vector<larutil::PxHit> &pxhit_vector);
+
     /// Function to take in a list of pxhits and return a list of 
     /// highest "frac" fraction of those hits (by charge)
+    /// This is super inefficient. I copy the hit vector, sort it, then make ANOTHER hit vector w/ reduced size
+    /// Can definitely be rewritten faster. I don't care enough right now.
     const std::vector<larutil::PxHit> GetHighQHits(const std::vector<larutil::PxHit> &pxhit_vector, double frac);
-    /// Function needed to sort pxhit vector by charge
-    bool SortPxHitsMethod(const larutil::PxHit &h1, const larutil::PxHit &h2);
+
+    /// Function needed to sort pxhit vector by charge (static b/c that's the only way it'll compile...)
+    static bool SortPxHitsMethod(const larutil::PxHit &h1, const larutil::PxHit &h2);
 
     /// Obligatory debug flag
     bool _debug;

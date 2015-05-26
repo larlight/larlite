@@ -26,18 +26,20 @@ namespace cmtool {
     if ( (hits1 < _min_n_hits) or (hits2 < _min_n_hits) )
       return false;
 
+    auto high_q_hits1 = GetHighQHits(cluster1.GetHitVector(),_frac_hits_to_keep);
+    auto high_q_hits2 = GetHighQHits(cluster2.GetHitVector(),_frac_hits_to_keep);
     
-    double slope1 = ComputeSlope(cluster1.GetHitVector());
-    double slope2 = ComputeSlope(cluster2.GetHitVector());
-
+    double slope1 = ComputeSlope(high_q_hits1);
+    double slope2 = ComputeSlope(high_q_hits2);
 
     if (_debug){
       std::cout << "Cluster1:" << std::endl;
       std::cout << "\t Start: (" << cluster1.GetParams().start_point.w << ", " << cluster1.GetParams().start_point.t << ")" << std::endl; 
+      std::cout << "\t Slope: "<<slope1<<std::endl;
       std::cout << "Cluster2:" << std::endl;
       std::cout << "\t Start: (" << cluster2.GetParams().start_point.w << ", " << cluster2.GetParams().start_point.t << ")" << std::endl; 
+      std::cout << "\t Slope: "<<slope2<<std::endl;
       std::cout << std::endl;
-
     }
 
 
@@ -76,19 +78,25 @@ namespace cmtool {
     
   }
 
-
   const std::vector<larutil::PxHit> CBAlgoHighQLineCompat::GetHighQHits(const std::vector<larutil::PxHit> &pxhit_vector, double frac){
+    /// This is super inefficient. I copy the hit vector, sort it, then make ANOTHER hit vector w/ reduced size
+    /// Can definitely be rewritten faster. I don't care enough right now.
 
+    // Make a copy of the input pxhit vector
     std::vector<larutil::PxHit> myvec = pxhit_vector;
+
+    // Sort the copy by charge (highest charge hits first)
     std::sort(myvec.begin(),myvec.end(),CBAlgoHighQLineCompat::SortPxHitsMethod);
-    // Implement me! Sort pxhit_vector by chage,
-    // then make my own pxhit vector of the highest "frac" fraction, then return it
-    return myvec;
+
+    // Then make my own pxhit vector of the highest "frac" fraction, then return it
+    size_t nhits_reduced = size_t(myvec.size()*frac);
+    return std::vector<larutil::PxHit>(myvec.begin(),myvec.begin()+nhits_reduced);
 
   }
 
   bool CBAlgoHighQLineCompat::SortPxHitsMethod(const larutil::PxHit &h1, const larutil::PxHit &h2){
     return h1.charge > h2.charge;
   }
+
 }//end namespace cmtool
 #endif
