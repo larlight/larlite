@@ -11,6 +11,7 @@ namespace ertool {
   {
     _name     = "AlgoMichelE";
     michel_energy = 0;
+    shower_st_to_track_end = 0;
   }
 
   void AlgoMichelE::ProcessEnd(TFile* fout){
@@ -19,6 +20,8 @@ namespace ertool {
       fout->cd();
       if(michel_energy)
 	michel_energy->Write();
+      if(shower_st_to_track_end)
+	shower_st_to_track_end->Write();
 
     }
 
@@ -42,7 +45,8 @@ namespace ertool {
     
     if(!michel_energy)
       michel_energy = new TH1F("michel_energy","michel_energy",100,0,100);
-    
+    if(!shower_st_to_track_end)
+      shower_st_to_track_end = new TH1F("shower_st_to_track_end","shower_st_to_track_end",100,0,100);
   }
   
 
@@ -60,26 +64,30 @@ namespace ertool {
 
     //Loop over all showers in the event    
     for(size_t is = 0; is < data.Shower().size(); is++){
-      
+
       Shower shower(data.Shower(is));
 
       //Ask EMP if shower is electron, using only de/dx
       if( _alg_emp.LL(true, shower._dedx, -1) > _alg_emp.LL(false, shower._dedx, -1)){
+
 	//Loop over all tracks 
 	for(size_t it = 0; it < data.Track().size(); it++){
+
 	  Track track(data.Track(it));
 
-	  //Check if this shower is at the end (w/in 3cm) of this tracks,
-	  //Making sure the track is at least 25cm long
+	  shower_st_to_track_end->Fill(shower.Start().Dist(track.back()));
 
-	  if(shower.Start().Dist(track.back()) < 3. && track.Length() > 25.){
+	  //Check if this shower is at the end (w/in 3cm) of this tracks,
+	  //Making sure the track is at least 10cm long
+	  if(shower.Start().Dist(track.back()) < 3. && track.Length() > 10.){
 	    n_michel_e++;
 	    
 	    if(michel_energy)
 	      michel_energy->Fill(shower._energy);
-	    
 	    break;
+
 	  }//End if michel was found
+
 	}//End loop over tracks
       }//End if shower is likely an electron
     }//End loop over showers

@@ -10,6 +10,7 @@ if len(sys.argv) < 2:
 from ROOT import gSystem
 from ROOT import larlite as fmwk
 from ROOT import ertool
+from seltool.ccsingleeDef import GetCCSingleEInstance
 #ertool.Manager
 
 # open file on which to write values
@@ -22,31 +23,30 @@ from ROOT import ertool
 my_proc = fmwk.ana_processor()
 my_proc.enable_filter(True)
 
-# Create algorithm
-my_algo = ertool.AlgoSingleE()
-my_algo.useRadLength(True)
-my_algo.setVerbose(False)
-my_algo.setRejectLongTracks(True)
-my_algo.setVtxToTrkStartDist(1)  #1
-my_algo.setVtxToTrkDist(1)	 #1
-my_algo.setVtxToShrStartDist(50) #50
-my_algo.setMaxIP(1)		 #1
-my_algo.setVtxProximityCut(5)	 #5
-my_algo.setEThreshold(0.)	 #100
-#my_algo.setBDtW(10)
-#my_algo.setBDtTW(10)
-#my_algo.LoadParams()
+# Get Default CCSingleE Algorithm instance
+# this sets default parameters
+# this information is loaded from:
+# $LARLITE_BASEDIR/python/seltool/GetCCSingleEInstance
+# and the algorithm instance is the return of the
+# function GetCCSingleEInstance()
+my_algo = GetCCSingleEInstance()
+
 # Create ERTool filter
+# This filter removes any track that
+# is less than 3 mm in length
+# these tracks exist in "perfect reco"
+# but at this stage it is unreasonable
+# to assume we will be able to
+# reconstruct them
 my_filter = ertool.FilterTrackLength()
 my_filter.setLengthCut(0.3)
 
 # Create MC Filter
-
 # This filter is if you want to look at CC1E events
 MCfilter = fmwk.MC_CC1E_Filter();
 #Set flip to FALSE if you are looking for efficiency, TRUE if you are looking for MID efficiency
-MCfilter.flip(False)
-#MCfilter.flip(True)
+#MCfilter.flip(False)
+MCfilter.flip(True)
 #MCfilter.SetFilterEnergy(.02) 
 # Use this filter instead if you want to look at CCQE channel events with specified number of mcshowers and
 # mctracks above specified energies coming from the neutrino
@@ -86,10 +86,11 @@ my_anaunit._mgr.SetAna(my_ana)
 #Do not change this value unless you know what you are doing.
 my_anaunit.SetMinEDep(Ecut)
 my_anaunit._mgr._mc_for_ana = True
+
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
-my_anaunit.SetShowerProducer(True,"mcreco");
-#my_anaunit.SetShowerProducer(False,"showerreco");
+#my_anaunit.SetShowerProducer(True,"mcreco");
+my_anaunit.SetShowerProducer(False,"showerreco");
 #my_anaunit.SetShowerProducer(False,"newdefaultreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetShowerProducer(False,"mergeall");
@@ -97,20 +98,18 @@ my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 #my_anaunit.SetVtxProducer(True,"generator");
 # ************************************************
+
+# Add MC filter and analysis unit
+# to the process to be run
 my_proc.add_process(MCfilter)
 my_proc.add_process(my_anaunit)
 
 my_proc.run()
-
-# save efficiency to file
-#eff = my_ana.getEfficiency()
-#myfile.write(str(eff)+"\n")
 
 # done!
 print
 print "Finished running ana_processor event loop!"
 print
 
-#my_algo.StoreParams()
 sys.exit(0)
 

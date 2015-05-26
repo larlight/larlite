@@ -1649,8 +1649,8 @@ namespace larlite {
 			       const unsigned int subrun_id,
 			       const unsigned int event_id)
   { 
-    if(_run_id == run_id && _subrun_id == subrun_id && _event_id == event_id)
-      return;
+    //if(_run_id == run_id && _subrun_id == subrun_id && _event_id == event_id)
+    //  return;
 
     _run_id = run_id; 
     _subrun_id = subrun_id; 

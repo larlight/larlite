@@ -10,6 +10,8 @@
 #pragma link off all functions;
 
 #pragma link C++ class larlite::MC_NC1Gamma_Filter+;
+#pragma link C++ class larlite::MC_NCNGamma_Filter+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 

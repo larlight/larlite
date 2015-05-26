@@ -78,6 +78,7 @@ namespace ertool {
 		const double& z);
     void Time(const double& t) {_time = t;}
     void Momentum(const ::geoalgo::Vector_t& mom);
+    void SetPdgCode(const int pdg) {_pdg_code = pdg;}
     void Momentum(const double& px,
 		  const double& py,
 		  const double& pz);

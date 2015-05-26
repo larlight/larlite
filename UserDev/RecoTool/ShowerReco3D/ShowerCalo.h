@@ -27,7 +27,7 @@ namespace showerreco {
   };
     
     // Define constants to be used by ShowerCalo
-  static const double DEFAULT_ECorr = 1.81;//1.75133;
+  static const double DEFAULT_ECorr = 1.5833;//1.81;//1.75133;
   static const double DEFAULT_ECorrError = 0.173707;
     
   }

@@ -16,6 +16,7 @@ my_proc.set_ana_output_file("")
 
 raw_viewer   = larlite.ClusterViewer()
 merge_viewer = larlite.MergeViewer()
+ConfigureMergeAllInstance(merge_viewer)
 
 ########################################
 # decide what to show on display
@@ -27,22 +28,6 @@ raw_viewer.SetDrawStartEnd(False)
 merge_viewer.SetPrintClusterInfo(True)
 merge_viewer.SetDrawStartEnd(False)
 merge_viewer.SetDrawPolygon(True)
-
-########################################
-# attach merge algos here
-########################################
-
-
-########################################
-# MERGE ALGORITHMS
-########################################
-algo_array = cmtool.CBAlgoArray()
-algo_array.AddAlgo(cmtool.CBAlgoMergeAll())
-merge_viewer.GetManager().AddMergeAlgo(algo_array)
-# done attaching merge algos
-########################################
-merge_viewer.GetManager().MergeTillConverge(True)
-
 
 my_proc.add_process(raw_viewer)
 

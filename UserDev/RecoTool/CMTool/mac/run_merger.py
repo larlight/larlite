@@ -40,6 +40,6 @@ mgr.set_data_to_write(fmwk.data.kCluster,"mergedfuzzy2")
 mgr.set_data_to_write(fmwk.data.kAssociation,"mergedfuzzy2")
 #mgr.add_process(merge_all)
 
-mgr.run(0,10)
+mgr.run()
 
 
