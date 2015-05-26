@@ -13,6 +13,7 @@
 
 #pragma link C++ namespace cluster+;
 
+#pragma link C++ class std::vector<larutil::PxHit>+;
 #pragma link C++ class std::vector<const larutil::PxHit*>+;
 
 #pragma link C++ class cluster::ClusterParamsAlg+;
