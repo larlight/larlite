@@ -1,7 +1,7 @@
 #ifndef CPALGO_CLASS_NAME_CXX
 #define CPALGO_CLASS_NAME_CXX
 
-#include "CPAlgo_Class_Name.hh"
+#include "CPAlgo_Class_Name.h"
 
 namespace cmtool {
 
