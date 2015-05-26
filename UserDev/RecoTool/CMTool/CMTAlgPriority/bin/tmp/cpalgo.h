@@ -1,9 +1,9 @@
 /**
- * \file CBAlgo_Class_Name.hh
+ * \file CPAlgo_Class_Name.h
  *
  * \ingroup Working_Package
  * 
- * \brief Class def header for a class CBAlgo_Class_Name
+ * \brief Class def header for a class CPAlgo_Class_Name
  *
  * @author USER_NAME
  */
@@ -11,39 +11,38 @@
 /** \addtogroup Working_Package
 
     @{*/
-#ifndef CBALGO_CLASS_NAME_HH
-#define CBALGO_CLASS_NAME_HH
+#ifndef CPALGO_CLASS_NAME_H
+#define CPALGO_CLASS_NAME_H
 
-#include "CBoolAlgoBase.hh"
+#include "CPriorityAlgoBase.h"
 
 namespace cmtool {
   /**
-     \class CBAlgo_Class_Name
-     User implementation for CBoolAlgoBase class
+     \class CPAlgo_Class_Name
+     User implementation for CPriorityAlgoBase class
      doxygen documentation!
   */
-  class CBAlgo_Class_Name : public CBoolAlgoBase {
+  class CPAlgo_Class_Name : public CPriorityAlgoBase {
     
   public:
     
     /// Default constructor
-    CBAlgo_Class_Name();
+    CPAlgo_Class_Name();
     
     /// Default destructor
-    virtual ~CBAlgo_Class_Name(){};
+    virtual ~CPAlgo_Class_Name(){};
 
     //
-    // Author should be aware of 3 functions at least: Bool, Report, 
+    // Author should be aware of 3 functions at least: Priority, Report, 
     // and Reset. More possibly-useful functions can be found in the later 
     // part but commented out. All of these functions are virtual and defined
     // in the base class.
 
     /**
-       Core function: given two CPAN inputs, return a boolean which indicates 
-       whether two clusters are compatible or not
+       Core function: given the CPAN input, return a float which indicates 
+       the user-defined priority for analysis.
     */
-    virtual bool Bool(const ::cluster::ClusterParamsAlg &cluster1,
-		      const ::cluster::ClusterParamsAlg &cluster2);
+    virtual float Priority(const ::cluster::ClusterParamsAlg &cluster);
 
     /**
        Optional function: called after each iterative approach if a manager class is

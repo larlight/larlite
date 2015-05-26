@@ -1,7 +1,7 @@
 #ifndef CBALGO_CLASS_NAME_CXX
 #define CBALGO_CLASS_NAME_CXX
 
-#include "CBAlgo_Class_Name.hh"
+#include "CBAlgo_Class_Name.h"
 
 namespace cmtool {
 
