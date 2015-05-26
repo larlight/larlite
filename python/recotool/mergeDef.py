@@ -2,25 +2,28 @@
 ########################################################################
 # This module contains the default preliminary merging settings
 # Not meant to be run as a stand alone script, instead mean to be imported
+# The "Configure" functions hold the definitions of different stage merge algos
+# and parameters. The "Get" functions are wrappers for the "Configure" functions
+# These are separated so a user can pass objects to Configure function that
+# inherit from ClusterMerger, IE to configure MergeViewer objects.
 ########################################################################
 
 from larlite import larlite as fmwk
 from cpp_classes import cmtool
 
-def GetMergeAllInstance(producer="fuzzycluster",saveOutput=True):
-    
-    result = fmwk.ClusterMerger()
+def ConfigureMergeAllInstance(merger_instance=0, producer="fuzzycluster",saveOutput=True):
+    if not merger_instance:
+        raise Exception('To call ConfigureDefaultMergerInstance function, you need to hand it a ClusterMerger() instance! Or, an instance of something that inherits from ClusterMerger.')
 
-    result.GetManager().AddMergeAlgo(cmtool.CBAlgoMergeAll())
-    result.GetManager().MergeTillConverge(True)
-    result.SetInputProducer(producer)
-    result.SaveOutputCluster(saveOutput)
+    merger_instance.GetManager().AddMergeAlgo(cmtool.CBAlgoMergeAll())
+    merger_instance.GetManager().MergeTillConverge(True)
+    merger_instance.SetInputProducer(producer)
+    merger_instance.SaveOutputCluster(saveOutput)
 
-    return result
-
-def GetDefaultMergerInstance(producer='fuzzycluster',saveOutput=True):
-
-    result = fmwk.ClusterMerger()
+def ConfigureDefaultMergerInstance(merger_instance=0,producer='fuzzycluster',saveOutput=True):
+    #need to build in protection if user doesn't supply merger instance
+    if not merger_instance:
+        raise Exception('To call ConfigureDefaultMergerInstance function, you need to hand it a ClusterMerger() instance! Or, an instance of something that inherits from ClusterMerger.')
 
     ######################################
     # attach 1st stage  merge algos here #
@@ -37,7 +40,7 @@ def GetDefaultMergerInstance(producer='fuzzycluster',saveOutput=True):
     outofcone_prohibit.SetMaxAngleSep(20.)
     prohib_array.AddAlgo(outofcone_prohibit,False)
     
-    result.GetManager().AddSeparateAlgo(prohib_array)
+    merger_instance.GetManager().AddSeparateAlgo(prohib_array)
 
     ## MERGE ALGOS ##
     merge_array = cmtool.CBAlgoArray()
@@ -53,12 +56,13 @@ def GetDefaultMergerInstance(producer='fuzzycluster',saveOutput=True):
     pcontain = cmtool.CBAlgoPolyContain()
     merge_array.AddAlgo(pcontain,False)
     
-    result.GetManager().AddMergeAlgo(merge_array)
+    merger_instance.GetManager().AddMergeAlgo(merge_array)
 
-    result.GetManager().MergeTillConverge(True)
+    merger_instance.GetManager().MergeTillConverge(True)
 
-    result.SetInputProducer(producer)
-    result.SaveOutputCluster(saveOutput)
+    merger_instance.SetInputProducer(producer)
+    merger_instance.SetOutputProducer('fuzzyclustermerger')
+    merger_instance.SaveOutputCluster(saveOutput)
 
     ########################################
     # done attaching 2nd stage merge algos #
@@ -71,7 +75,7 @@ def GetDefaultMergerInstance(producer='fuzzycluster',saveOutput=True):
     ########################################
     # Remove tracks with priority algo!
     ########################################
-    result.GetManager(1).AddPriorityAlgo(cmtool.CPAlgoIgnoreTracks())
+    merger_instance.GetManager(1).AddPriorityAlgo(cmtool.CPAlgoIgnoreTracks())
 
     ########################################
     # PROHIBIT ALGORITHMS
@@ -101,7 +105,7 @@ def GetDefaultMergerInstance(producer='fuzzycluster',saveOutput=True):
     angle_prohibit.SetDebug(False)
     prohib_array.AddAlgo(angle_prohibit,False)
 
-    result.GetManager(1).AddSeparateAlgo(prohib_array)
+    merger_instance.GetManager(1).AddSeparateAlgo(prohib_array)
 
     ########################################
     # MERGE ALGORITHMS
@@ -130,18 +134,16 @@ def GetDefaultMergerInstance(producer='fuzzycluster',saveOutput=True):
     polyshortalg_bigclusters.SetDebug(False)
     algo_array.AddAlgo(polyshortalg_bigclusters,False)
 
-    result.GetManager(1).AddMergeAlgo(algo_array)
-    result.GetManager(1).MergeTillConverge(True)
+    merger_instance.GetManager(1).AddMergeAlgo(algo_array)
+    merger_instance.GetManager(1).MergeTillConverge(True)
 
     ########################################
     # done attaching 2nd stage merge algos #
     ########################################
 
-    return result
-
-def GetPrelimMergerInstance(producer="fuzzycluster",saveOutput=True):
-    
-    result = fmwk.ClusterMerger()
+def ConfigurePrelimMergerInstance(merger_instance=0, producer="fuzzycluster",saveOutput=True):
+    if not merger_instance:
+        raise Exception('To call ConfigureDefaultMergerInstance function, you need to hand it a ClusterMerger() instance! Or, an instance of something that inherits from ClusterMerger.')
 
     ########################################
     # attach merge algos here
@@ -158,7 +160,7 @@ def GetPrelimMergerInstance(producer="fuzzycluster",saveOutput=True):
     outofcone_prohibit.SetMaxAngleSep(20.)
     prohib_array.AddAlgo(outofcone_prohibit,False)
     
-    result.GetManager().AddSeparateAlgo(prohib_array)
+    merger_instance.GetManager().AddSeparateAlgo(prohib_array)
 
     ## MERGE ALGOS ##
     merge_array = cmtool.CBAlgoArray()
@@ -174,20 +176,19 @@ def GetPrelimMergerInstance(producer="fuzzycluster",saveOutput=True):
     pcontain = cmtool.CBAlgoPolyContain()
     merge_array.AddAlgo(pcontain,False)
     
-    result.GetManager().AddMergeAlgo(merge_array)
+    merger_instance.GetManager().AddMergeAlgo(merge_array)
 
-    result.GetManager().MergeTillConverge(True)
+    merger_instance.GetManager().MergeTillConverge(True)
 
-    result.SetInputProducer(producer)
-    result.SaveOutputCluster(saveOutput)
+    merger_instance.SetInputProducer(producer)
+    merger_instance.SaveOutputCluster(saveOutput)
 
-    return result
+def ConfigureSecondMergerInstance(merger_instance=0, producer="mergedfuzzycluster",saveOutput=True):
+    if not merger_instance:
+        raise Exception('To call ConfigureDefaultMergerInstance function, you need to hand it a ClusterMerger() instance! Or, an instance of something that inherits from ClusterMerger.')
 
-def GetSecondMergerInstance(producer="mergedfuzzycluster",saveOutput=True):
-    
-    result = fmwk.ClusterMerger()
-    result.SetInputProducer(producer)
-    result.SaveOutputCluster(saveOutput)
+    merger_instance.SetInputProducer(producer)
+    merger_instance.SaveOutputCluster(saveOutput)
 
 
     ########################################
@@ -197,9 +198,7 @@ def GetSecondMergerInstance(producer="mergedfuzzycluster",saveOutput=True):
     ########################################
     # Remove tracks with priority algo!
     ########################################
-    result.GetManager().AddPriorityAlgo(cmtool.CPAlgoIgnoreTracks())
-
-
+    merger_instance.GetManager().AddPriorityAlgo(cmtool.CPAlgoIgnoreTracks())
 
     ########################################
     # PROHIBIT ALGORITHMS
@@ -229,7 +228,7 @@ def GetSecondMergerInstance(producer="mergedfuzzycluster",saveOutput=True):
     angle_prohibit.SetDebug(False)
     prohib_array.AddAlgo(angle_prohibit,False)
 
-    result.GetManager().AddSeparateAlgo(prohib_array)
+    merger_instance.GetManager().AddSeparateAlgo(prohib_array)
 
     ########################################
     # MERGE ALGORITHMS
@@ -258,14 +257,29 @@ def GetSecondMergerInstance(producer="mergedfuzzycluster",saveOutput=True):
     polyshortalg_bigclusters.SetDebug(False)
     algo_array.AddAlgo(polyshortalg_bigclusters,False)
 
-    result.GetManager().AddMergeAlgo(algo_array)
-    result.GetManager().MergeTillConverge(True)
+    merger_instance.GetManager().AddMergeAlgo(algo_array)
+    merger_instance.GetManager().MergeTillConverge(True)
 
     ########################################
     # done attaching merge algos
     ########################################
 
-    return result
+def GetMergeAllInstance(producer='fuzzycluster',saveOutput=True):
+    merger_instance = fmwk.ClusterMerger()
+    ConfigureMergeAllInstance(merger_instance,producer=producer,saveOutput=saveOutput)
+    return merger_instance
 
+def GetDefaultMergerInstance(producer='fuzzycluster',saveOutput=True):
+    merger_instance = fmwk.ClusterMerger()
+    ConfigureDefaultMergerInstance(merger_instance,producer=producer,saveOutput=saveOutput)
+    return merger_instance
 
+def GetPrelimMergerInstance(producer='fuzzycluster',saveOutput=True):
+    merger_instance = fmwk.ClusterMerger()
+    ConfigurePrelimMergerInstance(merger_instance,producer=producer,saveOutput=saveOutput)
+    return merger_instance
 
+def GetSecondMergerInstance(producer='fuzzycluster',saveOutput=True):
+    merger_instance = fmwk.ClusterMerger()
+    ConfigureSecondMergerInstance(merger_instance,producer=producer,saveOutput=saveOutput)
+    return merger_instance
