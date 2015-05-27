@@ -115,7 +115,7 @@ namespace larlite {
     ClusterMerger::analyze(storage);
     
     // Find hits-per-cluster
-    for(auto const &cl : ClusterMerger::GetManager().GetClusters()) {
+    for(auto const &cl : ClusterMerger::GetManager(this->GetNumManager()-1).GetClusters()) {
       
       UChar_t plane = cl.Plane();
       
@@ -209,7 +209,7 @@ namespace larlite {
 
     int index_offset = 0;
     //get the clusters (after merging)
-    for (auto const &cl : ClusterMerger::GetManager().GetClusters()) {
+    for (auto const &cl : ClusterMerger::GetManager(this->GetNumManager()-1).GetClusters()) {
       if (cl.Plane() == plane) break;
       else index_offset++;
     }
