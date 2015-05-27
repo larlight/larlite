@@ -10,11 +10,12 @@ namespace cluster{
     if (s != "") net.create_from_file(s);
     else
       net.create_from_file(fInputFileName);
+    net.print_parameters();
   }
 
   void FANNModule::init(){
 
-    larutil::LArUtilManager::Reconfigure(larlite::geo::kArgoNeuT);
+    // larutil::LArUtilManager::Reconfigure(larlite::geo::kArgoNeuT);
     return;
   }
 

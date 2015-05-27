@@ -40,6 +40,7 @@ namespace cluster{
       fOutputFileName = "default.net";
       fNumHiddenLayers = 0;
       fHiddenLayerLength.clear();
+      _use_cascade = false;
     }
 
     /// Default destructor
@@ -69,7 +70,7 @@ namespace cluster{
     /**
      * call this function to actually initialize the network.
      */
-    void init();
+    void init(std::string file);
 
     /**
      * Runs the fann training alg on 1 iteration of input data
@@ -79,6 +80,15 @@ namespace cluster{
     void trainOnData(float * data, float * truth);
     void trainOnData(std::vector<float>& data,
                      std::vector<float>& truth);
+    /**
+     * @brief train the data on a file
+     * @details run this training over a file until the desired precision is reached
+     * 
+     * 
+     * @param file input file
+     */
+    void train();
+
 
     void run(float * data);
     void run(std::vector<float> & data);
@@ -90,13 +100,20 @@ namespace cluster{
      */
     void saveFANNToFile(std::string s = "");
 
-    void configureHiddenLayers(int numLayers, ... );
-
+    /**
+     * @brief add a hidden layer
+     * @details call this function to add a hidden layer. Layers are added to the back of the previous layer
+     * 
+     * @param nodes number of nodes in this layer
+     */
+    void addLayer(int nodes);
 
   private:
     double fFeatureVectorLength;
     double fOutputVectorLength;
     std::string fOutputFileName;
+
+    bool _use_cascade;
 
     int    fNumHiddenLayers;
     std::vector<int> fHiddenLayerLength;
@@ -104,7 +121,7 @@ namespace cluster{
   public:
     // this is the actual neural network.  Right now only one per class:
     FANN::neural_net ann;
-
+    FANN::training_data trainingData;
   };
 }
 

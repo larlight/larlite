@@ -14,7 +14,7 @@ namespace cluster{
     fMinNHits = 1;
     fGSer=nullptr;
     enableFANN = false;
-    verbose=true;
+    verbose=false;
     Initialize();
   }
 
@@ -23,7 +23,7 @@ namespace cluster{
     fMinNHits = 1;
     fGSer=nullptr;
     enableFANN = false;
-    verbose=true;
+    verbose=false;
     SetHits(inhitlist);
   }
 
@@ -32,7 +32,7 @@ namespace cluster{
     fMinNHits = 1;
     fGSer=nullptr;
     enableFANN = false;
-    verbose=true;
+    verbose=false;
     SetHits(inhitlist);
   }
 
@@ -123,22 +123,19 @@ namespace cluster{
   }
 
   void  ClusterParamsAlg::GetFANNVector(std::vector<float> & data) const{
-    unsigned int length = 13;
+    unsigned int length = 9;
     if (data.size() != length) 
-      data.resize(length);
-    data[0]  = fParams.opening_angle / PI;
-    data[1]  = fParams.opening_angle_charge_wgt / PI;
-    data[2]  = fParams.closing_angle / PI;
-    data[3]  = fParams.closing_angle_charge_wgt / PI;
-    data[4]  = fParams.eigenvalue_principal;
-    data[5]  = fParams.eigenvalue_secondary;
-    data[6]  = fParams.width / fParams.length;
-    data[7]  = fParams.hit_density_1D / fParams.modified_hit_density;
-    data[8]  = fParams.multi_hit_wires/fParams.N_Wires;
-    data[9]  = fParams.N_Hits_HC / fParams.N_Hits;
-    data[10] = fParams.modified_hit_density;
-    data[11] = fParams.RMS_charge / fParams.mean_charge;
-    data[12] = log(fParams.sum_charge / fParams.length);
+      data.reserve(length);
+    data.push_back( -fParams.opening_angle / PI + fParams.closing_angle / PI );
+    // data.push_back( -fParams.opening_angle_charge_wgt / PI + fParams.closing_angle_charge_wgt / PI );
+    data.push_back( -log(1-fParams.eigenvalue_principal)/10.0 );
+    // data.push_back( -log(fParams.eigenvalue_secondary) / 10.0 );
+    data.push_back( fParams.width / fParams.length );
+    // data.push_back( fParams.hit_density_1D / fParams.modified_hit_density );
+    data.push_back( fParams.multi_hit_wires/fParams.N_Wires );
+    data.push_back( fParams.modified_hit_density );
+    data.push_back( fParams.RMS_charge / fParams.mean_charge );
+    data.push_back( log(fParams.sum_charge / fParams.length)/10.0 );
     return;
   }
 
@@ -151,25 +148,44 @@ namespace cluster{
   void  ClusterParamsAlg::PrintFANNVector(){
     std::vector<float> data;
     GetFANNVector(data);
-    if(verbose){
-    std::cout << "Printing FANN input vector:\n"
-              << "   Opening Angle (normalized)  ... : " << data[0] << "\n"
-              << "   Opening Angle charge weight  .. : " << data[1] << "\n"
-              << "   Closing Angle (normalized)  ... : " << data[2] << "\n"
-              << "   Closing Angle charge weight  .. : " << data[3] << "\n"
-              << "   Principal Eigenvalue  ......... : " << data[4] << "\n"
-              << "   Secondary Eigenvalue  ......... : " << data[5] << "\n"
-              << "   Width / Length  ............... : " << data[6] << "\n"
-              << "   Hit Density / M.H.D.  ......... : " << data[7] << "\n"
-              << "   Percent MultiHit Wires  ....... : " << data[8] << "\n"
-              << "   Percent High Charge Hits  ..... : " << data[9] << "\n"
-              << "   Modified Hit Density  ......... : " << data[10] << "\n"
-              << "   Charge RMS / Mean Charge ...... : " << data[11] << "\n"
-              << "   log(Sum Charge / Length) ...... : " << data[12] << "\n";
-    }
+    // if(verbose){
+    int i = 0;
+    std::cout << "Printing FANN input vector:\n";
+    std::cout << "   Opening - Closing Angle (normalized)  ... : " << data[i] << "\n"; i++;
+    // std::cout << "   Opening - Closing Angle charge weight  .. : " << data[i] << "\n"; i++;
+    // std::cout << "   Closing Angle (normalized)  ............. : " << data[i] << "\n"; i++;
+    // std::cout << "   Closing Angle charge weight  ............ : " << data[i] << "\n"; i++;
+    std::cout << "   Principal Eigenvalue  ................... : " << data[i] << "\n"; i++;
+    // std::cout << "   Secondary Eigenvalue  ................... : " << data[i] << "\n"; i++;
+    std::cout << "   Width / Length  ......................... : " << data[i] << "\n"; i++;
+    // std::cout << "   Hit Density / M.H.D.  ................... : " << data[i] << "\n"; i++;
+    std::cout << "   Percent MultiHit Wires  ................. : " << data[i] << "\n"; i++;
+    // std::cout << "   Percent High Charge Hits  ............... : " << data[i] << "\n"; i++;
+    std::cout << "   Modified Hit Density  ................... : " << data[i] << "\n"; i++;
+    std::cout << "   Charge RMS / Mean Charge ................ : " << data[i] << "\n"; i++;
+    std::cout << "   log(Sum Charge / Length) ................ : " << data[i] << "\n"; i++;
+    // }
     return;
   }
 
+  std::vector<std::string> ClusterParamsAlg::GetFANNVectorTitle(){
+    std::vector<std::string> FannLegend;
+    FannLegend.push_back("Opening - Closing Angle (normalized)");
+    // FannLegend.push_back("Opening - Closing Angle charge weight");
+    // FannLegend.push_back("Closing Angle (normalized)");
+    // FannLegend.push_back("Closing Angle charge weight");
+    FannLegend.push_back("Principal Eigenvalue");
+    // FannLegend.push_back("Secondary Eigenvalue");
+    FannLegend.push_back("Width / Length");
+    // FannLegend.push_back("Hit Density / M.H.D.");
+    FannLegend.push_back("Percent MultiHit Wires");
+    // FannLegend.push_back("Percent High Charge Hits");
+    FannLegend.push_back("Modified Hit Density");
+    FannLegend.push_back("Charge RMS / Mean Charge");
+    FannLegend.push_back("log(Sum Charge / Length)");
+    return FannLegend;
+
+  }
 
   void ClusterParamsAlg::SetArgoneutGeometry(){
     larutil::LArUtilManager::Reconfigure(larlite::geo::kArgoNeuT);
