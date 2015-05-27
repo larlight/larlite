@@ -21,8 +21,6 @@ HOST            = $(shell uname -n)
 OSNAMEMODE      = $(OSNAME)
 
 CINTFLAGS += -p
-
-
 # call kernel specific compiler setup
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 LDFLAGS += $(shell larlite-config --libs)

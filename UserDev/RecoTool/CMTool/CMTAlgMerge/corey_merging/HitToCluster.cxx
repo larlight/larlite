@@ -50,9 +50,7 @@ namespace larlite {
       std::cout << "ev_clus is == 0, returning.\n";
       return false;
     }
-    out_cluster_v->set_event_id(ev_clus->event_id());
-    out_cluster_v->set_run(ev_clus->run());
-    out_cluster_v->set_subrun(ev_clus->subrun());
+
     // std::cout << "reset  id is " << out_cluster_v -> event_id() << std::endl;
     
     if(!ev_clus->size()) {
@@ -63,31 +61,18 @@ namespace larlite {
     }
 
     // Get the associations between the clusters and hits:
-    auto associated_hit_producers = ev_clus->association_keys(data::kHit);
-    if(!(associated_hit_producers.size()))
+    event_hit* ev_hit = nullptr;
+    auto const& ass_info = storage->find_one_ass( ev_clus->id(), ev_hit, ev_clus->id().second );
+    if(!ev_hit || ev_hit->size() < 1)
       return false;
-
-    // Get the hits from the event:
-    larlite::event_hit * ev_hit  = storage->get_data<event_hit>(associated_hit_producers[0]);
-    if(!ev_hit){
-      std::cout << "Did not find hit data product by "
-                << associated_hit_producers[0].c_str()
-                << "!" << std::endl;
-      return false;
-    }
 
     // Copy an index of every hit so that it's possible to keep track of 
     // the ones associated to a cluster (and the ones NOT associated):
     std::vector<int> hit_index_vec;
     hit_index_vec.resize(ev_hit->size());
 
-    // Loop over the clusters and pop off the hits that are associated 
-    // with a cluster.  
-
     // std::cout << "Number of starting hits: "  << ev_hit -> size() << std::endl;
     int found_hits = 0;
-    auto ass_info = ev_clus->association(ev_hit->id());
-
     for(auto const& hit_indices : ass_info) {
       for(auto const& hit_index : hit_indices){
         // std::cout << "Hit index is " << hit_index << std::endl;
@@ -112,10 +97,8 @@ namespace larlite {
 
     // Make new associations
     AssSet_t hit_ass;
-    auto original_hit_ass = ev_clus->association(data::kHit,_input_producer);
-
-    for (unsigned int i = 0; i < original_hit_ass.size(); i ++){
-      hit_ass.push_back(original_hit_ass.at(i));
+    for (unsigned int i = 0; i < ass_info.size(); i ++){
+      hit_ass.push_back(ass_info.at(i));
       out_cluster_v -> push_back(ev_clus -> at(i));
     }
 
@@ -131,7 +114,7 @@ namespace larlite {
       // std::cout << "Getting the hit at index " << index << std::endl;
       auto hit = ev_hit->at(index);
       out_cluster_v -> push_back(larlite::cluster());
-      out_cluster_v -> back().set_charge(hit.Charge());
+      out_cluster_v -> back().set_integral(hit.Integral(),0,0);
       out_cluster_v -> back().set_id(1);
       out_cluster_v -> back().set_view(hit.View());
 
@@ -140,7 +123,8 @@ namespace larlite {
 
     }
     // std::cout << "output id is: " << out_cluster_v -> event_id() << std::endl;
-    out_cluster_v->set_association(data::kHit,_input_producer,hit_ass);
+    auto out_ass = storage->get_data<event_ass>(out_cluster_v->name());
+    out_ass->set_association(out_cluster_v->id(), ev_hit->id(), hit_ass);
 
     // // Print out all the hits in the new clusters on one plane:
     // for(auto const& hit_indices : hit_ass) {

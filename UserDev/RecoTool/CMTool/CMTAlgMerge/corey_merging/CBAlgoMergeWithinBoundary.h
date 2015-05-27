@@ -41,7 +41,7 @@ namespace cmtool {
 
   	  bool isBig(const ::cluster::ClusterParamsAlg &cluster);
       bool isSmall(const ::cluster::ClusterParamsAlg &cluster);
-      float* inBoundary(const ::cluster::ClusterParamsAlg &cluster);
+	  //float* inBoundary(const ::cluster::ClusterParamsAlg &cluster);
       float closestApproach(const ::cluster::ClusterParamsAlg &cluster1,
                           const ::cluster::ClusterParamsAlg &cluster2);
 
