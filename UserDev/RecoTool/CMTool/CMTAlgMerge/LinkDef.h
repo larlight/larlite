@@ -32,48 +32,7 @@
 #pragma link C++ class cmtool::CBAlgoAngleIncompat+;
 #pragma link C++ class cmtool::CBAlgoMergeTinyWithBig+;
 #pragma link C++ class cmtool::CBAlgoProhibitBigClusters+;
+#pragma link C++ class cmtool::CBAlgoHighQLineCompat+;
 //ADD_CBALGO_CLASS ... do not change this line
 //ADD_NEW_CLASS ... do not change this line
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -59,6 +59,13 @@ namespace larlite {
       return false;
     }
 
+    event_hit* ev_hit = nullptr;
+    auto const& ass_hit_v = storage->find_one_ass(ev_clus->id(),ev_hit,ev_clus->name());
+    if (!ev_hit)
+      throw ::cluster::ViewerException("Did not find associated hits!");
+    if (!ass_hit_v.size())
+      throw ::cluster::ViewerException("Did not find associated hits!");
+    /*
     auto associated_hit_producers = ev_clus->association_keys(data::kHit);
     
     if(!(associated_hit_producers.size()))
@@ -72,7 +79,8 @@ namespace larlite {
 					    associated_hit_producers[0].c_str()
 					    )
 				       );
-    
+    */
+
     // Find hit range & fill all-hits vector
     std::vector<std::pair<double,double> > xrange(nplanes,std::pair<double,double>(1e9,0));
     std::vector<std::pair<double,double> > yrange(nplanes,std::pair<double,double>(1e9,0));
@@ -81,7 +89,7 @@ namespace larlite {
     for(auto const &h : *ev_hit) {
       
       UChar_t plane = geo->ChannelToPlane(h.Channel());
-      double x = h.Wire() * wire2cm;
+      double x = h.WireID().Wire * wire2cm;
       double y = h.PeakTime() * time2cm;
       
       if(xrange.at(plane).first > x ) xrange.at(plane).first = x;
@@ -91,7 +99,7 @@ namespace larlite {
       if(yrange.at(plane).second < y ) yrange.at(plane).second = y;
       
       hits_xy.at(plane).push_back(std::pair<double,double>(x,y));
-      hits_charge.at(plane).push_back(h.Charge());
+      hits_charge.at(plane).push_back(h.Integral());
     }
     
     // Inform the algorithm about the range

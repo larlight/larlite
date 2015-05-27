@@ -9,7 +9,6 @@ namespace larlite {
   void ide::clear_data()
   //--------------------------------------------------
   {
-    TObject::Clear();
     trackID      = data::kINVALID_INT;
     numElectrons = data::kINVALID_DOUBLE;
     energy       = data::kINVALID_DOUBLE;
@@ -28,6 +27,9 @@ namespace larlite {
     fTDCIDEs.clear();
   }
 
+  const std::map<unsigned short, std::vector<larlite::ide> >& simch::TDCIDEMap() const
+  { return fTDCIDEs; }
+  
   //--------------------------------------------------------------------------
   std::vector<larlite::ide> simch::TrackIDsAndEnergies(unsigned short startTDC,
 						       unsigned short endTDC) const

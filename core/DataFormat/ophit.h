@@ -20,7 +20,7 @@ namespace larlite {
 
   public:
     ophit(); // Default constructor
-    
+
   private:
     
     int                   fOpChannel;
@@ -32,7 +32,7 @@ namespace larlite {
     double                fAmplitude;
     double                fPE;
     double                fFastToTotal;
-    
+
   public:
     
     ophit(int opchannel, 
@@ -46,20 +46,19 @@ namespace larlite {
 	  double fasttototal);
     
     // Get Methods
-    inline int    OpChannel()      const { return fOpChannel;      }
-    unsigned short Frame()         const { return fFrame;          }
-    inline double PeakTime()       const { return fPeakTime;       }
-    inline double PeakTimeAbs()    const { return fPeakTimeAbs;    }
-    inline double Width()          const { return fWidth;          }
-    inline double Area()           const { return fArea;           }
-    inline double Amplitude()      const { return fAmplitude;      }
-    inline double PE()             const { return fPE;             }
-    inline double FastToTotal()    const { return fFastToTotal;    }
+    int    OpChannel()      const;
+    unsigned short Frame()  const;
+    double PeakTime()       const;
+    double PeakTimeAbs()    const;
+    double Width()          const;
+    double Area()           const;
+    double Amplitude()      const;
+    double PE()             const;
+    double FastToTotal()    const;
     
     friend bool           operator <  (const ophit & a, const ophit & b);
     
   private:
-    ClassDef(ophit,1)
   };
 
   class event_ophit : public std::vector<larlite::ophit>,
@@ -82,7 +81,6 @@ namespace larlite {
 
   private:
 
-    ClassDef(event_ophit,1)
   };
 		      
 }

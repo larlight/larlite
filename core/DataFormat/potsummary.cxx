@@ -7,7 +7,7 @@ namespace larlite {
 
   void potsummary::clear_data()
   { 
-    event_base::clear_data();
+    subrun_base::clear_data();
     //totpot = totgoodpot = 0;
     //totspills = goodspills = 0;
   }

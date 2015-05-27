@@ -22,7 +22,6 @@ namespace larlite{
       kFlash_BeamIncompatible=200,
       kFlash_Match=300
     } CosmicTagID_t;
-    
   }
 }
 #endif

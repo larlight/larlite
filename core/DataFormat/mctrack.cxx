@@ -42,6 +42,26 @@ namespace larlite {
 
   }
 
+  simb::Origin_t      mctrack::Origin     () const { return fOrigin;            }
+  int                 mctrack::PdgCode    () const { return fPDGCode;           }
+  unsigned int        mctrack::TrackID  () const { return fTrackID;         }
+  const std::string&  mctrack::Process    () const { return fProcess;           }
+  const mcstep&       mctrack::Start    () const { return fStart;           }
+  const mcstep&       mctrack::End      () const { return fEnd;             }
+  
+  int                mctrack::MotherPdgCode   () const { return fMotherPDGCode;     }
+  unsigned int       mctrack::MotherTrackID () const { return fMotherTrackID;   }
+  const std::string& mctrack::MotherProcess   () const { return fMotherProcess;     }
+  const mcstep&      mctrack::MotherStart   () const { return fMotherStart;     }
+  const mcstep&      mctrack::MotherEnd     () const { return fMotherEnd;       }
+  
+  int                mctrack::AncestorPdgCode   () const { return fAncestorPDGCode;   }
+  unsigned int       mctrack::AncestorTrackID () const { return fAncestorTrackID; }
+  const std::string& mctrack::AncestorProcess   () const { return fMotherProcess;     }
+  const mcstep&      mctrack::AncestorStart   () const { return fAncestorStart;   }
+  const mcstep&      mctrack::AncestorEnd     () const { return fAncestorEnd;     }
+  
+
 }
 #endif
   

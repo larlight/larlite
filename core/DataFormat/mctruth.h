@@ -29,18 +29,19 @@ namespace larlite {
     /// Default constructor
     mctruth() : data_base(data::kMCTruth) {clear_data();}
 
-    mctruth(const mctruth& origin) : data_base(origin),
-				     fPartList(origin.fPartList),
-				     fMCNeutrino(origin.fMCNeutrino),
-				     fOrigin(origin.fOrigin),
-				     fNeutrinoSet(origin.fNeutrinoSet)
-    {}
+    mctruth(const mctruth& origin);
 
     /// Default destructor
     virtual ~mctruth(){}
 
     /// Clear method
     virtual void clear_data();
+
+    ///--- Getters ---///
+    const std::vector<larlite::mcpart>&  GetParticles() const;
+    const mcnu&                          GetNeutrino()  const;
+    simb::Origin_t                       Origin()       const;
+    Bool_t                               NeutrinoSet()  const;
 
     ///--- Setters/Adders ---///
     void Add(mcpart part)              { fPartList.push_back(part); }
@@ -56,24 +57,13 @@ namespace larlite {
 		     Double_t y,
 		     Double_t qsqr);
 
-    ///--- Getters ---///
-
-    const std::vector<larlite::mcpart>&  GetParticles() const { return fPartList;    }
-    const mcnu&                          GetNeutrino()  const { return fMCNeutrino;  }
-    simb::Origin_t                       Origin()       const { return fOrigin;      }
-    Bool_t                               NeutrinoSet()  const { return fNeutrinoSet; }
-
   private:
     
     std::vector<larlite::mcpart>  fPartList;    ///< list of particles in this event
     mcnu                          fMCNeutrino;  ///< reference to neutrino info - null if not a neutrino
     simb::Origin_t                fOrigin;      ///< origin for this event
     Bool_t                        fNeutrinoSet; ///< flag for whether the neutrino information has been set
-    
-    ////////////////////////
-    ClassDef(mctruth,1)
-    ////////////////////////
-      
+
   };
   
   /**
@@ -101,10 +91,6 @@ namespace larlite {
     
   private:
     
-    ////////////////////////
-    ClassDef(event_mctruth,2)
-    ////////////////////////
-      
   };
 }
 #endif

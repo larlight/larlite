@@ -266,6 +266,22 @@ namespace larutil {
     return fChannelToWireMap.at(ch);
   }
 
+
+  larlite::geo::WireID Geometry::ChannelToWireID(const UInt_t ch)const
+  {
+    if(ch >= fChannelToWireMap.size()) {
+      throw LArUtilException(Form("Invalid channel number: %d",ch));
+      return larlite::geo::WireID();
+    }
+    
+    UInt_t wire  = fChannelToWireMap.at(ch);
+    UInt_t plane = ChannelToPlane(ch);
+
+    larlite::geo::WireID wireID(0,0,plane,wire);
+
+    return wireID;
+  }
+
   larlite::geo::SigType_t Geometry::SignalType(const UInt_t ch) const
   {
     if(ch >= fChannelToPlaneMap.size()) {

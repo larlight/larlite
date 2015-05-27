@@ -6,6 +6,7 @@
  * \brief Class def header for a class MC_NC1Gamma_Filter
  *
  * @author wforeman
+ *     and Joseph Zennamo, jzennamo@uchicago.edu 
  */
 
 /** \addtogroup SingleGamma
@@ -16,6 +17,7 @@
 #define LARLITE_MC_NC1GAMMA_FILTER_H
 
 #include "Analysis/ana_base.h"
+#include "DataFormat/mctruth.h"
 
 namespace larlite {
   /**
@@ -26,11 +28,10 @@ namespace larlite {
   
   public:
 
-	  int total_events;
-		int max_events;
-		size_t looped_events;
-		size_t kept_events;
+    int max_events;
 
+    size_t looped_events;
+		
     /// Default constructor
     MC_NC1Gamma_Filter(){ _name="MC_NC1Gamma_Filter"; _fout=0;}
 
@@ -47,8 +48,11 @@ namespace larlite {
     */
     virtual bool analyze(storage_manager* storage);
 
-		void setMaxNEvents(int N) { max_events = N; }
+    void setMaxNEvents(int N) { max_events = N; }
+    
+    void flip(bool on) {_flip = on;}
 		
+    
 
     /** IMPLEMENT in MC_NC1Gamma_Filter.cc! 
         Finalize method to be called after all events processed.
@@ -56,7 +60,12 @@ namespace larlite {
     virtual bool finalize();
 
   protected:
+
+    size_t total_events;
+    size_t kept_events;
+    bool _flip;
     
+
   };
 }
 #endif

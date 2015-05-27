@@ -32,30 +32,24 @@ namespace larlite {
 
     mcstep() {};
 
-    mcstep(const TLorentzVector& p, const TLorentzVector& m)
-      : _position(p), 
-	_momentum(m)
-    {}
+    mcstep(const TLorentzVector& p, const TLorentzVector& m);
 
     virtual ~mcstep(){}
     
-    mcstep(const mcstep& orig) : _position(orig._position),
-				 _momentum(orig._momentum)
-    {}
+    mcstep(const mcstep& orig);
 
-    const TLorentzVector& Momentum() const {return _momentum;}
+    const TLorentzVector& Momentum() const;
 
-    const TLorentzVector& Position() const {return _position;}
+    const TLorentzVector& Position() const;
 
-    double X()  const {return _position.X();  }
-    double Y()  const {return _position.Y();  }
-    double Z()  const {return _position.Z();  }
-    double T()  const {return _position.T();  }
-    double Px() const {return _momentum.Px(); }
-    double Py() const {return _momentum.Py(); }
-    double Pz() const {return _momentum.Pz(); }
-    double E() const  {return _momentum.E();  }
-
+    double X()  const;
+    double Y()  const;
+    double Z()  const;
+    double T()  const;
+    double Px() const;
+    double Py() const;
+    double Pz() const;
+    double E()  const;
     void SetPosition(const TLorentzVector& v) { _position=v; };
     void SetMomentum(const TLorentzVector& v) { _momentum=v; };
 
@@ -63,10 +57,6 @@ namespace larlite {
 
     TLorentzVector _position;
     TLorentzVector _momentum;
-
-    ////////////////////////
-    ClassDef(mcstep,1)
-    ////////////////////////
 
   };
 
@@ -88,18 +78,12 @@ namespace larlite {
     virtual void clear_data() {data_base::clear_data(); clear();}
     
     ///--- Setter/Adders ---//
-    void push_back(const larlite::mcstep& step){ std::vector<larlite::mcstep>::push_back(step);}
+    void push_back(const larlite::mcstep& step);
 
-    void push_back(const TLorentzVector p,
-		   const TLorentzVector m)
-    { std::vector<larlite::mcstep>::push_back(larlite::mcstep(p,m));}
+    void push_back(const TLorentzVector p,const TLorentzVector m);
 
   private:
 
-    ////////////////////////
-    ClassDef(mctrajectory,1)
-    ////////////////////////    
-      
   };
   
 }

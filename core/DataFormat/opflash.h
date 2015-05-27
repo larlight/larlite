@@ -39,7 +39,7 @@ namespace larlite {
       double                fFastToTotal;  // Fast to total light ratio
       bool                  fInBeamFrame;  // Is this in the beam frame?
       int                   fOnBeamTime;   // Is this in time with beam?
-
+    
   public:
 
     opflash(double time, double timewidth, double abstime, unsigned int frame,
@@ -51,27 +51,25 @@ namespace larlite {
 	    std::vector<double> WireWidths  = std::vector<double>(0));
     
     // Get Methods
-    inline double Time()              const { return fTime;        }
-    inline double TimeWidth()         const { return fTimeWidth;   }
-    inline double AbsTime()           const { return fAbsTime;     }
-    inline unsigned int Frame()       const { return fFrame;       }
-    inline double PE(unsigned int i)  const { return fPEperOpDet[i]; }
-    inline double YCenter()           const { return fYCenter;     }
-    inline double YWidth()            const { return fYWidth;      }
-    inline double ZCenter()           const { return fZCenter;     }
-    inline double ZWidth()            const { return fZWidth;      }
-    inline double FastToTotal()            const { return fFastToTotal;      }
-    inline std::vector<double> WireCenters()            const { return fWireCenters;      }
-    inline std::vector<double> WireWidths()             const { return fWireWidths;      }
-    inline bool  InBeamFrame()          const { return fInBeamFrame;     }
-    inline int  OnBeamTime()          const { return fOnBeamTime;     }
+    double Time()              const;
+    double TimeWidth()         const;
+    double AbsTime()           const;
+    unsigned int Frame()       const;
+    double PE(unsigned int i)  const;
+    double YCenter()           const;
+    double YWidth()            const;
+    double ZCenter()           const;
+    double ZWidth()            const;
+    double FastToTotal()       const;
+    const std::vector<double>& WireCenters() const;
+    const std::vector<double>& WireWidths()  const;
+    bool  InBeamFrame()        const;
+    int  OnBeamTime()          const;
     double TotalPE() const;
 
     friend bool           operator <  (const opflash & a, const opflash & b);
 
   private:
-
-    ClassDef(opflash,1);
 
   };
 
@@ -95,7 +93,6 @@ namespace larlite {
 
   private:
 
-    ClassDef(event_opflash,1)
   };
 
 }

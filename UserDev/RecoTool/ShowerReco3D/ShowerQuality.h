@@ -111,6 +111,9 @@ namespace larlite {
       double reco_x, reco_y, reco_z;
       double reco_dcosx, reco_dcosy, reco_dcosz;
       double reco_energy;
+      double reco_energy_U;
+      double reco_energy_V;
+      double reco_energy_Y;
       double reco_dedx;
       double reco_dedx_U;
       double reco_dedx_V;

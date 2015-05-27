@@ -29,7 +29,7 @@ namespace larlite {
     _hRecoDivMcIDEs_Pl1 = new TH1D("hRecoDivMcIDEs_Pl1", "Reco e- / MC e-", 100, -3, 3);
     _hRecoVSMcIDEs_Pl2 = new TH2D("hRecoVSMcIDEs_Pl2", "Hit ADC vs IDEs e- Matched; Pulse Area ADCs; Simch num. e- - Pl 2", 100, 0, 100000, 100, 0, 100000);
     _hRecoDivMcIDEs_Pl2 = new TH1D("hRecoDivMcIDEs_Pl2", "Reco e- / MC e-", 100, -3, 3);
-    _hRecoHitElectrons = new TH1D("hRecoHitElectrons", "Reco e- from each hit; Hit.Charge() / ADCtoElectrons(Hit.Plane())", 100, 0, 500000);
+    _hRecoHitElectrons = new TH1D("hRecoHitElectrons", "Reco e- from each hit; Hit.Integral() / ADCtoElectrons(Hit.Plane())", 100, 0, 500000);
     _hSimchQvsE_noLifetime = new TH2D("hSimchQvsE_noLifetime", "Q Deposited Collected vs. E deposited for all IDEs", 300, 0, 100000, 300, 0, 10);
     _hSimchQvsE = new TH2D("hSimchQvsE", "Q Deposited (lifetime-adjusted) vs. E deposited for all IDEs", 300, 0, 100000, 300, 0, 10);
     _hHitQvsE = new TH2D("hHitQvsE", "Q Deposited (lifetime-adjusted) vs. E deposited for all Hits", 300, 0, 300000, 300, 0, 30);
@@ -68,10 +68,10 @@ namespace larlite {
       if( simch_iter == _simch_map.end() ) 
 	std::cerr<<"Hit has no matched simchannel!!"<<std::endl;
 
-      if (_verbose) { std::cout << "Hit time boundaries: [" << h.StartTime() << ", " << h.EndTime() << "]" << std::endl; }
+      if (_verbose) { std::cout << "Hit time boundaries: [" << h.StartTick() << ", " << h.EndTick() << "]" << std::endl; }
 
       //Find IDEs on this simch
-      double sigmaTime = h.PeakTime() - h.StartTime();
+      double sigmaTime = h.PeakTime() - h.StartTick();
       std::vector<larlite::ide> matchedIDEs((*simch_iter).second.TrackIDsAndEnergies((h.PeakTime()-3200)-sigmaTime*2,(h.PeakTime()-3200)+sigmaTime*2));
 
       //if matchedIDEs is empty no IDEs in the time-range of the hit on that channel
@@ -99,28 +99,28 @@ namespace larlite {
 	int pl = int(h.View());
 	std::cout << "Plane: " << pl << std::endl;
 	if ( pl == 0 ){
-	  _hADCsVSIDEs_Pl0->Fill( h.Charge(), numElectrons );
-	  _ADCs_Pl0.push_back( h.Charge() );
+	  _hADCsVSIDEs_Pl0->Fill( h.Integral(), numElectrons );
+	  _ADCs_Pl0.push_back( h.Integral() );
 	  _IDEs_Pl0.push_back( numElectrons );
-	  _hRecoVSMcIDEs_Pl0->Fill( numElectrons, (h.Charge()/fCalAreaConstants.at(0)) );
-	  _hRecoDivMcIDEs_Pl0->Fill( (h.Charge()/fCalAreaConstants.at(2))/numElectrons );
+	  _hRecoVSMcIDEs_Pl0->Fill( numElectrons, (h.Integral()/fCalAreaConstants.at(0)) );
+	  _hRecoDivMcIDEs_Pl0->Fill( (h.Integral()/fCalAreaConstants.at(2))/numElectrons );
 	}
 	if ( pl == 1 ){
-	  _hADCsVSIDEs_Pl1->Fill( h.Charge(), numElectrons );
-	  _ADCs_Pl1.push_back( h.Charge() );
+	  _hADCsVSIDEs_Pl1->Fill( h.Integral(), numElectrons );
+	  _ADCs_Pl1.push_back( h.Integral() );
 	  _IDEs_Pl1.push_back( numElectrons );
-	  _hRecoVSMcIDEs_Pl1->Fill( numElectrons, (h.Charge()/fCalAreaConstants.at(1)) );
-	  _hRecoDivMcIDEs_Pl1->Fill( (h.Charge()/fCalAreaConstants.at(2))/numElectrons );
+	  _hRecoVSMcIDEs_Pl1->Fill( numElectrons, (h.Integral()/fCalAreaConstants.at(1)) );
+	  _hRecoDivMcIDEs_Pl1->Fill( (h.Integral()/fCalAreaConstants.at(2))/numElectrons );
 	}
 	if ( pl == 2 ){
-	  _hADCsVSIDEs_Pl2->Fill( h.Charge(), numElectrons );
-	  _ADCs_Pl2.push_back( h.Charge() );
+	  _hADCsVSIDEs_Pl2->Fill( h.Integral(), numElectrons );
+	  _ADCs_Pl2.push_back( h.Integral() );
 	  _IDEs_Pl2.push_back( numElectrons );
-	  _hRecoVSMcIDEs_Pl2->Fill( numElectrons, (h.Charge()/fCalAreaConstants.at(2)) );
-	  _hRecoDivMcIDEs_Pl2->Fill( (h.Charge()/fCalAreaConstants.at(2))/numElectrons );
+	  _hRecoVSMcIDEs_Pl2->Fill( numElectrons, (h.Integral()/fCalAreaConstants.at(2)) );
+	  _hRecoDivMcIDEs_Pl2->Fill( (h.Integral()/fCalAreaConstants.at(2))/numElectrons );
 	}
 	
-	_hRecoHitElectrons->Fill( h.Charge()/fCalAreaConstants.at(pl) );
+	_hRecoHitElectrons->Fill( h.Integral()/fCalAreaConstants.at(pl) );
 
       }
 

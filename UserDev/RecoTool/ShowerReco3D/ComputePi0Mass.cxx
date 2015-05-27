@@ -69,6 +69,29 @@ namespace larlite {
     //skip event if !2 showers found.
     if(ev_shower->size() != 2) return false;
 
+    // get associated clusters
+    event_cluster* ev_cluster = nullptr;
+    auto const& cluster_ass = storage->find_one_ass(ev_shower->id(),ev_cluster,ev_shower->name());
+
+    if (!ev_cluster)
+      throw ::showerreco::ShowerRecoException(Form("Shower product by \"%s\" does not contain association to clusters!",_shower_producer.c_str()));
+    else if(ev_cluster->size()<1) {
+      print(msg::kERROR,__FUNCTION__,Form("There are 0 clusters in this event! Skipping......"));      
+      return false;
+    }
+
+    // get associated hits
+    event_hit* ev_hit = nullptr;
+    auto const& ass_hit_v = storage->find_one_ass(ev_cluster->id(),ev_hit,ev_cluster->name());
+
+    if (!ev_hit)
+      throw ::showerreco::ShowerRecoException(Form("Shower product by \"%s\" does not contain association to hits!",_shower_producer.c_str()));
+    else if(ev_hit->size()<1) {
+      print(msg::kERROR,__FUNCTION__,Form("There are 0 hits in this event! Skipping......"));      
+      return false;
+    }
+
+    /*
     auto cluster_producers = ev_shower->association_keys(data::kCluster);
     if(!cluster_producers.size())
      // throw fSRException.ShowerRecoException(Form("Shower product by \"%s\" does not contain association to clusters!",_shower_producer.c_str()));
@@ -106,6 +129,7 @@ namespace larlite {
 
     // Retrieve cluster=>hit association
     auto ass_hit_v = ev_cluster->association(ev_hit->id());
+    */
 
     // Create G4 track ID vector for which we are interested in
     std::vector<unsigned int> g4_trackid_v;

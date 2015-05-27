@@ -56,6 +56,17 @@ namespace larlite {
   {
     
   }
+  
+  int    ophit::OpChannel()      const { return fOpChannel;      }
+  unsigned short ophit::Frame()  const { return fFrame;          }
+  double ophit::PeakTime()       const { return fPeakTime;       }
+  double ophit::PeakTimeAbs()    const { return fPeakTimeAbs;    }
+  double ophit::Width()          const { return fWidth;          }
+  double ophit::Area()           const { return fArea;           }
+  double ophit::Amplitude()      const { return fAmplitude;      }
+  double ophit::PE()             const { return fPE;             }
+  double ophit::FastToTotal()    const { return fFastToTotal;    }
+
 
   //----------------------------------------------------------------------
   bool operator < (const ophit & a, const ophit & b)

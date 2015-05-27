@@ -5,6 +5,14 @@
 
 namespace larlite {
 
+  mctruth::mctruth(const mctruth& origin) : data_base(origin),
+					    fPartList(origin.fPartList),
+					    fMCNeutrino(origin.fMCNeutrino),
+					    fOrigin(origin.fOrigin),
+					    fNeutrinoSet(origin.fNeutrinoSet)
+  {}
+
+  
   //***************************************************
   void mctruth::clear_data()
   //***************************************************
@@ -15,6 +23,11 @@ namespace larlite {
     fNeutrinoSet=false;
     fOrigin=simb::kUnknown;
   }
+
+  const std::vector<larlite::mcpart>&  mctruth::GetParticles() const { return fPartList;    }
+  const mcnu&                          mctruth::GetNeutrino()  const { return fMCNeutrino;  }
+  simb::Origin_t                       mctruth::Origin()       const { return fOrigin;      }
+  Bool_t                               mctruth::NeutrinoSet()  const { return fNeutrinoSet; }
 
   //*************************************
   void mctruth::SetNeutrino(Int_t CCNC,

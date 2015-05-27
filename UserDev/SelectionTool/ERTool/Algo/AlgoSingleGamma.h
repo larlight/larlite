@@ -55,6 +55,31 @@ namespace ertool {
 		// Set verbosity
     void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); }
 
+       /// Use EMPart
+    void useRadLength(bool on) { _useRadLength = on; }
+
+    void setRejectLongTracks(bool on) { _rejectLongTracks = on; }
+
+    void setVtxToTrkStartDist(double d){
+      _vtxToTrkStartDist = d;
+    }
+    void setVtxToTrkDist(double d){
+      _vtxToTrkDist = d;
+    }
+    void setVtxToShrStartDist(double d){
+      _vtxToShrStartDist = d;
+    }
+    void setMaxIP(double d){
+      _maxIP = d;
+    }
+    void setEThreshold(double E){ _Ethreshold = E; }
+
+    void setVtxProximityCut(double d) { _vtxProximityCut = d; }
+    void setBDtW(double b) { _BDtW = b; }
+    void setBDtTW(double bt) { _BDtTW = bt; }
+
+
+
   private:
 
     ::geoalgo::AABox fTPC;
@@ -98,6 +123,8 @@ namespace ertool {
     // is placed to remove cases where the shower is meters
     // away from the vertex. Probably an accidental correlation
     double _vtxToShrStartDist;
+    double _vtxToElecShrStartDist;
+    double _vtxToGammShrStartDist;
     // Maximum impact parameter allowed between the two objects
     // if larger it means that the two lines/segments do not come
     // within this value at any point and they therefore are 
@@ -123,8 +150,13 @@ namespace ertool {
 
     // Keep track of whether a sister track to the shower has
     // been found
-    bool _hassister;
-
+   bool _hassister;
+   bool _track_assister;
+   bool _elec_assister;
+   bool _gam_assister;
+   bool _vtx_assister;
+   bool _muon_assister;
+   
     // Other algorithms to use
     AlgoEMPart _alg_emp;
     AlgoFindRelationship _findRel;
@@ -138,8 +170,12 @@ namespace ertool {
     //Tree -> one entry per shower-other comparison
     // therefore possibly multiple entries for each shower
     TTree* _alg_tree;
+
+    //For every Shower
     double _E; // energy of shower
     int    _PDG; // PDG code assigned by AlgoEMPart
+    
+   
     int    _VsTrack; // comparing vs track (==1)
     double _thatE; // Energy of other shower/track
     double _dEdx;
@@ -149,8 +185,12 @@ namespace ertool {
     double _IPtrkBody; // distance from IP to body of track (if comparing with track)
     double _distBackAlongTraj; // distance backwards from vertex to nearest wall
     double _distToTopWall; // distance backwards along traj from vertex to top wall(extended to infinity)
-
-
+    
+    //At the algo level what is tied to an event
+    int _Ngamma; // Number of photons matched to an event 
+    int _Ntrks; // Number of tracks matched to an event
+    int _Nmu; // Number of muons matched to an event
+    
 
 
   };

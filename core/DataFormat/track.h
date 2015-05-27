@@ -16,6 +16,8 @@
 #define LARLITE_TRACK_H
 
 #include "data_base.h"
+#include "Base/GeoTypes.h"
+#include "Base/GeoConstants.h"
 #include "TVector3.h"
 #include "TMatrixD.h"
 
@@ -32,73 +34,84 @@ namespace larlite {
     track() : data_base(data::kTrack) { clear_data(); }
 
     track(const track& original) :   data_base(original),
-				     fID(original.fID),
 				     fXYZ(original.fXYZ),
 				     fDir(original.fDir),
 				     fCov(original.fCov),
 				     fdQdx(original.fdQdx),
-				     fFitMomentum(original.fFitMomentum)
+				     fFitMomentum(original.fFitMomentum),
+				     fID(original.fID)
     {}
     
     /// Default destructor
     virtual ~track(){}
-    
-    inline int     track_id      ()               const { return fID;                  }
-    inline size_t    n_point       ()               const { return fDir.size();          }
-    inline size_t    n_covariance  ()               const { return fCov.size();          }
-    inline size_t    n_momentum    ()               const { return fFitMomentum.size();  }
-    inline size_t    n_dQdx        ()               const { return fdQdx.size();         }
-    
-    inline const TVector3& direction_at  (unsigned int p) const { return fDir.at(p);           }
-    inline const TVector3& vertex_at     (unsigned int p) const { return fXYZ.at(p);           }
-    inline       double    momentum_at (unsigned int p) const { return fFitMomentum.at(p);   }
-    inline const TMatrixD& covariance_at (unsigned int p) const { return fCov.at(p);           }
-    
-    inline void set_track_id   (const int id)     { fID = id;                  }
-    inline void add_vertex     (const TVector3 v) { fXYZ.push_back(v);         }
-    inline void add_direction  (const TVector3 v) { fDir.push_back(v);         }
-    inline void add_momentum   (const double   v) { fFitMomentum.push_back(v); }
-    inline void add_covariance (const TMatrixD m) { fCov.push_back(m);         }
-    
+
     virtual void clear_data();
-    
+    void set_track_id   (const int id);
+    void add_vertex     (const TVector3 v);
+    void add_direction  (const TVector3 v);
+    void add_momentum   (const double   v);
+    void add_covariance (const TMatrixD m);
+    void add_dqdx       (const std::vector<double>& v);
+    void reserve(size_t n);
+    void            Extent(std::vector<double> &xyzStart,
+			   std::vector<double> &xyzEnd)        const;
+    void            Direction(double *dcosStart,
+			      double *dcosEnd)                 const;
+    double          ProjectedLength(geo::View_t view)          const;
+    double          PitchInView(geo::View_t view,
+				size_t trajectory_point=0)     const;
+    int             ID()                                       const;
+    // A trajectory point is the combination of a position vector
+    // and its corresponding direction vector
+    size_t          NumberTrajectoryPoints()                    const;
+    size_t          NumberCovariance()                          const;
+    size_t          NumberFitMomentum()                         const;
+    size_t          NumberdQdx(geo::View_t view=geo::kUnknown)  const;
+    double          Length(size_t p=0)                          const;
+    void            TrajectoryAtPoint(unsigned int  p,
+				      TVector3     &pos,
+				      TVector3     &dir)        const;
+    const double&   DQdxAtPoint(unsigned int p,
+				geo::View_t view=geo::kUnknown) const;
+    const TVector3& DirectionAtPoint (unsigned int p)           const;
+    const TVector3& LocationAtPoint  (unsigned int p)           const;
+    const double&   MomentumAtPoint  (unsigned int p)           const;
+    const TMatrixD& CovarianceAtPoint(unsigned int p)           const;
+
+    const TVector3& Vertex()                                    const;
+    const TVector3& End()                                     	const;
+    const TVector3& VertexDirection()                         	const;
+    const TVector3& EndDirection()                            	const;
+    const TMatrixD& VertexCovariance()                        	const;
+    const TMatrixD& EndCovariance()                           	const;
+    const double&   VertexMomentum()                          	const;
+    const double&   EndMomentum()                             	const;
+
+    double          Theta()                                     const;
+    double          Phi()                                       const;
+
+    // Calculate rotation matrices between global (x,y,z) and local (u,v,w)
+    // coordinate systems based on track direction (fDir).
+    // The local w-axis points along the track direction.
+    void GlobalToLocalRotationAtPoint(unsigned int p, TMatrixD& rot) const;
+    void LocalToGlobalRotationAtPoint(unsigned int p, TMatrixD& rot) const;
+
+    friend bool     operator <   (const track & a, const track & b);
   protected:
-    
-    /// track's ID
-    int fID;            
-    
-    /// position of points along the track
-    std::vector<TVector3> fXYZ;
-    
-    /// direction at each point along the track
-    std::vector<TVector3> fDir;
-    
-    /** 
-	covariance matrix of positions
-	possibly only end points are stored
-    */
-    std::vector<TMatrixD> fCov;
-    
-    /**
-       charge deposition per unit length at points
-       along track outer vector index is over view
-    */
-    std::vector< std::vector <double> > fdQdx;
-    
-    /**
-       momentum at start and end of track
-       determined from a fit. Intermediate points
-       can be added if desired
-    */
-    std::vector<double> fFitMomentum;
-    
+
+    std::vector<TVector3>               fXYZ;           ///< position of points along the track
+    std::vector<TVector3>               fDir;           ///< direction at each point along the track
+    std::vector<TMatrixD >              fCov;           ///< covariance matrix of positions
+                                                        ///< possibly only end points are stored
+    std::vector< std::vector <double> > fdQdx;          ///< charge deposition per unit length at points
+                                                        ///< along track outer vector index is over view
+    std::vector<double>                 fFitMomentum;   ///< momentum at start and end of track
+                                                        ///< determined from a fit. Intermediate points
+                                                        ///< can be added if desired
+    int                                 fID;            ///< track's ID
+
   private:
     
-    
-    ////////////////////////
-    ClassDef(track,2)
-    ////////////////////////
-      
   };
 
   /**
@@ -125,9 +138,6 @@ namespace larlite {
     
   private:
     
-    ////////////////////////
-    ClassDef(event_track,3)
-    ////////////////////////
   };
 }
 #endif

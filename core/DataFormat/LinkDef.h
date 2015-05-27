@@ -12,6 +12,7 @@
 #pragma link C++ class std::vector<std::vector<float> >+;
 
 #pragma link C++ class std::pair<size_t,size_t>+;
+#pragma link C++ class std::pair<unsigned short,string>+;
 #pragma link C++ class std::pair<string,bool>+;
 #pragma link C++ class std::pair<string,string>+;
 
@@ -26,24 +27,30 @@
 #pragma link C++ class std::vector<TMatrixD>+;
 #pragma link C++ class std::vector<TLorentzVector>+;
 
-#pragma link C++ class std::vector<unsigned int>+;
+//#pragma link C++ class std::vector<unsigned int>+;
 //#pragma link C++ class std::vector<std::vector<unsigned int> >+;
-#pragma link C++ class larlite::AssUnit_t+;
+//#pragma link C++ class larlite::AssUnit_t+;
 #pragma link C++ class std::vector<larlite::AssUnit_t>+;
 #pragma link C++ class larlite::AssSet_t+;
 
 #pragma link C++ class std::pair<larlite::data::DataType_t,string>+;
 #pragma link C++ class larlite::product_id+;
 #pragma link C++ class std::vector<larlite::product_id>+;
+#pragma link C++ class std::pair<larlite::product_id,larlite::product_id>+;
+#pragma link C++ class std::vector<std::pair<larlite::product_id,larlite::product_id> >+;
 
 #pragma link C++ class larlite::DataFormatException+;
 
 #pragma link C++ class larlite::data_base+;
+#pragma link C++ class larlite::output_base+;
+#pragma link C++ class larlite::run_base+;
+#pragma link C++ class larlite::subrun_base+;
 #pragma link C++ class larlite::event_base+;
 //#pragma link C++ class larlite::association+;
 
-#pragma link C++ namespace lar+;
-#pragma link C++ class lar::sparse_vector<float>+;
+#pragma link C++ class larlite::sparse_data<float>+;
+#pragma link C++ class std::vector<larlite::sparse_data<float> >+;
+#pragma link C++ class larlite::sparse_vector<float>+;
 
 #pragma link C++ class larlite::potsummary+;
 
@@ -167,8 +174,23 @@
 #pragma link C++ class std::vector<larlite::minos>+;
 #pragma link C++ class larlite::event_minos+;
 
+#pragma link C++ class larlite::pcaxis+;
+#pragma link C++ class std::vector<larlite::pcaxis>+;
+#pragma link C++ class larlite::event_pcaxis+;
+
+#pragma link C++ class larlite::flashmatch+;
+#pragma link C++ class std::vector<larlite::flashmatch>+;
+#pragma link C++ class larlite::event_flashmatch+;
+
+#pragma link C++ class larlite::event_ass+;
+
+#pragma link C++ class larlite::fifo+;
+#pragma link C++ class std::vector<larlite::fifo>+;
+#pragma link C++ class larlite::event_fifo+;
+
 #pragma link C++ class larlite::storage_manager+;
 
+/*
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_gtruth>();
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_mctruth>();
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_mcpart>();
@@ -192,6 +214,8 @@
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_pfpart>();
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_user>();
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_minos>();
+#pragma link C++ function larlite::storage_manager::data_type<larlite::event_ass>();
+#pragma link C++ function larlite::storage_manager::data_type<larlite::event_fifo>();
 
 #pragma link C++ function larlite::storage_manager::get_data<larlite::event_gtruth>(string);
 #pragma link C++ function larlite::storage_manager::get_data<larlite::event_mctruth>(string);
@@ -216,5 +240,9 @@
 #pragma link C++ function larlite::storage_manager::get_data<larlite::event_pfpart>(string);
 #pragma link C++ function larlite::storage_manager::get_data<larlite::event_user>(string);
 #pragma link C++ function larlite::storage_manager::get_data<larlite::event_minos>(string);
-
+#pragma link C++ function larlite::storage_manager::get_data<larlite::event_ass>(string);
+#pragma link C++ function larlite::storage_manager::get_data<larlite::event_fifo>(string);
+#pragma link C++ function larlite::storage_manager::subrundata_type<larlite::potsummary>();
+#pragma link C++ function larlite::storage_manager::get_subrundata<larlite::potsummary>(string);
+*/
 #endif

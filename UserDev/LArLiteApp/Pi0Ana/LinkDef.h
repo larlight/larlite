@@ -14,8 +14,12 @@
 #pragma link C++ class larlite::Pi0ContainmentFilter+;
 #pragma link C++ class ertool::ERAnaPi0Selection+;
 #pragma link C++ class larlite::singlepi0+;
+#pragma link C++ class ertool::ERAna1PI0+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
+
+
 
 

@@ -5,188 +5,124 @@
 
 namespace larlite {
 
-  //**************************
+  //
+  // data_base
+  //
+  
+  data_base::data_base(unsigned short type)
+    : _type(type)
+  { clear_data(); }
+
+  const unsigned short& data_base::data_type() const
+  {return _type; }  
+
+  //
+  // output_base
+  //
+
+  output_base::output_base(unsigned short type,
+			   const std::string name)
+    : data_base(type)
+    , _id(_type,name)
+  { clear_data(); }
+
+  output_base::output_base(const output_base& orig)
+    : data_base(orig)
+    , _id(orig._id)
+  {}
+
+  void output_base::clear_data()
+  { data_base::clear_data(); }
+
+  const std::string& output_base::name() const
+  { return _id.second; }
+
+  const ::larlite::product_id output_base::id() const
+  { return _id; }
+
+  //
+  // run_base
+  //
+  run_base::run_base(const unsigned short type,
+		     const std::string name)
+    : output_base(type,name)
+  { clear_data(); }
+
+  run_base::run_base(const run_base& origin) : output_base(origin)
+					     , fRunNumber(origin.fRunNumber)
+  {}
+
+  void run_base::clear_data()
+  { output_base::clear_data(); fRunNumber=kINVALID_RUN;}
+
+  const unsigned int& run_base::run() const
+  { return fRunNumber; }
+
+  void run_base::set_run(unsigned int run)
+  { fRunNumber    = run; }
+  
+  //
+  // subrun_base
+  //
+  subrun_base::subrun_base(const unsigned short type,
+			   const std::string name)
+    : output_base(type,name)
+  { clear_data(); }
+
+  subrun_base::subrun_base(const subrun_base& origin)
+  : output_base(origin)
+      , fRunNumber(origin.fRunNumber)
+      , fSubRunNumber(origin.fSubRunNumber)
+  {}
+
+  void subrun_base::clear_data()
+  {
+    output_base::clear_data(); 
+    fRunNumber=kINVALID_RUN; 
+    fSubRunNumber=kINVALID_SUBRUN;
+  }
+
+  const unsigned int& subrun_base::run() const
+  { return fRunNumber; }
+
+  const unsigned int& subrun_base::subrun() const
+  { return fSubRunNumber; }  
+
+  void subrun_base::set_run    (unsigned int run) { fRunNumber    = run; }
+
+  void subrun_base::set_subrun (unsigned int run) { fSubRunNumber = run; }
+
+  //
+  // event_base
+  //
+
+  event_base::event_base(unsigned short    type,
+			 const std::string name)
+    : output_base(type,name)
+  { clear_data(); }
+  
+  event_base::event_base(const event_base &original) 
+    : output_base(original)
+    , fRunNumber(original.fRunNumber)
+    , fSubRunNumber(original.fSubRunNumber)
+    , fEventID(original.fEventID)
+  {}
+  
   void event_base::clear_data()
-  //**************************
   {
-    data_base::clear_data();
-    fRunNumber = fSubRunNumber = fEventID = data::kINVALID_UINT;
-    fAssociation.clear();
+    output_base::clear_data();
+    fRunNumber = kINVALID_RUN;
+    fSubRunNumber = kINVALID_SUBRUN;
+    fEventID = kINVALID_EVENT;
   }
 
-  void event_base::list_association() const
-  {
-    std::cout << "  Listing associations stored..." << std::endl;
-    for(auto const& id_ass : fAssociation) {
-
-      size_t ass_count=0;
-
-      for(auto const& ass_set : id_ass.second)
-
-	ass_count = ass_set.size();
-
-      std::cout << "    Type: " << data::kDATA_TREE_NAME[id_ass.first.first].c_str()
-		<< " (enum = "  << id_ass.first.first << ") "
-		<< " produced by \"" << id_ass.first.second.c_str() << "\""
-		<< " ... length is "  << id_ass.second.size()
-		<< " => " << ass_count << std::endl;
-
-    }
-    std::cout << "  ... done!" << std::endl;
-  }
-
-  void event_base::set_association(const product_id type,
-				   const size_t index_source,
-				   const AssUnit_t& ass) {			   
-    auto loc = fAssociation.find(type);
-    if(loc == fAssociation.end()) {
-      // New entry
-      auto new_loc = fAssociation.insert(std::make_pair(type,AssSet_t(index_source+1,AssUnit_t())));
-      (*new_loc.first).second.at(index_source) = ass;
-    } else {
-      
-      if( (*loc).second.size() <= index_source ) {
-	// New entry
-	(*loc).second.resize(index_source+1,AssUnit_t());
-	(*loc).second[index_source]=ass;
-      }else if( (*loc).second[index_source].size() ) {
-
-	std::cerr << "\033[93m" 
-		  << " Association to " << data::kDATA_TREE_NAME[type.first].c_str() 
-		  << " by " << type.second.c_str() 
-		  << " already has entry " << index_source
-		  <<"\033[00m" << std::endl;
-	throw DataFormatException();
-	
-      }else
-
-	// New entry
-	(*loc).second[index_source] = ass;
-    }
-
-  }
+  unsigned int event_base::run      () const { return fRunNumber;    }
+  unsigned int event_base::subrun   () const { return fSubRunNumber; }
+  unsigned int event_base::event_id () const { return fEventID;      }
   
-  void event_base::set_association(const product_id type,
-				   const AssSet_t& ass)
-  {
-
-    auto loc = fAssociation.find(type);
-    if(loc == fAssociation.end())
-
-      fAssociation.insert(std::make_pair(type,ass));
-
-    else {
-
-	std::cerr << "\033[93m" 
-		  << " Association to " << data::kDATA_TREE_NAME[type.first].c_str()
-		  << " by " << type.second.c_str() 
-		  << " already exists!"
-		  <<"\033[00m" << std::endl;
-	throw DataFormatException();
-	
-    }
-
-  }
-  
-  size_t event_base::size_association(const product_id type) const
-  {
-    auto loc = fAssociation.find(type);
-    if(loc == fAssociation.end()) return 0;
-    else return (*loc).second.size();
-  }
-
-  size_t event_base::size_association(const product_id type, const size_t index_source) const
-  {
-    auto loc = fAssociation.find(type);
-    if(loc == fAssociation.end()) return 0;
-    else if( (*loc).second.size()<=index_source) return 0;
-    else return (*loc).second[index_source].size();
-  }
-
-  const AssSet_t& event_base::association(const product_id type) const
-  {
-    auto loc = fAssociation.find(type);
-    if(loc == fAssociation.end()) {
-      
-      std::cerr << "\033[93m"
-		<< " Association to " << data::kDATA_TREE_NAME[type.first].c_str() 
-		<< " by " << type.second.c_str()
-		<< " does not exist!"
-		<< "\033[00m" << std::endl;
-      throw DataFormatException();
-    }
-    return (*loc).second;
-  }
-
-  const AssUnit_t& event_base::association(const product_id type, const size_t index_source) const
-  {
-    auto loc = fAssociation.find(type);
-    if(loc == fAssociation.end()) {
-      
-      std::cerr << "\033[93m"
-		<< " Association to " << data::kDATA_TREE_NAME[type.first].c_str()
-		<< " by " << type.second.c_str() 
-		<< " does not exist!"
-		<< "\033[00m" << std::endl;
-      throw DataFormatException();
-    }
-    if( (*loc).second.size() <= index_source ) {
-
-      std::cerr << "\033[93m"
-		<< " Association to " << data::kDATA_TREE_NAME[type.first].c_str() 
-		<< " by " << type.second.c_str()
-		<< " does not exist for element [" << index_source<<"]"
-		<< "\033[00m" << std::endl;
-      throw DataFormatException();
-    }
-
-    return (*loc).second[index_source];
-  }
-
-  const std::vector< ::larlite::product_id> event_base::association_keys() const
-  {
-    std::vector< ::larlite::product_id> results;
-    results.reserve(fAssociation.size());
-
-    for(auto const& key_value : fAssociation)
-
-      results.push_back(key_value.first);
-
-    return results;
-  }
-
-  const std::vector<std::string> event_base::association_keys(const data::DataType_t type) const
-  {
-    std::vector<std::string> results;
-
-    for(auto const& key_value : fAssociation) 
-
-      if(key_value.first.first == type) results.push_back(key_value.first.second);
-
-    return results;
-
-  }
-
-  const std::vector<std::string> event_base::association_keys(const data::DataType_t type,
-							      const size_t index_source) const
-  {
-    std::vector<std::string> results;
-    
-    for(auto const& key_value : fAssociation) {
-
-      if(key_value.first.first != type) continue;
-
-      if(key_value.second.size() <= index_source) continue;
-
-      if(key_value.second.at(index_source).size())
-
-	results.push_back(key_value.first.second);
-    }
-
-    return results;
-  }
-
-
+  void event_base::set_run      (unsigned int run) { fRunNumber    = run; }
+  void event_base::set_subrun   (unsigned int run) { fSubRunNumber = run; }
+  void event_base::set_event_id (unsigned int id ) { fEventID      = id;  }
 
 }
 

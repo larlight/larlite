@@ -344,6 +344,7 @@ namespace larlite {
 				  const event_cosmictag& ctag_trk_v,
 				  const event_calorimetry& calo_trk_v,
 				  const event_partid& pid_trk_v,
+				  const event_ass& ass_v,
 				  ::ertool::EventData& res) const
   {
     std::vector< ::ertool::Track> t_v;
@@ -353,16 +354,18 @@ namespace larlite {
       t_v.push_back(::ertool::Track());
       auto &t = t_v.back();
 
-      for(size_t i=0; i<trk.n_point(); ++i)
-	t += trk.vertex_at(i);
+      for(size_t i=0; i<trk.NumberTrajectoryPoints(); ++i)
+	t += trk.LocationAtPoint(i);
       
       t._cosmogenic = -1;
-      t._energy     = trk.momentum_at(0);
+      t._energy     = trk.MomentumAtPoint(0);
 
     }
+    
     // Revise track cosmogenic score
     if (ctag_trk_v.size()){
-      auto const& ctag_trk_ass = ctag_trk_v.association(trk_v.id());
+      //auto const& ctag_trk_ass = ctag_trk_v.association(trk_v.id());
+      auto const& ctag_trk_ass = ass_v.association(trk_v.id(),ctag_trk_v.id());
       if(ctag_trk_ass.size()) {
 	for(size_t cos_index=0; cos_index<ctag_trk_v.size(); ++cos_index) {
 	  
@@ -374,7 +377,8 @@ namespace larlite {
     }// if ctag exists
     // Revise track energy
     if (calo_trk_v.size()){
-      auto const& calo_trk_ass = calo_trk_v.association(trk_v.id());
+      //auto const& calo_trk_ass = calo_trk_v.association(trk_v.id());
+      auto const& calo_trk_ass = ass_v.association(trk_v.id(),calo_trk_v.id()); 
       if(calo_trk_ass.size()) {
 	for(size_t calo_index=0; calo_index<calo_trk_v.size(); ++calo_index) {
 	  
@@ -386,7 +390,8 @@ namespace larlite {
     }// if calo exists
     // Revise track part id
     if (pid_trk_v.size()){
-      auto const& pid_trk_ass = pid_trk_v.association(trk_v.id());
+      //auto const& pid_trk_ass = pid_trk_v.association(trk_v.id());
+      auto const& pid_trk_ass = ass_v.association(trk_v.id(),pid_trk_v.id()); 
       if(pid_trk_ass.size()) {
 	for(size_t pid_index=0; pid_index<pid_trk_v.size(); ++pid_index) {
 	  
@@ -442,6 +447,7 @@ namespace larlite {
 
   void ERToolHelper::FillShowers(const event_shower& shw_v,
 				 const event_cosmictag& ctag_shw_v,
+				 const event_ass& ass_v,
 				 ::ertool::EventData& res ) const
   {
     
@@ -468,7 +474,8 @@ namespace larlite {
     // Revise shower cosmogenic score
     // make sure ctag_shr_v is not empty
     if ( ctag_shw_v.size() ){
-      auto const& ctag_shw_ass = ctag_shw_v.association(shw_v.id());
+      //auto const& ctag_shw_ass = ctag_shw_v.association(shw_v.id());
+      auto const& ctag_shw_ass = ass_v.association(shw_v.id(),ctag_shw_v.id());
       if(ctag_shw_ass.size()) {
 	for(size_t cos_index=0; cos_index<ctag_shw_v.size(); ++cos_index) {
 	  

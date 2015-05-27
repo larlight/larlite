@@ -58,23 +58,19 @@ namespace larlite{
     virtual void clear_data();
 
     /// Accessors                                                                                                                                 
-    int                        PdgCode()            const {return fPdgCode;}
-    bool                       IsPrimary()          const {return fParent == kPFParticlePrimary;}
-    int                        NumDaughters()       const {return fDaughters.size();}
-    size_t                     Self()               const {return fSelf;}
-    size_t                     Parent()             const {return fParent;}
+    int    PdgCode()      const;
+    bool   IsPrimary()    const;
+    int    NumDaughters() const;
+    size_t Self()         const;
+    size_t Parent()       const;
     //size_t                     Daughter(size_t idx) const;
-    const std::vector<size_t>& Daughters()          const {return fDaughters;}
+    const std::vector<size_t>& Daughters() const;
 
     friend std::ostream& operator << (std::ostream& o, const pfpart& c);
     friend bool          operator <  (const pfpart& a, const pfpart& b);
 
   private:
     
-    ////////////////////////
-    ClassDef(pfpart,1)
-    ////////////////////////
-      
   };
   
   /**
@@ -102,9 +98,6 @@ namespace larlite{
 
   private:
     
-    ////////////////////////
-    ClassDef(event_pfpart,1)
-    ////////////////////////
   };
 }
 #endif

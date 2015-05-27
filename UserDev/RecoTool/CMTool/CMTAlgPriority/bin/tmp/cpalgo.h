@@ -1,5 +1,5 @@
 /**
- * \file CPAlgo_Class_Name.hh
+ * \file CPAlgo_Class_Name.h
  *
  * \ingroup Working_Package
  * 
@@ -11,10 +11,10 @@
 /** \addtogroup Working_Package
 
     @{*/
-#ifndef CPALGO_CLASS_NAME_HH
-#define CPALGO_CLASS_NAME_HH
+#ifndef CPALGO_CLASS_NAME_H
+#define CPALGO_CLASS_NAME_H
 
-#include "CPriorityAlgoBase.hh"
+#include "CPriorityAlgoBase.h"
 
 namespace cmtool {
   /**

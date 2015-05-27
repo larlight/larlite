@@ -17,6 +17,7 @@
 
 #include "data_base.h"
 #include "Base/GeoTypes.h"
+#include <TVector3.h>
 namespace larlite{
   /**
      \class calorimetry
@@ -38,14 +39,16 @@ namespace larlite{
 					       fDeadWireResR(original.fDeadWireResR),
 					       fRange(original.fRange),
 					       fTrkPitch(original.fTrkPitch),
+					       fXYZ(original.fXYZ),
 					       fPlaneID(original.fPlaneID)
     {}
     
     /// Default destructor
     virtual ~calorimetry(){}
-    
+
+
     virtual void clear_data();
-    
+
     // Set methods
     void set_dedx(const std::vector<double> &v)           { fdEdx = v;          }
     void set_dqdx(const std::vector<double> &v)           { fdQdx = v;          }
@@ -55,6 +58,7 @@ namespace larlite{
     void set_range(const double v)                        { fRange = v;         }
     void set_track_pitch(const std::vector<double> &v)    { fTrkPitch = v;      }
     void set_plane_id(const geo::PlaneID& id)             { fPlaneID = id;      }
+    void set_xyz(const std::vector<TVector3>& xyz)        { fXYZ = xyz;         }
 
     // Get Methods 
     inline const std::vector<double>& dEdx()          const { return fdEdx; }
@@ -71,6 +75,8 @@ namespace larlite{
       else return 0;
     }
     inline const geo::PlaneID& PlaneID() const { return fPlaneID;}
+    inline const std::vector<TVector3>& XYZ() { return fXYZ; }
+
   protected:
 
     double              fKineticEnergy;   ///< determined kinetic energy
@@ -80,14 +86,11 @@ namespace larlite{
     std::vector<double> fDeadWireResR;    ///< dead wire residual range, collection plane
     double              fRange;           ///< total range of track
     std::vector<double> fTrkPitch;        ///< track pitch on collection plane
-    geo::PlaneID        fPlaneID;
+    std::vector<TVector3> fXYZ;           ///< coordinates of space points
+    geo::PlaneID        fPlaneID;         ///< plane ID
 
   private:
     
-    ////////////////////////
-    ClassDef(calorimetry,2)
-    ////////////////////////
-      
   };
   
   /**
@@ -115,9 +118,6 @@ namespace larlite{
 
   private:
     
-    ////////////////////////
-    ClassDef(event_calorimetry,3)
-    ////////////////////////
   };
 }
 #endif

@@ -3,6 +3,7 @@ from ROOT import gSystem
 from ROOT import ertool
 from ROOT import larlite as fmwk
 from algoviewer import viewAll, view
+from seltool.ccsingleeDef import GetCCSingleEInstance
 
 if len(sys.argv) < 2:
     msg  = '\n'
@@ -15,25 +16,31 @@ if len(sys.argv) < 2:
 my_proc = fmwk.ana_processor()
 my_proc.enable_filter(True)
 
-# Create algorithm
-my_algo = ertool.AlgoSingleE()
-my_algo.useRadLength(True)
-my_algo.setVerbose(True)
-my_algo.setRejectLongTracks(True)
-my_algo.setVtxToTrkStartDist(1)
-my_algo.setVtxToTrkDist(1)
-my_algo.setVtxToShrStartDist(50)
-my_algo.setMaxIP(1)
-my_algo.setVtxProximityCut(5)
-my_algo.setEThreshold(0)
-my_algo.LoadParams()
+# Get Default CCSingleE Algorithm instance
+# this sets default parameters
+# this information is loaded from:
+# $LARLITE_BASEDIR/python/seltool/GetCCSingleEInstance
+# and the algorithm instance is the return of the
+# function GetCCSingleEInstance()
+my_algo = GetCCSingleEInstance()
+
 # Create ERTool filter
+# This filter removes any track that
+# is less than 3 mm in length
+# these tracks exist in "perfect reco"
+# but at this stage it is unreasonable
+# to assume we will be able to
+# reconstruct them
 my_filter = ertool.FilterTrackLength()
 my_filter.setLengthCut(0.3)
 
+
 # Create MC Filter
+# This filter is if you want to look at CC1E events
 MCfilter = fmwk.MC_CC1E_Filter();
-MCfilter.flip(False)
+#Set flip to FALSE if you are looking for efficiency, TRUE if you are looking for MID efficiency
+#MCfilter.flip(False)
+MCfilter.flip(True)
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):
@@ -68,12 +75,10 @@ my_anaunit._mgr._mc_for_ana = True
 #my_anaunit.SetShowerProducer(False,"newdefaultreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetShowerProducer(False,"mergeall");
-#my_anaunit.SetShowerProducer(False,"showerreco");
-my_anaunit.SetShowerProducer(True,"mcreco");
-
+my_anaunit.SetShowerProducer(False,"showerreco");
+#my_anaunit.SetShowerProducer(True,"mcreco");
 my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
-
 #my_anaunit.SetVtxProducer(True,"generator");
 # ************************************************
 my_proc.add_process(MCfilter)
@@ -92,7 +97,7 @@ while (counter < 1800):
     print "Particles: {0}".format(part_reco.size())
     print "Event: ", counter
     
-    if (part_reco.size() != 0):
+    if (part_reco.size() != 1):
         # we found something...lets plot it
         data_mc   = my_anaunit.GetData(True)
         part_mc   = my_anaunit.GetParticles(True)

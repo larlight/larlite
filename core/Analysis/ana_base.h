@@ -36,13 +36,19 @@ namespace larlite {
     virtual ~ana_base(){}
     
     /// Initialization method to be called before analyze any data
-    virtual Bool_t initialize(){return true;}
-    
+    virtual bool initialize(){return true;}
+
+    /// Function to be called when new run is found
+    virtual bool begin_run(storage_manager* data){return (data);}
+
+    /// Function to be called when new sub-run is found
+    virtual bool begin_subrun(storage_manager* data){return (data);}
+
     /// Analyze a data event-by-event  
-    virtual Bool_t analyze(storage_manager* data){return (data);}
+    virtual bool analyze(storage_manager* data){return (data);}
     
     /// Finalize method to be called after all events processed.
-    virtual Bool_t finalize(){return true;}
+    virtual bool finalize(){return true;}
     
     /// A setter for analysis output file poitner
     void set_output_file(TFile* fout){_fout=fout;}

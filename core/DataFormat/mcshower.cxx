@@ -55,6 +55,32 @@ namespace larlite {
       
     return fPlaneCharge[plane];
   }
+  
+  simb::Origin_t       mcshower::Origin() const { return fOrigin;    }
+  
+  int                mcshower::PdgCode () const { return fPDGCode;   }
+  unsigned int       mcshower::TrackID () const { return fTrackID; } 
+  const std::string& mcshower::Process () const { return fProcess;   }
+  const mcstep&      mcshower::Start   () const { return fStart;   }
+  const mcstep&      mcshower::End     () const { return fEnd;     }
+
+  int                mcshower::MotherPdgCode () const { return fMotherPDGCode;   }
+  unsigned int       mcshower::MotherTrackID () const { return fMotherTrackID; }
+  const std::string& mcshower::MotherProcess () const { return fMotherProcess;   }
+  const mcstep&      mcshower::MotherStart   () const { return fMotherStart;   }
+  const mcstep&      mcshower::MotherEnd     () const { return fMotherEnd;     }
+
+  int                mcshower::AncestorPdgCode () const { return fAncestorPDGCode;   }
+  unsigned int       mcshower::AncestorTrackID () const { return fAncestorTrackID; }
+  const std::string& mcshower::AncestorProcess () const { return fAncestorProcess;   }
+  const mcstep&      mcshower::AncestorStart   () const { return fAncestorStart;   }
+  const mcstep&      mcshower::AncestorEnd     () const { return fAncestorEnd;     }
+
+  const mcstep& mcshower::DetProfile () const { return fDetProfile; }
+  
+  const std::vector<unsigned int>&  mcshower::DaughterTrackID() const { return fDaughterTrackID; }
+  
+  const std::vector<double>& mcshower::Charge() const { return fPlaneCharge; }
 
 }
 

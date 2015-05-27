@@ -33,6 +33,15 @@ namespace larlite {
     , fDaughters(std::move(daughters))
   {}
 
+  /// Accessors                                                                                                                                 
+  int    pfpart::PdgCode()      const {return fPdgCode;}
+  bool   pfpart::IsPrimary()    const {return fParent == kPFParticlePrimary;}
+  int    pfpart::NumDaughters() const {return fDaughters.size();}
+  size_t pfpart::Self()         const {return fSelf;}
+  size_t pfpart::Parent()       const {return fParent;}
+  //size_t                     Daughter(size_t idx) const;
+  const std::vector<size_t>& pfpart::Daughters() const {return fDaughters;}
+
   //----------------------------------------------------------------------                                                                        
   // ostream operator.                                                                                                                            
   //                                                                                                                                              

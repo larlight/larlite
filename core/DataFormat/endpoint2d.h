@@ -53,17 +53,13 @@ namespace larlite {
 
   private:
 
-    double    fDriftTime;    ///< vertex's drift time
-    unsigned int      fWire;         ///< vertex's wireID
-    int       fID;           ///< vertex's ID
-    double    fStrength;     ///< vertex's strength
-    geo::View_t fView;         ///< view for this end point
-    double    fTotalCharge;  ///< total charge of hits associated with end point 
-    
-    ////////////////////////
-    ClassDef(endpoint2d,1)
-    ////////////////////////
-      
+    double       fDriftTime;    ///< vertex's drift time
+    unsigned int fWire;         ///< vertex's wireID
+    int          fID;           ///< vertex's ID
+    double       fStrength;     ///< vertex's strength
+    geo::View_t  fView;         ///< view for this end point
+    double       fTotalCharge;  ///< total charge of hits associated with end point 
+
   };
   
   /**
@@ -91,9 +87,6 @@ namespace larlite {
     
   private:
     
-    ////////////////////////
-    ClassDef(event_endpoint2d,1)
-    ////////////////////////
   };
 }
 #endif

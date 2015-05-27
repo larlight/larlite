@@ -16,6 +16,9 @@ namespace larlite {
     _name_track     = "";
     _name_shower    = "";
     _name_vertex    = "";
+
+    // turn profile mode off
+    _mgr._profile_mode = false;
   }
 
   const ::ertool::EventData& ERToolAnaBase::GetData(bool mc) const
@@ -95,9 +98,9 @@ namespace larlite {
 
     static bool one_time_warning = true;
 
+
     //------------------------------
     // Start filling SPAData object!
-    
     // Fill showers
     if (_mcshowers && !_name_mcshr.empty()){
       auto ev_mcs = storage->get_data<event_mcshower> (_name_mcshr);
@@ -111,6 +114,7 @@ namespace larlite {
     else if(!_mcshowers && !_name_shower.empty()){
       auto ev_shw      = storage->get_data<event_shower>    (_name_shower);
       auto ev_ctag_shw = storage->get_data<event_cosmictag> (Form("%stag",_name_shower.c_str()));
+      auto ev_ass  = storage->get_data<event_ass>      (_name_shower);
       if (!ev_shw) {
 	print(msg::kERROR,__FUNCTION__,
 	      "RecoShower info not found in the event!");
@@ -121,10 +125,10 @@ namespace larlite {
 	  print(msg::kWARNING,__FUNCTION__,
 		Form("One-Time-Warning: No cosmictag for shower available (\"%stag\")",_name_shower.c_str()) );
 	event_cosmictag tmp;
-	_helper.FillShowers(*ev_shw, tmp, _mgr.EventDataWriteable());	  
+	_helper.FillShowers(*ev_shw, tmp, *ev_ass, _mgr.EventDataWriteable());	  
       }
       else
-	_helper.FillShowers(*ev_shw, *ev_ctag_shw, _mgr.EventDataWriteable());
+	_helper.FillShowers(*ev_shw, *ev_ctag_shw, *ev_ass, _mgr.EventDataWriteable());
     }
 
     // Fill tracks
@@ -142,6 +146,7 @@ namespace larlite {
       auto ev_ctag_trk = storage->get_data<event_cosmictag>   (Form("%stag",  _name_track.c_str()));
       auto ev_calo_trk = storage->get_data<event_calorimetry> (Form("%scalo", _name_track.c_str()));
       auto ev_pid_trk  = storage->get_data<event_partid>      (Form("%spid",  _name_track.c_str()));
+      auto ev_ass  = storage->get_data<event_ass>      (_name_track);
       if (!ev_trk) {
 	print(msg::kERROR,__FUNCTION__,
 	      Form(" Track \"%s\" not found in the event!",_name_track.c_str()));
@@ -165,9 +170,8 @@ namespace larlite {
 	delete ev_pid_trk;
 	ev_pid_trk = new event_partid();
       }
-      _helper.FillTracks( *ev_trk, *ev_ctag_trk, *ev_calo_trk, *ev_pid_trk, _mgr.EventDataWriteable() );
+      _helper.FillTracks( *ev_trk, *ev_ctag_trk, *ev_calo_trk, *ev_pid_trk, *ev_ass, _mgr.EventDataWriteable() );
     }
-
     // Fill Vertices
     if (_mcvtx && !_name_mcvtx.empty()){
       auto ev_mci = storage->get_data<event_mctruth> (_name_mcvtx);
@@ -178,10 +182,8 @@ namespace larlite {
       }
       _helper.FillVertices(*ev_mci, _mgr.EventDataWriteable());
     }
-
     // Done filling SPAData Object!
     // ----------------------------
-
     // If MC info is found, fill MCParticles into a ParticleSet
     if( !_name_generator.empty() &&
 	!_name_mcshr.empty()     &&
@@ -189,7 +191,6 @@ namespace larlite {
       auto ev_mci = storage->get_data<event_mctruth>  (_name_generator);
       auto ev_mcs = storage->get_data<event_mcshower> (_name_mcshr);
       auto ev_mct = storage->get_data<event_mctrack>  (_name_mctrk);
-
       // Make sure the data is there
       if (ev_mci && ev_mcs && ev_mct)
 	_helper.FillMCInfo(*ev_mci,

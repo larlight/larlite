@@ -57,7 +57,7 @@ namespace ertool {
     AlgoEMPart _alg_emp;
 
     TH1F* michel_energy;
-
+    TH1F* shower_st_to_track_end;
   };
 }
 #endif

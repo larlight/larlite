@@ -56,9 +56,6 @@ namespace larlite {
     /// Accessor to specific bit
     bool         Triggered(const unsigned char bit) const;
 
-    ////////////////////////
-    ClassDef(trigger,3)
-    ////////////////////////
   };
 }
 

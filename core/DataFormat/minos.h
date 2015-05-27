@@ -89,15 +89,11 @@ namespace larlite{
        void SetmcPz(double mcpz){fmcPz = mcpz;}
    private:    
     
-       //double fmcPx;
-       //double fmcPy;
-       //double fmcPz;
-      int fmatched; //our variable to store whether minos track is matched to ArgoNeuT track
+     //double fmcPx;
+     //double fmcPy;
+     //double fmcPz;
+     int fmatched; //our variable to store whether minos track is matched to ArgoNeuT track
    
-   ////////////////////////
-   ClassDef(minos,1)
-   ////////////////////////
-      
    };   
  
  /**
@@ -124,9 +120,6 @@ namespace larlite{
 
   private:
     
-    ////////////////////////
-    ClassDef(event_minos,4)
-    ////////////////////////
   };
 
 }

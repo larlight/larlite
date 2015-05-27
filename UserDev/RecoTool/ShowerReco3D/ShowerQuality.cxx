@@ -185,6 +185,30 @@ namespace larlite {
     }
     if(!ev_shower->size()) return false;
 
+
+    // get associated clusters
+    event_cluster* ev_cluster = nullptr;
+    auto const& ass_cluster_v = storage->find_one_ass(ev_shower->id(),ev_cluster,ev_shower->name());
+
+    if (!ev_cluster)
+      print(msg::kERROR,__FUNCTION__, Form("No associated cluster found to a shower produced by \"%s\"", fShowerProducer.c_str()));
+      else if(ev_cluster->size()<1) {
+      print(msg::kERROR,__FUNCTION__,Form("There are 0 clusters in this event! Skipping......"));      
+      return false;
+    }
+
+    // get associated hits
+    event_hit* ev_hit = nullptr;
+    auto const& ass_hit_v = storage->find_one_ass(ev_cluster->id(),ev_hit,ev_cluster->name());
+
+    if (!ev_hit)
+      print(msg::kERROR,__FUNCTION__, Form("No associated hit found to a shower produced by \"%s\"", ev_cluster->name().c_str()));
+    else if(ev_hit->size()<1) {
+      print(msg::kERROR,__FUNCTION__,Form("There are 0 hits in this event! Skipping......"));      
+      return false;
+    }
+
+    /*
     // Get cluster
     auto shower_cluster_ass_keys = ev_shower->association_keys(data::kCluster);
     if(!(shower_cluster_ass_keys.size())) {
@@ -220,6 +244,7 @@ namespace larlite {
 
     // Retrieve cluster=>hit association
     auto ass_hit_v = ev_cluster->association(ev_hit->id());
+    */
 
     // Create G4 track ID vector for which we are interested in
     std::vector<std::vector<unsigned int> > g4_trackid_v;
@@ -266,8 +291,8 @@ namespace larlite {
 	  auto const& h = (*ev_hit)[hit_index];
 
 	  w_v.push_back( ::btutil::WireRange_t( h.Channel(),
-						h.StartTime(),
-						h.EndTime() ) 
+						h.StartTick(),
+						h.EndTick() ) 
 			 );
 	}
       }
@@ -386,10 +411,14 @@ namespace larlite {
       */
 
       fTreeParams.reco_energy = reco_shower.Energy().at(reco_shower.best_plane());
-      //fTreeParams.reco_dedx_U   = reco_shower.dEdx().at(0);
-      //fTreeParams.reco_dedx_V   = reco_shower.dEdx().at(1);
-      //fTreeParams.reco_dedx_Y   = reco_shower.dEdx().at(2);
+      fTreeParams.reco_energy_U = reco_shower.Energy().at(0);
+      fTreeParams.reco_energy_V = reco_shower.Energy().at(1);
+      fTreeParams.reco_energy_Y = reco_shower.Energy().at(2);
+      
       fTreeParams.reco_dedx     = reco_shower.dEdx().at(reco_shower.best_plane());
+      fTreeParams.reco_dedx_U   = reco_shower.dEdx().at(0);
+      fTreeParams.reco_dedx_V   = reco_shower.dEdx().at(1);
+      fTreeParams.reco_dedx_Y   = reco_shower.dEdx().at(2);
 
       //
       // Fill histograms
@@ -492,6 +521,9 @@ namespace larlite {
     fTree->Branch("reco_dcosy",&fTreeParams.reco_dcosy,"reco_dcosy/D");
     fTree->Branch("reco_dcosz",&fTreeParams.reco_dcosz,"reco_dcosz/D");
     fTree->Branch("reco_energy",&fTreeParams.reco_energy,"reco_energy/D");
+    fTree->Branch("reco_energy_U",&fTreeParams.reco_energy_U,"reco_energy_U/D");
+    fTree->Branch("reco_energy_V",&fTreeParams.reco_energy_V,"reco_energy_V/D");
+    fTree->Branch("reco_energy_Y",&fTreeParams.reco_energy_Y,"reco_energy_Y/D");
 
     fTree->Branch("best_plane_id",&fTreeParams.best_plane_id,"best_plane_id/i");
 

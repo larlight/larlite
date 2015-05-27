@@ -76,7 +76,7 @@ namespace larlite {
   
   bool MMQuality::analyze(storage_manager* storage) {
 
-    event_shower* ev_shower = nullptr;
+    //event_shower* ev_shower = nullptr;
 
     // Retrieve mcshower data product
     auto ev_mcs = storage->get_data<event_mcshower>("mcreco");
@@ -92,20 +92,12 @@ namespace larlite {
       print(msg::kERROR,__FUNCTION__,"SimChannel data product not found!");
       return false;
     }      
-    
+
+    /*
     if(fClusterProducer.empty()) {
 
-      auto ev_shower = storage->get_data<event_shower>(fShowerProducer);
-
-      if(!ev_shower) {
-	print(msg::kERROR,__FUNCTION__,
-	      Form("Did not find shower produced by \"%s\"",fShowerProducer.c_str())
-	      );
-	return false;
-      }
-
       auto ass_keys = ev_shower->association_keys(data::kCluster);
-
+      
       if(!(ass_keys.size())) {
 	print(msg::kERROR,__FUNCTION__,
 	      Form("No associated cluster found to a shower produced by \"%s\"",
@@ -114,13 +106,33 @@ namespace larlite {
       }
       fClusterProducer = ass_keys[0];
     }
-
+    
     auto ev_cluster = storage->get_data<event_cluster>(fClusterProducer);
     if(!ev_cluster || !(ev_cluster->size())) {
       print(msg::kERROR,__FUNCTION__,"Could not retrieve a reconstructed cluster!");
       return false;
     }
+    */
+    
+    auto ev_shower = storage->get_data<event_shower>(fShowerProducer);
+    if(!ev_shower) {
+      print(msg::kERROR,__FUNCTION__,Form("Did not find shower produced by \"%s\"",fShowerProducer.c_str()));
+      return false;
+    }
 
+    // get associated clusters
+    event_cluster* ev_cluster = nullptr;
+    auto const& ass_cluster_v = storage->find_one_ass(ev_shower->id(),ev_cluster,ev_shower->name());
+    if (!ev_cluster)
+      print(msg::kERROR,__FUNCTION__,Form("No associated cluster found to a shower produced by \"%s\"",fShowerProducer.c_str()));
+    
+    // get associated hits
+    event_hit* ev_hit = nullptr;
+    auto const& ass_hit_v = storage->find_one_ass(ev_cluster->id(),ev_hit,ev_cluster->name());
+    if (!ev_hit)
+      print(msg::kERROR,__FUNCTION__,Form("No associated hit found to a cluster produced by \"%s\"",ev_cluster->name().c_str()));
+
+    /*
     // Retrieve shower => cluster association
     auto ass_cluster_v = ev_shower->association(ev_cluster->id());
 
@@ -141,6 +153,7 @@ namespace larlite {
 
     // Retrieve cluster=>hit association
     auto ass_hit_v = ev_cluster->association(ev_hit->id());
+    */
 
     // Create G4 track ID vector for which we are interested in
     std::vector<unsigned int> g4_trackid_v;

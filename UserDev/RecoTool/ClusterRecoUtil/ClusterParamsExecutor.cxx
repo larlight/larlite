@@ -23,6 +23,7 @@ namespace cluster {
 
     auto ev_cluster = mgr->get_data< ::larlite::event_cluster>(cluster_producer_name);
 
+    /*
     auto hit_ass_names = ev_cluster->association_keys(::larlite::data::kHit);
 
     if(!(hit_ass_names.size()) ||
@@ -30,7 +31,34 @@ namespace cluster {
       throw cluster::CRUException("Associated hits not found!");
       return -1;
     }
+    */
 
+    ::larlite::event_hit* ev_hits = nullptr;
+
+    auto const& hit_index_v = mgr->find_one_ass(ev_cluster->id(),ev_hits,ev_cluster->name());
+
+    if (!ev_hits){
+      throw cluster::CRUException("Associated hits not found!");
+      return -1;
+    }
+    
+    if (!hit_index_v.size()) {
+      throw cluster::CRUException("Associated hits not found!");
+      return -1;
+    }
+
+    cluster_hits.clear();
+
+    UChar_t plane = ::larutil::Geometry::GetME()->ChannelToPlane(ev_hits->at(hit_index_v[0][0]).Channel());
+
+    cluster_hits.reserve(hit_index_v.size());
+
+    for (auto const& ass : hit_index_v){
+      for (auto const& hitindex : ass)
+	cluster_hits.push_back((const ::larlite::hit*)(&ev_hits->at(hitindex)));
+    }
+
+    /*
     auto ev_hits = mgr->get_data< ::larlite::event_hit>(hit_ass_names[0]);
 
     auto const hit_index_v = ev_cluster->association(::larlite::data::kHit,hit_ass_names[0],cluster_index);
@@ -50,7 +78,9 @@ namespace cluster {
 
       cluster_hits.push_back((const ::larlite::hit*)(&(ev_hits->at(index))));
     
-   return Execute(ev_hits->event_id(), cluster_index, plane);
+    return Execute(ev_hits->event_id(), cluster_index, plane);
+    */
+
   }
 
 
@@ -85,7 +115,7 @@ namespace cluster {
     double time_max=0;
     for(auto const h : cluster_hits) {
       
-      double hit_wire = h->Wire();
+      double hit_wire = h->WireID().Wire;
       double hit_time = h->PeakTime();
       
       wire_min = hit_wire < wire_min ? hit_wire : wire_min;
@@ -127,9 +157,9 @@ namespace cluster {
     for(auto h : cluster_hits) {
 
       if(!_useHitBlurring)
-	hCurrentHit->Fill(h->Wire()*(fGSer->WireToCm()), 
+	hCurrentHit->Fill(h->WireID().Wire*(fGSer->WireToCm()), 
 			  h->PeakTime()*(fGSer->TimeToCm()), 
-			  h->Charge());
+			  h->Integral());
 
 
       else{
@@ -138,8 +168,8 @@ namespace cluster {
 
 	//width of peak (estimated) = avg time b/t peak&start, and peak&end
 	double blurfnsigma = 
-	  ( (h->PeakTime() - h->StartTime() )
-	   +(h->EndTime()  - h->PeakTime()) ) / 2;
+	  ( (h->PeakTime() - h->StartTick() )
+	   +(h->EndTick()  - h->PeakTime()) ) / 2;
 	blurfnsigma *= (fGSer->TimeToCm());
 	_blurFunction->SetParameter(2,blurfnsigma);
 	
@@ -157,14 +187,14 @@ namespace cluster {
 	unsigned int counter = 0;
 	double charge_in_bin, bin_low, bin_high;
 	
-	while( (charge_filled)/(h->Charge()) < 0.97
+	while( (charge_filled)/(h->Integral()) < 0.97
 	       && counter < (unsigned int)(hCurrentHit->GetNbinsY()) ){
 
 	  //if you're dealing with the one peak bin
 	  if(!counter){
-	    charge_in_bin = (_blurFunction->Integral(peak_bin_low,peak_bin_high)) * h->Charge();
+	    charge_in_bin = (_blurFunction->Integral(peak_bin_low,peak_bin_high)) * h->Integral();
 	    
-	    hCurrentHit->Fill(h->Wire()*(fGSer->WireToCm()), 
+	    hCurrentHit->Fill(h->WireID().Wire*(fGSer->WireToCm()), 
 			      h->PeakTime()*(fGSer->TimeToCm()), 
 			      charge_in_bin);
 	    
@@ -180,10 +210,10 @@ namespace cluster {
 	    bin_low = hCurrentHit->GetYaxis()->GetBinLowEdge(current_bin_above_peak);
 	    bin_high = hCurrentHit->GetYaxis()->GetBinUpEdge(current_bin_above_peak);
 	    
-	    charge_in_bin = (_blurFunction->Integral(bin_low,bin_high)) * h->Charge();
+	    charge_in_bin = (_blurFunction->Integral(bin_low,bin_high)) * h->Integral();
 
 	    if(charge_in_bin > 1e-4)
-	      hCurrentHit->Fill(h->Wire()*(fGSer->WireToCm()),
+	      hCurrentHit->Fill(h->WireID().Wire*(fGSer->WireToCm()),
 				hCurrentHit->GetYaxis()->GetBinCenter(current_bin_above_peak),
 				charge_in_bin);
 	    charge_filled += charge_in_bin;
@@ -193,10 +223,10 @@ namespace cluster {
 	    bin_low = hCurrentHit->GetYaxis()->GetBinLowEdge(current_bin_below_peak);
 	    bin_high = hCurrentHit->GetYaxis()->GetBinUpEdge(current_bin_below_peak);
 
-	    charge_in_bin = (_blurFunction->Integral(bin_low,bin_high)) * h->Charge();
+	    charge_in_bin = (_blurFunction->Integral(bin_low,bin_high)) * h->Integral();
 
 	    if(charge_in_bin > 1e-4)
-	      hCurrentHit->Fill(h->Wire()*(fGSer->WireToCm()),
+	      hCurrentHit->Fill(h->WireID().Wire*(fGSer->WireToCm()),
 				hCurrentHit->GetYaxis()->GetBinCenter(current_bin_below_peak),
 				charge_in_bin);
 	    charge_filled += charge_in_bin;

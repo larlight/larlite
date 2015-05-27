@@ -59,24 +59,24 @@ namespace larlite{
 
     void clear_data();
 
-    simb::Origin_t      Origin     () const { return fOrigin;            }
-    int                 PdgCode    () const { return fPDGCode;           }
-    unsigned int        TrackID  () const { return fTrackID;         }
-    const std::string&  Process    () const { return fProcess;           }
-    const mcstep&       Start    () const { return fStart;           }
-    const mcstep&       End      () const { return fEnd;             }
+    simb::Origin_t      Origin     () const;
+    int                 PdgCode    () const;
+    unsigned int        TrackID  () const;
+    const std::string&  Process    () const;
+    const mcstep&       Start    () const;
+    const mcstep&       End      () const;
 
-    int                MotherPdgCode   () const { return fMotherPDGCode;     }
-    unsigned int       MotherTrackID () const { return fMotherTrackID;   }
-    const std::string& MotherProcess   () const { return fMotherProcess;     }
-    const mcstep&      MotherStart   () const { return fMotherStart;     }
-    const mcstep&      MotherEnd     () const { return fMotherEnd;       }
+    int                MotherPdgCode   () const;
+    unsigned int       MotherTrackID () const;
+    const std::string& MotherProcess   () const;
+    const mcstep&      MotherStart   () const;
+    const mcstep&      MotherEnd     () const;
 
-    int                AncestorPdgCode   () const { return fAncestorPDGCode;   }
-    unsigned int       AncestorTrackID () const { return fAncestorTrackID; }
-    const std::string& AncestorProcess   () const { return fMotherProcess;     }
-    const mcstep&      AncestorStart   () const { return fAncestorStart;   }
-    const mcstep&      AncestorEnd     () const { return fAncestorEnd;     }
+    int                AncestorPdgCode   () const;
+    unsigned int       AncestorTrackID () const;
+    const std::string& AncestorProcess   () const;
+    const mcstep&      AncestorStart   () const;
+    const mcstep&      AncestorEnd     () const;
 
     void Origin          ( simb::Origin_t o ) { fOrigin    = o;        }
     void PdgCode         ( int id           ) { fPDGCode   = id;       }
@@ -118,10 +118,6 @@ namespace larlite{
     mcstep         fAncestorStart;     ///< This particle's ancestor's start position/momentum
     mcstep         fAncestorEnd;       ///< This particle's ancestor's start position/momentum
 
-    ////////////////////////
-    ClassDef(mctrack,1)
-    ////////////////////////
-      
   };
   
   /**
@@ -148,9 +144,6 @@ namespace larlite{
 
   private:
     
-    ////////////////////////
-    ClassDef(event_mctrack,1)
-    ////////////////////////
   };
 }
 #endif

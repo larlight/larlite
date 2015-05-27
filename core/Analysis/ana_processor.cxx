@@ -113,9 +113,9 @@ namespace larlite {
   }
   
   Bool_t ana_processor::process_event(UInt_t index){
-
+    
     if(index == data::kINVALID_UINT) index = _index;
-
+    
     _index = index;
     
     if(_process==kINIT) {
@@ -124,12 +124,7 @@ namespace larlite {
 	Message::send(msg::kERROR,__FUNCTION__,"Aborting.");
 	return false;
       }
-      else
-	_process=kPROCESSING;
     }
-    
-    if(_process==kREADY)
-      _process=kPROCESSING;
     
     bool event_found = 0;
     if(_filter_enable)
@@ -141,10 +136,33 @@ namespace larlite {
 
       _ana_unit_status = true;
 
+      if(_storage->run_id() != _storage->last_run_id()) {
+	
+	for(size_t i=0; i<_analyzers.size(); ++i) {
+	  auto& au = _analyzers[i];
+	  if(_process != kPROCESSING) {
+	    au->begin_run(_storage);
+	    au->begin_subrun(_storage);
+	  }else{
+	    au->begin_run(_storage);
+	    au->begin_subrun(_storage);
+	  }
+	}
+      }else if(_storage->subrun_id() != _storage->last_subrun_id()) {
+
+	for(size_t i=0; i<_analyzers.size(); ++i) {
+	  auto& au = _analyzers[i];
+	  if(_process != kPROCESSING)
+	    au->begin_subrun(_storage);
+	  else
+	    au->begin_subrun(_storage);
+	}
+      }
+      
       for(size_t i=0; i<_analyzers.size(); ++i){
 
 	_ana_status[i] = false;
-
+	   
 	_ana_status[i] = _analyzers[i]->analyze(_storage);
 
 	_ana_unit_status = _ana_unit_status && _ana_status[i];
@@ -155,11 +173,14 @@ namespace larlite {
       
       _index++;
       _nevents++;
-
+      
+      if(_process != kPROCESSING)
+	_process=kPROCESSING;
       return true;
     }
     else {
-
+      if(_process != kPROCESSING)
+	_process=kPROCESSING;
       return finalize();
     }
   }

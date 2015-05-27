@@ -17,6 +17,8 @@
 
 #include "data_base.h"
 #include "Base/GeoConstants.h"
+#include "Base/GeoTypes.h"
+#include "Base/RawConstants.h"
 #include <vector>
 namespace larlite{
   /**
@@ -33,89 +35,150 @@ namespace larlite{
     /// Default destructor
     virtual ~hit(){}
 
-    hit(const hit &original) : data_base(original),
-			       fHitSignal(original.fHitSignal),
-			       fStartTime(original.fStartTime),
-			       fSigmaStartTime(original.fSigmaStartTime),
-			       fPeakTime(original.fPeakTime),
-			       fSigmaPeakTime(original.fSigmaPeakTime),
-			       fEndTime(original.fEndTime),
-			       fSigmaEndTime(original.fSigmaEndTime),
-			       fCharge(original.fCharge),
-			       fSigmaCharge(original.fSigmaCharge),
-			       fMaxCharge(original.fMaxCharge),
-			       fSigmaMaxCharge(original.fSigmaMaxCharge),
-                               fMultiplicity(original.fMultiplicity),
-                               fGoodnessOfFit(original.fGoodnessOfFit),
-                               fView(original.fView),
-                               fSignalType(original.fSignalType),
-                               fChannel(original.fChannel),
-                               fWire(original.fWire)
-    {};
-  
-
     void clear_data();
-    
+
     // Set methods
-    void set_waveform  (const std::vector<double>& wf) { fHitSignal = wf;}
-    void set_times     (double start, double peak, double end)
-    {fStartTime = start; fPeakTime = peak; fEndTime = end;}
-    void set_times_err (double start, double peak, double end)
-    {fSigmaStartTime = start; fSigmaPeakTime = peak; fSigmaEndTime = end;}
-    void set_charge    (double q, double q_max)
-    {fCharge=q; fMaxCharge = q_max;}
-    void set_charge_err(double q, double q_max)
-    {fSigmaCharge=q; fSigmaMaxCharge=q_max;}
-    void set_multiplicity(int m){ fMultiplicity=m;}
-    void set_channel (unsigned int ch){ fChannel=ch;}
-    void set_wire    (unsigned int wire) { fWire=wire;}
-    void set_fit_goodness(double v){ fGoodnessOfFit = v;}
-    void set_view(geo::View_t v){ fView = v;}
-    void set_sigtype(geo::SigType_t t) {fSignalType=t;}
-    
-    // Get Methods 
-    const std::vector<double>& HitSignal()    const { return fHitSignal;      }  
-    double        StartTime()                 const { return fStartTime;      }  
-    double        EndTime()                   const { return fEndTime;        }
-    double        PeakTime()                  const { return fPeakTime;       }
-    double        SigmaStartTime()            const { return fSigmaStartTime; }
-    double        SigmaEndTime()              const { return fSigmaEndTime;   }
-    double        SigmaPeakTime()             const { return fSigmaPeakTime;  }
-    int           Multiplicity()              const { return fMultiplicity;   }
-    unsigned int          Channel()                   const { return fChannel;        }
-    unsigned int          Wire()                      const { return fWire;           }
-    double        Charge(bool max=false)      const { return ( max ? fMaxCharge : fCharge);}
-    double        SigmaCharge(bool max=false) const { return ( max ? fSigmaMaxCharge : fSigmaCharge ); }
-    double        GoodnessOfFit()             const { return fGoodnessOfFit;  }
-    geo::SigType_t  SignalType()                const { return fSignalType;     }
-    geo::View_t     View()                      const { return fView;           }
+    void set_rms (float rms)
+    {fRMS = rms; }
+    void set_time_range (raw::TDCtick_t start, raw::TDCtick_t end)
+    {fStartTick = start; fEndTick = end;}
+    void set_time_peak (float peak, float err)
+    {fPeakTime = peak; fSigmaPeakTime = err; }
+    void set_time_rms (float rms)
+    {fRMS = rms;}
+    void set_amplitude (float peak, float err)
+    {fPeakAmplitude = peak; fSigmaPeakAmplitude = err; }
+    void set_integral (float integral, float err)
+    {fIntegral = integral; fSigmaIntegral = err; }
+    void set_sumq (float sumadc)
+    {fSummedADC = sumadc; }
+    void set_multiplicity(short mult)
+    { fMultiplicity = mult; }
+    void set_local_index(short id)
+    { fLocalIndex = id; }
+    void set_goodness(float quality)
+    { fGoodnessOfFit = quality; }
+    void set_ndf(int ndf)
+    { fNDF = ndf; }
+    void set_channel(raw::ChannelID_t ch)
+    { fChannel = ch; }
+    void set_view(geo::View_t v)
+    { fView = v; }
+    void set_signal_type(geo::SigType_t sid)
+    { fSignalType = sid; }
+    void set_wire(const geo::WireID& wid)
+    { fWireID = wid; }
+
+    /// @{
+    /// @name Accessors
+      
+    /// Initial tdc tick for hit
+    raw::TDCtick_t          StartTick()                 const;
+      
+    /// Final tdc tick for hit
+    raw::TDCtick_t          EndTick()                   const;
+      
+    /// Time of the signal peak, in tick units
+    float                   PeakTime()                  const;
+      
+    /// Uncertainty for the signal peak, in tick units
+    float                   SigmaPeakTime()             const;
+      
+    /// RMS of the hit shape, in tick units
+    float                   RMS()                       const;
+      
+    /// The estimated amplitude of the hit at its peak, in ADC units
+    float                   PeakAmplitude()             const;
+      
+    /// Uncertainty on estimated amplitude of the hit at its peak, in ADC units
+    float                   SigmaPeakAmplitude()        const;
+      
+    /// The sum of calibrated ADC counts of the hit (0. by default)
+    float                   SummedADC()                 const;
+      
+    /// Integral under the calibrated signal waveform of the hit, in tick x ADC units
+    float                   Integral()                  const;
+      
+    ///< Uncertainty of integral under the calibrated signal waveform of the hit, in ADC units
+    float                   SigmaIntegral()             const;
+      
+    /// How many hits could this one be shared with
+    short int               Multiplicity()              const;
+      
+    ///< Index of this hit among the Multiplicity() hits in the signal window (-1 by default)
+    short int               LocalIndex()                const;
+      
+    ///< How well do we believe we know this hit?
+    float                   GoodnessOfFit()             const;
+      
+    ///< Degrees of freedom in the determination of the hit signal shape (-1 by default)
+    int                     DegreesOfFreedom()          const;
+      
+    /// ID of the readout channel the hit was extracted from
+    raw::ChannelID_t        Channel()                   const;
+      
+    /// View for the plane of the hit
+    geo::View_t             View()                      const;
+      
+    /// Signal type for the plane of the hit
+    geo::SigType_t          SignalType()                const;
+      
+    ///< ID of the wire the hit is on (Cryostat, TPC, Plane, Wire)
+    geo::WireID             WireID()                    const;
+      
+    /// @}
+      
+    //@{
+    /**
+     * @brief Returns a time sigmas RMS away from the peak time
+     * @param sigmas the number of RMS units to move away
+     * @return the shifted time in TDC ticks
+     *
+     * PeakTimePlusRMS() returns PeakTime() + sigmas x RMS();
+     * PeakTimeMinusRMS() returns PeakTime() - sigmas x RMS().
+     * 
+     * @note StartTime() of recob::Hit version <=13 was defined by
+     *   GausHitFinder to be PeakTimePlusRMS(-1.), and EndTime() was
+     *   PeakTimePlusRMS(+1.).
+     */
+    float                   PeakTimePlusRMS(float sigmas = +1.) const;
+    float                   PeakTimeMinusRMS(float sigmas = +1.) const;
+    //@}
+      
+    /**
+     * @brief Returns the distance of the specified time from peak, in RMS units
+     * @param ticks the time, in TDC tick units
+     * @return the distance of the specified time from peak, in RMS units
+     *
+     * This returns (ticks - PeakTime()) / RMS().
+     * There is no protection in case RMS is 0!
+     */
+    float                   TimeDistanceAsRMS(float time) const;
+      
+    friend bool           operator <  (const hit & a, const hit & b);
     
   protected:
-    
-    std::vector<double>   fHitSignal;      ///< vector of ADC values within the hit window
-    double                fStartTime;      ///< initial tdc tick for hit 
-    double                fSigmaStartTime; ///< uncertainty on initial tick
-    double                fPeakTime;       ///< tdc for the peak charge deposition
-    double                fSigmaPeakTime;  ///< uncertainty for tdc of the peak
-    double                fEndTime;        ///< final tdc tick for hit
-    double                fSigmaEndTime;   ///< uncertainty on final tick
-    double                fCharge;         ///< total charge deposited for hit
-    double                fSigmaCharge;    ///< uncertainty in total charge deposited
-    double                fMaxCharge;      ///< maximum ADC value in hit window
-    double                fSigmaMaxCharge; ///< maximum ADC value in hit window
-    int                   fMultiplicity;   ///< how many hits could this one be shared with
-    double                fGoodnessOfFit;  ///< how well do we believe we know this hit?
-    geo::View_t             fView;           ///< view for the plane of the hit
-    geo::SigType_t          fSignalType;     ///< signal type for the plane of the hit
-    unsigned int                  fChannel;        ///< channel number
-    unsigned int                  fWire;           ///< wire number
+    raw::ChannelID_t        fChannel;        ///< ID of the readout channel the hit was extracted from                                                  
+    raw::TDCtick_t          fStartTick;      ///< initial tdc tick for hit                                                                              
+    raw::TDCtick_t          fEndTick;        ///< final tdc tick for hit                                                                                
+    float                   fPeakTime;       ///< time of the signal peak, in tick units                                                                
+    float                   fSigmaPeakTime;  ///< uncertainty for the signal peak, in tick units                                                        
+    float                   fRMS;            ///< RMS of the hit shape, in tick units                                                                   
+    float                   fPeakAmplitude;  ///< the estimated amplitude of the hit at its peak, in ADC units                                          
+    float                   fSigmaPeakAmplitude; ///< uncertainty on estimated amplitude of the hit at its peak, in ADC units                           
+    float                   fSummedADC;      ///< the sum of calibrated ADC counts of the hit                                                           
+    float                   fIntegral;       ///< the integral under the calibrated signal waveform of the hit, in tick x ADC units                     
+    float                   fSigmaIntegral;  ///< the uncertainty of integral under the calibrated signal waveform of the hit, in ADC units             
+    short int               fMultiplicity;   ///< how many hits could this one be shared with                                                           
+    short int               fLocalIndex;     ///< index of this hit among the Multiplicity() hits in the signal window                                  
+    float                   fGoodnessOfFit;  ///< how well do we believe we know this hit?                                                              
+    int                     fNDF;            ///< degrees of freedom in the determination of the hit shape                                              
+    geo::View_t             fView;           ///< view for the plane of the hit                                                                         
+    geo::SigType_t          fSignalType;     ///< signal type for the plane of the hit                                                                  
+    geo::WireID             fWireID;         ///< WireID for the hit (Cryostat, TPC, Plane, Wire)
 
   private:
     
-    ////////////////////////
-    ClassDef(hit,3)
-    ////////////////////////
-      
   };
   
   /**
@@ -123,15 +186,15 @@ namespace larlite{
      A collection storage class of multiple hits.
   */
   class event_hit : public std::vector<larlite::hit>, 
-		    public event_base {
+    public event_base {
     
   public:
     
-    /// Default constructor
-    event_hit(std::string name="noname") : event_base(data::kHit,name) { clear_data(); }
+      /// Default constructor
+  event_hit(std::string name="noname") : event_base(data::kHit,name) { clear_data(); }
     
-    /// Default copy constructor
-    event_hit(const event_hit& original) : std::vector<larlite::hit>(original), event_base(original)
+      /// Default copy constructor
+  event_hit(const event_hit& original) : std::vector<larlite::hit>(original), event_base(original)
     {}
     
     /// Default destructor
@@ -142,9 +205,6 @@ namespace larlite{
 
   private:
     
-    ////////////////////////
-    ClassDef(event_hit,4)
-    ////////////////////////
   };
 }
 #endif

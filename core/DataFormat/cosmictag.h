@@ -71,8 +71,6 @@ namespace larlite {
 
   protected:
     
-    ClassDef(cosmictag,1)
-
   };
 
   /**
@@ -99,8 +97,6 @@ namespace larlite {
     virtual void clear_data(){event_base::clear_data(); clear();}
 
   private:
-
-    ClassDef(event_cosmictag,1);
 
   };
 

@@ -28,6 +28,7 @@
 #include "DataFormat/cosmictag.h"
 #include "DataFormat/calorimetry.h"
 #include "DataFormat/partid.h"
+#include "DataFormat/event_ass.h"
 
 #include "ERTool/Base/EventData.h"
 #include "ERTool/Base/Particle.h"
@@ -67,6 +68,7 @@ namespace larlite {
 		      const event_cosmictag&   cos_trk_v,
 		      const event_calorimetry& calo_trk_v,
 		      const event_partid&      pid_trk_v,
+		      const event_ass&         ass_v,
 		      ::ertool::EventData& res ) const;
 
     /// Fill Shower Info from MC
@@ -76,6 +78,7 @@ namespace larlite {
     /// Fill Shower Info from RECO
     void FillShowers ( const event_shower& shw_v,
 		       const event_cosmictag& ctag_shw_v,
+		       const event_ass&         ass_v,
 		       ::ertool::EventData& res ) const;
 
     /// Fill Vertex Info from MC
@@ -88,6 +91,7 @@ namespace larlite {
 
     /// Set minimum EDep amount for shower to be added to EventData
     void SetMinEDep(double E) { if(E<1.e-10) E=1.e-10; _minEDep = E; }
+
 
   private:
 

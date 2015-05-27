@@ -60,56 +60,52 @@ namespace larlite {
     ///--- Utility ---///
     virtual void clear_data();
 
-    ///--- Setters ---///
-
-    inline void AddDaughter     (const int trackID)   { fdaughters.insert(trackID);  }
-    inline void SetPolarization (TVector3 const& p)   { fpolarization = p;           }
-    inline void SetRescatter    (int code)          { frescatter    = code;        }
-    inline void SetWeight       (double wt)         { fWeight       = wt;          }
-    inline void SetTrajectory   (const mctrajectory steps) { ftrajectory   = steps;       }
-    inline void AddTrajectory   (const mcstep step)   { ftrajectory.push_back(step); }
-    inline void AddTrajectory   (const TLorentzVector& position,
-				 const TLorentzVector& momentum)
-    { ftrajectory.push_back(position,momentum); }
-
-    inline void AddFiducialTrack(size_t start, size_t end)
-    { ftrackFiducial.push_back(std::pair<size_t,size_t>(start,end)); }
-
-    inline void AddFiducialTrack(const std::pair<size_t,size_t>& step)
-    { ftrackFiducial.push_back(step); }
-
     ///--- Getters ---///
+    int                  StatusCode()   const;
+    int                  TrackId()      const;
+    int                  PdgCode()      const;
+    int                  Mother()       const;
+    const std::string    Process()      const;
+    const std::string    EndProcess()   const;
 
-    int                  StatusCode()   const { return fstatus;       }
-    int                  TrackId()      const { return ftrackId;      }
-    int                  PdgCode()      const { return fpdgCode;      }
-    int                  Mother()       const { return fmother;       }
-    const std::string      Process()      const { return fprocess;      }
-    const mctrajectory&    Trajectory()   const { return ftrajectory;   }
-    double               Mass()         const { return fmass;         }
-    const TVector3&        Polarization() const { return fpolarization; }
-    const std::set<int>& Daughters()    const { return fdaughters;    } 
-    double               Weight()       const { return fWeight;       }
-    TLorentzVector         GetGvtx()      const { return fGvtx;         }
-    int                  Rescatter()    const { return frescatter;    }
+    const mctrajectory&  Trajectory()   const;
+    double               Mass()         const;
+    const TVector3&      Polarization() const;
+    const std::set<int>& Daughters()    const;
+    double               Weight()       const;
+    TLorentzVector       GetGvtx()      const;
+    int                  Rescatter()    const;
+    const std::vector<std::pair<size_t,size_t> >& FiducialTrack() const;
 
-    const std::vector<std::pair<size_t,size_t> >& FiducialTrack() const 
-    {return ftrackFiducial;}
+    ///--- Setters ---///
+    void AddDaughter     (const int trackID);
+    void SetPolarization (TVector3 const& p);
+    void SetRescatter    (int code);
+    void SetWeight       (double wt);
+    void SetEndProcess   (std::string s);
+    void SetTrajectory   (const mctrajectory steps);
+    void AddTrajectory   (const mcstep step);
+    void AddTrajectory   (const TLorentzVector& position,
+			  const TLorentzVector& momentum);
+
+    void AddFiducialTrack(size_t start, size_t end);
+    void AddFiducialTrack(const std::pair<size_t,size_t>& step);
 
   private:
 
-    int           fstatus;       ///< Status code from generator, geant, etc. Status codes summarized in comments below.
-    int           ftrackId;      ///< TrackId
-    int           fpdgCode;      ///< PDG code
-    int           fmother;       ///< Mother
-    std::string     fprocess;      ///< Detector-simulation physics process that created the particle
-    mctrajectory    ftrajectory;   ///< particle trajectory (position,momentum)
-    double        fmass;         ///< Mass; from PDG unless overridden Should be in GeV
-    TVector3        fpolarization; ///< Polarization
-    std::set<int> fdaughters;    ///< Sorted list of daughters of this particle.
-    double        fWeight;       ///< Assigned weight to this particle for MC tests
-    TLorentzVector  fGvtx;         ///< Vertex needed by generater (genie) to rebuild. genie::EventRecord for event reweighting
-    int           frescatter;    ///< rescatter code
+    int            fstatus;       ///< Status code from generator, geant, etc
+    int            ftrackId;      ///< TrackId
+    int            fpdgCode;      ///< PDG code
+    int            fmother;       ///< Mother
+    std::string    fprocess;      ///< Detector-simulation physics process that created the particle
+    std::string    fendprocess;   ///< end process for the particle  
+    mctrajectory   ftrajectory;   ///< particle trajectory (position,momentum)
+    double         fmass;         ///< Mass; from PDG unless overridden Should be in GeV
+    TVector3       fpolarization; ///< Polarization
+    std::set<int>  fdaughters;    ///< Sorted list of daughters of this particle.
+    double         fWeight;       ///< Assigned weight to this particle for MC tests
+    TLorentzVector fGvtx;         ///< Vertex needed by generater (genie) to rebuild. genie::EventRecord for event reweighting
+    int            frescatter;    ///< rescatter code
 
     std::vector<std::pair<size_t,size_t> > ftrackFiducial; ///< mctrajectory indexes for a trajectory inside fiducial volume
    
@@ -127,10 +123,6 @@ namespace larlite {
     /// 15 => Final State Nuclear Remnant (low energy nuclear fragments entering the record collectively as a 'hadronic blob' pseudo-particle)
     /// 16 => Nucleon Cluster Target
 
-    ////////////////////////
-    ClassDef(mcpart,1)
-    ////////////////////////
-      
   };
   
   /**
@@ -159,10 +151,6 @@ namespace larlite {
     
   private:
     
-    ////////////////////////
-    ClassDef(event_mcpart,1)
-    ////////////////////////
-      
   };
 }
 #endif

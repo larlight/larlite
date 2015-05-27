@@ -26,6 +26,23 @@ namespace larlite {
   //***********************************************************
   {}
 
+  mcnu::mcnu(const mcnu& origin)
+    : data_base(origin),
+      fNu(origin.fNu),
+      fLepton(origin.fLepton),
+      fMode(origin.fMode),
+      fInteractionType(origin.fInteractionType),
+      fCCNC(origin.fCCNC),
+      fTarget(origin.fTarget),
+      fHitNuc(origin.fHitNuc),
+      fHitQuark(origin.fHitQuark),
+      fW(origin.fW),
+      fX(origin.fX),
+      fY(origin.fY),
+      fQSqr(origin.fQSqr)
+  {}
+
+  
   //**********************
   void  mcnu::clear_data()
   //**********************
@@ -45,7 +62,20 @@ namespace larlite {
     fY               = data::kINVALID_DOUBLE;
     fQSqr            = data::kINVALID_DOUBLE;
   }
-
+  
+  const  mcpart&  mcnu::Nu()     const { return fNu;              }
+  const  mcpart&  mcnu::Lepton() const { return fLepton;          }
+  int    mcnu::CCNC()            const { return fCCNC;            }
+  int    mcnu::Mode()            const { return fMode;            }
+  int    mcnu::InteractionType() const { return fInteractionType; }
+  int    mcnu::Target()          const { return fTarget;          }
+  int    mcnu::HitNuc()          const { return fHitNuc;          }
+  int    mcnu::HitQuark()        const { return fHitQuark;        }
+  double mcnu::W()               const { return fW;               }
+  double mcnu::X()               const { return fX;               }
+  double mcnu::Y()               const { return fY;               }
+  double mcnu::QSqr()            const { return fQSqr;            }
+  
 }
   
 #endif

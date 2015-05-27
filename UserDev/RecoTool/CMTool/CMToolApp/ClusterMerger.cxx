@@ -40,10 +40,10 @@ namespace larlite {
     if(_output_producer.empty()) _output_producer = Form("merged%s",_input_producer.c_str());
     auto out_cluster_v = storage->get_data<event_cluster>(_output_producer);
     out_cluster_v->clear();
-    out_cluster_v->set_event_id(ev_cluster->event_id());
-    out_cluster_v->set_run(ev_cluster->run());
-    out_cluster_v->set_subrun(ev_cluster->subrun());
 
+    // set event ID through storage manager
+    storage->set_id(ev_cluster->run(),ev_cluster->subrun(),ev_cluster->event_id());
+    
     // Proceed to write an output data product if any cluster data product exists in the input
     if(!ev_cluster->size()) {
       print(msg::kWARNING,__FUNCTION__,
@@ -51,6 +51,7 @@ namespace larlite {
       return true;
     }
 
+    /*
     // Get hit producer name
     auto hit_producer_v = ev_cluster->association_keys(data::kHit);
 
@@ -61,7 +62,7 @@ namespace larlite {
       return false;
     }
     auto hit_producer = hit_producer_v[0];
-
+    */
     std::vector<std::vector<unsigned short> > merged_indexes;
     bk.PassResult(merged_indexes);
 
@@ -71,7 +72,10 @@ namespace larlite {
     //tmp_index to know what plane to use
     unsigned int tmp_index = 0;
     AssSet_t hit_ass;
-    auto original_hit_ass = ev_cluster->association(data::kHit,hit_producer);
+
+    event_hit* ev_hits = nullptr;
+    auto const& original_hit_ass = storage->find_one_ass(ev_cluster->id(), ev_hits, ev_cluster->name());
+    //auto original_hit_ass = ev_cluster->association(data::kHit,hit_producer);
 
     for(auto const& indexes : merged_indexes) {
 
@@ -96,7 +100,9 @@ namespace larlite {
       hit_ass.push_back(merged_association);
     }
 
-    out_cluster_v->set_association(data::kHit,hit_producer,hit_ass);
+    auto out_event_ass = storage->get_data<event_ass>(out_cluster_v->name());
+    out_event_ass->set_association(out_cluster_v->id(),ev_hits->id(),hit_ass);
+    //out_cluster_v->set_association(data::kHit,hit_producer,hit_ass);
     return true;
   }
 

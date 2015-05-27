@@ -23,19 +23,18 @@ namespace larlite {
      \class ide
      LArSoft sim::IDE equivalent data product
   */
-  class ide : public TObject {
+  class ide {
     
   public:
 
     /// Default ctor
-    ide() : TObject() {clear_data();}
+    ide() {clear_data();}
 
     /// Default dtor
     ~ide(){}
 
     /// Copy ctor
-    ide(const ide& origin) : TObject(origin),
-			     trackID(origin.trackID),
+    ide(const ide& origin) : trackID(origin.trackID),
 			     numElectrons(origin.numElectrons),
 			     energy(origin.energy),
 			     x(origin.x),
@@ -55,10 +54,6 @@ namespace larlite {
 
   private:
 
-    ////////////////////////
-    ClassDef(ide,1)
-    ////////////////////////
-      
   };
 
   /**
@@ -98,8 +93,7 @@ namespace larlite {
 						   unsigned short endTDC) const;
     
     /// IDE map getter
-    const std::map<unsigned short, std::vector<larlite::ide> >& TDCIDEMap() const
-    { return fTDCIDEs; }
+    const std::map<unsigned short, std::vector<larlite::ide> >& TDCIDEMap() const;
 
     /**
        The number of ionization electrons associated with this channel for the
@@ -123,10 +117,6 @@ namespace larlite {
     /// vector of IDE structs for each TDC with signal
     std::map<unsigned short, std::vector< larlite::ide > > fTDCIDEs;
 
-    ////////////////////////
-    ClassDef(simch,1)
-    ////////////////////////
-      
   };
 
   /**
@@ -154,9 +144,6 @@ namespace larlite {
     
   private:
     
-    //////////////////////////
-    ClassDef(event_simch,1)
-    //////////////////////////
   };
   
 }

@@ -48,6 +48,39 @@ namespace larlite {
     ftrackFiducial.clear();
   }
 
+  void mcpart::AddDaughter     (const int trackID)   { fdaughters.insert(trackID);  }
+  void mcpart::SetPolarization (TVector3 const& p)   { fpolarization = p;           }
+  void mcpart::SetRescatter    (int code)            { frescatter    = code;        }
+  void mcpart::SetWeight       (double wt)           { fWeight       = wt;          }
+  void mcpart::SetEndProcess   (std::string s)       { fendprocess   = s;           }
+  void mcpart::SetTrajectory   (const mctrajectory steps) { ftrajectory   = steps;  }
+  void mcpart::AddTrajectory   (const mcstep step)   { ftrajectory.push_back(step); }
+  void mcpart::AddTrajectory   (const TLorentzVector& position,
+			const TLorentzVector& momentum)
+  { ftrajectory.push_back(position,momentum); }
+  
+  void mcpart::AddFiducialTrack(size_t start, size_t end)
+  { ftrackFiducial.push_back(std::pair<size_t,size_t>(start,end)); }
+  
+  void mcpart::AddFiducialTrack(const std::pair<size_t,size_t>& step)
+  { ftrackFiducial.push_back(step); }
+  
+  int                  mcpart::StatusCode()   const { return fstatus;       }
+  int                  mcpart::TrackId()      const { return ftrackId;      }
+  int                  mcpart::PdgCode()      const { return fpdgCode;      }
+  int                  mcpart::Mother()       const { return fmother;       }
+  const std::string    mcpart::Process()      const { return fprocess;      }
+  const std::string    mcpart::EndProcess()   const { return fendprocess;   }
+  
+  const mctrajectory&  mcpart::Trajectory()   const { return ftrajectory;   }
+  double               mcpart::Mass()         const { return fmass;         }
+  const TVector3&      mcpart::Polarization() const { return fpolarization; }
+  const std::set<int>& mcpart::Daughters()    const { return fdaughters;    } 
+  double               mcpart::Weight()       const { return fWeight;       }
+  TLorentzVector       mcpart::GetGvtx()      const { return fGvtx;         }
+  int                  mcpart::Rescatter()    const { return frescatter;    }
+  const std::vector<std::pair<size_t,size_t> >& mcpart::FiducialTrack() const 
+  {return ftrackFiducial;}
 }
 
 #endif

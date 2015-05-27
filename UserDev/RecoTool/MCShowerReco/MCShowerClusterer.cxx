@@ -51,9 +51,6 @@ namespace larlite {
     if(out_hit_v->size())
       print(msg::kWARNING,__FUNCTION__,"data::kHit is not empty. Clearing it...");
     out_hit_v->clear_data();
-    out_hit_v->set_event_id(mcshower_v->event_id());
-    out_hit_v->set_run(mcshower_v->run());
-    out_hit_v->set_subrun(mcshower_v->subrun());
 
     // Output clusters
     auto out_clus_v = (event_cluster*)(storage->get_data(data::kCluster,"mcshower"));
@@ -65,9 +62,9 @@ namespace larlite {
       print(msg::kWARNING,__FUNCTION__,"data::kCluster is not empty. Clearing it...");
     out_clus_v->clear_data();
     out_clus_v->reserve(mcshower_v->size() * _nplanes);
-    out_clus_v->set_event_id(mcshower_v->event_id());
-    out_clus_v->set_run(mcshower_v->run());
-    out_clus_v->set_subrun(mcshower_v->subrun());
+
+    // finished creating new products -> set ID
+    storage->set_id(mcshower_v->run(),mcshower_v->subrun(),mcshower_v->event_id());
 
     // Loop over MCShowers
     AssSet_t  assn_cs_v;
@@ -96,7 +93,7 @@ namespace larlite {
 	// Get channel number
 	auto const& ch = sch.Channel();
 
-	auto const& w  = geo->ChannelToWire(ch);
+	auto const& w  = geo->ChannelToWireID(ch);
 
 	auto const& plane = geo->ChannelToPlane(ch);
 
@@ -163,26 +160,28 @@ namespace larlite {
 	    double start_time = tdc - (_hitwidth/2);
 	    if(start_time<0) start_time = 0;
 
-	    h.set_times   ( start_time,
-			    tdc, 
-			    tdc + (_hitwidth/2) );
+	    h.set_time_range ( start_time, tdc + (_hitwidth/2) );
+	    
+	    h.set_time_peak( tdc, 0 );
 
 	    h.set_view    ( view );
 
-	    h.set_charge  ( hitq, hitq );
+	    h.set_integral  ( hitq, 0 );
+
+	    h.set_amplitude  ( hitq, 0 );
 	    
 	    switch(view) {
 	      
 	    case ::larlite::geo::kU:
 	    case ::larlite::geo::kV:
-	      h.set_sigtype( ::larlite::geo::kInduction   );
+	      h.set_signal_type( ::larlite::geo::kInduction   );
 	      break;
 	    case ::larlite::geo::kW:
 	      //case ::larlite::geo::kZ:
-	      h.set_sigtype( ::larlite::geo::kCollection  );
+	      h.set_signal_type( ::larlite::geo::kCollection  );
 	      break;
 	    default:
-	      h.set_sigtype( ::larlite::geo::kMysteryType );
+	      h.set_signal_type( ::larlite::geo::kMysteryType );
 	    }
 	    
 	    out_hit_v->push_back(h);
@@ -193,18 +192,21 @@ namespace larlite {
 	  
 	  //if this hit overlaps an existing hit, modify the existing hit
 	  else{
-	    Double_t newstart = std::min(tdc-(_hitwidth/2),out_hit_v->at(overlap_index).StartTime());
-	    Double_t newend   = std::max(tdc+(_hitwidth/2),out_hit_v->at(overlap_index).EndTime());
+	    Double_t newstart = std::min(tdc-(_hitwidth/2),double(out_hit_v->at(overlap_index).StartTick()));
+	    Double_t newend   = std::max(tdc+(_hitwidth/2),double(out_hit_v->at(overlap_index).EndTick()));
 	    //to-do: implement weighted average by charge here
 	    Double_t newpeak  = newstart + ((newend-newstart)/2);
-	    Double_t newq     = out_hit_v->at(overlap_index).Charge() + hitq;
-	    out_hit_v->at(overlap_index).set_times(newstart,newpeak,newend);
-	    out_hit_v->at(overlap_index).set_charge(newq,newq);
+	    Double_t newq     = out_hit_v->at(overlap_index).Integral() + hitq;
+	    out_hit_v->at(overlap_index).set_time_range(newstart,newend);
+	    out_hit_v->at(overlap_index).set_time_peak(newpeak,0);
+	    out_hit_v->at(overlap_index).set_integral(newq,0);
+	    out_hit_v->at(overlap_index).set_amplitude(newq,0);
 	  }
 
 
 	  //whether or not hit overlaps other hits, add to cluster charge
-	  clusters.at(plane).set_charge(clusters.at(plane).Charge() + hitq);
+	  clusters.at(plane).set_integral(clusters.at(plane).Integral() + hitq, 0,
+					  clusters.at(plane).Integral() + hitq);
 
 	}
       }
@@ -236,8 +238,12 @@ namespace larlite {
     }
 
     // store association
-    out_clus_v->set_association(data::kHit,"mcshower",assn_hc_v);
-    mcshower_v->set_association(data::kCluster,"mcshower",assn_cs_v);
+    auto out_event_ass = (event_ass*)(storage->get_data(data::kAssociation,"cmtool"));
+    out_event_ass->set_association(product_id(data::kCluster,out_clus_v->name()),product_id(data::kHit,"mcshower"),assn_hc_v);
+    out_event_ass->set_association(product_id(data::kMCShower,mcshower_v->name()),product_id(data::kCluster,"mcshower"),assn_cs_v);
+    //out_clus_v->set_association(data::kHit,"mcshower",assn_hc_v);
+    //mcshower_v->set_association(data::kCluster,"mcshower",assn_cs_v);
+
     return true;
   }
 
@@ -257,7 +263,7 @@ namespace larlite {
 
     auto it = std::find_if(original_hit_v->begin(),
 			   original_hit_v->end(),
-			   [&channel,&start,&end](const ::larlite::hit &ihit) {return ihit.Channel() == channel && ( (ihit.StartTime()<start && ihit.EndTime()>start) || (ihit.StartTime()<end && ihit.EndTime()>end) );});
+			   [&channel,&start,&end](const ::larlite::hit &ihit) {return ihit.Channel() == channel && ( (ihit.StartTick()<start && ihit.EndTick()>start) || (ihit.StartTick()<end && ihit.EndTick()>end) );});
 
 
     //if overlapping hit found, return the index in original_hit_v of that hit

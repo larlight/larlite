@@ -33,7 +33,26 @@ namespace larlite{
     virtual ~shower(){}
     
     virtual void clear_data();
+
+    // Get Methods 
+    int    ID()                    const;
+    const TVector3& Direction()    const;
+    const TVector3& DirectionErr() const;
     
+    const TVector3& ShowerStart()    const;
+    const TVector3& ShowerStartErr() const;
+
+    const std::vector< double >& Energy()    const;
+    const std::vector< double >& EnergyErr() const;
+    
+    const std::vector< double >& MIPEnergy()    const;
+    const std::vector< double >& MIPEnergyErr() const;
+
+    int    best_plane() const;
+    double Length() const;
+    const std::vector< double >& dEdx()    const;
+    const std::vector< double >& dEdxErr() const;
+
     // Set methods
     void set_id                (const int id)                      { fID = id;                 }
     void set_total_energy      (const std::vector< double >& q)    { fTotalEnergy = q;         }
@@ -49,32 +68,6 @@ namespace larlite{
     void set_dedx      (const std::vector< double >& q) { fdEdx = q;        }
     void set_dedx_err  (const std::vector< double >& q) { fSigmadEdx = q;        }
     void set_length(const double& l) { fLength = l; }
-    
-//     void set_max_width     (double x, double y) 
-//     { fMaxWidthX=x; fMaxWidthY=y; }
-//     void set_distance_max_width (double d)       { fDistanceMaxWidth = d;   }
-
-    // Get Methods 
-    //inline double TotalCharge()      const { return fTotalCharge;      }
-    inline int    ID()               const { return fID;               }
-   // inline double MaxWidthX()        const { return fMaxWidthX;           }
-  //  inline double MaxWidthY()        const { return fMaxWidthY;           }
-  //  inline double DistanceMaxWidth() const { return fDistanceMaxWidth; }
-    inline const TVector3& Direction()    const { return fDCosStart;          }
-    inline const TVector3& DirectionErr() const { return fSigmaDCosStart;     }
-    
-    inline const TVector3& ShowerStart()    const { return fXYZstart;          }
-    inline const TVector3& ShowerStartErr() const { return fSigmaXYZstart;     }
-
-    inline const std::vector< double >& Energy()    const { return fTotalEnergy;          }
-    inline const std::vector< double >& EnergyErr() const { return fSigmaTotalEnergy;     }
-    
-    inline const std::vector< double >& MIPEnergy()    const { return fTotalMIPEnergy;          }
-    inline const std::vector< double >& MIPEnergyErr() const { return fSigmaTotalMIPEnergy;     }
-    inline int    best_plane()               const { return fBestPlane;               }
-    inline double Length() const { return fLength; }
-    inline const std::vector< double >& dEdx()    const { return fdEdx;          }
-    inline const std::vector< double >& dEdxErr() const { return fSigmadEdx;     }
     
   protected:
 
@@ -92,17 +85,7 @@ namespace larlite{
     std::vector< double > fSigmaTotalMIPEnergy;           ///< Calculated Energy per each plane
     int fBestPlane;
     double fLength;
-    //  double fMaxWidthX;             ///< maximum width of the prong in the x(0)
-    //  double fMaxWidthY;             ///< maximum width of the prong in the y(0)
-    //  double fDistanceMaxWidth;      ///< distance from the start of the prong to its maximum width
-    //  double fTotalCharge;           ///< total charge of hits in the shower
     
-  private:
-    
-    ////////////////////////
-    ClassDef(shower,7)
-    ////////////////////////
-      
   };
   
   /**
@@ -130,9 +113,6 @@ namespace larlite{
     
   private:
     
-    ////////////////////////
-    ClassDef(event_shower,5)
-    ////////////////////////
   };
 }
 #endif

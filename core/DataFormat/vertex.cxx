@@ -37,6 +37,10 @@ namespace larlite {
     fID = data::kINVALID_INT;
   }
 
+  int vertex::ID() const   { return fID;     }
+  double vertex::X() const { return fXYZ[0]; }
+  double vertex::Y() const { return fXYZ[1]; }
+  double vertex::Z() const { return fXYZ[2]; }
 }
 
 #endif

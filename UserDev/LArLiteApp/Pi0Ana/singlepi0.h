@@ -29,7 +29,7 @@ namespace larlite {
   public:
 
     /// Default constructor
-    singlepi0(){ _name="singlepi0"; _fout=0; _Topo=0; _Sig=true;}
+    singlepi0(){ _name="singlepi0"; _fout=0; _Topo=0; _Sig=false; _ccnc=1;}
 
     /// Default destructor
     virtual ~singlepi0(){}
@@ -56,8 +56,14 @@ namespace larlite {
 	// 0 = inclusive ==> any pi0 that is a final state particle
 	// 1 = exclusive no cmeson ==> any pi0 that is a final state particle and has no final state pi+/-
     void SetTopology(int Topo) { _Topo = Topo ; }
+
+	// If looking for signal(TRUE)
+	// If looking at background(FALSE) 
     void SignalTopology(bool Sig) { _Sig = Sig ; }
-    //void SignalTopology(int Sig) { _Sig = Sig ; }
+
+	// CC = 0 
+	// NC = 1
+    void SetCCNC(int ccnc) { _ccnc = ccnc ; }
 
 
   protected:
@@ -66,7 +72,8 @@ namespace larlite {
 	int _passed_events; 
 	
 	int _Topo;
-	int _Sig;
+	bool _Sig;
+	int _ccnc;
 
     
   };
