@@ -94,6 +94,8 @@ namespace cluster {
      */
     void  PrintFANNVector();
 
+    std::vector<std::string> GetFANNVectorTitle();
+
 
     /**
       Runs all the functions which calculate cluster params                        

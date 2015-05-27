@@ -5,21 +5,11 @@
 #include "LArUtil/LArUtilManager.h"
 
 namespace cluster{
-  void TrainingModule::configureHiddenLayers(int numLayers, ...){
 
-    fHiddenLayerLength.clear();
-    fNumHiddenLayers = numLayers;
-    fHiddenLayerLength.reserve(numLayers);
 
-    int i;
-    va_list vl;
-    va_start(vl,numLayers);
-    for (i=1;i<numLayers;i++)
-    {
-      fHiddenLayerLength.push_back(va_arg(vl,int));
-    }
-    va_end(vl);
-    return;
+  void TrainingModule::addLayer(int nodes){
+    if (nodes > 0)
+      fHiddenLayerLength.push_back(nodes);
   }
 
   void TrainingModule::saveFANNToFile(std::string s){
@@ -31,24 +21,25 @@ namespace cluster{
     return;
   }
 
-  void TrainingModule::init(){
+  void TrainingModule::init(std::string file){
 
-    larutil::LArUtilManager::Reconfigure(larlite::geo::kArgoNeuT);
+    // initialize the training data object:
+    std::cout << "Initializing data from file " << file << "\n";
+    trainingData.read_train_from_file(file);
 
-    /*
-    if (ann){
-      std::cerr << "ERROR: ann is already initialized, aborting.\n";
-      return; 
+
+    if( _use_cascade){
+      ann.create_shortcut(2, trainingData.num_input_train_data(), trainingData.num_output_train_data()); 
     }
-    */
-
-    unsigned int * layers;
-    layers = new unsigned int[fNumHiddenLayers + 2];
-    layers[0] = fFeatureVectorLength;
-    for (int i = 1; i <= fNumHiddenLayers; i++)
-      layers[i] = fHiddenLayerLength[i-1];
-    layers[fNumHiddenLayers+1] = fOutputVectorLength;
-    ann.create_shortcut_array(fNumHiddenLayers+2, layers); 
+    else{
+      unsigned int * layers;
+      layers = new unsigned int[fNumHiddenLayers + 2];
+      layers[0] = fFeatureVectorLength;
+      for (int i = 1; i <= fNumHiddenLayers; i++)
+        layers[i] = fHiddenLayerLength[i-1];
+      layers[fNumHiddenLayers+1] = fOutputVectorLength;     
+      ann.create_standard_array(fNumHiddenLayers + 2, layers);
+    }
     ann.print_parameters();
     return;
   }
@@ -61,6 +52,27 @@ namespace cluster{
 
     if (data.size() != 0 && truth.size() != 0){
       ann.train(&data[0], &truth[0]);
+    }
+  }
+
+
+  void TrainingModule::train(){
+
+    if (_use_cascade){
+      const float desired_error = 0.1;
+      const unsigned int max_neurons = 30;
+      const unsigned int neurons_between_reports = 2;
+
+      ann.cascadetrain_on_data(trainingData, max_neurons,
+          neurons_between_reports, desired_error);
+    }
+    else{
+      const float desired_error = 0.001;
+      const unsigned int max_epochs = 100000;
+      const unsigned int epochs_between_reports = 1000;
+
+      ann.train_on_data(trainingData, max_epochs,
+          epochs_between_reports, desired_error);
     }
   }
 
