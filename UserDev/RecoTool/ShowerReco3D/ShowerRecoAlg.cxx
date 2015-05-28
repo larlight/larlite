@@ -28,7 +28,7 @@ namespace showerreco {
     std::vector < larutil::PxPoint > fStartPoint;    // for each plane
     std::vector < larutil::PxPoint > fEndPoint;    // for each plane
     std::vector < double > fOmega2D;    // for each plane
-    
+    std::vector < double > fOpeningAngles; // for each plane
     std::vector < double > fEnergy   (fGSer->Nplanes(),-1);    // for each plane
     std::vector < double > fMIPEnergy(fGSer->Nplanes(),-1);    // for each plane
     std::vector < double > fdEdx     (fGSer->Nplanes(),-1);      
@@ -40,6 +40,7 @@ namespace showerreco {
         fStartPoint.push_back(cl.start_point);    // for each plane
 	fEndPoint.push_back(cl.end_point);    // for each plane
         fOmega2D.push_back(cl.angle_2d);
+	fOpeningAngles.push_back(cl.opening_angle);
 	fPlaneID.push_back(cl.plane_id);
 	if(fVerbosity) {
 	  std::cout << " planes : " << cl.plane_id
@@ -59,6 +60,7 @@ namespace showerreco {
     int good_plane=-1;
     double best_length=0;
     double good_length=0;
+    double best_opening_angle=0;
     for (size_t ip=0;ip<fPlaneID.size();ip++)
       {
 	double dist = fabs( fEndPoint[ip].w - fStartPoint[ip].w );
@@ -80,9 +82,12 @@ namespace showerreco {
 	  }
       }
 
+    // For now, pick the "best plane" and save the 2d opening angle as the shower's 3d opening angle
+    // This needs to be improved... 2d angles are not 2d angles!
+    best_opening_angle = fOpeningAngles[index_to_use[0]];
+
     // Second Calculate 3D angle and effective pitch and start point 
     double xphi=0,xtheta=0;
-    
     
     fGSer->Get3DaxisN(fPlaneID[index_to_use[0]],
 		      fPlaneID[index_to_use[1]],
@@ -340,6 +345,7 @@ namespace showerreco {
     result.set_total_MIPenergy(fMIPEnergy);
     result.set_total_best_plane(best_plane);
     result.set_length(best_length);
+    result.set_opening_angle(best_opening_angle);
     result.set_total_energy(fEnergy);
     //result.set_total_energy_err  (std::vector< Double_t > q)            { fSigmaTotalEnergy = q;        }
     

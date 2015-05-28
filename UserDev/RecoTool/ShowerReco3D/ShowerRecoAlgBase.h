@@ -28,6 +28,7 @@ namespace showerreco {
     ::larutil::PxPoint start_point;
     ::larutil::PxPoint end_point;
     double             angle_2d;
+    double             opening_angle;
     unsigned short     plane_id;
     std::vector< ::larutil::PxHit> hit_vector;
 

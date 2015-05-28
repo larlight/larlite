@@ -50,6 +50,8 @@ namespace larlite{
 
     int    best_plane() const;
     double Length() const;
+    double OpeningAngle() const;
+
     const std::vector< double >& dEdx()    const;
     const std::vector< double >& dEdxErr() const;
 
@@ -68,7 +70,8 @@ namespace larlite{
     void set_dedx      (const std::vector< double >& q) { fdEdx = q;        }
     void set_dedx_err  (const std::vector< double >& q) { fSigmadEdx = q;        }
     void set_length(const double& l) { fLength = l; }
-    
+    void set_opening_angle(const double& oa) { fOpeningAngle = oa; }
+
   protected:
 
     int fID;
@@ -85,6 +88,7 @@ namespace larlite{
     std::vector< double > fSigmaTotalMIPEnergy;           ///< Calculated Energy per each plane
     int fBestPlane;
     double fLength;
+    double fOpeningAngle;
     
   };
   
