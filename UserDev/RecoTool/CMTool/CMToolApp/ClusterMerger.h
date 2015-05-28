@@ -55,6 +55,8 @@ namespace larlite {
 
     ::cmtool::CMergeManager& GetManager(size_t i=0) { return _merge_helper.GetManager(i); }
 
+    size_t GetNumManager() { return _merge_helper.size(); }
+    
     void SaveOutputCluster(bool doit=true) { _write_output = doit; }
     
   protected:
