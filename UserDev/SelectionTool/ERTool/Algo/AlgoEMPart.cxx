@@ -471,20 +471,47 @@ namespace ertool {
       h22_dEdx->Draw("sames");
       c->SaveAs("Likelihood_dEdx.png");
       
-      
       delete h11_dEdx;
       delete h22_dEdx;
+
+      // 2D ratio map
+      TH2D *h_2DRatio = new TH2D("_h2DRatio","2D Likelyhood; dEdx [MeV/cm]; Rad Len [cm]",100,0,8,100,0,20);
+
+      for (size_t dedx=0; dedx < 100; dedx++){
+	for (size_t radlen=0; radlen < 100; radlen++){
+
+	  _dEdxVar->setVal(8*dedx/100.);
+	  _radLenVar->setVal(20*radlen/100.);
+	  
+	  double e_likelyhood = log((_e_dEdxPdf->getVal(*_dEdxVar) * _e_radLenPdf->getVal(*_radLenVar) ) / 
+	    ( _g_dEdxPdf->getVal(*_dEdxVar) * _g_radLenPdf->getVal(*_radLenVar) + 
+	      _e_dEdxPdf->getVal(*_dEdxVar) * _e_radLenPdf->getVal(*_radLenVar) ) );
+
+	  h_2DRatio->SetBinContent(dedx,radlen,e_likelyhood);
+
+	}
+      }
+      gStyle->SetOptStat(0);
+      //TStyle* _gstyle;
+      //c->Setlogz();
+      //_gstyle->SetOptStat(0);
+      //h_2DRatio->GetZaxis()->
+      h_2DRatio->Draw("COLZ");
+      c->SaveAs("2DRatio.png");
+	    
 
       // for fun make a ProdPdf to plot 2D Pdf surface
       RooProdPdf ePDF("ePDF","ePDF",RooArgSet(*_e_radLenPdf,*_e_dEdxPdf));
       RooProdPdf gPDF("gPDF","gPDF",RooArgSet(*_g_radLenPdf,*_g_dEdxPdf));
       TH1* h_2D = gPDF.createHistogram("gamma radLen vs. dEdx",*_radLenVar,RooFit::Binning(100,0,30),
 				       RooFit::YVar(*_dEdxVar,RooFit::Binning(100,0,8)) ); 
+      h_2D->SetNameTitle("gamma radLen vs. dEdx","gamma radLen vs. dEdx");
       h_2D->Draw("SURF3");
       c->SaveAs("radLen_vs_dEdx_2DPDF_gamma.png");
       delete h_2D;
-      h_2D = ePDF.createHistogram("electron radLen vs. dEdx",*_radLenVar,RooFit::Binning(100,0,0.002),
+      h_2D = ePDF.createHistogram("electron radLen vs. dEdx",*_radLenVar,RooFit::Binning(100,0,30),
 				  RooFit::YVar(*_dEdxVar,RooFit::Binning(100,0,8)) ); 
+      h_2D->SetNameTitle("electron radLen vs. dEdx","electron radLen vs. dEdx");
       h_2D->Draw("SURF3");
       c->SaveAs("radLen_vs_dEdx_2DPDF_electron.png");
       delete h_2D;
@@ -512,9 +539,25 @@ namespace ertool {
 
       c->SetTitle("Distance PDF");
       frame_radLen->Draw();
+      if (_mode)
+	frame_radLen->SetNameTitle("Radiation Length PDF for gammas","Radiation Length PDF for gammas");
+      else
+	frame_radLen->SetNameTitle("Radiation Length PDF for electrons","Radiation Length PDF for electrons");
+      frame_radLen->SetXTitle("Distance from Shower Origin [cm]");
+      frame_radLen->SetYTitle("Number of Showers");
+      frame_radLen->SetTitleFont(50,"X");
+      frame_radLen->SetTitleFont(50,"Y");
       c->SaveAs(Form("RadLength_Selected_%s.png", part_letter.c_str()));
       c->SetTitle("dEdx Selection");
       frame_dEdx->Draw();
+      if (_mode)
+	frame_radLen->SetNameTitle("dE/dx PDF for gammas","dE/dx PDF for gammas");
+      else
+	frame_radLen->SetNameTitle("dE/dx PDF for electrons","dE/dx PDF for electrons");
+      frame_radLen->SetXTitle("dE/dx [MeV/cm]");
+      frame_radLen->SetYTitle("Number of Showers");
+      frame_radLen->SetTitleFont(50,"X");
+      frame_radLen->SetTitleFont(50,"Y");
       c->SaveAs(Form("dEdx_Selected_%s.png", part_letter.c_str()));
 
       delete c;
