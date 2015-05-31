@@ -142,18 +142,14 @@ namespace showerreco {
 
     // Find a way to choose the best start point
     // for now find minimum of the 3 distances. Start point should be half-way
-    double dMin = 1036;
     geoalgo::Point_t startPoint(3);
     if ( (dist_UV_UY < dist_UV_VY) && (dist_UV_UY < dist_UY_VY) ){
-      dMin = dist_UV_UY;
       startPoint = (s_UV + s_UY)/2. ;
     }
     else if ( dist_UV_VY < dist_UY_VY ){
-      dMin = dist_UV_VY;
       startPoint = (s_UV + s_VY)/2. ;
     }
     else{
-      dMin = dist_UY_VY;
       startPoint = (s_UY + s_VY)/2. ;
     }
     
@@ -176,8 +172,6 @@ namespace showerreco {
 	  std::cout << std::endl << " Plane: " << plane << std::endl;
 	*/
 	double totEnergy=0;
-	double totLowEnergy=0;
-	double totHighEnergy=0;
 	double totMIPEnergy=0;
 	int direction=-1;
 	//double RMS_dedx=0;

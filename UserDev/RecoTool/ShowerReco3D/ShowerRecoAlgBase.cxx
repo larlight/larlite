@@ -9,6 +9,7 @@ namespace showerreco {
   {
     fCaloAlg   = nullptr;
     fVerbosity = false;
+    _linearE   = false;
   }
 
   void ShowerRecoAlgBase::Reset()

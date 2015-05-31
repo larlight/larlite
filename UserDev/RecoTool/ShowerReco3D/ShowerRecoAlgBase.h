@@ -67,6 +67,8 @@ namespace showerreco {
     /// Calorimetry algorithm setter
     void CaloAlgo(::calo::CalorimetryAlg* alg) { fCaloAlg = alg; }
 
+    /// Function to set if to use a linear scale to calculate Energy
+    void SetUseLinearEnergy(bool on) { _linearE = on; }
 
   protected:
 
@@ -76,8 +78,10 @@ namespace showerreco {
 
     /// Function to reconstruct one shower
     virtual ::larlite::shower RecoOneShower(const std::vector<showerreco::ShowerCluster_t>& clusters) = 0;
-    
-  protected:
+
+    /// use linear dQ -> dE energy conversion? If true over-rides
+    /// either Box or Birks model
+    bool _linearE;
 
     /// Verbosity flag
     bool fVerbosity;

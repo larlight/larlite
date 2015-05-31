@@ -11,9 +11,10 @@ namespace showerreco {
     if(!fGSer) fGSer = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
     
     fcalodEdxlength=1000;
-    fdEdxlength=2.4;
-    fUseArea = true;
-    fVerbosity = true;
+    fdEdxlength  =2.4;
+    fUseArea     = true;
+    _linearE     = false;
+    fVerbosity   = true;
     _Ecorrection = true;
   }
 
@@ -160,9 +161,19 @@ namespace showerreco {
 	      hitElectrons = fCaloAlg->ElectronsFromADCArea(theHit.charge, plane);
 	    }
 
-	  hitElectrons *= fCaloAlg->LifetimeCorrection(theHit.t / fGSer->TimeToCm());
-	  
-	  totEnergy += hitElectrons * 1.e3 / (::larutil::kGeVToElectrons);
+	  // if we want to use a linear dQ->dE enrgy conversion instead of Box or Birks models
+	  if (_linearE){
+	    hitElectrons *= fCaloAlg->LifetimeCorrection(theHit.t / fGSer->TimeToCm());
+	    // convert to MeV energy scale
+	    totEnergy += hitElectrons * 1.e3 / (::larutil::kGeVToElectrons);
+	  }
+	  else {
+	    // make sure we aren't adding a crazy amount
+	    // this is totally possible due to non-linear
+	    // birks / box model formulas
+	    if (dEdx_new > 10.) { dEdx_new = 10.; }
+	    totEnergy += dEdx_new*newpitch;
+	  }
 
 	  //totNewCnrg+=dEdx_MIP;
 	//  if(dEdx_new < 3.5 && dEdx_new >0 )
