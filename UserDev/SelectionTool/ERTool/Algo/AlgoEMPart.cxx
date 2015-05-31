@@ -491,11 +491,7 @@ namespace ertool {
 
 	}
       }
-      gStyle->SetOptStat(0);
-      //TStyle* _gstyle;
-      //c->Setlogz();
-      //_gstyle->SetOptStat(0);
-      //h_2DRatio->GetZaxis()->
+
       h_2DRatio->Draw("COLZ");
       c->SaveAs("2DRatio.png");
 	    
