@@ -19,7 +19,8 @@
 #include <TFile.h>
 #include <TError.h>
 #include "ERException.h"
-#include "Env.h"
+#include "ERToolConstants.h"
+#include "ERToolTypes.h"
 #include "Params.h"
 
 namespace ertool {

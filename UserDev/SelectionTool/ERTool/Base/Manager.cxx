@@ -2,12 +2,15 @@
 #define ERTOOL_MANAGER_CXX
 
 #include "Manager.h"
+#include "Shower.h"
+#include "Track.h"
+#include <sstream>
+#include <iostream>
 
 namespace ertool {
 
   Manager::Manager() 
-    : _filter (nullptr)
-    , _algo   (nullptr)
+    : _algo   (nullptr)
     , _ana    (nullptr)
   { 
     _status = kIDLE; Reset(); 
@@ -16,38 +19,30 @@ namespace ertool {
     _mc_for_ana    = false;
     _tprof_algo.first   = _tprof_algo.second    = 0;
     _tprof_ana.first    = _tprof_ana.second     = 0;
-    _tprof_filter.first = _tprof_filter.second  = 0;
     _time_algo_init     = _time_algo_finalize   = 0;
-    _time_filter_init   = _time_filter_finalize = 0;
     _time_ana_init      = _time_ana_finalize    = 0;
   }
-
-  const ertool::EventData&   Manager::EventData     () const { return _data;    }
-  const ertool::EventData&   Manager::MCEventData   () const { return _mc_data; }
-  const ertool::ParticleSet& Manager::ParticleSet   () const { return _ps;      }
-  const ertool::ParticleSet& Manager::MCParticleSet () const { return _mc_ps;   }
   
+  const ertool::EventData&     Manager::EventData     () const { return _data;    }
+  const ertool::EventData&     Manager::MCEventData   () const { return _mc_data; }
+  const ertool::ParticleGraph& Manager::ParticleGraph   () const { return _graph;      }
+  const ertool::ParticleGraph& Manager::MCParticleGraph () const { return _mc_graph;   }
+
+  /*
   ertool::EventData&   Manager::EventDataWriteable     ()
   { return _data; }
-  ertool::ParticleSet& Manager::ParticleSetWriteable   ()
-  { return _ps; }
+  ertool::ParticleGraph& Manager::ParticleGraphWriteable   ()
+  { return _graph; }
   ertool::EventData&   Manager::MCEventDataWriteable   ()
   { return _mc_data; }
-  ertool::ParticleSet& Manager::MCParticleSetWriteable () 
-  { return _mc_ps;   } 
-
+  ertool::ParticleGraph& Manager::MCParticleGraphWriteable () 
+  { return _mc_graph;   } 
+  */
   void Manager::SetAlgo(AlgoBase* a) 
   { 
     if(_status != kIDLE)
       throw ERException("Cannot set algorithm in non-kIDLE state...");
     _algo = a; 
-  }
-
-  void Manager::SetFilter(FilterBase* f)
-  { 
-    if(_status != kIDLE)
-      throw ERException("Cannot set filter in non-kIDLE state...");
-    _filter = f;
   }
 
   void Manager::SetAna(AnaBase* a)
@@ -66,18 +61,61 @@ namespace ertool {
 		<< ">> Calling Reset() before calling Finalize()..."
 		<< std::endl;
     default:
-      if(_filter) _filter->Reset();
       if(_algo) _algo->Reset();
       _status = kIDLE;
     }
     ClearData();
   }
 
+  void Manager::Add(const ::ertool::Shower& obj, const bool mc) 
+  {
+    if(!mc) {
+      _data.Add(obj);
+      _graph.CreateParticle(_data.Shower().back());
+    }else{
+      _mc_data.Add(obj);
+      _mc_graph.CreateParticle(_data.Shower().back());
+    }
+  }
+
+  void Manager::Add(const ::ertool::Track&  obj, const bool mc) 
+  {
+    if(!mc) {
+      _data.Add(obj);
+      _graph.CreateParticle(_data.Track().back());
+    }else{
+      _mc_data.Add(obj);
+      _mc_graph.CreateParticle(_data.Track().back());
+    }
+  }
+
+  void Manager::Emplace(const ::ertool::Shower&& obj, const bool mc)
+  {
+    if(!mc) {
+      _data.Emplace(std::move(obj));
+      _graph.CreateParticle(_data.Shower().back());
+    }else{
+      _mc_data.Emplace(std::move(obj));
+      _mc_graph.CreateParticle(_data.Shower().back());
+    }
+  }
+
+  void Manager::Emplace(const ::ertool::Track&&  obj, const bool mc)
+  {
+    if(!mc) {
+      _data.Emplace(std::move(obj));
+      _graph.CreateParticle(_data.Track().back());
+    }else{
+      _mc_data.Emplace(std::move(obj));
+      _mc_graph.CreateParticle(_data.Track().back());
+    }
+  }
+
   void Manager::ClearData() {
     _data.Reset();
     _mc_data.Reset();
-    _ps.clear();
-    _mc_ps.clear();
+    _graph.Reset();
+    _mc_graph.Reset();
   }
   
   void Manager::Initialize()
@@ -95,12 +133,6 @@ namespace ertool {
     if(!_algo) {
       std::ostringstream msg;
       throw ERException("No algorithm attached (must be attached before Initialize())!");
-    }
-    if(_filter) {
-      fWatch.Start();
-      _filter->_training_mode = this->_training_mode;
-      _filter->ProcessBegin();
-      _time_filter_init = fWatch.RealTime();
     }
     if(_algo) {
       fWatch.Start();
@@ -133,12 +165,6 @@ namespace ertool {
       throw ERException(msg.str());
     }
     
-    if(_filter) {
-      fWatch.Start();
-      _filter->_training_mode = this->_training_mode;
-      _filter->ProcessEnd(fout);
-      _time_filter_finalize = fWatch.RealTime();
-    }
     if(_algo) {
       fWatch.Start();
       _algo->_training_mode = this->_training_mode;
@@ -152,11 +178,6 @@ namespace ertool {
     }
 
     if(_profile_mode) {
-      std::cout << "  \033[95m<<" << __FUNCTION__ << ">>\033[00m Time Profile Report 4 Filter"    << std::endl
-		<< "    ProcessBegin : " << _time_filter_init     << " [s] " << std::endl
-		<< "    Filter       : " << _tprof_filter.second  << " [s] ... or " 
-		<< _tprof_filter.second/_tprof_filter.first << " [s/event]" << std::endl
-		<< "    ProcessEnd   : " << _time_filter_finalize << " [s] " << std::endl;
       std::cout << "  \033[95m<<" << __FUNCTION__ << ">>\033[00m Time Profile Report 4 Algo"    << std::endl
 		<< "    ProcessBegin : " << _time_algo_init     << " [s] " << std::endl
 		<< "    Reconstruct  : " << _tprof_algo.second  << " [s] ... or " 
@@ -173,7 +194,7 @@ namespace ertool {
 
   bool Manager::Process()
   {
-    _ps.clear();
+    _graph.Reset();
     if(_status != kPROCESSING && _status != kINIT) {
       std::ostringstream msg;
       msg <<"Cannot call Process() while status ("
@@ -185,29 +206,23 @@ namespace ertool {
     }
     //fWatch.Start();
     _status = kPROCESSING;
-    if( _filter ) _filter->_training_mode = this->_training_mode;
     if( _algo   ) _algo->_training_mode = this->_training_mode;
 
     if(_profile_mode) fWatch.Start();
-    if(_filter) _filter->Filter(_data);
-    if(_profile_mode) _tprof_filter.second += fWatch.RealTime();
-
-    if(_profile_mode) fWatch.Start();
-    if(_algo)         _ps = _algo->Reconstruct(_data);
+    if(_algo)         _algo->Reconstruct(_data,_graph);
     if(_profile_mode) _tprof_algo.second += fWatch.RealTime();
 
     bool status = true;
     if(_profile_mode) fWatch.Start();
     if(_ana) {
-      if(_mc_for_ana) _ana->SetMCData(_mc_data,_mc_ps);
-      status = _ana->Analyze(_data,_ps);
+      if(_mc_for_ana) _ana->SetMCData(_mc_data,_mc_graph);
+      status = _ana->Analyze(_data,_graph);
       _ana->UnsetMCData();
     }
     if(_profile_mode) _tprof_algo.second += fWatch.RealTime();
 
     if(_profile_mode) {
       _tprof_algo.first   += 1.;
-      _tprof_filter.first += 1.;
     }
 
     return status;

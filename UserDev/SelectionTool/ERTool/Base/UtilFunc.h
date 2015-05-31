@@ -2,11 +2,7 @@
 #define ERTOOL_UTILFUNC_H
 
 #include <vector>
-#include <iostream>
-#include <algorithm>
-#include <sstream>
-#include "Env.h"
-#include "ERException.h"
+#include "ERToolTypes.h"
 
 namespace ertool {
 

@@ -2,183 +2,166 @@
 #define ERTOOL_PARTICLE_CXX
 
 #include "Particle.h"
+#include <iostream>
+#include "ERException.h"
 
 namespace ertool {
 
-  Particle::Particle(int pdg_code, double mass)
-    : _pdg_code(pdg_code)
-    , _mass(mass)
-    , _vtx(3)
-    , _mom(3)
-  { 
-    if(mass<0)    throw ERException("Must specify mass!");
-    //if(!pdg_code) throw ERException("Invalid PdgCode!");
-    _pdg_code = pdg_code;
-    _mass     = mass;
+  Particle::Particle(const NodeID_t node_id,
+		     const RecoType_t reco_type,
+		     const RecoID_t reco_id)
+    : _pdg_code(kINVALID_INT)
+    , _mass(kINVALID_DOUBLE)
+    , _vtx(kINVALID_VERTEX)
+    , _mom(kINVALID_MOMENTUM)
+    , _node_id(node_id)
+    , _parent_id(node_id)
+    , _ancestor_id(node_id)
+    , _layer_id(kDefaultLayer)
+    , _child_v()
+    , _reco_type(kInvisible)
+    , _reco_id(kINVALID_RECO_ID)
+  {}
 
-    Reset();
+  const NodeID_t& Particle::ID       () const { return _node_id;     }
+  const NodeID_t& Particle::Parent   () const { return _parent_id;   }
+  const NodeID_t& Particle::Ancestor () const { return _ancestor_id; }
+  const LayerID_t& Particle::Layer   () const { return _layer_id;    }
+  float Particle::RelationshipScore(const NodeID_t id)
+  {
+    if(id >= _score_v.size()) return -1;
+    return _score_v[id];
   }
+  
+  const RecoType_t& Particle::RecoType() const { return _reco_type; }
+  const RecoID_t&  Particle:: RecoID()   const { return _reco_id;   }
 
-  void Particle::Reset() {
-
-    for(size_t i=0; i<3; ++i) {
-      _vtx[i] = kINVALID_DOUBLE;
-      _mom[i] = kINVALID_DOUBLE;
-    }
-    _score = kINVALID_DOUBLE;
-    _daughters.clear();
-    _reco_obj_id = -1;
-    _reco_obj_type = kUnknown;
-    _time = -1;
-  }
-
-  //
-  // Getters
-  //
-  double Particle::Energy() const 
-  { return sqrt(_mom.SqLength() + _mass * _mass ); }
-
+  const int&    Particle::PdgCode() const
+  { return _pdg_code; }
+  const double& Particle::Mass() const
+  { return _mass; }
+  double Particle::Energy() const
+  { return sqrt(pow(_mass,2) + KineticEnergy()); }
   double Particle::KineticEnergy() const
-  { return (this->Energy() - this->Mass()); }
+  { return _mom.SqLength(); }
+  const ::geoalgo::Vector& Particle::Vertex()   const
+  { return _vtx; }
+  const ::geoalgo::Vector& Particle::Momentum() const
+  { return _mom; }
+  float Particle::RecoScore()
+  {
+    return RelationshipScore(_node_id); 
+  }
+  
+  const std::vector< ::ertool::NodeID_t >& Particle::Children() const
+  { return _child_v; }
+  
+  bool Particle::RelationAssessed() const
+  { return _layer_id != kDefaultLayer; }
+  
+  bool Particle::Primary() const
+  { return (_node_id == _ancestor_id && RelationAssessed() ); }
+  
+  bool Particle::Lonely() const
+  { return (_child_v.size()<1); }
 
-  double Particle::DaughterEnergySum() const
-  { 
-    double energy=0;
-    for(auto const& d : _daughters) energy += d.Energy();
-    return energy;
+  bool Particle::HasChild(const NodeID_t id)
+  {
+    if( id > _child_v.back()  ) return false;
+    if( id < _child_v.front() ) return false;
+    auto low = std::lower_bound(_child_v.begin(), _child_v.end(), id);
+    return ((*low) == id);
+  }
+  
+  bool Particle::HasRecoObject()
+  { return (_reco_type == kShower || _reco_type == kTrack); }
+
+ 
+  void Particle::SetRecoInfo(const RecoType_t reco_type, const RecoID_t reco_id )
+  {
+    if( reco_type == kINVALID_RECO_TYPE )
+      throw ERException("RecoType_t cannot be kINVALID_RECO_TYPE!");
+    
+    if( reco_type == kInvisible && reco_id != kINVALID_RECO_ID )
+      throw ERException("Invisible type particle cannot be associated with reco object!");
+
+    if( reco_type != kInvisible && reco_id == kINVALID_RECO_ID )
+      throw ERException("Shower/Track particle must be associated with a valid RecoID_t!");
+
+    _reco_type = reco_type;
+    _reco_id   = reco_id;
   }
 
-  //
-  // Setters
-  //
-  void Particle::Vertex(const ::geoalgo::Point_t& vtx)  
-  { _vtx.compat(vtx); _vtx = vtx; }
-  void Particle::Vertex(const double& x,
-			const double& y,
-			const double& z)
-  { _vtx[0]=x; _vtx[1]=y; _vtx[2]=z; }
-  void Particle::Momentum(const ::geoalgo::Vector_t& mom) 
-  { _mom.compat(mom); _mom = mom; } 
-  void Particle::Momentum(const double& px,
-			  const double& py,
-			  const double& pz)
-  { _mom[0]=px; _mom[1]=py; _mom[2]=pz; }
-  void Particle::AddDaughter(const Particle& s) 
-  { _daughters.push_back(s); }
-  void Particle::RecoObjInfo(const int id, const RecoObjType_t type)
-  { _reco_obj_id = id; _reco_obj_type = type; }
-
-
-  bool Particle::Match(const Particle& p, bool exclusive) const
+  void Particle::SetParticleInfo( const int pdg_code,
+				  const double mass,
+				  const ::geoalgo::Vector& vtx,
+				  const ::geoalgo::Vector& mom,
+				  const float score)
   {
-    if(exclusive) return (Match(p,false) && p.Match(*this,false));
+    _vtx.compat(vtx);
+    _mom.compat(mom);
+    _pdg_code  = pdg_code;
+    _mass      = mass;
+    _vtx       = vtx;
+    _mom       = mom;
+    SetScore(_node_id,score);
+  }
 
-    if(p._pdg_code && _pdg_code && _pdg_code != p._pdg_code) return false;
-
-    std::vector<bool> used_v(_daughters.size(),false);
-    for(auto const& p_daughter : p.Daughters()) {
-
-      bool found=false;
-      for(size_t i=0; i<_daughters.size(); ++i) {
-
-	if(used_v[i]) continue;
-
-	auto const& my_daughter = _daughters[i];
-
-	if(my_daughter.Match(p_daughter)) {
-	  found = true;
-	  used_v[i] = true;
-	  break;
-	}
-	
-      }
-      if(!found) return false;
+  void Particle::SetScore(const NodeID_t id, const float score)
+  {
+    if(id == kINVALID_NODE_ID) throw ERException("Cannot set a score for an invalid particle ID...");
+    if(_score_v.size() <= id) _score_v.resize(id+1,-1);
+    _score_v[id] = score;
+  }
+  
+  void Particle::AddChild(const NodeID_t id, const float score)
+  {
+    SetScore(id,score);
+    if( _child_v.empty() || _child_v.back() < id) {
+      _child_v.push_back(id);
+      return;
     }
-    return true;
+    auto low = std::lower_bound(_child_v.begin(),_child_v.end(),id);
+    if((*low) == id) return;
+
+    size_t low_index = low - _child_v.begin();
+    _child_v.resize(_child_v.size()+1);
+    for(size_t index = _child_v.size()-1; index > low_index; --index)
+      _child_v[index] = _child_v[index-1];
+    _child_v[low_index] = id;
   }
 
-  std::string Particle::Diagram() const
+  void Particle::RemoveChild(const NodeID_t child)
   {
-    std::string res;
-    Diagram(res);
-    return res;
+    auto low = std::lower_bound(_child_v.begin(),_child_v.end(),child);
+
+    if( (*low) != child ) return;
+
+    _child_v.erase(low);
   }
 
-  void Particle::Diagram(std::string& res,std::string prefix) const
+  void Particle::UpdateAfterRemoval(const NodeID_t removed)
   {
-    res += prefix + std::to_string(_pdg_code) + " ... ";
-    res += std::to_string(Vertex()[0]) + " : " + std::to_string(Vertex()[1]) + " : " + std::to_string(Vertex()[2]);
-    res += " --> " + std::to_string( KineticEnergy() );
-    res += "\n";
-    prefix += "  ";
-    for(auto const& d : _daughters) d.Diagram(res,prefix);
-  }
+    if( _node_id == removed )
+      throw ERException("Not yet removed!");
 
-  const std::vector<const ::ertool::Particle*> Particle::AllDaughters() const
-  {
-    std::vector<const ::ertool::Particle*> res;
-    this->AllDaughters(res);
-    return res;
-  }
+    if( _node_id     > removed ) --_node_id;
+    if( _parent_id   > removed ) --_parent_id;
+    if( _ancestor_id > removed ) --_ancestor_id;
 
-  void Particle::AllDaughters(std::vector<const ::ertool::Particle*>& part_v) const
-  {
-    part_v.push_back(this);
-    for(auto const& daughter : _daughters) daughter.AllDaughters(part_v);
-  }
+    for(auto& child_id : _child_v) {
 
-  std::string ParticleSet::Diagram() const
-  {
-    std::string res;
-    for(auto const& p : (*this)) res += p.Diagram() + "\n";
-    return res;
-  }
+      if( child_id > removed ) --child_id;
 
-  const std::vector< ::ertool::Particle>::iterator ParticleSet::Find(const ::ertool::Particle& p,bool exclusive)
-  {
-    std::vector< ::ertool::Particle>::iterator iter;
-    for(iter = this->begin(); iter != this->end(); ++iter) 
-      if((*iter).Match(p,exclusive)) return iter;
-    return iter;
-  }
-
-  void ParticleSet::Collapse()
-  {
-    ParticleSet ps;
-
-    for(auto const& p1 : (*this)) {
-
-      bool found=false;
-      for(auto& p2 : ps) {
-
-	::geoalgo::Point_t v1(p1.Vertex());
-	::geoalgo::Point_t v2(p2.Vertex());
-	for(size_t i=0; i<v1.size(); ++i) {
-	  v1[i] = (double)((int)(v1[i]*1.e9));
-	  v2[i] = (double)((int)(v2[i]*1.e9));
-	}
-
-	if(v1 == v2 && p1.Time() == p2.Time()) {
-
-	  for(auto const& d : p1.Daughters()) p2.AddDaughter(d);
-
-	  found=true;
-	  
-	  break;
-	}
-      }
-      if(!found) {
-	Particle p(0,0);
-	p.Vertex(p1.Vertex());
-	p.Time(p1.Time());
-	for(auto const& d : p1.Daughters())
-	  p.AddDaughter(d);
-	ps.push_back(p);
-      }
     }
-    (*this) = ps;
+    for(size_t index = removed; (index+1) < _score_v.size(); ++index)
+      _score_v[index] = _score_v[index+1];
+
+    if(_score_v.size())
+       _score_v.erase(--_score_v.end());
   }
 
 }
+
 
 #endif

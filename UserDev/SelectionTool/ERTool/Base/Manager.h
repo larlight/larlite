@@ -14,13 +14,11 @@
 #ifndef ERTOOL_MANAGER_H
 #define ERTOOL_MANAGER_H
 
-#include <iostream>
-#include <set>
-#include <map>
-#include <algorithm>
+#include <utility>
 #include "AlgoBase.h"
-#include "FilterBase.h"
 #include "AnaBase.h"
+#include "EventData.h"
+#include "ParticleGraph.h"
 #include <TStopwatch.h>
 namespace ertool {
 
@@ -57,7 +55,7 @@ namespace ertool {
 
   */
   class Manager{
-
+    
   public:
     enum ManagerStatus_t {
       kIDLE,       ///< status after creation/reset before initialize
@@ -77,9 +75,6 @@ namespace ertool {
     /// Algo setter
     void SetAlgo(AlgoBase* a);
 
-    /// Filter setter
-    void SetFilter(FilterBase* f);
-
     /// Ana setter
     void SetAna(AnaBase* a);
 
@@ -95,19 +90,33 @@ namespace ertool {
     /// Function to reset things
     void Reset();
 
+    /// Function to add input data product: Shower
+    void Add(const ::ertool::Shower& obj, const bool mc=false);
+    /// Function to add input data product: Track
+    void Add(const ::ertool::Track&  obj, const bool mc=false);
+#ifndef __CINT__
+    /// Function to add input data product: Shower
+    void Emplace(const ::ertool::Shower&& obj, const bool mc=false);
+    /// Function to add input data product: Track
+    void Emplace(const ::ertool::Track&&  obj, const bool mc=false);
+#endif
+
+
     /// Function to clear data
     void ClearData();
 
     const ertool::EventData&   EventData     () const;
     const ertool::EventData&   MCEventData   () const;
-    const ertool::ParticleSet& ParticleSet   () const;
-    const ertool::ParticleSet& MCParticleSet () const;
+    const ertool::ParticleGraph& ParticleGraph   () const;
+    const ertool::ParticleGraph& MCParticleGraph () const;
 
+    /*
     ertool::EventData&   EventDataWriteable     ();
-    ertool::ParticleSet& ParticleSetWriteable   ();
+    ertool::ParticleGraph& ParticleGraphWriteable   ();
     ertool::EventData&   MCEventDataWriteable   ();
-    ertool::ParticleSet& MCParticleSetWriteable ();
-
+    ertool::ParticleGraph& MCParticleGraphWriteable ();
+    */
+    
     /// Status getter
     ManagerStatus_t Status() const { return _status; }
 
@@ -122,20 +131,18 @@ namespace ertool {
 
   protected:
 
-    std::pair<double,double> _tprof_algo, _tprof_filter, _tprof_ana;
-    double _time_algo_init, _time_filter_init, _time_ana_init;
-    double _time_algo_finalize, _time_filter_finalize, _time_ana_finalize;
+    std::pair<double,double> _tprof_algo, _tprof_ana;
+    double _time_algo_init, _time_ana_init;
+    double _time_algo_finalize, _time_ana_finalize;
 
     ertool::EventData _data;
     ertool::EventData _mc_data;
-    ertool::ParticleSet _ps;
-    ertool::ParticleSet _mc_ps;
+    ertool::ParticleGraph _graph;
+    ertool::ParticleGraph _mc_graph;
 
     TStopwatch fWatch;
 
     ManagerStatus_t _status;
-
-    FilterBase* _filter;
 
     AlgoBase* _algo;
 

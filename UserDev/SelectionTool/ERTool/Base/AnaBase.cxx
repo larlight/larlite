@@ -2,31 +2,32 @@
 #define ERTOOL_ANABASE_CXX
 
 #include "AnaBase.h"
+#include "ERException.h"
 
 namespace ertool {
 
   AnaBase::AnaBase() 
     : UnitBase()
     , _mc_data (nullptr)
-    , _mc_ps   (nullptr)
+    , _mc_graph   (nullptr)
   { _name="AnaBase"; }
 
   bool AnaBase::Analyze(const EventData& data,
-			const ParticleSet& ps)
+			const ParticleGraph& graph)
   {
     return true;
   }
 
-  void AnaBase::SetMCData(EventData& data, ParticleSet& ps)
+  void AnaBase::SetMCData(EventData& data, ParticleGraph& graph)
   {
     _mc_data = &data;
-    _mc_ps   = &ps;
+    _mc_graph   = &graph;
   }
 
   void AnaBase::UnsetMCData()
   {
     _mc_data = nullptr;
-    _mc_ps = nullptr;
+    _mc_graph = nullptr;
   }
 
   const EventData& AnaBase::MCEventData() const
@@ -35,10 +36,10 @@ namespace ertool {
     return *_mc_data;
   }
   
-  const ParticleSet& AnaBase::MCParticleSet() const
+  const ParticleGraph& AnaBase::MCParticleGraph() const
   {
-    if(!_mc_ps) throw ERException("MC Data not available!");
-    return *_mc_ps;
+    if(!_mc_graph) throw ERException("MC Data not available!");
+    return *_mc_graph;
   }
  
 }

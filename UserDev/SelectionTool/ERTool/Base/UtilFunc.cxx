@@ -2,6 +2,10 @@
 #define ERTOOL_UTILFUNC_CXX
 
 #include "UtilFunc.h"
+#include <iostream>
+#include <algorithm>
+#include <sstream>
+#include "ERException.h"
 
 namespace ertool {
 

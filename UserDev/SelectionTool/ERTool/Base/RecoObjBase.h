@@ -15,10 +15,9 @@
 #define ERTOOL_RECOOBJBASE_H
 
 #include <iostream>
-#include "Env.h"
-#include "TObject.h"
+#include "ERToolTypes.h"
+#include "ERToolConstants.h"
 namespace ertool {
-
   class EventData;
 
   /**
@@ -26,44 +25,35 @@ namespace ertool {
      User defined class ertool::RecoObjBase ... these comments are used to generate
      doxygen documentation!
   */
-  class RecoObjBase : public TObject{
+  class RecoObjBase {
 
     friend class EventData;
     
   public:
     
     /// Default constructor
-    RecoObjBase(){Reset();}
+    RecoObjBase();
     
     /// Default destructor
     virtual ~RecoObjBase(){}
 
-    /// Reset variables
-    void Reset();
-
-    /// Cosmic score
-    double _cosmogenic;
-
-    /// Function to ask if this object is filtered
-    bool IsFiltered() const { return _exclude; }
-
+    /// Reset method (do nothing in the base class)
+    virtual void Reset(){};
+    
     /// ID query
-    size_t ID() const { return _id; }
+    RecoID_t RecoID() const;
+
+    /// Type query
+    RecoType_t RecoType() const;
 
   protected:
 
-    /// Function to set a filter flag
-    void Filter(bool doit=true) { _exclude = doit; }
-
     /// Function to set an id
-    void ID(size_t id) { _id = id; }
+    void SetRecoInfo(const RecoID_t id, const RecoType_t type);
 
-    /// Filter flag
-    bool _exclude;
-    /// ID integer
-    size_t _id;
-    
-    ClassDef(RecoObjBase,1)
+    RecoID_t   _reco_id;   ///< Unique reco object identifier
+    RecoType_t _reco_type; ///< Reco object type
+
   };
 }
 

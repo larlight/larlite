@@ -16,12 +16,12 @@
 
 #include <iostream>
 #include "UnitBase.h"
-#include "EventData.h"
-#include "Particle.h"
-#include "ERException.h"
 
 namespace ertool {
+  class ParticleGraph;
+  class EventData;
 
+  
   class Manager;
   /**
      \class AnaBase
@@ -39,22 +39,22 @@ namespace ertool {
     virtual ~AnaBase(){}
 
     virtual bool Analyze(const EventData& data,
-			 const ParticleSet& ps);
+			 const ParticleGraph& graph);
     
   protected:
 
-    void SetMCData(EventData& data, ParticleSet& ps);
+    void SetMCData(EventData& data, ParticleGraph& graph);
 
     void UnsetMCData();
 
     const EventData&   MCEventData() const;
 
-    const ParticleSet& MCParticleSet() const;
+    const ParticleGraph& MCParticleGraph() const;
 
   private:
 
     EventData*   _mc_data;
-    ParticleSet* _mc_ps;
+    ParticleGraph* _mc_graph;
 
   };
 }

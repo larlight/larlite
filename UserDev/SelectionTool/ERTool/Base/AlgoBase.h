@@ -15,10 +15,9 @@
 #define ERTOOL_ALGOBASE_H
 
 #include "UnitBase.h"
-#include "EventData.h"
-#include "Particle.h"
 namespace ertool {
-
+  class EventData;
+  class ParticleGraph;
   /**
      \class AlgoBase
      @brief Base class for Shower Pdf Algorithms (Algo).
@@ -46,7 +45,7 @@ namespace ertool {
     virtual ~AlgoBase(){}
     
     /// Function to evaluate input showers and determine a score
-    virtual ParticleSet Reconstruct(const EventData &data) {return ParticleSet(); }
+    virtual bool Reconstruct(const EventData &data, ParticleGraph& graph) {return true; }
 
   };
 }
