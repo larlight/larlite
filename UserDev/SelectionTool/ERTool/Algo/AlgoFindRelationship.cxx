@@ -131,8 +131,8 @@ namespace ertool{
     return sqrt(IP);
   }
 
-
-  ParticleSet AlgoFindRelationship::FindTrackHierarchy(const std::vector<const ertool::Track*> &tracks)
+  /*
+  ParticleGraph AlgoFindRelationship::FindTrackHierarchy(const std::vector<const ertool::Track> &tracks)
   {
 
     //std::cout << "Starting with " << tracks.size() << " tracks" << std::endl;
@@ -147,19 +147,17 @@ namespace ertool{
     // Create a ParticleSet.
     // Initially each track is an independent particle
     // as relationships are found sort by "genealogy"
-    ParticleSet trackParts;
+    ParticleGraph Parts;
     for (size_t t=0; t < tracks.size(); t++){
-      Track tr = *(tracks.at(t));
+      Track tr = tracks.at(t);
       //std::cout << "\tTrack " << t << "\tVtx: " << tr[0] << std::endl;
-      Particle thisp = GetPDG(tr);
-      thisp.Vertex(tr.at(0));
+      Particle thisp = Particle(tr.RecoID(),RecoType_t::kTrack,tr.RecoID());
+      geoalgo::Vector_t dir(tr.at(1) - tr.at(0));
       double mom = tr._energy - thisp.Mass();
       if (mom < 0) { mom = 1; }
-      geoalgo::Vector_t dir(tr.at(1) - tr.at(0));
       dir.Normalize();
-      thisp.Momentum(dir*mom);
-      thisp.RecoObjInfo(t,Particle::RecoObjType_t::kTrack);
-      trackParts.push_back(thisp);
+      thisp.SetParticleInfo(tr._pid,mass(tr._pid),tr.at(0),dir*mom);
+      //trackParts.push_back(thisp);
     }
     // create a list that keeps track of whether a particle
     // is "primary" or not. Primary == does not have a mother track
@@ -179,8 +177,8 @@ namespace ertool{
     // Now loop over particles and form hierarchy
     for (size_t t1=0; t1 < trackParts.size(); t1++){
       for (size_t t2=t1+1; t2 < trackParts.size(); t2++){
-	Track tr1 = *(tracks.at(trackParts.at(t1).RecoObjID()));
-	Track tr2 = *(tracks.at(trackParts.at(t2).RecoObjID()));
+	Track tr1 = tracks.at(trackParts.at(t1).RecoObjID());
+	Track tr2 = tracks.at(trackParts.at(t2).RecoObjID());
 	// require both tracks to be longer than some distance (1 cm)
 	//if ( (tr1.Length() > 1) || (tr2.Length() > 0.1) )
 	//  continue;
@@ -235,14 +233,14 @@ namespace ertool{
     //std::cout << "Primaries left: " << primary << std::endl;
 
     // Create a ParticleSet where to store output
-    ParticleSet thisset;
+    ParticleGraph thisset;
     // At the end, go through primary tracks
     // for those that have siblings, create a single unknown ancestor
     for (size_t t = 0; t < trackParts.size(); t++){
       if (trackPrimary.at(t) == 1){
-	// it si primary!
+	// it is primary!
 	// create unknown particle and add this track & siblings
-	Particle unknown(999,_uk_mass);
+	Particle unknown(999,RecoType_t::kInvisible,0);
 	// temporary holder for the vertex
 	geoalgo::Point_t thisvtx = trackParts[t].Vertex();
 	// how many particles at this vertex?
@@ -273,12 +271,12 @@ namespace ertool{
   }
 
 
-  ParticleSet AlgoFindRelationship::FindHierarchy(const std::vector<const ertool::Track*>  &tracks,
-						  const std::vector<const ertool::Shower*> &showers)
+  ParticleGraph AlgoFindRelationship::FindHierarchy(const std::vector<const ertool::Track>  &tracks,
+						  const std::vector<const ertool::Shower> &showers)
   {
     
     // First, find the hierarchy of all tracks
-    ParticleSet trackHierarchy = FindTrackHierarchy(tracks);
+    ParticleGraph trackHierarchy = FindTrackHierarchy(tracks);
 
     // Compare showers with tracks. First with vertices of each primary
     // group of tracks, then with all the tracks themselves
@@ -315,62 +313,20 @@ namespace ertool{
 		
     return trackHierarchy;
   }
-
-  /*
-    bool AlgoFindRelationship::CompareShrWithPartBranch(const Shower& shr,
-    const std::vector<const ertool::Track*>  &tracks,
-    Particle& part)
-    {
-    
-    for (auto &p : part._daughters){
-    
-    Track tr = *tracks.at(p.RecoObjID());
-    
-    geoalgo::Point_t vtx(3);
-    double IP = FindClosestApproach(shr, tr, vtx);
-      
-      // if IP small enough
-      if (IP < 1.){
-	
-	// if vtx close enough to both objects
-	if ( (vtx.Dist(shr.Start()) < 50.) &&
-	     (sqrt(_geoAlgo.SqDist(vtx,tr)) < 1.) ){
-	  
-	  // if close to track start:
-	  // should this ever happen?
-	  // in theory we checked this already...
-	  // this CAN happen...but do we want to handle
-	  // this case in a special way????
-	  if ( vtx.Dist(tr[0]) < 1.)
-	    part.AddDaughter(unknownShower);
-	  // otherwise shower comes from track
-	  else
-	    p.AddDaughter(unknownShower);
-	  
-	  daughter = true;
-	  return true;
-	  
-	}// if close enough to track body & shower start
-      }// if IP is small enough
-
-      }// for all particles at this "vertex"
-    
-    return false;
-  }
-  */  
-  Particle AlgoFindRelationship::GetPDG(const Track &trk)
+  */
+  double AlgoFindRelationship::GetPDG(const Track &trk)
   {
 
     switch(trk._pid){
-    case Track::TrackPartID_t::kUnknown : return Particle(999,_uk_mass);
-    case Track::TrackPartID_t::kPIDA    : return Particle(999,_uk_mass);
-    case Track::TrackPartID_t::kProton  : return Particle(2212,_pr_mass);
-    case Track::TrackPartID_t::kKaon    : return Particle(311,_ka_mass);
-    case Track::TrackPartID_t::kPion    : return Particle(211,_pi_mass);
-    case Track::TrackPartID_t::kMuon    : return Particle(13,_mu_mass);
+    case Track::TrackPartID_t::kUnknown : return -1;
+    case Track::TrackPartID_t::kPIDA    : return -1;
+    case Track::TrackPartID_t::kProton  : return 2212;
+    case Track::TrackPartID_t::kKaon    : return 311;
+    case Track::TrackPartID_t::kPion    : return 211;
+    case Track::TrackPartID_t::kMuon    : return 13;
     }
 
-    return Particle(999,_uk_mass);
+    return -1;
   }
 
 };

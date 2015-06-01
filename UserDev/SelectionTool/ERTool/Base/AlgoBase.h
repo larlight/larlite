@@ -15,9 +15,9 @@
 #define ERTOOL_ALGOBASE_H
 
 #include "UnitBase.h"
+#include "EventData.h"
+#include "ParticleGraph.h"
 namespace ertool {
-  class EventData;
-  class ParticleGraph;
   /**
      \class AlgoBase
      @brief Base class for Shower Pdf Algorithms (Algo).

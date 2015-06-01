@@ -2,7 +2,6 @@
 #define ERTOOL_ALGOPI0_CXX
 
 #include "AlgoPi0.h"
-#include "ERTool/Base/BookKeeper.h"
 #include "GeoAlgo/GeoAlgo.h"
 #include "EMShowerTools/EMShowerProfile.h"
 
@@ -241,17 +240,15 @@ namespace ertool {
     return;
   }
   
-  ParticleSet AlgoPi0::Reconstruct(const EventData &data)
+  bool AlgoPi0::Reconstruct(const EventData &data, ParticleGraph& graph)
   { 
 	
     if (_verbose) {
-      std::cout << "showers in event: " << data.Shower().size() << std::endl;
+      std::cout << "showers in event: " << graph.GetParticles(RecoType_t::kShower).size() << std::endl;
     }
-    ParticleSet res;
-    //    if(!data._vtxs.size() || data._showers.size()<2) return res;
-    if(data.Shower().size()<2) return res;
 
-    BookKeeper bk;
+    if(graph.GetParticles(RecoType_t::kShower).size() < 2) return true;
+
     Combination_t comb(2);
 
     double best_ll = -1.e10;
@@ -259,56 +256,64 @@ namespace ertool {
     geoalgo::Point_t vertex(3);
     geoalgo::Vector_t momentum(3);
 
-    for(auto const& shower_v : data.ShowerCombination(2)) {
+    auto datacpy = data;
 
-      comb[0] = shower_v[0]->ID();
-      comb[1] = shower_v[1]->ID();
+    // loop over showers and compare showers pair-by-pair
+    auto const& shrIDs = graph.GetParticles(RecoType_t::kShower);
 
-      double likelihood = 0.;
-      double mass       = -1.;
+    for (auto const& shrID1 : shrIDs){
+      for (auto const& shrID2 : shrIDs){
+	// skip if we have already checked this combination
+	// or if we are comparing to self
+	if (shrID2 <= shrID1) continue;
+
+	auto const& shr1 = datacpy.Shower(graph.GetParticle(shrID1).RecoID());
+	auto const& shr2 = datacpy.Shower(graph.GetParticle(shrID2).RecoID());
+
+	double likelihood = 0.;
+	double mass       = -1.;
       
-      _angle = 0;
+	_angle = 0;
       
-      LL(*(shower_v[0]),
-	 *(shower_v[1]),
-	 likelihood, mass, vertex, momentum);
-      if (likelihood > best_ll) { best_ll = likelihood; best_mass = mass; }
-      
-      bk.book(likelihood,comb);
+	LL(shr1, shr2, likelihood, mass, vertex, momentum);
+	if (likelihood > best_ll) { best_ll = likelihood; best_mass = mass; }
+	
+	
+	if ( (likelihood != -1.e-10) && (mass > 0) ){
+	  _hMass_vs_LL->Fill(mass,likelihood);
+	  // edit particle info to reflect the fact 
+	  // that we have 2 gammas coming from a pi0
+	  
+	  // specify info for 1st gamma
+	  auto const& gamma1vtx = shr1.Start();
+	  auto const& gamma1mom = shr1.Dir()*shr1._energy;
+	  graph.GetParticle(shrID1).SetParticleInfo(22,0,gamma1vtx,gamma1mom);
+	  // specify info for 2nd gamma
+	  auto const& gamma2vtx = shr2.Start();
+	  auto const& gamma2mom = shr2.Dir()*shr2._energy;
+	  graph.GetParticle(shrID2).SetParticleInfo(22,0,gamma2vtx,gamma2mom);
+	  // create pi0
+	  Particle pi0 = graph.CreateParticle();
+	  // Approximate vtx using lifetime
+	  auto dir = momentum.Dir();
+	  dir *= sqrt( 1 - pow( mass / (mass + momentum.Length()), 2)) * 2.998e10 * _tau;
+	  vertex -= dir;
+	  pi0.SetParticleInfo(111,mass,vertex,momentum);
+	  
+	  // Add relationships
+	  graph.SetSiblings(shrID1,shrID2);
+	  graph.SetParentage(pi0.ID(),shrID1);
+	  graph.SetParentage(pi0.ID(),shrID2);
 
-      if ( (likelihood != -1.e-10) && (mass > 0) ){
-	_hMass_vs_LL->Fill(mass,likelihood);
-	// create a Pi0 and two gamma showers!
-	Particle gamma1(22,0.);
-	gamma1.Vertex(shower_v[0]->Start());
-	gamma1.Momentum(shower_v[0]->Dir()*shower_v[0]->_energy);
-	gamma1.RecoObjInfo(comb[0],Particle::RecoObjType_t::kShower);
-	res.push_back(gamma1);
-	Particle gamma2(22,0.);
-	gamma2.Vertex(shower_v[1]->Start());
-	gamma2.Momentum(shower_v[1]->Dir()*shower_v[1]->_energy);
-	gamma2.RecoObjInfo(comb[1],Particle::RecoObjType_t::kShower);
-	res.push_back(gamma2);
+	}
+	_hMass->Fill(_mass);
 
-	Particle pi0(111,mass);
-	// Approximate vtx using lifetime
-	auto dir = momentum.Dir();
-	dir *= sqrt( 1 - pow( mass / (mass + momentum.Length()), 2)) * 2.998e10 * _tau;
-	vertex -= dir;
-	pi0.Vertex(vertex);
-	pi0.Momentum(momentum);
-	pi0.AddDaughter(gamma1);
-	pi0.AddDaughter(gamma2);
-	pi0.Score(likelihood);
-	res.push_back(pi0);
-      }
-      _hMass->Fill(_mass);
-
-    } // for all shower combinations
+      } // for all showers
+    } // for all showers
 
     if (best_mass != 0) { _hBestMass->Fill(best_mass); }
 
-    return res;
+    return true;
   }
 
   void AlgoPi0::ProcessEnd(TFile* fout)

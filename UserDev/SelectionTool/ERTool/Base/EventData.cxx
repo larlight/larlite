@@ -15,7 +15,7 @@ namespace ertool {
     _track_v.clear();
   }
 
-  const Shower& EventData::Shower (RecoID_t id)
+  const Shower& EventData::Shower (const RecoID_t& id)
   {
     if( id >= _shower_v.size() ) 
       throw ERException(Form("No shower corresponds to an id %zu",id));
@@ -29,7 +29,7 @@ namespace ertool {
     return this->Shower( p.RecoID() );
   }
 
-  const Track& EventData::Track (RecoID_t id)
+  const Track& EventData::Track (const RecoID_t& id)
   {
     if( id >= _track_v.size() ) 
       throw ERException(Form("No track corresponds to an id %zu",id));
@@ -42,7 +42,7 @@ namespace ertool {
       throw ERException("Track object queried for non-track particle!");
     return this->Track( p.RecoID() );
   }
-  
+
   void EventData::Add(const ::ertool::Shower& obj) 
   { 
     _shower_v.push_back(obj); 

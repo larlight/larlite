@@ -82,7 +82,7 @@ namespace ertool {
     virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
 
     /// Function to evaluate input showers and determine a score
-    virtual ParticleSet Reconstruct(const EventData &data);
+    virtual bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
     /// Function executed at end of process
     virtual void ProcessEnd(TFile* fout);

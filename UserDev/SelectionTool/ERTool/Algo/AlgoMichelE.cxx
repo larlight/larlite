@@ -58,23 +58,23 @@ namespace ertool {
     return;
   }
 
-  ParticleSet AlgoMichelE::Reconstruct(const EventData &data)
+  bool AlgoMichelE::Reconstruct(const EventData &data, ParticleGraph& graph)
   { 
-    ParticleSet res;    
 
-    //Loop over all showers in the event    
-    for(size_t is = 0; is < data.Shower().size(); is++){
+    // Loop through showers
+    for (auto const& p : graph.GetParticles(RecoType_t::kShower)){
 
-      Shower shower(data.Shower(is));
+      auto datacpy = data;
+      auto const& shower = datacpy.Shower(graph.GetParticle(p).RecoID());
 
       //Ask EMP if shower is electron, using only de/dx
       if( _alg_emp.LL(true, shower._dedx, -1) > _alg_emp.LL(false, shower._dedx, -1)){
 
-	//Loop over all tracks 
-	for(size_t it = 0; it < data.Track().size(); it++){
-
-	  Track track(data.Track(it));
-
+	// Loop through tracks
+	for (auto const& t : graph.GetParticles(RecoType_t::kTrack)){
+	  
+	  auto const& track = datacpy.Track(graph.GetParticle(t).RecoID());
+	  
 	  shower_st_to_track_end->Fill(shower.Start().Dist(track.back()));
 
 	  //Check if this shower is at the end (w/in 3cm) of this tracks,
@@ -92,7 +92,7 @@ namespace ertool {
       }//End if shower is likely an electron
     }//End loop over showers
 
-    return res;
+    return true;
     
   }
   

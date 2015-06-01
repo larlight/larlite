@@ -53,13 +53,15 @@ namespace ertool {
 
     void setMinLength(double l) { _minLength = l; }
 
-    ParticleSet FindTrackHierarchy(const std::vector<const ertool::Track*> &tracks);
+    /*
+    ParticleGraph FindTrackHierarchy(const std::vector<const ertool::Track> &tracks);
 
-    ParticleSet FindHierarchy(const std::vector<const ertool::Track*> &tracks,
-			      const std::vector<const ertool::Shower*> &showers);
+    ParticleGraph FindHierarchy(const std::vector<const ertool::Track> &tracks,
+				const std::vector<const ertool::Shower> &showers);
+    */
 
     // Get PDG Code given track type
-    Particle GetPDG(const Track &trk);
+    double GetPDG(const Track &trk);
 
   private:
 

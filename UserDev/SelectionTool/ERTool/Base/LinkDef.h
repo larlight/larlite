@@ -15,6 +15,7 @@
 #pragma link C++ class vector<RooRealVar>+;
 
 #pragma link C++ namespace ertool+;
+#pragma link C++ class ertool::RangeVar+;
 #pragma link C++ class ertool::Params+;
 #pragma link C++ class ertool::Record+;
 #pragma link C++ class ertool::RecoObjBase+;

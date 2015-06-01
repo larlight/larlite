@@ -26,12 +26,7 @@ namespace ertool {
     return;
   }
 
-  ParticleSet AlgoPrimaryFinder::Reconstruct(const EventData &data){
-    
-    // ParticleSet where to store primaries found
-    ParticleSet primaries;
-
-    //res = emParticles;
+  void AlgoPrimaryFinder::Reconstruct(const EventData &data, ParticleGraph& graph){
     
     if (_verbose) { 
       std::cout << "*********** BEGIN PrimaryFinder RECONSTRUCTION ************" << std::endl;
@@ -43,25 +38,32 @@ namespace ertool {
     // Stages are separated due to the different conditions required
     // to determine if a shower/track is primary
 
+    // make a copy of EventData -> to fix!!!
+    auto datacpy = data;
+
     // Find primary showers
-    for (size_t sh=0; sh < data.Shower().size(); sh++){
+    for (auto const& p : graph.GetParticles(RecoType_t::kShower)){
+
+      auto const& thisID = graph.GetParticle(p).RecoID();
+      auto const& thisShower = datacpy.Shower(thisID);
       
       // Ok, we have a shower.
       // make sure it does not:
       // 1) come from another shower
       // 2) come from a track
 
-      auto const& thisShower = data.Shower(sh);
-
       if (_verbose) { std::cout << "This shower: (" << sh << ")" << "\tE: " << thisShower._energy << std::endl; }
       bool primary = true;
       // loop over other showers and check 1) and 2)
-      for (size_t s=0; s < data.Shower().size(); s++){
-	auto const& thatShower(data.Shower(s));
+      for (auto const& p2 : graph.GetParticles(RecoType_t::kShower)){
+
+	auto const& thatID = graph.GetParticle(p2).RecoID();
+
+	// make sure we don't use the same shower or repeat search
+	if (thatID <= thisID) continue;
+	auto const& thatShower = datacpy.Shower(thatID);
 	geoalgo::Point_t vtx(3);
-	// make sure we don't use thisShower in the loop
-	if (thatShower.ID() == thisShower.ID())
-	  continue;
+
 	if (_verbose) { std::cout << "Comparing with shower (" << s << ")" << std::endl; }
 	// compare the two showers -> make sure thisShower does not come from thatShower
 	// if thisShower comes from somewhere along the second shower's trunk
@@ -95,8 +97,12 @@ namespace ertool {
       if (!primary)
 	continue;
 
-      for (size_t t=0; t < data.Track().size(); t++){
-	auto const& thatTrack(data.Track(t));
+      // loop over other showers and check 1) and 2)
+      for (auto const& t : graph.GetParticles(RecoType_t::kTrack)){
+
+	auto const& thatID = graph.GetParticle(t).RecoID();
+	auto const& thatTrack = datacpy.Track(thatID);
+
 	if (thatTrack.size() < 2)
 	  continue;
 	if (_verbose) { std::cout << "Comparing with track (" << t << ")" << std::endl; }

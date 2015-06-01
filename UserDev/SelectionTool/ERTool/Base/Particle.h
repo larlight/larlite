@@ -79,8 +79,8 @@ namespace ertool {
     void UpdateAfterRemoval(const NodeID_t removed);
     
     // Particle information
-    int    _pdg_code; ///< PDG code of a particle
-    double _mass;     ///< Particle's mass
+    int    _pdg_code;       ///< PDG code of a particle
+    double _mass;           ///< Particle's mass
     ::geoalgo::Vector _vtx; ///< Creation vertex of a particle
     ::geoalgo::Vector _mom; ///< Creation momentum of a particle
     

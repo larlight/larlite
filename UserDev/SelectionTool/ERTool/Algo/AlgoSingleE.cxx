@@ -76,7 +76,7 @@ namespace ertool {
     return;
   }
 
-  ParticleSet AlgoSingleE::Reconstruct(const EventData &data){
+  bool AlgoSingleE::Reconstruct(const EventData &data, ParticleGraph& graph){
     
     // ParticleSet where to store single electrons
     ParticleSet res;

@@ -124,7 +124,7 @@ namespace ertool {
   }
 
 
-  ParticleSet AlgoSingleGamma::Reconstruct(const EventData &data)
+  bool AlgoSingleGamma::Reconstruct(const EventData &data, ParticleGraph& graph)
   { 
 
 

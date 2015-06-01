@@ -58,7 +58,7 @@ namespace ertool {
     virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
 
     /// Function to reconstruct the start-point isolated electrons
-    virtual ParticleSet Reconstruct(const EventData &data);
+    virtual bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
     /// Set verbosity
     void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); }

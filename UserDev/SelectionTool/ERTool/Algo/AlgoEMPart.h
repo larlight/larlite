@@ -18,6 +18,9 @@
 #include "ERTool/Base/AlgoBase.h"
 #include "ERTool/Base/PdfFactory.h"
 #include "ERTool/Base/RangeVar.h"
+#include "ERTool/Base/Track.h"
+#include "ERTool/Base/Shower.h"
+#include "ERTool/Base/Particle.h"
 #include "TDatabasePDG.h"
 #include <RooPlot.h>
 #include <RooProdPdf.h>
@@ -59,7 +62,7 @@ namespace ertool {
     virtual void ProcessBegin();
 
     /// Function to evaluate input showers and determine a score
-    virtual ParticleSet Reconstruct(const EventData &data);
+    virtual bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
     /// What to do once event-loop is over
     virtual void ProcessEnd(TFile* fout);

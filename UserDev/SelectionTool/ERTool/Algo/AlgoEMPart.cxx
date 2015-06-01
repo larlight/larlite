@@ -249,31 +249,40 @@ namespace ertool {
     }
   }
 
-  ParticleSet AlgoEMPart::Reconstruct(const EventData &data)
+  bool AlgoEMPart::Reconstruct(const EventData &data, ParticleGraph& graph)
   {
-    ParticleSet res;
 
-    for(auto const& s : data.Shower()) {
+    // get vertex info (if it exists)
+    auto const& invisibles = graph.GetParticles(RecoType_t::kInvisible);
+    
+
+    // Loop through showers
+    for (auto const& p : graph.GetParticles(RecoType_t::kShower)){
+
+      auto datacpy = data;
+      auto const& s = datacpy.Shower(graph.GetParticle(p).RecoID());
 
       double dist   = -1.;
-      double dEdx   = s->_dedx;
+      double dEdx   = s._dedx;
 
       // skip if dEdx out of bounds
       if ( !_dEdxVar->inRange( dEdx, 0 ) ) continue;
 
-      if(data.Vertex().size())
-	dist = s->Start().Dist((*data.Vertex()[0]));
+      if (invisibles.size() > 0){
+	// particle containing vertex info:
+	auto const& vtxPart = graph.GetParticle(invisibles[0]);
+	dist = s.Start().Dist(vtxPart.Vertex());
+      }// if there is an invisible
 
       double e_like = LL(true,  dEdx, dist);
       double g_like = LL(false, dEdx, dist);
 
       int pdg_code = ( g_like > e_like ? 22 : 11 );
       double mass  = ( pdg_code == 11 ? _e_mass : _g_mass );
-      Particle p(pdg_code,mass);
-      p.Vertex(s->Start());
-      p.Momentum(s->Dir() * (s->_energy - p.Mass()));
-      p.RecoObjInfo(s->ID(),Particle::RecoObjType_t::kShower);
-      res.push_back(p);
+      Particle empart(0,RecoType_t::kShower,s.RecoID());
+      auto const& mom = s.Dir() * (s._energy - empart.Mass());
+      empart.SetParticleInfo(pdg_code,mass,s.Start(),mom);
+      //res.push_back(p);
 
       _dEdxVar->setVal(dEdx);
 
@@ -308,7 +317,7 @@ namespace ertool {
 
     }// for all showers
     
-    return res;
+    return true;
   }
 
   void AlgoEMPart::ProcessEnd(TFile* fout)
