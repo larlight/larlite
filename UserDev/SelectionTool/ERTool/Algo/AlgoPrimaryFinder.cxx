@@ -26,7 +26,7 @@ namespace ertool {
     return;
   }
 
-  void AlgoPrimaryFinder::Reconstruct(const EventData &data, ParticleGraph& graph){
+  bool AlgoPrimaryFinder::Reconstruct(const EventData &data, ParticleGraph& graph){
     
     if (_verbose) { 
       std::cout << "*********** BEGIN PrimaryFinder RECONSTRUCTION ************" << std::endl;
@@ -52,7 +52,7 @@ namespace ertool {
       // 1) come from another shower
       // 2) come from a track
 
-      if (_verbose) { std::cout << "This shower: (" << sh << ")" << "\tE: " << thisShower._energy << std::endl; }
+      if (_verbose) { std::cout << "This shower: (" << thisID << ")" << "\tE: " << thisShower._energy << std::endl; }
       bool primary = true;
       // loop over other showers and check 1) and 2)
       for (auto const& p2 : graph.GetParticles(RecoType_t::kShower)){
@@ -64,7 +64,7 @@ namespace ertool {
 	auto const& thatShower = datacpy.Shower(thatID);
 	geoalgo::Point_t vtx(3);
 
-	if (_verbose) { std::cout << "Comparing with shower (" << s << ")" << std::endl; }
+	if (_verbose) { std::cout << "Comparing with shower (" << thisID << ")" << std::endl; }
 	// compare the two showers -> make sure thisShower does not come from thatShower
 	// if thisShower comes from somewhere along the second shower's trunk
 	// then it is not primary
@@ -97,7 +97,7 @@ namespace ertool {
       if (!primary)
 	continue;
 
-      // loop over other showers and check 1) and 2)
+      // loop over other tracks
       for (auto const& t : graph.GetParticles(RecoType_t::kTrack)){
 
 	auto const& thatID = graph.GetParticle(t).RecoID();
@@ -133,30 +133,37 @@ namespace ertool {
       // if still primary append to list of primaries
       // create new particle
       if (primary){
-	// for now append a dummy particle of PDG = 0 and mass = 0
-	Particle thisP(0,0);
-	thisP.RecoObjInfo(sh,Particle::RecoObjType_t::kShower);
-	primaries.push_back(thisP);
+	// set particle as primary
+	graph.SetPrimary(thisID);
       }
       
     }// end loop through all showers
-    
-    // find primary tracks
-    for (size_t tr=0; tr < data.Track().size(); tr++){
+
+
+    // Find primary tracks
+    for (auto const& p : graph.GetParticles(RecoType_t::kTrack)){
+
+      auto const& thisID = graph.GetParticle(p).RecoID();
+      auto const& thisTrack = datacpy.Track(thisID);    
+
+      if (thisTrack.size() < 2)
+	continue;
       
-      auto const& thisTrack = data.Track(tr);
-	if (thisTrack.size() < 2)
-	  continue;
-      
-      if (_verbose) { std::cout << "This shower: (" << tr << ")" << "\tE: " << thisTrack._energy << std::endl; }
+      if (_verbose) { std::cout << "This Track: (" << thisID << ")" << "\tE: " << thisTrack._energy << std::endl; }
       bool primary = true;
       
-      // loop over other showers and check that the
-      // track does not come from the shower
-      for (size_t s=0; s < data.Shower().size(); s++){
-	auto const& thatShower(data.Shower(s));
+
+      // loop over other showers and check 1) and 2)
+      for (auto const& p2 : graph.GetParticles(RecoType_t::kShower)){
+
+	auto const& thatID = graph.GetParticle(p2).RecoID();
+
+	// make sure we don't use the same shower or repeat search
+	if (thatID <= thisID) continue;
+
+	auto const& thatShower = datacpy.Shower(thatID);
 	geoalgo::Point_t vtx(3);
-	if (_verbose) { std::cout << "Comparing with shower (" << s << ")" << std::endl; }
+	if (_verbose) { std::cout << "Comparing with shower (" << thatID << ")" << std::endl; }
 	// compare the two showers -> make sure thisTrack does not come from thatShower
 	// if thisTrack comes from somewhere along the second shower's trunk
 	// then it is not primary
@@ -187,11 +194,11 @@ namespace ertool {
       if (!primary)
 	continue;
 
-      for (size_t t=0; t < data.Track().size(); t++){
-	// do not compare with self
-	if (t == tr)
-	  continue;
-	auto const& thatTrack(data.Track(t));
+      // loop over other tracks
+      for (auto const& t : graph.GetParticles(RecoType_t::kTrack)){
+
+	auto const& thatID = graph.GetParticle(t).RecoID();
+	auto const& thatTrack = datacpy.Track(thatID);
 	if (thatTrack.size() < 2)
 	  continue;
 	if (_verbose) { std::cout << "Comparing with track (" << t << ")" << std::endl; }
@@ -221,15 +228,13 @@ namespace ertool {
       // if still primary append to list of primaries
       // create new particle
       if (primary){
-	// for now append a dummy particle of PDG = 0 and mass = 0
-	Particle thisP(0,0);
-	thisP.RecoObjInfo(tr,Particle::RecoObjType_t::kTrack);
-	primaries.push_back(thisP);
+	// set particle as primary
+	graph.SetPrimary(thisID);
       }
 
     }// loop over all track to find primaries
 
-    return primaries;
+    return true;
   }
 
   void AlgoPrimaryFinder::ProcessEnd(TFile* fout){

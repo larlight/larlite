@@ -128,11 +128,8 @@ namespace ertool {
   { 
 
 
+    auto datacpy = data;
 
-    //Name a ParticleSet that will contain all the particles 
-    //associated with our selected single photon event
-    ParticleSet SingleGamEvent;      
-  
     if (_verbose) { 
       std::cout << "***********BEGIN RECONSTRUCTION************" << std::endl;
       if(data.Shower().size() != 0 or data.Track().size() != 0){
@@ -151,7 +148,9 @@ namespace ertool {
       :::::::::
     */
     // loop over showers
-    for (auto & thisShower : data.Shower()){
+    for (auto const& p : graph.GetPrimaries(RecoType_t::kShower)){
+      
+      auto const& thisShower = datacpy.Shower(graph.GetParticle(p).RecoID());
       
       // Keep track of list of kin found for the shower (will be used to reconstruct full neutrino interaction)
       std::vector<int> shower_kin;
@@ -172,7 +171,7 @@ namespace ertool {
     */
 
       // Apply energy threshold (separate from the ERToolHelper threshold. Only used in this algorithm)
-      if (thisShower->_energy < _Ethreshold ) continue;
+      if (thisShower._energy < _Ethreshold ) continue;
 
     /*
       :::::::::
@@ -181,9 +180,9 @@ namespace ertool {
     */
 
       //Check if this shower has already been added to a particle tree
-      if(std::find(std::begin(showers_counted),std::end(showers_counted),thisShower->ID()) != std::end(showers_counted)) continue; 
+      if(std::find(std::begin(showers_counted),std::end(showers_counted),p) != std::end(showers_counted)) continue; 
       
-      if (_verbose) { std::cout << "This shower: (" << thisShower->ID() << ")" << "\tE: " << thisShower->_energy << std::endl; }
+      if (_verbose) { std::cout << "This shower: (" << p << ")" << "\tE: " << thisShower._energy << std::endl; }
 
       bool no_elec = true;  
       bool no_track_mama = true;
@@ -196,8 +195,8 @@ namespace ertool {
       :::::::::
     */
 
-      if(isGammaLike(thisShower->_dedx,-1)) elec = false;
-      _E = thisShower->_energy; 
+      if(isGammaLike(thisShower._dedx,-1)) elec = false;
+      _E = thisShower._energy; 
       if(elec){ _PDG = 11;}
       else{ _PDG = 22;}
 
@@ -209,20 +208,21 @@ namespace ertool {
 
       //loop over showers and look for other showers coming from a vertex, 
       //making sure there are no electrons and adding all the photons 
-      for(auto & thatShower: data.Shower()){
+      for (auto const& p2 : graph.GetParticles(RecoType_t::kShower)){
+	auto const& thatShower = datacpy.Shower(graph.GetParticle(p2).RecoID());
 	
 	//define the interaction vertex
 	geoalgo::Point_t vtx(3);
       
 	//don't check a shower against itself
-	if(thatShower->ID() == thisShower->ID()) {continue;}
+	if(p == p2) {continue;}
       
 	//compare the shower with the electron shower
-	double IP = _findRel.FindClosestApproach(*thisShower,*thatShower,vtx);
+	double IP = _findRel.FindClosestApproach(thisShower,thatShower,vtx);
 	_VsTrack = 0;
-	_thatE = thatShower->_energy;
+	_thatE = thatShower._energy;
 	_IP = IP;
-	_IPthisStart = vtx.Dist(thisShower->Start());
+	_IPthisStart = vtx.Dist(thisShower.Start());
 	_alg_tree->Fill(); 
 
 	if (_verbose)
@@ -233,8 +233,8 @@ namespace ertool {
 
 
 	if( (IP < _maxIP) and 
-	    ( vtx.Dist(thatShower->Start()) < _vtxToShrStartDist) and
-	    ( vtx.Dist(thisShower->Start()) < _vtxToShrStartDist)){
+	    ( vtx.Dist(thatShower.Start()) < _vtxToShrStartDist) and
+	    ( vtx.Dist(thisShower.Start()) < _vtxToShrStartDist)){
 
     /*
       :::::::::
@@ -242,7 +242,7 @@ namespace ertool {
       :::::::::
     */
 
-	  if(isGammaLike((*thatShower)._dedx,vtx.Dist((*thatShower).Start()))) 
+	  if(isGammaLike((thatShower)._dedx,vtx.Dist((thatShower).Start()))) 
 	    no_elec = true;
 	  else
 	    no_elec = false;	
@@ -254,8 +254,8 @@ namespace ertool {
     */
 	  
 	  if(no_elec){
-	    shower_kin.push_back((*thatShower).ID());
-	    showers_counted.push_back((*thatShower).ID());
+	    shower_kin.push_back(p2);
+	    showers_counted.push_back(p);
 	  }
 	  else{
 	    if(_verbose) {std::cout << "Matched to an electron. \t\t\t ::NOT SIGNAL::" << std::endl;}
@@ -263,13 +263,13 @@ namespace ertool {
 	}
 	//**** (1) is Satified
 	//****     thisShower does not share a vertex with an electron 
-	::geoalgo::HalfLine shr_vector(thisShower->Start(),thisShower->Dir());
-	_distBackAlongTraj = sqrt(thisShower->Start().SqDist(_geoAlgo.Intersection(fTPC,shr_vector,true)[0]));
+	::geoalgo::HalfLine shr_vector(thisShower.Start(),thisShower.Dir());
+	_distBackAlongTraj = sqrt(thisShower.Start().SqDist(_geoAlgo.Intersection(fTPC,shr_vector,true)[0]));
       	
 	//Distance to Top Wall definition, page 19 of DocDB 3978-v2
 	// DANGER DANGER DANGER Hard coded detector size
 	double detHalfHeight = 116.5;
-	_distToTopWall = ((*thisShower).Start()[1] - detHalfHeight)*((*thisShower).Dir().Length())/((*thisShower).Dir()[1]);
+	_distToTopWall = (thisShower.Start()[1] - detHalfHeight)*(thisShower.Dir().Length())/(thisShower.Dir()[1]);
       }//Loop over all OTHER showers
 
     /*
@@ -280,20 +280,21 @@ namespace ertool {
 
       //Loop over tracks 
       // Check (2), if shower is daughter of a track	
-      for(auto & thatTrack : data.Track()){
-	if(thatTrack->size() < 2) continue; //Because short tracks that we cannot resolve don't matter.
+      for (auto const& t : graph.GetParticles(RecoType_t::kTrack)){
+	auto const& thatTrack = datacpy.Track(graph.GetParticle(t).RecoID());
+	if(thatTrack.size() < 2) continue; //Because short tracks that we cannot resolve don't matter.
 	
-	if(_verbose) {std::cout << "Comparing with track (" << thatTrack->ID() << ")" << std::endl;}
+	if(_verbose) {std::cout << "Comparing with track (" << thatTrack.RecoID() << ")" << std::endl;}
 	geoalgo::Point_t vtx(3);
 	
 	// compare the track and the shower
-	double IP = _findRel.FindClosestApproach(*thisShower,*thatTrack,vtx);
+	double IP = _findRel.FindClosestApproach(thisShower,thatTrack,vtx);
 	_VsTrack = 1;
-	_thatE = thatTrack->_energy;
+	_thatE = thatTrack._energy;
 	_IP = IP;
-	_IPthisStart = vtx.Dist(thisShower->Start());
-	_IPthatStart = vtx.Dist(thatTrack->front());
-	_IPtrkBody = sqrt(_geoAlgo.SqDist(vtx,*thatTrack));
+	_IPthisStart = vtx.Dist(thisShower.Start());
+	_IPthatStart = vtx.Dist(thatTrack.front());
+	_IPtrkBody = sqrt(_geoAlgo.SqDist(vtx,thatTrack));
 	_alg_tree->Fill();
 	
 	if(_verbose)
@@ -310,9 +311,9 @@ namespace ertool {
       :::::::::
     */
 	if( (IP < _maxIP) and
-	    (vtx.Dist((*thatTrack).front()) > _vtxToTrkStartDist) and  // No chance that the track and the shower share that vertex!
-	    (sqrt(_geoAlgo.SqDist(vtx,*thatTrack)) < _vtxToTrkDist) and
-	    (vtx.Dist((*thisShower).Start()) < _vtxToShrStartDist) )
+	    (vtx.Dist(thatTrack.front()) > _vtxToTrkStartDist) and  // No chance that the track and the shower share that vertex!
+	    (sqrt(_geoAlgo.SqDist(vtx,thatTrack)) < _vtxToTrkDist) and
+	    (vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) )
 	  {
 	    //This shower has 
 	    no_track_mama = false;
@@ -325,15 +326,15 @@ namespace ertool {
       :::::::::
     */
 	else if( (IP < _maxIP) and
-		 (vtx.Dist((*thatTrack).front()) < _vtxToTrkStartDist) and
-		 (vtx.Dist((*thisShower).Start()) < _vtxToShrStartDist)
+		 (vtx.Dist(thatTrack.front()) < _vtxToTrkStartDist) and
+		 (vtx.Dist(thisShower.Start()) < _vtxToShrStartDist)
 		 ){
 	  
 	  //this Shower has a track sibling 
 	  
 	  _vtx_assister = true;
 	  evt_vtx.SetXYZ(vtx[0],vtx[1],vtx[2]);
-	  track_kin.push_back((*thatTrack).ID());
+	  track_kin.push_back(thatTrack.RecoID());
 
     /*
       :::::::::
@@ -341,7 +342,7 @@ namespace ertool {
       :::::::::
     */
 	  
-	  if(!isGammaLike((*thisShower)._dedx,vtx.Dist((*thisShower).Start()))) {
+	  if(!isGammaLike(thisShower._dedx,vtx.Dist(thisShower.Start()))) {
 	    elec = true;
 	    if(_verbose) {std::cout << "Matched to an electron. \t\t\t ::NOT SIGNAL::" << std::endl;}
 	    break;
@@ -368,19 +369,12 @@ namespace ertool {
 	
 	//Create a "neutrino" particle which anchors the event
 
-	Particle neutrino(0,0);
-	neutrino.Vertex(evt_vtx);
-	
-	int nummu = 0;
-	
-	//Define the neutrino energy and momentum
+	Particle neutrino = graph.CreateParticle();
 	geoalgo::Vector_t nuMom(0.,0.,0.);
-	double nuKE = 0;
-
-	//If there is a muon add set the neutrino flavor
-	if(_muon_assister){
-	  neutrino.SetPdgCode(14);
-	}
+	if (_muon_assister)
+	  neutrino.SetParticleInfo(14,0,evt_vtx,nuMom);
+	else
+	  neutrino.SetParticleInfo(0,0,evt_vtx,nuMom);
 
 	//if there is an electron, you did it wrong...
 	if(_elec_assister){
@@ -388,54 +382,47 @@ namespace ertool {
 	}
 
 	//Go through and add all the primary photons to the event
-	for(auto s : shower_kin){	  
-	  auto const& shower(data.Shower(s));
-
-	  Particle photon(22,0);
-	  photon.Vertex(shower.Start());
-	  double mom = shower._energy;
+	for(auto s : shower_kin){
+	  auto const& shr = datacpy.Shower(graph.GetParticle(s).RecoID());
+	  double mom = shr._energy;
 	  if(mom < 0) mom = 0;
-	  photon.Momentum(shower.Dir()*mom);
+	  graph.GetParticle(s).SetParticleInfo(22,0,shr.Start(),mom);
+	  // need to add back energy? can't do that right now..
+	  double nuKE = 0;
+	  double nuMom = 0;
 	  nuKE  += mom;
-	  nuMom += photon.Momentum();
-	  photon.RecoObjInfo(shower.ID(), Particle::RecoObjType_t::kShower);
-	  neutrino.AddDaughter(photon);	  
+	  //nuMom += photon.Momentum();
+	  //neutrino.SetParticleInfo();
+	  graph.SetParentage(neutrino.ID(),s);
 	}
 
 	for(auto t : track_kin){
-	  auto const& track(data.Track(t));
 
-	  //define your track as a particle 
-	  Particle PiKProMu = _findRel.GetPDG(track);
-	  if(PiKProMu.PdgCode() == 13)
-	    {nummu += 1;}
-	  
-	  //it starts where the track starts 
-	  PiKProMu.Vertex(track[0]);
+	  auto const& trk = datacpy.Track(graph.GetParticle(t).RecoID());
+	  double mom = trk._energy;
+	  if(mom < 0) mom = 0;
+	  graph.GetParticle(t).SetParticleInfo(_findRel.GetPDG(trk),0,trk[0],mom);
+	  double nuKE = 0;
+	  double nuMom = 0;
+	  nuKE  += mom;
+	  //nuMom += photon.Momentum();
+	  // need to edit neutrino momentum...can't do that right now...
+	  graph.SetParentage(neutrino.ID(),t);
 
-	  //define the particles kinimatics
-	  double engy = track._energy;
-	  if(engy < 0) engy = 0;
-	  PiKProMu.Momentum(track.Dir()*(sqrt(engy+2*PiKProMu.Mass())));
-	  nuKE += engy;
-	  nuMom += PiKProMu.Momentum();
-	  PiKProMu.RecoObjInfo(track.ID(), Particle::RecoObjType_t::kTrack);
-	  neutrino.AddDaughter(PiKProMu);
-	 
 	}
 
 	_Ngamma = shower_kin.size()+1;
 	_Ntrks = track_kin.size();
-	_Nmu = nummu;
-	std::cout << "MUON Number : " << nummu << std::endl; 
+	//_Nmu = nummu;
+	//std::cout << "MUON Number : " << nummu << std::endl; 
 	_alg_tree->Fill();  
 
-	nuMom.Normalize();
-	neutrino.Momentum(nuMom*nuKE);
-	
+	//nuMom.Normalize();
+	//neutrino.Momentum(nuMom*nuKE);
+	/*
 	if(fTPC.Contain(neutrino.Vertex())){
-	  SingleGamEvent.push_back(neutrino);
 	}
+	*/
       }
       else{
 	if(_verbose){
@@ -447,9 +434,8 @@ namespace ertool {
       
     }//Loop over all showers
 
-    
-
-    return SingleGamEvent; }
+    return true;
+  }
 
   void AlgoSingleGamma::ProcessEnd(TFile *fout){
     

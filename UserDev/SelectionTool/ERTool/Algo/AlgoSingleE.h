@@ -100,10 +100,6 @@ namespace ertool {
   protected:
 
 
-    /// Function to filter out events with long primary tracks 
-    /// return true if a muon is found
-    bool filterMuons(const EventData &data, const std::vector<int> &secondaryTracks);
-
     /// Function to check wether a shower is e- or gamma-like
     /// Returns true if gamma-like
     bool isGammaLike(const double dedx, double radlen,bool forceRadLen=false);

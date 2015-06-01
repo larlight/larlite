@@ -50,7 +50,7 @@ namespace ertool {
     virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
 
     /// Function to evaluate input showers and determine a score
-    virtual Reconstruct(const EventData &data, ParticleGraph& graph);
+    virtual bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
 		// Set verbosity
     void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); }

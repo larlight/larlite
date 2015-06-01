@@ -397,6 +397,21 @@ namespace ertool {
     throw ERException("Logic Error: report to the developers!");
   }
 
+
+  /// Set node as Primary. This should always be ok
+  void ParticleGraph::SetPrimary(const NodeID_t node)
+  {
+    ValidNode(node);
+    auto& thisnode = _particle_v[node];
+    // for now allow to set primary only if relation was never
+    // assessed
+    if (thisnode.RelationAssessed())
+      return;
+    // relation not assessed...proceed
+    thisnode._layer_id = 0;
+    thisnode._ancestor_id = thisnode._node_id;
+  }
+
   void ParticleGraph::Reset()
   {
     _particle_v.clear();

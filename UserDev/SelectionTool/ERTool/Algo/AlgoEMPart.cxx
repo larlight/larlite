@@ -252,6 +252,8 @@ namespace ertool {
   bool AlgoEMPart::Reconstruct(const EventData &data, ParticleGraph& graph)
   {
 
+    auto datacpy = data;
+
     // get vertex info (if it exists)
     auto const& invisibles = graph.GetParticles(RecoType_t::kInvisible);
     
@@ -259,7 +261,6 @@ namespace ertool {
     // Loop through showers
     for (auto const& p : graph.GetParticles(RecoType_t::kShower)){
 
-      auto datacpy = data;
       auto const& s = datacpy.Shower(graph.GetParticle(p).RecoID());
 
       double dist   = -1.;
@@ -279,9 +280,8 @@ namespace ertool {
 
       int pdg_code = ( g_like > e_like ? 22 : 11 );
       double mass  = ( pdg_code == 11 ? _e_mass : _g_mass );
-      Particle empart(0,RecoType_t::kShower,s.RecoID());
-      auto const& mom = s.Dir() * (s._energy - empart.Mass());
-      empart.SetParticleInfo(pdg_code,mass,s.Start(),mom);
+      auto const& mom = s.Dir() * (s._energy - mass);
+      graph.GetParticle(p).SetParticleInfo(pdg_code,mass,s.Start(),mom);
       //res.push_back(p);
 
       _dEdxVar->setVal(dEdx);
