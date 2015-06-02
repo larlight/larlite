@@ -324,6 +324,7 @@ namespace ertool{
     case Track::TrackPartID_t::kKaon    : return 311;
     case Track::TrackPartID_t::kPion    : return 211;
     case Track::TrackPartID_t::kMuon    : return 13;
+    case Track::TrackPartID_t::kTrackPartIDMax : return -1;
     }
 
     return -1;

@@ -255,11 +255,11 @@ namespace ertool {
     auto datacpy = data;
 
     // get vertex info (if it exists)
-    auto const& invisibles = graph.GetParticles(RecoType_t::kInvisible);
+    auto const& invisibles = graph.GetParticleNodes(RecoType_t::kInvisible);
     
 
     // Loop through showers
-    for (auto const& p : graph.GetParticles(RecoType_t::kShower)){
+    for (auto const& p : graph.GetParticleNodes(RecoType_t::kShower)){
 
       auto const& s = datacpy.Shower(graph.GetParticle(p).RecoID());
 

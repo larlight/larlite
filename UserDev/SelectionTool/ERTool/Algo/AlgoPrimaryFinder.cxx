@@ -42,7 +42,7 @@ namespace ertool {
     auto datacpy = data;
 
     // Find primary showers
-    for (auto const& p : graph.GetParticles(RecoType_t::kShower)){
+    for (auto const& p : graph.GetParticleNodes(RecoType_t::kShower)){
 
       auto const& thisID = graph.GetParticle(p).RecoID();
       auto const& thisShower = datacpy.Shower(thisID);
@@ -55,7 +55,7 @@ namespace ertool {
       if (_verbose) { std::cout << "This shower: (" << thisID << ")" << "\tE: " << thisShower._energy << std::endl; }
       bool primary = true;
       // loop over other showers and check 1) and 2)
-      for (auto const& p2 : graph.GetParticles(RecoType_t::kShower)){
+      for (auto const& p2 : graph.GetParticleNodes(RecoType_t::kShower)){
 
 	auto const& thatID = graph.GetParticle(p2).RecoID();
 
@@ -98,7 +98,7 @@ namespace ertool {
 	continue;
 
       // loop over other tracks
-      for (auto const& t : graph.GetParticles(RecoType_t::kTrack)){
+      for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
 
 	auto const& thatID = graph.GetParticle(t).RecoID();
 	auto const& thatTrack = datacpy.Track(thatID);
@@ -141,7 +141,7 @@ namespace ertool {
 
 
     // Find primary tracks
-    for (auto const& p : graph.GetParticles(RecoType_t::kTrack)){
+    for (auto const& p : graph.GetParticleNodes(RecoType_t::kTrack)){
 
       auto const& thisID = graph.GetParticle(p).RecoID();
       auto const& thisTrack = datacpy.Track(thisID);    
@@ -154,7 +154,7 @@ namespace ertool {
       
 
       // loop over other showers and check 1) and 2)
-      for (auto const& p2 : graph.GetParticles(RecoType_t::kShower)){
+      for (auto const& p2 : graph.GetParticleNodes(RecoType_t::kShower)){
 
 	auto const& thatID = graph.GetParticle(p2).RecoID();
 
@@ -195,7 +195,7 @@ namespace ertool {
 	continue;
 
       // loop over other tracks
-      for (auto const& t : graph.GetParticles(RecoType_t::kTrack)){
+      for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
 
 	auto const& thatID = graph.GetParticle(t).RecoID();
 	auto const& thatTrack = datacpy.Track(thatID);

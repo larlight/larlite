@@ -62,7 +62,7 @@ namespace ertool {
   { 
 
     // Loop through showers
-    for (auto const& p : graph.GetParticles(RecoType_t::kShower)){
+    for (auto const& p : graph.GetParticleNodes(RecoType_t::kShower)){
 
       auto datacpy = data;
       auto const& shower = datacpy.Shower(graph.GetParticle(p).RecoID());
@@ -71,7 +71,7 @@ namespace ertool {
       if( _alg_emp.LL(true, shower._dedx, -1) > _alg_emp.LL(false, shower._dedx, -1)){
 
 	// Loop through tracks
-	for (auto const& t : graph.GetParticles(RecoType_t::kTrack)){
+	for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
 	  
 	  auto const& track = datacpy.Track(graph.GetParticle(t).RecoID());
 	  

@@ -44,15 +44,15 @@ namespace ertool {
     //
     
     /// One shower object getter from Particle ID
-    const ::ertool::Shower& Shower (const RecoID_t& id);
+    const ::ertool::Shower& Shower (const RecoID_t& id) const;
     /// One shower object getter from Particle
-    const ::ertool::Shower& Shower (const Particle& p);
+    const ::ertool::Shower& Shower (const Particle& p) const;
     /// One shower object getter from Particle
 
     /// One shower object getter from Particle ID
-    const ::ertool::Track& Track (const RecoID_t& id);
+    const ::ertool::Track& Track (const RecoID_t& id) const;
     /// One shower object getter from Particle
-    const ::ertool::Track& Track (const Particle& p);
+    const ::ertool::Track& Track (const Particle& p) const;
 
     /// All showers getter
     const std::vector< ::ertool::Shower >& Shower() const { return _shower_v; }

@@ -20,7 +20,6 @@ namespace ertool {
     kInvisible, ///< No reconstructed information
     kShower,    ///< Associated with a shower object
     kTrack,     ///< Associated with a track object
-    kVertex,    ///< Associated with a vertex object
     kINVALID_RECO_TYPE
   };
 

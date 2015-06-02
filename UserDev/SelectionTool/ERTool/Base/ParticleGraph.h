@@ -33,19 +33,19 @@ namespace ertool {
 
     size_t GetNumParticles () const;
     size_t GetNumPrimaries () const;
-    const std::vector<NodeID_t> GetAllDescendants(const NodeID_t target) const;
-    const std::vector<NodeID_t> GetSiblings(const NodeID_t target) const;
-    const std::vector<NodeID_t> GetParticles ( const RecoType_t type      = kINVALID_RECO_TYPE,
-					       const bool unassessed_only = false,
-					       const int pdg_code = 0 ) const;
-    const std::vector<NodeID_t> GetPrimaries ( const RecoType_t type = kINVALID_RECO_TYPE,
-					       const bool unassessed_only = false,
-					       const int pdg_code = 0) const;
-    const CombinationSet_t GetCombinations( const size_t combination_size,
-					    const RecoType_t type = kINVALID_RECO_TYPE,
-					    const bool unassessed_only = false,
-					    const int pdg_code = 0) const;
-
+    const std::vector<NodeID_t> GetAllDescendantNodes(const NodeID_t target) const;
+    const std::vector<NodeID_t> GetSiblingNodes(const NodeID_t target) const;
+    const std::vector<NodeID_t> GetParticleNodes ( const RecoType_t type      = kINVALID_RECO_TYPE,
+						   const bool unassessed_only = false,
+						   const int pdg_code = 0 ) const;
+    const std::vector<NodeID_t> GetPrimaryNodes ( const RecoType_t type = kINVALID_RECO_TYPE,
+						  const bool unassessed_only = false,
+						  const int pdg_code = 0) const;
+    const CombinationSet_t GetNodeCombinations( const size_t combination_size,
+						const RecoType_t type = kINVALID_RECO_TYPE,
+						const bool unassessed_only = false,
+						const int pdg_code = 0) const;
+    
     void SetParentage    ( const NodeID_t parent, const NodeID_t child,  const float score = kDEFAULT_SCORE);
     void SetSiblings     ( const NodeID_t his_id, const NodeID_t her_id, const float score = kDEFAULT_SCORE);
     void SetPrimary      ( const NodeID_t node );

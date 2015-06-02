@@ -52,8 +52,8 @@ namespace ertool {
 
 
   AlgoSingleGamma::AlgoSingleGamma() : AlgoBase()
-				     , _alg_tree(nullptr)
 				     , fTPC(-10.,-126.,-10.,292.,136.,1150.)
+				     , _alg_tree(nullptr)
   {
     _name     = "AlgoSingleGamma";
     _e_mass     = TDatabasePDG().GetParticle(11)->Mass();
@@ -148,7 +148,7 @@ namespace ertool {
       :::::::::
     */
     // loop over showers
-    for (auto const& p : graph.GetPrimaries(RecoType_t::kShower)){
+    for (auto const& p : graph.GetPrimaryNodes(RecoType_t::kShower)){
       
       auto const& thisShower = datacpy.Shower(graph.GetParticle(p).RecoID());
       
@@ -208,7 +208,7 @@ namespace ertool {
 
       //loop over showers and look for other showers coming from a vertex, 
       //making sure there are no electrons and adding all the photons 
-      for (auto const& p2 : graph.GetParticles(RecoType_t::kShower)){
+      for (auto const& p2 : graph.GetParticleNodes(RecoType_t::kShower)){
 	auto const& thatShower = datacpy.Shower(graph.GetParticle(p2).RecoID());
 	
 	//define the interaction vertex
@@ -280,7 +280,7 @@ namespace ertool {
 
       //Loop over tracks 
       // Check (2), if shower is daughter of a track	
-      for (auto const& t : graph.GetParticles(RecoType_t::kTrack)){
+      for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
 	auto const& thatTrack = datacpy.Track(graph.GetParticle(t).RecoID());
 	if(thatTrack.size() < 2) continue; //Because short tracks that we cannot resolve don't matter.
 	

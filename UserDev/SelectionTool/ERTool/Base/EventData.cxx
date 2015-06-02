@@ -15,28 +15,28 @@ namespace ertool {
     _track_v.clear();
   }
 
-  const Shower& EventData::Shower (const RecoID_t& id)
+  const Shower& EventData::Shower (const RecoID_t& id) const
   {
     if( id >= _shower_v.size() ) 
       throw ERException(Form("No shower corresponds to an id %zu",id));
     return _shower_v[id];
   }
 
-  const Shower& EventData::Shower (const Particle& p)
+  const Shower& EventData::Shower (const Particle& p) const
   {
     if( p.RecoType() != kShower )
       throw ERException("Shower object queried for non-shower particle!");
     return this->Shower( p.RecoID() );
   }
 
-  const Track& EventData::Track (const RecoID_t& id)
+  const Track& EventData::Track (const RecoID_t& id) const
   {
     if( id >= _track_v.size() ) 
       throw ERException(Form("No track corresponds to an id %zu",id));
     return _track_v[id];
   }
 
-  const Track& EventData::Track (const Particle& p)
+  const Track& EventData::Track (const Particle& p) const
   {
     if( p.RecoType() != kTrack )
       throw ERException("Track object queried for non-track particle!");

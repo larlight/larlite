@@ -244,10 +244,10 @@ namespace ertool {
   { 
 	
     if (_verbose) {
-      std::cout << "showers in event: " << graph.GetParticles(RecoType_t::kShower).size() << std::endl;
+      std::cout << "showers in event: " << graph.GetParticleNodes(RecoType_t::kShower).size() << std::endl;
     }
 
-    if(graph.GetParticles(RecoType_t::kShower).size() < 2) return true;
+    if(graph.GetParticleNodes(RecoType_t::kShower).size() < 2) return true;
 
     Combination_t comb(2);
 
@@ -259,7 +259,7 @@ namespace ertool {
     auto datacpy = data;
 
     // loop over showers and compare showers pair-by-pair
-    auto const& shrIDs = graph.GetParticles(RecoType_t::kShower);
+    auto const& shrIDs = graph.GetParticleNodes(RecoType_t::kShower);
 
     for (auto const& shrID1 : shrIDs){
       for (auto const& shrID2 : shrIDs){

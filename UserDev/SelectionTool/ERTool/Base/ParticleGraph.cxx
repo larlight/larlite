@@ -55,20 +55,21 @@ namespace ertool {
     return ctr;
   }
   
-  const std::vector<NodeID_t> ParticleGraph::GetAllDescendants(const NodeID_t target) const
+  const std::vector<NodeID_t> ParticleGraph::GetAllDescendantNodes(const NodeID_t target) const
   {
     auto const& p = GetParticle(target);
     std::vector<NodeID_t> res;
     for(auto const& c : p.Children()) {
       res.push_back(c);
-      auto tmp_res = GetAllDescendants(c);
+      auto tmp_res = GetAllDescendantNodes(c);
       res.reserve(res.size() + tmp_res.size());
       for(auto const& id : tmp_res) res.push_back(id);
     }
     return res;
   }
 
-  const std::vector<NodeID_t> ParticleGraph::GetSiblings(const NodeID_t target) const
+  const std::vector<NodeID_t> ParticleGraph::GetSiblingNodes
+  (const NodeID_t target) const
   {
     auto const& p = GetParticle(target);
     std::vector<NodeID_t> res;
@@ -81,9 +82,10 @@ namespace ertool {
     return res;
   }
   
-  const std::vector<NodeID_t> ParticleGraph::GetParticles ( const RecoType_t type,
-							    const bool unassessed_only,
-							    const int pdg_code) const
+  const std::vector<NodeID_t> ParticleGraph::GetParticleNodes
+  ( const RecoType_t type,
+    const bool unassessed_only,
+    const int pdg_code) const
   {
     std::vector<NodeID_t> res;
     res.reserve(_particle_v.size());
@@ -98,9 +100,10 @@ namespace ertool {
     return res;
   }
 
-  const std::vector<NodeID_t> ParticleGraph::GetPrimaries ( const RecoType_t type,
-							    const bool unassessed_only,
-							    const int pdg_code) const
+  const std::vector<NodeID_t> ParticleGraph::GetPrimaryNodes
+  ( const RecoType_t type,
+    const bool unassessed_only,
+    const int pdg_code) const
   {
     std::vector<NodeID_t> res;
     res.reserve(_particle_v.size());
@@ -116,15 +119,16 @@ namespace ertool {
     return res;
   }
 
-  const CombinationSet_t ParticleGraph::GetCombinations ( const size_t combination_size,
-							  const RecoType_t type,
-							  const bool unassessed_only,
-							  const int pdg_code) const
+  const CombinationSet_t ParticleGraph::GetNodeCombinations
+  ( const size_t combination_size,
+    const RecoType_t type,
+    const bool unassessed_only,
+    const int pdg_code) const
   {
     CombinationSet_t res;
     if(combination_size < _particle_v.size()) return res;
     
-    auto const node_v = GetParticles(type,unassessed_only,pdg_code);
+    auto const node_v = GetParticleNodes(type,unassessed_only,pdg_code);
     if(combination_size < node_v.size()) return res;
     
     auto const comb_v = Combination(node_v.size(),combination_size);
@@ -322,7 +326,7 @@ namespace ertool {
   std::string ParticleGraph::Diagram() const
   {
     std::string res;
-    for(auto const& part_id : GetParticles()) {
+    for(auto const& part_id : GetParticleNodes()) {
       auto const& p = GetParticle(part_id);
       if( !p.Primary() && p.RelationAssessed() ) continue;
       std::string part_diagram;

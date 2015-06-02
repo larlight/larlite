@@ -11,8 +11,8 @@ namespace ertool {
   size_t nonzero_dedx_counter = 0;
   
   AlgoSingleE::AlgoSingleE() : AlgoBase()
-			     , _alg_tree(nullptr)
 			     , fTPC(-10.,-126.,-10.,292.,136.,1150.)
+			     , _alg_tree(nullptr)
   {
 
     _name       = "AlgoSingleE";
@@ -96,7 +96,7 @@ namespace ertool {
 
     // loop through primary showers
     // Loop through showers
-    for (auto const& p : graph.GetPrimaries(RecoType_t::kShower)){
+    for (auto const& p : graph.GetPrimaryNodes(RecoType_t::kShower)){
       
       auto const& thisShower = datacpy.Shower(graph.GetParticle(p).RecoID());
       // keep track of whether it is single
@@ -110,7 +110,7 @@ namespace ertool {
 
       // it is primary. Make sure it satisfies SingleE conditions also
       // 1) loop over all showers in event
-      for (auto const& p2 : graph.GetParticles(RecoType_t::kShower)){
+      for (auto const& p2 : graph.GetParticleNodes(RecoType_t::kShower)){
 	
 	auto const& thatShower = datacpy.Shower(graph.GetParticle(p2).RecoID());
 	geoalgo::Point_t vtx(3);
@@ -148,7 +148,7 @@ namespace ertool {
       if (!single)
 	continue;
 
-      for (auto const& t : graph.GetParticles(RecoType_t::kTrack)){
+      for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
 	
 	auto const& thatTrack = datacpy.Track(graph.GetParticle(t).RecoID());
 	// make sure track has more than 2 points. Otherwise GeoAlgo will get mad!
