@@ -17,6 +17,8 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <vector>
+#include "ERToolConstants.h"
 namespace ertool {
   /**
      \class Provenance
@@ -24,43 +26,30 @@ namespace ertool {
      doxygen documentation!
   */
   class Provenance{
-
-  public:
-    typedef std::map<std::string,std::string> ProcInfo_t;
     
   public:
     
     /// Default constructor
     Provenance(const std::string& name="noname");
+
+    Provenance(const Provenance& input, const std::string& name="noname");
     
     /// Default destructor
     ~Provenance(){}
 
-    void SetInput(const Provenance& input);
-
     void AddInfo(const std::string& key,
 		 const std::string& value);
 
-    const ProcInfo_t& InputInfo() const
-    { return _input_info; }
+    const ertool::ProcInfo_t& Info(const size_t proc_id=kINVALID_SIZE) const;
 
-    const ProcInfo_t& Info() const
-    { return _info; }
-
-    const std::string& ProcessName() const
-    { return _proc_name; }
+    const std::string& Name(const size_t proc_id=kINVALID_SIZE) const;
 
     const size_t ProcessID() const
-    { return _proc_id; }
+    { return (_proc_name_v.size()-1); }
     
   private:
-
-    size_t      _proc_id;
-    std::string _proc_name;
-    ProcInfo_t  _info;
-    
-    std::string _input_name;
-    ProcInfo_t  _input_info;
+    std::vector<std::string> _proc_name_v;
+    std::vector<ertool::ProcInfo_t>  _proc_info_v;
   };
 }
 

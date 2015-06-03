@@ -2,6 +2,8 @@
 #define ERTOOL_TYPES_H
 
 #include <vector>
+#include <map>
+#include <string>
 #include <cstddef>
 namespace ertool {
 
@@ -11,6 +13,9 @@ namespace ertool {
 
   /// Defines an input shower/track original product information
   typedef std::pair<size_t,std::string> RecoInputID_t;
+
+  /// Defines a process information container
+  typedef std::map<std::string,std::string> ProcInfo_t;
 
   /// Defines a type for a combinatory index expression
   typedef std::vector<NodeID_t> Combination_t;
