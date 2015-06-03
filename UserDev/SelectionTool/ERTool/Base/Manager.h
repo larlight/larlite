@@ -107,8 +107,8 @@ namespace ertool {
 
     const ertool::EventData&   EventData     () const;
     const ertool::EventData&   MCEventData   () const;
-    const ertool::ParticleGraph& ParticleGraph   () const;
-    const ertool::ParticleGraph& MCParticleGraph () const;
+    ertool::ParticleGraph& ParticleGraph   ();
+    ertool::ParticleGraph& MCParticleGraph ();
 
     /*
     ertool::EventData&   EventDataWriteable     ();

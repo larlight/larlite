@@ -25,8 +25,8 @@ namespace ertool {
   
   const ertool::EventData&     Manager::EventData     () const { return _data;    }
   const ertool::EventData&     Manager::MCEventData   () const { return _mc_data; }
-  const ertool::ParticleGraph& Manager::ParticleGraph   () const { return _graph;      }
-  const ertool::ParticleGraph& Manager::MCParticleGraph () const { return _mc_graph;   }
+  ertool::ParticleGraph& Manager::ParticleGraph   () { return _graph;      }
+  ertool::ParticleGraph& Manager::MCParticleGraph () { return _mc_graph;   }
 
   /*
   ertool::EventData&   Manager::EventDataWriteable     ()
