@@ -11,6 +11,7 @@
 
 #pragma link C++ class std::vector<size_t>+;
 #pragma link C++ class std::vector<std::vector<size_t> >+;
+#pragma link C++ class std::pair<size_t,string>+;
 #pragma link C++ class ertool::ERException+;
 #pragma link C++ class vector<RooRealVar>+;
 

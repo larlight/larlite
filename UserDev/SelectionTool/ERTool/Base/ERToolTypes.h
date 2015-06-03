@@ -9,6 +9,9 @@ namespace ertool {
   typedef size_t NodeID_t;  ///< A unique particle identifier variable type
   typedef int    LayerID_t; ///< A layer number in particle graph (0 = Primary, kDefaultLayer = not yet assessed )
 
+  /// Defines an input shower/track original product information
+  typedef std::pair<size_t,std::string> RecoInputID_t;
+
   /// Defines a type for a combinatory index expression
   typedef std::vector<NodeID_t> Combination_t;
 

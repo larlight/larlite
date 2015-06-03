@@ -1,6 +1,7 @@
 #ifndef ERTOOL_CONSTANTS_H
 #define ERTOOL_CONSTANTS_H
 
+#include <utility>
 #include <string>
 #include <climits>
 #include <limits>
@@ -44,6 +45,9 @@ namespace ertool {
 
   /// Default particle reco/relationship score
   const float     kDEFAULT_SCORE = -1;
+
+  /// Default (invalid) reco input ID
+  const RecoInputID_t kINVALID_RECO_INPUT_ID(kINVALID_SIZE,"");
   
   /// Default (invalid) vertex for ertool::Particle
   const ::geoalgo::Vector kINVALID_VERTEX(kINVALID_DOUBLE,kINVALID_DOUBLE,kINVALID_DOUBLE);

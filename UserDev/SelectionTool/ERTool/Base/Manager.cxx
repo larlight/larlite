@@ -67,46 +67,54 @@ namespace ertool {
     ClearData();
   }
 
-  NodeID_t Manager::Add(const ::ertool::Shower& obj, const bool mc) 
+  NodeID_t Manager::Add(const ertool::Shower& obj,
+			const ertool::RecoInputID_t& input_id,
+			const bool mc) 
   {
     if(!mc) {
-      _data.Add(obj);
+      _data.Add(obj,input_id);
       return _graph.CreateParticle(_data.Shower().back()).ID();
     }else{
-      _mc_data.Add(obj);
+      _mc_data.Add(obj,input_id);
       return _mc_graph.CreateParticle(_mc_data.Shower().back()).ID();
     }
   }
 
-  NodeID_t Manager::Add(const ::ertool::Track&  obj, const bool mc) 
+  NodeID_t Manager::Add(const ::ertool::Track& obj,
+			const ertool::RecoInputID_t& input_id,
+			const bool mc) 
   {
     if(!mc) {
-      _data.Add(obj);
+      _data.Add(obj,input_id);
       return _graph.CreateParticle(_data.Track().back()).ID();
     }else{
-      _mc_data.Add(obj);
+      _mc_data.Add(obj,input_id);
       return _mc_graph.CreateParticle(_mc_data.Track().back()).ID();
     }
   }
 
-  NodeID_t Manager::Emplace(const ::ertool::Shower&& obj, const bool mc)
+  NodeID_t Manager::Emplace(const ::ertool::Shower&& obj,
+			    const ertool::RecoInputID_t&& input_id,
+			    const bool mc)
   {
     if(!mc) {
-      _data.Emplace(std::move(obj));
+      _data.Emplace(std::move(obj),std::move(input_id));
       return _graph.CreateParticle(_data.Shower().back()).ID();
     }else{
-      _mc_data.Emplace(std::move(obj));
+      _mc_data.Emplace(std::move(obj),std::move(input_id));
       return _mc_graph.CreateParticle(_data.Shower().back()).ID();
     }
   }
 
-  NodeID_t Manager::Emplace(const ::ertool::Track&&  obj, const bool mc)
+  NodeID_t Manager::Emplace(const ::ertool::Track&& obj,
+			    const ertool::RecoInputID_t&& input_id,
+			    const bool mc)
   {
     if(!mc) {
-      _data.Emplace(std::move(obj));
+      _data.Emplace(std::move(obj),std::move(input_id));
       return _graph.CreateParticle(_data.Track().back()).ID();
     }else{
-      _mc_data.Emplace(std::move(obj));
+      _mc_data.Emplace(std::move(obj),std::move(input_id));
       return _mc_graph.CreateParticle(_data.Track().back()).ID();
     }
   }

@@ -7,12 +7,16 @@
 namespace ertool {
 
   EventData::EventData()
-  { Reset(); }
+  {
+    Reset();
+  }
 
   void EventData::Reset()
   {
     _shower_v.clear();
     _track_v.clear();
+    _shower_id_v.clear();
+    _track_id_v.clear();
   }
 
   const Shower& EventData::Shower (const RecoID_t& id) const
@@ -43,26 +47,49 @@ namespace ertool {
     return this->Track( p.RecoID() );
   }
 
-  void EventData::Add(const ::ertool::Shower& obj) 
-  { 
+  const RecoInputID_t& EventData::InputID(const RecoType_t& reco_type,
+					  const RecoID_t&   reco_id) const
+  {
+    if(reco_type == kShower && _shower_id_v.size() < reco_id)
+      return _shower_id_v[reco_id];
+    if(reco_type == kTrack && _track_id_v.size() < reco_id)
+      return _track_id_v[reco_id];
+    return kINVALID_RECO_INPUT_ID;
+  }
+  
+  const RecoInputID_t& EventData::InputID(const Particle& p) const
+  {
+    return InputID(p.RecoType(),p.RecoID());
+  }
+
+  void EventData::Add(const ertool::Shower& obj,
+		      const ertool::RecoInputID_t& id)
+  {
+    _shower_id_v.push_back(id);
     _shower_v.push_back(obj); 
     _shower_v.back().SetRecoInfo(_shower_v.size()-1, kShower);
   }
 
-  void EventData::Add(const ::ertool::Track&  obj) 
-  { 
+  void EventData::Add(const ertool::Track& obj,
+		      const ertool::RecoInputID_t& id)
+  {
+    _track_id_v.push_back(id);
     _track_v.push_back(obj);  
     _track_v.back().SetRecoInfo(_track_v.size()-1, kTrack);
   }
 
-  void EventData::Emplace(const ::ertool::Shower&& obj)
-  { 
+  void EventData::Emplace(const ertool::Shower&& obj,
+			  const ertool::RecoInputID_t&& id)
+  {
+    _shower_id_v.emplace_back(id);
     _shower_v.emplace_back(obj); 
     _shower_v.back().SetRecoInfo(_shower_v.size()-1, kShower);
   }
 
-  void EventData::Emplace(const ::ertool::Track&&  obj)
-  { 
+  void EventData::Emplace(const ertool::Track&& obj,
+			  const ertool::RecoInputID_t&& id)
+  {
+    _track_id_v.emplace_back(id);
     _track_v.emplace_back(obj);  
     _track_v.back().SetRecoInfo(_track_v.size()-1, kTrack);
   }

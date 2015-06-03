@@ -20,8 +20,8 @@ namespace larlite {
     particle_set.clear();
     static TDatabasePDG pdgdb_s;
     static std::map<int,double> partmass_s;
-    FillTracks  (mct_v, event_data);
-    FillShowers (mcs_v, event_data);
+    FillTracks  (mct_v, mgr);
+    FillShowers (mcs_v, mgr);
     //FillVertices(mci_v, event_data);
 
     std::map<unsigned int, ::ertool::Particle> g4_mother_parts;
@@ -252,7 +252,9 @@ namespace larlite {
   void ERToolHelper::FillTracks ( const event_mctrack&  mct_v,
 				  ::ertool::Manager&    mgr ) const
   {
-    for(auto const& mct : mct_v) {
+    for(size_t i=0; i<mct_v.size(); ++i){
+
+      auto const& mct = mct_v[i];
       if(mct.size()<2) continue;
       ::ertool::Track t;
       t.reserve(mct.size());
@@ -271,7 +273,11 @@ namespace larlite {
       for(auto& v : t._pid_score) v = 100;
       if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
 
-      mgr.Add(t,true);
+      auto nodeID = mgr.Add(t,ertool::RecoInputID_t(i,mct_v.name()),true);
+      mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
+								0,
+								mct.at(0).Position(),
+								::geoalgo::Vector(mct.at(0).Momentum()));
     }
     return;
   }
@@ -285,10 +291,15 @@ namespace larlite {
 				  ::ertool::Manager& mgr) const
   {
     std::vector< ::ertool::Track> t_v;
+    std::vector< ::ertool::RecoInputID_t > id_v;
     t_v.reserve(trk_v.size());
-    for(auto const& trk : trk_v) {
+    id_v.reserve(trk_v.size());
+    for(size_t i=0; i<trk_v.size(); ++i) {
+
+      auto const& trk = trk_v[i];
       
       t_v.push_back(::ertool::Track());
+      id_v.emplace_back(i,trk_v.name());
       auto &t = t_v.back();
 
       for(size_t i=0; i<trk.NumberTrajectoryPoints(); ++i)
@@ -354,8 +365,8 @@ namespace larlite {
       } // if association is found
     }// if pid exists
 
-    for(auto const& t : t_v)
-      mgr.Add(t);
+    for(size_t i=0; i<t_v.size(); ++i)
+      mgr.Add(t_v[i],id_v[i]);
   }
   
   
@@ -363,8 +374,9 @@ namespace larlite {
 				   ::ertool::Manager&    mgr ) const
   {
 
-    for(auto const& mcs : mcs_v) {
+    for(size_t i=0; i<mcs_v.size(); ++i) {
 
+      auto const& mcs = mcs_v[i];
       if(mcs.DetProfile().Momentum().E()<_minEDep) continue;
       //if(isnan(mcs.DetProfile().Momentum().E())) continue;
       //if(isnan(mcs.DetProfile().Momentum().Px())) continue;
@@ -377,7 +389,7 @@ namespace larlite {
       //s._energy = mcs.Start().Momentum().E();
       s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
       s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
-      auto nodeID = mgr.Add(s,true);
+      auto nodeID = mgr.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),true);
       mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
 								(mcs.PdgCode() == 22 ? 0 : 0.510998928),
 								mcs.Start().Position(),
@@ -396,8 +408,12 @@ namespace larlite {
     
     // Fill shower
     std::vector< ::ertool::Shower> s_v;
+    std::vector< ::ertool::RecoInputID_t> id_v;
     s_v.reserve(shw_v.size());
-    for(auto const& shw : shw_v) {
+    id_v.reserve(shw_v.size());
+    for(size_t i=0; i<shw_v.size(); ++i){
+      auto const& shw = shw_v[i];
+      id_v.emplace_back(i,shw_v.name());
       s_v.push_back( ::ertool::Shower(shw.ShowerStart(),
 				      shw.Direction(),
 				      shw.Length(),
@@ -429,7 +445,9 @@ namespace larlite {
       }
     }
 
-    for(auto const& s : s_v) mgr.Add(s);
+    for(size_t i=0; i<s_v.size(); ++i)
+      mgr.Add(s_v[i],id_v[i]);
+
     return;
   }
   /*
