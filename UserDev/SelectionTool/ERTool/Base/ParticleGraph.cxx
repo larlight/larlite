@@ -20,9 +20,11 @@ namespace ertool {
 
   Particle& ParticleGraph::CreateParticle(const RecoObjBase& reco_obj)
   {
-    _particle_v.emplace_back( (NodeID_t)(_particle_v.size()),
-			      reco_obj.RecoType(),
-			      reco_obj.RecoID() );
+    auto p = Particle((NodeID_t)(_particle_v.size()),
+		      kShower,//kINVALID_RECO_TYPE,//reco_obj.RecoType(),
+		      reco_obj.RecoID() );
+    _particle_v.emplace_back( p );
+    
     return _particle_v.back();
   }
   

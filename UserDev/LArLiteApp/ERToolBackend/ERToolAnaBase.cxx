@@ -55,7 +55,7 @@ namespace larlite {
       _mctracks   = false;
       _name_track = prod;
     }
-  
+
   return;
   }
 
@@ -141,12 +141,11 @@ namespace larlite {
       _helper.FillTracks(*ev_mct, _mgr);
     }
     else if(!_mctracks && !_name_track.empty()) {
-
       auto ev_trk      = storage->get_data<event_track>       (_name_track);
       auto ev_ctag_trk = storage->get_data<event_cosmictag>   (Form("%stag",  _name_track.c_str()));
       auto ev_calo_trk = storage->get_data<event_calorimetry> (Form("%scalo", _name_track.c_str()));
       auto ev_pid_trk  = storage->get_data<event_partid>      (Form("%spid",  _name_track.c_str()));
-      auto ev_ass  = storage->get_data<event_ass>      (_name_track);
+      auto ev_ass      = storage->get_data<event_ass>         (_name_track);
       if (!ev_trk) {
 	print(msg::kERROR,__FUNCTION__,
 	      Form(" Track \"%s\" not found in the event!",_name_track.c_str()));

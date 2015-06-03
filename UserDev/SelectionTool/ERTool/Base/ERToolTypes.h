@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <cstddef>
+#include <string>
 namespace ertool {
 
   typedef size_t RecoID_t;  ///< A unique reconstructed object (input) identifier variable type
