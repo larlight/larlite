@@ -14,10 +14,15 @@ namespace ertool {
   { return _reco_id; }
 
   RecoType_t RecoObjBase::RecoType() const
-  { return _reco_type; }
+  {
+    return _reco_type;
+  }
   
   void RecoObjBase::SetRecoInfo(const RecoID_t id, const RecoType_t type)
-  { _reco_id = id; _reco_type = type; }
+  {
+    _reco_id = id;
+    _reco_type = type;
+  }
 
 }
 

@@ -46,10 +46,10 @@ namespace ertool {
   const float     kDEFAULT_SCORE = -1;
   
   /// Default (invalid) vertex for ertool::Particle
-  const ::geoalgo::Vector kINVALID_VERTEX(3,kINVALID_DOUBLE);
+  const ::geoalgo::Vector kINVALID_VERTEX(kINVALID_DOUBLE,kINVALID_DOUBLE,kINVALID_DOUBLE);
 
   /// Default (invalid) momentum for ertool::Particle
-  const ::geoalgo::Vector kINVALID_MOMENTUM(3,kINVALID_DOUBLE);
+  const ::geoalgo::Vector kINVALID_MOMENTUM(kINVALID_DOUBLE,kINVALID_DOUBLE,kINVALID_DOUBLE);
 } 
 
 #endif

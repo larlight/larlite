@@ -91,14 +91,14 @@ namespace ertool {
     void Reset();
 
     /// Function to add input data product: Shower
-    void Add(const ::ertool::Shower& obj, const bool mc=false);
+    NodeID_t Add(const ::ertool::Shower& obj, const bool mc=false);
     /// Function to add input data product: Track
-    void Add(const ::ertool::Track&  obj, const bool mc=false);
+    NodeID_t Add(const ::ertool::Track&  obj, const bool mc=false);
 #ifndef __CINT__
     /// Function to add input data product: Shower
-    void Emplace(const ::ertool::Shower&& obj, const bool mc=false);
+    NodeID_t Emplace(const ::ertool::Shower&& obj, const bool mc=false);
     /// Function to add input data product: Track
-    void Emplace(const ::ertool::Track&&  obj, const bool mc=false);
+    NodeID_t Emplace(const ::ertool::Track&&  obj, const bool mc=false);
 #endif
 
 

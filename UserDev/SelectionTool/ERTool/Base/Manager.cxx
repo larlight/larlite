@@ -67,47 +67,47 @@ namespace ertool {
     ClearData();
   }
 
-  void Manager::Add(const ::ertool::Shower& obj, const bool mc) 
+  NodeID_t Manager::Add(const ::ertool::Shower& obj, const bool mc) 
   {
     if(!mc) {
       _data.Add(obj);
-      _graph.CreateParticle(_data.Shower().back());
+      return _graph.CreateParticle(_data.Shower().back()).ID();
     }else{
       _mc_data.Add(obj);
-      _mc_graph.CreateParticle(_data.Shower().back());
+      return _mc_graph.CreateParticle(_mc_data.Shower().back()).ID();
     }
   }
 
-  void Manager::Add(const ::ertool::Track&  obj, const bool mc) 
+  NodeID_t Manager::Add(const ::ertool::Track&  obj, const bool mc) 
   {
     if(!mc) {
       _data.Add(obj);
-      _graph.CreateParticle(_data.Track().back());
+      return _graph.CreateParticle(_data.Track().back()).ID();
     }else{
       _mc_data.Add(obj);
-      _mc_graph.CreateParticle(_data.Track().back());
+      return _mc_graph.CreateParticle(_mc_data.Track().back()).ID();
     }
   }
 
-  void Manager::Emplace(const ::ertool::Shower&& obj, const bool mc)
+  NodeID_t Manager::Emplace(const ::ertool::Shower&& obj, const bool mc)
   {
     if(!mc) {
       _data.Emplace(std::move(obj));
-      _graph.CreateParticle(_data.Shower().back());
+      return _graph.CreateParticle(_data.Shower().back()).ID();
     }else{
       _mc_data.Emplace(std::move(obj));
-      _mc_graph.CreateParticle(_data.Shower().back());
+      return _mc_graph.CreateParticle(_data.Shower().back()).ID();
     }
   }
 
-  void Manager::Emplace(const ::ertool::Track&&  obj, const bool mc)
+  NodeID_t Manager::Emplace(const ::ertool::Track&&  obj, const bool mc)
   {
     if(!mc) {
       _data.Emplace(std::move(obj));
-      _graph.CreateParticle(_data.Track().back());
+      return _graph.CreateParticle(_data.Track().back()).ID();
     }else{
       _mc_data.Emplace(std::move(obj));
-      _mc_graph.CreateParticle(_data.Track().back());
+      return _mc_graph.CreateParticle(_data.Track().back()).ID();
     }
   }
 

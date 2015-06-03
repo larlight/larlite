@@ -377,14 +377,11 @@ namespace larlite {
       //s._energy = mcs.Start().Momentum().E();
       s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
       s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
-      mgr.Add(s,true);
-      // shower was just added w/ RecoID equal to _shower_v.size()-1
-      // this created a node with NodeID equal to num. of particles
-      // use this info to grab NodeID and edit particle's veretx
-      // sketchy? YES!
-      auto nodeID = mgr.MCParticleGraph().GetNumParticles();
-      auto p = mgr.MCParticleGraph().GetParticle(nodeID);
-      p.SetParticleInfo(p.PdgCode(),p.Mass(),mcs.Start().Position(),p.Momentum());
+      auto nodeID = mgr.Add(s,true);
+      mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
+								(mcs.PdgCode() == 22 ? 0 : 0.510998928),
+								mcs.Start().Position(),
+								::geoalgo::Vector(mcs.Start().Momentum()));
     }
 
     return;
