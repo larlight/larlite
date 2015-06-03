@@ -26,9 +26,9 @@ namespace larlite {
     return (mc ? _mgr.MCEventData() : _mgr.EventData());
   }
 
-  const ::ertool::ParticleSet& ERToolAnaBase::GetParticles(bool mc) const
+  ::ertool::ParticleGraph& ERToolAnaBase::GetParticles(bool mc)
   {
-    return (mc ? _mgr.MCParticleSet() : _mgr.ParticleSet());
+    return (mc ? _mgr.MCParticleGraph() : _mgr.ParticleGraph());
   }
 
   void ERToolAnaBase::SetShowerProducer(const bool mc, const std::string prod)
@@ -109,7 +109,7 @@ namespace larlite {
 	      "MCShower info not found in the event!");
 	throw std::exception();
       }
-	_helper.FillShowers(*ev_mcs, _mgr.EventDataWriteable());
+	_helper.FillShowers(*ev_mcs, _mgr);
     }
     else if(!_mcshowers && !_name_shower.empty()){
       auto ev_shw      = storage->get_data<event_shower>    (_name_shower);
@@ -125,10 +125,10 @@ namespace larlite {
 	  print(msg::kWARNING,__FUNCTION__,
 		Form("One-Time-Warning: No cosmictag for shower available (\"%stag\")",_name_shower.c_str()) );
 	event_cosmictag tmp;
-	_helper.FillShowers(*ev_shw, tmp, *ev_ass, _mgr.EventDataWriteable());	  
+	_helper.FillShowers(*ev_shw, tmp, *ev_ass, _mgr);	  
       }
       else
-	_helper.FillShowers(*ev_shw, *ev_ctag_shw, *ev_ass, _mgr.EventDataWriteable());
+	_helper.FillShowers(*ev_shw, *ev_ctag_shw, *ev_ass, _mgr);
     }
 
     // Fill tracks
@@ -138,7 +138,7 @@ namespace larlite {
 	print(msg::kERROR,__FUNCTION__,
 	      "MCTrack info not found in the event!");
       }
-      _helper.FillTracks(*ev_mct, _mgr.EventDataWriteable());
+      _helper.FillTracks(*ev_mct, _mgr);
     }
     else if(!_mctracks && !_name_track.empty()) {
 
@@ -170,8 +170,9 @@ namespace larlite {
 	delete ev_pid_trk;
 	ev_pid_trk = new event_partid();
       }
-      _helper.FillTracks( *ev_trk, *ev_ctag_trk, *ev_calo_trk, *ev_pid_trk, *ev_ass, _mgr.EventDataWriteable() );
+      _helper.FillTracks( *ev_trk, *ev_ctag_trk, *ev_calo_trk, *ev_pid_trk, *ev_ass, _mgr);
     }
+    /*
     // Fill Vertices
     if (_mcvtx && !_name_mcvtx.empty()){
       auto ev_mci = storage->get_data<event_mctruth> (_name_mcvtx);
@@ -180,8 +181,9 @@ namespace larlite {
 	      "MCTruth info not found in the event!");
 	throw std::exception();
       }
-      _helper.FillVertices(*ev_mci, _mgr.EventDataWriteable());
+      _helper.FillVertices(*ev_mci, _mgr);
     }
+    */
     // Done filling SPAData Object!
     // ----------------------------
     // If MC info is found, fill MCParticles into a ParticleSet
@@ -196,8 +198,7 @@ namespace larlite {
 	_helper.FillMCInfo(*ev_mci,
 			   *ev_mcs,
 			   *ev_mct,
-			   _mgr.MCEventDataWriteable(),
-			   _mgr.MCParticleSetWriteable());
+			   _mgr);
     }
       
     one_time_warning = false;

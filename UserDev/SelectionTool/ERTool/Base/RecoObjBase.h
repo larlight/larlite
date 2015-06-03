@@ -46,6 +46,9 @@ namespace ertool {
     /// Type query
     RecoType_t RecoType() const;
 
+    /// Cosmogenic score
+    double _cosmogenic;
+
   protected:
 
     /// Function to set an id

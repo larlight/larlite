@@ -78,7 +78,7 @@ namespace larlite {
     /**
        @brief get Particles produced by Algorithm.
      */
-    const ::ertool::ParticleSet& GetParticles(bool mc=false) const;
+    ::ertool::ParticleGraph& GetParticles(bool mc=false);
 
     /**
        @brief set Min E Dep for Helper

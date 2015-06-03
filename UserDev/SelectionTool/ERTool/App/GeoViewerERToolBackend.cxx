@@ -36,7 +36,7 @@ namespace ertool {
     used_obj[ ::ertool::kTrack  ].resize( data.Track().size(),  false );
     used_obj[ ::ertool::kShower ].resize( data.Shower().size(), false );
 
-    for (auto &node_id : particles.GetParticles()) {
+    for (auto &node_id : particles.GetParticleNodes()) {
 
       auto const& p = particles.GetParticle(node_id);
       
