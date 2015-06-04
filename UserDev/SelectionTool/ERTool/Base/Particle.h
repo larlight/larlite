@@ -38,10 +38,10 @@ namespace ertool {
 	     const RecoType_t reco_type=kInvisible,
 	     const RecoID_t   reco_id=kINVALID_RECO_ID);
 
-    const NodeID_t&  ID       () const;
-    const NodeID_t&  Parent   () const;
-    const NodeID_t&  Ancestor () const;
-    const LayerID_t& Layer    () const;
+    const NodeID_t&     ID         () const;
+    const NodeID_t&     Parent     () const;
+    const NodeID_t&     Ancestor   () const;
+    const Generation_t& Generation () const;
     const std::vector< ::ertool::NodeID_t >& Children() const;
     float RelationshipScore(const NodeID_t id);
     
@@ -85,16 +85,16 @@ namespace ertool {
     ::geoalgo::Vector _mom; ///< Creation momentum of a particle
     
     // Graph structure information
-    NodeID_t  _node_id;     ///< A unique particle identifier
-    NodeID_t  _parent_id;   ///< Parent's ID
-    NodeID_t  _ancestor_id; ///< Ancestor's ID (useful for grouping particles from the same interaction)
-    LayerID_t _layer_id;    ///< Generation level from the primary interaction (0 = Primary)
+    NodeID_t     _node_id;     ///< A unique particle identifier
+    NodeID_t     _parent_id;   ///< Parent's ID
+    NodeID_t     _ancestor_id; ///< Ancestor's ID (essentially graph ID)
+    Generation_t _generation;  ///< Generation level from the primary (=0)
     std::vector< ::ertool::NodeID_t > _child_v; ///< List of children's ID
-    std::vector< float >  _score_v;    ///< List of a correlation score with other particles 
+    std::vector< float >  _score_v;    ///< Correlation score with one another
 
     // Associated reco object information (type & id to retrieve)
-    RecoType_t _reco_type; ///< Associated reco object type (shower, track, or invisible)
-    RecoID_t   _reco_id;   ///< Associated reco ojbect id
+    RecoType_t   _reco_type;   ///< Associated reco object type 
+    RecoID_t     _reco_id;     ///< Associated reco ojbect id
     
   };
 

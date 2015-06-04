@@ -17,16 +17,16 @@ namespace ertool {
     , _node_id(node_id)
     , _parent_id(node_id)
     , _ancestor_id(node_id)
-    , _layer_id(kDefaultLayer)
+    , _generation(kDefaultGeneration)
     , _child_v()
     , _reco_type(kInvisible)
     , _reco_id(kINVALID_RECO_ID)
   {}
 
-  const NodeID_t& Particle::ID       () const { return _node_id;     }
-  const NodeID_t& Particle::Parent   () const { return _parent_id;   }
-  const NodeID_t& Particle::Ancestor () const { return _ancestor_id; }
-  const LayerID_t& Particle::Layer   () const { return _layer_id;    }
+  const NodeID_t&     Particle::ID         () const { return _node_id;     }
+  const NodeID_t&     Particle::Parent     () const { return _parent_id;   }
+  const NodeID_t&     Particle::Ancestor   () const { return _ancestor_id; }
+  const Generation_t& Particle::Generation () const { return _generation;  }
   float Particle::RelationshipScore(const NodeID_t id)
   {
     if(id >= _score_v.size()) return -1;
@@ -57,7 +57,7 @@ namespace ertool {
   { return _child_v; }
   
   bool Particle::RelationAssessed() const
-  { return _layer_id != kDefaultLayer; }
+  { return _generation != kDefaultGeneration; }
   
   bool Particle::Primary() const
   { return (_node_id == _ancestor_id && RelationAssessed() ); }

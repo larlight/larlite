@@ -7,9 +7,9 @@
 #include <cstddef>
 namespace ertool {
 
-  typedef size_t RecoID_t;  ///< A unique reconstructed object (input) identifier variable type
-  typedef size_t NodeID_t;  ///< A unique particle identifier variable type
-  typedef int    LayerID_t; ///< A layer number in particle graph (0 = Primary, kDefaultLayer = not yet assessed )
+  typedef size_t RecoID_t;     ///< A unique reconstructed object (input) identifier variable type
+  typedef size_t NodeID_t;     ///< A unique particle identifier variable type
+  typedef int    Generation_t; ///< A layer number in particle graph (0 = Primary, kDefaultLayer = not yet assessed )
 
   /// Defines an input shower/track original product information
   typedef std::pair<size_t,std::string> RecoInputID_t;
