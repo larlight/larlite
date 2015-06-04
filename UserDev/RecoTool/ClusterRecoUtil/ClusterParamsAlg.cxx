@@ -347,6 +347,13 @@ namespace cluster{
     fParams.eigenvalue_principal = (* fPrincipal.GetEigenValues() )[0];
     fParams.eigenvalue_secondary = (* fPrincipal.GetEigenValues() )[1];
 
+    fParams.principal_dir.resize(2);
+    // std::cout << (* fPrincipal.GetEigenVectors())[0][0] << ", " << (* fPrincipal.GetEigenVectors())[0][1] << "\n"
+              // << (* fPrincipal.GetEigenVectors())[1][0] << ", " << (* fPrincipal.GetEigenVectors())[1][1] << "\n";
+
+    fParams.principal_dir[0] = (* fPrincipal.GetEigenVectors())[0][0];
+    fParams.principal_dir[1] = (* fPrincipal.GetEigenVectors())[1][0];
+
     fFinishedGetAverages = true;
     // Report();
 
