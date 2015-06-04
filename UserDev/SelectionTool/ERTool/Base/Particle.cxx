@@ -19,8 +19,8 @@ namespace ertool {
     , _ancestor_id(node_id)
     , _generation(kDefaultGeneration)
     , _child_v()
-    , _reco_type(kInvisible)
-    , _reco_id(kINVALID_RECO_ID)
+    , _reco_type(reco_type)
+    , _reco_id(reco_id)
   {}
 
   const NodeID_t&     Particle::ID         () const { return _node_id;     }

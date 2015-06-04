@@ -253,11 +253,13 @@ namespace ertool {
   {
 
     auto datacpy = data;
-
-    // get vertex info (if it exists)
-    auto const& invisibles = graph.GetParticleNodes(RecoType_t::kInvisible);
-    
-
+    /*
+    if (_verbose){
+      std::cout << "******************* BEGIN EMPArt Reconstruction  ******************" << std::endl;
+      std::cout << "Number of Showers: " << datacpy.Shower().size() << std::endl;
+      std::cout << "Number of Shower Particles: " << graph.GetParticleNodes(RecoType_t::kShower).size() << std::endl;
+    }
+    */
     // Loop through showers
     for (auto const& p : graph.GetParticleNodes(RecoType_t::kShower)){
 
@@ -269,12 +271,13 @@ namespace ertool {
       // skip if dEdx out of bounds
       if ( !_dEdxVar->inRange( dEdx, 0 ) ) continue;
 
-      if (invisibles.size() > 0){
-	// particle containing vertex info:
-	auto const& vtxPart = graph.GetParticle(invisibles[0]);
-	dist = s.Start().Dist(vtxPart.Vertex());
-      }// if there is an invisible
+      // get vertex info if it exists from particle
+      auto const& vtx = graph.GetParticle(p).Vertex();
+      if (vtx != kINVALID_VERTEX)
+	dist = s.Start().Dist(vtx);
 
+      //if (_verbose) { std::cout << "dEdx: " << dEdx << "\tdist: " << dist << std::endl; }
+      
       double e_like = LL(true,  dEdx, dist);
       double g_like = LL(false, dEdx, dist);
 

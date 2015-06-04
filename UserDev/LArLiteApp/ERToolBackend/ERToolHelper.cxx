@@ -273,11 +273,14 @@ namespace larlite {
       for(auto& v : t._pid_score) v = 100;
       if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
 
-      auto nodeID = mgr.Add(t,ertool::RecoInputID_t(i,mct_v.name()),true);
-      mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
-								0,
-								mct.at(0).Position(),
-								::geoalgo::Vector(mct.at(0).Momentum()));
+      auto nodeID = mgr.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
+      mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
+							      0,
+							      mct.at(0).Position(),
+							      ::geoalgo::Vector(mct.at(0).Momentum()));
+
+      std::cout << "num of particles: " << mgr.ParticleGraph().GetNumParticles() << std::endl;
+      
     }
     return;
   }
@@ -389,11 +392,11 @@ namespace larlite {
       //s._energy = mcs.Start().Momentum().E();
       s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
       s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
-      auto nodeID = mgr.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),true);
-      mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
-								(mcs.PdgCode() == 22 ? 0 : 0.510998928),
-								mcs.Start().Position(),
-								::geoalgo::Vector(mcs.Start().Momentum()));
+      auto nodeID = mgr.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
+      mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
+							      (mcs.PdgCode() == 22 ? 0 : 0.510998928),
+							      mcs.Start().Position(),
+							      ::geoalgo::Vector(mcs.Start().Momentum()));
     }
 
     return;

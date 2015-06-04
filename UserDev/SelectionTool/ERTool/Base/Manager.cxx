@@ -78,6 +78,8 @@ namespace ertool {
       _mc_data.Add(obj,input_id);
       return _mc_graph.CreateParticle(_mc_data.Shower().back()).ID();
     }
+
+    std::cout << "particles (ADD): " << _graph.GetNumParticles() << std::endl;
   }
 
   NodeID_t Manager::Add(const ::ertool::Track& obj,
@@ -202,7 +204,7 @@ namespace ertool {
 
   bool Manager::Process()
   {
-    _graph.Reset();
+    //_graph.Reset();
     if(_status != kPROCESSING && _status != kINIT) {
       std::ostringstream msg;
       msg <<"Cannot call Process() while status ("
