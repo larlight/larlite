@@ -267,6 +267,13 @@ namespace ertool {
 	// or if we are comparing to self
 	if (shrID2 <= shrID1) continue;
 
+	// make sure the two gammas have not been "used" to form a relationship before 
+	if ( graph.GetParticle(shrID1).RelationAssessed() or
+	     graph.GetParticle(shrID2).RelationAssessed() ){
+	  if (_verbose) { std::cout << "either shower already used to make pi0 or anything else...cannot proceed." << std::endl; }
+	  continue;
+	}
+
 	auto const& shr1 = datacpy.Shower(graph.GetParticle(shrID1).RecoID());
 	auto const& shr2 = datacpy.Shower(graph.GetParticle(shrID2).RecoID());
 
@@ -283,7 +290,7 @@ namespace ertool {
 	  _hMass_vs_LL->Fill(mass,likelihood);
 	  // edit particle info to reflect the fact 
 	  // that we have 2 gammas coming from a pi0
-	  
+
 	  // specify info for 1st gamma
 	  auto const& gamma1vtx = shr1.Start();
 	  auto const& gamma1mom = shr1.Dir()*shr1._energy;
@@ -299,11 +306,10 @@ namespace ertool {
 	  dir *= sqrt( 1 - pow( mass / (mass + momentum.Length()), 2)) * 2.998e10 * _tau;
 	  vertex -= dir;
 	  pi0.SetParticleInfo(111,mass,vertex,momentum);
-	  
 	  // Add relationships
-	  graph.SetSiblings(shrID1,shrID2);
 	  graph.SetParentage(pi0.ID(),shrID1);
 	  graph.SetParentage(pi0.ID(),shrID2);
+	  graph.SetSiblings(shrID1,shrID2);
 
 	}
 	_hMass->Fill(_mass);
