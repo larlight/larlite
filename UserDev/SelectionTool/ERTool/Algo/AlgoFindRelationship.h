@@ -48,6 +48,18 @@ namespace ertool {
     double FindClosestApproach(const geoalgo::Trajectory_t& trk2,
 			       const geoalgo::Trajectory_t& trk1,
 			       geoalgo::Point_t& vtx) const;
+    
+    RelationType_t FindRelation(const geoalgo::HalfLine_t& s1,
+				const geoalgo::HalfLine_t& s2) const;
+    
+    RelationType_t FindRelation(const geoalgo::HalfLine_t& s,
+				const geoalgo::Trajectory_t& t) const;
+    
+    RelationType_t FindRelation(const geoalgo::Trajectory_t& t,
+				const geoalgo::HalfLine_t& s) const;
+    
+    RelationType_t FindRelation(const geoalgo::Trajectory_t& t1,
+				const geoalgo::Trajectory_t& t2) const;
       
     void setDebug(bool on) { _debug = on; }
 

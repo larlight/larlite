@@ -361,7 +361,7 @@ namespace ertool {
 
     // Not OK if a child is not associated with anything
     if( child.RelationAssessed() && !child.Primary() )
-      throw ERException("Cannot make a parentage for a chile who is neither lonely nor primary!");
+	throw ERException("Cannot make parentage for a child who is neither lonely nor primary!");
 
     AddChild(parent_id, child_id, score);
   }

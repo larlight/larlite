@@ -131,6 +131,39 @@ namespace ertool{
     return sqrt(IP);
   }
 
+
+  RelationType_t AlgoFindRelationship::FindRelation(const geoalgo::HalfLine_t& s1,
+						    const geoalgo::HalfLine_t& s2) const
+  {
+
+
+    return RelationType_t::kUnrelated;
+  }
+
+
+  RelationType_t AlgoFindRelationship::FindRelation(const geoalgo::Trajectory_t& t,
+						    const geoalgo::HalfLine_t& s) const
+  {
+    
+    return RelationType_t::kUnrelated;
+  }
+
+  RelationType_t AlgoFindRelationship::FindRelation(const geoalgo::HalfLine_t& s,
+						    const geoalgo::Trajectory_t& t) const
+  {
+    
+    return RelationType_t::kUnrelated;
+  }
+  
+  
+  RelationType_t AlgoFindRelationship::FindRelation(const geoalgo::Trajectory_t& t1,
+						    const geoalgo::Trajectory_t& t2) const
+  {
+    
+    return RelationType_t::kUnrelated;
+  }
+
+
   /*
   ParticleGraph AlgoFindRelationship::FindTrackHierarchy(const std::vector<const ertool::Track> &tracks)
   {

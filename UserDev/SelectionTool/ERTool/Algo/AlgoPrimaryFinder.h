@@ -73,12 +73,29 @@ namespace ertool {
     void setVtxToShrStartDist(double d) { _vtxToShrStartDist = d; }
     void setMaxIP(double d) { _maxIP = d; }
 
+    /// Functions that returns if object given as 1st 
+    ///argument comes from object given as second argument
+    bool From(const ::geoalgo::Trajectory& thisTrack,
+	      const ::geoalgo::Trajectory& thatTrack) const;
+
+    bool From(const ::geoalgo::Cone& thisShower,
+	      const ::geoalgo::Cone& thatShower) const;
+
+    bool From(const ::geoalgo::Cone& thisShower,
+	      const ::geoalgo::Trajectory& thatTrack) const;
+
+    bool From(const ::geoalgo::Trajectory& thisTrack,
+	      const ::geoalgo::Cone& thatShower) const;
+
 
   protected:
 
     /// Function to check wether a shower is e- or gamma-like
     /// Returns true if gamma-like
     bool isGammaLike(const double dedx, double radlen,bool forceRadLen=false);
+
+
+
 
     // verbose flag
     bool _verbose;

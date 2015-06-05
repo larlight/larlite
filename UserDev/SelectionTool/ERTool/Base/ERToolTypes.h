@@ -37,6 +37,7 @@ namespace ertool {
     kChild,
     kParent,
     kSibling,
+    kUnrelated,
     kINVALID_RELATION_TYPE
   };
   
