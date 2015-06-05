@@ -279,9 +279,8 @@ namespace larlite {
 							      mct.at(0).Position(),
 							      ::geoalgo::Vector(mct.at(0).Momentum()));
 
-      std::cout << "num of particles: " << mgr.ParticleGraph().GetNumParticles() << std::endl;
-      
     }
+
     return;
   }
 

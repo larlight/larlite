@@ -284,7 +284,7 @@ namespace ertool {
       int pdg_code = ( g_like > e_like ? 22 : 11 );
       double mass  = ( pdg_code == 11 ? _e_mass : _g_mass );
       auto const& mom = s.Dir() * (s._energy - mass);
-      graph.GetParticle(p).SetParticleInfo(pdg_code,mass,s.Start(),mom);
+      graph.GetParticle(p).SetParticleInfo(pdg_code,mass,s.Start(),mom,0.);
       //res.push_back(p);
 
       _dEdxVar->setVal(dEdx);

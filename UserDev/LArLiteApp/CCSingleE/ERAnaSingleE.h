@@ -43,7 +43,7 @@ namespace ertool {
     virtual void Reset();
 
     /// Function to evaluate input showers and determine a score
-    virtual bool Analyze(const EventData &data, const ParticleSet &ps);
+    virtual bool Analyze(const EventData &data, const ParticleGraph &graph);
 
     void SetDebug(bool on) { _debug = on; }
 

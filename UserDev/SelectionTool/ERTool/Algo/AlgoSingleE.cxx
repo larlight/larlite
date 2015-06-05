@@ -27,6 +27,7 @@ namespace ertool {
     _vtxProximityCut = 0;
     _BDtW = 0; 
     _BDtTW = 0;
+    _neutrinos = 0;
 
   }
 
@@ -151,10 +152,9 @@ namespace ertool {
       for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
 	
 	auto const& thatTrack = datacpy.Track(graph.GetParticle(t).RecoID());
-	// make sure track has more than 2 points. Otherwise GeoAlgo will get mad!
-	// this is already enforced if TrackLength ERTool::Filter is used with a value
-	// greater than 0
-	if (thatTrack.size() < 2)
+	// make sure track has a length of at least 0.3 cm (wire spacing)
+	// greater longer than 3 mm
+	if (thatTrack.Length() < 0.3)
 	  continue;
 	if (_verbose) { std::cout << "Comparing with track (" << t << ")" << std::endl; }
 	geoalgo::Point_t vtx(3);
@@ -235,10 +235,18 @@ namespace ertool {
 	// fill in electron properties
 	double mom = sqrt( (thisShower._energy)*(thisShower._energy) - (_e_mass*_e_mass) );
 	if (mom < 0) { mom = 1; }
-	graph.GetParticle(p).SetParticleInfo(11,_e_mass,thisShower.Start(),mom);
+	if (_verbose) { std::cout << "Getting shower " << p << std::endl; }
+	auto electron = graph.GetParticle(p);
+	if (_verbose) { std::cout << " and modifying properties..." << std::endl; }
+	electron.SetParticleInfo(11,_e_mass,thisShower.Start(),thisShower.Dir()*mom);
 	// create a new particle for the neutrino!
-	Particle neutrino = graph.CreateParticle();
-	neutrino.SetParticleInfo(12,0.,thisShower.Start(),mom);
+	if (_verbose) { std::cout << "number of partciles before: " << graph.GetNumParticles() << std::endl; }
+	if (_verbose) { std::cout << "Making neutrino..." << std::endl; }
+	Particle& neutrino = graph.CreateParticle();
+	neutrino.SetParticleInfo(12,0.,thisShower.Start(),thisShower.Dir()*mom);
+	if (_verbose) { std::cout << "made neutrino with ID " << neutrino.ID() << " and PDG: " << neutrino.PdgCode() << std::endl; }
+	if (_verbose) { std::cout << "number of partciles after: " << graph.GetNumParticles() << std::endl; }
+	_neutrinos += 1;
 	// set relationship
 	graph.SetParentage(neutrino.ID(),p);
 
@@ -290,6 +298,8 @@ namespace ertool {
   }
   
   void AlgoSingleE::ProcessEnd(TFile* fout){
+
+    std::cout << "Num. of neutrinos found: " << _neutrinos << std::endl;
     
     if(fout){
       fout->cd();

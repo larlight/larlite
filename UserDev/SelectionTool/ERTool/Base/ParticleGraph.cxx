@@ -21,7 +21,7 @@ namespace ertool {
   Particle& ParticleGraph::CreateParticle(const RecoObjBase& reco_obj)
   {
     auto p = Particle((NodeID_t)(_particle_v.size()),
-		      kShower,//kINVALID_RECO_TYPE,//reco_obj.RecoType(),
+		      reco_obj.RecoType(),
 		      reco_obj.RecoID() );
     _particle_v.emplace_back( p );
     
@@ -310,9 +310,18 @@ namespace ertool {
   void ParticleGraph::Diagram(const NodeID_t target, std::string& res, std::string prefix) const
   {
     auto const& p = GetParticle(target);
-    res += prefix + std::to_string(p.PdgCode()) + " ... ";
-    res += std::to_string(p.Vertex()[0]) + " [cm] : " + std::to_string(p.Vertex()[1]) + " [cm] : " + std::to_string(p.Vertex()[2]);
-    res += " [cm] --> " + std::to_string( p.KineticEnergy() );
+    if (p.PdgCode() == kINVALID_INT)
+      res += prefix + "unknown" + " ... ";
+    else
+      res += prefix + std::to_string(p.PdgCode()) + " ... ";
+    if (p.Vertex() == kINVALID_VERTEX)
+      res += "[unknown] [cm]";
+    else
+      res += std::to_string(p.Vertex()[0]) + " [cm] : " + std::to_string(p.Vertex()[1]) + " [cm] : " + std::to_string(p.Vertex()[2]) + " [cm] ";
+    if (p.Momentum() == kINVALID_MOMENTUM)
+      res += "--> unknown" ;
+    else
+      res += "--> " + std::to_string( p.KineticEnergy() );
     res += " MeV \n";
     prefix += "  ";
     for(auto const& c : p.Children()) Diagram(c,res,prefix);

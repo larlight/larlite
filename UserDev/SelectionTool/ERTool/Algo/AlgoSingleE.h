@@ -156,7 +156,8 @@ namespace ertool {
     // top wall is extended to infinity)? This param will be
     // negative for upwards facing showers.
     double _BDtTW ;
-
+    // Keep track of number of neutrinos found
+    int _neutrinos;
     // Keep track of whether a sister track to the shower has
     // been found
     bool _hassister;
