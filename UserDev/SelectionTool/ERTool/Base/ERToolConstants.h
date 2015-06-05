@@ -25,8 +25,8 @@ namespace ertool {
   /// Utility: maximum value for size_t
   const size_t kSIZE_MAX   = std::numeric_limits<size_t>::max();
   
-  /// Default layer id for ertool::Particle
-  const LayerID_t kDefaultLayer = -1;
+  /// Default generation for ertool::Particle
+  const Generation_t kDefaultGeneration = -1;
 
   /// Default (invalid) node id
   const NodeID_t  kINVALID_NODE_ID = kSIZE_MAX;

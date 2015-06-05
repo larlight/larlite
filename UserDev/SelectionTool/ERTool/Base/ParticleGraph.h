@@ -56,14 +56,14 @@ namespace ertool {
     std::string Diagram(const NodeID_t id) const;
 
   private:
-    Particle& CreateParticle(const RecoObjBase& reco_obj);
-    void ValidNode(const NodeID_t& id) const;
-    void UpdateLayerID(const NodeID_t target, const LayerID_t layer);
-    void UpdateParentID(const NodeID_t target, const NodeID_t parent);
-    void UpdateAncestorID(const NodeID_t target, const NodeID_t ancestor);
-    void UpdateRecoInfo(const NodeID_t target, const RecoType_t reco_type, const RecoID_t reco_id );    
-    void AddChild(const NodeID_t target, const NodeID_t child, const float score = kDEFAULT_SCORE);
-    void Diagram(const NodeID_t target, std::string& res, std::string prefix="") const;
+    Particle& CreateParticle (const RecoObjBase& reco_obj);
+    void ValidNode           (const NodeID_t& id         ) const;
+    void UpdateGeneration    (const NodeID_t target, const Generation_t gen );
+    void UpdateParentID      (const NodeID_t target, const NodeID_t parent  );
+    void UpdateAncestorID    (const NodeID_t target, const NodeID_t ancestor);
+    void UpdateRecoInfo      (const NodeID_t target, const RecoType_t reco_type, const RecoID_t reco_id );    
+    void AddChild            (const NodeID_t target, const NodeID_t child, const float score = kDEFAULT_SCORE);
+    void Diagram             (const NodeID_t target, std::string& res, std::string prefix="") const;
     void Reset();
 
     std::deque< ::ertool::Particle > _particle_v;

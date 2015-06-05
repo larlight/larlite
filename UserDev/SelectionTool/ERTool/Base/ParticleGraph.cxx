@@ -174,11 +174,11 @@ namespace ertool {
     if( part_a.Ancestor() != part_a.ID() && part_b.Ancestor() != part_b.ID() && part_a.Ancestor() != part_b.Ancestor() )
       throw ERException("Two particles with different ancestors cannot be unified!");
     
-    // 2) Check layer ... OK only if
-    //                    2-a) neither has a valid layer
-    //                    2-b) only one of them has a valid layer
-    //                    2-c) shares the same layer in the 
-    if( part_a.Layer() != kDefaultLayer && part_b.Layer() != kDefaultLayer ) {
+    // 2) Check generation ... OK only if
+    //                         2-a) neither has a valid generation
+    //                         2-b) only one of them has a valid generation
+    //                         2-c) shares the same generation in the same tree
+    if( part_a.Generation() != kDefaultGeneration && part_b.Generation() != kDefaultGeneration ) {
       if( part_a.Ancestor() != part_b.Ancestor() && !part_a.Primary() && !part_b.Primary() )
 	throw ERException("Two non-primary particles from different ancestor cannot be unified!");
       if( part_a.Ancestor() == part_b.Ancestor() && part_a.Parent() != part_b.Parent() )
@@ -212,13 +212,13 @@ namespace ertool {
     // First merge children
     for(auto const& child_id : part_b.Children())
       AddChild ( part_a.ID(), child_id );
-    // Second propagate new parent/ancestor/layer to children
-    auto parent_id   = ( part_b.Parent()   == part_b.ID()   ? part_a.Parent()   : part_b.Parent()   );
-    auto ancestor_id = ( part_b.Ancestor() == part_b.ID()   ? part_a.Ancestor() : part_b.Ancestor() );
-    auto layer       = ( part_b.Layer()    == kDefaultLayer ? part_a.Layer()    : part_b.Layer()    );
+    // Second propagate new parent/ancestor/generation to children
+    auto parent_id   = ( part_b.Parent()     == part_b.ID()        ? part_a.Parent()     : part_b.Parent()     );
+    auto ancestor_id = ( part_b.Ancestor()   == part_b.ID()        ? part_a.Ancestor()   : part_b.Ancestor()   );
+    auto generation  = ( part_b.Generation() == kDefaultGeneration ? part_a.Generation() : part_b.Generation() );
     UpdateParentID   ( part_a.ID(), parent_id   );
     UpdateAncestorID ( part_a.ID(), ancestor_id ); 
-    UpdateLayerID    ( part_a.ID(), layer       );
+    UpdateGeneration ( part_a.ID(), generation  );
     // Update reco info
     if( part_b.RecoType() != kInvisible )
       part_a.SetRecoInfo ( part_b.RecoType(), part_b.RecoID() );
@@ -261,12 +261,12 @@ namespace ertool {
     _particle_v[target]._parent_id = parent;
   }
   
-  void ParticleGraph::UpdateLayerID(const NodeID_t target, const LayerID_t layer)
+  void ParticleGraph::UpdateGeneration(const NodeID_t target, const Generation_t gen)
   {
-    if(_particle_v[target]._layer_id != layer ) {
-      _particle_v[target]._layer_id = layer;
+    if(_particle_v[target]._generation != gen ) {
+      _particle_v[target]._generation = gen;
       for(auto const& child_id : _particle_v[target].Children())
-	UpdateLayerID(child_id, layer+1);
+	UpdateGeneration(child_id, gen+1);
     }
   }
 
@@ -298,13 +298,13 @@ namespace ertool {
     parent.AddChild(child_id);
     parent.SetScore(child_id,score);
     child.SetScore(parent_id,score);
-    // Update layer if not yet set
-    if(parent.Layer() == kDefaultLayer)
-      UpdateLayerID(parent_id, 0);
+    // Update generation if not yet set
+    if(parent.Generation() == kDefaultGeneration)
+      UpdateGeneration(parent_id, 0);
     // Update child
-    UpdateParentID   ( child_id, parent_id         );
-    UpdateLayerID    ( child_id, parent.Layer()+1  );
-    UpdateAncestorID ( child_id, parent.Ancestor() );
+    UpdateParentID   ( child_id, parent_id             );
+    UpdateGeneration ( child_id, parent.Generation()+1 );
+    UpdateAncestorID ( child_id, parent.Ancestor()     );
   }
 
   void ParticleGraph::Diagram(const NodeID_t target, std::string& res, std::string prefix) const
@@ -423,7 +423,7 @@ namespace ertool {
     if (thisnode.RelationAssessed())
       return;
     // relation not assessed...proceed
-    thisnode._layer_id = 0;
+    thisnode._generation  = 0;
     thisnode._ancestor_id = thisnode._node_id;
   }
 
