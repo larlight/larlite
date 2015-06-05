@@ -87,6 +87,15 @@ namespace ertool {
     bool From(const ::geoalgo::Trajectory& thisTrack,
 	      const ::geoalgo::Cone& thatShower) const;
 
+    /// Function that based on primaries in event
+    /// returns potential vertices.
+    /// Takes start point of each object
+    /// and groups together other start points
+    /// within _IP of the start point
+    /// Start points are this way grouped
+    /// into vertices
+    std::vector<::geoalgo::Point_t> GetVertices(const ParticleGraph& graph,
+						const int minObjectsAtVertex) const;
 
   protected:
 

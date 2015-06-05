@@ -199,16 +199,14 @@ namespace ertool {
       // compare shower start distance to these vertices.
       // if more than some threshold not single
       double distmin = 1036;
-      /* TODO TODO TODO
-      for (size_t v = 0; v < trackHierarchy.size(); v++){
-	if (trackHierarchy[v].Daughters().size() > 1){
-	  // more than one tracks for this vertex. -> reliable!
-	  double thisdist = thisShower.Start().Dist(trackHierarchy[v].Vertex());
-	  if ( thisdist < distmin)
-	    distmin = thisdist;
-	}
+      // get list of potential vertices that come from 2 or more objects
+      // sharing a start point
+      auto const& candidateVertices = _primaryFinder.GetVertices(graph,2);
+      for (auto const& vertex : candidateVertices){
+	double thisdist = thisShower.Start().Dist(vertex);
+	if ( thisdist < distmin)
+	  distmin = thisdist;
       }
-      TODO TODO TODO */
 
       if ( single and !_hassister and (_vtxProximityCut != 0) ){
 	if ( (distmin != 1036) and (distmin > _vtxProximityCut) ){
