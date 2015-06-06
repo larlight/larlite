@@ -480,40 +480,7 @@ namespace larlite {
 
     return;
   }
-  /*
-  void ERToolHelper::FillVertices( const event_vertex& vtx_v, 
-				   ::ertool::Manager&  mgr ) const
 
-  {
-    // Fill vertex
-    for(auto const& vtx : vtx_v) {
-      ::ertool::Vertex pos(vtx.X(),vtx.Y(),vtx.Z());
-      res.Add(pos);
-    }
-    return;
-  }
-
-  void ERToolHelper::FillVertices ( const event_mctruth& mci_v,
-				    ::ertool::Manager&   mgr) const
-  {
-    // Fill vertex
-    std::set< ::geoalgo::Point_t> vtxs;
-    for(auto const& mci : mci_v) {
-      
-      for(auto const& mcp : mci.GetParticles()) {
-
-	if(mcp.StatusCode()!=1) continue;
-
-	::geoalgo::Point_t vtx(mcp.Trajectory()[0].Position());
-	
-	if(vtxs.find(vtx) == vtxs.end()) {
-	  mgr.Add(::ertool::Vertex(vtx));
-	  vtxs.insert(vtx);
-	}
-      }
-    }
-  }
-  */
 }
 
 #endif

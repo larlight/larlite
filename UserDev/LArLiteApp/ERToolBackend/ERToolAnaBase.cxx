@@ -12,10 +12,8 @@ namespace larlite {
     _name_generator = "generator";
     _name_mcshr     = "mcreco";
     _name_mctrk     = "mcreco";
-    _name_mcvtx     = "generator";
     _name_track     = "";
     _name_shower    = "";
-    _name_vertex    = "";
     // set cheater for single showers
     _cheater        = false;
 
@@ -61,20 +59,6 @@ namespace larlite {
   return;
   }
 
-  void ERToolAnaBase::SetVtxProducer(const bool mc, const std::string prod)
-  {
-    if (mc){
-      _mcvtx = true;
-      _name_mcvtx = prod;
-    }
-    else{
-      _mcvtx = false;
-      _name_vertex = prod;
-    }
-
-    return;
-  }
-      
 
   bool ERToolAnaBase::initialize() {
     // Nothing provided...
