@@ -328,7 +328,7 @@ namespace ertool {
       bool newvtx = true;
       auto const start = graph.GetParticle(nodeID).Vertex();
       for (size_t v = 0; v < vertices.size(); v++){
-	if (start.Dist(vertices[v]) < _IP){
+	if (start.Dist(vertices[v]) < _maxIP){
 	  newvtx = false;
 	  // add to this vertex
 	  numObjects[v] += 1;
@@ -352,8 +352,7 @@ namespace ertool {
 
     return vertices_afterCut;
   }
-
-
+  
 }
 
 #endif

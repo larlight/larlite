@@ -401,6 +401,34 @@ namespace larlite {
     return;
   }
 
+  // Single Shower Cheater:
+  // Assumes a single shower is in the event
+  // fills the particle information with
+  // that of the mcshower
+  void ERToolHelper::SingleShowerCheater ( const event_mcshower& mcs_v,
+					   ::ertool::Manager&    mgr ) const
+  {
+
+    // if no mcshowers, do nothing
+    if (!mcs_v.size())
+      return;
+
+    // if no particles, do nothing
+    auto const& nodes = mgr.ParticleGraph().GetParticleNodes(::ertool::RecoType_t::kShower);
+    if (!nodes.size())
+      return;
+
+    auto &start = mcs_v[0].Start();
+    ::geoalgo::Point_t  vtx(start.X(),start.Y(),start.Z());
+    ::geoalgo::Vector_t mom(start.Px(),start.Py(),start.Pz());
+    auto const& pdg = mcs_v[0].PdgCode();
+    mgr.ParticleGraph().GetParticle(nodes[0]).SetParticleInfo(pdg,
+							      0.,
+							      vtx,
+							      mom);
+    return;
+  }
+  
 
   void ERToolHelper::FillShowers(const event_shower& shw_v,
 				 const event_cosmictag& ctag_shw_v,

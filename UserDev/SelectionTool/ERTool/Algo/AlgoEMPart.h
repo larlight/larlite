@@ -79,6 +79,9 @@ namespace ertool {
     /// Set verbosity mode
     void setVerbose(bool on) { _verbose = on; }
 
+    /// Set Plot mode (save output plots)
+    void setPlot(bool on) { _plot = on; }
+
   protected:
 
     PdfFactory _factory; ///< P.D.F. factory class instance
@@ -87,6 +90,7 @@ namespace ertool {
     double _g_mass; ///< Gamma's mass
 
     bool _verbose; ///< verbosity mode for debug
+    bool _plot;    ///< True: save plots with PDF information
     bool _mode;    ///< e-/gamma mode (true: gamma, false: e-)
     
     // Variables

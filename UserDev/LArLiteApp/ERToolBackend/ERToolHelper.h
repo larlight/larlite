@@ -81,15 +81,12 @@ namespace larlite {
 		       const event_cosmictag& ctag_shw_v,
 		       const event_ass&       ass_v,
 		       ::ertool::Manager&     mgr) const;
-    /*
-    /// Fill Vertex Info from MC
-    void FillVertices ( const event_vertex&  vtx_v, 
-			::ertool::Manager&   mgr) const;
-    
-    /// Fill Vertex Info from RECO
-    void FillVertices ( const event_mctruth&  mci_v,
-			::ertool::Manager&    res) const;
-    */
+
+
+    /// MC Cheater for single showers
+    void SingleShowerCheater(const event_mcshower& mcs_v,
+			     ::ertool::Manager&    mgr ) const;
+
     /// Set minimum EDep amount for shower to be added to EventData
     void SetMinEDep(double E) { if(E<1.e-10) E=1.e-10; _minEDep = E; }
 

@@ -16,6 +16,8 @@ namespace larlite {
     _name_track     = "";
     _name_shower    = "";
     _name_vertex    = "";
+    // set cheater for single showers
+    _cheater        = false;
 
     // turn profile mode off
     _mgr._profile_mode = false;
@@ -102,7 +104,7 @@ namespace larlite {
     //------------------------------
     // Start filling SPAData object!
     // Fill showers
-    if (_mcshowers && !_name_mcshr.empty()){
+    if (_mcshowers && _name_shower.empty()){
       auto ev_mcs = storage->get_data<event_mcshower> (_name_mcshr);
       if (!ev_mcs){
 	print(msg::kERROR,__FUNCTION__,
@@ -110,6 +112,9 @@ namespace larlite {
 	throw std::exception();
       }
 	_helper.FillShowers(*ev_mcs, _mgr);
+	// if cheater for single showers is to be used:
+	if (_cheater)
+	  _helper.SingleShowerCheater(*ev_mcs,_mgr);
     }
     else if(!_mcshowers && !_name_shower.empty()){
       auto ev_shw      = storage->get_data<event_shower>    (_name_shower);
@@ -129,10 +134,16 @@ namespace larlite {
       }
       else
 	_helper.FillShowers(*ev_shw, *ev_ctag_shw, *ev_ass, _mgr);
+      // if cheater for single showers is to be used:
+      if (_cheater){
+	// get mcshowers
+	auto ev_mcs = storage->get_data<event_mcshower> ("mcreco");
+	_helper.SingleShowerCheater(*ev_mcs,_mgr);
+      }// cheater
     }
 
     // Fill tracks
-    if (_mctracks && !_name_mctrk.empty()){
+    if (_mctracks && _name_track.empty()){
       auto ev_mct = storage->get_data<event_mctrack>  (_name_mctrk);
       if (!ev_mct) {
 	print(msg::kERROR,__FUNCTION__,
@@ -171,18 +182,9 @@ namespace larlite {
       }
       _helper.FillTracks( *ev_trk, *ev_ctag_trk, *ev_calo_trk, *ev_pid_trk, *ev_ass, _mgr);
     }
-    /*
-    // Fill Vertices
-    if (_mcvtx && !_name_mcvtx.empty()){
-      auto ev_mci = storage->get_data<event_mctruth> (_name_mcvtx);
-      if (!ev_mci) {
-	print(msg::kERROR,__FUNCTION__,
-	      "MCTruth info not found in the event!");
-	throw std::exception();
-      }
-      _helper.FillVertices(*ev_mci, _mgr);
-    }
-    */
+
+
+
     // Done filling SPAData Object!
     // ----------------------------
     // If MC info is found, fill MCParticles into a ParticleSet

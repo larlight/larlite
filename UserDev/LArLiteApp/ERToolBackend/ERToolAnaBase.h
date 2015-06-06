@@ -85,6 +85,11 @@ namespace larlite {
     */
     void SetMinEDep(double E) { _helper.SetMinEDep(E); }
 
+    /**
+       @brief Set Cheater mode (for single shower files)
+    */
+    void SetCheater(bool on) { _cheater = on; }
+
     /// Selection manager class instance
     ::ertool::Manager _mgr;
 
@@ -103,6 +108,7 @@ namespace larlite {
     bool _mcshowers; ///< Boolean. True: use MC for Showers
     bool _mctracks;  ///< Boolean. True: use MC for Tracks
     bool _mcvtx;     ///< Boolean. True: use MC for Vertices
+    bool _cheater;   ///< Boolean. True: use cheater to get single shower info
 
   };
 }

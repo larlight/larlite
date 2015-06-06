@@ -25,9 +25,8 @@ namespace ertool {
     _hradLen_e = new TH1D("_hradLen_e","rad len electrons",100,0,100);
     _hradLen_g = new TH1D("_hradLen_g","rad len gammas",100,0,100);
 
-    //if training mode clear params
-    //if (_training_mode)
-    //  _params.clear_data();
+    // default plot mode is false
+    _plot = false;
 
     std::string part_name;
 
@@ -253,13 +252,13 @@ namespace ertool {
   {
 
     auto datacpy = data;
-    /*
+
     if (_verbose){
       std::cout << "******************* BEGIN EMPArt Reconstruction  ******************" << std::endl;
       std::cout << "Number of Showers: " << datacpy.Shower().size() << std::endl;
       std::cout << "Number of Shower Particles: " << graph.GetParticleNodes(RecoType_t::kShower).size() << std::endl;
     }
-    */
+
     // Loop through showers
     for (auto const& p : graph.GetParticleNodes(RecoType_t::kShower)){
 
@@ -276,7 +275,7 @@ namespace ertool {
       if (vtx != kINVALID_VERTEX)
 	dist = s.Start().Dist(vtx);
 
-      //if (_verbose) { std::cout << "dEdx: " << dEdx << "\tdist: " << dist << std::endl; }
+      if (_verbose) { std::cout << "dEdx: " << dEdx << "\tdist: " << dist << std::endl; }
       
       double e_like = LL(true,  dEdx, dist);
       double g_like = LL(false, dEdx, dist);
@@ -428,7 +427,7 @@ namespace ertool {
     }// if in traning mode
       
     // Plot the likelyhoods if in verbose mode
-    if (_verbose){
+    if (_plot){
 
       TCanvas *c = new TCanvas("c","",1000,500);
 
