@@ -277,6 +277,13 @@ namespace geotree{
     return siblings;
   }
 
+
+  /// get sibling IDs
+  std::vector<NodeID_t> Node::getChildren() const
+  {
+    return _child_id_v;
+  }
+
   // Check if node is correlated with another
   bool Node::isCorrelated(NodeID_t id){
     

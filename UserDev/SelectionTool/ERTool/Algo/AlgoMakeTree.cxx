@@ -125,6 +125,39 @@ namespace ertool {
     if (_verbose) { _nodeMgr.CorrelationMatrix(); }
     // print out diagram
     if (_verbose) { _nodeMgr.Diagram(); }
+
+    // Now take tree and use it to sort the ParticleGraph
+
+    // first create extra nodes that were created
+    auto const& Nnodes = _nodeMgr.getNumNodes();
+    // node ID is equal to position in node vector
+    // just create extra nodes for all the ones missing
+    // in the graph
+    for (size_t i = graph.GetNumParticles(); i < Nnodes; i++){
+      auto& p = graph.CreateParticle();
+      if (_verbose) { std::cout << "Created Particle with node ID: " << p.ID() << std::endl; }
+    }
+	
+    // make sure node vectors now have the same size
+    if (graph.GetNumParticles() != _nodeMgr.getNumNodes())
+      throw ERException("Number of Nodes and Particles does not match!");
+
+    if (_verbose) { std::cout << "Nodes: " << _nodeMgr.getNumNodes() << "\tParticles: " << graph.GetNumParticles() << std::endl; }
+    if (_verbose) { std::cout << "now assigning relationships found by TreeGraph" << std::endl; }
+    // loop through all nodes...
+    // and assign parent
+    for (auto const& node : graph.GetParticleNodes()){
+      // does the node have a parent?
+      if (_nodeMgr.hasParent(node))
+	{
+	  auto const& parent = _nodeMgr.getParent(node);
+	  // establish relationship
+	  if (_verbose) { std::cout << "Assigning " << parent << " as parent of node " << node << std::endl; }
+	  graph.SetParentage(parent,node);
+	}// if there is a parent
+    }
+      
+    std::cout << graph.Diagram() << std::endl;
     /*    
 	  if (_verbose){
 	  std::cout << std::endl

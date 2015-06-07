@@ -54,12 +54,6 @@ namespace geotree{
     /// Function to call when to make tree
     void MakeTree();
 
-    /// Print correlation matrix
-    void CorrelationMatrix() { _coll.CorrelationMatrix(); }
-
-    /// Function to print out full diagram for nodes in manager
-    void Diagram() { _coll.Diagram(); }
-
     /// Function to find node in _head_node_v. Return true if found
     bool NodeAdded(NodeID_t n);
 
@@ -113,6 +107,28 @@ namespace geotree{
     void GenericConflict(NodeID_t ID);
 
     void ApplyAlgoCorrelations(const std::map< std::pair<NodeID_t, NodeID_t>, geotree::Correlation>& algoCorrs);
+
+
+    /// Getter Functions
+    
+    /// get number of nodes
+    size_t getNumNodes() { return _coll.GetNumNodes(); }
+    /// boolean: does the node have a parent
+    bool hasParent(const NodeID_t ID);
+    /// return parent NodeID
+    NodeID_t getParent(const NodeID_t ID);
+    /// boolean: does the node have siblings
+    bool hasSiblings(const NodeID_t ID);
+    /// return vector of IDs of siblings
+    std::vector<NodeID_t> getSiblings(const NodeID_t ID);
+    /// boolean: has children?
+    //bool hasChildren(const NodeID_t ID);
+    /// return vector of IDs of children
+    std::vector<NodeID_t> getChildren(const NodeID_t ID);
+    /// Print correlation matrix
+    void CorrelationMatrix() { _coll.CorrelationMatrix(); }
+    /// Function to print out full diagram for nodes in manager
+    void Diagram() { _coll.Diagram(); }
 
   private:
 

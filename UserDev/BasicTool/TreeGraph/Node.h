@@ -95,7 +95,11 @@ namespace geotree{
     /// node has sibling?
     bool hasSiblings() const;
 
+    /// get sibling's ID
     std::vector<NodeID_t> getSiblings() const;
+
+    /// get children IDs
+    std::vector<NodeID_t> getChildren() const;
 
     /// Check if node is primary (has no parent or sibling)
      bool isPrimary() const;

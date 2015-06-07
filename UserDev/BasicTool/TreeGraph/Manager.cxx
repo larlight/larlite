@@ -128,7 +128,7 @@ namespace geotree{
 	  }//for all siblings
 	}// if multiple siblings
 	// create new node to host the new siblings
-	NodeID_t id = _coll.GetNumNodes()+1;
+	NodeID_t id = _coll.GetNumNodes();
 	// Make sure this ID does not exist
 	if (_coll.NodeExists(id) == true)
 	  throw ::geoalgo::GeoAlgoException(Form("About to create a NodeID that already exists (%i). Not acceptable!",(int)id));
@@ -634,6 +634,32 @@ namespace geotree{
       }// for correlations returned by the algorithm
 
     return;
+  }
+
+
+  bool Manager::hasParent(const NodeID_t ID)
+  {
+    return _coll.GetNode(ID).hasParent();
+  }
+
+  NodeID_t Manager::getParent(const NodeID_t ID)
+  {
+    return _coll.GetNode(ID).getParent();
+  }
+
+  bool Manager::hasSiblings(const NodeID_t ID)
+  {
+    return _coll.GetNode(ID).hasSiblings();
+  }
+
+  std::vector<NodeID_t> Manager::getSiblings(const NodeID_t ID)
+  {
+    return _coll.GetNode(ID).getSiblings();
+  }
+
+  std::vector<NodeID_t> Manager::getChildren(const NodeID_t ID)
+  {
+    return _coll.GetNode(ID).getChildren();
   }
   
 }

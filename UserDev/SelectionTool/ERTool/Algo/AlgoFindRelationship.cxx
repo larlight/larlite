@@ -153,7 +153,7 @@ namespace ertool{
     if (IP != 0)
       score = 1./IP;
     else
-      score = 1e-10;
+      score = 1e+10;
 
     if (IP < _maxIP){
       if (_debug) { std::cout << "\tshowers are siblings" << std::endl; }
@@ -174,7 +174,7 @@ namespace ertool{
     if (IP != 0)
       score = 1./IP;
     else
-      score = 1e-10;
+      score = 1e+10;
 
     if (IP < _maxIP){
 
@@ -234,7 +234,7 @@ namespace ertool{
     if (IP != 0)
       score = 1./IP;
     else
-      score = 1e-10;
+      score = 1e+10;
 
     if (IP < _maxIP){
 
