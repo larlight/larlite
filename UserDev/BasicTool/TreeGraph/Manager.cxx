@@ -128,7 +128,7 @@ namespace geotree{
 	  }//for all siblings
 	}// if multiple siblings
 	// create new node to host the new siblings
-	NodeID_t id = ID*10+siblings[0]*100+1; 
+	NodeID_t id = _coll.GetNumNodes()+1;
 	// Make sure this ID does not exist
 	if (_coll.NodeExists(id) == true)
 	  throw ::geoalgo::GeoAlgoException(Form("About to create a NodeID that already exists (%i). Not acceptable!",(int)id));

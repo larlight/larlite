@@ -10,7 +10,7 @@ if len(sys.argv) < 2:
 from seltool import ertool
 from ROOT import geotree
 from larlite import larlite as fmwk
-#from algoviewer import view, setDisplay
+from algoviewer import view, setDisplay
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
@@ -38,8 +38,8 @@ my_anaunit.SetTrackProducer(True,"mcreco");
 #############################
 my_anaunit._mgr.SetAlgo(my_algo)
 my_proc.add_process(my_anaunit)
-my_proc.run()
-sys.exit(0)
+#my_proc.run()
+#sys.exit(0)
 
 #create display
 display = setDisplay("TreeMaker")
@@ -51,11 +51,11 @@ while (counter < 1000):
     except SyntaxError:
         counter = counter + 1
     my_proc.process_event(counter)
-    part_mc   = my_ana.GetParticles(True)
-    data_mc   = my_ana.GetData(True)
-    view(data_mc,part_mc,display)
-    for x in xrange(part_mc.size()):
-        print part_mc[x].Diagram()
+    part   = my_anaunit.GetParticles(False)
+    data   = my_anaunit.GetData(False)
+    view(data,part,display)
+    #for x in xrange(part_mc.size()):
+    #    print part_mc[x].Diagram()
     print counter
 
 # done!

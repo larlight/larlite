@@ -39,6 +39,9 @@ namespace geotree{
     // Default destructor
     virtual ~NodeCollection(){}
 
+    /// Get number of nodes
+    size_t GetNumNodes() { return _nodes.size(); }
+
     /// Add a node to the internal vector of nodes
     void AddNode(const size_t ID);
 

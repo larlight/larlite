@@ -63,37 +63,56 @@ namespace ertool {
       // get reco ID for both
       auto const& recoID1 = p1.RecoID();
       auto const& recoID2 = p2.RecoID();
+
+      // do not consider tracks of 0-length
+      if (type1 == kTrack){
+	if (datacpy.Track(recoID1).size() <= 1)
+	  continue;
+      }
+      if (type2 == kTrack){
+	if (datacpy.Track(recoID2).size() <= 1)
+	  continue;
+      }
+
+      if ( ( (type1 != kShower) and (type1 != kTrack) ) or
+	   ( (type1 != kShower) and (type1 != kTrack) ) )
+	continue;
       
       if (_verbose) { std::cout << "comparing particles [" << comb[0] << ", " << comb[1] << "]" << std::endl; } 
       
       ::geoalgo::Point_t vtx(3);
       double score;
       RelationType_t rel = kINVALID_RELATION_TYPE;
-
+      
       if ( (type1 == kShower) and (type2 == kShower) )
 	rel = _findRel.FindRelation(datacpy.Shower(recoID1),
 				    datacpy.Shower(recoID2),
 				    vtx, score);
-
-      else if ( (type1 == kShower) and (type2 == kTrack) )
+      
+      if ( (type1 == kShower) and (type2 == kTrack) )
 	rel = _findRel.FindRelation(datacpy.Shower(recoID1),
 				    datacpy.Track(recoID2),
 				    vtx, score);
-
-      else if ( (type1 == kTrack) and (type2 == kShower) )
+      
+      if ( (type1 == kTrack) and (type2 == kShower) )
 	rel = _findRel.FindRelation(datacpy.Track(recoID1),
 				    datacpy.Shower(recoID2),
 				    vtx, score);
-
-      else if ( (type1 == kTrack) and (type2 == kTrack) )
+      
+      if ( (type1 == kTrack) and (type2 == kTrack) )
 	rel = _findRel.FindRelation(datacpy.Track(recoID1),
 				    datacpy.Track(recoID2),
 				    vtx, score);
-
+      
+      if (_verbose) { std::cout << "done assessing relation type" << std::endl; }
+      
       // Add the correlation to the tree
-      if (rel != kINVALID_RELATION_TYPE)
+      if ( (rel != kINVALID_RELATION_TYPE) and (score > _minScore) ){
+	if (_verbose) { std::cout << "Assigning relation " << rel << " with score: " << score << std::endl; }
 	_nodeMgr.AddCorrelation(comb[0],comb[1],score,vtx,
 				GetGeoTreeRelation(rel));
+      }
+      
 
     }// for all combos  
     
@@ -141,7 +160,7 @@ namespace ertool {
       return ::geotree::RelationType_t::kParent;
     
     if (rel == kChild)
-      return ::geotree::RelationType_t::kParent;
+      return ::geotree::RelationType_t::kChild;
 
     return ::geotree::RelationType_t::kUnknown;
 

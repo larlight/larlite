@@ -217,6 +217,8 @@ namespace ertool{
     // 1st object to second
     if (rel == RelationType_t::kParent)
       return RelationType_t::kChild;
+    if (rel == RelationType_t::kChild)
+      return RelationType_t::kParent;
 
     return RelationType_t::kUnrelated;
   }
