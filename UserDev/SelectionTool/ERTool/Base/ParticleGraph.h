@@ -46,8 +46,12 @@ namespace ertool {
 						const bool unassessed_only = false,
 						const int pdg_code = 0) const;
     
-    void SetParentage    ( const NodeID_t parent, const NodeID_t child,  const float score = kDEFAULT_SCORE);
-    void SetSiblings     ( const NodeID_t his_id, const NodeID_t her_id, const float score = kDEFAULT_SCORE);
+    void SetParentage    ( const NodeID_t parent,
+			   const NodeID_t child,
+			   const float score = kDEFAULT_SCORE);
+    void SetSiblings     ( const NodeID_t his_id,
+			   const NodeID_t her_id,
+			   const float score = kDEFAULT_SCORE);
     void SetPrimary      ( const NodeID_t node );
     void SameParticle    ( const NodeID_t a,      const NodeID_t b      );
 
