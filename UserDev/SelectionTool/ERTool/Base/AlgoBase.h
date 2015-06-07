@@ -45,7 +45,7 @@ namespace ertool {
     virtual ~AlgoBase(){}
     
     /// Function to evaluate input showers and determine a score
-    virtual bool Reconstruct(const EventData &data, ParticleGraph& graph) {return true; }
+    virtual bool Reconstruct(const EventData &data, ParticleGraph& graph) { return true; }
 
   };
 }

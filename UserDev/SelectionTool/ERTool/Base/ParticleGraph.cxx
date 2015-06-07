@@ -128,10 +128,10 @@ namespace ertool {
     const int pdg_code) const
   {
     CombinationSet_t res;
-    if(combination_size < _particle_v.size()) return res;
+    if(combination_size > _particle_v.size()) return res;
     
     auto const node_v = GetParticleNodes(type,unassessed_only,pdg_code);
-    if(combination_size < node_v.size()) return res;
+    if(combination_size > node_v.size()) return res;
     
     auto const comb_v = Combination(node_v.size(),combination_size);
     for(auto const& comb : comb_v) {
