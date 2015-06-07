@@ -5,9 +5,8 @@
 
 namespace ertool{
 
-  AlgoFindRelationship::AlgoFindRelationship() : AlgoBase()
+  AlgoFindRelationship::AlgoFindRelationship()
   {
-    _name   = "AlgoFindRelationship";
     _debug  = false;
 
     //Track-particle masses (convert to MEV)
@@ -16,6 +15,7 @@ namespace ertool{
     _mu_mass = 1000.* TDatabasePDG().GetParticle(13)->Mass();
     _ka_mass = 1000.* TDatabasePDG().GetParticle(311)->Mass();
     _uk_mass = 0.;
+    _maxIP   = 1.;
   }
   
   void AlgoFindRelationship::Reset()
@@ -72,6 +72,17 @@ namespace ertool{
     vtx = (PtShr+PtTrk)/2.;
     
     return sqrt(IP);
+  }
+
+
+  double AlgoFindRelationship::FindClosestApproach(const geoalgo::Trajectory_t& trk,
+						   const geoalgo::HalfLine_t& shr,
+						   geoalgo::Point_t& vtx) const
+  {
+    
+    double IP = FindClosestApproach(shr,trk,vtx);
+    
+    return IP;
   }
 
 
@@ -133,220 +144,136 @@ namespace ertool{
 
 
   RelationType_t AlgoFindRelationship::FindRelation(const geoalgo::HalfLine_t& s1,
-						    const geoalgo::HalfLine_t& s2) const
+						    const geoalgo::HalfLine_t& s2,
+						    geoalgo::Point_t& vtx,
+						    double& score) const
   {
+    
+    double IP = FindClosestApproach(s1,s2,vtx);
+    if (IP != 0)
+      score = 1./IP;
+    else
+      score = 1e+10;
 
+    if (IP < _maxIP){
+      if (_debug) { std::cout << "\tshowers are siblings" << std::endl; }
+      return RelationType_t::kSibling;
+    }
 
     return RelationType_t::kUnrelated;
   }
 
 
   RelationType_t AlgoFindRelationship::FindRelation(const geoalgo::Trajectory_t& t,
-						    const geoalgo::HalfLine_t& s) const
+						    const geoalgo::HalfLine_t& s,
+						    geoalgo::Point_t& vtx,
+						    double& score) const
   {
+    
+    double IP = FindClosestApproach(t,s,vtx);
+    if (IP != 0)
+      score = 1./IP;
+    else
+      score = 1e+10;
+
+    if (IP < _maxIP){
+
+      double vtx_to_t_start = vtx.Dist(t.front());
+      double vtx_to_t_body  = sqrt(_geoAlgo.SqDist(vtx,t));
+      
+      if (_debug) { 
+	std::cout << "\tShr Start: " << s.Start() << std::endl
+		  << "\tTrk Start: " << t.front() << "\tEnd: " << t.back() << std::endl
+		  << "\tVtx to Trk Start: " << vtx_to_t_start << "\t Vtx to Trk Body: " << vtx_to_t_body << std::endl;
+      }
+      
+      // if vertex closer to track start point => siblings
+      if ( (vtx_to_t_start <= vtx_to_t_body) || (vtx_to_t_start < 0.1) ){
+	if (_debug) { std::cout << "\ttrk-shr are Siblings! HARDCODED NUMBER" << std::endl; }
+	return RelationType_t::kSibling;
+      }
+      // otherwise assume track is parent
+      if (_debug) { std::cout << "\tTrack is Shower's parent! HARDCODED NUMBER" << std::endl; }
+      return RelationType_t::kParent;
+
+    }
     
     return RelationType_t::kUnrelated;
   }
-
+  
   RelationType_t AlgoFindRelationship::FindRelation(const geoalgo::HalfLine_t& s,
-						    const geoalgo::Trajectory_t& t) const
+						    const geoalgo::Trajectory_t& t,
+						    geoalgo::Point_t& vtx,
+						    double& score) const
   {
-    
+  
+    auto const& rel = FindRelation(t,s,vtx,score);
+
+    if (rel == RelationType_t::kSibling)
+      return rel;
+    // if track is shower's parent flip
+    // order to reflect the fact that
+    // return should show relation of
+    // 1st object to second
+    if (rel == RelationType_t::kParent)
+      return RelationType_t::kChild;
+    if (rel == RelationType_t::kChild)
+      return RelationType_t::kParent;
+
     return RelationType_t::kUnrelated;
   }
   
   
   RelationType_t AlgoFindRelationship::FindRelation(const geoalgo::Trajectory_t& t1,
-						    const geoalgo::Trajectory_t& t2) const
+						    const geoalgo::Trajectory_t& t2,
+						    geoalgo::Point_t& vtx,
+						    double& score) const
   {
-    
+
+    double IP = FindClosestApproach(t1,t2,vtx);
+    if (IP != 0)
+      score = 1./IP;
+    else
+      score = 1e+10;
+
+    if (IP < _maxIP){
+
+      // if vertex closer to body than to start point
+      // of one shower => that shower is parent
+      double vtx_to_t1_start = vtx.Dist(t1.front());
+      double vtx_to_t1_body  = sqrt(_geoAlgo.SqDist(vtx,t1));
+      double vtx_to_t2_start = vtx.Dist(t2.front());
+      double vtx_to_t2_body  = sqrt(_geoAlgo.SqDist(vtx,t2));
+      
+      if (_debug) { 
+	std::cout << "\tTrk1 Start: " << t1.front() << "\tEnd: " << t1.back() << std::endl
+		  << "\tTrk2 Start: " << t2.front() << "\tEnd: " << t2.back() << std::endl
+		  << "\tVtx to Trk1 Start: " << vtx_to_t1_start << "\t Vtx to Trk1 Body: " << vtx_to_t1_body << std::endl
+		  << "\tVtx to Trk2 Start: " << vtx_to_t2_start << "\t Vtx to Trk2 Body: " << vtx_to_t2_body << std::endl;
+      }
+      
+      // if vertex very very close to start points
+      if ( (vtx_to_t1_start <= 0.1) and (vtx_to_t2_start <= 0.1) ){
+	if (_debug) { std::cout << "\ttracks are siblings - HARDCODED NUMBER" << std::endl; }
+	return RelationType_t::kSibling;
+      }
+      // if vertex closer to track start point => siblings
+      if ( (vtx_to_t1_start <= vtx_to_t1_body) and (vtx_to_t2_start <= vtx_to_t2_body) ){
+	if (_debug) { std::cout << "\ttracks are siblings" << std::endl; }
+	return RelationType_t::kSibling;
+      }
+      else if (vtx_to_t1_start < vtx_to_t2_start){
+	if (_debug) { std::cout << "\ttrk1 is child of trk2" << std::endl; }
+	return RelationType_t::kParent; // t1 is parent to t2
+      }
+      if (_debug) { std::cout << "\ttrk2 is child of trk1" << std::endl; }
+      return RelationType_t::kChild;
+    }// if IP passes cut
+      
     return RelationType_t::kUnrelated;
   }
 
 
-  /*
-  ParticleGraph AlgoFindRelationship::FindTrackHierarchy(const std::vector<const ertool::Track> &tracks)
-  {
-
-    //std::cout << "Starting with " << tracks.size() << " tracks" << std::endl;
-
-    // Purpose of this function:
-    // To read in a list of tracks in the event
-    // and sort them into a "hierarchical" order
-    // Example interaction:
-    // nu -> p + n + pi+
-    //               pi+ -> mu+
-
-    // Create a ParticleSet.
-    // Initially each track is an independent particle
-    // as relationships are found sort by "genealogy"
-    ParticleGraph Parts;
-    for (size_t t=0; t < tracks.size(); t++){
-      Track tr = tracks.at(t);
-      //std::cout << "\tTrack " << t << "\tVtx: " << tr[0] << std::endl;
-      Particle thisp = Particle(tr.RecoID(),RecoType_t::kTrack,tr.RecoID());
-      geoalgo::Vector_t dir(tr.at(1) - tr.at(0));
-      double mom = tr._energy - thisp.Mass();
-      if (mom < 0) { mom = 1; }
-      dir.Normalize();
-      thisp.SetParticleInfo(tr._pid,mass(tr._pid),tr.at(0),dir*mom);
-      //trackParts.push_back(thisp);
-    }
-    // create a list that keeps track of whether a particle
-    // is "primary" or not. Primary == does not have a mother track
-    // primary = 1. Not = 0.
-    std::vector<int> trackPrimary(trackParts.size(),1);
-
-    // Map to keep track of siblings
-    std::map<int, std::vector<int> > siblingMap;
-    // format:
-    // [ 0 : 1,2 ]
-    // [ 1 : 0,2 ]
-    // [ 2 : 0,1 ]
-    // [ 3 : 4 ]
-    // [ 4 : 3 ]
-    // 1st element is position of particle
-    // 2nd element is list of position of siblings
-    // Now loop over particles and form hierarchy
-    for (size_t t1=0; t1 < trackParts.size(); t1++){
-      for (size_t t2=t1+1; t2 < trackParts.size(); t2++){
-	Track tr1 = tracks.at(trackParts.at(t1).RecoObjID());
-	Track tr2 = tracks.at(trackParts.at(t2).RecoObjID());
-	// require both tracks to be longer than some distance (1 cm)
-	//if ( (tr1.Length() > 1) || (tr2.Length() > 0.1) )
-	//  continue;
-	// now find the relationship between the two tracks
-	geoalgo::Point_t vtx;
-	//std::cout << "Compare " << t1 << " and " << t2 << std::endl;
-	double IP = FindClosestApproach(tr1,tr2,vtx);
-	// 3 cases:
-	// tracks are uncorrelated (IP > something)
-	// track 1 comes from track 2 (or vice-versa)
-	// track 1 and 2 are "siblings"
-	//std::cout << "\t IP: " << IP << std::endl;
-	if (IP > 1)
-	  continue;
-	// calculate distance from IP to track bodies and start points
-	//std::cout << "\tVtx: " << vtx << std::endl;
-	double vtx_t1S = vtx.Dist(tr1.at(0));
-	double vtx_t2S = vtx.Dist(tr2.at(0));
-	double vtx_t1B = sqrt(_geoAlgo.SqDist(vtx,tr1));
-	double vtx_t2B = sqrt(_geoAlgo.SqDist(vtx,tr2));
-	//std::cout << "\t\tVtx-1 Start: " << vtx_t1S
-	//	    << "\t\tVtx-2 Start: " << vtx_t2S
-	//	    << "\t\tVtx-1 Body : " << vtx_t1B
-	//	    << "\t\tVtx-2 Body : " << vtx_t2B << std::endl;
-	// check if 2 comes form 1
-	if ( (vtx_t1B < 1) && (vtx_t1S > 1) && (vtx_t2S < 1) ){
-	  trackParts.at(t1).AddDaughter(trackParts.at(t2));
-	  trackPrimary.at(t2) = 0;
-	  //std::cout << "Track " << t2 << " daughter of " << t1 << std::endl;
-	}
-	// check if 1 comes form 2
-	if ( (vtx_t2B < 1) && (vtx_t2S > 1) && (vtx_t1S < 1) ){
-	  trackParts.at(t2).AddDaughter(trackParts.at(t1));
-	  trackPrimary.at(t1) = 0;
-	  //std::cout << "Track " << t1 << " daughter of " << t2 << std::endl;
-	}
-	// check if siblings
-	if ( (vtx_t1S < 1) && (vtx_t2S < 1) ){
-	  // now what???
-	  //std::cout << "Tracks " << t1 << "and " << t2 << " are siblings" << std::endl;
-	  siblingMap[t1].push_back(t2);
-	  siblingMap[t2].push_back(t1);
-	}
-      }
-    }
-
-    int primary = 0;
-    for (size_t n=0; n < trackPrimary.size(); n++){
-      if (trackPrimary[n] == 1)
-	primary += 1;
-    }
-    //std::cout << "Primaries left: " << primary << std::endl;
-
-    // Create a ParticleSet where to store output
-    ParticleGraph thisset;
-    // At the end, go through primary tracks
-    // for those that have siblings, create a single unknown ancestor
-    for (size_t t = 0; t < trackParts.size(); t++){
-      if (trackPrimary.at(t) == 1){
-	// it is primary!
-	// create unknown particle and add this track & siblings
-	Particle unknown(999,RecoType_t::kInvisible,0);
-	// temporary holder for the vertex
-	geoalgo::Point_t thisvtx = trackParts[t].Vertex();
-	// how many particles at this vertex?
-	int numP = 1;
-	unknown.AddDaughter(trackParts[t]);
-	//std::cout << "Found primary " << t;
-	if ( siblingMap.find(t) != siblingMap.end() ){
-	  //std::cout << "\tWith siblings: ";
-	  // has siblings. Add them to unknown as daughters
-	  for (auto &s : siblingMap.find(t)->second){
-	    //std::cout <<  s << "\t";
-	    unknown.AddDaughter(trackParts[s]);
-	    thisvtx += trackParts[s].Vertex();
-	    numP += 1;
-	    // erase this particle's "primary" status to avoid double counting
-	    trackPrimary.at(s) = 0;
-	  }
-	}// if has siblings
-	//std::cout << std::endl;
-	// get Vtx by averaging over vertices of all particles that are siblings
-	thisvtx /= numP;
-	unknown.Vertex(thisvtx);
-	thisset.push_back(unknown);
-      }// if track is primary
-    }// for all tracks
-
-    return thisset;
-  }
-
-
-  ParticleGraph AlgoFindRelationship::FindHierarchy(const std::vector<const ertool::Track>  &tracks,
-						  const std::vector<const ertool::Shower> &showers)
-  {
-    
-    // First, find the hierarchy of all tracks
-    ParticleGraph trackHierarchy = FindTrackHierarchy(tracks);
-
-    // Compare showers with tracks. First with vertices of each primary
-    // group of tracks, then with all the tracks themselves
-    for (size_t s=0; s < showers.size(); s++){
-      Shower shr = *(showers.at(s));
-      Particle unknownShower(0,0);
-      // boolean to know if this shower was added as daughter somewhere
-      bool daughter = false;
-      
-      // loop over trackHierarchy vector
-      for (size_t i=0; i < trackHierarchy.size(); i++){
-	
-	// if the shower start point is close to the vertex
-	if (trackHierarchy.at(i).Vertex().Dist(shr.Start()) < 1.){
-
-	  trackHierarchy.at(i).AddDaughter(unknownShower);
-	  daughter = true;
-	}
-
-	// assigned to a vertex? good! we are done with this shower!
-	if (daughter)
-	  continue;
-
-	// otherwise, compare track-by-track (including daughters of tracks)
-	//CompareShrWithPartBranch(shr, tracks, trackHierarchy.at(i) );
-	
-      }// for all "vertices"
-
-      // if shower was not assigned somewhere -> Add as independent
-      if (!daughter)
-	trackHierarchy.push_back(unknownShower);
-      
-    }// for all showers
-		
-    return trackHierarchy;
-  }
-  */
   double AlgoFindRelationship::GetPDG(const Track &trk)
   {
 
