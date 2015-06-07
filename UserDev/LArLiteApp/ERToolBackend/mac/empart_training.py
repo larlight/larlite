@@ -33,30 +33,30 @@ def main():
     my_algo = ertool.AlgoEMPart()
     # ******* Set Fit ranges **********
     # Fit ranges for Reconstructed Info
-    #my_algo.SetFitRange_dEdx(1.2,2,False); # False = e- / True = gamma
-    #my_algo.SetFitRange_dEdx(3.0,4.5,True);
-    #my_algo.SetFitRange_RadLen(5.,25.,True);
-    #my_algo.SetFitRange_RadLen(0.,10.,False);
-    # Fit ranges for MC Info:
-    my_algo.SetFitRange_dEdx(0.5,6,False); # False = e- / True = gamma
-    my_algo.SetFitRange_dEdx(0.5,6,True);
+    my_algo.SetFitRange_dEdx(1.7,2.3,False); # False = e- / True = gamma
+    my_algo.SetFitRange_dEdx(3.5,6,True);
     my_algo.SetFitRange_RadLen(5.,25.,True);
-    my_algo.SetFitRange_RadLen(0.,5.,False);
+    my_algo.SetFitRange_RadLen(0.,10.,False);
+    # Fit ranges for MC Info:
+    #my_algo.SetFitRange_dEdx(0.5,6,False); # False = e- / True = gamma
+    #my_algo.SetFitRange_dEdx(0.5,6,True);
+    #my_algo.SetFitRange_RadLen(5.,25.,True);
+    #my_algo.SetFitRange_RadLen(0.,5.,False);
     # ******* End Set Fit Ranges *******
-    my_algo.setVerbose(True)
+    my_algo.setVerbose(False)
+    my_algo.setPlot(True)
     # Create analysis unit
     my_ana = fmwk.ExampleERSelection()
     my_ana.SetMinEDep(10)
+    my_ana.SetCheater(True)
 
     # Set Producers
     # First Argument: True = MC, False = Reco
-    my_ana.SetShowerProducer(True,"mcreco");
-    #my_ana.SetTrackProducer(True,"mcreco");
-    my_ana.SetVtxProducer(True,"generator");
+    #my_ana.SetShowerProducer(True,"mcreco");
+    my_ana.SetTrackProducer(True,"mcreco");
     #my_ana.SetShowerProducer(False,"pandoraNuShower");
-    #my_ana.SetShowerProducer(False,"showerreco");
-    my_ana.SetTrackProducer(False,"");
-    #my_ana.SetVtxProducer(False,"");
+    my_ana.SetShowerProducer(False,"showerreco");
+    #my_ana.SetTrackProducer(False,"");
 
     my_ana._mgr.SetAlgo(my_algo)
     my_ana._mgr._training_mode =True
@@ -118,7 +118,7 @@ def main():
         my_ana._mgr.Reset()
         my_proc.set_ana_output_file("electron_training.root")
         print '    Start running electron training...'
-        my_proc.run()
+        my_proc.run(10)
         print
         print '    Finished running electron training...'
         print
