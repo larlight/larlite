@@ -11,15 +11,16 @@
 /** \addtogroup FhiclLite
 
     @{*/
-#ifndef BASICTOOL_PSET_H
-#define BASICTOOL_PSET_H
+#ifndef BASICTOOL_FHICLLITE_PSET_H
+#define BASICTOOL_FHICLLITE_PSET_H
 
 #include <iostream>
 #include <string>
 #include <map>
 #include <TString.h>
 #include "FhiclLiteException.h"
-namespace fcl {
+#include "UtilFunc.h"
+namespace fclite {
   /**
      \class PSet
      User defined class PSet ... these comments are used to generate
@@ -30,51 +31,86 @@ namespace fcl {
   public:
     
     /// Default constructor
-    PSet(const std::string name="noname") : fName(name)
-    {}
+    PSet(const std::string name="",
+	 const std::string data="");
 
     /// Default destructor
     virtual ~PSet(){};
 
     /// Copy ctor
-    PSet(const PSet& orig) : fName     ( orig.fName     ),
-			     fParams_m ( orig.fParams_m ),
-			     fPSets_m  ( orig.fPSets_m  )
+    PSet(const PSet& orig) : _name       ( orig._name       )
+			   , _data_value ( orig._data_value )
+			   , _data_pset  ( orig._data_pset  )
     {}
 
     /// clear method
     void clear() 
-    { fParams_m.clear(); fPSets_m.clear(); }
+    { _data_value.clear(); _data_pset.clear(); }
+
+    /// Set data contents
+    void add(const std::string& data);
 
     /// Insert method for a simple param
-    void set(const std::string key,
-	     const std::string value);
-
-    /// Insert method for a parameter set
-    void set(const std::string key,
-	     const PSet ps);
-
-    /// Get value 
-    const std::string& get_param(std::string key) const;
-
-    /// Get PSet
-    const PSet& get_pset(std::string key) const;
-
-    /// Get writeable PSet reference
-    PSet& get_pset_writeable(std::string key);
-
+    void add_value(std::string key,
+		   std::string value);
+    
     /// Dump into a text format
-    std::string dump(int x) const;
+    std::string dump(size_t indent_size=0) const;
+
+    /// Template getter
+    template <class T>
+    T get(const std::string& key) const{
+      auto iter = _data_value.find(key);
+      if( iter == _data_value.end() ) {
+	std::string msg;
+	msg = "Key does not exist: \"" + key + "\"";
+	throw FhiclLiteException(msg);
+      }
+      return FromString<T>((*iter).second);
+    }
+
+    const PSet& get_pset(const std::string& key) const;
+
+    const std::vector<std::string> value_keys () const;
+    const std::vector<std::string> pset_keys  () const;
+    bool  contains_value (const std::string& key) const;
+    bool  contains_pset  (const std::string& key) const;
 
   protected:
 
-    std::string fName;
+    enum KeyChar_t {
+      kParamDef,
+      kBlockStart,
+      kBlockEnd,
+      kNone
+    };
 
-    std::map<std::string,std::string> fParams_m;
+    /// Insert method for a PSet rep
+    void add_pset(std::string key,
+		  std::string pset);
 
-    std::map<std::string,PSet> fPSets_m;
+    std::pair<PSet::KeyChar_t,size_t> search(const std::string& txt, const size_t start) const;
+    void strip(std::string& str, const std::string& key);
+    void rstrip(std::string& str, const std::string& key);
+    void no_space(std::string& txt);
+
+    std::string _name;
+
+    std::map<std::string,std::string> _data_value;
+    std::map<std::string,::fclite::PSet> _data_pset;
 
   };
+
+  template std::string PSet::get(const std::string& key) const;
+  template float       PSet::get(const std::string& key) const;
+  template double      PSet::get(const std::string& key) const;
+  template short       PSet::get(const std::string& key) const;
+  template int         PSet::get(const std::string& key) const;
+  template long        PSet::get(const std::string& key) const;
+  template unsigned short PSet::get(const std::string& key) const;
+  template unsigned int   PSet::get(const std::string& key) const;
+  template unsigned long  PSet::get(const std::string& key) const;
+
 }
 
 #endif
