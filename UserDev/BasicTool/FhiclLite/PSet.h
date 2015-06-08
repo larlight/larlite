@@ -101,6 +101,7 @@ namespace fclite {
 
   };
 
+  /*
   template std::string PSet::get(const std::string& key) const;
   template float       PSet::get(const std::string& key) const;
   template double      PSet::get(const std::string& key) const;
@@ -110,6 +111,7 @@ namespace fclite {
   template unsigned short PSet::get(const std::string& key) const;
   template unsigned int   PSet::get(const std::string& key) const;
   template unsigned long  PSet::get(const std::string& key) const;
+  */
 
 }
 

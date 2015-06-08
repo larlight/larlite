@@ -13,7 +13,7 @@
 #pragma link C++ class fclite::FhiclLiteException+;
 #pragma link C++ class fclite::PSet+;
 #pragma link C++ class fclite::ConfigManager+;
-//#pragma link C++ function fclite::PSet::get< string > (const string&)+;
+#pragma link C++ function fclite::PSet::get< string > (const string&)+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
