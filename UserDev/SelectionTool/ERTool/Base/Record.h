@@ -58,6 +58,9 @@ namespace ertool {
     
     /// Default destructor
     virtual ~Record(){}
+
+    /// Name
+    const std::string& Name() { return _name; }
     
     /// Parameter (Record) getter
     const ::ertool::Params& Params() { return _params; }

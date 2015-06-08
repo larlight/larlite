@@ -19,6 +19,7 @@
 #include "AnaBase.h"
 #include "EventData.h"
 #include "ParticleGraph.h"
+#include "FhiclLite/ConfigManager.h"
 #include <TStopwatch.h>
 namespace ertool {
 
@@ -71,6 +72,9 @@ namespace ertool {
     
     /// Default destructor
     virtual ~Manager(){};
+
+    /// FhiclLite config file adder
+    void AddCfgFile(const std::string cfg_fname);
 
     /// Algo setter
     void SetAlgo(AlgoBase* a);
@@ -147,6 +151,8 @@ namespace ertool {
     AlgoBase* _algo;
 
     AnaBase* _ana;
+
+    ::fclite::ConfigManager _cfg_mgr;
 
   };
 }

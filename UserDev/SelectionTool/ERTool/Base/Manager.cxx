@@ -22,6 +22,11 @@ namespace ertool {
     _time_algo_init     = _time_algo_finalize   = 0;
     _time_ana_init      = _time_ana_finalize    = 0;
   }
+
+  void Manager::AddCfgFile(const std::string cfg_fname)
+  {
+    _cfg_mgr.AddCfgFile(cfg_fname);
+  }
   
   const ertool::EventData&     Manager::EventData     () const { return _data;    }
   const ertool::EventData&     Manager::MCEventData   () const { return _mc_data; }
