@@ -5,7 +5,7 @@
 
 namespace geotree{
 
-  AlgoGenericConflictBase::AlgoGenericConflictBase(NodeCollection *coll)
+  AlgoGenericConflictBase::AlgoGenericConflictBase(NodeCollection* coll)
   {
     _coll = coll;
     _name = "GenericConflictBase";

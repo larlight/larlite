@@ -5,7 +5,7 @@
 
 namespace geotree{
 
-  AlgoMultipleParentsHighScore::AlgoMultipleParentsHighScore(NodeCollection *coll)
+  AlgoMultipleParentsHighScore::AlgoMultipleParentsHighScore(NodeCollection* coll)
   {
     _coll = coll;
     _name = "MultipleParentsHighScore";

@@ -5,7 +5,7 @@
 
 namespace geotree{
 
-  AlgoGenericConflictRemoveSibling::AlgoGenericConflictRemoveSibling(NodeCollection *coll)
+  AlgoGenericConflictRemoveSibling::AlgoGenericConflictRemoveSibling(NodeCollection* coll)
   {
     _coll = coll;
     _name = "GenericConflictRemoveSibling";

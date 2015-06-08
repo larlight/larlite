@@ -5,7 +5,7 @@
 
 namespace geotree{
 
-  AlgoParentIsSiblingsSiblingBase::AlgoParentIsSiblingsSiblingBase(NodeCollection *coll)
+  AlgoParentIsSiblingsSiblingBase::AlgoParentIsSiblingsSiblingBase(NodeCollection* coll)
   {
     _coll = coll;
     _name = "ParentIsSiblingsSiblingBase";

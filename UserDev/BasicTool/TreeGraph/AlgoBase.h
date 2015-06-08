@@ -42,6 +42,9 @@ namespace geotree{
     /// set verbosity
     void SetVerbose(bool on) { _verbose = on; }
 
+    /// set node collection to be used
+    void SetCollection(NodeCollection* coll) { _coll = coll; }
+
   protected:
 
     // verbosity flag

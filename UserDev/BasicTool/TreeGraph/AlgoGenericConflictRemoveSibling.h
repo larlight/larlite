@@ -21,11 +21,11 @@
 #define ALGOGENERICCONFLICTREMOVESIBLING_H
 
 //#include "AlgoMultipleParentsBase.h"
-#include "AlgoBase.h"
+#include "AlgoGenericConflictBase.h"
 
 namespace geotree{
 
-  class AlgoGenericConflictRemoveSibling : public AlgoBase {
+  class AlgoGenericConflictRemoveSibling : public AlgoGenericConflictBase {
 
   public:
     

@@ -16,6 +16,9 @@ namespace geotree{
     _verbose = false;
     _loose   = false;
 
+    std::cout << "num of nodes: " << _coll.GetNumNodes() << std::endl;
+
+    /*
     // Initialize algorithms used
     if (_algoMultipleParents) { delete _algoMultipleParents; }
     _algoMultipleParents = new AlgoMultipleParentsHighScore(&_coll);
@@ -25,6 +28,10 @@ namespace geotree{
 
     if (_algoGenericConflict) { delete _algoGenericConflict; }
     _algoGenericConflict = new AlgoGenericConflictRemoveSibling(&_coll);
+    */
+
+
+    
 
   }
   
@@ -40,6 +47,8 @@ namespace geotree{
       if (_verbose) { std::cout << "Created Node Num. " << i << "/" << n <<" with ID " << nID << std::endl; }
     }
 
+    LinkCollectionToAlgos();
+
     return;
   }
 
@@ -53,6 +62,21 @@ namespace geotree{
       if (_verbose) { std::cout << "Created Node Num. " << i << "/" << IDs.size() <<" with ID " << IDs[i] << std::endl; }
     }
 
+    LinkCollectionToAlgos();
+
+    return;
+  }
+
+  void Manager::LinkCollectionToAlgos()
+  {
+
+    std::cout << "setting collection to algos" << std::endl;
+    // link algos to the node collections in the manager
+    _algoMultipleParents->SetCollection(&_coll);
+    _algoParentIsSiblingsSibling->SetCollection(&_coll);
+    _algoGenericConflict->SetCollection(&_coll);
+    std::cout << "done doing so" << std::endl;
+    
     return;
   }
   

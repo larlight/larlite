@@ -5,7 +5,7 @@
 
 namespace geotree{
 
-  AlgoGenericConflictFindHighestScore::AlgoGenericConflictFindHighestScore(NodeCollection *coll)
+  AlgoGenericConflictFindHighestScore::AlgoGenericConflictFindHighestScore(NodeCollection* coll)
   {
     _coll = coll;
     _name = "GenericConflictFindHighestScore";

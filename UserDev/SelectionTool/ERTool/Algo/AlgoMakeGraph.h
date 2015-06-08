@@ -23,7 +23,6 @@ namespace ertool {
 
   /**
      \class AlgoMakeGraph
-     User custom SPAFilter class made by davidkaleko
    */
   class AlgoMakeGraph : public AlgoBase {
   
@@ -51,10 +50,13 @@ namespace ertool {
     virtual bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
     /// Set verbosity
-    void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); _nodeMgr.setVerbose(on); }
+    void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); _nodeMgr->setVerbose(on); }
 
     /// set cut on score (score = 1/IP)
     void setMinScore(double s) { _minScore = s; }
+
+    /// Set Node Manager
+    void setManager(::geotree::Manager* mgr) { _nodeMgr = mgr; }
     
 
   private:
@@ -69,7 +71,7 @@ namespace ertool {
     AlgoFindRelationship _findRel;
 
     // Manager for nodes
-    ::geotree::Manager _nodeMgr;
+    ::geotree::Manager* _nodeMgr;
 
     // minimum score for two object to be called correlated
     double _minScore;    

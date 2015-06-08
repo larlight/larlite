@@ -17,9 +17,9 @@
 #include "GeoAlgo/GeoAlgo.h"         //-> for bounding sphere
 #include "NodeCollection.h"          //-> where nodes are stored
 //#include "AlgoMultipleParentsBase.h" //-> algorithm to resolve conflict due to multiple parents
-#include "AlgoMultipleParentsHighScore.h"
-#include "AlgoParentIsSiblingsSibling.h"
-#include "AlgoGenericConflictRemoveSibling.h"
+#include "AlgoMultipleParentsBase.h"
+#include "AlgoParentIsSiblingsSiblingBase.h"
+#include "AlgoGenericConflictBase.h"
 
 namespace geotree{
 
@@ -91,7 +91,7 @@ namespace geotree{
     void ResolveConflicts();
 
     /// setter for verbosity
-    void setVerbose(bool on) { _verbose = on; _coll.SetVerbose(on); _algoMultipleParents->SetVerbose(on); }
+    void setVerbose(bool on) { }//_verbose = on; }//_coll.SetVerbose(on); }
     
     /// setter for looseness
     void setLoose(bool on) { _loose = on; }
@@ -130,7 +130,17 @@ namespace geotree{
     /// Function to print out full diagram for nodes in manager
     void Diagram() { _coll.Diagram(); }
 
+    /// Conflict resolution algorithm setters
+    void setAlgoMultipleParents(AlgoMultipleParentsBase* algo)
+    { _algoMultipleParents = algo; }
+    void setAlgoGenericConflict(AlgoGenericConflictBase* algo)
+    { _algoGenericConflict = algo; }
+    void setAlgoParentIsSiblingsSibling(AlgoParentIsSiblingsSiblingBase *algo)
+    { _algoParentIsSiblingsSibling = algo; }
+
   private:
+
+    void LinkCollectionToAlgos();
 
     /// verbosity flag
     bool _verbose;
@@ -155,9 +165,9 @@ namespace geotree{
     ::geoalgo::GeoAlgo _geoAlgo;
 
     /// multiple parents algorithm
-    AlgoMultipleParentsHighScore*         _algoMultipleParents;
-    AlgoParentIsSiblingsSibling* _algoParentIsSiblingsSibling;
-    AlgoGenericConflictRemoveSibling*         _algoGenericConflict;
+    AlgoMultipleParentsBase*         _algoMultipleParents;
+    AlgoParentIsSiblingsSiblingBase* _algoParentIsSiblingsSibling;
+    AlgoGenericConflictBase*         _algoGenericConflict;
 
   };
 }

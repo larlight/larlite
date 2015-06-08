@@ -5,7 +5,7 @@
 
 namespace geotree{
 
-  AlgoSibHasDiffParent::AlgoSibHasDiffParent(NodeCollection *coll)
+  AlgoSibHasDiffParent::AlgoSibHasDiffParent(NodeCollection* coll)
   {
     _coll = coll;
     _name = "SibHasDiffParent";
