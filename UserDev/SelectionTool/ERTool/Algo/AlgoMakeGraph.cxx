@@ -1,38 +1,38 @@
-#ifndef ERTOOL_MAKETREE_CXX
-#define ERTOOL_MAKETREE_CXX
+#ifndef ERTOOL_MAKEGRAPH_CXX
+#define ERTOOL_MAKEGRAPH_CXX
 
-#include "AlgoMakeTree.h"
+#include "AlgoMakeGraph.h"
 
 namespace ertool {
 
-  AlgoMakeTree::AlgoMakeTree() : AlgoBase()
+  AlgoMakeGraph::AlgoMakeGraph() : AlgoBase()
   {
-    _name       = "AlgoMakeTree";
+    _name       = "AlgoMakeGraph";
     _minScore   = 1.;
     _verbose    = false;
   }
 
-  void AlgoMakeTree::ProcessEnd(TFile* fout){
+  void AlgoMakeGraph::ProcessEnd(TFile* fout){
  
     return;
   }
 
-  void AlgoMakeTree::Finalize()
+  void AlgoMakeGraph::Finalize()
   {
     return;
   }
 
-  void AlgoMakeTree::ProcessBegin()
+  void AlgoMakeGraph::ProcessBegin()
   {
     return;
   }
 
-  void AlgoMakeTree::LoadParams(std::string fname, size_t version){
+  void AlgoMakeGraph::LoadParams(std::string fname, size_t version){
     
     return;
   }
 
-  bool AlgoMakeTree::Reconstruct(const EventData &data, ParticleGraph& graph)
+  bool AlgoMakeGraph::Reconstruct(const EventData &data, ParticleGraph& graph)
   { 
 
     auto datacpy = data;
@@ -184,7 +184,7 @@ namespace ertool {
     return true;
   }
 
-  ::geotree::RelationType_t AlgoMakeTree::GetGeoTreeRelation(RelationType_t rel){
+  ::geotree::RelationType_t AlgoMakeGraph::GetGeoTreeRelation(RelationType_t rel){
     
     if (rel == kSibling)
       return ::geotree::RelationType_t::kSibling;

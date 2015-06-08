@@ -1,9 +1,9 @@
 /**
- * \file AlgoMakeTree.h
+ * \file AlgoMakeGraph.h
  *
  * \ingroup ERTool
  * 
- * \brief Class def header for a class AlgoMakeTree
+ * \brief Class def header for a class AlgoMakeGraph
  *
  * @author davidc1
  */
@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef ERTOOL_ALGOMAKETREE_H
-#define ERTOOL_ALGOMAKETREE_H
+#ifndef ERTOOL_ALGOMAKEGRAPH_H
+#define ERTOOL_ALGOMAKEGRAPH_H
 
 #include "ERTool/Algo/AlgoFindRelationship.h"
 #include "TreeGraph/Manager.h"
@@ -22,18 +22,18 @@
 namespace ertool {
 
   /**
-     \class AlgoMakeTree
+     \class AlgoMakeGraph
      User custom SPAFilter class made by davidkaleko
    */
-  class AlgoMakeTree : public AlgoBase {
+  class AlgoMakeGraph : public AlgoBase {
   
   public:
 
     /// Default constructor
-    AlgoMakeTree();
+    AlgoMakeGraph();
 
     /// Default destructor
-    virtual ~AlgoMakeTree(){};
+    virtual ~AlgoMakeGraph(){};
 
     /// Reset function
     virtual void Finalize();
