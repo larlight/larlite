@@ -25,8 +25,16 @@ my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 # Specify output root file name
 my_proc.set_ana_output_file("treeMaker.root")
 
-my_algo = ertool.AlgoMakeTree()
+# prepare GraphMaker manager
+mgr = geotree.Manager()
+# add conflict-resolving algos
+mgr.setAlgoMultipleParents(geotree.AlgoMultipleParentsHighScore())
+mgr.setAlgoGenericConflict(geotree.AlgoGenericConflictRemoveSibling())
+mgr.setAlgoParentIsSiblingsSibling(geotree.AlgoParentIsSiblingsSibling())
+
+my_algo = ertool.AlgoMakeGraph()
 my_algo.setVerbose(True)
+my_algo.setManager(mgr)
 my_anaunit = fmwk.ExampleERSelection()
 #### SET PRODUCERS HERE ####
 # MC PRODUCERS

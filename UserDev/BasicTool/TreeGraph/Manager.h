@@ -91,7 +91,7 @@ namespace geotree{
     void ResolveConflicts();
 
     /// setter for verbosity
-    void setVerbose(bool on) { }//_verbose = on; }//_coll.SetVerbose(on); }
+    void setVerbose(bool on) { _verbose = on; _coll.SetVerbose(on); }
     
     /// setter for looseness
     void setLoose(bool on) { _loose = on; }

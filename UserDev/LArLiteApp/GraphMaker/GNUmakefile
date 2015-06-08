@@ -3,8 +3,8 @@
 #
 
 # specific names for this package
-DICT  = LArLiteAPp_TreeMakerDict
-SHLIB = libLArLiteApp_TreeMaker.so
+DICT  = LArLiteAPp_GraphMakerDict
+SHLIB = libLArLiteApp_GraphMaker.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
 HEADERS = $(filter-out $(FMWK_HEADERS), $(wildcard *.h))

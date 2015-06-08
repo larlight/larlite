@@ -1,19 +1,19 @@
 /**
- * \file ERAnaTreeMaker.h
+ * \file ERAnaGraphMaker.h
  *
- * \ingroup TreeMaker
+ * \ingroup GraphMaker
  * 
- * \brief Class def header for a class ERAnaTreeMaker
+ * \brief Class def header for a class ERAnaGraphMaker
  *
  * @author david
  */
 
-/** \addtogroup TreeMaker
+/** \addtogroup GraphMaker
 
     @{*/
 
-#ifndef ERTOOL_ERANATREEMAKER_H
-#define ERTOOL_ERANATREEMAKER_H
+#ifndef ERTOOL_ERANAGRAPHMAKER_H
+#define ERTOOL_ERANAGRAPHMAKER_H
 
 #include "ERTool/Base/AnaBase.h"
 #include "TTree.h"
@@ -22,18 +22,18 @@
 namespace ertool {
 
   /**
-     \class ERAnaTreeMaker
+     \class ERAnaGraphMaker
      User custom Analysis class made by kazuhiro
    */
-  class ERAnaTreeMaker : public AnaBase {
+  class ERAnaGraphMaker : public AnaBase {
   
   public:
 
     /// Default constructor
-    ERAnaTreeMaker();
+    ERAnaGraphMaker();
 
     /// Default destructor
-    virtual ~ERAnaTreeMaker(){};
+    virtual ~ERAnaGraphMaker(){};
 
     /// Reset function
     virtual void Reset();
