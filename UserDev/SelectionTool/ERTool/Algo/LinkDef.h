@@ -16,7 +16,7 @@
 #pragma link C++ class ertool::AlgoFindRelationship+;
 #pragma link C++ class ertool::AlgoSingleGamma+;
 #pragma link C++ class ertool::AlgoPrimaryFinder+;
-#pragma link C++ class ertool::AlgoMakeTree+;
+#pragma link C++ class ertool::AlgoMakeGraph+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
