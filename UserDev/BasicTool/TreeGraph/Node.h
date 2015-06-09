@@ -17,6 +17,8 @@
 #include "Correlation.h"
 #include <map>
 #include <string>
+#include <limits>
+#include <climits>
 
 typedef size_t NodeID_t;
 
@@ -46,15 +48,15 @@ namespace geotree{
   private:
 
     // Constructors are private -> only accessed by Manager friend class
-    /// Default constructor
-    Node(){}
-
-    //Node(const Node& orig) : Node() {std::cout<<"copy ctor"<<std::endl;}
-
     /// Constructor
     Node(size_t n) { _node_id = n; _verbose = false; }
+
+    //Node(const Node& orig) : Node() {std::cout<<"copy ctor"<<std::endl;}
     
   public:
+
+    /// Default constructor required by CINT (make it practically invalid)
+    Node() { _node_id = std::numeric_limits<size_t>::max(); }
 
     /// Default destructor
     virtual ~Node(){}
