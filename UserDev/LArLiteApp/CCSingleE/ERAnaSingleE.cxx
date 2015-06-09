@@ -111,7 +111,7 @@ namespace ertool {
     std::cout << "ParticleGraph Diagram: " << std::endl
 	      << graph.Diagram() << std::endl;
   }
-
+  /*
     // Get MC particle set
     auto mc_graph = MCParticleGraph();
 
@@ -143,7 +143,7 @@ namespace ertool {
       if (t._energy > _eCut) { _n_tracks += 1; }
     }
     if (_debug) { std::cout << "Total Energy deposited in detector: " << _EDep << std::endl; }
-
+  */
     /*
     // If debug -> print out MC particle set
     if (_debug){
@@ -237,14 +237,14 @@ namespace ertool {
       }
     }
     */
-    
+  /*    
     // Count number of tracks and showers with E > _eCut MeV
     _n_showersReco = 0;
     _n_tracksReco  = 0;
     for (auto &s : data.Shower())
       if (s._energy > _eCut) { _n_showersReco += 1; }
     _n_tracksReco = data.Track().size();
-
+  */
 
     // size of ParticleSet should be the number of neutrinos found, each associated with a single electron
     _n_singleReco = graph.GetNumPrimaries();
