@@ -300,7 +300,7 @@ namespace ertool {
 	  auto const& gamma2mom = shr2.Dir()*shr2._energy;
 	  graph.GetParticle(shrID2).SetParticleInfo(22,0,gamma2vtx,gamma2mom);
 	  // create pi0
-	  Particle pi0 = graph.CreateParticle();
+	  Particle& pi0 = graph.CreateParticle();
 	  // Approximate vtx using lifetime
 	  auto dir = momentum.Dir();
 	  dir *= sqrt( 1 - pow( mass / (mass + momentum.Length()), 2)) * 2.998e10 * _tau;
