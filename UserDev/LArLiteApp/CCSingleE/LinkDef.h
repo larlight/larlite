@@ -10,6 +10,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class ertool::ERAnaSingleE+;
+#pragma link C++ class ertool::ERAnaSingleEKaleko+;
 #pragma link C++ class ertool::ERAnaToy+;
 #pragma link C++ class larlite::MC_CC1E_Filter+;
 #pragma link C++ class larlite::MC_CCQE_Filter+;
