@@ -57,9 +57,6 @@ namespace larlite {
     // First, create a PDG -> MASS map
     //auto& PdgMass = getMassMap(mcs_v,mct_v);
 
-    //FillTracks  (mct_v, mgr);
-    //FillShowers (mcs_v, mgr);
-
     std::map<unsigned int, ::ertool::Particle> g4_mother_parts;
     std::map<unsigned int, PartID_t> g4_mother_id;
     size_t reco_obj_index = 0;
@@ -72,6 +69,25 @@ namespace larlite {
 
       reco_obj_index++;
 
+      // create shower/particle object
+      // first add Shower object to event data
+      ::ertool::Shower s( mcs.DetProfile().Position(),
+			  mcs.DetProfile().Momentum(),
+			  _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
+			  _shrProfiler.ShowerRadius() );
+      s._energy     = mcs.DetProfile().Momentum().E();
+      s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
+      s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
+      auto nodeID = mgr.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),true);
+      std::cout << "Shower E: " << s._energy << std::endl;
+      int pdg = mcs.PdgCode();
+      // then edit the particle
+      mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
+								pdgdbs.GetParticle(pdg)->Mass()*1.e-3,
+								mcs.Start().Position(),
+								mcs.Start().Momentum()); 
+      std::cout << "Associated particle energy: " << mgr.MCParticleGraph().GetParticle(nodeID).Energy() << std::endl;
+      
       // if not primary
       if( mcs.MotherTrackID() != mcs.AncestorTrackID() ) continue;
       
@@ -83,30 +99,12 @@ namespace larlite {
 	mother.SetParticleInfo(pdg_mom,pdgdbs.GetParticle(pdg_mom)->Mass()*1.e3,//PdgMass[pdg_mom],
 			       mcs.MotherStart().Position(),
 			       mcs.MotherStart().Momentum());
-
+	
 	g4_mother_parts.insert(std::make_pair(trkid_mom,mother));
 	g4_mother_id[trkid_mom] = PartID_t(mother.Vertex(), mother.Momentum(), mother.PdgCode());
       }
       if(mcs.TrackID() != mcs.MotherTrackID()) {      
-	// first add Shower object to event data
-	::ertool::Shower s( mcs.DetProfile().Position(),
-			    mcs.DetProfile().Momentum(),
-			    _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
-			    _shrProfiler.ShowerRadius() );
-	s._energy     = mcs.DetProfile().Momentum().E();
-	s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
-	s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
-	auto nodeID = mgr.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),true);
-	std::cout << "Shower E: " << s._energy << std::endl;
-	int pdg = mcs.PdgCode();
-	mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
-								  pdgdbs.GetParticle(pdg)->Mass()*1.e-3,
-								  mcs.Start().Position(),
-								  mcs.Start().Momentum()); 
-	std::cout << "Associated particle energy: " << mgr.MCParticleGraph().GetParticle(nodeID).Energy() << std::endl;
-	//\ TO DO
-	//p.RecoObjInfo(reco_obj_index-1, ::ertool::Particle::kShower);
-	// Add parentage information
+	
 	auto const& motherNodeID = g4_mother_parts[trkid_mom].ID();
 	auto const& childNodeID  = mgr.MCParticleGraph().GetParticle(nodeID).ID();
 	mgr.MCParticleGraph().SetParentage(motherNodeID,
@@ -122,11 +120,38 @@ namespace larlite {
 
        if(mct.size()<2) continue;
        reco_obj_index++;
-
+       
+       ::ertool::Track t;
+       t.reserve(mct.size());
+       for(auto const& step : mct)
+	 t += step.Position();
+       //This is the TOTAL energy minus TOTAL energy, so mass is removed.
+       //If you want only initial kinetic energy, remember to subtract off mass.
+       t._energy     = (*mct.begin()).Momentum().E() - (*mct.rbegin()).Momentum().E();
+       t._cosmogenic = (double)(mct.Origin() == simb::kCosmicRay);
+       if(abs(mct.PdgCode()) == 13 ) t._pid = ::ertool::Track::kMuon;
+       if(mct.PdgCode() == 2212    ) t._pid = ::ertool::Track::kProton;
+       if(abs(mct.PdgCode()) == 321) t._pid = ::ertool::Track::kKaon;
+       if(abs(mct.PdgCode()) == 211) t._pid = ::ertool::Track::kPion;
+       for(auto& v : t._pid_score) v = 100;
+       if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
+       
+       auto nodeID = mgr.Add(t,ertool::RecoInputID_t(i,mct_v.name()),true);
+       int pdg = mct.PdgCode();
+       mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
+								 pdg,
+								 mct.at(0).Position(),
+								 ::geoalgo::Vector(mct.at(0).Momentum()));
+       std::cout << "track energy: " << t._energy << std::endl;
+       std::cout << "track PDG : " << pdg << std::endl;
+       std::cout << "track number of steps: " << t.size() << std::endl;
+       std::cout << "associated particle energy: " << mgr.MCParticleGraph().GetParticle(nodeID).Energy() << std::endl;
+       
+       // if not primary
        if( mct.MotherTrackID() != mct.AncestorTrackID() ) continue;
-
+       
        unsigned int trkid_mom = mct.AncestorTrackID();
-
+       
        if(g4_mother_parts.find(trkid_mom) == g4_mother_parts.end()) {
 	 int pdg_mom = mct.AncestorPdgCode();
 	 auto& mother = mgr.MCParticleGraph().CreateParticle();
@@ -138,48 +163,23 @@ namespace larlite {
        }
        if(mct.TrackID() != mct.MotherTrackID()) {
 	 
-	 ::ertool::Track t;
-	 t.reserve(mct.size());
-	 for(auto const& step : mct)
-	   t += step.Position();
-	 //This is the TOTAL energy minus TOTAL energy, so mass is removed.
-	 //If you want only initial kinetic energy, remember to subtract off mass.
-	 t._energy     = (*mct.begin()).Momentum().E() - (*mct.rbegin()).Momentum().E();
-	 t._cosmogenic = (double)(mct.Origin() == simb::kCosmicRay);
-	 if(abs(mct.PdgCode()) == 13 ) t._pid = ::ertool::Track::kMuon;
-	 if(mct.PdgCode() == 2212    ) t._pid = ::ertool::Track::kProton;
-	 if(abs(mct.PdgCode()) == 321) t._pid = ::ertool::Track::kKaon;
-	 if(abs(mct.PdgCode()) == 211) t._pid = ::ertool::Track::kPion;
-	 for(auto& v : t._pid_score) v = 100;
-	 if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
-	 
-	 auto nodeID = mgr.Add(t,ertool::RecoInputID_t(i,mct_v.name()),true);
-	 int pdg = mct.PdgCode();
-	 mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
-								   pdg,
-								   mct.at(0).Position(),
-								   ::geoalgo::Vector(mct.at(0).Momentum()));
-	 std::cout << "track energy: " << t._energy << std::endl;
-	 std::cout << "track PDG : " << pdg << std::endl;
-	 std::cout << "track number of steps: " << t.size() << std::endl;
-	 std::cout << "associated particle energy: " << mgr.MCParticleGraph().GetParticle(nodeID).Energy() << std::endl;
 	 auto const& motherNodeID = g4_mother_parts[trkid_mom].ID();
 	 auto const& childNodeID  = mgr.MCParticleGraph().GetParticle(nodeID).ID();
 	 mgr.MCParticleGraph().SetParentage(motherNodeID,
 					    childNodeID);
        }
      }
-
+     
      //
      // Revise mother particle information w/ MCShower/MCTrack
      //
      reco_obj_index = 0;
      for(size_t i=0; i<mcs_v.size(); ++i) {
-
+       
        auto const& mcs = mcs_v[i];
        if(mcs.DetProfile().E()<_minEDep) continue;
        reco_obj_index++;
-
+       
        unsigned int trkid = mcs.TrackID();
        if(g4_mother_parts.find(trkid) != g4_mother_parts.end()) {
 	 // revise particle information
@@ -193,11 +193,11 @@ namespace larlite {
      }
      reco_obj_index = 0;
      for(size_t i=0; i<mct_v.size(); ++i) {
-
+       
        auto const& mct = mct_v[i];
        if(mct.size()<2) continue;
        reco_obj_index++;
-
+       
        unsigned int trkid = mct.TrackID();
        if(g4_mother_parts.find(trkid) != g4_mother_parts.end()) {
 	 // revise particle information
@@ -209,10 +209,9 @@ namespace larlite {
 							       ::geoalgo::Vector(mct.front().Momentum()) );
        }
      }
-
      std::set<unsigned int> g4_mother_used;
      for(auto const& mci : mci_v) {
-
+       
        // Make status 1 => parent mapping: key = track ID and value = index
        std::map<unsigned int, unsigned int> trkid_to_grand_mother;
        // Make grand mother => particle set mapping: key = grand_mother index, value = particle set index #
