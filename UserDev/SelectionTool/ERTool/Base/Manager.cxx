@@ -84,7 +84,6 @@ namespace ertool {
       return _mc_graph.CreateParticle(_mc_data.Shower().back()).ID();
     }
 
-    std::cout << "particles (ADD): " << _graph.GetNumParticles() << std::endl;
   }
 
   NodeID_t Manager::Add(const ::ertool::Track& obj,

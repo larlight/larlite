@@ -340,8 +340,8 @@ namespace larlite {
       if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
 
       auto nodeID = mgr.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
-      mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
-							      0,
+      mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(::ertool::kINVALID_INT,
+							      ::ertool::kINVALID_INT,
 							      mct.at(0).Position(),
 							      ::geoalgo::Vector(mct.at(0).Momentum()));
 
@@ -458,8 +458,8 @@ namespace larlite {
       s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
       s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
       auto nodeID = mgr.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
-      mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
-							      (mcs.PdgCode() == 22 ? 0 : 0.510998928),
+      mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(::ertool::kINVALID_INT,
+							      ::ertool::kINVALID_INT,
 							      mcs.Start().Position(),
 							      ::geoalgo::Vector(mcs.Start().Momentum()));
     }
