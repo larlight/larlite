@@ -55,7 +55,7 @@ namespace geotree{
     void MakeTree();
 
     /// Function to find node in _head_node_v. Return true if found
-    bool NodeAdded(NodeID_t n);
+    //bool NodeAdded(NodeID_t n);
 
     /// CompareNodes: act on result of correlation check
     /// NOTE: RelationType is the relatioship of id2 w.r.t. id1
