@@ -57,6 +57,7 @@ def main():
     #my_ana.SetShowerProducer(False,"showerreco");
     #my_ana.SetTrackProducer(False,"");
 
+    #my_ana._mgr.SetAlgo(my_algo)
     my_ana._mgr.AddAlgo(my_algo)
     my_ana._mgr._training_mode =True
 
