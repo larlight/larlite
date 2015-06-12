@@ -7,7 +7,6 @@ namespace ertool {
 
   AlgoEMPart::AlgoEMPart(const std::string& name) 
     : AlgoBase(name)
-    , _params(name)
     , _e_radLenData(nullptr)
     , _e_dEdxData(nullptr)
     , _g_radLenData(nullptr)
@@ -375,7 +374,8 @@ namespace ertool {
       }
 
       // Save parameters
-	std::vector<double> darray;      
+      std::vector<double> darray;
+      auto& params = OutputPSet();
       if (!_mode){
 	RooRealVar *tau, *mean, *sigma;
 	std::cout << "["<<__FUNCTION__<<"] " << Form("Extracted %s_params... ",part_letter.c_str()) << std::endl;
@@ -395,10 +395,7 @@ namespace ertool {
 	darray[5] = sigma->getVal();
 	std::cout << "["<<__FUNCTION__<<"] "
 		  << "dEdx: Mean: " << mean->getVal() << " Sigma: " << sigma->getVal() << std::endl;
-	std::cout<<darray.size()<<" ahoaho"<<std::endl;
-	std::cout<< ::fcllite::VecToString(darray).c_str() << std::endl;
-	_params.add_value(Form("%s_params",part_letter.c_str()),::fcllite::VecToString<double>(darray));
-	std::cout<<"ahoaho"<<std::endl;
+	params.add_value(Form("%s_params",part_letter.c_str()),::fcllite::VecToString<double>(darray));
       }
       if (_mode){
 	RooRealVar *tau, *meanhigh, *sigmahigh, *meanlow, *sigmalow;
@@ -427,7 +424,7 @@ namespace ertool {
 		  << "dEdx: Low Mean: " << meanlow->getVal() 
 		  << " Low Sigma: "     << sigmalow->getVal() 
 		  << " ... Fraction = " << 1. - frac->getVal() << std::endl;
-	_params.add_value(Form("%s_params",part_letter.c_str()),::fcllite::VecToString(darray));
+	params.add_value(Form("%s_params",part_letter.c_str()),::fcllite::VecToString(darray));
       }
       
     }// if in traning mode

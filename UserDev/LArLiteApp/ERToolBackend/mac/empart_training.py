@@ -51,13 +51,13 @@ def main():
 
     # Set Producers
     # First Argument: True = MC, False = Reco
-    #my_ana.SetShowerProducer(True,"mcreco");
+    my_ana.SetShowerProducer(True,"mcreco");
     my_ana.SetTrackProducer(True,"mcreco");
     #my_ana.SetShowerProducer(False,"pandoraNuShower");
-    my_ana.SetShowerProducer(False,"showerreco");
+    #my_ana.SetShowerProducer(False,"showerreco");
     #my_ana.SetTrackProducer(False,"");
 
-    my_ana._mgr.SetAlgo(my_algo)
+    my_ana._mgr.AddAlgo(my_algo)
     my_ana._mgr._training_mode =True
 
     # Check if gamma/electron files are provided:
@@ -129,7 +129,7 @@ def main():
     # Store trained parameters
     #
     if (gamma_trained or electron_trained) and ask_binary('  Store train result parameters? [y/n]:'):
-        my_ana._mgr.StoreParams("kazu.txt")
+        my_ana._mgr.StorePSet("new_empart.txt")
         #my_algo.StoreParams()
         print '  Parameter stored...'
         print

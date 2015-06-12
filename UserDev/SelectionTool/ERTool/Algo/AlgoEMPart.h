@@ -89,8 +89,6 @@ namespace ertool {
 
     PdfFactory _factory; ///< P.D.F. factory class instance
 
-    ::fcllite::PSet _params; ///< Input/Output parameter set
-
     double _e_mass; ///< Electron's mass
     double _g_mass; ///< Gamma's mass
 
