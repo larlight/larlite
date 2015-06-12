@@ -455,7 +455,7 @@ namespace larlite {
 			  _shrProfiler.ShowerRadius() );
       s._energy     = mcs.DetProfile().Momentum().E();
       //s._energy = mcs.Start().Momentum().E();
-      s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
+      s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.05) : gRandom->Gaus(2,2*0.05));
       s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
       auto nodeID = mgr.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
       mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(::ertool::kINVALID_INT,

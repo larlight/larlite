@@ -125,7 +125,7 @@ namespace larlite{
       "track",
       "shower",
       "vertex",
-      "end2d",
+      "endpoint2d",
       "calo",
       "partid",
       "pfpart",

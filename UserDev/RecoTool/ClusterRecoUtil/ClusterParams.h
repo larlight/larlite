@@ -57,6 +57,8 @@ namespace cluster{
     double eigenvalue_principal;       ///< the principal eigenvalue from PCA
     double eigenvalue_secondary;       ///< the secondary eigenvalue from PCA
     double verticalness;               ///< ???
+    std::vector<float> principal_dir;  ///< The direction of the principal eigenvalue
+
 
     double length;
     double width;
@@ -119,7 +121,7 @@ namespace cluster{
       trackness                         = -999.999 ;
     }
 
-    void Report(std::ostream & os = std::cout){
+    void Report(std::ostream & os = std::cout) const {
 
       os << "ClusterParams report: \n"
 	       << "   start_point  ................ : (" << start_point.w <<","<<start_point.t<<")\n"

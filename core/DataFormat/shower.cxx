@@ -39,6 +39,8 @@ namespace larlite {
   const std::vector< double >& shower::MIPEnergyErr() const { return fSigmaTotalMIPEnergy;     }
   int    shower::best_plane()               const { return fBestPlane;               }
   double shower::Length() const { return fLength; }
+  double shower::OpeningAngle() const { return fOpeningAngle; }
+
   const  std::vector< double >& shower::dEdx()    const { return fdEdx;          }
   const  std::vector< double >& shower::dEdxErr() const { return fSigmadEdx;     }
   

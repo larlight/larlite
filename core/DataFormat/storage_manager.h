@@ -238,7 +238,7 @@ namespace larlite {
       if(ev_ass_m.find(ass_producer)==ev_ass_m.end())
 	return std::make_pair((const larlite::event_ass*)nullptr,kINVALID_ASS);	
 
-      auto const& ev_ass = this->get_data< ::larlite::event_ass>(ass_producer);
+      auto const& ev_ass = this->get_data<larlite::event_ass>(ass_producer);
       auto id = ev_ass->find_one_assid(a,b);
       if( id != kINVALID_ASS )
 	return std::make_pair((const larlite::event_ass*)(ev_ass),id);
@@ -254,7 +254,7 @@ namespace larlite {
       if(ev_ass_m.find(ass_producer)==ev_ass_m.end())
 	return std::make_pair((const larlite::event_ass*)nullptr,kINVALID_ASS);	
 
-      auto const& ev_ass = this->get_data< ::larlite::event_ass>(ass_producer);
+      auto const& ev_ass = this->get_data<larlite::event_ass>(ass_producer);
       auto id = ev_ass->find_unique_assid(a,b);
       if( id != kINVALID_ASS )
 	return std::make_pair((const larlite::event_ass*)(ev_ass),id);
@@ -271,7 +271,7 @@ namespace larlite {
       if(ev_ass_m.find(ass_producer)==ev_ass_m.end())
 	return res;
 
-      auto const& ev_ass = this->get_data< ::larlite::event_ass>(ass_producer);
+      auto const& ev_ass = this->get_data<larlite::event_ass>(ass_producer);
       auto id_v = ev_ass->find_all_assid(a,b);
       if( id_v.size() ) {
 	for(auto const& id : id_v) 

@@ -279,6 +279,10 @@ namespace ertool {
     _result_tree->Fill();
     /*
     for(int i = 0; i< ps.size(); i++){
+    if ( _n_singleReco == 0 )
+      _result_tree->Fill();
+    
+    for(size_t i = 0; i< ps.size(); i++){
       Particle neutrino = ps[i];
 
       if(abs(neutrino.PdgCode()) != 12  && abs(neutrino.PdgCode()) != 14)
@@ -394,8 +398,8 @@ namespace ertool {
 	      << "SingleE Events: " << _singleE_ctr << std::endl
 	      << "Eff           : " << _eff << " %" << std::endl;
 
-    MakeEffPlot("e_lep",10,0,2000);
-    MakeEffPlot("e_nu",10,0,2000);
+    MakeEffPlot("e_lep",10,0,3000);
+    MakeEffPlot("e_nu",10,0,3000);
     MakeEffPlot("n_tracks",10,-0.5,9.5);
     MakeEffPlot("n_tracksReco",10,-0.5,9.5);
 
@@ -412,8 +416,8 @@ namespace ertool {
   void ERAnaSingleE::MakeEffPlot(std::string varname,
 				 int nbins, double xmin, double xmax){
 
-    int Nall, Nok;
     // Efficiency vs. variable "varname"
+    int Nall, Nok;
     TH1D *hist = new TH1D(Form("_hEffvs%s",varname.c_str()),Form("Efficiency vs %s",varname.c_str()),nbins,xmin,xmax);
     TH1D *All = new TH1D("All","All",nbins,xmin,xmax); // Histogram of all entries as a function of Elep
     TH1D *Ok = new TH1D("Ok","Ok",nbins,xmin,xmax);  // Histogram of all entries that are not mis-ID vs Elep

@@ -39,6 +39,12 @@ namespace larlite {
     // Initialize the output cluster data product
     if(_output_producer.empty()) _output_producer = Form("merged%s",_input_producer.c_str());
     auto out_cluster_v = storage->get_data<event_cluster>(_output_producer);
+    if(!out_cluster_v){
+      print(msg::kERROR,__FUNCTION__,
+	    Form("Failed initializing the output cluster data product with producer name %s!",_output_producer.c_str()));
+      return false;
+    }
+    // without the above (!out_cluster_v) check, code crashes here
     out_cluster_v->clear();
 
     // set event ID through storage manager
