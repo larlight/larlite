@@ -222,21 +222,23 @@ namespace ertool {
     // Loop over alogirthms, check PSet should be stored or not
     for(size_t i=0; i<_algo_v.size(); ++i) {
       auto const& unit_conf = _algo_v[i]->OutputPSet();
+      out_cfg.add_pset(unit_conf);
       if(!(unit_conf.size())) continue;
       if( _cfg_mgr.Config().contains_pset(unit_conf.name()) &&
 	  _cfg_mgr.Config().get_pset(unit_conf.name()) == unit_conf ) continue;
       std::cout<<unit_conf.name()<<std::endl;
-      out_cfg.add_pset(unit_conf);
+      //out_cfg.add_pset(unit_conf);
     }
 
     // Loop over analyses, check PSet should be stored or not
     for(size_t i=0; i<_ana_v.size(); ++i) {
       auto const& unit_conf = _ana_v[i]->OutputPSet();
+      out_cfg.add_pset(unit_conf);
       if(!(unit_conf.size())) continue;
       if( _cfg_mgr.Config().contains_pset(unit_conf.name()) &&
 	  _cfg_mgr.Config().get_pset(unit_conf.name()) == unit_conf ) continue;
       std::cout<<unit_conf.name()<<std::endl;
-      out_cfg.add_pset(unit_conf);
+      //out_cfg.add_pset(unit_conf);
     }
 
     if(out_cfg.size()) {
