@@ -18,7 +18,7 @@
 #pragma link C++ namespace ertool+;
 #pragma link C++ namespace ertool::io+;
 #pragma link C++ namespace ertool::msg+;
-#pragma link C++ class ertool::Message+;
+#pragma link C++ class ertool::msg::Message+;
 #pragma link C++ class ertool::RangeVar+;
 //#pragma link C++ class ertool::Params+;
 //#pragma link C++ class ertool::Record+;

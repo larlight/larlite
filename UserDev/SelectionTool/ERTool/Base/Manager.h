@@ -154,8 +154,8 @@ namespace ertool {
 
     ManagerStatus_t _status;
 
-    std::vector<AlgoBase*> _algo_v;
-    std::vector<AnaBase*> _ana_v;
+    std::vector< ertool::AlgoBase*> _algo_v;
+    std::vector< ertool::AnaBase*> _ana_v;
     std::set<std::string> _name_v;
 
     TStopwatch fWatch;
