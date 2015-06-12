@@ -375,13 +375,13 @@ namespace ertool {
       }
 
       // Save parameters
-      std::vector<double> darray;      
+	std::vector<double> darray;      
       if (!_mode){
 	RooRealVar *tau, *mean, *sigma;
 	std::cout << "["<<__FUNCTION__<<"] " << Form("Extracted %s_params... ",part_letter.c_str()) << std::endl;
 	// radLen
 	tau = (RooRealVar*)(fit_res_radLen->floatParsFinal().find(Form("%s_radLen_tau",part_letter.c_str())));
-	darray.resize(5);
+	darray.resize(6);
 	darray[0] = tau->getVal();
 	darray[1] = tau->getErrorLo();
 	darray[2] = tau->getErrorHi();
@@ -395,7 +395,10 @@ namespace ertool {
 	darray[5] = sigma->getVal();
 	std::cout << "["<<__FUNCTION__<<"] "
 		  << "dEdx: Mean: " << mean->getVal() << " Sigma: " << sigma->getVal() << std::endl;
-	_params.add_value(Form("%s_params",part_letter.c_str()),::fcllite::VecToString(darray));
+	std::cout<<darray.size()<<" ahoaho"<<std::endl;
+	std::cout<< ::fcllite::VecToString(darray).c_str() << std::endl;
+	_params.add_value(Form("%s_params",part_letter.c_str()),::fcllite::VecToString<double>(darray));
+	std::cout<<"ahoaho"<<std::endl;
       }
       if (_mode){
 	RooRealVar *tau, *meanhigh, *sigmahigh, *meanlow, *sigmalow;
