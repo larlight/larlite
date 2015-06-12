@@ -25,7 +25,6 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
 # set linker flags
 LDFLAGS += -L$(shell root-config --libdir) -lEG -lRooFit -lRooFitCore -lRooStats
-LDFLAGS += $(shell seltool-config --libs)
 LDFLAGS += $(shell basictool-config --libs)
 LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_ERBase
 LDFLAGS += -L$(LARLITE_LIBDIR) -lTreeGraph_GeoGraph

@@ -45,8 +45,8 @@
 
 //#pragma link C++ class ertool::IOHandler+;
 //#pragma link C++ class ertool::ROOTFileIO+;
-#pragma link C++ class ertool::IStreamBase+;
-#pragma link C++ class ertool::OStreamBase+;
+//#pragma link C++ class ertool::IStreamBase+;
+//#pragma link C++ class ertool::OStreamBase+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
