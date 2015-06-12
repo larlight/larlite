@@ -77,8 +77,8 @@ def main():
     print '  Identified %2d input files for electron' % len(electron_files)
     if not ask_binary('  Proceed? [y/n]:'): return False
     print
-    if ask_binary('  Load previously extracted fit parameters? [y/n]:'):
-        my_algo.LoadParams()    
+    #if ask_binary('  Load previously extracted fit parameters? [y/n]:'):
+    #    my_algo.LoadParams()    
     #
     # Training for gamma mode
     #
@@ -129,7 +129,8 @@ def main():
     # Store trained parameters
     #
     if (gamma_trained or electron_trained) and ask_binary('  Store train result parameters? [y/n]:'):
-        my_algo.StoreParams()
+        my_ana._mgr.StoreParams("kazu.txt")
+        #my_algo.StoreParams()
         print '  Parameter stored...'
         print
 
