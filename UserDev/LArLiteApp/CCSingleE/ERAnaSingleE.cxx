@@ -106,15 +106,19 @@ namespace ertool {
   if (_debug)
     std::cout << "******  Begin ERAnaSingleE Analysis  ******" << std::endl;
 
-
-  if (_debug){
+    if (_debug){
     std::cout << "ParticleGraph Diagram: " << std::endl
 	      << graph.Diagram() << std::endl;
-  }
-  /*
-    // Get MC particle set
-    auto mc_graph = MCParticleGraph();
+    }
 
+    // Get MC particle set
+    auto const& mc_graph = MCParticleGraph();
+
+    if (_debug){
+      std::cout << "MC Particle Diagram: " << std::endl
+		<< mc_graph.Diagram() << std::endl;
+    }
+     
     // Reset tree variables
     // Assume we will mis-ID
     ResetTreeVariables();
@@ -125,7 +129,7 @@ namespace ertool {
     _n_gammas    = 0;
 
     // Get MC EventData (showers/tracks...)
-    auto mc_data = MCEventData();
+    auto const& mc_data = MCEventData();
     // Count number of MC tracks and showers with E > _eCut MeV
     _n_showers   = 0;
     _n_tracks    = 0;
@@ -133,17 +137,17 @@ namespace ertool {
 
     // Keep track of all energy deposited in detector
     _EDep = 0;
-
-    for (auto &s : data.Shower()){
+    /*
+    for (auto const &s : data.Shower()){
       _EDep += s._energy;
       if (s._energy > _eCut) { _n_showers += 1; }
     }
-    for (auto &t : data.Track()){
+    for (auto const &t : data.Track()){
       _EDep += t._energy;
       if (t._energy > _eCut) { _n_tracks += 1; }
     }
     if (_debug) { std::cout << "Total Energy deposited in detector: " << _EDep << std::endl; }
-  */
+    */
     /*
     // If debug -> print out MC particle set
     if (_debug){

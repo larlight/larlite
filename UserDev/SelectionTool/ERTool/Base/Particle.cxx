@@ -41,9 +41,9 @@ namespace ertool {
   const double& Particle::Mass() const
   { return _mass; }
   double Particle::Energy() const
-  { return sqrt(pow(_mass,2) + KineticEnergy()); }
+  { return sqrt(pow(_mass,2) + pow(KineticEnergy(),2)); }
   double Particle::KineticEnergy() const
-  { return _mom.SqLength(); }
+  { return _mom.Length(); }
   const ::geoalgo::Vector& Particle::Vertex()   const
   { return _vtx; }
   const ::geoalgo::Vector& Particle::Momentum() const
