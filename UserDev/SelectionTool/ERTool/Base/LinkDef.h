@@ -16,10 +16,13 @@
 #pragma link C++ class vector<RooRealVar>+;
 
 #pragma link C++ namespace ertool+;
+#pragma link C++ namespace ertool::io+;
+#pragma link C++ namespace ertool::msg+;
+#pragma link C++ class ertool::Message+;
 #pragma link C++ class ertool::RangeVar+;
-#pragma link C++ class ertool::Params+;
-#pragma link C++ class ertool::Record+;
-#pragma link C++ class ertool::RecoObjBase+;
+//#pragma link C++ class ertool::Params+;
+//#pragma link C++ class ertool::Record+;
+//#pragma link C++ class ertool::RecoObjBase+;
 #pragma link C++ class ertool::Shower+;
 #pragma link C++ class ertool::Track+;
 #pragma link C++ class std::vector<ertool::Shower>+;
@@ -29,9 +32,9 @@
 #pragma link C++ class ertool::ParticleGraph+;
 #pragma link C++ class std::vector<ertool::Particle>+;
 
-#pragma link C++ class ertool::UnitBase+;
-#pragma link C++ class ertool::AlgoBase+;
-#pragma link C++ class ertool::AnaBase+;
+//#pragma link C++ class ertool::UnitBase+;
+//#pragma link C++ class ertool::AlgoBase+;
+//#pragma link C++ class ertool::AnaBase+;
 
 #pragma link C++ class ertool::Manager+;
 #pragma link C++ class ertool::Provenance+;
@@ -40,8 +43,18 @@
 
 #pragma link C++ function ertool::Combination(const size_t,const size_t)+;
 
+//#pragma link C++ class ertool::IOHandler+;
+//#pragma link C++ class ertool::ROOTFileIO+;
+#pragma link C++ class ertool::IStreamBase+;
+#pragma link C++ class ertool::OStreamBase+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
+
+
+
+
 
 
 

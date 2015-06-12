@@ -29,25 +29,27 @@ namespace ertool {
   public:
 
     /// Default constructor
-    AlgoMakeGraph();
+    AlgoMakeGraph(const std::string &name="MakeGraph");
 
     /// Default destructor
-    virtual ~AlgoMakeGraph(){};
+    ~AlgoMakeGraph(){};
 
     /// Reset function
-    virtual void Finalize();
+    void Reset(){}
+    
+    void Finalize();
 
     /// What to do before event-loop begins
-    virtual void ProcessBegin();
+    void ProcessBegin();
 
     /// What to do once event-loop is over
-    virtual void ProcessEnd(TFile* fout);
+    void ProcessEnd(TFile* fout);
 
-    /// Override the ertool::SPTBase::LoadParams function
-    virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
-
+    /// Configuration setter
+    void AcceptPSet(const ::fcllite::PSet& cfg);
+    
     /// Function to evaluate input showers and determine a score
-    virtual bool Reconstruct(const EventData &data, ParticleGraph& graph);
+    bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
     /// Set verbosity
     void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); _nodeMgr->setVerbose(on); }

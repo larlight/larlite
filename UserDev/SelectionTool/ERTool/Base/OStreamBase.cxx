@@ -1,0 +1,6 @@
+#ifndef SELECTIONTOOL_ERTOOL_OSTREAMBASE_CXX
+#define SELECTIONTOOL_ERTOOL_OSTREAMBASE_CXX
+
+#include "OStreamBase.h"
+
+#endif

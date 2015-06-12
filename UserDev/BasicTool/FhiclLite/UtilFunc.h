@@ -5,7 +5,7 @@
 #include <vector>
 #include <algorithm>
 
-namespace fclite {
+namespace fcllite {
 
   template <class T>
   T FromString( const std::string& value );
@@ -31,11 +31,21 @@ namespace fclite {
   template<> std::vector< unsigned long  > FromString< std::vector< unsigned long  > > (const std::string& value );
   template<> std::vector< bool           > FromString< std::vector< bool           > > (const std::string& value );
 
-  template <class T>
-  std::string ToString(const T& value);
+  template <class T> std::string ToString(const T& value)
+  { return std::to_string(value); }
 
   template<> std::string ToString<std::string>(const std::string& value);
-
+  
+  template <class T> std::string VecToString(const std::vector<T>& value)
+  {
+    std::string res="[";
+    for(auto const& v : value)
+      res += ToString(v) + ",";
+    res = res.substr(0,res.size()-1);
+    res += "]";
+    return res;
+  }
+  
 }
 
 #endif

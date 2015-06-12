@@ -40,7 +40,31 @@ namespace ertool {
     kUnrelated,
     kINVALID_RELATION_TYPE
   };
-  
+
+  namespace io {
+    enum Mode_t {
+      kUNDEFINED, ///< undefined mode
+      kREAD,  ///< read mode
+      kWRITE, ///< write mode
+      kBOTH   ///< both read & write mode
+    };
+
+    enum StreamType_t {
+      kEmptyStream,
+      kROOT
+    };
+  }
+
+  namespace msg {
+    enum Level_t {
+      kDEBUG=0,      ///< Message level ... useful to debug a crash
+      kINFO,         ///< Debug info but not the lowest level
+      kNORMAL,       ///< Normal stdout
+      kWARNING,      ///< notify a user in the standard operation mode for an important finding.
+      kERROR,        ///< notify a user when something is clearly wrong
+      kMSG_TYPE_MAX
+    };
+  }
 } 
 
 #endif

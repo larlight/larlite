@@ -7,9 +7,8 @@ namespace ertool {
 
   size_t n_michel_e = 0;
 
-  AlgoMichelE::AlgoMichelE() : AlgoBase()
+  AlgoMichelE::AlgoMichelE(const std::string& name) : AlgoBase(name)
   {
-    _name     = "AlgoMichelE";
     michel_energy = 0;
     shower_st_to_track_end = 0;
   }
@@ -34,7 +33,6 @@ namespace ertool {
 
   void AlgoMichelE::ProcessBegin()
   {
-    _alg_emp.LoadParams();
     _alg_emp.ProcessBegin();
     InitializeHistos();
 
@@ -50,10 +48,10 @@ namespace ertool {
   }
   
 
-  void AlgoMichelE::LoadParams(std::string fname, size_t version){
+  void AlgoMichelE::AcceptPSet(const ::fcllite::PSet& cfg) {
     
     // Load singleE params
-    _alg_emp.LoadParams(fname,version);
+    _alg_emp.AcceptPSet(cfg);
     
     return;
   }

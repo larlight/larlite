@@ -10,12 +10,10 @@ namespace ertool {
   size_t total_g_showers = 0;
   size_t nonzero_dedx_counter = 0;
   
-  AlgoSingleE::AlgoSingleE() : AlgoBase()
+  AlgoSingleE::AlgoSingleE(const std::string& name) : AlgoBase(name)
 			     , fTPC(-10.,-126.,-10.,292.,136.,1150.)
 			     , _alg_tree(nullptr)
   {
-
-    _name       = "AlgoSingleE";
     _e_mass     = TDatabasePDG().GetParticle(11)->Mass();
     _e_ll_values = 0;
     _dedx_values = 0;
@@ -42,7 +40,6 @@ namespace ertool {
   void AlgoSingleE::ProcessBegin()
   {
 
-    _alg_emp.LoadParams();
     _alg_emp.ProcessBegin();
     _alg_emp.SetMode(true);
 
@@ -69,10 +66,10 @@ namespace ertool {
     return;
   }
 
-  void AlgoSingleE::LoadParams(std::string fname, size_t version){
+  void AlgoSingleE::AcceptPSet(const ::fcllite::PSet& cfg) {
     
     // Load EMPart params
-    _alg_emp.LoadParams(fname,version);
+    _alg_emp.AcceptPSet(cfg);
     
     return;
   }

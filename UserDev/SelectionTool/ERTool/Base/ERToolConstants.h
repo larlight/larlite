@@ -11,7 +11,7 @@
 namespace ertool {
 
   /// Default parameter set storage file name
-  const std::string kDataFileName = "larlite_spt_data.root";
+  const std::string kDefaultConfigFileName = std::string(getenv("LARLITE_USERDEVDIR")) + std::string("/SelectionTool/ERTool/dat/ertool_default.cfg");
 
   /// Utility: maximum value for double 
   const double kDOUBLE_MAX = std::numeric_limits<double>::max();
@@ -54,6 +54,40 @@ namespace ertool {
 
   /// Default (invalid) momentum for ertool::Particle
   const ::geoalgo::Vector kINVALID_MOMENTUM(kINVALID_DOUBLE,kINVALID_DOUBLE,kINVALID_DOUBLE);
+
+  namespace io{
+    /// EventData identifier
+    const std::string kEVENT_DATA_NAME("event_data");
+    /// ParticleGraph identifier
+    const std::string kGRAPH_DATA_NAME("part_graph");
+
+    /// MC EventData identifier
+    const std::string kMC_EVENT_DATA_NAME("mc_event_data");
+    /// MC ParticleGraph identifier
+    const std::string kMC_GRAPH_DATA_NAME("mc_part_graph");
+  }
+
+  namespace msg{
+    const std::string ColorPrefix[kMSG_TYPE_MAX] =
+      {
+	"\033[94m", ///< blue ... DEBUG
+	"\033[92m", ///< green ... INFO
+	"\033[95m", ///< magenta ... NORMAL
+	"\033[93m", ///< yellow ... WARNING
+	"\033[91m"  ///< red ... ERROR
+      };
+    ///< Color coding of message
+    
+    const std::string StringPrefix[kMSG_TYPE_MAX] =
+      {
+	"     [DEBUG]  ", ///< DEBUG message prefix
+	"      [INFO]  ", ///< INFO message prefix
+	"    [NORMAL]  ", ///< NORMAL message prefix
+	"   [WARNING]  ", ///< WARNING message prefix
+	"     [ERROR]  "  ///< ERROR message prefix
+      };
+    ///< Prefix of message
+  }
 } 
 
 #endif

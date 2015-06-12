@@ -5,15 +5,14 @@
 
 namespace ertool {
 
-  AlgoEMPart::AlgoEMPart() 
-    : AlgoBase()
+  AlgoEMPart::AlgoEMPart(const std::string& name) 
+    : AlgoBase(name)
+    , _params(name)
     , _e_radLenData(nullptr)
     , _e_dEdxData(nullptr)
     , _g_radLenData(nullptr)
     , _g_dEdxData(nullptr)
   { 
-    _name = "AlgoEMPart";
-
     _dEdxVar   = new RooRealVar("empart_dedx","dE/dx [MeV/cm] Variable",0.,10.);
     _radLenVar = new RooRealVar("empart_radlen","Radiation Length [cm] Variable",0,100);
 
@@ -113,49 +112,49 @@ namespace ertool {
     }
   }
 
-  void AlgoEMPart::LoadParams(std::string fname,size_t version)
+  void AlgoEMPart::AcceptPSet(const ::fcllite::PSet& cfg)
   {
-    // Load user_info
-    Record::LoadParams(fname,version);
+    auto p = cfg.get_pset(Name());
+    
     // Extract if parameters found
-    if(_params.exist_darray("rad_range")) {
-      auto darray = _params.get_darray("rad_range");
-      _radLenVar->setRange( (*darray)[0], (*darray)[1] );
+    if(p.contains_value("rad_range")) {
+      auto darray = p.get<std::vector<double> >("rad_range");
+      _radLenVar->setRange( darray[0], darray[1] );
       std::cout<<"["<<__FUNCTION__<<"] "
 	       << "Loaded distance fit range : "
 	       << _radLenVar->getMin() << " => " << _radLenVar->getMax()
 	       << std::endl;
     }
 
-    if(_params.exist_darray("dedx_range")) {
-      auto darray = _params.get_darray("dedx_range");
-      _dEdxVar->setRange( (*darray)[0], (*darray)[1] );
+    if(p.contains_value("dedx_range")) {
+      auto darray = p.get<std::vector<double> >("dedx_range");
+      _dEdxVar->setRange( darray[0], darray[1] );
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"Loaded dEdx range : "
 	       << _dEdxVar->getMin() << " => " << _dEdxVar->getMax()
 	       << std::endl;
     }
 
-    if(_params.exist_darray("g_params")) {
-      auto darray = _params.get_darray("g_params");
+    if(p.contains_value("g_params")) {
+      auto darray = p.get<std::vector<double> >("g_params");
       RooRealVar *tau, *meanlow, *meanhigh, *sigmalow, *sigmahigh, *frac;
 
       tau = (RooRealVar*)(_g_radLenPdf->getVariables()->find("g_radLen_tau"));
-      tau->setVal   ( (*darray)[0]               );
-      tau->setRange ( (*darray)[1], (*darray)[2] );
+      tau->setVal   ( darray[0]               );
+      tau->setRange ( darray[1], darray[2] );
 
       meanhigh  = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_mean_high"));
-      meanhigh->setVal  ( (*darray)[3] );
+      meanhigh->setVal  ( darray[3] );
       sigmahigh = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_sigma_high"));
-      sigmahigh->setVal ( (*darray)[4] );
+      sigmahigh->setVal ( darray[4] );
 
       meanlow  = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_mean_low"));
-      meanlow->setVal  ( (*darray)[5] );
+      meanlow->setVal  ( darray[5] );
       sigmalow = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_sigma_low"));
-      sigmalow->setVal ( (*darray)[6] );
+      sigmalow->setVal ( darray[6] );
 
       frac = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_fraction"));
-      frac->setVal ( (*darray)[7] );
+      frac->setVal ( darray[7] );
       
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"Loaded gamma parameters..." << std::endl;
@@ -169,17 +168,17 @@ namespace ertool {
 	       <<"Frac: " << frac->getVal() <<std::endl;
     }
 
-    if(_params.exist_darray("e_params")) {
-      auto darray = _params.get_darray("e_params");
+    if(p.contains_value("e_params")) {
+      auto darray = p.get<std::vector<double> >("e_params");
       RooRealVar *tau, *mean, *sigma;
       tau = (RooRealVar*)(_e_radLenPdf->getVariables()->find("e_radLen_tau"));
-      tau->setVal   ( (*darray)[0]               );
-      tau->setRange ( (*darray)[1], (*darray)[2] );
+      tau->setVal   ( darray[0]               );
+      tau->setRange ( darray[1], darray[2] );
 
       mean  = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_dEdxGaus_mean"));
-      mean->setVal  ( (*darray)[3] );
+      mean->setVal  ( darray[3] );
       sigma = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_dEdxGaus_sigma"));
-      sigma->setVal ( (*darray)[4] );
+      sigma->setVal ( darray[4] );
 
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"Loaded electron parameters..." << std::endl;
@@ -376,25 +375,27 @@ namespace ertool {
       }
 
       // Save parameters
-      
+      std::vector<double> darray;      
       if (!_mode){
 	RooRealVar *tau, *mean, *sigma;
 	std::cout << "["<<__FUNCTION__<<"] " << Form("Extracted %s_params... ",part_letter.c_str()) << std::endl;
 	// radLen
 	tau = (RooRealVar*)(fit_res_radLen->floatParsFinal().find(Form("%s_radLen_tau",part_letter.c_str())));
-	_params.append(Form("%s_params",part_letter.c_str()),tau->getVal());
-	_params.append(Form("%s_params",part_letter.c_str()),tau->getVal()+tau->getErrorLo());
-	_params.append(Form("%s_params",part_letter.c_str()),tau->getVal()+tau->getErrorHi());
+	darray.resize(5);
+	darray[0] = tau->getVal();
+	darray[1] = tau->getErrorLo();
+	darray[2] = tau->getErrorHi();
 	std::cout << "["<<__FUNCTION__<<"] "
 		  << "RadLen: "<< tau->getVal() << " [" << tau->getErrorLo() + tau->getVal()
 		  << " => " << tau->getErrorHi() + tau->getVal() << "]" << std::endl;
 	// dEdx
 	mean  = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_dEdxGaus_mean",part_letter.c_str())));
 	sigma = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_dEdxGaus_sigma",part_letter.c_str())));
-	_params.append(Form("%s_params",part_letter.c_str()),mean->getVal());
-	_params.append(Form("%s_params",part_letter.c_str()),sigma->getVal());
+	darray[4] = mean->getVal();
+	darray[5] = sigma->getVal();
 	std::cout << "["<<__FUNCTION__<<"] "
 		  << "dEdx: Mean: " << mean->getVal() << " Sigma: " << sigma->getVal() << std::endl;
+	_params.add_value(Form("%s_params",part_letter.c_str()),::fcllite::VecToString(darray));
       }
       if (_mode){
 	RooRealVar *tau, *meanhigh, *sigmahigh, *meanlow, *sigmalow;
@@ -405,14 +406,15 @@ namespace ertool {
 	meanlow  = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_dEdxGaus_mean_low",part_letter.c_str())));
 	sigmalow = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_dEdxGaus_sigma_low",part_letter.c_str())));
 	RooRealVar* frac = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_dEdxGaus_fraction",part_letter.c_str())));
-	_params.append(Form("%s_params",part_letter.c_str()),tau->getVal());
-	_params.append(Form("%s_params",part_letter.c_str()),tau->getVal()+tau->getErrorLo());
-	_params.append(Form("%s_params",part_letter.c_str()),tau->getVal()+tau->getErrorHi());
-	_params.append(Form("%s_params",part_letter.c_str()),meanhigh->getVal());
-	_params.append(Form("%s_params",part_letter.c_str()),sigmahigh->getVal());
-	_params.append(Form("%s_params",part_letter.c_str()),meanlow->getVal());
-	_params.append(Form("%s_params",part_letter.c_str()),sigmalow->getVal());
-	_params.append(Form("%s_params",part_letter.c_str()),frac->getVal());
+	darray.resize(8);
+	darray[0] = tau->getVal();
+	darray[1] = tau->getVal()+tau->getErrorLo();
+	darray[2] = tau->getVal()+tau->getErrorHi();
+	darray[3] = meanhigh->getVal();
+	darray[4] = sigmahigh->getVal();
+	darray[5] = meanlow->getVal();
+	darray[6] = sigmalow->getVal();
+	darray[7] = frac->getVal();
 	std::cout << "["<<__FUNCTION__<<"] "
 		  << "RadLen: "<< tau->getVal() << " [" << tau->getErrorLo() + tau->getVal()
 		  << " => " << tau->getErrorHi() + tau->getVal() << "]" << std::endl;
@@ -422,6 +424,7 @@ namespace ertool {
 		  << "dEdx: Low Mean: " << meanlow->getVal() 
 		  << " Low Sigma: "     << sigmalow->getVal() 
 		  << " ... Fraction = " << 1. - frac->getVal() << std::endl;
+	_params.add_value(Form("%s_params",part_letter.c_str()),::fcllite::VecToString(darray));
       }
       
     }// if in traning mode

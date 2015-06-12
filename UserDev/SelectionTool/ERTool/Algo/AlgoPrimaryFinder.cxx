@@ -5,10 +5,8 @@
 
 namespace ertool {
 
-  AlgoPrimaryFinder::AlgoPrimaryFinder() : AlgoBase()
+  AlgoPrimaryFinder::AlgoPrimaryFinder(const std::string& name) : AlgoBase(name)
   {
-
-    _name       = "AlgoPrimaryFinder";
     _verbose = false;
     _useRadLength = false;
 
@@ -21,7 +19,7 @@ namespace ertool {
     return;
   }
 
-  void AlgoPrimaryFinder::LoadParams(std::string fname, size_t version)
+  void AlgoPrimaryFinder::AcceptPSet(const ::fcllite::PSet& cfg)
   {
     return;
   }

@@ -1,37 +1,37 @@
 /**
- * \file Algo_Class_Name.h
+ * \file ERAlgoToy.h
  *
- * \ingroup Working_Package
+ * \ingroup Algo
  * 
- * \brief Class def header for a class Algo_Class_Name
+ * \brief Class def header for a class ERAlgoToy
  *
- * @author Shell_User_Name
+ * @author kazuhiro
  */
 
-/** \addtogroup Working_Package
+/** \addtogroup Algo
 
     @{*/
 
-#ifndef ERTOOL_ALGO_CLASS_NAME_H
-#define ERTOOL_ALGO_CLASS_NAME_H
+#ifndef ERTOOL_ERALGOTOY_H
+#define ERTOOL_ERALGOTOY_H
 
 #include "ERTool/Base/AlgoBase.h"
 
 namespace ertool {
 
   /**
-     \class Algo_Class_Name
+     \class ERAlgoToy
      User custom Algorithm class made by kazuhiro
    */
-  class Algo_Class_Name : public AlgoBase {
+  class ERAlgoToy : public AlgoBase {
   
   public:
 
     /// Default constructor
-    Algo_Class_Name(const std::string& name="Algo_Class_Name");
+    ERAlgoToy(const std::string& name="ERAlgoToy");
 
     /// Default destructor
-    virtual ~Algo_Class_Name(){};
+    virtual ~ERAlgoToy(){};
 
     /// Reset function
     void Reset();

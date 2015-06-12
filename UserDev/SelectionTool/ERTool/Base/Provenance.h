@@ -40,6 +40,11 @@ namespace ertool {
     void AddInfo(const std::string& key,
 		 const std::string& value);
 
+    void SetInfo(const std::string& key,
+		 const std::string& value);
+
+    bool HasInfo(const std::string& key) const;
+
     const ertool::ProcInfo_t& Info(const size_t proc_id=kINVALID_SIZE) const;
 
     const std::string& Name(const size_t proc_id=kINVALID_SIZE) const;

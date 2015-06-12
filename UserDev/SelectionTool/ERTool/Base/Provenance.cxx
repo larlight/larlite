@@ -32,6 +32,20 @@ namespace ertool {
     info[key]=value;
   }
 
+  void Provenance::SetInfo(const std::string& key,
+			   const std::string& value)
+  {
+    auto& info = _proc_info_v.back();
+    if( info.find(key) == info.end() )
+      throw ERException("Did not find an information key...");
+    info[key]=value;
+  }
+
+  bool Provenance::HasInfo(const std::string& key) const
+  {
+    return (_proc_info_v.back().find(key) != _proc_info_v.back().end());
+  }
+
   const ertool::ProcInfo_t& Provenance::Info(const size_t proc_id) const
   {
     if(proc_id == kINVALID_SIZE) return _proc_info_v.back();

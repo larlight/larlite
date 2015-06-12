@@ -5,12 +5,14 @@
 
 namespace ertool {
 
-  AlgoMakeGraph::AlgoMakeGraph() : AlgoBase()
+  AlgoMakeGraph::AlgoMakeGraph(const std::string& name) : AlgoBase(name)
   {
-    _name       = "AlgoMakeGraph";
     _minScore   = 1.;
     _verbose    = false;
   }
+
+  void AlgoMakeGraph::AcceptPSet(const ::fcllite::PSet& cfg)
+  {}
 
   void AlgoMakeGraph::ProcessEnd(TFile* fout){
  
@@ -24,11 +26,6 @@ namespace ertool {
 
   void AlgoMakeGraph::ProcessBegin()
   {
-    return;
-  }
-
-  void AlgoMakeGraph::LoadParams(std::string fname, size_t version){
-    
     return;
   }
 

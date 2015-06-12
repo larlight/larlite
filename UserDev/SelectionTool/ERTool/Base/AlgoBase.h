@@ -39,13 +39,13 @@ namespace ertool {
   public:
     
     /// Default constructor
-    AlgoBase() : UnitBase() { _name = "AlgoBase"; _training_mode = false; }
+    AlgoBase(const std::string& name="") : UnitBase(name) {}
     
     /// Default destructor
     virtual ~AlgoBase(){}
     
     /// Function to evaluate input showers and determine a score
-    virtual bool Reconstruct(const EventData &data, ParticleGraph& graph) { return true; }
+    virtual bool Reconstruct(const EventData &data, ParticleGraph& graph) = 0;
 
   };
 }

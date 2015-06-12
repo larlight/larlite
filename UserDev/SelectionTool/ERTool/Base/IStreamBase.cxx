@@ -1,0 +1,6 @@
+#ifndef SELECTIONTOOL_ERTOOL_ISTREAMBASE_CXX
+#define SELECTIONTOOL_ERTOOL_ISTREAMBASE_CXX
+
+#include "IStreamBase.h"
+
+#endif

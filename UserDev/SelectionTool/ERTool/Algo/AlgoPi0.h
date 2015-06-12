@@ -16,6 +16,7 @@
 #define ERTOOL_ALGOPI0_H
 
 #include "ERTool/Algo/AlgoEMPart.h"
+#include <TTree.h>
 #include <TH1D.h>
 #include <TH2D.h>
 #include <RooGaussian.h>
@@ -67,25 +68,27 @@ namespace ertool {
   public:
 
     /// Default constructor
-    AlgoPi0();
+    AlgoPi0(const std::string& name="Pi0");
 
     /// Default destructor
-    virtual ~AlgoPi0(){}
+    ~AlgoPi0(){}
 
     /// Called only once by the constructor in its lifespan
     void SetDefaultParams();
 
-    /// What to do before event-loop begins
-    virtual void ProcessBegin();
+    void Reset(){}
 
-    /// Override the sptool::SPTBase::LoadParams function
-    virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
+    /// What to do before event-loop begins
+    void ProcessBegin();
+
+    /// Configuration setter
+    void AcceptPSet(const ::fcllite::PSet& cfg);
 
     /// Function to evaluate input showers and determine a score
-    virtual bool Reconstruct(const EventData &data, ParticleGraph& graph);
+    bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
     /// Function executed at end of process
-    virtual void ProcessEnd(TFile* fout);
+    void ProcessEnd(TFile* fout);
 
     /// Likelihood of two showers being pi0 daughters
     void LL(const Shower& shower_a,

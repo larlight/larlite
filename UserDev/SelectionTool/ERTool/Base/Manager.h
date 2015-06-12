@@ -15,6 +15,7 @@
 #define ERTOOL_MANAGER_H
 
 #include <utility>
+#include <set>
 #include "AlgoBase.h"
 #include "AnaBase.h"
 #include "EventData.h"
@@ -76,11 +77,14 @@ namespace ertool {
     /// FhiclLite config file adder
     void AddCfgFile(const std::string cfg_fname);
 
+    /// Reset FhiclLite config file to be used
+    void ClearCfgFile();
+
     /// Algo setter
-    void SetAlgo(AlgoBase* a);
+    void AddAlgo(AlgoBase* a);
 
     /// Ana setter
-    void SetAna(AnaBase* a);
+    void AddAna(AnaBase* a);
 
     /// Process input data
     bool Process();
@@ -90,6 +94,9 @@ namespace ertool {
 
     /// Function to be called after Process()
     void Finalize(TFile* fout=nullptr);
+
+    /// Function to store an "output configuration" in a text file (full path + name in the argument)
+    void StorePSet(const std::string& fname=kDefaultConfigFileName) const;
 
     /// Function to reset things
     void Reset();
@@ -114,13 +121,6 @@ namespace ertool {
     ertool::ParticleGraph& ParticleGraph   ();
     ertool::ParticleGraph& MCParticleGraph ();
 
-    /*
-    ertool::EventData&   EventDataWriteable     ();
-    ertool::ParticleGraph& ParticleGraphWriteable   ();
-    ertool::EventData&   MCEventDataWriteable   ();
-    ertool::ParticleGraph& MCParticleGraphWriteable ();
-    */
-    
     /// Status getter
     ManagerStatus_t Status() const { return _status; }
 
@@ -133,27 +133,37 @@ namespace ertool {
     /// Make MC info available to ana
     bool _mc_for_ana;
 
+    /// struct for time profiling
+    struct _tprof_t {
+      /// ctor
+      _tprof_t(){ Reset(); }
+      /// resetter
+      void Reset()
+      { _time_start = _time_proc = _time_end = 0; }
+      double _time_start; ///< Time to execute ertool::UnitBase::ProcessBegin
+      double _time_proc;  ///< Time to execute ertool::AnaBase::Analyze or ertool::AlgoBase::Reconstruct
+      double _time_end;   ///< Time to execute ertool::UnitBase::ProcessEnd
+    };
+    
   protected:
-
-    std::pair<double,double> _tprof_algo, _tprof_ana;
-    double _time_algo_init, _time_ana_init;
-    double _time_algo_finalize, _time_ana_finalize;
 
     ertool::EventData _data;
     ertool::EventData _mc_data;
     ertool::ParticleGraph _graph;
     ertool::ParticleGraph _mc_graph;
 
-    TStopwatch fWatch;
-
     ManagerStatus_t _status;
 
-    AlgoBase* _algo;
+    std::vector<AlgoBase*> _algo_v;
+    std::vector<AnaBase*> _ana_v;
+    std::set<std::string> _name_v;
 
-    AnaBase* _ana;
-
-    ::fclite::ConfigManager _cfg_mgr;
-
+    TStopwatch fWatch;
+    std::vector<_tprof_t> _time_algo_v;
+    std::vector<_tprof_t> _time_ana_v;
+    
+    ::fcllite::ConfigManager _cfg_mgr;
+    std::set<std::string> _cfg_file_v;
   };
 }
 #endif

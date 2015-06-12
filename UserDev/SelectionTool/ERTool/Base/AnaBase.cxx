@@ -6,11 +6,11 @@
 
 namespace ertool {
 
-  AnaBase::AnaBase() 
-    : UnitBase()
+  AnaBase::AnaBase(const std::string& name) 
+    : UnitBase(name)
     , _mc_data (nullptr)
     , _mc_graph   (nullptr)
-  { _name="AnaBase"; }
+  {}
 
   bool AnaBase::Analyze(const EventData& data,
 			const ParticleGraph& graph)
