@@ -60,11 +60,8 @@ namespace ertool {
     const std::string kEVENT_DATA_NAME("edata");
     /// ParticleGraph identifier
     const std::string kGRAPH_DATA_NAME("pgraph");
-
-    /// MC EventData identifier
-    const std::string kMC_EVENT_DATA_NAME("mc_edata");
-    /// MC ParticleGraph identifier
-    const std::string kMC_GRAPH_DATA_NAME("mc_pgraph");
+    /// Provenance identifier
+    const std::string kPROVENANCE_NAME("prov");
   }
 
   namespace msg{

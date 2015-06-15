@@ -31,8 +31,8 @@ namespace ertool {
       
       /// Default constructor
       FileIO( const std::string& proc_name = "no_name",
-		 const StreamType_t in_strm   = kEmptyStream,
-		 const StreamType_t out_strm  = kEmptyStream);
+	      const StreamType_t in_strm   = kEmptyStream,
+	      const StreamType_t out_strm  = kEmptyStream);
       
       /// Default destructor
       ~FileIO(){}

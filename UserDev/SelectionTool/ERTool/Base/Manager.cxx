@@ -295,14 +295,14 @@ namespace ertool {
     for(size_t i=0; i<_algo_v.size(); ++i) {
       _algo_v[i]->_training_mode = this->_training_mode;
       fWatch.Start();
-      _algo_v[i]->ProcessEnd();
+      _algo_v[i]->ProcessEnd(fout);
       _time_algo_v[i]._time_end = fWatch.RealTime();
     }
 
     // Finalize analyses
     for(size_t i=0; i<_ana_v.size(); ++i) {
       fWatch.Start();
-      _ana_v[i]->ProcessEnd();
+      _ana_v[i]->ProcessEnd(fout);
       _time_ana_v[i]._time_end = fWatch.RealTime();
     }
 
