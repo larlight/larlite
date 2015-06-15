@@ -57,14 +57,14 @@ namespace ertool {
 
   namespace io{
     /// EventData identifier
-    const std::string kEVENT_DATA_NAME("event_data");
+    const std::string kEVENT_DATA_NAME("edata");
     /// ParticleGraph identifier
-    const std::string kGRAPH_DATA_NAME("part_graph");
+    const std::string kGRAPH_DATA_NAME("pgraph");
 
     /// MC EventData identifier
-    const std::string kMC_EVENT_DATA_NAME("mc_event_data");
+    const std::string kMC_EVENT_DATA_NAME("mc_edata");
     /// MC ParticleGraph identifier
-    const std::string kMC_GRAPH_DATA_NAME("mc_part_graph");
+    const std::string kMC_GRAPH_DATA_NAME("mc_pgraph");
   }
 
   namespace msg{

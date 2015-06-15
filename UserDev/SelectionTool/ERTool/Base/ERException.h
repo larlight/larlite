@@ -26,16 +26,11 @@ namespace ertool {
 
   public:
 
-    ERException(std::string msg="") : std::exception()
-    {
-      _msg = "\033[93m EXCEPTION \033[00m\033[95m";
-      _msg += msg;
-      _msg += "\033[00m\n";
-    }
+    ERException(const std::string& msg="");
 
     virtual ~ERException() throw(){};
-    virtual const char* what() const throw() 
-    { return _msg.c_str(); }
+
+    virtual const char* what() const throw();
 
   private:
 

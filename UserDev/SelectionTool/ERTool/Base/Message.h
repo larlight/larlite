@@ -48,12 +48,12 @@ namespace ertool {
 	if(!me) me=new Message();
 	return me;
       };
-      
+
       /// Static method to send message out.
-      static void send(Level_t level, std::string msg);
+      static void send_msg(Level_t level, const std::string& msg);
       
       /// Extra argument "where" is used to indicate function/class name.
-      static void send(Level_t level, std::string where, std::string msg);
+      static void send_msg(Level_t level, const std::string& where, const std::string& msg);
       
     };
   }

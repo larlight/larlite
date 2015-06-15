@@ -19,42 +19,44 @@
 #include "Provenance.h"
 
 namespace ertool {
-  /**
-     \class OStreamBase
-     User defined class OStreamBase ... these comments are used to generate
-     doxygen documentation!
-  */
-  class OStreamBase{
-    
-  public:
-    
-    /// Default constructor
-    OStreamBase(){}
-    
-    /// Default destructor
-    virtual ~OStreamBase(){}
+  namespace io {
+    /**
+       \class OStreamBase
+       User defined class OStreamBase ... these comments are used to generate
+       doxygen documentation!
+    */
+    class OStreamBase{
+      
+    public:
+      
+      /// Default constructor
+      OStreamBase(const std::string& name="noname");
+      
+      /// Default destructor
+      virtual ~OStreamBase(){}
 
-    /// Function to "open" the input stream
-    virtual bool Open() = 0;
-
-    /// Function to "read" the input stream
-    virtual bool Write() = 0;
-    
-    /// Function to "close" the output stream
-    virtual bool Close(Provenance* prov) = 0;
-
-    /// Set an output file
-    virtual void SetFile( const std::string& fname ) = 0;
-
-  protected:
-
-    /// Function to "set data pointer"
-    virtual void SetDataPointer(EventData* data, ParticleGraph* graph) = 0;
-
-    /// Function to "set mc data pointer"
-    virtual void SetMCPointer(EventData* data, ParticleGraph* graph) = 0;
-    
-  };
+      /// Name
+      const std::string& Name() const;
+      
+      /// Function to prepare self before opening a file
+      virtual void Prepare( ::ertool::EventData     *event_ptr,
+			    ::ertool::ParticleGraph *graph_ptr,
+			    bool mc) = 0;
+      
+      /// Function to "open" the input stream
+      virtual bool Open(const std::string& fname) = 0;
+      
+      /// Function to "read" the input stream
+      virtual bool WriteEntry() = 0;
+      
+      /// Function to "close" the output stream
+      virtual bool Close(const ::ertool::Provenance& prov) = 0;
+      
+    private:
+      std::string _name;
+      
+    };
+  }
 }
 #endif
 /** @} */ // end of doxygen group 

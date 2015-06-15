@@ -7,7 +7,7 @@ namespace ertool {
 
     Message* Message::me = 0;
     
-    void Message::send(Level_t level, std::string msg)
+    void Message::send_msg(Level_t level, const std::string& msg)
     {
       std::cout 
 	<< msg::ColorPrefix[level].c_str()
@@ -17,7 +17,7 @@ namespace ertool {
 	<< std::endl;
     }
     
-    void Message::send(Level_t level, std::string where, std::string msg)
+    void Message::send_msg(Level_t level, const std::string& where, const std::string& msg)
     {
       std::cout 
 	<< msg::ColorPrefix[level].c_str()

@@ -51,7 +51,8 @@ namespace ertool {
 
     enum StreamType_t {
       kEmptyStream,
-      kROOT
+      kROOT,
+      kROOTTuple
     };
   }
 
