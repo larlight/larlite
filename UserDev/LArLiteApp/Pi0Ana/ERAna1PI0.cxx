@@ -42,6 +42,11 @@ namespace ertool {
     _1pi0_tree->Branch("_x_gamma_MC",&_x_gamma_MC,"x_gamma_MC/D");
     _1pi0_tree->Branch("_y_gamma_MC",&_y_gamma_MC,"y_gamma_MC/D");
     _1pi0_tree->Branch("_z_gamma_MC",&_z_gamma_MC,"z_gamma_MC/D");
+    _1pi0_tree->Branch("_x_pi0_MC",&_x_pi0_MC,"x_pi0_MC/D");
+    _1pi0_tree->Branch("_y_pi0_MC",&_y_pi0_MC,"y_pi0_MC/D");
+    _1pi0_tree->Branch("_z_pi0_MC",&_z_pi0_MC,"z_pi0_MC/D");
+    _1pi0_tree->Branch("_e_pi0_MC",&_e_pi0_MC,"e_pi0_MC/D");
+    _1pi0_tree->Branch("_e_gamma_MC",&_e_gamma_MC,"e_gamma_MC/D");
     _1pi0_tree->Branch("_theta_gamma_MC",&_theta_gamma_MC,"theta_gamma_MC/D");
     _1pi0_tree->Branch("_phi_gamma_MC",&_phi_gamma_MC,"phi_gamma_MC/D");
     _1pi0_tree->Branch("_px_gamma_MC",&_px_gamma_MC,"px_gamma_MC/D");
@@ -50,9 +55,14 @@ namespace ertool {
     _1pi0_tree->Branch("_x_gamma_Reco",&_x_gamma_Reco,"x_gamma_Reco/D");
     _1pi0_tree->Branch("_y_gamma_Reco",&_y_gamma_Reco,"y_gamma_Reco/D");
     _1pi0_tree->Branch("_z_gamma_Reco",&_z_gamma_Reco,"z_gamma_Reco/D");
+    _1pi0_tree->Branch("_e_gamma_Reco",&_e_gamma_Reco,"e_gamma_Reco/D");
     _1pi0_tree->Branch("_px_gamma_Reco",&_px_gamma_Reco,"px_gamma_Reco/D");
     _1pi0_tree->Branch("_py_gamma_Reco",&_py_gamma_Reco,"py_gamma_Reco/D");
     _1pi0_tree->Branch("_pz_gamma_Reco",&_pz_gamma_Reco,"pz_gamma_Reco/D");
+    _1pi0_tree->Branch("_e_pi0_Reco",&_e_pi0_Reco,"e_pi0_Reco/D");
+    _1pi0_tree->Branch("_x_pi0_Reco",&_x_pi0_Reco,"x_pi0_Reco/D");
+    _1pi0_tree->Branch("_y_pi0_Reco",&_y_pi0_Reco,"y_pi0_Reco/D");
+    _1pi0_tree->Branch("_z_pi0_Reco",&_z_pi0_Reco,"z_pi0_Reco/D");
     _1pi0_tree->Branch("_theta_gamma_Reco",&_theta_gamma_Reco,"theta_gamma_Reco/D");
     _1pi0_tree->Branch("_phi_gamma_Reco",&_phi_gamma_Reco,"phi_gamma_Reco/D");
 
@@ -74,6 +84,8 @@ namespace ertool {
     _mpi0_tree->Branch("_pz_gamma_Reco",&_pz_gamma_Reco,"pz_gamma_Reco/D");
     _mpi0_tree->Branch("_theta_gamma_Reco",&_theta_gamma_Reco,"theta_gamma_Reco/D");
     _mpi0_tree->Branch("_phi_gamma_Reco",&_phi_gamma_Reco,"phi_gamma_Reco/D");
+
+    ct = 0 ;
   }
 
   void ERAna1PI0::Reset()
@@ -92,14 +104,20 @@ namespace ertool {
 	// Look to see if there was a recod pi0 
 	int _n_pi0reco = 0; 
         for (auto &preco : ps){ if(preco.PdgCode()==111) _n_pi0reco++;}
-
+	
 	if(_n_pi0reco==1){
+	ct++;
 	    for (auto &preco : ps){
 		if(preco.PdgCode()==111){ 
 		//fill out the info about that was reconstructed 
 // still needs to be done 
 		// Find the reco daughters and then look for the gammas
 		// at the moment I am assuming that a reco pi0 is only filling a gamma/gamma 
+		_x_pi0_Reco = preco.Vertex()[0];
+		_y_pi0_Reco = preco.Vertex()[1];
+		_z_pi0_Reco = preco.Vertex()[2];
+		_e_pi0_Reco = preco.Energy();
+
 		for(auto &gammareco: preco.Daughters()){
 		/// fill out the info about the reco gamma  particle 
 	        _x_gamma_Reco = gammareco.Vertex()[0];
@@ -108,6 +126,7 @@ namespace ertool {
 	        _px_gamma_Reco = gammareco.Momentum()[0];
 		_py_gamma_Reco = gammareco.Momentum()[1];
 		_pz_gamma_Reco = gammareco.Momentum()[2]; 
+		_e_gamma_Reco = gammareco.Energy(); 
 		_theta_gamma_Reco = (180./3.14) * acos( _pz_gamma_Reco / sqrt( _px_gamma_Reco*_px_gamma_Reco + _py_gamma_Reco*_py_gamma_Reco + _pz_gamma_Reco*_pz_gamma_Reco ) );
 		_phi_gamma_Reco   = (180./3.14) * asin( _py_gamma_Reco / sqrt( _px_gamma_Reco*_px_gamma_Reco + _py_gamma_Reco*_py_gamma_Reco ) );
 
@@ -147,6 +166,12 @@ namespace ertool {
 					 if(pdaughter.PdgCode() == 111 ){
 						// was it a Dalitz Decay? 
 						if(pdaughter.Daughters().size()!=2){DalitzDecay = true; }
+						
+						_x_pi0_MC = pdaughter.Vertex()[0];
+						_y_pi0_MC = pdaughter.Vertex()[1];
+						_z_pi0_MC = pdaughter.Vertex()[2];
+						_e_pi0_MC = pdaughter.Energy();
+
 					// 
 					for(auto&gammamc : pdaughter.Daughters()){ 
 					// now match the reco gamma to mc gamma
@@ -162,8 +187,10 @@ namespace ertool {
 						_px_gamma_MC = gammamc.Momentum()[0];
 						_py_gamma_MC = gammamc.Momentum()[1];
 						_pz_gamma_MC = gammamc.Momentum()[2]; 
+						_e_gamma_MC = gammamc.Energy(); 
 						_theta_gamma_MC = (180./3.14) * acos( _pz_gamma_MC / sqrt( _px_gamma_MC*_px_gamma_MC + _py_gamma_MC*_py_gamma_MC + _pz_gamma_MC*_pz_gamma_MC ) );
 						_phi_gamma_MC   = (180./3.14) * asin( _py_gamma_MC / sqrt( _px_gamma_MC*_px_gamma_MC + _py_gamma_MC*_py_gamma_MC ) );
+						_mass_pi0_MC = pow(2*(e_g ));
 							}//(_vtx_dist>temp_dist)
 						}// loop over mc gamma
 					    }// if the particle is a pi0
@@ -224,18 +251,20 @@ namespace ertool {
     if (fout){
       fout->cd();
       _pi0_reco_tree->Write();
-      _pi0_tree->Write();
+     // _pi0_tree->Write();
       _1pi0_tree->Write();
-      _mpi0_tree->Write();
+     // _mpi0_tree->Write();
     }
-
+    
+        double found = _pi0_reco_tree->GetEntries()/2 ;
 
 	std::cout<<"From ER1pi0Ana  -->  Summary of Events \n" 	
-	//<< "\nTotal Reco 1pi0       "<<_pi0_reco_tree->GetEntries()
 	<< "\nTotal Reco 1pi0       "<<_pi0_reco_tree->GetEntries()/2
-	<< "\nTotal Reco Events that have 0pi0 "<<_pi0_tree->GetEntries()/2
-	<< "\nTotal Reco Events that have 1pi0 "<<_1pi0_tree->GetEntries()/2
-	<< "\nTotal Reco Events that have >1pi0 "<<_mpi0_tree->GetEntries()/2
+//	<< "\nTotal MC Events that have 0pi0 "<<_pi0_tree->GetEntries()/2
+	<< "\nTotal MC Events that have 1pi0 "<<_1pi0_tree->GetEntries()/2
+//	<< "\nTotal MC Events that have >1pi0 "<<_mpi0_tree->GetEntries()/2
+	<< "\nTotal MC Events with !=1 pi0: "<<ct
+	<< "\nEfficiency is: "<< found / ct 
 	
 
 	<<std::endl;
@@ -249,19 +278,34 @@ namespace ertool {
     _x_gamma_MC = -1000;
     _y_gamma_MC = -1000;
     _z_gamma_MC = -1000;
+    _e_gamma_MC = -1000;
     _px_gamma_MC = -1000;
     _py_gamma_MC = -1000;
     _pz_gamma_MC = -1000;
     _theta_gamma_MC = -1000;
     _phi_gamma_MC = -1000;
+    _x_pi0_MC = -1000;
+    _y_pi0_MC = -1000;
+    _z_pi0_MC = -1000;
+    _e_pi0_MC = -1000;
+
+    _mass_pi0_MC = -1000;
+    _mass_pi0_Reco = -1000;
+
+
     _x_gamma_Reco = -1000;
     _y_gamma_Reco = -1000;
     _z_gamma_Reco = -1000;
     _px_gamma_Reco = -1000;
     _py_gamma_Reco = -1000;
     _pz_gamma_Reco = -1000;
+    _e_gamma_Reco = -1000;
     _theta_gamma_Reco = -1000;
     _phi_gamma_Reco = -1000;
+    _x_pi0_Reco = -1000;
+    _y_pi0_Reco = -1000;
+    _z_pi0_Reco = -1000;
+    _e_pi0_Reco = -1000;
 	
     _vtx_dist = 10000000;
 	return;
