@@ -44,28 +44,31 @@ namespace ertool {
   public:
 
     /// Default constructor
-    AlgoEMPart();
+    AlgoEMPart(const std::string& name="EMPart");
 
     /// Default destructor
-    virtual ~AlgoEMPart(){}
+    ~AlgoEMPart(){}
 
     /// Called only once by the constructor in its lifespan
     void SetDefaultParams();
 
-    /// Override the sptool::SPTBase::LoadParams function
-    virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
+    /// Resetter
+    void Reset(){}
+
+    /// Implement AcceptPSet
+    void AcceptPSet(const ::fcllite::PSet& cfg);
     
     /// Switch e- (false) / gamma (true) mode
     void SetMode(const bool gamma) { _mode = gamma; }
 
     /// What to do before event-loop begins
-    virtual void ProcessBegin();
+    void ProcessBegin();
 
     /// Function to evaluate input showers and determine a score
-    virtual bool Reconstruct(const EventData &data, ParticleGraph& graph);
+    bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
     /// What to do once event-loop is over
-    virtual void ProcessEnd(TFile* fout);
+    void ProcessEnd(TFile* fout);
 
     /// Likelihood for a particle being gamma/electron
     double LL(bool is_electron, double dedx, double rad_length = -1.);

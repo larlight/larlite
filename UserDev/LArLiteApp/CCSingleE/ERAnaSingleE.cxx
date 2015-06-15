@@ -106,15 +106,19 @@ namespace ertool {
   if (_debug)
     std::cout << "******  Begin ERAnaSingleE Analysis  ******" << std::endl;
 
-
-  if (_debug){
+    if (_debug){
     std::cout << "ParticleGraph Diagram: " << std::endl
 	      << graph.Diagram() << std::endl;
-  }
-  /*
-    // Get MC particle set
-    auto mc_graph = MCParticleGraph();
+    }
 
+    // Get MC particle set
+    auto const& mc_graph = MCParticleGraph();
+
+    if (_debug){
+      std::cout << "MC Particle Diagram: " << std::endl
+		<< mc_graph.Diagram() << std::endl;
+    }
+     
     // Reset tree variables
     // Assume we will mis-ID
     ResetTreeVariables();
@@ -125,7 +129,7 @@ namespace ertool {
     _n_gammas    = 0;
 
     // Get MC EventData (showers/tracks...)
-    auto mc_data = MCEventData();
+    auto const& mc_data = MCEventData();
     // Count number of MC tracks and showers with E > _eCut MeV
     _n_showers   = 0;
     _n_tracks    = 0;
@@ -133,17 +137,17 @@ namespace ertool {
 
     // Keep track of all energy deposited in detector
     _EDep = 0;
-
-    for (auto &s : data.Shower()){
+    /*
+    for (auto const &s : data.Shower()){
       _EDep += s._energy;
       if (s._energy > _eCut) { _n_showers += 1; }
     }
-    for (auto &t : data.Track()){
+    for (auto const &t : data.Track()){
       _EDep += t._energy;
       if (t._energy > _eCut) { _n_tracks += 1; }
     }
     if (_debug) { std::cout << "Total Energy deposited in detector: " << _EDep << std::endl; }
-  */
+    */
     /*
     // If debug -> print out MC particle set
     if (_debug){
@@ -275,6 +279,10 @@ namespace ertool {
     _result_tree->Fill();
     /*
     for(int i = 0; i< ps.size(); i++){
+    if ( _n_singleReco == 0 )
+      _result_tree->Fill();
+    
+    for(size_t i = 0; i< ps.size(); i++){
       Particle neutrino = ps[i];
 
       if(abs(neutrino.PdgCode()) != 12  && abs(neutrino.PdgCode()) != 14)
@@ -390,8 +398,8 @@ namespace ertool {
 	      << "SingleE Events: " << _singleE_ctr << std::endl
 	      << "Eff           : " << _eff << " %" << std::endl;
 
-    MakeEffPlot("e_lep",10,0,2000);
-    MakeEffPlot("e_nu",10,0,2000);
+    MakeEffPlot("e_lep",10,0,3000);
+    MakeEffPlot("e_nu",10,0,3000);
     MakeEffPlot("n_tracks",10,-0.5,9.5);
     MakeEffPlot("n_tracksReco",10,-0.5,9.5);
 
@@ -408,8 +416,8 @@ namespace ertool {
   void ERAnaSingleE::MakeEffPlot(std::string varname,
 				 int nbins, double xmin, double xmax){
 
-    int Nall, Nok;
     // Efficiency vs. variable "varname"
+    int Nall, Nok;
     TH1D *hist = new TH1D(Form("_hEffvs%s",varname.c_str()),Form("Efficiency vs %s",varname.c_str()),nbins,xmin,xmax);
     TH1D *All = new TH1D("All","All",nbins,xmin,xmax); // Histogram of all entries as a function of Elep
     TH1D *Ok = new TH1D("Ok","Ok",nbins,xmin,xmax);  // Histogram of all entries that are not mis-ID vs Elep

@@ -6,10 +6,14 @@
 #include "ConfigManager.h"
 #include "FhiclLiteException.h"
 
-namespace fclite {
-  ConfigManager::ConfigManager() : _data("MainConfig")
+namespace fcllite {
+  ConfigManager::ConfigManager(const std::string& name)
+    : _data(name)
   {
   }
+
+  void ConfigManager::Reset()
+  { _data.clear(); }
   
   void ConfigManager::AddCfgFile(std::string fname)
   {

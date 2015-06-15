@@ -33,7 +33,7 @@ namespace ertool {
   public:
     
     /// Default constructor
-    AnaBase();
+    AnaBase(const std::string& name="");
     
     /// Default destructor
     virtual ~AnaBase(){}

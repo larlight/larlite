@@ -51,7 +51,7 @@ namespace larlite {
       : _ranges(orig._ranges)
     {}
 
-    const std::vector< ::larlite::sparse_data<T> >& get_ranges() const
+    const std::vector<larlite::sparse_data<T> >& get_ranges() const
     { return _ranges; }
 
     size_t size() const { return _ranges.size(); }
@@ -59,7 +59,7 @@ namespace larlite {
     void add_range(unsigned int start, const std::vector<T>& data);
 
   protected:
-    std::vector< ::larlite::sparse_data<T> > _ranges;
+    std::vector<larlite::sparse_data<T> > _ranges;
 
   };
 }

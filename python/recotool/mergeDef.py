@@ -11,53 +11,6 @@
 from larlite import larlite as fmwk
 from cpp_classes import cmtool
 
-
-def DebugMultipleManagers(merger_instance=0,producer='fuzzycluster',saveOutput=True):
-    if not merger_instance:
-        raise Exception('To call ConfigureDefaultMergerInstance function, you need to hand it a ClusterMerger() instance! Or, an instance of something that inherits from ClusterMerger.')
-
-    ######################################
-    # attach 1st stage  merge algos here #
-    ######################################
-
-    ## PROHIBIT ALGOS ##
-    prohib_array = cmtool.CBAlgoArray()
-    
-    tracksep_prohibit = cmtool.CBAlgoTrackSeparate()
-    tracksep_prohibit.SetUseEP(True)
-    prohib_array.AddAlgo(tracksep_prohibit,False)
-    
-    outofcone_prohibit = cmtool.CBAlgoOutOfConeSeparate()
-    outofcone_prohibit.SetMaxAngleSep(20.)
-    prohib_array.AddAlgo(outofcone_prohibit,False)
-    
-    merger_instance.GetManager().AddSeparateAlgo(prohib_array)
-
-    ## MERGE ALGOS ##
-    merge_array = cmtool.CBAlgoArray()
-    
-    shortdist_alg = cmtool.CBAlgoShortestDist()
-    shortdist_alg.SetMinHits(10)
-    shortdist_alg.SetSquaredDistanceCut(5.)
-    merge_array.AddAlgo(shortdist_alg,False)
-    
-    trackblob = cmtool.CBAlgoStartTrack()
-    merge_array.AddAlgo(trackblob,False)
-    
-    pcontain = cmtool.CBAlgoPolyContain()
-    merge_array.AddAlgo(pcontain,False)
-    
-    merger_instance.GetManager().AddMergeAlgo(merge_array)
-
-    merger_instance.GetManager().MergeTillConverge(True)
-
-    merger_instance.SetInputProducer(producer)
-    merger_instance.SetOutputProducer('fuzzyclustermerger')
-    merger_instance.SaveOutputCluster(saveOutput)
-
-    merger_instance.GetManager(1).AddMergeAlgo(cmtool.CBAlgoMergeAll())
-
-
 def ConfigureMergeAllInstance(merger_instance=0, producer="fuzzycluster",saveOutput=True):
     if not merger_instance:
         raise Exception('To call ConfigureDefaultMergerInstance function, you need to hand it a ClusterMerger() instance! Or, an instance of something that inherits from ClusterMerger.')

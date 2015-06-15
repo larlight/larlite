@@ -93,6 +93,10 @@ namespace larlite {
 
   private:
 
+    // Function to get a map of masses from PDG code
+    std::map<int,double>& getMassMap(const event_mcshower& mcs_v,
+				     const event_mctrack& mct_v);
+
     // Minimum deposited energy for showers in order to
     // be added to EventData
     double _minEDep;

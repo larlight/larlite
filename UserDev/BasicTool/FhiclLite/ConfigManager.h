@@ -16,7 +16,7 @@
 
 #include "PSet.h"
 
-namespace fclite {
+namespace fcllite {
 
   /**
      \class ConfigManager
@@ -28,21 +28,23 @@ namespace fclite {
   public:
     
     /// Default constructor
-    ConfigManager();
+    ConfigManager(const std::string& name="MainConfig");
     
     /// Default destructor
     virtual ~ConfigManager(){};
+
+    void Reset();
     
     void AddCfgFile(std::string fname);
     
-    const fclite::PSet& Config() const { return _data; }
+    const fcllite::PSet& Config() const { return _data; }
     
-    const fclite::PSet& SubConfig(const std::string& key)
+    const fcllite::PSet& SubConfig(const std::string& key)
     { return _data.get_pset(key); }
     
   protected:
     
-    fclite::PSet _data;
+    fcllite::PSet _data;
   };
 }
 #endif

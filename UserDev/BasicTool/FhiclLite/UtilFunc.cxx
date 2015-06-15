@@ -3,7 +3,7 @@
 
 #include "UtilFunc.h"
 #include "FhiclLiteException.h"
-namespace fclite {
+namespace fcllite {
 
   template<> std::string FromString( const std::string& value)
   { return value; }
@@ -152,12 +152,9 @@ namespace fclite {
       res.push_back( FromString<bool>(v) );
     return res;
   }
-  
-  template <class T> std::string ToString(const T& value)
-  { return std::to_string(value); }
 
   template<> std::string ToString<std::string>(const std::string& value)
   { return std::string(value); }
-  
+
 }
 #endif

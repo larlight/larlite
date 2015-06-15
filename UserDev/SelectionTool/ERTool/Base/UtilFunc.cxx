@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <sstream>
 #include "ERException.h"
+#include "Message.h"
 
 namespace ertool {
 
@@ -41,7 +42,20 @@ namespace ertool {
 
     return result;
   }
-  
+
+  namespace msg {
+
+    void send(Level_t level, const std::string& msg)
+    {
+      Message::get()->send_msg(level,msg);
+    }
+    
+    void send(Level_t level, const std::string& where, const std::string& msg)
+    {
+      Message::get()->send_msg(level,where,msg);
+    }
+
+  }
 }
 
 #endif

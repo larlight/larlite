@@ -30,8 +30,10 @@ def DefaultShowerReco3D():
     sralg.Verbose(False)
     # sralg.Verbose(True)
     sralg.SetUseArea(True)
+    sralg.SetUseLinearEnergy(False)
     # Attach calo alg
     calg = calo.CalorimetryAlg()
+    calg.setUseModBox(True)
     sralg.CaloAlgo(calg)
     #sralg.SetUseModBox(True)
     ana_unit.SetShowerAlgo(sralg)

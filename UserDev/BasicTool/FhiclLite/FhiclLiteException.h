@@ -17,7 +17,7 @@
 #include <iostream>
 #include <exception>
 
-namespace fclite {
+namespace fcllite {
   /**
      \class FhiclLiteException
      Generic (base) exception class

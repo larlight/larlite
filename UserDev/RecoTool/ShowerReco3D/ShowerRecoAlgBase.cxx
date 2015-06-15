@@ -9,6 +9,7 @@ namespace showerreco {
   {
     fCaloAlg   = nullptr;
     fVerbosity = false;
+    _linearE   = false;
   }
 
   void ShowerRecoAlgBase::Reset()
@@ -25,11 +26,12 @@ namespace showerreco {
 
       clusters.push_back( ::showerreco::ShowerCluster_t() );
 
-      (*clusters.rbegin()).start_point = cpan.GetParams().start_point;
-      (*clusters.rbegin()).end_point   = cpan.GetParams().end_point;
-      (*clusters.rbegin()).angle_2d    = cpan.GetParams().angle_2d;
-      (*clusters.rbegin()).plane_id    = cpan.Plane();
-      (*clusters.rbegin()).hit_vector  = cpan.GetHitVector();
+      (*clusters.rbegin()).start_point      = cpan.GetParams().start_point;
+      (*clusters.rbegin()).end_point        = cpan.GetParams().end_point;
+      (*clusters.rbegin()).angle_2d         = cpan.GetParams().angle_2d;
+      (*clusters.rbegin()).opening_angle    = cpan.GetParams().opening_angle;
+      (*clusters.rbegin()).plane_id         = cpan.Plane();
+      (*clusters.rbegin()).hit_vector       = cpan.GetHitVector();
 
     }
 

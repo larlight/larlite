@@ -15,10 +15,10 @@
 #define ERTOOL_UNITBASE_H
 
 #include <iostream>
-#include "Record.h"
-
+#include <TFile.h>
+#include "FhiclLite/PSet.h"
 namespace ertool {
-
+  class Manager;
   /**
      \class UnitBase
      @brief Base class for ertool::AlgoBase and ertool::FilterBase
@@ -28,28 +28,46 @@ namespace ertool {
      As the class inherits from ertool::Record, it has a systemtaic procedure to store/load parameter \n
      sets (variable name & values) from larlite::user_info.
  */
-  class UnitBase : public Record {
-
+  //class UnitBase : public Record {
+  class UnitBase {
+    friend class Manager;
   public:
     
     /// Default constructor
-    UnitBase() : Record() { _name = "UnitBase"; _training_mode = false; }
+    UnitBase(const std::string& name="");
     
     /// Default destructor
     virtual ~UnitBase(){}
+
+    /// Name getter
+    const std::string& Name() const;
+
+    /// Function to accept fclite::PSet
+    virtual void AcceptPSet(const ::fcllite::PSet& cfg) = 0;
     
     /// Function to reset itself
-    virtual void Reset(){}
+    virtual void Reset() = 0;
 
     /// Called @ before processing the first event sample
-    virtual void ProcessBegin(){}
+    virtual void ProcessBegin() = 0;
 
     /// Called after processing the last event sample
-    virtual void ProcessEnd(TFile* fout=nullptr) {}
-
+    virtual void ProcessEnd(TFile* fout=nullptr) = 0;
+    
     /// Boolean to set whether the use is in the training mode or not
     bool _training_mode;
 
+  protected:
+
+    ::fcllite::PSet& OutputPSet();
+
+  private:
+    /// Name
+    std::string _name;
+
+    /// Output configuration
+    ::fcllite::PSet _out_conf;
+    
   };
 }
 

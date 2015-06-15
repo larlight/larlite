@@ -7,8 +7,8 @@
 
 namespace ertool {
 
-  AlgoPi0::AlgoPi0() 
-    : AlgoBase()
+  AlgoPi0::AlgoPi0(const std::string& name) 
+    : AlgoBase(name)
     , _radLenVar(nullptr)
     , _vtxVar(nullptr)
     , _vtxSigl(nullptr)
@@ -18,7 +18,6 @@ namespace ertool {
     , _hBestMass(nullptr)
     , _ll_tree(nullptr)
   {
-    _name     = "AlgoPi0";
     _energy_min = 40.;
     _energy_max = 1200.;
     _fit_min    = 10;
@@ -62,31 +61,31 @@ namespace ertool {
 
   }
 
-  void AlgoPi0::LoadParams(std::string fname, size_t version){
+  void AlgoPi0::AcceptPSet(const ::fcllite::PSet& cfg) {
 
     // Load EMPart params
-    _alg_emp.LoadParams(fname,version);
+    _alg_emp.AcceptPSet(cfg);
 
     //Load user_info
-    Record::LoadParams(fname,version);
+    auto p = cfg.get_pset(Name());
 
     // Extract if parameters found
     std::cout << "["<<__FUNCTION__<<"] : Loading Pi0 Params." << std::endl;
 
-    if(_params.exist_darray("energy_range")){
-      auto darray = _params.get_darray("energy_range");
-      _energy_min = (*darray)[0];
-      _energy_max = (*darray)[1];
+    if(p.contains_value("energy_range")) {
+      auto darray = p.get<std::vector<double> >("energy_range");
+      _energy_min = darray[0];
+      _energy_max = darray[1];
       std::cout<<"["<<__FUNCTION__<<"] "
 	       << "Loaded energy range : "
 	       << _energy_min << " => " << _energy_max
 	       << std::endl;
     }
 
-    if(_params.exist_darray("angle_range")){
-      auto darray = _params.get_darray("angle_range");
-      _angle_min = (*darray)[0];
-      _angle_max = (*darray)[1];
+    if(p.contains_value("angle_range")){
+      auto darray = p.get<std::vector<double> >("angle_range");
+      _angle_min = darray[0];
+      _angle_max = darray[1];
       std::cout<<"["<<__FUNCTION__<<"] "
 	       << "Loaded angle range : "
 	       << _angle_min << " => " << _angle_max

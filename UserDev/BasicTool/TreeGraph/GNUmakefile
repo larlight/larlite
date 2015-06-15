@@ -19,7 +19,7 @@ OSNAME          = $(shell uname -s)
 HOST            = $(shell uname -n)
 OSNAMEMODE      = $(OSNAME)
 
-LDFLAGS += $(shell basictool-config --libs)
+LDFLAGS += -L$(LARLITE_LIBDIR) -lBasicTool_GeoAlgo
 
 # call kernel specific compiler setup
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}

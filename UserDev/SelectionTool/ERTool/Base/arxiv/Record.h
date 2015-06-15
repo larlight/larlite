@@ -80,7 +80,7 @@ namespace ertool {
     std::string _name;
 
     /// Parameter set for an algorithm. Stored in a data file.
-    ::ertool::Params _params;
+    ::ertool::Params _params;    
 
   };
 }

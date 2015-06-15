@@ -51,11 +51,10 @@ namespace ertool {
   size_t dedx_counter = 0;
 
 
-  AlgoSingleGamma::AlgoSingleGamma() : AlgoBase()
+  AlgoSingleGamma::AlgoSingleGamma(const std::string& name) : AlgoBase(name)
 				     , fTPC(-10.,-126.,-10.,292.,136.,1150.)
 				     , _alg_tree(nullptr)
   {
-    _name     = "AlgoSingleGamma";
     _e_mass     = TDatabasePDG().GetParticle(11)->Mass();
     _e_ll_values = 0;
     _dedx_values = 0;
@@ -84,7 +83,6 @@ namespace ertool {
 
   void AlgoSingleGamma::ProcessBegin()
   {
-    _alg_emp.LoadParams();
     _alg_emp.ProcessBegin();
     _alg_emp.SetMode(true);
 
@@ -115,10 +113,10 @@ namespace ertool {
 
   }
   
-  void AlgoSingleGamma::LoadParams(std::string fname, size_t version)
+  void AlgoSingleGamma::AcceptPSet(const ::fcllite::PSet& cfg) 
   {
     //Load EMPart params
-    _alg_emp.LoadParams(fname,version);
+    _alg_emp.AcceptPSet(cfg);
     
     return;
   }
@@ -389,7 +387,7 @@ namespace ertool {
 	  graph.GetParticle(s).SetParticleInfo(22,0,shr.Start(),mom);
 	  // need to add back energy? can't do that right now..
 	  double nuKE = 0;
-	  double nuMom = 0;
+	  //double nuMom = 0;
 	  nuKE  += mom;
 	  //nuMom += photon.Momentum();
 	  //neutrino.SetParticleInfo();
@@ -403,7 +401,7 @@ namespace ertool {
 	  if(mom < 0) mom = 0;
 	  graph.GetParticle(t).SetParticleInfo(_findRel.GetPDG(trk),0,trk[0],mom);
 	  double nuKE = 0;
-	  double nuMom = 0;
+	  //double nuMom = 0;
 	  nuKE  += mom;
 	  //nuMom += photon.Momentum();
 	  // need to edit neutrino momentum...can't do that right now...

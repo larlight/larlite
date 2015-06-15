@@ -3,7 +3,7 @@
 
 #include "PSet.h"
 
-namespace fclite {
+namespace fcllite {
 
   PSet::PSet(const std::string name,
 	     const std::string data)
@@ -13,6 +13,18 @@ namespace fclite {
     if(!data.empty()) this->add(data);
   }
 
+  size_t PSet::size() const
+  { return (_data_value.size() + _data_pset.size()); }
+
+  const std::vector<std::string> PSet::keys() const
+  {
+    std::vector<std::string> res;
+    res.reserve(_data_value.size() + _data_pset.size());
+    for(auto const& key_value : _data_value) res.push_back(key_value.first);
+    for(auto const& key_value : _data_pset ) res.push_back(key_value.first);
+    return res;
+  }
+  
   const std::vector<std::string> PSet::value_keys () const
   {
     std::vector<std::string> res;
@@ -106,6 +118,17 @@ namespace fclite {
     _data_value[key]=value;
   }
 
+  void PSet::add_pset(const PSet& p)
+  {
+    if( _data_value.find(p.name()) != _data_value.end() ||
+        _data_pset.find(p.name())  != _data_pset.end() ) {
+      std::string msg;
+      msg = " Duplicate key: \"" + p.name() + "\"";
+      throw FhiclLiteException(msg.c_str());
+    }    
+    _data_pset.insert(std::make_pair(p.name(),p));
+  }
+  
   void PSet::add_pset(std::string key,
 		      std::string value)
   {
@@ -113,7 +136,7 @@ namespace fclite {
         _data_pset.find(key)  != _data_pset.end() ) {
       std::string msg;
       msg = " Duplicate key: \"" + key + "\"";
-      throw FhiclLiteException(key.c_str());
+      throw FhiclLiteException(msg.c_str());
     }
     no_space(key);
     if(key.empty()) throw FhiclLiteException("Empty key cannot be registered!");
@@ -239,10 +262,10 @@ namespace fclite {
   std::string PSet::dump(size_t indent_size) const
   {
     
-    std::string res,out_indent,in_indent;
+    std::string res,in_indent,out_indent;
     for(size_t i=0; i<indent_size; ++i) out_indent += " ";
     res = out_indent + _name + " : {\n";
-    for(size_t i=0; i<res.size(); ++i) in_indent += " ";
+    in_indent = out_indent + "  ";
     for(auto const& key_value : _data_value)
 
       res += in_indent + key_value.first + " : " + key_value.second + "\n";

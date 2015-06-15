@@ -20,7 +20,7 @@
 #include <TString.h>
 #include "FhiclLiteException.h"
 #include "UtilFunc.h"
-namespace fclite {
+namespace fcllite {
   /**
      \class PSet
      User defined class PSet ... these comments are used to generate
@@ -43,6 +43,35 @@ namespace fclite {
 			   , _data_pset  ( orig._data_pset  )
     {}
 
+    /// name getter
+    const std::string& name() const { return _name; }
+    
+    /// operator override
+    inline bool operator==(const PSet& rhs) const
+    {
+      if(_name != rhs.name()) return false;
+      auto const v_keys = this->value_keys();
+      if(v_keys.size() != rhs.value_keys().size()) return false;
+      for(auto const& key : v_keys) {
+	if(!rhs.contains_value(key))
+	  return false;
+	if(this->get<std::string>(key) != rhs.get<std::string>(key))
+	  return false;
+      }
+      auto const p_keys = this->pset_keys();
+      if(p_keys.size() != rhs.pset_keys().size()) return false;
+      for(auto const& key : p_keys) {
+	if(!rhs.contains_pset(key))
+	  return false;
+	if(this->get_pset(key) != rhs.get_pset(key))
+	  return false;
+      }
+      return true;
+    }
+
+    inline bool operator!=(const PSet& rhs) const
+    { return !((*this) == rhs); }
+
     /// clear method
     void clear() 
     { _data_value.clear(); _data_pset.clear(); }
@@ -51,8 +80,14 @@ namespace fclite {
     void add(const std::string& data);
 
     /// Insert method for a simple param
-    void add_value(std::string key,
-		   std::string value);
+    void add_value(std::string key, std::string value);
+
+    /// Insert method for a PSet rep
+    void add_pset(const PSet& p);
+
+    /// Insert method for a PSet rep
+    void add_pset(std::string key,
+		  std::string pset);
     
     /// Dump into a text format
     std::string dump(size_t indent_size=0) const;
@@ -71,6 +106,8 @@ namespace fclite {
 
     const PSet& get_pset(const std::string& key) const;
 
+    size_t size() const;
+    const std::vector<std::string> keys() const;
     const std::vector<std::string> value_keys () const;
     const std::vector<std::string> pset_keys  () const;
     bool  contains_value (const std::string& key) const;
@@ -85,10 +122,6 @@ namespace fclite {
       kNone
     };
 
-    /// Insert method for a PSet rep
-    void add_pset(std::string key,
-		  std::string pset);
-
     std::pair<PSet::KeyChar_t,size_t> search(const std::string& txt, const size_t start) const;
     void strip(std::string& str, const std::string& key);
     void rstrip(std::string& str, const std::string& key);
@@ -97,21 +130,9 @@ namespace fclite {
     std::string _name;
 
     std::map<std::string,std::string> _data_value;
-    std::map<std::string,::fclite::PSet> _data_pset;
+    std::map<std::string,::fcllite::PSet> _data_pset;
 
   };
-
-  /*
-  template std::string PSet::get(const std::string& key) const;
-  template float       PSet::get(const std::string& key) const;
-  template double      PSet::get(const std::string& key) const;
-  template short       PSet::get(const std::string& key) const;
-  template int         PSet::get(const std::string& key) const;
-  template long        PSet::get(const std::string& key) const;
-  template unsigned short PSet::get(const std::string& key) const;
-  template unsigned int   PSet::get(const std::string& key) const;
-  template unsigned long  PSet::get(const std::string& key) const;
-  */
 
 }
 
