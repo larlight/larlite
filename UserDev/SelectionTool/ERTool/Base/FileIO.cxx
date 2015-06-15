@@ -8,7 +8,7 @@
 namespace ertool {
   namespace io {
     
-    FileIO::FileIO( const std::string&     proc_name,
+    FileIO::FileIO( const std::string& proc_name,
 		    const StreamType_t in_strm,
 		    const StreamType_t out_strm)
       : _state     ( kINIT          )
@@ -23,7 +23,6 @@ namespace ertool {
       , _n_entries ( 0              )
       , _current_entry ( ertool::kINVALID_SIZE )
     {
-      
       _prov   = new ::ertool::Provenance(proc_name);
       _edata  = new ::ertool::EventData;
       _pgraph = new ::ertool::ParticleGraph;
@@ -62,27 +61,18 @@ namespace ertool {
 
     EventData& FileIO::GetEventDataWriteable(bool mc)
     {
-      if(_state != kOPEN)
-	throw ertool::ERException("File not yet opened...");
-
       if(mc) return *_edata_mc;
       return *_edata;
     }
     
     ParticleGraph& FileIO::GetParticleGraphWriteable(bool mc)
     {
-      if(_state != kOPEN)
-	throw ertool::ERException("File not yet opened...");
-
       if(mc) return *_pgraph_mc;
       return *_pgraph;
     }
     
     Provenance& FileIO::GetProvenanceWriteable()
     {
-      if(_state != kOPEN)
-	throw ertool::ERException("File not yet opened...");
-
       return *_prov;
     }
 
@@ -175,7 +165,6 @@ namespace ertool {
       
     }
 
-    /// Open input/output file(s)
     bool FileIO::Open()
     {
       if(_state != kINIT)
@@ -217,7 +206,6 @@ namespace ertool {
       return status;
     }
   
-    /// Read a specified entry (event) 
     bool FileIO::ReadEntry(size_t entry)
     {
       if( _state != kOPEN )
@@ -240,7 +228,6 @@ namespace ertool {
       return status;
     }
     
-    /// Write the current entry (event)
     bool FileIO::WriteEntry()
     {
       if( _state != kOPEN )
@@ -263,7 +250,6 @@ namespace ertool {
       return status;
     }
     
-    /// Close input/output file(s)
     bool FileIO::Close()
     {
       if( _state != kOPEN )
