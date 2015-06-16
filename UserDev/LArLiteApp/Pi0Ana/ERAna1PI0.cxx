@@ -5,14 +5,11 @@
 
 namespace ertool {
 
-  ERAna1PI0::ERAna1PI0() : AnaBase()
-			, _pi0_reco_tree(nullptr)
-			, _pi0_tree(nullptr)
-			, _1pi0_tree(nullptr)
-			, _mpi0_tree(nullptr)
+  ERAna1PI0::ERAna1PI0(const std::string& name) 
+    : AnaBase(name)
+    , _pi0_reco_tree(nullptr)
+    , _1pi0_tree(nullptr)
   {
-    _name     = "ERAna1PI0";
-
 //====================
 // Reco objects tree
 //====================
@@ -48,14 +45,12 @@ namespace ertool {
 // both showers 
     _pi0_reco_tree->Branch("_shr_a_dot_b_Reco",&_shr_a_dot_b_Reco,"shr_a_dot_b_Reco/D");
 
-
-  if (_pi0_tree) { delete _pi0_tree; }
-    _pi0_tree = new TTree("_pi0_tree","Pi0 Tree");
-
 ///=========================================
 // Reco & MC objects tree with 1pi0 events
+//.... This is to try to compare
+// reco object to mc object in cases of signal events
 //=========================================
-  if (_1pi0_tree) { delete _1pi0_tree; }
+  if (_1pi0_tree){ delete _1pi0_tree; }
     _1pi0_tree = new TTree("_1pi0_tree","1Pi0 Tree");
 		// RECO INFO
     _1pi0_tree->Branch("_x_pi0_Reco",&_x_pi0_Reco,"x_pi0_Reco/D");
@@ -87,33 +82,28 @@ namespace ertool {
 // both showers 
     _1pi0_tree->Branch("_shr_a_dot_b_Reco",&_shr_a_dot_b_Reco,"shr_a_dot_b_Reco/D");
 		// MC INFO
-
-  if (_mpi0_tree) { delete _mpi0_tree; }
-    _mpi0_tree = new TTree("_mpi0_tree","mPi0 Tree");
-
-
-
   }// 
+
+
+  void ERAna1PI0::AcceptPSet(const ::fcllite::PSet& cfg)
+  {}
+
+  void ERAna1PI0::ProcessBegin()
+  {
+	std::cout<<" Look we are defining things "<<std::endl;
+  }
 
   void ERAna1PI0::Reset()
   {}
 
   bool ERAna1PI0::Analyze(const EventData &data,  const ParticleGraph &graph)
   {
-
   if(_debug){
-	std::cout<< "\nStart of the ERANA"<<std::endl;}
-
-  if(_debug){
-    std::cout << "ParticleGraph Diagram: " << std::endl
+    std::cout << "Start of ANA : ParticleGraph Diagram: " << std::endl
               << graph.Diagram() << std::endl;
   }
 
-
-    // Get MC particle set
-   // auto mc_graph = MCParticleGraph();
    ResetTreeVariables();
-
 
 	auto const& particles = graph.GetParticleArray();
 	// First Find out how many pi0's we have 
@@ -131,15 +121,14 @@ namespace ertool {
 	_px_pi0_Reco = pi0particle_r.Momentum()[0];
 	_py_pi0_Reco = pi0particle_r.Momentum()[1];
 	_pz_pi0_Reco = pi0particle_r.Momentum()[2];
-	_p_pi0_Reco = pi0particle_r.Momentum()[3];// This returns a value that doesnt make sense. RG 
+	//_p_pi0_Reco = pi0particle_r.Momentum()[3];// This returns a value that doesnt make sense. RG 
+	_p_pi0_Reco = sqrt(pow(_px_pi0_Reco,2) + pow(_py_pi0_Reco,2) + pow(_pz_pi0_Reco,2));// not working. little hack
 	_mass_pi0_Reco =pi0particle_r.Mass();
-	
 	
 		// What are the descendents of this pi0 
 		// We know that there are two photons in the reconstruction
 		// We will define showerA and showerB
 		auto photonid = graph.GetAllDescendantNodes(pi0node);
-		std::cout<<"Photons? :"<<photonid.size()<<std::endl;
 		auto shra_r =  graph.GetParticle(photonid[0]);
 		auto shrb_r =  graph.GetParticle(photonid[1]);
 
@@ -163,14 +152,10 @@ namespace ertool {
 		_p_shrb_Reco = shrb_r.Momentum()[3];// not working.... but should be just energy for photons
 		_e_shrb_Reco = shrb_r.Energy();
 
-
 		// Fill out some comparison of the two photons. 
 		// showerA dot showerB 
 		_shr_a_dot_b_Reco = cos(shra_r.Momentum().Angle(shrb_r.Momentum()));// needs to be normalized
-
-
 	_pi0_reco_tree->Fill();
-
 
 	// We need to see how many pi0's are in the event from truth level 
 	auto mcgraph = MCParticleGraph();	
@@ -183,10 +168,24 @@ namespace ertool {
 	auto mcgammanode = mcgraph.GetAllDescendantNodes(mcpi0node);
 	//Dalitz Decay ?
 	if(mcgammanode.size()!=2){std::cout<<"This is a dalitz decay "<<std::endl;}
+	
+	if(mcgammanode.size()==2 && mcpi0counter==1){
+		auto photon1_mc =  mcgraph.GetParticle(mcgammanode[0]);
+		auto photon2_mc =  mcgraph.GetParticle(mcgammanode[1]);
+		auto p1_RID_MC= photon1_mc.RecoID();
+		std::cout<<" THe reco ID "<<p1_RID_MC<<std::endl;
+		//auto shr1_startpt_mc = mcgraph.GetParticle(shr1_nodes_mc[0]);
+		
+	/*	
+
+
 		auto shr1_mc =  mcgraph.GetParticle(mcgammanode[0]);
 		auto shr2_mc =  mcgraph.GetParticle(mcgammanode[1]);
 		std::cout<<" MC NODE : "<< mcgammanode[0]<<"   ,     "<<mcgammanode[1]<<std::endl;
-	
+		std::cout<<" These are the two shower particle info : " 
+			<<"\n\tShower1 : "<<shr1_mc.Energy()<<std::endl<<"\tPosition"<<shr1_mc.Vertex()<<std::endl
+			<<"\n\n\tShower2 : "<<shr2_mc.Energy()<<std::endl<<"\tPosition"<<shr2_mc.Vertex()<<std::endl;
+		// fill and mathch the photons
 //================================
 //================================
 	// Match the showers
@@ -202,12 +201,14 @@ std::pair<int, int> shower_match_B;
 		double vmatz= shra_r.Vertex().Dist(shr1_mc.Vertex());
 		double vmatx= shra_r.Vertex().Dist(shr2_mc.Vertex());
 	std::cout<<" vetx match dist "<< vmatz << " other vert match dist "<< vmatx<<std::endl;
-
+*/
+		}// if 2shower
 //================================
 //================================
 //================================
 //================================
-
+/*
+*/
 	}// if pi0counter==1
 
 
@@ -371,21 +372,21 @@ std::pair<int, int> shower_match_B;
 
   void ERAna1PI0::ProcessEnd(TFile* fout)
   {
+
     if (fout){
+	std::cout<<" Are we finishing the fout part  HUHUHUHUHUHUH"<<std::endl;
       fout->cd();
       _pi0_reco_tree->Write();
-      _pi0_tree->Write();
       _1pi0_tree->Write();
-      _mpi0_tree->Write();
     }
 
 
 	std::cout<<"From ER1pi0Ana  -->  Summary of Events \n" 	
 	//<< "\nTotal Reco 1pi0       "<<_pi0_reco_tree->GetEntries()
 	<< "\nTotal Reco 1pi0       "<<_pi0_reco_tree->GetEntries()/2
-	<< "\nTotal Reco Events that have 0pi0 "<<_pi0_tree->GetEntries()/2
+//	<< "\nTotal Reco Events that have 0pi0 "<<_pi0_tree->GetEntries()/2
 	<< "\nTotal Reco Events that have 1pi0 "<<_1pi0_tree->GetEntries()/2
-	<< "\nTotal Reco Events that have >1pi0 "<<_mpi0_tree->GetEntries()/2
+//	<< "\nTotal Reco Events that have >1pi0 "<<_mpi0_tree->GetEntries()/2
 	
 
 	<<std::endl;

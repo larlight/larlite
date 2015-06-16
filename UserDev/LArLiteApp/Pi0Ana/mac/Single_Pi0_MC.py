@@ -52,17 +52,6 @@ my_proc.enable_filter(True)
 my_ana = ertool.ERAna1PI0()
 
 
-# First lets make a filter that looks for a certain events
-pi0_topo = fmwk.singlepi0();
-# 0 == inclusive 1 == 1pi0&&nopi+/-
-pi0_topo.SetTopology(1);
-#pi0_topo.SetTopology(0);
-# 0 == ntsignal 1 == signal
-pi0_topo.SignalTopology(True);
-# 0 == CC 1 == NC 
-pi0_topo.SetCCNC(1);
-
-
 my_anaunit._mgr.AddAna(my_ana)
 my_anaunit._mgr.AddAlgo(my_algo)
 #my_anaunit._mgr.AddCfgFile("/home/ryan/TESTERMOD/UserDev/LArLiteApp/ERToolBackend/mac/new_empart.txt")
@@ -77,7 +66,7 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
-my_proc.set_ana_output_file("singlepi0_signal.root")
+my_proc.set_ana_output_file("singlepi0_mc.root")
 
 # here set E-cut for Helper & Ana modules
 my_anaunit._mgr._mc_for_ana = True
@@ -103,7 +92,6 @@ my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetVtxProducer(False,"");
 # ************************************************
 
-my_proc.add_process(pi0_topo)
 my_proc.add_process(my_anaunit)
 
 my_proc.run()
