@@ -38,7 +38,7 @@ namespace ertool {
   public:
 
     /// Default constructor
-    ERAna1PI0();
+    ERAna1PI0(const std::string& name="ERAna1Pi0");
 
     /// Default destructor
     virtual ~ERAna1PI0(){};
@@ -47,11 +47,13 @@ namespace ertool {
     virtual void Reset();
 
     /// Called @ before processing the first event sample
-//    virtual void ProcessBegin(){}
+    virtual void ProcessBegin();
+
+    void AcceptPSet(const ::fcllite::PSet& cfg);
+
     void SetDebug(bool on) { _debug = on; }
 
     /// Function to evaluate input showers and determine a score
-    //virtual bool Analyze(const EventData &data, const ParticleSet &ps);
     virtual bool Analyze(const EventData &data,  const ParticleGraph &graph);
 
     /// Called after processing the last event sample
@@ -59,19 +61,13 @@ namespace ertool {
     /// Function to re-set TTree variables
     void ResetTreeVariables();
 
-
-    // Tree that has reco pi0 in it.
-	// If reco fill out the info. 
-		//If there is an actual pi0 then compare it
 	
    private:
 
     bool _debug;
 
     TTree* _pi0_reco_tree;
-    TTree* _pi0_tree;
     TTree* _1pi0_tree;
-    TTree* _mpi0_tree;
 	
     double _x_pi0_Reco, _y_pi0_Reco, _z_pi0_Reco; /// pi0 x,y,z start point
     double _px_pi0_Reco, _py_pi0_Reco, _pz_pi0_Reco , _p_pi0_Reco; /// pi0 px,py,pz,pmag
