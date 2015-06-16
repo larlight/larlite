@@ -91,32 +91,17 @@ namespace ertool {
 
 
 
-
     double _x_gamma_Reco, _y_gamma_Reco, _z_gamma_Reco; /// lepton x,y,z start point
     double _x_gamma_MC, _y_gamma_MC, _z_gamma_MC; /// lepton x,y,z start point
-
-    double _x_pi0_Reco, _y_pi0_Reco, _z_pi0_Reco; /// lepton x,y,z start point
-    double _x_pi0_MC, _y_pi0_MC, _z_pi0_MC; /// lepton x,y,z start point
-
-    double _e_gamma_Reco;
-    double _e_gamma_MC ;
-
-    double _e_pi0_Reco ;
-    double _e_pi0_MC ;
 
     double _px_gamma_Reco, _py_gamma_Reco, _pz_gamma_Reco; /// lepton x,y,z start point
     double _px_gamma_MC, _py_gamma_MC, _pz_gamma_MC; /// lepton x,y,z start point
 
-    double _theta_gamma_MC, _phi_gamma_MC;
     double _theta_gamma_Reco, _phi_gamma_Reco;
-
-    double _mass_pi0_Reco;
-    double _mass_pi0_MC ;
+    double _theta_gamma_MC, _phi_gamma_MC;
 
     double _vtx_dist;
 
-
-    int ct ;
 
   };
 }
