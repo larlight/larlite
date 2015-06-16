@@ -79,15 +79,12 @@ namespace larlite {
       s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
       s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
       auto nodeID = mgr.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),true);
-      std::cout << "Shower E: " << s._energy << std::endl;
       int pdg = mcs.PdgCode();
       // then edit the particle
       mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
 								pdgdbs.GetParticle(pdg)->Mass()*1.e-3,
 								mcs.Start().Position(),
 								mcs.Start().Momentum()); 
-      std::cout << "Associated particle energy: " << mgr.MCParticleGraph().GetParticle(nodeID).Energy() << std::endl;
-      
       // if not primary
       if( mcs.MotherTrackID() != mcs.AncestorTrackID() ) continue;
       
