@@ -2,7 +2,7 @@ from colored_msg import info,warning
 import ROOT
 libs=['libSelectionTool_ERApp',
       'libSelectionTool_ERAlgo',
-      'libSelectionTool_ERFilter',
+   #   'libSelectionTool_ERFilter',
       'libSelectionTool_ERBase']
 orig_level = ROOT.gErrorIgnoreLevel
 ROOT.gErrorIgnoreLevel = ROOT.kFatal
