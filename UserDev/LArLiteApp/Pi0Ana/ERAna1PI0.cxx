@@ -396,12 +396,13 @@ std::pair<int, int> shower_match_B;
       _1pi0_tree->Write();
     }
     
-        double found = _pi0_reco_tree->GetEntries()/2 ;
+//        double found = _pi0_reco_tree->GetEntries()/2 ;
 
 	std::cout<<"From ER1pi0Ana  -->  Summary of Events \n" 	
 	<< "\nTotal Reco 1pi0       "<<_pi0_reco_tree->GetEntries()/2
 //	<< "\nTotal Reco Events that have 0pi0 "<<_pi0_tree->GetEntries()/2
 	<< "\nTotal Reco Events that have 1pi0 "<<_1pi0_tree->GetEntries()/2
+//	<< "\n Efficiency: "<< found/ct
 //	<< "\nTotal Reco Events that have >1pi0 "<<_mpi0_tree->GetEntries()/2
 	
 
@@ -413,9 +414,6 @@ std::pair<int, int> shower_match_B;
 
  void ERAna1PI0::ResetTreeVariables(){
 
-    _x_pi0_Reco = -1000;
-    _y_pi0_Reco = -1000;
-    _z_pi0_Reco = -1000;
     _px_pi0_Reco = -1000;
     _py_pi0_Reco = -1000;
     _pz_pi0_Reco = -1000;
@@ -424,18 +422,12 @@ std::pair<int, int> shower_match_B;
     _x_gamma_MC = -1000;
     _y_gamma_MC = -1000;
     _z_gamma_MC = -1000;
-    _e_gamma_MC = -1000;
     _px_gamma_MC = -1000;
     _py_gamma_MC = -1000;
     _pz_gamma_MC = -1000;
     _theta_gamma_MC = -1000;
     _phi_gamma_MC = -1000;
-    _x_pi0_MC = -1000;
-    _y_pi0_MC = -1000;
-    _z_pi0_MC = -1000;
-    _e_pi0_MC = -1000;
 
-    _mass_pi0_MC = -1000;
     _mass_pi0_Reco = -1000;
 
 
@@ -445,13 +437,11 @@ std::pair<int, int> shower_match_B;
     _px_gamma_Reco = -1000;
     _py_gamma_Reco = -1000;
     _pz_gamma_Reco = -1000;
-    _e_gamma_Reco = -1000;
     _theta_gamma_Reco = -1000;
     _phi_gamma_Reco = -1000;
     _x_pi0_Reco = -1000;
     _y_pi0_Reco = -1000;
     _z_pi0_Reco = -1000;
-    _e_pi0_Reco = -1000;
 	
     _vtx_dist = 10000000;
 	return;
