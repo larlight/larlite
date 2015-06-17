@@ -32,9 +32,8 @@ namespace ertool {
     auto datacpy = data ;
     auto const& primaryTrks = graph.GetPrimaryNodes(RecoType_t::kTrack);
     bool primaryPi0 = false ; 
-    //Now compare pi0 vertex with the vertex of primary tracks. 
-    //We're interested in pi0s, whether or not there are tracks.  
-    //If pi0 is associated with a track, make those guys siblings
+
+    //First, look only at events with pi0s
     for ( auto const & p : graph.GetParticleArray()){
 	if (p.PdgCode() == 111){
 	    auto pi0 = p;
@@ -51,7 +50,7 @@ namespace ertool {
 	    if ( primaryPi0 ){
 	    	    graph.SetPrimary(pi0.ID());
     
-		    //If no primary tracks, must be single NC pi0	    
+		    //Loop over primary tracks and compare vertices with primary pi0 
 	    	    for( auto const & primID : primaryTrks) {
     
 	    	        auto trk = graph.GetParticle(primID) ;
