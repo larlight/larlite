@@ -18,9 +18,11 @@
 #pragma link C++ class ertool::AlgoPrimaryFinder+;
 #pragma link C++ class ertool::AlgoMakeGraph+;
 #pragma link C++ class ertool::ERAlgoToy+;
+#pragma link C++ class ertool::ERAlgoPrimaryPi0+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 
 
 
