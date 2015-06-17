@@ -27,17 +27,20 @@ namespace ertool {
 
   /**
      \class ERAnaSingleE
-     User custom Analysis class made by kazuhiro
+     User custom Analysis class made by david caratelli
    */
   class ERAnaSingleE : public AnaBase {
   
   public:
 
     /// Default constructor
-    ERAnaSingleE();
+    ERAnaSingleE(const std::string& name="ERAnaSingleE");
 
     /// Default destructor
     virtual ~ERAnaSingleE(){};
+
+    /// Accept Pset
+    void AcceptPSet(const ::fcllite::PSet& cfg) {}
 
     /// Reset function
     virtual void Reset();
@@ -47,7 +50,9 @@ namespace ertool {
 
     void SetDebug(bool on) { _debug = on; }
 
-    void ProcessEnd(TFile* fout);
+    virtual void ProcessBegin() {}
+
+    virtual void ProcessEnd(TFile* fout);
 
     /// Function to re-set TTree variables
     void ResetTreeVariables();
