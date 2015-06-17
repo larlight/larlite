@@ -5,10 +5,23 @@
 
 namespace ertool {
 
-  void RecoObjBase::Reset() {
-    _exclude    = false;
-    _cosmogenic = kINVALID_DOUBLE;
-    _id         = kINVALID_SIZE;
+  RecoObjBase::RecoObjBase()
+    : _reco_id(kINVALID_RECO_ID)
+    , _reco_type(kInvisible)
+  {}
+
+  RecoID_t RecoObjBase::RecoID() const
+  { return _reco_id; }
+
+  RecoType_t RecoObjBase::RecoType() const
+  {
+    return _reco_type;
+  }
+  
+  void RecoObjBase::SetRecoInfo(const RecoID_t id, const RecoType_t type)
+  {
+    _reco_id = id;
+    _reco_type = type;
   }
 
 }

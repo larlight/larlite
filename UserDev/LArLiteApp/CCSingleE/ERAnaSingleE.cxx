@@ -100,15 +100,25 @@ namespace ertool {
   void ERAnaSingleE::Reset()
   {}
 
-  bool ERAnaSingleE::Analyze(const EventData &data, const ParticleSet &ps)
+  bool ERAnaSingleE::Analyze(const EventData &data, const ParticleGraph &graph)
 {
 
   if (_debug)
     std::cout << "******  Begin ERAnaSingleE Analysis  ******" << std::endl;
 
-    // Get MC particle set
-    auto mc_ps = MCParticleSet();
+    if (_debug){
+    std::cout << "ParticleGraph Diagram: " << std::endl
+	      << graph.Diagram() << std::endl;
+    }
 
+    // Get MC particle set
+    auto const& mc_graph = MCParticleGraph();
+
+    if (_debug){
+      std::cout << "MC Particle Diagram: " << std::endl
+		<< mc_graph.Diagram() << std::endl;
+    }
+     
     // Reset tree variables
     // Assume we will mis-ID
     ResetTreeVariables();
@@ -119,7 +129,7 @@ namespace ertool {
     _n_gammas    = 0;
 
     // Get MC EventData (showers/tracks...)
-    auto mc_data = MCEventData();
+    auto const& mc_data = MCEventData();
     // Count number of MC tracks and showers with E > _eCut MeV
     _n_showers   = 0;
     _n_tracks    = 0;
@@ -127,27 +137,29 @@ namespace ertool {
 
     // Keep track of all energy deposited in detector
     _EDep = 0;
-
-    for (auto &s : data.AllShower()){
+    /*
+    for (auto const &s : data.Shower()){
       _EDep += s._energy;
       if (s._energy > _eCut) { _n_showers += 1; }
     }
-    for (auto &t : data.AllTrack()){
+    for (auto const &t : data.Track()){
       _EDep += t._energy;
       if (t._energy > _eCut) { _n_tracks += 1; }
     }
     if (_debug) { std::cout << "Total Energy deposited in detector: " << _EDep << std::endl; }
-
+    */
+    /*
     // If debug -> print out MC particle set
     if (_debug){
       std::cout << "MC Particle Tree: " << std::endl;
-      for (auto &p : mc_ps)
+      for (auto &p : mc_graph)
 	std::cout << p.Diagram();
     }
-
-
+    */
+    // Loop through MC Particle Graph...not yet being made...
+    /*
     // loop over all particles in MC particle set (made by Helper)
-    for (auto &p : mc_ps){
+    for (auto &p : mc_graph){
       // Find the Lepton and store its energy
       if (abs(p.PdgCode()) == 12 || abs(p.PdgCode()) == 14){
 	_e_nu = p.Energy();
@@ -207,6 +219,7 @@ namespace ertool {
 	  found_parent_nucleus = true;
       }
     }
+
     
     // find the number of tracks that start within 1 cm of the neutrino interaction
     _n_tracksInt = 0;
@@ -227,32 +240,45 @@ namespace ertool {
 	}
       }
     }
-    
+    */
+  /*    
     // Count number of tracks and showers with E > _eCut MeV
     _n_showersReco = 0;
     _n_tracksReco  = 0;
     for (auto &s : data.Shower())
-      if (s->_energy > _eCut) { _n_showersReco += 1; }
+      if (s._energy > _eCut) { _n_showersReco += 1; }
     _n_tracksReco = data.Track().size();
-
+  */
 
     // size of ParticleSet should be the number of neutrinos found, each associated with a single electron
-    _n_singleReco = ps.size();
+    _n_singleReco = graph.GetNumPrimaries();
+    auto const& particles = graph.GetParticleArray();
+    int neutrinos = 0;
+    for (std::deque<::ertool::Particle>::const_iterator it = particles.begin(); it != particles.end(); it++){
+      if ((*it).PdgCode() == 12){
+	neutrinos += 1;
+      }
+    }
+    //std::cout << "number of neutrinos: " << neutrinos << std::endl;
 
     // if only 1 CCSingleE interaction was found -> misID = 0
-    if ( _n_singleReco == 1){
+    if ( neutrinos == 1){
       _misID = 0;
       _singleE_ctr += 1;
     }
-
+    /*
     // If debug -> print out RECO particle set
     if (_debug){
       std::cout << "Reco Particle Tree: " << std::endl;
       for (auto &p : ps)
 	std::cout << p.Diagram();
     }
-
+    */
     // If no single electrons reconstructed -> fill tree anyway with misID info
+    //if ( _n_singleReco == 0 )
+    _result_tree->Fill();
+    /*
+    for(int i = 0; i< ps.size(); i++){
     if ( _n_singleReco == 0 )
       _result_tree->Fill();
     
@@ -342,7 +368,7 @@ namespace ertool {
 
       _result_tree->Fill();
     }// loop over all CCSingleEs found in event
-    
+    */    
     _h_e_nu_correlation->Fill(_e_nu,_e_nuReco);
     
     if (_debug){

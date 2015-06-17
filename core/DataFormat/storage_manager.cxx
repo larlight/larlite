@@ -326,7 +326,6 @@ namespace larlite {
       if(data_ptr_iter!=_ptr_data_array[type].end() && (*data_ptr_iter).second) {
 
 	result_ptr = (*data_ptr_iter).second;
-	
 	result_ptr->set_run(_run_id);
 	result_ptr->set_subrun(_subrun_id);
 	result_ptr->set_event_id(_event_id);
@@ -1154,7 +1153,7 @@ namespace larlite {
       print(msg::kERROR,__FUNCTION__,Form("Event-data identifier not supported: %d",(int)type));
       break;
     }
-    
+
     return;
   }
   
@@ -1533,7 +1532,7 @@ namespace larlite {
 			   _ptr_data_array[i][name_ptr.first]->event_id(),
 			   data::kDATA_TREE_NAME[i].c_str(),
 			   name_ptr.first.c_str()));
-		
+
 		return false;
 		
 	      }
@@ -1541,7 +1540,7 @@ namespace larlite {
 	  } // ptr exists
 	} // loop over all trees of type i
       } // loop over all types
-    
+
       for(int i=0; i<data::kRUNDATA_TYPE_MAX; ++i) { 
 
 	if(_use_read_bool && !(_read_rundata_array[i].size()))
@@ -1555,6 +1554,8 @@ namespace larlite {
 	      continue;
 
 	    auto data_ptr_iter = _ptr_rundata_array[i].find(name_ptr.first);
+
+	    if(name_ptr.second->GetReadEntry()<0) name_ptr.second->GetEntry(0);
 
 	    if(_run_id == (*data_ptr_iter).second->run()) continue;
 
@@ -1599,6 +1600,8 @@ namespace larlite {
 	      continue;
 
 	    auto data_ptr_iter = _ptr_subrundata_array[i].find(name_ptr.first);
+
+	    if(name_ptr.second->GetReadEntry()<0) name_ptr.second->GetEntry(0);
 
 	    if(_run_id == (*data_ptr_iter).second->run() &&
 	       _subrun_id == (*data_ptr_iter).second->subrun()) continue;

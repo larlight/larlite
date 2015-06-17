@@ -7,23 +7,55 @@
 #include <climits>
 namespace larlite {
 
+  /// Function to fill map with mass mass from PDG code
+  std::map<int,double>& ERToolHelper::getMassMap(const event_mcshower& mcs_v,
+						 const event_mctrack& mct_v)
+  {
+
+    static TDatabasePDG pdgdbs;
+
+    std::map<int,double> pdgmap;
+
+    // loop over all showers
+    for (auto const& mcs : mcs_v){
+      int pdg = mcs.PdgCode();
+      if(pdgmap.find(pdg) == pdgmap.end()) {
+	double mass = 0;
+	if(pdg>1000000000)
+	  mass = (double)((int(pdg/10))%1000);
+	else
+	  mass = pdgdbs.GetParticle(pdg)->Mass() * 1.e3; //Mass is now in MEV
+	pdgmap[pdg] = mass;
+      }
+    }// for all showers
+
+    // loop over all tracks
+    for (auto const& mcs : mcs_v){
+      int pdg = mcs.PdgCode();
+      if(pdgmap.find(pdg) == pdgmap.end()) {
+	double mass = 0;
+	if(pdg>1000000000)
+	  mass = (double)((int(pdg/10))%1000);
+	else
+	  mass = pdgdbs.GetParticle(pdg)->Mass() * 1.e3; //Mass is now in MEV
+	pdgmap[pdg] = mass;
+      }
+    }// for all tracks
+    
+    return pdgmap;
+  }
+  
   /// Create MC EventData and ParticleSet
   void ERToolHelper::FillMCInfo( const event_mctruth&   mci_v,
 				 const event_mcshower&  mcs_v,
 				 const event_mctrack&   mct_v,
-				 ::ertool::EventData&   event_data,
-				 ::ertool::ParticleSet& particle_set) const
+				 ::ertool::Manager&     mgr) const
   {
-    
-    //std::cout << "************ EVENT: " << mci_v.event_id() << "  *****" << std::endl;
 
-    event_data.Reset();
-    particle_set.clear();
-    static TDatabasePDG pdgdb_s;
-    static std::map<int,double> partmass_s;
-    FillTracks  (mct_v, event_data);
-    FillShowers (mcs_v, event_data);
-    //FillVertices(mci_v, event_data);
+    static TDatabasePDG pdgdbs;
+
+    // First, create a PDG -> MASS map
+    //auto& PdgMass = getMassMap(mcs_v,mct_v);
 
     std::map<unsigned int, ::ertool::Particle> g4_mother_parts;
     std::map<unsigned int, PartID_t> g4_mother_id;
@@ -32,290 +64,263 @@ namespace larlite {
 
       auto const& mcs = mcs_v[i];
 
+      // apply cut on deposited energy
       if(mcs.DetProfile().E()<_minEDep) continue;
+
       reco_obj_index++;
-      /*
-      std::cout<<"MCShower: "
-	       << mcs.PdgCode()
-	       << " => "
-	       << mcs.MotherPdgCode()
-	       << " => "
-	       << mcs.AncestorPdgCode()
-	       << " ... " << std::endl;
-      */
+
+      // create shower/particle object
+      // first add Shower object to event data
+      ::ertool::Shower s( mcs.DetProfile().Position(),
+			  mcs.DetProfile().Momentum(),
+			  _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
+			  _shrProfiler.ShowerRadius() );
+      s._energy     = mcs.DetProfile().Momentum().E();
+      s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
+      s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
+      auto nodeID = mgr.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),true);
+      std::cout << "Shower E: " << s._energy << std::endl;
+      int pdg = mcs.PdgCode();
+      // then edit the particle
+      mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
+								pdgdbs.GetParticle(pdg)->Mass()*1.e-3,
+								mcs.Start().Position(),
+								mcs.Start().Momentum()); 
+      std::cout << "Associated particle energy: " << mgr.MCParticleGraph().GetParticle(nodeID).Energy() << std::endl;
+      
+      // if not primary
       if( mcs.MotherTrackID() != mcs.AncestorTrackID() ) continue;
       
       unsigned int trkid_mom = mcs.AncestorTrackID();
       
       if(g4_mother_parts.find(trkid_mom) == g4_mother_parts.end()) {
 	int pdg_mom = mcs.AncestorPdgCode();
-	if(partmass_s.find(pdg_mom) == partmass_s.end()) {
-	  double mass = 0;
-	  if(pdg_mom>1000000000)
-	    mass = (double)((int(pdg_mom/10))%1000);
-	  else
-	    mass = pdgdb_s.GetParticle(pdg_mom)->Mass() * 1.e3; //Mass is now in MEV
-	  partmass_s[pdg_mom] = mass;
-	}
-
-	::ertool::Particle mother(pdg_mom, partmass_s[pdg_mom]);
-	mother.Vertex( ::geoalgo::Vector(mcs.MotherStart().Position()) );
-	mother.Momentum( ::geoalgo::Vector(mcs.MotherStart().Momentum()) );
-
+	auto& mother = mgr.MCParticleGraph().CreateParticle();
+	mother.SetParticleInfo(pdg_mom,pdgdbs.GetParticle(pdg_mom)->Mass()*1.e3,//PdgMass[pdg_mom],
+			       mcs.MotherStart().Position(),
+			       mcs.MotherStart().Momentum());
+	
 	g4_mother_parts.insert(std::make_pair(trkid_mom,mother));
 	g4_mother_id[trkid_mom] = PartID_t(mother.Vertex(), mother.Momentum(), mother.PdgCode());
       }
       if(mcs.TrackID() != mcs.MotherTrackID()) {      
-	int pdg = mcs.PdgCode();
-	if(partmass_s.find(pdg) == partmass_s.end()) {
-	  double mass = 0;
-	  if(pdg>1000000000)
-	    mass = (double)((int(pdg/10))%1000);
-	  else
-	    mass = pdgdb_s.GetParticle(pdg)->Mass() * 1.e3; //Mass is now in MEV
-	  partmass_s[pdg] = mass;
-	}
-	::ertool::Particle p(mcs.PdgCode(),partmass_s[pdg]);
-	p.Vertex( ::geoalgo::Vector(mcs.DetProfile().Position()) );
-	p.Momentum( ::geoalgo::Vector(mcs.DetProfile().Momentum()) );
-	p.RecoObjInfo(reco_obj_index-1, ::ertool::Particle::kShower);
-	g4_mother_parts[trkid_mom].AddDaughter(p);
-	/*std::cout<<p.PdgCode()<<" : Shower ID "<<p.RecoObjID()<<std::endl;*/
-      }
-    }
-
-    reco_obj_index = 0;
-    for(size_t i=0; i<mct_v.size(); ++i) {
-
-      auto const& mct = mct_v[i];
-
-      if(mct.size()<2) continue;
-      reco_obj_index++;
-
-      if( mct.MotherTrackID() != mct.AncestorTrackID() ) continue;
-      /*
-      std::cout<<"MCTrack: "<<mct.PdgCode()
-	       <<" ... "<<mct.TrackID()
-	       <<" => "<<mct.MotherTrackID()
-	       <<" => "<<mct.AncestorTrackID()
-	       <<" : "<<mct[0].Position().X()
-	       <<" : "<<mct[0].Position().Y()
-	       <<" : "<<mct[0].Position().Z()
-	       <<" : "<<mct[0].Position().Px()
-	       <<" : "<<mct[0].Position().Py()
-	       <<" : "<<mct[0].Position().Pz()
-	       << std::endl;
-      */
-      unsigned int trkid_mom = mct.AncestorTrackID();
-      
-      if(g4_mother_parts.find(trkid_mom) == g4_mother_parts.end()) {
-	int pdg_mom = mct.AncestorPdgCode();
-	if(partmass_s.find(pdg_mom) == partmass_s.end()) {
-	  double mass = 0;
-	  if(pdg_mom>1000000000)
-	    mass = (double)((int(pdg_mom/10))%1000);
-	  else
-	    mass = pdgdb_s.GetParticle(pdg_mom)->Mass() * 1.e3; //Mass is now in MEV
-	  partmass_s[pdg_mom] = mass;
-	}
-
-	::ertool::Particle mother(pdg_mom, partmass_s[pdg_mom]);
-	mother.Vertex( ::geoalgo::Vector(mct.MotherStart().Position()) );
-	mother.Momentum( ::geoalgo::Vector(mct.MotherStart().Momentum()) );
-	g4_mother_parts.insert(std::make_pair(trkid_mom,mother));
-	g4_mother_id[trkid_mom] = PartID_t(mother.Vertex(), mother.Momentum(), mother.PdgCode());
-      }
-      if(mct.TrackID() != mct.MotherTrackID()) {
-	int pdg = mct.PdgCode();
-	if(partmass_s.find(pdg) == partmass_s.end()) {
-	  double mass = 0;
-	  if(pdg>1000000000)
-	    mass = (double)((int(pdg/10))%1000);
-	  else
-	    mass = pdgdb_s.GetParticle(pdg)->Mass() * 1.e3; //Mass is now in MEV
-	  partmass_s[pdg] = mass;
-	}
-	::ertool::Particle p(mct.PdgCode(),partmass_s[pdg]);
-	p.Vertex( ::geoalgo::Vector(mct.front().Position()) );
-	p.Momentum( ::geoalgo::Vector(mct.front().Momentum()) );
-	p.RecoObjInfo(reco_obj_index-1, ::ertool::Particle::kTrack);
-	g4_mother_parts[trkid_mom].AddDaughter(p);
-      }
-    }
-
-    //
-    // Revise mother particle information w/ MCShower/MCTrack
-    //
-    reco_obj_index = 0;
-    for(size_t i=0; i<mcs_v.size(); ++i) {
-
-      auto const& mcs = mcs_v[i];
-      if(mcs.DetProfile().E()<_minEDep) continue;
-      reco_obj_index++;
-
-      unsigned int trkid = mcs.TrackID();
-      if(g4_mother_parts.find(trkid) != g4_mother_parts.end()) {
-	g4_mother_parts[trkid].Vertex( ::geoalgo::Vector(mcs.DetProfile().Position()) );
-	g4_mother_parts[trkid].Momentum( ::geoalgo::Vector(mcs.DetProfile().Momentum()) );
-	g4_mother_parts[trkid].RecoObjInfo(reco_obj_index-1, ::ertool::Particle::kShower);
-      }
-    }
-    reco_obj_index = 0;
-    for(size_t i=0; i<mct_v.size(); ++i) {
-
-      auto const& mct = mct_v[i];
-      if(mct.size()<2) continue;
-      reco_obj_index++;
-
-      unsigned int trkid = mct.TrackID();
-      if(g4_mother_parts.find(trkid) != g4_mother_parts.end()) {
-	g4_mother_parts[trkid].Vertex( ::geoalgo::Vector(mct.front().Position()) );
-	g4_mother_parts[trkid].Momentum( ::geoalgo::Vector(mct.front().Momentum()) );
-	g4_mother_parts[trkid].RecoObjInfo(reco_obj_index-1, ::ertool::Particle::kTrack);
-      }
-    }
-  
-    particle_set.clear();
-    std::set<unsigned int> g4_mother_used;
-    for(auto const& mci : mci_v) {
-
-      // Make status 1 => parent mapping: key = track ID and value = index
-      std::map<unsigned int, unsigned int> trkid_to_grand_mother;
-      // Make grand mother => particle set mapping: key = grand_mother index, value = particle set index #
-      std::map<unsigned int, unsigned int> grand_mother_to_res_index;
-      for(auto const& mcp : mci.GetParticles()) {
-	if(mcp.StatusCode()!=1) continue;
-	if(mcp.PdgCode()>2000000000) continue;
-	if(mcp.Mother() == -1 || mcp.Mother() == mcp.TrackId()) continue;
-	/*
-	std::cout<<"MCTruth: "<<mcp.PdgCode()
-		 <<" ... "<<mcp.TrackId()
-		 <<" => "<<mcp.Mother()
-		 <<" : "<<mcp.Trajectory()[0].Position().X()
-		 <<" : "<<mcp.Trajectory()[0].Position().Y()
-		 <<" : "<<mcp.Trajectory()[0].Position().Z()
-		 <<" : "<<mcp.Trajectory()[0].Position().Px()
-		 <<" : "<<mcp.Trajectory()[0].Position().Py()
-		 <<" : "<<mcp.Trajectory()[0].Position().Pz()
-		 << std::endl;
-	*/
-	unsigned int grand_mother_trkid = mcp.Mother();
-	bool search = true;
-	while(search) {
-	  search = false;
-	  for(size_t i=0; i<mci.GetParticles().size(); ++i) {
-	    auto const& mom_cand = mci.GetParticles()[i];
-	    if(mom_cand.TrackId() == grand_mother_trkid) {
-	      // Found a grand mother particle
-	      // See if further search is needed
-	      if(mom_cand.Mother() != -1 && 
-		 mom_cand.Mother() != mom_cand.TrackId()) { 
-		grand_mother_trkid = mom_cand.Mother();
-		search = true;
-	      }else{
-		trkid_to_grand_mother[mcp.TrackId()] = i;
-		if(grand_mother_to_res_index.find(i) == grand_mother_to_res_index.end()) {
-		  grand_mother_to_res_index[i]=particle_set.size();
-		  ::ertool::Particle p(mom_cand.PdgCode(),mom_cand.Mass()*1000.);
-		  p.Vertex( ::geoalgo::Vector(mom_cand.Trajectory()[0].Position()) );
-		  p.Momentum( ::geoalgo::Vector(mom_cand.Trajectory()[0].Momentum())*1.e3 );
-		  particle_set.push_back(p);
-		}		
-	      }	      
-	      break;
-	    }
-	  }
-	}
-      }
-
-      // Now try matching of MCTruth => MCShower/MCTrack
-      for(auto const& mcp : mci.GetParticles()) {
-
-	if(mcp.PdgCode()>2000000000) continue;
-	if(mcp.StatusCode() != 1) continue;
-
-	// Check if this particle exists
-	PartID_t mcp_id( ::geoalgo::Vector(mcp.Trajectory()[0].Position()),
-			 ::geoalgo::Vector(mcp.Trajectory()[0].Momentum())*1.e3,
-			 mcp.PdgCode() );
-	bool g4_mother_found = false;
-	/*
-	std::cout<<"Inspect: " << mcp_id._pdg
-		 <<" ... "
-		 << mcp_id._pos[0] << " : " << mcp_id._pos[1] << " : " << mcp_id._pos[2]
-		 <<" ... "
-		 << mcp_id._mom[0] << " : " << mcp_id._mom[1] << " : " << mcp_id._mom[2]
-		 << std::endl;
-	*/
-	for(auto const& mom_pair : g4_mother_id) {
-
-	  if( mcp_id.same(mom_pair.second) && g4_mother_used.find(mom_pair.first) == g4_mother_used.end() ) {
-	    //std::cout<<"Match!"<<std::endl;
-	    // Found a matched g4 mother
-	    g4_mother_found = true;
-
-	    // See if there's a grand mother
-	    if(trkid_to_grand_mother.find(mcp.TrackId())==trkid_to_grand_mother.end()) break;
-
-	    auto& grand_mother = particle_set[grand_mother_to_res_index[trkid_to_grand_mother[mcp.TrackId()]]];
-	    grand_mother.AddDaughter(g4_mother_parts[mom_pair.first]);
-	    g4_mother_used.insert(mom_pair.first);
-	    break;
-	  }
-	  /*
-	  else{
-	    std::cout<<"Unmatch: " << mom_pair.second._pdg
-		     <<" ... "
-		     << mom_pair.second._pos[0] << " : " << mom_pair.second._pos[1] << " : " << mom_pair.second._pos[2]
-		     <<" ... "
-		     << mom_pair.second._mom[0] << " : " << mom_pair.second._mom[1] << " : " << mom_pair.second._mom[2]
-		     << std::endl;
-	  }
-	  */
-	}
-
-	if(!g4_mother_found) {
-	  int pdg = mcp.PdgCode();
-	  /*
-	  std::cout<<"Creating mother not in G4 list... " 
-		   << pdg
-		   << " ... "
-		   << mcp.Trajectory()[0].Position().X()
-		   << mcp.Trajectory()[0].Position().Y()
-		   << mcp.Trajectory()[0].Position().Z()
-		   << mcp.Trajectory()[0].Position().Px()
-		   << mcp.Trajectory()[0].Position().Py()
-		   << mcp.Trajectory()[0].Position().Pz()
-		   <<std::endl;
-	  */
-	  ::ertool::Particle p(pdg,mcp.Mass()*1000.);
-	  p.Vertex(::geoalgo::Vector(mcp.Trajectory()[0].Position()));
-	  p.Momentum(::geoalgo::Vector(mcp.Trajectory()[0].Momentum())*1.e3); //MCParticle units are converted into MEV here
-	  if(trkid_to_grand_mother.find(mcp.TrackId())==trkid_to_grand_mother.end())  
-	    particle_set.push_back(p);
-	  else
-	    particle_set[grand_mother_to_res_index[trkid_to_grand_mother[mcp.TrackId()]]].AddDaughter(p);	    
-	}
-      }
-    }
-
-    for(auto const& mom_pair : g4_mother_parts) {
-      
-      if(g4_mother_used.find(mom_pair.first) == g4_mother_used.end())
 	
-	particle_set.push_back(mom_pair.second);
-      
-    }
-    /*
-    for(auto const& p : particle_set)
-      std::cout<<p.Diagram()<<std::endl;
-    */
+	auto const& motherNodeID = g4_mother_parts[trkid_mom].ID();
+	auto const& childNodeID  = mgr.MCParticleGraph().GetParticle(nodeID).ID();
+	mgr.MCParticleGraph().SetParentage(motherNodeID,
+					   childNodeID);
+	
+       }
+     }
+
+     reco_obj_index = 0;
+     for(size_t i=0; i<mct_v.size(); ++i) {
+
+       auto const& mct = mct_v[i];
+
+       if(mct.size()<2) continue;
+       reco_obj_index++;
+       
+       ::ertool::Track t;
+       t.reserve(mct.size());
+       for(auto const& step : mct)
+	 t += step.Position();
+       //This is the TOTAL energy minus TOTAL energy, so mass is removed.
+       //If you want only initial kinetic energy, remember to subtract off mass.
+       t._energy     = (*mct.begin()).Momentum().E() - (*mct.rbegin()).Momentum().E();
+       t._cosmogenic = (double)(mct.Origin() == simb::kCosmicRay);
+       if(abs(mct.PdgCode()) == 13 ) t._pid = ::ertool::Track::kMuon;
+       if(mct.PdgCode() == 2212    ) t._pid = ::ertool::Track::kProton;
+       if(abs(mct.PdgCode()) == 321) t._pid = ::ertool::Track::kKaon;
+       if(abs(mct.PdgCode()) == 211) t._pid = ::ertool::Track::kPion;
+       for(auto& v : t._pid_score) v = 100;
+       if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
+       
+       auto nodeID = mgr.Add(t,ertool::RecoInputID_t(i,mct_v.name()),true);
+       int pdg = mct.PdgCode();
+       mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
+								 pdg,
+								 mct.at(0).Position(),
+								 ::geoalgo::Vector(mct.at(0).Momentum()));
+       std::cout << "track energy: " << t._energy << std::endl;
+       std::cout << "track PDG : " << pdg << std::endl;
+       std::cout << "track number of steps: " << t.size() << std::endl;
+       std::cout << "associated particle energy: " << mgr.MCParticleGraph().GetParticle(nodeID).Energy() << std::endl;
+       
+       // if not primary
+       if( mct.MotherTrackID() != mct.AncestorTrackID() ) continue;
+       
+       unsigned int trkid_mom = mct.AncestorTrackID();
+       
+       if(g4_mother_parts.find(trkid_mom) == g4_mother_parts.end()) {
+	 int pdg_mom = mct.AncestorPdgCode();
+	 auto& mother = mgr.MCParticleGraph().CreateParticle();
+	 mother.SetParticleInfo(pdg_mom,pdgdbs.GetParticle(pdg_mom)->Mass()*1.e3,//PdgMass[pdg_mom],
+				mct.MotherStart().Position(),
+				mct.MotherStart().Momentum());
+	 g4_mother_parts.insert(std::make_pair(trkid_mom,mother));
+	 g4_mother_id[trkid_mom] = PartID_t(mother.Vertex(), mother.Momentum(), mother.PdgCode());
+       }
+       if(mct.TrackID() != mct.MotherTrackID()) {
+	 
+	 auto const& motherNodeID = g4_mother_parts[trkid_mom].ID();
+	 auto const& childNodeID  = mgr.MCParticleGraph().GetParticle(nodeID).ID();
+	 mgr.MCParticleGraph().SetParentage(motherNodeID,
+					    childNodeID);
+       }
+     }
+     
+     //
+     // Revise mother particle information w/ MCShower/MCTrack
+     //
+     reco_obj_index = 0;
+     for(size_t i=0; i<mcs_v.size(); ++i) {
+       
+       auto const& mcs = mcs_v[i];
+       if(mcs.DetProfile().E()<_minEDep) continue;
+       reco_obj_index++;
+       
+       unsigned int trkid = mcs.TrackID();
+       if(g4_mother_parts.find(trkid) != g4_mother_parts.end()) {
+	 // revise particle information
+	 auto const& ID = g4_mother_parts[trkid].ID();
+	 auto const& mass = mgr.MCParticleGraph().GetParticle(ID).Mass();
+	 auto const& pdg  = mgr.MCParticleGraph().GetParticle(ID).PdgCode();
+	 mgr.MCParticleGraph().GetParticle(ID).SetParticleInfo(pdg,mass,
+							       ::geoalgo::Vector(mcs.DetProfile().Position()),
+							       ::geoalgo::Vector(mcs.DetProfile().Momentum()) );
+       }
+     }
+     reco_obj_index = 0;
+     for(size_t i=0; i<mct_v.size(); ++i) {
+       
+       auto const& mct = mct_v[i];
+       if(mct.size()<2) continue;
+       reco_obj_index++;
+       
+       unsigned int trkid = mct.TrackID();
+       if(g4_mother_parts.find(trkid) != g4_mother_parts.end()) {
+	 // revise particle information
+	 auto const& ID = g4_mother_parts[trkid].ID();
+	 auto const& mass = mgr.MCParticleGraph().GetParticle(ID).Mass();
+	 auto const& pdg  = mgr.MCParticleGraph().GetParticle(ID).PdgCode();
+	 mgr.MCParticleGraph().GetParticle(ID).SetParticleInfo(pdg,mass,
+							       ::geoalgo::Vector(mct.front().Position()),
+							       ::geoalgo::Vector(mct.front().Momentum()) );
+       }
+     }
+     std::set<unsigned int> g4_mother_used;
+     for(auto const& mci : mci_v) {
+       
+       // Make status 1 => parent mapping: key = track ID and value = index
+       std::map<unsigned int, unsigned int> trkid_to_grand_mother;
+       // Make grand mother => particle set mapping: key = grand_mother index, value = particle set index #
+       std::map<unsigned int, unsigned int> grand_mother_to_res_index;
+       for(auto const& mcp : mci.GetParticles()) {
+	 if(mcp.StatusCode()!=1) continue;
+	 if(mcp.PdgCode()>2000000000) continue;
+	 if(mcp.Mother() == -1 || mcp.Mother() == mcp.TrackId()) continue;
+
+	 unsigned int grand_mother_trkid = mcp.Mother();
+	 bool search = true;
+	 while(search) {
+	   search = false;
+	   for(size_t i=0; i<mci.GetParticles().size(); ++i) {
+	     auto const& mom_cand = mci.GetParticles()[i];
+	     if(mom_cand.TrackId() == grand_mother_trkid) {
+	       // Found a grand mother particle
+	       // See if further search is needed
+	       if(mom_cand.Mother() != -1 && 
+		  mom_cand.Mother() != mom_cand.TrackId()) { 
+		 grand_mother_trkid = mom_cand.Mother();
+		 search = true;
+	       }else{
+		 trkid_to_grand_mother[mcp.TrackId()] = i;
+		 if(grand_mother_to_res_index.find(i) == grand_mother_to_res_index.end()) {
+
+		   auto& p = mgr.MCParticleGraph().CreateParticle();
+		   p.SetParticleInfo(mom_cand.PdgCode(),
+				     mom_cand.Mass()*1000.,
+				     ::geoalgo::Vector(mom_cand.Trajectory()[0].Position()),
+				     ::geoalgo::Vector(mom_cand.Trajectory()[0].Momentum())*1.e3 );
+		   grand_mother_to_res_index[i]=p.ID();
+		 }		
+	       }	      
+	       break;
+	     }
+	   }
+	 }
+       }
+
+       // Now try matching of MCTruth => MCShower/MCTrack
+       for(auto const& mcp : mci.GetParticles()) {
+
+	 if(mcp.PdgCode()>2000000000) continue;
+	 if(mcp.StatusCode() != 1) continue;
+
+	 // Check if this particle exists
+	 PartID_t mcp_id( ::geoalgo::Vector(mcp.Trajectory()[0].Position()),
+			  ::geoalgo::Vector(mcp.Trajectory()[0].Momentum())*1.e3,
+			  mcp.PdgCode() );
+	 bool g4_mother_found = false;
+
+	 for(auto const& mom_pair : g4_mother_id) {
+
+	   if( mcp_id.same(mom_pair.second) && g4_mother_used.find(mom_pair.first) == g4_mother_used.end() ) {
+	     //std::cout<<"Match!"<<std::endl;
+	     // Found a matched g4 mother
+	     g4_mother_found = true;
+
+	     // See if there's a grand mother
+	     if(trkid_to_grand_mother.find(mcp.TrackId())==trkid_to_grand_mother.end()) break;
+
+	     auto const& grandMotherID = mgr.MCParticleGraph().GetParticle(grand_mother_to_res_index[trkid_to_grand_mother[mcp.TrackId()]]).ID();
+	     auto const& thisID = g4_mother_parts[mom_pair.first].ID();
+	     mgr.MCParticleGraph().SetParentage(grandMotherID,thisID);
+	     //auto& grand_mother = particle_set[grand_mother_to_res_index[trkid_to_grand_mother[mcp.TrackId()]]];
+	     //grand_mother.AddDaughter(g4_mother_parts[mom_pair.first]);
+	     g4_mother_used.insert(mom_pair.first);
+	     break;
+	   }
+	 }
+
+	 if(!g4_mother_found) {
+	   int pdg = mcp.PdgCode();
+
+	   auto& p = mgr.MCParticleGraph().CreateParticle();
+	   p.SetParticleInfo(pdg,mcp.Mass()*1000.,
+			     ::geoalgo::Vector(mcp.Trajectory()[0].Position()),
+			     ::geoalgo::Vector(mcp.Trajectory()[0].Momentum()*1.e3));
+	   if(trkid_to_grand_mother.find(mcp.TrackId())!=trkid_to_grand_mother.end()){
+	     auto& parentID = grand_mother_to_res_index[trkid_to_grand_mother[mcp.TrackId()]];
+	     auto& childID  = p.ID();
+	     mgr.MCParticleGraph().SetParentage(parentID,childID);
+	   }
+	   //::ertool::Particle p(pdg,mcp.Mass()*1000.);
+	   //p.Vertex(::geoalgo::Vector(mcp.Trajectory()[0].Position()));
+	   //p.Momentum(::geoalgo::Vector(mcp.Trajectory()[0].Momentum())*1.e3); //MCParticle units are converted into MEV here
+	   //if(trkid_to_grand_mother.find(mcp.TrackId())==trkid_to_grand_mother.end())  
+	   //  particle_set.push_back(p);
+	   //else
+	   //  particle_set[grand_mother_to_res_index[trkid_to_grand_mother[mcp.TrackId()]]].AddDaughter(p);	    
+	 }
+       }
+     }
+     /*
+     for(auto const& mom_pair : g4_mother_parts) {
+       if(g4_mother_used.find(mom_pair.first) == g4_mother_used.end())
+	 particle_set.push_back(mom_pair.second);
+     }
+     */
+     return;
   }
 
   void ERToolHelper::FillTracks ( const event_mctrack&  mct_v,
-				  ::ertool::EventData& res ) const
+				  ::ertool::Manager&    mgr ) const
   {
-    for(auto const& mct : mct_v) {
+    for(size_t i=0; i<mct_v.size(); ++i){
+
+      auto const& mct = mct_v[i];
       if(mct.size()<2) continue;
       ::ertool::Track t;
       t.reserve(mct.size());
@@ -334,8 +339,14 @@ namespace larlite {
       for(auto& v : t._pid_score) v = 100;
       if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
 
-      res.Add(t);
+      auto nodeID = mgr.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
+      mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(::ertool::kINVALID_INT,
+							      ::ertool::kINVALID_INT,
+							      mct.at(0).Position(),
+							      ::geoalgo::Vector(mct.at(0).Momentum()));
+
     }
+
     return;
   }
 
@@ -345,13 +356,18 @@ namespace larlite {
 				  const event_calorimetry& calo_trk_v,
 				  const event_partid& pid_trk_v,
 				  const event_ass& ass_v,
-				  ::ertool::EventData& res) const
+				  ::ertool::Manager& mgr) const
   {
     std::vector< ::ertool::Track> t_v;
+    std::vector< ::ertool::RecoInputID_t > id_v;
     t_v.reserve(trk_v.size());
-    for(auto const& trk : trk_v) {
+    id_v.reserve(trk_v.size());
+    for(size_t i=0; i<trk_v.size(); ++i) {
+
+      auto const& trk = trk_v[i];
       
       t_v.push_back(::ertool::Track());
+      id_v.emplace_back(i,trk_v.name());
       auto &t = t_v.back();
 
       for(size_t i=0; i<trk.NumberTrajectoryPoints(); ++i)
@@ -417,16 +433,18 @@ namespace larlite {
       } // if association is found
     }// if pid exists
 
-    for(auto const& t : t_v)
-      res.Add(t);
+    for(size_t i=0; i<t_v.size(); ++i)
+      mgr.Add(t_v[i],id_v[i]);
   }
   
   
   void ERToolHelper::FillShowers ( const event_mcshower& mcs_v,
-				   ::ertool::EventData& res ) const
+				   ::ertool::Manager&    mgr ) const
   {
-    for(auto const& mcs : mcs_v) {
 
+    for(size_t i=0; i<mcs_v.size(); ++i) {
+
+      auto const& mcs = mcs_v[i];
       if(mcs.DetProfile().Momentum().E()<_minEDep) continue;
       //if(isnan(mcs.DetProfile().Momentum().E())) continue;
       //if(isnan(mcs.DetProfile().Momentum().Px())) continue;
@@ -439,22 +457,59 @@ namespace larlite {
       //s._energy = mcs.Start().Momentum().E();
       s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.05) : gRandom->Gaus(2,2*0.05));
       s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
-      res.Add(s);
+      auto nodeID = mgr.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
+      mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(::ertool::kINVALID_INT,
+							      ::ertool::kINVALID_INT,
+							      mcs.Start().Position(),
+							      ::geoalgo::Vector(mcs.Start().Momentum()));
     }
 
     return;
   }
 
+  // Single Shower Cheater:
+  // Assumes a single shower is in the event
+  // fills the particle information with
+  // that of the mcshower
+  void ERToolHelper::SingleShowerCheater ( const event_mcshower& mcs_v,
+					   ::ertool::Manager&    mgr ) const
+  {
+
+    // if no mcshowers, do nothing
+    if (!mcs_v.size())
+      return;
+
+    // if no particles, do nothing
+    auto const& nodes = mgr.ParticleGraph().GetParticleNodes(::ertool::RecoType_t::kShower);
+    if (!nodes.size())
+      return;
+
+    auto &start = mcs_v[0].Start();
+    ::geoalgo::Point_t  vtx(start.X(),start.Y(),start.Z());
+    ::geoalgo::Vector_t mom(start.Px(),start.Py(),start.Pz());
+    auto const& pdg = mcs_v[0].PdgCode();
+    mgr.ParticleGraph().GetParticle(nodes[0]).SetParticleInfo(pdg,
+							      0.,
+							      vtx,
+							      mom);
+    return;
+  }
+  
+
   void ERToolHelper::FillShowers(const event_shower& shw_v,
 				 const event_cosmictag& ctag_shw_v,
 				 const event_ass& ass_v,
-				 ::ertool::EventData& res ) const
+				 ::ertool::Manager& mgr ) const
   {
     
     // Fill shower
     std::vector< ::ertool::Shower> s_v;
+    std::vector< ::ertool::RecoInputID_t> id_v;
     s_v.reserve(shw_v.size());
-    for(auto const& shw : shw_v) {
+    id_v.reserve(shw_v.size());
+    for(size_t i=0; i<shw_v.size(); ++i){
+      auto const& shw = shw_v[i];
+      id_v.emplace_back(i,shw_v.name());
       s_v.push_back( ::ertool::Shower(shw.ShowerStart(),
 				      shw.Direction(),
 				      shw.Length(),
@@ -486,42 +541,12 @@ namespace larlite {
       }
     }
 
-    for(auto const& s : s_v) res.Add(s);
+    for(size_t i=0; i<s_v.size(); ++i)
+      mgr.Add(s_v[i],id_v[i]);
+
     return;
   }
 
-  void ERToolHelper::FillVertices( const event_vertex& vtx_v, 
-				   ::ertool::EventData& res ) const
-
-  {
-    // Fill vertex
-    for(auto const& vtx : vtx_v) {
-      ::ertool::Vertex pos(vtx.X(),vtx.Y(),vtx.Z());
-      res.Add(pos);
-    }
-    return;
-  }
-
-  void ERToolHelper::FillVertices ( const event_mctruth& mci_v,
-				    ::ertool::EventData& res) const
-  {
-    // Fill vertex
-    std::set< ::geoalgo::Point_t> vtxs;
-    for(auto const& mci : mci_v) {
-      
-      for(auto const& mcp : mci.GetParticles()) {
-
-	if(mcp.StatusCode()!=1) continue;
-
-	::geoalgo::Point_t vtx(mcp.Trajectory()[0].Position());
-	
-	if(vtxs.find(vtx) == vtxs.end()) {
-	  res.Add(::ertool::Vertex(vtx));
-	  vtxs.insert(vtx);
-	}
-      }
-    }
-  }
 }
 
 #endif
