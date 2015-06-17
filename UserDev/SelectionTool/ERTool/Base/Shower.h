@@ -56,6 +56,7 @@ namespace ertool {
     /// Total deposited energy
     double _energy;
 
+    ClassDef(Shower,1)
   };
 }
 #endif

@@ -5,23 +5,16 @@
 
 namespace ertool {
 
-  Algo_Class_Name::Algo_Class_Name(const std::string& name) : AlgoBase(name)
-  {}
+  Algo_Class_Name::Algo_Class_Name() : AlgoBase()
+  {
+    _name     = "Algo_Class_Name";
+  }
 
   void Algo_Class_Name::Reset()
   {}
 
-  void Algo_Class_Name::AcceptPSet(const ::fcllite::PSet& cfg)
-  {}
-
-  void Algo_Class_Name::ProcessBegin()
-  {}
-
-  bool Algo_Class_Name::Reconstruct(const EventData &data, ParticleGraph& graph)
-  {return true;}
-
-  void Algo_Class_Name::ProcessEnd(TFile* fout)
-  {}
+  ParticleSet Algo_Class_Name::Reconstruct(const EventData &data)
+  { return ParticleSet(); }
 
 }
 

@@ -19,7 +19,7 @@
 #include <TDatabasePDG.h>
 #include "GeoAlgo/GeoObjCollection.h"
 #include "EMShowerTools/EMShowerProfile.h"
-#include "ERTool/Base/ParticleGraph.h"
+#include "ERTool/Base/Particle.h"
 #include "ERTool/Base/EventData.h"
 
 namespace ertool {
@@ -37,7 +37,7 @@ namespace ertool {
     /// Default destructor
     virtual ~GeoViewerERToolBackend(){}
 
-    void Add(const ParticleGraph& particles,
+    void Add(const ParticleSet& particles,
 	     const EventData& data,
 	     bool randColors);
 

@@ -1,0 +1,10 @@
+
+a{
+  b:1 # This is comment
+  c:2  c: 5
+  d:3 e: 4 f :5
+  g : 6 
+
+}
+
+# Selection a: input = 1000 events output = 500 events

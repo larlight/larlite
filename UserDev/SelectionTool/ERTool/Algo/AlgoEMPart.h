@@ -18,9 +18,6 @@
 #include "ERTool/Base/AlgoBase.h"
 #include "ERTool/Base/PdfFactory.h"
 #include "ERTool/Base/RangeVar.h"
-#include "ERTool/Base/Track.h"
-#include "ERTool/Base/Shower.h"
-#include "ERTool/Base/Particle.h"
 #include "TDatabasePDG.h"
 #include <RooPlot.h>
 #include <RooProdPdf.h>
@@ -44,31 +41,28 @@ namespace ertool {
   public:
 
     /// Default constructor
-    AlgoEMPart(const std::string& name="EMPart");
+    AlgoEMPart();
 
     /// Default destructor
-    ~AlgoEMPart(){}
+    virtual ~AlgoEMPart(){}
 
     /// Called only once by the constructor in its lifespan
     void SetDefaultParams();
 
-    /// Resetter
-    void Reset(){}
-
-    /// Implement AcceptPSet
-    void AcceptPSet(const ::fcllite::PSet& cfg);
+    /// Override the sptool::SPTBase::LoadParams function
+    virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
     
     /// Switch e- (false) / gamma (true) mode
     void SetMode(const bool gamma) { _mode = gamma; }
 
     /// What to do before event-loop begins
-    void ProcessBegin();
+    virtual void ProcessBegin();
 
     /// Function to evaluate input showers and determine a score
-    bool Reconstruct(const EventData &data, ParticleGraph& graph);
+    virtual ParticleSet Reconstruct(const EventData &data);
 
     /// What to do once event-loop is over
-    void ProcessEnd(TFile* fout);
+    virtual void ProcessEnd(TFile* fout);
 
     /// Likelihood for a particle being gamma/electron
     double LL(bool is_electron, double dedx, double rad_length = -1.);
@@ -82,9 +76,6 @@ namespace ertool {
     /// Set verbosity mode
     void setVerbose(bool on) { _verbose = on; }
 
-    /// Set Plot mode (save output plots)
-    void setPlot(bool on) { _plot = on; }
-
   protected:
 
     PdfFactory _factory; ///< P.D.F. factory class instance
@@ -93,7 +84,6 @@ namespace ertool {
     double _g_mass; ///< Gamma's mass
 
     bool _verbose; ///< verbosity mode for debug
-    bool _plot;    ///< True: save plots with PDF information
     bool _mode;    ///< e-/gamma mode (true: gamma, false: e-)
     
     // Variables

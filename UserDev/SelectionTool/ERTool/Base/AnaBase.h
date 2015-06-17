@@ -16,12 +16,12 @@
 
 #include <iostream>
 #include "UnitBase.h"
+#include "EventData.h"
+#include "Particle.h"
+#include "ERException.h"
 
 namespace ertool {
-  class ParticleGraph;
-  class EventData;
 
-  
   class Manager;
   /**
      \class AnaBase
@@ -33,28 +33,28 @@ namespace ertool {
   public:
     
     /// Default constructor
-    AnaBase(const std::string& name="");
+    AnaBase();
     
     /// Default destructor
     virtual ~AnaBase(){}
 
     virtual bool Analyze(const EventData& data,
-			 const ParticleGraph& graph);
+			 const ParticleSet& ps);
     
   protected:
 
-    void SetMCData(EventData& data, ParticleGraph& graph);
+    void SetMCData(EventData& data, ParticleSet& ps);
 
     void UnsetMCData();
 
     const EventData&   MCEventData() const;
 
-    const ParticleGraph& MCParticleGraph() const;
+    const ParticleSet& MCParticleSet() const;
 
   private:
 
     EventData*   _mc_data;
-    ParticleGraph* _mc_graph;
+    ParticleSet* _mc_ps;
 
   };
 }

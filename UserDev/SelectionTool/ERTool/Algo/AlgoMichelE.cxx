@@ -7,8 +7,9 @@ namespace ertool {
 
   size_t n_michel_e = 0;
 
-  AlgoMichelE::AlgoMichelE(const std::string& name) : AlgoBase(name)
+  AlgoMichelE::AlgoMichelE() : AlgoBase()
   {
+    _name     = "AlgoMichelE";
     michel_energy = 0;
     shower_st_to_track_end = 0;
   }
@@ -33,6 +34,7 @@ namespace ertool {
 
   void AlgoMichelE::ProcessBegin()
   {
+    _alg_emp.LoadParams();
     _alg_emp.ProcessBegin();
     InitializeHistos();
 
@@ -48,31 +50,31 @@ namespace ertool {
   }
   
 
-  void AlgoMichelE::AcceptPSet(const ::fcllite::PSet& cfg) {
+  void AlgoMichelE::LoadParams(std::string fname, size_t version){
     
     // Load singleE params
-    _alg_emp.AcceptPSet(cfg);
+    _alg_emp.LoadParams(fname,version);
     
     return;
   }
 
-  bool AlgoMichelE::Reconstruct(const EventData &data, ParticleGraph& graph)
+  ParticleSet AlgoMichelE::Reconstruct(const EventData &data)
   { 
+    ParticleSet res;    
 
-    // Loop through showers
-    for (auto const& p : graph.GetParticleNodes(RecoType_t::kShower)){
+    //Loop over all showers in the event    
+    for(size_t is = 0; is < data.Shower().size(); is++){
 
-      auto datacpy = data;
-      auto const& shower = datacpy.Shower(graph.GetParticle(p).RecoID());
+      Shower shower(data.Shower(is));
 
       //Ask EMP if shower is electron, using only de/dx
       if( _alg_emp.LL(true, shower._dedx, -1) > _alg_emp.LL(false, shower._dedx, -1)){
 
-	// Loop through tracks
-	for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
-	  
-	  auto const& track = datacpy.Track(graph.GetParticle(t).RecoID());
-	  
+	//Loop over all tracks 
+	for(size_t it = 0; it < data.Track().size(); it++){
+
+	  Track track(data.Track(it));
+
 	  shower_st_to_track_end->Fill(shower.Start().Dist(track.back()));
 
 	  //Check if this shower is at the end (w/in 3cm) of this tracks,
@@ -90,7 +92,7 @@ namespace ertool {
       }//End if shower is likely an electron
     }//End loop over showers
 
-    return true;
+    return res;
     
   }
   

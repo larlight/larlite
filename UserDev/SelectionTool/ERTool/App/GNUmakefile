@@ -26,6 +26,7 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 LDFLAGS += -L$(shell root-config --libdir) -lEG -lRooFit -lRooFitCore -lRooStats
 LDFLAGS += $(shell basictool-config --libs)
 LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_ERAlgo
+LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_ERFilter
 LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_ERBase
 
 # call the common GNUmakefile

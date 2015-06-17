@@ -2,12 +2,11 @@
 #define ERTOOL_SHOWER_CXX
 
 #include "Shower.h"
-#include "ERToolConstants.h"
+
 namespace ertool {
 
   Shower::Shower() : RecoObjBase()
-  {
-    _reco_type = kShower;
+  { 
     Reset(); 
   }
 
@@ -15,7 +14,7 @@ namespace ertool {
 		 const ::geoalgo::Vector& dir,
 		 double length, double radius) :
     ::geoalgo::Cone(start,dir,length,radius)
-  { _reco_type = kShower; }
+  { }
 
 
   void Shower::Reset() 

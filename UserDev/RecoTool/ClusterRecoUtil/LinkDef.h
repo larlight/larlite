@@ -10,7 +10,6 @@
 #pragma link off all functions;
 
 #pragma link C++ class Polygon2D+;
-#pragma link C++ class Points+;
 
 #pragma link C++ namespace cluster+;
 

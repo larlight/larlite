@@ -29,33 +29,33 @@ namespace ertool {
   public:
 
     /// Default constructor
-    AlgoMichelE(const std::string& name="MichelE");
+    AlgoMichelE();
 
     /// Default destructor
-    ~AlgoMichelE(){};
+    virtual ~AlgoMichelE(){};
 
     /// Reset function
-    void Reset() {}
-    
-    void Finalize();
+    virtual void Finalize();
 
     /// What to do before event-loop begins
-    void ProcessBegin();
+    virtual void ProcessBegin();
 
     /// What to do once event-loop is over
-    void ProcessEnd(TFile* fout);
+    virtual void ProcessEnd(TFile* fout);
 
     void InitializeHistos();
 
-    /// Config setter
-    void AcceptPSet(const ::fcllite::PSet& cfg);
+    /// Override the ertool::SPTBase::LoadParams function
+    virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
 
     /// Function to evaluate input showers and determine a score
-    bool Reconstruct(const EventData &data, ParticleGraph& graph);
+    virtual ParticleSet Reconstruct(const EventData &data);
+    
     
   protected:
     
     AlgoEMPart _alg_emp;
+
     TH1F* michel_energy;
     TH1F* shower_st_to_track_end;
   };

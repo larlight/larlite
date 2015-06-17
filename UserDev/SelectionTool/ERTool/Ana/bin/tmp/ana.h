@@ -28,7 +28,7 @@ namespace ertool {
   public:
 
     /// Default constructor
-    Ana_Class_Name(const std::string& name="Ana_Class_Name");
+    Ana_Class_Name();
 
     /// Default destructor
     virtual ~Ana_Class_Name(){}
@@ -36,17 +36,14 @@ namespace ertool {
     /// Reset function
     virtual void Reset();
 
-    /// Function to accept fclite::PSet
-    void AcceptPSet(const ::fcllite::PSet& cfg);
-
     /// Called @ before processing the first event sample
-    void ProcessBegin();
+    virtual void ProcessBegin(){}
 
     /// Function to evaluate input showers and determine a score
-    bool Analyze(const EventData &data, const ParticleGraph &ps);
+    virtual bool Analyze(const EventData &data, const ParticleSet &ps);
 
     /// Called after processing the last event sample
-    void ProcessEnd(TFile* fout=nullptr);
+    virtual void ProcessEnd(TFile* fout=nullptr) {}
 
   };
 }

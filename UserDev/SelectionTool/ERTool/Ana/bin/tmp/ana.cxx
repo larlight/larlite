@@ -5,23 +5,16 @@
 
 namespace ertool {
 
-  Ana_Class_Name::Ana_Class_Name(const std::string& name) : AnaBase(name)
-  {}
+  Ana_Class_Name::Ana_Class_Name() : AnaBase()
+  {
+    _name     = "Ana_Class_Name";
+  }
 
   void Ana_Class_Name::Reset()
   {}
 
-  void Ana_Class_Name::AcceptPSet(const ::fcllite::PSet& cfg)
-  {}
-
-  void Ana_Class_Name::ProcessBegin()
-  {}
-
-  bool Ana_Class_Name::Analyze(const EventData &data, const ParticleGraph &ps)
+  bool Ana_Class_Name::Analyze(const EventData &data, const ParticleSet &ps)
   { return true; }
-
-  void Ana_Class_Name::ProcessEnd(TFile* fout)
-  {}
 
 }
 

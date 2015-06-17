@@ -66,6 +66,11 @@ namespace larlite {
     void SetTrackProducer(const bool mc, const std::string prod);
 
     /**
+       @brief Add Vertex producer name & if to use MC or not
+     */
+    void SetVtxProducer(const bool mc, const std::string prod);
+
+    /**
        @brief get EventData that is used by the manager
      */
     const ::ertool::EventData& GetData(bool mc=false) const;
@@ -73,17 +78,12 @@ namespace larlite {
     /**
        @brief get Particles produced by Algorithm.
      */
-    ::ertool::ParticleGraph& GetParticles(bool mc=false);
+    const ::ertool::ParticleSet& GetParticles(bool mc=false) const;
 
     /**
        @brief set Min E Dep for Helper
     */
     void SetMinEDep(double E) { _helper.SetMinEDep(E); }
-
-    /**
-       @brief Set Cheater mode (for single shower files)
-    */
-    void SetCheater(bool on) { _cheater = on; }
 
     /// Selection manager class instance
     ::ertool::Manager _mgr;
@@ -96,11 +96,13 @@ namespace larlite {
     std::string _name_generator; ///< Generator's producer name
     std::string _name_mcshr;     ///< MCShower producer name
     std::string _name_mctrk;     ///< MCTrack producer name
+    std::string _name_mcvtx;     ///< MCVertex producer name
     std::string _name_shower;    ///< 3D shower producer name
     std::string _name_track;     ///< 3D track producer name
+    std::string _name_vertex;    ///< 3D vertex producer name
     bool _mcshowers; ///< Boolean. True: use MC for Showers
     bool _mctracks;  ///< Boolean. True: use MC for Tracks
-    bool _cheater;   ///< Boolean. True: use cheater to get single shower info
+    bool _mcvtx;     ///< Boolean. True: use MC for Vertices
 
   };
 }

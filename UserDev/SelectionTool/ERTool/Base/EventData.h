@@ -17,11 +17,11 @@
 #include <vector>
 #include "Track.h"
 #include "Shower.h"
+#include "Vertex.h"
+#include "UtilFunc.h"
 //#include "BookKeeper.h"
 namespace ertool {
-  class Particle;
-  
-  class Manager;
+
   /**
      \class EventData
      @brief Data holder class to contain full information, to be used by AlgoX and FilterX
@@ -29,8 +29,8 @@ namespace ertool {
      array contents for each possible combination of showers while tracks and vertex points are
      left unchanged. This class instance is provided to AlgoX and FilterX.
   */
-  class EventData {
-    friend class Manager;
+  class EventData : public TObject {
+    
   public:
     
     /// Default constructor
@@ -42,50 +42,45 @@ namespace ertool {
     //
     // Getters
     //
-    
-    /// One shower object getter from Particle ID
-    const ertool::Shower& Shower (const RecoID_t& id) const;
-    /// One shower object getter from Particle
-    const ertool::Shower& Shower (const Particle& p) const;
-
-    /// One shower object getter from Particle ID
-    const ertool::Track& Track (const RecoID_t& id) const;
-    /// One shower object getter from Particle
-    const ertool::Track& Track (const Particle& p) const;
-
-    /// RecoInputID getter
-    const ertool::RecoInputID_t& InputID(const RecoType_t& reco_type,
-					 const RecoID_t&   reco_id) const;
-    /// RecoInputID getter
-    const ertool::RecoInputID_t& InputID(const Particle& p) const;
-
-    /// All showers getter
-    const std::vector< ertool::Shower >& Shower() const { return _shower_v; }
-    /// All tracks getter
-    const std::vector< ertool::Track >& Track() const { return _track_v;  }
-
-  protected:
-
+    const ::ertool::Shower& Shower (size_t id) const;
+    const ::ertool::Track&  Track  (size_t id) const;
+    const ::ertool::Vertex& Vertex (size_t id) const;
+    std::vector< const ::ertool::Shower* > FilteredShower() const;
+    std::vector< const ::ertool::Track*  > FilteredTrack() const;
+    std::vector< const ::ertool::Vertex* > FilteredVertex() const;
+    std::vector< const ::ertool::Shower* > Shower() const;
+    std::vector< const ::ertool::Track*  > Track()  const;
+    std::vector< const ::ertool::Vertex* > Vertex() const;
+    const std::vector< ::ertool::Shower > AllShower() const { return _shower_v; }
+    const std::vector< ::ertool::Track  > AllTrack()  const { return _track_v;  }
+    const std::vector< ::ertool::Vertex > AllVertex() const { return _vertex_v; }
+    std::vector<std::vector< const ::ertool::Shower* > > ShowerCombination (size_t n) const;
+    std::vector<std::vector< const ::ertool::Track*  > > TrackCombination  (size_t n)  const;
+    std::vector<std::vector< const ::ertool::Vertex* > > VertexCombination (size_t n) const;
     //
     // Setters
     //
-    void Add(const ertool::Shower& obj, const RecoInputID_t& id);
-    void Add(const ertool::Track&  obj, const RecoInputID_t& id);
-#ifndef __CINT__
-    void Emplace(const ertool::Shower&& obj, const RecoInputID_t&& id);
-    void Emplace(const ertool::Track&&  obj, const RecoInputID_t&& id);
-#endif
+    void Add(const ::ertool::Shower& obj);
+    void Add(const ::ertool::Track&  obj);
+    void Add(const ::ertool::Vertex& obj);
+
+    void FilterShower (size_t id, bool filter=true);
+    void FilterTrack  (size_t id, bool filter=true);
+    void FilterVertex (size_t id, bool filter=true);
+
     /// Reset function
     void Reset();
 
+  protected:
+
     /// Showers
     std::vector<ertool::Shower> _shower_v;
-    /// Input ID for showers
-    std::vector<ertool::RecoInputID_t> _shower_id_v;
     /// Tracks
     std::vector<ertool::Track>  _track_v;
-    /// Input ID for tracks
-    std::vector<ertool::RecoInputID_t> _track_id_v;
+    /// Candidate event vertecies
+    std::vector<ertool::Vertex> _vertex_v;
+
+    ClassDef(EventData,1)
   };
 }
 

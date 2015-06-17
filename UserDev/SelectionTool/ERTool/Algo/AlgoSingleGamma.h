@@ -22,7 +22,7 @@
 #include "GeoAlgo/GeoAABox.h"
 #include <algorithm> // for std::find
 #include <utility>
-#include <TTree.h>
+
 namespace ertool {
 
   /**
@@ -34,23 +34,23 @@ namespace ertool {
   public:
 
     /// Default constructor
-    AlgoSingleGamma(const std::string& name="SingleGamma");
+    AlgoSingleGamma();
 
     /// Default destructor
-    ~AlgoSingleGamma(){};
+    virtual ~AlgoSingleGamma(){};
 
     /// Reset function
-    void Reset();
+    virtual void Reset();
 
-    void ProcessBegin();
+    virtual void ProcessBegin();
 
-    void ProcessEnd(TFile* fout);
+    virtual void ProcessEnd(TFile* fout);
 
-    /// Configuration setter
-    void AcceptPSet(const ::fcllite::PSet& cfg);
+    /// Override the ertool::SPTBase::LoadParams function
+    virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
 
     /// Function to evaluate input showers and determine a score
-    bool Reconstruct(const EventData &data, ParticleGraph& graph);
+    virtual ParticleSet Reconstruct(const EventData &data);
 
 		// Set verbosity
     void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); }

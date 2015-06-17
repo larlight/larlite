@@ -14,7 +14,6 @@ OBJECTS = $(SOURCES:.cxx=.o)
 INCFLAGS  = -I.                       #Include itself
 INCFLAGS += $(shell basictool-config --includes)
 INCFLAGS += $(shell seltool-config --includes)
-INCFLAGS += -I$(LARLITE_USERDEVDIR)/BasicTool/TreeGraph
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
@@ -27,11 +26,9 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 LDFLAGS += -L$(shell root-config --libdir) -lEG -lRooFit -lRooFitCore -lRooStats
 LDFLAGS += $(shell basictool-config --libs)
 LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_ERBase
-LDFLAGS += -L$(LARLITE_LIBDIR) -lTreeGraph_GeoGraph
 
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE
-
 
 
 

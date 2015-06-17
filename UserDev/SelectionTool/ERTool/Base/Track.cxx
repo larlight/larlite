@@ -6,14 +6,10 @@
 namespace ertool {
 
   Track::Track() : RecoObjBase()
-  {
-    _reco_type = kTrack;
-    Reset();
-  }
+  { Reset(); }
 
   void Track::Reset()
   {
-    _reco_type = kTrack;
     Trajectory::clear();
     RecoObjBase::Reset();
 

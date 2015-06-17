@@ -13,225 +13,74 @@ namespace ertool {
   {
     _name     = "ERAna1PI0";
 
-//====================
-// Reco objects tree
-//====================
   if (_pi0_reco_tree) { delete _pi0_reco_tree; }
     _pi0_reco_tree = new TTree("_pi0_reco_tree","Pi0_reco Tree");
-// Reco about the pi0
-    _pi0_reco_tree->Branch("_x_pi0_Reco",&_x_pi0_Reco,"x_pi0_Reco/D");
-    _pi0_reco_tree->Branch("_y_pi0_Reco",&_y_pi0_Reco,"y_pi0_Reco/D");
-    _pi0_reco_tree->Branch("_z_pi0_Reco",&_z_pi0_Reco,"z_pi0_Reco/D");
-    _pi0_reco_tree->Branch("_px_pi0_Reco",&_px_pi0_Reco,"px_pi0_Reco/D");
-    _pi0_reco_tree->Branch("_py_pi0_Reco",&_py_pi0_Reco,"py_pi0_Reco/D");
-    _pi0_reco_tree->Branch("_pz_pi0_Reco",&_pz_pi0_Reco,"pz_pi0_Reco/D");
-    _pi0_reco_tree->Branch("_p_pi0_Reco",&_p_pi0_Reco,"p_pi0_Reco/D");
-    _pi0_reco_tree->Branch("_mass_pi0_Reco",&_mass_pi0_Reco,"mass_pi0_Reco/D");
-//First shower
-    _pi0_reco_tree->Branch("_x_shra_Reco",&_x_shra_Reco,"x_shra_Reco/D");
-    _pi0_reco_tree->Branch("_y_shra_Reco",&_y_shra_Reco,"y_shra_Reco/D");
-    _pi0_reco_tree->Branch("_z_shra_Reco",&_z_shra_Reco,"z_shra_Reco/D");
-    _pi0_reco_tree->Branch("_px_shra_Reco",&_px_shra_Reco,"px_shra_Reco/D");
-    _pi0_reco_tree->Branch("_py_shra_Reco",&_py_shra_Reco,"py_shra_Reco/D");
-    _pi0_reco_tree->Branch("_pz_shra_Reco",&_pz_shra_Reco,"pz_shra_Reco/D");
-    _pi0_reco_tree->Branch("_p_shra_Reco",&_p_shra_Reco,"p_shra_Reco/D");
-    _pi0_reco_tree->Branch("_e_shra_Reco",&_e_shra_Reco,"e_shra_Reco/D");
-//Second shower
-    _pi0_reco_tree->Branch("_x_shrb_Reco",&_x_shrb_Reco,"x_shrb_Reco/D");
-    _pi0_reco_tree->Branch("_y_shrb_Reco",&_y_shrb_Reco,"y_shrb_Reco/D");
-    _pi0_reco_tree->Branch("_z_shrb_Reco",&_z_shrb_Reco,"z_shrb_Reco/D");
-    _pi0_reco_tree->Branch("_px_shrb_Reco",&_px_shrb_Reco,"px_shrb_Reco/D");
-    _pi0_reco_tree->Branch("_py_shrb_Reco",&_py_shrb_Reco,"py_shrb_Reco/D");
-    _pi0_reco_tree->Branch("_pz_shrb_Reco",&_pz_shrb_Reco,"pz_shrb_Reco/D");
-    _pi0_reco_tree->Branch("_p_shrb_Reco",&_p_shrb_Reco,"p_shrb_Reco/D");
-    _pi0_reco_tree->Branch("_e_shrb_Reco",&_e_shrb_Reco,"e_shrb_Reco/D");
-// both showers 
-    _pi0_reco_tree->Branch("_shr_a_dot_b_Reco",&_shr_a_dot_b_Reco,"shr_a_dot_b_Reco/D");
+    _pi0_reco_tree->Branch("_x_gamma_Reco",&_x_gamma_Reco,"x_gamma_Reco/D");
+    _pi0_reco_tree->Branch("_y_gamma_Reco",&_y_gamma_Reco,"y_gamma_Reco/D");
+    _pi0_reco_tree->Branch("_z_gamma_Reco",&_z_gamma_Reco,"z_gamma_Reco/D");
+    _pi0_reco_tree->Branch("_px_gamma_Reco",&_px_gamma_Reco,"px_gamma_Reco/D");
+    _pi0_reco_tree->Branch("_py_gamma_Reco",&_py_gamma_Reco,"py_gamma_Reco/D");
+    _pi0_reco_tree->Branch("_pz_gamma_Reco",&_pz_gamma_Reco,"pz_gamma_Reco/D");
+    _pi0_reco_tree->Branch("_theta_gamma_Reco",&_theta_gamma_Reco,"theta_gamma_Reco/D");
+    _pi0_reco_tree->Branch("_phi_gamma_Reco",&_phi_gamma_Reco,"phi_gamma_Reco/D");
 
 
   if (_pi0_tree) { delete _pi0_tree; }
     _pi0_tree = new TTree("_pi0_tree","Pi0 Tree");
+    _pi0_tree->Branch("_x_gamma_Reco",&_x_gamma_Reco,"x_gamma_Reco/D");
+    _pi0_tree->Branch("_y_gamma_Reco",&_y_gamma_Reco,"y_gamma_Reco/D");
+    _pi0_tree->Branch("_z_gamma_Reco",&_z_gamma_Reco,"z_gamma_Reco/D");
+    _pi0_tree->Branch("_px_gamma_Reco",&_px_gamma_Reco,"px_gamma_Reco/D");
+    _pi0_tree->Branch("_py_gamma_Reco",&_py_gamma_Reco,"py_gamma_Reco/D");
+    _pi0_tree->Branch("_pz_gamma_Reco",&_pz_gamma_Reco,"pz_gamma_Reco/D");
+    _pi0_tree->Branch("_theta_gamma_Reco",&_theta_gamma_Reco,"theta_gamma_Reco/D");
+    _pi0_tree->Branch("_phi_gamma_Reco",&_phi_gamma_Reco,"phi_gamma_Reco/D");
 
-///=========================================
-// Reco & MC objects tree with 1pi0 events
-//=========================================
+
   if (_1pi0_tree) { delete _1pi0_tree; }
     _1pi0_tree = new TTree("_1pi0_tree","1Pi0 Tree");
-		// RECO INFO
-    _1pi0_tree->Branch("_x_pi0_Reco",&_x_pi0_Reco,"x_pi0_Reco/D");
-    _1pi0_tree->Branch("_y_pi0_Reco",&_y_pi0_Reco,"y_pi0_Reco/D");
-    _1pi0_tree->Branch("_z_pi0_Reco",&_z_pi0_Reco,"z_pi0_Reco/D");
-    _1pi0_tree->Branch("_px_pi0_Reco",&_px_pi0_Reco,"px_pi0_Reco/D");
-    _1pi0_tree->Branch("_py_pi0_Reco",&_py_pi0_Reco,"py_pi0_Reco/D");
-    _1pi0_tree->Branch("_pz_pi0_Reco",&_pz_pi0_Reco,"pz_pi0_Reco/D");
-    _1pi0_tree->Branch("_p_pi0_Reco",&_p_pi0_Reco,"p_pi0_Reco/D");
-    _1pi0_tree->Branch("_mass_pi0_Reco",&_mass_pi0_Reco,"mass_pi0_Reco/D");
-//First shower
-    _1pi0_tree->Branch("_x_shra_Reco",&_x_shra_Reco,"x_shra_Reco/D");
-    _1pi0_tree->Branch("_y_shra_Reco",&_y_shra_Reco,"y_shra_Reco/D");
-    _1pi0_tree->Branch("_z_shra_Reco",&_z_shra_Reco,"z_shra_Reco/D");
-    _1pi0_tree->Branch("_px_shra_Reco",&_px_shra_Reco,"px_shra_Reco/D");
-    _1pi0_tree->Branch("_py_shra_Reco",&_py_shra_Reco,"py_shra_Reco/D");
-    _1pi0_tree->Branch("_pz_shra_Reco",&_pz_shra_Reco,"pz_shra_Reco/D");
-    _1pi0_tree->Branch("_p_shra_Reco",&_p_shra_Reco,"p_shra_Reco/D");
-    _1pi0_tree->Branch("_e_shra_Reco",&_e_shra_Reco,"e_shra_Reco/D");
-//Second shower
-    _1pi0_tree->Branch("_x_shrb_Reco",&_x_shrb_Reco,"x_shrb_Reco/D");
-    _1pi0_tree->Branch("_y_shrb_Reco",&_y_shrb_Reco,"y_shrb_Reco/D");
-    _1pi0_tree->Branch("_z_shrb_Reco",&_z_shrb_Reco,"z_shrb_Reco/D");
-    _1pi0_tree->Branch("_px_shrb_Reco",&_px_shrb_Reco,"px_shrb_Reco/D");
-    _1pi0_tree->Branch("_py_shrb_Reco",&_py_shrb_Reco,"py_shrb_Reco/D");
-    _1pi0_tree->Branch("_pz_shrb_Reco",&_pz_shrb_Reco,"pz_shrb_Reco/D");
-    _1pi0_tree->Branch("_p_shrb_Reco",&_p_shrb_Reco,"p_shrb_Reco/D");
-    _1pi0_tree->Branch("_e_shrb_Reco",&_e_shrb_Reco,"e_shrb_Reco/D");
-// both showers 
-    _1pi0_tree->Branch("_shr_a_dot_b_Reco",&_shr_a_dot_b_Reco,"shr_a_dot_b_Reco/D");
-		// MC INFO
+    _1pi0_tree->Branch("_x_gamma_MC",&_x_gamma_MC,"x_gamma_MC/D");
+    _1pi0_tree->Branch("_y_gamma_MC",&_y_gamma_MC,"y_gamma_MC/D");
+    _1pi0_tree->Branch("_z_gamma_MC",&_z_gamma_MC,"z_gamma_MC/D");
+    _1pi0_tree->Branch("_theta_gamma_MC",&_theta_gamma_MC,"theta_gamma_MC/D");
+    _1pi0_tree->Branch("_phi_gamma_MC",&_phi_gamma_MC,"phi_gamma_MC/D");
+    _1pi0_tree->Branch("_px_gamma_MC",&_px_gamma_MC,"px_gamma_MC/D");
+    _1pi0_tree->Branch("_py_gamma_MC",&_py_gamma_MC,"py_gamma_MC/D");
+    _1pi0_tree->Branch("_pz_gamma_MC",&_pz_gamma_MC,"pz_gamma_MC/D");
+    _1pi0_tree->Branch("_x_gamma_Reco",&_x_gamma_Reco,"x_gamma_Reco/D");
+    _1pi0_tree->Branch("_y_gamma_Reco",&_y_gamma_Reco,"y_gamma_Reco/D");
+    _1pi0_tree->Branch("_z_gamma_Reco",&_z_gamma_Reco,"z_gamma_Reco/D");
+    _1pi0_tree->Branch("_px_gamma_Reco",&_px_gamma_Reco,"px_gamma_Reco/D");
+    _1pi0_tree->Branch("_py_gamma_Reco",&_py_gamma_Reco,"py_gamma_Reco/D");
+    _1pi0_tree->Branch("_pz_gamma_Reco",&_pz_gamma_Reco,"pz_gamma_Reco/D");
+    _1pi0_tree->Branch("_theta_gamma_Reco",&_theta_gamma_Reco,"theta_gamma_Reco/D");
+    _1pi0_tree->Branch("_phi_gamma_Reco",&_phi_gamma_Reco,"phi_gamma_Reco/D");
 
   if (_mpi0_tree) { delete _mpi0_tree; }
     _mpi0_tree = new TTree("_mpi0_tree","mPi0 Tree");
-
-
-
-  }// 
+    _mpi0_tree->Branch("_x_gamma_MC",&_x_gamma_MC,"x_gamma_MC/D");
+    _mpi0_tree->Branch("_y_gamma_MC",&_y_gamma_MC,"y_gamma_MC/D");
+    _mpi0_tree->Branch("_z_gamma_MC",&_z_gamma_MC,"z_gamma_MC/D");
+    _mpi0_tree->Branch("_px_gamma_MC",&_px_gamma_MC,"px_gamma_MC/D");
+    _mpi0_tree->Branch("_py_gamma_MC",&_py_gamma_MC,"py_gamma_MC/D");
+    _mpi0_tree->Branch("_pz_gamma_MC",&_pz_gamma_MC,"pz_gamma_MC/D");
+    _mpi0_tree->Branch("_theta_gamma_MC",&_theta_gamma_MC,"theta_gamma_MC/D");
+    _mpi0_tree->Branch("_phi_gamma_MC",&_phi_gamma_MC,"phi_gamma_MC/D");
+    _mpi0_tree->Branch("_x_gamma_Reco",&_x_gamma_Reco,"x_gamma_Reco/D");
+    _mpi0_tree->Branch("_y_gamma_Reco",&_y_gamma_Reco,"y_gamma_Reco/D");
+    _mpi0_tree->Branch("_z_gamma_Reco",&_z_gamma_Reco,"z_gamma_Reco/D");
+    _mpi0_tree->Branch("_px_gamma_Reco",&_px_gamma_Reco,"px_gamma_Reco/D");
+    _mpi0_tree->Branch("_py_gamma_Reco",&_py_gamma_Reco,"py_gamma_Reco/D");
+    _mpi0_tree->Branch("_pz_gamma_Reco",&_pz_gamma_Reco,"pz_gamma_Reco/D");
+    _mpi0_tree->Branch("_theta_gamma_Reco",&_theta_gamma_Reco,"theta_gamma_Reco/D");
+    _mpi0_tree->Branch("_phi_gamma_Reco",&_phi_gamma_Reco,"phi_gamma_Reco/D");
+  }
 
   void ERAna1PI0::Reset()
   {}
 
-  bool ERAna1PI0::Analyze(const EventData &data,  const ParticleGraph &graph)
+  bool ERAna1PI0::Analyze(const EventData &data, const ParticleSet &ps)
   {
-
-  if(_debug){
-	std::cout<< "\nStart of the ERANA"<<std::endl;}
-
-  if(_debug){
-    std::cout << "ParticleGraph Diagram: " << std::endl
-              << graph.Diagram() << std::endl;
-  }
-
-
-    // Get MC particle set
-   // auto mc_graph = MCParticleGraph();
-   ResetTreeVariables();
-
-
-	auto const& particles = graph.GetParticleArray();
-	// First Find out how many pi0's we have 
-	int pi0counter = 0;
-	NodeID_t pi0node ;
-	for(auto const &p: particles) if(p.PdgCode()==111){ pi0counter++; pi0node=p.ID();}
-
-	// if single pi0 let's inspect it	
-	if(pi0counter==1){ 
-	// Fill out info for reconstructed pi0
-	auto pi0particle_r = graph.GetParticle(pi0node);
-	_x_pi0_Reco = pi0particle_r.Vertex()[0];
-	_y_pi0_Reco = pi0particle_r.Vertex()[1];
-	_z_pi0_Reco = pi0particle_r.Vertex()[2];
-	_px_pi0_Reco = pi0particle_r.Momentum()[0];
-	_py_pi0_Reco = pi0particle_r.Momentum()[1];
-	_pz_pi0_Reco = pi0particle_r.Momentum()[2];
-	_p_pi0_Reco = pi0particle_r.Momentum()[3];// This returns a value that doesnt make sense. RG 
-	_mass_pi0_Reco =pi0particle_r.Mass();
-	
-	
-		// What are the descendents of this pi0 
-		// We know that there are two photons in the reconstruction
-		// We will define showerA and showerB
-		auto photonid = graph.GetAllDescendantNodes(pi0node);
-		std::cout<<"Photons? :"<<photonid.size()<<std::endl;
-		auto shra_r =  graph.GetParticle(photonid[0]);
-		auto shrb_r =  graph.GetParticle(photonid[1]);
-
-		// Fill out the first shower 
-		_x_shra_Reco = shra_r.Vertex()[0];
-		_y_shra_Reco = shra_r.Vertex()[1];
-		_z_shra_Reco = shra_r.Vertex()[2];
-		_px_shra_Reco = shra_r.Momentum()[0];
-		_py_shra_Reco = shra_r.Momentum()[1];
-		_pz_shra_Reco = shra_r.Momentum()[2];
-		_p_shra_Reco = shra_r.Momentum()[3];// not working.... but should be just energy for photons
-		_e_shra_Reco = shra_r.Energy();
-		
-		//Fill out the second shower
-		_x_shrb_Reco = shrb_r.Vertex()[0];
-		_y_shrb_Reco = shrb_r.Vertex()[1];
-		_z_shrb_Reco = shrb_r.Vertex()[2];
-		_px_shrb_Reco = shrb_r.Momentum()[0];
-		_py_shrb_Reco = shrb_r.Momentum()[1];
-		_pz_shrb_Reco = shrb_r.Momentum()[2];
-		_p_shrb_Reco = shrb_r.Momentum()[3];// not working.... but should be just energy for photons
-		_e_shrb_Reco = shrb_r.Energy();
-
-
-		// Fill out some comparison of the two photons. 
-		// showerA dot showerB 
-		_shr_a_dot_b_Reco = cos(shra_r.Momentum().Angle(shrb_r.Momentum()));// needs to be normalized
-
-
-	_pi0_reco_tree->Fill();
-
-
-	// We need to see how many pi0's are in the event from truth level 
-	auto mcgraph = MCParticleGraph();	
-	auto const& mcparticles = mcgraph.GetParticleArray();
-	// First Find out how many pi0's we have 
-	int mcpi0counter = 0;
-	NodeID_t mcpi0node ;
-	for(auto const &mcp: mcparticles) if(mcp.PdgCode()==111){ mcpi0counter++; mcpi0node=mcp.ID();}
-	// Next find the matching shower. 
-	auto mcgammanode = mcgraph.GetAllDescendantNodes(mcpi0node);
-	//Dalitz Decay ?
-	if(mcgammanode.size()!=2){std::cout<<"This is a dalitz decay "<<std::endl;}
-		auto shr1_mc =  mcgraph.GetParticle(mcgammanode[0]);
-		auto shr2_mc =  mcgraph.GetParticle(mcgammanode[1]);
-		std::cout<<" MC NODE : "<< mcgammanode[0]<<"   ,     "<<mcgammanode[1]<<std::endl;
-	
-//================================
-//================================
-	// Match the showers
-//================================
-//================================
-	int match_a;
-	int match_b;
-// Adding a shower match pair.
-std::pair<int, int> shower_match_A;
-std::pair<int, int> shower_match_B;
-	
-		// This can be a lot cleaner with a few loops but just temp for now 
-		double vmatz= shra_r.Vertex().Dist(shr1_mc.Vertex());
-		double vmatx= shra_r.Vertex().Dist(shr2_mc.Vertex());
-	std::cout<<" vetx match dist "<< vmatz << " other vert match dist "<< vmatx<<std::endl;
-
-//================================
-//================================
-//================================
-//================================
-
-	}// if pi0counter==1
-
-
-	// First we need to match which shower belongs to which 
-		
-	//	    temp_dist = sqrt( pow(gammamc.Vertex()[0] - _x_gamma_Reco,2)
-          //                                  + pow(gammamc.Vertex()[1] - _y_gamma_Reco,2)
-            //                                + pow(gammamc.Vertex()[2] - _z_gamma_Reco,2) );
-	//					if(_vtx_dist>temp_dist){ 
-	//					_vtx_dist = temp_dist;
-
-	// first check to see which showers match the photons from the pi0
-	auto recoshowers = data.Shower();
-	// here we can store the ID and then use to compare down the road. 
-	
-// Next Match some things.
-   // If there is a pi0 match the truth info 
-   // If pi0 goes to gamma/gamma match the gamma's
-	// We still do not have a way to match the gamma directly 
-
-
-
-
-/*
     // Get MC particle set, EventData(showers/tracks...)
     auto mc_ps = MCParticleSet();
     auto mc_data = MCEventData();
@@ -304,6 +153,7 @@ std::pair<int, int> shower_match_B;
 					    temp_dist = sqrt( pow(gammamc.Vertex()[0] - _x_gamma_Reco,2)
                                             + pow(gammamc.Vertex()[1] - _y_gamma_Reco,2)
                                             + pow(gammamc.Vertex()[2] - _z_gamma_Reco,2) );
+
 						if(_vtx_dist>temp_dist){ 
 						_vtx_dist = temp_dist;
 						_x_gamma_MC = gammamc.Vertex()[0];
@@ -365,7 +215,7 @@ std::pair<int, int> shower_match_B;
 	       	       }// for (auto &preco : ps)	
 		}// if(preco.PdgCode()==111)
 	}//if(_n_pi0reco==1) Single pi0
-*/
+
  return true; }
 
 
@@ -396,14 +246,6 @@ std::pair<int, int> shower_match_B;
 
  void ERAna1PI0::ResetTreeVariables(){
 
-    _x_pi0_Reco = -1000;
-    _y_pi0_Reco = -1000;
-    _z_pi0_Reco = -1000;
-    _px_pi0_Reco = -1000;
-    _py_pi0_Reco = -1000;
-    _pz_pi0_Reco = -1000;
-    _p_pi0_Reco = -1000;
-    _mass_pi0_Reco = -1000;
     _x_gamma_MC = -1000;
     _y_gamma_MC = -1000;
     _z_gamma_MC = -1000;
