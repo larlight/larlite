@@ -25,6 +25,8 @@ namespace ertool {
 
     // default plot mode is false
     _plot = false;
+    // default setting for loading params
+    _loadParams = true;
 
     std::string part_name;
 
@@ -113,6 +115,10 @@ namespace ertool {
 
   void AlgoEMPart::AcceptPSet(const ::fcllite::PSet& cfg)
   {
+    
+    if (!_loadParams)
+      return;
+    
     auto p = cfg.get_pset(Name());
     
     // Extract if parameters found

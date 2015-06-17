@@ -52,7 +52,6 @@ namespace ertool {
 //=========================================
   if (_1pi0_tree){ delete _1pi0_tree; }
     _1pi0_tree = new TTree("_1pi0_tree","1Pi0 Tree");
-
 		// RECO INFO
     _1pi0_tree->Branch("_x_pi0_Reco",&_x_pi0_Reco,"x_pi0_Reco/D");
     _1pi0_tree->Branch("_y_pi0_Reco",&_y_pi0_Reco,"y_pi0_Reco/D");
@@ -160,6 +159,7 @@ namespace ertool {
 
 	// We need to see how many pi0's are in the event from truth level 
 	auto mcgraph = MCParticleGraph();	
+	auto mceventdata = MCEventData();	
 	auto const& mcparticles = mcgraph.GetParticleArray();
 	// First Find out how many pi0's we have 
 	int mcpi0counter = 0;
@@ -174,12 +174,18 @@ namespace ertool {
 		auto photon1_mc =  mcgraph.GetParticle(mcgammanode[0]);
 		auto photon2_mc =  mcgraph.GetParticle(mcgammanode[1]);
 		auto p1_RID_MC= photon1_mc.RecoID();
-		std::cout<<" THe reco ID "<<p1_RID_MC<<std::endl;
-		//auto shr1_startpt_mc = mcgraph.GetParticle(shr1_nodes_mc[0]);
+		auto p2_RID_MC= photon2_mc.RecoID();
+		std::cout<<" THe reco first ID "<<p1_RID_MC<<std::endl;
+		std::cout<<" THe reco second ID "<<p2_RID_MC<<std::endl;
+		auto shr1_startpt_mc = mceventdata.Shower(p1_RID_MC);
+		auto shr2_startpt_mc = mceventdata.Shower(p2_RID_MC);
+		
+		//std::cout<<"\n\tShower1 : "<<shr1_startpt_mc.Energy()<<std::endl<<"\tPosition"<<shr1_startpt_mc.Vertex()<<std::endl;
+		//std::cout<<"\n\tShower2 : "<<shr2_startpt_mc.Energy()<<std::endl<<"\tPosition"<<shr2_startpt_mc.Vertex()<<std::endl;
+		std::cout<<"\n\tShower1 : "<<shr1_startpt_mc._energy<<std::endl;
+		std::cout<<"\n\tShower2 : "<<shr2_startpt_mc._energy<<std::endl;
 		
 	/*	
-
-
 		auto shr1_mc =  mcgraph.GetParticle(mcgammanode[0]);
 		auto shr2_mc =  mcgraph.GetParticle(mcgammanode[1]);
 		std::cout<<" MC NODE : "<< mcgammanode[0]<<"   ,     "<<mcgammanode[1]<<std::endl;
@@ -245,20 +251,14 @@ std::pair<int, int> shower_match_B;
 	// Look to see if there was a recod pi0 
 	int _n_pi0reco = 0; 
         for (auto &preco : ps){ if(preco.PdgCode()==111) _n_pi0reco++;}
-	
+
 	if(_n_pi0reco==1){
-	ct++;
 	    for (auto &preco : ps){
 		if(preco.PdgCode()==111){ 
 		//fill out the info about that was reconstructed 
 // still needs to be done 
 		// Find the reco daughters and then look for the gammas
 		// at the moment I am assuming that a reco pi0 is only filling a gamma/gamma 
-		_x_pi0_Reco = preco.Vertex()[0];
-		_y_pi0_Reco = preco.Vertex()[1];
-		_z_pi0_Reco = preco.Vertex()[2];
-		_e_pi0_Reco = preco.Energy();
-
 		for(auto &gammareco: preco.Daughters()){
 		/// fill out the info about the reco gamma  particle 
 	        _x_gamma_Reco = gammareco.Vertex()[0];
@@ -267,7 +267,6 @@ std::pair<int, int> shower_match_B;
 	        _px_gamma_Reco = gammareco.Momentum()[0];
 		_py_gamma_Reco = gammareco.Momentum()[1];
 		_pz_gamma_Reco = gammareco.Momentum()[2]; 
-		_e_gamma_Reco = gammareco.Energy(); 
 		_theta_gamma_Reco = (180./3.14) * acos( _pz_gamma_Reco / sqrt( _px_gamma_Reco*_px_gamma_Reco + _py_gamma_Reco*_py_gamma_Reco + _pz_gamma_Reco*_pz_gamma_Reco ) );
 		_phi_gamma_Reco   = (180./3.14) * asin( _py_gamma_Reco / sqrt( _px_gamma_Reco*_px_gamma_Reco + _py_gamma_Reco*_py_gamma_Reco ) );
 
@@ -307,12 +306,6 @@ std::pair<int, int> shower_match_B;
 					 if(pdaughter.PdgCode() == 111 ){
 						// was it a Dalitz Decay? 
 						if(pdaughter.Daughters().size()!=2){DalitzDecay = true; }
-						
-						_x_pi0_MC = pdaughter.Vertex()[0];
-						_y_pi0_MC = pdaughter.Vertex()[1];
-						_z_pi0_MC = pdaughter.Vertex()[2];
-						_e_pi0_MC = pdaughter.Energy();
-
 					// 
 					for(auto&gammamc : pdaughter.Daughters()){ 
 					// now match the reco gamma to mc gamma
@@ -327,10 +320,8 @@ std::pair<int, int> shower_match_B;
 						_px_gamma_MC = gammamc.Momentum()[0];
 						_py_gamma_MC = gammamc.Momentum()[1];
 						_pz_gamma_MC = gammamc.Momentum()[2]; 
-						_e_gamma_MC = gammamc.Energy(); 
 						_theta_gamma_MC = (180./3.14) * acos( _pz_gamma_MC / sqrt( _px_gamma_MC*_px_gamma_MC + _py_gamma_MC*_py_gamma_MC + _pz_gamma_MC*_pz_gamma_MC ) );
 						_phi_gamma_MC   = (180./3.14) * asin( _py_gamma_MC / sqrt( _px_gamma_MC*_px_gamma_MC + _py_gamma_MC*_py_gamma_MC ) );
-						_mass_pi0_MC = pow(2*(e_g ));
 							}//(_vtx_dist>temp_dist)
 						}// loop over mc gamma
 					    }// if the particle is a pi0
@@ -395,10 +386,9 @@ std::pair<int, int> shower_match_B;
       _pi0_reco_tree->Write();
       _1pi0_tree->Write();
     }
-    
-//        double found = _pi0_reco_tree->GetEntries()/2 ;
 
 	std::cout<<"From ER1pi0Ana  -->  Summary of Events \n" 	
+	//<< "\nTotal Reco 1pi0       "<<_pi0_reco_tree->GetEntries()
 	<< "\nTotal Reco 1pi0       "<<_pi0_reco_tree->GetEntries()/2
 //	<< "\nTotal Reco Events that have 0pi0 "<<_pi0_tree->GetEntries()/2
 	<< "\nTotal Reco Events that have 1pi0 "<<_1pi0_tree->GetEntries()/2

@@ -23,17 +23,20 @@ namespace ertool {
 
   /**
      \class ERAnaGraphMaker
-     User custom Analysis class made by kazuhiro
+     User custom Analysis class made by david caratelli
    */
   class ERAnaGraphMaker : public AnaBase {
   
   public:
 
     /// Default constructor
-    ERAnaGraphMaker();
+    ERAnaGraphMaker(const std::string& name="ERAnaGraphMaker");
 
     /// Default destructor
     virtual ~ERAnaGraphMaker(){};
+
+    /// Accept Pset
+    void AcceptPSet(const ::fcllite::PSet& cfg) {}
 
     /// Reset function
     virtual void Reset();
@@ -43,7 +46,9 @@ namespace ertool {
 
     void SetDebug(bool on) { _debug = on; }
 
-    void ProcessEnd(TFile* fout);
+    virtual void ProcessBegin() {}
+
+    virtual void ProcessEnd(TFile* fout);
 
   private:
 

@@ -35,6 +35,7 @@ def main():
     # Fit ranges for Reconstructed Info
     my_algo.SetFitRange_dEdx(1.6,2.4,False); # False = e- / True = gamma
     my_algo.SetFitRange_dEdx(3.5,6.0,True);
+    my_algo.SetFitRange_RadLen(1.,4.,False);
     my_algo.SetFitRange_RadLen(5.,35.,True);
     # Fit ranges for MC Info:
     #my_algo.SetFitRange_dEdx(0.5,6,False); # False = e- / True = gamma
@@ -51,10 +52,10 @@ def main():
 
     # Set Producers
     # First Argument: True = MC, False = Reco
-    my_ana.SetShowerProducer(True,"mcreco");
+    #my_ana.SetShowerProducer(True,"mcreco");
     my_ana.SetTrackProducer(True,"mcreco");
     #my_ana.SetShowerProducer(False,"pandoraNuShower");
-    #my_ana.SetShowerProducer(False,"showerreco");
+    my_ana.SetShowerProducer(False,"showerreco");
     #my_ana.SetTrackProducer(False,"");
 
     #my_ana._mgr.SetAlgo(my_algo)
@@ -78,8 +79,10 @@ def main():
     print '  Identified %2d input files for electron' % len(electron_files)
     if not ask_binary('  Proceed? [y/n]:'): return False
     print
-    #if ask_binary('  Load previously extracted fit parameters? [y/n]:'):
-    #    my_algo.LoadParams()    
+    if ask_binary('  Load previously extracted fit parameters? [y/n]:'):
+        my_algo.setLoadParams(True)
+    else:
+        my_algo.setLoadParams(False)
     #
     # Training for gamma mode
     #

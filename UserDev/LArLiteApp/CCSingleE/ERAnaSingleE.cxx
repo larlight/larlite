@@ -5,12 +5,12 @@
 
 namespace ertool {
 
-  ERAnaSingleE::ERAnaSingleE() : AnaBase()
-			       , _result_tree(nullptr)
-			       , fTPC(0.,-115.5,0.,254.8,117.5,1036.92)
+  ERAnaSingleE::ERAnaSingleE(const std::string& name)
+    : AnaBase(name)
+    , _result_tree(nullptr)
+    , fTPC(0.,-115.5,0.,254.8,117.5,1036.92)
 
   {
-    _name     = "ERAnaSingleE";
 
     if (_result_tree) { delete _result_tree; }
     _result_tree = new TTree("_result_tree","Result Tree");

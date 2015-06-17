@@ -231,7 +231,7 @@ namespace ertool {
 	double mom = sqrt( (thisShower._energy)*(thisShower._energy) - (_e_mass*_e_mass) );
 	if (mom < 0) { mom = 1; }
 	if (_verbose) { std::cout << "Getting shower " << p << std::endl; }
-	auto electron = graph.GetParticle(p);
+	auto& electron = graph.GetParticle(p);
 	if (_verbose) { std::cout << " and modifying properties..." << std::endl; }
 	electron.SetParticleInfo(11,_e_mass,thisShower.Start(),thisShower.Dir()*mom);
 	// create a new particle for the neutrino!
