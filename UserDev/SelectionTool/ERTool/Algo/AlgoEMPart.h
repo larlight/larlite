@@ -85,6 +85,9 @@ namespace ertool {
     /// Set Plot mode (save output plots)
     void setPlot(bool on) { _plot = on; }
 
+    /// Set whether to load parameters stored in config
+    void setLoadParams(bool on) { _loadParams = on; }
+
   protected:
 
     PdfFactory _factory; ///< P.D.F. factory class instance
@@ -95,6 +98,7 @@ namespace ertool {
     bool _verbose; ///< verbosity mode for debug
     bool _plot;    ///< True: save plots with PDF information
     bool _mode;    ///< e-/gamma mode (true: gamma, false: e-)
+    bool _loadParams; ///< whether to load params or not from config
     
     // Variables
     RangeVar _e_dedx_fit_range;   ///< electron dE/dx [MeV/cm] range for fit
