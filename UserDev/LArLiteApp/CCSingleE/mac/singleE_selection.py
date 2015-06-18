@@ -15,7 +15,7 @@ from seltool.ccsingleeDef import GetCCSingleEInstance
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
-my_proc.enable_filter(False)
+my_proc.enable_filter(True)
 
 # Get Default CCSingleE Algorithm instance
 # this sets default parameters
@@ -25,6 +25,16 @@ my_proc.enable_filter(False)
 # function GetCCSingleEInstance()
 my_algo = GetCCSingleEInstance()
 my_algo.setVerbose(False)
+
+# Pi0 Algo
+pi0_algo = ertool.AlgoPi0()
+pi0_algo.setVerbose(False)
+pi0_algo.setMinShrEnergy(0)
+pi0_algo.setMaxShrEnergy(1000)
+pi0_algo.setIPMax(10)
+pi0_algo.setMinFitMass(50)
+pi0_algo.setMaxFitMass(200)
+pi0_algo.setAngleMax(3.14)
 
 # Create ERTool filter
 # This filter removes any track that
@@ -38,8 +48,8 @@ my_algo.setVerbose(False)
 # This filter is if you want to look at CC1E events
 MCfilter = fmwk.MC_CC1E_Filter();
 #Set flip to FALSE if you are looking for efficiency, TRUE if you are looking for MID efficiency
-#MCfilter.flip(False)
-MCfilter.flip(True)
+MCfilter.flip(False)
+#MCfilter.flip(True)
 #MCfilter.SetFilterEnergy(.02) 
 # Use this filter instead if you want to look at CCQE channel events with specified number of mcshowers and
 # mctracks above specified energies coming from the neutrino
@@ -72,6 +82,7 @@ my_ana.SetECut(Ecut)
 
 my_anaunit = fmwk.ExampleERSelection()
 my_anaunit._mgr.AddAlgo(my_algo)
+#my_anaunit._mgr.AddAlgo(pi0_algo)
 my_anaunit._mgr.AddAna(my_ana)
 #my_anaunit._mgr.AddCfgFile('new_empart.txt')
 #This cut is applied in helper... ertool showers are not made if the energy of mcshower or reco shower
@@ -82,13 +93,14 @@ my_anaunit._mgr._mc_for_ana = True
 
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
-my_anaunit.SetShowerProducer(True,"mcreco");
-#my_anaunit.SetShowerProducer(False,"showerreco");
+#my_anaunit.SetShowerProducer(True,"mcreco");
+my_anaunit.SetShowerProducer(False,"showerreco");
 #my_anaunit.SetShowerProducer(False,"newdefaultreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetShowerProducer(False,"mergeall");
 my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
+#my_anaunit.SetTrackProducer(False,"costrk");
 #my_anaunit.SetVtxProducer(True,"generator");
 # ************************************************
 

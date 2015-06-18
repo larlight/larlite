@@ -139,11 +139,6 @@ namespace larlite {
 								 pdg,
 								 mct.at(0).Position(),
 								 ::geoalgo::Vector(mct.at(0).Momentum()));
-       std::cout << "track energy: " << t._energy << std::endl;
-       std::cout << "track PDG : " << pdg << std::endl;
-       std::cout << "track number of steps: " << t.size() << std::endl;
-       std::cout << "associated particle energy: " << mgr.MCParticleGraph().GetParticle(nodeID).Energy() << std::endl;
-       
        // if not primary
        if( mct.MotherTrackID() != mct.AncestorTrackID() ) continue;
        

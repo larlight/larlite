@@ -23,6 +23,7 @@ my_proc.enable_filter(False)
 # and the algorithm instance is the return of the
 # function GetCCSingleEInstance()
 my_algo = GetCCSingleEInstance()
+my_algo.setVerbose(True)
 
 # Create ERTool filter
 # This filter removes any track that
@@ -31,8 +32,6 @@ my_algo = GetCCSingleEInstance()
 # but at this stage it is unreasonable
 # to assume we will be able to
 # reconstruct them
-my_filter = ertool.FilterTrackLength()
-my_filter.setLengthCut(0.3)
 
 # Create MC Filter
 MCfilter = fmwk.MC_CC1E_Filter();
@@ -55,25 +54,25 @@ my_proc.set_ana_output_file("singleE_selection.root")
 Ecut = 20 # in MeV
 
 my_ana = ertool.ERAnaSingleE()
-my_ana.SetDebug(True)
+my_ana.SetDebug(False)
 my_ana.SetECut(Ecut)
 
 my_anaunit = fmwk.ExampleERSelection()
-my_anaunit._mgr.SetAlgo(my_algo)
-my_anaunit._mgr.SetFilter(my_filter)
-my_anaunit._mgr.SetAna(my_ana)
+my_anaunit._mgr.AddAlgo(my_algo)
+my_anaunit._mgr.AddAna(my_ana)
+#my_anaunit._mgr.AddCfgFile('new_empart.txt')
 my_anaunit.SetMinEDep(Ecut)
 my_anaunit._mgr._mc_for_ana = True
 
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
-my_anaunit.SetShowerProducer(True,"mcreco");
+#my_anaunit.SetShowerProducer(True,"mcreco");
 my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetVtxProducer(True,"generator");
 #my_anaunit.SetShowerProducer(False,"mergeall");
 #my_anaunit.SetShowerProducer(False,"newdefaultreco");
 #my_anaunit.SetShowerProducer(True,"mcreco");
-#my_anaunit.SetShowerProducer(False,"showerreco");
+my_anaunit.SetShowerProducer(False,"showerreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 # ************************************************
@@ -99,8 +98,8 @@ while (counter < 11700):
     part_mc   = my_anaunit.GetParticles(True)
     viewAll(data_mc,part_mc,data_reco,part_reco)
 
-    for x in xrange(part_mc.size()):
-        print part_mc[x].Diagram()
+    #for x in xrange(part_mc.size()):
+    #    print part_mc[x].Diagram()
 
 
 

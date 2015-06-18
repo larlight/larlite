@@ -181,9 +181,11 @@ namespace ertool {
       tau->setRange ( darray[1], darray[2] );
 
       mean  = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_dEdxGaus_mean"));
-      mean->setVal  ( darray[3] );
+      mean->setVal  ( darray[4] );
       sigma = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_dEdxGaus_sigma"));
-      sigma->setVal ( darray[4] );
+      sigma->setVal ( darray[5] );
+
+      std::cout << "mean: " << darray[4] << "\tsigma: " << darray[5] << std::endl;
 
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"Loaded electron parameters..." << std::endl;
@@ -465,6 +467,10 @@ namespace ertool {
       h11_radLen->Draw();
       h22_radLen->Draw("sames");
       c->SaveAs("Likelihood_radLen.png");
+      if (fout){
+	h11_radLen->Write();
+	h22_radLen->Write();
+      }
       
       TH1D *h11_dEdx = new TH1D("h11_dEdx","Electron vs. Gamma Likelihood; dEdx [MeV/cm]; Likelihood",100,0,8);
       TH1D *h22_dEdx = new TH1D("h22_dEdx","Electron vs. Gamma Likelihood; dEdx [MeV/cm]; Likelihood",100,0,8);
@@ -490,6 +496,10 @@ namespace ertool {
       h11_dEdx->Draw();
       h22_dEdx->Draw("sames");
       c->SaveAs("Likelihood_dEdx.png");
+      if (fout){
+	h11_dEdx->Write();
+	h22_dEdx->Write();
+      }
       
       delete h11_dEdx;
       delete h22_dEdx;
@@ -503,17 +513,24 @@ namespace ertool {
 	  _dEdxVar->setVal(8*dedx/100.);
 	  _radLenVar->setVal(20*radlen/100.);
 	  
+	  //double e_likelyhood = LL(true,8*dedx/100.,50*radlen/100.)-LL(false,8*dedx/100.,50*radlen/100.);
+	  double e_likelyhood = log((_e_dEdxPdf->getVal(*_dEdxVar) * _e_radLenPdf->getVal(*_radLenVar) ) /
+				    (_g_dEdxPdf->getVal(*_dEdxVar) * _g_radLenPdf->getVal(*_radLenVar) ) );
+	  if (e_likelyhood > 1)  { e_likelyhood =  1; }
+	  if (e_likelyhood < -1) { e_likelyhood = -1; }
+	  /*
 	  double e_likelyhood = log((_e_dEdxPdf->getVal(*_dEdxVar) * _e_radLenPdf->getVal(*_radLenVar) ) / 
 	    ( _g_dEdxPdf->getVal(*_dEdxVar) * _g_radLenPdf->getVal(*_radLenVar) + 
 	      _e_dEdxPdf->getVal(*_dEdxVar) * _e_radLenPdf->getVal(*_radLenVar) ) );
-
-	  h_2DRatio->SetBinContent(dedx,radlen,e_likelyhood);
+	  */
+	  h_2DRatio->SetBinContent(dedx+1,radlen+1,e_likelyhood);
 
 	}
       }
 
       h_2DRatio->Draw("COLZ");
       c->SaveAs("2DRatio.png");
+      if (fout) { h_2DRatio->Write(); }
 	    
 
       // for fun make a ProdPdf to plot 2D Pdf surface
@@ -524,12 +541,14 @@ namespace ertool {
       h_2D->SetNameTitle("gamma radLen vs. dEdx","gamma radLen vs. dEdx");
       h_2D->Draw("SURF3");
       c->SaveAs("radLen_vs_dEdx_2DPDF_gamma.png");
+      if (fout) { h_2D->Write(); }
       delete h_2D;
       h_2D = ePDF.createHistogram("electron radLen vs. dEdx",*_radLenVar,RooFit::Binning(100,0,30),
 				  RooFit::YVar(*_dEdxVar,RooFit::Binning(100,0,8)) ); 
       h_2D->SetNameTitle("electron radLen vs. dEdx","electron radLen vs. dEdx");
       h_2D->Draw("SURF3");
       c->SaveAs("radLen_vs_dEdx_2DPDF_electron.png");
+      if (fout) { h_2D->Write(); }
       delete h_2D;
       
       
@@ -566,6 +585,7 @@ namespace ertool {
       c->SaveAs(Form("RadLength_Selected_%s.png", part_letter.c_str()));
       c->SetTitle("dEdx Selection");
       frame_dEdx->Draw();
+      if (fout) { frame_dEdx->Write(); }
       if (_mode)
 	frame_radLen->SetNameTitle("dE/dx PDF for gammas","dE/dx PDF for gammas");
       else

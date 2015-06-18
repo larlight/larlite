@@ -121,7 +121,7 @@ def main():
         my_ana._mgr.Reset()
         my_proc.set_ana_output_file("electron_training.root")
         print '    Start running electron training...'
-        my_proc.run(10)
+        my_proc.run()
         print
         print '    Finished running electron training...'
         print
