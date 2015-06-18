@@ -51,7 +51,8 @@ namespace ertool {
 
     void SetVerbose ( bool verbose ) { _verbose = verbose ; }
     
-    void SetMinDist   ( double minDist ) { _minDist = minDist ; }
+    void SetMinDistVtx   ( double minDistVtx ) { _minDistVtx = minDistVtx ; }
+    void SetMinDistEnd   ( double minDistEnd ) { _minDistEnd = minDistEnd ; }
 
     /// Functions that returns if object given as 1st 
     ///argument comes from object given as second argument
@@ -66,9 +67,10 @@ namespace ertool {
 
   AlgoPrimaryFinder _primary_alg ;
   
-  bool 		_verbose ;
-  double 	_vtxDist ;
-  double 	_minDist   ;
+  bool 		_verbose    ;
+  double 	_vtxDist    ;
+  double 	_minDistVtx ;
+  double 	_minDistEnd ;
 
 
   };
