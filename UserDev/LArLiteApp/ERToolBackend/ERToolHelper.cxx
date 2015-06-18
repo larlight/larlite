@@ -508,8 +508,8 @@ namespace larlite {
 				      _shrProfiler.ShowerRadius()) );
       auto& s = (*s_v.rbegin());
       if(shw.best_plane()){
-	s._energy = (*(shw.Energy().rbegin()));
-	s._dedx   = (*(shw.dEdx().rbegin()));
+	s._energy = shw.Energy()[shw.best_plane()];
+	s._dedx   = shw.dEdx()[shw.best_plane()];
       }else{
 	s._energy = (*(shw.Energy().begin()));
 	s._dedx   = (*(shw.dEdx().begin()));
