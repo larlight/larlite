@@ -51,7 +51,7 @@ namespace ertool {
 
     void AcceptPSet(const ::fcllite::PSet& cfg);
 
-    void SetDebug(bool on) { _debug = on; }
+    void setVerbose(bool on) { _verbose = on; }
 
     /// Function to evaluate input showers and determine a score
     virtual bool Analyze(const EventData &data,  const ParticleGraph &graph);
@@ -64,7 +64,7 @@ namespace ertool {
 	
    private:
 
-    bool _debug;
+    bool _verbose;
 
     TTree* _pi0_reco_tree;
     TTree* _1pi0_tree;
@@ -72,7 +72,8 @@ namespace ertool {
     double _x_pi0_Reco, _y_pi0_Reco, _z_pi0_Reco; /// pi0 x,y,z start point
     double _px_pi0_Reco, _py_pi0_Reco, _pz_pi0_Reco , _p_pi0_Reco; /// pi0 px,py,pz,pmag
     double _mass_pi0_Reco; // reco mass of pi0
-
+    int _primary; // is pi0 reco as primary 
+ 
     double _x_shra_Reco, _y_shra_Reco, _z_shra_Reco; /// showera x,y,z start point
     double _px_shra_Reco, _py_shra_Reco, _pz_shra_Reco, _p_shra_Reco; /// showera momentum
     double _e_shra_Reco;
