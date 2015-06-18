@@ -3,9 +3,7 @@
 
 #include "ShowerQuality.h"
 #include "LArUtil/Geometry.h"
-#include "DataFormat/mcshower.h"
 #include "DataFormat/simch.h"
-#include "DataFormat/shower.h"
 #include "DataFormat/cluster.h"
 #include "DataFormat/hit.h"
 namespace larlite {
@@ -15,6 +13,8 @@ namespace larlite {
     _fout=0;
 
     fShowerProducer  = "";
+
+    _mcShowerQuality = true;
     
     hMatchCorrectness = nullptr;
 
@@ -39,6 +39,8 @@ namespace larlite {
     hBestPlane = nullptr;
 
     fTree = nullptr;
+    
+    _numRecoShowers = 0;
   }
 
   bool ShowerQuality::initialize() {
@@ -176,7 +178,7 @@ namespace larlite {
 
     // Get shower
     auto ev_shower = storage->get_data<event_shower>(fShowerProducer);
-    
+    _numRecoShowers += ev_shower->size();
     if(!ev_shower) {
       print(msg::kERROR,__FUNCTION__,
 	    Form("Did not find shower produced by \"%s\"",fShowerProducer.c_str())
@@ -308,38 +310,130 @@ namespace larlite {
       }      
     }
 
-    // Loop over MCShower and inspect corresponding shower quality
-    for(size_t mcs_index = 0; mcs_index < mc_index_v.size(); ++mcs_index) {
+    // are we filling once per Reco shower or once per MC shower?
+    mcshower mc_shower;
+    shower reco_shower;
+    size_t best_index;
+    size_t mcs_index;
+    size_t shower_index;
+    // if filling once per MC shower
+    if (_mcShowerQuality)
+      {
+	// Loop over MCShower and inspect corresponding shower quality
+	for(mcs_index = 0; mcs_index < mc_index_v.size(); ++mcs_index) {
+	  
+	  mc_shower = (*ev_mcs)[mc_index_v[mcs_index]];
+	  
+	  // Search for the best representative shower
+	  best_index = shower_mcq_vv.size();
+	  double max_mcq=0;
+	  for(shower_index = 0; shower_index < shower_mcq_vv.size(); ++shower_index) {
+	    
+	    if( shower_mcq_vv[shower_index][mcs_index] > max_mcq)
+	      best_index = shower_index;
+	  }
+	  
+	  if(best_index == shower_mcq_vv.size()) {
+	    print(msg::kERROR,__FUNCTION__,
+		  Form("Failed to find a corresponding shower for MCShower %d",mc_index_v[mcs_index])
+		  );
+	    continue;
+	  }
 
-      auto const& mc_shower = (*ev_mcs)[mc_index_v[mcs_index]];
+	  reco_shower = (*ev_shower)[best_index];
 
-      // Search for the best representative shower
-      size_t best_shower_index = shower_mcq_vv.size();
-      double max_mcq=0;
-      for(size_t shower_index = 0; shower_index < shower_mcq_vv.size(); ++shower_index) {
+	  FillQualityInfo(reco_shower, mc_shower, best_index, mcs_index, ass_cluster_v);
+	}
+      }// if filling once per MC shower
+    // if filling once per RECO shower
+    else {
+      
+      // Loop over RECOShower and inspect corresponding shower quality
+      for(shower_index = 0; shower_index < shower_mcq_vv.size(); ++shower_index) {
+	
+	reco_shower = (*ev_shower)[shower_index];
+	
+	// search for the best representative mc shower
+	best_index = mc_index_v.size();
+	double max_mcq=0;
+	
+	for(size_t mcs_index = 0; mcs_index < mc_index_v.size(); ++mcs_index) {
+	  
+	  if( shower_mcq_vv[shower_index][mcs_index] > max_mcq)
+	    best_index = mcs_index;
+	}
+	
+	if(best_index == mc_index_v.size()) {
+	  continue;
+	}
+	
+	mc_shower = (*ev_mcs)[mc_index_v[best_index]];
 
-	if( shower_mcq_vv[shower_index][mcs_index] > max_mcq)
-	  best_shower_index = shower_index;
+	FillQualityInfo(reco_shower, mc_shower, shower_index, best_index, ass_cluster_v);
+      }// if filling once per RECO shower
+
+    }
+    
+    return true;
+  }
+
+  bool ShowerQuality::finalize() {
+
+    std::cout << "Number of reco showers: " << _numRecoShowers << std::endl;
+
+    if(_fout) {
+
+      
+      // Write shower histograms if any entry made
+      if(hMatchCorrectness->GetEntries()) {
+	
+	hMatchCorrectness->Write();
+
+	hVtxDX->Write();
+	hVtxDY->Write();
+	hVtxDZ->Write();
+	hVtxDR->Write();
+	
+	hDCosX->Write();
+	hDCosY->Write();
+	hDCosZ->Write();
+	h3DAngleDiff->Write();
+	
+	hEnergyCorr->Write();
+	hEnergyAssym->Write();
+	hEnergyDiff->Write();
+
+	for(auto& h_pair : mDEDX)
+	  
+	  h_pair.second->Write();
+
+	hMatchedClusterPur->Write();
+	hMatchedClusterEff->Write();
+
+	hBestPlane->Write();
+
+	fTree->Write();
       }
 
-      if(best_shower_index == shower_mcq_vv.size()) {
-	print(msg::kERROR,__FUNCTION__,
-	      Form("Failed to find a corresponding shower for MCShower %d",mc_index_v[mcs_index])
-	      );
-	continue;
-      }
+    }
 
-      auto const& reco_shower = (*ev_shower)[best_shower_index];
+    return true;
+  }
 
-      auto res = fBTAlg.ShowerCorrectness(ass_cluster_v[best_shower_index]);
+  void ShowerQuality::FillQualityInfo(const shower& reco_shower, const mcshower& mc_shower,
+				      const size_t& shower_index, const size_t& mcshower_index,
+				      const AssSet_t& ass_cluster_v)
+  {
+
+      auto res = fBTAlg.ShowerCorrectness(ass_cluster_v[shower_index]);
 
       fTreeParams.match_correctness = res.second;
 
       if(fTreeParams.match_correctness < 0) {
 	print(msg::kERROR,__FUNCTION__,
-	      Form("Failed to find a corresponding MCShower for shower %zu",best_shower_index)
+	      Form("Failed to find a corresponding MCShower for shower %zu", shower_index)
 	      );
-	continue;
+	return;
       }
 
       // MC Info
@@ -380,8 +474,8 @@ namespace larlite {
       // Reco cluster efficiency & purity
       fTreeParams.cluster_eff = 1.;
       fTreeParams.cluster_pur = 1.;
-      for(auto const& cluster_index : ass_cluster_v[best_shower_index]) {
-	auto ep = fBTAlg.ClusterEP(cluster_index, mcs_index);
+      for(auto const& cluster_index : ass_cluster_v[shower_index]) {
+	auto ep = fBTAlg.ClusterEP(cluster_index, mcshower_index);
 	if(ep.first==0 && ep.second==0) continue;
 	fTreeParams.cluster_eff *= ep.first;
 	fTreeParams.cluster_pur *= ep.second;
@@ -389,26 +483,6 @@ namespace larlite {
 
       // Reco energy & dedx info
       fTreeParams.best_plane_id = reco_shower.best_plane();
-
-      /*
-      int best_plane_index = -1;
-
-      for(size_t i=0; i < ass_cluster_v[best_shower_index].size(); ++i) {
-
-	size_t cluster_index = ass_cluster_v[best_shower_index][i];
-	//std::cout<<best_plane_index<<" : "<<ev_cluster->at(cluster_index).View()<<std::endl;
-	if( ev_cluster->at(cluster_index).View() == reco_shower.best_plane() ) {
-	  best_plane_index = i;
-	  break;
-	}
-      }
-
-      if(best_plane_index < 0) {
-	throw ::showerreco::ShowerRecoException(Form("Failed to identify the best plane for shower %zu",
-						     best_shower_index)
-						);
-      }
-      */
 
       fTreeParams.reco_energy = reco_shower.Energy().at(reco_shower.best_plane());
       fTreeParams.reco_energy_U = reco_shower.Energy().at(0);
@@ -462,50 +536,6 @@ namespace larlite {
       // Fill Tree
       fTree->Fill();
 
-    }
-  
-    return true;
-  }
-
-  bool ShowerQuality::finalize() {
-
-    if(_fout) {
-
-      
-      // Write shower histograms if any entry made
-      if(hMatchCorrectness->GetEntries()) {
-	
-	hMatchCorrectness->Write();
-
-	hVtxDX->Write();
-	hVtxDY->Write();
-	hVtxDZ->Write();
-	hVtxDR->Write();
-	
-	hDCosX->Write();
-	hDCosY->Write();
-	hDCosZ->Write();
-	h3DAngleDiff->Write();
-	
-	hEnergyCorr->Write();
-	hEnergyAssym->Write();
-	hEnergyDiff->Write();
-
-	for(auto& h_pair : mDEDX)
-	  
-	  h_pair.second->Write();
-
-	hMatchedClusterPur->Write();
-	hMatchedClusterEff->Write();
-
-	hBestPlane->Write();
-
-	fTree->Write();
-      }
-
-    }
-
-    return true;
   }
 
   void ShowerQuality::InitializeAnaTree()
