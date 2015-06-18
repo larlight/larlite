@@ -185,8 +185,6 @@ namespace ertool {
       sigma = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_dEdxGaus_sigma"));
       sigma->setVal ( darray[5] );
 
-      std::cout << "mean: " << darray[4] << "\tsigma: " << darray[5] << std::endl;
-
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"Loaded electron parameters..." << std::endl;
       std::cout<<"["<<__FUNCTION__<<"] "
