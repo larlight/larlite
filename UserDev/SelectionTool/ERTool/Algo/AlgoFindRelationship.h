@@ -85,6 +85,9 @@ namespace ertool {
     // Get PDG Code given track type
     double GetPDG(const Track &trk);
 
+    // Get Mass given PDG
+    double GetMass(const Track &trk);
+
   private:
 
     bool _debug;

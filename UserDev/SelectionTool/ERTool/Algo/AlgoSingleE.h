@@ -173,6 +173,13 @@ namespace ertool {
     TH1F* _e_ll_values;
     TH1F* _dedx_values;
 
+    //Tree -> one entry for every time EMPart LL function
+    // is called using both dEdx and rad-length
+    TTree* _empart_tree;
+    double _dedx;
+    double _radlen;
+    int    _pdg;
+
     //Tree -> one entry per shower-other comparison
     // therefore possibly multiple entries for each shower
     TTree* _alg_tree;

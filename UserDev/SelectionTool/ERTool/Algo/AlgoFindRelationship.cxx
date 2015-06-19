@@ -150,7 +150,7 @@ namespace ertool{
   {
     
     double IP = FindClosestApproach(s1,s2,vtx);
-    if (IP != 0)
+    if (IP < 1e-10)
       score = 1./IP;
     else
       score = 1e+10;
@@ -171,7 +171,7 @@ namespace ertool{
   {
     
     double IP = FindClosestApproach(t,s,vtx);
-    if (IP != 0)
+    if (IP < 1e-10)
       score = 1./IP;
     else
       score = 1e+10;
@@ -231,7 +231,7 @@ namespace ertool{
   {
 
     double IP = FindClosestApproach(t1,t2,vtx);
-    if (IP != 0)
+    if (IP < 1e-10)
       score = 1./IP;
     else
       score = 1e+10;
@@ -288,6 +288,21 @@ namespace ertool{
     }
 
     return -1;
+  }
+
+  double AlgoFindRelationship::GetMass(const Track &trk)
+  {
+
+    switch(trk._pid){
+    case Track::TrackPartID_t::kUnknown : return 0;
+    case Track::TrackPartID_t::kPIDA    : return 0;
+    case Track::TrackPartID_t::kProton  : return _pr_mass;
+    case Track::TrackPartID_t::kKaon    : return _ka_mass;
+    case Track::TrackPartID_t::kPion    : return _pi_mass;
+    case Track::TrackPartID_t::kMuon    : return _mu_mass;
+    case Track::TrackPartID_t::kTrackPartIDMax : return 0;
+    }
+    return 0.;
   }
 
 };

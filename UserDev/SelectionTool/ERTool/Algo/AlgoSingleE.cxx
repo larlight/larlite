@@ -10,9 +10,11 @@ namespace ertool {
   size_t total_g_showers = 0;
   size_t nonzero_dedx_counter = 0;
   
-  AlgoSingleE::AlgoSingleE(const std::string& name) : AlgoBase(name)
-			     , fTPC(-10.,-126.,-10.,292.,136.,1150.)
-			     , _alg_tree(nullptr)
+  AlgoSingleE::AlgoSingleE(const std::string& name)
+    : AlgoBase(name)
+    , fTPC(-10.,-126.,-10.,292.,136.,1150.)
+    , _alg_tree(nullptr)
+    , _empart_tree(nullptr)
   {
     _e_mass     = TDatabasePDG().GetParticle(11)->Mass();
     _e_ll_values = 0;
@@ -63,6 +65,12 @@ namespace ertool {
     _alg_tree->Branch("_distBackAlongTraj",&_distBackAlongTraj,"_distBackAlongTraj/D");
     _alg_tree->Branch("_distToTopWall",&_distToTopWall,"_distToTopWall/D");
     
+    if (_empart_tree) { delete _empart_tree; }
+    _empart_tree = new TTree("_empart_tree","EMPart gamma/electron Tagging Tree");
+    _empart_tree->Branch("_dedx",&_dedx,"dedx/D");
+    _empart_tree->Branch("_radlen",&_radlen,"radlen/D");
+    _empart_tree->Branch("_pdg",&_pdg,"pdg/I");
+
     return;
   }
 
@@ -75,9 +83,6 @@ namespace ertool {
   }
 
   bool AlgoSingleE::Reconstruct(const EventData &data, ParticleGraph& graph){
-    
-    // Reconstruct Track Hierarchy
-    //_findRel.FindTrackHierarchy(data.Track());
 
     auto datacpy = data;
 
@@ -181,13 +186,20 @@ namespace ertool {
 	    siblings.push_back(t);
 	    
 	    if (isGammaLike(thisShower._dedx,vtx.Dist(thisShower.Start()))){
+	      _dedx   = thisShower._dedx;
+	      _radlen = vtx.Dist(thisShower.Start());
+	      _pdg    = 22;
 	      if (_verbose) { std::cout << "Shower is gamma-like. Ignore " << std::endl; }
 	      single = false;
 	      break;
 	    }
 	    else{
-		single = true;
+	      _dedx   = thisShower._dedx;
+	      _radlen = vtx.Dist(thisShower.Start());
+	      _pdg    = 11;
+	      single = true;
 	    }
+	    _empart_tree->Fill();
 	    
 	  }// if common origin with primary!
       }// for all tracks
@@ -211,7 +223,30 @@ namespace ertool {
 	  single = false;
 	}
       }
-      
+
+
+      // Try and remove any shower that is on top of a track
+      // this could be due to a track mis-reconstructed as a 
+      // shower.
+      /*
+      for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
+	
+	auto const& track = datacpy.Track(graph.GetParticle(t).RecoID());
+	
+	// check if track and shower start points are close
+	if (thisShower.Start().Dist(track[0]) > 1 )
+	  continue;
+	// if their start point is very close:
+	// calculate a stupid track direction
+	size_t nsteps = track.size();
+	::geoalgo::Vector_t trackDir = track[int(nsteps/2.)]-track[0];
+	trackDir.Normalize();
+	// get dot product
+	double dot = thisShower.Dir()*trackDir;
+	if (dot > 0.9)
+	  single = false;
+      }
+      */
       // if still single (and no sister track) look at
       // dEdx to determine if e-like
       if (single && !_hassister){
@@ -227,6 +262,10 @@ namespace ertool {
       if (single){
 	if (_verbose) { std::cout << "Shower is Single!" << std::endl; }
 
+	// prepare holder for neutrino momentum
+	//::geoalgo::Vector_t neutrinoMom(0,0,0);
+	double neutrinoMom = 0;
+
 	// fill in electron properties
 	double mom = sqrt( (thisShower._energy)*(thisShower._energy) - (_e_mass*_e_mass) );
 	if (mom < 0) { mom = 1; }
@@ -238,48 +277,45 @@ namespace ertool {
 	if (_verbose) { std::cout << "number of partciles before: " << graph.GetNumParticles() << std::endl; }
 	if (_verbose) { std::cout << "Making neutrino..." << std::endl; }
 	Particle& neutrino = graph.CreateParticle();
-	neutrino.SetParticleInfo(12,0.,thisShower.Start(),thisShower.Dir()*mom);
+	neutrinoMom += mom;//thisShower.Dir()*mom;
+	//neutrino.SetParticleInfo(12,0.,thisShower.Start(),thisShower.Dir()*mom);
 	if (_verbose) { std::cout << "made neutrino with ID " << neutrino.ID() << " and PDG: " << neutrino.PdgCode() << std::endl; }
 	if (_verbose) { std::cout << "number of partciles after: " << graph.GetNumParticles() << std::endl; }
 	_neutrinos += 1;
 	// set relationship
 	graph.SetParentage(neutrino.ID(),p);
 
-	// momentum reconstruction -> this will need to change!
-	/*
-	double neutrinoMomentum = 0;
-	double neutrinoKineticEnergy = 0;
-	neutrinoKineticEnergy += thisShower._energy;
-	neutrinoMomentum += electron.Momentum();
-	// if the shower has siblings associated with it
-	if (_hassister){
-	  // loop over siblings found
-	  for (auto &sibling : siblings){
-	    auto const& sibTrack(data.Track(sibling));
-	    Particle sib = _findRel.GetPDG(sibTrack);
-	    sib.Vertex(sibTrack[0]);
-	    //sib.Mass() is in GEV, sibTrack._energy is in MEV
-	    //I think sibTrack._energy already has mass taken out of it.
-	    double Edep = sibTrack._energy;
-	    if (Edep < 0) { Edep = 0.; }
-	    geoalgo::Vector_t sibUnitDir = (sibTrack[1]-sibTrack[0]);
-	    sibUnitDir /= sibUnitDir.Length();
-	    sib.Momentum(sibUnitDir*( sqrt(Edep*(Edep+2*sib.Mass())) ));
-	    neutrinoMomentum += sib.Momentum();
-	    neutrinoKineticEnergy += sibTrack._energy;
-	    sib.RecoObjInfo(sibling,Particle::RecoObjType_t::kTrack);
-	    neutrino.AddDaughter(sib);
-	  }// for all sibling tracks
-	}// if hassister
-	// get neutrino momentum direction
-	neutrinoMomentum.Normalize();
-	neutrino.Momentum(neutrinoMomentum*neutrinoKineticEnergy);
-
-	//Only store the neutrino if lepton is in active volume!
-	if(fTPC.Contain(neutrino.Vertex())){
-	  res.push_back(neutrino);
+	// Now look for all potential siblins
+	// using AlgoFindRelationship
+	for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
+	  
+	  auto const& track = datacpy.Track(graph.GetParticle(t).RecoID());
+	  // make sure track has a length of at least 0.3 cm (wire spacing)
+	  // greater longer than 3 mm
+	  if (track.Length() < 0.3)
+	    continue;
+	  
+	  ::geoalgo::Point_t vtx(3);
+	  double score = -1;
+	  auto const& rel = _findRel.FindRelation(thisShower,track,vtx,score);
+	  if (rel == kSibling)
+	    { // add this track to PaticleTree
+	      auto &trackParticle = graph.GetParticle(t);
+	      // track deposited energy
+	      double Edep = track._energy;
+	      // track direction
+	      geoalgo::Vector_t Dir = (track[1]-track[0]);
+	      Dir.Normalize();
+	      double mass = _findRel.GetMass(track);
+	      geoalgo::Vector_t Mom = Dir * ( sqrt( Edep * (Edep+2*mass) ) );
+	      trackParticle.SetParticleInfo(_findRel.GetPDG(track),mass,track[0],Mom);
+	      neutrinoMom += sqrt( Edep * ( Edep + 2*mass ) );
+	      graph.SetParentage(neutrino.ID(),t);
+	    }
 	}
-	*/
+	::geoalgo::Vector_t momdir(0,0,1);
+	neutrino.SetParticleInfo(12,0.,thisShower.Start(),momdir*neutrinoMom);
+
       }// if single
       // if not single
       else
@@ -307,6 +343,8 @@ namespace ertool {
 
       if (_alg_tree)
 	_alg_tree->Write();
+      if (_empart_tree)
+	_empart_tree->Write();
     }
 
     return;
