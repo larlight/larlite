@@ -2,8 +2,8 @@ import sys, os
 from ROOT import gSystem
 from ROOT import ertool
 from ROOT import larlite as fmwk
-from algoviewer import viewAll, view
 from seltool.ccsingleeDef import GetCCSingleEInstance
+from seltool.algoviewer import viewAll
 
 if len(sys.argv) < 2:
     msg  = '\n'
@@ -49,7 +49,7 @@ my_proc.set_ana_output_file("singleE_selection.root")
 Ecut = 20 # in MeV
 
 my_ana = ertool.ERAnaSingleE()
-my_ana.SetDebug(False)
+my_ana.SetDebug(True)
 my_ana.SetECut(Ecut)
 
 my_anaunit = fmwk.ExampleERSelection()
@@ -64,8 +64,8 @@ my_anaunit._mgr._mc_for_ana = True
 #my_anaunit.SetShowerProducer(False,"newdefaultreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetShowerProducer(False,"mergeall");
-my_anaunit.SetShowerProducer(False,"showerreco");
-#my_anaunit.SetShowerProducer(True,"mcreco");
+#my_anaunit.SetShowerProducer(False,"showerreco");
+my_anaunit.SetShowerProducer(True,"mcreco");
 my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 #my_anaunit.SetVtxProducer(True,"generator");
@@ -95,7 +95,7 @@ while (my_proc.process_event(counter)):
     print numNeutrinos
 
     
-    if (numNeutrinos == 2):
+    if (numNeutrinos == 1):
         # we found something...lets plot it
         data_mc   = my_anaunit.GetData(True)
         part_mc   = my_anaunit.GetParticles(True)
