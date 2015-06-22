@@ -65,13 +65,14 @@ namespace ertool {
 
     // Result tree comparison for reconstructed events
     TTree* _result_tree;
-    double _dist;
-    double _dedx;
-    double _e_reco;
-    double _e_mc;
-    double _dot;
-    int    _pdg_reco;
-    int    _pdg_mc;
+    double _dist_part;  ///< Distance between Reco & MC Part Vtx()
+    double _dist_shrs;  ///< Distance between Reco & MC Shr Start()
+    double _dedx;       ///< dEdx of reco shower
+    double _e_reco;     ///< Energy of reco shower
+    double _e_mc;       ///< energy of MC shower
+    double _dot;        ///< dot-prod. of reco & mc part directions
+    int    _pdg_reco;   ///< PDG of reconstructed particle
+    int    _pdg_mc;     ///< PDG of MC particle
 
     /// counters to cout to screen after running
     int _numEvts;

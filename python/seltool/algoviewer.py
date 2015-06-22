@@ -19,9 +19,7 @@ def viewAll(mcData, mcPart, recoData, recoPart):
     display_reco.clear()
     display_mc.clear()
 
-    print "display reco"
     display_reco.add(recoPart,recoData,False)
-    print "display mc"
     display_mc.add(mcPart,mcData,False)
 
     display_mc.show()

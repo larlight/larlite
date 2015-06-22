@@ -14,10 +14,14 @@ namespace ertool {
 
     if (_result_tree) { delete _result_tree; }
     _result_tree = new TTree("_result_tree","Result Tree");
-    _result_tree->Branch("_dist",&_dist,"dist/D");
+    _result_tree->Branch("_dist_shrs",&_dist_shrs,"dist_shrs/D");
+    _result_tree->Branch("_dist_part",&_dist_part,"dist_part/D");
     _result_tree->Branch("_dedx",&_dedx,"dedx/D");
     _result_tree->Branch("_pdg_reco",&_pdg_reco,"pdg_reco/I");
     _result_tree->Branch("_pdg_mc",&_pdg_mc,"pdg_mc/I");
+    _result_tree->Branch("_dot",&_dot,"dot/D");
+    _result_tree->Branch("_e_reco",&_e_reco,"e_reco/D");
+    _result_tree->Branch("_e_mc",&_e_mc,"e_mc/D");
     // keep track of number of events gone by
     _numEvts = 0;
 
@@ -31,7 +35,7 @@ namespace ertool {
 
   bool ERAnaEMPart::Analyze(const EventData &data, const ParticleGraph &graph)
   {
-    
+
     if (_debug)
       std::cout << "******  Begin ERAnaEMPart Analysis  ******" << std::endl;
 
@@ -39,40 +43,51 @@ namespace ertool {
     
     // Get MC particle set
     auto const& mc_graph = MCParticleGraph();
+    auto const& mc_evtdata = MCEventData();
     auto const& mcparticles = mc_graph.GetParticleArray();
-    
+
     // define variables to use
+    ::ertool::Particle recoPart;
+    ::ertool::Particle mcPart;
     ::ertool::Particle closestPart;
     double minDist;
     
     // loop through particles reconstructed
     auto const& particles = graph.GetParticleArray();
     for (std::deque<::ertool::Particle>::const_iterator it = particles.begin(); it != particles.end(); it++){
-      if ( ((*it).PdgCode() == 11) or ((*it).PdgCode() == 22) ){
+      recoPart = *it;
+      if ( (recoPart.PdgCode() == 11) or (recoPart.PdgCode() == 22) ){
 	minDist = 1036;
 	// find the shower in MCParticleGraph with the closest start/end point
 	for (std::deque<::ertool::Particle>::const_iterator mcit = mcparticles.begin(); mcit != mcparticles.end(); mcit++){
-	  if ( ((*mcit).PdgCode() == 11) or ((*mcit).PdgCode() == 22) ){
-	    // check distance between start points
-	    if ( (*mcit).Vertex().Dist((*it).Vertex()) < minDist ){
-	      minDist = (*mcit).Vertex().Dist((*it).Vertex());
-	      closestPart = (*mcit);
+	  mcPart = *mcit;
+	  if ( (mcPart.PdgCode() == 11) or (mcPart.PdgCode() == 22) ){
+	    // check distance between shower start points
+	    if (recoPart.RecoID() < 1000 && mcPart.RecoID() < 1000){
+	    auto const& recoShrStart = datacpy.Shower(recoPart.RecoID()).Start();
+	    auto const& mcShrStart   = mc_evtdata.Shower(mcPart.RecoID()).Start();
+	    if ( recoShrStart.Dist(mcShrStart) < minDist ){
+	      minDist = recoShrStart.Dist(mcShrStart);
+	      closestPart = mcPart;
+	    }
 	    }
 	  }// if a shower
 	}// for all MCParticles
 	if (minDist < 1036){
-	  _dist = minDist;
-	  _dedx = datacpy.Shower((*it).RecoID())._dedx;
-	  _e_reco   = (*it).Energy();
+	  _dist_shrs = minDist;
+	  _dist_part = recoPart.Vertex().Dist(closestPart.Vertex());
+	  _dedx = datacpy.Shower(recoPart.RecoID())._dedx;
+	  _e_reco   = recoPart.Energy();
 	  _e_mc     = closestPart.Energy();
-	  _dot      = closestPart.Momentum().Dot((*it).Momentum())/(closestPart.Momentum().Length()*(*it).Momentum().Length());
-	  _pdg_reco = (*it).PdgCode();
+	  _dot      = closestPart.Momentum().Dot(recoPart.Momentum())/(closestPart.Momentum().Length()*recoPart.Momentum().Length());
+	  _pdg_reco = recoPart.PdgCode();
 	  _pdg_mc   = closestPart.PdgCode();
 	  _result_tree->Fill();
 	  if (_debug){
 	    std::cout << "Comparing RECO shower to MC w/ nearest start point:" << std::endl
 		      << "Ereco: " << _e_reco << "\tE mc: " << _e_mc << std::endl
-		      << "Distance: " << _dist << std::endl
+		      << "Shr Distance : " << _dist_shrs << std::endl
+	      	      << "Part Distance: " << _dist_part << std::endl
 		      << "Direction Dot: " << _dot << std::endl
 		      << "PDG reco: " << _pdg_reco << "\tPDG mc: " << _pdg_mc << std::endl
 		      << "dE/dx: " << _dedx << std::endl << std::endl;
@@ -91,7 +106,7 @@ namespace ertool {
     ResetTreeVariables();
     
     _numEvts += 1;
-    
+
     return true;
   }
   

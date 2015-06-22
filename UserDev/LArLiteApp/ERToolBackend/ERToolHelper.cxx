@@ -89,16 +89,21 @@ namespace larlite {
       if( mcs.MotherTrackID() != mcs.AncestorTrackID() ) continue;
       
       unsigned int trkid_mom = mcs.AncestorTrackID();
-      
       if(g4_mother_parts.find(trkid_mom) == g4_mother_parts.end()) {
-	int pdg_mom = mcs.AncestorPdgCode();
-	auto& mother = mgr.MCParticleGraph().CreateParticle();
-	mother.SetParticleInfo(pdg_mom,pdgdbs.GetParticle(pdg_mom)->Mass()*1.e3,//PdgMass[pdg_mom],
-			       mcs.MotherStart().Position(),
-			       mcs.MotherStart().Momentum());
-	
-	g4_mother_parts.insert(std::make_pair(trkid_mom,mother));
-	g4_mother_id[trkid_mom] = PartID_t(mother.Vertex(), mother.Momentum(), mother.PdgCode());
+	int pdg_mom = mcs.MotherPdgCode();
+	if (pdg_mom != mcs.PdgCode()){
+	  auto& mother = mgr.MCParticleGraph().CreateParticle();
+	  mother.SetParticleInfo(pdg_mom,pdgdbs.GetParticle(pdg_mom)->Mass()*1.e3,//PdgMass[pdg_mom],
+				 mcs.MotherStart().Position(),
+				 mcs.MotherStart().Momentum());
+	  g4_mother_parts.insert(std::make_pair(trkid_mom,mother));
+	  g4_mother_id[trkid_mom] = PartID_t(mother.Vertex(), mother.Momentum(), mother.PdgCode());
+	}
+	else{
+	  auto const& aaa = mgr.MCParticleGraph().GetParticle(nodeID);
+	  g4_mother_parts.insert(std::make_pair(trkid_mom,aaa));
+	  g4_mother_id[trkid_mom] = PartID_t(aaa.Vertex(), aaa.Momentum(), aaa.PdgCode());
+	}
       }
       if(mcs.TrackID() != mcs.MotherTrackID()) {      
 	
@@ -108,6 +113,7 @@ namespace larlite {
 					   childNodeID);
 	
        }
+
      }
 
      reco_obj_index = 0;
@@ -165,6 +171,7 @@ namespace larlite {
      //
      // Revise mother particle information w/ MCShower/MCTrack
      //
+     /*
      reco_obj_index = 0;
      for(size_t i=0; i<mcs_v.size(); ++i) {
        
@@ -178,6 +185,7 @@ namespace larlite {
 	 auto const& ID = g4_mother_parts[trkid].ID();
 	 auto const& mass = mgr.MCParticleGraph().GetParticle(ID).Mass();
 	 auto const& pdg  = mgr.MCParticleGraph().GetParticle(ID).PdgCode();
+	 std::cout << "EDITING PDG TO " << pdg << std::endl;
 	 mgr.MCParticleGraph().GetParticle(ID).SetParticleInfo(pdg,mass,
 							       ::geoalgo::Vector(mcs.DetProfile().Position()),
 							       ::geoalgo::Vector(mcs.DetProfile().Momentum()) );
@@ -196,11 +204,13 @@ namespace larlite {
 	 auto const& ID = g4_mother_parts[trkid].ID();
 	 auto const& mass = mgr.MCParticleGraph().GetParticle(ID).Mass();
 	 auto const& pdg  = mgr.MCParticleGraph().GetParticle(ID).PdgCode();
+	 std::cout << "EDITING PDG TO " << pdg << std::endl;
 	 mgr.MCParticleGraph().GetParticle(ID).SetParticleInfo(pdg,mass,
 							       ::geoalgo::Vector(mct.front().Position()),
 							       ::geoalgo::Vector(mct.front().Momentum()) );
        }
      }
+     */
      std::set<unsigned int> g4_mother_used;
      for(auto const& mci : mci_v) {
        
@@ -275,10 +285,10 @@ namespace larlite {
 	     break;
 	   }
 	 }
-
+	 /*
 	 if(!g4_mother_found) {
 	   int pdg = mcp.PdgCode();
-
+	   std::cout << "new particle with PDG: " << pdg << std::endl;
 	   auto& p = mgr.MCParticleGraph().CreateParticle();
 	   p.SetParticleInfo(pdg,mcp.Mass()*1000.,
 			     ::geoalgo::Vector(mcp.Trajectory()[0].Position()),
@@ -296,6 +306,7 @@ namespace larlite {
 	   //else
 	   //  particle_set[grand_mother_to_res_index[trkid_to_grand_mother[mcp.TrackId()]]].AddDaughter(p);	    
 	 }
+	 */
        }
      }
      /*
