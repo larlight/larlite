@@ -21,6 +21,7 @@
 #include "ERTool/Base/Track.h"
 #include "ERTool/Base/Shower.h"
 #include "ERTool/Base/Particle.h"
+#include "AlgoFindRelationship.h"
 #include "TDatabasePDG.h"
 #include <RooPlot.h>
 #include <RooProdPdf.h>
@@ -91,6 +92,8 @@ namespace ertool {
   protected:
 
     PdfFactory _factory; ///< P.D.F. factory class instance
+
+    AlgoFindRelationship _findRel;
 
     double _e_mass; ///< Electron's mass
     double _g_mass; ///< Gamma's mass

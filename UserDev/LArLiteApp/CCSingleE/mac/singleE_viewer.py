@@ -2,8 +2,8 @@ import sys, os
 from ROOT import gSystem
 from ROOT import ertool
 from ROOT import larlite as fmwk
-from algoviewer import viewAll, view
 from seltool.ccsingleeDef import GetCCSingleEInstance
+from seltool.algoviewer import viewAll
 
 if len(sys.argv) < 2:
     msg  = '\n'
@@ -66,13 +66,13 @@ my_anaunit._mgr._mc_for_ana = True
 
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
-#my_anaunit.SetShowerProducer(True,"mcreco");
+my_anaunit.SetShowerProducer(True,"mcreco");
 my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetVtxProducer(True,"generator");
 #my_anaunit.SetShowerProducer(False,"mergeall");
 #my_anaunit.SetShowerProducer(False,"newdefaultreco");
 #my_anaunit.SetShowerProducer(True,"mcreco");
-my_anaunit.SetShowerProducer(False,"showerreco");
+#my_anaunit.SetShowerProducer(False,"showerreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 # ************************************************

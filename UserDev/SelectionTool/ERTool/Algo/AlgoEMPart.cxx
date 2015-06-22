@@ -164,7 +164,7 @@ namespace ertool {
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"Loaded gamma parameters..." << std::endl;
       std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"Rad Length: " << 1./tau->getVal() << " ["<< 1./tau->getMax() <<" => "<< 1./tau->getMin() <<"]" << std:: endl;
+	       <<"Rad Length: " << -1./tau->getVal() << " ["<< -1./tau->getMax() <<" => "<< -1./tau->getMin() <<"]" << std:: endl;
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"dEdx: Mean low: " << meanlow->getVal() << " Sigma high: " << sigmalow->getVal() << std::endl
 	       <<"["<<__FUNCTION__<<"] "
@@ -188,7 +188,7 @@ namespace ertool {
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"Loaded electron parameters..." << std::endl;
       std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"Rad Length: " << 1./tau->getVal() << " ["<< 1./tau->getMax() <<" => "<< 1./tau->getMin() <<"]" << std:: endl;
+	       <<"Rad Length: " << -1./tau->getVal() << " ["<< -1./tau->getMax() <<" => "<< -1./tau->getMin() <<"]" << std:: endl;
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"dEdx: Mean1: " << mean->getVal() << " Sigma1: " << sigma->getVal() << std::endl;
     }
@@ -262,37 +262,93 @@ namespace ertool {
       std::cout << "Number of Showers: " << datacpy.Shower().size() << std::endl;
       std::cout << "Number of Shower Particles: " << graph.GetParticleNodes(RecoType_t::kShower).size() << std::endl;
     }
-
+    
     // Loop through showers
-    for (auto const& p : graph.GetParticleNodes(RecoType_t::kShower)){
+    for (auto const& s : graph.GetParticleNodes(RecoType_t::kShower)){
 
-      auto const& s = datacpy.Shower(graph.GetParticle(p).RecoID());
+      auto const& shr = datacpy.Shower(graph.GetParticle(s).RecoID());
 
-      double dist   = -1.;
-      double dEdx   = s._dedx;
+      double dEdx;
+      double dist;
+      double e_like, g_like;
 
-      // skip if dEdx out of bounds
-      if ( !_dEdxVar->inRange( dEdx, 0 ) ) continue;
-
-      // get vertex info if it exists from particle
-      auto const& vtx = graph.GetParticle(p).Vertex();
-      if (vtx != kINVALID_VERTEX)
-	dist = s.Start().Dist(vtx);
-
-      if (_verbose) { std::cout << "dEdx: " << dEdx << "\tdist: " << dist << std::endl; }
-      
-      double e_like = LL(true,  dEdx, dist);
-      double g_like = LL(false, dEdx, dist);
-
-      int pdg_code = ( g_like > e_like ? 22 : 11 );
-      double mass  = ( pdg_code == 11 ? _e_mass : _g_mass );
-      auto const& mom = s.Dir() * (s._energy - mass);
-      graph.GetParticle(p).SetParticleInfo(pdg_code,mass,s.Start(),mom,0.);
-      //res.push_back(p);
+      if (!_training_mode){
+	// for every shower find the object with the smallest IP
+	double IPmin = 1036;
+	::geoalgo::Point_t vtxMin(3);
+	for (auto const& s2 : graph.GetParticleNodes(RecoType_t::kShower)){
+	  // make sure we are not comparing with itself
+	  if (s2 == s) continue;
+	  ::geoalgo::Point_t vtx(3);
+	  auto const& shr2 = datacpy.Shower(graph.GetParticle(s2).RecoID());
+	  double IP = _findRel.FindClosestApproach(shr,shr2,vtx);
+	  if (IP < IPmin){
+	    IPmin = IP;
+	    vtxMin = vtx;
+	  }
+	}// loop over other showers
+	// loop over other tracks
+	for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
+	  // make sure we are not comparing with itself
+	  ::geoalgo::Point_t vtx(3);
+	  auto const& trk = datacpy.Track(graph.GetParticle(t).RecoID());
+	  double IP = _findRel.FindClosestApproach(shr,trk,vtx);
+	  if (IP < IPmin){
+	    IPmin = IP;
+	    vtxMin = vtx;
+	  }
+	}// loop over other tracks
+	
+	// if IP min is < 1 cm -> use radLen
+	::geoalgo::Point_t shrvtx(3);
+	dist = -1;
+	dEdx = shr._dedx;
+	if (IPmin < 1) {
+	  dist = vtxMin.Dist(shr.Start());
+	  e_like = LL(true,  dEdx, dist);
+	  g_like = LL(false, dEdx, dist);
+	  shrvtx = vtxMin;
+	}
+	else{
+	  e_like = LL(true,  dEdx, dist);
+	  g_like = LL(false, dEdx, dist);
+	  shrvtx = shr.Start();
+	}
+	
+	int pdg_code = ( g_like > e_like ? 22 : 11 );
+	double mass  = ( pdg_code == 11 ? _e_mass : _g_mass );
+	auto const& mom = shr.Dir() * (shr._energy - mass);
+	graph.GetParticle(s).SetParticleInfo(pdg_code,mass,shrvtx,mom,0.);
+      }// if not in training mode
+      // if in training mode
+      else{
+	
+	dist   = -1.;
+	dEdx   = shr._dedx;
+	
+	// skip if dEdx out of bounds
+	if ( !_dEdxVar->inRange( dEdx, 0 ) ) continue;
+	
+	// get vertex info if it exists from particle
+	auto const& vtx = graph.GetParticle(s).Vertex();
+	if (vtx != kINVALID_VERTEX)
+	  dist = shr.Start().Dist(vtx);
+	
+	if (_verbose) { std::cout << "dEdx: " << dEdx << "\tdist: " << dist << std::endl; }
+	
+	e_like = LL(true,  dEdx, dist);
+	g_like = LL(false, dEdx, dist);
+	
+	int pdg_code = ( g_like > e_like ? 22 : 11 );
+	double mass  = ( pdg_code == 11 ? _e_mass : _g_mass );
+	auto const& mom = shr.Dir() * (shr._energy - mass);
+	graph.GetParticle(s).SetParticleInfo(pdg_code,mass,shr.Start(),mom,0.);
+      }
 
       _dEdxVar->setVal(dEdx);
-
       if (!(dist<0)) { _radLenVar->setVal(dist); }
+
+
       // If in training mode, fill RooDataSet
       // of the particle we are training
       // If in Selection mode, fill RooDataSet

@@ -52,6 +52,11 @@ namespace larlite {
 				 ::ertool::Manager&     mgr) const
   {
 
+    // Parentage information:
+    // for parantage within tracks/showers
+    // hold a map that connects mother TrackID -> child NodeID
+    std::map<unsigned int, std::vector<unsigned int> > parentageMap;
+
     static TDatabasePDG pdgdbs;
 
     // First, create a PDG -> MASS map
@@ -85,20 +90,34 @@ namespace larlite {
 								pdgdbs.GetParticle(pdg)->Mass()*1.e-3,
 								mcs.Start().Position(),
 								mcs.Start().Momentum()); 
+      if (mcs.MotherTrackID() != mcs.TrackID()){
+	if (parentageMap.find(mcs.MotherTrackID()) == parentageMap.end()){
+	  std::vector<unsigned int> aaa = {(unsigned int)nodeID};
+	  parentageMap[mcs.MotherTrackID()] = aaa;
+	}
+	else
+	  parentageMap[mcs.MotherTrackID()].push_back(nodeID);
+      }
+      
       // if not primary
       if( mcs.MotherTrackID() != mcs.AncestorTrackID() ) continue;
       
       unsigned int trkid_mom = mcs.AncestorTrackID();
-      
       if(g4_mother_parts.find(trkid_mom) == g4_mother_parts.end()) {
-	int pdg_mom = mcs.AncestorPdgCode();
-	auto& mother = mgr.MCParticleGraph().CreateParticle();
-	mother.SetParticleInfo(pdg_mom,pdgdbs.GetParticle(pdg_mom)->Mass()*1.e3,//PdgMass[pdg_mom],
-			       mcs.MotherStart().Position(),
-			       mcs.MotherStart().Momentum());
-	
-	g4_mother_parts.insert(std::make_pair(trkid_mom,mother));
-	g4_mother_id[trkid_mom] = PartID_t(mother.Vertex(), mother.Momentum(), mother.PdgCode());
+	int pdg_mom = mcs.MotherPdgCode();
+	if (pdg_mom != mcs.PdgCode()){
+	  auto& mother = mgr.MCParticleGraph().CreateParticle();
+	  mother.SetParticleInfo(pdg_mom,pdgdbs.GetParticle(pdg_mom)->Mass()*1.e3,//PdgMass[pdg_mom],
+				 mcs.MotherStart().Position(),
+				 mcs.MotherStart().Momentum());
+	  g4_mother_parts.insert(std::make_pair(trkid_mom,mother));
+	  g4_mother_id[trkid_mom] = PartID_t(mother.Vertex(), mother.Momentum(), mother.PdgCode());
+	}
+	else{
+	  auto const& aaa = mgr.MCParticleGraph().GetParticle(nodeID);
+	  g4_mother_parts.insert(std::make_pair(trkid_mom,aaa));
+	  g4_mother_id[trkid_mom] = PartID_t(aaa.Vertex(), aaa.Momentum(), aaa.PdgCode());
+	}
       }
       if(mcs.TrackID() != mcs.MotherTrackID()) {      
 	
@@ -108,6 +127,7 @@ namespace larlite {
 					   childNodeID);
 	
        }
+
      }
 
      reco_obj_index = 0;
@@ -139,6 +159,26 @@ namespace larlite {
 								 pdg,
 								 mct.at(0).Position(),
 								 ::geoalgo::Vector(mct.at(0).Momentum()));
+
+       // does this node have children?
+       if (parentageMap.find(mct.TrackID()) != parentageMap.end()){
+	 auto const& childNodeID_v = parentageMap[mct.TrackID()];
+	 for (auto const& childNodeID : childNodeID_v){
+	   if (!mgr.MCParticleGraph().GetParticle(childNodeID).RelationAssessed())
+	     mgr.MCParticleGraph().SetParentage(nodeID,childNodeID);
+	 }
+       }
+
+       // set parentage info if available
+       if (mct.MotherTrackID() != mct.TrackID()){
+	 if (parentageMap.find(mct.MotherTrackID()) == parentageMap.end()){
+	   std::vector<unsigned int> aaa = {(unsigned int)nodeID};
+	  parentageMap[mct.MotherTrackID()] = aaa;
+	 }
+	 else
+	   parentageMap[mct.MotherTrackID()].push_back(nodeID);
+       }
+       
        // if not primary
        if( mct.MotherTrackID() != mct.AncestorTrackID() ) continue;
        
@@ -152,6 +192,7 @@ namespace larlite {
 				mct.MotherStart().Momentum());
 	 g4_mother_parts.insert(std::make_pair(trkid_mom,mother));
 	 g4_mother_id[trkid_mom] = PartID_t(mother.Vertex(), mother.Momentum(), mother.PdgCode());
+
        }
        if(mct.TrackID() != mct.MotherTrackID()) {
 	 
@@ -162,45 +203,6 @@ namespace larlite {
        }
      }
      
-     //
-     // Revise mother particle information w/ MCShower/MCTrack
-     //
-     reco_obj_index = 0;
-     for(size_t i=0; i<mcs_v.size(); ++i) {
-       
-       auto const& mcs = mcs_v[i];
-       if(mcs.DetProfile().E()<_minEDep) continue;
-       reco_obj_index++;
-       
-       unsigned int trkid = mcs.TrackID();
-       if(g4_mother_parts.find(trkid) != g4_mother_parts.end()) {
-	 // revise particle information
-	 auto const& ID = g4_mother_parts[trkid].ID();
-	 auto const& mass = mgr.MCParticleGraph().GetParticle(ID).Mass();
-	 auto const& pdg  = mgr.MCParticleGraph().GetParticle(ID).PdgCode();
-	 mgr.MCParticleGraph().GetParticle(ID).SetParticleInfo(pdg,mass,
-							       ::geoalgo::Vector(mcs.DetProfile().Position()),
-							       ::geoalgo::Vector(mcs.DetProfile().Momentum()) );
-       }
-     }
-     reco_obj_index = 0;
-     for(size_t i=0; i<mct_v.size(); ++i) {
-       
-       auto const& mct = mct_v[i];
-       if(mct.size()<2) continue;
-       reco_obj_index++;
-       
-       unsigned int trkid = mct.TrackID();
-       if(g4_mother_parts.find(trkid) != g4_mother_parts.end()) {
-	 // revise particle information
-	 auto const& ID = g4_mother_parts[trkid].ID();
-	 auto const& mass = mgr.MCParticleGraph().GetParticle(ID).Mass();
-	 auto const& pdg  = mgr.MCParticleGraph().GetParticle(ID).PdgCode();
-	 mgr.MCParticleGraph().GetParticle(ID).SetParticleInfo(pdg,mass,
-							       ::geoalgo::Vector(mct.front().Position()),
-							       ::geoalgo::Vector(mct.front().Momentum()) );
-       }
-     }
      std::set<unsigned int> g4_mother_used;
      for(auto const& mci : mci_v) {
        
@@ -275,35 +277,8 @@ namespace larlite {
 	     break;
 	   }
 	 }
-
-	 if(!g4_mother_found) {
-	   int pdg = mcp.PdgCode();
-
-	   auto& p = mgr.MCParticleGraph().CreateParticle();
-	   p.SetParticleInfo(pdg,mcp.Mass()*1000.,
-			     ::geoalgo::Vector(mcp.Trajectory()[0].Position()),
-			     ::geoalgo::Vector(mcp.Trajectory()[0].Momentum()*1.e3));
-	   if(trkid_to_grand_mother.find(mcp.TrackId())!=trkid_to_grand_mother.end()){
-	     auto& parentID = grand_mother_to_res_index[trkid_to_grand_mother[mcp.TrackId()]];
-	     auto& childID  = p.ID();
-	     mgr.MCParticleGraph().SetParentage(parentID,childID);
-	   }
-	   //::ertool::Particle p(pdg,mcp.Mass()*1000.);
-	   //p.Vertex(::geoalgo::Vector(mcp.Trajectory()[0].Position()));
-	   //p.Momentum(::geoalgo::Vector(mcp.Trajectory()[0].Momentum())*1.e3); //MCParticle units are converted into MEV here
-	   //if(trkid_to_grand_mother.find(mcp.TrackId())==trkid_to_grand_mother.end())  
-	   //  particle_set.push_back(p);
-	   //else
-	   //  particle_set[grand_mother_to_res_index[trkid_to_grand_mother[mcp.TrackId()]]].AddDaughter(p);	    
-	 }
        }
      }
-     /*
-     for(auto const& mom_pair : g4_mother_parts) {
-       if(g4_mother_used.find(mom_pair.first) == g4_mother_used.end())
-	 particle_set.push_back(mom_pair.second);
-     }
-     */
      return;
   }
 
