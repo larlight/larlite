@@ -55,7 +55,7 @@ namespace larlite {
     // Parentage information:
     // for parantage within tracks/showers
     // hold a map that connects mother TrackID -> child NodeID
-    std::map<unsigned int, unsigned int> parentageMap;
+    std::map<unsigned int, std::vector<unsigned int> > parentageMap;
 
     static TDatabasePDG pdgdbs;
 
@@ -90,8 +90,14 @@ namespace larlite {
 								pdgdbs.GetParticle(pdg)->Mass()*1.e-3,
 								mcs.Start().Position(),
 								mcs.Start().Momentum()); 
-      if (mcs.MotherTrackID() != mcs.TrackID())
-	parentageMap[mcs.MotherTrackID()] = nodeID;
+      if (mcs.MotherTrackID() != mcs.TrackID()){
+	if (parentageMap.find(mcs.MotherTrackID()) == parentageMap.end()){
+	  std::vector<unsigned int> aaa = {(unsigned int)nodeID};
+	  parentageMap[mcs.MotherTrackID()] = aaa;
+	}
+	else
+	  parentageMap[mcs.MotherTrackID()].push_back(nodeID);
+      }
       
       // if not primary
       if( mcs.MotherTrackID() != mcs.AncestorTrackID() ) continue;
@@ -156,14 +162,23 @@ namespace larlite {
 
        // does this node have children?
        if (parentageMap.find(mct.TrackID()) != parentageMap.end()){
-	 auto const& childNodeID = parentageMap[mct.TrackID()];
-	 if (!mgr.MCParticleGraph().GetParticle(childNodeID).RelationAssessed())
-	   mgr.MCParticleGraph().SetParentage(nodeID,childNodeID);
+	 auto const& childNodeID_v = parentageMap[mct.TrackID()];
+	 for (auto const& childNodeID : childNodeID_v){
+	   if (!mgr.MCParticleGraph().GetParticle(childNodeID).RelationAssessed())
+	     mgr.MCParticleGraph().SetParentage(nodeID,childNodeID);
+	 }
+       }
+
+       // set parentage info if available
+       if (mct.MotherTrackID() != mct.TrackID()){
+	 if (parentageMap.find(mct.MotherTrackID()) == parentageMap.end()){
+	   std::vector<unsigned int> aaa = {(unsigned int)nodeID};
+	  parentageMap[mct.MotherTrackID()] = aaa;
+	 }
+	 else
+	   parentageMap[mct.MotherTrackID()].push_back(nodeID);
        }
        
-       if (mct.MotherTrackID() != mct.TrackID())
-	 parentageMap[mct.MotherTrackID()] = nodeID;
-
        // if not primary
        if( mct.MotherTrackID() != mct.AncestorTrackID() ) continue;
        
