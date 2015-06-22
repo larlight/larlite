@@ -5,14 +5,15 @@
 #include <TDatabasePDG.h>
 #include <limits>
 #include <climits>
+
+static TDatabasePDG pdgdbs;
+
 namespace larlite {
 
   /// Function to fill map with mass mass from PDG code
   std::map<int,double>& ERToolHelper::getMassMap(const event_mcshower& mcs_v,
 						 const event_mctrack& mct_v)
   {
-
-    static TDatabasePDG pdgdbs;
 
     std::map<int,double> pdgmap;
 
@@ -56,8 +57,6 @@ namespace larlite {
     // for parantage within tracks/showers
     // hold a map that connects mother TrackID -> child NodeID
     std::map<unsigned int, std::vector<unsigned int> > parentageMap;
-
-    static TDatabasePDG pdgdbs;
 
     // First, create a PDG -> MASS map
     //auto& PdgMass = getMassMap(mcs_v,mct_v);
@@ -307,8 +306,8 @@ namespace larlite {
       if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
 
       auto nodeID = mgr.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
-      mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(::ertool::kINVALID_INT,
-							      ::ertool::kINVALID_INT,
+      mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
+							      pdgdbs.GetParticle(mct.PdgCode())->Mass()*1.e-3,
 							      mct.at(0).Position(),
 							      ::geoalgo::Vector(mct.at(0).Momentum()));
 
