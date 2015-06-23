@@ -30,8 +30,10 @@ class view_manager(object):
     self._wirePlotItem = pg.PlotDataItem(pen=(0,0,0))
     # self._wirePlotItem.setBac
     self._wirePlot.addItem(self._wirePlotItem)
-    self._wireDrawer.setMaximumHeight(100)
+    self._wireDrawer.setMaximumHeight(200)
+    self._wireDrawer.setMinimumHeight(100)
 
+    self._autoRange = False
 
 
   def addEvdDrawer(self,plane):
@@ -50,9 +52,13 @@ class view_manager(object):
     # loop through the list and add the drawing windows and their scale
     self._widget = QtGui.QWidget()
     self._layout = QtGui.QVBoxLayout()
+    self._layout.setSpacing(0)
+    self._layout.setMargin(0)
+    self._layout.setContentsMargins(0,0,0,0)
+
 
     for view in self._drawerList:
-      self._layout.addWidget(view.getWidget())
+      self._layout.addWidget(view.getWidget(),0)
 
     self._widget.setLayout(self._layout)
     return self._widget
@@ -66,9 +72,10 @@ class view_manager(object):
     for view in self._drawerList:
       view.setRangeToMax()
 
-  def autoRange(self):
+  def autoRange(self,event_manager):
     for view in self._drawerList:
-      view.autoRange()
+      xRange,yRange = event_manager.getAutoRange(view.plane())
+      view.autoRange(xRange,yRange)
 
   def lockAR(self, lockRatio):
     for view in self._drawerList:
@@ -94,8 +101,6 @@ class view_manager(object):
       else:
         self._drawerList[i].drawBlank()
 
-    # Max sure the widgets are maxed:
-    self.setRangeToMax()
  
   def drawWireOnPlot(self, wireData):
     # Need to draw a wire on the wire view
@@ -121,7 +126,7 @@ class gui(QtGui.QWidget):
     self._view_manager = view_manager(geometry)
     self._event_manager.connectGui(self)
     self._event_manager.connectViewManager(self._view_manager)
-
+    # self.setStyleSheet("background-color:rgb(230,230,230);")
 
   def closeEvent(self, event):
     self.quit()  
@@ -143,6 +148,7 @@ class gui(QtGui.QWidget):
     self._subrunLabel.setText(subrunLabel)
     
     self._view_manager.drawPlanes(self._event_manager)
+    self.autoRangeWorker()
 
   # This function prepares the buttons such as prev, next, etc and returns a layout
   def getEventControlButtons(self):
@@ -248,7 +254,9 @@ class gui(QtGui.QWidget):
 
   def autoRangeWorker(self):
     if self._autoRangeBox.isChecked():
-      self._view_manager.autoRange()
+      self._view_manager.autoRange(self._event_manager)
+    else:
+      self._view_manager.setRangeToMax()
 
   def lockARWorker(self):
     if self._lockAspectRatio.isChecked():

@@ -131,19 +131,20 @@ namespace evd {
 
   Shower2d DrawShower::getShower2d(larlite::shower shower, unsigned int plane){
     Shower2d result;
+    result._plane = plane;
     // Fill out the parameters of the 2d shower
     float _wire = geoService->NearestWire(shower.ShowerStart(), plane);
     float _time = shower.ShowerStart().X();
     // Convert wire and time to cm:
     _wire *= geoUtils->WireToCm();
     _time *= geoUtils->WireToCm();
-    result.startPoint = TVector2(_wire,_time);
+    result._startPoint = TVector2(_wire,_time);
 
     // Next get the direction:
-    result.angleInPlane = geoUtils->Get2DangleFrom3D(plane,shower.Direction());
+    result._angleInPlane = geoUtils->Get2DangleFrom3D(plane,shower.Direction());
 
     // Get the opening Angle:
-    result.openingAngle = shower.OpeningAngle();
+    result._openingAngle = shower.OpeningAngle();
 
     // Get the length:
     float length = shower.Length();
@@ -153,7 +154,7 @@ namespace evd {
     float _second_wire = geoUtils->WireToCm() * geoService->NearestWire(secondPoint,plane);
     float _second_time = geoUtils->TimeToCm() * secondPoint.X();
 
-    result.length = sqrt(pow(_wire - _second_wire, 2) + pow(_time - _second_time, 2));
+    result._length = sqrt(pow(_wire - _second_wire, 2) + pow(_time - _second_time, 2));
     return result;
   }
 

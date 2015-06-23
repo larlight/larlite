@@ -34,12 +34,19 @@ namespace evd {
     /// Default destructor
     ~Shower2d(){}
 
+    int plane(){return _plane;}
+    TVector2 startPoint(){return _startPoint;}
+    float angleInPlane(){return _angleInPlane;}
+    float openingAngle(){return _openingAngle;}
+    float length(){return _length;}
+
+
     // ALL OF THESE VARIABLES ARE THE PROJECTION INTO THE PLANE
-    int plane;                ///< The Plane of the shower
-    TVector2 startPoint;      ///< Wire time start point (units in cm)
-    float angleInPlane;       ///< Angle in the plane
-    float openingAngle;       ///< Opening angle
-    float length;             ///< Length in cm
+    int _plane;                ///< The Plane of the shower
+    TVector2 _startPoint;      ///< Wire time start point (units in cm)
+    float _angleInPlane;       ///< Angle in the plane
+    float _openingAngle;       ///< Opening angle
+    float _length;             ///< Length in cm
   };
 
 } // evd

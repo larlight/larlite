@@ -1,5 +1,5 @@
 
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 from larlite import larlite as fmwk
 from ROOT import evd
 import numpy as np
@@ -46,6 +46,7 @@ class drawableItems(object):
     self._drawableClasses = collections.OrderedDict()
     self._drawableClasses.update({'hit':hit})
     self._drawableClasses.update({'cluster':cluster})
+    # self._drawableClasses.update({'shower':shower})
 
   def getListOfItems(self):
     return self._drawableClasses.keys()
@@ -107,7 +108,8 @@ class recoBase(dataBase):
   def drawObjects(self,view_manager):
     pass
 
-
+  def getAutoRange(self,plane):
+    return None, None
 
 
 
@@ -313,4 +315,37 @@ class cluster(recoBase):
       for cluster in plane:
         cluster.clearHits(view_manager)
 
+  def getAutoRange(self,plane):
+    wires = self._process.GetWireRange(plane)
+    times = self._process.GetTimeRange(plane)
+    return [wires[0],wires[1]],[times[0],times[1]]
 
+
+
+# Shower drawing is currently "experimental"
+class shower(recoBase):
+  """docstring for shower"""
+  def __init__(self):
+    super(shower, self).__init__()
+    self._productName = 'shower'
+    self._process = evd.DrawCluster()
+    self.init()
+
+  def clearDrawnObjects(self,view_manager):
+    pass
+
+  def getAutoRange(self,plane):
+    pass
+
+  def drawObjects(self,view_manager):
+    points = []
+    points.append(QtCore.QPoint(130,130))
+    points.append(QtCore.QPoint(30,560))
+    points.append(QtCore.QPoint(90,830))
+    needle = QtGui.QPolygonF(points)
+    poly = QtGui.QGraphicsPolygonItem(needle)
+    for view in view_manager.getViewPorts():
+      view._view.addItem(poly)
+      return
+    # self.painter.setBrush(QtGui.cyan)
+    pass

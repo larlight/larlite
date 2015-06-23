@@ -59,7 +59,7 @@ namespace evd{
     void setProducer(std::string s){producer = s;}
 
 
-    const std::vector<Shower2d>   & getShowersByPlane(unsigned int p) const;
+    const std::vector< ::evd::Shower2d >   & getShowersByPlane(unsigned int p) const;
 
 
   private:
@@ -75,7 +75,7 @@ namespace evd{
     // This shows how to handle abstract objects in the viewer
 
     // Internally, keep the showers sorted by plane
-    std::vector<std::vector<Shower2d> > * showerVectorByPlane;
+    std::vector<std::vector< ::evd::Shower2d> > * showerVectorByPlane;
 
     Shower2d getShower2d(larlite::shower shower, unsigned int plane);
 

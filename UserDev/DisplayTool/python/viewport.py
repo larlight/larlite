@@ -6,9 +6,9 @@ import numpy as np
 
 class viewport(pg.GraphicsLayoutWidget):
   def __init__(self, geometry,plane=-1):
-    super(viewport, self).__init__()
+    super(viewport, self).__init__(border=None)
     # add a view box, which is a widget that allows an image to be shown
-    self._view = self.addViewBox(border=(0,0,0))
+    self._view = self.addViewBox(border=None)
     # add an image item which handles drawing (and refreshing) the image
     self._item = pg.ImageItem(useOpenGL=True)
     # self._item._setPen((0,0,0))
@@ -30,8 +30,8 @@ class viewport(pg.GraphicsLayoutWidget):
     # each drawer contains its own color gradient and levels
     # this class can return a widget containing the right layout for everything
     # Define some color collections:
-    self._blankMapCollection    = {'ticks': [(0, (255, 255, 255, 255)), 
-                                             (1, (255, 255, 255, 255))], 
+    self._blankMapCollection    = {'ticks': [(0, (243, 243, 243, 255)), 
+                                             (1, (243, 243, 243, 255))], 
                                              'mode': 'rgb'}
     self._daqColorMapCollection = {'ticks': [(0.0,  (30,  30, 255, 255)),
                                              (0.15, (30,  30, 255, 255)), 
@@ -160,7 +160,8 @@ class viewport(pg.GraphicsLayoutWidget):
     yR = (0,self._geometry.tRange())
     self._view.setRange(xRange=xR,yRange=yR, padding=0.002)
 
-  def autoRange(self):
+  def autoRange(self,xR,yR):
+    self._view.setRange(xRange=xR,yRange=yR, padding=0.002)
     pass
 
   def plane(self):
