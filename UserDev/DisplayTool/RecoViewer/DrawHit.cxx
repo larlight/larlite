@@ -8,7 +8,7 @@ namespace evd {
 
 
   DrawHit::DrawHit(){
-    _name="DrawCluster";
+    _name="DrawHit";
     _fout=0;
     // std::cout << "Constructing!" << std::endl;
     wireByPlane = new std::vector<std::vector<int>>;
