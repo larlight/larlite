@@ -80,7 +80,7 @@ namespace evd {
     }
     
 
-    
+    // Populate the shower vector:
     for (auto & shower: *showerHandle){
       for (unsigned int view = 0; view < geoService -> Nviews(); view++){
         showerVectorByPlane->at(view).push_back(getShower2d(shower,view));
