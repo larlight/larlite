@@ -117,7 +117,6 @@ namespace ertool {
     double _px_lepReco, _py_lepReco, _pz_lepReco; /// lepton x,y,z momentum
     double _px_lepNormReco, _py_lepNormReco, _pz_lepNormReco; /// lepton x,y,z momentum
     double _angle_Norm ;
-    double _angle_PxPy ;
     double _theta_lepReco; /// lepton angle w.r.t. beam direction (from reco. i.e. SingleE if found)
     double _phi_lepReco;   /// lepton angle w.r.t. x on xy plane (from reco. i.e. SingleE if found)
     double _lep_dot;  /// Dot product between direction vector of MC SingleE shower and Reco SingleE shower
