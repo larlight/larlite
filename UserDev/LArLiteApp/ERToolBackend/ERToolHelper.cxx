@@ -1,51 +1,25 @@
 #ifndef LARLITE_ERTOOLHELPER_CXX
 #define LARLITE_ERTOOLHELPER_CXX
 
+#include "DataFormat/mctruth.h"
+#include "DataFormat/mcshower.h"
+#include "DataFormat/mctrack.h"
+
+#include "DataFormat/shower.h"
+#include "DataFormat/track.h"
+#include "DataFormat/vertex.h"
+#include "DataFormat/cosmictag.h"
+#include "DataFormat/calorimetry.h"
+#include "DataFormat/partid.h"
+#include "DataFormat/event_ass.h"
+
 #include "ERToolHelper.h"
-#include <TDatabasePDG.h>
+#include "ERTool/Base/UtilFunc.h"
 #include <limits>
 #include <climits>
 
-static TDatabasePDG pdgdbs;
-
 namespace larlite {
 
-  /// Function to fill map with mass mass from PDG code
-  std::map<int,double>& ERToolHelper::getMassMap(const event_mcshower& mcs_v,
-						 const event_mctrack& mct_v)
-  {
-
-    std::map<int,double> pdgmap;
-
-    // loop over all showers
-    for (auto const& mcs : mcs_v){
-      int pdg = mcs.PdgCode();
-      if(pdgmap.find(pdg) == pdgmap.end()) {
-	double mass = 0;
-	if(pdg>1000000000)
-	  mass = (double)((int(pdg/10))%1000);
-	else
-	  mass = pdgdbs.GetParticle(pdg)->Mass() * 1.e3; //Mass is now in MEV
-	pdgmap[pdg] = mass;
-      }
-    }// for all showers
-
-    // loop over all tracks
-    for (auto const& mcs : mcs_v){
-      int pdg = mcs.PdgCode();
-      if(pdgmap.find(pdg) == pdgmap.end()) {
-	double mass = 0;
-	if(pdg>1000000000)
-	  mass = (double)((int(pdg/10))%1000);
-	else
-	  mass = pdgdbs.GetParticle(pdg)->Mass() * 1.e3; //Mass is now in MEV
-	pdgmap[pdg] = mass;
-      }
-    }// for all tracks
-    
-    return pdgmap;
-  }
-  
   /// Create MC EventData and ParticleSet
   void ERToolHelper::FillMCInfo( const event_mctruth&   mci_v,
 				 const event_mcshower&  mcs_v,
@@ -57,9 +31,6 @@ namespace larlite {
     // for parantage within tracks/showers
     // hold a map that connects mother TrackID -> child NodeID
     std::map<unsigned int, std::vector<unsigned int> > parentageMap;
-
-    // First, create a PDG -> MASS map
-    //auto& PdgMass = getMassMap(mcs_v,mct_v);
 
     std::map<unsigned int, ::ertool::Particle> g4_mother_parts;
     std::map<unsigned int, PartID_t> g4_mother_id;
@@ -86,7 +57,7 @@ namespace larlite {
       int pdg = mcs.PdgCode();
       // then edit the particle
       mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
-								pdgdbs.GetParticle(pdg)->Mass()*1.e-3,
+								::ertool::ParticleMass(pdg),
 								mcs.Start().Position(),
 								mcs.Start().Momentum()); 
       if (mcs.MotherTrackID() != mcs.TrackID()){
@@ -106,7 +77,8 @@ namespace larlite {
 	int pdg_mom = mcs.MotherPdgCode();
 	if (pdg_mom != mcs.PdgCode()){
 	  auto& mother = mgr.MCParticleGraph().CreateParticle();
-	  mother.SetParticleInfo(pdg_mom,pdgdbs.GetParticle(pdg_mom)->Mass()*1.e3,//PdgMass[pdg_mom],
+	  mother.SetParticleInfo(pdg_mom,
+				 ::ertool::ParticleMass(pdg_mom),
 				 mcs.MotherStart().Position(),
 				 mcs.MotherStart().Momentum());
 	  g4_mother_parts.insert(std::make_pair(trkid_mom,mother));
@@ -186,7 +158,8 @@ namespace larlite {
        if(g4_mother_parts.find(trkid_mom) == g4_mother_parts.end()) {
 	 int pdg_mom = mct.AncestorPdgCode();
 	 auto& mother = mgr.MCParticleGraph().CreateParticle();
-	 mother.SetParticleInfo(pdg_mom,pdgdbs.GetParticle(pdg_mom)->Mass()*1.e3,//PdgMass[pdg_mom],
+	 mother.SetParticleInfo(pdg_mom,
+				::ertool::ParticleMass(pdg_mom),
 				mct.MotherStart().Position(),
 				mct.MotherStart().Momentum());
 	 g4_mother_parts.insert(std::make_pair(trkid_mom,mother));
@@ -307,7 +280,7 @@ namespace larlite {
 
       auto nodeID = mgr.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
       mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
-							      pdgdbs.GetParticle(mct.PdgCode())->Mass()*1.e-3,
+							      ::ertool::ParticleMass(mct.PdgCode()),
 							      mct.at(0).Position(),
 							      ::geoalgo::Vector(mct.at(0).Momentum()));
 

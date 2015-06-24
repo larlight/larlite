@@ -12,6 +12,7 @@ OBJECTS = $(SOURCES:.cxx=.o)
 
 # include options for this package
 INCFLAGS  = -I.                       #Include itself
+INCFLAGS += $(shell larlite-config --includes)
 INCFLAGS += $(shell basictool-config --includes)
 INCFLAGS += $(shell seltool-config --includes)
 INCFLAGS += -I$(LARLITE_USERDEVDIR)/BasicTool/TreeGraph
@@ -24,7 +25,8 @@ OSNAMEMODE      = $(OSNAME)
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
 # set linker flags
-LDFLAGS += -L$(shell root-config --libdir) -lEG -lRooFit -lRooFitCore -lRooStats
+LDFLAGS += $(shell larlite-config --libs)
+LDFLAGS += -L$(shell root-config --libdir) -lRooFit -lRooFitCore -lRooStats
 #LDFLAGS += $(shell seltool-config --libs)
 LDFLAGS += $(shell basictool-config --libs)
 LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_ERBase

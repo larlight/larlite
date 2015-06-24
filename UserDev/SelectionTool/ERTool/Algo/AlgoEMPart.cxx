@@ -15,8 +15,8 @@ namespace ertool {
     _dEdxVar   = new RooRealVar("empart_dedx","dE/dx [MeV/cm] Variable",0.,10.);
     _radLenVar = new RooRealVar("empart_radlen","Radiation Length [cm] Variable",0,100);
 
-    _e_mass = TDatabasePDG().GetParticle(11)->Mass();
-    _g_mass = TDatabasePDG().GetParticle(22)->Mass();
+    _e_mass = ParticleMass(11);
+    _g_mass = ParticleMass(22);
 
     srand (time(NULL));
 

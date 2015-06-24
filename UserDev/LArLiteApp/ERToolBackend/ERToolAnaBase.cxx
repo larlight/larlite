@@ -2,7 +2,9 @@
 #define ERToolANABASE_CXX
 
 #include "ERToolAnaBase.h"
-
+#include "DataFormat/calorimetry.h"
+#include "DataFormat/cosmictag.h"
+#include "DataFormat/partid.h"
 namespace larlite {
 
   ERToolAnaBase::ERToolAnaBase() : ana_base()
@@ -95,15 +97,16 @@ namespace larlite {
 	      "MCShower info not found in the event!");
 	throw std::exception();
       }
-	_helper.FillShowers(*ev_mcs, _mgr);
-	// if cheater for single showers is to be used:
-	if (_cheater)
-	  _helper.SingleShowerCheater(*ev_mcs,_mgr);
+      _helper.FillShowers(*ev_mcs, _mgr);
+      // if cheater for single showers is to be used:
+      if (_cheater)
+	_helper.SingleShowerCheater(*ev_mcs,_mgr);
     }
     else if(!_mcshowers && !_name_shower.empty()){
+
       auto ev_shw      = storage->get_data<event_shower>    (_name_shower);
       auto ev_ctag_shw = storage->get_data<event_cosmictag> (Form("%stag",_name_shower.c_str()));
-      auto ev_ass  = storage->get_data<event_ass>      (_name_shower);
+      auto ev_ass      = storage->get_data<event_ass>       (_name_shower);
       if (!ev_shw) {
 	print(msg::kERROR,__FUNCTION__,
 	      "RecoShower info not found in the event!");
@@ -122,6 +125,11 @@ namespace larlite {
       if (_cheater){
 	// get mcshowers
 	auto ev_mcs = storage->get_data<event_mcshower> ("mcreco");
+	if (!ev_mcs){
+	  print(msg::kERROR,__FUNCTION__,
+		"MCShower info not found in the event!");
+	  throw std::exception();
+	}
 	_helper.SingleShowerCheater(*ev_mcs,_mgr);
       }// cheater
     }
@@ -166,8 +174,6 @@ namespace larlite {
       }
       _helper.FillTracks( *ev_trk, *ev_ctag_trk, *ev_calo_trk, *ev_pid_trk, *ev_ass, _mgr);
     }
-
-
 
     // Done filling SPAData Object!
     // ----------------------------

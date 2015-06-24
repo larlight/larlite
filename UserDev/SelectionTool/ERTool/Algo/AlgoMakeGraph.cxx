@@ -11,9 +11,16 @@ namespace ertool {
     _verbose    = false;
   }
 
+  void AlgoMakeGraph::setVerbose(const bool on)
+  { _verbose = on;
+    _findRel.setDebug(on); 
+    if (_nodeMgr)
+      _nodeMgr->setVerbose(on);
+  }
+  
   void AlgoMakeGraph::AcceptPSet(const ::fcllite::PSet& cfg)
   {}
-
+  
   void AlgoMakeGraph::ProcessEnd(TFile* fout){
  
     return;
@@ -154,29 +161,7 @@ namespace ertool {
 	}// if there is a parent
     }
       
-    std::cout << graph.Diagram() << std::endl;
-    /*    
-	  if (_verbose){
-	  std::cout << std::endl
-	  << "Node ID and associated energy: " << std::endl;
-	  for (size_t i=0; i < _posMap.size(); i++){
-	  double E = 0;
-	  ::geoalgo::Point_t vtx(0,0,0);
-	  if (_typeMap[i] == Particle::RecoObjType_t::kShower){
-	  E = data.Shower(_posMap[i])._energy;
-	  vtx = data.Shower(_posMap[i]).Start();
-	  }
-	  if (_typeMap[i] == Particle::RecoObjType_t::kTrack){
-	  E = data.Track(_posMap[i])._energy;
-	  vtx = data.Track(_posMap[i]).front();
-	  }
-	  std::cout << "Node " << _nodeMgr.FindID(i) 
-	  << "\t Energy: " << E 
-	  << "\t Vtx: " << vtx << std::endl;
-	  }
-	  std::cout << std::endl;
-	  }// if verbose
-    */    
+    if (_verbose) { std::cout << graph.Diagram() << std::endl; }
     
     return true;
   }

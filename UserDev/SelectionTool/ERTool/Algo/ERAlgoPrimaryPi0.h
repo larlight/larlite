@@ -16,7 +16,12 @@
 #define ERTOOL_ERALGOPRIMARYPI0_H
 
 #include "ERTool/Base/AlgoBase.h"
+#include "ERTool/Base/AnaBase.h"
+#include "ERTool/Base/ParticleGraph.h"
+#include "ERTool/Base/Particle.h"
+#include "ERTool/Base/EventData.h"
 #include "AlgoPrimaryFinder.h"
+#include "DataFormat/mctruth.h"
 
 namespace ertool {
 
