@@ -19,7 +19,6 @@
 #include "ERTool/Base/AlgoBase.h"
 #include "ERTool/Algo/AlgoEMPart.h"
 #include "ERTool/Algo/AlgoFindRelationship.h"
-#include "ERTool/Algo/AlgoPrimaryFinder.h"
 #include "GeoAlgo/GeoAlgo.h"
 #include "GeoAlgo/GeoAABox.h"
 #include <algorithm> // for std::find
@@ -59,32 +58,17 @@ namespace ertool {
     void setVerbose(bool on){
       _verbose = on;
       _findRel.setDebug(on);
-      _primaryFinder.setVerbose(on);
     }
     
     /// Use EMPart
     void useRadLength(bool on) { _useRadLength = on; }
 
     void setRejectLongTracks(bool on) { _rejectLongTracks = on; }
-
-    void setVtxToTrkStartDist(double d){
-      _vtxToTrkStartDist = d;
-      _primaryFinder.setVtxToTrkStartDist(d);
-    }
-    void setVtxToTrkDist(double d){
-      _vtxToTrkDist = d;
-      _primaryFinder.setVtxToTrkDist(d);
-    }
-    void setVtxToShrStartDist(double d){
-      _vtxToShrStartDist = d;
-      _primaryFinder.setVtxToShrStartDist(d); 
-    }
-    void setMaxIP(double d){
-      _maxIP = d;
-      _primaryFinder.setMaxIP(d); 
-    }
+    void setVtxToTrkStartDist(double d){ _vtxToTrkStartDist = d; }
+    void setVtxToTrkDist(double d){ _vtxToTrkDist = d; }
+    void setVtxToShrStartDist(double d){ _vtxToShrStartDist = d; }
+    void setMaxIP(double d){ _maxIP = d; }
     void setEThreshold(double E){ _Ethreshold = E; }
-
     void setVtxProximityCut(double d) { _vtxProximityCut = d; }
     void setBDtW(double b) { _BDtW = b; }
     void setBDtTW(double bt) { _BDtTW = bt; }
@@ -165,13 +149,15 @@ namespace ertool {
     // Other algorithms to use
     AlgoEMPart _alg_emp;
     AlgoFindRelationship _findRel;
-    AlgoPrimaryFinder _primaryFinder;
     // GeoAlgo Tool
     ::geoalgo::GeoAlgo _geoAlgo;
 
-    //debug histos
-    TH1F* _e_ll_values;
-    TH1F* _dedx_values;
+    //Tree -> one entry for every time EMPart LL function
+    // is called using both dEdx and rad-length
+    TTree* _empart_tree;
+    double _dedx;
+    double _radlen;
+    int    _pdg;
 
     //Tree -> one entry per shower-other comparison
     // therefore possibly multiple entries for each shower

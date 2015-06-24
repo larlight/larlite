@@ -30,7 +30,9 @@ my_proc.set_output_file("outfile.root")
 
 # Create analysis unit
 sq_module = fmwk.ShowerQuality()
+sq_module.setMCShowerQuality(True)
 sq_module.SetShowerProducer("showerreco")
+#sq_module.SetShowerProducer("showermergeall")
 
 sq_module.SetMaxEnergyCut(99999999.)
 sq_module.SetMinEnergyCut(0.)
@@ -41,7 +43,7 @@ print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
-my_proc.run(0)
+my_proc.run()
 
 sys.exit(0)
 

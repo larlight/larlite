@@ -2,8 +2,8 @@ import sys, os
 from ROOT import gSystem
 from ROOT import ertool
 from ROOT import larlite as fmwk
-from algoviewer import viewAll, view
 from seltool.ccsingleeDef import GetCCSingleEInstance
+from seltool.algoviewer import viewAll
 
 if len(sys.argv) < 2:
     msg  = '\n'
@@ -23,24 +23,14 @@ my_proc.enable_filter(True)
 # and the algorithm instance is the return of the
 # function GetCCSingleEInstance()
 my_algo = GetCCSingleEInstance()
-
-# Create ERTool filter
-# This filter removes any track that
-# is less than 3 mm in length
-# these tracks exist in "perfect reco"
-# but at this stage it is unreasonable
-# to assume we will be able to
-# reconstruct them
-my_filter = ertool.FilterTrackLength()
-my_filter.setLengthCut(0.3)
-
+my_algo.setVerbose(True)
 
 # Create MC Filter
 # This filter is if you want to look at CC1E events
 MCfilter = fmwk.MC_CC1E_Filter();
 #Set flip to FALSE if you are looking for efficiency, TRUE if you are looking for MID efficiency
-#MCfilter.flip(False)
-MCfilter.flip(True)
+MCfilter.flip(False)
+#MCfilter.flip(True)
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):
@@ -59,14 +49,13 @@ my_proc.set_ana_output_file("singleE_selection.root")
 Ecut = 20 # in MeV
 
 my_ana = ertool.ERAnaSingleE()
-my_ana.SetDebug(False)
+my_ana.SetDebug(True)
 my_ana.SetECut(Ecut)
 
 my_anaunit = fmwk.ExampleERSelection()
-my_anaunit._mgr.SetAlgo(my_algo)
-my_anaunit._mgr.SetFilter(my_filter)
-my_anaunit._mgr.SetAna(my_ana)
-my_anaunit.SetMinEDep(100)
+my_anaunit._mgr.AddAlgo(my_algo)
+my_anaunit._mgr.AddAna(my_ana)
+my_anaunit.SetMinEDep(Ecut)
 my_anaunit._mgr._mc_for_ana = True
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
@@ -75,8 +64,8 @@ my_anaunit._mgr._mc_for_ana = True
 #my_anaunit.SetShowerProducer(False,"newdefaultreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetShowerProducer(False,"mergeall");
-my_anaunit.SetShowerProducer(False,"showerreco");
-#my_anaunit.SetShowerProducer(True,"mcreco");
+#my_anaunit.SetShowerProducer(False,"showerreco");
+my_anaunit.SetShowerProducer(True,"mcreco");
 my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 #my_anaunit.SetVtxProducer(True,"generator");
@@ -87,17 +76,26 @@ my_proc.add_process(my_anaunit)
 
 # Start event-by-event loop
 counter = 0
-while (counter < 1800):
+while (my_proc.process_event(counter)):
     
     counter = counter + 1
     my_proc.process_event(counter)
     data_reco = my_anaunit.GetData()
     part_reco = my_anaunit.GetParticles()
 
-    print "Particles: {0}".format(part_reco.size())
     print "Event: ", counter
     
-    if (part_reco.size() != 1):
+    # how many neutrinos?
+    numNeutrinos = 0
+    Nodes = part_reco.GetPrimaryNodes()
+    for nodeID in Nodes:
+        if (part_reco.GetParticle(nodeID).PdgCode() == 12):
+            numNeutrinos += 1
+
+    print numNeutrinos
+
+    
+    if (numNeutrinos == 1):
         # we found something...lets plot it
         data_mc   = my_anaunit.GetData(True)
         part_mc   = my_anaunit.GetParticles(True)
@@ -105,9 +103,6 @@ while (counter < 1800):
         # get objets and display
         viewAll(data_mc,part_mc,data_reco,part_reco)
 
-        for x in xrange(part_mc.size()):
-            print part_mc[x].Diagram()
-            
         try:
             counter = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
         except SyntaxError:

@@ -17,19 +17,7 @@
 #include <iostream>
 #include <map>
 #include <TRandom.h>
-
-#include "DataFormat/mctruth.h"
-#include "DataFormat/mcshower.h"
-#include "DataFormat/mctrack.h"
-
-#include "DataFormat/shower.h"
-#include "DataFormat/track.h"
-#include "DataFormat/vertex.h"
-#include "DataFormat/cosmictag.h"
-#include "DataFormat/calorimetry.h"
-#include "DataFormat/partid.h"
-#include "DataFormat/event_ass.h"
-
+#include "DataFormat/DataFormat-TypeDef.h"
 #include "ERTool/Base/Manager.h"
 //#include "ERTool/Base/EventData.h"
 //#include "ERTool/Base/ParticleGraph.h"
@@ -92,10 +80,6 @@ namespace larlite {
 
 
   private:
-
-    // Function to get a map of masses from PDG code
-    std::map<int,double>& getMassMap(const event_mcshower& mcs_v,
-				     const event_mctrack& mct_v);
 
     // Minimum deposited energy for showers in order to
     // be added to EventData

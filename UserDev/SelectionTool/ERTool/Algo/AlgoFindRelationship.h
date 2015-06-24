@@ -20,6 +20,7 @@
 #include "ERTool/Base/Track.h"
 #include "ERTool/Base/ParticleGraph.h"
 #include "ERTool/Base/ERToolTypes.h"
+#include "ERTool/Base/UtilFunc.h"
 
 namespace ertool {
    /**
@@ -84,6 +85,19 @@ namespace ertool {
 
     // Get PDG Code given track type
     double GetPDG(const Track &trk);
+
+    // Get Mass given PDG
+    double GetMass(const Track &trk);
+
+    /// Function that based on primaries in event
+    /// returns potential vertices.
+    /// Takes start point of each object
+    /// and groups together other start points
+    /// within _IP of the start point
+    /// Start points are this way grouped
+    /// into vertices
+    std::vector<::geoalgo::Point_t> GetVertices(const ParticleGraph& graph,
+						const int minObjectsAtVertex) const;
 
   private:
 

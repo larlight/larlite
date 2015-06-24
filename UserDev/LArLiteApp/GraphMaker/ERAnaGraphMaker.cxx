@@ -5,12 +5,11 @@
 
 namespace ertool {
 
-  ERAnaGraphMaker::ERAnaGraphMaker() : AnaBase()
-			       , _result_tree(nullptr)
+  ERAnaGraphMaker::ERAnaGraphMaker(const std::string& name) 
+    : AnaBase(name)
+    , _result_tree(nullptr)
 
   {
-    _name     = "ERAnaGraphMaker";
-
     if (_result_tree) { delete _result_tree; }
     _result_tree = new TTree("_result_tree","Result Tree");
 

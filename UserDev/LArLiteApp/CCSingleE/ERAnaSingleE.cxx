@@ -5,12 +5,12 @@
 
 namespace ertool {
 
-  ERAnaSingleE::ERAnaSingleE() : AnaBase()
-			       , _result_tree(nullptr)
-			       , fTPC(0.,-115.5,0.,254.8,117.5,1036.92)
+  ERAnaSingleE::ERAnaSingleE(const std::string& name)
+    : AnaBase(name)
+    , _result_tree(nullptr)
+    , fTPC(0.,-115.5,0.,254.8,117.5,1036.92)
 
   {
-    _name     = "ERAnaSingleE";
 
     if (_result_tree) { delete _result_tree; }
     _result_tree = new TTree("_result_tree","Result Tree");
@@ -137,7 +137,7 @@ namespace ertool {
 
     // Keep track of all energy deposited in detector
     _EDep = 0;
-    /*
+ /*   
     for (auto const &s : data.Shower()){
       _EDep += s._energy;
       if (s._energy > _eCut) { _n_showers += 1; }
@@ -147,19 +147,18 @@ namespace ertool {
       if (t._energy > _eCut) { _n_tracks += 1; }
     }
     if (_debug) { std::cout << "Total Energy deposited in detector: " << _EDep << std::endl; }
-    */
-    /*
+   */ 
+    
     // If debug -> print out MC particle set
     if (_debug){
-      std::cout << "MC Particle Tree: " << std::endl;
-      for (auto &p : mc_graph)
-	std::cout << p.Diagram();
-    }
-    */
+	std::cout << "MC Particle Tree: " << std::endl;
+	std::cout << mc_graph.Diagram();
+      }
+    
     // Loop through MC Particle Graph...not yet being made...
-    /*
+    // */ 
     // loop over all particles in MC particle set (made by Helper)
-    for (auto &p : mc_graph){
+    for (auto &p : mc_graph.GetParticleArray()){
       // Find the Lepton and store its energy
       if (abs(p.PdgCode()) == 12 || abs(p.PdgCode()) == 14){
 	_e_nu = p.Energy();
@@ -173,22 +172,23 @@ namespace ertool {
 	
 	bool found_lepton_daughter = false;
 
-	for (auto &nud : p.Daughters()){
-	  if (abs(nud.PdgCode()) == 11 || abs(nud.PdgCode()) == 13){
+	for (auto &nud : p.Children()){
+	  auto d = mc_graph.GetParticle(nud) ;
+	  if (abs(d.PdgCode()) == 11 || abs(d.PdgCode()) == 13){
 	    if(found_lepton_daughter) 
 	      std::cout<<"wtf already found daughter? overwriting variables..."<<std::endl;
 	    found_lepton_daughter = true;
-	    _e_lep = nud.Energy();
-	    _x_lep = nud.Vertex()[0];
-	    _y_lep = nud.Vertex()[1];
-	    _z_lep = nud.Vertex()[2];
-	    _px_lep = nud.Momentum()[0];
-	    _py_lep = nud.Momentum()[1];
-	    _pz_lep = nud.Momentum()[2];
+	    _e_lep = d.Energy();
+	    _x_lep = d.Vertex()[0];
+	    _y_lep = d.Vertex()[1];
+	    _z_lep = d.Vertex()[2];
+	    _px_lep = d.Momentum()[0];
+	    _py_lep = d.Momentum()[1];
+	    _pz_lep = d.Momentum()[2];
 	    _theta_lep = (180./3.14) * acos( _pz_lep / sqrt( _px_lep*_px_lep + _py_lep*_py_lep + _pz_lep*_pz_lep ) );
 	    _phi_lep   = (180./3.14) * asin( _py_lep / sqrt( _px_lep*_px_lep + _py_lep*_py_lep ) );
 					     
-	    _pdg_lep = nud.PdgCode();
+	    _pdg_lep = d.PdgCode();
 	  }
 	}
       }
@@ -197,50 +197,50 @@ namespace ertool {
       _e_neutrals = 0;
       _e_nucleus_diff = 0;
       bool found_parent_nucleus = false;
-      for (auto &d : p.AllDaughters()){
-	if ( (d->PdgCode() == 22) && (d->Energy() > _eCut) )
-	  _n_gammas += 1;
-	else if ( (abs(d->PdgCode()) == 11) && (d->Energy() > _eCut) )
-	  _n_electrons += 1;
-	else if ( (d->PdgCode() == 111) && (d->Energy() > _eCut) )
-	  _n_pi0 += 1;
-	else if ( (d->PdgCode() == 211) && (d->Energy() > _eCut) )
-	  _n_piplus += 1;
-	else if ( (d->PdgCode() == 2112) && (d->Energy() > _eCut) ){
-	  _n_neutrons += 1;
-	  // Add up neutral particles' energies
-	  _e_neutrals += d->KineticEnergy();
-	}
-	else if ( (d->PdgCode() == 2212) && (d->Energy() > _eCut) )
-	  _n_protons += 1;
-	else if (found_parent_nucleus &&  d->PdgCode() == 1000180400 )
-	  _e_nucleus_diff = d->KineticEnergy();
-	else if ( d->PdgCode() == 1000180400 )
-	  found_parent_nucleus = true;
-      }
+ //     for (auto &d : p.AllDaughters()){
+ //       if ( (d->PdgCode() == 22) && (d->Energy() > _eCut) )
+ //         _n_gammas += 1;
+ //       else if ( (abs(d->PdgCode()) == 11) && (d->Energy() > _eCut) )
+ //         _n_electrons += 1;
+ //       else if ( (d->PdgCode() == 111) && (d->Energy() > _eCut) )
+ //         _n_pi0 += 1;
+ //       else if ( (d->PdgCode() == 211) && (d->Energy() > _eCut) )
+ //         _n_piplus += 1;
+ //       else if ( (d->PdgCode() == 2112) && (d->Energy() > _eCut) ){
+ //         _n_neutrons += 1;
+ //         // Add up neutral particles' energies
+ //         _e_neutrals += d->KineticEnergy();
+ //       }
+ //       else if ( (d->PdgCode() == 2212) && (d->Energy() > _eCut) )
+ //         _n_protons += 1;
+ //       else if (found_parent_nucleus &&  d->PdgCode() == 1000180400 )
+ //         _e_nucleus_diff = d->KineticEnergy();
+ //       else if ( d->PdgCode() == 1000180400 )
+ //         found_parent_nucleus = true;
+ //     }
     }
 
     
     // find the number of tracks that start within 1 cm of the neutrino interaction
     _n_tracksInt = 0;
     geoalgo::Point_t nu_vtx(_x_nu,_y_nu,_z_nu);
-    for (auto &part : mc_ps){
-      if (abs(part.PdgCode()) == 13 || abs(part.PdgCode()) == 211 || abs(part.PdgCode()) == 2212 ){
-	if ( nu_vtx.Dist(part.Vertex()) < 1){
-	  _n_tracksInt += 1;
-	  _e_trkInt += part.KineticEnergy();
-	}
-      }
-      for (auto &nud : part.Daughters()){
-	if (abs(nud.PdgCode()) == 13 || abs(nud.PdgCode()) == 211 || abs(nud.PdgCode()) == 2212 ){
-	  if ( nu_vtx.Dist(nud.Vertex()) < 1){
-	    _n_tracksInt += 1;
-	    _e_trkInt += nud.KineticEnergy();
-	  }
-	}
-      }
-    }
-    */
+//    for (auto &part : mc_ps){
+//      if (abs(part.PdgCode()) == 13 || abs(part.PdgCode()) == 211 || abs(part.PdgCode()) == 2212 ){
+//	if ( nu_vtx.Dist(part.Vertex()) < 1){
+//	  _n_tracksInt += 1;
+//	  _e_trkInt += part.KineticEnergy();
+//	}
+//      }
+//      for (auto &nud : part.Daughters()){
+//	if (abs(nud.PdgCode()) == 13 || abs(nud.PdgCode()) == 211 || abs(nud.PdgCode()) == 2212 ){
+//	  if ( nu_vtx.Dist(nud.Vertex()) < 1){
+//	    _n_tracksInt += 1;
+//	    _e_trkInt += nud.KineticEnergy();
+//	  }
+//	}
+//      }
+//    }
+    //*/
   /*    
     // Count number of tracks and showers with E > _eCut MeV
     _n_showersReco = 0;
@@ -277,17 +277,21 @@ namespace ertool {
     // If no single electrons reconstructed -> fill tree anyway with misID info
     //if ( _n_singleReco == 0 )
     _result_tree->Fill();
-    /*
-    for(int i = 0; i< ps.size(); i++){
+   // /*
+//    for(int i = 0; i< ps.size(); i++){
     if ( _n_singleReco == 0 )
       _result_tree->Fill();
     
-    for(size_t i = 0; i< ps.size(); i++){
-      Particle neutrino = ps[i];
+//    for(size_t i = 0; i< ps.size(); i++){
+    for( auto const & p : graph.GetParticleArray() ){
+    //  Particle neutrino = p[i];
 
-      if(abs(neutrino.PdgCode()) != 12  && abs(neutrino.PdgCode()) != 14)
-	std::cout<<"wtf neutrino doesn't have a neutrino pdg code"<<std::endl;
-      
+      //if(abs(neutrino.PdgCode()) != 12  && abs(neutrino.PdgCode()) != 14)
+      //std::cout<<"wtf neutrino doesn't have a neutrino pdg code"<<std::endl;
+
+      if(abs(p.PdgCode()) == 12  || abs(p.PdgCode()) == 14){
+
+      auto neutrino = p ;
       
       _x_nuReco = neutrino.Vertex()[0];
       _y_nuReco = neutrino.Vertex()[1];
@@ -295,14 +299,16 @@ namespace ertool {
       _px_nuReco = neutrino.Momentum()[0];
       _py_nuReco = neutrino.Momentum()[1];
       _pz_nuReco = neutrino.Momentum()[2];
-      _n_tracksIntReco = ps[i].Daughters().size()-1;
+   //   _n_tracksIntReco = ps[i].Daughters().size()-1;
       
       double momMag = 0;
       
       _e_trkIntReco = 0;
       _e_nuReco = 0;
       //find the neutrino daughter that is a lepton
-      for (auto const& daught : ps[i].Daughters()){
+      for (auto const& d : neutrino.Children()){
+	
+	auto daught = graph.GetParticle(d) ;
 	_e_nuReco += daught.KineticEnergy();
 	
 	// if not a lepton, add energy to tracks
@@ -362,13 +368,14 @@ namespace ertool {
 	    _angle_Norm = 180 + _angle_Norm ;
 	  else if(py <0 && pz >=0)
 	    _angle_Norm = 360 - _angle_Norm ;
-	  
+
+	  }
 	}// if particle is lepton
       }// for all daughters
 
       _result_tree->Fill();
     }// loop over all CCSingleEs found in event
-    */    
+  //  */    
     _h_e_nu_correlation->Fill(_e_nu,_e_nuReco);
     
     if (_debug){

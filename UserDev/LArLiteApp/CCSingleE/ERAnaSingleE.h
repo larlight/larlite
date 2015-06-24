@@ -27,17 +27,20 @@ namespace ertool {
 
   /**
      \class ERAnaSingleE
-     User custom Analysis class made by kazuhiro
+     User custom Analysis class made by david caratelli
    */
   class ERAnaSingleE : public AnaBase {
   
   public:
 
     /// Default constructor
-    ERAnaSingleE();
+    ERAnaSingleE(const std::string& name="ERAnaSingleE");
 
     /// Default destructor
     virtual ~ERAnaSingleE(){};
+
+    /// Accept Pset
+    void AcceptPSet(const ::fcllite::PSet& cfg) {}
 
     /// Reset function
     virtual void Reset();
@@ -47,7 +50,9 @@ namespace ertool {
 
     void SetDebug(bool on) { _debug = on; }
 
-    void ProcessEnd(TFile* fout);
+    virtual void ProcessBegin() {}
+
+    virtual void ProcessEnd(TFile* fout);
 
     /// Function to re-set TTree variables
     void ResetTreeVariables();
@@ -112,7 +117,6 @@ namespace ertool {
     double _px_lepReco, _py_lepReco, _pz_lepReco; /// lepton x,y,z momentum
     double _px_lepNormReco, _py_lepNormReco, _pz_lepNormReco; /// lepton x,y,z momentum
     double _angle_Norm ;
-    double _angle_PxPy ;
     double _theta_lepReco; /// lepton angle w.r.t. beam direction (from reco. i.e. SingleE if found)
     double _phi_lepReco;   /// lepton angle w.r.t. x on xy plane (from reco. i.e. SingleE if found)
     double _lep_dot;  /// Dot product between direction vector of MC SingleE shower and Reco SingleE shower

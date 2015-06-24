@@ -21,6 +21,8 @@
 #include "Analysis/ana_base.h"
 #include "MCComp/MCMatchAlg.h"
 #include "ShowerRecoException.h"
+#include "DataFormat/shower.h"
+#include "DataFormat/mcshower.h"
 
 namespace larlite {
   /**
@@ -64,7 +66,21 @@ namespace larlite {
     */
     virtual bool finalize();
 
+    /// set whether to fill quality info per MC or per reco shower
+    void setMCShowerQuality(bool on) { _mcShowerQuality = on; }
+
   protected:
+
+    // Function to fill TTree
+    void FillQualityInfo(const shower& reco_shower,
+			 const mcshower& mc_shower,
+			 const size_t& shower_index, const size_t& best_index,
+			 const AssSet_t& ass_cluster_v);
+
+
+    // boolean to decide if to fill the tree once per MC shower
+    // or once per RECO shower
+    bool _mcShowerQuality;
 
     /// Shower back tracking algorithm
     ::btutil::MCMatchAlg fBTAlg;
@@ -140,6 +156,8 @@ namespace larlite {
 
     /// Function to prepare TTree
     void InitializeAnaTree();
+
+    int _numRecoShowers = 0;
 
   };
 }

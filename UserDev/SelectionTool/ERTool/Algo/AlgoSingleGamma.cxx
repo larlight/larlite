@@ -55,7 +55,7 @@ namespace ertool {
 				     , fTPC(-10.,-126.,-10.,292.,136.,1150.)
 				     , _alg_tree(nullptr)
   {
-    _e_mass     = TDatabasePDG().GetParticle(11)->Mass();
+    _e_mass     = ParticleMass(11);
     _e_ll_values = 0;
     _dedx_values = 0;
     _Ethreshold = 0;

@@ -15,8 +15,8 @@ namespace ertool {
     _dEdxVar   = new RooRealVar("empart_dedx","dE/dx [MeV/cm] Variable",0.,10.);
     _radLenVar = new RooRealVar("empart_radlen","Radiation Length [cm] Variable",0,100);
 
-    _e_mass = TDatabasePDG().GetParticle(11)->Mass();
-    _g_mass = TDatabasePDG().GetParticle(22)->Mass();
+    _e_mass = ParticleMass(11);
+    _g_mass = ParticleMass(22);
 
     srand (time(NULL));
 
@@ -25,6 +25,8 @@ namespace ertool {
 
     // default plot mode is false
     _plot = false;
+    // default setting for loading params
+    _loadParams = true;
 
     std::string part_name;
 
@@ -113,6 +115,10 @@ namespace ertool {
 
   void AlgoEMPart::AcceptPSet(const ::fcllite::PSet& cfg)
   {
+    
+    if (!_loadParams)
+      return;
+    
     auto p = cfg.get_pset(Name());
     
     // Extract if parameters found
@@ -158,7 +164,7 @@ namespace ertool {
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"Loaded gamma parameters..." << std::endl;
       std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"Rad Length: " << 1./tau->getVal() << " ["<< 1./tau->getMax() <<" => "<< 1./tau->getMin() <<"]" << std:: endl;
+	       <<"Rad Length: " << -1./tau->getVal() << " ["<< -1./tau->getMax() <<" => "<< -1./tau->getMin() <<"]" << std:: endl;
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"dEdx: Mean low: " << meanlow->getVal() << " Sigma high: " << sigmalow->getVal() << std::endl
 	       <<"["<<__FUNCTION__<<"] "
@@ -175,14 +181,14 @@ namespace ertool {
       tau->setRange ( darray[1], darray[2] );
 
       mean  = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_dEdxGaus_mean"));
-      mean->setVal  ( darray[3] );
+      mean->setVal  ( darray[4] );
       sigma = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_dEdxGaus_sigma"));
-      sigma->setVal ( darray[4] );
+      sigma->setVal ( darray[5] );
 
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"Loaded electron parameters..." << std::endl;
       std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"Rad Length: " << 1./tau->getVal() << " ["<< 1./tau->getMax() <<" => "<< 1./tau->getMin() <<"]" << std:: endl;
+	       <<"Rad Length: " << -1./tau->getVal() << " ["<< -1./tau->getMax() <<" => "<< -1./tau->getMin() <<"]" << std:: endl;
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"dEdx: Mean1: " << mean->getVal() << " Sigma1: " << sigma->getVal() << std::endl;
     }
@@ -256,37 +262,93 @@ namespace ertool {
       std::cout << "Number of Showers: " << datacpy.Shower().size() << std::endl;
       std::cout << "Number of Shower Particles: " << graph.GetParticleNodes(RecoType_t::kShower).size() << std::endl;
     }
-
+    
     // Loop through showers
-    for (auto const& p : graph.GetParticleNodes(RecoType_t::kShower)){
+    for (auto const& s : graph.GetParticleNodes(RecoType_t::kShower)){
 
-      auto const& s = datacpy.Shower(graph.GetParticle(p).RecoID());
+      auto const& shr = datacpy.Shower(graph.GetParticle(s).RecoID());
 
-      double dist   = -1.;
-      double dEdx   = s._dedx;
+      double dEdx;
+      double dist;
+      double e_like, g_like;
 
-      // skip if dEdx out of bounds
-      if ( !_dEdxVar->inRange( dEdx, 0 ) ) continue;
-
-      // get vertex info if it exists from particle
-      auto const& vtx = graph.GetParticle(p).Vertex();
-      if (vtx != kINVALID_VERTEX)
-	dist = s.Start().Dist(vtx);
-
-      if (_verbose) { std::cout << "dEdx: " << dEdx << "\tdist: " << dist << std::endl; }
-      
-      double e_like = LL(true,  dEdx, dist);
-      double g_like = LL(false, dEdx, dist);
-
-      int pdg_code = ( g_like > e_like ? 22 : 11 );
-      double mass  = ( pdg_code == 11 ? _e_mass : _g_mass );
-      auto const& mom = s.Dir() * (s._energy - mass);
-      graph.GetParticle(p).SetParticleInfo(pdg_code,mass,s.Start(),mom,0.);
-      //res.push_back(p);
+      if (!_training_mode){
+	// for every shower find the object with the smallest IP
+	double IPmin = 1036;
+	::geoalgo::Point_t vtxMin(3);
+	for (auto const& s2 : graph.GetParticleNodes(RecoType_t::kShower)){
+	  // make sure we are not comparing with itself
+	  if (s2 == s) continue;
+	  ::geoalgo::Point_t vtx(3);
+	  auto const& shr2 = datacpy.Shower(graph.GetParticle(s2).RecoID());
+	  double IP = _findRel.FindClosestApproach(shr,shr2,vtx);
+	  if (IP < IPmin){
+	    IPmin = IP;
+	    vtxMin = vtx;
+	  }
+	}// loop over other showers
+	// loop over other tracks
+	for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
+	  // make sure we are not comparing with itself
+	  ::geoalgo::Point_t vtx(3);
+	  auto const& trk = datacpy.Track(graph.GetParticle(t).RecoID());
+	  double IP = _findRel.FindClosestApproach(shr,trk,vtx);
+	  if (IP < IPmin){
+	    IPmin = IP;
+	    vtxMin = vtx;
+	  }
+	}// loop over other tracks
+	
+	// if IP min is < 1 cm -> use radLen
+	::geoalgo::Point_t shrvtx(3);
+	dist = -1;
+	dEdx = shr._dedx;
+	if (IPmin < 1) {
+	  dist = vtxMin.Dist(shr.Start());
+	  e_like = LL(true,  dEdx, dist);
+	  g_like = LL(false, dEdx, dist);
+	  shrvtx = vtxMin;
+	}
+	else{
+	  e_like = LL(true,  dEdx, dist);
+	  g_like = LL(false, dEdx, dist);
+	  shrvtx = shr.Start();
+	}
+	
+	int pdg_code = ( g_like > e_like ? 22 : 11 );
+	double mass  = ( pdg_code == 11 ? _e_mass : _g_mass );
+	auto const& mom = shr.Dir() * (shr._energy - mass);
+	graph.GetParticle(s).SetParticleInfo(pdg_code,mass,shrvtx,mom,0.);
+      }// if not in training mode
+      // if in training mode
+      else{
+	
+	dist   = -1.;
+	dEdx   = shr._dedx;
+	
+	// skip if dEdx out of bounds
+	if ( !_dEdxVar->inRange( dEdx, 0 ) ) continue;
+	
+	// get vertex info if it exists from particle
+	auto const& vtx = graph.GetParticle(s).Vertex();
+	if (vtx != kINVALID_VERTEX)
+	  dist = shr.Start().Dist(vtx);
+	
+	if (_verbose) { std::cout << "dEdx: " << dEdx << "\tdist: " << dist << std::endl; }
+	
+	e_like = LL(true,  dEdx, dist);
+	g_like = LL(false, dEdx, dist);
+	
+	int pdg_code = ( g_like > e_like ? 22 : 11 );
+	double mass  = ( pdg_code == 11 ? _e_mass : _g_mass );
+	auto const& mom = shr.Dir() * (shr._energy - mass);
+	graph.GetParticle(s).SetParticleInfo(pdg_code,mass,shr.Start(),mom,0.);
+      }
 
       _dEdxVar->setVal(dEdx);
-
       if (!(dist<0)) { _radLenVar->setVal(dist); }
+
+
       // If in training mode, fill RooDataSet
       // of the particle we are training
       // If in Selection mode, fill RooDataSet
@@ -459,6 +521,10 @@ namespace ertool {
       h11_radLen->Draw();
       h22_radLen->Draw("sames");
       c->SaveAs("Likelihood_radLen.png");
+      if (fout){
+	h11_radLen->Write();
+	h22_radLen->Write();
+      }
       
       TH1D *h11_dEdx = new TH1D("h11_dEdx","Electron vs. Gamma Likelihood; dEdx [MeV/cm]; Likelihood",100,0,8);
       TH1D *h22_dEdx = new TH1D("h22_dEdx","Electron vs. Gamma Likelihood; dEdx [MeV/cm]; Likelihood",100,0,8);
@@ -484,6 +550,10 @@ namespace ertool {
       h11_dEdx->Draw();
       h22_dEdx->Draw("sames");
       c->SaveAs("Likelihood_dEdx.png");
+      if (fout){
+	h11_dEdx->Write();
+	h22_dEdx->Write();
+      }
       
       delete h11_dEdx;
       delete h22_dEdx;
@@ -497,17 +567,24 @@ namespace ertool {
 	  _dEdxVar->setVal(8*dedx/100.);
 	  _radLenVar->setVal(20*radlen/100.);
 	  
+	  //double e_likelyhood = LL(true,8*dedx/100.,50*radlen/100.)-LL(false,8*dedx/100.,50*radlen/100.);
+	  double e_likelyhood = log((_e_dEdxPdf->getVal(*_dEdxVar) * _e_radLenPdf->getVal(*_radLenVar) ) /
+				    (_g_dEdxPdf->getVal(*_dEdxVar) * _g_radLenPdf->getVal(*_radLenVar) ) );
+	  if (e_likelyhood > 1)  { e_likelyhood =  1; }
+	  if (e_likelyhood < -1) { e_likelyhood = -1; }
+	  /*
 	  double e_likelyhood = log((_e_dEdxPdf->getVal(*_dEdxVar) * _e_radLenPdf->getVal(*_radLenVar) ) / 
 	    ( _g_dEdxPdf->getVal(*_dEdxVar) * _g_radLenPdf->getVal(*_radLenVar) + 
 	      _e_dEdxPdf->getVal(*_dEdxVar) * _e_radLenPdf->getVal(*_radLenVar) ) );
-
-	  h_2DRatio->SetBinContent(dedx,radlen,e_likelyhood);
+	  */
+	  h_2DRatio->SetBinContent(dedx+1,radlen+1,e_likelyhood);
 
 	}
       }
 
       h_2DRatio->Draw("COLZ");
       c->SaveAs("2DRatio.png");
+      if (fout) { h_2DRatio->Write(); }
 	    
 
       // for fun make a ProdPdf to plot 2D Pdf surface
@@ -518,12 +595,14 @@ namespace ertool {
       h_2D->SetNameTitle("gamma radLen vs. dEdx","gamma radLen vs. dEdx");
       h_2D->Draw("SURF3");
       c->SaveAs("radLen_vs_dEdx_2DPDF_gamma.png");
+      if (fout) { h_2D->Write(); }
       delete h_2D;
       h_2D = ePDF.createHistogram("electron radLen vs. dEdx",*_radLenVar,RooFit::Binning(100,0,30),
 				  RooFit::YVar(*_dEdxVar,RooFit::Binning(100,0,8)) ); 
       h_2D->SetNameTitle("electron radLen vs. dEdx","electron radLen vs. dEdx");
       h_2D->Draw("SURF3");
       c->SaveAs("radLen_vs_dEdx_2DPDF_electron.png");
+      if (fout) { h_2D->Write(); }
       delete h_2D;
       
       
@@ -560,6 +639,7 @@ namespace ertool {
       c->SaveAs(Form("RadLength_Selected_%s.png", part_letter.c_str()));
       c->SetTitle("dEdx Selection");
       frame_dEdx->Draw();
+      if (fout) { frame_dEdx->Write(); }
       if (_mode)
 	frame_radLen->SetNameTitle("dE/dx PDF for gammas","dE/dx PDF for gammas");
       else
