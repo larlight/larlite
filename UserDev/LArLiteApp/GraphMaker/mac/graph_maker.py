@@ -10,7 +10,6 @@ if len(sys.argv) < 2:
 from seltool import ertool
 from ROOT import geotree
 from larlite import larlite as fmwk
-from algoviewer import view, setDisplay
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
@@ -31,10 +30,11 @@ mgr = geotree.Manager()
 mgr.setAlgoMultipleParents(geotree.AlgoMultipleParentsHighScore())
 mgr.setAlgoGenericConflict(geotree.AlgoGenericConflictRemoveSibling())
 mgr.setAlgoParentIsSiblingsSibling(geotree.AlgoParentIsSiblingsSibling())
+mgr.setLoose(True)
 
 my_algo = ertool.AlgoMakeGraph()
-my_algo.setVerbose(True)
 my_algo.setManager(mgr)
+my_algo.setVerbose(False)
 my_anaunit = fmwk.ExampleERSelection()
 #### SET PRODUCERS HERE ####
 # MC PRODUCERS
@@ -44,27 +44,10 @@ my_anaunit.SetTrackProducer(True,"mcreco");
 #my_ana.SetShowerProducer(False,"showerreco");
 #my_ana.SetTrackProducer(False,"");
 #############################
-my_anaunit._mgr.SetAlgo(my_algo)
+my_anaunit._mgr.AddAlgo(my_algo)
+my_anaunit._mgr._mc_for_ana = True
 my_proc.add_process(my_anaunit)
-#my_proc.run()
-#sys.exit(0)
-
-#create display
-display = setDisplay("TreeMaker")
-
-counter = 0
-while (counter < 1000):
-    try:
-        counter = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
-    except SyntaxError:
-        counter = counter + 1
-    my_proc.process_event(counter)
-    part   = my_anaunit.GetParticles(False)
-    data   = my_anaunit.GetData(False)
-    view(data,part,display)
-    #for x in xrange(part_mc.size()):
-    #    print part_mc[x].Diagram()
-    print counter
+my_proc.run()
 
 # done!
 print

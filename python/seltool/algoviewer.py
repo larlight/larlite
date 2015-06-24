@@ -8,35 +8,43 @@ import matplotlib.pyplot as plt
 
 #viewers
 plt.ion()
-display_reco = ERViewer()
-display_reco.set_window_title("Reco Objects")
-display_mc   = ERViewer()
-display_mc.set_window_title("MC Objects")
+
+def getViewer(name):
+    display = ERViewer()
+    display.set_window_title(name)
+    return display
 
 
-def viewAll(mcData, mcPart, recoData, recoPart):
 
-    display_reco.clear()
-    display_mc.clear()
+def viewAll(mcDisplay, mcData, mcPart, recoDisplay, recoData, recoPart):
 
-    display_reco.add(recoPart,recoData,False)
-    display_mc.add(mcPart,mcData,False)
+    mcDisplay.clear()
+    recoDisplay.clear()
 
-    display_mc.show()
-    display_reco.show()
-    
+    recoDisplay.add(recoPart,recoData,False)
+    mcDisplay.add(mcPart,mcData,False)
+
+    recoDisplay.show()
+    mcDisplay.show()
+
     # The ranges for the two planes "should" be identical
-    mcrange = display_mc.get_ax_range()
-    recorange = display_reco.get_ax_range()
+    mcrange = mcDisplay.get_ax_range()
+    recorange = recoDisplay.get_ax_range()
     for dim in xrange(3):
         if (recorange[0][dim] < mcrange[0][dim]): mcrange[0][dim] = recorange[0][dim]
         if (recorange[1][dim] > mcrange[1][dim]): mcrange[1][dim] = recorange[1][dim]
 
-    display_reco.set_ax_range(mcrange[0],mcrange[1])
-    display_mc.set_ax_range(mcrange[0],mcrange[1])
+    recoDisplay.set_ax_range(mcrange[0],mcrange[1])
+    mcDisplay.set_ax_range(mcrange[0],mcrange[1])
 
 
-def view(data, part):
+    
+
+
+def view(display, data, part):
+
+    display_reco = ERViewer()
+    display_reco.set_window_title("Reco Objects")
 
     del display_mc
 
