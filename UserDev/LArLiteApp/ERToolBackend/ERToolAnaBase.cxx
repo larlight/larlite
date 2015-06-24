@@ -2,7 +2,9 @@
 #define ERToolANABASE_CXX
 
 #include "ERToolAnaBase.h"
-
+#include "DataFormat/calorimetry.h"
+#include "DataFormat/cosmictag.h"
+#include "DataFormat/partid.h"
 namespace larlite {
 
   ERToolAnaBase::ERToolAnaBase() : ana_base()
