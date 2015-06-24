@@ -17,6 +17,7 @@
 #include <iostream>
 #include "ERTool/Base/Shower.h"
 #include "ERTool/Base/Track.h"
+#include "ERTool/Base/UtilFunc.h"
 namespace ertool {
   /**
      \class ToyDataMaker
@@ -34,16 +35,27 @@ namespace ertool {
     ~ToyDataMaker(){}
 
     /// Track maker
-    void MakeTrack(double x,  double y,  double z,
-		   double px, double py, double pz,
-		   int pdg_code)
-    {}
-    
-    /// Shower adder
-    void MakeShower(double x, double y, double z,
+    Track MakeTrack(double x,  double y,  double z,
 		    double px, double py, double pz,
 		    int pdg_code)
-    {}
+    {
+      Track t;
+      t.push_back(::geoalgo::Vector(x,y,z));
+      auto mass = ParticleMass(pdg_code);
+      t._energy = sqrt(pow(mass,2) + pow(px,2) + pow(py,2) + pow(pz,2) );
+      return t;
+    }
+    
+    /// Shower adder
+    Shower MakeShower(double x, double y, double z,
+		      double px, double py, double pz,
+		      int pdg_code)
+    {
+      Shower s( geoalgo::Vector(x,y,z),
+		geoalgo::Vector(px,py,pz),
+		10, 2);
+      return s;
+    }
 
     /// Vtx sigma
     void SetVertexSigma(const double s)
