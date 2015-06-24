@@ -1,3 +1,4 @@
+
 /*
 AlgoSingleGamma, April 2015
 
@@ -53,7 +54,10 @@ namespace ertool {
 
   AlgoSingleGamma::AlgoSingleGamma(const std::string& name) : AlgoBase(name)
 				     , fTPC(-10.,-126.,-10.,292.,136.,1150.)
+				     , _empart_tree(nullptr)
 				     , _alg_tree(nullptr)
+
+							   
   {
     _e_mass     = ParticleMass(11);
     _e_ll_values = 0;
@@ -108,6 +112,13 @@ namespace ertool {
     _alg_tree->Branch("_Ngamma",&_Ngamma,"_Ngamma/I");
     _alg_tree->Branch("_Ntrks",&_Ntrks,"_Ntrks/I");
     _alg_tree->Branch("_Nmu",&_Nmu,"_Nmu/I");
+
+    if(_empart_tree){delete _empart_tree;}
+    _empart_tree = new TTree("_empart_tree","EMPart gamma/electron Tagging Tree");
+    _empart_tree->Branch("_dedx",&_dedx,"dedx/D");
+    _empart_tree->Branch("_radlen",&_radlen,"radlen/D");
+    _empart_tree->Branch("_pdg",&_pdg,"pdg/I");
+
     
     return;
 
@@ -127,6 +138,12 @@ namespace ertool {
 
 
     auto datacpy = data;
+
+    //Finding Primaries...Copied from CCSingleE for now, 
+    //                    need to understand the changes 
+    _primaryFinder.Reconstruct(data,graph);
+    
+
 
     if (_verbose) { 
       std::cout << "***********BEGIN RECONSTRUCTION************" << std::endl;
@@ -210,12 +227,17 @@ namespace ertool {
 	auto const& thatShower = datacpy.Shower(graph.GetParticle(p2).RecoID());
 	
 	//define the interaction vertex
+
+	std::cout << "At line 230 I try to make a vtx" << std::endl; 
 	geoalgo::Point_t vtx(3);
       
 	//don't check a shower against itself
+	// JOSEPH JOSEPH joseph joe f;gka
+	// Why is it p vs p2? can't they come from the same node?
 	if(p == p2) {continue;}
       
 	//compare the shower with the electron shower
+	std::cout << "At line 239 I use fill that vtx" << std::endl; 
 	double IP = _findRel.FindClosestApproach(thisShower,thatShower,vtx);
 	_VsTrack = 0;
 	_thatE = thatShower._energy;
@@ -229,7 +251,7 @@ namespace ertool {
 		    << "\tIP to this Shr Start  : " << _IPthisStart << std::endl;
 
 
-
+	std::cout << "At line 253 I make a cut with that vtx" << std::endl; 
 	if( (IP < _maxIP) and 
 	    ( vtx.Dist(thatShower.Start()) < _vtxToShrStartDist) and
 	    ( vtx.Dist(thisShower.Start()) < _vtxToShrStartDist)){
@@ -261,6 +283,7 @@ namespace ertool {
 	}
 	//**** (1) is Satified
 	//****     thisShower does not share a vertex with an electron 
+	std::cout << "At line 285 I make a half-line" << std::endl; 
 	::geoalgo::HalfLine shr_vector(thisShower.Start(),thisShower.Dir());
 	_distBackAlongTraj = sqrt(thisShower.Start().SqDist(_geoAlgo.Intersection(fTPC,shr_vector,true)[0]));
       	
@@ -283,9 +306,11 @@ namespace ertool {
 	if(thatTrack.size() < 2) continue; //Because short tracks that we cannot resolve don't matter.
 	
 	if(_verbose) {std::cout << "Comparing with track (" << thatTrack.RecoID() << ")" << std::endl;}
+	std::cout << "At line 308 I try to make a vtx" << std::endl; 
 	geoalgo::Point_t vtx(3);
 	
 	// compare the track and the shower
+	std::cout << "At line 312 I fill that vtx" << std::endl; 
 	double IP = _findRel.FindClosestApproach(thisShower,thatTrack,vtx);
 	_VsTrack = 1;
 	_thatE = thatTrack._energy;
@@ -308,6 +333,7 @@ namespace ertool {
       ::  9  ::
       :::::::::
     */
+	std::cout << "At line 335 I make cuts with that vtx" << std::endl; 
 	if( (IP < _maxIP) and
 	    (vtx.Dist(thatTrack.front()) > _vtxToTrkStartDist) and  // No chance that the track and the shower share that vertex!
 	    (sqrt(_geoAlgo.SqDist(vtx,thatTrack)) < _vtxToTrkDist) and
@@ -331,7 +357,9 @@ namespace ertool {
 	  //this Shower has a track sibling 
 	  
 	  _vtx_assister = true;
+	  std::cout << " I bet I brake at line 360 " << std::endl;
 	  evt_vtx.SetXYZ(vtx[0],vtx[1],vtx[2]);
+	  std::cout << "nope, you're an idiot..." << std::endl;
 	  track_kin.push_back(thatTrack.RecoID());
 
     /*
@@ -363,7 +391,8 @@ namespace ertool {
       :::::::::
     */
 
-      if(!elec and _vtx_assister){
+      /*
+	if(!elec and _vtx_assister){
 	
 	//Create a "neutrino" particle which anchors the event
 
@@ -417,10 +446,7 @@ namespace ertool {
 
 	//nuMom.Normalize();
 	//neutrino.Momentum(nuMom*nuKE);
-	/*
-	if(fTPC.Contain(neutrino.Vertex())){
-	}
-	*/
+	
       }
       else{
 	if(_verbose){
@@ -429,7 +455,7 @@ namespace ertool {
 	  else if(!_vtx_assister){
 	    std::cout << "Event has no vertex activity! \t\t\t\t ::Possibly Signal...but not counted::" << std::endl; }
 	}}
-      
+      */
     }//Loop over all showers
 
     return true;
