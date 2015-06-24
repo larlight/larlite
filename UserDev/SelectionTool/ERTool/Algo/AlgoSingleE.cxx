@@ -10,12 +10,10 @@ namespace ertool {
   size_t total_g_showers = 0;
   size_t nonzero_dedx_counter = 0;
   
-  AlgoSingleE::AlgoSingleE() : AlgoBase()
-			     , _alg_tree(nullptr)
+  AlgoSingleE::AlgoSingleE(const std::string& name) : AlgoBase(name)
 			     , fTPC(-10.,-126.,-10.,292.,136.,1150.)
+			     , _alg_tree(nullptr)
   {
-
-    _name       = "AlgoSingleE";
     _e_mass     = TDatabasePDG().GetParticle(11)->Mass();
     _e_ll_values = 0;
     _dedx_values = 0;
@@ -27,6 +25,7 @@ namespace ertool {
     _vtxProximityCut = 0;
     _BDtW = 0; 
     _BDtTW = 0;
+    _neutrinos = 0;
 
   }
 
@@ -41,7 +40,6 @@ namespace ertool {
   void AlgoSingleE::ProcessBegin()
   {
 
-    _alg_emp.LoadParams();
     _alg_emp.ProcessBegin();
     _alg_emp.SetMode(true);
 
@@ -68,28 +66,23 @@ namespace ertool {
     return;
   }
 
-  void AlgoSingleE::LoadParams(std::string fname, size_t version){
+  void AlgoSingleE::AcceptPSet(const ::fcllite::PSet& cfg) {
     
     // Load EMPart params
-    _alg_emp.LoadParams(fname,version);
+    _alg_emp.AcceptPSet(cfg);
     
     return;
   }
 
-  ParticleSet AlgoSingleE::Reconstruct(const EventData &data){
+  bool AlgoSingleE::Reconstruct(const EventData &data, ParticleGraph& graph){
     
-    // ParticleSet where to store single electrons
-    ParticleSet res;
-
-    //res = emParticles;
-
     // Reconstruct Track Hierarchy
-    ParticleSet trackHierarchy;
-    trackHierarchy = _findRel.FindTrackHierarchy(data.Track());
+    //_findRel.FindTrackHierarchy(data.Track());
+
+    auto datacpy = data;
 
     // Find Primaries
-    ParticleSet primaries;
-    primaries = _primaryFinder.Reconstruct(data);
+    _primaryFinder.Reconstruct(data,graph);
 
     if (_verbose) { 
       std::cout << "*********** BEGIN SingleE RECONSTRUCTION ************" << std::endl;
@@ -99,16 +92,11 @@ namespace ertool {
     // We have a list of primaries.
     // Filter them to select single e- showers
 
-
-    // FIND PRIMARY
-    for (size_t pr=0; pr < primaries.size(); pr++){
-
-      // get the associated RecoObject (only care about showers)
-      if (primaries[pr].Type() != Particle::RecoObjType_t::kShower)
-	continue;
-
-      // get primary shower
-      auto const& thisShower = data.Shower(primaries[pr].RecoObjID());
+    // loop through primary showers
+    // Loop through showers
+    for (auto const& p : graph.GetPrimaryNodes(RecoType_t::kShower)){
+      
+      auto const& thisShower = datacpy.Shower(graph.GetParticle(p).RecoID());
       // keep track of whether it is single
       bool single = true;
       // if we find that this shower shares a vertex with a track -> change "_hassister" to true.
@@ -116,17 +104,18 @@ namespace ertool {
       // Keep track of list of siblings found for the shower (will be used to reconstruct full neutrino interaction)
       std::vector<int> siblings;
 
-      if (_verbose) { std::cout << "This shower: (" << primaries[pr].RecoObjID() << ")" << "\tE: " << thisShower._energy << std::endl; }
+      if (_verbose) { std::cout << "This shower: (" << p << ")" << "\tE: " << thisShower._energy << std::endl; }
 
       // it is primary. Make sure it satisfies SingleE conditions also
       // 1) loop over all showers in event
-      for (size_t s=0; s < data.Shower().size(); s++){
-	auto const& thatShower(data.Shower(s));
+      for (auto const& p2 : graph.GetParticleNodes(RecoType_t::kShower)){
+	
+	auto const& thatShower = datacpy.Shower(graph.GetParticle(p2).RecoID());
 	geoalgo::Point_t vtx(3);
 	// make sure we don't use "thisShower" in the loop
-	if (thatShower.ID() == thisShower.ID()) 
+	if (thatShower.RecoID() == thisShower.RecoID()) 
 	  continue;
-	if (_verbose) { std::cout << "Comparing with shower (" << s << ")" << std::endl; }
+	if (_verbose) { std::cout << "Comparing with shower (" << p2 << ")" << std::endl; }
 	// is "thatshower" gamma or e-like?
 	// if gamma-like maybe a nearby pi0 -> ok if close
 	if (isGammaLike(thatShower._dedx,-1))
@@ -157,12 +146,12 @@ namespace ertool {
       if (!single)
 	continue;
 
-      for (size_t t=0; t < data.Track().size(); t++){
-	auto const& thatTrack(data.Track(t));
-	// make sure track has more than 2 points. Otherwise GeoAlgo will get mad!
-	// this is already enforced if TrackLength ERTool::Filter is used with a value
-	// greater than 0
-	if (thatTrack.size() < 2)
+      for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
+	
+	auto const& thatTrack = datacpy.Track(graph.GetParticle(t).RecoID());
+	// make sure track has a length of at least 0.3 cm (wire spacing)
+	// greater longer than 3 mm
+	if (thatTrack.Length() < 0.3)
 	  continue;
 	if (_verbose) { std::cout << "Comparing with track (" << t << ")" << std::endl; }
 	geoalgo::Point_t vtx(3);
@@ -207,13 +196,13 @@ namespace ertool {
       // compare shower start distance to these vertices.
       // if more than some threshold not single
       double distmin = 1036;
-      for (size_t v = 0; v < trackHierarchy.size(); v++){
-	if (trackHierarchy[v].Daughters().size() > 1){
-	  // more than one tracks for this vertex. -> reliable!
-	  double thisdist = thisShower.Start().Dist(trackHierarchy[v].Vertex());
-	  if ( thisdist < distmin)
-	    distmin = thisdist;
-	}
+      // get list of potential vertices that come from 2 or more objects
+      // sharing a start point
+      auto const& candidateVertices = _primaryFinder.GetVertices(graph,2);
+      for (auto const& vertex : candidateVertices){
+	double thisdist = thisShower.Start().Dist(vertex);
+	if ( thisdist < distmin)
+	  distmin = thisdist;
       }
 
       if ( single and !_hassister and (_vtxProximityCut != 0) ){
@@ -237,25 +226,31 @@ namespace ertool {
       // created, simply add it to the result vector
       if (single){
 	if (_verbose) { std::cout << "Shower is Single!" << std::endl; }
-	// Create an "neutrino" particle that gave
-	// birth to this electron shower
-	Particle neutrino(12,0);
-	neutrino.Vertex(thisShower.Start());
-	//neutrino.Momentum(thisShower.Dir()*mom);
 
-	// momentum to be decided later (after summing momenta from all daughters)
-	geoalgo::Vector_t neutrinoMomentum(0.,0.,0.);
-	double neutrinoKineticEnergy = 0;
-	// Create electron!
-	Particle electron(11,_e_mass);
-	electron.Vertex(thisShower.Start());
+	// fill in electron properties
 	double mom = sqrt( (thisShower._energy)*(thisShower._energy) - (_e_mass*_e_mass) );
 	if (mom < 0) { mom = 1; }
-	electron.Momentum(thisShower.Dir()*mom);
+	if (_verbose) { std::cout << "Getting shower " << p << std::endl; }
+	auto electron = graph.GetParticle(p);
+	if (_verbose) { std::cout << " and modifying properties..." << std::endl; }
+	electron.SetParticleInfo(11,_e_mass,thisShower.Start(),thisShower.Dir()*mom);
+	// create a new particle for the neutrino!
+	if (_verbose) { std::cout << "number of partciles before: " << graph.GetNumParticles() << std::endl; }
+	if (_verbose) { std::cout << "Making neutrino..." << std::endl; }
+	Particle& neutrino = graph.CreateParticle();
+	neutrino.SetParticleInfo(12,0.,thisShower.Start(),thisShower.Dir()*mom);
+	if (_verbose) { std::cout << "made neutrino with ID " << neutrino.ID() << " and PDG: " << neutrino.PdgCode() << std::endl; }
+	if (_verbose) { std::cout << "number of partciles after: " << graph.GetNumParticles() << std::endl; }
+	_neutrinos += 1;
+	// set relationship
+	graph.SetParentage(neutrino.ID(),p);
+
+	// momentum reconstruction -> this will need to change!
+	/*
+	double neutrinoMomentum = 0;
+	double neutrinoKineticEnergy = 0;
 	neutrinoKineticEnergy += thisShower._energy;
 	neutrinoMomentum += electron.Momentum();
-	electron.RecoObjInfo(primaries[pr].RecoObjID(),Particle::RecoObjType_t::kShower);
-	neutrino.AddDaughter(electron);
 	// if the shower has siblings associated with it
 	if (_hassister){
 	  // loop over siblings found
@@ -284,6 +279,7 @@ namespace ertool {
 	if(fTPC.Contain(neutrino.Vertex())){
 	  res.push_back(neutrino);
 	}
+	*/
       }// if single
       // if not single
       else
@@ -293,10 +289,12 @@ namespace ertool {
       
     }// for all primaries found / for all showers
     
-    return res;
+    return true;
   }
   
   void AlgoSingleE::ProcessEnd(TFile* fout){
+
+    std::cout << "Num. of neutrinos found: " << _neutrinos << std::endl;
     
     if(fout){
       fout->cd();
@@ -315,24 +313,6 @@ namespace ertool {
   }
 
   
-  bool AlgoSingleE::filterMuons(const EventData &data, const std::vector<int> &secondaryTracks){
-
-    for(size_t t=0; t < data.Track().size(); t++){
-
-      auto it = std::find(secondaryTracks.begin(), secondaryTracks.end(), t );
-      if ( it == secondaryTracks.end() ){      
-	// then it's a primary
-	// check track length
-	double len = data.Track().at(t)->Length();
-	if (len > 100.)
-	  return true;
-      }
-    }
-    
-    return false;
-  }
-
-
   bool AlgoSingleE::isGammaLike(const double dedx, double radlen, bool forceRadLen)
   {
     if ( !_useRadLength && !forceRadLen )

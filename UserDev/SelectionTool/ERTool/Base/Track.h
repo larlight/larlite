@@ -66,7 +66,6 @@ namespace ertool {
     /// Total deposited energy
     double _energy;
 
-    ClassDef(Track,1)
   };
 
 }

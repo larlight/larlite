@@ -24,7 +24,7 @@
 #include "GeoAlgo/GeoAABox.h"
 #include <algorithm> // for std::find
 #include <utility>
-
+#include <TTree.h>
 namespace ertool {
 
   /**
@@ -36,24 +36,24 @@ namespace ertool {
   public:
 
     /// Default constructor
-    AlgoSingleE();
+    AlgoSingleE(const std::string& name="SingleE");
 
     /// Default destructor
-    virtual ~AlgoSingleE(){};
+    ~AlgoSingleE(){};
 
     /// Reset function
-    virtual void Reset();
+    void Reset();
 
     /// What to do before event-loop begins
-    virtual void ProcessBegin();
+    void ProcessBegin();
 
-    virtual void ProcessEnd(TFile* fout);
+    void ProcessEnd(TFile* fout);
 
     /// Override the ertool::SPTBase::LoadParams function
-    virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
+    void AcceptPSet(const ::fcllite::PSet& cfg);
 
     /// Function to reconstruct the start-point isolated electrons
-    virtual ParticleSet Reconstruct(const EventData &data);
+    bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
     /// Set verbosity
     void setVerbose(bool on){
@@ -99,10 +99,6 @@ namespace ertool {
 
   protected:
 
-
-    /// Function to filter out events with long primary tracks 
-    /// return true if a muon is found
-    bool filterMuons(const EventData &data, const std::vector<int> &secondaryTracks);
 
     /// Function to check wether a shower is e- or gamma-like
     /// Returns true if gamma-like
@@ -160,7 +156,8 @@ namespace ertool {
     // top wall is extended to infinity)? This param will be
     // negative for upwards facing showers.
     double _BDtTW ;
-
+    // Keep track of number of neutrinos found
+    int _neutrinos;
     // Keep track of whether a sister track to the shower has
     // been found
     bool _hassister;

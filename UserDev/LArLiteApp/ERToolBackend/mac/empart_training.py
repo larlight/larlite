@@ -36,29 +36,29 @@ def main():
     my_algo.SetFitRange_dEdx(1.6,2.4,False); # False = e- / True = gamma
     my_algo.SetFitRange_dEdx(3.5,6.0,True);
     my_algo.SetFitRange_RadLen(5.,35.,True);
-    my_algo.SetFitRange_RadLen(0.,10.,False);
     # Fit ranges for MC Info:
     #my_algo.SetFitRange_dEdx(0.5,6,False); # False = e- / True = gamma
     #my_algo.SetFitRange_dEdx(0.5,6,True);
     #my_algo.SetFitRange_RadLen(5.,25.,True);
     #my_algo.SetFitRange_RadLen(0.,5.,False);
     # ******* End Set Fit Ranges *******
-    my_algo.setVerbose(True)
+    my_algo.setVerbose(False)
+    my_algo.setPlot(True)
     # Create analysis unit
     my_ana = fmwk.ExampleERSelection()
     my_ana.SetMinEDep(10)
+    my_ana.SetCheater(True)
 
     # Set Producers
     # First Argument: True = MC, False = Reco
     my_ana.SetShowerProducer(True,"mcreco");
-    #my_ana.SetTrackProducer(True,"mcreco");
-    my_ana.SetVtxProducer(True,"generator");
+    my_ana.SetTrackProducer(True,"mcreco");
     #my_ana.SetShowerProducer(False,"pandoraNuShower");
     #my_ana.SetShowerProducer(False,"showerreco");
-    my_ana.SetTrackProducer(False,"");
-    #my_ana.SetVtxProducer(False,"");
+    #my_ana.SetTrackProducer(False,"");
 
-    my_ana._mgr.SetAlgo(my_algo)
+    #my_ana._mgr.SetAlgo(my_algo)
+    my_ana._mgr.AddAlgo(my_algo)
     my_ana._mgr._training_mode =True
 
     # Check if gamma/electron files are provided:
@@ -78,8 +78,8 @@ def main():
     print '  Identified %2d input files for electron' % len(electron_files)
     if not ask_binary('  Proceed? [y/n]:'): return False
     print
-    if ask_binary('  Load previously extracted fit parameters? [y/n]:'):
-        my_algo.LoadParams()    
+    #if ask_binary('  Load previously extracted fit parameters? [y/n]:'):
+    #    my_algo.LoadParams()    
     #
     # Training for gamma mode
     #
@@ -118,7 +118,7 @@ def main():
         my_ana._mgr.Reset()
         my_proc.set_ana_output_file("electron_training.root")
         print '    Start running electron training...'
-        my_proc.run()
+        my_proc.run(10)
         print
         print '    Finished running electron training...'
         print
@@ -130,7 +130,8 @@ def main():
     # Store trained parameters
     #
     if (gamma_trained or electron_trained) and ask_binary('  Store train result parameters? [y/n]:'):
-        my_algo.StoreParams()
+        my_ana._mgr.StorePSet("new_empart.txt")
+        #my_algo.StoreParams()
         print '  Parameter stored...'
         print
 

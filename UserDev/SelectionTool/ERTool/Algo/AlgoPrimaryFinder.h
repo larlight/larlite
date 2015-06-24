@@ -41,24 +41,24 @@ namespace ertool {
   public:
 
     /// Default constructor
-    AlgoPrimaryFinder();
+    AlgoPrimaryFinder(const std::string& name="PrimaryFinder");
 
     /// Default destructor
-    virtual ~AlgoPrimaryFinder(){};
+    ~AlgoPrimaryFinder(){};
+
+    /// Configuration setter
+    void AcceptPSet(const ::fcllite::PSet& cfg);
 
     /// Reset function
-    virtual void Reset();
+    void Reset();
 
     /// What to do before event-loop begins
-    virtual void ProcessBegin();
+    void ProcessBegin();
 
-    virtual void ProcessEnd(TFile* fout);
-
-    /// Override the ertool::SPTBase::LoadParams function
-    virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
+    void ProcessEnd(TFile* fout);
 
     /// Function to reconstruct the start-point isolated electrons
-    virtual ParticleSet Reconstruct(const EventData &data);
+    bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
     /// Set verbosity
     void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); }
@@ -73,12 +73,38 @@ namespace ertool {
     void setVtxToShrStartDist(double d) { _vtxToShrStartDist = d; }
     void setMaxIP(double d) { _maxIP = d; }
 
+    /// Functions that returns if object given as 1st 
+    ///argument comes from object given as second argument
+    bool From(const ::geoalgo::Trajectory& thisTrack,
+	      const ::geoalgo::Trajectory& thatTrack) const;
+
+    bool From(const ::geoalgo::Cone& thisShower,
+	      const ::geoalgo::Cone& thatShower) const;
+
+    bool From(const ::geoalgo::Cone& thisShower,
+	      const ::geoalgo::Trajectory& thatTrack) const;
+
+    bool From(const ::geoalgo::Trajectory& thisTrack,
+	      const ::geoalgo::Cone& thatShower) const;
+
+    /// Function that based on primaries in event
+    /// returns potential vertices.
+    /// Takes start point of each object
+    /// and groups together other start points
+    /// within _IP of the start point
+    /// Start points are this way grouped
+    /// into vertices
+    std::vector<::geoalgo::Point_t> GetVertices(const ParticleGraph& graph,
+						const int minObjectsAtVertex) const;
 
   protected:
 
     /// Function to check wether a shower is e- or gamma-like
     /// Returns true if gamma-like
     bool isGammaLike(const double dedx, double radlen,bool forceRadLen=false);
+
+
+
 
     // verbose flag
     bool _verbose;

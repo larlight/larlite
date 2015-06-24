@@ -28,16 +28,25 @@ namespace ertool {
   public:
 
     /// Default constructor
-    Algo_Class_Name();
+    Algo_Class_Name(const std::string& name="Algo_Class_Name");
 
     /// Default destructor
     virtual ~Algo_Class_Name(){};
 
     /// Reset function
-    virtual void Reset();
+    void Reset();
+
+    /// Function to accept fclite::PSet
+    void AcceptPSet(const ::fcllite::PSet& cfg);
+
+    /// Called @ before processing the first event sample
+    void ProcessBegin();
 
     /// Function to evaluate input showers and determine a score
-    virtual ParticleSet Reconstruct(const EventData &data);
+    bool Reconstruct(const EventData &data, ParticleGraph& graph);
+
+    /// Called after processing the last event sample
+    void ProcessEnd(TFile* fout=nullptr);
 
   };
 }
