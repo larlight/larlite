@@ -10,10 +10,10 @@ namespace ertool{
     _debug  = false;
 
     //Track-particle masses (convert to MEV)
-    _pi_mass = 1000.* TDatabasePDG().GetParticle(211)->Mass();
-    _pr_mass = 1000.* TDatabasePDG().GetParticle(2212)->Mass();
-    _mu_mass = 1000.* TDatabasePDG().GetParticle(13)->Mass();
-    _ka_mass = 1000.* TDatabasePDG().GetParticle(311)->Mass();
+    _pi_mass = ParticleMass(211);
+    _pr_mass = ParticleMass(2212);
+    _mu_mass = ParticleMass(13);
+    _ka_mass = ParticleMass(311);
     _uk_mass = 0.;
     _maxIP   = 1.;
   }

@@ -16,7 +16,7 @@ namespace ertool {
     , _empart_tree(nullptr)
     , _alg_tree(nullptr)
   {
-    _e_mass     = TDatabasePDG().GetParticle(11)->Mass();
+    _e_mass     = ParticleMass(11);
     _Ethreshold = 0;
     _verbose = false;
     _useRadLength = false;

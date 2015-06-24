@@ -20,6 +20,7 @@
 #include "ERTool/Base/Track.h"
 #include "ERTool/Base/ParticleGraph.h"
 #include "ERTool/Base/ERToolTypes.h"
+#include "ERTool/Base/UtilFunc.h"
 
 namespace ertool {
    /**
