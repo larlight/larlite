@@ -10,10 +10,10 @@ namespace ertool{
     _debug  = false;
 
     //Track-particle masses (convert to MEV)
-    _pi_mass = 1000.* TDatabasePDG().GetParticle(211)->Mass();
-    _pr_mass = 1000.* TDatabasePDG().GetParticle(2212)->Mass();
-    _mu_mass = 1000.* TDatabasePDG().GetParticle(13)->Mass();
-    _ka_mass = 1000.* TDatabasePDG().GetParticle(311)->Mass();
+    _pi_mass = ParticleMass(211);
+    _pr_mass = ParticleMass(2212);
+    _mu_mass = ParticleMass(13);
+    _ka_mass = ParticleMass(311);
     _uk_mass = 0.;
     _maxIP   = 1.;
   }
@@ -303,6 +303,59 @@ namespace ertool{
     case Track::TrackPartID_t::kTrackPartIDMax : return 0;
     }
     return 0.;
+  }
+
+
+  /// Function that based on primaries in event
+  /// returns potential vertices.
+  /// Takes start point of each object
+  /// and groups together other start points
+  /// within _IP of the start point
+  /// Start points are this way grouped
+  /// into vertices
+  std::vector<::geoalgo::Point_t> AlgoFindRelationship::GetVertices(const ParticleGraph& graph,
+								    const int minObjectsAtVertex) const
+  {
+    // make list to hold vertices
+    std::vector<::geoalgo::Point_t> vertices;
+    // vector keeping track of how many objects
+    // share the same  vertex
+    std::vector<int> numObjects;
+
+    // get primaries only
+    auto const& primaries = graph.GetPrimaryNodes();
+    
+    // for each primary, get the start point
+    // check against all already found vertices
+    // if any one is within the _IP of the
+    // current start point -> add object to that vertex
+    for (auto const& nodeID : primaries){
+      bool newvtx = true;
+      auto const start = graph.GetParticle(nodeID).Vertex();
+      for (size_t v = 0; v < vertices.size(); v++){
+	if (start.Dist(vertices[v]) < _maxIP){
+	  newvtx = false;
+	  // add to this vertex
+	  numObjects[v] += 1;
+	}
+      }
+      if (newvtx){
+	// this vertex is new!
+	// add it
+	vertices.push_back(start);
+	numObjects.push_back(1);
+      }
+    }// for all primaries
+
+    // we only want vertices with a minimum number of objects
+    // starting from this vertex
+    std::vector<::geoalgo::Point_t> vertices_afterCut;
+    for (size_t i=0; i < vertices.size(); i++){
+      if (numObjects[i] >= minObjectsAtVertex)
+	vertices_afterCut.push_back(vertices[i]);
+    }
+
+    return vertices_afterCut;
   }
 
 };

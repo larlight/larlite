@@ -52,7 +52,7 @@ namespace ertool {
     bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
     /// Set verbosity
-    void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); _nodeMgr->setVerbose(on); }
+    void setVerbose(const bool on);
 
     /// set cut on score (score = 1/IP)
     void setMinScore(double s) { _minScore = s; }

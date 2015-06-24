@@ -70,12 +70,10 @@ namespace geotree{
   void Manager::LinkCollectionToAlgos()
   {
 
-    std::cout << "setting collection to algos" << std::endl;
     // link algos to the node collections in the manager
     _algoMultipleParents->SetCollection(&_coll);
     _algoParentIsSiblingsSibling->SetCollection(&_coll);
     _algoGenericConflict->SetCollection(&_coll);
-    std::cout << "done doing so" << std::endl;
     
     return;
   }
@@ -191,6 +189,9 @@ namespace geotree{
 			       const double score,
 			       const geoalgo::Point_t& vtx,
 			       const geotree::RelationType_t type){
+
+    if (type == geotree::RelationType_t::kUnknown)
+      return;
 
     // make sure nodes exist
     if (_coll.NodeExists(id1) == false)
@@ -356,7 +357,7 @@ namespace geotree{
     ParentIsSiblingsSibling();
 
     // if there is a conflict, remove sibling relation
-    if (_verbose) { std::cout << "If there is a conflict, remove sibling status" << std::endl; }
+    if (_verbose) { std::cout << "If there is an ADDITIONAL conflict, remove sibling status" << std::endl; }
     GenericConflict();
 
     // Conflict 3)
@@ -584,7 +585,7 @@ namespace geotree{
 
       // Ok, let's give the algorithm a shot! 
       // call the algorithm with node & parent, and sibling
-      if (_verbose) { std::cout << "\talgoMultipleParents called..." << std::endl; }
+      if (_verbose) { std::cout << "\talgoParentIsSiblingsSibling called..." << std::endl; }
       _algoParentIsSiblingsSibling->ResolveConflict(ID,parentID,s);
 
       // now loop through correlations found and act on them
