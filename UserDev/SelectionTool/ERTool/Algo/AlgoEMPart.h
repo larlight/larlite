@@ -23,7 +23,6 @@
 #include "ERTool/Base/Particle.h"
 #include "ERTool/Base/UtilFunc.h"
 #include "AlgoFindRelationship.h"
-#include "TDatabasePDG.h"
 #include <RooPlot.h>
 #include <RooProdPdf.h>
 #include <TCanvas.h>

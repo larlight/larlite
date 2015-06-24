@@ -69,11 +69,15 @@ namespace larlite {
 	n_viable_mcshowers++;
     
     //Ask mctrack particles have > 50 MeV *kinetic* energy.
-    for(auto const& mct: *ev_mctrack)
-      if( (mct.Start().E() - 
-	   (_pdgdb->GetParticle(mct.PdgCode())->Mass()*1000.) ) > 50. )
+    for(auto const& mct: *ev_mctrack) {
+      auto iter = _massdb.find(mct.PdgCode());
+      if(iter == _massdb.end()) {
+	_massdb[mct.PdgCode()] = _pdgdb->GetParticle(mct.PdgCode())->Mass()*1000.;
+	iter = _massdb.find(mct.PdgCode());
+      }      
+      if( (mct.Start().E() - (*iter).second) > 50. )
 	n_viable_mctracks++;
-
+    }
     // Want specifically 1 mcshower, 0 mctracks (simplest topology)
     if(n_viable_mcshowers != 1)
       return false;
