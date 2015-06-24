@@ -15,9 +15,10 @@
 #ifndef ERTOOL_ALGOSINGLEGAMMA_H
 #define ERTOOL_ALGOSINGLEGAMMA_H
 
+#include "ERTool/Base/AlgoBase.h"
 #include "ERTool/Algo/AlgoEMPart.h"
 #include "ERTool/Algo/AlgoFindRelationship.h"
-#include "ERTool/Base/AlgoBase.h"
+#include "ERTool/Algo/AlgoPrimaryFinder.h"
 #include "GeoAlgo/GeoAlgo.h"
 #include "GeoAlgo/GeoAABox.h"
 #include <algorithm> // for std::find
@@ -53,8 +54,12 @@ namespace ertool {
     bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
 		// Set verbosity
-    void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); }
-
+    void setVerbose(bool on) { 
+          _verbose = on; 
+	  _findRel.setDebug(on); 
+	  _primaryFinder.setVerbose(on);
+    }
+    
        /// Use EMPart
     void useRadLength(bool on) { _useRadLength = on; }
 
@@ -62,15 +67,19 @@ namespace ertool {
 
     void setVtxToTrkStartDist(double d){
       _vtxToTrkStartDist = d;
+      _primaryFinder.setVtxToTrkStartDist(d);
     }
     void setVtxToTrkDist(double d){
       _vtxToTrkDist = d;
+      _primaryFinder.setVtxToTrkDist(d);
     }
     void setVtxToShrStartDist(double d){
       _vtxToShrStartDist = d;
+      _primaryFinder.setVtxToShrStartDist(d); 
     }
     void setMaxIP(double d){
       _maxIP = d;
+      _primaryFinder.setMaxIP(d); 
     }
     void setEThreshold(double E){ _Ethreshold = E; }
 
@@ -89,7 +98,7 @@ namespace ertool {
 
   protected:
 
-        /// Function to check wether a shower is e- or gamma-like
+    /// Function to check wether a shower is e- or gamma-like
     /// Returns true if gamma-like
     bool isGammaLike(const double dedx, double radlen,bool forceRadLen=false);
 
@@ -160,12 +169,22 @@ namespace ertool {
     // Other algorithms to use
     AlgoEMPart _alg_emp;
     AlgoFindRelationship _findRel;
+    AlgoPrimaryFinder _primaryFinder;
     // GeoAlgo Tool
     ::geoalgo::GeoAlgo _geoAlgo;
 
     //debug histos
     TH1F* _e_ll_values;
     TH1F* _dedx_values;
+
+    //Tree -> one entry for every time EMPart LL function
+    // is called using both dEdx and rad-length
+    TTree* _empart_tree;
+    double _dedx;
+    double _radlen;
+    int    _pdg;
+
+
 
     //Tree -> one entry per shower-other comparison
     // therefore possibly multiple entries for each shower
