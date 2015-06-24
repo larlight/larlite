@@ -13,12 +13,10 @@ namespace ertool {
   AlgoSingleE::AlgoSingleE(const std::string& name)
     : AlgoBase(name)
     , fTPC(-10.,-126.,-10.,292.,136.,1150.)
-    , _alg_tree(nullptr)
     , _empart_tree(nullptr)
+    , _alg_tree(nullptr)
   {
     _e_mass     = TDatabasePDG().GetParticle(11)->Mass();
-    _e_ll_values = 0;
-    _dedx_values = 0;
     _Ethreshold = 0;
     _verbose = false;
     _useRadLength = false;
@@ -45,12 +43,6 @@ namespace ertool {
     _alg_emp.ProcessBegin();
     _alg_emp.SetMode(true);
 
-    if(!_e_ll_values)
-      _e_ll_values = new TH1F("e_ll_values","e_ll_values",1000,-1,0);
-
-    if(!_dedx_values)
-      _dedx_values = new TH1F("dedx_values","dedx_values",1000,0,8);
-    
     if (_alg_tree) { delete _alg_tree; }
     _alg_tree = new TTree("_alg_tree","Algo SingleE Tree");
     _alg_tree->Branch("_E",&_E,"_E/D");
@@ -85,9 +77,6 @@ namespace ertool {
   bool AlgoSingleE::Reconstruct(const EventData &data, ParticleGraph& graph){
 
     auto datacpy = data;
-
-    // Find Primaries
-    _primaryFinder.Reconstruct(data,graph);
 
     if (_verbose) { 
       std::cout << "*********** BEGIN SingleE RECONSTRUCTION ************" << std::endl;
@@ -210,7 +199,7 @@ namespace ertool {
       double distmin = 1036;
       // get list of potential vertices that come from 2 or more objects
       // sharing a start point
-      auto const& candidateVertices = _primaryFinder.GetVertices(graph,2);
+      auto const& candidateVertices = _findRel.GetVertices(graph,2);
       for (auto const& vertex : candidateVertices){
 	double thisdist = thisShower.Start().Dist(vertex);
 	if ( thisdist < distmin)
@@ -301,6 +290,9 @@ namespace ertool {
 	  if (rel == kSibling)
 	    { // add this track to PaticleTree
 	      auto &trackParticle = graph.GetParticle(t);
+	      // if not primary according to primary finder -> don't add
+	      if (!trackParticle.Primary())
+		continue;
 	      // track deposited energy
 	      double Edep = track._energy;
 	      // track direction
@@ -314,7 +306,10 @@ namespace ertool {
 	    }
 	}
 	::geoalgo::Vector_t momdir(0,0,1);
+
 	neutrino.SetParticleInfo(12,0.,thisShower.Start(),momdir*neutrinoMom);
+
+	
 
       }// if single
       // if not single
@@ -335,12 +330,6 @@ namespace ertool {
     if(fout){
       fout->cd();
       
-      if(_e_ll_values)
-	_e_ll_values->Write();
-
-      if(_dedx_values)
-	_dedx_values->Write();
-
       if (_alg_tree)
 	_alg_tree->Write();
       if (_empart_tree)

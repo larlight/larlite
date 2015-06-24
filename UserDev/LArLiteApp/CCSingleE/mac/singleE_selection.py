@@ -26,6 +26,12 @@ my_proc.enable_filter(True)
 my_algo = GetCCSingleEInstance()
 my_algo.setVerbose(False)
 
+primary_algo = ertool.AlgoPrimaryFinder()
+primary_algo.setVtxToTrkStartDist(1)
+primary_algo.setVtxToTrkDist(1)
+primary_algo.setVtxToShrStartDist(50)
+primary_algo.setMaxIP(1)
+
 # Pi0 Algo
 pi0_algo = ertool.AlgoPi0()
 pi0_algo.setVerbose(False)
@@ -81,6 +87,7 @@ my_ana.SetDebug(False)
 my_ana.SetECut(Ecut)
 
 my_anaunit = fmwk.ExampleERSelection()
+my_anaunit._mgr.AddAlgo(primary_algo)
 my_anaunit._mgr.AddAlgo(my_algo)
 #my_anaunit._mgr.AddAlgo(pi0_algo)
 my_anaunit._mgr.AddAna(my_ana)
