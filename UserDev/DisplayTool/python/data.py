@@ -341,24 +341,46 @@ class shower(recoBase):
     self._process = evd.DrawShower()
     self.init()
 
-  def clearDrawnObjects(self,view_manager):
-    pass
+    # Defining the cluster colors:
+    self._showerColors = [ 
+                            (0,147,147, 100),  # dark teal
+                            (0,0,252, 100),   # bright blue
+                            (156,0,156, 100), # purple
+                            (255,0,255, 100), # pink
+                            (255,0,0, 100),  #red
+                            (175,0,0, 100),  #red/brown
+                            (252,127,0, 100), # orange
+                            (102,51,0, 100), # brown
+                            (127,127,127, 100),  # dark gray
+                            (210,210,210, 100),  # gray
+                            (100,253,0, 100) # bright green
+                          ]   
 
-  def getAutoRange(self,plane):
-    pass
+  # def clearDrawnObjects(self,view_manager):
+  #   pass
+
+  # def getAutoRange(self,plane):
+  #   pass
 
   def drawObjects(self,view_manager):
     
     for view in view_manager.getViewPorts():
     #   # get the showers from the process:
+      self._drawnObjects.append([])
       showers = self._process.getShowersByPlane(view.plane())
+      i = 0
       for shower in showers:
-        print "hi"
-        print shower.plane()
-        print shower.startPoint()
-        print shower.angleInPlane()
-        print shower.openingAngle()
-        print shower.length()
+        # print "hi"
+        # print shower.plane()
+        # print shower.startPoint()
+        # print shower.angleInPlane()
+        # print shower.openingAngle()
+        # print shower.length()
+
+        if i > len(self._showerColors):
+          i = 0
+
+        color = self._showerColors[i]
 
         # construct a polygon for this shower:
         points = []
@@ -376,14 +398,22 @@ class shower(recoBase):
         y2 = y2 + shower.length() * sin(shower.angleInPlane() + shower.openingAngle()/2)
 
         # Scale everything to wire/time:
-        x1 *= geom.wire2cm()
-        y1 *= geom.time2cm()
-        x2 *= geom.wire2cm()
-        y2 *= geom.time2cm()
+        x1 /= geom.wire2cm()
+        y1 /= geom.time2cm()
+        x2 /= geom.wire2cm()
+        y2 /= geom.time2cm()
 
         points.append(QtCore.QPoint(x1,y1))
         points.append(QtCore.QPoint(x2,y2))
 
         thisPolyF = QtGui.QPolygonF(points)
         thisPoly = QtGui.QGraphicsPolygonItem(thisPolyF)
+        
+        thisPoly.setPen(pg.mkPen(None))
+        thisPoly.setBrush(pg.mkColor(color))
+
         view._view.addItem(thisPoly)
+
+
+        self._drawnObjects[view.plane()].append(thisPoly)
+        i+= 1
