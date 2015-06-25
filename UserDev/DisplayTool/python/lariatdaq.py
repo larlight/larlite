@@ -5,6 +5,7 @@ from event import manager
 from data import wire
 import argparse, sys, signal
 from PyQt4 import QtGui, QtCore
+import os
 
 from ROOT import evd
 
@@ -83,10 +84,10 @@ class lariat_manager(manager, wire, QtCore.QObject):
     if file == None:
       return
     else:
+      file = str(file)
       self._process.setInput(file)
-      print "OK to here"
       self._hasFile = True
-      # self.goToEvent(0)
+      self.goToEvent(0)
       # self._gui.update()
 
   def parseFileName(self,fileName):
@@ -190,16 +191,18 @@ class fileWatcher(QtCore.QObject,threading.Thread):
         raise e
       # At this point, the file exists.
       fileToDraw = f.readline()
-      # print "Contents of file are: ", fileToDraw
+      fileName, fileExtension = os.path.splitext(fileToDraw)
+      fileExtension = fileExtension.rstrip()
       if fileToDraw == self._prevFile:
         # print "Not drawing because file has not changed."
         continue
-      if fileToDraw.endswith(".root"):
-        print "Attempting to refresh picture"
-        self.fileChanged.emit()
+      if fileExtension == ".root":
+        print "Refreshing file!"
+        self.fileChanged.emit(fileToDraw)
         self._prevFile = fileToDraw
       else:
         print "File has changed but does not appear to be a root file."
+        self._prevFile = fileToDraw
 
 class delayTimer(QtCore.QObject,threading.Thread):
   """docstring for funcCaller"""

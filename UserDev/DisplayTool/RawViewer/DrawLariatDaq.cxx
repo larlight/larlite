@@ -236,9 +236,7 @@ namespace evd {
       _current_event = 0;
       c -> Reset();
       c -> Add(producer.c_str());
-      // _n_events  = c -> GetEntries("board_id==0");
-      _n_events = 35;
-      std::cout << "_n_events is " << _n_events << std::endl;
+      _n_events  = c -> GetEntries() / (_n_cards + _card_offset);
       if (_n_events == 0){
         _run = 0;
         _event_no = 0;

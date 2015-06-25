@@ -88,7 +88,7 @@ class lariat(geometry):
     # lariat has a different number of time ticks
     # fix it directly:
     self._tRange = 3072
-    self._levels = [ (-15,150),(-2,200) ]
+    self._levels = [ (-20,200),(-20,200) ]
     self._name = "lariat"
 
 
