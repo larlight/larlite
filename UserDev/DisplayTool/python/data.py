@@ -1,7 +1,7 @@
 
 from PyQt4 import QtGui, QtCore
 from larlite import larlite as fmwk
-from ROOT import evd
+from ROOT import *
 import numpy as np
 import pyqtgraph as pg
 
@@ -46,7 +46,7 @@ class drawableItems(object):
     self._drawableClasses = collections.OrderedDict()
     self._drawableClasses.update({'hit':hit})
     self._drawableClasses.update({'cluster':cluster})
-    # self._drawableClasses.update({'shower':shower})
+    self._drawableClasses.update({'shower':shower})
 
   def getListOfItems(self):
     return self._drawableClasses.keys()
@@ -133,6 +133,16 @@ class wire(dataBase):
     return d
 
   def getPlane(self,plane):
+    a = np.array(self._c2p.Convert(self._process.getDataByPlane(plane)))
+    # print "a[", str(plane), "[0][0]" , str(a[0][0])
+    # print "a[", str(plane), "[0][1]" , str(a[0][1])
+    # print "a[", str(plane), "[0][2]" , str(a[0][2])
+    # print "a[", str(plane), "[29][0]" , str(a[29][0])
+    # print "a[", str(plane), "[29][1]" , str(a[29][1])
+    # print "a[", str(plane), "[29][2]" , str(a[29][2])
+    # print "a[", str(plane), "[93][0]" , str(a[93][0])
+    # print "a[", str(plane), "[93][1]" , str(a[93][1])
+    # print "a[", str(plane), "[93][2]" , str(a[93][2])
     return np.array(self._c2p.Convert(self._process.getDataByPlane(plane)))
 
   def getWire(self, plane, wire):
@@ -328,7 +338,7 @@ class shower(recoBase):
   def __init__(self):
     super(shower, self).__init__()
     self._productName = 'shower'
-    self._process = evd.DrawCluster()
+    self._process = evd.DrawShower()
     self.init()
 
   def clearDrawnObjects(self,view_manager):
@@ -338,14 +348,42 @@ class shower(recoBase):
     pass
 
   def drawObjects(self,view_manager):
-    points = []
-    points.append(QtCore.QPoint(130,130))
-    points.append(QtCore.QPoint(30,560))
-    points.append(QtCore.QPoint(90,830))
-    needle = QtGui.QPolygonF(points)
-    poly = QtGui.QGraphicsPolygonItem(needle)
+    
     for view in view_manager.getViewPorts():
-      view._view.addItem(poly)
-      return
-    # self.painter.setBrush(QtGui.cyan)
-    pass
+    #   # get the showers from the process:
+      showers = self._process.getShowersByPlane(view.plane())
+      for shower in showers:
+        print "hi"
+        print shower.plane()
+        print shower.startPoint()
+        print shower.angleInPlane()
+        print shower.openingAngle()
+        print shower.length()
+
+        # construct a polygon for this shower:
+        points = []
+        # Remeber - everything is in cm, but the display is in wire/time!
+        geom = view_manager._geometry
+        x = shower.startPoint().X() / geom.wire2cm()
+        y = shower.startPoint().Y() / geom.time2cm()
+        points.append(QtCore.QPoint(x,y))
+        # next connect the two points at the end of the shower to make a cone
+        x1, y1 = shower.startPoint().X(), shower.startPoint().Y()
+        x2, y2 = shower.startPoint().X(), shower.startPoint().Y()
+        x1 = x1 + shower.length() * cos(shower.angleInPlane() - shower.openingAngle()/2)
+        y1 = y1 + shower.length() * sin(shower.angleInPlane() - shower.openingAngle()/2)
+        x2 = x2 + shower.length() * cos(shower.angleInPlane() + shower.openingAngle()/2)
+        y2 = y2 + shower.length() * sin(shower.angleInPlane() + shower.openingAngle()/2)
+
+        # Scale everything to wire/time:
+        x1 *= geom.wire2cm()
+        y1 *= geom.time2cm()
+        x2 *= geom.wire2cm()
+        y2 *= geom.time2cm()
+
+        points.append(QtCore.QPoint(x1,y1))
+        points.append(QtCore.QPoint(x2,y2))
+
+        thisPolyF = QtGui.QPolygonF(points)
+        thisPoly = QtGui.QGraphicsPolygonItem(thisPolyF)
+        view._view.addItem(thisPoly)

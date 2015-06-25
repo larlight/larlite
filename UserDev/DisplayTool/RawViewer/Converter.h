@@ -28,7 +28,7 @@ typedef _object PyObject;
 
 #include <vector>
 #include <string>
-
+#include "RecoViewer/Shower2d.h"
 /**
    \class Converter
    User defined class Converter ... these comments are used to generate
@@ -46,6 +46,8 @@ public:
   /// Default destructor
   virtual ~Converter(){}
 
+  // PyObject* Convert(const std::vector<::evd::Shower2d> & _array) const;
+
   PyObject* Convert(const std::vector<std::string>& str_array) const;
   PyObject* Convert(const std::vector<float>& flt_array) const;
   PyObject* Convert(const std::vector<std::vector<float>>& fltflt_array) const;
@@ -53,6 +55,8 @@ public:
   PyObject* Convert(const std::vector<std::vector<int>>& fltflt_array) const;
   PyObject* ConvertShort(const std::vector<unsigned short>& flt_array) const;
   PyObject* ConvertShort(const std::vector<std::vector<unsigned short>>& fltflt_array) const;
+
+
 
 };
 

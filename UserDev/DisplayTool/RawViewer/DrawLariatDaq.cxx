@@ -9,7 +9,6 @@
 namespace evd {
 
   DrawLariatDaq::DrawLariatDaq(int ticks){ 
-    wiredataIN = new std::vector<std::vector<std::vector<unsigned short> > > ;
     branches.resize(64);
     if (ticks == -1)
       _n_time_ticks = 3072;
@@ -20,12 +19,8 @@ namespace evd {
   }
 
   DrawLariatDaq::~DrawLariatDaq(){
-    // std::cout << "\n\n\nDestructing the drawer!\n\n\n";
-    delete wiredataIN;
     delete c;
-    // for (auto branch : branches){
-      // delete branch;
-    // }
+
   }
 
   void DrawLariatDaq::initialize() {
@@ -34,22 +29,6 @@ namespace evd {
     _run=0;
     _spill=0;
 
-
-    // Initialize data holder:
-    // Resize data holder to accomodate planes and wires:
-    if (wiredataIN -> size() != geoService -> Nviews())
-      wiredataIN->resize(geoService -> Nviews());
-     
-    // resize to the right number of planes
-    for (unsigned int p = 0; p < geoService -> Nviews(); p ++){
-      // resize to the right number of wires
-      if (wiredataIN->at(p).size() != geoService->Nwires(p) )
-        wiredataIN->at(p).resize(geoService->Nwires(p));
-        // Resize the wires to the right length
-        for (auto & vec : wiredataIN->at(p)){
-          vec.resize(_n_time_ticks);
-        }
-    }
 
     if (wiredata -> size() != geoService -> Nviews())
       wiredata->resize(geoService -> Nviews());
@@ -75,22 +54,56 @@ namespace evd {
     // Want to be sure that the TChain is ready to go...
     // Do that later.
 
+
     std::map<int,int> lar_channel_usage;
 
-    // Need to loop over the file 7 times to get all the cards
-    for (int i_card = 0; i_card < _n_cards; i_card ++){
-      // Set all the branch addresses for this card.
-      // For each channel, can use card + channel to map
-      // to larsoft channel.  Then, use larsoft channel
-      // to map to the wire location.
+    std::vector<std::vector<unsigned short> > * wiredataIN2;
+    wiredataIN2 = new std::vector<std::vector<unsigned short>>;
+    wiredataIN2->resize(_n_channels);
+    for (auto & wire : *wiredataIN2){
+      wire.resize(_n_time_ticks);
+    }
+
+    // Need to loop over the file 8 times to get all the cards
+    int _boards_found = 0;
+    // make a guess at where the first card will be:
+    unsigned int _n_entry = _current_event*(_n_cards+_card_offset);
+    while(_boards_found < 8){
+
+
+
+      // First, get the basic information about this entry:
       c -> SetBranchAddress("run",&_run);
       c -> SetBranchAddress("event_counter",&_event_no);
       c -> SetBranchAddress("spill",&_spill);
+      c -> SetBranchAddress("board_id",&_board_id);
 
+      c -> GetEntry(_n_entry);
+      // std::cout << "Board id: " << _board_id << std::endl;
+      // Make some checks:
+      // Just skip board 24, always
+      if (_board_id == 24){
+        _n_entry ++;
+        // std::cout << "Continuing\n";
+        continue;
+      }
+      if (_event_no != _current_event){
+        std::cout << "event " << _event_no << " in file, but on event " << _current_event << std::endl;
+        // then that's an issue, move on
+        _n_entry ++;
+        continue;
+      }
+
+      // std::cout << "Board id is " << _board_id << " (root event " 
+      //           << _n_entry 
+      //           << ", lariat event " << _event_no << ")"
+      //           << std::endl;
+
+      // Now, we know it's not board 24 and it's the right event
+      // Set up the channels to read into the storage area
       for(int channel = 0; channel < _n_channels; channel ++ ){
-
         int plane(0),wire(0);
-        int ch = i_card*_n_channels + channel;
+        int ch = _board_id*_n_channels + channel;
         if (ch < 240 ){
           plane = 0;
           wire = 239 - ch;
@@ -99,38 +112,63 @@ namespace evd {
           plane = 1;
           wire = 479-ch;
         }
+        if (ch > 480){
+          break;
+        }
+        lar_channel_usage[ch] ++;
+        // std::cout << "Mapped board, channel ("<< _board_id << ", " << channel << ") to " 
+        //           << "plane, wire (" << plane << ", " << wire << ")\n";
 
         // Now we know which part of the data to read this channel into;
         char name[20];
         sprintf(name,"channel_%i",channel);
         c -> SetBranchAddress(name,
-            &(wiredataIN->at(plane).at(wire)[0]),
-            &(branches.at(channel)) );
+            &(wiredataIN2->at(channel)[0]));
 
         if (lar_channel_usage[ch] > 1){
           std::cout << "Found a duplicate channel at " << ch << std::endl;
         }
       }
-      c -> GetEntry(_current_event*_n_cards + i_card);
-    }
 
-    // The wire data needs to be pedestal subtracted.
-    int i_plane = 0;
-    for (auto & plane : *wiredataIN){
-      float pedestal =0;
-      int i_wire = 0;
-      for (auto & wire : plane){
+      // Read in the data:
+      c -> GetEntry(_n_entry);
 
-        for (auto & tick : wire){
+      // Now, pedestal subtract and then copy the data into place
+      for(int channel = 0; channel < _n_channels; channel ++ ){
+        int plane(0),wire(0);
+        // Map the channel again
+        int ch = _board_id*_n_channels + channel;
+        if (ch < 240 ){
+          plane = 0;
+          wire = 239 - ch;
+        }
+        else if (ch < 480 && ch >= 240){
+          plane = 1;
+          wire = 479-ch;
+        }
+        if (ch > 480){
+          break;
+        }
+        auto & wireVec = wiredataIN2 -> at(channel);
+        float pedestal =0;
+        for (auto & tick : wireVec){
           pedestal += tick;
         }
         pedestal /= _n_time_ticks;
-        for (unsigned int tick = 0; tick < wire.size(); tick++){
-          wiredata->at(i_plane).at(i_wire).at(tick) = wire.at(tick) - pedestal;
+        for (unsigned int tick = 0; tick < wireVec.size(); tick++){
+          wiredata->at(plane).at(wire).at(tick) = wireVec.at(tick) - pedestal;
+          // And, delete the data that was just copied:
+          wireVec.at(tick) = 0;
         }
-        i_wire ++;
       }
-      i_plane ++;
+
+
+
+      if (_board_id == 24 )
+        std::cerr << "Got board_id 24, might be an issue ..." << std::endl;
+
+      _boards_found ++;
+      _n_entry ++;
     }
 
   }
@@ -198,7 +236,9 @@ namespace evd {
       _current_event = 0;
       c -> Reset();
       c -> Add(producer.c_str());
-      _n_events  = c -> GetEntries() / _n_cards;
+      // _n_events  = c -> GetEntries("board_id==0");
+      _n_events = 35;
+      std::cout << "_n_events is " << _n_events << std::endl;
       if (_n_events == 0){
         _run = 0;
         _event_no = 0;
