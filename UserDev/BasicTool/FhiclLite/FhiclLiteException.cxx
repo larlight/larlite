@@ -1,6 +1,0 @@
-#ifndef RECOTOOL_FHICLLITEEXCEPTION_CXX
-#define RECOTOOL_FHICLLITEEXCEPTION_CXX
-
-#include "FhiclLiteException.h"
-
-#endif

@@ -4,8 +4,10 @@ gSystem.Load("libLArLite_Analysis")
 from ROOT import larlite as fmwk
 fmwk.ana_processor
 gSystem.Load("libLArLiteApp_Pi0Ana")
-from ROOT import ertool
-from ROOT import geoalgo
+#from ROOT import ertool
+#from ROOT import geoalgo
+from seltool import ertool
+#ertool.Manager
 
 
 if len(sys.argv) < 2:
@@ -30,7 +32,8 @@ my_proc.enable_filter(True)
 
 my_algo = ertool.AlgoPi0()
 my_algo.setVerbose(False)
-my_algo.setMinShrEnergy(10)
+#my_algo.setMinShrEnergy(10)
+my_algo.setMinShrEnergy(0)
 my_algo.setMaxShrEnergy(1000)
 my_algo.setIPMax(10)
 my_algo.setMinFitMass(50)
@@ -53,14 +56,16 @@ my_ana = ertool.ERAna1PI0()
 pi0_topo = fmwk.singlepi0();
 # 0 == inclusive 1 == 1pi0&&nopi+/-
 pi0_topo.SetTopology(1);
+#pi0_topo.SetTopology(0);
 # 0 == ntsignal 1 == signal
 pi0_topo.SignalTopology(True);
 # 0 == CC 1 == NC 
 pi0_topo.SetCCNC(1);
 
 
-my_anaunit._mgr.SetAna(my_ana)
-my_anaunit._mgr.SetAlgo(my_algo)
+my_anaunit._mgr.AddAna(my_ana)
+my_anaunit._mgr.AddAlgo(my_algo)
+#my_anaunit._mgr.AddCfgFile("/home/ryan/TESTERMOD/UserDev/LArLiteApp/ERToolBackend/mac/new_empart.txt")
 my_anaunit._mgr._training_mode =False
 
 
@@ -87,9 +92,15 @@ my_anaunit._mgr._mc_for_ana = True
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 #my_anaunit.SetVtxProducer(True,"generator");
 #my_anaunit.SetShowerProducer(False,"showerrecofuzzy");
-my_anaunit.SetShowerProducer(False,"showerrecofuzzy");
-my_anaunit.SetTrackProducer(False,"");
-my_anaunit.SetVtxProducer(False,"");
+#my_anaunit.SetShowerProducer(False,"showerreco");
+
+my_anaunit.SetShowerProducer(True,"mcreco");
+my_anaunit.SetTrackProducer(True,"mcreco");
+#my_anaunit.SetVtxProducer(True,"generator");
+
+#my_anaunit.SetShowerProducer(False,"showerrecofuzzy");
+#my_anaunit.SetTrackProducer(False,"");
+#my_anaunit.SetVtxProducer(False,"");
 # ************************************************
 
 my_proc.add_process(pi0_topo)

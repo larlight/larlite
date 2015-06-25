@@ -11,13 +11,13 @@
 /** \addtogroup FhiclLite
 
     @{*/
-#ifndef BASICTOOL_FHICLLITEEXCEPTION_H
-#define BASICTOOL_FHICLLITEEXCEPTION_H
+#ifndef BASICTOOL_FHICLLITE_EXCEPTION_H
+#define BASICTOOL_FHICLLITE_EXCEPTION_H
 
 #include <iostream>
 #include <exception>
 
-namespace fcl {
+namespace fcllite {
   /**
      \class FhiclLiteException
      Generic (base) exception class

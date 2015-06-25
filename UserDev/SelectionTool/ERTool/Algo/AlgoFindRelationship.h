@@ -15,8 +15,12 @@
 #define ERTOOL_ALGOFINDRELATIONSHIP_H
 
 #include "TDatabasePDG.h"
-#include "ERTool/Base/AlgoBase.h"
 #include "GeoAlgo/GeoAlgo.h"
+#include "ERTool/Base/Shower.h"
+#include "ERTool/Base/Track.h"
+#include "ERTool/Base/ParticleGraph.h"
+#include "ERTool/Base/ERToolTypes.h"
+#include "ERTool/Base/UtilFunc.h"
 
 namespace ertool {
    /**
@@ -24,7 +28,7 @@ namespace ertool {
      User defined class ertool::AlgoFindRelationship ... these comments are used to generate
      doxygen documentation!
   */
-  class AlgoFindRelationship : public AlgoBase {
+  class AlgoFindRelationship {
     
   public:
     
@@ -34,7 +38,7 @@ namespace ertool {
     /// Default destructor
     virtual ~AlgoFindRelationship(){ _debug=false; };
     
-    virtual void Reset();
+    void Reset();
 
 
     double FindClosestApproach(const geoalgo::HalfLine_t& shr1,
@@ -44,33 +48,65 @@ namespace ertool {
     double FindClosestApproach(const geoalgo::HalfLine_t& shr,
 			       const geoalgo::Trajectory_t& trk,
 			       geoalgo::Point_t& vtx) const;
+
+    double FindClosestApproach(const geoalgo::Trajectory_t& trk,
+			       const geoalgo::HalfLine_t& shr,
+			       geoalgo::Point_t& vtx) const;
       
     double FindClosestApproach(const geoalgo::Trajectory_t& trk2,
 			       const geoalgo::Trajectory_t& trk1,
 			       geoalgo::Point_t& vtx) const;
+    
+    RelationType_t FindRelation(const geoalgo::HalfLine_t& s1,
+				const geoalgo::HalfLine_t& s2,
+				geoalgo::Point_t& vtx,
+				double& score) const;
+    
+    RelationType_t FindRelation(const geoalgo::HalfLine_t& s,
+				const geoalgo::Trajectory_t& t,
+				geoalgo::Point_t& vtx,
+				double& score) const;
+    
+    RelationType_t FindRelation(const geoalgo::Trajectory_t& t,
+				const geoalgo::HalfLine_t& s,
+				geoalgo::Point_t& vtx,
+				double& score) const;
+    
+    RelationType_t FindRelation(const geoalgo::Trajectory_t& t1,
+				const geoalgo::Trajectory_t& t2,
+				geoalgo::Point_t& vtx,
+				double& score) const;
       
     void setDebug(bool on) { _debug = on; }
 
     void setMinLength(double l) { _minLength = l; }
 
-    ParticleSet FindTrackHierarchy(const std::vector<const ertool::Track*> &tracks);
-
-    ParticleSet FindHierarchy(const std::vector<const ertool::Track*> &tracks,
-			      const std::vector<const ertool::Shower*> &showers);
+    void setMaxIP(double ip) { _maxIP = ip; }
 
     // Get PDG Code given track type
-    Particle GetPDG(const Track &trk);
+    double GetPDG(const Track &trk);
+
+    // Get Mass given PDG
+    double GetMass(const Track &trk);
+
+    /// Function that based on primaries in event
+    /// returns potential vertices.
+    /// Takes start point of each object
+    /// and groups together other start points
+    /// within _IP of the start point
+    /// Start points are this way grouped
+    /// into vertices
+    std::vector<::geoalgo::Point_t> GetVertices(const ParticleGraph& graph,
+						const int minObjectsAtVertex) const;
 
   private:
-
-    /// Compare shower with particles (and daughters of such particles)
-    //bool CompareShrWithPartBranch(const Shower& shr,
-    //				  const std::vector<const ertool::Track*>  &tracks,
-    //				  Particle& part);
 
     bool _debug;
 
     double _minLength; // track length after which to stop and calculate direction
+
+    double _maxIP; ///< Maximum Impact Parameter allowed for success
+
 
     geoalgo::GeoAlgo _geoAlgo;
 

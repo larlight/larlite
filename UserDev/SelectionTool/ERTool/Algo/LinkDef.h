@@ -13,13 +13,18 @@
 #pragma link C++ class ertool::AlgoEMPart+;
 #pragma link C++ class ertool::AlgoSingleE+;
 #pragma link C++ class ertool::AlgoMichelE+;
-#pragma link C++ class ertool::AlgoCCSignalE+;
 #pragma link C++ class ertool::AlgoFindRelationship+;
 #pragma link C++ class ertool::AlgoSingleGamma+;
 #pragma link C++ class ertool::AlgoPrimaryFinder+;
+#pragma link C++ class ertool::AlgoMakeGraph+;
+#pragma link C++ class ertool::ERAlgoToy+;
+#pragma link C++ class ertool::ERAlgoPrimaryPi0+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
+
+
 
 
 

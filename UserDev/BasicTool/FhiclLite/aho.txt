@@ -1,5 +1,0 @@
-a b c # d e f
- # ghi
-d:e d :e d: e d : e
-f{g f {g f{ g f { g
-h}i h }i h} i h } i

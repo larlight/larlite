@@ -18,6 +18,11 @@
 #include "ERTool/Base/AlgoBase.h"
 #include "ERTool/Base/PdfFactory.h"
 #include "ERTool/Base/RangeVar.h"
+#include "ERTool/Base/Track.h"
+#include "ERTool/Base/Shower.h"
+#include "ERTool/Base/Particle.h"
+#include "ERTool/Base/UtilFunc.h"
+#include "AlgoFindRelationship.h"
 #include "TDatabasePDG.h"
 #include <RooPlot.h>
 #include <RooProdPdf.h>
@@ -41,28 +46,31 @@ namespace ertool {
   public:
 
     /// Default constructor
-    AlgoEMPart();
+    AlgoEMPart(const std::string& name="EMPart");
 
     /// Default destructor
-    virtual ~AlgoEMPart(){}
+    ~AlgoEMPart(){}
 
     /// Called only once by the constructor in its lifespan
     void SetDefaultParams();
 
-    /// Override the sptool::SPTBase::LoadParams function
-    virtual void LoadParams(std::string fname="",size_t version=kINVALID_SIZE);
+    /// Resetter
+    void Reset(){}
+
+    /// Implement AcceptPSet
+    void AcceptPSet(const ::fcllite::PSet& cfg);
     
     /// Switch e- (false) / gamma (true) mode
     void SetMode(const bool gamma) { _mode = gamma; }
 
     /// What to do before event-loop begins
-    virtual void ProcessBegin();
+    void ProcessBegin();
 
     /// Function to evaluate input showers and determine a score
-    virtual ParticleSet Reconstruct(const EventData &data);
+    bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
     /// What to do once event-loop is over
-    virtual void ProcessEnd(TFile* fout);
+    void ProcessEnd(TFile* fout);
 
     /// Likelihood for a particle being gamma/electron
     double LL(bool is_electron, double dedx, double rad_length = -1.);
@@ -76,15 +84,25 @@ namespace ertool {
     /// Set verbosity mode
     void setVerbose(bool on) { _verbose = on; }
 
+    /// Set Plot mode (save output plots)
+    void setPlot(bool on) { _plot = on; }
+
+    /// Set whether to load parameters stored in config
+    void setLoadParams(bool on) { _loadParams = on; }
+
   protected:
 
     PdfFactory _factory; ///< P.D.F. factory class instance
+
+    AlgoFindRelationship _findRel;
 
     double _e_mass; ///< Electron's mass
     double _g_mass; ///< Gamma's mass
 
     bool _verbose; ///< verbosity mode for debug
+    bool _plot;    ///< True: save plots with PDF information
     bool _mode;    ///< e-/gamma mode (true: gamma, false: e-)
+    bool _loadParams; ///< whether to load params or not from config
     
     // Variables
     RangeVar _e_dedx_fit_range;   ///< electron dE/dx [MeV/cm] range for fit
