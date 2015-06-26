@@ -63,6 +63,7 @@ namespace ertool {
   { 
     _nEvents++ ;
 
+    std::cout<<"\n\n\nNEW EVENT: "<<std::endl; 
 
     if(graph.GetParticleNodes(RecoType_t::kShower).size() < 2)
 	return true; 
@@ -117,17 +118,19 @@ namespace ertool {
 		    _y_track = trk.Vertex()[1];  
 		    _z_track = trk.Vertex()[2];  
 
-        	    if( trk.PdgCode() == 13 || trk.PdgCode() == -13 )
+        	    if( abs( trk.PdgCode() ) == 13 )
 			{
-			if( _nNCIncPi0 > 0 )
+			if( _nNCIncPi0 > 0 ){
 			    _nNCIncPi0 = 0 ;
+			    _NC_ctr -= 1 ;
+			    }
         	       _nCCPi0++; 
 		       _CC_ctr ++ ;
 			if ( _verbose )
 			    std::cout<<"******************************This is a CC event "<<std::endl ;
 		       break;
 			}
-		    else if( trk.PdgCode() == 211 || trk.PdgCode() == -211 || trk.PdgCode() == 2212 ) 
+		    else if( abs( trk.PdgCode() ) == 211 || trk.PdgCode() == 2212 ) 
 			{
 			if(_nNCIncPi0 == 0 ){
 			    _nNCIncPi0++ ;
@@ -163,8 +166,8 @@ namespace ertool {
                << "NC Events           : " << _NC_ctr << std::endl
                << "Tot Events          : " << _nEvents << std::endl
                << "Single NC pi0 Events: " << _NC1pi0_ctr << std::endl
-               << "NC Eff              : " << double ( _CC_ctr )/ _nEvents *100 << " %" << std::endl
-               << "CC Eff              : " << double ( _NC_ctr )/ _nEvents *100 << " %" << std::endl
+               << "NC Eff              : " << double ( _NC_ctr )/ _nEvents *100 << " %" << std::endl
+               << "CC Eff              : " << double ( _CC_ctr )/ _nEvents *100 << " %" << std::endl
                << "Single NC Eff       : " << _eff << " %" << std::endl;
 
 
