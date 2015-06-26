@@ -46,7 +46,7 @@ def view(display, data, part):
     display_reco = ERViewer()
     display_reco.set_window_title("Reco Objects")
 
-    del display_mc
+   # del display_mc
 
     display_reco.clear()
 
