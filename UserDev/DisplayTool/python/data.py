@@ -47,6 +47,7 @@ class drawableItems(object):
     self._drawableClasses.update({'hit':hit})
     self._drawableClasses.update({'cluster':cluster})
     self._drawableClasses.update({'shower':shower})
+    self._drawableClasses.update({'track':track})
 
   def getListOfItems(self):
     return self._drawableClasses.keys()
@@ -417,3 +418,103 @@ class shower(recoBase):
 
         self._drawnObjects[view.plane()].append(thisPoly)
         i+= 1
+
+class polyLine(QtGui.QGraphicsPathItem):
+
+  def __init__(self, points, pen = None):
+    super(polyLine,self).__init__()
+    self._points = points
+    
+    # Initialize a path:
+    path = QtGui.QPainterPath()
+    if pen is None:
+      pen = QtGui.QPen(QtCore.Qt.black)
+    self.setPen(pen)
+
+    # Fill the path:
+    path.moveTo(points[0])
+    for i in xrange(len(points)-1):
+      path.lineTo(points[i+1])
+    self.setPath(path)
+
+
+        
+  def doDrawing(self, qp):
+
+    blackPen = QtGui.QPen(QtCore.Qt.black, 1, QtCore.Qt.DashLine)
+    redPen = QtGui.QPen(QtCore.Qt.red, 1, QtCore.Qt.DashLine)
+    bluePen = QtGui.QPen(QtCore.Qt.blue, 1, QtCore.Qt.DashLine)
+    greenPen = QtGui.QPen(QtCore.Qt.green, 1, QtCore.Qt.DashLine)
+    redBrush = QtGui.QBrush(QtCore.Qt.red)
+    
+    qp.setPen(redPen)
+    qp.setBrush(redBrush)
+
+    # Just draw a line from the first to last point:
+    for point in self._points:
+      qp.drawLine(oldPoint[0], oldPoint[1], point[0], point[1])
+      oldPoint = point
+
+
+
+  #     qp.drawEllipse(oldPoint[0] - 3, oldPoint[1] - 3, 6, 6)
+
+  #     qp.drawText(oldPoint[0] + 5, oldPoint[1] - 3, '1')
+  #     for i, point in enumerate(controlPoints[1:]):
+  #         i += 2
+  #         qp.setPen(blackPen)
+  #         qp.drawLine(oldPoint[0], oldPoint[1], point[0], point[1])
+          
+  #         qp.setPen(redPen)
+  #         qp.drawEllipse(point[0] - 3, point[1] - 3, 6, 6)
+
+  #         qp.drawText(point[0] + 5, point[1] - 3, '%d' % i)
+  #         oldPoint = point
+          
+  #     qp.setPen(bluePen)
+  #     for point in bezier_curve_range(steps, controlPoints):
+  #         qp.drawLine(oldPoint[0], oldPoint[1], point[0], point[1])
+  #         oldPoint = point
+
+
+
+class track(recoBase):
+
+  def __init__(self):
+    super(track, self).__init__()
+    self._productName = 'track'
+    self._process = evd.DrawTrack()
+    self.init()
+
+
+
+  def drawObjects(self,view_manager):
+    
+    for view in view_manager.getViewPorts():
+    #   # get the showers from the process:
+      self._drawnObjects.append([])
+      tracks = self._process.getTracksByPlane(view.plane())
+      for track in tracks:
+
+        # construct a polygon for this track:
+        points = []
+        # Remeber - everything is in cm, but the display is in wire/time!
+        for pair in track:
+          x = pair.first
+          y = pair.second
+          points.append(QtCore.QPointF(x,y))
+
+        # self._drawnObjects[view.plane()].append(thisPoly)
+
+        thisPoly = polyLine(points)
+        # polyLine.draw(view._view)
+
+        view._view.addItem(thisPoly)
+
+
+        self._drawnObjects[view.plane()].append(thisPoly)
+
+  # def clearDrawnObjects(self,view_manager):
+  #   for plane in self._listOfClusters:
+  #     for cluster in plane:
+  #       cluster.clearHits(view_manager)
