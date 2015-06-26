@@ -365,23 +365,24 @@ class shower(recoBase):
 
   def drawObjects(self,view_manager):
     
+    # Showers can get messed up so only draw "good" showers
+    # This means that if either projection is bad, don't draw that shower
+    print ""
+
     for view in view_manager.getViewPorts():
-    #   # get the showers from the process:
+      # get the showers from the process:
       self._drawnObjects.append([])
+
       showers = self._process.getShowersByPlane(view.plane())
-      i = 0
+
+      i_color = 0
+
       for shower in showers:
-        # print "hi"
-        # print shower.plane()
-        # print shower.startPoint()
-        # print shower.angleInPlane()
-        # print shower.openingAngle()
-        # print shower.length()
 
-        if i > len(self._showerColors):
-          i = 0
+        if i_color > len(self._showerColors):
+          i_color = 0
 
-        color = self._showerColors[i]
+        color = self._showerColors[i_color]
 
         # construct a polygon for this shower:
         points = []
@@ -414,10 +415,14 @@ class shower(recoBase):
         thisPoly.setBrush(pg.mkColor(color))
 
         view._view.addItem(thisPoly)
-
-
         self._drawnObjects[view.plane()].append(thisPoly)
-        i+= 1
+
+        if view.plane() == 0:
+          print "dedx: ", shower.dedx()
+
+
+        i_color += 1
+
 
 class polyLine(QtGui.QGraphicsPathItem):
 
@@ -436,45 +441,6 @@ class polyLine(QtGui.QGraphicsPathItem):
     for i in xrange(len(points)-1):
       path.lineTo(points[i+1])
     self.setPath(path)
-
-
-        
-  def doDrawing(self, qp):
-
-    blackPen = QtGui.QPen(QtCore.Qt.black, 1, QtCore.Qt.DashLine)
-    redPen = QtGui.QPen(QtCore.Qt.red, 1, QtCore.Qt.DashLine)
-    bluePen = QtGui.QPen(QtCore.Qt.blue, 1, QtCore.Qt.DashLine)
-    greenPen = QtGui.QPen(QtCore.Qt.green, 1, QtCore.Qt.DashLine)
-    redBrush = QtGui.QBrush(QtCore.Qt.red)
-    
-    qp.setPen(redPen)
-    qp.setBrush(redBrush)
-
-    # Just draw a line from the first to last point:
-    for point in self._points:
-      qp.drawLine(oldPoint[0], oldPoint[1], point[0], point[1])
-      oldPoint = point
-
-
-
-  #     qp.drawEllipse(oldPoint[0] - 3, oldPoint[1] - 3, 6, 6)
-
-  #     qp.drawText(oldPoint[0] + 5, oldPoint[1] - 3, '1')
-  #     for i, point in enumerate(controlPoints[1:]):
-  #         i += 2
-  #         qp.setPen(blackPen)
-  #         qp.drawLine(oldPoint[0], oldPoint[1], point[0], point[1])
-          
-  #         qp.setPen(redPen)
-  #         qp.drawEllipse(point[0] - 3, point[1] - 3, 6, 6)
-
-  #         qp.drawText(point[0] + 5, point[1] - 3, '%d' % i)
-  #         oldPoint = point
-          
-  #     qp.setPen(bluePen)
-  #     for point in bezier_curve_range(steps, controlPoints):
-  #         qp.drawLine(oldPoint[0], oldPoint[1], point[0], point[1])
-  #         oldPoint = point
 
 
 
@@ -513,8 +479,3 @@ class track(recoBase):
 
 
         self._drawnObjects[view.plane()].append(thisPoly)
-
-  # def clearDrawnObjects(self,view_manager):
-  #   for plane in self._listOfClusters:
-  #     for cluster in plane:
-  #       cluster.clearHits(view_manager)

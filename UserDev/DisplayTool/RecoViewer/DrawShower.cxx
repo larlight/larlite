@@ -136,6 +136,7 @@ namespace evd {
 
 
     Shower2d result;
+    result._is_good = false;
     result._plane = plane;
     // Fill out the parameters of the 2d shower
     float _wire = 0;
@@ -196,6 +197,10 @@ namespace evd {
       _second_time += detProp -> TimeOffsetV() * geoUtils -> TimeToCm();
     }
     result._length = sqrt(pow(_wire - _second_wire, 2) + pow(_time - _second_time, 2));
+
+    result._dedx = shower.dEdx().back();
+
+    result._is_good = true;
     return result;
   }
 
