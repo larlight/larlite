@@ -155,8 +155,8 @@ namespace ertool {
     //if( (_dedx_A < 0.5) || (_dedx_B < 0.5) ) return;
 
     // Find the common origin, along with
- //   if (  (shower_a.Dir().Length() != 1) || (shower_b.Dir().Length() != 1) )
-   //   return;
+//    if (  (shower_a.Dir().Length() != 1) || (shower_b.Dir().Length() != 1) )
+//      return;
     _dot = _geoAlgo.commonOrigin(shower_a, shower_b, vtx, true);
 
     if (_verbose) {

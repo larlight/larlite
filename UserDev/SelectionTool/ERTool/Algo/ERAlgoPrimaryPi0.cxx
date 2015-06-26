@@ -19,6 +19,7 @@ namespace ertool {
 
   bool ERAlgoPrimaryPi0::Reconstruct(const EventData &data, ParticleGraph& graph)
   {
+   // std::cout<<"\n\nNEW EVENT"<<std::endl ;
 
     if(graph.GetParticleNodes(RecoType_t::kShower).size() < 2) return true;	
 
@@ -29,7 +30,7 @@ namespace ertool {
 
     auto datacpy = data ;
     auto const& primaryTrks = graph.GetPrimaryNodes(RecoType_t::kTrack);
-    int nPrimTracks = primaryTrks.size() ;
+//    int nPrimTracks = primaryTrks.size() ;
 
 
     //First, look only at events with pi0s
@@ -99,7 +100,11 @@ namespace ertool {
     	            trkParticle.SetParticleInfo( trkParticle.PdgCode(), trkParticle.Mass(),
 					         trkParticle.Vertex() , trkParticle.Momentum());
     	            graph.SetSiblings(pi0.ID(),primID);
-		    graph.SetPrimary(pi0.ID()) ;
+		   // graph.SetPrimary(pi0.ID()) ;
+		    if(abs( graph.GetParticle(primID).PdgCode()) == 13 ){
+//			std::cout<<"Muon sib"<<std::endl;
+			break ;
+			}
 		   }
 
 		//case 2)
@@ -126,6 +131,8 @@ namespace ertool {
 	//	if(nPrimTracks == 0) 
 	//	    graph.SetPrimary(pi0.ID());
 
+
+
 	    	}//Loop over primary tracks
 
 		if ( _verbose )	
@@ -148,6 +155,7 @@ namespace ertool {
 	//	    }
 	//	}
 		    
+		break ;
 	    }//if pi0
 	}//Loop over particle array
 
