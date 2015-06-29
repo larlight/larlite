@@ -53,7 +53,9 @@ namespace ertool {
     {
       Shower s( geoalgo::Vector(x,y,z),
 		geoalgo::Vector(px,py,pz),
-		10, 2);
+		30, 15);
+      s._energy = 100;
+      s._dedx = 2;
       return s;
     }
 

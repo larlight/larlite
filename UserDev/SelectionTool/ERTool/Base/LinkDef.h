@@ -43,9 +43,9 @@
 
 #pragma link C++ function ertool::Combination(const size_t,const size_t)+;
 
-#pragma link C++ class ertool::io::FileIO+;
-//#pragma link C++ class ertool::IStreamBase+;
-//#pragma link C++ class ertool::OStreamBase+;
+#pragma link C++ class ertool::io::IOHandler+;
+#pragma link C++ class ertool::io::EmptyInput+;
+#pragma link C++ class ertool::io::EmptyOutput+;
 #pragma link C++ class ertool::io::ROOTInput+;
 #pragma link C++ class ertool::io::ROOTOutput+;
 //ADD_NEW_CLASS ... do not change this line

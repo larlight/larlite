@@ -100,11 +100,16 @@ namespace ertool {
 
     /// Function to reset things
     void Reset();
-
+    
     /// Function to add input data product: Shower
-    NodeID_t Add(const ertool::Shower& obj, const ertool::RecoInputID_t& input_id, const bool mc=false);
+    NodeID_t Add(const ertool::Shower& obj,
+		 const ertool::RecoInputID_t& input_id,
+		 const bool mc=false);
+
     /// Function to add input data product: Track
-    NodeID_t Add(const ertool::Track&  obj, const ertool::RecoInputID_t& input_id, const bool mc=false);
+    NodeID_t Add(const ertool::Track&  obj,
+		 const ertool::RecoInputID_t& input_id,
+		 const bool mc=false);
 #ifndef __CINT__
     /// Function to add input data product: Shower
     NodeID_t Emplace(const ertool::Shower&& obj, const ertool::RecoInputID_t&& input_id, const bool mc=false);
@@ -112,8 +117,7 @@ namespace ertool {
     NodeID_t Emplace(const ertool::Track&&  obj, const ertool::RecoInputID_t&& input_id, const bool mc=false);
 #endif
 
-
-    /// Function to clear data
+    /// Clear event-wise data contents
     void ClearData();
 
     const ertool::EventData&   EventData     () const;
@@ -147,10 +151,10 @@ namespace ertool {
     
   protected:
 
-    ertool::EventData _data;
-    ertool::EventData _mc_data;
-    ertool::ParticleGraph _graph;
-    ertool::ParticleGraph _mc_graph;
+    ertool::EventData *_data;
+    ertool::EventData *_mc_data;
+    ertool::ParticleGraph *_graph;
+    ertool::ParticleGraph *_mc_graph;
 
     ManagerStatus_t _status;
 

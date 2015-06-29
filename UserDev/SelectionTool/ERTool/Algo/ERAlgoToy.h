@@ -12,11 +12,11 @@
 
     @{*/
 
-#ifndef ERTOOL_ERALGOTOY_H
-#define ERTOOL_ERALGOTOY_H
+#ifndef SELECTIONTOOL_ERTOOL_ERALGOTOY_H
+#define SELECTIONTOOL_ERTOOL_ERALGOTOY_H
 
 #include "ERTool/Base/AlgoBase.h"
-
+#include <TH1D.h>
 namespace ertool {
 
   /**
@@ -47,6 +47,17 @@ namespace ertool {
 
     /// Called after processing the last event sample
     void ProcessEnd(TFile* fout=nullptr);
+
+  private:
+
+    /// Minimum radius to claim a vtx point
+    double _vtx_min_radius;
+
+    /// Verbosity flag: make it noisy
+    bool _verbose;
+
+    /// Radius histogram
+    TH1D* _hRadius;
 
   };
 }

@@ -134,6 +134,9 @@ namespace ertool {
     TH1D* _hradLen_e;
     TH1D* _hradLen_g;
 
+    TH1D* _hdEdx_e;
+    TH1D* _hdEdx_g;
+
   };
 }
 #endif

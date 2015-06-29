@@ -60,7 +60,10 @@ namespace ertool {
   { return _generation != kDefaultGeneration; }
   
   bool Particle::Primary() const
-  { return (_node_id == _ancestor_id && RelationAssessed() ); }
+  { return _primary; }
+
+  bool Particle::Descendant() const
+  { return (!(_node_id == _ancestor_id && RelationAssessed())); }
   
   bool Particle::Lonely() const
   { return (_child_v.size()<1); }
