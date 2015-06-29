@@ -79,7 +79,10 @@ namespace ertool {
 	  //Making sure the track is at least 10cm long
 	  if(shower.Start().Dist(track.back()) < 3. && track.Length() > 10.){
 	    n_michel_e++;
-	    
+
+	    // edit the particle's information
+	    graph.GetParticle(p).SetParticleInfo(11,0.511,track.back(),shower.Dir()*shower._energy);
+
 	    if(michel_energy)
 	      michel_energy->Fill(shower._energy);
 	    break;
