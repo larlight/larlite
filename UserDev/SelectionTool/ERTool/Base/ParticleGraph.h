@@ -19,9 +19,16 @@
 #include <deque>
 namespace ertool {
   class Manager;
-  
+  namespace io {
+    class IOHandler;
+  }
+}
+
+namespace ertool {
+
   class ParticleGraph {
     friend class Manager;
+    friend class io::IOHandler;
   public:
     
     ParticleGraph() {}

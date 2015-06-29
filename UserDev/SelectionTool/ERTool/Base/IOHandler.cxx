@@ -1,16 +1,16 @@
-#ifndef SELECTIONTOOL_ERTOOL_FILEIO_CXX
-#define SELECTIONTOOL_ERTOOL_FILEIO_CXX
+#ifndef SELECTIONTOOL_ERTOOL_IOHANDLER_CXX
+#define SELECTIONTOOL_ERTOOL_IOHANDLER_CXX
 
-#include "FileIO.h"
+#include "IOHandler.h"
 #include "ROOTInput.h"
 #include "ROOTOutput.h"
 
 namespace ertool {
   namespace io {
     
-    FileIO::FileIO( const std::string& proc_name,
-		    const StreamType_t in_strm,
-		    const StreamType_t out_strm)
+    IOHandler::IOHandler( const std::string& proc_name,
+			  const StreamType_t in_strm,
+			  const StreamType_t out_strm)
       : _state     ( kINIT          )
       , _prov      ( nullptr        )
       , _io_mode   ( io::kUNDEFINED )
@@ -59,24 +59,24 @@ namespace ertool {
 	_out_strm->Prepare(_edata,_pgraph,false);
     }
 
-    EventData& FileIO::GetEventDataWriteable(bool mc)
+    EventData& IOHandler::GetEventDataWriteable(bool mc)
     {
       if(mc) return *_edata_mc;
       return *_edata;
     }
     
-    ParticleGraph& FileIO::GetParticleGraphWriteable(bool mc)
+    ParticleGraph& IOHandler::GetParticleGraphWriteable(bool mc)
     {
       if(mc) return *_pgraph_mc;
       return *_pgraph;
     }
     
-    Provenance& FileIO::GetProvenanceWriteable()
+    Provenance& IOHandler::GetProvenanceWriteable()
     {
       return *_prov;
     }
 
-    const EventData& FileIO::GetEventData(bool mc) const
+    const EventData& IOHandler::GetEventData(bool mc) const
     {
       if(_state != kOPEN)
 	throw ertool::ERException("File not yet opened...");
@@ -85,7 +85,7 @@ namespace ertool {
       return *_edata;
     }
     
-    const ParticleGraph& FileIO::GetParticleGraph(bool mc) const
+    const ParticleGraph& IOHandler::GetParticleGraph(bool mc) const
     {
       if(_state != kOPEN)
 	throw ertool::ERException("File not yet opened...");
@@ -94,7 +94,7 @@ namespace ertool {
       return *_pgraph;
     }
     
-    const Provenance& FileIO::GetProvenance() const
+    const Provenance& IOHandler::GetProvenance() const
     {
       if(_state != kOPEN)
 	throw ertool::ERException("File not yet opened...");
@@ -102,7 +102,7 @@ namespace ertool {
       return *_prov;
     }
 
-    void FileIO::AddInputFile(const std::string& fname)
+    void IOHandler::AddInputFile(const std::string& fname)
     {
       if(_state == kOPEN)
 	throw ::ertool::ERException("Cannot add input file after OPEN-ed!");
@@ -139,7 +139,7 @@ namespace ertool {
       _in_file_name_v.push_back(fname);
     }
     
-    void FileIO::SetOutputFile(const std::string& fname)
+    void IOHandler::SetOutputFile(const std::string& fname)
     {
       if(_state == kOPEN)
 	throw ::ertool::ERException("Cannot set output file after OPEN-ed!");
@@ -165,7 +165,7 @@ namespace ertool {
       
     }
 
-    bool FileIO::Open()
+    bool IOHandler::Open()
     {
       if(_state != kINIT)
 	throw ::ertool::ERException("Cannot OPEN if aleady OPEN-ed!");
@@ -206,7 +206,7 @@ namespace ertool {
       return status;
     }
   
-    bool FileIO::ReadEntry(size_t entry)
+    bool IOHandler::ReadEntry(size_t entry)
     {
       if( _state != kOPEN )
 	throw ::ertool::ERException("Cannot read entry before OPEN a file");
@@ -228,7 +228,7 @@ namespace ertool {
       return status;
     }
     
-    bool FileIO::WriteEntry()
+    bool IOHandler::WriteEntry()
     {
       if( _state != kOPEN )
 	throw ::ertool::ERException("Cannot write entry before OPEN a file");
@@ -250,7 +250,7 @@ namespace ertool {
       return status;
     }
     
-    bool FileIO::Close()
+    bool IOHandler::Close()
     {
       if( _state != kOPEN )
 	throw ::ertool::ERException("Cannot close before OPEN a file");
@@ -261,6 +261,14 @@ namespace ertool {
       _state = kINIT;
       return status;
     }
+
+    void IOHandler::ClearData() {
+      _edata->Reset();
+      _edata_mc->Reset();
+      _pgraph->Reset();
+      _pgraph_mc->Reset();
+    }
+
   }
 }
 

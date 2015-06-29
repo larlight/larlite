@@ -20,8 +20,13 @@
 //#include "BookKeeper.h"
 namespace ertool {
   class Particle;
-  
   class Manager;
+  namespace io {
+    class IOHandler;
+  }
+}
+
+namespace ertool {
   /**
      \class EventData
      @brief Data holder class to contain full information, to be used by AlgoX and FilterX
@@ -31,6 +36,7 @@ namespace ertool {
   */
   class EventData {
     friend class Manager;
+    friend class io::IOHandler;
   public:
     
     /// Default constructor
