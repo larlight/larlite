@@ -1088,12 +1088,18 @@ namespace larutil{
   
 
   void GeometryUtilities::SelectPolygonHitList(const std::vector<larutil::PxHit>   &hitlist,
-					       std::vector <const larutil::PxHit*> &hitlistlocal)
+					       std::vector <const larutil::PxHit*> &hitlistlocal,
+					       double frac)
   {
     if(!(hitlist.size())) {
       throw LArUtilException("Provided empty hit list!");
       return;
     }
+
+    // if the fraction is > 1 then use 1...should not be larger
+    // frac is the fraction of charge in the hit list
+    // than needs to be included in the Polygon
+    if (frac > 1) { frac = 1; }
 
     hitlistlocal.clear();
     unsigned char plane = (*hitlist.begin()).plane;
@@ -1111,7 +1117,7 @@ namespace larutil{
     std::vector<const larutil::PxHit*> ordered_hits;
     ordered_hits.reserve(hitlist.size());
     for(auto hiter = hitmap.rbegin();
-	qintegral < qtotal*0.95 && hiter != hitmap.rend();
+	qintegral <= qtotal*frac && hiter != hitmap.rend();
 	++hiter) {
 
       qintegral += (*hiter).first;

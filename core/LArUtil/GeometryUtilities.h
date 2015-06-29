@@ -189,7 +189,8 @@ namespace larutil{
 			    larutil::PxHit &averageHit);
 
     void SelectPolygonHitList(const std::vector<larutil::PxHit> &hitlist,
-			      std::vector <const larutil::PxHit*> &hitlistlocal);
+			      std::vector <const larutil::PxHit*> &hitlistlocal,
+			      double frac=0.95);
 
     std::vector<size_t> PolyOverlap( std::vector<const larutil::PxHit*> ordered_hits,
 				  std::vector<size_t> candidate_polygon);
