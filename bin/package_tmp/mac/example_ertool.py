@@ -26,9 +26,6 @@ my_proc.set_ana_output_file("ertool_hist.root")
 # Create ERTool algorithm (empty base class for this example)
 my_algo = ertool.AlgoBase()
 
-# Create ERTool filter (empty base class for this example)
-my_filter = ertool.FilterBase()
-
 # Create ERTool analysis (empty base class for this example)
 my_ana = ertool.AnaBase()
 
@@ -43,9 +40,8 @@ my_anaunit.SetTrackProducer(True,"mcreco");
 my_anaunit.SetVtxProducer(True,"generator");
 
 # Implement manager
-my_anaunit._mgr.SetAlgo(my_algo)
-my_anaunit._mgr.SetFilter(my_filter)
-my_anaunit._mgr.SetAna(my_ana)
+my_anaunit._mgr.AddAlgo(my_algo)
+my_anaunit._mgr.AddAna(my_ana)
 my_ana._mode =True # True = Select. False = Fill mode
 my_proc.add_process(my_anaunit)
 
