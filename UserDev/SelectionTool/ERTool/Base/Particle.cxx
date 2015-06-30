@@ -21,7 +21,9 @@ namespace ertool {
     , _child_v()
     , _reco_type(reco_type)
     , _reco_id(reco_id)
-  {}
+  {
+    _primary = 0 ;
+  }
 
   const NodeID_t&     Particle::ID         () const { return _node_id;     }
   const NodeID_t&     Particle::Parent     () const { return _parent_id;   }
