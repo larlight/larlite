@@ -36,9 +36,6 @@ namespace ertool {
     // Stages are separated due to the different conditions required
     // to determine if a shower/track is primary
 
-    // make a copy of EventData -> to fix!!!
-    auto datacpy = data;
-
     // get node combinations
     //combos = graph.GetNodeCombinations(2,
     
@@ -52,7 +49,7 @@ namespace ertool {
       bool primary = true;
 
       auto const& thisID = graph.GetParticle(s).RecoID();
-      auto const& thisShower = datacpy.Shower(thisID);
+      auto const& thisShower = data.Shower(thisID);
       
       // Ok, we have a shower.
       // make sure it does not:
@@ -69,7 +66,7 @@ namespace ertool {
 	if (thatID == thisID) continue;
 
 	if (_verbose) { std::cout << "Comparing with shower (" << thisID << ")" << std::endl; }
-	auto const& thatShower = datacpy.Shower(thatID);
+	auto const& thatShower = data.Shower(thatID);
 
 	if (From(thisShower,thatShower)){
 	  if (_verbose) { std::cout << "shower not primary" << std::endl; }
@@ -87,7 +84,7 @@ namespace ertool {
       for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
 
 	auto const& thatID = graph.GetParticle(t).RecoID();
-	auto const& thatTrack = datacpy.Track(thatID);
+	auto const& thatTrack = data.Track(thatID);
 
 	if (thatTrack.size() < 2)
 	  continue;
@@ -125,7 +122,7 @@ namespace ertool {
       bool primary = true;
 
       auto const& thisID = graph.GetParticle(t).RecoID();
-      auto const& thisTrack = datacpy.Track(thisID);    
+      auto const& thisTrack = data.Track(thisID);    
 
       if (thisTrack.size() < 2)
 	continue;
@@ -136,7 +133,7 @@ namespace ertool {
       for (auto const& p2 : graph.GetParticleNodes(RecoType_t::kShower)){
 
 	auto const& thatID = graph.GetParticle(p2).RecoID();
-	auto const& thatShower = datacpy.Shower(thatID);
+	auto const& thatShower = data.Shower(thatID);
 	if (_verbose) { std::cout << "Comparing with shower (" << thatID << ")" << std::endl; }
 
 	if (From(thisTrack,thatShower)){
@@ -155,7 +152,7 @@ namespace ertool {
       for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
 
 	auto const& thatID = graph.GetParticle(t).RecoID();
-	auto const& thatTrack = datacpy.Track(thatID);
+	auto const& thatTrack = data.Track(thatID);
 	if (thatTrack.size() < 2)
 	  continue;
 	if (thatID == thisID)

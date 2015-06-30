@@ -33,8 +33,8 @@ Track ToyDataMaker::MakeTrack(double x, double y, double z, double px,
 				<< current_energy << std::endl;
 	}
 
-	// loop until we are out of kinetic energy, add each position value to the trajectory
-	while (current_energy > mass) {
+	// loop until we are out of energy, add each position value to the trajectory
+	while (current_energy > 0.0) {
 		t.push_back(t.back() + dx);
 
 		current_energy = current_energy - (_track_step_dedx * dx.Length());

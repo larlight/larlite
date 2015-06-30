@@ -34,8 +34,6 @@ namespace ertool {
     if (_debug)
       std::cout << "******  Begin ERAnaMichelE Analysis  ******" << std::endl;
 
-    auto datacpy = data;
-
     // Get MC particle set
     auto const& mc_graph = MCParticleGraph();
     auto const& mc_evtdata = MCEventData();
@@ -55,7 +53,7 @@ namespace ertool {
 	if ( abs(graph.GetParticle(recoPart.Parent()).PdgCode()) != 13 )
 	  continue;
 	// get shower associated with the reconstructed michel particle
-	auto const& shower = datacpy.Shower(recoPart.RecoID());
+	auto const& shower = data.Shower(recoPart.RecoID());
 	
 	_dedx   = shower._dedx;
 	_pdg    = recoPart.PdgCode();
