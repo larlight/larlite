@@ -65,6 +65,10 @@ namespace ertool {
     
     TTree * _pi0_tree ;
 
+    int _nPi0 	 ;
+    int _nMeson	 ;
+    int _nProton ;
+
     //Examine 3 cases: 
     //0) CC pi0s (pi0 + muon)
     //1) NC pi0 inclusive (pi0 + pi+/-)

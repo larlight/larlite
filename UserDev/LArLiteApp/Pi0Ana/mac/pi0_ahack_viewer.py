@@ -46,10 +46,19 @@ my_algo2.setVtxToShrStartDist(1)
 my_algo2.setMaxIP(5)
 
 my_algo3 = ertool.ERAlgoPrimaryPi0()
-my_algo3.SetMinDistVtx(6)
-my_algo3.SetMinDistEnd(6)
-my_algo3.SetVerbose(False)
+my_algo3.SetMinDistVtx(8.9)
+my_algo3.SetMinDistEnd(8.9)
+my_algo3.SetVerbose(True)
 
+# First lets make a filter that looks for a certain events
+pi0_topo = fmwk.singlepi0();
+# 0 == inclusive 1 == 1pi0&&nopi+/-
+pi0_topo.SetTopology(0);
+# 0 == ntsignal 1 == signal
+pi0_topo.SignalTopology(True);
+# 0 == CC 1 == NC 
+pi0_topo.SetCCNC(1);
+my_proc.add_process(pi0_topo)
 
 
 # Create ERTool filter
@@ -81,6 +90,7 @@ my_proc.set_ana_output_file("pi0_selection.root")
 Ecut = 20 # in MeV
 
 my_ana = ertool.ERAnaPi0All() #ERAnaSingleE()
+my_ana.SetVerbose(True)
 #my_ana.SetECut(Ecut)
 
 my_anaunit = fmwk.ExampleERSelection()
@@ -105,6 +115,8 @@ my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 # ************************************************
 
+
+#my_proc.add_process(pi0_topo)
 #my_proc.add_process(MCfilter)
 my_proc.add_process(my_anaunit)
 

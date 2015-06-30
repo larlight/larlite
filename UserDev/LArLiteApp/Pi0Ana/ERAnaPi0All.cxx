@@ -61,13 +61,19 @@ namespace ertool {
 
   bool ERAnaPi0All::Analyze(const EventData &data, const ParticleGraph &graph)
   { 
-    _nEvents++ ;
 
+    _nEvents++; 
 
     if(graph.GetParticleNodes(RecoType_t::kShower).size() < 2)
 	return true; 
 
     //Fill a bunch of variables
+
+    //How many pi0s per event? 
+   // for (auto const & p : particles){
+
+	
+
 
   //auto primNodes = graph.GetPrimaryNodes(RecoType_t::kTrack) ;
     auto particles = graph.GetParticleArray() ;
@@ -76,6 +82,7 @@ namespace ertool {
 	Reset() ; 
 
         if( p.PdgCode() == 111 ){
+	  //  _nEvents++ ;
 	    if ( _verbose )
 		std::cout<<"In Ana: found a pi0: "<<std::endl;
 	    }
@@ -88,20 +95,29 @@ namespace ertool {
 	    _y_pi0 = pi0.Vertex()[1];
 	    _z_pi0 = pi0.Vertex()[2];
 
-//	    if ( graph.GetSiblingNodes(p.ID()).size() == 0  ){
-	    if ( graph.GetParticle(p.ID()).Primary() ){
-		if ( _verbose )
-		    std::cout<<"Graph particles : "<<graph.Diagram()<<std::endl ;
-		_nNC1Pi0++;
-		_nNCIncPi0++;
+	    //if ( graph.GetSiblingNodes(p.ID()).size() == 0  ){
 
-		_NC_ctr++;
+	    if ( pi0.Primary() ) { 
+
+		_nNC1Pi0++;
 		_NC1pi0_ctr++;
+
+		_nNCIncPi0++;
+		_NC_ctr++;
+
+		if ( _verbose ){
+		    std::cout<<"Graph particles : "<<graph.Diagram()<<std::endl ;
+		    std::cout<<_NC1pi0_ctr<<"****************SINGLE NC pi0~!!!!!! ********************"<<std::endl;
+		    }
+
+	//	std::cout<<"EVENT: "<<_nEvents<<std::endl ;
+		continue ;
+
 		}
 	    
 	    _vtx_dist = 10000 ;
 
-	    for( auto const & sib : graph.GetSiblingNodes(p.ID())){ 
+	    for( auto const & sib : graph.GetSiblingNodes(pi0.ID())){ 
 
 		auto trk = graph.GetParticle(sib) ;
 
@@ -110,34 +126,61 @@ namespace ertool {
                                  + pow(pi0.Vertex()[2] - trk.Vertex()[2],2) ,0.5) ;
 
 		
-		if ( _vtx_dist > minVtx ){
+//		if ( _vtx_dist > minVtx ){
+
+		    if ( _verbose ) 
+			std::cout<<"sib PDG and vertex dist : "<<trk.PdgCode()<<" , "<<minVtx<<std::endl ;
 
 		    _vtx_dist = minVtx ;
 		    _x_track = trk.Vertex()[0];  
 		    _y_track = trk.Vertex()[1];  
 		    _z_track = trk.Vertex()[2];  
 
-        	    if( trk.PdgCode() == 13 || trk.PdgCode() == -13 )
+        	    if( abs( trk.PdgCode() ) == 13 )
 			{
-			if( _nNCIncPi0 > 0 )
+			if( _nNCIncPi0 > 0 ){
 			    _nNCIncPi0 = 0 ;
+			    _NC_ctr-- ;
+			    }
+			if( _nNC1Pi0 > 0 ){
+			    _nNC1Pi0 = 0 ;
+			    _NC1pi0_ctr-- ;
+			    }
         	       _nCCPi0++; 
 		       _CC_ctr ++ ;
 			if ( _verbose )
-			    std::cout<<"******************************This is a CC event "<<std::endl ;
+			    std::cout<<_nEvents<<"******************************This is a CC event "<<std::endl ;
 		       break;
 			}
-		    else if( trk.PdgCode() == 211 || trk.PdgCode() == -211 || trk.PdgCode() == 2212 ) 
+		    else if( abs( trk.PdgCode() ) == 2212 ){
+			if (_nNC1Pi0 == 0 && _nNCIncPi0 == 0){
+			    _nNC1Pi0  = 1;
+			    _NC1pi0_ctr++;
+			    if (_verbose)
+				std::cout<<_NC1pi0_ctr<<"****************SINGLE NC pi0~!!!!!! ********************"<<std::endl;
+
+			    _nNCIncPi0++ ;
+			    _NC_ctr++ ;
+			    }
+			}
+		    
+		    else if( abs( trk.PdgCode() ) == 211 ) 
 			{
 			if(_nNCIncPi0 == 0 ){
 			    _nNCIncPi0++ ;
 			    _NC_ctr++ ;
 			    }
-			if ( _verbose )
+			if( _nNC1Pi0 > 0 ){
+			    _nNC1Pi0 = 0 ;
+			    _NC1pi0_ctr-- ;
+			    }
+			if ( _verbose ){
+			    std::cout<<"Graph particles : "<<graph.Diagram()<<std::endl ;
 			    std::cout<<"******************************This is a NC event "<<std::endl ;
+			    }
 		       continue;
 			}
-		    }
+		    //}
 
 
         	} 
@@ -163,8 +206,8 @@ namespace ertool {
                << "NC Events           : " << _NC_ctr << std::endl
                << "Tot Events          : " << _nEvents << std::endl
                << "Single NC pi0 Events: " << _NC1pi0_ctr << std::endl
-               << "NC Eff              : " << double ( _CC_ctr )/ _nEvents *100 << " %" << std::endl
-               << "CC Eff              : " << double ( _NC_ctr )/ _nEvents *100 << " %" << std::endl
+               << "NC Eff              : " << double ( _NC_ctr )/ _nEvents *100 << " %" << std::endl
+               << "CC Eff              : " << double ( _CC_ctr )/ _nEvents *100 << " %" << std::endl
                << "Single NC Eff       : " << _eff << " %" << std::endl;
 
 

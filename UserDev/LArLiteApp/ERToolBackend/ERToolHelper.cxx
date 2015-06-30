@@ -396,9 +396,11 @@ namespace larlite {
       //s._energy = mcs.Start().Momentum().E();
       s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.05) : gRandom->Gaus(2,2*0.05));
       s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
+      double mass = 0;
+      if (mcs.PdgCode() == 11) { mass = 0.511; }
       auto nodeID = mgr.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
-      mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(::ertool::kINVALID_INT,
-							      ::ertool::kINVALID_INT,
+      mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
+							      mass,
 							      mcs.Start().Position(),
 							      ::geoalgo::Vector(mcs.Start().Momentum()));
     }
