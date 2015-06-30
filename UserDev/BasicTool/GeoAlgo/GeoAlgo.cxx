@@ -981,12 +981,13 @@ namespace geoalgo {
   {
 
     // Remove any duplicate points
-    std::vector<Point_t> copyPts;
-    std::vector<Point_t>::iterator it;
+    std::vector<Point_t> copyPts = {pts[0]};
     for(size_t p1=0; p1 < pts.size(); p1++){
       // if an identical point does not already exist in copyPts -> then add
-      it = find(copyPts.begin(), copyPts.end(), copyPts[p1]);
-      if (it != copyPts.end())
+      bool found = false;
+      for (size_t p2 =0; p2 < copyPts.size(); p2++)
+	if (pts[p1] == copyPts[p2]) { found = true; break; }
+      if (!found)
 	copyPts.push_back(pts[p1]);
     }
 
@@ -997,9 +998,8 @@ namespace geoalgo {
     // too many points to call simple constructor! find minimally bounding sphere
     // compute sphere for first 4 points
     //Sphere_t tmpSphere(copyPts[0],copyPts[1],copyPts[2],copyPts[3]);
-    std::vector<Point_t> sosPoints;
+    std::vector<Point_t> sosPoints;// = {pts[0]};
     sosPoints.clear();
-
     return _WelzlSphere_(copyPts,copyPts.size(),sosPoints);
   }
 
@@ -1008,9 +1008,8 @@ namespace geoalgo {
 				  std::vector<Point_t> sosPts) const
   {
 
-    if (numPts == 0){
+    if (numPts == 0)
       return Sphere_t(sosPts);
-    }
     // choose last point in the input set as the one to test (if it fits in current sphere or not)
     int index = numPts-1;
     // recursively compute the smallest bounding sphere of the remaining points
