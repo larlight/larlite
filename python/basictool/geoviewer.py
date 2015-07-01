@@ -89,6 +89,13 @@ class GeoViewer(object):
 
         self._ax.scatter(*data,color=c,marker='*',s=100)
 
+        # update boundaries
+        for i in xrange(3):
+            if data[i] < self._range_min[i]: self._range_min[i] = data[i]
+            if data[i] > self._range_max[i]: self._range_max[i] = data[i]
+
+        self._ax.scatter(*data,color=c,marker='*',s=100)
+
     def _add_trajectory(self,arg,c=''):
         if not c: c = self.rand_color()
         data = self._converter.Convert(arg) 
@@ -213,11 +220,12 @@ class GeoViewer(object):
         self._ax.plot(xp,yp,zp,color=c)
 
 
+    # add sphere
     def _add_sphere(self,arg,c=''):
 
         if not c: c = self.rand_color()
         
-        o = arg.Origin()
+        o = arg.Center()
         r = arg.Radius()
 
         xp,yp,zp = sphere(o,r)
@@ -291,8 +299,8 @@ class GeoViewer(object):
             self._add_trajectory(self._holder.Trajectory()[x], self._holder.TrajectoryColor()[x])
         for x in xrange(len(self._holder.Cone())):
             self._add_cone(self._holder.Cone()[x], self._holder.ConeColor()[x])
-        #for x in xrange(len(self._holder.Sphere())):
-        #    self._add_sphere(self._holder.Sphere()[x], self._holder.SphereColor()[x])
+        for x in xrange(len(self._holder.Sphere())):
+            self._add_sphere(self._holder.Sphere()[x], self._holder.SphereColor()[x])
         for x in self._converter.Convert(self._holder.Labels()):
             self._add_label(x)
 

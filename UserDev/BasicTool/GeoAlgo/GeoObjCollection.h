@@ -52,7 +52,7 @@ namespace geoalgo {
 
     void Add(const Cone_t& cone, std::string label="", std::string c="");
 
-    //void Add(const Sphere_t& sphere, std::string label="", std::string c="");
+    void Add(const Sphere_t& sphere, std::string label="", std::string c="");
 
     const std::vector< geoalgo::Point_t >& Point() const { return _pt_v; }
     const std::vector< std::string >& PointColor() const { return _pt_col; }
@@ -72,7 +72,7 @@ namespace geoalgo {
     const std::vector< geoalgo::Cone_t >& Cone() const { return _cone_v; }
     const std::vector< std::string >& ConeColor() const { return _cone_col; }
 
-    //const std::vector< geoalgo::Sphere_t >& Sphere() const { return _sphere_v; }
+    const std::vector< geoalgo::Sphere_t >& Sphere() const { return _sphere_v; }
     const std::vector< std::string >& SphereColor() const { return _sphere_col; }
 
     const std::map<geoalgo::Point_t,std::string>& Labels() const  { return _labels;}
@@ -94,10 +94,8 @@ namespace geoalgo {
     const Cone_t& _Cone_(size_t i) const
     { return _cone_v[i]; }
 
-    /*
     const Sphere_t& _Sphere_(size_t i) const
     { return _sphere_v[i]; }
-    */
 
     void _AddLabel_(const Point_t& pt,
 		    std::string label);
@@ -114,7 +112,7 @@ namespace geoalgo {
     std::vector< std::string            > _trj_col; 
     std::vector< geoalgo::Cone_t        > _cone_v;
     std::vector< std::string            > _cone_col; 
-    //std::vector< geoalgo::Sphere        > _sphere_v;
+    std::vector< geoalgo::Sphere        > _sphere_v;
     std::vector< std::string            > _sphere_col; 
     std::map<geoalgo::Point_t,std::string > _labels;
 

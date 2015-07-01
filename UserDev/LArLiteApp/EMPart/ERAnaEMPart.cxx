@@ -39,8 +39,6 @@ namespace ertool {
     if (_debug)
       std::cout << "******  Begin ERAnaEMPart Analysis  ******" << std::endl;
 
-    auto datacpy = data;
-    
     // Get MC particle set
     auto const& mc_graph = MCParticleGraph();
     auto const& mc_evtdata = MCEventData();
@@ -64,7 +62,7 @@ namespace ertool {
 	  if ( (mcPart.PdgCode() == 11) or (mcPart.PdgCode() == 22) ){
 	    // check distance between shower start points
 	    if (recoPart.RecoID() < 1000 && mcPart.RecoID() < 1000){
-	    auto const& recoShrStart = datacpy.Shower(recoPart.RecoID()).Start();
+	    auto const& recoShrStart = data.Shower(recoPart.RecoID()).Start();
 	    auto const& mcShrStart   = mc_evtdata.Shower(mcPart.RecoID()).Start();
 	    if ( recoShrStart.Dist(mcShrStart) < minDist ){
 	      minDist = recoShrStart.Dist(mcShrStart);
@@ -76,7 +74,7 @@ namespace ertool {
 	if (minDist < 1036){
 	  _dist_shrs = minDist;
 	  _dist_part = recoPart.Vertex().Dist(closestPart.Vertex());
-	  _dedx = datacpy.Shower(recoPart.RecoID())._dedx;
+	  _dedx = data.Shower(recoPart.RecoID())._dedx;
 	  _e_reco   = recoPart.Energy();
 	  _e_mc     = closestPart.Energy();
 	  _dot      = closestPart.Momentum().Dot(recoPart.Momentum())/(closestPart.Momentum().Length()*recoPart.Momentum().Length());

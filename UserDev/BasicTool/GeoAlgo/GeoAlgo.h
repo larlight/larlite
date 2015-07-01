@@ -450,6 +450,7 @@ namespace geoalgo {
 
     // Bounding Sphere given a vector of points
     Sphere_t _boundingSphere_(const std::vector<Point_t>& pts) const;
+    Sphere_t _RemainingPoints_(std::vector<Point_t>& remaining, const Sphere_t& thisSphere)const;
     Sphere_t _WelzlSphere_(const std::vector<Point_t>& pts, int numPts, std::vector<Point_t> sosPts) const;
 
     /// Clamp function: checks if value out of bounds
