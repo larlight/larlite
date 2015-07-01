@@ -166,6 +166,36 @@ namespace ertool {
        _score_v.erase(--_score_v.end());
   }
 
+
+
+  void Particle::Print(std::string& res, std::string prefix) const
+  {
+    res+="Printing members of particle \n";
+    if (PdgCode() == kINVALID_INT)
+      res += prefix + "unknown" + " ... ";
+    else
+      res += "Pdg " + prefix + std::to_string(PdgCode()) + " ... \n";
+    if (Vertex() == kINVALID_VERTEX)
+      res += "[unknown] [cm]";
+    else
+      res += "Vtx " + std::to_string(Vertex()[0]) + " [cm] : " + std::to_string(Vertex()[1]) + " [cm] : " + std::to_string(Vertex()[2]) + " [cm] \n";
+    if (Momentum() == kINVALID_MOMENTUM)
+      res += "--> unknown" ;
+    else
+      res += "Kinetic Energy " + std::to_string( KineticEnergy() );
+    res += " MeV \n";
+
+    prefix += "  ";
+
+  }
+
+  std::string Particle::Print() const
+  {
+    std::string res;
+    Print(res," ");
+    return res;    
+  }
+
 }
 
 
