@@ -994,15 +994,70 @@ namespace geoalgo {
     // if 4 or less points call appropriate constructor
     if (copyPts.size() < 5)
       return Sphere_t(copyPts);
+
+    size_t npoints = copyPts.size();
+    std::vector<Point_t> points4 = {copyPts[npoints-1],copyPts[npoints-2],copyPts[npoints-3],copyPts[npoints-4]};
+    copyPts.pop_back();
+    copyPts.pop_back();
+    copyPts.pop_back();
+    copyPts.pop_back();
+    Sphere_t tmpSphere = Sphere(points4);
+    return _RemainingPoints_(copyPts,tmpSphere);
     
     // too many points to call simple constructor! find minimally bounding sphere
     // compute sphere for first 4 points
     //Sphere_t tmpSphere(copyPts[0],copyPts[1],copyPts[2],copyPts[3]);
-    std::vector<Point_t> sosPoints;// = {pts[0]};
-    sosPoints.clear();
-    return _WelzlSphere_(copyPts,copyPts.size(),sosPoints);
+    //std::vector<Point_t> sosPoints;// = {pts[0]};
+    //sosPoints.clear();
+    //return _WelzlSphere_(copyPts,copyPts.size(),sosPoints);
   }
 
+  Sphere_t GeoAlgo::_RemainingPoints_(std::vector<Point_t>& remaining,
+				      const Sphere_t& thisSphere) const
+  {
+
+
+    // if no points lef -> done...return the current sphere
+    if (remaining.size() == 0)
+      return thisSphere;
+
+    //std::cout << "Remaining points: " << remaining.size() << std::endl;
+
+    auto const& lastPoint = remaining.back();
+   
+    // if this point is bounded by the already constructed sphere, continue
+    if ( thisSphere.Contain(lastPoint) ){
+      remaining.pop_back();
+      return _RemainingPoints_(remaining,thisSphere);
+    }
+    // if not, need to adjust so that the new point is also bound
+    // get distance from lastPoint and center
+    double dist = lastPoint.Dist(thisSphere.Center());
+    //std::cout << "point does not fit: " << lastPoint << std::endl; 
+    //std::cout << "distance: " << dist << std::endl;
+    //std::cout << "center  : " << thisSphere.Center() << std::endl;
+    //std::cout << "radius  : " << thisSphere.Radius() << std::endl;
+    // the new center should be shifted in the direction
+    // of the new point by half the difference between
+    // the current radius and "dist"
+    // direction in which to move:
+    Vector_t dir = lastPoint-thisSphere.Center();
+    dir.Normalize();
+    // amount to move by
+    double shift = (dist-thisSphere.Radius())/2.;
+    if (shift < 0) { shift *= -1; }
+    Point_t newCenter = thisSphere.Center() + dir*shift;
+    double newRadius  = thisSphere.Radius()+shift;
+    //std::cout << "new center: " << newCenter << std::endl;
+    //std::cout << "new radius: " << newRadius << std::endl;
+    Sphere_t newsphere(newCenter,newRadius);
+    //if (newsphere.Contain(lastPoint)) { std::cout << "new point contained!" << std::endl; }
+    //else { std::cout << "WRONG!" << std::endl; }
+    remaining.pop_back();
+
+    return _RemainingPoints_(remaining,newsphere);
+  }
+  
   Sphere_t GeoAlgo::_WelzlSphere_(const std::vector<Point_t>& pts,
 				  int numPts,
 				  std::vector<Point_t> sosPts) const
