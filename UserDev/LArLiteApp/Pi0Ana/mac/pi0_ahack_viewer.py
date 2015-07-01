@@ -3,6 +3,7 @@ from ROOT import gSystem
 from ROOT import ertool
 from ROOT import larlite as fmwk
 #from seltool.ccsingleeDef import GetCCSingleEInstance
+from seltool.erviewer import ERViewer
 from seltool.algoviewer import viewAll, view
 import basictool.geoviewer as gv
 
@@ -120,6 +121,8 @@ my_anaunit.SetTrackProducer(True,"mcreco");
 #my_proc.add_process(MCfilter)
 my_proc.add_process(my_anaunit)
 
+mcviewer   = ERViewer() #'MC Info')
+recoviewer = ERViewer() #'RECO Info')
 
 # Start event-by-event loop
 counter = 0
@@ -130,8 +133,8 @@ while (counter < 11700):
         counter = counter + 1
     print "Event number: ", counter
 
-    display_mc = gv.GeoViewer()
-    display_reco = gv.GeoViewer()
+#    display_mc = gv.GeoViewer()
+#    display_reco = gv.GeoViewer()
 
     my_proc.process_event(counter)
     print "Processing event {0}".format(counter) 
@@ -141,7 +144,12 @@ while (counter < 11700):
     data_mc   = my_anaunit.GetData(True)
     part_mc   = my_anaunit.GetParticles(True)
     #viewAll(display_mc,data_mc,part_mc,display_reco,data_reco,part_reco)
-    view(display_mc,data_mc,part_mc)
+  #  view(display_mc,data_mc,part_mc)
+
+    viewAll(mcviewer, data_mc, part_mc,
+               recoviewer, data_reco, part_reco)
+
+  #  dist = shower.Start().Dist(track.back())
 
     #for x in xrange(part_mc.size()):
     #    print part_mc[x].Diagram()
