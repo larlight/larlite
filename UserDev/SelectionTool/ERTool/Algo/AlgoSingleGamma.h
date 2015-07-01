@@ -84,11 +84,7 @@ namespace ertool {
     void setEThreshold(double E){ _Ethreshold = E; }
 
     void setVtxProximityCut(double d) { _vtxProximityCut = d; }
-    void setBDtW(double b) { _BDtW = b; }
-    void setBDtTW(double bt) { _BDtTW = bt; }
-
-
-
+    
   private:
 
     ::geoalgo::AABox fTPC;
@@ -184,8 +180,6 @@ namespace ertool {
     double _radlen;
     int    _pdg;
 
-
-
     //Tree -> one entry per shower-other comparison
     // therefore possibly multiple entries for each shower
     TTree* _alg_tree;
@@ -193,25 +187,28 @@ namespace ertool {
     //For every Shower
     double _E; // energy of shower
     int    _PDG; // PDG code assigned by AlgoEMPart
-    
-   
+       
     int    _VsTrack; // comparing vs track (==1)
     double _thatE; // Energy of other shower/track
     double _dEdx;
     double _IP; // Impact Paramter with other object
+    double _IPa;
     double _IPthisStart; // distance from IP to this shower start point
+    double _IPathisStart;
     double _IPthatStart; // distance from IP to that shower/track start point
+    double _IPathatStart;
     double _IPtrkBody; // distance from IP to body of track (if comparing with track)
     double _distBackAlongTraj; // distance backwards from vertex to nearest wall
     double _distToTopWall; // distance backwards along traj from vertex to top wall(extended to infinity)
+    double _vtx_min_radius; // minimum radius to claim a vertex point
     
     //At the algo level what is tied to an event
     int _Ngamma; // Number of photons matched to an event 
     int _Ntrks; // Number of tracks matched to an event
     int _Nmu; // Number of muons matched to an event
+
+    TH1D* _hRadius; // radius histogram
     
-
-
   };
 }
 #endif
