@@ -43,7 +43,7 @@ def viewAll(mcDisplay, mcData, mcPart, recoDisplay, recoData, recoPart):
 
 def view(display, data, part):
 
-    display_reco = ERViewer()
+    display_reco = ERViewer("view")
     display_reco.set_window_title("Reco Objects")
 
    # del display_mc

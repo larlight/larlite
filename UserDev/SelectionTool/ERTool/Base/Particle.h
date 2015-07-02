@@ -69,6 +69,8 @@ namespace ertool {
 			  const ::geoalgo::Vector& mom = kINVALID_MOMENTUM,
 			  const float score = 0);
 
+    std::string Print() const;
+
   private:
 
     void AddChild(const NodeID_t id, const float score = kDEFAULT_SCORE);
@@ -78,6 +80,9 @@ namespace ertool {
 
     void RemoveChild(const NodeID_t child );
     void UpdateAfterRemoval(const NodeID_t removed);
+
+    void Print             (std::string& res, std::string prefix="") const;
+
     
     // Particle information
     int    _pdg_code;       ///< PDG code of a particle

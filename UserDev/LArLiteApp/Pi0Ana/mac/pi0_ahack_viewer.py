@@ -117,12 +117,12 @@ my_anaunit.SetTrackProducer(True,"mcreco");
 # ************************************************
 
 
-#my_proc.add_process(pi0_topo)
+my_proc.add_process(pi0_topo)
 #my_proc.add_process(MCfilter)
 my_proc.add_process(my_anaunit)
 
-mcviewer   = ERViewer() #'MC Info')
-recoviewer = ERViewer() #'RECO Info')
+mcviewer   = ERViewer('MC Info')
+recoviewer = ERViewer('RECO Info')
 
 # Start event-by-event loop
 counter = 0
@@ -133,8 +133,8 @@ while (counter < 11700):
         counter = counter + 1
     print "Event number: ", counter
 
-#    display_mc = gv.GeoViewer()
-#    display_reco = gv.GeoViewer()
+    display_mc = gv.GeoViewer()
+    display_reco = gv.GeoViewer()
 
     my_proc.process_event(counter)
     print "Processing event {0}".format(counter) 
@@ -143,11 +143,11 @@ while (counter < 11700):
     part_reco = my_anaunit.GetParticles()
     data_mc   = my_anaunit.GetData(True)
     part_mc   = my_anaunit.GetParticles(True)
-    #viewAll(display_mc,data_mc,part_mc,display_reco,data_reco,part_reco)
-  #  view(display_mc,data_mc,part_mc)
+    view(display_mc,data_mc,part_mc)
+#    view(display_reco,data_reco,part_reco)
 
-    viewAll(mcviewer, data_mc, part_mc,
-               recoviewer, data_reco, part_reco)
+#    viewAll(mcviewer  , data_mc  , part_mc,
+#	    recoviewer, data_reco, part_reco)
 
   #  dist = shower.Start().Dist(track.back())
 
