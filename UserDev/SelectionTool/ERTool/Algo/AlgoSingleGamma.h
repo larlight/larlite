@@ -1,16 +1,10 @@
-/**
- * \file AlgoSingleGamma.h
- *
- * \ingroup Algo
- * 
- * \brief Class def header for a class AlgoSingleGamma
- *
- * @author jzennamo
- */
+/*
+AlgoSingleGamma, July 2015
 
-/** \addtogroup Algo
-
-    @{*/
+authors: Brooke Russell, brooke.russell@yale.edu
+         Bobby Murrells, robertmurrells@gmail.com
+         Joseph Zennamo, jzennamo@uchicago.edu
+*/
 
 #ifndef ERTOOL_ALGOSINGLEGAMMA_H
 #define ERTOOL_ALGOSINGLEGAMMA_H
@@ -190,11 +184,14 @@ namespace ertool {
        
     int    _VsTrack; // comparing vs track (==1)
     double _thatE; // Energy of other shower/track
+    double _thisShwrE;
+    double _thisTrkE;
     double _dEdx;
     double _IP; // Impact Paramter with other object
-    double _IPa;
-    double _IPthisStart; // distance from IP to this shower start point
-    double _IPathisStart;
+    double _Impa;
+    double _IPthisShwrStrt;
+    double _IPthisTrkStrt;
+    double _IPthisStart;
     double _IPthatStart; // distance from IP to that shower/track start point
     double _IPathatStart;
     double _IPtrkBody; // distance from IP to body of track (if comparing with track)
@@ -208,7 +205,9 @@ namespace ertool {
     int _Nmu; // Number of muons matched to an event
 
     TH1D* _hRadius; // radius histogram
-    
+    TH1D* _IPi; // impact parameter
+    TH1D* _IPj; // impact parameter "this" track with "other" track
+    TH1D* _IPsn; // impact parameter "other" shower with "this" shower
   };
 }
 #endif
