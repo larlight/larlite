@@ -52,6 +52,10 @@ namespace ertool {
     _hassister = false;
     _vtx_min_radius = 20; // minimum bounding sphere radius in cm
     _maxIP = 20; // maximum impact parameter
+
+    track_gamma = 0;
+    track_elec = 0;
+    track_aelec = 0;
   }
 
   void AlgoSingleGamma::Reset()
@@ -118,7 +122,7 @@ namespace ertool {
     _alg_emp.AcceptPSet(cfg); // load EMPart parameters
     return;
   }
-
+  
   bool AlgoSingleGamma::Reconstruct(const EventData &data, ParticleGraph& graph)
   { 
     auto datacpy = data; 
@@ -155,6 +159,9 @@ namespace ertool {
 	
 	geoalgo::Point_t vtx_s(3);
 
+        NodeID_t parent_track = -1;
+	int parent_track_counter = 0;
+	
       	/// loop thru particles associated with a track object
 	for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack))
 	  {
@@ -187,8 +194,8 @@ namespace ertool {
 	    /// determine the impact parameter
 	    /// between the shower and this track
 	    double IPi = _findRel.FindClosestApproach(thisShower,
-							thisTrack,
-							vtx_s);
+						      thisTrack,
+						      vtx_s);
 
 	    std::vector<double> impactPst;
 	    impactPst.push_back(IPi);
@@ -203,7 +210,26 @@ namespace ertool {
 	    /// and impact parameter mid point
 	    auto const& thisShwrStart = thisShower.Start();
 	    double disti = thisShwrStart.Dist(vtx_s);
+	    
+	    if(parent_track_counter < 1) {
 
+	      if(vtx_s.Dist(thisTrack.front()) > _vtxToTrkStartDist &&
+		 IPi / 2 < _vtxToTrkDist &&
+		 disti < _vtxToShrStartDist) {
+
+		parent_track_counter++;
+		
+		if( _alg_emp.LL(false,thisShower._dedx,disti) >
+		    _alg_emp.LL(true,thisShower._dedx,disti)) {
+		  
+		  parent_track = t;
+
+		}
+
+	      }
+
+	    }
+	    
 	    std::vector<int > otherTracksCounted;
 	    
 	    /// loop thru particles associated with a track but not "this" track
@@ -239,6 +265,33 @@ namespace ertool {
 		    //_IPj->Fill(IPj);
 		    continue;
 		  }
+
+		if(parent_track_counter < 1) {
+
+		  geoalgo::Point_t vtx_so(3);
+		  
+		  double IPso = _findRel.FindClosestApproach(thisShower,
+							     otherTrack,
+							     vtx_so);
+
+		  double distso = thisShower.Start().Dist(vtx_so);
+		  
+		  if(vtx_so.Dist(thisTrack.front()) > _vtxToTrkStartDist &&
+		     IPso / 2 < _vtxToTrkDist &&
+		     distso < _vtxToShrStartDist) {
+
+		    parent_track_counter++;
+		    
+		    if(_alg_emp.LL(false,thisShower._dedx,distso) >
+		       _alg_emp.LL(true,thisShower._dedx,distso)) {
+		      
+		      parent_track = t;
+		      
+		    }
+		    
+		  }
+		  
+		}
 		
 		std::vector<double> impactPtt;
 		impactPtt.push_back(IPj);
@@ -312,13 +365,47 @@ namespace ertool {
 	      }
 	    std::cout << "bbb" << std::endl;
 	  }
+
+	if(parent_track != -1 && parent_track_counter == 1) {
+
+	  graph.SetParentage(parent_track, s);
+
+	  switch(graph.GetParticle(s).PdgCode()) { 
+
+	  case 22:
+	    track_gamma++;
+	    break;
+	  case 11:
+	    track_elec++;
+	    break;
+	  case -11:
+	    track_aelec++;
+	    break;
+	  default:
+	    std::cout << "Warning, shower pdg: "
+		      << graph.GetParticle(s).PdgCode() << "\n";
+	    
+	  }
+    
+	}
+	
 	std::cout << "aaa" << std::endl;
       }
+
+    std::cout << graph.Diagram();
+    
     std::cout << "return.." << std::endl;
     return true;
   }
+  
   void AlgoSingleGamma::ProcessEnd(TFile* fout)
   {
+
+    std::cout << "Track children identified as gammas:\n\tgamma: "
+	      << track_gamma << " "
+	      << " elec: " << track_elec
+	      << " aelec: " << track_aelec << "\n";
+    
     return;
   }
 
