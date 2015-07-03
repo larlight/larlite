@@ -51,7 +51,7 @@ namespace larlite {
     /// Fill Track Info from MC
     void FillTracks( const event_mctrack&   mct_v,
 		     ::ertool::Manager&     res) const;
-    
+
     /// Fill Track Info from RECO
     void FillTracks ( const event_track&       trk_v,
 		      const event_cosmictag&   cos_trk_v,
@@ -77,6 +77,10 @@ namespace larlite {
 
     /// Set minimum EDep amount for shower to be added to EventData
     void SetMinEDep(double E) { if(E<1.e-10) E=1.e-10; _minEDep = E; }
+
+
+    TLorentzVector getXShift(const mctrack& mct) const;
+    TLorentzVector getXShift(const mcshower& mct) const;
 
 
   private:

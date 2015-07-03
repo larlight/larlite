@@ -19,7 +19,6 @@
 #include <climits>
 
 namespace larlite {
-
   /// Create MC EventData and ParticleSet
   void ERToolHelper::FillMCInfo( const event_mctruth&   mci_v,
 				 const event_mcshower&  mcs_v,
@@ -263,8 +262,12 @@ namespace larlite {
       if(mct.size()<2) continue;
       ::ertool::Track t;
       t.reserve(mct.size());
-      for(auto const& step : mct)
-	t += step.Position();
+
+      TLorentzVector shift = getXShift(mct_v[i]);
+
+      for(auto const& step : mct) {
+    	  t += (step.Position() + shift);;
+      }
 
       //This is the TOTAL energy minus TOTAL energy, so mass is removed.
       //If you want only initial kinetic energy, remember to subtract off mass.
@@ -288,7 +291,6 @@ namespace larlite {
 
     return;
   }
-
 
   void ERToolHelper::FillTracks ( const event_track&  trk_v,
 				  const event_cosmictag& ctag_trk_v,
@@ -388,7 +390,7 @@ namespace larlite {
       //if(isnan(mcs.DetProfile().Momentum().E())) continue;
       //if(isnan(mcs.DetProfile().Momentum().Px())) continue;
       //if(mcs.DetProfile().Momentum().Mag2() == 0) continue;
-      ::ertool::Shower s( mcs.DetProfile().Position(),
+      ::ertool::Shower s( (mcs.DetProfile().Position() + getXShift(mcs_v[i])),
 			  mcs.DetProfile().Momentum(),
 			  _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
 			  _shrProfiler.ShowerRadius() );
@@ -396,6 +398,7 @@ namespace larlite {
       //s._energy = mcs.Start().Momentum().E();
       s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.05) : gRandom->Gaus(2,2*0.05));
       s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
+      s._time = mcs_v[i].End().T();
       double mass = 0;
       if (mcs.PdgCode() == 11) { mass = 0.511; }
       auto nodeID = mgr.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
@@ -488,6 +491,29 @@ namespace larlite {
     return;
   }
 
+	TLorentzVector ERToolHelper::getXShift(const mctrack& mct) const{
+
+	  TLorentzVector shift;
+
+	  double event_time = mct.End().T();
+
+	  double shift_x = (event_time/3.2E6) * 2 * 256;
+	  shift.SetXYZT(shift_x, 0., 0., 0.);
+
+	  return shift;
+	}
+
+	TLorentzVector ERToolHelper::getXShift(const mcshower& mcs) const{
+
+	  TLorentzVector shift;
+
+	  double event_time = mcs.End().T();
+
+	  double shift_x = (event_time/3.2E6) * 2 * 256;
+	  shift.SetXYZT(shift_x, 0., 0., 0.);
+
+	  return shift;
+	}
 }
 
 #endif
