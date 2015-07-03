@@ -256,6 +256,7 @@ namespace larlite {
   void ERToolHelper::FillTracks ( const event_mctrack&  mct_v,
 				  ::ertool::Manager&    mgr ) const
   {
+	//SetDetWidth();
     for(size_t i=0; i<mct_v.size(); ++i){
 
       auto const& mct = mct_v[i];
@@ -491,28 +492,24 @@ namespace larlite {
     return;
   }
 
-	TLorentzVector ERToolHelper::getXShift(const mctrack& mct) const{
+	TLorentzVector ERToolHelper::getXShift(const mctrack& mct) const {
 
-	  TLorentzVector shift;
+		TLorentzVector shift;
+		double event_time = mct.End().T();
+		double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
+		shift.SetXYZT(shift_x, 0., 0., 0.);
 
-	  double event_time = mct.End().T();
-
-	  double shift_x = (event_time/3.2E6) * 2 * 256;
-	  shift.SetXYZT(shift_x, 0., 0., 0.);
-
-	  return shift;
+		return shift;
 	}
 
-	TLorentzVector ERToolHelper::getXShift(const mcshower& mcs) const{
+	TLorentzVector ERToolHelper::getXShift(const mcshower& mcs) const {
+		// Calculates for each mc shower, based on the time of the event, the corresponding shift in x-direction
+		TLorentzVector shift;
+		double event_time = mcs.End().T();
+		double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
+		shift.SetXYZT(shift_x, 0., 0., 0.);
 
-	  TLorentzVector shift;
-
-	  double event_time = mcs.End().T();
-
-	  double shift_x = (event_time/3.2E6) * 2 * 256;
-	  shift.SetXYZT(shift_x, 0., 0., 0.);
-
-	  return shift;
+		return shift;
 	}
 }
 
