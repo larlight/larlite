@@ -274,6 +274,7 @@ namespace larlite {
       //If you want only initial kinetic energy, remember to subtract off mass.
       t._energy     = (*mct.begin()).Momentum().E() - (*mct.rbegin()).Momentum().E();
       t._cosmogenic = (double)(mct.Origin() == simb::kCosmicRay);
+      t._time = mct_v[i].End().T();
 
       if(abs(mct.PdgCode()) == 13 ) t._pid = ::ertool::Track::kMuon;
       if(mct.PdgCode() == 2212    ) t._pid = ::ertool::Track::kProton;
