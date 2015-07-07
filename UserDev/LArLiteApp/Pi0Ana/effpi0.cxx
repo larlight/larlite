@@ -92,7 +92,7 @@ namespace larlite {
         if (selected.size() < 2 && totalpi0 == 1){ 
 	    _n_E++;
 	    lowEnergy = 1 ;
-	   // return false;
+	    return false;
 	    }
 
 
