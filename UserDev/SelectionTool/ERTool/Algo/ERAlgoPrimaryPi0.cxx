@@ -100,8 +100,10 @@ namespace ertool {
 
     	            trkParticle.SetParticleInfo( trkParticle.PdgCode(), trkParticle.Mass(),
 					         trkParticle.Vertex() , trkParticle.Momentum());
-    	            graph.SetSiblings(pi0.ID(),primID);
 		    graph.SetPrimary(pi0.ID()) ;
+    	            graph.SetSiblings(pi0.ID(),primID);
+//		    std::cout<<"Pi0 should  be primary! "<<pi0.Primary() <<std::endl ;
+//		    std::cout<<"How many? "<<graph.GetSiblingNodes(p.ID()).size() <<std::endl ;
 		    if(abs( graph.GetParticle(primID).PdgCode()) == 13 ){
 			std::cout<<"Muon sib"<<std::endl;
 			break ;
@@ -131,11 +133,9 @@ namespace ertool {
 
 	    	}//Loop over primary tracks
 
-
 		break ;
 	    }//if pi0
 	}//Loop over particle array
-
 
 
 	
