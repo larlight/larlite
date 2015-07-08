@@ -204,10 +204,10 @@ namespace ertool {
     mass = _mass;
 
     // calculate momentum:
-    // add direction vectors scaled by shower energies and subtract mass
     geoalgo::Vector_t energy(shower_a.Dir() * energy_a + shower_b.Dir() * energy_b);
-    energy *= (energy.Length() - _mass) / energy.Length();
-    mom = energy;
+    energy.Normalize();
+    double mom2 = sqrt(pow(energy_a,2)+pow(energy_b,2)+2*energy_a*energy_b*cos(_angle));
+    mom = energy*mom2;
 
     if (_verbose) { std::cout << "reconstructed mass: " << _mass << std::endl; }
 
