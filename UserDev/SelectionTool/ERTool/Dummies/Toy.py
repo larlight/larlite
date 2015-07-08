@@ -1,5 +1,5 @@
-import ROOT
-from ROOT import ertool
+import ROOT 
+from ROOT import ertool, TFile
 
 #
 # Make my fake data input
@@ -41,4 +41,6 @@ mgr.Add(my_shower1,myid)
 mgr.Add(my_shower2,myid)
 mgr.Process()
 
-mgr.Finalize()
+# Give an analysis output file ptr & Finalize
+fout = TFile("dummy.root","RECREATE")
+mgr.Finalize(fout)

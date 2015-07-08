@@ -21,6 +21,8 @@
 #include "ShowerRecoException.h"
 #include <limits>
 #include <climits>
+#include "TTree.h"
+
 namespace showerreco {
 
   struct ShowerCluster_t {
@@ -70,6 +72,9 @@ namespace showerreco {
     /// Function to set if to use a linear scale to calculate Energy
     void SetUseLinearEnergy(bool on) { _linearE = on; }
 
+    /// Function to get algorithm's TTree
+    TTree* getTree() { return _alg_tree; }
+
   protected:
 
     /// Function to reorganize input cluster information
@@ -91,6 +96,9 @@ namespace showerreco {
 
     /// Input clusters
     std::vector<std::vector<showerreco::ShowerCluster_t> > fInputClusters;
+
+    /// TTree for algorithm's stuff
+    TTree *_alg_tree;
 
   };
 }

@@ -3,8 +3,8 @@
 #
 
 # specific names for this package
-DICT  = LArLiteAPp_AnaNdkDict
-SHLIB = libLArLiteApp_AnaNdk.so
+DICT  = LArLiteAPp_MichelEDict
+SHLIB = libLArLiteApp_MichelE.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
 HEADERS = $(filter-out $(FMWK_HEADERS), $(wildcard *.h))

@@ -9,8 +9,8 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class ertool::AnaNdkModeZero+;
-#pragma link C++ class ertool::AnaNdkModeThirteen+;
+#pragma link C++ class ertool::ERAnaMichelE+;
+#pragma link C++ class larlite::MichelElectronFilter+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif

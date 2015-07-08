@@ -19,7 +19,6 @@ namespace ertool {
 
   bool ERAlgoPrimaryPi0::Reconstruct(const EventData &data, ParticleGraph& graph)
   {
-   // std::cout<<"\n\nNEW EVENT"<<std::endl ;
 
     if(graph.GetParticleNodes(RecoType_t::kShower).size() < 2) return true;	
 
@@ -30,25 +29,24 @@ namespace ertool {
 
     auto datacpy = data ;
     auto const& primaryTrks = graph.GetPrimaryNodes(RecoType_t::kTrack);
-//    int nPrimTracks = primaryTrks.size() ;
-
 
     //First, look only at events with pi0s
     for ( auto const & p : graph.GetParticleArray()){
 	if (p.PdgCode() == 111){
-	    auto pi0 = p;
+	    auto & pi0 = p;
 
 	    //  Event cases:
 	    //	0) prim pi0, no primary tracks
 	    //	1) prim pi0, primary tracks at vertex
-	    //	2) prim pi0, primary tracks from cosmics or some other unrelated interaction in event somewhere
-	    //	3) non-prim pi0 
+	    //	2) non-prim pi0 
+	    //	3) prim pi0, primary tracks from cosmics or some other unrelated interaction in event somewhere
+
 
 	    
 	    // case 0)
 	    //If there are no primary tracks, it's a NC pi0
 	    if ( primaryTrks.size() == 0 ){
-		//graph.SetPrimary(pi0.ID());
+		graph.SetPrimary(pi0.ID());
 		if ( _verbose )
 		    std::cout<<"SINGLE NC pi0 "<<std::endl ;
 		}
@@ -56,8 +54,11 @@ namespace ertool {
 	    if ( _verbose )
 		std::cout<<primaryTrks.size()<<" primary track(s) with pi0 "<<std::endl ;// <<pi0.ID()<<std::endl;
 
+	    int primTrks = graph.GetPrimaryNodes(RecoType_t::kTrack).size() ;
+
 	    //Loop over primary tracks and compare vertices with primary pi0 
 	    for ( auto const& primID : graph.GetPrimaryNodes(RecoType_t::kTrack) ){
+		primTrks-- ;
 		if ( _verbose ){
 		    std::cout<<"New primary track! "<<std::endl ;
 		    std::cout<<"Pdg of prim track: "<<graph.GetParticle(primID).PdgCode() <<std::endl ;
@@ -99,66 +100,42 @@ namespace ertool {
 
     	            trkParticle.SetParticleInfo( trkParticle.PdgCode(), trkParticle.Mass(),
 					         trkParticle.Vertex() , trkParticle.Momentum());
+		    graph.SetPrimary(pi0.ID()) ;
     	            graph.SetSiblings(pi0.ID(),primID);
-		   // graph.SetPrimary(pi0.ID()) ;
+//		    std::cout<<"Pi0 should  be primary! "<<pi0.Primary() <<std::endl ;
+//		    std::cout<<"How many? "<<graph.GetSiblingNodes(p.ID()).size() <<std::endl ;
 		    if(abs( graph.GetParticle(primID).PdgCode()) == 13 ){
-//			std::cout<<"Muon sib"<<std::endl;
+			std::cout<<"Muon sib"<<std::endl;
 			break ;
 			}
 		   }
 
 		//case 2)
 		//If pi0 not from vertex, but pi0 is close to the end of track, non-primary pi0
-		if( _vtxDist >= _minDistVtx && _pi0vtxToTrkEnd < _minDistEnd ){
+		else if( _vtxDist >= _minDistVtx && _pi0vtxToTrkEnd < _minDistEnd ){
 
     	            trkParticle.SetParticleInfo( trkParticle.PdgCode(), trkParticle.Mass(),
 					   trkParticle.Vertex() , trkParticle.Momentum());
-		 //   std::cout<<"Set pi0's parent to track "<<std::endl ;
+		    if ( _verbose )
+		    std::cout<<"Set pi0's parent to track "<<std::endl ;
     	            graph.SetParentage(primID,pi0.ID());
 		    break ; 
 		    }
-
-		//case 3) 
-		//Pi0 is not near the start or end point of a primary track
-		//If all primary tracks fulfill this condition, particles are likely unrelated--
-		//make pi0 primary
-//		if( _vtxDist >= 2*_minDistVtx && _pi0vtxToTrkEnd >= 2*_minDistEnd){
-//		    nPrimTracks -= 1; 
-//		 //   std::cout<<"Not a primary pi0-track relation."<<std::endl;    
-//		    } 
-
-		//Otherwise, this pi0 walks alone.  
-	//	if(nPrimTracks == 0) 
-	//	    graph.SetPrimary(pi0.ID());
-
-
+		
+		//case 3)
+		//If pi0 is in event with primary tracks, but after loop seems to not
+		//be associated with any of them, primary pi0
+		else if( _vtxDist > _minDistVtx && _pi0vtxToTrkEnd > _minDistEnd && primTrks == 0 ){ 
+		    graph.SetPrimary( pi0.ID() ) ;
+		    if ( _verbose )
+			std::cout<<"*******************Setting pi0 to primary ! "<<std::endl ;
+		    }
 
 	    	}//Loop over primary tracks
 
-		if ( _verbose )	
-		    std::cout<<"After loop: is pi0 primary ? "<<pi0.Primary() <<std::endl; 
-
-	//  If able to store pi0 as shower object, can use the following 
-	//    if (pi0.Primary() ) {
-
-	//    	auto pi0Shr = data.Shower(pi0.RecoID()) ;
-	//	for (auto const & s : graph.GetParticleNodes(RecoType_t::kShower) ) {
-	//	
-	//	    auto thisID = graph.GetParticle(s).RecoID() ;
-	//    	    auto thisShr = data.Shower ( thisID ) ;
-	//	    //Does thisShr come from pi0? 
-	//	    auto related = _primary_alg.From ( thisShr, pi0Shr ) ;
-
-	//	    if ( related ) 
-	//		graph.SetParentage(pi0.ID(),thisID) ;
-	//		
-	//	    }
-	//	}
-		    
 		break ;
 	    }//if pi0
 	}//Loop over particle array
-
 
 
 	

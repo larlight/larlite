@@ -66,6 +66,7 @@ namespace geoalgo {
     double Length  () const; ///< Compute the length of the vector
     Vector Dir     () const; ///< Return a direction unit vector
     double Phi	   () const; ///< Compute the angle Phi
+    double Theta   () const; ///< Compute the angle theta
 
     double SqDist(const Vector &obj) const; ///< Compute the squared distance to another vector
     double Dist  (const Vector& obj) const; ///< Compute the distance to another vector
