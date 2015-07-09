@@ -3,6 +3,7 @@ from ROOT import gSystem
 from ROOT import ertool
 from ROOT import larlite as fmwk
 #from seltool.ccsingleeDef import GetCCSingleEInstance
+from seltool.erviewer import ERViewer
 from seltool.algoviewer import viewAll, view
 import basictool.geoviewer as gv
 
@@ -51,14 +52,14 @@ my_algo3.SetMinDistEnd(8.9)
 my_algo3.SetVerbose(True)
 
 # First lets make a filter that looks for a certain events
-pi0_topo = fmwk.singlepi0();
+pi0_topo = fmwk.effpi0()
 # 0 == inclusive 1 == 1pi0&&nopi+/-
-pi0_topo.SetTopology(0);
+pi0_topo.SetTopology(1)
 # 0 == ntsignal 1 == signal
-pi0_topo.SignalTopology(True);
+pi0_topo.SignalTopology(1)
 # 0 == CC 1 == NC 
-pi0_topo.SetCCNC(1);
-my_proc.add_process(pi0_topo)
+pi0_topo.SetCCNC(1)
+pi0_topo.SetFVCut(17)
 
 
 # Create ERTool filter
@@ -68,10 +69,6 @@ my_proc.add_process(pi0_topo)
 # but at this stage it is unreasonable
 # to assume we will be able to
 # reconstruct them
-
-# Create MC Filter
-MCfilter = fmwk.MC_CC1E_Filter();
-MCfilter.flip(False)
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):
@@ -116,10 +113,11 @@ my_anaunit.SetTrackProducer(True,"mcreco");
 # ************************************************
 
 
-#my_proc.add_process(pi0_topo)
-#my_proc.add_process(MCfilter)
+my_proc.add_process(pi0_topo)
 my_proc.add_process(my_anaunit)
 
+mcviewer   = ERViewer('MC Info')
+recoviewer = ERViewer('RECO Info')
 
 # Start event-by-event loop
 counter = 0
@@ -140,8 +138,13 @@ while (counter < 11700):
     part_reco = my_anaunit.GetParticles()
     data_mc   = my_anaunit.GetData(True)
     part_mc   = my_anaunit.GetParticles(True)
-    #viewAll(display_mc,data_mc,part_mc,display_reco,data_reco,part_reco)
     view(display_mc,data_mc,part_mc)
+#    view(display_reco,data_reco,part_reco)
+
+#    viewAll(mcviewer  , data_mc  , part_mc,
+#	    recoviewer, data_reco, part_reco)
+
+  #  dist = shower.Start().Dist(track.back())
 
     #for x in xrange(part_mc.size()):
     #    print part_mc[x].Diagram()

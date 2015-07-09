@@ -10,6 +10,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class ertool::ERAnaMichelE+;
+#pragma link C++ class larlite::MichelElectronFilter+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif

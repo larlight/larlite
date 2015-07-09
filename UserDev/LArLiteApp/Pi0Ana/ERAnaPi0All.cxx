@@ -63,19 +63,21 @@ namespace ertool {
   { 
 
     _nEvents++; 
-
+ //   std::cout<<"Event: "<<_nEvents<<std::endl ;
+    auto const& mc_graph = MCParticleGraph();
+//    std::cout << "MC Particle Diagram: " << std::endl
+//           << mc_graph.Diagram() << std::endl;
+//           
+//    
+//    std::cout << "Reg Particle Diagram: " << std::endl
+//           << graph.Diagram() << std::endl;
+//
     if(graph.GetParticleNodes(RecoType_t::kShower).size() < 2)
 	return true; 
 
+
     //Fill a bunch of variables
 
-    //How many pi0s per event? 
-   // for (auto const & p : particles){
-
-	
-
-
-  //auto primNodes = graph.GetPrimaryNodes(RecoType_t::kTrack) ;
     auto particles = graph.GetParticleArray() ;
     for( auto const & p : particles){
 
@@ -95,9 +97,7 @@ namespace ertool {
 	    _y_pi0 = pi0.Vertex()[1];
 	    _z_pi0 = pi0.Vertex()[2];
 
-	    //if ( graph.GetSiblingNodes(p.ID()).size() == 0  ){
-
-	    if ( pi0.Primary() ) { 
+	    if ( pi0.Primary() && graph.GetSiblingNodes(p.ID()).size() == 0 ) { 
 
 		_nNC1Pi0++;
 		_NC1pi0_ctr++;
@@ -106,18 +106,26 @@ namespace ertool {
 		_NC_ctr++;
 
 		if ( _verbose ){
+
+		    std::cout << "MC Particle Diagram: " << std::endl
+		              << mc_graph.Diagram() << std::endl;
+
 		    std::cout<<"Graph particles : "<<graph.Diagram()<<std::endl ;
-		    std::cout<<_NC1pi0_ctr<<"****************SINGLE NC pi0~!!!!!! ********************"<<std::endl;
+		    std::cout<<_NC1pi0_ctr<<"****************SINGLE primaryNC pi0~!!!!!! ********************"<<std::endl;
 		    }
 
 	//	std::cout<<"EVENT: "<<_nEvents<<std::endl ;
-		continue ;
+		std::cout<< " Status of CC, NC, NC Single: "<<_nCCPi0<<", "<<_nNCIncPi0<<", "<<_nNC1Pi0<<std::endl ;
+		_pi0_tree->Fill();
+		break;
 
 		}
 	    
 	    _vtx_dist = 10000 ;
 
+	    
 	    for( auto const & sib : graph.GetSiblingNodes(pi0.ID())){ 
+
 
 		auto trk = graph.GetParticle(sib) ;
 
@@ -146,9 +154,12 @@ namespace ertool {
 			    _nNC1Pi0 = 0 ;
 			    _NC1pi0_ctr-- ;
 			    }
+			std::cout << "MC Particle Diagram: " << std::endl
+			              << mc_graph.Diagram() << std::endl;
+			std::cout<<"Graph particles :\n "<<graph.Diagram()<<std::endl ;
         	       _nCCPi0++; 
 		       _CC_ctr ++ ;
-			if ( _verbose )
+		//	if ( _verbose )
 			    std::cout<<_nEvents<<"******************************This is a CC event "<<std::endl ;
 		       break;
 			}
@@ -175,6 +186,11 @@ namespace ertool {
 			    _NC1pi0_ctr-- ;
 			    }
 			if ( _verbose ){
+
+
+			    std::cout << "MC Particle Diagram: " << std::endl
+			              << mc_graph.Diagram() << std::endl;
+
 			    std::cout<<"Graph particles : "<<graph.Diagram()<<std::endl ;
 			    std::cout<<"******************************This is a NC event "<<std::endl ;
 			    }
@@ -184,6 +200,9 @@ namespace ertool {
 
 
         	} 
+
+		std::cout<< " Status of CC, NC, NC Single: "<<_nCCPi0<<", "<<_nNCIncPi0<<", "<<_nNC1Pi0<<std::endl ;
+		
 
 		_pi0_tree->Fill();
 
@@ -198,7 +217,7 @@ namespace ertool {
   void ERAnaPi0All::ProcessEnd(TFile* fout)
   {
 
-//  if ( _nEvents != 0 )
+  if ( _nEvents != 0 )
     _eff = double( _NC1pi0_ctr) /_nEvents * 100 ;
 
      std::cout << "RESULTS: " << std::endl

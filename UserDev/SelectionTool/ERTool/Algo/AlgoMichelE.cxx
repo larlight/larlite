@@ -69,13 +69,11 @@ namespace ertool {
   bool AlgoMichelE::Reconstruct(const EventData &data, ParticleGraph& graph)
   { 
 
-    auto datacpy = data;
-
     // Loop through Particles associated with a shower object
     for (auto const& p : graph.GetParticleNodes(RecoType_t::kShower)){
 
       // get the shower object
-      auto const& shower = datacpy.Shower(graph.GetParticle(p).RecoID());
+      auto const& shower = data.Shower(graph.GetParticle(p).RecoID());
 
       //Ask EMParticle Algorithm if shower is electron, using only de/dx
       if( _alg_emp.LL(true, shower._dedx, -1) > _alg_emp.LL(false, shower._dedx, -1)){
@@ -84,7 +82,7 @@ namespace ertool {
 	for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
 	  
 	  // get track object
-	  auto const& track = datacpy.Track(graph.GetParticle(t).RecoID());
+	  auto const& track = data.Track(graph.GetParticle(t).RecoID());
 	  
 	  // calculate distance between track end point and shower start point
 	  auto const& trackEnd = track.back();
