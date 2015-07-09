@@ -54,6 +54,7 @@ namespace larlite {
       s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
       auto nodeID = mgr.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),true);
       int pdg = mcs.PdgCode();
+      
       // then edit the particle
       mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
 								::ertool::ParticleMass(pdg),
@@ -76,6 +77,7 @@ namespace larlite {
 	int pdg_mom = mcs.MotherPdgCode();
 	if (pdg_mom != mcs.PdgCode()){
 	  auto& mother = mgr.MCParticleGraph().CreateParticle();
+	  
 	  mother.SetParticleInfo(pdg_mom,
 				 ::ertool::ParticleMass(pdg_mom),
 				 mcs.MotherStart().Position(),
@@ -125,11 +127,12 @@ namespace larlite {
        
        auto nodeID = mgr.Add(t,ertool::RecoInputID_t(i,mct_v.name()),true);
        int pdg = mct.PdgCode();
+       
        mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
-								 pdg,
+								 ::ertool::ParticleMass(pdg),
 								 mct.at(0).Position(),
 								 ::geoalgo::Vector(mct.at(0).Momentum()));
-
+       
        // does this node have children?
        if (parentageMap.find(mct.TrackID()) != parentageMap.end()){
 	 auto const& childNodeID_v = parentageMap[mct.TrackID()];
@@ -157,6 +160,7 @@ namespace larlite {
        if(g4_mother_parts.find(trkid_mom) == g4_mother_parts.end()) {
 	 int pdg_mom = mct.AncestorPdgCode();
 	 auto& mother = mgr.MCParticleGraph().CreateParticle();
+	 
 	 mother.SetParticleInfo(pdg_mom,
 				::ertool::ParticleMass(pdg_mom),
 				mct.MotherStart().Position(),
