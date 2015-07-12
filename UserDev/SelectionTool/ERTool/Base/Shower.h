@@ -55,6 +55,7 @@ namespace ertool {
 
     /// Total deposited energy
     double _energy;
+    double _time;
 
   };
 }

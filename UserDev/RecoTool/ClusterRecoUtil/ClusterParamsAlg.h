@@ -184,7 +184,7 @@ namespace cluster {
 
     void setNeuralNetPath(std::string s){fNeuralNetPath = s;}
 
-    void FillPolygon();
+    void FillPolygon(double frac=0.95);// frac is frac of charge to be included in polygon
 
     //void GetOpeningAngle();
 

@@ -179,8 +179,8 @@ namespace ertool {
     //                         2-b) only one of them has a valid generation
     //                         2-c) shares the same generation in the same tree
     if( part_a.Generation() != kDefaultGeneration && part_b.Generation() != kDefaultGeneration ) {
-      if( part_a.Ancestor() != part_b.Ancestor() && !part_a.Primary() && !part_b.Primary() )
-	throw ERException("Two non-primary particles from different ancestor cannot be unified!");
+      if( part_a.Ancestor() != part_b.Ancestor() && part_a.Descendant() && part_b.Descendant())
+	throw ERException("Two decendants particles from different ancestor cannot be unified!");
       if( part_a.Ancestor() == part_b.Ancestor() && part_a.Parent() != part_b.Parent() )
 	throw ERException("Two particles from the same ancestor but from different parents cannot be unified!");
     }
@@ -339,7 +339,7 @@ namespace ertool {
     std::string res;
     for(auto const& part_id : GetParticleNodes()) {
       auto const& p = GetParticle(part_id);
-      if( !p.Primary() && p.RelationAssessed() ) continue;
+      if( p.Descendant() && p.RelationAssessed() ) continue;
       std::string part_diagram;
       if( !p.RelationAssessed() )
 	part_diagram += "UN-ASSESSED " + std::to_string(p.PdgCode());
@@ -360,7 +360,7 @@ namespace ertool {
     auto& child  = _particle_v[child_id];
 
     // Not OK if a child is not associated with anything
-    if( child.RelationAssessed() && !child.Primary() )
+    if( child.RelationAssessed() && child.Descendant() )
 	throw ERException("Cannot make parentage for a child who is neither lonely nor primary!");
 
     AddChild(parent_id, child_id, score);
@@ -418,13 +418,13 @@ namespace ertool {
   {
     ValidNode(node);
     auto& thisnode = _particle_v[node];
-    // for now allow to set primary only if relation was never
-    // assessed
-    if (thisnode.RelationAssessed())
-      return;
-    // relation not assessed...proceed
-    thisnode._generation  = 0;
-    thisnode._ancestor_id = thisnode._node_id;
+    if(thisnode.Primary()) return;
+
+    thisnode._primary = true;
+    UpdateGeneration(node,0);
+    UpdateParentID(node,node);
+    UpdateAncestorID(node,node);
+    return;
   }
 
   void ParticleGraph::Reset()

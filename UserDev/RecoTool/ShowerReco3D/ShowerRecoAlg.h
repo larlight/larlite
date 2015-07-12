@@ -64,6 +64,11 @@ namespace showerreco {
     double fdEdxlength;
     bool fUseArea;
 
+    /// variables fot TTree
+    double _dedx;
+    int    _pl;
+    std::vector<double> _dedx_v;
+
   };
 }
 

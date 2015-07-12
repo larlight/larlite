@@ -94,7 +94,7 @@ namespace larlite {
     std::cout<<"Here's where we lost them:"
 	     <<"\nWrong numer pi0s            : "<<_n_pi0
 	     <<"\nShowers with energy < 20 MeV: "<<_n_E
-	     <<"\nShowers with EC <"<<_EC<<"       : "<<_n_detProf<<std::endl;
+	     <<"\nShowers with EC < "<<_EC<<"       : "<<_n_detProf<<std::endl;
 
     return true;
   }

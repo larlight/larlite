@@ -23,6 +23,9 @@ namespace ertool {
     _hradLen_e = new TH1D("_hradLen_e","rad len electrons",100,0,100);
     _hradLen_g = new TH1D("_hradLen_g","rad len gammas",100,0,100);
 
+    _hdEdx_e = new TH1D("_hdEdx_e","dedx electrons",100,0,10);
+    _hdEdx_g = new TH1D("_hdEdx_g","dedx gammas",100,0,10);
+
     // default plot mode is false
     _plot = false;
     // default setting for loading params
@@ -325,7 +328,7 @@ namespace ertool {
 	
 	dist   = -1.;
 	dEdx   = shr._dedx;
-	
+
 	// skip if dEdx out of bounds
 	if ( !_dEdxVar->inRange( dEdx, 0 ) ) continue;
 	
@@ -358,10 +361,12 @@ namespace ertool {
 	if ( g_like > e_like ){
 	  if(!(dist<0)) { _g_radLenData->add(RooArgSet(*_radLenVar)); }
 	  _g_dEdxData->add(RooArgSet(*_dEdxVar));
+
 	}
 	else{
 	  if(!(dist<0)) { _e_radLenData->add(RooArgSet(*_radLenVar)); }
 	  _e_dEdxData->add(RooArgSet(*_dEdxVar));
+
 	}
       }// if selection mode
 
@@ -370,10 +375,12 @@ namespace ertool {
 	  if(!(dist<0)) { _g_radLenData->add(RooArgSet(*_radLenVar)); }
 	  _g_dEdxData->add(RooArgSet(*_dEdxVar));
 	  _hradLen_g->Fill(dist);
+	  _hdEdx_g->Fill(dEdx);
 	}else {
 	  if(!(dist<0)) { _e_radLenData->add(RooArgSet(*_radLenVar)); }
 	  _e_dEdxData->add(RooArgSet(*_dEdxVar));
 	  _hradLen_e->Fill(dist);
+	  _hdEdx_e->Fill(dEdx);
 	}
       }// if training mode
 
@@ -387,6 +394,9 @@ namespace ertool {
 
     _hradLen_e->Write();
     _hradLen_g->Write();
+
+    _hdEdx_e->Write();
+    _hdEdx_g->Write();
     
     RooMsgService::instance().setSilentMode(true);
 

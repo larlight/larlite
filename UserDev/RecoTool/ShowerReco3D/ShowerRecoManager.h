@@ -55,7 +55,7 @@ namespace showerreco {
     
     ::cmtool::CMatchManager& MatchManager() { return *fMatchMgr; }
 
-    void Finalize() { if (_saveClusterTree) { _clusterTree->Write(); } }
+    void finalize(TFile* fout=nullptr);
 
     /// save cluster Ttree
     void SaveClusterTree(bool on) { _saveClusterTree = on; }

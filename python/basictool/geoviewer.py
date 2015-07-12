@@ -19,6 +19,8 @@ class GeoViewer(object):
     _type_sph  = geoalgo.Sphere()
     _holder    = geoalgo.GeoObjCollection()
     _converter = larpy.PyGeoObj()
+    _tpc_box   = geoalgo.AABox(0,-126,0,256,116,1036)
+    _use_box   = False;
 
     def __init__(self):
         self._fig = plt.figure(#num=None,
@@ -38,6 +40,10 @@ class GeoViewer(object):
         #self._ax.set_aspect("equal")
         self._range_min = [ 1e12, 1e12, 1e12]
         self._range_max = [-1e12,-1e12,-1e12]
+
+    # decide if to limit the view to the entire TPC
+    def use_box(self,boolean):
+        self._use_box = boolean
 
     def rand_color(self):
         c = np.random.rand(3,1)
@@ -82,6 +88,13 @@ class GeoViewer(object):
         data = self._converter.Convert(arg)
         if not c: c = self.rand_color()
         
+        # update boundaries
+        for i in xrange(3):
+            if data[i] < self._range_min[i]: self._range_min[i] = data[i]
+            if data[i] > self._range_max[i]: self._range_max[i] = data[i]
+
+        self._ax.scatter(*data,color=c,marker='*',s=100)
+
         # update boundaries
         for i in xrange(3):
             if data[i] < self._range_min[i]: self._range_min[i] = data[i]
@@ -213,11 +226,12 @@ class GeoViewer(object):
         self._ax.plot(xp,yp,zp,color=c)
 
 
+    # add sphere
     def _add_sphere(self,arg,c=''):
 
         if not c: c = self.rand_color()
         
-        o = arg.Origin()
+        o = arg.Center()
         r = arg.Radius()
 
         xp,yp,zp = sphere(o,r)
@@ -291,8 +305,8 @@ class GeoViewer(object):
             self._add_trajectory(self._holder.Trajectory()[x], self._holder.TrajectoryColor()[x])
         for x in xrange(len(self._holder.Cone())):
             self._add_cone(self._holder.Cone()[x], self._holder.ConeColor()[x])
-        #for x in xrange(len(self._holder.Sphere())):
-        #    self._add_sphere(self._holder.Sphere()[x], self._holder.SphereColor()[x])
+        for x in xrange(len(self._holder.Sphere())):
+            self._add_sphere(self._holder.Sphere()[x], self._holder.SphereColor()[x])
         for x in self._converter.Convert(self._holder.Labels()):
             self._add_label(x)
 
@@ -312,11 +326,17 @@ class GeoViewer(object):
             '''
             #plt.xlim([self._range_min[0],self._range_max[0]])
             #plt.ylim([self._range_min[1],self._range_max[1]])
-            
-        self._ax.set_xlim(self._range_min[0],self._range_max[0])
-        self._ax.set_ylim(self._range_min[1],self._range_max[1])
-        self._ax.set_zlim(self._range_min[2],self._range_max[2])
 
+        # if we ware using the TPC as our bounadry:
+        if (self._use_box):
+            self._ax.set_xlim( self._tpc_box.Min()[0]-10 , self._tpc_box.Max()[0]+10 )
+            self._ax.set_ylim( self._tpc_box.Min()[1]-10 , self._tpc_box.Max()[1]+10 )
+            self._ax.set_zlim( self._tpc_box.Min()[2]-10 , self._tpc_box.Max()[2]+10 )
+            self._add_box(self._tpc_box)
+        else:
+            self._ax.set_xlim(self._range_min[0],self._range_max[0])
+            self._ax.set_ylim(self._range_min[1],self._range_max[1])
+            self._ax.set_zlim(self._range_min[2],self._range_max[2])
 
         #self._ax.plot([0,0],[0,0],[0,30],color='red')
         #self._ax.plot([0,0],[0,30],[0,0],color='red')
@@ -325,6 +345,8 @@ class GeoViewer(object):
         self._ax.set_xlabel('X [cm]')
         self._ax.set_ylabel('Y [cm]')
         self._ax.set_zlabel('Z [cm]')
+
+        self._ax.view_init(elev=10., azim=270)
 
         self._fig.canvas
         self._fig.canvas.draw()#plt.show()

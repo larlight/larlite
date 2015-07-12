@@ -11,7 +11,11 @@
 namespace ertool {
 
   Manager::Manager()
-    : _cfg_mgr("ERToolConfig")
+    : _data(new class EventData)
+    , _mc_data(new class EventData)
+    , _graph(new class ParticleGraph)
+    , _mc_graph(new class ParticleGraph)
+    , _cfg_mgr("ERToolConfig")
   {
     Reset(); 
     _status = kIDLE; 
@@ -23,6 +27,7 @@ namespace ertool {
     _name_v.clear();
     _time_ana_v.clear();
     _time_algo_v.clear();
+
   }
 
   void Manager::AddCfgFile(const std::string cfg_fname)
@@ -35,10 +40,10 @@ namespace ertool {
     _cfg_file_v.clear();
   }
   
-  const ertool::EventData& Manager::EventData       () const { return _data;     }
-  const ertool::EventData& Manager::MCEventData     () const { return _mc_data;  }
-  ertool::ParticleGraph&   Manager::ParticleGraph   ()       { return _graph;    }
-  ertool::ParticleGraph&   Manager::MCParticleGraph ()       { return _mc_graph; }
+  const ertool::EventData& Manager::EventData       () const { return *_data;     }
+  const ertool::EventData& Manager::MCEventData     () const { return *_mc_data;  }
+  ertool::ParticleGraph&   Manager::ParticleGraph   ()       { return *_graph;    }
+  ertool::ParticleGraph&   Manager::MCParticleGraph ()       { return *_mc_graph; }
 
   void Manager::AddAlgo(AlgoBase* a) 
   { 
@@ -92,11 +97,11 @@ namespace ertool {
 			const bool mc) 
   {
     if(!mc) {
-      _data.Add(obj,input_id);
-      return _graph.CreateParticle(_data.Shower().back()).ID();
+      _data->Add(obj,input_id);
+      return _graph->CreateParticle(_data->Shower().back()).ID();
     }else{
-      _mc_data.Add(obj,input_id);
-      return _mc_graph.CreateParticle(_mc_data.Shower().back()).ID();
+      _mc_data->Add(obj,input_id);
+      return _mc_graph->CreateParticle(_mc_data->Shower().back()).ID();
     }
 
   }
@@ -106,11 +111,11 @@ namespace ertool {
 			const bool mc) 
   {
     if(!mc) {
-      _data.Add(obj,input_id);
-      return _graph.CreateParticle(_data.Track().back()).ID();
+      _data->Add(obj,input_id);
+      return _graph->CreateParticle(_data->Track().back()).ID();
     }else{
-      _mc_data.Add(obj,input_id);
-      return _mc_graph.CreateParticle(_mc_data.Track().back()).ID();
+      _mc_data->Add(obj,input_id);
+      return _mc_graph->CreateParticle(_mc_data->Track().back()).ID();
     }
   }
 
@@ -119,11 +124,11 @@ namespace ertool {
 			    const bool mc)
   {
     if(!mc) {
-      _data.Emplace(std::move(obj),std::move(input_id));
-      return _graph.CreateParticle(_data.Shower().back()).ID();
+      _data->Emplace(std::move(obj),std::move(input_id));
+      return _graph->CreateParticle(_data->Shower().back()).ID();
     }else{
-      _mc_data.Emplace(std::move(obj),std::move(input_id));
-      return _mc_graph.CreateParticle(_data.Shower().back()).ID();
+      _mc_data->Emplace(std::move(obj),std::move(input_id));
+      return _mc_graph->CreateParticle(_data->Shower().back()).ID();
     }
   }
 
@@ -132,21 +137,21 @@ namespace ertool {
 			    const bool mc)
   {
     if(!mc) {
-      _data.Emplace(std::move(obj),std::move(input_id));
-      return _graph.CreateParticle(_data.Track().back()).ID();
+      _data->Emplace(std::move(obj),std::move(input_id));
+      return _graph->CreateParticle(_data->Track().back()).ID();
     }else{
-      _mc_data.Emplace(std::move(obj),std::move(input_id));
-      return _mc_graph.CreateParticle(_data.Track().back()).ID();
+      _mc_data->Emplace(std::move(obj),std::move(input_id));
+      return _mc_graph->CreateParticle(_data->Track().back()).ID();
     }
   }
 
   void Manager::ClearData() {
-    _data.Reset();
-    _mc_data.Reset();
-    _graph.Reset();
-    _mc_graph.Reset();
+    _data->Reset();
+    _mc_data->Reset();
+    _graph->Reset();
+    _mc_graph->Reset();
   }
-  
+
   void Manager::Initialize()
   {
     //fWatch.Start();
@@ -308,7 +313,8 @@ namespace ertool {
 
     if(_profile_mode) {
       std::cout << std::endl << "  \033[95m<<" << __FUNCTION__ << ">>\033[00m Time Profile Report"  << std::endl;
-      for(size_t i=0; i<70; ++i)
+      std::cout << " ";
+      for(size_t i=0; i<68; ++i)
 	std::cout<<"_";
       std::cout << std::endl;
       
@@ -319,29 +325,33 @@ namespace ertool {
 		<< std::left << std::setw(12) << "End [s]"      << " | "
 		<< std::endl;
 
-      for(size_t i=0; i<70; ++i)
+      std::cout << " ";
+      for(size_t i=0; i<68; ++i)
 	std::cout<<"_";
-      std::cout << std::endl;
+      std::cout << std::flush;
 
       for(size_t i=0; i<_algo_v.size(); ++i) {
-	std::cout << "| "
-		  << std::left << std::setw(20) << _ana_v[i]->Name() << " | "
-		  << std::left << std::setw(11) << _time_algo_v[i]._time_start << " | "
-		  << std::left << std::setw(11) << _time_algo_v[i]._time_proc  << " | "
-		  << std::left << std::setw(11) << _time_algo_v[i]._time_end   << " | "
-		  << std::endl;
+	std::cout << std::endl
+		  << "| "
+		  << std::left << std::setw(20) << _algo_v[i]->Name() << " | "
+		  << std::left << std::setw(12) << _time_algo_v[i]._time_start << " | "
+		  << std::left << std::setw(12) << _time_algo_v[i]._time_proc  << " | "
+		  << std::left << std::setw(12) << _time_algo_v[i]._time_end   << " | ";
       }
       for(size_t i=0; i<_ana_v.size(); ++i) {
-	std::cout << "| "
+	std::cout << std::endl
+		  << "| "
 		  << std::left << std::setw(20) << _ana_v[i]->Name() << " | "
-		  << std::left << std::setw(11) << _time_ana_v[i]._time_start << " | "
-		  << std::left << std::setw(11) << _time_ana_v[i]._time_proc  << " | "
-		  << std::left << std::setw(11) << _time_ana_v[i]._time_end   << " | "
-		  << std::endl;
+		  << std::left << std::setw(12) << _time_ana_v[i]._time_start << " | "
+		  << std::left << std::setw(12) << _time_ana_v[i]._time_proc  << " | "
+		  << std::left << std::setw(12) << _time_ana_v[i]._time_end   << " | ";
       }
-      for(size_t i=0; i<70; ++i)
-	std::cout<<"_";
+
       std::cout << std::endl;
+      std::cout << " ";
+      for(size_t i=0; i<68; ++i)
+	std::cout <<  "_";
+      std::cout << std::endl << std::endl;
     }
 
     _status = kFINISHED;
@@ -365,7 +375,7 @@ namespace ertool {
       auto& algo = _algo_v[i];
       algo->_training_mode = this->_training_mode;
       if(_profile_mode) fWatch.Start();
-      algo->Reconstruct(_data,_graph);
+      algo->Reconstruct(*_data,*_graph);
       if(_profile_mode) _time_algo_v[i]._time_proc += fWatch.RealTime();
     }
     
@@ -373,8 +383,8 @@ namespace ertool {
     for(size_t i=0; i<_ana_v.size(); ++i) {
       auto& ana = _ana_v[i];
       if(_profile_mode) fWatch.Start();
-      if(_mc_for_ana) ana->SetMCData(_mc_data,_mc_graph);
-      status = ana->Analyze(_data,_graph);
+      if(_mc_for_ana) ana->SetMCData(*_mc_data,*_mc_graph);
+      status = ana->Analyze(*_data,*_graph);
       ana->UnsetMCData();
       if(_profile_mode) _time_ana_v[i]._time_proc += fWatch.RealTime();
     }

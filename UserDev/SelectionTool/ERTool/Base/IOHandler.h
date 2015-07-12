@@ -1,9 +1,9 @@
 /**
- * \file FileIO.h
+ * \file IOHandler.h
  *
  * \ingroup Base
  * 
- * \brief Class def header for a class FileIO
+ * \brief Class def header for a class IOHandler
  *
  * @author kazuhiro
  */
@@ -11,8 +11,8 @@
 /** \addtogroup Base
 
     @{*/
-#ifndef SELECTIONTOOL_ERTOOL_FILEIO_H
-#define SELECTIONTOOL_ERTOOL_FILEIO_H
+#ifndef SELECTIONTOOL_ERTOOL_IOHANDLER_H
+#define SELECTIONTOOL_ERTOOL_IOHANDLER_H
 
 #include "IStreamBase.h"
 #include "OStreamBase.h"
@@ -21,21 +21,21 @@ namespace ertool {
   class Manager;
   namespace io {
     /**
-       \class FileIO
-       User defined class FileIO ... these comments are used to generate
+       \class IOHandler
+       User defined class IOHandler ... these comments are used to generate
        doxygen documentation!
     */
-    class FileIO{
+    class IOHandler{
       friend class ::ertool::Manager;
     public:
       
       /// Default constructor
-      FileIO( const std::string& proc_name = "no_name",
-	      const StreamType_t in_strm   = kEmptyStream,
-	      const StreamType_t out_strm  = kEmptyStream);
+      IOHandler( const std::string& proc_name = "no_name",
+		 const StreamType_t in_strm   = kEmptyStream,
+		 const StreamType_t out_strm  = kEmptyStream);
       
       /// Default destructor
-      ~FileIO(){}
+      ~IOHandler(){}
       
       /// Input file name adder
       void AddInputFile( const std::string& fname );
@@ -63,6 +63,9 @@ namespace ertool {
       
       /// Close input/output file(s)
       bool Close();
+
+      /// Clear event-wise data contents
+      void ClearData();
       
     protected:
 

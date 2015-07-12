@@ -1,23 +1,18 @@
-/**
- * \file AlgoSingleGamma.h
- *
- * \ingroup Algo
- * 
- * \brief Class def header for a class AlgoSingleGamma
- *
- * @author jzennamo
- */
+/*
+AlgoSingleGamma, July 2015
 
-/** \addtogroup Algo
-
-    @{*/
+authors: Brooke Russell, brooke.russell@yale.edu
+         Bobby Murrells, robertmurrells@gmail.com
+         Joseph Zennamo, jzennamo@uchicago.edu
+*/
 
 #ifndef ERTOOL_ALGOSINGLEGAMMA_H
 #define ERTOOL_ALGOSINGLEGAMMA_H
 
+#include "ERTool/Base/AlgoBase.h"
 #include "ERTool/Algo/AlgoEMPart.h"
 #include "ERTool/Algo/AlgoFindRelationship.h"
-#include "ERTool/Base/AlgoBase.h"
+#include "ERTool/Algo/AlgoPrimaryFinder.h"
 #include "GeoAlgo/GeoAlgo.h"
 #include "GeoAlgo/GeoAABox.h"
 #include <algorithm> // for std::find
@@ -53,8 +48,12 @@ namespace ertool {
     bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
 		// Set verbosity
-    void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); }
-
+    void setVerbose(bool on) { 
+          _verbose = on; 
+	  _findRel.setDebug(on); 
+	  _primaryFinder.setVerbose(on);
+    }
+    
        /// Use EMPart
     void useRadLength(bool on) { _useRadLength = on; }
 
@@ -62,24 +61,24 @@ namespace ertool {
 
     void setVtxToTrkStartDist(double d){
       _vtxToTrkStartDist = d;
+      _primaryFinder.setVtxToTrkStartDist(d);
     }
     void setVtxToTrkDist(double d){
       _vtxToTrkDist = d;
+      _primaryFinder.setVtxToTrkDist(d);
     }
     void setVtxToShrStartDist(double d){
       _vtxToShrStartDist = d;
+      _primaryFinder.setVtxToShrStartDist(d); 
     }
     void setMaxIP(double d){
       _maxIP = d;
+      _primaryFinder.setMaxIP(d); 
     }
     void setEThreshold(double E){ _Ethreshold = E; }
 
     void setVtxProximityCut(double d) { _vtxProximityCut = d; }
-    void setBDtW(double b) { _BDtW = b; }
-    void setBDtTW(double bt) { _BDtTW = bt; }
-
-
-
+    
   private:
 
     ::geoalgo::AABox fTPC;
@@ -88,8 +87,8 @@ namespace ertool {
     void ClearTree();
 
   protected:
-
-        /// Function to check wether a shower is e- or gamma-like
+    
+    /// Function to check wether a shower is e- or gamma-like
     /// Returns true if gamma-like
     bool isGammaLike(const double dedx, double radlen,bool forceRadLen=false);
 
@@ -160,12 +159,20 @@ namespace ertool {
     // Other algorithms to use
     AlgoEMPart _alg_emp;
     AlgoFindRelationship _findRel;
+    AlgoPrimaryFinder _primaryFinder;
     // GeoAlgo Tool
     ::geoalgo::GeoAlgo _geoAlgo;
 
     //debug histos
     TH1F* _e_ll_values;
     TH1F* _dedx_values;
+
+    //Tree -> one entry for every time EMPart LL function
+    // is called using both dEdx and rad-length
+    TTree* _empart_tree;
+    double _dedx;
+    double _radlen;
+    int    _pdg;
 
     //Tree -> one entry per shower-other comparison
     // therefore possibly multiple entries for each shower
@@ -174,25 +181,37 @@ namespace ertool {
     //For every Shower
     double _E; // energy of shower
     int    _PDG; // PDG code assigned by AlgoEMPart
-    
-   
+       
     int    _VsTrack; // comparing vs track (==1)
     double _thatE; // Energy of other shower/track
+    double _thisShwrE;
+    double _thisTrkE;
     double _dEdx;
     double _IP; // Impact Paramter with other object
-    double _IPthisStart; // distance from IP to this shower start point
+    double _Impa;
+    double _IPthisShwrStrt;
+    double _IPthisTrkStrt;
+    double _IPthisStart;
     double _IPthatStart; // distance from IP to that shower/track start point
+    double _IPathatStart;
     double _IPtrkBody; // distance from IP to body of track (if comparing with track)
     double _distBackAlongTraj; // distance backwards from vertex to nearest wall
     double _distToTopWall; // distance backwards along traj from vertex to top wall(extended to infinity)
+    double _vtx_min_radius; // minimum radius to claim a vertex point
     
     //At the algo level what is tied to an event
     int _Ngamma; // Number of photons matched to an event 
     int _Ntrks; // Number of tracks matched to an event
     int _Nmu; // Number of muons matched to an event
-    
 
+    int track_gamma;
+    int track_elec;
+    int track_aelec;
 
+    TH1D* _hRadius; // radius histogram
+    TH1D* _IPi; // impact parameter
+    TH1D* _IPj; // impact parameter "this" track with "other" track
+    TH1D* _IPsn; // impact parameter "other" shower with "this" shower
   };
 }
 #endif

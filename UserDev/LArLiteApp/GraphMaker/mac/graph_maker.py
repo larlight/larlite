@@ -41,8 +41,8 @@ my_anaunit = fmwk.ExampleERSelection()
 my_anaunit.SetShowerProducer(True,"mcreco");
 my_anaunit.SetTrackProducer(True,"mcreco");
 # RECO PRODUCERS
-#my_ana.SetShowerProducer(False,"showerreco");
-#my_ana.SetTrackProducer(False,"");
+#my_anaunit.SetShowerProducer(False,"showerreco");
+#my_anaunit.SetTrackProducer(False,"");
 #############################
 my_anaunit._mgr.AddAlgo(my_algo)
 my_anaunit._mgr._mc_for_ana = True

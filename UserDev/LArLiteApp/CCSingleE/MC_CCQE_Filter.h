@@ -65,18 +65,18 @@ namespace larlite {
     size_t total_events;
     size_t kept_events;
 
-    // Exact number of mcshowers to look for
+    /// Exact number of mcshowers to look for
     size_t _n_mcshowers_requested;
-    // Minimum MCShower energy to consider (MEV)
+    /// Minimum MCShower energy to consider (MEV)
     double _min_mcshower_E_requested;
-    // Exact number of mctracks to look for
+    /// Exact number of mctracks to look for
     size_t _n_mctracks_requested;
-    // Minimum MCTrack kinetic energy to consider (MEV)
+    /// Minimum MCTrack kinetic energy to consider (MEV)
     double _min_mctrack_E_requested;
-    
-
-    // TDatabasePDG instance
+    /// TDatabasePDG instance
     TDatabasePDG *_pdgdb;
+    /// Particle mass map
+    std::map<int,double> _massdb;
   };
 }
 #endif

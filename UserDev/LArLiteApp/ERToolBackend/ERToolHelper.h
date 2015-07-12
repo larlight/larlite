@@ -19,6 +19,10 @@
 #include <TRandom.h>
 #include "DataFormat/DataFormat-TypeDef.h"
 #include "ERTool/Base/Manager.h"
+
+#include "LArUtil/ElecClock.h"
+#include "LArUtil/Geometry.h"
+
 //#include "ERTool/Base/EventData.h"
 //#include "ERTool/Base/ParticleGraph.h"
 
@@ -36,7 +40,14 @@ namespace larlite {
   public:
     
     /// Default constructor
-    ERToolHelper(){ _minEDep = 1.e-10; };
+    ERToolHelper(){
+    	_minEDep = 1.e-10;
+
+    	// get the detector width and total time of a singel fram
+    	auto geom = ::larutil::Geometry::GetME();
+    	_DetWidth = 2 * geom->DetHalfWidth();
+    	_DetFramePeriod = 1.6E6; //ns, TODO: Fill this not by hand but from a better source
+    };
     
     /// Default destructor
     virtual ~ERToolHelper(){};
@@ -51,7 +62,7 @@ namespace larlite {
     /// Fill Track Info from MC
     void FillTracks( const event_mctrack&   mct_v,
 		     ::ertool::Manager&     res) const;
-    
+
     /// Fill Track Info from RECO
     void FillTracks ( const event_track&       trk_v,
 		      const event_cosmictag&   cos_trk_v,
@@ -78,6 +89,12 @@ namespace larlite {
     /// Set minimum EDep amount for shower to be added to EventData
     void SetMinEDep(double E) { if(E<1.e-10) E=1.e-10; _minEDep = E; }
 
+	/// Calculates for each mc track, based on the time of the event, the corresponding shift in x-direction
+    TLorentzVector getXShift(const mctrack& mct) const;
+
+	/// Calculates for each mc shower, based on the time of the event, the corresponding shift in x-direction
+    TLorentzVector getXShift(const mcshower& mct) const;
+
 
   private:
 
@@ -85,6 +102,10 @@ namespace larlite {
     // be added to EventData
     double _minEDep;
     
+    // detector width and time size of a frame used for calculations of shift
+    double _DetWidth;  //cm
+    double _DetFramePeriod;
+
     EMShowerProfile _shrProfiler;
 
     struct PartID_t {

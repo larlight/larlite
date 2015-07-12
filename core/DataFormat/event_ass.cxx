@@ -3,7 +3,7 @@
 
 #include "event_ass.h"
 #include <sstream>
-
+#include <set>
 namespace larlite{
   
   event_ass::event_ass(const std::string name)
@@ -16,6 +16,7 @@ namespace larlite{
     //for(auto& ass : _ass_data) ass.clear();
     _ass_map_key.clear();
     _ass_data.clear();
+    _ass_ids.clear();
   }
 
   size_t event_ass::size() const
@@ -180,18 +181,22 @@ namespace larlite{
       
       auto const& index = assid(keys.first,keys.second);
       
-      size_t b_ctr = 0;
-      for(auto const& ass : _ass_data[index])
-	b_ctr += ass.size();
-      
+      size_t a_ctr = 0;
+      std::set<size_t> unique_partner;
+      for(auto const& ass : _ass_data[index]){
+	if(!ass.size()) continue;
+	a_ctr += 1;
+	for(auto const& partner_id : ass)
+	  unique_partner.insert((size_t)partner_id);
+      }      
       std::cout << "    Association ID: " << index << "/" << _ass_data.size() << " ... ("
 		<< data::kDATA_TREE_NAME[keys.first.first].c_str() << "," << keys.first.second.c_str()
 		<< ") => ("
 		<< data::kDATA_TREE_NAME[keys.second.first].c_str() << "," << keys.second.second.c_str()
 		<< ") ... "
-		<< _ass_data[index].size()
+		<< a_ctr
 		<< " objects associated with "
-		<< b_ctr
+		<< unique_partner.size()
 		<< " objects."
 		<< std::endl;
     }

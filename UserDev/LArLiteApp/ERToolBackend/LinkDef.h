@@ -12,6 +12,7 @@
 #pragma link C++ class larlite::ERToolHelper+;
 #pragma link C++ class larlite::ERToolAnaBase+;
 #pragma link C++ class larlite::ExampleERSelection+;
+#pragma link C++ class larlite::ParticleID+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif

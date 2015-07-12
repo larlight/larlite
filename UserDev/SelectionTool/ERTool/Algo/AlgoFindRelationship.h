@@ -14,7 +14,6 @@
 #ifndef ERTOOL_ALGOFINDRELATIONSHIP_H
 #define ERTOOL_ALGOFINDRELATIONSHIP_H
 
-#include "TDatabasePDG.h"
 #include "GeoAlgo/GeoAlgo.h"
 #include "ERTool/Base/Shower.h"
 #include "ERTool/Base/Track.h"
