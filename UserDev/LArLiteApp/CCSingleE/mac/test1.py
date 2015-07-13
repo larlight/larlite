@@ -54,7 +54,7 @@ Ecut = 20 # in MeV
 #my_ana.SetDebug(False)
 #my_ana.SetECut(Ecut)
 
-my_ana = ertool.ERAnatestTree()
+my_ana = ertool.ERAnatestTree("ERAnatestTree")
 
 my_anaunit = fmwk.ExampleERSelection()
 #my_anaunit._mgr.AddAlgo(primary_algo)
