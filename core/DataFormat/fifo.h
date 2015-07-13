@@ -103,10 +103,10 @@ namespace larlite {
     UInt_t channel_number() const {return _channel_number;}
     
     /// Getter for the module address
-    UChar_t module_address() const { return _module_address; }
+    UInt_t module_address() const { return (UInt_t)(_module_address);}
     
     /// Getter for the module id
-    UChar_t module_id() const {return _module_id;}
+    UInt_t module_id() const {return (UInt_t)(_module_id);}
 
     /// Getter for the discriminator ID number
     fem::Discriminator_t disc_id() const  {return _disc_id;}
@@ -190,10 +190,10 @@ namespace larlite {
     UInt_t event_frame_number() const {return _event_frame_number;}
     
     /// Getter for the module address
-    UChar_t module_address() const {return _module_address;}
+    UInt_t module_address() const {return (UInt_t)(_module_address);}
     
     /// Getter for the module ID
-    UChar_t module_id()      const {return _module_id;}
+    UInt_t module_id()      const {return (UInt_t)(_module_id);}
     
     /// Getter for the checksum
     UInt_t checksum()       const {return _checksum;} 

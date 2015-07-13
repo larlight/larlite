@@ -22,7 +22,7 @@ namespace larlite {
     ParticleID(const mcpart& mcp);
     
     // Default destructor
-    ~ParticleID();
+    virtual ~ParticleID(){};
 
     friend bool operator== (const ParticleID& p1, const ParticleID& p2);
     friend bool operator<  (const ParticleID& p1, const ParticleID& p2);
