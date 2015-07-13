@@ -39,10 +39,12 @@ namespace ertool {
     virtual void Reset();
 
     /// Function to accept fclite::PSet
-    // void AcceptPSet(const ::fcllite::PSet& cfg);
+     void AcceptPSet(const ::fcllite::PSet& cfg);
 
     /// Called @ before processing the first event sample
     void ProcessBegin();
+
+    void PrepareTTree() ;
 
     /// Function to evaluate input showers and determine a score
     bool Analyze(const EventData &data, const ParticleGraph &ps);

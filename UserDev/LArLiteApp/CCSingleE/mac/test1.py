@@ -9,13 +9,15 @@ if len(sys.argv) < 2:
 
 from ROOT import gSystem
 from ROOT import larlite as fmwk
-from ROOT import ertool
+from ROOT import ertool, larutil
 from seltool.ccsingleeDef import GetCCSingleEInstance
 #ertool.Manager
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
 my_proc.enable_filter(True)
+
+larutil.LArUtilManager.Reconfigure(fmwk.geo.kArgoNeuT)
 
 # Get Default CCSingleE Algorithm instance
 # this sets default parameters
@@ -26,25 +28,11 @@ my_proc.enable_filter(True)
 my_algo = GetCCSingleEInstance()
 my_algo.setVerbose(False)
 
-#primary_algo = ertool.AlgoPrimaryFinder()
-#primary_algo.setVtxToTrkStartDist(1)
-#primary_algo.setVtxToTrkDist(1)
-#primary_algo.setVtxToShrStartDist(50)
-#primary_algo.setMaxIP(1)
-
-# Create ERTool filter
-# This filter removes any track that
-# is less than 3 mm in length
-# these tracks exist in "perfect reco"
-# but at this stage it is unreasonable
-# to assume we will be able to
-# reconstruct them
-
-# Create MC Filter
-# This filter is if you want to look at CC1E events
-#MCfilter = fmwk.MC_CC1E_Filter();
-#Set flip to FALSE if you are looking for efficiency, TRUE if you are looking for MID efficiency
-#MCfilter.flip(False)
+primary_algo = ertool.AlgoPrimaryFinder()
+primary_algo.setVtxToTrkStartDist(1)
+primary_algo.setVtxToTrkDist(1)
+primary_algo.setVtxToShrStartDist(50)
+primary_algo.setMaxIP(1)
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):
@@ -54,7 +42,7 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
-my_proc.set_ana_output_file("singleE_selection.root")
+my_proc.set_ana_output_file("testSelection.root")
 
 # here set E-cut for Helper & Ana modules
 #This cut is applied in helper... ertool showers are not made if the energy of mcshower or reco shower
@@ -70,7 +58,7 @@ my_ana = ertool.ERAnatestTree()
 
 my_anaunit = fmwk.ExampleERSelection()
 #my_anaunit._mgr.AddAlgo(primary_algo)
-#my_anaunit._mgr.AddAlgo(my_algo)
+my_anaunit._mgr.AddAlgo(my_algo)
 my_anaunit._mgr.AddAna(my_ana)
 #my_anaunit._mgr.AddCfgFile('new_empart.txt')
 #This cut is applied in helper... ertool showers are not made if the energy of mcshower or reco shower
@@ -81,12 +69,12 @@ my_anaunit._mgr._mc_for_ana = True
 
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
-#my_anaunit.SetShowerProducer(True,"mcreco");
+my_anaunit.SetShowerProducer(True,"mcreco");
 #my_anaunit.SetShowerProducer(False,"showerreco");
 #my_anaunit.SetShowerProducer(False,"newdefaultreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetShowerProducer(False,"mergeall");
-#my_anaunit.SetTrackProducer(True,"mcreco");
+my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 #my_anaunit.SetTrackProducer(False,"costrk");
 #my_anaunit.SetVtxProducer(True,"generator");

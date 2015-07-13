@@ -14,6 +14,8 @@
 #pragma link C++ class larlite::MC_CCQE_Filter+;
 #pragma link C++ class larlite::MC_Dirt_Filter+;
 #pragma link C++ class larlite::MC_NC_Filter+;
+#pragma link C++ class ertool::ERAnatestTree+;
+
 //ADD_NEW_CLASS ... do not change this line
 
 #endif

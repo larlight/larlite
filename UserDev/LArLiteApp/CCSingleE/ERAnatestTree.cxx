@@ -13,18 +13,22 @@ namespace ertool {
   }
 
   void ERAnatestTree::Reset()
-  {
-    _x = -1000;
-  }
+  {}
 
-  //void ERAnatestTree::AcceptPSet(const ::fcllite::PSet& cfg)
-  //{}
+  void ERAnatestTree::PrepareTTree(){
+    _x = -1000 ;
+    }
+
+  void ERAnatestTree::AcceptPSet(const ::fcllite::PSet& cfg)
+  {}
 
   void ERAnatestTree::ProcessBegin()
   {}
 
   bool ERAnatestTree::Analyze(const EventData &data, const ParticleGraph &ps)
   {
+
+    PrepareTTree() ;
     auto const& mc_graph = MCParticleGraph();
     
       for (auto &p : mc_graph.GetParticleArray())
