@@ -5,7 +5,8 @@
 
 namespace ertool {
 
-  ERAnatestTree::ERAnatestTree(const std::string& name) : AnaBase(name)
+  ERAnatestTree::ERAnatestTree(const std::string& name) : AnaBase(name),
+  _tree(nullptr)
   {
     if (_tree) { delete _tree; }
     _tree = new TTree("_tree","Result Tree");
