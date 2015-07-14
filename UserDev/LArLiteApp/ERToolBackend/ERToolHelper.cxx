@@ -126,7 +126,7 @@ namespace larlite {
        auto nodeID = mgr.Add(t,ertool::RecoInputID_t(i,mct_v.name()),true);
        int pdg = mct.PdgCode();
        mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
-								 pdg,
+								 ::ertool::ParticleMass(pdg),
 								 mct.at(0).Position(),
 								 ::geoalgo::Vector(mct.at(0).Momentum()));
 
