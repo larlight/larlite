@@ -57,6 +57,11 @@ namespace ertool {
     /// TTree
     TTree* _tree;
     double _x;
+    double _y;
+    double _z;
+    double _e;
+    double _ke;
+    double _m;
 
 
   };

@@ -42,10 +42,13 @@ namespace ertool {
   { return _pdg_code; }
   const double& Particle::Mass() const
   { return _mass; }
+
   double Particle::Energy() const
-  { return sqrt(pow(_mass,2) + pow(KineticEnergy(),2)); }
+  { return  pow((_mom * _mom + _mass * _mass), 0.5); }
+
   double Particle::KineticEnergy() const
-  { return _mom.Length(); }
+  { return pow((_mom * _mom + _mass * _mass), 0.5) - _mass ; }
+
   const ::geoalgo::Vector& Particle::Vertex()   const
   { return _vtx; }
   const ::geoalgo::Vector& Particle::Momentum() const
