@@ -126,10 +126,11 @@ namespace larlite {
        
        auto nodeID = strm.Add(t,ertool::RecoInputID_t(i,mct_v.name()),true);
        int pdg = mct.PdgCode();
-       strm.GetParticleGraphWriteable(true).GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
-								 pdg,
-								 mct.at(0).Position(),
-								 ::geoalgo::Vector(mct.at(0).Momentum()));
+
+       strm.GetParticleGraphWriteable(true).GetParticle(nodeID).SetParticleInfo(pdg,
+										::ertool::ParticleMass(pdg),
+										mct.at(0).Position(),
+										::geoalgo::Vector(mct.at(0).Momentum()));
 
        // does this node have children?
        if (parentageMap.find(mct.TrackID()) != parentageMap.end()){
