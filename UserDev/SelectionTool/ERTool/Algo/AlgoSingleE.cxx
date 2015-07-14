@@ -227,6 +227,7 @@ namespace ertool {
 	  continue;
 	// if their start point is very close:
 	// calculate a stupid track direction
+
 	size_t nsteps = track.size();
 	::geoalgo::Vector_t trackDir = track[int(nsteps/2.)]-track[0];
 	trackDir.Normalize();
