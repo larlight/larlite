@@ -39,8 +39,8 @@ namespace larlite {
 
     // set event ID through storage manager
     storage->set_id(storage->get_data<event_cluster>(fInputProducer)->run(),
-		    storage->get_data<event_cluster>(fInputProducer)->subrun(),
-		    storage->get_data<event_cluster>(fInputProducer)->event_id());
+                    storage->get_data<event_cluster>(fInputProducer)->subrun(),
+                    storage->get_data<event_cluster>(fInputProducer)->event_id());
 
     // Run matching
     std::vector<std::vector<unsigned int> > matched_pairs;
@@ -52,35 +52,35 @@ namespace larlite {
 
       if(pfpart_v && pfpart_v->size()) {
       
-	//auto const& ass_clusters = pfpart_v->association(data::kCluster, fInputProducer);
-	event_cluster* ev_cluster = nullptr;
-	auto const& ass_clusters = storage->find_one_ass(pfpart_v->id(),ev_cluster,pfpart_v->name());
-	// Loop over pfparticles
-	for(size_t pfpart_index=0; pfpart_index<pfpart_v->size(); ++pfpart_index) {
-	  
-	  auto const& pfp = (*pfpart_v)[pfpart_index];
-	  
-	  // If this is not pdg=11 pfparticle, ignore
-	  if(pfp.PdgCode()!=11) continue;
-	  
-	  // Otherwise we store the association information in matched_pair
-	  matched_pairs.push_back(std::vector<unsigned int>());
-	  
-	  auto& last_pair = (*matched_pairs.rbegin());
-	  
-	  last_pair.reserve(ass_clusters[pfpart_index].size());
-	  
-	  // Loop over associated index for *this* pfparticle
-	  for(auto const& ass_index : ass_clusters[pfpart_index]) 
-	    last_pair.push_back(ass_index);
-	}
+        //auto const& ass_clusters = pfpart_v->association(data::kCluster, fInputProducer);
+        event_cluster* ev_cluster = nullptr;
+        auto const& ass_clusters = storage->find_one_ass(pfpart_v->id(),ev_cluster,pfpart_v->name());
+        // Loop over pfparticles
+        for(size_t pfpart_index=0; pfpart_index<pfpart_v->size(); ++pfpart_index) {
+          
+          auto const& pfp = (*pfpart_v)[pfpart_index];
+          
+          // If this is not pdg=11 pfparticle, ignore
+          if(pfp.PdgCode()!=11) continue;
+          
+          // Otherwise we store the association information in matched_pair
+          matched_pairs.push_back(std::vector<unsigned int>());
+          
+          auto& last_pair = (*matched_pairs.rbegin());
+          
+          last_pair.reserve(ass_clusters[pfpart_index].size());
+          
+          // Loop over associated index for *this* pfparticle
+          for(auto const& ass_index : ass_clusters[pfpart_index]) 
+            last_pair.push_back(ass_index);
+        }
       }
 
       fManager.Reconstruct(local_clusters,
-			   matched_pairs,
-			   *shower_v);
+                           matched_pairs,
+                           *shower_v);
     }
-	
+        
     // Make sure result has the same size 
     if(shower_v->size() != matched_pairs.size())
       throw ::showerreco::ShowerRecoException("Mismatch in # of showers from algorithm's return!");
