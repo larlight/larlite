@@ -15,6 +15,7 @@
 
 #include "ERToolHelper.h"
 #include "ERTool/Base/UtilFunc.h"
+#include "ERTool/Base/EmptyInput.h"
 #include <limits>
 #include <climits>
 
@@ -23,7 +24,7 @@ namespace larlite {
   void ERToolHelper::FillMCInfo( const event_mctruth&   mci_v,
 				 const event_mcshower&  mcs_v,
 				 const event_mctrack&   mct_v,
-				 ::ertool::Manager&     mgr) const
+				 ::ertool::io::EmptyInput& strm) const
   {
 
     // Parentage information:
@@ -52,10 +53,10 @@ namespace larlite {
       s._energy     = mcs.DetProfile().Momentum().E();
       s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
       s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
-      auto nodeID = mgr.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),true);
+      auto nodeID = strm.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),true);
       int pdg = mcs.PdgCode();
       // then edit the particle
-      mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
+      strm.GetParticleGraphWriteable(true).GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
 								::ertool::ParticleMass(pdg),
 								mcs.Start().Position(),
 								mcs.Start().Momentum()); 
@@ -75,7 +76,7 @@ namespace larlite {
       if(g4_mother_parts.find(trkid_mom) == g4_mother_parts.end()) {
 	int pdg_mom = mcs.MotherPdgCode();
 	if (pdg_mom != mcs.PdgCode()){
-	  auto& mother = mgr.MCParticleGraph().CreateParticle();
+	  auto& mother = strm.GetParticleGraphWriteable(true).CreateParticle();
 	  mother.SetParticleInfo(pdg_mom,
 				 ::ertool::ParticleMass(pdg_mom),
 				 mcs.MotherStart().Position(),
@@ -84,7 +85,7 @@ namespace larlite {
 	  g4_mother_id[trkid_mom] = PartID_t(mother.Vertex(), mother.Momentum(), mother.PdgCode());
 	}
 	else{
-	  auto const& aaa = mgr.MCParticleGraph().GetParticle(nodeID);
+	  auto const& aaa = strm.GetParticleGraphWriteable(true).GetParticle(nodeID);
 	  g4_mother_parts.insert(std::make_pair(trkid_mom,aaa));
 	  g4_mother_id[trkid_mom] = PartID_t(aaa.Vertex(), aaa.Momentum(), aaa.PdgCode());
 	}
@@ -92,8 +93,8 @@ namespace larlite {
       if(mcs.TrackID() != mcs.MotherTrackID()) {      
 	
 	auto const& motherNodeID = g4_mother_parts[trkid_mom].ID();
-	auto const& childNodeID  = mgr.MCParticleGraph().GetParticle(nodeID).ID();
-	mgr.MCParticleGraph().SetParentage(motherNodeID,
+	auto const& childNodeID  = strm.GetParticleGraphWriteable(true).GetParticle(nodeID).ID();
+	strm.GetParticleGraphWriteable(true).SetParentage(motherNodeID,
 					   childNodeID);
 	
        }
@@ -123,9 +124,9 @@ namespace larlite {
        for(auto& v : t._pid_score) v = 100;
        if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
        
-       auto nodeID = mgr.Add(t,ertool::RecoInputID_t(i,mct_v.name()),true);
+       auto nodeID = strm.Add(t,ertool::RecoInputID_t(i,mct_v.name()),true);
        int pdg = mct.PdgCode();
-       mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
+       strm.GetParticleGraphWriteable(true).GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
 								 pdg,
 								 mct.at(0).Position(),
 								 ::geoalgo::Vector(mct.at(0).Momentum()));
@@ -134,8 +135,8 @@ namespace larlite {
        if (parentageMap.find(mct.TrackID()) != parentageMap.end()){
 	 auto const& childNodeID_v = parentageMap[mct.TrackID()];
 	 for (auto const& childNodeID : childNodeID_v){
-	   if (!mgr.MCParticleGraph().GetParticle(childNodeID).RelationAssessed())
-	     mgr.MCParticleGraph().SetParentage(nodeID,childNodeID);
+	   if (!strm.GetParticleGraphWriteable(true).GetParticle(childNodeID).RelationAssessed())
+	     strm.GetParticleGraphWriteable(true).SetParentage(nodeID,childNodeID);
 	 }
        }
 
@@ -156,7 +157,7 @@ namespace larlite {
        
        if(g4_mother_parts.find(trkid_mom) == g4_mother_parts.end()) {
 	 int pdg_mom = mct.AncestorPdgCode();
-	 auto& mother = mgr.MCParticleGraph().CreateParticle();
+	 auto& mother = strm.GetParticleGraphWriteable(true).CreateParticle();
 	 mother.SetParticleInfo(pdg_mom,
 				::ertool::ParticleMass(pdg_mom),
 				mct.MotherStart().Position(),
@@ -168,8 +169,8 @@ namespace larlite {
        if(mct.TrackID() != mct.MotherTrackID()) {
 	 
 	 auto const& motherNodeID = g4_mother_parts[trkid_mom].ID();
-	 auto const& childNodeID  = mgr.MCParticleGraph().GetParticle(nodeID).ID();
-	 mgr.MCParticleGraph().SetParentage(motherNodeID,
+	 auto const& childNodeID  = strm.GetParticleGraphWriteable(true).GetParticle(nodeID).ID();
+	 strm.GetParticleGraphWriteable(true).SetParentage(motherNodeID,
 					    childNodeID);
        }
      }
@@ -203,7 +204,7 @@ namespace larlite {
 		 trkid_to_grand_mother[mcp.TrackId()] = i;
 		 if(grand_mother_to_res_index.find(i) == grand_mother_to_res_index.end()) {
 
-		   auto& p = mgr.MCParticleGraph().CreateParticle();
+		   auto& p = strm.GetParticleGraphWriteable(true).CreateParticle();
 		   p.SetParticleInfo(mom_cand.PdgCode(),
 				     mom_cand.Mass()*1000.,
 				     ::geoalgo::Vector(mom_cand.Trajectory()[0].Position()),
@@ -239,9 +240,9 @@ namespace larlite {
 	     // See if there's a grand mother
 	     if(trkid_to_grand_mother.find(mcp.TrackId())==trkid_to_grand_mother.end()) break;
 
-	     auto const& grandMotherID = mgr.MCParticleGraph().GetParticle(grand_mother_to_res_index[trkid_to_grand_mother[mcp.TrackId()]]).ID();
+	     auto const& grandMotherID = strm.GetParticleGraphWriteable(true).GetParticle(grand_mother_to_res_index[trkid_to_grand_mother[mcp.TrackId()]]).ID();
 	     auto const& thisID = g4_mother_parts[mom_pair.first].ID();
-	     mgr.MCParticleGraph().SetParentage(grandMotherID,thisID);
+	     strm.GetParticleGraphWriteable(true).SetParentage(grandMotherID,thisID);
 	     //auto& grand_mother = particle_set[grand_mother_to_res_index[trkid_to_grand_mother[mcp.TrackId()]]];
 	     //grand_mother.AddDaughter(g4_mother_parts[mom_pair.first]);
 	     g4_mother_used.insert(mom_pair.first);
@@ -254,9 +255,9 @@ namespace larlite {
   }
 
   void ERToolHelper::FillTracks ( const event_mctrack&  mct_v,
-				  ::ertool::Manager&    mgr ) const
+				  ::ertool::io::EmptyInput& strm ) const
   {
-	//SetDetWidth();
+    //SetDetWidth();
     for(size_t i=0; i<mct_v.size(); ++i){
 
       auto const& mct = mct_v[i];
@@ -283,8 +284,8 @@ namespace larlite {
       for(auto& v : t._pid_score) v = 100;
       if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
 
-      auto nodeID = mgr.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
-      mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
+      auto nodeID = strm.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
+      strm.GetParticleGraphWriteable().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
 							      ::ertool::ParticleMass(mct.PdgCode()),
 							      mct.at(0).Position(),
 							      ::geoalgo::Vector(mct.at(0).Momentum()));
@@ -299,7 +300,7 @@ namespace larlite {
 				  const event_calorimetry& calo_trk_v,
 				  const event_partid& pid_trk_v,
 				  const event_ass& ass_v,
-				  ::ertool::Manager& mgr) const
+				  ::ertool::io::EmptyInput& strm) const
   {
     std::vector< ::ertool::Track> t_v;
     std::vector< ::ertool::RecoInputID_t > id_v;
@@ -377,12 +378,12 @@ namespace larlite {
     }// if pid exists
 
     for(size_t i=0; i<t_v.size(); ++i)
-      mgr.Add(t_v[i],id_v[i]);
+      strm.Add(t_v[i],id_v[i]);
   }
   
   
   void ERToolHelper::FillShowers ( const event_mcshower& mcs_v,
-				   ::ertool::Manager&    mgr ) const
+				   ::ertool::io::EmptyInput& strm) const
   {
 
     for(size_t i=0; i<mcs_v.size(); ++i) {
@@ -403,8 +404,8 @@ namespace larlite {
       s._time = mcs_v[i].End().T();
       double mass = 0;
       if (mcs.PdgCode() == 11) { mass = 0.511; }
-      auto nodeID = mgr.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
-      mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
+      auto nodeID = strm.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
+      strm.GetParticleGraphWriteable().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
 							      mass,
 							      mcs.Start().Position(),
 							      ::geoalgo::Vector(mcs.Start().Momentum()));
@@ -418,7 +419,7 @@ namespace larlite {
   // fills the particle information with
   // that of the mcshower
   void ERToolHelper::SingleShowerCheater ( const event_mcshower& mcs_v,
-					   ::ertool::Manager&    mgr ) const
+					   ::ertool::io::EmptyInput& strm ) const
   {
 
     // if no mcshowers, do nothing
@@ -426,7 +427,7 @@ namespace larlite {
       return;
 
     // if no particles, do nothing
-    auto const& nodes = mgr.ParticleGraph().GetParticleNodes(::ertool::RecoType_t::kShower);
+    auto const& nodes = strm.GetParticleGraphWriteable().GetParticleNodes(::ertool::RecoType_t::kShower);
     if (!nodes.size())
       return;
 
@@ -434,10 +435,10 @@ namespace larlite {
     ::geoalgo::Point_t  vtx(start.X(),start.Y(),start.Z());
     ::geoalgo::Vector_t mom(start.Px(),start.Py(),start.Pz());
     auto const& pdg = mcs_v[0].PdgCode();
-    mgr.ParticleGraph().GetParticle(nodes[0]).SetParticleInfo(pdg,
-							      0.,
-							      vtx,
-							      mom);
+    strm.GetParticleGraphWriteable().GetParticle(nodes[0]).SetParticleInfo(pdg,
+								      0.,
+								      vtx,
+								      mom);
     return;
   }
   
@@ -445,7 +446,7 @@ namespace larlite {
   void ERToolHelper::FillShowers(const event_shower& shw_v,
 				 const event_cosmictag& ctag_shw_v,
 				 const event_ass& ass_v,
-				 ::ertool::Manager& mgr ) const
+				 ::ertool::io::EmptyInput& strm ) const
   {
     
     // Fill shower
@@ -488,7 +489,7 @@ namespace larlite {
     }
 
     for(size_t i=0; i<s_v.size(); ++i)
-      mgr.Add(s_v[i],id_v[i]);
+      strm.Add(s_v[i],id_v[i]);
 
     return;
   }
