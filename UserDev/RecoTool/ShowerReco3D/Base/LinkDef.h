@@ -13,10 +13,16 @@
 #pragma link C++ namespace showerreco::energy;
 
 //ADD_NEW_CLASS ... do not change this line
+#pragma link C++ class showerreco::ShowerCluster_t+;
+#pragma link C++ class showerreco::ShowerClusterSet_t+;
+#pragma link C++ class showerreco::Shower_t+;
 #pragma link C++ class showerreco::ShowerRecoException+;
 #pragma link C++ class showerreco::ShowerCalo+;
 #pragma link C++ class showerreco::ShowerRecoAlgBase+;
+#pragma link C++ class showerreco::ShowerAnaBase+;
 #pragma link C++ class showerreco::ShowerRecoManager+;
 //ADD_NEW_ALG_CLASS ... do not change this line
 #endif
+
+
 

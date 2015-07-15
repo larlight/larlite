@@ -3,6 +3,7 @@
 
 #include "ShowerReco3D.h"
 #include "DataFormat/pfpart.h"
+#include "DataFormat/shower.h"
 #include "DataFormat/DataFormat-TypeDef.h"
 namespace larlite {
 
@@ -15,12 +16,7 @@ namespace larlite {
   }
   
   bool ShowerReco3D::initialize() {
-    if(!fManager.Algo()) {
-      
-      throw ::cluster::CRUException("Shower reco algorithm not attached... aborting.");
-      return false;
 
-    }
     return true;
   }
   
@@ -42,10 +38,13 @@ namespace larlite {
                     storage->get_data<event_cluster>(fInputProducer)->subrun(),
                     storage->get_data<event_cluster>(fInputProducer)->event_id());
 
+    // Result shower holder
+    std::vector< ::showerreco::Shower_t> res_shower_v;
+    
     // Run matching
     std::vector<std::vector<unsigned int> > matched_pairs;
     if(!fUsePFParticle) {
-      matched_pairs = fManager.Reconstruct(local_clusters,*shower_v);
+      matched_pairs = fManager.Reconstruct(local_clusters,res_shower_v);
     }else{
 
       auto pfpart_v = storage->get_data<event_pfpart>(fInputProducer);
@@ -78,7 +77,29 @@ namespace larlite {
 
       fManager.Reconstruct(local_clusters,
                            matched_pairs,
-                           *shower_v);
+                           res_shower_v);
+    }
+
+    for(auto const& res_shower : res_shower_v) {
+
+      shower s;
+      s.set_id ( shower_v->size() );
+
+      s.set_total_energy        ( res_shower.fTotalEnergy         );
+      s.set_total_energy_err    ( res_shower.fSigmaTotalEnergy    );
+      s.set_total_MIPenergy     ( res_shower.fTotalMIPEnergy      );
+      s.set_total_MIPenergy_err ( res_shower.fSigmaTotalMIPEnergy );
+      s.set_total_best_plane    ( res_shower.fBestPlane.Plane     );
+      s.set_direction           ( res_shower.fDCosStart           );
+      s.set_direction_err       ( res_shower.fSigmaDCosStart      );
+      s.set_start_point         ( res_shower.fXYZStart            );
+      s.set_start_point_err     ( res_shower.fSigmaXYZStart       );
+      s.set_dedx                ( res_shower.fdEdx                );
+      s.set_dedx_err            ( res_shower.fSigmadEdx           );
+      s.set_length              ( res_shower.fLength              );
+      s.set_opening_angle       ( res_shower.fOpeningAngle        );
+
+      shower_v->emplace_back(s);
     }
         
     // Make sure result has the same size 
@@ -96,11 +117,9 @@ namespace larlite {
     return true;
   }
   
-  bool ShowerReco3D::finalize() {
-
+  bool ShowerReco3D::finalize() {    
     
-    
-    fManager.finalize(_fout);
+    fManager.Finalize(_fout);
 
     return true;
   }

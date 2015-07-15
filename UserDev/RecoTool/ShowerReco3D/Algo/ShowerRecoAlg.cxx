@@ -14,22 +14,17 @@ namespace showerreco {
     fdEdxlength  =2.4;
     fUseArea     = true;
     _linearE     = false;
-    fVerbosity   = true;
+    _verbosity   = true;
     _Ecorrection = true;
-
-    if (!_alg_tree) { _alg_tree = new TTree("_alg_tree","ShowerReco Algo Tree"); }
-    _alg_tree->Branch("_pl",&_pl,"pl/I");
-    _alg_tree->Branch("_dedx",&_dedx,"dedx/D");
-    _alg_tree->Branch("_dedx_v","std::vector<double>",&_dedx_v);
 
     _linearE   = false;
   }
 
 
-  ::larlite::shower ShowerRecoAlg::RecoOneShower(const std::vector< ::showerreco::ShowerCluster_t>& clusters)
+  Shower_t ShowerRecoAlg::RecoOneShower(const ShowerClusterSet_t& clusters)
   {
     
-    ::larlite::shower result;
+    Shower_t result;
     //
     // Reconstruct and store
     //
@@ -49,9 +44,9 @@ namespace showerreco {
         fEndPoint.push_back(cl.end_point);    // for each plane
         fOmega2D.push_back(cl.angle_2d);
         fOpeningAngles.push_back(cl.opening_angle);
-        fPlaneID.push_back(cl.plane_id);
-        if(fVerbosity) {
-          std::cout << " planes : " << cl.plane_id
+        fPlaneID.push_back(cl.plane_id.Plane);
+        if(_verbosity) {
+          std::cout << " planes : " << cl.plane_id.Plane
                     << " " << cl.start_point.t 
                     << " " << cl.start_point.w 
                     << " " << cl.end_point.t 
@@ -104,7 +99,7 @@ namespace showerreco {
                       xphi,
                       xtheta);
     
-    if(fVerbosity)
+    if(_verbosity)
       std::cout << " new angles: " << xphi << " " << xtheta << std::endl; 
     
     
@@ -112,7 +107,7 @@ namespace showerreco {
     // calculate start point here?
     fGSer-> GetXYZ(&(fStartPoint[index_to_use[0]]),&(fStartPoint[index_to_use[1]]),xyz);
     
-    if(fVerbosity)
+    if(_verbosity)
       std::cout << " XYZ:  " << xyz[0] << " " << xyz[1] << " " << xyz[2] << std::endl;
     
     // Third calculate dE/dx and total energy for all planes, because why not?
@@ -129,7 +124,7 @@ namespace showerreco {
         double newpitch=fGSer->PitchInView(plane,xphi,xtheta);
         if(plane == best_plane) best_length *= newpitch / fGSer->WireToCm();
 
-        if(fVerbosity)
+        if(_verbosity)
           std::cout << std::endl << " Plane: " << plane << std::endl;
         
         double totEnergy=0;
@@ -189,7 +184,7 @@ namespace showerreco {
             totMIPEnergy += theHit.charge *  0.00336*multiplier;
           }
           
-          if(fVerbosity && dEdx_new >1.9 && dEdx_new <2.1)
+          if(_verbosity && dEdx_new >1.9 && dEdx_new <2.1)
             std::cout << "dEdx_new " << dEdx_new << " " <<dEdx_new/theHit.charge*newpitch << " "<< theHit.charge *0.0033*multiplier/newpitch << std::endl;
           
           larutil::PxPoint OnlinePoint; 
@@ -205,7 +200,7 @@ namespace showerreco {
           //calculate the distance from the vertex using the effective pitch metric 
           double wdist=((theHit.w-fStartPoint.at(cl_index).w)*newpitch)*direction;  //wdist is always positive
           
-          if(fVerbosity && dEdx_new < 3.5 )
+          if(_verbosity && dEdx_new < 3.5 )
             std::cout << " CALORIMETRY:" 
                       << " Pitch " <<newpitch 
                       << " dist: " << wdist 
@@ -229,7 +224,7 @@ namespace showerreco {
               local_hitlist.push_back(theHit);
               
               npoints_first++;
-              if(fVerbosity)
+              if(_verbosity)
                 std::cout << " CALORIMETRY:" << " Pitch " <<newpitch 
                           << " dist: " << wdist 
                           << " dE/dx: " << dEdx_new << "MeV/cm "  
@@ -303,7 +298,7 @@ namespace showerreco {
           dedx_final/=npoints_sec;
         }
         
-        if(fVerbosity){ 
+        if(_verbosity){ 
           std::cout << " total ENERGY, birks: " << totEnergy << " MeV "  
                     << " |average:  " << dedx_final  << std::endl
                     << " Energy:  lo:" << totLowEnergy << " hi: " << totHighEnergy 
@@ -318,27 +313,26 @@ namespace showerreco {
 
         _pl = plane;
         _dedx = dedx_final;
-        _alg_tree->Fill();
     
         // break;
       } // end loop on clusters
 
-    result.set_total_MIPenergy(fMIPEnergy);
-    result.set_total_best_plane(best_plane);
-    result.set_length(best_length);
-    result.set_opening_angle(best_opening_angle);
-    result.set_total_energy(fEnergy);
-    
+    result.fTotalMIPEnergy  = fMIPEnergy;
+    result.fBestPlane.Plane = best_plane;
+    result.fLength          = best_length;
+    result.fOpeningAngle    = best_opening_angle;
+    result.fTotalEnergy     = fEnergy;
+
     double dirs[3]={0};
     fGSer->GetDirectionCosines(xphi,xtheta,dirs);
     TVector3 vdirs(dirs[0],dirs[1],dirs[2]);
     
     TVector3 vxyz(xyz[0], xyz[1], xyz[2]);
     
-    result.set_direction(vdirs); 
-    result.set_start_point(vxyz); 
-    result.set_dedx  (fdEdx);
-
+    result.fDCosStart = vdirs;
+    result.fXYZStart  = vxyz;
+    result.fdEdx      = fdEdx;
+    
     // done
     return result;
     }
