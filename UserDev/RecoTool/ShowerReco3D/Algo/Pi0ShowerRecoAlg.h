@@ -14,7 +14,7 @@
 #ifndef RECOTOOL_PI0SHOWERRECOALG_H
 #define RECOTOOL_PI0SHOWERRECOALG_H
 
-#include "ShowerRecoAlgBase.h"
+#include "ShowerReco3D/Base/ShowerRecoAlgBase.h"
 #include "AnalysisAlg/CalorimetryAlg.h"
 namespace showerreco {
   
