@@ -20,7 +20,7 @@
 #include <map>
 #include "Analysis/ana_base.h"
 #include "MCComp/MCMatchAlg.h"
-#include "ShowerRecoException.h"
+#include "ShowerReco3D/Base/ShowerRecoException.h"
 #include "DataFormat/shower.h"
 #include "DataFormat/mcshower.h"
 

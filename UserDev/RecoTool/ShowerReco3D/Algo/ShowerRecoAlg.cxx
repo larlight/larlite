@@ -21,6 +21,8 @@ namespace showerreco {
     _alg_tree->Branch("_pl",&_pl,"pl/I");
     _alg_tree->Branch("_dedx",&_dedx,"dedx/D");
     _alg_tree->Branch("_dedx_v","std::vector<double>",&_dedx_v);
+
+    _linearE   = false;
   }
 
 

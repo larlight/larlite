@@ -1,6 +1,0 @@
-#ifndef LARLITE_PANDORASHOWER_SAMPLE_CXX
-#define LARLITE_PANDORASHOWER_SAMPLE_CXX
-
-#include "sample.h"
-
-#endif
