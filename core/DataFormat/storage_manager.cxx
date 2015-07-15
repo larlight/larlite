@@ -1429,10 +1429,12 @@ namespace larlite {
   bool storage_manager::go_to(uint32_t index,bool store) {
     
     bool status=true;
-    if(_mode==kWRITE){
-      Message::send(msg::kERROR,__FUNCTION__,
-		    "Cannot move the data pointer back/forth in kWRITE mode.");
-      status=false;
+    if(_mode==kWRITE) {
+      if( index && index >= _nevents_written ){
+	Message::send(msg::kERROR,__FUNCTION__,
+		      "Cannot move the data pointer back/forth in kWRITE mode.");
+	status=false;
+      }
     }else if(!_nevents) {
       Message::send(msg::kWARNING,__FUNCTION__,"Input file empty!");
       status=false;

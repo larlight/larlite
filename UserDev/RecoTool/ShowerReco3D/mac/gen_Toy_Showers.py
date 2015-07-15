@@ -38,7 +38,7 @@ print
   # pass
 
 # Let's run it.
-my_proc.run(20);
+my_proc.run(0,20)
 
 # done!
 print
