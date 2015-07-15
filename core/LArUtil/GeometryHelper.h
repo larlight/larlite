@@ -145,6 +145,15 @@ namespace larutil{
      */
     void Line_3Dto2D(const TVector3 & startPoint3D, const TVector3 & direction3D, unsigned int plane) const;
 
+    /**
+     * @brief deterimine if a point is in the TPC
+     * @details Checks this point against the geometry parameters
+     * 
+     * @param pointIn3D The point to be evaluated, units in cm.
+     * @return true if the point is in the TPC, false if otherwise
+     */
+    bool Point_isInTPC(const TVector3 & pointIn3D) const;
+
     float TimeToCm() const {return fTimeToCm;}
     float WireToCm() const {return fWireToCm;}
   

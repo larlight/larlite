@@ -90,6 +90,25 @@ namespace larutil {
   }
 
 
+  bool GeometryHelper::Point_isInTPC(const TVector3 & pointIn3D) const{
+    // Use the geometry class to determine if this point is in the TPC
+    auto geom = larutil::Geometry::GetME();
+    if (pointIn3D.X() > geom -> DetHalfWidth() || pointIn3D.X() < - geom -> DetHalfWidth() )
+    {
+      return false;
+    }
+    if (pointIn3D.Y() > geom -> DetHalfHeight() || pointIn3D.Y() < - geom -> DetHalfHeight() )
+    {
+      return false;
+    }
+    if (pointIn3D.Z() > geom -> DetLength() || pointIn3D.Z() < 0.0 )
+    {
+      return false;
+    }
+  }
+
+
+
 
 
 } // larutil

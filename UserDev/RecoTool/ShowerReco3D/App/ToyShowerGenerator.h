@@ -45,7 +45,7 @@ namespace larlite {
   public:
 
     /// Default constructor
-    ToyShowerGenerator(){ _name="ToyShowerGenerator"; _fout=0;}
+    ToyShowerGenerator();
 
     /// Default destructor
     virtual ~ToyShowerGenerator(){}
@@ -78,7 +78,7 @@ namespace larlite {
 
     void setXRange(float min, float max){_x_min = min; _x_max = max;}
     void setYRange(float min, float max){_y_min = min; _y_max = max;}
-    void setZRange(float min, float max){_y_min = min; _y_max = max;}
+    void setZRange(float min, float max){_z_min = min; _z_max = max;}
 
     void setThetaRange(float min, float max){_theta_min = min; _theta_max = max;}
     void setPhiRange(float min, float max){_phi_min = min; _phi_max = max;}
@@ -86,6 +86,8 @@ namespace larlite {
     void setLengthSmearing(float smear){_length_smearing = smear;}
 
     void setWidthSmearing(float width){_width_smearing = width;}
+
+    void printParams() const;
 
   protected:
 

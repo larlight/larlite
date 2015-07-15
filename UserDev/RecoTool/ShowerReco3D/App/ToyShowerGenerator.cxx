@@ -12,15 +12,9 @@
 
 namespace larlite {
 
-  bool ToyShowerGenerator::initialize() {
-
-    //
-    // This function is called in the beggining of event loop
-    // Do all variable initialization you wish to do here.
-    // If you have a histogram to fill in the event loop, for example,
-    // here is a good place to create one on the heap (i.e. "new TH1D"). 
-    //
-
+  ToyShowerGenerator::ToyShowerGenerator(){ 
+    _name="ToyShowerGenerator"; 
+    _fout=0;
     auto geom = larutil::Geometry::GetME();
 
     setEnergyRange(0.2, 3.0);
@@ -30,8 +24,30 @@ namespace larlite {
     setThetaRange(0.0, 3.14159);
     setPhiRange(0.0, 2*3.14159);
     setLengthSmearing(50); // cm
-    setWidthSmearing(50); // cm
+    setWidthSmearing(50); // cm    
+  }
+
+  bool ToyShowerGenerator::initialize() {
+
+    //
+    // This function is called in the beggining of event loop
+    // Do all variable initialization you wish to do here.
+    // If you have a histogram to fill in the event loop, for example,
+    // here is a good place to create one on the heap (i.e. "new TH1D"). 
+    //
+
+
     return true;
+  }
+
+  void ToyShowerGenerator::printParams() const{
+    std::cout << "Print parameters of generation: \n"
+              << "Energy: ....... " << _e_min << " to " << _e_max << "\n"
+              << "X Position: ... " << _x_min << " to " << _x_max << "\n"
+              << "Y Position: ... " << _y_min << " to " << _y_max << "\n"
+              << "Z Position: ... " << _z_min << " to " << _z_max << "\n"
+              << "Theta Range: .. " << _theta_min << " to " << _theta_max << "\n"
+              << "Phi Range: .... " << _phi_min << " to " << _phi_max << "\n";
   }
   
   bool ToyShowerGenerator::analyze(storage_manager* storage) {
@@ -102,7 +118,7 @@ namespace larlite {
     // Now we start to make energy depositions
     // Keep track of how much energy has been allocated so far
     float _total_energy_used = 0;
-    float mean_hit_energy = 0.02;
+    float mean_hit_energy = 0.002;
 
     std::vector<TVector3> _hit_locations_3d;
     std::vector<float> _hit_charge;
@@ -114,7 +130,7 @@ namespace larlite {
     while (pos < _start_length){
       // Generate a hit:
       _hit_locations_3d.push_back(position + pos*direction);
-      _hit_charge.push_back(rand.Landau(mean_hit_energy));
+      _hit_charge.push_back(mean_hit_energy* rand.Poisson(4));
       _total_energy_used += _hit_charge.back();
       pos += 0.5;
     }
@@ -123,7 +139,7 @@ namespace larlite {
     float step = length /(0.5*energy/mean_hit_energy);
     while (_total_energy_used < 0.5*energy){
       _hit_locations_3d.push_back(position + pos*direction);
-      _hit_charge.push_back(rand.Landau(mean_hit_energy));
+      _hit_charge.push_back(mean_hit_energy* rand.Poisson(4));
       _total_energy_used += _hit_charge.back();
       pos += step;
     }
@@ -133,7 +149,7 @@ namespace larlite {
     while (_total_energy_used < energy){
       // Select a random position along the shower
       pos = rand.Gaus(length/2.0,(length/4.0));      
-      // Generate a random displacement that is perpendicular to the axis, landau in shape
+      // Generate a random displacement that is perpendicular to the axis, Gaus in shape
       TVector3 perp = direction.Orthogonal();
       // Normalize the perp, and rotate it a random amount:
       perp *= 1.0/perp.Mag();
@@ -141,12 +157,23 @@ namespace larlite {
       // Get a random displacement:
       float dist = rand.Gaus(0.0, width);
       _hit_locations_3d.push_back(position + pos*direction + perp*dist);
-      _hit_charge.push_back(rand.Landau(mean_hit_energy));
+      _hit_charge.push_back(mean_hit_energy* rand.Poisson(4));
       _total_energy_used += _hit_charge.back();
     }
 
     // Ok, now there is a list of points in 3D with charge associated with them
     // Project them all into each 2D plane and make hits and clusters to go with them
+    std::cout << "Shower is created, attempting to make hits and clusters." << std::endl;
+    std::cout << "Shower Parameters: \n"
+              << "Start Point: ....." << " (" << position.X()  << ", " << position.Y() << ", " << position.Z() << ")\n"
+              << "Direction: ......." << " (" << direction.X()  << ", " << direction.Y() << ", " << direction.Z() << ")\n"
+              << "Length: .........." << length << "\n"
+              << "Width: ..........." << width << "\n"
+              << "Energy: .........." << energy << "\n"
+              << "Energy Used: ....." << _total_energy_used << "\n"
+              << "Number of Hits: .." << _hit_charge.size() << "\n";
+
+
 
     auto geom = larutil::Geometry::GetME();
     auto geomHelper = larutil::GeometryHelper::GetME();  
@@ -162,6 +189,7 @@ namespace larlite {
     //   out_cluster_v -> push_back(ev_clus -> at(i));
     // }
 
+
     for (unsigned int plane = 0; plane < geom -> Nplanes(); plane ++ ){
       
       // Project each point into the plane and create a hit
@@ -169,7 +197,13 @@ namespace larlite {
       AssUnit_t new_association;
       for (unsigned int hit_id = 0; hit_id < _hit_locations_3d.size(); hit_id ++ ){
         // Get the point in 2D for this plane:
-        larutil::PxPoint loc = geomHelper -> Point_3Dto2D(_hit_locations_3d.at(hit_id),plane);
+        larutil::PxPoint loc;
+        try {
+          loc = geomHelper -> Point_3Dto2D(_hit_locations_3d.at(hit_id),plane);
+        }
+        catch( ... ) {
+          continue;
+        }
         larlite::hit thisHit;
         auto channel = geom -> PlaneWireToChannel(plane, (int) loc.w / geomHelper -> WireToCm() );
   
@@ -193,6 +227,7 @@ namespace larlite {
         out_hit_v -> push_back(thisHit);
         new_association.push_back(out_hit_v->size() -1 );
       }
+      if (hitList.size() == 0 ) continue;
       hit_ass.push_back(new_association);
       out_cluster_v -> push_back(larlite::cluster());
       out_cluster_v -> back().set_integral(hitList.front().Integral(),0,0);

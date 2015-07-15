@@ -26,7 +26,12 @@ my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 
 # Attach an analysis unit ... here we use a base class which does nothing.
 # Replace with your analysis unit if you wish.
-my_proc.add_process(fmwk.ToyShowerGenerator())
+proc = fmwk.ToyShowerGenerator()
+proc.setOutProducerName("toy")
+
+proc.printParams()
+
+my_proc.add_process(proc)
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
