@@ -41,6 +41,8 @@ namespace larutil {
       throw larutil::LArUtilException(Form("Can't project 3D point to unknown plane %u",plane));
     }    
 
+    // Verify that the point is in the TPC before trying to project:
+
     //initialize return value
     PxPoint returnPoint;
     
@@ -69,8 +71,6 @@ namespace larutil {
     
     return returnPoint;
   }
-
-
 
   PxPoint GeometryHelper::Point_3Dto2D(double * xyz, unsigned int plane) const{
     TVector3 vec(xyz);

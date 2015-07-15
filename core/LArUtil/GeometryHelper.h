@@ -130,6 +130,20 @@ namespace larutil{
     PxPoint Point_3Dto2D(double * xyz, unsigned int plane) const;
 
  
+    /**
+     * @brief Take a line segment (start point and direction) and project that into 2D
+     * @details This function will return the start point and direction of a line segment projected into 2D
+     *  It works by using the Point_3Dto2D function to project the start point into 2D.  Then, it finds a second
+     *  point along the line by using startPoint + direction3D.  If that point is not in the TPC, it halves the distance and
+     *  tries that point.  Then, once it has two points in the TPC, it projects both into the plane, normalizes the direction,
+     *  and returns them as PxPoints
+     * 
+     * @param startPoint3D [description]
+     * @param direction3D [description]
+     * @param int [description]
+     * @return [description]
+     */
+    void Line_3Dto2D(const TVector3 & startPoint3D, const TVector3 & direction3D, unsigned int plane) const;
 
     float TimeToCm() const {return fTimeToCm;}
     float WireToCm() const {return fWireToCm;}
