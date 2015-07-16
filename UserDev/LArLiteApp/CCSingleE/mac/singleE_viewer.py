@@ -3,7 +3,9 @@ from ROOT import gSystem
 from ROOT import ertool
 from ROOT import larlite as fmwk
 from seltool.ccsingleeDef import GetCCSingleEInstance
-from seltool.algoviewer import viewAll
+from seltool.algoviewer import viewAll,view
+from seltool.erviewer import ERViewer
+import basictool.geoviewer as gv
 
 if len(sys.argv) < 2:
     msg  = '\n'
@@ -24,6 +26,12 @@ my_proc.enable_filter(False)
 # function GetCCSingleEInstance()
 my_algo = GetCCSingleEInstance()
 my_algo.setVerbose(True)
+
+primary_algo = ertool.AlgoPrimaryFinder()
+primary_algo.setVtxToTrkStartDist(1)
+primary_algo.setVtxToTrkDist(1)
+primary_algo.setVtxToShrStartDist(50)
+primary_algo.setMaxIP(1)
 
 # Create ERTool filter
 # This filter removes any track that
@@ -53,11 +61,12 @@ my_proc.set_ana_output_file("singleE_selection.root")
 #Do not change this value unless you know what you are doing.
 Ecut = 20 # in MeV
 
-my_ana = ertool.ERAnaSingleE()
-my_ana.SetDebug(False)
-my_ana.SetECut(Ecut)
+my_ana = ertool.ERAnatestTree()
+#my_ana.SetDebug(False)
+#my_ana.SetECut(Ecut)
 
 my_anaunit = fmwk.ExampleERSelection()
+my_anaunit._mgr.AddAlgo(primary_algo)
 my_anaunit._mgr.AddAlgo(my_algo)
 my_anaunit._mgr.AddAna(my_ana)
 #my_anaunit._mgr.AddCfgFile('new_empart.txt')
@@ -77,9 +86,11 @@ my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 # ************************************************
 
-my_proc.add_process(MCfilter)
+#my_proc.add_process(MCfilter)
 my_proc.add_process(my_anaunit)
 
+mcviewer   = ERViewer('MC Info')
+recoviewer = ERViewer('RECO Info')
 
 # Start event-by-event loop
 counter = 0
@@ -88,15 +99,28 @@ while (counter < 11700):
         counter = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
     except SyntaxError:
         counter = counter + 1
-    print "Event number: ", counter
+#    print "Event number: ", counter
+#    my_proc.process_event(counter)
+#    print "Processing event {0}".format(counter) 
+#    # get objets and display
+#    data_reco = my_anaunit.GetData()
+#    part_reco = my_anaunit.GetParticles()
+#    data_mc   = my_anaunit.GetData(True)
+#    part_mc   = my_anaunit.GetParticles(True)
+#    viewAll(data_mc,part_mc,data_reco,part_reco)
+#
+    display_mc = gv.GeoViewer()
+    display_reco = gv.GeoViewer()
+
     my_proc.process_event(counter)
-    print "Processing event {0}".format(counter) 
+    print "Processing event {0}".format(counter)
     # get objets and display
     data_reco = my_anaunit.GetData()
     part_reco = my_anaunit.GetParticles()
     data_mc   = my_anaunit.GetData(True)
     part_mc   = my_anaunit.GetParticles(True)
-    viewAll(data_mc,part_mc,data_reco,part_reco)
+    view(display_mc,data_mc,part_mc)
+
 
     #for x in xrange(part_mc.size()):
     #    print part_mc[x].Diagram()
