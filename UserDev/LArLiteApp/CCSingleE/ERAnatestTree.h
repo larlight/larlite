@@ -56,14 +56,20 @@ namespace ertool {
     
     /// TTree
     TTree* _tree;
-    double _x;
-    double _y;
-    double _z;
-    double _e;
-    double _ke;
-    double _m;
-
-
+    double _xMC;
+    double _yMC;
+    double _zMC;
+    double _eMC;
+    double _keMC;
+    double _mMC;
+    double _xReco;
+    double _yReco;
+    double _zReco;
+    double _eReco;
+    double _keReco;
+    double _mReco;
+    int counter;
+    int event_counter;
   };
 
 }
