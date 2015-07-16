@@ -93,6 +93,7 @@ namespace larutil {
   bool GeometryHelper::Point_isInTPC(const TVector3 & pointIn3D) const{
     // Use the geometry class to determine if this point is in the TPC
     auto geom = larutil::Geometry::GetME();
+    // Check against the 3 coordinates:
     if (pointIn3D.X() > geom -> DetHalfWidth() || pointIn3D.X() < - geom -> DetHalfWidth() )
     {
       return false;
@@ -106,6 +107,34 @@ namespace larutil {
       return false;
     }
   }
+
+
+    void GeometryHelper::Line_3Dto2D( const TVector3 & startPoint3D, const TVector3 & direction3D, unsigned int plane,
+                                      PxPoint & startPoint2D, PxPoint & direction2D) const
+    {
+      // First step, project the start point into 2D
+      startPoint2D = Point_3Dto2D(startPoint3D,plane);
+
+      // Next, get a second point in 3D:
+      float alpha = 1.0;
+      TVector3 secondPoint3D = startPoint3D + alpha*direction3D;
+      while ( ! Point_isInTPC(secondPoint3D) ){
+        alpha *= 0.5;
+        secondPoint3D = startPoint3D + alpha*direction3D;
+      }
+
+      // Project the second point into 2D:
+      PxPoint secondPoint2D = Point_3Dto2D(secondPoint3D,plane);
+
+      // Now we have two points in 2D.  Get the direction by subtracting, and normalize
+      TVector2 dir(secondPoint2D.w - startPoint2D.w,secondPoint2D.t - startPoint2D.t);
+      dir *= 1.0 / dir.Mod();
+      direction2D.w = dir.X();
+      direction2D.t = dir.Y();
+      direction2D.plane = plane;
+
+      return;
+    }
 
 
 
