@@ -36,7 +36,10 @@ namespace cluster{
     ~cluster_params(){};
 
     /// Hold the list of hits for this particular cluster, for convenience 
-    std::vector<larutil::PxHit> fHitVector;
+    std::vector<larutil::PxHit> hit_vector;
+    ::larlite::geo::PlaneID     plane_id;
+
+
 
     Polygon2D PolyObject;               ///< Polygon Object...see Polygon2D.hh
 

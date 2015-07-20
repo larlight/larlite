@@ -71,6 +71,12 @@ namespace cluster{
     
     fPlane=fHitVector[0].plane;
     
+    // Add the plane and hit vector to the params
+    ::larlite::geo::PlaneID id;
+    id.Plane = fPlane;
+    fParams.plane_id = id;
+    fParams.hit_vector = fHitVector;
+
       
     if (fHitVector.size() < fMinNHits)
     {
@@ -105,8 +111,14 @@ namespace cluster{
       (*fHitVector.rbegin()).plane = plane;
     }
     fPlane=fHitVector[0].plane;
-        
-    fParams.fHitVector = fHitVector;
+
+    // Add the plane and hit vector to the params
+    ::larlite::geo::PlaneID id;
+    id.Plane = fPlane;
+    fParams.plane_id = id;
+    fParams.hit_vector = fHitVector;
+
+
 
     if (fHitVector.size()<fMinNHits)
     {
