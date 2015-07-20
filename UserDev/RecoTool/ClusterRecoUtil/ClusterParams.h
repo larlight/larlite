@@ -35,6 +35,9 @@ namespace cluster{
 
     ~cluster_params(){};
 
+    /// Hold the list of hits for this particular cluster, for convenience 
+    std::vector<larutil::PxHit> fHitVector;
+
     Polygon2D PolyObject;               ///< Polygon Object...see Polygon2D.hh
 
     larutil::PxPoint start_point;      ///< start point 

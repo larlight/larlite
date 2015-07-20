@@ -106,6 +106,8 @@ namespace cluster{
     }
     fPlane=fHitVector[0].plane;
         
+    fParams.fHitVector = fHitVector;
+
     if (fHitVector.size()<fMinNHits)
     {
       if(verbose) std::cout << " the hitlist is too small. Continuing to run may result in crash!!! " << std::endl;
