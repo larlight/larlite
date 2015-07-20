@@ -5,23 +5,13 @@
 #include <vector>
 #include "LArUtil/PxUtils.h"
 #include "Base/GeoTypes.h"
+#include "ClusterRecoUtil/ClusterParams.h"
 
 namespace showerreco {
 
-  /// Input cluster representation for shower reco algorithms
-  struct ShowerCluster_t {
-    ::larutil::PxPoint start_point;
-    ::larutil::PxPoint end_point;
-    double             angle_2d;
-    double             opening_angle;
-    ::larlite::geo::PlaneID     plane_id;
-    std::vector< ::larutil::PxHit> hit_vector;
-    ShowerCluster_t() : hit_vector()
-    {}
-  };
 
   /// Input matched cluster set representation for shower reco algorithms
-  typedef std::vector<showerreco::ShowerCluster_t> ShowerClusterSet_t;
+  typedef std::vector<cluster::cluster_params> ShowerClusterSet_t;
 
   /// Output shower representation from shower reco algorithms
   struct Shower_t {

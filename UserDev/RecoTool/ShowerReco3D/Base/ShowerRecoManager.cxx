@@ -20,7 +20,7 @@ namespace showerreco {
   }
 
   ClusterAss_t ShowerRecoManager::Reconstruct (const std::vector<std::vector<larutil::PxHit> >& clusters,
-					       std::vector<showerreco::Shower_t>& showers)
+                                               std::vector<showerreco::Shower_t>& showers)
   {
     showers.clear();
     fMatchMgr->SetClusters(clusters);
@@ -41,8 +41,8 @@ namespace showerreco {
   }
   
   void ShowerRecoManager::Reconstruct (const std::vector<std::vector<larutil::PxHit> >& clusters,
-				       const ClusterAss_t& ass,
-				       std::vector<showerreco::Shower_t>& showers)
+                                       const ClusterAss_t& ass,
+                                       std::vector<showerreco::Shower_t>& showers)
   {
     showers.clear();
     fMatchMgr->SetClusters(clusters);
@@ -50,7 +50,7 @@ namespace showerreco {
   }
   
   void ShowerRecoManager::Process(const ClusterAss_t& ass,
-				  std::vector<showerreco::Shower_t>& showers)
+                                  std::vector<showerreco::Shower_t>& showers)
   {
 
     showers.clear();
@@ -62,16 +62,16 @@ namespace showerreco {
       
       for(auto const& index : pair)
 
-	in_clusters.emplace_back( cpan_2_scluster (fMatchMgr->GetInputClusters()[index]) );
+        in_clusters.emplace_back( fMatchMgr->GetInputClusters()[index].fParams );
 
       for(auto& shower_alg : _alg_v)
 
-	showers.emplace_back(shower_alg->RecoOneShower(in_clusters));
+        showers.emplace_back(shower_alg->RecoOneShower(in_clusters));
 
       for(auto& shower_ana : _ana_v)
 
-	shower_ana->Analyze(showers.back(),in_clusters);
-	
+        shower_ana->Analyze(showers.back(),in_clusters);
+        
     }
 
   }

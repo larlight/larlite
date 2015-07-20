@@ -16,7 +16,8 @@
 
 #include <iostream>
 #include "ShowerRecoTypes.h"
-#include "ShowerRecoUtils.h"
+#include "TTree.h"
+
 
 namespace showerreco {
   /**
