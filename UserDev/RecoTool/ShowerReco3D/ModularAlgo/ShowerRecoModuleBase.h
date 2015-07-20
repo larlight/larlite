@@ -50,7 +50,7 @@ namespace showerreco {
      */
     virtual void do_reconstruction(const ShowerClusterSet_t & clusters, Shower_t & shower) = 0;
 
-  private:
+  protected:
     std::string _name;
 
   };

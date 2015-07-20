@@ -33,12 +33,10 @@ namespace showerreco {
     /// Default destructor
     ~ShowerChargeModule(){}
 
-    std::string name(){return _name;}
 
     void do_reconstruction(const ShowerClusterSet_t &, Shower_t &);
 
   private:
-    std::string _name;
 
   };
 

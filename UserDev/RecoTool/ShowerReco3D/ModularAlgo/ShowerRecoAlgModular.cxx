@@ -41,7 +41,6 @@ namespace showerreco {
     }
     
 
-
     void ShowerRecoAlgModular::ReplaceShowerRecoModule( ShowerRecoModuleBase * module, unsigned int index){
       if (_modules.size() > index){
         _modules.at(index) = module;
@@ -61,6 +60,17 @@ namespace showerreco {
         }
       }
       std::cerr << "WARNING: Request to remove non existing module \"" << name << "\"" << std::endl;
+
+    }
+
+    void ShowerRecoAlgModular::PrintModuleList(){
+
+      std::cout << "Print the list of modules to run in Shower Reco Alg Modular:\n";
+      int i = 0;
+      for (auto & module : _modules){
+        std::cout << "\t" << i << ") " << module -> name() << "\n";
+        i++;
+      }
 
     }
 

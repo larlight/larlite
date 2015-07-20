@@ -98,7 +98,11 @@ namespace showerreco {
      */
     void ReplaceShowerRecoModule(ShowerRecoModuleBase * module, std::string name);
 
-    
+    /**
+     * @brief Prints the module list
+     * @details Prints out the module list in the order in which they will run, nicely formatted.
+     */
+    void PrintModuleList();
 
   private:
 
