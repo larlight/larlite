@@ -1,21 +1,21 @@
 /**
- * \file ShowerRecoModuleBase.h
+ * \file ShowerChargeModule.h
  *
- * \ingroup Algo
+ * \ingroup ModularAlgo
  * 
- * \brief Class def header for a class ShowerRecoModuleBase
+ * \brief Class def header for a class ShowerChargeModule
  *
  * @author cadams
  */
 
-/** \addtogroup Algo
+/** \addtogroup ModularAlgo
 
     @{*/
-#ifndef SHOWERRECOMODULEBASE_H
-#define SHOWERRECOMODULEBASE_H
+#ifndef SHOWERCHARGEMODULE_H
+#define SHOWERCHARGEMODULE_H
 
 #include <iostream>
-#include "ShowerReco3D/Base/ShowerRecoTypes.h"
+#include "ShowerRecoModuleBase.h"
 /**
    \class ShowerRecoModuleBase
    User defined class ShowerRecoModuleBase ... these comments are used to generate
@@ -23,19 +23,19 @@
  */
 namespace showerreco {
 
-  class ShowerRecoModuleBase{
+  class ShowerChargeModule : ShowerRecoModuleBase{
 
   public:
 
     /// Default constructor
-    ShowerRecoModuleBase(){}
+    ShowerChargeModule(){_name = "ShowerChargeModule";}
 
     /// Default destructor
-    virtual ~ShowerRecoModuleBase(){}
+    ~ShowerChargeModule(){}
 
     std::string name(){return _name;}
 
-    virtual void do_reconstruction(const ShowerClusterSet_t &, Shower_t &) = 0;
+    void do_reconstruction(const ShowerClusterSet_t &, Shower_t &);
 
   private:
     std::string _name;

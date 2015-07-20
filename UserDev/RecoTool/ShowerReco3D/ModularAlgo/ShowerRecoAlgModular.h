@@ -1,14 +1,14 @@
 /**
  * \file ShowerRecoAlgModular.h
  *
- * \ingroup Algo
+ * \ingroup ModularAlgo
  * 
  * \brief Class def header for a class ShowerRecoAlgModular
  *
  * @author cadams
  */
 
-/** \addtogroup Algo
+/** \addtogroup ModularAlgo
 
     @{*/
 #ifndef SHOWERRECOALGMODULAR_H
@@ -97,6 +97,8 @@ namespace showerreco {
      * @param int The name of the module to be replaced
      */
     void ReplaceShowerRecoModule(ShowerRecoModuleBase * module, std::string name);
+
+    
 
   private:
 
