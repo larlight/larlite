@@ -57,6 +57,26 @@ namespace showerreco {
     void AddShowerRecoModule(ShowerRecoModuleBase * module);
 
     /**
+     * @brief Insert a module after the index specifed
+     * @details Allows the user to insert a module at a specific index. If the index is not present before this function call, 
+     * the module will not be added and an error is generated.
+     * 
+     * @param module The module to be added
+     * @param index The current index after which the module will be inserted
+     */
+    void InsertShowerRecoModule(ShowerRecoModuleBase * module, unsigned int index);
+
+    /**
+     * @brief Insert a module after a specified name
+     * @details Allows the user to insert a module after a module of the name specified. If the name is not present before this function call, 
+     * the module will not be added and an error is generated.
+     * 
+     * @param module The module to be added.
+     * @param name The name of another module, after which the target module will be inserted.
+     */
+    void InsertShowerRecoModule(ShowerRecoModuleBase * module, std::string name);
+
+    /**
      * @brief Replace a module from the list of modules
      * @details The reason for having module removal ability is to allow users to easily override a module. 
      * Instead of having to know the whole process of shower reconstruction, they can just take the default 

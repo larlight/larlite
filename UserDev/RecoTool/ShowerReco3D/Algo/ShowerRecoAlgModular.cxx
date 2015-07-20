@@ -20,7 +20,28 @@ namespace showerreco {
       _modules.push_back(module);
     }
 
+    void ShowerRecoAlgModular::InsertShowerRecoModule(ShowerRecoModuleBase * module, unsigned int index){
+      if (_modules.size() > index){
+        _modules.insert(_modules.begin() + index, module);
+      }
+      else{
+        std::cerr << "WARNING: Request to insert module at index " << index << " which is beyond the last index." << std::endl;
+      }
+    }
+
+    void ShowerRecoAlgModular::InsertShowerRecoModule(ShowerRecoModuleBase * module, std::string name){
+      for (unsigned int index = 0; index < _modules.size(); index ++){
+        if (_modules.at(index)->name() == name){
+          _modules.insert(_modules.begin() + index, module);
+          return;
+        }
+      }
+      std::cerr << "WARNING: Request to insert module after non existing module \"" << name << "\"" << std::endl;
+
+    }
     
+
+
     void ShowerRecoAlgModular::ReplaceShowerRecoModule( ShowerRecoModuleBase * module, unsigned int index){
       if (_modules.size() > index){
         _modules.at(index) = module;
