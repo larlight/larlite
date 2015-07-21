@@ -32,7 +32,7 @@ namespace showerreco {
   public:
 
     /// Default constructor
-    ShowerRecoAlgModular(){}
+    ShowerRecoAlgModular(){_debug = false;}
 
     /// Default destructor
     ~ShowerRecoAlgModular(){}
@@ -104,9 +104,22 @@ namespace showerreco {
      */
     void PrintModuleList();
 
+    /**
+     * @brief Set the debug option
+     * @details Debug mode prints the changes in the shower_t object after each module is called.
+     * Modules are expected to have their own debug mode that is activated separately.
+     * 
+     * @param b true or false to turn on or off debug mode.  Default for the whole class is off, default for this function is on
+     */
+    void SetDebug(bool b = true){_debug = b;}
+
   private:
 
+    void printChanges(const Shower_t & localCopy, const Shower_t result, std::string moduleName);
+
     std::vector<ShowerRecoModuleBase * > _modules;
+
+    bool _debug;
 
 
   };
