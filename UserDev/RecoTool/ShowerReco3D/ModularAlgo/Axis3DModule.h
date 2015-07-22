@@ -38,6 +38,8 @@ namespace showerreco {
 
   private:
 
+    void padVector(std::vector<TVector3> & inVec, const TVector3 & startPoint, float range, unsigned int dim, unsigned int nPoints = 10);
+
   };
 
 } // showerreco
