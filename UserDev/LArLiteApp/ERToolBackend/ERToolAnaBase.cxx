@@ -85,6 +85,7 @@ namespace larlite {
     fWatch.Start();
 
     static bool one_time_warning = true;
+    _mgr.SetID(storage->event_id(), storage->run_id(), storage->subrun_id());
 
 
     //------------------------------
@@ -192,6 +193,8 @@ namespace larlite {
 			   _mgr);
     }
       
+
+
     one_time_warning = false;
 
     return true;

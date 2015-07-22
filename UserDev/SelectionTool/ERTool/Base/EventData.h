@@ -69,6 +69,16 @@ namespace ertool {
     const std::vector< ertool::Shower >& Shower() const { return _shower_v; }
     /// All tracks getter
     const std::vector< ertool::Track >& Track() const { return _track_v;  }
+    
+    const unsigned int Event_ID() const { return _event_id;  }
+    const unsigned int Run()      const { return _run     ;  }
+    const unsigned int SubRun()   const { return _subrun  ;  }
+
+    void SetEvent_ID(unsigned int value) {  _event_id = value;  }
+    void SetRun(     unsigned int value) {  _run      = value;  }
+    void SetSubRun(  unsigned int value) {  _subrun   = value;  }
+
+
 
   protected:
 
@@ -92,6 +102,10 @@ namespace ertool {
     std::vector<ertool::Track>  _track_v;
     /// Input ID for tracks
     std::vector<ertool::RecoInputID_t> _track_id_v;
+
+    unsigned int _event_id;
+    unsigned int _run;
+    unsigned int _subrun;
   };
 }
 
