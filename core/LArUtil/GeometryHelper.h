@@ -147,7 +147,42 @@ namespace larutil{
     void Line_3Dto2D( const TVector3 & startPoint3D, const TVector3 & direction3D, unsigned int plane,
                       PxPoint & startPoint2D, PxPoint & direction2D) const;
 
+
     /**
+     * @brief Calculate the shortest distance between a line and a point in 2D
+     *  
+     * @param pointOnLine PxPoint - Any point on the line of interest
+     * @param directionOfLine PxPoint - The direction of the line of interest
+     * @param targetPoint PxPoint - The point from which the closest distance is calculated
+     * @return the distance between the point and the line in centimeters
+     */
+    float DistanceToLine2D( const PxPoint & pointOnLine, const PxPoint & directionOfLine, 
+                            const PxPoint & targetPoint) const;
+
+    /**
+     * @brief Calculate the shortest distance between a line and a point in 2D
+     *  
+     * @param pointOnLine  TVector2 - Any point on the line of interest
+     * @param directionOfLine  TVector2 - The direction of the line of interest
+     * @param targetPoint  TVector2 - The point from which the closest distance is calculated
+     * @return the distance between the point and the line in centimeters
+     */
+    float DistanceToLine2D( const TVector2 & pointOnLine, const TVector2 & directionOfLine, 
+                            const TVector2 & targetPoint) const;
+
+    /**
+     * @brief Calculate the shortest distance between a line and a point in 3D
+     *  
+     * @param pointOnLine TVector3 - Any point on the line of interest
+     * @param directionOfLine TVector3 - The direction of the line of interest
+     * @param targetPoint TVector3 - The point from which the closest distance is calculated
+     * @return the distance between the point and the line in centimeters 
+     */
+    float DistanceToLine3D( const TVector3 & pointOnLine, const TVector3 & directionOfLine, 
+                            const TVector3 & targetPoint) const;
+
+
+    /** 
      * @brief deterimine if a point is in the TPC
      * @details Checks this point against the geometry parameters
      * 
