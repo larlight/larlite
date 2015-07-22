@@ -6,7 +6,7 @@
  * \brief Class def header for a class dQdx2DModule
  *
  * @authors Joseph Zennamo, UChicago, jzennamo@uchicago.edu
- * 
+ * @authors Brooke Russell, Yale U, brooke.russell@yale.edu
  */
 
 /** \addtogroup ModularAlgo
@@ -37,7 +37,9 @@ namespace showerreco {
     void do_reconstruction(const ShowerClusterSet_t &, Shower_t &);
 
   private:
-
+    //This variable will contain the average dQdx from the start of a shower projected into the 3 planes.
+    //it is inteded to be filled such that element 1 contains the average dQdx for the U-plane, 
+    //element 2 contains the same for the V-plane, and element 3 will be for the Y-plane. 
     std::vector<double> fdQdx; 
 
   };
