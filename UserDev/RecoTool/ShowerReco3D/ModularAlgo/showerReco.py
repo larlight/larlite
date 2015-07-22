@@ -159,6 +159,9 @@ my_proc.set_ana_output_file("");
 # Specify data output root file name
 my_proc.set_output_file("elecShowers.root")
 
+########################################################
+# Change here to switch between microboone and argoneut!
+########################################################
 
 # Argoneut specific:
 ana_unit=DefaultShowerReco3DArgo()
