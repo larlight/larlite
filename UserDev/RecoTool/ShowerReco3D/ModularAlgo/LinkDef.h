@@ -14,6 +14,7 @@
 #pragma link C++ class showerreco::StartPoint2DModule+;
 #pragma link C++ class showerreco::ShowerChargeModule+;
 #pragma link C++ class showerreco::StartPoint3DModule+;
+#pragma link C++ class showerreco::dQdx2DModule+;
 #pragma link C++ class showerreco::EmptyModule+;
 //ADD_NEW_CLASS ... do not change this line
 
