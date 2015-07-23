@@ -157,11 +157,12 @@ namespace ertool {
 	_IPthatStart = vtx.Dist(thatTrack.front());
 	_IPtrkBody = sqrt(_geoAlgo.SqDist(vtx,thatTrack));
 	_alg_tree->Fill();
-	if (_verbose)
-	std::cout << "\tImpact Parameter: " << _IP << std::endl
-		  << "\tIP to Trk Start : " << _IPthatStart << std::endl
-		  << "\tIP to Trk Body  : " << _IPtrkBody << std::endl
-		  << "\tIP to Shr Start : " << _IPthisStart << std::endl;
+	if (_verbose) {
+	  std::cout << "\tImpact Parameter: " << _IP << std::endl
+		    << "\tIP to Trk Start : " << _IPthatStart << std::endl
+		    << "\tIP to Trk Body  : " << _IPtrkBody << std::endl
+		    << "\tIP to Shr Start : " << _IPthisStart << std::endl;
+	}
 	single = true;
 	if ( (IP < _maxIP)                                              // good correlation
 	     && (vtx.Dist(thatTrack.front()) < _vtxToTrkStartDist)      // vertex close to track start
@@ -231,9 +232,9 @@ namespace ertool {
 	::geoalgo::Vector_t trackDir = track[int(nsteps/2.)]-track[0];
 	trackDir.Normalize();
 	// get dot product
-	double dot = thisShower.Dir()*trackDir;
-	if (dot > 0.9)
-	  single = false;
+	//double dot = thisShower.Dir()*trackDir;
+	//if (dot > 0.9)
+	//single = false;
       }
 
       // if still single (and no sister track) look at
