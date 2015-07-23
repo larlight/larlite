@@ -137,7 +137,14 @@ namespace larlite {
 	throw ::ertool::ERException("Duplicate particle found in MCTrack filling loop!");
 
       // Assign ParticleID <=> NodeID map value
-      part_list[id] = nodeID;      
+      part_list[id] = nodeID;
+      /*
+      std::cout<<"New Particle..."<<std::endl
+	       <<"PdgCode  : "<<id.PdgCode()<<std::endl
+	       <<"Position : "<<id.Position().X() << " : " <<id.Position().Y() << " : " <<id.Position().Z() << std::endl
+	       <<"Momentum : "<<id.Momentum().X() << " : " <<id.Momentum().Y() << " : " <<id.Momentum().Z() << std::endl
+	       <<std::endl;
+      */
     }
     
     //
@@ -162,7 +169,6 @@ namespace larlite {
 	
 	// Check if this ID is already dispatched (=> then we don't care)
 	if(part_list.find(id) == part_list.end()) {
-	
 	  // Create a new particle & fill information
 	  auto& p = graph.CreateParticle();
 	  p.SetParticleInfo( mcp.PdgCode(),
@@ -171,6 +177,13 @@ namespace larlite {
 			     ::geoalgo::Vector(mcp.Trajectory()[0].Momentum())*1.e3 );
 
 	  part_list[id] = p.ID();
+	  /*
+	  std::cout<<"New Particle..."<<std::endl
+		   <<"PdgCode  : "<<id.PdgCode()<<std::endl
+		   <<"Position : "<<id.Position().X() << " : " <<id.Position().Y() << " : " <<id.Position().Z() << std::endl
+		   <<"Momentum : "<<id.Momentum().X() << " : " <<id.Momentum().Y() << " : " <<id.Momentum().Z() << std::endl
+		   <<std::endl;
+	  */
 	}
 	
 	if(mcp.StatusCode() != 1) continue;
@@ -179,27 +192,19 @@ namespace larlite {
 	// Step 3.1 ... Make status 0=>1 parentage map 
 	//
 	bool search = true;
-	unsigned int grand_parent_track_id = mcp.TrackId();
+	int mct_parent_id = mcp.TrackId();
 	while(search) {
 	  search = false;
-	  auto const& mcp_list = mci.GetParticles();
-	  for(size_t i=0; i<mcp_list.size(); ++i) {
-	    auto const& mom_cand = mcp_list[i];
-	    if(mom_cand.TrackId() == grand_parent_track_id) {
-	      // Found a grand parent particle
-	      ::ertool_helper::ParticleID grand_parent_id(mom_cand);
+	  for(auto const& mcp_parent : mci.GetParticles()) {
+	    if(mcp_parent.TrackId() == mct_parent_id) {
+	      ::ertool_helper::ParticleID grand_parent_id(mcp_parent);
 	      grand_parent_map[id] = grand_parent_id;
-
-	      // See if further search is needed
-	      if(mom_cand.Mother() != -1 && 
-		 mom_cand.Mother() != mom_cand.TrackId()) { 
-		grand_parent_track_id = mom_cand.Mother();
-		search = true;
-	       }
-	      break;
+	      search = true;
+	      if(mct_parent_id == mcp_parent.Mother())
+		search = false;
+	      mct_parent_id = mcp_parent.Mother();
 	    }
-	  } 
-
+	  }
 	} // Finish finding a parentage within mctruth
       } // Finish looping over particles in mctruth
       
@@ -213,17 +218,28 @@ namespace larlite {
 	
 	auto const& child_id  = id_pair.first;
 	auto const& parent_id = id_pair.second;
-	
-	auto parent_iter = part_list.find(parent_id);
-	auto child_iter  = part_list.find(child_id);
+
+	auto child_iter  = part_list.find( child_id  );
+
+	if( part_list.find(parent_id) == part_list.end() ) {
+	  auto& p = graph.CreateParticle();
+	  p.SetParticleInfo( parent_id.PdgCode(),
+			     ::ertool::ParticleMass(parent_id.PdgCode()),
+			     ::geoalgo::Vector(parent_id.Position()),
+			     ::geoalgo::Vector(parent_id.Momentum()) );
+	  part_list[parent_id] = p.ID();
+	}
+	auto parent_iter = part_list.find( parent_id );
 	
 	if( parent_iter == part_list.end() || child_iter == part_list.end() )
 	  
 	  throw ::ertool::ERException("Missing parent/child relationship within MCTruth!");
+
 	if((*parent_iter).second != (*child_iter).second)
 	  graph.SetParentage( (*parent_iter).second, (*child_iter).second );
 	
       } // finish looping over mctruth-internal particle set
+
     } // finish looping over MCTruth
     
     //
@@ -431,12 +447,12 @@ namespace larlite {
       for(auto& v : t._pid_score) v = 100;
       if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
       
-      auto nodeID = strm.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
+      //auto nodeID = strm.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
       /*
       strm.GetParticleGraphWriteable().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
-									   ::ertool::ParticleMass(mct.PdgCode()),
-									   mct.at(0).Position(),
-									   ::geoalgo::Vector(mct.at(0).Momentum()));
+      ::ertool::ParticleMass(mct.PdgCode()),
+      mct.at(0).Position(),
+      ::geoalgo::Vector(mct.at(0).Momentum()));
       */
     }
 
@@ -552,7 +568,7 @@ namespace larlite {
       s._time = mcs_v[i].End().T();
       double mass = 0;
       if (mcs.PdgCode() == 11) { mass = 0.511; }
-      auto nodeID = strm.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
+      //auto nodeID = strm.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
       /*
       mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
 							      mass,
