@@ -26,6 +26,12 @@ namespace ertool {
     _BDtTW = 0;
     _neutrinos = 0;
 
+    _one = 0;
+    _two = 0;
+    _three = 0;
+    _four = 0;
+    _five = 0;
+
   }
 
   void AlgoSingleE::Reset()
@@ -129,6 +135,8 @@ namespace ertool {
 		    << "\tIP to other Shr Start : " << _IPthatStart << std::endl
 		    << "\tIP to this Shr Start  : " << _IPthisStart << std::endl;
 	if ( (IP < _maxIP) && ( vtx.Dist(thisShower.Start()) < _vtxToShrStartDist) && ( vtx.Dist(thatShower.Start()) < _vtxToShrStartDist) ){
+	  std::cout<<"1) Losing this shower to IP or multiple electrons" <<std::endl; 
+	  _one++;
 	  single = false;
 	  if (_verbose) { std::cout << "NOT single" << std::endl; }
 	  break;
@@ -177,6 +185,8 @@ namespace ertool {
 	      _dedx   = thisShower._dedx;
 	      _radlen = vtx.Dist(thisShower.Start());
 	      _pdg    = 22;
+	      std::cout<<"2) Losing this shower because gamma (with sibling track)" <<std::endl; 
+	      _two++;
 	      if (_verbose) { std::cout << "Shower is gamma-like. Ignore " << std::endl; }
 	      single = false;
 	      break;
@@ -207,6 +217,8 @@ namespace ertool {
 
       if ( single and !_hassister and (_vtxProximityCut != 0) ){
 	if ( (distmin != 1036) and (distmin > _vtxProximityCut) ){
+	  std::cout<<"3) Losing this shower because it's not close enough to the vdrtex of tracks" <<std::endl; 
+	  _three++;
 	  if(_verbose) { std::cout << "Trk-Vtx found @ distance of " << distmin << ". Shower not single!" << std::endl; }
 	  single = false;
 	}
@@ -232,14 +244,19 @@ namespace ertool {
 	trackDir.Normalize();
 	// get dot product
 	double dot = thisShower.Dir()*trackDir;
-	if (dot > 0.9)
-	  single = false;
+//	if (dot > 0.9){
+//	  std::cout<< "4) Something about a dot product"<<std::endl ;
+//	  _four++;
+//	  single = false;
+//	} 
       }
 
       // if still single (and no sister track) look at
       // dEdx to determine if e-like
       if (single && !_hassister){
 	if ( isGammaLike(thisShower._dedx,-1) || (thisShower._dedx <= 0) || (thisShower._dedx > 10.) ){
+	      std::cout<<"5) Losing this shower because gamma (with NO sibling track)" <<std::endl; 
+	      _five++;
 	  if (_verbose) { std::cout << "Shower is single but gamma-like -> reject" << std::endl; }
 	  single = false;
 	}
@@ -327,6 +344,12 @@ namespace ertool {
   void AlgoSingleE::ProcessEnd(TFile* fout){
 
     std::cout << "Num. of neutrinos found: " << _neutrinos << std::endl;
+    std::cout<<"Losing things here: "
+	    <<"\n1): "<<_one
+	    <<"\n2): "<<_two
+	    <<"\n3): "<<_three
+	    <<"\n4): "<<_four
+	    <<"\n5): "<<_five <<std::endl ;
     
     if(fout){
       fout->cd();
