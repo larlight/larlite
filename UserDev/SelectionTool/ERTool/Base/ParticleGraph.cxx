@@ -325,6 +325,7 @@ namespace ertool {
       res += prefix + "unknown" + " ... ";
     else
       res += prefix + std::to_string(p.PdgCode()) + " ... ";
+
     if (p.Vertex() == kINVALID_VERTEX)
       res += "[unknown] [cm]";
     else
@@ -333,6 +334,7 @@ namespace ertool {
       res += "--> unknown" ;
     else
       res += "--> " + std::to_string( p.KineticEnergy() );
+      //res += std::to_string(p.Momentum()[0]) + " [MeV/c] : " + std::to_string(p.Momentum()[1]) + " [MeV/c] : " + std::to_string(p.Momentum()[2]) + " [MeV/c] ";
     res += " MeV \n";
     prefix += "  ";
     for(auto const& c : p.Children()) Diagram(c,res,prefix);
@@ -355,8 +357,8 @@ namespace ertool {
       if( !p.RelationAssessed() )
 	part_diagram += "UN-ASSESSED " + std::to_string(p.PdgCode());
       else {
-	part_diagram  = " ";
-	Diagram(part_id,part_diagram," ");
+	part_diagram  = "";
+	Diagram(part_id,part_diagram,"  ");
 	part_diagram += "\n";
 	res += part_diagram;
       }
