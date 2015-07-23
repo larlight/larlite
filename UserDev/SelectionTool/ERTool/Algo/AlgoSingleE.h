@@ -174,6 +174,12 @@ namespace ertool {
     double _distBackAlongTraj; // distance backwards from vertex to nearest wall
     double _distToTopWall; // distance backwards along traj from vertex to top wall(extended to infinity)
 
+    int _one ;
+    int _two ;
+    int _three ;
+    int _four ;
+    int _five ; 
+
   };
 }
 #endif
