@@ -111,7 +111,7 @@ while (counter < 11700):
 #    viewAll(data_mc,part_mc,data_reco,part_reco)
 #
     display_mc = gv.GeoViewer()
-    display_reco = gv.GeoViewer()
+   # display_reco = gv.GeoViewer()
 
     my_proc.process_event(counter)
     print "Processing event {0}".format(counter)

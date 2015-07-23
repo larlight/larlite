@@ -1,6 +1,5 @@
 #ifndef ERTOOL_ALGOSINGLEE_CXX
 #define ERTOOL_ALGOSINGLEE_CXX
-
 #include "AlgoSingleE.h"
 
 namespace ertool {
@@ -12,7 +11,7 @@ namespace ertool {
   
   AlgoSingleE::AlgoSingleE(const std::string& name)
     : AlgoBase(name)
-    , fTPC(0.,-20.,0.,47.,20.,90.)
+    , fTPC(-0.,-20.,0.,47.,20.,90.)
     , _empart_tree(nullptr)
     , _alg_tree(nullptr)
   {

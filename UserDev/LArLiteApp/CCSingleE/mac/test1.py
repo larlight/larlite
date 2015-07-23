@@ -70,15 +70,17 @@ my_anaunit._mgr._mc_for_ana = True
 
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
-my_anaunit.SetShowerProducer(True,"mcreco");
-#my_anaunit.SetShowerProducer(False,"showerreco");
+#my_anaunit.SetShowerProducer(True,"mcreco");
+my_anaunit.SetShowerProducer(False,"showerreco");
 #my_anaunit.SetShowerProducer(False,"newdefaultreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetShowerProducer(False,"mergeall");
-my_anaunit.SetTrackProducer(True,"mcreco");
-#my_anaunit.SetTrackProducer(False,"");
+
+#my_anaunit.SetTrackProducer(True,"mcreco");
+
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 #my_anaunit.SetTrackProducer(False,"costrk");
+my_anaunit.SetTrackProducer(False,"");
 #my_anaunit.SetVtxProducer(True,"generator");
 # ************************************************
 
@@ -86,6 +88,8 @@ my_anaunit.SetTrackProducer(True,"mcreco");
 # to the process to be run
 #my_proc.add_process(MCfilter)
 my_proc.add_process(my_anaunit)
+
+
 
 my_proc.run()
 

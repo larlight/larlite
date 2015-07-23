@@ -47,7 +47,7 @@ namespace ertool {
   { return  pow((_mom * _mom + _mass * _mass), 0.5); }
 
   double Particle::KineticEnergy() const
-  { return pow((_mom * _mom + _mass * _mass), 0.5) - _mass ; }
+  { return ( this->Energy() - _mass ); }
 
   const ::geoalgo::Vector& Particle::Vertex()   const
   { return _vtx; }
