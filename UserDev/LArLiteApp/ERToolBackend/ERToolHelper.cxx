@@ -432,11 +432,12 @@ namespace larlite {
       if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
       
       auto nodeID = strm.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
+      /*
       strm.GetParticleGraphWriteable().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
 									   ::ertool::ParticleMass(mct.PdgCode()),
 									   mct.at(0).Position(),
 									   ::geoalgo::Vector(mct.at(0).Momentum()));
-      
+      */
     }
 
     return;
@@ -552,10 +553,12 @@ namespace larlite {
       double mass = 0;
       if (mcs.PdgCode() == 11) { mass = 0.511; }
       auto nodeID = strm.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
-      strm.GetParticleGraphWriteable().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
+      /*
+      mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
 							      mass,
 							      mcs.Start().Position(),
 							      ::geoalgo::Vector(mcs.Start().Momentum()));
+      */
     }
 
     return;

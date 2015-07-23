@@ -15,6 +15,14 @@ namespace ertool {
       , _data     (nullptr)
       , _mc_data  (nullptr)
     {}
+    
+    void EmptyInput::SetID(unsigned int evID,
+			   unsigned int runID,
+			   unsigned int subrunID)
+    {
+      _data->SetID(evID,runID,subrunID);
+      _mc_data->SetID(evID,runID,subrunID);
+    }
 
     size_t EmptyInput::NumEntries() const
     { return 0; }

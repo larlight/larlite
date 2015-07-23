@@ -59,6 +59,11 @@ namespace ertool {
       /// Function to "close" the output stream
       bool Close();
 
+      /// Function to set event id, run and subrun
+      void SetID(unsigned int evID,
+		 unsigned int runID,
+		 unsigned int subrunID);
+
       /// Function to add input data product: Shower
       NodeID_t Add(const ertool::Shower& obj,
 		   const ertool::RecoInputID_t& input_id,
