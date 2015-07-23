@@ -62,6 +62,7 @@ my_proc.set_ana_output_file("singleE_selection.root")
 Ecut = 20 # in MeV
 
 my_ana = ertool.ERAnatestTree()
+#my_ana = ertool.AlgoSingleE()
 #my_ana.SetDebug(False)
 #my_ana.SetECut(Ecut)
 
