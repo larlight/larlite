@@ -36,7 +36,7 @@ namespace ertool {
       
       /// Default destructor
       ~IOHandler(){}
-      
+
       /// Input file name adder
       void AddInputFile( const std::string& fname );
       
@@ -66,6 +66,13 @@ namespace ertool {
 
       /// Clear event-wise data contents
       void ClearData();
+
+      /// Input stream getter
+      IStreamBase* InputStream() { return _in_strm; }
+
+      /// Output stream getter
+      OStreamBase* OutputStream() { return _out_strm; }
+
       
     protected:
 

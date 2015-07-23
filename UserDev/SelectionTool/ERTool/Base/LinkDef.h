@@ -29,6 +29,7 @@
 #pragma link C++ class std::vector<ertool::Track>+;
 #pragma link C++ class ertool::EventData+;
 #pragma link C++ class ertool::Particle+;
+#pragma link C++ class std::deque<ertool::Particle>+;
 #pragma link C++ class ertool::ParticleGraph+;
 #pragma link C++ class std::vector<ertool::Particle>+;
 

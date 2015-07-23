@@ -23,6 +23,7 @@ namespace ertool {
   class Manager;
   namespace io {
     class IOHandler;
+    class EmptyInput;
   }
 }
 
@@ -37,6 +38,7 @@ namespace ertool {
   class EventData {
     friend class Manager;
     friend class io::IOHandler;
+    friend class io::EmptyInput;
   public:
     
     /// Default constructor
