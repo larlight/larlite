@@ -39,7 +39,8 @@ namespace evd {
     float angleInPlane(){return _angleInPlane;}
     float openingAngle(){return _openingAngle;}
     float length(){return _length;}
-
+    bool is_good(){return _is_good;}
+    float dedx(){return _dedx;}
 
     // ALL OF THESE VARIABLES ARE THE PROJECTION INTO THE PLANE
     int _plane;                ///< The Plane of the shower
@@ -47,6 +48,8 @@ namespace evd {
     float _angleInPlane;       ///< Angle in the plane
     float _openingAngle;       ///< Opening angle
     float _length;             ///< Length in cm
+    bool _is_good;             ///< Whether or not the projection succeeded
+    float _dedx;                ///< dedx in collection plane, for printout
   };
 
 } // evd

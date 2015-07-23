@@ -3,6 +3,7 @@
 
 #include "DrawShower.h"
 #include "DataFormat/shower.h"
+#include "LArUtil/DetectorProperties.h"
 
 namespace evd {
 
@@ -130,15 +131,42 @@ namespace evd {
   }
 
   Shower2d DrawShower::getShower2d(larlite::shower shower, unsigned int plane){
+    
+    auto detProp = larutil::DetectorProperties::GetME();
+
+
     Shower2d result;
+    result._is_good = false;
     result._plane = plane;
     // Fill out the parameters of the 2d shower
-    float _wire = geoService->NearestWire(shower.ShowerStart(), plane);
+    float _wire = 0;
+    try{
+      _wire = geoService->NearestWire(shower.ShowerStart(), plane);
+    }
+    catch(...){
+      // std::cerr << "Caught exception trying to find nearest shower.  There is a junk shower.\n";
+      return result;
+    }
+
     float _time = shower.ShowerStart().X();
-    // Convert wire and time to cm:
+    _time += detProp -> TriggerOffset() * geoUtils -> TimeToCm();
+    if (plane == 0){
+      _time += detProp -> TimeOffsetU() * geoUtils -> TimeToCm();
+    }
+    if (plane == 1){
+      _time += detProp -> TimeOffsetV() * geoUtils -> TimeToCm();
+    }
+
+
+
+    // Convert wire to cm:
     _wire *= geoUtils->WireToCm();
-    _time *= geoUtils->WireToCm();
     result._startPoint = TVector2(_wire,_time);
+    // std::cout << "3D start point: (" << shower.ShowerStart().X() 
+    //           << ", " << shower.ShowerStart().Y()  
+    //           << ", " << shower.ShowerStart().Z()  
+    //           << ") " << std::endl;
+    // std::cout << "Start point in plane " << plane << " (" << _wire << ", " << _time << ")\n";
 
     // Next get the direction:
     result._angleInPlane = geoUtils->Get2DangleFrom3D(plane,shower.Direction());
@@ -151,10 +179,28 @@ namespace evd {
     auto secondPoint = shower.ShowerStart() + length*shower.Direction();
 
     // project the second point into the plane:
-    float _second_wire = geoUtils->WireToCm() * geoService->NearestWire(secondPoint,plane);
-    float _second_time = geoUtils->TimeToCm() * secondPoint.X();
 
+    float _second_wire =0; 
+    try {
+      _second_wire = geoUtils->WireToCm() * geoService->NearestWire(secondPoint,plane);
+    }
+    catch(...) {
+      // std::cerr << "another exception" << '\n';
+      return result;
+    }
+    float _second_time = geoUtils->TimeToCm() * secondPoint.X();
+    _second_time += detProp -> TriggerOffset() * geoUtils -> TimeToCm();
+    if (plane == 0){
+      _second_time += detProp -> TimeOffsetU() * geoUtils -> TimeToCm();
+    }
+    if (plane == 1){
+      _second_time += detProp -> TimeOffsetV() * geoUtils -> TimeToCm();
+    }
     result._length = sqrt(pow(_wire - _second_wire, 2) + pow(_time - _second_time, 2));
+
+    result._dedx = shower.dEdx().back();
+
+    result._is_good = true;
     return result;
   }
 

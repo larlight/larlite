@@ -1,9 +1,9 @@
 /**
- * \file DrawShower.h
+ * \file DrawTrack.h
  *
  * \ingroup RecoViewer
  * 
- * \brief Class def header for a class DrawShower
+ * \brief Class def header for a class DrawTrack
  *
  * @author cadams
  */
@@ -11,34 +11,33 @@
 /** \addtogroup RecoViewer
 
     @{*/
-#ifndef LARLITE_DRAWSHOWER_H
-#define LARLITE_DRAWSHOWER_H
+#ifndef LARLITE_DRAWTRACK_H
+#define LARLITE_DRAWTRACK_H
 
 #include <iostream>
 #include "Analysis/ana_base.h"
 #include "LArUtil/Geometry.h"
 #include "LArUtil/GeometryUtilities.h"
-#include "DataFormat/shower.h"
-#include "Shower2d.h"
+#include "DataFormat/track.h"
 /**
-   \class DrawShower
-   User defined class DrawShower ... these comments are used to generate
+   \class DrawTrack
+   User defined class DrawTrack ... these comments are used to generate
    doxygen documentation!
  */
 
-
+typedef std::vector< std::pair<float,float> > track2d;
 
 namespace evd{
 
-  class DrawShower : public larlite::ana_base {
+  class DrawTrack : public larlite::ana_base {
 
   public:
 
     /// Default constructor
-    DrawShower();
+    DrawTrack();
 
     /// Default destructor
-    ~DrawShower();
+    ~DrawTrack();
 
     /** IMPLEMENT in DrawCluster.cc!
         Initialization method to be called before the analysis event loop.
@@ -59,8 +58,9 @@ namespace evd{
     void setProducer(std::string s){producer = s;}
 
 
-    const std::vector< ::evd::Shower2d >   & getShowersByPlane(unsigned int p) const;
-    // const shower2d getShower(unsigned int plane, unsigned int index) const;
+    const std::vector< track2d >   & getTracksByPlane(unsigned int p) const;
+    // int getNTracks() const;
+    // const track2d getTrack(unsigned int plane, unsigned int index) const;
 
   private:
     
@@ -75,9 +75,9 @@ namespace evd{
     // This shows how to handle abstract objects in the viewer
 
     // Internally, keep the showers sorted by plane
-    std::vector<std::vector< ::evd::Shower2d> > * showerVectorByPlane;
+    std::vector<std::vector< track2d > > * trackVectorByPlane;
 
-    Shower2d getShower2d(larlite::shower shower, unsigned int plane);
+    track2d getTrack2d(larlite::track track, unsigned int plane);
 
   };
 

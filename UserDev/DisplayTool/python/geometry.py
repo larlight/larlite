@@ -87,8 +87,8 @@ class lariat(geometry):
     super(lariat, self).__init__()
     # lariat has a different number of time ticks
     # fix it directly:
-    self._tRange = 3072/2
-    self._levels = [ (-15,15),(-2,20) ]
+    self._tRange = 3072
+    self._levels = [ (-20,200),(-20,200) ]
     self._name = "lariat"
 
 
