@@ -48,7 +48,10 @@ namespace larutil {
     
     // The wire position can be gotten with Geometry::NearestWire()
     // Convert result to centimeters as part of the unit convention
-    returnPoint.w = geom->NearestWire(_3D_position, plane) * fWireToCm;
+    // Previously used nearest wire functions, but they are slightly inaccurate
+    // If you want the nearest wire, use the nearest wire function!
+    returnPoint.w = geom->WireCoordinate(_3D_position, plane) * fWireToCm;
+    // std::cout << "wire is " << returnPoint.w << " (cm)" << std::endl;
 
     // The time position is the X coordinate, corrected for trigger offset and the offset of the plane
     auto detp = DetectorProperties::GetME();
@@ -99,25 +102,46 @@ namespace larutil {
       return;
     }
     // Next, get a second point in 3D:
-    float alpha = 1.0;
+    float alpha = 10;
     TVector3 secondPoint3D = startPoint3D + alpha*direction3D;
     while ( ! Point_isInTPC(secondPoint3D) ){
       alpha *= -0.75;
       secondPoint3D = startPoint3D + alpha*direction3D;
     }
 
+    // std::cout << "3D line is (" << startPoint3D.X() << ", " << startPoint3D.Y()
+    //           << ", " << startPoint3D.Z() << ") to ( " << secondPoint3D.X() 
+    //           << ", " << secondPoint3D.Y() << ", " << secondPoint3D.Z() << ")\n";
+
     // Project the second point into 2D:
     PxPoint secondPoint2D = Point_3Dto2D(secondPoint3D,plane);
 
+    // std::cout << "2D line is (" << startPoint2D.w << ", " << startPoint2D.t
+    //           << ") to (" << secondPoint2D.w << ", " << secondPoint2D.t << ")\n";
+
     // Now we have two points in 2D.  Get the direction by subtracting, and normalize
     TVector2 dir(secondPoint2D.w - startPoint2D.w,secondPoint2D.t - startPoint2D.t);
-    dir *= 1.0 / dir.Mod();
+    if (dir.X() != 0.0 || dir.Y() != 0.0 )
+      dir *= 1.0 / dir.Mod();
     direction2D.w = dir.X();
     direction2D.t = dir.Y();
     direction2D.plane = plane;
 
     return;
   }
+
+  float GeometryHelper::Slope_3Dto2D(const TVector3 & inputVector, unsigned int plane) const {
+    // Do this by projecting the line:
+    // Generate a start point right in the middle of the detector:
+    auto geom = larutil::Geometry::GetME();
+    TVector3 startPoint3D(0,0,0);
+    startPoint3D.SetZ(0.5 * geom -> DetLength());
+    larutil::PxPoint p1,slope;
+    Line_3Dto2D(startPoint3D,inputVector,plane,p1,slope);
+    return slope.t / slope.w;
+  }
+
+
 
   float GeometryHelper::DistanceToLine2D( const PxPoint & pointOnLine, const PxPoint & directionOfLine, 
                                           const PxPoint & targetPoint) const

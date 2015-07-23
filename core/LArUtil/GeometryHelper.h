@@ -147,6 +147,7 @@ namespace larutil{
     void Line_3Dto2D( const TVector3 & startPoint3D, const TVector3 & direction3D, unsigned int plane,
                       PxPoint & startPoint2D, PxPoint & direction2D) const;
 
+    float Slope_3Dto2D(const TVector3 & inputVector, unsigned int plane) const ;
 
     /**
      * @brief Calculate the shortest distance between a line and a point in 2D
