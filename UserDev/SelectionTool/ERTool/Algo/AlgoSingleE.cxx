@@ -12,7 +12,7 @@ namespace ertool {
   
   AlgoSingleE::AlgoSingleE(const std::string& name)
     : AlgoBase(name)
-    , fTPC(-10.,-126.,-10.,292.,136.,1150.)
+    , fTPC(0.,-20.,0.,47.,20.,90.)
     , _empart_tree(nullptr)
     , _alg_tree(nullptr)
   {
@@ -268,7 +268,7 @@ namespace ertool {
 	if (_verbose) { std::cout << "Making neutrino..." << std::endl; }
 	Particle& neutrino = graph.CreateParticle();
 	neutrinoMom += mom;//thisShower.Dir()*mom;
-	//neutrino.SetParticleInfo(12,0.,thisShower.Start(),thisShower.Dir()*mom);
+	neutrino.SetParticleInfo(12,0.,thisShower.Start(),thisShower.Dir()*mom);
 	if (_verbose) { std::cout << "made neutrino with ID " << neutrino.ID() << " and PDG: " << neutrino.PdgCode() << std::endl; }
 	if (_verbose) { std::cout << "number of partciles after: " << graph.GetNumParticles() << std::endl; }
 	_neutrinos += 1;

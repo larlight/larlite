@@ -70,6 +70,7 @@ namespace ertool {
     double _mReco;
     int counter;
     int event_counter;
+    int neutrino;
   };
 
 }

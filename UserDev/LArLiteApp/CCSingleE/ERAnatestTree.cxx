@@ -24,6 +24,7 @@ namespace ertool {
     _tree->Branch("_mReco",&_mReco,"mReco/D");
     counter = 0;
     event_counter = 0;
+    neutrino = 0;
   }
 
   void ERAnatestTree::Reset()
@@ -62,51 +63,67 @@ namespace ertool {
         if (p.PdgCode() != 11) continue;
 	else {
 	  _xMC = p.Vertex()[0];
-	  std::cout << "\n" << "\n";
-	  std::cout << "*************************************" << "\n";
-	  std::cout << "************ NEW SHOWER *************" << "\n";
-	  std::cout << "*************************************" << "\n";
-	  std::cout << "\n\n" << "The MC x coordinate is " << _xMC << "\n";
+	  //std::cout << "\n" << "\n";
+	  //std::cout << "*************************************" << "\n";
+	  //std::cout << "************ NEW SHOWER *************" << "\n";
+	  //std::cout << "*************************************" << "\n";
+	  //std::cout << "\n\n" << "The MC x coordinate is " << _xMC << "\n";
 	  _yMC = p.Vertex()[1];
-	  std::cout << "The MC y coordinate is " << _yMC << "\n";
+	  //std::cout << "The MC y coordinate is " << _yMC << "\n";
 	  _zMC = p.Vertex()[2];
-	  std::cout << "The MC z coordinate is " << _zMC << "\n";
+	  //std::cout << "The MC z coordinate is " << _zMC << "\n";
 	  _eMC = p.Energy();
-	  std::cout << "The MC PDG is " << p.PdgCode() << "\n";
-	  std::cout << "The MC energy is " << _eMC << " \n";
+	  //std::cout << "The MC PDG is " << p.PdgCode() << "\n";
+	  //std::cout << "The MC energy is " << _eMC << " \n";
 	  _keMC = p.KineticEnergy();
-	  std::cout << "The MC kinetic energy is " << _keMC << " \n";
+	  //std::cout << "The MC kinetic energy is " << _keMC << " \n";
 	  _mMC = p.Mass();
-	  std::cout << "The MC mass is " << _mMC << " \n";
+	  //std::cout << "The MC mass is " << _mMC << " \n";
 	  _tree->Fill();
 	}
       }
 
      for (auto &p : ps.GetParticleArray())
-      {
+       {
         if (p.PdgCode() != 11) continue;
 	else {
 	  _xReco = p.Vertex()[0];
-	  std::cout << "*************************************" << "\n";
-	  std::cout << "********* COMPARE WITH RECO *********" << "\n";
-	  std::cout << "*************************************" << "\n";
-	  std::cout << "The Reco x coordinate is " << _xReco << "\n";
+	  //std::cout << "*************************************" << "\n";
+	  //std::cout << "********* COMPARE WITH RECO *********" << "\n";
+	  //std::cout << "*************************************" << "\n";
+	  //std::cout << "The Reco x coordinate is " << _xReco << "\n";
 	  _yReco = p.Vertex()[1];
-	  std::cout << "The Reco y coordinate is " << _yReco << "\n";
+	  //std::cout << "The Reco y coordinate is " << _yReco << "\n";
 	  _zReco = p.Vertex()[2];
-	  std::cout << "The Reco z coordinate is " << _zReco << "\n";
+	  //std::cout << "The Reco z coordinate is " << _zReco << "\n";
 	  _eReco = p.Energy();
-	  std::cout << "Reco PDG is " << p.PdgCode() << "\n";
-	  std::cout << "The Reco energy is " << _eReco << " \n";
+	  //std::cout << "Reco PDG is " << p.PdgCode() << "\n";
+	  //std::cout << "The Reco energy is " << _eReco << " \n";
 	  _keReco = p.KineticEnergy();
-	  std::cout << "The Reco kinetic energy is " << _keReco << " \n";
+	  //std::cout << "The Reco kinetic energy is " << _keReco << " \n";
 	  _mReco = p.Mass();
-	  std::cout << "The Reco mass is " << _mReco << " \n";
+	  //std::cout << "The Reco mass is " << _mReco << " \n";
 	  _tree->Fill();
 	  counter++;
-	  std::cout << "\n\n\n ";
+	  //std::cout << "\n\n\n ";
 	}
+
       }
+
+     for (auto &p : ps.GetParticleArray()){
+
+       if (p.PdgCode() == 12) {
+	 neutrino++ ;
+       }
+     }
+
+
+
+     if (neutrino != 1) {
+       std::cout << " Missed this event!" << "\n" ;
+       std::cout << "Missed event is: " << event_counter <<"\n";
+       }
+
 
     return true; 
   }
