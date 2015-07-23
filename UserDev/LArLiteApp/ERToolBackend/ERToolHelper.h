@@ -18,7 +18,7 @@
 #include <map>
 #include <TRandom.h>
 #include "DataFormat/DataFormat-TypeDef.h"
-#include "ERTool/Base/Manager.h"
+#include "ERTool/Base/EmptyInput.h"
 
 #include "LArUtil/ElecClock.h"
 #include "LArUtil/Geometry.h"
@@ -56,35 +56,35 @@ namespace larlite {
     void FillMCInfo( const event_mctruth&   mci_v,
 		     const event_mcshower&  mcs_v,
 		     const event_mctrack&   mct_v,
-		     ::ertool::Manager&     mgr) const;
+		     ::ertool::io::EmptyInput& strm) const;
 
 
     /// Fill Track Info from MC
-    void FillTracks( const event_mctrack&   mct_v,
-		     ::ertool::Manager&     res) const;
+    void FillTracks( const event_mctrack& mct_v,
+		     ::ertool::io::EmptyInput& strm) const;
 
     /// Fill Track Info from RECO
-    void FillTracks ( const event_track&       trk_v,
-		      const event_cosmictag&   cos_trk_v,
-		      const event_calorimetry& calo_trk_v,
-		      const event_partid&      pid_trk_v,
-		      const event_ass&         ass_v,
-		      ::ertool::Manager&       mgr) const;
+    void FillTracks ( const event_track&        trk_v,
+		      const event_cosmictag&    cos_trk_v,
+		      const event_calorimetry&  calo_trk_v,
+		      const event_partid&       pid_trk_v,
+		      const event_ass&          ass_v,
+		      ::ertool::io::EmptyInput& strm) const;
 
     /// Fill Shower Info from MC
     void FillShowers ( const event_mcshower&  mcs_v,
-		       ::ertool::Manager&     mgr) const;
+		       ::ertool::io::EmptyInput& mgr) const;
 
     /// Fill Shower Info from RECO
     void FillShowers ( const event_shower&    shw_v,
 		       const event_cosmictag& ctag_shw_v,
 		       const event_ass&       ass_v,
-		       ::ertool::Manager&     mgr) const;
+		       ::ertool::io::EmptyInput& mgr) const;
 
 
     /// MC Cheater for single showers
     void SingleShowerCheater(const event_mcshower& mcs_v,
-			     ::ertool::Manager&    mgr ) const;
+			     ::ertool::io::EmptyInput& strm ) const;
 
     /// Set minimum EDep amount for shower to be added to EventData
     void SetMinEDep(double E) { if(E<1.e-10) E=1.e-10; _minEDep = E; }

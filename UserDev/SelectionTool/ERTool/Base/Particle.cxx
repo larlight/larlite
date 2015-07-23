@@ -65,7 +65,7 @@ namespace ertool {
   { return _primary; }
 
   bool Particle::Descendant() const
-  { return (!(_node_id == _ancestor_id && RelationAssessed())); }
+  { return (!(_node_id == _parent_id && RelationAssessed())); }
   
   bool Particle::Lonely() const
   { return (_child_v.size()<1); }

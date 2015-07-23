@@ -43,18 +43,18 @@ namespace ertool {
     
   protected:
 
-    void SetMCData(EventData& data, ParticleGraph& graph);
-
-    void UnsetMCData();
-
     const EventData&   MCEventData() const;
 
     const ParticleGraph& MCParticleGraph() const;
 
   private:
 
-    EventData*   _mc_data;
-    ParticleGraph* _mc_graph;
+    void SetMCData(const EventData& data, const ParticleGraph& graph);
+
+    void UnsetMCData();
+
+    const EventData*   _mc_data;
+    const ParticleGraph* _mc_graph;
 
   };
 }

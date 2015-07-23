@@ -28,7 +28,7 @@ namespace larlite {
     return (mc ? _mgr.MCEventData() : _mgr.EventData());
   }
 
-  ::ertool::ParticleGraph& ERToolAnaBase::GetParticles(bool mc)
+  const ::ertool::ParticleGraph& ERToolAnaBase::GetParticles(bool mc)
   {
     return (mc ? _mgr.MCParticleGraph() : _mgr.ParticleGraph());
   }
@@ -74,7 +74,7 @@ namespace larlite {
     }
 
     _mgr.Initialize();
-
+    _mgr.GetIOHandle().Open();
     return true;
   }
   
@@ -84,8 +84,12 @@ namespace larlite {
     TStopwatch fWatch;
     fWatch.Start();
 
+    auto in_strm = (ertool::io::EmptyInput*)(_mgr.GetIOHandle().InputStream());
+
     static bool one_time_warning = true;
-    _mgr.SetID(storage->event_id(), storage->run_id(), storage->subrun_id());
+    in_strm->SetID(storage->event_id(),
+		   storage->run_id(),
+		   storage->subrun_id());
 
 
     //------------------------------
@@ -98,10 +102,10 @@ namespace larlite {
 	      "MCShower info not found in the event!");
 	throw std::exception();
       }
-      _helper.FillShowers(*ev_mcs, _mgr);
+      _helper.FillShowers(*ev_mcs, *in_strm);
       // if cheater for single showers is to be used:
       if (_cheater)
-	_helper.SingleShowerCheater(*ev_mcs,_mgr);
+	_helper.SingleShowerCheater(*ev_mcs,*in_strm);
     }
     else if(!_mcshowers && !_name_shower.empty()){
 
@@ -118,10 +122,10 @@ namespace larlite {
 	  print(msg::kWARNING,__FUNCTION__,
 		Form("One-Time-Warning: No cosmictag for shower available (\"%stag\")",_name_shower.c_str()) );
 	event_cosmictag tmp;
-	_helper.FillShowers(*ev_shw, tmp, *ev_ass, _mgr);	  
+	_helper.FillShowers(*ev_shw, tmp, *ev_ass, *in_strm);	  
       }
       else
-	_helper.FillShowers(*ev_shw, *ev_ctag_shw, *ev_ass, _mgr);
+	_helper.FillShowers(*ev_shw, *ev_ctag_shw, *ev_ass, *in_strm);
       // if cheater for single showers is to be used:
       if (_cheater){
 	// get mcshowers
@@ -131,7 +135,7 @@ namespace larlite {
 		"MCShower info not found in the event!");
 	  throw std::exception();
 	}
-	_helper.SingleShowerCheater(*ev_mcs,_mgr);
+	_helper.SingleShowerCheater(*ev_mcs,*in_strm);
       }// cheater
     }
 
@@ -142,7 +146,7 @@ namespace larlite {
 	print(msg::kERROR,__FUNCTION__,
 	      "MCTrack info not found in the event!");
       }
-      _helper.FillTracks(*ev_mct, _mgr);
+      _helper.FillTracks(*ev_mct, *in_strm);
     }
     else if(!_mctracks && !_name_track.empty()) {
       auto ev_trk      = storage->get_data<event_track>       (_name_track);
@@ -173,7 +177,7 @@ namespace larlite {
 	delete ev_pid_trk;
 	ev_pid_trk = new event_partid();
       }
-      _helper.FillTracks( *ev_trk, *ev_ctag_trk, *ev_calo_trk, *ev_pid_trk, *ev_ass, _mgr);
+      _helper.FillTracks( *ev_trk, *ev_ctag_trk, *ev_calo_trk, *ev_pid_trk, *ev_ass, *in_strm);
     }
 
     // Done filling SPAData Object!
@@ -190,7 +194,7 @@ namespace larlite {
 	_helper.FillMCInfo(*ev_mci,
 			   *ev_mcs,
 			   *ev_mct,
-			   _mgr);
+			   *in_strm);
     }
       
 
@@ -201,6 +205,7 @@ namespace larlite {
   }
 
   bool ERToolAnaBase::finalize() {
+    _mgr.GetIOHandle().Close();
     _mgr.Finalize(_fout);
     return true;
   }

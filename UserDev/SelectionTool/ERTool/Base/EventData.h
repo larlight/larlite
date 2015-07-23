@@ -23,6 +23,7 @@ namespace ertool {
   class Manager;
   namespace io {
     class IOHandler;
+    class EmptyInput;
   }
 }
 
@@ -37,6 +38,7 @@ namespace ertool {
   class EventData {
     friend class Manager;
     friend class io::IOHandler;
+    friend class io::EmptyInput;
   public:
     
     /// Default constructor
@@ -74,11 +76,10 @@ namespace ertool {
     const unsigned int Run()      const { return _run     ;  }
     const unsigned int SubRun()   const { return _subrun  ;  }
 
-    void SetEvent_ID(unsigned int value) {  _event_id = value;  }
-    void SetRun(     unsigned int value) {  _run      = value;  }
-    void SetSubRun(  unsigned int value) {  _subrun   = value;  }
-
-
+    /// Function to set event id, run and subrun
+    void SetID(unsigned int evID,
+	       unsigned int runID,
+	       unsigned int subrunID);
 
   protected:
 

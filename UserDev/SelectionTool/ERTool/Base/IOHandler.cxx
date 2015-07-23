@@ -4,7 +4,8 @@
 #include "IOHandler.h"
 #include "ROOTInput.h"
 #include "ROOTOutput.h"
-
+#include "EmptyInput.h"
+#include "EmptyOutput.h"
 namespace ertool {
   namespace io {
     
@@ -36,27 +37,31 @@ namespace ertool {
       // Instantiate input stream
       switch(in_strm) {
       case kEmptyStream:
-	break;
+	_in_strm = new EmptyInput; break;
       case kROOT:
-	_in_strm = new ROOTInput;
-      default:
+	_in_strm = new ROOTInput; break;
+      default: 
 	throw ertool::ERException("This mode not yet implemented!");
 	break;
       }
       // Instantiate output stream
       switch(out_strm) {
       case kEmptyStream:
-	break;
+	_out_strm = new EmptyOutput; break;
       case kROOT:
-	_out_strm = new ROOTOutput;
+	_out_strm = new ROOTOutput; break;
       default:
 	throw ertool::ERException("This mode not yet implemented!");
 	break;
       }
-      if(_in_strm)
+      if(_in_strm){
 	_in_strm->Prepare(_edata,_pgraph,false);
-      if(_out_strm)
+	_in_strm->Prepare(_edata_mc,_pgraph_mc,true);
+      }
+      if(_out_strm){
 	_out_strm->Prepare(_edata,_pgraph,false);
+	_out_strm->Prepare(_edata_mc,_pgraph_mc,true);
+      }
     }
 
     EventData& IOHandler::GetEventDataWriteable(bool mc)
@@ -181,15 +186,7 @@ namespace ertool {
 	  throw ::ertool::ERException("Input files provided but no input stream handler provided!");
 	
 	_in_strm->AddFile(fname);
-      }
-      
-      if( _out_file_name.empty() &&  _out_strm )
-	
-	throw ::ertool::ERException("Output file not provided but output stream handler provided!");
-
-      if( !_out_file_name.empty() && !_out_strm )
-	
-	throw ::ertool::ERException("Output file provided but output stream handler not provided!");
+      }     
 
       if( _in_strm  ) {
 
@@ -198,10 +195,12 @@ namespace ertool {
 	_n_entries = _in_strm->NumEntries();
 
       }
-      
-      if( _out_strm )
+
+      if( !(_out_strm && _out_strm->Open(_out_file_name)) )
 	
-	status = status && _out_strm->Open(_out_file_name);
+	throw ::ertool::ERException("Failed to open an output file!");
+
+      if(status) _state = kOPEN;
       
       return status;
     }
