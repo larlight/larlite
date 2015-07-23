@@ -17,6 +17,7 @@ if len(sys.argv) < 2:
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
 my_proc.enable_filter(False)
+#larutil.LArUtilManager.Reconfigure(larlite.geo.kArgoNeuT)
 
 # Get Default CCSingleE Algorithm instance
 # this sets default parameters
@@ -110,8 +111,8 @@ while (counter < 11700):
 #    part_mc   = my_anaunit.GetParticles(True)
 #    viewAll(data_mc,part_mc,data_reco,part_reco)
 #
-    display_mc = gv.GeoViewer()
-   # display_reco = gv.GeoViewer()
+ #   display_mc = gv.GeoViewer()
+ #   display_reco = gv.GeoViewer()
 
     my_proc.process_event(counter)
     print "Processing event {0}".format(counter)
@@ -120,8 +121,8 @@ while (counter < 11700):
     part_reco = my_anaunit.GetParticles()
     data_mc   = my_anaunit.GetData(True)
     part_mc   = my_anaunit.GetParticles(True)
-    view(display_mc,data_mc,part_mc)
-
+#    view(display_mc,data_mc,part_mc)
+    viewAll(mcviewer,data_mc,part_mc,recoviewer,data_reco,part_reco)
 
     #for x in xrange(part_mc.size()):
     #    print part_mc[x].Diagram()
