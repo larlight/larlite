@@ -202,6 +202,7 @@ class connectedBox(QtGui.QGraphicsRectItem):
       
 
   def hoverEnterEvent(self, e):
+    self.setToolTip(self._ownerToolTip())
     self._ownerHoverEnter(e)
 
   def hoverLeaveEvent(self,e):
@@ -219,10 +220,14 @@ class connectedBox(QtGui.QGraphicsRectItem):
   def connectToggleHighlight(self, ownerTH):
     self._toggleHighlight = ownerTH
 
+  def connectToolTip(self, ownerToolTip):
+    self._ownerToolTip = ownerToolTip
+
 class boxCollection(QtGui.QGraphicsItem):
   # This class wraps a collection of hits and connects them together
   # it can draw and delete itself when provided with view_manager
   def __init__(self):
+    super(boxCollection, self).__init__()
     self._color = (0,0,0)
     self._plane = -1
     self._listOfHits = []
@@ -233,6 +238,11 @@ class boxCollection(QtGui.QGraphicsItem):
 
   def setPlane(self,plane):
     self._plane = plane
+
+  def genToolTip(self):
+    nhits = len(self._listOfHits)
+    tip = "Hits: " + str(nhits)  
+    return tip
 
   def hoverEnter(self, e):
     for hit in self._listOfHits:
@@ -261,6 +271,7 @@ class boxCollection(QtGui.QGraphicsItem):
       r.connectOwnerHoverEnter(self.hoverEnter)
       r.connectOwnerHoverExit(self.hoverExit)
       r.connectToggleHighlight(self.toggleHighlight)
+      r.connectToolTip(self.genToolTip)
 
   def clearHits(self,view_manager):
     view = view_manager.getViewPorts()[self._plane]

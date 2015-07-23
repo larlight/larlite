@@ -13,7 +13,9 @@
 #pragma link C++ class larlite::ComputePi0Mass+;
 #pragma link C++ class larlite::ShowerQuality+;
 #pragma link C++ class larlite::HitCalibration+;
+#pragma link C++ class larlite::ToyShowerGenerator+;
 //ADD_NEW_CLASS ... do not change this line
 //ADD_NEW_ALG_CLASS ... do not change this line
 #endif
+
 
