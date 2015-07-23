@@ -60,7 +60,7 @@ namespace evd{
 
 
     const std::vector< ::evd::Shower2d >   & getShowersByPlane(unsigned int p) const;
-
+    // const shower2d getShower(unsigned int plane, unsigned int index) const;
 
   private:
     

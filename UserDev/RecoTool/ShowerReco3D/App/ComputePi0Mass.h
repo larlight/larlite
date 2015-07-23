@@ -17,8 +17,8 @@
 
 #include "Analysis/ana_base.h"
 #include "MCComp/MCMatchAlg.h"
-#include "ShowerCalo.h"
-#include "ShowerRecoException.h"
+#include "ShowerReco3D/Base/ShowerCalo.h"
+#include "ShowerReco3D/Base/ShowerRecoException.h"
 #include <TH1D.h>
 namespace larlite {
   /**
