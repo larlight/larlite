@@ -22,7 +22,7 @@ namespace showerreco{
 
 
     // Start by making a guess:
-    TVector3 pointOnAxis,direction(0,0,1);
+    TVector3 pointOnAxis,direction(0,1,0);
 
     ///\todo temporary: set the minimum error hardcoded:
     float _error_minimum = 1.0;  // [units are cm, averaged over all showers]
@@ -42,209 +42,208 @@ namespace showerreco{
     minDim.push_back(-geom -> DetHalfWidth());
     minDim.push_back(-geom -> DetHalfHeight());
     minDim.push_back(0.0);
-
-
-    std::cout << "Detector dimensions: ( "
-              << 2* geom -> DetHalfWidth() << ", "
-              << 2* geom -> DetHalfHeight() << ", "
-              << geom -> DetLength() << ")\n";
-
-    std::cout << "\n\nStarting guess is ("
-              << pointOnAxis.X() << ", "
-              << pointOnAxis.Y() << ", "
-              << pointOnAxis.Z() << ")\n";
-
-    bool converged = false;
-    int max_iterations = 5;
-    // int max_iterations = 500;
-    int current_iteration = 0; 
     
-    int nPoints = 100;
     
+    // Determine the shower projections in 2D by plane (slopes):
+    std::vector<float> slopeByPlane;
+    std::vector<int> planes;
 
-    // Another attempt:  Try to find a line that is most parallel to the clusters.
-    // Make an educated guess: Take a cluster, use it's 2D angle as the angle between X and Z,
-    // Set the angle between Y and Z to 0 to start.
+    // ///########################################################
+    // // For algorithm development:
+    // ///########################################################
+    // // Start with a *known* 3D axis and project that into the plane:
+    // TVector3 knownAxis(17,8.0,-6.0);
+    // knownAxis *= 1.0 / knownAxis.Mag();
 
-    direction.SetMag(1);
-    // Theta is the angle away from the Z axis.  So, if there is no angle between Y and Z, theta is the 2D angle
-    // Be careful with the "edges" - if w is negative and t is positive, that's theta between pi/2 and pi
-    // If w is positive and t is negative, that's theta between 0 and pi/2 BUT phi is set to pi instead of 0
+    // for (unsigned int i = 0; i < inputShowers.size();i++){
+    //   planes.push_back(inputShowers.at(i).plane_id.Plane);
+    //   float slope = geomHelper -> Slope_3Dto2D(knownAxis,planes[i]);
+    //   slopeByPlane.push_back(slope);
+    //   std::cout << "Pushed back slope == " << slopeByPlane.back() << std::endl;
+    //   planes.push_back(inputShowers.at(i).plane_id.Plane);
+    // }
 
-    float w = inputShowers.front().principal_dir[0];
-    float t = inputShowers.front().principal_dir[1];
+    // ///########################################################
+    // ///End development section
+    // ///########################################################
 
-    if (w > 0 && t > 0){
-      // Positive slope in 2D, so pointing away from wires
-      direction.SetTheta(atan(t/w));
-      direction.SetPhi(0.0);
+
+    ///########################################################
+    ///For real
+    ///########################################################
+    for (unsigned int i = 0; i < inputShowers.size();i++){
+      planes.push_back(inputShowers.at(i).plane_id.Plane);
+      float slope = inputShowers.at(i).principal_dir[1] / inputShowers.at(i).principal_dir[0];
+      slopeByPlane.push_back(slope);
+      std::cout << "Pushed back slope == " << slopeByPlane.back() << std::endl;
+      planes.push_back(inputShowers.at(i).plane_id.Plane);
     }
-    if (w > 0 && t < 0){
-      float theta = atan(t/w);
-      // That value is negative, but we want the positive value
-      theta = fabs(theta);
-      direction.SetTheta(theta);
-      direction.SetPhi(PI);
-    }
-    if ( w < 0 && t < 0){
-      // Here, the direction is towards the wire planes but at a high angle
-      direction.SetTheta(atan(t/w));
-      direction.SetPhi(PI);
-    }
-    if ( w < 0 && t > 0){
-      float theta = atan(t/w);
-      // Again, that's negative.  Fix by subtracting from pi:
-      theta = PI - theta;
-      direction.SetTheta(theta);
-      direction.SetPhi(0.0);
-    }
-
 
 
     // Try to determine the 3D axis iteratively.
-    // Some notes:
-    //   -> If the projected slope in a plane is higher than the actual slope (using absolute values), that means either
-    //      a) The 3D angle is too steep in the X-Z plane (that is, pointing away from the wires too aggressively)
-    //      b) The 3D angle needs to be rotated towards the direction that would make it parallel with the wires
+    // Here's how it is, I have NO IDEA how to rotate things to fix things.  So instead, just
+    // make a bunch of guesses and narrow in on the result.
 
-    // Changes to the direction vector are most simply accomplished with rotations around N + 1 overlapping
-    // but complete axes:
-    //  1) Rotations that increase or decrease X direction (this is a rotation around the Y axis)
-    //  2) Rotations that bring a vector closer or farther from being parallel to a particular wire plane
-    //    a)  This is a rotation around the axis that is perpendicular to the wire plane AND perpendicular to 
-    //        the wires themselves
+    bool converged = false;
+    int current_iteration = 0; 
 
-    TVector3 xAxis (1.0, 0.0, 0.0);
-    TVector3 yAxis (0.0, 1.0, 0.0);
-    TVector3 zAxis (0.0, 0.0, 1.0);
-    // Construct the others by finding the wire's angle to vertical:
-    std::vector<TVector3> wirePlaneRotationAxes;
-    for (auto & shower : inputShowers){
-      float angleToVert = geom -> WireAngleToVertical(geom -> PlaneToView(shower.plane_id.Plane)) * PI / 180.0;
-      // Start along the z axis
-      TVector3 planeVec(zAxis);
-      // Rotate it up to the correct angle:
-      planeVec.Rotate(angleToVert,xAxis);
-      // Now we need the vector that is perpendicular to both this vector AND the Z axis
-      planeVec = planeVec.Cross(zAxis);
-      planeVec *= 1.0 / planeVec.Mag();
-      wirePlaneRotationAxes.push_back(planeVec);
-    }
+    float thetaRange = PI / 2.0;
+    int nSteps_current = fNStepsMin;
 
-    // Ok, start iterating over this 3D direction vector
-    float rot_angle = 1.0;
-    while (! converged )
-    {
+    float prevError = 99999;
 
-      std::cout << "Vector is ( "
+    while ( ! converged ){
+      // Get a set of seed vectors:
+      std::vector<TVector3> seedVectors;
+      generateSeedVectors(direction, thetaRange, nSteps_current, seedVectors);
+      int min_index = findBestVector(seedVectors, slopeByPlane,planes);
+      direction = seedVectors.at(min_index);
+      // Print out an update:
+      float error = getErrorOfProjection(direction,slopeByPlane,planes);
+      std::cout << "Current vector: ("
                 << direction.X() << ", "
                 << direction.Y() << ", "
-                << direction.Z() << ")\n\n";
+                << direction.Z() << ")., error: "
+                << error
+                << ", steps: " << nSteps_current
+                << std::endl;
 
-      std::vector<float> w_diff, t_diff,slope_diff;
-      for (auto & shower : inputShowers ){
-        larutil::PxPoint start2D, dir2D;
-        geomHelper -> Line_3Dto2D(pointOnAxis, direction, shower.plane_id.Plane, start2D, dir2D);
-        w_diff.push_back(shower.principal_dir[0] - dir2D.w);
-        t_diff.push_back(shower.principal_dir[1] - dir2D.t);
-        slope_diff.push_back( (shower.principal_dir[1] / shower.principal_dir[0]) - (dir2D.t / dir2D.w) );
-      }
-
-      // Calculate the total, absolute error:
-      float tot_error = 0.0;
-      for (unsigned int i = 0; i < w_diff.size(); i++ ){
-        tot_error += w_diff[i]*w_diff[i];
-        tot_error += t_diff[i]*t_diff[i];
-      }
-
-      std::cout << " Diffs are: \nw\t\tt\t\ts\n";
-
-      for (unsigned int i = 0; i < w_diff.size(); i++ ){
-        std::cout << std::setw(3) << std::setprecision(3) << "" << w_diff[i] << "\t" << t_diff[i] << "\t\t" << slope_diff[i] <<  "\n";
-      }
-      std::cout << "Total error is: " << tot_error << std::endl;
-
-      // Try to improve things ...
-      // Use the plane that is most incorrect to fix things:
-      int worst_plane = 0;
-      float worst_val = 0.0;
-      for (unsigned int i = 0; i < slope_diff.size(); i++){
-        if (fabs(slope_diff.at(i)) > worst_val){
-          worst_plane = i;
-          worst_val = fabs(slope_diff.at(i));
+      // Only reduce the range of theta if the error is getting good:
+      if (error < 1 ){
+        // Narrow down if we're getting better
+        if (error < prevError){
+          thetaRange *= 0.75;
+          nSteps_current = fNStepsMin;
         }
+        // Go finer if it's good but not getting better
+        else
+          nSteps_current += fNStepsMin;
+      }
+      // Otherwise, go for finer sampling to find a good spot:
+      else{
+        nSteps_current += 4*fNStepsMin;
       }
 
-      // The improvement can be made either by rotating towards or away from the wires OR up or down from Z
-      // I don't know which to do, really, so try both and keep the one that improves things more
+      prevError = error;
 
-      TVector3 leftRight = direction;
-      TVector3 upDown = direction;
+      error /= inputShowers.size();
 
-      upDown.Rotate(rot_angle*atan(worst_val), xAxis);
-      leftRight.Rotate(rot_angle*atan(worst_val), yAxis);
-      // Rotate around the vector for this plane:
-      // 
-
-      std::vector<float> w_diff_post1, t_diff_post1,slope_diff_post1;
-      std::vector<float> w_diff_post2, t_diff_post2,slope_diff_post2;
-      for (auto & shower : inputShowers ){
-        larutil::PxPoint start2D, dir2D;
-        geomHelper -> Line_3Dto2D(pointOnAxis, leftRight, shower.plane_id.Plane, start2D, dir2D);
-        w_diff_post1.push_back(shower.principal_dir[0] - dir2D.w);
-        t_diff_post1.push_back(shower.principal_dir[1] - dir2D.t);
-        slope_diff_post1.push_back( (shower.principal_dir[1] / shower.principal_dir[0]) - (dir2D.t / dir2D.w) );
-        geomHelper -> Line_3Dto2D(pointOnAxis, upDown, shower.plane_id.Plane, start2D, dir2D);
-        w_diff_post2.push_back(shower.principal_dir[0] - dir2D.w);
-        t_diff_post2.push_back(shower.principal_dir[1] - dir2D.t);
-        slope_diff_post2.push_back( (shower.principal_dir[1] / shower.principal_dir[0]) - (dir2D.t / dir2D.w) );
-      }
-
-      // Calculate the total, absolute error:
-      float tot_error_post1 = 0.0, tot_error_post2 = 0.0 ;
-      for (unsigned int i = 0; i < w_diff.size(); i++ ){
-        tot_error_post1 += w_diff_post1[i]*w_diff_post1[i];
-        tot_error_post1 += t_diff_post1[i]*t_diff_post1[i];
-        tot_error_post2 += w_diff_post2[i]*w_diff_post2[i];
-        tot_error_post2 += t_diff_post2[i]*t_diff_post2[i];
-      }
-
-      std::cout << "--------------\nPost Diffs are: \nw\t\tt\t\ts\n";
-
-      for (unsigned int i = 0; i < w_diff_post1.size(); i++ ){
-        std::cout << std::setw(3) << std::setprecision(3) << "" << w_diff_post1[i] << "\t" << t_diff_post1[i] << "\t\t" << slope_diff_post1[i] <<  "\n";
-      }
-      std::cout << "Total error is: " << tot_error_post1 << std::endl;
-      std::cout << "Error Changed by " << tot_error_post1 - tot_error << "\n\n\n" << std::endl;
-      for (unsigned int i = 0; i < w_diff_post2.size(); i++ ){
-        std::cout << std::setw(3) << std::setprecision(3) << "" << w_diff_post2[i] << "\t" << t_diff_post2[i] << "\t\t" << slope_diff_post2[i] <<  "\n";
-      }
-      std::cout << "Total error is: " << tot_error_post2 << std::endl;
-      std::cout << "Error Changed by " << tot_error_post2 - tot_error << "\n------------\n\n\n" << std::endl;
-
-      if (tot_error_post1 < tot_error_post2 && tot_error_post1 < tot_error) direction = leftRight;
-      else if (tot_error_post2 < tot_error) direction = upDown;
-      
-      else {
-        // Didn't improve anything!  Just break
-        std::cout << "Failed to improve!  breaking." << std::endl;
-        break;
-      }
-      if (current_iteration > max_iterations) break;
+      if (error < fTargetError) converged = true;
       current_iteration ++;
-      // converged = true;
+      if (current_iteration > fMaxIterations) break;
     }
-    for (auto & shower : inputShowers ){
+
+
+
+    std::cout << "FINAL RESULT: \n";
+
+    std::cout 
+              // << "True vector: ("
+              // << knownAxis.X() << ", "
+              // << knownAxis.Y() << ", "
+              // << knownAxis.Z() << "), "
+              << "Calculated vector: ("
+              << direction.X() << ", "
+              << direction.Y() << ", "
+              << direction.Z() << ").\n";
+              // << " Difference is " << acos(knownAxis.Dot(direction)) << " radians.\n";
+
+    for (unsigned int i = 0; i < inputShowers.size();i++){
       larutil::PxPoint start2D, dir2D;
-      geomHelper -> Line_3Dto2D(pointOnAxis, direction, shower.plane_id.Plane, start2D, dir2D);
-      std::cout << "FINAL RESULT: In plane " << shower.plane_id.Plane << ", the projection is "
-                << "(" << dir2D.w << ", " << dir2D.t << "), the target is "
-                << "(" << shower.principal_dir[0] << ", " << shower.principal_dir[1] << ").\n";
+      geomHelper -> Line_3Dto2D(pointOnAxis, direction, planes[i], start2D, dir2D);
+      std::cout << "\tIn plane " << planes[i] << ", the projection is "
+                << dir2D.t / dir2D.w << ", the target is "
+                << slopeByPlane[i] << ".\n";
     }
+
+    // Compare the 3D vector and the *known* 3D vector:
+    
 
     return;
 
   }
+
+
+    void Axis3DModule::generateSeedVectors(const TVector3 & initialVector, 
+                                                                    float thetaRange, 
+                                                                    int nSteps,
+                                                                    std::vector<TVector3> & result)
+    {
+
+      // Initialize the result
+      result.clear();
+      result.reserve(nSteps*nSteps);
+
+      // Do some safety checks:
+      if (initialVector.Mag() == 0){
+        std::cerr << "ERROR - Axis3DModule::generateSeedVectors: can not have intial vector be zero!\n";
+        return;
+      }
+      if (nSteps == 0){
+        std::cerr << "ERROR - Axis3DModule::generateSeedVectors: can not generate a list of zero steps!\n";
+        return;        
+      }
+
+
+      // Need one vector to rotate around and such.  Make it start as a copy of the initialVector
+      TVector3 workerVector(initialVector);
+      // Make sure it's normalized:
+      workerVector *= 1.0 / workerVector.Mag();
+
+      // Push back the initial vector, since it ought to be included:
+      result.push_back(workerVector);
+
+      // Now, find a vector that is perpendicular to the initialVector:
+      // Need to make sure it's not zero, and not parallel to the workerVector
+      TVector3 perp(workerVector.X() - 1,workerVector.Y() + 1,workerVector.Z()+2);
+      perp = perp.Cross(workerVector);
+      perp *= 1.0 / perp.Mag();
+
+      for (float i = 1.0; i <= nSteps; i++){
+        TVector3 seedVector = workerVector;
+        // Rotate up a fraction of the 90 degrees needed:
+        seedVector.Rotate( (thetaRange / nSteps) * (i), perp );
+        // Rotate around the center vector a full rotation
+        for (float j = 0; j <= nSteps; j++){
+          seedVector.Rotate( 2*PI * (j / nSteps), workerVector);
+          result.push_back(seedVector);
+        }
+      }
+      return;
+
+    }
+    int Axis3DModule::findBestVector( const std::vector<TVector3> seedVectors, 
+                                      const std::vector<float> & slopesByPlane, 
+                                      const std::vector<int> & planes){
+
+      // Loop over the vectors, calculate the error, and return the one with smallest error
+      std::vector<float> errs;
+      errs.reserve(seedVectors.size());
+      for (auto & vec : seedVectors){
+        errs.push_back(getErrorOfProjection(vec,slopesByPlane,planes));
+      }
+      // Use a standard function to find the min
+      int min_index = min_element(errs.begin(), errs.end()) - errs.begin();
+      return min_index;
+
+    }
+    float Axis3DModule::getErrorOfProjection( const TVector3 & inputVector, 
+                                              const std::vector<float> & slopesByPlane, 
+                                              const std::vector<int> & planes)
+    {  
+
+      auto geomHelper = larutil::GeometryHelper::GetME();
+      float err = 0;
+      for (unsigned int i = 0; i < slopesByPlane.size(); i++){
+        // Get the 2D slope for this plane, and compute the error as squared difference
+        float slope = geomHelper -> Slope_3Dto2D(inputVector,planes[i]);
+        err += (slope - slopesByPlane[i])*(slope - slopesByPlane[i]);
+      }
+
+      return err;
+
+    }
+
 
 
 
