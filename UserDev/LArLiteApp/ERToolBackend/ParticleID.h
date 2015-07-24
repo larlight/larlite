@@ -11,23 +11,30 @@ namespace ertool_helper {
     friend class ParticleID;
 
   public:
-    // Particle ID default constructor
+    /// Particle ID default constructor
     ParticleID();
-
+    
     ParticleID(const int pdg,
 	       const TLorentzVector& pos,
 	       const TLorentzVector& mom);
     
-    // Particle ID constructor from MCShower
+    /// Particle ID constructor from MCShower
     ParticleID(const ::larlite::mcshower& mcs);
     
-    // Particle ID constructor from MCTrack
+    /// Particle ID constructor from MCTrack
     ParticleID(const ::larlite::mctrack& mct);
-
-    // Particle ID constructor from MCTruth
-    ParticleID(const ::larlite::mcpart& mcp);
     
-    // Default destructor
+    /// Particle ID constructor from MCTruth
+    ParticleID(const ::larlite::mcpart& mcp);
+
+    /// PDGCode
+    int PdgCode() const { return _pdg; }
+    /// Position
+    const TLorentzVector& Position() const { return _pos; }
+    /// Momentum
+    const TLorentzVector& Momentum() const { return _mom; }
+    
+    /// Default destructor
     virtual ~ParticleID(){};
 
     inline bool operator== (const ParticleID& rhs) const
@@ -66,6 +73,7 @@ namespace ertool_helper {
     int _pdg;              ///< PDG code of particle
     TLorentzVector _pos;
     TLorentzVector _mom;
+    void Approx();
   };
 
 }
