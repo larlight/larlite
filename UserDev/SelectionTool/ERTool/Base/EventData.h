@@ -80,7 +80,6 @@ namespace ertool {
     void SetID(unsigned int evID,
 	       unsigned int runID,
 	       unsigned int subrunID);
-
   protected:
 
     //

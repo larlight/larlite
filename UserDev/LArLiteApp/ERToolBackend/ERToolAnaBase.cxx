@@ -111,7 +111,6 @@ namespace larlite {
 
       auto ev_shw      = storage->get_data<event_shower>    (_name_shower);
       auto ev_ctag_shw = storage->get_data<event_cosmictag> (Form("%stag",_name_shower.c_str()));
-      auto ev_ass      = storage->get_data<event_ass>       (_name_shower);
       if (!ev_shw) {
 	print(msg::kERROR,__FUNCTION__,
 	      "RecoShower info not found in the event!");
@@ -121,11 +120,9 @@ namespace larlite {
 	if(one_time_warning)
 	  print(msg::kWARNING,__FUNCTION__,
 		Form("One-Time-Warning: No cosmictag for shower available (\"%stag\")",_name_shower.c_str()) );
-	event_cosmictag tmp;
-	_helper.FillShowers(*ev_shw, tmp, *ev_ass, *in_strm);	  
       }
-      else
-	_helper.FillShowers(*ev_shw, *ev_ctag_shw, *ev_ass, *in_strm);
+      _helper.FillShowers(*ev_shw, *storage, *in_strm);
+
       // if cheater for single showers is to be used:
       if (_cheater){
 	// get mcshowers
@@ -153,7 +150,6 @@ namespace larlite {
       auto ev_ctag_trk = storage->get_data<event_cosmictag>   (Form("%stag",  _name_track.c_str()));
       auto ev_calo_trk = storage->get_data<event_calorimetry> (Form("%scalo", _name_track.c_str()));
       auto ev_pid_trk  = storage->get_data<event_partid>      (Form("%spid",  _name_track.c_str()));
-      auto ev_ass      = storage->get_data<event_ass>         (_name_track);
       if (!ev_trk) {
 	print(msg::kERROR,__FUNCTION__,
 	      Form(" Track \"%s\" not found in the event!",_name_track.c_str()));
@@ -162,22 +158,16 @@ namespace larlite {
       if(!ev_ctag_trk){
 	if(one_time_warning)
 	  print(msg::kWARNING,__FUNCTION__,Form("One-Time-Warning: No cosmictag for track available (\"%stag\")",_name_track.c_str()) );
-	delete ev_ctag_trk;
-	ev_ctag_trk = new event_cosmictag();
       }
       if(!ev_calo_trk){
 	if(one_time_warning)
 	  print(msg::kWARNING,__FUNCTION__,Form("One-Time-Warning: No calorimetry for track available (\"%stag\")",_name_track.c_str()) );
-	delete ev_calo_trk;
-	ev_calo_trk = new event_calorimetry();
       }
       if(!ev_pid_trk){
 	if(one_time_warning)
 	  print(msg::kWARNING,__FUNCTION__,Form("One-Time-Warning: No PID for track available (\"%stag\")",_name_track.c_str()) );
-	delete ev_pid_trk;
-	ev_pid_trk = new event_partid();
       }
-      _helper.FillTracks( *ev_trk, *ev_ctag_trk, *ev_calo_trk, *ev_pid_trk, *ev_ass, *in_strm);
+      _helper.FillTracks( *ev_trk, *storage, *in_strm);
     }
 
     // Done filling SPAData Object!
@@ -196,8 +186,6 @@ namespace larlite {
 			   *ev_mct,
 			   *in_strm);
     }
-      
-
 
     one_time_warning = false;
 
