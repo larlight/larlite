@@ -484,13 +484,13 @@ namespace larlite {
     }
 
     event_cosmictag* ctag_trk_v = nullptr;
-    auto const& ctag_trk_ass = storage.find_one_ass(trk_v.id(), ctag_trk_v, trk_v.name());
+    auto const& ctag_trk_ass = storage.find_one_ass(trk_v.id(), ctag_trk_v, Form("%stag",trk_v.name().c_str()));
 
     event_calorimetry* calo_trk_v = nullptr;
-    auto const& calo_trk_ass = storage.find_one_ass(trk_v.id(), calo_trk_v, trk_v.name());
+    auto const& calo_trk_ass = storage.find_one_ass(trk_v.id(), calo_trk_v, Form("%scalo",trk_v.name().c_str()));
 
     event_partid* pid_trk_v = nullptr;
-    auto const& pid_trk_ass = storage.find_one_ass(trk_v.id(), pid_trk_v, trk_v.name());
+    auto const& pid_trk_ass = storage.find_one_ass(trk_v.id(), pid_trk_v, Form("%spid",trk_v.name().c_str()));
 
     for(size_t t_index=0; t_index < id_v.size(); ++t_index) {
 
@@ -623,7 +623,7 @@ namespace larlite {
     }
     
     event_cosmictag* ctag_shw_v = nullptr;
-    auto const& ctag_shw_ass = storage.find_one_ass(shw_v.id(), ctag_shw_v, shw_v.name());
+    auto const& ctag_shw_ass = storage.find_one_ass(shw_v.id(), ctag_shw_v, Form("%scalo",shw_v.name().c_str()));
     
     // Revise shower cosmogenic score
     // make sure ctag_shr_v is not empty
