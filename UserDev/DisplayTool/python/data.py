@@ -257,6 +257,21 @@ class boxCollection(QtGui.QGraphicsItem):
   def toggleHighlight(self):
       self._isHighlighted = not self._isHighlighted
 
+  #Draw start endpoints, ahack 072415
+#  def drawStartPoint(self,view_manager,cStartList):
+#    view = view_manager.getViewPorts()[self._plane]
+#
+#    red   = (255,0  ,0)  #red
+#    green = (100,253,0) # bright green
+#
+#    s = connectedBox(cStartList[0],cStartList[1],3,3)
+##   e = connectedBox(cTimeEndtList[i],cWireEndList[i],3,3)
+#
+#    s.setPen(pg.mkPen(None))
+#    s.setBrush(pg.mkColor(green))
+#    view._view.addItem(s)
+
+
   def drawHits(self,view_manager,wireList,timeStartList,timeEndList):
     view = view_manager.getViewPorts()[self._plane]
     for i in xrange(len(wireList)):
@@ -318,6 +333,8 @@ class cluster(recoBase):
         timeStartList  = self._c2p.Convert(self._process.getHitStartByPlaneAndCluster(thisPlane,i_cluster))
         timeEndList    = self._c2p.Convert(self._process.getHitEndByPlaneAndCluster(thisPlane,i_cluster))
 
+	#cStartList = self._c2p.Convert(self._process.getParamsByPlane(thisPlane,i_cluster))
+
         # Now make the cluster
         cluster = boxCollection()
         cluster.setColor(self._clusterColors[colorIndex])
@@ -325,6 +342,7 @@ class cluster(recoBase):
 
         # draw the hits in this cluster:
         cluster.drawHits(view_manager,wireList,timeStartList,timeEndList)
+#	cluster.drawStartPoint(view_manager,cStartList)
 
         self._listOfClusters[thisPlane].append(cluster)
 
