@@ -100,7 +100,15 @@ namespace ertool {
 
     /// Function to reset things
     void Reset();
+
+    /// Function to set event id, run and subrun
+    void SetID(unsigned int evID, unsigned int runID, unsigned int subrunID) {
+      _data->SetEvent_ID(evID)  ; 
+      _data->SetRun(runID)      ; 
+      _data->SetSubRun(subrunID);
+    }
     
+
     /// Function to add input data product: Shower
     NodeID_t Add(const ertool::Shower& obj,
 		 const ertool::RecoInputID_t& input_id,
