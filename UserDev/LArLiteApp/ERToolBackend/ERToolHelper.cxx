@@ -447,7 +447,7 @@ namespace larlite {
       for(auto& v : t._pid_score) v = 100;
       if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
       
-      //auto nodeID = strm.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
+      strm.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
       /*
       strm.GetParticleGraphWriteable().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
       ::ertool::ParticleMass(mct.PdgCode()),
@@ -552,7 +552,7 @@ namespace larlite {
       s._time = mcs_v[i].End().T();
       double mass = 0;
       if (mcs.PdgCode() == 11) { mass = 0.511; }
-      //auto nodeID = strm.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
+      strm.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
       /*
       mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
 							      mass,
