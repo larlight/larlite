@@ -16,20 +16,20 @@ namespace ertool {
     _result_tree = new TTree("_result_tree","Result Tree");
 
     _result_tree->Branch("_numEvts",&_numEvts,"numEvts/I");
-    _result_tree->Branch("_EDep",&_EDep,"EDep/D");
+//    _result_tree->Branch("_EDep",&_EDep,"EDep/D");
     _result_tree->Branch("_angle_Norm",&_angle_Norm,"_angle_Norm/D");
     _result_tree->Branch("_n_singleReco",&_n_singleReco,"n_singleReco/I");
     _result_tree->Branch("_distToTopWall",&_distToTopWall,"distToTopWall/D");
     _result_tree->Branch("_distToWall",&_distToWall,"distToWall/D");
     _result_tree->Branch("_distBackAlongTraj",&_distBackAlongTraj,"distBackAlongTraj/D");
-    _result_tree->Branch("_n_showers",&_n_showers,"n_showers/I");
-    _result_tree->Branch("_n_showersReco",&_n_showersReco,"n_showersReco/I");
-    _result_tree->Branch("_n_tracks",&_n_tracks,"n_tracks/I");
-    _result_tree->Branch("_n_tracksReco",&_n_tracksReco,"n_tracksReco/I");
-    _result_tree->Branch("_n_tracksInt",&_n_tracksInt,"n_tracksInt/I");
-    _result_tree->Branch("_n_tracksIntReco",&_n_tracksIntReco,"n_tracksIntReco/I");
-    _result_tree->Branch("_n_electrons",&_n_electrons,"n_electrons/I");
-    _result_tree->Branch("_n_gammas",&_n_gammas,"n_gammas/I");
+//    _result_tree->Branch("_n_showers",&_n_showers,"n_showers/I");
+//    _result_tree->Branch("_n_showersReco",&_n_showersReco,"n_showersReco/I");
+//    _result_tree->Branch("_n_tracks",&_n_tracks,"n_tracks/I");
+//    _result_tree->Branch("_n_tracksReco",&_n_tracksReco,"n_tracksReco/I");
+//    _result_tree->Branch("_n_tracksInt",&_n_tracksInt,"n_tracksInt/I");
+//    _result_tree->Branch("_n_tracksIntReco",&_n_tracksIntReco,"n_tracksIntReco/I");
+//    _result_tree->Branch("_n_electrons",&_n_electrons,"n_electrons/I");
+//    _result_tree->Branch("_n_gammas",&_n_gammas,"n_gammas/I");
     _result_tree->Branch("_e_nu",&_e_nu,"e_nu/D");
     _result_tree->Branch("_e_nuReco",&_e_nuReco,"e_nuReco/D");
     _result_tree->Branch("_x_nu",&_x_nu,"x_nu/D");
@@ -44,14 +44,14 @@ namespace ertool {
     _result_tree->Branch("_px_nuReco",&_px_nuReco,"px_nuReco/D");
     _result_tree->Branch("_py_nuReco",&_py_nuReco,"py_nuReco/D");
     _result_tree->Branch("_pz_nuReco",&_pz_nuReco,"pz_nuReco/D");
-    _result_tree->Branch("_n_protons",&_n_protons,"n_protons/I");
-    _result_tree->Branch("_n_neutrons",&_n_neutrons,"n_neutrons/I");
-    _result_tree->Branch("_e_trkInt",&_e_trkInt,"e_trkInt/D");
-    _result_tree->Branch("_e_neutrals",&_e_neutrals,"e_neutrals/D");
-    _result_tree->Branch("_e_nucleus_diff",&_e_nucleus_diff,"e_nucleus_diff/D");
+//    _result_tree->Branch("_n_protons",&_n_protons,"n_protons/I");
+//    _result_tree->Branch("_n_neutrons",&_n_neutrons,"n_neutrons/I");
+//    _result_tree->Branch("_e_trkInt",&_e_trkInt,"e_trkInt/D");
+//    _result_tree->Branch("_e_neutrals",&_e_neutrals,"e_neutrals/D");
+//    _result_tree->Branch("_e_nucleus_diff",&_e_nucleus_diff,"e_nucleus_diff/D");
     _result_tree->Branch("_e_trkIntReco",&_e_trkIntReco,"e_trkIntReco/D");
-    _result_tree->Branch("_n_piplus",&_n_piplus,"n_piplus/I");
-    _result_tree->Branch("_n_pi0",&_n_pi0,"n_pi0/I");
+//    _result_tree->Branch("_n_piplus",&_n_piplus,"n_piplus/I");
+//    _result_tree->Branch("_n_pi0",&_n_pi0,"n_pi0/I");
     _result_tree->Branch("_pdg_nu",&_pdg_nu,"pdg_nu/I");
     _result_tree->Branch("_e_lep",&_e_lep,"e_lep/D");
     _result_tree->Branch("_pdg_lep",&_pdg_lep,"pdg_lep/I");
@@ -64,7 +64,7 @@ namespace ertool {
     _result_tree->Branch("_theta_lep",&_theta_lep,"theta_lep/D");
     _result_tree->Branch("_phi_lep",&_phi_lep,"phi_lep/D");
     _result_tree->Branch("_e_lepReco",&_e_lepReco,"e_lepReco/D");
-    _result_tree->Branch("_showerlength_lepReco",&_showerlength_lepReco,"showerlength_lepReco/D");
+//    _result_tree->Branch("_showerlength_lepReco",&_showerlength_lepReco,"showerlength_lepReco/D");
     _result_tree->Branch("_theta_lepReco",&_theta_lepReco,"theta_lepReco/D");
     _result_tree->Branch("_phi_lepReco",&_phi_lepReco,"phi_lepReco/D");
     _result_tree->Branch("_x_lepReco",&_x_lepReco,"x_lepReco/D");
@@ -76,8 +76,8 @@ namespace ertool {
     _result_tree->Branch("_px_lepNormReco",&_px_lepNormReco,"px_lepNormReco/D");
     _result_tree->Branch("_py_lepNormReco",&_py_lepNormReco,"py_lepNormReco/D");
     _result_tree->Branch("_pz_lepNormReco",&_pz_lepNormReco,"pz_lepNormReco/D");
-    _result_tree->Branch("_lep_dot",&_lep_dot,"_lep_dot/D");
-    _result_tree->Branch("_lep_vtxdist",&_lep_vtxdist,"_lep_vtxdist/D");
+//    _result_tree->Branch("_lep_dot",&_lep_dot,"_lep_dot/D");
+//    _result_tree->Branch("_lep_vtxdist",&_lep_vtxdist,"_lep_vtxdist/D");
     _result_tree->Branch("_misID",&_misID,"misID/I");
 
     // keep track of number of events gone by
@@ -131,9 +131,9 @@ namespace ertool {
     // Get MC EventData (showers/tracks...)
     auto const& mc_data = MCEventData();
     // Count number of MC tracks and showers with E > _eCut MeV
-    _n_showers   = 0;
-    _n_tracks    = 0;
-    _n_tracksInt = 0;
+   // _n_showers   = 0;
+  //  _n_tracks    = 0;
+  //  _n_tracksInt = 0;
 
     // Keep track of all energy deposited in detector
     _EDep = 0;
@@ -254,42 +254,31 @@ namespace ertool {
     _n_singleReco = graph.GetNumPrimaries();
     auto const& particles = graph.GetParticleArray();
     int neutrinos = 0;
-    for (std::deque<::ertool::Particle>::const_iterator it = particles.begin(); it != particles.end(); it++){
-      if ((*it).PdgCode() == 12){
-	neutrinos += 1;
-      }
+
+    for ( auto const & p : particles ){
+	if ( p.PdgCode() == 12 )
+	    neutrinos += 1;
     }
-    //std::cout << "number of neutrinos: " << neutrinos << std::endl;
 
     // if only 1 CCSingleE interaction was found -> misID = 0
     if ( neutrinos == 1){
       _misID = 0;
       _singleE_ctr += 1;
     }
-    /*
-    // If debug -> print out RECO particle set
-    if (_debug){
-      std::cout << "Reco Particle Tree: " << std::endl;
-      for (auto &p : ps)
-	std::cout << p.Diagram();
-    }
-    */
+
     // If no single electrons reconstructed -> fill tree anyway with misID info
-    //if ( _n_singleReco == 0 )
-    _result_tree->Fill();
-   // /*
-//    for(int i = 0; i< ps.size(); i++){
     if ( _n_singleReco == 0 )
       _result_tree->Fill();
     
+//	std::cout<<"NUmber of single reconstructions!"<<_n_singleReco<<" particle array: "<<graph.GetParticleArray().size()<<std::endl ;
 //    for(size_t i = 0; i< ps.size(); i++){
     for( auto const & p : graph.GetParticleArray() ){
-    //  Particle neutrino = p[i];
 
+      ResetTreeVariables();
       //if(abs(neutrino.PdgCode()) != 12  && abs(neutrino.PdgCode()) != 14)
       //std::cout<<"wtf neutrino doesn't have a neutrino pdg code"<<std::endl;
 
-      if(abs(p.PdgCode()) == 12  || abs(p.PdgCode()) == 14){
+      if(abs(p.PdgCode()) == 12 ){ // || abs(p.PdgCode()) == 14){
 
       auto neutrino = p ;
       
@@ -312,11 +301,11 @@ namespace ertool {
 	_e_nuReco += daught.KineticEnergy();
 	
 	// if not a lepton, add energy to tracks
-	if (abs(daught.PdgCode()) != 11){
+	if (abs(daught.PdgCode()) != 11)
 	  _e_trkIntReco += daught.KineticEnergy();
-	}
 	
-	if(abs(daught.PdgCode()) == 11 || abs(daught.PdgCode()) == 13){
+	
+	if(abs(daught.PdgCode()) == 11 ){//|| abs(daught.PdgCode()) == 13){
 	  _e_lepReco = daught.Energy();
 	  
 	  //length of shower (geoalgo cone) associated with the electron
@@ -340,7 +329,6 @@ namespace ertool {
 	  
 	  double detHalfHeight = 116.5 ;
 	  _distToTopWall = (_y_lepReco - detHalfHeight)*daught.Momentum().Length()/_py_lepReco ;
-	  
 	  _distToWall = sqrt(_geoAlgo.SqDist(daught.Vertex(),fTPC));
 	  if(_geoAlgo.Intersection(fTPC,shr,true).size() > 0)
 	    _distBackAlongTraj = sqrt(daught.Vertex().SqDist(_geoAlgo.Intersection(fTPC,shr,true)[0])) ;
@@ -370,8 +358,8 @@ namespace ertool {
 	    _angle_Norm = 360 - _angle_Norm ;
 
 	  }
-	}// if particle is lepton
-      }// for all daughters
+	}// for all children 
+      }// if electorn neutrino  
 
       _result_tree->Fill();
     }// loop over all CCSingleEs found in event
@@ -498,6 +486,9 @@ namespace ertool {
     _lep_dot       = -2;
     _lep_vtxdist   = -1000;
     _distToTopWall = -9999;
+    _distToWall    = -999;
+    _distBackAlongTraj = -999;
+    _angle_Norm    = -9999;
 
     _e_trkInt = -1;
     _e_trkIntReco = -1;

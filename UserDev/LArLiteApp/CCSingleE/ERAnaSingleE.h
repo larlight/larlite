@@ -57,6 +57,8 @@ namespace ertool {
     /// Function to re-set TTree variables
     void ResetTreeVariables();
 
+    void ResetReco();
+
     /// Function to save efficiency vs. variable to histogram
     void MakeEffPlot(std::string varname,
 		     int nbins, double xmin, double xmax);
