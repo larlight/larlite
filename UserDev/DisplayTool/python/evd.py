@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 from gui import gui
 from event import *
 from data import wire

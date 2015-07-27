@@ -236,6 +236,7 @@ class circles(QtGui.QGraphicsItem):
     view._view.addItem(e)
 
 
+
   def clearStarts(self,view_manager):
     view = view_manager.getViewPorts()[self._plane]
     print "clearing!"
@@ -284,6 +285,7 @@ class boxCollection(QtGui.QGraphicsItem):
     self._color = (0,0,0)
     self._plane = -1
     self._listOfHits = []
+    self._listOfStarts = []
     self._isHighlighted = False
 #    self._listOfStarts = []
 
@@ -312,35 +314,39 @@ class boxCollection(QtGui.QGraphicsItem):
       self._isHighlighted = not self._isHighlighted
 
   #Draw start endpoints, ahack 072415
-#  def drawStartPoint(self,view_manager,cStartList):
-#    print "START LIST: ", cStartList
-#    view = view_manager.getViewPorts()[self._plane]
-#
-#    red   = (255,0  ,0)  #red
-#    green = (100,253,0) # bright green
-#    black = (0 , 0, 0,)
-#
-##    s = connectedBox(cStartList[0],int(cStartList[1]),1,40)
-#    s = circleThing(cStartList[0],int(cStartList[1])-25,1,50)
-#    self._listOfStarts.append(s)
-#    s.setPen(pg.mkPen(None))
-#    s.setBrush(pg.mkColor(red))
-#    view._view.addItem(s)
-#
-#    #e = connectedBox(cStartList[2],int(cStartList[3]),1,40)
-#    e = circleThing(cStartList[2],int(cStartList[3])-25,1,50)
-#    self._listOfStarts.append(e)
-#    e.setPen(pg.mkPen(None))
-#    e.setBrush(pg.mkColor(green))
-#    view._view.addItem(e)
-#
-#
-#  def clearStarts(self,view_manager):
-#    view = view_manager.getViewPorts()[self._plane]
-#    print "clearing!"
-#    for s in self._listOfStarts:
-#      view._view.removeItem(s)
-#    self._listOfStarts = []
+  def drawStartPoint(self,view_manager,cStartList):
+    print "START LIST: ", cStartList
+    view = view_manager.getViewPorts()[self._plane]
+
+    red   = (255,0  ,0)  #red
+    green = (100,253,0) # bright green
+    black = (0 , 0, 0,)
+
+#    s = connectedBox(cStartList[0],int(cStartList[1]),1,40)
+    s = circleThing(cStartList[0],int(cStartList[1])-25,1,50)
+    self._listOfStarts.append(s)
+    s.setPen(pg.mkPen(None))
+    s.setBrush(pg.mkColor(red))
+    view._view.addItem(s)
+
+    #e = connectedBox(cStartList[2],int(cStartList[3]),1,40)
+    e = circleThing(cStartList[2],int(cStartList[3])-25,1,50)
+    self._listOfStarts.append(e)
+    e.setPen(pg.mkPen(None))
+    e.setBrush(pg.mkColor(green))
+    view._view.addItem(e)
+
+#    QGraphicsScene scene(0,0,800,600); 
+ #   double rad = 1;
+#    scene->addEllipse(cStartList[0]-rad, cStartList[1]-rad, rad*2.0, rad*2.0, QPen(), QBrush(Qt::SolidPattern));
+
+
+  def clearStarts(self,view_manager):
+    view = view_manager.getViewPorts()[self._plane]
+    print "clearing!"
+    for s in self._listOfStarts:
+      view._view.removeItem(s)
+    self._listOfStarts = []
 
 
   def drawHits(self,view_manager,wireList,timeStartList,timeEndList):
@@ -431,10 +437,9 @@ class cluster(recoBase):
         print "In draw objects, storing startlist...", thisPlane 
         cStartList = self._c2p.Convert(self._process.getParamsByPlane(thisPlane,i))
 
-	start = circles()
-	#self._listOfStarts2[i].append(cStartList)
+	self._listOfStarts2[i].append(cStartList)
 #	print "cStartList things: ", cStartList[0], " ", cStartList[1]
-        start.drawStartPoint(view_manager,cStartList)
+        cluster.drawStartPoint(view_manager,cStartList)
 
  #       self._listOfClusters[thisPlane].append(cluster)
 
