@@ -69,6 +69,8 @@ namespace larlite {
 			::ertool::ParticleMass(mcs.PdgCode()),
 			mcs.Start().Position(),
 			mcs.Start().Momentum());
+//      std::cout<<"\nSetting the particle info of shower.."<<std::endl ;
+//      std::cout<<"particle graph node size : "<<graph.GetParticleNodes(ertool::RecoType_t::kShower).size()<<std::endl ;
 
       // Create ParticleID
       ::ertool_helper::ParticleID id(mcs);
@@ -416,6 +418,10 @@ namespace larlite {
 	throw e;
       }
     }
+
+
+      std::cout<<"End of FillMCInfo: particle graph node size : "<<graph.GetParticleNodes(ertool::RecoType_t::kShower).size()<<std::endl ;
+
   }
 
   void ERToolHelper::FillTracks ( const event_mctrack&  mct_v,
@@ -621,6 +627,7 @@ namespace larlite {
       // by default. Add cosmic score for showers to edit
       s._cosmogenic = -1;
     }
+    std::cout<<"Shower vector size: "<<s_v.size()<<std::endl ;
     
     event_cosmictag* ctag_shw_v = nullptr;
     auto const& ctag_shw_ass = storage.find_one_ass(shw_v.id(), ctag_shw_v, shw_v.name());
