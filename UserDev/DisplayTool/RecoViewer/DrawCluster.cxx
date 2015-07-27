@@ -123,7 +123,7 @@ namespace evd {
 
 	}
 
-	std::cout<<"PLANE CONTAINS: "<<plane0Clus<<", "<<plane1Clus<<", "<<plane2Clus<<std::endl ;
+	std::cout<<"\n\n\nPLANE CONTAINS: "<<plane0Clus<<", "<<plane1Clus<<", "<<plane2Clus<<std::endl ;
     
     for (unsigned int p = 0; p < geoService -> Nviews(); p ++){
 
@@ -214,6 +214,8 @@ namespace evd {
     if(cpan.Plane () == p){
 	clusterStartByPlaneByCluster->at(p).at(j).push_back(int (cpan.GetParams().start_point.w / w2cm));
 	clusterStartByPlaneByCluster->at(p).at(j).push_back(int (cpan.GetParams().start_point.t / t2cm));
+	clusterStartByPlaneByCluster->at(p).at(j).push_back(int (cpan.GetParams().end_point.w / w2cm));
+	clusterStartByPlaneByCluster->at(p).at(j).push_back(int (cpan.GetParams().end_point.t / t2cm));
 	j++ ;
 	}
   //  clusterStartByPlaneByCluster->at(p).at(c.ID()-1).push_back(c.StartWire());
