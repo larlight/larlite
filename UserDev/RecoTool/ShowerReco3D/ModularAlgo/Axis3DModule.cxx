@@ -22,10 +22,8 @@ namespace showerreco{
 
 
     // Start by making a guess:
-    TVector3 pointOnAxis,direction(0,1,0);
+    TVector3 pointOnAxis,direction(0,0,1.0);
 
-    ///\todo temporary: set the minimum error hardcoded:
-    float _error_minimum = 1.0;  // [units are cm, averaged over all showers]
 
     // Seed the pointOnAxis variable here.
     pointOnAxis.SetX( 0.0 );
@@ -75,10 +73,7 @@ namespace showerreco{
       planes.push_back(inputShowers.at(i).plane_id.Plane);
       float slope = inputShowers.at(i).principal_dir[1] / inputShowers.at(i).principal_dir[0];
       slopeByPlane.push_back(slope);
-      std::cout << "Pushed back slope == " << slopeByPlane.back() << std::endl;
-      planes.push_back(inputShowers.at(i).plane_id.Plane);
     }
-
 
     // Try to determine the 3D axis iteratively.
     // Here's how it is, I have NO IDEA how to rotate things to fix things.  So instead, just
@@ -100,13 +95,14 @@ namespace showerreco{
       direction = seedVectors.at(min_index);
       // Print out an update:
       float error = getErrorOfProjection(direction,slopeByPlane,planes);
-      std::cout << "Current vector: ("
-                << direction.X() << ", "
-                << direction.Y() << ", "
-                << direction.Z() << ")., error: "
-                << error
-                << ", steps: " << nSteps_current
-                << std::endl;
+      // std::cout << "Current vector: ("
+      //           << direction.X() << ", "
+      //           << direction.Y() << ", "
+      //           << direction.Z() << ")., error: "
+      //           << error
+      //           << ", thetaRange: " << thetaRange 
+      //           << ", steps: " << nSteps_current
+      //           << std::endl;
 
       // Only reduce the range of theta if the error is getting good:
       if (error < 1 ){

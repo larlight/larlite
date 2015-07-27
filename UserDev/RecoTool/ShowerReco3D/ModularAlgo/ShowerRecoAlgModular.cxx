@@ -2,12 +2,24 @@
 #define SHOWERRECOALGMODULAR_CXX
 
 #include "ShowerRecoAlgModular.h"
+#include "LArUtil/Geometry.h"
 
 namespace showerreco {
 
     Shower_t ShowerRecoAlgModular::RecoOneShower(const ShowerClusterSet_t& clusters){
       // Run over the shower reco modules:
       Shower_t result;
+
+      // Make sure the result shower has the right size of all it's elements
+      auto geom = larutil::Geometry::GetME();
+      int nPlanes = geom -> Nplanes();
+      result.fTotalEnergy.resize(nPlanes);
+      result.fSigmaTotalEnergy.resize(nPlanes);
+      result.fdEdx.resize(nPlanes);
+      result.fSigmadEdx.resize(nPlanes);
+      result.fTotalMIPEnergy.resize(nPlanes);
+      result.fSigmaTotalMIPEnergy.resize(nPlanes);
+
       Shower_t localCopy = result;
 
       for (auto & module : _modules){
@@ -83,7 +95,7 @@ namespace showerreco {
     void ShowerRecoAlgModular::printChanges(const Shower_t & localCopy, const Shower_t result, std::string moduleName){
 
           // Look at each value of Shower_t and if it has changed, print out that change
-          std::cout << "Printing the list of changes made by module " << moduleName << std::endl;
+          std::cout << "\nPrinting the list of changes made by module " << moduleName << std::endl;
 
           // Compare vectors by x/y/z/ values
           // Doing comparisons in the order of values in Shower_t
@@ -260,6 +272,9 @@ namespace showerreco {
             std::cout << "\tfBestPlane has changed from " << localCopy.fBestPlane.Plane
                       << " to "  << result.fBestPlane.Plane << std::endl; 
           }
+
+
+          std::cout << std::endl;
 
     }
 

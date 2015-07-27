@@ -36,8 +36,8 @@ def getShowerRecoAlgModular():
   # 3D Axis Module:
   axis3D = showerreco.Axis3DModule()
   axis3D.setMaxIterations(50)
-  axis3D.setNStepsMin(5)
-  axis3D.setTargetError(0.0001)
+  axis3D.setNStepsMin(7)
+  axis3D.setTargetError(0.00001)
 
   alg.AddShowerRecoModule(axis3D                           )
   alg.AddShowerRecoModule(showerreco.StartPoint2DModule()  )
@@ -161,10 +161,11 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 
 # Specify analysis output root file name
-my_proc.set_ana_output_file("");
+my_proc.set_ana_output_file("elecShowersAna.root");
 
 # Specify data output root file name
 my_proc.set_output_file("elecShowers.root")
+
 
 ########################################################
 # Change here to switch between microboone and argoneut!
@@ -184,12 +185,21 @@ ana_unit.SetOutputProducer("showerreco")
 
 my_proc.add_process(ana_unit)
 
+# Add an ana unit to do the shower quality:
+quality_unit = fmwk.MCShowerAna()
+
+# quality_unit.SetShowerProducer("showerreco")
+
+my_proc.add_process(quality_unit)
+
 print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
-#my_proc.run(0,5)
-my_proc.process_event(3)
+my_proc.run(0,50)
+# my_proc.process_event(2)
+
+
 
 sys.exit()
 
