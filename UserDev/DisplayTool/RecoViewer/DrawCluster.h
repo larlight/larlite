@@ -17,6 +17,25 @@
 
 #include "Analysis/ana_base.h"
 #include "LArUtil/Geometry.h"
+#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/DetectorProperties.h"
+//#include "LArUtil/PxUtils.h"
+#include "DataFormat/cluster.h"
+#include "DataFormat/hit.h"
+#include "ClusterRecoUtil/ClusterParamsAlg.h"
+#include "ClusterRecoUtil/CRUHelper.h"
+
+#ifdef __APPLE__ 
+#include <_types/_uint8_t.h> 
+#include <_types/_uint16_t.h>
+#include <_types/_uint32_t.h> 
+#include <_types/_uint64_t.h> 
+#else 
+#include <stdint.h> 
+#endif
+
+
+
 
 namespace evd {
   /**
@@ -55,6 +74,11 @@ namespace evd {
     const std::vector<int>   & getWireByPlaneAndCluster(unsigned int p, unsigned int c) const;
     const std::vector<float> & getHitStartByPlaneAndCluster(unsigned int p, unsigned int c) const;
     const std::vector<float> & getHitEndByPlaneAndCluster(unsigned int p, unsigned int c) const;
+    //Adding functionality for startpoint drawing, 7/23/15 ahack
+//    ::cluster::cluster_params getParamsByPlane(unsigned int p, unsigned int c) const;
+    const std::vector<float> & getParamsByPlane(unsigned int p, unsigned int c) const;
+
+    int getClusters(unsigned int p) const ;
 
     std::vector<float> GetWireRange(unsigned int p);
     std::vector<float> GetTimeRange(unsigned int p);
@@ -64,6 +88,9 @@ namespace evd {
   private:
 
     const larutil::Geometry * geoService;
+    const larutil::GeometryUtilities * geoUtil;
+    
+//    ::cluster::CRUHelper cruHelper ;
 
     std::string producer;
 
@@ -76,6 +103,11 @@ namespace evd {
     std::vector<std::vector<std::vector<int>   > > * wireByPlaneByCluster;
     std::vector<std::vector<std::vector<float> > > * hitStartByPlaneByCluster;
     std::vector<std::vector<std::vector<float> > > * hitEndByPlaneByCluster;
+ //   std::vector<std::vector<::cluster::cluster_params> > * clusterStartByPlaneByCluster;
+    std::vector< std::vector<std::vector<float> > > * clusterStartByPlaneByCluster;
+
+    int clusters ;
+    
 
     // Store the bounding parameters of interest:
     // highest and lowest wire, highest and lowest time
@@ -83,6 +115,8 @@ namespace evd {
 
     std::vector<std::vector<float> > wireRange;
     std::vector<std::vector<float> > timeRange;
+
+    ::cluster::CRUHelper _cru_helper;
 
   };
 }

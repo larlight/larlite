@@ -232,6 +232,7 @@ class boxCollection(QtGui.QGraphicsItem):
     self._plane = -1
     self._listOfHits = []
     self._isHighlighted = False
+    self._listOfStarts = []
 
   def setColor(self,color):
     self._color = color
@@ -258,18 +259,25 @@ class boxCollection(QtGui.QGraphicsItem):
       self._isHighlighted = not self._isHighlighted
 
   #Draw start endpoints, ahack 072415
-#  def drawStartPoint(self,view_manager,cStartList):
-#    view = view_manager.getViewPorts()[self._plane]
-#
-#    red   = (255,0  ,0)  #red
-#    green = (100,253,0) # bright green
-#
-#    s = connectedBox(cStartList[0],cStartList[1],3,3)
-##   e = connectedBox(cTimeEndtList[i],cWireEndList[i],3,3)
-#
-#    s.setPen(pg.mkPen(None))
-#    s.setBrush(pg.mkColor(green))
-#    view._view.addItem(s)
+  def drawStartPoint(self,view_manager,cStartList):
+    print "START LIST: ", cStartList
+    view = view_manager.getViewPorts()[self._plane]
+
+    red   = (255,0  ,0)  #red
+    green = (100,253,0) # bright green
+    black = (0 , 0, 0,)
+
+    s = connectedBox(cStartList[0],int(cStartList[1]),1,40)
+    self._listOfHits.append(s)
+    s.setPen(pg.mkPen(None))
+    s.setBrush(pg.mkColor(red))
+    view._view.addItem(s)
+
+  def clearStarts(self,view_manager):
+    view = view_manager.getViewPorts()[self._plane]
+    for sp in self._listOfStarts:
+      view._view.removeItem(sp)
+    self._listOfStarts = []
 
 
   def drawHits(self,view_manager,wireList,timeStartList,timeEndList):
@@ -320,6 +328,8 @@ class cluster(recoBase):
 
   # this is the function that actually draws the cluster.
   def drawObjects(self,view_manager):
+
+    totalClus = 0 
     for view in view_manager.getViewPorts():
       colorIndex = 0
       # get the plane
@@ -329,12 +339,11 @@ class cluster(recoBase):
       # loop over the clusters in this plane:
       for i_cluster in xrange(self._process.getNClustersByPlane(thisPlane)):
 
+	totalClus += 1 
+
         wireList       = self._c2p.Convert(self._process.getWireByPlaneAndCluster(thisPlane,i_cluster))
         timeStartList  = self._c2p.Convert(self._process.getHitStartByPlaneAndCluster(thisPlane,i_cluster))
         timeEndList    = self._c2p.Convert(self._process.getHitEndByPlaneAndCluster(thisPlane,i_cluster))
-
-	#cStartList = self._c2p.Convert(self._process.getParamsByPlane(thisPlane,i_cluster))
-
         # Now make the cluster
         cluster = boxCollection()
         cluster.setColor(self._clusterColors[colorIndex])
@@ -342,7 +351,6 @@ class cluster(recoBase):
 
         # draw the hits in this cluster:
         cluster.drawHits(view_manager,wireList,timeStartList,timeEndList)
-#	cluster.drawStartPoint(view_manager,cStartList)
 
         self._listOfClusters[thisPlane].append(cluster)
 
@@ -350,10 +358,24 @@ class cluster(recoBase):
         if colorIndex >= len(self._clusterColors):
           colorIndex = 0
 
+	#Add per plane
+      nClus       = self._process.getClusters(thisPlane)
+      print "NCLUS??????" , nClus
+      for i in xrange(nClus):
+        #print "\n\n\nCluster: ", i, " size: " 
+    
+        print "In draw objects, storing startlist...", thisPlane 
+        cStartList = self._c2p.Convert(self._process.getParamsByPlane(thisPlane,i))
+#	print "cStartList things: ", cStartList[0], " ", cStartList[1]
+        cluster.drawStartPoint(view_manager,cStartList)
+
+	
+
   def clearDrawnObjects(self,view_manager):
     for plane in self._listOfClusters:
       for cluster in plane:
         cluster.clearHits(view_manager)
+	cluster.clearStarts(view_manager)
 
   def getAutoRange(self,plane):
     wires = self._process.GetWireRange(plane)
