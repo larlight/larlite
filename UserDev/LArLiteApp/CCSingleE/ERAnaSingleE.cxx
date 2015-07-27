@@ -222,7 +222,7 @@ namespace ertool {
 
     
     // find the number of tracks that start within 1 cm of the neutrino interaction
-    _n_tracksInt = 0;
+//    _n_tracksInt = 0;
     geoalgo::Point_t nu_vtx(_x_nu,_y_nu,_z_nu);
 //    for (auto &part : mc_ps){
 //      if (abs(part.PdgCode()) == 13 || abs(part.PdgCode()) == 211 || abs(part.PdgCode()) == 2212 ){
@@ -328,10 +328,19 @@ namespace ertool {
 	  ::geoalgo::HalfLine shr(daught.Vertex(),daught.Momentum());
 	  
 	  double detHalfHeight = 116.5 ;
-	  _distToTopWall = (_y_lepReco - detHalfHeight)*daught.Momentum().Length()/_py_lepReco ;
-	  _distToWall = sqrt(_geoAlgo.SqDist(daught.Vertex(),fTPC));
-	  if(_geoAlgo.Intersection(fTPC,shr,true).size() > 0)
+
+	  //If the lepton is contained, store the fiducial distance and the distance to top wall of shower.
+//	  if( _x_lepReco > 0 && _x_lepReco < 256 && _y_lepReco > -116 
+//	   && _y_lepReco < 116 && _z_lepReco > 0 && _z_lepReco < 1036){
+//	    _distToTopWall = (_y_lepReco - detHalfHeight)*daught.Momentum().Length()/_py_lepReco ;
+//	    _distToWall = sqrt(_geoAlgo.SqDist(daught.Vertex(),fTPC));
+//	    }
+	  if(_geoAlgo.Intersection(fTPC,shr,true).size() > 0){
 	    _distBackAlongTraj = sqrt(daught.Vertex().SqDist(_geoAlgo.Intersection(fTPC,shr,true)[0])) ;
+	    _distToTopWall = (_y_lepReco - detHalfHeight)*daught.Momentum().Length()/_py_lepReco ;
+	    _distToWall = sqrt(_geoAlgo.SqDist(daught.Vertex(),fTPC));
+	    std::cout<<"Testing to show we're using right"<<std::endl ;
+	    }
 	  else
 	    _distBackAlongTraj = -999; 
 	  
@@ -395,8 +404,8 @@ namespace ertool {
 
     MakeEffPlot("e_lep",10,0,3000);
     MakeEffPlot("e_nu",10,0,3000);
-    MakeEffPlot("n_tracks",10,-0.5,9.5);
-    MakeEffPlot("n_tracksReco",10,-0.5,9.5);
+//    MakeEffPlot("n_tracks",10,-0.5,9.5);
+//    MakeEffPlot("n_tracksReco",10,-0.5,9.5);
 
     if (fout){
       fout->cd();
