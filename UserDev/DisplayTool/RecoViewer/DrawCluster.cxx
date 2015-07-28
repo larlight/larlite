@@ -18,7 +18,7 @@ namespace evd {
     hitEndByPlaneByCluster   
       = new std::vector<std::vector<std::vector<float > > >;
     clusterStartByPlaneByCluster 
-      = new std::vector<std::vector<std::vector<float> > > ;
+      = new std::vector<std::vector<::cluster::cluster_params > > ;
 
   }
 
@@ -128,7 +128,7 @@ namespace evd {
       wireByPlaneByCluster        ->at(p).reserve(ev_clus->size());
       hitStartByPlaneByCluster    ->at(p).reserve(ev_clus->size());
       hitEndByPlaneByCluster      ->at(p).reserve(ev_clus->size());
-      clusterStartByPlaneByCluster->at(p).reserve(ev_clus->size());
+      //clusterStartByPlaneByCluster->at(p).reserve(ev_clus->size());
 
 
       // if ( p == 0  )
@@ -179,6 +179,7 @@ namespace evd {
     int view = ev_hit->at(hit_index_v.front()[0]).View();
     std::vector<int>  nullIntVec;
     std::vector<float>  nullFltVec;
+    ::cluster::cluster_params  nullCPVec;
 
     // std::vector<larutil::PxHit> pxhits;
     // pxhits.clear();
@@ -237,12 +238,12 @@ namespace evd {
 
 
       if ( (int) clusterStartByPlaneByCluster->at(view).size() != cluster_index[view] -1){
-        clusterStartByPlaneByCluster->at(view).push_back(nullFltVec);
+        clusterStartByPlaneByCluster->at(view).push_back(nullCPVec);
       }
-      clusterStartByPlaneByCluster->at(view).at(cluster_index[view]).push_back(int (cpan.GetParams().start_point.w / w2cm));
-      clusterStartByPlaneByCluster->at(view).at(cluster_index[view]).push_back(int (cpan.GetParams().start_point.t / t2cm));
-      clusterStartByPlaneByCluster->at(view).at(cluster_index[view]).push_back(int (cpan.GetParams().end_point.w / w2cm));
-      clusterStartByPlaneByCluster->at(view).at(cluster_index[view]).push_back(int (cpan.GetParams().end_point.t / t2cm));
+      clusterStartByPlaneByCluster->at(view).push_back( cpan.GetParams() );
+//      clusterStartByPlaneByCluster->at(view).at(cluster_index[view]).push_back(int (cpan.GetParams().start_point.t / t2cm));
+//      clusterStartByPlaneByCluster->at(view).at(cluster_index[view]).push_back(int (cpan.GetParams().end_point.w / w2cm));
+//      clusterStartByPlaneByCluster->at(view).at(cluster_index[view]).push_back(int (cpan.GetParams().end_point.t / t2cm));
 
 
       for(auto const& hit_index : hit_indices){
@@ -345,15 +346,15 @@ namespace evd {
       }
   }
 
-  const std::vector<float> & DrawCluster::getParamsByPlane(unsigned int p, unsigned int c) const{         
-      static std::vector<float> returnNull; 
+  const std::vector<::cluster::cluster_params> & DrawCluster::getParamsByPlane(unsigned int p) const{         
+      static std::vector<::cluster::cluster_params> returnNull; 
         if (clusterStartByPlaneByCluster !=0){
         //  if (c >= clusterStartByPlaneByCluster->at(p).size()){
         //    std::cerr << "ERROR: Request for nonexistent cluster " << c << std::endl;
         //    return returnNull;
         //  }
 
-          return clusterStartByPlaneByCluster->at(p).at(c);
+          return clusterStartByPlaneByCluster->at(p);
         }
         else{
           return returnNull;

@@ -76,7 +76,7 @@ namespace evd {
     const std::vector<float> & getHitEndByPlaneAndCluster(unsigned int p, unsigned int c) const;
     //Adding functionality for startpoint drawing, 7/23/15 ahack
 //    ::cluster::cluster_params getParamsByPlane(unsigned int p, unsigned int c) const;
-    const std::vector<float> & getParamsByPlane(unsigned int p, unsigned int c) const;
+    const std::vector<::cluster::cluster_params> & getParamsByPlane(unsigned int p) const;
 
     int getClusters(unsigned int p) const ;
 
@@ -104,7 +104,7 @@ namespace evd {
     std::vector<std::vector<std::vector<float> > > * hitStartByPlaneByCluster;
     std::vector<std::vector<std::vector<float> > > * hitEndByPlaneByCluster;
  //   std::vector<std::vector<::cluster::cluster_params> > * clusterStartByPlaneByCluster;
-    std::vector< std::vector<std::vector<float> > > * clusterStartByPlaneByCluster;
+    std::vector<std::vector<::cluster::cluster_params > > * clusterStartByPlaneByCluster;
 
     int clusters ;
     

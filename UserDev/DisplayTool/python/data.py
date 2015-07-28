@@ -268,7 +268,7 @@ class boxCollection(QtGui.QGraphicsItem):
 
   #Draw start endpoints, ahack 072415
   def drawStartPoint(self,view_manager,cStartList):
-    print "START LIST: ", cStartList
+#    print "START LIST: ", cStartList
     view = view_manager.getViewPorts()[self._plane]
 
     red   = (255,0  ,0)  #red
@@ -375,7 +375,10 @@ class cluster(recoBase):
       self._listOfClusters.append([])
       self._listOfStartEnd.append([])
       # loop over the clusters in this plane:
+      params_v = self._process.getParamsByPlane(thisPlane)
+      print "Params vector size: ", len( params_v)
       for i_cluster in xrange(self._process.getNClustersByPlane(thisPlane)):
+	
 
 	totalClus += 1 
 
@@ -396,19 +399,29 @@ class cluster(recoBase):
         if colorIndex >= len(self._clusterColors):
           colorIndex = 0
 
-	#Add per plane
-      nClus       = self._process.getClusters(thisPlane)
-      print "NCLUS??????" , nClus
-      for i in xrange(nClus):
-        #print "\n\n\nCluster: ", i, " size: " 
-    
-        print "In draw objects, storing startlist...", thisPlane 
-        cStartList = self._c2p.Convert(self._process.getParamsByPlane(thisPlane,i))
+      for i in xrange ( len(params_v) ):
+	#print "cluster number: ", i_cluster
+	params = params_v[i]
+        geom = view_manager._geometry
 
-	self._listOfStartEnd[thisPlane].append(cStartList)
+        wireStart = params.start_point.w / geom.wire2cm()
+        timeStart = params.start_point.t / geom.time2cm()
+        wireEnd   = params.end_point.w / geom.wire2cm()
+        timeEnd   = params.end_point.t / geom.time2cm()
+
+	cStartList = [ wireStart, timeStart, wireEnd, timeEnd ]
         cluster.drawStartPoint(view_manager,cStartList)
 
-       # self._listOfClusters[thisPlane].append(cluster)
+	#Add per plane
+#      nClus       = self._process.getClusters(thisPlane)
+#      print "NCLUS??????" , nClus
+#      for i in xrange(nClus):
+#        #print "\n\n\nCluster: ", i, " size: " 
+#    
+#        print "In draw objects, storing startlist...", thisPlane 
+#        cStartList = self._c2p.Convert(self._process.getParamsByPlane(thisPlane,i))
+#
+#	self._listOfStartEnd[thisPlane].append(cStartList)
 
 	
 
