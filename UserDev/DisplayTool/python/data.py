@@ -198,52 +198,6 @@ class circleThing(QtGui.QGraphicsEllipseItem):
 #    self.setAcceptHoverEvents(True)
 #    self._isHighlighted = False
 
-class circles(QtGui.QGraphicsItem):
-  # This class wraps a collection of hits and connects them together
-  # it can draw and delete itself when provided with view_manager
-  def __init__(self):
-    super(circles, self).__init__()
-    self._color = (0,0,0)
-    self._plane = -1
-    self._listOfStarts = []
-
-  def setColor(self,color):
-    self._color = color
-
-  def setPlane(self,plane):
-    self._plane = plane
-
-  def drawStartPoint(self,view_manager,cStartList):
-    print "START LIST: ", cStartList
-    view = view_manager.getViewPorts()[self._plane]
-
-    red   = (255,0  ,0)  #red
-    green = (100,253,0) # bright green
-    black = (0 , 0, 0,)
-
-#    s = connectedBox(cStartList[0],int(cStartList[1]),1,40)
-    s = circleThing(cStartList[0],int(cStartList[1])-25,1,50)
-    self._listOfStarts.append(s)
-    s.setPen(pg.mkPen(None))
-    s.setBrush(pg.mkColor(red))
-    view._view.addItem(s)
-
-    #e = connectedBox(cStartList[2],int(cStartList[3]),1,40)
-    e = circleThing(cStartList[2],int(cStartList[3])-25,1,50)
-    self._listOfStarts.append(e)
-    e.setPen(pg.mkPen(None))
-    e.setBrush(pg.mkColor(green))
-    view._view.addItem(e)
-
-
-
-  def clearStarts(self,view_manager):
-    view = view_manager.getViewPorts()[self._plane]
-    print "clearing!"
-    for s in self._listOfStarts:
-      view._view.removeItem(s)
-    self._listOfStarts = []
-
 
 
 # This class wraps the hit object to allow them to all function together
@@ -287,7 +241,6 @@ class boxCollection(QtGui.QGraphicsItem):
     self._listOfHits = []
     self._listOfStarts = []
     self._isHighlighted = False
-#    self._listOfStarts = []
 
   def setColor(self,color):
     self._color = color
@@ -319,22 +272,36 @@ class boxCollection(QtGui.QGraphicsItem):
     view = view_manager.getViewPorts()[self._plane]
 
     red   = (255,0  ,0)  #red
-    green = (100,253,0) # bright green
+    green = (0,255,0) # bright green
     black = (0 , 0, 0,)
 
 #    s = connectedBox(cStartList[0],int(cStartList[1]),1,40)
-    s = circleThing(cStartList[0],int(cStartList[1])-25,1,50)
+    s = circleThing(cStartList[0]-0.5,cStartList[1]-10,1,20)
     self._listOfStarts.append(s)
     s.setPen(pg.mkPen(None))
-    s.setBrush(pg.mkColor(red))
+    s.setBrush(pg.mkColor(green))
+    s.setOpacity(0.6)
+
+    s2 = circleThing(cStartList[0]-0.2,cStartList[1]-5,0.4,10)
+    s2.setPen(pg.mkPen(None))
+    s2.setBrush(pg.mkColor(black))
+
     view._view.addItem(s)
+    view._view.addItem(s2)
 
     #e = connectedBox(cStartList[2],int(cStartList[3]),1,40)
-    e = circleThing(cStartList[2],int(cStartList[3])-25,1,50)
+    e = circleThing(cStartList[2]-0.5,cStartList[3]-10,1,20)
     self._listOfStarts.append(e)
     e.setPen(pg.mkPen(None))
-    e.setBrush(pg.mkColor(green))
+    e.setBrush(pg.mkColor(red))
+    e.setOpacity(0.6)
     view._view.addItem(e)
+
+    e2 = circleThing(cStartList[2]-0.2,cStartList[3]-5,0.4,10)
+    e2.setPen(pg.mkPen(None))
+    e2.setBrush(pg.mkColor(black))
+
+    view._view.addItem(e2)
 
 #    QGraphicsScene scene(0,0,800,600); 
  #   double rad = 1;
@@ -380,7 +347,7 @@ class cluster(recoBase):
     self.init()
 
     self._listOfClusters = []
-    self._listOfStarts2 = []
+    self._listOfStartEnd = []
     # Defining the cluster colors:
     self._clusterColors = [ 
                             (0,147,147),  # dark teal
@@ -406,6 +373,7 @@ class cluster(recoBase):
       thisPlane = view.plane()
       # extend the list of clusters
       self._listOfClusters.append([])
+      self._listOfStartEnd.append([])
       # loop over the clusters in this plane:
       for i_cluster in xrange(self._process.getNClustersByPlane(thisPlane)):
 
@@ -437,11 +405,10 @@ class cluster(recoBase):
         print "In draw objects, storing startlist...", thisPlane 
         cStartList = self._c2p.Convert(self._process.getParamsByPlane(thisPlane,i))
 
-	self._listOfStarts2[i].append(cStartList)
-#	print "cStartList things: ", cStartList[0], " ", cStartList[1]
+	self._listOfStartEnd[thisPlane].append(cStartList)
         cluster.drawStartPoint(view_manager,cStartList)
 
- #       self._listOfClusters[thisPlane].append(cluster)
+       # self._listOfClusters[thisPlane].append(cluster)
 
 	
 
@@ -450,6 +417,7 @@ class cluster(recoBase):
       for cluster in plane:
         cluster.clearHits(view_manager)
 	cluster.clearStarts(view_manager)
+
 
   def getAutoRange(self,plane):
     wires = self._process.GetWireRange(plane)
