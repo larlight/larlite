@@ -173,9 +173,9 @@ def main():
     
   parser = argparse.ArgumentParser(description='Python based event display.')
   geom = parser.add_mutually_exclusive_group()
-  geom.add_argument('-A', '--argoneut',action='store_true',help="Run with the argoneut geometry")
-  geom.add_argument('-U', '--uboone',action='store_true',help="Run with the microboone geometry")
-  geom.add_argument('-L', '--lariat',action='store_true',help="Run with the lariat geometry")
+  geom.add_argument('-A','-a', '--argoneut',action='store_true',help="Run with the argoneut geometry")
+  geom.add_argument('-U','-u', '--uboone',action='store_true',help="Run with the microboone geometry")
+  geom.add_argument('-L','-l', '--lariat',action='store_true',help="Run with the lariat geometry")
   parser.add_argument('file',nargs='?',help="Optional input file to use")
   args = parser.parse_args()
 

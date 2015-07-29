@@ -22,8 +22,7 @@ class viewport(pg.GraphicsLayoutWidget):
     self._geometry = geometry
 
     # Set up the blank data:
-    self._blankData = np.ones((self._geometry.wRange(self._plane),self._geometry.tRange()))
-
+    # self._blankData = np.ones((self._geometry.wRange(self._plane),self._geometry.tRange()))
     self.setBackground('w')
 
 
@@ -186,8 +185,8 @@ class viewport(pg.GraphicsLayoutWidget):
     self.levelChanged()
 
   def drawBlank(self):
-    self._item.setImage(self._blankData)
-    self._item.setLookupTable(self._blankMap.getLookupTable(255))
+    self._item.clear()
+    # self._item.setLookupTable(self._blankMap.getLookupTable(255))
     self._cmap.setVisible(False)
     self._upperLevel.setVisible(False)
     self._lowerLevel.setVisible(False)
