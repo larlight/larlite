@@ -117,9 +117,12 @@ namespace larlite {
 	//nodeID = strm.Emplace(std::move(t),std::move(in_id),true);
 	nodeID = strm.Add( t, in_id, true);
 
-      }else
-
-	nodeID = graph.CreateParticle().ID();
+      }
+      
+      // if the track has only a single step point
+      else
+	continue;
+      //nodeID = graph.CreateParticle().ID();
       
       // Edit particle info
       auto& p = graph.GetParticle(nodeID);
@@ -128,6 +131,7 @@ namespace larlite {
 			::ertool::ParticleMass(mct.PdgCode()),
 			::geoalgo::Vector(mct.Start().Position()),
 			::geoalgo::Vector(mct.Start().Momentum()));
+
       // Create ParticleID
       ::ertool_helper::ParticleID id(mct);
 
@@ -277,6 +281,9 @@ namespace larlite {
 
     // First MCTrack Parentage
     for(auto const& mct : mct_v) {
+
+      if (mct.size() < 2)
+	continue;
 
       // This particle's ID
       ::ertool_helper::ParticleID id( mct.PdgCode(),
