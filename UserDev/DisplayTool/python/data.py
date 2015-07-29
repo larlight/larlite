@@ -276,32 +276,34 @@ class boxCollection(QtGui.QGraphicsItem):
     black = (0 , 0, 0,)
 
 #    s = connectedBox(cStartList[0],int(cStartList[1]),1,40)
-    s = circleThing(cStartList[0]-0.5,cStartList[1]-10,1,20)
+    s = QtGui.QGraphicsEllipseItem(cStartList[0]-0.5,cStartList[1]-10,1,20)
     self._listOfStarts.append(s)
     s.setPen(pg.mkPen(None))
     s.setBrush(pg.mkColor(green))
     s.setOpacity(0.6)
 
-    s2 = circleThing(cStartList[0]-0.2,cStartList[1]-5,0.4,10)
+    s2 = QtGui.QGraphicsEllipseItem(cStartList[0]-0.2,cStartList[1]-5,0.4,10)
     s2.setPen(pg.mkPen(None))
     s2.setBrush(pg.mkColor(black))
+    self._listOfStarts.append(s2)
 
     view._view.addItem(s)
     view._view.addItem(s2)
 
     #e = connectedBox(cStartList[2],int(cStartList[3]),1,40)
-    e = circleThing(cStartList[2]-0.5,cStartList[3]-10,1,20)
+    e = QtGui.QGraphicsEllipseItem(cStartList[2]-0.5,cStartList[3]-10,1,20)
     self._listOfStarts.append(e)
     e.setPen(pg.mkPen(None))
     e.setBrush(pg.mkColor(red))
     e.setOpacity(0.6)
     view._view.addItem(e)
 
-    e2 = circleThing(cStartList[2]-0.2,cStartList[3]-5,0.4,10)
+    e2 = QtGui.QGraphicsEllipseItem(cStartList[2]-0.2,cStartList[3]-5,0.4,10)
     e2.setPen(pg.mkPen(None))
     e2.setBrush(pg.mkColor(black))
 
     view._view.addItem(e2)
+    self._listOfStarts.append(e2)
 
 #    QGraphicsScene scene(0,0,800,600); 
  #   double rad = 1;
@@ -346,6 +348,8 @@ class cluster(recoBase):
     self._process = evd.DrawCluster()
     self.init()
 
+    self._drawParams = False
+
     self._listOfClusters = []
     self._listOfStartEnd = []
     # Defining the cluster colors:
@@ -362,6 +366,9 @@ class cluster(recoBase):
                             (210,210,210),  # gray
                             (100,253,0) # bright green
                           ]   
+
+  def setParamsDrawing(self, paramsBool):
+    self._drawParams = paramsBool
 
   # this is the function that actually draws the cluster.
   def drawObjects(self,view_manager):
@@ -380,7 +387,7 @@ class cluster(recoBase):
       for i_cluster in xrange(self._process.getNClustersByPlane(thisPlane)):
 	
 
-	totalClus += 1 
+        totalClus += 1 
 
         wireList       = self._c2p.Convert(self._process.getWireByPlaneAndCluster(thisPlane,i_cluster))
         timeStartList  = self._c2p.Convert(self._process.getHitStartByPlaneAndCluster(thisPlane,i_cluster))
@@ -400,8 +407,8 @@ class cluster(recoBase):
           colorIndex = 0
 
       for i in xrange ( len(params_v) ):
-	#print "cluster number: ", i_cluster
-	params = params_v[i]
+        #print "cluster number: ", i_cluster
+        params = params_v[i]
         geom = view_manager._geometry
 
         wireStart = params.start_point.w / geom.wire2cm()
@@ -409,19 +416,19 @@ class cluster(recoBase):
         wireEnd   = params.end_point.w / geom.wire2cm()
         timeEnd   = params.end_point.t / geom.time2cm()
 
-	cStartList = [ wireStart, timeStart, wireEnd, timeEnd ]
+        cStartList = [ wireStart, timeStart, wireEnd, timeEnd ]
         cluster.drawStartPoint(view_manager,cStartList)
 
-	#Add per plane
-#      nClus       = self._process.getClusters(thisPlane)
-#      print "NCLUS??????" , nClus
-#      for i in xrange(nClus):
-#        #print "\n\n\nCluster: ", i, " size: " 
-#    
-#        print "In draw objects, storing startlist...", thisPlane 
-#        cStartList = self._c2p.Convert(self._process.getParamsByPlane(thisPlane,i))
-#
-#	self._listOfStartEnd[thisPlane].append(cStartList)
+        # Add per plane
+        #      nClus       = self._process.getClusters(thisPlane)
+        #      print "NCLUS??????" , nClus
+        #      for i in xrange(nClus):
+        #        #print "\n\n\nCluster: ", i, " size: " 
+        #    
+        #        print "In draw objects, storing startlist...", thisPlane 
+        #        cStartList = self._c2p.Convert(self._process.getParamsByPlane(thisPlane,i))
+        #
+        #	self._listOfStartEnd[thisPlane].append(cStartList)
 
 	
 
@@ -429,7 +436,7 @@ class cluster(recoBase):
     for plane in self._listOfClusters:
       for cluster in plane:
         cluster.clearHits(view_manager)
-	cluster.clearStarts(view_manager)
+        cluster.clearStarts(view_manager)
 
 
   def getAutoRange(self,plane):

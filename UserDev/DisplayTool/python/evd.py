@@ -108,7 +108,7 @@ class larlitegui(gui):
     self._wireDrawBox.stateChanged.connect(self.wireDrawBoxWorker)
     self._eastLayout.addWidget(self._wireDrawBox)
 
-    self._startDrawBox = QtGui.QCheckBox("Draw Start/End Points")
+    self._startDrawBox = QtGui.QCheckBox("Draw Params.")
     self._startDrawBox.stateChanged.connect(self.startDrawBoxWorker)
     self._eastLayout.addWidget(self._startDrawBox)
 
@@ -149,9 +149,9 @@ class larlitegui(gui):
 
   def startDrawBoxWorker(self):
     if self._startDrawBox.isChecked():
-      self._event_manager.toggleStarts(True)
+      self._event_manager.toggleParams(True)
     else:
-      self._event_manager.toggleStarts(False)
+      self._event_manager.toggleParams(False)
 
     self._view_manager.drawPlanes(self._event_manager)
 
