@@ -213,7 +213,7 @@ namespace ertool {
 	}
       }
 
-
+      /*
       // Try and remove any shower that is on top of a track
       // this could be due to a track mis-reconstructed as a 
       // shower.
@@ -235,6 +235,7 @@ namespace ertool {
 	if (dot > 0.9)
 	  single = false;
       }
+      */
 
       // if still single (and no sister track) look at
       // dEdx to determine if e-like
@@ -293,6 +294,9 @@ namespace ertool {
 	      // if not primary according to primary finder -> don't add
 	      if (!trackParticle.Primary())
 		continue;
+	      // does this node already have a parent? if so ignore
+	      if (trackParticle.Descendant())
+		continue;
 	      // track deposited energy
 	      double Edep = track._energy;
 	      // track direction
@@ -302,9 +306,10 @@ namespace ertool {
 	      geoalgo::Vector_t Mom = Dir * ( sqrt( Edep * (Edep+2*mass) ) );
 	      trackParticle.SetParticleInfo(_findRel.GetPDG(track),mass,track[0],Mom);
 	      neutrinoMom += sqrt( Edep * ( Edep + 2*mass ) );
+	      std::cout << "setting parentage for sibling track..." << std::endl;
 	      graph.SetParentage(neutrino.ID(),t);
-	    }
-	}
+	    } // if the track was found to be a sibling of the electron shower
+	} // loop over all track to add siblings to particle graph
 
 	::geoalgo::Vector_t momdir(0,0,1);
 

@@ -408,7 +408,7 @@ namespace ertool {
 	throw ERException("Trying to assign parent that has already been assigned as as a descendant of this node!");
       }
     }
-    
+
     AddChild(parent_id, child_id, score);
   }
 

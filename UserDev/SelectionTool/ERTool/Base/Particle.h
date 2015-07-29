@@ -47,7 +47,7 @@ namespace ertool {
     
     bool RelationAssessed() const;
     bool Primary() const;
-    bool Descendant() const;
+    bool Descendant() const; ///< is this node is the descendant of another
     bool Lonely() const; ///< ILL DEFINED
     bool HasChild(const NodeID_t id);
 
