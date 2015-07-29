@@ -170,7 +170,7 @@ def main():
   app = QtGui.QApplication(sys.argv)
 
   if args.uboone:
-    geometry = uboone()
+    geometry = microboone()
   elif args.lariat:
     geometry = lariat()
   else:
