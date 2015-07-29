@@ -301,6 +301,43 @@ class boxCollection(QtGui.QGraphicsItem):
 #
 #    view._view.addItem(e)
 #    view._view.addItem(e2)
+  def drawStartPoint(self,view_manager,cStartList):
+#    print "START LIST: ", cStartList
+    view = view_manager.getViewPorts()[self._plane]
+
+    red   = (255,0  ,0)  #red
+    green = (0,255,0) # bright green
+    black = (0 , 0, 0,)
+
+#    s = connectedBox(cStartList[0],int(cStartList[1]),1,40)
+    s = QtGui.QGraphicsEllipseItem(cStartList[0]-0.5,cStartList[1]-10,1,20)
+    self._listOfStarts.append(s)
+    s.setPen(pg.mkPen(None))
+    s.setBrush(pg.mkColor(green))
+    s.setOpacity(0.6)
+
+    s2 = QtGui.QGraphicsEllipseItem(cStartList[0]-0.2,cStartList[1]-5,0.4,10)
+    s2.setPen(pg.mkPen(None))
+    s2.setBrush(pg.mkColor(black))
+    self._listOfStarts.append(s2)
+
+    view._view.addItem(s)
+    view._view.addItem(s2)
+
+    #e = connectedBox(cStartList[2],int(cStartList[3]),1,40)
+    e = QtGui.QGraphicsEllipseItem(cStartList[2]-0.5,cStartList[3]-10,1,20)
+    self._listOfStarts.append(e)
+    e.setPen(pg.mkPen(None))
+    e.setBrush(pg.mkColor(red))
+    e.setOpacity(0.6)
+    view._view.addItem(e)
+
+    e2 = QtGui.QGraphicsEllipseItem(cStartList[2]-0.2,cStartList[3]-5,0.4,10)
+    e2.setPen(pg.mkPen(None))
+    e2.setBrush(pg.mkColor(black))
+
+    view._view.addItem(e2)
+    self._listOfStarts.append(e2)
 
 
 
@@ -457,6 +494,8 @@ class cluster(recoBase):
     self._process = evd.DrawCluster()
     self.init()
 
+    self._drawParams = False
+
     self._listOfClusters = []
     self._listOfCParams  = []
     # Defining the cluster colors:
@@ -475,6 +514,9 @@ class cluster(recoBase):
                           ]   
 
   # Note: Recommended that you use spaces instead of tabs-- tabs screws up indentation in some editorss
+  def setParamsDrawing(self, paramsBool):
+    self._drawParams = paramsBool
+
   # this is the function that actually draws the cluster.
 
 
@@ -520,7 +562,8 @@ class cluster(recoBase):
           colorIndex = 0
 
       for i in xrange ( len(params_v) ):
-
+        #print "cluster number: ", i_cluster
+        params = params_v[i]
         geom = view_manager._geometry
         cParams.setParams(params_v[i])
 
