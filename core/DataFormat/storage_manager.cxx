@@ -7,6 +7,7 @@
 #include "potsummary.h"
 #include "hit.h"
 #include "track.h"
+#include "trackmom.h"
 #include "mctruth.h"
 #include "mctree.h"
 #include "user_info.h"
@@ -1067,6 +1068,9 @@ namespace larlite {
       break;
     case data::kTrack:
       _ptr_data_array[type][name]=new event_track(name);
+      break;
+    case data::kTrackMomentum:
+      _ptr_data_array[type][name]=new event_trackmom(name);
       break;
     case data::kMCTruth:
       _ptr_data_array[type][name]=new event_mctruth(name);
