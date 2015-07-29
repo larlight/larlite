@@ -41,6 +41,28 @@ namespace ertool {
     kINVALID_RELATION_TYPE
   };
 
+  /// "Process Type" that created this particle
+  enum ProcessType_t {
+    kUnknown,
+    /// Particles coming out of the neutrino interaction
+    kNuCCQE,         //1001
+    kNuNC,           //1002
+    kNuCC1Pi,        //1003,5,10,12
+    kNuCC1PiZero,    //1004,11
+    kNuNC1Pi,        //1007,9,14,16
+    kNuNC1PiZero,    //1008,15
+    kNuCCDeltaRes,   //1017-21,28-32
+    kNuNCDeltaRes,   //1022-27,33-38
+    kNuDIS,          //1091-1092
+    kNuOther,        //every other types of neutrino interactions
+    /// Other particles
+    kMichel,         //michel electrons "muMinusCaptureAtRest"
+    kMuIoni,         //particles (electrons?) from muon ionization "muIoni"
+    kCosmicDaughter, //daughters of cosmics
+    kPiZeroDecay,    //daughters of pizero decays (gammas usually)
+    kINVALID_PROCESS_TYPE
+  };
+
   namespace io {
     enum Mode_t {
       kUNDEFINED, ///< undefined mode
