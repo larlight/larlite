@@ -267,53 +267,49 @@ class boxCollection(QtGui.QGraphicsItem):
       self._isHighlighted = not self._isHighlighted
 
   #Draw start endpoints, ahack 072415
-  def drawStartPoint(self,view_manager,cStartList):
-#    print "START LIST: ", cStartList
-    view = view_manager.getViewPorts()[self._plane]
-
-    red   = (255,0  ,0)  #red
-    green = (0,255,0) # bright green
-    black = (0 , 0, 0,)
-
-#    s = connectedBox(cStartList[0],int(cStartList[1]),1,40)
-    s = circleThing(cStartList[0]-0.5,cStartList[1]-10,1,20)
-    self._listOfStarts.append(s)
-    s.setPen(pg.mkPen(None))
-    s.setBrush(pg.mkColor(green))
-    s.setOpacity(0.6)
-
-    s2 = circleThing(cStartList[0]-0.2,cStartList[1]-5,0.4,10)
-    s2.setPen(pg.mkPen(None))
-    s2.setBrush(pg.mkColor(black))
-
-    view._view.addItem(s)
-    view._view.addItem(s2)
-
-    #e = connectedBox(cStartList[2],int(cStartList[3]),1,40)
-    e = circleThing(cStartList[2]-0.5,cStartList[3]-10,1,20)
-    self._listOfStarts.append(e)
-    e.setPen(pg.mkPen(None))
-    e.setBrush(pg.mkColor(red))
-    e.setOpacity(0.6)
-    view._view.addItem(e)
-
-    e2 = circleThing(cStartList[2]-0.2,cStartList[3]-5,0.4,10)
-    e2.setPen(pg.mkPen(None))
-    e2.setBrush(pg.mkColor(black))
-
-    view._view.addItem(e2)
-
-#    QGraphicsScene scene(0,0,800,600); 
- #   double rad = 1;
-#    scene->addEllipse(cStartList[0]-rad, cStartList[1]-rad, rad*2.0, rad*2.0, QPen(), QBrush(Qt::SolidPattern));
+#  def drawStartPoint(self,view_manager,cStartList):
+##    print "START LIST: ", cStartList
+#    view = view_manager.getViewPorts()[self._plane]
+#
+#    red   = (255,0  ,0)  #red
+#    green = (0,255,0) # bright green
+#    black = (0 , 0, 0,)
+#
+##    s = connectedBox(cStartList[0],int(cStartList[1]),1,40)
+#    s = circleThing(cStartList[0]-0.5,cStartList[1]-10,1,20)
+#    self._listOfStarts.append(s)
+#    s.setPen(pg.mkPen(None))
+#    s.setBrush(pg.mkColor(green))
+#    s.setOpacity(0.6)
+#
+#    s2 = circleThing(cStartList[0]-0.2,cStartList[1]-5,0.4,10)
+#    s2.setPen(pg.mkPen(None))
+#    s2.setBrush(pg.mkColor(black))
+#
+#    view._view.addItem(s)
+#    view._view.addItem(s2)
+#
+#    e = circleThing(cStartList[2]-0.5,cStartList[3]-10,1,20)
+#    self._listOfStarts.append(e)
+#    e.setPen(pg.mkPen(None))
+#    e.setBrush(pg.mkColor(red))
+#    e.setOpacity(0.6)
+#
+#    e2 = circleThing(cStartList[2]-0.2,cStartList[3]-5,0.4,10)
+#    e2.setPen(pg.mkPen(None))
+#    e2.setBrush(pg.mkColor(black))
+#
+#    view._view.addItem(e)
+#    view._view.addItem(e2)
 
 
-  def clearStarts(self,view_manager):
-    view = view_manager.getViewPorts()[self._plane]
-    print "clearing!"
-    for s in self._listOfStarts:
-      view._view.removeItem(s)
-    self._listOfStarts = []
+
+#  def clearStarts(self,view_manager):
+#    view = view_manager.getViewPorts()[self._plane]
+#    print "clearing!"
+#    for s in self._listOfStarts:
+#      view._view.removeItem(s)
+#    self._listOfStarts = []
 
 
   def drawHits(self,view_manager,wireList,timeStartList,timeEndList):
@@ -338,6 +334,121 @@ class boxCollection(QtGui.QGraphicsItem):
       view._view.removeItem(hit)
     self._listOfHits = []
 
+
+class clusterParams(recoBase):
+  """docstring for cluster"""
+  def __init__(self):
+    super(clusterParams, self).__init__()
+    self._productName = 'clusterParams'
+    self._process = evd.DrawCluster()
+    self.init()
+#    self._listOfCParams  = []
+    self._listOfPoints   = []
+    # Defining the cluster colors:
+    #self._params       = []  #self._process.getParamsByPlane(thisPlane)
+    self._startW       = -1 
+    self._startT       = -1 
+    self._endW         = -1 
+    self._endT         = -1 
+    self._openingAngle = -1 
+    self._length       = -1 
+    self._width        = -1 
+    self._nHits        = -1 
+    #principal_dir is a v
+    self._dir          = -1 
+    self._plane        = -1
+    
+    self._radX = 10
+    self._radY = 0.5
+
+    self._startPoint = QtGui.QGraphicsEllipseItem(self._startW - self._radX, \
+                                                  self._startT - self._radY, \
+                                                  2*self._radX, 2*self._radY)
+
+    self._endPoint = QtGui.QGraphicsEllipseItem(self._endW - self._radX, \
+                                                self._endT - self._radY, \
+                                                2*self._radX, 2*self._radY)
+
+    startW       = -1 
+    startT       = -1 
+    endW         = -1 
+    endT         = -1 
+    openingAngle = -1 
+    length       = -1 
+    width        = -1 
+    nHits        = -1 
+    direc        = -1 
+
+  def setPlane(self,plane):
+    self._plane = plane
+
+  def setParams(self,params):
+    startW       = params.start_point.w
+    startT       = params.start_point.t
+    endW         = params.end_point.w
+    endT         = params.end_point.t
+    openingAngle = params.opening_angle 
+    length       = params.length
+    width        = params.width
+    nHits        = params.N_Hits
+    direc        = params.principal_dir
+
+
+#  def getParams(self):
+#  def getStartEndPoints(self):
+
+  def drawStartPoint(self,view_manager, cStartList): 
+    view = view_manager.getViewPorts()[self._plane]
+
+    red   = (255,0  ,0) 
+    green = (0  ,255,0)  
+    black = (0  ,0  ,0)
+
+#    s = self._startPoint 
+    s = QtGui.QGraphicsEllipseItem(cStartList[0]-0.5,cStartList[1]-10,1,20)
+    self._listOfPoints.append(s)
+    s.setPen(pg.mkPen(None))
+    s.setBrush(pg.mkColor(green))
+    s.setOpacity(0.6)
+
+    s2 = QtGui.QGraphicsEllipseItem(cStartList[0]-0.2,cStartList[1]-5,0.4,10)
+    s2.setPen(pg.mkPen(None))
+    s2.setBrush(pg.mkColor(black))
+    self._listOfPoints.append(s2)
+
+#    e = self._endPoint 
+    e = QtGui.QGraphicsEllipseItem(cStartList[2]-0.5,cStartList[3]-10,1,20)
+    self._listOfPoints.append(e)
+    e.setPen(pg.mkPen(None))
+    e.setBrush(pg.mkColor(red))
+    e.setOpacity(0.6)
+
+    e2 = QtGui.QGraphicsEllipseItem(cStartList[2]-0.2,cStartList[3]-5,0.4,10)
+    e2.setPen(pg.mkPen(None))
+    e2.setBrush(pg.mkColor(black))
+    self._listOfPoints.append(e2)
+
+#    self._listOfPoints.append(cStartList)
+
+    view._view.addItem(s)
+    view._view.addItem(s2)
+    view._view.addItem(e)
+    view._view.addItem(e2)
+
+
+  def clearStarts(self,view_manager):
+    view = view_manager.getViewPorts()[self._plane]
+    for s in self._listOfPoints:
+      view._view.removeItem(s)
+    self._listOfPoints= []
+
+#    def clearDrawnObjects(self,view_manager):
+#      for plane in self._listOfCParams:
+#        for points in plane:
+#          points.clearStarts(view_manager)
+
+    
+
 class cluster(recoBase):
   """docstring for cluster"""
   def __init__(self):
@@ -347,7 +458,7 @@ class cluster(recoBase):
     self.init()
 
     self._listOfClusters = []
-    self._listOfStartEnd = []
+    self._listOfCParams  = []
     # Defining the cluster colors:
     self._clusterColors = [ 
                             (0,147,147),  # dark teal
@@ -363,7 +474,11 @@ class cluster(recoBase):
                             (100,253,0) # bright green
                           ]   
 
+  # Note: Recommended that you use spaces instead of tabs-- tabs screws up indentation in some editorss
   # this is the function that actually draws the cluster.
+
+
+
   def drawObjects(self,view_manager):
 
     totalClus = 0 
@@ -373,14 +488,19 @@ class cluster(recoBase):
       thisPlane = view.plane()
       # extend the list of clusters
       self._listOfClusters.append([])
-      self._listOfStartEnd.append([])
-      # loop over the clusters in this plane:
+
+      # extend list of cluster params
+      cParams = clusterParams() 
+      cParams.setPlane(thisPlane)
+      self._listOfCParams.append([])
+#      cParams._listOfCParams.append(thisPlane)
       params_v = self._process.getParamsByPlane(thisPlane)
       print "Params vector size: ", len( params_v)
-      for i_cluster in xrange(self._process.getNClustersByPlane(thisPlane)):
-	
 
-	totalClus += 1 
+      # loop over the clusters in this plane:
+      for i_cluster in xrange(self._process.getNClustersByPlane(thisPlane)):
+
+        totalClus += 1 
 
         wireList       = self._c2p.Convert(self._process.getWireByPlaneAndCluster(thisPlane,i_cluster))
         timeStartList  = self._c2p.Convert(self._process.getHitStartByPlaneAndCluster(thisPlane,i_cluster))
@@ -400,36 +520,31 @@ class cluster(recoBase):
           colorIndex = 0
 
       for i in xrange ( len(params_v) ):
-	#print "cluster number: ", i_cluster
-	params = params_v[i]
+
         geom = view_manager._geometry
+        cParams.setParams(params_v[i])
 
-        wireStart = params.start_point.w / geom.wire2cm()
-        timeStart = params.start_point.t / geom.time2cm()
-        wireEnd   = params.end_point.w / geom.wire2cm()
-        timeEnd   = params.end_point.t / geom.time2cm()
+   #     cParams.startW /= geom.wire2cm()
+   #     cParams.startT /= geom.time2cm()
+   #     cParams.endW   /= geom.wire2cm()
+   #     cParams.endT   /= geom.time2cm()
+    #    cStartList = [ self._startW, self._startT, self._endW, self._endT ] 
+        cStartList = [ params_v[i].start_point.w / geom.wire2cm() , params_v[i].start_point.t / geom.time2cm(),  params_v[i].end_point.w / geom.wire2cm(), params_v[i].end_point.t / geom.time2cm() ] 
 
-	cStartList = [ wireStart, timeStart, wireEnd, timeEnd ]
-        cluster.drawStartPoint(view_manager,cStartList)
+#        cStartList = cParams.getStartEndPoints()
+        cParams.drawStartPoint(view_manager,cStartList)
 
-	#Add per plane
-#      nClus       = self._process.getClusters(thisPlane)
-#      print "NCLUS??????" , nClus
-#      for i in xrange(nClus):
-#        #print "\n\n\nCluster: ", i, " size: " 
-#    
-#        print "In draw objects, storing startlist...", thisPlane 
-#        cStartList = self._c2p.Convert(self._process.getParamsByPlane(thisPlane,i))
-#
-#	self._listOfStartEnd[thisPlane].append(cStartList)
-
+        print "The plane and cluster index: ", thisPlane, ", ", i
+        self._listOfCParams[thisPlane].append(cParams)
 	
 
   def clearDrawnObjects(self,view_manager):
     for plane in self._listOfClusters:
       for cluster in plane:
         cluster.clearHits(view_manager)
-	cluster.clearStarts(view_manager)
+    for plane in self._listOfCParams:
+      for cparams in plane:
+        cparams.clearStarts(view_manager)
 
 
   def getAutoRange(self,plane):
