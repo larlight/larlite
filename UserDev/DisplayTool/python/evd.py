@@ -108,6 +108,11 @@ class larlitegui(gui):
     self._wireDrawBox.stateChanged.connect(self.wireDrawBoxWorker)
     self._eastLayout.addWidget(self._wireDrawBox)
 
+    self._startDrawBox = QtGui.QCheckBox("Draw Start/End Points")
+    self._startDrawBox.stateChanged.connect(self.startDrawBoxWorker)
+    self._eastLayout.addWidget(self._startDrawBox)
+
+
     # Now we get the list of items that are drawable:
     drawableProducts = self._event_manager.getDrawableProducts()
     self._listOfRecoBoxes = []
@@ -139,6 +144,14 @@ class larlitegui(gui):
       self._event_manager.toggleWires(True)
     else:
       self._event_manager.toggleWires(False)
+
+    self._view_manager.drawPlanes(self._event_manager)
+
+  def startDrawBoxWorker(self):
+    if self._startDrawBox.isChecked():
+      self._event_manager.toggleStarts(True)
+    else:
+      self._event_manager.toggleStarts(False)
 
     self._view_manager.drawPlanes(self._event_manager)
 
