@@ -371,6 +371,8 @@ namespace larlite {
     // MCTrack
     for(auto const& mct : mct_v) {
 
+      if (mct.size() < 2) continue;
+
       // Construct parent's ID
       ::ertool_helper::ParticleID parent_id( mct.MotherPdgCode(),
 					     mct.MotherStart().Position(),
