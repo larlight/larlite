@@ -352,7 +352,7 @@ namespace evd {
         //  if (c >= clusterStartByPlaneByCluster->at(p).size()){
         //    std::cerr << "ERROR: Request for nonexistent cluster " << c << std::endl;
         //    return returnNull;
-        //  }
+        //  } 
 
           return clusterStartByPlaneByCluster->at(p);
         }

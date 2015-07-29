@@ -81,7 +81,7 @@ namespace evd {
     int getClusters(unsigned int p) const ;
 
     std::vector<float> GetWireRange(unsigned int p);
-    std::vector<float> GetTimeRange(unsigned int p);
+    std::vector<float> GetTimeRange(unsigned int p); 
 
   protected:
     
