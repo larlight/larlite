@@ -448,7 +448,7 @@ class cluster(recoBase):
           colorIndex = 0
 
 
-        if int(i_cluster) < int(len(params_v)) :
+        if int(i_cluster) < int(len(params_v)) and params_v[i_cluster].N_Hits > 10 :
 
           cParams = clusterParams() 
           cParams.setPlane(thisPlane)
