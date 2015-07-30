@@ -103,8 +103,7 @@ namespace evd {
     std::vector<std::vector<std::vector<int>   > > * wireByPlaneByCluster;
     std::vector<std::vector<std::vector<float> > > * hitStartByPlaneByCluster;
     std::vector<std::vector<std::vector<float> > > * hitEndByPlaneByCluster;
- //   std::vector<std::vector<::cluster::cluster_params> > * clusterStartByPlaneByCluster;
-    std::vector<std::vector<::cluster::cluster_params > > * clusterStartByPlaneByCluster;
+    std::vector<std::vector<::cluster::cluster_params > > * clusterParamsByPlane;
 
     int clusters ;
     

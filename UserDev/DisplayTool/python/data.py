@@ -285,7 +285,6 @@ class boxCollection(QtGui.QGraphicsItem):
   def clearHits(self,view_manager):
     view = view_manager.getViewPorts()[self._plane]
     for hit in self._listOfHits:
-#      print "HIIIITS is: ",hit 
       view._view.removeItem(hit)
     self._listOfHits = []
 
@@ -295,7 +294,7 @@ class clusterParams(QtGui.QGraphicsEllipseItem): #recoBase):
   def __init__(self):
     super(clusterParams, self).__init__()
     self._productName = 'clusterParams'
-    self._process = evd.DrawCluster()
+#    self._process = evd.DrawCluster()
    # self.init()
     self._listOfStartPoints   = []
     self._plane          = -1
@@ -328,7 +327,6 @@ class clusterParams(QtGui.QGraphicsEllipseItem): #recoBase):
     width        = params.width
     nHits        = params.N_Hits
     direc        = params.principal_dir
-#    print "Startw t end : ", startT, ", ", startW,", ",endT
 
 #  def getParams(self,params):
 #    self._params = params
@@ -340,7 +338,7 @@ class clusterParams(QtGui.QGraphicsEllipseItem): #recoBase):
     green = (0  ,255,0)  
     black = (0  ,0  ,0)
 
-    s = QtGui.QGraphicsEllipseItem(cStartList[0]-0.5,cStartList[1]-10,1,20)
+    s = QtGui.QGraphicsEllipseItem(cStartList[0]-1,cStartList[1]-20,2,40)
     s.setPen(pg.mkPen(None))
     s.setBrush(pg.mkColor(green))
     s.setOpacity(0.6)
@@ -349,7 +347,7 @@ class clusterParams(QtGui.QGraphicsEllipseItem): #recoBase):
     s2.setPen(pg.mkPen(None))
     s2.setBrush(pg.mkColor(black))
 
-    e = QtGui.QGraphicsEllipseItem(cStartList[2]-0.5,cStartList[3]-10,1,20)
+    e = QtGui.QGraphicsEllipseItem(cStartList[2]-1,cStartList[3]-20,2,40)
     e.setPen(pg.mkPen(None))
     e.setBrush(pg.mkColor(red))
     e.setOpacity(0.6)
@@ -372,7 +370,6 @@ class clusterParams(QtGui.QGraphicsEllipseItem): #recoBase):
   def clearStarts(self,view_manager):
     view = view_manager.getViewPorts()[self._plane]
     for s in self._listOfStartPoints:
-      print "Point is: ", s
       view._view.removeItem(s)
     self._listOfStartPoints= []
 
@@ -420,13 +417,11 @@ class cluster(recoBase):
 
       # extend the list of clusters
       self._listOfClusters.append([])
-      cParams = clusterParams() 
-      cParams.setPlane(thisPlane)
       
       self._listOfCParams.append([])
 
       params_v = self._process.getParamsByPlane(thisPlane)
-      print "Params vector size: ", len( params_v)
+      #print "Params vector size: ", len( params_v)
 
       # loop over the clusters in this plane:
       for i_cluster in xrange(self._process.getNClustersByPlane(thisPlane)):
@@ -436,6 +431,8 @@ class cluster(recoBase):
         wireList       = self._c2p.Convert(self._process.getWireByPlaneAndCluster(thisPlane,i_cluster))
         timeStartList  = self._c2p.Convert(self._process.getHitStartByPlaneAndCluster(thisPlane,i_cluster))
         timeEndList    = self._c2p.Convert(self._process.getHitEndByPlaneAndCluster(thisPlane,i_cluster))
+
+
         # Now make the cluster
         cluster = boxCollection()
         cluster.setColor(self._clusterColors[colorIndex])
@@ -450,34 +447,32 @@ class cluster(recoBase):
         if colorIndex >= len(self._clusterColors):
           colorIndex = 0
 
-      for i in xrange ( len(params_v) ):
-        #print "cluster number: ", i_cluster
-        #params = params_v[i]
-        geom = view_manager._geometry
-        cParams.setParams(params_v[i])
 
-        sW = params_v[i].start_point.w / geom.wire2cm()
-        sT = params_v[i].start_point.t / geom.time2cm()
-        eW = params_v[i].end_point.w / geom.wire2cm()
-        eT = params_v[i].end_point.t / geom.time2cm()
-#	print "sw st et " , sW, " , ", sT, ", ", eW
-        cStartList = [ sW, sT, eW, eT ] 
+        if int(i_cluster) < int(len(params_v)) :
 
-        cParams.drawStartPoint(view_manager,cStartList)
+          cParams = clusterParams() 
+          cParams.setPlane(thisPlane)
 
-#        print "The plane and cluster index: ", thisPlane, ", ", i
-        self._listOfCParams[thisPlane].append(cParams)
+          geom = view_manager._geometry
+          cParams.setParams(params_v[i_cluster])
+
+          sW = params_v[i_cluster].start_point.w / geom.wire2cm()
+          sT = params_v[i_cluster].start_point.t / geom.time2cm()
+          eW = params_v[i_cluster].end_point.w / geom.wire2cm()
+          eT = params_v[i_cluster].end_point.t / geom.time2cm()
+          cStartList = [ sW, sT, eW, eT ] 
+
+          cParams.drawStartPoint(view_manager,cStartList)
+
+          self._listOfCParams[thisPlane].append(cParams)
 	
 
   def clearDrawnObjects(self,view_manager):
     for plane in self._listOfClusters:
-#      print "Plane in listofCParams : ", plane
       for cluster in plane:
         cluster.clearHits(view_manager)
     for plane in self._listOfCParams:
-      print "Plane in listofCParams : ", plane
       for cparams in plane:
-      #  print "clearing cparams: ", cparams
         cparams.clearStarts(view_manager)
 
 
