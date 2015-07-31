@@ -130,20 +130,11 @@ class wire(dataBase):
     d = []
     for i in range(0,self._nviews):
       d.append(np.array(self._c2p.Convert(self._process.getDataByPlane(i))) )
-      print "got a plane, here is a sample: ", d[i][0][0]
+      # print "got a plane, here is a sample: ", d[i][0][0]
     return d
 
   def getPlane(self,plane):
-    a = np.array(self._c2p.Convert(self._process.getDataByPlane(plane)))
-    # print "a[", str(plane), "[0][0]" , str(a[0][0])
-    # print "a[", str(plane), "[0][1]" , str(a[0][1])
-    # print "a[", str(plane), "[0][2]" , str(a[0][2])
-    # print "a[", str(plane), "[29][0]" , str(a[29][0])
-    # print "a[", str(plane), "[29][1]" , str(a[29][1])
-    # print "a[", str(plane), "[29][2]" , str(a[29][2])
-    # print "a[", str(plane), "[93][0]" , str(a[93][0])
-    # print "a[", str(plane), "[93][1]" , str(a[93][1])
-    # print "a[", str(plane), "[93][2]" , str(a[93][2])
+    # a = np.array(self._c2p.Convert(self._process.getDataByPlane(plane)))
     return np.array(self._c2p.Convert(self._process.getDataByPlane(plane)))
 
   def getWire(self, plane, wire):
@@ -154,6 +145,7 @@ class recoWire(wire):
     super(recoWire,self).__init__()
     self._process = evd.DrawRaw()
     self._process.initialize()
+
 
 
 class hit(recoBase):
@@ -337,6 +329,24 @@ class clusterParams(QtCore.QObject): #recoBase):
   #Some member params i'm not filling forrectly.
   def setParams(self,params):
     self._params = params
+
+
+
+  def hoverEnter(self, e):
+    self.mouseEnter.emit(e)
+    for hit in self._listOfHits:
+      hit.setPen(pg.mkPen((0,0,0),width=1))
+
+  def hoverExit(self, e):
+    self.mouseExit.emit(e)
+    if self._isHighlighted:
+      return
+    for hit in self._listOfHits:
+      hit.setPen(pg.mkPen(None))
+
+  def toggleHighlight(self):
+    self.highlightChange.emit()
+    self._isHighlighted = not self._isHighlighted
 
 
   def draw(self, view):
