@@ -12,7 +12,7 @@ from larlite import larlite as fmwk
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
 
-# # Set input root file
+# Set input root file
 # for x in xrange(len(sys.argv)-1):
 #     my_proc.add_input_file(sys.argv[x+1])
 
@@ -36,14 +36,14 @@ my_proc.add_process(proc)
 print
 print  "Finished configuring ana_processor. Start event loop!"
 print
-# my_proc.process_event(0)
-# my_proc.process_event(1)
-# my_proc.process_event(2)
+my_proc.process_event(0)
+my_proc.process_event(1)
+my_proc.process_event(2)
 # while my_proc.process_event():
   # pass
 
 # Let's run it.
-my_proc.run(0,20)
+# my_proc.run(0,20)
 
 # done!
 print
