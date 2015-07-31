@@ -68,6 +68,7 @@ namespace evd {
     virtual bool finalize();
 
     void setProducer(std::string s){producer = s;}
+    void setFillParams(bool doityouwont){_fill_params = doityouwont;}
 
     int getNClustersByPlane(unsigned int p) const;
 
@@ -90,7 +91,8 @@ namespace evd {
     const larutil::Geometry * geoService;
     const larutil::GeometryUtilities * geoUtil;
     
-//    ::cluster::CRUHelper cruHelper ;
+
+    bool _fill_params;
 
     std::string producer;
 
