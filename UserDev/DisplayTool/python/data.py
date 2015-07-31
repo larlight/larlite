@@ -466,7 +466,7 @@ class cluster(recoBase):
           colorIndex = 0
 
         if self._drawParams:
-          if int(i_cluster) < int(len(params_v)) :
+          if int(i_cluster) < int(len(params_v)) and params_v[i_cluster].N_Hits > 10:
 
             cParams = clusterParams(params_v[i_cluster],view_manager._geometry) 
             self._listOfCParams[thisPlane][-1] = cParams
