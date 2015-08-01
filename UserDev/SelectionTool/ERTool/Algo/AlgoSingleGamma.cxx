@@ -262,6 +262,10 @@ namespace ertool {
 		vtx_tt = otherTrack.front();
 		vrtThsTrkOthTrk.push_back(vtx_tt);
 
+		// TEMPORARY placement
+		if(vrtThsTrkOthTrk.size()>4)
+		  {continue;}
+		
 		/// construct a sphere with minimum radius
 		/// bounded by the common track vertices
 		::geoalgo::Sphere s(vrtThsTrkOthTrk);
@@ -313,9 +317,12 @@ namespace ertool {
 		    if(IPss > _maxIP)
 		      { continue; }
 
-		    geoalgo::Vector dir = otherShower.Dir(vtx_ss);
-		    
-		    //geoalgo::Cone c(vtx_ss,);
+		    //geoalgo::Vector dir = otherShower.Dir(vtx_ss);
+		    auto dir = otherShower.Dir();
+		    auto ln = otherShower.Length();
+		    auto radius = otherShower.Radius();
+		    geoalgo::Cone c(vtx_ss,dir,ln,radius);
+
 		    vrtThsShwrOthShwr.push_back(vtx_ss);
 		    
 		      /// calculate the distance between that shower start

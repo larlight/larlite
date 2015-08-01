@@ -1,4 +1,4 @@
-/*
+ /*
 AlgoSingleGamma, July 2015
 
 authors: Brooke Russell, brooke.russell@yale.edu
@@ -181,7 +181,43 @@ namespace ertool {
     //For every Shower
     double _E; // energy of shower
     int    _PDG; // PDG code assigned by AlgoEMPart
-       
+
+    //==========================================
+
+    /* Parameters related to this shower and this track */
+    double _ThsShwrThsTrk;
+    double _ThsShwrE;
+    double _dedxThsShwr;
+    double _ThsTrkE;
+    double _IPst;
+    double _IPstThsShwrSt;
+    double _IPstThsTrkSt;
+    double _IPstThsTrkBody;
+
+    /* Parameters related to this track and other track */
+    double _ThsTrkOthTrk;
+    double _OthTrkE;
+    double _IPtt;
+    double _IPttOthTrkSt;
+    double _IPttOthTrkBody;
+
+    /* Parameters related to this shower and other shower */
+    double _ThsShwrOthShwr;
+    double _OthShwrE;
+    double _dedxOthShwr;
+    double _IPss;
+    double _IPssOthShwrSt;
+
+    //=============================================
+    
+    double _distst; // distance between shower start point and impact parameter mid point
+    
+    double _IPsot;
+    double _distsot; // original shower and other track
+    double _disto; // distan
+    //==========================================
+
+    
     int    _VsTrack; // comparing vs track (==1)
     double _thatE; // Energy of other shower/track
     double _thisShwrE;
@@ -204,8 +240,12 @@ namespace ertool {
     int _Ntrks; // Number of tracks matched to an event
     int _Nmu; // Number of muons matched to an event
 
+    int track_gamma;
+    int track_elec;
+    int track_aelec;
+    
     TH1D* _hRadius; // radius histogram
-    TH1D* _IPi; // impact parameter
+    //TH1D* _IPst; // impact parameter
     TH1D* _IPj; // impact parameter "this" track with "other" track
     TH1D* _IPsn; // impact parameter "other" shower with "this" shower
   };
