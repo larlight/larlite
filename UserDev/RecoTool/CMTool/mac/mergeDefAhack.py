@@ -124,9 +124,33 @@ def getPolyOverlap():
     overlapalg.SetMinNumHits(0)
     algo_array.AddAlgo(overlapalg,False)
 
+    prohib_array = cmtool.CBAlgoArray()
+    tracksep_prohibit = cmtool.CBAlgoTrackSeparate()
+    tracksep_prohibit.SetDebug(False)
+    tracksep_prohibit.SetVerbose(False)
+    tracksep_prohibit.SetUseEP(True)
+    prohib_array.AddAlgo(tracksep_prohibit,False)
+
+    outofcone_prohibit = cmtool.CBAlgoOutOfConeSeparate()
+    outofcone_prohibit.SetDebug(False)
+    outofcone_prohibit.SetVerbose(False)
+    outofcone_prohibit.SetMaxAngleSep(20.)
+    prohib_array.AddAlgo(outofcone_prohibit,False)
+
+    angle_prohibit = cmtool.CBAlgoAngleIncompat()
+    #this only applies if both clusters have >50 hits
+    angle_prohibit.SetMinHits(50)
+    angle_prohibit.SetAllow180Ambig(True)
+    angle_prohibit.SetUseOpeningAngle(False)
+    #this prohibits clusters w/ angles different than 10 degrees
+    angle_prohibit.SetAngleCut(10.)
+    angle_prohibit.SetMinLength(20.)
+    angle_prohibit.SetDebug(False)
+    prohib_array.AddAlgo(angle_prohibit,False)
+
     merger_instance.GetManager().MergeTillConverge(False)
     merger_instance.GetManager().AddMergeAlgo(algo_array)
-
+    merger_instance.GetManager().AddSeparateAlgo(prohib_array)
     return merger_instance
 
 
