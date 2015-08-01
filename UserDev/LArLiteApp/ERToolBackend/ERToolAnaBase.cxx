@@ -96,13 +96,16 @@ namespace larlite {
     // Start filling SPAData object!
     // Fill showers
     if (_mcshowers && _name_shower.empty()){
+	std::cout<<"In ERToolAnaBase...looking to add showers..."<<std::endl ;
       auto ev_mcs = storage->get_data<event_mcshower> (_name_mcshr);
       if (!ev_mcs){
 	print(msg::kERROR,__FUNCTION__,
 	      "MCShower info not found in the event!");
 	throw std::exception();
       }
+
       _helper.FillShowers(*ev_mcs, *in_strm);
+      std::cout<<"We successfully added shower!"<<std::endl ;
       // if cheater for single showers is to be used:
       if (_cheater)
 	_helper.SingleShowerCheater(*ev_mcs,*in_strm);
