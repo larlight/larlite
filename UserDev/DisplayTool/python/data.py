@@ -155,6 +155,11 @@ class recoWire(wire):
     self._process = evd.DrawRaw()
     self._process.initialize()
 
+class rawDigit(wire):
+  def __init__(self):
+    super(rawDigit,self).__init__()
+    self._process = evd.DrawRawDigit()
+    self._process.initialize()
 
 class hit(recoBase):
   """docstring for hit"""

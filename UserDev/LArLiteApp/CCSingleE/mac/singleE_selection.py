@@ -32,6 +32,7 @@ primary_algo.setVtxToTrkDist(1)
 primary_algo.setVtxToShrStartDist(50)
 primary_algo.setMaxIP(1)
 
+
 # Pi0 Algo
 #pi0_algo = ertool.AlgoPi0()
 #pi0_algo.setVerbose(False)
@@ -41,6 +42,7 @@ primary_algo.setMaxIP(1)
 #pi0_algo.setMinFitMass(50)
 #pi0_algo.setMaxFitMass(200)
 #pi0_algo.setAngleMax(3.14)
+
 
 # Create ERTool filter
 # This filter removes any track that
@@ -89,7 +91,6 @@ my_ana.SetECut(Ecut)
 my_anaunit = fmwk.ExampleERSelection()
 my_anaunit._mgr.AddAlgo(primary_algo)
 my_anaunit._mgr.AddAlgo(my_algo)
-#my_anaunit._mgr.AddAlgo(pi0_algo)
 my_anaunit._mgr.AddAna(my_ana)
 #my_anaunit._mgr.AddCfgFile('new_empart.txt')
 #This cut is applied in helper... ertool showers are not made if the energy of mcshower or reco shower

@@ -17,8 +17,8 @@
 #include "Analysis/ana_base.h"
 #include "DataFormat/DataFormat-TypeDef.h"
 #include "ClusterRecoUtil/CRUHelper.h"
-#include "ShowerReco3D/ShowerRecoException.h"
-#include "ShowerReco3D/ShowerRecoAlgBase.h"
+#include "ShowerReco3D/Base/ShowerRecoException.h"
+#include "ShowerReco3D/Base/ShowerRecoAlgBase.h"
 #include <iostream>
 
 /**

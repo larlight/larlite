@@ -14,8 +14,8 @@
 #ifndef RECOTOOL_SHOWERRECOALG_H
 #define RECOTOOL_SHOWERRECOALG_H
 
-#include "ShowerRecoAlgBase.h"
-#include "ShowerCalo.h"
+#include "ShowerReco3D/Base/ShowerRecoAlgBase.h"
+#include "ShowerReco3D/Base/ShowerCalo.h"
 
 namespace showerreco {
   
@@ -46,6 +46,9 @@ namespace showerreco {
     /// Function to set whether to use E correction
     void setEcorrection(bool on) { _Ecorrection = on; }
 
+    /// Function to set if to use a linear scale to calculate Energy
+    void SetUseLinearEnergy(bool on) { _linearE = on; }
+
   protected:
 
     /// Function to reconstruct a shower
@@ -59,6 +62,10 @@ namespace showerreco {
 
     /// Boolean -> decide if to use energy correction or not
     bool _Ecorrection;
+
+    /// use linear dQ -> dE energy conversion? If true over-rides
+    /// either Box or Birks model
+    bool _linearE;
     
     double fcalodEdxlength;
     double fdEdxlength;

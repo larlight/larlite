@@ -18,7 +18,7 @@ namespace ertool {
     return true;
   }
 
-  void AnaBase::SetMCData(EventData& data, ParticleGraph& graph)
+  void AnaBase::SetMCData(const EventData& data, const ParticleGraph& graph)
   {
     _mc_data = &data;
     _mc_graph   = &graph;

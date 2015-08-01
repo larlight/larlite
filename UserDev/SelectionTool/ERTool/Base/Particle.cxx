@@ -34,9 +34,10 @@ namespace ertool {
     if(id >= _score_v.size()) return -1;
     return _score_v[id];
   }
-  
-  const RecoType_t& Particle::RecoType() const { return _reco_type; }
-  const RecoID_t&  Particle:: RecoID()   const { return _reco_id;   }
+
+  const ProcessType_t& Particle::ProcessType() const { return _process;   }
+  const RecoType_t& Particle::RecoType()       const { return _reco_type; }
+  const RecoID_t&  Particle:: RecoID()         const { return _reco_id;   }
 
   const int&    Particle::PdgCode() const
   { return _pdg_code; }
@@ -65,7 +66,7 @@ namespace ertool {
   { return _primary; }
 
   bool Particle::Descendant() const
-  { return (!(_node_id == _ancestor_id && RelationAssessed())); }
+  { return (!(_node_id == _parent_id && RelationAssessed())); }
   
   bool Particle::Lonely() const
   { return (_child_v.size()<1); }
