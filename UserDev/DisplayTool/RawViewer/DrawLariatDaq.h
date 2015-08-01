@@ -58,11 +58,7 @@ namespace evd {
     int n_events() const{return _n_events;}
 
   protected:
-    
-    //vector of [tpc][wire][time]
-    std::vector<std::vector<std::vector<unsigned short>>> * wiredataIN;
-    // std::vector<std::vector<std::vector<float>>> * wiredata;
-    // std::vector<unsigned short> * data;
+
 
     std::vector< TBranch *> branches;
 
@@ -78,9 +74,13 @@ namespace evd {
     unsigned int _event_no;
     unsigned int _run;
     unsigned int _spill;
+    unsigned int _board_id;
 
     const int _n_cards = 8;
+    const int _card_offset = 1;
     const int _n_channels = 64;
+
+    std::vector<unsigned int> board_start_index;
 
     int _n_time_ticks;
 

@@ -34,37 +34,62 @@ namespace ertool {
       virtual ~EmptyInput(){}
       
       /// Name
-      const std::string& Name() const;
+//      const std::string& Name() const;
 
       /// # of entries in the input file
       size_t NumEntries() const;
       
       /// Function to prepare self before opening a file
-      virtual void Prepare( ::ertool::EventData     *event_ptr,
+      void Prepare( ::ertool::EventData     *event_ptr,
 			    ::ertool::ParticleGraph *graph_ptr,
 			    bool mc);
       
       /// Add an input file
-      virtual void AddFile( const std::string& fname );
+      void AddFile( const std::string& fname );
       
       /// Function to "open" the input stream
-      virtual bool Open( ::ertool::Provenance& in_prov);
+      bool Open( ::ertool::Provenance& in_prov);
       
       /// Function to "read" ParticleGraph
-      virtual bool ReadParticleGraph(const size_t entry);
+      bool ReadParticleGraph(const size_t entry);
       
       /// Function to "read" EventData
-      virtual bool ReadEventData(const size_t entry);
+      bool ReadEventData(const size_t entry);
       
       /// Function to "close" the output stream
-      virtual bool Close() = 0;
+      bool Close();
 
-    protected:
-      /// # entries
-      size_t _n_entries;
+      /// Function to set event id, run and subrun
+      void SetID(unsigned int evID,
+		 unsigned int runID,
+		 unsigned int subrunID);
+
+      /// Function to add input data product: Shower
+      NodeID_t Add(const ertool::Shower& obj,
+		   const ertool::RecoInputID_t& input_id,
+		   const bool mc=false);
+      
+      /// Function to add input data product: Track
+      NodeID_t Add(const ertool::Track&  obj,
+		   const ertool::RecoInputID_t& input_id,
+		   const bool mc=false);
+#ifndef __CINT__
+      /// Function to add input data product: Shower
+      NodeID_t Emplace(const ertool::Shower&& obj, const ertool::RecoInputID_t&& input_id, const bool mc=false);
+      /// Function to add input data product: Track
+      NodeID_t Emplace(const ertool::Track&&  obj, const ertool::RecoInputID_t&& input_id, const bool mc=false);
+#endif
+
+      /// ParticleGraph accessor
+      ::ertool::ParticleGraph& GetParticleGraphWriteable(bool mc=false);
+
     private:
-      /// Name of this instance
-      std::string _name;
+      
+      ::ertool::ParticleGraph *_graph;
+      ::ertool::ParticleGraph *_mc_graph;
+      ::ertool::EventData *_data;
+      ::ertool::EventData *_mc_data;
+      
     };
   }
 }

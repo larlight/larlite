@@ -7,6 +7,19 @@
 
 namespace evd {
 
+  // PyObject* Converter::Convert(const std::vector<::evd::Shower2d> & _array) const{
+  //   PyObject* pvec = PyList_New(_array.size());
+
+  //   for(size_t i=0; i<_array.size(); ++i) {
+
+  //     if(PyList_SetItem(pvec, i, _array[i])) {
+
+  //       Py_DECREF(pvec);
+  //     }
+  //   }
+  //   return pvec;
+  // }
+
   PyObject* Converter::Convert(const std::vector<std::string>& str_array) const
   {
     PyObject* pvec = PyList_New(str_array.size());
@@ -116,6 +129,8 @@ namespace evd {
     }
     return pvec;
   }
+
+
 
 
 }

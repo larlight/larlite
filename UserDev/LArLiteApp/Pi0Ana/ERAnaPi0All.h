@@ -16,7 +16,6 @@
 #define ERTOOL_ERANAPI0ALL_H
 
 #include "ERTool/Base/AnaBase.h"
-#include "ERTool/Base/AnaBase.h"
 #include "ERTool/Base/ParticleGraph.h"
 #include "ERTool/Base/Particle.h"
 #include "ERTool/Base/EventData.h"
@@ -25,6 +24,8 @@
 #include "TH2F.h"
 #include <math.h>       /* cos */
 #include "DataFormat/mctruth.h"
+#include "GeoAlgo/GeoAlgo.h"
+
 
 namespace ertool {
 
@@ -87,13 +88,35 @@ namespace ertool {
     double _x_pi0 ;
     double _y_pi0 ;
     double _z_pi0 ;
+    double _e_pi0 ;
+    double _x_pi0_mc ;
+    double _y_pi0_mc ;
+    double _z_pi0_mc ;
+    double _e_pi0_mc ;
+
+    int    _manyPi0 ;
+    double _vtx_mc_reco ;
     double _vtx_dist ;
     double _x_track ;
     double _y_track ;
     double _z_track ;
 
+    double _angle ;
+    double _mass  ;
     bool _verbose ;
 
+
+    double _distToWall ;
+    double _distAlongTraj ;
+    double _combinedE ;
+
+    double _x_shr ;
+    double _y_shr ;
+    double _z_shr ;
+
+
+    ::geoalgo::GeoAlgo _geoAlgo;
+    ::geoalgo::AABox   fTPC;
 
   };
 }

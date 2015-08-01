@@ -233,6 +233,15 @@ namespace showerreco {
     
     return;
   }
+
+  void ShowerRecoManager::finalize(TFile* fout){
+    if (!fout)
+      return;
+    if (_saveClusterTree) { _clusterTree->Write(); }
+    TTree* algtree = fShowerAlgo->getTree();
+    if (algtree) { algtree->Write(); }
+    return;
+  }
   
   void ShowerRecoManager::Sort(double a, double b, double c, double &min, double &med, double &max){
 

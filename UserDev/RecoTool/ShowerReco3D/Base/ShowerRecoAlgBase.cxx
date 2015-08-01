@@ -5,11 +5,12 @@
 
 namespace showerreco {
   
-  ShowerRecoAlgBase::ShowerRecoAlgBase() : fInputClusters()
+  ShowerRecoAlgBase::ShowerRecoAlgBase()
+    : fInputClusters()
+    , _alg_tree(nullptr)
   {
     fCaloAlg   = nullptr;
     fVerbosity = false;
-    _linearE   = false;
   }
 
   void ShowerRecoAlgBase::Reset()

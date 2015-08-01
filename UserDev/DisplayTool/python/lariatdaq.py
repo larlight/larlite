@@ -5,15 +5,19 @@ from event import manager
 from data import wire
 import argparse, sys, signal
 from PyQt4 import QtGui, QtCore
+import os
 
 from ROOT import evd
 
 from geometry import *
 
-class lariat_manager(manager, wire, QtGui.QWidget):
+class lariat_manager(manager, wire, QtCore.QObject):
   """docstring for lariat_manager"""
   def __init__(self, geom, file=None):
-    super(lariat_manager, self).__init__(geom,file)
+    # super(lariat_manager, self).__init__(geom,file)
+    QtCore.QObject.__init__(self)
+    manager.__init__(self,geom,file)
+    wire.__init__(self)
 
     # override the wire drawing process for lariat
     self._process = evd.DrawLariatDaq(self._geom.tRange())
@@ -72,13 +76,15 @@ class lariat_manager(manager, wire, QtGui.QWidget):
     self.setSpill(self._process.spill())
     self.processEvent()
     # print "Event ", self.event(), ", spill ", self.spill(), ", run ", self.run()
-    self._gui.update()
+    if self._gui != None:
+      self._gui.update()
 
   def setInputFile(self, file):
     self._file = file
     if file == None:
       return
     else:
+      file = str(file)
       self._process.setInput(file)
       self._hasFile = True
       self.goToEvent(0)
@@ -118,7 +124,7 @@ class lariat_manager(manager, wire, QtGui.QWidget):
           return
       self._stopFlag = threading.Event()
       self._watcher = fileWatcher(self._stopFlag, self._monitorFile)
-      self.connect(self._watcher, QtCore.SIGNAL("fileChanged"),self.setInputFile)
+      self._watcher.fileChanged.connect(self.setInputFile)
       self._running = True
       self._watcher.start()
       pass
@@ -135,7 +141,7 @@ class lariat_manager(manager, wire, QtGui.QWidget):
     self._cycling = True
     self._stopCycleFlag = threading.Event()
     self._cycleWatcher = delayTimer(self._stopCycleFlag,self._delay)
-    self.connect(self._cycleWatcher, QtCore.SIGNAL("delayExpired"),self.next)
+    self._cycleWatcher.delayExpired.connect(self.next)
     self._cycleWatcher.start()
 
   def stopCycle(self):
@@ -163,7 +169,7 @@ class lariat_manager(manager, wire, QtGui.QWidget):
 import threading
 class fileWatcher(QtCore.QObject,threading.Thread):
   """This file watcher class monitors a file and calls a function when it's contents change"""
-
+  fileChanged = QtCore.pyqtSignal(str)
   def __init__(self, event,file):
     QtCore.QObject.__init__(self)
     threading.Thread.__init__(self)
@@ -185,21 +191,22 @@ class fileWatcher(QtCore.QObject,threading.Thread):
         raise e
       # At this point, the file exists.
       fileToDraw = f.readline()
-      # print "Contents of file are: ", fileToDraw
+      fileName, fileExtension = os.path.splitext(fileToDraw)
+      fileExtension = fileExtension.rstrip()
       if fileToDraw == self._prevFile:
         # print "Not drawing because file has not changed."
         continue
-      if fileToDraw.endswith(".root"):
-        print "Attempting to refresh picture"
-        self.emit(QtCore.SIGNAL("fileChanged"),fileToDraw)
-        # self._signal.fileChanged.emit()
-        # self._func(fileToDraw)
+      if fileExtension == ".root":
+        print "Refreshing file!"
+        self.fileChanged.emit(fileToDraw)
         self._prevFile = fileToDraw
       else:
         print "File has changed but does not appear to be a root file."
+        self._prevFile = fileToDraw
 
 class delayTimer(QtCore.QObject,threading.Thread):
   """docstring for funcCaller"""
+  delayExpired = QtCore.pyqtSignal()
   def __init__(self, event, delay):
     QtCore.QObject.__init__(self)
     threading.Thread.__init__(self)
@@ -209,7 +216,7 @@ class delayTimer(QtCore.QObject,threading.Thread):
   def run(self):
     # print "Called run"
     while not self._stopped.wait(self._delay):
-      self.emit(QtCore.SIGNAL("delayExpired"))
+      self.delayExpired.emit()
 
 
 
@@ -227,6 +234,7 @@ class lariatgui(gui):
   # override the initUI function to change things:
   def initUI(self):
     super(lariatgui,self).initUI()
+
     # Change the name of the labels for lariat:
     self._subrunLabel.setText("Spill: 0")      
 
@@ -255,38 +263,6 @@ class lariatgui(gui):
     else:
       self._eventUpdatePauseButton.setText("START")
       self._autoRunLabel.setText("Event update OFF")
-
-  def stopRun(self):
-    self._runControlButton.setText("Start Run")
-    self._running = False
-    self._stopFlag.set()
-    pass
-
-  def runControl(self):
-    if not self._running:
-      self.startRun()
-      return
-    else:
-      self.stopRun()
-
-  def updateFile(self, file):
-      if self._running:
-        self.stopRun()
-      self.parseFileName(file)
-      self._filePath = file
-
-  # this function is ONLY meant to be called by a thread for auto updating.
-  # Do not call this yourself, use updateFile instead
-  def autoUpdateFile(self,file):
-    # Checking that the file is a .root file is left to the thread
-    # print "Called function to update image ", file
-    self._filePath = file
-    self.initData()
-    self.updateDataChoices()
-    self.goToEvent(0)
-    for view in range(0,self._baseData._nviews):
-      self._drawerList[view].setVisible(False)
-      self._drawerList[view].setVisible(True)
 
 
   def quit(self): 
@@ -395,13 +371,14 @@ def main():
 
   thisgui = lariatgui(geom,manager)
   thisgui.initUI()
-  manager.goToEvent(0)
+  # manager.goToEvent(0)
 
 
   signal.signal(signal.SIGINT, sigintHandler)
   timer = QtCore.QTimer()
   timer.start(500)  # You may change this if you wish.
   timer.timeout.connect(lambda: None)  # Let the interpreter run each 500 ms.
+
 
   app.exec_()
   # sys.exit(app.exec_())

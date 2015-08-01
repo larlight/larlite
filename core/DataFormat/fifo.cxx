@@ -1,5 +1,5 @@
-#ifndef FIFO_CXX
-#define FIFO_CXX
+#ifndef LARLITE_FIFO_CXX
+#define LARLITE_FIFO_CXX
 
 #include "fifo.h"
 
@@ -30,8 +30,9 @@ namespace larlite {
     _channel_number=fem::kINVALID_CH;
     _module_address=data::kINVALID_UCHAR;
     _module_id=data::kINVALID_UCHAR;
-    _readout_frame_number=fem::kINVALID_WORD;
-    _readout_sample_number=fem::kINVALID_WORD;
+    _readout_frame_number=data::kINVALID_UINT;
+    _readout_sample_number=data::kINVALID_UINT;
+    _disc_id = fem::kDISC_MAX;
   }
 
   ////////////////////////////////////////////////////////
@@ -47,13 +48,13 @@ namespace larlite {
   //***************************************************************************
   void event_fifo::init_vars(){
   //***************************************************************************
-    _event_frame_number=fem::kINVALID_WORD;
+    _event_frame_number=data::kINVALID_UINT;
     _module_address=data::kINVALID_UCHAR;
     _module_id=data::kINVALID_UCHAR;
-    _checksum=fem::kINVALID_WORD;
-    _nwords=fem::kINVALID_WORD;
-    _fem_trig_frame_number=fem::kINVALID_WORD;
-    _fem_trig_sample_number=fem::kINVALID_WORD;
+    _checksum=data::kINVALID_UINT;
+    _nwords=data::kINVALID_UINT;
+    _fem_trig_frame_number=data::kINVALID_UINT;
+    _fem_trig_sample_number=data::kINVALID_UINT;
   }
 
 }

@@ -16,6 +16,13 @@ namespace showerreco {
     _linearE     = false;
     fVerbosity   = true;
     _Ecorrection = true;
+
+    if (!_alg_tree) { _alg_tree = new TTree("_alg_tree","ShowerReco Algo Tree"); }
+    _alg_tree->Branch("_pl",&_pl,"pl/I");
+    _alg_tree->Branch("_dedx",&_dedx,"dedx/D");
+    _alg_tree->Branch("_dedx_v","std::vector<double>",&_dedx_v);
+
+    _linearE   = false;
   }
 
 
@@ -82,11 +89,11 @@ namespace showerreco {
 	    index_to_use[1] = ip;
 	  }
       }
-
+    
     // For now, pick the "best plane" and save the 2d opening angle as the shower's 3d opening angle
     // This needs to be improved... 2d angles are not 2d angles!
     best_opening_angle = fOpeningAngles[index_to_use[0]];
-
+    
     // Second Calculate 3D angle and effective pitch and start point 
     double xphi=0,xtheta=0;
     
@@ -101,7 +108,6 @@ namespace showerreco {
       std::cout << " new angles: " << xphi << " " << xtheta << std::endl; 
     
     
-    
     double xyz[3];
     // calculate start point here?
     fGSer-> GetXYZ(&(fStartPoint[index_to_use[0]]),&(fStartPoint[index_to_use[1]]),xyz);
@@ -113,6 +119,12 @@ namespace showerreco {
     //for(auto const &clustit : clusters)
     for(size_t cl_index=0; cl_index < fPlaneID.size(); ++cl_index) 
       {
+	
+	// reset TTree variables
+	_pl = -1;
+	_dedx_v.clear();
+	_dedx = -1;
+
 	int plane = fPlaneID.at(cl_index);
 	double newpitch=fGSer->PitchInView(plane,xphi,xtheta);
 	if(plane == best_plane) best_length *= newpitch / fGSer->WireToCm();
@@ -142,14 +154,7 @@ namespace showerreco {
 	  
 	  double dEdx_new=0;
 	  double hitElectrons = 0;
-	  //double Bcorr_half;
-	  //double dEdx_sub;
-	  // double dEdx_MIP;
-	  
-	  //    dEdx_new = fCaloAlg->dEdx_AREA(theHit, newpitch );
-	  //Bcorr_half = 2.*fCaloAlg->dEdx_AREA(theHit->Charge()/2.,theHit->PeakTime(), newpitch, plane); ; 
-	  //dEdx_sub = fCaloAlg->dEdx_AREA(theHit->Charge()-PION_CORR,theHit->PeakTime(), newpitch, plane); ; 
-	  // dEdx_MIP = fCaloAlg->dEdx_AREA_forceMIP(theHit, newpitch ); 
+
 	  if(!fUseArea)
 	    {
 	      dEdx_new = fCaloAlg->dEdx_AMP(theHit.peak / newpitch, theHit.t / fGSer->TimeToCm(), theHit.plane);
@@ -160,7 +165,7 @@ namespace showerreco {
 	      dEdx_new = fCaloAlg->dEdx_AREA(theHit.charge / newpitch, theHit.t / fGSer->TimeToCm(), theHit.plane);
 	      hitElectrons = fCaloAlg->ElectronsFromADCArea(theHit.charge, plane);
 	    }
-
+	  
 	  // if we want to use a linear dQ->dE enrgy conversion instead of Box or Birks models
 	  if (_linearE){
 	    hitElectrons *= fCaloAlg->LifetimeCorrection(theHit.t / fGSer->TimeToCm());
@@ -174,27 +179,17 @@ namespace showerreco {
 	    if (dEdx_new > 10.) { dEdx_new = 10.; }
 	    totEnergy += dEdx_new*newpitch;
 	  }
-
-	  //totNewCnrg+=dEdx_MIP;
-	//  if(dEdx_new < 3.5 && dEdx_new >0 )
-	//    {
-	//      totLowEnergy +=dEdx_new*newpitch;
-	//      totMIPEnergy += dEdx_new*newpitch;
-	//    }
-	//  else
-	 //   {
-	 //     totHighEnergy += dEdx_new*newpitch;
-	      int multiplier=1;
-	      if(plane < 2) multiplier =2 ;
-	      if(!fUseArea){
-		totMIPEnergy += theHit.peak *  0.0061*multiplier;
-	      }
-	      else{
-		totMIPEnergy += theHit.charge *  0.00336*multiplier;
-	      }
-	  //  }
 	  
-	   if(fVerbosity && dEdx_new >1.9 && dEdx_new <2.1)
+	  int multiplier=1;
+	  if(plane < 2) multiplier =2 ;
+	  if(!fUseArea){
+	    totMIPEnergy += theHit.peak *  0.0061*multiplier;
+	  }
+	  else{
+	    totMIPEnergy += theHit.charge *  0.00336*multiplier;
+	  }
+	  
+	  if(fVerbosity && dEdx_new >1.9 && dEdx_new <2.1)
 	    std::cout << "dEdx_new " << dEdx_new << " " <<dEdx_new/theHit.charge*newpitch << " "<< theHit.charge *0.0033*multiplier/newpitch << std::endl;
 	  
 	  larutil::PxPoint OnlinePoint; 
@@ -206,7 +201,6 @@ namespace showerreco {
 	  
 	  double ortdist=fGSer->Get2DDistance(&OnlinePoint,&theHit);
 	  double linedist=fGSer->Get2DDistance(&OnlinePoint,&(fStartPoint.at(cl_index)));
-	  
 	  
 	  //calculate the distance from the vertex using the effective pitch metric 
 	  double wdist=((theHit.w-fStartPoint.at(cl_index).w)*newpitch)*direction;  //wdist is always positive
@@ -223,26 +217,6 @@ namespace showerreco {
 	  
 	  //   if( (fabs(wdist)<fcalodEdxlength)&&(fabs(wdist)>0.2)){  
 	  if( (wdist<fcalodEdxlength)&&(wdist>0.2)){    
-	    
-	    //vdEdx.push_back(dEdx_new);
-	    //vresRange.push_back(fabs(wdist));
-	    //vdQdx.push_back(theHit->Charge(true)/newpitch);
-	    //Trk_Length=wdist;
-	    
-	    //fTrkPitchC=fNPitch[set][plane];
-	    //Kin_En+=dEdx_new*newpitch;
-	    //npoints_calo++;
-	    //sum+=dEdx_new;
-	    
-	    
-	    
-	    //fDistribChargeADC[set].push_back(ch_adc);  //vector with the first De/Dx points
-	    //     fDistribChargeMeV[set].push_back(dEdx_new);  //vector with the first De/Dx points
-	    //     fDistribHalfChargeMeV[set].push_back(Bcorr_half);
-	    //     fDistribChargeposition[set].push_back(wdist);  //vector with the first De/Dx points' positions 
-	    //     fDistribChargeMeVMIPsub[set].push_back(dEdx_sub);
-	    // 	
-	    
 	    
 	    //first pass at average dE/dx
 	    if(wdist<fdEdxlength 
@@ -292,15 +266,8 @@ namespace showerreco {
 	    {
 	      dEdx = fCaloAlg->dEdx_AMP(theHit.peak / newpitch, theHit.t / fGSer->TimeToCm(), theHit.plane);
 	    }
-	  //fDistribAfterMin[set].push_back(MinBefore);
-	  //fDistribBeforeMin[set].push_back(MinAfter);
-	  //  auto position = hitIter - local_hitlist.begin() ;	
-	  
 	  fRMS_corr+=(dEdx-mevav2cm)*(dEdx-mevav2cm); 
-	  
 	}
-	
-	
 	
 	if(npoints_first>0)	
 	  {
@@ -309,19 +276,19 @@ namespace showerreco {
 	
 	/// third loop to get only points inside of 1RMS of value.      
 	//loop only on subset of hits
-
+	
 	for(auto const & theHit : local_hitlist){
 	  double dEdx=0;
 	  if(fUseArea)
 	    { 
 	      dEdx = fCaloAlg->dEdx_AREA(theHit.charge / newpitch, theHit.t / fGSer->TimeToCm(), theHit.plane);
+	      _dedx_v.push_back(dEdx);
 	    }
 	  else  //this will hopefully go away, once all of the calibration factors are calculated.
 	    {
 	      dEdx = fCaloAlg->dEdx_AMP(theHit.peak / newpitch, theHit.t / fGSer->TimeToCm(), theHit.plane);
+	      _dedx_v.push_back(dEdx);
 	    }
-	  //fDistribAfterMin[set].push_back(MinBefore);
-	  //fDistribBeforeMin[set].push_back(MinAfter);
 	  
 	  if( ((dEdx > (mevav2cm-fRMS_corr) ) && (dEdx < (mevav2cm+fRMS_corr) )) 
 	      || 
@@ -337,7 +304,6 @@ namespace showerreco {
 	}
 	
 	if(fVerbosity){ 
-	  ////std::cout << " total ENERGY, birks: " << fTotChargeMeV[set] << " MeV " << " assumeMIPs:  " << fTotChargeMeV_MIPs[set] << "MeV " <<  std::endl;
 	  std::cout << " total ENERGY, birks: " << totEnergy << " MeV "  
 		    << " |average:  " << dedx_final  << std::endl
 		    << " Energy:  lo:" << totLowEnergy << " hi: " << totHighEnergy 
@@ -349,6 +315,10 @@ namespace showerreco {
 	fEnergy[plane]    = totEnergy;    // for each plane
 	fMIPEnergy[plane] = totMIPEnergy;
 	fdEdx[plane]      = dedx_final; 
+
+	_pl = plane;
+	_dedx = dedx_final;
+	_alg_tree->Fill();
     
 	// break;
       } // end loop on clusters
@@ -358,7 +328,6 @@ namespace showerreco {
     result.set_length(best_length);
     result.set_opening_angle(best_opening_angle);
     result.set_total_energy(fEnergy);
-    //result.set_total_energy_err  (std::vector< Double_t > q)            { fSigmaTotalEnergy = q;        }
     
     double dirs[3]={0};
     fGSer->GetDirectionCosines(xphi,xtheta,dirs);
@@ -367,11 +336,8 @@ namespace showerreco {
     TVector3 vxyz(xyz[0], xyz[1], xyz[2]);
     
     result.set_direction(vdirs); 
-    //result.set_direction_err (TVector3 dir_e)      { fSigmaDCosStart = dir_e; }
     result.set_start_point(vxyz); 
-    //result.set_start_point_err (TVector3 xyz_e)      { fSigmaXYZstart = xyz_e; }
     result.set_dedx  (fdEdx);
-    //result.set_dedx_err  (std::vector< Double_t > q)            { fSigmadEdx = q;        }
 
     // done
     return result;

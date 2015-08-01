@@ -87,7 +87,7 @@ namespace ertool {
     void ClearTree();
 
   protected:
-
+    
     /// Function to check wether a shower is e- or gamma-like
     /// Returns true if gamma-like
     bool isGammaLike(const double dedx, double radlen,bool forceRadLen=false);
@@ -243,7 +243,11 @@ namespace ertool {
     int track_gamma;
     int track_elec;
     int track_aelec;
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> bc605cdb13ab2ca0add2e2556a842186d51405ad
     TH1D* _hRadius; // radius histogram
     //TH1D* _IPst; // impact parameter
     TH1D* _IPj; // impact parameter "this" track with "other" track

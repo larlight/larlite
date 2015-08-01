@@ -21,21 +21,22 @@
 #include "ShowerRecoException.h"
 #include <limits>
 #include <climits>
+#include "TTree.h"
+
 namespace showerreco {
 
   struct ShowerCluster_t {
-
     ::larutil::PxPoint start_point;
     ::larutil::PxPoint end_point;
     double             angle_2d;
     double             opening_angle;
     unsigned short     plane_id;
     std::vector< ::larutil::PxHit> hit_vector;
-
     ShowerCluster_t() : hit_vector()
     {}
-
   };
+
+  typedef std::vector<showerreco::ShowerCluster_t> ShowerClusterSet_t;
   
   /**
      \class ShowerRecoAlgBase
@@ -67,8 +68,8 @@ namespace showerreco {
     /// Calorimetry algorithm setter
     void CaloAlgo(::calo::CalorimetryAlg* alg) { fCaloAlg = alg; }
 
-    /// Function to set if to use a linear scale to calculate Energy
-    void SetUseLinearEnergy(bool on) { _linearE = on; }
+    /// Function to get algorithm's TTree
+    TTree* getTree() { return _alg_tree; }
 
   protected:
 
@@ -77,11 +78,7 @@ namespace showerreco {
     { return; }
 
     /// Function to reconstruct one shower
-    virtual ::larlite::shower RecoOneShower(const std::vector<showerreco::ShowerCluster_t>& clusters) = 0;
-
-    /// use linear dQ -> dE energy conversion? If true over-rides
-    /// either Box or Birks model
-    bool _linearE;
+    virtual ::larlite::shower RecoOneShower(const ShowerClusterSet_t& clusters) = 0;
 
     /// Verbosity flag
     bool fVerbosity;
@@ -90,7 +87,10 @@ namespace showerreco {
     ::calo::CalorimetryAlg *fCaloAlg;
 
     /// Input clusters
-    std::vector<std::vector<showerreco::ShowerCluster_t> > fInputClusters;
+    std::vector<showerreco::ShowerClusterSet_t> fInputClusters;
+
+    /// TTree for algorithm's stuff
+    TTree *_alg_tree;
 
   };
 }

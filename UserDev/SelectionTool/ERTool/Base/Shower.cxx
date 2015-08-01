@@ -27,6 +27,7 @@ namespace ertool {
     RecoObjBase::Reset();
     _dedx       = kINVALID_DOUBLE;
     _energy     = kINVALID_DOUBLE;
+    _time		= kINVALID_DOUBLE;
   }
 }
 #endif

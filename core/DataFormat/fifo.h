@@ -42,6 +42,7 @@ namespace larlite {
       , _module_id(original._module_id)
       , _readout_frame_number(original._readout_frame_number)
       , _readout_sample_number(original._readout_sample_number)
+      , _disc_id(original._disc_id)
     {}
 
     /// Fast vector copy constructor
@@ -50,6 +51,7 @@ namespace larlite {
 	 UInt_t  sample,
 	 UChar_t module_address,
 	 UChar_t module_id,
+	 fem::Discriminator_t disc_id,
 	 std::vector<unsigned short> wf)
       : std::vector<unsigned short>(wf)
       , data_base(data::kFIFO)
@@ -58,9 +60,9 @@ namespace larlite {
       , _module_id(module_id)
       , _readout_frame_number(frame)
       , _readout_sample_number(sample)
+      , _disc_id(disc_id)
     {}
     
-
     /// Setter for the channel number
     void set_channel_number (UInt_t ch)     {_channel_number=ch;}
 
@@ -75,6 +77,9 @@ namespace larlite {
 
     /// Setter for the module id
     void set_module_id(UChar_t n) { _module_id = n;}
+
+    /// Setter for the channel discriminator ID number
+    void set_disc_id (fem::Discriminator_t id)  {_disc_id=id;}
     
     /// Getter for the channel frame ID number
     UInt_t readout_frame_number() const {return _readout_frame_number;}
@@ -84,31 +89,33 @@ namespace larlite {
     
     /// Getter for the readout_sample_number number
     inline UInt_t readout_sample_number_2MHz() const  
-    {return _readout_sample_number; }
+    {return _readout_sample_number/32; }
 
     /// Getter for the readout_sample_number number
     inline UInt_t readout_sample_number_16MHz() const  
-    {return _readout_sample_number*8; }
+    {return _readout_sample_number/8; }
 
     /// Getter for the readout_sample_number number
     inline UInt_t readout_sample_number_64MHz() const  
-    {return _readout_sample_number*32; }
+    {return _readout_sample_number; }
     
     /// Getter for the channel number
     UInt_t channel_number() const {return _channel_number;}
     
     /// Getter for the module address
-    UChar_t module_address() const { return _module_address; }
+    UInt_t module_address() const { return (UInt_t)(_module_address);}
     
     /// Getter for the module id
-    UChar_t module_id() const {return _module_id;}
+    UInt_t module_id() const {return (UInt_t)(_module_id);}
+
+    /// Getter for the discriminator ID number
+    fem::Discriminator_t disc_id() const  {return _disc_id;}
     
     /// Method to clear currently held data contents in the buffer
     virtual void clear_data();
     
     /// Default destructor
     ~fifo(){}
-    
     
   protected:
     
@@ -118,9 +125,9 @@ namespace larlite {
     UInt_t  _channel_number;            ///< Channel number
     UChar_t _module_address;            ///< Module number
     UChar_t _module_id;                 ///< Module ID
-    UInt_t  _readout_frame_number;      ///< Frame number
-    UInt_t  _readout_sample_number;     ///< Sample number
-    
+    UInt_t  _readout_frame_number;      ///< Frame number 
+    UInt_t  _readout_sample_number;     ///< Sample number in 64 MHz clock
+    fem::Discriminator_t _disc_id;      ///< Discriminator ID (only for PMT)
   };
   
   
@@ -183,10 +190,10 @@ namespace larlite {
     UInt_t event_frame_number() const {return _event_frame_number;}
     
     /// Getter for the module address
-    UChar_t module_address() const {return _module_address;}
+    UInt_t module_address() const {return (UInt_t)(_module_address);}
     
     /// Getter for the module ID
-    UChar_t module_id()      const {return _module_id;}
+    UInt_t module_id()      const {return (UInt_t)(_module_id);}
     
     /// Getter for the checksum
     UInt_t checksum()       const {return _checksum;} 

@@ -17,7 +17,7 @@
 
 #include "Analysis/ana_base.h"
 #include "ClusterRecoUtil/CRUHelper.h"
-#include "ShowerRecoManager.h"
+#include "ShowerReco3D/Base/ShowerRecoManager.h"
 
 namespace larlite {
   /**
