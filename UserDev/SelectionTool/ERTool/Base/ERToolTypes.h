@@ -61,7 +61,6 @@ namespace ertool {
     kCosmicDaughter, //daughters of cosmics
     kCosmicPrimary, // cosmic primary particle
     kPiZeroDecay,    //daughters of pizero decays (gammas usually)
-    kCosmicPrimary,
     kINVALID_PROCESS_TYPE
   };
 
