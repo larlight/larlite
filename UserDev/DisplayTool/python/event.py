@@ -253,6 +253,7 @@ class larlite_manager(manager,QtCore.QObject):
       # Special case for clusters, connect it to the signal:
       if product == 'cluster':
         self.clusterParamsChanged.connect(drawingClass.setParamsDrawing)
+        drawingClass.setParamsDrawing(self._drawParams)
 
       drawingClass.setProducer(producer)
       self._process.add_process(drawingClass._process)
@@ -288,6 +289,7 @@ class larlite_manager(manager,QtCore.QObject):
     # # wires are special:
     # if self._drawWires:
     #   self._view_manager.drawPlanes(self)
+    self.clearAll()
     # Draw objects in a specific order defined by drawableItems
     order = self._drawableItems.getListOfItems()
     for item in order:
@@ -337,6 +339,7 @@ class larlite_manager(manager,QtCore.QObject):
       self._wireDrawer = None   
 
   def toggleParams(self, paramsBool):
+    self._drawParams = paramsBool
     self.clusterParamsChanged.emit(paramsBool)
     if 'cluster' in self._drawnClasses:
       self.drawFresh()

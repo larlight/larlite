@@ -140,13 +140,14 @@ class viewport(pg.GraphicsLayoutWidget):
     # pdi.plot()
     # For this function, a click should get the wire that is
     # being hovered over and draw it at the bottom
-    wire = int( self._item.mapFromScene(event.pos()).x())
-    # get the data from the plot:
-    data = self._item.image
-    wireData = data[wire]
-    self._wdf(wireData)
-    # print "Plane: " + str(self._plane) + ", Wire: " + str(wire)
-    # return self.plane,self.wire
+    if self._item.image != None:
+      wire = int( self._item.mapFromScene(event.pos()).x())
+      # get the data from the plot:
+      data = self._item.image
+      wireData = data[wire]
+      self._wdf(wireData)
+      # print "Plane: " + str(self._plane) + ", Wire: " + str(wire)
+      # return self.plane,self.wire
 
   def connectWireDrawingFunction(self,func):
     self._wdf = func
