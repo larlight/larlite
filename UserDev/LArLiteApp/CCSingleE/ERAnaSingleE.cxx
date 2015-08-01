@@ -337,8 +337,8 @@ namespace ertool {
 //	    }
 	  if(_geoAlgo.Intersection(fTPC,shr,true).size() > 0){
 	    _distBackAlongTraj = sqrt(daught.Vertex().SqDist(_geoAlgo.Intersection(fTPC,shr,true)[0])) ;
-	    _distToTopWall = (_y_lepReco - detHalfHeight)*daught.Momentum().Length()/_py_lepReco ;
-	    _distToWall = sqrt(_geoAlgo.SqDist(daught.Vertex(),fTPC));
+	    _distToTopWall     = (_y_lepReco - detHalfHeight)*daught.Momentum().Length()/_py_lepReco ;
+	    _distToWall        = sqrt(_geoAlgo.SqDist(daught.Vertex(),fTPC));
 	  }
 	  else{
 	    _distBackAlongTraj = -9999; 
@@ -497,8 +497,8 @@ namespace ertool {
     _lep_dot       = -2;
     _lep_vtxdist   = -1000;
     _distToTopWall = -9999;
-    _distToWall    = -999;
-    _distBackAlongTraj = -999;
+    _distToWall    = -9999;
+    _distBackAlongTraj = -9999;
     _angle_Norm    = -9999;
 
     _e_trkInt = -1;
