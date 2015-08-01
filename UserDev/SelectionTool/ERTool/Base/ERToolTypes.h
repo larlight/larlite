@@ -59,7 +59,9 @@ namespace ertool {
     kMichel,         //michel electrons "muMinusCaptureAtRest"
     kMuIoni,         //particles (electrons?) from muon ionization "muIoni"
     kCosmicDaughter, //daughters of cosmics
+    kCosmicPrimary, // cosmic primary particle
     kPiZeroDecay,    //daughters of pizero decays (gammas usually)
+    kCosmicPrimary,
     kINVALID_PROCESS_TYPE
   };
 
