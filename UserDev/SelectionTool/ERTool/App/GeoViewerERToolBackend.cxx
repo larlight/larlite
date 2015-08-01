@@ -37,15 +37,15 @@ namespace ertool {
     used_obj[ ::ertool::kShower ].resize( data.Shower().size(), false );
 
     for (auto &node_id : particles.GetParticleNodes()) {
-
-      auto const& p = particles.GetParticle(node_id);
       
+      auto const& p = particles.GetParticle(node_id);
+
       if(part_map_s.find(p.PdgCode()) == part_map_s.end()) 
 	part_map_s.insert(std::make_pair(p.PdgCode(),db_s.GetParticle(p.PdgCode())));
 
 	std::string name="";
 	if(part_map_s[p.PdgCode()]) name = part_map_s[p.PdgCode()]->GetName();
-
+	if(name.empty()) name = "noname";
 	// If this particle has associated EventData, show it as well (if name is non-empty)
 	if (p.RecoID() != kINVALID_RECO_ID){
 	  if(!name.empty()) {

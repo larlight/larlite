@@ -18,6 +18,8 @@ namespace ertool {
     , _hBestMass(nullptr)
     , _ll_tree(nullptr)
   {
+
+
     _energy_min = 40.;
     _energy_max = 1200.;
     _fit_min    = 10;
@@ -153,9 +155,10 @@ namespace ertool {
     //if( (_dedx_A < 0.5) || (_dedx_B < 0.5) ) return;
 
     // Find the common origin, along with
-    if (  (shower_a.Dir().Length() != 1) || (shower_b.Dir().Length() != 1) )
-      return;
+//    if (  (shower_a.Dir().Length() != 1) || (shower_b.Dir().Length() != 1) )
+//      return;
     _dot = _geoAlgo.commonOrigin(shower_a, shower_b, vtx, true);
+
     if (_verbose) {
       std::cout << "Sum of dot-products for direction-matching: " << _dot << std::endl;
     }
@@ -166,6 +169,8 @@ namespace ertool {
     _ll_vtxDist_A = log( _radLenSigl->getVal(*_radLenVar) / (_radLenSigl->getVal(*_radLenVar) + _radLenBkgd->getVal(*_radLenVar)) );
     _radLenVar->setVal(_vtxDist_B);
     _ll_vtxDist_B = log( _radLenSigl->getVal(*_radLenVar) / (_radLenSigl->getVal(*_radLenVar) + _radLenBkgd->getVal(*_radLenVar)) );
+
+  std::cout << "Vertex of pi0 would be : "<< vtx[0]<<", "<<vtx[1]<<", "<<vtx[2]<<std::endl ; 
 
     if (_verbose) {
       std::cout << "Shr A: " << std::endl 
@@ -201,10 +206,10 @@ namespace ertool {
     mass = _mass;
 
     // calculate momentum:
-    // add direction vectors scaled by shower energies and subtract mass
     geoalgo::Vector_t energy(shower_a.Dir() * energy_a + shower_b.Dir() * energy_b);
-    energy *= (energy.Length() - _mass) / energy.Length();
-    mom = energy;
+    energy.Normalize();
+    double mom2 = sqrt(pow(energy_a,2)+pow(energy_b,2)+2*energy_a*energy_b*cos(_angle));
+    mom = energy*mom2;
 
     if (_verbose) { std::cout << "reconstructed mass: " << _mass << std::endl; }
 
@@ -234,6 +239,7 @@ namespace ertool {
     ll += _ll_vtxDist_B;
     _ll = ll;
 
+
     _ll_tree->Fill();
 
     return;
@@ -242,11 +248,14 @@ namespace ertool {
   bool AlgoPi0::Reconstruct(const EventData &data, ParticleGraph& graph)
   { 
 	
-    if (_verbose) {
-      std::cout << "showers in event: " << graph.GetParticleNodes(RecoType_t::kShower).size() << std::endl;
-    }
+//    if (_verbose) 
+  //    std::cout << "showers in event: " << graph.GetParticleNodes(RecoType_t::kShower).size() << std::endl;
+    
 
+ //   std::cout<<"\n\n\nNew Event! "<<std::endl ;
     if(graph.GetParticleNodes(RecoType_t::kShower).size() < 2) return true;
+
+
 
     Combination_t comb(2);
 
@@ -273,8 +282,12 @@ namespace ertool {
 	  continue;
 	}
 
+
 	auto const& shr1 = datacpy.Shower(graph.GetParticle(shrID1).RecoID());
 	auto const& shr2 = datacpy.Shower(graph.GetParticle(shrID2).RecoID());
+
+//	std::cout<< "SHOWER STARTS: "<<shr1.Start()[0]<<", "<<shr1.Start()[1]<<", "<<shr1.Start()[2]<<std::endl ;
+//	std::cout<< "SHOWER STARTS: "<<shr2.Start()[0]<<", "<<shr2.Start()[1]<<", "<<shr2.Start()[2]<<std::endl ;
 
 	double likelihood = 0.;
 	double mass       = -1.;
@@ -283,9 +296,12 @@ namespace ertool {
       
 	LL(shr1, shr2, likelihood, mass, vertex, momentum);
 	if (likelihood > best_ll) { best_ll = likelihood; best_mass = mass; }
+
+//	std::cout<<"Shower dedx, likelihood: "<<shr1._dedx<<" , "<<shr2._dedx<<", "<<likelihood<<std::endl ;	
+//	std::cout<<"Shower dedx, likelihood: "<<shr1._energy<<" , "<<shr2._energy<<std::endl ;
 	
-	
-	if ( (likelihood != -1.e-10) && (mass > 0) ){
+	if ( (likelihood != -1.e-10) && (likelihood > -2)&& (mass > 0)&& shr1._energy > 20 && shr2._energy > 20 ){
+
 	  _hMass_vs_LL->Fill(mass,likelihood);
 	  // edit particle info to reflect the fact 
 	  // that we have 2 gammas coming from a pi0
@@ -300,6 +316,8 @@ namespace ertool {
 	  graph.GetParticle(shrID2).SetParticleInfo(22,0,gamma2vtx,gamma2mom);
 	  // create pi0
 	  Particle& pi0 = graph.CreateParticle();
+
+
 	  // Approximate vtx using lifetime
 	  auto dir = momentum.Dir();
 	  dir *= sqrt( 1 - pow( mass / (mass + momentum.Length()), 2)) * 2.998e10 * _tau;
@@ -309,6 +327,16 @@ namespace ertool {
 	  graph.SetParentage(pi0.ID(),shrID1);
 	  graph.SetParentage(pi0.ID(),shrID2);
 	  graph.SetSiblings(shrID1,shrID2);
+    
+	  //Let's try to make a shower object out of this pi0
+	  double momDot = ( gamma1mom[0] * gamma2mom[0] + gamma1mom[1] * gamma2mom[1] + gamma1mom[2] * gamma2mom[2] );
+	  double momLengthProd = ( gamma1mom.Length() * gamma2mom.Length() ) ;
+	  double openAngle = acos ( momDot / momLengthProd ) ; 
+
+	  auto radius = momentum.Length() * tan ( openAngle/2 ) ;
+
+	  ::ertool::Shower s( vertex, momentum, momentum.Length(), radius);
+//	  _mgr.Add (s, ::ertool::RecoInputType_t(0,data.Shower().name()), true i);
 
 	}
 	_hMass->Fill(_mass);

@@ -10,9 +10,11 @@
 #pragma link off all functions;
 
 #pragma link C++ class ertool::GeoViewerERToolBackend+;
+#pragma link C++ class ertool::ToyDataMaker+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 
 
 

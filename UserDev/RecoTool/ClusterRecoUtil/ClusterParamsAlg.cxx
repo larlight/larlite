@@ -59,6 +59,7 @@ namespace cluster{
     // Make default values
     // Is done by the struct
     if(!(inhitlist.size())) {
+      return -1;
       throw CRUException("Provided empty hit list!");
       return -1;
     }
@@ -1559,7 +1560,7 @@ namespace cluster{
   } //end RefineDirection
   
 
-  void ClusterParamsAlg::FillPolygon()
+  void ClusterParamsAlg::FillPolygon(double frac)
   {
 
     TStopwatch localWatch;
@@ -1567,7 +1568,7 @@ namespace cluster{
 
     if(fHitVector.size()) {
       std::vector<const larutil::PxHit*> container_polygon;
-      fGSer->SelectPolygonHitList(fHitVector,container_polygon);
+      fGSer->SelectPolygonHitList(fHitVector,container_polygon,frac);
       //now making Polygon Object
       std::pair<float,float> tmpvertex;
       //make Polygon Object as in mac/PolyOverlap.cc

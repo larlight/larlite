@@ -26,6 +26,7 @@ namespace larlite {
   class event_hit;
   class hit;
   class event_track;
+  class event_trackmom;
   class event_mctruth;
   class event_gtruth;
   class event_mcpart;
@@ -511,6 +512,7 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_seed> () const;
   template<> data::DataType_t storage_manager::data_type<event_spacepoint> () const;
   template<> data::DataType_t storage_manager::data_type<event_track> () const;
+  template<> data::DataType_t storage_manager::data_type<event_trackmom> () const;
   template<> data::DataType_t storage_manager::data_type<event_shower> () const;
   template<> data::DataType_t storage_manager::data_type<event_vertex> () const;
   template<> data::DataType_t storage_manager::data_type<event_endpoint2d> () const;

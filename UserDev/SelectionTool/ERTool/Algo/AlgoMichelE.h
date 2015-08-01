@@ -52,12 +52,32 @@ namespace ertool {
 
     /// Function to evaluate input showers and determine a score
     bool Reconstruct(const EventData &data, ParticleGraph& graph);
+
+    /// Function to set minumum required length for a muon track
+    void setMinMuonLength(double l) { _minMuonLength = l; }
+
+    /// Function to set the maximum allowed muon-michel separation
+    void setMaxDistance(double d) { _maxDistance = d; }
+
+    /// set verbosity flag
+    void setVerbose(bool on) { _verbose = on; }
     
   protected:
     
+    // Instance of EMPart Algorithm
     AlgoEMPart _alg_emp;
+
+    // histograms to be filled in Algo
     TH1F* michel_energy;
     TH1F* shower_st_to_track_end;
+
+    // cut values that are settable by user
+    double _minMuonLength;
+    double _maxDistance;
+
+    // verbosity flag
+    bool _verbose;
+
   };
 }
 #endif

@@ -213,11 +213,11 @@ namespace ertool {
 	}
       }
 
-
+      /*
       // Try and remove any shower that is on top of a track
       // this could be due to a track mis-reconstructed as a 
       // shower.
-      /*
+
       for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
 	
 	auto const& track = datacpy.Track(graph.GetParticle(t).RecoID());
@@ -236,6 +236,7 @@ namespace ertool {
 	  single = false;
       }
       */
+
       // if still single (and no sister track) look at
       // dEdx to determine if e-like
       if (single && !_hassister){
@@ -276,14 +277,14 @@ namespace ertool {
 
 	// Now look for all potential siblins
 	// using AlgoFindRelationship
-	for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
+	for (auto const& t : graph.GetPrimaryNodes(RecoType_t::kTrack)){
 	  
 	  auto const& track = datacpy.Track(graph.GetParticle(t).RecoID());
 	  // make sure track has a length of at least 0.3 cm (wire spacing)
 	  // greater longer than 3 mm
 	  if (track.Length() < 0.3)
 	    continue;
-	  
+
 	  ::geoalgo::Point_t vtx(3);
 	  double score = -1;
 	  auto const& rel = _findRel.FindRelation(thisShower,track,vtx,score);
@@ -292,6 +293,9 @@ namespace ertool {
 	      auto &trackParticle = graph.GetParticle(t);
 	      // if not primary according to primary finder -> don't add
 	      if (!trackParticle.Primary())
+		continue;
+	      // does this node already have a parent? if so ignore
+	      if (trackParticle.Descendant())
 		continue;
 	      // track deposited energy
 	      double Edep = track._energy;
@@ -302,9 +306,11 @@ namespace ertool {
 	      geoalgo::Vector_t Mom = Dir * ( sqrt( Edep * (Edep+2*mass) ) );
 	      trackParticle.SetParticleInfo(_findRel.GetPDG(track),mass,track[0],Mom);
 	      neutrinoMom += sqrt( Edep * ( Edep + 2*mass ) );
+	      std::cout << "setting parentage for sibling track..." << std::endl;
 	      graph.SetParentage(neutrino.ID(),t);
-	    }
-	}
+	    } // if the track was found to be a sibling of the electron shower
+	} // loop over all track to add siblings to particle graph
+
 	::geoalgo::Vector_t momdir(0,0,1);
 
 	neutrino.SetParticleInfo(12,0.,thisShower.Start(),momdir*neutrinoMom);

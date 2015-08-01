@@ -19,12 +19,21 @@
 #include <deque>
 namespace ertool {
   class Manager;
-  
+  namespace io {
+    class IOHandler;
+    class EmptyInput;
+  }
+}
+
+namespace ertool {
+
   class ParticleGraph {
     friend class Manager;
+    friend class io::IOHandler;
+    friend class io::EmptyInput;
   public:
     
-    ParticleGraph() {}
+    ParticleGraph() : _particle_v() {}
 
     Particle& CreateParticle();
     Particle& GetParticle(const NodeID_t id);

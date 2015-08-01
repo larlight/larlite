@@ -17,6 +17,16 @@ namespace ertool {
     _track_v.clear();
     _shower_id_v.clear();
     _track_id_v.clear();
+    _event_id = _run = _subrun = kUINT_MAX;
+  }
+  
+  void EventData::SetID(unsigned int evID,
+			unsigned int runID,
+			unsigned int subrunID)
+  {
+    _event_id = evID;
+    _run      = runID;
+    _subrun   = subrunID;
   }
 
   const Shower& EventData::Shower (const RecoID_t& id) const
