@@ -150,7 +150,7 @@ def getPolyOverlap():
 
     merger_instance.GetManager().MergeTillConverge(False)
     merger_instance.GetManager().AddMergeAlgo(algo_array)
-    merger_instance.GetManager().AddSeparateAlgo(prohib_array)
+#    merger_instance.GetManager().AddSeparateAlgo(prohib_array)
     return merger_instance
 
 
@@ -172,6 +172,17 @@ def getPolyShortestDist():
 
     merger_instance.GetManager().MergeTillConverge(False)
     merger_instance.GetManager().AddMergeAlgo(algo_array)
-    merger_instance.GetManager().MergeTillConverge(True)
+    merger_instance.GetManager().MergeTillConverge(False)
 
     return merger_instance
+
+
+def getNickiePoly():
+    merger_instance = larlite.ClusterMerger()
+    algo_array = cmtool.CBAlgoArray()
+
+    nickiePoly = cmtool.CBAlgoMergeStartToEnd()
+    algo_array.AddAlgo(nickiePoly,False)
+
+    merger_instance.GetManager().MergeTillConverge(False)
+    merger_instance.GetManager().AddMergeAlgo(algo_array)
