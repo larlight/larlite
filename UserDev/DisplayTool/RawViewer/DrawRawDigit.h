@@ -19,6 +19,16 @@
 #include "LArUtil/Geometry.h"
 #include "RawBase.h"
 
+struct _object;
+typedef _object PyObject;
+
+#ifndef __CINT__
+#include "Python.h"
+#include "numpy/arrayobject.h"
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#endif
+
+
 namespace evd {
   /**
      \class DrawRawDigit
@@ -50,6 +60,13 @@ namespace evd {
     virtual bool finalize();
 
 
+    PyObject * getNumpyByPlane(unsigned int p);
+
+  private:
+
+    std::vector<PyObject *> numpyPlanes;
+
+    std::vector<std::vector<float > > planeData;
   };
 }
 #endif

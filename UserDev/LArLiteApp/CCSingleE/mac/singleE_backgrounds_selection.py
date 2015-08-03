@@ -26,16 +26,11 @@ my_proc.enable_filter(True)
 my_algo = GetCCSingleEInstance()
 my_algo.setVerbose(False)
 
-# primary finder algorithm
 primary_algo = ertool.AlgoPrimaryFinder()
 primary_algo.setVtxToTrkStartDist(1)
 primary_algo.setVtxToTrkDist(1)
 primary_algo.setVtxToShrStartDist(50)
 primary_algo.setMaxIP(1)
-
-# track PID algorithm
-pid_algo = ertool.ERAlgoTrackPid()
-pid_algo.setVerbose(False)
 
 # Create ERTool filter
 # This filter removes any track that
@@ -69,7 +64,7 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
-my_proc.set_ana_output_file("singleE_selection.root")
+my_proc.set_ana_output_file("singleE_backgrounds_selection.root")
 
 # here set E-cut for Helper & Ana modules
 #This cut is applied in helper... ertool showers are not made if the energy of mcshower or reco shower
@@ -77,13 +72,12 @@ my_proc.set_ana_output_file("singleE_selection.root")
 #Do not change this value unless you know what you are doing.
 Ecut = 20 # in MeV
 
-my_ana = ertool.ERAnaSingleE()
+my_ana = ertool.ERAnaBackgroundsSingleE()
 my_ana.SetDebug(False)
 my_ana.SetECut(Ecut)
 
 my_anaunit = fmwk.ExampleERSelection()
 my_anaunit._mgr.AddAlgo(primary_algo)
-my_anaunit._mgr.AddAlgo(pid_algo)
 my_anaunit._mgr.AddAlgo(my_algo)
 my_anaunit._mgr.AddAna(my_ana)
 #my_anaunit._mgr.AddCfgFile('new_empart.txt')

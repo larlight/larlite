@@ -213,30 +213,6 @@ namespace ertool {
 	}
       }
 
-      /*
-      // Try and remove any shower that is on top of a track
-      // this could be due to a track mis-reconstructed as a 
-      // shower.
-
-      for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
-	
-	auto const& track = datacpy.Track(graph.GetParticle(t).RecoID());
-	
-	// check if track and shower start points are close
-	if (thisShower.Start().Dist(track[0]) > 1 )
-	  continue;
-	// if their start point is very close:
-	// calculate a stupid track direction
-	size_t nsteps = track.size();
-	::geoalgo::Vector_t trackDir = track[int(nsteps/2.)]-track[0];
-	trackDir.Normalize();
-	// get dot product
-	double dot = thisShower.Dir()*trackDir;
-	if (dot > 0.9)
-	  single = false;
-      }
-      */
-
       // if still single (and no sister track) look at
       // dEdx to determine if e-like
       if (single && !_hassister){
@@ -306,7 +282,7 @@ namespace ertool {
 	      geoalgo::Vector_t Mom = Dir * ( sqrt( Edep * (Edep+2*mass) ) );
 	      trackParticle.SetParticleInfo(_findRel.GetPDG(track),mass,track[0],Mom);
 	      neutrinoMom += sqrt( Edep * ( Edep + 2*mass ) );
-	      std::cout << "setting parentage for sibling track..." << std::endl;
+	      //std::cout << "setting parentage for sibling track..." << std::endl;
 	      graph.SetParentage(neutrino.ID(),t);
 	    } // if the track was found to be a sibling of the electron shower
 	} // loop over all track to add siblings to particle graph
