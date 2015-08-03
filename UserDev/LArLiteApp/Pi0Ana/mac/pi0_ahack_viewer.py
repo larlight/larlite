@@ -47,8 +47,8 @@ my_algo2.setVtxToShrStartDist(1)
 my_algo2.setMaxIP(5)
 
 my_algo3 = ertool.ERAlgoPrimaryPi0()
-my_algo3.SetMinDistVtx(8.9)
-my_algo3.SetMinDistEnd(8.9)
+my_algo3.SetMinDistVtx(7)
+my_algo3.SetMinDistEnd(7)
 my_algo3.SetVerbose(True)
 
 # First lets make a filter that looks for a certain events
@@ -59,7 +59,9 @@ pi0_topo.SetTopology(1)
 pi0_topo.SignalTopology(1)
 # 0 == CC 1 == NC 
 pi0_topo.SetCCNC(1)
-pi0_topo.SetFVCut(17)
+pi0_topo.SetFVCut(0)
+pi0_topo.SetEnergyCut(20);
+pi0_topo.SetContainment(0.0);
 
 
 # Create ERTool filter
@@ -108,6 +110,7 @@ my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetShowerProducer(False,"newdefaultreco");
 #my_anaunit.SetShowerProducer(True,"mcreco");
 #my_anaunit.SetShowerProducer(False,"showerreco");
+#my_anaunit.SetShowerProducer(False,"showerrecofuzzy");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 # ************************************************

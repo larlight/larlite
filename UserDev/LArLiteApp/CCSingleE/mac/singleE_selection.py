@@ -32,18 +32,6 @@ primary_algo.setVtxToTrkDist(1)
 primary_algo.setVtxToShrStartDist(50)
 primary_algo.setMaxIP(1)
 
-
-# Pi0 Algo
-#pi0_algo = ertool.AlgoPi0()
-#pi0_algo.setVerbose(False)
-#pi0_algo.setMinShrEnergy(0)
-#pi0_algo.setMaxShrEnergy(1000)
-#pi0_algo.setIPMax(10)
-#pi0_algo.setMinFitMass(50)
-#pi0_algo.setMaxFitMass(200)
-#pi0_algo.setAngleMax(3.14)
-
-
 # Create ERTool filter
 # This filter removes any track that
 # is less than 3 mm in length

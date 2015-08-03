@@ -6,23 +6,16 @@ authors : Brooke Russell, brooke.russell@yale.edu
 	  Joseph Zennamo, jzennamo@uchicago.edu
 */
 
-/* ITEMS TO BE IMPLEMENTED (BR):
-(1) iteratively loop thru tracks to form the most tightly bound --
-based on impact parameter between each track
-(2) check that all track endpoints are inside this sphere
-(3) loop for showers which meet "halfline impact parameter" 
-requirements with the center of this sphere
-(4) also loop for showers which have a reasonable impact parameter
-with initial shower
-(5) develop chi^2 handle to determine which spheres are most highly
-associated with vertex of event and which can be discarded
-(6) fill histos & include more branches of interest
+/*
+Ongoing implementation:
+--- directionality of cones associated with showers 
+and corresponding cut on cones which do not subtend
+event vertex
+--- chi^2 to choose from vertex candididates for 
+event vertex AND chi^2 metric for shower assocition 
+with event vertex
+--- particle graph
 */
-
-
-
-
-
 
 #ifndef ERTOOL_ALGOSINGLEGAMMA_CXX
 #define ERTOOL_ALGOSINGLEGAMMA_CXX
@@ -42,7 +35,6 @@ namespace ertool {
     , _empart_tree(nullptr)
     , _alg_tree(nullptr)
     , _hRadius(nullptr)
-    , _IPi(nullptr)
     , _IPj(nullptr)
     , _IPsn(nullptr)
   {
@@ -81,6 +73,28 @@ namespace ertool {
     
     if (_alg_tree) { delete _alg_tree; }
     _alg_tree = new TTree("_alg_tree","Algo SingleGamma Tree");
+    /* ------------ */
+    _alg_tree->Branch("_ThsShwrThsTrk",&_ThsShwrThsTrk,"_ThsShwrThsTrk/D");
+    _alg_tree->Branch("_ThsShwrE",&_ThsShwrE,"_ThsShwrE/D");
+    _alg_tree->Branch("_dedxThsShwr",&_dedxThsShwr,"_dedxThsShwr/D");
+    _alg_tree->Branch("_ThsTrkE",&_ThsTrkE,"_ThsTrkE/D");
+    _alg_tree->Branch("_IPst",&_IPst,"_IPst/D");
+    _alg_tree->Branch("_IPstThsShwrSt",&_IPstThsShwrSt,"_IPstThsShwrSt/D");
+    _alg_tree->Branch("_IPstThsTrkSt", &_IPstThsTrkSt,"_IPstThsTrkSt/D");
+    _alg_tree->Branch("_IPstThsTrkBody", &_IPstThsTrkBody,"_IPstThsTrkBody/D");
+    /* ------------ */
+    _alg_tree->Branch("_ThsTrkOthTrk",&_ThsTrkOthTrk,"_ThsTrkOthTrk/D");
+    _alg_tree->Branch("_OthTrkE",&_OthTrkE,"_OthTrkE/D");
+    _alg_tree->Branch("_IPtt",&_IPtt,"IPtt/D");
+    _alg_tree->Branch("_IPttOthTrkSt",&_IPttOthTrkSt,"_IPttOthTrkSt/D");
+    _alg_tree->Branch("_IPttOthTrkBody",&_IPttOthTrkBody,"_IPttOthTrkBody/D");
+    /* ------------ */
+    _alg_tree->Branch("_ThsShwrOthShwr",&_ThsShwrOthShwr,"_ThsShwrOthShwr/D");
+    _alg_tree->Branch("_OthShwrE",&_OthShwrE,"_OthShwrE/D");
+    _alg_tree->Branch("_dedxOthShwr",&_dedxOthShwr,"_dedxOthShwr/D");
+    _alg_tree->Branch("_IPss",&_IPss,"_IPss/D");
+    _alg_tree->Branch("_IPssOthShwrSt",&_IPssOthShwrSt,"_IPssOthShwrSt/D");
+    /* ------------ */
     _alg_tree->Branch("_E",&_E,"_E/D");
     _alg_tree->Branch("_PDG",&_PDG,"PDG/I");
     _alg_tree->Branch("_VsTrack",&_VsTrack,"_VsTrack/I");
@@ -105,8 +119,8 @@ namespace ertool {
     //    if(_hRadius)
     //_hRadius = new TH1D("_hRadius","_hRadius",1000,0,100);
 
-    //if(_IPi)
-    //_IPi = new TH1D("_IPi","_IPi",200,0,20);
+    //if(_IPst)
+    //_IPst = new TH1D("_IPi","_IPi",200,0,20);
 
     //if(_IPj)
     //_IPj = new TH1D("_IPj","_IPj",200,0,20);
@@ -134,81 +148,92 @@ namespace ertool {
     
     std::vector<int> showers_counted;
     std::vector<int> tracks_counted;
+    std::vector<int> other_tracks_counted;
+    std::vector<int> other_showers_counted;
+    std::vector<int> pi0s_counted;
 
-    /// loop thru particles associated with a shower object
     for (auto const& s : graph.GetParticleNodes(RecoType_t::kShower))
       {
-	auto const& thisShower = datacpy.Shower(graph.GetParticle(s).RecoID());
+	auto const& thisID = graph.GetParticle(s).RecoID();
+	auto const& thisShower = datacpy.Shower(thisID);
+	auto const& thisParent = graph.GetParticle(s).Parent();
 
-	/// check to make sure the shower has not
-	/// already been added to a particle graph
-	if(std::find(std::begin(showers_counted),
-		       std::end(showers_counted),s)
-	   != std::end(showers_counted))
+	/*only consider showers that have either 
+	  not been assessed or are Pi0 children*/
+	if(graph.GetParticle(s).RelationAssessed())
 	  {
-	    continue;
+	    if(graph.GetParticle(thisParent).PdgCode() != 111)
+	      { continue; }
 	  }
-
-	/// mark this shower as counted
-	showers_counted.push_back(s);
 	
+	/// disregard showers which are below energy threshold
 	if(thisShower._energy < _Ethreshold)
-	  {
-	    continue;
-	  }
+	  { continue; }
+		
+	NodeID_t parent_track = -1;
+	int parent_track_counter = 0;
 	
+<<<<<<< HEAD
+=======
 	geoalgo::Point_t vtx_s(3);
 
         NodeID_t parent_track = -1;
 	int parent_track_counter = 0;
 	
       	/// loop thru particles associated with a track object
+>>>>>>> bc605cdb13ab2ca0add2e2556a842186d51405ad
 	for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack))
 	  {
 	    auto const& thisTrack = datacpy.Track(graph.GetParticle(t).RecoID());
+	    if(graph.GetParticle(t).RelationAssessed())
+	      { continue; }
 
-	    if(std::find(std::begin(tracks_counted),
-			 std::end(tracks_counted),t)
-	       != std::end(tracks_counted))
-	      {
-		continue;
-	      }
-
-	    tracks_counted.push_back(t);
-	      
-	    /// disregard tracks that are two short to be resolved
+	    /// disregard tracks that are too short to be resolved
 	    if(thisTrack.size() < 2)
-	      {
-		continue;
-	      }
-	      	     
-	    geoalgo::Point_t vtx_t(3);
+	      { continue; }
 
-	    /// define a vector of vertices
-	    std::cout << "1" << std::endl;
-	    std::vector<::geoalgo::Point_t> pts = {vtx_t};
-	    pts.clear();
-	    pts.push_back(vtx_t);
-	    std::cout << "1end" << std::endl;
-	      
+	    std::vector<::geoalgo::Vector> vrtThsShwrThsTrk;
+	    std::vector<::geoalgo::Vector> vrtThsTrkOthTrk;
+	    geoalgo::Vector vtx_st(0,0,0);
+	    geoalgo::Vector vtx_tt(0,0,0);
+	    
 	    /// determine the impact parameter
+<<<<<<< HEAD
+	    /// between this shower and this track
+	    double IPst = _findRel.FindClosestApproach(thisShower,
+							thisTrack,
+							vtx_st);
+
+	    if (IPst > _maxIP)
+	      {	continue; }
+=======
 	    /// between the shower and this track
 	    double IPi = _findRel.FindClosestApproach(thisShower,
 						      thisTrack,
 						      vtx_s);
+>>>>>>> bc605cdb13ab2ca0add2e2556a842186d51405ad
 
-	    std::vector<double> impactPst;
-	    impactPst.push_back(IPi);
+	    vrtThsShwrThsTrk.push_back(vtx_st);
+	    vrtThsTrkOthTrk.push_back(vtx_st);
 	    
-	    if (IPi < _maxIP)
-	      {
-		//_IPi->Fill(IPi);
-		continue;
-	      }
-	  
+	    _ThsShwrThsTrk = 1;
+	    _ThsShwrE = thisShower._energy;
+	    _dedxThsShwr = thisShower._dedx;
+	    _ThsTrkE = thisTrack._energy;
+	    _IPst = IPst;
+	    _IPstThsShwrSt = vtx_st.Dist(thisShower.Start()); // rad. length
+	    _IPstThsTrkSt = vtx_st.Dist(thisTrack.front());
+	    _IPstThsTrkBody = sqrt(_geoAlgo.SqDist(vtx_st,thisTrack));
+	    _alg_tree->Fill();
+	    
 	    /// calculate distance between shower start point
 	    /// and impact parameter mid point
 	    auto const& thisShwrStart = thisShower.Start();
+<<<<<<< HEAD
+	    double distst = thisShwrStart.Dist(vtx_st);
+
+	    if(parent_track_counter < 1)
+=======
 	    double disti = thisShwrStart.Dist(vtx_s);
 	    
 	    if(parent_track_counter < 1) {
@@ -234,30 +259,35 @@ namespace ertool {
 	    
 	    /// loop thru particles associated with a track but not "this" track
 	    for (auto const& tr : graph.GetParticleNodes(RecoType_t::kTrack))
+>>>>>>> bc605cdb13ab2ca0add2e2556a842186d51405ad
+	      {
+		if(vtx_st.Dist(thisTrack.front()) > _vtxToTrkStartDist &&
+		   IPst / 2 < _vtxToTrkDist &&
+		   distst < _vtxToShrStartDist)
+		  {
+		    parent_track_counter++;
+		    if( _alg_emp.LL(false,thisShower._dedx,distst) >
+			_alg_emp.LL(true,thisShower._dedx,distst))
+		      { parent_track = t; }
+		  }
+	      }
+
+	    for (auto const& tr : graph.GetParticleNodes(RecoType_t::kTrack))
 	      {
 		auto const& otherTrack =
 		  datacpy.Track(graph.GetParticle(tr).RecoID());
-
-		if(std::find(std::begin(tracks_counted),
-			     std::end(tracks_counted),tr)
-		   != std::end(tracks_counted))
-		  {
-		    continue;
-		  }
-
-		otherTracksCounted.push_back(tr);
-		
+		if(graph.GetParticle(tr).RelationAssessed())
+		  { continue; }
 		if(otherTrack.size() < 2)
-		  {
-		    continue;
-		  }
-
-		geoalgo::Point_t vtx_tr(3);
+		  { continue; }
 		
-	        pts.push_back(vtx_tr);
-
-		double IPj = _findRel.FindClosestApproach(thisTrack,
+		double IPtt = _findRel.FindClosestApproach(thisTrack,
 							  otherTrack,
+<<<<<<< HEAD
+							  vtx_tt);
+		if (IPtt > _maxIP)
+		  { continue; }
+=======
 							  vtx_tr
 							 );
 		if (IPj < _maxIP)
@@ -295,75 +325,139 @@ namespace ertool {
 		
 		std::vector<double> impactPtt;
 		impactPtt.push_back(IPj);
+>>>>>>> bc605cdb13ab2ca0add2e2556a842186d51405ad
 
-		if (impactPtt.size() < 4)
+		if(parent_track_counter < 1)
 		  {
-		    continue;
+		    geoalgo::Point_t vtx_so(3);
+		    double IPso = _findRel.FindClosestApproach(thisShower,
+							       otherTrack,
+							       vtx_so);
+		    double distso = thisShower.Start().Dist(vtx_so);
+		    if(vtx_so.Dist(thisTrack.front()) > _vtxToTrkStartDist &&
+				   IPso / 2 < _vtxToTrkDist &&
+				   distso < _vtxToShrStartDist)
+		      { parent_track_counter++; }
+		    if(_alg_emp.LL(false,thisShower._dedx,distso) >
+		       _alg_emp.LL(true,thisShower._dedx,distso))
+		      { parent_track = t; }
 		  }
-		  
+	
+		vtx_tt = otherTrack.front();
+		vrtThsTrkOthTrk.push_back(vtx_tt);
+
+		// TEMPORARY placement
+		if(vrtThsTrkOthTrk.size()>4)
+		  {continue;}
+		
 		/// construct a sphere with minimum radius
 		/// bounded by the common track vertices
-		std::cout << "calling sphere" << std::endl;
-		::geoalgo::Sphere s(pts);
-		std::cout << "called sphere" << std::endl;
-
-	        if(s.Radius() < _maxIP)
+		::geoalgo::Sphere s(vrtThsTrkOthTrk);
+		if(s.Radius() > _maxIP)
 		  {
-		    _hRadius->Fill(s.Radius());
+		    vrtThsTrkOthTrk.pop_back();
 		    continue;
 		  }
 
+		_ThsTrkOthTrk = 1;
+		_OthTrkE = otherTrack._energy;
+		_IPtt = IPtt;
+		_IPttOthTrkSt = vtx_tt.Dist(otherTrack.front());
+		_IPttOthTrkBody = sqrt(_geoAlgo.SqDist(vtx_tt,otherTrack));
+		_alg_tree->Fill();
+
+		///COMPUTE CANDIDATE VERTEX CHI^2 HERE!!!
+		
+		/// radiation length: distance between the center
+		/// of the sphere and the shower start point
 		double disto = thisShwrStart.Dist(s.Center());
-				
-		if (_alg_emp.LL(false,thisShower._dedx,disto) >
-		    (_alg_emp.LL(true,thisShower._dedx,disto)))
-	          {
-		    continue;
-		  }
+
+		if (_alg_emp.LL(true,thisShower._dedx,disto) >
+		    (_alg_emp.LL(false,thisShower._dedx,disto)))
+	          { continue; }
 		std::cout << "fff" << std::endl;
-		/// loop the particles associated with a shower object
+
 		for (auto const& sn : graph.GetParticleNodes(RecoType_t::kShower))
-		  {
-		    auto const& thatShower =
-		      datacpy.Shower(graph.GetParticle(sn).RecoID());
+		{
+		  auto const& otherShower =
+		    datacpy.Shower(graph.GetParticle(sn).RecoID());
+		  if (otherShower._energy < _Ethreshold)
+			{ continue; }
+		  std::cout << "eee" << std::endl;
+		  if (graph.GetParticle(sn).RelationAssessed())
+		    {
+		      if (graph.GetParticle(thisParent).PdgCode() != 111)
+			  { continue; }
+		    } 
+		  std::cout << "ddd" << std::endl;
 
-		    if (thatShower._energy < _Ethreshold)
-			{
-			  continue;
-			}
-		    std::cout << "eee" << std::endl;
-		    if(std::find(std::begin(showers_counted),
-				 std::end(showers_counted),sn)
-		       != std::end(showers_counted))
-		       {
-			 continue;
-		       }
-		    std::cout << "ddd" << std::endl;
- 		    geoalgo::Point_t vtx_sn(3);
+		  std::vector<::geoalgo::Vector> vrtThsShwrOthShwr;
+		  //geoalgo::Vector vtx_ss(0,0,0);
+		  geoalgo::Point_t vtx_ss(3);
+		  
+		  double IPss = _findRel.FindClosestApproach(thisShower,
+							     otherShower,
+							     vtx_ss);
+		    if(IPss > _maxIP)
+		      { continue; }
+
+		    //geoalgo::Vector dir = otherShower.Dir(vtx_ss);
+		    auto dir = otherShower.Dir();
+		    auto ln = otherShower.Length();
+		    auto radius = otherShower.Radius();
+		    geoalgo::Cone c(vtx_ss,dir,ln,radius);
+
+		    vrtThsShwrOthShwr.push_back(vtx_ss);
 		    
-		    double IPsn = _findRel.FindClosestApproach(thisShower,
-								thatShower,
-								vtx_sn);
-		    if(IPsn < _maxIP)
-		      {
-			//_IPsn->Fill(IPsn);
-			continue;
-		      }
-
 		      /// calculate the distance between that shower start
 		      /// point and the impact parameter mid point
-		      auto const& thatShwrStart = thatShower.Start();
-		      double dist_sn = thatShwrStart.Dist(vtx_sn);
-		    
-		      if (_alg_emp.LL(false,thatShower._dedx,dist_sn) >
-			  (_alg_emp.LL(true,thatShower._dedx,dist_sn)))
-			{
-			  continue;
-			}
+		      auto const& otherShwrStart = otherShower.Start();
+		      double dist_ss = otherShwrStart.Dist(vtx_ss);
+
+		      if (_alg_emp.LL(true,otherShower._dedx,dist_ss) >
+			  (_alg_emp.LL(false,otherShower._dedx,dist_ss)))
+			{ continue; }
 		      std::cout << "ccc" << std::endl;
-		  }
-	      }
+
+		      _ThsShwrOthShwr = 1;
+		      _OthShwrE = otherShower._energy;
+		      _dedxOthShwr = otherShower._dedx;
+		      _IPss = IPss;
+		      _IPssOthShwrSt = vtx_ss.Dist(otherShower.Start());
+		      _alg_tree->Fill();
+		} // <-- end for loop sn
+	      } // <-- end for loop tr
 	    std::cout << "bbb" << std::endl;
+<<<<<<< HEAD
+	  } // <-- end for loop t
+	if(parent_track != -1 && parent_track_counter == 1)
+	  {
+	    graph.SetParentage(parent_track, s);
+	    switch(graph.GetParticle(s).PdgCode())
+	      {
+	      case 22:
+		track_gamma++;
+		break;
+	      case 11:
+		track_elec++;
+		break;
+	      case -11:
+	        track_aelec++;
+		break;
+	      default:
+		std::cout << "Warning, shower pdg: "
+			  << graph.GetParticle(s).PdgCode() << "\n";
+	      } 
+	  } 
+	std::cout << "aaa" << std::endl;
+      } // <-- end for loop s
+    std::cout << graph.Diagram();
+    std::cout << "return.." << std::endl;
+    return true;
+  } // <-- end Reconstruct
+  void AlgoSingleGamma::ProcessEnd(TFile* fout)
+  {
+=======
 	  }
 
 	if(parent_track != -1 && parent_track_counter == 1) {
@@ -401,14 +495,17 @@ namespace ertool {
   void AlgoSingleGamma::ProcessEnd(TFile* fout)
   {
 
+>>>>>>> bc605cdb13ab2ca0add2e2556a842186d51405ad
     std::cout << "Track children identified as gammas:\n\tgamma: "
 	      << track_gamma << " "
 	      << " elec: " << track_elec
 	      << " aelec: " << track_aelec << "\n";
+<<<<<<< HEAD
+=======
     
+>>>>>>> bc605cdb13ab2ca0add2e2556a842186d51405ad
     return;
   }
-
 
 }
 #endif
