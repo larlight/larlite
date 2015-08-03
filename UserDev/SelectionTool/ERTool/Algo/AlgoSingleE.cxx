@@ -206,7 +206,7 @@ namespace ertool {
       // If single and there are "track-candidate-vertices" formed by 2 or more tracks
       // compare shower start distance to these vertices.
       // if more than some threshold not single
-      double distmin = 1036;
+      double distmin = 90;
       // get list of potential vertices that come from 2 or more objects
       // sharing a start point
       auto const& candidateVertices = _findRel.GetVertices(graph,2);
@@ -217,7 +217,7 @@ namespace ertool {
       }
 
       if ( single and !_hassister and (_vtxProximityCut != 0) ){
-	if ( (distmin != 1036) and (distmin > _vtxProximityCut) ){
+	if ( (distmin != 90) and (distmin > _vtxProximityCut) ){
 	  std::cout<<"3) Losing this shower because it's not close enough to the vdrtex of tracks" <<std::endl; 
 	  _three++;
 	  if(_verbose) { std::cout << "Trk-Vtx found @ distance of " << distmin << ". Shower not single!" << std::endl; }
