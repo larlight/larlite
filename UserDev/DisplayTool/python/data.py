@@ -134,9 +134,12 @@ class wire(dataBase):
     return d
 
   def getPlane(self,plane):
-    # a = np.array(self._c2p.Convert(self._process.getDataByPlane(plane)))
-    return np.array(self._c2p.Convert(self._process.getDataByPlane(plane)))
 
+    print "Called getPlane"
+    b = self._process.getNumpyByPlane(plane)
+    print type(b)
+    return b
+    
   def getWire(self, plane, wire):
     return np.array(self._c2p.Convert(self._process.getWireData(plane,wire)))
 

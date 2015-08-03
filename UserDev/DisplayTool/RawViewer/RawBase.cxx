@@ -8,6 +8,7 @@ namespace evd {
   RawBase::RawBase(){ 
     wiredata = new std::vector<std::vector<std::vector<float> > > ;
     geoService = larutil::Geometry::GetME();
+    std::cout << "Constructing." << std::endl;
   }
 
   RawBase::~RawBase(){ 
