@@ -11,11 +11,6 @@ for x in xrange(len(sys.argv)-2):
 
 #last arg should be output file name
 out_file = sys.argv[-1]
-if os.path.isfile(out_file):
-    print
-    print 'ERROR: output file already exist...'
-    print
-    sys.exit(0)
 
 mgr.set_output_file(out_file)
 
@@ -50,6 +45,7 @@ prevProducer = 'Step3PolyContain'
 mgr.add_process(polyContain)
 print "At this stage, producer is: ", prevProducer
 
+
 com = getCOM()
 com.SetInputProducer(prevProducer)
 com.SetOutputProducer('Step4CenterOfMass')
@@ -66,6 +62,8 @@ prevProducer = 'Step5PolyOverlap'
 mgr.add_process(polyOverlap)
 print "At this stage, producer is: ", prevProducer
 
+
+
 polyShortestDist = getPolyShortestDist()
 polyShortestDist.SetInputProducer(prevProducer)
 polyShortestDist.SetOutputProducer('Step6PolyShortDist')
@@ -74,6 +72,21 @@ prevProducer = 'Step6PolyShortDist'
 mgr.add_process(polyShortestDist)
 print "At this stage, producer is: ", prevProducer
 
+
+#nickiePoly = getNickiePoly()
+#nickiePoly.SetInputProducer(prevProducer)
+#nickiePoly.SetOutputProducer('Step7NickiePoly')
+#nickiePoly.SaveOutputCluster()
+#prevProducer = 'Step7NickiePoly'
+#mgr.add_process(nickiePoly)
+
+slope = getSlope()
+slope.SetInputProducer(prevProducer)
+slope.SetOutputProducer('Step7Slope')
+slope.SaveOutputCluster()
+prevProducer = 'Step7Slope'
+mgr.add_process(slope)
+print "At this stage, producer is: ", prevProducer
 
 
 
