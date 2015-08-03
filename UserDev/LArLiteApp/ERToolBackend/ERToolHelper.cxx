@@ -429,7 +429,7 @@ namespace larlite {
     }
 
 
-      std::cout<<"End of FillMCInfo: particle graph node size : "<<graph.GetParticleNodes(ertool::RecoType_t::kShower).size()<<std::endl ;
+    //std::cout<<"End of FillMCInfo: particle graph node size : "<<graph.GetParticleNodes(ertool::RecoType_t::kShower).size()<<std::endl ;
 
   }
 

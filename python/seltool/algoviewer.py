@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 plt.ion()
 
 def getViewer(name):
-    display = ERViewer()
-    display.set_window_title(name)
+    display = ERViewer(name)
+    #display.set_window_title(name)
     return display
 
 
