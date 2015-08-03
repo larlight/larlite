@@ -3,7 +3,7 @@ from ROOT import gSystem
 from ROOT import ertool
 from ROOT import larlite as fmwk
 from seltool.ccsingleeDef import GetCCSingleEInstance
-from seltool.algoviewer import viewAll
+from seltool.algoviewer import viewAll, getViewer
 
 if len(sys.argv) < 2:
     msg  = '\n'
@@ -81,6 +81,10 @@ my_proc.add_process(MCfilter)
 my_proc.add_process(my_anaunit)
 
 
+#create instance of mc and reco viewer
+mcviewer   = getViewer('mc info')
+recoviewer = getViewer('reco info')
+
 # Start event-by-event loop
 counter = 0
 while (counter < 11700):
@@ -96,7 +100,8 @@ while (counter < 11700):
     part_reco = my_anaunit.GetParticles()
     data_mc   = my_anaunit.GetData(True)
     part_mc   = my_anaunit.GetParticles(True)
-    viewAll(data_mc,part_mc,data_reco,part_reco)
+    viewAll(mcviewer,data_mc,part_mc,
+            recoviewer,data_reco,part_reco)
 
     #for x in xrange(part_mc.size()):
     #    print part_mc[x].Diagram()

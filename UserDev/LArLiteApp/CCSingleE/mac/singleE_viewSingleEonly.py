@@ -3,7 +3,7 @@ from ROOT import gSystem
 from ROOT import ertool
 from ROOT import larlite as fmwk
 from seltool.ccsingleeDef import GetCCSingleEInstance
-from seltool.algoviewer import viewAll
+from seltool.algoviewer import viewAll, getViewer
 
 if len(sys.argv) < 2:
     msg  = '\n'
@@ -74,6 +74,10 @@ my_proc.add_process(MCfilter)
 my_proc.add_process(my_anaunit)
 
 
+#create instance of mc and reco viewer
+mcviewer   = getViwer('mc info')
+recoviewer = getViewer('reco info')
+
 # Start event-by-event loop
 counter = 0
 while (my_proc.process_event(counter)):
@@ -101,7 +105,8 @@ while (my_proc.process_event(counter)):
         part_mc   = my_anaunit.GetParticles(True)
         print "Processing event {0}".format(counter) 
         # get objets and display
-        viewAll(data_mc,part_mc,data_reco,part_reco)
+        viewAll(mcviewer,data_mc,part_mc,
+                recoviewer,data_reco,part_reco)
 
         try:
             counter = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
