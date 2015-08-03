@@ -12,6 +12,8 @@ if len(sys.argv) < 2:
 
 # Create algorithm
 
+my_algo0 = ertool.ERAlgoTrackPid()
+
 my_algo = ertool.AlgoPi0()
 my_algo.setVerbose(False)
 #my_algo.setMinShrEnergy(10)
@@ -21,8 +23,6 @@ my_algo.setIPMax(10)
 my_algo.setMinFitMass(50)
 my_algo.setMaxFitMass(200)
 my_algo.setAngleMax(3.14)
-
-
 
 my_algo2 = ertool.AlgoPrimaryFinder()
 my_algo2.setVtxToTrkStartDist(1)
@@ -54,10 +54,11 @@ pi0_topo.SignalTopology(1);
 pi0_topo.SetCCNC(1);
 pi0_topo.SetFVCut(0) #17);
 pi0_topo.SetEnergyCut(0) #20);
-pi0_topo.SetContainment(0) #0.05);
+pi0_topo.SetContainment(0) #.05);
 
 
 my_anaunit._mgr.AddAna(my_ana)
+my_anaunit._mgr.AddAlgo(my_algo0)
 my_anaunit._mgr.AddAlgo(my_algo)
 my_anaunit._mgr.AddAlgo(my_algo2)
 my_anaunit._mgr.AddAlgo(my_algo3)

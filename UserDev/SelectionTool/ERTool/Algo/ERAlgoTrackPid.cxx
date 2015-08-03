@@ -12,7 +12,7 @@ namespace ertool {
     // histogram to hold the energy of each reconstructed michel electron
     
     // set verbosity to be off by default
-    _verbose = true;
+    _verbose = false;
   }
 
   void ERAlgoTrackPid::Reset()
@@ -109,7 +109,7 @@ namespace ertool {
 
       double Energy = sqrt(Mom*Mom + mass*mass);
 
-      std::cout<<"I found a track!!!\n I assigned the PdgCode for its particle to be "<<Pdg  <<" \n";
+//      std::cout<<"I found a track!!!\n I assigned the PdgCode for its particle to be "<<Pdg  <<" \n";
       if (_verbose){
 	std::cout<<"Edep  .............. "<<Edep      <<" \n";
 	std::cout<<"lenght.............. "<<lenght    <<" \n";
