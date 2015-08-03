@@ -173,15 +173,6 @@ namespace ertool {
 	NodeID_t parent_track = -1;
 	int parent_track_counter = 0;
 	
-<<<<<<< HEAD
-=======
-	geoalgo::Point_t vtx_s(3);
-
-        NodeID_t parent_track = -1;
-	int parent_track_counter = 0;
-	
-      	/// loop thru particles associated with a track object
->>>>>>> bc605cdb13ab2ca0add2e2556a842186d51405ad
 	for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack))
 	  {
 	    auto const& thisTrack = datacpy.Track(graph.GetParticle(t).RecoID());
@@ -198,7 +189,6 @@ namespace ertool {
 	    geoalgo::Vector vtx_tt(0,0,0);
 	    
 	    /// determine the impact parameter
-<<<<<<< HEAD
 	    /// between this shower and this track
 	    double IPst = _findRel.FindClosestApproach(thisShower,
 							thisTrack,
@@ -206,12 +196,6 @@ namespace ertool {
 
 	    if (IPst > _maxIP)
 	      {	continue; }
-=======
-	    /// between the shower and this track
-	    double IPi = _findRel.FindClosestApproach(thisShower,
-						      thisTrack,
-						      vtx_s);
->>>>>>> bc605cdb13ab2ca0add2e2556a842186d51405ad
 
 	    vrtThsShwrThsTrk.push_back(vtx_st);
 	    vrtThsTrkOthTrk.push_back(vtx_st);
@@ -229,37 +213,9 @@ namespace ertool {
 	    /// calculate distance between shower start point
 	    /// and impact parameter mid point
 	    auto const& thisShwrStart = thisShower.Start();
-<<<<<<< HEAD
 	    double distst = thisShwrStart.Dist(vtx_st);
 
 	    if(parent_track_counter < 1)
-=======
-	    double disti = thisShwrStart.Dist(vtx_s);
-	    
-	    if(parent_track_counter < 1) {
-
-	      if(vtx_s.Dist(thisTrack.front()) > _vtxToTrkStartDist &&
-		 IPi / 2 < _vtxToTrkDist &&
-		 disti < _vtxToShrStartDist) {
-
-		parent_track_counter++;
-		
-		if( _alg_emp.LL(false,thisShower._dedx,disti) >
-		    _alg_emp.LL(true,thisShower._dedx,disti)) {
-		  
-		  parent_track = t;
-
-		}
-
-	      }
-
-	    }
-	    
-	    std::vector<int > otherTracksCounted;
-	    
-	    /// loop thru particles associated with a track but not "this" track
-	    for (auto const& tr : graph.GetParticleNodes(RecoType_t::kTrack))
->>>>>>> bc605cdb13ab2ca0add2e2556a842186d51405ad
 	      {
 		if(vtx_st.Dist(thisTrack.front()) > _vtxToTrkStartDist &&
 		   IPst / 2 < _vtxToTrkDist &&
@@ -283,49 +239,9 @@ namespace ertool {
 		
 		double IPtt = _findRel.FindClosestApproach(thisTrack,
 							  otherTrack,
-<<<<<<< HEAD
 							  vtx_tt);
 		if (IPtt > _maxIP)
 		  { continue; }
-=======
-							  vtx_tr
-							 );
-		if (IPj < _maxIP)
-		  {
-		    //_IPj->Fill(IPj);
-		    continue;
-		  }
-
-		if(parent_track_counter < 1) {
-
-		  geoalgo::Point_t vtx_so(3);
-		  
-		  double IPso = _findRel.FindClosestApproach(thisShower,
-							     otherTrack,
-							     vtx_so);
-
-		  double distso = thisShower.Start().Dist(vtx_so);
-		  
-		  if(vtx_so.Dist(thisTrack.front()) > _vtxToTrkStartDist &&
-		     IPso / 2 < _vtxToTrkDist &&
-		     distso < _vtxToShrStartDist) {
-
-		    parent_track_counter++;
-		    
-		    if(_alg_emp.LL(false,thisShower._dedx,distso) >
-		       _alg_emp.LL(true,thisShower._dedx,distso)) {
-		      
-		      parent_track = t;
-		      
-		    }
-		    
-		  }
-		  
-		}
-		
-		std::vector<double> impactPtt;
-		impactPtt.push_back(IPj);
->>>>>>> bc605cdb13ab2ca0add2e2556a842186d51405ad
 
 		if(parent_track_counter < 1)
 		  {
@@ -428,7 +344,6 @@ namespace ertool {
 		} // <-- end for loop sn
 	      } // <-- end for loop tr
 	    std::cout << "bbb" << std::endl;
-<<<<<<< HEAD
 	  } // <-- end for loop t
 	if(parent_track != -1 && parent_track_counter == 1)
 	  {
@@ -457,53 +372,11 @@ namespace ertool {
   } // <-- end Reconstruct
   void AlgoSingleGamma::ProcessEnd(TFile* fout)
   {
-=======
-	  }
-
-	if(parent_track != -1 && parent_track_counter == 1) {
-
-	  graph.SetParentage(parent_track, s);
-
-	  switch(graph.GetParticle(s).PdgCode()) { 
-
-	  case 22:
-	    track_gamma++;
-	    break;
-	  case 11:
-	    track_elec++;
-	    break;
-	  case -11:
-	    track_aelec++;
-	    break;
-	  default:
-	    std::cout << "Warning, shower pdg: "
-		      << graph.GetParticle(s).PdgCode() << "\n";
-	    
-	  }
-    
-	}
-	
-	std::cout << "aaa" << std::endl;
-      }
-
-    std::cout << graph.Diagram();
-    
-    std::cout << "return.." << std::endl;
-    return true;
-  }
-  
-  void AlgoSingleGamma::ProcessEnd(TFile* fout)
-  {
-
->>>>>>> bc605cdb13ab2ca0add2e2556a842186d51405ad
     std::cout << "Track children identified as gammas:\n\tgamma: "
 	      << track_gamma << " "
 	      << " elec: " << track_elec
 	      << " aelec: " << track_aelec << "\n";
-<<<<<<< HEAD
-=======
     
->>>>>>> bc605cdb13ab2ca0add2e2556a842186d51405ad
     return;
   }
 
