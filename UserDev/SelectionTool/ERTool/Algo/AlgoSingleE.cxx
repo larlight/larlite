@@ -306,7 +306,7 @@ namespace ertool {
 	      geoalgo::Vector_t Mom = Dir * ( sqrt( Edep * (Edep+2*mass) ) );
 	      trackParticle.SetParticleInfo(_findRel.GetPDG(track),mass,track[0],Mom);
 	      neutrinoMom += sqrt( Edep * ( Edep + 2*mass ) );
-	      std::cout << "setting parentage for sibling track..." << std::endl;
+	      //std::cout << "setting parentage for sibling track..." << std::endl;
 	      graph.SetParentage(neutrino.ID(),t);
 	    } // if the track was found to be a sibling of the electron shower
 	} // loop over all track to add siblings to particle graph
