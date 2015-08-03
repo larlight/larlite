@@ -25,6 +25,13 @@ namespace ertool {
     counter = 0;
     event_counter = 0;
     neutrino = 0;
+    _fv = 2.625;
+    edgeEvents = 0;
+    inside = true;
+    all_event_counter = 0;
+    positron_electron_events = 0;
+    ep_check = 0;
+    all_neutrino_events = 0;
   }
 
   void ERAnatestTree::Reset()
@@ -53,86 +60,120 @@ namespace ertool {
 
   bool ERAnatestTree::Analyze(const EventData &data, const ParticleGraph &ps)
   {
-    
-    event_counter++;
-    PrepareTTree() ;
-    auto const& mc_graph = MCParticleGraph();
-    
-     for (auto &p : mc_graph.GetParticleArray())
-      {
-        if (p.PdgCode() != 11) continue;
-	else {
-	  _xMC = p.Vertex()[0];
-	  //std::cout << "\n" << "\n";
-	  //std::cout << "*************************************" << "\n";
-	  //std::cout << "************ NEW SHOWER *************" << "\n";
-	  //std::cout << "*************************************" << "\n";
-	  //std::cout << "\n\n" << "The MC x coordinate is " << _xMC << "\n";
-	  _yMC = p.Vertex()[1];
-	  //std::cout << "The MC y coordinate is " << _yMC << "\n";
-	  _zMC = p.Vertex()[2];
-	  //std::cout << "The MC z coordinate is " << _zMC << "\n";
-	  _eMC = p.Energy();
-	  //std::cout << "The MC PDG is " << p.PdgCode() << "\n";
-	  //std::cout << "The MC energy is " << _eMC << " \n";
-	  _keMC = p.KineticEnergy();
-	  //std::cout << "The MC kinetic energy is " << _keMC << " \n";
-	  _mMC = p.Mass();
-	  //std::cout << "The MC mass is " << _mMC << " \n";
-	  _tree->Fill();
-	}
-      }
-
-     for (auto &p : ps.GetParticleArray())
-       {
-        if (p.PdgCode() != 11) continue;
+    all_event_counter++;
+    for (auto &p : ps.GetParticleArray())
+    {
+        if (abs(p.PdgCode()) != 11) continue;
 	else {
 	  _xReco = p.Vertex()[0];
-	  //std::cout << "*************************************" << "\n";
-	  //std::cout << "********* COMPARE WITH RECO *********" << "\n";
-	  //std::cout << "*************************************" << "\n";
-	  //std::cout << "The Reco x coordinate is " << _xReco << "\n";
 	  _yReco = p.Vertex()[1];
-	  //std::cout << "The Reco y coordinate is " << _yReco << "\n";
 	  _zReco = p.Vertex()[2];
-	  //std::cout << "The Reco z coordinate is " << _zReco << "\n";
-	  _eReco = p.Energy();
-	  //std::cout << "Reco PDG is " << p.PdgCode() << "\n";
-	  //std::cout << "The Reco energy is " << _eReco << " \n";
-	  _keReco = p.KineticEnergy();
-	  //std::cout << "The Reco kinetic energy is " << _keReco << " \n";
-	  _mReco = p.Mass();
-	  //std::cout << "The Reco mass is " << _mReco << " \n";
-	  _tree->Fill();
-	  counter++;
-	  //std::cout << "\n\n\n ";
 	}
+    }
+    ep_check = 0;
+    for (auto &p : ps.GetParticleArray()){
+      if (abs(p.PdgCode()) == 11) {ep_check++;}
+    }
+    for (auto &p : ps.GetParticleArray()){
+      if (abs(p.PdgCode()) == 12 && ep_check < 2) {all_neutrino_events++;}
+    }
+   
+    if( _xReco < _fv || _xReco > (45 - _fv) || _yReco < (-20 + _fv) || _yReco > (20 - _fv) || _zReco < _fv || _zReco > (90 - _fv) ) {
+      edgeEvents++;
+      std::cout << "edge event!\n";
+      if (_xReco < _fv || _xReco > (45 - _fv)){
+	std::cout << "problem in the x coordinate! x = " << _xReco << "\n\n";
+      }
+      if (_yReco < (-20 + _fv) || _yReco > (20 - _fv)){
+	std::cout << "problem in the y coordinate! y = " << _yReco << "\n\n";
+      }
+      if (_zReco < _fv || _zReco > (90 - _fv)){
+	std::cout << "problem in the z coordinate! z = " << _zReco << "\n\n";
+      }
+    }
+    else {
+      event_counter++;
+      PrepareTTree() ;
 
+      std::cout << "**************EVENT "<< event_counter << "******************\n";
+      for (auto &p : ps.GetParticleArray())
+      {
+        if (abs(p.PdgCode()) != 11) continue;
+	else {
+	  _xReco = p.Vertex()[0];
+	  std::cout << "Reco PDG is " << p.PdgCode() << "\n";
+	  std::cout << "The Reco x coordinate is " << _xReco << "\n";
+	  _yReco = p.Vertex()[1];
+	  std::cout << "The Reco y coordinate is " << _yReco << "\n";
+	  _zReco = p.Vertex()[2];
+	  std::cout << "The Reco z coordinate is " << _zReco << "\n";
+	  _tree->Fill();
+	  std::cout << "\n ";
+	}
+	  //if( _xReco < _fv || _xReco > (47 - _fv) || _yReco < (-20 + _fv) || _yReco > (20 - _fv) || _zReco < _fv || _zReco > (90 - _fv) ){ 
+	  // edgeEvents++;
+	  //inside = false ;
+	    //std::cout<<"BREAKING OUT! "<<std::endl ;	    
+	    //inside = 0 ;  
+	    // break ;
+	    //continue;
+          //}
+	// else {
+	  //  inside = true;
+	  // }
+	//}
       }
 
-     for (auto &p : ps.GetParticleArray()){
-
-       if (p.PdgCode() == 12) {
+      neutrino = 0;
+      for (auto &p : ps.GetParticleArray()){
+	if (abs(p.PdgCode()) == 12 /*&& inside == true*/) {
 	 neutrino++ ;
-       }
-     }
+	}
+      }
 
 
+      if (neutrino == 1 /*&& inside == true*/) {
+	counter++;
+      }
+      else  {
+	std::cout << " Missed this event!" << "\n" ;
+	std::cout << "Missed event is: " << event_counter <<"\n\n\n";
+      }
+ 
+      // if (neutrino == 1) {
+      //all_event_counter++;
+      //}
 
-     if (neutrino != 1) {
-       std::cout << " Missed this event!" << "\n" ;
-       std::cout << "Missed event is: " << event_counter <<"\n";
-       }
+      positron_electron_events = 0;
+      for (auto &p : ps.GetParticleArray()){
+	if (abs(p.PdgCode()) == 11) {
+	  positron_electron_events++ ;
+	} 
+      }
 
+      if (positron_electron_events > 1) {
+	event_counter = event_counter - 1;
+	//all_event_counter = all_event_counter - 1;
+      }
 
-    return true; 
+      return true; 
+    }
+    return true;
   }
+
 
   void ERAnatestTree::ProcessEnd(TFile* fout)
   {
-    std::cout << "Events Selected: " << counter << "\n";
-    std::cout << "Total Events: " << event_counter << "\n";
+    std::cout << "Total Events (BEFORE Any Cuts): " << all_event_counter << "\n";
+    std::cout << "Total Events with Reconstructed Neutrinos: " << all_neutrino_events << "\n";
+    //std::cout << "Events Selected: " << counter << "\n";
+    std::cout << "Events Selected (WITH Fiducial Cut): " << counter << "\n";
+    std::cout << "Edge Events Cut: " << edgeEvents << "\n";
+    // std::cout << "Total Events: " << event_counter << "\n";
+    std::cout << "Total Events (WITH Fiducial Cut): " << event_counter << "\n";
     std::cout << "Selection Efficiency: " << float (counter)/event_counter << "\n";
+    std::cout << "Selection Efficiency with Fiducial Cut: " << float (counter)/(event_counter) << "\n";
+    std::cout << "Overall Selection Efficiency: " << float (counter)/all_neutrino_events << "\n";
     if (fout){
       fout->cd();
       _tree->Write();

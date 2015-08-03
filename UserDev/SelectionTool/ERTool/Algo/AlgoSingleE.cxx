@@ -165,11 +165,12 @@ namespace ertool {
 	_IPthatStart = vtx.Dist(thatTrack.front());
 	_IPtrkBody = sqrt(_geoAlgo.SqDist(vtx,thatTrack));
 	_alg_tree->Fill();
-	if (_verbose)
-	std::cout << "\tImpact Parameter: " << _IP << std::endl
-		  << "\tIP to Trk Start : " << _IPthatStart << std::endl
-		  << "\tIP to Trk Body  : " << _IPtrkBody << std::endl
-		  << "\tIP to Shr Start : " << _IPthisStart << std::endl;
+	if (_verbose) {
+	  std::cout << "\tImpact Parameter: " << _IP << std::endl
+		    << "\tIP to Trk Start : " << _IPthatStart << std::endl
+		    << "\tIP to Trk Body  : " << _IPtrkBody << std::endl
+		    << "\tIP to Shr Start : " << _IPthisStart << std::endl;
+	}
 	single = true;
 	if ( (IP < _maxIP)                                              // good correlation
 	     && (vtx.Dist(thatTrack.front()) < _vtxToTrkStartDist)      // vertex close to track start
@@ -205,7 +206,7 @@ namespace ertool {
       // If single and there are "track-candidate-vertices" formed by 2 or more tracks
       // compare shower start distance to these vertices.
       // if more than some threshold not single
-      double distmin = 1036;
+      double distmin = 90;
       // get list of potential vertices that come from 2 or more objects
       // sharing a start point
       auto const& candidateVertices = _findRel.GetVertices(graph,2);
@@ -216,7 +217,7 @@ namespace ertool {
       }
 
       if ( single and !_hassister and (_vtxProximityCut != 0) ){
-	if ( (distmin != 1036) and (distmin > _vtxProximityCut) ){
+	if ( (distmin != 90) and (distmin > _vtxProximityCut) ){
 	  std::cout<<"3) Losing this shower because it's not close enough to the vdrtex of tracks" <<std::endl; 
 	  _three++;
 	  if(_verbose) { std::cout << "Trk-Vtx found @ distance of " << distmin << ". Shower not single!" << std::endl; }
@@ -243,12 +244,14 @@ namespace ertool {
 	::geoalgo::Vector_t trackDir = track[int(nsteps/2.)]-track[0];
 	trackDir.Normalize();
 	// get dot product
+	
 	double dot = thisShower.Dir()*trackDir;
 //	if (dot > 0.9){
 //	  std::cout<< "4) Something about a dot product"<<std::endl ;
 //	  _four++;
 //	  single = false;
 //	} 
+
       }
 
       // if still single (and no sister track) look at

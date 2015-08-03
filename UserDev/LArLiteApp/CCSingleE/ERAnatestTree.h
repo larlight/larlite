@@ -71,6 +71,13 @@ namespace ertool {
     int counter;
     int event_counter;
     int neutrino;
+    float _fv;
+    int edgeEvents;
+    bool inside;
+    int all_event_counter;
+    int positron_electron_events;
+    int all_neutrino_events;
+    int ep_check;
   };
 
 }

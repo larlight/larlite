@@ -26,7 +26,7 @@ my_proc.enable_filter(False)
 # and the algorithm instance is the return of the
 # function GetCCSingleEInstance()
 my_algo = GetCCSingleEInstance()
-my_algo.setVerbose(True)
+my_algo.setVerbose(False)
 
 primary_algo = ertool.AlgoPrimaryFinder()
 primary_algo.setVtxToTrkStartDist(1)
@@ -111,8 +111,10 @@ while (counter < 11700):
 #    part_mc   = my_anaunit.GetParticles(True)
 #    viewAll(data_mc,part_mc,data_reco,part_reco)
 #
+
  #   display_mc = gv.GeoViewer()
  #   display_reco = gv.GeoViewer()
+
 
     my_proc.process_event(counter)
     print "Processing event {0}".format(counter)
@@ -123,6 +125,9 @@ while (counter < 11700):
     part_mc   = my_anaunit.GetParticles(True)
 #    view(display_mc,data_mc,part_mc)
     viewAll(mcviewer,data_mc,part_mc,recoviewer,data_reco,part_reco)
+
+=======
+
 
     #for x in xrange(part_mc.size()):
     #    print part_mc[x].Diagram()
