@@ -50,7 +50,7 @@ namespace larlite {
     */
     virtual bool finalize();
 
-    ::fluxRW fluxRW;
+    ::fluxRW _fluxRW;
 
   protected:
     
