@@ -46,6 +46,8 @@ namespace ertool {
     /// Reset function
     virtual void Reset();
 
+  //  virtual void ResetTrue();
+
     /// Function to accept fclite::PSet
     void AcceptPSet(const ::fcllite::PSet& cfg);
 
@@ -60,11 +62,14 @@ namespace ertool {
 
     void PrepareTTree();
 
+//    void PrepareTrueTree();
+
     void SetVerbose( bool verbose ) { _verbose = verbose ; }
 
  protected:
     
     TTree * _pi0_tree ;
+    TTree * _mc_pi0_tree ;
 
     int _nPi0 	 ;
     int _nMeson	 ;
