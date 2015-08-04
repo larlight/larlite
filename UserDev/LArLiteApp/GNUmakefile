@@ -20,7 +20,7 @@ endif
 #
 # Define directories to be compile upon a global "make"...
 #
-SUBDIRS := ERToolBackend CCSingleE Pi0Ana SingleGamma GraphMaker EMPart #ADD_NEW_SUBDIR ... do not remove this comment from this line
+SUBDIRS := ERToolBackend CCSingleE Pi0Ana SingleGamma GraphMaker EMPart MichelE fluxRW #ADD_NEW_SUBDIR ... do not remove this comment from this line
 
 #####################################################################################
 #

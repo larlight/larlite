@@ -31,7 +31,6 @@ namespace larlite{
     std::map<larlite::product_id,std::map<larlite::product_id,size_t> > _ass_map_key;
     std::vector<larlite::AssSet_t> _ass_data;
     std::vector<std::pair<larlite::product_id,larlite::product_id> > _ass_ids;
-
   public:
     
     /// Default constructor

@@ -1,0 +1,5 @@
+
+k : {
+ vtx_min_radius : 1.0
+ verbosity : true
+}

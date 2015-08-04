@@ -47,6 +47,7 @@ namespace ertool {
     
     bool RelationAssessed() const;
     bool Primary() const;
+    bool Descendant() const; ///< is this node is the descendant of another
     bool Lonely() const; ///< ILL DEFINED
     bool HasChild(const NodeID_t id);
 
@@ -61,12 +62,15 @@ namespace ertool {
     const ::geoalgo::Vector& Vertex()   const;
     const ::geoalgo::Vector& Momentum() const;
     float RecoScore();
+    const ProcessType_t& ProcessType() const;
     
     void SetParticleInfo( const int pdg_code = kINVALID_INT,
 			  const double mass  = kINVALID_DOUBLE,
 			  const ::geoalgo::Vector& vtx = kINVALID_VERTEX,
 			  const ::geoalgo::Vector& mom = kINVALID_MOMENTUM,
 			  const float score = 0);
+
+    std::string Print() const;
 
   private:
 
@@ -77,18 +81,23 @@ namespace ertool {
 
     void RemoveChild(const NodeID_t child );
     void UpdateAfterRemoval(const NodeID_t removed);
+    void SetProcess(const ProcessType_t process){ _process = process; }
+    void Print             (std::string& res, std::string prefix="") const;
+
     
     // Particle information
     int    _pdg_code;       ///< PDG code of a particle
     double _mass;           ///< Particle's mass
     ::geoalgo::Vector _vtx; ///< Creation vertex of a particle
     ::geoalgo::Vector _mom; ///< Creation momentum of a particle
+    ProcessType_t _process; ///< Creation process (enum) of a particle
     
     // Graph structure information
     NodeID_t     _node_id;     ///< A unique particle identifier
     NodeID_t     _parent_id;   ///< Parent's ID
     NodeID_t     _ancestor_id; ///< Ancestor's ID (essentially graph ID)
     Generation_t _generation;  ///< Generation level from the primary (=0)
+    bool         _primary;     ///< Boolean to flag a primary particle
     std::vector< ::ertool::NodeID_t > _child_v; ///< List of children's ID
     std::vector< float >  _score_v;    ///< Correlation score with one another
 

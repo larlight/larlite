@@ -77,7 +77,7 @@ namespace ertool {
 	if(entries>0) {
 	  if(_n_entries && entries != _n_entries) {
 	    ertool::msg::send(ertool::msg::kWARNING, __FUNCTION__,
-			      Form("Found mis-match in # entries (EventData %zu vs. ParticleGraph %zu)",
+			      Form("Found mis-match in # entries (EventData %zu vs. ParticleGraph %lld)",
 				   _n_entries,entries)
 			      );
 	    if(_n_entries > entries) _n_entries = entries;

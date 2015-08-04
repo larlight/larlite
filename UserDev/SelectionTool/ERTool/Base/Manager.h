@@ -20,6 +20,7 @@
 #include "AnaBase.h"
 #include "EventData.h"
 #include "ParticleGraph.h"
+#include "IOHandler.h"
 #include "FhiclLite/ConfigManager.h"
 #include <TStopwatch.h>
 namespace ertool {
@@ -69,10 +70,14 @@ namespace ertool {
   public:
     
     /// Default constructor
-    Manager();
+    Manager( const io::StreamType_t in_strm  = io::kEmptyStream,
+	     const io::StreamType_t out_strm = io::kEmptyStream);
     
     /// Default destructor
     virtual ~Manager(){};
+
+    /// IO Handler
+    ertool::io::IOHandler& GetIOHandle() { return _io_handle; }
 
     /// FhiclLite config file adder
     void AddCfgFile(const std::string cfg_fname);
@@ -101,25 +106,13 @@ namespace ertool {
     /// Function to reset things
     void Reset();
 
-    /// Function to add input data product: Shower
-    NodeID_t Add(const ertool::Shower& obj, const ertool::RecoInputID_t& input_id, const bool mc=false);
-    /// Function to add input data product: Track
-    NodeID_t Add(const ertool::Track&  obj, const ertool::RecoInputID_t& input_id, const bool mc=false);
-#ifndef __CINT__
-    /// Function to add input data product: Shower
-    NodeID_t Emplace(const ertool::Shower&& obj, const ertool::RecoInputID_t&& input_id, const bool mc=false);
-    /// Function to add input data product: Track
-    NodeID_t Emplace(const ertool::Track&&  obj, const ertool::RecoInputID_t&& input_id, const bool mc=false);
-#endif
-
-
-    /// Function to clear data
+    /// Clear event-wise data contents
     void ClearData();
 
-    const ertool::EventData&   EventData     () const;
-    const ertool::EventData&   MCEventData   () const;
-    ertool::ParticleGraph& ParticleGraph   ();
-    ertool::ParticleGraph& MCParticleGraph ();
+    const ertool::EventData&     EventData       () const;
+    const ertool::EventData&     MCEventData     () const;
+    const ertool::ParticleGraph& ParticleGraph   () const;
+    const ertool::ParticleGraph& MCParticleGraph () const;
 
     /// Status getter
     ManagerStatus_t Status() const { return _status; }
@@ -145,12 +138,9 @@ namespace ertool {
       double _time_end;   ///< Time to execute ertool::UnitBase::ProcessEnd
     };
     
-  protected:
+  private:
 
-    ertool::EventData _data;
-    ertool::EventData _mc_data;
-    ertool::ParticleGraph _graph;
-    ertool::ParticleGraph _mc_graph;
+    ertool::io::IOHandler _io_handle;
 
     ManagerStatus_t _status;
 

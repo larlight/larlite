@@ -37,15 +37,17 @@ namespace ertool {
     used_obj[ ::ertool::kShower ].resize( data.Shower().size(), false );
 
     for (auto &node_id : particles.GetParticleNodes()) {
-
-      auto const& p = particles.GetParticle(node_id);
       
+      auto const& p = particles.GetParticle(node_id);
+
+      if (p.PdgCode() == kINVALID_INT) continue;
+
       if(part_map_s.find(p.PdgCode()) == part_map_s.end()) 
 	part_map_s.insert(std::make_pair(p.PdgCode(),db_s.GetParticle(p.PdgCode())));
 
 	std::string name="";
 	if(part_map_s[p.PdgCode()]) name = part_map_s[p.PdgCode()]->GetName();
-
+	if(name.empty()) name = "noname";
 	// If this particle has associated EventData, show it as well (if name is non-empty)
 	if (p.RecoID() != kINVALID_RECO_ID){
 	  if(!name.empty()) {
@@ -64,7 +66,6 @@ namespace ertool {
 	}
     }
 
-
     // Process all unassociated objects
     // Tracks
     for(size_t trk_index = 0; trk_index < data.Track().size(); ++trk_index) {
@@ -78,6 +79,7 @@ namespace ertool {
       if( !(used_obj[ ::ertool::RecoType_t::kShower ][ shr_index ]) )
 	GeoObjCollection::Add( data.Shower( shr_index ), Form("un-tagged (%zu)",shr_index), shr_col.c_str() );
     }
+
     return;
   }
 
