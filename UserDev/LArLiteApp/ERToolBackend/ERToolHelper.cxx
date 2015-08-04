@@ -31,7 +31,7 @@ namespace larlite {
     std::map< ::ertool_helper::ParticleID, ::ertool::NodeID_t > part_list;
 
     auto& graph = strm.GetParticleGraphWriteable(true);
-    
+
     //
     // Step 1 ... Register ALL MCShower
     //
@@ -114,9 +114,9 @@ namespace larlite {
 	if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
 	
 	::ertool::RecoInputID_t in_id(i,mct_v.name());
-	
+
 	// Emplace a track to EventData
-	//nodeID = strm.Emplace(std::move(t),std::move(in_id),true);
+	// nodeID = strm.Emplace(std::move(t),std::move(in_id),true);
 	nodeID = strm.Add( t, in_id, true);
 
       }
