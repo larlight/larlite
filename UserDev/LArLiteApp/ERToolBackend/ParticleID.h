@@ -5,34 +5,75 @@
 #include "DataFormat/mcshower.h"
 #include "DataFormat/mctrack.h"
 
-namespace larlite {
+namespace ertool_helper {
 
   class ParticleID {
+    friend class ParticleID;
 
-    // Particle ID default constructor
+  public:
+    /// Particle ID default constructor
     ParticleID();
     
-    // Particle ID constructor from MCShower
-    ParticleID(const mcshower& mcs);
+    ParticleID(const int pdg,
+	       const TLorentzVector& pos,
+	       const TLorentzVector& mom);
     
-    // Particle ID constructor from MCTrack
-    ParticleID(const mctrack& mct);
+    /// Particle ID constructor from MCShower
+    ParticleID(const ::larlite::mcshower& mcs);
+    
+    /// Particle ID constructor from MCTrack
+    ParticleID(const ::larlite::mctrack& mct);
+    
+    /// Particle ID constructor from MCTruth
+    ParticleID(const ::larlite::mcpart& mcp);
 
-    // Particle ID constructor from MCTruth
-    ParticleID(const mcpart& mcp);
+    /// PDGCode
+    int PdgCode() const { return _pdg; }
+    /// Position
+    const TLorentzVector& Position() const { return _pos; }
+    /// Momentum
+    const TLorentzVector& Momentum() const { return _mom; }
     
-    // Default destructor
+    /// Default destructor
     virtual ~ParticleID(){};
 
-    friend bool operator== (const ParticleID& p1, const ParticleID& p2);
-    friend bool operator<  (const ParticleID& p1, const ParticleID& p2);
+    inline bool operator== (const ParticleID& rhs) const
+    {
+      return ( _pdg == rhs._pdg && _pos == rhs._pos && _mom == rhs._mom ); 
+    }
 
+    inline bool operator!= (const ParticleID& rhs) const
+    {
+      return !((*this) == rhs);
+    }
+
+    inline bool operator< (const ParticleID& rhs) const
+    {
+      if( _pdg         < rhs._pdg     ) return true;
+      if( rhs._pdg     < _pdg         ) return false;
+
+      if( _pos.X()     < rhs._pos.X() ) return true;
+      if( rhs._pos.X() < _pos.X()     ) return false;
+      if( _pos.Y()     < rhs._pos.Y() ) return true;
+      if( rhs._pos.Y() < _pos.Y()     ) return false;
+      if( _pos.Z()     < rhs._pos.Z() ) return true;
+      if( rhs._pos.Z() < _pos.Z()     ) return false;
+
+      if( _mom.X()     < rhs._mom.X() ) return true;
+      if( rhs._mom.X() < _mom.X()     ) return false;
+      if( _mom.Y()     < rhs._mom.Y() ) return true;
+      if( rhs._mom.Y() < _mom.Y()     ) return false;
+      if( _mom.Z()     < rhs._mom.Z() ) return true;
+      if( rhs._mom.Z() < _mom.Z()     ) return false;
+
+      return false;
+    }
   private:
     
     int _pdg;              ///< PDG code of particle
-    TLorentzVector _mom;   ///< Momentum @ creation (1st step)
-    TLorentzVector _pos;   ///< Position @ creation (1st step)
-    
+    TLorentzVector _pos;
+    TLorentzVector _mom;
+    void Approx();
   };
 
 }

@@ -50,9 +50,10 @@
 
   PyObject* CToNumpy::Convert(  std::vector<float> * _array) const{
 
-    int n_dim = 1;
+    int n_dim = 2;
     int * dims = new int[n_dim];
-    dims[0] = _array->size();
+    dims[0] = 2;
+    dims[1] = 50;
     int data_type = PyArray_FLOAT;
     // PyObject * retVec;
     PyArrayObject * retVec = (PyArrayObject*) PyArray_FromDimsAndData(n_dim, dims, data_type, (char*) &((*_array)[0]));
@@ -78,6 +79,20 @@
     // return PyArray_Return(retVec);
     return (PyObject*) retVec;
 
+  }
+
+  template <class T>
+  PyObject* CToNumpy::Convert( std::vector<T> * _array) const{
+    PyObject* pvec = PyList_New(_array -> size());
+
+    for(size_t i=0; i<_array -> size(); ++i) {
+
+      if(PyList_SetItem(pvec, i, _array[i])) {
+
+        Py_DECREF(pvec);
+      }
+    }
+    return pvec;
   }
 
 #endif

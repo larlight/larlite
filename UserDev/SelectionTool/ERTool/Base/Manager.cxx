@@ -10,11 +10,9 @@
 #include <iomanip>
 namespace ertool {
 
-  Manager::Manager()
-    : _data(new class EventData)
-    , _mc_data(new class EventData)
-    , _graph(new class ParticleGraph)
-    , _mc_graph(new class ParticleGraph)
+  Manager::Manager( const io::StreamType_t in_strm,
+		    const io::StreamType_t out_strm)
+    : _io_handle("ertool",in_strm,out_strm)
     , _cfg_mgr("ERToolConfig")
   {
     Reset(); 
@@ -40,10 +38,10 @@ namespace ertool {
     _cfg_file_v.clear();
   }
   
-  const ertool::EventData& Manager::EventData       () const { return *_data;     }
-  const ertool::EventData& Manager::MCEventData     () const { return *_mc_data;  }
-  ertool::ParticleGraph&   Manager::ParticleGraph   ()       { return *_graph;    }
-  ertool::ParticleGraph&   Manager::MCParticleGraph ()       { return *_mc_graph; }
+  const EventData&     Manager::EventData       () const { return _io_handle.GetEventData     (    ); }
+  const EventData&     Manager::MCEventData     () const { return _io_handle.GetEventData     (true); }
+  const ParticleGraph& Manager::ParticleGraph   () const { return _io_handle.GetParticleGraph (    ); }
+  const ParticleGraph& Manager::MCParticleGraph () const { return _io_handle.GetParticleGraph (true); }
 
   void Manager::AddAlgo(AlgoBase* a) 
   { 
@@ -92,64 +90,8 @@ namespace ertool {
     _cfg_file_v.insert(kDefaultConfigFileName);
   }
 
-  NodeID_t Manager::Add(const ertool::Shower& obj,
-			const ertool::RecoInputID_t& input_id,
-			const bool mc) 
-  {
-    if(!mc) {
-      _data->Add(obj,input_id);
-      return _graph->CreateParticle(_data->Shower().back()).ID();
-    }else{
-      _mc_data->Add(obj,input_id);
-      return _mc_graph->CreateParticle(_mc_data->Shower().back()).ID();
-    }
-
-  }
-
-  NodeID_t Manager::Add(const ::ertool::Track& obj,
-			const ertool::RecoInputID_t& input_id,
-			const bool mc) 
-  {
-    if(!mc) {
-      _data->Add(obj,input_id);
-      return _graph->CreateParticle(_data->Track().back()).ID();
-    }else{
-      _mc_data->Add(obj,input_id);
-      return _mc_graph->CreateParticle(_mc_data->Track().back()).ID();
-    }
-  }
-
-  NodeID_t Manager::Emplace(const ::ertool::Shower&& obj,
-			    const ertool::RecoInputID_t&& input_id,
-			    const bool mc)
-  {
-    if(!mc) {
-      _data->Emplace(std::move(obj),std::move(input_id));
-      return _graph->CreateParticle(_data->Shower().back()).ID();
-    }else{
-      _mc_data->Emplace(std::move(obj),std::move(input_id));
-      return _mc_graph->CreateParticle(_data->Shower().back()).ID();
-    }
-  }
-
-  NodeID_t Manager::Emplace(const ::ertool::Track&& obj,
-			    const ertool::RecoInputID_t&& input_id,
-			    const bool mc)
-  {
-    if(!mc) {
-      _data->Emplace(std::move(obj),std::move(input_id));
-      return _graph->CreateParticle(_data->Track().back()).ID();
-    }else{
-      _mc_data->Emplace(std::move(obj),std::move(input_id));
-      return _mc_graph->CreateParticle(_data->Track().back()).ID();
-    }
-  }
-
   void Manager::ClearData() {
-    _data->Reset();
-    _mc_data->Reset();
-    _graph->Reset();
-    _mc_graph->Reset();
+    _io_handle.ClearData();
   }
 
   void Manager::Initialize()
@@ -375,7 +317,7 @@ namespace ertool {
       auto& algo = _algo_v[i];
       algo->_training_mode = this->_training_mode;
       if(_profile_mode) fWatch.Start();
-      algo->Reconstruct(*_data,*_graph);
+      algo->Reconstruct(_io_handle.GetEventData(),_io_handle.GetParticleGraphWriteable());
       if(_profile_mode) _time_algo_v[i]._time_proc += fWatch.RealTime();
     }
     
@@ -383,8 +325,10 @@ namespace ertool {
     for(size_t i=0; i<_ana_v.size(); ++i) {
       auto& ana = _ana_v[i];
       if(_profile_mode) fWatch.Start();
-      if(_mc_for_ana) ana->SetMCData(*_mc_data,*_mc_graph);
-      status = ana->Analyze(*_data,*_graph);
+      if(_mc_for_ana) ana->SetMCData(_io_handle.GetEventData(true),
+				     _io_handle.GetParticleGraph(true)
+				     );
+      status = ana->Analyze(_io_handle.GetEventData(),_io_handle.GetParticleGraph());
       ana->UnsetMCData();
       if(_profile_mode) _time_ana_v[i]._time_proc += fWatch.RealTime();
     }

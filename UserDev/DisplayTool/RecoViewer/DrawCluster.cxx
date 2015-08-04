@@ -2,9 +2,6 @@
 #define LARLITE_DRAWCLUSTER_CXX
 
 #include "DrawCluster.h"
-#include "DataFormat/hit.h"
-#include "DataFormat/cluster.h"
-#include "LArUtil/DetectorProperties.h"
 
 namespace evd {
 
@@ -20,6 +17,9 @@ namespace evd {
       = new std::vector<std::vector<std::vector<float > > >;
     hitEndByPlaneByCluster   
       = new std::vector<std::vector<std::vector<float > > >;
+    clusterParamsByPlane 
+      = new std::vector<std::vector<::cluster::cluster_params > > ;
+
   }
 
   bool DrawCluster::initialize() {
@@ -33,6 +33,7 @@ namespace evd {
 
     // Initialize the geoService object:
     geoService = larutil::Geometry::GetME();
+    geoUtil    = larutil::GeometryUtilities::GetME();
 
     wireRange.resize(geoService -> Nviews());
     timeRange.resize(geoService -> Nviews());
@@ -43,6 +44,7 @@ namespace evd {
       wireByPlaneByCluster     -> resize(geoService -> Nviews());
       hitStartByPlaneByCluster -> resize(geoService -> Nviews());
       hitEndByPlaneByCluster   -> resize(geoService -> Nviews());
+      clusterParamsByPlane     -> resize(geoService -> Nviews());
     }
 
     return true;
@@ -50,6 +52,7 @@ namespace evd {
   
   bool DrawCluster::analyze(larlite::storage_manager* storage) {
   
+    clusters = 0 ;
     //
     // Do your event-by-event analysis here. This function is called for 
     // each event in the loop. You have "storage" pointer which contains 
@@ -70,8 +73,9 @@ namespace evd {
     // clear the spots that hold the data:
   // Obtain event-wise data object pointers
     //
-   
+      
     auto detProp = larutil::DetectorProperties::GetME();
+    
 
     // Clear out the hit data but reserve some space for the hits
     for (unsigned int p = 0; p < geoService -> Nviews(); p ++){
@@ -79,6 +83,7 @@ namespace evd {
       wireByPlaneByCluster     ->at(p).clear();
       hitStartByPlaneByCluster ->at(p).clear();
       hitEndByPlaneByCluster   ->at(p).clear();
+      clusterParamsByPlane ->at(p).clear();
 
       
       wireRange.at(p).resize(2);
@@ -101,13 +106,17 @@ namespace evd {
       return false;
     }
 
+    clusters = ev_clus->size() ;
+
     
     for (unsigned int p = 0; p < geoService -> Nviews(); p ++){
 
-      wireByPlaneByCluster     ->at(p).reserve(ev_clus->size());
-      hitStartByPlaneByCluster ->at(p).reserve(ev_clus->size());
-      hitEndByPlaneByCluster   ->at(p).reserve(ev_clus->size());
+      wireByPlaneByCluster        ->at(p).reserve(ev_clus->size());
+      hitStartByPlaneByCluster    ->at(p).reserve(ev_clus->size());
+      hitEndByPlaneByCluster      ->at(p).reserve(ev_clus->size());
+
     }
+            
 
     ::larlite::event_hit* ev_hit = nullptr;
     auto const& hit_index_v = storage->find_one_ass(ev_clus->id(),ev_hit,producer);
@@ -132,9 +141,28 @@ namespace evd {
     int view = ev_hit->at(hit_index_v.front()[0]).View();
     std::vector<int>  nullIntVec;
     std::vector<float>  nullFltVec;
+    ::cluster::cluster_params  nullCPVec;
+
+    cluster::ClusterParamsAlg cpan ;
+    cpan.DisableFANN();
+    cpan.SetVerbose(false);
+    
     for(auto const& hit_indices : hit_index_v) {
       view = ev_hit->at(hit_indices[0]).View();
+      // Fill the cluster params alg
+      _cru_helper.GenerateCPAN( hit_indices, ev_hit, cpan);
+      cpan.FillParams(true,true,true,true,true,true);
+
+
+      // if ( (int) clusterParamsByPlane->at(view).size() != cluster_index[view] -1){
+      //   clusterParamsByPlane->at(view).push_back(nullCPVec);
+      // }
+      clusterParamsByPlane->at(view).push_back( cpan.GetParams() );
+
       for(auto const& hit_index : hit_indices){
+
+
+
         // if (view == 0){
         //   std::cout << "Got a hit, seems to be view " << view
         //             << " and cluster " << cluster_index[view] 
@@ -142,6 +170,8 @@ namespace evd {
         //             << ", " << ev_hit->at(hit_index).PeakTime()
         //             << std::endl;
         // }
+
+
 
         if ((int)wireByPlaneByCluster -> at(view).size() != cluster_index[view]-1){
           wireByPlaneByCluster -> at(view).push_back(nullIntVec);
@@ -173,7 +203,11 @@ namespace evd {
           timeRange.at(view).at(0) = ev_hit->at(hit_index).PeakTime();
 
       }
+
+
+
       cluster_index[view] ++;
+
     }
     
 
@@ -206,6 +240,12 @@ namespace evd {
     delete hitEndByPlaneByCluster;
   }
 
+  int DrawCluster::getClusters(unsigned int p) const{
+
+        std::cout<<"Number of clus and p "<<p<<", "<< clusterParamsByPlane->at(p).size() <<std::endl  ;
+        return clusterParamsByPlane->at(p).size() ;
+    }
+
   int DrawCluster::getNClustersByPlane(unsigned int p) const{
       if (p >= geoService->Nviews() ){
         std::cerr << "ERROR: Request for nonexistent plane " << p << std::endl;
@@ -218,6 +258,23 @@ namespace evd {
         return 0;
       }
   }
+
+  const std::vector<::cluster::cluster_params> & DrawCluster::getParamsByPlane(unsigned int p) const{         
+      static std::vector<::cluster::cluster_params> returnNull; 
+        if (clusterParamsByPlane !=0){
+        //  if (c >= clusterParamsByPlane->at(p).size()){
+        //    std::cerr << "ERROR: Request for nonexistent cluster " << c << std::endl;
+        //    return returnNull;
+        //  } 
+
+          return clusterParamsByPlane->at(p);
+        }
+        else{
+          return returnNull;
+        }
+        
+
+    }
 
   const std::vector<int>   & 
     DrawCluster::getWireByPlaneAndCluster(unsigned int p, unsigned int c) const{

@@ -13,282 +13,447 @@
 #include "DataFormat/partid.h"
 #include "DataFormat/event_ass.h"
 
+#include "ParticleID.h"
 #include "ERToolHelper.h"
 #include "ERTool/Base/UtilFunc.h"
+#include "ERTool/Base/EmptyInput.h"
 #include <limits>
 #include <climits>
 
 namespace larlite {
-  /// Create MC EventData and ParticleSet
+
   void ERToolHelper::FillMCInfo( const event_mctruth&   mci_v,
 				 const event_mcshower&  mcs_v,
 				 const event_mctrack&   mct_v,
-				 ::ertool::Manager&     mgr) const
+				 ::ertool::io::EmptyInput& strm) const
   {
 
-    // Parentage information:
-    // for parantage within tracks/showers
-    // hold a map that connects mother TrackID -> child NodeID
-    std::map<unsigned int, std::vector<unsigned int> > parentageMap;
+    std::map< ::ertool_helper::ParticleID, ::ertool::NodeID_t > part_list;
 
-    std::map<unsigned int, ::ertool::Particle> g4_mother_parts;
-    std::map<unsigned int, PartID_t> g4_mother_id;
-    size_t reco_obj_index = 0;
+    auto& graph = strm.GetParticleGraphWriteable(true);
+    
+    //
+    // Step 1 ... Register ALL MCShower
+    //
     for(size_t i=0; i<mcs_v.size(); ++i) {
 
       auto const& mcs = mcs_v[i];
 
-      // apply cut on deposited energy
-      if(mcs.DetProfile().E()<_minEDep) continue;
+      ::ertool::NodeID_t nodeID;
 
-      reco_obj_index++;
-
-      // create shower/particle object
-      // first add Shower object to event data
-      ::ertool::Shower s( mcs.DetProfile().Position(),
-			  mcs.DetProfile().Momentum(),
-			  _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
-			  _shrProfiler.ShowerRadius() );
-      s._energy     = mcs.DetProfile().Momentum().E();
-      s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
-      s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
-      auto nodeID = mgr.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),true);
-      int pdg = mcs.PdgCode();
-      // then edit the particle
-      mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
-								::ertool::ParticleMass(pdg),
-								mcs.Start().Position(),
-								mcs.Start().Momentum()); 
-      if (mcs.MotherTrackID() != mcs.TrackID()){
-	if (parentageMap.find(mcs.MotherTrackID()) == parentageMap.end()){
-	  std::vector<unsigned int> aaa = {(unsigned int)nodeID};
-	  parentageMap[mcs.MotherTrackID()] = aaa;
-	}
-	else
-	  parentageMap[mcs.MotherTrackID()].push_back(nodeID);
-      }
-      
-      // if not primary
-      if( mcs.MotherTrackID() != mcs.AncestorTrackID() ) continue;
-      
-      unsigned int trkid_mom = mcs.AncestorTrackID();
-      if(g4_mother_parts.find(trkid_mom) == g4_mother_parts.end()) {
-	int pdg_mom = mcs.MotherPdgCode();
-	if (pdg_mom != mcs.PdgCode()){
-	  auto& mother = mgr.MCParticleGraph().CreateParticle();
-	  mother.SetParticleInfo(pdg_mom,
-				 ::ertool::ParticleMass(pdg_mom),
-				 mcs.MotherStart().Position(),
-				 mcs.MotherStart().Momentum());
-	  g4_mother_parts.insert(std::make_pair(trkid_mom,mother));
-	  g4_mother_id[trkid_mom] = PartID_t(mother.Vertex(), mother.Momentum(), mother.PdgCode());
-	}
-	else{
-	  auto const& aaa = mgr.MCParticleGraph().GetParticle(nodeID);
-	  g4_mother_parts.insert(std::make_pair(trkid_mom,aaa));
-	  g4_mother_id[trkid_mom] = PartID_t(aaa.Vertex(), aaa.Momentum(), aaa.PdgCode());
-	}
-      }
-      if(mcs.TrackID() != mcs.MotherTrackID()) {      
+      // If energy is above threshold, create ertool::Shower
+      if(mcs.DetProfile().Momentum().E() >= _minEDep) {
+	::ertool::Shower s( (mcs.DetProfile().Position() + getXShift(mcs_v[i])),
+			    mcs.DetProfile().Momentum(),
+			    _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
+			    _shrProfiler.ShowerRadius() );
+	// Fill more info
+	s._energy     = mcs.DetProfile().Momentum().E();
+	s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
+	s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
 	
-	auto const& motherNodeID = g4_mother_parts[trkid_mom].ID();
-	auto const& childNodeID  = mgr.MCParticleGraph().GetParticle(nodeID).ID();
-	mgr.MCParticleGraph().SetParentage(motherNodeID,
-					   childNodeID);
+	::ertool::RecoInputID_t in_id(i,mcs_v.name());
 	
-       }
+	// Emplace this shower, and get corresponding particle unique ID
+	//nodeID = strm.Emplace( std::move(s), std::move(in_id), true );
+	nodeID = strm.Add( s, in_id, true );
 
-     }
+      }else
 
-     reco_obj_index = 0;
-     for(size_t i=0; i<mct_v.size(); ++i) {
+	nodeID = graph.CreateParticle().ID();
 
-       auto const& mct = mct_v[i];
+      // Edit particle info
+      auto& p = graph.GetParticle(nodeID);
 
-       if(mct.size()<2) continue;
-       reco_obj_index++;
-       
-       ::ertool::Track t;
-       t.reserve(mct.size());
-       for(auto const& step : mct)
-	 t += step.Position();
-       //This is the TOTAL energy minus TOTAL energy, so mass is removed.
-       //If you want only initial kinetic energy, remember to subtract off mass.
-       t._energy     = (*mct.begin()).Momentum().E() - (*mct.rbegin()).Momentum().E();
-       t._cosmogenic = (double)(mct.Origin() == simb::kCosmicRay);
-       if(abs(mct.PdgCode()) == 13 ) t._pid = ::ertool::Track::kMuon;
-       if(mct.PdgCode() == 2212    ) t._pid = ::ertool::Track::kProton;
-       if(abs(mct.PdgCode()) == 321) t._pid = ::ertool::Track::kKaon;
-       if(abs(mct.PdgCode()) == 211) t._pid = ::ertool::Track::kPion;
-       for(auto& v : t._pid_score) v = 100;
-       if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
-       
-       auto nodeID = mgr.Add(t,ertool::RecoInputID_t(i,mct_v.name()),true);
-       int pdg = mct.PdgCode();
-       mgr.MCParticleGraph().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
-								 pdg,
-								 mct.at(0).Position(),
-								 ::geoalgo::Vector(mct.at(0).Momentum()));
+      p.SetParticleInfo(mcs.PdgCode(),
+			::ertool::ParticleMass(mcs.PdgCode()),
+			mcs.Start().Position(),
+			mcs.Start().Momentum());
 
-       // does this node have children?
-       if (parentageMap.find(mct.TrackID()) != parentageMap.end()){
-	 auto const& childNodeID_v = parentageMap[mct.TrackID()];
-	 for (auto const& childNodeID : childNodeID_v){
-	   if (!mgr.MCParticleGraph().GetParticle(childNodeID).RelationAssessed())
-	     mgr.MCParticleGraph().SetParentage(nodeID,childNodeID);
-	 }
-       }
+      // Create ParticleID
+      ::ertool_helper::ParticleID id(mcs);
 
-       // set parentage info if available
-       if (mct.MotherTrackID() != mct.TrackID()){
-	 if (parentageMap.find(mct.MotherTrackID()) == parentageMap.end()){
-	   std::vector<unsigned int> aaa = {(unsigned int)nodeID};
-	  parentageMap[mct.MotherTrackID()] = aaa;
-	 }
-	 else
-	   parentageMap[mct.MotherTrackID()].push_back(nodeID);
-       }
-       
-       // if not primary
-       if( mct.MotherTrackID() != mct.AncestorTrackID() ) continue;
-       
-       unsigned int trkid_mom = mct.AncestorTrackID();
-       
-       if(g4_mother_parts.find(trkid_mom) == g4_mother_parts.end()) {
-	 int pdg_mom = mct.AncestorPdgCode();
-	 auto& mother = mgr.MCParticleGraph().CreateParticle();
-	 mother.SetParticleInfo(pdg_mom,
-				::ertool::ParticleMass(pdg_mom),
-				mct.MotherStart().Position(),
-				mct.MotherStart().Momentum());
-	 g4_mother_parts.insert(std::make_pair(trkid_mom,mother));
-	 g4_mother_id[trkid_mom] = PartID_t(mother.Vertex(), mother.Momentum(), mother.PdgCode());
+      // Check if this ID already exists ... it should not, so throw an exception if it does
+      if( part_list.find(id) != part_list.end() )
 
-       }
-       if(mct.TrackID() != mct.MotherTrackID()) {
-	 
-	 auto const& motherNodeID = g4_mother_parts[trkid_mom].ID();
-	 auto const& childNodeID  = mgr.MCParticleGraph().GetParticle(nodeID).ID();
-	 mgr.MCParticleGraph().SetParentage(motherNodeID,
-					    childNodeID);
-       }
-     }
-     
-     std::set<unsigned int> g4_mother_used;
-     for(auto const& mci : mci_v) {
-       
-       // Make status 1 => parent mapping: key = track ID and value = index
-       std::map<unsigned int, unsigned int> trkid_to_grand_mother;
-       // Make grand mother => particle set mapping: key = grand_mother index, value = particle set index #
-       std::map<unsigned int, unsigned int> grand_mother_to_res_index;
-       for(auto const& mcp : mci.GetParticles()) {
-	 if(mcp.StatusCode()!=1) continue;
-	 if(mcp.PdgCode()>2000000000) continue;
-	 if(mcp.Mother() == -1 || mcp.Mother() == mcp.TrackId()) continue;
+	throw ::ertool::ERException("Duplicate particle found in MCShower filling loop!");
 
-	 unsigned int grand_mother_trkid = mcp.Mother();
-	 bool search = true;
-	 while(search) {
-	   search = false;
-	   for(size_t i=0; i<mci.GetParticles().size(); ++i) {
-	     auto const& mom_cand = mci.GetParticles()[i];
-	     if(mom_cand.TrackId() == grand_mother_trkid) {
-	       // Found a grand mother particle
-	       // See if further search is needed
-	       if(mom_cand.Mother() != -1 && 
-		  mom_cand.Mother() != mom_cand.TrackId()) { 
-		 grand_mother_trkid = mom_cand.Mother();
-		 search = true;
-	       }else{
-		 trkid_to_grand_mother[mcp.TrackId()] = i;
-		 if(grand_mother_to_res_index.find(i) == grand_mother_to_res_index.end()) {
+      // Assign ParticleID <=> NodeID map value
+      part_list[id] = nodeID;
+    }
 
-		   auto& p = mgr.MCParticleGraph().CreateParticle();
-		   p.SetParticleInfo(mom_cand.PdgCode(),
-				     mom_cand.Mass()*1000.,
-				     ::geoalgo::Vector(mom_cand.Trajectory()[0].Position()),
-				     ::geoalgo::Vector(mom_cand.Trajectory()[0].Momentum())*1.e3 );
-		   grand_mother_to_res_index[i]=p.ID();
-		 }		
-	       }	      
-	       break;
-	     }
-	   }
-	 }
-       }
+    //
+    // Step 2 ... Register ALL MCTrack
+    //
+    for(size_t i=0; i<mct_v.size(); ++i) {
 
-       // Now try matching of MCTruth => MCShower/MCTrack
-       for(auto const& mcp : mci.GetParticles()) {
+      auto const& mct = mct_v[i];
+      // Create ertool::Track
+      ::ertool::Track t;
+      // Fill track info
+      t.reserve(mct.size());
+      TLorentzVector shift = getXShift(mct);
+      for(auto const& step : mct) 
+	t += (step.Position() + shift);;
 
-	 if(mcp.PdgCode()>2000000000) continue;
-	 if(mcp.StatusCode() != 1) continue;
+      ::ertool::NodeID_t nodeID;
+      // Check minimum number of physical steps
+      if( t.size() >= 2 ) {
 
-	 // Check if this particle exists
-	 PartID_t mcp_id( ::geoalgo::Vector(mcp.Trajectory()[0].Position()),
-			  ::geoalgo::Vector(mcp.Trajectory()[0].Momentum())*1.e3,
-			  mcp.PdgCode() );
-	 bool g4_mother_found = false;
+	//This is the TOTAL energy minus TOTAL energy, so mass is removed.
+	//If you want only initial kinetic energy, remember to subtract off mass.
+	t._energy     = (*mct.begin()).Momentum().E() - (*mct.rbegin()).Momentum().E();
+	t._cosmogenic = (double)(mct.Origin() == simb::kCosmicRay);
+	if(abs(mct.PdgCode()) == 13 ) t._pid = ::ertool::Track::kMuon;
+	if(mct.PdgCode() == 2212    ) t._pid = ::ertool::Track::kProton;
+	if(abs(mct.PdgCode()) == 321) t._pid = ::ertool::Track::kKaon;
+	if(abs(mct.PdgCode()) == 211) t._pid = ::ertool::Track::kPion;
+	for(auto& v : t._pid_score) v = 100;
+	if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
+	
+	::ertool::RecoInputID_t in_id(i,mct_v.name());
+	
+	// Emplace a track to EventData
+	//nodeID = strm.Emplace(std::move(t),std::move(in_id),true);
+	nodeID = strm.Add( t, in_id, true);
 
-	 for(auto const& mom_pair : g4_mother_id) {
+      }else
 
-	   if( mcp_id.same(mom_pair.second) && g4_mother_used.find(mom_pair.first) == g4_mother_used.end() ) {
-	     //std::cout<<"Match!"<<std::endl;
-	     // Found a matched g4 mother
-	     g4_mother_found = true;
+	nodeID = graph.CreateParticle().ID();
+      
+      // Edit particle info
+      auto& p = graph.GetParticle(nodeID);
 
-	     // See if there's a grand mother
-	     if(trkid_to_grand_mother.find(mcp.TrackId())==trkid_to_grand_mother.end()) break;
+      p.SetParticleInfo(mct.PdgCode(),
+			::ertool::ParticleMass(mct.PdgCode()),
+			::geoalgo::Vector(mct.Start().Position()),
+			::geoalgo::Vector(mct.Start().Momentum()));
+      // Create ParticleID
+      ::ertool_helper::ParticleID id(mct);
 
-	     auto const& grandMotherID = mgr.MCParticleGraph().GetParticle(grand_mother_to_res_index[trkid_to_grand_mother[mcp.TrackId()]]).ID();
-	     auto const& thisID = g4_mother_parts[mom_pair.first].ID();
-	     mgr.MCParticleGraph().SetParentage(grandMotherID,thisID);
-	     //auto& grand_mother = particle_set[grand_mother_to_res_index[trkid_to_grand_mother[mcp.TrackId()]]];
-	     //grand_mother.AddDaughter(g4_mother_parts[mom_pair.first]);
-	     g4_mother_used.insert(mom_pair.first);
-	     break;
-	   }
-	 }
-       }
-     }
-     return;
+      // Check if this ID already exists ... it should not, so throw an exception if it does
+      if( part_list.find(id) != part_list.end() )
+
+	throw ::ertool::ERException("Duplicate particle found in MCTrack filling loop!");
+
+      // Assign ParticleID <=> NodeID map value
+      part_list[id] = nodeID;
+      /*
+      std::cout<<"New Particle..."<<std::endl
+	       <<"PdgCode  : "<<id.PdgCode()<<std::endl
+	       <<"Position : "<<id.Position().X() << " : " <<id.Position().Y() << " : " <<id.Position().Z() << std::endl
+	       <<"Momentum : "<<id.Momentum().X() << " : " <<id.Momentum().Y() << " : " <<id.Momentum().Z() << std::endl
+	       <<std::endl;
+      */
+    }
+    
+    //
+    // Step 3 ... MCTruth hell
+    //
+    for(auto const& mci : mci_v) {
+
+      // Create MCTruth particle ParticleID => ParticleID mapping for step 3.1
+      std::map< ::ertool_helper::ParticleID,
+		::ertool_helper::ParticleID > grand_parent_map;
+      
+      //
+      // Step 3.0 ... loop over MCParticles and add to the list if not yet created
+      //
+      for(auto const& mcp : mci.GetParticles()) {
+
+	// Skip if this particle has status code neither 0 nor 1
+	if(mcp.StatusCode() != 0 && mcp.StatusCode() != 1) continue;
+
+	// Construct an ID
+	::ertool_helper::ParticleID id(mcp);
+	
+	// Check if this ID is already dispatched (=> then we don't care)
+	if(part_list.find(id) == part_list.end()) {
+	  // Create a new particle & fill information
+	  auto& p = graph.CreateParticle();
+	  p.SetParticleInfo( mcp.PdgCode(),
+			     mcp.Mass()*1000.,
+			     ::geoalgo::Vector(mcp.Trajectory()[0].Position()),
+			     ::geoalgo::Vector(mcp.Trajectory()[0].Momentum())*1.e3 );
+
+	  part_list[id] = p.ID();
+	  /*
+	  std::cout<<"New Particle..."<<std::endl
+		   <<"PdgCode  : "<<id.PdgCode()<<std::endl
+		   <<"Position : "<<id.Position().X() << " : " <<id.Position().Y() << " : " <<id.Position().Z() << std::endl
+		   <<"Momentum : "<<id.Momentum().X() << " : " <<id.Momentum().Y() << " : " <<id.Momentum().Z() << std::endl
+		   <<std::endl;
+	  */
+	}
+	
+	if(mcp.StatusCode() != 1) continue;
+
+	//
+	// Step 3.1 ... Make status 0=>1 parentage map 
+	//
+	bool search = true;
+	int mct_parent_id = mcp.TrackId();
+	while(search) {
+	  search = false;
+	  for(auto const& mcp_parent : mci.GetParticles()) {
+	    if(mcp_parent.TrackId() == mct_parent_id) {
+	      ::ertool_helper::ParticleID grand_parent_id(mcp_parent);
+	      grand_parent_map[id] = grand_parent_id;
+	      search = true;
+	      if(mct_parent_id == mcp_parent.Mother())
+		search = false;
+	      mct_parent_id = mcp_parent.Mother();
+	    }
+	  }
+	} // Finish finding a parentage within mctruth
+      } // Finish looping over particles in mctruth
+      
+      // Is check needed for 3.1? Loop over grand_parent_map values and see if all exist in part_list
+      // not done right now...
+      
+      //
+      // Step 3.2 ... assign parentage within MCTruth
+      //
+      for(auto const& id_pair : grand_parent_map) {
+	
+	auto const& child_id  = id_pair.first;
+	auto const& parent_id = id_pair.second;
+
+	auto child_iter  = part_list.find( child_id  );
+
+	if( part_list.find(parent_id) == part_list.end() ) {
+	  auto& p = graph.CreateParticle();
+	  p.SetParticleInfo( parent_id.PdgCode(),
+			     ::ertool::ParticleMass(parent_id.PdgCode()),
+			     ::geoalgo::Vector(parent_id.Position()),
+			     ::geoalgo::Vector(parent_id.Momentum()) );
+	  part_list[parent_id] = p.ID();
+	}
+	auto parent_iter = part_list.find( parent_id );
+	
+	if( parent_iter == part_list.end() || child_iter == part_list.end() )
+	  
+	  throw ::ertool::ERException("Missing parent/child relationship within MCTruth!");
+
+	if((*parent_iter).second != (*child_iter).second)
+	  graph.SetParentage( (*parent_iter).second, (*child_iter).second );
+	
+      } // finish looping over mctruth-internal particle set
+
+    } // finish looping over MCTruth
+    
+    //
+    // Step 4 ... MCX parentage 
+    //
+    // First MCShower Parentage
+    for(auto const& mcs : mcs_v) {
+
+      // This particle's ID
+      ::ertool_helper::ParticleID id( mcs.PdgCode(),
+				      mcs.Start().Position(),
+				      mcs.Start().Momentum() );
+
+      // Construct parent's ID
+      ::ertool_helper::ParticleID parent_id( mcs.MotherPdgCode(),
+					     mcs.MotherStart().Position(),
+					     mcs.MotherStart().Momentum() );
+
+      // If parent not found, register
+      if(part_list.find(parent_id) == part_list.end()) {
+	auto& p = graph.CreateParticle();
+	p.SetParticleInfo( mcs.MotherPdgCode(),
+			   ::ertool::ParticleMass(mcs.MotherPdgCode()),
+			   ::geoalgo::Vector(mcs.MotherStart().Position()),
+			   ::geoalgo::Vector(mcs.MotherStart().Momentum()) );
+	
+	part_list[parent_id] = p.ID();
+      }
+      // Set parentage
+      auto const& parent_node = part_list[parent_id];
+      auto const& node = part_list[id];
+      if(parent_node != node)
+	graph.SetParentage( parent_node, node );
+    }
+
+    // First MCTrack Parentage
+    for(auto const& mct : mct_v) {
+
+      // This particle's ID
+      ::ertool_helper::ParticleID id( mct.PdgCode(),
+				      mct.Start().Position(),
+				      mct.Start().Momentum() );
+
+      // Construct parent's ID
+      ::ertool_helper::ParticleID parent_id( mct.MotherPdgCode(),
+					     mct.MotherStart().Position(),
+					     mct.MotherStart().Momentum() );
+
+      // If parent not found, register
+      if(part_list.find(parent_id) == part_list.end()) {
+	auto& p = graph.CreateParticle();
+	p.SetParticleInfo( mct.MotherPdgCode(),
+			   ::ertool::ParticleMass(mct.MotherPdgCode()),
+			   ::geoalgo::Vector(mct.MotherStart().Position()),
+			   ::geoalgo::Vector(mct.MotherStart().Momentum()) );
+	
+	part_list[parent_id] = p.ID();
+      }
+      // Set parentage
+      auto const& parent_node = part_list[parent_id];
+      auto const& node = part_list[id];
+      if(parent_node != node)
+	graph.SetParentage( parent_node, node );
+    }
+
+    //
+    // Step 5 ... MCX grandpa and grandma 
+    //
+    // MCShower
+    for(auto const& mcs : mcs_v) {
+      continue;
+
+      // Construct parent's ID
+      ::ertool_helper::ParticleID parent_id( mcs.MotherPdgCode(),
+					     mcs.MotherStart().Position(),
+					     mcs.MotherStart().Momentum() );
+
+      // If parent has other parents, ancestor pathway is done. Continue.
+      auto const& parent_node = part_list[ parent_id ];
+      auto const& parent = graph.GetParticle(parent_node);
+      if(parent.Parent() != parent.ID()) continue;
+      
+      // Construct ancestor's ID
+      ::ertool_helper::ParticleID ancestor_id( mcs.AncestorPdgCode(),
+					       mcs.AncestorStart().Position(),
+					       mcs.AncestorStart().Momentum() );
+      // If parent not found, register
+      if(part_list.find(ancestor_id) == part_list.end()) {
+	auto& p = graph.CreateParticle();
+	p.SetParticleInfo( mcs.AncestorPdgCode(),
+			   ::ertool::ParticleMass(mcs.AncestorPdgCode()),
+			   ::geoalgo::Vector(mcs.AncestorStart().Position()),
+			   ::geoalgo::Vector(mcs.AncestorStart().Momentum()) );
+	
+	part_list[ancestor_id] = p.ID();
+      }
+      auto const& ancestor_node = part_list[ ancestor_id ];
+      
+      // Create X
+      auto& particle_x = graph.CreateParticle();
+      // Put X in between parentage
+      try{
+	graph.SetParentage( ancestor_node,   particle_x.ID() );
+	graph.SetParentage( particle_x.ID(), parent_node     );
+      }catch( ::ertool::ERException& e ){
+	std::cout << std::endl
+		  << "Caught exception! Current particle info shown below..." << std::endl
+		  << "MCShower: " << mcs.PdgCode()
+		  << " ... " << mcs.Start().X() << " : " << mcs.Start().Y() << " : " << mcs.Start().Z() << " : "
+		  << mcs.Start().E() <<std::endl
+		  << "Parent: " << mcs.MotherPdgCode()
+		  << " ... " << mcs.MotherStart().X() << " : " << mcs.MotherStart().Y() << " : " << mcs.MotherStart().Z() << " : "
+		  << mcs.MotherStart().E() <<std::endl
+		  << "Ancestor: " << mcs.AncestorPdgCode()
+		  << " ... " << mcs.AncestorStart().X() << " : " << mcs.AncestorStart().Y() << " : " << mcs.AncestorStart().Z() << " : "
+		  << mcs.AncestorStart().E() <<std::endl
+		  << "Re-throwing..." << std::endl
+		  << std::endl;
+	throw e;
+      }
+    }
+    // MCTrack
+    for(auto const& mct : mct_v) {
+
+      // Construct parent's ID
+      ::ertool_helper::ParticleID parent_id( mct.MotherPdgCode(),
+					     mct.MotherStart().Position(),
+					     mct.MotherStart().Momentum() );
+      
+      // If parent has other parents, ancestor pathway is done. Continue.
+      auto const& parent_node = part_list[ parent_id ];
+      auto const& parent = graph.GetParticle(parent_node);
+      if(parent.Parent() != parent.ID()) continue;
+
+      // Construct ancestor's ID
+      ::ertool_helper::ParticleID ancestor_id( mct.AncestorPdgCode(),
+					       mct.AncestorStart().Position(),
+					       mct.AncestorStart().Momentum() );
+
+      if(parent_id == ancestor_id) continue;
+      
+      // If ancestor not found, register
+      if(part_list.find(ancestor_id) == part_list.end()) {
+	auto& p = graph.CreateParticle();
+	p.SetParticleInfo( mct.AncestorPdgCode(),
+			   ::ertool::ParticleMass(mct.AncestorPdgCode()),
+			   ::geoalgo::Vector(mct.AncestorStart().Position()),
+			   ::geoalgo::Vector(mct.AncestorStart().Momentum()) );
+	
+	part_list[ancestor_id] = p.ID();
+      }
+      auto const& ancestor_node = part_list[ ancestor_id ];
+      
+      // Create X
+      auto& particle_x = graph.CreateParticle();
+      // Put X in between parentage
+      try{
+	graph.SetParentage( ancestor_node,   particle_x.ID() );
+	graph.SetParentage( particle_x.ID(), parent_node     );
+      }catch( ::ertool::ERException& e) {
+	std::cout << std::endl
+		  << "Caught exception! Current particle info shown below..." << std::endl
+		  << "MCTrack: " << mct.PdgCode()
+		  << " ... " << mct.Start().X() << " : " << mct.Start().Y() << " : " << mct.Start().Z() << " : "
+		  << mct.Start().E() <<std::endl
+		  << "Parent: " << mct.MotherPdgCode()
+		  << " ... " << mct.MotherStart().X() << " : " << mct.MotherStart().Y() << " : " << mct.MotherStart().Z() << " : "
+		  << mct.MotherStart().E() <<std::endl
+		  << "Ancestor: " << mct.AncestorPdgCode()
+		  << " ... " << mct.AncestorStart().X() << " : " << mct.AncestorStart().Y() << " : " << mct.AncestorStart().Z() << " : "
+		  << mct.AncestorStart().E() <<std::endl
+		  << "Re-throwing..." << std::endl
+		  << std::endl;
+	throw e;
+      }
+    }
   }
 
   void ERToolHelper::FillTracks ( const event_mctrack&  mct_v,
-				  ::ertool::Manager&    mgr ) const
+				  ::ertool::io::EmptyInput& strm ) const
   {
-	//SetDetWidth();
+    //SetDetWidth();
     for(size_t i=0; i<mct_v.size(); ++i){
 
       auto const& mct = mct_v[i];
-      if(mct.size()<2) continue;
+      
       ::ertool::Track t;
       t.reserve(mct.size());
-
-      TLorentzVector shift = getXShift(mct_v[i]);
-
-      for(auto const& step : mct) {
+      TLorentzVector shift = getXShift(mct);
+      for(auto const& step : mct)
     	  t += (step.Position() + shift);;
-      }
 
+      if(t.size()<2) continue;
+      
       //This is the TOTAL energy minus TOTAL energy, so mass is removed.
       //If you want only initial kinetic energy, remember to subtract off mass.
       t._energy     = (*mct.begin()).Momentum().E() - (*mct.rbegin()).Momentum().E();
       t._cosmogenic = (double)(mct.Origin() == simb::kCosmicRay);
       t._time = mct_v[i].End().T();
-
+      
       if(abs(mct.PdgCode()) == 13 ) t._pid = ::ertool::Track::kMuon;
       if(mct.PdgCode() == 2212    ) t._pid = ::ertool::Track::kProton;
       if(abs(mct.PdgCode()) == 321) t._pid = ::ertool::Track::kKaon;
       if(abs(mct.PdgCode()) == 211) t._pid = ::ertool::Track::kPion;
       for(auto& v : t._pid_score) v = 100;
       if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
-
-      auto nodeID = mgr.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
-      mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
-							      ::ertool::ParticleMass(mct.PdgCode()),
-							      mct.at(0).Position(),
-							      ::geoalgo::Vector(mct.at(0).Momentum()));
-
+      
+      //auto nodeID = strm.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
+      /*
+      strm.GetParticleGraphWriteable().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
+      ::ertool::ParticleMass(mct.PdgCode()),
+      mct.at(0).Position(),
+      ::geoalgo::Vector(mct.at(0).Momentum()));
+      */
     }
 
     return;
@@ -299,7 +464,7 @@ namespace larlite {
 				  const event_calorimetry& calo_trk_v,
 				  const event_partid& pid_trk_v,
 				  const event_ass& ass_v,
-				  ::ertool::Manager& mgr) const
+				  ::ertool::io::EmptyInput& strm) const
   {
     std::vector< ::ertool::Track> t_v;
     std::vector< ::ertool::RecoInputID_t > id_v;
@@ -377,12 +542,12 @@ namespace larlite {
     }// if pid exists
 
     for(size_t i=0; i<t_v.size(); ++i)
-      mgr.Add(t_v[i],id_v[i]);
+      strm.Add(t_v[i],id_v[i]);
   }
   
   
   void ERToolHelper::FillShowers ( const event_mcshower& mcs_v,
-				   ::ertool::Manager&    mgr ) const
+				   ::ertool::io::EmptyInput& strm) const
   {
 
     for(size_t i=0; i<mcs_v.size(); ++i) {
@@ -403,11 +568,13 @@ namespace larlite {
       s._time = mcs_v[i].End().T();
       double mass = 0;
       if (mcs.PdgCode() == 11) { mass = 0.511; }
-      auto nodeID = mgr.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
+      //auto nodeID = strm.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
+      /*
       mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
 							      mass,
 							      mcs.Start().Position(),
 							      ::geoalgo::Vector(mcs.Start().Momentum()));
+      */
     }
 
     return;
@@ -418,7 +585,7 @@ namespace larlite {
   // fills the particle information with
   // that of the mcshower
   void ERToolHelper::SingleShowerCheater ( const event_mcshower& mcs_v,
-					   ::ertool::Manager&    mgr ) const
+					   ::ertool::io::EmptyInput& strm ) const
   {
 
     // if no mcshowers, do nothing
@@ -426,7 +593,7 @@ namespace larlite {
       return;
 
     // if no particles, do nothing
-    auto const& nodes = mgr.ParticleGraph().GetParticleNodes(::ertool::RecoType_t::kShower);
+    auto const& nodes = strm.GetParticleGraphWriteable().GetParticleNodes(::ertool::RecoType_t::kShower);
     if (!nodes.size())
       return;
 
@@ -434,10 +601,10 @@ namespace larlite {
     ::geoalgo::Point_t  vtx(start.X(),start.Y(),start.Z());
     ::geoalgo::Vector_t mom(start.Px(),start.Py(),start.Pz());
     auto const& pdg = mcs_v[0].PdgCode();
-    mgr.ParticleGraph().GetParticle(nodes[0]).SetParticleInfo(pdg,
-							      0.,
-							      vtx,
-							      mom);
+    strm.GetParticleGraphWriteable().GetParticle(nodes[0]).SetParticleInfo(pdg,
+								      0.,
+								      vtx,
+								      mom);
     return;
   }
   
@@ -445,7 +612,7 @@ namespace larlite {
   void ERToolHelper::FillShowers(const event_shower& shw_v,
 				 const event_cosmictag& ctag_shw_v,
 				 const event_ass& ass_v,
-				 ::ertool::Manager& mgr ) const
+				 ::ertool::io::EmptyInput& strm ) const
   {
     
     // Fill shower
@@ -488,30 +655,30 @@ namespace larlite {
     }
 
     for(size_t i=0; i<s_v.size(); ++i)
-      mgr.Add(s_v[i],id_v[i]);
+      strm.Add(s_v[i],id_v[i]);
 
     return;
   }
 
-	TLorentzVector ERToolHelper::getXShift(const mctrack& mct) const {
-
-		TLorentzVector shift;
-		double event_time = mct.End().T();
-		double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
-		shift.SetXYZT(shift_x, 0., 0., 0.);
-
-		return shift;
-	}
-
-	TLorentzVector ERToolHelper::getXShift(const mcshower& mcs) const {
-		// Calculates for each mc shower, based on the time of the event, the corresponding shift in x-direction
-		TLorentzVector shift;
-		double event_time = mcs.End().T();
-		double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
-		shift.SetXYZT(shift_x, 0., 0., 0.);
-
-		return shift;
-	}
+  TLorentzVector ERToolHelper::getXShift(const mctrack& mct) const {
+    
+    TLorentzVector shift;
+    double event_time = mct.End().T();
+    double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
+    shift.SetXYZT(shift_x, 0., 0., 0.);
+    
+    return shift;
+  }
+  
+  TLorentzVector ERToolHelper::getXShift(const mcshower& mcs) const {
+    // Calculates for each mc shower, based on the time of the event, the corresponding shift in x-direction
+    TLorentzVector shift;
+    double event_time = mcs.End().T();
+    double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
+    shift.SetXYZT(shift_x, 0., 0., 0.);
+    
+    return shift;
+  }
 }
 
 #endif

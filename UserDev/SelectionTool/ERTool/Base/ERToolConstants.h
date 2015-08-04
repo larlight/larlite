@@ -22,6 +22,9 @@ namespace ertool {
   /// Utility: maximum value for int
   const int    kINT_MAX    = std::numeric_limits<int>::max();
 
+  /// Utility: maximum value for unsigned int
+  const unsigned int kUINT_MAX    = std::numeric_limits<unsigned int>::max();
+
   /// Utility: maximum value for size_t
   const size_t kSIZE_MAX   = std::numeric_limits<size_t>::max();
   

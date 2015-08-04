@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 from gui import gui
 from event import *
 from data import wire
@@ -109,6 +108,11 @@ class larlitegui(gui):
     self._wireDrawBox.stateChanged.connect(self.wireDrawBoxWorker)
     self._eastLayout.addWidget(self._wireDrawBox)
 
+    self._startDrawBox = QtGui.QCheckBox("Draw Params.")
+    self._startDrawBox.stateChanged.connect(self.startDrawBoxWorker)
+    self._eastLayout.addWidget(self._startDrawBox)
+
+
     # Now we get the list of items that are drawable:
     drawableProducts = self._event_manager.getDrawableProducts()
     self._listOfRecoBoxes = []
@@ -143,6 +147,14 @@ class larlitegui(gui):
 
     self._view_manager.drawPlanes(self._event_manager)
 
+  def startDrawBoxWorker(self):
+    if self._startDrawBox.isChecked():
+      self._event_manager.toggleParams(True)
+    else:
+      self._event_manager.toggleParams(False)
+
+    self._view_manager.drawPlanes(self._event_manager)
+
 
   def recoBoxHandler(self,text):
     sender = self.sender()
@@ -161,9 +173,9 @@ def main():
     
   parser = argparse.ArgumentParser(description='Python based event display.')
   geom = parser.add_mutually_exclusive_group()
-  geom.add_argument('-A', '--argoneut',action='store_true',help="Run with the argoneut geometry")
-  geom.add_argument('-U', '--uboone',action='store_true',help="Run with the microboone geometry")
-  geom.add_argument('-L', '--lariat',action='store_true',help="Run with the lariat geometry")
+  geom.add_argument('-A','-a', '--argoneut',action='store_true',help="Run with the argoneut geometry")
+  geom.add_argument('-U','-u', '--uboone',action='store_true',help="Run with the microboone geometry")
+  geom.add_argument('-L','-l', '--lariat',action='store_true',help="Run with the lariat geometry")
   parser.add_argument('file',nargs='?',help="Optional input file to use")
   args = parser.parse_args()
 
