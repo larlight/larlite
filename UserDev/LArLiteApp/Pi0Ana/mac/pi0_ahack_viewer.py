@@ -60,7 +60,7 @@ pi0_topo.SignalTopology(1)
 # 0 == CC 1 == NC 
 pi0_topo.SetCCNC(1)
 pi0_topo.SetFVCut(0)
-pi0_topo.SetEnergyCut(20);
+pi0_topo.SetEnergyCut(0);
 pi0_topo.SetContainment(0.0);
 
 
