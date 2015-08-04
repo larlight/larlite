@@ -49,7 +49,8 @@ namespace larlite {
 			    _shrProfiler.ShowerRadius() );
 	// Fill more info
 	s._energy     = mcs.DetProfile().Momentum().E();
-	s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
+	if(mcs.dEdx() == 0){s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));} 
+	else{s._dedx =  mcs.dEdx();}
 	s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
 	
 	::ertool::RecoInputID_t in_id(i,mcs_v.name());
@@ -562,7 +563,8 @@ namespace larlite {
 			  _shrProfiler.ShowerRadius() );
       s._energy     = mcs.DetProfile().Momentum().E();
       //s._energy = mcs.Start().Momentum().E();
-      s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.05) : gRandom->Gaus(2,2*0.05));
+      if(mcs.dEdx() == 0){s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));} 
+      else{s._dedx =  mcs.dEdx();}
       s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
       s._time = mcs_v[i].End().T();
       double mass = 0;
