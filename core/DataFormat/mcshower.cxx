@@ -14,6 +14,11 @@ namespace larlite {
 			   data::kINVALID_DOUBLE,
 			   data::kINVALID_DOUBLE,
 			   data::kINVALID_DOUBLE);
+    
+    TVector3 invalid_vec(data::kINVALID_DOUBLE,
+			 data::kINVALID_DOUBLE,
+			 data::kINVALID_DOUBLE);
+
     mcstep invalid_step(invalid,invalid);
 
     fOrigin    = simb::kUnknown;
@@ -40,6 +45,10 @@ namespace larlite {
     
     fDaughterTrackID.clear();
     fPlaneCharge.clear();
+    
+    fStartDir = invalid_vec;
+
+    fdEdx = data::kINVALID_DOUBLE;
   }
 
   //----------------------------------------------------
@@ -56,7 +65,7 @@ namespace larlite {
     return fPlaneCharge[plane];
   }
   
-  simb::Origin_t       mcshower::Origin() const { return fOrigin;    }
+  simb::Origin_t     mcshower::Origin() const { return fOrigin;    }
   
   int                mcshower::PdgCode () const { return fPDGCode;   }
   unsigned int       mcshower::TrackID () const { return fTrackID; } 
@@ -81,6 +90,9 @@ namespace larlite {
   const std::vector<unsigned int>&  mcshower::DaughterTrackID() const { return fDaughterTrackID; }
   
   const std::vector<double>& mcshower::Charge() const { return fPlaneCharge; }
+
+  const TVector3& mcshower::StartDir() const { return fStartDir; }
+  const double& mcshower::dEdx() const { return fdEdx; }
 
 }
 

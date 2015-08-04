@@ -52,8 +52,8 @@ namespace larlite {
                                        fDaughterTrackID(origin.fDaughterTrackID),
                                        fDetProfile(origin.fDetProfile),
                                        fPlaneCharge(origin.fPlaneCharge),
-                                       fdEdx(origin.fdEdx),
-                                       fStartDir(origin.fStartDir)
+                                       fStartDir(origin.fStartDir),
+                                       fdEdx(origin.fdEdx)
     {}
 
     /// Default destructor
@@ -92,10 +92,9 @@ namespace larlite {
 
     const std::vector<double>& Charge() const;
 
-    const double& dEdx() const{ return fdEdx;}
+    const TVector3& StartDir() const;
 
-    const TVector3& StartDir() const {return fStartDir;}
-
+    const double& dEdx() const;
 
     //--- Setters ---//
     void Origin  ( simb::Origin_t o ) { fOrigin    = o;    }
@@ -105,7 +104,7 @@ namespace larlite {
     void Process ( const std::string &name ) { fProcess   = name; }
     void Start   ( const mcstep &s         ) { fStart   = s;      }
     void End     ( const mcstep &s         ) { fEnd     = s;      }
-    void StartDir ( const TVector3 &sdir) { fStartDir = sdir; }
+
 
 
     void MotherPdgCode ( int id                  ) { fMotherPDGCode   = id;   }
@@ -126,6 +125,7 @@ namespace larlite {
 
     void Charge (const std::vector<double>& q) { fPlaneCharge = q; }
 
+    void StartDir ( const TVector3 &sdir) { fStartDir = sdir; }
     void dEdx    (const double& dedx) {fdEdx = dedx;}
 
 
@@ -140,7 +140,7 @@ namespace larlite {
     std::string  fProcess;     ///< Shower particle's creation process
     mcstep       fStart;     ///< Shower particle's G4 start point
     mcstep       fEnd;       ///< Shower particle's G4 end point
-    TVector3 fStartDir; ///< Shower Starting Direction, within the first 2.4cm                   
+
 
     //---- Mother's particle info ---//
     int          fMotherPDGCode;   ///< Shower's mother PDG code   
@@ -159,11 +159,14 @@ namespace larlite {
     //---- Energy deposition info ----//
     std::vector<unsigned int>  fDaughterTrackID; ///< Daughters' track ID
     mcstep                     fDetProfile;      ///< Combined energy deposition information
-    double                     fdEdx;            ///< Shower True dEdx
-
 
     //---- Charge per plane ----//
     std::vector<double> fPlaneCharge; ///< Charge deposit per plane
+    TVector3                   fStartDir;        ///< Shower Starting Direction, within the first 2.4cm                   
+    double                     fdEdx;            ///< Shower True dEdx
+
+
+
   };
 
   /**
