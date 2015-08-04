@@ -134,18 +134,11 @@ class wire(dataBase):
     return d
 
   def getPlane(self,plane):
-    a = np.array(self._c2p.Convert(self._process.getDataByPlane(plane)))
-    # print "a[", str(plane), "[0][0]" , str(a[0][0])
-    # print "a[", str(plane), "[0][1]" , str(a[0][1])
-    # print "a[", str(plane), "[0][2]" , str(a[0][2])
-    # print "a[", str(plane), "[29][0]" , str(a[29][0])
-    # print "a[", str(plane), "[29][1]" , str(a[29][1])
-    # print "a[", str(plane), "[29][2]" , str(a[29][2])
-    # print "a[", str(plane), "[93][0]" , str(a[93][0])
-    # print "a[", str(plane), "[93][1]" , str(a[93][1])
-    # print "a[", str(plane), "[93][2]" , str(a[93][2])
-    return np.array(self._c2p.Convert(self._process.getDataByPlane(plane)))
-
+    print "Called getPlane"
+    b = self._process.getNumpyByPlane(plane)
+    print type(b)
+    return b
+    
   def getWire(self, plane, wire):
     return np.array(self._c2p.Convert(self._process.getWireData(plane,wire)))
 
@@ -155,6 +148,11 @@ class recoWire(wire):
     self._process = evd.DrawRaw()
     self._process.initialize()
 
+class rawDigit(wire):
+  def __init__(self):
+    super(rawDigit,self).__init__()
+    self._process = evd.DrawRawDigit()
+    self._process.initialize()
 
 class hit(recoBase):
   """docstring for hit"""

@@ -3,6 +3,7 @@
 
 #include "ParticleGraph.h"
 #include <iostream>
+#include <sstream>
 #include "ERException.h"
 #include "UtilFunc.h"
 namespace ertool {
@@ -179,8 +180,8 @@ namespace ertool {
     //                         2-b) only one of them has a valid generation
     //                         2-c) shares the same generation in the same tree
     if( part_a.Generation() != kDefaultGeneration && part_b.Generation() != kDefaultGeneration ) {
-      if( part_a.Ancestor() != part_b.Ancestor() && !part_a.Primary() && !part_b.Primary() )
-	throw ERException("Two non-primary particles from different ancestor cannot be unified!");
+      if( part_a.Ancestor() != part_b.Ancestor() && part_a.Descendant() && part_b.Descendant())
+	throw ERException("Two decendants particles from different ancestor cannot be unified!");
       if( part_a.Ancestor() == part_b.Ancestor() && part_a.Parent() != part_b.Parent() )
 	throw ERException("Two particles from the same ancestor but from different parents cannot be unified!");
     }
@@ -265,6 +266,11 @@ namespace ertool {
   {
     if(_particle_v[target]._generation != gen ) {
       _particle_v[target]._generation = gen;
+      //std::cout<<target<<"/"<<_particle_v.size()<<" => "<<gen<<std::endl;
+      //std::cout<<Diagram(target)<<std::endl<<"belongs to an ancestor ";
+      //auto const ancestor_node = GetParticle(target).Ancestor();
+      //std::cout<<ancestor_node<<" ... w/ diagram:"<<std::endl
+      //<<Diagram(GetParticle(target).Ancestor())<<std::endl;
       for(auto const& child_id : _particle_v[target].Children())
 	UpdateGeneration(child_id, gen+1);
     }
@@ -294,6 +300,11 @@ namespace ertool {
     // Add child
     auto& parent = GetParticle(parent_id);
     auto& child  = GetParticle(child_id);
+    if(child.Parent() == parent_id) {
+      parent.SetScore(child_id,score);
+      child.SetScore(parent_id,score);
+      return;
+    }
     ValidNode(child_id);
     parent.AddChild(child_id);
     parent.SetScore(child_id,score);
@@ -314,6 +325,7 @@ namespace ertool {
       res += prefix + "unknown" + " ... ";
     else
       res += prefix + std::to_string(p.PdgCode()) + " ... ";
+
     if (p.Vertex() == kINVALID_VERTEX)
       res += "[unknown] [cm]";
     else
@@ -322,6 +334,7 @@ namespace ertool {
       res += "--> unknown" ;
     else
       res += "--> " + std::to_string( p.KineticEnergy() );
+      //res += std::to_string(p.Momentum()[0]) + " [MeV/c] : " + std::to_string(p.Momentum()[1]) + " [MeV/c] : " + std::to_string(p.Momentum()[2]) + " [MeV/c] ";
     res += " MeV \n";
     prefix += "  ";
     for(auto const& c : p.Children()) Diagram(c,res,prefix);
@@ -330,7 +343,7 @@ namespace ertool {
   std::string ParticleGraph::Diagram(const NodeID_t target) const
   {
     std::string res;
-    Diagram(target,res," ");
+    Diagram(target,res,"  ");
     return res;    
   }
 
@@ -339,13 +352,13 @@ namespace ertool {
     std::string res;
     for(auto const& part_id : GetParticleNodes()) {
       auto const& p = GetParticle(part_id);
-      if( !p.Primary() && p.RelationAssessed() ) continue;
+      if( p.Descendant() && p.RelationAssessed() ) continue;
       std::string part_diagram;
       if( !p.RelationAssessed() )
 	part_diagram += "UN-ASSESSED " + std::to_string(p.PdgCode());
       else {
-	part_diagram  = " ";
-	Diagram(part_id,part_diagram," ");
+	part_diagram  = "";
+	Diagram(part_id,part_diagram,"  ");
 	part_diagram += "\n";
 	res += part_diagram;
       }
@@ -355,19 +368,60 @@ namespace ertool {
   
   void ParticleGraph::SetParentage(const NodeID_t parent_id, const NodeID_t child_id, const float score)
   {
+    if(parent_id == child_id) {
+      std::cout << "\033[93m<<WARNING>>\033[00m Two particles ("
+	        << parent_id << "," << child_id
+		<< ") are identical! SetParentage is ignored..."
+		<< std::endl;
+      return;
+    }
+    
     ValidNode(parent_id);
     ValidNode(child_id);
     auto& child  = _particle_v[child_id];
 
     // Not OK if a child is not associated with anything
-    if( child.RelationAssessed() && !child.Primary() )
-	throw ERException("Cannot make parentage for a child who is neither lonely nor primary!");
+    if( child.RelationAssessed() && child.Descendant() ) {
+      std::cout << "\033[91m<<ERROR>>\033[00m @ SetParentage..." << std::endl
+		<< "Parent (" << parent_id <<") has diagram: " << std::endl
+		<< Diagram(parent_id).c_str() << std::endl
+		<< "... and belongs to the whole family:" << std::endl
+		<< Diagram(_particle_v[parent_id].Ancestor()) << std::endl
+		<< "Child  (" << child_id <<") has diagram:" << std::endl
+		<< Diagram(child_id).c_str()
+		<< "... and belongs to the whole family:" << std::endl
+		<< Diagram(child.Ancestor()) << std::endl;
+      //std::cout<<msg.str()<<std::endl;
+      throw ERException("Cannot make parentage for a child who is neither lonely nor primary!");
+    }
+
+    auto const& des_a = GetAllDescendantNodes(parent_id);
+    for(auto const& id : des_a) {
+      if(id == child_id) {
+	throw ERException("Child is already in a chain of parent!");
+      }
+    }
+    auto const& des_b = GetAllDescendantNodes(child_id);
+    for(auto const& id : des_b){
+      if(id == parent_id) {
+	std::cout<<Diagram(child_id)<<std::endl;
+	throw ERException("Trying to assign parent that has already been assigned as as a descendant of this node!");
+      }
+    }
 
     AddChild(parent_id, child_id, score);
   }
 
   void ParticleGraph::SetSiblings(const NodeID_t his_id, const NodeID_t her_id, const float score)
   {
+    if(his_id == her_id) {
+      std::cout << "\033[93m<<WARNING>>\033[00m Two particles ("
+	        << his_id << "," << her_id
+		<< ") are identical! SetSiblings is ignored..."
+		<< std::endl;
+      return;
+    }
+    
     ValidNode(his_id);
     ValidNode(her_id);
 
@@ -418,13 +472,13 @@ namespace ertool {
   {
     ValidNode(node);
     auto& thisnode = _particle_v[node];
-    // for now allow to set primary only if relation was never
-    // assessed
-    if (thisnode.RelationAssessed())
-      return;
-    // relation not assessed...proceed
-    thisnode._generation  = 0;
-    thisnode._ancestor_id = thisnode._node_id;
+    if(thisnode.Primary()) return;
+
+    thisnode._primary = true;
+    UpdateGeneration(node,0);
+    UpdateParentID(node,node);
+    UpdateAncestorID(node,node);
+    return;
   }
 
   void ParticleGraph::Reset()

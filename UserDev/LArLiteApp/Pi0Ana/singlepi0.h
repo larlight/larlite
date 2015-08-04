@@ -74,7 +74,8 @@ namespace larlite {
 	int _Topo;
 	bool _Sig;
 	int _ccnc;
-
+	double _Energy ;
+	int _n_E;
     
   };
 }

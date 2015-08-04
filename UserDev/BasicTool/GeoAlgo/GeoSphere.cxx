@@ -106,7 +106,9 @@ namespace geoalgo {
   //  Alternative ctor (4) - 4 Points
   //  Real-Time Collision Blog
   //  http://realtimecollisiondetection.net/blog/?p=20
+  /*
   Sphere::Sphere(const Point_t& A, const Point_t& B, const Point_t& C, const Point_t& D){
+
     compat(A);
     compat(B);
     compat(C);
@@ -139,13 +141,119 @@ namespace geoalgo {
       _radius = _center.Dist(A);
     }
 
+    std::cout << "the center size at this stage is: " << _center.size() << std::endl;
     // TEMPORARY
     // otherwise find the 4 possible sphere combinations,
     // which contains the 4th point,
     // and if multiple ones choose the one with the smallest radius
-    Sphere tmp;
-    tmp = Sphere(A,B,C);
+    Sphere tmp = Sphere(A,B,C);
     _radius = kINVALID_DOUBLE;
+    if (tmp.Contain(D)){
+      _center = tmp.Center();
+      _radius = tmp.Radius();
+    }
+    tmp = Sphere(A,B,D);
+    if (tmp.Contain(C)){
+      if (tmp.Radius() < _radius){
+	_center = tmp.Center();
+	_radius = tmp.Radius();
+      }
+    }
+    tmp = Sphere(A,C,D);
+    if (tmp.Contain(B)){
+	if (tmp.Radius() < _radius){
+	  _center = tmp.Center();
+	  _radius = tmp.Radius();
+	}
+    }
+    tmp = Sphere(B,C,D);
+    if (tmp.Contain(A)){
+      if (tmp.Radius() < _radius){
+	_center = tmp.Center();
+	_radius = tmp.Radius();
+      }
+    }
+
+    std::cout << "the center size is: " << _center.size() << std::endl;
+
+  }
+  */
+
+  // 4-point constructor
+  Sphere::Sphere(const Point_t& A, const Point_t& B, const Point_t& C, const Point_t& D){
+
+    compat(A);
+    compat(B);
+    compat(C);
+    compat(D);
+
+    // get sphere from 3 points (A,B,C)
+    Vector_t AB(B-A);
+    Vector_t AC(C-A);
+    Vector_t AD(D-A);
+
+    double dABAB = AB.Dot(AB);
+    double dACAC = AC.Dot(AC);
+    double dADAD = AD.Dot(AD);
+    double dABAC = AB.Dot(AC);
+    double dABAD = AB.Dot(AD);
+    double dACAD = AC.Dot(AD);
+    
+    double d = 4*dABAC*dABAD*dACAD;
+
+    if (d==0)
+      throw GeoAlgoException("GeoSphere Exception: I think it means 3 points collinear. Find out which and call 3 point constructor - TO DO");
+    
+    double s = (dABAC*dACAD*dADAD + dABAD*dACAC*dACAD - dABAB*dACAD*dACAD)/d;
+    double t = (dABAB*dACAD*dABAD + dABAD*dABAC*dADAD - dABAD*dABAD*dACAC)/d;
+    double u = (dABAB*dABAC*dACAD + dABAC*dABAD*dACAC - dABAC*dABAC*dADAD)/d;
+    
+    // if everything positive! P = A + s(B-A) + t(C-A) + u(D-A)
+    if ( (s > 0) && (t > 0) && (u > 0) && ((1-s-t-u) > 0) ){
+      _center = A + AB*s + AC*t + AD*u;
+      _radius = _center.Dist(A);
+    }
+    else{
+      // take the largest side and use it as the diameter
+      double maxdist = A.Dist(B);
+      Vector_t max1 = A;
+      Vector_t max2 = B;
+      if (A.Dist(C) > maxdist){
+	maxdist = A.Dist(C);
+	max1 = A;
+	max2 = C;
+      }
+      if (A.Dist(D) > maxdist){
+	maxdist = A.Dist(D);
+	max1 = A;
+	max2 = D;
+      }
+      if (B.Dist(C) > maxdist){
+	maxdist = B.Dist(C);
+	max1 = B;
+	max2 = C;
+      }
+      if (B.Dist(D) > maxdist){
+	maxdist = B.Dist(D);
+	max1 = B;
+	max2 = D;
+      }
+      if (C.Dist(D) > maxdist){
+	maxdist = C.Dist(D);
+	max1 = C;
+	max2 = D;
+      }
+      _center = (max1+max2)/2.;
+      _radius = max1.Dist(max2)/2.;
+    }
+      
+
+    // TEMPORARY
+    // otherwise find the 4 possible sphere combinations,
+    // which contains the 4th point,
+    // and if multiple ones choose the one with the smallest radius
+    Sphere tmp = Sphere(A,B,C);
+    //_radius = kINVALID_DOUBLE;
     if (tmp.Contain(D)){
       _center = tmp.Center();
       _radius = tmp.Radius();
@@ -180,7 +288,7 @@ namespace geoalgo {
     : _center(0,0,0)
     , _radius(0)
   {
-    
+
     switch(pts.size()) {
     case 0:
       break;
@@ -195,6 +303,7 @@ namespace geoalgo {
     default:
       throw GeoAlgoException("Cannot call Sphere constructor with more than 4 points. Something went wront");	
     }
+
   }
   
   const Point_t& Sphere::Center() const { return _center; }

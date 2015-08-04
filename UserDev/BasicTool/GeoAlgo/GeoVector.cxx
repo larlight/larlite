@@ -22,7 +22,7 @@ namespace geoalgo {
   
   Vector::Vector(const TLorentzVector &pt) : Vector(3)
   { (*this)[0] = pt[0]; (*this)[1] = pt[1]; (*this)[2] = pt[2]; }
-  
+
   bool Vector::IsValid() const {
     
     for (auto const &v : (*this)){
@@ -70,6 +70,13 @@ namespace geoalgo {
     return (*this)[0] == 0.0 && (*this)[1] == 0.0 ? 0.0 : atan2((*this)[1],(*this)[0]);
   }
   
+  double Vector::Theta() const {
+    if ( size() != 3 )
+      throw GeoAlgoException("<<Theta>> Only possible for 3-dimensional vectors!");
+
+    return (*this).Length() == 0.0 ? 0.0 : acos( (*this)[2] / (*this).Length() );
+  }
+
   double Vector::Angle(const Vector &obj) const {
     compat(obj);
     if(size()!=2 && size()!=3)

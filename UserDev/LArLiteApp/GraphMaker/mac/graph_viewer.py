@@ -10,7 +10,8 @@ if len(sys.argv) < 2:
 from seltool import ertool
 from ROOT import geotree
 from larlite import larlite as fmwk
-from seltool.algoviewer import getViewer, viewAll
+from seltool.erviewer import ERViewer
+from seltool.algoviewer import viewAll
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
@@ -42,8 +43,8 @@ my_anaunit = fmwk.ExampleERSelection()
 my_anaunit.SetShowerProducer(True,"mcreco");
 my_anaunit.SetTrackProducer(True,"mcreco");
 # RECO PRODUCERS
-#my_ana.SetShowerProducer(False,"showerreco");
-#my_ana.SetTrackProducer(False,"");
+#my_anaunit.SetShowerProducer(False,"showerreco");
+#my_anaunit.SetTrackProducer(False,"");
 #############################
 my_anaunit._mgr.AddAlgo(my_algo)
 my_anaunit._mgr._mc_for_ana = True
@@ -51,8 +52,8 @@ my_proc.add_process(my_anaunit)
 #my_proc.run()
 #sys.exit(0)
 
-mcviewer   = getViewer('MC Info')
-recoviewer = getViewer('RECO Info')
+mcviewer   = ERViewer('MC Info')
+recoviewer = ERViewer('RECO Info')
 
 counter = 0
 while (counter < 1000):

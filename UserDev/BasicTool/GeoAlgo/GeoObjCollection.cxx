@@ -94,7 +94,8 @@ namespace geoalgo {
     _cone_v.push_back(cone);
     _cone_col.push_back(c);
   }
-  /*
+
+
   void GeoObjCollection::Add(const Sphere_t& sphere, std::string name, std::string c)
   {
     if(name.empty()) name = Form("Sphere (%zu)",_sphere_v.size());
@@ -102,7 +103,7 @@ namespace geoalgo {
     _sphere_v.push_back(sphere);
     _sphere_col.push_back(c);
   }
-  */
+
 }
 
 #endif

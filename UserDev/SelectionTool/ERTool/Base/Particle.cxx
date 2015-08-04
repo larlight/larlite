@@ -21,7 +21,9 @@ namespace ertool {
     , _child_v()
     , _reco_type(reco_type)
     , _reco_id(reco_id)
-  {}
+  {
+    _primary = 0 ;
+  }
 
   const NodeID_t&     Particle::ID         () const { return _node_id;     }
   const NodeID_t&     Particle::Parent     () const { return _parent_id;   }
@@ -32,9 +34,10 @@ namespace ertool {
     if(id >= _score_v.size()) return -1;
     return _score_v[id];
   }
-  
-  const RecoType_t& Particle::RecoType() const { return _reco_type; }
-  const RecoID_t&  Particle:: RecoID()   const { return _reco_id;   }
+
+  const ProcessType_t& Particle::ProcessType() const { return _process;   }
+  const RecoType_t& Particle::RecoType()       const { return _reco_type; }
+  const RecoID_t&  Particle:: RecoID()         const { return _reco_id;   }
 
   const int&    Particle::PdgCode() const
   { return _pdg_code; }
@@ -60,7 +63,10 @@ namespace ertool {
   { return _generation != kDefaultGeneration; }
   
   bool Particle::Primary() const
-  { return (_node_id == _ancestor_id && RelationAssessed() ); }
+  { return _primary; }
+
+  bool Particle::Descendant() const
+  { return (!(_node_id == _parent_id && RelationAssessed())); }
   
   bool Particle::Lonely() const
   { return (_child_v.size()<1); }
@@ -159,6 +165,36 @@ namespace ertool {
 
     if(_score_v.size())
        _score_v.erase(--_score_v.end());
+  }
+
+
+
+  void Particle::Print(std::string& res, std::string prefix) const
+  {
+    res+="Printing members of particle \n";
+    if (PdgCode() == kINVALID_INT)
+      res += prefix + "unknown" + " ... ";
+    else
+      res += "Pdg " + prefix + std::to_string(PdgCode()) + " ... \n";
+    if (Vertex() == kINVALID_VERTEX)
+      res += "[unknown] [cm]";
+    else
+      res += "Vtx " + std::to_string(Vertex()[0]) + " [cm] : " + std::to_string(Vertex()[1]) + " [cm] : " + std::to_string(Vertex()[2]) + " [cm] \n";
+    if (Momentum() == kINVALID_MOMENTUM)
+      res += "--> unknown" ;
+    else
+      res += "Kinetic Energy " + std::to_string( KineticEnergy() );
+    res += " MeV \n";
+
+    prefix += "  ";
+
+  }
+
+  std::string Particle::Print() const
+  {
+    std::string res;
+    Print(res," ");
+    return res;    
   }
 
 }

@@ -18,7 +18,7 @@ my_proc.enable_filter(True)
 # Create algorithm
 my_algo = ertool.AlgoSingleGamma()
 my_algo.useRadLength(True)
-my_algo.setVerbose(False)
+my_algo.setVerbose(True)
 #my_algo.setRejectLongTracks(False)
 my_algo.setVtxToTrkStartDist(1)  #1
 my_algo.setVtxToTrkDist(1)	 #1
@@ -29,14 +29,9 @@ my_algo.setEThreshold(0.)	 #100
 #my_algo.setBDtW(10)
 #my_algo.setBDtTW(10)
 
-# Create ERTool filter
-#my_filter = ertool.FilterTrackLength()
-#my_filter.setLengthCut(0.3)
-
-
 # Create MC Filter
-MCfilter = fmwk.MC_NCNGamma_Filter();
-MCfilter.setMaxNEvents(1000);
+#MCfilter = fmwk.MC_NCNGamma_Filter();
+#MCfilter.setMaxNEvents(1000);
 #MCfilter.flip(False)
 
 # Set input root file
@@ -56,13 +51,13 @@ my_proc.set_ana_output_file("singleGamma_selection.root")
 Ecut = 20 # in MeV
 
 my_ana = ertool.ERAnaSingleE()
-my_ana.SetDebug(False)
-my_ana.SetECut(Ecut)
+#my_ana.SetDebug(False)
+#my_ana.SetECut(Ecut)
 
 my_anaunit = fmwk.ExampleERSelection()
-my_anaunit._mgr.SetAlgo(my_algo)
+my_anaunit._mgr.AddAlgo(my_algo)
 #my_anaunit._mgr.SetFilter(my_filter)
-#my_anaunit._mgr.SetAna(my_ana)
+my_anaunit._mgr.AddAna(my_ana)
 
 #This cut is applied in helper... ertool showers are not made if the energy of mcshower or reco shower
 #is below this threshold. This has to be above 0 or else the code may segfault. This is not a "physics cut".
@@ -81,7 +76,7 @@ my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
 #my_anaunit.SetVtxProducer(True,"generator");
 # ************************************************
-my_proc.add_process(MCfilter)
+#my_proc.add_process(MCfilter)
 my_proc.add_process(my_anaunit)
 
 my_proc.run()

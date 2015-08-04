@@ -53,6 +53,9 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_track> () const
   { return data::kTrack; }
 
+  template<> data::DataType_t storage_manager::data_type<event_trackmom> () const
+  { return data::kTrackMomentum; }
+
   template<> data::DataType_t storage_manager::data_type<event_shower> () const
   { return data::kShower; }
 

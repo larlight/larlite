@@ -86,6 +86,7 @@ namespace larlite{
       kAssociation,        ///< Association data product
       kPCAxis,             ///< recob::PCAxis
       kFlashMatch,         ///< anab::FlashMatch
+      kTrackMomentum,      ///< track momentum
       kDATA_TYPE_MAX       ///< Event-wise enum boundary
     };
 
@@ -137,7 +138,8 @@ namespace larlite{
       "fifo",
       "ass",
       "pcaxis",
-      "fmatch"
+      "fmatch",
+      "trackmom"
     };
 
     const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {
