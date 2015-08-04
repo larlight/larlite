@@ -285,20 +285,31 @@ class boxCollection(QtCore.QObject):
     return tip
 
   def hoverEnter(self, e):
-    self.mouseEnter.emit(e)
     for hit in self._listOfHits:
       hit.setPen(pg.mkPen((0,0,0),width=1))
+    # When the function is called from a box, the sender is none
+    # When its passed from the params, the sender is something
+    if self.sender() == None:
+      self.mouseEnter.emit(e)
 
   def hoverExit(self, e):
-    self.mouseExit.emit(e)
     if self._isHighlighted:
       return
     for hit in self._listOfHits:
       hit.setPen(pg.mkPen(None))
+    # When the function is called from a box, the sender is none
+    # When its passed from the params, the sender is something
+    if self.sender() == None:
+      self.mouseExit.emit(e)
+
 
   def toggleHighlight(self):
-    self.highlightChange.emit()
     self._isHighlighted = not self._isHighlighted
+    # When the function is called from a box, the sender is none
+    # When its passed from the params, the sender is something
+    if self.sender() == None:
+      self.highlightChange.emit()
+
 
   def drawHits(self,view,wireList,timeStartList,timeEndList):
     for i in xrange(len(wireList)):
@@ -323,11 +334,17 @@ class boxCollection(QtCore.QObject):
 
 class clusterParams(QtCore.QObject): #recoBase):
   """docstring for clusterParams"""
+  
+  mouseEnter  = QtCore.pyqtSignal(QtGui.QGraphicsSceneHoverEvent)
+  mouseExit   = QtCore.pyqtSignal(QtGui.QGraphicsSceneHoverEvent)
+  highlightChange = QtCore.pyqtSignal()
+
   def __init__(self,params,geom):
     super(clusterParams, self).__init__()
     self._listOfStartPoints = []
     self._params = params
     self._geom = geom
+    self._isHighlighted = False
 
   #Some member params i'm not filling forrectly.
   def setParams(self,params):
@@ -336,21 +353,34 @@ class clusterParams(QtCore.QObject): #recoBase):
 
 
   def hoverEnter(self, e):
-    self.mouseEnter.emit(e)
-    for hit in self._listOfHits:
-      hit.setPen(pg.mkPen((0,0,0),width=1))
+    for circle in self._listOfStartPoints:
+      circle.setPen(pg.mkPen((0,0,0),width=1))
+    # When the function is called from a box, the sender is none
+    # When its passed from the params, the sender is something
+    if self.sender() == None:
+      self.mouseEnter.emit(e)
 
   def hoverExit(self, e):
-    self.mouseExit.emit(e)
     if self._isHighlighted:
       return
-    for hit in self._listOfHits:
-      hit.setPen(pg.mkPen(None))
+    for circle in self._listOfStartPoints:
+      circle.setPen(pg.mkPen(None))
+    # When the function is called from a box, the sender is none
+    # When its passed from the params, the sender is something
+    if self.sender() == None:
+      self.mouseExit.emit(e)
 
   def toggleHighlight(self):
-    self.highlightChange.emit()
     self._isHighlighted = not self._isHighlighted
+    # When the function is called from a box, the sender is none
+    # When its passed from the params, the sender is something
+    if self.sender() == None:
+      self.highlightChange.emit()
 
+  def genToolTip(self):
+    # nhits = len(self._listOfHits)
+    tip = "No Tip!"  
+    return tip
 
   def draw(self, view):
     # This function is responsible for all clusterparams drawing
@@ -365,10 +395,18 @@ class clusterParams(QtCore.QObject): #recoBase):
 
 
     bigCircleStart = connectedCircle(sW-1,sT-20,2,40)
-    bigCircleStart.setPen(pg.mkPen(None))
+    if self._isHighlighted:
+      bigCircleStart.setPen(pg.mkPen(black))
+    else:
+      bigCircleStart.setPen(pg.mkPen(None))
     bigCircleStart.setBrush(pg.mkColor(green))
     bigCircleStart.setOpacity(0.6)
-    
+    bigCircleStart.connectOwnerHoverEnter(self.hoverEnter)
+    bigCircleStart.connectOwnerHoverExit(self.hoverExit)
+    bigCircleStart.connectToggleHighlight(self.toggleHighlight)
+    bigCircleStart.connectToolTip(self.genToolTip)
+
+
     smallCircleStart = QtGui.QGraphicsEllipseItem(sW-0.2,sT-5,0.4,10)
     smallCircleStart.setPen(pg.mkPen(None))
     smallCircleStart.setBrush(pg.mkColor(black))
@@ -377,6 +415,11 @@ class clusterParams(QtCore.QObject): #recoBase):
     bigCircleEnd.setPen(pg.mkPen(None))
     bigCircleEnd.setBrush(pg.mkColor(red))
     bigCircleEnd.setOpacity(0.6)
+    bigCircleEnd.connectOwnerHoverEnter(self.hoverEnter)
+    bigCircleEnd.connectOwnerHoverExit(self.hoverExit)
+    bigCircleEnd.connectToggleHighlight(self.toggleHighlight)
+    bigCircleEnd.connectToolTip(self.genToolTip)
+
 
     smallCircleEnd = QtGui.QGraphicsEllipseItem(eW-0.2,eT-5,0.4,10)
     smallCircleEnd.setPen(pg.mkPen(None))
@@ -484,7 +527,14 @@ class cluster(recoBase):
             cParams = clusterParams(params_v[i_cluster],view_manager._geometry) 
             self._listOfCParams[thisPlane][-1] = cParams
             self._listOfCParams[thisPlane][-1].draw(view)
-	
+
+            # Connect the params to the cluster:
+            self._listOfCParams[thisPlane][-1].mouseEnter.connect(self._listOfClusters[thisPlane][-1].hoverEnter)
+            self._listOfCParams[thisPlane][-1].mouseExit.connect(self._listOfClusters[thisPlane][-1].hoverExit)
+            self._listOfCParams[thisPlane][-1].highlightChange.connect(self._listOfClusters[thisPlane][-1].toggleHighlight)
+            self._listOfClusters[thisPlane][-1].mouseEnter.connect(self._listOfCParams[thisPlane][-1].hoverEnter)
+            self._listOfClusters[thisPlane][-1].mouseExit.connect(self._listOfCParams[thisPlane][-1].hoverExit)
+            self._listOfClusters[thisPlane][-1].highlightChange.connect(self._listOfCParams[thisPlane][-1].toggleHighlight)	
 
   def clearDrawnObjects(self,view_manager):
     i_plane = 0
