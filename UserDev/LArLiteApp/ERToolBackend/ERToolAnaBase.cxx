@@ -96,13 +96,16 @@ namespace larlite {
     // Start filling SPAData object!
     // Fill showers
     if (_mcshowers && _name_shower.empty()){
+      //std::cout<<"In ERToolAnaBase...looking to add showers..."<<std::endl ;
       auto ev_mcs = storage->get_data<event_mcshower> (_name_mcshr);
       if (!ev_mcs){
 	print(msg::kERROR,__FUNCTION__,
-	      "MCShower info not found in the event!");
+	      "MCShower info not found in the event!\nLikely the producer type/name is set incorrectly\nCheck your python script!\nA producer name for MCShower needs to be set to (False,\"\") if none being used.");
 	throw std::exception();
       }
+
       _helper.FillShowers(*ev_mcs, *in_strm);
+      //std::cout<<"We successfully added shower!"<<std::endl ;
       // if cheater for single showers is to be used:
       if (_cheater)
 	_helper.SingleShowerCheater(*ev_mcs,*in_strm);
@@ -113,7 +116,7 @@ namespace larlite {
       auto ev_ctag_shw = storage->get_data<event_cosmictag> (Form("%stag",_name_shower.c_str()));
       if (!ev_shw) {
 	print(msg::kERROR,__FUNCTION__,
-	      "RecoShower info not found in the event!");
+	      "RecoShower info not found in the event!\nLikely the producer type/name is set incorrectly\nCheck your python script!\nA producer name for MCShower needs to be set to (False,\"\") if none being used.");
 	throw std::exception();
       }
       if(!ev_ctag_shw){
@@ -129,7 +132,7 @@ namespace larlite {
 	auto ev_mcs = storage->get_data<event_mcshower> ("mcreco");
 	if (!ev_mcs){
 	  print(msg::kERROR,__FUNCTION__,
-		"MCShower info not found in the event!");
+		"MCShower info not found in the event!\nLikely the producer type/name is set incorrectly\nCheck your python script!\nA producer name for MCShower needs to be set to (False,\"\") if none being used.");
 	  throw std::exception();
 	}
 	_helper.SingleShowerCheater(*ev_mcs,*in_strm);
@@ -141,7 +144,7 @@ namespace larlite {
       auto ev_mct = storage->get_data<event_mctrack>  (_name_mctrk);
       if (!ev_mct) {
 	print(msg::kERROR,__FUNCTION__,
-	      "MCTrack info not found in the event!");
+	      "MCTrack info not found in the event!\nLikely the producer type/name is set incorrectly\nCheck your python script!\nA producer name for MCTrack needs to be set to (False,\"\") if none being used.");
       }
       _helper.FillTracks(*ev_mct, *in_strm);
     }

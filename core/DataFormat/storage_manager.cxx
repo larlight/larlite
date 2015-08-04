@@ -7,6 +7,7 @@
 #include "potsummary.h"
 #include "hit.h"
 #include "track.h"
+#include "trackmom.h"
 #include "mctruth.h"
 #include "mctree.h"
 #include "user_info.h"
@@ -1068,6 +1069,9 @@ namespace larlite {
     case data::kTrack:
       _ptr_data_array[type][name]=new event_track(name);
       break;
+    case data::kTrackMomentum:
+      _ptr_data_array[type][name]=new event_trackmom(name);
+      break;
     case data::kMCTruth:
       _ptr_data_array[type][name]=new event_mctruth(name);
       break;
@@ -1429,10 +1433,12 @@ namespace larlite {
   bool storage_manager::go_to(uint32_t index,bool store) {
     
     bool status=true;
-    if(_mode==kWRITE){
-      Message::send(msg::kERROR,__FUNCTION__,
-		    "Cannot move the data pointer back/forth in kWRITE mode.");
-      status=false;
+    if(_mode==kWRITE) {
+      if( index && index >= _nevents_written ){
+	Message::send(msg::kERROR,__FUNCTION__,
+		      "Cannot move the data pointer back/forth in kWRITE mode.");
+	status=false;
+      }
     }else if(!_nevents) {
       Message::send(msg::kWARNING,__FUNCTION__,"Input file empty!");
       status=false;

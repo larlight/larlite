@@ -95,8 +95,7 @@ namespace ertool {
     bool _verbose;
 
     TTree* _algoPid_tree ;
-    int n_mu = 0;
-    double _part_x         ;
+    int _part_pid         ;
     
 
     

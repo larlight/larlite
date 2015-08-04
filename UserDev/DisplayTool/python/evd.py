@@ -105,9 +105,35 @@ class larlitegui(gui):
 
     # The wires are a special case.
     # Use a check box to control wire drawing
-    self._wireDrawBox = QtGui.QCheckBox("Draw Wires")
-    self._wireDrawBox.stateChanged.connect(self.wireDrawBoxWorker)
-    self._eastLayout.addWidget(self._wireDrawBox)
+    self._wireButtonGroup = QtGui.QButtonGroup()
+    # Draw no wires:
+    self._noneWireButton = QtGui.QRadioButton("None")
+    self._noneWireButton.clicked.connect(self.wireChoiceWorker)
+    self._wireButtonGroup.addButton(self._noneWireButton)
+
+    # Draw Wires:
+    self._wireButton = QtGui.QRadioButton("Wire")
+    self._wireButton.clicked.connect(self.wireChoiceWorker)
+    self._wireButtonGroup.addButton(self._wireButton)
+
+    # Draw Raw Digit
+    self._rawDigitButton = QtGui.QRadioButton("Raw Digit")
+    self._rawDigitButton.clicked.connect(self.wireChoiceWorker)
+    self._wireButtonGroup.addButton(self._rawDigitButton)
+
+    # Make a layout for this stuff:
+    self._wireChoiceLayout = QtGui.QVBoxLayout()
+    self._wireChoiceLabel = QtGui.QLabel("Wire Draw Options")
+    self._wireChoiceLayout.addWidget(self._wireChoiceLabel)
+    self._wireChoiceLayout.addWidget(self._noneWireButton)
+    self._wireChoiceLayout.addWidget(self._wireButton)
+    self._wireChoiceLayout.addWidget(self._rawDigitButton)
+
+    self._eastLayout.addLayout(self._wireChoiceLayout)
+
+    # Set the default to be no wires
+    self._noneWireButton.toggle()
+
 
     # Now we get the list of items that are drawable:
     drawableProducts = self._event_manager.getDrawableProducts()
@@ -135,13 +161,25 @@ class larlitegui(gui):
     # self._eastLayout.setVisible(False)
     # self._eastLayout.setVisible(True)
 
-  def wireDrawBoxWorker(self):
-    if self._wireDrawBox.isChecked():
-      self._event_manager.toggleWires(True)
-    else:
-      self._event_manager.toggleWires(False)
+  def wireChoiceWorker(self):
+    sender = self.sender()
+    if sender == self._noneWireButton:
+      self._event_manager.toggleWires(None)
+      # print "None is selected"
+    if sender == self._wireButton:
+      self._event_manager.toggleWires('wire')
+      # print "Wire is selected"
+    if sender == self._rawDigitButton:
+      self._event_manager.toggleWires('rawdigit')
+      # print "Raw digit is selected"
 
     self._view_manager.drawPlanes(self._event_manager)
+    # if self._wireDrawBox.isChecked():
+    #   self._event_manager.toggleWires(True)
+    # else:
+    #   self._event_manager.toggleWires(False)
+
+    # self._view_manager.drawPlanes(self._event_manager)
 
 
   def recoBoxHandler(self,text):

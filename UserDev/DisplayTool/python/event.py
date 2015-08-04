@@ -315,19 +315,31 @@ class larlite_manager(manager,QtCore.QObject):
     return xRange,yRange
 
   # handle all the wire stuff:
-  def toggleWires(self, wiresBool):
+  def toggleWires(self, product):
     # Now, either add the drawing process or remove it:
-    if 'wire' not in self._keyTable:
-      print "No wire data available to draw"
-      return
-    self._drawWires = wiresBool
-
-    if self._drawWires:
+    
+    if product == 'wire':
+      if 'wire' not in self._keyTable:
+        print "No wire data available to draw"
+        self._drawWires = False
+        return
+      self._drawWires = True
       self._wireDrawer = recoWire()
       self._process.add_process(self._wireDrawer._process)
       self.processEvent(True)
+    
+    elif product == 'rawdigit':
+      if 'rawdigit' not in self._keyTable:
+        print "No raw digit data available to draw"
+        self._drawWires = False
+        return
+      self._drawWires = True
+      self._wireDrawer = rawDigit()
+      self._process.add_process(self._wireDrawer._process)
+      self.processEvent(True)
     else:
-      self._wireDrawer = None   
+      self._wireDrawer = None
+      self._drawWires = False   
 
 
   def getPlane(self,plane):

@@ -29,11 +29,6 @@ my_algo.setEThreshold(0.)	 #100
 #my_algo.setBDtW(10)
 #my_algo.setBDtTW(10)
 
-# Create ERTool filter
-#my_filter = ertool.FilterTrackLength()
-#my_filter.setLengthCut(0.3)
-
-
 # Create MC Filter
 #MCfilter = fmwk.MC_NCNGamma_Filter();
 #MCfilter.setMaxNEvents(1000);

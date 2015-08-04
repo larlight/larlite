@@ -95,10 +95,6 @@ print '    > make --directory=%s' % target_dir
 print ' OR'
 print '    > cd %s; make;' % target_dir
 print
-print 'If needed, make sure you define linked libraries in rootmap generation script.'
-print 'The script is: %s/gen_rootmap.sh' % target_dir
-print 'If you have no idea what this means, just ignore it!'
-print
 print 'To remove your analysis unit code, you should remove:'
 print '%s/%s.h' % (target_dir,name)
 print '%s/%s.cxx' % (target_dir,name)

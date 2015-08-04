@@ -98,6 +98,10 @@
 #pragma link C++ class std::vector<larlite::track>+;
 #pragma link C++ class larlite::event_track+;
 
+#pragma link C++ class larlite::trackmom+;
+#pragma link C++ class std::vector<larlite::trackmom>+;
+#pragma link C++ class larlite::event_trackmom+;
+
 #pragma link C++ class larlite::shower+;
 #pragma link C++ class std::vector<larlite::shower>+;
 #pragma link C++ class larlite::event_shower+;

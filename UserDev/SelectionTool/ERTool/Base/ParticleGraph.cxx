@@ -405,10 +405,10 @@ namespace ertool {
     for(auto const& id : des_b){
       if(id == parent_id) {
 	std::cout<<Diagram(child_id)<<std::endl;
-	throw ERException("Parent is already in a chain of child!");
+	throw ERException("Trying to assign parent that has already been assigned as as a descendant of this node!");
       }
     }
-    
+
     AddChild(parent_id, child_id, score);
   }
 

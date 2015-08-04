@@ -3,7 +3,7 @@ from ROOT import gSystem
 from ROOT import ertool
 from ROOT import larlite as fmwk
 from seltool.ccsingleeDef import GetCCSingleEInstance
-from seltool.algoviewer import viewAll
+from seltool.algoviewer import viewAll, getViewer
 
 if len(sys.argv) < 2:
     msg  = '\n'
@@ -19,19 +19,11 @@ my_proc.enable_filter(False)
 # Get Default CCSingleE Algorithm instance
 # this sets default parameters
 # this information is loaded from:
-# $LARLITE_BASEDIR/python/seltool/GetCCSingleEInstance
+# $LARLITE_BASEDIR/python/seltool/ccsingleeDef
 # and the algorithm instance is the return of the
 # function GetCCSingleEInstance()
 my_algo = GetCCSingleEInstance()
 my_algo.setVerbose(True)
-
-# Create ERTool filter
-# This filter removes any track that
-# is less than 3 mm in length
-# these tracks exist in "perfect reco"
-# but at this stage it is unreasonable
-# to assume we will be able to
-# reconstruct them
 
 # Create MC Filter
 MCfilter = fmwk.MC_CC1E_Filter();
@@ -54,7 +46,7 @@ my_proc.set_ana_output_file("singleE_selection.root")
 Ecut = 20 # in MeV
 
 my_ana = ertool.ERAnaSingleE()
-my_ana.SetDebug(False)
+my_ana.SetDebug(True)
 my_ana.SetECut(Ecut)
 
 my_anaunit = fmwk.ExampleERSelection()
@@ -81,6 +73,10 @@ my_proc.add_process(MCfilter)
 my_proc.add_process(my_anaunit)
 
 
+#create instance of mc and reco viewer
+mcviewer   = getViewer('mc info')
+recoviewer = getViewer('reco info')
+
 # Start event-by-event loop
 counter = 0
 while (counter < 11700):
@@ -96,7 +92,8 @@ while (counter < 11700):
     part_reco = my_anaunit.GetParticles()
     data_mc   = my_anaunit.GetData(True)
     part_mc   = my_anaunit.GetParticles(True)
-    viewAll(data_mc,part_mc,data_reco,part_reco)
+    #viewAll(mcviewer,data_mc,part_mc,
+    #        recoviewer,data_reco,part_reco)
 
     #for x in xrange(part_mc.size()):
     #    print part_mc[x].Diagram()

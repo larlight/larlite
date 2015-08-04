@@ -149,12 +149,6 @@ namespace ertool {
     if (_debug) { std::cout << "Total Energy deposited in detector: " << _EDep << std::endl; }
    */ 
     
-    // If debug -> print out MC particle set
-    if (_debug){
-	std::cout << "MC Particle Tree: " << std::endl;
-	std::cout << mc_graph.Diagram();
-      }
-    
     // Loop through MC Particle Graph...not yet being made...
     // */ 
     // loop over all particles in MC particle set (made by Helper)
@@ -337,12 +331,14 @@ namespace ertool {
 //	    }
 	  if(_geoAlgo.Intersection(fTPC,shr,true).size() > 0){
 	    _distBackAlongTraj = sqrt(daught.Vertex().SqDist(_geoAlgo.Intersection(fTPC,shr,true)[0])) ;
-	    _distToTopWall = (_y_lepReco - detHalfHeight)*daught.Momentum().Length()/_py_lepReco ;
-	    _distToWall = sqrt(_geoAlgo.SqDist(daught.Vertex(),fTPC));
-	    std::cout<<"Testing to show we're using right"<<std::endl ;
-	    }
-	  else
-	    _distBackAlongTraj = -999; 
+	    _distToTopWall     = (_y_lepReco - detHalfHeight)*daught.Momentum().Length()/_py_lepReco ;
+	    _distToWall        = sqrt(_geoAlgo.SqDist(daught.Vertex(),fTPC));
+	  }
+	  else{
+	    _distBackAlongTraj = -9999; 
+	    _distToTopWall     = -9999;  
+	    _distToWall        = -9999; 
+	  }
 	  
 	  momMag = sqrt(_px_lepReco*_px_lepReco + _py_lepReco *_py_lepReco + _pz_lepReco*_pz_lepReco);
 	  _px_lepNormReco = _px_lepReco / momMag ;
@@ -495,8 +491,8 @@ namespace ertool {
     _lep_dot       = -2;
     _lep_vtxdist   = -1000;
     _distToTopWall = -9999;
-    _distToWall    = -999;
-    _distBackAlongTraj = -999;
+    _distToWall    = -9999;
+    _distBackAlongTraj = -9999;
     _angle_Norm    = -9999;
 
     _e_trkInt = -1;

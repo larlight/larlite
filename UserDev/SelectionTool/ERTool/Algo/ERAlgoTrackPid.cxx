@@ -31,7 +31,7 @@ namespace ertool {
 
     if (_algoPid_tree) { delete _algoPid_tree; }
     _algoPid_tree = new TTree("_algoPid_tree","algoPid Tree");
-    _algoPid_tree->Branch("_part_x"     ,&_part_x     ,"_part_x/D     ");
+    _algoPid_tree->Branch("_part_pid"     ,&_part_pid     ,"_part_pid/D     ");
     
     return;
   }
@@ -46,27 +46,6 @@ namespace ertool {
       // get track object
       auto const& particleFromDataP = graph.GetParticle(t);
       auto const& track = datacpy.Track(particleFromDataP.RecoID());
-
-      if (_verbose){
-	std::cout<<"\n";
-	std::cout<<track._pid_score[Track::kTrackPartIDMax]<<" score kTrackPartIDMax\n";
-	std::cout<<track._pid_score[Track::kPIDA]<<" score kPIDA\n";
-	std::cout<<track._pid_score[Track::kUnknown]<<" score kUnknown\n";
-	std::cout<<track._pid_score[Track::kProton]<<" score proton\n";
-	std::cout<<track._pid_score[Track::kPion]<<" score pion\n";
-	std::cout<<track._pid_score[Track::kKaon]<<" score kaon\n";
-	std::cout<<track._pid_score[Track::kMuon]<<" score muon\n";
-	std::cout<<"\n";
-	std::cout<<"Pid    : "<<track._pid<<" \n";
-	std::cout<<"Energy : "<<track._energy<<" \n";
-	std::cout<<"Length : "<<track.Length()<<" \n";
-	std::cout<<"\n In Particle\n";
-	std::cout<<"Energy         : "<<particleFromDataP.Energy()<<"\n";
-	std::cout<<"Kinetic Energy : "<<particleFromDataP.KineticEnergy()<<"\n";
-	std::cout<<"Momentum       : "<<particleFromDataP.Momentum()<<"\n";
-
-      }
-      n_mu++;
 
       
       if ((track._pid_score[Track::kProton]<track._pid_score[Track::kPion])&&
@@ -86,41 +65,14 @@ namespace ertool {
 	  (track._pid_score[Track::kMuon]<track._pid_score[Track::kKaon]))        Pdg = 13;      
       
 
-      // track deposited energy
 
-      double Edep = track._energy;
-      double lenght = track.Length();
-      double rough_dEdx = Edep/lenght;
+
+      graph.GetParticle(t).SetParticleInfo(Pdg);
+
+      if (_verbose) { std::cout<<"I found a track!!!\n I assigned the PdgCode for its particle to be "<<Pdg  <<" \n"; }
+      _part_pid = Pdg;
       
-      // if  (rough_dEdx < 2.4) Pdg = 13;
-
-      // track direction
-      if (track.Length() < 0.3)  continue;
-      geoalgo::Vector_t Dir = (track[1]-track[0]);
-      Dir.Normalize();
-      double mass = ParticleMass(Pdg);
-      geoalgo::Vector_t Mom = Dir * ( sqrt( Edep * (Edep+2*mass) ) );
-
-
-      graph.GetParticle(t).SetParticleInfo(Pdg,
-					   mass,
-					   track.front(),
-					   Mom);
-
-      double Energy = sqrt(Mom*Mom + mass*mass);
-
-      std::cout<<"I found a track!!!\n I assigned the PdgCode for its particle to be "<<Pdg  <<" \n";
-      if (_verbose){
-	std::cout<<"Edep  .............. "<<Edep      <<" \n";
-	std::cout<<"lenght.............. "<<lenght    <<" \n";
-	std::cout<<"dedx  .............. "<<rough_dEdx<<"\n";
-	std::cout<<"mass  .............. "<<mass      <<"  \n";
-	std::cout<<"Dir   .............. "<<Dir       <<"  \n";
-	std::cout<<"Momentum ........... "<<Mom       <<"  \n";
-	std::cout<<"Energy ............. "<<Energy    <<" \n";
-      }
-      
-      
+      _algoPid_tree->Fill();
     }//End loop over tracks
 
     
@@ -161,7 +113,7 @@ namespace ertool {
 
   void ERAlgoTrackPid::ClearTree(){
 
-    _part_x         = -1 ;
+    _part_pid         = -1 ;
     
     return;
   }
