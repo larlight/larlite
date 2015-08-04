@@ -272,6 +272,7 @@ class boxCollection(QtCore.QObject):
     self._listOfHits = []
     self._listOfStarts = []
     self._isHighlighted = False
+    self._params = None
 
   def setColor(self,color):
     self._color = color
@@ -279,10 +280,16 @@ class boxCollection(QtCore.QObject):
   def setPlane(self,plane):
     self._plane = plane
 
+  def attachParams(self,params):
+    self._params = params
+
   def genToolTip(self):
-    nhits = len(self._listOfHits)
-    tip = "Hits: " + str(nhits)  
-    return tip
+    if self._params == None:
+      nhits = len(self._listOfHits)
+      tip = "Hits: " + str(nhits)  
+      return tip
+    else:
+      return self._params.toolTip()
 
   def hoverEnter(self, e):
     for hit in self._listOfHits:
@@ -378,8 +385,15 @@ class clusterParams(QtCore.QObject): #recoBase):
       self.highlightChange.emit()
 
   def genToolTip(self):
-    # nhits = len(self._listOfHits)
-    tip = "No Tip!"  
+    return self.toolTip()
+
+  def toolTip(self):
+    tip = "Hits: \t" + str(self._params.N_Hits) + "\n"
+    tip += "Start:\t(" + "{:.2f}".format(self._params.start_point.w) + ", "
+    tip += "{:.2f}".format(self._params.start_point.t) + ")\n"
+    tip += "End:  \t(" + "{:.2f}".format(self._params.end_point.w) + ", "
+    tip += "{:.2f}".format(self._params.end_point.t) + ")\n"
+    tip += "Add more in data.py:clusterParams:toolTip!"
     return tip
 
   def draw(self, view):
@@ -517,6 +531,7 @@ class cluster(recoBase):
         self._listOfClusters[thisPlane].append(cluster)
         self._listOfCParams[thisPlane].append(None)
 
+
         colorIndex += 1
         if colorIndex >= len(self._clusterColors):
           colorIndex = 0
@@ -526,6 +541,7 @@ class cluster(recoBase):
 
             cParams = clusterParams(params_v[i_cluster],view_manager._geometry) 
             self._listOfCParams[thisPlane][-1] = cParams
+            cluster.attachParams(cParams)
             self._listOfCParams[thisPlane][-1].draw(view)
 
             # Connect the params to the cluster:

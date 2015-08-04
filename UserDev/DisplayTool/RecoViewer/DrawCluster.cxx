@@ -44,7 +44,7 @@ namespace evd {
       wireByPlaneByCluster     -> resize(geoService -> Nviews());
       hitStartByPlaneByCluster -> resize(geoService -> Nviews());
       hitEndByPlaneByCluster   -> resize(geoService -> Nviews());
-      clusterParamsByPlane -> resize(geoService -> Nviews());
+      clusterParamsByPlane     -> resize(geoService -> Nviews());
     }
 
     return true;
@@ -154,9 +154,9 @@ namespace evd {
       cpan.FillParams(true,true,true,true,true,true);
 
 
-      if ( (int) clusterParamsByPlane->at(view).size() != cluster_index[view] -1){
-        clusterParamsByPlane->at(view).push_back(nullCPVec);
-      }
+      // if ( (int) clusterParamsByPlane->at(view).size() != cluster_index[view] -1){
+      //   clusterParamsByPlane->at(view).push_back(nullCPVec);
+      // }
       clusterParamsByPlane->at(view).push_back( cpan.GetParams() );
 
       for(auto const& hit_index : hit_indices){
