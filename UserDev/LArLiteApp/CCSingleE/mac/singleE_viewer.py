@@ -126,8 +126,6 @@ while (counter < 11700):
 #    view(display_mc,data_mc,part_mc)
     viewAll(mcviewer,data_mc,part_mc,recoviewer,data_reco,part_reco)
 
-=======
-
 
     #for x in xrange(part_mc.size()):
     #    print part_mc[x].Diagram()
