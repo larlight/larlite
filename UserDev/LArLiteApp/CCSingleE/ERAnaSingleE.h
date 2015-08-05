@@ -54,11 +54,6 @@ namespace ertool {
 
     virtual void ProcessEnd(TFile* fout);
 
-    /// Function to re-set TTree variables
-    void ResetTreeVariables();
-
-    //void ResetReco();
-
     /// Function to save efficiency vs. variable to histogram
     void MakeEffPlot(std::string varname,
 		     int nbins, double xmin, double xmax);
@@ -85,8 +80,6 @@ namespace ertool {
     //Number of reconstructed *particles* in the output PSet
     //(this is 1-to-1 with number of single electrons reconstructed)
     int _n_singleReco;
-    int _n_electrons;  ///Total number of MC electron/positron particles in the event
-    int _n_gammas;     ///Total number of MC gamma particles in the event
     int _n_showers;    ///Number of mc *showers*
     int _n_showersReco;/// Number of reconstructed *showers* in the event data (could be e or g, etc)
     int _n_tracks;     /// Number of mc *tracks*
@@ -102,6 +95,7 @@ namespace ertool {
     double _e_neutrals; /// Energy of all neutral particles
     double _e_nucleus_diff; /// Energy of final nucleus minus initial Ar nucleus
     double _e_nu, _e_nuReco;     /// Neutrino energy
+    double _e_nuCCQE; /// reconstructed CCQE neutrino energy
     double _e_dep; /// energy deposited by all daughters of netrino, at all generations
     double _e_r; /// energy of neutrino measured by summing the energy of everything starting within X centermeters of the neutrino vertex
     double _x_nu, _y_nu, _z_nu; /// Neutrino position
@@ -141,6 +135,14 @@ namespace ertool {
     AlgoFindRelationship _findRel;
 
     TH2F* _h_e_nu_correlation;
+
+    // prepare TTree with variables
+    void PrepareTreeVariables();
+    /// Function to re-set TTree variables
+    void ResetTreeVariables();
+    // CCQE Energy formula
+    double CCQEEnergy(const double& Elep, const double& theta);
+    
    
   };
 }
