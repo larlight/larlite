@@ -12,75 +12,8 @@ namespace ertool {
 
   {
 
-    if (_result_tree) { delete _result_tree; }
 
-    _result_tree = new TTree("_result_tree","Result Tree");
-    _result_tree->Branch("_numEvts",&_numEvts,"numEvts/I");
-    //    _result_tree->Branch("_EDep",&_EDep,"EDep/D");
-    _result_tree->Branch("_angle_Norm",&_angle_Norm,"_angle_Norm/D");
-    _result_tree->Branch("_n_singleReco",&_n_singleReco,"n_singleReco/I");
-    _result_tree->Branch("_distToTopWall",&_distToTopWall,"distToTopWall/D");
-    _result_tree->Branch("_distToWall",&_distToWall,"distToWall/D");
-    _result_tree->Branch("_distBackAlongTraj",&_distBackAlongTraj,"distBackAlongTraj/D");
-    //    _result_tree->Branch("_n_showers",&_n_showers,"n_showers/I");
-    //    _result_tree->Branch("_n_showersReco",&_n_showersReco,"n_showersReco/I");
-    //    _result_tree->Branch("_n_tracks",&_n_tracks,"n_tracks/I");
-    //    _result_tree->Branch("_n_tracksReco",&_n_tracksReco,"n_tracksReco/I");
-    //    _result_tree->Branch("_n_tracksInt",&_n_tracksInt,"n_tracksInt/I");
-    //    _result_tree->Branch("_n_tracksIntReco",&_n_tracksIntReco,"n_tracksIntReco/I");
-    //    _result_tree->Branch("_n_electrons",&_n_electrons,"n_electrons/I");
-    //    _result_tree->Branch("_n_gammas",&_n_gammas,"n_gammas/I");
-    _result_tree->Branch("_e_nu",&_e_nu,"e_nu/D");
-    _result_tree->Branch("_e_nuReco",&_e_nuReco,"e_nuReco/D");
-    _result_tree->Branch("_e_dep",&_e_dep,"e_dep/D");
-    _result_tree->Branch("_e_r",&_e_r,"e_r/D");
-    _result_tree->Branch("_x_nu",&_x_nu,"x_nu/D");
-    _result_tree->Branch("_y_nu",&_y_nu,"y_nu/D");
-    _result_tree->Branch("_z_nu",&_z_nu,"z_nu/D");
-    _result_tree->Branch("_px_nu",&_px_nu,"px_nu/D");
-    _result_tree->Branch("_py_nu",&_py_nu,"py_nu/D");
-    _result_tree->Branch("_pz_nu",&_pz_nu,"pz_nu/D");
-    _result_tree->Branch("_x_nuReco",&_x_nuReco,"x_nuReco/D");
-    _result_tree->Branch("_y_nuReco",&_y_nuReco,"y_nuReco/D");
-    _result_tree->Branch("_z_nuReco",&_z_nuReco,"z_nuReco/D");
-    _result_tree->Branch("_px_nuReco",&_px_nuReco,"px_nuReco/D");
-    _result_tree->Branch("_py_nuReco",&_py_nuReco,"py_nuReco/D");
-    _result_tree->Branch("_pz_nuReco",&_pz_nuReco,"pz_nuReco/D");
-    //    _result_tree->Branch("_n_protons",&_n_protons,"n_protons/I");
-    //    _result_tree->Branch("_n_neutrons",&_n_neutrons,"n_neutrons/I");
-    //    _result_tree->Branch("_e_trkInt",&_e_trkInt,"e_trkInt/D");
-    //    _result_tree->Branch("_e_neutrals",&_e_neutrals,"e_neutrals/D");
-    //    _result_tree->Branch("_e_nucleus_diff",&_e_nucleus_diff,"e_nucleus_diff/D");
-    _result_tree->Branch("_e_trkIntReco",&_e_trkIntReco,"e_trkIntReco/D");
-    //    _result_tree->Branch("_n_piplus",&_n_piplus,"n_piplus/I");
-    //    _result_tree->Branch("_n_pi0",&_n_pi0,"n_pi0/I");
-    _result_tree->Branch("_pdg_nu",&_pdg_nu,"pdg_nu/I");
-    _result_tree->Branch("_e_lep",&_e_lep,"e_lep/D");
-    _result_tree->Branch("_pdg_lep",&_pdg_lep,"pdg_lep/I");
-    _result_tree->Branch("_x_lep",&_x_lep,"x_lep/D");
-    _result_tree->Branch("_y_lep",&_y_lep,"y_lep/D");
-    _result_tree->Branch("_z_lep",&_z_lep,"z_lep/D");
-    _result_tree->Branch("_px_lep",&_px_lep,"px_lep/D");
-    _result_tree->Branch("_py_lep",&_py_lep,"py_lep/D");
-    _result_tree->Branch("_pz_lep",&_pz_lep,"pz_lep/D");
-    _result_tree->Branch("_theta_lep",&_theta_lep,"theta_lep/D");
-    _result_tree->Branch("_phi_lep",&_phi_lep,"phi_lep/D");
-    _result_tree->Branch("_e_lepReco",&_e_lepReco,"e_lepReco/D");
-    //    _result_tree->Branch("_showerlength_lepReco",&_showerlength_lepReco,"showerlength_lepReco/D");
-    _result_tree->Branch("_theta_lepReco",&_theta_lepReco,"theta_lepReco/D");
-    _result_tree->Branch("_phi_lepReco",&_phi_lepReco,"phi_lepReco/D");
-    _result_tree->Branch("_x_lepReco",&_x_lepReco,"x_lepReco/D");
-    _result_tree->Branch("_y_lepReco",&_y_lepReco,"y_lepReco/D");
-    _result_tree->Branch("_z_lepReco",&_z_lepReco,"z_lepReco/D");
-    _result_tree->Branch("_px_lepReco",&_px_lepReco,"px_lepReco/D");
-    _result_tree->Branch("_py_lepReco",&_py_lepReco,"py_lepReco/D");
-    _result_tree->Branch("_pz_lepReco",&_pz_lepReco,"pz_lepReco/D");
-    _result_tree->Branch("_px_lepNormReco",&_px_lepNormReco,"px_lepNormReco/D");
-    _result_tree->Branch("_py_lepNormReco",&_py_lepNormReco,"py_lepNormReco/D");
-    _result_tree->Branch("_pz_lepNormReco",&_pz_lepNormReco,"pz_lepNormReco/D");
-    //    _result_tree->Branch("_lep_dot",&_lep_dot,"_lep_dot/D");
-    //    _result_tree->Branch("_lep_vtxdist",&_lep_vtxdist,"_lep_vtxdist/D");
-    _result_tree->Branch("_misID",&_misID,"misID/I");
+    PrepareTreeVariables();
     // keep track of number of events gone by
     _numEvts = 0;
     // keep track of singleEs found
@@ -125,12 +58,9 @@ namespace ertool {
     ResetTreeVariables();
     
     _numEvts += 1;
-    // count number of showers in event
-    _n_electrons = 0;
-    _n_gammas    = 0;
     
     // Get MC EventData (showers/tracks...)
-    auto const& mc_data = MCEventData();
+    //auto const& mc_data = MCEventData();
     
     // Keep track of all energy deposited in detector
     _EDep = 0;
@@ -182,14 +112,7 @@ namespace ertool {
 	  }
 	}
       }
-
-      // now keep track of all showers and tracks in the event
-      _e_neutrals = 0;
-      _e_nucleus_diff = 0;
-      bool found_parent_nucleus = false;
-
-    }
-
+    }// for all particles in MC Particle Graph
     
     // find the number of tracks that start within 1 cm of the neutrino interaction
     //    _n_tracksInt = 0;
@@ -212,10 +135,8 @@ namespace ertool {
 	  if (part.HasRecoObject() == true){
 	    // get the reco object's dep. energy
 	    // if shower
-	    if (part.RecoType() == kShower){
-	      auto const evtID = data.Event_ID();
+	    if (part.RecoType() == kShower)
 	      _e_dep += data.Shower(part.RecoID())._energy;
-	    }
 	    if (part.RecoType() == kTrack)
 	      _e_dep += data.Track(part.RecoID())._energy;
 	  }// if the particle has a reco object
@@ -226,13 +147,12 @@ namespace ertool {
 
     // if only 1 CCSingleE interaction was found -> misID = 0
     _misID = 1;
-    if ( neutrinos == 1){
+    if (neutrinos == 1){
       _misID = 0;
       _singleE_ctr += 1;
     }
-
     // If no single electrons reconstructed -> fill tree anyway with misID info
-    if ( _misID == 1 ){
+    if (neutrinos == 0){
       _result_tree->Fill();
       return true;
     }
@@ -240,10 +160,7 @@ namespace ertool {
     for( auto const & p : graph.GetParticleArray() ){
       
 
-      //if(abs(neutrino.PdgCode()) != 12  && abs(neutrino.PdgCode()) != 14)
-      //std::cout<<"wtf neutrino doesn't have a neutrino pdg code"<<std::endl;
-
-      if(abs(p.PdgCode()) == 12 ){ // || abs(p.PdgCode()) == 14){
+      if(abs(p.PdgCode()) == 12 ){
 
 	auto neutrino = p ;
 	
@@ -253,7 +170,6 @@ namespace ertool {
 	_px_nuReco = neutrino.Momentum()[0];
 	_py_nuReco = neutrino.Momentum()[1];
 	_pz_nuReco = neutrino.Momentum()[2];
-	//   _n_tracksIntReco = ps[i].Daughters().size()-1;
 
 	// search for all energy deposited by something starting
 	// within x centimeters of the neutrino vertex
@@ -292,7 +208,11 @@ namespace ertool {
 	  
 	  
 	  if(abs(daught.PdgCode()) == 11 ){//|| abs(daught.PdgCode()) == 13){
+
 	    _e_lepReco = daught.Energy();
+
+	    // get shower's deposited energy
+	    double e_lep_dep = data.Shower(daught.RecoID())._energy;
 	    
 	    //length of shower (geoalgo cone) associated with the electron
 	    //_showerlength_lepReco = data.AllShower().at(daught.RecoObjID()).Length(); //kaleko
@@ -302,7 +222,8 @@ namespace ertool {
 	    _px_lepReco = daught.Momentum()[0];
 	    _py_lepReco = daught.Momentum()[1];
 	    _pz_lepReco = daught.Momentum()[2];
-	    _theta_lepReco = (180./3.14) * acos( _pz_lepReco / sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco + _pz_lepReco*_pz_lepReco ) );
+	    double theta_lepReco_rad = acos( _pz_lepReco / sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco + _pz_lepReco*_pz_lepReco ) );
+	    _theta_lepReco = (180./3.14) * theta_lepReco_rad;
 	    _phi_lepReco   = (180./3.14) * asin( _py_lepReco / sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco ) );
 	    _lep_vtxdist = sqrt( (_x_lep-_x_lepReco)*(_x_lep-_x_lepReco) +
 				 (_y_lep-_y_lepReco)*(_y_lep-_y_lepReco) + 
@@ -310,6 +231,9 @@ namespace ertool {
 	    _lep_dot = ( ( _px_lep*_px_lepReco + _py_lep*_py_lepReco + _pz_lep*_pz_lepReco ) / 
 			 ( sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco + _pz_lepReco*_pz_lepReco ) * 
 			   sqrt( _px_lep*_px_lep + _py_lep*_py_lep + _pz_lep*_pz_lep ) ) );
+
+	    // try and get CCQE energy
+	    _e_nuCCQE = CCQEEnergy(e_lep_dep,_pz_lepReco / sqrt( _px_lepReco*_px_lepReco + _py_lepReco*_py_lepReco + _pz_lepReco*_pz_lepReco ));
 	    
 	    ::geoalgo::HalfLine shr(daught.Vertex(),daught.Momentum());
 	    
@@ -358,12 +282,8 @@ namespace ertool {
 	}// for all children 
 	_result_tree->Fill();
       }// if electorn neutrino  
-      
-      //_result_tree->Fill();
-    }// loop over all CCSingleEs found in event
-    if ( _misID == 0 )
+    }// loop over all particles in graph
 
-    //  */    
     _h_e_nu_correlation->Fill(_e_nu,_e_nuReco);
     
     if (_debug){
@@ -396,8 +316,8 @@ namespace ertool {
 
     MakeEffPlot("e_lep",10,0,3000);
     MakeEffPlot("e_nu",10,0,3000);
-//    MakeEffPlot("n_tracks",10,-0.5,9.5);
-//    MakeEffPlot("n_tracksReco",10,-0.5,9.5);
+    //MakeEffPlot("n_tracks",10,-0.5,9.5);
+    //MakeEffPlot("n_tracksReco",10,-0.5,9.5);
 
     if (fout){
       fout->cd();
@@ -437,13 +357,82 @@ namespace ertool {
     return;
   }
 
+  double ERAnaSingleE::CCQEEnergy(const double& Elep, const double& theta){
+    
+
+    double Mp = 938.28; // proton mass [MeV]
+    double Mn = 939.57; // neutron mass [MeV]
+    double Eb = 30;     // binding energy [MeV]
+    double PZlep = Elep*theta; // lepton z-component momentum [MeV]
+    // assume lepton mass irrelevant (i.e. 0)
+
+    double ECCQE = ((Mp*Mp) - (Mn-Eb)*(Mn-Eb) + 2*(Mn-Eb)*Elep) / (2*(Mn-Eb-Elep+PZlep));
+      
+    return ECCQE;
+  }
+
+
+  void ERAnaSingleE::PrepareTreeVariables(){
+
+    if (_result_tree) { delete _result_tree; }
+    
+    _result_tree = new TTree("_result_tree","Result Tree");
+    _result_tree->Branch("_numEvts",&_numEvts,"numEvts/I");
+    _result_tree->Branch("_EDep",&_EDep,"EDep/D");
+    _result_tree->Branch("_angle_Norm",&_angle_Norm,"_angle_Norm/D");
+    _result_tree->Branch("_n_singleReco",&_n_singleReco,"n_singleReco/I");
+    _result_tree->Branch("_distToTopWall",&_distToTopWall,"distToTopWall/D");
+    _result_tree->Branch("_distToWall",&_distToWall,"distToWall/D");
+    _result_tree->Branch("_distBackAlongTraj",&_distBackAlongTraj,"distBackAlongTraj/D");
+    _result_tree->Branch("_e_nu",&_e_nu,"e_nu/D");
+    _result_tree->Branch("_e_nuReco",&_e_nuReco,"e_nuReco/D");
+    _result_tree->Branch("_e_nuCCQE",&_e_nuCCQE,"e_nuCCQE/D");
+    _result_tree->Branch("_e_dep",&_e_dep,"e_dep/D");
+    _result_tree->Branch("_e_r",&_e_r,"e_r/D");
+    _result_tree->Branch("_x_nu",&_x_nu,"x_nu/D");
+    _result_tree->Branch("_y_nu",&_y_nu,"y_nu/D");
+    _result_tree->Branch("_z_nu",&_z_nu,"z_nu/D");
+    _result_tree->Branch("_px_nu",&_px_nu,"px_nu/D");
+    _result_tree->Branch("_py_nu",&_py_nu,"py_nu/D");
+    _result_tree->Branch("_pz_nu",&_pz_nu,"pz_nu/D");
+    _result_tree->Branch("_x_nuReco",&_x_nuReco,"x_nuReco/D");
+    _result_tree->Branch("_y_nuReco",&_y_nuReco,"y_nuReco/D");
+    _result_tree->Branch("_z_nuReco",&_z_nuReco,"z_nuReco/D");
+    _result_tree->Branch("_px_nuReco",&_px_nuReco,"px_nuReco/D");
+    _result_tree->Branch("_py_nuReco",&_py_nuReco,"py_nuReco/D");
+    _result_tree->Branch("_pz_nuReco",&_pz_nuReco,"pz_nuReco/D");
+    _result_tree->Branch("_e_trkIntReco",&_e_trkIntReco,"e_trkIntReco/D");
+    _result_tree->Branch("_pdg_nu",&_pdg_nu,"pdg_nu/I");
+    _result_tree->Branch("_e_lep",&_e_lep,"e_lep/D");
+    _result_tree->Branch("_pdg_lep",&_pdg_lep,"pdg_lep/I");
+    _result_tree->Branch("_x_lep",&_x_lep,"x_lep/D");
+    _result_tree->Branch("_y_lep",&_y_lep,"y_lep/D");
+    _result_tree->Branch("_z_lep",&_z_lep,"z_lep/D");
+    _result_tree->Branch("_px_lep",&_px_lep,"px_lep/D");
+    _result_tree->Branch("_py_lep",&_py_lep,"py_lep/D");
+    _result_tree->Branch("_pz_lep",&_pz_lep,"pz_lep/D");
+    _result_tree->Branch("_theta_lep",&_theta_lep,"theta_lep/D");
+    _result_tree->Branch("_phi_lep",&_phi_lep,"phi_lep/D");
+    _result_tree->Branch("_e_lepReco",&_e_lepReco,"e_lepReco/D");
+    _result_tree->Branch("_theta_lepReco",&_theta_lepReco,"theta_lepReco/D");
+    _result_tree->Branch("_phi_lepReco",&_phi_lepReco,"phi_lepReco/D");
+    _result_tree->Branch("_x_lepReco",&_x_lepReco,"x_lepReco/D");
+    _result_tree->Branch("_y_lepReco",&_y_lepReco,"y_lepReco/D");
+    _result_tree->Branch("_z_lepReco",&_z_lepReco,"z_lepReco/D");
+    _result_tree->Branch("_px_lepReco",&_px_lepReco,"px_lepReco/D");
+    _result_tree->Branch("_py_lepReco",&_py_lepReco,"py_lepReco/D");
+    _result_tree->Branch("_pz_lepReco",&_pz_lepReco,"pz_lepReco/D");
+    _result_tree->Branch("_px_lepNormReco",&_px_lepNormReco,"px_lepNormReco/D");
+    _result_tree->Branch("_py_lepNormReco",&_py_lepNormReco,"py_lepNormReco/D");
+    _result_tree->Branch("_pz_lepNormReco",&_pz_lepNormReco,"pz_lepNormReco/D");
+    _result_tree->Branch("_misID",&_misID,"misID/I");
+  }
+  
   void ERAnaSingleE::ResetTreeVariables(){
     
     //_misID = 1;
 
     _n_singleReco  = -1;
-    _n_electrons   = -1;
-    _n_gammas      = -1;
     _n_showers     = -1;
     _n_showersReco = -1;
     _n_tracks      = -1;
@@ -457,6 +446,7 @@ namespace ertool {
 
     _e_nu          = -1000;
     _e_nuReco      = -1000;
+    _e_nuCCQE     = -1000;
     _e_dep        = -1000;
     _e_r          = -1000;
     _x_nu         = -1000;
@@ -480,6 +470,7 @@ namespace ertool {
     _theta_lep     = -360;
     _phi_lep       = -360;
     _e_lepReco     = -1000;
+
     _showerlength_lepReco     = -1000;
     _x_lepReco     = -1000;
     _y_lepReco     = -1000;
