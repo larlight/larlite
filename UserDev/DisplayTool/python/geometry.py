@@ -65,7 +65,8 @@ class microboone(geometry):
     # and then call the base class __init__
     larutil.LArUtilManager.Reconfigure(fmwk.geo.kMicroBooNE)
     super(microboone, self).__init__()
-    self._levels = [ (-15,15),(-15,15),(-10,10) ]
+    self._levels = [ (-150,150),(-150,150),(-10,100) ]
+    self._pedestals = [2000,2000,440]
     self._name = "uboone"
 
 class argoneut(geometry):
@@ -76,6 +77,7 @@ class argoneut(geometry):
     larutil.LArUtilManager.Reconfigure(fmwk.geo.kArgoNeuT)
     super(argoneut, self).__init__()
     self._levels = [ (-15,60),(-5,80) ]
+    self._pedestals = [0,0]
     self._name = "argoneut"
 
 class lariat(geometry):
@@ -89,6 +91,7 @@ class lariat(geometry):
     # fix it directly:
     self._tRange = 3072
     self._levels = [ (-20,200),(-20,200) ]
+    self._pedestals = [0,0]
     self._name = "lariat"
 
 

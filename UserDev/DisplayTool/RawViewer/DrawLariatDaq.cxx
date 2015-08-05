@@ -14,6 +14,8 @@ namespace evd {
       _n_time_ticks = 3072;
     else
       _n_time_ticks = ticks;
+
+
     c = new TChain("DataQuality/v1740");
     initialize();
   }
@@ -29,20 +31,15 @@ namespace evd {
     _run=0;
     _spill=0;
 
-
-    if (wiredata -> size() != geoService -> Nviews())
-      wiredata->resize(geoService -> Nviews());
-     
+    // set up the wire and drift dimensions
     // resize to the right number of planes
     for (unsigned int p = 0; p < geoService -> Nviews(); p ++){
-      // resize to the right number of wires
-      if (wiredata->at(p).size() != geoService->Nwires(p) )
-        wiredata->at(p).resize(geoService->Nwires(p));
-        // Resize the wires to the right length
-        for (auto & vec : wiredata->at(p)){
-          vec.resize(_n_time_ticks);
-        }
+      setXDimension(geoService->Nwires(p), p);
+      setYDimension(_n_time_ticks, p);
     }
+
+    // Initialize the place to hold data:
+    initDataHolder();
 
     return;
 
@@ -141,7 +138,7 @@ namespace evd {
         if (ch < 240 ){
           plane = 0;
           wire = 239 - ch;
-        }
+        } 
         else if (ch < 480 && ch >= 240){
           plane = 1;
           wire = 479-ch;
@@ -156,9 +153,9 @@ namespace evd {
         }
         pedestal /= _n_time_ticks;
         for (unsigned int tick = 0; tick < wireVec.size(); tick++){
-          wiredata->at(plane).at(wire).at(tick) = wireVec.at(tick) - pedestal;
+          _planeData.at(plane).at(wire*_y_dimensions.at(plane) + tick) = wireVec.at(tick) - pedestal;
           // And, delete the data that was just copied:
-          wireVec.at(tick) = 0;
+          // wireVec.at(tick) = 0;
         }
       }
 
