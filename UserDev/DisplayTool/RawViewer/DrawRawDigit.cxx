@@ -62,7 +62,6 @@ namespace evd {
 
     // This is an event viewer.  In particular, this handles raw wire signal drawing.
     // So, obviously, first thing to do is to get the wires.
-    std::cout << "Start getting data\n";
     auto RawDigitHandle = storage->get_data<larlite::event_rawdigit>(producer);
 
 
