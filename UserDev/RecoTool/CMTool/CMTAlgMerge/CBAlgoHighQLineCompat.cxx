@@ -10,9 +10,11 @@ namespace cmtool {
     //Sets default values
     _debug = false;
     _min_n_hits = 10;
-    _max_slope_sep = 10; //in time (cm)/wire (cm)
-    _frac_hits_to_keep = .10;
+    _max_angle_sep = 10; //in degrees
+    _frac_hits_to_keep = .50;
     _tge = new TGraphErrors();
+
+    _debug_histo = new TH1F("debug_histo","Angle Differences between Clusters",180,0,180); //1 degree bins
 
   } //end constructor
 
@@ -29,8 +31,21 @@ namespace cmtool {
     auto high_q_hits1 = GetHighQHits(cluster1.GetHitVector(),_frac_hits_to_keep);
     auto high_q_hits2 = GetHighQHits(cluster2.GetHitVector(),_frac_hits_to_keep);
     
-    double slope1 = ComputeSlope(high_q_hits1);
-    double slope2 = ComputeSlope(high_q_hits2);
+
+    //If for some reason slope can't be computed (fitter fails), just assume these
+    //two clusters are not compatible
+    double slope1, slope2;
+    try{ 
+      slope1 = ComputeSlope(high_q_hits1);
+      slope2 = ComputeSlope(high_q_hits2);
+    }
+    catch (int e){
+      if(_debug){
+	std::cout<< "Note: ComputeSlope failed ("<<e<<") so these clusters will not be merged. "
+		 << "Try keeping a higher fraction of the hits." << std::endl;
+      }
+      return false;
+    }
 
     if (_debug){
       std::cout << "Cluster1:" << std::endl;
@@ -42,10 +57,10 @@ namespace cmtool {
       std::cout << std::endl;
     }
 
+    double anglediff = (atan(slope1)-atan(slope2))*180./3.14159265358979323846264338327950; //lol
+    _debug_histo->Fill(abs(anglediff));
 
-    bool compatible = false;
-
-    return compatible;
+    return abs(anglediff) < _max_angle_sep ? true : false;
     
   } // end Merge function 
   
@@ -61,16 +76,29 @@ namespace cmtool {
       // Add the pxhit (wire, time) to the graph
       _tge->SetPoint(pt_ctr,pxh.w,pxh.t);
       // Make the error on this point 1/charge (in both x- and y- dirs)
-      _tge->SetPoint(pt_ctr++,1/pxh.charge,1/pxh.charge);
+      //      _tge->SetPointError(pt_ctr++,1/pxh.charge,1/pxh.charge);
+
+      if(_debug)
+	std::cout<<"Set point "<<pt_ctr<<" to ("<<pxh.w<<","<<pxh.t<<")."<<std::endl;
+      pt_ctr++;
     }
 
-    // Fit the graph with a line
+    // Fit the graph with a line (note: if 0 or 1 points in the graph, this fails)
+    if(pt_ctr <= 1)
+      throw 1;
+
     // S: Save the fit result
     // Q: Quiet mode
     // N: Do not store the graphics function, don't draw
     // 0: Don't plot the result of the fit
     // C: Don't calculate chisquare (saves time)
-    _frp = _tge->Fit("pol1","SQN0C");
+    _frp = _tge->Fit("pol1","SN0CQ");
+    Int_t fitstatus = _frp;
+
+    if(fitstatus) 
+      throw fitstatus;
+
+
     slope =_frp->Value(1);
     //double slope_err = _frp->ParError(1);
  
