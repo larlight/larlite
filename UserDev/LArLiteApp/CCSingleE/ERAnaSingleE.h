@@ -102,6 +102,8 @@ namespace ertool {
     double _e_neutrals; /// Energy of all neutral particles
     double _e_nucleus_diff; /// Energy of final nucleus minus initial Ar nucleus
     double _e_nu, _e_nuReco;     /// Neutrino energy
+    double _e_dep; /// energy deposited by all daughters of netrino, at all generations
+    double _e_r; /// energy of neutrino measured by summing the energy of everything starting within X centermeters of the neutrino vertex
     double _x_nu, _y_nu, _z_nu; /// Neutrino position
     double _x_nuReco, _y_nuReco, _z_nuReco; /// Neutrino position
     double _px_nu, _py_nu, _pz_nu; /// Neutrino momentum
