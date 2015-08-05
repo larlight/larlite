@@ -19,7 +19,10 @@ def DefaultMatch():
 
     algo_array = cmtool.CFAlgoArray()
     #algo_array.SetMode(cmtool.CFAlgoArray.kPositiveAddition)
-    algo_array.AddAlgo(cmtool.CFAlgoTimeOverlap())
+    TOL = cmtool.CFAlgoTimeOverlap()
+    #TOL.RequireThreePlanes(False)
+    TOL.RequireThreePlanes(True)
+    algo_array.AddAlgo(TOL)
     #algo_array.AddAlgo(cmtool.CFAlgoTimeProf())
     #algo_array.AddAlgo(cmtool.CFAlgo3DAngle())
     #algo_array.AddAlgo(cmtool.CFAlgoStartPointMatch())

@@ -79,7 +79,7 @@ namespace ertool {
     return ((*low) == id);
   }
   
-  bool Particle::HasRecoObject()
+  const bool Particle::HasRecoObject() const
   { return (_reco_type == kShower || _reco_type == kTrack); }
 
  

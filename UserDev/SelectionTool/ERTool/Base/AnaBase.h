@@ -16,10 +16,12 @@
 
 #include <iostream>
 #include "UnitBase.h"
+#include "EventData.h"
+#include "ParticleGraph.h"
 
 namespace ertool {
-  class ParticleGraph;
-  class EventData;
+  //class ParticleGraph;
+  //class EventData;
 
   
   class Manager;

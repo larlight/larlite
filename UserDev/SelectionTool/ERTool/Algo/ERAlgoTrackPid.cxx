@@ -69,7 +69,7 @@ namespace ertool {
 
       graph.GetParticle(t).SetParticleInfo(Pdg);
 
-      std::cout<<"I found a track!!!\n I assigned the PdgCode for its particle to be "<<Pdg  <<" \n";
+      if (_verbose) { std::cout<<"I found a track!!!\n I assigned the PdgCode for its particle to be "<<Pdg  <<" \n"; }
       _part_pid = Pdg;
       
       _algoPid_tree->Fill();
