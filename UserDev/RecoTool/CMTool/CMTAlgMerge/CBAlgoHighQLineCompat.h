@@ -26,9 +26,13 @@ namespace cmtool {
      User defined class CBAlgoAngleCompat ... these comments are used to generate
      doxygen documentation!
      This function takes the highest charge hits in each cluster and fits them to
-     a line in wire-time space. It compares the slopes of these lines to determine
+     a line in wire-time space. It compares the slopes (angles) of these lines to determine
      if clusters should be merged. Each point has errors related to the charge of the
      hit, to aid in fitting.
+     Note: if this becomes useful, we should probably compute the slope (as done
+     in this class) for each cluster and save it in cluster params. Currently,
+     this re-fits a line to the same cluster each time it is compared to another,
+     which is overkill.
   */
   class CBAlgoHighQLineCompat : public CBoolAlgoBase{
     
@@ -48,11 +52,13 @@ namespace cmtool {
     void SetDebug(bool on) { _debug = on; }
 
     /// Method to set cut value in degrees for angle compatibility test
-    void SetSlopeCut(double slopediff) { _max_slope_sep = slopediff; }
+    void SetAngleCutDegrees(double kaleko) { _max_angle_sep = kaleko; }
 
     void SetMinNHits(size_t n) { _min_n_hits = n; }
 
     void SetQFracCut(double kaleko) { _frac_hits_to_keep = kaleko; }
+
+    TH1F* GetDebugHisto() const{ return _debug_histo; };
 
   protected:
 
@@ -74,11 +80,15 @@ namespace cmtool {
     size_t _min_n_hits;    
     /// Fraction of hits to consider (highest charge hits)
     double _frac_hits_to_keep; 
-    /// Fit line slope difference between two clusters
-    double _max_slope_sep;
+    /// Fit line angle difference between two clusters (in degrees)
+    double _max_angle_sep;
 
     TGraphErrors* _tge;
+
     TFitResultPtr _frp;
+
+
+    TH1F* _debug_histo;
   };
   
 } // end namespace cmtool
