@@ -64,7 +64,8 @@ namespace evd {
     // Need to loop over the file 8 times to get all the cards
     int _boards_found = 0;
     // make a guess at where the first card will be:
-    unsigned int _n_entry = _current_event*(_n_cards+_card_offset);
+    unsigned int _n_entry = (_current_event)*(_n_cards);
+    _n_entry = fmax(_n_entry,0);
     while(_boards_found < 8){
 
 
@@ -81,6 +82,7 @@ namespace evd {
       // Just skip board 24, always
       if (_board_id == 24){
         _n_entry ++;
+
         // std::cout << "Continuing\n";
         continue;
       }
@@ -88,6 +90,8 @@ namespace evd {
         std::cout << "event " << _event_no << " in file, but on event " << _current_event << std::endl;
         // then that's an issue, move on
         _n_entry ++;
+        if (_n_entry > c -> GetEntries())
+          _n_entry = 0;
         continue;
       }
 

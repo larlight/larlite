@@ -88,9 +88,6 @@ namespace evd {
   void RawBase::initDataHolder(){
     _planeData.resize(_x_dimensions.size());
     for (int i = 0; i < _x_dimensions.size(); i ++ ){
-      std::cout << "Resizing plane " << i << " to " << _x_dimensions.at(i)
-                << " * " << _y_dimensions.at(i) << " = " <<
-                _x_dimensions.at(i)*_y_dimensions.at(i) << std::endl;
       _planeData.at(i).resize(_x_dimensions.at(i) * _y_dimensions.at(i));
     }
     return;
