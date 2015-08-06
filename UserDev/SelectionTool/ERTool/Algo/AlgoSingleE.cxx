@@ -280,7 +280,8 @@ namespace ertool {
 	      Dir.Normalize();
 	      double mass = _findRel.GetMass(track);
 	      geoalgo::Vector_t Mom = Dir * ( sqrt( Edep * (Edep+2*mass) ) );
-	      trackParticle.SetParticleInfo(_findRel.GetPDG(track),mass,track[0],Mom);
+	      //trackParticle.SetParticleInfo(_findRel.GetPDG(track),mass,track[0],Mom);
+	      trackParticle.SetParticleInfo(trackParticle.PdgCode(),mass,track[0],Mom);
 	      neutrinoMom += sqrt( Edep * ( Edep + 2*mass ) );
 	      //std::cout << "setting parentage for sibling track..." << std::endl;
 	      graph.SetParentage(neutrino.ID(),t);

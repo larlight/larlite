@@ -22,17 +22,13 @@ namespace evd {
     // here is a good place to create one on the heap (i.e. "new TH1D"). 
     //
 
-    // Initialize the geoService object:
-
-    // Initialize data holder:
-    // Resize data holder to accomodate planes and wires:
-    if (wiredata -> size() != geoService -> Nviews())
-      wiredata->resize(geoService -> Nviews());
-     
     for (unsigned int p = 0; p < geoService -> Nviews(); p ++){
-      if (wiredata->at(p).size() != geoService->Nwires(p) )
-        wiredata->at(p).resize(geoService->Nwires(p));
+      setXDimension(geoService->Nwires(p), p);
+      setYDimension(detProp -> ReadOutWindowSize(), p);
     }
+
+    // Initialize the place to hold data:
+    initDataHolder();
 
     // std::cout << "\n\nCompleted initialize.\n\n";
 
@@ -65,8 +61,13 @@ namespace evd {
     
 
     for (auto & wire: *WireHandle){
-        unsigned int ch = wire.Channel();
-        wiredata->at(geoService->ChannelToPlane(ch))[geoService->ChannelToWire(ch)] = wire.Signal();
+      unsigned int ch = wire.Channel();
+      int i = 0;
+      int plane = geoService->ChannelToPlane(ch);
+      for (auto & tick : wire.Signal()){
+        _planeData.at(plane)[geoService->ChannelToWire(ch)*_y_dimensions.at(plane) + i] = tick;        
+        i++;
+      }
     }
 
 
@@ -87,8 +88,6 @@ namespace evd {
     // else 
     //   print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
     //
-  
-    delete wiredata;
 
     return true;
   }
