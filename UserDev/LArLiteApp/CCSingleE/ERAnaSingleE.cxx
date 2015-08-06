@@ -149,12 +149,6 @@ namespace ertool {
     if (_debug) { std::cout << "Total Energy deposited in detector: " << _EDep << std::endl; }
    */ 
     
-    // If debug -> print out MC particle set
-    if (_debug){
-	std::cout << "MC Particle Tree: " << std::endl;
-	std::cout << mc_graph.Diagram();
-      }
-    
     // Loop through MC Particle Graph...not yet being made...
     // */ 
     // loop over all particles in MC particle set (made by Helper)
