@@ -17,6 +17,18 @@
 #include <iostream>
 #include <vector>
 #include "LArUtil/Geometry.h"
+#include "LArUtil/DetectorProperties.h"
+
+struct _object;
+typedef _object PyObject;
+
+#ifndef __CINT__
+#include "Python.h"
+#include "numpy/arrayobject.h"
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#endif
+
+
 
 namespace evd {
 
@@ -40,30 +52,45 @@ namespace evd {
     // for lariat, this can be used to set the file
     void setInput(std::string s){producer = s;}
 
+    // This class has two outputs.
+    // First, a user can get the plane data as a vector of float
+    // Which means the user may have to know how to convert that back into
+    // a 2D array
+    // Alternatively, and because this is meant to be used as python,
+    // you can get the numpy array of the plane of data, which is 2D
 
-    // The following two functions are the interface
-    // to the outside world in terms of passing data out.
-    // Do not change their form without good reason!
-    // If you are concerned about the speed of passing this 
-    // vector, I think it is OK.  It is passed by reference 
-    // and so later, a c++ -> numpy converter could turn this
-    // data into numpy array.  This seems ideal; this class
-    // here could be the owner of the data, responsible for
-    // memory management, while numpy provides the streamlined
-    // interface for python for drawing.
+    // You are responsible for setting the dimensions of the planes too
+    // There is no requirement they are uniform, but you should make sure to initialize
+    // them properly with the following functions:
+    void setXDimension(unsigned int x_dim, unsigned int plane);
+    void setYDimension(unsigned int y_dim, unsigned int plane);
+    void setPedestal(float pedestal, unsigned int plane);
 
+
+
+    // Function to get the array of data
+    PyObject * getArrayByPlane(unsigned int p);
 
     // Function to get the data by plane:
-    const std::vector<std::vector<float>> & getDataByPlane(unsigned int p) const;
-
-    // Get just a single wire's worth of data
-    const std::vector<float> & getWireData(unsigned int plane, unsigned int wire) const;
+    const std::vector<float> & getDataByPlane(unsigned int p) const;
 
   protected:
 
-    std::vector<std::vector<std::vector<float>>> * wiredata;
+    // sets up the _plane data object
+    void initDataHolder();
+
+
+    // This section holds the images for the data (wire, raw digit, etc)
+    std::vector<std::vector<float > > _planeData;
+
+    // these two objects hold the dimensions of the data:
+    std::vector<unsigned int> _x_dimensions;
+    std::vector<unsigned int> _y_dimensions;
+
+    std::vector<float> _pedestals;
 
     const larutil::Geometry * geoService;
+    const larutil::DetectorProperties * detProp;
 
     std::string producer;
 

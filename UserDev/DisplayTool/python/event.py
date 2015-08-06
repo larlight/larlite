@@ -110,6 +110,7 @@ class larlite_manager(manager,QtCore.QObject):
     # the storage manager
     self._process = fmwk.ana_processor()
     self._mgr = fmwk.storage_manager()
+
     self._drawableItems = drawableItems()
     self._keyTable = dict()
     self._drawnClasses = dict()
@@ -334,7 +335,7 @@ class larlite_manager(manager,QtCore.QObject):
         self._drawWires = False
         return
       self._drawWires = True
-      self._wireDrawer = rawDigit()
+      self._wireDrawer = rawDigit(self._geom)
       self._process.add_process(self._wireDrawer._process)
       self.processEvent(True)
     else:
