@@ -23,7 +23,8 @@ namespace showerreco {
 
   Shower_t ShowerRecoAlg::RecoOneShower(const ShowerClusterSet_t& clusters)
   {
-    
+   
+
     Shower_t result;
     //
     // Reconstruct and store

@@ -54,6 +54,8 @@ namespace showerreco {
     /// Function to set if to use a linear scale to calculate Energy
     void SetUseLinearEnergy(bool on) { _linearE = on; }
 
+    void CaloAlgo(::calo::CalorimetryAlg * c){fCaloAlg = c;}
+
   protected:
 
     larutil::GeometryUtilities  *fGSer;
