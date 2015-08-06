@@ -215,87 +215,97 @@ Double_t fluxRW::get_weight(Double_t energy, Int_t ntype, Int_t ptype) {
 
 
 
-/*Method to get the event weight automatically using the decay type from mcflux
+/*
+
+Method to get the event weight automatically using the decay type from mcflux
 Use method only if beam events are being used (specifically if only one entry
-is present in the event_mctruth vector and that entry contains beam events)*/
+is present in the event_mctruth vector and that entry contains beam events)
+
+One also needs to be very careful to find the weight for every neutrino interaction
+in a given event and then we will want to take the total weight (product of the 
+individual weights) and apply that.
+
+*/
+
+
 Double_t fluxRW::event_weight(larlite::storage_manager * storage) {
   
-  larlite::mcnu const & mcn =
-    storage->get_data<larlite::event_mctruth>("generator")->at(0).
-    GetNeutrino();
+    Double_t weight = 1; 
 
-
-
-  //Determine neutrino type (nue, nuebar, numu or numubar)
-  Int_t ntype = 0;
-
-  if(mcn.Nu().PdgCode() == 12) ntype = 1;
-  
-  else if(mcn.Nu().PdgCode() == -12) ntype = 2;
-
-  else if(mcn.Nu().PdgCode() == 14) ntype = 3;
-  
-  else if(mcn.Nu().PdgCode() == -14) ntype = 4;
-  
-  Int_t decay_type =
-    storage->get_data<larlite::event_mcflux>("generator")->at(0).fndecay;
-
-
-
-  //Determine parent type (muon, charged pion, K_L^0 or charged kaon)
-  Int_t ptype = 0;
-  
-  switch(decay_type) {
+    auto const & mcn_v = storage->get_data<larlite::event_mctruth>("generator"); 
     
-  case 1:
-  case 2:
-  case 3:
-  case 4:
-    ptype = 3;
-    break;
-  case 5:
-  case 6:
-  case 7:
-  case 8:
-  case 9:
-  case 10:
-    ptype = 4;
-    break;
-  case 11:
-  case 12:
-    ptype = 1;
-    break;
-  case 13:
-  case 14:
-    ptype = 2;
-    
-  }
-  
-  /*
-    Int_t parent_pdg = storage->get_data<larlite::event_mcflux>("generator")->
-    at(0).fptype;
-
-    switch (abs(parent_pdg)) {
-    
-    case 13:
-    ptype = 1;
-    break;
-    case 321:
-    ptype = 4;
-    break;
-    case 130:
-    ptype = 3;
-    break;
-    case 211:
-    ptype = 2;
-    
-    }
-  */
-
-
-  
-  return get_weight(mcn.Nu().Trajectory().at(0).E(), ntype, ptype);
-  
-}
+    for(int i = 0; i < mcn_v->size();  i++){
+      
+	auto &mcn= mcn_v->at(i).GetNeutrino();
+	
+	//Determine neutrino type (nue, nuebar, numu or numubar)
+	Int_t ntype = 0;
+	
+	if(mcn.Nu().PdgCode() == 12) ntype = 1;
+      
+	else if(mcn.Nu().PdgCode() == -12) ntype = 2;
+	
+	else if(mcn.Nu().PdgCode() == 14) ntype = 3;
+	
+	else if(mcn.Nu().PdgCode() == -14) ntype = 4;
+	
+	Int_t decay_type = storage->get_data<larlite::event_mcflux>("generator")->at(i).fndecay;
+	
+	//Determine parent type (muon, charged pion, K_L^0 or charged kaon)
+	Int_t ptype = 0;
+	
+	switch(decay_type) {
+	  
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+	  ptype = 3;
+	  break;
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+	case 9:
+	case 10:
+	  ptype = 4;
+	  break;
+	case 11:
+	case 12:
+	  ptype = 1;
+	  break;
+	case 13:
+	case 14:
+	  ptype = 2;
+	  
+	}
+	
+	/*
+	  Int_t parent_pdg = storage->get_data<larlite::event_mcflux>("generator")->
+	  at(0).fptype;
+	  
+	  switch (abs(parent_pdg)) {
+	  
+	  case 13:
+	  ptype = 1;
+	  break;
+	  case 321:
+	  ptype = 4;
+	  break;
+	  case 130:
+	  ptype = 3;
+	  break;
+	  case 211:
+	  ptype = 2;
+	  
+	  }
+	*/
+	
+	weight *= get_weight(mcn.Nu().Trajectory().at(0).E(), ntype, ptype);
+	
+      }
+    return weight;
+	
+	}
 
 #endif

@@ -37,28 +37,30 @@ robertmurrells@gmail.com
    doxygen documentation!
  */
 
-class fluxRW{
-  
- public:
-  
-  /// Default constructor
-  fluxRW();
-  
-  /// Default destructor
-  ~fluxRW(){}
 
-  Double_t get_weight(Double_t energy, Int_t ntype, Int_t ptype);
-  
-  Double_t event_weight(larlite::storage_manager * storage);
-  
- private:
-  
-  Double_t bin_size;
-  
-  std::vector<Double_t> gs[4][4];
-  std::vector<Double_t> mb[4][4];
 
-};
+  class fluxRW{
+    
+  public:
+    
+    /// Default constructor
+    fluxRW();
+    
+    /// Default destructor
+    ~fluxRW(){}
+    
+    Double_t get_weight(Double_t energy, Int_t ntype, Int_t ptype);
+    
+    Double_t event_weight(larlite::storage_manager * storage);
+    
+  private:
+    
+    Double_t bin_size;
+    
+    std::vector<Double_t> gs[4][4];
+    std::vector<Double_t> mb[4][4];
+    
+  };
 
 #endif
 /** @} */ // end of doxygen group 
