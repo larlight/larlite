@@ -65,7 +65,7 @@ class microboone(geometry):
     # and then call the base class __init__
     larutil.LArUtilManager.Reconfigure(fmwk.geo.kMicroBooNE)
     super(microboone, self).__init__()
-    self._levels = [ (-50,350),(-50,350),(-10,100) ]
+    self._levels = [ (-50,200),(-50,200),(-10,100) ]
     self._pedestals = [2000,2000,440]
     self._name = "uboone"
 
