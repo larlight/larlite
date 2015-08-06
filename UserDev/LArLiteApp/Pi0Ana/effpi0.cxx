@@ -173,8 +173,8 @@ namespace larlite {
 	    if( _isExclusive == 1 ){ 
 		if( totalpi0 != 1 || cmeson != 0 ) 
 		    return false;
-		if ( !pi0Inside || !contained || lowEnergy || nShowers != 2 ){//|| lowEnergy){
-//		if ( nShowers != 2){
+//		if ( !pi0Inside || !contained || lowEnergy || nShowers != 2 ){//|| lowEnergy){
+		if ( nShowers != 2){
 		    _fidLoss++;
 		    return false;
 		    }
