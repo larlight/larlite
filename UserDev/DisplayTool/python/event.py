@@ -274,7 +274,7 @@ class larlite_manager(manager,QtCore.QObject):
   def goToEvent(self,event,force = False):
     self.setEvent(event)
     self.processEvent()
-    self.clearAll()
+    # self.clearAll()
     if self._view_manager != None:
       self._view_manager.drawPlanes(self)
     self.drawFresh()

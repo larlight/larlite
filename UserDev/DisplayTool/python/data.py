@@ -135,7 +135,6 @@ class wire(dataBase):
 
   def getPlane(self,plane):
 
-    print "Called getPlane"
     b = self._process.getNumpyByPlane(plane)
     print type(b)
     return b
@@ -665,11 +664,12 @@ class shower(recoBase):
         view._view.addItem(thisPoly)
         self._drawnObjects[view.plane()].append(thisPoly)
 
-        if view.plane() == 0:
-          print "dedx: ", shower.dedx()
+        # if view.plane() == 0:
+        #   print "dedx: ", shower.dedx()
 
 
         i_color += 1
+
 
 
 class polyLine(QtGui.QGraphicsPathItem):
