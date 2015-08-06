@@ -131,26 +131,26 @@ namespace showerreco{
 
 
 
-    std::cout << "FINAL RESULT: \n";
+    // std::cout << "FINAL RESULT: \n";
 
-    std::cout 
-              // << "True vector: ("
-              // << knownAxis.X() << ", "
-              // << knownAxis.Y() << ", "
-              // << knownAxis.Z() << "), "
-              << "Calculated vector: ("
-              << direction.X() << ", "
-              << direction.Y() << ", "
-              << direction.Z() << ").\n";
-              // << " Difference is " << acos(knownAxis.Dot(direction)) << " radians.\n";
+    // std::cout 
+    //           // << "True vector: ("
+    //           // << knownAxis.X() << ", "
+    //           // << knownAxis.Y() << ", "
+    //           // << knownAxis.Z() << "), "
+    //           << "Calculated vector: ("
+    //           << direction.X() << ", "
+    //           << direction.Y() << ", "
+    //           << direction.Z() << ").\n";
+    //           // << " Difference is " << acos(knownAxis.Dot(direction)) << " radians.\n";
 
-    for (unsigned int i = 0; i < inputShowers.size();i++){
-      larutil::PxPoint start2D, dir2D;
-      geomHelper -> Line_3Dto2D(pointOnAxis, direction, planes[i], start2D, dir2D);
-      std::cout << "\tIn plane " << planes[i] << ", the projection is "
-                << dir2D.t / dir2D.w << ", the target is "
-                << slopeByPlane[i] << ".\n";
-    }
+    // for (unsigned int i = 0; i < inputShowers.size();i++){
+    //   larutil::PxPoint start2D, dir2D;
+    //   geomHelper -> Line_3Dto2D(pointOnAxis, direction, planes[i], start2D, dir2D);
+    //   std::cout << "\tIn plane " << planes[i] << ", the projection is "
+    //             << dir2D.t / dir2D.w << ", the target is "
+    //             << slopeByPlane[i] << ".\n";
+    // }
 
     // Compare the 3D vector and the *known* 3D vector:
     

@@ -80,6 +80,8 @@ namespace larlite {
                            res_shower_v);
     }
 
+    std::cout << "Done reco'ing\n";
+
     for(auto const& res_shower : res_shower_v) {
 
       shower s;

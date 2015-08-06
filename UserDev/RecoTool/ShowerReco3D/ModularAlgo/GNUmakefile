@@ -3,8 +3,8 @@
 #
 
 # specific names for this package
-DICT  = RecoTool_ShowerRecoAlgoDict
-SHLIB = libRecoTool_ShowerRecoAlgo.so
+DICT  = RecoTool_ShowerRecoAlgoModularDict
+SHLIB = libRecoTool_ShowerRecoAlgoModular.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
 HEADERS = $(filter-out $(FMWK_HEADERS), $(wildcard *.h))
