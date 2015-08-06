@@ -50,7 +50,7 @@ def getShowerRecoAlgModular():
 
 # Copied from the recotool/matchDef.py file.
 # In general, use that one, but I reproduced it here for simplicity
-def DefaultMatchUboone():
+def DefaultMatch():
   palgo_array = cmtool.CPAlgoArray()
   
   palgo1 = cmtool.CPAlgoNHits()
@@ -71,39 +71,14 @@ def DefaultMatchUboone():
   return palgo_array, algo_array
 
 
-# Unless you have the argoneut repository checked out and built,
-# this matching algorithm won't even run.
-# It's not exclusive, you can try it if you want at 
-# https://github.com/coreyjadams/argoneut_electrons
-# But it's not tuned for anything but argoneut
-def DefaultMatchArgo():
+def DefaultShowerReco3D():
 
-    palgo_array = cmtool.CPAlgoArray()
-    
-    palgo1 = cmtool.CPAlgoNHits()
-    palgo1.SetMinHits(60)
-        
-    palgo_array.AddAlgo(palgo1)
-
-    algo_array = cmtool.CFAlgoArray()
-    wireAlg    = cmtool.CFAlgoShowerWireMatch()
-    timeAlg = cmtool.CFAlgoTimeOverlap()
-    timeAlg.RequireThreePlanes(False)
-    algo_array.AddAlgo(wireAlg)
-    algo_array.AddAlgo(timeAlg)
-
-    return palgo_array, algo_array
-
-
-# This function creates the actual shower reconstruction object
-def DefaultShowerReco3DArgo():
     # Create analysis unit
     ana_unit = fmwk.ShowerReco3D()
-    larutil.LArUtilManager.Reconfigure(fmwk.geo.kArgoNeuT)
     
     # Attach shower reco alg
     sralg = getShowerRecoAlgModular()
-    sralg.SetDebug()
+    # sralg.SetDebug()
     # sralg.Verbose(False)
     # sralg.Verbose(True)
     # sralg.SetUseArea(True)
@@ -116,33 +91,7 @@ def DefaultShowerReco3DArgo():
     # 
     # Attach Matching algorithm
     #
-    palgo_array, algo_array = DefaultMatchArgo()
-    ana_unit.GetManager().AddPriorityAlgo(palgo_array)
-    ana_unit.GetManager().AddMatchAlgo(algo_array)
-
-    return ana_unit
-
-def DefaultShowerReco3DUboone():
-
-    # Create analysis unit
-    ana_unit = fmwk.ShowerReco3D()
-    
-    # Attach shower reco alg
-    sralg = getShowerRecoAlgModular()
-    sralg.SetDebug()
-    # sralg.Verbose(False)
-    # sralg.Verbose(True)
-    # sralg.SetUseArea(True)
-    # Attach calo alg
-    # calg = calo.CalorimetryAlg()
-    # sralg.CaloAlgo(calg)
-    #sralg.SetUseModBox(True)
-    ana_unit.AddShowerAlgo(sralg)
-
-    # 
-    # Attach Matching algorithm
-    #
-    palgo_array, algo_array = DefaultMatchUboone()
+    palgo_array, algo_array = DefaultMatch()
     ana_unit.GetManager().AddPriorityAlgo(palgo_array)
     ana_unit.GetManager().AddMatchAlgo(algo_array)
 
@@ -161,25 +110,14 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 
 # Specify analysis output root file name
-my_proc.set_ana_output_file("elecShowersAna.root");
-
+my_proc.set_ana_output_file("showerRecoUboone_ana.root")
 # Specify data output root file name
-my_proc.set_output_file("elecShowers.root")
+my_proc.set_output_file("showerRecoUboone.root")
 
 
-########################################################
-# Change here to switch between microboone and argoneut!
-########################################################
 
-# Argoneut specific:
-ana_unit=DefaultShowerReco3DArgo()
-ana_unit.SetInputProducer("ccMergedFinal")
-
-# Uboone specific:
-# ana_unit = DefaultShowerReco3DUboone()
-# ana_unit.SetInputProducer("mergedFuzzy")
-
-########################################################
+ana_unit=DefaultShowerReco3D()
+ana_unit.SetInputProducer("mergeall")
 
 ana_unit.SetOutputProducer("showerreco")
 
@@ -190,13 +128,13 @@ quality_unit = fmwk.MCShowerAna()
 
 # quality_unit.SetShowerProducer("showerreco")
 
-my_proc.add_process(quality_unit)
+# my_proc.add_process(quality_unit)
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
-my_proc.run(0,50)
+my_proc.run()
 # my_proc.process_event(2)
 
 
