@@ -4,7 +4,6 @@
 #include "ERAlgoNGamma.h"
 
 namespace ertool {
-  int ctr = 0;
   ERAlgoNGamma::ERAlgoNGamma(const std::string& name)
     : AlgoBase(name)
     , fTPC(-10.,-126.,-10.,292.,136.,1150.)
@@ -54,6 +53,9 @@ namespace ertool {
 
   bool ERAlgoNGamma::Reconstruct(const EventData &data, ParticleGraph& graph)
   {
+    int ctr = 0;
+    int gamma_evtctr = 0;
+    int null_evtctr = 0;
     auto datacpy = data;
     if(_verbose)
       {
@@ -379,6 +381,7 @@ namespace ertool {
 	  } // <-- end if vtxS
 	// SECTION F ==========================================================
 	/// fill the particle graph
+	/// declare reference shower as a gamma
 	auto& gamma = graph.GetParticle(s);
 	double mom = thisShower._energy;
 	gamma.SetParticleInfo(22,
@@ -387,6 +390,7 @@ namespace ertool {
 			      thisShower.Dir()*mom);
 	for(auto const& c : sibShwrFin)
 	  {
+	    if (s == c) {continue;}
 	    auto const& d = datacpy.Shower(graph.GetParticle(c).RecoID());
 	    /// add this shower to ParticleTree
 	    auto &ruggles = graph.GetParticle(c);
@@ -395,6 +399,7 @@ namespace ertool {
 				    _gamma_mass,
 				    d.Start(),
 				    d.Dir()*shwrMom);
+	    //graph.SetSiblings(s,c);
 	  } // <-- end c loop 
 	if(siblingsT.size()>0)
 	  {
@@ -413,8 +418,24 @@ namespace ertool {
 					   mass,
 					   g[0],
 					   tMom);
-					   } // <-- end f loop 
-	  } //<-- end siblingsTRK.size()
+		//graph.SetSiblings(s,f);
+					   } // <-- end f loop
+	  } //<-- end siblingsT.size()
+	/// create a new particle for the neutrino
+	/*if(_verbose)
+	  {
+	    std::cout<<"# of particles before: "<<graph.GetNumParticles()<<std::endl
+		     <<"Making neutrino..."<<std::endl;
+	    
+	  }
+	Particle& neutrino = graph.CreateParticle();
+	if(_verbose)
+	  {
+	    std::cout<<"Made neutrino with ID: "<<neutrino.ID()<<" and PDG: "<<neutrino.PdgCode()<<std::endl
+		     <<"# of particles after: "<<graph.GetNumParticles()<<std::endl;
+	  } */
+	/// set relationship
+	//graph.SetParentage(neutrino.ID(),s);
 	if(_verbose)
 	  {
 	    std::cout<<"We found a gamma event! Hooray!!"<<std::endl;
@@ -424,15 +445,15 @@ namespace ertool {
 	siblingsT.clear();
 	sibShwrFin.clear();
       } // <-- end s loop
+    if(ctr > 0)
+      {gamma_evtctr++;}
+    if(ctr == 0)
+      {null_evtctr++;}
     return true;
   } // <__ end Reconstruct
 
   void ERAlgoNGamma::ProcessEnd(TFile* fout)
   {
-    if(_verbose)
-      {
-	std::cout<<"Found "<<ctr<<" reconstructed gamma events."<<std::endl;
-      }
     if(fout)
       {
 	fout->cd();
