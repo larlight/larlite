@@ -40,6 +40,8 @@ namespace ertool {
       
       auto const& p = particles.GetParticle(node_id);
 
+      if (p.PdgCode() == kINVALID_INT) continue;
+
       if(part_map_s.find(p.PdgCode()) == part_map_s.end()) 
 	part_map_s.insert(std::make_pair(p.PdgCode(),db_s.GetParticle(p.PdgCode())));
 
@@ -64,7 +66,6 @@ namespace ertool {
 	}
     }
 
-
     // Process all unassociated objects
     // Tracks
     for(size_t trk_index = 0; trk_index < data.Track().size(); ++trk_index) {
@@ -78,6 +79,7 @@ namespace ertool {
       if( !(used_obj[ ::ertool::RecoType_t::kShower ][ shr_index ]) )
 	GeoObjCollection::Add( data.Shower( shr_index ), Form("un-tagged (%zu)",shr_index), shr_col.c_str() );
     }
+
     return;
   }
 

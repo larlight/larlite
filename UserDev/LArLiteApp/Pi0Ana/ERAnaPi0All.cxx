@@ -13,7 +13,6 @@ namespace ertool {
   { 
 
     PrepareTTree() ;
-//    PrepareTrueTree();
     _CC_ctr 	= 0;
     _NC_ctr 	= 0;
     _NC1pi0_ctr = 0;
@@ -54,36 +53,12 @@ namespace ertool {
 
     }
 
-// void ERAnaPi0All::ResetTrue()
-// {
-//    _p_tot_pi0 	= -10000 ;
-//    _x_pi0_mc 	= -10000 ; 
-//    _y_pi0_mc 	= -10000 ;
-//    _z_pi0_mc 	= -10000 ;
-//    _e_pi0_mc 	= -10000 ;
-//    _n_pi0_mc 	= -1 ;
-//
-//    }
-
   void ERAnaPi0All::AcceptPSet(const ::fcllite::PSet& cfg)
   {}
 
   void ERAnaPi0All::ProcessBegin()
   {}
 
-//  void ERAnaPi0All::PrepareTrueTree(){
-//  
-//      if (_mc_pi0_tree) { delete _mc_pi0_tree; }
-//        _mc_pi0_tree = new TTree("_mc_pi0_tree","Pi0 Tree");
-//        _mc_pi0_tree->Branch("_x_pi0_mc",&_x_pi0_mc,"x_pi0_mc/D");
-//        _mc_pi0_tree->Branch("_y_pi0_mc",&_y_pi0_mc,"y_pi0_mc/D");
-//        _mc_pi0_tree->Branch("_z_pi0_mc",&_z_pi0_mc,"z_pi0_mc/D");
-//        _mc_pi0_tree->Branch("_e_pi0_mc",&_e_pi0_mc,"e_pi0_mc/D");
-//        _mc_pi0_tree->Branch("_n_pi0_mc",&_n_pi0_mc,"n_pi0_mc/I");
-//        _mc_pi0_tree->Branch("_angle",&_angle,"angle/D");
-//        _mc_pi0_tree->Branch("_p_tot_pi0",&_p_tot_pi0,"p_tot_pi0/D");
-//
-//    }
   void ERAnaPi0All::PrepareTTree(){
   
       if (_pi0_tree) { delete _pi0_tree; }
@@ -128,7 +103,6 @@ namespace ertool {
     std::cout<<"\n\nNumber of events thus far: "<<_nEvents<<std::endl ;
 
     Reset() ;
- //   ResetTrue();
 
     int pi0_mc = 0 ;
     double xMC(0.), yMC(0.), zMC(0.), eMC(0.), mMC(0.);
@@ -157,7 +131,6 @@ namespace ertool {
 	    py = mcp.Momentum()[1] ;
 	    pz = mcp.Momentum()[2] ;
 
-//	    _mc_pi0_tree->Fill();
 	    break; 
 	    }
 	}
@@ -166,6 +139,7 @@ namespace ertool {
 	_n_pi0_mc = 1;
 
     _p_tot_pi0 = sqrt ( px*px + py*py + pz*pz); 
+
     //Fill a bunch of 'reco' variables
     for( auto const & p : graph.GetParticleArray()){
 
@@ -194,7 +168,6 @@ namespace ertool {
             _distToWall = sqrt(_geoAlgo.SqDist(pi0.Vertex(),fTPC));
 	    
 	    //MC momentum and other things
-
 	    _x_pi0_mc = xMC ;
 	    _y_pi0_mc = yMC ;
 	    _z_pi0_mc = zMC ;
@@ -204,7 +177,6 @@ namespace ertool {
 	    _vtx_mc_reco = pow( pow(pi0.Vertex()[0] - xMC,2)
 			      + pow(pi0.Vertex()[1] - yMC,2)
 			      + pow(pi0.Vertex()[2] - zMC,2) ,0.5) ;
-
 
 
 	    if(pi0_mc > 0 )
@@ -308,12 +280,12 @@ namespace ertool {
 			}
         	} 
 
-//		std::cout<< " Status of CC, NC, NC Single: "<<_nCCPi0<<", "<<_nNCIncPi0<<", "<<_nNC1Pi0<<std::endl ;
+	std::cout<< " Status of CC, NC, NC Single: "<<_nCCPi0<<", "<<_nNCIncPi0<<", "<<_nNC1Pi0<<std::endl ;
 	std::cout<<"Pi0 particle!" <<std::endl ;
 	break ;
     }
 
-    std::cout<<"Now we're filling...."<<std::endl; 
+//    std::cout<<"Now we're filling...."<<std::endl; 
     _pi0_tree->Fill();
 
   return true; 

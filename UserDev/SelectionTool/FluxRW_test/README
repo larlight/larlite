@@ -1,0 +1,5 @@
+To use the fluxRW package located in LArLiteApp/fluxRW you need to first copy the ROOT files which live in /uboone/data/users/rmurrell/fluxRW into LArLiteApp/fluxRW/.
+
+Once this is done you can then use the implementation that is shown in SelectionTool/FluxRW_test/LArLite_FluxRW.cxx to correctly assign the flux weight to a neutrino interaction.
+
+If there is no neutrino interaction then this function ***SHOULD*** return a weight of 1.  
