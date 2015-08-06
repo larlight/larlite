@@ -73,9 +73,17 @@ namespace evd {
       int plane = geoService->ChannelToPlane(ch);
       // convert short ADCs to float
       
+      // Get the pedestal for this channel:
+      float ped = 0.0;
+      for (int j = 0; j < 500; j++){
+        ped += rawdigit.ADC(j);
+      }
+      ped /= 500.0;
+
       int i = 0;
       for (auto & adc : rawdigit.ADCs()){
-        _planeData.at(plane).at(offset + i) = adc - _pedestals.at(plane);
+        _planeData.at(plane).at(offset + i) = adc - ped;
+        // _planeData.at(plane).at(offset + i) = adc - _pedestals.at(plane);
         i++;
       }
     }
