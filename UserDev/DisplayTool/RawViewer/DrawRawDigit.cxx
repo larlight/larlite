@@ -69,8 +69,17 @@ namespace evd {
       unsigned int ch = rawdigit.Channel();
       if (ch >= 8254) continue;
 
-      int offset = geoService->ChannelToWire(ch) * detProp -> ReadOutWindowSize();
+      int wire = geoService->ChannelToWire(ch);
       int plane = geoService->ChannelToPlane(ch);
+      // TEMPORARY: fix collection mapping.
+      if (plane == 2){
+        // std::cout << "Wire from " << wire;
+        int wireAnchor = wire - (wire % 32);
+        wire = wireAnchor + 32 - (wire % 32) - 1;
+        // std::cout << " to " << wire <<std::endl;
+      }
+
+      int offset = wire * detProp -> ReadOutWindowSize();
       // convert short ADCs to float
       
       // Get the pedestal for this channel:
