@@ -71,6 +71,8 @@ namespace evd {
 
       int wire = geoService->ChannelToWire(ch);
       int plane = geoService->ChannelToPlane(ch);
+
+
       // TEMPORARY: fix collection mapping.
       if (plane == 2){
         // std::cout << "Wire from " << wire;
@@ -78,6 +80,31 @@ namespace evd {
         wire = wireAnchor + 32 - (wire % 32) - 1;
         // std::cout << " to " << wire <<std::endl;
       }
+      if (plane == 1){
+        if (wire < 672){
+          // if (wire > 31){
+            // int wireTemp = wire - 32;
+            // int wireAnchor = wireTemp - (wireTemp % 64);
+            // wireTemp = wireAnchor + 64 - (wire % 64) - 1;
+            // wire = wireTemp;
+          // }
+          // int wireAnchor = wire - (wire % 256);
+          // wire = wireAnchor + 256 - (wire % 256) - 1 ;
+          int wireAnchor = wire - (wire % 64) + 16;
+          wire = wireAnchor + 64 - (wire % 64) - 1;
+        }
+
+      }
+
+      if (plane == 0){
+        if (wire > 1727){
+
+        }
+      }
+
+      if (wire < 0  || wire > geoService -> Nwires(plane))
+        continue;
+
 
       int offset = wire * detProp -> ReadOutWindowSize();
       // convert short ADCs to float
