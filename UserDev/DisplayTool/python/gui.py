@@ -56,9 +56,11 @@ class view_manager(object):
     self._layout.setMargin(0)
     self._layout.setContentsMargins(0,0,0,0)
 
-
+    plane = 0
     for view in self._drawerList:
-      self._layout.addWidget(view.getWidget(),0)
+      if plane == 2:
+        self._layout.addWidget(view.getWidget(),0)
+      plane += 1
 
     self._widget.setLayout(self._layout)
     return self._widget
