@@ -14,6 +14,7 @@
 #pragma link C++ class larlite::ShowerQuality+;
 #pragma link C++ class larlite::HitCalibration+;
 #pragma link C++ class larlite::ToyShowerGenerator+;
+#pragma link C++ class larlite::ShowerAna+;
 //ADD_NEW_CLASS ... do not change this line
 //ADD_NEW_ALG_CLASS ... do not change this line
 #endif
