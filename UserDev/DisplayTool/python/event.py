@@ -20,6 +20,8 @@ class event(object):
     self._event = 0
     self._subrun = 0
 
+    self._keyTable = dict()
+
     self._lastProcessed = -1
 
   def next(self):
@@ -112,11 +114,15 @@ class larlite_manager(manager,QtCore.QObject):
     # the storage manager
     self._process = fmwk.ana_processor()
     self._mgr = fmwk.storage_manager()
+
     self._drawableItems = drawableItems()
     self._keyTable = dict()
     self._drawnClasses = dict()
 
-    self.setInputFile(file)
+    if file != None:
+      self.setInputFiles(file)
+    
+    self._n_entries = 0
 
     # Toggle whether or not to draw wires:
     self._drawWires = False
@@ -134,7 +140,7 @@ class larlite_manager(manager,QtCore.QObject):
     # Open the file
     f = TFile(file)
     # Use the larlite_id_tree to find out how many entries are in the file:
-    self._n_entries = f.larlite_id_tree.GetEntries()
+    self._n_entries += f.larlite_id_tree.GetEntries()
     # prepare a dictionary of data products
     lookUpTable = dict()
     # Loop over the keys (list of trees)
@@ -150,37 +156,52 @@ class larlite_manager(manager,QtCore.QObject):
       else:
         lookUpTable.update( {thisKeyList[0] : (thisKeyList[1],)})
 
-    self._keyTable = lookUpTable
+    self._keyTable.update(lookUpTable)
 
   def setInputFile(self,file):
-    # First, check that the file exists:
-    try:
-      if not os.path.exists(file):
-        print "ERROR: requested file does not exist."
-        return
-    except Exception, e:
-      return
-    # Next, verify it is a root file:
-    if not file.endswith(".root"):
-      print "ERROR: must supply a root file."
-      return
-    # Finally, ping the file to see what is available to draw
-    self.pingFile(file)
-    if len(self._keyTable) > 0:
-      self._hasFile = True
-      # add this file to the storage manager here
-      self._mgr.reset()
-      self._mgr.add_in_filename(file)
-      self._mgr.set_io_mode(fmwk.storage_manager.kREAD)
-      self._mgr.open()
-      # setup the processor in the same way
-      self._process.reset()
-      self._process.add_input_file(file)
-      self._process.set_io_mode(fmwk.storage_manager.kREAD)
+    f = [file,]
+    self.setInputFiles(f)
 
-      self._lastProcessed = -1
-      self.goToEvent(0)
-      self.fileChanged.emit()
+  def setInputFiles(self,files):
+    
+    # reset the storage manager and process
+    self._mgr.reset()
+    self._process.reset()
+    
+    if files == None:
+      return
+
+    for file in files:
+      # First, check that the file exists:
+      try:
+        if not os.path.exists(file):
+          print "ERROR: requested file does not exist."
+          continue
+      except Exception, e:
+        return
+      # Next, verify it is a root file:
+      if not file.endswith(".root"):
+        print "ERROR: must supply a root file."
+        continue
+
+      # Finally, ping the file to see what is available to draw
+      self.pingFile(file)
+      if len(self._keyTable) > 0:
+        self._hasFile = True
+        # add this file to the storage manager here
+        self._mgr.add_in_filename(file)
+        self._mgr.set_io_mode(fmwk.storage_manager.kREAD)
+        # setup the processor in the same way
+        self._process.add_input_file(file)
+        self._process.set_io_mode(fmwk.storage_manager.kREAD)
+
+
+
+    # Open the manager
+    self._mgr.open()
+    self._lastProcessed = -1
+    self.goToEvent(0)
+    self.fileChanged.emit()
 
 
   # This function will return all producers for the given product
@@ -212,6 +233,9 @@ class larlite_manager(manager,QtCore.QObject):
       return 0
 
     return self._mgr.subrun_id()
+
+  def internalEvent(self):
+    return self._event
 
   # override the functions from manager as needed here
   def next(self):
@@ -324,19 +348,31 @@ class larlite_manager(manager,QtCore.QObject):
     return xRange,yRange
 
   # handle all the wire stuff:
-  def toggleWires(self, wiresBool):
+  def toggleWires(self, product):
     # Now, either add the drawing process or remove it:
-    if 'wire' not in self._keyTable:
-      print "No wire data available to draw"
-      return
-    self._drawWires = wiresBool
-
-    if self._drawWires:
+    
+    if product == 'wire':
+      if 'wire' not in self._keyTable:
+        print "No wire data available to draw"
+        self._drawWires = False
+        return
+      self._drawWires = True
       self._wireDrawer = recoWire()
       self._process.add_process(self._wireDrawer._process)
       self.processEvent(True)
+    
+    elif product == 'rawdigit':
+      if 'rawdigit' not in self._keyTable:
+        print "No raw digit data available to draw"
+        self._drawWires = False
+        return
+      self._drawWires = True
+      self._wireDrawer = rawDigit(self._geom)
+      self._process.add_process(self._wireDrawer._process)
+      self.processEvent(True)
     else:
-      self._wireDrawer = None   
+      self._wireDrawer = None
+      self._drawWires = False   
 
   def toggleParams(self, paramsBool):
     self._drawParams = paramsBool
