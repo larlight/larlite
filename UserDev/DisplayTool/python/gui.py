@@ -12,9 +12,9 @@ from viewport import viewport
 
 # Import the basic event management class
 from event import event
+from PyQt4 import QtCore
 
-
-class view_manager(object):
+class view_manager(QtCore.QObject):
   """This class manages a collection of viewports"""
   def __init__(self, geometry):
     super(view_manager, self).__init__()
@@ -87,10 +87,31 @@ class view_manager(object):
           widget.setVisible(False)
         i += 1
 
+
   def connectStatusBar(self,statusBar):
     for view in self._drawerList:
       view.connectStatusBar(statusBar)
 
+
+  def linkViews(self):
+    pass
+  #   print "linking views"
+  #   self._lockYRange = True
+  #   self._drawerList[0]._view.sigYRangeChanged.connect(self.rangeChangeHandler)
+  #   self._drawerList[1]._view.sigYRangeChanged.connect(self.rangeChangeHandler)
+  #   self._drawerList[2]._view.sigYRangeChanged.connect(self.rangeChangeHandler)
+  #   self._wirePlot.sigXRangeChanged.connect(self.rangeChangeHandler)
+
+
+
+
+  # def rangeChangeHandler(self):
+  #   range = self.sender().range
+  #   if self._lockYRange:
+  #     for view in self._drawerList:
+  #       if view._view != self.sender():
+  #         view._view.setRange
+  #   print "range changed by ", self.sender()
 
   def setRangeToMax(self):
     for view in self._drawerList:
@@ -460,6 +481,8 @@ class gui(QtGui.QWidget):
     for i in range(0, nviews):
       # These boxes hold the wire/time views:
       self._view_manager.addEvdDrawer(i)
+
+    self._view_manager.linkViews()
 
     self._view_manager.connectStatusBar(self._statusBar)
 

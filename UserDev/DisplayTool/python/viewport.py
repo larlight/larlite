@@ -173,6 +173,7 @@ class viewport(pg.GraphicsLayoutWidget):
     self._view.setRange(xRange=xR,yRange=yR, padding=0.002)
     pass
 
+
   def plane(self):
     return self._plane
 
