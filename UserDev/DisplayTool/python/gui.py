@@ -33,6 +33,8 @@ class view_manager(object):
     self._wireDrawer.setMaximumHeight(200)
     self._wireDrawer.setMinimumHeight(100)
 
+    self._selectedPlane = -1
+
     self._autoRange = False
 
 
@@ -41,6 +43,8 @@ class view_manager(object):
     self._drawerList[-1].connectWireDrawingFunction(self.drawWireOnPlot)
     self._nviews += 1
   
+  def selectPlane(self,plane):
+    self._selectedPlane = plane
 
 
   def restoreDefaults(self):
@@ -49,6 +53,8 @@ class view_manager(object):
 
   def getDrawListWidget(self):
 
+    self._widgetList = []
+
     # loop through the list and add the drawing windows and their scale
     self._widget = QtGui.QWidget()
     self._layout = QtGui.QVBoxLayout()
@@ -56,14 +62,30 @@ class view_manager(object):
     self._layout.setMargin(0)
     self._layout.setContentsMargins(0,0,0,0)
 
-    plane = 0
+    self._planeWidgets = []
     for view in self._drawerList:
-      if plane == 2:
-        self._layout.addWidget(view.getWidget(),0)
-      plane += 1
+      widget,layout = view.getWidget()
+      self._planeWidgets.append(widget)
+      self._layout.addWidget(widget,0)
 
     self._widget.setLayout(self._layout)
+
     return self._widget
+
+  def refreshDrawListWidget(self):
+
+    if self._selectedPlane == -1:
+      for widget in self._planeWidgets:
+        widget.setVisible(True)
+
+    else:
+      i = 0
+      for widget in self._planeWidgets:
+        if i == self._selectedPlane:
+          widget.setVisible(True)
+        else:
+          widget.setVisible(False)
+        i += 1
 
   def connectStatusBar(self,statusBar):
     for view in self._drawerList:
@@ -242,6 +264,8 @@ class gui(QtGui.QWidget):
     self._unitDisplayOption.setTristate(False)
     self._unitDisplayOption.stateChanged.connect(self.useCMWorker)
 
+
+
     # Pack the stuff into a layout
 
     self._drawingControlBox = QtGui.QVBoxLayout()
@@ -259,6 +283,24 @@ class gui(QtGui.QWidget):
       self._view_manager.autoRange(self._event_manager)
     else:
       self._view_manager.setRangeToMax()
+
+  def viewSelectWorker(self):
+
+    i = 0
+    for i in xrange(self._geometry.nViews()):
+      if self.sender() == self._viewButtonArray[i]:
+        self._view_manager.selectPlane(i)
+        self._view_manager.refreshDrawListWidget()
+        return
+      else:
+        i += 1
+
+    # if there wasn't a match, then it must be the ALL button:
+    if self.sender() != None:
+      self._view_manager.selectPlane(-1)
+      self._view_manager.refreshDrawListWidget()
+      return
+
 
   def lockARWorker(self):
     if self._lockAspectRatio.isChecked():
@@ -302,6 +344,36 @@ class gui(QtGui.QWidget):
     self._westLayout.addStretch(1)
     self._westLayout.addLayout(draw_control)
     self._westLayout.addStretch(1)
+
+    # Add a section to allow users to just view one window instead of two/three
+    self._viewButtonGroup = QtGui.QButtonGroup()
+    # Draw all planes:
+    self._allViewsButton = QtGui.QRadioButton("All")
+    self._allViewsButton.clicked.connect(self.viewSelectWorker)
+    self._viewButtonGroup.addButton(self._allViewsButton)
+
+    # Put the buttons in a layout
+    self._viewChoiceLayout = QtGui.QVBoxLayout()
+
+    # Make a label for this stuff:
+    self._viewChoiceLabel = QtGui.QLabel("View Options")
+    self._viewChoiceLayout.addWidget(self._viewChoiceLabel)
+    self._viewChoiceLayout.addWidget(self._allViewsButton)
+
+    i = 0
+    self._viewButtonArray = []
+    for plane in xrange(self._geometry.nViews()):
+      button = QtGui.QRadioButton("Plane" + str(i))
+      i += 1
+      self._viewButtonGroup.addButton(button)
+      button.clicked.connect(self.viewSelectWorker)
+      self._viewButtonArray.append(button)
+      self._viewChoiceLayout.addWidget(button)
+
+    self._westLayout.addLayout(self._viewChoiceLayout)
+
+    self._westLayout.addStretch(1)
+
     self._westLayout.addWidget(quit_control)
     self._westWidget = QtGui.QWidget()
     self._westWidget.setLayout(self._westLayout)
@@ -346,13 +418,38 @@ class gui(QtGui.QWidget):
     self._eastLayout.setVisible(False)
     self._eastLayout.setVisible(True)
 
+  def refreshCenterView(self):
+
+    # for child in self.centerWidget.children():
+    #   print type(child)
+    #   if type(child) == QtGui.QVBoxLayout:
+    #     layout = child
+
+    # print layout.children()
+    # print layout
+
+    widget = self._view_manager.getDrawListWidget()
+    # for child in widget.children():
+    #   print child
+
+    # print widget
+    # print layout
+
+    # print layout.children()
+
+    # for i in reversed(range(self.centerWidget.layout.count())): 
+        # layout.itemAt(i).widget().setParent(None)
+
+    self.centerWidget.setVisible(False)   
+    self.centerWidget.setVisible(True)   
+
   def initUI(self):
 
 
     # Get all of the widgets:
-    eastWidget  = self.getEastLayout()
-    westWidget  = self.getWestLayout()
-    southLayout = self.getSouthLayout()
+    self.eastWidget  = self.getEastLayout()
+    self.westWidget  = self.getWestLayout()
+    self.southLayout = self.getSouthLayout()
 
     # Area to hold data:
     nviews = self._geometry.nViews()
@@ -363,24 +460,18 @@ class gui(QtGui.QWidget):
 
     self._view_manager.connectStatusBar(self._statusBar)
 
-    drawListWidget = self._view_manager.getDrawListWidget()
-
-
-    # Connect the wire drawing box to the planes so that they may
-    # update it
-    # for i in range(0, nviews):
-        # self._drawerList[i].connectWireDrawFunction(self.drawWire)
+    self.centerWidget = self._view_manager.getDrawListWidget()
 
     # Put the layout together
 
 
     self.master = QtGui.QVBoxLayout()
     self.slave = QtGui.QHBoxLayout()
-    self.slave.addWidget(westWidget)
-    self.slave.addWidget(drawListWidget)
-    self.slave.addWidget(eastWidget)
+    self.slave.addWidget(self.westWidget)
+    self.slave.addWidget(self.centerWidget)
+    self.slave.addWidget(self.eastWidget)
     self.master.addLayout(self.slave)
-    self.master.addWidget(southLayout)
+    self.master.addWidget(self.southLayout)
 
     self.setLayout(self.master)    
 
@@ -433,49 +524,5 @@ class gui(QtGui.QWidget):
     # Print
     pixmapImage = QtGui.QPixmap.grabWidget(self)
     pixmapImage.save(f,"PNG")
-
-
-
-# def sigintHandler(*args):
-#     """Handler for the SIGINT signal."""
-#     sys.stderr.write('\r')
-#     sys.exit()
-
-# def main():
-    
-#   parser = argparse.ArgumentParser(description='Python based event display.')
-#   geom = parser.add_mutually_exclusive_group()
-#   geom.add_argument('-A', '--argoneut',action='store_true',help="Run with the argoneut geometry")
-#   geom.add_argument('-U', '--uboone',action='store_true',help="Run with the microboone geometry")
-#   geom.add_argument('-L', '--lariat',action='store_true',help="Run with the lariat geometry")
-#   parser.add_argument('file',nargs='?',help="Optional input file to use")
-#   parser.add_argument('-d',"--daq",action='store_true',help="Run the evd in daq mode.")
-#   args = parser.parse_args()
-
-#   app = QtGui.QApplication(sys.argv)
-#   geometry = "uboone"
-#   if args.argoneut:
-#       geometry = "argoneut"
-#   elif args.lariat:
-#       geometry = "lariat"
-#   if args.daq:
-#       mode = "daq"
-#       print "Running in daq mode"
-#   else:
-#     mode = ""
-  
-#   ex = gui(geometry,mode,args.file)
-
-#   signal.signal(signal.SIGINT, sigintHandler)
-#   timer = QtCore.QTimer()
-#   timer.start(500)  # You may change this if you wish.
-#   timer.timeout.connect(lambda: None)  # Let the interpreter run each 500 ms.
-
-#   app.exec_()
-#   # sys.exit(app.exec_())
-
-
-# if __name__ == '__main__':
-#   main()
 
 

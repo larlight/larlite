@@ -10,7 +10,7 @@ class viewport(pg.GraphicsLayoutWidget):
     # add a view box, which is a widget that allows an image to be shown
     self._view = self.addViewBox(border=None)
     # add an image item which handles drawing (and refreshing) the image
-    self._item = pg.ImageItem(useOpenGL=True)
+    self._item = pg.ImageItem(useOpenGL=True,autoDownsample=True)
     # self._item._setPen((0,0,0))
     self._view.addItem(self._item)
     # connect the scene to click events, used to get wires
@@ -78,6 +78,17 @@ class viewport(pg.GraphicsLayoutWidget):
     self._cmap.setMaximumWidth(25)
     self._lowerLevel.setMaximumWidth(35)
 
+    colors = QtGui.QVBoxLayout()
+    colors.addWidget(self._upperLevel)
+    colors.addWidget(self._cmap)
+    colors.addWidget(self._lowerLevel)
+    self._totalLayout = QtGui.QHBoxLayout()
+    self._totalLayout.addWidget(self)
+    self._totalLayout.addLayout(colors)
+    self._widget = QtGui.QWidget()
+    self._widget.setLayout(self._totalLayout)
+
+
   def restoreDefaults(self):
     self._lowerLevel.setText(str(self._geometry.getLevels(self._plane)[0]))
     self._upperLevel.setText(str(self._geometry.getLevels(self._plane)[1]))
@@ -87,16 +98,7 @@ class viewport(pg.GraphicsLayoutWidget):
 
   def getWidget(self):
 
-    colors = QtGui.QVBoxLayout()
-    colors.addWidget(self._upperLevel)
-    colors.addWidget(self._cmap)
-    colors.addWidget(self._lowerLevel)
-    total = QtGui.QHBoxLayout()
-    total.addWidget(self)
-    total.addLayout(colors)
-    widget = QtGui.QWidget()
-    widget.setLayout(total)
-    return widget
+    return self._widget,self._totalLayout
 
   def levelChanged(self):
     # First, get the current values of the levels:
