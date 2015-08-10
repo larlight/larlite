@@ -202,7 +202,7 @@ def main():
   geom.add_argument('-A', '--argoneut',action='store_true',help="Run with the argoneut geometry")
   geom.add_argument('-U', '--uboone',action='store_true',help="Run with the microboone geometry")
   geom.add_argument('-L', '--lariat',action='store_true',help="Run with the lariat geometry")
-  parser.add_argument('file',nargs='?',help="Optional input file to use")
+  parser.add_argument('file',nargs='*',help="Optional input file to use")
   args = parser.parse_args()
 
   app = QtGui.QApplication(sys.argv)
@@ -217,8 +217,9 @@ def main():
   # If a file was passed, give it to the manager:
 
 
+
   manager = larlite_manager(geometry)
-  manager.setInputFile(args.file)
+  manager.setInputFiles(args.file)
 
   thisgui = larlitegui(geometry,manager)
   thisgui.initUI()
