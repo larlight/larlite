@@ -59,14 +59,8 @@ namespace evd {
     */
     virtual bool finalize();
 
-
-    PyObject * getNumpyByPlane(unsigned int p);
-
   private:
 
-    std::vector<PyObject *> numpyPlanes;
-
-    std::vector<std::vector<float > > planeData;
   };
 }
 #endif

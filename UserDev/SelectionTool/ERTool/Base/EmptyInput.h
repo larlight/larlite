@@ -34,7 +34,8 @@ namespace ertool {
       virtual ~EmptyInput(){}
       
       /// Name
-//      const std::string& Name() const;
+
+      //const std::string& Name() const;
 
       /// # of entries in the input file
       size_t NumEntries() const;

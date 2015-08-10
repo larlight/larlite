@@ -10,7 +10,7 @@ class viewport(pg.GraphicsLayoutWidget):
     # add a view box, which is a widget that allows an image to be shown
     self._view = self.addViewBox(border=None)
     # add an image item which handles drawing (and refreshing) the image
-    self._item = pg.ImageItem(useOpenGL=True)
+    self._item = pg.ImageItem(useOpenGL=True,autoDownsample=True)
     # self._item._setPen((0,0,0))
     self._view.addItem(self._item)
     # connect the scene to click events, used to get wires
@@ -38,9 +38,16 @@ class viewport(pg.GraphicsLayoutWidget):
                                              (0.8,  (0,  255, 0,   255)), 
                                              (1,    (255,  0, 0,   255))], 
                                              'mode': 'rgb'}
-    self._colorMapCollection    = {'ticks': [(0, (30, 30, 255, 255)),
-                                             (0.33333, (0, 255, 255, 255)), 
-                                             (0.66666, (255,255,100,255)), 
+    # self._colorMapCollection    = {'ticks': [(0, (30, 30, 255, 255)),
+    #                                          (0.33333, (0, 255, 255, 255)), 
+    #                                          (0.66666, (255,255,100,255)), 
+    #                                          (1, (255, 0, 0, 255))], 
+    #                                          'mode': 'rgb'}
+    self._colorMapCollection    = {'ticks': [(0, (22, 30, 151, 255)),
+                                             (0.33333, (0, 181, 226, 255)), 
+                                             (0.47, (76, 140, 43, 255)), 
+                                             (0.645, (0, 206, 24, 255)), 
+                                             (0.791, (254,209,65,255)), 
                                              (1, (255, 0, 0, 255))], 
                                              'mode': 'rgb'}
 
@@ -71,6 +78,17 @@ class viewport(pg.GraphicsLayoutWidget):
     self._cmap.setMaximumWidth(25)
     self._lowerLevel.setMaximumWidth(35)
 
+    colors = QtGui.QVBoxLayout()
+    colors.addWidget(self._upperLevel)
+    colors.addWidget(self._cmap)
+    colors.addWidget(self._lowerLevel)
+    self._totalLayout = QtGui.QHBoxLayout()
+    self._totalLayout.addWidget(self)
+    self._totalLayout.addLayout(colors)
+    self._widget = QtGui.QWidget()
+    self._widget.setLayout(self._totalLayout)
+
+
   def restoreDefaults(self):
     self._lowerLevel.setText(str(self._geometry.getLevels(self._plane)[0]))
     self._upperLevel.setText(str(self._geometry.getLevels(self._plane)[1]))
@@ -80,16 +98,7 @@ class viewport(pg.GraphicsLayoutWidget):
 
   def getWidget(self):
 
-    colors = QtGui.QVBoxLayout()
-    colors.addWidget(self._upperLevel)
-    colors.addWidget(self._cmap)
-    colors.addWidget(self._lowerLevel)
-    total = QtGui.QHBoxLayout()
-    total.addWidget(self)
-    total.addLayout(colors)
-    widget = QtGui.QWidget()
-    widget.setLayout(total)
-    return widget
+    return self._widget,self._totalLayout
 
   def levelChanged(self):
     # First, get the current values of the levels:
@@ -163,6 +172,7 @@ class viewport(pg.GraphicsLayoutWidget):
   def autoRange(self,xR,yR):
     self._view.setRange(xRange=xR,yRange=yR, padding=0.002)
     pass
+
 
   def plane(self):
     return self._plane

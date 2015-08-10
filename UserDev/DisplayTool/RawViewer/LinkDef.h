@@ -13,6 +13,7 @@
 #pragma link C++ class evd::DrawRaw+;
 #pragma link C++ class evd::Converter+;
 #pragma link C++ class evd::DrawLariatDaq+;
+#pragma link C++ class evd::DrawRawDigit+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 

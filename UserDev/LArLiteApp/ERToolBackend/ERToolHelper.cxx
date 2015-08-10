@@ -4,7 +4,7 @@
 #include "DataFormat/mctruth.h"
 #include "DataFormat/mcshower.h"
 #include "DataFormat/mctrack.h"
-
+#include "DataFormat/storage_manager.h"
 #include "DataFormat/shower.h"
 #include "DataFormat/track.h"
 #include "DataFormat/vertex.h"
@@ -31,7 +31,7 @@ namespace larlite {
     std::map< ::ertool_helper::ParticleID, ::ertool::NodeID_t > part_list;
 
     auto& graph = strm.GetParticleGraphWriteable(true);
-    
+
     //
     // Step 1 ... Register ALL MCShower
     //
@@ -69,6 +69,8 @@ namespace larlite {
 			::ertool::ParticleMass(mcs.PdgCode()),
 			mcs.Start().Position(),
 			mcs.Start().Momentum());
+//      std::cout<<"\nSetting the particle info of shower.."<<std::endl ;
+//      std::cout<<"particle graph node size : "<<graph.GetParticleNodes(ertool::RecoType_t::kShower).size()<<std::endl ;
 
       // Create ParticleID
       ::ertool_helper::ParticleID id(mcs);
@@ -112,14 +114,17 @@ namespace larlite {
 	if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
 	
 	::ertool::RecoInputID_t in_id(i,mct_v.name());
-	
+
 	// Emplace a track to EventData
-	//nodeID = strm.Emplace(std::move(t),std::move(in_id),true);
+	// nodeID = strm.Emplace(std::move(t),std::move(in_id),true);
 	nodeID = strm.Add( t, in_id, true);
 
-      }else
-
-	nodeID = graph.CreateParticle().ID();
+      }
+      
+      // if the track has only a single step point
+      else
+	continue;
+      //nodeID = graph.CreateParticle().ID();
       
       // Edit particle info
       auto& p = graph.GetParticle(nodeID);
@@ -128,6 +133,7 @@ namespace larlite {
 			::ertool::ParticleMass(mct.PdgCode()),
 			::geoalgo::Vector(mct.Start().Position()),
 			::geoalgo::Vector(mct.Start().Momentum()));
+
       // Create ParticleID
       ::ertool_helper::ParticleID id(mct);
 
@@ -278,6 +284,9 @@ namespace larlite {
     // First MCTrack Parentage
     for(auto const& mct : mct_v) {
 
+      if (mct.size() < 2)
+	continue;
+
       // This particle's ID
       ::ertool_helper::ParticleID id( mct.PdgCode(),
 				      mct.Start().Position(),
@@ -364,6 +373,8 @@ namespace larlite {
     // MCTrack
     for(auto const& mct : mct_v) {
 
+      if (mct.size() < 2) continue;
+
       // Construct parent's ID
       ::ertool_helper::ParticleID parent_id( mct.MotherPdgCode(),
 					     mct.MotherStart().Position(),
@@ -416,6 +427,10 @@ namespace larlite {
 	throw e;
       }
     }
+
+
+    //std::cout<<"End of FillMCInfo: particle graph node size : "<<graph.GetParticleNodes(ertool::RecoType_t::kShower).size()<<std::endl ;
+
   }
 
   void ERToolHelper::FillTracks ( const event_mctrack&  mct_v,
@@ -447,7 +462,7 @@ namespace larlite {
       for(auto& v : t._pid_score) v = 100;
       if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
       
-      //auto nodeID = strm.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
+      strm.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
       /*
       strm.GetParticleGraphWriteable().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
       ::ertool::ParticleMass(mct.PdgCode()),
@@ -460,10 +475,7 @@ namespace larlite {
   }
 
   void ERToolHelper::FillTracks ( const event_track&  trk_v,
-				  const event_cosmictag& ctag_trk_v,
-				  const event_calorimetry& calo_trk_v,
-				  const event_partid& pid_trk_v,
-				  const event_ass& ass_v,
+				  storage_manager& storage,
 				  ::ertool::io::EmptyInput& strm) const
   {
     std::vector< ::ertool::Track> t_v;
@@ -485,62 +497,49 @@ namespace larlite {
       t._energy     = trk.MomentumAtPoint(0);
 
     }
-    
-    // Revise track cosmogenic score
-    if (ctag_trk_v.size()){
-      //auto const& ctag_trk_ass = ctag_trk_v.association(trk_v.id());
-      auto const& ctag_trk_ass = ass_v.association(trk_v.id(),ctag_trk_v.id());
-      if(ctag_trk_ass.size()) {
-	for(size_t cos_index=0; cos_index<ctag_trk_v.size(); ++cos_index) {
-	  
-	  auto const& ctag = ctag_trk_v[cos_index];
-	  for(auto const& trk_index : ctag_trk_ass[cos_index])  
-	    t_v.at(trk_index)._cosmogenic = ctag.fCosmicScore;
-	}// for all associations
-      }// if association is found
-    }// if ctag exists
-    // Revise track energy
-    if (calo_trk_v.size()){
-      //auto const& calo_trk_ass = calo_trk_v.association(trk_v.id());
-      auto const& calo_trk_ass = ass_v.association(trk_v.id(),calo_trk_v.id()); 
-      if(calo_trk_ass.size()) {
-	for(size_t calo_index=0; calo_index<calo_trk_v.size(); ++calo_index) {
-	  
-	  auto const& calo = calo_trk_v[calo_index];
-	  for(auto const& trk_index : calo_trk_ass[calo_index])
-	    t_v.at(trk_index)._energy = calo.KineticEnergy();
-	}// for all associations
-      }// if association is found
-    }// if calo exists
-    // Revise track part id
-    if (pid_trk_v.size()){
-      //auto const& pid_trk_ass = pid_trk_v.association(trk_v.id());
-      auto const& pid_trk_ass = ass_v.association(trk_v.id(),pid_trk_v.id()); 
-      if(pid_trk_ass.size()) {
-	for(size_t pid_index=0; pid_index<pid_trk_v.size(); ++pid_index) {
-	  
-	  auto const &pid = pid_trk_v[pid_index];
-	  // pick the one w/ minimum chi2
-	  for(auto const& trk_index : pid_trk_ass[pid_index]) {
-	    
-	    auto& spa_trk = t_v.at(trk_index);
-	    std::map<double,::ertool::Track::TrackPartID_t> score_map;
-	    if(spa_trk._pid==::ertool::Track::kUnknown ||
-	       spa_trk._pid_score[spa_trk._pid] > pid.MinChi2()) {
-	      score_map.insert(std::make_pair(pid.Chi2Proton(),::ertool::Track::kProton));
-	      score_map.insert(std::make_pair(pid.Chi2Kaon(),::ertool::Track::kKaon));
-	      score_map.insert(std::make_pair(pid.Chi2Pion(),::ertool::Track::kPion));
-	      score_map.insert(std::make_pair(pid.Chi2Muon(),::ertool::Track::kMuon));
-	      for(auto const& score_pid : score_map)
-		spa_trk._pid_score[score_pid.second] = score_pid.first;
-	      spa_trk._pid = (*score_map.begin()).second;
-	      spa_trk._pid_score[::ertool::Track::kPIDA] = pid.PIDA();
-	    }
-	  }// for all associations
-	}// for pid indices
-      } // if association is found
-    }// if pid exists
 
+    event_cosmictag* ctag_trk_v = nullptr;
+    auto const& ctag_trk_ass = storage.find_one_ass(trk_v.id(), ctag_trk_v, Form("%stag",trk_v.name().c_str()));
+
+    event_calorimetry* calo_trk_v = nullptr;
+    auto const& calo_trk_ass = storage.find_one_ass(trk_v.id(), calo_trk_v, Form("%scalo",trk_v.name().c_str()));
+
+    event_partid* pid_trk_v = nullptr;
+    auto const& pid_trk_ass = storage.find_one_ass(trk_v.id(), pid_trk_v, Form("%spid",trk_v.name().c_str()));
+
+    for(size_t t_index=0; t_index < id_v.size(); ++t_index) {
+
+      auto  trk_index = id_v[t_index];
+      auto& t = t_v[t_index];
+      if(ctag_trk_v) {
+	for(auto const& ctag_index : ctag_trk_ass[t_index])
+	  t._cosmogenic = (*ctag_trk_v)[ctag_index].fCosmicScore;
+      }
+
+      if(calo_trk_v) {
+	for(auto const& calo_index : calo_trk_ass[t_index])
+	  t._energy = (*calo_trk_v)[calo_index].KineticEnergy();
+      }
+
+      if(pid_trk_v) {
+	for(auto const& pid_index : pid_trk_ass[t_index]) {
+
+	  auto const &pid = (*pid_trk_v)[pid_index];
+
+	  std::map<double,::ertool::Track::TrackPartID_t> score_map;
+	  score_map.insert(std::make_pair(pid.Chi2Proton(),::ertool::Track::kProton));
+	  score_map.insert(std::make_pair(pid.Chi2Kaon(),::ertool::Track::kKaon));
+	  score_map.insert(std::make_pair(pid.Chi2Pion(),::ertool::Track::kPion));
+	  score_map.insert(std::make_pair(pid.Chi2Muon(),::ertool::Track::kMuon));
+	  for(auto const& score_pid : score_map)
+	    t._pid_score[score_pid.second] = score_pid.first;
+	  t._pid = (*score_map.begin()).second;
+	  t._pid_score[::ertool::Track::kPIDA] = pid.PIDA();
+	}
+      }
+      
+    }
+    
     for(size_t i=0; i<t_v.size(); ++i)
       strm.Add(t_v[i],id_v[i]);
   }
@@ -568,7 +567,7 @@ namespace larlite {
       s._time = mcs_v[i].End().T();
       double mass = 0;
       if (mcs.PdgCode() == 11) { mass = 0.511; }
-      //auto nodeID = strm.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
+      strm.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
       /*
       mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
 							      mass,
@@ -610,8 +609,7 @@ namespace larlite {
   
 
   void ERToolHelper::FillShowers(const event_shower& shw_v,
-				 const event_cosmictag& ctag_shw_v,
-				 const event_ass& ass_v,
+				 storage_manager& storage,
 				 ::ertool::io::EmptyInput& strm ) const
   {
     
@@ -639,18 +637,20 @@ namespace larlite {
       s._cosmogenic = -1;
     }
 
+    event_cosmictag* ctag_shw_v = nullptr;
+    auto const& ctag_shw_ass = storage.find_one_ass(shw_v.id(), ctag_shw_v, Form("%scalo",shw_v.name().c_str()));
+    
     // Revise shower cosmogenic score
     // make sure ctag_shr_v is not empty
-    if ( ctag_shw_v.size() ){
-      //auto const& ctag_shw_ass = ctag_shw_v.association(shw_v.id());
-      auto const& ctag_shw_ass = ass_v.association(shw_v.id(),ctag_shw_v.id());
-      if(ctag_shw_ass.size()) {
-	for(size_t cos_index=0; cos_index<ctag_shw_v.size(); ++cos_index) {
-	  
-	  auto const& ctag = ctag_shw_v[cos_index];
-	  for(auto const& shw_index : ctag_shw_ass[cos_index])  
-	    s_v.at(shw_index)._cosmogenic = ctag.fCosmicScore;
-	}
+    if ( ctag_shw_v ){
+      for(size_t s_index=0; s_index < s_v.size(); ++s_index) {
+
+	auto const& shw_index = id_v[s_index].first;
+
+	for(auto const& ctag_index : ctag_shw_ass[shw_index])
+
+	  s_v[s_index]._cosmogenic = (*ctag_shw_v)[ctag_index].fCosmicScore;
+
       }
     }
 

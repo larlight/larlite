@@ -58,17 +58,13 @@ namespace larlite {
 		     const event_mctrack&   mct_v,
 		     ::ertool::io::EmptyInput& strm) const;
 
-
     /// Fill Track Info from MC
     void FillTracks( const event_mctrack& mct_v,
 		     ::ertool::io::EmptyInput& strm) const;
 
     /// Fill Track Info from RECO
     void FillTracks ( const event_track&        trk_v,
-		      const event_cosmictag&    cos_trk_v,
-		      const event_calorimetry&  calo_trk_v,
-		      const event_partid&       pid_trk_v,
-		      const event_ass&          ass_v,
+		      storage_manager&          storage,
 		      ::ertool::io::EmptyInput& strm) const;
 
     /// Fill Shower Info from MC
@@ -77,10 +73,8 @@ namespace larlite {
 
     /// Fill Shower Info from RECO
     void FillShowers ( const event_shower&    shw_v,
-		       const event_cosmictag& ctag_shw_v,
-		       const event_ass&       ass_v,
+		       storage_manager&       storage,
 		       ::ertool::io::EmptyInput& mgr) const;
-
 
     /// MC Cheater for single showers
     void SingleShowerCheater(const event_mcshower& mcs_v,
@@ -107,31 +101,6 @@ namespace larlite {
     double _DetFramePeriod;
 
     EMShowerProfile _shrProfiler;
-
-    struct PartID_t {
-      ::geoalgo::Vector _pos, _mom;
-      int _pdg;
-
-      PartID_t() : _pos(3), _mom(3), _pdg(0) 
-      {}
-
-      PartID_t(const ::geoalgo::Vector& pos,
-	       const ::geoalgo::Vector& mom,
-	       int pdg)
-	: _pos(pos), _mom(mom), _pdg(pdg)
-      { 
-	for(auto& v : _mom) {
-	  v = double(int(v*1.e9))/1.e9;
-	}
-	for(auto& v : _pos) {
-	  v = double(int(v*1.e9))/1.e9;
-	}
-      }
-
-      bool same(const PartID_t& obj)
-      { return (_pdg == obj._pdg && _pos == obj._pos && _mom == obj._mom); }
-
-    };
 
   };
 }

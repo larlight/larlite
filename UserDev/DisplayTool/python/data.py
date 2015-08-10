@@ -123,29 +123,25 @@ class wire(dataBase):
     super(wire, self).__init__()
     self._process = None
     
-    # This is the (clunky) converter to native python
-    self._c2p = evd.Converter()
-
-  def get_img(self):
-    d = []
-    for i in range(0,self._nviews):
-      d.append(np.array(self._c2p.Convert(self._process.getDataByPlane(i))) )
-      # print "got a plane, here is a sample: ", d[i][0][0]
-    return d
 
   def getPlane(self,plane):
-
-    b = self._process.getNumpyByPlane(plane)
-    print type(b)
-    return b
+    return self._process.getArrayByPlane(plane)
     
-  def getWire(self, plane, wire):
-    return np.array(self._c2p.Convert(self._process.getWireData(plane,wire)))
+  # def getWire(self, plane, wire):
+  #   return np.array(self._c2p.Convert(self._process.getWireData(plane,wire)))
 
 class recoWire(wire):
   def __init__(self):
     super(recoWire,self).__init__()
     self._process = evd.DrawRaw()
+    self._process.initialize()
+
+class rawDigit(wire):
+  def __init__(self,geom):
+    super(rawDigit,self).__init__()
+    self._process = evd.DrawRawDigit()
+    for i in xrange(len(geom._pedestals)):
+      self._process.setPedestal(geom._pedestals[i],i)
     self._process.initialize()
 
 

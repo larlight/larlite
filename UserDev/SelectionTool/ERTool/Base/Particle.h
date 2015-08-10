@@ -47,11 +47,11 @@ namespace ertool {
     
     bool RelationAssessed() const;
     bool Primary() const;
-    bool Descendant() const;
+    bool Descendant() const; ///< is this node is the descendant of another
     bool Lonely() const; ///< ILL DEFINED
     bool HasChild(const NodeID_t id);
 
-    bool HasRecoObject();
+    const bool HasRecoObject() const;
     const RecoType_t& RecoType() const;
     const RecoID_t&   RecoID()   const;
 
@@ -62,6 +62,7 @@ namespace ertool {
     const ::geoalgo::Vector& Vertex()   const;
     const ::geoalgo::Vector& Momentum() const;
     float RecoScore();
+    const ProcessType_t& ProcessType() const;
     
     void SetParticleInfo( const int pdg_code = kINVALID_INT,
 			  const double mass  = kINVALID_DOUBLE,
@@ -80,7 +81,7 @@ namespace ertool {
 
     void RemoveChild(const NodeID_t child );
     void UpdateAfterRemoval(const NodeID_t removed);
-
+    void SetProcess(const ProcessType_t process){ _process = process; }
     void Print             (std::string& res, std::string prefix="") const;
 
     
@@ -89,6 +90,7 @@ namespace ertool {
     double _mass;           ///< Particle's mass
     ::geoalgo::Vector _vtx; ///< Creation vertex of a particle
     ::geoalgo::Vector _mom; ///< Creation momentum of a particle
+    ProcessType_t _process; ///< Creation process (enum) of a particle
     
     // Graph structure information
     NodeID_t     _node_id;     ///< A unique particle identifier

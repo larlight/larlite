@@ -64,17 +64,30 @@ namespace larlite {
 
     void SetFVCut(float fv) { _fv = fv ; }
 
+    void SetEnergyCut (float energy) { _energy = energy; }
+
+    void SetContainment(float con) { _con = con ; }
+
+    void PrepareTTree() ;
+
+    void Reset() ;
+
   protected:
+
+	TTree * _pi0_eff_tree ;
 
 	int _total_events; 
 	int _passed_events; 
 	int _misID ;
 	int _fidLoss ;
 	float _fv ;
+	float _con ;
+	double _length ;
 
 	int _nNCpi0	  ;
 	int _nSingleNCpi0 ;
 	int _nCCpi0 	  ;
+	int _nNC 	  ;
 
 	int _isExclusive;
 	bool _isSignal;
@@ -83,6 +96,22 @@ namespace larlite {
 	int _n_E;
 	int _event ;
     
+
+/// variables for tree
+        int totalpi0 ;
+        int cmeson   ;
+        int mu       ;
+	int nShowers ;
+
+        bool pi0Inside     ;  
+        bool lowEnergy        ;
+	bool contained ;
+	
+	float _containment  ;
+	double _energy_shr ;
+	
+
+
   };
 }
 #endif
