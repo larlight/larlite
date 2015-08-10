@@ -163,9 +163,10 @@ class gui(QtGui.QWidget):
 
   def update(self):
     # set the text boxes correctly:
-    eventLabel = "Ev: "
+    self._larliteEventEntry.setText(str(self._event_manager.internalEvent()))
+
+    eventLabel = "Ev: " + str(self._event_manager.event())
     self._eventLabel.setText(eventLabel)
-    self._eventEntry.setText(str(self._event_manager.event()))
     runLabel = "Run: " + str(self._event_manager.run())
     self._runLabel.setText(runLabel)
     subrunLabel = "Subrun: " + str(self._event_manager.subrun())
@@ -177,13 +178,14 @@ class gui(QtGui.QWidget):
   # This function prepares the buttons such as prev, next, etc and returns a layout
   def getEventControlButtons(self):
 
-    # This is a box to allow users to enter an event
-    self._eventEntry = QtGui.QLineEdit()
-    self._eventEntry.setToolTip("Enter an event to skip to that event")
-    self._eventEntry.returnPressed.connect(self.goToEventWorker)
+    # This is a box to allow users to enter an event (larlite numbering)
+    self._goToLabel = QtGui.QLabel("Go to: ")
+    self._larliteEventEntry = QtGui.QLineEdit()
+    self._larliteEventEntry.setToolTip("Enter an event to skip to that event (larlite numbering")
+    self._larliteEventEntry.returnPressed.connect(self.goToEventWorker)
     # These labels display current events
     self._runLabel = QtGui.QLabel("Run: 0")
-    self._eventLabel = QtGui.QLabel("Ev.:")
+    self._eventLabel = QtGui.QLabel("Ev.: 0")
     self._subrunLabel = QtGui.QLabel("Subrun: 0")
 
     # Jump to the next event
@@ -203,15 +205,16 @@ class gui(QtGui.QWidget):
 
     # Make a horiztontal box for the event entry and label:
     self._eventGrid = QtGui.QHBoxLayout()
-    self._eventGrid.addWidget(self._eventLabel)
-    self._eventGrid.addWidget(self._eventEntry)
+    self._eventGrid.addWidget(self._goToLabel)
+    self._eventGrid.addWidget(self._larliteEventEntry)
     # Another horizontal box for the run/subrun
     self._runSubRunGrid = QtGui.QHBoxLayout()
+    self._runSubRunGrid.addWidget(self._eventLabel)
     self._runSubRunGrid.addWidget(self._runLabel)
-    self._runSubRunGrid.addWidget(self._subrunLabel)
     # Pack it all together
     self._eventControlBox.addLayout(self._eventGrid)
     self._eventControlBox.addLayout(self._runSubRunGrid)
+    self._eventControlBox.addWidget(self._subrunLabel)
     self._eventControlBox.addWidget(self._nextButton)
     self._eventControlBox.addWidget(self._prevButton)
     self._eventControlBox.addWidget(self._fileSelectButton)
@@ -222,10 +225,10 @@ class gui(QtGui.QWidget):
   # this function helps pass the entry of the line edit item to the event control
   def goToEventWorker(self):
     try:
-      event = int(self._eventEntry.text())
+      event = int(self._larliteEventEntry.text())
     except:
       print "Error, must enter an integer"
-      self._eventEntry.setText(str(self._event_manager.event()))
+      self._larliteEventEntry.setText(str(self._event_manager.event()))
       return
     self._event_manager.goToEvent(event)
 
