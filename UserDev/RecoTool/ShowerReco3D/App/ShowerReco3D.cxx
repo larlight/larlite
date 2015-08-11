@@ -102,7 +102,6 @@ namespace larlite {
 
       shower_v->emplace_back(s);
     }
-    std::cout << "Done reco'ing\n";
         
     // Make sure result has the same size 
     if(shower_v->size() != matched_pairs.size())
@@ -116,7 +115,7 @@ namespace larlite {
     auto shower_ass_v = storage->get_data<event_ass>(shower_v->name());    
     shower_ass_v->set_association(shower_v->id(),product_id(data::kCluster,fInputProducer),matched_pairs);
     //shower_v->set_association(data::kCluster,fInputProducer,matched_pairs);
-    std::cout << "Returning again\n";
+    // std::cout << "Done with this event\n";
     return true;
   }
   
