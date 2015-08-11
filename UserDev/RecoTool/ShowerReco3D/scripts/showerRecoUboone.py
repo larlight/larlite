@@ -124,18 +124,17 @@ ana_unit.SetOutputProducer("showerreco")
 my_proc.add_process(ana_unit)
 
 # Add an ana unit to do the shower quality:
-# quality_unit = fmwk.MCShowerAna()
+quality_unit = fmwk.ShowerAna()
 
-# quality_unit.SetShowerProducer("showerreco")
 
-# my_proc.add_process(quality_unit)
+my_proc.add_process(quality_unit)
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
-# my_proc.run()
-my_proc.process_event(2)
+my_proc.run(0,1000)
+# my_proc.process_event(2)
 
 
 
