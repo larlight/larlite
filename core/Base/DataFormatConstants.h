@@ -140,7 +140,8 @@ namespace larlite{
       "ass",
       "pcaxis",
       "fmatch",
-      "trackmom"
+      "trackmom",
+      "opdigit"
     };
 
     const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {
