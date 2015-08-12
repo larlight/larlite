@@ -34,13 +34,9 @@ namespace larlite {
     // To save on memory reallocations, offer an option to specify the
     // the initial memory allocation of the channel vector.
     
-    //opdetwaveform() : data_base(data::kOpDetWaveform){clear_data();}
-
-    //    optdetwaveform( larlite::TimeStamp_t time = std::numeric_limits<larlite::TimeStamp_t>::max(), 
-    //		    larlite::Channel_t   chan = std::numeric_limits<larlite::Channel_t>::max(), 
-    //		    size_t len = 0 );
- 
-    optdetwaveform( TimeStamp_t time = std::numeric_limits<TimeStamp_t>::max(), 
+    opdetwaveform() : data_base(data::kOpDetWaveform){clear_data();}
+    /*
+    opdetwaveform( TimeStamp_t time = std::numeric_limits<TimeStamp_t>::max(), 
 		    Channel_t   chan = std::numeric_limits<Channel_t>::max(), 
 		    size_type len = 0 ) : fChannel(chan), 
 					  fTimeStamp(time)
@@ -48,8 +44,8 @@ namespace larlite {
       this->reserve(len);
     }
 
-    /*
-    optdetwaveform( TimeStamp_t time,
+
+    opdetwaveform( TimeStamp_t time,
 		    Channel_t   chan,
 		    std::vector< uint16_t > rhs )
       : fChannel(chan)
@@ -94,15 +90,39 @@ namespace larlite {
   // For no extra charge, include how to sort ChannelData*, just in
   // case we want (for example) a std::set<ChannelData*>.
   /*
-template <> 
-    class less<larlite::opdetwaveform*>
+  template <> 
+  class less<larlite::opdetwaveform*>
   {
   public:
     bool operator()( const larlite::opdetwaveform* lhs, const larlite::opdetwaveform* rhs )
     {
       return (*lhs) < (*rhs);
     }
-    };*/
+  };
+  */
+
+  class event_opdetwaveform : public std::vector<larlite::opdetwaveform>,
+			      public event_base {
+
+  public:
+
+    /// default ctor
+    event_opdetwaveform(std::string name="noname") : event_base(data::kOpDetWaveform,name) {clear_data();}
+
+    /// Default copy constructor
+    event_opdetwaveform(const event_opdetwaveform& original) : std::vector<larlite::opdetwaveform>(original),
+					       event_base(original)
+    {}
+
+    ~event_opdetwaveform() {}
+    
+    /// Method to clear currently held data contents in the buffer
+    virtual void clear_data(){event_base::clear_data(); clear();}
+
+  private:
+
+  };
+
 }
 #endif
 
