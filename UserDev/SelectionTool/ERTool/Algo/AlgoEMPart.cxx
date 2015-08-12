@@ -93,16 +93,16 @@ namespace ertool {
       var->setRange ( 0.0, 1.0 );
 
       var  = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_Gaus_mean"));
-      var->setVal   ( 2.0      );
-      var->setRange ( 0.0, 3.0 );
+      var->setVal   ( 3.0      );
+      var->setRange ( 1.0, 4.0 );
       
       var = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_Gaus_sigma"));
-      var->setVal   ( 1.0     );
-      var->setRange ( 0.0, 3.0 );
+      var->setVal   ( 3.0     );
+      var->setRange ( 0.5, 5.0 );
 
       var = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_fraction"));
       var->setVal   ( 0.05     );
-      var->setRange ( 0.0, 0.5 );
+      var->setRange ( 0.0, 1.0 );
     }
     if (_mode){
       // Gamma PDFs
@@ -162,55 +162,65 @@ namespace ertool {
 
     if(p.contains_value("g_params")) {
       auto darray = p.get<std::vector<double> >("g_params");
-      RooRealVar *tau, *meanlow, *meanhigh, *sigmalow, *sigmahigh, *frac;
+      RooRealVar *tau, *meanL, *sigmaL, *meanG, *sigmaG, *frac;
 
       tau = (RooRealVar*)(_g_radLenPdf->getVariables()->find("g_radLen_tau"));
       tau->setVal   ( darray[0]               );
       tau->setRange ( darray[1], darray[2] );
 
-      meanhigh  = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_mean_high"));
-      meanhigh->setVal  ( darray[3] );
-      sigmahigh = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_sigma_high"));
-      sigmahigh->setVal ( darray[4] );
+      meanL  = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_Landau_mean"));
+      meanL->setVal  ( darray[3] );
+      sigmaL = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_Landau_sigma"));
+      sigmaL->setVal ( darray[4] );
 
-      meanlow  = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_mean_low"));
-      meanlow->setVal  ( darray[5] );
-      sigmalow = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_sigma_low"));
-      sigmalow->setVal ( darray[6] );
+      meanG  = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_Gaus_mean"));
+      meanG->setVal  ( darray[5] );
+      sigmaG = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_Gaus_sigma"));
+      sigmaG->setVal ( darray[6] );
 
-      frac = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_dEdxGaus_fraction"));
+      frac = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_fraction"));
       frac->setVal ( darray[7] );
       
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"Loaded gamma parameters..." << std::endl;
       std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"Rad Length: " << -1./tau->getVal() << " ["<< -1./tau->getMax() <<" => "<< -1./tau->getMin() <<"]" << std:: endl;
+	       <<"Rad Length       : " << -1./tau->getVal() << " ["<< -1./tau->getMax() <<" => "<< -1./tau->getMin() <<"]" << std:: endl;
       std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"dEdx: Mean low: " << meanlow->getVal() << " Sigma high: " << sigmalow->getVal() << std::endl
+	       <<"dEdx Landau mean : " << meanL->getVal() << " sigma : " << sigmaL->getVal() << std::endl
 	       <<"["<<__FUNCTION__<<"] "
-	       <<"dEdx: Mean high: " << meanhigh->getVal() << " Sigma high: " << sigmahigh->getVal() << std::endl
+	       <<"dEdx Gaus mean   : " << meanG->getVal() << " sigma : " << sigmaG->getVal() << std::endl
 	       <<"["<<__FUNCTION__<<"] "
 	       <<"Frac: " << frac->getVal() <<std::endl;
     }
 
     if(p.contains_value("e_params")) {
       auto darray = p.get<std::vector<double> >("e_params");
-      RooRealVar *tau, *mean, *sigma;
+      RooRealVar *tau, *meanL, *sigmaL, *meanG, *sigmaG, *frac;
       tau = (RooRealVar*)(_e_radLenPdf->getVariables()->find("e_radLen_tau"));
       tau->setVal   ( darray[0]               );
       tau->setRange ( darray[1], darray[2] );
 
-      mean  = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_dEdxGaus_mean"));
-      mean->setVal  ( darray[4] );
-      sigma = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_dEdxGaus_sigma"));
-      sigma->setVal ( darray[5] );
+      meanL  = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_Landau_mean"));
+      meanL->setVal  ( darray[3] );
+      sigmaL = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_Landau_sigma"));
+      sigmaL->setVal ( darray[4] );
+
+      meanG  = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_Gaus_mean"));
+      meanG->setVal  ( darray[5] );
+      sigmaG = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_Gaus_sigma"));
+      sigmaG->setVal ( darray[6] );
+
+      frac = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_fraction"));
+      frac->setVal ( darray[7] );
 
       std::cout<<"["<<__FUNCTION__<<"] "
 	       <<"Loaded electron parameters..." << std::endl;
       std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"Rad Length: " << -1./tau->getVal() << " ["<< -1./tau->getMax() <<" => "<< -1./tau->getMin() <<"]" << std:: endl;
+	       <<"Rad Length       : " << -1./tau->getVal() << " ["<< -1./tau->getMax() <<" => "<< -1./tau->getMin() <<"]" << std:: endl;
       std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"dEdx: Mean1: " << mean->getVal() << " Sigma1: " << sigma->getVal() << std::endl;
+	       <<"dEdx Landau mean : " << meanL->getVal() << " sigma : " << sigmaL->getVal() << std::endl;
+      std::cout<<"["<<__FUNCTION__<<"] "
+	       <<"dEdx Gaus mean   : " << meanG->getVal() << " sigma : " << sigmaG->getVal() << std::endl;
     }
   }
 
@@ -466,27 +476,29 @@ namespace ertool {
       auto& params = OutputPSet();
       if (!_mode){
 	RooRealVar *tau, *meanL, *sigmaL, *meanG, *sigmaG, *frac;
-	std::cout << "["<<__FUNCTION__<<"] " << Form("Extracted %s_params... ",part_letter.c_str()) << std::endl;
+	if (_verbose)
+	  std::cout << "["<<__FUNCTION__<<"] " << Form("Extracted %s_params... ",part_letter.c_str()) << std::endl;
 	// radLen
 	tau = (RooRealVar*)(fit_res_radLen->floatParsFinal().find(Form("%s_radLen_tau",part_letter.c_str())));
-	darray.resize(6);
+	meanL  = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_Landau_mean",part_letter.c_str())));
+	sigmaL = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_Landau_sigma",part_letter.c_str())));
+	meanG  = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_Gaus_mean",part_letter.c_str())));
+	sigmaG = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_Gaus_sigma",part_letter.c_str())));
+	frac   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_fraction",part_letter.c_str())));
+
+	darray.resize(8);
 	darray[0] = tau->getVal();
 	darray[1] = tau->getErrorLo();
 	darray[2] = tau->getErrorHi();
+	darray[3] = meanL->getVal();
+	darray[4] = sigmaL->getVal();
+	darray[5] = meanG->getVal();
+	darray[6] = sigmaG->getVal();
+	darray[7] = frac->getVal();
+	
 	std::cout << "["<<__FUNCTION__<<"] "
 		  << "RadLen: "<< tau->getVal() << " [" << tau->getErrorLo() + tau->getVal()
 		  << " => " << tau->getErrorHi() + tau->getVal() << "]" << std::endl;
-	// dEdx
-	meanL  = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_Landau_mean",part_letter.c_str())));
-	sigmaL = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_Landau_sigma",part_letter.c_str())));
-	darray[4] = meanL->getVal();
-	darray[5] = sigmaL->getVal();
-	meanG  = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_Gaus_mean",part_letter.c_str())));
-	sigmaG = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_Gaus_sigma",part_letter.c_str())));
-	darray[6] = meanG->getVal();
-	darray[7] = sigmaG->getVal();
-	frac   = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_fraction",part_letter.c_str())));
-	darray[8] = frac->getVal();
 	std::cout << "["<<__FUNCTION__<<"] "
 		  << "dEdx: MeanL: " << meanL->getVal() << " SigmaL: " << sigmaL->getVal() << std::endl;
 	std::cout << "["<<__FUNCTION__<<"] "
@@ -521,12 +533,12 @@ namespace ertool {
 		  << "["<<__FUNCTION__<<"] "
 		  << "dEdx: Gauss  Mean: " << meanG->getVal() << " Sigma: " << sigmaG->getVal() << std::endl
 		  << "["<<__FUNCTION__<<"] "
-		  << "fraction         : " << frac->getVal();
+		  << "fraction         : " << frac->getVal() << std::endl;
 	params.add_value(Form("%s_params",part_letter.c_str()),::fcllite::VecToString(darray));
       }
       
     }// if in traning mode
-      
+
     // Plot the likelyhoods if in verbose mode
     if (_plot){
 

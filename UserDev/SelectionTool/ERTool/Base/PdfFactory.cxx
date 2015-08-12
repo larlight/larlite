@@ -136,34 +136,34 @@ namespace ertool {
   RooAbsPdf* PdfFactory::LandauPlusLandau(const std::string& name,
 				RooRealVar &x)
   {
-    auto meanL = new RooRealVar(Form("%s_Landau_mean",  name.c_str()),
-				Form("Single landau mean for %s",name.c_str()),
+    auto meanL1 = new RooRealVar(Form("%s_Landau1_mean",  name.c_str()),
+				Form("Single landau1 mean for %s",name.c_str()),
 				1.,0.,10.);
-    Register(meanL);
+    Register(meanL1);
     
-    auto sigmaL = new RooRealVar(Form("%s_Landau_sigma", name.c_str()),
-				 Form("Single landau sigma for %s",name.c_str()),
+    auto sigmaL1 = new RooRealVar(Form("%s_Landau1_sigma", name.c_str()),
+				 Form("Single landau1 sigma for %s",name.c_str()),
 				 0.1,0.,1.);
-    Register(sigmaL);
+    Register(sigmaL1);
 
-    auto landau1 = new RooLandau(Form("%s_Landau_pdf",   name.c_str()),
-				 Form("Landau Pdf for %s",name.c_str()),
-				 x, *meanL, *sigmaL);
+    auto landau1 = new RooLandau(Form("%s_Landau1_pdf",   name.c_str()),
+				 Form("Landau1 Pdf for %s",name.c_str()),
+				 x, *meanL1, *sigmaL1);
     Register(landau1);
 
-    auto meanG = new RooRealVar(Form("%s_Gaus_mean",  name.c_str()),
-				Form("Single gauss mean for %s",name.c_str()),
+    auto meanL2 = new RooRealVar(Form("%s_Landau2_mean",  name.c_str()),
+				Form("Single landau2 mean for %s",name.c_str()),
 				1.,0.,10.);
-    Register(meanG);
+    Register(meanL2);
     
-    auto sigmaG = new RooRealVar(Form("%s_Gaus_sigma", name.c_str()),
-				 Form("Single gauss sigma for %s",name.c_str()),
+    auto sigmaL2 = new RooRealVar(Form("%s_Landau2_sigma", name.c_str()),
+				 Form("Single landau2 sigma for %s",name.c_str()),
 				 0.1,0.,1.);
-    Register(sigmaG);
+    Register(sigmaL2);
 
-    auto landau2 = new RooLandau(Form("%s_Gaus_pdf",   name.c_str()),
-				 Form("Gauss Pdf for %s",name.c_str()),
-				 x, *meanG, *sigmaG);
+    auto landau2 = new RooLandau(Form("%s_Landau2_pdf",   name.c_str()),
+				 Form("Landau2 Pdf for %s",name.c_str()),
+				 x, *meanL2, *sigmaL2);
     Register(landau2);
 
     // need a fraction

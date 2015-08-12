@@ -33,12 +33,12 @@ def main():
     my_algo = ertool.AlgoEMPart()
     # ******* Set Fit ranges **********
     # Fit ranges for Reconstructed Info
-    my_algo.SetFitRange_dEdx(1.5,8,False); # False = e- / True = gamma
-    my_algo.SetFitRange_dEdx(1.5,9,True);
+    my_algo.SetFitRange_dEdx(0.5,8,False); # False = e- / True = gamma
+    my_algo.SetFitRange_dEdx(0.5,9,True);
     my_algo.SetFitRange_RadLen(1.,4.,False);
     my_algo.SetFitRange_RadLen(5.,35.,True);
     # Fit ranges for MC Info:
-    #my_algo.SetFitRange_dEdx(1.5,8,False); # False = e- / True = gamma
+    #my_algo.SetFitRange_dEdx(0.5,8,False); # False = e- / True = gamma
     #my_algo.SetFitRange_dEdx(0.5,9,True);
     #my_algo.SetFitRange_RadLen(5.,25.,True);
     #my_algo.SetFitRange_RadLen(0.,5.,False);
@@ -52,8 +52,8 @@ def main():
     
     # Set Producers
     # First Argument: True = MC, False = Reco
-    #my_ana.SetShowerProducer(True,"mcreco");
-    my_ana.SetTrackProducer(True,"mcreco");
+    my_ana.SetShowerProducer(True,"mcreco");
+    #my_ana.SetTrackProducer(True,"mcreco");
     #my_ana.SetShowerProducer(False,"pandoraNuShower");
     my_ana.SetShowerProducer(False,"showerreco");
     #my_ana.SetTrackProducer(False,"");

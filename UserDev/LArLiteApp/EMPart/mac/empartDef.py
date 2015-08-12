@@ -30,7 +30,7 @@ def EMPartAlgo():
 
 def EMPartAna():
     my_ana = ertool.ERAnaEMPart()
-    my_ana.SetDebug(True)
+    my_ana.SetDebug(False)
     return my_ana
 
 def AnaUnit():
@@ -38,8 +38,8 @@ def AnaUnit():
     # Set Producers
     # First Argument: True = MC, False = Reco
     my_anaunit.SetShowerProducer(True,"mcreco");
-    my_anaunit.SetTrackProducer(True,"mcreco");
-    #my_anaunit.SetShowerProducer(False,"showerreco");
+    #my_anaunit.SetTrackProducer(True,"mcreco");
+    my_anaunit.SetShowerProducer(False,"showerreco");
     #my_anaunit.SetTrackProducer(False,"");
     my_anaunit._mode =True # True = Select. False = Fill mode
     my_anaunit._mgr._mc_for_ana = True
