@@ -27,7 +27,10 @@ namespace larlite {
   { return data::kMCShower; }
 
   template<> data::DataType_t storage_manager::data_type<event_rawdigit> () const
-  { return data::kRawDigit; }
+  { return data::kRawDigit;}
+
+  template<> data::DataType_t storage_manager::data_type<event_opdetwaveform> () const
+  { return data::kOpDetWaveform; }
 
   template<> data::DataType_t storage_manager::data_type<event_wire> () const
   { return data::kWire; }
