@@ -87,6 +87,7 @@ namespace larlite{
       kPCAxis,             ///< recob::PCAxis
       kFlashMatch,         ///< anab::FlashMatch
       kTrackMomentum,      ///< track momentum
+      kOpDetWaveform,      ///< optical detector waveform
       kDATA_TYPE_MAX       ///< Event-wise enum boundary
     };
 

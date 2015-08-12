@@ -107,6 +107,9 @@ namespace larlite{
 
   class flashmatch;
   class event_flashmatch;
+
+  class opdetwaveform;
+  class event_opdetwaveform;
 }
 
 class treenode;
