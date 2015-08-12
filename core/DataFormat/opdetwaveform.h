@@ -34,7 +34,7 @@ namespace larlite {
     // To save on memory reallocations, offer an option to specify the
     // the initial memory allocation of the channel vector.
     
-    opdetwaveform() : data_base(data::kOpDetWaveform){clear_data();}
+    opdetwaveform();
     /*
     opdetwaveform( TimeStamp_t time = std::numeric_limits<TimeStamp_t>::max(), 
 		    Channel_t   chan = std::numeric_limits<Channel_t>::max(), 
@@ -69,7 +69,15 @@ namespace larlite {
     TimeStamp_t TimeStamp() const                { return fTimeStamp; }
     void        SetChannelNumber(Channel_t chan) { fChannel = chan; }
     void        SetTimeStamp(TimeStamp_t time)   { fTimeStamp = time; }
-    
+
+    inline bool operator< (const opdetwaveform& rhs) const
+    {
+      // Sort by channel, then time
+      if ( fChannel < rhs.ChannelNumber() ) return true;
+      if ( fChannel > rhs.ChannelNumber() ) return false;
+      
+      return ( fTimeStamp < rhs.TimeStamp() );
+    }
     
   private:
     
@@ -77,15 +85,6 @@ namespace larlite {
     TimeStamp_t fTimeStamp;
     
   };
-  
-  bool operator<( const opdetwaveform& lhs, const opdetwaveform& rhs )
-  {
-    // Sort by channel, then time
-    if ( lhs.ChannelNumber()  < rhs.ChannelNumber() ) return true;
-    if ( rhs.ChannelNumber()  > rhs.ChannelNumber() ) return false;
-    
-    return ( lhs.TimeStamp() < rhs.TimeStamp() );
-  }
 
   // For no extra charge, include how to sort ChannelData*, just in
   // case we want (for example) a std::set<ChannelData*>.
@@ -111,7 +110,7 @@ namespace larlite {
 
     /// Default copy constructor
     event_opdetwaveform(const event_opdetwaveform& original) : std::vector<larlite::opdetwaveform>(original),
-					       event_base(original)
+      event_base(original)
     {}
 
     ~event_opdetwaveform() {}
