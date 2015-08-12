@@ -638,7 +638,6 @@ namespace larlite {
       // by default. Add cosmic score for showers to edit
       s._cosmogenic = -1;
     }
-    std::cout<<"Shower vector size: "<<s_v.size()<<std::endl ;
     
     event_cosmictag* ctag_shw_v = nullptr;
     auto const& ctag_shw_ass = storage.find_one_ass(shw_v.id(), ctag_shw_v, Form("%scalo",shw_v.name().c_str()));

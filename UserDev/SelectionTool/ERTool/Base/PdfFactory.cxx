@@ -60,6 +60,173 @@ namespace ertool {
     return res;
   }
 
+  RooAbsPdf* PdfFactory::Landau(const std::string& name,
+				RooRealVar &x)
+  {
+    auto mean = new RooRealVar(Form("%s_Landau_mean",  name.c_str()),
+			       Form("Single landau mean for %s",name.c_str()),
+			       1.,0.,10.);
+    Register(mean);
+
+    auto sigma = new RooRealVar(Form("%s_Landau_sigma", name.c_str()),
+				Form("Single landau sigma for %s",name.c_str()),
+				0.1,0.,1.);
+    Register(sigma);
+
+    auto res = new RooLandau(Form("%s_Landau_pdf",   name.c_str()),
+			     Form("Landau Pdf for %s",name.c_str()),
+			     x, *mean, *sigma);
+
+    Register(res);
+    
+    return res;
+  }
+
+
+  RooAbsPdf* PdfFactory::LandauPlusGauss(const std::string& name,
+				RooRealVar &x)
+  {
+    auto meanL = new RooRealVar(Form("%s_Landau_mean",  name.c_str()),
+				Form("Single landau mean for %s",name.c_str()),
+				1.,0.,10.);
+    Register(meanL);
+    
+    auto sigmaL = new RooRealVar(Form("%s_Landau_sigma", name.c_str()),
+				 Form("Single landau sigma for %s",name.c_str()),
+				 0.1,0.,1.);
+    Register(sigmaL);
+
+    auto landau = new RooLandau(Form("%s_Landau_pdf",   name.c_str()),
+				Form("Landau Pdf for %s",name.c_str()),
+				x, *meanL, *sigmaL);
+    Register(landau);
+
+    auto meanG = new RooRealVar(Form("%s_Gaus_mean",  name.c_str()),
+				Form("Single gauss mean for %s",name.c_str()),
+				1.,0.,10.);
+    Register(meanG);
+    
+    auto sigmaG = new RooRealVar(Form("%s_Gaus_sigma", name.c_str()),
+				 Form("Single gauss sigma for %s",name.c_str()),
+				 0.1,0.,1.);
+    Register(sigmaG);
+
+    auto gauss = new RooGaussian(Form("%s_Gaus_pdf",   name.c_str()),
+				 Form("Gauss Pdf for %s",name.c_str()),
+				 x, *meanG, *sigmaG);
+    Register(gauss);
+
+    // need a fraction
+    auto frac = new RooRealVar(Form("%s_fraction",name.c_str()),
+			       "Fractional amplitude of gaussian peak",
+			       1.0,0.0,1.0);
+    Register(frac);
+
+    // add the two
+    auto res = new RooAddPdf(Form("%s_LandauPlusGaus_pdf",name.c_str()),
+			     Form("Sum of Landau and Gaussian %s",name.c_str()),
+			     *landau, *gauss, *frac);
+    Register(res);
+    
+    return res;
+  }
+
+
+  // Landau + Landau (for gamma PDF to simulate 2 MeV/cm distrib)
+  RooAbsPdf* PdfFactory::LandauPlusLandau(const std::string& name,
+				RooRealVar &x)
+  {
+    auto meanL = new RooRealVar(Form("%s_Landau_mean",  name.c_str()),
+				Form("Single landau mean for %s",name.c_str()),
+				1.,0.,10.);
+    Register(meanL);
+    
+    auto sigmaL = new RooRealVar(Form("%s_Landau_sigma", name.c_str()),
+				 Form("Single landau sigma for %s",name.c_str()),
+				 0.1,0.,1.);
+    Register(sigmaL);
+
+    auto landau1 = new RooLandau(Form("%s_Landau_pdf",   name.c_str()),
+				 Form("Landau Pdf for %s",name.c_str()),
+				 x, *meanL, *sigmaL);
+    Register(landau1);
+
+    auto meanG = new RooRealVar(Form("%s_Gaus_mean",  name.c_str()),
+				Form("Single gauss mean for %s",name.c_str()),
+				1.,0.,10.);
+    Register(meanG);
+    
+    auto sigmaG = new RooRealVar(Form("%s_Gaus_sigma", name.c_str()),
+				 Form("Single gauss sigma for %s",name.c_str()),
+				 0.1,0.,1.);
+    Register(sigmaG);
+
+    auto landau2 = new RooLandau(Form("%s_Gaus_pdf",   name.c_str()),
+				 Form("Gauss Pdf for %s",name.c_str()),
+				 x, *meanG, *sigmaG);
+    Register(landau2);
+
+    // need a fraction
+    auto frac = new RooRealVar(Form("%s_fraction",name.c_str()),
+			       "Fractional amplitude of gaussian peak",
+			       1.0,0.0,1.0);
+    Register(frac);
+
+    // add the two
+    auto res = new RooAddPdf(Form("%s_LandauPlusGaus_pdf",name.c_str()),
+			     Form("Sum of Landau and Gaussian %s",name.c_str()),
+			     *landau1, *landau2, *frac);
+    Register(res);
+    
+    return res;
+  }
+
+
+  RooAbsPdf* PdfFactory::LandauConvGauss(const std::string& name,
+					 RooRealVar &x)
+  {
+
+    // Create Gaussian PDF
+    auto meanG = new RooRealVar(Form("%s_Gaus_mean",  name.c_str()),
+			       Form("Single gaussian mean for %s",name.c_str()),
+			       1.,0.,10.);
+    Register(meanG);
+
+    auto sigmaG = new RooRealVar(Form("%s_Gaus_sigma", name.c_str()),
+				Form("Single gaussian sigma for %s",name.c_str()),
+				0.1,0.,1.);
+    Register(sigmaG);
+
+    auto gauss = new RooGaussian(Form("%s_Gaus_pdf",   name.c_str()),
+				 Form("Gauss Pdf for %s",name.c_str()),
+				 x, *meanG, *sigmaG);
+
+    Register(gauss);
+
+    // Create Landau PDF
+    auto meanL = new RooRealVar(Form("%s_Landau_mean",  name.c_str()),
+			       Form("Single landau mean for %s",name.c_str()),
+			       1.,0.,10.);
+    Register(meanL);
+
+    auto sigmaL = new RooRealVar(Form("%s_Landau_sigma", name.c_str()),
+				Form("Single landau sigma for %s",name.c_str()),
+				0.1,0.,1.);
+    Register(sigmaL);
+
+    auto landau = new RooLandau(Form("%s_Landau_pdf",   name.c_str()),
+				Form("Landau Pdf for %s",name.c_str()),
+				x, *meanL, *sigmaL);
+
+    Register(landau);
+
+    auto res = new RooNumConvPdf("model", "model", x, *landau, *gauss);
+    
+    return res;
+  }
+
+
+
   RooAbsPdf* PdfFactory::dEdxGaus(const std::string& name,
 				  RooRealVar &x)
   {
