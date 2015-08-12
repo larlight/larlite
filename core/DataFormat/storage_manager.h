@@ -57,6 +57,7 @@ namespace larlite {
   class event_pcaxis;
   class event_flashmatch;
   class event_fifo;
+  class event_opdetwaveform;
 }
 
 namespace larlite {
@@ -528,6 +529,7 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_ass>() const;
   template<> data::DataType_t storage_manager::data_type<event_pcaxis>() const;
   template<> data::DataType_t storage_manager::data_type<event_flashmatch>() const;
+  template<> data::DataType_t storage_manager::data_type<event_opdetwaveform> () const;
   template<> data::SubRunDataType_t storage_manager::subrundata_type<potsummary>() const;
 
   template<>

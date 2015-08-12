@@ -192,6 +192,10 @@
 #pragma link C++ class std::vector<larlite::fifo>+;
 #pragma link C++ class larlite::event_fifo+;
 
+#pragma link C++ class larlite::opdetwaveform+;
+#pragma link C++ class std::vector<larlite::opdetwaveform>+;
+#pragma link C++ class larlite::event_opdetwaveform+;
+
 #pragma link C++ class larlite::storage_manager+;
 
 /*
