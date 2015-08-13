@@ -51,6 +51,10 @@ class view_manager(QtCore.QObject):
     for view in self._drawerList:
       view.restoreDefaults()
 
+  def clearPoints(self):
+    for view in self._drawerList:
+      view.clearPoints()
+
   def getDrawListWidget(self):
 
     self._widgetList = []
@@ -125,6 +129,13 @@ class view_manager(QtCore.QObject):
   def lockAR(self, lockRatio):
     for view in self._drawerList:
       view.lockRatio(lockRatio)
+
+  def makePath(self):
+    for view in self._drawerList:
+      path = view.makeIonizationPath()
+      if path != None:
+        self.drawWireOnPlot(path)
+        return
 
   def drawWire(self,wireView):
     if wireView:
@@ -289,12 +300,22 @@ class gui(QtGui.QWidget):
     self._unitDisplayOption.stateChanged.connect(self.useCMWorker)
 
 
+    self._clearPointsButton = QtGui.QPushButton("ClearPoints")
+    self._clearPointsButton.setToolTip("Clear all of the drawn points from the views")
+    self._clearPointsButton.clicked.connect(self.clearPointsWorker)
+
+    self._makePathButton = QtGui.QPushButton("Eval. Points")
+    self._makePathButton.setToolTip("Compute the ADCs along the path defined by the points")
+    self._makePathButton.clicked.connect(self.drawIonizationWorker)
+
 
     # Pack the stuff into a layout
 
     self._drawingControlBox = QtGui.QVBoxLayout()
     self._drawingControlBox.addWidget(self._restoreDefaults)
     self._drawingControlBox.addWidget(self._maxRangeButton)
+    self._drawingControlBox.addWidget(self._clearPointsButton)
+    self._drawingControlBox.addWidget(self._makePathButton)
     self._drawingControlBox.addWidget(self._autoRangeBox)
     self._drawingControlBox.addWidget(self._lockAspectRatio)
     self._drawingControlBox.addWidget(self._drawWireOption)
@@ -325,6 +346,13 @@ class gui(QtGui.QWidget):
       self._view_manager.refreshDrawListWidget()
       return
 
+  def clearPointsWorker(self):
+    self._view_manager.clearPoints()
+    pass
+
+  def drawIonizationWorker(self):
+    self._view_manager.makePath()
+    pass
 
   def lockARWorker(self):
     if self._lockAspectRatio.isChecked():
@@ -357,8 +385,10 @@ class gui(QtGui.QWidget):
 
   # This function combines the control button layouts, range layouts, and quit button
   def getWestLayout(self):
+
     event_control = self.getEventControlButtons()
     draw_control = self.getDrawingControlButtons()
+
 
     # Add the quit button?
     quit_control = self.getQuitLayout()
