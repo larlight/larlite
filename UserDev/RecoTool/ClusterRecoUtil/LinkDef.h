@@ -26,15 +26,14 @@
 #pragma link C++ class cluster::cluster_params+;
 #pragma link C++ class std::vector<cluster::cluster_params>+;
 
-// #pragma link C++ class cluster::ClusterParamsExecutor+;
-// #pragma link C++ class std::vector<cluster::ClusterParamsExecutor>+;
-
 #pragma link C++ class cluster::CRUException+;
 // #pragma link C++ class cluster::CRUHelper+;
 
 
+#pragma link C++ class cluster::GetAverages+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 
