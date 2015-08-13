@@ -19,14 +19,36 @@ manager.open()
 
 manager.next_event()
 
-cluster = manager.get_data(larlite.data.kCluster,"mergeall")
-print cluster
-print cluster.size()
+clusts = manager.get_data(larlite.data.kCluster,"mergeall")
+# print clusts
+# print clusts.size()
 
 hits = manager.get_data(larlite.data.kHit,"gaushit")
 print hits
-print hits.size()
+# print hits.size()
 
-ass = manager.get_data(larlite.data.kAssociation,"mergall")
-print ass
-print ass.size()
+ass = manager.get_data(larlite.data.kAssociation,"mergeall")
+# print ass
+# print ass.size()
+
+hit_index_v = ass.association(clusts.id(), hits.id())
+print hit_index_v
+
+# Make the hits into PxHits and pass to the clusterParamsAlg
+
+
+alg      = cluster.ClusterParamsAlg()
+alg.SetDebug()
+
+averages = cluster.GetAverages()
+alg.attachAlg(averages)
+
+hitsSelected = larlite.event_hit()
+
+for hit in hit_index_v[0]:
+  # print hits[hit].WireID().Wire
+  hitsSelected.push_back(hits[hit])
+
+alg.SetHits(hitsSelected)
+alg.FillParams()
+

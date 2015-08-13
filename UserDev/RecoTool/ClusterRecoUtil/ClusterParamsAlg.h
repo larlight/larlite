@@ -37,7 +37,9 @@ namespace cluster{
     /// Default destructor
     ~ClusterParamsAlg(){}
 
-    void FillParams(cluster_params & cluster);
+    void attachAlg(ParamsAlgBase * alg){_modules.push_back(alg);}
+
+    void FillParams();
 
     /**
      * @brief set the hits of the params object
@@ -47,7 +49,7 @@ namespace cluster{
      * @param a vector of hits, either pointer to larlite hits, Hit2D
      */
     int SetHits(const std::vector<Hit2D> &);
-    int SetHits(const std::vector<const ::larlite::hit*> &);
+    int SetHits(const std::vector< ::larlite::hit> &);
 
     void SetVerbose(bool yes=true){ _verbose = yes;}
     void SetDebug(bool yes=true)  { _debug = yes;}
@@ -58,6 +60,8 @@ namespace cluster{
 
     bool _verbose;
     bool _debug;
+
+    cluster_params fParams;
 
   };
 
