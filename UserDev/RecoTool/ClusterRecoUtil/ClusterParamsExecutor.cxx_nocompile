@@ -2,6 +2,8 @@
 #define RECOTOOL_CLUSTERPARAMSEXECUTOR_CXX
 
 #include "ClusterParamsExecutor.h"
+#include "CRUException.h"
+#include "LArUtil/GeometryUtilities.h"
 
 namespace cluster {
 
@@ -131,6 +133,8 @@ namespace cluster {
     time_max += ((time_max - time_min)*0.25);
     //if(wire_min<0) wire_min = 0;
     //if(time_min<0) time_min = 0;
+    //
+    auto fGSer = ::larutil::GeometryUtilities::GetME(); 
 
     hCurrentHit = new TH2D("hCurrentHit",
 			   Form("Event %d Cluster %d (Plane=%d); Wire [cm]; Time [cm]",
