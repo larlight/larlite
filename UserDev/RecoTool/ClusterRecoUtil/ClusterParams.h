@@ -16,8 +16,12 @@
 #define RECOTOOL_CLUSTERPARAMS_H
 
 #include <ostream>
-#include "LArUtil/PxUtils.h"
 #include "Polygon2D.h"
+#include "Base/GeoTypes.h"
+
+
+#include "LArUtil/PxUtils.h"
+typedef larutil::PxHit Hit2D;
 
 namespace cluster{
 
@@ -36,7 +40,8 @@ namespace cluster{
     ~cluster_params(){};
 
     /// Hold the list of hits for this particular cluster, for convenience 
-    std::vector<larutil::PxHit> hit_vector;
+    std::vector< Hit2D > hit_vector;
+    // The plane of this cluster, all hits are from this plane
     ::larlite::geo::PlaneID     plane_id;
 
 
