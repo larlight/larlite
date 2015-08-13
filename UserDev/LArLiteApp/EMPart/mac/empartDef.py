@@ -35,6 +35,8 @@ def EMPartAna():
 
 def AnaUnit():
     my_anaunit = fmwk.ExampleERSelection()
+    my_anaunit.SetMinEDep(10)
+    my_anaunit.SetCheater(True)
     # Set Producers
     # First Argument: True = MC, False = Reco
     my_anaunit.SetShowerProducer(True,"mcreco");

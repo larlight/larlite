@@ -303,6 +303,7 @@ namespace ertool {
       double e_like, g_like;
 
       if (!_training_mode){
+
 	// for every shower find the object with the smallest IP
 	double IPmin = 1036;
 	::geoalgo::Point_t vtxMin(3);
@@ -329,6 +330,9 @@ namespace ertool {
 	  }
 	}// loop over other tracks
 	
+	// get vertex info if it exists from particle
+	auto const& vtx = graph.GetParticle(s).Vertex();
+
 	// if IP min is < 1 cm -> use radLen
 	::geoalgo::Point_t shrvtx(3);
 	dist = -1;
@@ -338,6 +342,12 @@ namespace ertool {
 	  e_like = LL(true,  dEdx, dist);
 	  g_like = LL(false, dEdx, dist);
 	  shrvtx = vtxMin;
+	}
+	else if (vtx != kINVALID_VERTEX){
+	  dist = shr.Start().Dist(vtx);
+	  e_like = LL(true,  dEdx, dist);
+	  g_like = LL(false, dEdx, dist);
+	  shrvtx = vtx;
 	}
 	else{
 	  e_like = LL(true,  dEdx, dist);
