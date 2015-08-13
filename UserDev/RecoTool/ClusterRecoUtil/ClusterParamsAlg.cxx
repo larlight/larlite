@@ -8,6 +8,7 @@ namespace cluster{
   void ClusterParamsAlg::FillParams(cluster_params & cluster){
 
 
+
       // Make sure the result cluster has the right size of all it's elements
       // auto geom = larutil::Geometry::GetME();
       // int nPlanes = geom -> Nplanes();
@@ -18,16 +19,20 @@ namespace cluster{
       // result.fTotalMIPEnergy.resize(nPlanes);
       // result.fSigmaTotalMIPEnergy.resize(nPlanes);
 
-      // Shower_t localCopy = result;
+      cluster_params localCopy;
+      if (_debug)
+       localCopy = cluster;
 
-      // for (auto & module : _modules){
-      //   module -> do_reconstruction(clusters, result);
-      //   if (_debug){
-      //     printChanges(localCopy, result,module->name());
-      //     localCopy = result;
-      //   }
+      for (auto & module : _modules){
+        module -> do_params_fill(cluster, _verbose);
+        if (_debug){
+          cluster.ReportDiff(localCopy);
+          localCopy = cluster;
+        }
 
-      // }
+      }
+
+      return;
 
       // return result;
     }

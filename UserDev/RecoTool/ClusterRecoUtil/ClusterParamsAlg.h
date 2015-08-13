@@ -17,6 +17,7 @@
 #include <iostream>
 #include <vector>
 #include "ClusterParams.h"
+#include "ParamsAlgBase.h"
 #include "DataFormat/hit.h"
 
 namespace cluster{
@@ -38,13 +39,25 @@ namespace cluster{
 
     void FillParams(cluster_params & cluster);
 
-    void SetHits(const std::vector<Hit2D> &);
+    /**
+     * @brief set the hits of the params object
+     * @details These functions will convert, if necessary, the hits and
+     * then save them into the params object
+     * 
+     * @param a vector of hits, either pointer to larlite hits, Hit2D
+     */
+    int SetHits(const std::vector<Hit2D> &);
     int SetHits(const std::vector<const ::larlite::hit*> &);
+
+    void SetVerbose(bool yes=true){ _verbose = yes;}
+    void SetDebug(bool yes=true)  { _debug = yes;}
 
   private:
 
-    bool verbose;
-    bool debug;
+    std::vector<ParamsAlgBase * > _modules;
+
+    bool _verbose;
+    bool _debug;
 
   };
 
