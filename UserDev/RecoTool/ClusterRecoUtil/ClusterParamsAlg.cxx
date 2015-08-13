@@ -2,10 +2,11 @@
 #define CLUSTERPARAMSALG_CXX
 
 #include "ClusterParamsAlg.h"
+#include "LArUtil/GeometryHelper.h"
 
 namespace cluster{
 
-  void ClusterParamsAlg::FillParams(cluster_params & cluster){
+  void ClusterParamsAlg::FillParams(){
 
 
 
@@ -21,13 +22,13 @@ namespace cluster{
 
       cluster_params localCopy;
       if (_debug)
-       localCopy = cluster;
+       localCopy = fParams;
 
       for (auto & module : _modules){
-        module -> do_params_fill(cluster, _verbose);
+        module -> do_params_fill(fParams, _verbose);
         if (_debug){
-          cluster.ReportDiff(localCopy);
-          localCopy = cluster;
+          fParams.ReportDiff(localCopy);
+          localCopy = fParams;
         }
 
       }
@@ -36,6 +37,33 @@ namespace cluster{
 
       // return result;
     }
+
+  int ClusterParamsAlg::SetHits(const std::vector<Hit2D> &){
+    return 0;
+  }
+
+  int ClusterParamsAlg::SetHits(const std::vector< ::larlite::hit> & inputHits){
+
+    fParams.Clear();
+
+    auto geoHelper = larutil::GeometryHelper::GetME();
+
+    std::vector<Hit2D> tempHits;
+    Hit2D temp;
+
+    for (int i = 0; i < inputHits.size(); i++ ){
+      temp.w = inputHits[i].WireID().Wire * geoHelper -> WireToCm();
+      temp.t = inputHits[i].PeakTime() * geoHelper -> TimeToCm();
+      temp.charge = inputHits[i].Integral();
+      tempHits.push_back(temp);
+    }
+
+    fParams.hit_vector = tempHits;
+
+    return tempHits.size();
+
+  }
+
 
 }    
 
