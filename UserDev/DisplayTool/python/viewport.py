@@ -11,7 +11,7 @@ class viewport(pg.GraphicsLayoutWidget):
     # add a view box, which is a widget that allows an image to be shown
     self._view = self.addViewBox(border=None)
     # add an image item which handles drawing (and refreshing) the image
-    self._item = pg.ImageItem(useOpenGL=True,autoDownsample=True)
+    self._item = pg.ImageItem(useOpenGL=True)
     # self._item._setPen((0,0,0))
     self._view.addItem(self._item)
     # connect the scene to click events, used to get wires
