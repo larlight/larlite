@@ -16,9 +16,8 @@ namespace cluster {
       rms_y                             = kDOUBLE_MIN ;
       charge_wgt_x                      = kDOUBLE_MIN ;
       charge_wgt_y                      = kDOUBLE_MIN ;
-      cluster_angle_2d                  = kDOUBLE_MIN ;
+      slope_2d_high_q                   = kDOUBLE_MIN ;
       slope_2d                          = kDOUBLE_MIN ;
-      angle_2d                          = kDOUBLE_MIN ;
       eigenvalue_principal              = kDOUBLE_MIN ;
       eigenvalue_secondary              = kDOUBLE_MIN ;
       multi_hit_wires                   = kDOUBLE_MIN ;
@@ -56,9 +55,8 @@ namespace cluster {
          << "   rms_y  .................... : " << rms_y << "\n"
          << "   charge_wgt_x  ............. : " << charge_wgt_x << "\n"
          << "   charge_wgt_y  ............. : " << charge_wgt_y << "\n"
-         << "   cluster_angle_2d  ......... : " << cluster_angle_2d << "\n"
+         << "   slope_2d_high_q  ......... : " << slope_2d_high_q << "\n"
          << "   slope_2d  ................. : " << slope_2d         << "\n"
-         << "   angle_2d  ................. : " << angle_2d         << "\n"
          << "   eigenvalue_principal  ..... : " << eigenvalue_principal << "\n"
          << "   eigenvalue_secondary  ..... : " << eigenvalue_secondary << "\n"
          << "   multi_hit_wires  .......... : " << multi_hit_wires << "\n"
@@ -141,15 +139,10 @@ namespace cluster {
                 << this -> charge_wgt_y << " vs. "
                 << otherCluster.charge_wgt_y << "\n";
     }
-    if (this -> cluster_angle_2d         != otherCluster.cluster_angle_2d){
-      std::cout << "  cluster_angle_2d is different: "
-                << this -> cluster_angle_2d << " vs. "
-                << otherCluster.cluster_angle_2d << "\n";
-    }
-    if (this -> angle_2d                 != otherCluster.angle_2d){
-      std::cout << "  angle_2d is different: "
-                << this -> angle_2d << " vs. "
-                << otherCluster.angle_2d << "\n";
+    if (this -> slope_2d_high_q         != otherCluster.slope_2d_high_q){
+      std::cout << "  slope_2d_high_q is different: "
+                << this -> slope_2d_high_q << " vs. "
+                << otherCluster.slope_2d_high_q << "\n";
     }
     if (this -> slope_2d                 != otherCluster.slope_2d){
       std::cout << "  slope_2d is different: "
