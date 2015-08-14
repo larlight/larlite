@@ -183,6 +183,38 @@ namespace larutil{
                             const TVector3 & targetPoint) const;
 
 
+    /**
+     * @brief Find the Polygon boundary given a list of hits
+     * @param inputHits : list of PxHits that make up the cluster
+     * @param edgeHits  : list of PxHits that define the boundary of the polygon
+     * @param frac      : fraction of charge in list of hits that needs to be contained by the polygon
+     */
+    void SelectPolygonHitList(const std::vector<larutil::PxHit> &inputHits,
+			      std::vector <const larutil::PxHit*> &edgeHits,
+			      double frac=0.95) const;
+    
+    /**
+     * @brief Given a vector of PXHits return a sorted list of indices that represents the correct order for the polygon edges
+     * @details ...
+     * @param ordered_hits : vector of PxHits that represent the list of edges for the polygon
+     * @param candidate_polygon : list of indices of the vector ordered_hits in the order in which they should be connected to form a nice, non-overlapping polygon
+     */
+    std::vector<size_t>  OrderPolygonEdges( std::vector<const larutil::PxHit*> ordered_hits ,
+					    std::vector<size_t> candidate_polygon) const;
+    
+    
+    /**
+     * @brief Return if a triangle of points A,B,C is clockwire or not
+     * @details given an ordered list of points A, B, and C, imagine
+     * drawing a line connecting the points in that order. If to do so
+     * you need to make a clockwise loop, the algorithm returns True
+     * if not, it returns false.
+     * @return boolean telling wether the three points are ordered clockwire or counter-clockwise
+     */
+    bool Clockwise(const double& Ax, const double& Ay,
+		   const double& Bx, const double& By,
+		   const double& Cx, const double& Cy) const;
+    
     /** 
      * @brief deterimine if a point is in the TPC
      * @details Checks this point against the geometry parameters
