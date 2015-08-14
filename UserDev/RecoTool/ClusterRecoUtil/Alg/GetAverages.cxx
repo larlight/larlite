@@ -83,6 +83,49 @@ namespace cluster {
 
     cluster.principal_dir[0] = (* fPrincipal.GetEigenVectors())[0][0];
     cluster.principal_dir[1] = (* fPrincipal.GetEigenVectors())[1][0];
+    cluster.slope_2d = cluster.principal_dir[1] / cluster.principal_dir[0];
+
+    double rmsx = 0.0;
+    double rmsy = 0.0;
+    double rmsq = 0.0;
+    //using the charge weighted coordinates find the axis from slope
+    double ncw=0;
+    double sumtime=0;//from sum averages
+    double sumwire=0;//from sum averages
+    double sumwiretime=0;//sum over (wire*time)
+    double sumwirewire=0;//sum over (wire*wire)
+    //next loop over all hits again
+
+    for (auto& hit : cluster.hit_vector){
+      // First, abuse this loop to calculate rms in x and y
+      rmsx += pow(cluster.mean_x - hit.w, 2)/cluster.N_Hits;
+      rmsy += pow(cluster.mean_y - hit.t, 2)/cluster.N_Hits;
+      rmsq += pow(cluster.mean_charge - hit.charge, 2)/cluster.N_Hits;
+      //if charge is above avg_charge
+      // std::cout << "This hit has charge " <<  hit . charge << "\n";
+       
+      if(hit.charge > cluster.mean_charge){
+        ncw+=1;
+        sumwire+=hit.w;
+        sumtime+=hit.t;
+        sumwiretime+=hit.w * hit.t;
+        sumwirewire+=pow(hit.w,2);  
+      }//for high charge
+    }//For hh loop
+
+    cluster.rms_x = sqrt(rmsx);
+    cluster.rms_y = sqrt(rmsy);
+    cluster.RMS_charge = sqrt(rmsq);
+    
+    cluster.N_Hits_HC = ncw;
+
+    //Looking for the slope and intercept of the line above avg_charge hits
+
+    float slope_high_charge = (ncw*sumwiretime - sumwire*sumtime) / (ncw*sumwirewire - sumwire*sumwire);
+
+    cluster.slope_2d_high_q = slope_high_charge;
+
+    return;
 
   }
 
