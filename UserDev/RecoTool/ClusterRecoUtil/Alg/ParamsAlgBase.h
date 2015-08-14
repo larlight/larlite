@@ -44,8 +44,15 @@ namespace cluster {
 
     virtual void do_params_fill(cluster_params &, bool verbose) = 0;
 
+    void SetVerbose(bool on=true) { _verbose = on; }
+
   protected:
+
     std::string _name;
+
+    /// Verbosity flag to be used within each algorithm
+    bool _verbose;
+
 
   };
 
