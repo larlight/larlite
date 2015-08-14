@@ -193,7 +193,235 @@ namespace larutil {
 
   }
 
+  void GeometryHelper::SelectPolygonHitList(const std::vector<larutil::PxHit> &inputHits,
+					    std::vector <const larutil::PxHit*> &edgeHits,
+					    double frac) const
+  {
 
+    // if hit list is empty get out of here!
+    if(!(inputHits.size())) {
+      throw LArUtilException("Provided empty hit list!");
+      return;
+    }
+
+    // Utilities
+    auto geom = larutil::Geometry::GetME();
+    auto detp = DetectorProperties::GetME();
+    
+    // if the fraction is > 1 then use 1...should not be larger
+    // frac is the fraction of charge in the hit list
+    // than needs to be included in the Polygon
+    if (frac > 1) { frac = 1; }
+
+    // clear list of hits that define the edges of the polygon
+    edgeHits.clear();
+    
+    // determine the plane for this cluster (assumes all hits from the same cluster)
+    unsigned char plane = (*inputHits.begin()).plane;
+
+    // Define subset of hits to define polygon
+    std::map<double,const larutil::PxHit*> hitmap;
+
+    // define a parameter that stores the total charge in the cluster
+    double qtotal = 0;
+    for(auto const &h : inputHits){
+      hitmap.insert(std::pair<double,const larutil::PxHit*>(h.charge,&h));
+      qtotal += h.charge;
+    }
+    // define a parameter to store the charge that will be within the polygon
+    double qintegral=0;
+    std::vector<const larutil::PxHit*> ordered_hits;
+    ordered_hits.reserve(inputHits.size());
+    for(auto hiter = hitmap.rbegin(); qintegral <= qtotal*frac && hiter != hitmap.rend(); ++hiter) {
+      qintegral += (*hiter).first;
+      ordered_hits.push_back((*hiter).second);
+    }
+
+    // Define container to hold found polygon corner PxHit index & distance
+    std::vector<size_t> hit_index(8,0);
+    std::vector<double> hit_distance(8,1e9);
+    
+    // Loop over hits and find corner points in the plane view
+    // Also fill corner edge points
+    std::vector<larutil::PxPoint> edges(4,PxPoint(plane,0,0));
+    double wire_max = geom->Nwires(plane) * fWireToCm;
+    double time_max = detp->NumberTimeSamples() * fTimeToCm;
+    
+    for(size_t index = 0; index<ordered_hits.size(); ++index) {
+      
+      if(ordered_hits.at(index)->t < 0 ||
+	 ordered_hits.at(index)->w < 0 ||
+	 ordered_hits.at(index)->t > time_max ||
+	 ordered_hits.at(index)->w > wire_max ) {
+
+	throw LArUtilException(Form("Invalid wire/time (%g,%g) ... range is (0=>%g,0=>%g)",
+				    ordered_hits.at(index)->w,
+				    ordered_hits.at(index)->t,
+				    wire_max,
+				    time_max)
+			       );
+	return;
+      }
+
+      double dist = 0;
+      
+      // First thing to do:
+      // Find the hits that have the largest/smallest wire number and time
+      // these will define the first (up to) 4 boundaries of our polygon
+
+      // Comparison w/ (Wire,0)
+      dist = ordered_hits.at(index)->t;
+      if(dist < hit_distance.at(1)) {
+	hit_distance.at(1) = dist;
+	hit_index.at(1) = index;
+	edges.at(0).t = ordered_hits.at(index)->t;
+	edges.at(1).t = ordered_hits.at(index)->t;
+      }
+
+      // Comparison w/ (WireMax,Time)
+      dist = wire_max - ordered_hits.at(index)->w;
+      if(dist < hit_distance.at(3)) {
+	hit_distance.at(3) = dist;
+	hit_index.at(3) = index;
+	edges.at(1).w = ordered_hits.at(index)->w;
+	edges.at(2).w = ordered_hits.at(index)->w;
+      }
+
+      // Comparison w/ (Wire,TimeMax)
+      dist = time_max - ordered_hits.at(index)->t;
+      if(dist < hit_distance.at(5)) {
+	hit_distance.at(5) = dist;
+	hit_index.at(5) = index;
+	edges.at(2).t = ordered_hits.at(index)->t;
+	edges.at(3).t = ordered_hits.at(index)->t;
+      }
+
+      // Comparison w/ (0,Time)
+      dist = ordered_hits.at(index)->w;
+      if(dist < hit_distance.at(7)) {
+	hit_distance.at(7) = dist;
+	hit_index.at(7) = index;
+	edges.at(0).w = ordered_hits.at(index)->w;
+	edges.at(3).w = ordered_hits.at(index)->w;
+      }
+    }
+
+    // next find the hits that are closest to the 3 corners of the rectangle
+    for(size_t index = 0; index<ordered_hits.size(); ++index) {
+
+      double dist = 0;
+      // Comparison w/ (0,0)
+      dist = pow((ordered_hits.at(index)->t - edges.at(0).t),2) + pow((ordered_hits.at(index)->w - edges.at(0).w),2);
+      if(dist < hit_distance.at(0)) {
+	hit_distance.at(0) = dist;
+	hit_index.at(0) = index;
+      }
+      
+      // Comparison w/ (WireMax,0)
+      dist = pow((ordered_hits.at(index)->t - edges.at(1).t),2) + pow((ordered_hits.at(index)->w - edges.at(1).w),2);
+      if(dist < hit_distance.at(2)) {
+	hit_distance.at(2) = dist;
+	hit_index.at(2) = index;
+      }
+
+      // Comparison w/ (WireMax,TimeMax)
+      dist = pow((ordered_hits.at(index)->t - edges.at(2).t),2) + pow((ordered_hits.at(index)->w - edges.at(2).w),2);
+      if(dist < hit_distance.at(4)) {
+	hit_distance.at(4) = dist;
+	hit_index.at(4) = index;
+      }
+
+      // Comparison w/ (0,TimeMax)
+      dist = pow((ordered_hits.at(index)->t - edges.at(3).t),2) + pow((ordered_hits.at(index)->w - edges.at(3).w),2);
+      if(dist < hit_distance.at(6)) {
+	hit_distance.at(6) = dist;
+	hit_index.at(6) = index;
+      }
+
+    }
+    // Loop over the resulting hit indexes and append unique hits to define the polygon to the return hit list
+    std::set<size_t> unique_index;
+    std::vector<size_t> candidate_polygon;
+    candidate_polygon.reserve(9);
+    //    std::cout << "Original polygon: " << std::endl;
+    for(auto &index : hit_index) {
+      
+      if(unique_index.find(index) == unique_index.end()) {
+	//	hitlistlocal.push_back((const larutil::PxHit*)(ordered_hits.at(index)));
+	//std::cout << "(" << ordered_hits.at(index)->w << ", " << ordered_hits.at(index)->t << ")" << std::endl;
+	unique_index.insert(index);
+	candidate_polygon.push_back(index);
+      }
+    }
+    for (auto &index: hit_index){
+      candidate_polygon.push_back(index);
+      break;
+    }
+
+    // we should only have a maximum of 8 edges for the polygon!
+    if(unique_index.size()>8) throw LArUtilException("Size of the polygon > 8!");    
+
+    //Untangle Polygon
+    candidate_polygon = OrderPolygonEdges( ordered_hits, candidate_polygon);
+    
+    edgeHits.clear();
+    for( unsigned int i=0; i<(candidate_polygon.size()-1); i++){
+      edgeHits.push_back((const larutil::PxHit*)(ordered_hits.at(candidate_polygon.at(i))));
+    }
+
+    //check that polygon does not have more than 8 sides
+    if(unique_index.size()>8) throw LArUtilException("Size of the polygon > 8!");
+
+    return;
+  }
+  
+
+  std::vector<size_t>  GeometryHelper::OrderPolygonEdges( std::vector<const larutil::PxHit*> ordered_hits ,
+							  std::vector<size_t> candidate_polygon) const 
+  {
+    
+    //loop over edges
+    for ( unsigned int i=0; i<(candidate_polygon.size()-1); i++){
+      double Ax = ordered_hits.at(candidate_polygon.at(i))->w;
+      double Ay = ordered_hits.at(candidate_polygon.at(i))->t;
+      double Bx = ordered_hits.at(candidate_polygon.at(i+1))->w;
+      double By = ordered_hits.at(candidate_polygon.at(i+1))->t;
+      //loop over edges that have not been checked yet...
+      //only ones furhter down in polygon
+      for ( unsigned int j=i+2; j<(candidate_polygon.size()-1); j++){
+	//avoid consecutive segments:
+	if ( candidate_polygon.at(i) == candidate_polygon.at(j+1) )
+	  continue;
+	else{
+	  double Cx = ordered_hits.at(candidate_polygon.at(j))->w;
+	  double Cy = ordered_hits.at(candidate_polygon.at(j))->t;
+	  double Dx = ordered_hits.at(candidate_polygon.at(j+1))->w;
+	  double Dy = ordered_hits.at(candidate_polygon.at(j+1))->t;
+	  
+	  if ( (Clockwise(Ax,Ay,Cx,Cy,Dx,Dy) != Clockwise(Bx,By,Cx,Cy,Dx,Dy))
+	       and (Clockwise(Ax,Ay,Bx,By,Cx,Cy) != Clockwise(Ax,Ay,Bx,By,Dx,Dy)) ){
+	    size_t tmp = candidate_polygon.at(i+1);
+	    candidate_polygon.at(i+1) = candidate_polygon.at(j);
+	    candidate_polygon.at(j) = tmp;
+	    //check that last element is still first (to close circle...)
+	    candidate_polygon.at(candidate_polygon.size()-1) = candidate_polygon.at(0);
+	    //swapped polygon...now do recursion to make sure
+	    return OrderPolygonEdges( ordered_hits, candidate_polygon);
+	  }//if crossing
+	}
+      }//second loop
+    }//first loop
+    return candidate_polygon;
+  }
+  
+  bool GeometryHelper::Clockwise(const double& Ax,const double& Ay,
+				 const double& Bx,const double& By,
+				 const double& Cx,const double& Cy) const
+  {
+
+    return (Cy-Ay)*(Bx-Ax) > (By-Ay)*(Cx-Ax);
+  }    
+  
   bool GeometryHelper::Point_isInTPC(const TVector3 & pointIn3D) const{
     // Use the geometry class to determine if this point is in the TPC
     auto geom = larutil::Geometry::GetME();
