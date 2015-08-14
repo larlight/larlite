@@ -31,6 +31,7 @@
 
 
 #pragma link C++ class cluster::GetAverages+;
+#pragma link C++ class cluster::FillPolygon+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
