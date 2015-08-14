@@ -27,6 +27,7 @@ namespace cluster{
       for (auto & module : _modules){
         module -> do_params_fill(fParams, _verbose);
         if (_debug){
+          std::cout << "Listing the changes made by " << module -> name() << ":" << std::endl;
           fParams.ReportDiff(localCopy);
           localCopy = fParams;
         }

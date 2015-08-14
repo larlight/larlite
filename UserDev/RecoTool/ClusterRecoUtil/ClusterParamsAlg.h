@@ -17,7 +17,7 @@
 #include <iostream>
 #include <vector>
 #include "ClusterParams.h"
-#include "ParamsAlgBase.h"
+#include "Alg/ParamsAlgBase.h"
 #include "DataFormat/hit.h"
 
 namespace cluster{
@@ -56,7 +56,7 @@ namespace cluster{
 
   private:
 
-    std::vector<ParamsAlgBase * > _modules;
+    std::vector<::cluster::ParamsAlgBase * > _modules;
 
     bool _verbose;
     bool _debug;

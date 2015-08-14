@@ -29,7 +29,7 @@ namespace cluster {
   public:
 
     /// Default constructor
-    FillPolygon(){}
+    FillPolygon(){_name = "FillPolygon";}
 
     /// Default destructor
     ~FillPolygon(){}

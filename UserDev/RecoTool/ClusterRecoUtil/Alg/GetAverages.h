@@ -29,7 +29,7 @@ namespace cluster {
   public:
 
     /// Default constructor
-    GetAverages(){}
+    GetAverages(){_name = "GetAverages";}
 
     /// Default destructor
     ~GetAverages(){}
