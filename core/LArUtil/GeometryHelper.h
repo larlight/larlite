@@ -192,6 +192,37 @@ typedef PxPoint Point2D;
 
 
     /**
+     * @brief Get 2D distance squared between two points
+     * @param point1 : Point2D (w,t) in cm space
+     * @param point2 : Point2D (w,t) in cm space
+     * @return double -> distance between the two
+     */
+    float Get2DDistanceSqrd( const Point2D & point1, const Point2D & point2) const;
+
+    /**
+     * @brief Get 2D distance between two points
+     * @param point1 : Point2D (w,t) in cm space
+     * @param point2 : Point2D (w,t) in cm space
+     * @return double -> distance between the two
+     */
+    float Get2DDistance( const Point2D & point1, const Point2D & point2) const;
+
+    /**
+     * @brief return the projected point on a line
+     * @details given a slope and a point that define a line
+     * this function returns the projected point on that
+     * line of an input 2D point anywhere on the plane
+     * @param slope -> slope in (cm,cm) space of the line
+     * @param startpoint -> point that lies on the line
+     * @param point1 -> point that we wish to find the projection for
+     * @return pointout -> the point projected on the line
+     */
+    int GetPointOnLine(const double& slope,
+		       const Point2D& startpoint,
+		       const Point2D& point1,
+		       Point2D& pointout) const;
+
+    /**
      * @brief Find the Polygon boundary given a list of hits
      * @param inputHits : list of PxHits that make up the cluster
      * @param edgeHits  : list of PxHits that define the boundary of the polygon
