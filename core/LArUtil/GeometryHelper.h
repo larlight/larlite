@@ -18,6 +18,15 @@
 #include "PxUtils.h"
 #include "Geometry.h"
 
+
+#include "LArUtil/PxUtils.h"
+
+namespace larutil{
+
+
+typedef PxHit Hit2D;
+typedef PxPoint Point2D;
+
 /**
    \class GeometryHelper
    This class is meant as an aide to reconstruction by handling geometrical operations.  
@@ -30,7 +39,6 @@
 
  */
 
-namespace larutil{
 
   class GeometryHelper : public larlite::larlite_base {
 
@@ -77,9 +85,9 @@ namespace larutil{
      * @param xyz TVector3 of the point in 3D to project into 2D
      * @param plane The index of the plane to project into.  Ranges from 0 to Nplanes -1 (Nplanes available in Geometry::Nplanes() )
      * 
-     * @return Returns a PxPoint of the 2D projection into the plane
+     * @return Returns a Point2D of the 2D projection into the plane
      */
-    PxPoint Point_3Dto2D(const TVector3 & xyz, unsigned int plane) const;
+    Point2D Point_3Dto2D(const TVector3 & xyz, unsigned int plane) const;
     /**
      * @brief Convert a 3D point in the detector to 2D point on a plane
      * @details Conversion is done by setting the time to the X coordinated, minus any corrections from trigger offset and plane offset.
@@ -88,9 +96,9 @@ namespace larutil{
      * @param xyz std::vector<float> of the point in 3D to project into 2D
      * @param plane The index of the plane to project into.  Ranges from 0 to Nplanes -1 (Nplanes available in Geometry::Nplanes() )
      * 
-     * @return Returns a PxPoint of the 2D projection into the plane
+     * @return Returns a Point2D of the 2D projection into the plane
      */
-    PxPoint Point_3Dto2D(const std::vector<float> & xyz, unsigned int plane) const;
+    Point2D Point_3Dto2D(const std::vector<float> & xyz, unsigned int plane) const;
 
     /**
      * @brief Convert a 3D point in the detector to 2D point on a plane
@@ -100,9 +108,9 @@ namespace larutil{
      * @param xyz std::vector<float> of the point in 3D to project into 2D
      * @param plane The index of the plane to project into.  Ranges from 0 to Nplanes -1 (Nplanes available in Geometry::Nplanes() )
      * 
-     * @return Returns a PxPoint of the 2D projection into the plane
+     * @return Returns a Point2D of the 2D projection into the plane
      */
-    PxPoint Point_3Dto2D(const std::vector<double> & xyz, unsigned int plane) const;
+    Point2D Point_3Dto2D(const std::vector<double> & xyz, unsigned int plane) const;
 
 
     /**
@@ -113,9 +121,9 @@ namespace larutil{
      * @param xyz Pointer to float of the point in 3D to project into 2D.  Caller is responsible for creating and deleting this array
      * @param plane The index of the plane to project into.  Ranges from 0 to Nplanes -1 (Nplanes available in Geometry::Nplanes() )
      * 
-     * @return Returns a PxPoint of the 2D projection into the plane
+     * @return Returns a Point2D of the 2D projection into the plane
      */
-    PxPoint Point_3Dto2D(float * xyz, unsigned int plane) const;
+    Point2D Point_3Dto2D(float * xyz, unsigned int plane) const;
 
     /**
      * @brief Convert a 3D point in the detector to 2D point on a plane
@@ -125,9 +133,9 @@ namespace larutil{
      * @param xyz Pointer to double of the point in 3D to project into 2D.  Caller is responsible for creating and deleting this array
      * @param plane The index of the plane to project into.  Ranges from 0 to Nplanes -1 (Nplanes available in Geometry::Nplanes() )
      * 
-     * @return Returns a PxPoint of the 2D projection into the plane
+     * @return Returns a Point2D of the 2D projection into the plane
      */
-    PxPoint Point_3Dto2D(double * xyz, unsigned int plane) const;
+    Point2D Point_3Dto2D(double * xyz, unsigned int plane) const;
 
  
     /**
@@ -141,24 +149,24 @@ namespace larutil{
      * @param startPoint3D TVector3 describing the 3D start point (in detector coordinates) 
      * @param direction3D TVector3 describing the direction that the line emanates from the start point.  Need not be normalized  
      * @param plane The plane in which the projection needs to be done.
-     * @param startPoint2D Returned by reference: A PxPoint representing the projection of the start point into the plane.
-     * @param direction2D Returned by reference: A PxPoint representing the projection of the direction into the plane, normalized.
+     * @param startPoint2D Returned by reference: A Point2D representing the projection of the start point into the plane.
+     * @param direction2D Returned by reference: A Point2D representing the projection of the direction into the plane, normalized.
      */
     void Line_3Dto2D( const TVector3 & startPoint3D, const TVector3 & direction3D, unsigned int plane,
-                      PxPoint & startPoint2D, PxPoint & direction2D) const;
+                      Point2D & startPoint2D, Point2D & direction2D) const;
 
     float Slope_3Dto2D(const TVector3 & inputVector, unsigned int plane) const ;
 
     /**
      * @brief Calculate the shortest distance between a line and a point in 2D
      *  
-     * @param pointOnLine PxPoint - Any point on the line of interest
-     * @param directionOfLine PxPoint - The direction of the line of interest
-     * @param targetPoint PxPoint - The point from which the closest distance is calculated
+     * @param pointOnLine Point2D - Any point on the line of interest
+     * @param directionOfLine Point2D - The direction of the line of interest
+     * @param targetPoint Point2D - The point from which the closest distance is calculated
      * @return the distance between the point and the line in centimeters
      */
-    float DistanceToLine2D( const PxPoint & pointOnLine, const PxPoint & directionOfLine, 
-                            const PxPoint & targetPoint) const;
+    float DistanceToLine2D( const Point2D & pointOnLine, const Point2D & directionOfLine, 
+                            const Point2D & targetPoint) const;
 
     /**
      * @brief Calculate the shortest distance between a line and a point in 2D
@@ -197,11 +205,11 @@ namespace larutil{
      * @brief Given a vector of PXHits return a sorted list of indices that represents the correct order for the polygon edges
      * @details ...
      * @param ordered_hits : vector of PxHits that represent the list of edges for the polygon
-     * @param candidate_polygon : list of indices of the vector ordered_hits in the order in which they should be connected to form a nice, non-overlapping polygon
+     * @param candidate_polygon : list of indices of the vector ordered_hits in the order in which they should be 
+     * connected to form a nice, non-overlapping polygon
      */
     std::vector<size_t>  OrderPolygonEdges( std::vector<const larutil::PxHit*> ordered_hits ,
 					    std::vector<size_t> candidate_polygon) const;
-    
     
     /**
      * @brief Return if a triangle of points A,B,C is clockwire or not
@@ -215,6 +223,28 @@ namespace larutil{
 		   const double& Bx, const double& By,
 		   const double& Cx, const double& Cy) const;
     
+
+
+    /**
+     * @brief This function takes in a hit list and some parameters describing a box around that hit list, 
+     *        returns the hits inside the box
+     * @details The list of input hits is looped over to find hits inside of the box.  The box is defined to be of the 
+     *          length "distanceAlongLine" and the width of "distancePerpToLine."  The axis of the box starts at startingHit
+     *          and continues for the length "distanceAlongLine" in the direction specified by "lineSlope"
+     * 
+     * @param inputHits The list of hits to loop over 
+     * @param startingHit The hit that defines the start of the box
+     * @param distanceAlongLine The maximum distance along the line to look
+     * @param distancePerpToLine The maximum distance perpendicular to the line to look
+     * @param lineSlope The direction of the line emanating from the starting Hit 
+     * @return A vector of the indexes of the hits to return
+     */
+    std::vector<unsigned int> SelectLocalPointList( const std::vector<Hit2D> & inputHits,
+                                                    const Hit2D & startingHit,
+                                                    const float & distanceAlongLine,
+                                                    const float & distancePerpToLine,
+                                                    const float & lineSlope) const;
+
     /** 
      * @brief deterimine if a point is in the TPC
      * @details Checks this point against the geometry parameters

@@ -32,7 +32,7 @@ namespace larutil {
 
   // The next set of functions is the collection of functions to convert 3D Point to 2D point
   // The first function is maintained, and the rest convert their arguments and call it
-  PxPoint GeometryHelper::Point_3Dto2D(const TVector3 & _3D_position, unsigned int plane) const {
+  Point2D GeometryHelper::Point_3Dto2D(const TVector3 & _3D_position, unsigned int plane) const {
     
     auto geom = larutil::Geometry::GetME();
 
@@ -44,7 +44,7 @@ namespace larutil {
     // Verify that the point is in the TPC before trying to project:
 
     //initialize return value
-    PxPoint returnPoint;
+    Point2D returnPoint;
     
     // The wire position can be gotten with Geometry::NearestWire()
     // Convert result to centimeters as part of the unit convention
@@ -69,31 +69,31 @@ namespace larutil {
     // Therefore, subtract the offest (which is already in centimeters)
     returnPoint.t -= planeOrigin[0];
 
-    // Set the plane of the PxPoint:
+    // Set the plane of the Point2D:
     returnPoint.plane = plane;
     
     return returnPoint;
   }
 
-  PxPoint GeometryHelper::Point_3Dto2D(double * xyz, unsigned int plane) const{
+  Point2D GeometryHelper::Point_3Dto2D(double * xyz, unsigned int plane) const{
     TVector3 vec(xyz);
     return Point_3Dto2D(vec,plane);
   }
-  PxPoint GeometryHelper::Point_3Dto2D(float * xyz, unsigned int plane) const{
+  Point2D GeometryHelper::Point_3Dto2D(float * xyz, unsigned int plane) const{
     TVector3 vec(xyz);
     return Point_3Dto2D(vec,plane);
   }
-  PxPoint GeometryHelper::Point_3Dto2D(const std::vector<double> & xyz, unsigned int plane) const{
+  Point2D GeometryHelper::Point_3Dto2D(const std::vector<double> & xyz, unsigned int plane) const{
     TVector3 vec(&(xyz[0]));
     return Point_3Dto2D(vec,plane);
   }
-  PxPoint GeometryHelper::Point_3Dto2D(const std::vector<float> & xyz, unsigned int plane) const{
+  Point2D GeometryHelper::Point_3Dto2D(const std::vector<float> & xyz, unsigned int plane) const{
     TVector3 vec(&(xyz[0]));
     return Point_3Dto2D(vec,plane);
   }
   
   void GeometryHelper::Line_3Dto2D( const TVector3 & startPoint3D, const TVector3 & direction3D, unsigned int plane,
-                                    PxPoint & startPoint2D, PxPoint & direction2D) const
+                                    Point2D & startPoint2D, Point2D & direction2D) const
   {
     // First step, project the start point into 2D
     startPoint2D = Point_3Dto2D(startPoint3D,plane);
@@ -114,7 +114,7 @@ namespace larutil {
     //           << ", " << secondPoint3D.Y() << ", " << secondPoint3D.Z() << ")\n";
 
     // Project the second point into 2D:
-    PxPoint secondPoint2D = Point_3Dto2D(secondPoint3D,plane);
+    Point2D secondPoint2D = Point_3Dto2D(secondPoint3D,plane);
 
     // std::cout << "2D line is (" << startPoint2D.w << ", " << startPoint2D.t
     //           << ") to (" << secondPoint2D.w << ", " << secondPoint2D.t << ")\n";
@@ -136,15 +136,15 @@ namespace larutil {
     auto geom = larutil::Geometry::GetME();
     TVector3 startPoint3D(0,0,0);
     startPoint3D.SetZ(0.5 * geom -> DetLength());
-    larutil::PxPoint p1,slope;
+    larutil::Point2D p1,slope;
     Line_3Dto2D(startPoint3D,inputVector,plane,p1,slope);
     return slope.t / slope.w;
   }
 
 
 
-  float GeometryHelper::DistanceToLine2D( const PxPoint & pointOnLine, const PxPoint & directionOfLine, 
-                                          const PxPoint & targetPoint) const
+  float GeometryHelper::DistanceToLine2D( const Point2D & pointOnLine, const Point2D & directionOfLine, 
+                                          const Point2D & targetPoint) const
   {
 
     // Utilize the 3D function to make it easier to maintain
@@ -193,9 +193,9 @@ namespace larutil {
 
   }
 
-  void GeometryHelper::SelectPolygonHitList(const std::vector<larutil::PxHit> &inputHits,
-					    std::vector <const larutil::PxHit*> &edgeHits,
-					    double frac) const
+  void GeometryHelper::SelectPolygonHitList(const std::vector<Hit2D> &inputHits,
+                                            std::vector <const Hit2D*> &edgeHits,
+                                            double frac) const
   {
 
     // if hit list is empty get out of here!
@@ -220,17 +220,17 @@ namespace larutil {
     unsigned char plane = (*inputHits.begin()).plane;
 
     // Define subset of hits to define polygon
-    std::map<double,const larutil::PxHit*> hitmap;
+    std::map<double,const Hit2D*> hitmap;
 
     // define a parameter that stores the total charge in the cluster
     double qtotal = 0;
     for(auto const &h : inputHits){
-      hitmap.insert(std::pair<double,const larutil::PxHit*>(h.charge,&h));
+      hitmap.insert(std::pair<double,const Hit2D*>(h.charge,&h));
       qtotal += h.charge;
     }
     // define a parameter to store the charge that will be within the polygon
     double qintegral=0;
-    std::vector<const larutil::PxHit*> ordered_hits;
+    std::vector<const Hit2D*> ordered_hits;
     ordered_hits.reserve(inputHits.size());
     for(auto hiter = hitmap.rbegin(); qintegral <= qtotal*frac && hiter != hitmap.rend(); ++hiter) {
       qintegral += (*hiter).first;
@@ -243,24 +243,24 @@ namespace larutil {
     
     // Loop over hits and find corner points in the plane view
     // Also fill corner edge points
-    std::vector<larutil::PxPoint> edges(4,PxPoint(plane,0,0));
+    std::vector<larutil::Point2D> edges(4,Point2D(plane,0,0));
     double wire_max = geom->Nwires(plane) * fWireToCm;
     double time_max = detp->NumberTimeSamples() * fTimeToCm;
     
     for(size_t index = 0; index<ordered_hits.size(); ++index) {
       
       if(ordered_hits.at(index)->t < 0 ||
-	 ordered_hits.at(index)->w < 0 ||
-	 ordered_hits.at(index)->t > time_max ||
-	 ordered_hits.at(index)->w > wire_max ) {
+         ordered_hits.at(index)->w < 0 ||
+         ordered_hits.at(index)->t > time_max ||
+         ordered_hits.at(index)->w > wire_max ) {
 
-	throw LArUtilException(Form("Invalid wire/time (%g,%g) ... range is (0=>%g,0=>%g)",
-				    ordered_hits.at(index)->w,
-				    ordered_hits.at(index)->t,
-				    wire_max,
-				    time_max)
-			       );
-	return;
+        throw LArUtilException(Form("Invalid wire/time (%g,%g) ... range is (0=>%g,0=>%g)",
+                                    ordered_hits.at(index)->w,
+                                    ordered_hits.at(index)->t,
+                                    wire_max,
+                                    time_max)
+                               );
+        return;
       }
 
       double dist = 0;
@@ -272,37 +272,37 @@ namespace larutil {
       // Comparison w/ (Wire,0)
       dist = ordered_hits.at(index)->t;
       if(dist < hit_distance.at(1)) {
-	hit_distance.at(1) = dist;
-	hit_index.at(1) = index;
-	edges.at(0).t = ordered_hits.at(index)->t;
-	edges.at(1).t = ordered_hits.at(index)->t;
+        hit_distance.at(1) = dist;
+        hit_index.at(1) = index;
+        edges.at(0).t = ordered_hits.at(index)->t;
+        edges.at(1).t = ordered_hits.at(index)->t;
       }
 
       // Comparison w/ (WireMax,Time)
       dist = wire_max - ordered_hits.at(index)->w;
       if(dist < hit_distance.at(3)) {
-	hit_distance.at(3) = dist;
-	hit_index.at(3) = index;
-	edges.at(1).w = ordered_hits.at(index)->w;
-	edges.at(2).w = ordered_hits.at(index)->w;
+        hit_distance.at(3) = dist;
+        hit_index.at(3) = index;
+        edges.at(1).w = ordered_hits.at(index)->w;
+        edges.at(2).w = ordered_hits.at(index)->w;
       }
 
       // Comparison w/ (Wire,TimeMax)
       dist = time_max - ordered_hits.at(index)->t;
       if(dist < hit_distance.at(5)) {
-	hit_distance.at(5) = dist;
-	hit_index.at(5) = index;
-	edges.at(2).t = ordered_hits.at(index)->t;
-	edges.at(3).t = ordered_hits.at(index)->t;
+        hit_distance.at(5) = dist;
+        hit_index.at(5) = index;
+        edges.at(2).t = ordered_hits.at(index)->t;
+        edges.at(3).t = ordered_hits.at(index)->t;
       }
 
       // Comparison w/ (0,Time)
       dist = ordered_hits.at(index)->w;
       if(dist < hit_distance.at(7)) {
-	hit_distance.at(7) = dist;
-	hit_index.at(7) = index;
-	edges.at(0).w = ordered_hits.at(index)->w;
-	edges.at(3).w = ordered_hits.at(index)->w;
+        hit_distance.at(7) = dist;
+        hit_index.at(7) = index;
+        edges.at(0).w = ordered_hits.at(index)->w;
+        edges.at(3).w = ordered_hits.at(index)->w;
       }
     }
 
@@ -313,29 +313,29 @@ namespace larutil {
       // Comparison w/ (0,0)
       dist = pow((ordered_hits.at(index)->t - edges.at(0).t),2) + pow((ordered_hits.at(index)->w - edges.at(0).w),2);
       if(dist < hit_distance.at(0)) {
-	hit_distance.at(0) = dist;
-	hit_index.at(0) = index;
+        hit_distance.at(0) = dist;
+        hit_index.at(0) = index;
       }
       
       // Comparison w/ (WireMax,0)
       dist = pow((ordered_hits.at(index)->t - edges.at(1).t),2) + pow((ordered_hits.at(index)->w - edges.at(1).w),2);
       if(dist < hit_distance.at(2)) {
-	hit_distance.at(2) = dist;
-	hit_index.at(2) = index;
+        hit_distance.at(2) = dist;
+        hit_index.at(2) = index;
       }
 
       // Comparison w/ (WireMax,TimeMax)
       dist = pow((ordered_hits.at(index)->t - edges.at(2).t),2) + pow((ordered_hits.at(index)->w - edges.at(2).w),2);
       if(dist < hit_distance.at(4)) {
-	hit_distance.at(4) = dist;
-	hit_index.at(4) = index;
+        hit_distance.at(4) = dist;
+        hit_index.at(4) = index;
       }
 
       // Comparison w/ (0,TimeMax)
       dist = pow((ordered_hits.at(index)->t - edges.at(3).t),2) + pow((ordered_hits.at(index)->w - edges.at(3).w),2);
       if(dist < hit_distance.at(6)) {
-	hit_distance.at(6) = dist;
-	hit_index.at(6) = index;
+        hit_distance.at(6) = dist;
+        hit_index.at(6) = index;
       }
 
     }
@@ -347,10 +347,10 @@ namespace larutil {
     for(auto &index : hit_index) {
       
       if(unique_index.find(index) == unique_index.end()) {
-	//	hitlistlocal.push_back((const larutil::PxHit*)(ordered_hits.at(index)));
-	//std::cout << "(" << ordered_hits.at(index)->w << ", " << ordered_hits.at(index)->t << ")" << std::endl;
-	unique_index.insert(index);
-	candidate_polygon.push_back(index);
+        //        hitlistlocal.push_back((const Hit2D*)(ordered_hits.at(index)));
+        //std::cout << "(" << ordered_hits.at(index)->w << ", " << ordered_hits.at(index)->t << ")" << std::endl;
+        unique_index.insert(index);
+        candidate_polygon.push_back(index);
       }
     }
     for (auto &index: hit_index){
@@ -366,7 +366,7 @@ namespace larutil {
     
     edgeHits.clear();
     for( unsigned int i=0; i<(candidate_polygon.size()-1); i++){
-      edgeHits.push_back((const larutil::PxHit*)(ordered_hits.at(candidate_polygon.at(i))));
+      edgeHits.push_back((const Hit2D*)(ordered_hits.at(candidate_polygon.at(i))));
     }
 
     //check that polygon does not have more than 8 sides
@@ -376,8 +376,8 @@ namespace larutil {
   }
   
 
-  std::vector<size_t>  GeometryHelper::OrderPolygonEdges( std::vector<const larutil::PxHit*> ordered_hits ,
-							  std::vector<size_t> candidate_polygon) const 
+  std::vector<size_t>  GeometryHelper::OrderPolygonEdges( std::vector<const Hit2D*> ordered_hits ,
+                                                          std::vector<size_t> candidate_polygon) const 
   {
     
     //loop over edges
@@ -389,34 +389,34 @@ namespace larutil {
       //loop over edges that have not been checked yet...
       //only ones furhter down in polygon
       for ( unsigned int j=i+2; j<(candidate_polygon.size()-1); j++){
-	//avoid consecutive segments:
-	if ( candidate_polygon.at(i) == candidate_polygon.at(j+1) )
-	  continue;
-	else{
-	  double Cx = ordered_hits.at(candidate_polygon.at(j))->w;
-	  double Cy = ordered_hits.at(candidate_polygon.at(j))->t;
-	  double Dx = ordered_hits.at(candidate_polygon.at(j+1))->w;
-	  double Dy = ordered_hits.at(candidate_polygon.at(j+1))->t;
-	  
-	  if ( (Clockwise(Ax,Ay,Cx,Cy,Dx,Dy) != Clockwise(Bx,By,Cx,Cy,Dx,Dy))
-	       and (Clockwise(Ax,Ay,Bx,By,Cx,Cy) != Clockwise(Ax,Ay,Bx,By,Dx,Dy)) ){
-	    size_t tmp = candidate_polygon.at(i+1);
-	    candidate_polygon.at(i+1) = candidate_polygon.at(j);
-	    candidate_polygon.at(j) = tmp;
-	    //check that last element is still first (to close circle...)
-	    candidate_polygon.at(candidate_polygon.size()-1) = candidate_polygon.at(0);
-	    //swapped polygon...now do recursion to make sure
-	    return OrderPolygonEdges( ordered_hits, candidate_polygon);
-	  }//if crossing
-	}
+        //avoid consecutive segments:
+        if ( candidate_polygon.at(i) == candidate_polygon.at(j+1) )
+          continue;
+        else{
+          double Cx = ordered_hits.at(candidate_polygon.at(j))->w;
+          double Cy = ordered_hits.at(candidate_polygon.at(j))->t;
+          double Dx = ordered_hits.at(candidate_polygon.at(j+1))->w;
+          double Dy = ordered_hits.at(candidate_polygon.at(j+1))->t;
+          
+          if ( (Clockwise(Ax,Ay,Cx,Cy,Dx,Dy) != Clockwise(Bx,By,Cx,Cy,Dx,Dy))
+               and (Clockwise(Ax,Ay,Bx,By,Cx,Cy) != Clockwise(Ax,Ay,Bx,By,Dx,Dy)) ){
+            size_t tmp = candidate_polygon.at(i+1);
+            candidate_polygon.at(i+1) = candidate_polygon.at(j);
+            candidate_polygon.at(j) = tmp;
+            //check that last element is still first (to close circle...)
+            candidate_polygon.at(candidate_polygon.size()-1) = candidate_polygon.at(0);
+            //swapped polygon...now do recursion to make sure
+            return OrderPolygonEdges( ordered_hits, candidate_polygon);
+          }//if crossing
+        }
       }//second loop
     }//first loop
     return candidate_polygon;
   }
   
   bool GeometryHelper::Clockwise(const double& Ax,const double& Ay,
-				 const double& Bx,const double& By,
-				 const double& Cx,const double& Cy) const
+                                 const double& Bx,const double& By,
+                                 const double& Cx,const double& Cy) const
   {
 
     return (Cy-Ay)*(Bx-Ax) > (By-Ay)*(Cx-Ax);
@@ -442,6 +442,50 @@ namespace larutil {
   }
 
 
+  std::vector<unsigned int> GeometryHelper::SelectLocalPointList( const std::vector<Hit2D> & inputHits,
+                                                                  const Hit2D & startingHit,
+                                                                  const float & distanceAlongLine,
+                                                                  const float & distancePerpToLine,
+                                                                  const float & lineSlope) const{
+
+    std::vector<unsigned int> returnIndexes;
+    returnIndexes.reserve(inputHits.size());
+    
+    // Turn the slope into a vector for the direction:
+    TVector3 slope(1.0,lineSlope,0.0);
+    slope *= 1.0/slope.Mag();
+
+    // Figure out the starting point:
+    TVector3 startPoint(startingHit.w,startingHit.t,0.0);
+
+    // Loop over the hits and figure out if they are in the box or not:
+    unsigned int i = 0;
+    for (auto & hit : inputHits){
+      // Make each hit a real point for simplicity:
+      TVector3 thisHit(hit.w,hit.t,0.0);
+      // Linear distance is easy to find:
+      float linearDisplacement = (thisHit - startPoint).Dot(slope);
+      // Check the linear displacement:
+      if (linearDisplacement > distanceAlongLine && linearDisplacement > 0.0){
+        // Then this hit fails, continue
+        i++;
+        continue;
+      }
+      // Perp distance isn't hard either:
+      float perpDistance = DistanceToLine3D(startPoint,slope,thisHit);
+      if (perpDistance > distancePerpToLine){
+        // Again, then this hit fails.
+        i++;
+        continue;
+      }
+
+      // Reached here, push back the index and move on with the loop:
+      returnIndexes.push_back(i);
+      i++;
+    }
+
+    return returnIndexes;
+  }
 
 
 
