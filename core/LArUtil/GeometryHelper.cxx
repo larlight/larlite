@@ -446,7 +446,8 @@ namespace larutil {
                                                                   const Hit2D & startingHit,
                                                                   const float & distanceAlongLine,
                                                                   const float & distancePerpToLine,
-                                                                  const float & lineSlope) const{
+                                                                  const float & lineSlope,
+                                                                  Hit2D & averageHit) const{
 
     std::vector<unsigned int> returnIndexes;
     returnIndexes.reserve(inputHits.size());
@@ -457,6 +458,9 @@ namespace larutil {
 
     // Figure out the starting point:
     TVector3 startPoint(startingHit.w,startingHit.t,0.0);
+
+    // keep track of the averages:
+    float _average_w = 0.0, _average_t = 0.0;
 
     // Loop over the hits and figure out if they are in the box or not:
     unsigned int i = 0;
@@ -479,10 +483,21 @@ namespace larutil {
         continue;
       }
 
+
       // Reached here, push back the index and move on with the loop:
       returnIndexes.push_back(i);
+      _average_w += hit.w;
+      _average_t += hit.t;
       i++;
     }
+
+    if (returnIndexes.size() > 0){
+      _average_w /= returnIndexes.size();
+      _average_t /= returnIndexes.size();
+    }
+
+    averageHit.w = _average_w;
+    averageHit.t = _average_t;
 
     return returnIndexes;
   }

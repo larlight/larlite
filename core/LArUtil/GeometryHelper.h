@@ -243,7 +243,8 @@ typedef PxPoint Point2D;
                                                     const Hit2D & startingHit,
                                                     const float & distanceAlongLine,
                                                     const float & distancePerpToLine,
-                                                    const float & lineSlope) const;
+                                                    const float & lineSlope,
+                                                    Hit2D & averagePoint ) const;
 
     /** 
      * @brief deterimine if a point is in the TPC
