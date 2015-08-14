@@ -3,19 +3,20 @@
 #
 
 # specific names for this package
-DICT  = RecoTool_ClusterRecoUtilDict
-SHLIB = libRecoTool_ClusterRecoUtil.so
+DICT  = RecoTool_ClusterRecoUtilAlgDict
+SHLIB = libRecoTool_ClusterRecoUtilAlg.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
 HEADERS = $(filter-out $(FMWK_HEADERS), $(wildcard *.h))
 OBJECTS = $(SOURCES:.cxx=.o)
 
 # include options for this package
-INCFLAGS  = -I.                       #Include itself
+INCFLAGS  = -I.                      #Include itself
 INCFLAGS += $(shell larlite-config --includes)
 INCFLAGS += $(shell recotool-config --includes)
+INCFLAGS += -I.. #Include one layer up
 
-# Add -p flag to CINT compilation
+# Add -p flag to CINT 
 CINTFLAGS += -p
 
 # platform-specific options
@@ -29,14 +30,6 @@ LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_FANN
 LDFLAGS += -L$(LARLITE_LIBDIR) -lfloatfann
 
 SUBDIRS := Alg
-
-.phony: all clean
-
-all:
-	@for i in $(SUBDIRS); do ( echo "" && echo "Compiling $$i..." && cd $$i && $(MAKE) ) || exit $$?; done
-
-clean:
-	@for i in $(SUBDIRS); do ( echo "" && echo "Cleaning $$i..." && cd $$i && $(MAKE) clean && rm -f $(LARLIGHT_LIBDIR)/$$i.* ) || exit $$?; done
 
 
 

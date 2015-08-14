@@ -44,7 +44,7 @@ namespace cluster {
 
     virtual void do_params_fill(cluster_params &, bool verbose) = 0;
 
-  private:
+  protected:
     std::string _name;
 
   };

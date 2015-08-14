@@ -14,8 +14,6 @@
 
 #pragma link C++ namespace cluster+;
 
-#pragma link C++ class cluster::ParamsAlgBase+;
-
 
 #pragma link C++ class std::vector<larutil::PxHit>+;
 #pragma link C++ class std::vector<const larutil::PxHit*>+;
@@ -30,8 +28,6 @@
 // #pragma link C++ class cluster::CRUHelper+;
 
 
-#pragma link C++ class cluster::GetAverages+;
-#pragma link C++ class cluster::FillPolygon+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
