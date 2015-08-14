@@ -17,6 +17,7 @@ namespace cluster {
       charge_wgt_x                      = kDOUBLE_MIN ;
       charge_wgt_y                      = kDOUBLE_MIN ;
       cluster_angle_2d                  = kDOUBLE_MIN ;
+      slope_2d                          = kDOUBLE_MIN ;
       angle_2d                          = kDOUBLE_MIN ;
       eigenvalue_principal              = kDOUBLE_MIN ;
       eigenvalue_secondary              = kDOUBLE_MIN ;
@@ -56,6 +57,7 @@ namespace cluster {
          << "   charge_wgt_x  ............. : " << charge_wgt_x << "\n"
          << "   charge_wgt_y  ............. : " << charge_wgt_y << "\n"
          << "   cluster_angle_2d  ......... : " << cluster_angle_2d << "\n"
+         << "   slope_2d  ................. : " << slope_2d         << "\n"
          << "   angle_2d  ................. : " << angle_2d         << "\n"
          << "   eigenvalue_principal  ..... : " << eigenvalue_principal << "\n"
          << "   eigenvalue_secondary  ..... : " << eigenvalue_secondary << "\n"
@@ -148,6 +150,11 @@ namespace cluster {
       std::cout << "  angle_2d is different: "
                 << this -> angle_2d << " vs. "
                 << otherCluster.angle_2d << "\n";
+    }
+    if (this -> slope_2d                 != otherCluster.slope_2d){
+      std::cout << "  slope_2d is different: "
+                << this -> slope_2d << " vs. "
+                << otherCluster.slope_2d << "\n";
     }
     if (this -> eigenvalue_principal     != otherCluster.eigenvalue_principal){
       std::cout << "  eigenvalue_principal is different: "
