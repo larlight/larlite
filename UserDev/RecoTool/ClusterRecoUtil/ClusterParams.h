@@ -16,6 +16,8 @@
 #define RECOTOOL_CLUSTERPARAMS_H
 
 #include <ostream>
+#include <climits>
+#include <limits>
 #include "Polygon2D.h"
 #include "Base/GeoTypes.h"
 
@@ -26,10 +28,27 @@ typedef larutil::PxPoint Point2D;
 
 namespace cluster{
 
+
+  /// Utility: maximum value for double 
+  const double kDOUBLE_MAX = std::numeric_limits<double>::max();
+  
+  /// Utility: minimum value for double
+  const double kDOUBLE_MIN = std::numeric_limits<double>::min();
+
+  /// Utility: maximum value for int
+  const int    kINT_MAX    = std::numeric_limits<int>::max();
+  
+  /// Utility: maximum value for unsigned int
+  const unsigned int kUINT_MAX    = std::numeric_limits<unsigned int>::max();
+
+  /// Utility: maximum value for size_t
+  const size_t kSIZE_MAX   = std::numeric_limits<size_t>::max();
+
+
   /**
      \class cluster_params
      (Detailed) information holder for 2D cluster, computed by ClusterParamsAlg
-  */
+ */
   class cluster_params
   {
   public:
