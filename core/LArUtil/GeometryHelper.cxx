@@ -193,6 +193,43 @@ namespace larutil {
 
   }
 
+  float GeometryHelper::Get2DDistanceSqrd(const Point2D& point1, const Point2D& point2) const
+  {
+    return (point1.w - point2.w)*(point1.w - point2.w) + (point1.t - point2.t)*(point1.t - point2.t);
+  }
+
+
+  float GeometryHelper::Get2DDistance(const Point2D& point1, const Point2D& point2) const
+  {
+    return TMath::Sqrt(Get2DDistanceSqrd(point1,point2));
+  }
+
+  int GeometryHelper::GetPointOnLine(const double& slope,
+				     const Point2D &startpoint,
+				     const Point2D &point1,
+				     Point2D& pointout) const
+  {
+    
+    double intercept=startpoint.t - slope * startpoint.w;  
+    
+    double invslope=0;
+    
+    if(slope)	
+       invslope=-1./slope;
+  
+    double ort_intercept=point1.t - invslope * point1.w;
+    
+    if((slope-invslope)!=0)
+      pointout.w = (ort_intercept - intercept)/(slope-invslope); 
+    else
+      pointout.w = point1.w;
+    
+    pointout.t = slope * pointout.w + intercept;   
+    
+    return 0;   
+  }
+
+
   void GeometryHelper::SelectPolygonHitList(const std::vector<Hit2D> &inputHits,
                                             std::vector <const Hit2D*> &edgeHits,
                                             double frac) const
