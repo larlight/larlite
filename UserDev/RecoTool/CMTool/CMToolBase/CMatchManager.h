@@ -15,6 +15,7 @@
 #define RECOTOOL_CMATCHMANAGER_H
 
 #include <iostream>
+#include <algorithm>
 
 #include "CMManagerBase.h"
 #include "CMatchBookKeeper.h"

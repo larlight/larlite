@@ -47,7 +47,7 @@ namespace cmtool {
     void AddSeparateAlgo(CBoolAlgoBase* algo) {_separate_algo = algo;}
 
     /// A method to obtain output clusters
-    const std::vector<cluster::ClusterParamsAlg>& GetClusters() const { return _out_clusters; }
+    const std::vector<::cluster::cluster_params>& GetClusters() const { return _out_clusters; }
 
     /// A method to obtain book keeper
     const CMergeBookKeeper& GetBookKeeper() const { return _book_keeper; }
@@ -75,20 +75,20 @@ namespace cmtool {
 
   protected:
 
-    void RunMerge(const std::vector<cluster::ClusterParamsAlg > &in_clusters,
+    void RunMerge(const std::vector<::cluster::cluster_params > &in_clusters,
 		  CMergeBookKeeper &book_keeper) const;
 
-    void RunMerge(const std::vector<cluster::ClusterParamsAlg > &in_clusters,
+    void RunMerge(const std::vector<::cluster::cluster_params > &in_clusters,
 		  const std::vector<bool> &merge_flag,
 		  CMergeBookKeeper &book_keeper) const;
 
-    void RunSeparate(const std::vector<cluster::ClusterParamsAlg > &in_clusters,
+    void RunSeparate(const std::vector<::cluster::cluster_params > &in_clusters,
 		     CMergeBookKeeper &book_keeper) const;
 
   protected:
 
     /// Output clusters
-    std::vector<cluster::ClusterParamsAlg> _out_clusters;
+    std::vector<cluster::cluster_params> _out_clusters;
 
     /// Book keeper instance
     CMergeBookKeeper _book_keeper;
@@ -105,7 +105,7 @@ namespace cmtool {
 
     std::vector<std::vector<unsigned short> > _tmp_merged_indexes;
 
-    std::vector<cluster::ClusterParamsAlg> _tmp_merged_clusters;
+    std::vector<::cluster::cluster_params> _tmp_merged_clusters;
 
   };
 }
