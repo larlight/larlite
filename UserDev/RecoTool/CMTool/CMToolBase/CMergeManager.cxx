@@ -201,15 +201,15 @@ namespace cmtool {
 	
 	size_t tmp_hit_counts=0;
 	for(auto const& index : indexes_v) 
-	  tmp_hit_counts += _tmp_merged_clusters.at(index).GetHitVector().size();
+	  tmp_hit_counts += _tmp_merged_clusters.at(index).hit_vector.size();
 	std::vector<larutil::PxHit> tmp_hits;
 	tmp_hits.reserve(tmp_hit_counts);
 	
 	for(auto const& index : indexes_v) {
-	  for(auto const& hit : _tmp_merged_clusters.at(index).GetHitVector())
+	  for(auto const& hit : _tmp_merged_clusters.at(index).hit_vector)
 	    tmp_hits.push_back(hit);
 	}
-	_out_clusters.push_back(::cluster::ClusterParamsAlg());
+	_out_clusters.push_back(::cluster::cluster_params());
 	(*_out_clusters.rbegin()).SetVerbose(false);
 	(*_out_clusters.rbegin()).DisableFANN();
 	
@@ -232,7 +232,7 @@ namespace cmtool {
     return true;
   }
 
-  void CMergeManager::RunMerge(const std::vector<cluster::ClusterParamsAlg> &in_clusters,
+  void CMergeManager::RunMerge(const std::vector<::cluster::cluster_params> &in_clusters,
 			       CMergeBookKeeper &book_keeper) const
   {
     RunMerge(in_clusters,
@@ -240,7 +240,7 @@ namespace cmtool {
 	     book_keeper);
   }
 
-  void CMergeManager::RunMerge(const std::vector<cluster::ClusterParamsAlg> &in_clusters,
+  void CMergeManager::RunMerge(const std::vector<::cluster::cluster_params> &in_clusters,
 			       const std::vector<bool> &merge_flag,
 			       CMergeBookKeeper &book_keeper) const
   {
@@ -333,7 +333,7 @@ namespace cmtool {
 
   }
 
-  void CMergeManager::RunSeparate(const std::vector<cluster::ClusterParamsAlg> &in_clusters,
+  void CMergeManager::RunSeparate(const std::vector<::cluster::cluster_params> &in_clusters,
 				  CMergeBookKeeper &book_keeper) const
   {
     /*

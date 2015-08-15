@@ -37,7 +37,7 @@ namespace cmtool {
 
     _in_clusters.reserve(clusters.size());
 
-    ::cluster::ClusterParamsAlg tmp_alg;
+    ::cluster::cluster_params tmp_alg;
     tmp_alg.SetMinNHits(_min_nhits);
     tmp_alg.SetVerbose(false);
 
@@ -67,7 +67,7 @@ namespace cmtool {
     
   }
 
-  void CMManagerBase::SetClusters(const std::vector<cluster::ClusterParamsAlg> &clusters)
+  void CMManagerBase::SetClusters(const std::vector<::cluster::cluster_params> &clusters)
   {
     TStopwatch localWatch;
 
@@ -144,7 +144,7 @@ namespace cmtool {
     
   }
 
-  void CMManagerBase::ComputePriority(const std::vector<cluster::ClusterParamsAlg> &clusters) {
+  void CMManagerBase::ComputePriority(const std::vector<::cluster::cluster_params> &clusters) {
 
     TStopwatch localWatch;
     localWatch.Start();
