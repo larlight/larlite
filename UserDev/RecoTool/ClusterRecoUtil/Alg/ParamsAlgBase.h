@@ -16,7 +16,7 @@
 
 #include <iostream>
 #include <string>
-#include "ClusterParams.h"
+#include "ClusterRecoUtil/ClusterParams.h"
 
 namespace cluster {
 
