@@ -17,15 +17,31 @@
 #include <iostream>
 #include "PxUtils.h"
 #include "Geometry.h"
-
+#include <climits>
+#include <limits>
 
 #include "LArUtil/PxUtils.h"
 
 namespace larutil{
 
+  
+  /// Utility: maximum value for double 
+  const double kDOUBLE_MAX = std::numeric_limits<double>::max();
+  
+  /// Utility: minimum value for double
+  const double kDOUBLE_MIN = std::numeric_limits<double>::min();
 
-typedef PxHit Hit2D;
-typedef PxPoint Point2D;
+  /// Utility: maximum value for int
+  const int    kINT_MAX    = std::numeric_limits<int>::max();
+  
+  /// Utility: maximum value for unsigned int
+  const unsigned int kUINT_MAX    = std::numeric_limits<unsigned int>::max();
+
+  /// Utility: maximum value for size_t
+  const size_t kSIZE_MAX   = std::numeric_limits<size_t>::max();
+
+  typedef PxHit Hit2D;
+  typedef PxPoint Point2D;
 
 /**
    \class GeometryHelper
@@ -221,6 +237,22 @@ typedef PxPoint Point2D;
 		       const Point2D& startpoint,
 		       const Point2D& point1,
 		       Point2D& pointout) const;
+
+    /**
+     * @brief Get cosine of angle between two lines defined by their slope
+     * @param slope1 : slope of first line
+     * @param slope2 : slope of second line
+     * @return cosine angle between the two lines
+     */
+    double GetCosAngleBetweenLines(const double& s1, const double& s2) const;
+
+    /**
+     * @brief Get tangent of angle between two lines defined by their slope
+     * @param slope1 : slope of first line
+     * @param slope2 : slope of second line
+     * @return tangent of angle between the two lines
+     */
+    double GetTanAngleBetweenLines(const double& s1, const double& s2) const;
 
     /**
      * @brief Find the Polygon boundary given a list of hits
