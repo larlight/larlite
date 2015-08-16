@@ -18,6 +18,8 @@ namespace cluster {
 
   void GetRoughStartPoint::do_params_fill(cluster_params & cluster, bool verbose){
 
+    // Geometry Utilities
+    auto geomHelper = ::larutil::GeometryHelper::GetME();
 
 
     // The idea:
@@ -25,6 +27,9 @@ namespace cluster {
     // measure angle between segment connecting hits and slope_2d for each pair
     // the hit with the smallest spread in this parameter (summing over all angles for that hit)
     // will be the start point
+
+    // what plane are we on?
+    int plane = cluster.hit_vector[0].plane;
 
     if (_verbose) { std::cout << "2d slope (found previously) is " << cluster.slope_2d << std::endl; }
 
@@ -109,6 +114,7 @@ namespace cluster {
     Point2D start;
     double avgTan = kDOUBLE_MAX;
     size_t nScanned = 0;
+    size_t nStart = 0;
     //for (auto hiter = hitmap.rbegin(); hiter != hitmap.rend() && nScanned < _N; hiter++){
     for (size_t n1 = 0; n1 < nEdges; n1++){
       double avg = 0;
@@ -121,13 +127,37 @@ namespace cluster {
       // if we found the best average (lowest value)
       if (avg < avgTan){
 	// save this hit as the start point
-	start = Point2D(0,poly.Point(n1).first,poly.Point(n1).second);
+	start = Point2D(plane,poly.Point(n1).first,poly.Point(n1).second);
 	avgTan = avg;
+	nStart = n1;
       }
       nScanned += 1;
     }// for all rows in the matrix
 
     cluster.start_point = start;
+
+    // NEXT STEP:
+    // Assign the end point
+    // take the polygon point furthest from the start point
+    // and project it down onto the direction vector
+    // that will be out end point
+    double maxDist = 0;
+    size_t endEdge = 0;
+    for (size_t n = 0; n < nEdges; n++){
+      if (n == nStart)
+	continue;
+      double dist = ( (poly.Point(n).first-poly.Point(nStart).first)*(poly.Point(n).first-poly.Point(nStart).first) +
+		      (poly.Point(n).second-poly.Point(nStart).second)*(poly.Point(n).second-poly.Point(nStart).second) );
+      if (dist > maxDist){
+	maxDist = dist;
+	endEdge = n;
+      }
+    }
+    Point2D endPolyPoint(plane,poly.Point(endEdge).first,poly.Point(endEdge).second);
+    // project this point onto the line determined by the slope and the start-point
+    Point2D endPoint;
+    geomHelper->GetPointOnLine(cluster.slope_2d,cluster.start_point,endPolyPoint,endPoint);
+    cluster.end_point = endPoint;
     
     if (_verbose) { std::cout << "BEST HIT: (" << cluster.start_point.w << ", " << cluster.start_point.t << ")" << std::endl; }
     
