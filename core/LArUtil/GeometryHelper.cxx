@@ -274,7 +274,7 @@ namespace larutil {
     edgeHits.clear();
     
     // determine the plane for this cluster (assumes all hits from the same cluster)
-    unsigned char plane = (*inputHits.begin()).plane;
+    unsigned char plane = (inputHits[0]).plane;
 
     // Define subset of hits to define polygon
     std::map<double,const Hit2D*> hitmap;
@@ -311,9 +311,10 @@ namespace larutil {
          ordered_hits.at(index)->t > time_max ||
          ordered_hits.at(index)->w > wire_max ) {
 
-        throw LArUtilException(Form("Invalid wire/time (%g,%g) ... range is (0=>%g,0=>%g)",
+        throw LArUtilException(Form("Invalid wire/time (%g,%g) for plane %i ... range is (0=>%g,0=>%g)",
                                     ordered_hits.at(index)->w,
                                     ordered_hits.at(index)->t,
+				    plane,
                                     wire_max,
                                     time_max)
                                );
