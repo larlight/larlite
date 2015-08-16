@@ -229,6 +229,26 @@ namespace larutil {
     return 0;   
   }
 
+  double GeometryHelper::GetCosAngleBetweenLines(const double& s1, const double& s2) const
+  {
+
+    double den = sqrt(1+s1*s1) + sqrt(1+s2*s2);
+    return (s1*s2+1)/den;
+  }
+
+  double GeometryHelper::GetTanAngleBetweenLines(const double& s1, const double& s2) const
+  {
+
+    // see this: http://planetmath.org/anglebetweentwolines
+
+    // if the slopes are the same -> the angle is 0
+    // if slope1 * slope2 == -1 -> perpendicular lines -> 90 degrees
+    if (s1*s2 == -1)
+      return kDOUBLE_MAX;
+
+    return (s1-s2)/(1+s1*s2);
+  }
+
 
   void GeometryHelper::SelectPolygonHitList(const std::vector<Hit2D> &inputHits,
                                             std::vector <const Hit2D*> &edgeHits,
