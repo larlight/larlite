@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include "ParamsAlgBase.h"
+#include "LArUtil/GeometryHelper.h"
 
 namespace cluster {
 
@@ -29,7 +30,7 @@ namespace cluster {
   public:
 
     /// Default constructor
-    GetRoughStartPoint(){_name = "GetRoughStartPoint";}
+    GetRoughStartPoint();
 
     /// Default destructor
     ~GetRoughStartPoint(){}
@@ -37,14 +38,34 @@ namespace cluster {
     void do_params_fill(cluster_params &, bool verbose = false);
 
     /**
-     * @brief Set fraction of charge that needs to be enclosed by polygon
+     * @brief Set Number of Hits to consider for angle calculation
+     * @details The algorithm computes the angle between the segment
+     * connecting each pair of hits in this list and the slope_2d
+     * parameter. This mean N! angle computations.
+     * The N hits are the hits with the mosst charge
      */
-    void setFrac(const double f) { _frac = f; }
+    void SetNHits(size_t n) { _N = n; }
 
   private:
+    
+    /**
+       @brief Get angle between two hits and the 2d slope.
+       @details Angle is calculated as the angle (radians)
+       * between the line connecting h1 and h2 (pointing to h2)
+       * and the slope. This calculation is in (cm,cm) space
+       * @param h1 is a Hit2D
+       * @param h2 is a Hit2D
+       * @param slope is the slope_2d of the cluster previously calculated
+       * @return angle between (h1->h2) and slope
+     */
+    const double GetAngle(const Point2D& h1, const Point2D& h2, const double& slope);
 
-    /// Fraction of cluster charge that needs to be included in the polygon
-    double _frac;
+    /// Number of hits to be used for angle calculation
+    size_t _N;
+
+    /// Matrix that will hold the angle computed for each pair
+    /// of hits. Vector size is _N X _N
+    std::vector<std::vector<float> > _angleMatrix;
 
   };
 
