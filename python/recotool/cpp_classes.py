@@ -3,8 +3,10 @@ import ROOT
 orig_level = ROOT.gErrorIgnoreLevel
 ROOT.gErrorIgnoreLevel = ROOT.kFatal
 
-libs = [ 'libRecoTool_ShowerReco3D.so',
-         'libRecoTool_CMToolAna.so',
+libs = [ 'libRecoTool_ShowerRecoAlgo.so',
+         'libRecoTool_ShowerRecoApp.so',
+         'libRecoTool_ShowerRecoBase.so',
+         'libRecoTool_ShowerRecoModular.so',
          'libRecoTool_CMToolApp.so',
          'libRecoTool_CMTAlgMatch.so',
          'libRecoTool_CMTAlgMerge.so',
