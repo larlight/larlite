@@ -26,17 +26,18 @@ OSNAMEMODE      = $(OSNAME)
 # linker flags
 LDFLAGS += $(shell larlite-config --libs)
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_FANN
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtilAlg
 LDFLAGS += -L$(LARLITE_LIBDIR) -lfloatfann
 
 SUBDIRS := Alg
 
-.phony: all clean
+# .phony: all clean
 
-all:
-	@for i in $(SUBDIRS); do ( echo "" && echo "Compiling $$i..." && cd $$i && $(MAKE) ) || exit $$?; done
+# all:
+# 	@for i in $(SUBDIRS); do ( echo "" && echo "Compiling $$i..." && cd $$i && $(MAKE) ) || exit $$?; done
 
-clean:
-	@for i in $(SUBDIRS); do ( echo "" && echo "Cleaning $$i..." && cd $$i && $(MAKE) clean && rm -f $(LARLIGHT_LIBDIR)/$$i.* ) || exit $$?; done
+# clean:
+# 	@for i in $(SUBDIRS); do ( echo "" && echo "Cleaning $$i..." && cd $$i && $(MAKE) clean && rm -f $(LARLIGHT_LIBDIR)/$$i.* ) || exit $$?; done
 
 
 
