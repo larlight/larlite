@@ -16,7 +16,6 @@
 
 #include <iostream>
 #include "ParamsAlgBase.h"
-#include "LArUtil/GeometryHelper.h"
 
 namespace cluster {
 

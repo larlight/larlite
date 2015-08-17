@@ -45,4 +45,3 @@ namespace cluster {
 
 #endif
 /** @} */ // end of doxygen group 
-
