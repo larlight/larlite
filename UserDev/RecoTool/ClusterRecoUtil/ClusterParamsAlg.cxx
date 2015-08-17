@@ -42,9 +42,15 @@ namespace cluster{
       if (_debug){
         std::cout << "Listing the changes made by " << module -> name() << ":" << std::endl;
         fParams.ReportDiff(localCopy);
+        std::cout << std::endl;
         localCopy = fParams;
       }
       nmodule += 1;
+    }
+
+    if (_debug){
+      std::cout << "Final cluster is :\n";
+      fParams.Report();
     }
     
     return;
