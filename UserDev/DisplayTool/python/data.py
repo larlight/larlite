@@ -181,12 +181,6 @@ class hit(recoBase):
         view._view.addItem(r)
 
 
-class circleThing(QtGui.QGraphicsEllipseItem):
-
-  def __init__(self, *args, **kwargs):
-    super(circleThing, self).__init__(*args)
-#    self.setAcceptHoverEvents(True)
-#    self._isHighlighted = False
 
 
 
@@ -383,11 +377,13 @@ class clusterParams(QtCore.QObject): #recoBase):
     return self.toolTip()
 
   def toolTip(self):
-    tip = "Hits: \t" + str(self._params.N_Hits) + "\n"
-    tip += "Start:\t(" + "{:.2f}".format(self._params.start_point.w) + ", "
+    tip =  "Hits:  \t" + str(self._params.N_Hits) + "\n"
+    tip += "Start: \t(" + "{:.2f}".format(self._params.start_point.w) + ", "
     tip += "{:.2f}".format(self._params.start_point.t) + ")\n"
-    tip += "End:  \t(" + "{:.2f}".format(self._params.end_point.w) + ", "
+    tip += "End:   \t(" + "{:.2f}".format(self._params.end_point.w) + ", "
     tip += "{:.2f}".format(self._params.end_point.t) + ")\n"
+    tip += "Slope: \t" + "{:.2f}".format(self._params.principal_dir[1]/self._params.principal_dir[0]) + "\n"
+    tip += "Angle: \t" + "{:.2f}".format(self._params.angle_2d) + "\n"
     tip += "Add more in data.py:clusterParams:toolTip!"
     return tip
 
