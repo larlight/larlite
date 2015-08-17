@@ -2,6 +2,8 @@
 #define RECOTOOL_DIVREG_CXX
 
 #include "DivReg.h"
+#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/Geometry.h"
 //#include "ClusterParamsAlg.hh"
 //#include "LArUtilBase.hh"
 #include <math.h>       /* cos sin */
