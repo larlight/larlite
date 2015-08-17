@@ -70,6 +70,8 @@ namespace cluster{
 
     Point2D start_point;      ///< start point 
     Point2D end_point;        ///< end point 
+    
+    Point2D showering_point;  ///< point at which showering of cluster begins
 
     double sum_charge;                 ///< Sum charge of hits in ADC
     double mean_charge;                ///< Mean (average) charge of hits in ADC

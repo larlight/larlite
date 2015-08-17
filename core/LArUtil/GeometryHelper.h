@@ -247,6 +247,26 @@ namespace larutil{
     double GetCosAngleBetweenLines(const double& s1, const double& s2) const;
 
     /**
+     * @brief Get cosine of angle given three points
+     * @param p1 : the point common to both segments
+     * @param p2 : the end of one vector
+     * @param p3 : the end of the other vector
+     * @return cosine between vectors (p1->p2) and (p1->p3)
+     */
+    double GetCosAngleBetweenLines(const Point2D& p1, const Point2D& p2, const Point2D& p3) const;
+
+    /**
+     * @brief Get cosine of angle given two segments (p1->p2) and (p3->p4)
+     * @param p1 : start of 1st segment
+     * @param p2 : end of first segment
+     * @param p3 : start of 2nd segment
+     * @param p4 : end of second segment
+     * @return cosine between vectors (p1->p2) and (p3->p4)
+     */
+    double GetCosAngleBetweenLines(const Point2D& p1, const Point2D& p2,
+				   const Point2D& p3, const Point2D& p4) const;
+
+    /**
      * @brief Get tangent of angle between two lines defined by their slope
      * @param slope1 : slope of first line
      * @param slope2 : slope of second line
