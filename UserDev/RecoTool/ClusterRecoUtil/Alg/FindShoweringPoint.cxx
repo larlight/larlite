@@ -49,6 +49,11 @@ namespace cluster {
     // mark the last point explored as the showering start point
     Point2D showering_start = start;
     size_t nPoints = 0;
+    //typedef std::map<double,size_t>::iterator *it;
+    for (auto it = hitmap.begin(); it != hitmap.end(); it++){
+      std::cout << "this hit's charge: : " << it->first << std::endl;
+      //std::cout << "this hit's charge: : " << (it+1)->first << std::endl;
+    }
     for (size_t n=0; n < hitmap.size()-2; n++){
       std::cout << "points: " << hitmap[n] << ", " << hitmap[n+1] << ", " << hitmap[n+2] << std::endl;
       double cos = geomHelper->GetCosAngleBetweenLines(hits[hitmap[n]],hits[hitmap[n+1]],
