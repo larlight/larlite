@@ -19,24 +19,24 @@ namespace cmtool {
   }
 
   //--------------------------------------------------------
-  bool CBAlgoOutOfConeSeparate::Bool(const ::cluster::ClusterParamsAlg &cluster1,
-			    const ::cluster::ClusterParamsAlg &cluster2)
+  bool CBAlgoOutOfConeSeparate::Bool(const ::cluster::cluster_params &cluster1,
+                                     const ::cluster::cluster_params &cluster2)
   //--------------------------------------------------------
   {
 
-    double angle1 = cluster1.GetParams().angle_2d;
-    double angle2 = cluster2.GetParams().angle_2d;
+    double angle1 = cluster1.angle_2d;
+    double angle2 = cluster2.angle_2d;
 
-    double w_start1 = cluster1.GetParams().start_point.w;
-    double t_start1 = cluster1.GetParams().start_point.t;
-    double w_start2 = cluster2.GetParams().start_point.w;
-    double t_start2 = cluster2.GetParams().start_point.t;
+    double w_start1 = cluster1.start_point.w;
+    double t_start1 = cluster1.start_point.t;
+    double w_start2 = cluster2.start_point.w;
+    double t_start2 = cluster2.start_point.t;
 
-    double len1 = cluster1.GetParams().length;
-    double len2 = cluster2.GetParams().length;
+    double len1 = cluster1.length;
+    double len2 = cluster2.length;
     
-    size_t hits1 = cluster1.GetHitVector().size();
-    size_t hits2 = cluster2.GetHitVector().size();
+    size_t hits1 = cluster1.hit_vector.size();
+    size_t hits2 = cluster2.hit_vector.size();
 
     double startseparation = (w_start2-w_start1)*(w_start2-w_start1) + (t_start2-t_start1)*(t_start2-t_start1);
     //convert sepration to be instead of just angle -> angle/distance^n (n=1 for now)
@@ -46,7 +46,7 @@ namespace cmtool {
 
     //if either cluster has less than _minHits don't even try...
     if ( (hits1 < _minHits) or (hits2 < _minHits)
-	 or (angle1 < -360) or (angle2 < -360) )
+         or (angle1 < -360) or (angle2 < -360) )
       return false;
     
     if (_debug){
@@ -87,11 +87,11 @@ namespace cmtool {
       std::cout << "Angle1--S2: " << separation << std::endl;
     }
     if ( ( ( ( (separation > _MaxAngle) and (separation < 180-_MaxAngle) ) or
-	     ( (separation > 180+_MaxAngle) and (separation< 360-_MaxAngle) ) )
-	   or ( ( (separation > _MaxAngleFar) and (separation < 180-_MaxAngleFar) ) or
-		( (separation > 180+_MaxAngleFar) and (separation< 360-_MaxAngleFar) ) ) )
-	 and (hits2 > _minHits)
-	 and (len1 > _MinLen)      ){
+             ( (separation > 180+_MaxAngle) and (separation< 360-_MaxAngle) ) )
+           or ( ( (separation > _MaxAngleFar) and (separation < 180-_MaxAngleFar) ) or
+              ( (separation > 180+_MaxAngleFar) and (separation< 360-_MaxAngleFar) ) ) )
+         and (hits2 > _minHits)
+         and (len1 > _MinLen)      ){
       if (_verbose) { std::cout << "Separate! cluster 1 BIG" << std::endl << std::endl; }
       return true;
     }
@@ -107,11 +107,11 @@ namespace cmtool {
       std::cout << "Angle2--S1: " << separation << std::endl;
     }
     if ( ( ( ( (separation > _MaxAngle) and (separation < 180-_MaxAngle) ) or
-	     ( (separation > 180+_MaxAngle) and (separation< 360-_MaxAngle) ) )
-	   or ( ( (separation > _MaxAngleFar) and (separation < 180-_MaxAngleFar) ) or
-		( (separation > 180+_MaxAngleFar) and (separation< 360-_MaxAngleFar) ) ) )
-	 and (hits1 > _minHits)
-	 and (len2 > _MinLen)    ){
+             ( (separation > 180+_MaxAngle) and (separation< 360-_MaxAngle) ) )
+           or ( ( (separation > _MaxAngleFar) and (separation < 180-_MaxAngleFar) ) or
+              ( (separation > 180+_MaxAngleFar) and (separation< 360-_MaxAngleFar) ) ) )
+         and (hits1 > _minHits)
+         and (len2 > _MinLen)    ){
       if (_verbose) { std::cout << "Separate! cluster 2 BIG" << std::endl << std::endl; }
       return true;
     }
