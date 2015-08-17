@@ -62,7 +62,7 @@ namespace showerreco {
       
       for(auto const& index : pair)
 
-        in_clusters.emplace_back( fMatchMgr->GetInputClusters()[index].fParams );
+        in_clusters.emplace_back( fMatchMgr->GetInputClusters()[index] );
 
       for(auto& shower_alg : _alg_v)
 
