@@ -72,6 +72,7 @@ namespace showerreco{
     for (unsigned int i = 0; i < inputShowers.size();i++){
       planes.push_back(inputShowers.at(i).plane_id.Plane);
       float slope = inputShowers.at(i).principal_dir[1] / inputShowers.at(i).principal_dir[0];
+      std::cout << "Slope is " << slope << " with strength " << inputShowers.at(i).eigenvalue_principal << std::endl;
       slopeByPlane.push_back(slope);
     }
 
@@ -131,26 +132,26 @@ namespace showerreco{
 
 
 
-    // std::cout << "FINAL RESULT: \n";
+    std::cout << "FINAL RESULT: \n";
 
-    // std::cout 
-    //           // << "True vector: ("
-    //           // << knownAxis.X() << ", "
-    //           // << knownAxis.Y() << ", "
-    //           // << knownAxis.Z() << "), "
-    //           << "Calculated vector: ("
-    //           << direction.X() << ", "
-    //           << direction.Y() << ", "
-    //           << direction.Z() << ").\n";
-    //           // << " Difference is " << acos(knownAxis.Dot(direction)) << " radians.\n";
+    std::cout 
+              // << "True vector: ("
+              // << knownAxis.X() << ", "
+              // << knownAxis.Y() << ", "
+              // << knownAxis.Z() << "), "
+              << "Calculated vector: ("
+              << direction.X() << ", "
+              << direction.Y() << ", "
+              << direction.Z() << ").\n";
+              // << " Difference is " << acos(knownAxis.Dot(direction)) << " radians.\n";
 
-    // for (unsigned int i = 0; i < inputShowers.size();i++){
-    //   larutil::PxPoint start2D, dir2D;
-    //   geomHelper -> Line_3Dto2D(pointOnAxis, direction, planes[i], start2D, dir2D);
-    //   std::cout << "\tIn plane " << planes[i] << ", the projection is "
-    //             << dir2D.t / dir2D.w << ", the target is "
-    //             << slopeByPlane[i] << ".\n";
-    // }
+    for (unsigned int i = 0; i < inputShowers.size();i++){
+      larutil::PxPoint start2D, dir2D;
+      geomHelper -> Line_3Dto2D(pointOnAxis, direction, planes[i], start2D, dir2D);
+      std::cout << "\tIn plane " << planes[i] << ", the projection is "
+                << dir2D.t / dir2D.w << ", the target is "
+                << slopeByPlane[i] << ".\n";
+    }
 
     // Compare the 3D vector and the *known* 3D vector:
     
@@ -232,11 +233,18 @@ namespace showerreco{
 
       auto geomHelper = larutil::GeometryHelper::GetME();
       float err = 0;
+      // float wgt = 0;
       for (unsigned int i = 0; i < slopesByPlane.size(); i++){
         // Get the 2D slope for this plane, and compute the error as squared difference
         float slope = geomHelper -> Slope_3Dto2D(inputVector,planes[i]);
-        err += (slope - slopesByPlane[i])*(slope - slopesByPlane[i]);
+        // float error = (slope - slopesByPlane[i])*(slope - slopesByPlane[i]);
+        float error = 1 - fabs(slope / slopesByPlane[i]);
+        // Weight this error by the inverse value of the target slope (so that higher slopes don't get higher weight)
+        err += error;
+        // wgt += 1.0 / slopesByPlane[i];
       }
+
+
 
       return err;
 
