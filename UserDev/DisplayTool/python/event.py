@@ -2,7 +2,10 @@
 from PyQt4.QtGui import QFileDialog
 from PyQt4 import QtCore
 from data import *
-from larlite import larlite as fmwk
+import ROOT
+ROOT.gSystem.Load("libLArLite_Analysis")
+from ROOT import larlite as fmwk
+#from larlite import larlite as fmwk
 from ROOT import *
 import os
 
