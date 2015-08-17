@@ -1,5 +1,8 @@
 
-from larlite import larlite as fmwk
+#from larlite import larlite as fmwk
+import ROOT
+ROOT.gSystem.Load("libLArLite_Analysis")
+from ROOT import larlite as fmwk
 from larlite import larutil
 import numpy as np
 
