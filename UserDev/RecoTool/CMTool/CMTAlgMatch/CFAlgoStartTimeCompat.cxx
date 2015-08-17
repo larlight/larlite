@@ -2,6 +2,7 @@
 #define RECOTOOL_CFALGOSTARTTIMECOMPAT_CXX
 
 #include "CFAlgoStartTimeCompat.h"
+#include "LArUtil/GeometryUtilities.h"
 #include <algorithm>
 
 namespace cmtool {
@@ -23,7 +24,7 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------------------------------------
-  float CFAlgoStartTimeCompat::Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters)
+  float CFAlgoStartTimeCompat::Float(const std::vector<const cluster::cluster_params*> &clusters)
   //----------------------------------------------------------------------------------------------
   {
 
@@ -41,22 +42,22 @@ namespace cmtool {
       return -1;
 
     //Get Start Wire [cm], Time [cm], Plane and Channel for each cluster in the 3 planes.
-    double startWirecm0 = clusters.at(0)->GetParams().start_point.w;
-    double startTimecm0 = clusters.at(0)->GetParams().start_point.t;
+    double startWirecm0 = clusters.at(0)->start_point.w;
+    double startTimecm0 = clusters.at(0)->start_point.t;
     int startWire0 = int( startWirecm0 / _w2cm );
-    unsigned char Pl0 = clusters.at(0)->GetParams().start_point.plane;
+    unsigned char Pl0 = clusters.at(0)->start_point.plane;
     UInt_t startChan0 = larutil::Geometry::GetME()->PlaneWireToChannel(Pl0, startWire0);
 
-    double startWirecm1 = clusters.at(1)->GetParams().start_point.w;
-    double startTimecm1 = clusters.at(1)->GetParams().start_point.t;
+    double startWirecm1 = clusters.at(1)->start_point.w;
+    double startTimecm1 = clusters.at(1)->start_point.t;
     int startWire1 = int( startWirecm1 / _w2cm );
-    unsigned char Pl1 = clusters.at(1)->GetParams().start_point.plane;
+    unsigned char Pl1 = clusters.at(1)->start_point.plane;
     UInt_t startChan1 = larutil::Geometry::GetME()->PlaneWireToChannel(Pl1, startWire1);
 
-    double startWirecm2 = clusters.at(2)->GetParams().start_point.w;
-    double startTimecm2 = clusters.at(2)->GetParams().start_point.t;
+    double startWirecm2 = clusters.at(2)->start_point.w;
+    double startTimecm2 = clusters.at(2)->start_point.t;
     int startWire2 = int( startWirecm2 / _w2cm );
-    unsigned char Pl2 = clusters.at(2)->GetParams().start_point.plane;
+    unsigned char Pl2 = clusters.at(2)->start_point.plane;
     UInt_t startChan2 = larutil::Geometry::GetME()->PlaneWireToChannel(Pl2, startWire2);
 
     //Get Intersections in pairs:
@@ -127,21 +128,21 @@ namespace cmtool {
       Pl3rd = Pl2;
       Start[1] = yS01;
       Start[2] = zS01;
-      hits = clusters.at(2)->GetHitVector();
+      hits = clusters.at(2)->hit_vector;
     }
     if ( bestcompat == 0 ){
       StartT3rdPlane = startTimecm0;//(startTimecm1+startTimecm2)/2.;
       Pl3rd = Pl0;
       Start[1] = yS12;
       Start[2] = zS12;
-      hits = clusters.at(0)->GetHitVector();
+      hits = clusters.at(0)->hit_vector;
     }
     if ( bestcompat == 1 ){
       StartT3rdPlane = startTimecm1;//(startTimecm0+startTimecm2)/2.;
       Pl3rd = Pl1;
       Start[1] = yS02;
       Start[2] = zS02;
-      hits = clusters.at(1)->GetHitVector();
+      hits = clusters.at(1)->hit_vector;
     }
 
     for (auto& h: hits){

@@ -2,6 +2,7 @@
 #define RECOTOOL_CFALGOCHARGEDISTRIB_CXX
 
 #include "CFAlgoChargeDistrib.h"
+#include "LArUtil/GeometryUtilities.h"
 
 namespace cmtool {
 
@@ -21,7 +22,7 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------------------------------------
-  float CFAlgoChargeDistrib::Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters)
+  float CFAlgoChargeDistrib::Float(const std::vector<const cluster::cluster_params*> &clusters)
   //----------------------------------------------------------------------------------------------
   {
 
@@ -48,7 +49,7 @@ namespace cmtool {
     std::vector<std::vector<larutil::PxHit> > Hits;//(clusters.size(), std::vector<larutil::PxHit>());
 
     for (size_t c=0; c < clusters.size(); c++)
-      Hits.push_back( clusters.at(c)->GetHitVector() );
+      Hits.push_back( clusters.at(c)->hit_vector );
 
     // return parameter is the product of 
     // "convolutions" of each pair of clusters
@@ -65,8 +66,8 @@ namespace cmtool {
     float totOverlap = 1;
     for (size_t c1=0; c1 < (Hits.size()-1); c1++){
       for (size_t c2=c1+1; c2 < Hits.size(); c2++){
-	if (_verbose) { std::cout << "Considering Clusters: " << c1 << ", " << c2 << std::endl; }
-	totOverlap *= TProfConvol(Hits.at(c1), Hits.at(c2) );
+        if (_verbose) { std::cout << "Considering Clusters: " << c1 << ", " << c2 << std::endl; }
+        totOverlap *= TProfConvol(Hits.at(c1), Hits.at(c2) );
       }
     }
 
@@ -130,10 +131,10 @@ namespace cmtool {
     if (_debug){
       std::cout << "Q distribution for Cluster A:" << std::endl;
       for (size_t b=0; b < QprofA.size(); b++)
-	if ( QprofA.at(b) != 0 ) { std::cout << b << "\t" << QprofA.at(b) << std::endl; }
+        if ( QprofA.at(b) != 0 ) { std::cout << b << "\t" << QprofA.at(b) << std::endl; }
       std::cout << "Q distribution for Cluster B:" << std::endl;
       for (size_t b=0; b < QprofB.size(); b++)
-	if ( QprofB.at(b) != 0 ) { std::cout << b << "\t" << QprofB.at(b) << std::endl; }
+        if ( QprofB.at(b) != 0 ) { std::cout << b << "\t" << QprofB.at(b) << std::endl; }
     }
 
     // Now find convolution between the two distributions
