@@ -2,6 +2,7 @@
 #define RECOTOOL_CLUSTERVIEWER_CXX
 
 #include "ClusterViewer.h"
+#include "ClusterRecoUtil/DefaultParamsAlg.h"
 
 namespace larlite {
 
@@ -169,14 +170,14 @@ namespace larlite {
 
 	//for start/end point, need to calculate CPAN
        	auto hit_index = ass_hit_v[i];
-	::cluster::ClusterParamsAlg bestclus_CPAN;
-	_cru_helper.GenerateCPAN( hit_index, ev_hit, bestclus_CPAN);
-	bestclus_CPAN.DisableFANN();
-	bestclus_CPAN.SetVerbose(false);
-	bestclus_CPAN.FillParams(true,true,true,true,true,true);
+	::cluster::DefaultParamsAlg _params_alg;
+  ::cluster::cluster_params _params;
+	_cru_helper.GenerateParams( hit_index, ev_hit, _params);
 
-	std::pair<double,double> cluster_start  ( bestclus_CPAN.GetParams().start_point.w, bestclus_CPAN.GetParams().start_point.t );
-	std::pair<double,double> cluster_end    ( bestclus_CPAN.GetParams().end_point.w,   bestclus_CPAN.GetParams().end_point.t     );
+	_params_alg.FillParams(_params);
+
+	std::pair<double,double> cluster_start  ( _params.start_point.w, _params.start_point.t );
+	std::pair<double,double> cluster_end    ( _params.end_point.w,   _params.end_point.t     );
 	
 	_algo.AddCluster(plane,
 			 cluster_hits,

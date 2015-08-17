@@ -23,9 +23,9 @@ namespace larlite {
   
   bool ClusterMerger::analyze(storage_manager* storage) {
 
-    std::vector<std::vector<larutil::PxHit> > local_clusters;
+    std::vector<std::vector<Hit2D> > local_clusters;
 
-    _cru_helper.GeneratePxHit(storage,_input_producer,local_clusters);
+    _cru_helper.GenerateHit2D(storage,_input_producer,local_clusters);
 
     _merge_helper.Process(local_clusters);
 
