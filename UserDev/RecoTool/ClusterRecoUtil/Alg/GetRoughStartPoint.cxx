@@ -40,14 +40,14 @@ namespace cluster {
     // loop over nEdges twice:
     for (size_t n1 = 0; n1 < nEdges; n1++){
       for (size_t n2 = 0; n2 < nEdges; n2++){
-	if (n1 == n2){
-	  _angleMatrix[n1][n2] = 0;
-	  continue;
-	}
-	Point2D p1(0,poly.Point(n1).first,poly.Point(n1).second);
-	Point2D p2(0,poly.Point(n2).first,poly.Point(n2).second);
-	auto const tanangle = GetAngle(p1,p2,cluster.slope_2d);
-	_angleMatrix[n1][n2] = tanangle;
+        if (n1 == n2){
+          _angleMatrix[n1][n2] = 0;
+          continue;
+        }
+        Point2D p1(0,poly.Point(n1).first,poly.Point(n1).second);
+        Point2D p2(0,poly.Point(n2).first,poly.Point(n2).second);
+        auto const tanangle = GetAngle(p1,p2,cluster.slope_2d);
+        _angleMatrix[n1][n2] = tanangle;
       }// for second loop over Poly points
     }// for 1st loop over Poly points
 
@@ -78,18 +78,18 @@ namespace cluster {
       nScanned2 = 0;
       // second loop over hits
       for (auto hiter2 = hitmap.rbegin(); hiter2 != hitmap.rend() && nScanned2 < _N; hiter2++){
-	// if same iterator -> angle is 0
-	if (hiter1 == hiter2){
-	  _angleMatrix[nScanned1][nScanned2] = 0;
-	  continue;
-	}
-	// calculate tha angle between these two hits of interest
-	//if (_verbose) { std::cout << "Checking entry in matrix: (" << nScanned1 << ", " << nScanned2 << ")" << std::endl; }
-	//if (_verbose) { std::cout << "compare hits (" << hiter1->second << ", " << hiter2->second << ")"; }
-	auto const tanangle = GetAngle(hits[hiter1->second],hits[hiter2->second],cluster.slope_2d);
-	//if (_verbose) { std::cout << "\ttan(angle): " << tanangle << std::endl; }
-	_angleMatrix[nScanned1][nScanned2] = tanangle;
-	nScanned2 += 1;
+        // if same iterator -> angle is 0
+        if (hiter1 == hiter2){
+          _angleMatrix[nScanned1][nScanned2] = 0;
+          continue;
+        }
+        // calculate tha angle between these two hits of interest
+        //if (_verbose) { std::cout << "Checking entry in matrix: (" << nScanned1 << ", " << nScanned2 << ")" << std::endl; }
+        //if (_verbose) { std::cout << "compare hits (" << hiter1->second << ", " << hiter2->second << ")"; }
+        auto const tanangle = GetAngle(hits[hiter1->second],hits[hiter2->second],cluster.slope_2d);
+        //if (_verbose) { std::cout << "\ttan(angle): " << tanangle << std::endl; }
+        _angleMatrix[nScanned1][nScanned2] = tanangle;
+        nScanned2 += 1;
       }// 2nd loop over hits
       nScanned1 += 1;
     }// 1st loop over hits
@@ -101,10 +101,10 @@ namespace cluster {
     if (_verbose){
       std::cout << "Matrix of angles between edges:" << std::endl;
       for (size_t n1 = 0; n1 < nEdges; n1++){
-	std::cout << "Point: (" << poly.Point(n1).first << ", " << poly.Point(n1).second << ")" << std::endl;
-	for (size_t n2 = 0; n2 < nEdges; n2++)
-	  std::cout << _angleMatrix[n1][n2] << "\t";
-	std::cout << std::endl;
+        std::cout << "Point: (" << poly.Point(n1).first << ", " << poly.Point(n1).second << ")" << std::endl;
+        for (size_t n2 = 0; n2 < nEdges; n2++)
+          std::cout << _angleMatrix[n1][n2] << "\t";
+        std::cout << std::endl;
       }
       std::cout << std::endl;
     }
@@ -119,17 +119,17 @@ namespace cluster {
     for (size_t n1 = 0; n1 < nEdges; n1++){
       double avg = 0;
       for (size_t n2 = 0; n2 < nEdges; n2++){
-	double deg = _angleMatrix[n1][n2];
-	if (deg < 0) avg -= deg;
-	else avg += deg;
-	//avg += _angleMatrix[n1][n2]*_angleMatrix[n1][n2];
+        double deg = _angleMatrix[n1][n2];
+        if (deg < 0) avg -= deg;
+        else avg += deg;
+        //avg += _angleMatrix[n1][n2]*_angleMatrix[n1][n2];
       }
       // if we found the best average (lowest value)
       if (avg < avgTan){
-	// save this hit as the start point
-	start = Point2D(plane,poly.Point(n1).first,poly.Point(n1).second);
-	avgTan = avg;
-	nStart = n1;
+        // save this hit as the start point
+        start = Point2D(plane,poly.Point(n1).first,poly.Point(n1).second);
+        avgTan = avg;
+        nStart = n1;
       }
       nScanned += 1;
     }// for all rows in the matrix
@@ -145,12 +145,12 @@ namespace cluster {
     size_t endEdge = 0;
     for (size_t n = 0; n < nEdges; n++){
       if (n == nStart)
-	continue;
+        continue;
       double dist = ( (poly.Point(n).first-poly.Point(nStart).first)*(poly.Point(n).first-poly.Point(nStart).first) +
-		      (poly.Point(n).second-poly.Point(nStart).second)*(poly.Point(n).second-poly.Point(nStart).second) );
+                      (poly.Point(n).second-poly.Point(nStart).second)*(poly.Point(n).second-poly.Point(nStart).second) );
       if (dist > maxDist){
-	maxDist = dist;
-	endEdge = n;
+        maxDist = dist;
+        endEdge = n;
       }
     }
     Point2D endPolyPoint(plane,poly.Point(endEdge).first,poly.Point(endEdge).second);
@@ -164,7 +164,7 @@ namespace cluster {
     return;
   }
   
-  const double GetRoughStartPoint::GetAngle(const Point2D& h1, const Point2D& h2, const double& slope){
+  double GetRoughStartPoint::GetAngle(const Point2D& h1, const Point2D& h2, const double& slope){
 
     // Geometry Utilities
     auto geomHelper = ::larutil::GeometryHelper::GetME();

@@ -5,6 +5,31 @@
 
 namespace cluster {
 
+
+  int cluster_params::SetHits(const std::vector< Hit2D> & inputHits){
+
+    Clear();
+
+    // auto geoHelper = larutil::GeometryHelper::GetME();
+
+    // UChar_t plane = larutil::Geometry::GetME()->ChannelToPlane(inputHits[0].Channel());
+    // std::vector<Hit2D> tempHits;
+    // Hit2D temp;
+
+    // for (int i = 0; i < inputHits.size(); i++ ){
+    //   temp.w = inputHits[i].WireID().Wire * geoHelper -> WireToCm();
+    //   temp.t = inputHits[i].PeakTime() * geoHelper -> TimeToCm();
+    //   temp.charge = inputHits[i].Integral();
+    //   temp.plane = plane;
+    //   tempHits.push_back(temp);
+    // }
+
+    hit_vector = inputHits;
+
+    return hit_vector.size();
+
+  }
+
   void cluster_params::Clear(){
       start_point.Clear();
       end_point.Clear();
@@ -18,6 +43,7 @@ namespace cluster {
       charge_wgt_y                      = kDOUBLE_MIN ;
       slope_2d_high_q                   = kDOUBLE_MIN ;
       slope_2d                          = kDOUBLE_MIN ;
+      angle_2d                          = kDOUBLE_MIN ;
       eigenvalue_principal              = kDOUBLE_MIN ;
       eigenvalue_secondary              = kDOUBLE_MIN ;
       multi_hit_wires                   = kDOUBLE_MIN ;
@@ -55,8 +81,9 @@ namespace cluster {
          << "   rms_y  .................... : " << rms_y << "\n"
          << "   charge_wgt_x  ............. : " << charge_wgt_x << "\n"
          << "   charge_wgt_y  ............. : " << charge_wgt_y << "\n"
-         << "   slope_2d_high_q  ......... : " << slope_2d_high_q << "\n"
+         << "   slope_2d_high_q  .......... : " << slope_2d_high_q << "\n"
          << "   slope_2d  ................. : " << slope_2d         << "\n"
+         << "   angle_2d  ................. : " << angle_2d         << "\n"
          << "   eigenvalue_principal  ..... : " << eigenvalue_principal << "\n"
          << "   eigenvalue_secondary  ..... : " << eigenvalue_secondary << "\n"
          << "   multi_hit_wires  .......... : " << multi_hit_wires << "\n"
@@ -148,6 +175,11 @@ namespace cluster {
       std::cout << "  slope_2d is different: "
                 << this -> slope_2d << " vs. "
                 << otherCluster.slope_2d << "\n";
+    }
+    if (this -> angle_2d                 != otherCluster.angle_2d){
+      std::cout << "  angle_2d is different: "
+                << this -> angle_2d << " vs. "
+                << otherCluster.angle_2d << "\n";
     }
     if (this -> eigenvalue_principal     != otherCluster.eigenvalue_principal){
       std::cout << "  eigenvalue_principal is different: "

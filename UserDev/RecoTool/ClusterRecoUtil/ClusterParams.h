@@ -83,6 +83,7 @@ namespace cluster{
     double charge_wgt_y;               ///< Mean of hits along y, charge weighted
     double slope_2d_high_q;           ///< Linear best fit to high-charge hits in the cluster
     double slope_2d;                   ///< The slope of the cluster in this plane
+    double angle_2d;                   ///< The slope of the cluster converted to an angle, in radians
     double opening_angle;              ///< Width of angular distubtion wrt vertx
     double opening_angle_charge_wgt;   ///< Same for charge_wgt
     double closing_angle;              ///< Width of angular distubtion wrt endpoint
@@ -116,6 +117,17 @@ namespace cluster{
     double showerness;                 ///< got heart
     double trackness;                  ///< got soul                                       
     double offaxis_hits;               ///< got brain
+
+
+    /**
+     * @brief set the hits of the params object
+     * @details These functions will convert, if necessary, the hits and
+     * then save them into the params object
+     * 
+     * @param a vector of hits, either pointer to larlite hits, Hit2D
+     */
+
+    int SetHits(const std::vector< Hit2D> & inputHits);
 
     void Clear();
 

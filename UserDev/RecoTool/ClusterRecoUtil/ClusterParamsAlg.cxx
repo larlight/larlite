@@ -6,7 +6,7 @@
 
 namespace cluster{
 
-  void ClusterParamsAlg::FillParams(){
+  void ClusterParamsAlg::FillParams(cluster_params & fParams){
 
     // increase cluster counter by one
     _nClusters += 1;
@@ -39,9 +39,9 @@ namespace cluster{
       _moduleTimes[nmodule] += 1000*localWatch.RealTime();
 
       if (_debug){
-	std::cout << "Listing the changes made by " << module -> name() << ":" << std::endl;
-	fParams.ReportDiff(localCopy);
-	localCopy = fParams;
+        std::cout << "Listing the changes made by " << module -> name() << ":" << std::endl;
+        fParams.ReportDiff(localCopy);
+        localCopy = fParams;
       }
       nmodule += 1;
     }
@@ -51,33 +51,8 @@ namespace cluster{
     // return result;
   }
   
-  int ClusterParamsAlg::SetHits(const std::vector<Hit2D> &){
-    return 0;
-  }
 
-  int ClusterParamsAlg::SetHits(const std::vector< ::larlite::hit> & inputHits){
 
-    fParams.Clear();
-
-    auto geoHelper = larutil::GeometryHelper::GetME();
-
-    UChar_t plane = larutil::Geometry::GetME()->ChannelToPlane(inputHits[0].Channel());
-    std::vector<Hit2D> tempHits;
-    Hit2D temp;
-
-    for (int i = 0; i < inputHits.size(); i++ ){
-      temp.w = inputHits[i].WireID().Wire * geoHelper -> WireToCm();
-      temp.t = inputHits[i].PeakTime() * geoHelper -> TimeToCm();
-      temp.charge = inputHits[i].Integral();
-      temp.plane = plane;
-      tempHits.push_back(temp);
-    }
-
-    fParams.hit_vector = tempHits;
-
-    return tempHits.size();
-
-  }
 
   void ClusterParamsAlg::ReportTimes() const
   {
@@ -86,10 +61,16 @@ namespace cluster{
 
     for (size_t m=0; m < _modules.size(); m++)
       std::cout << "  \033[95m<<" << _modules.at(m)->name() << " Time>>\033[00m  : "
-		<< _moduleTimes[m]/1000. << " [s] ... or "
-		<< 1000.*(_moduleTimes[m]/_nClusters) << " [us/cluster]" << std::endl;
+                << _moduleTimes[m]/1000. << " [s] ... or "
+                << 1000.*(_moduleTimes[m]/_nClusters) << " [us/cluster]" << std::endl;
   }
 
+  ClusterParamsAlg::~ClusterParamsAlg(){
+    // Attempt to safely delete the algs:
+    for(unsigned int i = 0; i < _modules.size(); i ++ ){
+      if (_modules.at(i)) delete _modules.at(i);
+    }
+  }
 
 }    
 
