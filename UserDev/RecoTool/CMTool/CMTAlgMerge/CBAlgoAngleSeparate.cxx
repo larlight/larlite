@@ -18,24 +18,24 @@ namespace cmtool {
   }
 
   //--------------------------------------------------------
-  bool CBAlgoAngleSeparate::Bool(const ::cluster::ClusterParamsAlg &cluster1,
-				 const ::cluster::ClusterParamsAlg &cluster2)
+  bool CBAlgoAngleSeparate::Bool(const ::cluster::cluster_params &cluster1,
+                                 const ::cluster::cluster_params &cluster2)
   //--------------------------------------------------------
   {
 
-    double angle1 = cluster1.GetParams().angle_2d;
-    double angle2 = cluster2.GetParams().angle_2d;
+    double angle1 = cluster1.angle_2d;
+    double angle2 = cluster2.angle_2d;
 
-    double w_start1 = cluster1.GetParams().start_point.w;
-    double t_start1 = cluster1.GetParams().start_point.t;
-    double w_start2 = cluster2.GetParams().start_point.w;
-    double t_start2 = cluster2.GetParams().start_point.t;
+    double w_start1 = cluster1.start_point.w;
+    double t_start1 = cluster1.start_point.t;
+    double w_start2 = cluster2.start_point.w;
+    double t_start2 = cluster2.start_point.t;
 
-    double len1 = cluster1.GetParams().length;
-    double len2 = cluster2.GetParams().length;
+    double len1 = cluster1.length;
+    double len2 = cluster2.length;
     
-    size_t hits1 = cluster1.GetHitVector().size();
-    size_t hits2 = cluster1.GetHitVector().size();
+    size_t hits1 = cluster1.hit_vector.size();
+    size_t hits2 = cluster1.hit_vector.size();
 
     //if either cluster has less than _minHits don't even try...
     if ( (hits1 < _minHits) or (hits2 < _minHits)

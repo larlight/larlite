@@ -16,41 +16,41 @@ namespace cmtool {
   }
 
   //--------------------------------------------------------
-  bool CBAlgoStartNearEnd::Bool(const ::cluster::ClusterParamsAlg &cluster1,
-			const ::cluster::ClusterParamsAlg &cluster2)
+  bool CBAlgoStartNearEnd::Bool(const ::cluster::cluster_params &cluster1,
+                                const ::cluster::cluster_params &cluster2)
   //--------------------------------------------------------
   {
 
-    double start_w1 = cluster1.GetParams().start_point.w;
-    double start_t1 = cluster1.GetParams().start_point.t;
-    double end_w1 = cluster1.GetParams().end_point.w;
-    double end_t1 = cluster1.GetParams().end_point.t;
+    double start_w1 = cluster1.start_point.w;
+    double start_t1 = cluster1.start_point.t;
+    double end_w1 = cluster1.end_point.w;
+    double end_t1 = cluster1.end_point.t;
 
-    double start_w2 = cluster2.GetParams().start_point.w;
-    double start_t2 = cluster2.GetParams().start_point.t;
-    double end_w2 = cluster2.GetParams().end_point.w;
-    double end_t2 = cluster2.GetParams().end_point.t;
+    double start_w2 = cluster2.start_point.w;
+    double start_t2 = cluster2.start_point.t;
+    double end_w2 = cluster2.end_point.w;
+    double end_t2 = cluster2.end_point.t;
 
-    double angle_1 = cluster1.GetParams().opening_angle;
-    double angle_2 = cluster2.GetParams().opening_angle;
+    double angle_1 = cluster1.opening_angle;
+    double angle_2 = cluster2.opening_angle;
 
-    size_t hits_1 = cluster1.GetHitVector().size();
-    size_t hits_2 = cluster2.GetHitVector().size();
+    size_t hits_1 = cluster1.hit_vector.size();
+    size_t hits_2 = cluster2.hit_vector.size();
 
 
     if ( (angle_1 < _maxopeningangle) and (hits_1 > _MinHits) and
-	 ( ((start_w2-end_w1)*(start_w2-end_w1) +
-	    (start_t2-end_t1)*(start_t2-end_t1)) < _separation) ){
+       ( ((start_w2-end_w1)*(start_w2-end_w1) +
+          (start_t2-end_t1)*(start_t2-end_t1)) < _separation) ){
       if (_verbose)
-	std::cout << "Start in End!" << std::endl;
+      std::cout << "Start in End!" << std::endl;
       return true;
     }
 
     if ( (angle_2 < _maxopeningangle) and (hits_2 > _MinHits) and
-	 ( ((start_w1-end_w2)*(start_w1-end_w2) +
-	    (start_t1-end_t2)*(start_t1-end_t2)) < _separation) ){
+       ( ((start_w1-end_w2)*(start_w1-end_w2) +
+          (start_t1-end_t2)*(start_t1-end_t2)) < _separation) ){
       if (_verbose)
-	std::cout << "Start in End!" << std::endl;
+      std::cout << "Start in End!" << std::endl;
       return true;
     }
 
