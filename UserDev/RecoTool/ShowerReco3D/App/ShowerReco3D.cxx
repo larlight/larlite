@@ -27,7 +27,7 @@ namespace larlite {
 
     // Retrieve clusters and fed into the algorithm
     std::vector<std::vector<larutil::PxHit> > local_clusters;
-    fCRUHelper.GeneratePxHit(storage,fInputProducer,local_clusters);
+    fCRUHelper.GenerateHit2D(storage,fInputProducer,local_clusters);
 
     // Create output data product holder
     auto shower_v = storage->get_data<event_shower>(fOutputProducer);
