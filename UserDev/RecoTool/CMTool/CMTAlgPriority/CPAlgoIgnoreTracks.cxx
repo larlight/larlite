@@ -2,6 +2,7 @@
 #define RECOTOOL_CPALGOIGNORETRACKS_CXX
 
 #include "CPAlgoIgnoreTracks.h"
+#include "TMath.h"
 
 namespace cmtool {
 
@@ -25,11 +26,11 @@ namespace cmtool {
   }
 
   //------------------------------------------------------------------------------
-  float CPAlgoIgnoreTracks::Priority(const ::cluster::ClusterParamsAlg &cluster)
+  float CPAlgoIgnoreTracks::Priority(const ::cluster::cluster_params &cluster)
   //------------------------------------------------------------------------------
   {
     //return -1 for tracks, otherwise return nhits
-    auto nhit = cluster.GetNHits();
+    auto nhit = cluster.hit_vector.size();
     
     //NOTE! default return value for non-track clusters is nhits
     //but if you want to sort by a different way, use a separate
@@ -46,14 +47,14 @@ namespace cmtool {
   }
     
 
-  bool CPAlgoIgnoreTracks::IsTrack(const ::cluster::ClusterParamsAlg &cluster)
+  bool CPAlgoIgnoreTracks::IsTrack(const ::cluster::cluster_params &cluster)
   {
-    double fPrincipal = TMath::Log(1-cluster.GetParams().eigenvalue_principal);
+    double fPrincipal = TMath::Log(1-cluster.eigenvalue_principal);
 
     bool isTrack = false;
-    if(//cluster.GetNHits() > _min_hits &&
-       cluster.GetParams().modified_hit_density < _min_mod_hit_dens ||
-       cluster.GetParams().multi_hit_wires < _min_multihit_wires ||
+    if(//cluster.hit_vector.size() > _min_hits &&
+       cluster.modified_hit_density < _min_mod_hit_dens ||
+       cluster.multi_hit_wires < _min_multihit_wires ||
        fPrincipal < _min_principal)
       isTrack = true;
 
