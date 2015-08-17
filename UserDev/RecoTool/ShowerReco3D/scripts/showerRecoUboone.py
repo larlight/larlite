@@ -36,7 +36,7 @@ def getShowerRecoAlgModular():
   # 3D Axis Module:
   axis3D = showerreco.Axis3DModule()
   axis3D.setMaxIterations(50)
-  axis3D.setNStepsMin(7)
+  axis3D.setNStepsMin(10)
   axis3D.setTargetError(0.00001)
 
   alg.AddShowerRecoModule(axis3D                           )
@@ -133,7 +133,7 @@ print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
-my_proc.run(0,1000)
+my_proc.run(0,5)
 # my_proc.process_event(2)
 
 
