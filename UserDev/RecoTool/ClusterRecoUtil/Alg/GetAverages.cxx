@@ -85,6 +85,10 @@ namespace cluster {
     cluster.principal_dir[1] = (* fPrincipal.GetEigenVectors())[1][0];
     cluster.slope_2d = cluster.principal_dir[1] / cluster.principal_dir[0];
 
+    // By request, save the angle too:
+    cluster.angle_2d = atan(cluster.slope_2d);
+
+
     double rmsx = 0.0;
     double rmsy = 0.0;
     double rmsq = 0.0;
