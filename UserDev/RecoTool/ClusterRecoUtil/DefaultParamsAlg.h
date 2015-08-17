@@ -39,7 +39,7 @@ namespace cluster {
     DefaultParamsAlg();
 
     /// Default destructor
-    ~DefaultParamsAlg();
+    ~DefaultParamsAlg(){}
 
   };
 
