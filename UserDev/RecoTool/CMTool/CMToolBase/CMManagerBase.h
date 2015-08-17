@@ -20,6 +20,8 @@
 
 #include "CPriorityAlgoBase.h"
 #include "TStopwatch.h"
+#include "ClusterRecoUtil/DefaultParamsAlg.h"
+#include "ClusterRecoUtil/ClusterParams.h"
 
 namespace cmtool {
 
@@ -68,7 +70,7 @@ namespace cmtool {
     void MergeTillConverge(bool doit=true) {_merge_till_converge = doit;}
 
     /// A simple method to add a cluster
-    void SetClusters(const std::vector<std::vector<larutil::PxHit> > &clusters);
+    void SetClusters(const std::vector<std::vector<Hit2D> > &clusters);
 
     /// A simple method to add a cluster
     void SetClusters(const std::vector<::cluster::cluster_params> &clusters);
@@ -119,6 +121,9 @@ namespace cmtool {
 
     /// Input clusters
     std::vector<::cluster::cluster_params> _in_clusters;
+
+    /// Cluster Params Filler:
+    ::cluster::DefaultParamsAlg _params_alg;
 
     /// Priority algorithm
     ::cmtool::CPriorityAlgoBase* _priority_algo;
