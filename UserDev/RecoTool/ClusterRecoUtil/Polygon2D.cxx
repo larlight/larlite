@@ -321,3 +321,28 @@ void Polygon2D::UntanglePolygon()
   }//first loop
 
 }
+
+bool operator==(const Polygon2D& lhs, const Polygon2D& rhs){
+  return lhs.vertices == rhs.vertices;
+}
+
+bool operator!=(const Polygon2D& lhs, const Polygon2D& rhs){
+  return !(lhs == rhs);
+}
+
+std::ostream &operator<<(std::ostream &out, Polygon2D poly){
+
+  if (poly.vertices.size( )== 0){
+    out << "(NULL POLYGON)";
+    return out;
+  }
+
+  for (unsigned int i = 0; i < poly.vertices.size(); ++i)
+  {
+    out << "(" << poly.vertices.at(i).first << ", " << poly.vertices.at(i).second << ")";
+    if (i != poly.vertices.size() -1 )
+      out << ", ";
+  }
+
+  return out;
+}

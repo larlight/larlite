@@ -63,6 +63,11 @@ class Polygon2D{
   /// untangle polygon
   void UntanglePolygon();
 
+  friend bool operator==(const Polygon2D& lhs, const Polygon2D& rhs);
+  friend bool operator!=(const Polygon2D& lhs, const Polygon2D& rhs);
+  friend std::ostream &operator<<(std::ostream &out, Polygon2D poly);     //output
+
+
 private:
 
   /// vector listing the polygon edges
@@ -75,6 +80,8 @@ private:
   bool PolyOverlapSegments(const Polygon2D &poly2) const;
 
 };
+
+
 /** @} */ // end of doxygen group
 
 #endif
