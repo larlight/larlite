@@ -32,16 +32,16 @@ namespace cluster {
     for(size_t i=0; i < hits.size(); i++){
       // distance to start point:
       double distSq = ( (hits[i].w-cluster.start_point.w)*(hits[i].w-cluster.start_point.w) +
-			(hits[i].t-cluster.start_point.t)*(hits[i].t-cluster.start_point.t) );
+                        (hits[i].t-cluster.start_point.t)*(hits[i].t-cluster.start_point.t) );
 
       if ( distSq < 25 ){
-	// check that the point is towards the shower direction (and not backwards)
-	// this assumes we have got the right direction
-	// the full cosine is not necessary. All we need is the sign.
-	// so we just use the numerator from "GetCosAngleBetweenLines" function in GeometryHelper
-	// for 3 points
-	if ( ( (hits[i].w-start.w)*(end.w-start.w) + (hits[i].t-start.t)*(end.t-start.t) ) > 0 ) 
-	  hitmap.insert(std::pair<double,size_t>(distSq,i));
+        // check that the point is towards the shower direction (and not backwards)
+        // this assumes we have got the right direction
+        // the full cosine is not necessary. All we need is the sign.
+        // so we just use the numerator from "GetCosAngleBetweenLines" function in GeometryHelper
+        // for 3 points
+        if ( ( (hits[i].w-start.w)*(end.w-start.w) + (hits[i].t-start.t)*(end.t-start.t) ) > 0 ) 
+          hitmap.insert(std::pair<double,size_t>(distSq,i));
       }
     }
 
@@ -58,13 +58,13 @@ namespace cluster {
       //std::cout << "this hit's charge: : " << (it+1)->first << std::endl;
     }
     for (size_t n=0; n < hitmap.size()-2; n++){
-      std::cout << "points: " << hitmap[n] << ", " << hitmap[n+1] << ", " << hitmap[n+2] << std::endl;
+      if (_verbose) std::cout << "points: " << hitmap[n] << ", " << hitmap[n+1] << ", " << hitmap[n+2] << std::endl;
       double cos = geomHelper->GetCosAngleBetweenLines(hits[hitmap[n]],hits[hitmap[n+1]],
-						       hits[hitmap[n+1]],hits[hitmap[n+2]]);
+                                                       hits[hitmap[n+1]],hits[hitmap[n+2]]);
       if (cos > 0.7)
-      	showering_start = hits[hitmap[n+2]];
+        showering_start = hits[hitmap[n+2]];
       else
-	break;
+        break;
       nPoints += 1;
     }
 
