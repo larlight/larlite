@@ -41,7 +41,7 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------------------------------------
-  float CFAlgoShowerCompat::Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters)
+  float CFAlgoShowerCompat::Float(const std::vector<const cluster::cluster_params*> &clusters)
   //----------------------------------------------------------------------------------------------
   {
     _o_ang_avg = 0;
@@ -62,21 +62,21 @@ namespace cmtool {
     double max_OA_wt = -99999.;
     for(auto const& c : clusters){
       //      PrintClusterInfo(*c);
-      double this_OA = c->GetParams().opening_angle;
+      double this_OA = c->opening_angle;
       if(this_OA > max_OA) max_OA = this_OA;
       if(this_OA < min_OA) min_OA = this_OA;
-      double this_OA_wt = c->GetParams().opening_angle_charge_wgt;
+      double this_OA_wt = c->opening_angle_charge_wgt;
       if(this_OA_wt > max_OA) max_OA_wt = this_OA_wt;
       if(this_OA_wt < min_OA) min_OA_wt = this_OA_wt;
-      double this_trackness = c->GetParams().trackness;
+      double this_trackness = c->trackness;
       if(this_trackness > _max_trackness) _max_trackness = this_trackness;
-      double this_L_over_W = c->GetParams().length / c->GetParams().width;
+      double this_L_over_W = c->length / c->width;
       if(this_L_over_W > _max_len_over_width) _max_len_over_width = this_L_over_W;
-      double this_OA_over_L = this_OA/c->GetParams().length;
+      double this_OA_over_L = this_OA/c->length;
       if(this_OA_over_L < _min_oa_over_len) _min_oa_over_len = this_OA_over_L;
-      double this_poly_perim_over_A = c->GetParams().PolyObject.Perimeter()/c->GetParams().PolyObject.Area();
+      double this_poly_perim_over_A = c->PolyObject.Perimeter()/c->PolyObject.Area();
       if(this_poly_perim_over_A > _max_poly_perim_over_A) _max_poly_perim_over_A=this_poly_perim_over_A;
-      double this_modhitdens = c->GetParams().modified_hit_density;
+      double this_modhitdens = c->modified_hit_density;
       if(this_modhitdens < _min_modhitdens) _min_modhitdens = this_modhitdens;
     }
   
@@ -103,10 +103,10 @@ namespace cmtool {
 
   }
 
-  void CFAlgoShowerCompat::PrintClusterInfo(const cluster::ClusterParamsAlg &c){
+  void CFAlgoShowerCompat::PrintClusterInfo(const cluster::cluster_params &c){
     std::cout<<"    This cluster's info is as follows:"<<std::endl;
-    std::cout<<"        Opening Angle: "<<c.GetParams().opening_angle<<std::endl;
-    //    std::cout<<"        Opening Angle Charge Weight: "<<c.GetParams().opening_angle_charge_wgt<<std::endl;
+    std::cout<<"        Opening Angle: "<<c.opening_angle<<std::endl;
+    //    std::cout<<"        Opening Angle Charge Weight: "<<c.opening_angle_charge_wgt<<std::endl;
 
   }
 }

@@ -20,7 +20,7 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------------------------------------
-  float CFAlgoZOverlap::Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters)
+  float CFAlgoZOverlap::Float(const std::vector<const cluster::cluster_params*> &clusters)
   //----------------------------------------------------------------------------------------------
   {
 
@@ -50,15 +50,15 @@ namespace cmtool {
 
 		//...start_point.w in planes 0 and 1 returns a distance in slanted wire space (perp to slanted wires).
 		//Rotate this to properly compare to the other planes
-		if(c->Plane() !=2){
-				start_w  	= 0.5* c->GetParams().start_point.w ;
-				end_w		= 0.5* c->GetParams().end_point.w  ;
+		if(c->plane_id.Plane !=2){
+				start_w  	= 0.5* c->start_point.w ;
+				end_w		= 0.5* c->end_point.w  ;
 				wire_distance 	= end_w - start_w 	;
 				}
 			else {			
-				start_w  	=  c->GetParams().start_point.w ;
-				end_w		=  c->GetParams().end_point.w  ;
-				wire_distance   = c->GetParams().end_point.w - c->GetParams().start_point.w ;
+				start_w  	=  c->start_point.w ;
+				end_w		=  c->end_point.w  ;
+				wire_distance   = c->end_point.w - c->start_point.w ;
 				}
 
 			if(wire_distance < 0)
@@ -66,7 +66,7 @@ namespace cmtool {
 	
 			if(max_wire_distance < wire_distance){
 				max_wire_distance = wire_distance;
-				max_plane 	=	c->Plane();		
+				max_plane 	=	c->plane_id.Plane;		
 				max_start_w =	start_w ;
 				max_end_w	=	end_w ;
 			   }
@@ -78,15 +78,15 @@ namespace cmtool {
 
  	for(auto const& c : clusters){
 			
-		if(c->Plane() !=2){
-			start_w  	= 0.5* c->GetParams().start_point.w ;
-			end_w		= 0.5* c->GetParams().end_point.w  ;
+		if(c->plane_id.Plane !=2){
+			start_w  	= 0.5* c->start_point.w ;
+			end_w		= 0.5* c->end_point.w  ;
 			wire_distance 	= end_w - start_w 	;
 	  	  }
 		else{
-			start_w  	=  c->GetParams().start_point.w ;
-			end_w		=  c->GetParams().end_point.w  ;
-			wire_distance   = c->GetParams().end_point.w - c->GetParams().start_point.w ;
+			start_w  	=  c->start_point.w ;
+			end_w		=  c->end_point.w  ;
+			wire_distance   = c->end_point.w - c->start_point.w ;
 			}
 
 		if(wire_distance < 0)
@@ -98,7 +98,7 @@ namespace cmtool {
 			ratio *=0.1 ;	
 	
 		if(_verbose && ratio > _wire_ratio_cut){
-			std::cout<<"\nThe wire distance for cluster in plane "<<c->Plane()<<" is: "<<wire_distance <<std::endl;
+			std::cout<<"\nThe wire distance for cluster in plane "<<c->plane_id.Plane<<" is: "<<wire_distance <<std::endl;
 			std::cout<<"Max wire disatance is: "<<max_wire_distance<<std::endl ;	
 			std::cout<<"Ratio is: "<<ratio<<std::endl;
 			std::cout<<"Start and end points: "<<start_w<<",  "<<end_w<<std::endl;
