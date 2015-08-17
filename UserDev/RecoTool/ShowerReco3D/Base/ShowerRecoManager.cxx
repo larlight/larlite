@@ -2,6 +2,7 @@
 #define SHOWERRECOMANAGER_CXX
 
 #include "ShowerRecoManager.h"
+#include "LArUtil/Geometry.h"
 
 namespace showerreco {
 
