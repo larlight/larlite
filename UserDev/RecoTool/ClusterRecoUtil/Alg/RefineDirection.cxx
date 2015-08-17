@@ -29,10 +29,10 @@ namespace cluster {
     this_endPoint   = cluster.end_point;
 
     if(verbose) {
-    std::cout << "Angle: Start point: (" << this_startPoint.w 
-              << ", " << this_startPoint.t << ")\n";
-    std::cout << "Angle: End point  : (" << this_endPoint.w   
-              << ", " << this_endPoint.t << ")\n";
+      std::cout << "Angle: Start point: (" << this_startPoint.w 
+                << ", " << this_startPoint.t << ")\n";
+      std::cout << "Angle: End point  : (" << this_endPoint.w   
+                << ", " << this_endPoint.t << ")\n";
     }
 
     double endStartDiff_x = (this_endPoint.w - this_startPoint.w);
@@ -96,9 +96,9 @@ namespace cluster {
       
       // figure out if in 1st or 2nd half of cluster
       if ( (lineDist*2) > clusterLength )
-	Q_end   += weight;
+        Q_end   += weight;
       else
-	Q_begin += weight;
+        Q_begin += weight;
       
       //skip this hit if below minimum cutoff param
       if(hit.charge < _Qmin) continue;
@@ -148,13 +148,13 @@ namespace cluster {
       if (N_bins_CLOSE < 0) N_bins_CLOSE = 0;
 
       if (_verbose){
-	std::cout << "endStartDiff_x :" << endStartDiff_x
-		  << "endStartDiff_y :" << endStartDiff_y
-		  << "cosangle_start :" << cosangle_start
-		  << "cosangle_end   :" << cosangle_end
-		  << "N_bins_OPEN    :" << N_bins_OPEN
-		  << "N_bins_CLOSE   :" << N_bins_CLOSE
-		  << std::endl; 
+        std::cout << "endStartDiff_x :" << endStartDiff_x << "\n"
+                  << "endStartDiff_y :" << endStartDiff_y << "\n"
+                  << "cosangle_start :" << cosangle_start << "\n"
+                  << "cosangle_end   :" << cosangle_end << "\n"
+                  << "N_bins_OPEN    :" << N_bins_OPEN << "\n"
+                  << "N_bins_CLOSE   :" << N_bins_CLOSE << "\n"
+                  << std::endl; 
       }
 
       opening_angle_chargeWgt_bin[N_bins_OPEN ] 
@@ -219,14 +219,14 @@ namespace cluster {
     double closing_angle_charge_wgt = nBin * PI /_Nbins ;
 
     if (_verbose){
-      std::cout<<"opening angle: "<<opening_angle
-	       <<"closing angle: "<<closing_angle
-	       <<"opening high charge angle: "<<opening_angle_highcharge
-	       <<"closing high charge angle: "<<closing_angle_highcharge
-	       <<"opening high charge wgt  : "<<opening_angle_charge_wgt
-	       <<"closing high charge wgt  : "<<closing_angle_charge_wgt
-	       <<"fCoarseChargeProfile     : "<<Q_begin
-	       << ", " << Q_end << std::endl;
+      std::cout<<"opening angle: "<<opening_angle << "\n"
+               <<"closing angle: "<<closing_angle << "\n"
+               <<"opening high charge angle: "<<opening_angle_highcharge << "\n"
+               <<"closing high charge angle: "<<closing_angle_highcharge << "\n"
+               <<"opening high charge wgt  : "<<opening_angle_charge_wgt << "\n"
+               <<"closing high charge wgt  : "<<closing_angle_charge_wgt << "\n"
+               <<"fCoarseChargeProfile     : "<<Q_begin << "\n"
+               <<"Q_end                    : " << Q_end << std::endl;
     }
 
     double value_1 = closing_angle/opening_angle -1;
@@ -239,10 +239,10 @@ namespace cluster {
     double value_3 = closing_angle_charge_wgt/opening_angle_charge_wgt -1;
 
     if (_verbose){
-      std::cout << "value_1 : " << value_1
-		<< "value_2 : " << value_2
-		<< "value_3 : " << value_3
-		<< std::endl;
+      std::cout << "value_1 : " << value_1 << "\n"
+                << "value_2 : " << value_2 << "\n"
+                << "value_3 : " << value_3 << "\n"
+                << std::endl;
     }
 
     // Using a sigmoid function to determine flipping.
