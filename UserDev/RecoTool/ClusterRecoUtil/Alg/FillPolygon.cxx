@@ -30,7 +30,7 @@ namespace cluster {
       }
       cluster.PolyObject = Polygon2D( vertices );
     }
-    
+
     return;
   }
   

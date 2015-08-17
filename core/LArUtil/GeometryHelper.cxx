@@ -229,6 +229,54 @@ namespace larutil {
     return 0;   
   }
 
+  double GeometryHelper::GetCosAngleBetweenLines(const double& s1, const double& s2) const
+  {
+
+    double den = sqrt(1+s1*s1) + sqrt(1+s2*s2);
+    return (s1*s2+1)/den;
+  }
+
+  double GeometryHelper::GetCosAngleBetweenLines(const Point2D& p1, const Point2D& p2, const Point2D& p3) const
+    {
+
+      if ( ( (p1.w == p2.w) and (p1.t == p2.t) ) or
+	   ( (p1.w == p3.w) and (p1.t == p3.t) ) )
+	throw LArUtilException("Trying to calculate dot-product using a zero-length vector!");
+
+      double den = ( sqrt( (p2.w-p1.w)*(p2.w-p1.w) + (p2.t-p1.t)*(p2.t-p1.t) ) +
+		     sqrt( (p3.w-p1.w)*(p3.w-p1.w) + (p3.t-p1.t)*(p3.t-p1.t) ) );
+
+      return ( (p2.w-p1.w)*(p3.w-p1.w) + (p2.t-p1.t)*(p3.t-p1.t) ) / den;
+    }
+
+
+  double GeometryHelper::GetCosAngleBetweenLines(const Point2D& p1, const Point2D& p2,
+				   const Point2D& p3, const Point2D& p4) const
+    {
+
+      if ( ( (p1.w == p2.w) and (p1.t == p2.t) ) or
+	   ( (p4.w == p3.w) and (p4.t == p3.t) ) )
+	throw LArUtilException("Trying to calculate dot-product using a zero-length vector!");
+
+      double den = ( sqrt( (p2.w-p1.w)*(p2.w-p1.w) + (p2.t-p1.t)*(p2.t-p1.t) ) +
+		     sqrt( (p4.w-p3.w)*(p4.w-p3.w) + (p4.t-p3.t)*(p4.t-p3.t) ) );
+
+      return ( (p2.w-p1.w)*(p4.w-p3.w) + (p2.t-p1.t)*(p4.t-p3.t) ) / den;
+    }
+
+  double GeometryHelper::GetTanAngleBetweenLines(const double& s1, const double& s2) const
+  {
+
+    // see this: http://planetmath.org/anglebetweentwolines
+
+    // if the slopes are the same -> the angle is 0
+    // if slope1 * slope2 == -1 -> perpendicular lines -> 90 degrees
+    if (s1*s2 == -1)
+      return kDOUBLE_MAX;
+
+    return (s1-s2)/(1+s1*s2);
+  }
+
 
   void GeometryHelper::SelectPolygonHitList(const std::vector<Hit2D> &inputHits,
                                             std::vector <const Hit2D*> &edgeHits,
@@ -254,7 +302,7 @@ namespace larutil {
     edgeHits.clear();
     
     // determine the plane for this cluster (assumes all hits from the same cluster)
-    unsigned char plane = (*inputHits.begin()).plane;
+    unsigned char plane = (inputHits[0]).plane;
 
     // Define subset of hits to define polygon
     std::map<double,const Hit2D*> hitmap;
@@ -291,9 +339,10 @@ namespace larutil {
          ordered_hits.at(index)->t > time_max ||
          ordered_hits.at(index)->w > wire_max ) {
 
-        throw LArUtilException(Form("Invalid wire/time (%g,%g) ... range is (0=>%g,0=>%g)",
+        throw LArUtilException(Form("Invalid wire/time (%g,%g) for plane %i ... range is (0=>%g,0=>%g)",
                                     ordered_hits.at(index)->w,
                                     ordered_hits.at(index)->t,
+				    plane,
                                     wire_max,
                                     time_max)
                                );
