@@ -35,7 +35,8 @@ namespace cluster{
     for (auto & module : _modules){
       
       localWatch.Start();
-      module -> do_params_fill(fParams, _verbose);
+      if (_verbose) module -> SetVerbose();
+      module -> do_params_fill(fParams);
       _moduleTimes[nmodule] += 1000*localWatch.RealTime();
 
       if (_debug){

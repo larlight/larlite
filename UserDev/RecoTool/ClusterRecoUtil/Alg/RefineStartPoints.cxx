@@ -17,7 +17,7 @@ namespace cluster {
    * direction
    * @param override [description]
    */
-  void RefineStartPoints::do_params_fill(cluster_params & cluster, bool verbose) {
+  void RefineStartPoints::do_params_fill(cluster_params & cluster) {
  
     // need to define physical direction with opening angles and pass that to Ryan's line finder.
     
@@ -69,7 +69,7 @@ namespace cluster {
 
     
     if(!(subhit.size()) || subhit.size()<3) {
-      if(verbose) 
+      if(_verbose) 
         std::cout<<"Subhit list is empty or too small. Using rough start/end points..."<<std::endl;      
       return;
     }
@@ -161,7 +161,7 @@ namespace cluster {
     
     if(vs.size()==0)   //al hits on same wire?!
     {
-      if(verbose) std::cout<<"vertil list is empty. all subhits are on the same wire?"<<std::endl;      
+      if(_verbose) std::cout<<"vertil list is empty. all subhits are on the same wire?"<<std::endl;      
       return;
     }
     //need to find the min of the distance of vertex in tilda-space

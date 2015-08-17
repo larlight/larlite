@@ -42,7 +42,7 @@ namespace cluster {
      */
     std::string name(){return _name;}
 
-    virtual void do_params_fill(cluster_params &, bool verbose) = 0;
+    virtual void do_params_fill(cluster_params &) = 0;
 
     void SetVerbose(bool on=true) { _verbose = on; }
 

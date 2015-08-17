@@ -34,7 +34,7 @@ namespace cluster {
     /// Default destructor
     ~FillPolygon(){}
 
-    void do_params_fill(cluster_params &, bool verbose = false);
+    void do_params_fill(cluster_params &);
 
     /**
      * @brief Set fraction of charge that needs to be enclosed by polygon

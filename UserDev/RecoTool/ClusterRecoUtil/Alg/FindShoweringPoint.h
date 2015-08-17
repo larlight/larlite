@@ -34,7 +34,7 @@ namespace cluster {
     /// Default destructor
     ~FindShoweringPoint(){}
 
-    void do_params_fill(cluster_params &, bool verbose = false);
+    void do_params_fill(cluster_params &);
 
   private:
 

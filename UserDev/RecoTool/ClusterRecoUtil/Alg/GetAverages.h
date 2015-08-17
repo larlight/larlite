@@ -52,7 +52,7 @@ namespace cluster {
        slope_2d
        slope_2d_high_q
       */
-    void do_params_fill(cluster_params &, bool verbose = false);
+    void do_params_fill(cluster_params &);
 
   };
 

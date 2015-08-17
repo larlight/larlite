@@ -34,7 +34,7 @@ namespace cluster {
     /// Default destructor
     ~GetRoughStartPoint(){}
 
-    void do_params_fill(cluster_params &, bool verbose = false);
+    void do_params_fill(cluster_params &);
 
     /**
      * @brief Set Number of Hits to consider for angle calculation
