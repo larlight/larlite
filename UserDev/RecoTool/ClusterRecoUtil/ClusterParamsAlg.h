@@ -36,26 +36,17 @@ namespace cluster{
     ClusterParamsAlg(){_nClusters=0;}
 
     /// Default destructor
-    ~ClusterParamsAlg(){}
+    ~ClusterParamsAlg();
 
     void attachAlg(ParamsAlgBase * alg){_modules.push_back(alg); _moduleTimes.push_back(0); }
 
-    void FillParams();
+    void FillParams(cluster_params &);
 
-    /**
-     * @brief set the hits of the params object
-     * @details These functions will convert, if necessary, the hits and
-     * then save them into the params object
-     * 
-     * @param a vector of hits, either pointer to larlite hits, Hit2D
-     */
-    int SetHits(const std::vector<Hit2D> &);
-    int SetHits(const std::vector< ::larlite::hit> &);
+
 
     void SetVerbose(bool yes=true){ _verbose = yes;}
     void SetDebug(bool yes=true)  { _debug = yes;}
 
-    cluster_params GetParams() { return fParams; }
 
     /**
      * @brief Report average time spent per algorithm
@@ -76,7 +67,6 @@ namespace cluster{
     bool _verbose;
     bool _debug;
 
-    cluster_params fParams;
 
   };
 

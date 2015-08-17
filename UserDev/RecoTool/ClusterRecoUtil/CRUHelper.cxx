@@ -2,48 +2,50 @@
 #define RECOTOOL_CRUHELPER_CXX
 
 #include "CRUHelper.h"
+#include "LArUtil/Geometry.h"
+#include "LArUtil/GeometryHelper.h"
 
 namespace cluster {
 
   /// Generate: from 1 set of hits => 1 CPAN using indexes (association)
-  void CRUHelper::GenerateCPAN(const std::vector<unsigned int>& hit_index,
+  void CRUHelper::GenerateParams(const std::vector<unsigned int>& hit_index,
 			       const ::larlite::event_hit* hits,
-			       ClusterParamsAlg &cpan) const
+			       cluster_params &params) const
   {
-    std::vector<larutil::PxHit> pxhits;
-    GeneratePxHit(hit_index,hits,pxhits);
-    cpan.SetHits(pxhits);
+    std::vector<Hit2D> hits2d;
+    GenerateHit2D(hit_index,hits,hits2d);
+    params.SetHits(hits2d);
   }
   
   /// Generate: CPAN vector from event storage by specifying cluster type
-  void CRUHelper::GenerateCPAN(::larlite::storage_manager* storage,
+  void CRUHelper::GenerateParams(::larlite::storage_manager* storage,
 				const std::string &cluster_producer_name,
-			       std::vector<cluster::ClusterParamsAlg> &cpan_v) const
+			       std::vector<cluster::cluster_params> &params_v) const
   {
-    std::vector<std::vector<larutil::PxHit> > pxhits_v;
-    GeneratePxHit(storage,cluster_producer_name,pxhits_v);
-    cpan_v.clear();
-    cpan_v.resize(pxhits_v.size(),ClusterParamsAlg());
+    std::vector<std::vector<Hit2D> > hits2d_v;
+    GenerateHit2D(storage,cluster_producer_name,hits2d_v);
+    params_v.clear();
+    params_v.resize(hits2d_v.size(),cluster_params());
 
-    for(size_t i=0; i<pxhits_v.size(); ++i)
+    for(size_t i=0; i<hits2d_v.size(); ++i)
 
-      cpan_v.at(i).SetHits(pxhits_v.at(i));
+      params_v.at(i).SetHits(hits2d_v.at(i));
 
   }
   
-  /// Generate: from 1 set of hits => 1 set of PxHits using indexes (association)
-  void CRUHelper::GeneratePxHit(const std::vector<unsigned int>& hit_index,
+  /// Generate: from 1 set of hits => 1 set of Hit2D using indexes (association)
+  void CRUHelper::GenerateHit2D(const std::vector<unsigned int>& hit_index,
 				const ::larlite::event_hit* hits,
-				std::vector<larutil::PxHit> &pxhits) const
+				std::vector<Hit2D> &hits2d) const
   {
 
     if(!(hit_index.size())) throw CRUException(Form("Hit list empty! (%s)",__FUNCTION__));
     
-    pxhits.clear();
-    pxhits.reserve(hit_index.size());
+    hits2d.clear();
+    hits2d.reserve(hit_index.size());
 
     auto geo  = ::larutil::Geometry::GetME();
-    auto geou = ::larutil::GeometryUtilities::GetME();
+    auto geoH = ::larutil::GeometryHelper::GetME();
 
     UChar_t plane = geo->ChannelToPlane(hits->at(hit_index.at(0)).Channel());
 
@@ -51,27 +53,27 @@ namespace cluster {
       
       auto const& hit = hits->at(index);
 
-      ::larutil::PxHit h;
+      ::Hit2D h;
 
-      h.t = hit.PeakTime()    * geou->TimeToCm();
-      h.w = hit.WireID().Wire * geou->WireToCm();
+      h.t = hit.PeakTime()    * geoH->TimeToCm();
+      h.w = hit.WireID().Wire * geoH->WireToCm();
 
       h.charge = hit.Integral();
       h.peak   = hit.PeakAmplitude();
       h.plane  = plane;
 
-      pxhits.push_back(h);
+      hits2d.push_back(h);
     }      
 
   }
   
   /// Generate: vector of PxHit sets from event storage by specifying cluster type
-  void CRUHelper::GeneratePxHit(::larlite::storage_manager* storage,
+  void CRUHelper::GenerateHit2D(::larlite::storage_manager* storage,
 				const std::string &cluster_producer_name,
-				std::vector<std::vector<larutil::PxHit> > &pxhits_v) const
+				std::vector<std::vector<Hit2D> > &hits2d_v) const
   {
 
-    pxhits_v.clear();
+    hits2d_v.clear();
 
     auto ev_cluster = storage->get_data< ::larlite::event_cluster>(cluster_producer_name);
     
@@ -90,7 +92,7 @@ namespace cluster {
     if (!hit_index_v.size())
       throw CRUException(Form("Size 0 associated hits to clusters by %s!", cluster_producer_name.c_str()) );
 
-    pxhits_v.reserve(ev_cluster->size());
+    hits2d_v.reserve(ev_cluster->size());
 
     for(size_t i=0; i<ev_cluster->size(); ++i) {
 
@@ -98,11 +100,11 @@ namespace cluster {
 
       auto &hit_index = hit_index_v[i];
 
-      std::vector<larutil::PxHit> pxhits;
+      std::vector<Hit2D> hits2d;
 
-      GeneratePxHit(hit_index, ev_hits, pxhits);
+      GenerateHit2D(hit_index, ev_hits, hits2d);
 
-      pxhits_v.push_back(pxhits);
+      hits2d_v.push_back(hits2d);
 
     }
 
@@ -140,9 +142,9 @@ namespace cluster {
 
       auto &hit_index = ass[i];
 
-      std::vector<larutil::PxHit> pxhits;
+      std::vector<Hit2D> pxhits;
 
-      GeneratePxHit(hit_index, ev_hits, pxhits);
+      GenerateHit2D(hit_index, ev_hits, pxhits);
 
       pxhits_v.push_back(pxhits);
 
