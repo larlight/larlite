@@ -33,6 +33,7 @@ namespace cluster {
   void cluster_params::Clear(){
       start_point.Clear();
       end_point.Clear();
+      showering_point.Clear();
       sum_charge                        = kDOUBLE_MIN ;
       mean_charge                       = kDOUBLE_MIN ;
       mean_x                            = kDOUBLE_MIN ;
@@ -73,6 +74,7 @@ namespace cluster {
       os << "ClusterParams report: \n"
          << "   start_point  ................ : (" << start_point.w <<","<<start_point.t<<")\n"
          << "   end_point  .................. : (" << end_point.w <<","<<end_point.t<<")\n"
+         << "   showering_point  ............ : (" << showering_point.w <<","<<showering_point.t<<")\n"
          << "   sum_charge  ................. : "<< sum_charge << "\n"
          << "   mean_charge   ............. : " << mean_charge << "\n"
          << "   mean_x  ................... : " << mean_x << "\n"
@@ -124,6 +126,13 @@ namespace cluster {
       std::cout << "  end_point is different: " 
                 << "(" << this->end_point.w << ", " << this->end_point.t << ") vs. "
                 << "(" << otherCluster.end_point.w << ", " << otherCluster.end_point.t << ")\n";
+    }
+
+    if (this -> showering_point.w != otherCluster.showering_point.w ||
+        this -> showering_point.t != otherCluster.showering_point.t ){
+      std::cout << "  showering_point is different: " 
+                << "(" << this->showering_point.w << ", " << this->showering_point.t << ") vs. "
+                << "(" << otherCluster.showering_point.w << ", " << otherCluster.showering_point.t << ")\n";
     }
 
     if (this -> sum_charge               != otherCluster.sum_charge){

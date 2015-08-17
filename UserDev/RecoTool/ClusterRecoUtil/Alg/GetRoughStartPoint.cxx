@@ -3,6 +3,7 @@
 
 #include "GetRoughStartPoint.h"
 #include "CRUException.h"
+#include "LArUtil/GeometryHelper.h"
 #include <map>
 #include <iomanip>
 
