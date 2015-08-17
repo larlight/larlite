@@ -45,7 +45,7 @@ namespace cluster {
 
     /// Fraction of cluster charge that needs to be included in the polygon
     double _frac;
-
+    
   };
 
 } // cluster
