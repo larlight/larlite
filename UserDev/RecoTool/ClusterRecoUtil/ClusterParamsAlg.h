@@ -19,6 +19,7 @@
 #include "ClusterParams.h"
 #include "Alg/ParamsAlgBase.h"
 #include "DataFormat/hit.h"
+#include "TStopwatch.h"
 
 namespace cluster{
 
@@ -32,12 +33,12 @@ namespace cluster{
   public:
 
     /// Default constructor
-    ClusterParamsAlg(){}
+    ClusterParamsAlg(){_nClusters=0;}
 
     /// Default destructor
     ~ClusterParamsAlg(){}
 
-    void attachAlg(ParamsAlgBase * alg){_modules.push_back(alg);}
+    void attachAlg(ParamsAlgBase * alg){_modules.push_back(alg); _moduleTimes.push_back(0); }
 
     void FillParams();
 
@@ -54,9 +55,23 @@ namespace cluster{
     void SetVerbose(bool yes=true){ _verbose = yes;}
     void SetDebug(bool yes=true)  { _debug = yes;}
 
+    cluster_params GetParams() { return fParams; }
+
+    /**
+     * @brief Report average time spent per algorithm
+     */
+    void ReportTimes() const;
+
   private:
 
     std::vector<::cluster::ParamsAlgBase * > _modules;
+    
+    /// Time it takes each module to run
+    /// times are added continuously -> average at the end
+    std::vector<double> _moduleTimes;
+
+    /// number of clusters scanned (for stopwatch time calculation)
+    int _nClusters;
 
     bool _verbose;
     bool _debug;
