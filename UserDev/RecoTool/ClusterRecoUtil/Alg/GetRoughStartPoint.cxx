@@ -17,7 +17,7 @@ namespace cluster {
 
   }
 
-  void GetRoughStartPoint::do_params_fill(cluster_params & cluster, bool verbose){
+  void GetRoughStartPoint::do_params_fill(cluster_params & cluster){
 
     // Geometry Utilities
     auto geomHelper = ::larutil::GeometryHelper::GetME();

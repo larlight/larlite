@@ -8,7 +8,10 @@
 
 namespace cluster {
 
-  void FindShoweringPoint::do_params_fill(cluster_params & cluster, bool verbose){
+  void FindShoweringPoint::do_params_fill(cluster_params & cluster){
+
+    ///\ToDo: Make sure we don't try too hard to find showering Start Points on clusters
+    ///that aren't showers, or are too small.
 
     // Geometry Utilities
     auto geomHelper = ::larutil::GeometryHelper::GetME();

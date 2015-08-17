@@ -8,7 +8,7 @@
 
 namespace cluster {
 
-  void FillPolygon::do_params_fill(cluster_params & cluster, bool verbose){
+  void FillPolygon::do_params_fill(cluster_params & cluster){
 
     // Geometry Utilities
     auto geomHelper = ::larutil::GeometryHelper::GetME();

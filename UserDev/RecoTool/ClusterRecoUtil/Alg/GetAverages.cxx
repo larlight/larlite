@@ -8,7 +8,7 @@
 
 namespace cluster {
 
-  void GetAverages::do_params_fill(cluster_params & cluster, bool verbose){
+  void GetAverages::do_params_fill(cluster_params & cluster){
 
     // Use principal component analysis for a lot of this
     // So, use root's built in class

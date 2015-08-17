@@ -34,7 +34,7 @@ namespace cluster {
     /// Default destructor
     ~RefineDirection(){}
 
-    void do_params_fill(cluster_params &, bool verbose = false);
+    void do_params_fill(cluster_params &);
 
     /**
      * @brief set percentage of hits to be used

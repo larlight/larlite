@@ -18,7 +18,7 @@ namespace cluster {
 
   }
 
-  void RefineDirection::do_params_fill(cluster_params & cluster, bool verbose){
+  void RefineDirection::do_params_fill(cluster_params & cluster){
 
     // Geometry Utilities
     auto geomHelper = ::larutil::GeometryHelper::GetME();
@@ -28,7 +28,7 @@ namespace cluster {
     this_startPoint = cluster.start_point;
     this_endPoint   = cluster.end_point;
 
-    if(verbose) {
+    if(_verbose) {
       std::cout << "Angle: Start point: (" << this_startPoint.w 
                 << ", " << this_startPoint.t << ")\n";
       std::cout << "Angle: End point  : (" << this_endPoint.w   
@@ -45,7 +45,7 @@ namespace cluster {
     double hit_counter_forward  = 0;
     double hit_counter_backward = 0;
     
-    if (verbose && endStartDiff_y == 0 && endStartDiff_x == 0) {
+    if (_verbose && endStartDiff_y == 0 && endStartDiff_x == 0) {
       std::cerr << "Error:  end point and start point are the same!\n";
 
       return;
@@ -265,13 +265,13 @@ namespace cluster {
     bool flip = false;
     if (sigmoid < 0) flip = true;
     if (flip){
-      if(verbose) std::cout << "Flipping!" << std::endl;
+      if(_verbose) std::cout << "Flipping!" << std::endl;
       std::swap(opening_angle,closing_angle);
       std::swap(opening_angle_highcharge,closing_angle_highcharge);
       std::swap(opening_angle_charge_wgt,closing_angle_charge_wgt);
       std::swap(cluster.start_point,cluster.end_point);
     }
-    else if(verbose){
+    else if(_verbose){
       std::cout << "Not Flipping!\n";
     }
     
