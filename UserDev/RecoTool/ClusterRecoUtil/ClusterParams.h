@@ -66,12 +66,12 @@ namespace cluster{
 
 
 
-    Polygon2D PolyObject;               ///< Polygon Object...see Polygon2D.hh
+    Polygon2D PolyObject;              ///< Polygon Object...see Polygon2D.hh
 
-    Point2D start_point;      ///< start point 
-    Point2D end_point;        ///< end point 
+    Point2D start_point;               ///< start point 
+    Point2D end_point;                 ///< end point 
     
-    Point2D showering_point;  ///< point at which showering of cluster begins
+    Point2D showering_point;           ///< point at which showering of cluster begins
 
     double sum_charge;                 ///< Sum charge of hits in ADC
     double mean_charge;                ///< Mean (average) charge of hits in ADC
@@ -81,7 +81,7 @@ namespace cluster{
     double rms_y;                      ///< rms of hits along y, (time)
     double charge_wgt_x;               ///< Mean of hits along x, charge weighted
     double charge_wgt_y;               ///< Mean of hits along y, charge weighted
-    double slope_2d_high_q;           ///< Linear best fit to high-charge hits in the cluster
+    double slope_2d_high_q;            ///< Linear best fit to high-charge hits in the cluster
     double slope_2d;                   ///< The slope of the cluster in this plane
     double angle_2d;                   ///< The slope of the cluster converted to an angle, in radians
     double opening_angle;              ///< Width of angular distubtion wrt vertx
@@ -136,6 +136,8 @@ namespace cluster{
     void ReportDiff(const cluster_params & otherParams);
 
   };
+
+  
 }
 
 #endif
