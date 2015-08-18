@@ -62,6 +62,8 @@ class Polygon2D{
   bool Contained(const Polygon2D &poly2) const; 
   /// untangle polygon
   void UntanglePolygon();
+  /// clear polygon's points
+  void Clear() { vertices.clear(); }
 
   friend bool operator==(const Polygon2D& lhs, const Polygon2D& rhs);
   friend bool operator!=(const Polygon2D& lhs, const Polygon2D& rhs);
