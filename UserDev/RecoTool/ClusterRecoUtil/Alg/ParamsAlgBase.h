@@ -31,7 +31,7 @@ namespace cluster {
   public:
 
     /// Default constructor
-    ParamsAlgBase(){}
+    ParamsAlgBase(){_verbose=false;}
 
     /// Default destructor
     virtual ~ParamsAlgBase(){}

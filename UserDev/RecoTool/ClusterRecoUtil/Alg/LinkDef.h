@@ -14,6 +14,7 @@
 #pragma link C++ class cluster::GetAverages+;
 #pragma link C++ class cluster::FillPolygon+;
 #pragma link C++ class cluster::RefineDirection+;
+#pragma link C++ class cluster::RefineStartPoints+;
 #pragma link C++ class cluster::GetRoughStartPoint+;
 #pragma link C++ class cluster::FindShoweringPoint+;
 //ADD_NEW_CLASS ... do not change this line
