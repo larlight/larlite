@@ -22,6 +22,7 @@ namespace cluster {
       start_point.Clear();
       end_point.Clear();
       showering_point.Clear();
+      PolyObject.Clear();
       sum_charge                        = kDOUBLE_MIN ;
       mean_charge                       = kDOUBLE_MIN ;
       mean_x                            = kDOUBLE_MIN ;
