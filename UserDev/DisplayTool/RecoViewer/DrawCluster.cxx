@@ -121,6 +121,7 @@ namespace evd {
     ::larlite::event_hit* ev_hit = nullptr;
     auto const& hit_index_v = storage->find_one_ass(ev_clus->id(),ev_hit,producer);
 
+    // std::cout << "Hit producer is " << ev_hit -> name() << std::endl;
 
     if(!ev_hit){
       std::cout << "Did not find hit data product"
@@ -143,21 +144,22 @@ namespace evd {
     std::vector<float>  nullFltVec;
     ::cluster::cluster_params  nullCPVec;
 
-    cluster::ClusterParamsAlg cpan ;
-    cpan.DisableFANN();
-    cpan.SetVerbose(false);
+    cluster::DefaultParamsAlg params_alg ;
+    cluster::cluster_params params;
+    params_alg.SetVerbose(false);
+    params_alg.SetDebug(false);
     
     for(auto const& hit_indices : hit_index_v) {
       view = ev_hit->at(hit_indices[0]).View();
       // Fill the cluster params alg
-      _cru_helper.GenerateCPAN( hit_indices, ev_hit, cpan);
-      cpan.FillParams(true,true,true,true,true,true);
+      _cru_helper.GenerateParams( hit_indices, ev_hit, params);
+      params_alg.FillParams(params);
 
 
       // if ( (int) clusterParamsByPlane->at(view).size() != cluster_index[view] -1){
       //   clusterParamsByPlane->at(view).push_back(nullCPVec);
       // }
-      clusterParamsByPlane->at(view).push_back( cpan.GetParams() );
+      clusterParamsByPlane->at(view).push_back( params );
 
       for(auto const& hit_index : hit_indices){
 

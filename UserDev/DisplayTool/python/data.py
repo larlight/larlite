@@ -3,6 +3,7 @@ from PyQt4 import QtGui, QtCore
 from larlite import larlite as fmwk
 from ROOT import *
 import numpy as np
+import math
 import pyqtgraph as pg
 
 
@@ -441,6 +442,51 @@ class clusterParams(QtCore.QObject): #recoBase):
     view._view.addItem(smallCircleEnd)
 
 
+    # Draw the axis
+    # The axis is just a line between two points.
+    self._axisPolygon = QtGui.QPolygonF()
+    self._axisPolygon.append(QtCore.QPointF(sW,sT))
+    l = self._params.length
+    if l < 1:
+      l =  (self._params.start_point.w - self._params.end_point.w)**2 
+      l += (self._params.start_point.t - self._params.end_point.t)**2
+      l = math.sqrt(l)
+
+
+    axisEndW = sW + l*self._params.principal_dir.at(0)/self._geom.wire2cm() 
+    axisEndT = sT + l*self._params.principal_dir.at(1)/self._geom.time2cm() 
+    # Check to see if this line needs to be reversed:
+    sign = (sW - axisEndW)*(sW - eW) + (sT - axisEndT)*(sT - eT)
+    if sign < 0:
+      axisEndW = sW - l*self._params.principal_dir.at(0)/self._geom.wire2cm() 
+      axisEndT = sT - l*self._params.principal_dir.at(1)/self._geom.time2cm() 
+    
+
+    self._axisPolygon.append(QtCore.QPointF(axisEndW,axisEndT))
+
+    self._axisPath = QtGui.QPainterPath()
+    self._axisPath.addPolygon(self._axisPolygon)
+    self._polyGraphicsItem = QtGui.QGraphicsPathItem(self._axisPath)
+    pen = self._polyGraphicsItem.pen()
+    pen.setWidth(2)
+    self._polyGraphicsItem.setPen(pen)
+    view._view.addItem(self._polyGraphicsItem)
+
+
+    # Draw the polygon
+    # Not super hard to do with the poly object
+    self._thisPolyF = QtGui.QPolygonF()
+    for p in xrange(self._params.PolyObject.Size()):
+      point = self._params.PolyObject.Point(p)
+      qpoint = QtCore.QPointF(point.first/self._geom.wire2cm(),point.second/self._geom.time2cm())
+      self._thisPolyF.append(qpoint)
+
+    self._thisPoly = QtGui.QGraphicsPolygonItem(self._thisPolyF)
+    pen = self._thisPoly.pen()
+    pen.setStyle(QtCore.Qt.DashLine)
+    self._thisPoly.setPen(pen)
+    view._view.addItem(self._thisPoly)
+
 
   def clear(self,view):
     # This function clears all of this cluster params
@@ -448,6 +494,8 @@ class clusterParams(QtCore.QObject): #recoBase):
     for item in self._listOfStartPoints:
       view._view.removeItem(item)
     self._listOfStartPoints = []
+    view._view.removeItem(self._thisPoly)
+    view._view.removeItem(self._polyGraphicsItem)
 
 
 

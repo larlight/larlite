@@ -22,7 +22,7 @@
 //#include "LArUtil/PxUtils.h"
 #include "DataFormat/cluster.h"
 #include "DataFormat/hit.h"
-#include "ClusterRecoUtil/ClusterParamsAlg.h"
+#include "ClusterRecoUtil/DefaultParamsAlg.h"
 #include "ClusterRecoUtil/CRUHelper.h"
 
 #ifdef __APPLE__ 
