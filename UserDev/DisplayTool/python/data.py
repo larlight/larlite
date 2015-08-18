@@ -1,9 +1,7 @@
 
 from PyQt4 import QtGui, QtCore
-#from larlite import larlite as fmwk
+from larlite import larlite as fmwk
 import ROOT
-ROOT.gSystem.Load("libLArLite_Analysis")
-from ROOT import larlite as fmwk
 from ROOT import *
 import numpy as np
 import pyqtgraph as pg
