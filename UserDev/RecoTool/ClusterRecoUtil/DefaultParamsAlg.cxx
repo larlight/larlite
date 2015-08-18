@@ -32,7 +32,7 @@ namespace cluster {
     // attachAlg(showeringpoint);
 
     
-    SetDebug(true);
+    SetDebug(false);
     SetVerbose(false);
   }
 
