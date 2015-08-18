@@ -243,23 +243,23 @@ namespace larutil {
 	   ( (p1.w == p3.w) and (p1.t == p3.t) ) )
 	throw LArUtilException("Trying to calculate dot-product using a zero-length vector!");
 
-      double den = ( sqrt( (p2.w-p1.w)*(p2.w-p1.w) + (p2.t-p1.t)*(p2.t-p1.t) ) +
-		     sqrt( (p3.w-p1.w)*(p3.w-p1.w) + (p3.t-p1.t)*(p3.t-p1.t) ) );
-
+      double den = sqrt( ( (p2.w-p1.w)*(p2.w-p1.w) + (p2.t-p1.t)*(p2.t-p1.t) ) *
+			 ( (p3.w-p1.w)*(p3.w-p1.w) + (p3.t-p1.t)*(p3.t-p1.t) ) );
+      
       return ( (p2.w-p1.w)*(p3.w-p1.w) + (p2.t-p1.t)*(p3.t-p1.t) ) / den;
     }
 
 
   double GeometryHelper::GetCosAngleBetweenLines(const Point2D& p1, const Point2D& p2,
-				   const Point2D& p3, const Point2D& p4) const
+						 const Point2D& p3, const Point2D& p4) const
     {
 
       if ( ( (p1.w == p2.w) and (p1.t == p2.t) ) or
 	   ( (p4.w == p3.w) and (p4.t == p3.t) ) )
 	throw LArUtilException("Trying to calculate dot-product using a zero-length vector!");
 
-      double den = ( sqrt( (p2.w-p1.w)*(p2.w-p1.w) + (p2.t-p1.t)*(p2.t-p1.t) ) +
-		     sqrt( (p4.w-p3.w)*(p4.w-p3.w) + (p4.t-p3.t)*(p4.t-p3.t) ) );
+      double den = sqrt( ( (p2.w-p1.w)*(p2.w-p1.w) + (p2.t-p1.t)*(p2.t-p1.t) ) *
+			 ( (p4.w-p3.w)*(p4.w-p3.w) + (p4.t-p3.t)*(p4.t-p3.t) ) );
 
       return ( (p2.w-p1.w)*(p4.w-p3.w) + (p2.t-p1.t)*(p4.t-p3.t) ) / den;
     }
