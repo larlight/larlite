@@ -18,7 +18,7 @@ namespace cluster {
     GetRoughStartPoint * roughStartPoint = new GetRoughStartPoint();
     roughStartPoint                      -> SetVerbose(false);
     RefineDirection    * direction       = new RefineDirection();
-    direction                            -> SetVerbose(false);
+    direction                            -> SetVerbose(true);
     RefineStartPoints  * startPoint      = new RefineStartPoints();
     startPoint                           -> SetVerbose(false);
     FindShoweringPoint * showeringpoint  = new FindShoweringPoint();

@@ -45,5 +45,4 @@ params = cluster.cluster_params()
 helper = cluster.CRUHelper()
 helper.GenerateParams(hit_index_v[0],hits,params)
 
-# alg.FillParams(params)
 defaultAlg.FillParams(params)
