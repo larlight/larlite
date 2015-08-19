@@ -64,13 +64,202 @@ namespace evd {
     // So, obviously, first thing to do is to get the wires.
     auto RawDigitHandle = storage->get_data<larlite::event_rawdigit>(producer);
 
+    run = RawDigitHandle->run();
+    subrun = RawDigitHandle->subrun();
+    event = RawDigitHandle->event_id();
 
+    // Save one file per event ...
+    char name[100];
+    sprintf(name,"RawDigitAna_%i_%i_%i.root",run, subrun,event);
+    _fout= new TFile(name,"RECREATE");
+    _fout -> cd();
+    
+    // Set up the TTree:
+    TTree * tree = new TTree("waveformsub","waveformsub");
+
+    tree -> Branch("run",&run);
+    tree -> Branch("subrun",&subrun);
+    tree -> Branch("event",&event);
+
+    std::vector<float> x_axis;
+    x_axis.resize(detProp->ReadOutWindowSize());
+    for (unsigned int i = 0; i < x_axis.size(); i++)
+      x_axis.at(i) = i;
+
+    // Determine how many steps are needed, and set up to write out waveforms
+    _subtractionWaveForm.resize(geoService -> Nplanes());
+    _graphSubtractionWaveForm.resize(geoService -> Nplanes());
+    
+    for (unsigned int p = 0; p < geoService -> Nplanes(); p++){
+      int nSteps = geoService -> Nwires(p) / stepSize;
+      _subtractionWaveForm.at(p).resize(nSteps);
+      _graphSubtractionWaveForm.at(p).resize(geoService ->Nwires(p));
+      for (auto & vec : _subtractionWaveForm.at(p))
+        vec.resize(detProp->ReadOutWindowSize());
+    }
+
+
+    float rmsMinBadWire = 1.0;
+
+    std::vector<std::vector<bool>> badWireMapByPlane;
+    badWireMapByPlane.resize(geoService->Nplanes());
+
+    std::cout << "badWireMapByPlane.size() " << badWireMapByPlane.size() << std::endl;
     for (auto const& rawdigit: *RawDigitHandle){
       unsigned int ch = rawdigit.Channel();
       if (ch >= 8254) continue;
 
       int wire = geoService->ChannelToWire(ch);
       int plane = geoService->ChannelToPlane(ch);
+      if (badWireMapByPlane.at(plane).size() < geoService -> Nwires(plane))
+        badWireMapByPlane.at(plane).resize(geoService->Nwires(plane));
+
+      if (wire < 0  || wire > geoService -> Nwires(plane))
+        continue;
+
+
+
+
+      int offset = wire * detProp -> ReadOutWindowSize();
+      // convert short ADCs to float
+      
+      // Get the pedestal for this channel:
+      float ped = 0.0;
+      for (int j = 0; j < 500; j++){
+        ped += rawdigit.ADC(j);
+      }
+      ped /= 500.0;
+
+      int i = 0;
+      // Calculate an rms here to spot bad wires
+      float rms = 0.0;
+      for (auto & adc : rawdigit.ADCs()){
+        _planeData.at(plane).at(offset + i) = adc - ped;
+        rms += (adc-ped)*(adc-ped);
+        i++;
+      }
+      rms /= detProp -> ReadOutWindowSize();
+      if (plane == 2){
+        if (wire > 1333 && wire < 1350){
+          std::cout << "RMS of wire " << wire << " is " << rms << std::endl;
+        }
+      }
+      if (rms < rmsMinBadWire)
+        badWireMapByPlane.at(plane).at(wire) = true;
+    }
+    std::cout
+
+    
+    // Do a median subtraction in the simplest possible way, across 96 channels
+
+    for (unsigned int plane = 0; plane < 3; plane ++){
+
+      unsigned int nSteps = geoService -> Nwires(plane) / stepSize;
+      for (unsigned int step = 0; step < nSteps; step ++){
+        // Within each step, loop over the ticks.
+        // For each tick, loop over each wire and find the median.
+        // Then, subtract the median from each tick.
+        for (unsigned int tick = 0; tick < detProp -> ReadOutWindowSize(); tick ++){
+          // Get the median across this step's set of wires.
+          int wireStart = step*stepSize;
+          std::vector<float> vals;
+          vals.resize(stepSize);
+          for (unsigned int wire = wireStart; wire < wireStart + stepSize; wire ++){
+            // skip bad wires
+            if (badWireMapByPlane.at(plane)[wire]) continue;
+            int offset = wire*detProp->ReadOutWindowSize();
+            if (plane != 2)
+              vals.at(wire-wireStart) = _planeData.at(plane).at(offset + tick);
+            // do a rolling average for collection plane:
+            else{
+              int averageSize = 10;
+              if (tick < averageSize || tick > detProp->ReadOutWindowSize() - averageSize)
+                vals.at(wire-wireStart) = _planeData.at(plane).at(offset + tick);
+              else{
+                for (int workingTick = tick - averageSize; workingTick <= tick + averageSize; workingTick ++ )
+                  vals.at(wire-wireStart) += _planeData.at(plane).at(offset + workingTick);
+                vals.at(wire-wireStart) /= (2*averageSize + 1);
+              }
+            }
+          }
+          // Calculate the median:
+          sort(vals.begin(), vals.end());
+          float median = 0.5* vals.at(stepSize/2) + 0.5*vals.at(stepSize/2 -1);
+          // Now subtract the median from the values:
+          for (unsigned int wire = wireStart; wire < wireStart + stepSize; wire ++){
+            // Skip bad wires
+            if (badWireMapByPlane.at(plane)[wire]) continue;
+            int offset = wire*detProp->ReadOutWindowSize();
+            _planeData.at(plane).at(offset + tick) -= median;
+          }
+
+          // Save the subtraction waveform:
+          _subtractionWaveForm.at(plane).at(step).at(tick) = median;
+
+          // // Do a subtraction of the U plane wires with V plane values
+          // if(plane == 0) {
+          //   if ( step <= 7 || step >= 25-7) continue;
+          //   int U_wire = wireStart - 672;
+
+          //   for (unsigned int wire = U_wire; wire < U_wire + stepSize; wire ++){
+          //     int offset = wire*detProp->ReadOutWindowSize();
+          //     _planeData.at(plane+1).at(offset + tick) += median;
+          //   }
+          // }
+        } // loop over ticks
+
+        // Now that the tick loop is finished, the wave form is finalized
+        // Copy the data to the tgraph so that it can be stored, and set up the branches
+        
+        // initialize the graph to point to the right vector:
+        _graphSubtractionWaveForm.at(plane).at(step) 
+          = new TGraph(x_axis.size(), &(x_axis[0]), &(_subtractionWaveForm.at(plane).at(step)[0]));
+
+        char name[100];
+        sprintf(name,"subwaveform_%i_%i",plane,step);
+        tree -> Branch(name, &(_subtractionWaveForm.at(plane).at(step)) );
+        sprintf(name,"graphwaveform_%i_%i",plane,step);
+        tree -> Branch(name, &(_graphSubtractionWaveForm.at(plane).at(step)));
+        _graphSubtractionWaveForm.at(plane).at(step)->Write(name);
+      } // loop over steps
+    } // loop over planes
+
+    tree -> Fill();
+
+    std::cout << "Finalized called\n";
+    std::cout << "_fout is " << _fout << std::endl;
+
+    tree -> Write();
+    _fout -> Close();
+
+    return true;
+  }
+
+  bool DrawRawDigit::finalize() {
+
+    // This function is called at the end of event loop.
+    // Do all variable finalization you wish to do here.
+    // If you need, you can store your ROOT class instance in the output
+    // file. You have an access to the output file through "_fout" pointer.
+    //
+    // Say you made a histogram pointer h1 to store. You can do this:
+    //
+    // if(_fout) { _fout->cd(); h1->Write(); }
+    //
+    // else 
+    //   print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
+    //
+  
+
+
+    return true;
+  }
+
+
+
+}
+#endif
+
 
 
       // // TEMPORARY: fix collection mapping.
