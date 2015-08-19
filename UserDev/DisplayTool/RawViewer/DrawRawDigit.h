@@ -19,6 +19,9 @@
 #include "LArUtil/Geometry.h"
 #include "RawBase.h"
 
+#include "TTree.h"
+#include "TGraph.h"
+
 struct _object;
 typedef _object PyObject;
 
@@ -61,6 +64,18 @@ namespace evd {
 
 
   private:
+
+    // Contains the wave form to subtract 
+    std::vector<std::vector<std::vector<float> > > _subtractionWaveForm;
+    std::vector<std::vector<TGraph * > > _graphSubtractionWaveForm;
+
+
+    const int stepSize = 96;
+
+    int event;
+    int run;
+    int subrun;
+
 
   };
 }
