@@ -10,9 +10,7 @@ namespace evd {
 
   DrawRawDigit::DrawRawDigit(){ 
     _name="DrawRawDigit"; 
-    _fout=0;
     producer = "daq";
-    std::cout << "Constructed!" << std::endl;
     // Py_InitModule("DrawRawDigit",NULL);
 
   }
@@ -147,7 +145,6 @@ namespace evd {
       if (rms < rmsMinBadWire)
         badWireMapByPlane.at(plane).at(wire) = true;
     }
-    std::cout
 
     
     // Do a median subtraction in the simplest possible way, across 96 channels
@@ -467,52 +464,3 @@ namespace evd {
       //   }
       // }
 
-
-      if (wire < 0  || wire > geoService -> Nwires(plane))
-        continue;
-
-
-      int offset = wire * detProp -> ReadOutWindowSize();
-      // convert short ADCs to float
-      
-      // Get the pedestal for this channel:
-      float ped = 0.0;
-      for (int j = 0; j < 500; j++){
-        ped += rawdigit.ADC(j);
-      }
-      ped /= 500.0;
-
-      int i = 0;
-      for (auto & adc : rawdigit.ADCs()){
-        _planeData.at(plane).at(offset + i) = adc - ped;
-        // _planeData.at(plane).at(offset + i) = adc - _pedestals.at(plane);
-        i++;
-      }
-    }
-
-    return true;
-  }
-
-  bool DrawRawDigit::finalize() {
-
-    // This function is called at the end of event loop.
-    // Do all variable finalization you wish to do here.
-    // If you need, you can store your ROOT class instance in the output
-    // file. You have an access to the output file through "_fout" pointer.
-    //
-    // Say you made a histogram pointer h1 to store. You can do this:
-    //
-    // if(_fout) { _fout->cd(); h1->Write(); }
-    //
-    // else 
-    //   print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
-    //
-  
-
-    return true;
-  }
-
-
-
-}
-#endif
