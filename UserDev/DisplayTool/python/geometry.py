@@ -1,5 +1,6 @@
 
 from larlite import larlite as fmwk
+import ROOT
 from larlite import larutil
 import numpy as np
 
