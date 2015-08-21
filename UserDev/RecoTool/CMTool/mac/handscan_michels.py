@@ -25,8 +25,11 @@ raw_viewer   = larlite.ClusterViewer()
 
 my_proc.add_process(raw_viewer)
 
-raw_viewer.SetClusterProducer("fuzzycluster")
-#raw_viewer.SetClusterProducer("michel")
+#raw_viewer.SetClusterProducer("fuzzycluster")
+raw_viewer.SetClusterProducer("michel")
+raw_viewer.SetHitProducer("cchit")
+
+raw_viewer.SetZoomedView(True)
 
 gStyle.SetOptStat(0)
 
@@ -49,12 +52,11 @@ while True:
     for cindex in xrange(raw_viewer.ClusterCount(plane)):
 
        print "        Cluster:",cindex
-       raw_viewer.DrawOneCluster(plane,cindex)
+       raw_viewer.DrawOneClusterGraphAndHits(plane,cindex)
        sys.stdin.readline()
 
 
-    print "Just showed Event %d. Hit enter to go next event..." % user_input_evt_no
-    sys.stdin.readline()
+    print "Just showed Event %d." 
 
 
 # done!
