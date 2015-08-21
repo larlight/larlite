@@ -17,7 +17,7 @@ ClusterViewer::ClusterViewer() : ana_base(),
   SetDrawShowers(false);
   //default is now to use log-z scale for hits viewer
   SetHitsLogZ(true);
-  SetDrawStartEnd(false);
+  _tryzoomed = false;
 }
 
 //#######################################
@@ -73,31 +73,26 @@ bool ClusterViewer::analyze(storage_manager* storage)
     return false;
   }
 
-  event_hit* ev_hit = nullptr;
-  auto const& ass_hit_v = storage->find_one_ass(ev_clus->id(), ev_hit, ev_clus->name());
+  //Grab the hits
+  auto ev_hit = storage->get_data<event_hit>(_hit_producer);
+  if (!ev_hit) {
+    print(larlite::msg::kERROR, __FUNCTION__, Form("Did not find specified data product, hit!"));
+    return false;
+  }
+  if (!ev_hit->size())
+    return false;
+
+  //Grab the associations
+  auto ass_data = storage->get_data<event_ass>(_cluster_producer);
+
+  //Get association to cluster => hit
+  auto const& ass_hit_v = ass_data->association(ev_clus->id(), ev_hit->id());
+
   if (!ev_hit)
     throw ::cluster::ViewerException("Did not find associated hits!");
   if (!ass_hit_v.size())
     throw ::cluster::ViewerException("Did not find associated hits!");
 
-  //std::cout << "Hit producer name is " << ev_hit->name() << std::endl;
-  //std::cout << "ass_hit_v has size: " << ass_hit_v.size() << std::endl;
-
-  /*
-  auto associated_hit_producers = ev_clus->association_keys(data::kHit);
-
-  if(!(associated_hit_producers.size()))
-
-    throw ::cluster::ViewerException("Did not find associated hits!");
-
-  auto ev_hit  = storage->get_data<event_hit>(associated_hit_producers[0]);
-
-  if(!ev_hit)
-    throw ::cluster::ViewerException(Form("Did not find hit data product by %s!",
-            associated_hit_producers[0].c_str()
-            )
-             );
-  */
   std::vector<float> hit_charge_frac;
   std::vector<UInt_t> MCShower_indices;
   int n_showers = 0;
@@ -144,19 +139,13 @@ bool ClusterViewer::analyze(storage_manager* storage)
 
   // Find hits-per-cluster
   //auto ass_hit_v = ev_clus->association(data::kHit,associated_hit_producers[0]);
-  for (size_t i = 0; i < ev_clus->size(); ++i) {
-
-    if (!ass_hit_v[i].size()){
-      continue;
-      //throw ::cluster::ViewerException("No associated hits found!");
-      //return true;
-    }
+  //Loop over clusters
+  for (auto const& hit_indices : ass_hit_v) {
 
     UChar_t plane = nplanes;
     std::vector<std::pair<double, double> > cluster_hits;
 
-    for (auto const& index : ass_hit_v[i]) {
-      std::cout<<"ass_hit_v["<<i<<"] tells me to look in ev_hit at index "<<index<<std::endl;
+    for (auto const& index : hit_indices) {
       cluster_hits.push_back(std::pair<double, double>( ev_hit->at(index).WireID().Wire * wire2cm,
                              ev_hit->at(index).PeakTime() * time2cm )
                             );
@@ -172,27 +161,8 @@ bool ClusterViewer::analyze(storage_manager* storage)
       return true;
     }
 
-    if ( _showStartEnd ) {
-
-      //for start/end point, need to calculate CPAN
-      auto hit_index = ass_hit_v[i];
-      ::cluster::ClusterParamsAlg bestclus_CPAN;
-      _cru_helper.GenerateCPAN( hit_index, ev_hit, bestclus_CPAN);
-      bestclus_CPAN.DisableFANN();
-      bestclus_CPAN.SetVerbose(false);
-      bestclus_CPAN.FillParams(true, true, true, true, true, true);
-
-      std::pair<double, double> cluster_start  ( bestclus_CPAN.GetParams().start_point.w, bestclus_CPAN.GetParams().start_point.t );
-      std::pair<double, double> cluster_end    ( bestclus_CPAN.GetParams().end_point.w,   bestclus_CPAN.GetParams().end_point.t     );
-
-      _algo.AddCluster(plane,
-                       cluster_hits,
-                       cluster_start,
-                       cluster_end);
-    }
-    else
-      _algo.AddCluster(plane,
-                       cluster_hits);
+    _algo.AddCluster(plane,
+                     cluster_hits,_tryzoomed);
 
   }
 
