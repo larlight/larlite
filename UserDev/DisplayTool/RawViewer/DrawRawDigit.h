@@ -62,20 +62,30 @@ namespace evd {
     */
     virtual bool finalize();
 
+    void SetCorrectData(bool _doit = true){_correct_data = _doit;}
+    void SetSaveData(bool _doit = true){_save_data = _doit;}
+
+    void SetStepSizeByPlane(int stepSize, int plane);
 
   private:
 
-    // Contains the wave form to subtract 
-    std::vector<std::vector<std::vector<float> > > _subtractionWaveForm;
-    std::vector<std::vector<TGraph * > > _graphSubtractionWaveForm;
+    // This function corrects the data by removing correlated noise
+    // It can also save out the information
+    void correctData();
+
+    bool _correct_data;
+    bool _save_data;
 
 
-    const int stepSize = 96;
+    std::vector<std::vector<float> > pedestalByPlane;
+    std::vector<std::vector<float> > rmsByPlane;
+    std::vector<std::vector<float> > rmsByPlaneCorrected;
 
-    int event;
-    int run;
-    int subrun;
+    std::vector<std::vector<int  > > badWireMapByPlane;
 
+    int run, subrun, event;
+
+    std::vector<int> stepSize;
 
   };
 }
