@@ -51,7 +51,27 @@ namespace larlite{
     double fnenergyf;
     double fnwtfar;
     int    fnorig;
-    int    fndecay;
+    //Decay codes listed here: http://www.hep.utexas.edu/~zarko/wwwgnumi/v19/    
+    int    fndecay; 
+    // GNUMI decay codes (as in Ndecay)
+    /* --------------------------
+       Decay type	Decay code
+       K0L -> nue pi- e+	1
+       K0L -> nuebar pi+ e-	2
+       K0L -> numu pi- mu+	3
+       K0L -> numubar pi+ mu-	4
+       K+ -> numu mu+	        5
+       K+ -> nue pi0 e+	        6
+       K+ -> numu pi0 mu+	7
+       K- -> numubar mu-	8
+       K- -> nuebar pi0 e-	9
+       K- -> numubar pi0 mu-	10
+       mu+ -> numubar nue e+	11
+       mu- -> numu nuebar e-	12
+       pi+ -> numu mu+	        13
+       pi- -> numubar mu-	14
+       -------------------------- */
+    
     int    fntype;
     double fvx;
     double fvy;
