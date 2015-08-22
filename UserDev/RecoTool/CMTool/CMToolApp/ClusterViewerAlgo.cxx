@@ -14,7 +14,8 @@ ClusterViewerAlgo::ClusterViewerAlgo(std::string name) : _name(name)
   _cTwoClusters = nullptr;
   _hits_log_z = true;
   ShowShowers(false);
-
+  time2cm = larutil::GeometryUtilities::GetME()->TimeToCm();
+  wire2cm = larutil::GeometryUtilities::GetME()->WireToCm();
 }
 
 //#############################
@@ -86,6 +87,8 @@ void ClusterViewerAlgo::SetRange(UChar_t plane,
                                  const std::pair<double, double> &yrange)
 //######################################################################
 {
+  //    double x = h.WireID().Wire * wire2cm;
+  //    double y = h.PeakTime() * time2cm;
   if (plane >= _nplanes)
     throw ViewerException(Form("Invalid plane ID: %d", plane));
 
@@ -421,13 +424,20 @@ TH2D* ClusterViewerAlgo::GetPlaneViewHisto(const UChar_t plane,
     const std::string &title) const
 //########################################################################
 {
+
+  //Set number of x-bins equal to number of wires (in cm)
+  //Set number of y-bins equal to the number of TDCs (in cm)
   if (plane >= _nplanes) throw ViewerException(Form("Invalid plane ID: %d", plane));
+
+  size_t n_bins_x = (_xrange.at(plane).second - _xrange.at(plane).first) / wire2cm;
+  size_t n_bins_y = (_xrange.at(plane).second - _xrange.at(plane).first) / time2cm;
+
+  n_bins_y /= 8;
+
   TH2D* h = new TH2D(Form("%sFor%s", name.c_str(), _name.c_str()),
                      title.c_str(),
-                     5000, _xrange.at(plane).first * 0.9, _xrange.at(plane).second * 1.1,
-                     5000, _yrange.at(plane).first * 0.9, _yrange.at(plane).second * 1.1);
-  // 100, _xrange.at(plane).first * 0.9, _xrange.at(plane).second * 1.1,
-  //                    100, _yrange.at(plane).first * 0.9, _yrange.at(plane).second * 1.1);
+                     n_bins_x, _xrange.at(plane).first, _xrange.at(plane).second,
+                     n_bins_y, _yrange.at(plane).first, _yrange.at(plane).second);
   return h;
 }
 
@@ -438,11 +448,18 @@ TH2D* ClusterViewerAlgo::GetPlaneViewHisto(const UChar_t plane,
     const std::string &title) const
 //########################################################################
 {
+  // double x = h.WireID().Wire * wire2cm;
+  // double y = h.PeakTime() * time2cm;
   if (plane >= _nplanes) throw ViewerException(Form("Invalid plane ID: %d", plane));
+  //Set number of x-bins equal to number of wires (in cm)
+  //Set number of y-bins equal to the number of TDCs (in cm)
+  size_t n_bins_x = (xmax - xmin) / wire2cm;
+  size_t n_bins_y = (ymax - ymin) / time2cm;
+
   TH2D* h = new TH2D(Form("%sFor%s", name.c_str(), _name.c_str()),
                      title.c_str(),
-                     1000, xmin * 0.9, xmax * 1.1,
-                     1000, ymin * 0.9, ymax * 1.1);
+                     n_bins_x, xmin, xmax,
+                     n_bins_y, ymin, ymax);
 
   return h;
 }
@@ -588,21 +605,36 @@ void ClusterViewerAlgo::DrawOneClusterGraphAndHits(UChar_t plane, size_t index)
   _cOneCluster->cd();
 
   //Set the graph range to extend 50cm outwards in each direction
-  _gAllHits.at(plane)->GetXaxis()->SetRangeUser(
-    _gClusterHits.at(plane).at(index)->GetXaxis()->GetXmin() - 50,
-    _gClusterHits.at(plane).at(index)->GetXaxis()->GetXmin() + 50);
-  _gAllHits.at(plane)->SetMaximum(_gClusterHits.at(plane).at(index)->GetMaximum() + 50.);
-  _gAllHits.at(plane)->SetMinimum(_gClusterHits.at(plane).at(index)->GetMinimum() - 50.);
+  // _gAllHits.at(plane)->GetXaxis()->SetRangeUser(
+  //   _gClusterHits.at(plane).at(index)->GetXaxis()->GetXmin() - 50,
+  //   _gClusterHits.at(plane).at(index)->GetXaxis()->GetXmin() + 50);
+  // _gAllHits.at(plane)->SetMaximum(_gClusterHits.at(plane).at(index)->GetMaximum() + 50.);
+  // _gAllHits.at(plane)->SetMinimum(_gClusterHits.at(plane).at(index)->GetMinimum() - 50.);
 
-  _gAllHits.at(plane)->SetMarkerColor(kBlack);
-  _gAllHits.at(plane)->SetMarkerStyle(kOpenCircle);
-  _gAllHits.at(plane)->SetMarkerSize(.5);
-  _gAllHits.at(plane)->Draw("AP");
-  _gClusterHits.at(plane).at(index)->SetMarkerStyle(kFullCircle);
-  _gClusterHits.at(plane).at(index)->SetMarkerSize(.5);
-  _gClusterHits.at(plane).at(index)->SetMarkerColor(kRed);
+  // _gAllHits.at(plane)->SetMarkerColor(kBlack);
+  // _gAllHits.at(plane)->SetMarkerStyle(kOpenCircle);
+  // _gAllHits.at(plane)->SetMarkerSize(.5);
+  // _gAllHits.at(plane)->Draw("AP");
+
+  //First draw cluster graph so the range of the plot is good
+  //_gClusterHits.at(plane).at(index)->Draw("AP");
+
+  double local_xmin = _gClusterHits.at(plane).at(index)->GetXaxis()->GetXmin() * 0.8;
+  double local_xmax = _gClusterHits.at(plane).at(index)->GetXaxis()->GetXmax() * 1.2;
+  double local_ymin = _gClusterHits.at(plane).at(index)->GetYaxis()->GetXmin() * 0.8;
+  double local_ymax = _gClusterHits.at(plane).at(index)->GetYaxis()->GetXmax() * 1.2;
+
+  _hAllHits.at(plane)->Draw("COLZ");
+  _hAllHits.at(plane)->GetYaxis()->SetRangeUser(local_ymin,local_ymax);
+  _hAllHits.at(plane)->GetXaxis()->SetRangeUser(local_xmin,local_xmax);
+
+  _gClusterHits.at(plane).at(index)->SetMarkerStyle(kOpenCircle);
+  _gClusterHits.at(plane).at(index)->SetMarkerSize(1);
+  // _gClusterHits.at(plane).at(index)->SetMarkerColor(kBlack);
+  _gClusterHits.at(plane).at(index)->SetMarkerColorAlpha(kBlack,0.5);
   _gClusterHits.at(plane).at(index)->Draw("P");
 
+  _cOneCluster->Modified();
   _cOneCluster->Update();
 
 

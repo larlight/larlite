@@ -53,7 +53,11 @@ while True:
 
        print "        Cluster:",cindex
        raw_viewer.DrawOneClusterGraphAndHits(plane,cindex)
-       sys.stdin.readline()
+       try: 
+        good_or_bad = input('Type 1 if good, 0 if bad.')
+       except SyntaxError:
+        pass
+       #sys.stdin.readline()
 
 
     print "Just showed Event %d." 
