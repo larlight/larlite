@@ -17,6 +17,7 @@
 
 #include "ViewerException.h"
 #include "LArUtil/Geometry.h"
+#include "LArUtil/GeometryUtilities.h"
 #include <TH2D.h>
 #include <TGraph.h>
 #include <TCanvas.h>
@@ -125,7 +126,7 @@ protected:
 
     /// Overloaded definition if user wants to supply custom x-y min-max values
     TGraph* GetPlaneViewGraph(const UChar_t plane,
-        double xmin, double ymin, double xmax, double ymax,
+                              double xmin, double ymin, double xmax, double ymax,
                               const std::string &name,
                               const std::string &title) const;
 protected:
@@ -168,6 +169,9 @@ protected:
     std::vector<std::vector<TGraph*> > _gClusterHits;
     /// All hits in the event, as a massive tgraph. Index in vector is plane.
     std::vector<TGraph*> _gAllHits;
+
+    double time2cm;
+    double wire2cm;
 };
 
 }
