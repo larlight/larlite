@@ -637,7 +637,6 @@ void ClusterViewerAlgo::DrawOneClusterGraphAndHits(UChar_t plane, size_t index)
   _cOneCluster->Modified();
   _cOneCluster->Update();
 
-
 }
 
 //#################################################################

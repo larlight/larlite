@@ -28,8 +28,10 @@ namespace cluster {
    \class ClusterViewerAlgo
    User custom analysis class made by kazuhiro/kaleko
 */
-class ClusterViewerAlgo {
 
+
+class ClusterViewerAlgo {
+   
 public:
 
     /// Default constructor

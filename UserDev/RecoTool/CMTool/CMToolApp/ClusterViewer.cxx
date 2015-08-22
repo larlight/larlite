@@ -61,15 +61,15 @@ bool ClusterViewer::analyze(storage_manager* storage)
   //
   // Obtain event-wise data object pointers
   //
-  auto ev_clus = storage->get_data<event_cluster>(_cluster_producer);
-  if (!ev_clus)
+  _stored_event_cluster = storage->get_data<event_cluster>(_cluster_producer);
+  if (!_stored_event_cluster)
     throw ::cluster::ViewerException(Form("Did not find cluster data product by %s!",
                                           _cluster_producer.c_str()
                                          )
                                     );
-  if (!ev_clus->size()) {
+  if (!_stored_event_cluster->size()) {
     print(msg::kWARNING, __FUNCTION__,
-          Form("Skipping event %d since no cluster found...", ev_clus->event_id()));
+          Form("Skipping event %d since no cluster found...", _stored_event_cluster->event_id()));
     return false;
   }
 
@@ -86,7 +86,7 @@ bool ClusterViewer::analyze(storage_manager* storage)
   auto ass_data = storage->get_data<event_ass>(_cluster_producer);
 
   //Get association to cluster => hit
-  auto const& ass_hit_v = ass_data->association(ev_clus->id(), ev_hit->id());
+  auto const& ass_hit_v = ass_data->association(_stored_event_cluster->id(), ev_hit->id());
 
   if (!ev_hit)
     throw ::cluster::ViewerException("Did not find associated hits!");
@@ -138,7 +138,7 @@ bool ClusterViewer::analyze(storage_manager* storage)
       _algo.AddHits(i, hits_xy.at(i), hits_charge.at(i));
 
   // Find hits-per-cluster
-  //auto ass_hit_v = ev_clus->association(data::kHit,associated_hit_producers[0]);
+  //auto ass_hit_v = _stored_event_cluster->association(data::kHit,associated_hit_producers[0]);
   //Loop over clusters
   for (auto const& hit_indices : ass_hit_v) {
 
@@ -162,7 +162,7 @@ bool ClusterViewer::analyze(storage_manager* storage)
     }
 
     _algo.AddCluster(plane,
-                     cluster_hits,_tryzoomed);
+                     cluster_hits, _tryzoomed);
 
   }
 
@@ -173,6 +173,23 @@ bool ClusterViewer::finalize() {
 
   return true;
 }
+
+
+/// Function to draw one cluster (as a trgraph) with nearby hits (as XXX) overlaid
+/// returns struct with runnumber, subrunnumber, eventid, index
+ClusterViewer::cluster_unique_id ClusterViewer::DrawOneClusterGraphAndHits(UChar_t plane, size_t index) {
+
+  _algo.DrawOneClusterGraphAndHits(plane, index);
+
+  cluster_unique_id myuniqueid;
+  myuniqueid.runnumber = _stored_event_cluster->run();
+  myuniqueid.subrunnumber = _stored_event_cluster->subrun();
+  myuniqueid.eventid = _stored_event_cluster->event_id();
+  myuniqueid.index = index;
+
+  return myuniqueid;
+}
+
 
 }
 #endif
