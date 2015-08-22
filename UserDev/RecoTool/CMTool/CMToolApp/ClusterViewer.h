@@ -1,5 +1,5 @@
 /**
- * \file ClusterViewer.h
+> * \file ClusterViewer.h
  *
  * \ingroup CMTool
  *
@@ -56,6 +56,13 @@ public:
     */
     virtual bool finalize();
 
+    struct cluster_unique_id {
+        size_t runnumber;
+        size_t subrunnumber;
+        size_t eventid;
+        size_t index;
+    };
+
     /// Setter for a cluster type to be viewed
     virtual void SetClusterProducer(std::string name) { _cluster_producer = name;}
 
@@ -72,7 +79,8 @@ public:
     void DrawOneCluster(UChar_t plane, size_t index) {_algo.DrawOneCluster(plane, index);}
 
     /// Function to draw one cluster (as a trgraph) with nearby hits (as XXX) overlaid
-    void DrawOneClusterGraphAndHits(UChar_t plane, size_t index) {_algo.DrawOneClusterGraphAndHits(plane,index);}
+    /// returns struct with runnumber, subrunnumber, eventid, index
+    ClusterViewer::cluster_unique_id DrawOneClusterGraphAndHits(UChar_t plane, size_t index);
 
     /// Function to draw a tertiary canvas w/ two clusters on it
     void DrawTwoClusters(UChar_t plane, size_t index1, size_t index2) {_algo.DrawTwoClusters(plane, index1, index2);}
@@ -83,8 +91,11 @@ public:
     /// A function to decide if the hits COLZ canvas should be shown in log-z scale
     void SetHitsLogZ(bool flag);
 
-    void SetZoomedView(bool flag){ _tryzoomed = flag; }
-   
+    void SetZoomedView(bool flag) { _tryzoomed = flag; }
+
+    //hackity hack hack hack
+    larlite::event_cluster* get_event_cluster(){ return _stored_event_cluster; }
+
 protected:
     /// Type of cluster to view
     std::string _cluster_producer;
@@ -95,8 +106,7 @@ protected:
     /// Actual viewer code
     ::cluster::ClusterViewerAlgo _algo;
 
-    // McshowerLookback object
-    //McshowerLookback _mcslb;
+    larlite::event_cluster *_stored_event_cluster;
 
     //some maps that mcshowerlookback fills once per event
     std::map<UInt_t, UInt_t> _shower_idmap;
