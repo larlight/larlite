@@ -16,7 +16,7 @@
 
 #include "CMTool/CMToolBase/CFloatAlgoBase.h"
 #include <math.h>
-#include "ClusterRecoUtil/Polygon2D.h"
+#include "Polygon2D.h"
 
 namespace cmtool {
   /**
