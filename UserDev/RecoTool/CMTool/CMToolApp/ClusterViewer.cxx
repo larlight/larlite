@@ -90,8 +90,10 @@ bool ClusterViewer::analyze(storage_manager* storage)
 
   if (!ev_hit)
     throw ::cluster::ViewerException("Did not find associated hits!");
-  if (!ass_hit_v.size())
-    throw ::cluster::ViewerException("Did not find associated hits!");
+  if (!ass_hit_v.size()) {
+    std::cout << "Event doesn't have any associations from cluster => hit! Skipping event..." << std::endl;
+    return false;
+  }
 
   std::vector<float> hit_charge_frac;
   std::vector<UInt_t> MCShower_indices;
