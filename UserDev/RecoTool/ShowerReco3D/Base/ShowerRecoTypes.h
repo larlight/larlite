@@ -17,9 +17,9 @@ namespace showerreco {
   struct Shower_t {
 
     TVector3 fDCosStart;                        ///< direction cosines at start of shower
-    TVector3 fSigmaDCosStart;                   ///< uncertainting on initial direction cosines
-    TVector3 fXYZStart;                         ///< direction cosines at start of shower
-    TVector3 fSigmaXYZStart;                    ///< uncertainting on initial direction cosines
+    TVector3 fSigmaDCosStart;                   ///< uncertainty on initial direction cosines
+    TVector3 fXYZStart;                         ///< 3D start point of shower
+    TVector3 fSigmaXYZStart;                    ///< uncertainty on 3D start point
     double   fLength;                           ///< 3D length of a shower
     double   fOpeningAngle;                     ///< 3D opening angle of a shower
     std::vector< double > fTotalEnergy;         ///< Calculated Energy per each plane
