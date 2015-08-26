@@ -51,7 +51,7 @@ namespace ertool {
     bool Lonely() const; ///< ILL DEFINED
     bool HasChild(const NodeID_t id);
 
-    bool HasRecoObject();
+    const bool HasRecoObject() const;
     const RecoType_t& RecoType() const;
     const RecoID_t&   RecoID()   const;
 

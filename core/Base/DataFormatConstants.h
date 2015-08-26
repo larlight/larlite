@@ -87,6 +87,7 @@ namespace larlite{
       kPCAxis,             ///< recob::PCAxis
       kFlashMatch,         ///< anab::FlashMatch
       kTrackMomentum,      ///< track momentum
+      kOpDetWaveform,      ///< optical detector waveform
       kDATA_TYPE_MAX       ///< Event-wise enum boundary
     };
 
@@ -139,7 +140,8 @@ namespace larlite{
       "ass",
       "pcaxis",
       "fmatch",
-      "trackmom"
+      "trackmom",
+      "opdigit"
     };
 
     const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {

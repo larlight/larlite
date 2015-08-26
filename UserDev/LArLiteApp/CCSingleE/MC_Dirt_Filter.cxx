@@ -2,6 +2,7 @@
 #define LARLITE_MC_DIRT_FILTER_CXX
 
 #include "MC_Dirt_Filter.h"
+#include "DataFormat/mcshower.h"
 
 namespace larlite {
 
@@ -23,25 +24,26 @@ namespace larlite {
   
   bool MC_Dirt_Filter::analyze(storage_manager* storage) {
 
-
     auto ev_mctruth = storage->get_data<event_mctruth>("generator");
     if(!ev_mctruth) {
       print(larlite::msg::kERROR,__FUNCTION__,Form("Did not find specified data product, mctruth!"));
       return false;
     }
 
-    total_events++;
-    
-    bool ret = true;
-    if(TPC.Contain(ev_mctruth->at(0).GetNeutrino().Nu().Trajectory().back().Position())){
-      //std::cout<<"Inside TPC"<<std::endl;
-      ret = false;
-    }
-    else{ 
-      //std::cout<<"Outside TPC"<<std::endl;
-      ret = true;
+    if(!ev_mctruth->size()){
+      print(larlite::msg::kERROR,__FUNCTION__,Form("MCTruth size is zero?? Last time this happened to me, it was because I was trying to read in very old larlite files that had a different data format."));
+      return false;
     }
 
+    total_events++;    
+    bool ret = true;
+
+    //If ANY neutrinos interact within the TPC, skip this entire "event".
+    for(auto const mct : *ev_mctruth){
+      if(TPC.Contain(mct.GetNeutrino().Nu().Trajectory().back().Position())){
+	ret = false;
+      }
+    }
     if(ret && !_flip)
       kept_events++;
     if(!ret && _flip)
@@ -49,6 +51,7 @@ namespace larlite {
     
     if(_flip)
       return(!ret);
+    std::cout<<"returning: "<<ret<<std::endl;
     return ret;
   }
 

@@ -1,9 +1,11 @@
 
 from PyQt4 import QtGui, QtCore
 from larlite import larlite as fmwk
+import ROOT
 from ROOT import *
 import numpy as np
 import pyqtgraph as pg
+import math as mt 
 
 
 # These classes provide the basic interfaces for drawing objects
@@ -124,23 +126,20 @@ class wire(dataBase):
     self._process = None
     
     # This is the (clunky) converter to native python
-    self._c2p = evd.Converter()
+    # self._c2p = evd.Converter()
 
-  def get_img(self):
-    d = []
-    for i in range(0,self._nviews):
-      d.append(np.array(self._c2p.Convert(self._process.getDataByPlane(i))) )
-      print "got a plane, here is a sample: ", d[i][0][0]
-    return d
+  # def get_img(self):
+  #   d = []
+  #   for i in range(0,self._nviews):
+  #     d.append(np.array(self._c2p.Convert(self._process.getDataByPlane(i))) )
+  #     print "got a plane, here is a sample: ", d[i][0][0]
+  #   return d
 
   def getPlane(self,plane):
-    print "Called getPlane"
-    b = self._process.getNumpyByPlane(plane)
-    print type(b)
-    return b
+    return self._process.getArrayByPlane(plane)
     
-  def getWire(self, plane, wire):
-    return np.array(self._c2p.Convert(self._process.getWireData(plane,wire)))
+  # def getWire(self, plane, wire):
+  #   return np.array(self._c2p.Convert(self._process.getWireData(plane,wire)))
 
 class recoWire(wire):
   def __init__(self):
@@ -149,10 +148,13 @@ class recoWire(wire):
     self._process.initialize()
 
 class rawDigit(wire):
-  def __init__(self):
+  def __init__(self,geom):
     super(rawDigit,self).__init__()
     self._process = evd.DrawRawDigit()
+    for i in xrange(len(geom._pedestals)):
+      self._process.setPedestal(geom._pedestals[i],i)
     self._process.initialize()
+
 
 class hit(recoBase):
   """docstring for hit"""
@@ -392,10 +394,10 @@ class shower(recoBase):
         # next connect the two points at the end of the shower to make a cone
         x1, y1 = shower.startPoint().X(), shower.startPoint().Y()
         x2, y2 = shower.startPoint().X(), shower.startPoint().Y()
-        x1 = x1 + shower.length() * cos(shower.angleInPlane() - shower.openingAngle()/2)
-        y1 = y1 + shower.length() * sin(shower.angleInPlane() - shower.openingAngle()/2)
-        x2 = x2 + shower.length() * cos(shower.angleInPlane() + shower.openingAngle()/2)
-        y2 = y2 + shower.length() * sin(shower.angleInPlane() + shower.openingAngle()/2)
+        x1 = x1 + shower.length() * mt.cos(shower.angleInPlane() - shower.openingAngle()/2)
+        y1 = y1 + shower.length() * mt.sin(shower.angleInPlane() - shower.openingAngle()/2)
+        x2 = x2 + shower.length() * mt.cos(shower.angleInPlane() + shower.openingAngle()/2)
+        y2 = y2 + shower.length() * mt.sin(shower.angleInPlane() + shower.openingAngle()/2)
 
         # Scale everything to wire/time:
         x1 /= geom.wire2cm()

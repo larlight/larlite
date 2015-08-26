@@ -12,7 +12,7 @@ namespace ertool {
     // histogram to hold the energy of each reconstructed michel electron
     
     // set verbosity to be off by default
-    _verbose = true;
+    _verbose = false;
   }
 
   void ERAlgoTrackPid::Reset()

@@ -8,8 +8,14 @@ while test $# -gt 0; do
   esac
 
   case $1 in
+      --incdir)
+	  out="${LARLITE_COREDIR}"
+	  ;;
       --includes)
 	  out="-I${LARLITE_COREDIR} "
+	  ;;
+      --libdir)
+	  out="{$LARLITE_LIBDIR}"
 	  ;;
       --libs)
 	  out="-L${LARLITE_LIBDIR} -lLArLite_Analysis -lLArLite_LArUtil -lLArLite_DataFormat -lLArLite_Base "

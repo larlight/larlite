@@ -22,8 +22,19 @@ my_proc.enable_filter(False)
 # $LARLITE_BASEDIR/python/seltool/ccsingleeDef
 # and the algorithm instance is the return of the
 # function GetCCSingleEInstance()
-my_algo = GetCCSingleEInstance()
-my_algo.setVerbose(True)
+ccsinglee_algo = GetCCSingleEInstance()
+ccsinglee_algo.setVerbose(False)
+
+# primary finder algorithm
+primary_algo = ertool.AlgoPrimaryFinder()
+primary_algo.setVtxToTrkStartDist(1)
+primary_algo.setVtxToTrkDist(1)
+primary_algo.setVtxToShrStartDist(50)
+primary_algo.setMaxIP(1)
+
+# track PID algorithm
+pid_algo = ertool.ERAlgoTrackPid()
+pid_algo.setVerbose(False)
 
 # Create MC Filter
 MCfilter = fmwk.MC_CC1E_Filter();
@@ -50,7 +61,9 @@ my_ana.SetDebug(True)
 my_ana.SetECut(Ecut)
 
 my_anaunit = fmwk.ExampleERSelection()
-my_anaunit._mgr.AddAlgo(my_algo)
+my_anaunit._mgr.AddAlgo(pid_algo)
+my_anaunit._mgr.AddAlgo(primary_algo)
+my_anaunit._mgr.AddAlgo(ccsinglee_algo)
 my_anaunit._mgr.AddAna(my_ana)
 #my_anaunit._mgr.AddCfgFile('new_empart.txt')
 my_anaunit.SetMinEDep(Ecut)
@@ -92,8 +105,8 @@ while (counter < 11700):
     part_reco = my_anaunit.GetParticles()
     data_mc   = my_anaunit.GetData(True)
     part_mc   = my_anaunit.GetParticles(True)
-    #viewAll(mcviewer,data_mc,part_mc,
-    #        recoviewer,data_reco,part_reco)
+    viewAll(mcviewer,data_mc,part_mc,
+            recoviewer,data_reco,part_reco)
 
     #for x in xrange(part_mc.size()):
     #    print part_mc[x].Diagram()

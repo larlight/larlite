@@ -4,7 +4,6 @@
 #include "ERAlgoNGamma.h"
 
 namespace ertool {
-
   ERAlgoNGamma::ERAlgoNGamma(const std::string& name)
     : AlgoBase(name)
     , fTPC(-10.,-126.,-10.,292.,136.,1150.)
@@ -54,24 +53,28 @@ namespace ertool {
 
   bool ERAlgoNGamma::Reconstruct(const EventData &data, ParticleGraph& graph)
   {
+    int ctr = 0;
+    int gamma_evtctr = 0;
+    int null_evtctr = 0;
     auto datacpy = data;
     if(_verbose)
       {
 	std::cout<<"***** BEGIN N GAMMA RECONSTRUCTION *****"<<std::endl;
 	std::cout<<"\tShowers in event : "<<data.Shower().size()<<std::endl;
-	std::cout<<"\tTracks in event : "<<data.Track().size()<<std::endl;
-      }
-    std::vector<int> sibShwrFin;
-    std::vector<int> siblingsSHWR;
-    std::vector<int> siblingsTRK;
-    std::vector<int> siblingsS;
-    std::vector<int> siblingsT;
-    std::vector<RecoID_t> TrkInc;
-    std::vector<RecoID_t> ShwrInc;
+	std::cout<<"\tTracks in event : "<<data.Track().size()<<std::endl;      }
+    std::vector<NodeID_t> sibShwrFin;
+    std::vector<NodeID_t> siblingsS;
+    std::vector<NodeID_t> siblingsT;
     RecoID_t refT,refS;
-    double IPst,radst,IPsos,radsos;
+    Track referenceTrack;
+    Shower referenceShower;
+    double IPst=0;
+    double radst=0;
+    double IPsos=0;
+    double radsos=0;
     geoalgo::Trajectory_t refTrk;
     geoalgo::Cone refShwr;
+    // SECTION A ==============================================================
     for(auto const& s : graph.GetParticleNodes(RecoType_t::kShower))
       {
 	auto const& thisID = graph.GetParticle(s).RecoID();
@@ -97,25 +100,30 @@ namespace ertool {
 	double crefopang = atan(cref.Radius()/cref.Length());
 	::geoalgo::HalfLine refhl(thisShower.Start(),
 				  cdir);
+	/// variables to be used in section E
 	auto const& thisShwrStart = thisShower.Start();
 	std::vector<geoalgo::Point_t> vtxT;
 	std::vector<geoalgo::Point_t> vtxS;
-	//===================================================================
+	/// add this shower's NodeID_t to a shower sibling vector
+	siblingsS.push_back(thisID);
+	// SECTION B =========================================================
 	/// find the track with the smallest impact parameter
 	/// with respect to the reference shower
 	double IPminA = 1036;
 	::geoalgo::Point_t vtxMinA(3);
-	//for(t : graph.GetParticleNodes(RecoType_t::kTrack))
 	for(auto const& t : graph.GetParticleNodes(RecoType_t::kTrack))
 	  {
 	    auto const& thisT = graph.GetParticle(t).RecoID();
-	    auto const& thisTrack = datacpy.Track(thisT);
+	    //	    auto const& tT = graph.GetParticle(t).ID();
+	    auto const& thisTrack = datacpy.Track(thisT);	    
 	    /// only consider tracks that have not been assessed
 	    if(graph.GetParticle(t).RelationAssessed()) {continue;}
 	    /// only consider tracks that are long enough to be resolved
 	    if(thisTrack.size() < 2) {continue;}
 	    ::geoalgo::Point_t vtxst(3);
-	    IPst = _findRel.FindClosestApproach(s,t,vtxst);
+	    IPst = _findRel.FindClosestApproach(thisShower,
+						thisTrack,
+						vtxst);
 	    if(IPst < IPminA) {IPminA = IPst; vtxMinA = vtxst;};
 	    /// *** determine error on shwr-trk impact parameter ***
 	    /// closest point between point and half line
@@ -127,10 +135,10 @@ namespace ertool {
 	    /// determine the radius of the cone at the specified length
 	    /// along the cone axis
 	    radst = distst*(tan(crefopang)); // <-- shwr-trk error
-	    TrkInc.push_back(thisTrack.RecoID());
-	    refTrk = t;
+	    /// add this track's NodeID_t to a track sibling vector
+	    siblingsT.push_back(thisT);
 	    refT = thisT;
-	    siblingsT.push_back(t);
+	    referenceTrack = thisTrack;
 	  } // <-- end t loop
 	/// find the other shower with the smallest impact parameter
 	/// with respect to the reference shower
@@ -139,6 +147,7 @@ namespace ertool {
 	for(auto const& os : graph.GetParticleNodes(RecoType_t::kShower))
 	  {
 	    auto const& otherS = graph.GetParticle(os).RecoID();
+	    //auto const& sS = graph.GetParticle(os).ID();
 	    auto const& otherShower = datacpy.Shower(otherS);
 	    /// check that the shower is not being compared against itself
 	    if(os == s) {continue;}
@@ -147,7 +156,9 @@ namespace ertool {
 	      {if(graph.GetParticle(othShwrParent).PdgCode() != 111) {continue;}
 	      }
 	    ::geoalgo::Point_t vtxsos(3);
-	    IPsos = _findRel.FindClosestApproach(s,os,vtxsos);
+	    IPsos = _findRel.FindClosestApproach(thisShower,
+						 otherShower,
+						 vtxsos);
 	    if(IPsos < IPminB) {IPminB = IPsos; vtxMinB = vtxsos;}
 	    /// *** determine error on shwr-shwr impact parameter ***
 	    geoalgo::Point_t refPtorigs = _geoAlgo.ClosestPt(vtxMinB,refhl);
@@ -172,21 +183,23 @@ namespace ertool {
 	    double radoths = distoths*(tan(cothsopang)); // <-- other shwr error
 	    radsos = sqrt(radorigs*radorigs
 			  +radoths*radoths); // <-- shwr-shwr error
-	    ShwrInc.push_back(otherShower.RecoID());
+	    /// variables to be used in section ___
+	    /// add this shower's NodeID_t to a shower sibling vector
+	    siblingsS.push_back(otherS);
 	    geoalgo::Cone temp(otherShower.Start(),
 			       otherShower.Dir(),
 			       otherShower.Length(),
 			       otherShower.Radius());
 	    refShwr = temp;
 	    refS = otherS;
-	    siblingsS.push_back(os);
+	    referenceShower = otherShower;
 	  } // <-- end os loop
-	//====================================================================
+	// SECTION C ==========================================================
 	/// compare shwr-trk minimum IP with trk-trk minimum IP
 	/// choose object with smaller IP to ossiciate with original shwr
-	if(IPminA < IPminB) // track preferred
+	if(IPminA < IPminB && IPminA < _maxIP) // track preferred
 	  {
-	    siblingsTRK.swap(siblingsT);
+	    siblingsS.pop_back();
 	    for(auto const& ot : graph.GetParticleNodes(RecoType_t::kTrack))
 	      {
 		auto const& otherT = graph.GetParticle(ot).RecoID();
@@ -196,12 +209,12 @@ namespace ertool {
 		if(otherTrack.size() < 2) {continue;}
 		if(refT == otherT) {continue;}
 		::geoalgo::Point_t vtxtot(3);
-		double IPtot = _findRel.FindClosestApproach(refTrk,ot,vtxtot);
-		/// *** impose condition on impact parameter ***
+		double IPtot = _findRel.FindClosestApproach(referenceTrack,
+							    otherTrack,
+							    vtxtot);
+		/// impose condition on impact parameter 
 		if(IPtot > IPst+radst) {continue;}
-		TrkInc.push_back(otherTrack.RecoID());
 		vtxT.push_back(vtxtot);
-		siblingsTRK.push_back(ot);
 		//_E;
 		_thatE = otherTrack._energy;
 		//_PDG;
@@ -212,9 +225,8 @@ namespace ertool {
 		_IPthatStart = vtxtot.Dist(otherTrack.front());
 		//_IPtrkBody;
 		_alg_tree->Fill();
+		siblingsT.push_back(otherT);
 	      } // <-- end ot loop
-	    siblingsS.pop_back();
-	    siblingsSHWR.swap(siblingsS);
 	    for(auto const& oos : graph.GetParticleNodes(RecoType_t::kShower))
 	      {
 		auto const& othothS = graph.GetParticle(oos).RecoID();
@@ -227,87 +239,90 @@ namespace ertool {
 		    if(graph.GetParticle(othothShowerParent).PdgCode() != 111)
 		      {continue;}
 		  }
+		if(thisID == othothS) {continue;}
 		::geoalgo::Point_t vtxtoos(3);
 		double IPtoos =
-		  _findRel.FindClosestApproach(refTrk,oos,vtxtoos);
-		/// *** impose condition on impact parameter ***
+		  _findRel.FindClosestApproach(referenceTrack,
+					       othothShower,
+					       vtxtoos);
+		///  impose condition on impact parameter 
 		if(IPtoos > IPst+radst) {continue;}
-		TrkInc.push_back(othothShower.RecoID());
 		vtxT.push_back(vtxtoos);
-		siblingsSHWR.push_back(oos);
 		_VsTrack = 0;
 		_thatE = othothShower._energy;
 		_IP = IPtoos;
 		_IPthisStart = vtxtoos.Dist(thisShower.Start());
 		_IPthatStart = vtxtoos.Dist(othothShower.Start());
 		_alg_tree->Fill();
+		siblingsS.push_back(othothS);
 	      } // <-- end oos loop
 	  } // <-- end if(IPminA < IPminB)
-	//====================================================================
+	// SECTION D ===========================================================
 	else // shower preferred
 	  {
-	    siblingsSHWR.swap(siblingsS);
-	    for(auto const& oot : graph.GetParticleNodes(RecoType_t::kTrack))
+	    if(IPminB < _maxIP)
 	      {
-		auto const& othothT = graph.GetParticle(oot).RecoID();
-		auto const& othothTrack = datacpy.Track(othothT);
-		//if (oot = t) {continue;}
-		if(graph.GetParticle(oot).RelationAssessed()) {continue;}
-		if(othothTrack.size() < 2) {continue;}
-		::geoalgo::Point_t vtxsoot(3);
-		double IPsoot =
-		  _findRel.FindClosestApproach(refShwr,oot,vtxsoot);
-		/// *** impose condition on impact parameter ***
-		if(IPsoot > IPsos + radsos) {continue;}
-		ShwrInc.push_back(othothTrack.RecoID());
-		vtxS.push_back(vtxsoot);
-		siblingsSHWR.push_back(oot);
-		//_E;
-		_thatE = othothTrack._energy;
-		//_PDG;
-		//_dEdx;
-		_VsTrack = 1;
-		_IP = IPsoot;
-		_IPthisStart = vtxsoot.Dist(thisShower.Start());
-		_IPthatStart = vtxsoot.Dist(othothTrack.front());
-		//_IPtrkBody;
-		_alg_tree->Fill();
-		  
-	      } // <-- end oot loop
-	    siblingsT.pop_back();
-	    siblingsTRK.swap(siblingsT);
-	    for(auto const& ooos : graph.GetParticleNodes(RecoType_t::kShower))
-	      {
-		auto const& othothothS = graph.GetParticle(ooos).RecoID();
-		auto const& othothothShower = datacpy.Shower(othothothS);
-		auto const& othothothShowerParent =
-		  graph.GetParticle(ooos).Parent();
-		if(othothothShower._energy<_Ethreshold) {continue;}
-		if(graph.GetParticle(ooos).RelationAssessed())
+		siblingsT.pop_back();
+		for(auto const& oot : graph.GetParticleNodes(RecoType_t::kTrack))
 		  {
-		    if(graph.GetParticle(othothothShowerParent).PdgCode()
-		       != 111) {continue;}		     
-		  }
-		if(refS == othothothS) {continue;}
-		::geoalgo::Point_t vtxsooos(3);
-		double IPsooos =
-		  _findRel.FindClosestApproach(refShwr,ooos,vtxsooos);
-		/// *** impose condition on impact parameter ***
-		if(IPsooos > IPsos + radsos) {continue;}
-		ShwrInc.push_back(othothothShower.RecoID());
-		vtxS.push_back(vtxsooos);
-		siblingsTRK.push_back(ooos);
-		_VsTrack = 0;
-		_thatE = othothothShower._energy;
-		_IP = IPsooos;
-		_IPthisStart = vtxsooos.Dist(thisShower.Start());
-		_IPthatStart = vtxsooos.Dist(othothothShower.Start());
-		_alg_tree->Fill();
-	      } // <-- end ooos loop
+		    auto const& othothT = graph.GetParticle(oot).RecoID();
+		    auto const& othothTrack = datacpy.Track(othothT);
+		    if(graph.GetParticle(oot).RelationAssessed()) {continue;}
+		    if(othothTrack.size() < 2) {continue;}
+		    ::geoalgo::Point_t vtxsoot(3);
+		    double IPsoot = _findRel.FindClosestApproach(referenceShower,
+								 othothTrack,
+								 vtxsoot);
+		    /// *** impose condition on impact parameter ***
+		    if(IPsoot > IPsos + radsos) {continue;}
+		    vtxS.push_back(vtxsoot);
+		    //_E;
+		    _thatE = othothTrack._energy;
+		    //_PDG;
+		    //_dEdx;
+		    _VsTrack = 1;
+		    _IP = IPsoot;
+		    _IPthisStart = vtxsoot.Dist(thisShower.Start());
+		    _IPthatStart = vtxsoot.Dist(othothTrack.front());
+		    //_IPtrkBody;
+		    _alg_tree->Fill();
+		    siblingsT.push_back(othothT);
+		  } // <-- end oot loop
+		for(auto const& ooos : graph.GetParticleNodes(RecoType_t::kShower))
+		  {
+		    auto const& othothothS = graph.GetParticle(ooos).RecoID();
+		    auto const& othothothShower = datacpy.Shower(othothothS);
+		    auto const& othothothShowerParent =
+		      graph.GetParticle(ooos).Parent();
+		    if(othothothShower._energy<_Ethreshold) {continue;}
+		    if(graph.GetParticle(ooos).RelationAssessed())
+		      {
+			if(graph.GetParticle(othothothShowerParent).PdgCode()
+			   != 111) {continue;}		     
+		      }
+		    if(refS == othothothS) {continue;}
+		    if(thisID == othothothS) {continue;}
+		    ::geoalgo::Point_t vtxsooos(3);
+		    double IPsooos =
+		      _findRel.FindClosestApproach(referenceShower,
+						   othothothShower,
+						   vtxsooos);
+		    /// *** impose condition on impact parameter ***
+		    if(IPsooos > IPsos + radsos) {continue;}
+		    vtxS.push_back(vtxsooos);
+		    _VsTrack = 0;
+		    _thatE = othothothShower._energy;
+		    _IP = IPsooos;
+		    _IPthisStart = vtxsooos.Dist(thisShower.Start());
+		    _IPthatStart = vtxsooos.Dist(othothothShower.Start());
+		    _alg_tree->Fill();
+		    siblingsS.push_back(othothothS);
+		  } // <-- end ooos loop
+	      } // <-- if (IPminB < _maxIP)
 	  } // <-- end else
-	//====================================================================
+	// SECTION E ==========================================================
 	///REMOVE IF STATEMENT ONCE "SPHERE" IS FIXED
-	if(vtxT.size() < 5)
+	if(vtxT.size() < 4)
 	  {
 	    ::geoalgo::Sphere sT(vtxT);
 	    const auto VTX = sT.Center();
@@ -321,7 +336,7 @@ namespace ertool {
 	    _radlen = VTX.Dist(thisShower.Start());
 	    _pdg = 22;
 	    _empart_tree->Fill();
-	    for(auto const& aa : siblingsSHWR)
+	    for(auto const& aa : siblingsS)
 	      {
 		/// disregard electrons in event
 		auto const& bb = datacpy.Shower(graph.GetParticle(aa).RecoID());
@@ -329,7 +344,7 @@ namespace ertool {
 		double distBB = bbShwrStart.Dist(VTX);
 		if(_alg_emp.LL(true,bb._dedx,distBB) >
 		   (_alg_emp.LL(false,bb._dedx,distBB))) {continue;}
-		sibShwrFin.push_back(siblingsSHWR[aa]);
+		sibShwrFin.push_back(siblingsS[aa]);
 		_dedx = bb._dedx;
 		_radlen = VTX.Dist(bb.Start());
 		_pdg = 22;
@@ -337,7 +352,7 @@ namespace ertool {
 	      } // <-- end aa loop
 	  } // <-- end  if vtxT
 	///REMOVE IF STATEMENT ONCE "SPHERE" IS FIXED
-	if(vtxS.size() < 5)
+	if(vtxS.size() < 4)
 	  {
 	    ::geoalgo::Sphere sS(vtxS);
 	    const auto VTX = sS.Center();
@@ -348,23 +363,25 @@ namespace ertool {
 	    _radlen = VTX.Dist(thisShower.Start());
 	    _pdg = 22;
 	    _empart_tree->Fill();
-	    for(auto const& a : siblingsSHWR)
+	    for(auto const& a : siblingsS)
 	      {
 		/// disregard electrons in event
-		auto const& b = datacpy.Shower(graph.GetParticle(a).RecoID());
+		auto const& b =
+		  datacpy.Shower(graph.GetParticle(a).RecoID());
 		auto const& bShwrStart = b.Start();
 		double distB = bShwrStart.Dist(VTX);
 		if(_alg_emp.LL(true,b._dedx,distB) >
 		   (_alg_emp.LL(false,b._dedx,distB))) {continue;}
-		sibShwrFin.push_back(siblingsSHWR[a]);
+		sibShwrFin.push_back(siblingsS[a]);
 		_dedx = b._dedx;
 		_radlen = VTX.Dist(b.Start());
 		_pdg = 22;
 		_empart_tree->Fill();
 	      } // <-- end a loop
 	  } // <-- end if vtxS
-	//=====================================================================
+	// SECTION F ==========================================================
 	/// fill the particle graph
+	/// declare reference shower as a gamma
 	auto& gamma = graph.GetParticle(s);
 	double mom = thisShower._energy;
 	gamma.SetParticleInfo(22,
@@ -373,6 +390,7 @@ namespace ertool {
 			      thisShower.Dir()*mom);
 	for(auto const& c : sibShwrFin)
 	  {
+	    if (s == c) {continue;}
 	    auto const& d = datacpy.Shower(graph.GetParticle(c).RecoID());
 	    /// add this shower to ParticleTree
 	    auto &ruggles = graph.GetParticle(c);
@@ -381,24 +399,56 @@ namespace ertool {
 				    _gamma_mass,
 				    d.Start(),
 				    d.Dir()*shwrMom);
-	  } // <-- end c loop
-	for(auto const& f : siblingsTRK)
+	    //graph.SetSiblings(s,c);
+	  } // <-- end c loop 
+	if(siblingsT.size()>0)
 	  {
-	    auto const& g = datacpy.Track(graph.GetParticle(f).RecoID());
-	    auto &charlesmgh = graph.GetParticle(f);
-	    // track deposited energy
-	    double EDep = g._energy;
-	    // track direction
-	    geoalgo::Vector_t Tdir = (g[1]-g[0]);
-	    Tdir.Normalize();
-	    double mass = _findRel.GetMass(g);
-	    geoalgo::Vector_t tMom = Tdir*(sqrt(EDep*(EDep+2*mass)));
-	    charlesmgh.SetParticleInfo(_findRel.GetPDG(g),
-				       mass,
-				       g[0],
-				       tMom);
-	  } // <-- end f loop
+	    for(auto const& f : siblingsT)
+	      {
+		auto const& g = datacpy.Track(graph.GetParticle(f).RecoID());
+		auto &charlesmgh = graph.GetParticle(f);
+		// track deposited energy
+		double EDep = g._energy;
+		// track direction
+		geoalgo::Vector_t Tdir = (g[1]-g[0]);
+		Tdir.Normalize();
+		double mass = _findRel.GetMass(g);
+		geoalgo::Vector_t tMom = Tdir*(sqrt(EDep*(EDep+2*mass)));
+		charlesmgh.SetParticleInfo(charlesmgh.PdgCode(),
+					   mass,
+					   g[0],
+					   tMom);
+		//graph.SetSiblings(s,f);
+					   } // <-- end f loop
+	  } //<-- end siblingsT.size()
+	/// create a new particle for the neutrino
+	/*if(_verbose)
+	  {
+	    std::cout<<"# of particles before: "<<graph.GetNumParticles()<<std::endl
+		     <<"Making neutrino..."<<std::endl;
+	    
+	  }
+	Particle& neutrino = graph.CreateParticle();
+	if(_verbose)
+	  {
+	    std::cout<<"Made neutrino with ID: "<<neutrino.ID()<<" and PDG: "<<neutrino.PdgCode()<<std::endl
+		     <<"# of particles after: "<<graph.GetNumParticles()<<std::endl;
+	  } */
+	/// set relationship
+	//graph.SetParentage(neutrino.ID(),s);
+	if(_verbose)
+	  {
+	    std::cout<<"We found a gamma event! Hooray!!"<<std::endl;
+	    ctr++;
+	  }
+	siblingsS.clear();
+	siblingsT.clear();
+	sibShwrFin.clear();
       } // <-- end s loop
+    if(ctr > 0)
+      {gamma_evtctr++;}
+    if(ctr == 0)
+      {null_evtctr++;}
     return true;
   } // <__ end Reconstruct
 

@@ -12,9 +12,9 @@ from viewport import viewport
 
 # Import the basic event management class
 from event import event
+from PyQt4 import QtCore
 
-
-class view_manager(object):
+class view_manager(QtCore.QObject):
   """This class manages a collection of viewports"""
   def __init__(self, geometry):
     super(view_manager, self).__init__()
@@ -33,6 +33,8 @@ class view_manager(object):
     self._wireDrawer.setMaximumHeight(200)
     self._wireDrawer.setMinimumHeight(100)
 
+    self._selectedPlane = -1
+
     self._autoRange = False
 
 
@@ -41,13 +43,21 @@ class view_manager(object):
     self._drawerList[-1].connectWireDrawingFunction(self.drawWireOnPlot)
     self._nviews += 1
   
+  def selectPlane(self,plane):
+    self._selectedPlane = plane
 
 
   def restoreDefaults(self):
     for view in self._drawerList:
       view.restoreDefaults()
 
+  def clearPoints(self):
+    for view in self._drawerList:
+      view.clearPoints()
+
   def getDrawListWidget(self):
+
+    self._widgetList = []
 
     # loop through the list and add the drawing windows and their scale
     self._widget = QtGui.QWidget()
@@ -56,17 +66,56 @@ class view_manager(object):
     self._layout.setMargin(0)
     self._layout.setContentsMargins(0,0,0,0)
 
-
+    self._planeWidgets = []
     for view in self._drawerList:
-      self._layout.addWidget(view.getWidget(),0)
+      widget,layout = view.getWidget()
+      self._planeWidgets.append(widget)
+      self._layout.addWidget(widget,0)
 
     self._widget.setLayout(self._layout)
+
     return self._widget
+
+  def refreshDrawListWidget(self):
+
+    if self._selectedPlane == -1:
+      for widget in self._planeWidgets:
+        widget.setVisible(True)
+
+    else:
+      i = 0
+      for widget in self._planeWidgets:
+        if i == self._selectedPlane:
+          widget.setVisible(True)
+        else:
+          widget.setVisible(False)
+        i += 1
+
 
   def connectStatusBar(self,statusBar):
     for view in self._drawerList:
       view.connectStatusBar(statusBar)
 
+
+  def linkViews(self):
+    pass
+  #   print "linking views"
+  #   self._lockYRange = True
+  #   self._drawerList[0]._view.sigYRangeChanged.connect(self.rangeChangeHandler)
+  #   self._drawerList[1]._view.sigYRangeChanged.connect(self.rangeChangeHandler)
+  #   self._drawerList[2]._view.sigYRangeChanged.connect(self.rangeChangeHandler)
+  #   self._wirePlot.sigXRangeChanged.connect(self.rangeChangeHandler)
+
+
+
+
+  # def rangeChangeHandler(self):
+  #   range = self.sender().range
+  #   if self._lockYRange:
+  #     for view in self._drawerList:
+  #       if view._view != self.sender():
+  #         view._view.setRange
+  #   print "range changed by ", self.sender()
 
   def setRangeToMax(self):
     for view in self._drawerList:
@@ -80,6 +129,13 @@ class view_manager(object):
   def lockAR(self, lockRatio):
     for view in self._drawerList:
       view.lockRatio(lockRatio)
+
+  def makePath(self):
+    for view in self._drawerList:
+      path = view.makeIonizationPath()
+      if path != None:
+        self.drawWireOnPlot(path)
+        return
 
   def drawWire(self,wireView):
     if wireView:
@@ -139,9 +195,10 @@ class gui(QtGui.QWidget):
 
   def update(self):
     # set the text boxes correctly:
-    eventLabel = "Ev: "
+    self._larliteEventEntry.setText(str(self._event_manager.internalEvent()))
+
+    eventLabel = "Ev: " + str(self._event_manager.event())
     self._eventLabel.setText(eventLabel)
-    self._eventEntry.setText(str(self._event_manager.event()))
     runLabel = "Run: " + str(self._event_manager.run())
     self._runLabel.setText(runLabel)
     subrunLabel = "Subrun: " + str(self._event_manager.subrun())
@@ -153,13 +210,14 @@ class gui(QtGui.QWidget):
   # This function prepares the buttons such as prev, next, etc and returns a layout
   def getEventControlButtons(self):
 
-    # This is a box to allow users to enter an event
-    self._eventEntry = QtGui.QLineEdit()
-    self._eventEntry.setToolTip("Enter an event to skip to that event")
-    self._eventEntry.returnPressed.connect(self.goToEventWorker)
+    # This is a box to allow users to enter an event (larlite numbering)
+    self._goToLabel = QtGui.QLabel("Go to: ")
+    self._larliteEventEntry = QtGui.QLineEdit()
+    self._larliteEventEntry.setToolTip("Enter an event to skip to that event (larlite numbering")
+    self._larliteEventEntry.returnPressed.connect(self.goToEventWorker)
     # These labels display current events
     self._runLabel = QtGui.QLabel("Run: 0")
-    self._eventLabel = QtGui.QLabel("Ev.:")
+    self._eventLabel = QtGui.QLabel("Ev.: 0")
     self._subrunLabel = QtGui.QLabel("Subrun: 0")
 
     # Jump to the next event
@@ -179,15 +237,16 @@ class gui(QtGui.QWidget):
 
     # Make a horiztontal box for the event entry and label:
     self._eventGrid = QtGui.QHBoxLayout()
-    self._eventGrid.addWidget(self._eventLabel)
-    self._eventGrid.addWidget(self._eventEntry)
+    self._eventGrid.addWidget(self._goToLabel)
+    self._eventGrid.addWidget(self._larliteEventEntry)
     # Another horizontal box for the run/subrun
     self._runSubRunGrid = QtGui.QHBoxLayout()
+    self._runSubRunGrid.addWidget(self._eventLabel)
     self._runSubRunGrid.addWidget(self._runLabel)
-    self._runSubRunGrid.addWidget(self._subrunLabel)
     # Pack it all together
     self._eventControlBox.addLayout(self._eventGrid)
     self._eventControlBox.addLayout(self._runSubRunGrid)
+    self._eventControlBox.addWidget(self._subrunLabel)
     self._eventControlBox.addWidget(self._nextButton)
     self._eventControlBox.addWidget(self._prevButton)
     self._eventControlBox.addWidget(self._fileSelectButton)
@@ -198,10 +257,10 @@ class gui(QtGui.QWidget):
   # this function helps pass the entry of the line edit item to the event control
   def goToEventWorker(self):
     try:
-      event = int(self._eventEntry.text())
+      event = int(self._larliteEventEntry.text())
     except:
       print "Error, must enter an integer"
-      self._eventEntry.setText(str(self._event_manager.event()))
+      self._larliteEventEntry.setText(str(self._event_manager.event()))
       return
     self._event_manager.goToEvent(event)
 
@@ -240,11 +299,23 @@ class gui(QtGui.QWidget):
     self._unitDisplayOption.setTristate(False)
     self._unitDisplayOption.stateChanged.connect(self.useCMWorker)
 
+
+    self._clearPointsButton = QtGui.QPushButton("ClearPoints")
+    self._clearPointsButton.setToolTip("Clear all of the drawn points from the views")
+    self._clearPointsButton.clicked.connect(self.clearPointsWorker)
+
+    self._makePathButton = QtGui.QPushButton("Eval. Points")
+    self._makePathButton.setToolTip("Compute the ADCs along the path defined by the points")
+    self._makePathButton.clicked.connect(self.drawIonizationWorker)
+
+
     # Pack the stuff into a layout
 
     self._drawingControlBox = QtGui.QVBoxLayout()
     self._drawingControlBox.addWidget(self._restoreDefaults)
     self._drawingControlBox.addWidget(self._maxRangeButton)
+    self._drawingControlBox.addWidget(self._clearPointsButton)
+    self._drawingControlBox.addWidget(self._makePathButton)
     self._drawingControlBox.addWidget(self._autoRangeBox)
     self._drawingControlBox.addWidget(self._lockAspectRatio)
     self._drawingControlBox.addWidget(self._drawWireOption)
@@ -257,6 +328,31 @@ class gui(QtGui.QWidget):
       self._view_manager.autoRange(self._event_manager)
     else:
       self._view_manager.setRangeToMax()
+
+  def viewSelectWorker(self):
+
+    i = 0
+    for i in xrange(self._geometry.nViews()):
+      if self.sender() == self._viewButtonArray[i]:
+        self._view_manager.selectPlane(i)
+        self._view_manager.refreshDrawListWidget()
+        return
+      else:
+        i += 1
+
+    # if there wasn't a match, then it must be the ALL button:
+    if self.sender() != None:
+      self._view_manager.selectPlane(-1)
+      self._view_manager.refreshDrawListWidget()
+      return
+
+  def clearPointsWorker(self):
+    self._view_manager.clearPoints()
+    pass
+
+  def drawIonizationWorker(self):
+    self._view_manager.makePath()
+    pass
 
   def lockARWorker(self):
     if self._lockAspectRatio.isChecked():
@@ -289,8 +385,10 @@ class gui(QtGui.QWidget):
 
   # This function combines the control button layouts, range layouts, and quit button
   def getWestLayout(self):
+
     event_control = self.getEventControlButtons()
     draw_control = self.getDrawingControlButtons()
+
 
     # Add the quit button?
     quit_control = self.getQuitLayout()
@@ -300,6 +398,36 @@ class gui(QtGui.QWidget):
     self._westLayout.addStretch(1)
     self._westLayout.addLayout(draw_control)
     self._westLayout.addStretch(1)
+
+    # Add a section to allow users to just view one window instead of two/three
+    self._viewButtonGroup = QtGui.QButtonGroup()
+    # Draw all planes:
+    self._allViewsButton = QtGui.QRadioButton("All")
+    self._allViewsButton.clicked.connect(self.viewSelectWorker)
+    self._viewButtonGroup.addButton(self._allViewsButton)
+
+    # Put the buttons in a layout
+    self._viewChoiceLayout = QtGui.QVBoxLayout()
+
+    # Make a label for this stuff:
+    self._viewChoiceLabel = QtGui.QLabel("View Options")
+    self._viewChoiceLayout.addWidget(self._viewChoiceLabel)
+    self._viewChoiceLayout.addWidget(self._allViewsButton)
+
+    i = 0
+    self._viewButtonArray = []
+    for plane in xrange(self._geometry.nViews()):
+      button = QtGui.QRadioButton("Plane" + str(i))
+      i += 1
+      self._viewButtonGroup.addButton(button)
+      button.clicked.connect(self.viewSelectWorker)
+      self._viewButtonArray.append(button)
+      self._viewChoiceLayout.addWidget(button)
+
+    self._westLayout.addLayout(self._viewChoiceLayout)
+
+    self._westLayout.addStretch(1)
+
     self._westLayout.addWidget(quit_control)
     self._westWidget = QtGui.QWidget()
     self._westWidget.setLayout(self._westLayout)
@@ -344,13 +472,38 @@ class gui(QtGui.QWidget):
     self._eastLayout.setVisible(False)
     self._eastLayout.setVisible(True)
 
+  def refreshCenterView(self):
+
+    # for child in self.centerWidget.children():
+    #   print type(child)
+    #   if type(child) == QtGui.QVBoxLayout:
+    #     layout = child
+
+    # print layout.children()
+    # print layout
+
+    widget = self._view_manager.getDrawListWidget()
+    # for child in widget.children():
+    #   print child
+
+    # print widget
+    # print layout
+
+    # print layout.children()
+
+    # for i in reversed(range(self.centerWidget.layout.count())): 
+        # layout.itemAt(i).widget().setParent(None)
+
+    self.centerWidget.setVisible(False)   
+    self.centerWidget.setVisible(True)   
+
   def initUI(self):
 
 
     # Get all of the widgets:
-    eastWidget  = self.getEastLayout()
-    westWidget  = self.getWestLayout()
-    southLayout = self.getSouthLayout()
+    self.eastWidget  = self.getEastLayout()
+    self.westWidget  = self.getWestLayout()
+    self.southLayout = self.getSouthLayout()
 
     # Area to hold data:
     nviews = self._geometry.nViews()
@@ -359,26 +512,22 @@ class gui(QtGui.QWidget):
       # These boxes hold the wire/time views:
       self._view_manager.addEvdDrawer(i)
 
+    self._view_manager.linkViews()
+
     self._view_manager.connectStatusBar(self._statusBar)
 
-    drawListWidget = self._view_manager.getDrawListWidget()
-
-
-    # Connect the wire drawing box to the planes so that they may
-    # update it
-    # for i in range(0, nviews):
-        # self._drawerList[i].connectWireDrawFunction(self.drawWire)
+    self.centerWidget = self._view_manager.getDrawListWidget()
 
     # Put the layout together
 
 
     self.master = QtGui.QVBoxLayout()
     self.slave = QtGui.QHBoxLayout()
-    self.slave.addWidget(westWidget)
-    self.slave.addWidget(drawListWidget)
-    self.slave.addWidget(eastWidget)
+    self.slave.addWidget(self.westWidget)
+    self.slave.addWidget(self.centerWidget)
+    self.slave.addWidget(self.eastWidget)
     self.master.addLayout(self.slave)
-    self.master.addWidget(southLayout)
+    self.master.addWidget(self.southLayout)
 
     self.setLayout(self.master)    
 
@@ -431,49 +580,5 @@ class gui(QtGui.QWidget):
     # Print
     pixmapImage = QtGui.QPixmap.grabWidget(self)
     pixmapImage.save(f,"PNG")
-
-
-
-# def sigintHandler(*args):
-#     """Handler for the SIGINT signal."""
-#     sys.stderr.write('\r')
-#     sys.exit()
-
-# def main():
-    
-#   parser = argparse.ArgumentParser(description='Python based event display.')
-#   geom = parser.add_mutually_exclusive_group()
-#   geom.add_argument('-A', '--argoneut',action='store_true',help="Run with the argoneut geometry")
-#   geom.add_argument('-U', '--uboone',action='store_true',help="Run with the microboone geometry")
-#   geom.add_argument('-L', '--lariat',action='store_true',help="Run with the lariat geometry")
-#   parser.add_argument('file',nargs='?',help="Optional input file to use")
-#   parser.add_argument('-d',"--daq",action='store_true',help="Run the evd in daq mode.")
-#   args = parser.parse_args()
-
-#   app = QtGui.QApplication(sys.argv)
-#   geometry = "uboone"
-#   if args.argoneut:
-#       geometry = "argoneut"
-#   elif args.lariat:
-#       geometry = "lariat"
-#   if args.daq:
-#       mode = "daq"
-#       print "Running in daq mode"
-#   else:
-#     mode = ""
-  
-#   ex = gui(geometry,mode,args.file)
-
-#   signal.signal(signal.SIGINT, sigintHandler)
-#   timer = QtCore.QTimer()
-#   timer.start(500)  # You may change this if you wish.
-#   timer.timeout.connect(lambda: None)  # Let the interpreter run each 500 ms.
-
-#   app.exec_()
-#   # sys.exit(app.exec_())
-
-
-# if __name__ == '__main__':
-#   main()
 
 
