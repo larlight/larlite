@@ -166,11 +166,11 @@ namespace larlite {
 
     //---- Charge per plane ----//
     std::vector<double> fPlaneCharge; ///< Charge deposit per plane
-    std::vector<double> fdQdx; ///< Charge deposit per plane
+
 
     TVector3                   fStartDir;        ///< Shower Starting Direction, within the first 2.4cm                   
     double                     fdEdx;            ///< Shower True dEdx
-
+    std::vector<double> fdQdx; ///< Charge deposit per plane
 
 
   };
