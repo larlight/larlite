@@ -2,7 +2,7 @@
  * \file StartPoint3DModule.h
  *
  * \ingroup ModularAlgo
- * 
+ *
  * \brief Class def header for a class StartPoint3DModule
  *
  * @author cadams
@@ -23,25 +23,25 @@
  */
 namespace showerreco {
 
-  class StartPoint3DModule : ShowerRecoModuleBase{
+class StartPoint3DModule : ShowerRecoModuleBase {
 
-  public:
+public:
 
-    /// Default constructor
-    StartPoint3DModule(){_name = "StartPoint3DModule";}
+  /// Default constructor
+  StartPoint3DModule() {_name = "StartPoint3DModule";}
 
-    /// Default destructor
-    ~StartPoint3DModule(){}
+  /// Default destructor
+  ~StartPoint3DModule() {}
 
+  /// Inherited/overloaded function from ShowerRecoModuleBase
+  void do_reconstruction(const ShowerClusterSet_t &, Shower_t &);
 
-    void do_reconstruction(const ShowerClusterSet_t &, Shower_t &);
+private:
 
-  private:
-
-  };
+};
 
 } // showerreco
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 
