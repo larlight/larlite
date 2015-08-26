@@ -45,10 +45,11 @@ namespace larlite {
     
     fDaughterTrackID.clear();
     fPlaneCharge.clear();
-    
+
     fStartDir = invalid_vec;
 
     fdEdx = data::kINVALID_DOUBLE;
+    fdQdx.clear();
   }
 
   //----------------------------------------------------
@@ -64,6 +65,21 @@ namespace larlite {
       
     return fPlaneCharge[plane];
   }
+
+  //----------------------------------------------------
+  Double_t mcshower::dQdx(const size_t plane) const
+  //----------------------------------------------------
+  {
+    if(plane > fdQdx.size()) {
+
+      std::cerr<<"\033[93m"<<"No charge stored for plane: "<<plane<<"\033[00m"<<std::endl;
+      return -1;
+
+    }
+      
+    return fdQdx[plane];
+  }
+
   
   simb::Origin_t     mcshower::Origin() const { return fOrigin;    }
   
@@ -93,6 +109,8 @@ namespace larlite {
 
   const TVector3& mcshower::StartDir() const { return fStartDir; }
   const double& mcshower::dEdx() const { return fdEdx; }
+
+  const std::vector<double>& mcshower::dQdx() const { return fdQdx; }
 
 }
 

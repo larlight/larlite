@@ -53,7 +53,8 @@ namespace larlite {
                                        fDetProfile(origin.fDetProfile),
                                        fPlaneCharge(origin.fPlaneCharge),
                                        fStartDir(origin.fStartDir),
-                                       fdEdx(origin.fdEdx)
+                                       fdEdx(origin.fdEdx),
+                                       fdQdx(origin.fdQdx)
     {}
 
     /// Default destructor
@@ -89,8 +90,10 @@ namespace larlite {
     const std::vector<unsigned int>&  DaughterTrackID() const;
 
     double Charge(const size_t plane) const;
+    double dQdx(const size_t plane) const;
 
     const std::vector<double>& Charge() const;
+    const std::vector<double>& dQdx() const;
 
     const TVector3& StartDir() const;
 
@@ -124,6 +127,7 @@ namespace larlite {
     void DaughterTrackID ( const std::vector<unsigned int>& id_v ) { fDaughterTrackID = id_v; }
 
     void Charge (const std::vector<double>& q) { fPlaneCharge = q; }
+    void dQdx (const std::vector<double>& dqdx) { fdQdx = dqdx; }
 
     void StartDir ( const TVector3 &sdir) { fStartDir = sdir; }
     void dEdx    (const double& dedx) {fdEdx = dedx;}
@@ -162,6 +166,8 @@ namespace larlite {
 
     //---- Charge per plane ----//
     std::vector<double> fPlaneCharge; ///< Charge deposit per plane
+    std::vector<double> fdQdx; ///< Charge deposit per plane
+
     TVector3                   fStartDir;        ///< Shower Starting Direction, within the first 2.4cm                   
     double                     fdEdx;            ///< Shower True dEdx
 
