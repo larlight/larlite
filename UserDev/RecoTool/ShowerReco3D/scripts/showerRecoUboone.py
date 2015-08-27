@@ -32,6 +32,7 @@ def getShowerRecoAlgModular():
   # and if you are developing you ought to be updating it here!
 
   alg = showerreco.ShowerRecoAlgModular()
+  alg.SetDebug(True)
 
   # 3D Axis Module:
   axis3D = showerreco.Axis3DModule()
@@ -59,7 +60,7 @@ def DefaultMatch():
   palgo2 = cmtool.CPAlgoIgnoreTracks()
   
   palgo_array.AddAlgo(palgo1)
-  palgo_array.AddAlgo(palgo2)
+#  palgo_array.AddAlgo(palgo2)
 
   algo_array = cmtool.CFAlgoArray()
   #algo_array.SetMode(cmtool.CFAlgoArray.kPositiveAddition)
@@ -124,10 +125,10 @@ ana_unit.SetOutputProducer("showerreco")
 my_proc.add_process(ana_unit)
 
 # Add an ana unit to do the shower quality:
-quality_unit = fmwk.ShowerAna()
+# quality_unit = fmwk.ShowerAna()
 
 
-my_proc.add_process(quality_unit)
+# my_proc.add_process(quality_unit)
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
