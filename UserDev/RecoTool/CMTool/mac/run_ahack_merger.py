@@ -80,13 +80,13 @@ print "At this stage, producer is: ", prevProducer
 #prevProducer = 'Step7NickiePoly'
 #mgr.add_process(nickiePoly)
 
-slope = getSlope()
-slope.SetInputProducer(prevProducer)
-slope.SetOutputProducer('Step7Slope')
-slope.SaveOutputCluster()
-prevProducer = 'Step7Slope'
-mgr.add_process(slope)
-print "At this stage, producer is: ", prevProducer
+#slope = getSlope()
+#slope.SetInputProducer(prevProducer)
+#slope.SetOutputProducer('Step7Slope')
+#slope.SaveOutputCluster()
+#prevProducer = 'Step7Slope'
+#mgr.add_process(slope)
+#print "At this stage, producer is: ", prevProducer
 
 
 
