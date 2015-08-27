@@ -32,14 +32,17 @@ LDFLAGS += -L$(LARLITE_LIBDIR) -lfloatfann
 
 SUBDIRS := Alg
 
-.phony: all clean
 
-all:
+# .phony: all clean
+
+all: subdir
 	@for i in $(SUBDIRS); do ( echo "" && echo "Compiling $$i..." && cd $$i && $(MAKE) ) || exit $$?; done
 
-clean:
-	@for i in $(SUBDIRS); do ( echo "" && echo "Cleaning $$i..." && cd $$i && $(MAKE) clean && rm -f $(LARLIGHT_LIBDIR)/$$i.* ) || exit $$?; done
+# clean:
+# 	@for i in $(SUBDIRS); do ( echo "" && echo "Cleaning $$i..." && cd $$i && $(MAKE) clean && rm -f $(LARLIGHT_LIBDIR)/$$i.* ) || exit $$?; done
 
+subdir: dummy_subdir
+	cd Alg; $(MAKE)
 
 
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
@@ -48,6 +51,8 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE
 
 
+dummy_subdir:
+	true
 
 
 

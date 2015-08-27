@@ -151,21 +151,17 @@ namespace cmtool {
     // Priority is computed cluster-by-cluster. In case of two clusters having the same priority 
     // value the one with lower cluster index gets the priority. Also, clusters with priority < 0
     // are not logged (assumed not to be used)
+    
+        for(size_t i=0; i<clusters.size(); ++i) {
+    
+          size_t c_index = clusters.size() - i - 1;
+          float priority = clusters.at(c_index).hit_vector.size();
 
-    for(size_t i=0; i<clusters.size(); ++i) {
+          if(_priority_algo) {
+            priority = _priority_algo->Priority(clusters.at(c_index));
+          }
 
-      size_t c_index = clusters.size() - i - 1;
-
-      float priority = clusters.at(c_index).hit_vector.size();
-      
-      if(_priority_algo) {
-        
-        priority = _priority_algo->Priority(clusters.at(c_index));
-
-      }
-        
       if(priority>0) {
-        
         _priority.insert(std::make_pair(priority,c_index));
 
         if( _planes.find(clusters.at(c_index).plane_id.Plane) == _planes.end() )
