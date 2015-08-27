@@ -64,45 +64,11 @@ namespace cluster {
 
     int index = -1;
 
-    // Calculate a Rough Charge Profile
-    // This is basically a set of two numbers, containing info
-    // on how much charge is in each half of the shower
-    // Each hit's charget is added to either bin depending on whether
-    // the perpendicular projection of the hit onto the 2D slope
-    // of the cluster falls in the 1st or 2nd half.
-    // the charge of the cluster is weighted by the perpendicular
-    // distance to the 2Dslope line.
-    float Q_begin = 0; ///< Charge (weighted) in the 1st half of the cluster
-    float Q_end   = 0; ///< Charge (weighted) in the 2nd half of the cluster
-
-    // calculate a cluster length as distance from start and end point
-    float clusterLength = geomHelper->Get2DDistance(cluster.start_point,cluster.end_point);
-
     for(auto& hit : cluster.hit_vector) {
       index ++;
 
-      // keep information on a hit's projected point on the cluster's slope
-      Point2D hitProjectedOnLine;
-      geomHelper->GetPointOnLine(cluster.slope_2d,cluster.start_point,hit,hitProjectedOnLine);
-      // calculate orthogonal distance between the hit and the slope line
-      float orthDist = geomHelper->Get2DDistance(hitProjectedOnLine,hit);
-      // distance from the start of the cluster
-      float lineDist = geomHelper->Get2DDistance(cluster.start_point,hitProjectedOnLine);
 
-      // calculate a weight for this hit
-      // w = Q                (if orthDist < 1 i.e. close to trunk)
-      // w = Q/(2*orthDist)   (if orthDist > 1 i.e. far from trunk)
-      float weight = (orthDist < 1.) ? (hit.charge) : (hit.charge) / (orthDist/2.);
-      
-      // figure out if in 1st or 2nd half of cluster
-      if ( (lineDist*2) > clusterLength )
-        Q_end   += weight;
-      else
-        Q_begin += weight;
-      
-      //skip this hit if below minimum cutoff param
-      if(hit.charge < _Qmin) continue;
-      
+
       // Compute forward mean
       double hitStartDiff_x = (hit.w - this_startPoint.w) ;
       double hitStartDiff_y = (hit.t - this_startPoint.t) ;
@@ -147,15 +113,15 @@ namespace cluster {
       if (N_bins_OPEN  < 0) N_bins_OPEN  = 0;
       if (N_bins_CLOSE < 0) N_bins_CLOSE = 0;
 
-      if (_verbose){
-        std::cout << "endStartDiff_x :" << endStartDiff_x << "\n"
-                  << "endStartDiff_y :" << endStartDiff_y << "\n"
-                  << "cosangle_start :" << cosangle_start << "\n"
-                  << "cosangle_end   :" << cosangle_end << "\n"
-                  << "N_bins_OPEN    :" << N_bins_OPEN << "\n"
-                  << "N_bins_CLOSE   :" << N_bins_CLOSE << "\n"
-                  << std::endl; 
-      }
+      // if (_verbose){
+      //   std::cout << "endStartDiff_x :" << endStartDiff_x << "\n"
+      //             << "endStartDiff_y :" << endStartDiff_y << "\n"
+      //             << "cosangle_start :" << cosangle_start << "\n"
+      //             << "cosangle_end   :" << cosangle_end << "\n"
+      //             << "N_bins_OPEN    :" << N_bins_OPEN << "\n"
+      //             << "N_bins_CLOSE   :" << N_bins_CLOSE << "\n"
+      //             << std::endl; 
+      // }
 
       opening_angle_chargeWgt_bin[N_bins_OPEN ] 
                     += hit.charge/cluster.sum_charge;
@@ -225,23 +191,24 @@ namespace cluster {
                <<"closing high charge angle: "<<closing_angle_highcharge << "\n"
                <<"opening high charge wgt  : "<<opening_angle_charge_wgt << "\n"
                <<"closing high charge wgt  : "<<closing_angle_charge_wgt << "\n"
-               <<"fCoarseChargeProfile     : "<<Q_begin << "\n"
-               <<"Q_end                    : " << Q_end << std::endl;
+               // <<"fCoarseChargeProfile     : "<<Q_begin << "\n"
+               // <<"Q_end                    : " << Q_end 
+               << std::endl;
     }
 
     double value_1 = closing_angle/opening_angle -1;
-    double value_2 = Q_begin/Q_end;//(fCoarseChargeProfile[0]/fCoarseChargeProfile[1]);
+    // double value_2 = Q_begin/Q_end;//(fCoarseChargeProfile[0]/fCoarseChargeProfile[1]);
     
-    if (value_2 < 100.0 && value_2 > 0.01)
-      value_2 = log(value_2);
-    else
-      value_2 = 0.0;
+    // if (value_2 < 100.0 && value_2 > 0.01)
+    //   value_2 = log(value_2);
+    // else
+    //   value_2 = 0.0;
     double value_3 = closing_angle_charge_wgt/opening_angle_charge_wgt -1;
 
     if (_verbose){
-      std::cout << "value_1 : " << value_1 << "\n"
-                << "value_2 : " << value_2 << "\n"
-                << "value_3 : " << value_3 << "\n"
+      std::cout << "value_1 (angle)   : " << value_1 << "\n"
+                // << "value_2 (Q ratio) : " << value_2 << "\n"
+                << "value_3 (angle Q) : " << value_3 << "\n"
                 << std::endl;
     }
 
@@ -251,12 +218,13 @@ namespace cluster {
     
     if (value_1 > 3  ) value_1 = 3.0;
     if (value_1 < -3 ) value_1 = -3.0;
-    if (value_2 > 3  ) value_2 = 3.0;
-    if (value_2 < -3 ) value_2 = -3.0;
+    // if (value_2 > 3  ) value_2 = 3.0;
+    // if (value_2 < -3 ) value_2 = -3.0;
     if (value_3 > 3  ) value_3 = 3.0;
     if (value_3 < -3 ) value_3 = -3.0;
 
-    double Exp = exp(value_1 + value_2 + value_3);
+    double Exp = exp(value_1 + value_3);
+    // double Exp = exp(value_1 + value_2 + value_3);
     double sigmoid = (Exp - 1)/(Exp + 1);
 
     if (_verbose)

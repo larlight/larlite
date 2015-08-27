@@ -40,7 +40,9 @@ namespace cluster{
       _moduleTimes[nmodule] += 1000*localWatch.RealTime();
 
       if (_debug){
-        std::cout << "Listing the changes made by " << module -> name() << ":" << std::endl;
+        std::cout << "Listing the changes made by " << module -> name() << ":"
+                  << " [" << _moduleTimes.back() << " s ]"
+                  << std::endl;
         fParams.ReportDiff(localCopy);
         std::cout << std::endl;
         localCopy = fParams;

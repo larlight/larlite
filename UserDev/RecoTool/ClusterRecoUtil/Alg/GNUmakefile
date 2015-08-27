@@ -27,10 +27,8 @@ OSNAMEMODE      = $(OSNAME)
 # linker flags
 LDFLAGS += $(shell larlite-config --libs)
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_FANN
+# LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtil
 LDFLAGS += -L$(LARLITE_LIBDIR) -lfloatfann
-
-SUBDIRS := Alg
-
 
 
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
