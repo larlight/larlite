@@ -26,8 +26,7 @@ namespace cmtool {
       float score = algo->Float(clusters);
 
       if(_mode != kSimpleAddition && score < 0)
-
-	return score;
+        return score;
 
       score_array.push_back(score);
       

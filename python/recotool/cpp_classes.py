@@ -6,7 +6,7 @@ ROOT.gErrorIgnoreLevel = ROOT.kFatal
 libs = [ 'libRecoTool_ShowerRecoAlgo.so',
          'libRecoTool_ShowerRecoApp.so',
          'libRecoTool_ShowerRecoBase.so',
-         'libRecoTool_ShowerRecoModular.so',
+         'libRecoTool_ShowerRecoAlgoModular.so',
          'libRecoTool_CMToolApp.so',
          'libRecoTool_CMTAlgMatch.so',
          'libRecoTool_CMTAlgMerge.so',

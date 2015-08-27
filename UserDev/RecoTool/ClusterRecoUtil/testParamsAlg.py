@@ -36,20 +36,13 @@ hit_index_v = ass.association(clusts.id(), hits.id())
 # Make the hits into PxHits and pass to the clusterParamsAlg
 
 
-alg      = cluster.ClusterParamsAlg()
-alg.SetDebug()
-
-averages = cluster.GetAverages()
-alg.attachAlg(averages)
 
 defaultAlg = cluster.DefaultParamsAlg()
+defaultAlg.SetDebug(True)
 
 
 params = cluster.cluster_params()
 helper = cluster.CRUHelper()
 helper.GenerateParams(hit_index_v[0],hits,params)
 
-
-
-# alg.FillParams(params)
 defaultAlg.FillParams(params)
