@@ -44,7 +44,13 @@ namespace cmtool {
     /// Function to reset the algorithm instance ... maybe implemented via child class
     virtual void Reset(){}
 
+    ///Set hits threshold for 2 clusters to be merged
+    void SetHits( int hits ) { _hits = hits ; }
+
   protected:
+
+
+  int _hits ;
 
   };
 }
