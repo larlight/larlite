@@ -73,6 +73,8 @@ namespace evd {
     // It can also save out the information
     void correctData();
 
+    float getCorrelation(const std::vector<float> &, const std::vector<float> &);
+
     bool _correct_data;
     bool _save_data;
 

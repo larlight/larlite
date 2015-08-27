@@ -44,16 +44,7 @@ namespace evd {
     }
     initDataHolder();
 
-    // Also initalize the space to hold the pedestal and RMS by Plane
-    pedestalByPlane.resize(geoService->Nviews());
-    rmsByPlane.resize(geoService->Nviews());
-    rmsByPlaneCorrected.resize(geoService->Nviews());
 
-    for (unsigned int p = 0; p < geoService -> Nviews(); p ++){
-      pedestalByPlane.at(p).resize(geoService->Nwires(p));
-      rmsByPlane.at(p).resize(geoService->Nwires(p));
-      rmsByPlaneCorrected.at(p).resize(geoService->Nwires(p));
-    }
 
     return true;
 
@@ -78,6 +69,22 @@ namespace evd {
     //   std::cout << "Event ID: " << my_pmtfifo_v->event_id() << std::endl;
     //
 
+    // Initalize the space to hold the pedestal and RMS by Plane
+    pedestalByPlane.clear();
+    pedestalByPlane.resize(geoService->Nviews());
+    rmsByPlane.clear();
+    rmsByPlane.resize(geoService->Nviews());
+    rmsByPlaneCorrected.clear();
+    rmsByPlaneCorrected.resize(geoService->Nviews());
+    badWireMapByPlane.clear();
+    badWireMapByPlane.resize(geoService->Nviews());
+
+    for (unsigned int p = 0; p < geoService -> Nviews(); p ++){
+      pedestalByPlane.at(p).resize(geoService->Nwires(p));
+      rmsByPlane.at(p).resize(geoService->Nwires(p));
+      rmsByPlaneCorrected.at(p).resize(geoService->Nwires(p));
+      badWireMapByPlane.at(p).resize(geoService->Nwires(p));
+    }
 
     // This is an event viewer.  In particular, this handles raw wire signal drawing.
     // So, obviously, first thing to do is to get the wires.
@@ -87,7 +94,8 @@ namespace evd {
     subrun = RawDigitHandle->subrun();
     event = RawDigitHandle->event_id();
 
-    float rmsMinBadWire = 1.0;
+    float rmsMinBadWire = 2.0*2.0;
+    float rmsMaxBadWire = 10*10;
 
     badWireMapByPlane.resize(geoService->Nplanes());
 
@@ -160,9 +168,9 @@ namespace evd {
       rms /= i;
 
       // Store the rms for saving:
-      rmsByPlane.at(plane).at(wire) = rms;
+      rmsByPlane.at(plane).at(wire) = sqrt(rms);
 
-      if (rms < rmsMinBadWire)
+      if (rms < rmsMinBadWire || rms > rmsMaxBadWire)
         badWireMapByPlane.at(plane).at(wire) = true;
     }
 
@@ -192,6 +200,16 @@ namespace evd {
     return true;
   }
 
+  void DrawRawDigit::SetStepSizeByPlane(int step, int plane){
+    if (plane < 0 || plane >= geoService -> Nviews()){
+      std::cerr << "ERROR: can't set step size for non existent plane " << plane << std::endl;
+    }
+    else{
+      if (step < 5) return;
+      stepSize.at(plane) = step;
+    }
+  }
+
   void DrawRawDigit::correctData(){
 
     // Loops over the data, figures out the coherent noise, and removes it.
@@ -201,6 +219,9 @@ namespace evd {
     // If _correct_data is true, it saves out the corrected rms as well as
     //  the uncorrected rms
 
+
+    // Clear the stuff that gets saved every event:
+    // 
 
     // Contains the wave form to subtract [plane][block][tick]
     std::vector<std::vector<std::vector<float> > > _subtractionWaveForm;
@@ -226,13 +247,11 @@ namespace evd {
       }
     }
 
+    char nameFile[100];
     // Initialize all of the variables and branches possible
     if (_save_data){
 
-
       // Setup the file and the ttree
-      // 
-      char nameFile[100];
       sprintf(nameFile,"RawDigitAna_%i_%i_%i.root",run, subrun,event);
       
       _out = new TFile(nameFile,"RECREATE");
@@ -249,10 +268,10 @@ namespace evd {
 
       // Save the pedestals, rms, and corrected rms by plane
       for (unsigned int p = 0; p < geoService -> Nviews(); p ++){
-        _tree -> Branch(Form("pedestal_%u",p), &(pedestalByPlane.at(p)[0]));
-        _tree -> Branch(Form("rms_%u",p),      &(rmsByPlane.at(p)[0]));
+        _tree -> Branch(Form("pedestal_%u",p), &(pedestalByPlane.at(p)));
+        _tree -> Branch(Form("rms_%u",p),      &(rmsByPlane.at(p)));
         if (_correct_data)
-          _tree -> Branch(Form("rmsCorrected_%u",p),  &(rmsByPlaneCorrected.at(p)[0]));
+          _tree -> Branch(Form("rmsCorrected_%u",p),  &(rmsByPlaneCorrected.at(p)));
       }
 
     }
@@ -338,10 +357,17 @@ namespace evd {
             for (unsigned int wire = wireStart; wire < wireStart + stepSize.at(plane); wire ++){
               // Skip bad wires
               int offset = wire*detProp->ReadOutWindowSize();
-              rmsByPlaneCorrected.at(plane).at(wire) 
-                += pow((pedestalByPlane.at(plane).at(wire) - _planeData.at(plane).at(offset+tick) - median), 2);
-              if (badWireMapByPlane.at(plane)[wire]) continue;
-              _planeData.at(plane).at(offset + tick) -= median;
+
+              if (badWireMapByPlane.at(plane)[wire]){
+                rmsByPlaneCorrected.at(plane).at(wire) 
+                  += pow((_planeData.at(plane).at(offset+tick)), 2); 
+                continue;
+              }
+              else{
+                _planeData.at(plane).at(offset + tick) -= median;
+                rmsByPlaneCorrected.at(plane).at(wire) 
+                  += pow((_planeData.at(plane).at(offset+tick)), 2); 
+              }
               // While we're here, do stuff to get the corrected RMS
 
             }
@@ -367,33 +393,120 @@ namespace evd {
 
           // Copy the data to the tgraph so that it can be stored, and set up the branches
           
-
-          char name[100];
-          sprintf(name,"subwaveform_%u_%u",plane,step);
-          _tree -> Branch(name, &(_subtractionWaveForm.at(plane).at(step)) );
+          if (_save_data){
+            char name[100];
+            sprintf(name,"subwaveform_%u_%u",plane,step);
+            _tree -> Branch(name, &(_subtractionWaveForm.at(plane).at(step)) );
+          }
         } // loop over steps
 
         // Divide the RMS by the number of ticks (which is actually 9595, not 9600)
         for (auto & wire : rmsByPlaneCorrected.at(plane)){
           wire /= 9595.0;
+          wire = sqrt(wire);
         }
 
       } // loop over planes
 
     }
 
+    int totalWaveforms = 0;
+    for (auto & vec : _subtractionWaveForm){
+      totalWaveforms += vec.size();
+    }
 
-    _tree -> Fill();
 
-    std::cout << "_out is " << _out << std::endl;
+    std::vector<std::vector<float> > correlationMatrix(totalWaveforms,std::vector<float>(totalWaveforms,0.0));
 
-    _tree -> Write();
-    _out -> Close();
+
+    if (_save_data){
+      int count = 0;
+      // Loop over the waveforms and get the correlations:
+      for (unsigned int i = 0; i < _subtractionWaveForm.size(); i ++){
+        for (int j = 0; j < _subtractionWaveForm.at(i).size(); j ++ )
+        {
+
+          // For each wave form, correlate it to all the other waveforms.
+          // Increment the count here, and don't correlate if the correlation 
+          // has already been calculated
+          int count2 = 0;
+          for (unsigned int i2 = 0; i2 < _subtractionWaveForm.size(); i2 ++){
+            for (int j2 = 0; j2 < _subtractionWaveForm.at(i2).size(); j2 ++ ) {
+              if (correlationMatrix[count][count2] == 0){
+                // This entry unfilled.  See if the cross diagonal is filled:
+                if (correlationMatrix[count2][count] != 0){
+                  correlationMatrix[count][count2] = correlationMatrix[count2][count];
+                  count2 ++;
+                  continue;
+                }
+                else{
+                  correlationMatrix[count][count2] = getCorrelation(_subtractionWaveForm[i][j],_subtractionWaveForm[i2][j2]);
+                  correlationMatrix[count2][count] = correlationMatrix[count][count2];
+                  count2 ++;
+                  continue;
+                }
+              }
+              count2++;
+            } // j2
+          } // i2
+          // Increment the number of counts
+          count ++;
+        }
+      }
+
+      // Save the correlation matrix
+      _tree -> Branch("correlationMatrix", &(correlationMatrix));
+    }
+
+    if (_save_data){
+      _tree -> Fill();
+      _tree -> Write();
+      _out -> Close();
+      std::cout << "Output successfully written to " << nameFile << std::endl;  
+    }
 
     return;
 
 
   }
+
+  float DrawRawDigit::getCorrelation(const std::vector<float> & vec1, const std::vector<float> & vec2)
+  {
+    
+    if (vec1.size() != vec2.size()){
+      std::cerr << "ERROR: vector sizes do not match" << std::endl;
+      return 0.0;
+    }
+
+    float rms_1  = 0.0; 
+    float rms_2  = 0.0;
+    float mean_1 = 0.0;
+    float mean_2 = 0.0;
+
+    for (unsigned int i = 0; i < vec1.size(); i++){
+      mean_1 += vec1.at(i);
+      mean_2 += vec2.at(i);
+    }
+
+    mean_1 /= vec1.size();
+    mean_2 /= vec2.size();
+    
+    float corr = 0.0;
+
+    for (unsigned int i = 0; i < vec1.size(); i++){
+      rms_1 += pow(mean_1 - vec1.at(i),2);
+      rms_2 += pow(mean_2 - vec2.at(i),2);
+      corr += (mean_1 - vec1.at(i))*(mean_2 - vec2.at(i));
+    }
+
+    rms_1 = sqrt(rms_1 / vec1.size());
+    rms_2 = sqrt(rms_2 / vec2.size());
+
+    corr /= (rms_1 * rms_2 * vec1.size());
+    return corr;
+
+  }
+
 
 
 }
