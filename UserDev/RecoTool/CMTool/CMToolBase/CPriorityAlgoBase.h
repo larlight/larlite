@@ -37,11 +37,7 @@ namespace cmtool {
        Core function: given the CPAN input, return whether a cluster should be
        merged or not.
     */
-    virtual float Priority(const ::cluster::cluster_params &cluster)
-    { 
-      if(cluster.N_Hits) return 1.;
-      return 0.1;
-    }
+    virtual float Priority(const ::cluster::cluster_params &cluster) = 0;
 
   };
 
