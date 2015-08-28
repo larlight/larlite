@@ -2,7 +2,7 @@
 #define RECOTOOL_CLUSTERVIEWER_CXX
 
 #include "ClusterViewer.h"
-#include "ClusterRecoUtil/DefaultParamsAlg.h"
+#include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
 
 namespace larlite {
 

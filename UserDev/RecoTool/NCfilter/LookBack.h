@@ -22,8 +22,8 @@
 #include "Analysis/ana_base.h"
 #include "LArUtil/PxUtils.h"
 #include "LArUtil/LArUtilBase.h"
-#include "ClusterRecoUtil/CRUHelper.h"
-#include "ClusterRecoUtil/ClusterParamsAlg.h"
+#include "ClusterRecoUtil/Base/CRUHelper.h"
+#include "ClusterRecoUtil/Base/ClusterParamsAlg.h"
 
 // ROOT includes
 #include <TF1.h>

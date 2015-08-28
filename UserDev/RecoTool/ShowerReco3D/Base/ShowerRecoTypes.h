@@ -5,7 +5,7 @@
 #include <vector>
 #include "LArUtil/PxUtils.h"
 #include "Base/GeoTypes.h"
-#include "ClusterRecoUtil/ClusterParams.h"
+#include "ClusterRecoUtil/Base/ClusterParams.h"
 
 namespace showerreco {
 

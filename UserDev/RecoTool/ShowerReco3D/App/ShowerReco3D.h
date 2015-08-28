@@ -16,7 +16,7 @@
 #define RECOTOOL_SHOWERRECO3D_H
 
 #include "Analysis/ana_base.h"
-#include "ClusterRecoUtil/CRUHelper.h"
+#include "ClusterRecoUtil/Base/CRUHelper.h"
 #include "ShowerReco3D/Base/ShowerRecoManager.h"
 
 namespace larlite {
