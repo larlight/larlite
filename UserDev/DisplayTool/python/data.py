@@ -157,7 +157,7 @@ class rawDigit(wire):
     self._process.SetStepSizeByPlane(48,0)
     self._process.SetStepSizeByPlane(48,1)
     self._process.SetStepSizeByPlane(96,2)
-    self._process.SetCorrectData(False)
+    self._process.SetCorrectData(True)
     self._process.SetSaveData(False)
 
 
