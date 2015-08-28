@@ -15,13 +15,13 @@
 #define DEFAULTPARAMSALG_H
 
 #include <iostream>
-#include "ClusterParamsAlg.h"
-#include "Alg/GetAverages.h"
-#include "Alg/FillPolygon.h"
-#include "Alg/GetRoughStartPoint.h"
-#include "Alg/RefineDirection.h"
-#include "Alg/RefineStartPoints.h"
-#include "Alg/FindShoweringPoint.h"
+#include "ClusterRecoUtil/Base/ClusterParamsAlg.h"
+#include "GetAverages.h"
+#include "FillPolygon.h"
+#include "GetRoughStartPoint.h"
+#include "RefineDirection.h"
+#include "RefineStartPoints.h"
+#include "FindShoweringPoint.h"
 
 namespace cluster {
 

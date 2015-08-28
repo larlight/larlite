@@ -17,6 +17,7 @@
 #pragma link C++ class cluster::RefineStartPoints+;
 #pragma link C++ class cluster::GetRoughStartPoint+;
 #pragma link C++ class cluster::FindShoweringPoint+;
+#pragma link C++ class cluster::DefaultParamsAlg+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 

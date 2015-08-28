@@ -2,7 +2,7 @@
 #define REFINEDIRECTION_CXX
 
 #include "RefineDirection.h"
-#include "CRUException.h"
+#include "ClusterRecoUtil/Base/CRUException.h"
 #include "LArUtil/GeometryHelper.h"
 
 const float PI = 3.14159265;

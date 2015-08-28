@@ -28,7 +28,7 @@
 #pragma link C++ class cluster::CRUHelper+;
 
 
-#pragma link C++ class cluster::DefaultParamsAlg+;
+//#pragma link C++ class cluster::DefaultParamsAlg+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
