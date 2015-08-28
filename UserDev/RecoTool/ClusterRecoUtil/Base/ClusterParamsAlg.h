@@ -17,7 +17,7 @@
 #include <iostream>
 #include <vector>
 #include "ClusterParams.h"
-#include "Alg/ParamsAlgBase.h"
+#include "ClusterRecoUtil/Alg/ParamsAlgBase.h"
 #include "DataFormat/hit.h"
 #include "TStopwatch.h"
 

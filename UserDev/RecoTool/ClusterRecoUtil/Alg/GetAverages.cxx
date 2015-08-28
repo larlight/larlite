@@ -3,7 +3,7 @@
 
 #include "GetAverages.h"
 #include "TPrincipal.h"
-#include "CRUException.h"
+#include "ClusterRecoUtil/Base/CRUException.h"
 #include <map>
 
 namespace cluster {

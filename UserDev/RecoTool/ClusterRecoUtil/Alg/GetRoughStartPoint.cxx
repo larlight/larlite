@@ -2,7 +2,7 @@
 #define GETROUGHSTARTPOINT_CXX
 
 #include "GetRoughStartPoint.h"
-#include "CRUException.h"
+#include "ClusterRecoUtil/Base/CRUException.h"
 #include "LArUtil/GeometryHelper.h"
 #include <map>
 #include <iomanip>

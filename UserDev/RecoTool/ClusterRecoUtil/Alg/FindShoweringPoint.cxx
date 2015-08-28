@@ -2,7 +2,7 @@
 #define FINDSHOWERINGPOINT_CXX
 
 #include "FindShoweringPoint.h"
-#include "CRUException.h"
+#include "ClusterRecoUtil/Base/CRUException.h"
 #include "LArUtil/GeometryHelper.h"
 #include <map>
 
