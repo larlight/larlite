@@ -16,7 +16,7 @@
 
 #include <iostream>
 #include "TFile.h"
-#include "ClusterRecoUtil/ClusterParams.h"
+#include "ClusterRecoUtil/Base/ClusterParams.h"
 
 namespace cmtool {
 

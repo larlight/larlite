@@ -20,8 +20,8 @@
 
 #include "CPriorityAlgoBase.h"
 #include "TStopwatch.h"
-#include "ClusterRecoUtil/DefaultParamsAlg.h"
-#include "ClusterRecoUtil/ClusterParams.h"
+#include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
+#include "ClusterRecoUtil/Base/ClusterParams.h"
 
 namespace cmtool {
 

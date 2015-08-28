@@ -18,8 +18,8 @@
 #define PI 3.14159265
 
 #include "Analysis/ana_base.h"
-#include "ClusterRecoUtil/ClusterParamsAlg.h"
-#include "ClusterRecoUtil/CRUHelper.h"
+#include "ClusterRecoUtil/Base/ClusterParamsAlg.h"
+#include "ClusterRecoUtil/Base/CRUHelper.h"
 #include "LArUtil/LArUtilBase.h"
 
 #include "DivReg.h"
