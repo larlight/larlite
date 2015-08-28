@@ -74,6 +74,7 @@ namespace evd {
     void correctData();
 
     float getCorrelation(const std::vector<float> &, const std::vector<float> &);
+    float getMedian( std::vector<float> & vals);
 
     bool _correct_data;
     bool _save_data;
