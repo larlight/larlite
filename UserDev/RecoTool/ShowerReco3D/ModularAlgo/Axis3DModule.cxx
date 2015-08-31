@@ -16,6 +16,7 @@ namespace showerreco{
     // This function takes the shower cluster set and computes the best fit 3D axis
     // and then assigns it to the shower.
 
+    // std::cout << "Got here 1\n";
 
     auto geom = larutil::Geometry::GetME();
     auto geomHelper = larutil::GeometryHelper::GetME();
@@ -69,12 +70,12 @@ namespace showerreco{
     ///########################################################
     ///For real
     ///########################################################
-    for (unsigned int i = 0; i < inputShowers.size();i++){
-      planes.push_back(inputShowers.at(i).plane_id.Plane);
-      float slope = inputShowers.at(i).principal_dir[1] / inputShowers.at(i).principal_dir[0];
-      std::cout << "Slope is " << slope << " with strength " << inputShowers.at(i).eigenvalue_principal << std::endl;
-      slopeByPlane.push_back(slope);
-    }
+    // for (unsigned int i = 0; i < inputShowers.size();i++){
+    //   planes.push_back(inputShowers.at(i).plane_id.Plane);
+    //   float slope = inputShowers.at(i).angle_2d;
+    //   std::cout << "Slope is " << slope << " with strength " << inputShowers.at(i).eigenvalue_principal << std::endl;
+    //   slopeByPlane.push_back(slope);
+    // }
 
     // Try to determine the 3D axis iteratively.
     // Here's how it is, I have NO IDEA how to rotate things to fix things.  So instead, just
@@ -131,27 +132,26 @@ namespace showerreco{
     }
 
 
+    // std::cout << "FINAL RESULT: \n";
 
-    std::cout << "FINAL RESULT: \n";
+    // std::cout 
+    //           // << "True vector: ("
+    //           // << knownAxis.X() << ", "
+    //           // << knownAxis.Y() << ", "
+    //           // << knownAxis.Z() << "), "
+    //           << "Calculated vector: ("
+    //           << direction.X() << ", "
+    //           << direction.Y() << ", "
+    //           << direction.Z() << ").\n";
+    //           // << " Difference is " << acos(knownAxis.Dot(direction)) << " radians.\n";
 
-    std::cout 
-              // << "True vector: ("
-              // << knownAxis.X() << ", "
-              // << knownAxis.Y() << ", "
-              // << knownAxis.Z() << "), "
-              << "Calculated vector: ("
-              << direction.X() << ", "
-              << direction.Y() << ", "
-              << direction.Z() << ").\n";
-              // << " Difference is " << acos(knownAxis.Dot(direction)) << " radians.\n";
-
-    for (unsigned int i = 0; i < inputShowers.size();i++){
-      larutil::PxPoint start2D, dir2D;
-      geomHelper -> Line_3Dto2D(pointOnAxis, direction, planes[i], start2D, dir2D);
-      std::cout << "\tIn plane " << planes[i] << ", the projection is "
-                << dir2D.t / dir2D.w << ", the target is "
-                << slopeByPlane[i] << ".\n";
-    }
+    // for (unsigned int i = 0; i < inputShowers.size();i++){
+    //   larutil::PxPoint start2D, dir2D;
+    //   geomHelper -> Line_3Dto2D(pointOnAxis, direction, planes[i], start2D, dir2D);
+    //   std::cout << "\tIn plane " << planes[i] << ", the projection is "
+    //             << atan(dir2D.t / dir2D.w) << ", the target is "
+    //             << slopeByPlane[i] << ".\n";
+    // }
 
     // Compare the 3D vector and the *known* 3D vector:
     
@@ -175,7 +175,7 @@ namespace showerreco{
 
       // Do some safety checks:
       if (initialVector.Mag() == 0){
-        std::cerr << "ERROR - Axis3DModule::generateSeedVectors: can not have intial vector be zero!\n";
+        std::cerr << "ERROR - Axis3DModule::generateSeedVectors: can not have initial vector be zero!\n";
         return;
       }
       if (nSteps == 0){
@@ -236,11 +236,12 @@ namespace showerreco{
       // float wgt = 0;
       for (unsigned int i = 0; i < slopesByPlane.size(); i++){
         // Get the 2D slope for this plane, and compute the error as squared difference
-        float slope = geomHelper -> Slope_3Dto2D(inputVector,planes[i]);
-        // float error = (slope - slopesByPlane[i])*(slope - slopesByPlane[i]);
-        float error = 1 - fabs(slope / slopesByPlane[i]);
+        float slope = atan(geomHelper -> Slope_3Dto2D(inputVector,planes[i]));
+        float error = (slope - slopesByPlane[i]);
+        // float error = (slope - slopesByPlane[i])/(slopesByPlane[i]);
+        // float error = 1 - fabs(slope / slopesByPlane[i]);
         // Weight this error by the inverse value of the target slope (so that higher slopes don't get higher weight)
-        err += error;
+        err += fabs(error);
         // wgt += 1.0 / slopesByPlane[i];
       }
 

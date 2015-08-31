@@ -59,10 +59,12 @@ def main(**args):
   ########################################
   algo_array = cmtool.CBAlgoArray()
   mergeAll = cmtool.CBAlgoMergeAll()
+  mergeAll.SetHits(3)
   algo_array.AddAlgo(mergeAll)
 
   
   merger.GetManager().AddMergeAlgo(algo_array)
+  merger.SetInputProducer("cccluster")
   merger.SetOutputProducer("mergeall")
   merger.SaveOutputCluster()
   my_proc.add_process(merger)
