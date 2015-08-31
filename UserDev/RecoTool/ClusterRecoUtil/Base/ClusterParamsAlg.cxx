@@ -8,6 +8,9 @@ namespace cluster{
 
   void ClusterParamsAlg::FillParams(cluster_params & fParams){
 
+    // Figure out if it's worth running on this cluster params, basically if there are enough hits:
+    if (fParams.hit_vector.size() < _min_hits) return;
+
     // increase cluster counter by one
     _nClusters += 1;
 
@@ -31,6 +34,7 @@ namespace cluster{
     
     // count modules
     int nmodule = 0;
+
 
     for (auto & module : _modules){
       
