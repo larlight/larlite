@@ -40,10 +40,14 @@ namespace cluster {
         // the full cosine is not necessary. All we need is the sign.
         // so we just use the numerator from "GetCosAngleBetweenLines" function in GeometryHelper
         // for 3 points
-        if ( ( (hits[i].w-start.w)*(end.w-start.w) + (hits[i].t-start.t)*(end.t-start.t) ) > 0 ) 
+        if ( ( (hits[i].w-start.w)*(end.w-start.w)
+             + (hits[i].t-start.t)*(end.t-start.t) ) > 0 ) 
           hitmap.insert(std::pair<double,size_t>(distSq,i));
       }
     }
+
+    // If there are no hits, we need to bail:
+    if (hitmap.size() < 5) return;
 
     // loop through hits in distance-order to start-point
     // keep track of the cosine of the angle between
@@ -53,16 +57,18 @@ namespace cluster {
     Point2D showering_start = start;
     size_t nPoints = 0;
     //typedef std::map<double,size_t>::iterator *it;
-    for (auto it = hitmap.begin(); it != hitmap.end(); it++){
-      std::cout << "this hit's charge: : " << it->first << std::endl;
-      //std::cout << "this hit's charge: : " << (it+1)->first << std::endl;
-    }
-    for (size_t n=0; n < hitmap.size()-2; n++){
-      if (_verbose) std::cout << "points: " << hitmap[n] << ", " << hitmap[n+1] << ", " << hitmap[n+2] << std::endl;
-      double cos = geomHelper->GetCosAngleBetweenLines(hits[hitmap[n]],hits[hitmap[n+1]],
-                                                       hits[hitmap[n+1]],hits[hitmap[n+2]]);
+    // for (auto it = hitmap.begin(); it != hitmap.end(); it++){
+    //   std::cout << "hit " << it->second << " charge: : " << it->first << std::endl;
+    //   //std::cout << "this hit's charge: : " << next->first << std::endl;
+    // }
+    if (_verbose) std::cout << "\n\nLooping over " << hitmap.size() << " hits ..." << std::endl;
+    for (auto it = hitmap.begin(); it != std::prev(std::prev(hitmap.end())); it++){
+      auto next = std::next(it);
+      if (_verbose) std::cout << "points: " << it->second << ", " <<next->second<< ", " << std::next(next)->second << std::endl;
+      double cos = geomHelper->GetCosAngleBetweenLines(hits[(it)->second],hits[next->second],
+                                                       hits[next->second],hits[std::next(next)->second]);
       if (cos > 0.7)
-        showering_start = hits[hitmap[n+2]];
+        showering_start = hits[std::next(next)->second];
       else
         break;
       nPoints += 1;
