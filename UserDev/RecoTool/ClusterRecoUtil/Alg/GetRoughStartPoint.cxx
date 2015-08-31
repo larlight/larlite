@@ -37,7 +37,8 @@ namespace cluster {
     auto const& poly = cluster.PolyObject;
     size_t nEdges = poly.Size();
     _angleMatrix = std::vector<std::vector<float> >(nEdges,std::vector<float>(nEdges));
-
+    std::vector<float> interiorAngles;
+    interiorAngles.resize(nEdges);
     // loop over nEdges twice:
     for (size_t n1 = 0; n1 < nEdges; n1++){
       for (size_t n2 = 0; n2 < nEdges; n2++){
@@ -50,6 +51,8 @@ namespace cluster {
         auto const tanangle = GetAngle(p1,p2,cluster.slope_2d);
         _angleMatrix[n1][n2] = tanangle;
       }// for second loop over Poly points
+      interiorAngles.at(n1) = cluster.PolyObject.InteriorAngle(n1);
+      // std::cout << "InteriorAngle is " << interiorAngles.at(n1) <<std::endl;
     }// for 1st loop over Poly points
 
     /*
@@ -126,7 +129,7 @@ namespace cluster {
         //avg += _angleMatrix[n1][n2]*_angleMatrix[n1][n2];
       }
       // if we found the best average (lowest value)
-      if (avg < avgTan){
+      if (avg < avgTan && interiorAngles[n1] < M_PI/2.0){
         // save this hit as the start point
         start = Point2D(plane,poly.Point(n1).first,poly.Point(n1).second);
         avgTan = avg;
