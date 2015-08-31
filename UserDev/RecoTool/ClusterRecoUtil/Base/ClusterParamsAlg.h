@@ -47,6 +47,7 @@ namespace cluster{
     void SetVerbose(bool yes=true){ _verbose = yes;}
     void SetDebug(bool yes=true)  { _debug = yes;}
 
+    void SetMinHits(int i = 1)    { _min_hits = i;}
 
     /**
      * @brief Report average time spent per algorithm
@@ -63,6 +64,8 @@ namespace cluster{
 
     /// number of clusters scanned (for stopwatch time calculation)
     int _nClusters;
+
+    int _min_hits;
 
     bool _verbose;
     bool _debug;
