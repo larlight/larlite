@@ -32,7 +32,7 @@ def getShowerRecoAlgModular():
   # and if you are developing you ought to be updating it here!
 
   alg = showerreco.ShowerRecoAlgModular()
-  alg.SetDebug(True)
+  alg.SetDebug(False)
 
   # 3D Axis Module:
   axis3D = showerreco.Axis3DModule()
@@ -125,16 +125,16 @@ ana_unit.SetOutputProducer("showerreco")
 my_proc.add_process(ana_unit)
 
 # Add an ana unit to do the shower quality:
-# quality_unit = fmwk.ShowerAna()
+quality_unit = fmwk.ShowerAna()
 
 
-# my_proc.add_process(quality_unit)
+my_proc.add_process(quality_unit)
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
-my_proc.run(0,5)
+my_proc.run(0,500)
 # my_proc.process_event(2)
 
 
