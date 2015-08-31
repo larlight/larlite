@@ -22,8 +22,8 @@
 //#include "LArUtil/PxUtils.h"
 #include "DataFormat/cluster.h"
 #include "DataFormat/hit.h"
-#include "ClusterRecoUtil/DefaultParamsAlg.h"
-#include "ClusterRecoUtil/CRUHelper.h"
+#include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
+#include "ClusterRecoUtil/Base/CRUHelper.h"
 
 #ifdef __APPLE__ 
 #include <_types/_uint8_t.h> 
