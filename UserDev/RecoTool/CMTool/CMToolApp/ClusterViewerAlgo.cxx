@@ -432,11 +432,13 @@ TH2D* ClusterViewerAlgo::GetPlaneViewHisto(const UChar_t plane,
   size_t n_bins_x = (_xrange.at(plane).second - _xrange.at(plane).first) / wire2cm;
   size_t n_bins_y = (_xrange.at(plane).second - _xrange.at(plane).first) / time2cm;
 
+  double bin_width_x = wire2cm;
+  
   n_bins_y /= 8;
 
   TH2D* h = new TH2D(Form("%sFor%s", name.c_str(), _name.c_str()),
                      title.c_str(),
-                     n_bins_x, _xrange.at(plane).first, _xrange.at(plane).second,
+                     n_bins_x + 1, _xrange.at(plane).first - (bin_width_x / 2), _xrange.at(plane).second + (bin_width_x / 2),
                      n_bins_y, _yrange.at(plane).first, _yrange.at(plane).second);
   return h;
 }
@@ -625,13 +627,13 @@ void ClusterViewerAlgo::DrawOneClusterGraphAndHits(UChar_t plane, size_t index)
   double local_ymax = _gClusterHits.at(plane).at(index)->GetYaxis()->GetXmax() * 1.2;
 
   _hAllHits.at(plane)->Draw("COLZ");
-  _hAllHits.at(plane)->GetYaxis()->SetRangeUser(local_ymin,local_ymax);
-  _hAllHits.at(plane)->GetXaxis()->SetRangeUser(local_xmin,local_xmax);
+  _hAllHits.at(plane)->GetYaxis()->SetRangeUser(local_ymin, local_ymax);
+  _hAllHits.at(plane)->GetXaxis()->SetRangeUser(local_xmin, local_xmax);
 
   _gClusterHits.at(plane).at(index)->SetMarkerStyle(kOpenCircle);
   _gClusterHits.at(plane).at(index)->SetMarkerSize(1);
   // _gClusterHits.at(plane).at(index)->SetMarkerColor(kBlack);
-  _gClusterHits.at(plane).at(index)->SetMarkerColorAlpha(kBlack,0.5);
+  _gClusterHits.at(plane).at(index)->SetMarkerColorAlpha(kBlack, 0.5);
   _gClusterHits.at(plane).at(index)->Draw("P");
 
   _cOneCluster->Modified();
