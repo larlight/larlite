@@ -69,8 +69,8 @@ def main(**args):
   merger.SaveOutputCluster()
   my_proc.add_process(merger)
 
-
-
+  print merger
+  print my_proc
 
   if args['num_events'] != None:
     start = time.clock()
