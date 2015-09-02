@@ -133,6 +133,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
     
     resultShower.fDCosStart = direction;
     resultShower.fXYZStart = pointOnAxis;
+
     error /= inputShowers.size();
 
     if (error < fTargetError) converged = true;
