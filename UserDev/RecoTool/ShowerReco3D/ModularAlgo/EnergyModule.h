@@ -1,9 +1,9 @@
 /**
- * \file EnergyBirksModule.h
+ * \file EnergyModule.h
  *
  * \ingroup ModularAlgo
  * 
- * \brief Class def header for a class EnergyBirksModule
+ * \brief Class def header for a class EnergyModule
  *
  * @author david caratelli
  */
@@ -11,8 +11,8 @@
 /** \addtogroup ModularAlgo
 
     @{*/
-#ifndef ENERGYBIRKSMODULE_H
-#define ENERGYBIRKSMODULE_H
+#ifndef ENERGYMODULE_H
+#define ENERGYMODULE_H
 
 #include <iostream>
 #include "ShowerRecoModuleBase.h"
@@ -25,19 +25,23 @@
  */
 namespace showerreco {
 
-  class EnergyBirksModule : ShowerRecoModuleBase{
+  class EnergyModule : ShowerRecoModuleBase{
 
   public:
 
     /// Default constructor
-    EnergyBirksModule();
+    EnergyModule();
 
     /// Default destructor
-    ~EnergyBirksModule(){}
+    ~EnergyModule(){}
 
     void do_reconstruction(const ShowerClusterSet_t &, Shower_t &);
 
     void SetUseArea(bool on) { _useArea = on; }
+
+    void SetUseBirks(bool on=true) { _caloAlg->setUseModBox(!on); }
+
+    void SetUseBox(bool on = true) { _caloAlg->setUseModBox(on); }
 
   private:
 
@@ -46,6 +50,9 @@ namespace showerreco {
 
     /// flag for whether to decide if we should use the hit area or amplitude for energy calculations
     bool _useArea;
+
+    /// flag to decide which ionization module to use
+    bool _useBirks;
 
   };
   

@@ -249,7 +249,7 @@ public:
      * @param plane     -> 0,1,2
      * @return the effective pitch in cm
      */
-    double GetPitch(const TVector3& direction, const int& pl);
+    double GetPitch(const TVector3& direction, const int& pl) const;
 
     /**
      * @brief Get cosine of angle between two lines defined by their slope
