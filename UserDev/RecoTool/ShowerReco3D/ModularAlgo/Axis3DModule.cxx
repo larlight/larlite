@@ -74,8 +74,8 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
     planes.push_back(inputShowers.at(i).plane_id.Plane);
     // float slope = inputShowers.at(i).angle_2d;
     float slope = 0;
-    if (inputShowers.at(i).start_dir[0] != 0){
-      std::cout << "Using (" << inputShowers.at(i).start_dir[0] << ", " inputShowers.at(i).start_dir[1] << ")\n";
+    if (inputShowers.at(i).start_dir[0] != 0) {
+      std::cout << "Using (" << inputShowers.at(i).start_dir[0] << ", " << inputShowers.at(i).start_dir[1] << ")\n";
       slope = inputShowers.at(i).start_dir[1] / inputShowers.at(i).start_dir[0];
     }
     std::cout << "Slope is " << slope << " with strength " << inputShowers.at(i).eigenvalue_principal << std::endl;
@@ -130,7 +130,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
     prevError = error;
 
     // Compare the 3D vector and the *known* 3D vector:
-    
+
     resultShower.fDCosStart = direction;
     resultShower.fXYZStart = pointOnAxis;
 
@@ -144,24 +144,24 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
 
   // std::cout << "FINAL RESULT: \n";
 
-  std::cout
-  // << "True vector: ("
-  // << knownAxis.X() << ", "
-  // << knownAxis.Y() << ", "
-  // << knownAxis.Z() << "), "
-      << "Calculated vector: ("
-      << direction.X() << ", "
-      << direction.Y() << ", "
-      << direction.Z() << ").\n";
-  // << " Difference is " << acos(knownAxis.Dot(direction)) << " radians.\n";
+  // std::cout
+  // // << "True vector: ("
+  // // << knownAxis.X() << ", "
+  // // << knownAxis.Y() << ", "
+  // // << knownAxis.Z() << "), "
+  //     << "Calculated vector: ("
+  //     << direction.X() << ", "
+  //     << direction.Y() << ", "
+  //     << direction.Z() << ").\n";
+  // // << " Difference is " << acos(knownAxis.Dot(direction)) << " radians.\n";
 
-  for (unsigned int i = 0; i < inputShowers.size(); i++) {
-    larutil::PxPoint start2D, dir2D;
-    geomHelper -> Line_3Dto2D(pointOnAxis, direction, planes[i], start2D, dir2D);
-    std::cout << "\tIn plane " << planes[i] << ", the projection is "
-              << atan(dir2D.t / dir2D.w) << ", the target is "
-              << slopeByPlane[i] << ".\n";
-  }
+  // for (unsigned int i = 0; i < inputShowers.size(); i++) {
+  //   larutil::PxPoint start2D, dir2D;
+  //   geomHelper -> Line_3Dto2D(pointOnAxis, direction, planes[i], start2D, dir2D);
+  //   std::cout << "\tIn plane " << planes[i] << ", the projection is "
+  //             << atan(dir2D.t / dir2D.w) << ", the target is "
+  //             << slopeByPlane[i] << ".\n";
+  // }
 
   // Compare the 3D vector and the *known* 3D vector:
 
@@ -192,6 +192,7 @@ void Axis3DModule::generateSeedVectors(const TVector3 & initialVector,
     std::cerr << "ERROR - Axis3DModule::generateSeedVectors: can not generate a list of zero steps!\n";
     return;
   }
+
 
 
   // Need one vector to rotate around and such.  Make it start as a copy of the initialVector
@@ -249,10 +250,10 @@ float Axis3DModule::getErrorOfProjection( const TVector3 & inputVector,
     float slope = atan(geomHelper -> Slope_3Dto2D(inputVector, planes[i]));
     // float error = (slope - slopesByPlane[i]);
     float error = 0;
-    if (slopesByPlane[i] != 0){
+    if (slopesByPlane[i] != 0) {
       error = (slope - slopesByPlane[i]) / (slopesByPlane[i]);
       err += fabs(error);
-    }    
+    }
     // float error = 1 - fabs(slope / slopesByPlane[i]);
     // Weight this error by the inverse value of the target slope (so that higher slopes don't get higher weight)
     // wgt += 1.0 / slopesByPlane[i];
