@@ -156,6 +156,7 @@ namespace showerreco{
     // Compare the 3D vector and the *known* 3D vector:
     
     resultShower.fDCosStart = direction;
+    resultShower.fXYZStart = pointOnAxis;
 
 
     return;
