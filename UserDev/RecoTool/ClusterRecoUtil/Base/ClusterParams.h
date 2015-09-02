@@ -92,6 +92,7 @@ namespace cluster{
     double eigenvalue_secondary;       ///< the secondary eigenvalue from PCA
     double verticalness;               ///< ???
     std::vector<float> principal_dir;  ///< The direction of the principal eigenvalue
+    std::vector<float> start_dir;      ///< The slope of the cluster right at the start
 
 
     double length;
