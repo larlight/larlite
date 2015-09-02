@@ -37,8 +37,8 @@ def getShowerRecoAlgModular():
   # 3D Axis Module:
   axis3D = showerreco.Axis3DModule()
   axis3D.setMaxIterations(50)
-  axis3D.setNStepsMin(10)
-  axis3D.setTargetError(0.00001)
+  axis3D.setNStepsMin(5)
+  axis3D.setTargetError(0.0001)
 
   alg.AddShowerRecoModule(axis3D                           )
   alg.AddShowerRecoModule(showerreco.StartPoint2DModule()  )
