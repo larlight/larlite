@@ -15,7 +15,7 @@ INCFLAGS = -I.                       #Include itself
 INCFLAGS += $(shell basictool-config --includes)
 INCFLAGS += $(shell larlite-config --includes)
 INCFLAGS += $(shell recotool-config --includes)
-INCFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool/ClusterRecoUtil/Alg
+# INCFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool/ClusterRecoUtil/Alg
  
 
 
@@ -38,7 +38,6 @@ LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtil
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtilAlg
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_FANN
 LDFLAGS += -L$(LARLITE_LIBDIR) -lfloatfann
-LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtilAlg
 
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 

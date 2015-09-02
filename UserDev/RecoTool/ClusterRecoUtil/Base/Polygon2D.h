@@ -65,6 +65,9 @@ class Polygon2D{
   /// clear polygon's points
   void Clear() { vertices.clear(); }
 
+  ///Calculate the opening angle at the specified vertex:
+  float InteriorAngle(unsigned int p);
+
   friend bool operator==(const Polygon2D& lhs, const Polygon2D& rhs);
   friend bool operator!=(const Polygon2D& lhs, const Polygon2D& rhs);
   friend std::ostream &operator<<(std::ostream &out, Polygon2D poly);     //output

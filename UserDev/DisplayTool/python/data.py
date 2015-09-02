@@ -381,6 +381,8 @@ class clusterParams(QtCore.QObject): #recoBase):
     tip =  "Hits:  \t" + str(self._params.N_Hits) + "\n"
     tip += "Start: \t(" + "{:.2f}".format(self._params.start_point.w) + ", "
     tip += "{:.2f}".format(self._params.start_point.t) + ")\n"
+    tip += "Shw:   \t(" + "{:.2f}".format(self._params.showering_point.w) + ", "
+    tip += "{:.2f}".format(self._params.showering_point.t) + ")\n"
     tip += "End:   \t(" + "{:.2f}".format(self._params.end_point.w) + ", "
     tip += "{:.2f}".format(self._params.end_point.t) + ")\n"
     tip += "Slope: \t" + "{:.2f}".format(self._params.principal_dir[1]/self._params.principal_dir[0]) + "\n"
@@ -393,18 +395,27 @@ class clusterParams(QtCore.QObject): #recoBase):
     red   = (255,0  ,0) 
     green = (0  ,255,0)  
     black = (0  ,0  ,0)
+    blue  = (0  ,0  ,255)
+
     # Draw the start and end points:
     sW = self._params.start_point.w / self._geom.wire2cm()
     sT = self._params.start_point.t / self._geom.time2cm()
     eW = self._params.end_point.w / self._geom.wire2cm()
     eT = self._params.end_point.t / self._geom.time2cm()
+    showeringW = self._params.showering_point.w / self._geom.wire2cm()
+    showeringT = self._params.showering_point.t / self._geom.time2cm()
 
+    radBigW   = 0.5 / self._geom.wire2cm()
+    radBigT   = 0.5 / self._geom.time2cm()
+    radSmallW = 0.25 / self._geom.wire2cm()
+    radSmallT = 0.25 / self._geom.time2cm()
 
-    bigCircleStart = connectedCircle(sW-1,sT-20,2,40)
+    bigCircleStart = connectedCircle(sW-radBigW,sT-radBigT,2*radBigW,2*radBigT)
     if self._isHighlighted:
       bigCircleStart.setPen(pg.mkPen(black))
     else:
       bigCircleStart.setPen(pg.mkPen(None))
+
     bigCircleStart.setBrush(pg.mkColor(green))
     bigCircleStart.setOpacity(0.6)
     bigCircleStart.connectOwnerHoverEnter(self.hoverEnter)
@@ -413,11 +424,11 @@ class clusterParams(QtCore.QObject): #recoBase):
     bigCircleStart.connectToolTip(self.genToolTip)
 
 
-    smallCircleStart = QtGui.QGraphicsEllipseItem(sW-0.2,sT-5,0.4,10)
+    smallCircleStart = QtGui.QGraphicsEllipseItem(sW-radSmallW,sT-radSmallT,2*radSmallW,2*radSmallT)
     smallCircleStart.setPen(pg.mkPen(None))
     smallCircleStart.setBrush(pg.mkColor(black))
 
-    bigCircleEnd = connectedCircle(eW-1,eT-20,2,40)
+    bigCircleEnd = connectedCircle(eW-radBigW,eT-radBigT,2*radBigW,2*radBigT)
     bigCircleEnd.setPen(pg.mkPen(None))
     bigCircleEnd.setBrush(pg.mkColor(red))
     bigCircleEnd.setOpacity(0.6)
@@ -427,19 +438,31 @@ class clusterParams(QtCore.QObject): #recoBase):
     bigCircleEnd.connectToolTip(self.genToolTip)
 
 
-    smallCircleEnd = QtGui.QGraphicsEllipseItem(eW-0.2,eT-5,0.4,10)
+    smallCircleEnd = QtGui.QGraphicsEllipseItem(eW-radSmallW,eT-radSmallT,2*radSmallW,2*radSmallT)
     smallCircleEnd.setPen(pg.mkPen(None))
     smallCircleEnd.setBrush(pg.mkColor(black))
+
+
+    radW = 0.5 / self._geom.wire2cm()
+    radT = 0.5 / self._geom.time2cm()
+    showeringPoint = connectedCircle(showeringW -radW, showeringT - radT, 2*radW, 2*radT)
+    showeringPoint.setBrush(pg.mkColor(blue))
+    showeringPoint.connectOwnerHoverEnter(self.hoverEnter)
+    showeringPoint.connectOwnerHoverExit(self.hoverExit)
+    showeringPoint.connectToggleHighlight(self.toggleHighlight)
+    showeringPoint.connectToolTip(self.genToolTip)
 
     self._listOfStartPoints.append(bigCircleStart)
     self._listOfStartPoints.append(smallCircleStart)
     self._listOfStartPoints.append(bigCircleEnd)
     self._listOfStartPoints.append(smallCircleEnd)
+    self._listOfStartPoints.append(showeringPoint)
 
     view._view.addItem(bigCircleStart)
     view._view.addItem(smallCircleStart)
     view._view.addItem(bigCircleEnd)
     view._view.addItem(smallCircleEnd)
+    view._view.addItem(showeringPoint)
 
 
     # Draw the axis
@@ -469,6 +492,7 @@ class clusterParams(QtCore.QObject): #recoBase):
     self._polyGraphicsItem = QtGui.QGraphicsPathItem(self._axisPath)
     pen = self._polyGraphicsItem.pen()
     pen.setWidth(2)
+    pen.setBrush(pg.mkColor((0,0,0,125)))
     self._polyGraphicsItem.setPen(pen)
     view._view.addItem(self._polyGraphicsItem)
 
@@ -508,6 +532,7 @@ class cluster(recoBase):
     self._process = evd.DrawCluster()
     self.init()
 
+    
     self.setParamsDrawing(False)
 
     self._listOfClusters = []
