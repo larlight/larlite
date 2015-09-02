@@ -56,6 +56,8 @@ namespace cluster {
     // mark the last point explored as the showering start point
     Point2D showering_start = start;
     size_t nPoints = 0;
+    //\\\TODO: Make this slope determination done by a fit and not just connecting points.
+
     //typedef std::map<double,size_t>::iterator *it;
     // for (auto it = hitmap.begin(); it != hitmap.end(); it++){
     //   std::cout << "hit " << it->second << " charge: : " << it->first << std::endl;
@@ -75,7 +77,16 @@ namespace cluster {
     }
 
     cluster.showering_point = showering_start;
+
+    // Now that there is a showering point, use the start point and the showering point and the hits in between to determine
+    // the slope of the start of the shower
+    cluster.start_dir.resize(2);
+    float mag = sqrt(pow((showering_start.w - cluster.start_point.w),2) + pow((showering_start.t - cluster.start_point.t),2));
+    cluster.start_dir[0] = (showering_start.w - cluster.start_point.w)/mag;
+    cluster.start_dir[1] = (showering_start.t - cluster.start_point.t)/mag;
     
+    //\\\TODO: Make this slope determination done by a fit and not just connecting points.
+
     return;
   }
   

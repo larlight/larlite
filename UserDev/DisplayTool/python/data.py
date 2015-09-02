@@ -447,6 +447,7 @@ class clusterParams(QtCore.QObject): #recoBase):
     radT = 0.5 / self._geom.time2cm()
     showeringPoint = connectedCircle(showeringW -radW, showeringT - radT, 2*radW, 2*radT)
     showeringPoint.setBrush(pg.mkColor(blue))
+    showeringPoint.setOpacity(0.6)
     showeringPoint.connectOwnerHoverEnter(self.hoverEnter)
     showeringPoint.connectOwnerHoverExit(self.hoverExit)
     showeringPoint.connectToggleHighlight(self.toggleHighlight)
@@ -496,6 +497,29 @@ class clusterParams(QtCore.QObject): #recoBase):
     self._polyGraphicsItem.setPen(pen)
     view._view.addItem(self._polyGraphicsItem)
 
+    # Draw an line to show the start direction of the shower
+    self._startAxis = QtGui.QPolygonF()
+    self._startAxis.append(QtCore.QPointF(sW,sT))
+    startDirEndW = sW + l*self._params.start_dir.at(0)/self._geom.wire2cm() 
+    startDirEndT = sT + l*self._params.start_dir.at(1)/self._geom.time2cm() 
+
+    # print sign
+    sign = (sW - startDirEndW)*(sW - eW) + (sT - startDirEndT)*(sT - eT)
+    if sign < 0:
+      startDirEndW = sW - l*self._params.start_dir.at(0)/self._geom.wire2cm() 
+      startDirEndT = sT - l*self._params.start_dir.at(1)/self._geom.time2cm() 
+
+    self._startAxis.append(QtCore.QPointF(startDirEndW,startDirEndT))
+    self._startAxisPath = QtGui.QPainterPath()
+    self._startAxisPath.addPolygon(self._startAxis)
+    self._startAxisPolyItem = QtGui.QGraphicsPathItem(self._startAxisPath)
+    pen = self._startAxisPolyItem.pen()
+    pen.setWidth(1)
+    pen.setStyle(QtCore.Qt.DashLine)
+    pen.setBrush(pg.mkColor((0,0,0,200)))
+    self._startAxisPolyItem.setPen(pen)
+    view._view.addItem(self._startAxisPolyItem)    
+
 
     # Draw the polygon
     # Not super hard to do with the poly object
@@ -520,6 +544,7 @@ class clusterParams(QtCore.QObject): #recoBase):
     self._listOfStartPoints = []
     view._view.removeItem(self._thisPoly)
     view._view.removeItem(self._polyGraphicsItem)
+    view._view.removeItem(self._startAxisPolyItem)
 
 
 
