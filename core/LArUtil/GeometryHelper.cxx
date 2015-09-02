@@ -229,7 +229,7 @@ namespace larutil {
     return 0;
   }
   
-  double GeometryHelper::GetPitch(const TVector3& direction, const int& pl)
+  double GeometryHelper::GetPitch(const TVector3& direction, const int& pl) const
   {
     
     // prepare a direction vector for the plane
