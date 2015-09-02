@@ -7,238 +7,271 @@
 
 namespace larutil {
 
-GeometryHelper* GeometryHelper::_me = 0;
-
-
-// Function to load any parameters for convenience :
-void GeometryHelper::Reconfigure()
-{
-  // Need the geometry for wire pitch
-  auto geom = larutil::Geometry::GetME();
-  // Need detector properties and lar properties for time to cm conversion
-  auto detp = larutil::DetectorProperties::GetME();
-  auto larp = larutil::LArProperties::GetME();
-
-  // fNPlanes = geom->Nplanes();
-  // vertangle.resize(fNPlanes);
-  // for(UInt_t ip=0;ip<fNPlanes;ip++)
-  //   vertangle[ip]=geom->WireAngleToVertical(geom->PlaneToView(ip)) - TMath::Pi()/2; // wire angle
-
-
-  fWireToCm = geom->WirePitch(0, 1, 0);
-  fTimeToCm = detp->SamplingRate() / 1000.0 * larp->DriftVelocity(larp->Efield(), larp->Temperature());
-}
-
-
-// The next set of functions is the collection of functions to convert 3D Point to 2D point
-// The first function is maintained, and the rest convert their arguments and call it
-Point2D GeometryHelper::Point_3Dto2D(const TVector3 & _3D_position, unsigned int plane) const {
-
-  auto geom = larutil::Geometry::GetME();
-
-  // Make a check on the plane:
-  if (plane > geom -> Nplanes()) {
-    throw larutil::LArUtilException(Form("Can't project 3D point to unknown plane %u", plane));
+  GeometryHelper* GeometryHelper::_me = 0;
+  
+  
+  // Function to load any parameters for convenience :
+  void GeometryHelper::Reconfigure()
+  {
+    // Need the geometry for wire pitch
+    auto geom = larutil::Geometry::GetME();
+    // Need detector properties and lar properties for time to cm conversion
+    auto detp = larutil::DetectorProperties::GetME();
+    auto larp = larutil::LArProperties::GetME();
+    
+    // fNPlanes = geom->Nplanes();
+    // vertangle.resize(fNPlanes);
+    // for(UInt_t ip=0;ip<fNPlanes;ip++)
+    //   vertangle[ip]=geom->WireAngleToVertical(geom->PlaneToView(ip)) - TMath::Pi()/2; // wire angle
+    
+    
+    fWireToCm = geom->WirePitch(0, 1, 0);
+    fTimeToCm = detp->SamplingRate() / 1000.0 * larp->DriftVelocity(larp->Efield(), larp->Temperature());
   }
-
-  // Verify that the point is in the TPC before trying to project:
-
-  //initialize return value
-  Point2D returnPoint;
-
-  // The wire position can be gotten with Geometry::NearestWire()
-  // Convert result to centimeters as part of the unit convention
-  // Previously used nearest wire functions, but they are slightly inaccurate
-  // If you want the nearest wire, use the nearest wire function!
-  returnPoint.w = geom->WireCoordinate(_3D_position, plane) * fWireToCm;
-  // std::cout << "wire is " << returnPoint.w << " (cm)" << std::endl;
-
-  // The time position is the X coordinate, corrected for trigger offset and the offset of the plane
-  auto detp = DetectorProperties::GetME();
-  returnPoint.t = _3D_position.X();
-  // Add in the trigger offset:
-  // (Trigger offset is time that the data is recorded before the actual spill.
-  // So, it moves the "0" farther away from the actual time and is an addition)
-  returnPoint.t += detp -> TriggerOffset() * fTimeToCm;
-  //Get the origin point of this plane:
-  Double_t planeOrigin[3];
-  geom -> PlaneOriginVtx(plane, planeOrigin);
-  // Correct for the origin of the planes
-  // X = 0 is at the very first wire plane, so the values of the coords of the planes are either 0 or negative
-  // because the planes are negative, the extra distance beyond 0 needs to make the time coordinate larger
-  // Therefore, subtract the offest (which is already in centimeters)
-  returnPoint.t -= planeOrigin[0];
-
-  // Set the plane of the Point2D:
-  returnPoint.plane = plane;
-
-  return returnPoint;
-}
-
-Point2D GeometryHelper::Point_3Dto2D(double * xyz, unsigned int plane) const {
-  TVector3 vec(xyz);
-  return Point_3Dto2D(vec, plane);
-}
-Point2D GeometryHelper::Point_3Dto2D(float * xyz, unsigned int plane) const {
-  TVector3 vec(xyz);
-  return Point_3Dto2D(vec, plane);
-}
-Point2D GeometryHelper::Point_3Dto2D(const std::vector<double> & xyz, unsigned int plane) const {
-  TVector3 vec(&(xyz[0]));
-  return Point_3Dto2D(vec, plane);
-}
-Point2D GeometryHelper::Point_3Dto2D(const std::vector<float> & xyz, unsigned int plane) const {
-  TVector3 vec(&(xyz[0]));
-  return Point_3Dto2D(vec, plane);
-}
-
-void GeometryHelper::Line_3Dto2D( const TVector3 & startPoint3D, const TVector3 & direction3D, unsigned int plane,
-                                  Point2D & startPoint2D, Point2D & direction2D) const
-{
-  // First step, project the start point into 2D
-  startPoint2D = Point_3Dto2D(startPoint3D, plane);
-  if (! Point_isInTPC( startPoint3D ) ) {
-    std::cerr << "ERROR - GeometryHelper::Line_3Dto2D: StartPoint3D must be in the TPC.\n";
+  
+  
+  // The next set of functions is the collection of functions to convert 3D Point to 2D point
+  // The first function is maintained, and the rest convert their arguments and call it
+  Point2D GeometryHelper::Point_3Dto2D(const TVector3 & _3D_position, unsigned int plane) const {
+    
+    auto geom = larutil::Geometry::GetME();
+    
+    // Make a check on the plane:
+    if (plane > geom -> Nplanes()) {
+      throw larutil::LArUtilException(Form("Can't project 3D point to unknown plane %u", plane));
+    }
+    
+    // Verify that the point is in the TPC before trying to project:
+    
+    //initialize return value
+    Point2D returnPoint;
+    
+    // The wire position can be gotten with Geometry::NearestWire()
+    // Convert result to centimeters as part of the unit convention
+    // Previously used nearest wire functions, but they are slightly inaccurate
+    // If you want the nearest wire, use the nearest wire function!
+    returnPoint.w = geom->WireCoordinate(_3D_position, plane) * fWireToCm;
+    // std::cout << "wire is " << returnPoint.w << " (cm)" << std::endl;
+    
+    // The time position is the X coordinate, corrected for trigger offset and the offset of the plane
+    auto detp = DetectorProperties::GetME();
+    returnPoint.t = _3D_position.X();
+    // Add in the trigger offset:
+    // (Trigger offset is time that the data is recorded before the actual spill.
+    // So, it moves the "0" farther away from the actual time and is an addition)
+    returnPoint.t += detp -> TriggerOffset() * fTimeToCm;
+    //Get the origin point of this plane:
+    Double_t planeOrigin[3];
+    geom -> PlaneOriginVtx(plane, planeOrigin);
+    // Correct for the origin of the planes
+    // X = 0 is at the very first wire plane, so the values of the coords of the planes are either 0 or negative
+    // because the planes are negative, the extra distance beyond 0 needs to make the time coordinate larger
+    // Therefore, subtract the offest (which is already in centimeters)
+    returnPoint.t -= planeOrigin[0];
+    
+    // Set the plane of the Point2D:
+    returnPoint.plane = plane;
+    
+    return returnPoint;
+  }
+  
+  Point2D GeometryHelper::Point_3Dto2D(double * xyz, unsigned int plane) const {
+    TVector3 vec(xyz);
+    return Point_3Dto2D(vec, plane);
+  }
+  Point2D GeometryHelper::Point_3Dto2D(float * xyz, unsigned int plane) const {
+    TVector3 vec(xyz);
+    return Point_3Dto2D(vec, plane);
+  }
+  Point2D GeometryHelper::Point_3Dto2D(const std::vector<double> & xyz, unsigned int plane) const {
+    TVector3 vec(&(xyz[0]));
+    return Point_3Dto2D(vec, plane);
+  }
+  Point2D GeometryHelper::Point_3Dto2D(const std::vector<float> & xyz, unsigned int plane) const {
+    TVector3 vec(&(xyz[0]));
+    return Point_3Dto2D(vec, plane);
+  }
+  
+  void GeometryHelper::Line_3Dto2D( const TVector3 & startPoint3D, const TVector3 & direction3D, unsigned int plane,
+				    Point2D & startPoint2D, Point2D & direction2D) const
+  {
+    // First step, project the start point into 2D
+    startPoint2D = Point_3Dto2D(startPoint3D, plane);
+    if (! Point_isInTPC( startPoint3D ) ) {
+      std::cerr << "ERROR - GeometryHelper::Line_3Dto2D: StartPoint3D must be in the TPC.\n";
+      return;
+    }
+    // Next, get a second point in 3D:
+    float alpha = 10;
+    TVector3 secondPoint3D = startPoint3D + alpha * direction3D;
+    while ( ! Point_isInTPC(secondPoint3D) ) {
+      alpha *= -0.75;
+      secondPoint3D = startPoint3D + alpha * direction3D;
+    }
+    
+    // std::cout << "3D line is (" << startPoint3D.X() << ", " << startPoint3D.Y()
+    //           << ", " << startPoint3D.Z() << ") to ( " << secondPoint3D.X()
+    //           << ", " << secondPoint3D.Y() << ", " << secondPoint3D.Z() << ")\n";
+    
+    // Project the second point into 2D:
+    Point2D secondPoint2D = Point_3Dto2D(secondPoint3D, plane);
+    
+    // std::cout << "2D line is (" << startPoint2D.w << ", " << startPoint2D.t
+    //           << ") to (" << secondPoint2D.w << ", " << secondPoint2D.t << ")\n";
+    
+    // Now we have two points in 2D.  Get the direction by subtracting, and normalize
+    TVector2 dir(secondPoint2D.w - startPoint2D.w, secondPoint2D.t - startPoint2D.t);
+    if (dir.X() != 0.0 || dir.Y() != 0.0 )
+      dir *= 1.0 / dir.Mod();
+    direction2D.w = dir.X();
+    direction2D.t = dir.Y();
+    direction2D.plane = plane;
+    
     return;
   }
-  // Next, get a second point in 3D:
-  float alpha = 10;
-  TVector3 secondPoint3D = startPoint3D + alpha * direction3D;
-  while ( ! Point_isInTPC(secondPoint3D) ) {
-    alpha *= -0.75;
-    secondPoint3D = startPoint3D + alpha * direction3D;
+  
+  float GeometryHelper::Slope_3Dto2D(const TVector3 & inputVector, unsigned int plane) const {
+    // Do this by projecting the line:
+    // Generate a start point right in the middle of the detector:
+    auto geom = larutil::Geometry::GetME();
+    TVector3 startPoint3D(0, 0, 0);
+    startPoint3D.SetZ(0.5 * geom -> DetLength());
+    larutil::Point2D p1, slope;
+    Line_3Dto2D(startPoint3D, inputVector, plane, p1, slope);
+    return slope.t / slope.w;
+  }
+  
+  
+  
+  float GeometryHelper::DistanceToLine2D( const Point2D & pointOnLine, const Point2D & directionOfLine,
+					  const Point2D & targetPoint) const
+  {
+    
+    // Utilize the 3D function to make it easier to maintain
+    TVector3 _pointOnLine(pointOnLine.w, pointOnLine.t, 0.0);
+    TVector3 _directionOfLine(directionOfLine.w, directionOfLine.t, 0.0);
+    TVector3 _targetPoint(targetPoint.w, targetPoint.t, 0.0);
+    
+    return DistanceToLine3D(_pointOnLine, _directionOfLine, _targetPoint);
+  }
+  
+  float GeometryHelper::DistanceToLine2D( const TVector2 & pointOnLine, const TVector2 & directionOfLine,
+					  const TVector2 & targetPoint) const
+  {
+    // Utilize the 3D function to make it easier to maintain
+    TVector3 _pointOnLine(pointOnLine.X(), pointOnLine.Y(), 0.0);
+    TVector3 _directionOfLine(directionOfLine.X(), directionOfLine.Y(), 0.0);
+    TVector3 _targetPoint(targetPoint.X(), targetPoint.Y(), 0.0);
+    
+    return DistanceToLine3D(_pointOnLine, _directionOfLine, _targetPoint);
+  }
+  
+  float GeometryHelper::DistanceToLine3D( const TVector3 & pointOnLine, const TVector3 & directionOfLine,
+					  const TVector3 & targetPoint) const
+  {
+    // This algorithm finds the distance between a point and a line by finding the closest point on the line
+    // Using minimization techniques from calculus.
+    
+    // Line is defined by the vectors pointOnLine and directionOfLine.
+    // So, any point on the line can be parametrized as (pointOnLine + t * directionOfLine)
+    // This distance between any point on the line and the target point is thus:
+    // L = |(pointOnLine + t*directionOfLine) . targetPoint |
+    //
+    // Using this, minimize the distance with respect to t (actually, minimize the distance squared since it's easier):
+    // d(L^2)/dt = 2 * ( (pointOnLine + t*directionOfLine) . targetPoint ) * directionOfLine
+    //
+    // Set equal to 0 and solve for t:
+    // pointOnLine . directionOfLine + t * directionOfLine^2 - targetPoint . directionOfLine = 0;
+    // Therefore:
+    float t = ( targetPoint.Dot(directionOfLine) - pointOnLine.Dot(directionOfLine) ) / (directionOfLine.Dot(directionOfLine));
+    
+    // Now, construct the closest approach point, subtract the target point, and return the mag
+    TVector3 closestApproach = pointOnLine + t * directionOfLine;
+    
+    closestApproach -= targetPoint;
+    return closestApproach.Mag();
+    
+  }
+  
+  float GeometryHelper::Get2DDistanceSqrd(const Point2D& point1, const Point2D& point2) const
+  {
+    return (point1.w - point2.w) * (point1.w - point2.w) + (point1.t - point2.t) * (point1.t - point2.t);
+  }
+  
+  
+  float GeometryHelper::Get2DDistance(const Point2D& point1, const Point2D& point2) const
+  {
+    return TMath::Sqrt(Get2DDistanceSqrd(point1, point2));
+  }
+  
+  int GeometryHelper::GetPointOnLine(const double& slope,
+				     const Point2D &startpoint,
+				     const Point2D &point1,
+				     Point2D& pointout) const
+  {
+    
+    double intercept = startpoint.t - slope * startpoint.w;
+    
+    double invslope = 0;
+    
+    if (slope)
+      invslope = -1. / slope;
+    
+    double ort_intercept = point1.t - invslope * point1.w;
+    
+    if ((slope - invslope) != 0)
+      pointout.w = (ort_intercept - intercept) / (slope - invslope);
+    else
+      pointout.w = point1.w;
+    
+    pointout.t = slope * pointout.w + intercept;
+    
+    return 0;
+  }
+  
+  double GeometryHelper::GetPitch(const TVector3& direction, const int& pl)
+  {
+    
+    // prepare a direction vector for the plane
+    TVector3 wireDir = {0.,0.,0.};
+    
+    // the direction of the plane is the vector uniting two consecutive wires
+    // such that this vector is perpendicular to both wires
+    // basically this is the vector perpendicular to the wire length direction,
+    // and still in the wire-plane direction
+    if (pl == 0)
+      wireDir = {0., -1/2., sqrt(3)/2.};
+    else if (pl == 1)
+      wireDir = {0., 1/2., sqrt(3)/2.};
+    else if (pl == 2)
+      wireDir = {0., 0., 1.};
+    else
+      throw LArUtilException("Plane number out of bounds!");
+    
+    // cosine between shower direction and plane direction gives the factor
+    // by which to divide 0.3, the minimum wire-spacing
+    double minWireSpacing = 0.3;
+    
+    double cos = wireDir.Dot(direction);
+    cos /= (wireDir.Mag() * direction.Mag());
+
+    // if cosine is 0 the direction is perpendicular and the wire-spacing is infinite
+    return kDOUBLE_MAX;
+
+    double pitch = minWireSpacing/cos;
+    return pitch;
   }
 
-  // std::cout << "3D line is (" << startPoint3D.X() << ", " << startPoint3D.Y()
-  //           << ", " << startPoint3D.Z() << ") to ( " << secondPoint3D.X()
-  //           << ", " << secondPoint3D.Y() << ", " << secondPoint3D.Z() << ")\n";
-
-  // Project the second point into 2D:
-  Point2D secondPoint2D = Point_3Dto2D(secondPoint3D, plane);
-
-  // std::cout << "2D line is (" << startPoint2D.w << ", " << startPoint2D.t
-  //           << ") to (" << secondPoint2D.w << ", " << secondPoint2D.t << ")\n";
-
-  // Now we have two points in 2D.  Get the direction by subtracting, and normalize
-  TVector2 dir(secondPoint2D.w - startPoint2D.w, secondPoint2D.t - startPoint2D.t);
-  if (dir.X() != 0.0 || dir.Y() != 0.0 )
-    dir *= 1.0 / dir.Mod();
-  direction2D.w = dir.X();
-  direction2D.t = dir.Y();
-  direction2D.plane = plane;
-
-  return;
-}
-
-float GeometryHelper::Slope_3Dto2D(const TVector3 & inputVector, unsigned int plane) const {
-  // Do this by projecting the line:
-  // Generate a start point right in the middle of the detector:
-  auto geom = larutil::Geometry::GetME();
-  TVector3 startPoint3D(0, 0, 0);
-  startPoint3D.SetZ(0.5 * geom -> DetLength());
-  larutil::Point2D p1, slope;
-  Line_3Dto2D(startPoint3D, inputVector, plane, p1, slope);
-  return slope.t / slope.w;
-}
-
-
-
-float GeometryHelper::DistanceToLine2D( const Point2D & pointOnLine, const Point2D & directionOfLine,
-                                        const Point2D & targetPoint) const
-{
-
-  // Utilize the 3D function to make it easier to maintain
-  TVector3 _pointOnLine(pointOnLine.w, pointOnLine.t, 0.0);
-  TVector3 _directionOfLine(directionOfLine.w, directionOfLine.t, 0.0);
-  TVector3 _targetPoint(targetPoint.w, targetPoint.t, 0.0);
-
-  return DistanceToLine3D(_pointOnLine, _directionOfLine, _targetPoint);
-}
-
-float GeometryHelper::DistanceToLine2D( const TVector2 & pointOnLine, const TVector2 & directionOfLine,
-                                        const TVector2 & targetPoint) const
-{
-  // Utilize the 3D function to make it easier to maintain
-  TVector3 _pointOnLine(pointOnLine.X(), pointOnLine.Y(), 0.0);
-  TVector3 _directionOfLine(directionOfLine.X(), directionOfLine.Y(), 0.0);
-  TVector3 _targetPoint(targetPoint.X(), targetPoint.Y(), 0.0);
-
-  return DistanceToLine3D(_pointOnLine, _directionOfLine, _targetPoint);
-}
-
-float GeometryHelper::DistanceToLine3D( const TVector3 & pointOnLine, const TVector3 & directionOfLine,
-                                        const TVector3 & targetPoint) const
-{
-  // This algorithm finds the distance between a point and a line by finding the closest point on the line
-  // Using minimization techniques from calculus.
-
-  // Line is defined by the vectors pointOnLine and directionOfLine.
-  // So, any point on the line can be parametrized as (pointOnLine + t * directionOfLine)
-  // This distance between any point on the line and the target point is thus:
-  // L = |(pointOnLine + t*directionOfLine) . targetPoint |
-  //
-  // Using this, minimize the distance with respect to t (actually, minimize the distance squared since it's easier):
-  // d(L^2)/dt = 2 * ( (pointOnLine + t*directionOfLine) . targetPoint ) * directionOfLine
-  //
-  // Set equal to 0 and solve for t:
-  // pointOnLine . directionOfLine + t * directionOfLine^2 - targetPoint . directionOfLine = 0;
-  // Therefore:
-  float t = ( targetPoint.Dot(directionOfLine) - pointOnLine.Dot(directionOfLine) ) / (directionOfLine.Dot(directionOfLine));
-
-  // Now, construct the closest approach point, subtract the target point, and return the mag
-  TVector3 closestApproach = pointOnLine + t * directionOfLine;
-
-  closestApproach -= targetPoint;
-  return closestApproach.Mag();
-
-}
-
-float GeometryHelper::Get2DDistanceSqrd(const Point2D& point1, const Point2D& point2) const
-{
-  return (point1.w - point2.w) * (point1.w - point2.w) + (point1.t - point2.t) * (point1.t - point2.t);
-}
-
-
-float GeometryHelper::Get2DDistance(const Point2D& point1, const Point2D& point2) const
-{
-  return TMath::Sqrt(Get2DDistanceSqrd(point1, point2));
-}
-
-int GeometryHelper::GetPointOnLine(const double& slope,
-                                   const Point2D &startpoint,
-                                   const Point2D &point1,
-                                   Point2D& pointout) const
-{
-
-  double intercept = startpoint.t - slope * startpoint.w;
-
-  double invslope = 0;
-
-  if (slope)
-    invslope = -1. / slope;
-
-  double ort_intercept = point1.t - invslope * point1.w;
-
-  if ((slope - invslope) != 0)
-    pointout.w = (ort_intercept - intercept) / (slope - invslope);
-  else
-    pointout.w = point1.w;
-
-  pointout.t = slope * pointout.w + intercept;
-
-  return 0;
-}
-
-double GeometryHelper::GetCosAngleBetweenLines(const double& s1, const double& s2) const
-{
-
-  double den = sqrt(1 + s1 * s1) + sqrt(1 + s2 * s2);
-  return (s1 * s2 + 1) / den;
-}
-
-double GeometryHelper::GetCosAngleBetweenLines(const Point2D& p1, const Point2D& p2, const Point2D& p3) const
-{
-
+  double GeometryHelper::GetCosAngleBetweenLines(const double& s1, const double& s2) const
+  {
+    
+    double den = sqrt(1 + s1 * s1) + sqrt(1 + s2 * s2);
+    return (s1 * s2 + 1) / den;
+  }
+  
+  double GeometryHelper::GetCosAngleBetweenLines(const Point2D& p1, const Point2D& p2, const Point2D& p3) const
+  {
+    
   if ( ( (p1.w == p2.w) and (p1.t == p2.t) ) or
        ( (p1.w == p3.w) and (p1.t == p3.t) ) )
     throw LArUtilException("Trying to calculate dot-product using a zero-length vector!");
@@ -251,87 +284,87 @@ double GeometryHelper::GetCosAngleBetweenLines(const Point2D& p1, const Point2D&
 
 
 double GeometryHelper::GetCosAngleBetweenLines(const Point2D& p1, const Point2D& p2,
-    const Point2D& p3, const Point2D& p4) const
+					       const Point2D& p3, const Point2D& p4) const
 {
-
+  
   if ( ( (p1.w == p2.w) and (p1.t == p2.t) ) or
        ( (p4.w == p3.w) and (p4.t == p3.t) ) )
     throw LArUtilException("Trying to calculate dot-product using a zero-length vector!");
-
+  
   double den = sqrt( ( (p2.w - p1.w) * (p2.w - p1.w) + (p2.t - p1.t) * (p2.t - p1.t) ) *
                      ( (p4.w - p3.w) * (p4.w - p3.w) + (p4.t - p3.t) * (p4.t - p3.t) ) );
-
+  
   return ( (p2.w - p1.w) * (p4.w - p3.w) + (p2.t - p1.t) * (p4.t - p3.t) ) / den;
 }
-
-double GeometryHelper::GetTanAngleBetweenLines(const double& s1, const double& s2) const
+  
+  double GeometryHelper::GetTanAngleBetweenLines(const double& s1, const double& s2) const
 {
-
+  
   // see this: http://planetmath.org/anglebetweentwolines
-
+  
   // if the slopes are the same -> the angle is 0
   // if slope1 * slope2 == -1 -> perpendicular lines -> 90 degrees
   if (s1 * s2 == -1)
     return kDOUBLE_MAX;
-
+  
   return (s1 - s2) / (1 + s1 * s2);
 }
+  
 
-
-void GeometryHelper::SelectPolygonHitList(const std::vector<Hit2D> &inputHits,
-    std::vector <const Hit2D*> &edgeHits,
-    double frac) const
-{
-
+  void GeometryHelper::SelectPolygonHitList(const std::vector<Hit2D> &inputHits,
+					    std::vector <const Hit2D*> &edgeHits,
+					    double frac) const
+  {
+    
   // if hit list is empty get out of here!
-  if (!(inputHits.size())) {
-    throw LArUtilException("Provided empty hit list!");
-    return;
-  }
-
+    if (!(inputHits.size())) {
+      throw LArUtilException("Provided empty hit list!");
+      return;
+    }
+    
   // Utilities
-  auto geom = larutil::Geometry::GetME();
-  auto detp = DetectorProperties::GetME();
+    auto geom = larutil::Geometry::GetME();
+    auto detp = DetectorProperties::GetME();
+    
+    // if the fraction is > 1 then use 1...should not be larger
+    // frac is the fraction of charge in the hit list
+    // than needs to be included in the Polygon
+    if (frac > 1) { frac = 1; }
+    
+    // clear list of hits that define the edges of the polygon
+    edgeHits.clear();
 
-  // if the fraction is > 1 then use 1...should not be larger
-  // frac is the fraction of charge in the hit list
-  // than needs to be included in the Polygon
-  if (frac > 1) { frac = 1; }
-
-  // clear list of hits that define the edges of the polygon
-  edgeHits.clear();
-
-  // determine the plane for this cluster (assumes all hits from the same cluster)
-  unsigned char plane = (inputHits[0]).plane;
-
-  // Define subset of hits to define polygon
-  std::map<double, const Hit2D*> hitmap;
-
-  // define a parameter that stores the total charge in the cluster
-  double qtotal = 0;
-  for (auto const &h : inputHits) {
-    hitmap.insert(std::pair<double, const Hit2D*>(h.charge, &h));
+    // determine the plane for this cluster (assumes all hits from the same cluster)
+    unsigned char plane = (inputHits[0]).plane;
+    
+    // Define subset of hits to define polygon
+    std::map<double, const Hit2D*> hitmap;
+    
+    // define a parameter that stores the total charge in the cluster
+    double qtotal = 0;
+    for (auto const &h : inputHits) {
+      hitmap.insert(std::pair<double, const Hit2D*>(h.charge, &h));
     qtotal += h.charge;
-  }
-  // define a parameter to store the charge that will be within the polygon
-  double qintegral = 0;
-  std::vector<const Hit2D*> ordered_hits;
-  ordered_hits.reserve(inputHits.size());
-  for (auto hiter = hitmap.rbegin(); qintegral <= qtotal * frac && hiter != hitmap.rend(); ++hiter) {
+    }
+    // define a parameter to store the charge that will be within the polygon
+    double qintegral = 0;
+    std::vector<const Hit2D*> ordered_hits;
+    ordered_hits.reserve(inputHits.size());
+    for (auto hiter = hitmap.rbegin(); qintegral <= qtotal * frac && hiter != hitmap.rend(); ++hiter) {
     qintegral += (*hiter).first;
     ordered_hits.push_back((*hiter).second);
-  }
-
+    }
+    
   // Define container to hold found polygon corner PxHit index & distance
-  std::vector<size_t> hit_index(8, 0);
-  std::vector<double> hit_distance(8, 1e9);
-
+    std::vector<size_t> hit_index(8, 0);
+    std::vector<double> hit_distance(8, 1e9);
+    
   // Loop over hits and find corner points in the plane view
   // Also fill corner edge points
-  std::vector<larutil::Point2D> edges(4, Point2D(plane, 0, 0));
-  double wire_max = geom->Nwires(plane) * fWireToCm;
+    std::vector<larutil::Point2D> edges(4, Point2D(plane, 0, 0));
+    double wire_max = geom->Nwires(plane) * fWireToCm;
   double time_max = detp->NumberTimeSamples() * fTimeToCm;
-
+  
   for (size_t index = 0; index < ordered_hits.size(); ++index) {
 
     if (ordered_hits.at(index)->t < 0 ||

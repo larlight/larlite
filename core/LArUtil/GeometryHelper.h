@@ -5,7 +5,7 @@
  *
  * \brief Class def header for a class GeometryHelper
  *
- * @author cadams
+ * @author cadams + david caratelli
  */
 
 /** \addtogroup LArUtil
@@ -237,6 +237,19 @@ public:
                        const Point2D& startpoint,
                        const Point2D& point1,
                        Point2D& pointout) const;
+
+    /**
+     * @brief Get pitch given a certain 3D direction and plane
+     * @details Provided a 3D direction (the shower dir) and a
+     * plane, this algorithm returns the pitch for this direction
+     * in that plane. The pitch is the effective distance between
+     * seen between wires on this plane from the point of view of
+     * the track. This is a quantity in cm and can only be >= 3 cm
+     * @param direction -> TVector3 of the shower's 3D direction
+     * @param plane     -> 0,1,2
+     * @return the effective pitch in cm
+     */
+    double GetPitch(const TVector3& direction, const int& pl);
 
     /**
      * @brief Get cosine of angle between two lines defined by their slope
