@@ -27,9 +27,9 @@ namespace cluster {
     attachAlg(averages);
     attachAlg(polygon);
     attachAlg(roughStartPoint);
-    attachAlg(direction);
-    attachAlg(startPoint);
-    // attachAlg(showeringpoint);
+    // attachAlg(direction);
+    // attachAlg(startPoint);
+    attachAlg(showeringpoint);
 
     
     SetDebug(false);

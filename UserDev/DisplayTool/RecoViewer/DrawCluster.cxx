@@ -148,6 +148,7 @@ namespace evd {
     cluster::cluster_params params;
     params_alg.SetVerbose(false);
     params_alg.SetDebug(false);
+    params_alg.SetMinHits(10);
     
     for(auto const& hit_indices : hit_index_v) {
       view = ev_hit->at(hit_indices[0]).View();
