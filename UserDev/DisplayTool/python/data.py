@@ -397,18 +397,20 @@ class clusterParams(QtCore.QObject): #recoBase):
     black = (0  ,0  ,0)
     blue  = (0  ,0  ,255)
 
+    offset = self._geom.offset(self._params.plane_id.Plane) / self._geom.time2cm()
+
     # Draw the start and end points:
     sW = self._params.start_point.w / self._geom.wire2cm()
-    sT = self._params.start_point.t / self._geom.time2cm()
+    sT = (self._params.start_point.t ) / self._geom.time2cm() + offset
     eW = self._params.end_point.w / self._geom.wire2cm()
-    eT = self._params.end_point.t / self._geom.time2cm()
+    eT = (self._params.end_point.t) / self._geom.time2cm() + offset
     showeringW = self._params.showering_point.w / self._geom.wire2cm()
-    showeringT = self._params.showering_point.t / self._geom.time2cm()
+    showeringT = (self._params.showering_point.t) / self._geom.time2cm() + offset
 
     radBigW   = 0.5 / self._geom.wire2cm()
-    radBigT   = 0.5 / self._geom.time2cm()
+    radBigT   = (0.5 ) / self._geom.time2cm()
     radSmallW = 0.25 / self._geom.wire2cm()
-    radSmallT = 0.25 / self._geom.time2cm()
+    radSmallT = (0.25 ) / self._geom.time2cm()
 
     bigCircleStart = connectedCircle(sW-radBigW,sT-radBigT,2*radBigW,2*radBigT)
     if self._isHighlighted:
@@ -444,7 +446,7 @@ class clusterParams(QtCore.QObject): #recoBase):
 
 
     radW = 0.5 / self._geom.wire2cm()
-    radT = 0.5 / self._geom.time2cm()
+    radT = (0.5) / self._geom.time2cm()
     showeringPoint = connectedCircle(showeringW -radW, showeringT - radT, 2*radW, 2*radT)
     showeringPoint.setBrush(pg.mkColor(blue))
     showeringPoint.setOpacity(0.6)
@@ -478,12 +480,12 @@ class clusterParams(QtCore.QObject): #recoBase):
 
 
     axisEndW = sW + l*self._params.principal_dir.at(0)/self._geom.wire2cm() 
-    axisEndT = sT + l*self._params.principal_dir.at(1)/self._geom.time2cm() 
+    axisEndT = sT + (l*self._params.principal_dir.at(1) )/self._geom.time2cm()
     # Check to see if this line needs to be reversed:
     sign = (sW - axisEndW)*(sW - eW) + (sT - axisEndT)*(sT - eT)
     if sign < 0:
       axisEndW = sW - l*self._params.principal_dir.at(0)/self._geom.wire2cm() 
-      axisEndT = sT - l*self._params.principal_dir.at(1)/self._geom.time2cm() 
+      axisEndT = sT - (l*self._params.principal_dir.at(1) )/self._geom.time2cm()
     
 
     self._axisPolygon.append(QtCore.QPointF(axisEndW,axisEndT))
@@ -501,13 +503,13 @@ class clusterParams(QtCore.QObject): #recoBase):
     self._startAxis = QtGui.QPolygonF()
     self._startAxis.append(QtCore.QPointF(sW,sT))
     startDirEndW = sW + l*self._params.start_dir.at(0)/self._geom.wire2cm() 
-    startDirEndT = sT + l*self._params.start_dir.at(1)/self._geom.time2cm() 
+    startDirEndT = sT + (l*self._params.start_dir.at(1) )/self._geom.time2cm()
 
     # print sign
     sign = (sW - startDirEndW)*(sW - eW) + (sT - startDirEndT)*(sT - eT)
     if sign < 0:
       startDirEndW = sW - l*self._params.start_dir.at(0)/self._geom.wire2cm() 
-      startDirEndT = sT - l*self._params.start_dir.at(1)/self._geom.time2cm() 
+      startDirEndT = sT - (l*self._params.start_dir.at(1) )/self._geom.time2cm()
 
     self._startAxis.append(QtCore.QPointF(startDirEndW,startDirEndT))
     self._startAxisPath = QtGui.QPainterPath()
@@ -526,7 +528,7 @@ class clusterParams(QtCore.QObject): #recoBase):
     self._thisPolyF = QtGui.QPolygonF()
     for p in xrange(self._params.PolyObject.Size()):
       point = self._params.PolyObject.Point(p)
-      qpoint = QtCore.QPointF(point.first/self._geom.wire2cm(),point.second/self._geom.time2cm())
+      qpoint = QtCore.QPointF(point.first/self._geom.wire2cm(),(point.second)/self._geom.time2cm() + offset)
       self._thisPolyF.append(qpoint)
 
     self._thisPoly = QtGui.QGraphicsPolygonItem(self._thisPolyF)

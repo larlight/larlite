@@ -129,7 +129,7 @@ class viewport(pg.GraphicsLayoutWidget):
       message.append(str(int(self.q.x())))
     if self._cmSpace:
       message.append(", Y: ")
-      message.append("{0:.1f}".format(self.q.y()*self._geometry.time2cm()))
+      message.append("{0:.1f}".format(self.q.y()*self._geometry.time2cm() - self._geometry.offset(self._plane)))
     else:
       message.append(", T: ")
       message.append(str(int(self.q.y())))
