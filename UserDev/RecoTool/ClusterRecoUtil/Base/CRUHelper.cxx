@@ -4,6 +4,8 @@
 #include "CRUHelper.h"
 #include "LArUtil/Geometry.h"
 #include "LArUtil/GeometryHelper.h"
+#include "LArUtil/DetectorProperties.h"
+
 
 namespace cluster {
 
@@ -46,6 +48,7 @@ namespace cluster {
 
     auto geo  = ::larutil::Geometry::GetME();
     auto geoH = ::larutil::GeometryHelper::GetME();
+    auto detProp = ::larutil::DetectorProperties::GetME();
 
     UChar_t plane = geo->ChannelToPlane(hits->at(hit_index.at(0)).Channel());
 
@@ -55,7 +58,7 @@ namespace cluster {
 
       ::Hit2D h;
 
-      h.t = hit.PeakTime()    * geoH->TimeToCm();
+      h.t = (hit.PeakTime() - detProp->TriggerOffset())* geoH->TimeToCm() + geo->PlaneOriginVtx(plane)[0];
       h.w = hit.WireID().Wire * geoH->WireToCm();
 
       h.charge = hit.Integral();
