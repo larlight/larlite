@@ -19,6 +19,9 @@
 #include "LArUtil/Geometry.h"
 #include "RawBase.h"
 
+#include "TTree.h"
+#include "TGraph.h"
+
 struct _object;
 typedef _object PyObject;
 
@@ -59,8 +62,33 @@ namespace evd {
     */
     virtual bool finalize();
 
+    void SetCorrectData(bool _doit = true){_correct_data = _doit;}
+    void SetSaveData(bool _doit = true){_save_data = _doit;}
+
+    void SetStepSizeByPlane(int stepSize, int plane);
 
   private:
+
+    // This function corrects the data by removing correlated noise
+    // It can also save out the information
+    void correctData();
+
+    float getCorrelation(const std::vector<float> &, const std::vector<float> &);
+    float getMedian( std::vector<float> & vals);
+
+    bool _correct_data;
+    bool _save_data;
+
+
+    std::vector<std::vector<float> > pedestalByPlane;
+    std::vector<std::vector<float> > rmsByPlane;
+    std::vector<std::vector<float> > rmsByPlaneCorrected;
+
+    std::vector<std::vector<int  > > badWireMapByPlane;
+
+    int run, subrun, event;
+
+    std::vector<int> stepSize;
 
   };
 }

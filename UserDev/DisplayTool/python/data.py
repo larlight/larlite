@@ -154,6 +154,11 @@ class rawDigit(wire):
     for i in xrange(len(geom._pedestals)):
       self._process.setPedestal(geom._pedestals[i],i)
     self._process.initialize()
+    self._process.SetStepSizeByPlane(48,0)
+    self._process.SetStepSizeByPlane(48,1)
+    self._process.SetStepSizeByPlane(96,2)
+    self._process.SetCorrectData(True)
+    self._process.SetSaveData(False)
 
 
 class hit(recoBase):

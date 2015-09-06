@@ -13,6 +13,7 @@
 #pragma link C++ class cluster::ClusterViewerAlgo+;
 #pragma link C++ class cluster::ViewerException+;
 #pragma link C++ class larlite::ClusterViewer+;
+#pragma link C++ class larlite::ClusterViewer::cluster_unique_id+;
 #pragma link C++ class larlite::MergeViewer+;
 #pragma link C++ class larlite::ClusterMerger+;
 #pragma link C++ class larlite::ClusterMatcher+;
