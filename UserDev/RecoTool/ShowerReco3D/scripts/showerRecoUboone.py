@@ -36,14 +36,14 @@ def getShowerRecoAlgModular():
 
   # 3D Axis Module:
   axis3D = showerreco.Axis3DModule()
-  axis3D.setMaxIterations(50)
-  axis3D.setNStepsMin(5)
-  axis3D.setTargetError(0.0001)
+  axis3D.setMaxIterations(100)
+  axis3D.setNStepsInitial(11)
+  axis3D.setTargetError(0.001)
 
   alg.AddShowerRecoModule(axis3D                           )
-  alg.AddShowerRecoModule(showerreco.StartPoint2DModule()  )
-  alg.AddShowerRecoModule(showerreco.StartPoint3DModule()  )
-  alg.AddShowerRecoModule(showerreco.ShowerChargeModule()  )
+  # alg.AddShowerRecoModule(showerreco.StartPoint2DModule()  )
+  # alg.AddShowerRecoModule(showerreco.StartPoint3DModule()  )
+  # alg.AddShowerRecoModule(showerreco.ShowerChargeModule()  )
 
   alg.PrintModuleList()
 
@@ -55,7 +55,7 @@ def DefaultMatch():
   palgo_array = cmtool.CPAlgoArray()
   
   palgo1 = cmtool.CPAlgoNHits()
-  palgo1.SetMinHits(25)
+  palgo1.SetMinHits(50)
   
   palgo2 = cmtool.CPAlgoIgnoreTracks()
   
@@ -134,7 +134,7 @@ print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
-my_proc.run(0,500)
+my_proc.run(0)
 # my_proc.process_event(2)
 
 
