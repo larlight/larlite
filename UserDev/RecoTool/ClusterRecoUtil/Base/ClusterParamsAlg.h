@@ -54,7 +54,7 @@ namespace cluster{
      */
     void ReportTimes() const;
 
-  private:
+  protected:
 
     std::vector<::cluster::ParamsAlgBase * > _modules;
     

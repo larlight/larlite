@@ -18,8 +18,10 @@
 #pragma link C++ class cluster::GetRoughStartPoint+;
 #pragma link C++ class cluster::FindShoweringPoint+;
 #pragma link C++ class cluster::DefaultParamsAlg+;
+#pragma link C++ class cluster::ClusterParamsAna+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 
