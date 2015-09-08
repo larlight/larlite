@@ -378,15 +378,22 @@ class clusterParams(QtCore.QObject): #recoBase):
     return self.toolTip()
 
   def toolTip(self):
-    tip =  "Hits:  \t" + str(self._params.N_Hits) + "\n"
-    tip += "Start: \t(" + "{:.2f}".format(self._params.start_point.w) + ", "
+    tip =  "Hits: " + str(self._params.N_Hits) + "\n"
+    tip += "Start: (" + "{:.2f}".format(self._params.start_point.w) + ", "
     tip += "{:.2f}".format(self._params.start_point.t) + ")\n"
-    tip += "Shw:   \t(" + "{:.2f}".format(self._params.showering_point.w) + ", "
+    tip += "Shower Start (" + "{:.2f}".format(self._params.showering_point.w) + ", "
     tip += "{:.2f}".format(self._params.showering_point.t) + ")\n"
-    tip += "End:   \t(" + "{:.2f}".format(self._params.end_point.w) + ", "
+    tip += "End: (" + "{:.2f}".format(self._params.end_point.w) + ", "
     tip += "{:.2f}".format(self._params.end_point.t) + ")\n"
-    tip += "Slope: \t" + "{:.2f}".format(self._params.principal_dir[1]/self._params.principal_dir[0]) + "\n"
-    tip += "Angle: \t" + "{:.2f}".format(self._params.angle_2d) + "\n"
+    if self._params.principal_dir[0] != 0:
+      tip += "Slope: " + "{:.2f}".format(self._params.principal_dir[1]/self._params.principal_dir[0]) + "\n"
+    else:
+      tip += "Slope: inf\n" 
+    if self._params.start_dir[0] != 0:
+      tip += "Start Slope: " + "{:.2f}".format(self._params.start_dir[1]/self._params.start_dir[0]) + "\n"
+    else:
+      tip += "Start Slope: inf\n"
+    tip += "Angle: " + "{:.2f}".format(self._params.angle_2d) + "\n"
     tip += "Add more in data.py:clusterParams:toolTip!"
     return tip
 
@@ -467,7 +474,26 @@ class clusterParams(QtCore.QObject): #recoBase):
     view._view.addItem(smallCircleEnd)
     view._view.addItem(showeringPoint)
 
+    ########################################
+    # 2D Polygon Drawing
+    ########################################
+    # Not super hard to do with the poly object
+    self._thisPolyF = QtGui.QPolygonF()
+    for p in xrange(self._params.PolyObject.Size()):
+      point = self._params.PolyObject.Point(p)
+      qpoint = QtCore.QPointF(point.first/self._geom.wire2cm(),(point.second)/self._geom.time2cm() + offset)
+      self._thisPolyF.append(qpoint)
 
+    self._thisPoly = QtGui.QGraphicsPolygonItem(self._thisPolyF)
+    pen = self._thisPoly.pen()
+    pen.setStyle(QtCore.Qt.DashLine)
+    self._thisPoly.setPen(pen)
+    view._view.addItem(self._thisPoly)
+
+
+    ########################################
+    # 2D Principal Axis Drawing
+    ########################################
     # Draw the axis
     # The axis is just a line between two points.
     self._axisPolygon = QtGui.QPolygonF()
@@ -478,16 +504,13 @@ class clusterParams(QtCore.QObject): #recoBase):
       l += (self._params.start_point.t - self._params.end_point.t)**2
       l = math.sqrt(l)
 
-
     axisEndW = sW + l*self._params.principal_dir.at(0)/self._geom.wire2cm() 
     axisEndT = sT + (l*self._params.principal_dir.at(1) )/self._geom.time2cm()
     # Check to see if this line needs to be reversed:
     sign = (sW - axisEndW)*(sW - eW) + (sT - axisEndT)*(sT - eT)
     if sign < 0:
       axisEndW = sW - l*self._params.principal_dir.at(0)/self._geom.wire2cm() 
-      axisEndT = sT - (l*self._params.principal_dir.at(1) )/self._geom.time2cm()
-    
-
+      axisEndT = sT - (l*self._params.principal_dir.at(1) )/self._geom.time2cm()  
     self._axisPolygon.append(QtCore.QPointF(axisEndW,axisEndT))
 
     self._axisPath = QtGui.QPainterPath()
@@ -499,6 +522,9 @@ class clusterParams(QtCore.QObject): #recoBase):
     self._polyGraphicsItem.setPen(pen)
     view._view.addItem(self._polyGraphicsItem)
 
+    ########################################
+    # 2D Start Axis Drawing
+    ########################################
     # Draw an line to show the start direction of the shower
     self._startAxis = QtGui.QPolygonF()
     self._startAxis.append(QtCore.QPointF(sW,sT))
@@ -523,19 +549,7 @@ class clusterParams(QtCore.QObject): #recoBase):
     view._view.addItem(self._startAxisPolyItem)    
 
 
-    # Draw the polygon
-    # Not super hard to do with the poly object
-    self._thisPolyF = QtGui.QPolygonF()
-    for p in xrange(self._params.PolyObject.Size()):
-      point = self._params.PolyObject.Point(p)
-      qpoint = QtCore.QPointF(point.first/self._geom.wire2cm(),(point.second)/self._geom.time2cm() + offset)
-      self._thisPolyF.append(qpoint)
 
-    self._thisPoly = QtGui.QGraphicsPolygonItem(self._thisPolyF)
-    pen = self._thisPoly.pen()
-    pen.setStyle(QtCore.Qt.DashLine)
-    self._thisPoly.setPen(pen)
-    view._view.addItem(self._thisPoly)
 
 
   def clear(self,view):
