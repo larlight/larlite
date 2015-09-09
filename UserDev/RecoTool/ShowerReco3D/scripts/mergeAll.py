@@ -53,24 +53,24 @@ def main(**args):
 
   # Merge all:
   merger = larlite.ClusterMerger()
+  merger.SetInputProducer("cccluster")
+  merger.SetOutputProducer("mergeall")
+
   
   ########################################
   # MERGE ALGORITHMS
   ########################################
-  algo_array = cmtool.CBAlgoArray()
+  # algo_array = cmtool.CBAlgoArray()
   mergeAll = cmtool.CBAlgoMergeAll()
-  mergeAll.SetHits(3)
-  algo_array.AddAlgo(mergeAll)
+  mergeAll.SetHits(5)
+  # algo_array.AddAlgo(mergeAll, True)
 
-  
-  merger.GetManager().AddMergeAlgo(algo_array)
-  merger.SetInputProducer("cccluster")
-  merger.SetOutputProducer("mergeall")
+
+
+  merger.GetManager().AddMergeAlgo(mergeAll)
   merger.SaveOutputCluster()
   my_proc.add_process(merger)
 
-  print merger
-  print my_proc
 
   if args['num_events'] != None:
     start = time.clock()
