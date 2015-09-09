@@ -27,6 +27,8 @@ class Axis3DModule : ShowerRecoModuleBase {
 
 public:
 
+    enum Status {kNormal, kNotOptFit, kIterMaxOut, kNStatus};
+
     /// Default constructor
     Axis3DModule() {_name = "Axis3DModule";}
 
@@ -60,9 +62,9 @@ private:
     /**
      * @brief generate seed direction vectors in the angle around the initial vector
      * @details Takes the initial vector and maps out and area around it and returns that vector array
-     *          It defines theta as the angle outward from the initial vector.  There is no reason for theta to be
-     *          greater than 90 degrees because this will make a full circuit in phi and there is no distinction later
-     *          amongst vectors and their inverse
+     *          It defines theta as the angle outward from the initial vector.  There is no reason
+     *          for theta to be greater than 90 degrees because this will make a full circuit in phi
+     *          and there is no distinction later amongst vectors and their inverse
      *
      *
      * @param initialVector The TVector3 that is the effective Z axis, all the others wrap around it.
@@ -101,7 +103,9 @@ private:
      * @param planes The index of each plane - doesn't assume we're getting planes in any particular order
      * @return The index in the seedVectors array of the best vector
      */
-    int findBestVector(const std::vector<TVector3> seedVectors, const std::vector<float> & slopesByPlane, const std::vector<int> & planes);
+    int findBestVector(const std::vector<TVector3> seedVectors,
+                       const std::vector<float> & slopesByPlane,
+                       const std::vector<int> & planes);
 
 
     /**
@@ -115,8 +119,33 @@ private:
      *
      * @return The error (squared), unitless
      */
-    float getErrorOfProjection(const TVector3 & inputVector, const std::vector<float> & slopesByPlane, const std::vector<int> & planes);
+    float getErrorOfProjection(const TVector3 & inputVector,
+                               const std::vector<float> & slopesByPlane,
+                               const std::vector<int> & planes);
 
+    /**
+     * @brief This function takes a seed vector and optimizes it to the slopes and planes specified
+     * @details The algorithm will make a set of vectors that surround the seed vector and move the seed
+     *          to the vector that has the least error.  If the error is smallest at the seed vector,
+     *          it attempts to decrease the window around the vector to reduce the area it's looking in.
+     *          If the calculated error (which is normalized to nPlanes) drops below a required minimum,
+     *          the algorithm returns with exit status kNormal.  If the window around the algorithm
+     *          reaches a minimum window without the minimum error, the algorithm also returns but with
+     *          exit status kNotOptFit.  If the algorithm fails to converge in the max number of iterations,
+     *          it returns with status kIterMaxOut.
+     *
+     * @param inputVector Reference to the initial seed vector, gets modified directly
+     * @param exitStatus Reference to the exit status, filled as enum Status
+     * @param n_iterations The number of iterations this algorithm required
+     * @param slopeByPlane The slopes that this algorithm is going to fit against
+     * @param plane The planes that each of the above slopes match to.
+     * @return The error of the performed fit.
+     */
+    float optimzeVector(TVector3 & inputVector,
+                        Status & exitStatus,
+                        int & n_iterations,
+                        const std::vector<float> & slopeByPlane,
+                        const std::vector<int> & planes );
 
     int fMaxIterations;
     float fNStepsInitial;
