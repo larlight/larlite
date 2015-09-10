@@ -71,6 +71,11 @@ namespace cluster{
     Point2D start_point;               ///< start point 
     Point2D end_point;                 ///< end point 
     
+    std::vector<Point2D > start_point_cand;     ///<Worker variable saves the list of candidate start points between modules
+    std::vector<Point2D > shwr_point_cand;     ///<Worker variable saves the list of candidate start points between modules
+    std::vector<Point2D > start_dir_cand;       ///candidate start point directions
+
+
     Point2D showering_point;           ///< point at which showering of cluster begins
 
     double sum_charge;                 ///< Sum charge of hits in ADC
