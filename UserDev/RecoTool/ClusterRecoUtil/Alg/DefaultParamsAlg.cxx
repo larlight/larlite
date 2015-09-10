@@ -19,17 +19,17 @@ namespace cluster {
     roughStartPoint                      -> SetVerbose(false);
     RefineDirection    * direction       = new RefineDirection();
     direction                            -> SetVerbose(false);
-    RefineStartPoints  * startPoint      = new RefineStartPoints();
-    startPoint                           -> SetVerbose(false);
     FindShoweringPoint * showeringpoint  = new FindShoweringPoint();
     showeringpoint                       -> SetVerbose(false);
+    RefineStartPoints  * startPoint      = new RefineStartPoints();
+    startPoint                           -> SetVerbose(false);
 
     attachAlg(averages);
     attachAlg(polygon);
     attachAlg(roughStartPoint);
     // attachAlg(direction);
-    // attachAlg(startPoint);
     attachAlg(showeringpoint);
+    attachAlg(startPoint);
 
     
     SetDebug(false);

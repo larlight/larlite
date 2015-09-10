@@ -11,14 +11,15 @@
 
 namespace cluster {
 
-bool ClusterParamsAna::initialize() {
+  ClusterParamsAna::ClusterParamsAna()
+    : _param_tree(nullptr)
+  {
+    _fout = 0;
+    _name = "ClusterParamsAna";
+    _verbose = false;
+  }
 
-    //
-    // This function is called in the beggining of event loop
-    // Do all variable initialization you wish to do here.
-    // If you have a histogram to fill in the event loop, for example,
-    // here is a good place to create one on the heap (i.e. "new TH1D").
-    //
+bool ClusterParamsAna::initialize() {
 
     auto geo = larutil::Geometry::GetME();
 
@@ -52,28 +53,23 @@ bool ClusterParamsAna::initialize() {
         p++;
     }
 
+    if (_param_tree) delete _param_tree;
+    _param_tree = new TTree("_param_tree","Cluster Parameter TTree");
+    _param_tree->Branch("_plane",&_plane,"plane/I");
+    _param_tree->Branch("_E",&_E,"E/D");
+    _param_tree->Branch("_containment",&_containment,"containment/D");
+    _param_tree->Branch("_w",&_w,"w/D");
+    _param_tree->Branch("_t",&_t,"t/D");
+    _param_tree->Branch("_angle",&_angle,"angle/D");
+    _param_tree->Branch("_start_angle",&_start_angle,"start_angle/D");
+    _param_tree->Branch("_mc_w",&_mc_w,"mc_w/D");
+    _param_tree->Branch("_mc_t",&_mc_t,"mc_t/D");
+    _param_tree->Branch("_mc_angle",&_mc_angle,"mc_angle/D");
 
     return true;
 }
 
 bool ClusterParamsAna::analyze(::larlite::storage_manager* storage) {
-
-    //
-    // Do your event-by-event analysis here. This function is called for
-    // each event in the loop. You have "storage" pointer which contains
-    // event-wise data. To see what is available, check the "Manual.pdf":
-    //
-    // http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
-    //
-    // Or you can refer to Base/DataFormatConstants.hh for available data type
-    // enum values. Here is one example of getting PMT waveform collection.
-    //
-    // event_fifo* my_pmtfifo_v = (event_fifo*)(storage->get_data(DATA::PMFIFO));
-    //
-    // if( event_fifo )
-    //
-    //   std::cout << "Event ID: " << my_pmtfifo_v->event_id() << std::endl;
-    //
 
     auto geoHelper = larutil::GeometryHelper::GetME();
 
@@ -85,9 +81,12 @@ bool ClusterParamsAna::analyze(::larlite::storage_manager* storage) {
     }
     auto mcShower = ev_shower -> front();
 
+    _E = mcShower.DetProfile().E();
+    _containment = _E / mcShower.Start().E();
+
     std::vector<cluster_params> _params_vec;
 
-    DefaultParamsAlg params_alg ;
+    DefaultParamsAlg params_alg;
     params_alg.SetVerbose(false);
     params_alg.SetDebug(false);
     params_alg.SetMinHits(25);
@@ -98,41 +97,53 @@ bool ClusterParamsAna::analyze(::larlite::storage_manager* storage) {
     // Run ClusterParamsAlg on each cluster, compare to MC projection:
     for ( auto & clust : _params_vec) {
         params_alg.FillParams(clust);
-        int plane = clust.plane_id.Plane;
+        _plane = clust.plane_id.Plane;
         // Get the mc info:
-        Point2D mcStartPoint = geoHelper -> Point_3Dto2D(mcShower.Start().Position().Vect(), plane);
-        float mcSlope = geoHelper -> Slope_3Dto2D(mcShower.Start().Momentum().Vect(), plane);
+        Point2D mcStartPoint = geoHelper -> Point_3Dto2D(mcShower.Start().Position().Vect(), _plane);
+        float mcSlope = geoHelper -> Slope_3Dto2D(mcShower.Start().Momentum().Vect(), _plane);
         if (clust.start_point.w == 0) {
             continue;
         }
-        std::cout << "reco (" << clust.start_point.w << ", " << clust.start_point.t << ") vs "
-                  << "(" << mcStartPoint.w << ", " << mcStartPoint.t << ").";
+
+	_mc_w = mcStartPoint.w;
+	_mc_t = mcStartPoint.t;
+	_mc_angle = atan(mcSlope);
+
+	auto reco_start = clust.start_point;
+	auto reco_end   = clust.end_point;
+
+	_w = reco_start.w;
+	_t = reco_start.t;
+	_angle = clust.angle_2d;
+	_start_angle = atan(clust.start_dir[1] / clust.start_dir[0]);
+
+	if (_verbose)
+	  std::cout << "reco (" << reco_start.w << ", " << reco_start.t << ") vs "
+		    << "(" << mcStartPoint.w << ", " << mcStartPoint.t << ").";
 
         // Figure out if this cluster is forwards, backwards, or just plain bad:
-        float dist_start = sqrt(pow(clust.start_point.w - mcStartPoint.w,2)
-                              + pow(clust.start_point.t - mcStartPoint.t,2));
-        float dist_end   = sqrt(pow(clust.end_point.w - mcStartPoint.w,2)
-                              + pow(clust.end_point.t - mcStartPoint.t,2));
+        float dist_start = sqrt(pow(reco_start.w - mcStartPoint.w,2)
+                              + pow(reco_start.t - mcStartPoint.t,2));
+        float dist_end   = sqrt(pow(reco_end.w - mcStartPoint.w,2)
+                              + pow(reco_end.t - mcStartPoint.t,2));
 
-        if (dist_start < dist_end){
+	if (_verbose){
+	  if (dist_start < dist_end)
             std::cout << " Forwards." << dist_start << std::endl;
-        }
-        else {
+	  else
             std::cout << " Backwards." << dist_end << std::endl;
         }
 
         // Fill the right histogram:
-        startPointW.at(plane) -> Fill(clust.start_point.w - mcStartPoint.w);
-        startPointT.at(plane) -> Fill(clust.start_point.t - mcStartPoint.t);
-        float mcAngle, startAngle, prinAngle;
-        mcAngle = atan(mcSlope);
-        prinAngle  = clust.angle_2d;
-        startAngle = atan(clust.start_dir[1] / clust.start_dir[0]);
+        startPointW.at(_plane) -> Fill(reco_start.w - mcStartPoint.w);
+        startPointT.at(_plane) -> Fill(reco_start.t - mcStartPoint.t);
 
-        startSlope.at(plane) -> Fill(startAngle - mcAngle);
-        prinSlope.at(plane) -> Fill(prinAngle - mcAngle);
+        startSlope.at(_plane) -> Fill(_start_angle - _mc_angle);
+        prinSlope.at(_plane) -> Fill(_angle - _mc_angle);
 
-    }
+	_param_tree->Fill();
+
+    }// for all clusters
 
 
     return true;
@@ -140,13 +151,6 @@ bool ClusterParamsAna::analyze(::larlite::storage_manager* storage) {
 
 bool ClusterParamsAna::finalize() {
 
-    // This function is called at the end of event loop.
-    // Do all variable finalization you wish to do here.
-    // If you need, you can store your ROOT class instance in the output
-    // file. You have an access to the output file through "_fout" pointer.
-    //
-    // Say you made a histogram pointer h1 to store. You can do this:
-    //
     if (_fout) {
         _fout->cd();
         for (auto & hist : startPointW) {
@@ -161,11 +165,9 @@ bool ClusterParamsAna::finalize() {
         for (auto & hist : prinSlope) {
             hist -> Write();
         }
+	if (_param_tree)
+	  _param_tree->Write();
     }
-    //
-    // else
-    //   print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
-    //
 
     return true;
 }

@@ -17,6 +17,7 @@
 
 #include "Analysis/ana_base.h"
 #include "TH1F.h"
+#include "TTree.h"
 
 namespace cluster {
   /**
@@ -28,7 +29,7 @@ namespace cluster {
   public:
 
     /// Default constructor
-    ClusterParamsAna(){ _name="ClusterParamsAna"; _fout=0;}
+    ClusterParamsAna();
 
     /// Default destructor
     virtual ~ClusterParamsAna(){}
@@ -48,7 +49,11 @@ namespace cluster {
     */
     virtual bool finalize();
 
+    void SetVerbose(bool on) { _verbose = on; }
+
   protected:
+
+    bool _verbose;
     
     std::vector<TH1F *> startPointW;
     std::vector<TH1F *> startPointT;
@@ -56,6 +61,13 @@ namespace cluster {
     std::vector<TH1F *> prinSlope;
     std::vector<TH1F *> direction;
 
+    TTree* _param_tree;
+    int _plane;
+    double _E;
+    double _w, _mc_w;
+    double _t, _mc_t;
+    double _angle, _start_angle, _mc_angle;
+    double _containment;
 
   };
 }
