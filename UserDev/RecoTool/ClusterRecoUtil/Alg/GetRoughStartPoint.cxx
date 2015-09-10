@@ -142,9 +142,9 @@ void GetRoughStartPoint::do_params_fill(cluster_params & cluster) {
   // Take the avgTan and multiply by 4, then save all points where the candidates are
   float cutoffAvg = 4 * minAvg;
   for (size_t n1 = 0; n1 < nEdges; n1++) {
-    std::cout << "avg is " << averageList[n1]  << ", angle is " << interiorAngles[n1]
-              << " at (" << poly.Point(n1).first
-              << ", " << poly.Point(n1).second << ")" << std::endl;
+    // std::cout << "avg is " << averageList[n1]  << ", angle is " << interiorAngles[n1]
+    //           << " at (" << poly.Point(n1).first
+    //           << ", " << poly.Point(n1).second << ")" << std::endl;
     if (averageList[n1] < cutoffAvg && interiorAngles[n1] < M_PI / 2.0) {
       cluster.start_point_cand.push_back(Point2D(plane, poly.Point(n1).first, poly.Point(n1).second));
     }
@@ -156,11 +156,7 @@ void GetRoughStartPoint::do_params_fill(cluster_params & cluster) {
 
   // if we found the best average (lowest value)
 
-  std::cout << "Candidate start points are: ";
-  for (auto & pair : cluster.start_point_cand) {
-    std::cout << "(" << pair.w << ", " << pair.t << ")\n";
-  }
-  std::cout << std::endl;
+
 
   cluster.start_point = start;
 

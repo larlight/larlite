@@ -187,6 +187,17 @@ public:
     /**
      * @brief Calculate the shortest distance between a line and a point in 2D
      *
+     * @param pointOnLine Point2D - Any point on the line of interest
+     * @param directionOfLine Point2D - The direction of the line of interest
+     * @param targetPoint Point2D - The point from which the closest distance is calculated
+     * @return the distance between the point and the line in centimeters
+     */
+    float DistanceToLine2D( const Point2D & pointOnLine, const Point2D & directionOfLine,
+                            const Hit2D & targetPoint) const;
+
+    /**
+     * @brief Calculate the shortest distance between a line and a point in 2D
+     *
      * @param pointOnLine  TVector2 - Any point on the line of interest
      * @param directionOfLine  TVector2 - The direction of the line of interest
      * @param targetPoint  TVector2 - The point from which the closest distance is calculated

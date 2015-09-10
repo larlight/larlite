@@ -155,6 +155,18 @@ float GeometryHelper::DistanceToLine2D( const Point2D & pointOnLine, const Point
   return DistanceToLine3D(_pointOnLine, _directionOfLine, _targetPoint);
 }
 
+float GeometryHelper::DistanceToLine2D( const Point2D & pointOnLine, const Point2D & directionOfLine,
+                                        const Hit2D & targetPoint) const
+{
+
+  // Utilize the 3D function to make it easier to maintain
+  TVector3 _pointOnLine(pointOnLine.w, pointOnLine.t, 0.0);
+  TVector3 _directionOfLine(directionOfLine.w, directionOfLine.t, 0.0);
+  TVector3 _targetPoint(targetPoint.w, targetPoint.t, 0.0);
+
+  return DistanceToLine3D(_pointOnLine, _directionOfLine, _targetPoint);
+}
+
 float GeometryHelper::DistanceToLine2D( const TVector2 & pointOnLine, const TVector2 & directionOfLine,
                                         const TVector2 & targetPoint) const
 {
