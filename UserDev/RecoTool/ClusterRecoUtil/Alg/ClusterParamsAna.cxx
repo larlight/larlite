@@ -11,13 +11,13 @@
 
 namespace cluster {
 
-  ClusterParamsAna::ClusterParamsAna()
+ClusterParamsAna::ClusterParamsAna()
     : _param_tree(nullptr)
-  {
+{
     _fout = 0;
     _name = "ClusterParamsAna";
     _verbose = false;
-  }
+}
 
 bool ClusterParamsAna::initialize() {
 
@@ -54,17 +54,17 @@ bool ClusterParamsAna::initialize() {
     }
 
     if (_param_tree) delete _param_tree;
-    _param_tree = new TTree("_param_tree","Cluster Parameter TTree");
-    _param_tree->Branch("_plane",&_plane,"plane/I");
-    _param_tree->Branch("_E",&_E,"E/D");
-    _param_tree->Branch("_containment",&_containment,"containment/D");
-    _param_tree->Branch("_w",&_w,"w/D");
-    _param_tree->Branch("_t",&_t,"t/D");
-    _param_tree->Branch("_angle",&_angle,"angle/D");
-    _param_tree->Branch("_start_angle",&_start_angle,"start_angle/D");
-    _param_tree->Branch("_mc_w",&_mc_w,"mc_w/D");
-    _param_tree->Branch("_mc_t",&_mc_t,"mc_t/D");
-    _param_tree->Branch("_mc_angle",&_mc_angle,"mc_angle/D");
+    _param_tree = new TTree("_param_tree", "Cluster Parameter TTree");
+    _param_tree->Branch("_plane", &_plane, "plane/I");
+    _param_tree->Branch("_E", &_E, "E/D");
+    _param_tree->Branch("_containment", &_containment, "containment/D");
+    _param_tree->Branch("_w", &_w, "w/D");
+    _param_tree->Branch("_t", &_t, "t/D");
+    _param_tree->Branch("_angle", &_angle, "angle/D");
+    _param_tree->Branch("_start_angle", &_start_angle, "start_angle/D");
+    _param_tree->Branch("_mc_w", &_mc_w, "mc_w/D");
+    _param_tree->Branch("_mc_t", &_mc_t, "mc_t/D");
+    _param_tree->Branch("_mc_angle", &_mc_angle, "mc_angle/D");
 
     return true;
 }
@@ -105,33 +105,33 @@ bool ClusterParamsAna::analyze(::larlite::storage_manager* storage) {
             continue;
         }
 
-	_mc_w = mcStartPoint.w;
-	_mc_t = mcStartPoint.t;
-	_mc_angle = atan(mcSlope);
+        _mc_w = mcStartPoint.w;
+        _mc_t = mcStartPoint.t;
+        _mc_angle = atan(mcSlope);
 
-	auto reco_start = clust.start_point;
-	auto reco_end   = clust.end_point;
+        auto reco_start = clust.start_point;
+        auto reco_end   = clust.end_point;
 
-	_w = reco_start.w;
-	_t = reco_start.t;
-	_angle = clust.angle_2d;
-	_start_angle = atan(clust.start_dir[1] / clust.start_dir[0]);
+        _w = reco_start.w;
+        _t = reco_start.t;
+        _angle = clust.angle_2d;
+        _start_angle = atan(clust.start_dir[1] / clust.start_dir[0]);
 
-	if (_verbose)
-	  std::cout << "reco (" << reco_start.w << ", " << reco_start.t << ") vs "
-		    << "(" << mcStartPoint.w << ", " << mcStartPoint.t << ").";
+        if (_verbose)
+            std::cout << "reco (" << reco_start.w << ", " << reco_start.t << ") vs "
+                      << "(" << mcStartPoint.w << ", " << mcStartPoint.t << ").";
 
         // Figure out if this cluster is forwards, backwards, or just plain bad:
-        float dist_start = sqrt(pow(reco_start.w - mcStartPoint.w,2)
-                              + pow(reco_start.t - mcStartPoint.t,2));
-        float dist_end   = sqrt(pow(reco_end.w - mcStartPoint.w,2)
-                              + pow(reco_end.t - mcStartPoint.t,2));
+        float dist_start = sqrt(pow(reco_start.w - mcStartPoint.w, 2)
+                                + pow(reco_start.t - mcStartPoint.t, 2));
+        float dist_end   = sqrt(pow(reco_end.w - mcStartPoint.w, 2)
+                                + pow(reco_end.t - mcStartPoint.t, 2));
 
-	if (_verbose){
-	  if (dist_start < dist_end)
-            std::cout << " Forwards." << dist_start << std::endl;
-	  else
-            std::cout << " Backwards." << dist_end << std::endl;
+        if (_verbose) {
+            if (dist_start < dist_end)
+                std::cout << " Forwards." << dist_start << std::endl;
+            else
+                std::cout << " Backwards." << dist_end << std::endl;
         }
 
         // Fill the right histogram:
@@ -141,7 +141,7 @@ bool ClusterParamsAna::analyze(::larlite::storage_manager* storage) {
         startSlope.at(_plane) -> Fill(_start_angle - _mc_angle);
         prinSlope.at(_plane) -> Fill(_angle - _mc_angle);
 
-	_param_tree->Fill();
+        _param_tree->Fill();
 
     }// for all clusters
 
@@ -165,8 +165,8 @@ bool ClusterParamsAna::finalize() {
         for (auto & hist : prinSlope) {
             hist -> Write();
         }
-	if (_param_tree)
-	  _param_tree->Write();
+        if (_param_tree)
+            _param_tree->Write();
     }
 
     return true;
