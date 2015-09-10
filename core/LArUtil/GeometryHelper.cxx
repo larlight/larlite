@@ -541,6 +541,32 @@ bool GeometryHelper::Clockwise(const double& Ax, const double& Ay,
   return (Cy - Ay) * (Bx - Ax) > (By - Ay) * (Cx - Ax);
 }
 
+  double GeometryHelper::PerpendicularDistance(const Point2D& pt,
+					       const double& slope,
+					       const double& intercept) const
+  {
+
+    // line assumed to be of form :
+    // y = slope * x + intercept
+
+    if (slope == 0)
+      return fabs ( pt.t - intercept );
+
+    double d_perp = fabs ( pt.t - slope * pt.w - intercept ) / fabs(slope);
+
+    return d_perp;
+  }
+
+  double GeometryHelper::PerpendicularDistance(const Point2D& pt,
+					       const double& slope,
+					       const Point2D& anchor) const
+  {
+
+    double intercept = anchor.t - slope * anchor.w;
+
+    return PerpendicularDistance(pt,slope,intercept);
+  }
+
 bool GeometryHelper::Point_isInTPC(const TVector3 & pointIn3D) const {
   // Use the geometry class to determine if this point is in the TPC
   auto geom = larutil::Geometry::GetME();

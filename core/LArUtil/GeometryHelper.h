@@ -343,6 +343,28 @@ public:
             Hit2D & averagePoint ) const;
 
     /**
+     * @brief calculate the peprendicular distance from a point to aline
+     * @param pt = point for which to calculate the perpendicular distance
+     * @param slope = slope of line
+     * @param intercept = intercept of line with y-axis
+     * @return 2D perpendicular distance in cm
+     */
+    double PerpendicularDistance(const Point2D& pt,
+				 const double& slope,
+				 const double& intercept) const;
+
+    /**
+     * @brief calcualte the perpendicular distance from a point to a line
+     * @param pt = point for which to calculate the perpendicular distance
+     * @param slope = slope of line
+     * @param anchor = point on line to anchor the line
+     * @return 2D perpendicular distance in cm
+     */
+    double PerpendicularDistance(const Point2D& pt,
+				 const double& slope,
+				 const Point2D& anchor) const;
+
+    /**
      * @brief deterimine if a point is in the TPC
      * @details Checks this point against the geometry parameters
      *
