@@ -30,7 +30,7 @@ DefaultParamsAlg::DefaultParamsAlg() {
     attachAlg(roughStartPoint);
     attachAlg(showeringpoint);
     attachAlg(selectStartPoint);
-    // attachAlg(refineStartPoint);
+    attachAlg(refineStartPoint);
 
 
     SetDebug(false);
