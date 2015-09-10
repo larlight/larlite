@@ -95,6 +95,8 @@ void FindShoweringPoint::do_params_fill(cluster_params & cluster) {
     // std::cout << "mean is " << mean.w << ", " << mean.t << std::endl;
 
     // Remove all the points from consideration if the point is behind the start point:
+    std::vector<int> goodValues;
+    goodValues.reserve(hitmapByStartCand.at(j).size());
     for (auto it = hitmapByStartCand.at(j).begin();
          it != std::prev(std::prev(hitmapByStartCand.at(j).end()));
          it++)
@@ -104,25 +106,29 @@ void FindShoweringPoint::do_params_fill(cluster_params & cluster) {
                       (mean.w - cluster.start_point_cand.at(j).w);
       forward += (hits[it->second].t - cluster.start_point_cand.at(j).t) *
                  (mean.t - cluster.start_point_cand.at(j).t);
-      if (forward < 0) {
-        hitmapByStartCand.at(j).erase(it);
+      if (forward > 0) {
+        goodValues.push_back(it->second);
       }
     }
-    for (auto it = hitmapByStartCand.at(j).begin();
-         it != std::prev(std::prev(hitmapByStartCand.at(j).end()));
-         it++)
-    {
-      auto next = std::next(it);
+    if (goodValues.size() < 2) continue;
+    // std::cout << "goodValues is ";
+    // for (auto & val : goodValues)
+    //   std::cout << val << " ";
+    // std::cout << std::endl;
+    for (size_t i = 0; i < goodValues.size() - 2; i++){
+      int curr = goodValues.at(i);
+      int next = goodValues.at(i + 1);
+      int nextnext = goodValues.at(i+2);
       if (_verbose ) {
-        std::cout << "points: " << it->second << ", " << next->second << ", " << std::next(next)->second;
-        std::cout << " (" << hits[it->second].w << ", " << hits[it->second].t << "),"
-                  << " (" << hits[next->second].w << ", " << hits[next->second].t << "),"
-                  << " (" << hits[std::next(next)->second].w << ", " << hits[std::next(next)->second].t << ")"
+        std::cout << "points: " << curr << ", " << next << ", " << nextnext;
+        std::cout << " (" << hits[curr].w << ", " << hits[curr].t << "),"
+                  << " (" << hits[next].w << ", " << hits[next].t << "),"
+                  << " (" << hits[nextnext].w << ", " << hits[nextnext].t << ")"
                   << std::endl;
       }
 
       // std::cout << "Checking forwardness of hit at "
-      //           << hits[it->second].w << ", " << hits[it->second].t << std::endl;
+      //           << hits[curr].w << ", " << hits[curr].t << std::endl;
 
 
 
@@ -133,10 +139,11 @@ void FindShoweringPoint::do_params_fill(cluster_params & cluster) {
       // if ( forward > 0 )
       // {
         // std::cout << "Forward" << std::endl;
-        double cos = geomHelper->GetCosAngleBetweenLines(hits[(it)->second], hits[next->second],
-                     hits[next->second], hits[std::next(next)->second]);
+        // std::cout << curr << ", " << next << ", " << nextnext << std::endl;
+        double cos = geomHelper->GetCosAngleBetweenLines(hits[curr], hits[next],
+                     hits[next], hits[nextnext]);
         if (cos > 0.7)
-          cluster.shwr_point_cand.at(j)  = hits[std::next(next)->second];
+          cluster.shwr_point_cand.at(j)  = hits[nextnext];
         else
           break;
         nPoints += 1;
