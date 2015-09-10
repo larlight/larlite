@@ -19,8 +19,8 @@
 #include "GetAverages.h"
 #include "FillPolygon.h"
 #include "GetRoughStartPoint.h"
-#include "RefineDirection.h"
 #include "RefineStartPoints.h"
+#include "SelectStartPoint.h"
 #include "FindShoweringPoint.h"
 
 namespace cluster {
