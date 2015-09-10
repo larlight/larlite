@@ -23,6 +23,9 @@ void cluster_params::Clear() {
   end_point.Clear();
   showering_point.Clear();
   PolyObject.Clear();
+  start_point_cand.clear(); start_point_cand.reserve(5);
+  shwr_point_cand.clear(); shwr_point_cand.reserve(5);
+  start_dir_cand.clear(); start_dir_cand.reserve(5);
   sum_charge                        = kDOUBLE_MIN ;
   mean_charge                       = kDOUBLE_MIN ;
   mean_x                            = kDOUBLE_MIN ;
