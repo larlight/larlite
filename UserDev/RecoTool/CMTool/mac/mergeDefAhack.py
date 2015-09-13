@@ -21,14 +21,14 @@ def getFirstProhibit(merger_instance = 0):
     prohib_array.AddAlgo(outofcone_prohibit,False)
 
     # prohibit merging tracks
-#    trackmerge_prohibit = cmtool.CBAlgoProhibitAllTracks()
-#    trackmerge_prohibit.SetMinEP(0.9950000)
-#    prohib_array.AddAlgo(trackmerge_prohibit,False)
+    trackmerge_prohibit = cmtool.CBAlgoProhibitAllTracks()
+    trackmerge_prohibit.SetMinEP(0.9950000)
+    prohib_array.AddAlgo(trackmerge_prohibit,False)
 
-#    ignoretracks_priority = cmtool.CPAlgoIgnoreTracks()
+    ignoretracks_priority = cmtool.CPAlgoIgnoreTracks()
     ########################################
 
-#    merger_instance.GetManager().AddPriorityAlgo(ignoretracks_priority)
+    merger_instance.GetManager().AddPriorityAlgo(ignoretracks_priority)
     merger_instance.GetManager().AddSeparateAlgo(prohib_array)
 
 def getSecondProhibit(merger_instance = 0):

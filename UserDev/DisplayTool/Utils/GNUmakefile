@@ -13,6 +13,7 @@ OBJECTS = $(SOURCES:.cxx=.o)
 # include options for this package
 INCFLAGS  = -I.                       #Include itself
 INCFLAGS += $(shell python-config --includes)
+#INCFLAGS += -I/System/Library/Frameworks/Python.framework/Versions/2.5/Extras/lib/python/numpy/core/include
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
