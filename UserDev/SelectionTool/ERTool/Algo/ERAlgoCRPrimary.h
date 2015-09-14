@@ -50,6 +50,7 @@ namespace ertool {
 
   private:
     bool _respect_track_dir;
+    bool _tag_entering_or_exiting_as_cosmics;
     ::geoalgo::AABox _tpc_box;
     ::geoalgo::AABox _cosmic_box;
   };
