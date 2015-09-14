@@ -60,10 +60,7 @@ namespace ertool {
     }
   }
 
-  void ERAnaCRTagger::ResetTree(){
-
-    _ctr_cosmic = 0 ;
-    _ctr_non_cosmic = 0 ;
+  void ERAnaCRTagger::ResetIntTree(){
 
     _int_x = -999;
     _int_y = -999;
@@ -71,15 +68,30 @@ namespace ertool {
     _primary_pdg = -999 ;
     _ctr_child   = -1;
     _ctr_level   = -1;
-    _distToTopWall = -99999;
-    _distToWall    = -9999;
-    _distBackAlongTraj = -9999;
     _angle = -999;
     _length = -999;
+
+  }
+
+  void ERAnaCRTagger::ResetEventTree(){
 
    _run = -99;
    _subrun = -99; 
    _event = -99;
+   _ctr_cosmic = 0 ;
+   _ctr_non_cosmic = 0 ;
+
+  }
+
+  void ERAnaCRTagger::ResetPartTree(){
+
+
+ //   _distToTopWall = -99999;
+ //   _distToWall    = -9999;
+ //   _distBackAlongTraj = -9999;
+    _run = -99;
+    _subrun = -99; 
+    _event = -99;
    _pdg = -99;;
    _primary = -99;
    _start_x = -999;
@@ -97,6 +109,7 @@ namespace ertool {
 
   bool ERAnaCRTagger::Analyze(const EventData &data, const ParticleGraph &graph)
   {
+    ResetEventTree() ;
 
     _run    = data.Run() ;
     _subrun = data.SubRun() ;
@@ -105,28 +118,36 @@ namespace ertool {
     double detHalfHeight = 116.5 ;
 
     for( auto const& p : graph.GetParticleArray() ){
+	ResetPartTree();
+
+        auto const& t = data.Track(p.RecoID());
+	std::cout<<"PDG code: "<<p.PdgCode() <<std::endl;
 
     	_pdg = p.PdgCode() ; 
     	_primary = p.Primary() ; 
-    	_start_x = p.Vertex()[0]; 
-    	_start_y = p.Vertex()[1];
-    	_start_z = p.Vertex()[2];
-    	_end_x = p.Vertex()[0]; 
-    	_end_y = p.Vertex()[1];
-    	_end_z = p.Vertex()[2];
+    	_start_x = t.at(0)[0];
+    	_start_y = t.at(0)[1];
+    	_start_z = t.at(0)[2];
+    	_end_x = t.at(t.size()-1)[0]; 
+    	_end_y = t.at(t.size()-1)[1]; 
+    	_end_z = t.at(t.size()-1)[2]; 
 	
-	_px = p.Momentum()[0];
-	_py = p.Momentum()[1];
-	_pz = p.Momentum()[2];
+	_px = t.at(0).Dir()[0];
+	_py = t.at(0).Dir()[1];
+	_pz = t.at(0).Dir()[2];
 
+	std::cout<<"Vertices: "<<p.Vertex()[0]
+				<<p.Vertex()[1]
+				<<p.Vertex()[2]<<std::endl ;
+	std::cout<<"End: "<<_end_x<<", "<<_end_y<<", "<<_end_z<<std::endl;
 	_part_tree->Fill(); 
 	
 	} 
 
     //Every primary particle should correspond wiht an 'interaction'
     for( auto const& track : graph.GetPrimaryNodes(RecoType_t::kTrack)){
+	ResetIntTree();
 	 
-        ResetTree();
         auto const& t = data.Track(graph.GetParticle(track).RecoID());
 
 	if (graph.GetParticle(track).ProcessType() == kCosmic )
@@ -165,10 +186,10 @@ namespace ertool {
             _distBackAlongTraj = 0;
             _distToTopWall = (_int_y - detHalfHeight)/t.at(0).Dir()[1] ;
 
-	    std::cout<<"If we're here, what are x,y,z: "<<_int_x<<", "<<_int_y<<", "<<_int_z<<std::endl ;
+//	    std::cout<<"If we're here, what are x,y,z: "<<_int_x<<", "<<_int_y<<", "<<_int_z<<std::endl ;
 	    }
-	else
-	    ResetTree();
+//	else
+//	    ResetIntTree();
 //
 	_int_tree->Fill();
 	}
@@ -194,6 +215,8 @@ namespace ertool {
       auto px = p.Momentum()[0];
       auto py = p.Momentum()[1];
       auto pz = p.Momentum()[2];
+
+      std::cout<<"PX, py, pz: "<<px<<", "<<py<<", "<<pz<<std::endl;
       double quad = py/pz  ;
       double convert = 180.0/ 3.1415926525898 ;
 
