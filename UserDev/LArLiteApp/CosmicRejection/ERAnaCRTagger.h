@@ -16,6 +16,8 @@
 #define ERTOOL_ERANACRTAGGER_H
 
 #include "ERTool/Base/AnaBase.h"
+#include "ERTool/Base/Particle.h"
+#include "GeoAlgo/GeoAlgo.h"
 #include <TTree.h>
 namespace ertool {
 
@@ -48,6 +50,10 @@ namespace ertool {
     /// Called after processing the last event sample
     void ProcessEnd(TFile* fout=nullptr);
 
+    void ResetTree() ;
+
+    void CalculateAngleYZ( const Particle & p, double & angle ) ;
+
   private:
 
     unsigned int _run, _subrun, _event;
@@ -63,12 +69,22 @@ namespace ertool {
     int _primary_pdg;
     unsigned int _ctr_child;
     unsigned int _ctr_level;
+    double _angle; 
+    double _length ;
 
     TTree* _part_tree;
     int _pdg;
-    double _x, _y, _z;
-    double _ex, _ey, _ez;
+    bool _primary;
+    double _start_x, _start_y, _start_z;
+    double _end_x, _end_y, _end_z;
     double _px, _py, _pz;
+
+    ::geoalgo::AABox fTPC ;
+    ::geoalgo::GeoAlgo _geoAlgo;
+
+    double _distToTopWall ;
+    double _distBackAlongTraj ;
+    double _distToWall ;
     
   };
 }
