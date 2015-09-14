@@ -44,8 +44,8 @@ namespace ertool {
     for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
       
       // get track object
-      auto const& particleFromDataP = graph.GetParticle(t);
-      auto const& track = data.Track(particleFromDataP.RecoID());
+      auto& part = graph.GetParticle(t);
+      auto const& track = data.Track(part.RecoID());
 
       
       if ((track._pid_score[Track::kProton]<track._pid_score[Track::kPion])&&
@@ -64,10 +64,12 @@ namespace ertool {
 	  (track._pid_score[Track::kMuon]<track._pid_score[Track::kPion])&&
 	  (track._pid_score[Track::kMuon]<track._pid_score[Track::kKaon]))        Pdg = 13;      
       
-
-
-
-      graph.GetParticle(t).SetParticleInfo(Pdg);
+      part.SetParticleInfo(Pdg,
+			   ParticleMass(Pdg),
+			   part.Vertex(),
+			   part.Momentum(),
+			   part.RecoScore(),
+			   part.ProcessType());
 
       if (_verbose) { std::cout<<"I found a track!!!\n I assigned the PdgCode for its particle to be "<<Pdg  <<" \n"; }
       _part_pid = Pdg;
