@@ -5,7 +5,8 @@ orig_level = ROOT.gErrorIgnoreLevel
 
 libs = [ 'libBasicTool_LArPyBackend',
          'libBasicTool_GeoAlgo',
-         'libBasicTool_EMShowerTools']
+         'libBasicTool_EMShowerTools',
+         'libBasicTool_FhiclLite']
          
 
 ROOT.gErrorIgnoreLevel = ROOT.kFatal
@@ -17,7 +18,7 @@ for l in libs:
         info('%s %s' % (val,l))
 ROOT.gErrorIgnoreLevel = orig_level
 
-names=['geoalgo','larpy']
+names=['geoalgo','larpy','fcllite']
 for n in names:
     try:
         exec('ROOT.%s' % n)
