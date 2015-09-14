@@ -47,7 +47,7 @@ namespace ertool {
     	_part_tree->Branch("pz",&_pz,"pz/D");
     }
 
-    if ( _int_tree ){
+    if ( !_int_tree ){
 	_int_tree = new TTree("event_tree","");
     	_int_tree->Branch("int_x",&_int_x,"int_x/D");
     	_int_tree->Branch("int_y",&_int_y,"int_y/D");
