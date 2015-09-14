@@ -142,19 +142,22 @@ namespace ertool {
 				<<p.Vertex()[2]<<std::endl ;
 	std::cout<<"End: "<<_end_x<<", "<<_end_y<<", "<<_end_z<<std::endl;
 	_part_tree->Fill(); 
+
+	if (p.ProcessType() == kCosmic )
+	    _ctr_cosmic++;
+	else
+	    _ctr_non_cosmic++;
+
 	
 	} 
+
+    
 
     //Every primary particle should correspond wiht an 'interaction'
     for( auto const& track : graph.GetPrimaryNodes(RecoType_t::kTrack)){
 	ResetIntTree();
 	 
         auto const& t = data.Track(graph.GetParticle(track).RecoID());
-
-	if (graph.GetParticle(track).ProcessType() == kCosmic )
-	    _ctr_cosmic++;
-	else
-	    _ctr_non_cosmic++;
 
 	_ctr_child = graph.GetAllDescendantNodes(track).size();
 
