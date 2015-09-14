@@ -12,12 +12,14 @@ namespace ertool {
 
   {
 
-
     PrepareTreeVariables();
+
     // keep track of number of events gone by
     _numEvts = 0;
     // keep track of singleEs found
     _singleE_ctr = 0;
+
+    //    _treename = "_result_tree";
 
     _debug = false;
 
@@ -37,6 +39,9 @@ namespace ertool {
   bool ERAnaSingleE::Analyze(const EventData &data, const ParticleGraph &graph)
   {
 
+    _result_tree->SetName(Form("%s",_treename.c_str()));
+    
+ 
     if (_debug)
       std::cout << "******  Begin ERAnaSingleE Analysis  ******" << std::endl;
     
@@ -376,7 +381,7 @@ namespace ertool {
 
     if (_result_tree) { delete _result_tree; }
     
-    _result_tree = new TTree("_result_tree","Result Tree");
+    _result_tree = new TTree(Form("%s",_treename.c_str()),"Result Tree");
     _result_tree->Branch("_numEvts",&_numEvts,"numEvts/I");
     _result_tree->Branch("_EDep",&_EDep,"EDep/D");
     _result_tree->Branch("_angle_Norm",&_angle_Norm,"_angle_Norm/D");
