@@ -14,12 +14,13 @@ namespace ertool {
 
   void ERAlgoCRSecondary::AcceptPSet(const ::fcllite::PSet& cfg)
   {
-    _min_dist_trk_trk       = cfg.get<double>("min_dist_track_2_track");
-    _min_dist_common_origin = cfg.get<double>("min_dist_common_origin");
-    _min_dist_trk_def       = cfg.get<double>("min_dist_track_to_be"  );
-    _use_perpdist_trk_trk   = cfg.get<bool>  ("use_perp_dist_track_2_track");
-    _min_dist_trk_shr       = cfg.get<double>("min_dist_track_2_shower");
-    _use_perpdist_trk_shr   = cfg.get<bool>  ("use_perp_dist_track_2_shower");
+    auto p = cfg.get_pset(Name());
+    _min_dist_trk_trk       = p.get<double>("min_dist_track_2_track");
+    _min_dist_common_origin = p.get<double>("min_dist_common_origin");
+    _min_dist_trk_def       = p.get<double>("min_dist_track_to_be"  );
+    _use_perpdist_trk_trk   = p.get<bool>  ("use_perp_dist_track_2_track");
+    _min_dist_trk_shr       = p.get<double>("min_dist_track_2_shower");
+    _use_perpdist_trk_shr   = p.get<bool>  ("use_perp_dist_track_2_shower");
   }
 
   void ERAlgoCRSecondary::ProcessBegin()
