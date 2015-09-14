@@ -65,6 +65,7 @@ namespace ertool {
 	  // If primary or parent already exists, don't worry
 	  if( part.Primary() ||
 	      part.Descendant() ||
+	      part.Parent() != id ||
 	      part.ProcessType() == kCosmic ) continue;
 	  
 	  bool is_cosmic=false;
@@ -116,8 +117,7 @@ namespace ertool {
 				 part.Mass(),
 				 part.Vertex(),
 				 part.Momentum(),
-				 part.RecoScore(),
-				 kCosmic);
+				 part.RecoScore());
 	    removed_id_v.back().push_back(id);
 	  }
 	} // loop over particles ends
