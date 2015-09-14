@@ -21,8 +21,14 @@
 #pragma link C++ class ertool::ERAlgoPrimaryPi0+;
 #pragma link C++ class ertool::ERAlgoNGamma+;
 #pragma link C++ class ertool::ERAlgoTrackPid+;
+#pragma link C++ class ertool::ERAlgoCRPrimary+;
+#pragma link C++ class ertool::ERAlgoCRSecondary+;
+#pragma link C++ class ertool::ERAlgoCROrphan+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
+
+
 
 

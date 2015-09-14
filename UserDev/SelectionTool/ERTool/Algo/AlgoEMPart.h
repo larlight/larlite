@@ -89,6 +89,8 @@ namespace ertool {
     /// Set whether to load parameters stored in config
     void setLoadParams(bool on) { _loadParams = on; }
 
+    void Show() const;
+
   protected:
 
     PdfFactory _factory; ///< P.D.F. factory class instance
