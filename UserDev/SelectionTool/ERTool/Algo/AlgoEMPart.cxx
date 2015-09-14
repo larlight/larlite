@@ -258,18 +258,16 @@ namespace ertool {
   bool AlgoEMPart::Reconstruct(const EventData &data, ParticleGraph& graph)
   {
 
-    auto datacpy = data;
-
     if (_verbose){
       std::cout << "******************* BEGIN EMPArt Reconstruction  ******************" << std::endl;
-      std::cout << "Number of Showers: " << datacpy.Shower().size() << std::endl;
+      std::cout << "Number of Showers: " << data.Shower().size() << std::endl;
       std::cout << "Number of Shower Particles: " << graph.GetParticleNodes(RecoType_t::kShower).size() << std::endl;
     }
     
     // Loop through showers
     for (auto const& s : graph.GetParticleNodes(RecoType_t::kShower)){
 
-      auto const& shr = datacpy.Shower(graph.GetParticle(s).RecoID());
+      auto const& shr = data.Shower(graph.GetParticle(s).RecoID());
 
       double dEdx;
       double dist;
@@ -283,7 +281,7 @@ namespace ertool {
 	  // make sure we are not comparing with itself
 	  if (s2 == s) continue;
 	  ::geoalgo::Point_t vtx(3);
-	  auto const& shr2 = datacpy.Shower(graph.GetParticle(s2).RecoID());
+	  auto const& shr2 = data.Shower(graph.GetParticle(s2).RecoID());
 	  double IP = _findRel.FindClosestApproach(shr,shr2,vtx);
 	  if (IP < IPmin){
 	    IPmin = IP;
@@ -294,7 +292,7 @@ namespace ertool {
 	for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
 	  // make sure we are not comparing with itself
 	  ::geoalgo::Point_t vtx(3);
-	  auto const& trk = datacpy.Track(graph.GetParticle(t).RecoID());
+	  auto const& trk = data.Track(graph.GetParticle(t).RecoID());
 	  double IP = _findRel.FindClosestApproach(shr,trk,vtx);
 	  if (IP < IPmin){
 	    IPmin = IP;
