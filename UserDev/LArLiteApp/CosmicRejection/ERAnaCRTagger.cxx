@@ -169,15 +169,14 @@ namespace ertool {
   }
 
   void ERAnaCRTagger::ProcessEnd(TFile* fout)
-  {
+  {return;
     if(fout) {
-        fout->cd();
-        _int_tree->Write();
-	_event_tree->Write();
-	_part_tree->Write();
-	}
+      fout->cd();
+      _int_tree->Write();
+      _event_tree->Write();
+      _part_tree->Write();
     }
-
+  }
 
   void ERAnaCRTagger::CalculateAngleYZ ( const Particle & p , double & angle) {
 	
