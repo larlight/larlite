@@ -9,6 +9,14 @@ namespace ertool {
     : ::geoalgo::GeoObjCollection()
   {}
 
+
+  void GeoViewerERToolBackend::AcceptPSet(const ::fcllite::PSet& cfg)
+  {
+    auto p = cfg.get_pset("GeoViewerERToolBackend");
+
+    _show_cosmics = p.get<bool>("show_cosmics");
+  }
+
   void GeoViewerERToolBackend::Add( const ::ertool::ParticleGraph& particles,
 				    const ::ertool::EventData& data,
 				    bool randColors) 
@@ -45,14 +53,16 @@ namespace ertool {
 	if (p.RecoID() != kINVALID_RECO_ID){
 	  if (p.RecoType() == ::ertool::RecoType_t::kShower){
 	    if (p.ProcessType() == ::ertool::ProcessType_t::kCosmic){
-	      GeoObjCollection::Add( data.Shower(p.RecoID()), "" , "cyan");
+	      if (_show_cosmics)
+		GeoObjCollection::Add( data.Shower(p.RecoID()), "" , "cyan");
 	      used_obj[ p.RecoType() ][ p.RecoID() ] = true;
 	    }
 	  }
 	  if (p.RecoType() == ::ertool::RecoType_t::kTrack){
 	    if (data.Track(p.RecoID()).size() >= 2){
 	      if (p.ProcessType() == ::ertool::ProcessType_t::kCosmic){
-		GeoObjCollection::Add( data.Track(p.RecoID()), "" , "magenta");
+		if (_show_cosmics)
+		  GeoObjCollection::Add( data.Track(p.RecoID()), "" , "magenta");
 		used_obj[ p.RecoType() ][ p.RecoID() ] = true;
 	      }
 	    }
