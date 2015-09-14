@@ -125,16 +125,16 @@ namespace ertool {
 
     //Every primary particle should correspond wiht an 'interaction'
     for( auto const& track : graph.GetPrimaryNodes(RecoType_t::kTrack)){
-
 	 
         ResetTree();
         auto const& t = data.Track(graph.GetParticle(track).RecoID());
-	auto pr = graph.GetParticle(track).ProcessType() ;
 
-	if (pr == kCosmic )
+	if (graph.GetParticle(track).ProcessType() == kCosmic )
 	    _ctr_cosmic++;
 	else
 	    _ctr_non_cosmic++;
+
+	_ctr_child = graph.GetAllDescendantNodes(track).size();
 
         ::geoalgo::HalfLine trk(t.at(0),t.at(0).Dir()); //Start().Position(),t.Start().Momentum());
 
