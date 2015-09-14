@@ -13,15 +13,16 @@ namespace ertool {
 
   void ERAlgoCROrphan::AcceptPSet(const ::fcllite::PSet& cfg)
   {
-    auto xrange_v = cfg.get<std::vector<double> >("tpc_aabox_xrange");
-    auto yrange_v = cfg.get<std::vector<double> >("tpc_aabox_yrange");
-    auto zrange_v = cfg.get<std::vector<double> >("tpc_aabox_zrange");
+    auto p = cfg.get_pset(Name());
+    auto xrange_v = p.get<std::vector<double> >("tpc_aabox_xrange");
+    auto yrange_v = p.get<std::vector<double> >("tpc_aabox_yrange");
+    auto zrange_v = p.get<std::vector<double> >("tpc_aabox_zrange");
     _tpc_box.Min( xrange_v[0], yrange_v[0], zrange_v[0] );
     _tpc_box.Max( xrange_v[1], yrange_v[1], zrange_v[1] );
     
-    _respect_trk_dir      = cfg.get<bool  >( "respect_track_dir"     );
-    _min_dist_trk_def     = cfg.get<double>( "min_dist_track_to_be"  );
-    _dist_back_to_ceiling = cfg.get<double>( "dist_back_to_ceiling"  );
+    _respect_trk_dir      = p.get<bool  >( "respect_track_dir"     );
+    _min_dist_trk_def     = p.get<double>( "min_dist_track_to_be"  );
+    _dist_back_to_ceiling = p.get<double>( "dist_back_to_ceiling"  );
   }
 
   void ERAlgoCROrphan::ProcessBegin()
