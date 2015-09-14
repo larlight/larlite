@@ -50,7 +50,9 @@ namespace ertool {
     /// Called after processing the last event sample
     void ProcessEnd(TFile* fout=nullptr);
 
-    void ResetTree() ;
+   void ResetEventTree() ;
+   void ResetPartTree() ;
+   void ResetIntTree() ;
 
     void CalculateAngleYZ( const Particle & p, double & angle ) ;
 
