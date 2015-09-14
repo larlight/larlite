@@ -106,11 +106,7 @@ namespace ertool {
 
     double _maxIP; ///< Maximum Impact Parameter allowed for success
 
-
-    geoalgo::GeoAlgo _geoAlgo;
-
-    // Partile masses
-    double _pi_mass, _pr_mass, _mu_mass, _ka_mass, _uk_mass;
+    ::geoalgo::GeoAlgo _geoAlgo;
     
   };
 }
