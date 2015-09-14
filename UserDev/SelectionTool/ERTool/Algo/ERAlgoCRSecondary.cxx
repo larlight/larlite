@@ -131,6 +131,12 @@ namespace ertool {
     ::geoalgo::GeoAlgo geo_alg;
     AlgoFindRelationship rel_alg;
     if(_use_perpdist_trk_trk) {
+      // If cand.front() -> seed.front() > _min_dist_trk_trk
+      // and if cand.length() > _min_dist_trk_trk
+      // then no hope of the two being close enough -> return false
+      auto d1 = cand.front().Dist(seed.front());
+      if (d1 > _min_dist_trk_trk) return false;
+      if ( cand.Length() > _min_dist_trk_trk ) return false;
       // If perpendicular distance of the "start" to "track" is bigger
       // than the cut value, not secondary
       auto dist = sqrt(geo_alg.SqDist(cand.front(),seed));
