@@ -48,7 +48,7 @@ namespace ertool {
     }
 
     if ( !_int_tree ){
-	_int_tree = new TTree("event_tree","");
+	_int_tree = new TTree("int_tree","");
     	_int_tree->Branch("int_x",&_int_x,"int_x/D");
     	_int_tree->Branch("int_y",&_int_y,"int_y/D");
     	_int_tree->Branch("int_z",&_int_z,"int_z/D");
@@ -139,12 +139,12 @@ namespace ertool {
 	_length = t.Length(); 
 	CalculateAngleYZ(graph.GetParticle(track),_angle);
 
-	if( fTPC.Contain(t.at(0)) ){
+	if( fTPC.Contain(t.at(0)) && _geoAlgo.Intersection(fTPC,trk,true).size() > 0){
 	     _distBackAlongTraj = sqrt(_geoAlgo.Intersection(fTPC,trk,true)[0].SqDist(t.at(0))) ;
              _distToTopWall     = (_int_y - detHalfHeight)/t.at(0).Dir()[1] ; // py is normalize, pmag is not--so ignore pmag
              _distToWall        = sqrt(_geoAlgo.SqDist(t.at(0),fTPC));
 	   }   
-	else{ 
+	else if ( !fTPC.Contain(t.at(0)) && _geoAlgo.Intersection(fTPC,trk,true).size() > 0){ 
 	//There seems to be an issue with setting the new points when x < 0-- they always
 	//get set to 0,0,0.  This is a temporary fix
 	    if( _int_x >= 0 ){
@@ -161,7 +161,9 @@ namespace ertool {
 
 	    std::cout<<"If we're here, what are x,y,z: "<<_int_x<<", "<<_int_y<<", "<<_int_z<<std::endl ;
 	    }
-
+	else
+	    ResetTree();
+//
 	_int_tree->Fill();
 	}
 
@@ -169,13 +171,14 @@ namespace ertool {
   }
 
   void ERAnaCRTagger::ProcessEnd(TFile* fout)
-  {return;
+  {
     if(fout) {
       fout->cd();
       _int_tree->Write();
       _event_tree->Write();
       _part_tree->Write();
     }
+    return;
   }
 
   void ERAnaCRTagger::CalculateAngleYZ ( const Particle & p , double & angle) {
