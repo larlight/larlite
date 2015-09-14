@@ -107,6 +107,45 @@ void cluster_params::Report(std::ostream & os) const {
      << "   direction  ................ : " << direction << "\n"
      << "   Polygon  .................. : " << PolyObject << "\n";
 
+}
+
+
+void  cluster_params::GetFANNVector(std::vector<float> & data) const {
+  unsigned int length = 9;
+  if (data.size() != length) {
+    data.clear();
+    data.reserve(length);
+  }
+  data.push_back( -opening_angle / M_PI + closing_angle / M_PI );
+  // data.push_back( -opening_angle_charge_wgt / M_PI + closing_angle_charge_wgt / M_PI );
+  data.push_back( -log(1 - eigenvalue_principal) / 10.0 );
+  // data.push_back( -log(eigenvalue_secondary) / 10.0 );
+  data.push_back( width / length );
+  // data.push_back( hit_density_1D / modified_hit_density );
+  data.push_back( multi_hit_wires / N_Wires );
+  data.push_back( modified_hit_density );
+  data.push_back( RMS_charge / mean_charge );
+  data.push_back( log(sum_charge / length) / 10.0 );
+  return;
+}
+
+
+std::vector<std::string> cluster_params::GetFANNVectorTitle() {
+  std::vector<std::string> FannLegend;
+  FannLegend.push_back("Opening - Closing Angle (normalized)");
+  // FannLegend.push_back("Opening - Closing Angle charge weight");
+  // FannLegend.push_back("Closing Angle (normalized)");
+  // FannLegend.push_back("Closing Angle charge weight");
+  FannLegend.push_back("Principal Eigenvalue");
+  // FannLegend.push_back("Secondary Eigenvalue");
+  FannLegend.push_back("Width / Length");
+  // FannLegend.push_back("Hit Density / M.H.D.");
+  FannLegend.push_back("Percent MultiHit Wires");
+  // FannLegend.push_back("Percent High Charge Hits");
+  FannLegend.push_back("Modified Hit Density");
+  FannLegend.push_back("Charge RMS / Mean Charge");
+  FannLegend.push_back("log(Sum Charge / Length)");
+  return FannLegend;
 
 }
 
