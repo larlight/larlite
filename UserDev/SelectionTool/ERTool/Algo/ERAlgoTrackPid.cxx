@@ -38,14 +38,14 @@ namespace ertool {
 
   bool ERAlgoTrackPid::Reconstruct(const EventData &data, ParticleGraph& graph)
   {
-    auto datacpy = data;
+
     int Pdg = -1; 
     // Loop through Particles associated with a track
     for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
       
       // get track object
       auto const& particleFromDataP = graph.GetParticle(t);
-      auto const& track = datacpy.Track(particleFromDataP.RecoID());
+      auto const& track = data.Track(particleFromDataP.RecoID());
 
       
       if ((track._pid_score[Track::kProton]<track._pid_score[Track::kPion])&&

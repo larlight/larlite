@@ -43,6 +43,14 @@ namespace ertool {
     // Find primary showers
     for (auto const& s : graph.GetParticleNodes(RecoType_t::kShower)){
       
+      if( graph.GetParticle(graph.GetParticle(s).Parent()).RecoType() == RecoType_t::kTrack){
+        
+       if(_verbose) std::cout << "\t\t Muon mama" << std::endl;
+
+        continue;
+      }
+	
+
       // default: the shower is primary
       // if we find an indication of the
       // contrary change state accordingly
@@ -60,6 +68,14 @@ namespace ertool {
       // loop over other showers and check 1) and 2)
       for (auto const& p2 : graph.GetParticleNodes(RecoType_t::kShower)){
 
+	if( graph.GetParticle(graph.GetParticle(p2).Parent()).RecoType() == RecoType_t::kTrack){
+
+	  if(_verbose) std::cout << "\t\t Muon mama" << std::endl;
+
+	  continue;
+	}
+
+	
 	auto const& thatID = graph.GetParticle(p2).RecoID();
 
 	// make sure we don't use the same shower or repeat search
@@ -131,6 +147,13 @@ namespace ertool {
 
       // loop over other showers and check 1) and 2)
       for (auto const& p2 : graph.GetParticleNodes(RecoType_t::kShower)){
+
+	if( graph.GetParticle(graph.GetParticle(p2).Parent()).RecoType() == RecoType_t::kTrack){
+
+	  if(_verbose) std::cout << "\t\t Muon mama" << std::endl;
+
+	  continue;
+	}
 
 	auto const& thatID = graph.GetParticle(p2).RecoID();
 	auto const& thatShower = data.Shower(thatID);

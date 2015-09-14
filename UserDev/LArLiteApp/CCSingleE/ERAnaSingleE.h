@@ -19,6 +19,7 @@
 #include "TTree.h"
 #include "TH1D.h"
 #include "TH2F.h"
+#include <string>
 #include "GeoAlgo/GeoAlgo.h"
 #include "ERTool/Algo/AlgoFindRelationship.h"
 #include "DataFormat/mctruth.h"
@@ -64,6 +65,10 @@ namespace ertool {
     /// set the energy cut to be used when counting particles
     void SetECut(double c) { _eCut = c; }
 
+    /// setting result tree name for running the LowEExcess plotting code
+    void SetTreeName(const std::string& name){ _treename = name; }
+
+
   private:
 
     // debug flag
@@ -74,6 +79,8 @@ namespace ertool {
 
     // Result tree comparison for reconstructed events
     TTree* _result_tree;
+    std::string _treename;
+
 
     // total energy deposited in detector by tracks & showers
     double _EDep;
