@@ -114,7 +114,7 @@ namespace ertool {
     _run    = data.Run() ;
     _subrun = data.SubRun() ;
     _event  = data.Event_ID() ;
-
+    
     double detHalfHeight = 116.5 ;
 
     for( auto const& p : graph.GetParticleArray() ){
@@ -196,6 +196,7 @@ namespace ertool {
 
 	_event_tree->Fill();
 
+      
     return true;
   }
 

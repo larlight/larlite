@@ -28,6 +28,7 @@ namespace ertool {
     _cosmic_box.Max( cr_x[1], cr_y[1], cr_z[1] );
     
     _respect_track_dir = p.get<bool>("respect_track_dir");
+    _tag_entering_or_exiting_as_cosmics = p.get<bool>("tag_entering_or_exiting_as_cosmics");
   }
 
   void ERAlgoCRPrimary::ProcessBegin()
@@ -61,7 +62,8 @@ namespace ertool {
 	// Tag method 1: if both ends are outside TPC, tag
 	//
 	if( (!start_contained && !end_contained) ||   // Both ends are outside TPC
-	    (_respect_track_dir && !start_contained)  // Check only start if told to respect dir
+	    (_respect_track_dir && !start_contained) || // Check only start if told to respect dir
+	    (_tag_entering_or_exiting_as_cosmics && (!start_contained || !end_contained) ) // if we should remove anything that enters or exits though the TPC, check if either the start or end point pass a boundary
 	    )
 	  is_cosmic = true;
       }
