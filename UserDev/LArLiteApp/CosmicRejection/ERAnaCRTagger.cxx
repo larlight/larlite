@@ -22,20 +22,20 @@ namespace ertool {
   {
     if ( !_event_tree ){
 	_event_tree = new TTree("event_tree","");
-    	_event_tree->Branch("run",&_run,"run/i");
-    	_event_tree->Branch("subrun",&_subrun,"subrun/i");
-    	_event_tree->Branch("event",&_event,"event/i");
-    	_event_tree->Branch("ctr_cosmic",&_ctr_cosmic,"ctr_cosmic/i");
-    	_event_tree->Branch("ctr_non_cosmic",&_ctr_non_cosmic,"ctr_non_cosmic/i");
+    	_event_tree->Branch("run",&_run,"run/I");
+    	_event_tree->Branch("subrun",&_subrun,"subrun/I");
+    	_event_tree->Branch("event",&_event,"event/I");
+    	_event_tree->Branch("ctr_cosmic",&_ctr_cosmic,"ctr_cosmic/I");
+    	_event_tree->Branch("ctr_non_cosmic",&_ctr_non_cosmic,"ctr_non_cosmic/I");
     }
     
     if ( !_part_tree ){
 	_part_tree = new TTree("part_tree","");
-    	_part_tree->Branch("run",&_run,"run/i");
-    	_part_tree->Branch("subrun",&_subrun,"subrun/i");
-    	_part_tree->Branch("event",&_event,"event/i");
+    	_part_tree->Branch("run",&_run,"run/I");
+    	_part_tree->Branch("subrun",&_subrun,"subrun/I");
+    	_part_tree->Branch("event",&_event,"event/I");
     	_part_tree->Branch("pdg",&_pdg,"pdg/I");
-    	_part_tree->Branch("primary",&_primary,"primary/i");
+    	_part_tree->Branch("primary",&_primary,"primary/I");
     	_part_tree->Branch("start_x",&_start_x,"start_x/D");
     	_part_tree->Branch("start_y",&_start_y,"start_y/D");
     	_part_tree->Branch("start_z",&_start_z,"start_z/D");
