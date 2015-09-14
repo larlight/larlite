@@ -54,7 +54,8 @@ namespace ertool {
    void ResetPartTree() ;
    void ResetIntTree() ;
 
-    void CalculateAngleYZ( const Particle & p, double & angle ) ;
+    //void CalculateAngleYZ( const Particle & p, double & angle ) ;
+    void CalculateAngleYZ( const geoalgo::Point_t & p, double & angle ) ;
 
   private:
 

@@ -111,14 +111,15 @@ namespace ertool {
   {
     ResetEventTree() ;
 
-    _run    = data.Run() ;
-    _subrun = data.SubRun() ;
-    _event  = data.Event_ID() ;
-    
+
     double detHalfHeight = 116.5 ;
 
     for( auto const& p : graph.GetParticleArray() ){
 	ResetPartTree();
+
+	_run    = data.Run() ;
+    	_subrun = data.SubRun() ;
+    	_event  = data.Event_ID() ;
 
         auto const& t = data.Track(p.RecoID());
 	std::cout<<"PDG code: "<<p.PdgCode() <<std::endl;
@@ -164,7 +165,8 @@ namespace ertool {
         _int_z = t.at(0)[2] ;
         _primary_pdg = t._pid ;
 	_length = t.Length(); 
-	CalculateAngleYZ(graph.GetParticle(track),_angle);
+	//CalculateAngleYZ(graph.GetParticle(track),_angle);
+	CalculateAngleYZ(t.at(0).Dir(),_angle);
 
 	if( fTPC.Contain(t.at(0)) && _geoAlgo.Intersection(fTPC,trk,true).size() > 0){
 	     _distBackAlongTraj = sqrt(_geoAlgo.Intersection(fTPC,trk,true)[0].SqDist(t.at(0))) ;
@@ -194,6 +196,10 @@ namespace ertool {
 	_int_tree->Fill();
 	}
 
+	_run    = data.Run() ;
+    	_subrun = data.SubRun() ;
+    	_event  = data.Event_ID() ;
+
 	_event_tree->Fill();
 
       
@@ -211,11 +217,11 @@ namespace ertool {
     return;
   }
 
-  void ERAnaCRTagger::CalculateAngleYZ ( const Particle & p , double & angle) {
+  void ERAnaCRTagger::CalculateAngleYZ ( const geoalgo::Point_t & p , double & angle) {
 	
-      auto px = p.Momentum()[0];
-      auto py = p.Momentum()[1];
-      auto pz = p.Momentum()[2];
+      auto px = p[0];
+      auto py = p[1];
+      auto pz = p[2];
 
       std::cout<<"PX, py, pz: "<<px<<", "<<py<<", "<<pz<<std::endl;
       double quad = py/pz  ;
