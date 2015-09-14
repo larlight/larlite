@@ -1,6 +1,7 @@
 #ifndef LARLITE_ERTOOLHELPER_CXX
 #define LARLITE_ERTOOLHELPER_CXX
 
+#include <TStopwatch.h>
 #include "DataFormat/mctruth.h"
 #include "DataFormat/mcshower.h"
 #include "DataFormat/mctrack.h"
@@ -55,8 +56,8 @@ namespace larlite {
 	::ertool::RecoInputID_t in_id(i,mcs_v.name());
 	
 	// Emplace this shower, and get corresponding particle unique ID
-	//nodeID = strm.Emplace( std::move(s), std::move(in_id), true );
-	nodeID = strm.Add( s, in_id, true );
+	nodeID = strm.Emplace( std::move(s), std::move(in_id), true );
+	//nodeID = strm.Add( s, in_id, true );
 
       }else
 
@@ -116,8 +117,8 @@ namespace larlite {
 	::ertool::RecoInputID_t in_id(i,mct_v.name());
 
 	// Emplace a track to EventData
-	// nodeID = strm.Emplace(std::move(t),std::move(in_id),true);
-	nodeID = strm.Add( t, in_id, true);
+	nodeID = strm.Emplace(std::move(t),std::move(in_id),true);
+	//nodeID = strm.Add( t, in_id, true);
 
       }
       
@@ -462,7 +463,8 @@ namespace larlite {
       for(auto& v : t._pid_score) v = 100;
       if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
       
-      strm.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
+      strm.Emplace(std::move(t),std::move(ertool::RecoInputID_t(i,mct_v.name())),false);
+      //strm.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
       /*
       strm.GetParticleGraphWriteable().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
       ::ertool::ParticleMass(mct.PdgCode()),
@@ -541,14 +543,20 @@ namespace larlite {
     }
     
     for(size_t i=0; i<t_v.size(); ++i)
-      strm.Add(t_v[i],id_v[i]);
+      strm.Emplace(std::move(t_v[i]),std::move(id_v[i]));
+    //strm.Add(t_v[i],id_v[i]);
   }
   
   
   void ERToolHelper::FillShowers ( const event_mcshower& mcs_v,
 				   ::ertool::io::EmptyInput& strm) const
   {
+    strm.ReserveShowerArray(mcs_v.size());
+    double create_time=0;
+    double emplace_time=0;
+    double random_time=0;
 
+    TStopwatch fWatch;
     for(size_t i=0; i<mcs_v.size(); ++i) {
 
       auto const& mcs = mcs_v[i];
@@ -556,18 +564,25 @@ namespace larlite {
       //if(isnan(mcs.DetProfile().Momentum().E())) continue;
       //if(isnan(mcs.DetProfile().Momentum().Px())) continue;
       //if(mcs.DetProfile().Momentum().Mag2() == 0) continue;
+      fWatch.Start();
       ::ertool::Shower s( (mcs.DetProfile().Position() + getXShift(mcs_v[i])),
 			  mcs.DetProfile().Momentum(),
 			  _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
 			  _shrProfiler.ShowerRadius() );
+      create_time += fWatch.RealTime();
       s._energy     = mcs.DetProfile().Momentum().E();
       //s._energy = mcs.Start().Momentum().E();
+      fWatch.Start();
       s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.05) : gRandom->Gaus(2,2*0.05));
+      random_time+=fWatch.RealTime();
       s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
       s._time = mcs_v[i].End().T();
       double mass = 0;
       if (mcs.PdgCode() == 11) { mass = 0.511; }
-      strm.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
+      fWatch.Start();
+      strm.Emplace(std::move(s),std::move(ertool::RecoInputID_t(i,mcs_v.name())),false);
+      emplace_time+=fWatch.RealTime();
+      //strm.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
       /*
       mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
 							      mass,
@@ -575,7 +590,11 @@ namespace larlite {
 							      ::geoalgo::Vector(mcs.Start().Momentum()));
       */
     }
-
+    /*
+    std::cout<<"Create  time: "<<create_time<<std::endl;
+    std::cout<<"Random  time: "<<random_time<<std::endl;
+    std::cout<<"Emplace time: "<<emplace_time<<std::endl;
+    */
     return;
   }
 
@@ -621,10 +640,10 @@ namespace larlite {
     for(size_t i=0; i<shw_v.size(); ++i){
       auto const& shw = shw_v[i];
       id_v.emplace_back(i,shw_v.name());
-      s_v.push_back( ::ertool::Shower(shw.ShowerStart(),
-				      shw.Direction(),
-				      shw.Length(),
-				      _shrProfiler.ShowerRadius()) );
+      s_v.emplace_back( ::ertool::Shower(shw.ShowerStart(),
+					 shw.Direction(),
+					 shw.Length(),
+					 _shrProfiler.ShowerRadius()) );
       auto& s = (*s_v.rbegin());
       if(shw.best_plane()){
 	s._energy = shw.Energy()[shw.best_plane()];
@@ -654,8 +673,10 @@ namespace larlite {
       }
     }
 
+    strm.ReserveShowerArray(s_v.size());
     for(size_t i=0; i<s_v.size(); ++i)
-      strm.Add(s_v[i],id_v[i]);
+      strm.Emplace(std::move(s_v[i]),std::move(id_v[i]));
+      //strm.Add(s_v[i],id_v[i]);
 
     return;
   }
