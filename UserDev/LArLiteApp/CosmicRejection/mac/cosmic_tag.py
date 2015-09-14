@@ -52,6 +52,7 @@ my_anaunit._mgr._mc_for_ana = False
 # First Argument: True = MC, False = Reco
 #my_anaunit.SetShowerProducer(True,"")
 my_anaunit.SetShowerProducer(False,"")
+#my_anaunit.SetShowerProducer(False,"showerrecopandora")
 #my_anaunit.SetShowerProducer(False,"newdefaultreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetShowerProducer(False,"mergeall");
