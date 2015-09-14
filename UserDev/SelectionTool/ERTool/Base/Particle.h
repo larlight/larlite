@@ -43,7 +43,7 @@ namespace ertool {
     const NodeID_t&     Ancestor   () const;
     const Generation_t& Generation () const;
     const std::vector< ::ertool::NodeID_t >& Children() const;
-    float RelationshipScore(const NodeID_t id);
+    float RelationshipScore(const NodeID_t id) const;
     
     bool RelationAssessed() const;
     bool Primary() const;
@@ -61,14 +61,15 @@ namespace ertool {
     double KineticEnergy() const;
     const ::geoalgo::Vector& Vertex()   const;
     const ::geoalgo::Vector& Momentum() const;
-    float RecoScore();
+    float RecoScore() const;
     const ProcessType_t& ProcessType() const;
     
     void SetParticleInfo( const int pdg_code = kINVALID_INT,
 			  const double mass  = kINVALID_DOUBLE,
 			  const ::geoalgo::Vector& vtx = kINVALID_VERTEX,
 			  const ::geoalgo::Vector& mom = kINVALID_MOMENTUM,
-			  const float score = 0);
+			  const float score = 0,
+			  const ProcessType_t process = kUnknown);
 
     std::string Print() const;
 

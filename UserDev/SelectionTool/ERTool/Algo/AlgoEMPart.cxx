@@ -672,6 +672,53 @@ namespace ertool {
     }
     
   }
+
+  void AlgoEMPart::Show() const {
+    
+    // Plot a bunch of stuff!
+    RooPlot* frame_radLen = nullptr;
+    RooPlot* frame_dEdx   = nullptr;
+    
+    frame_radLen = _radLenVar->frame();
+    frame_dEdx   = _dEdxVar->frame();
+      
+    _g_dEdxPdf->plotOn(frame_dEdx,RooFit::LineColor(kRed));
+    _e_dEdxPdf->plotOn(frame_dEdx,RooFit::LineColor(kBlue));
+    _g_radLenPdf->plotOn(frame_radLen,RooFit::LineColor(kRed));
+    _e_radLenPdf->plotOn(frame_radLen,RooFit::LineColor(kBlue));
+
+    TCanvas *c1 = new TCanvas("c1","",600,500);
+    c1->SetRightMargin(0.08);
+    c1->SetLeftMargin(0.13);
+    c1->SetBottomMargin(0.13);
+    c1->SetTitle("Distance PDF");
+    frame_radLen->Draw();
+    frame_radLen->SetNameTitle("Radiation Length PDF (red=gamma,blue=electron)",
+			       "Radiation Length PDF (red=gamma,blue=electron)");
+    frame_radLen->SetXTitle("Distance from Shower Origin [cm]");
+    frame_radLen->SetYTitle("Number of Showers");
+    frame_radLen->SetTitleFont(50,"X");
+    frame_radLen->SetTitleFont(50,"Y");
+    c1->SetLogy(1);
+    c1->Draw();
+    c1->SaveAs("RadLength.png");
+
+    TCanvas *c2 = new TCanvas("c2","",600,500);
+    c2->SetRightMargin(0.08);
+    c2->SetLeftMargin(0.13);
+    c2->SetBottomMargin(0.13);
+    c2->SetTitle("dEdx Selection");
+    frame_dEdx->Draw();
+    frame_dEdx->SetNameTitle("dE/dx PDF (red=gamma,blue=electron)",
+			     "dE/dx PDF (red=gamma,blue=electron)");
+    frame_dEdx->SetXTitle("dE/dx [MeV/cm]");
+    frame_dEdx->SetYTitle("Number of Showers");
+    frame_dEdx->SetTitleFont(50,"X");
+    frame_dEdx->SetTitleFont(50,"Y");
+    c2->Draw();
+    c2->SaveAs("dEdx.png");
+
+  }
   
 }
 

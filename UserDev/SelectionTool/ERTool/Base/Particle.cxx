@@ -29,7 +29,7 @@ namespace ertool {
   const NodeID_t&     Particle::Parent     () const { return _parent_id;   }
   const NodeID_t&     Particle::Ancestor   () const { return _ancestor_id; }
   const Generation_t& Particle::Generation () const { return _generation;  }
-  float Particle::RelationshipScore(const NodeID_t id)
+  float Particle::RelationshipScore(const NodeID_t id) const
   {
     if(id >= _score_v.size()) return -1;
     return _score_v[id];
@@ -51,7 +51,7 @@ namespace ertool {
   { return _vtx; }
   const ::geoalgo::Vector& Particle::Momentum() const
   { return _mom; }
-  float Particle::RecoScore()
+  float Particle::RecoScore() const
   {
     return RelationshipScore(_node_id); 
   }
@@ -66,7 +66,7 @@ namespace ertool {
   { return _primary; }
 
   bool Particle::Descendant() const
-  { return (!(_node_id == _parent_id && RelationAssessed())); }
+  { return !(_node_id == _parent_id); }
   
   bool Particle::Lonely() const
   { return (_child_v.size()<1); }
@@ -102,7 +102,8 @@ namespace ertool {
 				  const double mass,
 				  const ::geoalgo::Vector& vtx,
 				  const ::geoalgo::Vector& mom,
-				  const float score)
+				  const float score,
+				  const ProcessType_t process)
   {
     _vtx.compat(vtx);
     _mom.compat(mom);
@@ -111,6 +112,7 @@ namespace ertool {
     _vtx       = vtx;
     _mom       = mom;
     SetScore(_node_id,score);
+    SetProcess(process);
   }
 
   void Particle::SetScore(const NodeID_t id, const float score)

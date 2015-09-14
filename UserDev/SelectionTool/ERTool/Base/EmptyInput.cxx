@@ -66,6 +66,18 @@ namespace ertool {
       return true;
     }
 
+    void EmptyInput::ReserveShowerArray(const size_t n,const bool mc)
+    {
+      if(mc) _mc_data->_shower_v.reserve(n);
+      else _data->_shower_v.reserve(n);
+    }
+
+    void EmptyInput::ReserveTrackArray(const size_t n,const bool mc)
+    {
+      if(mc) _mc_data->_track_v.reserve(n);
+      else _data->_track_v.reserve(n);
+    }
+
     NodeID_t EmptyInput::Add(const ertool::Shower& obj,
 			     const ertool::RecoInputID_t& input_id,
 			     const bool mc) 
