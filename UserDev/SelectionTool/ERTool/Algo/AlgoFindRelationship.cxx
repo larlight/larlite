@@ -8,13 +8,6 @@ namespace ertool{
   AlgoFindRelationship::AlgoFindRelationship()
   {
     _debug  = false;
-
-    //Track-particle masses (convert to MEV)
-    _pi_mass = ParticleMass(211);
-    _pr_mass = ParticleMass(2212);
-    _mu_mass = ParticleMass(13);
-    _ka_mass = ParticleMass(311);
-    _uk_mass = 0.;
     _maxIP   = 1.;
   }
   
@@ -296,10 +289,10 @@ namespace ertool{
     switch(trk._pid){
     case Track::TrackPartID_t::kUnknown : return 0;
     case Track::TrackPartID_t::kPIDA    : return 0;
-    case Track::TrackPartID_t::kProton  : return _pr_mass;
-    case Track::TrackPartID_t::kKaon    : return _ka_mass;
-    case Track::TrackPartID_t::kPion    : return _pi_mass;
-    case Track::TrackPartID_t::kMuon    : return _mu_mass;
+    case Track::TrackPartID_t::kProton  : return ParticleMass(2212);
+    case Track::TrackPartID_t::kKaon    : return ParticleMass(311);
+    case Track::TrackPartID_t::kPion    : return ParticleMass(211);
+    case Track::TrackPartID_t::kMuon    : return ParticleMass(13);
     case Track::TrackPartID_t::kTrackPartIDMax : return 0;
     }
     return 0.;

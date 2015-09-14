@@ -64,6 +64,12 @@ namespace ertool {
 		 unsigned int runID,
 		 unsigned int subrunID);
 
+      /// Function to reserve size for shower vector
+      void ReserveShowerArray(const size_t n,const bool mc=false);
+
+      /// Function to reserve size for track vector
+      void ReserveTrackArray(const size_t n,const bool mc=false);
+
       /// Function to add input data product: Shower
       NodeID_t Add(const ertool::Shower& obj,
 		   const ertool::RecoInputID_t& input_id,
