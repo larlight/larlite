@@ -51,12 +51,13 @@ my_anaunit._mgr._mc_for_ana = False
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
 #my_anaunit.SetShowerProducer(True,"")
-my_anaunit.SetShowerProducer(False,"showerrecopandora")
+my_anaunit.SetShowerProducer(False,"")
+#my_anaunit.SetShowerProducer(False,"showerrecopandora")
 #my_anaunit.SetShowerProducer(False,"newdefaultreco");
 #my_anaunit.SetShowerProducer(False,"pandoraNuShower");
 #my_anaunit.SetShowerProducer(False,"mergeall");
 #my_anaunit.SetTrackProducer(True,"mcreco");
-my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
+my_anaunit.SetTrackProducer(False,"trackkalmanhit");
 #my_anaunit.SetTrackProducer(False,"costrk");
 #my_anaunit.SetVtxProducer(True,"generator");
 # ************************************************
