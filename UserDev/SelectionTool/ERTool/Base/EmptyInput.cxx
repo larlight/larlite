@@ -104,6 +104,12 @@ namespace ertool {
 	return _mc_graph->CreateParticle(_mc_data->Track().back()).ID();
       }
     }
+
+    void EmptyInput::Add(const ::ertool::Flash& obj,
+			 const ertool::RecoInputID_t& input_id)
+    {
+      _data->Add(obj,input_id);
+    }
     
     NodeID_t EmptyInput::Emplace(const ::ertool::Shower&& obj,
 				 const ertool::RecoInputID_t&& input_id,
@@ -129,6 +135,12 @@ namespace ertool {
 	_mc_data->Emplace(std::move(obj),std::move(input_id));
 	return _mc_graph->CreateParticle(_data->Track().back()).ID();
       }
+    }
+
+    void EmptyInput::Emplace(const ::ertool::Flash&& obj,
+			     const ertool::RecoInputID_t&& input_id)
+    {
+      _data->Emplace(std::move(obj),std::move(input_id));
     }
   }
 

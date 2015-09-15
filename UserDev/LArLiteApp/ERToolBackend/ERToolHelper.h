@@ -76,6 +76,10 @@ namespace larlite {
 		       storage_manager&       storage,
 		       ::ertool::io::EmptyInput& mgr) const;
 
+    /// Fill Flash info from RECO
+    void FillFlashes ( const event_opflash& flash_v,
+		       ::ertool::io::EmptyInput& strm) const;
+    
     /// MC Cheater for single showers
     void SingleShowerCheater(const event_mcshower& mcs_v,
 			     ::ertool::io::EmptyInput& strm ) const;
