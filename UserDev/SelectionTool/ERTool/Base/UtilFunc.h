@@ -3,9 +3,13 @@
 
 #include <vector>
 #include "ERToolTypes.h"
+#include "ERToolConstants.h"
 
 namespace ertool {
 
+  /// Utility to get a default configuration file
+  const std::string GetDefaultConfigFileName();
+  
   /// Utility to get a particle mass.
   double ParticleMass(const int pdgcode);
   

@@ -29,6 +29,18 @@ namespace ertool {
     _subrun   = subrunID;
   }
 
+  const Flash& EventData::Flash (const FlashID_t& id) const
+  {
+    if( id >= _flash_v.size() ) 
+      throw ERException(Form("No flash corresponds to an id %zu",id));
+    return _flash_v[id];
+  }
+
+  const Flash& EventData::Flash (const Particle& p) const
+  {
+    return this->Flash(p.FlashID());
+  }
+
   const Shower& EventData::Shower (const RecoID_t& id) const
   {
     if( id >= _shower_v.size() ) 
@@ -72,6 +84,14 @@ namespace ertool {
     return InputID(p.RecoType(),p.RecoID());
   }
 
+  void EventData::Add(const ertool::Flash& obj,
+		      const ertool::RecoInputID_t& id)
+  {
+    _flash_id_v.push_back(id);
+    _flash_v.push_back(obj); 
+    _flash_v.back().SetFlashID(_flash_v.size()-1);
+  }
+
   void EventData::Add(const ertool::Shower& obj,
 		      const ertool::RecoInputID_t& id)
   {
@@ -86,6 +106,14 @@ namespace ertool {
     _track_id_v.push_back(id);
     _track_v.push_back(obj);  
     _track_v.back().SetRecoInfo(_track_v.size()-1, kTrack);
+  }
+
+  void EventData::Emplace(const ertool::Flash&& obj,
+			  const ertool::RecoInputID_t&& id)
+  {
+    _flash_id_v.emplace_back(id);
+    _flash_v.emplace_back(obj); 
+    _flash_v.back().SetFlashID(_flash_v.size()-1);
   }
 
   void EventData::Emplace(const ertool::Shower&& obj,
