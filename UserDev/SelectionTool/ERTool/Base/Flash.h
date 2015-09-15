@@ -45,8 +45,14 @@ namespace ertool {
     /// ID getter
     FlashID_t FlashID() const;
 
+    /// Total PE getter
+    double TotalPE() const;
+
     /// optical PE distribution
     std::vector<double> _npe_v;
+
+    /// Position
+    double _x, _y, _z, _t;
 
   private:
 

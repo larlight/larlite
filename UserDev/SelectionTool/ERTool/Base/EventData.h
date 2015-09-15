@@ -76,6 +76,8 @@ namespace ertool {
     const std::vector< ertool::Shower >& Shower() const { return _shower_v; }
     /// All tracks getter
     const std::vector< ertool::Track >& Track() const { return _track_v;  }
+    /// All flash getter
+    const std::vector< ertool::Flash >& Flash() const { return _flash_v; }
     
     const unsigned int Event_ID() const { return _event_id;  }
     const unsigned int Run()      const { return _run     ;  }
