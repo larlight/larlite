@@ -45,11 +45,17 @@ namespace ertool {
       
       if( graph.GetParticle(graph.GetParticle(s).Parent()).RecoType() == RecoType_t::kTrack){
         
-       if(_verbose) std::cout << "\t\t Muon mama" << std::endl;
+       if(_verbose) std::cout << "\t\t Track mama" << std::endl;
 
         continue;
       }
 	
+      if(graph.GetParticle(s).ProcessType() == ::ertool::ProcessType_t::kCosmic || 
+	 graph.GetParticle(graph.GetParticle(s).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
+	if(_verbose) std::cout << "\t\t Cosmic Shower" << std::endl;	
+        continue;	
+      }
+
 
       // default: the shower is primary
       // if we find an indication of the
@@ -75,6 +81,15 @@ namespace ertool {
 	  continue;
 	}
 
+
+	if(graph.GetParticle(p2).ProcessType() == ::ertool::ProcessType_t::kCosmic|| 
+	 graph.GetParticle(graph.GetParticle(p2).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
+	if(_verbose) std::cout << "\t\t Cosmic Shower" << std::endl;
+	
+        continue;
+	
+      }
+
 	
 	auto const& thatID = graph.GetParticle(p2).RecoID();
 
@@ -99,9 +114,17 @@ namespace ertool {
       // loop over other tracks
       for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
 
+	if(graph.GetParticle(t).ProcessType() == ::ertool::ProcessType_t::kCosmic|| 
+	 graph.GetParticle(graph.GetParticle(t).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
+	  if(_verbose) std::cout << "\t\t Cosmic Track" << std::endl;
+	  
+	  continue;
+	  
+	}
+	
 	auto const& thatID = graph.GetParticle(t).RecoID();
 	auto const& thatTrack = data.Track(thatID);
-
+	
 	if (thatTrack.size() < 2)
 	  continue;
 	if (_verbose) { std::cout << "Comparing with track (" << t << ")" << std::endl; }
@@ -132,6 +155,12 @@ namespace ertool {
     // Find primary tracks
     for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
 
+      if(graph.GetParticle(t).ProcessType() == ::ertool::ProcessType_t::kCosmic|| 
+	 graph.GetParticle(graph.GetParticle(t).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
+	if(_verbose) std::cout << "\t\t Cosmic Shower" << std::endl;	
+        continue;	
+      }
+
       // default: the track is primary
       // if we find an indication of the
       // contrary change state accordingly
@@ -149,11 +178,17 @@ namespace ertool {
       for (auto const& p2 : graph.GetParticleNodes(RecoType_t::kShower)){
 
 	if( graph.GetParticle(graph.GetParticle(p2).Parent()).RecoType() == RecoType_t::kTrack){
-
 	  if(_verbose) std::cout << "\t\t Muon mama" << std::endl;
-
 	  continue;
 	}
+	
+	if(graph.GetParticle(p2).ProcessType() == ::ertool::ProcessType_t::kCosmic|| 
+	 graph.GetParticle(graph.GetParticle(p2).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
+	  if(_verbose) std::cout << "\t\t Cosmic Shower" << std::endl;	
+	  continue;	
+	}
+
+	
 
 	auto const& thatID = graph.GetParticle(p2).RecoID();
 	auto const& thatShower = data.Shower(thatID);
@@ -173,6 +208,12 @@ namespace ertool {
       
       // loop over other tracks
       for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
+
+	if(graph.GetParticle(t).ProcessType() == ::ertool::ProcessType_t::kCosmic|| 
+	 graph.GetParticle(graph.GetParticle(t).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
+	  if(_verbose) std::cout << "\t\t Cosmic Shower" << std::endl;	
+	  continue;	
+	}
 
 	auto const& thatID = graph.GetParticle(t).RecoID();
 	auto const& thatTrack = data.Track(thatID);

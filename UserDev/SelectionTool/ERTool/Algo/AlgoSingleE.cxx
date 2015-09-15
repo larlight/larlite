@@ -88,6 +88,12 @@ namespace ertool {
     // Loop through showers
     for (auto const& p : graph.GetPrimaryNodes(RecoType_t::kShower)){
       
+      if(graph.GetParticle(p).ProcessType() == ::ertool::ProcessType_t::kCosmic ||
+         graph.GetParticle(graph.GetParticle(p).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
+	if(_verbose) std::cout << "\t\t Cosmic Shower" << std::endl;	
+        continue;	
+      }
+      
       auto const& thisShower = data.Shower(graph.GetParticle(p).RecoID());
 
       // keep track of whether it is single
@@ -109,6 +115,13 @@ namespace ertool {
 	  if(_verbose) std::cout << "\t\t Muon mama" << std::endl; 
 	  continue;
 	}
+
+	if(graph.GetParticle(p2).ProcessType() == ::ertool::ProcessType_t::kCosmic ||
+	   graph.GetParticle(graph.GetParticle(p2).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
+	  if(_verbose) std::cout << "\t\t Cosmic Shower" << std::endl;	
+	  continue;	
+	}
+
 
 	geoalgo::Point_t vtx(3);
 	// make sure we don't use "thisShower" in the loop
@@ -146,6 +159,12 @@ namespace ertool {
 	continue;
 
       for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
+
+	if(graph.GetParticle(t).ProcessType() == ::ertool::ProcessType_t::kCosmic||
+	   graph.GetParticle(graph.GetParticle(t).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
+	  if(_verbose) std::cout << "\t\t Cosmic Shower" << std::endl;	
+	  continue;	
+	}
 	
 	auto const& thatTrack = data.Track(graph.GetParticle(t).RecoID());
 	// make sure track has a length of at least 0.3 cm (wire spacing)
