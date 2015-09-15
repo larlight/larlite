@@ -44,9 +44,8 @@ namespace ertool {
     
     while(removed_id_v.back().size()) {
 
-      auto const& seed_v = removed_id_v.back();
-
       removed_id_v.push_back(std::vector<NodeID_t>());
+      auto const& seed_v = removed_id_v.at(removed_id_v.size()-2) ; //back();
 
       // Loop over seed (reference from which secondaries come from)
       for(auto const& seed_id : seed_v) {
