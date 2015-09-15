@@ -95,7 +95,18 @@ namespace larlite {
     in_strm->SetID(storage->event_id(),
 		   storage->run_id(),
 		   storage->subrun_id());
+    // Fill Flash
+    if(!_name_flash.empty()) {
 
+      auto ev_flash = storage->get_data<event_opflash>(_name_flash);
+      if(!ev_flash) {
+	print(msg::kERROR,__FUNCTION__,"OpFlash not found in the input data file!");
+	throw std::exception();
+      }
+
+      _helper.FillFlashes(*ev_flash,*in_strm);
+
+    }
 
     //------------------------------
     // Start filling SPAData object!
