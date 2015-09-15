@@ -79,11 +79,17 @@ namespace ertool {
       NodeID_t Add(const ertool::Track&  obj,
 		   const ertool::RecoInputID_t& input_id,
 		   const bool mc=false);
+
+      /// Function to add input data product: Flash
+      void Add(const ertool::Flash&  obj,
+	       const ertool::RecoInputID_t& input_id);
 #ifndef __CINT__
       /// Function to add input data product: Shower
       NodeID_t Emplace(const ertool::Shower&& obj, const ertool::RecoInputID_t&& input_id, const bool mc=false);
       /// Function to add input data product: Track
       NodeID_t Emplace(const ertool::Track&&  obj, const ertool::RecoInputID_t&& input_id, const bool mc=false);
+      /// Function to add input data product: Track
+      void Emplace(const ertool::Flash&&  obj, const ertool::RecoInputID_t&& input_id);
 #endif
 
       /// ParticleGraph accessor

@@ -16,6 +16,7 @@ namespace larlite {
     _name_mctrk     = "mcreco";
     _name_track     = "";
     _name_shower    = "";
+    _name_flash     = "";
     // set cheater for single showers
     _cheater        = false;
 
@@ -61,6 +62,10 @@ namespace larlite {
   return;
   }
 
+  void ERToolAnaBase::SetFlashProducer(const std::string prod)
+  {
+    _name_flash = prod;
+  }
 
   bool ERToolAnaBase::initialize() {
     // Nothing provided...

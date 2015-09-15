@@ -13,7 +13,7 @@
 #include "DataFormat/calorimetry.h"
 #include "DataFormat/partid.h"
 #include "DataFormat/event_ass.h"
-
+#include "DataFormat/opflash.h"
 #include "ParticleID.h"
 #include "ERToolHelper.h"
 #include "ERTool/Base/UtilFunc.h"
@@ -620,9 +620,9 @@ namespace larlite {
     ::geoalgo::Vector_t mom(start.Px(),start.Py(),start.Pz());
     auto const& pdg = mcs_v[0].PdgCode();
     strm.GetParticleGraphWriteable().GetParticle(nodes[0]).SetParticleInfo(pdg,
-								      0.,
-								      vtx,
-								      mom);
+									   0.,
+									   vtx,
+									   mom);
     return;
   }
   
@@ -679,6 +679,26 @@ namespace larlite {
       //strm.Add(s_v[i],id_v[i]);
 
     return;
+  }
+
+  void ERToolHelper::FillFlashes ( const event_opflash& flash_v,
+				   ::ertool::io::EmptyInput& strm) const
+  {
+    for(size_t flash_index=0; flash_index<flash_v.size(); ++flash_index) {
+
+      auto const& f = flash_v[flash_index];
+      
+      ::ertool::Flash erflash;
+      erflash._x = 0;
+      erflash._y = f.YCenter();
+      erflash._z = f.ZCenter();
+      erflash._npe_v.reserve(32);
+      for(size_t i=0; i<32; ++i) erflash._npe_v.push_back(f.PE(i));
+      erflash._t = f.Time();
+
+      ::ertool::RecoInputID_t id(flash_index,flash_v.name());
+      strm.Emplace(std::move(erflash),std::move(id));
+    }
   }
 
   TLorentzVector ERToolHelper::getXShift(const mctrack& mct) const {
