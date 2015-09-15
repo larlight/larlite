@@ -36,7 +36,8 @@ namespace ertool {
 
     Particle(const NodeID_t   node=kINVALID_NODE_ID,
 	     const RecoType_t reco_type=kInvisible,
-	     const RecoID_t   reco_id=kINVALID_RECO_ID);
+	     const RecoID_t   reco_id=kINVALID_RECO_ID,
+	     const FlashID_t  flash_id=kINVALID_FLASH_ID);
 
     const NodeID_t&     ID         () const;
     const NodeID_t&     Parent     () const;
@@ -54,6 +55,7 @@ namespace ertool {
     const bool HasRecoObject() const;
     const RecoType_t& RecoType() const;
     const RecoID_t&   RecoID()   const;
+    const FlashID_t&  FlashID()  const;
 
     const int&    PdgCode() const;
     const double& Mass() const;
@@ -79,7 +81,7 @@ namespace ertool {
     void SetScore(const NodeID_t id, const float score = kDEFAULT_SCORE);
     void SetRecoInfo(const RecoType_t type,
 		     const RecoID_t id  = kINVALID_RECO_ID);
-
+    void SetFlashID(const FlashID_t id);
     void RemoveChild(const NodeID_t child );
     void UpdateAfterRemoval(const NodeID_t removed);
     void SetProcess(const ProcessType_t process){ _process = process; }
@@ -105,7 +107,7 @@ namespace ertool {
     // Associated reco object information (type & id to retrieve)
     RecoType_t   _reco_type;   ///< Associated reco object type 
     RecoID_t     _reco_id;     ///< Associated reco ojbect id
-    
+    FlashID_t    _flash_id;    ///< Associated flash id
   };
 
 }

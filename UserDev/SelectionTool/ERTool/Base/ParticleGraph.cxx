@@ -257,6 +257,13 @@ namespace ertool {
 
   }
 
+  void ParticleGraph::UpdateFlashID(const NodeID_t target, const FlashID_t flash)
+  {
+    _particle_v[target].SetFlashID(flash);
+    for(auto const& child_id : _particle_v[target].Children())
+      UpdateFlashID(child_id,flash);
+  }
+
   void ParticleGraph::UpdateParentID(const NodeID_t target, const NodeID_t parent)
   {
     _particle_v[target]._parent_id = parent;
@@ -364,6 +371,11 @@ namespace ertool {
       }
     }
     return res;    
+  }
+
+  void ParticleGraph::SetFlashID(const NodeID_t node_id, const FlashID_t flash)
+  {
+
   }
   
   void ParticleGraph::SetParentage(const NodeID_t parent_id, const NodeID_t child_id, const float score)
