@@ -43,7 +43,7 @@
 #pragma link C++ class ertool::PdfFactory+;
 
 #pragma link C++ function ertool::Combination(const size_t,const size_t)+;
-
+#pragma link C++ function ertool::GetDefaultConfigFileName()+;
 #pragma link C++ class ertool::io::IOHandler+;
 #pragma link C++ class ertool::io::EmptyInput+;
 #pragma link C++ class ertool::io::EmptyOutput+;
