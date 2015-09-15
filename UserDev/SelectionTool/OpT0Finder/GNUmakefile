@@ -3,7 +3,7 @@
 #
 
 #SUBDIRS := Base Filter Algo App
-SUBDIRS := Base Algorithms App
+SUBDIRS := Base Algorithms App Ana
 
 .phony: all clean
 
