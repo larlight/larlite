@@ -24,18 +24,19 @@ def viewAll(mcDisplay, mcData, mcPart, recoDisplay, recoData, recoPart):
     recoDisplay.add(recoPart,recoData,False)
     mcDisplay.add(mcPart,mcData,False)
 
-    recoDisplay.show()
+
     mcDisplay.show()
+    recoDisplay.show()
 
     # The ranges for the two planes "should" be identical
-    mcrange = mcDisplay.get_ax_range()
+    mcrange   = mcDisplay.get_ax_range()
     recorange = recoDisplay.get_ax_range()
-    for dim in xrange(3):
-        if (recorange[0][dim] < mcrange[0][dim]): mcrange[0][dim] = recorange[0][dim]
-        if (recorange[1][dim] > mcrange[1][dim]): mcrange[1][dim] = recorange[1][dim]
+    #for dim in xrange(3):
+    #    if (recorange[0][dim] < mcrange[0][dim]): mcrange[0][dim] = recorange[0][dim]
+    #    if (recorange[1][dim] > mcrange[1][dim]): mcrange[1][dim] = recorange[1][dim]
 
-    recoDisplay.set_ax_range(mcrange[0],mcrange[1])
-    mcDisplay.set_ax_range(mcrange[0],mcrange[1])
+    #recoDisplay.set_ax_range(mcrange[0],mcrange[1])
+    #mcDisplay.set_ax_range(mcrange[0],mcrange[1])
 
 
     
