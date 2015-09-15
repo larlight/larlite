@@ -16,7 +16,7 @@
 #define LARLITE_UBT0FINDER_H
 
 #include "Analysis/ana_base.h"
-#include "Base/FlashMatchManager.h"
+#include "OpT0Finder/Base/FlashMatchManager.h"
 #include <TTree.h>
 
 namespace larlite {
