@@ -3,8 +3,8 @@
 #
 
 # specific names for this package
-DICT  = OpFlashAna_OpT0FinderAnaDict
-SHLIB = libOpFlashAna_OpT0FinderAna.so
+DICT  = SelectionTool_OpT0FinderAnaDict
+SHLIB = libSelectionTool_OpT0FinderAna.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
 HEADERS = $(filter-out $(FMWK_HEADERS), $(wildcard *.h))
@@ -24,6 +24,7 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
 # call the common GNUmakefile
 LDFLAGS += $(shell larlite-config --libs)
+LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_OpT0FinderBase -lSelectionTool_OpT0FinderAlgorithms
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE
 
 
