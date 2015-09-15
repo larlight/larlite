@@ -16,7 +16,7 @@
 
 #include "GeoAlgo/GeoCone.h"
 #include "RecoObjBase.h"
-#include "ERException.h"
+
 namespace ertool {
 
   /**

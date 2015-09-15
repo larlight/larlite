@@ -10,6 +10,9 @@
 
 namespace ertool {
 
+  const std::string GetDefaultConfigFileName()
+  { return kDefaultConfigFileName; }
+
   double ParticleMass(const int pdgcode)
   {
     switch(pdgcode) {
