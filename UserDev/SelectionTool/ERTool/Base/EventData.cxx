@@ -15,8 +15,10 @@ namespace ertool {
   {
     _shower_v.clear();
     _track_v.clear();
+    _flash_v.clear();
     _shower_id_v.clear();
     _track_id_v.clear();
+    _flash_id_v.clear();
     _event_id = _run = _subrun = kUINT_MAX;
   }
   
