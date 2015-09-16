@@ -39,14 +39,14 @@ namespace showerreco {
 
     void SetUseArea(bool on) { _useArea = on; }
 
-    void SetUseBirks(bool on=true) { _caloAlg->setUseModBox(!on); }
+    void SetUseBirks(bool on=true) { _caloAlg.setUseModBox(!on); }
 
-    void SetUseBox(bool on = true) { _caloAlg->setUseModBox(on); }
+    void SetUseBox(bool on = true) { _caloAlg.setUseModBox(on); }
 
   private:
 
     /// Calorimetry algorithm
-    ::calo::CalorimetryAlg *_caloAlg;
+    ::calo::CalorimetryAlg _caloAlg;
 
     /// flag for whether to decide if we should use the hit area or amplitude for energy calculations
     bool _useArea;

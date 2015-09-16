@@ -17,6 +17,11 @@ namespace larlite {
   
   bool ShowerReco3D::initialize() {
 
+    if (_fout)
+      _fout->cd();
+
+    fManager.Initialize();
+
     return true;
   }
   

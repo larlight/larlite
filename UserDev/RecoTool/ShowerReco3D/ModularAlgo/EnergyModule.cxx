@@ -9,11 +9,13 @@
 
 namespace showerreco{
 
-  EnergyModule::EnergyModule(){
+  EnergyModule::EnergyModule()
+  {
 
     _name = "EnergyModule";
     _useArea = true;
-    _caloAlg->setUseModBox(false);
+    _caloAlg = ::calo::CalorimetryAlg();
+    _caloAlg.setUseModBox(false);
 
   }
 
@@ -52,9 +54,9 @@ namespace showerreco{
       for (auto const &h : hits){
 	
 	if (_useArea)
-	  dEdx = _caloAlg->dEdx_AMP(h.charge / pitch, h.t / geomHelper->TimeToCm(), h.plane);
+	  dEdx = _caloAlg.dEdx_AMP(h.charge / pitch, h.t / geomHelper->TimeToCm(), h.plane);
 	else
-	  dEdx = _caloAlg->dEdx_AMP(h.peak / pitch, h.t / geomHelper->TimeToCm(), h.plane);
+	  dEdx = _caloAlg.dEdx_AMP(h.peak / pitch, h.t / geomHelper->TimeToCm(), h.plane);
 
 	// make sure we aren't adding a crazy amount
 	// this is totally possible due to non-linear
@@ -64,6 +66,9 @@ namespace showerreco{
 	E += dEdx*pitch;
 
       }// loop over all hits
+
+      if (_verbose)
+	std::cout << "energy on plane " << pl << " is : " << E << std::endl;
 						
       // set the energy for this plane
       resultShower.fTotalEnergy[pl] = E;
