@@ -46,22 +46,20 @@ namespace showerreco{
       //Which plane does the cluster live in
       auto const& pl = cluster.plane_id.Plane;
 
-      //      std::cout << " \t \t \t Cluster in Plane " << pl << std::endl;
-      
-      // measure the distance between the start point and showering point
-      
+      // measure the distance between the start point and showering point      
       double dist; 
       if(cluster.showering_point.w !=0 && cluster.showering_point.t !=0){
 	dist = geomHelper->Get2DDistance(cluster.start_point, cluster.showering_point);      
       }
-      else{dist = 2.4;}
+      else{
+	//Major failure mode is ShoweringPoint is == 0, when that happens pull the "default" value
+	dist = 2.4;
+      }
  
       _StartW = cluster.start_point.w;
       _StartT = cluster.start_point.t;
       _ShowW = cluster.showering_point.w;
       _ShowT = cluster.showering_point.t;
-
-      //      std::cout << "Distance : " << dist << std::endl; 
 
       resultShower.fShoweringLength[pl] = dist;      
       _length = dist;
@@ -83,18 +81,26 @@ namespace showerreco{
 	slope = cluster.slope_2d;
       }
 
+
+      // Calculate which hits are in the beginning of the shower (from start->showering point)
+      // and fall within a rectangle with this distance as its length and the width is based
+      // on the opening angle of the cluster with a slope as defined above
+      // Possible improvement: Turn this into a triangle! 
       auto StartHits = geomHelper->SelectLocalPointList( cluster.hit_vector,
 							 strtHit,
 							 dist,
 							 2*dist*TMath::Tan((cluster.opening_angle_charge_wgt)/2),
 							 slope,
 							 avg );      
-      
+
+
+
+      //Caculation of the Charge deposited at start of shower
+      //UNSMOOTHED! Possible improvement 
       for(auto h : StartHits){
 	dQdx.at(pl) += cluster.hit_vector.at(h).charge;	       
       }
 
-      //      std::cout << "Charge " << dQdx.at(pl) << std::endl;
 
       if(pl == 0)
 	_Q0 = dQdx[0];
@@ -105,7 +111,7 @@ namespace showerreco{
       if(pl == 2)
 	_Q2 = dQdx[2];
 
-
+      //Calculate the dQdx!
       if(dist != 0){
 	dQdx.at(pl) /= dist;
       }
@@ -113,8 +119,6 @@ namespace showerreco{
 	std::cout << " How your dist = 0 foo! " << std::endl;
       }
       
-      //      std::cout << " dQdx !!!! " << dQdx[pl] << std::endl;
-
       if(pl == 0)
 	_dQdx0 = dQdx[0];
       
