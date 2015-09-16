@@ -48,7 +48,7 @@ def getShowerRecoAlgModular():
   axis3D.setSeedVectorErrorCutoff(0.5)
 
   energy = showerreco.EnergyModule()
-  energy.SetUseModBox(True)
+  energy.SetUseBox(True)
   energy.setVerbosity(True)
 
   alg.AddShowerRecoModule(axis3D)
@@ -147,7 +147,7 @@ print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
-my_proc.run(0,10)
+my_proc.run()
 # my_proc.process_event(2)
 
 
