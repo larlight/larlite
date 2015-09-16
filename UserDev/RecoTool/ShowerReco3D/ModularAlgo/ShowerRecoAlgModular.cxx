@@ -174,6 +174,12 @@ namespace showerreco {
                       << " to "  << result.fLength << std::endl; 
           }
 
+	  // BestdQdx
+          if (localCopy.fBestdQdx != result.fBestdQdx) {
+            std::cout << "\tfBestdQdx has changed from " << localCopy.fBestdQdx
+                      << " to "  << result.fBestdQdx << std::endl; 
+          }
+
           // Opening Angle
           if (localCopy.fOpeningAngle != result.fOpeningAngle) {
             std::cout << "\tfDCosStart has changed from " << localCopy.fOpeningAngle 
