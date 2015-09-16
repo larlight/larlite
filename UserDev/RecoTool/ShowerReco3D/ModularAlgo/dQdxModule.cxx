@@ -67,7 +67,7 @@ namespace showerreco{
 
       _pl = pl;
       _length = trunk_length;
-      _tree->Write();
+      _tree->Fill();
 
       if (_verbose)
 	std::cout << "trunk length for plane " << pl << " is " << trunk_length << std::endl;
