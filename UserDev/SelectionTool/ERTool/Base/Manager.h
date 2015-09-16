@@ -126,6 +126,9 @@ namespace ertool {
     /// Make MC info available to ana
     bool _mc_for_ana;
 
+    /// Debug mode
+    msg::Level_t _verbosity;
+
     /// struct for time profiling
     struct _tprof_t {
       /// ctor
