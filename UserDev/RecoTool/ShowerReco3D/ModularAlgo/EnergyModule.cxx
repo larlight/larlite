@@ -33,6 +33,8 @@ namespace showerreco{
     // get the 3D direction reconstructed hopefully in a previous step
     auto const& dir3D = resultShower.fDCosStart;
 
+    std::cout << "dir3D: [" << dir3D[0] << ", " << dir3D[1] << ", " << dir3D[2] << "]" << std::endl;
+
     // we want an energy for each plane
     for (size_t n=0; n < inputShowers.size(); n++){
 
@@ -50,6 +52,8 @@ namespace showerreco{
       //*** we need to calculate a pitch for this plane
       double pitch = geomHelper->GetPitch(dir3D,(int)pl);
 
+      if (_verbose) std::cout << "pitch is: " << pitch << std::endl;
+
       // loop over hits
       for (auto const &h : hits){
 	
@@ -61,7 +65,7 @@ namespace showerreco{
 	// make sure we aren't adding a crazy amount
 	// this is totally possible due to non-linear
 	// birks / box model formulas
-	
+
 	if (dEdx > 10.) { dEdx = 10.; }
 	E += dEdx*pitch;
 

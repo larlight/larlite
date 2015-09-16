@@ -265,14 +265,12 @@ double GeometryHelper::GetPitch(const TVector3& direction, const int& pl) const
   double minWireSpacing = 0.3;
 
   double cos = wireDir.Dot(direction);
-  std::cout << "cosine is " << cos << std::endl;
   cos /= (wireDir.Mag() * direction.Mag());
 
   // if cosine is 0 the direction is perpendicular and the wire-spacing is infinite
   if (cos == 0)
     return kDOUBLE_MAX;
 
-  std::cout << "cosine: " << cos << "\tspacing: " << minWireSpacing << std::endl;
   double pitch = minWireSpacing / cos;
   return pitch;
 }
