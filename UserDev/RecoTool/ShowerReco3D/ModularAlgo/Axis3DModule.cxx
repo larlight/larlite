@@ -106,10 +106,10 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   
   // Keep the best vector with the best error;
   int bestIndex = -1;
-  float bestError = 9999;
+  
 
   findSeedVectors(tempSeedVectors, seedVectors, errorVector, convergeStatus, convergeNumber,
-                  n_converged, planes, slopeByPlane, bestIndex, bestError);
+                  n_converged, planes, slopeByPlane, bestIndex);
   
   // Set the best vector to direction:
   if (bestIndex != -1)
@@ -480,7 +480,7 @@ float Axis3DModule::getErrorOfProjection( const TVector3 & inputVector,
 
 }
   
-  void Axis3DModule::findSeedVectors(const std::vector<TVector3> & tempSeedVectors,
+void Axis3DModule::findSeedVectors(const std::vector<TVector3> & tempSeedVectors,
                                      std::vector<TVector3> & seedVectors,
                                      std::vector<float> & errorVector,
                                      std::vector<Status> & convergeStatus,
@@ -488,12 +488,12 @@ float Axis3DModule::getErrorOfProjection( const TVector3 & inputVector,
                                      int & n_converged,
                                      const std::vector<int> & planes,
                                      const std::vector<float> & slopeByPlane,
-                                     int & bestIndex,
-                                     float & bestError)
+                                     int & bestIndex)
 {
-    auto geomHelper = larutil::GeometryHelper::GetME();
-    float errorCutoff = _seedVectorErrorCutoff;
-    
+  auto geomHelper = larutil::GeometryHelper::GetME();
+  float errorCutoff = _seedVectorErrorCutoff;
+  float bestError = 9999;
+  
     // Find out the seed vectors with reasonable error, and reject all the others
     while (seedVectors.size() == 0) {
       for (auto & vec : tempSeedVectors) {

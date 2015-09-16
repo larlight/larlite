@@ -193,10 +193,7 @@ private:
                        int & n_converged,
                        const std::vector<int> & planes,
                        const std::vector<float> & slopeByPlane,
-                       int & bestIndex,
-                       float & bestError);
-
-
+                       int & bestIndex);
 
 
     // Configurable variables for this module:
