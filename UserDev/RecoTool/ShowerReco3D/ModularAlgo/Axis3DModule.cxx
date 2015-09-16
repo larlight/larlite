@@ -15,7 +15,6 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   // This function takes the shower cluster set and computes the best fit 3D axis
   // and then assigns it to the shower.
 
-  std::cout << "Entering axis3d\n";
 
   // std::cout << "Got here 1\n";
 
@@ -111,14 +110,10 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   int bestIndex = -1;
   float bestError = 9999;
 
-  std::cout << "Got to here0\n";
-
 
   findSeedVectors(seedVectors, errorVector, planes, slopeByPlane);
   
-  // Now the list of seed vectors is reduced to a few candidate vectors that are close
-  std::cout << "Got to here1\n";
-  
+  // Now the list of seed vectors is reduced to a few candidate vectors that are close  
   int vecIndex = 0;
   for (auto & vec : seedVectors) {
     Status exitStatus = kNStatus;
@@ -129,9 +124,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
     if (exitStatus == kNormal)
       n_converged++;
     vecIndex ++;
-  }
-  std::cout << "Got to here2\n";
-  
+  }  
   // Print out the final vectors and their errors:
   vecIndex = 0;
   for (auto & vec : seedVectors) {
