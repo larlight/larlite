@@ -57,6 +57,40 @@ public:
      */
     void setTargetError(float f) {fTargetError = f;}
 
+    /**
+     * @brief sets the starting value at which theta converges 
+     * @details Theta range is the opening angle around which the algorithm searches
+     * 
+     * @param f target theta range
+     */
+    void setThetaRangeStart(float f){_thetaRangeStart = f;}
+
+    /**
+     * @brief sets the  value at which theta stops decreasing 
+     * 
+     * @param f target theta min
+     */
+    void setThetaRangeMin(float f){_thetaRangeMin = f;}
+
+
+    /**
+     * @brief Set the number of steps to use when finding better vectors
+     * @details More steps is slower, but also might be more accurate.  Alg will stop converging
+     *          after 4* the start steps.
+     * 
+     * @param n starting number of steps
+     */
+    void setNStepsStart(size_t n){_nStepsStart = n;}
+
+    /**
+     * @brief Set the rate at which the angle decreases
+     * @details This algorithm will decrease the range it's looking in as it 
+     *          converges.  This is the rate at which it decreases.  Don't make it too small.
+     * 
+     * @param f Target convergence rate, default is ~0.85
+     */
+    void setConvergeRate(float f){_alpha = f;}
+
 private:
 
     /**
@@ -147,9 +181,34 @@ private:
                         const std::vector<float> & slopeByPlane,
                         const std::vector<int> & planes );
 
+
+
+
+
+    // Configurable variables for this module:
+
+
+    // Maximum number of iterations to loop over per seed vector
     int fMaxIterations;
+    // The initial number of divisions used for computing seed vectors
     float fNStepsInitial;
+    // The target error (fractional per plane) for normal completion
     float fTargetError;
+
+    // The cutoff error (fractional error per plane) for picking seed vectors
+    float _seedVectorErrorCutoff;
+
+    // The initial opening angle for a seed vector
+    float _thetaRangeStart;
+
+    float _thetaRangeMin;
+    // float _thetaRangeMax   = M_PI / 8;
+
+    // The number of steps that are used in wrapping around a seed vector
+    int _nStepsStart;
+
+    // Alpha is the "converge rate" - the rate at which the angle narrows in on a value
+    float _alpha;
 
 };
 
