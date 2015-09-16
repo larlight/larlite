@@ -13,6 +13,15 @@ namespace showerreco {
     fMatchMgr = new ::cmtool::CMatchManager(geom->Nplanes());
   }
 
+  void ShowerRecoManager::Initialize()
+  {
+    std::cout << "initialzing algorithms" << std::endl;
+    for(auto alg : _alg_v)
+      alg->Initialize();
+    
+    return;
+  }
+
   void ShowerRecoManager::Reset()
   {
     for(auto alg : _alg_v) alg->Reset();
@@ -61,9 +70,11 @@ namespace showerreco {
       ShowerClusterSet_t in_clusters;
       in_clusters.reserve(pair.size());
       
-      for(auto const& index : pair)
-
+      for(auto const& index : pair){
         in_clusters.emplace_back( fMatchMgr->GetInputClusters()[index] );
+        // Make sure to fill the params:
+        _params_alg.FillParams(in_clusters.back());
+      }
 
       for(auto& shower_alg : _alg_v)
 
@@ -81,10 +92,17 @@ namespace showerreco {
     if (!fout)
       return;
     fout->cd();
+
+    // loop through algorithms
+    for (auto& alg : _alg_v)
+      alg->Finalize(fout);
+
+    // loop through ana modules
     for(auto& ana : _ana_v) {
       auto tree = ana->GetTree();
       if (tree) tree->Write();
     }
+
     return;
   }
   

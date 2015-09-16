@@ -152,6 +152,14 @@ namespace cluster{
 
     std::vector<std::string> GetFANNVectorTitle();
 
+    /**
+     * For debugging purposes, prints the result of GetFANNVector
+     * in a nicely formatted form.
+     * @return [description]
+     */
+    void  PrintFANNVector();
+
+
   };
 
   

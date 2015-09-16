@@ -58,38 +58,40 @@ public:
     void setTargetError(float f) {fTargetError = f;}
 
     /**
-     * @brief sets the starting value at which theta converges 
+     * @brief sets the starting value at which theta converges
      * @details Theta range is the opening angle around which the algorithm searches
-     * 
+     *
      * @param f target theta range
      */
-    void setThetaRangeStart(float f){_thetaRangeStart = f;}
+    void setThetaRangeStart(float f) {_thetaRangeStart = f;}
 
     /**
-     * @brief sets the  value at which theta stops decreasing 
-     * 
+     * @brief sets the  value at which theta stops decreasing
+     *
      * @param f target theta min
      */
-    void setThetaRangeMin(float f){_thetaRangeMin = f;}
+    void setThetaRangeMin(float f) {_thetaRangeMin = f;}
 
 
     /**
      * @brief Set the number of steps to use when finding better vectors
      * @details More steps is slower, but also might be more accurate.  Alg will stop converging
      *          after 4* the start steps.
-     * 
+     *
      * @param n starting number of steps
      */
-    void setNStepsStart(size_t n){_nStepsStart = n;}
+    void setNStepsStart(size_t n) {_nStepsStart = n;}
 
     /**
      * @brief Set the rate at which the angle decreases
-     * @details This algorithm will decrease the range it's looking in as it 
+     * @details This algorithm will decrease the range it's looking in as it
      *          converges.  This is the rate at which it decreases.  Don't make it too small.
-     * 
+     *
      * @param f Target convergence rate, default is ~0.85
      */
-    void setConvergeRate(float f){_alpha = f;}
+    void setConvergeRate(float f) {_alpha = f;}
+
+    void setSeedVectorErrorCutoff(float f){_seedVectorErrorCutoff = f;}
 
 private:
 
@@ -181,12 +183,21 @@ private:
                         const std::vector<float> & slopeByPlane,
                         const std::vector<int> & planes );
 
+    /**
+     * @brief This function identifies seed vectors, optimises them and finds the best candidate
+     * @details
+    */
 
+  void findSeedVectors(std::vector<TVector3> & seedVectors,
+                       std::vector<float> & errorVector,
+                       const std::vector<int> & planes,
+                       const std::vector<float> & slopeByPlane);
 
+    // Private members that get used frequently:
+    std::vector<TVector3> _globalSeedVectors;
 
 
     // Configurable variables for this module:
-
 
     // Maximum number of iterations to loop over per seed vector
     int fMaxIterations;

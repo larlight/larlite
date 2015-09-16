@@ -6,6 +6,17 @@
 
 namespace showerreco {
 
+  // initialize the various algorithms
+  void ShowerRecoAlgModular::Initialize()
+  {
+    std::cout << "initializing modules..." << std::endl;
+    std::cout << "there are " << _modules.size() << " modules" << std::endl;
+    for (auto & module : _modules)
+      module->initialize();
+
+    return;
+  }
+
     Shower_t ShowerRecoAlgModular::RecoOneShower(const ShowerClusterSet_t& clusters){
       // Run over the shower reco modules:
       Shower_t result;
@@ -285,6 +296,24 @@ namespace showerreco {
           std::cout << std::endl;
 
     }
+
+
+  // finalize function
+  void ShowerRecoAlgModular::Finalize(TFile* fout)
+  {
+    
+    std::cout << "finalize" << std::endl;
+    // for each algorithm, get its tree and write it to output
+    if (fout){
+      fout->cd();
+      for (auto & module : _modules){
+	auto tree = module->GetTree();
+	if (tree) { tree->Write(); std::cout << "got tree! " << std::endl; }
+      }// for each modular algo
+    }// if output file exists
+
+    return;
+  }
 
 } // showerreco
 

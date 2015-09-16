@@ -22,6 +22,7 @@
 #include "RefineStartPoints.h"
 #include "SelectStartPoint.h"
 #include "FindShoweringPoint.h"
+#include "FillGeomParams.h"
 
 namespace cluster {
 
