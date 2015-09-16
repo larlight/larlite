@@ -65,7 +65,7 @@ namespace showerreco {
     /**
      * @brief Function to initialize the algorithm (such as setting up tree)
      */
-    virtual void initialize() = 0;
+    virtual void initialize(){};
 
   protected:
 
