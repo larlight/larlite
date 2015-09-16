@@ -67,6 +67,9 @@ public:
   /// Finalize: provide TFile access so that anything that needs to be stored can be stored
   void Finalize(TFile* fout = nullptr);
 
+  // initalize function
+  void Initialize();
+
 private:
 
   /// Shower reconstruction algorithm
