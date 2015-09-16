@@ -45,6 +45,7 @@ def getShowerRecoAlgModular():
   axis3D.setNStepsStart(8)
   axis3D.setConvergeRate(0.85)
   axis3D.setVerbosity(True)
+  axis3D.setSeedVectorErrorCutoff(0.5)
 
   alg.AddShowerRecoModule(axis3D                           )
   # alg.AddShowerRecoModule(showerreco.StartPoint2DModule()  )

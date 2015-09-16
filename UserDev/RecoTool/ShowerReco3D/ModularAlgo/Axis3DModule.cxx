@@ -15,6 +15,8 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   // This function takes the shower cluster set and computes the best fit 3D axis
   // and then assigns it to the shower.
 
+  std::cout << "Entering axis3d\n";
+
   // std::cout << "Got here 1\n";
 
   auto geom = larutil::Geometry::GetME();
@@ -87,6 +89,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
     return;
   }
 
+
   // Try to determine the 3D axis iteratively.
   // Here's how it is, I have NO IDEA how to rotate things to fix things.  So instead, just
   // make a bunch of guesses and narrow in on the result.
@@ -108,9 +111,13 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   int bestIndex = -1;
   float bestError = 9999;
 
+  std::cout << "Got to here0\n";
+
+
   findSeedVectors(seedVectors, errorVector, planes, slopeByPlane);
   
   // Now the list of seed vectors is reduced to a few candidate vectors that are close
+  std::cout << "Got to here1\n";
   
   int vecIndex = 0;
   for (auto & vec : seedVectors) {
@@ -123,6 +130,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
       n_converged++;
     vecIndex ++;
   }
+  std::cout << "Got to here2\n";
   
   // Print out the final vectors and their errors:
   vecIndex = 0;
@@ -542,7 +550,7 @@ void Axis3DModule::findSeedVectors(std::vector<TVector3> & seedVectors,
       if (error < errorCutoff) {
         seedVectors.push_back(vec);
         errorVector.push_back(error);
-        // std::cout << "vector "
+        // std::cout << "vector ("
         //           << vec.X() << ", "
         //           << vec.Y() << ", "
         //           << vec.Z() << ")., error " << error
