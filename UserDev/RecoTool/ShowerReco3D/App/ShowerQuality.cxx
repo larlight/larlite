@@ -409,7 +409,7 @@ void ShowerQuality::FillQualityInfo(const shower& reco_shower, const mcshower& m
   fTreeParams.mc_y = mc_shower.DetProfile().Y();
   fTreeParams.mc_z = mc_shower.DetProfile().Z();
 
-  // fTreeParams.mc_energy = mc_shower.DetProfile().E();
+  fTreeParams.mc_energy = mc_shower.DetProfile().E();
   // fTreeParams.mc_pdgid  = mc_shower.PdgCode();
   // fTreeParams.mc_containment = mc_shower.DetProfile().E() / mc_shower.Start().E();
 
@@ -453,9 +453,9 @@ void ShowerQuality::FillQualityInfo(const shower& reco_shower, const mcshower& m
   // fTreeParams.best_plane_id = reco_shower.best_plane();
 
   // fTreeParams.reco_energy = reco_shower.Energy().at(reco_shower.best_plane());
-  // fTreeParams.reco_energy_U = reco_shower.Energy().at(0);
-  // fTreeParams.reco_energy_V = reco_shower.Energy().at(1);
-  // fTreeParams.reco_energy_Y = reco_shower.Energy().at(2);
+  fTreeParams.reco_energy_U = reco_shower.Energy().at(0);
+  fTreeParams.reco_energy_V = reco_shower.Energy().at(1);
+  fTreeParams.reco_energy_Y = reco_shower.Energy().at(2);
 
   // fTreeParams.reco_dedx     = reco_shower.dEdx().at(reco_shower.best_plane());
   // fTreeParams.reco_dedx_U   = reco_shower.dEdx().at(0);
@@ -519,9 +519,9 @@ void ShowerQuality::InitializeAnaTree()
   fTree->Branch("reco_dcosy", &fTreeParams.reco_dcosy, "reco_dcosy/D");
   fTree->Branch("reco_dcosz", &fTreeParams.reco_dcosz, "reco_dcosz/D");
   // fTree->Branch("reco_energy", &fTreeParams.reco_energy, "reco_energy/D");
-  // fTree->Branch("reco_energy_U", &fTreeParams.reco_energy_U, "reco_energy_U/D");
-  // fTree->Branch("reco_energy_V", &fTreeParams.reco_energy_V, "reco_energy_V/D");
-  // fTree->Branch("reco_energy_Y", &fTreeParams.reco_energy_Y, "reco_energy_Y/D");
+  fTree->Branch("reco_energy_U", &fTreeParams.reco_energy_U, "reco_energy_U/D");
+  fTree->Branch("reco_energy_V", &fTreeParams.reco_energy_V, "reco_energy_V/D");
+  fTree->Branch("reco_energy_Y", &fTreeParams.reco_energy_Y, "reco_energy_Y/D");
 
   // fTree->Branch("best_plane_id", &fTreeParams.best_plane_id, "best_plane_id/i");
 
@@ -531,7 +531,7 @@ void ShowerQuality::InitializeAnaTree()
   fTree->Branch("mc_dcosx", &fTreeParams.mc_dcosx, "mc_dcosx/D");
   fTree->Branch("mc_dcosy", &fTreeParams.mc_dcosy, "mc_dcosy/D");
   fTree->Branch("mc_dcosz", &fTreeParams.mc_dcosz, "mc_dcosz/D");
-  // fTree->Branch("mc_energy", &fTreeParams.mc_energy, "mc_energy/D");
+  fTree->Branch("mc_energy", &fTreeParams.mc_energy, "mc_energy/D");
 
   // fTree->Branch("reco_dedx", &fTreeParams.reco_dedx, "reco_dedx_/D");
   // fTree->Branch("reco_dedx_U", &fTreeParams.reco_dedx_U, "reco_dedx_U/D");
@@ -555,9 +555,9 @@ void ShowerQuality::resetTreeParams() {
   fTreeParams.reco_x = -1.; fTreeParams.reco_y = -1.; fTreeParams.reco_z = -1.;
   fTreeParams.reco_dcosx = -1.; fTreeParams.reco_dcosy = -1.; fTreeParams.reco_dcosz = -1.;
   // fTreeParams.reco_energy = -1;
-  // fTreeParams.reco_energy_U = -1;
-  // fTreeParams.reco_energy_V = -1;
-  // fTreeParams.reco_energy_Y = -1;
+  fTreeParams.reco_energy_U = -1;
+  fTreeParams.reco_energy_V = -1;
+  fTreeParams.reco_energy_Y = -1;
   // fTreeParams.reco_dedx = -1;
   // fTreeParams.reco_dedx_U = -1;
   // fTreeParams.reco_dedx_V = -1;
@@ -566,7 +566,7 @@ void ShowerQuality::resetTreeParams() {
 
   fTreeParams.mc_x = -1; fTreeParams.mc_y = -1; fTreeParams.mc_z = -1;
   fTreeParams.mc_dcosx = -1; fTreeParams.mc_dcosy = -1; fTreeParams.mc_dcosz = -1;
-  // fTreeParams.mc_energy = -1;
+  fTreeParams.mc_energy = -1;
   // fTreeParams.mc_pdgid = -1;
 
   fTreeParams.mc_reco_anglediff = -1;

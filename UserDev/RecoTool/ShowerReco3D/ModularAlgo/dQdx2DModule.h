@@ -43,7 +43,8 @@ namespace showerreco {
     //it is inteded to be filled such that element 1 contains the average dQdx for the U-plane, 
     //element 2 contains the same for the V-plane, and element 3 will be for the Y-plane. 
     std::vector<double> dQdx; 
-    
+
+    std::vector<double> Len;
     double _length;
     double _dQdx0;
     double _dQdx1;
@@ -55,7 +56,7 @@ namespace showerreco {
     double _StartT;
     double _ShowW;
     double _ShowT;
-
+    double _BestdQdx;
     
   };
 
