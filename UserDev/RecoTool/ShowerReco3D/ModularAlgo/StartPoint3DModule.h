@@ -36,8 +36,6 @@ public:
   /// Inherited/overloaded function from ShowerRecoModuleBase
   void do_reconstruction(const ShowerClusterSet_t &, Shower_t &);
 
-  void setNSteps(float f){fNSteps = f;}
-
  /** 
      * @brief generate seed points along 3D axis
      * @details 
@@ -50,23 +48,8 @@ public:
      */
   void generatePoints(TVector3 & seedPoint, int nSteps, const Shower_t & resultShower, std::vector<TVector3> & result);
 
- /** 
-     * @brief Find some point along the 3D axis 
-     * @details 
-     * 
-     * 
-     * @param anchorCandidates List of candidate 3D points generated using 2D start in Y plane 
-     * @param resultShower Want access to the axis-- pass in this fashion.
-     * @param nSteps Number of steps to take from Y = -116.5 to 116.5
-     * @param plane Plane number 
-     */
-//  void generateAnchorPoint(TVector3 anchorCandidates, const Shower_t & resultShower, const int & nSteps, const int & plane); 
-
   bool inTPC( const TVector3 & pt );
 
-private:
-
-    int fNSteps ;
 
 };
 
