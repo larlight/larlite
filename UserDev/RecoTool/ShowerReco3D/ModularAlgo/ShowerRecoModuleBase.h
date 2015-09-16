@@ -28,7 +28,7 @@ namespace showerreco {
   public:
 
     /// Default constructor
-    ShowerRecoModuleBase(){}
+    ShowerRecoModuleBase(){ _verbose = false; }
 
     /// Default destructor
     virtual ~ShowerRecoModuleBase(){}
@@ -50,8 +50,15 @@ namespace showerreco {
      */
     virtual void do_reconstruction(const ShowerClusterSet_t & clusters, Shower_t & shower) = 0;
 
+    /**
+     * @brief Verbosity setter function for each Modular Algo
+     */
+    void setVerbosity(bool on) { _verbose = on; }
+
   protected:
     std::string _name;
+
+    bool _verbose;
 
   };
 
