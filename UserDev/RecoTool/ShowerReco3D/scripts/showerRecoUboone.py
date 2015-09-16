@@ -48,6 +48,7 @@ def getShowerRecoAlgModular():
   axis3D.setSeedVectorErrorCutoff(0.5)
 
   energy = showerreco.EnergyModule()
+  energy.SetUseModBox(True)
   energy.setVerbosity(True)
 
   alg.AddShowerRecoModule(axis3D)
