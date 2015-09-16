@@ -47,8 +47,11 @@ namespace showerreco{
       auto const& pl = cluster.plane_id.Plane;
 
       // measure the distance between the start point and showering point      
-      double dist; 
-      if(cluster.showering_point.w !=0 && cluster.showering_point.t !=0){
+      // Lots of failure modes to remove
+      double dist = 0; 
+      if(cluster.showering_point.w != 0 && cluster.showering_point.t != 0 &&
+	 cluster.start_point.w != 0 && cluster.start_point.t != 0 && 
+	 cluster.start_point.w != cluster.showering_point.w){
 	dist = geomHelper->Get2DDistance(cluster.start_point, cluster.showering_point);      
       }
       else{
