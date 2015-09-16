@@ -148,11 +148,7 @@ print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
-<<<<<<< HEAD
-my_proc.run(9,1)
-=======
 my_proc.run()
->>>>>>> ba238cfbafca8aefed4b89f46f83c4563bdaf2e9
 # my_proc.process_event(2)
 
 
