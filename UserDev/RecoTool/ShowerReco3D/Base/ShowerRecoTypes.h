@@ -64,6 +64,7 @@ namespace showerreco {
       fOpeningAngle = 0;
       
       fTotalEnergy.clear();
+      fTotalEnergy = {kDOUBLE_MIN,kDOUBLE_MIN,kDOUBLE_MIN};
       fSigmaTotalEnergy.clear();
       fdEdx.clear();
       fdEdx = {kDOUBLE_MIN,kDOUBLE_MIN,kDOUBLE_MIN};
