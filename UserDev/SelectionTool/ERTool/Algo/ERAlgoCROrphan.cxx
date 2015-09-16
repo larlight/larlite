@@ -34,7 +34,6 @@ namespace ertool {
     ::geoalgo::HalfLine shower;
 
     for(auto const& id : graph.GetParticleNodes()) {
-    std::cout<<"Do we enter particle nodes loop? "<<std::endl; 
 
       auto& part = graph.GetParticle(id);
 
@@ -71,7 +70,6 @@ namespace ertool {
 	is_cosmic = IsCROrphan(data.Shower(part.RecoID()));
 
       if(is_cosmic) {
-	std::cout<<"Does this help at all " <<std::endl ;
 
 	graph.SetPrimary(id);
 	
