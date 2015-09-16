@@ -166,9 +166,9 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
       std::cout << "nonopt";
     std::cout << "\tN: " << convergeNumber.at(vecIndex);
     std::cout << std::endl;
-    for (unsigned int p = 0; p< planes.size();p++){
+    for (unsigned int p = 0; p < planes.size(); p++) {
       float slope = geomHelper -> Slope_3Dto2D(vec, planes[p]);
-      std::cout << "\t"<< p <<" - \tgoal:\t" << slopeByPlane.at(p) << "\tact:\t" << slope << "\n";     
+      std::cout << "\t" << p << " - \tgoal:\t" << slopeByPlane.at(p) << "\tact:\t" << slope << "\n";
     }
 
 
@@ -186,6 +186,58 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   // Set the best vector to direction:
   if (bestIndex != -1)
     resultShower.fDCosStart = seedVectors.at(bestIndex);
+  // else {
+  //   // In this case, none of the seeds converged.  Maxout seed vectors aren't useful, but
+  //   // the nonopt ones are.  We can try removing each plane and refitting all the vectors
+  //   // that were returned to see if they converge.
+  //   vecIndex = 0;
+  //   for (auto & vec : seedVectors ) {
+  //     // check the return value, skip max out vectors.:
+  //     if (convergeStatus.at(vecIndex) == kIterMaxOut)
+  //       continue;
+  //     // else {
+  //     //   std::cout << "Going into alternative fitting options" <<std::endl;
+  //     //   // try to fit this vector against the planes but remove one plane.
+  //     //   for (unsigned int i = 0; i < slopeByPlane.size(); i ++) {
+  //     //     // Make a temp slope and temp plane object for this case:
+  //     //     std::vector<float> tempSlopes;
+  //     //     std::vector<int> tempPlane;
+  //     //     for (unsigned int j = 0; j < slopeByPlane.size(); j++) {
+  //     //       if (i == j) continue;
+  //     //       tempSlopes.push_back(slopeByPlane.at(j));
+  //     //       tempPlane.push_back(planes.at(j));
+  //     //     }
+  //     //     // Now, try to make a fit of this vector:
+  //     //     Status exitStatus = kNStatus;
+  //     //     int n_iterations = 0;
+  //     //     errorVector.at(vecIndex) = optimzeVector(vec, exitStatus, n_iterations, tempSlopes, tempPlane);
+  //     //     convergeStatus.at(vecIndex) = exitStatus;
+  //     //     convergeNumber.at(vecIndex) = n_iterations;
+  //     //     // Print out what happened:
+  //     //     // Print out info about this vector:
+  //     //     std::cout << "Error: " << errorVector.at(vecIndex)
+  //     //               << "\tVec: (" << vec.X() << ", "
+  //     //               << vec.Y() << ", "
+  //     //               << vec.Z() << ")"
+  //     //               << "\tStatus: ";
+  //     //     if (convergeStatus.at(vecIndex) == kNormal)
+  //     //       std::cout << "normal";
+  //     //     if (convergeStatus.at(vecIndex) == kIterMaxOut)
+  //     //       std::cout << "maxout";
+  //     //     if (convergeStatus.at(vecIndex) == kNotOptFit)
+  //     //       std::cout << "nonopt";
+  //     //     std::cout << "\tN: " << convergeNumber.at(vecIndex);
+  //     //     std::cout << std::endl;
+  //     //     for (unsigned int p = 0; p < tempPlane.size(); p++) {
+  //     //       float slope = geomHelper -> Slope_3Dto2D(vec, tempPlane[p]);
+  //     //       std::cout << "\t" << p << " - \tgoal:\t" << tempSlopes.at(p) << "\tact:\t" << slope << "\n";
+  //     //     }
+  //     //   }
+  //     // }
+  //   }
+  //   vecIndex ++;
+  // }
+
 
   resultShower.fXYZStart = pointOnAxis;
 
