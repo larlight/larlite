@@ -33,7 +33,8 @@ namespace showerreco{
     // get the 3D direction reconstructed hopefully in a previous step
     auto const& dir3D = resultShower.fDCosStart;
 
-    std::cout << "dir3D: [" << dir3D[0] << ", " << dir3D[1] << ", " << dir3D[2] << "]" << std::endl;
+    if (_verbose)
+      std::cout << "dir3D: [" << dir3D[0] << ", " << dir3D[1] << ", " << dir3D[2] << "]" << std::endl;
 
     // we want an energy for each plane
     for (size_t n=0; n < inputShowers.size(); n++){

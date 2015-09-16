@@ -9,11 +9,12 @@
 
 namespace showerreco {
 
-void StartPoint3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Shower_t & resultShower) {
-
-	std::cout<<"\n\nIn do_reco of 3D start.... "<<std::endl ;
-
-	// This function takes the matched shower cluster set and computes the best fit 3D start point
+  void StartPoint3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Shower_t & resultShower) {
+    
+    if (_verbose)
+      std::cout<<"\n\nIn do_reco of 3D start.... "<<std::endl ;
+    
+    // This function takes the matched shower cluster set and computes the best fit 3D start point
 	// and then assigns it to the shower
 	auto geomHelper = larutil::GeometryHelper::GetME();
 	auto detProp = larutil::DetectorProperties::GetME() ;

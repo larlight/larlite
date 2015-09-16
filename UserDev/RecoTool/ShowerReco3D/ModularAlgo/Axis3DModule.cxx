@@ -171,7 +171,8 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
 
     // Loop over all possible pair of planes.
 
-    std::cout << "Running alternate axis finding..." << std::endl;
+    if (_verbose)
+      std::cout << "Running alternate axis finding..." << std::endl;
 
     std::vector<int> bestIndexAlt;
     std::vector<float> bestErrorAlt;
