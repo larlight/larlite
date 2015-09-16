@@ -187,6 +187,17 @@ public:
     /**
      * @brief Calculate the shortest distance between a line and a point in 2D
      *
+     * @param pointOnLine Point2D - Any point on the line of interest
+     * @param directionOfLine Point2D - The direction of the line of interest
+     * @param targetPoint Point2D - The point from which the closest distance is calculated
+     * @return the distance between the point and the line in centimeters
+     */
+    float DistanceToLine2D( const Point2D & pointOnLine, const Point2D & directionOfLine,
+                            const Hit2D & targetPoint) const;
+
+    /**
+     * @brief Calculate the shortest distance between a line and a point in 2D
+     *
      * @param pointOnLine  TVector2 - Any point on the line of interest
      * @param directionOfLine  TVector2 - The direction of the line of interest
      * @param targetPoint  TVector2 - The point from which the closest distance is calculated
@@ -341,6 +352,28 @@ public:
             const float & distancePerpToLine,
             const float & lineSlope,
             Hit2D & averagePoint ) const;
+
+    /**
+     * @brief calculate the peprendicular distance from a point to aline
+     * @param pt = point for which to calculate the perpendicular distance
+     * @param slope = slope of line
+     * @param intercept = intercept of line with y-axis
+     * @return 2D perpendicular distance in cm
+     */
+    double PerpendicularDistance(const Point2D& pt,
+				 const double& slope,
+				 const double& intercept) const;
+
+    /**
+     * @brief calcualte the perpendicular distance from a point to a line
+     * @param pt = point for which to calculate the perpendicular distance
+     * @param slope = slope of line
+     * @param anchor = point on line to anchor the line
+     * @return 2D perpendicular distance in cm
+     */
+    double PerpendicularDistance(const Point2D& pt,
+				 const double& slope,
+				 const Point2D& anchor) const;
 
     /**
      * @brief deterimine if a point is in the TPC

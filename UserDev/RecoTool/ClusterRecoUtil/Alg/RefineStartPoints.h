@@ -31,30 +31,20 @@ namespace cluster {
   public:
 
     /// Default constructor
-    RefineStartPoints(){_name = "RefineStartPoints";}
+    RefineStartPoints();
 
     /// Default destructor
     ~RefineStartPoints(){}
 
-
-    /**
-     * Calculates the following variables:
-     * length
-     * width
-     * hit_density_1D
-     * hit_density_2D
-     * direction
-     * start_point
-     * end_point
-     * @param override [description]
-     */
     void do_params_fill(cluster_params &);
+
+    void SetMaxPerpDist(double d) { _max_d_perp = d; }
 
   private:
 
-    // The following variables are used to select the local hit list
-    float linearDistance;
-    float orthogDistance;
+    /// maximum perpendicular distance squared
+    /// to the start_dir line anchored at the start point
+    double _max_d_perp;
 
   };
 

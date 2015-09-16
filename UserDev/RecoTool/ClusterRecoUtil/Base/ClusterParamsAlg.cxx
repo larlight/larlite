@@ -18,15 +18,6 @@ namespace cluster{
     TStopwatch localWatch;
 
 
-    // Make sure the result cluster has the right size of all it's elements
-    // auto geom = larutil::Geometry::GetME();
-    // int nPlanes = geom -> Nplanes();
-    // result.fTotalEnergy.resize(nPlanes);
-    // result.fSigmaTotalEnergy.resize(nPlanes);
-    // result.fdEdx.resize(nPlanes);
-    // result.fSigmadEdx.resize(nPlanes);
-    // result.fTotalMIPEnergy.resize(nPlanes);
-    // result.fSigmaTotalMIPEnergy.resize(nPlanes);
     
     cluster_params localCopy;
     if (_debug)
