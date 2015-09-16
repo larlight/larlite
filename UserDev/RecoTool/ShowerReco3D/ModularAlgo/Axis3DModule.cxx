@@ -152,22 +152,24 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   vecIndex = 0;
   for (auto & vec : seedVectors) {
     // Print out info about this vector:
-    std::cout << "Error: " << errorVector.at(vecIndex)
-              << "\tVec: (" << vec.X() << ", "
-              << vec.Y() << ", "
-              << vec.Z() << ")"
-              << "\tStatus: ";
-    if (convergeStatus.at(vecIndex) == kNormal)
-      std::cout << "normal";
-    if (convergeStatus.at(vecIndex) == kIterMaxOut)
-      std::cout << "maxout";
-    if (convergeStatus.at(vecIndex) == kNotOptFit)
-      std::cout << "nonopt";
-    std::cout << "\tN: " << convergeNumber.at(vecIndex);
-    std::cout << std::endl;
-    for (unsigned int p = 0; p < planes.size(); p++) {
-      float slope = geomHelper -> Slope_3Dto2D(vec, planes[p]);
-      std::cout << "\t" << p << " - \tgoal:\t" << slopeByPlane.at(p) << "\tact:\t" << slope << "\n";
+    if (_verbose) {
+      std::cout << "Error: " << errorVector.at(vecIndex)
+                << "\tVec: (" << vec.X() << ", "
+                << vec.Y() << ", "
+                << vec.Z() << ")"
+                << "\tStatus: ";
+      if (convergeStatus.at(vecIndex) == kNormal)
+        std::cout << "normal";
+      if (convergeStatus.at(vecIndex) == kIterMaxOut)
+        std::cout << "maxout";
+      if (convergeStatus.at(vecIndex) == kNotOptFit)
+        std::cout << "nonopt";
+      std::cout << "\tN: " << convergeNumber.at(vecIndex);
+      std::cout << std::endl;
+      for (unsigned int p = 0; p < planes.size(); p++) {
+        float slope = geomHelper -> Slope_3Dto2D(vec, planes[p]);
+        std::cout << "\t" << p << " - \tgoal:\t" << slopeByPlane.at(p) << "\tact:\t" << slope << "\n";
+      }
     }
 
 
@@ -241,27 +243,28 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   resultShower.fXYZStart = pointOnAxis;
 
 
-  std::cout << "FINAL RESULT: \n";
+  if (_verbose) {
+    std::cout << "FINAL RESULT: \n";
 
-  std::cout
-  // << "True vector: ("
-  // << knownAxis.X() << ", "
-  // << knownAxis.Y() << ", "
-  // << knownAxis.Z() << "), "
-      << "Calculated vector: ("
-      << resultShower.fDCosStart.X() << ", "
-      << resultShower.fDCosStart.Y() << ", "
-      << resultShower.fDCosStart.Z() << ").\n";
-  // << " Difference is " << acos(knownAxis.Dot(resultShower.fDCosStart)) << " radians.\n";
+    std::cout
+    // << "True vector: ("
+    // << knownAxis.X() << ", "
+    // << knownAxis.Y() << ", "
+    // << knownAxis.Z() << "), "
+        << "Calculated vector: ("
+        << resultShower.fDCosStart.X() << ", "
+        << resultShower.fDCosStart.Y() << ", "
+        << resultShower.fDCosStart.Z() << ").\n";
+    // << " Difference is " << acos(knownAxis.Dot(resultShower.fDCosStart)) << " radians.\n";
 
-  for (unsigned int i = 0; i < inputShowers.size(); i++) {
-    larutil::PxPoint start2D, dir2D;
-    geomHelper -> Line_3Dto2D(pointOnAxis, resultShower.fDCosStart, planes[i], start2D, dir2D);
-    std::cout << "\tIn plane " << planes[i] << ", the projection is "
-              << (dir2D.t / dir2D.w) << ", the target is "
-              << slopeByPlane[i] << ".\n";
+    for (unsigned int i = 0; i < inputShowers.size(); i++) {
+      larutil::PxPoint start2D, dir2D;
+      geomHelper -> Line_3Dto2D(pointOnAxis, resultShower.fDCosStart, planes[i], start2D, dir2D);
+      std::cout << "\tIn plane " << planes[i] << ", the projection is "
+                << (dir2D.t / dir2D.w) << ", the target is "
+                << slopeByPlane[i] << ".\n";
+    }
   }
-
 
   return;
 
@@ -311,21 +314,21 @@ float Axis3DModule::optimzeVector(TVector3 & inputVector,
       current_error = error;
       // If there was improvement, make sure that nSteps is
       // set to its min value:
-      nSteps = nStepsStart;
+      nSteps = _nStepsStart;
       // For theta range, since that is the convergence speed, set it to
-      // the max of it's min value and alpha*currentValue:
-      thetaRange = fmin(thetaRangeStart, alpha * thetaRange);
+      // the max of it's min value and _alpha*currentValue:
+      thetaRange = fmin(_thetaRangeStart, _alpha * thetaRange);
       if (thetaRange < _thetaRangeMin) thetaRange = _thetaRangeMin;
     }
     // Else things didn't improve
     else {
       // This step didn't help. Try to increase the granularity first:
       if (nSteps < nStepsMax) {
-        nSteps += nStepsStart;
+        nSteps += _nStepsStart;
       }
       // If that fails, perhaps need to look at smaller angles:
       else if (thetaRange > _thetaRangeMin) {
-        thetaRange *= alpha;
+        thetaRange *= _alpha;
       }
       else {
         // Both nSteps and theta range are maxed out.  Bail on this point.
