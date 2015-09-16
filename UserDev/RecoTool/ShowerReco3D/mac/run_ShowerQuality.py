@@ -26,17 +26,17 @@ my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 my_proc.set_ana_output_file("ShowerQuality_ana_out.root");
 
 # Specify data output root file name
-my_proc.set_output_file("outfile.root")
+my_proc.set_output_file('')
 
 # Create analysis unit
 sq_module = fmwk.ShowerQuality()
-sq_module.setMCShowerQuality(True)
+#sq_module.setMCShowerQuality(True)
 sq_module.SetShowerProducer("showerreco")
 #sq_module.SetShowerProducer("showermergeall")
 
 sq_module.SetMaxEnergyCut(99999999.)
 sq_module.SetMinEnergyCut(0.)
-
+sq_module.setSingleParticleQuality(True)
 my_proc.add_process(sq_module)
 
 print
