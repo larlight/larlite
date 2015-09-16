@@ -94,8 +94,8 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
 
   TVector3 prevDir = direction;
 
-  std::vector<TVector3> tempSeedVectors;
-  generateSeedVectors(direction, M_PI / 2.0, fNStepsInitial, tempSeedVectors);
+  if (globalSeedVectors.size() == 0)
+    generateSeedVectors(direction, M_PI / 2.0, fNStepsInitial, globalSeedVectors);
 
   // maintain a list of the good seeds and the errors of the seed vectors too:
   std::vector<TVector3> seedVectors;
@@ -103,14 +103,14 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   std::vector<Status>   convergeStatus;
   std::vector<int>      convergeNumber;
   int                   n_converged(0);
-  
+
   // Keep the best vector with the best error;
   int bestIndex = -1;
   float bestError = 9999;
 
   findSeedVectors(tempSeedVectors, seedVectors, errorVector, convergeStatus, convergeNumber,
                   n_converged, planes, slopeByPlane, bestIndex, bestError);
-  
+
   // Set the best vector to direction:
   if (bestIndex != -1)
     resultShower.fDCosStart = seedVectors.at(bestIndex);
@@ -118,15 +118,15 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   // In this case, none of the seeds converged.  Maxout seed vectors aren't useful, but
   // the nonopt ones are.  We can try removing each plane and refitting all the vectors
   // that were returned to see if they converge.
-  
+
   // Loop over all possible pair of planes.
-  
+
   std::cout << "Running alternate axis finding..." << std::endl;
   for (unsigned int i = 0; i < planes.size(); i++) {
-    
+
     std::vector<float> slopeByPlaneAlt;
     std::vector<int> planesAlt;
-    
+
     for (unsigned int j = 0; j < planes.size(); j++) {
       if (i == j) continue;
       else {
@@ -167,12 +167,12 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
     //        }
     //        errorCutoff += _seedVectorErrorCutoff;
     //      }
-    
+
   }
-  
-  
-  
-    
+
+
+
+
 //    vecIndex = 0;
 //    for (auto & vec : seedVectors ) {
 //      // check the return value, skip max out vectors.:
@@ -223,7 +223,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
 
 
   resultShower.fXYZStart = pointOnAxis;
-  
+
   if (_verbose) {
     std::cout << "FINAL RESULT: \n";
 
@@ -432,7 +432,7 @@ void Axis3DModule::generateSeedVectors(const TVector3 & initialVector,
 
 }
 int Axis3DModule::findBestVector( const std::vector<TVector3> seedVectors,
-                                 const std::vector<float> & slopesByPlane,
+                                  const std::vector<float> & slopesByPlane,
                                   const std::vector<int> & planes) {
 
   // Loop over the vectors, calculate the error, and return the one with smallest error
@@ -479,47 +479,47 @@ float Axis3DModule::getErrorOfProjection( const TVector3 & inputVector,
   return err;
 
 }
-  
-  void Axis3DModule::findSeedVectors(const std::vector<TVector3> & tempSeedVectors,
-                                     std::vector<TVector3> & seedVectors,
-                                     std::vector<float> & errorVector,
-                                     std::vector<Status> & convergeStatus,
-                                     std::vector<int> & convergeNumber,
-                                     int & n_converged,
-                                     const std::vector<int> & planes,
-                                     const std::vector<float> & slopeByPlane,
-                                     int & bestIndex,
-                                     float & bestError)
+
+void Axis3DModule::findSeedVectors(const std::vector<TVector3> & tempSeedVectors,
+                                   std::vector<TVector3> & seedVectors,
+                                   std::vector<float> & errorVector,
+                                   std::vector<Status> & convergeStatus,
+                                   std::vector<int> & convergeNumber,
+                                   int & n_converged,
+                                   const std::vector<int> & planes,
+                                   const std::vector<float> & slopeByPlane,
+                                   int & bestIndex,
+                                   float & bestError)
 {
-    auto geomHelper = larutil::GeometryHelper::GetME();
-    float errorCutoff = _seedVectorErrorCutoff;
-    
-    // Find out the seed vectors with reasonable error, and reject all the others
-    while (seedVectors.size() == 0) {
-      for (auto & vec : tempSeedVectors) {
-        float error = getErrorOfProjection(vec, slopeByPlane, planes);
-        if (error < errorCutoff) {
-          seedVectors.push_back(vec);
-          errorVector.push_back(error);
-          // std::cout << "vector "
-          //           << vec.X() << ", "
-          //           << vec.Y() << ", "
-          //           << vec.Z() << ")., error " << error
-          //           << " was kept\n";
-        }
-        // else {
-        //   std::cout << "vector "
-        //             << vec.X() << ", "
-        //             << vec.Y() << ", "
-        //             << vec.Z() << ")., error " << error
-        //             << " was rejected\n";
-        // }
+  auto geomHelper = larutil::GeometryHelper::GetME();
+  float errorCutoff = _seedVectorErrorCutoff;
+
+  // Find out the seed vectors with reasonable error, and reject all the others
+  while (seedVectors.size() == 0) {
+    for (auto & vec : tempSeedVectors) {
+      float error = getErrorOfProjection(vec, slopeByPlane, planes);
+      if (error < errorCutoff) {
+        seedVectors.push_back(vec);
+        errorVector.push_back(error);
+        // std::cout << "vector "
+        //           << vec.X() << ", "
+        //           << vec.Y() << ", "
+        //           << vec.Z() << ")., error " << error
+        //           << " was kept\n";
       }
-      errorCutoff += _seedVectorErrorCutoff;
+      // else {
+      //   std::cout << "vector "
+      //             << vec.X() << ", "
+      //             << vec.Y() << ", "
+      //             << vec.Z() << ")., error " << error
+      //             << " was rejected\n";
+      // }
     }
-  
+    errorCutoff += _seedVectorErrorCutoff;
+  }
+
   // Now the list of seed vectors is reduced to a few candidate vectors that are close
-  
+
   int vecIndex = 0;
   for (auto & vec : seedVectors) {
     Status exitStatus = kNStatus;
@@ -531,17 +531,17 @@ float Axis3DModule::getErrorOfProjection( const TVector3 & inputVector,
       n_converged++;
     vecIndex ++;
   }
-  
+
   // Print out the final vectors and their errors:
   vecIndex = 0;
   for (auto & vec : seedVectors) {
     // Print out info about this vector:
     if (_verbose) {
       std::cout << "Error: " << errorVector.at(vecIndex)
-      << "\tVec: (" << vec.X() << ", "
-      << vec.Y() << ", "
-      << vec.Z() << ")"
-      << "\tStatus: ";
+                << "\tVec: (" << vec.X() << ", "
+                << vec.Y() << ", "
+                << vec.Z() << ")"
+                << "\tStatus: ";
       if (convergeStatus.at(vecIndex) == kNormal)
         std::cout << "normal";
       if (convergeStatus.at(vecIndex) == kIterMaxOut)
@@ -555,7 +555,7 @@ float Axis3DModule::getErrorOfProjection( const TVector3 & inputVector,
         std::cout << "\t" << p << " - \tgoal:\t" << slopeByPlane.at(p) << "\tact:\t" << slope << "\n";
       }
     }
-    
+
     if ( convergeStatus.at(vecIndex) == kNormal ) {
       if (errorVector.at(vecIndex) < bestError) {
         bestIndex = vecIndex;
@@ -563,7 +563,7 @@ float Axis3DModule::getErrorOfProjection( const TVector3 & inputVector,
       }
     }
     vecIndex ++;
-  
+
   }
 }
 
