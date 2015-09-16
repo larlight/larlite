@@ -27,6 +27,8 @@ namespace ertool {
     	_event_tree->Branch("event",&_event,"event/I");
     	_event_tree->Branch("ctr_cosmic",&_ctr_cosmic,"ctr_cosmic/I");
     	_event_tree->Branch("ctr_non_cosmic",&_ctr_non_cosmic,"ctr_non_cosmic/I");
+    	_event_tree->Branch("ctr_cosmic_w_secondaries",&_ctr_cosmic_w_secondaries,"ctr_cosmic_w_secondaries/I");
+    	_event_tree->Branch("ctr_non_cosmic_w_sec",&_ctr_non_cosmic_w_sec,"ctr_non_cosmic_w_sec/I");
     }
     
     if ( !_part_tree ){
@@ -80,6 +82,9 @@ namespace ertool {
    _event = -99;
    _ctr_cosmic = 0 ;
    _ctr_non_cosmic = 0 ;
+   _ctr_cosmic_w_secondaries = 0;
+   _ctr_non_cosmic_w_sec = 0;
+	
 
   }
 
@@ -122,7 +127,6 @@ namespace ertool {
     	_event  = data.Event_ID() ;
 
         auto const& t = data.Track(p.RecoID());
-	std::cout<<"PDG code: "<<p.PdgCode() <<std::endl;
 
     	_pdg = p.PdgCode() ; 
     	_primary = p.Primary() ; 
@@ -137,16 +141,17 @@ namespace ertool {
 	_py = t.at(0).Dir()[1];
 	_pz = t.at(0).Dir()[2];
 
-	std::cout<<"Vertices: "<<p.Vertex()[0]
-				<<p.Vertex()[1]
-				<<p.Vertex()[2]<<std::endl ;
-	std::cout<<"End: "<<_end_x<<", "<<_end_y<<", "<<_end_z<<std::endl;
 	_part_tree->Fill(); 
 
 	if (p.ProcessType() == kCosmic )
 	    _ctr_cosmic++;
 	else
 	    _ctr_non_cosmic++;
+
+	if ( p.ProcessType() == kCosmic || graph.GetParticle(p.Ancestor()).ProcessType() == kCosmic)	
+	    _ctr_cosmic_w_secondaries++;
+	else 
+	    _ctr_non_cosmic_w_sec++;
 
 	
 	} 
@@ -160,6 +165,7 @@ namespace ertool {
         auto const& t = data.Track(graph.GetParticle(track).RecoID());
 
 	_ctr_child = graph.GetAllDescendantNodes(track).size();
+	std::cout<<" Child ctr: "<<_ctr_child << std::endl ;
 
         ::geoalgo::HalfLine trk(t.at(0),t.at(0).Dir()); //Start().Position(),t.Start().Momentum());
 
@@ -191,7 +197,6 @@ namespace ertool {
             _distBackAlongTraj = 0;
             _distToTopWall = (_int_y - detHalfHeight)/t.at(0).Dir()[1] ;
 
-//	    std::cout<<"If we're here, what are x,y,z: "<<_int_x<<", "<<_int_y<<", "<<_int_z<<std::endl ;
 	    }
 //	else
 //	    ResetIntTree();
@@ -226,7 +231,6 @@ namespace ertool {
       auto py = p[1];
       auto pz = p[2];
 
-      std::cout<<"PX, py, pz: "<<px<<", "<<py<<", "<<pz<<std::endl;
       double quad = py/pz  ;
       double convert = 180.0/ 3.1415926525898 ;
 
