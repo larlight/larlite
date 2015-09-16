@@ -68,6 +68,18 @@ namespace larlite {
 
 
     event_mctruth * event_truth = storage -> get_data<event_mctruth>("generator");
+    
+    if (!event_truth){
+      print(msg::kERROR,__FUNCTION__,
+        "MCTruth info not found in the event!\nLikely you didn't include the mcinfo files, which are necessary.\n");
+      throw std::exception();
+    }
+    if (!event_truth->size()){
+      print(msg::kERROR,__FUNCTION__,
+        "For some reason, MCTruth has size zero. Figure out why!\n");
+      throw std::exception();
+    }
+    
     auto truth = event_truth -> at(0);
     if ( truth.GetNeutrino().CCNC() == 1){
       return false;
