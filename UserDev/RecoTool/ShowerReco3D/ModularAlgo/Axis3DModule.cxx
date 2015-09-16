@@ -66,6 +66,8 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   // //########################################################
 
 
+
+
   //########################################################
   //For real
   //########################################################
@@ -112,8 +114,8 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
 
 
   findSeedVectors(seedVectors, errorVector, planes, slopeByPlane);
-  
-  // Now the list of seed vectors is reduced to a few candidate vectors that are close  
+
+  // Now the list of seed vectors is reduced to a few candidate vectors that are close
   int vecIndex = 0;
   for (auto & vec : seedVectors) {
     Status exitStatus = kNStatus;
@@ -124,17 +126,17 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
     if (exitStatus == kNormal)
       n_converged++;
     vecIndex ++;
-  }  
+  }
   // Print out the final vectors and their errors:
   vecIndex = 0;
   for (auto & vec : seedVectors) {
     // Print out info about this vector:
     if (_verbose) {
       std::cout << "Error: " << errorVector.at(vecIndex)
-      << "\tVec: (" << vec.X() << ", "
-      << vec.Y() << ", "
-      << vec.Z() << ")"
-      << "\tStatus: ";
+                << "\tVec: (" << vec.X() << ", "
+                << vec.Y() << ", "
+                << vec.Z() << ")"
+                << "\tStatus: ";
       if (convergeStatus.at(vecIndex) == kNormal)
         std::cout << "normal";
       if (convergeStatus.at(vecIndex) == kIterMaxOut)
@@ -148,7 +150,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
         std::cout << "\t" << p << " - \tgoal:\t" << slopeByPlane.at(p) << "\tact:\t" << slope << "\n";
       }
     }
-    
+
     if ( convergeStatus.at(vecIndex) == kNormal ) {
       if (errorVector.at(vecIndex) < bestError) {
         bestIndex = vecIndex;
@@ -156,9 +158,9 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
       }
     }
     vecIndex ++;
-    
+
   }
-  
+
   // Set the best vector to direction:
   if (bestIndex != -1)
     resultShower.fDCosStart = seedVectors.at(bestIndex);
@@ -362,7 +364,11 @@ float Axis3DModule::optimzeVector(TVector3 & inputVector,
       else {
         // Both nSteps and theta range are maxed out.  Bail on this point.
         // std::cout << "bailing because both maxed out.\n";
-        exitStatus = kNotOptFit;
+        // Determine whether this fit reached the acceptable range or not:
+        if (current_error < _normalErrorRange)
+          exitStatus = kNormal;
+        else
+          exitStatus = kNotOptFit;
         return current_error;
       }
     }
@@ -528,14 +534,14 @@ float Axis3DModule::getErrorOfProjection( const TVector3 & inputVector,
 
 }
 
-  
+
 void Axis3DModule::findSeedVectors(std::vector<TVector3> & seedVectors,
                                    std::vector<float> & errorVector,
                                    const std::vector<int> & planes,
                                    const std::vector<float> & slopeByPlane)
 {
   float errorCutoff = _seedVectorErrorCutoff;
-  
+
   // Find out the seed vectors with reasonable error, and reject all the others
   while (seedVectors.size() == 0) {
     for (auto & vec : _globalSeedVectors) {
@@ -562,7 +568,7 @@ void Axis3DModule::findSeedVectors(std::vector<TVector3> & seedVectors,
     errorCutoff += _seedVectorErrorCutoff;
   }
 }
-  
+
 } //showerreco
 
 #endif

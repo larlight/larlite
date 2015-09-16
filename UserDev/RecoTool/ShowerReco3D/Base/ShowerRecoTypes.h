@@ -10,6 +10,22 @@
 namespace showerreco {
 
 
+  /// Utility: maximum value for double 
+  const double kDOUBLE_MAX = std::numeric_limits<double>::max();
+  
+  /// Utility: minimum value for double
+  const double kDOUBLE_MIN = std::numeric_limits<double>::min();
+
+  /// Utility: maximum value for int
+  const int    kINT_MAX    = std::numeric_limits<int>::max();
+  
+  /// Utility: maximum value for unsigned int
+  const unsigned int kUINT_MAX    = std::numeric_limits<unsigned int>::max();
+
+  /// Utility: maximum value for size_t
+  const size_t kSIZE_MAX   = std::numeric_limits<size_t>::max();
+
+
   /// Input matched cluster set representation for shower reco algorithms
   typedef std::vector<cluster::cluster_params> ShowerClusterSet_t;
 
@@ -38,18 +54,20 @@ namespace showerreco {
 
     void Reset() {
       
-      fDCosStart[0] = fDCosStart[1] = fDCosStart[2] = -1;
-      fSigmaDCosStart[0] = fSigmaDCosStart[1] = fSigmaDCosStart[2] = -1;
+      fDCosStart[0] = fDCosStart[1] = fDCosStart[2] = kDOUBLE_MIN;
+      fSigmaDCosStart[0] = fSigmaDCosStart[1] = fSigmaDCosStart[2] = kDOUBLE_MIN;
 
-      fXYZStart[0] = fXYZStart[1] = fXYZStart[2] = -1;
-      fSigmaXYZStart[0] = fSigmaXYZStart[1] = fSigmaXYZStart[2] = -1;
+      fXYZStart[0] = fXYZStart[1] = fXYZStart[2] = kDOUBLE_MIN;
+      fSigmaXYZStart[0] = fSigmaXYZStart[1] = fSigmaXYZStart[2] = kDOUBLE_MIN;
 
-      fLength = -1;
+      fLength = kDOUBLE_MIN;
       fOpeningAngle = 0;
       
       fTotalEnergy.clear();
+      fTotalEnergy = {kDOUBLE_MIN,kDOUBLE_MIN,kDOUBLE_MIN};
       fSigmaTotalEnergy.clear();
       fdEdx.clear();
+      fdEdx = {kDOUBLE_MIN,kDOUBLE_MIN,kDOUBLE_MIN};
       fShoweringLength.clear();
       fSigmadEdx.clear();
       fTotalMIPEnergy.clear();
