@@ -17,6 +17,8 @@
 #include <iostream>
 #include "ShowerRecoException.h"
 #include "ShowerRecoTypes.h"
+#include "TTree.h"
+#include "TFile.h"
 
 namespace showerreco {
 
@@ -43,6 +45,12 @@ namespace showerreco {
     
     /// Verbosity switch
     void Verbose(bool on=true);
+
+    /// finalize function to write trees
+    virtual void Finalize(TFile* fout) = 0;
+
+    /// initialize function
+    virtual void Initialize() = 0;
 
   protected:
 
