@@ -17,7 +17,8 @@
 #include <iostream>
 #include "ShowerReco3D/Base/ShowerRecoAlgBase.h"
 #include "ShowerRecoModuleBase.h"
-
+#include "TTree.h"
+#include "TFile.h"
 
 /**
    \class ShowerRecoAlgModular
@@ -112,6 +113,16 @@ namespace showerreco {
      * @param b true or false to turn on or off debug mode.  Default for the whole class is off, default for this function is on
      */
     void SetDebug(bool b = true){_debug = b;}
+
+    /**
+     * @brief function to finalize the algorithm -> basically used to write each modular algo's trees
+     */
+    void Finalize(TFile* fout);
+
+    /**
+     * @brief function to initialize the algorithm -> basically used to create the tree
+     */
+    void Initialize();
 
   private:
 

@@ -149,6 +149,30 @@ std::vector<std::string> cluster_params::GetFANNVectorTitle() {
 
 }
 
+
+void  cluster_params::PrintFANNVector() {
+  std::vector<float> data;
+  GetFANNVector(data);
+  // if(verbose){
+  int i = 0;
+  std::cout << "Printing FANN input vector:\n";
+  std::cout << "   Opening - Closing Angle (normalized)  ... : " << data[i] << "\n"; i++;
+  // std::cout << "   Opening - Closing Angle charge weight  .. : " << data[i] << "\n"; i++;
+  // std::cout << "   Closing Angle (normalized)  ............. : " << data[i] << "\n"; i++;
+  // std::cout << "   Closing Angle charge weight  ............ : " << data[i] << "\n"; i++;
+  std::cout << "   Principal Eigenvalue  ................... : " << data[i] << "\n"; i++;
+  // std::cout << "   Secondary Eigenvalue  ................... : " << data[i] << "\n"; i++;
+  std::cout << "   Width / Length  ......................... : " << data[i] << "\n"; i++;
+  // std::cout << "   Hit Density / M.H.D.  ................... : " << data[i] << "\n"; i++;
+  std::cout << "   Percent MultiHit Wires  ................. : " << data[i] << "\n"; i++;
+  // std::cout << "   Percent High Charge Hits  ............... : " << data[i] << "\n"; i++;
+  std::cout << "   Modified Hit Density  ................... : " << data[i] << "\n"; i++;
+  std::cout << "   Charge RMS / Mean Charge ................ : " << data[i] << "\n"; i++;
+  std::cout << "   log(Sum Charge / Length) ................ : " << data[i] << "\n"; i++;
+  // }
+  return;
+}
+
 void cluster_params::ReportDiff(const cluster_params & otherCluster) {
 
 

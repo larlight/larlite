@@ -2,7 +2,7 @@
  * \file ShowerRecoManager.h
  *
  * \ingroup ShowerReco3D
- * 
+ *
  * \brief Class def header for a class ShowerRecoManager
  *
  * @author kazuhiro
@@ -17,72 +17,78 @@
 #include <iostream>
 #include <TFile.h>
 #include "CMTool/CMToolBase/CMatchManager.h"
+#include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
 #include "ShowerRecoException.h"
 #include "ShowerRecoAlgBase.h"
 #include "ShowerAnaBase.h"
 
 namespace showerreco {
 
-  typedef std::vector<std::vector<unsigned int> > ClusterAss_t;
+typedef std::vector<std::vector<unsigned int> > ClusterAss_t;
 
-  typedef std::vector< ::larutil::PxHit> PxHitSet_t;
+typedef std::vector< ::Hit2D> PxHitSet_t;
 
-  /**
-     \class ShowerRecoManager
-     User defined class ShowerRecoManager ... these comments are used to generate
-     doxygen documentation!
-  */
-  class ShowerRecoManager{
-    
-  public:
-    
-    /// Default constructor
-    ShowerRecoManager();
-    
-    /// Default destructor
-    ~ShowerRecoManager(){}
+/**
+   \class ShowerRecoManager
+   User defined class ShowerRecoManager ... these comments are used to generate
+   doxygen documentation!
+*/
+class ShowerRecoManager {
 
-    /// Add shower reconstruction algorithm
-    void AddAlgo(ShowerRecoAlgBase* alg) { _alg_v.push_back(alg); }
+public:
 
-    /// Add shower analysis class
-    void AddAna(ShowerAnaBase* ana) { _ana_v.push_back(ana); }
+  /// Default constructor
+  ShowerRecoManager();
 
-    /// Per event "Reset"
-    void Reset();
+  /// Default destructor
+  ~ShowerRecoManager() {}
 
-    /// Reconstruct shower w/ matching: return is a matched cluster association
-    ClusterAss_t Reconstruct (const std::vector<std::vector<larutil::PxHit> >& clusters,
-			      std::vector< ::showerreco::Shower_t>& showers);
+  /// Add shower reconstruction algorithm
+  void AddAlgo(ShowerRecoAlgBase* alg) { _alg_v.push_back(alg); }
 
-    /// Reconstruct shower w/ matched clusters
-    void Reconstruct (const std::vector<std::vector<larutil::PxHit> >& clusters,
-		      const ClusterAss_t& ass,
-		      std::vector< ::showerreco::Shower_t>& showers);
+  /// Add shower analysis class
+  void AddAna(ShowerAnaBase* ana) { _ana_v.push_back(ana); }
 
-    /// Access to MatchManager
-    ::cmtool::CMatchManager& MatchManager() { return *fMatchMgr; }
+  /// Per event "Reset"
+  void Reset();
 
-    /// Finalize: provide TFile access so that anything that needs to be stored can be stored
-    void Finalize(TFile* fout=nullptr);
+  /// Reconstruct shower w/ matching: return is a matched cluster association
+  ClusterAss_t Reconstruct (const std::vector<std::vector<Hit2D> >& clusters,
+                            std::vector< ::showerreco::Shower_t>& showers);
 
-  private:
-    
-    /// Shower reconstruction algorithm
-    std::vector< ::showerreco::ShowerRecoAlgBase* > _alg_v;
+  /// Reconstruct shower w/ matched clusters
+  void Reconstruct (const std::vector<std::vector<Hit2D> >& clusters,
+                    const ClusterAss_t& ass,
+                    std::vector< ::showerreco::Shower_t>& showers);
 
-    /// Shower analysis code
-    std::vector< ::showerreco::ShowerAnaBase* > _ana_v;
+  /// Access to MatchManager
+  ::cmtool::CMatchManager& MatchManager() { return *fMatchMgr; }
 
-    /// Cluster matching code
-    ::cmtool::CMatchManager *fMatchMgr;
+  /// Finalize: provide TFile access so that anything that needs to be stored can be stored
+  void Finalize(TFile* fout = nullptr);
 
-    void Process(const ClusterAss_t& ass,
-		 std::vector< ::showerreco::Shower_t >& showers);
-    
-  };
+  // initalize function
+  void Initialize();
+
+private:
+
+  /// Shower reconstruction algorithm
+  std::vector< ::showerreco::ShowerRecoAlgBase* > _alg_v;
+
+  /// Shower analysis code
+  std::vector< ::showerreco::ShowerAnaBase* > _ana_v;
+
+  /// Cluster matching code
+  ::cmtool::CMatchManager *fMatchMgr;
+
+  void Process(const ClusterAss_t& ass,
+               std::vector< ::showerreco::Shower_t >& showers);
+
+  ::cluster::DefaultParamsAlg _params_alg;
+
+};
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

@@ -54,17 +54,17 @@ public:
   /// Set minimum energy for MCShowers to be considered
   void SetMinEnergyCut(const double energy) { _mc_energy_min = energy; }
 
-  /** 
+  /**
       Initialization method to be called before the analysis event loop.
   */
   virtual bool initialize();
 
-  /** 
+  /**
       Analyze a data event-by-event
   */
   virtual bool analyze(storage_manager* storage);
 
-  /** 
+  /**
       Finalize method to be called after all events processed.
   */
   virtual bool finalize();
@@ -142,28 +142,28 @@ protected:
 
     double reco_x, reco_y, reco_z;
     double reco_dcosx, reco_dcosy, reco_dcosz;
-    double reco_energy;
-    double reco_energy_U;
-    double reco_energy_V;
-    double reco_energy_Y;
-    double reco_dedx;
-    double reco_dedx_U;
-    double reco_dedx_V;
-    double reco_dedx_Y;
-    int    best_plane_id;
+    // double reco_energy;
+    // double reco_energy_U;
+    // double reco_energy_V;
+    // double reco_energy_Y;
+    // double reco_dedx;
+    // double reco_dedx_U;
+    // double reco_dedx_V;
+    // double reco_dedx_Y;
+    // int    best_plane_id;
 
     double mc_x, mc_y, mc_z;
     double mc_dcosx, mc_dcosy, mc_dcosz;
-    double mc_energy;
-    int    mc_pdgid;
+    // double mc_energy;
+    // int    mc_pdgid;
 
     double mc_reco_anglediff;
     double mc_reco_dist;
 
-    double mc_containment;
-    double match_correctness;
-    double cluster_eff;
-    double cluster_pur;
+    // double mc_containment;
+    // double match_correctness;
+    // double cluster_eff;
+    // double cluster_pur;
 
   } fTreeParams;
 
