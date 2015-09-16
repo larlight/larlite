@@ -26,6 +26,7 @@ namespace showerreco{
     _tree->Branch("_ShowW",&_ShowW,"ShowW/D");
     _tree->Branch("_ShowT",&_ShowT,"ShowT/D");
     _tree->Branch("_length",&_length,"length/D");
+    _tree->Branch("_BestdQdx",&_BestdQdx,"BestdQdx/D");
     std::cout << "tree created" << std::endl;
 
     return;
@@ -35,9 +36,9 @@ namespace showerreco{
   void dQdx2DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Shower_t & resultShower){
     // This function takes the shower cluster set and computes the dQdx in the beginning of the shower
     // and then assigns it to the shower
-    
+    Len.clear();
     dQdx.resize(3);
-
+    Len.resize(3);
     auto geomHelper = larutil::GeometryHelper::GetME();
     
     //iterate through the selected clusters
@@ -56,8 +57,9 @@ namespace showerreco{
       }
       else{
 	//Major failure mode is ShoweringPoint is == 0, when that happens pull the "default" value
-	dist = 2.4;
+	dist = -999;
       }
+      Len[pl] = dist;
  
       _StartW = cluster.start_point.w;
       _StartT = cluster.start_point.t;
@@ -115,11 +117,11 @@ namespace showerreco{
 	_Q2 = dQdx[2];
 
       //Calculate the dQdx!
-      if(dist != 0){
+      if(dist > 0){
 	dQdx.at(pl) /= dist;
       }
       else{
-	std::cout << " How your dist = 0 foo! " << std::endl;
+	dQdx.at(pl) = kDOUBLE_MIN;
       }
       
       if(pl == 0)
@@ -131,14 +133,17 @@ namespace showerreco{
       if(pl == 2)
 	_dQdx2 = dQdx[2];
 
-       _tree->Fill();
+     
 
        resultShower.fdQdx = dQdx;
-
+       _tree->Fill(); 
+   
     }
     
-    
-    
+    _BestdQdx = dQdx[std::distance(Len.begin(),std::max_element(Len.begin(),Len.end()))];
+    resultShower.fBestdQdx = _BestdQdx;
+    _tree->Fill();
+       
     return;
     
   }
