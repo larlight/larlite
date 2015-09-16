@@ -91,6 +91,8 @@ public:
      */
     void setConvergeRate(float f) {_alpha = f;}
 
+    void setSeedVectorErrorCutoff(float f){_seedVectorErrorCutoff = f;}
+
 private:
 
     /**
