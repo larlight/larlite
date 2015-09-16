@@ -9,10 +9,11 @@ namespace showerreco {
   // initialize the various algorithms
   void ShowerRecoAlgModular::Initialize()
   {
-    for (auto & module : _modules)
+    for (auto & module : _modules){
       module->initialize();
-    _module_time_v.push_back(0.);
-    _module_ctr_v.push_back(0);
+      _module_time_v.push_back(0.);
+      _module_ctr_v.push_back(0);
+    }
     return;
   }
 
