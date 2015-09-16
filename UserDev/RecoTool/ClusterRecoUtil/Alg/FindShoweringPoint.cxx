@@ -160,10 +160,12 @@ void FindShoweringPoint::do_params_fill(cluster_params & cluster) {
 
   // Set the default values just in case.
   // Unless there is exactly 1 candidate, this might be junk.
-  cluster.showering_point = cluster.shwr_point_cand.front();
   cluster.start_dir.resize(2);
-  cluster.start_dir[0] = cluster.start_dir_cand.front().w;
-  cluster.start_dir[1] = cluster.start_dir_cand.front().t;
+  if (cluster.shwr_point_cand.size() != 0){
+    cluster.showering_point = cluster.shwr_point_cand.front();
+    cluster.start_dir[0] = cluster.start_dir_cand.front().w;
+    cluster.start_dir[1] = cluster.start_dir_cand.front().t;
+  }
 
 
 

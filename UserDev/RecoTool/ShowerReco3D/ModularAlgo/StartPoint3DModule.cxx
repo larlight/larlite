@@ -15,10 +15,8 @@ void StartPoint3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowe
 
 	// This function takes the matched shower cluster set and computes the best fit 3D start point
 	// and then assigns it to the shower
-
 //	auto geom = larutil::Geometry::GetME();
 	auto geomHelper = larutil::GeometryHelper::GetME();
-//	auto w2cm = larutil::GeometryUtilities::GetME()->WireToCm();
 //	auto t2cm = larutil::GeometryUtilities::GetME()->TimeToCm();
 	auto detProp = larutil::DetectorProperties::GetME() ;
 
@@ -26,44 +24,55 @@ void StartPoint3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowe
 	auto pointOnAxis = resultShower.fXYZStart ;
 	auto axis 	 = resultShower.fDCosStart ; 
 
-	double sW(0.), sT(0.) ;
-	
+	double sW;
+	double sT;
 
+	/**
+	*  Let's try to get close to 3D start by using 2D start info.
+	*  Let's do this by first using the info from plane2,Y 
+	*/
 	for( auto const c : inputShowers ){
 	    if ( c.plane_id.Plane == 2 ){
-		//Let's try to get close to start point on axis.
-		//Let's do this by first using the info from plane2,Y 
-		sW = c.start_point.w ; // / w2cm ;
-		sT = c.start_point.t ; // / t2cm ;
-
-		std::cout<<"*******************sW, sT: "<<sW<<", "<<sT<<std::endl ;
+		sW = c.start_point.w ; 
+		sT = c.start_point.t ; 
+//		std::cout<<"**********sW, sT, shower#: "<<sW<<", "<<sT<", "<<std::endl ;
 		}
 	    }
 
 	double sY = -116.5 ;
 	std::vector<TVector3> anchorCoords ;
 	TVector3 Temp ;
+	
+	/**
+	*  Create List of N points up y across the detector using this time, Z info.  
+	*  Loop over all showers in event, build up list of start points for each	
+	*/
+	for ( int i = 0 ; i < 232; i++ ){
 
-	for ( int i = 0 ; i < 232 ; i++ ){
 	    sY += 1 ;
 	    Temp.SetX(sT) ; 
-	    Temp.SetY(sY) ; 
+	    Temp.SetY(sY) 	 ; 
 	    Temp.SetZ(sW) ; 
 
 	    anchorCoords.emplace_back(Temp) ;
 	    }
+
+	std::cout<<"Anchor coords filled :: "<<anchorCoords.size() <<std::endl ;
 	
-	//To be done once some anchor point is had. 
-	//Loop over matched clusters, pick 2 best planes by finding worse plane 
-	float dist      =  999999 ;
+	/**
+	*  Once anchor points are stored, loop over matched clusters, pick 2 best
+	*  planes by finding worse plane. Will use 2 best planes as 3D->2D projection
+	*  comparisons.
+	*/
+	float minClusDist      =  999999 ;
 	int worstPlane  = -1      ; 
 	int planeTemp   =  0      ;
 
 	for( auto const c : inputShowers ){
 	    float distTemp = abs ( c.start_point.w - c.end_point.w );
 
-	    if( distTemp < dist ){
-		dist = distTemp ;
+	    if( distTemp < minClusDist ){
+		minClusDist = distTemp ;
 		worstPlane = planeTemp;
 		}
 
@@ -71,90 +80,59 @@ void StartPoint3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowe
 	    }
 
 	std::vector<TVector3> pointsVector ;
-	std::vector<float>    errors (0) ;
-
-	//Create List of N points up y across the detector using this time, Z info.  
-       // generatePoints(pointOnAxis, 100, resultShower,pointsVector);
 
 	//Store plane of interest
+	//Point2D projStart, projDir ;
+	//Point2D projStartNeg, projDirNeg ;
+
 	int plane = -1;
-	bool forward   = false ;
-	bool backwards = false ; 
-	Point2D projStart, projDir ;
-	Point2D projStartNeg, projDirNeg ;
+	int minDistIt = -1 ; //Keep track of the iterator with smallest error 
+	double minDist   =  99999999. ; 
 
-	int minErrorIt = -1 ; //Keep track of the iterator with smallest error 
-	int minError   =  99999999 ; 
+	/**
+	*  Look at the projection of each 3D point onto the 2 best planes in 2D
+	*  Loop through the line of points in anchorCoords and test each roughly. 
+	*  Dist is the distance from the cluster's 2D start to this new projection point
+	*  Use this distance to calculate an error in the chosen start point
+	*/
+	for( auto const & c : inputShowers ){
 
-	//Look at the projection of the point onto the 2 best planes in 2D
-	//Loop through the line of points in anchorCoords and test each roughly. 
-	for( int i = 0 ; i < anchorCoords.size() ; i++ ){
-
-	    float multError  =  0 ;
-	    float minAngle = 999999 ; 
 	    float dist = 0 ; 
 
+	    if ( c.plane_id.Plane != worstPlane && c.plane_id.Plane != 2){
+		//std::cout<<"\n\ncluster points : "<<c.start_point.t<<", "<<c.start_point.w<<std::endl ;
+		for( int i = 0 ; i < anchorCoords.size() ; i++ ){
 
-	    for( auto const c : inputShowers ){
-		if ( c.plane_id.Plane != worstPlane && c.plane_id.Plane != 2){
-		    
 		    plane = c.plane_id.Plane ;
-
 		    //testPoint is a PxPoint, 2D
-		    auto testPoint = geomHelper->Point_3Dto2D(anchorCoords[i],c.plane_id.Plane) ;
+		    auto testPoint = geomHelper->Point_3Dto2D(anchorCoords[i],plane) ;
 
-
-		    //Dist is the distance from the cluster's 2D start to this new projection point
-		    //Use this distance to calculate an error in the chosen start point
 		    dist = sqrt ( pow(c.start_point.t - testPoint.t,2) + 
 			    	  pow(c.start_point.w - testPoint.w,2) ) ;
 
-		    //std::cout<< " In TPC? "<<inTPC(anchorCoords[i])<<", "<<anchorCoords[i].X()
-		    //	     <<", "<<anchorCoords[i].Y()<<", "<<anchorCoords[i].Z()<<std::endl;
-		    geomHelper->Line_3Dto2D(anchorCoords[i],axis,c.plane_id.Plane,projStart,projDir) ;
-		    geomHelper->Line_3Dto2D(anchorCoords[i],-axis,c.plane_id.Plane,projStartNeg,projDirNeg) ;
-		    auto clusDir = c.principal_dir ;
-		    clusDir[0] /= sqrt ( pow(clusDir[0],2) + pow(clusDir[1],2) ) ;
-		    clusDir[1] /= sqrt ( pow(clusDir[0],2) + pow(clusDir[1],2) ) ;
+		    //std::cout<<"Test points    : "<<testPoint.t<<", "<<testPoint.w
+		    //	     <<"\nDist           : "<<dist<<std::endl;
 
-		    //Both vectors are normalized-- the angle between them is thus the dot product
-		    auto cosAngle = clusDir[0] * projDir.t + clusDir[1] * projDir.w ;
-		    auto cosAngleNeg = clusDir[0] * projDirNeg.t + clusDir[1] * projDirNeg.w ;
-    
-		    if ( cosAngle < minAngle ){
-			minAngle = cosAngle ;
-			forward   = true  ;
-			backwards = false ;
-			}
+		    //geomHelper->Line_3Dto2D(anchorCoords[i],axis,c.plane_id.Plane,projStart,projDir) ;
+		    //geomHelper->Line_3Dto2D(anchorCoords[i],-axis,c.plane_id.Plane,projStartNeg,projDirNeg) ;
 
-		    if ( cosAngleNeg < minAngle ){
-			minAngle = cosAngleNeg ;
-			forward   = false ;
-			backwards = true  ;
-			}
+		    if ( dist < minDist ){
+			minDistIt = i ;
+		    	minDist   = dist ; 
+		    	}
 		    }
-
+		break;
 		}
-		multError = sqrt ( pow(minAngle,2) + pow(dist,2) ) ;
-
-//		errors.emplace_back(multError) ;
-//
-		if ( multError < minError ){
-		    minErrorIt = i ;
-		    minError   = multError ;
-		    }
-	
 	    }
 
+    resultShower.fXYZStart = anchorCoords[minDistIt] ;
+    std::cout<<"min dist : "<<minDist<<std::endl ;
 
-    resultShower.fXYZStart = anchorCoords[minErrorIt] ;
-//    std::cout<<"This is the error! "<<minError<<" , "<<minErrorIt<<std::endl ;
     
     // Temporary: Make sure I can store the result appropriately
     //resultShower.fXYZStart = TVector3(1., 2., 3.);
 
-    }
-
+}
 
 bool StartPoint3DModule::inTPC(const TVector3 & pt ){
 
@@ -169,6 +147,9 @@ bool StartPoint3DModule::inTPC(const TVector3 & pt ){
 
     }
 
+/**
+*  Not used right now-- leaving this here just in case I need it again
+*/
 void StartPoint3DModule::generatePoints(TVector3 & seedPoint, int nSteps, const Shower_t & s, std::vector<TVector3> & result){
 
     //create vector of ordered points. Doesn't matter which direction vector moves in, so long as 
@@ -196,6 +177,7 @@ void StartPoint3DModule::generatePoints(TVector3 & seedPoint, int nSteps, const 
 	    break ;
 	}
     }
+
 } //showerreco
 
 #endif
