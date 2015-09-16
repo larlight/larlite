@@ -15,6 +15,8 @@ INCFLAGS  = -I.                       #Include itself
 INCFLAGS += -I$(LARLITE_COREDIR)
 INCFLAGS += -I$(LARLITE_USERDEVDIR)/DisplayTool
 INCFLAGS += $(shell python-config --includes)
+INCFLAGS += -I/usr/local/Cellar/numpy/1.9.2_1/lib/python2.7/site-packages/numpy/core/include/
+
 
 # platform-specific options
 OSNAME          = $(shell uname -s)

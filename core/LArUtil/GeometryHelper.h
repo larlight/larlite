@@ -361,8 +361,8 @@ public:
      * @return 2D perpendicular distance in cm
      */
     double PerpendicularDistance(const Point2D& pt,
-				 const double& slope,
-				 const double& intercept) const;
+                                 const double& slope,
+                                 const double& intercept) const;
 
     /**
      * @brief calcualte the perpendicular distance from a point to a line
@@ -372,8 +372,8 @@ public:
      * @return 2D perpendicular distance in cm
      */
     double PerpendicularDistance(const Point2D& pt,
-				 const double& slope,
-				 const Point2D& anchor) const;
+                                 const double& slope,
+                                 const Point2D& anchor) const;
 
     /**
      * @brief deterimine if a point is in the TPC

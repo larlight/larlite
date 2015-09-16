@@ -268,7 +268,8 @@ double GeometryHelper::GetPitch(const TVector3& direction, const int& pl) const
   cos /= (wireDir.Mag() * direction.Mag());
 
   // if cosine is 0 the direction is perpendicular and the wire-spacing is infinite
-  return kDOUBLE_MAX;
+  if (cos == 0)
+    return kDOUBLE_MAX;
 
   double pitch = minWireSpacing / cos;
   return pitch;
