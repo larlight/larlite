@@ -9,11 +9,10 @@ namespace showerreco {
   // initialize the various algorithms
   void ShowerRecoAlgModular::Initialize()
   {
-    std::cout << "initializing modules..." << std::endl;
-    std::cout << "there are " << _modules.size() << " modules" << std::endl;
     for (auto & module : _modules)
       module->initialize();
-
+    _module_time_v.push_back(0.);
+    _module_ctr_v.push_back(0);
     return;
   }
 
@@ -37,10 +36,13 @@ namespace showerreco {
 
       Shower_t localCopy = result;
 
-      for (auto & module : _modules){
-        module -> do_reconstruction(clusters, result);
+      for (size_t n=0; n < _modules.size(); n++){
+	_watch.Start();
+        _modules[n] -> do_reconstruction(clusters, result);
+	_module_time_v[n] += _watch.RealTime();
+	_module_ctr_v[n] += 1;
         if (_debug){
-          printChanges(localCopy, result,module->name());
+          printChanges(localCopy, result,_modules[n]->name());
           localCopy = result;
         }
 
@@ -346,6 +348,18 @@ namespace showerreco {
   // finalize function
   void ShowerRecoAlgModular::Finalize(TFile* fout)
   {
+
+  // loop through algos and evaluate time-performance
+  std::cout << std::endl
+            << "=================== Time Report =====================" << std::endl;
+  for (size_t n = 0; n < _modules.size(); n++) {
+    double module_time = _module_time_v[n] / ((double)_module_ctr_v[n]);
+    std::cout <<  _modules[n]->name() << "\t Algo Time: " << module_time * 1.e6     << " [us/cluster]"
+	      << "\t Clusters Scanned: " << _module_ctr_v[n] << std::endl;
+  }
+
+  std::cout << "=====================================================" << std::endl
+            << std::endl;
     
     std::cout << "finalize" << std::endl;
     // for each algorithm, get its tree and write it to output
