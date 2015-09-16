@@ -25,6 +25,10 @@ primary_algo = ertool.ERAlgoCRPrimary()
 
 secondary_algo = ertool.ERAlgoCRSecondary()
 
+orphan_algo = ertool.ERAlgoCROrphan()
+
+flash_algo  = ertool.ERAlgoFlashMatch() 
+
 # Set input root file
 for x in xrange(len(sys.argv)-1):
     my_proc.add_input_file(sys.argv[x+1])
@@ -33,7 +37,7 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
-my_proc.set_ana_output_file("singleE_selection.root")
+my_proc.set_ana_output_file("cosmic_trees.root")
 
 Ecut = 20 # in MeV
 
@@ -43,6 +47,8 @@ my_anaunit = fmwk.ExampleERSelection()
 my_anaunit._mgr.AddAlgo(pid_algo)
 my_anaunit._mgr.AddAlgo(primary_algo)
 my_anaunit._mgr.AddAlgo(secondary_algo)
+#my_anaunit._mgr.AddAlgo(orphan_algo)
+my_anaunit._mgr.AddAlgo(flash_algo)
 my_anaunit._mgr.AddAna(my_ana)
 #my_anaunit._mgr.AddCfgFile('new_empart.txt')
 my_anaunit.SetMinEDep(Ecut)

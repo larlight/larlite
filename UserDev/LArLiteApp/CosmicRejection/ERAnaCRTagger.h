@@ -63,6 +63,8 @@ namespace ertool {
 
     TTree* _event_tree;
     unsigned int _ctr_cosmic;
+    unsigned int _ctr_cosmic_w_secondaries;
+    unsigned int _ctr_non_cosmic_w_sec;
     unsigned int _ctr_non_cosmic;
     unsigned int _ctr_interaction;
     unsigned int _ctr_orphan;
