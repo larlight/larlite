@@ -121,7 +121,7 @@ namespace showerreco{
 	dQdx.at(pl) /= dist;
       }
       else{
-	dQdx.at(pl) = kDOUBLE_MIN;
+	dQdx.at(pl) = 0;
       }
       
       if(pl == 0)
@@ -141,6 +141,18 @@ namespace showerreco{
     }
     
     _BestdQdx = dQdx[std::distance(Len.begin(),std::max_element(Len.begin(),Len.end()))];
+
+    /// Trying to guard against selecting a bad plane, this does a second pass just to make sure
+    /// we are using the best value. 
+    if(_BestdQdx == 0){
+      std::vector< double> Len2;
+      for( int L = 0; L < Len.size(); L++){
+	if(Len.at(L) != *std::max_element(Len.begin(),Len.end()))
+	  Len2.push_back(Len.at(L));	
+      }
+      _BestdQdx = dQdx[std::distance(Len2.begin(),std::max_element(Len2.begin(),Len2.end()))];
+    }
+
     resultShower.fBestdQdx = _BestdQdx;
     _tree->Fill();
        
