@@ -16,6 +16,7 @@ namespace showerreco {
       result.fTotalEnergy.resize(nPlanes);
       result.fSigmaTotalEnergy.resize(nPlanes);
       result.fdEdx.resize(nPlanes);
+      result.fShoweringLength.resize(nPlanes); // resizing Showering Length Vector
       result.fSigmadEdx.resize(nPlanes);
       result.fTotalMIPEnergy.resize(nPlanes);
       result.fSigmaTotalMIPEnergy.resize(nPlanes);
@@ -186,6 +187,13 @@ namespace showerreco {
             std::cout << ")" << std::endl;
           }
 
+          if (changed){
+            std::cout << "\tfShoweringLength has changed from (";
+            for (auto & val : localCopy.fShoweringLength ) std::cout << val << " ";
+            std::cout << ") to (";
+            for (auto & val : result.fShoweringLength ) std::cout << val << " ";
+            std::cout << ")" << std::endl;
+          }
 
           // Sigma Total Energy
           changed = false;

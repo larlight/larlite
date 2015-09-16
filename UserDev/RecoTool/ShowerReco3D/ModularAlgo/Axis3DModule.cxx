@@ -7,7 +7,6 @@
 #include "LArUtil/Geometry.h"
 #include "LArUtil/GeometryHelper.h"
 
-#define PI           3.14159265358979323846  /* pi */
 
 namespace showerreco {
 
@@ -105,7 +104,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   std::vector<int>      convergeNumber;
   int                   n_converged(0);
 
-  float errorCutoff = 0.5;
+  float errorCutoff = _seedVectorErrorCutoff;
 
   // Find out the seed vectors with reasonable error, and reject all the others
   while (seedVectors.size() == 0) {
@@ -128,7 +127,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
       //             << " was rejected\n";
       // }
     }
-    errorCutoff += 0.5;
+    errorCutoff += _seedVectorErrorCutoff;
   }
 
   // Now the list of seed vectors is reduced to a few candidate vectors that are close
@@ -153,22 +152,24 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   vecIndex = 0;
   for (auto & vec : seedVectors) {
     // Print out info about this vector:
-    std::cout << "Error: " << errorVector.at(vecIndex)
-              << "\tVec: (" << vec.X() << ", "
-              << vec.Y() << ", "
-              << vec.Z() << ")"
-              << "\tStatus: ";
-    if (convergeStatus.at(vecIndex) == kNormal)
-      std::cout << "normal";
-    if (convergeStatus.at(vecIndex) == kIterMaxOut)
-      std::cout << "maxout";
-    if (convergeStatus.at(vecIndex) == kNotOptFit)
-      std::cout << "nonopt";
-    std::cout << "\tN: " << convergeNumber.at(vecIndex);
-    std::cout << std::endl;
-    for (unsigned int p = 0; p < planes.size(); p++) {
-      float slope = geomHelper -> Slope_3Dto2D(vec, planes[p]);
-      std::cout << "\t" << p << " - \tgoal:\t" << slopeByPlane.at(p) << "\tact:\t" << slope << "\n";
+    if (_verbose) {
+      std::cout << "Error: " << errorVector.at(vecIndex)
+                << "\tVec: (" << vec.X() << ", "
+                << vec.Y() << ", "
+                << vec.Z() << ")"
+                << "\tStatus: ";
+      if (convergeStatus.at(vecIndex) == kNormal)
+        std::cout << "normal";
+      if (convergeStatus.at(vecIndex) == kIterMaxOut)
+        std::cout << "maxout";
+      if (convergeStatus.at(vecIndex) == kNotOptFit)
+        std::cout << "nonopt";
+      std::cout << "\tN: " << convergeNumber.at(vecIndex);
+      std::cout << std::endl;
+      for (unsigned int p = 0; p < planes.size(); p++) {
+        float slope = geomHelper -> Slope_3Dto2D(vec, planes[p]);
+        std::cout << "\t" << p << " - \tgoal:\t" << slopeByPlane.at(p) << "\tact:\t" << slope << "\n";
+      }
     }
 
 
@@ -242,27 +243,28 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   resultShower.fXYZStart = pointOnAxis;
 
 
-  std::cout << "FINAL RESULT: \n";
+  if (_verbose) {
+    std::cout << "FINAL RESULT: \n";
 
-  std::cout
-  // << "True vector: ("
-  // << knownAxis.X() << ", "
-  // << knownAxis.Y() << ", "
-  // << knownAxis.Z() << "), "
-      << "Calculated vector: ("
-      << resultShower.fDCosStart.X() << ", "
-      << resultShower.fDCosStart.Y() << ", "
-      << resultShower.fDCosStart.Z() << ").\n";
-  // << " Difference is " << acos(knownAxis.Dot(resultShower.fDCosStart)) << " radians.\n";
+    std::cout
+    // << "True vector: ("
+    // << knownAxis.X() << ", "
+    // << knownAxis.Y() << ", "
+    // << knownAxis.Z() << "), "
+        << "Calculated vector: ("
+        << resultShower.fDCosStart.X() << ", "
+        << resultShower.fDCosStart.Y() << ", "
+        << resultShower.fDCosStart.Z() << ").\n";
+    // << " Difference is " << acos(knownAxis.Dot(resultShower.fDCosStart)) << " radians.\n";
 
-  for (unsigned int i = 0; i < inputShowers.size(); i++) {
-    larutil::PxPoint start2D, dir2D;
-    geomHelper -> Line_3Dto2D(pointOnAxis, resultShower.fDCosStart, planes[i], start2D, dir2D);
-    std::cout << "\tIn plane " << planes[i] << ", the projection is "
-              << (dir2D.t / dir2D.w) << ", the target is "
-              << slopeByPlane[i] << ".\n";
+    for (unsigned int i = 0; i < inputShowers.size(); i++) {
+      larutil::PxPoint start2D, dir2D;
+      geomHelper -> Line_3Dto2D(pointOnAxis, resultShower.fDCosStart, planes[i], start2D, dir2D);
+      std::cout << "\tIn plane " << planes[i] << ", the projection is "
+                << (dir2D.t / dir2D.w) << ", the target is "
+                << slopeByPlane[i] << ".\n";
+    }
   }
-
 
   return;
 
@@ -276,26 +278,19 @@ float Axis3DModule::optimzeVector(TVector3 & inputVector,
 {
 
   // Some variables needed for this loop:
-  int n_converged = 0;
   n_iterations = 0;
 
 
-  float thetaRangeStart = 0.05;
-  float thetaRangeMax  = M_PI / 8;
-  float thetaRangeMin  = 0.0005;
 
-  float nStepsStart = 8;
-  float nStepsMax = 4 * nStepsStart;
-
-  float alpha = 0.85;
+  float nStepsMax = 4 * _nStepsStart;
 
   float current_error = getErrorOfProjection(inputVector, slopeByPlane, planes);
 
   // For each seed vector, compare the error of it vs. it's neighbors.
   // If the error at a neighbor is better, move to that.
 
-  float thetaRange = thetaRangeStart;
-  float nSteps = nStepsStart;
+  float thetaRange = _thetaRangeStart;
+  float nSteps = _nStepsStart;
 
 
   while ( n_iterations < fMaxIterations ) {
@@ -319,21 +314,21 @@ float Axis3DModule::optimzeVector(TVector3 & inputVector,
       current_error = error;
       // If there was improvement, make sure that nSteps is
       // set to its min value:
-      nSteps = nStepsStart;
+      nSteps = _nStepsStart;
       // For theta range, since that is the convergence speed, set it to
-      // the max of it's min value and alpha*currentValue:
-      thetaRange = fmin(thetaRangeStart, alpha * thetaRange);
-      if (thetaRange < thetaRangeMin) thetaRange = thetaRangeMin;
+      // the max of it's min value and _alpha*currentValue:
+      thetaRange = fmin(_thetaRangeStart, _alpha * thetaRange);
+      if (thetaRange < _thetaRangeMin) thetaRange = _thetaRangeMin;
     }
     // Else things didn't improve
     else {
       // This step didn't help. Try to increase the granularity first:
       if (nSteps < nStepsMax) {
-        nSteps += nStepsStart;
+        nSteps += _nStepsStart;
       }
       // If that fails, perhaps need to look at smaller angles:
-      else if (thetaRange > thetaRangeMin) {
-        thetaRange *= alpha;
+      else if (thetaRange > _thetaRangeMin) {
+        thetaRange *= _alpha;
       }
       else {
         // Both nSteps and theta range are maxed out.  Bail on this point.
@@ -397,7 +392,7 @@ void Axis3DModule::generateNearbyVectors( const TVector3 & initialVector,
   seedVector.Rotate(thetaRange, perp );
   // Rotate around the center vector a full rotation
   for (float j = 0; j < nSteps - 1; j++) {
-    seedVector.Rotate( (PI / nSteps) * (j), workerVector);
+    seedVector.Rotate( (M_PI / nSteps) * (j), workerVector);
     result.push_back(seedVector);
   }
 
@@ -447,7 +442,7 @@ void Axis3DModule::generateSeedVectors(const TVector3 & initialVector,
     seedVector.Rotate( (thetaRange / nSteps) * (i), perp );
     // Rotate around the center vector a full rotation
     for (float j = 0; j < nSteps - 1; j++) {
-      seedVector.Rotate( (PI / nSteps) * (j), workerVector);
+      seedVector.Rotate( (M_PI / nSteps) * (j), workerVector);
       result.push_back(seedVector);
     }
   }
