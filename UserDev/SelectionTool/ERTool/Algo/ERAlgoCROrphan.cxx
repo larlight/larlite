@@ -65,11 +65,9 @@ namespace ertool {
 	  is_cosmic = IsCROrphan(shower);
 	}
 
-      }else{
+      }else if( part.RecoType() == kShower)
 
-	is_cosmic = IsCROrphan(shower);
-
-      }
+	is_cosmic = IsCROrphan(data.Shower(part.RecoID()));
 
       if(is_cosmic) {
 

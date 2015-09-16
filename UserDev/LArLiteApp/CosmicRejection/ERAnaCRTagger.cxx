@@ -118,30 +118,35 @@ namespace ertool {
 
 
     double detHalfHeight = 116.5 ;
-
+    
     for( auto const& p : graph.GetParticleArray() ){
-	ResetPartTree();
 
-	_run    = data.Run() ;
-    	_subrun = data.SubRun() ;
-    	_event  = data.Event_ID() ;
+      ResetPartTree();
+      
+      _run    = data.Run() ;
+      _subrun = data.SubRun() ;
+      _event  = data.Event_ID() ;
+      
+      std::cout<<"PDG code: "<<p.PdgCode() <<std::endl;
 
-        auto const& t = data.Track(p.RecoID());
+      _pdg = p.PdgCode() ; 
+      _primary = p.Primary() ;
 
-    	_pdg = p.PdgCode() ; 
-    	_primary = p.Primary() ; 
-    	_start_x = t.at(0)[0];
-    	_start_y = t.at(0)[1];
-    	_start_z = t.at(0)[2];
-    	_end_x = t.at(t.size()-1)[0]; 
-    	_end_y = t.at(t.size()-1)[1]; 
-    	_end_z = t.at(t.size()-1)[2]; 
+      if(p.RecoType() == kTrack) {
+	auto const& t = data.Track(p.RecoID());
+	_start_x = t.at(0)[0];
+	_start_y = t.at(0)[1];
+	_start_z = t.at(0)[2];
+	_end_x = t.at(t.size()-1)[0]; 
+	_end_y = t.at(t.size()-1)[1]; 
+	_end_z = t.at(t.size()-1)[2]; 
 	
 	_px = t.at(0).Dir()[0];
 	_py = t.at(0).Dir()[1];
 	_pz = t.at(0).Dir()[2];
 
 	_part_tree->Fill(); 
+	}
 
 	if (p.ProcessType() == kCosmic )
 	    _ctr_cosmic++;
@@ -155,62 +160,63 @@ namespace ertool {
 
 	
 	} 
-
     
 
     //Every primary particle should correspond wiht an 'interaction'
-    for( auto const& track : graph.GetPrimaryNodes(RecoType_t::kTrack)){
-	ResetIntTree();
-	 
-        auto const& t = data.Track(graph.GetParticle(track).RecoID());
-
-	_ctr_child = graph.GetAllDescendantNodes(track).size();
-	std::cout<<" Child ctr: "<<_ctr_child << std::endl ;
-
-        ::geoalgo::HalfLine trk(t.at(0),t.at(0).Dir()); //Start().Position(),t.Start().Momentum());
-
-        _int_x = t.at(0)[0] ;
-        _int_y = t.at(0)[1] ;
-        _int_z = t.at(0)[2] ;
-        _primary_pdg = t._pid ;
-	_length = t.Length(); 
-	//CalculateAngleYZ(graph.GetParticle(track),_angle);
-	CalculateAngleYZ(t.at(0).Dir(),_angle);
-
-	if( fTPC.Contain(t.at(0)) && _geoAlgo.Intersection(fTPC,trk,true).size() > 0){
-	     _distBackAlongTraj = sqrt(_geoAlgo.Intersection(fTPC,trk,true)[0].SqDist(t.at(0))) ;
-             _distToTopWall     = (_int_y - detHalfHeight)/t.at(0).Dir()[1] ; // py is normalize, pmag is not--so ignore pmag
-             _distToWall        = sqrt(_geoAlgo.SqDist(t.at(0),fTPC));
-	   }   
-	else if ( !fTPC.Contain(t.at(0)) && _geoAlgo.Intersection(fTPC,trk,true).size() > 0){ 
+    for( auto const& track_node_id : graph.GetPrimaryNodes(RecoType_t::kTrack)){
+      ResetIntTree();
+      
+      auto const& track_part = graph.GetParticle(track_node_id);
+      
+      auto const& track = data.Track(track_part.RecoID());
+      
+      _ctr_child = graph.GetAllDescendantNodes(track_node_id).size();
+      
+      ::geoalgo::HalfLine trk(track.at(0),track.at(0).Dir()); //Start().Position(),track.Start().Momentum());
+      
+      _int_x = track.at(0)[0] ;
+      _int_y = track.at(0)[1] ;
+      _int_z = track.at(0)[2] ;
+      _primary_pdg = track._pid ;
+      _length = track.Length(); 
+      //CalculateAngleYZ(graph.GetParticle(track),_angle);
+      CalculateAngleYZ(track.at(0).Dir(),_angle);
+      
+      if( fTPC.Contain(track.at(0)) && _geoAlgo.Intersection(fTPC,trk,true).size() > 0){
+	_distBackAlongTraj = sqrt(_geoAlgo.Intersection(fTPC,trk,true)[0].SqDist(track.at(0))) ;
+	_distToTopWall     = (_int_y - detHalfHeight)/track.at(0).Dir()[1] ; // py is normalize, pmag is not--so ignore pmag
+	_distToWall        = sqrt(_geoAlgo.SqDist(track.at(0),fTPC));
+      }   
+      else if ( !fTPC.Contain(track.at(0)) && _geoAlgo.Intersection(fTPC,trk,true).size() > 0){ 
 	//There seems to be an issue with setting the new points when x < 0-- they always
 	//get set to 0,0,0.  This is a temporary fix
-	    if( _int_x >= 0 ){
-         	 _int_x = _geoAlgo.Intersection(fTPC,trk,true).at(0)[0] ;
-         	 _int_y = _geoAlgo.Intersection(fTPC,trk,true).at(0)[1] ;
-         	 _int_z = _geoAlgo.Intersection(fTPC,trk,true).at(0)[2] ;
-		}   
-            else
-		_int_x = 0 ; 
+	if( _int_x >= 0 ){
+	  _int_x = _geoAlgo.Intersection(fTPC,trk,true).at(0)[0] ;
+	  _int_y = _geoAlgo.Intersection(fTPC,trk,true).at(0)[1] ;
+	  _int_z = _geoAlgo.Intersection(fTPC,trk,true).at(0)[2] ;
+	}   
+	else
+	  _int_x = 0 ; 
 
-	    _distToWall = 0 ; 
-            _distBackAlongTraj = 0;
-            _distToTopWall = (_int_y - detHalfHeight)/t.at(0).Dir()[1] ;
-
-	    }
-//	else
-//	    ResetIntTree();
-//
-	_int_tree->Fill();
-	}
-
-	_run    = data.Run() ;
-    	_subrun = data.SubRun() ;
-    	_event  = data.Event_ID() ;
-
-	_event_tree->Fill();
-
-      
+	_distToWall = 0 ; 
+	_distBackAlongTraj = 0;
+	_distToTopWall = (_int_y - detHalfHeight)/track.at(0).Dir()[1] ;
+	
+	//	    std::cout<<"If we're here, what are x,y,z: "<<_int_x<<", "<<_int_y<<", "<<_int_z<<std::endl ;
+      }
+      //	else
+      //	    ResetIntTree();
+      //
+      _int_tree->Fill();
+    }
+    
+    _run    = data.Run() ;
+    _subrun = data.SubRun() ;
+    _event  = data.Event_ID() ;
+    
+    _event_tree->Fill();
+    
+    
     return true;
   }
 
