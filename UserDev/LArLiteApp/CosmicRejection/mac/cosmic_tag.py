@@ -22,8 +22,9 @@ pid_algo.setVerbose(False)
 
 # primary finder algorithm
 primary_algo = ertool.ERAlgoCRPrimary()
-
 secondary_algo = ertool.ERAlgoCRSecondary()
+orphan = ertool.ERAlgoCROrphan()
+fmatch = ertool.ERAlgoFlashMatch()
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):
@@ -43,7 +44,10 @@ my_anaunit = fmwk.ExampleERSelection()
 my_anaunit._mgr.AddAlgo(pid_algo)
 my_anaunit._mgr.AddAlgo(primary_algo)
 my_anaunit._mgr.AddAlgo(secondary_algo)
+my_anaunit._mgr.AddAlgo(orphan)
+my_anaunit._mgr.AddAlgo(fmatch)
 my_anaunit._mgr.AddAna(my_ana)
+my_anaunit._mgr._verbosity = 0
 #my_anaunit._mgr.AddCfgFile('new_empart.txt')
 my_anaunit.SetMinEDep(Ecut)
 my_anaunit._mgr._mc_for_ana = False
