@@ -16,6 +16,8 @@
 
 #include <iostream>
 #include "ShowerReco3D/Base/ShowerRecoTypes.h"
+#include "TTree.h"
+
 /**
    \class ShowerRecoModuleBase
    User defined class ShowerRecoModuleBase ... these comments are used to generate
@@ -28,7 +30,7 @@ namespace showerreco {
   public:
 
     /// Default constructor
-    ShowerRecoModuleBase(){ _verbose = false; }
+    ShowerRecoModuleBase();
 
     /// Default destructor
     virtual ~ShowerRecoModuleBase(){}
@@ -55,10 +57,23 @@ namespace showerreco {
      */
     void setVerbosity(bool on) { _verbose = on; }
 
+    /**
+     * @brief Function to return the algorithm's tree
+     */
+    TTree* GetTree() { return _tree; }
+
+    /**
+     * @brief Function to initialize the algorithm (such as setting up tree)
+     */
+    virtual void initialize() = 0;
+
   protected:
+
     std::string _name;
 
     bool _verbose;
+
+    TTree* _tree;
 
   };
 

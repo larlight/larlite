@@ -12,6 +12,19 @@ namespace showerreco{
     _name = "dQdxModule";
   }
 
+  void dQdxModule::initialize()
+  {
+
+    std::cout << "creating tree" << std::endl;
+    if (_tree) delete _tree;
+    _tree = new TTree(_name.c_str(),"dQdx Info Tree");
+    _tree->Branch("_length",&_length,"lendth/D");
+    _tree->Branch("_pl",&_pl,"pl/I");
+    std::cout << "tree created" << std::endl;
+
+    return;
+  }
+
   void dQdxModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Shower_t & resultShower){
     
 
@@ -51,6 +64,10 @@ namespace showerreco{
 
       double trunk_length = sqrt ( (shr_start.w - start.w) * (shr_start.w - start.w) + 
 				   (shr_start.t - start.t) * (shr_start.t - start.t) );
+
+      _pl = pl;
+      _length = trunk_length;
+      _tree->Write();
 
       if (_verbose)
 	std::cout << "trunk length for plane " << pl << " is " << trunk_length << std::endl;
