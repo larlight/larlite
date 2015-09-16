@@ -19,6 +19,7 @@
 #include "ShowerRecoModuleBase.h"
 #include "TTree.h"
 #include "TFile.h"
+#include <TStopwatch.h>
 
 /**
    \class ShowerRecoAlgModular
@@ -132,6 +133,10 @@ namespace showerreco {
 
     bool _debug;
 
+    // Time profilers
+    TStopwatch _watch; ///< For profiling
+    std::vector<double> _module_time_v; ///< Overall time for processing
+    std::vector<size_t> _module_ctr_v;  ///< Overall number of clusters processed by algo
 
   };
 
