@@ -52,6 +52,9 @@ namespace showerreco{
       double trunk_length = sqrt ( (shr_start.w - start.w) * (shr_start.w - start.w) + 
 				   (shr_start.t - start.t) * (shr_start.t - start.t) );
 
+      if (_verbose)
+	std::cout << "trunk length for plane " << pl << " is " << trunk_length << std::endl;
+
     }
 
     return;
