@@ -96,7 +96,7 @@ void OtherStartPoint3D::do_reconstruction(const ShowerClusterSet_t & inputShower
 
 //		    std::cout<<"\nCluster points: "<<c.start_point.t<<", "<<c.start_point.w<<std::endl;
 //		    std::cout<<"Test points : "<<geomHelper->Point_3Dto2D(pts[minDistIt],c.plane_id.Plane).t<<", "
-					       <<geomHelper->Point_3Dto2D(pts[minDistIt],c.plane_id.Plane).t<<std::endl;
+//					       <<geomHelper->Point_3Dto2D(pts[minDistIt],c.plane_id.Plane).t<<std::endl;
 //		    std::cout<<"Min iterator: "<<minDistIt<<std::endl;
 		}//if not worst plane
 	    }
