@@ -40,6 +40,7 @@ def getShowerRecoAlgModular():
   axis3D.setMaxIterations(100)
   axis3D.setNStepsInitial(11)
   axis3D.setTargetError(0.001)
+  axis3D.setNormalErrorRange(0.01)
   axis3D.setThetaRangeStart(0.05)
   axis3D.setThetaRangeMin(0.0005)
   axis3D.setNStepsStart(8)
@@ -47,7 +48,12 @@ def getShowerRecoAlgModular():
   axis3D.setVerbosity(True)
   axis3D.setSeedVectorErrorCutoff(0.5)
 
-  alg.AddShowerRecoModule(axis3D                           )
+  energy = showerreco.EnergyModule()
+  energy.SetUseBox(True)
+  energy.setVerbosity(True)
+
+  alg.AddShowerRecoModule(axis3D)
+  alg.AddShowerRecoModule(energy)
   # alg.AddShowerRecoModule(showerreco.StartPoint2DModule()  )
   # alg.AddShowerRecoModule(showerreco.StartPoint3DModule()  )
   # alg.AddShowerRecoModule(showerreco.ShowerChargeModule()  )
@@ -142,7 +148,11 @@ print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
-my_proc.run(0,10)
+<<<<<<< HEAD
+my_proc.run(9,1)
+=======
+my_proc.run()
+>>>>>>> ba238cfbafca8aefed4b89f46f83c4563bdaf2e9
 # my_proc.process_event(2)
 
 

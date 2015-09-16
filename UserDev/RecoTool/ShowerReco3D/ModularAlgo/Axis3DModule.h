@@ -57,6 +57,8 @@ public:
      */
     void setTargetError(float f) {fTargetError = f;}
 
+    void setNormalErrorRange(float f){_normalErrorRange = f;}
+
     /**
      * @brief sets the starting value at which theta converges
      * @details Theta range is the opening angle around which the algorithm searches
@@ -205,6 +207,8 @@ private:
     float fNStepsInitial;
     // The target error (fractional per plane) for normal completion
     float fTargetError;
+
+    float _normalErrorRange;
 
     // The cutoff error (fractional error per plane) for picking seed vectors
     float _seedVectorErrorCutoff;
