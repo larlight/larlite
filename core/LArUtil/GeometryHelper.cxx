@@ -59,7 +59,7 @@ Point2D GeometryHelper::Point_3Dto2D(const TVector3 & _3D_position, unsigned int
   // Add in the trigger offset:
   // (Trigger offset is time that the data is recorded before the actual spill.
   // So, it moves the "0" farther away from the actual time and is an addition)
-  returnPoint.t += detp -> TriggerOffset() * fTimeToCm;
+  // returnPoint.t -= detp -> TriggerOffset() * fTimeToCm;
   //Get the origin point of this plane:
   Double_t planeOrigin[3];
   geom -> PlaneOriginVtx(plane, planeOrigin);
@@ -67,7 +67,7 @@ Point2D GeometryHelper::Point_3Dto2D(const TVector3 & _3D_position, unsigned int
   // X = 0 is at the very first wire plane, so the values of the coords of the planes are either 0 or negative
   // because the planes are negative, the extra distance beyond 0 needs to make the time coordinate larger
   // Therefore, subtract the offest (which is already in centimeters)
-  returnPoint.t -= planeOrigin[0];
+  // returnPoint.t += planeOrigin[0];
 
   // Set the plane of the Point2D:
   returnPoint.plane = plane;
@@ -145,6 +145,18 @@ float GeometryHelper::Slope_3Dto2D(const TVector3 & inputVector, unsigned int pl
 
 float GeometryHelper::DistanceToLine2D( const Point2D & pointOnLine, const Point2D & directionOfLine,
                                         const Point2D & targetPoint) const
+{
+
+  // Utilize the 3D function to make it easier to maintain
+  TVector3 _pointOnLine(pointOnLine.w, pointOnLine.t, 0.0);
+  TVector3 _directionOfLine(directionOfLine.w, directionOfLine.t, 0.0);
+  TVector3 _targetPoint(targetPoint.w, targetPoint.t, 0.0);
+
+  return DistanceToLine3D(_pointOnLine, _directionOfLine, _targetPoint);
+}
+
+float GeometryHelper::DistanceToLine2D( const Point2D & pointOnLine, const Point2D & directionOfLine,
+                                        const Hit2D & targetPoint) const
 {
 
   // Utilize the 3D function to make it easier to maintain
@@ -363,11 +375,11 @@ void GeometryHelper::SelectPolygonHitList(const std::vector<Hit2D> &inputHits,
   // Also fill corner edge points
   std::vector<larutil::Point2D> edges(4, Point2D(plane, 0, 0));
   double wire_max = geom->Nwires(plane) * fWireToCm;
-  double time_max = detp->NumberTimeSamples() * fTimeToCm;
+  double time_max = (detp->NumberTimeSamples() - detp -> TriggerOffset()) * fTimeToCm;
 
   for (size_t index = 0; index < ordered_hits.size(); ++index) {
 
-    if (ordered_hits.at(index)->t < 0 ||
+    if (ordered_hits.at(index)->t < -detp -> TriggerOffset() ||
         ordered_hits.at(index)->w < 0 ||
         ordered_hits.at(index)->t > time_max ||
         ordered_hits.at(index)->w > wire_max ) {
@@ -540,6 +552,32 @@ bool GeometryHelper::Clockwise(const double& Ax, const double& Ay,
 
   return (Cy - Ay) * (Bx - Ax) > (By - Ay) * (Cx - Ax);
 }
+
+  double GeometryHelper::PerpendicularDistance(const Point2D& pt,
+					       const double& slope,
+					       const double& intercept) const
+  {
+
+    // line assumed to be of form :
+    // y = slope * x + intercept
+
+    if (slope == 0)
+      return fabs ( pt.t - intercept );
+
+    double d_perp = fabs ( pt.t - slope * pt.w - intercept ) / fabs(slope);
+
+    return d_perp;
+  }
+
+  double GeometryHelper::PerpendicularDistance(const Point2D& pt,
+					       const double& slope,
+					       const Point2D& anchor) const
+  {
+
+    double intercept = anchor.t - slope * anchor.w;
+
+    return PerpendicularDistance(pt,slope,intercept);
+  }
 
 bool GeometryHelper::Point_isInTPC(const TVector3 & pointIn3D) const {
   // Use the geometry class to determine if this point is in the TPC

@@ -71,6 +71,11 @@ namespace cluster{
     Point2D start_point;               ///< start point 
     Point2D end_point;                 ///< end point 
     
+    std::vector<Point2D > start_point_cand;     ///<Worker variable saves the list of candidate start points between modules
+    std::vector<Point2D > shwr_point_cand;     ///<Worker variable saves the list of candidate start points between modules
+    std::vector<Point2D > start_dir_cand;       ///candidate start point directions
+
+
     Point2D showering_point;           ///< point at which showering of cluster begins
 
     double sum_charge;                 ///< Sum charge of hits in ADC
@@ -135,6 +140,17 @@ namespace cluster{
     void Report(std::ostream & os = std::cout) const;
 
     void ReportDiff(const cluster_params & otherParams);
+
+    /**
+     * This function returns a feature vector suitable for a neural net
+     * This function uses the data from cluster_params but packages it
+     * up in a different way, and so is inappropriate to include in 
+     * clusterParams.hh.   That's why it's here.
+     * @param  data  takes a reference to a vector< float>
+     */
+    void  GetFANNVector(std::vector<float> & data) const;
+
+    std::vector<std::string> GetFANNVectorTitle();
 
   };
 
