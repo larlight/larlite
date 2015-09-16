@@ -61,11 +61,14 @@ namespace showerreco{
 	// birks / box model formulas
 	
 	if (dEdx > 10.) { dEdx = 10.; }
-	E += dEdx;
+	E += dEdx*pitch;
 
       }// loop over all hits
+						
+      // set the energy for this plane
+      resultShower.fTotalEnergy[pl] = E;
 
-    }
+    }// for all input clusters
     
     return;
 
