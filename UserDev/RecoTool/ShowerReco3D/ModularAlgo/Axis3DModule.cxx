@@ -168,32 +168,32 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
     // In this case, none of the seeds converged.  Maxout seed vectors aren't useful, but
     // the nonopt ones are.  We can try removing each plane and refitting all the vectors
     // that were returned to see if they converge.
-    
+
     // Loop over all possible pair of planes.
-    
+
     std::cout << "Running alternate axis finding..." << std::endl;
-    
+
     std::vector<int> bestIndexAlt;
     std::vector<float> bestErrorAlt;
     std::vector<TVector3> bestVectorAlt;
-    
+
     for (unsigned int i = 0; i < planes.size(); i++) {
-      
+
       // maintain a list of the good seeds and the errors of the seed vectors too:
       std::vector<TVector3> seedVectorsAlt;
       std::vector<float>    errorVectorAlt;
       std::vector<Status>   convergeStatusAlt;
       std::vector<int>      convergeNumberAlt;
       int                   n_convergedAlt(0);
-      
+
       // Keep the best vector with the best error;
       int bestIndexTemp = -1;
       float bestErrorTemp = 9999;
       TVector3 bestVectorTemp;
-      
+
       std::vector<float> slopeByPlaneAlt;
       std::vector<int> planesAlt;
-      
+
       for (unsigned int j = 0; j < planes.size(); j++) {
         if (i == j) continue;
         else {
@@ -201,11 +201,13 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
           slopeByPlaneAlt.push_back(slopeByPlane[j]);
         }
       }
-      
-      std::cout << "Omitting plane " << planes[i] << std::endl;
-      
+
+      if (_verbose){
+        std::cout << "Omitting plane " << planes[i] << std::endl;
+      }
+
       findSeedVectors(seedVectorsAlt, errorVectorAlt, planesAlt, slopeByPlaneAlt);
-      
+
       // Now the list of seed vectors is reduced to a few candidate vectors that are close
       vecIndex = 0;
       for (auto & vec : seedVectorsAlt) {
@@ -218,7 +220,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
           n_convergedAlt++;
         vecIndex ++;
       }
-      
+
       // Print out the final vectors and their errors:
       vecIndex = 0;
 
@@ -226,10 +228,10 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
         // Print out info about this vector:
         if (_verbose) {
           std::cout << "Error: " << errorVectorAlt.at(vecIndex)
-          << "\tVec: (" << vec.X() << ", "
-          << vec.Y() << ", "
-          << vec.Z() << ")"
-          << "\tStatus: ";
+                    << "\tVec: (" << vec.X() << ", "
+                    << vec.Y() << ", "
+                    << vec.Z() << ")"
+                    << "\tStatus: ";
           if (convergeStatusAlt.at(vecIndex) == kNormal)
             std::cout << "normal";
           if (convergeStatusAlt.at(vecIndex) == kIterMaxOut)
@@ -243,7 +245,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
             std::cout << "\t" << p << " - \tgoal:\t" << slopeByPlaneAlt.at(p) << "\tact:\t" << slope << "\n";
           }
         }
-        
+
         if ( convergeStatusAlt.at(vecIndex) == kNormal ) {
           if (errorVectorAlt.at(vecIndex) < bestError) {
             bestIndexTemp = vecIndex;
@@ -253,74 +255,77 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
         }
         vecIndex ++;
       }
-      
+
       bestIndexAlt.push_back(bestIndexTemp);
       bestErrorAlt.push_back(bestErrorTemp);
       bestVectorAlt.push_back(bestVectorTemp);
     }
-    
-    std::cout << "SUMMARY OF ALTERNATIVE AXES:" << std::endl;
-    for (int i = 0; i < bestIndexAlt.size(); i++) {
-      std::cout << "Best vector omitting plane " << i << ":"
-                << "  Error " << bestErrorAlt[i] << " with vector (" << bestVectorAlt[i].X() << ", "
-                << bestVectorAlt[i].Y() << ", " << bestVectorAlt[i].Z() << ")" << std::endl;
+
+    if (_verbose) {
+      std::cout << "SUMMARY OF ALTERNATIVE AXES:" << std::endl;
+      for (int i = 0; i < bestIndexAlt.size(); i++) {
+        std::cout << "Best vector omitting plane " << i << ":"
+                  << "  Error " << bestErrorAlt[i] << " with vector (" << bestVectorAlt[i].X() << ", "
+                  << bestVectorAlt[i].Y() << ", " << bestVectorAlt[i].Z() << ")" << std::endl;
+      }
     }
-  }
-  
-    
+    // Make a selection from bestVectorAlt
+    // Easy easy way: figure out if one of the start points is much farther from the others in time.
+    // This most often happens if a shower start point is backwards
+    std::vector<float> startTimeDiffs;
+    for (size_t i = 0; i < planes.size(); i++) {
+      int point1, point2;
+      if (i == 0) {
+        point1 = 1;
+        point2 = 2;
+      }
+      else if ( i == 1) {
+        point1 = 0;
+        point2 = 2;
+      }
+      else {
+        point1 = 0;
+        point2 = 1;
+      }
+      startTimeDiffs.push_back(inputShowers.at(point1).start_point.t - inputShowers.at(point2).start_point.t);
+    }
+    // Figure out is one is much smaller than the other two.  If so, keep that pair.
+    float minVal(99999), nextMin(99999);
+    size_t min_index = -1;
+    size_t i = 0;
+    for (auto & val : startTimeDiffs) {
+      if (fabs(val) < minVal) {
+        nextMin = minVal;
+        minVal = fabs(val);
+        min_index = i;
+      }
+      i++;
+    }
+    if (i != -1 && 3 * minVal < nextMin ) {
+      // In this case, there is clearly a shower with a bad start point
+      // Pick the vector that ignores it.
+      resultShower.fDCosStart = bestVectorAlt.at(min_index);
+    }
+
+    else {
+      // give up, just average it ...
+      resultShower.fDCosStart.SetX(0.0);
+      resultShower.fDCosStart.SetY(0.0);
+      resultShower.fDCosStart.SetZ(0.0);
+      for (auto & vec : bestVectorAlt) {
+        TVector3 tempVec;
+        tempVec.SetX(vec.X() / bestVectorAlt.size());
+        tempVec.SetY(vec.Y() / bestVectorAlt.size());
+        tempVec.SetZ(vec.Z() / bestVectorAlt.size());
+        resultShower.fDCosStart += tempVec;
+      }
+
+    }
 
 
 
-//    vecIndex = 0;
-//    for (auto & vec : seedVectors ) {
-//      // check the return value, skip max out vectors.:
-//      if (convergeStatus.at(vecIndex) == kIterMaxOut)
-//        continue;
-//      else {
-//        std::cout << "Going into alternative fitting options" <<std::endl;
-//        // try to fit this vector against the planes but remove one plane.
-//        for (unsigned int i = 0; i < slopeByPlane.size(); i ++) {
-//          // Make a temp slope and temp plane object for this case:
-//          std::vector<float> tempSlopes;
-//          std::vector<int> tempPlane;
-//          for (unsigned int j = 0; j < slopeByPlane.size(); j++) {
-//            if (i == j) continue;
-//            tempSlopes.push_back(slopeByPlane.at(j));
-//            tempPlane.push_back(planes.at(j));
-//          }
-//          // Now, try to make a fit of this vector:
-//          Status exitStatus = kNStatus;
-//          int n_iterations = 0;
-//          errorVector.at(vecIndex) = optimzeVector(vec, exitStatus, n_iterations, tempSlopes, tempPlane);
-//          convergeStatus.at(vecIndex) = exitStatus;
-//          convergeNumber.at(vecIndex) = n_iterations;
-//          // Print out what happened:
-//          // Print out info about this vector:
-//          std::cout << "Error: " << errorVector.at(vecIndex)
-//          << "\tVec: (" << vec.X() << ", "
-//          << vec.Y() << ", "
-//          << vec.Z() << ")"
-//          << "\tStatus: ";
-//          if (convergeStatus.at(vecIndex) == kNormal)
-//            std::cout << "normal";
-//          if (convergeStatus.at(vecIndex) == kIterMaxOut)
-//            std::cout << "maxout";
-//          if (convergeStatus.at(vecIndex) == kNotOptFit)
-//            std::cout << "nonopt";
-//          std::cout << "\tN: " << convergeNumber.at(vecIndex);
-//          std::cout << std::endl;
-//          for (unsigned int p = 0; p < tempPlane.size(); p++) {
-//            float slope = geomHelper -> Slope_3Dto2D(vec, tempPlane[p]);
-//            std::cout << "\t" << p << " - \tgoal:\t" << tempSlopes.at(p) << "\tact:\t" << slope << "\n";
-//          }
-//        }
-//      }
-//    }
-//    vecIndex ++;
-//  }
+  } // alternate fitting options
 
-
-  resultShower.fXYZStart = pointOnAxis;
 
   if (_verbose) {
     std::cout << "FINAL RESULT: \n";

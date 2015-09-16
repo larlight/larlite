@@ -55,7 +55,7 @@ def getShowerRecoAlgModular():
   alg.AddShowerRecoModule(axis3D)
   alg.AddShowerRecoModule(energy)
   # alg.AddShowerRecoModule(showerreco.StartPoint2DModule()  )
-  # alg.AddShowerRecoModule(showerreco.StartPoint3DModule()  )
+  alg.AddShowerRecoModule(showerreco.StartPoint3DModule()  )
   # alg.AddShowerRecoModule(showerreco.ShowerChargeModule()  )
 
   alg.PrintModuleList()
@@ -148,7 +148,7 @@ print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
-my_proc.run()
+my_proc.run(9,1)
 # my_proc.process_event(2)
 
 
