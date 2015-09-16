@@ -164,62 +164,110 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   // Set the best vector to direction:
   if (bestIndex != -1)
     resultShower.fDCosStart = seedVectors.at(bestIndex);
-  //else {
-  // In this case, none of the seeds converged.  Maxout seed vectors aren't useful, but
-  // the nonopt ones are.  We can try removing each plane and refitting all the vectors
-  // that were returned to see if they converge.
-
-  // Loop over all possible pair of planes.
-
-  std::cout << "Running alternate axis finding..." << std::endl;
-  for (unsigned int i = 0; i < planes.size(); i++) {
-
-    std::vector<float> slopeByPlaneAlt;
-    std::vector<int> planesAlt;
-
-    for (unsigned int j = 0; j < planes.size(); j++) {
-      if (i == j) continue;
-      else {
-        planesAlt.push_back(planes[j]);
-        slopeByPlaneAlt.push_back(slopeByPlane[j]);
+  else {
+    // In this case, none of the seeds converged.  Maxout seed vectors aren't useful, but
+    // the nonopt ones are.  We can try removing each plane and refitting all the vectors
+    // that were returned to see if they converge.
+    
+    // Loop over all possible pair of planes.
+    
+    std::cout << "Running alternate axis finding..." << std::endl;
+    
+    std::vector<int> bestIndexAlt;
+    std::vector<float> bestErrorAlt;
+    std::vector<TVector3> bestVectorAlt;
+    
+    for (unsigned int i = 0; i < planes.size(); i++) {
+      
+      // maintain a list of the good seeds and the errors of the seed vectors too:
+      std::vector<TVector3> seedVectorsAlt;
+      std::vector<float>    errorVectorAlt;
+      std::vector<Status>   convergeStatusAlt;
+      std::vector<int>      convergeNumberAlt;
+      int                   n_convergedAlt(0);
+      
+      // Keep the best vector with the best error;
+      int bestIndexTemp = -1;
+      float bestErrorTemp = 9999;
+      TVector3 bestVectorTemp;
+      
+      std::vector<float> slopeByPlaneAlt;
+      std::vector<int> planesAlt;
+      
+      for (unsigned int j = 0; j < planes.size(); j++) {
+        if (i == j) continue;
+        else {
+          planesAlt.push_back(planes[j]);
+          slopeByPlaneAlt.push_back(slopeByPlane[j]);
+        }
       }
+      
+      std::cout << "Omitting plane " << planes[i] << std::endl;
+      
+      findSeedVectors(seedVectorsAlt, errorVectorAlt, planesAlt, slopeByPlaneAlt);
+      
+      // Now the list of seed vectors is reduced to a few candidate vectors that are close
+      vecIndex = 0;
+      for (auto & vec : seedVectorsAlt) {
+        Status exitStatus = kNStatus;
+        int n_iterations = 0;
+        errorVectorAlt.at(vecIndex) = optimzeVector(vec, exitStatus, n_iterations, slopeByPlaneAlt, planesAlt);
+        convergeStatusAlt.push_back(exitStatus);
+        convergeNumberAlt.push_back(n_iterations);
+        if (exitStatus == kNormal)
+          n_convergedAlt++;
+        vecIndex ++;
+      }
+      
+      // Print out the final vectors and their errors:
+      vecIndex = 0;
+
+      for (auto & vec : seedVectorsAlt) {
+        // Print out info about this vector:
+        if (_verbose) {
+          std::cout << "Error: " << errorVectorAlt.at(vecIndex)
+          << "\tVec: (" << vec.X() << ", "
+          << vec.Y() << ", "
+          << vec.Z() << ")"
+          << "\tStatus: ";
+          if (convergeStatusAlt.at(vecIndex) == kNormal)
+            std::cout << "normal";
+          if (convergeStatusAlt.at(vecIndex) == kIterMaxOut)
+            std::cout << "maxout";
+          if (convergeStatusAlt.at(vecIndex) == kNotOptFit)
+            std::cout << "nonopt";
+          std::cout << "\tN: " << convergeNumberAlt.at(vecIndex);
+          std::cout << std::endl;
+          for (unsigned int p = 0; p < planesAlt.size(); p++) {
+            float slope = geomHelper -> Slope_3Dto2D(vec, planesAlt[p]);
+            std::cout << "\t" << p << " - \tgoal:\t" << slopeByPlaneAlt.at(p) << "\tact:\t" << slope << "\n";
+          }
+        }
+        
+        if ( convergeStatusAlt.at(vecIndex) == kNormal ) {
+          if (errorVectorAlt.at(vecIndex) < bestError) {
+            bestIndexTemp = vecIndex;
+            bestErrorTemp = errorVectorAlt.at(vecIndex);
+            bestVectorTemp = vec;
+          }
+        }
+        vecIndex ++;
+      }
+      
+      bestIndexAlt.push_back(bestIndexTemp);
+      bestErrorAlt.push_back(bestErrorTemp);
+      bestVectorAlt.push_back(bestVectorTemp);
     }
-    //
-    //      // maintain a list of the good seeds and the errors of the seed vectors too:
-    //      std::vector<TVector3> seedVectors;
-    //      std::vector<float>    errorVector;
-    //      std::vector<Status>   convergeStatus;
-    //      std::vector<int>      convergeNumber;
-    //      int                   n_converged(0);
-    //
-    //      float errorCutoff = _seedVectorErrorCutoff;
-    //
-    //      // Find out the seed vectors with reasonable error, and reject all the others
-    //      while (seedVectors.size() == 0) {
-    //        for (auto & vec : tempSeedVectors) {
-    //          float error = getErrorOfProjection(vec, slopeByPlane, planes);
-    //          if (error < errorCutoff) {
-    //            seedVectors.push_back(vec);
-    //            errorVector.push_back(error);
-    //            // std::cout << "vector "
-    //            //           << vec.X() << ", "
-    //            //           << vec.Y() << ", "
-    //            //           << vec.Z() << ")., error " << error
-    //            //           << " was kept\n";
-    //          }
-    //          // else {
-    //          //   std::cout << "vector "
-    //          //             << vec.X() << ", "
-    //          //             << vec.Y() << ", "
-    //          //             << vec.Z() << ")., error " << error
-    //          //             << " was rejected\n";
-    //          // }
-    //        }
-    //        errorCutoff += _seedVectorErrorCutoff;
-    //      }
-
+    
+    std::cout << "SUMMARY OF ALTERNATIVE AXES:" << std::endl;
+    for (int i = 0; i < bestIndexAlt.size(); i++) {
+      std::cout << "Best vector omitting plane " << i << ":"
+                << "  Error " << bestErrorAlt[i] << " with vector (" << bestVectorAlt[i].X() << ", "
+                << bestVectorAlt[i].Y() << ", " << bestVectorAlt[i].Z() << ")" << std::endl;
+    }
   }
-
+  
+    
 
 
 
