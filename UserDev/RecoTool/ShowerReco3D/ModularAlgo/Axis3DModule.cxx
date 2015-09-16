@@ -94,8 +94,8 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
 
   TVector3 prevDir = direction;
 
-  if (globalSeedVectors.size() == 0)
-    generateSeedVectors(direction, M_PI / 2.0, fNStepsInitial, globalSeedVectors);
+  if (_globalSeedVectors.size() == 0)
+    generateSeedVectors(direction, M_PI / 2.0, fNStepsInitial, _globalSeedVectors);
 
   // maintain a list of the good seeds and the errors of the seed vectors too:
   std::vector<TVector3> seedVectors;
@@ -108,8 +108,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   int bestIndex = -1;
   float bestError = 9999;
 
-  findSeedVectors(globalSeedVectors, seedVectors, errorVector, convergeStatus, convergeNumber,
-                  n_converged, planes, slopeByPlane, bestIndex);
+  findSeedVectors(seedVectors, errorVector, planes, slopeByPlane);
   
   // Now the list of seed vectors is reduced to a few candidate vectors that are close
   
@@ -529,21 +528,16 @@ float Axis3DModule::getErrorOfProjection( const TVector3 & inputVector,
 }
 
   
-void Axis3DModule::findSeedVectors(const std::vector<TVector3> & tempSeedVectors,
-                                     std::vector<TVector3> & seedVectors,
-                                     std::vector<float> & errorVector,
-                                     std::vector<Status> & convergeStatus,
-                                     std::vector<int> & convergeNumber,
-                                     int & n_converged,
-                                     const std::vector<int> & planes,
-                                     const std::vector<float> & slopeByPlane,
-                                     int & bestIndex)
+void Axis3DModule::findSeedVectors(std::vector<TVector3> & seedVectors,
+                                   std::vector<float> & errorVector,
+                                   const std::vector<int> & planes,
+                                   const std::vector<float> & slopeByPlane)
 {
   float errorCutoff = _seedVectorErrorCutoff;
   
   // Find out the seed vectors with reasonable error, and reject all the others
   while (seedVectors.size() == 0) {
-    for (auto & vec : tempSeedVectors) {
+    for (auto & vec : _globalSeedVectors) {
       float error = getErrorOfProjection(vec, slopeByPlane, planes);
       if (error < errorCutoff) {
         seedVectors.push_back(vec);

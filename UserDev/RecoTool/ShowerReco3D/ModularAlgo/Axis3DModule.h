@@ -186,18 +186,13 @@ private:
      * @details
     */
 
-  void findSeedVectors(const std::vector<TVector3> & tempSeedVectors,
-                       std::vector<TVector3> & seedVectors,
+  void findSeedVectors(std::vector<TVector3> & seedVectors,
                        std::vector<float> & errorVector,
-                       std::vector<Status> & convergeStatus,
-                       std::vector<int> & convergeNumber,
-                       int & n_converged,
                        const std::vector<int> & planes,
-                       const std::vector<float> & slopeByPlane,
-                       int & bestIndex);
+                       const std::vector<float> & slopeByPlane);
 
     // Private members that get used frequently:
-    std::vector<TVector3> globalSeedVectors;
+    std::vector<TVector3> _globalSeedVectors;
 
 
     // Configurable variables for this module:
