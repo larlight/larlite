@@ -59,7 +59,6 @@ namespace cluster {
     std::vector<TH1F *> startPointT;
     std::vector<TH1F *> startSlope;
     std::vector<TH1F *> prinSlope;
-    std::vector<TH1F *> direction;
 
     TTree* _param_tree;
     int _plane;
@@ -68,6 +67,7 @@ namespace cluster {
     double _t, _mc_t;
     double _angle, _start_angle, _mc_angle;
     double _containment;
+    int _direction; //0 is forward, 1 is backwards
 
   };
 }

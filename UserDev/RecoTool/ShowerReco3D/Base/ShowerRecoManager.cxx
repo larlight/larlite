@@ -61,9 +61,11 @@ namespace showerreco {
       ShowerClusterSet_t in_clusters;
       in_clusters.reserve(pair.size());
       
-      for(auto const& index : pair)
-
+      for(auto const& index : pair){
         in_clusters.emplace_back( fMatchMgr->GetInputClusters()[index] );
+        // Make sure to fill the params:
+        _params_alg.FillParams(in_clusters.back());
+      }
 
       for(auto& shower_alg : _alg_v)
 

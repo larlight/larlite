@@ -65,6 +65,7 @@ bool ClusterParamsAna::initialize() {
     _param_tree->Branch("_mc_w", &_mc_w, "mc_w/D");
     _param_tree->Branch("_mc_t", &_mc_t, "mc_t/D");
     _param_tree->Branch("_mc_angle", &_mc_angle, "mc_angle/D");
+    _param_tree->Branch("_direction", &_direction, "_direction/D");
 
     return true;
 }
@@ -126,6 +127,14 @@ bool ClusterParamsAna::analyze(::larlite::storage_manager* storage) {
                                 + pow(reco_start.t - mcStartPoint.t, 2));
         float dist_end   = sqrt(pow(reco_end.w - mcStartPoint.w, 2)
                                 + pow(reco_end.t - mcStartPoint.t, 2));
+
+        _direction = -1;
+        if (dist_start < dist_end){
+            _direction = 0;
+        }
+        else{
+            _direction = 1;
+        }
 
         if (_verbose) {
             if (dist_start < dist_end)

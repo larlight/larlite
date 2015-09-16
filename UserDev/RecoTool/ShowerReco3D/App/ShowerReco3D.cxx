@@ -26,7 +26,7 @@ namespace larlite {
     fManager.Reset();
 
     // Retrieve clusters and fed into the algorithm
-    std::vector<std::vector<larutil::PxHit> > local_clusters;
+    std::vector<std::vector<Hit2D> > local_clusters;
     fCRUHelper.GenerateHit2D(storage,fInputProducer,local_clusters);
 
     // Create output data product holder
