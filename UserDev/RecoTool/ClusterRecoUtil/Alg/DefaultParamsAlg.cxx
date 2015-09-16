@@ -24,6 +24,9 @@ DefaultParamsAlg::DefaultParamsAlg() {
     selectStartPoint                           -> SetVerbose(false);
     RefineStartPoints  * refineStartPoint      = new RefineStartPoints();
     refineStartPoint                           -> SetVerbose(false);
+    FillGeomParams     * fillGeomParams        = new FillGeomParams();
+    fillGeomParams                             -> SetVerbose(false);
+
 
     attachAlg(averages);
     attachAlg(polygon);
@@ -31,6 +34,7 @@ DefaultParamsAlg::DefaultParamsAlg() {
     attachAlg(showeringpoint);
     attachAlg(selectStartPoint);
     attachAlg(refineStartPoint);
+    attachAlg(fillGeomParams);
 
 
     SetDebug(false);
