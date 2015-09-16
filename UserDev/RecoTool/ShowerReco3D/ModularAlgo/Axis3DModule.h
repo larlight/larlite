@@ -185,18 +185,16 @@ private:
      * @brief This function identifies seed vectors, optimises them and finds the best candidate
      * @details
     */
-    void findSeedVectors(const std::vector<TVector3> & tempSeedVectors,
-                         std::vector<TVector3> & seedVectors,
-                         std::vector<float> & errorVector,
-                         std::vector<Status> & convergeStatus,
-                         std::vector<int> & convergeNumber,
-                         int & n_converged,
-                         const std::vector<int> & planes,
-                         const std::vector<float> & slopeByPlane,
-                         int & bestIndex,
-                         float & bestError);
 
-
+  void findSeedVectors(const std::vector<TVector3> & tempSeedVectors,
+                       std::vector<TVector3> & seedVectors,
+                       std::vector<float> & errorVector,
+                       std::vector<Status> & convergeStatus,
+                       std::vector<int> & convergeNumber,
+                       int & n_converged,
+                       const std::vector<int> & planes,
+                       const std::vector<float> & slopeByPlane,
+                       int & bestIndex);
 
     // Private members that get used frequently:
     std::vector<TVector3> globalSeedVectors;
