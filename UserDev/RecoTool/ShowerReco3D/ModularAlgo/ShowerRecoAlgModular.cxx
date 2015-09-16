@@ -28,6 +28,8 @@ namespace showerreco {
       result.fSigmaTotalEnergy.resize(nPlanes);
       result.fdEdx.resize(nPlanes);
       result.fdQdx.resize(nPlanes);
+      result.fHitdQdx_v.resize(nPlanes);
+
       result.fShoweringLength.resize(nPlanes); // resizing Showering Length Vector
       result.fSigmadEdx.resize(nPlanes);
       result.fTotalMIPEnergy.resize(nPlanes);
@@ -258,6 +260,26 @@ namespace showerreco {
             for (auto & val : localCopy.fdQdx ) std::cout << val << " ";
             std::cout << ") to (";
             for (auto & val : result.fdQdx ) std::cout << val << " ";
+            std::cout << ")" << std::endl;
+          }
+
+          // HitdQdx_v
+          changed = false;
+          for (unsigned int i = 0; i < localCopy.fHitdQdx_v.size(); i++){
+	    for (unsigned int j = 0; j < localCopy.fHitdQdx_v[i].size(); j++){
+	      if (localCopy.fHitdQdx_v[i][j] != result.fHitdQdx_v[i][j]){
+		changed = true;
+		break;
+	      }
+	    }
+          }
+          if (changed){
+            std::cout << "\tfHitdQdx_v has changed from (";
+            for (auto & val : localCopy.fHitdQdx_v ) 
+	      for (auto & v : val) std::cout << v << " ";
+	    std::cout << ") to (";
+            for (auto & val : result.fHitdQdx_v ) 
+	      for(auto & v : val )std::cout << v << " ";
             std::cout << ")" << std::endl;
           }
 
