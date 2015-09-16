@@ -20,8 +20,11 @@ namespace showerreco{
     for(auto const & cluster : inputShowers){
       
       // measure the distance between the start point and showering point
-      double dist = 8;//sqrt(geomHelper->Get2DDistanceSqrd(cluster.start_point,cluster.showering_point));      
+      double dist = geomHelper->Get2DDistance(cluster.start_point, cluster.showering_point);      
+
       
+      
+      std::cout << " start T" << cluster.start_point.t << "  showering t " << cluster.showering_point.t << std::endl;
       std::cout << "Dist " << dist << std::endl;
       
       // get the plane associated with this cluster
