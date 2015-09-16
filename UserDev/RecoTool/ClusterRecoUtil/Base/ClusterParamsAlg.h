@@ -33,7 +33,7 @@ namespace cluster{
   public:
 
     /// Default constructor
-    ClusterParamsAlg(){_nClusters=0;_verbose=false;_debug=false;}
+    ClusterParamsAlg(){_nClusters=0;_verbose=false;_debug=false;_min_hits=2;}
 
     /// Default destructor
     ~ClusterParamsAlg();
