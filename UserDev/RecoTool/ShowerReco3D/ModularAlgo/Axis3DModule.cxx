@@ -103,146 +103,127 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   std::vector<Status>   convergeStatus;
   std::vector<int>      convergeNumber;
   int                   n_converged(0);
-
-  float errorCutoff = _seedVectorErrorCutoff;
-
-  // Find out the seed vectors with reasonable error, and reject all the others
-  while (seedVectors.size() == 0) {
-    for (auto & vec : tempSeedVectors) {
-      float error = getErrorOfProjection(vec, slopeByPlane, planes);
-      if (error < errorCutoff) {
-        seedVectors.push_back(vec);
-        errorVector.push_back(error);
-        // std::cout << "vector "
-        //           << vec.X() << ", "
-        //           << vec.Y() << ", "
-        //           << vec.Z() << ")., error " << error
-        //           << " was kept\n";
-      }
-      // else {
-      //   std::cout << "vector "
-      //             << vec.X() << ", "
-      //             << vec.Y() << ", "
-      //             << vec.Z() << ")., error " << error
-      //             << " was rejected\n";
-      // }
-    }
-    errorCutoff += _seedVectorErrorCutoff;
-  }
-
-  // Now the list of seed vectors is reduced to a few candidate vectors that are close
-
-  int vecIndex = 0;
-  for (auto & vec : seedVectors) {
-    Status exitStatus = kNStatus;
-    int n_iterations = 0;
-    errorVector.at(vecIndex) = optimzeVector(vec, exitStatus, n_iterations, slopeByPlane, planes);
-    convergeStatus.push_back(exitStatus);
-    convergeNumber.push_back(n_iterations);
-    if (exitStatus == kNormal)
-      n_converged++;
-    vecIndex ++;
-  }
-
+  
   // Keep the best vector with the best error;
   int bestIndex = -1;
   float bestError = 9999;
 
-  // Print out the final vectors and their errors:
-  vecIndex = 0;
-  for (auto & vec : seedVectors) {
-    // Print out info about this vector:
-    if (_verbose) {
-      std::cout << "Error: " << errorVector.at(vecIndex)
-                << "\tVec: (" << vec.X() << ", "
-                << vec.Y() << ", "
-                << vec.Z() << ")"
-                << "\tStatus: ";
-      if (convergeStatus.at(vecIndex) == kNormal)
-        std::cout << "normal";
-      if (convergeStatus.at(vecIndex) == kIterMaxOut)
-        std::cout << "maxout";
-      if (convergeStatus.at(vecIndex) == kNotOptFit)
-        std::cout << "nonopt";
-      std::cout << "\tN: " << convergeNumber.at(vecIndex);
-      std::cout << std::endl;
-      for (unsigned int p = 0; p < planes.size(); p++) {
-        float slope = geomHelper -> Slope_3Dto2D(vec, planes[p]);
-        std::cout << "\t" << p << " - \tgoal:\t" << slopeByPlane.at(p) << "\tact:\t" << slope << "\n";
-      }
-    }
-
-
-
-    if ( convergeStatus.at(vecIndex) == kNormal ) {
-      if (errorVector.at(vecIndex) < bestError) {
-        bestIndex = vecIndex;
-        bestError = errorVector.at(vecIndex);
-      }
-    }
-    vecIndex ++;
-  }
-
-
+  findSeedVectors(tempSeedVectors, seedVectors, errorVector, convergeStatus, convergeNumber,
+                  n_converged, planes, slopeByPlane, bestIndex, bestError);
+  
   // Set the best vector to direction:
   if (bestIndex != -1)
     resultShower.fDCosStart = seedVectors.at(bestIndex);
-  // else {
-  //   // In this case, none of the seeds converged.  Maxout seed vectors aren't useful, but
-  //   // the nonopt ones are.  We can try removing each plane and refitting all the vectors
-  //   // that were returned to see if they converge.
-  //   vecIndex = 0;
-  //   for (auto & vec : seedVectors ) {
-  //     // check the return value, skip max out vectors.:
-  //     if (convergeStatus.at(vecIndex) == kIterMaxOut)
-  //       continue;
-  //     // else {
-  //     //   std::cout << "Going into alternative fitting options" <<std::endl;
-  //     //   // try to fit this vector against the planes but remove one plane.
-  //     //   for (unsigned int i = 0; i < slopeByPlane.size(); i ++) {
-  //     //     // Make a temp slope and temp plane object for this case:
-  //     //     std::vector<float> tempSlopes;
-  //     //     std::vector<int> tempPlane;
-  //     //     for (unsigned int j = 0; j < slopeByPlane.size(); j++) {
-  //     //       if (i == j) continue;
-  //     //       tempSlopes.push_back(slopeByPlane.at(j));
-  //     //       tempPlane.push_back(planes.at(j));
-  //     //     }
-  //     //     // Now, try to make a fit of this vector:
-  //     //     Status exitStatus = kNStatus;
-  //     //     int n_iterations = 0;
-  //     //     errorVector.at(vecIndex) = optimzeVector(vec, exitStatus, n_iterations, tempSlopes, tempPlane);
-  //     //     convergeStatus.at(vecIndex) = exitStatus;
-  //     //     convergeNumber.at(vecIndex) = n_iterations;
-  //     //     // Print out what happened:
-  //     //     // Print out info about this vector:
-  //     //     std::cout << "Error: " << errorVector.at(vecIndex)
-  //     //               << "\tVec: (" << vec.X() << ", "
-  //     //               << vec.Y() << ", "
-  //     //               << vec.Z() << ")"
-  //     //               << "\tStatus: ";
-  //     //     if (convergeStatus.at(vecIndex) == kNormal)
-  //     //       std::cout << "normal";
-  //     //     if (convergeStatus.at(vecIndex) == kIterMaxOut)
-  //     //       std::cout << "maxout";
-  //     //     if (convergeStatus.at(vecIndex) == kNotOptFit)
-  //     //       std::cout << "nonopt";
-  //     //     std::cout << "\tN: " << convergeNumber.at(vecIndex);
-  //     //     std::cout << std::endl;
-  //     //     for (unsigned int p = 0; p < tempPlane.size(); p++) {
-  //     //       float slope = geomHelper -> Slope_3Dto2D(vec, tempPlane[p]);
-  //     //       std::cout << "\t" << p << " - \tgoal:\t" << tempSlopes.at(p) << "\tact:\t" << slope << "\n";
-  //     //     }
-  //     //   }
-  //     // }
-  //   }
-  //   vecIndex ++;
-  // }
+  //else {
+  // In this case, none of the seeds converged.  Maxout seed vectors aren't useful, but
+  // the nonopt ones are.  We can try removing each plane and refitting all the vectors
+  // that were returned to see if they converge.
+  
+  // Loop over all possible pair of planes.
+  
+  std::cout << "Running alternate axis finding..." << std::endl;
+  for (unsigned int i = 0; i < planes.size(); i++) {
+    
+    std::vector<float> slopeByPlaneAlt;
+    std::vector<int> planesAlt;
+    
+    for (unsigned int j = 0; j < planes.size(); j++) {
+      if (i == j) continue;
+      else {
+        planesAlt.push_back(planes[j]);
+        slopeByPlaneAlt.push_back(slopeByPlane[j]);
+      }
+    }
+    //
+    //      // maintain a list of the good seeds and the errors of the seed vectors too:
+    //      std::vector<TVector3> seedVectors;
+    //      std::vector<float>    errorVector;
+    //      std::vector<Status>   convergeStatus;
+    //      std::vector<int>      convergeNumber;
+    //      int                   n_converged(0);
+    //
+    //      float errorCutoff = _seedVectorErrorCutoff;
+    //
+    //      // Find out the seed vectors with reasonable error, and reject all the others
+    //      while (seedVectors.size() == 0) {
+    //        for (auto & vec : tempSeedVectors) {
+    //          float error = getErrorOfProjection(vec, slopeByPlane, planes);
+    //          if (error < errorCutoff) {
+    //            seedVectors.push_back(vec);
+    //            errorVector.push_back(error);
+    //            // std::cout << "vector "
+    //            //           << vec.X() << ", "
+    //            //           << vec.Y() << ", "
+    //            //           << vec.Z() << ")., error " << error
+    //            //           << " was kept\n";
+    //          }
+    //          // else {
+    //          //   std::cout << "vector "
+    //          //             << vec.X() << ", "
+    //          //             << vec.Y() << ", "
+    //          //             << vec.Z() << ")., error " << error
+    //          //             << " was rejected\n";
+    //          // }
+    //        }
+    //        errorCutoff += _seedVectorErrorCutoff;
+    //      }
+    
+  }
+  
+  
+  
+    
+//    vecIndex = 0;
+//    for (auto & vec : seedVectors ) {
+//      // check the return value, skip max out vectors.:
+//      if (convergeStatus.at(vecIndex) == kIterMaxOut)
+//        continue;
+//      else {
+//        std::cout << "Going into alternative fitting options" <<std::endl;
+//        // try to fit this vector against the planes but remove one plane.
+//        for (unsigned int i = 0; i < slopeByPlane.size(); i ++) {
+//          // Make a temp slope and temp plane object for this case:
+//          std::vector<float> tempSlopes;
+//          std::vector<int> tempPlane;
+//          for (unsigned int j = 0; j < slopeByPlane.size(); j++) {
+//            if (i == j) continue;
+//            tempSlopes.push_back(slopeByPlane.at(j));
+//            tempPlane.push_back(planes.at(j));
+//          }
+//          // Now, try to make a fit of this vector:
+//          Status exitStatus = kNStatus;
+//          int n_iterations = 0;
+//          errorVector.at(vecIndex) = optimzeVector(vec, exitStatus, n_iterations, tempSlopes, tempPlane);
+//          convergeStatus.at(vecIndex) = exitStatus;
+//          convergeNumber.at(vecIndex) = n_iterations;
+//          // Print out what happened:
+//          // Print out info about this vector:
+//          std::cout << "Error: " << errorVector.at(vecIndex)
+//          << "\tVec: (" << vec.X() << ", "
+//          << vec.Y() << ", "
+//          << vec.Z() << ")"
+//          << "\tStatus: ";
+//          if (convergeStatus.at(vecIndex) == kNormal)
+//            std::cout << "normal";
+//          if (convergeStatus.at(vecIndex) == kIterMaxOut)
+//            std::cout << "maxout";
+//          if (convergeStatus.at(vecIndex) == kNotOptFit)
+//            std::cout << "nonopt";
+//          std::cout << "\tN: " << convergeNumber.at(vecIndex);
+//          std::cout << std::endl;
+//          for (unsigned int p = 0; p < tempPlane.size(); p++) {
+//            float slope = geomHelper -> Slope_3Dto2D(vec, tempPlane[p]);
+//            std::cout << "\t" << p << " - \tgoal:\t" << tempSlopes.at(p) << "\tact:\t" << slope << "\n";
+//          }
+//        }
+//      }
+//    }
+//    vecIndex ++;
+//  }
 
 
   resultShower.fXYZStart = pointOnAxis;
-
-
+  
   if (_verbose) {
     std::cout << "FINAL RESULT: \n";
 
@@ -400,6 +381,7 @@ void Axis3DModule::generateNearbyVectors( const TVector3 & initialVector,
   return;
 }
 
+
 void Axis3DModule::generateSeedVectors(const TVector3 & initialVector,
                                        float thetaRange,
                                        int nSteps,
@@ -450,7 +432,7 @@ void Axis3DModule::generateSeedVectors(const TVector3 & initialVector,
 
 }
 int Axis3DModule::findBestVector( const std::vector<TVector3> seedVectors,
-                                  const std::vector<float> & slopesByPlane,
+                                 const std::vector<float> & slopesByPlane,
                                   const std::vector<int> & planes) {
 
   // Loop over the vectors, calculate the error, and return the one with smallest error
@@ -497,9 +479,93 @@ float Axis3DModule::getErrorOfProjection( const TVector3 & inputVector,
   return err;
 
 }
-
-
-
+  
+  void Axis3DModule::findSeedVectors(const std::vector<TVector3> & tempSeedVectors,
+                                     std::vector<TVector3> & seedVectors,
+                                     std::vector<float> & errorVector,
+                                     std::vector<Status> & convergeStatus,
+                                     std::vector<int> & convergeNumber,
+                                     int & n_converged,
+                                     const std::vector<int> & planes,
+                                     const std::vector<float> & slopeByPlane,
+                                     int & bestIndex,
+                                     float & bestError)
+{
+    auto geomHelper = larutil::GeometryHelper::GetME();
+    float errorCutoff = _seedVectorErrorCutoff;
+    
+    // Find out the seed vectors with reasonable error, and reject all the others
+    while (seedVectors.size() == 0) {
+      for (auto & vec : tempSeedVectors) {
+        float error = getErrorOfProjection(vec, slopeByPlane, planes);
+        if (error < errorCutoff) {
+          seedVectors.push_back(vec);
+          errorVector.push_back(error);
+          // std::cout << "vector "
+          //           << vec.X() << ", "
+          //           << vec.Y() << ", "
+          //           << vec.Z() << ")., error " << error
+          //           << " was kept\n";
+        }
+        // else {
+        //   std::cout << "vector "
+        //             << vec.X() << ", "
+        //             << vec.Y() << ", "
+        //             << vec.Z() << ")., error " << error
+        //             << " was rejected\n";
+        // }
+      }
+      errorCutoff += _seedVectorErrorCutoff;
+    }
+  
+  // Now the list of seed vectors is reduced to a few candidate vectors that are close
+  
+  int vecIndex = 0;
+  for (auto & vec : seedVectors) {
+    Status exitStatus = kNStatus;
+    int n_iterations = 0;
+    errorVector.at(vecIndex) = optimzeVector(vec, exitStatus, n_iterations, slopeByPlane, planes);
+    convergeStatus.push_back(exitStatus);
+    convergeNumber.push_back(n_iterations);
+    if (exitStatus == kNormal)
+      n_converged++;
+    vecIndex ++;
+  }
+  
+  // Print out the final vectors and their errors:
+  vecIndex = 0;
+  for (auto & vec : seedVectors) {
+    // Print out info about this vector:
+    if (_verbose) {
+      std::cout << "Error: " << errorVector.at(vecIndex)
+      << "\tVec: (" << vec.X() << ", "
+      << vec.Y() << ", "
+      << vec.Z() << ")"
+      << "\tStatus: ";
+      if (convergeStatus.at(vecIndex) == kNormal)
+        std::cout << "normal";
+      if (convergeStatus.at(vecIndex) == kIterMaxOut)
+        std::cout << "maxout";
+      if (convergeStatus.at(vecIndex) == kNotOptFit)
+        std::cout << "nonopt";
+      std::cout << "\tN: " << convergeNumber.at(vecIndex);
+      std::cout << std::endl;
+      for (unsigned int p = 0; p < planes.size(); p++) {
+        float slope = geomHelper -> Slope_3Dto2D(vec, planes[p]);
+        std::cout << "\t" << p << " - \tgoal:\t" << slopeByPlane.at(p) << "\tact:\t" << slope << "\n";
+      }
+    }
+    
+    if ( convergeStatus.at(vecIndex) == kNormal ) {
+      if (errorVector.at(vecIndex) < bestError) {
+        bestIndex = vecIndex;
+        bestError = errorVector.at(vecIndex);
+      }
+    }
+    vecIndex ++;
+  
+  }
+}
 
 } //showerreco
 
