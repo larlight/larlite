@@ -26,6 +26,10 @@ secondary_algo = ertool.ERAlgoCRSecondary()
 orphan = ertool.ERAlgoCROrphan()
 fmatch = ertool.ERAlgoFlashMatch()
 
+orphan_algo = ertool.ERAlgoCROrphan()
+
+flash_algo  = ertool.ERAlgoFlashMatch() 
+
 # Set input root file
 for x in xrange(len(sys.argv)-1):
     my_proc.add_input_file(sys.argv[x+1])
@@ -34,7 +38,7 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
-my_proc.set_ana_output_file("singleE_selection.root")
+my_proc.set_ana_output_file("cosmic_trees.root")
 
 Ecut = 20 # in MeV
 
