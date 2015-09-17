@@ -22,7 +22,7 @@ namespace showerreco{
     _tree->Branch("_pl",&_pl,"_pl/I");
     _tree->Branch("_dQ",&_dQ,"dQ/D");    
     _tree->Branch("_dQdx",&_dQdx,"dQdx/D");
-    _tree->Branch("_dQdx_pitch",&_dQdx_pitch,"dQdx/D_pitch");
+    _tree->Branch("_dQdx_pitch",&_dQdx_pitch,"dQdx_p/D");
     
     
     _fC_to_e = 6250.; // a fC in units of the electron charge
