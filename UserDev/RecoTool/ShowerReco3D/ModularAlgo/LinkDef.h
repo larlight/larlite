@@ -20,6 +20,7 @@
 #pragma link C++ class showerreco::dEdxFromdQdx+;
 #pragma link C++ class showerreco::EnergyModule+;
 #pragma link C++ class showerreco::LinearEnergy+;
+#pragma link C++ class showerreco::GeoModule+;
 #pragma link C++ class showerreco::EmptyModule+;
 //ADD_NEW_CLASS ... do not change this line
 
