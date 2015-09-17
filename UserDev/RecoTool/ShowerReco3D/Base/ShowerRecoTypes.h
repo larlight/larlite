@@ -52,6 +52,9 @@ namespace showerreco {
 
     std::vector< ::larlite::geo::PlaneID > fPlaneIDs;    ///< List of PlaneIDs in the order aligned w.r.t. other vectors
     
+    std::vector< bool > fPlaneIsBad;            ///< Matches number of planes, gets flagged if a plane is bad
+
+
     Shower_t()
     { Reset(); }
 
