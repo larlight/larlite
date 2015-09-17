@@ -39,27 +39,31 @@ namespace ertool {
 
     // Find primary showers
     for (auto const& s : graph.GetParticleNodes(RecoType_t::kShower)){
+
+      auto const& part = graph.GetParticle(s);
+      if(part.Descendant()) continue;
+
+      auto const& parent_part = graph.GetParticle(part.Parent());
+      auto const& ancestor_part = graph.GetParticle(part.Ancestor());
       
-      if( graph.GetParticle(graph.GetParticle(s).Parent()).RecoType() == RecoType_t::kTrack){
+      if( parent_part.RecoType() == RecoType_t::kTrack) {
         
 	if(Debug()) Debug(__FUNCTION__,"\t\t Track mama");
 
         continue;
       }
 	
-      if(graph.GetParticle(s).ProcessType() == ::ertool::ProcessType_t::kCosmic || 
-	 graph.GetParticle(graph.GetParticle(s).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
+      if(part.ProcessType() == kCosmic || ancestor_part.ProcessType() == kCosmic){
 	if(Debug()) Debug("\t\t Cosmic Shower");
         continue;	
       }
-
 
       // default: the shower is primary
       // if we find an indication of the
       // contrary change state accordingly
       bool primary = true;
 
-      auto const& thisID = graph.GetParticle(s).RecoID();
+      auto const& thisID = part.RecoID();
       auto const& thisShower = data.Shower(thisID);
       
       // Ok, we have a shower.
@@ -89,11 +93,9 @@ namespace ertool {
 	
         continue;
 	
-      }
-
-	
+	}
 	auto const& thatID = graph.GetParticle(p2).RecoID();
-
+	
 	// make sure we don't use the same shower or repeat search
 	if (thatID == thisID) continue;
 
@@ -165,8 +167,13 @@ namespace ertool {
     // Find primary tracks
     for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
 
-      if(graph.GetParticle(t).ProcessType() == ::ertool::ProcessType_t::kCosmic|| 
-	 graph.GetParticle(graph.GetParticle(t).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
+      auto const& part = graph.GetParticle(t);
+      if(part.Descendant()) continue;
+
+      auto const& parent_part = graph.GetParticle(part.Parent());
+      auto const& ancestor_part = graph.GetParticle(part.Ancestor());
+      
+      if(part.ProcessType() == kCosmic || ancestor_part.ProcessType() == kCosmic) {
 	if(Debug()) Debug("Cosmic Shower");
         continue;	
       }

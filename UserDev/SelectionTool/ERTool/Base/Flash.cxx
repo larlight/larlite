@@ -2,37 +2,40 @@
 #define ERTOOLBASE_FLASH_CXX
 #include "Flash.h"
 #include "ERToolConstants.h"
+#include "ERException.h"
 namespace ertool {
 
   Flash::Flash(const ::geoalgo::Vector& pos)
-    : ::geoalgo::Point_t ( pos )
-    , _npe_v  (     )
-    , _x      ( kINVALID_DOUBLE   )
+    : _npe_v  ()
+    , _t      ( kINVALID_DOUBLE   )
+    , _id     ( kINVALID_FLASH_ID )
+  {
+    if(pos.size()!=3) throw ERException("Flash must be 3D point!");
+    _x = pos[0];
+    _y = pos[1];
+    _z = pos[2];
+  }
+
+  Flash::Flash()
+    : _npe_v  ()
+    , _x      ( kINVALID_DOUBLE  )
     , _y      ( kINVALID_DOUBLE   )
     , _z      ( kINVALID_DOUBLE   )
     , _t      ( kINVALID_DOUBLE   )
     , _id     ( kINVALID_FLASH_ID )
   {}
 
-  Flash::Flash()
-    : ::geoalgo::Point_t ()
-    , _x      ( kINVALID_DOUBLE   )
-    , _y      ( kINVALID_DOUBLE   )
-    , _z      ( kINVALID_DOUBLE   )
-    , _t      ( kINVALID_DOUBLE   )
-    , _id ( kINVALID_FLASH_ID )
-  {}
-
   Flash::Flash(const ::geoalgo::Vector& pos,
 	       const std::vector<double>& npe_v)
-    : ::geoalgo::Point_t ( pos   )
-    , _npe_v  ( npe_v )
-    , _x      ( kINVALID_DOUBLE   )
-    , _y      ( kINVALID_DOUBLE   )
-    , _z      ( kINVALID_DOUBLE   )
+    : _npe_v  ( npe_v )
     , _t      ( kINVALID_DOUBLE   )
-    , _id ( kINVALID_FLASH_ID )
-  {}
+    , _id     ( kINVALID_FLASH_ID )
+  {
+    if(pos.size()!=3) throw ERException("Flash must be 3D point!");
+    _x = pos[0];
+    _y = pos[1];
+    _z = pos[2];
+  }
 
   FlashID_t Flash::FlashID() const
   { return _id; }
@@ -45,7 +48,7 @@ namespace ertool {
 
   void Flash::Reset()
   {
-    for(auto& v : (*this)) v = kINVALID_DOUBLE;
+    _x = _y = _z = _t = kINVALID_DOUBLE;
     _npe_v.clear();
   }
 
