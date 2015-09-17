@@ -36,6 +36,7 @@ void GetRoughStartPoint::do_params_fill(cluster_params & cluster) {
 
   auto const& poly = cluster.PolyObject;
   size_t nEdges = poly.Size();
+  _angleMatrix.clear();
   _angleMatrix = std::vector<std::vector<float> >(nEdges, std::vector<float>(nEdges));
   std::vector<float> interiorAngles;
   interiorAngles.resize(nEdges);
