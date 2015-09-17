@@ -362,13 +362,12 @@ namespace showerreco {
   std::cout << "=====================================================" << std::endl
             << std::endl;
     
-    std::cout << "finalize" << std::endl;
     // for each algorithm, get its tree and write it to output
     if (fout){
       fout->cd();
       for (auto & module : _modules){
 	auto tree = module->GetTree();
-	if (tree) { tree->Write(); std::cout << "got tree! " << std::endl; }
+	if (tree) { tree->Write(); }
       }// for each modular algo
     }// if output file exists
 
