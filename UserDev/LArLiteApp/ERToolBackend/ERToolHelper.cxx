@@ -2,6 +2,7 @@
 #define LARLITE_ERTOOLHELPER_CXX
 
 #include <TStopwatch.h>
+#include "DataFormat/mcflux.h"
 #include "DataFormat/mctruth.h"
 #include "DataFormat/mcshower.h"
 #include "DataFormat/mctrack.h"
@@ -23,10 +24,11 @@
 
 namespace larlite {
 
-  void ERToolHelper::FillMCInfo( const event_mctruth&   mci_v,
-				 const event_mcshower&  mcs_v,
-				 const event_mctrack&   mct_v,
-				 ::ertool::io::EmptyInput& strm) const
+  void ERToolHelper::FillMCInfo(const event_mcflux&    mcf_v, 
+				const event_mctruth&   mci_v,
+				const event_mcshower&  mcs_v,
+				const event_mctrack&   mct_v,
+				::ertool::io::EmptyInput& strm) const
   {
 
     std::map< ::ertool_helper::ParticleID, ::ertool::NodeID_t > part_list;
@@ -184,6 +186,33 @@ namespace larlite {
 			     ::geoalgo::Vector(mcp.Trajectory()[0].Momentum())*1.e3 );
 
 	  part_list[id] = p.ID();
+
+	  if(abs(mcp.PdgCode()) == 12 ||
+	     abs(mcp.PdgCode()) == 12){
+	    
+	    int f = &mci-&mci_v[0];
+	    
+	    if(mcf_v.at(f).fndecay == 1 ||
+	       mcf_v.at(f).fndecay == 2 ||
+	       mcf_v.at(f).fndecay == 3 ||
+	       mcf_v.at(f).fndecay == 4) 
+	      p.SetProcess(::ertool::kK0L);
+	    else if(mcf_v.at(f).fndecay == 5 ||
+		    mcf_v.at(f).fndecay == 6 ||
+		    mcf_v.at(f).fndecay == 7 ||
+		    mcf_v.at(f).fndecay == 8 ||
+		    mcf_v.at(f).fndecay == 9 ||
+		    mcf_v.at(f).fndecay == 10)
+	      p.SetProcess(::ertool::kKCharged); 
+	    else if(mcf_v.at(f).fndecay == 11 ||
+		    mcf_v.at(f).fndecay == 12)
+	      p.SetProcess(::ertool::kMuDecay);	
+	    else if(mcf_v.at(f).fndecay == 13 ||
+		    mcf_v.at(f).fndecay == 14)
+	      p.SetProcess(::ertool::kPionDecay);
+	    else{std::cout << "\t\t\tI AIN'T Got NO PROCESSES ";}
+
+	      }
 	  /*
 	  std::cout<<"New Particle..."<<std::endl
 		   <<"PdgCode  : "<<id.PdgCode()<<std::endl

@@ -341,8 +341,14 @@ namespace ertool {
       res += "--> unknown" ;
     else
       res += "--> " + std::to_string( p.KineticEnergy() );
-      //res += std::to_string(p.Momentum()[0]) + " [MeV/c] : " + std::to_string(p.Momentum()[1]) + " [MeV/c] : " + std::to_string(p.Momentum()[2]) + " [MeV/c] ";
-    res += " MeV \n";
+
+    res += " MeV ";
+
+    if(p.ProcessType() == kUnknown)
+      res += "--> Process unknown\n" ;
+    else
+      res += "--> Process " + std::to_string(p.ProcessType() ) + "\n";
+    
     prefix += "  ";
     for(auto const& c : p.Children()) Diagram(c,res,prefix);
   }
