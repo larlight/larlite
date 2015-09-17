@@ -20,7 +20,7 @@ void SelectStartPoint::do_params_fill(cluster_params & cluster) {
   //
   // If there is only one candidate, then just set the value in cluster params and leave
 
-  auto & hits = cluster.hit_vector;
+  auto const& hits = cluster.hit_vector;
   auto & starts = cluster.start_point_cand;
   auto & shwrs = cluster.shwr_point_cand;
   auto & dirs = cluster.start_dir_cand;
@@ -59,7 +59,7 @@ void SelectStartPoint::do_params_fill(cluster_params & cluster) {
   // Need a place to store the list of scores:
   std::vector<float> chi2Score(starts.size(), 0);
   // Now loop over the hits and add the values to the score
-  for (auto & hit : hits) {
+  for (auto const& hit : hits) {
     for (size_t i = 0; i < starts.size(); i ++) {
       chi2Score.at(i) += geoHelper -> DistanceToLine2D(starts.at(i), dirs.at(i), hit);
     }
