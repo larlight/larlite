@@ -26,6 +26,7 @@ namespace ertool {
     	_event_tree->Branch("subrun",&_subrun,"subrun/I");
     	_event_tree->Branch("event",&_event,"event/I");
     	_event_tree->Branch("ctr_cosmic",&_ctr_cosmic,"ctr_cosmic/I");
+	_event_tree->Branch("ctr_non_cosmic_primary",&_ctr_non_cosmic_primary,"ctr_non_cosmic_primary/I");
     	_event_tree->Branch("ctr_non_cosmic",&_ctr_non_cosmic,"ctr_non_cosmic/I");
     	_event_tree->Branch("ctr_cosmic_w_secondaries",&_ctr_cosmic_w_secondaries,"ctr_cosmic_w_secondaries/I");
     	_event_tree->Branch("ctr_non_cosmic_w_sec",&_ctr_non_cosmic_w_sec,"ctr_non_cosmic_w_sec/I");
@@ -82,6 +83,7 @@ namespace ertool {
    _event = -99;
    _ctr_cosmic = 0 ;
    _ctr_non_cosmic = 0 ;
+   _ctr_non_cosmic_primary = 0;
    _ctr_cosmic_w_secondaries = 0;
    _ctr_non_cosmic_w_sec = 0;
 	
@@ -127,7 +129,8 @@ namespace ertool {
       _subrun = data.SubRun() ;
       _event  = data.Event_ID() ;
       
-      std::cout<<"PDG code: "<<p.PdgCode() <<std::endl;
+      if(Debug())
+	Debug(__FUNCTION__,Form("PDG code: %d",p.PdgCode()));
 
       _pdg = p.PdgCode() ; 
       _primary = p.Primary() ;
@@ -158,8 +161,9 @@ namespace ertool {
 	else 
 	    _ctr_non_cosmic_w_sec++;
 
+	if ( p.Primary() && p.ProcessType() != kCosmic ) _ctr_non_cosmic_primary++;
 	
-	} 
+    } 
     
 
     //Every primary particle should correspond wiht an 'interaction'
