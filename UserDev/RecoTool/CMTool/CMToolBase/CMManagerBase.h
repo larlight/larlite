@@ -75,6 +75,10 @@ namespace cmtool {
     /// A simple method to add a cluster
     void SetClusters(const std::vector<::cluster::cluster_params> &clusters);
 
+#ifndef __CINT__
+    /// A simple method to add a cluster
+    void SetClusters(std::vector<::cluster::cluster_params>&& clusters);
+#endif
     /// A getter for input clusters
     const std::vector<::cluster::cluster_params>&  GetInputClusters() const 
     { return _in_clusters; }

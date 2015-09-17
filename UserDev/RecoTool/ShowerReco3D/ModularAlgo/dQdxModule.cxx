@@ -20,8 +20,9 @@ namespace showerreco{
     _tree->Branch("_n_hits",&_n_hits,"_n_hits/I");
     _tree->Branch("_length",&_length,"_length/D");
     _tree->Branch("_pl",&_pl,"_pl/I");
+    _tree->Branch("_dQ",&_dQ,"dQ/D");    
     _tree->Branch("_dQdx",&_dQdx,"dQdx/D");
-    _tree->Branch("_dQdx_pitch",&_dQdx_pitch,"dQdx/D_pitch");
+    _tree->Branch("_dQdx_pitch",&_dQdx_pitch,"dQdx_p/D");
     
     
     _fC_to_e = 6250.; // a fC in units of the electron charge
@@ -91,7 +92,8 @@ namespace showerreco{
 
       if (_verbose)
 	std::cout << "trunk length for plane " << pl << " is " << trunk_length << std::endl;
-      
+
+      dQ[pl]=0;
       for (int i=0;i<n_hits;i++){
 	hit_length = sqrt((hits[i].w-start.w)*(hits[i].w-start.w)+
 			  (hits[i].t-start.t)*(hits[i].t-start.t));
@@ -101,9 +103,12 @@ namespace showerreco{
 	  dQ[pl] += Q;
 	}
       }
-      dQdx=dQ[pl]/dx[pl];dQdx_pitch=dQ[pl]/dx_p[pl];
+      dQdx=dQ[pl]/trunk_length;
+      dQdx_pitch=dQ[pl]/(trunk_length*factor);
       
-      _dQdx =dQdx;_dQdx_pitch =dQdx_pitch;
+      _dQ=dQ[pl];
+      _dQdx =dQdx;
+      _dQdx_pitch =dQdx_pitch;
 
       resultShower.fdQdx[pl] = dQdx;
 

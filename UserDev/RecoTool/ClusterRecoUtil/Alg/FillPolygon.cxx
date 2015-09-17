@@ -14,7 +14,7 @@ namespace cluster {
     auto geomHelper = ::larutil::GeometryHelper::GetME();
 
     // get hit list
-    auto const hits = cluster.hit_vector;
+    auto const& hits = cluster.hit_vector;
     
     if(hits.size()) {
       std::vector<const Hit2D*> polygonEdges;

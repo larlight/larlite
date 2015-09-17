@@ -44,6 +44,7 @@ namespace showerreco {
     int _n_hits;
     double _length;
     int    _pl;
+    double _dQ;
     double _dQdx;
     double _dQdx_pitch;
     

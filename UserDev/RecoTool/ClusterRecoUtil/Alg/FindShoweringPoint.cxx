@@ -18,7 +18,7 @@ void FindShoweringPoint::do_params_fill(cluster_params & cluster) {
   auto geomHelper = ::larutil::GeometryHelper::GetME();
 
   // get hit list
-  auto const hits = cluster.hit_vector;
+  auto const& hits = cluster.hit_vector;
 
   // Make sure the start dir cand vec is ready:
   cluster.start_dir_cand.resize(cluster.start_point_cand.size());
@@ -30,7 +30,7 @@ void FindShoweringPoint::do_params_fill(cluster_params & cluster) {
 
   // Also making an array of TPrincipal's to compute the lines for the start_dir
   std::vector<TPrincipal*> tPrincipalArray;
-  tPrincipalArray.resize(hitmapByStartCand.size());
+  tPrincipalArray.resize(hitmapByStartCand.size(),nullptr);
 
   float dist_cutoff = 5 * 5;
 
@@ -40,7 +40,7 @@ void FindShoweringPoint::do_params_fill(cluster_params & cluster) {
     // loop over the whole list of start_point_candidates:
     for (size_t i_start_cand = 0; i_start_cand < cluster.start_dir_cand.size(); i_start_cand++) {
       if (! tPrincipalArray.at(i_start_cand))
-        tPrincipalArray.at(i_start_cand) = new TPrincipal(2, "D");
+	tPrincipalArray.at(i_start_cand) = new TPrincipal(2, "D");
       double distSq = ( (hits[i_hit].w - cluster.start_point_cand.at(i_start_cand).w)
                         * (hits[i_hit].w - cluster.start_point_cand.at(i_start_cand).w)
                         + (hits[i_hit].t - cluster.start_point_cand.at(i_start_cand).t)
@@ -153,10 +153,14 @@ void FindShoweringPoint::do_params_fill(cluster_params & cluster) {
     }
 
     // Make sure to clear out the TPrincipal objects:
+    /*
     if (tPrincipalArray.at(j))
       delete tPrincipalArray.at(j);
-
+    */
   }
+
+  for(auto& ptr : tPrincipalArray) delete ptr;
+  tPrincipalArray.clear();
 
   // Set the default values just in case.
   // Unless there is exactly 1 candidate, this might be junk.
