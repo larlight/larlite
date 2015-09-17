@@ -179,21 +179,88 @@ private:
      * @param plane The planes that each of the above slopes match to.
      * @return The error of the performed fit.
      */
-    float optimzeVector(TVector3 & inputVector,
+    float optimizeVector(TVector3 & inputVector,
                         Status & exitStatus,
                         int & n_iterations,
                         const std::vector<float> & slopeByPlane,
                         const std::vector<int> & planes );
 
     /**
-     * @brief This function identifies seed vectors, optimises them and finds the best candidate
-     * @details
-    */
-
+     * @brief Identifies good seed vector candidates from the initial globalSeedVectors list
+     * @details The algorithm will loop over each vector in the globalSeedVectors list. For each one, it will
+     *          get the error provided by that projection and compare it to some initial value. All vectors
+     *          that satisfy this condition will be added to the vector of candidates. If no vectors satisfy
+     *          the initial condition, the code will relax this condition slightly and try again, until it gets
+     *          at least one candidate.
+     *
+     * @param seedVectors Reference to the empty seed vector to which candidates are added
+     * @param errorVector Reference to the error on each seed vector candidate
+     * @param planes The planes that each of the slopes match to
+     * @param slopeByPlane The slopes on each plane that the algorithm fits against
+     */
     void findSeedVectors(std::vector<TVector3> & seedVectors,
                          std::vector<float> & errorVector,
                          const std::vector<int> & planes,
                          const std::vector<float> & slopeByPlane);
+
+  
+    /**
+     * @brief Optimizes all seed vectors contained in input vector
+     * @details The algorithm takes an input vector which contains all candidates for a vector. It then attempts
+     *          to refine each one using the OptimizeVector function, and then logs some information, such as
+     *          whether the optimization converged, and how good the final fit was.
+     *
+     * @param seedVectors Reference to the vector containing all potential seed candidates
+     * @param errorVector Reference to the vector containing the error on each seed candidate
+     * @param planes The planes that each of the slopes match to
+     * @param slopeByPlane The slope on each plane that the algorithm fits against
+     * @param convergeStatus Vector reporting the convergence status for each candidate
+     * @param convergeNumber Vector containing the number of iterations used for each candidate
+     */
+    void optimizeSeedVectors(std::vector<TVector3> & seedVectors,
+                             std::vector<float> & errorVector,
+                             std::vector<int> planes,
+                             std::vector<float> & slopeByPlane,
+                             std::vector<Status> & convergeStatus,
+                             std::vector<int> & convergeNumber);
+  
+    /**
+     * @brief Prints out all candidate vectors, and their errors
+     * @details Takes in a vector of all candidate seed vectors, and prints out the error and vector for each one,
+     *          as well as the status of the optimization.
+     *
+     * @param seedVectors Reference to the vector containing all potential seed vector candidates
+     * @param errorVector Reference to the vector containing the error on each seed candidate
+     * @param planes The planes that each of the slopes match to
+     * @param slopeByPlane The slope on each plane that the algorithm fits against
+     * @param convergeStatus Vector reporting the convergence status for each candidate
+     * @param convergeNumber Vector containing the number of iterations used for each candidate
+     */
+    void printVectors(std::vector<TVector3> & seedVectors,
+                      std::vector<float> & errorVector,
+                      std::vector<int> & planes,
+                      std::vector<float> & slopeByPlane,
+                      std::vector<Status> & convergeStatus,
+                      std::vector<int> & convergeNumber);
+  
+    /**
+     * @brief Finds the one optimal vector from the vector of candidates
+     * @details Algorithm which loops through the vector containing all candidates, and checks the error on each one.
+     *          It then saves the index & error of the one vector with the smallest error, and saves them in bestIndex
+     *          and bestError.
+     *
+     * @param seedVectors Reference to the vector containing all potential seed vector candidates
+     * @param errorVector Reference to the vector containing the error on each seed vector candidate
+     * @param convergeStatus The convergence status of each seed vector candidate
+     * @param bestIndex The index of the best seed vector candidate
+     * @param bestError The error of the best seed vector candidate
+     * @return The optimal vector candidate
+     */
+    TVector3 findOptimalVector(std::vector<TVector3> & seedVectors,
+                               std::vector<float> & errorVector,
+                               std::vector<Status> & convergeStatus,
+                               int & bestIndex,
+                               float & bestError);
 
     // Private members that get used frequently:
     std::vector<TVector3> _globalSeedVectors;
