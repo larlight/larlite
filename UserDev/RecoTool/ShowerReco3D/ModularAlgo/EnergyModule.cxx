@@ -57,11 +57,10 @@ namespace showerreco{
 
       // loop over hits
       for (auto const &h : hits){
-	
 	if (_useArea)
-	  dEdx = _caloAlg.dEdx_AMP(h.charge / pitch, h.t / geomHelper->TimeToCm(), h.plane);
+	  dEdx = _caloAlg.dEdx_AREA(h.charge / pitch, h.t, h.plane);
 	else
-	  dEdx = _caloAlg.dEdx_AMP(h.peak / pitch, h.t / geomHelper->TimeToCm(), h.plane);
+	  dEdx = _caloAlg.dEdx_AMP(h.peak / pitch, h.t, h.plane);
 
 	// make sure we aren't adding a crazy amount
 	// this is totally possible due to non-linear
