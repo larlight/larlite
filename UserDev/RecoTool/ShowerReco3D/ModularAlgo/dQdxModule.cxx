@@ -21,7 +21,9 @@ namespace showerreco{
     _tree->Branch("_length",&_length,"_length/D");
     _tree->Branch("_pl",&_pl,"_pl/I");
     _tree->Branch("_dQdx",&_dQdx,"dQdx/D");
-
+    _tree->Branch("_dQdx_pitch",&_dQdx_pitch,"dQdx/D_pitch");
+    
+    
     _fC_to_e = 6250.; // a fC in units of the electron charge
     _ADC_to_mV = 0.5; // ADC -> mV conversion from gain measurements
     // to go from mV to fC the ASIC gain and Shaping time
@@ -77,7 +79,7 @@ namespace showerreco{
 				   (shr_start.t - start.t) * (shr_start.t - start.t) );
       double hit_length;
       int n_hits = hits.size();
-      double dQdx =0;
+      double dQdx, dQdx_pitch =0;
       double factor;
       _n_hits =n_hits;
       _pl = pl;
@@ -86,7 +88,6 @@ namespace showerreco{
       _length = trunk_length;
       dx[pl]=trunk_length;
       dx_p[pl]=trunk_length*factor;
-      //_tree->Fill();
 
       if (_verbose)
 	std::cout << "trunk length for plane " << pl << " is " << trunk_length << std::endl;
@@ -100,9 +101,9 @@ namespace showerreco{
 	  dQ[pl] += Q;
 	}
       }
+      dQdx=dQ[pl]/dx[pl];dQdx_pitch=dQ[pl]/dx_p[pl];
       
-      dQdx=dQ[pl]/dx_p[pl];
-      _dQdx =dQdx;
+      _dQdx =dQdx;_dQdx_pitch =dQdx_pitch;
 
       resultShower.fdQdx[pl] = dQdx;
 
