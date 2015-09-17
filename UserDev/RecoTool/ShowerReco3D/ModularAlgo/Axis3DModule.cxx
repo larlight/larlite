@@ -23,24 +23,8 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
 
 
   // Start by making a guess:
-  TVector3 pointOnAxis, direction(0, 0, 1.0);
-
-
-  // Seed the pointOnAxis variable here.
-  pointOnAxis.SetX( 0.0 );
-  pointOnAxis.SetY( 0.0 );
-  pointOnAxis.SetZ( geom -> DetLength() / 2.0 );
-
-
-
-  // Also want the max dimensions of the detector easily reachable:
-  std::vector<float> maxDim, minDim;
-  maxDim.push_back(geom -> DetHalfWidth());
-  maxDim.push_back(geom -> DetHalfHeight());
-  maxDim.push_back(geom -> DetLength());
-  minDim.push_back(-geom -> DetHalfWidth());
-  minDim.push_back(-geom -> DetHalfHeight());
-  minDim.push_back(0.0);
+  TVector3 direction(0, 0, 1.0);
+  resultShower.fDCosStart = TVector3(0, 0, 0);
 
 
   // Determine the shower projections in 2D by plane (slopes):
@@ -86,7 +70,6 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   }
 
   if (goodSlopes < 2) {
-    resultShower.fDCosStart = TVector3(0, 0, 0);
     return;
   }
 
@@ -96,7 +79,6 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   // make a bunch of guesses and narrow in on the result.
 
 
-  TVector3 prevDir = direction;
 
   if (_globalSeedVectors.size() == 0)
     generateSeedVectors(direction, M_PI / 2.0, fNStepsInitial, _globalSeedVectors);
@@ -213,6 +195,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
       // In this case, there is clearly a shower with a bad start point
       // Pick the vector that ignores it.
       resultShower.fDCosStart = bestVectorAlt.at(min_index);
+      resultShower.fPlaneIsBad.at(min_index) = true;
     }
 
     else {
@@ -248,9 +231,9 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
 
     for (unsigned int i = 0; i < inputShowers.size(); i++) {
       larutil::PxPoint start2D, dir2D;
-      geomHelper -> Line_3Dto2D(pointOnAxis, resultShower.fDCosStart, planes[i], start2D, dir2D);
+      float slope = geomHelper -> Slope_3Dto2D(resultShower.fDCosStart, planes[i]);
       std::cout << "\tIn plane " << planes[i] << ", the projection is "
-                << (dir2D.t / dir2D.w) << ", the target is "
+                << slope << ", the target is "
                 << slopeByPlane[i] << ".\n";
     }
   }

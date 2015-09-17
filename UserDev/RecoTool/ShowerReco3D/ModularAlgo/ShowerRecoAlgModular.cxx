@@ -35,6 +35,8 @@ Shower_t ShowerRecoAlgModular::RecoOneShower(const ShowerClusterSet_t& clusters)
   result.fTotalMIPEnergy.resize(nPlanes);
   result.fSigmaTotalMIPEnergy.resize(nPlanes);
 
+  result.fPlaneIsBad.resize(nPlanes);
+
   Shower_t localCopy = result;
 
   for (size_t n = 0; n < _modules.size(); n++) {
