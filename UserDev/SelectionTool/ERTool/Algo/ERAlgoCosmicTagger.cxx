@@ -2,7 +2,7 @@
 #define ERTOOL_ERALGOCOSMICTAGGER_CXX
 
 #include "ERAlgoCosmicTagger.h"
-
+#include <sstream>
 namespace ertool {
 
   ERAlgoCosmicTagger::ERAlgoCosmicTagger(const std::string& name) 
@@ -66,15 +66,16 @@ namespace ertool {
 	showStart = show.Start();
 
 	
-	if(_verbose){
-	  
+	if(Debug()){
+	  std::stringstream ss;
+	  ss << std::endl;
 	  if(_geoAlgo.SqDist(showStart, trk) > (_minDist * _minDist) && _geoAlgo.SqDist(showStart, trk) < 1.1*(_minDist * _minDist)) 
-	    std::cout << "\t\t Shower-Track Dist : "<< sqrt(_geoAlgo.SqDist(showStart, trk)) << std::endl;
+	    ss << "\t\t Shower-Track Dist : "<< sqrt(_geoAlgo.SqDist(showStart, trk)) << std::endl;
 	  if(showStart.SqDist(trkStart) > (_strtDist*_strtDist) && showStart.SqDist(trkStart) < 1.1*(_strtDist*_strtDist))
-	    std::cout << "\t\t Shower-TrkSt Dist : "<< sqrt(showStart.SqDist(trkStart))      << std::endl;
+	    ss << "\t\t Shower-TrkSt Dist : "<< sqrt(showStart.SqDist(trkStart))      << std::endl;
 	  if(showStart.SqDist(trkEnd)   > (_endDist * _endDist) && showStart.SqDist(trkEnd)   < 1.1*(_endDist * _endDist))
-	    std::cout << "\t\t Shower-TrkEd Dist : "<< sqrt(showStart.SqDist(trkEnd))        << std::endl;
-	  
+	    ss << "\t\t Shower-TrkEd Dist : "<< sqrt(showStart.SqDist(trkEnd))        << std::endl;
+	  Debug(__FUNCTION__,ss.str());
 	}
 	
 	if(_geoAlgo.SqDist(showStart, trk) > (_minDist * _minDist) || 

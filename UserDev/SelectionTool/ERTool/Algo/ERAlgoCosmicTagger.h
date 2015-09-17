@@ -50,7 +50,6 @@ namespace ertool {
     /// Called after processing the last event sample
     void ProcessEnd(TFile* fout=nullptr);
 
-    void setVerbose(bool on){ _verbose = on; }
     void setMinShwToTrackDist(double dist){ _minDist = dist;  }
     void setMinTrkStartDist  (double dist){ _strtDist = dist; }
     void setMinTrkEndDist    (double dist){ _endDist = dist;  }
@@ -59,9 +58,6 @@ namespace ertool {
   protected:
     // GeoAlgo Tool
     ::geoalgo::GeoAlgo _geoAlgo;
-    
-    //verbosity flag
-    bool _verbose;
     
     double _minDist;
     double _strtDist;

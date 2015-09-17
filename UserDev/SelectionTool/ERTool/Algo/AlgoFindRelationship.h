@@ -20,14 +20,14 @@
 #include "ERTool/Base/ParticleGraph.h"
 #include "ERTool/Base/ERToolTypes.h"
 #include "ERTool/Base/UtilFunc.h"
-
+#include "ERTool/Base/MessageUtil.h"
 namespace ertool {
    /**
      \class AlgoFindRelationship
      User defined class ertool::AlgoFindRelationship ... these comments are used to generate
      doxygen documentation!
   */
-  class AlgoFindRelationship {
+  class AlgoFindRelationship : public MessageUtil{
     
   public:
     

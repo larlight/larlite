@@ -4,7 +4,7 @@
 #include "ERAlgoToy.h"
 #include "ERTool/Base/ERException.h"
 #include "GeoAlgo/GeoSphere.h"
-
+#include <sstream>
 namespace ertool {
 
   ERAlgoToy::ERAlgoToy(const std::string& name)
@@ -33,8 +33,6 @@ namespace ertool {
 
       _vtx_min_radius = pset.get<double>("vtx_min_radius");
 
-      _verbose = pset.get<bool>("verbosity");
-
     }else{
       std::cout << "oops I didn't find my config... ("
 		<< this->Name()
@@ -53,9 +51,9 @@ namespace ertool {
 
   bool ERAlgoToy::Reconstruct(const EventData &data, ParticleGraph& graph)
   {
-    if(_verbose)
+    if(Debug())
 
-      std::cout << std::endl << "New event!" << std::endl;
+      Debug(__FUNCTION__,"New event!");
     
     // Loop over all possible combinations of 2 particles
     for(auto const& combination_set : graph.GetNodeCombinations(2)) {
@@ -64,9 +62,11 @@ namespace ertool {
       auto const& part_a = graph.GetParticle( combination_set[0] );
       auto const& part_b = graph.GetParticle( combination_set[1] );
 
-      if(_verbose)
-
-	std::cout << "Processing particles: " << part_a.ID() << " & " << part_b.ID() << std::endl;
+      if(Debug()) {
+	std::stringstream ss;
+	ss << "Processing particles: " << part_a.ID() << " & " << part_b.ID();
+	Debug(__FUNCTION__,ss.str());
+      }
 
       // Start 3D point variables
       ::geoalgo::Vector vtx_a(0,0,0);
@@ -86,11 +86,13 @@ namespace ertool {
       // If radius of containment is smaller than minimum set in config, make them into siblings
       if(s.Radius() < _vtx_min_radius) {
 
-	if(_verbose)
-
-	  std::cout << "  ... they are sibings! "
-		    << " radius = " << s.Radius() << " [cm] "
-		    << std::endl;
+	if(Debug()) {
+	  std::stringstream ss;
+	  ss << "  ... they are sibings! "
+	     << " radius = " << s.Radius() << " [cm] "
+	     << std::endl;
+	  Debug(__FUNCTION__,ss.str());
+	}
 
 	// Fill radius histogram
 	_hRadius->Fill(s.Radius());
@@ -105,14 +107,9 @@ namespace ertool {
 
 	  graph.SetSiblings(part_a.ID(), part_b.ID());
 
-      }else{
+      }else
 
-	if(_verbose)
-
-	  std::cout << "  ... they are NOT sibings..." << std::endl;
-
-      }
-      
+	if(Debug()) Debug(__FUNCTION__,"  ... they are NOT sibings...");
     }
     
     return true;
