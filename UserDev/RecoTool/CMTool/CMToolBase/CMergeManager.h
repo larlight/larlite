@@ -28,7 +28,7 @@ namespace cmtool {
      The book-keeping of merged cluster sets are done by CMergeBookKeeper.
   */
   class CMergeManager : public CMManagerBase {
-
+    friend class CMergeManager;
   public:
     
     /// Default constructor
@@ -48,6 +48,14 @@ namespace cmtool {
 
     /// A method to obtain output clusters
     const std::vector<::cluster::cluster_params>& GetClusters() const { return _out_clusters; }
+
+    /// A method to give up clusters
+#ifndef __CINT__
+    void PassOutputClusters(CMergeManager& rhs)
+    {
+      rhs.SetClusters(std::move(_out_clusters));
+    }
+#endif
 
     /// A method to obtain book keeper
     const CMergeBookKeeper& GetBookKeeper() const { return _book_keeper; }
