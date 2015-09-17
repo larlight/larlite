@@ -265,6 +265,7 @@ double GeometryHelper::GetPitch(const TVector3& direction, const int& pl) const
   double minWireSpacing = 0.3;
 
   double cos = wireDir.Dot(direction);
+  if (cos < 0) cos *= -1;
   cos /= (wireDir.Mag() * direction.Mag());
 
   // if cosine is 0 the direction is perpendicular and the wire-spacing is infinite
