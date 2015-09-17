@@ -27,6 +27,9 @@ namespace ertool {
     std::vector<double> opdet_y_v = p.get< std::vector<double> >("OpDetPosition_Y");
     std::vector<double> opdet_z_v = p.get< std::vector<double> >("OpDetPosition_Z");
 
+    _beam_dt_min = p.get<double>("BeamDTMin");
+    _beam_dt_max = p.get<double>("BeamDTMax");
+
     if(opdet_x_v.size() != opdet_y_v.size() || opdet_x_v.size() != opdet_z_v.size())
       throw ERException("Optical Detector Position dimension does not match among x/y/z!");
     if(xrange.size()!=2)
@@ -41,6 +44,7 @@ namespace ertool {
     auto ptr = new ::flashana::QWeightPoint( opdet_x_v, opdet_y_v, opdet_z_v, step_size );
     ptr->SetMaxZDiff(step_size);
     _mgr.SetAlgo(ptr);
+
   }
 
   void ERAlgoFlashMatch::ProcessBegin()
@@ -108,7 +112,21 @@ namespace ertool {
       auto const& nord_id  = primary_id_v[match.tpc_id];
       auto const& flash_id = flash_id_v[match.flash_id];
       graph.SetFlashID(nord_id,flash_id);
+
+      auto const& flash = data.Flash(flash_id);
+
+      if(flash._t < _beam_dt_min || flash._t > _beam_dt_max) {
+
+	auto& part = graph.GetParticle(nord_id);
+	part.SetParticleInfo(part.PdgCode(),
+			     part.Mass(),
+			     part.Vertex(),
+			     part.Momentum(),
+			     part.RecoScore(),
+			     kCosmic);
+      }      
     }
+
     return true;
   }
 
