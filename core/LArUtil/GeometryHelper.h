@@ -173,6 +173,8 @@ public:
 
     float Slope_3Dto2D(const TVector3 & inputVector, unsigned int plane) const ;
 
+    float Slope_Proj(const TVector3 & inputVector, unsigned int plane) const ;
+
     /**
      * @brief Calculate the shortest distance between a line and a point in 2D
      *
