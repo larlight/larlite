@@ -67,6 +67,11 @@ bool ClusterParamsAna::initialize() {
     _param_tree->Branch("_mc_angle", &_mc_angle, "mc_angle/D");
     _param_tree->Branch("_direction", &_direction, "_direction/D");
 
+
+    _params_alg.SetVerbose(false);
+    _params_alg.SetDebug(false);
+    _params_alg.SetMinHits(25);
+
     return true;
 }
 
@@ -87,17 +92,13 @@ bool ClusterParamsAna::analyze(::larlite::storage_manager* storage) {
 
     std::vector<cluster_params> _params_vec;
 
-    DefaultParamsAlg params_alg;
-    params_alg.SetVerbose(false);
-    params_alg.SetDebug(false);
-    params_alg.SetMinHits(25);
 
     CRUHelper _cru_helper;
     _cru_helper.GenerateParams(storage, "mergeall", _params_vec);
 
     // Run ClusterParamsAlg on each cluster, compare to MC projection:
     for ( auto & clust : _params_vec) {
-        params_alg.FillParams(clust);
+        _params_alg.FillParams(clust);
         _plane = clust.plane_id.Plane;
         // Get the mc info:
         Point2D mcStartPoint = geoHelper -> Point_3Dto2D(mcShower.Start().Position().Vect(), _plane);

@@ -18,6 +18,7 @@
 #include "Analysis/ana_base.h"
 #include "TH1F.h"
 #include "TTree.h"
+#include "DefaultParamsAlg.h"
 
 namespace cluster {
   /**
@@ -68,6 +69,8 @@ namespace cluster {
     double _angle, _start_angle, _mc_angle;
     double _containment;
     int _direction; //0 is forward, 1 is backwards
+
+    DefaultParamsAlg _params_alg;
 
   };
 }

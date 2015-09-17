@@ -17,6 +17,10 @@ namespace cluster{
     // prepare stopwatch
     TStopwatch localWatch;
 
+    // static int i = 0;
+    // i ++;
+    // if (i % 10000 == 0)
+    //     std::cin.get();
 
     
     cluster_params localCopy;
@@ -75,6 +79,7 @@ namespace cluster{
       if (_modules.at(i)) delete _modules.at(i);
     }
   }
+
 
 }    
 
