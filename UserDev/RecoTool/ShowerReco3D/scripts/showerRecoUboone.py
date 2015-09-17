@@ -48,18 +48,23 @@ def getShowerRecoAlgModular():
   axis3D.setVerbosity(False)
   axis3D.setSeedVectorErrorCutoff(0.5)
 
-  energy = showerreco.EnergyModule()
-  energy.SetUseBox(True)
+  energy = showerreco.LinearEnergy()
+  energy.SetUseModBox(True)
   energy.setVerbosity(False)
 
   dqdx = showerreco.dQdxModule()
 
+  dedx = showerreco.dEdxFromdQdx()
+  dedx.SetUsePitch(False)
+  dedx.setVerbosity(False)
+
   alg.AddShowerRecoModule(axis3D)
   alg.AddShowerRecoModule(energy)
   alg.AddShowerRecoModule(dqdx)
+  alg.AddShowerRecoModule(dedx)
+  alg.AddShowerRecoModule(showerreco.StartPoint3DModule()  )
   # alg.AddShowerRecoModule(showerreco.StartPoint2DModule()  )
   #alg.AddShowerRecoModule(showerreco.OtherStartPoint3D()  )
-  alg.AddShowerRecoModule(showerreco.StartPoint3DModule()  )
   # alg.AddShowerRecoModule(showerreco.ShowerChargeModule()  )
 
   alg.PrintModuleList()
@@ -72,7 +77,7 @@ def DefaultMatch():
   palgo_array = cmtool.CPAlgoArray()
   
   palgo1 = cmtool.CPAlgoNHits()
-  palgo1.SetMinHits(50)
+  palgo1.SetMinHits(25)
   
   palgo2 = cmtool.CPAlgoIgnoreTracks()
   
@@ -81,8 +86,8 @@ def DefaultMatch():
 
   algo_array = cmtool.CFAlgoArray()
   #algo_array.SetMode(cmtool.CFAlgoArray.kPositiveAddition)
-  #algo_array.AddAlgo(cmtool.CFAlgoTimeOverlap())
-  algo_array.AddAlgo(cmtool.CFAlgoQRatio())
+  algo_array.AddAlgo(cmtool.CFAlgoTimeOverlap())
+  #algo_array.AddAlgo(cmtool.CFAlgoQRatio())
   #algo_array.AddAlgo(cmtool.CFAlgoTimeProf())
   #algo_array.AddAlgo(cmtool.CFAlgo3DAngle())
   #algo_array.AddAlgo(cmtool.CFAlgoStartPointMatch())
