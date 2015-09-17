@@ -147,9 +147,9 @@ protected:
     double reco_energy_V;
     double reco_energy_Y;
     // double reco_dedx;
-    // double reco_dedx_U;
-    // double reco_dedx_V;
-    // double reco_dedx_Y;
+    double reco_dedx_U;
+    double reco_dedx_V;
+    double reco_dedx_Y;
     // int    best_plane_id;
 
     double mc_x, mc_y, mc_z;

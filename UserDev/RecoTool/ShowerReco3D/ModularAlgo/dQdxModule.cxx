@@ -22,6 +22,15 @@ namespace showerreco{
     _tree->Branch("_pl",&_pl,"_pl/I");
     _tree->Branch("_dQdx",&_dQdx,"dQdx/D");
 
+    _fC_to_e = 6250.; // a fC in units of the electron charge
+    _ADC_to_mV = 0.5; // ADC -> mV conversion from gain measurements
+    // to go from mV to fC the ASIC gain and Shaping time
+    // must be considered
+    // fC -> mV *= ( shaping time * ASIC gain )
+    _shp_time  = 2.; // in usec
+    _asic_gain = 7.8; // in mV/fC
+    _charge_conversion = _ADC_to_mV * _fC_to_e / ( _shp_time * _asic_gain ) ;
+
     return;
   }
 
@@ -87,12 +96,16 @@ namespace showerreco{
 			  (hits[i].t-start.t)*(hits[i].t-start.t));
 	dx[pl]=hit_length;
 	if (hit_length<trunk_length){	  
-	  dQ[pl]=hits[i].charge+dQ[pl];	  
+	  double Q = hits[i].charge * _charge_conversion;
+	  dQ[pl] += Q;
 	}
       }
       
       dQdx=dQ[pl]/dx_p[pl];
       _dQdx =dQdx;
+
+      resultShower.fdQdx[pl] = dQdx;
+
       if (_verbose) std::cout<<"now2_pl="<<_pl<<"\n";
       _tree->Fill();
       if (_verbose) std::cout<<"now3_pl="<<_pl<<"\n";
