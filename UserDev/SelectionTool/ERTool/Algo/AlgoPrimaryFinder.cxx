@@ -2,14 +2,12 @@
 #define ERTOOL_ALGOPRIMARYFINDER_CXX
 
 #include "AlgoPrimaryFinder.h"
-
+#include <sstream>
 namespace ertool {
 
   AlgoPrimaryFinder::AlgoPrimaryFinder(const std::string& name) : AlgoBase(name)
   {
-    _verbose = false;
     _useRadLength = false;
-
   }
 
   void AlgoPrimaryFinder::Reset(){}
@@ -26,9 +24,8 @@ namespace ertool {
 
   bool AlgoPrimaryFinder::Reconstruct(const EventData &data, ParticleGraph& graph){
     
-    if (_verbose) { 
-      std::cout << "*********** BEGIN PrimaryFinder RECONSTRUCTION ************" << std::endl;
-    }
+    if (Debug()) 
+      Debug(__FUNCTION__,"*********** BEGIN PrimaryFinder RECONSTRUCTION ************");
 
     // This Reconstruction stage is divided in two independent parts:
     // 1) Reconstruct primary showers
@@ -45,14 +42,14 @@ namespace ertool {
       
       if( graph.GetParticle(graph.GetParticle(s).Parent()).RecoType() == RecoType_t::kTrack){
         
-       if(_verbose) std::cout << "\t\t Track mama" << std::endl;
+	if(Debug()) Debug(__FUNCTION__,"\t\t Track mama");
 
         continue;
       }
 	
       if(graph.GetParticle(s).ProcessType() == ::ertool::ProcessType_t::kCosmic || 
 	 graph.GetParticle(graph.GetParticle(s).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
-	if(_verbose) std::cout << "\t\t Cosmic Shower" << std::endl;	
+	if(Debug()) Debug("\t\t Cosmic Shower");
         continue;	
       }
 
@@ -70,13 +67,17 @@ namespace ertool {
       // 1) come from another shower
       // 2) come from a track
 
-      if (_verbose) { std::cout << "This shower: (" << thisID << ")" << "\tE: " << thisShower._energy << std::endl; }
+      if (Debug()) {
+	std::stringstream ss;
+	ss << "This shower: (" << thisID << ")" << "\tE: " << thisShower._energy;
+	Debug(__FUNCTION__,ss.str());
+      }
       // loop over other showers and check 1) and 2)
       for (auto const& p2 : graph.GetParticleNodes(RecoType_t::kShower)){
 
 	if( graph.GetParticle(graph.GetParticle(p2).Parent()).RecoType() == RecoType_t::kTrack){
 
-	  if(_verbose) std::cout << "\t\t Muon mama" << std::endl;
+	  if(Debug()) Debug("\t\t Joseph mama");
 
 	  continue;
 	}
@@ -84,7 +85,7 @@ namespace ertool {
 
 	if(graph.GetParticle(p2).ProcessType() == ::ertool::ProcessType_t::kCosmic|| 
 	 graph.GetParticle(graph.GetParticle(p2).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
-	if(_verbose) std::cout << "\t\t Cosmic Shower" << std::endl;
+	  if(Debug()) Debug("\t\t Cosmic Shower");
 	
         continue;
 	
@@ -96,11 +97,15 @@ namespace ertool {
 	// make sure we don't use the same shower or repeat search
 	if (thatID == thisID) continue;
 
-	if (_verbose) { std::cout << "Comparing with shower (" << thisID << ")" << std::endl; }
+	if (Debug()) {
+	  std::stringstream ss;
+	  ss << "Comparing with shower (" << thisID << ")";
+	  Debug(__FUNCTION__,ss.str());
+	}
 	auto const& thatShower = data.Shower(thatID);
 
 	if (From(thisShower,thatShower)){
-	  if (_verbose) { std::cout << "shower not primary" << std::endl; }
+	  if (Debug()) { Debug(__FUNCTION__,"shower not primary"); }
 	  primary = false;
 	  // exit the loop...no need to search further
 	  break;
@@ -116,7 +121,7 @@ namespace ertool {
 
 	if(graph.GetParticle(t).ProcessType() == ::ertool::ProcessType_t::kCosmic|| 
 	 graph.GetParticle(graph.GetParticle(t).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
-	  if(_verbose) std::cout << "\t\t Cosmic Track" << std::endl;
+	  if(Debug()) Debug(__FUNCTION__,"\t\t Cosmic Track");
 	  
 	  continue;
 	  
@@ -127,10 +132,14 @@ namespace ertool {
 	
 	if (thatTrack.size() < 2)
 	  continue;
-	if (_verbose) { std::cout << "Comparing with track (" << t << ")" << std::endl; }
-
+	if (Debug()) {
+	  std::stringstream ss;
+	  ss << "Comparing with track (" << t << ")";
+	  Debug(__FUNCTION__,ss.str());
+	}
+	
 	if (From(thisShower,thatTrack)){
-	  if (_verbose) { std::cout << "shower not primary" << std::endl; }
+	  if (Debug()) { Debug(__FUNCTION__,"shower not primary"); }
 	  primary = false;
 	  // exit the loop...no need to search further
 	  break;
@@ -141,7 +150,8 @@ namespace ertool {
       // create new particle
       if (primary){
 	// set particle as primary
-	if (_verbose) { std::cout << "shower is primary!" << std::endl; }
+	if (Debug())
+	  Debug("shower is primary!");
 	graph.SetPrimary(s);
 	graph.GetParticle(s).SetParticleInfo(graph.GetParticle(s).PdgCode(),
 					     graph.GetParticle(s).Mass(),
@@ -157,7 +167,7 @@ namespace ertool {
 
       if(graph.GetParticle(t).ProcessType() == ::ertool::ProcessType_t::kCosmic|| 
 	 graph.GetParticle(graph.GetParticle(t).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
-	if(_verbose) std::cout << "\t\t Cosmic Shower" << std::endl;	
+	if(Debug()) Debug("Cosmic Shower");
         continue;	
       }
 
@@ -172,19 +182,23 @@ namespace ertool {
       if (thisTrack.size() < 2)
 	continue;
       
-      if (_verbose) { std::cout << "This Track: (" << thisID << ")" << "\tE: " << thisTrack._energy << std::endl; }
+      if (Debug()) {
+	std::stringstream ss;
+	ss << "This Track: (" << thisID << ")" << "\tE: " << thisTrack._energy;
+	Debug(__FUNCTION__,ss.str());
+      }
 
       // loop over other showers and check 1) and 2)
       for (auto const& p2 : graph.GetParticleNodes(RecoType_t::kShower)){
 
 	if( graph.GetParticle(graph.GetParticle(p2).Parent()).RecoType() == RecoType_t::kTrack){
-	  if(_verbose) std::cout << "\t\t Muon mama" << std::endl;
+	  if(Debug()) Debug("Muon mama");
 	  continue;
 	}
 	
 	if(graph.GetParticle(p2).ProcessType() == ::ertool::ProcessType_t::kCosmic|| 
-	 graph.GetParticle(graph.GetParticle(p2).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
-	  if(_verbose) std::cout << "\t\t Cosmic Shower" << std::endl;	
+	   graph.GetParticle(graph.GetParticle(p2).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
+	  if(Debug()) Debug("Cosmic Shower");
 	  continue;	
 	}
 
@@ -192,10 +206,14 @@ namespace ertool {
 
 	auto const& thatID = graph.GetParticle(p2).RecoID();
 	auto const& thatShower = data.Shower(thatID);
-	if (_verbose) { std::cout << "Comparing with shower (" << thatID << ")" << std::endl; }
+	if (Debug()) {
+	  std::stringstream ss;
+	  ss << "Comparing with shower (" << thatID << ")";
+	  Debug(__FUNCTION__,ss.str());
+	}
 
 	if (From(thisTrack,thatShower)){
-	  if (_verbose) { std::cout << "track not primary" << std::endl; }
+	  if (Debug()) Debug("track not primary");
 	  primary = false;
 	  // exit the loop...no need to search further
 	  break;
@@ -211,7 +229,7 @@ namespace ertool {
 
 	if(graph.GetParticle(t).ProcessType() == ::ertool::ProcessType_t::kCosmic|| 
 	 graph.GetParticle(graph.GetParticle(t).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
-	  if(_verbose) std::cout << "\t\t Cosmic Shower" << std::endl;	
+	  if(Debug()) Debug("Cosmic Shower");
 	  continue;	
 	}
 
@@ -222,10 +240,14 @@ namespace ertool {
 	if (thatID == thisID)
 	  continue;
 	
-	if (_verbose) { std::cout << "Comparing with track (" << t << ")" << std::endl; }
+	if (Debug()) {
+	  std::stringstream ss;
+	  ss << "Comparing with track (" << t << ")";
+	  Debug(__FUNCTION__,ss.str());
+	}
 
 	if (From(thisTrack,thatTrack)){
-	  if (_verbose) { std::cout << "track not primary" << std::endl; }
+	  if (Debug()) Debug("track not primary");
 	  primary = false;
 	  // exit the loop...no need to search further
 	  break;
@@ -236,7 +258,7 @@ namespace ertool {
       // create new particle
       if (primary){
 	// set particle as primary
-	if (_verbose) { std::cout << "track is primary!" << std::endl; }
+	if (Debug()) Debug("track is primary!");
 	graph.SetPrimary(t);
 	graph.GetParticle(t).SetParticleInfo(graph.GetParticle(t).PdgCode(),
 					     graph.GetParticle(t).Mass(),
@@ -270,11 +292,14 @@ namespace ertool {
     double IPthisStart = vtx.Dist(thisShower.Start());
     double IPthatStart = vtx.Dist(thatShower.Start());
     double IPthatTrunk = sqrt(_geoAlgo.SqDist(vtx,thatShowerTrunk));
-    if (_verbose)
-      std::cout << "\tImpact Parameter      : " << IP << std::endl
-		<< "\tIP to other Shr Start : " << IPthatStart << std::endl
-		    << "\tIP to other Shr Trunk : " << IPthatTrunk << std::endl
-		<< "\tIP to this Shr Start  : " << IPthisStart << std::endl;
+    if (Debug()) {
+      std::stringstream ss;
+      ss << "\tImpact Parameter      : " << IP << std::endl
+	 << "\tIP to other Shr Start : " << IPthatStart << std::endl
+	 << "\tIP to other Shr Trunk : " << IPthatTrunk << std::endl
+	 << "\tIP to this Shr Start  : " << IPthisStart << std::endl;
+      Debug(__FUNCTION__,ss.str());
+    }
     if ( (IP < _maxIP)                            // good correlation
 	 && ( IPthisStart < _vtxToTrkDist)        // this shower's start point close to IP
 	 && ( IPthatTrunk < _vtxToTrkDist) )      // vtx close to thatShower's trunk
@@ -297,11 +322,15 @@ namespace ertool {
     double IPthisStart = vtx.Dist(thisTrack.front());
     double IPthatStart = vtx.Dist(thatShower.Start());
     double IPthatTrunk = sqrt(_geoAlgo.SqDist(vtx,thatShowerTrunk));
-    if (_verbose)
-      std::cout << "\tImpact Parameter : " << IP << std::endl
-		<< "\tIP to Shr Start  : " << IPthatStart << std::endl
-		<< "\tIP to Shr Trunk  : " << IPthatTrunk << std::endl
-		<< "\tIP to Trk Start  : " << IPthisStart << std::endl;
+    if (Debug()) {
+      std::stringstream ss;
+      ss << "\tImpact Parameter : " << IP << std::endl
+	 << "\tIP to Shr Start  : " << IPthatStart << std::endl
+	 << "\tIP to Shr Trunk  : " << IPthatTrunk << std::endl
+	 << "\tIP to Trk Start  : " << IPthisStart;
+      Debug(__FUNCTION__,ss.str());
+    }
+      
     if ( (IP < _maxIP)                       // good correlation
 	 && ( IPthisStart < _vtxToTrkDist )  // this shower's start point close to IP
 	 && ( IPthatTrunk < _vtxToTrkDist )  // vtx close to thatShower's trunk
@@ -321,11 +350,14 @@ namespace ertool {
     double IPthisStart = vtx.Dist(thisShower.Start());
     double IPthatStart = vtx.Dist(thatTrack.front());
     double IPtrkBody = sqrt(_geoAlgo.SqDist(vtx,thatTrack));
-    if (_verbose)
-      std::cout << "\tImpact Parameter: " << IP << std::endl
-		<< "\tIP to Trk Start : " << IPthatStart << std::endl
-		<< "\tIP to Trk Body  : " << IPtrkBody << std::endl
-		<< "\tIP to Shr Start : " << IPthisStart << std::endl;
+    if (Debug()) {
+      std::stringstream ss;
+      ss << "\tImpact Parameter: " << IP << std::endl
+	 << "\tIP to Trk Start : " << IPthatStart << std::endl
+	 << "\tIP to Trk Body  : " << IPtrkBody << std::endl
+	 << "\tIP to Shr Start : " << IPthisStart << std::endl;
+      Debug(__FUNCTION__,ss.str());
+    }
 
     if ( (IP < _maxIP)                             // good correlation
 	 && (IPthatStart > _vtxToTrkStartDist)     // vertex far enough away from track start
@@ -346,11 +378,14 @@ namespace ertool {
     double IPthisStart = vtx.Dist(thisTrack.front());
     double IPthatStart = vtx.Dist(thatTrack.front());
     double IPtrkBody = sqrt(_geoAlgo.SqDist(vtx,thatTrack));
-    if (_verbose)
-      std::cout << "\tImpact Parameter     : " << IP << std::endl
-		<< "\tIP to this Trk Start : " << IPthatStart << std::endl
-		<< "\tIP to that Trk Body  : " << IPtrkBody << std::endl
-		<< "\tIP to this Trk Start : " << IPthisStart << std::endl;
+    if (Debug()) {
+      std::stringstream ss;
+      ss << "\tImpact Parameter     : " << IP << std::endl
+	 << "\tIP to this Trk Start : " << IPthatStart << std::endl
+	 << "\tIP to that Trk Body  : " << IPtrkBody << std::endl
+	 << "\tIP to this Trk Start : " << IPthisStart << std::endl;
+      Debug(__FUNCTION__,ss.str());
+    }
     if ( (IP < _maxIP)                          // good correlation
 	 && (IPthatStart > _vtxToTrkStartDist)  // vertex far enough away from track start
 	 && (IPtrkBody < _vtxToTrkDist) )       // vertex close to track body
@@ -358,7 +393,7 @@ namespace ertool {
 	// our shower comes from t -> not interested
 	return true;
       }
-    
+      
     return false;
   }
 

@@ -18,10 +18,10 @@ namespace ertool {
 			      bool mc)
     {
       if(!event_ptr && !graph_ptr)
-	throw ::ertool::ERException("Neither EventData & ParticleGraph provided (nothing to read!)");
+	Exception("Neither EventData & ParticleGraph provided (nothing to read!)");
       
       if(_event_tree || _graph_tree) 
-	throw ertool::ERException("Output file seems to be open!");
+	Exception("Output file seems to be open!");
 
       std::string event_tree_name = kEVENT_DATA_NAME;
       std::string graph_tree_name = kGRAPH_DATA_NAME;
@@ -46,20 +46,17 @@ namespace ertool {
     bool ROOTOutput::Open(const std::string& fname)
     {
       if(_fout) {
-	ertool::msg::send(ertool::msg::kERROR,
-			  "Output file handle is already open!");
+	Error(__FUNCTION__,"Output file handle is already open!");
 	return false;
       }
 
       if(fname.empty()) {
-	ertool::msg::send(ertool::msg::kERROR,
-			  "Cannot open an output with an empty name!");
+	Error("Cannot open an output with an empty name!");
 	return false;
       }
 
       if(!_event_tree && !_graph_tree) {
-	ertool::msg::send(ertool::msg::kERROR,
-			  "Neither EventData nor ParticleGraph trees exist. Call Prepare() before Open!");
+	Error("Neither EventData nor ParticleGraph trees exist. Call Prepare() before Open!");
 	return false;
       }
 

@@ -86,6 +86,7 @@ namespace ertool {
       kNORMAL,       ///< Normal stdout
       kWARNING,      ///< notify a user in the standard operation mode for an important finding.
       kERROR,        ///< notify a user when something is clearly wrong
+      kEXCEPTION,    ///< Exception!
       kMSG_TYPE_MAX
     };
   }

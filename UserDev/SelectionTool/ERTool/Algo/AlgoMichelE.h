@@ -59,9 +59,6 @@ namespace ertool {
     /// Function to set the maximum allowed muon-michel separation
     void setMaxDistance(double d) { _maxDistance = d; }
 
-    /// set verbosity flag
-    void setVerbose(bool on) { _verbose = on; }
-    
   protected:
     
     // Instance of EMPart Algorithm
@@ -74,9 +71,6 @@ namespace ertool {
     // cut values that are settable by user
     double _minMuonLength;
     double _maxDistance;
-
-    // verbosity flag
-    bool _verbose;
 
   };
 }

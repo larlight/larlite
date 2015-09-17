@@ -59,21 +59,22 @@ namespace ertool {
 
     for(auto const& primary_node_id : graph.GetPrimaryNodes() ) {
 
-      auto const& part = graph.GetParticle(primary_node_id);
+      auto const& primary_part = graph.GetParticle(primary_node_id);
 
-      auto const& part_v = graph.GetAllDescendantNodes(part.ID());
+      auto const& children_v = graph.GetAllDescendantNodes(primary_part.ID());
 
       std::vector<NodeID_t> shower_v, track_v;
-      shower_v.reserve(part_v.size());
-      track_v.reserve(part_v.size());
+      shower_v.reserve(children_v.size());
+      track_v.reserve(children_v.size());
 
-      for(auto const& id : part_v) {
-	switch(graph.GetParticle(id).RecoType()) {
+      for(auto const& id : children_v) {
+	auto const& child_part = graph.GetParticle(id);
+	switch(child_part.RecoType()) {
 	case kShower:
-	  shower_v.push_back(id);
+	  shower_v.push_back(child_part.RecoID());
 	  break;
 	case kTrack:
-	  shower_v.push_back(id);
+	  track_v.push_back(child_part.RecoID());
 	  break;
 	default:
 	  break;
