@@ -15,14 +15,12 @@ namespace showerreco{
   void dQdxModule::initialize()
   {
 
-    std::cout << "creating tree" << std::endl;
     if (_tree) delete _tree;
     _tree = new TTree(_name.c_str(),"dQdx Info Tree");
     _tree->Branch("_n_hits",&_n_hits,"_n_hits/I");
     _tree->Branch("_length",&_length,"_length/D");
     _tree->Branch("_pl",&_pl,"_pl/I");
     _tree->Branch("_dQdx",&_dQdx,"dQdx/D");
-    std::cout << "tree created" << std::endl;
 
     return;
   }
@@ -74,7 +72,7 @@ namespace showerreco{
       double factor;
       _n_hits =n_hits;
       _pl = pl;
-      std::cout<<"now1_pl="<<_pl<<"\n";
+      if (_verbose) std::cout<<"now1_pl="<<_pl<<"\n";
       factor = pitch/0.3;
       _length = trunk_length;
       dx[pl]=trunk_length;
@@ -95,9 +93,9 @@ namespace showerreco{
       
       dQdx=dQ[pl]/dx_p[pl];
       _dQdx =dQdx;
-      std::cout<<"now2_pl="<<_pl<<"\n";
+      if (_verbose) std::cout<<"now2_pl="<<_pl<<"\n";
       _tree->Fill();
-      std::cout<<"now3_pl="<<_pl<<"\n";
+      if (_verbose) std::cout<<"now3_pl="<<_pl<<"\n";
     }
 
     return;
