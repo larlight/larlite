@@ -2,7 +2,7 @@
  * \file ShowerRecoModuleBase.h
  *
  * \ingroup ModularAlgo
- * 
+ *
  * \brief Class def header for a class ShowerRecoModuleBase
  *
  * @author cadams
@@ -25,28 +25,28 @@
  */
 namespace showerreco {
 
-  class ShowerRecoModuleBase{
+class ShowerRecoModuleBase {
 
-  public:
+public:
 
     /// Default constructor
     ShowerRecoModuleBase();
 
     /// Default destructor
-    virtual ~ShowerRecoModuleBase(){}
+    virtual ~ShowerRecoModuleBase() {}
 
     /**
      * @brief get the name of this module, used in helping organize order of modules and insertion/removal
      * @return name
      */
-    std::string name(){return _name;}
+    std::string name() {return _name;}
 
     /**
      * @brief Virtual function that is overridden in child class, does the reconstruction work
-     * @details Override this function in a base class and use it to do the actual reconstruction.  Organize the 
+     * @details Override this function in a base class and use it to do the actual reconstruction.  Organize the
      * class however you like, with as many private or non private functions as needed, but this particular
      * function is the one that is called by ShowerRecoAlgModular.
-     * 
+     *
      * @param t clusters The set of shower clusters
      * @param t shower The shower that is passed by reference.  Make edits to this object
      */
@@ -65,9 +65,9 @@ namespace showerreco {
     /**
      * @brief Function to initialize the algorithm (such as setting up tree)
      */
-    virtual void initialize(){};
+    virtual void initialize() {};
 
-  protected:
+protected:
 
     std::string _name;
 
@@ -75,10 +75,10 @@ namespace showerreco {
 
     TTree* _tree;
 
-  };
+};
 
 } // showerreco
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

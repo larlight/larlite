@@ -3,13 +3,13 @@
 
 #include "ShowerRecoModuleBase.h"
 
-namespace showerreco{
+namespace showerreco {
 
-  ShowerRecoModuleBase::ShowerRecoModuleBase()
-    : _tree(nullptr)
-  {
-    _verbose = false; 
-  }
+ShowerRecoModuleBase::ShowerRecoModuleBase()
+  : _tree(nullptr)
+{
+  _verbose = false;
+}
 
 }
 
