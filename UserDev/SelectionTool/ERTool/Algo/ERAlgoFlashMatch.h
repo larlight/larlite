@@ -53,6 +53,8 @@ namespace ertool {
 
     ::flashana::FlashMatchManager _mgr;
 
+    double _beam_dt_min, _beam_dt_max;
+
   };
 }
 #endif
