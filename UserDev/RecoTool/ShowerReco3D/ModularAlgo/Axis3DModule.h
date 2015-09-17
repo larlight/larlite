@@ -57,7 +57,7 @@ public:
      */
     void setTargetError(float f) {fTargetError = f;}
 
-    void setNormalErrorRange(float f){_normalErrorRange = f;}
+    void setNormalErrorRange(float f) {_normalErrorRange = f;}
 
     /**
      * @brief sets the starting value at which theta converges
@@ -93,7 +93,7 @@ public:
      */
     void setConvergeRate(float f) {_alpha = f;}
 
-    void setSeedVectorErrorCutoff(float f){_seedVectorErrorCutoff = f;}
+    void setSeedVectorErrorCutoff(float f) {_seedVectorErrorCutoff = f;}
 
 private:
 
@@ -202,6 +202,7 @@ private:
                          std::vector<float> & errorVector,
                          const std::vector<int> & planes,
                          const std::vector<float> & slopeByPlane);
+
   
     /**
      * @brief Optimizes all seed vectors contained in input vector

@@ -126,8 +126,9 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
 
     // Loop over all possible pair of planes.
 
-    if (_verbose)
+    if (_verbose) {
       std::cout << "Running alternate axis finding..." << std::endl;
+    }
 
     std::vector<int> bestIndexAlt;
     std::vector<float> bestErrorAlt;
@@ -220,12 +221,9 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
       resultShower.fDCosStart.SetY(0.0);
       resultShower.fDCosStart.SetZ(0.0);
       for (auto & vec : bestVectorAlt) {
-        TVector3 tempVec;
-        tempVec.SetX(vec.X() / bestVectorAlt.size());
-        tempVec.SetY(vec.Y() / bestVectorAlt.size());
-        tempVec.SetZ(vec.Z() / bestVectorAlt.size());
-        resultShower.fDCosStart += tempVec;
+        resultShower.fDCosStart += vec;
       }
+      resultShower.fDCosStart *= 1.0/resultShower.fDCosStart.Mag();
 
     }
 
