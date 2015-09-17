@@ -98,7 +98,7 @@ namespace ertool {
 
     dist = dist / dir[1] * -1.;
 
-    std::cout<<"Dist is  : "<<dist<<std::endl ;
+    //std::cout<<"Dist is  : "<<dist<<std::endl ;
 
     if(dist > _dist_back_to_ceiling) return false;
 
