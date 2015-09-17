@@ -158,16 +158,21 @@ namespace larlite {
 	    au->begin_subrun(_storage);
 	}
       }
-      
+
+      bool last_filter_status = true;
       for(size_t i=0; i<_analyzers.size(); ++i){
 
 	_ana_status[i] = false;
+
+	if(!last_filter_status && !_filter_marker_v[i]) continue;
 	   
 	_ana_status[i] = _analyzers[i]->analyze(_storage);
 
 	_ana_unit_status = _ana_unit_status && _ana_status[i];
 
 	if(!_ana_unit_status && _filter_enable) break;
+
+	if(_filter_marker_v[i]) last_filter_status = _ana_status[i];
 	
       }
       
