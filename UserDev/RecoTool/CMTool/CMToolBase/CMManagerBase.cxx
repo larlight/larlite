@@ -74,6 +74,11 @@ namespace cmtool {
                                << std::endl;
   }
 
+  void CMManagerBase::SetClusters(std::vector<::cluster::cluster_params>&& clusters)
+  {
+    std::swap(_in_clusters,clusters);
+  }
+
   void CMManagerBase::Process()
   {
     

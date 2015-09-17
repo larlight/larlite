@@ -32,25 +32,25 @@ namespace cmtool {
       if(_priority_algo) _priority_algo->SetVerbose(true);
     }
 
-    _match_algo->IterationBegin(_in_clusters);
-    if(_priority_algo) _priority_algo->IterationBegin(_in_clusters);    
+    if(_match_algo)_match_algo->IterationBegin(_in_clusters);
+    if(_priority_algo) _priority_algo->IterationBegin(_in_clusters);
   }
   
   void CMatchManager::IterationBegin()
   {
-    _match_algo->IterationBegin(_in_clusters);
+    if(_match_algo) _match_algo->IterationBegin(_in_clusters);
     if(_priority_algo) _priority_algo->IterationBegin(_in_clusters);
   }
   
   void CMatchManager::IterationEnd()
   {
-    _match_algo->IterationEnd();
+    if(_match_algo) _match_algo->IterationEnd();
     if(_priority_algo) _priority_algo->IterationEnd();
   }
 
   void CMatchManager::EventEnd()
   {
-    _match_algo->EventEnd();
+    if(_match_algo) _match_algo->EventEnd();
     if(_priority_algo) _priority_algo->EventEnd();
   }
 

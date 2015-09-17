@@ -27,7 +27,8 @@ namespace cmtool {
       mgr.Reset();
       
       if(!i) mgr.SetClusters(clusters);
-      else mgr.SetClusters( _mgr_v[i-1].GetClusters() );
+      else _mgr_v[i-1].PassOutputClusters(mgr);
+      //else mgr.SetClusters( _mgr_v[i-1].GetClusters() );
       
       mgr.Process();
       
