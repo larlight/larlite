@@ -195,12 +195,14 @@ namespace larlite {
     if( !_name_generator.empty() &&
 	!_name_mcshr.empty()     &&
 	!_name_mctrk.empty() ) {
+      auto ev_mcf = storage->get_data<event_mcflux>   (_name_generator);
       auto ev_mci = storage->get_data<event_mctruth>  (_name_generator);
       auto ev_mcs = storage->get_data<event_mcshower> (_name_mcshr);
       auto ev_mct = storage->get_data<event_mctrack>  (_name_mctrk);
       // Make sure the data is there
-      if (ev_mci && ev_mcs && ev_mct)
-	_helper.FillMCInfo(*ev_mci,
+      if (ev_mci && ev_mcs && ev_mct && ev_mcf)
+	_helper.FillMCInfo(*ev_mcf,
+			   *ev_mci,
 			   *ev_mcs,
 			   *ev_mct,
 			   *in_strm);

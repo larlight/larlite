@@ -73,6 +73,8 @@ namespace ertool {
 			  const float score = 0,
 			  const ProcessType_t process = kUnknown);
 
+    void SetProcess(const ProcessType_t process){ _process = process; }
+    
     std::string Print() const;
 
   private:
@@ -84,7 +86,6 @@ namespace ertool {
     void SetFlashID(const FlashID_t id);
     void RemoveChild(const NodeID_t child );
     void UpdateAfterRemoval(const NodeID_t removed);
-    void SetProcess(const ProcessType_t process){ _process = process; }
     void Print             (std::string& res, std::string prefix="") const;
 
     

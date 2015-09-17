@@ -61,6 +61,25 @@ namespace ertool {
     kMuIoni,         //particles (electrons?) from muon ionization "muIoni"
     kCosmic,         //Cosmics
     kPiZeroDecay,    //daughters of pizero decays (gammas usually)
+    //Neutrino Production Processes
+    kK0L,//Processes follow 
+    // K0L -> nue pi- e+, 
+    // K0L -> nuebar pi+ e- 
+    // K0L -> numu pi- mu+ 
+    // K0L -> numubar pi+ mu-
+    kKCharged,//Processes follow
+    // K+  -> numu mu+
+    // K+  -> nue pi0 e+
+    // K+  -> numu pi0 mu+
+    // K-  -> numubar mu-
+    // K-  -> nuebar pi0 e-
+    // K-  -> numubar pi0 mu-
+    kMuDecay,//Processes follow
+    // mu+ -> numubar nue e+
+    // mu- -> numu nuebar e-
+    kPionDecay,//Processes follow
+    // pi+ -> numu mu+
+    // pi- -> numubar mu- 
     kINVALID_PROCESS_TYPE
   };
 
