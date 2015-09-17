@@ -45,7 +45,8 @@ namespace showerreco {
     double _length;
     int    _pl;
     double _dQdx;
-
+    double _dQdx_pitch;
+    
     // ADC -> e- conversion factors
     double _fC_to_e;
     double _ADC_to_mV;
