@@ -15,7 +15,6 @@ namespace showerreco {
 
   void ShowerRecoManager::Initialize()
   {
-    std::cout << "initialzing algorithms" << std::endl;
     for(auto alg : _alg_v)
       alg->Initialize();
     
