@@ -43,6 +43,8 @@ namespace showerreco {
 
     void SetUseBox(bool on = true) { _caloAlg.setUseModBox(on); }
 
+    void initialize();
+
   private:
 
     /// Calorimetry algorithm
@@ -53,6 +55,11 @@ namespace showerreco {
 
     /// flag to decide which ionization module to use
     bool _useBirks;
+
+    // tree variables
+    std::vector<double> _dEdx_v;
+    int _pl;
+    std::vector<double> _timetick_v;
 
   };
   

@@ -14,6 +14,7 @@
 #pragma link C++ class showerreco::StartPoint2DModule+;
 #pragma link C++ class showerreco::ShowerChargeModule+;
 #pragma link C++ class showerreco::StartPoint3DModule+;
+#pragma link C++ class showerreco::OtherStartPoint3D+;
 #pragma link C++ class showerreco::dQdx2DModule+;
 #pragma link C++ class showerreco::dQdxModule+;
 #pragma link C++ class showerreco::EnergyModule+;

@@ -174,6 +174,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
     if (_verbose) {
       std::cout << "Running alternate axis finding..." << std::endl;
     }
+
     std::vector<int> bestIndexAlt;
     std::vector<float> bestErrorAlt;
     std::vector<TVector3> bestVectorAlt;

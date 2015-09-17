@@ -9,11 +9,11 @@ namespace showerreco {
   // initialize the various algorithms
   void ShowerRecoAlgModular::Initialize()
   {
-    std::cout << "initializing modules..." << std::endl;
-    std::cout << "there are " << _modules.size() << " modules" << std::endl;
-    for (auto & module : _modules)
+    for (auto & module : _modules){
       module->initialize();
-
+      _module_time_v.push_back(0.);
+      _module_ctr_v.push_back(0);
+    }
     return;
   }
 
@@ -28,6 +28,8 @@ namespace showerreco {
       result.fSigmaTotalEnergy.resize(nPlanes);
       result.fdEdx.resize(nPlanes);
       result.fdQdx.resize(nPlanes);
+      result.fHitdQdx_v.resize(nPlanes);
+
       result.fShoweringLength.resize(nPlanes); // resizing Showering Length Vector
       result.fSigmadEdx.resize(nPlanes);
       result.fTotalMIPEnergy.resize(nPlanes);
@@ -35,10 +37,13 @@ namespace showerreco {
 
       Shower_t localCopy = result;
 
-      for (auto & module : _modules){
-        module -> do_reconstruction(clusters, result);
+      for (size_t n=0; n < _modules.size(); n++){
+	_watch.Start();
+        _modules[n] -> do_reconstruction(clusters, result);
+	_module_time_v[n] += _watch.RealTime();
+	_module_ctr_v[n] += 1;
         if (_debug){
-          printChanges(localCopy, result,module->name());
+          printChanges(localCopy, result,_modules[n]->name());
           localCopy = result;
         }
 
@@ -174,6 +179,12 @@ namespace showerreco {
                       << " to "  << result.fLength << std::endl; 
           }
 
+	  // BestdQdx
+          if (localCopy.fBestdQdx != result.fBestdQdx) {
+            std::cout << "\tfBestdQdx has changed from " << localCopy.fBestdQdx
+                      << " to "  << result.fBestdQdx << std::endl; 
+          }
+
           // Opening Angle
           if (localCopy.fOpeningAngle != result.fOpeningAngle) {
             std::cout << "\tfDCosStart has changed from " << localCopy.fOpeningAngle 
@@ -255,6 +266,26 @@ namespace showerreco {
             std::cout << ")" << std::endl;
           }
 
+          // HitdQdx_v
+          changed = false;
+          for (unsigned int i = 0; i < localCopy.fHitdQdx_v.size(); i++){
+	    for (unsigned int j = 0; j < localCopy.fHitdQdx_v[i].size(); j++){
+	      if (localCopy.fHitdQdx_v[i][j] != result.fHitdQdx_v[i][j]){
+		changed = true;
+		break;
+	      }
+	    }
+          }
+          if (changed){
+            std::cout << "\tfHitdQdx_v has changed from (";
+            for (auto & val : localCopy.fHitdQdx_v ) 
+	      for (auto & v : val) std::cout << v << " ";
+	    std::cout << ") to (";
+            for (auto & val : result.fHitdQdx_v ) 
+	      for(auto & v : val )std::cout << v << " ";
+            std::cout << ")" << std::endl;
+          }
+
 
           // sigma dEdx
           changed = false;
@@ -318,14 +349,25 @@ namespace showerreco {
   // finalize function
   void ShowerRecoAlgModular::Finalize(TFile* fout)
   {
+
+  // loop through algos and evaluate time-performance
+  std::cout << std::endl
+            << "=================== Time Report =====================" << std::endl;
+  for (size_t n = 0; n < _modules.size(); n++) {
+    double module_time = _module_time_v[n] / ((double)_module_ctr_v[n]);
+    std::cout <<  _modules[n]->name() << "\t Algo Time: " << module_time * 1.e6     << " [us/cluster]"
+	      << "\t Clusters Scanned: " << _module_ctr_v[n] << std::endl;
+  }
+
+  std::cout << "=====================================================" << std::endl
+            << std::endl;
     
-    std::cout << "finalize" << std::endl;
     // for each algorithm, get its tree and write it to output
     if (fout){
       fout->cd();
       for (auto & module : _modules){
 	auto tree = module->GetTree();
-	if (tree) { tree->Write(); std::cout << "got tree! " << std::endl; }
+	if (tree) { tree->Write(); }
       }// for each modular algo
     }// if output file exists
 

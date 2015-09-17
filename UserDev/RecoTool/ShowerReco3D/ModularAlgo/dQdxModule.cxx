@@ -15,12 +15,12 @@ namespace showerreco{
   void dQdxModule::initialize()
   {
 
-    std::cout << "creating tree" << std::endl;
     if (_tree) delete _tree;
     _tree = new TTree(_name.c_str(),"dQdx Info Tree");
-    _tree->Branch("_length",&_length,"lendth/D");
-    _tree->Branch("_pl",&_pl,"pl/I");
-    std::cout << "tree created" << std::endl;
+    _tree->Branch("_n_hits",&_n_hits,"_n_hits/I");
+    _tree->Branch("_length",&_length,"_length/D");
+    _tree->Branch("_pl",&_pl,"_pl/I");
+    _tree->Branch("_dQdx",&_dQdx,"dQdx/D");
 
     return;
   }
@@ -33,7 +33,9 @@ namespace showerreco{
     
     // get the 3D direction reconstructed hopefully in a previous step
     auto const& dir3D = resultShower.fDCosStart;
-
+    double dQ[3]={};
+    double dx[3]={};
+    double dx_p[3]={};
     // loop over all input cluster -> calculate a dQdx per plane
     for (size_t n=0; n < inputShowers.size(); n++){
       
@@ -64,14 +66,36 @@ namespace showerreco{
 
       double trunk_length = sqrt ( (shr_start.w - start.w) * (shr_start.w - start.w) + 
 				   (shr_start.t - start.t) * (shr_start.t - start.t) );
-
+      double hit_length;
+      int n_hits = hits.size();
+      double dQdx =0;
+      double factor;
+      _n_hits =n_hits;
       _pl = pl;
+      if (_verbose) std::cout<<"now1_pl="<<_pl<<"\n";
+      factor = pitch/0.3;
       _length = trunk_length;
-      _tree->Fill();
+      dx[pl]=trunk_length;
+      dx_p[pl]=trunk_length*factor;
+      //_tree->Fill();
 
       if (_verbose)
 	std::cout << "trunk length for plane " << pl << " is " << trunk_length << std::endl;
-
+      
+      for (int i=0;i<n_hits;i++){
+	hit_length = sqrt((hits[i].w-start.w)*(hits[i].w-start.w)+
+			  (hits[i].t-start.t)*(hits[i].t-start.t));
+	dx[pl]=hit_length;
+	if (hit_length<trunk_length){	  
+	  dQ[pl]=hits[i].charge+dQ[pl];	  
+	}
+      }
+      
+      dQdx=dQ[pl]/dx_p[pl];
+      _dQdx =dQdx;
+      if (_verbose) std::cout<<"now2_pl="<<_pl<<"\n";
+      _tree->Fill();
+      if (_verbose) std::cout<<"now3_pl="<<_pl<<"\n";
     }
 
     return;

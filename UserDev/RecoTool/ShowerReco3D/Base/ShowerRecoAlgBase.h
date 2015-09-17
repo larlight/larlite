@@ -47,10 +47,10 @@ namespace showerreco {
     void Verbose(bool on=true);
 
     /// finalize function to write trees
-    virtual void Finalize(TFile* fout) = 0;
+    virtual void Finalize(TFile* fout){};
 
     /// initialize function
-    virtual void Initialize() = 0;
+    virtual void Initialize(){};
 
   protected:
 

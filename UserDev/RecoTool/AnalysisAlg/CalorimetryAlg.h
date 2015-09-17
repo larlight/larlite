@@ -71,6 +71,9 @@ namespace calo{
     std::vector< double > fCalAmpConstants;
     std::vector< double > fCalAreaConstants;
     bool fUseModBox;
+
+    double _tau;      // electron lifetime in usec
+    double _timetick; // time sample in usec
     
   }; // class CalorimetryAlg
 } //namespace calo
