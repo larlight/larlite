@@ -27,6 +27,8 @@ namespace ertool {
     	_event_tree->Branch("event",&_event,"event/I");
     	_event_tree->Branch("ctr_cosmic",&_ctr_cosmic,"ctr_cosmic/I");
     	_event_tree->Branch("ctr_non_cosmic",&_ctr_non_cosmic,"ctr_non_cosmic/I");
+    	_event_tree->Branch("ctr_cosmic_w_secondaries",&_ctr_cosmic_w_secondaries,"ctr_cosmic_w_secondaries/I");
+    	_event_tree->Branch("ctr_non_cosmic_w_sec",&_ctr_non_cosmic_w_sec,"ctr_non_cosmic_w_sec/I");
     }
     
     if ( !_part_tree ){
@@ -80,6 +82,9 @@ namespace ertool {
    _event = -99;
    _ctr_cosmic = 0 ;
    _ctr_non_cosmic = 0 ;
+   _ctr_cosmic_w_secondaries = 0;
+   _ctr_non_cosmic_w_sec = 0;
+	
 
   }
 
@@ -115,6 +120,7 @@ namespace ertool {
     double detHalfHeight = 116.5 ;
     
     for( auto const& p : graph.GetParticleArray() ){
+
       ResetPartTree();
       
       _run    = data.Run() ;
@@ -138,20 +144,22 @@ namespace ertool {
 	_px = t.at(0).Dir()[0];
 	_py = t.at(0).Dir()[1];
 	_pz = t.at(0).Dir()[2];
-      }
-      
-      std::cout<<"Vertices: "<<p.Vertex()[0]
-	       <<p.Vertex()[1]
-	       <<p.Vertex()[2]<<std::endl ;
-      std::cout<<"End: "<<_end_x<<", "<<_end_y<<", "<<_end_z<<std::endl;
-      _part_tree->Fill(); 
-      
-      if (p.ProcessType() == kCosmic )
-	_ctr_cosmic++;
-      else
-	_ctr_non_cosmic++;
-    } 
 
+	_part_tree->Fill(); 
+	}
+
+	if (p.ProcessType() == kCosmic )
+	    _ctr_cosmic++;
+	else
+	    _ctr_non_cosmic++;
+
+	if ( p.ProcessType() == kCosmic || graph.GetParticle(p.Ancestor()).ProcessType() == kCosmic)	
+	    _ctr_cosmic_w_secondaries++;
+	else 
+	    _ctr_non_cosmic_w_sec++;
+
+	
+	} 
     
 
     //Every primary particle should correspond wiht an 'interaction'
@@ -229,7 +237,6 @@ namespace ertool {
       auto py = p[1];
       auto pz = p[2];
 
-      std::cout<<"PX, py, pz: "<<px<<", "<<py<<", "<<pz<<std::endl;
       double quad = py/pz  ;
       double convert = 180.0/ 3.1415926525898 ;
 
