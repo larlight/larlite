@@ -40,6 +40,8 @@ void FillGeomParams::do_params_fill(cluster_params & cluster) {
   //double weight_total  = 0;
   double hit_counter_forward  = 0;
   double hit_counter_backward = 0;
+  /// Max( (distance between hit and shower axis)^2 ) over all hits
+  double max_orthog_dist2 = -1.;
 
   if (_verbose && endStartDiff_y == 0 && endStartDiff_x == 0) {
     std::cerr << "Error:  end point and start point are the same!\n";
@@ -82,6 +84,12 @@ void FillGeomParams::do_params_fill(cluster_params & cluster) {
     Point2D hitProjectedOnLine;
     geomHelper->GetPointOnLine(cluster.slope_2d, cluster.start_point, hit, hitProjectedOnLine);
 
+    /// Distance between this hit and its projection onto the cluster axis
+    /// This is computed to estimate the cluster "width"
+    /// (note: using dist squared here because it is faster... will square-root at the end)
+    double orthog_dist2 = geomHelper->Get2DDistanceSqrd(hit, hitProjectedOnLine);
+    if (orthog_dist2 > max_orthog_dist2) max_orthog_dist2 = orthog_dist2;
+
     // Compute forward mean
     double hitStartDiff_x = (hit.w - this_startPoint.w) ;
     double hitStartDiff_y = (hit.t - this_startPoint.t) ;
@@ -94,8 +102,6 @@ void FillGeomParams::do_params_fill(cluster_params & cluster) {
                         * pow(pow(hitStartDiff_x, 2) + pow(hitStartDiff_y, 2), 0.5));
 
     if (cosangle_start > 0) {
-
-
       // Only take into account for hits that are in "front"
       //no weighted average, works better as flat average w/ min charge cut
       mean_forward += cosangle_start;
@@ -114,7 +120,6 @@ void FillGeomParams::do_params_fill(cluster_params & cluster) {
                       * pow(pow(hitEndDiff_x, 2) + pow(hitEndDiff_y, 2), 0.5));
 
     if (cosangle_end > 0) {
-
       //no weighted average, works better as flat average w/ min charge cut
       mean_backward += cosangle_end;
       rms_backward  += pow(cosangle_end, 2);
@@ -149,7 +154,10 @@ void FillGeomParams::do_params_fill(cluster_params & cluster) {
     //   closing_angle_highcharge_bin[N_bins_CLOSE] += wgt;
     // }
 
-  }
+  } // end loop over hits in the cluster
+
+  //Square-root the maximum orthogonal hit distance and call it (half of the) the cluster width
+  cluster.width = std::sqrt(max_orthog_dist2);
 
   //initialize iterators for the angles
   size_t iBin(0), jBin(0), kBin(0), lBin(0), mBin(0), nBin(0);
@@ -161,34 +169,23 @@ void FillGeomParams::do_params_fill(cluster_params & cluster) {
          percentage_CLOSE_CHARGEWGT(0.0);
 
   for (iBin = 0; percentage_OPEN <= _percentage && iBin < _Nbins; iBin++)
-  {
     percentage_OPEN += opening_angle_bin[iBin];
-  }
+
 
   for (jBin = 0; percentage_CLOSE <= _percentage && jBin < _Nbins; jBin++)
-  {
     percentage_CLOSE += closing_angle_bin[jBin];
-  }
 
   // for (kBin = 0; percentage_OPEN_HC <= percentage_HC && kBin < _Nbins; kBin++)
-  // {
   //   percentage_OPEN_HC += opening_angle_highcharge_bin[kBin];
-  // }
 
   // for (lBin = 0; percentage_CLOSE_HC <= percentage_HC && lBin < _Nbins; lBin++)
-  // {
   //   percentage_CLOSE_HC += closing_angle_highcharge_bin[lBin];
-  // }
 
   for (mBin = 0; percentage_OPEN_CHARGEWGT <= _percentage && mBin < _Nbins; mBin++)
-  {
     percentage_OPEN_CHARGEWGT += opening_angle_chargeWgt_bin[mBin];
-  }
 
   for (nBin = 0; percentage_CLOSE_CHARGEWGT <= _percentage && nBin < _Nbins; nBin++)
-  {
     percentage_CLOSE_CHARGEWGT += closing_angle_chargeWgt_bin[nBin];
-  }
 
   double opening_angle = iBin * M_PI / _Nbins ;
   double closing_angle = jBin * M_PI / _Nbins ;
@@ -202,6 +199,11 @@ void FillGeomParams::do_params_fill(cluster_params & cluster) {
   cluster.opening_angle_charge_wgt = opening_angle_charge_wgt;
   cluster.closing_angle_charge_wgt = closing_angle_charge_wgt;
 
+  /// Compute modified hit density
+  /// This is the # of hits in the cluster divided by the length of the cluster
+  /// (used often for track-shower cluster discrimination)
+  /// (? operator used to avoid possible divide-by-zero errors)
+  cluster.modified_hit_density = cluster.length ? cluster.N_Hits / cluster.length : -1.;
 
   if (_verbose) {
     std::cout << "opening angle: " << opening_angle
