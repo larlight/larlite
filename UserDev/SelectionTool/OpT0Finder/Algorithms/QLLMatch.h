@@ -45,6 +45,8 @@ namespace flashana {
 			    const std::vector<double>&,
 			    const std::vector<double>&);
 
+    void UsePhotonLibrary(bool use=true);
+
     const std::vector<double>& ChargeHypothesis(const QCluster_t&);
 
     const  QCluster_t& VarTrack(double x);
@@ -72,6 +74,9 @@ namespace flashana {
     double _qll;
 
     TMinuit* _minuit_ptr;
+
+    bool _use_library;
+
   };
 }
 
