@@ -44,11 +44,14 @@ namespace showerreco {
     int _n_hits;
     double _length;
     int    _pl;
+    double _pitch;
     double _dQ;
     double _dQdx;
     double _dQdx_pitch;
+    double _shrs_w;
+    double _shrs_t;
     
-    // ADC -> e- conversion factors
+     // ADC -> e- conversion factors
     double _fC_to_e;
     double _ADC_to_mV;
     double _shp_time;
