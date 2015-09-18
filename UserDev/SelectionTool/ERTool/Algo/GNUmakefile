@@ -24,6 +24,8 @@ OSNAMEMODE      = $(OSNAME)
 
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
+CINTFLAGS += "-p" # Use system compiler to preprocess macros (something in Base is messing w/ rootcint)
+
 # set linker flags
 LDFLAGS += $(shell larlite-config --libs)
 LDFLAGS += -L$(shell root-config --libdir) -lRooFit -lRooFitCore -lRooStats

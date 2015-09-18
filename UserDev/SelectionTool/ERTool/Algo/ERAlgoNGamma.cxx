@@ -2,7 +2,7 @@
 #define ERTOOL_ERALGONGAMMA_CXX
 
 #include "ERAlgoNGamma.h"
-
+#include <sstream>
 namespace ertool {
   ERAlgoNGamma::ERAlgoNGamma(const std::string& name)
     : AlgoBase(name)
@@ -12,7 +12,6 @@ namespace ertool {
   {
     _gamma_mass = ParticleMass(22);
     _Ethreshold = 0;
-    _verbose = false;
   }
 
   void ERAlgoNGamma::Reset()
@@ -57,11 +56,14 @@ namespace ertool {
     int gamma_evtctr = 0;
     int null_evtctr = 0;
     auto datacpy = data;
-    if(_verbose)
+    if(Debug())
       {
-	std::cout<<"***** BEGIN N GAMMA RECONSTRUCTION *****"<<std::endl;
-	std::cout<<"\tShowers in event : "<<data.Shower().size()<<std::endl;
-	std::cout<<"\tTracks in event : "<<data.Track().size()<<std::endl;      }
+	std::stringstream ss;
+	ss<<"***** BEGIN N GAMMA RECONSTRUCTION *****"<<std::endl;
+	ss<<"\tShowers in event : "<<data.Shower().size()<<std::endl;
+	ss<<"\tTracks in event : "<<data.Track().size()<<std::endl;
+	Debug(__FUNCTION__,ss.str());
+      }
     std::vector<NodeID_t> sibShwrFin;
     std::vector<NodeID_t> siblingsS;
     std::vector<NodeID_t> siblingsT;
@@ -436,9 +438,9 @@ namespace ertool {
 	  } */
 	/// set relationship
 	//graph.SetParentage(neutrino.ID(),s);
-	if(_verbose)
+	if(Debug())
 	  {
-	    std::cout<<"We found a gamma event! Hooray!!"<<std::endl;
+	    Debug("We found a gamma event! Hooray!!");
 	    ctr++;
 	  }
 	siblingsS.clear();

@@ -7,7 +7,8 @@ namespace ertool {
   namespace io {
 
     OStreamBase::OStreamBase(const std::string& name)
-      : _name(name)
+      : MessageUtil()
+      , _name(name)
     {}
     
     const std::string& OStreamBase::Name() const

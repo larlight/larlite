@@ -60,9 +60,6 @@ namespace ertool {
     /// Function to reconstruct the start-point isolated electrons
     bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
-    /// Set verbosity
-    void setVerbose(bool on) { _verbose = on; _findRel.setDebug(on); }
-    
     /// Use EMPart
     void useRadLength(bool on) { _useRadLength = on; }
 
@@ -87,19 +84,12 @@ namespace ertool {
     bool From(const ::geoalgo::Trajectory& thisTrack,
 	      const ::geoalgo::Cone& thatShower) const;
 
-
-
   protected:
 
     /// Function to check wether a shower is e- or gamma-like
     /// Returns true if gamma-like
     bool isGammaLike(const double dedx, double radlen,bool forceRadLen=false);
 
-
-
-
-    // verbose flag
-    bool _verbose;
     // flag to decide whether to use EMPart or not
     // if True -> use radiation length to calculate LL
     // if False -> use only dEdx

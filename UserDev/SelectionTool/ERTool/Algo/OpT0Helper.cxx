@@ -27,6 +27,8 @@ namespace ertool {
 
       auto const& shower = data.Shower(id);
 
+      if(shower.Length()<0.1) continue;
+
       AppendGeoSteps(res,shower.Start(),shower.Dir(),shower.Length());
 
     }
@@ -37,6 +39,8 @@ namespace ertool {
 
       if(track.size()<2) continue;
 
+      if(!track.IsLonger(0.1)) continue;
+
       res.reserve(track.size());
       for(size_t i=0; i<(track.size()-1); ++i) {
 
@@ -46,8 +50,7 @@ namespace ertool {
 	double length = dir.Length();
 	dir /= length;
 	AppendGeoSteps(res,pt1,dir,length);
-      }
-      
+      }      
     }
 
     return res;

@@ -2,6 +2,7 @@
 #define ERTOOL_MANAGER_CXX
 
 #include "Manager.h"
+#include "UtilFunc.h"
 #include "Shower.h"
 #include "Track.h"
 #include <sstream>
@@ -12,7 +13,8 @@ namespace ertool {
 
   Manager::Manager( const io::StreamType_t in_strm,
 		    const io::StreamType_t out_strm)
-    : _io_handle("ertool",in_strm,out_strm)
+    : MessageUtil()
+    , _io_handle("ertool",in_strm,out_strm)
     , _cfg_mgr("ERToolConfig")
   {
     Reset(); 
@@ -35,7 +37,9 @@ namespace ertool {
 
   void Manager::ClearCfgFile()
   {
+    if(Debug()) Debug(__FUNCTION__,"called");
     _cfg_file_v.clear();
+    if(Debug()) Debug(__FUNCTION__,"ends");
   }
   
   const EventData&     Manager::EventData       () const { return _io_handle.GetEventData     (    ); }
@@ -50,7 +54,7 @@ namespace ertool {
     if(_name_v.find(a->Name()) != _name_v.end()){
       std::stringstream msg;
       msg << "Duplicate analysis/algorithm w/ the name " << a->Name().c_str();
-      throw ERException(msg.str());
+      Exception(msg.str());
     }
     _name_v.insert(a->Name());
     _algo_v.push_back(a);
@@ -59,18 +63,18 @@ namespace ertool {
   void Manager::AddAna(AnaBase* a)
   {
     if(_status != kIDLE)
-      throw ERException("Cannot set ana in non-kIDLE state...");
+      Exception("Cannot set ana in non-kIDLE state...");
     if(_name_v.find(a->Name()) != _name_v.end()){
       std::stringstream msg;
       msg << "Duplicate analysis/algorithm w/ the name " << a->Name().c_str();
-      throw ERException(msg.str());
+      Exception(msg.str());
     }
     _name_v.insert(a->Name());
     _ana_v.push_back(a);
   }
-
+  
   void Manager::Reset() {
-
+    if(Debug()) Debug(__FUNCTION__,"called");
     switch(_status) {
     case kPROCESSING:
       std::cout << "\033[93m[WARNING]\033[00m<<"
@@ -88,6 +92,7 @@ namespace ertool {
     _cfg_file_v.clear();
     _cfg_mgr.Reset();
     _cfg_file_v.insert(kDefaultConfigFileName);
+    if(Debug()) Debug(__FUNCTION__,"ends");
   }
 
   void Manager::ClearData() {
@@ -96,6 +101,7 @@ namespace ertool {
 
   void Manager::Initialize()
   {
+    if(Debug()) Debug(__FUNCTION__,"called");
     //fWatch.Start();
     if(_status != kIDLE) {
       std::ostringstream msg;
@@ -104,28 +110,44 @@ namespace ertool {
 	  << ") is not kIDLE ("
 	  << kIDLE
 	  << ")!";
-      throw ERException(msg.str());
+      Exception(msg.str());
     }
-    if(!_algo_v.size() && !_ana_v.size()) {
-      std::ostringstream msg;
-      throw ERException("No algorithm/analysis attached (must be attached before Initialize())!");
-    }
+    if(!_algo_v.size() && !_ana_v.size())
+      Exception("No algorithm/analysis attached (must be attached before Initialize())!");
 
     //
     // Apply PSet to algorithms/analysis instances
     //
-    for(auto const& fname : _cfg_file_v)
+    for(auto const& fname : _cfg_file_v) {
+      if(Info()) {
+	std::stringstream ss;
+	ss << "Reading in configuration: " << fname.c_str();
+	Info(__FUNCTION__,ss.str());
+      }
       _cfg_mgr.AddCfgFile(fname);
+    }
     
     auto const& main_cfg = _cfg_mgr.Config();
 
     // Loop & apply (create if not existing)
-    for(auto const& ptr : _algo_v) 
+    for(auto const& ptr : _algo_v) {
+      if(Info()) {
+	std::stringstream ss;
+	ss << "Configuring algorithm: " << ptr->Name().c_str();
+	Info(__FUNCTION__,ss.str());
+      }      
       ptr->AcceptPSet(main_cfg);
+    }
 
     // Loop & apply (create if not existing)
-    for(auto const& ptr : _ana_v) 
+    for(auto const& ptr : _ana_v) {
+      if(Info()) {
+	std::stringstream ss;
+	ss << "Configuring analysis: " << ptr->Name().c_str();
+	Info(__FUNCTION__,ss.str());
+      }      
       ptr->AcceptPSet(main_cfg);
+    }
 
     //
     // Initialize units
@@ -139,6 +161,11 @@ namespace ertool {
 
     // Initialize algorithms
     for(size_t i=0; i<_algo_v.size(); ++i) {
+      if(Info()) {
+	std::stringstream ss;
+	ss << "Initializing algorithm: " << _algo_v[i]->Name().c_str();
+	Info(__FUNCTION__,ss.str());
+      }      
       _algo_v[i]->_training_mode = this->_training_mode;
       fWatch.Start();
       _algo_v[i]->ProcessBegin();
@@ -146,24 +173,29 @@ namespace ertool {
     }
     // Initialize analyses
     for(size_t i=0; i<_ana_v.size(); ++i) {
+      if(Info()) {
+	std::stringstream ss;
+	ss << "Initializing analysis: " << _ana_v[i]->Name().c_str();
+	Info(__FUNCTION__,ss.str());
+      }      
       fWatch.Start();
       _ana_v[i]->ProcessBegin();
       _time_ana_v[i]._time_start = fWatch.RealTime();
     }
     _status = kINIT;
+    if(Debug()) Debug(__FUNCTION__,"ends");
   }
 
   void Manager::StorePSet(const std::string& fname) const
   {
-
+    if(Debug()) Debug(__FUNCTION__,"called");
     if (FILE *file = fopen(fname.c_str(), "r")) {
       fclose(file);
       std::stringstream msg;
       msg << "File " << fname.c_str() << " already exists and cannot be over-written...";
-      throw ERException(msg.str());
+      Exception(msg.str());
     }
 
-    std::cout<<_cfg_mgr.Config().name()<<std::endl;
     ::fcllite::PSet out_cfg(_cfg_mgr.Config().name());
 
     // Loop over alogirthms, check PSet should be stored or not
@@ -197,32 +229,36 @@ namespace ertool {
 
 	  out_cfg.add_pset(_cfg_mgr.Config().get_pset(key));
 
-	else
-
-	  std::cout << "  New Config Found ... "
-		    << "\033[95m" << key << "\033[00m "
-		    << std::endl;
-	
+	else {
+	  std::stringstream ss;
+	  ss << "  New Config Found: " << key.c_str();
+	  Normal(__FUNCTION__,ss.str());
+	}
       }
       std::fstream fout;
       fout.open (fname.c_str(), std::fstream::in | std::fstream::out | std::fstream::app);
       for(auto const& key : out_cfg.pset_keys())
 	fout << out_cfg.get_pset(key).dump().c_str() << std::endl;
       fout.close();
-      std::cout << "  Stored: \033[95m" << fname << "\033[00m" << std::endl;
+      std::stringstream ss;
+      ss << "  Stored: " << fname.c_str();
+      Normal(__FUNCTION__,ss.str());
       
     }else
 
-      std::cout << "  No new configuration to be stored... " << std::endl;
+      Normal(__FUNCTION__,"  No new configuration to be stored... ");
     
+    if(Debug()) Debug(__FUNCTION__,"ends");
   }
   
   void Manager::Finalize(TFile* fout)
   {
+    if(Debug()) Debug(__FUNCTION__,"called");
     if(_status == kINIT) {
       std::ostringstream msg;
       msg << "It seems Process() was never called ... (no problem but nothing to formally finalize)..."
 	  << std::endl;
+      Warning(msg.str());
     }
     else if(_status != kPROCESSING) {
       std::ostringstream msg;
@@ -231,7 +267,7 @@ namespace ertool {
 	  << ") is not kPROCESSING ("
 	  << kPROCESSING
 	  << ")!";
-      throw ERException(msg.str());
+      Exception(msg.str());
     }
 
     //
@@ -297,10 +333,12 @@ namespace ertool {
     }
 
     _status = kFINISHED;
+    if(Debug()) Debug(__FUNCTION__,"ends");
   }  
 
   bool Manager::Process()
   {
+    if(Debug()) Debug(__FUNCTION__,"called");
     //_graph.Reset();
     if(_status != kPROCESSING && _status != kINIT) {
       std::ostringstream msg;
@@ -309,13 +347,18 @@ namespace ertool {
 	  << ") is not kPROCESSING or kINIT ("
 	  << kINIT << " or " << kPROCESSING
 	  << ")!";
-      throw ERException(msg.str());
+      Exception(msg.str());
     }
     //fWatch.Start();
     _status = kPROCESSING;
     for(size_t i=0; i<_algo_v.size(); ++i) {
       auto& algo = _algo_v[i];
       algo->_training_mode = this->_training_mode;
+      if(Debug()){
+	std::stringstream ss;
+	ss << "Processing algorithm: " << algo->Name().c_str();
+	Debug(__FUNCTION__,ss.str());
+      }
       if(_profile_mode) fWatch.Start();
       algo->Reconstruct(_io_handle.GetEventData(),_io_handle.GetParticleGraphWriteable());
       if(_profile_mode) _time_algo_v[i]._time_proc += fWatch.RealTime();
@@ -324,6 +367,11 @@ namespace ertool {
     bool status = true;
     for(size_t i=0; i<_ana_v.size(); ++i) {
       auto& ana = _ana_v[i];
+      if(Debug()){
+	std::stringstream ss;
+	ss << "Processing analysis: " << ana->Name().c_str();
+	Debug(__FUNCTION__,ss.str());
+      }
       if(_profile_mode) fWatch.Start();
       if(_mc_for_ana) ana->SetMCData(_io_handle.GetEventData(true),
 				     _io_handle.GetParticleGraph(true)
@@ -333,6 +381,7 @@ namespace ertool {
       if(_profile_mode) _time_ana_v[i]._time_proc += fWatch.RealTime();
     }
 
+    if(Debug()) Debug(__FUNCTION__,"ends");
     return status;
   }
 

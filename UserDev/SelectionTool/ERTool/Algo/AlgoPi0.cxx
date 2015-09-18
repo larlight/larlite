@@ -4,7 +4,7 @@
 #include "AlgoPi0.h"
 #include "GeoAlgo/GeoAlgo.h"
 #include "EMShowerTools/EMShowerProfile.h"
-
+#include <sstream>
 namespace ertool {
 
   AlgoPi0::AlgoPi0(const std::string& name) 
@@ -159,8 +159,10 @@ namespace ertool {
 //      return;
     _dot = _geoAlgo.commonOrigin(shower_a, shower_b, vtx, true);
 
-    if (_verbose) {
-      std::cout << "Sum of dot-products for direction-matching: " << _dot << std::endl;
+    if (Debug()){
+      std::stringstream ss;
+      ss << "Sum of dot-products for direction-matching: " << _dot;
+      Debug(__FUNCTION__,ss.str());
     }
     _vtxDist_A = vtx.Dist(shower_a.Start());
     _vtxDist_B = vtx.Dist(shower_b.Start());
@@ -170,24 +172,30 @@ namespace ertool {
     _radLenVar->setVal(_vtxDist_B);
     _ll_vtxDist_B = log( _radLenSigl->getVal(*_radLenVar) / (_radLenSigl->getVal(*_radLenVar) + _radLenBkgd->getVal(*_radLenVar)) );
 
-  std::cout << "Vertex of pi0 would be : "<< vtx[0]<<", "<<vtx[1]<<", "<<vtx[2]<<std::endl ; 
+    if( Debug()) {
+      std::stringstream ss;
+      ss << "Vertex of pi0 would be : "<< vtx[0]<<", "<<vtx[1]<<", "<<vtx[2];
+      Debug(__FUNCTION__,ss.str());
+    }
 
-    if (_verbose) {
-      std::cout << "Shr A: " << std::endl 
-		<< "\tEnergy: " << shower_a._energy << std::endl
-		<< "\tdEdx:   " << shower_a._dedx << std::endl
-		<< "\tVtx D : " << _vtxDist_A << std::endl
-		<< "Shr B: " << std::endl 
-		<< "\tEnergy: " << shower_b._energy << std::endl
-		<< "\tdEdx:   " << shower_b._dedx << std::endl 
-		<< "\tVtx D : " << _vtxDist_B << std::endl 
-		<< "\tImpact Parameter: " << _vtx_IP << std::endl << std::endl;
+    if (Debug()) {
+      std::stringstream ss;
+      ss << std::endl
+	 << "Shr A: " << std::endl 
+	 << "\tEnergy: " << shower_a._energy << std::endl
+	 << "\tdEdx:   " << shower_a._dedx << std::endl
+	 << "\tVtx D : " << _vtxDist_A << std::endl
+	 << "Shr B: " << std::endl 
+	 << "\tEnergy: " << shower_b._energy << std::endl
+	 << "\tdEdx:   " << shower_b._dedx << std::endl 
+	 << "\tVtx D : " << _vtxDist_B << std::endl 
+	 << "\tImpact Parameter: " << _vtx_IP << std::endl << std::endl;
+      Debug(__FUNCTION__,ss.str());
     }
 
     // Opening angle
     _angle = shower_a.Dir().Angle(shower_b.Dir());
     //if (_angle > _angle_max) return;
-    if (_verbose) { std::cout << "Opening angle:" << _angle << std::endl; }
 
     // Corrected energies
     ::EMShowerProfile shower_prof;
@@ -211,25 +219,26 @@ namespace ertool {
     double mom2 = sqrt(pow(energy_a,2)+pow(energy_b,2)+2*energy_a*energy_b*cos(_angle));
     mom = energy*mom2;
 
-    if (_verbose) { std::cout << "reconstructed mass: " << _mass << std::endl; }
-
     // likelihood of each shower of being more e-like or g-like:
     _dedx_A = shower_a._dedx;
     _ll_dedx_A = _alg_emp.LL(false,shower_a._dedx,-1);//vtx.Dist(shower_a.Start()));
     _dedx_B = shower_b._dedx;
     _ll_dedx_B = _alg_emp.LL(false,shower_b._dedx,-1);//vtx.Dist(shower_b.Start()));
-    
-    if (_verbose){
-      std::cout << "dEdx Shower A: " << _dedx_A << "\tLL: " << _ll_dedx_A << std::endl;
-      std::cout << "dEdx Shower B: " << _dedx_B << "\tLL: " << _ll_dedx_B << std::endl;
-    }
      
     // get lilelyhood for vertex reconstruction:
     _vtxVar->setVal(_vtx_IP);
     _ll_vtx = log( _vtxSigl->getVal(*_vtxVar) / ( _vtxSigl->getVal(*_vtxVar) + _vtxBkgd->getVal(*_vtxVar) ) ); 
-    
-    if (_verbose) {
-      std::cout << "IP for Showers: " << _vtx_IP << "\tLL: "<< _ll_vtx << std::endl;
+
+
+    if (Debug()) {
+      std::stringstream ss;
+      ss << "Pi0 Info: "<<std::endl
+	 << "Opening angle:" << _angle << std::endl
+	 << "reconstructed mass: " << _mass << std::endl
+	 << "dEdx Shower A: " << _dedx_A << "\tLL: " << _ll_dedx_A << std::endl
+	 << "dEdx Shower B: " << _dedx_B << "\tLL: " << _ll_dedx_B << std::endl
+	 << "IP for Showers: " << _vtx_IP << "\tLL: "<< _ll_vtx << std::endl;
+      Debug(__FUNCTION__,ss.str());
     }
 
     ll += _ll_vtx;
@@ -278,7 +287,7 @@ namespace ertool {
 	// make sure the two gammas have not been "used" to form a relationship before 
 	if ( graph.GetParticle(shrID1).RelationAssessed() or
 	     graph.GetParticle(shrID2).RelationAssessed() ){
-	  if (_verbose) { std::cout << "either shower already used to make pi0 or anything else...cannot proceed." << std::endl; }
+	  if (Debug()) { Debug(__FUNCTION__,"either shower already used to make pi0 or anything else...cannot proceed.");}
 	  continue;
 	}
 

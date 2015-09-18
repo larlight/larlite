@@ -20,6 +20,8 @@ OSNAME          = $(shell uname -s)
 HOST            = $(shell uname -n)
 OSNAMEMODE      = $(OSNAME)
 
+CINTFLAGS += "-p" # Use system compiler to preprocess macros (something in Base is messing w/ rootcint)
+
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
 # set linker flags

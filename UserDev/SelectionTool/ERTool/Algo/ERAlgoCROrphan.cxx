@@ -65,11 +65,9 @@ namespace ertool {
 	  is_cosmic = IsCROrphan(shower);
 	}
 
-      }else{
+      }else if( part.RecoType() == kShower)
 
-	is_cosmic = IsCROrphan(shower);
-
-      }
+	is_cosmic = IsCROrphan(data.Shower(part.RecoID()));
 
       if(is_cosmic) {
 
@@ -99,6 +97,8 @@ namespace ertool {
     double dist = _tpc_box.Max()[1] - start[1];
 
     dist = dist / dir[1] * -1.;
+
+    //std::cout<<"Dist is  : "<<dist<<std::endl ;
 
     if(dist > _dist_back_to_ceiling) return false;
 

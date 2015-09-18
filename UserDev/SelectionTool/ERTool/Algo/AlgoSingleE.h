@@ -55,9 +55,9 @@ namespace ertool {
     bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
     /// Set verbosity
-    void setVerbose(bool on){
-      _verbose = on;
-      _findRel.setDebug(on);
+    void SetVerbosity(msg::Level_t level){
+      MessageUtil::SetVerbosity(level);
+      _findRel.SetVerbosity(level);
     }
     
     /// Use EMPart
@@ -88,8 +88,6 @@ namespace ertool {
     /// Returns true if gamma-like
     bool isGammaLike(const double dedx, double radlen,bool forceRadLen=false);
 
-    // verbose flag
-    bool _verbose;
     // electron mass
     double _e_mass;
     // flag to decide whether to use EMPart or not

@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <sstream>
 #include "ERException.h"
-#include "Message.h"
+#include "MessageUtil.h"
 
 namespace ertool {
 
@@ -118,7 +118,8 @@ namespace ertool {
     default:
       std::stringstream msg;
       msg << "PDG Code " << pdgcode << " is not handled yet! Please implement :) ";
-      msg::send(msg::kERROR,__FUNCTION__,msg.str());
+      MessageUtil mutil;
+      mutil.Error(__FUNCTION__,msg.str());
     }
     return -1;
   }
@@ -132,7 +133,7 @@ namespace ertool {
       msg << "<<" << __FUNCTION__ << ">>"
 	  << " Cannot make a combination of " << m 
 	  << " elements from the pool of " << n << std::endl;
-      throw ERException(msg.str());      
+      throw ERException(msg.str());
     }
 
     std::vector<Combination_t> result;
@@ -154,20 +155,6 @@ namespace ertool {
     } while (std::next_permutation(comb_index_v.begin(), comb_index_v.end()));
 
     return result;
-  }
-
-  namespace msg {
-
-    void send(Level_t level, const std::string& msg)
-    {
-      Message::get()->send_msg(level,msg);
-    }
-    
-    void send(Level_t level, const std::string& where, const std::string& msg)
-    {
-      Message::get()->send_msg(level,where,msg);
-    }
-
   }
 }
 

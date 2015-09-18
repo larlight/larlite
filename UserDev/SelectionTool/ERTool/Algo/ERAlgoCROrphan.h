@@ -28,7 +28,7 @@ namespace ertool {
   public:
 
     /// Default constructor
-    ERAlgoCROrphan(const std::string& name="ERAlgoCROrphan");
+    ERAlgoCROrphan(const std::string& name="CROrphan");
 
     /// Default destructor
     virtual ~ERAlgoCROrphan(){};

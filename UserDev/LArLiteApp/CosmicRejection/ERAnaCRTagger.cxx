@@ -26,7 +26,10 @@ namespace ertool {
     	_event_tree->Branch("subrun",&_subrun,"subrun/I");
     	_event_tree->Branch("event",&_event,"event/I");
     	_event_tree->Branch("ctr_cosmic",&_ctr_cosmic,"ctr_cosmic/I");
+	_event_tree->Branch("ctr_non_cosmic_primary",&_ctr_non_cosmic_primary,"ctr_non_cosmic_primary/I");
     	_event_tree->Branch("ctr_non_cosmic",&_ctr_non_cosmic,"ctr_non_cosmic/I");
+    	_event_tree->Branch("ctr_cosmic_w_secondaries",&_ctr_cosmic_w_secondaries,"ctr_cosmic_w_secondaries/I");
+    	_event_tree->Branch("ctr_non_cosmic_w_sec",&_ctr_non_cosmic_w_sec,"ctr_non_cosmic_w_sec/I");
     }
     
     if ( !_part_tree ){
@@ -80,6 +83,10 @@ namespace ertool {
    _event = -99;
    _ctr_cosmic = 0 ;
    _ctr_non_cosmic = 0 ;
+   _ctr_non_cosmic_primary = 0;
+   _ctr_cosmic_w_secondaries = 0;
+   _ctr_non_cosmic_w_sec = 0;
+	
 
   }
 
@@ -113,99 +120,107 @@ namespace ertool {
 
 
     double detHalfHeight = 116.5 ;
-
+    
     for( auto const& p : graph.GetParticleArray() ){
-	ResetPartTree();
 
-	_run    = data.Run() ;
-    	_subrun = data.SubRun() ;
-    	_event  = data.Event_ID() ;
+      ResetPartTree();
+      
+      _run    = data.Run() ;
+      _subrun = data.SubRun() ;
+      _event  = data.Event_ID() ;
+      
+      if(Debug())
+	Debug(__FUNCTION__,Form("PDG code: %d",p.PdgCode()));
 
-        auto const& t = data.Track(p.RecoID());
-	std::cout<<"PDG code: "<<p.PdgCode() <<std::endl;
+      _pdg = p.PdgCode() ; 
+      _primary = p.Primary() ;
 
-    	_pdg = p.PdgCode() ; 
-    	_primary = p.Primary() ; 
-    	_start_x = t.at(0)[0];
-    	_start_y = t.at(0)[1];
-    	_start_z = t.at(0)[2];
-    	_end_x = t.at(t.size()-1)[0]; 
-    	_end_y = t.at(t.size()-1)[1]; 
-    	_end_z = t.at(t.size()-1)[2]; 
+      if(p.RecoType() == kTrack) {
+	auto const& t = data.Track(p.RecoID());
+	_start_x = t.at(0)[0];
+	_start_y = t.at(0)[1];
+	_start_z = t.at(0)[2];
+	_end_x = t.at(t.size()-1)[0]; 
+	_end_y = t.at(t.size()-1)[1]; 
+	_end_z = t.at(t.size()-1)[2]; 
 	
 	_px = t.at(0).Dir()[0];
 	_py = t.at(0).Dir()[1];
 	_pz = t.at(0).Dir()[2];
 
-	std::cout<<"Vertices: "<<p.Vertex()[0]
-				<<p.Vertex()[1]
-				<<p.Vertex()[2]<<std::endl ;
-	std::cout<<"End: "<<_end_x<<", "<<_end_y<<", "<<_end_z<<std::endl;
 	_part_tree->Fill(); 
+	}
 
 	if (p.ProcessType() == kCosmic )
 	    _ctr_cosmic++;
 	else
 	    _ctr_non_cosmic++;
 
-	
-	} 
+	if ( p.ProcessType() == kCosmic || graph.GetParticle(p.Ancestor()).ProcessType() == kCosmic)	
+	    _ctr_cosmic_w_secondaries++;
+	else 
+	    _ctr_non_cosmic_w_sec++;
 
+	if ( p.Primary() && p.ProcessType() != kCosmic ) _ctr_non_cosmic_primary++;
+	
+    } 
     
 
     //Every primary particle should correspond wiht an 'interaction'
-    for( auto const& track : graph.GetPrimaryNodes(RecoType_t::kTrack)){
-	ResetIntTree();
-	 
-        auto const& t = data.Track(graph.GetParticle(track).RecoID());
-
-	_ctr_child = graph.GetAllDescendantNodes(track).size();
-
-        ::geoalgo::HalfLine trk(t.at(0),t.at(0).Dir()); //Start().Position(),t.Start().Momentum());
-
-        _int_x = t.at(0)[0] ;
-        _int_y = t.at(0)[1] ;
-        _int_z = t.at(0)[2] ;
-        _primary_pdg = t._pid ;
-	_length = t.Length(); 
-	//CalculateAngleYZ(graph.GetParticle(track),_angle);
-	CalculateAngleYZ(t.at(0).Dir(),_angle);
-
-	if( fTPC.Contain(t.at(0)) && _geoAlgo.Intersection(fTPC,trk,true).size() > 0){
-	     _distBackAlongTraj = sqrt(_geoAlgo.Intersection(fTPC,trk,true)[0].SqDist(t.at(0))) ;
-             _distToTopWall     = (_int_y - detHalfHeight)/t.at(0).Dir()[1] ; // py is normalize, pmag is not--so ignore pmag
-             _distToWall        = sqrt(_geoAlgo.SqDist(t.at(0),fTPC));
-	   }   
-	else if ( !fTPC.Contain(t.at(0)) && _geoAlgo.Intersection(fTPC,trk,true).size() > 0){ 
+    for( auto const& track_node_id : graph.GetPrimaryNodes(RecoType_t::kTrack)){
+      ResetIntTree();
+      
+      auto const& track_part = graph.GetParticle(track_node_id);
+      
+      auto const& track = data.Track(track_part.RecoID());
+      
+      _ctr_child = graph.GetAllDescendantNodes(track_node_id).size();
+      
+      ::geoalgo::HalfLine trk(track.at(0),track.at(0).Dir()); //Start().Position(),track.Start().Momentum());
+      
+      _int_x = track.at(0)[0] ;
+      _int_y = track.at(0)[1] ;
+      _int_z = track.at(0)[2] ;
+      _primary_pdg = track._pid ;
+      _length = track.Length(); 
+      //CalculateAngleYZ(graph.GetParticle(track),_angle);
+      CalculateAngleYZ(track.at(0).Dir(),_angle);
+      
+      if( fTPC.Contain(track.at(0)) && _geoAlgo.Intersection(fTPC,trk,true).size() > 0){
+	_distBackAlongTraj = sqrt(_geoAlgo.Intersection(fTPC,trk,true)[0].SqDist(track.at(0))) ;
+	_distToTopWall     = (_int_y - detHalfHeight)/track.at(0).Dir()[1] ; // py is normalize, pmag is not--so ignore pmag
+	_distToWall        = sqrt(_geoAlgo.SqDist(track.at(0),fTPC));
+      }   
+      else if ( !fTPC.Contain(track.at(0)) && _geoAlgo.Intersection(fTPC,trk,true).size() > 0){ 
 	//There seems to be an issue with setting the new points when x < 0-- they always
 	//get set to 0,0,0.  This is a temporary fix
-	    if( _int_x >= 0 ){
-         	 _int_x = _geoAlgo.Intersection(fTPC,trk,true).at(0)[0] ;
-         	 _int_y = _geoAlgo.Intersection(fTPC,trk,true).at(0)[1] ;
-         	 _int_z = _geoAlgo.Intersection(fTPC,trk,true).at(0)[2] ;
-		}   
-            else
-		_int_x = 0 ; 
+	if( _int_x >= 0 ){
+	  _int_x = _geoAlgo.Intersection(fTPC,trk,true).at(0)[0] ;
+	  _int_y = _geoAlgo.Intersection(fTPC,trk,true).at(0)[1] ;
+	  _int_z = _geoAlgo.Intersection(fTPC,trk,true).at(0)[2] ;
+	}   
+	else
+	  _int_x = 0 ; 
 
-	    _distToWall = 0 ; 
-            _distBackAlongTraj = 0;
-            _distToTopWall = (_int_y - detHalfHeight)/t.at(0).Dir()[1] ;
-
-//	    std::cout<<"If we're here, what are x,y,z: "<<_int_x<<", "<<_int_y<<", "<<_int_z<<std::endl ;
-	    }
-//	else
-//	    ResetIntTree();
-//
-	_int_tree->Fill();
-	}
-
-	_run    = data.Run() ;
-    	_subrun = data.SubRun() ;
-    	_event  = data.Event_ID() ;
-
-	_event_tree->Fill();
-
-      
+	_distToWall = 0 ; 
+	_distBackAlongTraj = 0;
+	_distToTopWall = (_int_y - detHalfHeight)/track.at(0).Dir()[1] ;
+	
+	//	    std::cout<<"If we're here, what are x,y,z: "<<_int_x<<", "<<_int_y<<", "<<_int_z<<std::endl ;
+      }
+      //	else
+      //	    ResetIntTree();
+      //
+      _int_tree->Fill();
+    }
+    
+    _run    = data.Run() ;
+    _subrun = data.SubRun() ;
+    _event  = data.Event_ID() ;
+    
+    _event_tree->Fill();
+    
+    
     return true;
   }
 
@@ -226,7 +241,6 @@ namespace ertool {
       auto py = p[1];
       auto pz = p[2];
 
-      std::cout<<"PX, py, pz: "<<px<<", "<<py<<", "<<pz<<std::endl;
       double quad = py/pz  ;
       double convert = 180.0/ 3.1415926525898 ;
 

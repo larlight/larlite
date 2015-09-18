@@ -18,13 +18,13 @@ my_proc.enable_filter(True)
 
 # track PID algorithm
 pid_algo = ertool.ERAlgoTrackPid()
-pid_algo.setVerbose(False)
 
 # primary finder algorithm
-primary_algo = ertool.ERAlgoCRPrimary()
-
-secondary_algo = ertool.ERAlgoCRSecondary()
-
+crprimary_algo = ertool.ERAlgoCRPrimary()
+crsecondary_algo = ertool.ERAlgoCRSecondary()
+crorphan = ertool.ERAlgoCROrphan()
+primary = ertool.AlgoPrimaryFinder()
+fmatch = ertool.ERAlgoFlashMatch()
 # Set input root file
 for x in xrange(len(sys.argv)-1):
     my_proc.add_input_file(sys.argv[x+1])
@@ -33,7 +33,7 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
-my_proc.set_ana_output_file("singleE_selection.root")
+my_proc.set_ana_output_file("cosmic_trees.root")
 
 Ecut = 20 # in MeV
 
@@ -41,9 +41,13 @@ my_ana = ertool.ERAnaCRTagger()
 
 my_anaunit = fmwk.ExampleERSelection()
 my_anaunit._mgr.AddAlgo(pid_algo)
-my_anaunit._mgr.AddAlgo(primary_algo)
-my_anaunit._mgr.AddAlgo(secondary_algo)
+my_anaunit._mgr.AddAlgo(crprimary_algo)
+my_anaunit._mgr.AddAlgo(crsecondary_algo)
+my_anaunit._mgr.AddAlgo(crorphan)
+my_anaunit._mgr.AddAlgo(primary)
+my_anaunit._mgr.AddAlgo(fmatch)
 my_anaunit._mgr.AddAna(my_ana)
+my_anaunit._mgr._verbosity = 0
 #my_anaunit._mgr.AddCfgFile('new_empart.txt')
 my_anaunit.SetMinEDep(Ecut)
 my_anaunit._mgr._mc_for_ana = False
@@ -60,11 +64,12 @@ my_anaunit.SetShowerProducer(False,"")
 my_anaunit.SetTrackProducer(False,"trackkalmanhit");
 #my_anaunit.SetTrackProducer(False,"costrk");
 #my_anaunit.SetVtxProducer(True,"generator");
+my_anaunit.SetFlashProducer("opflash")
 # ************************************************
 
 my_proc.add_process(my_anaunit)
 
-my_proc.run()
+my_proc.run(0,1000)
 
 # done!
 print

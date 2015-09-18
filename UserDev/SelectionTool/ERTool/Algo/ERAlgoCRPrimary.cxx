@@ -36,6 +36,7 @@ namespace ertool {
 
   bool ERAlgoCRPrimary::Reconstruct(const EventData &data, ParticleGraph& graph)
   {
+
     // Loop over track particle
     for(auto const& id : graph.GetParticleNodes(kTrack)) {
 
@@ -44,6 +45,8 @@ namespace ertool {
       if(part.Descendant()) continue;
       
       auto const& trk  = data.Track(part.RecoID()); // Get track
+      
+      if(trk.Length() < 0.3) continue; 
       
       auto const& start = trk.front(); // First step
       auto const& end   = trk.back();  // Last step

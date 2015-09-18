@@ -17,14 +17,5 @@ namespace ertool {
   std::vector<ertool::Combination_t> Combination(const size_t n, 
 						 const size_t m);
 
-  namespace msg {
-
-    /// ertool::msg::Message::send function direct call
-    void send(Level_t level, const std::string& msg);
-    
-    /// ertool::msg::Message::send function direct call
-    void send(Level_t level, const std::string& where, const std::string& msg);
-    
-  }
 }
 #endif
