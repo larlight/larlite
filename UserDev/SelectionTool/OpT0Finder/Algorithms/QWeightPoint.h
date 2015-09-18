@@ -50,6 +50,7 @@ namespace flashana {
 
     void SetMaxZDiff(const double dz) { _zdiff_max = dz;  }
 
+    void UsePhotonLibrary(bool doit=true) {_use_library=doit;}
   private:
 
     std::vector<double> _pos_x;
@@ -57,6 +58,7 @@ namespace flashana {
     std::vector<double> _pos_z;
     double _x_step_size;
     double _zdiff_max; ///< allowed diff in z-direction to be considered as a match
+    bool _use_library;
   };
 }
 #endif

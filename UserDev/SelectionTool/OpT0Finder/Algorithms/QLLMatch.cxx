@@ -3,6 +3,7 @@
 
 #include "QLLMatch.h"
 #include "OpT0Finder/Base/OpT0FinderException.h"
+#include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
 #include <TMinuit.h>
 namespace flashana {
 
@@ -15,7 +16,11 @@ namespace flashana {
     , _pmt_y_v()
     , _pmt_z_v()
     , _minuit_ptr(nullptr)
+    , _use_library(false)
   {}
+
+  void QLLMatch::UsePhotonLibrary(bool use)
+  { _use_library = use;}
 
   void QLLMatch::SetOpDetPositions( const std::vector<double>& pos_x,
 				    const std::vector<double>& pos_y,
@@ -105,24 +110,35 @@ namespace flashana {
 
 	auto const& pt = trk[pt_index];
 
-	double dx = _pmt_x_v[pmt_index] - pt.x;
-	double dy = _pmt_y_v[pmt_index] - pt.y;
-	double dz = _pmt_z_v[pmt_index] - pt.z;
+	if(!_use_library) {
 
-	double r2 = ( pow(dx,2) + pow(dy,2) + pow(dz,2) );
+	  double dx = _pmt_x_v[pmt_index] - pt.x;
+	  double dy = _pmt_y_v[pmt_index] - pt.y;
+	  double dz = _pmt_z_v[pmt_index] - pt.z;
+	  
+	  double r2 = ( pow(dx,2) + pow(dy,2) + pow(dz,2) );
+	  
+	  double angle = dx / sqrt(r2);
 
-	double angle = dx / sqrt(r2);
-
-	if(angle<0) angle *= -1;
+	  if(angle<0) angle *= -1;
 	
-	_qll_hypothesis_v[pmt_index] += pt.q * angle / r2;
-      }
+	  _qll_hypothesis_v[pmt_index] += pt.q * angle / r2;
+	}else{
 
+	  double q = pt.q;
+	  q *= ::phot::PhotonVisibilityService::GetME().GetVisibility(pt.x,pt.y,pt.z,pmt_index);
+	  _qll_hypothesis_v[pmt_index] += q;
+	    
+	}
+      }
       if(_qll_hypothesis_v[pmt_index] > qmax) qmax = _qll_hypothesis_v[pmt_index];
     }
-
-    for(auto& v : _qll_hypothesis_v) v /= qmax;
-
+      
+    //for(auto& v : _qll_hypothesis_v) v /= qmax;
+    double qsum =0;
+    for(auto const& v : _qll_hypothesis_v) qsum += v;
+    for(auto& v : _qll_hypothesis_v) v/= qsum;
+    
     return _qll_hypothesis_v;
   }
 
