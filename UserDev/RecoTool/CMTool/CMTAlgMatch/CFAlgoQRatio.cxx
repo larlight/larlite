@@ -10,7 +10,7 @@ namespace cmtool {
   //-------------------------------------------------------
   {
     _qratio_cut = 0.1 ;// Preliminary cuts
-	
+  
   }
 
   //-----------------------------
@@ -21,7 +21,7 @@ namespace cmtool {
   }
 
   //-----------------------------------------------------------------------------------------
-  float CFAlgoQRatio::Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters)
+  float CFAlgoQRatio::Float(const std::vector<const cluster::cluster_params*> &clusters)
   //-----------------------------------------------------------------------------------------
   {
 
@@ -35,41 +35,41 @@ namespace cmtool {
     float ratio = 1;
 
     // Search for max charge & return if any cluster has negative charge
-	for(auto const& c : clusters) {
+    for(auto const& c : clusters) {
 
-	  //Ignore all clusters with less than 40 hits 
+      //Ignore all clusters with less than 40 hits 
 
-    		if(c->GetParams().sum_charge < 0) {
-				if(_verbose) 
-					  std::cout 
-					<< "\033[00m Found a cluster with negative charge!\033[00m ... aborting " 
-					<< __FUNCTION__ <<std::endl;
-				  	  return -1;
-    	 		 }
+      if(c->sum_charge < 0) {
+        if(_verbose) 
+          std::cout 
+            << "\033[00m Found a cluster with negative charge!\033[00m ... aborting " 
+            << __FUNCTION__ <<std::endl;
+        return -1;
+      }
 
 
-	 		if(q_max < c->GetParams().sum_charge)
-				q_max = c->GetParams().sum_charge;
+      if(q_max < c->sum_charge)
+        q_max = c->sum_charge;
 
-	 }
+   }
 
     // Compute ratio
     for(auto const& c : clusters){
-	        ratio *= c->GetParams().sum_charge / q_max;
-	
-			if(_verbose){
-				std::cout<<"Sum Charge: "<<c->GetParams().sum_charge ;
-				std::cout<<"Q max : "<<q_max<<std::endl ;
-				std::cout<<"Ratio is: "<<ratio<<std::endl;	
-			  }
-	}
-	
-   		  if(_verbose) {
-      	  	if( ratio > _qratio_cut ) std::cout << " ... pass!" << std::endl;
-     	  	else std::cout << " ... below cut value: " << _qratio_cut << std::endl;
-    		}
+          ratio *= c->sum_charge / q_max;
+  
+      if(_verbose){
+        std::cout<<"Sum Charge: "<<c->sum_charge ;
+        std::cout<<"Q max : "<<q_max<<std::endl ;
+        std::cout<<"Ratio is: "<<ratio<<std::endl;  
+        }
+  }
+  
+         if(_verbose) {
+            if( ratio > _qratio_cut ) std::cout << " ... pass!" << std::endl;
+           else std::cout << " ... below cut value: " << _qratio_cut << std::endl;
+        }
 
-   	return ( ratio > _qratio_cut ? ratio : -1 );
+     return ( ratio > _qratio_cut ? ratio : -1 );
  }
   
 

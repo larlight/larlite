@@ -11,21 +11,21 @@ namespace larutil{
       unsigned char plane; // plane 0, 1, 2
       
       PxPoint(){
-	Clear();
-	//	std::cout<< "This is the default point ctor." << std::endl;
+        Clear();
+        //        std::cout<< "This is the default point ctor." << std::endl;
       }
       
       PxPoint(unsigned char pp,double ww,double tt){
-	plane=pp;
-	w=ww;
-	t=tt;
+        plane=pp;
+        w=ww;
+        t=tt;
       }
       
       void Clear()
       {
-	plane = 0;
-	w     = 0;
-	t     = 0;
+        plane = 0;
+        w     = 0;
+        t     = 0;
       }
       
       ~PxPoint(){}

@@ -15,7 +15,10 @@ def ConfigureMergeAllInstance(merger_instance=0, producer="fuzzycluster",saveOut
     if not merger_instance:
         raise Exception('To call ConfigureDefaultMergerInstance function, you need to hand it a ClusterMerger() instance! Or, an instance of something that inherits from ClusterMerger.')
 
-    merger_instance.GetManager().AddMergeAlgo(cmtool.CBAlgoMergeAll())
+    merge_all = cmtool.CBAlgoMergeAll()
+    merge_all.SetHits(0)
+
+    merger_instance.GetManager().AddMergeAlgo(merge_all)
     merger_instance.GetManager().MergeTillConverge(True)
     merger_instance.SetInputProducer(producer)
     merger_instance.SaveOutputCluster(saveOutput)

@@ -29,11 +29,11 @@ namespace cluster {
 
         //hit index, all the hits, and the vector of pxf
         if(Regions[0].first.size() > 15 && Regions[0].second.size()>15){
-            fCRUHelper.GeneratePxHit(Regions[0].first, hits, pxfa_v0);
-            fCRUHelper.GeneratePxHit(Regions[0].second, hits, pxfb_v0);
+            fCRUHelper.GenerateHit2D(Regions[0].first, hits, pxfa_v0);
+            fCRUHelper.GenerateHit2D(Regions[0].second, hits, pxfb_v0);
                 if(Regions[1].first.size() > 15 && Regions[1].second.size()>15){
-                    fCRUHelper.GeneratePxHit(Regions[1].first, hits, pxfa_v1);
-                    fCRUHelper.GeneratePxHit(Regions[1].second, hits, pxfb_v1);
+                    fCRUHelper.GenerateHit2D(Regions[1].first, hits, pxfa_v1);
+                    fCRUHelper.GenerateHit2D(Regions[1].second, hits, pxfb_v1);
                 double aa = fQuality.TimeProf(pxfa_v0,pxfa_v1);
                 double ab = fQuality.TimeProf(pxfa_v0,pxfb_v1);
                 double ba = fQuality.TimeProf(pxfb_v0,pxfa_v1);
@@ -44,8 +44,8 @@ namespace cluster {
                                         }//plane 1
 
                 if(Regions[2].first.size() > 15 && Regions[2].second.size()>15){
-                    fCRUHelper.GeneratePxHit(Regions[2].first, hits, pxfa_v2);
-                    fCRUHelper.GeneratePxHit(Regions[2].second, hits, pxfb_v2);
+                    fCRUHelper.GenerateHit2D(Regions[2].first, hits, pxfa_v2);
+                    fCRUHelper.GenerateHit2D(Regions[2].second, hits, pxfb_v2);
                 double aa = fQuality.TimeProf(pxfa_v0,pxfa_v2);
                 double ab = fQuality.TimeProf(pxfa_v0,pxfb_v2);
                 double ba = fQuality.TimeProf(pxfb_v0,pxfa_v2);
@@ -56,11 +56,11 @@ namespace cluster {
                                         }//plane 2
                                 }//if plane 0 
         if(Regions[1].first.size() > 15 && Regions[1].second.size()>15){
-                    fCRUHelper.GeneratePxHit(Regions[1].first, hits, pxfa_v1);
-                    fCRUHelper.GeneratePxHit(Regions[1].second, hits, pxfb_v1);
+                    fCRUHelper.GenerateHit2D(Regions[1].first, hits, pxfa_v1);
+                    fCRUHelper.GenerateHit2D(Regions[1].second, hits, pxfb_v1);
                 if(Regions[2].first.size() > 15 && Regions[2].second.size()>15){
-                    fCRUHelper.GeneratePxHit(Regions[2].first, hits, pxfa_v2);
-                    fCRUHelper.GeneratePxHit(Regions[2].second, hits, pxfb_v2);
+                    fCRUHelper.GenerateHit2D(Regions[2].first, hits, pxfa_v2);
+                    fCRUHelper.GenerateHit2D(Regions[2].second, hits, pxfb_v2);
                 double aa = fQuality.TimeProf(pxfa_v1,pxfa_v2);
                 double ab = fQuality.TimeProf(pxfa_v1,pxfb_v2);
                 double ba = fQuality.TimeProf(pxfb_v1,pxfa_v2);

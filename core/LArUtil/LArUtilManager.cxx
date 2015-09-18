@@ -56,6 +56,11 @@ namespace larutil {
       GeometryUtilities* gser = (GeometryUtilities*)(GeometryUtilities::GetME());
       gser->Reconfigure();
 
+      // GeometryHelper
+      larlite::Message::send(larlite::msg::kNORMAL,__FUNCTION__,"Reconfiguring GeometryHelper...");
+      GeometryHelper* ghelp = (GeometryHelper*)(GeometryHelper::GetME());
+      ghelp->Reconfigure();
+
     }
 
     return status;

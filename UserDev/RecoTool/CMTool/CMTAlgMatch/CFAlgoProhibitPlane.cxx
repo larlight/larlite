@@ -22,13 +22,13 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------------------------------------
-  float CFAlgoProhibitPlane::Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters)
+  float CFAlgoProhibitPlane::Float(const std::vector<const cluster::cluster_params*> &clusters)
   //----------------------------------------------------------------------------------------------
   {
 
     for (auto *cl : clusters){
-      if (cl->Plane() == _removePlane)
-	return -1;
+      if (cl->plane_id.Plane == _removePlane)
+        return -1;
     }
     
     return 1;

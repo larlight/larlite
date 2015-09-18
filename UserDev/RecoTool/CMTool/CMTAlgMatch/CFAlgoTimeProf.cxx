@@ -1,6 +1,7 @@
 #ifndef RECOTOOL_CFALGOTIMEPROF_CXX
 #define RECOTOOL_CFALGOTIMEPROF_CXX
 
+#include "LArUtil/GeometryUtilities.h"
 #include "CFAlgoTimeProf.h"
 // ROOT includes
 #include "TF1.h"
@@ -37,7 +38,7 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------------------------------------
-  float CFAlgoTimeProf::Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters)
+  float CFAlgoTimeProf::Float(const std::vector<const cluster::cluster_params*> &clusters)
   //----------------------------------------------------------------------------------------------
   {
   // We now have a vector a clusters.
@@ -61,9 +62,9 @@ namespace cmtool {
 //        std::cout<<"\tEnd Point: "<<EndPoint <<std::endl;
 
 	// Get assosiations for this cluster
-        if(c->Plane() ==0) hits0 = c->GetHitVector();
-        if(c->Plane() ==1) hits1 = c->GetHitVector();
-        if(c->Plane() ==2) hits2 = c->GetHitVector();
+        if(c->plane_id.Plane ==0) hits0 = c->hit_vector;
+        if(c->plane_id.Plane ==1) hits1 = c->hit_vector;
+        if(c->plane_id.Plane ==2) hits2 = c->hit_vector;
 
 	}// for over the clusters
 
