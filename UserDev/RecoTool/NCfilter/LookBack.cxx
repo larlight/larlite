@@ -2,6 +2,7 @@
 #define RECOTOOL_LOOKBACK_CXX
 
 #include "LookBack.h"
+#include "LArUtil/GeometryUtilities.h"
 
 namespace cluster {
 

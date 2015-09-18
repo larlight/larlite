@@ -13,11 +13,11 @@ namespace cmtool {
   }
 
   //------------------------------------------------------------------------------
-  float CPAlgoPolyArea::Priority(const ::cluster::ClusterParamsAlg &cluster)
+  float CPAlgoPolyArea::Priority(const ::cluster::cluster_params &cluster)
   //------------------------------------------------------------------------------
   {
 
-    auto area = cluster.GetParams().PolyObject.Area();
+    auto area = cluster.PolyObject.Area();
 
     return ( area < _area_cut ? -1 : area);
   }

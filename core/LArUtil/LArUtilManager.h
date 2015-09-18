@@ -19,6 +19,7 @@
 #include "LArProperties.h"
 #include "DetectorProperties.h"
 #include "GeometryUtilities.h"
+#include "GeometryHelper.h"
 
 namespace larutil {
   /**

@@ -14,7 +14,7 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------------------------------------
-  float CFAlgoArray::Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters)
+  float CFAlgoArray::Float(const std::vector<const cluster::cluster_params*> &clusters)
   //----------------------------------------------------------------------------------------------
   {
 
@@ -26,8 +26,7 @@ namespace cmtool {
       float score = algo->Float(clusters);
 
       if(_mode != kSimpleAddition && score < 0)
-
-	return score;
+        return score;
 
       score_array.push_back(score);
       

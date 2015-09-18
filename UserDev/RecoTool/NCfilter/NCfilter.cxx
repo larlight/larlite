@@ -2,6 +2,7 @@
 #define RECOTOOL_NCFILTER_CXX
 
 #include "NCfilter.h"
+#include "LArUtil/Geometry.h"
 
 namespace larlite {
 

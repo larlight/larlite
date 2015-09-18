@@ -2,6 +2,7 @@
 #define RECOTOOL_CBALGOTRACKSEPARATE_CXX
 
 #include "CBAlgoTrackSeparate.h"
+#include "LArUtil/GeometryUtilities.h"
 
 namespace cmtool {
 
@@ -36,15 +37,15 @@ namespace cmtool {
   }
 
   //--------------------------------------------------------
-  bool CBAlgoTrackSeparate::Bool(const ::cluster::ClusterParamsAlg &cluster1,
-			const ::cluster::ClusterParamsAlg &cluster2)
+  bool CBAlgoTrackSeparate::Bool(const ::cluster::cluster_params &cluster1,
+                        const ::cluster::cluster_params &cluster2)
   //--------------------------------------------------------
   {
     //if you are using EP method for this algo:
     if(_use_EP){
-      if(cluster1.GetParams().eigenvalue_principal > _ep_cut &&
-	 cluster2.GetParams().eigenvalue_principal > _ep_cut)
-	return true;
+      if(cluster1.eigenvalue_principal > _ep_cut &&
+         cluster2.eigenvalue_principal > _ep_cut)
+        return true;
     }
     //if you are using the original method for this algo:
     else{
@@ -54,52 +55,52 @@ namespace cmtool {
       //2) opening angle for both < _MAxOpeningAngle
       //3) diff. in direction of both < _MinAngleDiff
       
-      size_t N_Hits1 = cluster1.GetHitVector().size();
-      size_t N_Hits2 = cluster2.GetHitVector().size();
-      auto start_point1 = cluster1.GetParams().start_point;
-      auto start_point2 = cluster2.GetParams().start_point;
-      double angle_2d1 = cluster1.GetParams().angle_2d;
-      double angle_2d2 = cluster2.GetParams().angle_2d;
-      double opening_angle1 = cluster1.GetParams().opening_angle;
-      double opening_angle2 = cluster2.GetParams().opening_angle;
-      Polygon2D PolyObject1 = cluster1.GetParams().PolyObject;
-      Polygon2D PolyObject2 = cluster2.GetParams().PolyObject;
-      double length1 = cluster1.GetParams().length;
-      double length2 = cluster2.GetParams().length;
-      double width1 = cluster1.GetParams().width;
-      double width2 = cluster2.GetParams().width;
+      size_t N_Hits1 = cluster1.hit_vector.size();
+      size_t N_Hits2 = cluster2.hit_vector.size();
+      auto start_point1 = cluster1.start_point;
+      auto start_point2 = cluster2.start_point;
+      double angle_2d1 = cluster1.angle_2d;
+      double angle_2d2 = cluster2.angle_2d;
+      double opening_angle1 = cluster1.opening_angle;
+      double opening_angle2 = cluster2.opening_angle;
+      Polygon2D PolyObject1 = cluster1.PolyObject;
+      Polygon2D PolyObject2 = cluster2.PolyObject;
+      double length1 = cluster1.length;
+      double length2 = cluster2.length;
+      double width1 = cluster1.width;
+      double width2 = cluster2.width;
       
       //first filter out low hits clusters
       if ( (N_Hits1 > _MinNumHits) and
-	   (N_Hits2 > _MinNumHits) ) {
-	if (_debug) {
-	  std::cout << "Cluster1 Num Hits: " << N_Hits1 << std::endl;
-	  std::cout << "\t Start: (" << start_point1.w << " " << start_point1.t << " )" << std::endl;
-	  std::cout << "\t Opening ANgle " << opening_angle1*(360/(2*3.14)) << std::endl;
-	  std::cout << "\t Angle2D: " << angle_2d1 << std::endl;
-	  std::cout << "\t Length: " << length1 << std::endl;
-	  std::cout << "\t Width: " << width1 << std::endl;
-	  std::cout << "Cluster2 Num Hits: " << N_Hits2 << std::endl;
-	  std::cout << "\t Start: (" << start_point2.w  << " " << start_point2.t << " )" << std::endl;
-	  std::cout << "\t Opening ANgle " << opening_angle2*(360/(2*3.14)) << std::endl;
-	  std::cout << "\t Angle2D: " << angle_2d2 << std::endl;
-	  std::cout << "\t Length: " << length2 << std::endl;
-	  std::cout << "\t Width: " << width2 << std::endl;
-	}
-	if ( (N_Hits1 > _MinNumHits) and
-	     (N_Hits2 > _MinNumHits) and
-	     ( abs(angle_2d1 - angle_2d2) > _MinAngleDiff ) and
-	     //( PolyObject1.Area()/N_Hits1 > _MinDensity ) and
-	     //( PolyObject2.Area()/N_Hits2 > _MinDensity ) and
-	     (opening_angle1 < _MaxOpeningAngle/(360/(2*3.14))) and
-	     (opening_angle2 < _MaxOpeningAngle/(360/(2*3.14))) and
-	     (width1 < _MaxWidth) and
-	     (width2 < _MaxWidth) and
-	     (length1 > _MinLength) and
-	     (length2 > _MinLength) ){
-	  if (_verbose) { std::cout << "*****************************************Separate with TrackSeparate!" << std::endl; }
-	  return true;
-	}
+           (N_Hits2 > _MinNumHits) ) {
+        if (_debug) {
+          std::cout << "Cluster1 Num Hits: " << N_Hits1 << std::endl;
+          std::cout << "\t Start: (" << start_point1.w << " " << start_point1.t << " )" << std::endl;
+          std::cout << "\t Opening ANgle " << opening_angle1*(360/(2*3.14)) << std::endl;
+          std::cout << "\t Angle2D: " << angle_2d1 << std::endl;
+          std::cout << "\t Length: " << length1 << std::endl;
+          std::cout << "\t Width: " << width1 << std::endl;
+          std::cout << "Cluster2 Num Hits: " << N_Hits2 << std::endl;
+          std::cout << "\t Start: (" << start_point2.w  << " " << start_point2.t << " )" << std::endl;
+          std::cout << "\t Opening ANgle " << opening_angle2*(360/(2*3.14)) << std::endl;
+          std::cout << "\t Angle2D: " << angle_2d2 << std::endl;
+          std::cout << "\t Length: " << length2 << std::endl;
+          std::cout << "\t Width: " << width2 << std::endl;
+        }
+        if ( (N_Hits1 > _MinNumHits) and
+             (N_Hits2 > _MinNumHits) and
+             ( abs(angle_2d1 - angle_2d2) > _MinAngleDiff ) and
+             //( PolyObject1.Area()/N_Hits1 > _MinDensity ) and
+             //( PolyObject2.Area()/N_Hits2 > _MinDensity ) and
+             (opening_angle1 < _MaxOpeningAngle/(360/(2*3.14))) and
+             (opening_angle2 < _MaxOpeningAngle/(360/(2*3.14))) and
+             (width1 < _MaxWidth) and
+             (width2 < _MaxWidth) and
+             (length1 > _MinLength) and
+             (length2 > _MinLength) ){
+          if (_verbose) { std::cout << "*****************************************Separate with TrackSeparate!" << std::endl; }
+          return true;
+        }
       }
     }
     

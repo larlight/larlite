@@ -27,8 +27,10 @@
 
 #pragma link C++ class larutil::LArUtilConfig+;
 #pragma link C++ class larutil::LArUtilManager+;
+#pragma link C++ class larutil::GeometryHelper+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 

@@ -110,6 +110,10 @@ else
     export PYTHONPATH=$ROOTSYS/lib:$PYTHONPATH;
 fi
 
+# Set up the event display if possible:
+source $LARLITE_USERDEVDIR/DisplayTool/setup_evd.sh
+
+
 python $LARLITE_BASEDIR/config/python/gen_usermakefile.py
 python $LARLITE_BASEDIR/config/python/gen_topmakefile.py
 export LD_LIBRARY_PATH=$LARLITE_LIBDIR:$LD_LIBRARY_PATH
