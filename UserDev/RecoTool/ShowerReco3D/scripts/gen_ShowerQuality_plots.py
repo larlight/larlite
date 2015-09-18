@@ -79,3 +79,19 @@ plt.xlabel('3D Direction MC - Reco angular difference')
 plt.ylabel('Counts')
 plt.savefig('3Ddir_accuracy.pdf')
 plt.show()
+
+
+# dEdx plots
+fig = plt.figure(figsize=(10,6))
+dedx_u = df['reco_dedx_U']
+dedx_v = df['reco_dedx_V']
+dedx_y = df['reco_dedx_Y']
+bins = np.linspace(0,10,100)
+plt.hist(dedx_u,bins=bins,edgecolor=None,alpha=0.5,color='b',label='U Plane')
+plt.hist(dedx_v,bins=bins,edgecolor=None,alpha=0.5,color='g',label='V Plane')
+plt.hist(dedx_y,bins=bins,edgecolor=None,alpha=0.5,color='r',label='Y Plane')
+plt.grid()
+plt.xlabel('dE/dx [ MeV / cm ]')
+plt.ylabel('Count')
+plt.savefig('dEdx_resolution.pdf')
+plt.show()
