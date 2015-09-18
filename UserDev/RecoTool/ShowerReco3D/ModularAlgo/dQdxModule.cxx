@@ -17,9 +17,9 @@ namespace showerreco{
 
     if (_tree) delete _tree;
     _tree = new TTree(_name.c_str(),"dQdx Info Tree");
-    _tree->Branch("_n_hits",&_n_hits,"_n_hits/I");
-    _tree->Branch("_length",&_length,"_length/D");
-    _tree->Branch("_pl",&_pl,"_pl/I");
+    _tree->Branch("_n_hits",&_n_hits,"n_hits/I");
+    _tree->Branch("_length",&_length,"length/D");
+    _tree->Branch("_pl",&_pl,"pl/I");
     _tree->Branch("_dQ",&_dQ,"dQ/D");    
     _tree->Branch("_dQdx",&_dQdx,"dQdx/D");
     _tree->Branch("_dQdx_pitch",&_dQdx_pitch,"dQdx_p/D");
@@ -98,7 +98,14 @@ namespace showerreco{
 	hit_length = sqrt((hits[i].w-start.w)*(hits[i].w-start.w)+
 			  (hits[i].t-start.t)*(hits[i].t-start.t));
 	dx[pl]=hit_length;
-	if (hit_length<trunk_length){	  
+
+	if (trunk_length>=4){
+	  if (hit_length<trunk_length){
+	    double Q = hits[i].charge * _charge_conversion;
+	    dQ[pl] += Q;
+	  }
+	} 
+	else if(hit_length<4){
 	  double Q = hits[i].charge * _charge_conversion;
 	  dQ[pl] += Q;
 	}
@@ -111,9 +118,9 @@ namespace showerreco{
       _dQdx_pitch =dQdx_pitch;
 
       resultShower.fdQdx[pl] = dQdx;
-
+      
       if (_verbose) std::cout<<"now2_pl="<<_pl<<"\n";
-      _tree->Fill();
+      if (trunk_length>0) _tree->Fill();
       if (_verbose) std::cout<<"now3_pl="<<_pl<<"\n";
     }
 
