@@ -40,12 +40,12 @@ Ecut = 20 # in MeV
 my_ana = ertool.ERAnaCRTagger()
 
 my_anaunit = fmwk.ExampleERSelection()
-my_anaunit._mgr.AddAlgo(pid_algo)
+#my_anaunit._mgr.AddAlgo(pid_algo)
 my_anaunit._mgr.AddAlgo(crprimary_algo)
 my_anaunit._mgr.AddAlgo(crsecondary_algo)
 my_anaunit._mgr.AddAlgo(crorphan)
-my_anaunit._mgr.AddAlgo(primary)
-my_anaunit._mgr.AddAlgo(fmatch)
+#my_anaunit._mgr.AddAlgo(primary)
+#my_anaunit._mgr.AddAlgo(fmatch)
 my_anaunit._mgr.AddAna(my_ana)
 my_anaunit._mgr._verbosity = 0
 #my_anaunit._mgr.AddCfgFile('new_empart.txt')
@@ -69,7 +69,7 @@ my_anaunit.SetFlashProducer("opflash")
 
 my_proc.add_process(my_anaunit)
 
-my_proc.run(0,1000)
+my_proc.run()
 
 # done!
 print
