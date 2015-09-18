@@ -45,7 +45,7 @@ my_anaunit._mgr.AddAlgo(crprimary_algo)
 my_anaunit._mgr.AddAlgo(crsecondary_algo)
 my_anaunit._mgr.AddAlgo(crorphan)
 #my_anaunit._mgr.AddAlgo(primary)
-#my_anaunit._mgr.AddAlgo(fmatch)
+my_anaunit._mgr.AddAlgo(fmatch)
 my_anaunit._mgr.AddAna(my_ana)
 my_anaunit._mgr._verbosity = 0
 #my_anaunit._mgr.AddCfgFile('new_empart.txt')

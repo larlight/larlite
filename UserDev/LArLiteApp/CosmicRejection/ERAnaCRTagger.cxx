@@ -209,7 +209,7 @@ namespace ertool {
 
 	::geoalgo::Point_t dir(_int_px, _int_py,_int_pz) ;
 
-      std::cout<<"Y interaction point "<<_int_y<<std::endl ;
+//      std::cout<<"Y interaction point "<<_int_y<<std::endl ;
       _primary_pdg = track._pid ;
       _length = track.Length(); 
       //CalculateAngleYZ(graph.GetParticle(track),_angle);

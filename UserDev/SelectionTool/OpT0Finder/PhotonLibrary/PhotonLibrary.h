@@ -18,7 +18,6 @@ namespace phot{
     ~PhotonLibrary();
 
     TTree * ProduceTTree(){};
-    
 
     float GetCount(size_t Voxel, size_t OpChannel);
     void   SetCount(size_t Voxel, size_t OpChannel, float Count);

@@ -517,8 +517,6 @@ namespace larlite {
 
       auto const& trk = trk_v[i];
 
-      std::cout<<"trk start point: "<<trk.Vertex().Y()<<std::endl ;
-      
       t_v.push_back(::ertool::Track());
       id_v.emplace_back(i,trk_v.name());
       auto &t = t_v.back();
