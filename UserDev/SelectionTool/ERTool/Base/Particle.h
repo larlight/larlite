@@ -36,14 +36,15 @@ namespace ertool {
 
     Particle(const NodeID_t   node=kINVALID_NODE_ID,
 	     const RecoType_t reco_type=kInvisible,
-	     const RecoID_t   reco_id=kINVALID_RECO_ID);
+	     const RecoID_t   reco_id=kINVALID_RECO_ID,
+	     const FlashID_t  flash_id=kINVALID_FLASH_ID);
 
     const NodeID_t&     ID         () const;
     const NodeID_t&     Parent     () const;
     const NodeID_t&     Ancestor   () const;
     const Generation_t& Generation () const;
     const std::vector< ::ertool::NodeID_t >& Children() const;
-    float RelationshipScore(const NodeID_t id);
+    float RelationshipScore(const NodeID_t id) const;
     
     bool RelationAssessed() const;
     bool Primary() const;
@@ -54,6 +55,7 @@ namespace ertool {
     const bool HasRecoObject() const;
     const RecoType_t& RecoType() const;
     const RecoID_t&   RecoID()   const;
+    const FlashID_t&  FlashID()  const;
 
     const int&    PdgCode() const;
     const double& Mass() const;
@@ -61,15 +63,18 @@ namespace ertool {
     double KineticEnergy() const;
     const ::geoalgo::Vector& Vertex()   const;
     const ::geoalgo::Vector& Momentum() const;
-    float RecoScore();
+    float RecoScore() const;
     const ProcessType_t& ProcessType() const;
     
     void SetParticleInfo( const int pdg_code = kINVALID_INT,
 			  const double mass  = kINVALID_DOUBLE,
 			  const ::geoalgo::Vector& vtx = kINVALID_VERTEX,
 			  const ::geoalgo::Vector& mom = kINVALID_MOMENTUM,
-			  const float score = 0);
+			  const float score = 0,
+			  const ProcessType_t process = kUnknown);
 
+    void SetProcess(const ProcessType_t process){ _process = process; }
+    
     std::string Print() const;
 
   private:
@@ -78,10 +83,9 @@ namespace ertool {
     void SetScore(const NodeID_t id, const float score = kDEFAULT_SCORE);
     void SetRecoInfo(const RecoType_t type,
 		     const RecoID_t id  = kINVALID_RECO_ID);
-
+    void SetFlashID(const FlashID_t id);
     void RemoveChild(const NodeID_t child );
     void UpdateAfterRemoval(const NodeID_t removed);
-    void SetProcess(const ProcessType_t process){ _process = process; }
     void Print             (std::string& res, std::string prefix="") const;
 
     
@@ -104,7 +108,7 @@ namespace ertool {
     // Associated reco object information (type & id to retrieve)
     RecoType_t   _reco_type;   ///< Associated reco object type 
     RecoID_t     _reco_id;     ///< Associated reco ojbect id
-    
+    FlashID_t    _flash_id;    ///< Associated flash id
   };
 
 }

@@ -2,6 +2,7 @@
 #define RECOTOOL_MATCHVIEWER_CXX
 
 #include "MatchViewer.h"
+#include "LArUtil/GeometryUtilities.h"
 
 namespace larlite {
   
@@ -161,7 +162,7 @@ namespace larlite {
 
 	auto const& cl = GetManager().GetInputClusters().at(c_index);
 
-	UChar_t plane = cl.Plane();
+	UChar_t plane = cl.plane_id.Plane;
 
 	// Get associated hits
 	for(auto const& h_index : ass_hit_v[c_index]) {
@@ -183,20 +184,20 @@ namespace larlite {
 	}
 	
 	std::vector<std::pair<double,double> > cluster_hits;
-	std::pair<double,double> cluster_start  ( cl.GetParams().start_point.w, cl.GetParams().start_point.t ); 
-	std::pair<double,double> cluster_end    ( cl.GetParams().end_point.w,   cl.GetParams().end_point.t   ); 
+	std::pair<double,double> cluster_start  ( cl.start_point.w, cl.start_point.t ); 
+	std::pair<double,double> cluster_end    ( cl.end_point.w,   cl.end_point.t   ); 
       
-	for(auto const& h : cl.GetHitVector())
+	for(auto const& h : cl.hit_vector)
 	  
 	  cluster_hits.push_back(std::pair<double,double>( h.w, h.t));
       
-	std::vector<std::pair<double,double> > cluster_polygon(cl.GetParams().PolyObject.Size() + 1,
+	std::vector<std::pair<double,double> > cluster_polygon(cl.PolyObject.Size() + 1,
 							       std::pair<double,double>(0,0)
 							       );
       
-	for(size_t i=0; i<cl.GetParams().PolyObject.Size(); ++i) {
-	  cluster_polygon.at(i).first = cl.GetParams().PolyObject.Point(i).first;
-	  cluster_polygon.at(i).second = cl.GetParams().PolyObject.Point(i).second;
+	for(size_t i=0; i<cl.PolyObject.Size(); ++i) {
+	  cluster_polygon.at(i).first = cl.PolyObject.Point(i).first;
+	  cluster_polygon.at(i).second = cl.PolyObject.Point(i).second;
 	}
 	
 	if(cluster_polygon.size()){
@@ -207,7 +208,7 @@ namespace larlite {
 	//only draw clusters with more than _min_hits_to_draw
 	if(cluster_hits.size() > _min_hits_to_draw){
 	  
-	  bool is_track = cl.GetParams().eigenvalue_principal > 0.99000;
+	  bool is_track = cl.eigenvalue_principal > 0.99000;
 	  
 	  //if it's not a track, draw it only if !_draw_only_tracks
 	  if(!is_track){
@@ -273,20 +274,20 @@ namespace larlite {
     int index_offset = 0;
     //get the clusters (after merging)
     for (auto const &cl : ClusterMatcher::GetManager().GetInputClusters()) {
-      if (cl.Plane() == plane) break;
+      if (cl.plane_id.Plane == plane) break;
       else index_offset++;
     }
     
     index = index + index_offset;
     auto cl = ClusterMatcher::GetManager().GetInputClusters().at(index);
     std::cout<<"**********PRINTING CLUSTER INFO**********"<<std::endl;
-    std::cout<<"Angle 2D = "<<cl.GetParams().angle_2d<<std::endl;
-    std::cout<<"Opening Angle = "<<cl.GetParams().opening_angle<<std::endl;
-    std::cout<<"Sum charge = "<<cl.GetParams().sum_charge<<std::endl;
-    std::cout<<"Length = "<<cl.GetParams().length<<std::endl;
-    std::cout<<"Width = "<<cl.GetParams().width<<std::endl;
-    std::cout<<"N_Hits = "<<cl.GetParams().N_Hits<<std::endl;
-    std::cout<<"eigenvalue_principal = "<<cl.GetParams().eigenvalue_principal<<std::endl;
+    std::cout<<"Slope 2D = "<<cl.slope_2d<<std::endl;
+    std::cout<<"Opening Angle = "<<cl.opening_angle<<std::endl;
+    std::cout<<"Sum charge = "<<cl.sum_charge<<std::endl;
+    std::cout<<"Length = "<<cl.length<<std::endl;
+    std::cout<<"Width = "<<cl.width<<std::endl;
+    std::cout<<"N_Hits = "<<cl.N_Hits<<std::endl;
+    std::cout<<"eigenvalue_principal = "<<cl.eigenvalue_principal<<std::endl;
   }
   
 }

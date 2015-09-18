@@ -107,15 +107,27 @@ namespace larutil {
 
     /// nearest wire to input world coordinates
     UInt_t NearestWire(const Double_t worldLoc[3],
-		       const UInt_t   PlaneNo) const;
+                       const UInt_t   PlaneNo) const;
 
     /// nearest wire to input world coordinate
     UInt_t NearestWire(const std::vector<Double_t> &worldLoc,
-		       const UInt_t  PlaneNo) const;
+                       const UInt_t  PlaneNo) const;
 
     /// nearest wire to input world coordinates
     UInt_t NearestWire(const TVector3& worldLoc,
-		       const UInt_t PlaneNo) const;
+                       const UInt_t PlaneNo) const;
+
+    /// exact wire coordinate (fractional wire) to input world coordinates
+    Double_t WireCoordinate(const Double_t worldLoc[3],
+                            const UInt_t   PlaneNo) const;
+
+    /// exact wire coordinate (fractional wire) to input world coordinate
+    Double_t WireCoordinate(const std::vector<Double_t> &worldLoc,
+                            const UInt_t  PlaneNo) const;
+
+    /// exact wire coordinate (fractional wire) to input world coordinates
+    Double_t WireCoordinate(const TVector3& worldLoc,
+                            const UInt_t PlaneNo) const;
 
     /// half width of the TPC
     Double_t   DetHalfWidth() const

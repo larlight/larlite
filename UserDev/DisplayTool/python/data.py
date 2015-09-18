@@ -4,6 +4,7 @@ from larlite import larlite as fmwk
 import ROOT
 from ROOT import *
 import numpy as np
+import math
 import pyqtgraph as pg
 import math as mt 
 
@@ -125,15 +126,6 @@ class wire(dataBase):
     super(wire, self).__init__()
     self._process = None
     
-    # This is the (clunky) converter to native python
-    # self._c2p = evd.Converter()
-
-  # def get_img(self):
-  #   d = []
-  #   for i in range(0,self._nviews):
-  #     d.append(np.array(self._c2p.Convert(self._process.getDataByPlane(i))) )
-  #     print "got a plane, here is a sample: ", d[i][0][0]
-  #   return d
 
   def getPlane(self,plane):
     return self._process.getArrayByPlane(plane)
@@ -161,6 +153,7 @@ class rawDigit(wire):
     self._process.SetSaveData(False)
 
 
+
 class hit(recoBase):
   """docstring for hit"""
   def __init__(self):
@@ -172,7 +165,7 @@ class hit(recoBase):
 
   # this is the function that actually draws the hits.
   def drawObjects(self,view_manager):
-
+  
     for view in view_manager.getViewPorts():
       self._drawnObjects.append([])
       thisPlane = view.plane()
@@ -197,6 +190,8 @@ class hit(recoBase):
 
 
 
+
+
 # This class wraps the hit object to allow them to all function together
 class connectedBox(QtGui.QGraphicsRectItem):
   """docstring for connectedBox"""
@@ -207,6 +202,7 @@ class connectedBox(QtGui.QGraphicsRectItem):
       
 
   def hoverEnterEvent(self, e):
+    self.setToolTip(self._ownerToolTip())
     self._ownerHoverEnter(e)
 
   def hoverLeaveEvent(self,e):
@@ -224,14 +220,56 @@ class connectedBox(QtGui.QGraphicsRectItem):
   def connectToggleHighlight(self, ownerTH):
     self._toggleHighlight = ownerTH
 
-class boxCollection(QtGui.QGraphicsItem):
+  def connectToolTip(self, ownerToolTip):
+    self._ownerToolTip = ownerToolTip
+
+class connectedCircle(QtGui.QGraphicsEllipseItem):
+  """docstring for connectedCircle"""
+  def __init__(self, *args, **kwargs):
+    super(connectedCircle, self).__init__(*args,**kwargs)
+    self.setAcceptHoverEvents(True)
+    self._isHighlighted = False
+
+  def hoverEnterEvent(self, e):
+    self.setToolTip(self._ownerToolTip())
+    self._ownerHoverEnter(e)
+
+  def hoverLeaveEvent(self,e):
+    self._ownerHoverExit(e) 
+
+  def mouseDoubleClickEvent(self,e):
+    self._toggleHighlight()
+
+  def connectOwnerHoverEnter(self, ownerHoverEnter):
+    self._ownerHoverEnter = ownerHoverEnter
+
+  def connectOwnerHoverExit(self, ownerHoverExit):
+    self._ownerHoverExit = ownerHoverExit
+
+  def connectToggleHighlight(self, ownerTH):
+    self._toggleHighlight = ownerTH
+
+  def connectToolTip(self, ownerToolTip):
+    self._ownerToolTip = ownerToolTip  
+
+
+class boxCollection(QtCore.QObject):
   # This class wraps a collection of hits and connects them together
-  # it can draw and delete itself when provided with view_manager
+  # it can draw and delete itself when provided with view_manage
+  # 
+  # Provide some signals to communicate with cluster params
+  mouseEnter  = QtCore.pyqtSignal(QtGui.QGraphicsSceneHoverEvent)
+  mouseExit   = QtCore.pyqtSignal(QtGui.QGraphicsSceneHoverEvent)
+  highlightChange = QtCore.pyqtSignal()
+
   def __init__(self):
+    super(boxCollection, self).__init__()
     self._color = (0,0,0)
     self._plane = -1
     self._listOfHits = []
+    self._listOfStarts = []
     self._isHighlighted = False
+    self._params = None
 
   def setColor(self,color):
     self._color = color
@@ -239,21 +277,45 @@ class boxCollection(QtGui.QGraphicsItem):
   def setPlane(self,plane):
     self._plane = plane
 
+  def attachParams(self,params):
+    self._params = params
+
+  def genToolTip(self):
+    if self._params == None:
+      nhits = len(self._listOfHits)
+      tip = "Hits: " + str(nhits)  
+      return tip
+    else:
+      return self._params.toolTip()
+
   def hoverEnter(self, e):
     for hit in self._listOfHits:
       hit.setPen(pg.mkPen((0,0,0),width=1))
+    # When the function is called from a box, the sender is none
+    # When its passed from the params, the sender is something
+    if self.sender() == None:
+      self.mouseEnter.emit(e)
 
   def hoverExit(self, e):
-      if self._isHighlighted:
-          return
-      for hit in self._listOfHits:
-          hit.setPen(pg.mkPen(None))
+    if self._isHighlighted:
+      return
+    for hit in self._listOfHits:
+      hit.setPen(pg.mkPen(None))
+    # When the function is called from a box, the sender is none
+    # When its passed from the params, the sender is something
+    if self.sender() == None:
+      self.mouseExit.emit(e)
+
 
   def toggleHighlight(self):
-      self._isHighlighted = not self._isHighlighted
+    self._isHighlighted = not self._isHighlighted
+    # When the function is called from a box, the sender is none
+    # When its passed from the params, the sender is something
+    if self.sender() == None:
+      self.highlightChange.emit()
 
-  def drawHits(self,view_manager,wireList,timeStartList,timeEndList):
-    view = view_manager.getViewPorts()[self._plane]
+
+  def drawHits(self,view,wireList,timeStartList,timeEndList):
     for i in xrange(len(wireList)):
       # Draws a rectangle at (x,y,xlength, ylength)
       r = connectedBox(wireList[i], timeStartList[i], 1, timeEndList[i]-timeStartList[i])
@@ -266,12 +328,249 @@ class boxCollection(QtGui.QGraphicsItem):
       r.connectOwnerHoverEnter(self.hoverEnter)
       r.connectOwnerHoverExit(self.hoverExit)
       r.connectToggleHighlight(self.toggleHighlight)
+      r.connectToolTip(self.genToolTip)
 
-  def clearHits(self,view_manager):
-    view = view_manager.getViewPorts()[self._plane]
+  def clearHits(self,view):
     for hit in self._listOfHits:
       view._view.removeItem(hit)
     self._listOfHits = []
+
+
+class clusterParams(QtCore.QObject): #recoBase):
+  """docstring for clusterParams"""
+  
+  mouseEnter  = QtCore.pyqtSignal(QtGui.QGraphicsSceneHoverEvent)
+  mouseExit   = QtCore.pyqtSignal(QtGui.QGraphicsSceneHoverEvent)
+  highlightChange = QtCore.pyqtSignal()
+
+  def __init__(self,params,geom):
+    super(clusterParams, self).__init__()
+    self._listOfStartPoints = []
+    self._params = params
+    self._geom = geom
+    self._isHighlighted = False
+
+  #Some member params i'm not filling forrectly.
+  def setParams(self,params):
+    self._params = params
+
+
+
+  def hoverEnter(self, e):
+    for circle in self._listOfStartPoints:
+      circle.setPen(pg.mkPen((0,0,0),width=1))
+    # When the function is called from a box, the sender is none
+    # When its passed from the params, the sender is something
+    if self.sender() == None:
+      self.mouseEnter.emit(e)
+
+  def hoverExit(self, e):
+    if self._isHighlighted:
+      return
+    for circle in self._listOfStartPoints:
+      circle.setPen(pg.mkPen(None))
+    # When the function is called from a box, the sender is none
+    # When its passed from the params, the sender is something
+    if self.sender() == None:
+      self.mouseExit.emit(e)
+
+  def toggleHighlight(self):
+    self._isHighlighted = not self._isHighlighted
+    # When the function is called from a box, the sender is none
+    # When its passed from the params, the sender is something
+    if self.sender() == None:
+      self.highlightChange.emit()
+
+  def genToolTip(self):
+    return self.toolTip()
+
+  def toolTip(self):
+    tip =  "Hits: " + str(self._params.N_Hits) + "\n"
+    tip += "Start: (" + "{:.2f}".format(self._params.start_point.w) + ", "
+    tip += "{:.2f}".format(self._params.start_point.t) + ")\n"
+    tip += "Shower Start (" + "{:.2f}".format(self._params.showering_point.w) + ", "
+    tip += "{:.2f}".format(self._params.showering_point.t) + ")\n"
+    tip += "End: (" + "{:.2f}".format(self._params.end_point.w) + ", "
+    tip += "{:.2f}".format(self._params.end_point.t) + ")\n"
+    if self._params.principal_dir[0] != 0:
+      tip += "Slope: " + "{:.2f}".format(self._params.principal_dir[1]/self._params.principal_dir[0]) + "\n"
+    else:
+      tip += "Slope: inf\n" 
+    if self._params.start_dir[0] != 0:
+      tip += "Start Slope: " + "{:.2f}".format(self._params.start_dir[1]/self._params.start_dir[0]) + "\n"
+    else:
+      tip += "Start Slope: inf\n"
+    tip += "Angle: " + "{:.2f}".format(self._params.angle_2d) + "\n"
+    tip += "Add more in data.py:clusterParams:toolTip!"
+    return tip
+
+  def draw(self, view):
+    # This function is responsible for all clusterparams drawing
+    red   = (255,0  ,0) 
+    green = (0  ,255,0)  
+    black = (0  ,0  ,0)
+    blue  = (0  ,0  ,255)
+
+    offset = self._geom.offset(self._params.plane_id.Plane) / self._geom.time2cm()
+
+    # Draw the start and end points:
+    sW = self._params.start_point.w / self._geom.wire2cm()
+    sT = (self._params.start_point.t ) / self._geom.time2cm() + offset
+    eW = self._params.end_point.w / self._geom.wire2cm()
+    eT = (self._params.end_point.t) / self._geom.time2cm() + offset
+    showeringW = self._params.showering_point.w / self._geom.wire2cm()
+    showeringT = (self._params.showering_point.t) / self._geom.time2cm() + offset
+
+    radBigW   = 0.5 / self._geom.wire2cm()
+    radBigT   = (0.5 ) / self._geom.time2cm()
+    radSmallW = 0.25 / self._geom.wire2cm()
+    radSmallT = (0.25 ) / self._geom.time2cm()
+
+    bigCircleStart = connectedCircle(sW-radBigW,sT-radBigT,2*radBigW,2*radBigT)
+    if self._isHighlighted:
+      bigCircleStart.setPen(pg.mkPen(black))
+    else:
+      bigCircleStart.setPen(pg.mkPen(None))
+
+    bigCircleStart.setBrush(pg.mkColor(green))
+    bigCircleStart.setOpacity(0.6)
+    bigCircleStart.connectOwnerHoverEnter(self.hoverEnter)
+    bigCircleStart.connectOwnerHoverExit(self.hoverExit)
+    bigCircleStart.connectToggleHighlight(self.toggleHighlight)
+    bigCircleStart.connectToolTip(self.genToolTip)
+
+
+    smallCircleStart = QtGui.QGraphicsEllipseItem(sW-radSmallW,sT-radSmallT,2*radSmallW,2*radSmallT)
+    smallCircleStart.setPen(pg.mkPen(None))
+    smallCircleStart.setBrush(pg.mkColor(black))
+
+    bigCircleEnd = connectedCircle(eW-radBigW,eT-radBigT,2*radBigW,2*radBigT)
+    bigCircleEnd.setPen(pg.mkPen(None))
+    bigCircleEnd.setBrush(pg.mkColor(red))
+    bigCircleEnd.setOpacity(0.6)
+    bigCircleEnd.connectOwnerHoverEnter(self.hoverEnter)
+    bigCircleEnd.connectOwnerHoverExit(self.hoverExit)
+    bigCircleEnd.connectToggleHighlight(self.toggleHighlight)
+    bigCircleEnd.connectToolTip(self.genToolTip)
+
+
+    smallCircleEnd = QtGui.QGraphicsEllipseItem(eW-radSmallW,eT-radSmallT,2*radSmallW,2*radSmallT)
+    smallCircleEnd.setPen(pg.mkPen(None))
+    smallCircleEnd.setBrush(pg.mkColor(black))
+
+
+    radW = 0.5 / self._geom.wire2cm()
+    radT = (0.5) / self._geom.time2cm()
+    showeringPoint = connectedCircle(showeringW -radW, showeringT - radT, 2*radW, 2*radT)
+    showeringPoint.setBrush(pg.mkColor(blue))
+    showeringPoint.setOpacity(0.6)
+    showeringPoint.connectOwnerHoverEnter(self.hoverEnter)
+    showeringPoint.connectOwnerHoverExit(self.hoverExit)
+    showeringPoint.connectToggleHighlight(self.toggleHighlight)
+    showeringPoint.connectToolTip(self.genToolTip)
+
+    self._listOfStartPoints.append(bigCircleStart)
+    self._listOfStartPoints.append(smallCircleStart)
+    self._listOfStartPoints.append(bigCircleEnd)
+    self._listOfStartPoints.append(smallCircleEnd)
+    self._listOfStartPoints.append(showeringPoint)
+
+    view._view.addItem(bigCircleStart)
+    view._view.addItem(smallCircleStart)
+    view._view.addItem(bigCircleEnd)
+    view._view.addItem(smallCircleEnd)
+    view._view.addItem(showeringPoint)
+
+    ########################################
+    # 2D Polygon Drawing
+    ########################################
+    # Not super hard to do with the poly object
+    self._thisPolyF = QtGui.QPolygonF()
+    for p in xrange(self._params.PolyObject.Size()):
+      point = self._params.PolyObject.Point(p)
+      qpoint = QtCore.QPointF(point.first/self._geom.wire2cm(),(point.second)/self._geom.time2cm() + offset)
+      self._thisPolyF.append(qpoint)
+
+    self._thisPoly = QtGui.QGraphicsPolygonItem(self._thisPolyF)
+    pen = self._thisPoly.pen()
+    pen.setStyle(QtCore.Qt.DashLine)
+    self._thisPoly.setPen(pen)
+    view._view.addItem(self._thisPoly)
+
+
+    ########################################
+    # 2D Principal Axis Drawing
+    ########################################
+    # Draw the axis
+    # The axis is just a line between two points.
+    self._axisPolygon = QtGui.QPolygonF()
+    self._axisPolygon.append(QtCore.QPointF(sW,sT))
+    l = self._params.length
+    if l < 1:
+      l =  (self._params.start_point.w - self._params.end_point.w)**2 
+      l += (self._params.start_point.t - self._params.end_point.t)**2
+      l = math.sqrt(l)
+
+    axisEndW = sW + l*self._params.principal_dir.at(0)/self._geom.wire2cm() 
+    axisEndT = sT + (l*self._params.principal_dir.at(1) )/self._geom.time2cm()
+    # Check to see if this line needs to be reversed:
+    sign = (sW - axisEndW)*(sW - eW) + (sT - axisEndT)*(sT - eT)
+    if sign < 0:
+      axisEndW = sW - l*self._params.principal_dir.at(0)/self._geom.wire2cm() 
+      axisEndT = sT - (l*self._params.principal_dir.at(1) )/self._geom.time2cm()  
+    self._axisPolygon.append(QtCore.QPointF(axisEndW,axisEndT))
+
+    self._axisPath = QtGui.QPainterPath()
+    self._axisPath.addPolygon(self._axisPolygon)
+    self._polyGraphicsItem = QtGui.QGraphicsPathItem(self._axisPath)
+    pen = self._polyGraphicsItem.pen()
+    pen.setWidth(2)
+    pen.setBrush(pg.mkColor((0,0,0,125)))
+    self._polyGraphicsItem.setPen(pen)
+    view._view.addItem(self._polyGraphicsItem)
+
+    ########################################
+    # 2D Start Axis Drawing
+    ########################################
+    # Draw an line to show the start direction of the shower
+    self._startAxis = QtGui.QPolygonF()
+    self._startAxis.append(QtCore.QPointF(sW,sT))
+    startDirEndW = sW + l*self._params.start_dir.at(0)/self._geom.wire2cm() 
+    startDirEndT = sT + (l*self._params.start_dir.at(1) )/self._geom.time2cm()
+
+    # print sign
+    sign = (sW - startDirEndW)*(sW - eW) + (sT - startDirEndT)*(sT - eT)
+    if sign < 0:
+      startDirEndW = sW - l*self._params.start_dir.at(0)/self._geom.wire2cm() 
+      startDirEndT = sT - (l*self._params.start_dir.at(1) )/self._geom.time2cm()
+
+    self._startAxis.append(QtCore.QPointF(startDirEndW,startDirEndT))
+    self._startAxisPath = QtGui.QPainterPath()
+    self._startAxisPath.addPolygon(self._startAxis)
+    self._startAxisPolyItem = QtGui.QGraphicsPathItem(self._startAxisPath)
+    pen = self._startAxisPolyItem.pen()
+    pen.setWidth(1)
+    pen.setStyle(QtCore.Qt.DashLine)
+    pen.setBrush(pg.mkColor((0,0,0,200)))
+    self._startAxisPolyItem.setPen(pen)
+    view._view.addItem(self._startAxisPolyItem)    
+
+
+
+
+
+  def clear(self,view):
+    # This function clears all of this cluster params
+    # 
+    for item in self._listOfStartPoints:
+      view._view.removeItem(item)
+    self._listOfStartPoints = []
+    view._view.removeItem(self._thisPoly)
+    view._view.removeItem(self._polyGraphicsItem)
+    view._view.removeItem(self._startAxisPolyItem)
+
+
+
 
 class cluster(recoBase):
   """docstring for cluster"""
@@ -281,7 +580,13 @@ class cluster(recoBase):
     self._process = evd.DrawCluster()
     self.init()
 
+    
+    self.setParamsDrawing(False)
+
     self._listOfClusters = []
+    self._listOfCParams  = []
+
+
     # Defining the cluster colors:
     self._clusterColors = [ 
                             (0,147,147),  # dark teal
@@ -297,20 +602,35 @@ class cluster(recoBase):
                             (100,253,0) # bright green
                           ]   
 
+  def setParamsDrawing(self, paramsBool):
+    self._drawParams = paramsBool
+
   # this is the function that actually draws the cluster.
   def drawObjects(self,view_manager):
+
+
+    totalClus = 0 
     for view in view_manager.getViewPorts():
       colorIndex = 0
       # get the plane
       thisPlane = view.plane()
+
       # extend the list of clusters
       self._listOfClusters.append([])
+      
+      self._listOfCParams.append([])
+
+      params_v = self._process.getParamsByPlane(thisPlane)
+
       # loop over the clusters in this plane:
       for i_cluster in xrange(self._process.getNClustersByPlane(thisPlane)):
+
+        totalClus += 1 
 
         wireList       = self._c2p.Convert(self._process.getWireByPlaneAndCluster(thisPlane,i_cluster))
         timeStartList  = self._c2p.Convert(self._process.getHitStartByPlaneAndCluster(thisPlane,i_cluster))
         timeEndList    = self._c2p.Convert(self._process.getHitEndByPlaneAndCluster(thisPlane,i_cluster))
+
 
         # Now make the cluster
         cluster = boxCollection()
@@ -318,18 +638,53 @@ class cluster(recoBase):
         cluster.setPlane(thisPlane)
 
         # draw the hits in this cluster:
-        cluster.drawHits(view_manager,wireList,timeStartList,timeEndList)
+        cluster.drawHits(view,wireList,timeStartList,timeEndList)
 
         self._listOfClusters[thisPlane].append(cluster)
+        self._listOfCParams[thisPlane].append(None)
+
 
         colorIndex += 1
         if colorIndex >= len(self._clusterColors):
           colorIndex = 0
 
+        if self._drawParams:
+          if int(i_cluster) < int(len(params_v)) and params_v[i_cluster].N_Hits > 10:
+
+            cParams = clusterParams(params_v[i_cluster],view_manager._geometry) 
+            self._listOfCParams[thisPlane][-1] = cParams
+            cluster.attachParams(cParams)
+            self._listOfCParams[thisPlane][-1].draw(view)
+
+            # Connect the params to the cluster:
+            self._listOfCParams[thisPlane][-1].mouseEnter.connect(self._listOfClusters[thisPlane][-1].hoverEnter)
+            self._listOfCParams[thisPlane][-1].mouseExit.connect(self._listOfClusters[thisPlane][-1].hoverExit)
+            self._listOfCParams[thisPlane][-1].highlightChange.connect(self._listOfClusters[thisPlane][-1].toggleHighlight)
+            self._listOfClusters[thisPlane][-1].mouseEnter.connect(self._listOfCParams[thisPlane][-1].hoverEnter)
+            self._listOfClusters[thisPlane][-1].mouseExit.connect(self._listOfCParams[thisPlane][-1].hoverExit)
+            self._listOfClusters[thisPlane][-1].highlightChange.connect(self._listOfCParams[thisPlane][-1].toggleHighlight)	
+
   def clearDrawnObjects(self,view_manager):
+    i_plane = 0
+    # erase the clusters
     for plane in self._listOfClusters:
+      view = view_manager.getViewPorts()[i_plane]
+      i_plane += 1
       for cluster in plane:
-        cluster.clearHits(view_manager)
+        cluster.clearHits(view)
+
+    # Erase the cparams
+    i_plane = 0
+    for plane in self._listOfCParams:
+      view = view_manager.getViewPorts()[i_plane]
+      i_plane += 1
+      for cparams in plane:
+        if cparams != None:
+          cparams.clear(view)
+    
+    self._listOfClusters = []
+    self._listOfCParams  = []
+
 
   def getAutoRange(self,plane):
     wires = self._process.GetWireRange(plane)
@@ -422,11 +777,12 @@ class shower(recoBase):
         view._view.addItem(thisPoly)
         self._drawnObjects[view.plane()].append(thisPoly)
 
-        if view.plane() == 0:
-          print "dedx: ", shower.dedx()
+        # if view.plane() == 0:
+        #   print "dedx: ", shower.dedx()
 
 
         i_color += 1
+
 
 
 class polyLine(QtGui.QGraphicsPathItem):

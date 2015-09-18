@@ -24,11 +24,16 @@ OSNAMEMODE      = $(OSNAME)
 
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
+CINTFLAGS += "-p" # Use system compiler to preprocess macros (something in Base is messing w/ rootcint)
+
 # set linker flags
 LDFLAGS += $(shell larlite-config --libs)
 LDFLAGS += -L$(shell root-config --libdir) -lRooFit -lRooFitCore -lRooStats
 #LDFLAGS += $(shell seltool-config --libs)
 LDFLAGS += $(shell basictool-config --libs)
+LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_OpT0FinderAlgorithms
+LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_OpT0PhotonLibrary
+LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_OpT0FinderBase
 LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_ERBase
 LDFLAGS += -L$(LARLITE_LIBDIR) -lTreeGraph_GeoGraph
 

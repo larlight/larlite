@@ -1,0 +1,11 @@
+# New, simpler script for generating doxygen documentation.
+# It uses the main (maintained) doxygenMyProject.script,
+
+@INCLUDE = $(LARLITE_USERDEVDIR)/OpFlashAna/OpT0Finder/doc/doxygenMyProject.script
+
+OUTPUT_DIRECTORY       = $(LARLITE_USERDEVDIR)/OpFlashAna/OpT0Finder/doc/dOxygenMyProject+
+
+#
+# ROOT
+#
+INPUT +=$(ROOTSYS)/include

@@ -2,6 +2,7 @@
 #define RECOTOOL_CFALGO3DANGLE_CXX
 
 #include "CFAlgo3DAngle.h"
+#include "LArUtil/GeometryUtilities.h"
 
 namespace cmtool {
 
@@ -25,7 +26,7 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------------------------------------
-  float CFAlgo3DAngle::Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters)
+  float CFAlgo3DAngle::Float(const std::vector<const cluster::cluster_params*> &clusters)
   //----------------------------------------------------------------------------------------------
   {
     // Code-block by Kazu starts
@@ -35,19 +36,19 @@ namespace cmtool {
     // Code-block by Kazu ends
 
 
-	int plane_0 = clusters.at(0)->Plane();
-	int plane_1 = clusters.at(1)->Plane();
-	int plane_2 = clusters.at(2)->Plane();
-	double angle_2d_0 = clusters.at(0)->GetParams().angle_2d;
-	double angle_2d_1 = clusters.at(1)->GetParams().angle_2d;
-	double angle_2d_2 = clusters.at(2)->GetParams().angle_2d;
-	auto hits_0 = clusters.at(0)->GetParams().N_Hits ;
-	auto hits_1 = clusters.at(1)->GetParams().N_Hits ;
-	auto hits_2 = clusters.at(2)->GetParams().N_Hits ;
+	int plane_0 = clusters.at(0)->plane_id.Plane;
+	int plane_1 = clusters.at(1)->plane_id.Plane;
+	int plane_2 = clusters.at(2)->plane_id.Plane;
+	double angle_2d_0 = clusters.at(0)->angle_2d;
+	double angle_2d_1 = clusters.at(1)->angle_2d;
+	double angle_2d_2 = clusters.at(2)->angle_2d;
+	auto hits_0 = clusters.at(0)->N_Hits ;
+	auto hits_1 = clusters.at(1)->N_Hits ;
+	auto hits_2 = clusters.at(2)->N_Hits ;
 
-	auto sumCharge0 = clusters.at(0)->GetParams().sum_charge; 
-	auto sumCharge1 = clusters.at(1)->GetParams().sum_charge; 
-	auto sumCharge2 = clusters.at(2)->GetParams().sum_charge; 
+	auto sumCharge0 = clusters.at(0)->sum_charge; 
+	auto sumCharge1 = clusters.at(1)->sum_charge; 
+	auto sumCharge2 = clusters.at(2)->sum_charge; 
 	
 	//Calculate angles theta and phi for cluster pairs across 2 planes
 	//Theta goes from -90 to 90, phi from -180 to 180
@@ -131,8 +132,8 @@ namespace cmtool {
 
 
 	if(_debug && ratio > _ratio_cut ){
-		std::cout<<"\nNhits planes 0, 1, 2: " <<clusters.at(0)->GetParams().N_Hits<<", "<<clusters.at(1)->GetParams().N_Hits
-				 <<", "<<clusters.at(2)->GetParams().N_Hits ;
+		std::cout<<"\nNhits planes 0, 1, 2: " <<clusters.at(0)->N_Hits<<", "<<clusters.at(1)->N_Hits
+				 <<", "<<clusters.at(2)->N_Hits ;
 		std::cout<<"\nTheta1 , Theta2 : "<<ratio_theta1<<", "<<ratio_theta2;
 		std::cout<<"\nPhi Ratio: "<<ratio_phi;
 		std::cout<<"\nHits ratio mid : "<<ratio_max_middle ;
@@ -140,15 +141,15 @@ namespace cmtool {
 		std::cout<<"\nTotal is: " <<ratio<<" ***************";
 
 
-		std::cout<<"\n\n0: 2dAngle: "<<clusters.at(0)->GetParams().cluster_angle_2d<<std::endl;
-		std::cout<<"1: 2dAngle: "<<clusters.at(1)->GetParams().cluster_angle_2d<<std::endl;
-		std::cout<<"2: 2dAngle: "<<clusters.at(2)->GetParams().cluster_angle_2d<<std::endl;
+		std::cout<<"\n\n0: 2dAngle: "<<clusters.at(0)->angle_2d<<std::endl;
+		std::cout<<"1: 2dAngle: "<<clusters.at(1)->angle_2d<<std::endl;
+		std::cout<<"2: 2dAngle: "<<clusters.at(2)->angle_2d<<std::endl;
 		std::cout<<"\nTheta,Phi MaxMM : "<<max_theta<<", "<<middle_theta<<", "<<min_theta<<"\n\t\t"
 				 <<max_phi<<", "<<middle_phi<<", "<<min_phi;
 		
-		std::cout<<"\nStart End Points:  "<<clusters.at(0)->GetParams().start_point.t<<", "<<clusters.at(0)->GetParams().end_point.t<<"\n\t\t"
-		<<clusters.at(1)->GetParams().start_point.t<<", "<<clusters.at(1)->GetParams().end_point.t<<"\n\t\t "
-		<<clusters.at(2)->GetParams().start_point.t<<", "<<clusters.at(2)->GetParams().end_point.t;
+		std::cout<<"\nStart End Points:  "<<clusters.at(0)->start_point.t<<", "<<clusters.at(0)->end_point.t<<"\n\t\t"
+		<<clusters.at(1)->start_point.t<<", "<<clusters.at(1)->end_point.t<<"\n\t\t "
+		<<clusters.at(2)->start_point.t<<", "<<clusters.at(2)->end_point.t;
 
 /*		std::cout<<"\nFor planes 0 and 1: "<<std::endl ;
 		std::cout<<"\tPhi : "<<phi_01<<std::endl;

@@ -17,7 +17,7 @@
 #include "ParticleGraph.h"
 #include "EventData.h"
 #include "Provenance.h"
-
+#include "MessageUtil.h"
 namespace ertool {
   namespace io {
     /**
@@ -25,7 +25,7 @@ namespace ertool {
        User defined class IStreamBase ... these comments are used to generate
        doxygen documentation!
     */
-    class IStreamBase{
+    class IStreamBase : public ::ertool::MessageUtil{
       
     public:
       

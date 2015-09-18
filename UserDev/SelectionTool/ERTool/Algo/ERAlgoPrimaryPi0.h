@@ -54,8 +54,6 @@ namespace ertool {
     /// Called after processing the last event sample
     void ProcessEnd(TFile* fout=nullptr);
 
-    void SetVerbose ( bool verbose ) { _verbose = verbose ; }
-    
     void SetMinDistVtx   ( double minDistVtx ) { _minDistVtx = minDistVtx ; }
     void SetMinDistEnd   ( double minDistEnd ) { _minDistEnd = minDistEnd ; }
 
@@ -72,7 +70,6 @@ namespace ertool {
 
   AlgoPrimaryFinder _primary_alg ;
   
-  bool 		_verbose    ;
   double 	_vtxDist    ;
   double 	_minDistVtx ;
   double 	_minDistEnd ;

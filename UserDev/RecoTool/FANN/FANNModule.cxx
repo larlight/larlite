@@ -10,7 +10,7 @@ namespace cluster{
     if (s != "") net.create_from_file(s);
     else
       net.create_from_file(fInputFileName);
-    net.print_parameters();
+    // net.print_parameters();
   }
 
   void FANNModule::init(){

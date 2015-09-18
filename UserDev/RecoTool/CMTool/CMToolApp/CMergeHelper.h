@@ -43,7 +43,7 @@ namespace cmtool {
 
     const CMergeBookKeeper& GetResult() const { return _bk; }
 
-    const std::vector< ::cluster::ClusterParamsAlg>& GetClusters() const;
+    const std::vector< ::cluster::cluster_params>& GetClusters() const;
 
   protected:
 

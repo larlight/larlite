@@ -35,7 +35,7 @@ namespace cmtool {
     /**This algorithm calculates the difference between start and end times for merged clusters,
 		and compares across planes to form matches. 
     */
-    virtual float Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters);
+    virtual float Float(const std::vector<const cluster::cluster_params*> &clusters);
     
     void SetStartTimeCut(float start_time) { _start_time_cut = start_time ; } 
     

@@ -20,14 +20,14 @@
 #include "ERTool/Base/ParticleGraph.h"
 #include "ERTool/Base/ERToolTypes.h"
 #include "ERTool/Base/UtilFunc.h"
-
+#include "ERTool/Base/MessageUtil.h"
 namespace ertool {
    /**
      \class AlgoFindRelationship
      User defined class ertool::AlgoFindRelationship ... these comments are used to generate
      doxygen documentation!
   */
-  class AlgoFindRelationship {
+  class AlgoFindRelationship : public MessageUtil{
     
   public:
     
@@ -106,11 +106,7 @@ namespace ertool {
 
     double _maxIP; ///< Maximum Impact Parameter allowed for success
 
-
-    geoalgo::GeoAlgo _geoAlgo;
-
-    // Partile masses
-    double _pi_mass, _pr_mass, _mu_mass, _ka_mass, _uk_mass;
+    ::geoalgo::GeoAlgo _geoAlgo;
     
   };
 }

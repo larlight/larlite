@@ -15,6 +15,7 @@ INCFLAGS  = -I.                       #Include itself
 INCFLAGS += $(shell larlite-config --includes)
 INCFLAGS += $(shell basictool-config --includes)
 INCFLAGS += $(shell recotool-config --includes)
+INCFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool/ClusterRecoUtil/Alg
 
 
 # platform-specific options
@@ -27,6 +28,8 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
 # call the common GNUmakefile
 LDFLAGS += $(shell larlite-config --libs)
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtilAlg
+
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE
 
 

@@ -80,14 +80,13 @@ namespace ertool {
     /// Set bounds for radiation length PDF fitting
     void SetFitRange_RadLen (double min, double max, bool gamma=true);
 
-    /// Set verbosity mode
-    void setVerbose(bool on) { _verbose = on; }
-
     /// Set Plot mode (save output plots)
     void setPlot(bool on) { _plot = on; }
 
     /// Set whether to load parameters stored in config
     void setLoadParams(bool on) { _loadParams = on; }
+
+    void Show() const;
 
   protected:
 
@@ -98,7 +97,6 @@ namespace ertool {
     double _e_mass; ///< Electron's mass
     double _g_mass; ///< Gamma's mass
 
-    bool _verbose; ///< verbosity mode for debug
     bool _plot;    ///< True: save plots with PDF information
     bool _mode;    ///< e-/gamma mode (true: gamma, false: e-)
     bool _loadParams; ///< whether to load params or not from config

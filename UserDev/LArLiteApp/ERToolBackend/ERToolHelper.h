@@ -53,15 +53,16 @@ namespace larlite {
     virtual ~ERToolHelper(){};
     
     /// Create MC EventData and ParticleSet
-    void FillMCInfo( const event_mctruth&   mci_v,
-		     const event_mcshower&  mcs_v,
-		     const event_mctrack&   mct_v,
-		     ::ertool::io::EmptyInput& strm) const;
-
+    void FillMCInfo(const event_mcflux&    mcf_v,
+		    const event_mctruth&   mci_v,
+		    const event_mcshower&  mcs_v,
+		    const event_mctrack&   mct_v,
+		    ::ertool::io::EmptyInput& strm) const;
+    
     /// Fill Track Info from MC
     void FillTracks( const event_mctrack& mct_v,
 		     ::ertool::io::EmptyInput& strm) const;
-
+    
     /// Fill Track Info from RECO
     void FillTracks ( const event_track&        trk_v,
 		      storage_manager&          storage,
@@ -76,6 +77,10 @@ namespace larlite {
 		       storage_manager&       storage,
 		       ::ertool::io::EmptyInput& mgr) const;
 
+    /// Fill Flash info from RECO
+    void FillFlashes ( const event_opflash& flash_v,
+		       ::ertool::io::EmptyInput& strm) const;
+    
     /// MC Cheater for single showers
     void SingleShowerCheater(const event_mcshower& mcs_v,
 			     ::ertool::io::EmptyInput& strm ) const;

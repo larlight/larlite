@@ -2,7 +2,7 @@
 #define BASICTOOL_FHICLLITE_PSET_CXX
 
 #include "PSet.h"
-
+#include <sstream>
 namespace fcllite {
 
   PSet::PSet(const std::string name,
@@ -73,8 +73,11 @@ namespace fcllite {
     rstrip ( txt, " "  );
     rstrip ( txt, "\t" );
     rstrip ( txt, " "  );
-    if(txt.find(" ") < txt.size())
-      throw FhiclLiteException("Space not allowed!");
+    if(txt.find(" ") < txt.size()) {
+      std::stringstream ss;
+      ss << " Processing: " << txt.c_str() << " ... Space not allowed!";
+      throw FhiclLiteException(ss.str());
+    }
     if(txt.find("\t") < txt.size())
       throw FhiclLiteException("Tab not allowed!");
   }

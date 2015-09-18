@@ -38,8 +38,9 @@ namespace cmtool {
        Core function: given the ClusterParamsAlg input, return whether a cluster should be
        merged or not.
     */
-    virtual bool Bool(const ::cluster::ClusterParamsAlg &cluster1,
-		      const ::cluster::ClusterParamsAlg &cluster2);
+    virtual bool Bool(const ::cluster::cluster_params &cluster1,
+                      const ::cluster::cluster_params &cluster2);
+
 
     void SetDebug(bool debug) { _debug = debug; }
 

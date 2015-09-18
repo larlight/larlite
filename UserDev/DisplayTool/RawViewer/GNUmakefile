@@ -15,6 +15,7 @@ INCFLAGS  = -I.                       #Include itself
 INCFLAGS += -I$(LARLITE_COREDIR)
 INCFLAGS += -I$(LARLITE_USERDEVDIR)/DisplayTool
 INCFLAGS += $(shell python-config --includes)
+INCFLAGS += -I$(shell python -c "import numpy; print numpy.get_include()")
 
 # platform-specific options
 OSNAME          = $(shell uname -s)

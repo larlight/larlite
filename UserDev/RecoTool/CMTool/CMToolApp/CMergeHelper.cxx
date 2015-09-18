@@ -27,7 +27,8 @@ namespace cmtool {
       mgr.Reset();
       
       if(!i) mgr.SetClusters(clusters);
-      else mgr.SetClusters( _mgr_v[i-1].GetClusters() );
+      else _mgr_v[i-1].PassOutputClusters(mgr);
+      //else mgr.SetClusters( _mgr_v[i-1].GetClusters() );
       
       mgr.Process();
       
@@ -35,12 +36,12 @@ namespace cmtool {
       
       if(!i) _bk = new_bk;
       else if(new_bk.GetResult().size() < new_bk.size())
-	_bk.Combine(new_bk);
+        _bk.Combine(new_bk);
       
     }
   }
 
-  const std::vector< ::cluster::ClusterParamsAlg>& CMergeHelper::GetClusters() const
+  const std::vector< ::cluster::cluster_params>& CMergeHelper::GetClusters() const
   {
     if(!(_mgr_v.size())) throw CMTException("No manager = no output clusters...");
     return _mgr_v.back().GetClusters();
