@@ -7,6 +7,7 @@
 #include "OpT0Finder/Algorithms/NPtFilter.h"
 #include "OpT0Finder/Algorithms/MaxNPEWindow.h"
 #include "OpT0Finder/Algorithms/QWeightPoint.h"
+#include "OpT0Finder/Algorithms/QLLMatch.h"
 namespace ertool {
 
   ERAlgoFlashMatch::ERAlgoFlashMatch(const std::string& name) : AlgoBase(name)
@@ -19,11 +20,6 @@ namespace ertool {
   {
 
     auto p = cfg.get_pset(Name());
-    double step_size = p.get< double > ("StepSize");
-    double zdiff_max = p.get< double > ("ZDiffMax");
-
-    std::vector<double> xrange    = p.get< std::vector<double> >("XRange"         );
-
     std::vector<double> opdet_x_v = p.get< std::vector<double> >("OpDetPosition_X");
     std::vector<double> opdet_y_v = p.get< std::vector<double> >("OpDetPosition_Y");
     std::vector<double> opdet_z_v = p.get< std::vector<double> >("OpDetPosition_Z");
@@ -33,19 +29,41 @@ namespace ertool {
 
     if(opdet_x_v.size() != opdet_y_v.size() || opdet_x_v.size() != opdet_z_v.size())
       throw ERException("Optical Detector Position dimension does not match among x/y/z!");
-    if(xrange.size()!=2)
-      throw ERException("XRange must be length 2 vector!");
-    if(xrange[0]<=0)
-      throw ERException("XRange cannot be 0 or negative number!");
-    if(zdiff_max<=0)
-      throw ERException("ZDiffMax cannot be 0 or negative number!");
 
     _mgr.SetAlgo(new ::flashana::NPtFilter);
     _mgr.SetAlgo(new ::flashana::MaxNPEWindow);
-    auto ptr = new ::flashana::QWeightPoint( opdet_x_v, opdet_y_v, opdet_z_v, step_size );
-    ptr->SetMaxZDiff(zdiff_max);
+
+    std::string match_algo = p.get<std::string>("MatchAlgo");
+
+    if(match_algo == "QWeightPoint") {
+      auto alg_pset = p.get_pset(match_algo);
+      double step_size   = alg_pset.get< double > ("StepSize");
+      double zdiff_max   = alg_pset.get< double > ("ZDiffMax");
+      bool   use_library = alg_pset.get< bool   > ("UseLibrary");
+      std::vector<double> xrange = alg_pset.get< std::vector<double> >("XRange"         );
+
+      if(xrange.size()!=2)
+	throw ERException("XRange must be length 2 vector!");
+      if(xrange[0]<=0)
+	throw ERException("XRange cannot be 0 or negative number!");
+      if(zdiff_max<=0)
+	throw ERException("ZDiffMax cannot be 0 or negative number!");
+      auto ptr = new ::flashana::QWeightPoint( opdet_x_v, opdet_y_v, opdet_z_v, step_size );
+      ptr->SetMaxZDiff(zdiff_max);
+      ptr->UsePhotonLibrary(use_library);
+      _mgr.SetAlgo(ptr);
+    }
+    else if(match_algo == "QLLMatch") {
+      auto alg_pset = p.get_pset(match_algo);
+      bool   use_library = alg_pset.get< bool   > ("UseLibrary");
+      auto ptr = new ::flashana::QLLMatch;
+      ptr->SetOpDetPositions(opdet_x_v,opdet_y_v,opdet_z_v);
+      ptr->UsePhotonLibrary(use_library);
+      _mgr.SetAlgo(ptr);
+    }else
+      Exception(__FUNCTION__,"FlashMatch algorithm invalid!");
+      
     //ptr->SetVerbosity(::flashana::msg::kINFO);
-    _mgr.SetAlgo(ptr);
 
   }
 

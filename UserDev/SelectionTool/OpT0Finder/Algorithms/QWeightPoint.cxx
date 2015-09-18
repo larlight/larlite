@@ -3,6 +3,7 @@
 
 #include "QWeightPoint.h"
 #include "OpT0Finder/Base/OpT0FinderException.h"
+#include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
 #include <cmath>
 #include <sstream>
 namespace flashana {
@@ -13,6 +14,7 @@ namespace flashana {
     , _pos_y()
     , _pos_z()
     , _zdiff_max( 50*50 )
+    , _use_library( false )
   {
     _x_step_size=x_step_size;
   }
@@ -47,8 +49,26 @@ namespace flashana {
       for(auto const& tpc_pt : pt_v)
 	
 	if(min_pt.x > tpc_pt.x) min_pt = tpc_pt;
-      
-      if(_pos_x.empty()) {
+
+      if(_use_library) {
+
+	auto const& lib = ::phot::PhotonVisibilityService::GetME();
+	double weight = 0;
+	for(auto const& tpc_pt : pt_v) {
+
+	  for(size_t i=0; i<lib.NOpChannels(); ++i)
+	    weight += tpc_pt.q * lib.GetVisibility(tpc_pt.x,tpc_pt.y,tpc_pt.z,i);
+
+	  pt.x += (tpc_pt.x - min_pt.x + x_step_size) * weight;
+	  pt.y += (tpc_pt.y * weight);
+	  pt.z += (tpc_pt.z * weight);
+	  weight_tot += weight;
+	}
+	pt.x /= weight_tot;
+	pt.y /= weight_tot;
+	pt.z /= weight_tot;
+	
+      }else if(_pos_x.empty()) {
 	
 	for(auto const& tpc_pt : pt_v) {
 	  
@@ -101,13 +121,30 @@ namespace flashana {
       flash_hypothesis_v.push_back(pt);
     }
 
-
+    // (re)-evaluate flash position if possible
+    double flash_y = flash.y;
+    double flash_z = flash.z;
+    if(_pos_x.size()) {
+      double qsum = 0;
+      for(size_t i=0; i<_pos_x.size()&&i<flash.pe_v.size(); ++i) {
+	flash_y += flash.pe_v[i] * _pos_y[i];
+	flash_z += flash.pe_v[i] * _pos_z[i];
+	qsum += flash.pe_v[i];
+      }
+      flash_y /= qsum;
+      flash_z /= qsum;
+    }
+    
     // Compute the minimum z-position difference
+
+
+    
     double min_dist = 1e12;
     ID_t min_id=kINVALID_ID;
     for(ID_t id=0; id<flash_hypothesis_v.size(); ++id) {
       auto const& pt = flash_hypothesis_v[id];
-      double dist = pow(pt.z - flash.z,2);
+      // (re)-estimate position
+      double dist = pow(pt.z - flash_z,2);
       if(dist < min_dist) {
 	min_dist = dist;
 	min_id = id;

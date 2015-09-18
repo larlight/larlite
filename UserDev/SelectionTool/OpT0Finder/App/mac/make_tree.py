@@ -52,10 +52,12 @@ xv,yv,zv = pmt_pos()
 
 #match_alg = flashana.QWeightPoint(int(sys.argv[-1]))
 
-match_alg = flashana.QWeightPoint(xv,yv,zv,int(sys.argv[-1]))
+#match_alg = flashana.QWeightPoint(xv,yv,zv,int(sys.argv[-1]))
+#match_alg.UsePhotonLibrary(True)
 
-#match_alg = flashana.QLLMatch.GetME()
-#match_alg.SetOpDetPositions(xv,yv,zv)
+match_alg = flashana.QLLMatch.GetME()
+match_alg.SetOpDetPositions(xv,yv,zv)
+match_alg.UsePhotonLibrary(True)
 
 my_unit.Manager().SetAlgo(match_alg)
 

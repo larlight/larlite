@@ -188,7 +188,7 @@ namespace larlite {
 	  part_list[id] = p.ID();
 
 	  if(abs(mcp.PdgCode()) == 12 ||
-	     abs(mcp.PdgCode()) == 12){
+	     abs(mcp.PdgCode()) == 14){
 	    
 	    int f = &mci-&mci_v[0];
 	    
