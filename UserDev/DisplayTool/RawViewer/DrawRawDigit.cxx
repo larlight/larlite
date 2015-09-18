@@ -94,7 +94,7 @@ bool DrawRawDigit::analyze(larlite::storage_manager* storage) {
   subrun = RawDigitHandle->subrun();
   event = RawDigitHandle->event_id();
 
-  float rmsMinBadWire = 2.0 * 2.0;
+  float rmsMinBadWire = 1.5 * 1.5;
   float rmsMaxBadWire = 100 * 100;
 
   badWireMapByPlane.resize(geoService->Nplanes());
