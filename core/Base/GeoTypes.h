@@ -59,24 +59,24 @@ namespace larlite{
     */
     struct PlaneID {
       PlaneID()
-	: Cryostat(UINT_MAX)
-	, TPC(UINT_MAX)
-	, Plane(UINT_MAX)
-	, isValid(false)
+        : Cryostat(UINT_MAX)
+        , TPC(UINT_MAX)
+        , Plane(UINT_MAX)
+        , isValid(false)
       {}
 
       PlaneID(unsigned int c,
-	      unsigned int t,
-	      unsigned int p)
-	: Cryostat(c)
-	, TPC(t)
-	, Plane(p)
-	, isValid(true)
+              unsigned int t,
+              unsigned int p)
+        : Cryostat(c)
+        , TPC(t)
+        , Plane(p)
+        , isValid(true)
       {}
 
       PlaneID(const TPCID& tpcid, unsigned int p)
-	: Cryostat(tpcid.Cryostat), TPC(tpcid.TPC), Plane(p)
-	, isValid(tpcid.isValid)
+        : Cryostat(tpcid.Cryostat), TPC(tpcid.TPC), Plane(p)
+        , isValid(tpcid.isValid)
       {}
 
       unsigned int Cryostat;
@@ -85,18 +85,18 @@ namespace larlite{
       bool         isValid;
 
       bool operator==( const PlaneID& pid ) const {
-	return ( Cryostat == pid.Cryostat &&
-		 TPC      == pid.TPC      &&
-		 Plane    == pid.Plane      );
+        return ( Cryostat == pid.Cryostat &&
+                 TPC      == pid.TPC      &&
+                 Plane    == pid.Plane      );
       }
 
       bool operator!=( const PlaneID& pid ) const { return !((*this)==pid); }
 
       bool operator<( const PlaneID& pid ) const {
-	if(      Cryostat != pid.Cryostat ) return Cryostat < pid.Cryostat;
-	else if(      TPC != pid.TPC      ) return TPC      < pid.TPC;
-	else if(    Plane != pid.Plane    ) return Plane    < pid.Plane;
-	else return false;
+        if(      Cryostat != pid.Cryostat ) return Cryostat < pid.Cryostat;
+        else if(      TPC != pid.TPC      ) return TPC      < pid.TPC;
+        else if(    Plane != pid.Plane    ) return Plane    < pid.Plane;
+        else return false;
       }
     };
 
@@ -106,28 +106,28 @@ namespace larlite{
     */
     struct WireID {
       WireID()
-	: Cryostat(UINT_MAX)
-	, TPC(UINT_MAX)
-	, Plane(UINT_MAX)
-	, Wire(UINT_MAX)
-	, isValid(false)
+        : Cryostat(UINT_MAX)
+        , TPC(UINT_MAX)
+        , Plane(UINT_MAX)
+        , Wire(UINT_MAX)
+        , isValid(false)
       {}
 
       WireID(unsigned int c,
-	     unsigned int t,
-	     unsigned int p,
-	     unsigned int w)
-	: Cryostat(c)
-	, TPC(t)
-	, Plane(p)
-	, Wire(w)
-	, isValid(true)
+             unsigned int t,
+             unsigned int p,
+             unsigned int w)
+        : Cryostat(c)
+        , TPC(t)
+        , Plane(p)
+        , Wire(w)
+        , isValid(true)
       {}
 
       WireID(const PlaneID& planeid, unsigned int w)
-	: Cryostat(planeid.Cryostat), TPC(planeid.TPC), Plane(planeid.Plane)
-	, Wire(w)
-	, isValid(planeid.isValid)
+        : Cryostat(planeid.Cryostat), TPC(planeid.TPC), Plane(planeid.Plane)
+        , Wire(w)
+        , isValid(planeid.isValid)
       {}
 
       unsigned int Cryostat;
@@ -139,20 +139,20 @@ namespace larlite{
       PlaneID planeID() const { return PlaneID(Cryostat, TPC, Plane); }
       
       bool operator==( const WireID& wid ) const {
-	return ( Cryostat == wid.Cryostat &&
-		 TPC      == wid.TPC      &&
-		 Plane    == wid.Plane    &&
-		 Wire     == wid.Wire        );
+        return ( Cryostat == wid.Cryostat &&
+                 TPC      == wid.TPC      &&
+                 Plane    == wid.Plane    &&
+                 Wire     == wid.Wire        );
       }
 
       bool operator!=( const WireID& wid ) const { return !((*this)==wid);}
 
       bool operator<( const WireID& wid ) const {
-	if(      Cryostat != wid.Cryostat ) return Cryostat < wid.Cryostat;
-	else if(      TPC != wid.TPC      ) return TPC      < wid.TPC;
-	else if(    Plane != wid.Plane    ) return Plane    < wid.Plane;
-	else if(     Wire != wid.Wire     ) return Wire     < wid.Wire;
-	else return false;
+        if(      Cryostat != wid.Cryostat ) return Cryostat < wid.Cryostat;
+        else if(      TPC != wid.TPC      ) return TPC      < wid.TPC;
+        else if(    Plane != wid.Plane    ) return Plane    < wid.Plane;
+        else if(     Wire != wid.Wire     ) return Wire     < wid.Wire;
+        else return false;
       }
     };
   }

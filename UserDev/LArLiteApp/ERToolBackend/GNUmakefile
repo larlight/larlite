@@ -22,6 +22,8 @@ OSNAMEMODE      = $(OSNAME)
 
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
+CINTFLAGS += "-p" # Use system compiler to preprocess macros (something in ERTool/Base is messing w/ rootcint)
+
 # set compiler options for ROOT
 CXXFLAGS +=  `root-config --cflags`
 

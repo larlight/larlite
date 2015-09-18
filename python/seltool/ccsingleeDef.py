@@ -5,7 +5,7 @@ def GetCCSingleEInstance():
     # Create algorithm
     my_algo = ertool.AlgoSingleE()
     my_algo.useRadLength(True)
-    my_algo.setVerbose(False)
+#    my_algo.setVerbose(False)
     my_algo.setVtxToTrkStartDist(1)
     my_algo.setVtxToTrkDist(1)
     my_algo.setVtxToShrStartDist(50)

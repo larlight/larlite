@@ -2,7 +2,7 @@
 #define ERTOOL_ERALGOTRACKPID_CXX
 
 #include "ERAlgoTrackPid.h"
-
+#include <sstream>
 namespace ertool {
   
   ERAlgoTrackPid::ERAlgoTrackPid(const std::string& name) 
@@ -11,8 +11,6 @@ namespace ertool {
   {
     // histogram to hold the energy of each reconstructed michel electron
     
-    // set verbosity to be off by default
-    _verbose = false;
   }
 
   void ERAlgoTrackPid::Reset()
@@ -38,14 +36,14 @@ namespace ertool {
 
   bool ERAlgoTrackPid::Reconstruct(const EventData &data, ParticleGraph& graph)
   {
-    auto datacpy = data;
+
     int Pdg = -1; 
     // Loop through Particles associated with a track
     for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
       
       // get track object
-      auto const& particleFromDataP = graph.GetParticle(t);
-      auto const& track = datacpy.Track(particleFromDataP.RecoID());
+      auto& part = graph.GetParticle(t);
+      auto const& track = data.Track(part.RecoID());
 
       
       if ((track._pid_score[Track::kProton]<track._pid_score[Track::kPion])&&
@@ -64,12 +62,18 @@ namespace ertool {
 	  (track._pid_score[Track::kMuon]<track._pid_score[Track::kPion])&&
 	  (track._pid_score[Track::kMuon]<track._pid_score[Track::kKaon]))        Pdg = 13;      
       
+      part.SetParticleInfo(Pdg,
+			   ParticleMass(Pdg),
+			   part.Vertex(),
+			   part.Momentum(),
+			   part.RecoScore(),
+			   part.ProcessType());
 
-
-
-      graph.GetParticle(t).SetParticleInfo(Pdg);
-
-      if (_verbose) { std::cout<<"I found a track!!!\n I assigned the PdgCode for its particle to be "<<Pdg  <<" \n"; }
+      if (Debug()) {
+	std::stringstream ss;
+	ss<<"I found a track!!!\n I assigned the PdgCode for its particle to be "<<Pdg;
+	Debug(__FUNCTION__,ss.str());
+      }
       _part_pid = Pdg;
       
       _algoPid_tree->Fill();

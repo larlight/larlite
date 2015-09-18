@@ -6,7 +6,8 @@
 namespace ertool {
   namespace io {
     IStreamBase::IStreamBase(const std::string& name)
-      : _n_entries ( 0    )
+      : MessageUtil()
+      , _n_entries ( 0    )
       , _name      ( name )
     {}
     

@@ -28,9 +28,24 @@ namespace geoalgo {
     double length = 0;
     for(size_t i=0; i<size()-1; ++i) 
       
-      length += _Dir_(i).Length();
+      length += (*this)[i]._Dist_((*this)[i+1]);
     
     return length;
+  }
+
+  bool Trajectory::IsLonger(double ref) const {
+
+    if(size()<2) return false;
+
+    double length = 0;
+    for(size_t i=0; i<size()-1; ++i) {
+
+      length += (*this)[i]._Dist_((*this)[i+1]);
+
+      if(length > ref) return true;
+    }
+
+    return false;    
   }
 
   void Trajectory::push_back(const Point_t& obj) {

@@ -1,9 +1,9 @@
 from colored_msg import info,warning
 import ROOT
-libs=['libSelectionTool_ERApp',
+libs=['libSelectionTool_ERBase',
       'libSelectionTool_ERAlgo',
    #   'libSelectionTool_ERFilter',
-      'libSelectionTool_ERBase']
+      'libSelectionTool_ERApp']
 orig_level = ROOT.gErrorIgnoreLevel
 ROOT.gErrorIgnoreLevel = ROOT.kFatal
 try:
@@ -12,8 +12,8 @@ try:
         val = gSystem.Load(l)
         if val < 0:
             warning('Skip loading %s' % l)
-        #else:
-        #    info('%s %s' % (val,l))
+        else:
+            info('%s %s' % (val,l))
     from ROOT import ertool
 except ImportError,NameError:
     warning('Skipped ERTool (unavailable)')

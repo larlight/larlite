@@ -16,6 +16,7 @@ namespace larlite {
     _name_mctrk     = "mcreco";
     _name_track     = "";
     _name_shower    = "";
+    _name_flash     = "";
     // set cheater for single showers
     _cheater        = false;
 
@@ -61,6 +62,10 @@ namespace larlite {
   return;
   }
 
+  void ERToolAnaBase::SetFlashProducer(const std::string prod)
+  {
+    _name_flash = prod;
+  }
 
   bool ERToolAnaBase::initialize() {
     // Nothing provided...
@@ -90,7 +95,18 @@ namespace larlite {
     in_strm->SetID(storage->event_id(),
 		   storage->run_id(),
 		   storage->subrun_id());
+    // Fill Flash
+    if(!_name_flash.empty()) {
 
+      auto ev_flash = storage->get_data<event_opflash>(_name_flash);
+      if(!ev_flash) {
+	print(msg::kERROR,__FUNCTION__,"OpFlash not found in the input data file!");
+	throw std::exception();
+      }
+
+      _helper.FillFlashes(*ev_flash,*in_strm);
+
+    }
 
     //------------------------------
     // Start filling SPAData object!
@@ -179,12 +195,14 @@ namespace larlite {
     if( !_name_generator.empty() &&
 	!_name_mcshr.empty()     &&
 	!_name_mctrk.empty() ) {
+      auto ev_mcf = storage->get_data<event_mcflux>   (_name_generator);
       auto ev_mci = storage->get_data<event_mctruth>  (_name_generator);
       auto ev_mcs = storage->get_data<event_mcshower> (_name_mcshr);
       auto ev_mct = storage->get_data<event_mctrack>  (_name_mctrk);
       // Make sure the data is there
-      if (ev_mci && ev_mcs && ev_mct)
-	_helper.FillMCInfo(*ev_mci,
+      if (ev_mci && ev_mcs && ev_mct && ev_mcf)
+	_helper.FillMCInfo(*ev_mcf,
+			   *ev_mci,
 			   *ev_mcs,
 			   *ev_mct,
 			   *in_strm);

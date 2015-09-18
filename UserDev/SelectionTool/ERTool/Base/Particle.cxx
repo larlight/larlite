@@ -9,7 +9,8 @@ namespace ertool {
 
   Particle::Particle(const NodeID_t node_id,
 		     const RecoType_t reco_type,
-		     const RecoID_t reco_id)
+		     const RecoID_t reco_id,
+		     const FlashID_t flash_id)
     : _pdg_code(kINVALID_INT)
     , _mass(kINVALID_DOUBLE)
     , _vtx(kINVALID_VERTEX)
@@ -21,6 +22,7 @@ namespace ertool {
     , _child_v()
     , _reco_type(reco_type)
     , _reco_id(reco_id)
+    , _flash_id(flash_id)
   {
     _primary = 0 ;
   }
@@ -29,7 +31,7 @@ namespace ertool {
   const NodeID_t&     Particle::Parent     () const { return _parent_id;   }
   const NodeID_t&     Particle::Ancestor   () const { return _ancestor_id; }
   const Generation_t& Particle::Generation () const { return _generation;  }
-  float Particle::RelationshipScore(const NodeID_t id)
+  float Particle::RelationshipScore(const NodeID_t id) const
   {
     if(id >= _score_v.size()) return -1;
     return _score_v[id];
@@ -38,7 +40,8 @@ namespace ertool {
   const ProcessType_t& Particle::ProcessType() const { return _process;   }
   const RecoType_t& Particle::RecoType()       const { return _reco_type; }
   const RecoID_t&  Particle:: RecoID()         const { return _reco_id;   }
-
+  const FlashID_t&  Particle::FlashID()        const { return _flash_id;  }
+  
   const int&    Particle::PdgCode() const
   { return _pdg_code; }
   const double& Particle::Mass() const
@@ -51,7 +54,7 @@ namespace ertool {
   { return _vtx; }
   const ::geoalgo::Vector& Particle::Momentum() const
   { return _mom; }
-  float Particle::RecoScore()
+  float Particle::RecoScore() const
   {
     return RelationshipScore(_node_id); 
   }
@@ -66,7 +69,7 @@ namespace ertool {
   { return _primary; }
 
   bool Particle::Descendant() const
-  { return (!(_node_id == _parent_id && RelationAssessed())); }
+  { return !(_node_id == _parent_id); }
   
   bool Particle::Lonely() const
   { return (_child_v.size()<1); }
@@ -86,8 +89,8 @@ namespace ertool {
   void Particle::SetRecoInfo(const RecoType_t reco_type, const RecoID_t reco_id )
   {
     if( reco_type == kINVALID_RECO_TYPE )
-      throw ERException("RecoType_t cannot be kINVALID_RECO_TYPE!");
-    
+      throw ERException("Particle's RecoType_t cannot be kINVALID_RECO_TYPE!");
+
     if( reco_type == kInvisible && reco_id != kINVALID_RECO_ID )
       throw ERException("Invisible type particle cannot be associated with reco object!");
 
@@ -98,11 +101,17 @@ namespace ertool {
     _reco_id   = reco_id;
   }
 
+  void Particle::SetFlashID(const FlashID_t id)
+  {
+    _flash_id = id;
+  }
+
   void Particle::SetParticleInfo( const int pdg_code,
 				  const double mass,
 				  const ::geoalgo::Vector& vtx,
 				  const ::geoalgo::Vector& mom,
-				  const float score)
+				  const float score,
+				  const ProcessType_t process)
   {
     _vtx.compat(vtx);
     _mom.compat(mom);
@@ -111,6 +120,7 @@ namespace ertool {
     _vtx       = vtx;
     _mom       = mom;
     SetScore(_node_id,score);
+    SetProcess(process);
   }
 
   void Particle::SetScore(const NodeID_t id, const float score)

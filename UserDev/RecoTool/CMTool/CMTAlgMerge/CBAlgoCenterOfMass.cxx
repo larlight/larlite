@@ -22,8 +22,8 @@ namespace cmtool {
   }
 
   //---------------------------------------------------------------------------
-  bool CBAlgoCenterOfMass::Bool(const ::cluster::ClusterParamsAlg &cluster1,
-				const ::cluster::ClusterParamsAlg &cluster2)
+  bool CBAlgoCenterOfMass::Bool(const ::cluster::cluster_params &cluster1,
+                                 const ::cluster::cluster_params &cluster2)
   //---------------------------------------------------------------------------
   {
 
@@ -31,9 +31,9 @@ namespace cmtool {
     int hitssmall = 0;
 
     //determine if clusters ok and if so which is big and which is small
-    if ( (cluster1.GetHitVector().size() > _minHits) and (cluster2.GetHitVector().size() < _maxHits) )
+    if ( (cluster1.hit_vector.size() > _minHits) and (cluster2.hit_vector.size() < _maxHits) )
       small = 2;
-    else if ( (cluster2.GetHitVector().size() > _minHits) and (cluster1.GetHitVector().size() < _maxHits) )
+    else if ( (cluster2.hit_vector.size() > _minHits) and (cluster1.hit_vector.size() < _maxHits) )
       small = 1;
     else
       return false;
@@ -55,28 +55,28 @@ namespace cmtool {
     //Get Hit vector for small cluster
     std::vector<larutil::PxHit> hitss;
     if ( small == 1 ){
-      hitss = cluster1.GetHitVector();
+      hitss = cluster1.hit_vector;
       hitssmall = hitss.size();
-      direc_angle   = cluster2.GetParams().angle_2d;
-      opening_angle = cluster2.GetParams().opening_angle * (180./3.14);
-      length  = cluster2.GetParams().length;
-      start_w = cluster2.GetParams().start_point.w;
-      start_t = cluster2.GetParams().start_point.t;
-      end_w = cluster2.GetParams().end_point.w;
-      end_t = cluster2.GetParams().end_point.t;
-      poly  = cluster2.GetParams().PolyObject;
+      direc_angle   = cluster2.angle_2d;
+      opening_angle = cluster2.opening_angle * (180./3.14);
+      length  = cluster2.length;
+      start_w = cluster2.start_point.w;
+      start_t = cluster2.start_point.t;
+      end_w = cluster2.end_point.w;
+      end_t = cluster2.end_point.t;
+      poly  = cluster2.PolyObject;
     }      
     if ( small == 2 ){
-      hitss = cluster2.GetHitVector();
+      hitss = cluster2.hit_vector;
       hitssmall = hitss.size();
-      direc_angle   = cluster1.GetParams().angle_2d;
-      opening_angle = cluster1.GetParams().opening_angle * (180./3.14);
-      length  = cluster1.GetParams().length;
-      start_w = cluster1.GetParams().start_point.w;
-      start_t = cluster1.GetParams().start_point.t;
-      end_w = cluster1.GetParams().end_point.w;
-      end_t = cluster1.GetParams().end_point.t;
-      poly  = cluster1.GetParams().PolyObject;
+      direc_angle   = cluster1.angle_2d;
+      opening_angle = cluster1.opening_angle * (180./3.14);
+      length  = cluster1.length;
+      start_w = cluster1.start_point.w;
+      start_t = cluster1.start_point.t;
+      end_w = cluster1.end_point.w;
+      end_t = cluster1.end_point.t;
+      poly  = cluster1.PolyObject;
     }
 
     if (_debug){

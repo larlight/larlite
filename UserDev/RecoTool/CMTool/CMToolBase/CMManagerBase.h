@@ -15,9 +15,13 @@
 #define RECOTOOL_CMMANAGERBASE_H
 
 #include <iostream>
+#include <set>
+#include <map>
 
 #include "CPriorityAlgoBase.h"
 #include "TStopwatch.h"
+#include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
+#include "ClusterRecoUtil/Base/ClusterParams.h"
 
 namespace cmtool {
 
@@ -66,16 +70,20 @@ namespace cmtool {
     void MergeTillConverge(bool doit=true) {_merge_till_converge = doit;}
 
     /// A simple method to add a cluster
-    void SetClusters(const std::vector<std::vector<larutil::PxHit> > &clusters);
+    void SetClusters(const std::vector<std::vector<Hit2D> > &clusters);
 
     /// A simple method to add a cluster
-    void SetClusters(const std::vector<cluster::ClusterParamsAlg> &clusters);
+    void SetClusters(const std::vector<::cluster::cluster_params> &clusters);
 
+#ifndef __CINT__
+    /// A simple method to add a cluster
+    void SetClusters(std::vector<::cluster::cluster_params>&& clusters);
+#endif
     /// A getter for input clusters
-    const std::vector<cluster::ClusterParamsAlg>&  GetInputClusters() const 
+    const std::vector<::cluster::cluster_params>&  GetInputClusters() const 
     { return _in_clusters; }
 
-    /// A setter for minimum # of hits ... passed onto ClusterParamsAlg
+    /// A setter for minimum # of hits ... passed onto cluster_params
     void SetMinNHits(unsigned int n) { _min_nhits = n; }
 
     /// A method to execute the main action, to be called per event
@@ -87,7 +95,7 @@ namespace cmtool {
   protected:
 
     /// Function to compute priority
-    void ComputePriority(const std::vector<cluster::ClusterParamsAlg>& clusters);
+    void ComputePriority(const std::vector<::cluster::cluster_params> & clusters);
 
     /// FMWK function called @ beginning of Process()
     virtual void EventBegin(){}
@@ -109,14 +117,17 @@ namespace cmtool {
     /// Timing verbosity flag
     bool _time_report;
     
-    /// Minimum number of hits: the limit set for ClusterParamsAlg
+    /// Minimum number of hits: the limit set for cluster_params
     unsigned int _min_nhits;
 
     /// Debug mode switch
     CMMSGLevel_t _debug_mode;
 
     /// Input clusters
-    std::vector<cluster::ClusterParamsAlg> _in_clusters;
+    std::vector<::cluster::cluster_params> _in_clusters;
+
+    /// Cluster Params Filler:
+    ::cluster::DefaultParamsAlg _params_alg;
 
     /// Priority algorithm
     ::cmtool::CPriorityAlgoBase* _priority_algo;

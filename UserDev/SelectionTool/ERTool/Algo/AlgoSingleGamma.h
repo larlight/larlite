@@ -47,11 +47,11 @@ namespace ertool {
     /// Function to evaluate input showers and determine a score
     bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
-		// Set verbosity
-    void setVerbose(bool on) { 
-          _verbose = on; 
-	  _findRel.setDebug(on); 
-	  _primaryFinder.setVerbose(on);
+    // Set verbosity
+    void SetVerbosity(msg::Level_t verbosity) {
+      MessageUtil::SetVerbosity(verbosity);
+      _findRel.SetVerbosity(verbosity);
+      _primaryFinder.SetVerbosity(verbosity);
     }
     
        /// Use EMPart
@@ -92,8 +92,6 @@ namespace ertool {
     /// Returns true if gamma-like
     bool isGammaLike(const double dedx, double radlen,bool forceRadLen=false);
 
-    // verbose flag
-    bool _verbose;
     // electron mass
     double _e_mass;
     // flag to decide whether to use EMPart or not

@@ -2,6 +2,7 @@
 #define RECOTOOL_CFALGOSTARTPOINTMATCH_CXX
 
 #include "CFAlgoStartPointMatch.h"
+#include "LArUtil/GeometryUtilities.h"
 
 namespace cmtool {
 
@@ -25,7 +26,7 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------------------------------------
-  float CFAlgoStartPointMatch::Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters)
+  float CFAlgoStartPointMatch::Float(const std::vector<const cluster::cluster_params*> &clusters)
   //----------------------------------------------------------------------------------------------
   {
 
@@ -45,15 +46,15 @@ namespace cmtool {
     //Find 3D start point from start point on first 2 planes:
     //For now convert start point wire in cm back to wire number
     //Round to integer (sometimes output is double...why???)
-    int startWire1 = int( clusters.at(0)->GetParams().start_point.w / _w2cm );
-    double startTime1 = clusters.at(0)->GetParams().start_point.t;
-    unsigned char Pl1 = clusters.at(0)->GetParams().start_point.plane;
-    int startWire2 = int( clusters.at(1)->GetParams().start_point.w / _w2cm );
-    double startTime2 = clusters.at(1)->GetParams().start_point.t;
-    unsigned char Pl2 = clusters.at(1)->GetParams().start_point.plane;
-    int startWire3 = int( clusters.at(2)->GetParams().start_point.w / _w2cm );
-    double startTime3 = clusters.at(2)->GetParams().start_point.t;
-    unsigned char Pl3 = clusters.at(2)->GetParams().start_point.plane;
+    int startWire1 = int( clusters.at(0)->start_point.w / _w2cm );
+    double startTime1 = clusters.at(0)->start_point.t;
+    unsigned char Pl1 = clusters.at(0)->start_point.plane;
+    int startWire2 = int( clusters.at(1)->start_point.w / _w2cm );
+    double startTime2 = clusters.at(1)->start_point.t;
+    unsigned char Pl2 = clusters.at(1)->start_point.plane;
+    int startWire3 = int( clusters.at(2)->start_point.w / _w2cm );
+    double startTime3 = clusters.at(2)->start_point.t;
+    unsigned char Pl3 = clusters.at(2)->start_point.plane;
 
 
     //Get Intersections in pairs:

@@ -30,6 +30,21 @@ namespace larlite {
     , fCompression(compression)
   {clear_data();}
 
+  rawdigit::rawdigit(raw::ChannelID_t     channel,
+		     unsigned short       samples,
+		     std::vector<short>&& adclist,
+		     raw::Compress_t      compression
+		     )
+    : data_base(data::kRawDigit)
+    , fChannel(channel) 
+    , fSamples(samples)
+    , fPedestal(0.) 
+    , fSigma(0.)
+    , fADC(std::move(adclist) )
+    , fCompression(compression)
+  {clear_data();}
+
+  
   //--------------------------------------------------
   short rawdigit::ADC(int i) const
   {

@@ -18,7 +18,7 @@
 #include "Analysis/ana_base.h"
 #include "LArUtil/Geometry.h"
 #include "CMTool/CMToolBase/CMatchManager.h"
-#include "ClusterRecoUtil/CRUHelper.h"
+#include "ClusterRecoUtil/Base/CRUHelper.h"
 
 namespace larlite {
   /**

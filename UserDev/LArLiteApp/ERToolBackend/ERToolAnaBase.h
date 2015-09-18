@@ -66,6 +66,11 @@ namespace larlite {
     void SetTrackProducer(const bool mc, const std::string prod);
 
     /**
+       @brief Add Flash producer name (no MC option)
+     */
+    void SetFlashProducer(const std::string prod);
+
+    /**
        @brief get EventData that is used by the manager
      */
     const ::ertool::EventData& GetData(bool mc=false) const;
@@ -98,6 +103,7 @@ namespace larlite {
     std::string _name_mctrk;     ///< MCTrack producer name
     std::string _name_shower;    ///< 3D shower producer name
     std::string _name_track;     ///< 3D track producer name
+    std::string _name_flash;     ///< Flash producer name
     bool _mcshowers; ///< Boolean. True: use MC for Showers
     bool _mctracks;  ///< Boolean. True: use MC for Tracks
     bool _cheater;   ///< Boolean. True: use cheater to get single shower info

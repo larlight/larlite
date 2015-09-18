@@ -21,12 +21,12 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------
-  bool CBAlgoProhibitBigClusters::Bool(const ::cluster::ClusterParamsAlg &cluster1,
-			       const ::cluster::ClusterParamsAlg &cluster2)
+  bool CBAlgoProhibitBigClusters::Bool(const ::cluster::cluster_params &cluster1,
+                                       const ::cluster::cluster_params &cluster2)
   //----------------------------------------------------------------
   {
     //if both clusters are big enough, prohibit merging
-    if(cluster1.GetNHits() > _min_hits && cluster2.GetNHits() > _min_hits)
+    if(cluster1.hit_vector.size() > _min_hits && cluster2.hit_vector.size() > _min_hits)
       return true;
     else
       return false;

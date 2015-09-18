@@ -2,22 +2,22 @@
 #define ERTOOL_MAKEGRAPH_CXX
 
 #include "AlgoMakeGraph.h"
-
+#include <sstream>
 namespace ertool {
 
   AlgoMakeGraph::AlgoMakeGraph(const std::string& name) : AlgoBase(name)
   {
     _minScore   = 1.;
-    _verbose    = false;
   }
 
+  /*
   void AlgoMakeGraph::setVerbose(const bool on)
   { _verbose = on;
     _findRel.setDebug(on); 
     if (_nodeMgr)
       _nodeMgr->setVerbose(on);
   }
-  
+  */  
   void AlgoMakeGraph::AcceptPSet(const ::fcllite::PSet& cfg)
   {}
   
@@ -44,7 +44,8 @@ namespace ertool {
     // reset the node manager
     _nodeMgr->Reset();    
 
-    if (_verbose) { std::cout << "***********BEGIN RECONSTRUCTION************" << std::endl; }
+    if (Debug()) Debug("***********BEGIN RECONSTRUCTION************");
+      
 
     // set node IDs in manager
     _nodeMgr->setObjects(graph.GetParticleNodes());
@@ -52,7 +53,11 @@ namespace ertool {
     // make all 2-pair combinations of objects possible
     auto combos = graph.GetNodeCombinations(2);
 
-    if (_verbose) { std::cout << "Number of combinations: " << combos.size() << std::endl; }
+    if (Debug()) {
+      std::stringstream ss;
+      ss << "Number of combinations: " << combos.size();
+      Debug(__FUNCTION__,ss.str());
+    }
 
     for (auto const& comb : combos){
       
@@ -82,7 +87,11 @@ namespace ertool {
 	   ( (type1 != kShower) and (type1 != kTrack) ) )
 	continue;
       
-      if (_verbose) { std::cout << "comparing particles [" << comb[0] << ", " << comb[1] << "]" << std::endl; } 
+      if (Debug()){
+	std::stringstream ss;
+	ss << "comparing particles [" << comb[0] << ", " << comb[1] << "]" << std::endl;
+	Debug(__FUNCTION__,ss.str());
+      } 
       
       ::geoalgo::Point_t vtx(3);
       double score;
@@ -108,11 +117,15 @@ namespace ertool {
 				    datacpy.Track(recoID2),
 				    vtx, score);
       
-      if (_verbose) { std::cout << "done assessing relation type" << std::endl; }
+      if (Debug()) { Debug("done assessing relation type"); }
       
       // Add the correlation to the tree
       if ( (rel != kINVALID_RELATION_TYPE) and (score > _minScore) ){
-	if (_verbose) { std::cout << "Assigning relation " << rel << " with score: " << score << std::endl; }
+	if (Debug()) {
+	  std::stringstream ss;
+	  ss << "Assigning relation " << rel << " with score: " << score;
+	  Debug(__FUNCTION__,ss.str());
+	}
 	_nodeMgr->AddCorrelation(comb[0],comb[1],score,vtx,
 				GetGeoTreeRelation(rel));
       }
@@ -120,15 +133,15 @@ namespace ertool {
 
     }// for all combos  
     
-    if (_verbose) { _nodeMgr->CorrelationMatrix(); }
+    if (Debug()) { _nodeMgr->CorrelationMatrix(); }
     // All correlations have been added. Now solve any conflicts
     _nodeMgr->ResolveConflicts();
     // Make particle tree
     _nodeMgr->MakeTree();
     // print correlation matrix
-    if (_verbose) { _nodeMgr->CorrelationMatrix(); }
+    if (Debug()) { _nodeMgr->CorrelationMatrix(); }
     // print out diagram
-    if (_verbose) { _nodeMgr->Diagram(); }
+    if (Debug()) { _nodeMgr->Diagram(); }
 
     // Now take tree and use it to sort the ParticleGraph
 
@@ -139,15 +152,23 @@ namespace ertool {
     // in the graph
     for (size_t i = graph.GetNumParticles(); i < Nnodes; i++){
       auto& p = graph.CreateParticle();
-      if (_verbose) { std::cout << "Created Particle with node ID: " << p.ID() << std::endl; }
+      if (Debug()) {
+	std::stringstream ss;
+	ss << "Created Particle with node ID: " << p.ID();
+	Debug(__FUNCTION__,ss.str());
+      }
     }
 	
     // make sure node vectors now have the same size
     if (graph.GetNumParticles() != _nodeMgr->getNumNodes())
       throw ERException("Number of Nodes and Particles does not match!");
 
-    if (_verbose) { std::cout << "Nodes: " << _nodeMgr->getNumNodes() << "\tParticles: " << graph.GetNumParticles() << std::endl; }
-    if (_verbose) { std::cout << "now assigning relationships found by TreeGraph" << std::endl; }
+    if (Debug()) {
+      std::stringstream ss;
+      ss << "Nodes: " << _nodeMgr->getNumNodes() << "\tParticles: " << graph.GetNumParticles();
+      Debug(__FUNCTION__,ss.str());
+      Debug("now assigning relationships found by TreeGraph");
+    }
     // loop through all nodes...
     // and assign parent
     for (auto const& node : graph.GetParticleNodes()){
@@ -156,12 +177,16 @@ namespace ertool {
 	{
 	  auto const& parent = _nodeMgr->getParent(node);
 	  // establish relationship
-	  if (_verbose) { std::cout << "Assigning " << parent << " as parent of node " << node << std::endl; }
+	  if (Debug()) {
+	    std::stringstream ss;
+	    ss << "Assigning " << parent << " as parent of node " << node;
+	    Debug(__FUNCTION__,ss.str());
+	  }
 	  graph.SetParentage(parent,node);
 	}// if there is a parent
     }
       
-    if (_verbose) { std::cout << graph.Diagram() << std::endl; }
+    if (Debug()){ Debug(__FUNCTION__,graph.Diagram()); }
     
     return true;
   }

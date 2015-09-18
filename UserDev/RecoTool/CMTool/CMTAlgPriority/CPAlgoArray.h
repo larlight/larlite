@@ -69,7 +69,7 @@ namespace cmtool {
        Core function: given a set of CPANs, return a float which indicates 
        the compatibility the cluster combination.
     */
-    virtual float Priority(const ::cluster::ClusterParamsAlg &cluster);
+    virtual float Priority(const ::cluster::cluster_params &cluster);
 
     /**
        Optional function: called after each iterative approach if a manager class is
@@ -83,7 +83,7 @@ namespace cmtool {
     /**
        Optional function: called at the beginning of 1st iteration. This is called per event.
      */
-    virtual void EventBegin(const std::vector<cluster::ClusterParamsAlg> &clusters)
+    virtual void EventBegin(const std::vector<cluster::cluster_params> &clusters)
     { for(auto const& algo : _algo_array) algo->EventBegin(clusters); }
 
     /**
@@ -97,7 +97,7 @@ namespace cmtool {
        This provides all clusters' information in case the algorithm need them. Note this
        is called per iteration which may be more than once per event.
      */
-    virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlg> &clusters)
+    virtual void IterationBegin(const std::vector<cluster::cluster_params> &clusters)
     { for(auto const& algo : _algo_array) algo->IterationBegin(clusters); }
 
     /**

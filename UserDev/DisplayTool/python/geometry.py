@@ -16,6 +16,7 @@ class geoBase(object):
     self._wire2Cm = 0.4
     self._levels = [ (-15,15), (-10,30) ]
     self._name = "null"
+    self._offset = [0,0]
 
   def nViews(self):
     return self._nViews
@@ -44,6 +45,9 @@ class geoBase(object):
   def name(self):
     return self._name
 
+  def offset(self, plane):
+    return self._offset[plane]
+
 class geometry(geoBase):
 
   def __init__(self):
@@ -54,6 +58,7 @@ class geometry(geoBase):
     self._aspectRatio = self._wire2Cm / self._time2Cm
     self._tRange = larutil.DetectorProperties.GetME().ReadOutWindowSize()
     self._wRange = []
+    self._offset = []
     for v in range(0, self._nViews):
       self._wRange.append(larutil.Geometry.GetME().Nwires(v))   
     self._defaultColorScheme = []
@@ -61,6 +66,12 @@ class geometry(geoBase):
   def colorMap(self,plane):
     return self._defaultColorScheme[plane]
 
+      # Set up the correct drift time offset.
+      # Offset is returned in terms of centimeters.
+      self._offset.append(larutil.DetectorProperties.GetME().TriggerOffset()
+                         *larutil.GeometryUtilities.GetME().TimeToCm()
+                         -larutil.Geometry.GetME().PlaneOriginVtx(v)[0])
+    
 
 
 class microboone(geometry):

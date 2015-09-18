@@ -115,6 +115,12 @@ namespace geoalgo {
       return *this;
     }
 
+    inline Vector& operator=(const Vector& rhs) {
+      this->resize(rhs.size());
+      for(size_t i=0; i<rhs.size(); ++i) (*this)[i]=rhs[i];
+      return (*this);
+    }
+
     inline Vector operator+(const Vector& rhs) const
     { 
       Vector res((*this));

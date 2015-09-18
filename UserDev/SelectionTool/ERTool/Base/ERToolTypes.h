@@ -9,6 +9,7 @@
 namespace ertool {
 
   typedef size_t RecoID_t;     ///< A unique reconstructed object (input) identifier variable type
+  typedef size_t FlashID_t;    ///< A unique flash object (input) identifier variable type
   typedef size_t NodeID_t;     ///< A unique particle identifier variable type
   typedef int    Generation_t; ///< A layer number in particle graph (0 = Primary, kDefaultLayer = not yet assessed )
 
@@ -58,9 +59,27 @@ namespace ertool {
     /// Other particles
     kMichel,         //michel electrons "muMinusCaptureAtRest"
     kMuIoni,         //particles (electrons?) from muon ionization "muIoni"
-    kCosmicDaughter, //daughters of cosmics
-    kCosmicPrimary, // cosmic primary particle
+    kCosmic,         //Cosmics
     kPiZeroDecay,    //daughters of pizero decays (gammas usually)
+    //Neutrino Production Processes
+    kK0L,//Processes follow 
+    // K0L -> nue pi- e+, 
+    // K0L -> nuebar pi+ e- 
+    // K0L -> numu pi- mu+ 
+    // K0L -> numubar pi+ mu-
+    kKCharged,//Processes follow
+    // K+  -> numu mu+
+    // K+  -> nue pi0 e+
+    // K+  -> numu pi0 mu+
+    // K-  -> numubar mu-
+    // K-  -> nuebar pi0 e-
+    // K-  -> numubar pi0 mu-
+    kMuDecay,//Processes follow
+    // mu+ -> numubar nue e+
+    // mu- -> numu nuebar e-
+    kPionDecay,//Processes follow
+    // pi+ -> numu mu+
+    // pi- -> numubar mu- 
     kINVALID_PROCESS_TYPE
   };
 
@@ -86,6 +105,7 @@ namespace ertool {
       kNORMAL,       ///< Normal stdout
       kWARNING,      ///< notify a user in the standard operation mode for an important finding.
       kERROR,        ///< notify a user when something is clearly wrong
+      kEXCEPTION,    ///< Exception!
       kMSG_TYPE_MAX
     };
   }

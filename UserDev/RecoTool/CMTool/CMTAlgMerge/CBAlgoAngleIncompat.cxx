@@ -23,22 +23,22 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------
-  bool CBAlgoAngleIncompat::Bool(const ::cluster::ClusterParamsAlg &cluster1,
-				 const ::cluster::ClusterParamsAlg &cluster2)
+  bool CBAlgoAngleIncompat::Bool(const ::cluster::cluster_params &cluster1,
+                                 const ::cluster::cluster_params &cluster2)
   //----------------------------------------------------------------
   {
     //if either cluster is too small, do not prohibit them
-    if (cluster1.GetNHits() < _minHits || cluster2.GetNHits() < _minHits)
+    if (cluster1.hit_vector.size() < _minHits || cluster2.hit_vector.size() < _minHits)
       return false;
     
     //if either cluster is too short, do not prohibit them
-    if (cluster1.GetParams().length < _min_length ||
-	cluster2.GetParams().length < _min_length)
+    if (cluster1.length < _min_length ||
+        cluster2.length < _min_length)
       return false;
 
     
-    double angle1 = cluster1.GetParams().angle_2d;
-    double angle2 = cluster2.GetParams().angle_2d;
+    double angle1 = cluster1.angle_2d;
+    double angle2 = cluster2.angle_2d;
 
     if(angle1 < -998 || angle2 < -998)
       return false;
@@ -49,7 +49,7 @@ namespace cmtool {
 
     //if using opening angle, have angle cutoff be the smaller of the two opening angles
     if(_use_opening_angle) 
-      my_cut_value = std::min(cluster1.GetParams().opening_angle, cluster2.GetParams().opening_angle);
+      my_cut_value = std::min(cluster1.opening_angle, cluster2.opening_angle);
     
     //if you don't care if clusters have been reconstructed backwards
     if(_allow_180_ambig)

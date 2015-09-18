@@ -53,9 +53,6 @@ namespace ertool {
     /// Minimum radius to claim a vtx point
     double _vtx_min_radius;
 
-    /// Verbosity flag: make it noisy
-    bool _verbose;
-
     /// Radius histogram
     TH1D* _hRadius;
 

@@ -66,6 +66,18 @@ namespace ertool {
       return true;
     }
 
+    void EmptyInput::ReserveShowerArray(const size_t n,const bool mc)
+    {
+      if(mc) _mc_data->_shower_v.reserve(n);
+      else _data->_shower_v.reserve(n);
+    }
+
+    void EmptyInput::ReserveTrackArray(const size_t n,const bool mc)
+    {
+      if(mc) _mc_data->_track_v.reserve(n);
+      else _data->_track_v.reserve(n);
+    }
+
     NodeID_t EmptyInput::Add(const ertool::Shower& obj,
 			     const ertool::RecoInputID_t& input_id,
 			     const bool mc) 
@@ -92,6 +104,12 @@ namespace ertool {
 	return _mc_graph->CreateParticle(_mc_data->Track().back()).ID();
       }
     }
+
+    void EmptyInput::Add(const ::ertool::Flash& obj,
+			 const ertool::RecoInputID_t& input_id)
+    {
+      _data->Add(obj,input_id);
+    }
     
     NodeID_t EmptyInput::Emplace(const ::ertool::Shower&& obj,
 				 const ertool::RecoInputID_t&& input_id,
@@ -117,6 +135,12 @@ namespace ertool {
 	_mc_data->Emplace(std::move(obj),std::move(input_id));
 	return _mc_graph->CreateParticle(_data->Track().back()).ID();
       }
+    }
+
+    void EmptyInput::Emplace(const ::ertool::Flash&& obj,
+			     const ertool::RecoInputID_t&& input_id)
+    {
+      _data->Emplace(std::move(obj),std::move(input_id));
     }
   }
 

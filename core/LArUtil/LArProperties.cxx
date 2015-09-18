@@ -408,6 +408,23 @@ namespace larutil {
     
     return dEdx;
   }
+
+  Double_t LArProperties::BirksInverse(Double_t dEdx) const
+  {
+    // Correction for charge quenching using parameterization from
+    // S.Amoruso et al., NIM A 523 (2004) 275
+    
+    Double_t  A3t    = kRecombA;
+    Double_t  K3t    = kRecombk;                     // in KV/cm*(g/cm^2)/MeV
+    Double_t  rho    = this->Density();                    // LAr density in g/cm^3
+    Double_t Wion    = 1000./kGeVToElectrons;        // 23.6 eV = 1e, Wion in MeV/e
+    Double_t Efield  = this->Efield();                     // Electric Field in the drift region in KV/cm
+    K3t           /= rho;                                // KV/MeV
+
+    Double_t dQdx = (A3t/Wion) / ( K3t / Efield * dEdx + 1); 
+
+    return dQdx;
+  }
   
   // Modified Box model correction 
   Double_t LArProperties::ModBoxCorrection(Double_t dQdx) const
@@ -422,7 +439,22 @@ namespace larutil {
     Double_t dEdx = (exp(Beta * Wion * dQdx ) - Alpha) / Beta;
     
     return dEdx;
+  }
+
+  // Modified Box model correction 
+  Double_t LArProperties::ModBoxInverse(Double_t dEdx) const
+  {
+    // Modified Box model correction has better behavior than the Birks
+    // correction at high values of dQ/dx.
+    Double_t  rho    = this->Density();                    // LAr density in g/cm^3
+    Double_t Wion    = 1000./kGeVToElectrons;        // 23.6 eV = 1e, Wion in MeV/e
+    Double_t Efield  = this->Efield();                     // Electric Field in the drift region in KV/cm
+    Double_t Beta    = kModBoxB / (rho * Efield);
+    Double_t Alpha   = kModBoxA;
     
+    Double_t dQdx = log ( Alpha + Beta * dEdx ) / ( Beta * Wion );
+    
+    return dQdx;
   }
 
   //----------------------------------------------------------------------------------
