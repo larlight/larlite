@@ -55,6 +55,12 @@ namespace ertool {
     	_int_tree->Branch("int_x",&_int_x,"int_x/D");
     	_int_tree->Branch("int_y",&_int_y,"int_y/D");
     	_int_tree->Branch("int_z",&_int_z,"int_z/D");
+    	_int_tree->Branch("int_ex",&_int_ex,"int_ex/D");
+    	_int_tree->Branch("int_ey",&_int_ey,"int_ey/D");
+    	_int_tree->Branch("int_ez",&_int_ez,"int_ez/D");
+    	_int_tree->Branch("int_px",&_int_px,"int_px/D");
+    	_int_tree->Branch("int_py",&_int_py,"int_py/D");
+    	_int_tree->Branch("int_pz",&_int_pz,"int_pz/D");
     	_int_tree->Branch("primary_pdg",&_primary_pdg,"primary_pdg/D");
     	_int_tree->Branch("ctr_child",&_ctr_child,"ctr_child/D");
     	_int_tree->Branch("ctr_level",&_ctr_level,"ctr_level/D");
@@ -66,8 +72,14 @@ namespace ertool {
   void ERAnaCRTagger::ResetIntTree(){
 
     _int_x = -999;
-    _int_y = -999;
+    _int_y = -9999;
     _int_z = -999;
+    _int_ex = -999;
+    _int_ey = -999;
+    _int_ez = -999;
+    _int_px = -999;
+    _int_py = -999;
+    _int_pz = -999;
     _primary_pdg = -999 ;
     _ctr_child   = -1;
     _ctr_level   = -1;
@@ -144,9 +156,9 @@ namespace ertool {
 	_end_y = t.at(t.size()-1)[1]; 
 	_end_z = t.at(t.size()-1)[2]; 
 	
-	_px = t.at(0).Dir()[0];
-	_py = t.at(0).Dir()[1];
-	_pz = t.at(0).Dir()[2];
+	_px = _end_x - _start_x ; //t.at(0).Dir()[0];
+	_py = _end_y - _start_y ; //t.at(0).Dir()[1];
+	_pz = _end_z - _start_z ; //t.at(0).Dir()[2];
 
 	_part_tree->Fill(); 
 	}
@@ -156,10 +168,15 @@ namespace ertool {
 	else
 	    _ctr_non_cosmic++;
 
-	if ( p.ProcessType() == kCosmic || graph.GetParticle(p.Ancestor()).ProcessType() == kCosmic)	
+	if ( p.ProcessType() == kCosmic || graph.GetParticle(p.Ancestor()).ProcessType() == kCosmic){	
 	    _ctr_cosmic_w_secondaries++;
-	else 
+///	    std::cout<<"WHy the crap are we finding cosmics??"<<std::endl ;
+	    }
+
+	else{
+//	    std::cout<<"Do we ever come in here? "<<std::endl ;
 	    _ctr_non_cosmic_w_sec++;
+	    }
 
 	if ( p.Primary() && p.ProcessType() != kCosmic ) _ctr_non_cosmic_primary++;
 	
@@ -176,15 +193,29 @@ namespace ertool {
       
       _ctr_child = graph.GetAllDescendantNodes(track_node_id).size();
       
-      ::geoalgo::HalfLine trk(track.at(0),track.at(0).Dir()); //Start().Position(),track.Start().Momentum());
+      ::geoalgo::HalfLine trk(track.front(),track.back()-track.front()); //Start().Position(),track.Start().Momentum());
       
-      _int_x = track.at(0)[0] ;
-      _int_y = track.at(0)[1] ;
-      _int_z = track.at(0)[2] ;
+      _int_x = track.front()[0] ;
+      _int_y = track.front()[1] ; //at(0)[1] ;
+      _int_z = track.front()[2] ;
+
+      _int_ex = track.back()[0] ; //at(track.size()-1)[0] ;
+      _int_ey = track.back()[1] ; //at(track.size()-1)[1] ;
+      _int_ez = track.back()[2] ; //at(track.size()-1)[2] ;
+
+      _int_px = track.back()[0] - track.front()[0] ; //track.at(track.size()-1)[0] - _int_x ; 
+      _int_py = track.back()[1] - track.front()[1] ; //track.at(track.size()-1)[1] - _int_y ; 
+      _int_pz = track.back()[2] - track.front()[2] ; //track.at(track.size()-1)[2] - _int_z ; 
+
+	::geoalgo::Point_t dir(_int_px, _int_py,_int_pz) ;
+
+      std::cout<<"Y interaction point "<<_int_y<<std::endl ;
       _primary_pdg = track._pid ;
       _length = track.Length(); 
       //CalculateAngleYZ(graph.GetParticle(track),_angle);
-      CalculateAngleYZ(track.at(0).Dir(),_angle);
+      CalculateAngleYZ(dir,_angle);
+//      std::cout<<"Y comp of momentum:  "<<track.at(0).Dir()[1]<<std::endl ;
+
       
       if( fTPC.Contain(track.at(0)) && _geoAlgo.Intersection(fTPC,trk,true).size() > 0){
 	_distBackAlongTraj = sqrt(_geoAlgo.Intersection(fTPC,trk,true)[0].SqDist(track.at(0))) ;
@@ -194,13 +225,13 @@ namespace ertool {
       else if ( !fTPC.Contain(track.at(0)) && _geoAlgo.Intersection(fTPC,trk,true).size() > 0){ 
 	//There seems to be an issue with setting the new points when x < 0-- they always
 	//get set to 0,0,0.  This is a temporary fix
-	if( _int_x >= 0 ){
-	  _int_x = _geoAlgo.Intersection(fTPC,trk,true).at(0)[0] ;
-	  _int_y = _geoAlgo.Intersection(fTPC,trk,true).at(0)[1] ;
-	  _int_z = _geoAlgo.Intersection(fTPC,trk,true).at(0)[2] ;
-	}   
-	else
-	  _int_x = 0 ; 
+//	if( _int_x >= 0 ){
+//	  _int_x = _geoAlgo.Intersection(fTPC,trk,true).at(0)[0] ;
+//	  _int_y = _geoAlgo.Intersection(fTPC,trk,true).at(0)[1] ;
+//	  _int_z = _geoAlgo.Intersection(fTPC,trk,true).at(0)[2] ;
+//	}   
+//	else
+//	  _int_x = 0 ; 
 
 	_distToWall = 0 ; 
 	_distBackAlongTraj = 0;
