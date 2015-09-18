@@ -2,7 +2,7 @@
 #define ERTOOL_ERALGOCOSMICTAGGER_CXX
 
 #include "ERAlgoCosmicTagger.h"
-
+#include <sstream>
 namespace ertool {
 
   ERAlgoCosmicTagger::ERAlgoCosmicTagger(const std::string& name) 
@@ -26,7 +26,7 @@ namespace ertool {
 
   bool ERAlgoCosmicTagger::Reconstruct(const EventData &data, ParticleGraph& graph)
   {
-    
+
     //Step 1: Find Track
     //Step 2: Find Showers that are not close to the start or end
     //Step 3: Assign the Parent as Muon
@@ -35,10 +35,13 @@ namespace ertool {
     // Iterate through all Tracks
     
     for(auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
+
+      //      if(graph.GetParticle(t).Descendant()) continue;
             
       auto const& trk = data.Track(graph.GetParticle(t).RecoID());
-
+      
       if(trk.Length() < 0.3) continue;
+
 
       // Vector of Daughters gets reset
       daughters.clear();
@@ -51,47 +54,40 @@ namespace ertool {
       
       //Iterate through all the showers
       for(auto const& s : graph.GetParticleNodes(RecoType_t::kShower)){
+
+	if(graph.GetParticle(s).Descendant()) continue;
 	
-      auto const& show = data.Shower(graph.GetParticle(s).RecoID());	
+	auto const& show = data.Shower(graph.GetParticle(s).RecoID());	
 	// Find Showers that aren't too far from a muon
 	// Find Showers that aren't near the front
 	// Find Showers that aren't near the back
+	
 	geoalgo::Point_t showStart(3);
 	showStart = show.Start();
 
 	
-	if(_verbose){
-	  
+	if(Debug()){
+	  std::stringstream ss;
+	  ss << std::endl;
 	  if(_geoAlgo.SqDist(showStart, trk) > (_minDist * _minDist) && _geoAlgo.SqDist(showStart, trk) < 1.1*(_minDist * _minDist)) 
-	    std::cout << "\t\t Shower-Track Dist : "<< sqrt(_geoAlgo.SqDist(showStart, trk)) << std::endl;
+	    ss << "\t\t Shower-Track Dist : "<< sqrt(_geoAlgo.SqDist(showStart, trk)) << std::endl;
 	  if(showStart.SqDist(trkStart) > (_strtDist*_strtDist) && showStart.SqDist(trkStart) < 1.1*(_strtDist*_strtDist))
-	    std::cout << "\t\t Shower-TrkSt Dist : "<< sqrt(showStart.SqDist(trkStart))      << std::endl;
+	    ss << "\t\t Shower-TrkSt Dist : "<< sqrt(showStart.SqDist(trkStart))      << std::endl;
 	  if(showStart.SqDist(trkEnd)   > (_endDist * _endDist) && showStart.SqDist(trkEnd)   < 1.1*(_endDist * _endDist))
-	    std::cout << "\t\t Shower-TrkEd Dist : "<< sqrt(showStart.SqDist(trkEnd))        << std::endl;
-	  
+	    ss << "\t\t Shower-TrkEd Dist : "<< sqrt(showStart.SqDist(trkEnd))        << std::endl;
+	  Debug(__FUNCTION__,ss.str());
 	}
 	
-	if(_geoAlgo.SqDist(showStart, trk) > (_minDist * _minDist) ) continue;
-	if(showStart.SqDist(trkStart) < (_strtDist*_strtDist) ) continue;
-	if(showStart.SqDist(trkEnd)   < (_endDist * _endDist) ) continue;
+	if(_geoAlgo.SqDist(showStart, trk) > (_minDist * _minDist) || 
+	   showStart.SqDist(trkStart) < (_strtDist*_strtDist)      ||
+	   showStart.SqDist(trkStart) < (_strtDist*_strtDist)      ) continue;
 	
 	if(_geoAlgo.SqDist(showStart, trk) < (_deltaDist *_deltaDist) ){	  
-	  daughters.push_back(graph.GetParticle(s).ID());
+	  graph.SetParentage(graph.GetParticle(t).ID(), graph.GetParticle(s).ID());
 	}
 	
       } // iterate through all Showers
-
-      if(_verbose){
-	//	std::cout << "Number of deltas : " << daughters.size() << " for track " << graph.GetParticle(t).RecoID() << std::endl;        
-      }
-
-      for(auto const& showID : daughters){
-	
-
-	graph.SetParentage(graph.GetParticle(t).ID(), showID);
-
-      }//iterate daughter RecoIDs
-            
+      
     }//iterate through tracks
     
     return true;}

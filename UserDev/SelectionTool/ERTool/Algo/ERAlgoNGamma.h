@@ -52,10 +52,10 @@ namespace ertool {
     bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
     /// Set verbosity
-    void setVerbose(bool on)
+    void SetVerbosity(msg::Level_t level)
     {
-      _verbose = on;
-      _findRel.setDebug(on);
+      MessageUtil::SetVerbosity(level);
+      _findRel.SetVerbosity(level);
     }
     /// Called after processing the last event sample
     void ProcessEnd(TFile* fout=nullptr);
@@ -71,9 +71,6 @@ namespace ertool {
     void ClearTree();
 
   protected:
-
-    /// Verbose flag
-    bool _verbose;
 
     /// Gamma mass 
     double _gamma_mass;

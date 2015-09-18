@@ -114,6 +114,16 @@ namespace flashana {
       }
     }
 
+    if(_verbosity <= msg::kINFO) {
+      std::stringstream ss;
+      ss << "Best match Hypothesis: "
+	 << flash_hypothesis_v[min_id].x << " : "
+	 << flash_hypothesis_v[min_id].y << " : "
+	 << flash_hypothesis_v[min_id].z << std::endl
+	 << "Flash point: " << flash.x << " : " << flash.y << " : " << flash.z << std::endl;
+      Print(msg::kINFO,__FUNCTION__,ss.str());
+    }
+
     // If min-diff is bigger than assigned max, return default match (score<0)
     if(min_dist > _zdiff_max) return f;
 

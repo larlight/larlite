@@ -2,7 +2,7 @@
 #define ERTOOL_ERALGOTRACKPID_CXX
 
 #include "ERAlgoTrackPid.h"
-
+#include <sstream>
 namespace ertool {
   
   ERAlgoTrackPid::ERAlgoTrackPid(const std::string& name) 
@@ -11,8 +11,6 @@ namespace ertool {
   {
     // histogram to hold the energy of each reconstructed michel electron
     
-    // set verbosity to be off by default
-    _verbose = false;
   }
 
   void ERAlgoTrackPid::Reset()
@@ -71,7 +69,11 @@ namespace ertool {
 			   part.RecoScore(),
 			   part.ProcessType());
 
-      if (_verbose) { std::cout<<"I found a track!!!\n I assigned the PdgCode for its particle to be "<<Pdg  <<" \n"; }
+      if (Debug()) {
+	std::stringstream ss;
+	ss<<"I found a track!!!\n I assigned the PdgCode for its particle to be "<<Pdg;
+	Debug(__FUNCTION__,ss.str());
+      }
       _part_pid = Pdg;
       
       _algoPid_tree->Fill();

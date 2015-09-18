@@ -17,6 +17,8 @@
 #include <iostream>
 #include <TFile.h>
 #include "FhiclLite/PSet.h"
+#include "ERToolTypes.h"
+#include "MessageUtil.h"
 namespace ertool {
   class Manager;
   /**
@@ -29,7 +31,7 @@ namespace ertool {
      sets (variable name & values) from larlite::user_info.
  */
   //class UnitBase : public Record {
-  class UnitBase {
+  class UnitBase : public MessageUtil{
     friend class Manager;
   public:
     

@@ -6,7 +6,8 @@
 namespace ertool {
 
   UnitBase::UnitBase(const std::string& name)
-    : _training_mode(false)
+    : MessageUtil()
+    , _training_mode(false)
     , _name(name)
     , _out_conf(name)
   {

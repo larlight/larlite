@@ -39,7 +39,6 @@ namespace ertool {
     , _IPsn(nullptr)
   {
     _Ethreshold = 50; // set default energy threshold
-    _verbose = false; // set verbosity to be off by default
     _useRadLength = false;
     _hassister = false;
     _vtx_min_radius = 20; // minimum bounding sphere radius in cm
@@ -141,10 +140,7 @@ namespace ertool {
   { 
     auto datacpy = data; 
 
-    if (_verbose)
-      { 
-      std::cout << "***********BEGIN RECONSTRUCTION************" << std::endl;
-      }
+    if (Debug()) Debug(__FUNCTION__,"***********BEGIN RECONSTRUCTION************");
     
     std::vector<int> showers_counted;
     std::vector<int> tracks_counted;

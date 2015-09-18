@@ -98,9 +98,6 @@ namespace ertool {
 	    geoalgo::Point_t& vertex,
 	    geoalgo::Vector_t& momentum);
 
-    /// Select verbosity mode
-    void setVerbose(bool on) { _verbose = on; }
-
     /// Set maximum Impact Parameter for two showers
     void setIPMax(double ip) { _IPMax = ip; }
 
@@ -125,9 +122,6 @@ namespace ertool {
 
     /// GeoAlgo instance for geometric computations
     geoalgo::GeoAlgo _geoAlgo;
-
-    /// verobsity boolean for couts
-    bool _verbose;
 
     /// pi0 lifetime constant
     double _tau;

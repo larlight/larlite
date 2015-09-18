@@ -24,7 +24,7 @@ namespace ertool {
      This class instance is created per optical flash, and stored within ertool::EventData.
      AlgoX and FilterX will use ertool::EventData instance for evaluation.
   */
-  class Flash : public ::geoalgo::Point_t {
+  class Flash {
     friend class EventData;
   public:
 
@@ -52,7 +52,7 @@ namespace ertool {
     std::vector<double> _npe_v;
 
     /// Position
-    double _x, _y, _z, _t;
+    double _x,_y,_z,_t;
 
   private:
 
