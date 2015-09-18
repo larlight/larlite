@@ -32,25 +32,25 @@ namespace cmtool {
       if(_priority_algo) _priority_algo->SetVerbose(true);
     }
 
-    _match_algo->IterationBegin(_in_clusters);
-    if(_priority_algo) _priority_algo->IterationBegin(_in_clusters);    
+    if(_match_algo)_match_algo->IterationBegin(_in_clusters);
+    if(_priority_algo) _priority_algo->IterationBegin(_in_clusters);
   }
   
   void CMatchManager::IterationBegin()
   {
-    _match_algo->IterationBegin(_in_clusters);
+    if(_match_algo) _match_algo->IterationBegin(_in_clusters);
     if(_priority_algo) _priority_algo->IterationBegin(_in_clusters);
   }
   
   void CMatchManager::IterationEnd()
   {
-    _match_algo->IterationEnd();
+    if(_match_algo) _match_algo->IterationEnd();
     if(_priority_algo) _priority_algo->IterationEnd();
   }
 
   void CMatchManager::EventEnd()
   {
-    _match_algo->EventEnd();
+    if(_match_algo) _match_algo->EventEnd();
     if(_priority_algo) _priority_algo->EventEnd();
   }
 
@@ -89,27 +89,27 @@ namespace cmtool {
       
       res.push_back(std::vector<size_t>(seed.size(),0));
       for(size_t index=0; index<ctr.size(); ++index)
-	
-	(*res.rbegin())[index] = ctr.at(index);
+        
+        (*res.rbegin())[index] = ctr.at(index);
     
       for(size_t i=0; i<ctr.size(); ++i) {
-	
-	size_t index = (size_t)(ctr.size()-i-1);
-	
-	ctr.at(index) +=1;
-	
-	if(ctr.at(index) < seed.at(index))
-	  
-	  break;
-	
-	ctr.at(index) = 0;
+        
+        size_t index = (size_t)(ctr.size()-i-1);
+        
+        ctr.at(index) +=1;
+        
+        if(ctr.at(index) < seed.at(index))
+          
+          break;
+        
+        ctr.at(index) = 0;
 
       }
 
       bool abort = true;
       for(auto const& value : ctr)
-	
-	abort = abort && (!(value));
+        
+        abort = abort && (!(value));
       
     if(abort) break;
     }
@@ -133,20 +133,20 @@ namespace cmtool {
       // Loop over possible N-plane combinations
       for(auto const& plane_comb : plane_comb_v){
 
-	// Make a seed for cluster combinations
-	std::vector<size_t> cluster_seed_v;
-	cluster_seed_v.reserve(plane_comb.size());
-	for(auto const& index : plane_comb) cluster_seed_v.push_back(seed[index]);
-	
-	// Compute cluster combinations
-	for(auto const& cluster_comb : ClusterCombinations(cluster_seed_v)) {
-	  
-	  // Store result
-	  result.push_back(std::vector<std::pair<size_t,size_t> >());
-	  for(size_t i=0; i<cluster_comb.size(); ++i)
-	    
-	    (*result.rbegin()).push_back(std::make_pair(plane_comb.at(i),cluster_comb.at(i)));
-	}
+        // Make a seed for cluster combinations
+        std::vector<size_t> cluster_seed_v;
+        cluster_seed_v.reserve(plane_comb.size());
+        for(auto const& index : plane_comb) cluster_seed_v.push_back(seed[index]);
+        
+        // Compute cluster combinations
+        for(auto const& cluster_comb : ClusterCombinations(cluster_seed_v)) {
+          
+          // Store result
+          result.push_back(std::vector<std::pair<size_t,size_t> >());
+          for(size_t i=0; i<cluster_comb.size(); ++i)
+            
+            (*result.rbegin()).push_back(std::make_pair(plane_comb.at(i),cluster_comb.at(i)));
+        }
       }
     }
     return result;
@@ -183,18 +183,18 @@ namespace cmtool {
 
       if( _planes.find(plane) != _planes.end() ) {
 
-	plane_to_index[plane] = cluster_array.size();
+        plane_to_index[plane] = cluster_array.size();
 
-	cluster_array.push_back(std::vector<size_t>());
+        cluster_array.push_back(std::vector<size_t>());
       }
     }
 
     // Fill cluster_array
     for(auto riter = _priority.rbegin();
-	riter != _priority.rend();
-	++riter) 
+        riter != _priority.rend();
+        ++riter) 
 
-      cluster_array.at( plane_to_index.at(_in_clusters.at((*riter).second).Plane()) ).push_back((*riter).second);
+      cluster_array.at( plane_to_index.at(_in_clusters.at((*riter).second).plane_id.Plane) ).push_back((*riter).second);
 
     // Find combinations
     std::vector<size_t> seed;
@@ -208,7 +208,7 @@ namespace cmtool {
     // Loop over combinations and call algorithm
     for(auto const& comb : combinations) {
 
-      std::vector<const cluster::ClusterParamsAlg*> ptr_v;
+      std::vector<const cluster::cluster_params*> ptr_v;
 
       std::vector<unsigned int> tmp_index_v;
 
@@ -217,25 +217,25 @@ namespace cmtool {
       ptr_v.reserve(comb.size());
 
       for(auto const& plane_cluster : comb) {
-	
-	auto const& in_cluster_index = cluster_array.at(plane_cluster.first).at(plane_cluster.second);
+        
+        auto const& in_cluster_index = cluster_array.at(plane_cluster.first).at(plane_cluster.second);
 
-	tmp_index_v.push_back(in_cluster_index);
+        tmp_index_v.push_back(in_cluster_index);
 
-	ptr_v.push_back(&(_in_clusters.at(in_cluster_index)));
+        ptr_v.push_back(&(_in_clusters.at(in_cluster_index)));
 
       }
 
       if(_debug_mode <= kPerMerging){
-	
-	std::cout
-	  << "    \033[93m"
-	  << "Inspecting a pair (";
-	for(auto const& index : tmp_index_v)
-	  std::cout << index << " ";
-	std::cout<<") \033[00m" << std::flush;
+        
+        std::cout
+          << "    \033[93m"
+          << "Inspecting a pair (";
+        for(auto const& index : tmp_index_v)
+          std::cout << index << " ";
+        std::cout<<") \033[00m" << std::flush;
 
-	localWatch.Start();
+        localWatch.Start();
 
       }
       
@@ -243,11 +243,11 @@ namespace cmtool {
 
       if(_debug_mode <= kPerMerging)
 
-	std::cout << " ... Time taken = " << localWatch.RealTime() << " [s]" << std::endl;
+        std::cout << " ... Time taken = " << localWatch.RealTime() << " [s]" << std::endl;
 
       if(score>0)
-	
-	_book_keeper.Match(tmp_index_v,score);
+        
+        _book_keeper.Match(tmp_index_v,score);
 
     }
   

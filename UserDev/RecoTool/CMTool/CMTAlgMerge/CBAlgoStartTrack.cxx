@@ -26,7 +26,7 @@ namespace cmtool {
   }
 
   //------------------------------------------------------------------------------------------
-  //void CBAlgoStartTrack::EventBegin(const std::vector<cluster::ClusterParamsAlg> &clusters)
+  //void CBAlgoStartTrack::EventBegin(const std::vector<cluster::cluster_params> &clusters)
   //------------------------------------------------------------------------------------------
   //{
   //
@@ -40,7 +40,7 @@ namespace cmtool {
   //}
 
   //-----------------------------------------------------------------------------------------------
-  //void CBAlgoStartTrack::IterationBegin(const std::vector<cluster::ClusterParamsAlg> &clusters)
+  //void CBAlgoStartTrack::IterationBegin(const std::vector<cluster::cluster_params> &clusters)
   //-----------------------------------------------------------------------------------------------
   //{
   //
@@ -54,13 +54,13 @@ namespace cmtool {
   //}
   
   //----------------------------------------------------------------
-  bool CBAlgoStartTrack::Bool(const ::cluster::ClusterParamsAlg &cluster1,
-			       const ::cluster::ClusterParamsAlg &cluster2)
+  bool CBAlgoStartTrack::Bool(const ::cluster::cluster_params &cluster1,
+                              const ::cluster::cluster_params &cluster2)
   //----------------------------------------------------------------
   {
     
-    if(cluster1.GetHitVector().size() < _min_hits ||
-       cluster2.GetHitVector().size() < _min_hits )
+    if(cluster1.hit_vector.size() < _min_hits ||
+       cluster2.hit_vector.size() < _min_hits )
       return false;
     
     bool FirstTrackSecondBlob = false;
@@ -73,53 +73,53 @@ namespace cmtool {
 
     if(_debug){
       if(FirstTrackSecondBlob){
-	std::cout<<"*********************************************"<<std::endl;
-	std::cout<<"First track second blob! First has params:"<<std::endl;
-	std::cout<<"Angle 2D = "<<cluster1.GetParams().angle_2d<<std::endl;
-	std::cout<<"Opening Angle = "<<cluster1.GetParams().opening_angle<<std::endl;
-	std::cout<<"Sum charge = "<<cluster1.GetParams().sum_charge<<std::endl;
-	std::cout<<"Length = "<<cluster1.GetParams().length<<std::endl;
-	std::cout<<"Width = "<<cluster1.GetParams().width<<std::endl;
-	std::cout<<"N_Hits = "<<cluster1.GetHitVector().size()<<std::endl;
-	std::cout<<"eigenvalue_principal = "<<cluster1.GetParams().eigenvalue_principal<<std::endl;
-	std::cout<<"Second has params:"<<std::endl;
-	std::cout<<"Angle 2D = "<<cluster2.GetParams().angle_2d<<std::endl;
-	std::cout<<"Opening Angle = "<<cluster2.GetParams().opening_angle<<std::endl;
-	std::cout<<"Sum charge = "<<cluster2.GetParams().sum_charge<<std::endl;
-	std::cout<<"Length = "<<cluster2.GetParams().length<<std::endl;
-	std::cout<<"Width = "<<cluster2.GetParams().width<<std::endl;
-	std::cout<<"N_Hits = "<<cluster2.GetHitVector().size()<<std::endl;
-	std::cout<<"eigenvalue_principal = "<<cluster2.GetParams().eigenvalue_principal<<std::endl;
+        std::cout<<"*********************************************"<<std::endl;
+        std::cout<<"First track second blob! First has params:"<<std::endl;
+        std::cout<<"Angle 2D = "<<cluster1.angle_2d<<std::endl;
+        std::cout<<"Opening Angle = "<<cluster1.opening_angle<<std::endl;
+        std::cout<<"Sum charge = "<<cluster1.sum_charge<<std::endl;
+        std::cout<<"Length = "<<cluster1.length<<std::endl;
+        std::cout<<"Width = "<<cluster1.width<<std::endl;
+        std::cout<<"N_Hits = "<<cluster1.hit_vector.size()<<std::endl;
+        std::cout<<"eigenvalue_principal = "<<cluster1.eigenvalue_principal<<std::endl;
+        std::cout<<"Second has params:"<<std::endl;
+        std::cout<<"Angle 2D = "<<cluster2.angle_2d<<std::endl;
+        std::cout<<"Opening Angle = "<<cluster2.opening_angle<<std::endl;
+        std::cout<<"Sum charge = "<<cluster2.sum_charge<<std::endl;
+        std::cout<<"Length = "<<cluster2.length<<std::endl;
+        std::cout<<"Width = "<<cluster2.width<<std::endl;
+        std::cout<<"N_Hits = "<<cluster2.hit_vector.size()<<std::endl;
+        std::cout<<"eigenvalue_principal = "<<cluster2.eigenvalue_principal<<std::endl;
 
       }
-		 
+                 
 
     }
 
     //if cluster1 looks like a track and cluster2 looks like a blob
     if (FirstTrackSecondBlob)
       {
-	std::pair<float,float> trackEndPoint = 
-	  std::pair<float,float>( cluster1.GetParams().end_point.w, cluster1.GetParams().end_point.t );
+        std::pair<float,float> trackEndPoint = 
+          std::pair<float,float>( cluster1.end_point.w, cluster1.end_point.t );
 
-	//if the tracklike cluster's endpoint is inside polygon of blob
-	if(cluster2.GetParams().PolyObject.PointInside(trackEndPoint))
-	  return true;
-	else
-	  return false;
+        //if the tracklike cluster's endpoint is inside polygon of blob
+        if(cluster2.PolyObject.PointInside(trackEndPoint))
+          return true;
+        else
+          return false;
       }
 
     //if cluster2 looks like a track and cluster1 looks like a blob
     else if (SecondTrackFirstBlob)
       {
-	std::pair<float,float> trackEndPoint = 
-	  std::pair<float,float>( cluster2.GetParams().end_point.w, cluster2.GetParams().end_point.t );
+        std::pair<float,float> trackEndPoint = 
+          std::pair<float,float>( cluster2.end_point.w, cluster2.end_point.t );
 
-	//if the tracklike cluster's endpoint is inside polygon of blob
-	if(cluster1.GetParams().PolyObject.PointInside(trackEndPoint))
-	  return true;
-	else
-	  return false;
+        //if the tracklike cluster's endpoint is inside polygon of blob
+        if(cluster1.PolyObject.PointInside(trackEndPoint))
+          return true;
+        else
+          return false;
       }
 
     else
@@ -144,20 +144,20 @@ namespace cmtool {
   }
     
 
-  bool CBAlgoStartTrack::IsStartTrack(const ::cluster::ClusterParamsAlg &cluster)
+  bool CBAlgoStartTrack::IsStartTrack(const ::cluster::cluster_params &cluster)
   {
-    if(cluster.GetParams().eigenvalue_principal > _min_EP) 
+    if(cluster.eigenvalue_principal > _min_EP) 
       return true;
     else
       return false;
      
   }
 
-  bool CBAlgoStartTrack::IsOverlappingBlob(const ::cluster::ClusterParamsAlg &cluster)
+  bool CBAlgoStartTrack::IsOverlappingBlob(const ::cluster::cluster_params &cluster)
   {
-    if(cluster.GetParams().width > _min_width && 
-       cluster.GetParams().opening_angle > _min_opening_angle &&
-       cluster.GetParams().eigenvalue_principal < _min_EP)
+    if(cluster.width > _min_width && 
+       cluster.opening_angle > _min_opening_angle &&
+       cluster.eigenvalue_principal < _min_EP)
       return true;
     else
       return false;

@@ -1,37 +1,39 @@
+#####################################################################################
 #
-# This is an example GNUmakefile for my packages
+# A top Makefile for building my project.
+# One needs to define $LARLITE_USERDEVDIR environment variable and set it to where this
+# makefile exists. 
+# One can type "make" and this builds packages that are added in $SUBDIR defined below.
+# 
+# The original is taken from Glenn A. Smith's example for Double Chooz experiment.
 #
+#####################################################################################
+#
+# IMPOSE CONDITION BETWEEN LARLITE_USERDEVDIR & PWD =>
+#   do not compile if PWD !=$LARLITE_USERDEVDIR is set elsewhere
+#
+#####################################################################################
+#
+# Define directories to be compile upon a global "make"...
+#
+SUBDIRS := Base Alg 
 
-# specific names for this package
-DICT  = RecoTool_ClusterRecoUtilDict
-SHLIB = libRecoTool_ClusterRecoUtil.so
-SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
-FMWK_HEADERS = LinkDef.h $(DICT).h
-HEADERS = $(filter-out $(FMWK_HEADERS), $(wildcard *.h))
-OBJECTS = $(SOURCES:.cxx=.o)
+#####################################################################################
+#
+# COMPILATION...
+#
+#.phony: all configure default-config clean
+.phony: all clean
 
-# include options for this package
-INCFLAGS  = -I.                       #Include itself
-INCFLAGS += $(shell larlite-config --includes)
-INCFLAGS += $(shell recotool-config --includes)
+all:
+	@for i in $(SUBDIRS); do ( echo "" && echo "Compiling $$i..." && cd $$i && $(MAKE) ) || exit $$?; done
+#####################################################################################
+#
+# CLEANs...
+#
+clean:
+	@for i in $(SUBDIRS); do ( echo "" && echo "Cleaning $$i..." && cd $$i && $(MAKE) clean && rm -f $(LARLITE_LIBDIR)/$$i.* ) || exit $$?; done
 
-# Add -p flag to CINT compilation
-CINTFLAGS += -p
-
-# platform-specific options
-OSNAME          = $(shell uname -s)
-HOST            = $(shell uname -n)
-OSNAMEMODE      = $(OSNAME)
-
-# linker flags
-LDFLAGS += $(shell larlite-config --libs)
-LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_FANN
-LDFLAGS += -L$(LARLITE_LIBDIR) -lfloatfann
-
-include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
-
-# call the common GNUmakefile
-include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE
-
-
-
+#
+#####################################################################################
+#EOF

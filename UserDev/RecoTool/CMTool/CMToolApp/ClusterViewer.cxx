@@ -2,6 +2,7 @@
 #define RECOTOOL_CLUSTERVIEWER_CXX
 
 #include "ClusterViewer.h"
+#include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
 
 namespace larlite {
 
@@ -122,6 +123,7 @@ bool ClusterViewer::analyze(storage_manager* storage)
     hits_xy.at(plane).push_back(std::pair<double, double>(x, y));
 
     hits_charge.at(plane).push_back(h.Integral());
+
 
   }//for all hits
 

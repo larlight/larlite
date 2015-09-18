@@ -32,39 +32,39 @@ namespace cmtool {
   }
 
   
-  bool CBAlgoPolyOverlap::Bool(const ::cluster::ClusterParamsAlg &cluster1,
-                               const ::cluster::ClusterParamsAlg &cluster2)
+  bool CBAlgoPolyOverlap::Bool(const ::cluster::cluster_params &cluster1,
+                               const ::cluster::cluster_params &cluster2)
   {
 
-    if( (cluster1.GetParams().N_Hits < _min_hits) ||
-        (cluster2.GetParams().N_Hits < _min_hits) )
+    if( (cluster1.N_Hits < _min_hits) ||
+        (cluster2.N_Hits < _min_hits) )
       return false;
 
     //if either has < 3 sides do not merge!
-    if ( (cluster1.GetParams().PolyObject.Size() < 2) or
-         (cluster2.GetParams().PolyObject.Size() < 2) ){
+    if ( (cluster1.PolyObject.Size() < 2) or
+         (cluster2.PolyObject.Size() < 2) ){
       return false;
     }
-    if (_debug and cluster1.GetParams().N_Hits > _min_hits and cluster2.GetParams().N_Hits > _min_hits) {
+    if (_debug and cluster1.N_Hits > _min_hits and cluster2.N_Hits > _min_hits) {
       std::cout << "Cluster 1:" << std::endl;
-      std::cout << "\tN_Hits: " << cluster1.GetParams().N_Hits << std::endl;
-      std::cout << "\tN Sides:" << cluster1.GetParams().PolyObject.Size() << std::endl;
-      for (unsigned int n=0; n < cluster1.GetParams().PolyObject.Size(); n++)
-        std::cout << "\t\t\t(" << cluster1.GetParams().PolyObject.Point(n).first << ", "
-                  << cluster1.GetParams().PolyObject.Point(n).second << ")" << std::endl;
+      std::cout << "\tN_Hits: " << cluster1.N_Hits << std::endl;
+      std::cout << "\tN Sides:" << cluster1.PolyObject.Size() << std::endl;
+      for (unsigned int n=0; n < cluster1.PolyObject.Size(); n++)
+        std::cout << "\t\t\t(" << cluster1.PolyObject.Point(n).first << ", "
+                  << cluster1.PolyObject.Point(n).second << ")" << std::endl;
       std::cout << "Cluster 2:" << std::endl;
-      std::cout << "\tN_Hits: " << cluster2.GetParams().N_Hits << std::endl;
-      std::cout << "\tN Sides:" << cluster2.GetParams().PolyObject.Size() << std::endl;
-      for (unsigned int n=0; n < cluster2.GetParams().PolyObject.Size(); n++)
-        std::cout << "\t\t\t(" << cluster2.GetParams().PolyObject.Point(n).first << ", "
-                  << cluster2.GetParams().PolyObject.Point(n).second << ")" << std::endl;
+      std::cout << "\tN_Hits: " << cluster2.N_Hits << std::endl;
+      std::cout << "\tN Sides:" << cluster2.PolyObject.Size() << std::endl;
+      for (unsigned int n=0; n < cluster2.PolyObject.Size(); n++)
+        std::cout << "\t\t\t(" << cluster2.PolyObject.Point(n).first << ", "
+                  << cluster2.PolyObject.Point(n).second << ")" << std::endl;
     }
 
     // Two options.  If the overlap fraction is set to 0.0, then any overlap at all 
     // will return true
     // Get the polygon that is the overlap between the two:
-    Polygon2D overlap(cluster1.GetParams().PolyObject, 
-                      cluster2.GetParams().PolyObject);
+    Polygon2D overlap(cluster1.PolyObject, 
+                      cluster2.PolyObject);
 
     if (_debug){
       
@@ -82,11 +82,11 @@ namespace cmtool {
       float overlap_area = overlap.Area();
       float cluster_area = 0.0;
       // Find the smaller cluster for comparison:
-      if (cluster1.GetParams().N_Hits > cluster2.GetParams().N_Hits){
-        cluster_area = cluster1.GetParams().PolyObject.Area();
+      if (cluster1.N_Hits > cluster2.N_Hits){
+        cluster_area = cluster1.PolyObject.Area();
       }
       else{
-        cluster_area = cluster2.GetParams().PolyObject.Area();
+        cluster_area = cluster2.PolyObject.Area();
       }
 
       if ( (overlap_area / cluster_area ) > _overlap_fraction ) return true;
@@ -95,7 +95,7 @@ namespace cmtool {
 
     // //if the two polygons overlap even partially
     // //then return true! --> MERGE!
-    // if ( cluster1.GetParams().PolyObject.PolyOverlapSegments(cluster2.GetParams().PolyObject) ){
+    // if ( cluster1.PolyObject.PolyOverlapSegments(cluster2.PolyObject) ){
     //   return true;
     // }
     return false;

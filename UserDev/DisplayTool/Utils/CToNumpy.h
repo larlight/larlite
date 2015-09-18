@@ -46,6 +46,8 @@ public:
   // template <class T>
   PyObject* Convert(  std::vector<float> * _array) const;
   PyObject* Convert( std::vector<std::vector<float>> * _array) const;
+  template <class T>
+  PyObject* Convert( std::vector<T> * _array) const;
 
   std::vector<float> getTestVector();
   std::vector<std::vector<float>> getTestVector2d();

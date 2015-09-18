@@ -17,7 +17,7 @@
 
 #include "Analysis/ana_base.h"
 #include "CMergeHelper.h"
-#include "ClusterRecoUtil/CRUHelper.h"
+#include "ClusterRecoUtil/Base/CRUHelper.h"
 
 namespace larlite {
   /**

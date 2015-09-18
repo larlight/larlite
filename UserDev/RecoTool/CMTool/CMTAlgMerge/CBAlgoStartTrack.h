@@ -61,8 +61,8 @@ namespace cmtool {
        Core function: given the CPAN input, return whether a cluster should be
        merged or not.
     */
-    virtual bool Bool(const ::cluster::ClusterParamsAlg &cluster1,
-		      const ::cluster::ClusterParamsAlg &cluster2);
+    virtual bool Bool(const ::cluster::cluster_params &cluster1,
+                      const ::cluster::cluster_params &cluster2);
 
     /**
        Optional function: called after each Merge() function call by CMergeManager IFF
@@ -73,9 +73,9 @@ namespace cmtool {
     /// Function to reset the algorithm instance ... maybe implemented via child class
     virtual void Reset();
 
-    bool IsStartTrack(const ::cluster::ClusterParamsAlg &cluster);
+    bool IsStartTrack(const ::cluster::cluster_params &cluster);
 
-    bool IsOverlappingBlob(const ::cluster::ClusterParamsAlg &cluster);
+    bool IsOverlappingBlob(const ::cluster::cluster_params &cluster);
 
     void SetMinWidth(double value) { _min_width = value; }
 

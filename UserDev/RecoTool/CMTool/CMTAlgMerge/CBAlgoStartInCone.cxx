@@ -29,13 +29,13 @@ namespace cmtool {
   }//end reconfigure function
 
   
-  bool CBAlgoStartInCone::Bool(const ::cluster::ClusterParamsAlg &cluster1,
-			       const ::cluster::ClusterParamsAlg &cluster2)
+  bool CBAlgoStartInCone::Bool(const ::cluster::cluster_params &cluster1,
+                               const ::cluster::cluster_params &cluster2)
   {
 
     //apply filter on hit number and length immediately
-    if ( ( (cluster1.GetParams().length < _lenMin) and (cluster1.GetHitVector().size() < _NhitsMin) )
-	 and ( (cluster2.GetParams().length < _lenMin) and (cluster2.GetHitVector().size() < _NhitsMin) ) )
+    if ( ( (cluster1.length < _lenMin) and (cluster1.hit_vector.size() < _NhitsMin) )
+     and ( (cluster2.length < _lenMin) and (cluster2.hit_vector.size() < _NhitsMin) ) )
       return false;
 
     //A cluster has an associated cone defined as the cone originating
@@ -45,17 +45,17 @@ namespace cmtool {
     //by the cone of cluster B (A), and if cluster B (A) is good enough
     // (enough hits, charge, length...) then the two are merged.
 
-    double w_start1 = cluster1.GetParams().start_point.w;// * _wire_2_cm;
-    double t_start1 = cluster1.GetParams().start_point.t;// * _time_2_cm;
-    double angle1   = cluster1.GetParams().angle_2d;
-    double opening1 = cluster1.GetParams().opening_angle * (180./3.14);
-    double len1     = cluster1.GetParams().length;
+    double w_start1 = cluster1.start_point.w;// * _wire_2_cm;
+    double t_start1 = cluster1.start_point.t;// * _time_2_cm;
+    double angle1   = cluster1.angle_2d;
+    double opening1 = cluster1.opening_angle * (180./3.14);
+    double len1     = cluster1.length;
 
-    double w_start2 = cluster2.GetParams().start_point.w;// * _wire_2_cm;
-    double t_start2 = cluster2.GetParams().start_point.t;// * _time_2_cm;
-    double angle2   = cluster2.GetParams().angle_2d;
-    double opening2 = cluster2.GetParams().opening_angle * (180./3.14);
-    double len2     = cluster2.GetParams().length;
+    double w_start2 = cluster2.start_point.w;// * _wire_2_cm;
+    double t_start2 = cluster2.start_point.t;// * _time_2_cm;
+    double angle2   = cluster2.angle_2d;
+    double opening2 = cluster2.opening_angle * (180./3.14);
+    double len2     = cluster2.length;
 
     //check for angle compatibility: the direction of the two clusters must be within
     //this range of each other
@@ -98,16 +98,16 @@ namespace cmtool {
     }
 
     if ( (w_start1_rot < len2*_lengthReach ) and (w_start1_rot > 0) and
-	 ( abs(t_start1_rot) < (abs(w_start1_rot*sin(opening2*3.14/180.))) ) and
-	 (len2 > _lenMin) and 
-	 (cluster2.GetHitVector().size() > _NhitsMin) ){
+         ( abs(t_start1_rot) < (abs(w_start1_rot*sin(opening2*3.14/180.))) ) and
+         (len2 > _lenMin) and 
+         (cluster2.hit_vector.size() > _NhitsMin) ){
       if (_verbose) { std::cout << "Start point of Cluster 1 in cone of Cluster 2!" << std::endl; }
       return true;
     }
     if ( (w_start2_rot < len1*_lengthReach ) and (w_start2_rot > 0) and
-	 ( abs(t_start2_rot) < (abs(w_start2_rot*sin(opening1*3.14/180.))) ) and
-	 (len1 > _lenMin) and 
-	 (cluster1.GetHitVector().size() > _NhitsMin) ){
+         ( abs(t_start2_rot) < (abs(w_start2_rot*sin(opening1*3.14/180.))) ) and
+         (len1 > _lenMin) and 
+         (cluster1.hit_vector.size() > _NhitsMin) ){
       if (_verbose) { std::cout << "Start point of Cluster 2 in cone of Cluster 1!" << std::endl; }
       return true;
     }
