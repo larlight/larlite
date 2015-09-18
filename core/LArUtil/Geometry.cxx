@@ -12,8 +12,8 @@ namespace larutil {
     _name = "Geometry";
     if(default_load) {
       _file_name = Form("%s/LArUtil/dat/%s",
-			getenv("LARLITE_COREDIR"),
-			kUTIL_DATA_FILENAME[LArUtilConfig::Detector()].c_str());
+                        getenv("LARLITE_COREDIR"),
+                        kUTIL_DATA_FILENAME[LArUtilConfig::Detector()].c_str());
       _tree_name = kTREENAME_GEOMETRY;
       LoadData();
     }
@@ -42,16 +42,16 @@ namespace larutil {
       Double_t cth = TMath::Cos(th);
       
       for(size_t coord=0; coord<3; ++coord) {
-	WireCentre1[coord] = (fWireEndVtx.at(plane).at(0).at(coord) + fWireStartVtx.at(plane).at(0).at(coord)) / 2.;
-	WireCentre2[coord] = (fWireEndVtx.at(plane).at(1).at(coord) + fWireStartVtx.at(plane).at(1).at(coord)) / 2.;
+        WireCentre1[coord] = (fWireEndVtx.at(plane).at(0).at(coord) + fWireStartVtx.at(plane).at(0).at(coord)) / 2.;
+        WireCentre2[coord] = (fWireEndVtx.at(plane).at(1).at(coord) + fWireStartVtx.at(plane).at(1).at(coord)) / 2.;
       }
 
       Double_t OrthY =  cth;
       Double_t OrthZ = -sth;
       if(((WireCentre2[1] - WireCentre1[1])*OrthY 
-	  + (WireCentre2[2] - WireCentre1[2])*OrthZ) < 0){
-	OrthZ *= -1;
-	OrthY *= -1;
+        + (WireCentre2[2] - WireCentre1[2])*OrthZ) < 0){
+        OrthZ *= -1;
+        OrthY *= -1;
       }
 
       fOrthVectorsY[plane] = OrthY / ThisWirePitch;
@@ -330,7 +330,7 @@ namespace larutil {
   }
 
   UInt_t Geometry::PlaneWireToChannel(const UInt_t plane,
-				      const UInt_t wire) const
+                                      const UInt_t wire) const
   {
     
     if(plane >= Nplanes() || fPlaneWireToChannelMap.at(plane).size() <= wire) {
@@ -341,44 +341,43 @@ namespace larutil {
   }
 
   UInt_t Geometry::NearestChannel(const Double_t worldLoc[3],
-				  const UInt_t PlaneNo) const
+                                  const UInt_t PlaneNo) const
   {
     return PlaneWireToChannel(PlaneNo,NearestWire(worldLoc,PlaneNo));
   }
 
   UInt_t Geometry::NearestChannel(const std::vector<Double_t> &worldLoc,
-				  const UInt_t PlaneNo) const
+                                  const UInt_t PlaneNo) const
   {
     return PlaneWireToChannel(PlaneNo,NearestWire(worldLoc,PlaneNo));
   }
 
   UInt_t Geometry::NearestChannel(const TVector3 &worldLoc,
-				  const UInt_t PlaneNo) const
+                                  const UInt_t PlaneNo) const
   {
     return PlaneWireToChannel(PlaneNo,NearestWire(worldLoc,PlaneNo));
   }
 
   UInt_t Geometry::NearestWire(const Double_t worldLoc[3],
-			       const UInt_t PlaneNo) const
+                               const UInt_t PlaneNo) const
   {
     TVector3 loc(worldLoc);
     return NearestWire(loc,PlaneNo);
   }
   
   UInt_t Geometry::NearestWire(const std::vector<Double_t> &worldLoc,
-			       const UInt_t PlaneNo) const
+                               const UInt_t PlaneNo) const
   {
     TVector3 loc(&worldLoc[0]);
     return NearestWire(loc,PlaneNo);
   }
   
   UInt_t Geometry::NearestWire(const TVector3 &worldLoc,
-			       const UInt_t PlaneNo) const
+                               const UInt_t PlaneNo) const
   {
-
     int NearestWireNumber = int(nearbyint(worldLoc[1]*fOrthVectorsY.at(PlaneNo)
-					  + worldLoc[2]*fOrthVectorsZ.at(PlaneNo)
-					  - fFirstWireProj.at(PlaneNo)));
+                                          + worldLoc[2]*fOrthVectorsZ.at(PlaneNo)
+                                          - fFirstWireProj.at(PlaneNo)));
 
     unsigned int wireNumber = (unsigned int) NearestWireNumber;
 
@@ -389,7 +388,7 @@ namespace larutil {
       else wireNumber = this->Nwires(PlaneNo) - 1;
 
       throw larutil::LArUtilException(Form("Can't find nearest wire for (%g,%g,%g)",
-					   worldLoc[0],worldLoc[1], worldLoc[2]));
+                                           worldLoc[0],worldLoc[1], worldLoc[2]));
 
     }
     /*
@@ -399,11 +398,51 @@ namespace larutil {
                     fOrthVectorsY[PlaneNo],
                     fOrthVectorsZ[PlaneNo],
                     fFirstWireProj[PlaneNo],
-		    wireNumber,PlaneNo)
+                    wireNumber,PlaneNo)
              << std::endl;
     */
     return wireNumber;
   }
+
+    /// exact wire coordinate (fractional wire) to input world coordinates
+  Double_t Geometry::WireCoordinate(const Double_t worldLoc[3],
+                                    const UInt_t   PlaneNo) const
+  {
+    TVector3 loc(worldLoc);
+    return WireCoordinate(loc,PlaneNo);
+  }
+
+  /// exact wire coordinate (fractional wire) to input world coordinate
+  Double_t Geometry::WireCoordinate(const std::vector<Double_t> &worldLoc,
+                                    const UInt_t  PlaneNo) const
+  {
+    TVector3 loc(&worldLoc[0]);
+    return WireCoordinate(loc,PlaneNo);
+  }
+
+  /// exact wire coordinate (fractional wire) to input world coordinates
+  Double_t Geometry::WireCoordinate(const TVector3& worldLoc,
+                                    const UInt_t PlaneNo) const
+  {
+
+    Double_t NearestWireNumber = worldLoc[1]*fOrthVectorsY.at(PlaneNo)
+                               + worldLoc[2]*fOrthVectorsZ.at(PlaneNo)
+                               - fFirstWireProj.at(PlaneNo);
+
+
+    /*
+    std::cout<<"NearestWireID"<<std::endl;
+    std::cout<<Form("(%g,%g,%g) position ... using (%g,%g,%g) ... Wire %d Plane %d",
+                    worldLoc[0],worldLoc[1],worldLoc[2],
+                    fOrthVectorsY[PlaneNo],
+                    fOrthVectorsZ[PlaneNo],
+                    fFirstWireProj[PlaneNo],
+                    wireNumber,PlaneNo)
+             << std::endl;
+    */
+    return NearestWireNumber;
+  }
+
 
   // distance between planes p1 < p2
   Double_t Geometry::PlanePitch(const UChar_t p1, const UChar_t p2) const
@@ -419,8 +458,8 @@ namespace larutil {
   }
 
   Double_t Geometry::WirePitch(const UInt_t  w1,
-			       const UInt_t  w2,
-			       const UChar_t plane) const
+                               const UInt_t  w2,
+                               const UChar_t plane) const
   {
     if( w1 > w2 && w1 >= fPlaneWireToChannelMap.at(plane).size() ) {
       throw LArUtilException(Form("Invalid wire number: %d",w1));
@@ -457,8 +496,8 @@ namespace larutil {
 
 
   void Geometry::WireEndPoints(const UChar_t plane, 
-			       const UInt_t wire, 
-			       Double_t *xyzStart, Double_t *xyzEnd) const
+                               const UInt_t wire, 
+                               Double_t *xyzStart, Double_t *xyzEnd) const
   {
 
     if(plane >= fWireStartVtx.size())  {
@@ -480,8 +519,8 @@ namespace larutil {
   }
   
   bool Geometry::ChannelsIntersect(const UInt_t c1, 
-				   const UInt_t c2, 
-				   Double_t &y, Double_t &z) const
+                                   const UInt_t c2, 
+                                   Double_t &y, Double_t &z) const
   {
     if(c1==c2){
       throw LArUtilException("Same channel does not intersect!");
@@ -520,7 +559,7 @@ namespace larutil {
 
     bool overlapY_rev = (ValueInRange(start2[1], start1[1], end1[1]) || ValueInRange(end2[1], start1[1], end1[1]));
     bool overlapZ_rev = (ValueInRange(start2[2], start1[2], end1[2]) || ValueInRange(end2[2], start1[2], end1[2]));
-				       
+                                       
     // override y overlap checks if a vertical plane exists:
       if( fWireAngle.at(v1) == TMath::Pi()/2 || fWireAngle.at(v2) == TMath::Pi()/2 ) {
       overlapY     = true;
@@ -533,9 +572,9 @@ namespace larutil {
 
     if(overlapY && overlapZ){
       IntersectionPoint(w1,w2, p1, p2,
-			start1, end1,
-			start2, end2,
-			y, z);
+                        start1, end1,
+                        start2, end2,
+                        y, z);
       return true;
     }
 
@@ -552,10 +591,10 @@ namespace larutil {
   }
   
   void Geometry::IntersectionPoint(const UInt_t  wire1,  const UInt_t  wire2,
-				   const UChar_t plane1, const UChar_t plane2,
-				   Double_t start_w1[3], Double_t end_w1[3],
-				   Double_t start_w2[3], Double_t end_w2[3],
-				   Double_t &y, Double_t &z) const
+                                   const UChar_t plane1, const UChar_t plane2,
+                                   Double_t start_w1[3], Double_t end_w1[3],
+                                   Double_t start_w2[3], Double_t end_w2[3],
+                                   Double_t &y, Double_t &z) const
   {
 
     larlite::geo::View_t v1 = fViewType.at(plane1);
@@ -581,8 +620,8 @@ namespace larutil {
     // special case, one plane is vertical 
     if(angle1 == TMath::Pi()/2 || angle2 == TMath::Pi()/2){
       if(angle1 == TMath::Pi()/2){
-	
-	anglex = (angle2-TMath::Pi()/2);
+        
+        anglex = (angle2-TMath::Pi()/2);
         a = end_w1[2];
         b = end_w1[1];
         c = end_w2[2];
@@ -641,8 +680,8 @@ namespace larutil {
   //    particular algorithm.  Ben J, Oct 2011
   //--------------------------------------------------------------------
   void Geometry::IntersectionPoint(const UInt_t  wire1,  const UInt_t  wire2,
-				   const UChar_t plane1, const UChar_t plane2,
-				   Double_t &y, Double_t &z) const
+                                   const UChar_t plane1, const UChar_t plane2,
+                                   Double_t &y, Double_t &z) const
 
   {
     double WireStart1[3] = {0.};
@@ -654,7 +693,7 @@ namespace larutil {
     this->WireEndPoints(plane2, wire2, WireStart2, WireEnd2);
     this->IntersectionPoint(wire1, wire2, plane1, plane2,
                             WireStart1, WireEnd1, 
-			    WireStart2, WireEnd2, y, z);
+                            WireStart2, WireEnd2, y, z);
   }
 
   UInt_t Geometry::GetClosestOpChannel(const Double_t *xyz) const
@@ -665,14 +704,14 @@ namespace larutil {
     for(size_t ch=0; ch<fOpChannelVtx.size(); ++ch) {
 
       dist2 = 
-	pow(xyz[0] - fOpChannelVtx.at(ch).at(0),2) + 
-	pow(xyz[1] - fOpChannelVtx.at(ch).at(1),2) +
-	pow(xyz[2] - fOpChannelVtx.at(ch).at(2),2); 
-	
+        pow(xyz[0] - fOpChannelVtx.at(ch).at(0),2) + 
+        pow(xyz[1] - fOpChannelVtx.at(ch).at(1),2) +
+        pow(xyz[2] - fOpChannelVtx.at(ch).at(2),2); 
+        
       if( dist2 < min_dist2 ) {
-	
-	min_dist2 = dist2;
-	closest_ch = ch;
+        
+        min_dist2 = dist2;
+        closest_ch = ch;
 
       }
     }
@@ -687,14 +726,14 @@ namespace larutil {
     for(size_t ch=0; ch<fOpChannelVtx.size(); ++ch) {
 
       dist = 
-	pow(xyz[0] - fOpChannelVtx.at(ch).at(0),2) + 
-	pow(xyz[1] - fOpChannelVtx.at(ch).at(1),2) +
-	pow(xyz[2] - fOpChannelVtx.at(ch).at(2),2); 
-	
+        pow(xyz[0] - fOpChannelVtx.at(ch).at(0),2) + 
+        pow(xyz[1] - fOpChannelVtx.at(ch).at(1),2) +
+        pow(xyz[2] - fOpChannelVtx.at(ch).at(2),2); 
+        
       if( dist < min_dist2 ) {
-	
-	min_dist2 = dist;
-	closest_ch = ch;
+        
+        min_dist2 = dist;
+        closest_ch = ch;
 
       }
     }

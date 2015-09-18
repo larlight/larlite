@@ -20,7 +20,7 @@ endif
 #
 # Define directories to be compile upon a global "make"...
 #
-SUBDIRS := AnalysisAlg FANN ClusterRecoUtil MCShowerReco CMTool MCComp NCfilter ShowerReco3D CMToolAna PandoraShower #ADD_NEW_SUBDIR ... do not remove this comment from this line
+SUBDIRS := AnalysisAlg FANN ClusterRecoUtil MCShowerReco CMTool MCComp NCfilter ShowerReco3D CMToolAna  #ADD_NEW_SUBDIR ... do not remove this comment from this line
 
 #####################################################################################
 #

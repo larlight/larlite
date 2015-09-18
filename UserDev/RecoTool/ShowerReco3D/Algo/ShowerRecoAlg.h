@@ -16,6 +16,8 @@
 
 #include "ShowerReco3D/Base/ShowerRecoAlgBase.h"
 #include "ShowerReco3D/Base/ShowerCalo.h"
+#include "LArUtil/GeometryUtilities.h"
+#include "AnalysisAlg/CalorimetryAlg.h"
 
 namespace showerreco {
   
@@ -35,7 +37,10 @@ namespace showerreco {
     virtual ~ShowerRecoAlg(){}
 
     /// Function to reset algorithm, to be called @ beginning of each event
-    virtual void Reset() { ShowerRecoAlgBase::Reset(); }
+    void Reset() { ShowerRecoAlgBase::Reset(); }
+
+    /// Function to reconstruct a shower
+    Shower_t RecoOneShower(const ShowerClusterSet_t& );
 
     /// Function to decide if to use Area or Pulse Amplitude for calculations
     void SetUseArea(bool on) { fUseArea = on; }
@@ -49,16 +54,16 @@ namespace showerreco {
     /// Function to set if to use a linear scale to calculate Energy
     void SetUseLinearEnergy(bool on) { _linearE = on; }
 
-  protected:
-
-    /// Function to reconstruct a shower
-    virtual ::larlite::shower RecoOneShower(const std::vector< ::showerreco::ShowerCluster_t>& );
+    void CaloAlgo(::calo::CalorimetryAlg * c){fCaloAlg = c;}
 
   protected:
 
     larutil::GeometryUtilities  *fGSer;
    
   private:
+
+    /// Calorimetry algorithm
+    ::calo::CalorimetryAlg *fCaloAlg;
 
     /// Boolean -> decide if to use energy correction or not
     bool _Ecorrection;

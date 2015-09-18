@@ -25,6 +25,7 @@ CINTFLAGS += -p
 LDFLAGS += $(shell larlite-config --libs)
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_CMToolBase
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtil
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtilAlg
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_FANN
 LDFLAGS += -L$(LARLITE_LIBDIR) -lfloatfann
 

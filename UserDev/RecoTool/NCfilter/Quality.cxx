@@ -2,6 +2,8 @@
 #define RECOTOOL_FORCEREGIONS_CXX
 
 #include "Quality.h"
+#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/Geometry.h"
 
 namespace cluster {
 
@@ -97,8 +99,8 @@ double time_diff = ( larutil::DetectorProperties::GetME()->GetXTicksOffset(hita.
             std::vector<larutil::PxHit> hitb;
 	   if(Regions[k].first.size()>15 && Regions[k].second.size()>15)
 		{
-           fCRUHelper.GeneratePxHit(Regions[k].first, hits, hita);
-           fCRUHelper.GeneratePxHit(Regions[k].second, hits, hitb);
+           fCRUHelper.GenerateHit2D(Regions[k].first, hits, hita);
+           fCRUHelper.GenerateHit2D(Regions[k].second, hits, hitb);
 
 	
 
@@ -287,11 +289,11 @@ double time_diff = ( larutil::DetectorProperties::GetME()->GetXTicksOffset(hita.
 
         //hit index, all the hits, and the vector of pxf
         if(Regions[0].first.size() > 15 && Regions[0].second.size()>15){
-            fCRUHelper.GeneratePxHit(Regions[0].first, hits, pxfa_v0);
-            fCRUHelper.GeneratePxHit(Regions[0].second, hits, pxfb_v0);
+            fCRUHelper.GenerateHit2D(Regions[0].first, hits, pxfa_v0);
+            fCRUHelper.GenerateHit2D(Regions[0].second, hits, pxfb_v0);
                 if(Regions[1].first.size() > 15 && Regions[1].second.size()>15){
-                    fCRUHelper.GeneratePxHit(Regions[1].first, hits, pxfa_v1);
-                    fCRUHelper.GeneratePxHit(Regions[1].second, hits, pxfb_v1);
+                    fCRUHelper.GenerateHit2D(Regions[1].first, hits, pxfa_v1);
+                    fCRUHelper.GenerateHit2D(Regions[1].second, hits, pxfb_v1);
                 std::cout<< "\t \033[97m  Plane 01:"<<std::endl;
                 double aa = Quality.TimeProf(pxfa_v0,pxfa_v1);
                 double ab = Quality.TimeProf(pxfa_v0,pxfb_v1);
@@ -303,8 +305,8 @@ double time_diff = ( larutil::DetectorProperties::GetME()->GetXTicksOffset(hita.
                                         }//plane 1
 
                 if(Regions[2].first.size() > 15 && Regions[2].second.size()>15){
-                    fCRUHelper.GeneratePxHit(Regions[2].first, hits, pxfa_v2);
-                    fCRUHelper.GeneratePxHit(Regions[2].second, hits, pxfb_v2);
+                    fCRUHelper.GenerateHit2D(Regions[2].first, hits, pxfa_v2);
+                    fCRUHelper.GenerateHit2D(Regions[2].second, hits, pxfb_v2);
                 std::cout<< "\t \033[97m Plane 02:"<<std::endl;
                 double aa = Quality.TimeProf(pxfa_v0,pxfa_v2);
                 double ab = Quality.TimeProf(pxfa_v0,pxfb_v2);
@@ -316,11 +318,11 @@ double time_diff = ( larutil::DetectorProperties::GetME()->GetXTicksOffset(hita.
                                         }//plane 2
                                 }//if plane 0 
         if(Regions[1].first.size() > 15 && Regions[1].second.size()>15){
-                    fCRUHelper.GeneratePxHit(Regions[1].first, hits, pxfa_v1);
-                    fCRUHelper.GeneratePxHit(Regions[1].second, hits, pxfb_v1);
+                    fCRUHelper.GenerateHit2D(Regions[1].first, hits, pxfa_v1);
+                    fCRUHelper.GenerateHit2D(Regions[1].second, hits, pxfb_v1);
                 if(Regions[2].first.size() > 15 && Regions[2].second.size()>15){
-                    fCRUHelper.GeneratePxHit(Regions[2].first, hits, pxfa_v2);
-                    fCRUHelper.GeneratePxHit(Regions[2].second, hits, pxfb_v2);
+                    fCRUHelper.GenerateHit2D(Regions[2].first, hits, pxfa_v2);
+                    fCRUHelper.GenerateHit2D(Regions[2].second, hits, pxfb_v2);
                 std::cout<< "\t \033[97m  Plane 12:"<<std::endl;
                 double aa = Quality.TimeProf(pxfa_v1,pxfa_v2);
                 double ab = Quality.TimeProf(pxfa_v1,pxfb_v2);

@@ -23,9 +23,9 @@ namespace larlite {
   
   bool ClusterMerger::analyze(storage_manager* storage) {
 
-    std::vector<std::vector<larutil::PxHit> > local_clusters;
+    std::vector<std::vector<Hit2D> > local_clusters;
 
-    _cru_helper.GeneratePxHit(storage,_input_producer,local_clusters);
+    _cru_helper.GenerateHit2D(storage,_input_producer,local_clusters);
 
     _merge_helper.Process(local_clusters);
 
@@ -39,6 +39,7 @@ namespace larlite {
     // Initialize the output cluster data product
     if(_output_producer.empty()) _output_producer = Form("merged%s",_input_producer.c_str());
     auto out_cluster_v = storage->get_data<event_cluster>(_output_producer);
+    auto out_event_ass = storage->get_data<event_ass>(out_cluster_v->name());
     if(!out_cluster_v){
       print(msg::kERROR,__FUNCTION__,
 	    Form("Failed initializing the output cluster data product with producer name %s!",_output_producer.c_str()));
@@ -106,7 +107,7 @@ namespace larlite {
       hit_ass.push_back(merged_association);
     }
 
-    auto out_event_ass = storage->get_data<event_ass>(out_cluster_v->name());
+    //auto out_event_ass = storage->get_data<event_ass>(out_cluster_v->name());
     out_event_ass->set_association(out_cluster_v->id(),ev_hits->id(),hit_ass);
     //out_cluster_v->set_association(data::kHit,hit_producer,hit_ass);
     return true;
