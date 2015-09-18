@@ -36,7 +36,7 @@ namespace cmtool {
       Calculate 3d angles from all permutations of the 3 planes.  Weight them according to
 	  charge profile. Choose the 2 best weights and compare those 2 theta and phi 
     */
-    virtual float Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters);
+    virtual float Float(const std::vector<const cluster::cluster_params*> &clusters);
 
 	/**
 		If phi or theta are <360 (or greater than), adjust them to be in a more easily

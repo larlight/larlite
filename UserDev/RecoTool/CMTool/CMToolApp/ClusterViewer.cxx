@@ -2,6 +2,7 @@
 #define RECOTOOL_CLUSTERVIEWER_CXX
 
 #include "ClusterViewer.h"
+#include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
 
 namespace larlite {
 
@@ -123,6 +124,7 @@ bool ClusterViewer::analyze(storage_manager* storage)
 
     hits_charge.at(plane).push_back(h.Integral());
 
+<<<<<<< HEAD
   }//for all hits
 
   // Inform the algorithm about the range
@@ -134,6 +136,28 @@ bool ClusterViewer::analyze(storage_manager* storage)
     if ( _showerColor ) {
       for (int s = 0; s < n_showers; ++s) {
         _algo.AddShowers(i, shower_xy.at(i).at(s));
+=======
+	return true;
+      }
+      
+      if ( _showStartEnd ){
+
+	//for start/end point, need to calculate CPAN
+       	auto hit_index = ass_hit_v[i];
+	::cluster::DefaultParamsAlg _params_alg;
+  ::cluster::cluster_params _params;
+	_cru_helper.GenerateParams( hit_index, ev_hit, _params);
+
+	_params_alg.FillParams(_params);
+
+	std::pair<double,double> cluster_start  ( _params.start_point.w, _params.start_point.t );
+	std::pair<double,double> cluster_end    ( _params.end_point.w,   _params.end_point.t     );
+	
+	_algo.AddCluster(plane,
+			 cluster_hits,
+			 cluster_start,
+			 cluster_end);
+>>>>>>> shower_dev
       }
     }
     else

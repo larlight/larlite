@@ -45,7 +45,7 @@ namespace cmtool {
     /**
        Optional function: called at the beginning of 1st iteration. This is called per event.
      */
-    virtual void EventBegin(const std::vector<cluster::ClusterParamsAlg> &clusters);
+    virtual void EventBegin(const std::vector<cluster::cluster_params> &clusters);
 
     /**
        Optional function: called at the end of event ... after the last merging iteration is over.
@@ -55,7 +55,7 @@ namespace cmtool {
     /**
        Optional function: Called at the beginning of each iteration over possible pairs of clusters
      */
-    virtual void IterationBegin(const std::vector<cluster::ClusterParamsAlg> &clusters);
+    virtual void IterationBegin(const std::vector<cluster::cluster_params> &clusters);
 
     /**
        Optional function: Called at the end of each iteration over possible pairs of clusters
@@ -66,8 +66,8 @@ namespace cmtool {
        Core function: given the CPAN input, return whether a cluster should be
        merged or not.
     */
-    virtual bool Bool(const ::cluster::ClusterParamsAlg &cluster1,
-		      const ::cluster::ClusterParamsAlg &cluster2);
+    virtual bool Bool(const ::cluster::cluster_params &cluster1,
+		      const ::cluster::cluster_params &cluster2);
 
     /**
        Optional function: called after each Merge() function call by CMergeManager IFF

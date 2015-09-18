@@ -12,7 +12,7 @@
 #include "LArUtil/LArUtilBase.h"
 #include "DataFormat/hit.h"
 #include "DataFormat/cluster.h"
-#include "ClusterRecoUtil/ClusterParamsAlg.h"
+#include "ClusterRecoUtil/Base/ClusterParamsAlg.h"
 
 namespace cluster {
   class DivReg{

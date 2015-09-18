@@ -20,7 +20,7 @@ endif
 #
 # Define directories to be compile upon a global "make"...
 #
-SUBDIRS := RawViewer RecoViewer TruthViewer #ADD_NEW_SUBDIR ... do not remove this comment from this line
+SUBDIRS := RawViewer RecoViewer TruthViewer Utils #ADD_NEW_SUBDIR ... do not remove this comment from this line
 
 #####################################################################################
 #
