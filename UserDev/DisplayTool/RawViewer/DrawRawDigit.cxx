@@ -25,8 +25,6 @@ DrawRawDigit::DrawRawDigit() {
 
 }
 
-
-
 bool DrawRawDigit::initialize() {
 
   //
@@ -384,7 +382,6 @@ void DrawRawDigit::correctData() {
         //
 
         // Copy the data to the tgraph so that it can be stored, and set up the branches
-
         if (_save_data) {
           char name[100];
           sprintf(name, "subwaveform_%u_%u", plane, step);
@@ -458,7 +455,6 @@ void DrawRawDigit::correctData() {
   }
 
   return;
-
 
 }
 

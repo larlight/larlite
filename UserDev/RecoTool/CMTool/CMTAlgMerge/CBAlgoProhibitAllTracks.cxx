@@ -48,21 +48,21 @@ namespace cmtool {
   //}
   
   //----------------------------------------------------------------
-  bool CBAlgoProhibitAllTracks::Bool(const ::cluster::ClusterParamsAlg &cluster1,
-			       const ::cluster::ClusterParamsAlg &cluster2)
+  bool CBAlgoProhibitAllTracks::Bool(const ::cluster::cluster_params &cluster1,
+                                     const ::cluster::cluster_params &cluster2)
   //----------------------------------------------------------------
   {
     //return true means don't prohibit these two clusters
-    if(cluster1.GetParams().eigenvalue_principal > _min_EP ||
-       cluster2.GetParams().eigenvalue_principal > _min_EP) 
+    if(cluster1.eigenvalue_principal > _min_EP ||
+       cluster2.eigenvalue_principal > _min_EP) 
       {
-	if(_verbose) 
-	  std::cout<<"Prohibiting clusters with EP's of "
-		   <<cluster1.GetParams().eigenvalue_principal
-		   <<" and "
-		   <<cluster2.GetParams().eigenvalue_principal
-		   <<std::endl;
-	return true;
+        if(_verbose) 
+          std::cout<<"Prohibiting clusters with EP's of "
+                   <<cluster1.eigenvalue_principal
+                   <<" and "
+                   <<cluster2.eigenvalue_principal
+                   <<std::endl;
+        return true;
       }
     return false;
   }

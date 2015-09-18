@@ -15,14 +15,14 @@ namespace cmtool {
   }
 
   //--------------------------------------------------------
-  bool CBAlgoFake::Bool(const ::cluster::ClusterParamsAlg &cluster1,
-			const ::cluster::ClusterParamsAlg &cluster2)
+  bool CBAlgoFake::Bool(const ::cluster::cluster_params &cluster1,
+                        const ::cluster::cluster_params &cluster2)
   //--------------------------------------------------------
   {
-    if(cluster1.GetNHits() && cluster2.GetNHits()) {
+    if(cluster1.hit_vector.size() && cluster2.hit_vector.size()) {
       _ctr++;
       if( (_ctr%64) == 0)
-	_flip = (!_flip);
+        _flip = (!_flip);
       return _flip;
     }
     else return false;

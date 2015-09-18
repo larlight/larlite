@@ -18,18 +18,18 @@ namespace cmtool {
 
   } //end constructor
 
-  bool CBAlgoHighQLineCompat::Bool(const ::cluster::ClusterParamsAlg &cluster1,
-			      const ::cluster::ClusterParamsAlg &cluster2)
+  bool CBAlgoHighQLineCompat::Bool(const ::cluster::cluster_params &cluster1,
+                                   const ::cluster::cluster_params &cluster2)
   {
 
-    size_t hits1     = cluster1.GetHitVector().size();
-    size_t hits2     = cluster2.GetHitVector().size();
+    size_t hits1     = cluster1.hit_vector.size();
+    size_t hits2     = cluster2.hit_vector.size();
     //if don't make hit cut return false
     if ( (hits1 < _min_n_hits) or (hits2 < _min_n_hits) )
       return false;
 
-    auto high_q_hits1 = GetHighQHits(cluster1.GetHitVector(),_frac_hits_to_keep);
-    auto high_q_hits2 = GetHighQHits(cluster2.GetHitVector(),_frac_hits_to_keep);
+    auto high_q_hits1 = GetHighQHits(cluster1.hit_vector,_frac_hits_to_keep);
+    auto high_q_hits2 = GetHighQHits(cluster2.hit_vector,_frac_hits_to_keep);
     
 
     //If for some reason slope can't be computed (fitter fails), just assume these
@@ -41,18 +41,18 @@ namespace cmtool {
     }
     catch (int e){
       if(_debug){
-	std::cout<< "Note: ComputeSlope failed ("<<e<<") so these clusters will not be merged. "
-		 << "Try keeping a higher fraction of the hits." << std::endl;
+        std::cout<< "Note: ComputeSlope failed ("<<e<<") so these clusters will not be merged. "
+                 << "Try keeping a higher fraction of the hits." << std::endl;
       }
       return false;
     }
 
     if (_debug){
       std::cout << "Cluster1:" << std::endl;
-      std::cout << "\t Start: (" << cluster1.GetParams().start_point.w << ", " << cluster1.GetParams().start_point.t << ")" << std::endl; 
+      std::cout << "\t Start: (" << cluster1.start_point.w << ", " << cluster1.start_point.t << ")" << std::endl; 
       std::cout << "\t Slope: "<<slope1<<std::endl;
       std::cout << "Cluster2:" << std::endl;
-      std::cout << "\t Start: (" << cluster2.GetParams().start_point.w << ", " << cluster2.GetParams().start_point.t << ")" << std::endl; 
+      std::cout << "\t Start: (" << cluster2.start_point.w << ", " << cluster2.start_point.t << ")" << std::endl; 
       std::cout << "\t Slope: "<<slope2<<std::endl;
       std::cout << std::endl;
     }
@@ -65,7 +65,7 @@ namespace cmtool {
   } // end Merge function 
   
 
-  double CBAlgoHighQLineCompat::ComputeSlope(const std::vector<larutil::PxHit> &pxhit_vector){
+  double CBAlgoHighQLineCompat::ComputeSlope(const std::vector<Hit2D> &pxhit_vector){
     
     double slope = -1.;
     //Clear all points from the TGraphErrors
@@ -79,7 +79,7 @@ namespace cmtool {
       //      _tge->SetPointError(pt_ctr++,1/pxh.charge,1/pxh.charge);
 
       if(_debug)
-	std::cout<<"Set point "<<pt_ctr<<" to ("<<pxh.w<<","<<pxh.t<<")."<<std::endl;
+        std::cout<<"Set point "<<pt_ctr<<" to ("<<pxh.w<<","<<pxh.t<<")."<<std::endl;
       pt_ctr++;
     }
 
