@@ -9,7 +9,7 @@ class ERViewer (GeoViewer):
         self._holder = ertool.GeoViewerERToolBackend()
         self._cfg_mgr = fcllite.ConfigManager()
         self.set_window_title(name)
-        self.setConfigFile(ertool.kDefaultConfigFileName)
+        self.setConfigFile(ertool.GetDefaultConfigFileName())
 
     def setConfigFile(self, fname):
 

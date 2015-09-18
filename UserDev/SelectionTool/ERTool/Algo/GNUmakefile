@@ -32,6 +32,7 @@ LDFLAGS += -L$(shell root-config --libdir) -lRooFit -lRooFitCore -lRooStats
 #LDFLAGS += $(shell seltool-config --libs)
 LDFLAGS += $(shell basictool-config --libs)
 LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_OpT0FinderAlgorithms
+LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_OpT0PhotonLibrary
 LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_OpT0FinderBase
 LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_ERBase
 LDFLAGS += -L$(LARLITE_LIBDIR) -lTreeGraph_GeoGraph
