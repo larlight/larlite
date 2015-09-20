@@ -4,8 +4,10 @@
 #include "ExampleERSelection.h"
 
 namespace larlite {
-
-  ExampleERSelection::ExampleERSelection() : ERToolAnaBase()
+  
+  ExampleERSelection::ExampleERSelection( const ::ertool::io::StreamType_t in_strm,
+					  const ::ertool::io::StreamType_t out_strm)
+    : ERToolAnaBase(in_strm,out_strm)
   { 
     _name="ExampleERSelection"; 
   }

@@ -17,11 +17,13 @@ namespace ertool {
 			      ::ertool::ParticleGraph *graph_ptr,
 			      bool mc)
     {
+      Debug(__FUNCTION__,"called");
       if(!event_ptr && !graph_ptr)
-	throw ::ertool::ERException("Neither EventData & ParticleGraph provided (nothing to read!)");
-      
+	Exception("Neither EventData & ParticleGraph provided (nothing to read!)");
+
+      std::cout<<_event_tree<< " : " <<_graph_tree<<std::endl;
       if(_event_tree || _graph_tree) 
-	throw ertool::ERException("Output file seems to be open!");
+	Exception("Output file seems to be open!");
 
       std::string event_tree_name = kEVENT_DATA_NAME;
       std::string graph_tree_name = kGRAPH_DATA_NAME;
@@ -40,31 +42,31 @@ namespace ertool {
 	_graph_tree->Branch(Form("%s_branch",graph_tree_name.c_str()),
 			    &graph_ptr);
       }
+      Debug(__FUNCTION__,"done");
       return;
     }
     
     bool ROOTOutput::Open(const std::string& fname)
     {
+      Debug(__FUNCTION__,"called");
       if(_fout) {
-	ertool::msg::send(ertool::msg::kERROR,
-			  "Output file handle is already open!");
+	Error(__FUNCTION__,"Output file handle is already open!");
 	return false;
       }
 
       if(fname.empty()) {
-	ertool::msg::send(ertool::msg::kERROR,
-			  "Cannot open an output with an empty name!");
+	Error("Cannot open an output with an empty name!");
 	return false;
       }
 
       if(!_event_tree && !_graph_tree) {
-	ertool::msg::send(ertool::msg::kERROR,
-			  "Neither EventData nor ParticleGraph trees exist. Call Prepare() before Open!");
+	Error("Neither EventData nor ParticleGraph trees exist. Call Prepare() before Open!");
 	return false;
       }
 
       _fout = TFile::Open(fname.c_str(),"RECREATE");
-	  
+
+      Debug(__FUNCTION__,"done");
       return _fout;
     }
     
@@ -77,6 +79,7 @@ namespace ertool {
     
     bool ROOTOutput::Close(const ::ertool::Provenance& prov)
     {
+      Debug(__FUNCTION__,"called");
       if(_fout) {
 	_fout->cd();
 	if(_event_tree) _event_tree->Write();
@@ -87,6 +90,7 @@ namespace ertool {
       _fout       = nullptr;
       _event_tree = nullptr;
       _graph_tree = nullptr;
+      Debug(__FUNCTION__,"done");
       return true;
     }
   }

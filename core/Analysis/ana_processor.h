@@ -94,10 +94,11 @@ namespace larlite {
     Bool_t process_event(UInt_t index=data::kINVALID_UINT);
     
     /// A method to append analysis class instance. Returns index number.
-    Size_t add_process(ana_base* ana)
+    Size_t add_process(ana_base* ana,bool filter=false)
     {
       _ana_index.insert(std::make_pair(ana,_analyzers.size()));
-      _analyzers.push_back(ana); 
+      _analyzers.push_back(ana);
+      _filter_marker_v.push_back(filter);
       return (*_ana_index.find(ana)).second;
     }
     
@@ -123,6 +124,7 @@ namespace larlite {
     
     std::vector<ana_base*>   _analyzers;  ///< A vector of analysis modules
     std::vector<bool>        _ana_status; ///< A vector of analysis modules' status
+    std::vector<bool>   _filter_marker_v; ///< A vector to mark specific analysis unit as a filter
     std::map<ana_base*,size_t> _ana_index; ///< A map of analysis module status
     
     ProcessFlag_t _process;    ///< Processing status flag

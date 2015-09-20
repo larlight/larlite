@@ -2,6 +2,8 @@
 #define RECOTOOL_CFALGOWIREOVERLAP_CXX
 
 #include "CFAlgoWireOverlap.h"
+#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/Geometry.h"
 #include <algorithm>
 
 namespace cmtool {
@@ -24,7 +26,7 @@ namespace cmtool {
   }
 
   //----------------------------------------------------------------------------------------------
-  float CFAlgoWireOverlap::Float(const std::vector<const cluster::ClusterParamsAlg*> &clusters)
+  float CFAlgoWireOverlap::Float(const std::vector<const cluster::cluster_params*> &clusters)
   //----------------------------------------------------------------------------------------------
   {
 
@@ -51,11 +53,11 @@ namespace cmtool {
     std::vector<std::vector<larutil::PxHit> > Hits(3, std::vector<larutil::PxHit>());
 
     for (size_t c=0; c < clusters.size(); c++)
-      Hits.at( clusters.at(c)->Plane() ) = clusters.at(c)->GetHitVector();
+      Hits.at( clusters.at(c)->plane_id.Plane ) = clusters.at(c)->hit_vector;
 
-    //std::vector<larutil::PxHit> hits0 = clusters.at(0)->GetHitVector();
-    //std::vector<larutil::PxHit> hits1 = clusters.at(1)->GetHitVector();
-    //std::vector<larutil::PxHit> hits2 = clusters.at(2)->GetHitVector();
+    //std::vector<larutil::PxHit> hits0 = clusters.at(0)->hit_vector;
+    //std::vector<larutil::PxHit> hits1 = clusters.at(1)->hit_vector;
+    //std::vector<larutil::PxHit> hits2 = clusters.at(2)->hit_vector;
     
     //Wire Range Vector. Entries 0,1,2 correspond to planes
     std::vector<int> StartWires;

@@ -16,6 +16,7 @@ class geoBase(object):
     self._wire2Cm = 0.4
     self._levels = [ (-15,15), (-10,30) ]
     self._name = "null"
+    self._offset = [0,0]
 
   def nViews(self):
     return self._nViews
@@ -44,6 +45,9 @@ class geoBase(object):
   def name(self):
     return self._name
 
+  def offset(self, plane):
+    return self._offset[plane]
+
 class geometry(geoBase):
 
   def __init__(self):
@@ -54,9 +58,20 @@ class geometry(geoBase):
     self._aspectRatio = self._wire2Cm / self._time2Cm
     self._tRange = larutil.DetectorProperties.GetME().ReadOutWindowSize()
     self._wRange = []
+    self._offset = []
     for v in range(0, self._nViews):
       self._wRange.append(larutil.Geometry.GetME().Nwires(v))   
+    self._defaultColorScheme = []
 
+  def colorMap(self,plane):
+    return self._defaultColorScheme[plane]
+
+      # Set up the correct drift time offset.
+      # Offset is returned in terms of centimeters.
+      self._offset.append(larutil.DetectorProperties.GetME().TriggerOffset()
+                         *larutil.GeometryUtilities.GetME().TimeToCm()
+                         -larutil.Geometry.GetME().PlaneOriginVtx(v)[0])
+    
 
 
 class microboone(geometry):
@@ -66,10 +81,33 @@ class microboone(geometry):
     # and then call the base class __init__
     larutil.LArUtilManager.Reconfigure(fmwk.geo.kMicroBooNE)
     super(microboone, self).__init__()
-    self._levels = [ (-50,200),(-50,200),(-10,100) ]
+    self._levels = [ (-100,10),(-10,100),(-10,100) ]
     # self._colorScheme = 
     self._pedestals = [2000,2000,440]
     self._name = "uboone"
+    self._defaultColorScheme = [({'ticks': [(1, (22, 30, 151, 255)),
+                                             (0.791, (0, 181, 226, 255)), 
+                                             (0.645, (76, 140, 43, 255)), 
+                                             (0.47, (0, 206, 24, 255)), 
+                                             (0.33333, (254,209,65,255)), 
+                                             (0, (255, 0, 0, 255))], 
+                                             'mode': 'rgb'}) ] 
+    self._defaultColorScheme.append({'ticks': [(0, (22, 30, 151, 255)),
+                                             (0.33333, (0, 181, 226, 255)), 
+                                             (0.47, (76, 140, 43, 255)), 
+                                             (0.645, (0, 206, 24, 255)), 
+                                             (0.791, (254,209,65,255)), 
+                                             (1, (255, 0, 0, 255))], 
+                                             'mode': 'rgb'}) 
+    self._defaultColorScheme.append({'ticks': [(0, (22, 30, 151, 255)),
+                                             (0.33333, (0, 181, 226, 255)), 
+                                             (0.47, (76, 140, 43, 255)), 
+                                             (0.645, (0, 206, 24, 255)), 
+                                             (0.791, (254,209,65,255)), 
+                                             (1, (255, 0, 0, 255))], 
+                                             'mode': 'rgb'})
+
+
 
 class argoneut(geometry):
 
@@ -81,7 +119,18 @@ class argoneut(geometry):
     self._levels = [ (-15,60),(-5,80) ]
     self._pedestals = [0,0]
     self._name = "argoneut"
-
+    self._defaultColorScheme = [{'ticks': [(0.0,  (30,  30, 255, 255)),
+                                         (0.15, (30,  30, 255, 255)), 
+                                         (0.6,  (0,  255, 255, 255)), 
+                                         (0.8,  (0,  255, 0,   255)), 
+                                         (1,    (255,  0, 0,   255))], 
+                                         'mode': 'rgb'}]
+    self._defaultColorScheme.append({'ticks': [(0.0,  (30,  30, 255, 255)),
+                                             (0.15, (30,  30, 255, 255)), 
+                                             (0.6,  (0,  255, 255, 255)), 
+                                             (0.8,  (0,  255, 0,   255)), 
+                                             (1,    (255,  0, 0,   255))], 
+                                             'mode': 'rgb'}) 
 class lariat(geometry):
 
   def __init__(self):
@@ -95,6 +144,19 @@ class lariat(geometry):
     self._levels = [ (-20,200),(-20,200) ]
     self._pedestals = [0,0]
     self._name = "lariat"
+    # Make default color schemes here:
+    self._defaultColorScheme = [{'ticks': [(0.0,  (30,  30, 255, 255)),
+                                         (0.15, (30,  30, 255, 255)), 
+                                         (0.6,  (0,  255, 255, 255)), 
+                                         (0.8,  (0,  255, 0,   255)), 
+                                         (1,    (255,  0, 0,   255))], 
+                                         'mode': 'rgb'}]
+    self._defaultColorScheme.append({'ticks': [(0.0,  (30,  30, 255, 255)),
+                                             (0.15, (30,  30, 255, 255)), 
+                                             (0.6,  (0,  255, 255, 255)), 
+                                             (0.8,  (0,  255, 0,   255)), 
+                                             (1,    (255,  0, 0,   255))], 
+                                             'mode': 'rgb'}) 
 
 
 

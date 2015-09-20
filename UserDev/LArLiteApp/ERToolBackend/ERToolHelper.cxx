@@ -1,6 +1,8 @@
 #ifndef LARLITE_ERTOOLHELPER_CXX
 #define LARLITE_ERTOOLHELPER_CXX
 
+#include <TStopwatch.h>
+#include "DataFormat/mcflux.h"
 #include "DataFormat/mctruth.h"
 #include "DataFormat/mcshower.h"
 #include "DataFormat/mctrack.h"
@@ -12,7 +14,7 @@
 #include "DataFormat/calorimetry.h"
 #include "DataFormat/partid.h"
 #include "DataFormat/event_ass.h"
-
+#include "DataFormat/opflash.h"
 #include "ParticleID.h"
 #include "ERToolHelper.h"
 #include "ERTool/Base/UtilFunc.h"
@@ -22,10 +24,11 @@
 
 namespace larlite {
 
-  void ERToolHelper::FillMCInfo( const event_mctruth&   mci_v,
-				 const event_mcshower&  mcs_v,
-				 const event_mctrack&   mct_v,
-				 ::ertool::io::EmptyInput& strm) const
+  void ERToolHelper::FillMCInfo(const event_mcflux&    mcf_v, 
+				const event_mctruth&   mci_v,
+				const event_mcshower&  mcs_v,
+				const event_mctrack&   mct_v,
+				::ertool::io::EmptyInput& strm) const
   {
 
     std::map< ::ertool_helper::ParticleID, ::ertool::NodeID_t > part_list;
@@ -56,8 +59,8 @@ namespace larlite {
 	::ertool::RecoInputID_t in_id(i,mcs_v.name());
 	
 	// Emplace this shower, and get corresponding particle unique ID
-	//nodeID = strm.Emplace( std::move(s), std::move(in_id), true );
-	nodeID = strm.Add( s, in_id, true );
+	nodeID = strm.Emplace( std::move(s), std::move(in_id), true );
+	//nodeID = strm.Add( s, in_id, true );
 
       }else
 
@@ -117,8 +120,8 @@ namespace larlite {
 	::ertool::RecoInputID_t in_id(i,mct_v.name());
 
 	// Emplace a track to EventData
-	// nodeID = strm.Emplace(std::move(t),std::move(in_id),true);
-	nodeID = strm.Add( t, in_id, true);
+	nodeID = strm.Emplace(std::move(t),std::move(in_id),true);
+	//nodeID = strm.Add( t, in_id, true);
 
       }
       
@@ -184,6 +187,33 @@ namespace larlite {
 			     ::geoalgo::Vector(mcp.Trajectory()[0].Momentum())*1.e3 );
 
 	  part_list[id] = p.ID();
+
+	  if(abs(mcp.PdgCode()) == 12 ||
+	     abs(mcp.PdgCode()) == 14){
+	    
+	    int f = &mci-&mci_v[0];
+	    
+	    if(mcf_v.at(f).fndecay == 1 ||
+	       mcf_v.at(f).fndecay == 2 ||
+	       mcf_v.at(f).fndecay == 3 ||
+	       mcf_v.at(f).fndecay == 4) 
+	      p.SetProcess(::ertool::kK0L);
+	    else if(mcf_v.at(f).fndecay == 5 ||
+		    mcf_v.at(f).fndecay == 6 ||
+		    mcf_v.at(f).fndecay == 7 ||
+		    mcf_v.at(f).fndecay == 8 ||
+		    mcf_v.at(f).fndecay == 9 ||
+		    mcf_v.at(f).fndecay == 10)
+	      p.SetProcess(::ertool::kKCharged); 
+	    else if(mcf_v.at(f).fndecay == 11 ||
+		    mcf_v.at(f).fndecay == 12)
+	      p.SetProcess(::ertool::kMuDecay);	
+	    else if(mcf_v.at(f).fndecay == 13 ||
+		    mcf_v.at(f).fndecay == 14)
+	      p.SetProcess(::ertool::kPionDecay);
+	    else{std::cout << "\t\t\tI AIN'T Got NO PROCESSES ";}
+
+	      }
 	  /*
 	  std::cout<<"New Particle..."<<std::endl
 		   <<"PdgCode  : "<<id.PdgCode()<<std::endl
@@ -463,7 +493,8 @@ namespace larlite {
       for(auto& v : t._pid_score) v = 100;
       if(t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
       
-      strm.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
+      strm.Emplace(std::move(t),std::move(ertool::RecoInputID_t(i,mct_v.name())),false);
+      //strm.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
       /*
       strm.GetParticleGraphWriteable().GetParticle(nodeID).SetParticleInfo(mct.PdgCode(),
       ::ertool::ParticleMass(mct.PdgCode()),
@@ -542,14 +573,20 @@ namespace larlite {
     }
     
     for(size_t i=0; i<t_v.size(); ++i)
-      strm.Add(t_v[i],id_v[i]);
+      strm.Emplace(std::move(t_v[i]),std::move(id_v[i]));
+    //strm.Add(t_v[i],id_v[i]);
   }
   
   
   void ERToolHelper::FillShowers ( const event_mcshower& mcs_v,
 				   ::ertool::io::EmptyInput& strm) const
   {
+    strm.ReserveShowerArray(mcs_v.size());
+    double create_time=0;
+    double emplace_time=0;
+    double random_time=0;
 
+    TStopwatch fWatch;
     for(size_t i=0; i<mcs_v.size(); ++i) {
 
       auto const& mcs = mcs_v[i];
@@ -557,19 +594,29 @@ namespace larlite {
       //if(isnan(mcs.DetProfile().Momentum().E())) continue;
       //if(isnan(mcs.DetProfile().Momentum().Px())) continue;
       //if(mcs.DetProfile().Momentum().Mag2() == 0) continue;
+      fWatch.Start();
       ::ertool::Shower s( (mcs.DetProfile().Position() + getXShift(mcs_v[i])),
 			  mcs.DetProfile().Momentum(),
 			  _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
 			  _shrProfiler.ShowerRadius() );
+      create_time += fWatch.RealTime();
       s._energy     = mcs.DetProfile().Momentum().E();
       //s._energy = mcs.Start().Momentum().E();
-      if(mcs.dEdx() == 0){s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));} 
+      
+      if(mcs.dEdx() == 0){
+	fWatch.Start();
+	s._dedx = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
+	random_time+=fWatch.RealTime();
+      } 
       else{s._dedx =  mcs.dEdx();}
       s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
       s._time = mcs_v[i].End().T();
       double mass = 0;
       if (mcs.PdgCode() == 11) { mass = 0.511; }
-      strm.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
+      fWatch.Start();
+      strm.Emplace(std::move(s),std::move(ertool::RecoInputID_t(i,mcs_v.name())),false);
+      emplace_time+=fWatch.RealTime();
+      //strm.Add(s,ertool::RecoInputID_t(i,mcs_v.name()),false);
       /*
       mgr.ParticleGraph().GetParticle(nodeID).SetParticleInfo(mcs.PdgCode(),
 							      mass,
@@ -577,7 +624,11 @@ namespace larlite {
 							      ::geoalgo::Vector(mcs.Start().Momentum()));
       */
     }
-
+    /*
+    std::cout<<"Create  time: "<<create_time<<std::endl;
+    std::cout<<"Random  time: "<<random_time<<std::endl;
+    std::cout<<"Emplace time: "<<emplace_time<<std::endl;
+    */
     return;
   }
 
@@ -603,9 +654,9 @@ namespace larlite {
     ::geoalgo::Vector_t mom(start.Px(),start.Py(),start.Pz());
     auto const& pdg = mcs_v[0].PdgCode();
     strm.GetParticleGraphWriteable().GetParticle(nodes[0]).SetParticleInfo(pdg,
-								      0.,
-								      vtx,
-								      mom);
+									   0.,
+									   vtx,
+									   mom);
     return;
   }
   
@@ -623,10 +674,10 @@ namespace larlite {
     for(size_t i=0; i<shw_v.size(); ++i){
       auto const& shw = shw_v[i];
       id_v.emplace_back(i,shw_v.name());
-      s_v.push_back( ::ertool::Shower(shw.ShowerStart(),
-				      shw.Direction(),
-				      shw.Length(),
-				      _shrProfiler.ShowerRadius()) );
+      s_v.emplace_back( ::ertool::Shower(shw.ShowerStart(),
+					 shw.Direction(),
+					 shw.Length(),
+					 _shrProfiler.ShowerRadius()) );
       auto& s = (*s_v.rbegin());
       if(shw.best_plane()){
 	s._energy = shw.Energy()[shw.best_plane()];
@@ -656,10 +707,32 @@ namespace larlite {
       }
     }
 
+    strm.ReserveShowerArray(s_v.size());
     for(size_t i=0; i<s_v.size(); ++i)
-      strm.Add(s_v[i],id_v[i]);
+      strm.Emplace(std::move(s_v[i]),std::move(id_v[i]));
+      //strm.Add(s_v[i],id_v[i]);
 
     return;
+  }
+
+  void ERToolHelper::FillFlashes ( const event_opflash& flash_v,
+				   ::ertool::io::EmptyInput& strm) const
+  {
+    for(size_t flash_index=0; flash_index<flash_v.size(); ++flash_index) {
+
+      auto const& f = flash_v[flash_index];
+      
+      ::ertool::Flash erflash;
+      erflash._x = 0;
+      erflash._y = f.YCenter();
+      erflash._z = f.ZCenter();
+      erflash._npe_v.reserve(32);
+      for(size_t i=0; i<32; ++i) erflash._npe_v.push_back(f.PE(i));
+      erflash._t = f.Time();
+
+      ::ertool::RecoInputID_t id(flash_index,flash_v.name());
+      strm.Emplace(std::move(erflash),std::move(id));
+    }
   }
 
   TLorentzVector ERToolHelper::getXShift(const mctrack& mct) const {

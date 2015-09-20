@@ -51,23 +51,16 @@ namespace ertool {
     /// Function to evaluate input showers and determine a score
     bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
-    /// Set verbosity
-    void setVerbose(const bool on);
-
     /// set cut on score (score = 1/IP)
     void setMinScore(double s) { _minScore = s; }
 
     /// Set Node Manager
     void setManager(::geotree::Manager* mgr) { _nodeMgr = mgr; }
-    
 
   private:
 
     /// Function to go from ertool RelationType_t to geotree RelationType_t
     ::geotree::RelationType_t GetGeoTreeRelation(RelationType_t rel);
-
-    // verbose flag
-    bool _verbose;
 
     // Algorithm to use to find correlations
     AlgoFindRelationship _findRel;

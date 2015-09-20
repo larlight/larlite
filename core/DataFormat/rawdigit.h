@@ -39,6 +39,13 @@ namespace larlite{
 	     const std::vector<short>& adclist,
 	     raw::Compress_t           compression
 	     );
+#ifndef __CINT__
+    rawdigit(raw::ChannelID_t     channel,
+	     unsigned short       samples,
+	     std::vector<short>&& adclist,
+	     raw::Compress_t      compression
+	     );
+#endif
     /*
     inline rawdigit(unsigned int              channel,
 		    const std::vector<short>& adclist,

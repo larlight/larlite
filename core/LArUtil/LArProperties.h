@@ -59,7 +59,9 @@ namespace larutil {
     
     /// dQ/dX in electrons/cm, returns dE/dX in MeV/cm.
     Double_t BirksCorrection(Double_t dQdX) const;
+    Double_t BirksInverse(Double_t dEdX) const;
     Double_t ModBoxCorrection(Double_t dQdX) const;
+    Double_t ModBoxInverse(Double_t dEdX) const;
     
     Double_t Efield(UInt_t planegap=0) const; ///< kV/cm
 

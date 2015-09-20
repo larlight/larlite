@@ -37,6 +37,9 @@ namespace ertool {
   /// Default (invalid) reco object id
   const RecoID_t  kINVALID_RECO_ID = kSIZE_MAX;
 
+  /// Default (invalid) flash object id
+  const FlashID_t kINVALID_FLASH_ID = kSIZE_MAX;
+
   /// Default (invalid) value for an integer
   const int       kINVALID_INT = kINT_MAX;
 

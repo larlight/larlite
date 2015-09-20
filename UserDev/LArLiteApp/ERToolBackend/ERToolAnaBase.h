@@ -33,7 +33,8 @@ namespace larlite {
   public:
 
     /// Default constructor
-    ERToolAnaBase();
+    ERToolAnaBase( const ::ertool::io::StreamType_t in_strm  = ::ertool::io::kEmptyStream,
+		   const ::ertool::io::StreamType_t out_strm = ::ertool::io::kEmptyStream);
 
     /// Default destructor
     virtual ~ERToolAnaBase(){};
@@ -64,6 +65,11 @@ namespace larlite {
        @brief Add Track producer name & if to use MC or not
      */
     void SetTrackProducer(const bool mc, const std::string prod);
+
+    /**
+       @brief Add Flash producer name (no MC option)
+     */
+    void SetFlashProducer(const std::string prod);
 
     /**
        @brief get EventData that is used by the manager
@@ -98,6 +104,7 @@ namespace larlite {
     std::string _name_mctrk;     ///< MCTrack producer name
     std::string _name_shower;    ///< 3D shower producer name
     std::string _name_track;     ///< 3D track producer name
+    std::string _name_flash;     ///< Flash producer name
     bool _mcshowers; ///< Boolean. True: use MC for Showers
     bool _mctracks;  ///< Boolean. True: use MC for Tracks
     bool _cheater;   ///< Boolean. True: use cheater to get single shower info

@@ -17,14 +17,15 @@ namespace ertool {
 			     ::ertool::ParticleGraph *graph_ptr,
 			     bool mc)
     {
+      Debug(__FUNCTION__,"called");
       if(!event_ptr && !graph_ptr)
-	throw ::ertool::ERException("Neither EventData & ParticleGraph provided (nothing to read!)");
+	Exception("Neither EventData & ParticleGraph provided (nothing to read!)");
       
       if(_event_chain || _graph_chain) {
-	ertool::msg::send(ertool::msg::kWARNING,__FUNCTION__,
-			  "Looks Prepare/Open called beforehand. Re-setting before preparation...");
+	Warning(__FUNCTION__,
+		"Looks Prepare/Open called beforehand. Re-setting before preparation...");
 	if(!(this->Close()))
-	  throw ertool::ERException("Failed to close a file!");
+	  Exception("Failed to close a file!");
       }
       
       std::string event_chain_name = kEVENT_DATA_NAME;
@@ -44,12 +45,13 @@ namespace ertool {
 	_graph_chain->SetBranchAddress(Form("%s_branch",graph_chain_name.c_str()),
 				       &graph_ptr);
       }
+      Debug(__FUNCTION__,"done");
     }
     
     void ROOTInput::AddFile( const std::string& fname )
-    {
+    {      
       if(!_event_chain && !_graph_chain)
-	throw ertool::ERException("Call Prepare before AddFile!");
+	Exception("Call Prepare before AddFile!");
       if(_event_chain) _event_chain->AddFile(fname.c_str());
       if(_graph_chain) _graph_chain->AddFile(fname.c_str());
     }
@@ -59,8 +61,9 @@ namespace ertool {
     
     bool ROOTInput::Open(Provenance& in_prov)
     {
+      Debug(__FUNCTION__,"called");
       if(!_event_chain && !_graph_chain)
-	throw ertool::ERException("Call Prepare & AddFile before Open!");
+	Exception("Call Prepare & AddFile before Open!");
       
       long long int entries = 0;
 
@@ -76,20 +79,20 @@ namespace ertool {
 	entries = _graph_chain->GetEntries();
 	if(entries>0) {
 	  if(_n_entries && entries != _n_entries) {
-	    ertool::msg::send(ertool::msg::kWARNING, __FUNCTION__,
-			      Form("Found mis-match in # entries (EventData %zu vs. ParticleGraph %lld)",
-				   _n_entries,entries)
-			      );
+	    Warning( __FUNCTION__,
+		     Form("Found mis-match in # entries (EventData %zu vs. ParticleGraph %lld)",
+			  _n_entries,entries)
+		     );
 	    if(_n_entries > entries) _n_entries = entries;
-	    ertool::msg::send(ertool::msg::kWARNING, __FUNCTION__,
-			      Form("Setting the smaller one (%zu) to be used as the max # events...",_n_entries)
-			      );
-	  }  
+	    Warning( __FUNCTION__,
+		     Form("Setting the smaller one (%zu) to be used as the max # events...",_n_entries)
+		     );
+	  }
 	}
 	else
 	  delete _graph_chain;
       }
-      
+      Debug(__FUNCTION__,"done");      
       return IsOpen();
     }
     
@@ -97,12 +100,12 @@ namespace ertool {
     {
       if(_graph_entry == entry) return true;
       if(entry >= _n_entries) {
-	ertool::msg::send(ertool::msg::kERROR,__FUNCTION__,
-			  Form("Cannot read entry %zu (does not exist!)",entry));
+	Error(__FUNCTION__,
+	      Form("Cannot read entry %zu (does not exist!)",entry));
 	return false;
       }
       if(!_graph_chain) {
-	ertool::msg::send(ertool::msg::kERROR,__FUNCTION__,"EventData is not registered!");
+	Error(__FUNCTION__,"EventData is not registered!");
 	return false;
       }
       _graph_chain->GetEntry(entry);
@@ -114,12 +117,12 @@ namespace ertool {
     {
       if(_event_entry == entry) return true;
       if(entry >= _n_entries) {
-	ertool::msg::send(ertool::msg::kERROR,__FUNCTION__,
-			  Form("Cannot read entry %zu (does not exist!)",entry));
+	Error(__FUNCTION__,
+	      Form("Cannot read entry %zu (does not exist!)",entry));
 	return false;
       }
       if(!_event_chain) {
-	ertool::msg::send(ertool::msg::kERROR,__FUNCTION__,"EventData is not registered!");
+	Error(__FUNCTION__,"EventData is not registered!");
 	return false;
       }
       _event_chain->GetEntry(entry);
@@ -130,11 +133,13 @@ namespace ertool {
     /// Function to "close" the output stream
     bool ROOTInput::Close()
     {
+      Debug(__FUNCTION__,"called");
       delete _event_chain;
       delete _graph_chain;
       _n_entries   = 0;
       _event_entry = ertool::kINVALID_SIZE;
       _graph_entry = ertool::kINVALID_SIZE;
+      Debug(__FUNCTION__,"done");
       return true;
     }
     

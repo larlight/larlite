@@ -9,6 +9,14 @@ namespace ertool {
     : ::geoalgo::GeoObjCollection()
   {}
 
+
+  void GeoViewerERToolBackend::AcceptPSet(const ::fcllite::PSet& cfg)
+  {
+    auto p = cfg.get_pset("GeoViewerERToolBackend");
+
+    _show_cosmics = p.get<bool>("show_cosmics");
+  }
+
   void GeoViewerERToolBackend::Add( const ::ertool::ParticleGraph& particles,
 				    const ::ertool::EventData& data,
 				    bool randColors) 
@@ -40,11 +48,33 @@ namespace ertool {
       
       auto const& p = particles.GetParticle(node_id);
 
-      if (p.PdgCode() == kINVALID_INT) continue;
-
-      if(part_map_s.find(p.PdgCode()) == part_map_s.end()) 
-	part_map_s.insert(std::make_pair(p.PdgCode(),db_s.GetParticle(p.PdgCode())));
-
+      if (p.PdgCode() == kINVALID_INT){
+	// add only if associated with a cosmic
+	if (p.RecoID() != kINVALID_RECO_ID){
+	  if (p.RecoType() == ::ertool::RecoType_t::kShower){
+	    if (p.ProcessType() == ::ertool::ProcessType_t::kCosmic){
+	      if (_show_cosmics)
+		GeoObjCollection::Add( data.Shower(p.RecoID()), "" , "cyan");
+	      used_obj[ p.RecoType() ][ p.RecoID() ] = true;
+	    }
+	  }
+	  if (p.RecoType() == ::ertool::RecoType_t::kTrack){
+	    if (data.Track(p.RecoID()).size() >= 2){
+	      if (p.ProcessType() == ::ertool::ProcessType_t::kCosmic){
+		if (_show_cosmics)
+		  GeoObjCollection::Add( data.Track(p.RecoID()), "" , "magenta");
+		used_obj[ p.RecoType() ][ p.RecoID() ] = true;
+	      }
+	    }
+	  }
+	}
+      }
+      
+      // if PdgCode is valid
+      else{
+	if(part_map_s.find(p.PdgCode()) == part_map_s.end()) 
+	  part_map_s.insert(std::make_pair(p.PdgCode(),db_s.GetParticle(p.PdgCode())));
+	
 	std::string name="";
 	if(part_map_s[p.PdgCode()]) name = part_map_s[p.PdgCode()]->GetName();
 	if(name.empty()) name = "noname";
@@ -55,7 +85,7 @@ namespace ertool {
 	      GeoObjCollection::Add( data.Shower(p.RecoID()), name , "blue");
 	    if (p.RecoType() == ::ertool::RecoType_t::kTrack){
 	      if (data.Track(p.RecoID()).size() >= 2)
-	      GeoObjCollection::Add( data.Track(p.RecoID()), name, "red");
+		GeoObjCollection::Add( data.Track(p.RecoID()), name, "red");
 	    }
 	  }
 	  used_obj[ p.RecoType() ][ p.RecoID() ] = true;
@@ -64,8 +94,9 @@ namespace ertool {
 	  geoalgo::Vector_t part( p.Vertex() );
 	  GeoObjCollection::Add( part, name, "black" );
 	}
-    }
-
+      }// if PDG code is valid
+    }// for all particle nodes
+    
     // Process all unassociated objects
     // Tracks
     for(size_t trk_index = 0; trk_index < data.Track().size(); ++trk_index) {
@@ -79,10 +110,10 @@ namespace ertool {
       if( !(used_obj[ ::ertool::RecoType_t::kShower ][ shr_index ]) )
 	GeoObjCollection::Add( data.Shower( shr_index ), Form("un-tagged (%zu)",shr_index), shr_col.c_str() );
     }
-
+    
     return;
   }
-
+  
 }
 
 #endif

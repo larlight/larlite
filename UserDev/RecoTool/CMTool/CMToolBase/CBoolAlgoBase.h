@@ -38,9 +38,9 @@ namespace cmtool {
        Core function: given the CPAN input, return whether a cluster should be
        merged or not.
     */
-    virtual bool Bool(const ::cluster::ClusterParamsAlg &cluster1,
-		      const ::cluster::ClusterParamsAlg &cluster2)
-    { if(cluster1.Plane() != cluster2.Plane()) return false;
+    virtual bool Bool(const ::cluster::cluster_params &cluster1,
+                      const ::cluster::cluster_params &cluster2)
+    { if(cluster1.plane_id.Plane != cluster2.plane_id.Plane) return false;
       else return true;
     }
 

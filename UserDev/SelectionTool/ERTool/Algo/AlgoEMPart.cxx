@@ -2,7 +2,7 @@
 #define ERTOOL_ALGOEMPART_CXX
 
 #include "AlgoEMPart.h"
-
+#include <sstream>
 namespace ertool {
 
   AlgoEMPart::AlgoEMPart(const std::string& name) 
@@ -145,19 +145,19 @@ namespace ertool {
     if(p.contains_value("rad_range")) {
       auto darray = p.get<std::vector<double> >("rad_range");
       _radLenVar->setRange( darray[0], darray[1] );
-      std::cout<<"["<<__FUNCTION__<<"] "
-	       << "Loaded distance fit range : "
-	       << _radLenVar->getMin() << " => " << _radLenVar->getMax()
-	       << std::endl;
+      std::stringstream ss;
+      ss << "Loaded distance fit range : "
+	 << _radLenVar->getMin() << " => " << _radLenVar->getMax();
+      Normal(__FUNCTION__,ss.str());
     }
 
     if(p.contains_value("dedx_range")) {
       auto darray = p.get<std::vector<double> >("dedx_range");
       _dEdxVar->setRange( darray[0], darray[1] );
-      std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"Loaded dEdx range : "
-	       << _dEdxVar->getMin() << " => " << _dEdxVar->getMax()
-	       << std::endl;
+      std::stringstream ss;
+      ss <<"Loaded dEdx range : "
+	 << _dEdxVar->getMin() << " => " << _dEdxVar->getMax();
+      Normal(__FUNCTION__,ss.str());
     }
 
     if(p.contains_value("g_params")) {
@@ -180,17 +180,13 @@ namespace ertool {
 
       frac = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_fraction"));
       frac->setVal ( darray[7] );
-      
-      std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"Loaded gamma parameters..." << std::endl;
-      std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"Rad Length       : " << -1./tau->getVal() << " ["<< -1./tau->getMax() <<" => "<< -1./tau->getMin() <<"]" << std:: endl;
-      std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"dEdx Landau mean : " << meanL->getVal() << " sigma : " << sigmaL->getVal() << std::endl
-	       <<"["<<__FUNCTION__<<"] "
-	       <<"dEdx Gaus mean   : " << meanG->getVal() << " sigma : " << sigmaG->getVal() << std::endl
-	       <<"["<<__FUNCTION__<<"] "
-	       <<"Frac: " << frac->getVal() <<std::endl;
+
+      std::stringstream ss;      
+      ss <<"Loaded gamma parameters..." << std::endl
+	 <<"Rad Length       : " << -1./tau->getVal() << " ["<< -1./tau->getMax() <<" => "<< -1./tau->getMin() <<"]" << std:: endl
+	 <<"dEdx Landau mean : " << meanL->getVal() << " sigma : " << sigmaL->getVal() << std::endl
+	 <<"dEdx Gaus mean   : " << meanG->getVal() << " sigma : " << sigmaG->getVal() << std::endl
+	 <<"Frac: " << frac->getVal() <<std::endl;
     }
 
     if(p.contains_value("e_params")) {
@@ -213,16 +209,16 @@ namespace ertool {
       frac = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_fraction"));
       frac->setVal ( darray[7] );
 
-      std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"Loaded electron parameters..." << std::endl;
-      std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"Rad Length       : " << -1./tau->getVal() << " ["<< -1./tau->getMax() <<" => "<< -1./tau->getMin() <<"]" << std:: endl;
-      std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"dEdx Landau mean : " << meanL->getVal() << " sigma : " << sigmaL->getVal() << std::endl;
-      std::cout<<"["<<__FUNCTION__<<"] "
-	       <<"dEdx Gaus mean   : " << meanG->getVal() << " sigma : " << sigmaG->getVal() << std::endl;
+      std::stringstream ss;
+      ss <<"Loaded electron parameters..." << std::endl
+	 <<"Rad Length       : " << -1./tau->getVal() << " ["<< -1./tau->getMax() <<" => "<< -1./tau->getMin() <<"]" << std:: endl
+	 <<"dEdx Landau mean : " << meanL->getVal() << " sigma : " << sigmaL->getVal() << std::endl
+	 <<"dEdx Gaus mean   : " << meanG->getVal() << " sigma : " << sigmaG->getVal() << std::endl;
+      Info(__FUNCTION__,ss.str());
     }
-  }
+    
+  }    
+  
 
   void AlgoEMPart::ProcessBegin()
   {
@@ -285,18 +281,19 @@ namespace ertool {
   bool AlgoEMPart::Reconstruct(const EventData &data, ParticleGraph& graph)
   {
 
-    auto datacpy = data;
-
-    if (_verbose){
-      std::cout << "******************* BEGIN EMPArt Reconstruction  ******************" << std::endl;
-      std::cout << "Number of Showers: " << datacpy.Shower().size() << std::endl;
-      std::cout << "Number of Shower Particles: " << graph.GetParticleNodes(RecoType_t::kShower).size() << std::endl;
+    if (Info()) {
+      std::stringstream ss;
+      ss << std::endl
+	 << "******************* BEGIN EMPArt Reconstruction  ******************" << std::endl
+	 << "Number of Showers: " << data.Shower().size() << std::endl
+	 << "Number of Shower Particles: " << graph.GetParticleNodes(RecoType_t::kShower).size();
+      Info(__FUNCTION__,ss.str());
     }
     
     // Loop through showers
     for (auto const& s : graph.GetParticleNodes(RecoType_t::kShower)){
 
-      auto const& shr = datacpy.Shower(graph.GetParticle(s).RecoID());
+      auto const& shr = data.Shower(graph.GetParticle(s).RecoID());
 
       double dEdx;
       double dist;
@@ -311,7 +308,7 @@ namespace ertool {
 	  // make sure we are not comparing with itself
 	  if (s2 == s) continue;
 	  ::geoalgo::Point_t vtx(3);
-	  auto const& shr2 = datacpy.Shower(graph.GetParticle(s2).RecoID());
+	  auto const& shr2 = data.Shower(graph.GetParticle(s2).RecoID());
 	  double IP = _findRel.FindClosestApproach(shr,shr2,vtx);
 	  if (IP < IPmin){
 	    IPmin = IP;
@@ -322,7 +319,7 @@ namespace ertool {
 	for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)){
 	  // make sure we are not comparing with itself
 	  ::geoalgo::Point_t vtx(3);
-	  auto const& trk = datacpy.Track(graph.GetParticle(t).RecoID());
+	  auto const& trk = data.Track(graph.GetParticle(t).RecoID());
 	  double IP = _findRel.FindClosestApproach(shr,trk,vtx);
 	  if (IP < IPmin){
 	    IPmin = IP;
@@ -374,7 +371,11 @@ namespace ertool {
 	if (vtx != kINVALID_VERTEX)
 	  dist = shr.Start().Dist(vtx);
 	
-	if (_verbose) { std::cout << "dEdx: " << dEdx << "\tdist: " << dist << std::endl; }
+	if (Debug()) {
+	  std::stringstream ss;
+	  ss << "dEdx: " << dEdx << "\tdist: " << dist;
+	  Debug(__FUNCTION__,ss.str());
+	}
 	
 	e_like = LL(true,  dEdx, dist);
 	g_like = LL(false, dEdx, dist);
@@ -457,13 +458,13 @@ namespace ertool {
 					     RooFit::Save(),
 					     RooFit::PrintLevel(-1)
 					     );
-	if (_verbose) { fit_res_radLen->Print(); }
+	if (Info()) { fit_res_radLen->Print(); }
 	fit_res_dEdx   = _g_dEdxPdf->fitTo(*_g_dEdxData, 
 					   RooFit::Range(_g_dedx_fit_range.Min(), _g_dedx_fit_range.Max()), 
 					   RooFit::Save(),
 					   RooFit::PrintLevel(-1)
 					   );
-	if (_verbose) { fit_res_dEdx->Print(); }
+	if (Info()) { fit_res_dEdx->Print(); }
       }
       else{
 	fit_res_radLen = _e_radLenPdf->fitTo(*_e_radLenData,
@@ -471,13 +472,13 @@ namespace ertool {
 					     RooFit::Save(),
 					     RooFit::PrintLevel(-1)
 					     );
-	if (_verbose) { fit_res_radLen->Print(); }
+	if (Info()) { fit_res_radLen->Print(); }
 	fit_res_dEdx   = _e_dEdxPdf->fitTo(*_e_dEdxData, 
 					   RooFit::Range(_e_dedx_fit_range.Min(), _e_dedx_fit_range.Max()), 
 					   RooFit::Save(),
 					   RooFit::PrintLevel(-1)
 					   );
-	if (_verbose) { fit_res_dEdx->Print(); }
+	if (Info()) { fit_res_dEdx->Print(); }
 
       }
 
@@ -486,8 +487,9 @@ namespace ertool {
       auto& params = OutputPSet();
       if (!_mode){
 	RooRealVar *tau, *meanL, *sigmaL, *meanG, *sigmaG, *frac;
-	if (_verbose)
-	  std::cout << "["<<__FUNCTION__<<"] " << Form("Extracted %s_params... ",part_letter.c_str()) << std::endl;
+	std::stringstream ss;
+	ss << Form("Extracted %s_params... ",part_letter.c_str()) << std::endl;
+
 	// radLen
 	tau = (RooRealVar*)(fit_res_radLen->floatParsFinal().find(Form("%s_radLen_tau",part_letter.c_str())));
 	meanL  = (RooRealVar*)(fit_res_dEdx->floatParsFinal().find(Form("%s_Landau_mean",part_letter.c_str())));
@@ -506,16 +508,13 @@ namespace ertool {
 	darray[6] = sigmaG->getVal();
 	darray[7] = frac->getVal();
 	
-	std::cout << "["<<__FUNCTION__<<"] "
-		  << "RadLen: "<< tau->getVal() << " [" << tau->getErrorLo() + tau->getVal()
-		  << " => " << tau->getErrorHi() + tau->getVal() << "]" << std::endl;
-	std::cout << "["<<__FUNCTION__<<"] "
-		  << "dEdx: MeanL: " << meanL->getVal() << " SigmaL: " << sigmaL->getVal() << std::endl;
-	std::cout << "["<<__FUNCTION__<<"] "
-		  << "dEdx: MeanG: " << meanG->getVal() << " SigmaG: " << sigmaG->getVal() << std::endl;
-	std::cout << "["<<__FUNCTION__<<"] "
-		  << "fraction   : " << frac->getVal() << std::endl;
+	ss << "RadLen: "<< tau->getVal() << " [" << tau->getErrorLo() + tau->getVal()
+	   << " => " << tau->getErrorHi() + tau->getVal() << "]" << std::endl
+	   << "dEdx: MeanL: " << meanL->getVal() << " SigmaL: " << sigmaL->getVal() << std::endl
+	   << "dEdx: MeanG: " << meanG->getVal() << " SigmaG: " << sigmaG->getVal() << std::endl
+	   << "fraction   : " << frac->getVal() << std::endl;
 	params.add_value(Form("%s_params",part_letter.c_str()),::fcllite::VecToString<double>(darray));
+	Normal(__FUNCTION__,ss.str());
       }
       if (_mode){
 	RooRealVar *tau, *meanG, *sigmaG, *meanL, *sigmaL, *frac;
@@ -535,15 +534,16 @@ namespace ertool {
 	darray[5] = meanG->getVal();
 	darray[6] = sigmaG->getVal();
 	darray[7] = frac->getVal();
-	std::cout << "["<<__FUNCTION__<<"] "
-		  << "RadLen           : "<< tau->getVal() << " [" << tau->getErrorLo() + tau->getVal()
-		  << " => " << tau->getErrorHi() + tau->getVal() << "]" << std::endl
-		  << "["<<__FUNCTION__<<"] "
-		  << "dEdx: Landau Mean: " << meanL->getVal() << " Sigma: " << sigmaL->getVal() << std::endl 
-		  << "["<<__FUNCTION__<<"] "
-		  << "dEdx: Gauss  Mean: " << meanG->getVal() << " Sigma: " << sigmaG->getVal() << std::endl
-		  << "["<<__FUNCTION__<<"] "
-		  << "fraction         : " << frac->getVal() << std::endl;
+	std::stringstream ss;
+	ss << "RadLen           : "<< tau->getVal() << " [" << tau->getErrorLo() + tau->getVal()
+	   << " => " << tau->getErrorHi() + tau->getVal() << "]" << std::endl
+	   << "["<<__FUNCTION__<<"] "
+	   << "dEdx: Landau Mean: " << meanL->getVal() << " Sigma: " << sigmaL->getVal() << std::endl 
+	   << "["<<__FUNCTION__<<"] "
+	   << "dEdx: Gauss  Mean: " << meanG->getVal() << " Sigma: " << sigmaG->getVal() << std::endl
+	   << "["<<__FUNCTION__<<"] "
+	   << "fraction         : " << frac->getVal() << std::endl;
+	Normal(__FUNCTION__,ss.str());
 	params.add_value(Form("%s_params",part_letter.c_str()),::fcllite::VecToString(darray));
       }
       
@@ -713,14 +713,64 @@ namespace ertool {
     } // if verbose then plot the likelyhoods
     
     // Print How many of each kind were found
-    if (_verbose) {
-      std::cout << "******************************************" << std::endl
-		<< "Total Showers scanned            : " << _e_dEdxData->numEntries() + _g_dEdxData->numEntries() << std::endl
-		<< "Total Electron Showers identified: " << _e_dEdxData->numEntries() << std::endl
-		<< "Total Photon Showers identified  : " << _g_dEdxData->numEntries() << std::endl
-		<< "******************************************" << std::endl;
+    if (Info()) {
+      std::stringstream ss;
+      ss << std::endl
+	 << "******************************************" << std::endl
+	 << "Total Showers scanned            : " << _e_dEdxData->numEntries() + _g_dEdxData->numEntries() << std::endl
+	 << "Total Electron Showers identified: " << _e_dEdxData->numEntries() << std::endl
+	 << "Total Photon Showers identified  : " << _g_dEdxData->numEntries() << std::endl
+	 << "******************************************" << std::endl;
+      Info(__FUNCTION__,ss.str());
     }
     
+  }
+
+  void AlgoEMPart::Show() const {
+    
+    // Plot a bunch of stuff!
+    RooPlot* frame_radLen = nullptr;
+    RooPlot* frame_dEdx   = nullptr;
+    
+    frame_radLen = _radLenVar->frame();
+    frame_dEdx   = _dEdxVar->frame();
+      
+    _g_dEdxPdf->plotOn(frame_dEdx,RooFit::LineColor(kRed));
+    _e_dEdxPdf->plotOn(frame_dEdx,RooFit::LineColor(kBlue));
+    _g_radLenPdf->plotOn(frame_radLen,RooFit::LineColor(kRed));
+    _e_radLenPdf->plotOn(frame_radLen,RooFit::LineColor(kBlue));
+
+    TCanvas *c1 = new TCanvas("c1","",600,500);
+    c1->SetRightMargin(0.08);
+    c1->SetLeftMargin(0.13);
+    c1->SetBottomMargin(0.13);
+    c1->SetTitle("Distance PDF");
+    frame_radLen->Draw();
+    frame_radLen->SetNameTitle("Radiation Length PDF (red=gamma,blue=electron)",
+			       "Radiation Length PDF (red=gamma,blue=electron)");
+    frame_radLen->SetXTitle("Distance from Shower Origin [cm]");
+    frame_radLen->SetYTitle("Number of Showers");
+    frame_radLen->SetTitleFont(50,"X");
+    frame_radLen->SetTitleFont(50,"Y");
+    c1->SetLogy(1);
+    c1->Draw();
+    c1->SaveAs("RadLength.png");
+
+    TCanvas *c2 = new TCanvas("c2","",600,500);
+    c2->SetRightMargin(0.08);
+    c2->SetLeftMargin(0.13);
+    c2->SetBottomMargin(0.13);
+    c2->SetTitle("dEdx Selection");
+    frame_dEdx->Draw();
+    frame_dEdx->SetNameTitle("dE/dx PDF (red=gamma,blue=electron)",
+			     "dE/dx PDF (red=gamma,blue=electron)");
+    frame_dEdx->SetXTitle("dE/dx [MeV/cm]");
+    frame_dEdx->SetYTitle("Number of Showers");
+    frame_dEdx->SetTitleFont(50,"X");
+    frame_dEdx->SetTitleFont(50,"Y");
+    c2->Draw();
+    c2->SaveAs("dEdx.png");
+
   }
   
 }

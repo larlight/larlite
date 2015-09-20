@@ -19,7 +19,7 @@
 #include <vector>
 #include "LArUtil/LArUtilBase.h"
 #include "LArUtil/PxUtils.h"
-#include "ClusterRecoUtil/ClusterParamsAlg.h"
+#include "ClusterRecoUtil/Base/ClusterParamsAlg.h"
 
 namespace cluster {
   /**

@@ -43,8 +43,9 @@ namespace geoalgo {
     //
     // Getters
     //
-    double Length()        const; ///< The summed-length along all trajectory points
-    Vector Dir(size_t i=0) const; ///< The direction at a specified trajectory point
+    double Length()         const; ///< The summed-length along all trajectory points
+    bool   IsLonger(double) const; ///< Check if the trajectory is longer than specified value
+    Vector Dir(size_t i=0)  const; ///< The direction at a specified trajectory point
 
     //
     // Setters

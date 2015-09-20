@@ -18,7 +18,7 @@
 #pragma link C++ namespace ertool+;
 #pragma link C++ namespace ertool::io+;
 #pragma link C++ namespace ertool::msg+;
-#pragma link C++ class ertool::msg::Message+;
+#pragma link C++ class ertool::MessageUtil+;
 #pragma link C++ class ertool::RangeVar+;
 //#pragma link C++ class ertool::Params+;
 //#pragma link C++ class ertool::Record+;
@@ -43,7 +43,7 @@
 #pragma link C++ class ertool::PdfFactory+;
 
 #pragma link C++ function ertool::Combination(const size_t,const size_t)+;
-
+#pragma link C++ function ertool::GetDefaultConfigFileName()+;
 #pragma link C++ class ertool::io::IOHandler+;
 #pragma link C++ class ertool::io::EmptyInput+;
 #pragma link C++ class ertool::io::EmptyOutput+;

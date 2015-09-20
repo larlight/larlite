@@ -40,37 +40,15 @@ class viewport(pg.GraphicsLayoutWidget):
     # each drawer contains its own color gradient and levels
     # this class can return a widget containing the right layout for everything
     # Define some color collections:
-    self._blankMapCollection    = {'ticks': [(0, (243, 243, 243, 255)), 
-                                             (1, (243, 243, 243, 255))], 
-                                             'mode': 'rgb'}
-    self._daqColorMapCollection = {'ticks': [(0.0,  (30,  30, 255, 255)),
-                                             (0.15, (30,  30, 255, 255)), 
-                                             (0.6,  (0,  255, 255, 255)), 
-                                             (0.8,  (0,  255, 0,   255)), 
-                                             (1,    (255,  0, 0,   255))], 
-                                             'mode': 'rgb'}
-    # self._colorMapCollection    = {'ticks': [(0, (30, 30, 255, 255)),
-    #                                          (0.33333, (0, 255, 255, 255)), 
-    #                                          (0.66666, (255,255,100,255)), 
-    #                                          (1, (255, 0, 0, 255))], 
-    #                                          'mode': 'rgb'}
-    self._colorMapCollection    = {'ticks': [(0, (22, 30, 151, 255)),
-                                             (0.33333, (0, 181, 226, 255)), 
-                                             (0.47, (76, 140, 43, 255)), 
-                                             (0.645, (0, 206, 24, 255)), 
-                                             (0.791, (254,209,65,255)), 
-                                             (1, (255, 0, 0, 255))], 
-                                             'mode': 'rgb'}
+
+
+    self._colorMap = self._geometry.colorMap(self._plane)
+
 
     self._cmap = pg.GradientWidget(orientation='right')
+    self._cmap.restoreState(self._colorMap)
     self._cmap.sigGradientChanged.connect(self.refreshGradient)
     self._cmap.resize(1,1)
-
-    self._blankMap = pg.GradientWidget()
-    self._blankMap.restoreState(self._blankMapCollection)
-
-    self._cmap.restoreState(self._colorMapCollection)
-    self._item.setLookupTable(self._cmap.getLookupTable(255))
 
     # These boxes control the levels.
     self._upperLevel = QtGui.QLineEdit()
@@ -104,8 +82,7 @@ class viewport(pg.GraphicsLayoutWidget):
     self._lowerLevel.setText(str(self._geometry.getLevels(self._plane)[0]))
     self._upperLevel.setText(str(self._geometry.getLevels(self._plane)[1]))
 
-    self._cmap.restoreState(self._colorMapCollection)
-    # self._item.setLookupTable(self._cmap.getLookupTable(255))
+    self._cmap.restoreState(self._colorMap)
 
   def mouseDrag(self):
     print "mouse was dragged"
@@ -144,7 +121,7 @@ class viewport(pg.GraphicsLayoutWidget):
       message.append(str(int(self.q.x())))
     if self._cmSpace:
       message.append(", Y: ")
-      message.append("{0:.1f}".format(self.q.y()*self._geometry.time2cm()))
+      message.append("{0:.1f}".format(self.q.y()*self._geometry.time2cm() - self._geometry.offset(self._plane)))
     else:
       message.append(", T: ")
       message.append(str(int(self.q.y())))
@@ -217,7 +194,6 @@ class viewport(pg.GraphicsLayoutWidget):
 
   def drawBlank(self):
     self._item.clear()
-    # self._item.setLookupTable(self._blankMap.getLookupTable(255))
     self._cmap.setVisible(False)
     self._upperLevel.setVisible(False)
     self._lowerLevel.setVisible(False)

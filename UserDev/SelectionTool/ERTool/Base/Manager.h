@@ -22,6 +22,7 @@
 #include "ParticleGraph.h"
 #include "IOHandler.h"
 #include "FhiclLite/ConfigManager.h"
+#include "MessageUtil.h"
 #include <TStopwatch.h>
 namespace ertool {
 
@@ -57,7 +58,7 @@ namespace ertool {
 
 
   */
-  class Manager{
+  class Manager : public MessageUtil {
     
   public:
     enum ManagerStatus_t {

@@ -21,6 +21,7 @@
 #include "EMShowerTools/EMShowerProfile.h"
 #include "ERTool/Base/ParticleGraph.h"
 #include "ERTool/Base/EventData.h"
+#include "FhiclLite/PSet.h"
 
 namespace ertool {
 
@@ -40,10 +41,16 @@ namespace ertool {
     void Add(const ParticleGraph& particles,
 	     const EventData& data,
 	     bool randColors);
+    
+    /// Function to accept fclite::PSet
+    virtual void AcceptPSet(const ::fcllite::PSet& cfg);
 
   private:
     
     EMShowerProfile _shrProfiler;
+
+    // show cosmics?
+    bool _show_cosmics;
     
   };
 }

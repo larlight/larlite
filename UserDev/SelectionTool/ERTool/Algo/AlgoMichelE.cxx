@@ -2,7 +2,7 @@
 #define ERTOOL_ALGOMICHELE_CXX
 
 #include "AlgoMichelE.h"
-
+#include <sstream>
 namespace ertool {
 
   size_t n_michel_e = 0;
@@ -19,8 +19,6 @@ namespace ertool {
     _minMuonLength = 10;
     _maxDistance   = 3;
 
-    // set verbosity to be off by default
-    _verbose = false;
   }
 
   void AlgoMichelE::ProcessEnd(TFile* fout){
@@ -114,12 +112,15 @@ namespace ertool {
 	      graph.SetParentage(t,p);
 
 	      // finally, if in verbose mode, cout some info
-	      if (_verbose){
-		std::cout << "We found a michel electron!" << std::endl
-			  << "Track end point: " << trackEnd << std::endl
-			  << "Shower start point: " << shwrStart << std::endl
-			  << "Shower energy: " << shower._energy << " [MeV]" << std::endl
-			  << std::endl;
+	      if (Debug()){
+		std::stringstream ss;
+		ss << std::endl
+		   << "We found a michel electron!" << std::endl
+		   << "Track end point: " << trackEnd << std::endl
+		   << "Shower start point: " << shwrStart << std::endl
+		   << "Shower energy: " << shower._energy << " [MeV]" << std::endl
+		   << std::endl;
+		Debug(__FUNCTION__,ss.str());
 	      }
 	      
 	      // fill histogram with michel electron energy

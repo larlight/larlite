@@ -60,9 +60,6 @@ namespace ertool {
 
     void InitializeHistos();
    
-    /// set verbosity flag
-    void setVerbose(bool on) { _verbose = on; }
-
     /*
     /// Function to set minumum required length for a muon track
     void setMinMuonLength(double l) { _minMuonLength = l; }
@@ -90,9 +87,6 @@ namespace ertool {
     double _minMuonLength;
     double _maxDistance;
     */
-
-    // verbosity flag
-    bool _verbose;
 
     TTree* _algoPid_tree ;
     int _part_pid         ;
