@@ -7,7 +7,10 @@
 #include "DataFormat/partid.h"
 namespace larlite {
 
-  ERToolAnaBase::ERToolAnaBase() : ana_base()
+  ERToolAnaBase::ERToolAnaBase( const ::ertool::io::StreamType_t in_strm,
+				const ::ertool::io::StreamType_t out_strm)
+    : ana_base()
+    , _mgr(in_strm,out_strm)
   { 
     _name="ERToolAnaBase";
     //MCProducer("generator","mcreco");
