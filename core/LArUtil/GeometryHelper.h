@@ -173,7 +173,13 @@ public:
 
     float Slope_3Dto2D(const TVector3 & inputVector, unsigned int plane) const ;
 
-    float Slope_Proj(const TVector3 & inputVector, unsigned int plane) const ;
+    /**
+     * @brief Given a 3D line get the 3D vector that is the projection of that line on a plane
+     * @param inputVector -> input vector oriented in 3D space
+     * @param planeNormal -> normal to the plane on which we want to project the line
+     * @return TVector3   -> the projected line on the plane (not normalized to unit-length)
+     */
+    TVector3 Project_3DLine_OnPlane(const TVector3& inputVector, const TVector3& planeNormal) const ;
 
     /**
      * @brief Calculate the shortest distance between a line and a point in 2D

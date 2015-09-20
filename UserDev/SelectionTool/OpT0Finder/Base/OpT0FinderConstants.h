@@ -4,6 +4,8 @@
 #include <utility>
 #include <climits>
 #include <limits>
+#include <cstdlib>
+
 namespace flashana {
 
   /// Utility: invalid value for double 
