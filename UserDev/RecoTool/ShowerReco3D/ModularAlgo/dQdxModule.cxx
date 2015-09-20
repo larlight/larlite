@@ -18,8 +18,11 @@ namespace showerreco{
     if (_tree) delete _tree;
     _tree = new TTree(_name.c_str(),"dQdx Info Tree");
     _tree->Branch("_n_hits",&_n_hits,"n_hits/I");
+    _tree->Branch("_shrs_w",&_shrs_w,"shrs_w/D");
+    _tree->Branch("_shrs_t",&_shrs_t,"shrs_t/D");
     _tree->Branch("_length",&_length,"length/D");
     _tree->Branch("_pl",&_pl,"pl/I");
+    _tree->Branch("_pitch",&_pitch,"pitch/D");
     _tree->Branch("_dQ",&_dQ,"dQ/D");    
     _tree->Branch("_dQdx",&_dQdx,"dQdx/D");
     _tree->Branch("_dQdx_pitch",&_dQdx_pitch,"dQdx_p/D");
@@ -82,14 +85,18 @@ namespace showerreco{
       int n_hits = hits.size();
       double dQdx, dQdx_pitch =0;
       double factor;
+      
       _n_hits =n_hits;
       _pl = pl;
-      if (_verbose) std::cout<<"now1_pl="<<_pl<<"\n";
+      _pitch = pitch;
+      if (_verbose) std::cout<<"pitch="<<pitch<<"\n";
       factor = pitch/0.3;
       _length = trunk_length;
       dx[pl]=trunk_length;
       dx_p[pl]=trunk_length*factor;
-
+      _shrs_w=shr_start.w;
+      _shrs_t=shr_start.t;
+      
       if (_verbose)
 	std::cout << "trunk length for plane " << pl << " is " << trunk_length << std::endl;
 
@@ -99,16 +106,16 @@ namespace showerreco{
 			  (hits[i].t-start.t)*(hits[i].t-start.t));
 	dx[pl]=hit_length;
 
-	if (trunk_length>=4){
+	//	if (trunk_length>=2.4){
 	  if (hit_length<trunk_length){
 	    double Q = hits[i].charge * _charge_conversion;
 	    dQ[pl] += Q;
 	  }
-	} 
-	else if(hit_length<4){
-	  double Q = hits[i].charge * _charge_conversion;
-	  dQ[pl] += Q;
-	}
+	  //	} 
+	//else if(hit_length<2.4){
+	// double Q = hits[i].charge * _charge_conversion;
+	//  dQ[pl] += Q;
+	//	}
       }
       dQdx=dQ[pl]/trunk_length;
       dQdx_pitch=dQ[pl]/(trunk_length*factor);
@@ -119,8 +126,9 @@ namespace showerreco{
 
       resultShower.fdQdx[pl] = dQdx;
       
-      if (_verbose) std::cout<<"now2_pl="<<_pl<<"\n";
-      if (trunk_length>0) _tree->Fill();
+      if (_verbose) std::cout<<"_pitch="<<_pitch<<"\n";
+      //if (trunk_length>0)
+      _tree->Fill();
       if (_verbose) std::cout<<"now3_pl="<<_pl<<"\n";
     }
 

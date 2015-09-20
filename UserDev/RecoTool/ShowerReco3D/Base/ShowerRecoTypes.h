@@ -42,6 +42,7 @@ namespace showerreco {
     std::vector< double > fSigmaTotalEnergy;    ///< Calculated Energy per each plane
     std::vector< double > fdEdx;                ///< Calculated dEdx per each plane
     std::vector< double > fdQdx;                ///< Calculated dQdx per each plane [ADC/cm]
+    size_t fBestdQdxPlane;                      ///< Best plane for dQdx calculation
     std::vector< std::vector < double > > fHitdQdx_v;      ///< Hit-by-hit dQdx per each plane [ADC/cm]
     double fBestdQdx;                           ///< Selects dQdx with the longest ShoweringLength [ADC/cm]
     std::vector< double > fShoweringLength;     ///< Calculates the distance from start to shower points [in cm]

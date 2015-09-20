@@ -92,7 +92,7 @@ bool DrawRawDigit::analyze(larlite::storage_manager* storage) {
   subrun = RawDigitHandle->subrun();
   event = RawDigitHandle->event_id();
 
-  float rmsMinBadWire = 2.0 * 2.0;
+  float rmsMinBadWire = 1.5 * 1.5;
   float rmsMaxBadWire = 100 * 100;
 
   badWireMapByPlane.resize(geoService->Nplanes());
@@ -504,16 +504,16 @@ float DrawRawDigit::getMedian(std::vector<float> & vals) {
   // return max->first;
   ////Old style:
   // Calculate the median:
-    sort(vals.begin(), vals.end());
-    float median = 0;
-    if (vals.size() % 2 == 0){
-      median =  0.5* vals.at(vals.size()/2)
-              + 0.5* vals.at(vals.size()/2 -1);
-    }
-    else{
-      median = vals.at((int)vals.size()/2);
-    }
-    return median;            
+  sort(vals.begin(), vals.end());
+  float median = 0;
+  if (vals.size() % 2 == 0) {
+    median =  0.5 * vals.at(vals.size() / 2)
+              + 0.5 * vals.at(vals.size() / 2 - 1);
+  }
+  else {
+    median = vals.at((int)vals.size() / 2);
+  }
+  return median;
 }
 }
 #endif
