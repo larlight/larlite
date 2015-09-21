@@ -28,7 +28,7 @@ def energy_asym_plot(df):
 	entriesY, bin_edgesY, patchesY = plt.hist(eresY,bins=bins,label='Y',alpha=0.5,color='r',edgecolor=None)
 	params, errors = getGaussFit(entriesY,bin_edgesY)
 	plt.plot(curvebins,gauss(curvebins,*params),'r-',lw=3,label='Y plane: mu = %.02f sigma = %.02f'%(params[1],params[2]))
-	plt.grid()
+	plt.grid(True)
 	plt.legend(loc=2)
 	return fig
 
@@ -45,7 +45,7 @@ def anglediff_3d_plot(df):
 	angular_res = df['mc_reco_anglediff']
 	bins = np.linspace(0,180,100)
 	plt.hist(angular_res,bins,edgecolor=None)
-	plt.grid()
+	plt.grid(True)
 	plt.title('3D Direction MC - Reco angular difference')
 	plt.xlabel('3D Angle Difference [degrees]')
 	plt.ylabel('Counts')
@@ -60,9 +60,32 @@ def dEdx_plot(df):
 	plt.hist(dedx_u,bins=bins,edgecolor=None,alpha=0.5,color='b',label='U Plane')
 	plt.hist(dedx_v,bins=bins,edgecolor=None,alpha=0.5,color='g',label='V Plane')
 	plt.hist(dedx_y,bins=bins,edgecolor=None,alpha=0.5,color='r',label='Y Plane')
-	plt.grid()
+	plt.grid(True)
 	plt.legend(loc=2)
 	plt.title('dE/dx [ MeV/cm ] in each Plane')
 	plt.xlabel('dE/dx [ MeV / cm ]')
 	plt.ylabel('Count')
 	return fig
+
+def reco_efficiency_vsenergy_plot(df):
+	fig = plt.figure(figsize=(10,6))
+	plt.grid(True)
+	binmin, binmax, binwidth = 0, 1000, 100
+	bins = np.arange(binmin, binmax, binwidth)
+	effs_x = np.arange(binmin + (binwidth/2), binmax-binwidth, binwidth)
+	effs_y = np.zeros(len(effs_x))
+	errs_y = np.zeros(len(effs_x))
+	for i in xrange(len(bins)-1):
+		this_df = df.query('mcs_E > %d and mcs_E < %d' % (bins[i], bins[i+1]))
+		effs_y[i] = float(np.sum(this_df['n_recoshowers']))/np.sum(this_df['n_mcshowers'])
+		errs_y[i] = np.sqrt(effs_y[i]*(1-effs_y[i])/np.sum(this_df['n_mcshowers']))
+	plt.errorbar(effs_x,effs_y, yerr=errs_y, color='blue', linestyle = ':', marker='*', mfc='blue', mec='blue', label='Shower Reco Efficiency')
+	plt.legend(loc=4)
+	plt.title('Shower Reconstruction Efficiency vs True Shower Deposited Energy')
+	plt.xlabel('True Shower Deposited Energy [MeV]')
+	plt.ylabel('N Reco Showers / N True Showers per bin')
+	return fig
+
+
+
+
