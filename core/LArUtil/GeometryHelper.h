@@ -173,7 +173,37 @@ public:
 
     float Slope_3Dto2D(const TVector3 & inputVector, unsigned int plane) const ;
 
-    float Slope_Proj(const TVector3 & inputVector, unsigned int plane) const ;
+    /**
+     * @brief Given a 3D line get the 3D vector that is the projection of that line on a plane
+     * @param inputVector -> input vector oriented in 3D space
+     * @param planeNormal -> normal to the plane on which we want to project the line
+     * @return TVector3   -> the projected line on the plane (not normalized to unit-length)
+     */
+    TVector3 Project_3DLine_OnPlane(const TVector3& inputVector, const TVector3& planeNormal) const ;
+
+    /**
+     * @brief Given a 3D line get the 3D vector that is the projection of that line on a plane
+     * @param inputVector -> input vector oriented in 3D space
+     * @param pl          -> uboone plane number (0,1,2) in (w,t)
+     * @return TVector3   -> the projected line on the plane (not normalized to unit-length)
+     */
+    TVector3 Project_3DLine_OnPlane(const TVector3& inputVector, const int& pl) const ;
+
+    /**
+     * @brief Given a 3D line get the 3D vector that is the projection of that line on a plane
+     * @param V -> input vector oriented in 3D space
+     * @param N -> normal to the plane on which we want to project the line
+     * @return std::vector<double>   -> the projected line on the plane (not normalized to unit-length)
+     */
+    std::vector<double> Project_3DLine_OnPlane(const std::vector<double>& V, const std::vector<double>& N) const ;
+
+    /**
+     * @brief Given a 3D line get the 3D vector that is the projection of that line on a plane
+     * @param V -> input vector oriented in 3D space
+     * @param pl          -> uboone plane number (0,1,2) in (w,t)
+     * @return std::vector<double> -> the projected line on the plane (not normalized to unit-length)
+     */
+    std::vector<double> Project_3DLine_OnPlane(const std::vector<double>& V, const int& pl) const ;
 
     /**
      * @brief Calculate the shortest distance between a line and a point in 2D
