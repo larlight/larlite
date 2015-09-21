@@ -49,6 +49,10 @@ bool DrawHit::analyze(larlite::storage_manager* storage) {
     _dataByPlane.at(p).clear();
     _dataByPlane.at(p).reserve(hitHandle -> size());
     _maxCharge.at(p) = 0.0;
+    _wireRange.at(p).first  = 99999;
+    _timeRange.at(p).first  = 99999;
+    _timeRange.at(p).second = -1.0;
+    _wireRange.at(p).second = -1.0;
   }
 
 
@@ -63,6 +67,19 @@ bool DrawHit::analyze(larlite::storage_manager* storage) {
           hit.PeakAmplitude()));
     if (_dataByPlane.at(view).back()._charge > _maxCharge.at(view))
       _maxCharge.at(view) = _dataByPlane.at(view).back()._charge;
+    // Check the auto range values:
+    if (_dataByPlane.at(view).back().wire() < _wireRange.at(view).first) {
+      _wireRange.at(view).first = _dataByPlane.at(view).back().wire();
+    }
+    if (_dataByPlane.at(view).back().wire() > _wireRange.at(view).second) {
+      _wireRange.at(view).second = _dataByPlane.at(view).back().wire();
+    }
+    if (_dataByPlane.at(view).back().time() < _timeRange.at(view).first) {
+      _timeRange.at(view).first = _dataByPlane.at(view).back().time();
+    }
+    if (_dataByPlane.at(view).back().time() > _timeRange.at(view).second) {
+      _timeRange.at(view).second = _dataByPlane.at(view).back().time();
+    }
     // wireByPlane -> at(view).push_back(hit.WireID().Wire);
     // hitStartByPlane -> at(view).push_back(hit.PeakTime() - hit.RMS());
     // hitEndByPlane -> at(view).push_back(hit.PeakTime() + hit.RMS());
@@ -71,6 +88,24 @@ bool DrawHit::analyze(larlite::storage_manager* storage) {
 
 
   return true;
+}
+
+float DrawHit::maxCharge(size_t p) {
+  if (p >= geoService->Nviews() ) {
+    std::cerr << "ERROR: Request for nonexistent plane " << p << std::endl;
+    return 1.0;
+  }
+  else {
+    try {
+      return _maxCharge.at(p);
+    }
+    catch (const std::exception& e) {
+      std::cerr << e.what() << '\n';
+      return 1.0;
+    }
+  }
+
+
 }
 
 bool DrawHit::finalize() {

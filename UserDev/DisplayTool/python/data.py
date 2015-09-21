@@ -173,20 +173,21 @@ class hit(recoBase):
       thisPlane = view.plane()
       # First get the hit information:
       hits = self._process.getDataByPlane(thisPlane)
-      print hits
-      print hits[0]
 
-      for i in xrange(len(wireList)):
+      for hit in hits:
         # Draws a rectangle at (x,y,xlength, ylength)
-        r = QtGui.QGraphicsRectItem(wireList[i], timeStartList[i], 1, timeEndList[i]-timeStartList[i])
+        r = QtGui.QGraphicsRectItem(hit.wire(), hit.time(), 1, hit.rms())
 
+        opacity = hit.charge() / self._process.maxCharge(thisPlane)
+        # opacity = exp( 1 + hit.charge() / self._process.maxCharge(thisPlane))/exp(2);
         # # New Way
         # r.setPen(pg.mkPen(brush,width=2))
         # # r.setBrush(pg.mkColor((255,255,255)))
 
         # Old Way:
         r.setPen(pg.mkPen(None))
-        r.setBrush(pg.mkColor(self._brush))
+        r.setBrush(pg.mkColor(opacity))
+        # r.setBrush((0,0,0,opacity))
         self._drawnObjects[thisPlane].append(r)
         view._view.addItem(r)
 
