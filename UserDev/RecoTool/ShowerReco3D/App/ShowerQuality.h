@@ -18,7 +18,8 @@
 #ifndef LARLITE_SHOWERQUALITY_H
 #define LARLITE_SHOWERQUALITY_H
 
-// #include <TH1D.h>
+#include <TH1D.h>
+#include <TGraphErrors.h>
 // #include <TH2D.h>
 #include <map>
 #include "Analysis/ana_base.h"
@@ -30,7 +31,7 @@
 namespace larlite {
 /**
    \class ShowerQuality
-   User custom analysis class made by kazuhiro
+   User custom analysis class made by kazuhiro/kaleko
  */
 class ShowerQuality : public ana_base {
 
@@ -73,7 +74,7 @@ public:
   //    void setMCShowerQuality(bool on) { _mcShowerQuality = on; }
 
   /// Setter to toggle if you are running on a single particle file
-  void setSingleParticleQuality(bool flag) { _single_particle_quality = flag; }
+  void SetSingleParticleQuality(bool flag) { _single_particle_quality = flag; }
 
 
 protected:
@@ -86,9 +87,11 @@ protected:
   //                      const AssSet_t& ass_cluster_v);
 
 
-  /// Function to set all of tree parameters to default values
-  void resetTreeParams();
+  /// Function to set all of once-per-shower tree parameters to default values
+  void ResetShowerTreeParams();
 
+  /// Function to set all of once-per-event tree parameters to default values
+  void ResetEventTreeParams();
 
   // boolean to decide if to fill the tree once per MC shower
   // or once per RECO shower
@@ -137,8 +140,15 @@ protected:
   // /// Best plane id
   // TH1D *hBestPlane;
 
-  /// For convenience: struct to define a set of parameters per shower to be stored in TTree
-  struct TreeParams_t {
+
+  /// Analysis TTree. Filled once per reconstructed shower.
+  TTree *fShowerTree;
+
+  /// Analysis TTree. Filled once per event.
+  TTree *fEventTree;
+
+  /// For convenience: struct to define a set of parameters per shower to be stored in per-reconstructed-shower TTree
+  struct ShowerTreeParams_t {
 
     double reco_x, reco_y, reco_z;
     double reco_dcosx, reco_dcosy, reco_dcosz;
@@ -165,14 +175,28 @@ protected:
     // double cluster_eff;
     // double cluster_pur;
 
-  } fTreeParams;
+  } fShowerTreeParams;
 
-  /// Analysis TTree. Filled once per reconstructed shower.
-  TTree *fTree;
+  struct EventTreeParams_t {
 
-  /// Function to prepare TTree
-  void InitializeAnaTree();
+    int n_mcshowers;
+    int n_recoshowers;
+    //Detprofile energy of the FIRST (for now, only) mcshower
+    double mcs_E;
 
+  } fEventTreeParams;
+
+  /// Function to prepare TTrees
+  void InitializeAnaTrees();
+
+  /// Histograms used in efficiency calculations
+  TH1F* _n_mcshowers_trueenergybins;
+  TH1F* _n_recoshowers_trueenergybins;
+  /// The actual (saved) TGraph of shower reconstruction efficiency vs true shower energy
+  TGraphErrors* _reco_efficiency_trueenergybins;
+
+  /// Function to compute reconstruction efficiencies (filling TGraphs, etc)
+  void ComputeEfficiencies();
 };
 }
 #endif
