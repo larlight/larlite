@@ -16,6 +16,10 @@ ShowerQuality::ShowerQuality() {
 
   _single_particle_quality = true;
 
+  _n_mcshowers_trueenergybins = 0;
+  _n_recoshowers_trueenergybins = 0;
+  _reco_efficiency_trueenergybins = 0;
+
   //_mcShowerQuality = true;
 
   // hMatchCorrectness = nullptr;
@@ -40,11 +44,13 @@ ShowerQuality::ShowerQuality() {
   // mDEDX.clear();
   // hBestPlane = nullptr;
 
-  fTree = nullptr;
+  fShowerTree = nullptr;
+  fEventTree = nullptr;
 
 }
 
 bool ShowerQuality::initialize() {
+
 
   if (fShowerProducer.empty()) {
     print(msg::kERROR, __FUNCTION__, "Shower producer's name is not set!");
@@ -150,12 +156,23 @@ bool ShowerQuality::initialize() {
   //                       "Best Plane (for energy & dE/dx estimate); Plane ID; Showers",
   //                       geo->Nplanes(), -0.5, geo->Nplanes() - 0.5);
 
-  InitializeAnaTree();
+  InitializeAnaTrees();
+
+  _n_mcshowers_trueenergybins = new TH1F("n_mcshowers_trueenergybins", "n_mcshowers_trueenergybins", 30, 0, 3000);
+  _n_recoshowers_trueenergybins = new TH1F("n_recoshowers_trueenergybins", "n_recoshowers_trueenergybins", 30, 0, 3000);
+  _reco_efficiency_trueenergybins = new TGraphErrors();
 
   return true;
 }
 
 bool ShowerQuality::analyze(storage_manager* storage) {
+
+  ResetEventTreeParams();
+
+  if (!_single_particle_quality) {
+    print(msg::kERROR, __FUNCTION__, Form("Running on non-single-particle file not implemented yet!\n"));
+    return false;
+  }
 
   //auto geo = larutil::Geometry::GetME();
 
@@ -167,14 +184,29 @@ bool ShowerQuality::analyze(storage_manager* storage) {
     return false;
   }
 
-  // Get shower
+  // Before getting the reconstructed showers, we store some true (mcshower) information
+  // to be used as the denominator in efficiency calculations (n reco showers / n true showers, etc)
+  fEventTreeParams.n_mcshowers = ev_mcs->size();
+  fEventTreeParams.mcs_E = ev_mcs->at(0).DetProfile().E();
+  _n_mcshowers_trueenergybins->Fill(ev_mcs->at(0).DetProfile().E());
+
+  
+  // Retrieve shower data product
   auto ev_shower = storage->get_data<event_shower>(fShowerProducer);
   if (!ev_shower) {
     print(msg::kERROR, __FUNCTION__, Form("Did not find shower produced by \"%s\"", fShowerProducer.c_str()));
     return false;
   }
-  if (!ev_shower->size()) return false;
+  if (!ev_shower->size()){
+    //Fill the once-per-event TTree before you quit out early
+    fEventTreeParams.n_recoshowers = 0;
+    fEventTree->Fill();
+    return false;
+  } 
 
+  // If any showers were reconstructed (including more than should have been!) fill _n_recoshowers
+  _n_recoshowers_trueenergybins->Fill(ev_mcs->at(0).DetProfile().E());
+  fEventTreeParams.n_recoshowers = ev_shower->size();
 
   // // get associated clusters
   // event_cluster* ev_cluster = nullptr;
@@ -359,11 +391,6 @@ bool ShowerQuality::analyze(storage_manager* storage) {
 
 // }
 
-  if (!_single_particle_quality) {
-    print(msg::kERROR, __FUNCTION__, Form("Running on non-single-particle file not implemented yet!\n"));
-    return false;
-  }
-
   const larlite::mcshower &mymcshower = ev_mcs->at(0);
 
   /// Loop over reconstructed showers, and compute shower quality parameters/fill ttree for each
@@ -373,15 +400,23 @@ bool ShowerQuality::analyze(storage_manager* storage) {
 
   }
 
+//Fill the once-per-event TTree
+  fEventTree->Fill();
+
+
   return true;
 
 }
 
 bool ShowerQuality::finalize() {
 
-  if (_fout) 
-    fTree->Write();
+  ComputeEfficiencies();
 
+  if (_fout) {
+    if (fShowerTree) fShowerTree->Write();
+    if (fEventTree) fEventTree->Write();
+    if (_reco_efficiency_trueenergybins) _reco_efficiency_trueenergybins->Write();
+  }
   return true;
 }
 
@@ -391,13 +426,13 @@ void ShowerQuality::FillQualityInfo(const shower& reco_shower, const mcshower& m
 //                                     const AssSet_t& ass_cluster_v)
 {
 
-  resetTreeParams();
+  ResetShowerTreeParams();
 
 // auto res = fBTAlg.ShowerCorrectness(ass_cluster_v[shower_index]);
 
-// fTreeParams.match_correctness = res.second;
+// fShowerTreeParams.match_correctness = res.second;
 
-  // if (fTreeParams.match_correctness < 0) {
+  // if (fShowerTreeParams.match_correctness < 0) {
   //   print(msg::kERROR, __FUNCTION__,
   //         Form("Failed to find a corresponding MCShower for shower %zu", shower_index)
   //        );
@@ -405,179 +440,221 @@ void ShowerQuality::FillQualityInfo(const shower& reco_shower, const mcshower& m
   // }
 
   // MC Info
-  fTreeParams.mc_x = mc_shower.DetProfile().X();
-  fTreeParams.mc_y = mc_shower.DetProfile().Y();
-  fTreeParams.mc_z = mc_shower.DetProfile().Z();
+  fShowerTreeParams.mc_x = mc_shower.DetProfile().X();
+  fShowerTreeParams.mc_y = mc_shower.DetProfile().Y();
+  fShowerTreeParams.mc_z = mc_shower.DetProfile().Z();
 
-  fTreeParams.mc_energy = mc_shower.DetProfile().E();
-  // fTreeParams.mc_pdgid  = mc_shower.PdgCode();
-  // fTreeParams.mc_containment = mc_shower.DetProfile().E() / mc_shower.Start().E();
+  fShowerTreeParams.mc_energy = mc_shower.DetProfile().E();
+  // fShowerTreeParams.mc_pdgid  = mc_shower.PdgCode();
+  // fShowerTreeParams.mc_containment = mc_shower.DetProfile().E() / mc_shower.Start().E();
 
-  //fTreeParams.mc_dcosx = mc_shower.DetProfile().Px() / fTreeParams.mc_energy;
-  //fTreeParams.mc_dcosy = mc_shower.DetProfile().Py() / fTreeParams.mc_energy;
-  //fTreeParams.mc_dcosz = mc_shower.DetProfile().Pz() / fTreeParams.mc_energy;
-  fTreeParams.mc_dcosx = mc_shower.Start().Px() / mc_shower.Start().E();
-  fTreeParams.mc_dcosy = mc_shower.Start().Py() / mc_shower.Start().E();
-  fTreeParams.mc_dcosz = mc_shower.Start().Pz() / mc_shower.Start().E();
+  //fShowerTreeParams.mc_dcosx = mc_shower.DetProfile().Px() / fShowerTreeParams.mc_energy;
+  //fShowerTreeParams.mc_dcosy = mc_shower.DetProfile().Py() / fShowerTreeParams.mc_energy;
+  //fShowerTreeParams.mc_dcosz = mc_shower.DetProfile().Pz() / fShowerTreeParams.mc_energy;
+  fShowerTreeParams.mc_dcosx = mc_shower.Start().Px() / mc_shower.Start().E();
+  fShowerTreeParams.mc_dcosy = mc_shower.Start().Py() / mc_shower.Start().E();
+  fShowerTreeParams.mc_dcosz = mc_shower.Start().Pz() / mc_shower.Start().E();
 
   // Reco vtx
-  fTreeParams.reco_x = reco_shower.ShowerStart()[0];
-  fTreeParams.reco_y = reco_shower.ShowerStart()[1];
-  fTreeParams.reco_z = reco_shower.ShowerStart()[2];
+  fShowerTreeParams.reco_x = reco_shower.ShowerStart()[0];
+  fShowerTreeParams.reco_y = reco_shower.ShowerStart()[1];
+  fShowerTreeParams.reco_z = reco_shower.ShowerStart()[2];
 
   // Reco angle
-  fTreeParams.reco_dcosx = reco_shower.Direction()[0];
-  fTreeParams.reco_dcosy = reco_shower.Direction()[1];
-  fTreeParams.reco_dcosz = reco_shower.Direction()[2];
+  fShowerTreeParams.reco_dcosx = reco_shower.Direction()[0];
+  fShowerTreeParams.reco_dcosy = reco_shower.Direction()[1];
+  fShowerTreeParams.reco_dcosz = reco_shower.Direction()[2];
 
   // Reco - MC angle diff
-  fTreeParams.mc_reco_anglediff = acos( fTreeParams.reco_dcosx * fTreeParams.mc_dcosx +
-                                        fTreeParams.reco_dcosy * fTreeParams.mc_dcosy +
-                                        fTreeParams.reco_dcosz * fTreeParams.mc_dcosz ) / 3.14159265359 * 180.;
+  fShowerTreeParams.mc_reco_anglediff = acos( fShowerTreeParams.reco_dcosx * fShowerTreeParams.mc_dcosx +
+                                        fShowerTreeParams.reco_dcosy * fShowerTreeParams.mc_dcosy +
+                                        fShowerTreeParams.reco_dcosz * fShowerTreeParams.mc_dcosz ) / 3.14159265359 * 180.;
   // Reco - MC vtx distance
-  fTreeParams.mc_reco_dist = sqrt( pow(fTreeParams.reco_x - fTreeParams.mc_x, 2) +
-                                   pow(fTreeParams.reco_y - fTreeParams.mc_y, 2) +
-                                   pow(fTreeParams.reco_z - fTreeParams.mc_z, 2) );
+  fShowerTreeParams.mc_reco_dist = sqrt( pow(fShowerTreeParams.reco_x - fShowerTreeParams.mc_x, 2) +
+                                         pow(fShowerTreeParams.reco_y - fShowerTreeParams.mc_y, 2) +
+                                         pow(fShowerTreeParams.reco_z - fShowerTreeParams.mc_z, 2) );
 
   // // Reco cluster efficiency & purity
-  // fTreeParams.cluster_eff = 1.;
-  // fTreeParams.cluster_pur = 1.;
+  // fShowerTreeParams.cluster_eff = 1.;
+  // fShowerTreeParams.cluster_pur = 1.;
   // for (auto const& cluster_index : ass_cluster_v[shower_index]) {
   //   auto ep = fBTAlg.ClusterEP(cluster_index, mcshower_index);
   //   if (ep.first == 0 && ep.second == 0) continue;
-  //   fTreeParams.cluster_eff *= ep.first;
-  //   fTreeParams.cluster_pur *= ep.second;
+  //   fShowerTreeParams.cluster_eff *= ep.first;
+  //   fShowerTreeParams.cluster_pur *= ep.second;
   // }
 
   // Reco energy & dedx info
-  // fTreeParams.best_plane_id = reco_shower.best_plane();
+  // fShowerTreeParams.best_plane_id = reco_shower.best_plane();
 
-  // fTreeParams.reco_energy = reco_shower.Energy().at(reco_shower.best_plane());
-  fTreeParams.reco_energy_U = reco_shower.Energy().at(0);
-  fTreeParams.reco_energy_V = reco_shower.Energy().at(1);
-  fTreeParams.reco_energy_Y = reco_shower.Energy().at(2);
+  // fShowerTreeParams.reco_energy = reco_shower.Energy().at(reco_shower.best_plane());
+  fShowerTreeParams.reco_energy_U = reco_shower.Energy().at(0);
+  fShowerTreeParams.reco_energy_V = reco_shower.Energy().at(1);
+  fShowerTreeParams.reco_energy_Y = reco_shower.Energy().at(2);
 
-  // fTreeParams.reco_dedx     = reco_shower.dEdx().at(reco_shower.best_plane());
-  fTreeParams.reco_dedx_U   = reco_shower.dEdx().at(0);
-  fTreeParams.reco_dedx_V   = reco_shower.dEdx().at(1);
-  fTreeParams.reco_dedx_Y   = reco_shower.dEdx().at(2);
+  // fShowerTreeParams.reco_dedx     = reco_shower.dEdx().at(reco_shower.best_plane());
+  fShowerTreeParams.reco_dedx_U   = reco_shower.dEdx().at(0);
+  fShowerTreeParams.reco_dedx_V   = reco_shower.dEdx().at(1);
+  fShowerTreeParams.reco_dedx_Y   = reco_shower.dEdx().at(2);
 
   //
   // Fill histograms
   //
-  // hMatchCorrectness->Fill(fTreeParams.match_correctness);
+  // hMatchCorrectness->Fill(fShowerTreeParams.match_correctness);
 
-  // hVtxDX->Fill(fTreeParams.reco_x - fTreeParams.mc_x);
-  // hVtxDY->Fill(fTreeParams.reco_y - fTreeParams.mc_y);
-  // hVtxDZ->Fill(fTreeParams.reco_z - fTreeParams.mc_z);
-  // hVtxDR->Fill(fTreeParams.mc_reco_dist);
+  // hVtxDX->Fill(fShowerTreeParams.reco_x - fShowerTreeParams.mc_x);
+  // hVtxDY->Fill(fShowerTreeParams.reco_y - fShowerTreeParams.mc_y);
+  // hVtxDZ->Fill(fShowerTreeParams.reco_z - fShowerTreeParams.mc_z);
+  // hVtxDR->Fill(fShowerTreeParams.mc_reco_dist);
 
   // // Angular info
-  // hDCosX->Fill(fTreeParams.reco_dcosx - fTreeParams.mc_dcosx);
-  // hDCosY->Fill(fTreeParams.reco_dcosy - fTreeParams.mc_dcosy);
-  // hDCosZ->Fill(fTreeParams.reco_dcosz - fTreeParams.mc_dcosz);
-  // h3DAngleDiff->Fill( fTreeParams.mc_reco_anglediff );
+  // hDCosX->Fill(fShowerTreeParams.reco_dcosx - fShowerTreeParams.mc_dcosx);
+  // hDCosY->Fill(fShowerTreeParams.reco_dcosy - fShowerTreeParams.mc_dcosy);
+  // hDCosZ->Fill(fShowerTreeParams.reco_dcosz - fShowerTreeParams.mc_dcosz);
+  // h3DAngleDiff->Fill( fShowerTreeParams.mc_reco_anglediff );
 
-  // hEnergyCorr->Fill  ( fTreeParams.reco_energy, fTreeParams.mc_energy );
+  // hEnergyCorr->Fill  ( fShowerTreeParams.reco_energy, fShowerTreeParams.mc_energy );
 
-  // hEnergyAssym->Fill ( (fTreeParams.reco_energy - fTreeParams.mc_energy) /
-  //                      (fTreeParams.reco_energy + fTreeParams.mc_energy) * 2. );
+  // hEnergyAssym->Fill ( (fShowerTreeParams.reco_energy - fShowerTreeParams.mc_energy) /
+  //                      (fShowerTreeParams.reco_energy + fShowerTreeParams.mc_energy) * 2. );
 
-  // hEnergyDiff->Fill  ( fTreeParams.mc_energy - fTreeParams.reco_energy );
+  // hEnergyDiff->Fill  ( fShowerTreeParams.mc_energy - fShowerTreeParams.reco_energy );
 
-  // if (mDEDX.find(fTreeParams.mc_pdgid) == mDEDX.end())
+  // if (mDEDX.find(fShowerTreeParams.mc_pdgid) == mDEDX.end())
 
-  //   mDEDX.insert(std::make_pair(fTreeParams.mc_pdgid,
-  //                               new TH1D(Form("hdEdx_PDG_%d", fTreeParams.mc_pdgid),
-  //                                        Form("Reco dE/dx for PDG = %d; dE/dx [MeV/cm]; Showers", fTreeParams.mc_pdgid),
+  //   mDEDX.insert(std::make_pair(fShowerTreeParams.mc_pdgid,
+  //                               new TH1D(Form("hdEdx_PDG_%d", fShowerTreeParams.mc_pdgid),
+  //                                        Form("Reco dE/dx for PDG = %d; dE/dx [MeV/cm]; Showers", fShowerTreeParams.mc_pdgid),
   //                                        100, 0, 50)
   //                              )
   //               );
 
-  // // hMatchedClusterEff->Fill(fTreeParams.cluster_eff);
-  // // hMatchedClusterPur->Fill(fTreeParams.cluster_pur);
+  // // hMatchedClusterEff->Fill(fShowerTreeParams.cluster_eff);
+  // // hMatchedClusterPur->Fill(fShowerTreeParams.cluster_pur);
 
-  // mDEDX[fTreeParams.mc_pdgid]->Fill(fTreeParams.reco_dedx);
+  // mDEDX[fShowerTreeParams.mc_pdgid]->Fill(fShowerTreeParams.reco_dedx);
 
-  // hBestPlane->Fill(fTreeParams.best_plane_id);
+  // hBestPlane->Fill(fShowerTreeParams.best_plane_id);
 
   // Fill Tree
-  fTree->Fill();
+  fShowerTree->Fill();
 
 }
 
-void ShowerQuality::InitializeAnaTree()
+void ShowerQuality::InitializeAnaTrees()
 {
-  if (fTree) delete fTree;
 
-  fTree = new TTree("fShowerQualityTree", "");
+  //////////////////////////////////////////////////////
+  // This tree is filled once per reconstructed shower
+  //////////////////////////////////////////////////////
+  if (fShowerTree) delete fShowerTree;
 
-  fTree->Branch("reco_x", &fTreeParams.reco_x, "reco_x/D");
-  fTree->Branch("reco_y", &fTreeParams.reco_y, "reco_y/D");
-  fTree->Branch("reco_z", &fTreeParams.reco_z, "reco_z/D");
-  fTree->Branch("reco_dcosx", &fTreeParams.reco_dcosx, "reco_dcosx/D");
-  fTree->Branch("reco_dcosy", &fTreeParams.reco_dcosy, "reco_dcosy/D");
-  fTree->Branch("reco_dcosz", &fTreeParams.reco_dcosz, "reco_dcosz/D");
-  // fTree->Branch("reco_energy", &fTreeParams.reco_energy, "reco_energy/D");
-  fTree->Branch("reco_energy_U", &fTreeParams.reco_energy_U, "reco_energy_U/D");
-  fTree->Branch("reco_energy_V", &fTreeParams.reco_energy_V, "reco_energy_V/D");
-  fTree->Branch("reco_energy_Y", &fTreeParams.reco_energy_Y, "reco_energy_Y/D");
+  fShowerTree = new TTree("fShowerTree", "");
 
-  // fTree->Branch("best_plane_id", &fTreeParams.best_plane_id, "best_plane_id/i");
+  fShowerTree->Branch("reco_x", &fShowerTreeParams.reco_x, "reco_x/D");
+  fShowerTree->Branch("reco_y", &fShowerTreeParams.reco_y, "reco_y/D");
+  fShowerTree->Branch("reco_z", &fShowerTreeParams.reco_z, "reco_z/D");
+  fShowerTree->Branch("reco_dcosx", &fShowerTreeParams.reco_dcosx, "reco_dcosx/D");
+  fShowerTree->Branch("reco_dcosy", &fShowerTreeParams.reco_dcosy, "reco_dcosy/D");
+  fShowerTree->Branch("reco_dcosz", &fShowerTreeParams.reco_dcosz, "reco_dcosz/D");
+  // fShowerTree->Branch("reco_energy", &fShowerTreeParams.reco_energy, "reco_energy/D");
+  fShowerTree->Branch("reco_energy_U", &fShowerTreeParams.reco_energy_U, "reco_energy_U/D");
+  fShowerTree->Branch("reco_energy_V", &fShowerTreeParams.reco_energy_V, "reco_energy_V/D");
+  fShowerTree->Branch("reco_energy_Y", &fShowerTreeParams.reco_energy_Y, "reco_energy_Y/D");
 
-  fTree->Branch("mc_x", &fTreeParams.mc_x, "mc_x/D");
-  fTree->Branch("mc_y", &fTreeParams.mc_y, "mc_y/D");
-  fTree->Branch("mc_z", &fTreeParams.mc_z, "mc_z/D");
-  fTree->Branch("mc_dcosx", &fTreeParams.mc_dcosx, "mc_dcosx/D");
-  fTree->Branch("mc_dcosy", &fTreeParams.mc_dcosy, "mc_dcosy/D");
-  fTree->Branch("mc_dcosz", &fTreeParams.mc_dcosz, "mc_dcosz/D");
-  fTree->Branch("mc_energy", &fTreeParams.mc_energy, "mc_energy/D");
+  // fShowerTree->Branch("best_plane_id", &fShowerTreeParams.best_plane_id, "best_plane_id/i");
 
-  // fTree->Branch("reco_dedx", &fTreeParams.reco_dedx, "reco_dedx_/D");
-  fTree->Branch("reco_dedx_U", &fTreeParams.reco_dedx_U, "reco_dedx_U/D");
-  fTree->Branch("reco_dedx_V", &fTreeParams.reco_dedx_V, "reco_dedx_V/D");
-  fTree->Branch("reco_dedx_Y", &fTreeParams.reco_dedx_Y, "reco_dedx_Y/D");
-  // fTree->Branch("mc_pdgid", &fTreeParams.mc_pdgid, "mc_pdgid/i");
+  fShowerTree->Branch("mc_x", &fShowerTreeParams.mc_x, "mc_x/D");
+  fShowerTree->Branch("mc_y", &fShowerTreeParams.mc_y, "mc_y/D");
+  fShowerTree->Branch("mc_z", &fShowerTreeParams.mc_z, "mc_z/D");
+  fShowerTree->Branch("mc_dcosx", &fShowerTreeParams.mc_dcosx, "mc_dcosx/D");
+  fShowerTree->Branch("mc_dcosy", &fShowerTreeParams.mc_dcosy, "mc_dcosy/D");
+  fShowerTree->Branch("mc_dcosz", &fShowerTreeParams.mc_dcosz, "mc_dcosz/D");
+  fShowerTree->Branch("mc_energy", &fShowerTreeParams.mc_energy, "mc_energy/D");
 
-  fTree->Branch("mc_reco_anglediff", &fTreeParams.mc_reco_anglediff, "mc_reco_anglediff/D");
-  fTree->Branch("mc_reco_dist", &fTreeParams.mc_reco_dist, "mc_reco_dist/D");
+  // fShowerTree->Branch("reco_dedx", &fShowerTreeParams.reco_dedx, "reco_dedx_/D");
+  fShowerTree->Branch("reco_dedx_U", &fShowerTreeParams.reco_dedx_U, "reco_dedx_U/D");
+  fShowerTree->Branch("reco_dedx_V", &fShowerTreeParams.reco_dedx_V, "reco_dedx_V/D");
+  fShowerTree->Branch("reco_dedx_Y", &fShowerTreeParams.reco_dedx_Y, "reco_dedx_Y/D");
+  // fShowerTree->Branch("mc_pdgid", &fShowerTreeParams.mc_pdgid, "mc_pdgid/i");
 
-  // fTree->Branch("mc_containment", &fTreeParams.mc_containment, "mc_containment/D");
+  fShowerTree->Branch("mc_reco_anglediff", &fShowerTreeParams.mc_reco_anglediff, "mc_reco_anglediff/D");
+  fShowerTree->Branch("mc_reco_dist", &fShowerTreeParams.mc_reco_dist, "mc_reco_dist/D");
 
-  // fTree->Branch("match_correctness", &fTreeParams.match_correctness, "match_correctness/D");
-  // fTree->Branch("cluster_eff", &fTreeParams.cluster_eff, "cluster_eff/D");
-  // fTree->Branch("cluster_pur", &fTreeParams.cluster_pur, "cluster_pur/D");
+  // fShowerTree->Branch("mc_containment", &fShowerTreeParams.mc_containment, "mc_containment/D");
+
+  // fShowerTree->Branch("match_correctness", &fShowerTreeParams.match_correctness, "match_correctness/D");
+  // fShowerTree->Branch("cluster_eff", &fShowerTreeParams.cluster_eff, "cluster_eff/D");
+  // fShowerTree->Branch("cluster_pur", &fShowerTreeParams.cluster_pur, "cluster_pur/D");
+
+
+  //////////////////////////////////////////////////////
+  // This tree is filled once per event
+  //////////////////////////////////////////////////////
+  if (fEventTree) delete fEventTree;
+
+
+  fEventTree = new TTree("fEventTree", "");
+  fEventTree->Branch("n_recoshowers", &fEventTreeParams.n_recoshowers, "n_recoshowers/I");
+  fEventTree->Branch("n_mcshowers", &fEventTreeParams.n_mcshowers, "n_mcshowers/I");
+  fEventTree->Branch("mcs_E", &fEventTreeParams.mcs_E, "mcs_E/D");
+}
+
+void ShowerQuality::ResetShowerTreeParams() {
+
+  fShowerTreeParams.reco_x = -1.; fShowerTreeParams.reco_y = -1.; fShowerTreeParams.reco_z = -1.;
+  fShowerTreeParams.reco_dcosx = -1.; fShowerTreeParams.reco_dcosy = -1.; fShowerTreeParams.reco_dcosz = -1.;
+  // fShowerTreeParams.reco_energy = -1;
+  fShowerTreeParams.reco_energy_U = -1;
+  fShowerTreeParams.reco_energy_V = -1;
+  fShowerTreeParams.reco_energy_Y = -1;
+  //fShowerTreeParams.reco_dedx = -1;
+  fShowerTreeParams.reco_dedx_U = -1;
+  fShowerTreeParams.reco_dedx_V = -1;
+  fShowerTreeParams.reco_dedx_Y = -1;
+  // fShowerTreeParams.best_plane_id = -1;
+
+  fShowerTreeParams.mc_x = -1; fShowerTreeParams.mc_y = -1; fShowerTreeParams.mc_z = -1;
+  fShowerTreeParams.mc_dcosx = -1; fShowerTreeParams.mc_dcosy = -1; fShowerTreeParams.mc_dcosz = -1;
+  fShowerTreeParams.mc_energy = -1;
+  // fShowerTreeParams.mc_pdgid = -1;
+
+  fShowerTreeParams.mc_reco_anglediff = -1;
+  fShowerTreeParams.mc_reco_dist = -1;
+
+  // fShowerTreeParams.mc_containment = -1;
+  // fShowerTreeParams.match_correctness = -1;
+  // fShowerTreeParams.cluster_eff = -1;
+  // fShowerTreeParams.cluster_pur = -1;
 
 }
 
-void ShowerQuality::resetTreeParams() {
-
-  fTreeParams.reco_x = -1.; fTreeParams.reco_y = -1.; fTreeParams.reco_z = -1.;
-  fTreeParams.reco_dcosx = -1.; fTreeParams.reco_dcosy = -1.; fTreeParams.reco_dcosz = -1.;
-  // fTreeParams.reco_energy = -1;
-  fTreeParams.reco_energy_U = -1;
-  fTreeParams.reco_energy_V = -1;
-  fTreeParams.reco_energy_Y = -1;
-  //fTreeParams.reco_dedx = -1;
-  fTreeParams.reco_dedx_U = -1;
-  fTreeParams.reco_dedx_V = -1;
-  fTreeParams.reco_dedx_Y = -1;
-  // fTreeParams.best_plane_id = -1;
-
-  fTreeParams.mc_x = -1; fTreeParams.mc_y = -1; fTreeParams.mc_z = -1;
-  fTreeParams.mc_dcosx = -1; fTreeParams.mc_dcosy = -1; fTreeParams.mc_dcosz = -1;
-  fTreeParams.mc_energy = -1;
-  // fTreeParams.mc_pdgid = -1;
-
-  fTreeParams.mc_reco_anglediff = -1;
-  fTreeParams.mc_reco_dist = -1;
-
-  // fTreeParams.mc_containment = -1;
-  // fTreeParams.match_correctness = -1;
-  // fTreeParams.cluster_eff = -1;
-  // fTreeParams.cluster_pur = -1;
-
+void ShowerQuality::ResetEventTreeParams() {
+  fEventTreeParams.n_mcshowers = 0;
+  fEventTreeParams.n_recoshowers = 0;
+  fEventTreeParams.mcs_E = -1.;
 }
+
+
+void ShowerQuality::ComputeEfficiencies() {
+
+  if (!_reco_efficiency_trueenergybins) return;
+
+  _reco_efficiency_trueenergybins->SetName("reco_efficiency_trueenergybins");
+  _reco_efficiency_trueenergybins->SetTitle("Efficiency to reconstruct showers vs True shower (deposited) energy;True Shower Deposited Energy;Efficiency");
+
+  //Loop through bins of n_reco_showers and n_true_showers, divide them, fill TGraphErrors
+  //This loop starts at 1 because GetBinContent(0) is the underflow bin.
+  for (size_t i = 1; i < _n_recoshowers_trueenergybins->GetNbinsX(); ++i) {
+    // Avoid divide-by-zero errors
+    if ( !_n_mcshowers_trueenergybins->GetBinContent(i) ) continue;
+    double myeff = _n_recoshowers_trueenergybins->GetBinContent(i) / _n_mcshowers_trueenergybins->GetBinContent(i);
+    double myerr = sqrt( (myeff) * (1 - myeff) / _n_mcshowers_trueenergybins->GetBinContent(i) );
+    _reco_efficiency_trueenergybins->SetPoint(i, _n_mcshowers_trueenergybins->GetBinCenter(i), myeff);
+    _reco_efficiency_trueenergybins->SetPointError(i, _n_mcshowers_trueenergybins->GetBinWidth(i) / 2, myerr);
+  }
+
+} // End ComputeEfficiencies()
 
 }
 #endif

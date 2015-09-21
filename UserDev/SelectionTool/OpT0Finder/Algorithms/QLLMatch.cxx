@@ -5,6 +5,8 @@
 #include "OpT0Finder/Base/OpT0FinderException.h"
 #include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
 #include <TMinuit.h>
+#include <cmath>
+
 namespace flashana {
 
   QLLMatch* QLLMatch::_me = nullptr;
