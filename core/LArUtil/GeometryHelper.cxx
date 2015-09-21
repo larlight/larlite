@@ -203,7 +203,7 @@ float GeometryHelper::Slope_3Dto2D(const TVector3 & inputVector, unsigned int pl
     // get the vector corresponding to the normal in (w,t) space for the plane we are interested in
     if (pl == 0)
       plane = {0,0.866025404,-0.5};
-      else if (pl == 1)
+    else if (pl == 1)
       plane = {0,0.866025404,0.5};
     else if (pl == 2)
       plane = {0,1.,0};
