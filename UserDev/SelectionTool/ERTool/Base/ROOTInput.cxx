@@ -17,6 +17,7 @@ namespace ertool {
 			     ::ertool::ParticleGraph *graph_ptr,
 			     bool mc)
     {
+      Debug(__FUNCTION__,"called");
       if(!event_ptr && !graph_ptr)
 	Exception("Neither EventData & ParticleGraph provided (nothing to read!)");
       
@@ -44,10 +45,11 @@ namespace ertool {
 	_graph_chain->SetBranchAddress(Form("%s_branch",graph_chain_name.c_str()),
 				       &graph_ptr);
       }
+      Debug(__FUNCTION__,"done");
     }
     
     void ROOTInput::AddFile( const std::string& fname )
-    {
+    {      
       if(!_event_chain && !_graph_chain)
 	Exception("Call Prepare before AddFile!");
       if(_event_chain) _event_chain->AddFile(fname.c_str());
@@ -59,6 +61,7 @@ namespace ertool {
     
     bool ROOTInput::Open(Provenance& in_prov)
     {
+      Debug(__FUNCTION__,"called");
       if(!_event_chain && !_graph_chain)
 	Exception("Call Prepare & AddFile before Open!");
       
@@ -89,7 +92,7 @@ namespace ertool {
 	else
 	  delete _graph_chain;
       }
-      
+      Debug(__FUNCTION__,"done");      
       return IsOpen();
     }
     
@@ -130,11 +133,13 @@ namespace ertool {
     /// Function to "close" the output stream
     bool ROOTInput::Close()
     {
+      Debug(__FUNCTION__,"called");
       delete _event_chain;
       delete _graph_chain;
       _n_entries   = 0;
       _event_entry = ertool::kINVALID_SIZE;
       _graph_entry = ertool::kINVALID_SIZE;
+      Debug(__FUNCTION__,"done");
       return true;
     }
     

@@ -36,7 +36,7 @@ sq_module.SetShowerProducer("showerreco")
 
 sq_module.SetMaxEnergyCut(99999999.)
 sq_module.SetMinEnergyCut(0.)
-sq_module.setSingleParticleQuality(True)
+sq_module.SetSingleParticleQuality(True)
 my_proc.add_process(sq_module)
 
 print

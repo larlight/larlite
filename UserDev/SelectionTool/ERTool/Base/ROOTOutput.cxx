@@ -17,9 +17,11 @@ namespace ertool {
 			      ::ertool::ParticleGraph *graph_ptr,
 			      bool mc)
     {
+      Debug(__FUNCTION__,"called");
       if(!event_ptr && !graph_ptr)
 	Exception("Neither EventData & ParticleGraph provided (nothing to read!)");
-      
+
+      std::cout<<_event_tree<< " : " <<_graph_tree<<std::endl;
       if(_event_tree || _graph_tree) 
 	Exception("Output file seems to be open!");
 
@@ -40,11 +42,13 @@ namespace ertool {
 	_graph_tree->Branch(Form("%s_branch",graph_tree_name.c_str()),
 			    &graph_ptr);
       }
+      Debug(__FUNCTION__,"done");
       return;
     }
     
     bool ROOTOutput::Open(const std::string& fname)
     {
+      Debug(__FUNCTION__,"called");
       if(_fout) {
 	Error(__FUNCTION__,"Output file handle is already open!");
 	return false;
@@ -61,7 +65,8 @@ namespace ertool {
       }
 
       _fout = TFile::Open(fname.c_str(),"RECREATE");
-	  
+
+      Debug(__FUNCTION__,"done");
       return _fout;
     }
     
@@ -74,6 +79,7 @@ namespace ertool {
     
     bool ROOTOutput::Close(const ::ertool::Provenance& prov)
     {
+      Debug(__FUNCTION__,"called");
       if(_fout) {
 	_fout->cd();
 	if(_event_tree) _event_tree->Write();
@@ -84,6 +90,7 @@ namespace ertool {
       _fout       = nullptr;
       _event_tree = nullptr;
       _graph_tree = nullptr;
+      Debug(__FUNCTION__,"done");
       return true;
     }
   }

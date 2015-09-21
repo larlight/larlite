@@ -9,7 +9,18 @@ try:
 except ImportError:
 	raise ImportError('Something didn\'t import correctly! Do you have numpy, pandas, matplotlib, and root_numpy? Get it!')
 
+import sys
 import os.path
+
+#File that was output from ShowerQuality code including a ttree
+if len(sys.argv) != 2:
+        print "Usage: python %s $ROOT_FILE_OUTPUT_FROM_SHOWER_QUALITY" % sys.argv[0]
+        quit()
+
+#File that was output from ShowerQuality code including a ttree
+fname = sys.argv[1] #'ShowerQuality_ana_out.root'
+#Name of the once-per-shower ttree from the ShowerQuality output root file
+tname = 'fShowerTree'
 
 def gauss(x,A,mu,sigma):
 
@@ -27,10 +38,7 @@ def getGaussFit(entries,bin_edges):
 
         return parameters,cov_matrix
 
-#File that was output from ShowerQuality code including a ttree
-fname = 'ShowerQuality_ana_out.root'
-#Name of the ttree from the ShowerQuality output root file
-tname = 'fShowerQualityTree'
+
 
 if not os.path.isfile(fname):
 	raise IOError('ShowerQuality output file does not exist: %s'%fname)
@@ -78,4 +86,20 @@ plt.grid()
 plt.xlabel('3D Direction MC - Reco angular difference')
 plt.ylabel('Counts')
 plt.savefig('3Ddir_accuracy.pdf')
+plt.show()
+
+
+# dEdx plots
+fig = plt.figure(figsize=(10,6))
+dedx_u = df['reco_dedx_U']
+dedx_v = df['reco_dedx_V']
+dedx_y = df['reco_dedx_Y']
+bins = np.linspace(0,10,100)
+plt.hist(dedx_u,bins=bins,edgecolor=None,alpha=0.5,color='b',label='U Plane')
+plt.hist(dedx_v,bins=bins,edgecolor=None,alpha=0.5,color='g',label='V Plane')
+plt.hist(dedx_y,bins=bins,edgecolor=None,alpha=0.5,color='r',label='Y Plane')
+plt.grid()
+plt.xlabel('dE/dx [ MeV / cm ]')
+plt.ylabel('Count')
+plt.savefig('dEdx_resolution.pdf')
 plt.show()

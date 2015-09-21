@@ -140,44 +140,79 @@ float GeometryHelper::Slope_3Dto2D(const TVector3 & inputVector, unsigned int pl
   Line_3Dto2D(startPoint3D, inputVector, plane, p1, slope);
   return slope.t / slope.w;
 }
-
-
-float GeometryHelper::Slope_Proj(const TVector3 & inputVector, unsigned int plane) const {
-
-  // calculate the equivalent vector projected on the plane of interest
   
-  // V is the original vector in 3D
-  // N is the normal to the plane
-  // the component on the plane then is
-  // V - ( V dot N ) * N
   
-  double dot = 0;
-  std::vector<double> proj = {0.,0.,0.};
-
-  if (plane == 0){
-    dot = inputVector[1]*0.866 - inputVector[2]*0.5;
-    proj = {0., inputVector[1] + dot * 0.866, inputVector[2] - dot * 0.5};
-    return proj[0]/proj[2];
+  TVector3 GeometryHelper::Project_3DLine_OnPlane(const TVector3& inputVector, const TVector3& planeNormal) const {
+    
+    // calculate the equivalent vector projected on the plane of interest
+    
+    // V is the original vector in 3D
+    // N is the normal to the plane
+    // the component on the plane then is
+    // V - ( V dot N ) * N
+    
+    auto ret = inputVector - inputVector.Dot(planeNormal) * planeNormal;
+  
+    return ret;
   }
-  else if (plane == 1){
-    dot = inputVector[1]*0.866 + inputVector[2]*0.5;
-    proj = {0., inputVector[1] + dot * 0.866, inputVector[2] + dot * 0.5};
-    double dWire = - proj[1] * 0.5 + proj[2] * 0.866;
-    return proj[0]/dWire;
+
+
+  TVector3 GeometryHelper::Project_3DLine_OnPlane(const TVector3& inputVector, const int& pl) const {
+    
+    // NOTE: use 0.866025404 for sqrt(3)/2 to avoid sqrt computation
+    TVector3 plane(1.,1.,1.);
+
+    // get the TVector3 corresponding to the normal in (w,t) space for the plane we are interested in
+    if (pl == 0)
+      plane = {0,0.866025404,-0.5};
+    else if (pl == 1)
+      plane = {0,0.866025404,0.5};
+    else if (pl == 2)
+      plane = {0,1.,0};
+    else
+      throw LArUtilException("Invalid plane! this plane number does not exist");
+    
+    return Project_3DLine_OnPlane(inputVector,plane);  
   }
-  else if (plane == 2){
-    dot = inputVector[1];
-    proj = {0., inputVector[1] + dot * 1.0, inputVector[2]};
-    double dWire = proj[1] * 0.5 + proj[2] * 0.866;
-    return proj[0]/dWire;
+
+
+  std::vector<double> GeometryHelper::Project_3DLine_OnPlane(const std::vector<double>& V, const std::vector<double>& N) const {
+    
+    if ( (V.size() != 3) or (N.size() != 3) )
+      throw LArUtilException("Project_3DLine_OnPlane failed due to unrecognized vector size");
+
+    // calculate the equivalent vector projected on the plane of interest
+    
+    // V is the original vector in 3D
+    // N is the normal to the plane
+    // the component on the plane then is
+    // V - ( V dot N ) * N
+    
+    double dot = V[0] * N[0] + V[1] * N[1] + V[2] * N[2];
+
+    std::vector<double> ret = { V[0] - dot * N[0], V[1] - dot * N[1], V[2] - dot * N[2]};
+    return ret;
   }
-  else
-    throw LArUtilException("Plane number out of bounds!");
+  
+  std::vector<double> GeometryHelper::Project_3DLine_OnPlane(const std::vector<double>& V, const int& pl) const {
+    
+    // NOTE: use 0.866025404 for sqrt(3)/2 to avoid sqrt computation
 
-  return 0;
-}
+    std::vector<double> plane = {1.,1.,1.};
 
-
+    // get the vector corresponding to the normal in (w,t) space for the plane we are interested in
+    if (pl == 0)
+      plane = {0,0.866025404,-0.5};
+    else if (pl == 1)
+      plane = {0,0.866025404,0.5};
+    else if (pl == 2)
+      plane = {0,1.,0};
+    else
+      throw LArUtilException("Invalid plane! this plane number does not exist");
+  
+      return Project_3DLine_OnPlane(V,plane);
+  }
+  
 
 float GeometryHelper::DistanceToLine2D( const Point2D & pointOnLine, const Point2D & directionOfLine,
                                         const Point2D & targetPoint) const
