@@ -27,7 +27,8 @@ namespace larlite {
   public:
 
     /// Default constructor
-    ExampleERSelection();
+    ExampleERSelection( const ::ertool::io::StreamType_t in_strm = ::ertool::io::kEmptyStream,
+			const ::ertool::io::StreamType_t out_strm = ::ertool::io::kEmptyStream);
 
     /// Default destructor
     virtual ~ExampleERSelection(){}
