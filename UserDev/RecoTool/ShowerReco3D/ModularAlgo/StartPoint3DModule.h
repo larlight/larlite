@@ -28,7 +28,7 @@ class StartPoint3DModule : ShowerRecoModuleBase {
 public:
 
   /// Default constructor
-  StartPoint3DModule() {_name = "StartPoint3DModule"; }
+  StartPoint3DModule() {_name = "StartPoint3DModule"; _res = 0.5 ; }
 
   /// Default destructor
   ~StartPoint3DModule() {}
@@ -49,6 +49,12 @@ public:
   void generatePoints(TVector3 & seedPoint, int nSteps, const Shower_t & resultShower, std::vector<TVector3> & result);
 
   bool inTPC( const TVector3 & pt );
+
+  void setResolution ( double res ) { _res = res; }
+
+  private:
+
+  double _res ;
 
 
 };
