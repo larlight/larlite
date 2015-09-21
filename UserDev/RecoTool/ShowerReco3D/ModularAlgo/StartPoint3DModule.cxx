@@ -11,7 +11,7 @@ namespace showerreco {
 
   void StartPoint3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Shower_t & resultShower) {
     
-//    if (_verbose)
+    if (_verbose)
       std::cout<<"\n\nIn do_reco of 3D start.... "<<std::endl ;
     
     // This function takes the matched shower cluster set and computes the best fit 3D start point
@@ -31,34 +31,34 @@ namespace showerreco {
 	*  Let's try to get close to 3D start by using 2D start info.
 	*  Let's do this by first using the info from plane2,Y 
 	*/
-	for( auto const c : inputShowers ){
-	    if ( c.plane_id.Plane == 2 ){
-		sW = c.start_point.w ; 
-		sT = c.start_point.t ; 
-		}
-	    }
+//	for( auto const c : inputShowers ){
+//	    if ( c.plane_id.Plane == 2 ){
+//		sW = c.start_point.w ; 
+//		sT = c.start_point.t ; 
+//		}
+//	    }
+//
+//	double sY = -116.5 ;
+	std::vector<TVector3> anchorCoords ;
+	TVector3 Temp ;
+	
+	/**
+	*  Create List of N points up y across the detector using this time, Z info.  
+	*  Loop over all showers in event, build up list of start points for each	
+	*  2*abs(sY) = length of detector in Y.  _res < 1-- /_res divides detector up into 
+	*  _res sized steps.
+	*/
 
-	double sY = -116.5 ;
-      std::vector<TVector3> anchorCoords ;
-      TVector3 Temp ;
-      
-      /**
-      *  Create List of N points up y across the detector using this time, Z info.  
-      *  Loop over all showers in event, build up list of start points for each	
-      *  2*abs(sY) = length of detector in Y.  _res < 1-- /_res divides detector up into 
-      *  _res sized steps.
-      */
-
-	for ( int i = 0 ; i < 2*116.5/_res ; i++ ){
-
-	    sY += _res ;
-//	    std::cout<<"Y coord: "<<sY<<std::endl;
-	    Temp.SetX(sT) ; 
-	    Temp.SetY(sY) 	 ; 
-	    Temp.SetZ(sW) ; 
-
-	    anchorCoords.emplace_back(Temp) ;
-	    }
+//	for ( int i = 0 ; i < 2*116.5/_res ; i++ ){
+//
+//	    sY += _res ;
+////	    std::cout<<"Y coord: "<<sY<<std::endl;
+//	    Temp.SetX(sT) ; 
+//	    Temp.SetY(sY) 	 ; 
+//	    Temp.SetZ(sW) ; 
+//
+//	    anchorCoords.emplace_back(Temp) ;
+//	    }
 
 	/**
 	*  Once anchor points are stored, loop over matched clusters, pick 2 best
@@ -77,38 +77,32 @@ namespace showerreco {
 		worstPlane = planeTemp;
 		}
 
-	    std::cout<<"Cluster distance: "<<distTemp<<std::endl ;
+//	    std::cout<<"Cluster distance: "<<distTemp<<std::endl ;
 
 	    planeTemp ++ ;
 	    }
 
 
-//	double sX = 0 ;
-//	double sY ; 
-//	double sZ ; 
-//
-//	std::vector<int> wireStarts(0) ;
-//	std::vector<int> planes(0) ;
-//	
-//	for( auto const c : inputShowers ){
-//	    
-//	    if(c.plane_id.Plane != worstPlane){
-//		wireStarts.emplace_back( int(c.start_point.w/0.3) ) ;
-//		planes.emplace_back( c.plane_id.Plane ) ;
-//		sX += c.start_point.t;	
-//		}
-//	}
-//    
-//	//if ( 
-//	geom->IntersectionPoint(wireStarts[0],wireStarts[1],planes[0],planes[1],sY,sZ ); 
-//	    anchorCoords.push_back({sX/2,sY,sZ}); 
+	double sX = 0 ;
+	double sY ; 
+	double sZ ; 
+
+	std::vector<int> wireStarts(0) ;
+	std::vector<int> planes(0) ;
+	
+	for( auto const c : inputShowers ){
 	    
-//	else
-//	    anchorCoords.push_back({sX/2,0,0});
+	    if(c.plane_id.Plane != worstPlane){
+		wireStarts.emplace_back( int(c.start_point.w/0.3) ) ;
+		planes.emplace_back( c.plane_id.Plane ) ;
+		sX += c.start_point.t;	
+		}
+	}
+    
+	geom->IntersectionPoint(wireStarts[0],wireStarts[1],planes[0],planes[1],sY,sZ ); 
+	anchorCoords.push_back({sX/2,sY,sZ}); 
 
-
-
-	std::cout<<"Worst Plane: "<<worstPlane<<std::endl ;
+//	std::cout<<"Worst Plane: "<<worstPlane<<std::endl ;
 
 	std::vector<TVector3> pointsVector ;
 
@@ -122,40 +116,40 @@ namespace showerreco {
 	*  Dist is the distance from the cluster's 2D start to this new projection point
 	*  Use this distance to calculate an error in the chosen start point
 	*/
-	for( auto const & c : inputShowers ){
-
-	    float dist = 0 ; 
-
-	    if ( c.plane_id.Plane != worstPlane ){
-		std::cout<<"\nPlane: "<<c.plane_id.Plane
-			 <<"\nTimeS: "<<c.start_point.t
-			 <<"\nTimeE: "<<c.end_point.t
-			 <<"\nWireS: "<<c.start_point.w
-			 <<"\nWireE: "<<c.end_point.w<<std::endl ;
-		} 
-
-	    if ( c.plane_id.Plane != worstPlane && c.plane_id.Plane != 2){
-		for( int i = 0 ; i < anchorCoords.size() ; i++ ){
-
-		    plane = c.plane_id.Plane ;
-		    //testPoint is a PxPoint, 2D
-		    auto testPoint = geomHelper->Point_3Dto2D(anchorCoords[i],plane) ;
-
-		    dist = sqrt ( pow(c.start_point.t - testPoint.t,2) + 
-			    	  pow(c.start_point.w - testPoint.w,2) ) ;
-
-		    if ( dist < minDist ){
-			minDistIt = i ;
-		    	minDist   = dist ; 
-		    	}
-		    else
-			break;
-		    }
-		}
-	    }
-
-    resultShower.fXYZStart = anchorCoords[minDistIt] ;
-  //  resultShower.fXYZStart = anchorCoords[0] ;
+//	for( auto const & c : inputShowers ){
+//
+//	    float dist = 0 ; 
+//
+//	    if ( c.plane_id.Plane != worstPlane ){
+//		std::cout<<"\nPlane: "<<c.plane_id.Plane
+//			 <<"\nTimeS: "<<c.start_point.t
+//			 <<"\nTimeE: "<<c.end_point.t
+//			 <<"\nWireS: "<<c.start_point.w
+//			 <<"\nWireE: "<<c.end_point.w<<std::endl ;
+//		} 
+//
+//	    if ( c.plane_id.Plane != worstPlane && c.plane_id.Plane != 2){
+//		for( int i = 0 ; i < anchorCoords.size() ; i++ ){
+//
+//		    plane = c.plane_id.Plane ;
+//		    //testPoint is a PxPoint, 2D
+//		    auto testPoint = geomHelper->Point_3Dto2D(anchorCoords[i],plane) ;
+//
+//		    dist = sqrt ( pow(c.start_point.t - testPoint.t,2) + 
+//			    	  pow(c.start_point.w - testPoint.w,2) ) ;
+//
+//		    if ( dist < minDist ){
+//			minDistIt = i ;
+//		    	minDist   = dist ; 
+//		    	}
+//		    else
+//			break;
+//		    }
+//		}
+//	    }
+//
+//    resultShower.fXYZStart = anchorCoords[minDistIt] ;
+    resultShower.fXYZStart = anchorCoords[0] ;
 //    std::cout<<"min dist : "<<minDist<<std::endl ;
 
 }
