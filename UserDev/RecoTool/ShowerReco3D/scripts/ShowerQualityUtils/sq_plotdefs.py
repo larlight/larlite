@@ -34,21 +34,33 @@ def energy_asym_plot(df):
 
 def startpoint_acc_plot(df):
 	fig = plt.figure(figsize=(10,6))
+	xmin, xmax, nbins = 0., 5., 100
 	plt.title('Distance Between (3D) MC Start Point and Reco Start Point')
 	plt.xlabel('Distance in 3D [cm]')
 	plt.ylabel('Counts')
-	df['mc_reco_dist'].hist(bins=np.linspace(0,10,100))
+	plt.yscale('log')
+	n_total = len(df['mc_reco_dist'])
+	n_underflow = len(df.query('mc_reco_dist < %f'%xmin))
+	n_overflow  = len(df.query('mc_reco_dist > %f'%xmax))
+	df['mc_reco_dist'].hist(bins=np.linspace(xmin, xmax, nbins),label='Total entries: %d (%d underflow, %d overflow)'%(n_total,n_underflow,n_overflow))
+	plt.legend(loc=1)
 	return fig
 
 def anglediff_3d_plot(df):
 	fig = plt.figure(figsize=(10,6))
+	xmin, xmax, nbins =0., 180., 100
 	angular_res = df['mc_reco_anglediff']
-	bins = np.linspace(0,180,100)
-	plt.hist(angular_res,bins,edgecolor=None)
+	bins = np.linspace(xmin, xmax, nbins)
 	plt.grid(True)
-	plt.title('3D Direction MC - Reco angular difference')
+	plt.title('3D Direction MC - Reco Angular Difference')
 	plt.xlabel('3D Angle Difference [degrees]')
 	plt.ylabel('Counts')
+	n_total = len(df['mc_reco_anglediff'])
+	n_underflow = len(df.query('mc_reco_anglediff < %f'%xmin))
+	n_overflow  = len(df.query('mc_reco_anglediff > %f'%xmax))
+	plt.hist(angular_res,bins,edgecolor=None,label='Total entries: %d (%d underflow, %d overflow)'%(n_total,n_underflow,n_overflow))
+	plt.legend(loc=1)
+	plt.yscale('log')
 	return fig
 
 def dEdx_plot(df):
@@ -61,7 +73,7 @@ def dEdx_plot(df):
 	plt.hist(dedx_v,bins=bins,edgecolor=None,alpha=0.5,color='g',label='V Plane')
 	plt.hist(dedx_y,bins=bins,edgecolor=None,alpha=0.5,color='r',label='Y Plane')
 	plt.grid(True)
-	plt.legend(loc=2)
+	plt.legend(loc=1)
 	plt.title('dE/dx [ MeV/cm ] in each Plane')
 	plt.xlabel('dE/dx [ MeV / cm ]')
 	plt.ylabel('Count')
