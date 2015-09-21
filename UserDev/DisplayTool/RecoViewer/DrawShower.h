@@ -20,7 +20,6 @@
 #include "LArUtil/GeometryUtilities.h"
 #include "DataFormat/shower.h"
 #include "RecoBase.h"
-#include "Shower2d.h"
 
 /**
    \class DrawShower
@@ -31,7 +30,7 @@
 
 namespace evd {
 
-class Shower2d {
+class Shower2d  {
 
 public:
 

@@ -67,8 +67,7 @@ class dataBase(object):
     self._producerName = "null"
     self._process = None
     
-    # This is the (clunky) converter to native python
-    self._c2p = evd.Converter()
+
 
   def productName(self):
     return self._productName
@@ -173,9 +172,9 @@ class hit(recoBase):
       self._drawnObjects.append([])
       thisPlane = view.plane()
       # First get the hit information:
-      wireList       = self._c2p.Convert(self._process.getWireByPlane(thisPlane) )
-      timeStartList  = self._c2p.Convert(self._process.getHitStartByPlane(thisPlane) )
-      timeEndList    = self._c2p.Convert(self._process.getHitEndByPlane(thisPlane) )
+      hits = self._process.getDataByPlane(thisPlane)
+      print hits
+      print hits[0]
 
       for i in xrange(len(wireList)):
         # Draws a rectangle at (x,y,xlength, ylength)

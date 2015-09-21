@@ -10,9 +10,13 @@
 #pragma link off all functions;
 
 // #pragma link C++ class evd::RecoBase+;
+// Link all the classes that are "interactive" - for use in evd
 #pragma link C++ class evd::Shower2d;
 #pragma link C++ class evd::RecoBase<evd::Shower2d>;
+#pragma link C++ class evd::Hit;
+#pragma link C++ class evd::RecoBase<evd::Hit>;
 
+// Link the classes that are processors
 #pragma link C++ class evd::DrawShower+;
 #pragma link C++ class evd::DrawHit+;
 #pragma link C++ class evd::DrawCluster+;

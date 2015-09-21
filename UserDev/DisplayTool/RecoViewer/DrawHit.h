@@ -2,7 +2,7 @@
  * \file DrawHit.h
  *
  * \ingroup RecoViewer
- * 
+ *
  * \brief Class def header for a class DrawHit
  *
  * @author cadams
@@ -16,7 +16,7 @@
 
 #include <iostream>
 #include "Analysis/ana_base.h"
-#include "LArUtil/Geometry.h"
+#include "RecoBase.h"
 
 /**
    \class DrawHit
@@ -26,60 +26,62 @@
 
 namespace evd {
 
-  class DrawHit : public larlite::ana_base {
+class Hit {
 
-  public:
+public:
+    Hit(float w, float t, float c, float r) :
+    _wire(w),
+    _time(t),
+    _charge(c),
+    _rms(r)
+    {}
+    ~Hit() {}
+    float _wire;
+    float _time;
+    float _charge;
+    float _rms;
+
+    float wire()   {return _wire;}
+    float time()   {return _time;}
+    float charge() {return _charge;}
+    float rms()    {return _rms;}
+};
+
+class DrawHit : public larlite::ana_base, public RecoBase<Hit> {
+
+public:
 
     /// Default constructor
     DrawHit();
 
     /// Default destructor
-    ~DrawHit();
+    // ~DrawHit(){}
 
-    /** IMPLEMENT in DrawCluster.cc!
-        Initialization method to be called before the analysis event loop.
-    */ 
+    /**
+    Initialization method to be called before the analysis event loop.
+    */
     virtual bool initialize();
 
-    /** IMPLEMENT in DrawCluster.cc! 
-        Analyze a data event-by-event  
+    /** IMPLEMENT in DrawCluster.cc!
+        Analyze a data event-by-event
     */
     virtual bool analyze(larlite::storage_manager* storage);
 
-    /** IMPLEMENT in DrawCluster.cc! 
+    /** IMPLEMENT in DrawCluster.cc!
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
 
+    float maxCharge(size_t plane);
 
-    void setProducer(std::string s){producer = s;}
+private:
 
+    std::vector <float> _maxCharge;
 
-    const std::vector<int>   & getWireByPlane(unsigned int p) const;
-    const std::vector<float> & getHitStartByPlane(unsigned int p) const;
-    const std::vector<float> & getHitEndByPlane(unsigned int p) const;
-
-  private:
-    
-    const larutil::Geometry * geoService;
-
-    std::string producer;
-
-    // The hit data gets drawn as rectangles.  So we need to pass 
-    // the data in a way that's easy to draw.  That turns out to be
-    // (wire, start_time, end_time)
-    // Pack it up into 3 vectors that go together, easiest to
-    // convert to numpy and loop through.
-
-    // Internally, keep the hits sorted by plane
-    std::vector<std::vector<int>   > * wireByPlane;
-    std::vector<std::vector<float> > * hitStartByPlane;
-    std::vector<std::vector<float> > * hitEndByPlane;
-
-  };
+};
 
 } // evd
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 
