@@ -29,6 +29,7 @@ namespace evd {
 class Hit {
 
 public:
+    Hit(){}
     Hit(float w, float t, float c, float r) :
     _wire(w),
     _time(t),
