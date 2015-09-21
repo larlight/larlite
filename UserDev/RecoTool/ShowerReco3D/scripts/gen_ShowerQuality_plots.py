@@ -22,30 +22,38 @@ if len(sys.argv) != 2:
 #File that was output from ShowerQuality code including a ttree
 fname = sys.argv[1] #'ShowerQuality_ana_out.root'
 #Name of the once-per-shower ttree from the ShowerQuality output root file
-tname = 'fShowerTree'
+tshowername = 'fShowerTree'
+#Name of the once-per-event ttree from the ShowerQuality output root file
+teventname  = 'fEventTree'
 
 if not os.path.isfile(fname):
 	raise IOError('ShowerQuality output file does not exist: %s'%fname)
 
 #Turn the ShowerQuality output into a pandas dataframe like a BAMF
-df = pd.DataFrame(root2array(fname,tname))
+shower_df = pd.DataFrame(root2array(fname,tshowername))
+event_df  = pd.DataFrame(root2array(fname,teventname) )
 
-#Plot of energy asymmetro
-fig = energy_asym_plot(df)
+#Plot of energy asymmetry
+fig = energy_asym_plot(shower_df)
 plt.savefig('energy_asym.pdf')
 plt.show()
 
 #Plot of start point accuracy
-fig = startpoint_acc_plot(df)
+fig = startpoint_acc_plot(shower_df)
 plt.savefig('startpoint_accuracy.pdf')
 plt.show()
 
 # 3D direction angular resolution
-fig = anglediff_3d_plot(df)
+fig = anglediff_3d_plot(shower_df)
 plt.savefig('3Ddir_accuracy.pdf')
 plt.show()
 
 # dEdx plots
-fig = dEdx_plot(df)
+fig = dEdx_plot(shower_df)
 plt.savefig('dEdx_resolution.pdf')
+plt.show()
+
+# reco efficiency
+fig = reco_efficiency_vsenergy_plot(event_df)
+plt.savefig('reco_efficiency_vsenergy.pdf')
 plt.show()
