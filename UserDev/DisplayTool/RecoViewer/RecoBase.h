@@ -52,7 +52,7 @@ public:
 
   void setProducer(std::string s);
 
-  std::vector<DATA_TYPE> getDataByPlane(size_t p);
+  const std::vector<DATA_TYPE> & getDataByPlane(size_t p);
   // PyObject * getDataByPlane(size_t p);
 
 protected:
@@ -85,7 +85,7 @@ RecoBase <DATA_TYPE>::RecoBase() {
   // Set up default values of the _wire and _time range
   _wireRange.resize(geoService -> Nviews());
   _timeRange.resize(geoService -> Nviews());
-  for (size_t view = 0; view < geoService -> Nviews(); view ++){
+  for (size_t view = 0; view < geoService -> Nviews(); view ++) {
     _wireRange.at(view).first  = 0;
     _wireRange.at(view).second = geoService -> Nwires(view);
     _timeRange.at(view).first  = 0;
@@ -137,7 +137,7 @@ std::pair<float, float> RecoBase<DATA_TYPE>::getTimeRange(size_t p) {
 }
 
 template <class DATA_TYPE>
-std::vector<DATA_TYPE>  RecoBase<DATA_TYPE>::getDataByPlane(size_t p) {
+const std::vector<DATA_TYPE> & RecoBase<DATA_TYPE>::getDataByPlane(size_t p) {
   static std::vector<DATA_TYPE> returnNull;
   if (p >= geoService->Nviews() ) {
     std::cerr << "ERROR: Request for nonexistent plane " << p << std::endl;
@@ -153,6 +153,32 @@ std::vector<DATA_TYPE>  RecoBase<DATA_TYPE>::getDataByPlane(size_t p) {
     }
   }
 }
+
+// template <class DATA_TYPE>
+// PyObject * RecoBase<DATA_TYPE>::getDataByPlane(size_t p) {
+//   PyObject* pvec = PyList_New(_dataByPlane.at(p).size());
+//   if (p >= geoService->Nviews() ) {
+//     std::cerr << "ERROR: Request for nonexistent plane " << p << std::endl;
+//     Py_DECREF(pvec);
+//     throw std::exception();
+//   }
+//   else {
+//     // try {
+//       for (size_t i = 0; i < _dataByPlane.at(p).size(); ++i) {
+
+//         if (PyList_SetItem(pvec, i, &(_dataByPlane.at(p)[i]))) {
+
+//           Py_DECREF(pvec);
+//           throw std::exception();
+//         }
+//       }
+//       return pvec;
+//     // }
+//     // catch (const std::exception& e) {
+//     //   std::cerr << e.what() << '\n';
+//     // }
+//   }
+// }
 
 
 } // evd
