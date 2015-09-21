@@ -33,7 +33,6 @@ namespace evd {
 
     // Initialize the geoService object:
     geoService = larutil::Geometry::GetME();
-    geoUtil    = larutil::GeometryUtilities::GetME();
 
     wireRange.resize(geoService -> Nviews());
     timeRange.resize(geoService -> Nviews());

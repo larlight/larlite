@@ -17,9 +17,8 @@
 
 #include "Analysis/ana_base.h"
 #include "LArUtil/Geometry.h"
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/GeometryHelper.h"
 #include "LArUtil/DetectorProperties.h"
-//#include "LArUtil/PxUtils.h"
 #include "DataFormat/cluster.h"
 #include "DataFormat/hit.h"
 #include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
@@ -89,8 +88,7 @@ namespace evd {
   private:
 
     const larutil::Geometry * geoService;
-    const larutil::GeometryUtilities * geoUtil;
-    
+    const larutil::GeometryHelper * geoHelper;
 
     bool _fill_params;
 

@@ -113,6 +113,9 @@ class recoBase(dataBase):
     pass
 
   def getAutoRange(self,plane):
+    if self._process != None:
+      w,t = self._process.getWireRange(plane), self._process.getTimeRange(plane)
+      return [w.first,w.second],[t.first,t.second]
     return None, None
 
 
@@ -733,7 +736,7 @@ class shower(recoBase):
       # get the showers from the process:
       self._drawnObjects.append([])
 
-      showers = self._process.getShowersByPlane(view.plane())
+      showers = self._process.getDataByPlane(view.plane())
 
       i_color = 0
 
@@ -746,14 +749,14 @@ class shower(recoBase):
 
         # construct a polygon for this shower:
         points = []
-        # Remeber - everything is in cm, but the display is in wire/time!
+        # Remember - everything is in cm, but the display is in wire/time!
         geom = view_manager._geometry
-        x = shower.startPoint().X() / geom.wire2cm()
-        y = shower.startPoint().Y() / geom.time2cm()
+        x = shower.startPoint().w / geom.wire2cm()
+        y = shower.startPoint().t / geom.time2cm()
         points.append(QtCore.QPoint(x,y))
         # next connect the two points at the end of the shower to make a cone
-        x1, y1 = shower.startPoint().X(), shower.startPoint().Y()
-        x2, y2 = shower.startPoint().X(), shower.startPoint().Y()
+        x1, y1 = shower.startPoint().w, shower.startPoint().t
+        x2, y2 = shower.startPoint().w, shower.startPoint().t
         x1 = x1 + shower.length() * mt.cos(shower.angleInPlane() - shower.openingAngle()/2)
         y1 = y1 + shower.length() * mt.sin(shower.angleInPlane() - shower.openingAngle()/2)
         x2 = x2 + shower.length() * mt.cos(shower.angleInPlane() + shower.openingAngle()/2)

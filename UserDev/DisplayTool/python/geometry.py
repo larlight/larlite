@@ -61,17 +61,18 @@ class geometry(geoBase):
     self._offset = []
     for v in range(0, self._nViews):
       self._wRange.append(larutil.Geometry.GetME().Nwires(v))   
-    self._defaultColorScheme = []
-
-  def colorMap(self,plane):
-    return self._defaultColorScheme[plane]
-
       # Set up the correct drift time offset.
       # Offset is returned in terms of centimeters.
       self._offset.append(larutil.DetectorProperties.GetME().TriggerOffset()
                          *larutil.GeometryUtilities.GetME().TimeToCm()
                          -larutil.Geometry.GetME().PlaneOriginVtx(v)[0])
     
+    self._defaultColorScheme = []
+
+  def colorMap(self,plane):
+    return self._defaultColorScheme[plane]
+
+
 
 
 class microboone(geometry):
