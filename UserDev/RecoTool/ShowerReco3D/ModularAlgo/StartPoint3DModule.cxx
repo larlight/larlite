@@ -34,8 +34,7 @@ namespace showerreco {
 	}
 
     /**
-    *  Caluclate intersection point in Y,Z of the 2 best planes.
-    *  Calculate their average start time
+    *  Store planes and wire start, calculate average time for best 2 clusters.
     */
     double sX = 0 ;
     double sY ; 
@@ -51,9 +50,13 @@ namespace showerreco {
     	   planes.emplace_back( c.plane_id.Plane ) ;
     	   sX += c.start_point.t;	
     	   }
-    }
-    
-    auto geom       = larutil::Geometry::GetME();
+	}
+
+    /**
+    *  Caluclate intersection point in Y,Z of the 2 best planes.
+    *  Calculate their average start time
+    */
+    auto geom  = larutil::Geometry::GetME();
     geom->IntersectionPoint(wireStarts[0],wireStarts[1],planes[0],planes[1],sY,sZ ); 
     
     resultShower.fXYZStart = {sX/2,sY,sZ} ; 
