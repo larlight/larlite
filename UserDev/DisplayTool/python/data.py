@@ -318,10 +318,10 @@ class boxCollection(QtCore.QObject):
       self.highlightChange.emit()
 
 
-  def drawHits(self,view,wireList,timeStartList,timeEndList):
-    for i in xrange(len(wireList)):
+  def drawHits(self,view,cluster):
+    for hit in cluster:
       # Draws a rectangle at (x,y,xlength, ylength)
-      r = connectedBox(wireList[i], timeStartList[i], 1, timeEndList[i]-timeStartList[i])
+      r = connectedBox(hit.wire(), hit.time(), 1, hit.rms())
       r.setPen(pg.mkPen(None))
       r.setBrush(pg.mkColor(self._color))
       self._listOfHits.append(r)
@@ -623,40 +623,33 @@ class cluster(recoBase):
       
       self._listOfCParams.append([])
 
-      params_v = self._process.getParamsByPlane(thisPlane)
+      clusters = self._process.getDataByPlane(thisPlane)
 
-      # loop over the clusters in this plane:
-      for i_cluster in xrange(self._process.getNClustersByPlane(thisPlane)):
-
-        totalClus += 1 
-
-        wireList       = self._c2p.Convert(self._process.getWireByPlaneAndCluster(thisPlane,i_cluster))
-        timeStartList  = self._c2p.Convert(self._process.getHitStartByPlaneAndCluster(thisPlane,i_cluster))
-        timeEndList    = self._c2p.Convert(self._process.getHitEndByPlaneAndCluster(thisPlane,i_cluster))
-
+      for cluster in clusters:
 
         # Now make the cluster
-        cluster = boxCollection()
-        cluster.setColor(self._clusterColors[colorIndex])
-        cluster.setPlane(thisPlane)
+        cluster_box_coll = boxCollection()
+        cluster_box_coll.setColor(self._clusterColors[colorIndex])
+        cluster_box_coll.setPlane(thisPlane)
 
-        # draw the hits in this cluster:
-        cluster.drawHits(view,wireList,timeStartList,timeEndList)
-
-        self._listOfClusters[thisPlane].append(cluster)
+        # Keep track of the cluster for drawing management
+        self._listOfClusters[thisPlane].append(cluster_box_coll)
         self._listOfCParams[thisPlane].append(None)
 
+
+        # draw the hits in this cluster:
+        cluster_box_coll.drawHits(view,cluster)
 
         colorIndex += 1
         if colorIndex >= len(self._clusterColors):
           colorIndex = 0
 
         if self._drawParams:
-          if int(i_cluster) < int(len(params_v)) and params_v[i_cluster].N_Hits > 10:
+          if cluster.params().N_Hits > 10:
 
-            cParams = clusterParams(params_v[i_cluster],view_manager._geometry) 
+            cParams = clusterParams(cluster.params(),view_manager._geometry) 
             self._listOfCParams[thisPlane][-1] = cParams
-            cluster.attachParams(cParams)
+            cluster_box_coll.attachParams(cParams)
             self._listOfCParams[thisPlane][-1].draw(view)
 
             # Connect the params to the cluster:
@@ -665,7 +658,8 @@ class cluster(recoBase):
             self._listOfCParams[thisPlane][-1].highlightChange.connect(self._listOfClusters[thisPlane][-1].toggleHighlight)
             self._listOfClusters[thisPlane][-1].mouseEnter.connect(self._listOfCParams[thisPlane][-1].hoverEnter)
             self._listOfClusters[thisPlane][-1].mouseExit.connect(self._listOfCParams[thisPlane][-1].hoverExit)
-            self._listOfClusters[thisPlane][-1].highlightChange.connect(self._listOfCParams[thisPlane][-1].toggleHighlight)	
+            self._listOfClusters[thisPlane][-1].highlightChange.connect(self._listOfCParams[thisPlane][-1].toggleHighlight) 
+
 
   def clearDrawnObjects(self,view_manager):
     i_plane = 0
@@ -690,9 +684,9 @@ class cluster(recoBase):
 
 
   def getAutoRange(self,plane):
-    wires = self._process.GetWireRange(plane)
-    times = self._process.GetTimeRange(plane)
-    return [wires[0],wires[1]],[times[0],times[1]]
+    w,t = self._process.getWireRange(plane), self._process.getTimeRange(plane)
+    return [w.first,w.second],[t.first,t.second]
+
 
 
 
