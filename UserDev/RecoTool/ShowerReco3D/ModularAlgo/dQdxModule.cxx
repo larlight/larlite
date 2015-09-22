@@ -4,6 +4,7 @@
 #include "dQdxModule.h"
 #include "LArUtil/Geometry.h"
 #include "LArUtil/GeometryHelper.h"
+#include "ClusterRecoUtil/Base/ClusterParams.h"
 
 namespace showerreco{
 
@@ -66,6 +67,9 @@ namespace showerreco{
       // get the showering point for this cluster
       auto const& shr_start = inputShowers.at(n).showering_point;
 
+      // cluster open angle
+      auto const& opena_cluster = inputShowers.at(n).opening_angle;
+
       // start direction
       auto const& start_dir = inputShowers.at(n).start_dir;
 
@@ -89,33 +93,25 @@ namespace showerreco{
       _n_hits =n_hits;
       _pl = pl;
       _pitch = pitch;
-      if (_verbose) std::cout<<"pitch="<<pitch<<"\n";
+      if (_verbose)std::cout<<"pitch="<<pitch<<"\n";
       factor = pitch/0.3;
       _length = trunk_length;
       dx[pl]=trunk_length;
-      dx_p[pl]=trunk_length*factor;
+      dx_p[pl]=(shr_start.w - start.w)*factor;//3D length
       _shrs_w=shr_start.w;
       _shrs_t=shr_start.t;
       
-      if (_verbose)
-	std::cout << "trunk length for plane " << pl << " is " << trunk_length << std::endl;
-
       dQ[pl]=0;
       for (int i=0;i<n_hits;i++){
 	hit_length = sqrt((hits[i].w-start.w)*(hits[i].w-start.w)+
 			  (hits[i].t-start.t)*(hits[i].t-start.t));
 	dx[pl]=hit_length;
 
-	//	if (trunk_length>=2.4){
-	  if (hit_length<trunk_length){
-	    double Q = hits[i].charge * _charge_conversion;
+	if (hit_length<trunk_length){
+	  double Q = hits[i].charge * _charge_conversion;
 	    dQ[pl] += Q;
-	  }
-	  //	} 
-	//else if(hit_length<2.4){
-	// double Q = hits[i].charge * _charge_conversion;
-	//  dQ[pl] += Q;
-	//	}
+	}
+	
       }
       dQdx=dQ[pl]/trunk_length;
       dQdx_pitch=dQ[pl]/(trunk_length*factor);
@@ -123,19 +119,19 @@ namespace showerreco{
       _dQ=dQ[pl];
       _dQdx =dQdx;
       _dQdx_pitch =dQdx_pitch;
-
-      resultShower.fdQdx[pl] = dQdx;
+      
+      resultShower.fdQdx[pl] = dQdx_pitch;
       
       if (_verbose) std::cout<<"_pitch="<<_pitch<<"\n";
       //if (trunk_length>0)
       _tree->Fill();
-      if (_verbose) std::cout<<"now3_pl="<<_pl<<"\n";
+      std::cout<<"plane:"<<pl<<","opena_cluster<<"\n";
     }
-
+    
     return;
   }
 
-
+  
 } //showerreco
 
 #endif
