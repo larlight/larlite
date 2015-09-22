@@ -14,9 +14,14 @@
 #pragma link C++ class evd::Shower2d+;
 #pragma link C++ class std::vector<::evd::Shower2d>+;
 #pragma link C++ class evd::RecoBase<evd::Shower2d>+;
+
 #pragma link C++ class evd::Hit+;
 #pragma link C++ class std::vector<::evd::Hit>+;
 #pragma link C++ class evd::RecoBase<evd::Hit>+;
+
+#pragma link C++ class evd::Cluster2d+;
+#pragma link C++ class std::vector<::evd::Cluster2d>+;
+#pragma link C++ class evd::RecoBase<evd::Cluster2d>+;
 
 // Link the classes that are processors
 #pragma link C++ class evd::DrawShower+;
