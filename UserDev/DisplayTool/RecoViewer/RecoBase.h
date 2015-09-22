@@ -19,10 +19,10 @@
 struct _object;
 typedef _object PyObject;
 
-#ifndef __CINT__
-#include "Python.h"
-#include "numpy/arrayobject.h"
-#endif
+// #ifndef __CINT__
+// #include "Python.h"
+// #include "numpy/arrayobject.h"
+// #endif
 
 #include "LArUtil/Geometry.h"
 #include "LArUtil/GeometryHelper.h"
@@ -91,7 +91,7 @@ RecoBase <DATA_TYPE>::RecoBase() {
     _timeRange.at(view).first  = 0;
     _timeRange.at(view).second = detProp -> NumberTimeSamples();
   }
-  import_array();
+  // import_array();
 }
 
 template <class DATA_TYPE>
