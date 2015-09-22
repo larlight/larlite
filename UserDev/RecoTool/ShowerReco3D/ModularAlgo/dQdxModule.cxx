@@ -52,6 +52,7 @@ namespace showerreco{
     double dQ[3]={};
     double dx[3]={};
     double dx_p[3]={};
+    double trunk_length[3]={};
     // loop over all input cluster -> calculate a dQdx per plane
     for (size_t n=0; n < inputShowers.size(); n++){
       
@@ -83,7 +84,7 @@ namespace showerreco{
       // connecting the start point and the beginning of the
       // showering point along the start_dir direction
 
-      double trunk_length = sqrt ( (shr_start.w - start.w) * (shr_start.w - start.w) + 
+       trunk_length[pl] = sqrt ( (shr_start.w - start.w) * (shr_start.w - start.w) + 
 				   (shr_start.t - start.t) * (shr_start.t - start.t) );
       double hit_length;
       int n_hits = hits.size();
@@ -93,10 +94,9 @@ namespace showerreco{
       _n_hits =n_hits;
       _pl = pl;
       _pitch = pitch;
-      if (_verbose)std::cout<<"pitch="<<pitch<<"\n";
       factor = pitch/0.3;
-      _length = trunk_length;
-      dx[pl]=trunk_length;
+      _length = trunk_length[pl];
+      dx[pl]=trunk_length[pl];
       dx_p[pl]=(shr_start.w - start.w)*factor;//3D length
       _shrs_w=shr_start.w;
       _shrs_t=shr_start.t;
@@ -107,17 +107,17 @@ namespace showerreco{
 			  (hits[i].t-start.t)*(hits[i].t-start.t));
 	dx[pl]=hit_length;
 
-	if (hit_length<trunk_length){
+	if (hit_length<trunk_length[pl]){
 	  double Q = hits[i].charge * _charge_conversion;
 	    dQ[pl] += Q;
 	}
 	
       }
-      dQdx=dQ[pl]/trunk_length;
-      dQdx_pitch=dQ[pl]/(trunk_length*factor);
+      dQdx=dQ[pl]/dx[pl];
+      dQdx_pitch=dQ[pl]/dx_p[pl];
       
-      _dQ=dQ[pl];
-      _dQdx =dQdx;
+      _dQ   = dQ[pl];
+      _dQdx = dQdx;
       _dQdx_pitch =dQdx_pitch;
       
       resultShower.fdQdx[pl] = dQdx_pitch;
