@@ -64,6 +64,7 @@ namespace showerreco {
     double _dQdx1_smooth;
     double _dQdx2_smooth;
     double _BestdQdx_smooth;    
+    double _pitch;
     int _Nhits;
     int _Nhits_smooth;
     
