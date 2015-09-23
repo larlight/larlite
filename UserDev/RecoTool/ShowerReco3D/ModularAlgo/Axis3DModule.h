@@ -22,12 +22,42 @@
    doxygen documentation!
  */
 namespace showerreco {
+  
+enum Status {kNormal, kNotOptFit, kTwoPlane, kAveraged, kIterMaxOut, kNStatus};
+  
+class SeedVector {
+  
+public:
+  
+  bool     _exists = false;
+  TVector3 _vector;
+  float    _error;
+  Status   _status;
+  int      _iterations;
+  
+  /// Default constructor
+  SeedVector() {}
+  
+  /// Constructor
+  SeedVector(TVector3 vector, float error) {_exists = true; _vector = vector; _error = error;}
+  
+  /// Copy constructor
+  SeedVector(const SeedVector & vec) {
+    _exists     = vec._exists;
+    _vector     = vec._vector;
+    _error      = vec._error;
+    _status     = vec._status;
+    _iterations = vec._iterations;
+  }
+  
+  /// Default destructor
+  ~SeedVector() {}
+  
+};
 
 class Axis3DModule : ShowerRecoModuleBase {
 
 public:
-
-    enum Status {kNormal, kNotOptFit, kIterMaxOut, kNStatus};
 
     /// Default constructor
     Axis3DModule() {_name = "Axis3DModule";}
@@ -194,15 +224,12 @@ private:
      *          at least one candidate.
      *
      * @param seedVectors Reference to the empty seed vector to which candidates are added
-     * @param errorVector Reference to the error on each seed vector candidate
      * @param planes The planes that each of the slopes match to
      * @param slopeByPlane The slopes on each plane that the algorithm fits against
      */
-    void findSeedVectors(std::vector<TVector3> & seedVectors,
-                         std::vector<float> & errorVector,
+    void findSeedVectors(std::vector<SeedVector> & seedVectors,
                          const std::vector<int> & planes,
                          const std::vector<float> & slopeByPlane);
-
   
     /**
      * @brief Optimizes all seed vectors contained in input vector
@@ -211,18 +238,12 @@ private:
      *          whether the optimization converged, and how good the final fit was.
      *
      * @param seedVectors Reference to the vector containing all potential seed candidates
-     * @param errorVector Reference to the vector containing the error on each seed candidate
      * @param planes The planes that each of the slopes match to
      * @param slopeByPlane The slope on each plane that the algorithm fits against
-     * @param convergeStatus Vector reporting the convergence status for each candidate
-     * @param convergeNumber Vector containing the number of iterations used for each candidate
      */
-    void optimizeSeedVectors(std::vector<TVector3> & seedVectors,
-                             std::vector<float> & errorVector,
-                             std::vector<int> planes,
-                             std::vector<float> & slopeByPlane,
-                             std::vector<Status> & convergeStatus,
-                             std::vector<int> & convergeNumber);
+    void optimizeSeedVectors(std::vector<SeedVector> & seedVectors,
+                             const std::vector<int> & planes,
+                             const std::vector<float> & slopeByPlane);
   
     /**
      * @brief Prints out all candidate vectors, and their errors
@@ -230,18 +251,12 @@ private:
      *          as well as the status of the optimization.
      *
      * @param seedVectors Reference to the vector containing all potential seed vector candidates
-     * @param errorVector Reference to the vector containing the error on each seed candidate
      * @param planes The planes that each of the slopes match to
      * @param slopeByPlane The slope on each plane that the algorithm fits against
-     * @param convergeStatus Vector reporting the convergence status for each candidate
-     * @param convergeNumber Vector containing the number of iterations used for each candidate
      */
-    void printVectors(std::vector<TVector3> & seedVectors,
-                      std::vector<float> & errorVector,
-                      std::vector<int> & planes,
-                      std::vector<float> & slopeByPlane,
-                      std::vector<Status> & convergeStatus,
-                      std::vector<int> & convergeNumber);
+    void printVectors(std::vector<SeedVector> & seedVectors,
+                      const std::vector<int> & planes,
+                      const std::vector<float> & slopeByPlane);
   
     /**
      * @brief Finds the one optimal vector from the vector of candidates
@@ -249,18 +264,27 @@ private:
      *          It then saves the index & error of the one vector with the smallest error, and saves them in bestIndex
      *          and bestError.
      *
-     * @param seedVectors Reference to the vector containing all potential seed vector candidates
-     * @param errorVector Reference to the vector containing the error on each seed vector candidate
-     * @param convergeStatus The convergence status of each seed vector candidate
-     * @param bestIndex The index of the best seed vector candidate
-     * @param bestError The error of the best seed vector candidate
+     * @param seedVectors Reference to the object containing all potential seed vector candidates
      * @return The optimal vector candidate
      */
-    TVector3 findOptimalVector(std::vector<TVector3> & seedVectors,
-                               std::vector<float> & errorVector,
-                               std::vector<Status> & convergeStatus,
-                               int & bestIndex,
-                               float & bestError);
+    SeedVector findOptimalVector(std::vector<SeedVector> & seedVectors);
+  
+    // Info on best vector (ie. module output) for writing to tree
+    bool  _vec_exists;
+    float _vec_error;
+    int   _vec_status;
+    float _vec_x;
+    float _vec_y;
+    float _vec_z;
+    float _slope_0;
+    float _slope_1;
+    float _slope_2;
+    float _slope_0_true;
+    float _slope_1_true;
+    float _slope_2_true;
+  
+    // Function to initialise output tree
+    void initialize();
 
     // Private members that get used frequently:
     std::vector<TVector3> _globalSeedVectors;
