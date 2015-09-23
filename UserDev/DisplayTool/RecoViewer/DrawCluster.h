@@ -2,7 +2,7 @@
  * \file DrawCluster.h
  *
  * \ingroup RecoViewer
- * 
+ *
  * \brief Class def header for a class DrawCluster
  *
  * @author cadams
@@ -29,57 +29,60 @@
 
 
 namespace evd {
-  /**
-     \class DrawCluster
-     User custom analysis class made by SHELL_USER_NAME
-   */
+/**
+   \class DrawCluster
+   User custom analysis class made by SHELL_USER_NAME
+ */
 
-  class Cluster2d : public std::vector<Hit> {
+class Cluster2d : public std::vector<Hit> {
 
-    public:
-        ::cluster::cluster_params _params;
-        ::cluster::cluster_params params(){return _params;}
-  };
+public:
+  Cluster2d(){_is_good = false;}
+  ::cluster::cluster_params _params;
+  ::cluster::cluster_params params() {return _params;}
+  bool _is_good;
+  bool is_good() {return _is_good;}
+};
 
-  class DrawCluster : public larlite::ana_base, public RecoBase<Cluster2d>{
-  
-  public:
+class DrawCluster : public larlite::ana_base, public RecoBase<Cluster2d> {
 
-    /// Default constructor
-    DrawCluster();
+public:
 
-    /// Default destructor
-    virtual ~DrawCluster();
+  /// Default constructor
+  DrawCluster();
 
-    /** IMPLEMENT in DrawCluster.cc!
-        Initialization method to be called before the analysis event loop.
-    */ 
-    virtual bool initialize();
+  /// Default destructor
+  virtual ~DrawCluster();
 
-    /** IMPLEMENT in DrawCluster.cc! 
-        Analyze a data event-by-event  
-    */
-    virtual bool analyze(larlite::storage_manager* storage);
+  /** IMPLEMENT in DrawCluster.cc!
+      Initialization method to be called before the analysis event loop.
+  */
+  virtual bool initialize();
 
-    /** IMPLEMENT in DrawCluster.cc! 
-        Finalize method to be called after all events processed.
-    */
-    virtual bool finalize();
+  /** IMPLEMENT in DrawCluster.cc!
+      Analyze a data event-by-event
+  */
+  virtual bool analyze(larlite::storage_manager* storage);
 
-  protected:
+  /** IMPLEMENT in DrawCluster.cc!
+      Finalize method to be called after all events processed.
+  */
+  virtual bool finalize();
 
-    ::cluster::CRUHelper _cru_helper;
+protected:
 
-  };
+  ::cluster::CRUHelper _cru_helper;
+
+};
 }
 #endif
 
 //**************************************************************************
-// 
+//
 // For Analysis framework documentation, read Manual.pdf here:
 //
 // http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
 //
 //**************************************************************************
 
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
