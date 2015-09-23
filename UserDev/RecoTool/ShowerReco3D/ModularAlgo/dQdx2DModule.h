@@ -47,6 +47,7 @@ namespace showerreco {
 
     std::vector<double> HitDist_toStart;
     std::vector<double> HitCharge;
+    std::vector<double> pitch;
     std::vector<int> IndexSort;
     
     std::vector< std::vector <double > > HitdeltaQdeltax_v;
