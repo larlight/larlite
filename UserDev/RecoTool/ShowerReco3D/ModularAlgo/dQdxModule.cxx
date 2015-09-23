@@ -125,7 +125,7 @@ namespace showerreco{
       if (_verbose) std::cout<<"_pitch="<<_pitch<<"\n";
       //if (trunk_length>0)
       _tree->Fill();
-      std::cout<<"plane:"<<pl<<","<<opena_cluster<<"\n";
+      if (_verbose) std::cout<<"plane:"<<pl<<","<<opena_cluster<<"\n";
     }
     
     return;
