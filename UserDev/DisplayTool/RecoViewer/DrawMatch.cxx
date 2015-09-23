@@ -1,17 +1,17 @@
-#ifndef LARLITE_DRAWCLUSTER_CXX
-#define LARLITE_DRAWCLUSTER_CXX
+#ifndef LARLITE_DRAWMATCH_CXX
+#define LARLITE_DRAWMATCH_CXX
 
-#include "DrawCluster.h"
+#include "DrawMatch.h"
 
 namespace evd {
 
-DrawCluster::DrawCluster() {
-  _name = "DrawCluster";
+DrawMatch::DrawMatch() {
+  _name = "DrawMatch";
   _fout = 0;
 
 }
 
-bool DrawCluster::initialize() {
+bool DrawMatch::initialize() {
 
   //
   // This function is called in the beginning of event loop
@@ -28,7 +28,7 @@ bool DrawCluster::initialize() {
   return true;
 }
 
-bool DrawCluster::analyze(larlite::storage_manager* storage) {
+bool DrawMatch::analyze(larlite::storage_manager* storage) {
 
   //
   // Do your event-by-event analysis here. This function is called for
@@ -153,11 +153,26 @@ bool DrawCluster::analyze(larlite::storage_manager* storage) {
 
   }
 
+  // Now that clusters are done filling, go through and pad out the rest of the data
+  // Just in case they aren't the same length:
+  int max_val = cluster_index.front();
+  for (auto & val : cluster_index){
+    if (val > max_val ){
+      max_val = val;
+    }
+  }
+
+  for (auto & planeOfClusters : _dataByPlane){
+    if (planeOfClusters.size() < max_val){
+      planeOfClusters.resize(max_val);
+    }
+  }
+
 
   return true;
 }
 
-bool DrawCluster::finalize() {
+bool DrawMatch::finalize() {
 
   // This function is called at the end of event loop.
   // Do all variable finalization you wish to do here.
@@ -177,7 +192,7 @@ bool DrawCluster::finalize() {
   return true;
 }
 
-DrawCluster::~DrawCluster() {
+DrawMatch::~DrawMatch() {
 }
 
 }
