@@ -36,7 +36,10 @@ namespace showerreco{
     _tree->Branch("_Nhits",&_Nhits,"Nhits/I");
     _tree->Branch("_Nhits_smooth",&_Nhits_smooth,"Nhits_smooth/I");
     _tree->Branch("_pitch",&_pitch,"pitch/D");
-
+    //    _tree->Branch("HitdeltaQdeltax_v0",&HitdeltaQdeltax_v[0]);
+    // _tree->Branch("HitdeltaQdeltax_v1",&HitdeltaQdeltax_v[1]);
+    // _tree->Branch("HitdeltaQdeltax_v2",&HitdeltaQdeltax_v[2]);
+    
     std::cout << "tree created" << std::endl;
 
     return;
@@ -49,10 +52,15 @@ namespace showerreco{
     Len.clear();
     dQdx.clear();
     dQdx_smooth.clear();
+    HitDist_toStart.clear();
+    HitCharge.clear();
+    IndexSort.clear();
+    HitdeltaQdeltax_v.clear();
+
     dQdx.resize(3);
     dQdx_smooth.resize(3);
     Len.resize(3);
-
+    HitdeltaQdeltax_v.resize(3);
 
     auto geomHelper = larutil::GeometryHelper::GetME();
 
@@ -77,6 +85,7 @@ namespace showerreco{
 	//Major failure mode is ShoweringPoint is == 0, when that happens pull the "default" value
 	dist = 2.4;
       }
+
       Len[pl] = dist;
       
       double pitch = (geomHelper->GetPitch(dir3D,pl));
@@ -130,7 +139,7 @@ namespace showerreco{
 
 
       //Caculation of the Charge deposited at start of shower
-      //UNSMOOTHED! Possible improvement      
+      //with SMOOTHING!
       double _rms_dQdx_temp = 0;
       _mean_dQdx = 0;
       _rms_dQdx_temp = 0;
@@ -142,8 +151,31 @@ namespace showerreco{
 	_Nhits++;
 	_mean_dQdx += cluster.hit_vector.at(h).charge;
 	_rms_dQdx_temp += cluster.hit_vector.at(h).charge*cluster.hit_vector.at(h).charge;
+	HitDist_toStart.push_back(geomHelper->Get2DDistance(cluster.start_point,cluster.hit_vector.at(h)));
+	HitCharge.push_back(cluster.hit_vector.at(h).charge);
       }
       
+      if(HitDist_toStart.size() != 0){
+	IndexSort.resize(HitDist_toStart.size());
+	int n = 0;
+
+	std::generate(IndexSort.begin(),  IndexSort.end(), [&]{ return n++; });
+	std::sort(IndexSort.begin(),IndexSort.end(),[&](int i1, int i2) {return HitDist_toStart[i1] < HitDist_toStart[i2];});
+
+	HitdeltaQdeltax_v[pl].resize(HitDist_toStart.size()-1);      
+
+	for(int i = 0; i < HitDist_toStart.size()-1; i++){
+
+	  if( (HitDist_toStart.at(IndexSort[i]) - HitDist_toStart.at(IndexSort[i+1])) != 0){
+	    HitdeltaQdeltax_v[pl].push_back( 
+					    (HitCharge.at(IndexSort[i]) - HitCharge.at(IndexSort[i+1]))/
+					    (HitDist_toStart.at(IndexSort[i]) - HitDist_toStart.at(IndexSort[i+1])));
+	    
+	    //    std::cout << HitdeltaQdeltax_v[pl].back() << std::endl;
+	  }
+	}
+      }
+
       _mean_dQdx /= StartHits.size();
       _rms_dQdx_temp /= StartHits.size();
       _rms_dQdx = sqrt(_rms_dQdx_temp);
@@ -164,8 +196,6 @@ namespace showerreco{
 	dQdx_smooth.at(pl) = dQdx.at(pl);
 	_Nhits_smooth = _Nhits;
       }
-
-      
 
       if(pl == 0)
 	_Q0 = dQdx[0];

@@ -45,6 +45,12 @@ namespace showerreco {
     std::vector<double> dQdx; 
     std::vector<double> dQdx_smooth; 
 
+    std::vector<double> HitDist_toStart;
+    std::vector<double> HitCharge;
+    std::vector<int> IndexSort;
+    
+    std::vector< std::vector <double > > HitdeltaQdeltax_v;
+
     std::vector<double> Len;
     double _length;
     double _dQdx0;
