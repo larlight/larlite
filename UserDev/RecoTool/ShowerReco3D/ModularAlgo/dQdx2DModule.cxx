@@ -35,6 +35,7 @@ namespace showerreco{
     _tree->Branch("_rms_dQdx",&_rms_dQdx,"rms_dQdx/D");
     _tree->Branch("_Nhits",&_Nhits,"Nhits/I");
     _tree->Branch("_Nhits_smooth",&_Nhits_smooth,"Nhits_smooth/I");
+    _tree->Branch("_pitch",&_pitch,"pitch/D");
 
     std::cout << "tree created" << std::endl;
 
@@ -54,6 +55,9 @@ namespace showerreco{
 
 
     auto geomHelper = larutil::GeometryHelper::GetME();
+
+    //Grab 3D direction already in the shower product
+    auto const& dir3D = resultShower.fDCosStart;
     
     //iterate through the selected clusters
     for(auto const & cluster : inputShowers){
@@ -74,7 +78,18 @@ namespace showerreco{
 	dist = 2.4;
       }
       Len[pl] = dist;
- 
+      
+      double pitch = (geomHelper->GetPitch(dir3D,pl));
+      _pitch = pitch;
+      pitch /= 0.3;
+      
+      if(pitch == 0){
+	std::cout << "no pitch" << std::endl; 
+	pitch = 1;
+      }
+      //Setting correct 3D length
+      Len[pl] /= pitch;
+
       _StartW = cluster.start_point.w;
       _StartT = cluster.start_point.t;
       _ShowW = cluster.showering_point.w;
@@ -145,6 +160,10 @@ namespace showerreco{
 	  _Nhits_smooth++;
 	}
       }
+      if(_Nhits_smooth < 5){
+	dQdx_smooth.at(pl) = dQdx.at(pl);
+	_Nhits_smooth = _Nhits;
+      }
 
       
 
@@ -159,8 +178,8 @@ namespace showerreco{
 
       //Calculate the dQdx!
       if(dist > 0){
-	dQdx.at(pl) /= dist;
-	dQdx_smooth.at(pl) /= dist;
+	dQdx.at(pl) /= Len[pl];
+	dQdx_smooth.at(pl) /= Len[pl];
       }
       else{
 	dQdx.at(pl) = 0;
