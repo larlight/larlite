@@ -53,6 +53,23 @@ namespace showerreco {
     std::vector< std::vector <double > > HitdeltaQdeltax_v;
 
     std::vector<double> Len;
+
+     // ADC -> e- conversion factors
+    double _fC_to_e;
+    double _ADC_to_mV;
+    double _shp_time;
+    double _asic_gain;
+
+
+    //Tree Variuable 
+    std::vector< double > _HitdeltaQdeltax_v0;
+    std::vector< double > _HitdeltaQdeltax_v1;
+    std::vector< double > _HitdeltaQdeltax_v2;
+
+    int _event;
+
+    double _ADC_to_fC;
+
     double _length;
     double _dQdx0;
     double _dQdx1;

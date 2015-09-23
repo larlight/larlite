@@ -15,6 +15,7 @@ namespace showerreco{
     std::cout << "creating tree" << std::endl;
     if (_tree) delete _tree;
     _tree = new TTree(_name.c_str(),"dQdx2D Info Tree");
+    _tree->Branch("_event",&_event,"event/I");
     _tree->Branch("_dQdx0",&_dQdx0,"dQdx_Plane0/D");
     _tree->Branch("_dQdx1",&_dQdx1,"dQdx_Plane1/D");
     _tree->Branch("_dQdx2",&_dQdx2,"dQdx_Plane2/D");
@@ -36,10 +37,21 @@ namespace showerreco{
     _tree->Branch("_Nhits",&_Nhits,"Nhits/I");
     _tree->Branch("_Nhits_smooth",&_Nhits_smooth,"Nhits_smooth/I");
     _tree->Branch("_pitch",&_pitch,"pitch/D");
-    //    _tree->Branch("HitdeltaQdeltax_v0",&HitdeltaQdeltax_v[0]);
-    // _tree->Branch("HitdeltaQdeltax_v1",&HitdeltaQdeltax_v[1]);
-    // _tree->Branch("HitdeltaQdeltax_v2",&HitdeltaQdeltax_v[2]);
-    
+    _tree->Branch("_ADC_to_fC",&_ADC_to_fC,"ADCtofC_converstion/D");
+    _tree->Branch("_HitdeltaQdeltax_v0",&_HitdeltaQdeltax_v0);
+    _tree->Branch("_HitdeltaQdeltax_v1",&_HitdeltaQdeltax_v1);
+    _tree->Branch("_HitdeltaQdeltax_v2",&_HitdeltaQdeltax_v2);
+        
+    _fC_to_e = 6250.; // a fC in units of the electron charge
+    _ADC_to_mV = 0.5; // ADC -> mV conversion from gain measurements
+    // to go from mV to fC the ASIC gain and Shaping time
+    // must be considered
+    // fC -> mV *= ( shaping time * ASIC gain )
+    _shp_time  = 2.; // in usec
+    _asic_gain = 7.8; // in mV/fC
+    _ADC_to_fC = _ADC_to_mV * _fC_to_e / ( _shp_time * _asic_gain ) ;
+
+
     std::cout << "tree created" << std::endl;
 
     return;
@@ -49,6 +61,7 @@ namespace showerreco{
   void dQdx2DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Shower_t & resultShower){
     // This function takes the shower cluster set and computes the dQdx in the beginning of the shower
     // and then assigns it to the shower
+    
     Len.clear();
     dQdx.clear();
     dQdx_smooth.clear();
@@ -160,24 +173,32 @@ namespace showerreco{
       if(HitDist_toStart.size() != 0){
 	IndexSort.resize(HitDist_toStart.size());
 	int n = 0;
-
+	
 	std::generate(IndexSort.begin(),  IndexSort.end(), [&]{ return n++; });
 	std::sort(IndexSort.begin(),IndexSort.end(),[&](int i1, int i2) {return HitDist_toStart[i1] < HitDist_toStart[i2];});
-
+	
 	HitdeltaQdeltax_v[pl].resize(HitDist_toStart.size()-1);      
 
+	std::cout << "Tab " << std::endl; 
+	
 	for(int i = 0; i < HitDist_toStart.size()-1; i++){
-
-	  if( (HitDist_toStart.at(IndexSort[i]) - HitDist_toStart.at(IndexSort[i+1])) != 0){
-	    HitdeltaQdeltax_v[pl].push_back( 
-					    pitch[pl]*(HitCharge.at(IndexSort[i]) - HitCharge.at(IndexSort[i+1]))/
-					    (HitDist_toStart.at(IndexSort[i]) - HitDist_toStart.at(IndexSort[i+1])));
-	    
-	    std::cout << HitdeltaQdeltax_v[pl].back() << std::endl;
-	  }
+	  
+	  
+	  HitdeltaQdeltax_v[pl].push_back( 
+					  (HitCharge.at(IndexSort[i]))/
+					  (pitch[pl]));
+	  
+	  std::cout << "\t\tHit num : " << i << " dQdx: " << HitdeltaQdeltax_v[pl].back() << std::endl;
+	  
 	}
       }
 
+      _HitdeltaQdeltax_v0 = HitdeltaQdeltax_v[0];
+      _HitdeltaQdeltax_v1 = HitdeltaQdeltax_v[1];
+      _HitdeltaQdeltax_v2 = HitdeltaQdeltax_v[2];
+
+
+      
       _mean_dQdx /= StartHits.size();
       _rms_dQdx_temp /= StartHits.size();
       _rms_dQdx = sqrt(_rms_dQdx_temp);
