@@ -56,11 +56,13 @@ namespace showerreco{
     HitCharge.clear();
     IndexSort.clear();
     HitdeltaQdeltax_v.clear();
+    pitch.clear();
 
     dQdx.resize(3);
     dQdx_smooth.resize(3);
     Len.resize(3);
     HitdeltaQdeltax_v.resize(3);
+    pitch.resize(3);
 
     auto geomHelper = larutil::GeometryHelper::GetME();
 
@@ -88,16 +90,16 @@ namespace showerreco{
 
       Len[pl] = dist;
       
-      double pitch = (geomHelper->GetPitch(dir3D,pl));
-      _pitch = pitch;
-      pitch /= 0.3;
+      pitch[pl] = (geomHelper->GetPitch(dir3D,pl));
+      _pitch = pitch[pl];
+      pitch[pl] /= 0.3;
       
-      if(pitch == 0){
-	std::cout << "no pitch" << std::endl; 
-	pitch = 1;
+      if(pitch[pl] == 0 || pitch[pl] != pitch[pl]){
+	std::cout << "\t\t\t no pitch" << std::endl; 
+	pitch[pl] = 1;
       }
       //Setting correct 3D length
-      Len[pl] /= pitch;
+      Len[pl] /= pitch[pl];
 
       _StartW = cluster.start_point.w;
       _StartT = cluster.start_point.t;
@@ -168,10 +170,10 @@ namespace showerreco{
 
 	  if( (HitDist_toStart.at(IndexSort[i]) - HitDist_toStart.at(IndexSort[i+1])) != 0){
 	    HitdeltaQdeltax_v[pl].push_back( 
-					    (HitCharge.at(IndexSort[i]) - HitCharge.at(IndexSort[i+1]))/
+					    pitch[pl]*(HitCharge.at(IndexSort[i]) - HitCharge.at(IndexSort[i+1]))/
 					    (HitDist_toStart.at(IndexSort[i]) - HitDist_toStart.at(IndexSort[i+1])));
 	    
-	    //    std::cout << HitdeltaQdeltax_v[pl].back() << std::endl;
+	    std::cout << HitdeltaQdeltax_v[pl].back() << std::endl;
 	  }
 	}
       }
