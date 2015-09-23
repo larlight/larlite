@@ -63,8 +63,8 @@ bool DrawHit::analyze(larlite::storage_manager* storage) {
     _dataByPlane.at(view).emplace_back(
       Hit(hit.WireID().Wire,
           hit.PeakTime(),
-          hit.RMS(),
-          hit.PeakAmplitude()));
+          hit.PeakAmplitude(),
+          hit.RMS() ));
     if (_dataByPlane.at(view).back()._charge > _maxCharge.at(view))
       _maxCharge.at(view) = _dataByPlane.at(view).back()._charge;
     // Check the auto range values:
