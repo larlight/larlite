@@ -27,6 +27,19 @@ namespace showerreco{
     _tree->Branch("_ShowT",&_ShowT,"ShowT/D");
     _tree->Branch("_length",&_length,"length/D");
     _tree->Branch("_BestdQdx",&_BestdQdx,"BestdQdx/D");
+    _tree->Branch("_dQdx0_smooth",&_dQdx0_smooth,"dQdx_Plane0_smooth/D");
+    _tree->Branch("_dQdx1_smooth",&_dQdx1_smooth,"dQdx_Plane1_smooth/D");
+    _tree->Branch("_dQdx2_smooth",&_dQdx2_smooth,"dQdx_Plane2_smooth/D");
+    _tree->Branch("_BestdQdx_smooth",&_BestdQdx_smooth,"BestdQdx_smooth/D");    
+    _tree->Branch("_mean_dQdx",&_mean_dQdx,"mean_dQdx/D");
+    _tree->Branch("_rms_dQdx",&_rms_dQdx,"rms_dQdx/D");
+    _tree->Branch("_Nhits",&_Nhits,"Nhits/I");
+    _tree->Branch("_Nhits_smooth",&_Nhits_smooth,"Nhits_smooth/I");
+    _tree->Branch("_pitch",&_pitch,"pitch/D");
+    //    _tree->Branch("HitdeltaQdeltax_v0",&HitdeltaQdeltax_v[0]);
+    // _tree->Branch("HitdeltaQdeltax_v1",&HitdeltaQdeltax_v[1]);
+    // _tree->Branch("HitdeltaQdeltax_v2",&HitdeltaQdeltax_v[2]);
+    
     std::cout << "tree created" << std::endl;
 
     return;
@@ -37,9 +50,24 @@ namespace showerreco{
     // This function takes the shower cluster set and computes the dQdx in the beginning of the shower
     // and then assigns it to the shower
     Len.clear();
+    dQdx.clear();
+    dQdx_smooth.clear();
+    HitDist_toStart.clear();
+    HitCharge.clear();
+    IndexSort.clear();
+    HitdeltaQdeltax_v.clear();
+    pitch.clear();
+
     dQdx.resize(3);
+    dQdx_smooth.resize(3);
     Len.resize(3);
+    HitdeltaQdeltax_v.resize(3);
+    pitch.resize(3);
+
     auto geomHelper = larutil::GeometryHelper::GetME();
+
+    //Grab 3D direction already in the shower product
+    auto const& dir3D = resultShower.fDCosStart;
     
     //iterate through the selected clusters
     for(auto const & cluster : inputShowers){
@@ -57,10 +85,22 @@ namespace showerreco{
       }
       else{
 	//Major failure mode is ShoweringPoint is == 0, when that happens pull the "default" value
-	dist = -999;
+	dist = 2.4;
       }
+
       Len[pl] = dist;
- 
+      
+      pitch[pl] = (geomHelper->GetPitch(dir3D,pl));
+      _pitch = pitch[pl];
+      pitch[pl] /= 0.3;
+      
+      if(pitch[pl] == 0 || pitch[pl] != pitch[pl]){
+	std::cout << "\t\t\t no pitch" << std::endl; 
+	pitch[pl] = 1;
+      }
+      //Setting correct 3D length
+      Len[pl] /= pitch[pl];
+
       _StartW = cluster.start_point.w;
       _StartT = cluster.start_point.t;
       _ShowW = cluster.showering_point.w;
@@ -101,15 +141,67 @@ namespace showerreco{
 
 
       //Caculation of the Charge deposited at start of shower
-      //UNSMOOTHED! Possible improvement 
+      //with SMOOTHING!
+      double _rms_dQdx_temp = 0;
+      _mean_dQdx = 0;
+      _rms_dQdx_temp = 0;
+      _Nhits = 0;
+      _Nhits_smooth = 0;
+
       for(auto h : StartHits){
 	dQdx.at(pl) += cluster.hit_vector.at(h).charge;	       
+	_Nhits++;
+	_mean_dQdx += cluster.hit_vector.at(h).charge;
+	_rms_dQdx_temp += cluster.hit_vector.at(h).charge*cluster.hit_vector.at(h).charge;
+	HitDist_toStart.push_back(geomHelper->Get2DDistance(cluster.start_point,cluster.hit_vector.at(h)));
+	HitCharge.push_back(cluster.hit_vector.at(h).charge);
+      }
+      
+      if(HitDist_toStart.size() != 0){
+	IndexSort.resize(HitDist_toStart.size());
+	int n = 0;
+
+	std::generate(IndexSort.begin(),  IndexSort.end(), [&]{ return n++; });
+	std::sort(IndexSort.begin(),IndexSort.end(),[&](int i1, int i2) {return HitDist_toStart[i1] < HitDist_toStart[i2];});
+
+	HitdeltaQdeltax_v[pl].resize(HitDist_toStart.size()-1);      
+
+	for(int i = 0; i < HitDist_toStart.size()-1; i++){
+
+	  if( (HitDist_toStart.at(IndexSort[i]) - HitDist_toStart.at(IndexSort[i+1])) != 0){
+	    HitdeltaQdeltax_v[pl].push_back( 
+					    pitch[pl]*(HitCharge.at(IndexSort[i]) - HitCharge.at(IndexSort[i+1]))/
+					    (HitDist_toStart.at(IndexSort[i]) - HitDist_toStart.at(IndexSort[i+1])));
+	    
+	    std::cout << HitdeltaQdeltax_v[pl].back() << std::endl;
+	  }
+	}
       }
 
+      _mean_dQdx /= StartHits.size();
+      _rms_dQdx_temp /= StartHits.size();
+      _rms_dQdx = sqrt(_rms_dQdx_temp);
+
+      double sigma = sqrt(_rms_dQdx*_rms_dQdx-_mean_dQdx*_mean_dQdx);
+
+      if(StartHits.size() < 5)
+	sigma = 0;
+
+      for(auto h : StartHits){
+	if(cluster.hit_vector.at(h).charge < (_mean_dQdx + sigma) &&
+	   cluster.hit_vector.at(h).charge > (_mean_dQdx - sigma) ){	  
+	  dQdx_smooth.at(pl) += cluster.hit_vector.at(h).charge;
+	  _Nhits_smooth++;
+	}
+      }
+      if(_Nhits_smooth < 5){
+	dQdx_smooth.at(pl) = dQdx.at(pl);
+	_Nhits_smooth = _Nhits;
+      }
 
       if(pl == 0)
 	_Q0 = dQdx[0];
-      
+
       if(pl == 1)
 	_Q1 = dQdx[1];
 
@@ -118,21 +210,31 @@ namespace showerreco{
 
       //Calculate the dQdx!
       if(dist > 0){
-	dQdx.at(pl) /= dist;
+	dQdx.at(pl) /= Len[pl];
+	dQdx_smooth.at(pl) /= Len[pl];
       }
       else{
 	dQdx.at(pl) = 0;
+	dQdx_smooth.at(pl) = 0;
       }
       
       if(pl == 0)
+	{
 	_dQdx0 = dQdx[0];
-      
+	_dQdx0_smooth = dQdx_smooth[0];
+	}
+
       if(pl == 1)
+	{
 	_dQdx1 = dQdx[1];
+	_dQdx1_smooth = dQdx_smooth[1];
+	}
 
       if(pl == 2)
+	{
 	_dQdx2 = dQdx[2];
-
+	_dQdx2_smooth = dQdx_smooth[2];
+	}
      
 
        resultShower.fdQdx = dQdx;
@@ -141,6 +243,7 @@ namespace showerreco{
     }
     
     _BestdQdx = dQdx[std::distance(Len.begin(),std::max_element(Len.begin(),Len.end()))];
+    _BestdQdx_smooth = dQdx_smooth[std::distance(Len.begin(),std::max_element(Len.begin(),Len.end()))];
 
     /// Trying to guard against selecting a bad plane, this does a second pass just to make sure
     /// we are using the best value. 
@@ -152,6 +255,16 @@ namespace showerreco{
       }
       _BestdQdx = dQdx[std::distance(Len2.begin(),std::max_element(Len2.begin(),Len2.end()))];
     }
+
+    if(_BestdQdx_smooth == 0){
+      std::vector< double> Len2;
+      for( int L = 0; L < Len.size(); L++){
+	if(Len.at(L) != *std::max_element(Len.begin(),Len.end()))
+	  Len2.push_back(Len.at(L));	
+      }
+      _BestdQdx_smooth = dQdx_smooth[std::distance(Len2.begin(),std::max_element(Len2.begin(),Len2.end()))];
+    }
+
 
     resultShower.fBestdQdx = _BestdQdx;
     _tree->Fill();
