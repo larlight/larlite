@@ -21,6 +21,7 @@
 #include "ShowerRecoException.h"
 #include "ShowerRecoAlgBase.h"
 #include "ShowerAnaBase.h"
+#include "TStopwatch.h"
 
 namespace showerreco {
 
@@ -52,11 +53,15 @@ public:
   /// Per event "Reset"
   void Reset();
 
-  /// Reconstruct shower w/ matching: return is a matched cluster association
+  /**
+   * @brief Reconstruct shower w/ matching: return is a matched cluster association
+   */
   ClusterAss_t Reconstruct (const std::vector<std::vector<Hit2D> >& clusters,
                             std::vector< ::showerreco::Shower_t>& showers);
 
-  /// Reconstruct shower w/ matched clusters
+  /**
+   * @brief Reconstruct shower w/ matching
+   */
   void Reconstruct (const std::vector<std::vector<Hit2D> >& clusters,
                     const ClusterAss_t& ass,
                     std::vector< ::showerreco::Shower_t>& showers);
@@ -85,6 +90,14 @@ private:
                std::vector< ::showerreco::Shower_t >& showers);
 
   ::cluster::DefaultParamsAlg _params_alg;
+
+  // stopwatch for time-profiling
+  TStopwatch _watch;
+  // keep track of number of calls
+  double _matching_times;
+  double _matching_calls;
+  double _CPAN_times;
+  double _CPAN_calls;
 
 };
 }
