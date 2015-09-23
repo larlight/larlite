@@ -3,6 +3,7 @@
 
 #include "ShowerRecoManager.h"
 #include "LArUtil/Geometry.h"
+#include <iomanip>
 
 namespace showerreco {
 
@@ -11,6 +12,10 @@ namespace showerreco {
   {
     auto geom = ::larutil::Geometry::GetME();
     fMatchMgr = new ::cmtool::CMatchManager(geom->Nplanes());
+    _matching_times = 0.;
+    _matching_calls = 0;
+    _CPAN_times = 0.;
+    _CPAN_calls = 0;
   }
 
   void ShowerRecoManager::Initialize()
@@ -37,8 +42,12 @@ namespace showerreco {
     ClusterAss_t res_ass;
     // Run matching & retrieve matched cluster indices
     try{
+      _watch.Start();
       fMatchMgr->Process();
-    }catch( ::cmtool::CMTException &e){
+      _matching_times += _watch.RealTime();
+      _matching_calls += 1;
+    }
+    catch( ::cmtool::CMTException &e){
       e.what();
       return res_ass;
     }
@@ -72,7 +81,10 @@ namespace showerreco {
       for(auto const& index : pair){
         in_clusters.emplace_back( fMatchMgr->GetInputClusters()[index] );
         // Make sure to fill the params:
+	_watch.Start();
         _params_alg.FillParams(in_clusters.back());
+	_CPAN_times += _watch.RealTime();
+	_CPAN_calls += 1;
       }
 
       for(auto& shower_alg : _alg_v)
@@ -92,6 +104,16 @@ namespace showerreco {
       return;
     fout->cd();
 
+    // print out profiling performance for CPAN and matching
+    double matching_T = _matching_times / (double) _matching_calls;
+    double CPAN_T    = _CPAN_times / (double) _CPAN_calls;
+    std::cout << std::endl
+	      << "=================== Time Report =====================" << std::endl
+	      << "Matching Time: " << std::setw(10) << matching_T * 1.e6 << " [us/cluster]" << std::endl
+	      << "CPAN Time    : " << std::setw(10) << CPAN_T * 1.e6 << " [us/cluster]" << std::endl
+	      << "=====================================================" << std::endl
+	      << std::endl;
+    
     // loop through algorithms
     for (auto& alg : _alg_v)
       alg->Finalize(fout);
