@@ -16,6 +16,7 @@ INCFLAGS += $(shell basictool-config --includes)
 INCFLAGS += $(shell larlite-config --includes)
 INCFLAGS += $(shell recotool-config --includes)
 INCFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool/ClusterRecoUtil/Alg
+INCFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool/MCComp
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
