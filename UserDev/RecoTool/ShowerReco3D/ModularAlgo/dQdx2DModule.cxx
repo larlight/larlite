@@ -179,7 +179,7 @@ namespace showerreco{
 	
 	HitdeltaQdeltax_v[pl].resize(HitDist_toStart.size()-1);      
 
-	std::cout << "Tab " << std::endl; 
+	//	std::cout << "Tab " << std::endl; 
 	
 	for(int i = 0; i < HitDist_toStart.size()-1; i++){
 	  
@@ -188,8 +188,8 @@ namespace showerreco{
 					  (HitCharge.at(IndexSort[i]))/
 					  (pitch[pl]));
 	  
-	  std::cout << "\t\tHit num : " << i << " dQdx: " << HitdeltaQdeltax_v[pl].back() << std::endl;
-	  
+	  //std::cout << "\t\tHit num : " << i << " dQdx: " << HitdeltaQdeltax_v[pl].back() << std::endl;
+	  	  
 	}
       }
 
