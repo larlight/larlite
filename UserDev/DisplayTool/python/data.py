@@ -973,25 +973,30 @@ class track(recoBase):
         self.init()
 
     def drawObjects(self, view_manager):
+        geom = view_manager._geometry
 
         for view in view_manager.getViewPorts():
             #   # get the showers from the process:
             self._drawnObjects.append([])
-            tracks = self._process.getTracksByPlane(view.plane())
+            tracks = self._process.getDataByPlane(view.plane())
+            offset = geom.offset(view.plane()) / geom.time2cm()
+
             for track in tracks:
 
                 # construct a polygon for this track:
                 points = []
                 # Remeber - everything is in cm, but the display is in
                 # wire/time!
-                for pair in track:
-                    x = pair.first
-                    y = pair.second
+                for pair in track.track():
+                    x = pair.first / geom.wire2cm()
+                    y = pair.second / geom.time2cm() + offset
                     points.append(QtCore.QPointF(x, y))
 
                 # self._drawnObjects[view.plane()].append(thisPoly)
 
                 thisPoly = polyLine(points)
+                pen = pg.mkPen((0,0,0), width=2)
+                thisPoly.setPen(pen)
                 # polyLine.draw(view._view)
 
                 view._view.addItem(thisPoly)
