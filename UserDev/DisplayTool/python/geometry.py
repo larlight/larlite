@@ -63,10 +63,11 @@ class geometry(geoBase):
       self._wRange.append(larutil.Geometry.GetME().Nwires(v))   
       # Set up the correct drift time offset.
       # Offset is returned in terms of centimeters.
+
       self._offset.append(larutil.DetectorProperties.GetME().TriggerOffset()
                          *larutil.GeometryUtilities.GetME().TimeToCm()
                          -larutil.Geometry.GetME().PlaneOriginVtx(v)[0])
-    
+
     self._defaultColorScheme = []
 
   def colorMap(self,plane):
@@ -132,6 +133,8 @@ class argoneut(geometry):
                                              (0.8,  (0,  255, 0,   255)), 
                                              (1,    (255,  0, 0,   255))], 
                                              'mode': 'rgb'}) 
+    self._offset = [1.7226813611, 2.4226813611]
+
 class lariat(geometry):
 
   def __init__(self):
