@@ -98,7 +98,7 @@ namespace showerreco{
       factor = pitch/0.3;
       _length = trunk_length[pl];
       dx[pl]=trunk_length[pl];
-      dx_p[pl]=(shr_start.w - start.w)*factor;//3D length
+      dx_p[pl]=std::abs((shr_start.w - start.w)*factor);//3D length absolute
       _shrs_w=shr_start.w;
       _shrs_t=shr_start.t;
       
@@ -111,8 +111,7 @@ namespace showerreco{
 	if (hit_length<trunk_length[pl]){
 	  double Q = hits[i].charge * _charge_conversion;
 	    dQ[pl] += Q;
-	}
-	
+	}	
       }
       dQdx=dQ[pl]/dx[pl];
       dQdx_pitch=dQ[pl]/dx_p[pl];
@@ -124,26 +123,22 @@ namespace showerreco{
 	if(trunk_length[pl_best]<trunk_length[pl-2])pl_best = pl-2;
 	_pl_best =pl_best;
 	resultShower.fBestdQdxPlane = pl_best;///best plane go to showerquality
-      }
-      
+      }      
       //tree variabls
       _dQ   = dQ[pl];
       _dQdx = dQdx;
       _dQdx_pitch =dQdx_pitch;
 
-      resultShower.fdQdx[pl] = dQdx_pitch;///dQdx go to showerquality
-      
-      if (_verbose) std::cout<<"_pitch="<<_pitch<<"\n";
-      
+      resultShower.fdQdx[pl] = dQdx_pitch;///dQdx go to showerquality      
+
       if(pl==2)///for best plane
       {_tree->Fill();}
+
       if (_verbose) std::cout<<"plane:"<<pl<<","<<opena_cluster<<"\n";
     }
     
     return;
   }
-
-  
 } //showerreco
 
 #endif
