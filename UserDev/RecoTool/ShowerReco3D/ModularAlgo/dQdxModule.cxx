@@ -27,7 +27,7 @@ namespace showerreco{
     _tree->Branch("_dQ",&_dQ,"dQ/D");    
     _tree->Branch("_dQdx",&_dQdx,"dQdx/D");
     _tree->Branch("_dQdx_pitch",&_dQdx_pitch,"dQdx_p/D");
-    
+    _tree->Branch("_pl_best",&_pl_best,"pl_best/I");
     
     _fC_to_e = 6250.; // a fC in units of the electron charge
     _ADC_to_mV = 0.5; // ADC -> mV conversion from gain measurements
@@ -90,6 +90,7 @@ namespace showerreco{
       int n_hits = hits.size();
       double dQdx, dQdx_pitch =0;
       double factor;
+
       
       _n_hits =n_hits;
       _pl = pl;
@@ -97,7 +98,7 @@ namespace showerreco{
       factor = pitch/0.3;
       _length = trunk_length[pl];
       dx[pl]=trunk_length[pl];
-      dx_p[pl]=(shr_start.w - start.w)*factor;//3D length
+      dx_p[pl]=std::abs((shr_start.w - start.w)*factor);//3D length absolute
       _shrs_w=shr_start.w;
       _shrs_t=shr_start.t;
       
@@ -110,28 +111,34 @@ namespace showerreco{
 	if (hit_length<trunk_length[pl]){
 	  double Q = hits[i].charge * _charge_conversion;
 	    dQ[pl] += Q;
-	}
-	
+	}	
       }
       dQdx=dQ[pl]/dx[pl];
       dQdx_pitch=dQ[pl]/dx_p[pl];
-      
+      //find best pl, this branch is special, for now, when draw best plane
+      if(pl==2){
+	int pl_best;
+	if(trunk_length[pl]>trunk_length[pl-1])pl_best=pl;
+	else pl_best = pl-1;
+	if(trunk_length[pl_best]<trunk_length[pl-2])pl_best = pl-2;
+	_pl_best =pl_best;
+	resultShower.fBestdQdxPlane = pl_best;///best plane go to showerquality
+      }      
+      //tree variabls
       _dQ   = dQ[pl];
       _dQdx = dQdx;
       _dQdx_pitch =dQdx_pitch;
-      
-      resultShower.fdQdx[pl] = dQdx_pitch;
-      
-      if (_verbose) std::cout<<"_pitch="<<_pitch<<"\n";
-      //if (trunk_length>0)
-      _tree->Fill();
+
+      resultShower.fdQdx[pl] = dQdx_pitch;///dQdx go to showerquality      
+
+      if(pl==2)///for best plane
+      {_tree->Fill();}
+
       if (_verbose) std::cout<<"plane:"<<pl<<","<<opena_cluster<<"\n";
     }
     
     return;
   }
-
-  
 } //showerreco
 
 #endif
