@@ -9,6 +9,13 @@
 
 namespace cluster {
 
+  FindShoweringPoint::FindShoweringPoint()
+  {
+    _name = "FindShoweringPoint";
+    _dMax = 5; // cm
+    _minCosine = 0.7;
+  }
+
 void FindShoweringPoint::do_params_fill(cluster_params & cluster) {
 
   ///\ToDo: Make sure we don't try too hard to find showering Start Points on clusters
@@ -32,7 +39,7 @@ void FindShoweringPoint::do_params_fill(cluster_params & cluster) {
   std::vector<TPrincipal*> tPrincipalArray;
   tPrincipalArray.resize(hitmapByStartCand.size(), nullptr);
 
-  float dist_cutoff = 5 * 5;
+  float dist_cutoff = _dMax * _dMax;
 
   // First build the collections of hits nearby to the start points:
   for (size_t i_hit = 0; i_hit < hits.size(); i_hit++) {
@@ -142,7 +149,7 @@ void FindShoweringPoint::do_params_fill(cluster_params & cluster) {
       // std::cout << curr << ", " << next << ", " << nextnext << std::endl;
       double cos = geomHelper->GetCosAngleBetweenLines(hits[curr], hits[next],
                    hits[next], hits[nextnext]);
-      if (cos > 0.7)
+      if (cos > _minCosine)
         cluster.shwr_point_cand.at(j)  = hits[nextnext];
       else
         break;

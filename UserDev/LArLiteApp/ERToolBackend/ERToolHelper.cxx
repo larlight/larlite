@@ -516,7 +516,7 @@ namespace larlite {
     for(size_t i=0; i<trk_v.size(); ++i) {
 
       auto const& trk = trk_v[i];
-      
+
       t_v.push_back(::ertool::Track());
       id_v.emplace_back(i,trk_v.name());
       auto &t = t_v.back();

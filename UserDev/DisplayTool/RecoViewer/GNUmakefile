@@ -14,7 +14,8 @@ OBJECTS = $(SOURCES:.cxx=.o)
 INCFLAGS  = -I.                       #Include itself
 INCFLAGS += $(shell larlite-config --includes)
 INCFLAGS += $(shell recotool-config --includes)
-INCFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool/ClusterRecoUtil/Alg
+INCFLAGS += $(shell python-config --includes)
+INCFLAGS += -I$(shell python -c "import numpy; print numpy.get_include()")
 
 # Add -p flag to CINT compilation
 CINTFLAGS += -p

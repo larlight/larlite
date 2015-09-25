@@ -7,6 +7,8 @@
  * quantify how well shower reconstruction ran. It requires reco showers and MCshowers. If you are running
  * on single particle generated files, that's all you need. If you are running on events with multiple MCshowers,
  * you also need to include simchannel files because those are needed to match a reco shower with an MCshower.
+ * Descriptions of definitions of efficiency/purity and other non-obvious parameters can be found in
+ * DocDB 3771, or my personal drawing at http://www.nevis.columbia.edu/~kaleko/drawing_explaning_kazus_eff_pur.jpeg
  *
  * @author kaleko
  */
@@ -18,19 +20,22 @@
 #ifndef LARLITE_SHOWERQUALITY_H
 #define LARLITE_SHOWERQUALITY_H
 
-// #include <TH1D.h>
-// #include <TH2D.h>
 #include <map>
 #include "Analysis/ana_base.h"
-//#include "MCComp/MCMatchAlg.h"
+// #include "MCComp/MCMatchAlg.h"
 #include "ShowerReco3D/Base/ShowerRecoException.h"
 #include "DataFormat/shower.h"
 #include "DataFormat/mcshower.h"
+// #include "DataFormat/cluster.h"
+
+#include "MCSingleShowerCompAlg.h"
+
+
 
 namespace larlite {
 /**
    \class ShowerQuality
-   User custom analysis class made by kazuhiro
+   User custom analysis class made by kazuhiro/kaleko
  */
 class ShowerQuality : public ana_base {
 
@@ -69,37 +74,27 @@ public:
   */
   virtual bool finalize();
 
-  /// set whether to fill quality info per MC or per reco shower
-  //    void setMCShowerQuality(bool on) { _mcShowerQuality = on; }
-
   /// Setter to toggle if you are running on a single particle file
-  void setSingleParticleQuality(bool flag) { _single_particle_quality = flag; }
+  void SetSingleParticleQuality(bool flag) { _single_particle_quality = flag; }
 
 
 protected:
 
   // Function to fill TTree
   void FillQualityInfo(const shower& reco_shower,
-                       const mcshower& mc_shower);
-  // ,
-  //                      const size_t& shower_index, const size_t& best_index,
-  //                      const AssSet_t& ass_cluster_v);
+                       const mcshower& mc_shower,
+                       size_t shower_index);
+  // const std::vector< const larlite::cluster * > associated_clusters);
 
+  /// Function to set all of once-per-shower tree parameters to default values
+  void ResetShowerTreeParams();
 
-  /// Function to set all of tree parameters to default values
-  void resetTreeParams();
-
-
-  // boolean to decide if to fill the tree once per MC shower
-  // or once per RECO shower
-  // bool _mcShowerQuality;
+  /// Function to set all of once-per-event tree parameters to default values
+  void ResetEventTreeParams();
 
   /// Boolean to toggle if you are looking for shower quality on single generated particle (simple)
   /// or on a multi-particle realistic event (complicated, needs simchannel)
   bool _single_particle_quality;
-
-  // /// Shower back tracking algorithm needed to match reco showers with mc showers.
-  // ::btutil::MCMatchAlg fBTAlg;
 
   /// Minimum MC shower energy cut
   double _mc_energy_min;
@@ -111,67 +106,65 @@ protected:
   std::string fShowerProducer;
 
   // /// Matching correctness
+  // All "MatchCorrectness" histograms depend on simchannel.
   // TH1D *hMatchCorrectness;
 
-  // TH1D *hVtxDX; ///< X difference (reco-MC) in cm
-  // TH1D *hVtxDY; ///< Y difference (reco-MC) in cm
-  // TH1D *hVtxDZ; ///< Z difference (reco-MC) in cm
-  // TH1D *hVtxDR; ///< 3D vtx distance between reco to MC in cm
-
-  // TH1D *hDCosX; ///< Direction unit vector X component difference
-  // TH1D *hDCosY; ///< Direction unit vector Y component difference
-  // TH1D *hDCosZ; ///< Direction unit vector Z component difference
-  // TH1D *h3DAngleDiff; ///< Opening angle between reco & MC 3D direction
-
-  // TH2D *hEnergyCorr; ///< Energy correlation reco (x) vs. MC (y)
-
-  // TH1D *hEnergyAssym; ///< Energy assym. parameter: (reco E - MC E) / (reco E + MC E) * 2
-  // TH1D *hEnergyDiff;  ///< Energy difference: reco E - MC E
-
+  // "cluster efficiency" is the cluster's charge divided by all hit charge associated with that mcshower
+  // (IE the Q summed over all hits in the event, for single particle events)
   // TH1D *hMatchedClusterEff; ///< Matched 3D shower's cluster efficiency (combined across planes)
+
+  // "cluster purity" is the fraction of that cluster's Q belonging to the MCShower
+  // for single-particle events, purity is always == 1 for every cluster.
   // TH1D *hMatchedClusterPur; ///< Matched 3D shower's cluster purity (combined across planes)
 
-  // /// dEdx per particle per PDG code
-  // std::map<int,TH1D*> mDEDX;
+  /// Analysis TTree. Filled once per reconstructed shower.
+  TTree *fShowerTree;
 
-  // /// Best plane id
-  // TH1D *hBestPlane;
+  /// Analysis TTree. Filled once per event.
+  TTree *fEventTree;
 
-  /// For convenience: struct to define a set of parameters per shower to be stored in TTree
-  struct TreeParams_t {
+  /// For convenience: struct to define a set of parameters per shower to be stored in per-reconstructed-shower TTree
+  struct ShowerTreeParams_t {
 
     double reco_x, reco_y, reco_z;
     double reco_dcosx, reco_dcosy, reco_dcosz;
-    // double reco_energy;
     double reco_energy_U;
     double reco_energy_V;
     double reco_energy_Y;
-    // double reco_dedx;
     double reco_dedx_U;
     double reco_dedx_V;
     double reco_dedx_Y;
-    // int    best_plane_id;
-
     double mc_x, mc_y, mc_z;
     double mc_dcosx, mc_dcosy, mc_dcosz;
     double mc_energy;
-    // int    mc_pdgid;
-
     double mc_reco_anglediff;
     double mc_reco_dist;
+    double cluster_eff_U;
+    double cluster_eff_V;
+    double cluster_eff_Y;
+    double cluster_pur_U;
+    double cluster_pur_V;
+    double cluster_pur_Y;
+    double mc_containment;
 
-    // double mc_containment;
-    // double match_correctness;
-    // double cluster_eff;
-    // double cluster_pur;
+  } fShowerTreeParams;
 
-  } fTreeParams;
+  struct EventTreeParams_t {
 
-  /// Analysis TTree. Filled once per reconstructed shower.
-  TTree *fTree;
+    int n_mcshowers;
+    int n_recoshowers;
+    //Detprofile energy of the FIRST (for now, only) mcshower
+    double mcs_E;
+    double mc_containment;
 
-  /// Function to prepare TTree
-  void InitializeAnaTree();
+  } fEventTreeParams;
+
+  /// Function to prepare TTrees
+  void InitializeAnaTrees();
+
+  /// Algorithm to compute cluster efficiency/purity WITHOUT simchannel usage
+  /// (only usable on single-mcshower events (single e, single gamma))
+  MCSingleShowerCompAlg _alg;
 
 };
 }

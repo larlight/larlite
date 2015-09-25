@@ -69,7 +69,7 @@ namespace evd {
 
     int _n_events;
     // this is the event in the file (0 -> n_events)
-    int _current_event;
+    unsigned int _current_event;
     // this is the official event:
     unsigned int _event_no;
     unsigned int _run;

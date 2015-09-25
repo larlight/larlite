@@ -18,13 +18,15 @@ my_proc = fmwk.ana_processor()
 my_proc.enable_filter(True)
 
 # track PID algorithm
-#pid_algo = ertool.ERAlgoTrackPid()
+pid_algo = ertool.ERAlgoTrackPid()
 #pid_algo.setVerbose(False)
 
 # primary finder algorithm
 primary_algo = ertool.ERAlgoCRPrimary()
 
 secondary_algo = ertool.ERAlgoCRSecondary()
+
+orphan_algo = ertool.ERAlgoCROrphan()
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):
@@ -41,9 +43,10 @@ Ecut = 20 # in MeV
 my_ana = ertool.ERAnaCRTagger()
 
 my_anaunit = fmwk.ExampleERSelection()
-#my_anaunit._mgr.AddAlgo(pid_algo)
+my_anaunit._mgr.AddAlgo(pid_algo)
 my_anaunit._mgr.AddAlgo(primary_algo)
-#my_anaunit._mgr.AddAlgo(secondary_algo)
+my_anaunit._mgr.AddAlgo(secondary_algo)
+my_anaunit._mgr.AddAlgo(orphan_algo)
 my_anaunit._mgr.AddAna(my_ana)
 #my_anaunit._mgr.AddCfgFile('new_empart.txt')
 my_anaunit.SetMinEDep(Ecut)
