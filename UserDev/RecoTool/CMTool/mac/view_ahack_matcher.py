@@ -27,11 +27,9 @@ larlite.storage_manager.get().set_in_rootdir("scanner")
 my_proc.set_ana_output_file("")
 
 raw_viewer   = larlite.ClusterViewer()
-raw_viewer2   = larlite.ClusterViewer()
 match_viewer = larlite.MatchViewer()
-clusterz = cluster.CRUHelper()
 
-match_viewer.SetPrintClusterInfo(True)
+
 ########################################
 # attach match algos here
 ########################################
@@ -61,8 +59,10 @@ my_proc.add_process(match_viewer)
 producer="Step1ShortestDist"
 #producer="cccluster"
 
-raw_viewer.SetClusterProducer(producer) #larlite.DATA.Cluster)
-match_viewer.SetClusterProducer(producer) #larlite.DATA.Cluster)
+raw_viewer.SetClusterProducer(producer) 
+raw_viewer.SetHitProducer("cccluster")
+match_viewer.SetClusterProducer(producer) 
+match_viewer.SetPrintClusterInfo(True)
 
 gStyle.SetOptStat(0)
 
