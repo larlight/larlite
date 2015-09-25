@@ -64,6 +64,15 @@ namespace evd {
 
     ::cluster::CRUHelper _cru_helper;
 
+    float _time_ratio_cut ;
+    float _start_time_cut ;
+    bool _debug ;
+    bool _verbose ;
+    bool _require_3planes;
+
+    std::vector<std::pair<std::vector<int>,double> > _match_scores ;
+
+
   };
 }
 #endif
