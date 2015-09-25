@@ -5,6 +5,8 @@
 #include "LArUtil/Geometry.h"
 #include "LArUtil/GeometryHelper.h"
 #include "ClusterRecoUtil/Base/ClusterParams.h"
+#include "ClusterRecoUtil/Base/Polygon2D.h"
+#include "math.h"
 
 namespace showerreco{
 
@@ -69,7 +71,7 @@ namespace showerreco{
       auto const& shr_start = inputShowers.at(n).showering_point;
 
       // cluster open angle
-      auto const& opena_cluster = inputShowers.at(n).opening_angle;
+      auto const& clu_an = inputShowers.at(n).opening_angle;
 
       // start direction
       auto const& start_dir = inputShowers.at(n).start_dir;
@@ -92,26 +94,51 @@ namespace showerreco{
       double factor;
 
       
-      _n_hits =n_hits;
-      _pl = pl;
+      _n_hits =n_hits;///hits in cluster
+      _pl = pl;//plane ID
       _pitch = pitch;
-      factor = pitch/0.3;
+      factor = pitch/0.3;//pitch correction
       _length = trunk_length[pl];
-      dx[pl]=trunk_length[pl];
-      dx_p[pl]=std::abs((shr_start.w - start.w)*factor);//3D length absolute
+      dx[pl]=trunk_length[pl];//trunk_length
+      dx_p[pl]=std::abs((shr_start.w - start.w)*factor);//3D length abs w/ pitch correction
       _shrs_w=shr_start.w;
       _shrs_t=shr_start.t;
       
       dQ[pl]=0;
-      for (int i=0;i<n_hits;i++){
+      //std::cout<<n_hits<<std::endl;
+      for (int i=1;i<n_hits;i++){
 	hit_length = sqrt((hits[i].w-start.w)*(hits[i].w-start.w)+
 			  (hits[i].t-start.t)*(hits[i].t-start.t));
 	dx[pl]=hit_length;
-
+	//Radius limit
 	if (hit_length<trunk_length[pl]){
-	  double Q = hits[i].charge * _charge_conversion;
-	    dQ[pl] += Q;
-	}	
+	  //Interior_angle should be smaller thaner half of cluster open angle
+	  std::vector<std::pair<float,float>> p_hit;///triangle
+	  p_hit.resize(3);
+	  p_hit.at(0).first=start.w;
+	  p_hit.at(0).second=start.t;
+	  p_hit.at(1).first=shr_start.w;
+	  p_hit.at(1).second=shr_start.t;
+	  p_hit.at(2).first=hits[i].w;
+	  p_hit.at(2).second=hits[i].t;
+	  ///remove hits lying on clu/shr start points
+	  float check_l1,check_l2;
+	  check_l1=sqrt((p_hit.at(2).second-p_hit.at(0).second)*(p_hit.at(2).second-p_hit.at(0).second)+
+			(p_hit.at(2).first-p_hit.at(0).first)*(p_hit.at(2).first-p_hit.at(0).first));
+	  check_l2=sqrt((p_hit.at(2).second-p_hit.at(0).second)*(p_hit.at(2).second-p_hit.at(0).second)+
+                        (p_hit.at(2).first-p_hit.at(0).first)*(p_hit.at(2).first-p_hit.at(0).first));
+	  
+	  Polygon2D poly(p_hit);
+	  
+	  if(check_l1*check_l2>0){float in_an=poly.InteriorAngle(0);///retrive interior angle      
+	    //std::cout<<"in_an"<<in_an<<"\n";
+	    //std::cout<<"cluster_an"<<poly.Size()<<"\n";
+	    if(tan(in_an)<=tan(clu_an/2)){
+	       double Q = hits[i].charge * _charge_conversion;
+	       dQ[pl] += Q;
+	    }
+	  }	
+	}
       }
       dQdx=dQ[pl]/dx[pl];
       dQdx_pitch=dQ[pl]/dx_p[pl];
@@ -130,13 +157,16 @@ namespace showerreco{
       _dQdx_pitch =dQdx_pitch;
 
       resultShower.fdQdx[pl] = dQdx_pitch;///dQdx go to showerquality      
-
+      if(_verbose)std::cout<<"#########################################################\n";
       if(pl==2)///for best plane
-      {_tree->Fill();}
+	{_tree->Fill();}
 
-      if (_verbose) std::cout<<"plane:"<<pl<<","<<opena_cluster<<"\n";
+      ///test------------------------------------------------------------------------
+      //      if (_verbose) 
+      //play polygon
+      
+      
     }
-    
     return;
   }
 } //showerreco
