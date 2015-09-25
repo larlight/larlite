@@ -14,5 +14,7 @@
 #pragma link C++ class btutil::MCBTException+;
 #pragma link C++ class btutil::MCBTAlg+;
 #pragma link C++ class btutil::MCMatchAlg+;
+#pragma link C++ class larlite::MCSingleShowerCompAlg+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
