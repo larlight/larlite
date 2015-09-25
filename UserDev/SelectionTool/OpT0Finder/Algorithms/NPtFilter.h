@@ -35,6 +35,9 @@ namespace flashana {
     /// Implementation of virtualfunction
     IDArray_t Filter(const QClusterArray_t&);
 
+    /// set minimum number of point in TPC track
+    void SetMinNumPoints(size_t n) { _min_num_pt = n; }
+
   private:
     size_t _min_num_pt; ///< mininum number of QPoint_t to pass the filter
     
