@@ -76,7 +76,7 @@ namespace sim {
 
     PhotonVoxel      GetPhotonVoxel(int ID) const;
     std::vector<int> GetVoxelCoords(int ID) const;
-    PhotonVoxel      GetContainingVoxel(TVector3) const{};
+    //PhotonVoxel      GetContainingVoxel(TVector3) const{};
 
     bool operator==(const PhotonVoxelDef &rhs) const;
     bool operator!=(const PhotonVoxelDef &rhs) const 
