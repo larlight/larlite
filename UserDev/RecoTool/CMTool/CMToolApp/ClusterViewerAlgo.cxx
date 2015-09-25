@@ -633,7 +633,7 @@ void ClusterViewerAlgo::DrawOneClusterGraphAndHits(UChar_t plane, size_t index)
   _gClusterHits.at(plane).at(index)->SetMarkerStyle(kOpenCircle);
   _gClusterHits.at(plane).at(index)->SetMarkerSize(1);
   _gClusterHits.at(plane).at(index)->SetMarkerColor(kBlack);
-   //_gClusterHits.at(plane).at(index)->SetMarkerColor(kBlack, 0.5);
+  //_gClusterHits.at(plane).at(index)->SetMarkerColor(kBlack, 0.5);
   _gClusterHits.at(plane).at(index)->Draw("P");
 
   _cOneCluster->Modified();

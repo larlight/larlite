@@ -20,7 +20,7 @@ class GeoViewer(object):
     _holder    = geoalgo.GeoObjCollection()
     _converter = larpy.PyGeoObj()
     _tpc_box   = geoalgo.AABox(0,-126,0,256,116,1036)
-    _use_box   = False;
+    _use_box   = True;
 
     def __init__(self):
         self._fig = plt.figure(#num=None,

@@ -43,8 +43,33 @@ namespace showerreco {
     //it is inteded to be filled such that element 1 contains the average dQdx for the U-plane, 
     //element 2 contains the same for the V-plane, and element 3 will be for the Y-plane. 
     std::vector<double> dQdx; 
+    std::vector<double> dQdx_smooth; 
+
+    std::vector<double> HitDist_toStart;
+    std::vector<double> HitCharge;
+    std::vector<double> pitch;
+    std::vector<int> IndexSort;
+    
+    std::vector< std::vector <double > > HitdeltaQdeltax_v;
 
     std::vector<double> Len;
+
+     // ADC -> e- conversion factors
+    double _fC_to_e;
+    double _ADC_to_mV;
+    double _shp_time;
+    double _asic_gain;
+
+
+    //Tree Variuable 
+    std::vector< double > _HitdeltaQdeltax_v0;
+    std::vector< double > _HitdeltaQdeltax_v1;
+    std::vector< double > _HitdeltaQdeltax_v2;
+
+    int _event;
+
+    double _ADC_to_fC;
+
     double _length;
     double _dQdx0;
     double _dQdx1;
@@ -57,6 +82,15 @@ namespace showerreco {
     double _ShowW;
     double _ShowT;
     double _BestdQdx;
+    double _mean_dQdx;
+    double _rms_dQdx;
+    double _dQdx0_smooth;
+    double _dQdx1_smooth;
+    double _dQdx2_smooth;
+    double _BestdQdx_smooth;    
+    double _pitch;
+    int _Nhits;
+    int _Nhits_smooth;
     
   };
 

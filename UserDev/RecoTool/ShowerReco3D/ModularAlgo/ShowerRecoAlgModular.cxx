@@ -3,6 +3,7 @@
 
 #include "ShowerRecoAlgModular.h"
 #include "LArUtil/Geometry.h"
+#include <iomanip>
 
 namespace showerreco {
 
@@ -357,7 +358,8 @@ void ShowerRecoAlgModular::Finalize(TFile* fout)
             << "=================== Time Report =====================" << std::endl;
   for (size_t n = 0; n < _modules.size(); n++) {
     double module_time = _module_time_v[n] / ((double)_module_ctr_v[n]);
-    std::cout <<  _modules[n]->name() << "\t Algo Time: " << module_time * 1.e6     << " [us/cluster]"
+    std::cout <<  std::setw(25) << _modules[n]->name() << "\t Algo Time: " 
+	      << std::setw(10) << module_time * 1.e6     << " [us/cluster]"
               << "\t Clusters Scanned: " << _module_ctr_v[n] << std::endl;
   }
 
