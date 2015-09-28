@@ -42,13 +42,17 @@ namespace showerreco {
     //element 2 contains the same for the V-plane, and element 3 will be for the Y-plane. 
     std::vector<double> fdQdx; 
     int _n_hits;
+    int _n_hits_poly;
+    int _n_hits_radius;
     double _length;
+    double tot_charge;
     int    _pl;
     int    _pl_best;
     double _pitch;
     double _dQ;
     double _dQdx;
     double _dQdx_pitch;
+    double _dQdx_pitch_pl2;
     double _shrs_w;
     double _shrs_t;
     
