@@ -88,7 +88,8 @@ namespace ertool {
     // loop through primary showers
     // Loop through showers
     for (auto const& p : graph.GetPrimaryNodes(RecoType_t::kShower)){
-      
+      bool muon = false;
+          
       if(graph.GetParticle(p).ProcessType() == ::ertool::ProcessType_t::kCosmic ||
          graph.GetParticle(graph.GetParticle(p).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
 	if(Debug()) Debug(__FUNCTION__,"Cosmic Shower");
@@ -273,7 +274,7 @@ namespace ertool {
 	  single = false;
 	}
       }
-
+    
       //If single still true -> we found it! Proceed!
       // the particle with all it's info was already
       // created, simply add it to the result vector
@@ -319,6 +320,7 @@ namespace ertool {
 
 	// Now look for all potential siblins
 	// using AlgoFindRelationship
+       	
 	for (auto const& t : graph.GetPrimaryNodes(RecoType_t::kTrack)){
 	  
 	  auto const& track = data.Track(graph.GetParticle(t).RecoID());
@@ -347,6 +349,7 @@ namespace ertool {
 	      double mass = _findRel.GetMass(track);
 	      geoalgo::Vector_t Mom = Dir * ( sqrt( Edep * (Edep+2*mass) ) );
 	      //trackParticle.SetParticleInfo(_findRel.GetPDG(track),mass,track[0],Mom);
+	      if(trackParticle.PdgCode() == 13){ muon = true;}
 	      trackParticle.SetParticleInfo(trackParticle.PdgCode(),mass,track[0],Mom);
 	      neutrinoMom += sqrt( Edep * ( Edep + 2*mass ) );
 	      //std::cout << "setting parentage for sibling track..." << std::endl;
@@ -355,11 +358,16 @@ namespace ertool {
 	} // loop over all track to add siblings to particle graph
 
 	::geoalgo::Vector_t momdir(0,0,1);
-
-	neutrino.SetParticleInfo(12,0.,thisShower.Start(),momdir*neutrinoMom);
-
+     
+	if(!(muon)){
+	  neutrino.SetParticleInfo(12,0.,thisShower.Start(),momdir*neutrinoMom);
+	}
+	else{
+	  std::cout << "this sucker is a freaking nu_mu" << std::endl; 
+	  neutrino.SetParticleInfo(14,0.,thisShower.Start(),momdir*neutrinoMom);
+	}
 	
-
+      
       }// if single
       // if not single
       else
