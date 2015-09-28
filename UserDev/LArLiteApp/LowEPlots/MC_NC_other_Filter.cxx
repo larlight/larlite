@@ -42,10 +42,10 @@ namespace larlite {
     
     for(auto &ev_mctruth : *ev_mctruth_v){      
       //Checks if the neutrino exchanged a W or a Z during the interaction 
-      if(ev_mctruth.GetNeutrino().CCNC() == 1)
-	NC = true;
-      else
-	NC = false;
+      if(ev_mctruth.GetNeutrino().CCNC() == 1){
+	NC = true;}
+      else{
+	NC = false;}
       
       // If there are any detector external interactions veto the event
       if(!(TPC.Contain(ev_mctruth.GetNeutrino().Nu().Trajectory().back().Position()))){
@@ -71,15 +71,24 @@ namespace larlite {
 
     
     //Enforce CC interaction channel
-    if( NC && 
-	((isCharPion && isPhoton) || 
-	 (!(isCharPion) && !(isPhoton))))
-      ret = true;
-    else{ret = false;}
-    
+    if(NC){
+      if(!(isCharPion) && isPhoton){
+	ret = false;
+      }
+      else if(isCharPion && !(isPhoton)){
+	ret = false;
+      }
+      else{
+	ret = true;
+      }
+    }
+    else{
+      ret = false;
+    }
+
     //check the status of the ret variable
-    if (_flip)
-      return (!ret);
+    //    if (_flip)
+    //  return (!ret);
     return ret;      
 
   }

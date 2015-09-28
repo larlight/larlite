@@ -51,8 +51,9 @@ namespace ertool {
 	    // if shower
 	    if (part.RecoType() == kShower)
 	      _e_dep += data.Shower(part.RecoID())._energy;
-	    if (part.RecoType() == kTrack)
+	    if (part.RecoType() == kTrack){
 	      _e_dep += data.Track(part.RecoID())._energy;
+	    }
 	  }// if the particle has a reco object
 	}// for all neutrino descendants
       }// if we found the neutrino
