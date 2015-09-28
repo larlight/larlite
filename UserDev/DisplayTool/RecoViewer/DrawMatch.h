@@ -71,7 +71,6 @@ namespace evd {
     bool _verbose ;
     bool _require_3planes;
 
-    std::vector<std::pair<std::vector<int>,double> > _match_scores ;
 
 
   };

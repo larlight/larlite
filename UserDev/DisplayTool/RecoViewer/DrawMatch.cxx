@@ -32,6 +32,9 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
   size_t planes = 3; 
   ::cmtool::CMatchManager _match_mgr(planes) ;
 
+  std::vector <std::vector < Cluster2d> > _pass;
+  _pass.resize(geoService->Nviews());
+
   auto ev_clus = storage->get_data<larlite::event_cluster>(_producer);
   if (!ev_clus)
     return false;
@@ -45,6 +48,9 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
   for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
     _dataByPlane.at(p).clear();
     _dataByPlane.at(p).reserve(ev_clus -> size());
+    _pass.at(p).clear();
+    _pass.at(p).reserve(ev_clus -> size());
+
     _wireRange.at(p).first  = 99999;
     _timeRange.at(p).first  = 99999;
     _timeRange.at(p).second = -1.0;
@@ -87,17 +93,17 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
     view = ev_hit->at(hit_indices[0]).View();
 
     // Make a new cluster in the data:
-    _dataByPlane.at(view).push_back(Cluster2d());
-    _dataByPlane.at(view).back()._is_good = true;
+ //   _dataByPlane.at(view).push_back(Cluster2d());
+ //   _dataByPlane.at(view).back()._is_good = true;
+    _pass.at(view).push_back(Cluster2d());
+    _pass.at(view).back()._is_good = true;
     
     // Fill the cluster params alg
     _cru_helper.GenerateParams( hit_indices, ev_hit, params);
     params_alg.FillParams(params);
 
     // Set the params:
-    _dataByPlane.at(view).back()._params = params;
-    pass_clusters.push_back(_dataByPlane.at(view).back()._params); 
-    
+    _pass.at(view).back()._params = params;
 
     for (auto const& hit_index : hit_indices) {
 
@@ -111,20 +117,20 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
       // }
     // Hit(float w, float t, float c, float r) :
 
-      _dataByPlane.at(view).back().emplace_back(Hit(hit.WireID().Wire,
-                                                    hit.PeakTime(),
-                                                    hit.PeakAmplitude(),
-                                                    hit.RMS()));
+      _pass.at(view).back().emplace_back(Hit(hit.WireID().Wire,
+                                                   hit.PeakTime(),
+                                                   hit.PeakAmplitude(),
+                                                   hit.RMS()));
 
 
       // Determine if this hit should change the view range:
-      if (hit.WireID().Wire > _wireRange.at(view).second)
-        _wireRange.at(view).second = hit.WireID().Wire;
-      if (hit.WireID().Wire < _wireRange.at(view).first)
-        _wireRange.at(view).first = hit.WireID().Wire;
-      if (hit.PeakTime() > _timeRange.at(view).second)
-        _timeRange.at(view).second = hit.PeakTime();
-      if (hit.PeakTime() < _timeRange.at(view).first)
+//      if (hit.WireID().Wire > _wireRange.at(view).second)
+//        _wireRange.at(view).second = hit.WireID().Wire;
+//      if (hit.WireID().Wire < _wireRange.at(view).first)
+//        _wireRange.at(view).first = hit.WireID().Wire;
+//      if (hit.PeakTime() > _timeRange.at(view).second)
+//        _timeRange.at(view).second = hit.PeakTime();
+//      if (hit.PeakTime() < _timeRange.at(view).first)
         _timeRange.at(view).first = hit.PeakTime();
 
     }
@@ -132,6 +138,15 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
     cluster_index[view] ++;
 
   }
+
+
+    for(auto & c0 : _pass.at(0))
+	pass_clusters.push_back(c0.params());
+    for(auto & c1 : _pass.at(1))
+	pass_clusters.push_back(c1.params());
+    for(auto & c2 : _pass.at(2))
+	pass_clusters.push_back(c2.params());
+    
 
   auto priority_algo = new ::cmtool::CPAlgoNHits ;
   priority_algo->SetMinHits(20);
@@ -142,43 +157,21 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
   _match_mgr.Process();
   auto scores = _match_mgr.GetBookKeeper().GetResult();
 
-//  std::cout<<"\n\nNEW: Size of matchscores :" <<scores.size()<<std::endl;
-
-
+  std::cout<<"\n\nNEW: Size of matchscores :" <<scores.size()<<std::endl;
 
   for(size_t i=0; i<scores.size(); i++){
-    //std::cout<<"Size of dataByPlanes: "<<_dataByPlane.at(0).size()<<", "<<_dataByPlane.at(1).size()<<", "<<_dataByPlane.at(2).size()<<std::endl ;
- //   for(size_t j=0; j<3; j++)
-//	std::cout<<"unadjusted scores: "<<scores[i][j]<<std::endl;
 
-    scores[i][1] -= (_dataByPlane.at(0).size()-1) ; 
-    scores[i][2] -= (_dataByPlane.at(0).size() + _dataByPlane.at(1).size()-1); 
-  //  for(size_t j=0; j<3; j++)
-  //	std::cout<<"adjusted scores: "<<scores[i][j]<<std::endl;
+    scores[i][1] -= (_pass.at(0).size()) ; 
+    scores[i][2] -= (_pass.at(0).size() + _pass.at(1).size()); 
 	
     }
 
-
-//  for ( auto s : scores) {
-//    std::cout<<"New s: "<<std::endl ;
-//    for ( auto i : s ) std::cout<<"Score is : "<<i <<std::endl ;
-//  }
-
-    // 
-    // Now insert the matched pairs at the beginning of dataByPlane
-    // Then, remove all clusters at the end not part of the match stuff
-    //
-    int a = 0;
     for ( auto & m : scores ){
-	_dataByPlane.at(0).insert(_dataByPlane.at(0).begin(),_dataByPlane.at(0)[m[0]+a]); 
-    	_dataByPlane.at(1).insert(_dataByPlane.at(1).begin(),_dataByPlane.at(1)[m[1]+a]); 
-    	_dataByPlane.at(2).insert(_dataByPlane.at(2).begin(),_dataByPlane.at(2)[m[2]+a]); 
-	a++; 
+	std::cout<<"What are the score. Geez. "<<m[0]<<", "<<m[1]<<", "<<m[2]<<std::endl ;
+	_dataByPlane.at(0).push_back(_pass.at(0)[m[0]]); 
+    	_dataByPlane.at(1).push_back(_pass.at(1)[m[1]]); 
+    	_dataByPlane.at(2).push_back(_pass.at(2)[m[2]]); 
        }
-       
-    _dataByPlane.at(0).erase(_dataByPlane.at(0).begin()+scores.size(),_dataByPlane.at(0).end()) ;
-    _dataByPlane.at(1).erase(_dataByPlane.at(1).begin()+scores.size(),_dataByPlane.at(1).end()) ;
-    _dataByPlane.at(2).erase(_dataByPlane.at(2).begin()+scores.size(),_dataByPlane.at(2).end()) ;
 
 
   // Now that clusters are done filling, go through and pad out the rest of the data
