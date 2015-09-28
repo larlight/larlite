@@ -54,16 +54,14 @@ namespace larlite {
       
       if( n_electrons > 0)
 	ret = false;
-
+      
       
       if(ret == true) continue;
-
-    }  
       
-      //check the status of the ret variable
-      if (_flip)
-	return (!ret);
-      return ret;  
+    }  
+    
+    //check the status of the ret variable
+    return ret;  
     
   }
 

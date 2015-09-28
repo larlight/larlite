@@ -46,8 +46,6 @@ namespace larlite {
     }  
     
     //check the status of the ret variable
-    if (_flip)
-      return (!ret);
     return ret;  
   
 

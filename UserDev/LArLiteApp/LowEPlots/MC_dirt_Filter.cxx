@@ -42,9 +42,6 @@ namespace larlite {
       if(ret == false) continue;
     }
     
-    if(_flip)
-      return(!ret);
-    else
       return ret;  
 
   }
