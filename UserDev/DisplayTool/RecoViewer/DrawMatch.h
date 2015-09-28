@@ -26,6 +26,7 @@
 
 #include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
 #include "ClusterRecoUtil/Base/CRUHelper.h"
+#include "CMTool/CMToolBase/CMatchManager.h"
 
 
 namespace evd {
@@ -62,7 +63,7 @@ namespace evd {
 
   protected:
 
-    ::cluster::CRUHelper _cru_helper;
+    ::cluster::CRUHelper    _cru_helper;
 
     float _time_ratio_cut ;
     float _start_time_cut ;
