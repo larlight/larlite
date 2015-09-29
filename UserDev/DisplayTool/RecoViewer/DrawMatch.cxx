@@ -13,6 +13,7 @@ DrawMatch::DrawMatch() {
   _time_ratio_cut  = 0.001;
   _start_time_cut  = 10 ;
   _require_3planes = true ;
+  _match_mgr = nullptr;
 }
 
 bool DrawMatch::initialize() {
@@ -23,17 +24,16 @@ bool DrawMatch::initialize() {
     _dataByPlane.resize(geoService -> Nviews());
   }
 
+
   return true;
 }
 
 bool DrawMatch::analyze(larlite::storage_manager* storage) {
 
-
-  size_t planes = 3;
-  ::cmtool::CMatchManager _match_mgr(planes) ;
-
-  std::vector <std::vector < Cluster2d> > _pass;
-  _pass.resize(geoService->Nviews());
+  if (_match_mgr == nullptr){
+    std::cout << "ERROR: Match Manager not set, can not make matches.  Returning.\n";
+    return false;
+  }
 
   auto ev_clus = storage->get_data<larlite::event_cluster>(_producer);
   if (!ev_clus)
@@ -48,8 +48,6 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
   for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
     _dataByPlane.at(p).clear();
     _dataByPlane.at(p).reserve(ev_clus -> size());
-    _pass.at(p).clear();
-    _pass.at(p).reserve(ev_clus -> size());
 
     _wireRange.at(p).first  = 99999;
     _timeRange.at(p).first  = 99999;
@@ -57,6 +55,9 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
     _wireRange.at(p).second = -1.0;
 
   }
+
+  std::vector < Cluster2d> _pass;
+  _pass.reserve(ev_clus -> size());
 
   ::larlite::event_hit* ev_hit = nullptr;
   auto const& hit_index_v = storage->find_one_ass(ev_clus->id(), ev_hit, _producer);
@@ -93,17 +94,15 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
     view = ev_hit->at(hit_indices[0]).View();
 
     // Make a new cluster in the data:
-//   _dataByPlane.at(view).push_back(Cluster2d());
-//   _dataByPlane.at(view).back()._is_good = true;
-    _pass.at(view).push_back(Cluster2d());
-    _pass.at(view).back()._is_good = true;
+    _pass.push_back(Cluster2d());
+    _pass.back()._is_good = true;
 
     // Fill the cluster params alg
     _cru_helper.GenerateParams( hit_indices, ev_hit, params);
     params_alg.FillParams(params);
 
     // Set the params:
-    _pass.at(view).back()._params = params;
+    _pass.back()._params = params;
 
     for (auto const& hit_index : hit_indices) {
 
@@ -117,10 +116,10 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
       // }
       // Hit(float w, float t, float c, float r) :
 
-      _pass.at(view).back().emplace_back(Hit(hit.WireID().Wire,
-                                             hit.PeakTime(),
-                                             hit.PeakAmplitude(),
-                                             hit.RMS()));
+      _pass.back().emplace_back(Hit(hit.WireID().Wire,
+                                    hit.PeakTime(),
+                                    hit.PeakAmplitude(),
+                                    hit.RMS()));
 
 
       // Determine if this hit should change the view range:
@@ -140,85 +139,101 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
   }
 
 
+  for (auto & clust : _pass) {
+    pass_clusters.push_back(clust.params());
+  }
 
-    for(auto & c0 : _pass.at(0))
-	pass_clusters.push_back(c0.params());
-    for(auto & c1 : _pass.at(1))
-	pass_clusters.push_back(c1.params());
-    for(auto & c2 : _pass.at(2))
-	pass_clusters.push_back(c2.params());
-    
-  _pass.at(2).push_back(Cluster2d());
-  _pass.at(2).back()._is_good = false;
+
+  // for (auto & c0 : _pass.at(0))
+  //   pass_clusters.push_back(c0.params());
+  // for (auto & c1 : _pass.at(1))
+  //   pass_clusters.push_back(c1.params());
+  // for (auto & c2 : _pass.at(2))
+  //   pass_clusters.push_back(c2.params());
+
+  // _pass.at(2).push_back(Cluster2d());
+  // _pass.at(2).back()._is_good = false;
 
   //std::cout<<"Hits for fake cluster: "<<_pass.at(2).back().params().N_Hits<<std::endl ;
 
-  auto priority_algo = new ::cmtool::CPAlgoNHits ;
-  priority_algo->SetMinHits(20);
 
-  bool three_planes = false ;
+  _match_mgr -> Reset();
+  _match_mgr->SetClusters(pass_clusters);
+  _match_mgr -> Process();
+  auto scores = _match_mgr->GetBookKeeper().GetResult();
 
-  auto time_algo = new ::cmtool::CFAlgoTimeOverlap ;
-  time_algo->RequireThreePlanes(false); 
-  _match_mgr.SetClusters(pass_clusters);
-  _match_mgr.AddPriorityAlgo(priority_algo);
-  _match_mgr.AddMatchAlgo(time_algo) ;
-  _match_mgr.Process();
-  auto scores = _match_mgr.GetBookKeeper().GetResult();
 
-//  std::cout<<"\n\nNEW: Size of matchscores :" <<scores.size()<<std::endl;
+//   std::vector<std::vector<int>> new_scores ;
+//   new_scores.resize(scores.size()) ;
 
-  std::vector<std::vector<int>> new_scores ;
-  new_scores.resize(scores.size()) ;
+//   for (int i = 0; i < scores.size(); i++)
+//     // new_scores.at(i).resize(3, -1);
+//     new_scores.at(i).resize(geoService->Nview(), -1);
 
-  for(int i=0; i < scores.size();i++)
-    new_scores.at(i).resize(3,-1);
+//   for (int i = 0; i < scores.size(); i++) {
+//     for (int j = 0; j < scores.at(i).size(); j++) {
 
-  for(int i=0; i < scores.size();i++){
-    for(int j=0; j < scores.at(i).size();j++){
+//       auto pl = pass_clusters.at(scores.at(i)[j]).plane_id.Plane ;
+//       new_scores.at(i)[pl] = scores.at(i)[j] ;
 
-      auto pl = pass_clusters.at(scores.at(i)[j]).plane_id.Plane ; 
-      new_scores.at(i)[pl] = scores.at(i)[j] ;
-      
-  //    std::cout<<"Plane is: "<<pl<<std::endl;
+//       //    std::cout<<"Plane is: "<<pl<<std::endl;
 
-      if( new_scores.at(i)[pl] != -1 && pl==1)
-	new_scores.at(i)[pl] -= _pass.at(0).size();
+//       if ( new_scores.at(i)[pl] != -1 && pl == 1)
+//         new_scores.at(i)[pl] -= _pass.at(0).size();
 
-      else if( new_scores.at(i)[pl] != -1 && pl==2)
-	new_scores.at(i)[pl] -= ( _pass.at(0).size() + _pass.at(1).size() );
+//       else if ( new_scores.at(i)[pl] != -1 && pl == 2)
+//         new_scores.at(i)[pl] -= ( _pass.at(0).size() + _pass.at(1).size() );
 
-      }
-//	std::cout<< "New_scores are: "<<new_scores.at(i)[0]<<", "<<new_scores.at(i)[1]<<", "<<new_scores.at(i)[2]<<std::endl;
+//     }
+// //  std::cout<< "New_scores are: "<<new_scores.at(i)[0]<<", "<<new_scores.at(i)[1]<<", "<<new_scores.at(i)[2]<<std::endl;
+//   }
+
+  // Put the matched clusters into _dataByPlane
+  // Keep track of how many matches are made
+  size_t matches = 0;
+  for (auto & set : scores) {
+    // The indexs in set are matched clusters, so copy the cluster2d objects
+    // into _dataByPlane based on that indexing:
+    size_t copied = 0;
+    for (auto & index : set) {
+      auto & plane = pass_clusters.at(index).plane_id.Plane;
+      _dataByPlane.at(plane).push_back(_pass.at(index));
+      copied ++;
     }
-    
+    matches ++;
+    if (copied < geoService -> Nviews()) {
+      for (auto & vec : _dataByPlane) {
+        vec.resize(matches);
+      }
+    }
+  }
 
-    for(int i=0; i < new_scores.size();i++){
-	for(int j=0; j < new_scores.at(i).size();j++){
-	    if(new_scores.at(i)[j] == -1)
-	      _dataByPlane.at(j).push_back(_pass.at(2).back()) ;//[score_array[i]]); 
-	    else
-	      _dataByPlane.at(j).push_back(_pass.at(j)[new_scores.at(i)[j]]); 
+//   for (int i = 0; i < new_scores.size(); i++) {
+//     for (int j = 0; j < new_scores.at(i).size(); j++) {
+//       if (new_scores.at(i)[j] == -1)
+//         _dataByPlane.at(j).push_back(_pass.at(2).back()) ;//[score_array[i]]);
+//       else
+//         _dataByPlane.at(j).push_back(_pass.at(j)[new_scores.at(i)[j]]);
 
-//	std::cout<<"What are the score. Geez. "<<new_scores.at(i)[j]<< std::endl ;
-         }
-       }
+// //  std::cout<<"What are the score. Geez. "<<new_scores.at(i)[j]<< std::endl ;
+//     }
+//   }
 //std::cout<<"Size of each dataBYPLane: "<<_dataByPlane.at(0).size()<<", "<<_dataByPlane.at(1).size()<<", "<<_dataByPlane.at(2).size()<<std::endl ;
 
   // Now that clusters are done filling, go through and pad out the rest of the data
   // Just in case they aren't the same length:
-  int max_val = cluster_index.front();
-  for (auto & val : cluster_index) {
-    if (val > max_val ) {
-      max_val = val;
-    }
-  }
+  // int max_val = cluster_index.front();
+  // for (auto & val : cluster_index) {
+  //   if (val > max_val ) {
+  //     max_val = val;
+  //   }
+  // }
 
-  for (auto & planeOfClusters : _dataByPlane) {
-    if (planeOfClusters.size() < max_val) {
-      planeOfClusters.resize(max_val);
-    }
-  }
+  // for (auto & planeOfClusters : _dataByPlane) {
+  //   if (planeOfClusters.size() < max_val) {
+  //     planeOfClusters.resize(max_val);
+  //   }
+  // }
 
 
   return true;
@@ -245,6 +260,7 @@ bool DrawMatch::finalize() {
 }
 
 DrawMatch::~DrawMatch() {
+  delete _match_mgr;
 }
 
 }

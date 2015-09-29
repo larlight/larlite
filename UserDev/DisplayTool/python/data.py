@@ -723,6 +723,25 @@ class match(recoBase):
         super(match, self).__init__()
         self._process = evd.DrawMatch()
         self.init()
+        nplanes = larutil.Geometry.GetME().Nplanes()
+        self.manager = cmtool.CMatchManager(nplanes)
+        # priority_array = cmtool.CPAlgoArray()
+        # palgo1 = cmtool.CPAlgoNHits()
+        # palgo1.SetMinHits(20)
+        # priority_array.AddAlgo(palgo1)
+
+
+        self.match_array = cmtool.CFAlgoArray()
+        self.timeAlg     = cmtool.CFAlgoTimeOverlap()
+        self.timeAlg.RequireThreePlanes(False)
+        self.match_array.AddAlgo(self.timeAlg)
+
+        # manager.AddPriorityAlgo(priority_array)
+        self.manager.AddMatchAlgo(self.match_array)
+
+        self._process.setManager(self.manager)
+
+
         self._listOfClusters = []
         self._listOfCParams  = []
 
