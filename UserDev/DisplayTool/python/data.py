@@ -7,7 +7,7 @@ import numpy as np
 import math
 import pyqtgraph as pg
 import math as mt
-
+import evdMatchDef
 
 # These classes provide the basic interfaces for drawing objects
 # It's meant to be inherited from for specific instances
@@ -723,23 +723,8 @@ class match(recoBase):
         super(match, self).__init__()
         self._process = evd.DrawMatch()
         self.init()
-        nplanes = larutil.Geometry.GetME().Nplanes()
-        self.manager = cmtool.CMatchManager(nplanes)
-        # priority_array = cmtool.CPAlgoArray()
-        # palgo1 = cmtool.CPAlgoNHits()
-        # palgo1.SetMinHits(20)
-        # priority_array.AddAlgo(palgo1)
-
-
-        self.match_array = cmtool.CFAlgoArray()
-        self.timeAlg     = cmtool.CFAlgoTimeOverlap()
-        self.timeAlg.RequireThreePlanes(False)
-        self.match_array.AddAlgo(self.timeAlg)
-
-        # manager.AddPriorityAlgo(priority_array)
-        self.manager.AddMatchAlgo(self.match_array)
-
-        self._process.setManager(self.manager)
+        self._manager = evdMatchDef.getMatchManager()
+        self._process.setManager(self._manager)
 
 
         self._listOfClusters = []

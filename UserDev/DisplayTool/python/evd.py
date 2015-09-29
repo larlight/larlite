@@ -23,14 +23,23 @@ class ComboBoxWithKeyConnect(QtGui.QComboBox):
         self._owner_KPE = kpe
 
     def keyPressEvent(self, e):
-        if e.key() == QtCore.Qt.Key_N:
-            self._owner_KPE(e)
-            pass
-        if e.key() == QtCore.Qt.Key_P:
-            self._owner_KPE(e)
-            pass
-        else:
+        if e.key() == QtCore.Qt.Key_Up:
             super(ComboBoxWithKeyConnect, self).keyPressEvent(e)
+            return
+        if e.key() == QtCore.Qt.Key_Down:
+            super(ComboBoxWithKeyConnect, self).keyPressEvent(e)
+            return
+        else:
+            self._owner_KPE(e)
+        # if e.key() == QtCore.Qt.Key_N:
+        #     self._owner_KPE(e)
+        #     pass
+        # if e.key() == QtCore.Qt.Key_P:
+        #     self._owner_KPE(e)
+        #     pass
+        # else:
+        #     super(ComboBoxWithKeyConnect, self).keyPressEvent(e)
+        #     self._owner_KPE(e)
 
 # This is a widget class that contains the label and combo box
 # It also knows what to do when updating
@@ -66,7 +75,7 @@ class recoBox(QtGui.QWidget):
 
     def keyPressEvent(self, e):
         self._box.keyPressEvent(e)
-        super(ComboBoxWithKeyConnect, self).keyPressEvent(e)
+        super(recoBox, self).keyPressEvent(e)
 
     def emitSignal(self, text):
         self.activated.emit(text)
