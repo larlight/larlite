@@ -29,7 +29,7 @@ bool DrawMatch::initialize() {
 bool DrawMatch::analyze(larlite::storage_manager* storage) {
 
 
-  size_t planes = 3; 
+  size_t planes = 3;
   ::cmtool::CMatchManager _match_mgr(planes) ;
 
   std::vector <std::vector < Cluster2d> > _pass;
@@ -93,11 +93,11 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
     view = ev_hit->at(hit_indices[0]).View();
 
     // Make a new cluster in the data:
- //   _dataByPlane.at(view).push_back(Cluster2d());
- //   _dataByPlane.at(view).back()._is_good = true;
+//   _dataByPlane.at(view).push_back(Cluster2d());
+//   _dataByPlane.at(view).back()._is_good = true;
     _pass.at(view).push_back(Cluster2d());
     _pass.at(view).back()._is_good = true;
-    
+
     // Fill the cluster params alg
     _cru_helper.GenerateParams( hit_indices, ev_hit, params);
     params_alg.FillParams(params);
@@ -115,12 +115,12 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
       //             << ", " << ev_hit->at(hit_index).PeakTime()
       //             << std::endl;
       // }
-    // Hit(float w, float t, float c, float r) :
+      // Hit(float w, float t, float c, float r) :
 
       _pass.at(view).back().emplace_back(Hit(hit.WireID().Wire,
-                                                   hit.PeakTime(),
-                                                   hit.PeakAmplitude(),
-                                                   hit.RMS()));
+                                             hit.PeakTime(),
+                                             hit.PeakAmplitude(),
+                                             hit.RMS()));
 
 
       // Determine if this hit should change the view range:
@@ -208,14 +208,14 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
   // Now that clusters are done filling, go through and pad out the rest of the data
   // Just in case they aren't the same length:
   int max_val = cluster_index.front();
-  for (auto & val : cluster_index){
-    if (val > max_val ){
+  for (auto & val : cluster_index) {
+    if (val > max_val ) {
       max_val = val;
     }
   }
 
-  for (auto & planeOfClusters : _dataByPlane){
-    if (planeOfClusters.size() < max_val){
+  for (auto & planeOfClusters : _dataByPlane) {
+    if (planeOfClusters.size() < max_val) {
       planeOfClusters.resize(max_val);
     }
   }
