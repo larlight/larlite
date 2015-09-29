@@ -140,39 +140,70 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
   }
 
 
-  for (auto & c0 : _pass.at(0))
-    pass_clusters.push_back(c0.params());
-  for (auto & c1 : _pass.at(1))
-    pass_clusters.push_back(c1.params());
-  for (auto & c2 : _pass.at(2))
-    pass_clusters.push_back(c2.params());
 
+    for(auto & c0 : _pass.at(0))
+	pass_clusters.push_back(c0.params());
+    for(auto & c1 : _pass.at(1))
+	pass_clusters.push_back(c1.params());
+    for(auto & c2 : _pass.at(2))
+	pass_clusters.push_back(c2.params());
+    
+  _pass.at(2).push_back(Cluster2d());
+  _pass.at(2).back()._is_good = false;
+
+  //std::cout<<"Hits for fake cluster: "<<_pass.at(2).back().params().N_Hits<<std::endl ;
 
   auto priority_algo = new ::cmtool::CPAlgoNHits ;
   priority_algo->SetMinHits(20);
 
+  bool three_planes = false ;
+
+  auto time_algo = new ::cmtool::CFAlgoTimeOverlap ;
+  time_algo->RequireThreePlanes(false); 
   _match_mgr.SetClusters(pass_clusters);
   _match_mgr.AddPriorityAlgo(priority_algo);
-  _match_mgr.AddMatchAlgo(new ::cmtool::CFAlgoTimeOverlap) ;
+  _match_mgr.AddMatchAlgo(time_algo) ;
   _match_mgr.Process();
   auto scores = _match_mgr.GetBookKeeper().GetResult();
 
-  std::cout << "\n\nNEW: Size of matchscores :" << scores.size() << std::endl;
+//  std::cout<<"\n\nNEW: Size of matchscores :" <<scores.size()<<std::endl;
 
-  for (size_t i = 0; i < scores.size(); i++) {
+  std::vector<std::vector<int>> new_scores ;
+  new_scores.resize(scores.size()) ;
 
-    scores[i][1] -= (_pass.at(0).size()) ;
-    scores[i][2] -= (_pass.at(0).size() + _pass.at(1).size());
+  for(int i=0; i < scores.size();i++)
+    new_scores.at(i).resize(3,-1);
 
-  }
+  for(int i=0; i < scores.size();i++){
+    for(int j=0; j < scores.at(i).size();j++){
 
-  for ( auto & m : scores ) {
-    std::cout << "What are the score. Geez. " << m[0] << ", " << m[1] << ", " << m[2] << std::endl ;
-    _dataByPlane.at(0).push_back(_pass.at(0)[m[0]]);
-    _dataByPlane.at(1).push_back(_pass.at(1)[m[1]]);
-    _dataByPlane.at(2).push_back(_pass.at(2)[m[2]]);
-  }
+      auto pl = pass_clusters.at(scores.at(i)[j]).plane_id.Plane ; 
+      new_scores.at(i)[pl] = scores.at(i)[j] ;
+      
+  //    std::cout<<"Plane is: "<<pl<<std::endl;
 
+      if( new_scores.at(i)[pl] != -1 && pl==1)
+	new_scores.at(i)[pl] -= _pass.at(0).size();
+
+      else if( new_scores.at(i)[pl] != -1 && pl==2)
+	new_scores.at(i)[pl] -= ( _pass.at(0).size() + _pass.at(1).size() );
+
+      }
+//	std::cout<< "New_scores are: "<<new_scores.at(i)[0]<<", "<<new_scores.at(i)[1]<<", "<<new_scores.at(i)[2]<<std::endl;
+    }
+    
+
+    for(int i=0; i < new_scores.size();i++){
+	for(int j=0; j < new_scores.at(i).size();j++){
+	    if(new_scores.at(i)[j] == -1)
+	      _dataByPlane.at(j).push_back(_pass.at(2).back()) ;//[score_array[i]]); 
+	    else
+	      _dataByPlane.at(j).push_back(_pass.at(j)[new_scores.at(i)[j]]); 
+
+//	std::cout<<"What are the score. Geez. "<<new_scores.at(i)[j]<< std::endl ;
+         }
+       }
+//std::cout<<"Size of each dataBYPLane: "<<_dataByPlane.at(0).size()<<", "<<_dataByPlane.at(1).size()<<", "<<_dataByPlane.at(2).size()<<std::endl ;
 
   // Now that clusters are done filling, go through and pad out the rest of the data
   // Just in case they aren't the same length:
