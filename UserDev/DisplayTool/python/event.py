@@ -381,7 +381,7 @@ class larlite_manager(manager,QtCore.QObject):
   def toggleParams(self, paramsBool):
     self._drawParams = paramsBool
     self.clusterParamsChanged.emit(paramsBool)
-    if 'cluster' in self._drawnClasses:
+    if 'Cluster' in self._drawnClasses or 'Match' in self._drawnClasses:
       self.drawFresh()
 
   def getPlane(self,plane):
