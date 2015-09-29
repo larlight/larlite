@@ -760,10 +760,16 @@ class match(recoBase):
 
             for cluster in matchedClusters:
 
+
+
+
                 # Check that this match is good
                 if not cluster.is_good():
                     self._listOfClusters[thisPlane].append(None)
                     self._listOfCParams[thisPlane].append(None)
+                    colorIndex += 1
+                    if colorIndex >= len(self._matchColors):
+                        colorIndex = 0
                     continue
 
                 # If the match is good, make the cluster and such
@@ -779,7 +785,7 @@ class match(recoBase):
 
                 # draw the hits in this cluster:
                 cluster_box_coll.drawHits(view, cluster)
-
+                
                 colorIndex += 1
                 if colorIndex >= len(self._matchColors):
                     colorIndex = 0
