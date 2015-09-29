@@ -61,6 +61,8 @@ namespace evd {
     */
     virtual bool finalize();
 
+    void setManager(::cmtool::CMatchManager * mgr){ _match_mgr = mgr;}
+
   protected:
 
     ::cluster::CRUHelper    _cru_helper;
@@ -71,7 +73,7 @@ namespace evd {
     bool _verbose ;
     bool _require_3planes;
 
-
+    ::cmtool::CMatchManager * _match_mgr;
 
   };
 }
