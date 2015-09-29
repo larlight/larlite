@@ -30,6 +30,18 @@ bool DrawMatch::initialize() {
 
 bool DrawMatch::analyze(larlite::storage_manager* storage) {
 
+
+  // Clear out the hit data but reserve some space for the hits
+  for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
+    _dataByPlane.at(p).clear();
+
+    _wireRange.at(p).first  = 99999;
+    _timeRange.at(p).first  = 99999;
+    _timeRange.at(p).second = -1.0;
+    _wireRange.at(p).second = -1.0;
+
+  }
+
   if (_match_mgr == nullptr){
     std::cout << "ERROR: Match Manager not set, can not make matches.  Returning.\n";
     return false;
@@ -43,18 +55,9 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
           Form("Skipping event %d since no cluster found...", ev_clus->event_id()));
     return false;
   }
-
-  // Clear out the hit data but reserve some space for the hits
-  for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
-    _dataByPlane.at(p).clear();
+  
+  for (unsigned int p = 0; p < geoService -> Nviews(); p ++)
     _dataByPlane.at(p).reserve(ev_clus -> size());
-
-    _wireRange.at(p).first  = 99999;
-    _timeRange.at(p).first  = 99999;
-    _timeRange.at(p).second = -1.0;
-    _wireRange.at(p).second = -1.0;
-
-  }
 
   std::vector < Cluster2d> _pass;
   _pass.reserve(ev_clus -> size());
