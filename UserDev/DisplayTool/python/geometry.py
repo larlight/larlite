@@ -133,7 +133,7 @@ class argoneut(geometry):
                                              (0.8,  (0,  255, 0,   255)), 
                                              (1,    (255,  0, 0,   255))], 
                                              'mode': 'rgb'}) 
-    self._offset = [1.7226813611, 2.4226813611]
+    # self._offset = [1.7226813611, 2.4226813611]
 
 class lariat(geometry):
 

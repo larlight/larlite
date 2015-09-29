@@ -640,6 +640,7 @@ class cluster(recoBase):
     # this is the function that actually draws the cluster.
     def drawObjects(self, view_manager):
 
+
         for view in view_manager.getViewPorts():
             colorIndex = 0
             # get the plane
