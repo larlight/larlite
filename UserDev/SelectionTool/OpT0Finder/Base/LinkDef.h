@@ -16,6 +16,7 @@
 #pragma link C++ class flashana::ColorPrint+;
 #pragma link C++ class flashana::FlashMatchManager+;
 #pragma link C++ class flashana::BaseAlgorithm+;
+#pragma link C++ class flashana::BaseProhibitAlgo+;
 #pragma link C++ class flashana::BaseTPCFilter+;
 #pragma link C++ class flashana::BaseFlashFilter+;
 #pragma link C++ class flashana::BaseFlashMatch+;
