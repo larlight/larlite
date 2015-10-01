@@ -179,6 +179,8 @@ namespace ertool {
 
 	if(graph.GetParticle(t).ProcessType() == ::ertool::ProcessType_t::kCosmic||
 	   graph.GetParticle(graph.GetParticle(t).Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic){
+	  
+	  //	  if(graph.GetParticle(t).PdgCode() == 13){std::cout << " \t \t \t \t COSMICS" << std::endl;}
 	  if(Debug()) Debug(__FUNCTION__,"Cosmic Shower");
 	  continue;	
 	}
@@ -349,7 +351,7 @@ namespace ertool {
 	      double mass = _findRel.GetMass(track);
 	      geoalgo::Vector_t Mom = Dir * ( sqrt( Edep * (Edep+2*mass) ) );
 	      //trackParticle.SetParticleInfo(_findRel.GetPDG(track),mass,track[0],Mom);
-	      if(trackParticle.PdgCode() == 13){ muon = true;}
+	      //	      if(trackParticle.PdgCode() == 13){ muon = true;}
 	      trackParticle.SetParticleInfo(trackParticle.PdgCode(),mass,track[0],Mom);
 	      neutrinoMom += sqrt( Edep * ( Edep + 2*mass ) );
 	      //std::cout << "setting parentage for sibling track..." << std::endl;
@@ -359,13 +361,13 @@ namespace ertool {
 
 	::geoalgo::Vector_t momdir(0,0,1);
      
-	if(!(muon)){
-	  neutrino.SetParticleInfo(12,0.,thisShower.Start(),momdir*neutrinoMom);
-	}
-	else{
+	/*	if(muon){
 	  std::cout << "this sucker is a freaking nu_mu" << std::endl; 
 	  neutrino.SetParticleInfo(14,0.,thisShower.Start(),momdir*neutrinoMom);
-	}
+	  }*/
+	//else{
+	  neutrino.SetParticleInfo(12,0.,thisShower.Start(),momdir*neutrinoMom);	  
+	  //}
 	
       
       }// if single
