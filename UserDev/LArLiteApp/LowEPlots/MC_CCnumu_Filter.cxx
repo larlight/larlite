@@ -7,6 +7,14 @@ namespace larlite {
 
   bool MC_CCnumu_Filter::initialize() {
 
+    TPC.Min(0,
+            -(::larutil::Geometry::GetME()->DetHalfHeight()),
+            0);
+
+    TPC.Max(2*(::larutil::Geometry::GetME()->DetHalfWidth()),
+            ::larutil::Geometry::GetME()->DetHalfHeight(),
+            ::larutil::Geometry::GetME()->DetLength());
+
     return true;
   }
   
@@ -19,35 +27,31 @@ namespace larlite {
       return false;
     }
     
-    bool ret = true;
-    
+    bool ret = false;
+    bool CC = false;
+    bool numu = false;
+
     for(auto &ev_mctruth : *ev_mctruth_v){
-      
+     
+
       //Enforce CC interaction channel
-      if( ev_mctruth.GetNeutrino().CCNC() != 0 )
-	ret = false;
+      if( ev_mctruth.GetNeutrino().CCNC() == 0 ){CC = true;}
       
-      //Enforce that there is exactly 1 electron, above 20MeV kinetic energy
-      //I don't care about neutrons, weird quarks, the neutrino, etc.
-      size_t n_muons = 0;
+      // If there are any detector external interactions veto the event
+      if(!(TPC.Contain(ev_mctruth.GetNeutrino().Nu().Trajectory().back().Position()))){
+	return false;}
       
-      for(auto const& particle : ev_mctruth.GetParticles()){
-	
-	if( abs(particle.PdgCode()) == 13 && 
-	    particle.StatusCode() == 1)
-	  n_muons++;
-      }
       
-      if( n_muons > 0)
-	ret = false;
+      if(ev_mctruth.GetNeutrino().Nu().PdgCode() == 14){numu = true;}
       
-      if(ret == true) continue;
       
-    }  
+    }
     
     //check the status of the ret variable
+    if(CC && numu){ret = true;} 
+    else{ret = false;}
+
     return ret;  
-  
 
   }
 

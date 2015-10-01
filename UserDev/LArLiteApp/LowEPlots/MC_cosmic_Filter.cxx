@@ -18,7 +18,7 @@ namespace larlite {
       return false;
     }
 
-    bool ret = true;
+    bool ret = false;
     
     for(auto &ev_mctruth : *ev_mctruth_v){
 
