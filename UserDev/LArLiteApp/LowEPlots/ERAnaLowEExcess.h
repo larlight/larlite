@@ -22,6 +22,9 @@
 #include <string>
 #include "DataFormat/mctruth.h"
 #include "../../LArLiteApp/fluxRW/fluxRW.h"
+#include "GeoAlgo/GeoAABox.h"
+#include "LArUtil/Geometry.h"
+
 
 namespace ertool {
 
@@ -59,6 +62,8 @@ namespace ertool {
 
     /// set the energy cut to be used when counting particles
     void SetECut(double c) { _eCut = c; }
+
+    geoalgo::AABox TPC;
 
     
   private:

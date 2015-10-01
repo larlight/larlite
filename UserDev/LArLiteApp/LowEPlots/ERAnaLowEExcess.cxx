@@ -12,7 +12,13 @@ namespace ertool {
     
     PrepareTreeVariables();
 
-    //    _numEvts = 0;
+    TPC.Min(0+10,
+            -(::larutil::Geometry::GetME()->DetHalfHeight())+10,
+            0+10);
+
+    TPC.Max(2*(::larutil::Geometry::GetME()->DetHalfWidth())-10,
+            ::larutil::Geometry::GetME()->DetHalfHeight()-10,
+            ::larutil::Geometry::GetME()->DetLength()-10);
 
     // set default energy cut (for counting) to 0
     _eCut = 0;
@@ -31,13 +37,22 @@ namespace ertool {
     
     _numEvts += 1;
 
+    bool reco = false;
+
     // size of ParticleSet should be the number of neutrinos found, each associated with a single electron
     
     auto const& particles = graph.GetParticleArray();
     
     for ( auto const & p : particles ){
       if ( p.PdgCode() == 12 ){
-	
+
+	if(!(TPC.Contain(p.Vertex()))){
+	  std::cout << "\n \t\t\t\t\t\t ::Not fiducial::\n" << std::endl; 
+	  continue;
+	}
+	//	std::cout << "\t\t\t Reco Graph: \n" << graph.Diagram() << std::endl; 	
+	reco = true;
+
 	_neutrinos  += 1;
 	
 	// get all descendants of the neutrino
@@ -49,8 +64,9 @@ namespace ertool {
 	  if (part.HasRecoObject() == true){
 	    // get the reco object's dep. energy
 	    // if shower
-	    if (part.RecoType() == kShower)
+	    if (part.RecoType() == kShower){
 	      _e_dep += data.Shower(part.RecoID())._energy;
+	    }
 	    if (part.RecoType() == kTrack){
 	      _e_dep += data.Track(part.RecoID())._energy;
 	    }
@@ -62,7 +78,7 @@ namespace ertool {
     
     for( auto const & p : graph.GetParticleArray() ){
             
-      if(abs(p.PdgCode()) == 12 ){
+      if(abs(p.PdgCode()) == 12){
 	
 	auto neutrino = p ;
 	
@@ -79,8 +95,18 @@ namespace ertool {
 
     // Get MC particle set
     auto const& mc_graph = MCParticleGraph();
+    if(reco){
+      //      std::cout << "\t\t\t MC Graph: \n" << mc_graph.Diagram() << std::endl; 	
+    }
     for( auto const & mc : mc_graph.GetParticleArray() ){
       
+      //if(abs(mc_graph.GetParticle(mc.Ancestor()).PdgCode()) == 12 &&
+      //abs(mc.PdgCode()) == 13){
+
+	
+	
+	//}
+
       if(abs(mc.PdgCode()) == 12 ||
 	 abs(mc.PdgCode()) == 14 ){
 	
