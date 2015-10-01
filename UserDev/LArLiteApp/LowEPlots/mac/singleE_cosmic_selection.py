@@ -13,7 +13,7 @@ from ROOT import ertool
 from seltool.ccsingleeDef import GetCCSingleEInstance
 from seltool.primaryfinderDef import GetPrimaryFinderInstance
 from seltool.trackpidDef import GetTrackPidInstance
-from seltool.cosmictaggerDef import GetCosmicTaggerInstance
+from seltool.trackDresserDef import GetTrackDresserInstance
 from seltool.primarycosmicDef import GetPrimaryCosmicFinderInstance
 
 # Create ana_processor instance
@@ -54,14 +54,14 @@ pid_algo = GetTrackPidInstance()
 #pid_algo.setVerbose(False)
 
 # cosmic tagger algo
-cos_algo = GetCosmicTaggerInstance()
+cos_algo = GetTrackDresserInstance() #GetCosmicTaggerInstance()
 #cos_algo.setVerbose(False)
 
 # here set E-cut for Helper & Ana modules
 #This cut is applied in helper... ertool showers are not made if the energy of mcshower or reco shower
 #is below this threshold. This has to be above 0 or else the code may segfault. This is not a "physics cut".
 #Do not change this value unless you know what you are doing.
-Ecut = 20 # in MeV
+Ecut = 50 # in MeV
 
 # ***************  Set Producers  ****************
 # First Argument: True = MC, False = Reco
