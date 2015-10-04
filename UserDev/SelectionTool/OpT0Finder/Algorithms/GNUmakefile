@@ -15,9 +15,11 @@ INCFLAGS  = -I.                       #Include itself
 INCFLAGS += $(shell larlite-config --includes)
 INCFLAGS += -I$(LARLITE_USERDEVDIR)/SelectionTool
 
+LDFLAGS += $(shell larlite-config --libs) 
 LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_OpT0FinderBase
 LDFLAGS += -L$(LARLITE_LIBDIR) -lSelectionTool_OpT0PhotonLibrary
 LDFLAGS += -L$(shell root-config --libdir) -lMinuit #-lMinuit2
+
 # platform-specific options
 OSNAME          = $(shell uname -s)
 HOST            = $(shell uname -n)

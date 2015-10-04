@@ -80,6 +80,8 @@ namespace showerreco{
     double mean[3];
     double sigma[3];
     std::vector<double> hits_poly[3];
+    std::vector<std::vector<double> > dQ_hit[3];//vector of vector of dQ/pitch in one pitch on 3 clusters of all evts
+    std::vector<double> dQ_hit_clu[3];//vector of dQ/pitch on 3 cluster of 1 evt 
     double median[3]={};
     
     //// loop over all input cluster -> calculate a dQdx per plane
@@ -117,20 +119,24 @@ namespace showerreco{
 				   (shr_start.t - start.t) * (shr_start.t - start.t) );
        
        double sum = 0;//sum of charge square
-       double hit_length;
+       double hit_length_c;
+       double hit_length_s;
        double factor=pitch/0.3;
        n_hits[pl] = hits.size();       
        dx[pl]=trunk_length[pl];
        dx_p[pl]=std::abs((shr_start.w - start.w)*factor);//3D length abs w/ pitch correction
+       dQ[pl]=0;
        
-       dQ[pl]=0;//sum of dQ
-       
+       //***Loop over hits in cluster START
        for (int i=0;i<n_hits[pl];i++){
-	 hit_length = sqrt((hits[i].w-start.w)*(hits[i].w-start.w)+
+	 hit_length_c = sqrt((hits[i].w-start.w)*(hits[i].w-start.w)+
 			   (hits[i].t-start.t)*(hits[i].t-start.t));
-	 //dx[pl]=hit_length;
-	 //Radius limit
-	 if (hit_length<trunk_length[pl]){
+	 hit_length_s = sqrt((hits[i].w-shr_start.w)*(hits[i].w-shr_start.w)+
+			     (hits[i].t-shr_start.t)*(hits[i].t-shr_start.t));
+	 
+	 //**Loop over hits inside 2.4cm START
+	 if (hit_length_c<= 2.4){
+	   //if (hit_length_c<=trunk_length[pl]){
 	   n_hits_radius[pl]++;//select hits inside circle
 	   std::vector<std::pair<float,float>> p_hit;//find triangle
 	   p_hit.resize(3);
@@ -139,7 +145,7 @@ namespace showerreco{
 	   p_hit.at(1).first=shr_start.w;
 	   p_hit.at(1).second=shr_start.t;
 	   p_hit.at(2).first=hits[i].w;
-	   p_hit.at(2).second=hits[i].t;	  
+	   p_hit.at(2).second=hits[i].t;
 	   
 	   float check_l1,check_l2;
 	   check_l1=sqrt((p_hit.at(2).second-p_hit.at(0).second)*(p_hit.at(2).second-p_hit.at(0).second)+
@@ -147,20 +153,28 @@ namespace showerreco{
 	   check_l2=sqrt((p_hit.at(2).second-p_hit.at(1).second)*(p_hit.at(2).second-p_hit.at(1).second)+
 			 (p_hit.at(2).first-p_hit.at(1).first)*(p_hit.at(2).first-p_hit.at(1).first));
 	   
-	   //Get the Triangle
-	   Polygon2D poly(p_hit);
+	   Polygon2D poly(p_hit);//Get the Triangle 
 	   
-	   if(check_l1*check_l2>0){
-	     float in_an=poly.InteriorAngle(0);//hits NOT overlapping cluster/shower start point
+	   // if(hit_length_c==0 || hit_length_s==0){
+	   if(trunk_length[pl]==0){
+	     double Q = hits[i].charge * _charge_conversion;
+             sum += Q*Q;
+             dQ[pl] += Q;
+             n_hits_poly[pl]++;
+             hits_poly[pl].push_back(Q/pitch);
+	   }
+	   
+	   else if(check_l1*check_l2>0){//hits not on cluster/shr start points
+	     float in_an=poly.InteriorAngle(0);
 	     if(tan(in_an)<=tan(clu_an)){//hits w/ cluster open angle
-	       double Q = hits[i].charge * _charge_conversion;//!!!!charge is indeed charge/dx!!!!
+	       double Q = hits[i].charge * _charge_conversion;
 	       sum += Q*Q;
 	       dQ[pl] += Q;
 	       n_hits_poly[pl]++;
-	       hits_poly[pl].push_back(Q/pitch);///!!!!!!!!!!!!!!!!!!!!
+	       hits_poly[pl].push_back(Q/pitch);//calculate dQ/dx
 	     }
 	   }
-	   else if(check_l1*check_l2==0){//hits overlaping cluster/shower start point
+	   else if(check_l1*check_l2==0){//hits on cluster/shower start point
 	     double Q = hits[i].charge * _charge_conversion;
 	     sum += Q*Q;
 	     dQ[pl] += Q;
@@ -168,8 +182,50 @@ namespace showerreco{
 	     hits_poly[pl].push_back(Q/pitch);
 	   }
 	 }
+	 //**Loop over hits inside 2.4cm END
+	 //**Loop over hits outside 2.4cm START
+	 if(hit_length_c> 2.4&&hit_length_c<trunk_length[pl]){
+	   n_hits_radius[pl]++;
+	   std::vector<std::pair<float,float>> p_hit;
+           p_hit.resize(3);
+           p_hit.at(0).first=start.w;
+           p_hit.at(0).second=start.t;
+           p_hit.at(1).first=shr_start.w;
+           p_hit.at(1).second=shr_start.t;
+           p_hit.at(2).first=hits[i].w;
+           p_hit.at(2).second=hits[i].t;
+
+           float check_l1,check_l2;
+           check_l1=sqrt((p_hit.at(2).second-p_hit.at(0).second)*(p_hit.at(2).second-p_hit.at(0).second)+
+                         (p_hit.at(2).first-p_hit.at(0).first)*(p_hit.at(2).first-p_hit.at(0).first));
+           check_l2=sqrt((p_hit.at(2).second-p_hit.at(1).second)*(p_hit.at(2).second-p_hit.at(1).second)+
+                         (p_hit.at(2).first-p_hit.at(1).first)*(p_hit.at(2).first-p_hit.at(1).first));
+	   
+           Polygon2D poly(p_hit);
+
+	   if(check_l1*check_l2>0){
+	     float in_an=poly.InteriorAngle(0);
+             if(tan(in_an)<=tan(clu_an)){
+               double Q = hits[i].charge * _charge_conversion;
+               sum += Q*Q;
+               dQ[pl] += Q;
+               n_hits_poly[pl]++;
+               hits_poly[pl].push_back(Q/pitch);
+             }
+           }
+           else if(check_l1*check_l2==0){
+             double Q = hits[i].charge * _charge_conversion;
+             sum += Q*Q;
+             dQ[pl] += Q;
+             n_hits_poly[pl]++;
+             hits_poly[pl].push_back(Q/pitch);
+           }
+	   
+	 }
        }
-       
+       // **Loop over hits outside 2.4cm END
+       //***Loop over all hits in cluster END
+
        rms[pl]=sqrt(sum/n_hits_poly[pl]);
        mean[pl]=dQ[pl]/n_hits_poly[pl];
        sigma[pl]=sqrt(rms[pl]*rms[pl]-mean[pl]*mean[pl]);
@@ -223,15 +279,14 @@ namespace showerreco{
          pl_best.at(1).second=trunk_length[1];
 	 pl_best.at(2).first=2;
          pl_best.at(2).second=trunk_length[2];
+	 
 	 std::sort(pl_best.begin(),pl_best.end(),larger);
-	 //std::cout<<"length0:"<<pl_best.at(0).second<<"\n";
-	 //std::cout<<"length1:"<<pl_best.at(1).second<<"\n";
-	 //std::cout<<"length2:"<<pl_best.at(2).second<<"\n";
+	 
 	 if(pl_best.at(2).second<10)_pl_best=pl_best.at(2).first;
 	 else if(pl_best.at(1).second<10)_pl_best=pl_best.at(1).first;
 	 else if(pl_best.at(0).second<10)_pl_best=pl_best.at(0).first;
 	 else break;
-	 //std::cout<<"best_pl:"<<_pl_best<<"\n";
+	 
        }      
        
        //tree variables w/ _ 
