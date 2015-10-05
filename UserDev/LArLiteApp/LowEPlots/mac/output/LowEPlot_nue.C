@@ -38,7 +38,6 @@ void LowEPlot_nue(){
     
 
 
-
   TH1D *nue    = new TH1D("NuEInt",";Reconstructed Neutrino Energy [GeV];Events",39, .1, 3);
   TH1D *numu   = new TH1D("NuMu",  ";Reconstructed Neutrino Energy [GeV];Events",39, .1, 3);
   TH1D *nc     = new TH1D("NC",    ";Reconstructed Neutrino Energy [GeV];Events",39, .1, 3);
@@ -71,7 +70,10 @@ void LowEPlot_nue(){
   }
 
   f1->GetObject("beamNuE",tree1);
-
+  if(!tree1){
+    std::cerr<<"Wasn't able to find tree in file."<<std::endl;
+    exit(0);
+  }
   tree1->SetBranchAddress("_numEvts", &_numEvts, &b_numEvts);
   tree1->SetBranchAddress("_neutrinos", &_neutrinos, &b_neutrinos);
   tree1->SetBranchAddress("_e_nuReco", &_e_nuReco, &b_e_nuReco);
@@ -99,8 +101,11 @@ void LowEPlot_nue(){
   if (!f2 || !f2->IsOpen()) {
     f2 = new TFile("singleE_mu_selection.root");
   }
-
-  f2->GetObject("beamNuE",tree2);
+  f2->GetObject("beamNuMu",tree2);
+  if(!tree2){
+    std::cerr<<"Wasn't able to find tree in file."<<std::endl;
+    exit(0);
+  }
 
   tree2->SetBranchAddress("_numEvts", &_numEvts, &b_numEvts);
   tree2->SetBranchAddress("_neutrinos", &_neutrinos, &b_neutrinos);
@@ -108,9 +113,8 @@ void LowEPlot_nue(){
   tree2->SetBranchAddress("_e_dep", &_e_dep, &b_e_dep);
   tree2->SetBranchAddress("_weight", &_weight, &b_weight);
 
-  Int_t nentries = tree2->GetEntries();
-  Int_t nbytes = 0;
-
+  nentries = tree2->GetEntries();
+  nbytes = 0;
   for(Int_t i = 0; i < nentries; i++){
     
     nbytes += tree2->GetEntry(i);
@@ -127,16 +131,19 @@ void LowEPlot_nue(){
     f3 = new TFile("singleE_nc_selection.root");
   }
 
-  f3->GetObject("beamNuE",tree3);
-
+  f3->GetObject("beamNC",tree3);
+  if(!tree3){
+    std::cerr<<"Wasn't able to find tree in file."<<std::endl;
+    exit(0);
+  }
   tree3->SetBranchAddress("_numEvts", &_numEvts, &b_numEvts);
   tree3->SetBranchAddress("_neutrinos", &_neutrinos, &b_neutrinos);
   tree3->SetBranchAddress("_e_nuReco", &_e_nuReco, &b_e_nuReco);
   tree3->SetBranchAddress("_e_dep", &_e_dep, &b_e_dep);
   tree3->SetBranchAddress("_weight", &_weight, &b_weight);
 
-  Int_t nentries = tree3->GetEntries();
-  Int_t nbytes = 0;
+  nentries = tree3->GetEntries();
+  nbytes = 0;
 
   for(Int_t i = 0; i < nentries; i++){
     
@@ -155,6 +162,10 @@ void LowEPlot_nue(){
   }
 
   f4->GetObject("cosmicShowers",tree4);
+  if(!tree4){
+    std::cerr<<"Wasn't able to find tree in file."<<std::endl;
+    exit(0);
+  }
 
   tree4->SetBranchAddress("_numEvts", &_numEvts, &b_numEvts);
   tree4->SetBranchAddress("_neutrinos", &_neutrinos, &b_neutrinos);
@@ -162,8 +173,8 @@ void LowEPlot_nue(){
   tree4->SetBranchAddress("_e_dep", &_e_dep, &b_e_dep);
   tree4->SetBranchAddress("_weight", &_weight, &b_weight);
 
-  Int_t nentries = tree4->GetEntries();
-  Int_t nbytes = 0;
+  nentries = tree4->GetEntries();
+  nbytes = 0;
 
   for(Int_t i = 0; i < nentries; i++){
     
@@ -183,7 +194,10 @@ void LowEPlot_nue(){
   }
 
   f5->GetObject("beamNuE",tree5);
-
+  if(!tree5){
+    std::cerr<<"Wasn't able to find tree in file."<<std::endl;
+    exit(0);
+  }
   tree5->SetBranchAddress("_numEvts", &_numEvts, &b_numEvts);
   tree5->SetBranchAddress("_neutrinos", &_neutrinos, &b_neutrinos);
   tree5->SetBranchAddress("_e_nuReco", &_e_nuReco, &b_e_nuReco);
@@ -209,7 +223,7 @@ void LowEPlot_nue(){
   LEE->Add(nc);
   LEE->Add(cosmic);
 
-  LEE->Draw("same");
+  LEE->Draw("samehist");
   
   c->RedrawAxis();
   

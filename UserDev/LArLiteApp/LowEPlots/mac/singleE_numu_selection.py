@@ -81,53 +81,53 @@ Ecut = 50 # in MeV
 
 
 
-#nueCC beam
-nuefilter = fmwk.MC_CCnue_Filter()
+# #nueCC beam
+# nuefilter = fmwk.MC_CCnue_Filter()
 
-nue_ana = ertool.ERAnaLowEExcess()
-nue_ana.SetTreeName("beamNuE")
-#nue_ana.SetDebug(False)
-nue_ana.SetECut(Ecut)
+# nue_ana = ertool.ERAnaLowEExcess()
+# nue_ana.SetTreeName("beamNuE")
+# #nue_ana.SetDebug(False)
+# nue_ana.SetECut(Ecut)
 
-nue_anaunit = fmwk.ExampleERSelection()
-nue_anaunit._mgr.AddAlgo(cos_algo)
-nue_anaunit._mgr.AddAlgo(cosmicprimary_algo)
-nue_anaunit._mgr.AddAlgo(cosmicsecondary_algo)
-nue_anaunit._mgr.AddAlgo(cosmicorphanalgo)
-nue_anaunit._mgr.AddAlgo(primary_algo)
-nue_anaunit._mgr.AddAlgo(pid_algo)
-nue_anaunit._mgr.AddAlgo(my_algo)
-nue_anaunit._mgr.AddAna(nue_ana)
-nue_anaunit._mgr._profile_mode = True
+# nue_anaunit = fmwk.ExampleERSelection()
+# nue_anaunit._mgr.AddAlgo(cos_algo)
+# nue_anaunit._mgr.AddAlgo(cosmicprimary_algo)
+# nue_anaunit._mgr.AddAlgo(cosmicsecondary_algo)
+# nue_anaunit._mgr.AddAlgo(cosmicorphanalgo)
+# nue_anaunit._mgr.AddAlgo(primary_algo)
+# nue_anaunit._mgr.AddAlgo(pid_algo)
+# nue_anaunit._mgr.AddAlgo(my_algo)
+# nue_anaunit._mgr.AddAna(nue_ana)
+# nue_anaunit._mgr._profile_mode = True
 
-nue_anaunit.SetMinEDep(Ecut)
-nue_anaunit._mgr._mc_for_ana = True
-nue_anaunit.SetShowerProducer(True,"mcreco")
-nue_anaunit.SetTrackProducer(True,"mcreco")
+# nue_anaunit.SetMinEDep(Ecut)
+# nue_anaunit._mgr._mc_for_ana = True
+# nue_anaunit.SetShowerProducer(True,"mcreco")
+# nue_anaunit.SetTrackProducer(True,"mcreco")
 
-#NC beam
-ncfilter = fmwk.MC_NC_Filter()
+# #NC beam
+# ncfilter = fmwk.MC_NC_Filter()
 
-nc_ana = ertool.ERAnaLowEExcess()
-nc_ana.SetTreeName("beamNC")
-#nc_ana.SetDebug(False)
-nc_ana.SetECut(Ecut)
+# nc_ana = ertool.ERAnaLowEExcess()
+# nc_ana.SetTreeName("beamNC")
+# #nc_ana.SetDebug(False)
+# nc_ana.SetECut(Ecut)
 
-nc_anaunit = fmwk.ExampleERSelection()
-nc_anaunit._mgr.AddAlgo(cos_algo)
-nc_anaunit._mgr.AddAlgo(cosmicprimary_algo)
-nc_anaunit._mgr.AddAlgo(cosmicsecondary_algo)
-nc_anaunit._mgr.AddAlgo(cosmicorphanalgo)
-nc_anaunit._mgr.AddAlgo(primary_algo)
-nc_anaunit._mgr.AddAlgo(pid_algo)
-nc_anaunit._mgr.AddAlgo(my_algo)
-nc_anaunit._mgr.AddAna(nue_ana)
-nc_anaunit._mgr._profile_mode = True
+# nc_anaunit = fmwk.ExampleERSelection()
+# nc_anaunit._mgr.AddAlgo(cos_algo)
+# nc_anaunit._mgr.AddAlgo(cosmicprimary_algo)
+# nc_anaunit._mgr.AddAlgo(cosmicsecondary_algo)
+# nc_anaunit._mgr.AddAlgo(cosmicorphanalgo)
+# nc_anaunit._mgr.AddAlgo(primary_algo)
+# nc_anaunit._mgr.AddAlgo(pid_algo)
+# nc_anaunit._mgr.AddAlgo(my_algo)
+# nc_anaunit._mgr.AddAna(nue_ana)
+# nc_anaunit._mgr._profile_mode = True
 
-nc_anaunit.SetMinEDep(Ecut)
-nc_anaunit._mgr._mc_for_ana = True
-nc_anaunit.SetShowerProducer(True,"mcreco")
-nc_anaunit.SetTrackProducer(True,"mcreco")
+# nc_anaunit.SetMinEDep(Ecut)
+# nc_anaunit._mgr._mc_for_ana = True
+# nc_anaunit.SetShowerProducer(True,"mcreco")
+# nc_anaunit.SetTrackProducer(True,"mcreco")
 
 #numuCC beam
 numufilter = fmwk.MC_CCnumu_Filter()
@@ -145,7 +145,7 @@ numu_anaunit._mgr.AddAlgo(cosmicorphanalgo)
 numu_anaunit._mgr.AddAlgo(primary_algo)
 numu_anaunit._mgr.AddAlgo(pid_algo)
 numu_anaunit._mgr.AddAlgo(my_algo)
-numu_anaunit._mgr.AddAna(nue_ana)
+numu_anaunit._mgr.AddAna(numu_ana)
 numu_anaunit._mgr._profile_mode = True
 
 numu_anaunit.SetMinEDep(Ecut)
@@ -154,54 +154,54 @@ numu_anaunit.SetShowerProducer(True,"mcreco")
 numu_anaunit.SetTrackProducer(True,"mcreco")
 
 
-#cosmics 
-Cosfilter = fmwk.MC_cosmic_Filter();
+# #cosmics 
+# Cosfilter = fmwk.MC_cosmic_Filter();
 
-cos_ana = ertool.ERAnaLowEExcess()
-cos_ana.SetTreeName("cosmicShowers")
-#cos_ana.SetDebug(False)
-cos_ana.SetECut(Ecut)
+# cos_ana = ertool.ERAnaLowEExcess()
+# cos_ana.SetTreeName("cosmicShowers")
+# #cos_ana.SetDebug(False)
+# cos_ana.SetECut(Ecut)
 
-cos_anaunit = fmwk.ExampleERSelection()
-cos_anaunit._mgr.AddAlgo(cos_algo)
-cos_anaunit._mgr.AddAlgo(cosmicprimary_algo)
-cos_anaunit._mgr.AddAlgo(cosmicsecondary_algo)
-cos_anaunit._mgr.AddAlgo(cosmicorphanalgo)
-cos_anaunit._mgr.AddAlgo(primary_algo)
-cos_anaunit._mgr.AddAlgo(pid_algo)
-cos_anaunit._mgr.AddAlgo(my_algo)
-cos_anaunit._mgr.AddAna(cos_ana)
-cos_anaunit._mgr._profile_mode = True
+# cos_anaunit = fmwk.ExampleERSelection()
+# cos_anaunit._mgr.AddAlgo(cos_algo)
+# cos_anaunit._mgr.AddAlgo(cosmicprimary_algo)
+# cos_anaunit._mgr.AddAlgo(cosmicsecondary_algo)
+# cos_anaunit._mgr.AddAlgo(cosmicorphanalgo)
+# cos_anaunit._mgr.AddAlgo(primary_algo)
+# cos_anaunit._mgr.AddAlgo(pid_algo)
+# cos_anaunit._mgr.AddAlgo(my_algo)
+# cos_anaunit._mgr.AddAna(cos_ana)
+# cos_anaunit._mgr._profile_mode = True
 
-cos_anaunit.SetMinEDep(Ecut)
-cos_anaunit._mgr._mc_for_ana = True
-cos_anaunit.SetShowerProducer(True,"mcreco");
-cos_anaunit.SetTrackProducer(True,"mcreco");
+# cos_anaunit.SetMinEDep(Ecut)
+# cos_anaunit._mgr._mc_for_ana = True
+# cos_anaunit.SetShowerProducer(True,"mcreco");
+# cos_anaunit.SetTrackProducer(True,"mcreco");
 
 
-#dirt 
-dirtfilter = fmwk.MC_dirt_Filter()
+# #dirt 
+# dirtfilter = fmwk.MC_dirt_Filter()
 
-dirt_ana = ertool.ERAnaLowEExcess()
-dirt_ana.SetTreeName("dirt")
-#dirt_ana.SetDebug(False)
-dirt_ana.SetECut(Ecut)
+# dirt_ana = ertool.ERAnaLowEExcess()
+# dirt_ana.SetTreeName("dirt")
+# #dirt_ana.SetDebug(False)
+# dirt_ana.SetECut(Ecut)
 
-dirt_anaunit = fmwk.ExampleERSelection()
-dirt_anaunit._mgr.AddAlgo(cos_algo)
-dirt_anaunit._mgr.AddAlgo(cosmicprimary_algo)
-dirt_anaunit._mgr.AddAlgo(cosmicsecondary_algo)
-dirt_anaunit._mgr.AddAlgo(cosmicorphanalgo)
-dirt_anaunit._mgr.AddAlgo(primary_algo)
-dirt_anaunit._mgr.AddAlgo(pid_algo)
-dirt_anaunit._mgr.AddAlgo(my_algo)
-dirt_anaunit._mgr.AddAna(nue_ana)
-dirt_anaunit._mgr._profile_mode = True
+# dirt_anaunit = fmwk.ExampleERSelection()
+# dirt_anaunit._mgr.AddAlgo(cos_algo)
+# dirt_anaunit._mgr.AddAlgo(cosmicprimary_algo)
+# dirt_anaunit._mgr.AddAlgo(cosmicsecondary_algo)
+# dirt_anaunit._mgr.AddAlgo(cosmicorphanalgo)
+# dirt_anaunit._mgr.AddAlgo(primary_algo)
+# dirt_anaunit._mgr.AddAlgo(pid_algo)
+# dirt_anaunit._mgr.AddAlgo(my_algo)
+# dirt_anaunit._mgr.AddAna(nue_ana)
+# dirt_anaunit._mgr._profile_mode = True
 
-dirt_anaunit.SetMinEDep(Ecut)
-dirt_anaunit._mgr._mc_for_ana = True
-dirt_anaunit.SetShowerProducer(True,"mcreco")
-dirt_anaunit.SetTrackProducer(True,"mcreco")
+# dirt_anaunit.SetMinEDep(Ecut)
+# dirt_anaunit._mgr._mc_for_ana = True
+# dirt_anaunit.SetShowerProducer(True,"mcreco")
+# dirt_anaunit.SetTrackProducer(True,"mcreco")
 
 
 # Add MC filter and analysis unit
