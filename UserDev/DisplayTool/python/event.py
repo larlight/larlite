@@ -214,7 +214,7 @@ class larlite_manager(manager,QtCore.QObject):
 
   # This function returns the list of products that can be drawn:
   def getDrawableProducts(self):
-    return self._drawableItems.getListOfItems()
+    return self._drawableItems.getDict()
 
 
   # override the run,event,subrun functions:
@@ -255,34 +255,37 @@ class larlite_manager(manager,QtCore.QObject):
 
   # this function is meant for the first request to draw an object or
   # when the producer changes
-  def redrawProduct(self,product,producer,view_manager):
+  def redrawProduct(self,name,product,producer,view_manager):
     # print "Received request to redraw ", product, " by ",producer
     # First, determine if there is a drawing process for this product:
-    if producer == None:
-      if product in self._drawnClasses:
-        self._drawnClasses[product].clearDrawnObjects(self._view_manager)
-        self._drawnClasses.pop(product)
+    if producer is None:
+      if name in self._drawnClasses:
+        self._drawnClasses[name].clearDrawnObjects(self._view_manager)
+        self._drawnClasses.pop(name)
       return
-    if product in self._drawnClasses:
-      self._drawnClasses[product].setProducer(producer)
+    if name in self._drawnClasses:
+      self._drawnClasses[name].setProducer(producer)
       self.processEvent(True)
-      self._drawnClasses[product].clearDrawnObjects(self._view_manager)
-      self._drawnClasses[product].drawObjects(self._view_manager)
+      self._drawnClasses[name].clearDrawnObjects(self._view_manager)
+      self._drawnClasses[name].drawObjects(self._view_manager)
       return
 
 
     # Now, draw the new product
-    if product in self._drawableItems.getListOfItems():
+    if name in self._drawableItems.getListOfTitles():
       # drawable items contains a reference to the class, so instantiate it
-      drawingClass = self._drawableItems.getDict()[product]()
+      drawingClass = self._drawableItems.getDict()[name][0]()
       # Special case for clusters, connect it to the signal:
-      if product == 'cluster':
+      if name == 'Cluster':
+        self.clusterParamsChanged.connect(drawingClass.setParamsDrawing)
+        drawingClass.setParamsDrawing(self._drawParams)
+      if name == 'Match':
         self.clusterParamsChanged.connect(drawingClass.setParamsDrawing)
         drawingClass.setParamsDrawing(self._drawParams)
 
       drawingClass.setProducer(producer)
       self._process.add_process(drawingClass._process)
-      self._drawnClasses.update({product : drawingClass})
+      self._drawnClasses.update({name : drawingClass})
       # Need to process the event
       self.processEvent(True)
       drawingClass.drawObjects(self._view_manager)
@@ -316,7 +319,7 @@ class larlite_manager(manager,QtCore.QObject):
     #   self._view_manager.drawPlanes(self)
     self.clearAll()
     # Draw objects in a specific order defined by drawableItems
-    order = self._drawableItems.getListOfItems()
+    order = self._drawableItems.getListOfTitles()
     for item in order:
       if item in self._drawnClasses:
         self._drawnClasses[item].drawObjects(self._view_manager)
@@ -378,7 +381,7 @@ class larlite_manager(manager,QtCore.QObject):
   def toggleParams(self, paramsBool):
     self._drawParams = paramsBool
     self.clusterParamsChanged.emit(paramsBool)
-    if 'cluster' in self._drawnClasses:
+    if 'Cluster' in self._drawnClasses or 'Match' in self._drawnClasses:
       self.drawFresh()
 
   def getPlane(self,plane):

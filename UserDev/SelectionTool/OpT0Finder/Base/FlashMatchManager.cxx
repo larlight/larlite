@@ -11,6 +11,7 @@ namespace flashana {
   FlashMatchManager::FlashMatchManager()
     : _alg_flash_filter(nullptr)
     , _alg_tpc_filter(nullptr)
+    , _alg_match_prohibit(nullptr)
     , _alg_flash_match(nullptr)
   {
     _allow_reuse_flash = true;
@@ -28,6 +29,10 @@ namespace flashana {
       // Flash filter
     case kFlashFilter:
       _alg_flash_filter = (BaseFlashFilter*)alg; break;
+
+      // Match prohibit algo
+    case kMatchProhibit:
+      _alg_match_prohibit = (BaseProhibitAlgo*)alg; break;
 
       // Flash matching
     case kFlashMatch:
@@ -110,6 +115,13 @@ namespace flashana {
 
 	auto const& tpc   = _tpc_object_v[tpc_index]; // Retrieve TPC object
 	auto const& flash = _flash_v[flash_index];    // Retrieve flash
+
+	// run the match-prohibit algo first
+	if (_alg_match_prohibit){
+	  bool compat = _alg_match_prohibit->MatchCompatible( tpc, flash);
+	  if (compat == false)
+	    continue;
+	}
 	
 	auto res = _alg_flash_match->Match( tpc, flash ); // Run matching
 

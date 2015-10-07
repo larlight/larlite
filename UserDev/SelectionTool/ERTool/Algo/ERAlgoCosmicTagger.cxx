@@ -83,12 +83,18 @@ namespace ertool {
 	   showStart.SqDist(trkStart) < (_strtDist*_strtDist)      ) continue;
 	
 	if(_geoAlgo.SqDist(showStart, trk) < (_deltaDist *_deltaDist) ){	  
+
 	  graph.SetParentage(graph.GetParticle(t).ID(), graph.GetParticle(s).ID());
+
 	}
 	
       } // iterate through all Showers
       
+
+
     }//iterate through tracks
+
+
     
     return true;}
 

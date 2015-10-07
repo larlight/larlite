@@ -18,6 +18,7 @@
 #include "BaseAlgorithm.h"
 #include "BaseTPCFilter.h"
 #include "BaseFlashFilter.h"
+#include "BaseProhibitAlgo.h"
 #include "BaseFlashMatch.h"
 namespace flashana {
   /**
@@ -66,9 +67,10 @@ namespace flashana {
     
   private:
 
-    BaseFlashFilter*     _alg_flash_filter; ///< Flash filter algorithm
-    BaseTPCFilter*       _alg_tpc_filter;   ///< TPC filter algorithm
-    BaseFlashMatch*      _alg_flash_match;  ///< Flash matching algorithm
+    BaseFlashFilter*     _alg_flash_filter;   ///< Flash filter algorithm
+    BaseTPCFilter*       _alg_tpc_filter;     ///< TPC filter algorithm
+    BaseProhibitAlgo*    _alg_match_prohibit; ///< Flash matchinig prohibit algorithm
+    BaseFlashMatch*      _alg_flash_match;    ///< Flash matching algorithm
 
     /// TPC object information collection (provided by a user)
     QClusterArray_t _tpc_object_v;

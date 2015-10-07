@@ -11,6 +11,7 @@ namespace flashana {
     kTPCFilter,       ///< Algorithm type to filter out TPC objects from matching candidate list
     kFlashFilter,     ///< Algorithm type to filter out flash from matching candidate list
     kFlashMatch,      ///< Algorithm type to match flash hypothesis and reconstructed flash
+    kMatchProhibit,   /// < Algorithm type to prohibit a match between a flash and a cluster
     kAlgorithmTypeMax ///< enum flag for algorithm type count & invalid type
   };
 

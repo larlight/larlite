@@ -8,6 +8,7 @@
 #include "LArUtil/GeometryHelper.h"
 #include "LArUtil/DetectorProperties.h"
 #include "LArUtil/LArProperties.h"
+#include "AnalysisAlg/AnalysisAlgConstants.h"
 
 namespace showerreco{
 
@@ -30,6 +31,7 @@ namespace showerreco{
     _shp_time  = 2.; // in usec
     _asic_gain = 7.8; // in mV/fC
 
+    return;
   }
 
   void LinearEnergy::initialize()
@@ -45,6 +47,7 @@ namespace showerreco{
     }
 
     _charge_conversion = _ADC_to_mV / ( _shp_time * _asic_gain ) ;
+    //_charge_conversion = _ADC_to_mV / _asic_gain;
 
     _energy_conversion = _charge_conversion * _fC_to_e * _e_to_eV * _eV_to_MeV;
 
@@ -81,6 +84,7 @@ namespace showerreco{
     
     // This function takes the shower cluster set and calculates an energy in MeV for each plane
 
+    _dQ_v.clear();
     _dE_v.clear();
     _dEdx_v.clear();
 
@@ -112,15 +116,15 @@ namespace showerreco{
 	
 	// lifetime correction
 	double hit_tick = h.t / t2cm ;
-	double corr = exp( hit_tick * _timetick / _tau );
+	double lifetimeCorr = exp( hit_tick * _timetick / _tau );
 
 	if (_useArea){
-	  dQ = h.charge * _charge_conversion;
-	  dE = h.charge * corr * _energy_conversion;
+	  dQ = _caloAlg.ElectronsFromADCArea(h.charge,pl);
+	  dE = dQ * lifetimeCorr * _e_to_eV * _eV_to_MeV;
 	}
 	else{
-	  dQ = h.peak * _charge_conversion; 
-	  dE = h.peak * corr * _energy_conversion;
+	  dQ = _caloAlg.ElectronsFromADCPeak(h.peak,pl);
+	  dE = dQ * lifetimeCorr * _e_to_eV * _eV_to_MeV;
 	}
 
 	if (_fill_tree){

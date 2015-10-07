@@ -72,6 +72,8 @@ namespace ertool {
     
     TTree* _int_tree;
     double _int_x, _int_y, _int_z;
+    double _int_ex, _int_ey, _int_ez;
+    double _int_px, _int_py, _int_pz;
     int _primary_pdg;
     unsigned int _ctr_child;
     unsigned int _ctr_level;
