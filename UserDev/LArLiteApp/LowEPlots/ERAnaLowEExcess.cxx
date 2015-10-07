@@ -47,7 +47,7 @@ namespace ertool {
       if ( p.PdgCode() == 12 ){
 
 	if(!(TPC.Contain(p.Vertex()))){
-	  std::cout << "\n \t\t\t\t\t\t ::Not fiducial::\n" << std::endl; 
+	  //std::cout << "\n \t\t\t\t\t\t ::Not fiducial::\n" << std::endl; 
 	  continue;
 	}
 	//	std::cout << "\t\t\t Reco Graph: \n" << graph.Diagram() << std::endl; 	
