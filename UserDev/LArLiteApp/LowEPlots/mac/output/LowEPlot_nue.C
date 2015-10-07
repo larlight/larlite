@@ -181,7 +181,7 @@ void LowEPlot_nue(){
     nbytes += tree4->GetEntry(i);
     
 
-    cosmic->Fill(_e_nuReco/1000, 2.5*1.5);//21);
+    cosmic->Fill(_e_nuReco/1000, 2.5);//21);
        
   }
 
