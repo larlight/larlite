@@ -22,7 +22,6 @@ namespace ertool {
     _result_tree->Branch("_dot",&_dot,"dot/D");
     _result_tree->Branch("_e_reco",&_e_reco,"e_reco/D");
     _result_tree->Branch("_e_mc",&_e_mc,"e_mc/D");
-    // keep track of number of events gone by
     _numEvts = 0;
 
     // set verbosity
