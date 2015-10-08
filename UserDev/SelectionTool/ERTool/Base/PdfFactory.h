@@ -5,7 +5,7 @@
  * 
  * \brief Class def header for a class PdfFactory
  *
- * @author David, Jeremy, Kazu
+ * @author David C., Jeremy, Kazu
  */
 
 /** \addtogroup ERTool
@@ -18,6 +18,7 @@
 #include <RooRealVar.h>
 #include <RooExponential.h>
 #include <RooGaussian.h>
+#include <RooLandau.h>
 #include <RooPolynomial.h>
 #include <RooArgusBG.h>
 #include <RooGenericPdf.h>
@@ -27,7 +28,6 @@
 #include <RooDataSet.h>
 #include <RooFitResult.h>
 #include <RooProdPdf.h>
-#include <RooLandau.h>
 #include <RooNumConvPdf.h>
 #include "RooClassFactory.h"
 #include "ERException.h"
@@ -64,6 +64,18 @@ namespace ertool {
     
     /// Instantiate generic Gaussian PDF
     RooAbsPdf* Gaus(const std::string& name, RooRealVar& x);
+
+    /// Instantiate generic Landau PDF
+    RooAbsPdf* Landau(const std::string& name, RooRealVar& x);
+
+    /// Instantiate generic Landau + Gaussian PDF
+    RooAbsPdf* LandauPlusGauss(const std::string& name, RooRealVar& x);
+
+    /// Instantiate generic Landau + Landau PDF
+    RooAbsPdf* LandauPlusLandau(const std::string& name, RooRealVar& x);
+
+    /// Instantiate generic Landau & Gauss Convolution PDF
+    RooAbsPdf* LandauConvGauss(const std::string& name, RooRealVar& x);
 
     /// Instantiate dEdx PDF
     RooAbsPdf* dEdxGaus(const std::string& name, RooRealVar& x);
