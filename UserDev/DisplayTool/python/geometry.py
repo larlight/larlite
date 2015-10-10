@@ -68,9 +68,10 @@ class geometry(geoBase):
             # Set up the correct drift time offset.
             # Offset is returned in terms of centimeters.
 
-            self._offset.append(larutil.DetectorProperties.GetME().TriggerOffset()
-                                * larutil.GeometryUtilities.GetME().TimeToCm()
-                                - larutil.Geometry.GetME().PlaneOriginVtx(v)[0])
+            self._offset.append(
+                larutil.DetectorProperties.GetME().TriggerOffset()
+                * larutil.GeometryUtilities.GetME().TimeToCm()
+                - larutil.Geometry.GetME().PlaneOriginVtx(v)[0])
 
         self._defaultColorScheme = []
 
@@ -85,36 +86,64 @@ class microboone(geometry):
         # and then call the base class __init__
         larutil.LArUtilManager.Reconfigure(fmwk.geo.kMicroBooNE)
         super(microboone, self).__init__()
-        self._levels = [(-100, 10), (-10, 100), (-10, 100)]
+        self._levels = [(-100, 10), (-10, 100), (-10, 2010)]
         # self._colorScheme =
+        self._time2Cm = 0.05515
+        self._aspectRatio = self._wire2Cm / self._time2Cm
         self._pedestals = [2000, 2000, 440]
         self._name = "uboone"
-        self._defaultColorScheme = [({'ticks': [(1, (22, 30, 151, 255)),
-                                                (0.791, (0, 181, 226, 255)),
-                                                (0.645, (76, 140, 43, 255)),
-                                                (0.47, (0, 206, 24, 255)),
-                                                (0.33333, (254, 209, 65, 255)),
-                                                (0, (255, 0, 0, 255))],
-                                      'mode': 'rgb'})]
-        self._defaultColorScheme.append({'ticks': [(0, (22, 30, 151, 255)),
-                                                   (0.33333,
-                                                    (0, 181, 226, 255)),
-                                                   (0.47, (76, 140, 43, 255)),
-                                                   (0.645, (0, 206, 24, 255)),
-                                                   (0.791,
-                                                    (254, 209, 65, 255)),
-                                                   (1, (255, 0, 0, 255))],
-                                         'mode': 'rgb'})
-        self._defaultColorScheme.append({'ticks': [(0, (22, 30, 151, 255)),
-                                                   (0.33333,
-                                                    (0, 181, 226, 255)),
-                                                   (0.47, (76, 140, 43, 255)),
-                                                   (0.645, (0, 206, 24, 255)),
-                                                   (0.791,
-                                                    (254, 209, 65, 255)),
-                                                   (1, (255, 0, 0, 255))],
-                                         'mode': 'rgb'})
+        self._defaultColorScheme = [(
+            {'ticks': [(1, (22, 30, 151, 255)),
+                       (0.791, (0, 181, 226, 255)),
+                       (0.645, (76, 140, 43, 255)),
+                       (0.47, (0, 206, 24, 255)),
+                       (0.33333, (254, 209, 65, 255)),
+                       (0, (255, 0, 0, 255))],
+             'mode': 'rgb'})]
+        self._defaultColorScheme.append(
+            {'ticks': [(0, (22, 30, 151, 255)),
+                       (0.33333, (0, 181, 226, 255)),
+                       (0.47, (76, 140, 43, 255)),
+                       (0.645, (0, 206, 24, 255)),
+                       (0.791, (254, 209, 65, 255)),
+                       (1, (255, 0, 0, 255))],
+             'mode': 'rgb'})
+        # self._defaultColorScheme.append(
+        #     {'ticks': [(0, (22, 30, 151, 255)),
+        #                (0.33333, (0, 181, 226, 255)),
+        #                (0.47, (76, 140, 43, 255)),
+        #                (0.645, (0, 206, 24, 255)),
+        #                (0.791, (254, 209, 65, 255)),
+        #                (1, (255, 0, 0, 255))],
+        #      'mode': 'rgb'})
+             
+        # Grayscale to logrithmic
+        self._defaultColorScheme.append(
+            {'ticks': [(0000./2010, (050,050,050, 255)),
+                       (0010./2010, (050,050,050, 250)),
+                       # (0010./2010, (000,181,226, 250)),
+                       (0015./2010, (50,101,156, 200)),
+                       (0030./2010, (50,101,156, 175)),
+                       (0050./2010, (50,101,156, 150)),
+                       (0100./2010, (50,101,156, 100)),
+                       (0150./2010, (50,101,156, 150)),
+                       (0300./2010, (50,101,156, 000)),
+                       (0500./2010, (000,206,024, 200)),
+                       (1000./2010, (254,209,065, 225)),
+                       (1500./2010, (254,209,065, 255)),
+                       (2010./2010, (255,000,000, 255))],
+             'mode': 'rgb'})
 
+        # Black background to red:
+
+        # self._defaultColorScheme.append(
+        #     {'ticks': [(0.00, (0,0,000, 255)),
+        #                (0.20, (0,0,255, 200)),
+        #                (0.40, (0,0,255, 150)),
+        #                (0.60, (0,0,255, 100)),
+        #                (0.80, (0,0,255, 050)),
+        #                (1.00, (0,0,255, 000))],
+        #      'mode': 'rgb'})
 
 class argoneut(geometry):
 
@@ -131,23 +160,25 @@ class argoneut(geometry):
             # Set up the correct drift time offset.
             # Offset is returned in terms of centimeters.
 
-            self._offset.append(larutil.DetectorProperties.GetME().TriggerOffset()
-                                * larutil.GeometryUtilities.GetME().TimeToCm()
-                                - larutil.Geometry.GetME().PlaneOriginVtx(v)[0])
+            self._offset.append(
+                larutil.DetectorProperties.GetME().TriggerOffset()
+                * larutil.GeometryUtilities.GetME().TimeToCm()
+                - larutil.Geometry.GetME().PlaneOriginVtx(v)[0])
 
-
-        self._defaultColorScheme = [{'ticks': [(0.0,  (30,  30, 255, 255)),
-                                               (0.15, (30,  30, 255, 255)),
-                                               (0.6,  (0,  255, 255, 255)),
-                                               (0.8,  (0,  255, 0,   255)),
-                                               (1,    (255,  0, 0,   255))],
-                                     'mode': 'rgb'}]
-        self._defaultColorScheme.append({'ticks': [(0.0,  (30,  30, 255, 255)),
-                                                   (0.15, (30,  30, 255, 255)),
-                                                   (0.6,  (0,  255, 255, 255)),
-                                                   (0.8,  (0,  255, 0,   255)),
-                                                   (1,    (255,  0, 0,   255))],
-                                         'mode': 'rgb'})
+        self._defaultColorScheme = [
+            {'ticks': [(0.0,  (30,  30, 255, 255)),
+                       (0.15, (30,  30, 255, 255)),
+                       (0.6,  (0,  255, 255, 255)),
+                       (0.8,  (0,  255, 0,   255)),
+                       (1,    (255,  0, 0,   255))],
+             'mode': 'rgb'}]
+        self._defaultColorScheme.append(
+            {'ticks': [(0.0,  (30,  30, 255, 255)),
+                       (0.15, (30,  30, 255, 255)),
+                       (0.6,  (0,  255, 255, 255)),
+                       (0.8,  (0,  255, 0,   255)),
+                       (1,    (255,  0, 0,   255))],
+             'mode': 'rgb'})
         # self._offset = [1.7226813611, 2.4226813611]
 
 
@@ -165,15 +196,17 @@ class lariat(geometry):
         self._pedestals = [0, 0]
         self._name = "lariat"
         # Make default color schemes here:
-        self._defaultColorScheme = [{'ticks': [(0.0,  (30,  30, 255, 255)),
-                                               (0.15, (30,  30, 255, 255)),
-                                               (0.6,  (0,  255, 255, 255)),
-                                               (0.8,  (0,  255, 0,   255)),
-                                               (1,    (255,  0, 0,   255))],
-                                     'mode': 'rgb'}]
-        self._defaultColorScheme.append({'ticks': [(0.0,  (30,  30, 255, 255)),
-                                                   (0.15, (30,  30, 255, 255)),
-                                                   (0.6,  (0,  255, 255, 255)),
-                                                   (0.8,  (0,  255, 0,   255)),
-                                                   (1,    (255,  0, 0,   255))],
-                                         'mode': 'rgb'})
+        self._defaultColorScheme = [
+            {'ticks': [(0.0,  (30,  30, 255, 255)),
+                       (0.15, (30,  30, 255, 255)),
+                       (0.6,  (0,  255, 255, 255)),
+                       (0.8,  (0,  255, 0,   255)),
+                       (1,    (255,  0, 0,   255))],
+             'mode': 'rgb'}]
+        self._defaultColorScheme.append(
+            {'ticks': [(0.0,  (30,  30, 255, 255)),
+                       (0.15, (30,  30, 255, 255)),
+                       (0.6,  (0,  255, 255, 255)),
+                       (0.8,  (0,  255, 0,   255)),
+                       (1,    (255,  0, 0,   255))],
+             'mode': 'rgb'})

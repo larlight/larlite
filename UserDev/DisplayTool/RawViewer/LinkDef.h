@@ -13,6 +13,9 @@
 #pragma link C++ class evd::DrawRaw+;
 #pragma link C++ class evd::DrawLariatDaq+;
 #pragma link C++ class evd::DrawRawDigit+;
+#pragma link C++ class evd::TreeElementReader+;
+#pragma link C++ class evd::DataFetcher+;
+#pragma link C++ class evd::DrawUbSwiz+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 

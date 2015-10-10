@@ -1,16 +1,17 @@
-#ifndef LARLITE_DRAWRAWDIGIT_CXX
-#define LARLITE_DRAWRAWDIGIT_CXX
-
+#ifndef LARLITE_DRAWUBSWIZ_CXX
+#define LARLITE_DRAWUBSWIZ_CXX
 
 #include "LArUtil/DetectorProperties.h"
-#include "DrawRawDigit.h"
+#include "DataFetcher.h"
+#include "DrawUbSwiz.h"
 #include "DataFormat/rawdigit.h"
+#include <fstream>
 
 namespace evd {
 
-DrawRawDigit::DrawRawDigit() {
-  _name = "DrawRawDigit";
-  producer = "daq";
+DrawUbSwiz::DrawUbSwiz() {
+  // _name = "DrawUbSwiz";
+  // producer = "daq";
 
   // Initialize whether or not to save the data:
   _save_data = true;
@@ -25,7 +26,7 @@ DrawRawDigit::DrawRawDigit() {
 
 }
 
-bool DrawRawDigit::initialize() {
+bool DrawUbSwiz::initialize() {
 
   //
   // This function is called in the beggining of event loop
@@ -35,6 +36,9 @@ bool DrawRawDigit::initialize() {
   //
   //
 
+  _event_no = 0;
+  _run = 0;
+  _spill = 0;
 
   for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
     setXDimension(geoService->Nwires(p), p);
@@ -44,28 +48,109 @@ bool DrawRawDigit::initialize() {
 
 
 
+
   return true;
 
 }
 
-bool DrawRawDigit::analyze(larlite::storage_manager* storage) {
+void DrawUbSwiz::setInput(std::string s) {
+  // if the file isn't new, do nothing:
+  if (s == _input_file) return;
+  // check to see if this file exists.
+  std::cout << "Attempting to open file " << s << std::endl;
+  std::ifstream ifile(s);
+  if (!ifile.is_open()) {
+    std::cerr << "ERROR: Input file failed to open.\n";
+    return;
+  }
+  else {
+    // The file exists, try to read it.
+    _input_file = s;
+    _current_event = 0;
+    if (df){
+      std::cout << df << std::endl;
+      // Deleting the old data fetcher
+      std::cout << "Deleting the old data fetcher"<< std::endl;
+      delete df;
+    }
+    df = new DataFetcher(_input_file);
+    _n_events  = df -> entries();
+    std::cout << "Entries: " << _n_events << std::endl;
+    if (_n_events == 0) {
+      _run = 0;
+      _event_no = 0;
+      return;
+    }
+    readData();
+  }
+}
 
-  //
-  // Do your event-by-event analysis here. This function is called for
-  // each event in the loop. You have "storage" pointer which contains
-  // event-wise data. To see what is available, check the "Manual.pdf":
-  //
-  // http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
-  //
-  // Or you can refer to Base/DataFormatConstants.hh for available data type
-  // enum values. Here is one example of getting PMT waveform collection.
-  //
-  // event_fifo* my_pmtfifo_v = (event_fifo*)(storage->get_data(DATA::PMFIFO));
-  //
-  // if( event_fifo )
-  //
-  //   std::cout << "Event ID: " << my_pmtfifo_v->event_id() << std::endl;
-  //
+
+// This is the function that actually reads in an event
+void DrawUbSwiz::nextEvent() {
+
+  if (_current_event >= _n_events) {
+    std::cout << "On Event " << _current_event << std::endl;
+    std::cout << "Warning, end of file reached, select a new file.\n";
+    return;
+  }
+  else {
+    _current_event ++;
+    readData();
+  }
+
+  return;
+}
+
+void DrawUbSwiz::prevEvent() {
+
+  if (_current_event <= 0) {
+    std::cout << "On event " << _current_event << std::endl;
+    std::cout << "Warning, at beginning of file, can not go backwards.\n";
+    return;
+  }
+  else {
+    _current_event --;
+    readData();
+  }
+
+  return;
+
+}
+
+void DrawUbSwiz::goToEvent(size_t e) {
+  if (e < 0) {
+    std::cout << "Selected event is too low.\n";
+    return;
+  }
+  if (e >= _n_events) {
+    std::cout << "Selected event is too high.\n";
+    return;
+  }
+  _current_event = e;
+  readData();
+
+}
+
+void DrawUbSwiz::readData() {
+
+  df -> get_entry(_current_event);
+
+  // get the channel data:
+  std::vector<short>  channel =  df -> channel();
+  std::vector<short>  adc = df -> adc();
+
+  std::cout << "adc.size() " << adc.size()  << "\n";
+  std::cout << "channel.size() " << channel.size()  << "\n";
+
+
+  std::cout << "adc[0]: " << adc[0] << "\n";
+  std::cout << "adc[100]: " << adc[100] << "\n";
+  std::cout << "adc[200]: " << adc[200] << "\n";
+  std::cout << "adc[300]: " << adc[300] << "\n";
+
+
+  std::cout << "done reading data.\n";
 
   // Initalize the space to hold the pedestal and RMS by Plane
   pedestalByPlane.clear();
@@ -84,21 +169,22 @@ bool DrawRawDigit::analyze(larlite::storage_manager* storage) {
     badWireMapByPlane.at(p).resize(geoService->Nwires(p));
   }
 
-  // This is an event viewer.  In particular, this handles raw wire signal drawing.
-  // So, obviously, first thing to do is to get the wires.
-  auto RawDigitHandle = storage->get_data<larlite::event_rawdigit>(producer);
 
-  run = RawDigitHandle->run();
-  subrun = RawDigitHandle->subrun();
-  event = RawDigitHandle->event_id();
+  _run =  df->run();
+  _subrun = df->subrun();
+  _event_no = df->event();
+
 
   float rmsMinBadWire = 1.5 * 1.5;
   float rmsMaxBadWire = 100 * 100;
 
   badWireMapByPlane.resize(geoService->Nplanes());
 
-  for (auto const& rawdigit : *RawDigitHandle) {
-    unsigned int ch = rawdigit.Channel();
+  size_t digitSize = 9595;
+
+  size_t i_channel = 0;
+  for (auto const& ch : channel) {
+    // unsigned int ch = rawdigit.Channel();
     if (ch >= 8254) continue;
 
     unsigned int wire = geoService->ChannelToWire(ch);
@@ -109,30 +195,6 @@ bool DrawRawDigit::analyze(larlite::storage_manager* storage) {
     if (wire > geoService -> Nwires(plane))
       continue;
 
-    // // There is one remaining mapping issue:
-    // if (plane == 1) {
-    //   if (wire > 63 && wire < 96) {
-    //     wire += 320;
-    //   }
-    //   else if (wire > 383 && wire < 416) {
-    //     wire -= 320;
-    //   }
-
-    //   // Now fix the rest:
-    //   if (wire < 31)
-    //     wire += 64;
-    //   else if (wire > 31 && wire < 64 ) {
-    //     int wireAnchor = wire - (wire % 32);
-    //     wire = wireAnchor + 32 - (wire % 32);
-    //   }
-    //   else if (wire > 63 && wire < 96) {
-    //     wire -= 64;
-    //   }
-
-    // }
-
-
-
     int offset = wire * detProp -> ReadOutWindowSize();
     // convert short ADCs to float
 
@@ -142,24 +204,25 @@ bool DrawRawDigit::analyze(larlite::storage_manager* storage) {
     pedestal.resize(nPedPoints);
 
     // Determine the distance between the pedestal points allowed:
-    int pedStepSize =  detProp->ReadOutWindowSize() / nPedPoints;
+    int pedStepSize =  detProp->ReadOutWindowSize() / nPedPoints - 2;
 
     for (int j = 0; j < nPedPoints; j++) {
-      pedestal.at(j) = rawdigit.ADC(j * pedStepSize);
+      pedestal.at(j) = adc.at(i_channel*digitSize + j * pedStepSize);
     }
     std::sort(pedestal.begin(), pedestal.end());
     float ped = 0.5 * pedestal.at(nPedPoints / 2 - 1) + 0.5 * pedestal.at(nPedPoints / 2);
 
     // Set the pedestal to be stored, if needed
     pedestalByPlane.at(plane).at(wire) = ped;
-
     int i = 0;
     // Calculate an rms here to spot bad wires
     float rms = 0.0;
-    for (auto & adc : rawdigit.ADCs()) {
+    // std::cout << "start: " << i_channel*digitSize << ", end " << (i_channel +1)*digitSize << std::endl;
+    for (size_t index = i_channel*digitSize; index < (i_channel+1)*digitSize; index ++) {
       // _planeData.at(plane).at(offset + i) = adc;
-      _planeData.at(plane).at(offset + i) = adc - ped;
-      rms += (adc - ped) * (adc - ped);
+      // std::cout << "Setting at plane " << plane << ", offset " << offset + i << " to " << adc.at(index) - ped << std::endl;
+      _planeData.at(plane).at(offset + i) = adc.at(index) - ped;
+      rms += (adc.at(index) - ped) * (adc.at(index) - ped);
       i++;
     }
 
@@ -170,15 +233,58 @@ bool DrawRawDigit::analyze(larlite::storage_manager* storage) {
 
     if (rms < rmsMinBadWire || rms > rmsMaxBadWire)
       badWireMapByPlane.at(plane).at(wire) = true;
+
+    i_channel ++;
   }
 
   if (_correct_data || _save_data)
     correctData();
 
-  return true;
+  // std::cout << "_planeData.size() " << _planeData.size() << std::endl;
+  // std::cout << "_planeData.at(0).at(0) " << _planeData.at(0).at(0) << std::endl;
+  // std::cout << "_planeData.at(0).at(1) " << _planeData.at(0).at(1) << std::endl;
+  // std::cout << "_planeData.at(0).at(2) " << _planeData.at(0).at(2) << std::endl;
+
+  return;
 }
 
-bool DrawRawDigit::finalize() {
+
+// bool DrawUbSwiz::analyze(larlite::storage_manager* storage) {
+
+//   //
+//   // Do your event-by-event analysis here. This function is called for
+//   // each event in the loop. You have "storage" pointer which contains
+//   // event-wise data. To see what is available, check the "Manual.pdf":
+//   //
+//   // http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
+//   //
+//   // Or you can refer to Base/DataFormatConstants.hh for available data type
+//   // enum values. Here is one example of getting PMT waveform collection.
+//   //
+//   // event_fifo* my_pmtfifo_v = (event_fifo*)(storage->get_data(DATA::PMFIFO));
+//   //
+//   // if( event_fifo )
+//   //
+//   //   std::cout << "Event ID: " << my_pmtfifo_v->event_id() << std::endl;
+//   //
+
+
+
+
+
+
+//   // This is an event viewer.  In particular, this handles raw wire signal drawing.
+//   // So, obviously, first thing to do is to get the wires.
+//   auto RawDigitHandle = storage->get_data<larlite::event_rawdigit>(producer);
+
+
+
+
+
+//   return true;
+// }
+
+bool DrawUbSwiz::finalize() {
 
   // This function is called at the end of event loop.
   // Do all variable finalization you wish to do here.
@@ -198,7 +304,7 @@ bool DrawRawDigit::finalize() {
   return true;
 }
 
-void DrawRawDigit::SetStepSizeByPlane(int step, int plane) {
+void DrawUbSwiz::SetStepSizeByPlane(int step, int plane) {
   if (plane < 0 || plane >= geoService -> Nviews()) {
     std::cerr << "ERROR: can't set step size for non existent plane " << plane << std::endl;
   }
@@ -208,7 +314,7 @@ void DrawRawDigit::SetStepSizeByPlane(int step, int plane) {
   }
 }
 
-void DrawRawDigit::correctData() {
+void DrawUbSwiz::correctData() {
 
   // Loops over the data, figures out the coherent noise, and removes it.
   // If requested, it saves out the pedestal, rms, and badChannelFlag for each wire
@@ -250,16 +356,16 @@ void DrawRawDigit::correctData() {
   if (_save_data) {
 
     // Setup the file and the ttree
-    sprintf(nameFile, "RawDigitAna_%i_%i_%i.root", run, subrun, event);
+    sprintf(nameFile, "RawDigitAna_%zu_%zu_%zu.root", _run, _subrun, _event_no);
 
     _out = new TFile(nameFile, "RECREATE");
     _out -> cd();
     _tree = new TTree("waveformsub", "waveformsub");
 
     // Save the run, subrun, and event number for redundancy
-    _tree -> Branch("run", &run);
-    _tree -> Branch("subrun", &subrun);
-    _tree -> Branch("event", &event);
+    _tree -> Branch("run", &_run);
+    _tree -> Branch("subrun", &_subrun);
+    _tree -> Branch("event", &_event_no);
 
     // Save the stepSize too
     _tree -> Branch("stepSize", &stepSize);
@@ -458,7 +564,7 @@ void DrawRawDigit::correctData() {
 
 }
 
-float DrawRawDigit::getCorrelation(const std::vector<float> & vec1, const std::vector<float> & vec2)
+float DrawUbSwiz::getCorrelation(const std::vector<float> & vec1, const std::vector<float> & vec2)
 {
 
   if (vec1.size() != vec2.size()) {
@@ -495,7 +601,7 @@ float DrawRawDigit::getCorrelation(const std::vector<float> & vec1, const std::v
 
 }
 
-float DrawRawDigit::getMedian(std::vector<float> & vals) {
+float DrawUbSwiz::getMedian(std::vector<float> & vals) {
   // std::map<float, int> mode_finder;
   // for (auto & val : vals ) {
   //   mode_finder[val] ++;

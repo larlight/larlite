@@ -51,28 +51,28 @@ bool DrawCluster::analyze(larlite::storage_manager* storage) {
   // Obtain event-wise data object pointers
   //
 
-
-
-  auto ev_clus = storage->get_data<larlite::event_cluster>(_producer);
-  if (!ev_clus)
-    return false;
-  if (!ev_clus->size()) {
-    print(larlite::msg::kWARNING, __FUNCTION__,
-          Form("Skipping event %d since no cluster found...", ev_clus->event_id()));
-    return false;
-  }
-
-
   // Clear out the hit data but reserve some space for the hits
   for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
     _dataByPlane.at(p).clear();
-    _dataByPlane.at(p).reserve(ev_clus -> size());
     _wireRange.at(p).first  = 99999;
     _timeRange.at(p).first  = 99999;
     _timeRange.at(p).second = -1.0;
     _wireRange.at(p).second = -1.0;
 
   }
+
+  auto ev_clus = storage->get_data<larlite::event_cluster>(_producer);
+  if (!ev_clus)
+    return false;
+  if (!ev_clus->size()) {
+    // print(larlite::msg::kWARNING, __FUNCTION__,
+          // Form("Skipping event %d since no cluster found...", ev_clus->event_id()));
+    return false;
+  }
+
+  for (unsigned int p = 0; p < geoService -> Nviews(); p ++)
+    _dataByPlane.at(p).reserve(ev_clus -> size());
+
 
   ::larlite::event_hit* ev_hit = nullptr;
   auto const& hit_index_v = storage->find_one_ass(ev_clus->id(), ev_hit, _producer);
@@ -109,7 +109,7 @@ bool DrawCluster::analyze(larlite::storage_manager* storage) {
     // Make a new cluster in the data:
     _dataByPlane.at(view).push_back(Cluster2d());
     _dataByPlane.at(view).back()._is_good = true;
-    
+
     // Fill the cluster params alg
     _cru_helper.GenerateParams( hit_indices, ev_hit, params);
     params_alg.FillParams(params);
@@ -127,12 +127,12 @@ bool DrawCluster::analyze(larlite::storage_manager* storage) {
       //             << ", " << ev_hit->at(hit_index).PeakTime()
       //             << std::endl;
       // }
-    // Hit(float w, float t, float c, float r) :
+      // Hit(float w, float t, float c, float r) :
 
       _dataByPlane.at(view).back().emplace_back(Hit(hit.WireID().Wire,
-                                                    hit.PeakTime(),
-                                                    hit.PeakAmplitude(),
-                                                    hit.RMS()));
+          hit.PeakTime(),
+          hit.PeakAmplitude(),
+          hit.RMS()));
 
 
       // Determine if this hit should change the view range:
