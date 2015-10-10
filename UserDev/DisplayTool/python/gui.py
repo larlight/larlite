@@ -222,6 +222,7 @@ class gui(QtGui.QWidget):
 
     # Jump to the next event
     self._nextButton = QtGui.QPushButton("Next")
+    # self._nextButton.setStyleSheet("background-color: red")
     self._nextButton.clicked.connect(self._event_manager.next)
     self._nextButton.setToolTip("Move to the next event.")
     # Go to the previous event
