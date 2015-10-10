@@ -41,7 +41,9 @@ namespace showerreco {
   private:
 
     bool _use_pitch;
-
+    double _dEdx;
+    int _pl_best;
+    int _pl;
   };
 
 } // showerreco

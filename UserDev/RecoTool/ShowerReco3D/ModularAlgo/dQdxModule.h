@@ -13,9 +13,10 @@
     @{*/
 #ifndef DQDXMODULE_H
 #define DQDXMODULE_H
-
 #include <iostream>
 #include "ShowerRecoModuleBase.h"
+//#include "AnalysisAlg/CalorimetryAlg.h"
+
 /**
    \class dQdxModule : ShowerRecoModuleBase
    This is meant to compute the 2D dQdx along the start of the shower. 
@@ -58,12 +59,16 @@ namespace showerreco {
     double _shrs_w;
     double _shrs_t;
     double _median;
-     // ADC -> e- conversion factors
+    std::vector<double> _dQ_hit;
+    // ADC -> e- conversion factors
     double _fC_to_e;
     double _ADC_to_mV;
     double _shp_time;
     double _asic_gain;
     double _charge_conversion;
+    //electron life time correction
+    double _tau; // electron lifetime in usec                                                   
+    double _timetick; // sampling size in usec
     
   };
 

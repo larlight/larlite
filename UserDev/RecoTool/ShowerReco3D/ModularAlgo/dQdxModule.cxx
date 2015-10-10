@@ -9,6 +9,11 @@
 #include "math.h"
 #include <algorithm>
 #include <functional>
+///electron life time correction
+#include "LArUtil/DetectorProperties.h"
+#include "LArUtil/LArProperties.h"
+//#include "AnalysisAlg/AnalysisAlgConstants.h"
+
 
 bool larger( std::pair<int,double> a,std::pair<int,double> b){
   return a.second<b.second;
@@ -36,6 +41,7 @@ namespace showerreco{
     _tree->Branch("_pl",&_pl,"pl/I");
     _tree->Branch("_pitch",&_pitch,"pitch/D");
     _tree->Branch("_dQ",&_dQ,"dQ/D");
+    _tree->Branch("dQ_hit","std::vector<double>",&_dQ_hit);
     _tree->Branch("_dQQ",&_dQQ,"dQQ/D");
     _tree->Branch("_dQdx",&_dQdx,"dQdx/D");
     _tree->Branch("_dQdx_pitch",&_dQdx_pitch,"dQdx_p/D");
@@ -44,6 +50,9 @@ namespace showerreco{
     //_tree->Branch("_sigma",&_sigma,"sigma/D");
     _tree->Branch("_pl_best",&_pl_best,"pl_best/I");
     _tree->Branch("_median",&_median,"median/D");
+    
+    _tau = larutil::LArProperties::GetME()->ElectronLifetime();        // electron lifetime in usec
+    _timetick = larutil::DetectorProperties::GetME()->SamplingRate()*1.e-3; //time sample in usec
     
     _fC_to_e = 6250.; // a fC in units of the electron charge
     _ADC_to_mV = 0.5; // ADC -> mV conversion from gain measurements
@@ -62,6 +71,10 @@ namespace showerreco{
 
     auto geom = larutil::Geometry::GetME();
     auto geomHelper = larutil::GeometryHelper::GetME();
+
+    auto t2cm = geomHelper->TimeToCm();
+    //_tau = larutil::LArProperties::GetME()->ElectronLifetime();        // electron lifetime in usec     
+    //_timetick = larutil::DetectorProperties::GetME()->SamplingRate()*1.e-3; //time sample in usec    
     
     // get the 3D direction reconstructed hopefully in a previous step
     auto const& dir3D = resultShower.fDCosStart;
@@ -79,9 +92,9 @@ namespace showerreco{
     double rms[3];//charge rms
     double mean[3];
     double sigma[3];
-    std::vector<double> hits_poly[3];
+    std::vector<double> hits_poly[3];//vector of dQ/pitch on 3 cluster of 1 evt 
     std::vector<std::vector<double> > dQ_hit[3];//vector of vector of dQ/pitch in one pitch on 3 clusters of all evts
-    std::vector<double> dQ_hit_clu[3];//vector of dQ/pitch on 3 cluster of 1 evt 
+    // std::vector<double> dQ_hit_clu[3];//vector of dQ/pitch on 3 cluster of 1 evt 
     double median[3]={};
     
     //// loop over all input cluster -> calculate a dQdx per plane
@@ -133,7 +146,9 @@ namespace showerreco{
 			   (hits[i].t-start.t)*(hits[i].t-start.t));
 	 hit_length_s = sqrt((hits[i].w-shr_start.w)*(hits[i].w-shr_start.w)+
 			     (hits[i].t-shr_start.t)*(hits[i].t-shr_start.t));
-	 
+	 double hit_tick =hits[i].t/t2cm;
+	 double lifetimeCorr = exp( hit_tick * _timetick / _tau );
+	 double Q = hits[i].charge * _charge_conversion*lifetimeCorr;
 	 //**Loop over hits inside 2.4cm START
 	 if (hit_length_c<= 2.4){
 	   //if (hit_length_c<=trunk_length[pl]){
@@ -157,17 +172,15 @@ namespace showerreco{
 	   
 	   // if(hit_length_c==0 || hit_length_s==0){
 	   if(trunk_length[pl]==0){
-	     double Q = hits[i].charge * _charge_conversion;
-             sum += Q*Q;
+	     sum += Q*Q;
              dQ[pl] += Q;
              n_hits_poly[pl]++;
-             hits_poly[pl].push_back(Q/pitch);
+             hits_poly[pl].push_back(Q/pitch);	     
 	   }
 	   
 	   else if(check_l1*check_l2>0){//hits not on cluster/shr start points
 	     float in_an=poly.InteriorAngle(0);
 	     if(tan(in_an)<=tan(clu_an)){//hits w/ cluster open angle
-	       double Q = hits[i].charge * _charge_conversion;
 	       sum += Q*Q;
 	       dQ[pl] += Q;
 	       n_hits_poly[pl]++;
@@ -175,7 +188,6 @@ namespace showerreco{
 	     }
 	   }
 	   else if(check_l1*check_l2==0){//hits on cluster/shower start point
-	     double Q = hits[i].charge * _charge_conversion;
 	     sum += Q*Q;
 	     dQ[pl] += Q;
 	     n_hits_poly[pl]++;
@@ -206,16 +218,14 @@ namespace showerreco{
 	   if(check_l1*check_l2>0){
 	     float in_an=poly.InteriorAngle(0);
              if(tan(in_an)<=tan(clu_an)){
-               double Q = hits[i].charge * _charge_conversion;
-               sum += Q*Q;
+	       sum += Q*Q;
                dQ[pl] += Q;
                n_hits_poly[pl]++;
                hits_poly[pl].push_back(Q/pitch);
              }
            }
            else if(check_l1*check_l2==0){
-             double Q = hits[i].charge * _charge_conversion;
-             sum += Q*Q;
+	     sum += Q*Q;
              dQ[pl] += Q;
              n_hits_poly[pl]++;
              hits_poly[pl].push_back(Q/pitch);
@@ -225,17 +235,12 @@ namespace showerreco{
        }
        // **Loop over hits outside 2.4cm END
        //***Loop over all hits in cluster END
+       
+       dQ_hit[pl].push_back(hits_poly[pl]);//vector of vector of hits in one cluster
 
        rms[pl]=sqrt(sum/n_hits_poly[pl]);
        mean[pl]=dQ[pl]/n_hits_poly[pl];
        sigma[pl]=sqrt(rms[pl]*rms[pl]-mean[pl]*mean[pl]);
-       
-       //std::cout<<"sigma:"<<sigma[pl]<<"\n";
-       //std::cout<<"+:"<<(mean[pl]+sigma[pl])<<"\n";
-       //std::cout<<"-:"<<(mean[pl]-sigma[pl])<<"\n";
-       // n_hits_sigma[pl]=hits_poly[pl].size();
-       //std::cout<<n_hits_sigma[pl]-n_hits_poly[pl]<<"\n";
-       //std::cout<<hits_poly[pl].size()<<"\n";
        
        /*Get Median*/
        std::nth_element(hits_poly[pl].begin(),hits_poly[pl].begin() + hits_poly[pl].size()/2, hits_poly[pl].end());
@@ -247,7 +252,7 @@ namespace showerreco{
        
        for(size_t j=0; j<hits_poly[pl].size(); j++){
 	 //if(hits_poly[pl].at(j)<=(mean[pl]+0.5*sigma[pl])&&hits_poly[pl].at(j)>=(mean[pl]-0.5*sigma[pl])){
-	 if(hits_poly[pl].at(j)<median[pl]){///??????????????  
+	 if(hits_poly[pl].at(j)<median[pl]){
 	   dQQ[pl] +=hits_poly[pl].at(j);
 	   n_hits_sigma[pl]++;
 	 }
@@ -260,17 +265,7 @@ namespace showerreco{
        dQdx_pitch[pl]=dQQ[pl]/pitch/n_hits_sigma[pl];///dx_p[pl];
        
        if(pl==2){//select best plane
-	 //int pl_bbest;
-	 
-	 //if(trunk_length[pl]>trunk_length[pl-1]&&trunk_length[pl]<10)pl_best=pl;
-	 //else pl_best = pl-1;
-	 
-	 //if(trunk_length[pl_best]<trunk_length[pl-2]&&trunk_length[pl-2]<10)pl_best = pl-2;
-	 //_pl_best =pl_best;//tree viriable
-	 
-	 //if(trunk_length[pl_best]>10)break;
-	 //resultShower.fBestdQdxPlane = pl_best;///best plane go to showerquality
-	 
+	 	 
 	 std::vector<std::pair<int,double>> pl_best;
 	 pl_best.resize(3);
 	 pl_best.at(0).first=0;
@@ -286,28 +281,32 @@ namespace showerreco{
 	 else if(pl_best.at(1).second<10)_pl_best=pl_best.at(1).first;
 	 else if(pl_best.at(0).second<10)_pl_best=pl_best.at(0).first;
 	 else break;
-	 
+	 resultShower.fBestdQdxPlane = _pl_best;///best plane go to showerquality 
        }      
        
        //tree variables w/ _ 
-       _dQ   = dQ[_pl_best];
-       _dQQ  = dQQ[_pl_best];
-       _dQdx = dQdx[_pl_best];
-       _dQdx_pitch =dQdx_pitch[_pl_best];
-       _dQdx_pitch_pl2= dQdx_pitch[2];
-       _rms = rms[_pl_best];
-       _n_hits =n_hits[_pl_best];
+                           _dQ   = dQ[_pl_best];
+                          _dQQ  = dQQ[_pl_best];
+                         _dQdx = dQdx[_pl_best];
+              _dQdx_pitch =dQdx_pitch[_pl_best];
+                           _rms = rms[_pl_best];
+                      _n_hits =n_hits[_pl_best];
        _n_hits_radius = n_hits_radius[_pl_best];
-       _n_hits_poly= n_hits_poly[_pl_best];
-       _n_hits_sigma=n_hits_sigma[_pl_best];
+            _n_hits_poly= n_hits_poly[_pl_best];
+           _n_hits_sigma=n_hits_sigma[_pl_best];
+	        _length= trunk_length[_pl_best];
+	               _median=median[_pl_best];
+	            _dQ_hit=hits_poly[_pl_best];
+		    
        _pl = pl;
        _pitch = pitch;
        _shrs_w=shr_start.w;
        _shrs_t=shr_start.t;
-       _length= trunk_length[_pl_best];
-       _median=median[pl];
-
-       resultShower.fdQdx[pl] = dQdx_pitch[_pl_best];///dQdx go to showerquality      
+       _dQdx_pitch_pl2= dQdx_pitch[2]; 
+       
+       ///dQdx passed to showerquality 
+       //resultShower.fdQdx[pl] = median[_pl_best];
+       resultShower.fdQdx[pl] = median[pl];
        
        //std::cout<<"#########################################################\n";
        
@@ -317,7 +316,7 @@ namespace showerreco{
        
        //test------------------------------------------------------------------------
        //if (_verbose) 
-       //play polygon
+
            }
     return;
   }
