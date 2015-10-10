@@ -16,6 +16,7 @@
 #define LARLITE_MCSHOWER_H
 
 #include "mctrajectory.h"
+#include <TVector3.h>
 #include "Base/MCConstants.h"
 namespace larlite {
   /**
@@ -50,7 +51,10 @@ namespace larlite {
 				       fAncestorEnd(origin.fAncestorEnd),
                                        fDaughterTrackID(origin.fDaughterTrackID),
                                        fDetProfile(origin.fDetProfile),
-                                       fPlaneCharge(origin.fPlaneCharge)
+                                       fPlaneCharge(origin.fPlaneCharge),
+                                       fStartDir(origin.fStartDir),
+                                       fdEdx(origin.fdEdx),
+                                       fdQdx(origin.fdQdx)
     {}
 
     /// Default destructor
@@ -86,8 +90,14 @@ namespace larlite {
     const std::vector<unsigned int>&  DaughterTrackID() const;
 
     double Charge(const size_t plane) const;
+    double dQdx(const size_t plane) const;
 
     const std::vector<double>& Charge() const;
+    const std::vector<double>& dQdx() const;
+
+    const TVector3& StartDir() const;
+
+    const double& dEdx() const;
 
     //--- Setters ---//
     void Origin  ( simb::Origin_t o ) { fOrigin    = o;    }
@@ -97,6 +107,8 @@ namespace larlite {
     void Process ( const std::string &name ) { fProcess   = name; }
     void Start   ( const mcstep &s         ) { fStart   = s;      }
     void End     ( const mcstep &s         ) { fEnd     = s;      }
+
+
 
     void MotherPdgCode ( int id                  ) { fMotherPDGCode   = id;   }
     void MotherTrackID ( unsigned int id         ) { fMotherTrackID = id;     }
@@ -115,6 +127,11 @@ namespace larlite {
     void DaughterTrackID ( const std::vector<unsigned int>& id_v ) { fDaughterTrackID = id_v; }
 
     void Charge (const std::vector<double>& q) { fPlaneCharge = q; }
+    void dQdx (const std::vector<double>& dqdx) { fdQdx = dqdx; }
+
+    void StartDir ( const TVector3 &sdir) { fStartDir = sdir; }
+    void dEdx    (const double& dedx) {fdEdx = dedx;}
+
 
   protected:
 
@@ -127,6 +144,7 @@ namespace larlite {
     std::string  fProcess;     ///< Shower particle's creation process
     mcstep       fStart;     ///< Shower particle's G4 start point
     mcstep       fEnd;       ///< Shower particle's G4 end point
+
 
     //---- Mother's particle info ---//
     int          fMotherPDGCode;   ///< Shower's mother PDG code   
@@ -148,6 +166,13 @@ namespace larlite {
 
     //---- Charge per plane ----//
     std::vector<double> fPlaneCharge; ///< Charge deposit per plane
+
+
+    TVector3                   fStartDir;        ///< Shower Starting Direction, within the first 2.4cm                   
+    double                     fdEdx;            ///< Shower True dEdx
+    std::vector<double> fdQdx; ///< Charge deposit per plane
+
+
   };
 
   /**

@@ -16,7 +16,11 @@ namespace showerreco{
 
   void dEdxFromdQdx::initialize()
   {
-
+    if (_tree) delete _tree;
+    _tree = new TTree(_name.c_str(),"dQdx Info Tree");
+    _tree->Branch("_dEdx",&_dEdx,"dEdx/D");
+    _tree->Branch("_pl",&_pl,"pl/I");
+    _tree->Branch("_pl_best",&_pl_best,"pl_best/I");
     return;
   }
 
@@ -37,8 +41,11 @@ namespace showerreco{
       // get the plane associated with this cluster
       auto const& pl = inputShowers.at(n).plane_id.Plane;
 
+      // get the best plane
+      auto const& pl_best = resultShower.fBestdQdxPlane;
+            
       //*** we need to calculate a pitch for this plane
-      double pitch = geomHelper->GetPitch(dir3D,(int)pl);
+      //double pitch = geomHelper->GetPitch(dir3D,(int)pl);
 
       double dEdx = 0.;
 
@@ -46,16 +53,20 @@ namespace showerreco{
 
       if (_verbose) { std::cout << "dQdx on plane : " << pl << " -> " << dqdx << std::endl; }
 
-      if (_use_pitch)
-	dqdx *= (pitch/0.3);
+      //if (_use_pitch)
+      //dqdx *= (pitch/0.3);
 
       dEdx = larutil::LArProperties::GetME()->ModBoxCorrection(dqdx);
-
+      
       if (_verbose) { std::cout << "dEdx on plane : " << pl << " -> " << dEdx << std::endl; }
-
+      
       // take the dQdx measured on each plane and convert
       // to dEdx using a recombination model
-
+      
+      _dEdx=dEdx;
+      _pl=pl;
+      _pl_best=pl_best;
+      _tree->Fill();
       resultShower.fdEdx[pl] = dEdx;
 
     }
