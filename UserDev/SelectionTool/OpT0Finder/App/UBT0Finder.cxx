@@ -10,7 +10,18 @@
 #include "GeoAlgo/GeoLineSegment.h"
 namespace larlite {
 
+  UBT0Finder::UBT0Finder()
+    : _track_tree(nullptr)
+    , _tree(nullptr)
+  {
+    _name="UBT0Finder";
+    _fout=0;
+  }
+
   bool UBT0Finder::initialize() {
+
+    _track_tree = new TTree("track_tree","");
+    _track_tree->Branch("trk_time",&_trk_time,"trk_time/D");
 
     _tree = new TTree("flash_tree","");
     _tree->Branch("npe",&_npe,"npe/D");
@@ -47,7 +58,8 @@ namespace larlite {
     
     if(!_use_mc) {
       if (!ev_track || ev_track->empty()) return false;
-      for(auto const& trk : *ev_track) {
+      for (size_t n=0; n < ev_track->size(); n++){
+	auto const& trk = ev_track->at(n);
 	    
 	::flashana::QCluster_t tpc_obj;
 	tpc_obj.reserve(trk.NumberTrajectoryPoints()-1);
@@ -69,18 +81,25 @@ namespace larlite {
 	  pt.z = pt1[2] + dz/2.;
 	  
 	  tpc_obj.emplace_back(pt);
+	  tpc_obj.idx = n;
 	}
 	_mgr.Emplace(std::move(tpc_obj));
       }
       
-    }else{
+    }
+    // use MC tracks
+    else{
       if (!ev_mctrack || ev_mctrack->empty()) return false;
-      for(auto const& trk : *ev_mctrack) {
+      for (size_t n=0; n < ev_mctrack->size(); n++){
+	auto const& trk = ev_mctrack->at(n);
 
 	::flashana::QCluster_t tpc_obj;
 
 	if(trk.size()>=2) {
 	  tpc_obj.reserve(trk.size()-1);
+
+	  _trk_time = trk[0].T()/1000.;
+	  _track_tree->Fill();
 	  
 	  for(size_t i=0; i < (trk.size()-1); ++i) {
 	    
@@ -98,15 +117,17 @@ namespace larlite {
 	    pt.y = pt1[1] + dy/2.;
 	    pt.z = pt1[2] + dz/2.;
 	    
-	  tpc_obj.emplace_back(pt);
+	  tpc_obj.push_back(pt);
+	  tpc_obj.idx = n;
 	  }
-	}
 	_mgr.Emplace(std::move(tpc_obj));
-
-      }
+	}// if the track is at least 2 elements long
+      }// for all tracks
     }
-    
-    for(auto const& flash : *ev_flash) {
+
+    for (size_t n=0; n < ev_flash->size(); n++){
+
+      auto const& flash = ev_flash->at(n);
 
       ::flashana::Flash_t f;
       f.x = f.x_err = 0;
@@ -118,6 +139,7 @@ namespace larlite {
       for(unsigned int i=0; i<32; i++)
 	f.pe_v.push_back(flash.PE(i));
       f.time = flash.Time();
+      f.idx = n;
 
       _mgr.Emplace(std::move(f));
     }
@@ -187,6 +209,7 @@ namespace larlite {
     if(_fout) {
       _fout->cd();
       _tree->Write();
+      _track_tree->Write();
     }
     return true;
   }

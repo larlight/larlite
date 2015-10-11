@@ -109,7 +109,7 @@ namespace flashana {
     // Double loop over a list of tpc object & flash
     // Call matching function to inspect the compatibility.
     for(size_t tpc_index=0; tpc_index < tpc_index_v.size(); ++tpc_index) {
-      
+
       // Loop over flash list
       for(auto const& flash_index : flash_index_v) {
 
@@ -129,8 +129,8 @@ namespace flashana {
 	if(res.score<=0) continue; 
 
 	// Else we store this match. Assign TPC & flash index info
-	res.tpc_id = tpc_index;
-	res.flash_id = flash_index;
+	res.tpc_id = tpc.idx;//_index;
+	res.flash_id = flash.idx;//_index;
 	// For ordering purpose, take an inverse of the score for sorting
 	score_map.emplace( 1./res.score, res);
 
@@ -140,6 +140,7 @@ namespace flashana {
 	     << " Score=" << res.score;
 	  Print(msg::kINFO,__FUNCTION__,ss.str());
 	}
+
       }
     }
 

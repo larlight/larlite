@@ -46,10 +46,12 @@ namespace flashana {
       pt.x = pt.y = pt.z = pt.q = 0;
       double weight_tot = 0;
       QPoint_t min_pt = pt_v[0];
+
       for(auto const& tpc_pt : pt_v)
 	
-	if(min_pt.x > tpc_pt.x) min_pt = tpc_pt;
+	if(min_pt.x < tpc_pt.x) min_pt = tpc_pt;
 
+      // if we should use the photon library
       if(_use_library) {
 
 	auto const& lib = ::phot::PhotonVisibilityService::GetME();
@@ -68,24 +70,36 @@ namespace flashana {
 	pt.y /= weight_tot;
 	pt.z /= weight_tot;
 	
-      }else if(_pos_x.empty()) {
-	
+      }
+      // default
+      else if(_pos_x.empty()) {
+
 	for(auto const& tpc_pt : pt_v) {
 	  
 	  double weight = 0;
+
 	  weight = tpc_pt.q / pow(tpc_pt.x - min_pt.x + x_step_size,2);
 	  //pt.x += (tpc_pt.x - min_pt.x + x_step_size) * weight;
 	  pt.y += (tpc_pt.y * weight);
 	  pt.z += (tpc_pt.z * weight);
 	  weight_tot += weight;
+
+
 	}
 
+	if(_verbosity <= msg::kINFO) {
+	  std::stringstream ss;
+	  ss << "@ step : " << x_step_size << " weight tot : " << weight_tot;
+	  Print(msg::kINFO,__FUNCTION__,ss.str());
+	}
+	
 	//pt.x /= weight_tot;
 	pt.x = x_step_size;
 	pt.y /= weight_tot;
 	pt.z /= weight_tot;
 	
-      }else{
+      }
+      else{
 	
 	for(auto const& tpc_pt : pt_v) {
 	  
@@ -115,7 +129,7 @@ namespace flashana {
       }
       if(_verbosity <= msg::kINFO) {
 	std::stringstream ss;
-	ss << "Flash Hypothesis Point: " << pt.x << " : " << pt.y << " : " << pt.z << std::endl;
+	ss << "Flash Hypothesis Point: " << pt.x << " : " << pt.y << " : " << pt.z;
 	Print(msg::kINFO,__FUNCTION__,ss.str());
       }
       flash_hypothesis_v.push_back(pt);
@@ -152,13 +166,16 @@ namespace flashana {
     }
 
     if(_verbosity <= msg::kINFO) {
-      std::stringstream ss;
-      ss << "Best match Hypothesis: "
-	 << flash_hypothesis_v[min_id].x << " : "
-	 << flash_hypothesis_v[min_id].y << " : "
-	 << flash_hypothesis_v[min_id].z << std::endl
-	 << "Flash point: " << flash.x << " : " << flash.y << " : " << flash.z << std::endl;
-      Print(msg::kINFO,__FUNCTION__,ss.str());
+      std::stringstream ss1;
+      ss1 << "Best match Hypothesis: "
+	  << flash_hypothesis_v[min_id].x << " : "
+	  << flash_hypothesis_v[min_id].y << " : "
+	  << flash_hypothesis_v[min_id].z;
+      Print(msg::kINFO,__FUNCTION__,ss1.str());
+      std::stringstream ss2;
+      ss2 << "Flash point: " << flash.x << " : " << flash.y << " : " << flash.z
+	  << "\t w/ dist : " << min_dist << std::endl;
+      Print(msg::kINFO,__FUNCTION__,ss2.str());
     }
 
     // If min-diff is bigger than assigned max, return default match (score<0)

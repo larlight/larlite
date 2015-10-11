@@ -28,8 +28,7 @@ namespace larlite {
   
   public:
 
-    /// Default constructor
-    UBT0Finder(){ _name="UBT0Finder"; _fout=0;}
+    UBT0Finder();
 
     /// Default destructor
     virtual ~UBT0Finder(){_use_mc=false;}
@@ -58,6 +57,9 @@ namespace larlite {
     ::flashana::FlashMatchManager _mgr;
 
     bool _use_mc;
+
+    TTree* _track_tree;
+    double _trk_time;
     
     TTree* _tree;
     double _npe;
