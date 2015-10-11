@@ -26,7 +26,7 @@ class evd_manager(manager, wire, QtCore.QObject):
 
         # override the wire drawing process for lariat
         self._process = evd.DrawUbSwiz()
-        self._process.SetCorrectData(False)
+        self._process.SetCorrectData(True)
         self._process.SetSaveData(False)
         self._process.initialize()
 
@@ -53,6 +53,12 @@ class evd_manager(manager, wire, QtCore.QObject):
     def setSpill(self, spill):
         self._spill = spill
 
+    def setEventNo(self, event_no):
+        self._event_no = event_no
+
+    def event_no(self):
+        return event_no
+
     def selectFile(self):
         filePath = str(QtGui.QFileDialog.getOpenFileName())
         self.parseFileName(filePath)
@@ -78,10 +84,11 @@ class evd_manager(manager, wire, QtCore.QObject):
             print "On the first event, can't go to previous."
 
     def goToEvent(self, event):
-        self.setRun(self._process.run())
         self.setEvent(event)
-        self.setSpill(self._process.spill())
         self.processEvent()
+        self.setRun(self._process.run())
+        self.setSpill(self._process.spill())
+        self.setEventNo(self._process.event_no())
         # print "Event ", self.event(), ", spill ", self.spill(), ", run ",
         # self.run()
         if self._gui != None:
@@ -265,7 +272,7 @@ class larsoftgui(gui):
         spillLabel = "Spill: " + str(self._event_manager.spill())
         self._subrunLabel.setText(spillLabel)
         self._view_manager.drawPlanes(self._event_manager)
-        self._eventEntry.setText(str(self._event_manager.event()))
+        self._larliteEventEntry.setText(str(self._event_manager.event()))
         # Also update the lariat text boxes, just in case:
         if self._event_manager.isRunning():
             self._spillUpdatePauseButton.setText("PAUSE")
