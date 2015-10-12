@@ -67,21 +67,14 @@ void DrawUbSwiz::setInput(std::string s) {
     // The file exists, try to read it.
     _input_file = s;
     _current_event = 0;
-    if (df){
-      std::cout << df << std::endl;
-      // Deleting the old data fetcher
-      std::cout << "Deleting the old data fetcher"<< std::endl;
-      delete df;
-    }
-    df = new DataFetcher(_input_file);
-    _n_events  = df -> entries();
-    std::cout << "Entries: " << _n_events << std::endl;
+    df.set_file_path(_input_file);
+    _n_events  = df.entries();
     if (_n_events == 0) {
       _run = 0;
       _event_no = 0;
       return;
     }
-    readData();
+    // readData();
   }
 }
 
@@ -134,23 +127,22 @@ void DrawUbSwiz::goToEvent(size_t e) {
 
 void DrawUbSwiz::readData() {
 
-  df -> get_entry(_current_event);
+  df.get_entry(_current_event);
 
   // get the channel data:
-  std::vector<short>  channel =  df -> channel();
-  std::vector<short>  adc = df -> adc();
+  std::vector<short>  channel =  df.channel();
+  std::vector<short>  adc = df.adc();
 
-  std::cout << "adc.size() " << adc.size()  << "\n";
-  std::cout << "channel.size() " << channel.size()  << "\n";
-
-
-  std::cout << "adc[0]: " << adc[0] << "\n";
-  std::cout << "adc[100]: " << adc[100] << "\n";
-  std::cout << "adc[200]: " << adc[200] << "\n";
-  std::cout << "adc[300]: " << adc[300] << "\n";
+  // std::cout << "adc.size() " << adc.size()  << "\n";
+  // std::cout << "channel.size() " << channel.size()  << "\n";
 
 
-  std::cout << "done reading data.\n";
+  // std::cout << "adc[0]: " << adc[0] << "\n";
+  // std::cout << "adc[100]: " << adc[100] << "\n";
+  // std::cout << "adc[200]: " << adc[200] << "\n";
+  // std::cout << "adc[300]: " << adc[300] << "\n";
+
+
 
   // Initalize the space to hold the pedestal and RMS by Plane
   pedestalByPlane.clear();
@@ -170,10 +162,11 @@ void DrawUbSwiz::readData() {
   }
 
 
-  _run =  df->run();
-  _subrun = df->subrun();
-  _event_no = df->event();
+  _run =  df.run();
+  _subrun = df.subrun();
+  _event_no = df.event();
 
+  // std::cout << "Run " << _run << ", subrun " << _subrun << ", event " << _event_no << std::endl;
 
   float rmsMinBadWire = 1.5 * 1.5;
   float rmsMaxBadWire = 100 * 100;
@@ -207,7 +200,7 @@ void DrawUbSwiz::readData() {
     int pedStepSize =  detProp->ReadOutWindowSize() / nPedPoints - 2;
 
     for (int j = 0; j < nPedPoints; j++) {
-      pedestal.at(j) = adc.at(i_channel*digitSize + j * pedStepSize);
+      pedestal.at(j) = adc.at(i_channel * digitSize + j * pedStepSize);
     }
     std::sort(pedestal.begin(), pedestal.end());
     float ped = 0.5 * pedestal.at(nPedPoints / 2 - 1) + 0.5 * pedestal.at(nPedPoints / 2);
@@ -218,7 +211,7 @@ void DrawUbSwiz::readData() {
     // Calculate an rms here to spot bad wires
     float rms = 0.0;
     // std::cout << "start: " << i_channel*digitSize << ", end " << (i_channel +1)*digitSize << std::endl;
-    for (size_t index = i_channel*digitSize; index < (i_channel+1)*digitSize; index ++) {
+    for (size_t index = i_channel * digitSize; index < (i_channel + 1)*digitSize; index ++) {
       // _planeData.at(plane).at(offset + i) = adc;
       // std::cout << "Setting at plane " << plane << ", offset " << offset + i << " to " << adc.at(index) - ped << std::endl;
       _planeData.at(plane).at(offset + i) = adc.at(index) - ped;
@@ -244,6 +237,8 @@ void DrawUbSwiz::readData() {
   // std::cout << "_planeData.at(0).at(0) " << _planeData.at(0).at(0) << std::endl;
   // std::cout << "_planeData.at(0).at(1) " << _planeData.at(0).at(1) << std::endl;
   // std::cout << "_planeData.at(0).at(2) " << _planeData.at(0).at(2) << std::endl;
+
+  // std::cout << "done reading data.\n";
 
   return;
 }

@@ -16,6 +16,9 @@ from geometry import *
 
 class evd_manager(manager, wire, QtCore.QObject):
 
+    eventChanged = QtCore.pyqtSignal()
+    processLockUpdate = QtCore.pyqtSignal(bool)
+
     """docstring for evd_manager"""
 
     def __init__(self, geom, file=None):
@@ -32,9 +35,6 @@ class evd_manager(manager, wire, QtCore.QObject):
 
         self.setInputFile(file)
 
-        # Lariat has special meanings to event/spill/run
-        self._spill = 0
-
         # The lariat manager handles watching files and sending signals
         self._watcher = None
         self._stopFlag = None
@@ -44,22 +44,36 @@ class evd_manager(manager, wire, QtCore.QObject):
         self._cycling = False
         self._delay = 0.1
 
-    def subrun(self):
-        return self._subrun
+        self._masterLock = False
+        self._processLock = False
+        self._drawingLock = False
+        self.processLockUpdate.connect(self.processLock)
 
-    def spill(self):
-        return self._spill
 
-    def setSpill(self, spill):
-        self._spill = spill
+    def setEventNo(self, event_no):
+        self._event_no = event_no
+
+    def event_no(self):
+        return self._event_no
 
     def selectFile(self):
         filePath = str(QtGui.QFileDialog.getOpenFileName())
         self.parseFileName(filePath)
         print "Selected file is ", filePath
 
+    def setNoiseFilter(self, runFilterBool):
+        self._process.SetCorrectData(runFilterBool)
+
     # override the functions from manager as needed here
     def next(self):
+        # Don't attempt to run if the process is locked
+        if self.sender() != None and self._masterLock:
+          # print "drawing: ", self._drawingLock
+          # print "process: ", self._processLock
+          # print "master:  ", self._masterLock
+          # print self.sender()
+          return
+
         # print "Called next"
         # Check that this isn't the last event:
         if self._event < self._process.n_events() - 1:
@@ -70,6 +84,9 @@ class evd_manager(manager, wire, QtCore.QObject):
             print "On the last event, can't go to next."
 
     def prev(self):
+        # Don't attempt to run if the process is locked
+        if self._masterLock:
+          return
         if self._event != 0:
             self.goToEvent(self._event - 1)
         elif self._cycling:
@@ -78,14 +95,13 @@ class evd_manager(manager, wire, QtCore.QObject):
             print "On the first event, can't go to previous."
 
     def goToEvent(self, event):
-        self.setRun(self._process.run())
+        # Don't attempt to run if the process is locked
         self.setEvent(event)
-        self.setSpill(self._process.spill())
         self.processEvent()
-        # print "Event ", self.event(), ", spill ", self.spill(), ", run ",
-        # self.run()
-        if self._gui != None:
-            self._gui.update()
+        self.setRun(self._process.run())
+        self.setSubRun(self._process.subrun())
+        self.setEventNo(self._process.event_no())
+        self.eventChanged.emit()
 
     def setInputFile(self, file):
         self._file = file
@@ -96,7 +112,6 @@ class evd_manager(manager, wire, QtCore.QObject):
             self._process.setInput(file)
             self._hasFile = True
             self.goToEvent(0)
-            # self._gui.update()
 
     def parseFileName(self, fileName):
 
@@ -116,13 +131,23 @@ class evd_manager(manager, wire, QtCore.QObject):
         else:
             self._filePath = None
 
+    def drawingLock(self,drawLock):
+        self._drawingLock = drawLock
+        self._masterLock = self._processLock or self._drawingLock
+
+
+    def processLock(self, procLock):
+        self._processLock = procLock
+        self._masterLock = self._processLock or self._drawingLock
+
+
     def isRunning(self):
         return self._running
 
     def isCycling(self):
         return self._cycling
 
-    def startSpillRun(self, fileName=None):
+    def startFileRun(self, fileName=None):
             # this function can be triggered by a button push, which implies it was stopped before;
             # In that case, refresh the thread and start over.
             # It can also be called by the parsefileName function, which implies a
@@ -138,7 +163,7 @@ class evd_manager(manager, wire, QtCore.QObject):
         self._watcher.start()
         pass
 
-    def stopSpillRun(self):
+    def stopFileRun(self):
         self._running = False
         self._stopFlag.set()
         return
@@ -161,8 +186,10 @@ class evd_manager(manager, wire, QtCore.QObject):
         if not self._hasFile:
             return
         if self._lastProcessed != self._event or force:
+            self.processLockUpdate.emit(True)
             self._process.goToEvent(self._event)
             self._lastProcessed = self._event
+            self.processLockUpdate.emit(False)
 
     def getPlane(self, plane):
         if self._hasFile:
@@ -229,6 +256,7 @@ class delayTimer(QtCore.QObject, threading.Thread):
         threading.Thread.__init__(self)
         self._stopped = event
         self._delay = delay
+        self._lock = False
 
     def run(self):
         # print "Called run"
@@ -236,49 +264,55 @@ class delayTimer(QtCore.QObject, threading.Thread):
             self.delayExpired.emit()
 
 
-# override the gui to give the lariat display special features:
+
+# override the gui to give the larsoft display special features:
 class larsoftgui(gui):
 
-    """special lariat gui"""
+    """special larsoft gui"""
+    drawingLock = QtCore.pyqtSignal(bool)
 
     def __init__(self, geometry, manager):
         super(larsoftgui, self).__init__(geometry, manager)
-
         self._watcher = None
         self._stopFlag = None
         self._running = False
+        self._event_manager.eventChanged.connect(self.update)
+        self.drawingLock.connect(self._event_manager.drawingLock)
+
 
     # override the initUI function to change things:
     def initUI(self):
         super(larsoftgui, self).initUI()
+        self.update()
+        self._view_manager.setRangeToMax()
 
-        # Change the name of the labels for lariat:
-        self._subrunLabel.setText("Spill: 0")
-
-    # override the update function for lariat:
+    # override the update function for larsoft:
     def update(self):
+        # Set a lock to 
+        self.drawingLock.emit(True)
         # set the text boxes correctly:
-        eventLabel = "Ev: "
+        eventLabel = "Ev: " + str(self._event_manager.event_no())
         self._eventLabel.setText(eventLabel)
         runLabel = "Run: " + str(self._event_manager.run())
         self._runLabel.setText(runLabel)
-        spillLabel = "Spill: " + str(self._event_manager.spill())
+        spillLabel = "SubRun: " + str(self._event_manager.subrun())
         self._subrunLabel.setText(spillLabel)
         self._view_manager.drawPlanes(self._event_manager)
-        self._eventEntry.setText(str(self._event_manager.event()))
-        # Also update the lariat text boxes, just in case:
+        self._larliteEventEntry.setText(str(self._event_manager.event()))
+        # Also update the larsoft text boxes, just in case:
         if self._event_manager.isRunning():
             self._spillUpdatePauseButton.setText("PAUSE")
-            self._spillUpdateLabel.setText("Spill update ON")
+            self._spillUpdateLabel.setText("File update ON")
         else:
             self._spillUpdatePauseButton.setText("START")
-            self._spillUpdateLabel.setText("Spill update OFF")
+            self._spillUpdateLabel.setText("File update OFF")
         if self._event_manager.isCycling():
             self._eventUpdatePauseButton.setText("PAUSE")
             self._autoRunLabel.setText("Event update ON")
         else:
             self._eventUpdatePauseButton.setText("START")
             self._autoRunLabel.setText("Event update OFF")
+        self.drawingLock.emit(False)
 
     def quit(self):
         if self._event_manager.isRunning():
@@ -290,12 +324,18 @@ class larsoftgui(gui):
     # This function sets up the eastern widget
     def getEastLayout(self):
         # This function just makes a dummy eastern layout to use.
-        label1 = QtGui.QLabel("Lariat DQM")
+        label1 = QtGui.QLabel("Larsoft Viewer")
         label2 = QtGui.QLabel("Online Monitor")
         font = label1.font()
         font.setBold(True)
         label1.setFont(font)
         label2.setFont(font)
+
+        self._noiseFilterCheck = QtGui.QCheckBox("Run Noise Filter")
+        self._noiseFilterCheck.setToolTip("Run the noise filter on data.  Runs slower and updates on next event.")
+        self._noiseFilterCheck.setTristate(False)
+        self._noiseFilterCheck.stateChanged.connect(self.noiseFilterWorker)  
+
         # This label tells the user that the event switching is on
         self._autoRunLabel = QtGui.QLabel("Event Update OFF")
         # This label is showing the delay between event updates
@@ -306,7 +346,7 @@ class larsoftgui(gui):
         self._eventUpdatePauseButton.clicked.connect(
             self.eventUpdateButtonHandler)
 
-        self._spillUpdateLabel = QtGui.QLabel("Spill Update ON")
+        self._spillUpdateLabel = QtGui.QLabel("File Update ON")
         self._spillUpdatePauseButton = QtGui.QPushButton("START")
         self._spillUpdatePauseButton.clicked.connect(
             self.spillUpdateButtonHandler)
@@ -318,6 +358,9 @@ class larsoftgui(gui):
         self._eastLayout.addWidget(label1)
         self._eastLayout.addWidget(label2)
         self._eastLayout.addStretch(1)
+        self._eastLayout.addWidget(self._noiseFilterCheck)
+        self._eastLayout.addStretch(1)
+
         # Add the auto event switch stuff:
         self._eastLayout.addWidget(self._autoRunLabel)
         autoDelayLayout = QtGui.QHBoxLayout()
@@ -338,15 +381,21 @@ class larsoftgui(gui):
         self._eastWidget.setMinimumWidth(100)
         return self._eastWidget
 
+    def noiseFilterWorker(self):
+      if self._noiseFilterCheck.isChecked():
+        self._event_manager.setNoiseFilter(True)
+      else:
+        self._event_manager.setNoiseFilter(False)
+
     def spillUpdateButtonHandler(self):
         if self._event_manager.isRunning():
             self._event_manager.stopSpillRun()
             self._spillUpdatePauseButton.setText("START")
-            self._spillUpdateLabel.setText("Spill update OFF")
+            self._spillUpdateLabel.setText("File update OFF")
         else:
             self._event_manager.startSpillRun()
             self._spillUpdatePauseButton.setText("PAUSE")
-            self._spillUpdateLabel.setText("Spill update ON")
+            self._spillUpdateLabel.setText("File update ON")
 
     def eventUpdateButtonHandler(self):
         if self._event_manager.isCycling():
