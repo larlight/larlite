@@ -7,13 +7,14 @@
 #include <vector>
 
 #include "TTree.h"
+#include "TBranchElement.h"
 
 namespace evd {
 
 class DataFetcher {
 public:
 
-  DataFetcher(std::string file_path);
+  DataFetcher();
   ~DataFetcher();
 
   //int * event_number();
@@ -51,10 +52,11 @@ public:
     return pedestal_array;
   }
 
-  size_t run(){return run_;}
-  size_t subrun(){return subrun_;}
-  size_t event(){return event_;}
+  unsigned int run() {return run_;}
+  unsigned int subrun() {return subrun_;}
+  unsigned int event() {return event_;}
 
+  void set_file_path(std::string s);
 
 
 private:
@@ -64,32 +66,22 @@ private:
 
   std::vector<std::string> FindLeavesOfType(std::string pattern);
 
-  size_t run_;
-  size_t subrun_;
-  size_t event_;
+  UShort_t run_;
+  UShort_t subrun_;
+  UShort_t event_;
+
+  // TBranchElement        *b_raw__DAQHeader_daq__Swizzler_obj_fRun;   //!
+  // TBranchElement        *b_raw__DAQHeader_daq__Swizzler_obj_fSubRun;   //!
+  // TBranchElement        *b_raw__DAQHeader_daq__Swizzler_obj_fEvent;   //!
+  // TBranch        *b_raw__DAQHeader_daq__Swizzler_obj_fTime;
 
   unsigned int entries_;
   unsigned int adc_rows_;
   unsigned int adc_cols_;
-  unsigned int number_particles_;
 
   std::vector<short> adc_;
   std::vector<short> channel_;
   std::vector<double> pedestal_;
-  std::vector<int> pdg_code_;
-  std::vector<int> track_id_;
-  std::vector<int> parent_id_;
-  std::vector<std::string> process_;
-  std::vector<double> start_momentum_;
-  std::vector<double> trajectory_length_;
-  std::vector< std::vector<double> > particle_x_;
-  std::vector< std::vector<double> > particle_y_;
-  std::vector< std::vector<double> > particle_z_;
-  std::vector< std::vector<double> > particle_t_;
-  std::vector< std::vector<double> > particle_px_;
-  std::vector< std::vector<double> > particle_py_;
-  std::vector< std::vector<double> > particle_pz_;
-  std::vector< std::vector<double> > particle_energy_;
 
 };
 

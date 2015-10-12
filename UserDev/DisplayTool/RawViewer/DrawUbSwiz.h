@@ -77,7 +77,7 @@ namespace evd {
 
     unsigned int run(){return _run;}
     unsigned int event_no(){return _event_no;}
-    unsigned int spill(){return _spill;}
+    unsigned int subrun(){return _subrun;}
     int current_event() const{return _current_event;}
     int n_events() const{return _n_events;}
 
@@ -116,7 +116,7 @@ namespace evd {
 
     std::vector<int> stepSize;
 
-    DataFetcher * df;
+    DataFetcher  df;
 
   };
 }
