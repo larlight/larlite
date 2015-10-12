@@ -82,6 +82,8 @@ namespace ertool {
 
     std::vector<NodeID_t> primary_id_v;
 
+    int i = 0;
+
     for(auto const& primary_node_id : graph.GetPrimaryNodes() ) {
 
       auto const& primary_part = graph.GetParticle(primary_node_id);
@@ -109,10 +111,11 @@ namespace ertool {
       else if(primary_part.RecoType()==kShower) shower_v.push_back(primary_part.RecoID());
       
       auto cluster = helper.GetQCluster(data,shower_v,track_v);
-      cluster.idx = primary_node_id;
+      cluster.idx = i; //primary_node_id;
       //std::cout<<cluster.size()<<" ";
       primary_id_v.push_back(primary_node_id);
       _mgr.Emplace(std::move(cluster));
+      i++;
       
     }
     //std::cout<<std::endl;
