@@ -50,7 +50,6 @@ void DataFetcher::set_file_path(std::string s) {
 
 void DataFetcher::get_entry(unsigned int entry) {
 
-  std::cout << "entry: " << entry << std::endl;
 
   adc_.clear();
   channel_.clear();
