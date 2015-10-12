@@ -17,10 +17,7 @@ namespace flashana {
 
   bool TimeCompatMatch::MatchCompatible(const QCluster_t& clus, const Flash_t& flash)
   {
-    // Prepare the return
-    FlashMatch_t f;
-    QCluster_t flash_hypothesis_v;
-    
+
     // conversion quantities
     double t2cm   = larutil::GeometryUtilities::GetME()->TimeToCm();
     double ROrate = larutil::DetectorProperties::GetME()->SamplingRate(); // ns
@@ -31,8 +28,8 @@ namespace flashana {
     auto flash_time = flash.time;
 
     // get time of cluster by looking at the range of x-positions
-    double clus_x_min = 1036.; // cm
-    double clus_x_max = 0.;    // cm
+    double clus_x_min =  1036.; // cm
+    double clus_x_max = -1036.;    // cm
     for (auto const& pt : clus){
       if (pt.x > clus_x_max) { clus_x_max = pt.x; }
       if (pt.x < clus_x_min) { clus_x_min = pt.x; }
@@ -44,10 +41,13 @@ namespace flashana {
     
     // find the largest distance in time between the flash
     // and the cluster's time
-    // if either greater than the total drift time -> no match possible
-    if ( fabs( clus_t_min - flash_time ) > _frame_drift_time )
+    // if the cluster's time is more than a drift-window larger
+    // then the flash -> impossible coincidence
+    if ( fabs(clus_t_max - flash_time) > _frame_drift_time )
       return false;
-    if ( fabs( clus_t_max - flash_time ) > _frame_drift_time )
+    // if the cluster comes before the flash entirely ->
+    // impossible match
+    if ( (clus_t_min+5) < flash_time)
       return false;
     
     return true;

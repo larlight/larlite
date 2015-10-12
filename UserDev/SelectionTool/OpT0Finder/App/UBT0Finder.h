@@ -50,7 +50,7 @@ namespace larlite {
 
     ::flashana::FlashMatchManager& Manager() { return _mgr;}
 
-    void UseMC(bool doit=true) { _use_mc = true; }
+    void UseMC(bool doit=true) { _use_mc = doit; }
 
   protected:
 
@@ -60,6 +60,7 @@ namespace larlite {
 
     TTree* _track_tree;
     double _trk_time;
+    double _trk_x;
     
     TTree* _tree;
     double _npe;
