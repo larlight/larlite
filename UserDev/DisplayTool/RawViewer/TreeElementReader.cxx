@@ -52,8 +52,8 @@ TreeElementReader::TreeElementReader(TTree * tree,
 
   element_offset_ = branch_element_->GetOffset();
 
-#if ROOT_VERSION_CODE > 322800
-
+#if ROOT_VERSION_CODE >= ROOT_VERSION(2,23,4)
+  
   pointer_offset_ = element_offset_ +
                     // TODO: Figure out a way to detect which version of ROOT is
                     //       being used. The following line of code is dependent on
@@ -80,7 +80,7 @@ TreeElementReader::TreeElementReader(TTree * tree,
                     //       work for previous versions of ROOT.
                     // branch_element_->GetInfo()->GetElementOffset(branch_element_->GetID());
 #endif
-                    
+
   ok_ = true;
 
 };
