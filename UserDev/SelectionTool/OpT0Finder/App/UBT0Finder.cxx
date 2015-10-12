@@ -22,6 +22,7 @@ namespace larlite {
 
     _track_tree = new TTree("track_tree","");
     _track_tree->Branch("trk_time",&_trk_time,"trk_time/D");
+    _track_tree->Branch("trk_x",&_trk_x,"trk_x/D");
 
     _tree = new TTree("flash_tree","");
     _tree->Branch("npe",&_npe,"npe/D");
@@ -96,9 +97,18 @@ namespace larlite {
 	::flashana::QCluster_t tpc_obj;
 
 	if(trk.size()>=2) {
+	  
+	  // per track calculate the shift in x-direction
+	  // so that the x-position is what would be seen
+	  // in the TPC, not the truth x-position
+	  double event_time = trk[trk.size()-1].T();
+	  double det_frame_period = 1.6E6; // ns
+	  double det_width = 256.; // cm
+	  double shift_x = event_time * (det_width/ det_frame_period);
 	  tpc_obj.reserve(trk.size()-1);
 
 	  _trk_time = trk[0].T()/1000.;
+	  _trk_x    = trk[0].X() + shift_x;
 	  _track_tree->Fill();
 	  
 	  for(size_t i=0; i < (trk.size()-1); ++i) {
@@ -113,7 +123,7 @@ namespace larlite {
 	    double dz = pt2[2] - pt1[2];
 	    
 	    pt.q = (trk[i].E() - trk[i+1].E());
-	    pt.x = pt1[0] + dx/2.;
+	    pt.x = pt1[0] + dx/2. + shift_x;
 	    pt.y = pt1[1] + dy/2.;
 	    pt.z = pt1[2] + dz/2.;
 	    
