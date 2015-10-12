@@ -109,6 +109,7 @@ namespace ertool {
       else if(primary_part.RecoType()==kShower) shower_v.push_back(primary_part.RecoID());
       
       auto cluster = helper.GetQCluster(data,shower_v,track_v);
+      cluster.idx = primary_node_id;
       //std::cout<<cluster.size()<<" ";
       primary_id_v.push_back(primary_node_id);
       _mgr.Emplace(std::move(cluster));
@@ -118,7 +119,9 @@ namespace ertool {
     std::vector<FlashID_t> flash_id_v;
     flash_id_v.reserve(data.Flash().size());
 
-    for(auto const& erflash : data.Flash()) {
+    for (size_t i=0; i < data.Flash().size(); i++){
+
+      auto const& erflash = data.Flash().at(i);
 
       ::flashana::Flash_t f;
       f.x = erflash._x;
@@ -128,6 +131,7 @@ namespace ertool {
       for(auto const& v : erflash._npe_v)
 	f.pe_v.push_back(v);
       f.time = erflash._t;
+      f.idx  = i;
       flash_id_v.push_back(erflash.FlashID());
       _mgr.Emplace(std::move(f));
     }
