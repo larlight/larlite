@@ -67,9 +67,13 @@ class evd_manager(manager, wire, QtCore.QObject):
     # override the functions from manager as needed here
     def next(self):
         # Don't attempt to run if the process is locked
-        if self._masterLock:
-          print "locked"
+        if self.sender() != None and self._masterLock:
+          # print "drawing: ", self._drawingLock
+          # print "process: ", self._processLock
+          # print "master:  ", self._masterLock
+          # print self.sender()
           return
+
         # print "Called next"
         # Check that this isn't the last event:
         if self._event < self._process.n_events() - 1:
@@ -92,10 +96,6 @@ class evd_manager(manager, wire, QtCore.QObject):
 
     def goToEvent(self, event):
         # Don't attempt to run if the process is locked
-        print self._masterLock
-        if self._masterLock:
-          print "Skipping because locked"
-          return
         self.setEvent(event)
         self.processEvent()
         self.setRun(self._process.run())
@@ -134,14 +134,12 @@ class evd_manager(manager, wire, QtCore.QObject):
     def drawingLock(self,drawLock):
         self._drawingLock = drawLock
         self._masterLock = self._processLock or self._drawingLock
-        print "drawing: ", self._drawingLock
-        print "master:  ", self._masterLock
+
 
     def processLock(self, procLock):
         self._processLock = procLock
         self._masterLock = self._processLock or self._drawingLock
-        print "process: ", self._processLock
-        print "master:  ", self._masterLock
+
 
     def isRunning(self):
         return self._running
