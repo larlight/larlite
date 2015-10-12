@@ -52,8 +52,10 @@ TreeElementReader::TreeElementReader(TTree * tree,
 
   element_offset_ = branch_element_->GetOffset();
 
-#if ROOT_VERSION_CODE >= ROOT_VERSION(2,23,4)
-  
+  std::cout << ROOT_VERSION(2,23,4) << std::endl;
+
+#if ROOT_VERSION_CODE >= ROOT_VERSION(5,34,20)
+
   pointer_offset_ = element_offset_ +
                     // TODO: Figure out a way to detect which version of ROOT is
                     //       being used. The following line of code is dependent on
