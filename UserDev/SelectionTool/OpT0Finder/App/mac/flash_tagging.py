@@ -41,8 +41,11 @@ my_proc.set_ana_output_file("ana.root")
 # Attach an analysis unit ... here we use a base class which does nothing.
 # Replace with your analysis unit if you wish.
 my_unit = fmwk.UBT0Finder()
-my_proc.add_process(my_unit)
 my_unit.UseMC(True)
+my_unit.SetROStart(-3200.)
+my_unit.SetROEnd(3200.)
+my_unit.SetTrigTime(0.)
+my_proc.add_process(my_unit)
 # use an array of filters for the TPC
 filter_ana = flashana.FilterArray()
 filter_ana.AppendFilterAlgo(flashana.NPtFilter())
