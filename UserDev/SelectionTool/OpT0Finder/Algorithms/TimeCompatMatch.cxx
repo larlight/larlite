@@ -47,7 +47,7 @@ namespace flashana {
       return false;
     // if the cluster comes before the flash entirely ->
     // impossible match
-    if ( (clus_t_min+5) < flash_time)
+    if ( (clus_t_min+5.) < flash_time)
       return false;
     
     return true;
