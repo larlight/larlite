@@ -89,18 +89,16 @@ void ShowerRecoManager::Process(const ClusterAss_t& ass,
       _CPAN_calls += 1;
     }
 
-
-    for (auto& shower_alg : _alg_v)
-
-      showers.emplace_back(shower_alg->RecoOneShower(in_clusters));
-
-
+    for (auto& shower_alg : _alg_v){
+      auto this_shower = shower_alg->RecoOneShower(in_clusters);
+      showers.emplace_back(this_shower);
+    }// for all shower reco algorithms? not modular algos...
+    // why is this a for-loop? DC very confused here...
     for (auto& shower_ana : _ana_v)
-
       shower_ana->Analyze(showers.back(), in_clusters);
-
-  }
-
+  }// for all association pairs    
+    
+  return;
 }
 
 void ShowerRecoManager::Finalize(TFile* fout) {
