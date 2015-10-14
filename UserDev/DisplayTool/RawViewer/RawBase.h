@@ -67,7 +67,7 @@ namespace evd {
     void setYDimension(unsigned int y_dim, unsigned int plane);
     void setPedestal(float pedestal, unsigned int plane);
 
-
+    bool fileExists(std::string s);
 
     // Function to get the array of data
     PyObject * getArrayByPlane(unsigned int p);
