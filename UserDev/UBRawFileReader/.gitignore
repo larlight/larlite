@@ -1,0 +1,17 @@
+.DS_Store
+*.o
+*Cint.h
+*Cint.cxx
+*Cint.cc
+.depend
+*.rootmap
+*.so
+*.dylib
+*.root
+*.bin
+*.dat
+*.info
+*~
+*.pcm
+*.swp
+
