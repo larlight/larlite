@@ -87,6 +87,7 @@ namespace larlite {
   }
   
   bool ERToolAnaBase::analyze(storage_manager* storage) {
+
     _mgr.ClearData();
 
     TStopwatch fWatch;
@@ -115,16 +116,14 @@ namespace larlite {
     // Start filling SPAData object!
     // Fill showers
     if (_mcshowers && _name_shower.empty()){
-      //std::cout<<"In ERToolAnaBase...looking to add showers..."<<std::endl ;
       auto ev_mcs = storage->get_data<event_mcshower> (_name_mcshr);
       if (!ev_mcs){
 	print(msg::kERROR,__FUNCTION__,
-	      "MCShower info not found in the event!\nLikely the producer type/name is set incorrectly\nCheck your python script!\nA producer name for MCShower needs to be set to (False,\"\") if none being used.");
+	      Form("MCShower info not found in the event for producer %s !\nLikely the producer type/name is set incorrectly\nCheck your python script!\nA producer name for MCShower needs to be set to (False,\"\") if none being used.",_name_mcshr.c_str()));
 	throw std::exception();
       }
 
       _helper.FillShowers(*ev_mcs, *in_strm);
-      //std::cout<<"We successfully added shower!"<<std::endl ;
       // if cheater for single showers is to be used:
       if (_cheater)
 	_helper.SingleShowerCheater(*ev_mcs,*in_strm);
@@ -151,7 +150,7 @@ namespace larlite {
 	auto ev_mcs = storage->get_data<event_mcshower> ("mcreco");
 	if (!ev_mcs){
 	  print(msg::kERROR,__FUNCTION__,
-		"MCShower info not found in the event!\nLikely the producer type/name is set incorrectly\nCheck your python script!\nA producer name for MCShower needs to be set to (False,\"\") if none being used.");
+		"MCShower info (for cheater) not found in the event for producer mcreco !\nLikely the producer type/name is set incorrectly\nCheck your python script!\nA producer name for MCShower needs to be set to (False,\"\") if none being used.");
 	  throw std::exception();
 	}
 	_helper.SingleShowerCheater(*ev_mcs,*in_strm);

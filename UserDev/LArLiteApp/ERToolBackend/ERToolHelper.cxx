@@ -52,7 +52,7 @@ namespace larlite {
 			    _shrProfiler.ShowerRadius() );
 	// Fill more info
 	s._energy     = mcs.DetProfile().Momentum().E();
-        if(mcs.dEdx() == 0)
+        if( (mcs.dEdx() == 0) ||  (mcs.dEdx() > 100) )
 	  {s._dedx = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));}
         else{s._dedx =  mcs.dEdx();}
 	//s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
@@ -605,7 +605,7 @@ namespace larlite {
       s._energy     = mcs.DetProfile().Momentum().E();
       //s._energy = mcs.Start().Momentum().E();
       fWatch.Start();
-      if(mcs.dEdx() == 0)
+      if( (mcs.dEdx() == 0) ||  (mcs.dEdx() > 100) )
 	{s._dedx = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));}
       else{s._dedx =  mcs.dEdx();}
       //s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.05) : gRandom->Gaus(2,2*0.05));
@@ -680,12 +680,13 @@ namespace larlite {
 					 shw.Length(),
 					 _shrProfiler.ShowerRadius()) );
       auto& s = (*s_v.rbegin());
-      if(shw.best_plane()){
+      if( (shw.best_plane() > 0) && (shw.best_plane() <= 2) ){
 	s._energy = shw.Energy()[shw.best_plane()];
 	s._dedx   = shw.dEdx()[shw.best_plane()];
       }else{
-	s._energy = (*(shw.Energy().begin()));
-	s._dedx   = (*(shw.dEdx().begin()));
+	// default to collection plane
+	s._energy = shw.Energy()[2];
+	s._dedx   = shw.dEdx()[2];
       }
       // by default. Add cosmic score for showers to edit
       s._cosmogenic = -1;
@@ -707,7 +708,6 @@ namespace larlite {
 
       }
     }
-
     strm.ReserveShowerArray(s_v.size());
     for(size_t i=0; i<s_v.size(); ++i)
       strm.Emplace(std::move(s_v[i]),std::move(id_v[i]));
@@ -737,7 +737,7 @@ namespace larlite {
   }
 
   TLorentzVector ERToolHelper::getXShift(const mctrack& mct) const {
-    
+    // Calculates for each mc track, based on the time of the event, the corresponding shift in x-direction
     TLorentzVector shift;
     double event_time = mct.End().T();
     double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
