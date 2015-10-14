@@ -52,14 +52,34 @@ namespace larlite {
 
     void UseMC(bool doit=true) { _use_mc = doit; }
 
+    void SetROStart(double t) { _RO_start = t; }
+    void SetROEnd(double t)   { _RO_end = t; }
+
+    void SetTrigTime(double t) { _Trig_time = t; }
+
   protected:
 
     ::flashana::FlashMatchManager _mgr;
+
+    // readout start : 
+    // time before the trigger when the RO start
+    double _RO_start; // us
+    // readout end :
+    // time after the trigger when the RO ends
+    double _RO_end; // us
+    // trigger time
+    // the time at which, within the TPC readout
+    // the trigger should arrive
+    // for MC this is generally 0
+    double _Trig_time; // us
 
     bool _use_mc;
 
     TTree* _track_tree;
     double _trk_time;
+    double _trk_shift;
+    double _trk_max_x;
+    double _trk_min_x;
     double _trk_x;
     
     TTree* _tree;
@@ -77,6 +97,13 @@ namespace larlite {
     double _mc_y;
     double _mc_z;
     double _mc_dx;
+
+    // tree to measure efficiency of matching for MCTracks
+    TTree *_eff_tree;
+    int _matched;
+    double _mc_edep;
+    double _trk_max_abs_x, _trk_min_abs_x;
+
   };
 }
 #endif

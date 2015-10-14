@@ -57,7 +57,7 @@ void LowEPlot_nue(){
   Int_t           _neutrinos;
   Double_t        _e_nuReco;
   Double_t        _e_dep;
-  Double_t        _weight;
+  Double_t        _weight; // right now this is the weight from fluxRW package
   TBranch        *b_numEvts;   //!
   TBranch        *b_neutrinos;   //!
   TBranch        *b_e_nuReco;   //!
@@ -88,7 +88,7 @@ void LowEPlot_nue(){
     
     nbytes += tree1->GetEntry(i);
     
-
+    ///1991 is # of events in the file, 2.701e17 is average POT per event (from POT tree), 6.6e20 is total POT we're scaling to
     nue->Fill(_e_nuReco/1000, _weight*(6.6e20/(2.701e17*1991)));
        
   }
@@ -119,7 +119,7 @@ void LowEPlot_nue(){
     
     nbytes += tree2->GetEntry(i);
     
-
+    ///1991 is # of events in the file, 2.701e17 is average POT per event (from POT tree), 6.6e20 is total POT we're scaling to
     numu->Fill(_e_nuReco/1000, _weight*(6.6e20/(2.701e17*1991)));
        
   }
@@ -149,7 +149,7 @@ void LowEPlot_nue(){
     
     nbytes += tree3->GetEntry(i);
     
-
+    ///1991 is # of events in the file, 2.701e17 is average POT per event (from POT tree), 6.6e20 is total POT we're scaling to
     nc->Fill(_e_nuReco/1000, _weight*(6.6e20/(2.701e17*1991)));
        
   }
@@ -180,7 +180,14 @@ void LowEPlot_nue(){
     
     nbytes += tree4->GetEntry(i);
     
-
+    // 2.5 comes from (4.8ms per event * total number of events) / 211 seconds
+    // 211 seconds is total amount of beam-gate-window open time that corresponds to 6.6e20 total POT
+    // note: this assumes 100% perfect flash-matching (IE no cosmics that arrive outside of the
+    // beam gate window get MID-ed as single electron events)
+    // note: for the 128 kV files, 2.5 is an overestimate. We generate *four* readout frames worth
+    // of cosmics (with a front-porch readout frame so the detector starts fully populated when readout begins)
+    // but we only read out 3 frames. therefore, 2.5 needs to be multiplied by (4.8/6.4) = 0.75
+    // so 2.5 should be replaced with 1.875
     cosmic->Fill(_e_nuReco/1000, 2.5);//21);
        
   }

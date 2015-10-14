@@ -37,6 +37,8 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
   // Create output data product holder
   auto shower_v = storage->get_data<event_shower>(fOutputProducer);
   shower_v->clear();
+  // create association for showers
+  auto shower_ass_v = storage->get_data<event_ass>(shower_v->name());
 
   // set event ID through storage manager
   storage->set_id(storage->get_data<event_cluster>(fInputProducer)->run(),
@@ -51,7 +53,8 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
   std::vector<std::vector<unsigned int> > matched_pairs;
   if (!fUsePFParticle) {
     matched_pairs = fManager.Reconstruct(local_clusters, res_shower_v);
-  } else {
+  }
+  else {
 
     auto pfpart_v = storage->get_data<event_pfpart>(fInputProducer);
 
@@ -80,20 +83,34 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
           last_pair.push_back(ass_index);
       }
     }
-
-
     fManager.Reconstruct(local_clusters,
                          matched_pairs,
                          res_shower_v);
   }
 
 
+  // re-size matched pair vector so that only the matched pairs
+  // for showers that will actually be reconstructed is used to
+  // for the association vector
+  std::vector<std::vector<unsigned int> > recod_matched_pairs;
 
-  for (auto const& res_shower : res_shower_v) {
+  // counter for reco'd showers
+  int ctr = 0;
+
+  for (size_t i=0; i < res_shower_v.size(); i++){
+    
+    auto const& res_shower = res_shower_v[i];
+
+
+    // filter out showers with garbage values
+    if (res_shower.fXYZStart.Mag2()  == 0)
+      continue;
+    if (res_shower.fDCosStart.Mag2() == 0)
+      continue;
+
 
     shower s;
     s.set_id ( shower_v->size() );
-
     s.set_total_energy        ( res_shower.fTotalEnergy         );
     s.set_total_energy_err    ( res_shower.fSigmaTotalEnergy    );
     s.set_total_MIPenergy     ( res_shower.fTotalMIPEnergy      );
@@ -108,22 +125,19 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     s.set_length              ( res_shower.fLength              );
     s.set_opening_angle       ( res_shower.fOpeningAngle        );
 
-    shower_v->emplace_back(s);
-  }
+    shower_v->push_back(s);
+    //(*shower_v)[i].set_id(ctr);
+    ctr += 1;
 
-  // Make sure result has the same size
-  if (shower_v->size() != matched_pairs.size())
-    throw ::showerreco::ShowerRecoException("Mismatch in # of showers from algorithm's return!");
+    recod_matched_pairs.push_back(matched_pairs[i]);
 
-  for (size_t index = 0; index < shower_v->size(); ++index)
 
-    (*shower_v)[index].set_id(index);
+  }// for all input cluster-paris
 
-  // create association for showers
-  auto shower_ass_v = storage->get_data<event_ass>(shower_v->name());
-  shower_ass_v->set_association(shower_v->id(), product_id(data::kCluster, fInputProducer), matched_pairs);
-  //shower_v->set_association(data::kCluster,fInputProducer,matched_pairs);
-  // std::cout << "Done with this event\n";
+  if (shower_v->size() == 0)
+    return true;
+
+  shower_ass_v->set_association(shower_v->id(), product_id(data::kCluster, fInputProducer), recod_matched_pairs);
   return true;
 }
 
