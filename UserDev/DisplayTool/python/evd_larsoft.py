@@ -13,6 +13,24 @@ from ROOT import evd
 
 from geometry import *
 
+# This section checks to see if daq data types can be read:
+try:
+    a = evd.DrawUbDaq()
+    has_daq_types = True
+except Exception, e:
+    has_daq_types = False
+
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 
 class evd_manager(manager, wire, QtCore.QObject):
 
@@ -27,11 +45,8 @@ class evd_manager(manager, wire, QtCore.QObject):
         manager.__init__(self, geom, file)
         wire.__init__(self)
 
-        # override the wire drawing process for lariat
+        # override the wire drawing process
         self._process = evd.DrawUbSwiz()
-        self._process.SetCorrectData(False)
-        self._process.SetSaveData(False)
-        self._process.initialize()
 
         self.setInputFile(file)
 
@@ -39,6 +54,8 @@ class evd_manager(manager, wire, QtCore.QObject):
         self._watcher = None
         self._stopFlag = None
         self._running = False
+
+        self._event_no = 0
 
         # the manager also can cycle through the events in a file:
         self._cycling = False
@@ -49,6 +66,23 @@ class evd_manager(manager, wire, QtCore.QObject):
         self._drawingLock = False
         self.processLockUpdate.connect(self.processLock)
 
+        if not has_daq_types:
+            print bcolors.WARNING + "NOTIFICATION: uboonedaq types are not configured to run.  \
+Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolors.ENDC
+
+    def initProcess(self, proc_type):
+        if proc_type == "daq":
+            self._process = evd.DrawUbDaq()
+        if proc_type == "swiz":
+            self._process = evd.DrawUbSwiz()
+
+        # Set up the noise filter and initialize
+        self._process.SetCorrectData(False)
+        self._process.SetSaveData(False)
+        self._process.SetStepSizeByPlane(48, 0)
+        self._process.SetStepSizeByPlane(48, 1)
+        self._process.SetStepSizeByPlane(96, 2)
+        self._process.initialize()
 
     def setEventNo(self, event_no):
         self._event_no = event_no
@@ -68,11 +102,11 @@ class evd_manager(manager, wire, QtCore.QObject):
     def next(self):
         # Don't attempt to run if the process is locked
         if self.sender() != None and self._masterLock:
-          # print "drawing: ", self._drawingLock
-          # print "process: ", self._processLock
-          # print "master:  ", self._masterLock
-          # print self.sender()
-          return
+            # print "drawing: ", self._drawingLock
+            # print "process: ", self._processLock
+            # print "master:  ", self._masterLock
+            # print self.sender()
+            return
 
         # print "Called next"
         # Check that this isn't the last event:
@@ -86,7 +120,7 @@ class evd_manager(manager, wire, QtCore.QObject):
     def prev(self):
         # Don't attempt to run if the process is locked
         if self._masterLock:
-          return
+            return
         if self._event != 0:
             self.goToEvent(self._event - 1)
         elif self._cycling:
@@ -109,9 +143,22 @@ class evd_manager(manager, wire, QtCore.QObject):
             return
         else:
             file = str(file)
+            if file.endswith(".root"):
+                self.initProcess("root")
+            elif file.endswith(".ubdaq"):
+                if has_daq_types:
+                    self.initProcess("daq")
+                else:
+                    print bcolors.FAIL + "ERROR: Can not open a daq file because daq types are not loaded" + bcolors.ENDC
+                    return
+
+            else:
+                return
             self._process.setInput(file)
             self._hasFile = True
             self.goToEvent(0)
+            self._view_manager.setRangeToMax()
+
 
     def parseFileName(self, fileName):
 
@@ -119,7 +166,7 @@ class evd_manager(manager, wire, QtCore.QObject):
             self._filePath = None
             return
 
-        if fileName.endswith(".root"):
+        if fileName.endswith(".root") or fileName.endswith(".ubdaq"):
             # this is a data file, set it to display:
             self.setInputFile(fileName)
 
@@ -127,19 +174,17 @@ class evd_manager(manager, wire, QtCore.QObject):
             # parse the txt file to get the file name
             # automatically start a run of autoupdates
             self._monitorFile = fileName
-            self.startSpillRun(fileName)
+            self.startFileRun(fileName)
         else:
             self._filePath = None
 
-    def drawingLock(self,drawLock):
+    def drawingLock(self, drawLock):
         self._drawingLock = drawLock
         self._masterLock = self._processLock or self._drawingLock
-
 
     def processLock(self, procLock):
         self._processLock = procLock
         self._masterLock = self._processLock or self._drawingLock
-
 
     def isRunning(self):
         return self._running
@@ -264,7 +309,6 @@ class delayTimer(QtCore.QObject, threading.Thread):
             self.delayExpired.emit()
 
 
-
 # override the gui to give the larsoft display special features:
 class larsoftgui(gui):
 
@@ -279,7 +323,6 @@ class larsoftgui(gui):
         self._event_manager.eventChanged.connect(self.update)
         self.drawingLock.connect(self._event_manager.drawingLock)
 
-
     # override the initUI function to change things:
     def initUI(self):
         super(larsoftgui, self).initUI()
@@ -288,7 +331,7 @@ class larsoftgui(gui):
 
     # override the update function for larsoft:
     def update(self):
-        # Set a lock to 
+        # Set a lock to
         self.drawingLock.emit(True)
         # set the text boxes correctly:
         eventLabel = "Ev: " + str(self._event_manager.event_no())
@@ -332,9 +375,10 @@ class larsoftgui(gui):
         label2.setFont(font)
 
         self._noiseFilterCheck = QtGui.QCheckBox("Run Noise Filter")
-        self._noiseFilterCheck.setToolTip("Run the noise filter on data.  Runs slower and updates on next event.")
+        self._noiseFilterCheck.setToolTip(
+            "Run the noise filter on data.  Runs slower and updates on next event.")
         self._noiseFilterCheck.setTristate(False)
-        self._noiseFilterCheck.stateChanged.connect(self.noiseFilterWorker)  
+        self._noiseFilterCheck.stateChanged.connect(self.noiseFilterWorker)
 
         # This label tells the user that the event switching is on
         self._autoRunLabel = QtGui.QLabel("Event Update OFF")
@@ -382,10 +426,10 @@ class larsoftgui(gui):
         return self._eastWidget
 
     def noiseFilterWorker(self):
-      if self._noiseFilterCheck.isChecked():
-        self._event_manager.setNoiseFilter(True)
-      else:
-        self._event_manager.setNoiseFilter(False)
+        if self._noiseFilterCheck.isChecked():
+            self._event_manager.setNoiseFilter(True)
+        else:
+            self._event_manager.setNoiseFilter(False)
 
     def spillUpdateButtonHandler(self):
         if self._event_manager.isRunning():
