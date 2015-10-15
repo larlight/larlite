@@ -66,13 +66,9 @@ void DrawUbDaq::setInput(std::string s) {
     // The file exists, try to read it.
     _input_file = s;
     _current_event = 0;
-    std::cout << "Good1"<<std::endl;
     _storage.Reset();
-    std::cout << "Good2"<<std::endl;
     _storage.AddInputFile(s);
-    std::cout << "Good3"<<std::endl;
     _storage.Initialize();
-    std::cout << "Good4"<<std::endl;
 
     // _n_events  = _storage.entries();
     _n_events  = 1;
@@ -138,24 +134,14 @@ void DrawUbDaq::readData() {
   // df.get_entry(_current_event);
 
   _storage.ProcessEvent();
-
-  std::vector<short> channel;
-  std::vector<short> adc;
-
-  // // get the channel data:
-  // std::vector<short>  channel =  df.channel();
-  // std::vector<short>  adc = df.adc();
-
-  // std::cout << "adc.size() " << adc.size()  << "\n";
-  // std::cout << "channel.size() " << channel.size()  << "\n";
+  // This is an event viewer.  In particular, this handles raw wire signal drawing.
+  // So, obviously, first thing to do is to get the wires.
+  const larlite::event_rawdigit & RawDigitHandle = _storage.RawDigit();
 
 
-  // std::cout << "adc[0]: " << adc[0] << "\n";
-  // std::cout << "adc[100]: " << adc[100] << "\n";
-  // std::cout << "adc[200]: " << adc[200] << "\n";
-  // std::cout << "adc[300]: " << adc[300] << "\n";
-
-
+  _run = RawDigitHandle.run();
+  _subrun = RawDigitHandle.subrun();
+  _event_no = RawDigitHandle.event_id();
 
   // Initalize the space to hold the pedestal and RMS by Plane
   pedestalByPlane.clear();
@@ -175,22 +161,13 @@ void DrawUbDaq::readData() {
   }
 
 
-  // _run =  df.run();
-  // _subrun = df.subrun();
-  // _event_no = df.event();
-
-  // std::cout << "Run " << _run << ", subrun " << _subrun << ", event " << _event_no << std::endl;
-
   float rmsMinBadWire = 1.5 * 1.5;
   float rmsMaxBadWire = 100 * 100;
 
   badWireMapByPlane.resize(geoService->Nplanes());
 
-  size_t digitSize = 9595;
-
-  size_t i_channel = 0;
-  for (auto const& ch : channel) {
-    // unsigned int ch = rawdigit.Channel();
+  for (auto const& rawdigit : RawDigitHandle) {
+    unsigned int ch = rawdigit.Channel();
     if (ch >= 8254) continue;
 
     unsigned int wire = geoService->ChannelToWire(ch);
@@ -201,6 +178,30 @@ void DrawUbDaq::readData() {
     if (wire > geoService -> Nwires(plane))
       continue;
 
+    // // There is one remaining mapping issue:
+    // if (plane == 1) {
+    //   if (wire > 63 && wire < 96) {
+    //     wire += 320;
+    //   }
+    //   else if (wire > 383 && wire < 416) {
+    //     wire -= 320;
+    //   }
+
+    //   // Now fix the rest:
+    //   if (wire < 31)
+    //     wire += 64;
+    //   else if (wire > 31 && wire < 64 ) {
+    //     int wireAnchor = wire - (wire % 32);
+    //     wire = wireAnchor + 32 - (wire % 32);
+    //   }
+    //   else if (wire > 63 && wire < 96) {
+    //     wire -= 64;
+    //   }
+
+    // }
+
+
+
     int offset = wire * detProp -> ReadOutWindowSize();
     // convert short ADCs to float
 
@@ -210,25 +211,24 @@ void DrawUbDaq::readData() {
     pedestal.resize(nPedPoints);
 
     // Determine the distance between the pedestal points allowed:
-    int pedStepSize =  detProp->ReadOutWindowSize() / nPedPoints - 2;
+    int pedStepSize =  detProp->ReadOutWindowSize() / nPedPoints;
 
     for (int j = 0; j < nPedPoints; j++) {
-      pedestal.at(j) = adc.at(i_channel * digitSize + j * pedStepSize);
+      pedestal.at(j) = rawdigit.ADC(j * pedStepSize);
     }
     std::sort(pedestal.begin(), pedestal.end());
     float ped = 0.5 * pedestal.at(nPedPoints / 2 - 1) + 0.5 * pedestal.at(nPedPoints / 2);
 
     // Set the pedestal to be stored, if needed
     pedestalByPlane.at(plane).at(wire) = ped;
+
     int i = 0;
     // Calculate an rms here to spot bad wires
     float rms = 0.0;
-    // std::cout << "start: " << i_channel*digitSize << ", end " << (i_channel +1)*digitSize << std::endl;
-    for (size_t index = i_channel * digitSize; index < (i_channel + 1)*digitSize; index ++) {
+    for (auto & adc : rawdigit.ADCs()) {
       // _planeData.at(plane).at(offset + i) = adc;
-      // std::cout << "Setting at plane " << plane << ", offset " << offset + i << " to " << adc.at(index) - ped << std::endl;
-      _planeData.at(plane).at(offset + i) = adc.at(index) - ped;
-      rms += (adc.at(index) - ped) * (adc.at(index) - ped);
+      _planeData.at(plane).at(offset + i) = adc - ped;
+      rms += (adc - ped) * (adc - ped);
       i++;
     }
 
@@ -239,19 +239,10 @@ void DrawUbDaq::readData() {
 
     if (rms < rmsMinBadWire || rms > rmsMaxBadWire)
       badWireMapByPlane.at(plane).at(wire) = true;
-
-    i_channel ++;
   }
 
   if (_correct_data || _save_data)
     correctData();
-
-  // std::cout << "_planeData.size() " << _planeData.size() << std::endl;
-  // std::cout << "_planeData.at(0).at(0) " << _planeData.at(0).at(0) << std::endl;
-  // std::cout << "_planeData.at(0).at(1) " << _planeData.at(0).at(1) << std::endl;
-  // std::cout << "_planeData.at(0).at(2) " << _planeData.at(0).at(2) << std::endl;
-
-  // std::cout << "done reading data.\n";
 
   return;
 }

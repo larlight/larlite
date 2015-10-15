@@ -77,7 +77,7 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
             self._process = evd.DrawUbSwiz()
 
         # Set up the noise filter and initialize
-        self._process.SetCorrectData(False)
+        self._process.SetCorrectData(True)
         self._process.SetSaveData(False)
         self._process.SetStepSizeByPlane(48, 0)
         self._process.SetStepSizeByPlane(48, 1)
@@ -157,7 +157,7 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
             self._process.setInput(file)
             self._hasFile = True
             self.goToEvent(0)
-            self._view_manager.setRangeToMax()
+            # self._view_manager.setRangeToMax()
 
 
     def parseFileName(self, fileName):
