@@ -58,6 +58,9 @@ namespace ubdaq {
     void Initialize();
     bool ProcessEvent();
 
+    ::larlite::storage_manager getManager(){return _mgr;}
+
+
   private:
 #ifndef __CINT__
     void ProcessRecord(ub_EventRecord& eventRecord);
