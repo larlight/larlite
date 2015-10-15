@@ -16,13 +16,16 @@ INCFLAGS += $(shell larlite-config --includes)
 INCFLAGS += -I$(shell pg_config --includedir)
 INCFLAGS += -I${BOOST_INC}
 INCFLAGS += -I${UBOONEDAQ_DATATYPES_INC}
+INCFLAGS += -I$(LARLITE_USERDEVDIR)
+INCFLAGS += $(shell python-config --includes)
+INCFLAGS += -I$(shell python -c "import numpy; print numpy.get_include()")
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
 HOST            = $(shell uname -n)
 OSNAMEMODE      = $(OSNAME)
 
-LDFLAGS += $(shell larlite-config --libs)
+LDFLAGS += $(shell larlite-config --libs) -lDisplayTool_RawViewer
 LDFLAGS += -L$(shell pg_config --libdir) -lpq
 LDFLAGS += -L${BOOST_LIB} -lboost_serialization
 LDFLAGS += -L${UBOONEDAQ_DATATYPES_LIB} -lubdata_types
