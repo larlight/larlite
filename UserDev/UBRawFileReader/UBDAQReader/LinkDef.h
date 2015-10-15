@@ -12,6 +12,7 @@
 #pragma link C++ namespace ubdaq+;
 #pragma link C++ class ubdaq::LiteStorageManager;
 #pragma link C++ class ubdaq::UBDaqID+;
+#pragma link C++ class evd::DrawUbDaq+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
