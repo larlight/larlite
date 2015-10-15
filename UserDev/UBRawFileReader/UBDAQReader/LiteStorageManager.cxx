@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #include "datatypes/raw_data_access.h"
+#include "datatypes/uboone_data_utils.h"
 //#include "datatypes/ub_EventRecord.h"
 
 #include "DataFormat/storage_manager.h"
@@ -81,6 +82,11 @@ namespace ubdaq {
     _current_input_index = 0;
     _eof = true;
     _event_ctr = 0;
+
+    ::peek_at_next_event<ub_TPC_CardData_v6>(false);
+    ::peek_at_next_event<ub_PMT_CardData_v6>(false);
+    ::handle_missing_words<ub_TPC_CardData_v6>(true);
+    ::handle_missing_words<ub_PMT_CardData_v6>(true);
   }
 
   const ::larlite::event_rawdigit& LiteStorageManager::RawDigit () const
@@ -139,17 +145,17 @@ namespace ubdaq {
       }
     }
 
-    try{
-      ::boost::archive::binary_iarchive ia(*_is);
-      ub_EventRecord  eventRecord;
-      ia >> eventRecord;
-      ProcessRecord(eventRecord);
-    }catch(...) {
-      std::cerr << "Could not interpret data... skipping (possibly eof)" <<std::endl;
-      _eof = true;
-      _current_input_index +=1;
-      return ProcessEvent();
-    }
+    //try{
+    ::boost::archive::binary_iarchive ia(*_is);
+    ub_EventRecord  eventRecord;
+    ia >> eventRecord;
+    ProcessRecord(eventRecord);
+    //}catch(...) {
+    //std::cerr << "Could not interpret data... skipping (possibly eof)" <<std::endl;
+    //_eof = true;
+    //_current_input_index +=1;
+    //return ProcessEvent();
+    //}
     ++_event_ctr;
     return true;
   }
