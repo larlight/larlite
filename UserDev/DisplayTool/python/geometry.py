@@ -86,7 +86,7 @@ class microboone(geometry):
         # and then call the base class __init__
         larutil.LArUtilManager.Reconfigure(fmwk.geo.kMicroBooNE)
         super(microboone, self).__init__()
-        self._levels = [(-100, 10), (-10, 100), (-10, 2010)]
+        self._levels = [(-100, 10), (-10, 100), (-10, 200)]
         # self._colorScheme =
         # self._time2Cm = 0.05515
         self._aspectRatio = self._wire2Cm / self._time2Cm

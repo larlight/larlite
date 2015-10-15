@@ -157,6 +157,10 @@ namespace ubdaq {
     //return ProcessEvent();
     //}
     ++_event_ctr;
+    std::cout << _event_ctr<< std::endl;
+    std::cout << "Run:" << _mgr.run_id() << std::endl;
+    std::cout << "Event: " << _mgr.event_id() << std::endl;
+    std::cout << "SubRun: " << _mgr.subrun_id() << std::endl;
     return true;
   }
 
