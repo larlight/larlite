@@ -88,7 +88,7 @@ class microboone(geometry):
         super(microboone, self).__init__()
         self._levels = [(-100, 10), (-10, 100), (-10, 2010)]
         # self._colorScheme =
-        self._time2Cm = 0.05515
+        # self._time2Cm = 0.05515
         self._aspectRatio = self._wire2Cm / self._time2Cm
         self._pedestals = [2000, 2000, 440]
         self._name = "uboone"
