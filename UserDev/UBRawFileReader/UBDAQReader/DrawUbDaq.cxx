@@ -71,7 +71,7 @@ void DrawUbDaq::setInput(std::string s) {
     _storage.Initialize();
 
     // _n_events  = _storage.entries();
-    _n_events  = 1;
+    _n_events  = 50;
     if (_n_events == 0) {
       _run = 0;
       _event_no = 0;
@@ -100,31 +100,38 @@ void DrawUbDaq::nextEvent() {
 
 void DrawUbDaq::prevEvent() {
 
-  if (_current_event <= 0) {
-    std::cout << "On event " << _current_event << std::endl;
-    std::cout << "Warning, at beginning of file, can not go backwards.\n";
-    return;
-  }
-  else {
-    _current_event --;
-    readData();
-  }
+  std::cerr<< "ERROR: ubdaq files can not go backwards yet!" << std::endl;
+  return;
+
+  // if (_current_event <= 0) {
+  //   std::cout << "On event " << _current_event << std::endl;
+  //   std::cout << "Warning, at beginning of file, can not go backwards.\n";
+  //   return;
+  // }
+  // else {
+  //   _current_event --;
+  //   readData();
+  // }
 
   return;
 
 }
 
 void DrawUbDaq::goToEvent(size_t e) {
-  if (e < 0) {
-    std::cout << "Selected event is too low.\n";
-    return;
-  }
-  if (e >= _n_events) {
-    std::cout << "Selected event is too high.\n";
-    return;
-  }
-  _current_event = e;
-  readData();
+
+  std::cerr << "ERROR: ubdaq files does not support random access yet!" << std::endl;
+  return;
+
+  // if (e < 0) {
+  //   std::cout << "Selected event is too low.\n";
+  //   return;
+  // }
+  // if (e >= _n_events) {
+  //   std::cout << "Selected event is too high.\n";
+  //   return;
+  // }
+  // _current_event = e;
+  // readData();
 
 }
 
@@ -139,9 +146,9 @@ void DrawUbDaq::readData() {
   const larlite::event_rawdigit & RawDigitHandle = _storage.RawDigit();
 
 
-  _run = RawDigitHandle.run();
-  _subrun = RawDigitHandle.subrun();
-  _event_no = RawDigitHandle.event_id();
+  _run = _storage.getManager().run_id();
+  _subrun = _storage.getManager().subrun_id();
+  _event_no = _storage.getManager().event_id();
 
   // Initalize the space to hold the pedestal and RMS by Plane
   pedestalByPlane.clear();

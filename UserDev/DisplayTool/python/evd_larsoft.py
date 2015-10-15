@@ -46,6 +46,7 @@ class evd_manager(manager, wire, QtCore.QObject):
         wire.__init__(self)
 
         # override the wire drawing process
+        self._type = None
         self._process = evd.DrawUbSwiz()
 
         self.setInputFile(file)
@@ -139,14 +140,17 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
 
     def setInputFile(self, file):
         self._file = file
+        self._type = None
         if file == None:
             return
         else:
             file = str(file)
             if file.endswith(".root"):
+                self._type = "root"
                 self.initProcess("root")
             elif file.endswith(".ubdaq"):
                 if has_daq_types:
+                    self._type = "daq"
                     self.initProcess("daq")
                 else:
                     print bcolors.FAIL + "ERROR: Can not open a daq file because daq types are not loaded" + bcolors.ENDC
@@ -232,7 +236,10 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
             return
         if self._lastProcessed != self._event or force:
             self.processLockUpdate.emit(True)
-            self._process.goToEvent(self._event)
+            if self._type == "daq":
+                self._process.nextEvent()
+            else:
+                self._process.goToEvent(self._event)
             self._lastProcessed = self._event
             self.processLockUpdate.emit(False)
 
