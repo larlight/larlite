@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #include "datatypes/raw_data_access.h"
+#include "datatypes/uboone_data_utils.h"
 //#include "datatypes/ub_EventRecord.h"
 
 #include "DataFormat/storage_manager.h"
@@ -81,6 +82,11 @@ namespace ubdaq {
     _current_input_index = 0;
     _eof = true;
     _event_ctr = 0;
+
+    ::peek_at_next_event<ub_TPC_CardData_v6>(false);
+    ::peek_at_next_event<ub_PMT_CardData_v6>(false);
+    ::handle_missing_words<ub_TPC_CardData_v6>(true);
+    ::handle_missing_words<ub_PMT_CardData_v6>(true);
   }
 
   const ::larlite::event_rawdigit& LiteStorageManager::RawDigit () const
@@ -139,17 +145,17 @@ namespace ubdaq {
       }
     }
 
-    try{
-      ::boost::archive::binary_iarchive ia(*_is);
-      ub_EventRecord  eventRecord;
-      ia >> eventRecord;
-      ProcessRecord(eventRecord);
-    }catch(...) {
-      std::cerr << "Could not interpret data... skipping (possibly eof)" <<std::endl;
-      _eof = true;
-      _current_input_index +=1;
-      return ProcessEvent();
-    }
+    //try{
+    ::boost::archive::binary_iarchive ia(*_is);
+    ub_EventRecord  eventRecord;
+    ia >> eventRecord;
+    ProcessRecord(eventRecord);
+    //}catch(...) {
+    //std::cerr << "Could not interpret data... skipping (possibly eof)" <<std::endl;
+    //_eof = true;
+    //_current_input_index +=1;
+    //return ProcessEvent();
+    //}
     ++_event_ctr;
     return true;
   }
@@ -315,18 +321,20 @@ namespace ubdaq {
 	          
 	    channel.decompress(adclist); // All-in-one call.
 	    uint16_t frailer = channel.getChannelTrailerWord();
-	          
+	    /*
 	    short lachadawin = adclist.at( adclist.size()-1 );
 	    if ( (frailer>>12 != 0x5) || ( (frailer&0xfff) != tpc_channel_number ) ) {
 	      std::vector<short> kaxufix = decodeChannelTrailer( (unsigned short)lachadawin, (unsigned short)frailer );
 	      for ( auto& it : kaxufix )
 		adclist.emplace_back( it );
 	    }
-	          
+	    */	          
 	    chdsize = adclist.size();
 	    const static size_t          fAdcList_size = chdsize;
 	    if (fAdcList_size!=chdsize) {
-	      std::cerr << "Unexpected data: Number of words for channel: " << tpc_channel_number << " different than first waveform in the readout. That's really bad!!!" << std::endl;
+	      std::cerr << "Unexpected data: Number of words for channel: " 
+			<< tpc_channel_number << " is " << chdsize << " and different than first waveform in the readout"
+			<< " (" << fAdcList_size << "). That's really bad!!!" << std::endl;
 	      throw std::exception();
 	    }
 	          
