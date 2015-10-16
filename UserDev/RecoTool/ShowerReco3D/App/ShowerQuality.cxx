@@ -179,6 +179,10 @@ bool ShowerQuality::analyze(storage_manager* storage) {
     return false;
   }
 
+  _event  = storage->event_id();
+  _run    = storage->run_id();
+  _subrun = storage->subrun_id();
+
   // Before getting the reconstructed showers, we store some true (mcshower) information
   // to be used as the denominator in efficiency calculations (n reco showers / n true showers, etc)
   fEventTreeParams.n_mcshowers = ev_mcs->size();
@@ -460,6 +464,9 @@ void ShowerQuality::InitializeAnaTrees()
   if (fShowerTree) delete fShowerTree;
   fShowerTree = new TTree("fShowerTree", "");
 
+  fShowerTree->Branch("event", &_event, "event/I");
+  fShowerTree->Branch("run", &_run, "run/I");
+  fShowerTree->Branch("subrun", &_subrun, "subrun/I");
   fShowerTree->Branch("reco_x", &fShowerTreeParams.reco_x, "reco_x/D");
   fShowerTree->Branch("reco_y", &fShowerTreeParams.reco_y, "reco_y/D");
   fShowerTree->Branch("reco_z", &fShowerTreeParams.reco_z, "reco_z/D");
