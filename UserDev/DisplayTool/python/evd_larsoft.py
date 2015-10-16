@@ -338,9 +338,7 @@ class larsoftgui(gui):
     # override the initUI function to change things:
     def initUI(self):
         super(larsoftgui, self).initUI()
-        self._viewButtonArray[-1].setChecked(True)
-        self._viewButtonArray[-1].clicked.emit(True)
-        # self.viewSelectWorker()
+        self._viewButtonArray[-1].setDown(True)
         self.update()
         self._view_manager.setRangeToMax()
 
@@ -401,6 +399,7 @@ class larsoftgui(gui):
         # This label is showing the delay between event updates
         self._eventUpdateDelayLabel = QtGui.QLabel("Delay (s):")
         self._eventUpdateDelayEntry = QtGui.QLineEdit("60")
+        self._eventUpdateDelayEntry.returnPressed.connect(self.eventUpdateEntryHandler)
         self._eventUpdateDelayEntry.setMaximumWidth(35)
         self._eventUpdatePauseButton = QtGui.QPushButton("START")
         self._eventUpdatePauseButton.clicked.connect(
@@ -440,6 +439,19 @@ class larsoftgui(gui):
         self._eastWidget.setMaximumWidth(150)
         self._eastWidget.setMinimumWidth(100)
         return self._eastWidget
+
+    def eventUpdateEntryHandler(self):
+        try:
+            delay = float(self._eventUpdateDelayEntry.text())
+        except Exception, e:
+            delay = 30.0
+        if delay < 30:
+            delay = 30
+        print "Should be setting text to ", delay
+        self._eventUpdateDelayEntry.setText(str(delay))
+        self._eventUpdatePauseButton.setText("PAUSE")
+        self._event_manager.startCycle(delay)
+        self._autoRunLabel.setText("Event update ON")
 
     def noiseFilterWorker(self):
         if self._noiseFilterCheck.isChecked():
