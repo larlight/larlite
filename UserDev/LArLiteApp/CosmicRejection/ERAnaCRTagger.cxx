@@ -168,15 +168,11 @@ namespace ertool {
 	else
 	    _ctr_non_cosmic++;
 
-	if ( p.ProcessType() == kCosmic || graph.GetParticle(p.Ancestor()).ProcessType() == kCosmic){	
+	if ( p.ProcessType() == kCosmic || graph.GetParticle(p.Ancestor()).ProcessType() == kCosmic)
 	    _ctr_cosmic_w_secondaries++;
-///	    std::cout<<"WHy the crap are we finding cosmics??"<<std::endl ;
-	    }
-
-	else{
-//	    std::cout<<"Do we ever come in here? "<<std::endl ;
+	else
 	    _ctr_non_cosmic_w_sec++;
-	    }
+	    
 
 	if ( p.Primary() && p.ProcessType() != kCosmic ) _ctr_non_cosmic_primary++;
 	

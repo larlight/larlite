@@ -241,12 +241,13 @@ class gui(QtGui.QWidget):
     self._eventGrid.addWidget(self._goToLabel)
     self._eventGrid.addWidget(self._larliteEventEntry)
     # Another horizontal box for the run/subrun
-    self._runSubRunGrid = QtGui.QHBoxLayout()
-    self._runSubRunGrid.addWidget(self._eventLabel)
-    self._runSubRunGrid.addWidget(self._runLabel)
+    # self._runSubRunGrid = QtGui.QHBoxLayout()
+    # self._runSubRunGrid.addWidget(self._eventLabel)
+    # self._runSubRunGrid.addWidget(self._runLabel)
     # Pack it all together
     self._eventControlBox.addLayout(self._eventGrid)
-    self._eventControlBox.addLayout(self._runSubRunGrid)
+    self._eventControlBox.addWidget(self._eventLabel)
+    self._eventControlBox.addWidget(self._runLabel)
     self._eventControlBox.addWidget(self._subrunLabel)
     self._eventControlBox.addWidget(self._nextButton)
     self._eventControlBox.addWidget(self._prevButton)
