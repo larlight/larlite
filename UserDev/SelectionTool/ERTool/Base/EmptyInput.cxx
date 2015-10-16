@@ -120,7 +120,7 @@ namespace ertool {
 	return _graph->CreateParticle(_data->Shower().back()).ID();
       }else{
 	_mc_data->Emplace(std::move(obj),std::move(input_id));
-	return _mc_graph->CreateParticle(_data->Shower().back()).ID();
+	return _mc_graph->CreateParticle(_mc_data->Shower().back()).ID();
       }
     }
     
@@ -133,7 +133,7 @@ namespace ertool {
 	return _graph->CreateParticle(_data->Track().back()).ID();
       }else{
 	_mc_data->Emplace(std::move(obj),std::move(input_id));
-	return _mc_graph->CreateParticle(_data->Track().back()).ID();
+	return _mc_graph->CreateParticle(_mc_data->Track().back()).ID();
       }
     }
 
