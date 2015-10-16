@@ -36,6 +36,7 @@ class evd_manager(manager, wire, QtCore.QObject):
 
     eventChanged = QtCore.pyqtSignal()
     processLockUpdate = QtCore.pyqtSignal(bool)
+    runStarted = QtCore.pyqtSignal()
 
     """docstring for evd_manager"""
 
@@ -144,7 +145,8 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
         if file == None:
             return
         else:
-            file = str(file)
+            file = str(file).rstrip('\n')
+            self._file = file
             if file.endswith(".root"):
                 self._type = "root"
                 self.initProcess("root")
@@ -161,7 +163,8 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
             self._process.setInput(file)
             self._hasFile = True
             self.goToEvent(0)
-            # self._view_manager.setRangeToMax()
+            if self._view_manager != None:
+                self._view_manager.setRangeToMax()
 
 
     def parseFileName(self, fileName):
@@ -179,6 +182,7 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
             # automatically start a run of autoupdates
             self._monitorFile = fileName
             self.startFileRun(fileName)
+            self.runStarted.emit()
         else:
             self._filePath = None
 
@@ -289,7 +293,7 @@ class fileWatcher(QtCore.QObject, threading.Thread):
             if fileToDraw == self._prevFile:
                 # print "Not drawing because file has not changed."
                 continue
-            if fileExtension == ".root":
+            if fileExtension == ".root" or fileExtension == ".ubdaq":
                 print "Refreshing file!"
                 self.fileChanged.emit(fileToDraw)
                 self._prevFile = fileToDraw
@@ -328,13 +332,16 @@ class larsoftgui(gui):
         self._stopFlag = None
         self._running = False
         self._event_manager.eventChanged.connect(self.update)
+        self._event_manager.runStarted.connect(self.runStartWorker)
         self.drawingLock.connect(self._event_manager.drawingLock)
 
     # override the initUI function to change things:
     def initUI(self):
         super(larsoftgui, self).initUI()
+        self._viewButtonArray[-1].setDown(True)
         self.update()
         self._view_manager.setRangeToMax()
+
 
     # override the update function for larsoft:
     def update(self):
@@ -366,7 +373,7 @@ class larsoftgui(gui):
 
     def quit(self):
         if self._event_manager.isRunning():
-            self._event_manager.stopSpillRun()
+            self._event_manager.stopFileRun()
         if self._event_manager.isCycling():
             self._event_manager.stopCycle()
         QtCore.QCoreApplication.instance().quit()
@@ -391,7 +398,7 @@ class larsoftgui(gui):
         self._autoRunLabel = QtGui.QLabel("Event Update OFF")
         # This label is showing the delay between event updates
         self._eventUpdateDelayLabel = QtGui.QLabel("Delay (s):")
-        self._eventUpdateDelayEntry = QtGui.QLineEdit("1")
+        self._eventUpdateDelayEntry = QtGui.QLineEdit("60")
         self._eventUpdateDelayEntry.setMaximumWidth(35)
         self._eventUpdatePauseButton = QtGui.QPushButton("START")
         self._eventUpdatePauseButton.clicked.connect(
@@ -440,11 +447,11 @@ class larsoftgui(gui):
 
     def spillUpdateButtonHandler(self):
         if self._event_manager.isRunning():
-            self._event_manager.stopSpillRun()
+            self._event_manager.stopFileRun()
             self._spillUpdatePauseButton.setText("START")
             self._spillUpdateLabel.setText("File update OFF")
         else:
-            self._event_manager.startSpillRun()
+            self._event_manager.startFileRun()
             self._spillUpdatePauseButton.setText("PAUSE")
             self._spillUpdateLabel.setText("File update ON")
 
@@ -457,12 +464,16 @@ class larsoftgui(gui):
             try:
                 delay = float(self._eventUpdateDelayEntry.text())
             except Exception, e:
-                delay = 1.0
-            if delay < 0.1:
-                delay = 0.1
+                delay = 60.0
+            if delay < 60:
+                delay = 60
             self._eventUpdatePauseButton.setText("PAUSE")
             self._event_manager.startCycle(delay)
             self._autoRunLabel.setText("Event update ON")
+
+    def runStartWorker(self):
+        self.spillUpdateButtonHandler()
+        # self.eventUpdateButtonHandler()
 
 
 def sigintHandler(*args):
@@ -504,6 +515,10 @@ def main():
     thisgui = larsoftgui(geometry, manager)
     thisgui.initUI()
     # manager.goToEvent(0)
+
+    # thisgui.setWindowState(window.windowState() & ~QtCore.Qt.WindowMinimized | QtCore.Qt.WindowActive)
+    thisgui.raise_()
+    thisgui.activateWindow()
 
     signal.signal(signal.SIGINT, sigintHandler)
     timer = QtCore.QTimer()

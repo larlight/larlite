@@ -536,7 +536,7 @@ class gui(QtGui.QWidget):
     # ask the view manager to draw the planes:
     self._view_manager.drawPlanes(self._event_manager)
 
-    self.setGeometry(500, 300, 1200, 800)
+    self.setGeometry(0, 0, 2400, 1600)
     self.setWindowTitle('Event Display')    
     self.setFocus()
     self.show()
