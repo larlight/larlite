@@ -34,6 +34,11 @@ const std::vector<float> & RawBase::getDataByPlane(unsigned int p) const {
 
 }
 
+bool RawBase::fileExists(std::string s){
+  struct stat buffer;   
+  return (stat (s.c_str(), &buffer) == 0); 
+}
+
 PyObject * RawBase::getArrayByPlane(unsigned int p) {
 
   PyObject * returnNull = nullptr;
