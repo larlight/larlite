@@ -5,7 +5,7 @@
  *
  * \brief Class def header for a class StartPoint3DModule
  *
- * @author cadams
+ * @author ariana Hackenburg 
  */
 
 /** \addtogroup ModularAlgo
