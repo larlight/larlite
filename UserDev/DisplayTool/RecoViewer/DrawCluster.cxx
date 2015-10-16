@@ -77,7 +77,7 @@ bool DrawCluster::analyze(larlite::storage_manager* storage) {
   ::larlite::event_hit* ev_hit = nullptr;
   auto const& hit_index_v = storage->find_one_ass(ev_clus->id(), ev_hit, _producer);
 
-  // std::cout << "Hit _producer is " << ev_hit -> name() << std::endl;
+  std::cout << "Hit _producer is " << ev_hit -> name() << std::endl;
 
   if (!ev_hit) {
     std::cout << "Did not find hit data product"

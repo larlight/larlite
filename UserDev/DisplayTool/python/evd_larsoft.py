@@ -338,7 +338,9 @@ class larsoftgui(gui):
     # override the initUI function to change things:
     def initUI(self):
         super(larsoftgui, self).initUI()
-        self._viewButtonArray[-1].setDown(True)
+        self._viewButtonArray[-1].setChecked(True)
+        self._viewButtonArray[-1].clicked.emit(True)
+        # self.viewSelectWorker()
         self.update()
         self._view_manager.setRangeToMax()
 
