@@ -10,8 +10,8 @@
 #pragma link off all functions;
 
 #pragma link C++ class flashana::QWeightPoint+;
+#pragma link C++ class flashana::CommonAmps+;
 #pragma link C++ class flashana::TimeCompatMatch+;
-//#pragma link C++ class flashana::SecondOrderQWeight+;
 #pragma link C++ class flashana::MaxNPEWindow+;
 #pragma link C++ class flashana::TimeRange+;
 #pragma link C++ class flashana::TimeRangeSet+;
