@@ -59,6 +59,8 @@ namespace larlite {
     // boolean to flip logical operation of algorithm
     bool _flip;
 
+    size_t _n_total_events;
+    size_t _n_kept_events;
   };
 }
 #endif
