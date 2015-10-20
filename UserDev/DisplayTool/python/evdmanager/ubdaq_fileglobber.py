@@ -17,15 +17,26 @@ class UBDaqFileGlobber(QtCore.QObject):
         self.file_base_dir = '/pnfs/uboone/scratch/uboonepro/dropbox/data/uboone/raw/'
         self.glob_pattern = '*.ubdaq'
         self.current_file = None
-        self.file_checking_period = 10 #check for a new file every X seconds
+        self.file_checking_period = 10000 #check for a new file every X milliseconds
     
-        # self.timer = QtCore.QTimer()
-        # self.timer.timeout.connect(self.FindFileAndEmitSignal)
-        # self.timer.start(self.file_checking_period)
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.FindFileAndEmitSignal)
 
-        while True:
-            self.FindFileAndEmitSignal()
-            time.sleep(self.file_checking_period)
+        # while True:
+        #     self.FindFileAndEmitSignal()
+        #     time.sleep(self.file_checking_period)
+
+    def start(self):
+        if self.timer.isActive():
+            return
+        self.timer.start(self.file_checking_period)
+        
+    def stop(self):
+        self.timer.stop()
+
+    def isActive(self):
+        return self.timer.isActive()
+
 
     def FindFileAndEmitSignal(self):
         #This line checks for the newest file in the directory. It occasionally throws an OSError
@@ -33,6 +44,8 @@ class UBDaqFileGlobber(QtCore.QObject):
         try:
             newest = max(glob.iglob(self.file_base_dir+self.glob_pattern), key=os.path.getctime)
         except OSError as e:
+            return
+        except:
             return
 
         #Sanity check: does file exist? If not, return (don't emit any signals)
