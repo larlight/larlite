@@ -55,9 +55,11 @@ namespace showerreco{
 
       //if (_use_pitch)
       //dqdx *= (pitch/0.3);
-
-      dEdx = larutil::LArProperties::GetME()->ModBoxCorrection(dqdx);
-      
+      if(dqdx<80000){
+	dEdx = larutil::LArProperties::GetME()->ModBoxCorrection(dqdx);}
+      else{
+	dEdx = (larutil::LArProperties::GetME()->ModBoxCorrection(dqdx/2))*2;
+      }
       if (_verbose) { std::cout << "dEdx on plane : " << pl << " -> " << dEdx << std::endl; }
       
       // take the dQdx measured on each plane and convert
