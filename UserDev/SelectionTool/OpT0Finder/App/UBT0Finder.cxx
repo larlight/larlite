@@ -249,7 +249,7 @@ namespace larlite {
     if(!_use_mc)
       return true;
 
-    _npts       = mct.size() ;
+    _npts = 0 ; 
     for (size_t n=0; n < ev_mctrack->size(); n++){
       auto const& mct = ev_mctrack->at(n);
       // ignore tracks with < 2 steps
@@ -285,6 +285,7 @@ namespace larlite {
       _mc_time    = -999; 
       _matched    = 0 ;
       _npe        = 0;
+      _npts = mct.size() ;
 
       for(auto const& match : res) {
 	if (match.tpc_id == n){
@@ -295,7 +296,7 @@ namespace larlite {
 	}
       }
 
-	std::cout<<"Matched is now: "<<_matched<<"\n"<<std::endl ;
+//	std::cout<<"Matched is now: "<<_matched<<"\n"<<std::endl ;
       _eff_tree->Fill();
     }// for all MCTracks
 
