@@ -1,105 +1,9 @@
-
-from PyQt4.QtGui import QFileDialog
 from PyQt4 import QtCore
-from data import *
-import ROOT
-from larlite import larlite as fmwk
-from ROOT import *
+from event import manager, event
+import datatypes
+from ROOT import larlite as fmwk
 import os
-
-# This class exists as the basic interface for controlling events
-# Defines a lot of functions but the final implementation needs to be done
-# by a specific mode of running
-# This base class is meant to provide information interface
-# This class is also the manager for file interface, and contains the general functions.
-# It needs to be extended independently for daq or reco viewing
-class event(object):
-  """docstring for event"""
-  def __init__(self):
-    super(event, self).__init__()
-    self._run = 0
-    self._event = 0
-    self._subrun = 0
-
-    self._keyTable = dict()
-
-    self._lastProcessed = -1
-
-  def next(self):
-    print "Called next event"
-
-  def prev(self):
-    print "Called prev event"
-
-  def subrun(self):
-    return self._subrun
-
-  def run(self):
-    return self._run
-
-  def event(self):
-    return self._event
-
-  def setRun(self, r):
-    self._run = r
-
-  def setEvent(self,e):
-    self._event = e
-
-  def setSubRun(self, s):
-    self._subrun = s
-
-
-
-class manager(event):
-  """docstring for manager"""
-  def __init__(self, geom,file=None):
-    super(manager, self).__init__()
-    self._geom = geom
-    
-    # The manager needs to know about the gui and the view manager
-    # It needs to be able to call a few of their methods to update things
-    self._gui = None
-    self._view_manager = None
-    self._hasFile = False
-
-  def connectGui(self,gui):
-    self._gui = gui
-
-  def connectViewManager(self,view_manager):
-    self._view_manager = view_manager
-
-  def next(self):
-    print "Called next"
-    # self._process.nextEvent()  
-
-
-  def prev(self):
-    print "Called prev"
-    # self._process.prevEvent()   
-
-  def goToEvent(self,event):
-    print "Requested jump to event ", event
-
-  def selectFile(self):
-    filePath = str(QFileDialog.getOpenFileName())
-    self.setInputFile(filePath)
-    print "Selected file is ", filePath
-    return filePath
-
-  def setInputFile(self,file):
-    pass
-
-  def hasWireData(self):
-    return False
-
-  def getAutoRange(self,plane):
-    xRange = [0,self._geom.wRange(plane)]
-    yRange = [0,self._geom.tRange()]
-    return xRange,yRange
-
-
-
+from ROOT import TFile
 
 class larlite_manager(manager,QtCore.QObject):
   fileChanged = QtCore.pyqtSignal()
@@ -116,7 +20,7 @@ class larlite_manager(manager,QtCore.QObject):
     self._process = fmwk.ana_processor()
     self._mgr = fmwk.storage_manager()
 
-    self._drawableItems = drawableItems()
+    self._drawableItems = datatypes.drawableItems()
     self._keyTable = dict()
     self._drawnClasses = dict()
 
@@ -165,10 +69,12 @@ class larlite_manager(manager,QtCore.QObject):
 
   def setInputFiles(self,files):
     
+
     # reset the storage manager and process
     self._mgr.reset()
     self._process.reset()
     
+
     if files == None:
       return
 
@@ -179,6 +85,7 @@ class larlite_manager(manager,QtCore.QObject):
           print "ERROR: requested file does not exist."
           continue
       except Exception, e:
+        print e
         return
       # Next, verify it is a root file:
       if not file.endswith(".root"):
@@ -195,8 +102,6 @@ class larlite_manager(manager,QtCore.QObject):
         # setup the processor in the same way
         self._process.add_input_file(file)
         self._process.set_io_mode(fmwk.storage_manager.kREAD)
-
-
 
     # Open the manager
     self._mgr.open()
@@ -371,7 +276,7 @@ class larlite_manager(manager,QtCore.QObject):
         self._drawWires = False
         return
       self._drawWires = True
-      self._wireDrawer = rawDigit(self._geom)
+      self._wireDrawer = datatypes.rawDigit(self._geom)
       self._process.add_process(self._wireDrawer._process)
       self.processEvent(True)
     else:
