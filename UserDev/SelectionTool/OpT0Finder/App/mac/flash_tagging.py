@@ -70,7 +70,14 @@ xv,yv,zv = pmt_pos()
 #match_alg.UsePhotonLibrary(True)
 match_alg = flashana.QWeightPoint(5)
 match_alg.SetVerbosity(3)
+
+match_alg_1 = flashana.CommonAmps(xv,yv,zv,5)
+match_alg_1.UsePhotonLibrary(True)
+match_alg_1.SetScore(0.8)
+match_alg_1.SetPercent(0.6)
+
 my_unit.Manager().SetAlgo(match_alg)
+
 
 print
 print  "Finished configuring ana_processor. Start event loop!"

@@ -84,6 +84,7 @@ namespace larlite {
     
     TTree* _tree;
     double _npe;
+    double _npts;
     double _flash_x;
     double _flash_y;
     double _flash_z;

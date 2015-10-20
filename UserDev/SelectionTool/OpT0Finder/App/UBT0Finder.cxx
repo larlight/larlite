@@ -52,6 +52,7 @@ namespace larlite {
     _eff_tree->Branch("_mc_edep",&_mc_edep,"mc_edep/D");
     _eff_tree->Branch("_flash_time",&_flash_time,"flash_time/D");
     _eff_tree->Branch("_npe",&_npe,"flash_pe/D");
+    _eff_tree->Branch("_npts",&_npts,"_npts/D");
     _eff_tree->Branch("trk_max_x",&_trk_max_x,"trk_max_x/D");
     _eff_tree->Branch("trk_min_x",&_trk_min_x,"trk_min_x/D");
     _eff_tree->Branch("trk_max_abs_x",&_trk_max_abs_x,"trk_max_abs_x/D");
@@ -71,6 +72,7 @@ namespace larlite {
       std::cout<<"No opflash found. Skipping event: "<<storage->event_id()<<std::endl;
       return false;
     }
+
 
     //auto ev_track = storage->get_data<event_track>("pandoraCosmicKHit");
     auto ev_track = storage->get_data<event_track>("trackkalmanhit");
@@ -192,7 +194,6 @@ namespace larlite {
 
     }
     */
-
     auto const res = _mgr.Match();
     ::geoalgo::LineSegment line;
     ::geoalgo::Point_t pt(0,0,0);
@@ -248,12 +249,12 @@ namespace larlite {
     if(!_use_mc)
       return true;
 
+    _npts       = mct.size() ;
     for (size_t n=0; n < ev_mctrack->size(); n++){
       auto const& mct = ev_mctrack->at(n);
       // ignore tracks with < 2 steps
       if (mct.size() < 2) continue;
       // find the flash that was matched for this MCTrack (if any)
-      _matched = 0;
       _mc_time = mct[0].T() * 1.e-3;
       _mc_edep = mct[0].E()-mct[mct.size()-1].E();
       double event_time = mct[0].T(); // ns
@@ -280,6 +281,11 @@ namespace larlite {
 	if (x < _trk_min_x) _trk_min_x = x;			   
       }
 
+      _flash_time = -999;
+      _mc_time    = -999; 
+      _matched    = 0 ;
+      _npe        = 0;
+
       for(auto const& match : res) {
 	if (match.tpc_id == n){
 	  _matched = 1;
@@ -288,9 +294,13 @@ namespace larlite {
 	  _npe = flash.TotalPE();
 	}
       }
+
+	std::cout<<"Matched is now: "<<_matched<<"\n"<<std::endl ;
       _eff_tree->Fill();
     }// for all MCTracks
-      
+
+    if(_npts == 0 )
+      _eff_tree->Fill();
 
     return true;
   }
