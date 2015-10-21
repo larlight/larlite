@@ -19,6 +19,14 @@ namespace ertool_helper {
     , _pos(pos)
     , _mom(mom)
   {Approx();}
+
+  ParticleID::ParticleID(const int pdg,
+    const geoalgo::Vector& pos,
+    const geoalgo::Vector& mom)
+  : _pdg(pdg)
+  , _pos(pos.ToTLorentzVector())
+  , _mom(mom.ToTLorentzVector())
+  {Approx();}
   
   // Particle ID constructor from MCShower
   ParticleID::ParticleID(const ::larlite::mcshower& mcs)
