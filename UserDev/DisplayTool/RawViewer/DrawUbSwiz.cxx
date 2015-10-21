@@ -7,6 +7,8 @@
 #include "DataFormat/rawdigit.h"
 #include <fstream>
 
+#include "TStopwatch.h"
+
 namespace evd {
 
 DrawUbSwiz::DrawUbSwiz() {
@@ -127,6 +129,9 @@ void DrawUbSwiz::goToEvent(size_t e) {
 
 void DrawUbSwiz::readData() {
 
+  TStopwatch watch;
+  watch.Start();
+
   df.get_entry(_current_event);
 
   // std::cout << "Reading data\n";
@@ -143,14 +148,14 @@ void DrawUbSwiz::readData() {
   rmsByPlane.resize(geoService->Nviews());
   rmsByPlaneCorrected.clear();
   rmsByPlaneCorrected.resize(geoService->Nviews());
-  badWireMapByPlane.clear();
-  badWireMapByPlane.resize(geoService->Nviews());
+  wireStatusByPlane.clear();
+  wireStatusByPlane.resize(geoService->Nviews());
 
   for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
     pedestalByPlane.at(p).resize(geoService->Nwires(p));
     rmsByPlane.at(p).resize(geoService->Nwires(p));
     rmsByPlaneCorrected.at(p).resize(geoService->Nwires(p));
-    badWireMapByPlane.at(p).resize(geoService->Nwires(p));
+    wireStatusByPlane.at(p).resize(geoService->Nwires(p));
   }
 
 
@@ -163,7 +168,8 @@ void DrawUbSwiz::readData() {
   float rmsMinBadWire = 1.5 * 1.5;
   float rmsMaxBadWire = 100 * 100;
 
-  badWireMapByPlane.resize(geoService->Nplanes());
+  float init_time = watch.RealTime();
+  watch.Start();
 
   size_t digitSize = 9595;
 
@@ -177,8 +183,7 @@ void DrawUbSwiz::readData() {
     unsigned int wire = geoService->ChannelToWire(ch);
     unsigned int plane = geoService->ChannelToPlane(ch);
 
-    if (badWireMapByPlane.at(plane).size() < geoService -> Nwires(plane))
-      badWireMapByPlane.at(plane).resize(geoService->Nwires(plane));
+
 
     if (wire > geoService -> Nwires(plane))
       continue;
@@ -205,7 +210,7 @@ void DrawUbSwiz::readData() {
     int i = 0;
     // Calculate an rms here to spot bad wires
     float rms = 0.0;
-    // std::cout << "start: " << i_channel*digitSize << ", end " << (i_channel +1)*digitSize << std::endl;
+    // std::cout << "Start: " << i_channel*digitSize << ", end " << (i_channel +1)*digitSize << std::endl;
     for (size_t index = i_channel * digitSize; index < (i_channel + 1)*digitSize; index ++) {
       // _planeData.at(plane).at(offset + i) = adc;
       // std::cout << "Setting at plane " << plane << ", offset " << offset + i << " to " << adc.at(index) - ped << std::endl;
@@ -219,13 +224,26 @@ void DrawUbSwiz::readData() {
     // Store the rms for saving:
     rmsByPlane.at(plane).at(wire) = sqrt(rms);
 
-    if (rms < rmsMinBadWire || rms > rmsMaxBadWire)
-      badWireMapByPlane.at(plane).at(wire) = true;
+    if ( rms < rmsMinBadWire)
+      wireStatusByPlane.at(plane).at(wire) = kLowRMS;
+    else if ( rms > rmsMaxBadWire)
+      wireStatusByPlane.at(plane).at(wire) = kHighRMS;
+    else
+      wireStatusByPlane.at(plane).at(wire) = kNormal;
 
   }
 
+  float first_pass = watch.RealTime();
+  watch.Start();
   if (_correct_data || _save_data)
     correctData();
+
+  float second_pass = watch.RealTime();
+
+
+  std::cout << "Time to read data:    " << init_time  << std::endl;
+  std::cout << "Time to arrange data: " << first_pass << std::endl;
+  std::cout << "Time to clean data:   " << second_pass << std::endl;
 
   // std::cout << "_planeData.size() " << _planeData.size() << std::endl;
   // std::cout << "_planeData.at(0).at(0) " << _planeData.at(0).at(0) << std::endl;
@@ -401,8 +419,12 @@ void DrawUbSwiz::correctData() {
           // Loop over this block of wires and get the median value for that tick
           for (unsigned int wire = wireStart; wire < wireStart + stepSize.at(plane); wire ++) {
             // skip bad wires
-            if (badWireMapByPlane.at(plane)[wire]) continue;
             int offset = wire * detProp->ReadOutWindowSize();
+            if ( wireStatusByPlane.at(plane)[wire] != kNormal ) {
+              // For now, set the tick to zero:
+              _planeData.at(plane).at(offset + tick) = 0.0;
+              continue;
+            }
             // if (plane != 2)
             vals.push_back(_planeData.at(plane).at(offset + tick));
 
@@ -434,7 +456,7 @@ void DrawUbSwiz::correctData() {
             // Skip bad wires
             int offset = wire * detProp->ReadOutWindowSize();
 
-            if (badWireMapByPlane.at(plane)[wire]) {
+            if (wireStatusByPlane.at(plane)[wire] != kNormal) {
               rmsByPlaneCorrected.at(plane).at(wire)
               += pow((_planeData.at(plane).at(offset + tick)), 2);
               continue;
@@ -452,16 +474,7 @@ void DrawUbSwiz::correctData() {
           // Save the subtraction waveform:
           _subtractionWaveForm.at(plane).at(step).at(tick) = median;
 
-          // // Do a subtraction of the U plane wires with V plane values
-          // if(plane == 0) {
-          //   if ( step <= 7 || step >= 25-7) continue;
-          //   int U_wire = wireStart - 672;
 
-          //   for (unsigned int wire = U_wire; wire < U_wire + stepSize.at(plane); wire ++){
-          //     int offset = wire*detProp->ReadOutWindowSize();
-          //     _planeData.at(plane+1).at(offset + tick) += median;
-          //   }
-          // }
         } // loop over ticks
 
         // Now that the tick loop is finished, the wave form is finalized
