@@ -41,7 +41,9 @@ namespace evd {
    */
   class DrawUbSwiz :  public RawBase{
   
+
   public:
+    enum wireStatus {kNormal, kLowRMS, kHighRMS, kChirping, kNStatus};
 
     /// Default constructor
     DrawUbSwiz();
@@ -110,7 +112,7 @@ namespace evd {
     std::vector<std::vector<float> > rmsByPlane;
     std::vector<std::vector<float> > rmsByPlaneCorrected;
 
-    std::vector<std::vector<int  > > badWireMapByPlane;
+    std::vector<std::vector<wireStatus > > wireStatusByPlane;
 
     // int run, subrun, event;
 
