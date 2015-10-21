@@ -84,6 +84,10 @@ class livegui(gui):
         self._noiseFilterCheck.setTristate(False)
         self._noiseFilterCheck.stateChanged.connect(self.noiseFilterWorker)
 
+        self._reprocessButton = QtGui.QPushButton("Redraw")
+        self._reprocessButton.clicked.connect(self._event_manager.reprocessEvent)
+        self._reprocessButton.setToolTip("Force this event to redraw.")
+
         # This label tells the user that the event switching is on
         self._autoRunLabel = QtGui.QLabel("Event Update OFF")
         # This label is showing the delay between event updates
@@ -108,6 +112,7 @@ class livegui(gui):
         self._eastLayout.addWidget(label2)
         self._eastLayout.addStretch(1)
         self._eastLayout.addWidget(self._noiseFilterCheck)
+        self._eastLayout.addWidget(self._reprocessButton)
         self._eastLayout.addStretch(1)
 
         # Add the auto event switch stuff:
