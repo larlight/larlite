@@ -4,6 +4,7 @@
 #include "DataFormat/mctruth.h"
 #include "DataFormat/mcshower.h"
 #include "DataFormat/mctrack.h"
+#include "GeoAlgo/GeoVector.h"
 
 namespace ertool_helper {
 
@@ -17,6 +18,10 @@ namespace ertool_helper {
     ParticleID(const int pdg,
 	       const TLorentzVector& pos,
 	       const TLorentzVector& mom);
+
+    ParticleID(const int pdg,
+      const geoalgo::Vector& pos,
+      const geoalgo::Vector& mom);
     
     /// Particle ID constructor from MCShower
     ParticleID(const ::larlite::mcshower& mcs);
