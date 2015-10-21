@@ -660,6 +660,40 @@ namespace geoalgo {
   }
 
 
+  // Closest Approach between a Trajectory and a Trajectory
+  // loop over segments in trajectory1 and those in 
+  // trahectory2 and find the best point
+  double GeoAlgo::SqDist(const Trajectory_t& trj1, const Trajectory_t& trj2, Point_t& c1, Point_t& c2) const
+  {
+
+    // Make sure trajectory object is properly defined
+    if ( !trj1.size() or !trj2.size() )
+      throw GeoAlgoException("Trajectory object not properly set...");
+    
+    // Check dimensionality compatibility between point and trajectory
+    trj1.compat(trj2[0]);
+
+    // keep track of c1 & c2
+    Point_t c1min;
+    Point_t c2min;
+    // Now keep track of smallest distance and loop over traj segments
+    double distMin = kMAX_DOUBLE;
+
+    for (size_t l1=0; l1 < trj1.size()-1; l1++){
+      for (size_t l2=0; l2 < trj2.size()-1; l2++){
+	LineSegment_t segTmp1(trj1[l1], trj1[l1+1]);
+	LineSegment_t segTmp2(trj2[l2], trj2[l2+1]);
+	double distTmp = _SqDist_(segTmp1, segTmp2, c1min, c2min);
+	if ( distTmp < distMin ){
+	  c1 = c1min;
+	  c2 = c2min;
+	  distMin = distTmp;
+	}
+      }// for segments in trajectory 2
+    }//for all segments in trajectory 1
+    
+    return distMin;
+  }
 
   // Closest Approach between a HalfLine and a Trajectory
   // loop over segments in trajectory and find the one that
@@ -904,7 +938,7 @@ namespace geoalgo {
     Point_t pt1(lin1.Start().size());
     Point_t pt2(lin2.Start().size());
 
-    double IP = _SqDist_(lin1Back, lin2Back, pt1, pt2);
+    //double IP = _SqDist_(lin1Back, lin2Back, pt1, pt2);
     origin = (pt1+pt2)/2.;
 
     // If origin coincides with lin1 start
