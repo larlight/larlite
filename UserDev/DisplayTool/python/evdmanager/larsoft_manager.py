@@ -1,4 +1,4 @@
-from PyQt4 import QtCore
+from PyQt4 import QtCore, QtGui
 from event import manager, event
 from datatypes import wire
 # from ROOT import larlite as fmwk
@@ -7,7 +7,6 @@ from ROOT import evd
 class larsoft_manager(manager, wire, QtCore.QObject):
 
     eventChanged = QtCore.pyqtSignal()
-    processLockUpdate = QtCore.pyqtSignal(bool)
     runStarted = QtCore.pyqtSignal()
 
     """docstring for larsoft_manager"""
@@ -56,25 +55,19 @@ class larsoft_manager(manager, wire, QtCore.QObject):
 
     # override the functions from manager as needed here
     def next(self):
-        # print "Called next"
         # Check that this isn't the last event:
         if self._event < self._process.n_events() - 1:
             self.goToEvent(self._event + 1)
-        elif self._cycling:
-            self.goToEvent(0)
         else:
             print "On the last event, can't go to next."
 
     def prev(self):
         if self._event != 0:
             self.goToEvent(self._event - 1)
-        elif self._cycling:
-            self.goToEvent(self._process.n_events() - 1)
         else:
             print "On the first event, can't go to previous."
 
     def goToEvent(self, event):
-        # Don't attempt to run if the process is locked
         self.setEvent(event)
         self.processEvent()
         self.setRun(self._process.run())
@@ -105,13 +98,8 @@ class larsoft_manager(manager, wire, QtCore.QObject):
         if not self._hasFile:
             return
         if self._lastProcessed != self._event or force:
-            self.processLockUpdate.emit(True)
-            if self._type == "daq":
-                self._process.nextEvent()
-            else:
-                self._process.goToEvent(self._event)
+            self._process.goToEvent(self._event)
             self._lastProcessed = self._event
-            self.processLockUpdate.emit(False)
 
     def getPlane(self, plane):
         if self._hasFile:
@@ -123,3 +111,9 @@ class larsoft_manager(manager, wire, QtCore.QObject):
         else:
             return False
 
+    def setNoiseFilter(self, noiseFilterBool):
+        self._process.SetCorrectData(noiseFilterBool)
+
+    def reprocessEvent(self):
+        self.processEvent(True)
+        self.eventChanged.emit()
