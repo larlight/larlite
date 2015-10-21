@@ -15,6 +15,9 @@ namespace larlite {
             ::larutil::Geometry::GetME()->DetHalfHeight(),
             ::larutil::Geometry::GetME()->DetLength());
 
+    _n_total_events = 0;
+    _n_kept_events = 0;
+
     return true;
   }
   
@@ -27,6 +30,8 @@ namespace larlite {
       return false;
     }
     
+    _n_total_events++;
+
     bool ret = false;
     bool CC = false;
     bool nue = false;
@@ -49,14 +54,14 @@ namespace larlite {
     if(CC && nue){ret = true;} 
     else{ret = false;}
 
-    
+    if (ret) _n_kept_events++;
     return ret;  
     
 
   }
 
   bool MC_CCnue_Filter::finalize() {
-
+    std::cout<<_n_total_events<<" total events analyzed, "<<_n_kept_events<<" events passed MC_CCnue_Filter."<<std::endl;
   
     return true;
   }
