@@ -256,3 +256,8 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
             return True
         else:
             return False
+
+    def reprocessEvent(self):
+        print "Calling event process"
+        self.processEvent(True)
+        self.eventChanged.emit()
