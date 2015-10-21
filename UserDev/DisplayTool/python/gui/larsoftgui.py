@@ -14,18 +14,17 @@ class larsoftgui(gui):
         if manager is None:
             manager = larsoft_manager(geometry)
         super(larsoftgui, self).initManager(manager)
+        self._event_manager.eventChanged.connect(self.update)
+        self.toggleNoiseFilter.connect(self._event_manager.setNoiseFilter)
 
     # override the initUI function to change things:
     def initUI(self):
         super(larsoftgui, self).initUI()
 
 
-    def setManager(self, manager):
-        self._event_manager.eventChanged.connect(self.update)
-
     # override the update function for larsoft:
     def update(self):
-        # Set a lock to
+
         # set the text boxes correctly:
         eventLabel = "Ev: " + str(self._event_manager.event())
         self._eventLabel.setText(eventLabel)
@@ -58,7 +57,14 @@ class larsoftgui(gui):
         self._noiseFilterCheck.setToolTip(
             "Run the noise filter on data.  Runs slower and updates on next event.")
         self._noiseFilterCheck.setTristate(False)
+        # self._noiseFilterCheck.setChecked(True)
+        self.noiseFilterWorker()
         self._noiseFilterCheck.stateChanged.connect(self.noiseFilterWorker)
+
+        self._reprocessButton = QtGui.QPushButton("Redraw")
+        self._reprocessButton.clicked.connect(self._event_manager.reprocessEvent)
+        self._reprocessButton.setToolTip("Force this event to redraw.")
+
 
         self._eastWidget = QtGui.QWidget()
         # This is the total layout
@@ -68,8 +74,9 @@ class larsoftgui(gui):
         self._eastLayout.addWidget(label2)
         self._eastLayout.addStretch(1)
         self._eastLayout.addWidget(self._noiseFilterCheck)
+        self._eastLayout.addWidget(self._reprocessButton)
         self._eastLayout.addStretch(1)
-        
+
         # add it to the widget:
         self._eastLayout.addStretch(1)
 

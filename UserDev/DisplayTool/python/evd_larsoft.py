@@ -49,6 +49,7 @@ def main():
 
     thisgui = larsoftgui(geom, manager)
     thisgui.initUI()
+    thisgui.update()
     # manager.goToEvent(0)
 
     # thisgui.setWindowState(window.windowState() & ~QtCore.Qt.WindowMinimized | QtCore.Qt.WindowActive)
