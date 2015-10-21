@@ -55,6 +55,13 @@ namespace ertool_helper {
     Approx();
   }
 
+  void ParticleID::Reset(){
+    for(size_t i=0; i<4; ++i) {
+      _pos[i] = 0.;
+      _mom[i] = 0.;
+    }
+  }
+  
   void ParticleID::Approx()
   {
     for(size_t i=0; i<4; ++i) {
