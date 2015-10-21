@@ -129,19 +129,11 @@ void DrawUbSwiz::readData() {
 
   df.get_entry(_current_event);
 
+  // std::cout << "Reading data\n";
+
   // get the channel data:
   std::vector<short>  channel =  df.channel();
   std::vector<short>  adc = df.adc();
-
-  // std::cout << "adc.size() " << adc.size()  << "\n";
-  // std::cout << "channel.size() " << channel.size()  << "\n";
-
-
-  // std::cout << "adc[0]: " << adc[0] << "\n";
-  // std::cout << "adc[100]: " << adc[100] << "\n";
-  // std::cout << "adc[200]: " << adc[200] << "\n";
-  // std::cout << "adc[300]: " << adc[300] << "\n";
-
 
 
   // Initalize the space to hold the pedestal and RMS by Plane
@@ -175,13 +167,16 @@ void DrawUbSwiz::readData() {
 
   size_t digitSize = 9595;
 
-  size_t i_channel = 0;
-  for (auto const& ch : channel) {
-    // unsigned int ch = rawdigit.Channel();
-    if (ch >= 8254) continue;
+  for (size_t i_channel = 0; i_channel < channel.size(); i_channel ++) {
+    unsigned int ch = channel.at(i_channel);
+
+    if (ch >= 8254) {
+      continue;
+    }
 
     unsigned int wire = geoService->ChannelToWire(ch);
     unsigned int plane = geoService->ChannelToPlane(ch);
+
     if (badWireMapByPlane.at(plane).size() < geoService -> Nwires(plane))
       badWireMapByPlane.at(plane).resize(geoService->Nwires(plane));
 
@@ -227,7 +222,6 @@ void DrawUbSwiz::readData() {
     if (rms < rmsMinBadWire || rms > rmsMaxBadWire)
       badWireMapByPlane.at(plane).at(wire) = true;
 
-    i_channel ++;
   }
 
   if (_correct_data || _save_data)
@@ -262,15 +256,6 @@ void DrawUbSwiz::readData() {
 //   //
 //   //   std::cout << "Event ID: " << my_pmtfifo_v->event_id() << std::endl;
 //   //
-
-
-
-
-
-
-//   // This is an event viewer.  In particular, this handles raw wire signal drawing.
-//   // So, obviously, first thing to do is to get the wires.
-//   auto RawDigitHandle = storage->get_data<larlite::event_rawdigit>(producer);
 
 
 
