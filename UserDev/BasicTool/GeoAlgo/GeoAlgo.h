@@ -148,7 +148,17 @@ namespace geoalgo {
     /// LineSegment & Trajectory, don't keep track of points
     double SqDist(const LineSegment_t& seg, const Trajectory_t& trj) const
     { Point_t c1; Point_t c2; return SqDist(seg, trj, c1, c2); }
-    
+
+
+    //****************************************
+    //CLOSEST APPROACH BETWEEN TRACK AND TRACK
+    //****************************************
+    /// Trajectory & Trajectory, keep track of points
+    double SqDist(const Trajectory_t& trj1, const Trajectory_t& trj2, Point_t& c1, Point_t& c2) const;
+    /// Trajectory & Trajectory, don't keep track of points
+    double SqDist(const Trajectory_t& trj1, const Trajectory_t& trj2) const
+    { Point_t c1; Point_t c2; return SqDist(trj1, trj2, c1, c2); }
+
 
     //*****************************************************
     //CLOSEST APPROACH BETWEEN SEGMENT AND VECTOR OF TRACKS
