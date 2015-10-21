@@ -7,6 +7,13 @@ if len(sys.argv) < 2:
     sys.stderr.write(msg)
     sys.exit(1)
 
+if sys.argv[1] not in ['reco','mc']:
+	msg = '\n'
+	msg += 'Specify if you want to use "reco" or "mc" quantities in your first argument to this script!'
+	msg += '\n'
+	sys.stderr.write(msg)
+	sys.exit(1)
+
 from ROOT import gSystem
 from ROOT import larlite as fmwk
 from ROOT import ertool
@@ -21,15 +28,17 @@ from seltool.primarycosmicDef import GetPrimaryCosmicFinderInstance
 my_proc = fmwk.ana_processor()
 my_proc.enable_filter(True)
 
+use_reco = True if sys.argv[1] == 'reco' else False
+
 # Set input root file
-for x in xrange(len(sys.argv)-1):
-    my_proc.add_input_file(sys.argv[x+1])
+for x in xrange(len(sys.argv)-2):
+    my_proc.add_input_file(sys.argv[x+2])
 
 # Specify IO mode
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
-my_proc.set_ana_output_file("output/singleE_mu_selection.root")
+my_proc.set_ana_output_file("output/70KV/%s/singleE_numu_selection_%s.root"%(('actual_reco' if use_reco else 'perfect_reco'),('reco' if use_reco else 'mc')))
 
 # Get Default CCSingleE Algorithm instance
 # this information is loaded from:
@@ -138,6 +147,15 @@ numu_ana.SetTreeName("beamNuMu")
 numu_ana.SetECut(Ecut)
 
 numu_anaunit = fmwk.ExampleERSelection()
+numu_anaunit._mgr.ClearCfgFile()
+numu_anaunit._mgr.AddCfgFile('/uboone/app/users/kaleko/larlite/UserDev/SelectionTool/ERTool/dat/ertool_default%s.cfg'%('_reco' if use_reco else ''))
+
+if use_reco:
+	numu_anaunit.SetShowerProducer(False,'showerrecofuzzy')
+	numu_anaunit.SetTrackProducer(False,'stitchkalmanhitcc')
+else:
+	numu_anaunit.SetShowerProducer(True,'mcreco')
+	numu_anaunit.SetTrackProducer(True,'mcreco')
 numu_anaunit._mgr.AddAlgo(cos_algo)
 numu_anaunit._mgr.AddAlgo(cosmicprimary_algo)
 numu_anaunit._mgr.AddAlgo(cosmicsecondary_algo)
@@ -150,75 +168,17 @@ numu_anaunit._mgr._profile_mode = True
 
 numu_anaunit.SetMinEDep(Ecut)
 numu_anaunit._mgr._mc_for_ana = True
-numu_anaunit.SetShowerProducer(True,"mcreco")
-numu_anaunit.SetTrackProducer(True,"mcreco")
 
-
-# #cosmics 
-# Cosfilter = fmwk.MC_cosmic_Filter();
-
-# cos_ana = ertool.ERAnaLowEExcess()
-# cos_ana.SetTreeName("cosmicShowers")
-# #cos_ana.SetDebug(False)
-# cos_ana.SetECut(Ecut)
-
-# cos_anaunit = fmwk.ExampleERSelection()
-# cos_anaunit._mgr.AddAlgo(cos_algo)
-# cos_anaunit._mgr.AddAlgo(cosmicprimary_algo)
-# cos_anaunit._mgr.AddAlgo(cosmicsecondary_algo)
-# cos_anaunit._mgr.AddAlgo(cosmicorphanalgo)
-# cos_anaunit._mgr.AddAlgo(primary_algo)
-# cos_anaunit._mgr.AddAlgo(pid_algo)
-# cos_anaunit._mgr.AddAlgo(my_algo)
-# cos_anaunit._mgr.AddAna(cos_ana)
-# cos_anaunit._mgr._profile_mode = True
-
-# cos_anaunit.SetMinEDep(Ecut)
-# cos_anaunit._mgr._mc_for_ana = True
-# cos_anaunit.SetShowerProducer(True,"mcreco");
-# cos_anaunit.SetTrackProducer(True,"mcreco");
-
-
-# #dirt 
-# dirtfilter = fmwk.MC_dirt_Filter()
-
-# dirt_ana = ertool.ERAnaLowEExcess()
-# dirt_ana.SetTreeName("dirt")
-# #dirt_ana.SetDebug(False)
-# dirt_ana.SetECut(Ecut)
-
-# dirt_anaunit = fmwk.ExampleERSelection()
-# dirt_anaunit._mgr.AddAlgo(cos_algo)
-# dirt_anaunit._mgr.AddAlgo(cosmicprimary_algo)
-# dirt_anaunit._mgr.AddAlgo(cosmicsecondary_algo)
-# dirt_anaunit._mgr.AddAlgo(cosmicorphanalgo)
-# dirt_anaunit._mgr.AddAlgo(primary_algo)
-# dirt_anaunit._mgr.AddAlgo(pid_algo)
-# dirt_anaunit._mgr.AddAlgo(my_algo)
-# dirt_anaunit._mgr.AddAna(nue_ana)
-# dirt_anaunit._mgr._profile_mode = True
-
-# dirt_anaunit.SetMinEDep(Ecut)
-# dirt_anaunit._mgr._mc_for_ana = True
-# dirt_anaunit.SetShowerProducer(True,"mcreco")
-# dirt_anaunit.SetTrackProducer(True,"mcreco")
 
 
 # Add MC filter and analysis unit
 # to the process to be run
 
-#my_proc.add_process(nuefilter)
-#my_proc.add_process(nue_anaunit)
 my_proc.add_process(numufilter)
 my_proc.add_process(numu_anaunit)
-#my_proc.add_process(ncfilter)
-#my_proc.add_process(nc_anaunit)
-#my_proc.add_process(Cosfilter)
-#my_proc.add_process(cos_anaunit)
-#my_proc.add_process(dirtfilter)
-#my_proc.add_process(dirt_anaunit)
+
 my_proc.run()
-#my_proc.run(0,500)
+# my_proc.run(0,500)
 
 # done!
 print
