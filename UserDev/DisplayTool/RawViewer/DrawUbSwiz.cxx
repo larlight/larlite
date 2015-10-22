@@ -172,6 +172,7 @@ void DrawUbSwiz::readData() {
   watch.Start();
 
   size_t digitSize = 9595;
+  int nPedPoints = 200;
 
   for (size_t i_channel = 0; i_channel < channel.size(); i_channel ++) {
     unsigned int ch = channel.at(i_channel);
@@ -192,7 +193,6 @@ void DrawUbSwiz::readData() {
     // convert short ADCs to float
 
     // Get the pedestal for this channel:
-    int nPedPoints = 500;
     std::vector<float> pedestal;
     pedestal.resize(nPedPoints);
 
@@ -241,9 +241,9 @@ void DrawUbSwiz::readData() {
   float second_pass = watch.RealTime();
 
 
-  std::cout << "Time to read data:    " << init_time  << std::endl;
-  std::cout << "Time to arrange data: " << first_pass << std::endl;
-  std::cout << "Time to clean data:   " << second_pass << std::endl;
+  // std::cout << "Time to read data:    " << init_time  << std::endl;
+  // std::cout << "Time to arrange data: " << first_pass << std::endl;
+  // std::cout << "Time to clean data:   " << second_pass << std::endl;
 
   // std::cout << "_planeData.size() " << _planeData.size() << std::endl;
   // std::cout << "_planeData.at(0).at(0) " << _planeData.at(0).at(0) << std::endl;
