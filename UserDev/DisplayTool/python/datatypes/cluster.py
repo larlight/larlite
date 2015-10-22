@@ -2,6 +2,7 @@ from data import recoBase
 from PyQt4 import QtGui, QtCore
 from connectedObjects import connectedBox, connectedCircle, boxCollection
 from ROOT import evd
+import pyqtgraph as pg
 
 
 class clusterParams(QtCore.QObject):  # recoBase):
