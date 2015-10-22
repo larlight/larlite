@@ -737,9 +737,24 @@ namespace larlite {
   }
 
   TLorentzVector ERToolHelper::getXShift(const mctrack& mct) const {
+   
     // Calculates for each mc track, based on the time of the event, the corresponding shift in x-direction
     TLorentzVector shift;
-    double event_time = mct.End().T();
+    
+    //Check if track as no energy deposition points in the detector, return 0 or something if so
+    if (!mct.size()){
+    	//Beware: this block is satisfied a LOT for cosmics events.
+    	//Any cosmic that doesn't go through the detector has a Start() and End() point, but has zero size.
+    	//Hopefully setting the xshift as zero means we won't shift the cosmic INTO the detector,
+    	//So this should be fine.
+    	shift.SetXYZT(0., 0., 0., 0.);
+    	return shift;
+    }
+
+	// double event_time = mct.End().T();
+    ///Use first energy deposition point in the detector, because for cosmics,
+    ///Start().T() is way in the upper atmosphere, End().T() is at bottom of world volume
+    double event_time = mct.at(0).T(); 
     double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
     shift.SetXYZT(shift_x, 0., 0., 0.);
     
@@ -749,7 +764,20 @@ namespace larlite {
   TLorentzVector ERToolHelper::getXShift(const mcshower& mcs) const {
     // Calculates for each mc shower, based on the time of the event, the corresponding shift in x-direction
     TLorentzVector shift;
-    double event_time = mcs.End().T();
+
+    //Check if mcshower has no energy deposition points in the detector
+    // (it seems mcshower.DetProfile().T() is 1e308 when there are none ... this should be initialized better)
+    // consider this a hotfix!
+    if(abs(mcs.DetProfile().T()) > 1e10  || abs(mcs.DetProfile().T()) < 1e-10){
+    	//Beware: this block is satisfied a LOT for cosmics events.
+    	//Any mcshower (from a cosmic) that doesn't go through the detector has a Start() and End() point,
+    	//but has a weirdly undefined DetProfile(), which I try to identify with the above if() statement.
+    	//Hopefully setting the xshift as zero means we won't shift the cosmic INTO the detector,
+    	//So this should be fine.
+    	shift.SetXYZT(0., 0., 0., 0.);
+    	return shift;
+    }
+    double event_time = mcs.DetProfile().T();//End().T(); <--- old usage (wrong)
     double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
     shift.SetXYZT(shift_x, 0., 0., 0.);
     
