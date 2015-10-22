@@ -2,7 +2,7 @@ import sys, os
 
 if len(sys.argv) < 2:
     msg  = '\n'
-    msg += "Usage 1: %s ['reco' or 'mc'] $INPUT_ROOT_FILE\n" % sys.argv[0]
+    msg += "Usage 1: %s $INPUT_ROOT_FILE\n" % sys.argv[0]
     msg += '\n'
     sys.stderr.write(msg)
     sys.exit(1)
@@ -84,7 +84,7 @@ nue_ana.SetECut(Ecut)
 
 nue_anaunit = fmwk.ExampleERSelection()
 nue_anaunit._mgr.ClearCfgFile()
-nue_anaunit._mgr.AddCfgFile('/uboone/app/users/kaleko/larlite/UserDev/SelectionTool/ERTool/dat/ertool_default%s.cfg'%('_reco' if use_reco else ''))
+nue_anaunit._mgr.AddCfgFile(os.environ['LARLITE_USERDEVDIR']+'/SelectionTool/ERTool/dat/ertool_default%s.cfg'%('_reco' if use_reco else ''))
 
 if use_reco:
 	nue_anaunit.SetShowerProducer(False,'showerrecofuzzy')
@@ -104,6 +104,8 @@ nue_anaunit._mgr._profile_mode = True
 
 nue_anaunit.SetMinEDep(Ecut)
 nue_anaunit._mgr._mc_for_ana = True
+
+
 
 # Add MC filter and analysis unit
 # to the process to be run
