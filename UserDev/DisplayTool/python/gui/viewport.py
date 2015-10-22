@@ -61,7 +61,6 @@ class viewport(pg.GraphicsLayoutWidget):
     self._upperLevel.setText(str(self._geometry.getLevels(self._plane)[1]))
 
 
-
     # Fix the maximum width of the widgets:
     self._upperLevel.setMaximumWidth(35)
     self._cmap.setMaximumWidth(25)
@@ -150,10 +149,11 @@ class viewport(pg.GraphicsLayoutWidget):
       wire = int( self._lastPos.x())
       # get the data from the plot:
       data = self._item.image
-      wireData = data[wire]
-      self._wdf(wireData)
+      self._wireData = data[wire]
+      self._wdf(self._wireData)
       # print "Plane: " + str(self._plane) + ", Wire: " + str(wire)
       # return self.plane,self.wire
+
 
   def connectWireDrawingFunction(self,func):
     self._wdf = func

@@ -2,17 +2,16 @@
 
 import sys, signal
 import argparse
-import collections
+# import collections
 from PyQt4 import QtGui, QtCore
 import pyqtgraph as pg
 import numpy as np
 
+import evdmanager 
+
 # Import the class that manages the view windows
 from viewport import viewport
 
-# Import the basic event management class
-from event import event
-from PyQt4 import QtCore
 
 class view_manager(QtCore.QObject):
   """This class manages a collection of viewports"""
@@ -36,7 +35,7 @@ class view_manager(QtCore.QObject):
     self._selectedPlane = -1
 
     self._autoRange = False
-
+    self._wireData = None
 
   def addEvdDrawer(self,plane):
     self._drawerList.append(viewport(self._geometry, plane))
@@ -165,7 +164,21 @@ class view_manager(QtCore.QObject):
       return
     else:
       # set the display to show the wire:
-      self._wirePlotItem.setData(wireData)
+      self._wireData = wireData
+      self._wirePlotItem.setData(self._wireData)
+      # if axisData is not None:
+      #   self._wirePlotItem.setData(axisData,wireData)
+      # else:
+
+
+  def plotFFT(self):
+    # Take the fft of wire data and plot it in place of the wire signal
+    if self._wireData is None:
+      return
+    fft = np.fft.rfft(self._wireData)
+    freqs = np.fft.rfftfreq(len(self._wireData),0.5E-3)
+    self._wirePlotItem.setData(freqs,np.absolute(fft))
+    return
 
   def getViewPorts(self):
     return self._drawerList
@@ -173,16 +186,20 @@ class view_manager(QtCore.QObject):
 
 class gui(QtGui.QWidget):
 
-  def __init__(self, geometry,manager):
+  def __init__(self, geometry):
     super(gui, self).__init__()
 
     # initUI should not do ANY data handling, it should only get the interface loaded
     self._geometry = geometry
-    self._event_manager = manager
     self._view_manager = view_manager(geometry)
+    # self.setStyleSheet("background-color:rgb(230,230,230);")
+
+  def initManager(self,manager=None):
+    if manager is None:
+      manager = evdmanager.manager(self._geometry)
+    self._event_manager = manager
     self._event_manager.connectGui(self)
     self._event_manager.connectViewManager(self._view_manager)
-    # self.setStyleSheet("background-color:rgb(230,230,230);")
 
   def closeEvent(self, event):
     self.quit()  
@@ -310,6 +327,10 @@ class gui(QtGui.QWidget):
     self._makePathButton.setToolTip("Compute the ADCs along the path defined by the points")
     self._makePathButton.clicked.connect(self.drawIonizationWorker)
 
+    self._fftButton = QtGui.QPushButton("FFT Wire")
+    self._fftButton.setToolTip("Compute and show the FFT of the wire currently drawn")
+    self._fftButton.clicked.connect(self._view_manager.plotFFT)
+
 
     # Pack the stuff into a layout
 
@@ -318,6 +339,7 @@ class gui(QtGui.QWidget):
     self._drawingControlBox.addWidget(self._maxRangeButton)
     self._drawingControlBox.addWidget(self._clearPointsButton)
     self._drawingControlBox.addWidget(self._makePathButton)
+    self._drawingControlBox.addWidget(self._fftButton)
     self._drawingControlBox.addWidget(self._autoRangeBox)
     self._drawingControlBox.addWidget(self._lockAspectRatio)
     self._drawingControlBox.addWidget(self._drawWireOption)
@@ -536,10 +558,12 @@ class gui(QtGui.QWidget):
     # ask the view manager to draw the planes:
     self._view_manager.drawPlanes(self._event_manager)
 
+
     self.setGeometry(0, 0, 2400, 1600)
     self.setWindowTitle('Event Display')    
     self.setFocus()
     self.show()
+    self._view_manager.setRangeToMax()
 
   def keyPressEvent(self,e):
     if e.key() == QtCore.Qt.Key_N:

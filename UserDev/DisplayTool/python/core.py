@@ -1,13 +1,11 @@
 #!/usr/bin/env python
-from gui import larsoftgui
+
 import argparse
 import sys
-import signal
 from PyQt4 import QtGui, QtCore
-
-from ROOT import evd
-
-from evdmanager import geometry, larsoft_manager
+import evdmanager
+import gui
+import signal
 
 
 def sigintHandler(*args):
@@ -15,11 +13,9 @@ def sigintHandler(*args):
     sys.stderr.write('\r')
     sys.exit()
 
-
 def main():
 
     parser = argparse.ArgumentParser(description='Python based event display.')
-    parser.add_argument('file', nargs='?', help="Optional input file to use")
     geom = parser.add_mutually_exclusive_group()
     geom.add_argument('-A', '-a', '--argoneut',
                       action='store_true',
@@ -30,31 +26,31 @@ def main():
     geom.add_argument('-L', '-l', '--lariat',
                       action='store_true',
                       help="Run with the lariat geometry")
+    parser.add_argument('file', nargs='*', help="Optional input file to use")
+
     args = parser.parse_args()
 
     app = QtGui.QApplication(sys.argv)
 
-    if args.argoneut:
-        geom = geometry.argoneut()
+    if args.uboone:
+        geom = evdmanager.microboone()
     elif args.lariat:
-        geom = geometry.lariat()
+        geom = evdmanager.lariat()
     else:
-        geom = geometry.microboone()
+        geom = evdmanager.argoneut()
 
     # If a file was passed, give it to the manager:
 
-    manager = larsoft_manager(geom)
-    manager.setInputFile(args.file)
 
-
-    thisgui = larsoftgui(geom, manager)
+    thisgui = gui.gui(geom)
+    thisgui.initManager()
     thisgui.initUI()
-    thisgui.update()
-    # manager.goToEvent(0)
 
-    # thisgui.setWindowState(window.windowState() & ~QtCore.Qt.WindowMinimized | QtCore.Qt.WindowActive)
-    thisgui.raise_()
-    thisgui.activateWindow()
+    # manager = larlite_manager(geom)
+    # manager.setInputFiles(args.file)
+
+
+    # manager.goToEvent(0)
 
     signal.signal(signal.SIGINT, sigintHandler)
     timer = QtCore.QTimer()
@@ -63,7 +59,6 @@ def main():
 
     app.exec_()
     # sys.exit(app.exec_())
-
 
 if __name__ == '__main__':
     main()
