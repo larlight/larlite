@@ -74,6 +74,7 @@ namespace geoalgo {
     Vector Cross (const Vector &obj) const; /// Compute a cross product of two vectors
     double Angle (const Vector &obj) const; /// Compute an opening angle w.r.t. the given vector
 
+    TLorentzVector ToTLorentzVector() const; ///< Convert geovector to TLorentzVector (with 4th element set equal to 0)
 
     /// Dimensional check for a compatibility
     void compat(const Vector& obj) const;
