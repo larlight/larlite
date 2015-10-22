@@ -84,6 +84,12 @@ namespace geoalgo {
     return _Angle_(obj);
   }
   
+  TLorentzVector Vector::ToTLorentzVector() const {
+    if(size()!=3)
+      throw GeoAlgoException("<<ToTLorentsVector>> only possible for 3-dimensional vectors!");
+    return TLorentzVector((*this)[0],(*this)[1],(*this)[2],0.);
+  }
+
   void Vector::Normalize() { (*this) /= this->Length(); }
 
   Vector Vector::Dir() const {
