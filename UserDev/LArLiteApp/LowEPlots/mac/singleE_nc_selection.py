@@ -85,7 +85,7 @@ nc_ana.SetECut(Ecut)
 
 nc_anaunit = fmwk.ExampleERSelection()
 nc_anaunit._mgr.ClearCfgFile()
-nc_anaunit._mgr.AddCfgFile('/uboone/app/users/kaleko/larlite/UserDev/SelectionTool/ERTool/dat/ertool_default%s.cfg'%('_reco' if use_reco else ''))
+nc_anaunit._mgr.AddCfgFile(os.environ['LARLITE_USERDEVDIR']+'/SelectionTool/ERTool/dat/ertool_default%s.cfg'%('_reco' if use_reco else ''))
 
 if use_reco:
 	nc_anaunit.SetShowerProducer(False,'showerrecofuzzy')

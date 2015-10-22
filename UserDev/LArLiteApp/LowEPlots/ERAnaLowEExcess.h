@@ -21,6 +21,7 @@
 #include "TH2F.h"
 #include <string>
 #include "DataFormat/mctruth.h"
+// #include "ERToolBackend/ParticleID.h"
 #include "../../LArLiteApp/fluxRW/fluxRW.h"
 #include "GeoAlgo/GeoAABox.h"
 #include "LArUtil/Geometry.h"
@@ -78,7 +79,14 @@ namespace ertool {
     double _e_dep;        /// Neutrino energy
     double _weight;
     int _numEvts;
-    int _neutrinos;
+    bool _is_fiducial;
+    int _parentPDG; /// true PDG of parent of the electron (only for running on MC)
+    int _mcPDG; /// true PDG of "single electron" (probably 11 or 22)
+    double _longestTrackLen; /// longest track associated with the reconstructed neutrino
+    double _x_vtx; /// Neutrino vertex point
+    double _y_vtx;
+    double _z_vtx;
+
 
     // prepare TTree with variables
     void PrepareTreeVariables();
@@ -87,8 +95,8 @@ namespace ertool {
 
     ::fluxRW _fluxRW;
 
-
-
+    // ertool_helper::ParticleID singleE_particleID;
+    ertool::Shower singleE_shower;
   };
 }
 #endif

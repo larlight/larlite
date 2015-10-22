@@ -74,70 +74,6 @@ cos_algo = GetTrackDresserInstance()
 #Do not change this value unless you know what you are doing.
 Ecut = 50 # in MeV
 
-# ***************  Set Producers  ****************
-# First Argument: True = MC, False = Reco
-#my_anaunit.SetShowerProducer(True,"mcreco");
-#my_anaunit.SetShowerProducer(False,"showerreco");
-#my_anaunit.SetShowerProducer(False,"newdefaultreco");
-#my_anaunit.SetShowerProducer(False,"pandoraNuShower");
-#my_anaunit.SetShowerProducer(False,"mergeall");
-
-#my_anaunit.SetTrackProducer(True,"mcreco");
-#my_anaunit.SetTrackProducer(False,"stitchkalmanhit");
-#my_anaunit.SetTrackProducer(False,"costrk");
-#my_anaunit.SetVtxProducer(True,"generator");
-# ************************************************
-
-
-
-# #nueCC beam
-# nuefilter = fmwk.MC_CCnue_Filter()
-
-# nue_ana = ertool.ERAnaLowEExcess()
-# nue_ana.SetTreeName("beamNuE")
-# #nue_ana.SetDebug(False)
-# nue_ana.SetECut(Ecut)
-
-# nue_anaunit = fmwk.ExampleERSelection()
-# nue_anaunit._mgr.AddAlgo(cos_algo)
-# nue_anaunit._mgr.AddAlgo(cosmicprimary_algo)
-# nue_anaunit._mgr.AddAlgo(cosmicsecondary_algo)
-# nue_anaunit._mgr.AddAlgo(cosmicorphanalgo)
-# nue_anaunit._mgr.AddAlgo(primary_algo)
-# nue_anaunit._mgr.AddAlgo(pid_algo)
-# nue_anaunit._mgr.AddAlgo(my_algo)
-# nue_anaunit._mgr.AddAna(nue_ana)
-# nue_anaunit._mgr._profile_mode = True
-
-# nue_anaunit.SetMinEDep(Ecut)
-# nue_anaunit._mgr._mc_for_ana = True
-# nue_anaunit.SetShowerProducer(True,"mcreco")
-# nue_anaunit.SetTrackProducer(True,"mcreco")
-
-# #NC beam
-# ncfilter = fmwk.MC_NC_Filter()
-
-# nc_ana = ertool.ERAnaLowEExcess()
-# nc_ana.SetTreeName("beamNC")
-# #nc_ana.SetDebug(False)
-# nc_ana.SetECut(Ecut)
-
-# nc_anaunit = fmwk.ExampleERSelection()
-# nc_anaunit._mgr.AddAlgo(cos_algo)
-# nc_anaunit._mgr.AddAlgo(cosmicprimary_algo)
-# nc_anaunit._mgr.AddAlgo(cosmicsecondary_algo)
-# nc_anaunit._mgr.AddAlgo(cosmicorphanalgo)
-# nc_anaunit._mgr.AddAlgo(primary_algo)
-# nc_anaunit._mgr.AddAlgo(pid_algo)
-# nc_anaunit._mgr.AddAlgo(my_algo)
-# nc_anaunit._mgr.AddAna(nue_ana)
-# nc_anaunit._mgr._profile_mode = True
-
-# nc_anaunit.SetMinEDep(Ecut)
-# nc_anaunit._mgr._mc_for_ana = True
-# nc_anaunit.SetShowerProducer(True,"mcreco")
-# nc_anaunit.SetTrackProducer(True,"mcreco")
-
 #numuCC beam
 numufilter = fmwk.MC_CCnumu_Filter()
 
@@ -148,7 +84,7 @@ numu_ana.SetECut(Ecut)
 
 numu_anaunit = fmwk.ExampleERSelection()
 numu_anaunit._mgr.ClearCfgFile()
-numu_anaunit._mgr.AddCfgFile('/uboone/app/users/kaleko/larlite/UserDev/SelectionTool/ERTool/dat/ertool_default%s.cfg'%('_reco' if use_reco else ''))
+numu_anaunit._mgr.AddCfgFile(os.environ['LARLITE_USERDEVDIR']+'/SelectionTool/ERTool/dat/ertool_default%s.cfg'%('_reco' if use_reco else ''))
 
 if use_reco:
 	numu_anaunit.SetShowerProducer(False,'showerrecofuzzy')

@@ -82,7 +82,7 @@ cos_ana.SetECut(Ecut)
 
 cos_anaunit = fmwk.ExampleERSelection()
 cos_anaunit._mgr.ClearCfgFile()
-cos_anaunit._mgr.AddCfgFile('/uboone/app/users/kaleko/larlite/UserDev/SelectionTool/ERTool/dat/ertool_default%s.cfg'%('_reco' if use_reco else ''))
+cos_anaunit._mgr.AddCfgFile(os.environ['LARLITE_USERDEVDIR']+'/SelectionTool/ERTool/dat/ertool_default%s.cfg'%('_reco' if use_reco else ''))
 
 if use_reco:
     cos_anaunit.SetShowerProducer(False,'showerrecofuzzy')
