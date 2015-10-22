@@ -55,6 +55,8 @@ void DataFetcher::get_entry(unsigned int entry) {
   channel_.clear();
   pedestal_.clear();
 
+  adc_.reserve(9595*8256);
+
   // Set to get the
   tree_ -> SetMakeClass(1);
   TBranchElement * b_raw__DAQHeader_daq__Swizzler_obj_fRun
@@ -86,6 +88,7 @@ void DataFetcher::get_entry(unsigned int entry) {
     adc_rows_ = 0;
     adc_cols_ = 0;
     for (size_t j = 0; j < adc_branch.entries(); ++j) {
+
       const std::vector<short> *
       adc_ptr = adc_branch.get< std::vector<short> >(j);
       adc_.insert(adc_.end(), adc_ptr->begin(), adc_ptr->end());
@@ -97,21 +100,28 @@ void DataFetcher::get_entry(unsigned int entry) {
     TreeElementReader channel_branch(tree_, name + "obj.fChannel");
     if (!channel_branch.ok()) continue;
 
+
     for (size_t j = 0; j < channel_branch.entries(); ++j) {
       const uint32_t * channel_ptr = channel_branch.get<uint32_t>(j);
       channel_.push_back(* channel_ptr);
     }
 
-    TreeElementReader pedestal_branch(tree_, name + "obj.fPedestal");
-    if (!pedestal_branch.ok()) continue;
+    // TreeElementReader pedestal_branch(tree_, name + "obj.fPedestal");
+    // if (!pedestal_branch.ok()) continue;
 
-    for (size_t j = 0; j < pedestal_branch.entries(); ++j) {
-      const double * pedestal_ptr = pedestal_branch.get<double>(j);
-      pedestal_.push_back(* pedestal_ptr);
-    }
+    // for (size_t j = 0; j < pedestal_branch.entries(); ++j) {
+    //   const double * pedestal_ptr = pedestal_branch.get<double>(j);
+    //   pedestal_.push_back(* pedestal_ptr);
+    //   if (j == 63){
+    //     std::cout <<  * pedestal_ptr << std::endl;
+    //   }
+    //   if (j == 12){
+    //     std::cout <<  * pedestal_ptr << std::endl;
+    //   }
+    // }
 
-    TreeElementReader pedestal_sigma_branch(tree_, name + "obj.fSigma");
-    if (!pedestal_sigma_branch.ok()) continue;
+    // TreeElementReader pedestal_sigma_branch(tree_, name + "obj.fSigma");
+    // if (!pedestal_sigma_branch.ok()) continue;
   }
 
 
