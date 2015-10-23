@@ -13,6 +13,9 @@ namespace larlite {
     _name="MMQuality"; 
     _fout=0;
 
+    _mc_energy_min = 1;
+    _mc_energy_max = 1000000;
+    
     fClusterProducer = "";
     fShowerProducer  = "";
     
@@ -162,37 +165,39 @@ namespace larlite {
     */
 
     // Create G4 track ID vector for which we are interested in
-    std::vector<unsigned int> g4_trackid_v;
+    std::vector<std::vector<unsigned int> > g4_trackid_v;
     std::vector<unsigned int> mc_index_v;
     g4_trackid_v.reserve(ev_mcs->size());
     for(size_t mc_index=0; mc_index<ev_mcs->size(); ++mc_index) {
       auto const& mcs = (*ev_mcs)[mc_index];
       auto energy = mcs.DetProfile().E();
       if( _mc_energy_min < energy && energy < _mc_energy_max ) {
-	g4_trackid_v.push_back(mcs.TrackID());
+	g4_trackid_v.push_back(mcs.DaughterTrackID());
 	mc_index_v.push_back(mc_index);
       }
+    }
+
+    if(g4_trackid_v.empty()) {
+      print(msg::kWARNING,__FUNCTION__,"No MCShower above cut energy value. Skipping an event...");
+      return true;
     }
 
     if(!fBTAlg.BuildMap(g4_trackid_v, *ev_simch, *ev_hit, ass_hit_v)) {
       print(msg::kERROR,__FUNCTION__,"Failed to build back-tracking map for MC...");
       return false;
     }
-    if(g4_trackid_v.empty()) {
-      print(msg::kWARNING,__FUNCTION__,"No MCShower above cut energy value. Skipping an event...");
-      return true;
-    }
     
     auto geo = larutil::Geometry::GetME();
 
     // Fill cluster quality plots
-    for(size_t mcs_index=0; mcs_index<ev_mcs->size(); ++mcs_index) {
+    for(size_t mcs_index=0; mcs_index<mc_index_v.size(); ++mcs_index) {
 
       for(size_t plane = 0; plane < geo->Nplanes(); ++plane) {
 
 	auto const ep = fBTAlg.BestClusterEP(mcs_index,plane);
 
-	if( ep.first==0 && ep.second==0 ) continue;
+	if( ep.first==0 && ep.second==0 )
+	  continue;
 
 	vShowerClusterEff[plane]->Fill(ep.first);
 	vShowerClusterPur[plane]->Fill(ep.second);
@@ -203,7 +208,7 @@ namespace larlite {
 
     // If this is not for 3D shower comparison, return
     if(fShowerProducer.empty()) return true;
-
+    std::cout<<"Looking at shower..."<<std::endl;
     auto const& ass_cluster_v = storage->find_one_ass(ev_shower->id(),ev_cluster,ev_shower->name());
 
     for(size_t shower_index=0; shower_index < ass_cluster_v.size(); ++shower_index) {

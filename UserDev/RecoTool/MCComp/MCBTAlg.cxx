@@ -83,7 +83,6 @@ namespace btutil {
 	  }
 	  
 	  if(ide_trk_id < (int)(_trkid_to_index.size())){
-	    std::cout<<index<<" : "<<_trkid_to_index.size()<<std::endl;
 	    index = _trkid_to_index[ide_trk_id];
 	  }
 	  if(_num_parts <= index) {
