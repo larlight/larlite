@@ -1,5 +1,5 @@
 /**
- * \file ShowerQuality.h
+ * \file ShowerQuality_multishowers.h
  *
  * \ingroup ShowerReco3D
  * 
@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef LARLITE_SHOWERQUALITY_OLDWAY_H
-#define LARLITE_SHOWERQUALITY_OLDWAY_H
+#ifndef LARLITE_SHOWERQUALITY_MULTISHOWERS_H
+#define LARLITE_SHOWERQUALITY_MULTISHOWERS_H
 
 #include <TH1D.h>
 #include <TH2D.h>
@@ -29,15 +29,15 @@ namespace larlite {
      \class ShowerQuality_oldway
      User custom analysis class made by kazuhiro
    */
-  class ShowerQuality_oldway : public ana_base{
+  class ShowerQuality_multishowers : public ana_base{
   
   public:
 
     /// Default constructor
-    ShowerQuality_oldway();
+    ShowerQuality_multishowers();
 
     /// Default destructor
-    virtual ~ShowerQuality_oldway(){};
+    virtual ~ShowerQuality_multishowers(){};
 
     /**
        Setter function for a shower producer name.
@@ -51,23 +51,23 @@ namespace larlite {
     /// Set minimum energy for MCShowers to be considered
     void SetMinEnergyCut(const double energy) { _mc_energy_min = energy; }
 
-    /** IMPLEMENT in ShowerQuality_oldway.cc!
+    /** IMPLEMENT in ShowerQuality_multishowers.cc!
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in ShowerQuality_oldway.cc! 
+    /** IMPLEMENT in ShowerQuality_multishowers.cc! 
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in ShowerQuality_oldway.cc! 
+    /** IMPLEMENT in ShowerQuality_multishowers.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
 
     /// set whether to fill quality info per MC or per reco shower
-    void setMCShowerQuality_oldway(bool on) { _mcShowerQuality = on; }
+    void setMCShowerQuality_multishowers(bool on) { _mcShowerQuality = on; }
 
   protected:
 
