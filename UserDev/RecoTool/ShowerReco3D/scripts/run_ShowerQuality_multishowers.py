@@ -23,20 +23,19 @@ for x in xrange(len(sys.argv)):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify analysis output root file name
-my_proc.set_ana_output_file("ShowerQuality_singleshowers_ana_out.root");
+my_proc.set_ana_output_file("ShowerQuality_multishowers_ana_out.root");
 
 # Specify data output root file name
 my_proc.set_output_file('')
 
 # Create analysis unit
-sq_module = fmwk.ShowerQuality_singleshowers()
+sq_module = fmwk.ShowerQuality_multishowers()
 #sq_module.setMCShowerQuality(True)
 sq_module.SetShowerProducer("showerrecofuzzy")
 #sq_module.SetShowerProducer("showermergeall")
 
 sq_module.SetMaxEnergyCut(99999999.)
 sq_module.SetMinEnergyCut(0.)
-sq_module.SetSingleParticleQuality(True)
 my_proc.add_process(sq_module)
 
 print
