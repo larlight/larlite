@@ -344,10 +344,10 @@ namespace ertool {
 
     res += " MeV ";
 
-    if(p.ProcessType() == kUnknown)
-      res += "--> Process unknown\n" ;
+    if(p.Primary() == true)
+      res += "--> Particle Primary\n" ;
     else
-      res += "--> Process " + std::to_string(p.ProcessType() ) + "\n";
+      res += "--> Particle not Primary\n";
     
     prefix += "  ";
     for(auto const& c : p.Children()) Diagram(c,res,prefix);

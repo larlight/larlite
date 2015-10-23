@@ -34,7 +34,7 @@ namespace cmtool {
     if(_require_3planes && clusters.size()==2) return -1;
     // Code-block by Kazu ends
 
-    double ratio               = 1;
+    double ratio               = 0;
     double time_difference     = 0;
     double max_time_difference = 0;
     double max_charge          = 0;
@@ -73,7 +73,7 @@ namespace cmtool {
       
     }
 
-    ratio        = 1;
+    ratio        = 0;
     charge_ratio = 1;
     for(size_t c_index=0; c_index<clusters.size(); ++c_index) {
       auto const& c = clusters[c_index];
@@ -100,13 +100,9 @@ namespace cmtool {
       
       time_difference  = end_t - start_t ; 
       
-      ratio *= time_difference/max_time_difference ;
-      
+      ratio += time_difference/max_time_difference ;
       charge_ratio = max_hits_2 / max_hits_1;// charge/max_charge ;
 
-      if(c_index==(clusters.size()-1))
-        ratio *= charge_ratio ;
-      
       //If current cluster's start time is not within some range of the previous cluster's start time,
       //modify ratio to disallow matching
       
@@ -136,6 +132,9 @@ namespace cmtool {
       } 
       
     }
+
+    ratio /= clusters.size() ;
+    ratio *= charge_ratio ;
     
     if(_verbose && ratio> _time_ratio_cut)
       std::cout<<"**************************FOUND A MATCH . ratio is: "<<ratio<<"\n\n\n"<<std::endl;

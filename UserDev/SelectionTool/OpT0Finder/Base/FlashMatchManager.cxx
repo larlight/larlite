@@ -11,6 +11,7 @@ namespace flashana {
   FlashMatchManager::FlashMatchManager()
     : _alg_flash_filter(nullptr)
     , _alg_tpc_filter(nullptr)
+    , _alg_match_prohibit(nullptr)
     , _alg_flash_match(nullptr)
   {
     _allow_reuse_flash = true;
@@ -28,6 +29,10 @@ namespace flashana {
       // Flash filter
     case kFlashFilter:
       _alg_flash_filter = (BaseFlashFilter*)alg; break;
+
+      // Match prohibit algo
+    case kMatchProhibit:
+      _alg_match_prohibit = (BaseProhibitAlgo*)alg; break;
 
       // Flash matching
     case kFlashMatch:
@@ -104,12 +109,19 @@ namespace flashana {
     // Double loop over a list of tpc object & flash
     // Call matching function to inspect the compatibility.
     for(size_t tpc_index=0; tpc_index < tpc_index_v.size(); ++tpc_index) {
-      
+
       // Loop over flash list
       for(auto const& flash_index : flash_index_v) {
 
 	auto const& tpc   = _tpc_object_v[tpc_index]; // Retrieve TPC object
 	auto const& flash = _flash_v[flash_index];    // Retrieve flash
+
+	// run the match-prohibit algo first
+	if (_alg_match_prohibit){
+	  bool compat = _alg_match_prohibit->MatchCompatible( tpc, flash);
+	  if (compat == false)
+	    continue;
+	}
 	
 	auto res = _alg_flash_match->Match( tpc, flash ); // Run matching
 
@@ -117,8 +129,8 @@ namespace flashana {
 	if(res.score<=0) continue; 
 
 	// Else we store this match. Assign TPC & flash index info
-	res.tpc_id = tpc_index;
-	res.flash_id = flash_index;
+	res.tpc_id = tpc.idx;//_index;
+	res.flash_id = flash.idx;//_index;
 	// For ordering purpose, take an inverse of the score for sorting
 	score_map.emplace( 1./res.score, res);
 
@@ -128,6 +140,7 @@ namespace flashana {
 	     << " Score=" << res.score;
 	  Print(msg::kINFO,__FUNCTION__,ss.str());
 	}
+
       }
     }
 

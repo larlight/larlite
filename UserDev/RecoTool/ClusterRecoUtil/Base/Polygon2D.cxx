@@ -324,7 +324,7 @@ void Polygon2D::UntanglePolygon()
 }
 
 ///Calculate the opening angle at the specified vertex:
-float Polygon2D::InteriorAngle(unsigned int p) {
+float Polygon2D::InteriorAngle(unsigned int p) const {
   // Get the specified point and the two adjacent points
   if (p > vertices.size()) {
     return -9999999;

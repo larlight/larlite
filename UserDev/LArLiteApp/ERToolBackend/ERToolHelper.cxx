@@ -52,7 +52,10 @@ namespace larlite {
 			    _shrProfiler.ShowerRadius() );
 	// Fill more info
 	s._energy     = mcs.DetProfile().Momentum().E();
-	s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
+        if( (mcs.dEdx() == 0) ||  (mcs.dEdx() > 100) )
+	  {s._dedx = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));}
+        else{s._dedx =  mcs.dEdx();}
+	//s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
 	s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
 	
 	::ertool::RecoInputID_t in_id(i,mcs_v.name());
@@ -119,8 +122,8 @@ namespace larlite {
 	::ertool::RecoInputID_t in_id(i,mct_v.name());
 
 	// Emplace a track to EventData
-	nodeID = strm.Emplace(std::move(t),std::move(in_id),true);
-	//nodeID = strm.Add( t, in_id, true);
+	//nodeID = strm.Emplace(std::move(t),std::move(in_id),true);
+	nodeID = strm.Add( t, in_id, true);
 
       }
       
@@ -602,7 +605,10 @@ namespace larlite {
       s._energy     = mcs.DetProfile().Momentum().E();
       //s._energy = mcs.Start().Momentum().E();
       fWatch.Start();
-      s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.05) : gRandom->Gaus(2,2*0.05));
+      if( (mcs.dEdx() == 0) ||  (mcs.dEdx() > 100) )
+	{s._dedx = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));}
+      else{s._dedx =  mcs.dEdx();}
+      //s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.05) : gRandom->Gaus(2,2*0.05));
       random_time+=fWatch.RealTime();
       s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
       s._time = mcs_v[i].End().T();
@@ -674,12 +680,13 @@ namespace larlite {
 					 shw.Length(),
 					 _shrProfiler.ShowerRadius()) );
       auto& s = (*s_v.rbegin());
-      if(shw.best_plane()){
+      if( (shw.best_plane() > 0) && (shw.best_plane() <= 2) ){
 	s._energy = shw.Energy()[shw.best_plane()];
 	s._dedx   = shw.dEdx()[shw.best_plane()];
       }else{
-	s._energy = (*(shw.Energy().begin()));
-	s._dedx   = (*(shw.dEdx().begin()));
+	// default to collection plane
+	s._energy = shw.Energy()[2];
+	s._dedx   = shw.dEdx()[2];
       }
       // by default. Add cosmic score for showers to edit
       s._cosmogenic = -1;
@@ -701,7 +708,6 @@ namespace larlite {
 
       }
     }
-
     strm.ReserveShowerArray(s_v.size());
     for(size_t i=0; i<s_v.size(); ++i)
       strm.Emplace(std::move(s_v[i]),std::move(id_v[i]));
@@ -731,9 +737,24 @@ namespace larlite {
   }
 
   TLorentzVector ERToolHelper::getXShift(const mctrack& mct) const {
-    
+   
+    // Calculates for each mc track, based on the time of the event, the corresponding shift in x-direction
     TLorentzVector shift;
-    double event_time = mct.End().T();
+    
+    //Check if track as no energy deposition points in the detector, return 0 or something if so
+    if (!mct.size()){
+    	//Beware: this block is satisfied a LOT for cosmics events.
+    	//Any cosmic that doesn't go through the detector has a Start() and End() point, but has zero size.
+    	//Hopefully setting the xshift as zero means we won't shift the cosmic INTO the detector,
+    	//So this should be fine.
+    	shift.SetXYZT(0., 0., 0., 0.);
+    	return shift;
+    }
+
+	// double event_time = mct.End().T();
+    ///Use first energy deposition point in the detector, because for cosmics,
+    ///Start().T() is way in the upper atmosphere, End().T() is at bottom of world volume
+    double event_time = mct.at(0).T(); 
     double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
     shift.SetXYZT(shift_x, 0., 0., 0.);
     
@@ -743,7 +764,20 @@ namespace larlite {
   TLorentzVector ERToolHelper::getXShift(const mcshower& mcs) const {
     // Calculates for each mc shower, based on the time of the event, the corresponding shift in x-direction
     TLorentzVector shift;
-    double event_time = mcs.End().T();
+
+    //Check if mcshower has no energy deposition points in the detector
+    // (it seems mcshower.DetProfile().T() is 1e308 when there are none ... this should be initialized better)
+    // consider this a hotfix!
+    if(abs(mcs.DetProfile().T()) > 1e10  || abs(mcs.DetProfile().T()) < 1e-10){
+    	//Beware: this block is satisfied a LOT for cosmics events.
+    	//Any mcshower (from a cosmic) that doesn't go through the detector has a Start() and End() point,
+    	//but has a weirdly undefined DetProfile(), which I try to identify with the above if() statement.
+    	//Hopefully setting the xshift as zero means we won't shift the cosmic INTO the detector,
+    	//So this should be fine.
+    	shift.SetXYZT(0., 0., 0., 0.);
+    	return shift;
+    }
+    double event_time = mcs.DetProfile().T();//End().T(); <--- old usage (wrong)
     double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
     shift.SetXYZT(shift_x, 0., 0., 0.);
     
