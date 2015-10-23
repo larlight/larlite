@@ -1,5 +1,5 @@
 /**
- * \file ShowerQuality.h
+ * \file ShowerQuality_singleshowers.h
  *
  * \ingroup ShowerReco3D
  *
@@ -17,8 +17,8 @@
 
     @{*/
 
-#ifndef LARLITE_SHOWERQUALITY_H
-#define LARLITE_SHOWERQUALITY_H
+#ifndef LARLITE_SHOWERQUALITY_SINGLESHOWERS_H
+#define LARLITE_SHOWERQUALITY_SINGLESHOWERS_H
 
 #include <map>
 #include "Analysis/ana_base.h"
@@ -34,18 +34,18 @@
 
 namespace larlite {
 /**
-   \class ShowerQuality
+   \class ShowerQuality_singleshowers
    User custom analysis class made by kazuhiro/kaleko
  */
-class ShowerQuality : public ana_base {
+class ShowerQuality_singleshowers : public ana_base {
 
 public:
 
   /// Default constructor
-  ShowerQuality();
+  ShowerQuality_singleshowers();
 
   /// Default destructor
-  virtual ~ShowerQuality() {};
+  virtual ~ShowerQuality_singleshowers() {};
 
   /**
      Setter function for a shower producer name.
