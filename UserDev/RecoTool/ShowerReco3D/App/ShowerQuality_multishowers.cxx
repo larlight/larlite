@@ -1,16 +1,16 @@
-#ifndef SHOWERQUALITY_OLDWAY_CXX
-#define SHOWERQUALITY_OLDWAY_CXX
+#ifndef SHOWERQUALITY_MULTISHOWERS_CXX
+#define SHOWERQUALITY_MULTISHOWERS_CXX
 
-#include "ShowerQuality_oldway.h"
+#include "ShowerQuality_multishowers.h"
 #include "LArUtil/Geometry.h"
 #include "DataFormat/simch.h"
 #include "DataFormat/cluster.h"
 #include "DataFormat/hit.h"
 namespace larlite {
 
-ShowerQuality_oldway::ShowerQuality_oldway() {
+ShowerQuality_multishowers::ShowerQuality_multishowers() {
 
-  _name = "ShowerQuality_oldway";
+  _name = "ShowerQuality_multishowers";
   _fout = 0;
 
   fShowerProducer  = "";
@@ -44,7 +44,7 @@ ShowerQuality_oldway::ShowerQuality_oldway() {
   _numRecoShowers = 0;
 }
 
-bool ShowerQuality_oldway::initialize() {
+bool ShowerQuality_multishowers::initialize() {
 
   if (fShowerProducer.empty()) {
     print(msg::kERROR, __FUNCTION__, "Shower producer's name is not set!");
@@ -155,7 +155,7 @@ bool ShowerQuality_oldway::initialize() {
   return true;
 }
 
-bool ShowerQuality_oldway::analyze(storage_manager* storage) {
+bool ShowerQuality_multishowers::analyze(storage_manager* storage) {
 
   //auto geo = larutil::Geometry::GetME();
 
@@ -176,7 +176,6 @@ bool ShowerQuality_oldway::analyze(storage_manager* storage) {
 
   // Get shower
   auto ev_shower = storage->get_data<event_shower>(fShowerProducer);
-  _numRecoShowers += ev_shower->size();
   if (!ev_shower) {
     print(msg::kERROR, __FUNCTION__,
           Form("Did not find shower produced by \"%s\"", fShowerProducer.c_str())
@@ -184,7 +183,7 @@ bool ShowerQuality_oldway::analyze(storage_manager* storage) {
     return false;
   }
   if (!ev_shower->size()) return false;
-
+  _numRecoShowers += ev_shower->size();
 
   // get associated clusters
   event_cluster* ev_cluster = nullptr;
@@ -375,7 +374,7 @@ bool ShowerQuality_oldway::analyze(storage_manager* storage) {
   return true;
 }
 
-bool ShowerQuality_oldway::finalize() {
+bool ShowerQuality_multishowers::finalize() {
 
   std::cout << "Number of reco showers: " << _numRecoShowers << std::endl;
 
@@ -418,7 +417,7 @@ bool ShowerQuality_oldway::finalize() {
   return true;
 }
 
-void ShowerQuality_oldway::FillQualityInfo(const shower& reco_shower, const mcshower& mc_shower,
+void ShowerQuality_multishowers::FillQualityInfo(const shower& reco_shower, const mcshower& mc_shower,
                                     const size_t& shower_index, const size_t& mcshower_index,
                                     const AssSet_t& ass_cluster_v)
 {
@@ -536,7 +535,7 @@ void ShowerQuality_oldway::FillQualityInfo(const shower& reco_shower, const mcsh
 
 }
 
-void ShowerQuality_oldway::InitializeAnaTree()
+void ShowerQuality_multishowers::InitializeAnaTree()
 {
   if (fTree) delete fTree;
 

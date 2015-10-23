@@ -1,22 +1,22 @@
-#ifndef SHOWERQUALITY_CXX
-#define SHOWERQUALITY_CXX
+#ifndef SHOWERQUALITY_singleshowers_SINGLESHOWERS_CXX
+#define SHOWERQUALITY_singleshowers_SINGLESHOWERS_CXX
 
-#include "ShowerQuality.h"
+#include "ShowerQuality_singleshowers.h"
 #include "LArUtil/Geometry.h"
 // #include "DataFormat/cluster.h"
 // #include "DataFormat/hit.h"
 namespace larlite {
 
-ShowerQuality::ShowerQuality() {
+ShowerQuality_singleshowers::ShowerQuality_singleshowers() {
 
-  _name = "ShowerQuality";
+  _name = "ShowerQuality_singleshowers";
   _fout = 0;
 
   fShowerProducer  = "";
 
   _single_particle_quality = true;
 
-  //_mcShowerQuality = true;
+  //_mcShowerQuality_singleshowers = true;
 
   // hMatchCorrectness = nullptr;
 
@@ -45,7 +45,7 @@ ShowerQuality::ShowerQuality() {
 
 }
 
-bool ShowerQuality::initialize() {
+bool ShowerQuality_singleshowers::initialize() {
 
 
   if (fShowerProducer.empty()) {
@@ -158,7 +158,7 @@ bool ShowerQuality::initialize() {
   return true;
 }
 
-bool ShowerQuality::analyze(storage_manager* storage) {
+bool ShowerQuality_singleshowers::analyze(storage_manager* storage) {
 
   ResetEventTreeParams();
 
@@ -315,7 +315,7 @@ bool ShowerQuality::analyze(storage_manager* storage) {
 // size_t mcs_index;
 // size_t shower_index;
 // // if filling once per MC shower
-// if (_mcShowerQuality)
+// if (_mcShowerQuality_singleshowers)
 // {
 //   // Loop over MCShower and inspect corresponding shower quality
 //   for (mcs_index = 0; mcs_index < mc_index_v.size(); ++mcs_index) {
@@ -382,7 +382,7 @@ bool ShowerQuality::analyze(storage_manager* storage) {
 
 }
 
-bool ShowerQuality::finalize() {
+bool ShowerQuality_singleshowers::finalize() {
 
   if (_fout) {
     if (fShowerTree) fShowerTree->Write();
@@ -391,7 +391,7 @@ bool ShowerQuality::finalize() {
   return true;
 }
 
-void ShowerQuality::FillQualityInfo(const shower& reco_shower, const mcshower& mc_shower, size_t shower_index)// const std::vector< const larlite::cluster * > associated_clusters)
+void ShowerQuality_singleshowers::FillQualityInfo(const shower& reco_shower, const mcshower& mc_shower, size_t shower_index)// const std::vector< const larlite::cluster * > associated_clusters)
 {
 
   ResetShowerTreeParams();
@@ -455,14 +455,14 @@ void ShowerQuality::FillQualityInfo(const shower& reco_shower, const mcshower& m
 
 }
 
-void ShowerQuality::InitializeAnaTrees()
+void ShowerQuality_singleshowers::InitializeAnaTrees()
 {
 
   //////////////////////////////////////////////////////
   // This tree is filled once per reconstructed shower
   //////////////////////////////////////////////////////
   if (fShowerTree) delete fShowerTree;
-  fShowerTree = new TTree("fShowerTree", "");
+  fShowerTree = new TTree("fShowerTree_singleshowers", "");
 
   fShowerTree->Branch("event", &_event, "event/I");
   fShowerTree->Branch("run", &_run, "run/I");
@@ -500,7 +500,7 @@ void ShowerQuality::InitializeAnaTrees()
   // This tree is filled once per event
   //////////////////////////////////////////////////////
   if (fEventTree) delete fEventTree;
-  fEventTree = new TTree("fEventTree", "");
+  fEventTree = new TTree("fEventTree_singleshowers", "");
 
   fEventTree->Branch("n_recoshowers", &fEventTreeParams.n_recoshowers, "n_recoshowers/I");
   fEventTree->Branch("n_mcshowers", &fEventTreeParams.n_mcshowers, "n_mcshowers/I");
@@ -508,7 +508,7 @@ void ShowerQuality::InitializeAnaTrees()
   fEventTree->Branch("mc_containment", &fEventTreeParams.mc_containment, "mc_containment/D");
 }
 
-void ShowerQuality::ResetShowerTreeParams() {
+void ShowerQuality_singleshowers::ResetShowerTreeParams() {
 
   fShowerTreeParams.reco_x = -1.; fShowerTreeParams.reco_y = -1.; fShowerTreeParams.reco_z = -1.;
   fShowerTreeParams.reco_dcosx = -1.; fShowerTreeParams.reco_dcosy = -1.; fShowerTreeParams.reco_dcosz = -1.;
@@ -533,7 +533,7 @@ void ShowerQuality::ResetShowerTreeParams() {
 
 }
 
-void ShowerQuality::ResetEventTreeParams() {
+void ShowerQuality_singleshowers::ResetEventTreeParams() {
   fEventTreeParams.n_mcshowers = 0;
   fEventTreeParams.n_recoshowers = 0;
   fEventTreeParams.mcs_E = -1.;

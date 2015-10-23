@@ -24,9 +24,9 @@ fname = sys.argv[1] #'ShowerQuality_ana_out.root'
 #Name of folder this script will create (or use, if exists) to put output image files in
 output_directory = 'generated_plots'
 #Name of the once-per-shower ttree from the ShowerQuality output root file
-tshowername = 'fShowerTree'
+tshowername = 'fShowerTree_singleshowers'
 #Name of the once-per-event ttree from the ShowerQuality output root file
-teventname  = 'fEventTree'
+teventname  = 'fEventTree_singleshowers'
 
 if not os.path.isfile(fname):
 	raise IOError('ShowerQuality output file does not exist: %s'%fname)
