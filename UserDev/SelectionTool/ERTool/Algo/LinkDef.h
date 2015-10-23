@@ -28,6 +28,7 @@
 #pragma link C++ class ertool::ERAlgoFlashMatch+;
 #pragma link C++ class ertool::OpT0Helper+;
 #pragma link C++ class ertool::ERAlgoTrackDresser+;
+#pragma link C++ class ertool::ERAlgopi0+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
