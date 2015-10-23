@@ -23,7 +23,7 @@ for x in xrange(len(sys.argv)):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify analysis output root file name
-my_proc.set_ana_output_file("ShowerQuality_ana_out.root");
+my_proc.set_ana_output_file("ShowerQuality_singleshowers_ana_out.root");
 
 # Specify data output root file name
 my_proc.set_output_file('')
