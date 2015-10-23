@@ -69,8 +69,22 @@ namespace btutil {
 	for(auto const& ide : ide_v) {
 	  
 	  size_t index = kINVALID_INDEX;
-	  if(ide.trackID < (int)(_trkid_to_index.size())){
-	    index = _trkid_to_index[ide.trackID];
+
+	  static bool one_time_warning = true;
+	  int ide_trk_id = ide.trackID;
+	  
+	  if(ide_trk_id<0) {
+	    if(one_time_warning)
+	      std::cout<<"\033[93m[WARNING]\033[00m detected negative IDE's track ID..."<<std::endl
+		       <<"     You did not turn on KeepEMShowerDaughters..."<<std::endl
+		       <<"     Your MC<=>Reco matching, MCShower/MCTrack may be affected..."<<std::endl;
+	    one_time_warning = false;
+	    ide_trk_id = ide_trk_id * -1;
+	  }
+	  
+	  if(ide_trk_id < (int)(_trkid_to_index.size())){
+	    std::cout<<index<<" : "<<_trkid_to_index.size()<<std::endl;
+	    index = _trkid_to_index[ide_trk_id];
 	  }
 	  if(_num_parts <= index) {
 	    (*edep_info.rbegin()) += ide.numElectrons;

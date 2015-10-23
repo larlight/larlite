@@ -106,26 +106,32 @@ namespace larlite {
       }
       fClusterProducer = ass_keys[0];
     }
-    
-    auto ev_cluster = storage->get_data<event_cluster>(fClusterProducer);
-    if(!ev_cluster || !(ev_cluster->size())) {
-      print(msg::kERROR,__FUNCTION__,"Could not retrieve a reconstructed cluster!");
-      return false;
-    }
     */
-    
-    auto ev_shower = storage->get_data<event_shower>(fShowerProducer);
-    if(!ev_shower) {
-      print(msg::kERROR,__FUNCTION__,Form("Did not find shower produced by \"%s\"",fShowerProducer.c_str()));
-      return false;
+
+    event_shower* ev_shower = nullptr;
+    if(!fShowerProducer.empty()) {
+      ev_shower = storage->get_data<event_shower>(fShowerProducer);
+      if(!ev_shower) {
+	print(msg::kERROR,__FUNCTION__,Form("Did not find shower produced by \"%s\"",fShowerProducer.c_str()));
+	return false;
+      }
     }
 
-    // get associated clusters
     event_cluster* ev_cluster = nullptr;
-    auto const& ass_cluster_v = storage->find_one_ass(ev_shower->id(),ev_cluster,ev_shower->name());
-    if (!ev_cluster)
-      print(msg::kERROR,__FUNCTION__,Form("No associated cluster found to a shower produced by \"%s\"",fShowerProducer.c_str()));
+
+    if(ev_shower) {
     
+      auto const& ass_cluster_v = storage->find_one_ass(ev_shower->id(),ev_cluster,ev_shower->name());
+      if (!ev_cluster || (!ev_shower->empty() && ass_cluster_v.empty()))
+	print(msg::kERROR,__FUNCTION__,Form("No associated cluster found to a shower produced by \"%s\"",fShowerProducer.c_str()));
+    }else{
+      ev_cluster = storage->get_data<event_cluster>(fClusterProducer);
+      if(!ev_cluster || !(ev_cluster->size())) {
+	print(msg::kERROR,__FUNCTION__,"Could not retrieve a reconstructed cluster!");
+	return false;
+      }
+    }
+
     // get associated hits
     event_hit* ev_hit = nullptr;
     auto const& ass_hit_v = storage->find_one_ass(ev_cluster->id(),ev_hit,ev_cluster->name());
@@ -172,7 +178,11 @@ namespace larlite {
       print(msg::kERROR,__FUNCTION__,"Failed to build back-tracking map for MC...");
       return false;
     }
-
+    if(g4_trackid_v.empty()) {
+      print(msg::kWARNING,__FUNCTION__,"No MCShower above cut energy value. Skipping an event...");
+      return true;
+    }
+    
     auto geo = larutil::Geometry::GetME();
 
     // Fill cluster quality plots
@@ -193,6 +203,8 @@ namespace larlite {
 
     // If this is not for 3D shower comparison, return
     if(fShowerProducer.empty()) return true;
+
+    auto const& ass_cluster_v = storage->find_one_ass(ev_shower->id(),ev_cluster,ev_shower->name());
 
     for(size_t shower_index=0; shower_index < ass_cluster_v.size(); ++shower_index) {
 
