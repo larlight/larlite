@@ -15,15 +15,22 @@ namespace larlite {
   public:
 
     /// Default ctor
-    trigger(std::string name="noname") : event_base(data::kTrigger,name)
-    {
-      fTriggerNumber       = data::kINVALID_UINT;
-      
-      fTriggerTime         = data::kINVALID_DOUBLE;
-      fBeamGateTime        = data::kINVALID_DOUBLE;
-      
-      fTriggerBits         = 0x0;
-    }
+  trigger(std::string name="noname") : event_base(data::kTrigger,name)
+      {
+	fTriggerNumber       = data::kINVALID_UINT;
+	
+	fTriggerTime         = data::kINVALID_DOUBLE;
+	fBeamGateTime        = data::kINVALID_DOUBLE;
+	
+	fTriggerBits         = 0x0;
+      }
+    
+  trigger(const trigger&rhs) : event_base(rhs)
+      , fTriggerNumber(rhs.fTriggerNumber)
+      , fTriggerTime(rhs.fTriggerTime)
+      , fBeamGateTime(rhs.fBeamGateTime)
+      , fTriggerBits(rhs.fTriggerBits)
+      {}
     
   private:
     
@@ -39,11 +46,21 @@ namespace larlite {
 	    double       trigger_time,
 	    double       beamgate_time,
 	    uint32_t     bits)
-      : fTriggerNumber       ( counter           ),
-	fTriggerTime         ( trigger_time      ),
-	fBeamGateTime        ( beamgate_time     ),
-	fTriggerBits         ( bits              )
+      : event_base(),
+      fTriggerNumber       ( counter           ),
+      fTriggerTime         ( trigger_time      ),
+      fBeamGateTime        ( beamgate_time     ),
+      fTriggerBits         ( bits              )
     {}
+
+    /// Trigger number
+    void TriggerNumber(unsigned int n)  { fTriggerNumber = n; }
+    /// Trigger time w.r.t. electronics clock T0 in us
+    void TriggerTime  (double t)        { fTriggerTime = t;   }
+    /// BeamGate time w.r.t. electronics clock T0 in us
+    void BeamGateTime (double t)        { fBeamGateTime = t;  }
+    /// Trigger Bits
+    void TriggerBits  (unsigned int b)  { fTriggerBits = b;   }
 
     /// Trigger number
     unsigned int TriggerNumber()          const { return fTriggerNumber;       }

@@ -6,11 +6,17 @@
 #include <string>
 namespace flashana {
 
+  /// Index used to identify Flash_t/QPointCollection_t uniquely in an event
+  typedef size_t ID_t;
+  /// Invalid ID
+  const ID_t kINVALID_ID = kINVALID_SIZE;
+
   /// Enumerator for different types of algorithm
   enum Algorithm_t {
     kTPCFilter,       ///< Algorithm type to filter out TPC objects from matching candidate list
     kFlashFilter,     ///< Algorithm type to filter out flash from matching candidate list
     kFlashMatch,      ///< Algorithm type to match flash hypothesis and reconstructed flash
+    kMatchProhibit,   /// < Algorithm type to prohibit a match between a flash and a cluster
     kAlgorithmTypeMax ///< enum flag for algorithm type count & invalid type
   };
 
@@ -22,11 +28,13 @@ namespace flashana {
     double x,y,z;             ///< Flash position 
     double x_err,y_err,z_err; ///< Flash timing, a candidate T0
     double time;
+    ID_t idx;                 ///< index from original larlite vector
     /// Default ctor assigns invalid values
     Flash_t() {
       x = y = z = kINVALID_DOUBLE;
       x_err = y_err = z_err = kINVALID_DOUBLE;
       time = kINVALID_DOUBLE;
+      idx = kINVALID_ID;
     }
   };
 
@@ -55,18 +63,22 @@ namespace flashana {
   };
 
   /// Collection of charge deposition 3D point (cluster)
-  typedef std::vector<flashana::QPoint_t> QCluster_t;
+  struct QCluster_t : public std::vector<QPoint_t>{
+    ID_t idx;                 ///< index from original larlite vector
+    /// Default constructor
+    QCluster_t()
+      : idx(kINVALID_ID)
+    {}
+  };
   /// Collection of 3D point clusters (one use case is TPC object representation for track(s) and shower(s))
   typedef std::vector<flashana::QCluster_t> QClusterArray_t;
   /// Collection of Flash objects
   typedef std::vector<flashana::Flash_t> FlashArray_t;
-  /// Index used to identify Flash_t/QPointCollection_t uniquely in an event
-  typedef size_t ID_t;
+
   /// Index collection
   typedef std::vector<flashana::ID_t> IDArray_t;
 
-  /// Invalid ID
-  const ID_t kINVALID_ID = kINVALID_SIZE;
+
 
   /// Flash-TPC match info
   struct FlashMatch_t {

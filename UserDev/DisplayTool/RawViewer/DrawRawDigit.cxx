@@ -109,27 +109,27 @@ bool DrawRawDigit::analyze(larlite::storage_manager* storage) {
     if (wire > geoService -> Nwires(plane))
       continue;
 
-    // There is one remaining mapping issue:
-    if (plane == 1) {
-      if (wire > 63 && wire < 96) {
-        wire += 320;
-      }
-      else if (wire > 383 && wire < 416) {
-        wire -= 320;
-      }
+    // // There is one remaining mapping issue:
+    // if (plane == 1) {
+    //   if (wire > 63 && wire < 96) {
+    //     wire += 320;
+    //   }
+    //   else if (wire > 383 && wire < 416) {
+    //     wire -= 320;
+    //   }
 
-      // Now fix the rest:
-      if (wire < 31)
-        wire += 64;
-      else if (wire > 31 && wire < 64 ) {
-        int wireAnchor = wire - (wire % 32);
-        wire = wireAnchor + 32 - (wire % 32);
-      }
-      else if (wire > 63 && wire < 96) {
-        wire -= 64;
-      }
+    //   // Now fix the rest:
+    //   if (wire < 31)
+    //     wire += 64;
+    //   else if (wire > 31 && wire < 64 ) {
+    //     int wireAnchor = wire - (wire % 32);
+    //     wire = wireAnchor + 32 - (wire % 32);
+    //   }
+    //   else if (wire > 63 && wire < 96) {
+    //     wire -= 64;
+    //   }
 
-    }
+    // }
 
 
 

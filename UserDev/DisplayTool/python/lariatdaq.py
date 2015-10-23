@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 
 from gui import gui
-from event import manager
-from data import wire
+from evdmanager import manager
+from evdmanager.geometry import lariat
+from datatypes import wire
 import argparse, sys, signal
 from PyQt4 import QtGui, QtCore
 import os
 
 from ROOT import evd
 
-from geometry import *
 
 class lariat_manager(manager, wire, QtCore.QObject):
   """docstring for lariat_manager"""
@@ -224,8 +224,8 @@ class delayTimer(QtCore.QObject,threading.Thread):
 class lariatgui(gui):
   """special lariat gui"""
   def __init__(self, geometry,manager):
-    super(lariatgui, self).__init__(geometry,manager)
-
+    super(lariatgui, self).__init__(geometry)
+    self.initManager(manager)
     self._watcher = None
     self._stopFlag = None
     self._running = False

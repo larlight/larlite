@@ -51,3 +51,4 @@ if [[ ! ":$PYTHONPATH:" == *":$DIR/python:"* ]]; then
 fi
 
 
+export BUILD_LARLITE_EVD=true

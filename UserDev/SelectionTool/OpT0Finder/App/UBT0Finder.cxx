@@ -10,7 +10,23 @@
 #include "GeoAlgo/GeoLineSegment.h"
 namespace larlite {
 
+  UBT0Finder::UBT0Finder()
+    : _track_tree(nullptr)
+    , _tree(nullptr)
+    , _eff_tree(nullptr)
+  {
+    _name="UBT0Finder";
+    _fout=0;
+  }
+
   bool UBT0Finder::initialize() {
+
+    _track_tree = new TTree("track_tree","");
+    _track_tree->Branch("trk_time",&_trk_time,"trk_time/D");
+    _track_tree->Branch("trk_max_x",&_trk_max_x,"trk_max_x/D");
+    _track_tree->Branch("trk_min_x",&_trk_min_x,"trk_min_x/D");
+    _track_tree->Branch("trk_shift",&_trk_shift,"trk_shift/D");
+    _track_tree->Branch("trk_x",&_trk_x,"trk_x/D");
 
     _tree = new TTree("flash_tree","");
     _tree->Branch("npe",&_npe,"npe/D");
@@ -21,11 +37,27 @@ namespace larlite {
     _tree->Branch("tz",&_tpc_z,"tz/D");
     _tree->Branch("ft",&_flash_time,"ft/D");
     _tree->Branch("mct",&_mc_time,"mct/D");
+    _tree->Branch("mcE",&_mc_edep,"mcE/D");
     _tree->Branch("mcx",&_mc_x,"mcx/D");
     _tree->Branch("mcy",&_mc_y,"mcy/D");
     _tree->Branch("mcz",&_mc_z,"mcz/D");
     _tree->Branch("mc_dx",&_mc_dx,"mc_dx/D");
     _tree->Branch("score",&_score,"score/D");
+    _tree->Branch("trk_shift",&_trk_shift,"trk_shift/D");
+
+    if (_eff_tree) delete _eff_tree;
+    _eff_tree = new TTree("_eff_tree","Efficiency Tree");
+    _eff_tree->Branch("_matched",&_matched,"matched/I");
+    _eff_tree->Branch("_mc_time",&_mc_time,"mc_time/D");
+    _eff_tree->Branch("_mc_edep",&_mc_edep,"mc_edep/D");
+    _eff_tree->Branch("_flash_time",&_flash_time,"flash_time/D");
+    _eff_tree->Branch("_npe",&_npe,"flash_pe/D");
+    _eff_tree->Branch("_npts",&_npts,"_npts/D");
+    _eff_tree->Branch("trk_max_x",&_trk_max_x,"trk_max_x/D");
+    _eff_tree->Branch("trk_min_x",&_trk_min_x,"trk_min_x/D");
+    _eff_tree->Branch("trk_max_abs_x",&_trk_max_abs_x,"trk_max_abs_x/D");
+    _eff_tree->Branch("trk_min_abs_x",&_trk_min_abs_x,"trk_min_abs_x/D");
+    _eff_tree->Branch("trk_shift",&_trk_shift,"trk_shift/D");
 
     return true;
   }
@@ -41,13 +73,15 @@ namespace larlite {
       return false;
     }
 
+
     //auto ev_track = storage->get_data<event_track>("pandoraCosmicKHit");
     auto ev_track = storage->get_data<event_track>("trackkalmanhit");
     auto ev_mctrack = storage->get_data<event_mctrack>("mcreco");
     
     if(!_use_mc) {
       if (!ev_track || ev_track->empty()) return false;
-      for(auto const& trk : *ev_track) {
+      for (size_t n=0; n < ev_track->size(); n++){
+	auto const& trk = ev_track->at(n);
 	    
 	::flashana::QCluster_t tpc_obj;
 	tpc_obj.reserve(trk.NumberTrajectoryPoints()-1);
@@ -69,21 +103,44 @@ namespace larlite {
 	  pt.z = pt1[2] + dz/2.;
 	  
 	  tpc_obj.emplace_back(pt);
+	  tpc_obj.idx = n;
 	}
 	_mgr.Emplace(std::move(tpc_obj));
       }
       
-    }else{
+    }
+    // use MC tracks
+    else{
       if (!ev_mctrack || ev_mctrack->empty()) return false;
-      for(auto const& trk : *ev_mctrack) {
+      for (size_t n=0; n < ev_mctrack->size(); n++){
+	auto const& trk = ev_mctrack->at(n);
 
 	::flashana::QCluster_t tpc_obj;
 
 	if(trk.size()>=2) {
+	  
+	  // per track calculate the shift in x-direction
+	  // so that the x-position is what would be seen
+	  // in the TPC, not the truth x-position
+	  double event_time = trk[0].T(); // ns
+	  double det_drift_time = 1.6E6; // ns
+	  double det_width = 256.; // cm
+	  double shift_x = event_time * (det_width/det_drift_time);
 	  tpc_obj.reserve(trk.size()-1);
+
+	  _trk_time = trk[0].T()/1000.;
+	  _trk_x    = trk[0].X();
+	  _trk_shift = shift_x;
+	  _trk_min_x = 1036.;
+	  _trk_max_x = -1036.;
+	  for(size_t i=0; i < trk.size(); ++i) {
+	    if (trk[i].X() > _trk_max_x) { _trk_max_x = trk[i].X(); }
+	    if (trk[i].X() < _trk_min_x) { _trk_min_x = trk[i].X(); }
+	  }
+	  _track_tree->Fill();
 	  
 	  for(size_t i=0; i < (trk.size()-1); ++i) {
-	    
+
 	    auto const& pt1 = trk[i].Position();
 	    auto const& pt2 = trk[i+1].Position();
 	    
@@ -94,19 +151,21 @@ namespace larlite {
 	    double dz = pt2[2] - pt1[2];
 	    
 	    pt.q = (trk[i].E() - trk[i+1].E());
-	    pt.x = pt1[0] + dx/2.;
+	    pt.x = pt1[0] + dx/2. + shift_x;
 	    pt.y = pt1[1] + dy/2.;
 	    pt.z = pt1[2] + dz/2.;
 	    
-	  tpc_obj.emplace_back(pt);
+	  tpc_obj.push_back(pt);
+	  tpc_obj.idx = n;
 	  }
-	}
 	_mgr.Emplace(std::move(tpc_obj));
-
-      }
+	}// if the track is at least 2 elements long
+      }// for all tracks
     }
-    
-    for(auto const& flash : *ev_flash) {
+
+    for (size_t n=0; n < ev_flash->size(); n++){
+
+      auto const& flash = ev_flash->at(n);
 
       ::flashana::Flash_t f;
       f.x = f.x_err = 0;
@@ -118,6 +177,7 @@ namespace larlite {
       for(unsigned int i=0; i<32; i++)
 	f.pe_v.push_back(flash.PE(i));
       f.time = flash.Time();
+      f.idx = n;
 
       _mgr.Emplace(std::move(f));
     }
@@ -134,7 +194,6 @@ namespace larlite {
 
     }
     */
-
     auto const res = _mgr.Match();
     ::geoalgo::LineSegment line;
     ::geoalgo::Point_t pt(0,0,0);
@@ -153,6 +212,10 @@ namespace larlite {
       if(_use_mc) {
 	auto const& mct = (*ev_mctrack)[match.tpc_id];
 	_mc_time = mct[0].T() * 1.e-3;
+	double event_time = mct[0].T(); // ns
+	double det_drift_time = 1.6E6; // ns
+	double det_width = 256.; // cm
+	_trk_shift = event_time * (det_width/det_drift_time);
 	double min_dist = 1e12;
 	pt[0] = _tpc_x;
 	pt[1] = _tpc_y;
@@ -179,7 +242,67 @@ namespace larlite {
 	_mc_dx = max_x - min_x;
       }
       _tree->Fill();
-    }
+    }// for all matches
+
+    
+    // make an entry of the flash-matching results for every MCTrack
+    if(!_use_mc)
+      return true;
+
+    _npts = 0 ; 
+    for (size_t n=0; n < ev_mctrack->size(); n++){
+      auto const& mct = ev_mctrack->at(n);
+      // ignore tracks with < 2 steps
+      if (mct.size() < 2) continue;
+      // find the flash that was matched for this MCTrack (if any)
+      _mc_time = mct[0].T() * 1.e-3;
+      _mc_edep = mct[0].E()-mct[mct.size()-1].E();
+      double event_time = mct[0].T(); // ns
+      double det_drift_time = 1.6E6; // ns
+      double det_width = 256.; // cm
+      _trk_shift = event_time * (det_width/det_drift_time);
+      _trk_min_x =  1036.;
+      _trk_max_x = -1036.;
+      _trk_min_abs_x =  2036.;
+      _trk_max_abs_x = -2036.;
+
+      for(size_t i=0; i < (mct.size()-1); ++i) {
+	
+	auto const& pt1 = mct[i].Position();
+	auto const& pt2 = mct[i+1].Position();
+	
+	if ( (pt1[0]+_trk_shift) > _trk_max_abs_x) _trk_max_abs_x = pt1[0]+_trk_shift;
+	if ( (pt1[0]+_trk_shift) < _trk_min_abs_x) _trk_min_abs_x = pt1[0]+_trk_shift;
+	    
+	double dx = pt2[0] - pt1[0];
+	double x  = pt1[0] + dx/2. + _trk_shift;
+	
+	if (x > _trk_max_x) _trk_max_x = x;
+	if (x < _trk_min_x) _trk_min_x = x;			   
+      }
+
+      _flash_time = -999;
+      _mc_time    = -999; 
+      _matched    = 0 ;
+      _npe        = 0;
+      _npts = mct.size() ;
+
+      for(auto const& match : res) {
+	if (match.tpc_id == n){
+	  _matched = 1;
+	  auto const& flash = (*ev_flash)[match.flash_id];
+	  _flash_time  = flash.Time();
+	  _npe = flash.TotalPE();
+	}
+      }
+
+//	std::cout<<"Matched is now: "<<_matched<<"\n"<<std::endl ;
+      _eff_tree->Fill();
+    }// for all MCTracks
+
+    if(_npts == 0 )
+      _eff_tree->Fill();
+
     return true;
   }
 
@@ -187,6 +310,8 @@ namespace larlite {
     if(_fout) {
       _fout->cd();
       _tree->Write();
+      _track_tree->Write();
+      _eff_tree->Write();
     }
     return true;
   }

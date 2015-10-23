@@ -19,6 +19,14 @@ namespace ertool_helper {
     , _pos(pos)
     , _mom(mom)
   {Approx();}
+
+  ParticleID::ParticleID(const int pdg,
+    const geoalgo::Vector& pos,
+    const geoalgo::Vector& mom)
+  : _pdg(pdg)
+  , _pos(pos.ToTLorentzVector())
+  , _mom(mom.ToTLorentzVector())
+  {Approx();}
   
   // Particle ID constructor from MCShower
   ParticleID::ParticleID(const ::larlite::mcshower& mcs)
@@ -47,6 +55,13 @@ namespace ertool_helper {
     Approx();
   }
 
+  void ParticleID::Reset(){
+    for(size_t i=0; i<4; ++i) {
+      _pos[i] = 0.;
+      _mom[i] = 0.;
+    }
+  }
+  
   void ParticleID::Approx()
   {
     for(size_t i=0; i<4; ++i) {

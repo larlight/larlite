@@ -2,7 +2,7 @@
  * \file DrawTrack.h
  *
  * \ingroup RecoViewer
- * 
+ *
  * \brief Class def header for a class DrawTrack
  *
  * @author cadams
@@ -19,19 +19,29 @@
 #include "LArUtil/Geometry.h"
 #include "LArUtil/GeometryUtilities.h"
 #include "DataFormat/track.h"
+
+#include "RecoBase.h"
 /**
    \class DrawTrack
    User defined class DrawTrack ... these comments are used to generate
    doxygen documentation!
  */
 
-typedef std::vector< std::pair<float,float> > track2d;
+// typedef std::vector< std::pair<float,float> > evd::Track2d;
 
-namespace evd{
+namespace evd {
 
-  class DrawTrack : public larlite::ana_base {
+class Track2d {
+public:
+    std::vector<std::pair<float, float> > _track;
+    const std::vector<std::pair<float, float> > & track() {return _track;}
+};
 
-  public:
+// typedef std::vector<std::pair<float, float> > Track2d;
+
+class DrawTrack : public larlite::ana_base, public RecoBase<Track2d> {
+
+public:
 
     /// Default constructor
     DrawTrack();
@@ -41,48 +51,28 @@ namespace evd{
 
     /** IMPLEMENT in DrawCluster.cc!
         Initialization method to be called before the analysis event loop.
-    */ 
+    */
     virtual bool initialize();
 
-    /** IMPLEMENT in DrawCluster.cc! 
-        Analyze a data event-by-event  
+    /** IMPLEMENT in DrawCluster.cc!
+        Analyze a data event-by-event
     */
     virtual bool analyze(larlite::storage_manager* storage);
 
-    /** IMPLEMENT in DrawCluster.cc! 
+    /** IMPLEMENT in DrawCluster.cc!
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
 
 
-    void setProducer(std::string s){producer = s;}
+private:
 
+    Track2d getTrack2d(larlite::track track, unsigned int plane);
 
-    const std::vector< track2d >   & getTracksByPlane(unsigned int p) const;
-    // int getNTracks() const;
-    // const track2d getTrack(unsigned int plane, unsigned int index) const;
-
-  private:
-    
-    const larutil::Geometry * geoService;
-    const larutil::GeometryUtilities * geoUtils;
-
-    std::string producer;
-
-    // Showers get drawn as cones.  Need a start point, and start direction
-    // Also need an opening angle and the length
-    // Return these as shower2d objects
-    // This shows how to handle abstract objects in the viewer
-
-    // Internally, keep the showers sorted by plane
-    std::vector<std::vector< track2d > > * trackVectorByPlane;
-
-    track2d getTrack2d(larlite::track track, unsigned int plane);
-
-  };
+};
 
 } // evd
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 
