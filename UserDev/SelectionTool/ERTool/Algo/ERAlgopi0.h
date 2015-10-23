@@ -83,7 +83,7 @@ namespace ertool {
     AlgoEMPart  _alg_emp;
 
     double _energy_min =0;
-    double _energy_max =0;
+    double _energy_max =1000000;
 
 
     // TTree info 
