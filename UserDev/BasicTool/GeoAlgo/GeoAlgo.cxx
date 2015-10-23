@@ -938,7 +938,7 @@ namespace geoalgo {
     Point_t pt1(lin1.Start().size());
     Point_t pt2(lin2.Start().size());
 
-    //double IP = _SqDist_(lin1Back, lin2Back, pt1, pt2);
+    double IP = _SqDist_(lin1Back, lin2Back, pt1, pt2);
     origin = (pt1+pt2)/2.;
 
     // If origin coincides with lin1 start
