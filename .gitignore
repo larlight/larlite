@@ -1,4 +1,5 @@
 .DS_Store
+build
 *.o
 *Cint.h
 *Cint.cxx
