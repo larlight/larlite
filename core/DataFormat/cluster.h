@@ -510,8 +510,35 @@ namespace larlite{
       
     /// A measure of the cluster width, in homogenized units.
     float Width() const { return fWidth; }
+     
+
+    /**
+     * @brief return whether this cluster is the result of merging
+     * @details Clusters are often merged in larlite, so it can be useful 
+     *          to keep track of whether or not the have been merged
+     * @return boolean, true if this cluster is the output of merging.
+     */
+    bool IsMergedCluster()  const {return fIsMergedCluster;}
       
-      
+
+    /**
+     * @brief For merged clusters, return the original producer
+     * @details This is not necessarily the producer of the clusters this
+     *          cluster has been made out of, if merging has multiple stages.
+     *          Instead, this is the producer that is completely unmerged.  This
+     *          is the producer that you want to get associations for.
+     * @return string of the original producer name
+     */
+    std::string OriginalClusterProducer() const {return fOriginalClusterProducer;}
+
+    /**
+     * @brief return the indexes of the original cluster in the larlite counting scheme
+     * @details Get the indexes of the original clusters for this particular cluster.  This 
+     *          is useful if you want to figure out associations later.
+     * @return vector of indexes
+     */
+    const std::vector<unsigned short> & OriginalClusterIndexes() const {return fOriginalClusterIndexes;}
+
     /**
      * @brief Identifier of this cluster
      * @return the identifier of this cluster
@@ -555,6 +582,10 @@ namespace larlite{
     void set_id(ID_t id);
     void set_view(geo::View_t v);
     void set_planeID(const geo::PlaneID& id);
+
+    void set_is_merged(bool b);
+    void set_original_producer(std::string p);
+    void set_original_indexes(std::vector<unsigned short> s);
 
   private:
 
@@ -631,6 +662,12 @@ namespace larlite{
     geo::View_t fView; ///< View for this cluster
     
     geo::PlaneID fPlaneID; ///< Location of the start of the cluster
+
+
+    // The following section is larlite specific information that gets produced in merging
+    bool fIsMergedCluster; ///< True only if this cluster is the result of merging other clusters
+    std::vector<unsigned short> fOriginalClusterIndexes;  ///< The original indexes of the clusters from merging
+    std::string fOriginalClusterProducer;  ///< The producer of the original cluster before merging
 
   };
   
