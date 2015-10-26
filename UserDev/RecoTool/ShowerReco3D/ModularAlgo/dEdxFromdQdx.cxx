@@ -55,7 +55,7 @@ namespace showerreco{
 
       //if (_use_pitch)
       //dqdx *= (pitch/0.3);
-      if(dqdx<80000){
+      if(dqdx<105000){
 	dedx = larutil::LArProperties::GetME()->ModBoxCorrection(dqdx);}
       else{
 	dedx = (larutil::LArProperties::GetME()->ModBoxCorrection(dqdx/2))*2;
