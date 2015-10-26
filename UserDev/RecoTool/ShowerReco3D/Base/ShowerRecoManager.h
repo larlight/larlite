@@ -22,6 +22,7 @@
 #include "ShowerRecoAlgBase.h"
 #include "ShowerAnaBase.h"
 #include "TStopwatch.h"
+#include "DataFormat/storage_manager.h"
 
 namespace showerreco {
 
@@ -75,6 +76,8 @@ public:
   // initalize function
   void Initialize();
 
+  void SetStorageManager(larlite::storage_manager * sm){_storage = sm;}
+
 private:
 
   /// Shower reconstruction algorithm
@@ -98,6 +101,8 @@ private:
   double _matching_calls;
   double _CPAN_times;
   double _CPAN_calls;
+
+  ::larlite::storage_manager * _storage;
 
 };
 }

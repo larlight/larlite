@@ -2,7 +2,7 @@
  * \file ShowerRecoAlgBase.h
  *
  * \ingroup ShowerReco3D
- * 
+ *
  * \brief Class def header for a class ShowerRecoAlgBase
  *
  * @author kazuhiro
@@ -19,47 +19,55 @@
 #include "ShowerRecoTypes.h"
 #include "TTree.h"
 #include "TFile.h"
+#include "DataFormat/storage_manager.h"
+
+
 
 namespace showerreco {
 
-  /**
-     \class ShowerRecoAlgBase
-     User defined class ShowerRecoAlgBase ... these comments are used to generate
-     doxygen documentation!
-  */
-  class ShowerRecoAlgBase{
-    
-  public:
-    
-    /// Default constructor
-    ShowerRecoAlgBase();
-    
-    /// Default destructor
-    virtual ~ShowerRecoAlgBase(){}
+/**
+   \class ShowerRecoAlgBase
+   User defined class ShowerRecoAlgBase ... these comments are used to generate
+   doxygen documentation!
+*/
+class ShowerRecoAlgBase {
 
-    /// Function to reset algorithm, to be called @ beginning of each event
-    virtual void Reset() = 0;
+public:
 
-    /// Function to reconstruct one shower
-    virtual Shower_t RecoOneShower(const ShowerClusterSet_t& clusters) = 0;
-    
-    /// Verbosity switch
-    void Verbose(bool on=true);
+  /// Default constructor
+  ShowerRecoAlgBase();
 
-    /// finalize function to write trees
-    virtual void Finalize(TFile* fout){};
+  /// Default destructor
+  virtual ~ShowerRecoAlgBase() {}
 
-    /// initialize function
-    virtual void Initialize(){};
+  /// Function to reset algorithm, to be called @ beginning of each event
+  virtual void Reset() = 0;
 
-  protected:
+  /// Function to reconstruct one shower
+  virtual Shower_t RecoOneShower(const ShowerClusterSet_t& clusters) = 0;
 
-    /// Verbosity flag
-    bool _verbosity;
+  /// Verbosity switch
+  void Verbose(bool on = true);
 
-  };
+  /// finalize function to write trees
+  virtual void Finalize(TFile* fout) {};
+
+  /// initialize function
+  virtual void Initialize() {};
+
+  // Pass the storage manager to the reco alg
+  void SetStorageManager(larlite::storage_manager * sm) {_storage = sm;}
+
+protected:
+
+  /// Verbosity flag
+  bool _verbosity;
+
+  ::larlite::storage_manager * _storage;
+
+};
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

@@ -30,6 +30,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
   // Re-initialize tools
   fManager.Reset();
 
+  // Pass the storage manager to the reco manager to allow access to other data products.
+  fManager.SetStorageManager(storage);
+
   // Retrieve clusters and fed into the algorithm
   std::vector<std::vector<Hit2D> > local_clusters;
   fCRUHelper.GenerateHit2D(storage, fInputProducer, local_clusters);
@@ -97,8 +100,8 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
   // counter for reco'd showers
   int ctr = 0;
 
-  for (size_t i=0; i < res_shower_v.size(); i++){
-    
+  for (size_t i = 0; i < res_shower_v.size(); i++) {
+
     auto const& res_shower = res_shower_v[i];
 
 
