@@ -33,7 +33,7 @@ namespace showerreco{
     auto const& dir3D = resultShower.fDCosStart;
 
     // get the vector of dQdx filled by someone else
-    auto const& dQdx = resultShower.fdQdx;
+    auto const& dQdx_v = resultShower.fdQdx_v;
 
     // loop over all input cluster -> calculate a dQdx per plane
     for (size_t n=0; n < inputShowers.size(); n++){
@@ -47,29 +47,29 @@ namespace showerreco{
       //*** we need to calculate a pitch for this plane
       //double pitch = geomHelper->GetPitch(dir3D,(int)pl);
 
-      double dEdx = 0.;
+      double dedx = 0.;
 
-      double dqdx = dQdx[pl];
+      double dqdx = dQdx_v[pl];
 
       if (_verbose) { std::cout << "dQdx on plane : " << pl << " -> " << dqdx << std::endl; }
 
       //if (_use_pitch)
       //dqdx *= (pitch/0.3);
       if(dqdx<80000){
-	dEdx = larutil::LArProperties::GetME()->ModBoxCorrection(dqdx);}
+	dedx = larutil::LArProperties::GetME()->ModBoxCorrection(dqdx);}
       else{
-	dEdx = (larutil::LArProperties::GetME()->ModBoxCorrection(dqdx/2))*2;
+	dedx = (larutil::LArProperties::GetME()->ModBoxCorrection(dqdx/2))*2;
       }
-      if (_verbose) { std::cout << "dEdx on plane : " << pl << " -> " << dEdx << std::endl; }
+      if (_verbose) { std::cout << "dEdx on plane : " << pl << " -> " << dedx << std::endl; }
       
       // take the dQdx measured on each plane and convert
       // to dEdx using a recombination model
       
-      _dEdx=dEdx;
+      _dEdx=dedx;
       _pl=pl;
       _pl_best=pl_best;
       _tree->Fill();
-      resultShower.fdEdx[pl] = dEdx;
+      resultShower.fdEdx_v[pl] = dedx;
 
     }
 

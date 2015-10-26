@@ -306,7 +306,7 @@ namespace showerreco{
        
        ///dQdx passed to showerquality 
        //resultShower.fdQdx[pl] = median[_pl_best];
-       resultShower.fdQdx[pl] = median[pl];
+       resultShower.fdQdx_v[pl] = median[pl];
        
        //std::cout<<"#########################################################\n";
        

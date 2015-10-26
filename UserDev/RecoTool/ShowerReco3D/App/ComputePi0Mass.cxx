@@ -158,8 +158,8 @@ namespace larlite {
       ++best_cluster2;
     }
 
-    _mass = Pi0MassFormula3D( fSECaloAlg.ShowerEnergy(ev_shower->at(0).Energy().at(best_cluster1)).first,
-			      fSECaloAlg.ShowerEnergy(ev_shower->at(1).Energy().at(best_cluster2)).first,
+    _mass = Pi0MassFormula3D( fSECaloAlg.ShowerEnergy(ev_shower->at(0).Energy_v().at(best_cluster1)).first,
+			      fSECaloAlg.ShowerEnergy(ev_shower->at(1).Energy_v().at(best_cluster2)).first,
     			      ev_shower->at(0).Direction(),
     			      ev_shower->at(1).Direction() );
     

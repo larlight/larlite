@@ -318,11 +318,11 @@ namespace showerreco {
         // break;
       } // end loop on clusters
 
-    result.fTotalMIPEnergy  = fMIPEnergy;
+    result.fTotalMIPEnergy_v  = fMIPEnergy;
     result.fBestPlane.Plane = best_plane;
     result.fLength          = best_length;
     result.fOpeningAngle    = best_opening_angle;
-    result.fTotalEnergy     = fEnergy;
+    result.fTotalEnergy_v     = fEnergy;
 
     double dirs[3]={0};
     fGSer->GetDirectionCosines(xphi,xtheta,dirs);
@@ -332,7 +332,7 @@ namespace showerreco {
     
     result.fDCosStart = vdirs;
     result.fXYZStart  = vxyz;
-    result.fdEdx      = fdEdx;
+    result.fdEdx_v      = fdEdx;
     
     // done
     return result;

@@ -25,16 +25,17 @@ Shower_t ShowerRecoAlgModular::RecoOneShower(const ShowerClusterSet_t& clusters)
   // Make sure the result shower has the right size of all it's elements
   auto geom = larutil::Geometry::GetME();
   int nPlanes = geom -> Nplanes();
-  result.fTotalEnergy.resize(nPlanes);
-  result.fSigmaTotalEnergy.resize(nPlanes);
-  result.fdEdx.resize(nPlanes);
-  result.fdQdx.resize(nPlanes);
+  result.fTotalEnergy_v.resize(nPlanes);
+  result.fSigmaTotalEnergy_v.resize(nPlanes);
+  result.fdEdx_v.resize(nPlanes);
+  result.fdQdx_v.resize(nPlanes);
+  result.fSigmadEdx_v.resize(nPlanes);
+  result.fSigmadQdx_v.resize(nPlanes);
   result.fHitdQdx_v.resize(nPlanes);
 
   result.fShoweringLength.resize(nPlanes); // resizing Showering Length Vector
-  result.fSigmadEdx.resize(nPlanes);
-  result.fTotalMIPEnergy.resize(nPlanes);
-  result.fSigmaTotalMIPEnergy.resize(nPlanes);
+  result.fTotalMIPEnergy_v.resize(nPlanes);
+  result.fSigmaTotalMIPEnergy_v.resize(nPlanes);
 
   result.fPlaneIsBad.resize(nPlanes);
 
@@ -114,6 +115,8 @@ void ShowerRecoAlgModular::PrintModuleList() {
 }
 
 void ShowerRecoAlgModular::printChanges(const Shower_t & localCopy, const Shower_t result, std::string moduleName) {
+
+  bool changed;
 
   // Look at each value of Shower_t and if it has changed, print out that change
   std::cout << "\nPrinting the list of changes made by module " << moduleName << std::endl;
@@ -196,76 +199,110 @@ void ShowerRecoAlgModular::printChanges(const Shower_t & localCopy, const Shower
 
   // Since these should be length = nplanes, checking each plane for change
   // If changed, print out
+
   // Total Energy
-  bool changed = false;
-  for (unsigned int i = 0; i < localCopy.fTotalEnergy.size(); i++) {
-    if (localCopy.fTotalEnergy[i] != result.fTotalEnergy[i]) {
+  changed = false;
+  if (localCopy.fTotalEnergy != result.fTotalEnergy)
+      changed = true;
+  if (changed) {
+    std::cout << "\tfTotalEnergy has changed from "
+	      << localCopy.fTotalEnergy << " to "
+	      << result.fTotalEnergy << std::endl;
+  }
+
+  //Total Energy vector
+  changed = false;
+  for (unsigned int i = 0; i < localCopy.fTotalEnergy_v.size(); i++) {
+    if (localCopy.fTotalEnergy_v[i] != result.fTotalEnergy_v[i]) {
       changed = true;
       break;
     }
   }
-
   if (changed) {
-    std::cout << "\tfTotalEnergy has changed from (";
-    for (auto & val : localCopy.fTotalEnergy ) std::cout << val << " ";
+    std::cout << "\tfTotalEnergy_v has changed from (";
+    for (auto & val : localCopy.fTotalEnergy_v ) std::cout << val << " ";
     std::cout << ") to (";
-    for (auto & val : result.fTotalEnergy ) std::cout << val << " ";
+    for (auto & val : result.fTotalEnergy_v ) std::cout << val << " ";
     std::cout << ")" << std::endl;
   }
 
-  if (changed) {
-    std::cout << "\tfShoweringLength has changed from (";
-    for (auto & val : localCopy.fShoweringLength ) std::cout << val << " ";
-    std::cout << ") to (";
-    for (auto & val : result.fShoweringLength ) std::cout << val << " ";
-    std::cout << ")" << std::endl;
-  }
+
 
   // Sigma Total Energy
   changed = false;
-  for (unsigned int i = 0; i < localCopy.fSigmaTotalEnergy.size(); i++) {
-    if (localCopy.fSigmaTotalEnergy[i] != result.fSigmaTotalEnergy[i]) {
+  if (localCopy.fSigmaTotalEnergy != result.fSigmaTotalEnergy)
+      changed = true;
+  if (changed) {
+    std::cout << "\tfSigmaTotalEnergy has changed from "
+	      << localCopy.fSigmaTotalEnergy << " to "
+	      << result.fSigmaTotalEnergy << std::endl;
+  }
+
+  // Sigma Total Energy vector
+  changed = false;
+  for (unsigned int i = 0; i < localCopy.fSigmaTotalEnergy_v.size(); i++) {
+    if (localCopy.fSigmaTotalEnergy_v[i] != result.fSigmaTotalEnergy_v[i]) {
       changed = true;
       break;
     }
   }
   if (changed) {
-    std::cout << "\tfSigmaTotalEnergy has changed from (";
-    for (auto & val : localCopy.fSigmaTotalEnergy ) std::cout << val << " ";
+    std::cout << "\tfSigmaTotalEnergy_v has changed from (";
+    for (auto & val : localCopy.fSigmaTotalEnergy_v ) std::cout << val << " ";
     std::cout << ") to (";
-    for (auto & val : result.fSigmaTotalEnergy ) std::cout << val << " ";
+    for (auto & val : result.fSigmaTotalEnergy_v ) std::cout << val << " ";
     std::cout << ")" << std::endl;
   }
 
   // dEdx
   changed = false;
-  for (unsigned int i = 0; i < localCopy.fdEdx.size(); i++) {
-    if (localCopy.fdEdx[i] != result.fdEdx[i]) {
+  if (localCopy.fdEdx != result.fdEdx)
+    changed = true;
+  if (changed) {
+    std::cout << "\tfdEdx has changed from "
+	      << localCopy.fdEdx << " to " 
+	      << result.fdEdx << std::endl;
+  }
+
+  // dEdx_v
+  changed = false;
+  for (unsigned int i = 0; i < localCopy.fdEdx_v.size(); i++) {
+    if (localCopy.fdEdx_v[i] != result.fdEdx_v[i]) {
       changed = true;
       break;
     }
   }
   if (changed) {
-    std::cout << "\tfdEdx has changed from (";
-    for (auto & val : localCopy.fdEdx ) std::cout << val << " ";
+    std::cout << "\tfdEdx_v has changed from (";
+    for (auto & val : localCopy.fdEdx_v ) std::cout << val << " ";
     std::cout << ") to (";
-    for (auto & val : result.fdEdx ) std::cout << val << " ";
+    for (auto & val : result.fdEdx_v ) std::cout << val << " ";
     std::cout << ")" << std::endl;
   }
 
   // dQdx
   changed = false;
-  for (unsigned int i = 0; i < localCopy.fdQdx.size(); i++) {
-    if (localCopy.fdQdx[i] != result.fdQdx[i]) {
+  if (localCopy.fdQdx_v != result.fdQdx_v)
+      changed = true;
+  if (changed) {
+    std::cout << "\tfdQdx has changed from"
+	      << localCopy.fdQdx << " to "
+	      << result.fdQdx << std::endl;
+  }
+
+  // dQdx_v
+  changed = false;
+  for (unsigned int i = 0; i < localCopy.fdQdx_v.size(); i++) {
+    if (localCopy.fdQdx_v[i] != result.fdQdx_v[i]) {
       changed = true;
       break;
     }
   }
   if (changed) {
-    std::cout << "\tfdQdx has changed from (";
-    for (auto & val : localCopy.fdQdx ) std::cout << val << " ";
+    std::cout << "\tfdQdx_v has changed from (";
+    for (auto & val : localCopy.fdQdx_v ) std::cout << val << " ";
     std::cout << ") to (";
-    for (auto & val : result.fdQdx ) std::cout << val << " ";
+    for (auto & val : result.fdQdx_v ) std::cout << val << " ";
     std::cout << ")" << std::endl;
   }
 
@@ -292,49 +329,86 @@ void ShowerRecoAlgModular::printChanges(const Shower_t & localCopy, const Shower
 
   // sigma dEdx
   changed = false;
-  for (unsigned int i = 0; i < localCopy.fSigmadEdx.size(); i++) {
-    if (localCopy.fSigmadEdx[i] != result.fSigmadEdx[i]) {
+  if (localCopy.fSigmadEdx != result.fSigmadEdx)
+    changed = true;
+  if (changed) {
+    std::cout << "\tfSigmadEdx has changed from "
+	      << localCopy.fSigmadEdx << " to "
+	      << result.fSigmadEdx << std::endl;
+  }
+
+  // sigma dEdx_v
+  changed = false;
+  for (unsigned int i = 0; i < localCopy.fSigmadEdx_v.size(); i++) {
+    if (localCopy.fSigmadEdx_v[i] != result.fSigmadEdx_v[i]) {
       changed = true;
       break;
     }
   }
   if (changed) {
-    std::cout << "\tfSigmadEdx has changed from (";
-    for (auto & val : localCopy.fSigmadEdx ) std::cout << val << " ";
+    std::cout << "\tfSigmadEdx_v has changed from (";
+    for (auto & val : localCopy.fSigmadEdx_v ) std::cout << val << " ";
     std::cout << ") to (";
-    for (auto & val : result.fSigmadEdx ) std::cout << val << " ";
+    for (auto & val : result.fSigmadEdx_v ) std::cout << val << " ";
+    std::cout << ")" << std::endl;
+  }
+
+
+  // sigma dQdx
+  changed = false;
+  if (localCopy.fSigmadQdx != result.fSigmadQdx)
+    changed = true;
+  if (changed) {
+    std::cout << "\tfSigmadQdx has changed from "
+	      << localCopy.fSigmadQdx << " to "
+	      << result.fSigmadQdx << std::endl;
+  }
+
+  // sigma dQdx_v
+  changed = false;
+  for (unsigned int i = 0; i < localCopy.fSigmadQdx_v.size(); i++) {
+    if (localCopy.fSigmadQdx_v[i] != result.fSigmadQdx_v[i]) {
+      changed = true;
+      break;
+    }
+  }
+  if (changed) {
+    std::cout << "\tfSigmadQdx_v has changed from (";
+    for (auto & val : localCopy.fSigmadQdx_v ) std::cout << val << " ";
+    std::cout << ") to (";
+    for (auto & val : result.fSigmadQdx_v ) std::cout << val << " ";
     std::cout << ")" << std::endl;
   }
 
   // Total MIP Energy
   changed = false;
-  for (unsigned int i = 0; i < localCopy.fTotalMIPEnergy.size(); i++) {
-    if (localCopy.fTotalMIPEnergy[i] != result.fTotalMIPEnergy[i]) {
+  for (unsigned int i = 0; i < localCopy.fTotalMIPEnergy_v.size(); i++) {
+    if (localCopy.fTotalMIPEnergy_v[i] != result.fTotalMIPEnergy_v[i]) {
       changed = true;
       break;
     }
   }
   if (changed) {
     std::cout << "\tfTotalMIPEnergy has changed from (";
-    for (auto & val : localCopy.fTotalMIPEnergy ) std::cout << val << " ";
+    for (auto & val : localCopy.fTotalMIPEnergy_v ) std::cout << val << " ";
     std::cout << ") to (";
-    for (auto & val : result.fTotalMIPEnergy ) std::cout << val << " ";
+    for (auto & val : result.fTotalMIPEnergy_v ) std::cout << val << " ";
     std::cout << ")" << std::endl;
   }
 
   // Sigma Total MIP Energy
   changed = false;
-  for (unsigned int i = 0; i < localCopy.fSigmaTotalMIPEnergy.size(); i++) {
-    if (localCopy.fSigmaTotalMIPEnergy[i] != result.fSigmaTotalMIPEnergy[i]) {
+  for (unsigned int i = 0; i < localCopy.fSigmaTotalMIPEnergy_v.size(); i++) {
+    if (localCopy.fSigmaTotalMIPEnergy_v[i] != result.fSigmaTotalMIPEnergy_v[i]) {
       changed = true;
       break;
     }
   }
   if (changed) {
     std::cout << "\tfSigmaTotalMIPEnergy has changed from (";
-    for (auto & val : localCopy.fSigmaTotalMIPEnergy ) std::cout << val << " ";
+    for (auto & val : localCopy.fSigmaTotalMIPEnergy_v ) std::cout << val << " ";
     std::cout << ") to (";
-    for (auto & val : result.fSigmaTotalMIPEnergy ) std::cout << val << " ";
+    for (auto & val : result.fSigmaTotalMIPEnergy_v ) std::cout << val << " ";
     std::cout << ")" << std::endl;
   }
 

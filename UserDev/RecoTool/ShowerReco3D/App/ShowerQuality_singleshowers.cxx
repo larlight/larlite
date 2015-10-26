@@ -443,17 +443,17 @@ void ShowerQuality_singleshowers::FillQualityInfo(const shower& reco_shower, con
   //   fShowerTreeParams.cluster_pur *= ep.second;
   // }
 
-  fShowerTreeParams.reco_energy_U = reco_shower.Energy().at(0);
-  fShowerTreeParams.reco_energy_V = reco_shower.Energy().at(1);
-  fShowerTreeParams.reco_energy_Y = reco_shower.Energy().at(2);
+  fShowerTreeParams.reco_energy_U = reco_shower.Energy_v().at(0);
+  fShowerTreeParams.reco_energy_V = reco_shower.Energy_v().at(1);
+  fShowerTreeParams.reco_energy_Y = reco_shower.Energy_v().at(2);
   
-  fShowerTreeParams.reco_dedx_U   = reco_shower.dEdx().at(0);
-  fShowerTreeParams.reco_dedx_V   = reco_shower.dEdx().at(1);
-  fShowerTreeParams.reco_dedx_Y   = reco_shower.dEdx().at(2);
+  fShowerTreeParams.reco_dedx_U   = reco_shower.dEdx_v().at(0);
+  fShowerTreeParams.reco_dedx_V   = reco_shower.dEdx_v().at(1);
+  fShowerTreeParams.reco_dedx_Y   = reco_shower.dEdx_v().at(2);
 
-  fShowerTreeParams.reco_dqdx_U = reco_shower.dQdx().at(0);
-  fShowerTreeParams.reco_dqdx_V = reco_shower.dQdx().at(1);                                                           
-  fShowerTreeParams.reco_dqdx_Y = reco_shower.dQdx().at(2);
+  fShowerTreeParams.reco_dqdx_U = reco_shower.dQdx_v().at(0);
+  fShowerTreeParams.reco_dqdx_V = reco_shower.dQdx_v().at(1);                                                           
+  fShowerTreeParams.reco_dqdx_Y = reco_shower.dQdx_v().at(2);
 
 
 

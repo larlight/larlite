@@ -102,7 +102,7 @@ namespace showerreco{
 	std::cout << "energy on plane " << pl << " is : " << E << std::endl;
 						
       // set the energy for this plane
-      resultShower.fTotalEnergy[pl] = E;
+      resultShower.fTotalEnergy_v[pl] = E;
 
     }// for all input clusters
     
