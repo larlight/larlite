@@ -136,6 +136,9 @@ protected:
     double reco_dedx_U;
     double reco_dedx_V;
     double reco_dedx_Y;
+    double reco_dqdx_U;
+    double reco_dqdx_V;
+    double reco_dqdx_Y;
     double mc_x, mc_y, mc_z;
     double mc_dcosx, mc_dcosy, mc_dcosz;
     double mc_energy;

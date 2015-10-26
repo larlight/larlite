@@ -407,7 +407,7 @@ void ShowerQuality_singleshowers::FillQualityInfo(const shower& reco_shower, con
   fShowerTreeParams.mc_dcosx = mc_shower.Start().Px() / mc_shower.Start().E();
   fShowerTreeParams.mc_dcosy = mc_shower.Start().Py() / mc_shower.Start().E();
   fShowerTreeParams.mc_dcosz = mc_shower.Start().Pz() / mc_shower.Start().E();
-
+    
   // Reco vtx
   fShowerTreeParams.reco_x = reco_shower.ShowerStart()[0];
   fShowerTreeParams.reco_y = reco_shower.ShowerStart()[1];
@@ -446,9 +446,16 @@ void ShowerQuality_singleshowers::FillQualityInfo(const shower& reco_shower, con
   fShowerTreeParams.reco_energy_U = reco_shower.Energy().at(0);
   fShowerTreeParams.reco_energy_V = reco_shower.Energy().at(1);
   fShowerTreeParams.reco_energy_Y = reco_shower.Energy().at(2);
+  
   fShowerTreeParams.reco_dedx_U   = reco_shower.dEdx().at(0);
   fShowerTreeParams.reco_dedx_V   = reco_shower.dEdx().at(1);
   fShowerTreeParams.reco_dedx_Y   = reco_shower.dEdx().at(2);
+
+  fShowerTreeParams.reco_dqdx_U = reco_shower.dQdx().at(0);
+  fShowerTreeParams.reco_dqdx_V = reco_shower.dQdx().at(1);                                                           
+  fShowerTreeParams.reco_dqdx_Y = reco_shower.dQdx().at(2);
+
+
 
   // Fill Tree
   fShowerTree->Fill();
@@ -482,6 +489,9 @@ void ShowerQuality_singleshowers::InitializeAnaTrees()
   fShowerTree->Branch("mc_dcosx", &fShowerTreeParams.mc_dcosx, "mc_dcosx/D");
   fShowerTree->Branch("mc_dcosy", &fShowerTreeParams.mc_dcosy, "mc_dcosy/D");
   fShowerTree->Branch("mc_dcosz", &fShowerTreeParams.mc_dcosz, "mc_dcosz/D");
+  fShowerTree->Branch("reco_dqdx_U", &fShowerTreeParams.reco_dqdx_U, "reco_dqdx_U/D");
+  fShowerTree->Branch("reco_dqdx_V", &fShowerTreeParams.reco_dqdx_V, "reco_dqdx_V/D");
+  fShowerTree->Branch("reco_dqdx_Y", &fShowerTreeParams.reco_dqdx_Y, "reco_dqdx_Y/D");
   fShowerTree->Branch("mc_energy", &fShowerTreeParams.mc_energy, "mc_energy/D");
   fShowerTree->Branch("reco_dedx_U", &fShowerTreeParams.reco_dedx_U, "reco_dedx_U/D");
   fShowerTree->Branch("reco_dedx_V", &fShowerTreeParams.reco_dedx_V, "reco_dedx_V/D");
@@ -518,6 +528,9 @@ void ShowerQuality_singleshowers::ResetShowerTreeParams() {
   fShowerTreeParams.reco_dedx_U = -1.;
   fShowerTreeParams.reco_dedx_V = -1.;
   fShowerTreeParams.reco_dedx_Y = -1.;
+  fShowerTreeParams.reco_dqdx_U =-1.;
+  fShowerTreeParams.reco_dqdx_V =-1.;
+  fShowerTreeParams.reco_dqdx_Y =-1.;
   fShowerTreeParams.mc_x = -1.; fShowerTreeParams.mc_y = -1.; fShowerTreeParams.mc_z = -1.;
   fShowerTreeParams.mc_dcosx = -1.; fShowerTreeParams.mc_dcosy = -1.; fShowerTreeParams.mc_dcosz = -1.;
   fShowerTreeParams.mc_energy = -1.;

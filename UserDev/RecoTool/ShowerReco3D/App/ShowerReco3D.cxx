@@ -122,6 +122,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     s.set_start_point_err     ( res_shower.fSigmaXYZStart       );
     s.set_dedx                ( res_shower.fdEdx                );
     s.set_dedx_err            ( res_shower.fSigmadEdx           );
+    s.set_dqdx                ( res_shower.fdQdx                );
     s.set_length              ( res_shower.fLength              );
     s.set_opening_angle       ( res_shower.fOpeningAngle        );
 
