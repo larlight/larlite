@@ -258,7 +258,7 @@ namespace showerreco{
 	}
      
 
-       resultShower.fdQdx = dQdx;
+       resultShower.fdQdx_v = dQdx;
        _tree->Fill(); 
    
     }

@@ -91,6 +91,11 @@ namespace showerreco{
     auto geom       = larutil::Geometry::GetME();
     auto geomHelper = larutil::GeometryHelper::GetME();
 
+    double y;
+    double z;
+    geom->IntersectionPoint(1808,998,2,0,y,z);
+    std::cout << "[y,z] -> [" << y << ", " << z << "]" << std::endl;
+
     auto t2cm = geomHelper->TimeToCm();
 
     // we want an energy for each plane
@@ -146,7 +151,7 @@ namespace showerreco{
 	std::cout << "energy on plane " << pl << " is : " << E << std::endl;
 						
       // set the energy for this plane
-      resultShower.fTotalEnergy[pl] = E;
+      resultShower.fTotalEnergy_v[pl] = E;
 
     }// for all input clusters
     

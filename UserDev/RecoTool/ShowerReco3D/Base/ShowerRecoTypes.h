@@ -38,17 +38,30 @@ namespace showerreco {
     TVector3 fSigmaXYZStart;                    ///< uncertainty on 3D start point
     double   fLength;                           ///< 3D length of a shower
     double   fOpeningAngle;                     ///< 3D opening angle of a shower
-    std::vector< double > fTotalEnergy;         ///< Calculated Energy per each plane
-    std::vector< double > fSigmaTotalEnergy;    ///< Calculated Energy per each plane
-    std::vector< double > fdEdx;                ///< Calculated dEdx per each plane
-    std::vector< double > fdQdx;                ///< Calculated dQdx per each plane [ADC/cm]
+
+    double fTotalEnergy;                        ///< Calculated Energy
+    double fSigmaTotalEnergy;                   ///< Calculated Energy uncertainty
+    std::vector< double > fTotalEnergy_v;       ///< Calculated Energy per each plane
+    std::vector< double > fSigmaTotalEnergy_v;  ///< Calculated Energy per each plane
+    std::vector< double > fTotalMIPEnergy_v;    ///< Calculated Energy per each plane
+    std::vector< double > fSigmaTotalMIPEnergy_v;///< Calculated Energy per each plane
+
+    double fdEdx;                               ///< Calculated dEdx
+    double fSigmadEdx;                          ///< Calculated dEdx uncertainty
+    std::vector< double > fdEdx_v;              ///< Calculated dEdx per each plane
+    std::vector< double > fSigmadEdx_v;         ///< Calculated dEdx per each plane
+
+    double fdQdx;                               ///< Calculated dQdx [fC/cm]
+    double fSigmadQdx;                          ///< Calculated dWdx uncertainty [fC/cm]
+    std::vector< double > fdQdx_v;              ///< Calculated dQdx per each plane [fC/cm]
+    std::vector< double > fSigmadQdx_v;         ///< Calculated dQdx per each plane
     size_t fBestdQdxPlane;                      ///< Best plane for dQdx calculation
     std::vector< std::vector < double > > fHitdQdx_v;      ///< Hit-by-hit dQdx per each plane [ADC/cm]
     double fBestdQdx;                           ///< Selects dQdx with the longest ShoweringLength [ADC/cm]
+
     std::vector< double > fShoweringLength;     ///< Calculates the distance from start to shower points [in cm]
-    std::vector< double > fSigmadEdx;           ///< Calculated dEdx per each plane
-    std::vector< double > fTotalMIPEnergy;      ///< Calculated Energy per each plane
-    std::vector< double > fSigmaTotalMIPEnergy; ///< Calculated Energy per each plane
+
+
     ::larlite::geo::PlaneID fBestPlane;         ///< "Best" plane used for geometrical interpretation
 
     std::vector< ::larlite::geo::PlaneID > fPlaneIDs;    ///< List of PlaneIDs in the order aligned w.r.t. other vectors
@@ -70,15 +83,23 @@ namespace showerreco {
       fLength = kDOUBLE_MIN;
       fOpeningAngle = 0;
       
-      fTotalEnergy.clear();
-      fTotalEnergy = {kDOUBLE_MIN,kDOUBLE_MIN,kDOUBLE_MIN};
-      fSigmaTotalEnergy.clear();
-      fdEdx.clear();
-      fdEdx = {kDOUBLE_MIN,kDOUBLE_MIN,kDOUBLE_MIN};
+      fTotalEnergy = kDOUBLE_MIN;
+      fSigmaTotalEnergy = kDOUBLE_MIN;
+      fTotalEnergy_v.clear();
+      fTotalEnergy_v = {kDOUBLE_MIN,kDOUBLE_MIN,kDOUBLE_MIN};
+      fSigmaTotalEnergy_v.clear();
+      fdEdx = kDOUBLE_MIN;
+      fSigmadEdx = kDOUBLE_MIN;
+      fdEdx_v.clear();
+      fdEdx_v = {kDOUBLE_MIN,kDOUBLE_MIN,kDOUBLE_MIN};
+      fdQdx = kDOUBLE_MIN;
+      fSigmadQdx = kDOUBLE_MIN;
+      fdQdx_v.clear();
+      fdQdx_v = {kDOUBLE_MIN,kDOUBLE_MIN,kDOUBLE_MIN};
       fShoweringLength.clear();
-      fSigmadEdx.clear();
-      fTotalMIPEnergy.clear();
-      fSigmaTotalMIPEnergy.clear();
+      fSigmadEdx_v.clear();
+      fTotalMIPEnergy_v.clear();
+      fSigmaTotalMIPEnergy_v.clear();
 
       fBestPlane = ::larlite::geo::PlaneID();
       fPlaneIDs.clear();      

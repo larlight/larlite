@@ -42,53 +42,93 @@ namespace larlite{
     const TVector3& ShowerStart()    const;
     const TVector3& ShowerStartErr() const;
 
-    const std::vector< double >& Energy()    const;
-    const std::vector< double >& EnergyErr() const;
-    
-    const std::vector< double >& MIPEnergy()    const;
-    const std::vector< double >& MIPEnergyErr() const;
+    const double& Energy(int pl=-1)    const;
+    const double& EnergyErr(int pl=-1) const;
+    const std::vector< double >& Energy_v()    const;
+    const std::vector< double >& EnergyErr_v() const;
+    const std::vector< double >& MIPEnergy_v()    const;
+    const std::vector< double >& MIPEnergyErr_v() const;
 
     int    best_plane() const;
     double Length() const;
     double OpeningAngle() const;
 
-    const std::vector< double >& dEdx()    const;
-    const std::vector< double >& dEdxErr() const;
-    const std::vector< double >& dQdx()    const;
+    const double& dEdx(int pl=-1)    const;
+    const double& dEdxErr(int pl=-1) const;
+    const std::vector< double >& dEdx_v()    const;
+    const std::vector< double >& dEdxErr_v() const;
+    const double& dQdx(int pl=-1)    const;
+    const double& dQdxErr(int pl=-1) const;
+    const std::vector< double >& dQdx_v()    const;
+    const std::vector< double >& dQdxErr_v() const;
 
     // Set methods
-    void set_id                (const int id)                      { fID = id;                 }
-    void set_total_energy      (const std::vector< double >& q)    { fTotalEnergy = q;         }
-    void set_total_energy_err  (const std::vector< double >& q)    { fSigmaTotalEnergy = q;    }
-    void set_total_MIPenergy   (const std::vector< double >& q)    { fTotalMIPEnergy = q;      }
-    void set_total_MIPenergy_err  (const std::vector< double >& q) { fSigmaTotalMIPEnergy = q; }
-    void set_total_best_plane  (const int q)                         { fBestPlane = q;        }
-    
-    void set_direction       (const TVector3& dir)        { fDCosStart = dir;        }
-    void set_direction_err   (const TVector3& dir_e)      { fSigmaDCosStart = dir_e; }
-    void set_start_point     (const TVector3& xyz)        { fXYZstart = xyz;        }
-    void set_start_point_err (const TVector3& xyz_e)      { fSigmaXYZstart = xyz_e; }
-    void set_dedx      (const std::vector< double >& q) { fdEdx = q;        }
-    void set_dqdx      (const std::vector< double >& q) { fdQdx = q;        }
-    void set_dedx_err  (const std::vector< double >& q) { fSigmadEdx = q;        }
+
+    // id setter function
+    void set_id (const int id) { fID = id; }
+
+    // Energy setter functions
+    void set_total_energy     (const double& q) { fTotalEnergy = q;      }
+    void set_total_energy_err (const double& q) { fSigmaTotalEnergy = q; }
+    void set_total_energy_v        (const std::vector< double >& q) { fTotalEnergy_v = q;         }
+    void set_total_energy_err_v    (const std::vector< double >& q) { fSigmaTotalEnergy_v = q;    }
+    void set_total_MIPenergy_v     (const std::vector< double >& q) { fTotalMIPEnergy_v = q;      }
+    void set_total_MIPenergy_err_v (const std::vector< double >& q) { fSigmaTotalMIPEnergy_v = q; }
+
+    // Best Plane setter function
+    void set_total_best_plane (const int q) { fBestPlane = q;}
+
+    // Start Direction setter functions
+    void set_direction       (const TVector3& dir)   { fDCosStart = dir;        }
+    void set_direction_err   (const TVector3& dir_e) { fSigmaDCosStart = dir_e; }
+
+    // Start Point setter functions
+    void set_start_point     (const TVector3& xyz)   { fXYZstart = xyz;        }
+    void set_start_point_err (const TVector3& xyz_e) { fSigmaXYZstart = xyz_e; }
+
+    // dEdx setter functions
+    void set_dedx       (const double& q) { fdEdx = q;      }
+    void set_dedx_err   (const double& q) { fSigmadEdx = q; }
+    void set_dedx_v     (const std::vector< double >& q) { fdEdx_v = q;      }
+    void set_dedx_err_v (const std::vector< double >& q) { fSigmadEdx_v = q; }
+
+    // dQdx setter functions
+    void set_dqdx       (const double& q) { fdQdx = q;      }
+    void set_dqdx_err   (const double& q) { fSigmadQdx = q; }
+    void set_dqdx_v     (const std::vector< double >& q) { fdQdx_v = q;      }
+    void set_dqdx_err_v (const std::vector< double >& q) { fSigmadQdx_v = q; }
+
+    // Length setter function
     void set_length(const double& l) { fLength = l; }
+
+    // Opening Angle setter function
     void set_opening_angle(const double& oa) { fOpeningAngle = oa; }
 
   protected:
 
     int fID;
-    TVector3 fDCosStart;             ///< direction cosines at start of shower
-    TVector3 fSigmaDCosStart;        ///< uncertainting on initial direction cosines
-    TVector3 fXYZstart;             ///< direction cosines at start of shower
-    TVector3 fSigmaXYZstart;        ///< uncertainting on initial direction cosines
-    std::vector< double > fTotalEnergy;           ///< Calculated Energy per each plane
-    std::vector< double > fSigmaTotalEnergy;           ///< Calculated Energy per each plane
-    std::vector< double > fdEdx;           ///< Calculated dEdx per each plane
-    std::vector< double > fdQdx;           ///< Calculated dQdx per each plane
-    std::vector< double > fSigmadEdx;           ///< Calculated dEdx per each plane
-    
-    std::vector< double > fTotalMIPEnergy;           ///< Calculated Energy per each plane
-    std::vector< double > fSigmaTotalMIPEnergy;           ///< Calculated Energy per each plane
+    TVector3 fDCosStart;      ///< direction cosines at start of shower
+    TVector3 fSigmaDCosStart; ///< uncertainting on initial direction cosines
+    TVector3 fXYZstart;       ///< direction cosines at start of shower
+    TVector3 fSigmaXYZstart;  ///< uncertainting on initial direction cosines
+    // Energy information
+    double fTotalEnergy;                          ///< Calculated Energy
+    double fSigmaTotalEnergy;                     ///< Calculated Energy error
+    std::vector< double > fTotalEnergy_v;         ///< Calculated Energy per each plane
+    std::vector< double > fSigmaTotalEnergy_v;    ///< Calculated Energy per each plane
+    std::vector< double > fTotalMIPEnergy_v;      ///< Calculated Energy per each plane
+    std::vector< double > fSigmaTotalMIPEnergy_v; ///< Calculated Energy error per each plane
+    // dQdx
+    double fdQdx;                       ///< Calculated dQdx
+    double fSigmadQdx;                  ///< Calculated dQdx error
+    std::vector< double > fdQdx_v;      ///< Calculated dQdx per each plane
+    std::vector< double > fSigmadQdx_v; ///< Calculated dQdx error per each plane
+    // dEdx
+    double fdEdx;                       ///< Calculated dQdx
+    double fSigmadEdx;                  ///< Calculated dQdx error
+    std::vector< double > fdEdx_v;      ///< Calculated dEdx per each plane
+    std::vector< double > fSigmadEdx_v; ///< Calculated dEdx error per each plane
+
     int fBestPlane;
     double fLength;
     double fOpeningAngle;
