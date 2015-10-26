@@ -90,6 +90,7 @@ void ShowerRecoManager::Process(const ClusterAss_t& ass,
     }
 
     for (auto& shower_alg : _alg_v){
+      shower_alg -> SetStorageManager(_storage);
       auto this_shower = shower_alg->RecoOneShower(in_clusters);
       showers.emplace_back(this_shower);
     }// for all shower reco algorithms? not modular algos...

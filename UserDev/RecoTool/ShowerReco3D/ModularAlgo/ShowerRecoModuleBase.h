@@ -17,6 +17,7 @@
 #include <iostream>
 #include "ShowerReco3D/Base/ShowerRecoTypes.h"
 #include "TTree.h"
+#include "DataFormat/storage_manager.h"
 
 /**
    \class ShowerRecoModuleBase
@@ -67,6 +68,16 @@ public:
      */
     virtual void initialize() {};
 
+    /**
+    * @brief allow access to the larlite storage manager
+    * @details Pass a pointer to the current storage manager to the reco alg.  Get's called once per event but
+    *          it's just passing pointers
+    *
+    * @param sm pointer to the storage manager
+    */
+    void SetStorageManager(larlite::storage_manager * sm) {_storage = sm;}
+
+
 protected:
 
     std::string _name;
@@ -74,6 +85,8 @@ protected:
     bool _verbose;
 
     TTree* _tree;
+
+    ::larlite::storage_manager * _storage;
 
 };
 
