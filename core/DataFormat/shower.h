@@ -54,6 +54,7 @@ namespace larlite{
 
     const std::vector< double >& dEdx()    const;
     const std::vector< double >& dEdxErr() const;
+    const std::vector< double >& dQdx()    const;
 
     // Set methods
     void set_id                (const int id)                      { fID = id;                 }
@@ -68,6 +69,7 @@ namespace larlite{
     void set_start_point     (const TVector3& xyz)        { fXYZstart = xyz;        }
     void set_start_point_err (const TVector3& xyz_e)      { fSigmaXYZstart = xyz_e; }
     void set_dedx      (const std::vector< double >& q) { fdEdx = q;        }
+    void set_dqdx      (const std::vector< double >& q) { fdQdx = q;        }
     void set_dedx_err  (const std::vector< double >& q) { fSigmadEdx = q;        }
     void set_length(const double& l) { fLength = l; }
     void set_opening_angle(const double& oa) { fOpeningAngle = oa; }
@@ -82,6 +84,7 @@ namespace larlite{
     std::vector< double > fTotalEnergy;           ///< Calculated Energy per each plane
     std::vector< double > fSigmaTotalEnergy;           ///< Calculated Energy per each plane
     std::vector< double > fdEdx;           ///< Calculated dEdx per each plane
+    std::vector< double > fdQdx;           ///< Calculated dQdx per each plane
     std::vector< double > fSigmadEdx;           ///< Calculated dEdx per each plane
     
     std::vector< double > fTotalMIPEnergy;           ///< Calculated Energy per each plane

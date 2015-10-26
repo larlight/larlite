@@ -17,6 +17,7 @@ namespace larlite {
     fTotalEnergy.clear();           ///< Calculated Energy per each plane
     fSigmaTotalEnergy.clear();           ///< Calculated Energy per each plane
     fdEdx.clear();           ///< Calculated dEdx per each plane
+    fdQdx.clear();
     fSigmadEdx.clear();           ///< Calculated dEdx per each plane
     fLength = -1;
     fBestPlane = -1;
@@ -43,6 +44,7 @@ namespace larlite {
 
   const  std::vector< double >& shower::dEdx()    const { return fdEdx;          }
   const  std::vector< double >& shower::dEdxErr() const { return fSigmadEdx;     }
+  const  std::vector< double >& shower::dQdx()    const { return fdQdx;          }
   
 }
 
