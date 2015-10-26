@@ -164,7 +164,7 @@ Shower2d DrawShower::getShower2d(larlite::shower shower, unsigned int plane){
   }
   result._length = sqrt(pow(_wire - _second_wire, 2) + pow(_time - _second_time, 2));
 
-  result._dedx = shower.dEdx().back();
+  result._dedx = shower.dEdx();
 
   result._is_good = true;
   return result;
