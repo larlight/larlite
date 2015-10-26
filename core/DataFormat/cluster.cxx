@@ -67,6 +67,13 @@ namespace larlite{
   void cluster::set_planeID(const geo::PlaneID& id)
   { fPlaneID = id; }
 
+  void cluster::set_is_merged(bool b)
+  { fIsMergedCluster = b; }
+  void cluster::set_original_producer(std::string p)
+  { fOriginalClusterProducer = p; }
+  void cluster::set_original_indexes(std::vector<unsigned short> s)
+  { fOriginalClusterIndexes = s; }
+
   bool operator < (const cluster& a, const cluster& b) {
     
     if (a.hasPlane() && b.hasPlane() && a.Plane() != b.Plane())
