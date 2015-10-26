@@ -17,17 +17,25 @@ namespace larlite {
     fSigmaDCosStart[0] = fSigmaDCosStart[1] = fSigmaDCosStart[2] = -1;
     fTotalEnergy = -1;
     fTotalEnergy_v.clear();
+    fTotalEnergy_v.resize(3);
     fSigmaTotalEnergy_v.clear();
+    fSigmaTotalEnergy_v.resize(3);
     fTotalMIPEnergy_v.clear();
+    fTotalMIPEnergy_v.resize(3);
     fSigmaTotalMIPEnergy_v.clear();
+    fSigmaTotalMIPEnergy_v.resize(3);
     fdQdx = -1;
     fSigmadQdx = -1;
     fdQdx_v.clear();
+    fdQdx_v.resize(3);
     fSigmadQdx_v.clear();
+    fSigmadQdx_v.resize(3);
     fdEdx = -1;
     fSigmadQdx = -1;
     fdEdx_v.clear();
+    fdEdx_v.resize(3);
     fSigmadEdx_v.clear();
+    fSigmadEdx_v.resize(3);
     fLength = -1;
     fBestPlane = -1;
   }

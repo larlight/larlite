@@ -93,8 +93,6 @@ namespace showerreco{
 
     double y;
     double z;
-    geom->IntersectionPoint(1808,998,2,0,y,z);
-    std::cout << "[y,z] -> [" << y << ", " << z << "]" << std::endl;
 
     auto t2cm = geomHelper->TimeToCm();
 
