@@ -65,6 +65,14 @@ namespace cluster{
     ::larlite::geo::PlaneID     plane_id;
 
 
+    // data about the cluster that this params was producer from,
+    // used if you need to get associations for this object:
+    // 
+    // The cluster producer that made the cluster that has associations to it
+    std::string original_producer;
+    // The index of those associations
+    std::vector<unsigned short> original_indexes;
+
 
     Polygon2D PolyObject;              ///< Polygon Object...see Polygon2D.hh
 

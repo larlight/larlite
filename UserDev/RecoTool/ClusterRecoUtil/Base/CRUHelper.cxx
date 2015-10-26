@@ -24,14 +24,45 @@ void CRUHelper::GenerateParams(::larlite::storage_manager* storage,
                                const std::string &cluster_producer_name,
                                std::vector<cluster::cluster_params> &params_v) const
 {
-  std::vector<std::vector<Hit2D> > hits2d_v;
-  GenerateHit2D(storage, cluster_producer_name, hits2d_v);
+
   params_v.clear();
-  params_v.resize(hits2d_v.size(), cluster_params());
 
-  for (size_t i = 0; i < hits2d_v.size(); ++i)
+  auto ev_cluster = storage->get_data< ::larlite::event_cluster>(cluster_producer_name);
 
-    params_v.at(i).SetHits(hits2d_v.at(i));
+  params_v.resize(ev_cluster -> size(), cluster_params());
+
+  if (!ev_cluster)
+    throw CRUException(Form("No cluster data product by %s found!", cluster_producer_name.c_str()) );
+
+  if (!(ev_cluster->size())) return;
+
+  ::larlite::event_hit* ev_hits = nullptr;
+
+  auto const& hit_index_v = storage->find_one_ass(ev_cluster->id(), ev_hits, cluster_producer_name);
+
+  if (!ev_hits)
+    throw CRUException(Form("No associated hits to clusters by %s!", cluster_producer_name.c_str()) );
+
+  if (!hit_index_v.size())
+    throw CRUException(Form("Size 0 associated hits to clusters by %s!", cluster_producer_name.c_str()) );
+
+
+  for (size_t i = 0; i < ev_cluster->size(); ++i) {
+
+    if ( i >= hit_index_v.size() ) break;
+
+    auto &hit_index = hit_index_v[i];
+
+    std::vector<Hit2D> hits2d;
+
+    GenerateHit2D(hit_index, ev_hits, hits2d);
+
+    params_v.at(i).SetHits(hits2d);
+    params_v.at(i).original_producer = ev_cluster -> at(i).OriginalClusterProducer();
+    params_v.at(i).original_indexes = ev_cluster -> at(i).OriginalClusterIndexes();
+  }
+
+  return;
 
 }
 
