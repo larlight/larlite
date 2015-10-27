@@ -92,7 +92,10 @@ namespace larlite {
     TLorentzVector getXShift(const mctrack& mct) const;
 
 	/// Calculates for each mc shower, based on the time of the event, the corresponding shift in x-direction
-    TLorentzVector getXShift(const mcshower& mct) const;
+    TLorentzVector getXShift(const mcshower& mcs) const;
+
+	/// Calculates for each mc particle, based on the time of the event, the corresponding shift in x-direction
+    TLorentzVector getXShift(const mcpart& mcp) const;
 
 
   private:
