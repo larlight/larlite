@@ -57,13 +57,13 @@ public:
   /**
    * @brief Reconstruct shower w/ matching: return is a matched cluster association
    */
-  ClusterAss_t Reconstruct (const std::vector<std::vector<Hit2D> >& clusters,
+  ClusterAss_t Reconstruct (const std::vector<::cluster::cluster_params >& clusters,
                             std::vector< ::showerreco::Shower_t>& showers);
 
   /**
    * @brief Reconstruct shower w/ matching
    */
-  void Reconstruct (const std::vector<std::vector<Hit2D> >& clusters,
+  void Reconstruct (const std::vector<::cluster::cluster_params >& clusters,
                     const ClusterAss_t& ass,
                     std::vector< ::showerreco::Shower_t>& showers);
 

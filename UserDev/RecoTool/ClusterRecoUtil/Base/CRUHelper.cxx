@@ -17,6 +17,7 @@ void CRUHelper::GenerateParams(const std::vector<unsigned int>& hit_index,
   std::vector<Hit2D> hits2d;
   GenerateHit2D(hit_index, hits, hits2d);
   params.SetHits(hits2d);
+
 }
 
 /// Generate: CPAN vector from event storage by specifying cluster type
@@ -24,6 +25,7 @@ void CRUHelper::GenerateParams(::larlite::storage_manager* storage,
                                const std::string &cluster_producer_name,
                                std::vector<cluster::cluster_params> &params_v) const
 {
+
 
   params_v.clear();
 
