@@ -33,7 +33,7 @@ void ShowerRecoManager::Reset()
   fMatchMgr->Reset();
 }
 
-ClusterAss_t ShowerRecoManager::Reconstruct (const std::vector<std::vector<larutil::PxHit> >& clusters,
+ClusterAss_t ShowerRecoManager::Reconstruct (const std::vector<::cluster::cluster_params >& clusters,
     std::vector<showerreco::Shower_t>& showers)
 {
   showers.clear();
@@ -60,7 +60,7 @@ ClusterAss_t ShowerRecoManager::Reconstruct (const std::vector<std::vector<larut
   return res_ass;
 }
 
-void ShowerRecoManager::Reconstruct (const std::vector<std::vector<larutil::PxHit> >& clusters,
+void ShowerRecoManager::Reconstruct (const std::vector<::cluster::cluster_params >& clusters,
                                      const ClusterAss_t& ass,
                                      std::vector<showerreco::Shower_t>& showers)
 {
