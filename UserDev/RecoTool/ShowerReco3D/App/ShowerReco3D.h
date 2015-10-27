@@ -17,6 +17,7 @@
 
 #include "Analysis/ana_base.h"
 #include "ClusterRecoUtil/Base/CRUHelper.h"
+#include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
 #include "ShowerReco3D/Base/ShowerRecoManager.h"
 
 namespace larlite {
@@ -78,6 +79,8 @@ namespace larlite {
 
     /// CRUHelper converts framework dependent data product to PxUtil
     ::cluster::CRUHelper fCRUHelper;
+
+    ::cluster::DefaultParamsAlg _params_alg;
 
   };
 }
