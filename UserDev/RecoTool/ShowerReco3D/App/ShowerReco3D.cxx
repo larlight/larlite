@@ -34,8 +34,12 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
   fManager.SetStorageManager(storage);
 
   // Retrieve clusters and fed into the algorithm
-  std::vector<std::vector<Hit2D> > local_clusters;
-  fCRUHelper.GenerateHit2D(storage, fInputProducer, local_clusters);
+  std::vector<::cluster::cluster_params > local_clusters;
+  fCRUHelper.GenerateParams(storage, fInputProducer, local_clusters);
+
+  for (auto & clust : local_clusters)
+    _params_alg.FillParams(clust);
+
 
   // Create output data product holder
   auto shower_v = storage->get_data<event_shower>(fOutputProducer);

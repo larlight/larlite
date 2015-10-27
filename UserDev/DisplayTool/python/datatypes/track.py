@@ -1,5 +1,5 @@
 from data import recoBase
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 from ROOT import evd
 import pyqtgraph as pg
 
