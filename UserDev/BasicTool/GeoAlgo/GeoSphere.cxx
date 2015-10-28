@@ -190,16 +190,20 @@ namespace geoalgo {
     // let's make sure there aren't duplicates...if so -> call a
     // different constructor
     std::vector<geoalgo::Point_t> valid_points = {A};
-    if (B != A)
+    if (A.SqDist(B) > 0.0001)
       valid_points.push_back(B);
-    if ( (C != B) and (C != A) )
+    
+    if ( (C.SqDist(B) > 0.0001) and (C.SqDist(A) > 0.0001) )
       valid_points.push_back(C);
-    if ( (D != C) and (D != B) and (C != A) )
+    
+    if ( (C.SqDist(D) > 0.0001) and (D.SqDist(B) > 0.0001) and (C.SqDist(A)> 0.0001) )
       valid_points.push_back(D);
+    
     // if we have less then 4 points -> call the appropriate constructor
-    if (valid_points.size() < 4)
+    if (valid_points.size() < 4){
       (*this) = Sphere(valid_points);
-    return;
+      return;
+    }
 
     // get sphere from 3 points (A,B,C)
     Vector_t AB(B-A);
