@@ -187,6 +187,20 @@ namespace geoalgo {
     compat(C);
     compat(D);
 
+    // let's make sure there aren't duplicates...if so -> call a
+    // different constructor
+    std::vector<geoalgo::Point_t> valid_points = {A};
+    if (B != A)
+      valid_points.push_back(B);
+    if ( (C != B) and (C != A) )
+      valid_points.push_back(C);
+    if ( (D != C) and (D != B) and (C != A) )
+      valid_points.push_back(D);
+    // if we have less then 4 points -> call the appropriate constructor
+    if (valid_points.size() < 4)
+      (*this) = Sphere(valid_points);
+    return;
+
     // get sphere from 3 points (A,B,C)
     Vector_t AB(B-A);
     Vector_t AC(C-A);
@@ -201,8 +215,12 @@ namespace geoalgo {
     
     double d = 4*dABAC*dABAD*dACAD;
 
-    if (d==0)
+    if (d==0){
+      // are any points duplicates? if so 
+      // find the points that are collinear and call constructor
+      // for the
       throw GeoAlgoException("GeoSphere Exception: I think it means 3 points collinear. Find out which and call 3 point constructor - TO DO");
+    }
     
     double s = (dABAC*dACAD*dADAD + dABAD*dACAC*dACAD - dABAB*dACAD*dACAD)/d;
     double t = (dABAB*dACAD*dABAD + dABAD*dABAC*dADAD - dABAD*dABAD*dACAC)/d;
