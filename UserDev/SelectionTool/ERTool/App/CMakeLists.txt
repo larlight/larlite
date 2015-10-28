@@ -1,7 +1,7 @@
 
 # Generare the library names based on the directory
 get_filename_component(DIR ${CMAKE_CURRENT_LIST_DIR} NAME)
-set(LIB_NAME ${MODULE_NAME}_${DIR})
+set(LIB_NAME ${MODULE_NAME}${DIR})
 set(DICT_NAME "${LIB_NAME}Dict")
 
 # Get all the header files
@@ -14,11 +14,11 @@ FILE(GLOB EXECUTABLES "*.cxx")
 set(EXEC ${EXECUTABLES})
 
 # generate rootmap
-ROOT_GENERATE_DICTIONARY(${DICT_NAME} ${HEADER_FILES} LINKDEF LinkDef.h)
+ROOT_GENERATE_DICTIONARY(${DICT_NAME} ${HEADER_FILES} LINKDEF LinkDef.h OPTIONS -p)
 
 add_library(${LIB_NAME} SHARED ${EXEC} ${DICT_NAME}.cxx)
 
-target_link_libraries(${LIB_NAME} ${ROOT_LIBRARIES})
+target_link_libraries(${LIB_NAME} ${ROOT_LIBRARIES} BasicTool_GeoAlgo)
 
 # installing library, rootmap and pcm to LArLite library path
 install(TARGETS ${LIB_NAME} DESTINATION lib LIBRARY)

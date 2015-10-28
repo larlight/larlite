@@ -14,11 +14,11 @@ FILE(GLOB EXECUTABLES "*.cxx")
 set(EXEC ${EXECUTABLES})
 
 # generate rootmap
-ROOT_GENERATE_DICTIONARY(${DICT_NAME} ${HEADER_FILES} LINKDEF LinkDef.h)
+ROOT_GENERATE_DICTIONARY(${DICT_NAME} ${HEADER_FILES} LINKDEF LinkDef.h OPTIONS -p)
 
 add_library(${LIB_NAME} SHARED ${EXEC} ${DICT_NAME}.cxx)
 
-target_link_libraries(${LIB_NAME} ${ROOT_LIBRARIES})
+target_link_libraries(${LIB_NAME} ${ROOT_LIBRARIES} LArLite_Analysis)
 
 # installing library, rootmap and pcm to LArLite library path
 install(TARGETS ${LIB_NAME} DESTINATION lib LIBRARY)
