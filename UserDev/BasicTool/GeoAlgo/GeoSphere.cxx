@@ -15,7 +15,7 @@ namespace geoalgo {
 
   Sphere::Sphere(const Point_t& center, const double r)
     : _radius (r)
-  {compat(center,_radius); _center = center;}
+  {_center = center;}
 
   Sphere::Sphere(const Point_t& pt1, const Point_t& pt2)
   {
