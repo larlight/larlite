@@ -26,7 +26,7 @@ class larsoftgui(gui):
     def update(self):
 
         # set the text boxes correctly:
-        eventLabel = "Ev: " + str(self._event_manager.event())
+        eventLabel = "Ev: " + str(self._event_manager.event_no())
         self._eventLabel.setText(eventLabel)
         runLabel = "Run: " + str(self._event_manager.run())
         self._runLabel.setText(runLabel)
