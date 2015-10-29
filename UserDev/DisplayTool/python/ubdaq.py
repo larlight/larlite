@@ -25,10 +25,14 @@ def main():
 
     geom = evdmanager.microboone()
 
+    file = None    
+    if len(args.file) > 0:
+        file = args.file[0]
+    
 
     # If a file was passed, give it to the manager:
     manager = evdmanager.ubdaq_manager(geom)
-    # manager.setInputFiles(args.file)
+    manager.setInputFile(file)
 
     thisgui = gui.livegui(geom,manager)
     thisgui.initUI()

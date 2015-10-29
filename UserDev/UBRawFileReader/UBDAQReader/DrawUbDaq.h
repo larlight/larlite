@@ -72,6 +72,7 @@ namespace evd {
     void nextEvent();
     void prevEvent();
     void goToEvent(size_t e);
+    void reprocessEvent();
 
     void setInput(std::string s);
 
@@ -83,7 +84,7 @@ namespace evd {
 
   private:
 
-    void readData();
+    void readData(bool skipFetchData=false);
 
     size_t _n_events;
     // this is the event in the file (0 -> n_events)
