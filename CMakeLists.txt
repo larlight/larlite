@@ -10,14 +10,13 @@ set(CMAKE_SHARED_LINKER_FLAGS "-rdynamic")
 # no clue if thats true...
 cmake_minimum_required(VERSION 3.1)
 
+# Check if LArlite was configured
 if(DEFINED ENV{LARLITE_BASEDIR})
 	message("Found LArLite in " $ENV{LARLITE_BASEDIR})
+	set(BASEDIR $ENV{LARLITE_BASEDIR})
 else()
 	message(FATAL_ERROR "LArLite was not configured properly, execute config/setup.sh")
 endif()
-
-set(CMAKE_INSTALL_PREFIX $ENV{LARLITE_BASEDIR})
-set(CMAKE_INSTALL_LIBDIR  $ENV{LARLITE_BASEDIR}/lib)
 
 # ======================================================================================================
 # ========================================== ROOT STUFF ================================================
@@ -27,20 +26,26 @@ set(CMAKE_INSTALL_LIBDIR  $ENV{LARLITE_BASEDIR}/lib)
 
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} $ENV{ROOTSYS}/etc/cmake/)
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
-#---Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
 
+#---Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
 find_package(ROOT REQUIRED COMPONENTS Core RIO Net Hist Graf Graf3d Gpad Tree Rint Postscript Matrix Physics MathCore Thread)
 
 #---Define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
 include(${ROOT_USE_FILE})
-#include_directories(${ROOT_INCLUDE_DIR})
 
 
+# Define where to put the compiled libraries
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BASEDIR}/lib)
+
+# Definitions for installing
+set(CMAKE_INSTALL_PREFIX ${BASEDIR})
+set(CMAKE_INSTALL_LIBDIR  ${BASEDIR}/lib)
+
+# Global include directories
 include_directories(${CMAKE_SOURCE_DIR} ${ROOT_INCLUDE_DIRS})
 add_definitions(${ROOT_CXX_FLAGS})
 
 # Building
-
 add_subdirectory(core)
 add_subdirectory(UserDev)
 

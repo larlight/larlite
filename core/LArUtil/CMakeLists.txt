@@ -18,7 +18,7 @@ ROOT_GENERATE_DICTIONARY(${DICT_NAME} ${HEADER_FILES} LINKDEF LinkDef.h OPTIONS 
 
 add_library(${LIB_NAME} SHARED ${EXEC} ${DICT_NAME}.cxx)
 
-target_link_libraries(${LIB_NAME} ${ROOT_LIBRARIES} LArLite_Base)
+target_link_libraries(${LIB_NAME} ${ROOT_LIBRARIES} ${LIBS} LArLite_Base)
 
 # installing library, rootmap and pcm to LArLite library path
 install(TARGETS ${LIB_NAME} DESTINATION lib)
