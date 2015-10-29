@@ -98,10 +98,13 @@ void DrawUbDaq::nextEvent() {
   return;
 }
 
+void DrawUbDaq::reprocessEvent(){
+    readData(true);
+}
+
 void DrawUbDaq::prevEvent() {
 
   std::cerr<< "ERROR: ubdaq files can not go backwards yet!" << std::endl;
-  return;
 
   // if (_current_event <= 0) {
   //   std::cout << "On event " << _current_event << std::endl;
@@ -135,17 +138,18 @@ void DrawUbDaq::goToEvent(size_t e) {
 
 }
 
-void DrawUbDaq::readData() {
+void DrawUbDaq::readData(bool skipDataFetch) {
 
 
   // df.get_entry(_current_event);
 
-  _storage.ProcessEvent();
+  if (!skipDataFetch)
+    _storage.ProcessEvent();
   // This is an event viewer.  In particular, this handles raw wire signal drawing.
   // So, obviously, first thing to do is to get the wires.
   const larlite::event_rawdigit & RawDigitHandle = _storage.RawDigit();
 
-
+    
   _run = _storage.getManager().run_id();
   _subrun = _storage.getManager().subrun_id();
   _event_no = _storage.getManager().event_id();

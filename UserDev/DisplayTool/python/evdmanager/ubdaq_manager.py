@@ -44,35 +44,25 @@ class ubdaq_manager(manager, wire, QtCore.QObject):
 
         self.setInputFile(file)
 
-        # The lariat manager handles watching files and sending signals
-        self._watcher = None
-        self._stopFlag = None
-        self._running = False
-
         self._event_no = 0
 
-        # the manager also can cycle through the events in a file:
-        self._cycling = False
-        self._delay = 0.1
-
-        self._masterLock = False
-        self._processLock = False
-        self._drawingLock = False
-        self.processLockUpdate.connect(self.processLock)
 
         if not has_daq_types:
             print bcolors.WARNING + "NOTIFICATION: uboonedaq types are not configured to run.  \
 Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolors.ENDC
 
     def initProcess(self):
-
-        # Set up the noise filter and initialize
-        self._process.SetCorrectData(False)
-        self._process.SetSaveData(False)
-        self._process.SetStepSizeByPlane(48, 0)
-        self._process.SetStepSizeByPlane(48, 1)
-        self._process.SetStepSizeByPlane(96, 2)
-        self._process.initialize()
+        if self._process is None:
+            self._process = evd.DrawUbDaq()
+            # Set up the noise filter and initialize
+            self._process.SetCorrectData(False)
+            self._process.SetSaveData(False)
+            self._process.SetStepSizeByPlane(48, 0)
+            self._process.SetStepSizeByPlane(48, 1)
+            self._process.SetStepSizeByPlane(96, 2)
+            self._process.initialize()
+        print "set input to process being called."
+        self._process.setInput(self._file)
 
     def setEventNo(self, event_no):
         self._event_no = event_no
@@ -90,35 +80,28 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
 
     # override the functions from manager as needed here
     def next(self):
-        # Don't attempt to run if the process is locked
-        if self.sender() != None and self._masterLock:
-            # print "drawing: ", self._drawingLock
-            # print "process: ", self._processLock
-            # print "master:  ", self._masterLock
-            # print self.sender()
-            return
+        # Only support for sequential access so just verify we're not on last event
+        # And then go forward
 
-        # print "Called next"
         # Check that this isn't the last event:
         if self._event < self._process.n_events() - 1:
-            self.goToEvent(self._event + 1)
-        elif self._cycling:
-            self.goToEvent(0)
+            self._process.nextEvent()
         else:
             print "On the last event, can't go to next."
+        self.setRun(self._process.run())
+        self.setSubRun(self._process.subrun())
+        self.setEventNo(self._process.event_no())
+        self.eventChanged.emit()
 
     def prev(self):
-        # Don't attempt to run if the process is locked
-        if self._masterLock:
-            return
         if self._event != 0:
             self.goToEvent(self._event - 1)
-        elif self._cycling:
-            self.goToEvent(self._process.n_events() - 1)
         else:
             print "On the first event, can't go to previous."
 
     def goToEvent(self, event):
+        # No support for random access so bail:
+        return
         # Don't attempt to run if the process is locked
         self.setEvent(event)
         self.processEvent()
@@ -135,6 +118,7 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
         else:
             file = str(file).rstrip('\n')
             self._file = file
+            print file
             if file.endswith(".ubdaq"):
                 if has_daq_types:
                     self.initProcess()
@@ -145,7 +129,7 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
                 return
             self._process.setInput(file)
             self._hasFile = True
-            self.goToEvent(0)
+            self.next()
             if self._view_manager != None:
                 self._view_manager.setRangeToMax()
 
@@ -156,79 +140,22 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
             self._filePath = None
             return
 
-        if fileName.endswith(".root") or fileName.endswith(".ubdaq"):
+        if fileName.endswith(".ubdaq"):
             # this is a data file, set it to display:
             self.setInputFile(fileName)
-
-        elif fileName.endswith(".txt"):
-            # parse the txt file to get the file name
-            # automatically start a run of autoupdates
-            self._monitorFile = fileName
-            self.startFileRun(fileName)
-            self.runStarted.emit()
         else:
             self._filePath = None
-
-    def drawingLock(self, drawLock):
-        self._drawingLock = drawLock
-        self._masterLock = self._processLock or self._drawingLock
-
-    def processLock(self, procLock):
-        self._processLock = procLock
-        self._masterLock = self._processLock or self._drawingLock
-
-    def isRunning(self):
-        return self._running
-
-    def isCycling(self):
-        return self._cycling
-
-    def startFileRun(self, fileName=None):
-            # this function can be triggered by a button push, which implies it was stopped before;
-            # In that case, refresh the thread and start over.
-            # It can also be called by the parsefileName function, which implies a
-            # file is ready
-        self._running = True
-        if self._watcher == None and fileName == None:
-            print "ERROR: there is no file to watch, can not start a run."
-            return
-        self._stopFlag = threading.Event()
-        self._watcher = fileWatcher(self._stopFlag, self._monitorFile)
-        self._watcher.fileChanged.connect(self.setInputFile)
-        self._running = True
-        self._watcher.start()
-        pass
-
-    def stopFileRun(self):
-        self._running = False
-        self._stopFlag.set()
-        return
-
-    def startCycle(self, delay=None):
-        if delay != None:
-            self._delay = delay
-        # set up a thread to call next event every so often
-        self._cycling = True
-        self._stopCycleFlag = threading.Event()
-        self._cycleWatcher = delayTimer(self._stopCycleFlag, self._delay)
-        self._cycleWatcher.delayExpired.connect(self.next)
-        self._cycleWatcher.start()
-
-    def stopCycle(self):
-        self._cycling = False
-        self._stopCycleFlag.set()
 
     def processEvent(self, force=False):
         if not self._hasFile:
             return
         if self._lastProcessed != self._event or force:
-            self.processLockUpdate.emit(True)
             if self._type == "daq":
                 self._process.nextEvent()
             else:
                 self._process.goToEvent(self._event)
             self._lastProcessed = self._event
-            self.processLockUpdate.emit(False)
+
 
     def getPlane(self, plane):
         if self._hasFile:
@@ -240,7 +167,11 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
         else:
             return False
 
+    def toggleNoiseFilter(self,doit):
+        if self._process is not None:
+            self._process.SetCorrectData(doit)
+
     def reprocessEvent(self):
-        print "Calling event process"
-        self.processEvent(True)
+        print "Calling event re-process"
+        self._process.reprocessEvent()
         self.eventChanged.emit()

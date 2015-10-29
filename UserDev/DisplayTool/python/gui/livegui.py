@@ -13,36 +13,43 @@ class livegui(gui):
     def __init__(self, geometry, manager = None):
         super(livegui, self).__init__(geometry)
         
+        self._timer = QtCore.QTimer()
+        self._timer.timeout.connect(self.eventTimeoutTest)
+        self._minEventUpdateTime = 30.0
+        self._minFileUpdateTime = 1
+        self._fileChecker = UBDaqFileGlobber()
+
         # Make sure a manager is set up:
         if manager is None:
             manager = ubdaq_manager(geometry)
-        super(livegui, self).initManager(manager)
+        self.initManager(manager)
 
-        self._timer = QtCore.QTimer()
-        self._timer.timeout.connect(self.eventTimeoutTest)
-        self._minEventUpdateTime = 3.0
-        self._fileChecker = UBDaqFileGlobber()
+
+
 
     def eventTimeoutTest(self):
-        print "Was called!"
+        self._event_manager.next()
 
     # override the initUI function to change things:
     def initUI(self):
         super(livegui, self).initUI()
         # self._viewButtonArray[-1].setDown(True)
-        # self.update()
+        self.update()
         # self._view_manager.setRangeToMax()
 
-    def setManager(self, manager):
+    def initManager(self, manager):
+        super(livegui, self).initManager(manager)
         self._event_manager.eventChanged.connect(self.update)
         self._event_manager.runStarted.connect(self.runStartWorker)
-        self.drawingLock.connect(self._event_manager.drawingLock)
+        self._fileChecker.new_file_ready.connect(self._event_manager.setInputFile)
+        self.toggleNoiseFilter.connect(self._event_manager.toggleNoiseFilter)
+
 
     # override the update function for larsoft:
     def update(self):
         # Set a lock to
         # set the text boxes correctly:
-        eventLabel = "Ev: " + str(self._event_manager.event())
+        eventLabel = "Ev: " + str(self._event_manager.event_no())
         self._eventLabel.setText(eventLabel)
         runLabel = "Run: " + str(self._event_manager.run())
         self._runLabel.setText(runLabel)
@@ -51,13 +58,13 @@ class livegui(gui):
         self._view_manager.drawPlanes(self._event_manager)
         self._larliteEventEntry.setText(str(self._event_manager.event()))
         # Also update the larsoft text boxes, just in case:
-        if self._event_manager.isRunning():
+        if self._fileChecker.isActive():
             self._fileUpdatePauseButton.setText("PAUSE")
             self._fileUpdateLabel.setText("File update ON")
         else:
             self._fileUpdatePauseButton.setText("START")
             self._fileUpdateLabel.setText("File update OFF")
-        if self._event_manager.isCycling():
+        if self._timer.isActive():
             self._eventUpdatePauseButton.setText("PAUSE")
             self._autoRunLabel.setText("Event update ON")
         else:
@@ -65,19 +72,11 @@ class livegui(gui):
             self._autoRunLabel.setText("Event update OFF")
 
     def quit(self):
-        try:
-            self._event_manager.quit()
-        except:
-            pass
-        # if self._event_manager.isRunning():
-            # self._event_manager.stopFileRun()
-        # if self._event_manager.isCycling():
-            # self._event_manager.stopCycle()
         QtCore.QCoreApplication.instance().quit()
 
     # This function sets up the eastern widget
     def getEastLayout(self):
-        # This function just makes a dummy eastern layout to use.
+        # This function just makes an eastern layout to use.
         label1 = QtGui.QLabel("UBDAQ Viewer")
         label2 = QtGui.QLabel("Online Monitor")
         font = label1.font()
@@ -92,7 +91,6 @@ class livegui(gui):
         self._noiseFilterCheck.stateChanged.connect(self.noiseFilterWorker)
 
         self._reprocessButton = QtGui.QPushButton("Redraw")
-        print self._event_manager
         self._reprocessButton.clicked.connect(self._event_manager.reprocessEvent)
         self._reprocessButton.setToolTip("Force this event to redraw.")
 
@@ -102,12 +100,16 @@ class livegui(gui):
         self._eventUpdateDelayLabel = QtGui.QLabel("Delay (s):")
         self._eventUpdateDelayEntry = QtGui.QLineEdit("60")
         self._eventUpdateDelayEntry.returnPressed.connect(self.eventUpdateEntryHandler)
-        self._eventUpdateDelayEntry.setMaximumWidth(35)
+        self._eventUpdateDelayEntry.setMaximumWidth(45)
         self._eventUpdatePauseButton = QtGui.QPushButton("START")
         self._eventUpdatePauseButton.clicked.connect(
             self.eventUpdateButtonHandler)
 
-        self._fileUpdateLabel = QtGui.QLabel("File Update ON")
+        self._fileUpdateLabel = QtGui.QLabel("File Update OFF")
+        self._fileUpdateDelayLabel = QtGui.QLabel("Delay (min):")
+        self._fileUpdateDelayEntry = QtGui.QLineEdit("5")
+        self._fileUpdateDelayEntry.returnPressed.connect(self.fileUpdateEntryHandler)
+        self._fileUpdateDelayEntry.setMaximumWidth(45)
         self._fileUpdatePauseButton = QtGui.QPushButton("START")
         self._fileUpdatePauseButton.clicked.connect(
             self.fileUpdateButtonHandler)
@@ -135,6 +137,10 @@ class livegui(gui):
 
         # Add the controls for file update:
         self._eastLayout.addWidget(self._fileUpdateLabel)
+        fileDelayLayout = QtGui.QHBoxLayout()
+        fileDelayLayout.addWidget(self._fileUpdateDelayLabel)
+        fileDelayLayout.addWidget(self._fileUpdateDelayEntry)
+        self._eastLayout.addLayout(fileDelayLayout)       
         self._eastLayout.addWidget(self._fileUpdatePauseButton)
         self._eastLayout.addStretch(1)
 
@@ -142,6 +148,19 @@ class livegui(gui):
         self._eastWidget.setMaximumWidth(150)
         self._eastWidget.setMinimumWidth(100)
         return self._eastWidget
+
+    def fileUpdateEntryHandler(self):
+        try:
+            delay = float(self._fileUpdateDelayEntry.text())
+        except Exception, e:
+            delay = self._minFileUpdateTime
+            self._fileUpdateDelayEntry.setText(str(delay))
+            return
+        if delay < self._minFileUpdateTime:
+            delay = self._minFileUpdateTime
+            self._fileUpdateDelayEntry.setText(str(delay))
+            return
+
 
     def eventUpdateEntryHandler(self):
         try:
@@ -167,6 +186,13 @@ class livegui(gui):
             self._fileUpdatePauseButton.setText("START")
             self._fileUpdateLabel.setText("File update OFF")
         else:
+            try:
+                delay = float(self._fileUpdateDelayEntry.text())
+            except Exception, e:
+                delay = self._minFileUpdateTime
+            if delay < self._minFileUpdateTime:
+                delay = self._minFileUpdateTime
+            self._fileChecker.setPeriod(delay*60*1000)
             self._fileChecker.start()
             self._fileUpdatePauseButton.setText("PAUSE")
             self._fileUpdateLabel.setText("File update ON")
