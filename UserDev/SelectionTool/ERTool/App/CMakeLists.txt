@@ -1,6 +1,6 @@
 # Generare the library names based on the directory
 get_filename_component(DIR ${CMAKE_CURRENT_LIST_DIR} NAME)
-set(LIB_NAME ${MODULE_NAME}_${DIR})
+set(LIB_NAME ${MODULE_NAME}${DIR})
 set(DICT_NAME "${LIB_NAME}Dict")
 
 # Get all the header files
