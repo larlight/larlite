@@ -27,13 +27,12 @@ def main():
 
 
     # If a file was passed, give it to the manager:
+    manager = evdmanager.ubdaq_manager(geom)
+    # manager.setInputFiles(args.file)
 
-    thisgui = gui.livegui(geom)
-    thisgui.initManager()
+    thisgui = gui.livegui(geom,manager)
     thisgui.initUI()
 
-    # manager = larlite_manager(geom)
-    # manager.setInputFiles(args.file)
 
 
     # manager.goToEvent(0)
