@@ -196,6 +196,12 @@
 #pragma link C++ class std::vector<larlite::opdetwaveform>+;
 #pragma link C++ class larlite::event_opdetwaveform+;
 
+#pragma link C++ class larlite::onephoton+;
+#pragma link C++ class std::vector<larlite::onephoton>+;
+#pragma link C++ class larlite::simphotons+;
+#pragma link C++ class std::vector<larlite::simphotons>+;
+#pragma link C++ class larlite::event_simphotons+;
+
 #pragma link C++ class larlite::storage_manager+;
 
 /*
