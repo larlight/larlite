@@ -1,17 +1,9 @@
-#!/usr/bin/env python
-
-from gui import gui
-from event import manager
-from data import wire
-import argparse
-import sys
-import signal
-from PyQt4 import QtGui, QtCore
-import os
+from PyQt4 import QtCore, QtGui
+from event import manager, event
+from datatypes import wire
 
 from ROOT import evd
 
-from geometry import *
 
 # This section checks to see if daq data types can be read:
 try:
@@ -32,16 +24,16 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
-class evd_manager(manager, wire, QtCore.QObject):
+class ubdaq_manager(manager, wire, QtCore.QObject):
 
     eventChanged = QtCore.pyqtSignal()
     processLockUpdate = QtCore.pyqtSignal(bool)
     runStarted = QtCore.pyqtSignal()
 
-    """docstring for evd_manager"""
+    """docstring for ubdaq_manager"""
 
     def __init__(self, geom, file=None):
-        # super(evd_manager, self).__init__(geom,file)
+        # super(ubdaq_manager, self).__init__(geom,file)
         QtCore.QObject.__init__(self)
         manager.__init__(self, geom, file)
         wire.__init__(self)
@@ -72,11 +64,7 @@ class evd_manager(manager, wire, QtCore.QObject):
             print bcolors.WARNING + "NOTIFICATION: uboonedaq types are not configured to run.  \
 Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolors.ENDC
 
-    def initProcess(self, proc_type):
-        if proc_type == "daq":
-            self._process = evd.DrawUbDaq()
-        if proc_type == "swiz":
-            self._process = evd.DrawUbSwiz()
+    def initProcess(self):
 
         # Set up the noise filter and initialize
         self._process.SetCorrectData(False)
@@ -147,17 +135,12 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
         else:
             file = str(file).rstrip('\n')
             self._file = file
-            if file.endswith(".root"):
-                self._type = "root"
-                self.initProcess("root")
-            elif file.endswith(".ubdaq"):
+            if file.endswith(".ubdaq"):
                 if has_daq_types:
-                    self._type = "daq"
-                    self.initProcess("daq")
+                    self.initProcess()
                 else:
                     print bcolors.FAIL + "ERROR: Can not open a daq file because daq types are not loaded" + bcolors.ENDC
                     return
-
             else:
                 return
             self._process.setInput(file)
@@ -249,7 +232,7 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
 
     def getPlane(self, plane):
         if self._hasFile:
-            return super(evd_manager, self).getPlane(plane)
+            return super(ubdaq_manager, self).getPlane(plane)
 
     def hasWireData(self):
         if self._hasFile:

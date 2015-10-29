@@ -117,11 +117,54 @@ class microboone(geometry):
                        (1, (255, 0, 0, 255))],
              'mode': 'rgb'})
 
+        # #   Using a package to generate the palette:
+        # self._levels[-1] = (-50,2000)
+        # import palettable
+        # from palettable.cubehelix import Cubehelix
+        # palette = Cubehelix.make(start=1,n=30,reverse=True,rotation=2,min_light=.2,max_light=0.8)
+        # # palette = palettable.cubehelix.perceptual_rainbow_16
+        # # palette = palettable.cubehelix.cubehelix3_16_r
+        # # palette = palettable.cubehelix.classic_16_r
+        # npoints = palette.number
+        # a = []
+        # power = 2
+        # a.append((0.0,(255,255,255)))
+        # for point in xrange(npoints):
+        #     step = (1.0*(point+1)**power) / (npoints**power)
+        #     # step = 1.0* (point+1) / npoints
+        #     # print "point, step", point, step
+        #     a.append((step, tuple(palette.colors[point])))
+
+        # # print a
+        # self._defaultColorScheme.append({'ticks': a, 'mode': 'rgb'})
+
 
         # # Default color scheme but fading into white at high Q
         # self._levels[-1] = (-10,2000)
         # self._defaultColorScheme.append(
-        #     {'ticks': [(0000./2010, (22, 30, 151, 255)),
+        #     {'ticks': [(0000./2010, (255, 255, 255, 255)),
+        #                # (0010./2010, (0, 15, 151, 205)),
+        #                (0037./2010, (000, 181, 226, 200)),
+        #                (0052./2010, (192, 065, 255, 200)),
+        #                (0071./2010, (255, 050, 255, 200)),
+        #                (087./2010,  (255,  38,  49, 200)),
+        #                (0110./2010, (255,  94,  80, 255)),
+        #                (0200./2010, (255, 197, 051, 255)),
+        #                (0300./2010, (255, 223, 060, 255)),
+        #                (0400./2010, (255, 247, 001, 255)),
+        #                (0550./2010, (166, 255, 001, 255)),
+        #                (0700./2010, ( 81, 023, 000, 255)),
+        #                (0850./2010, (000, 153,  69, 255)),
+        #                (1000./2010, (001, 135, 175, 255)),
+        #                (1250./2010, (002, 154, 255, 255)),
+        #                # (1500./2010, (255, 0, 0, 025)),
+        #                (2010./2010, (021, 000, 255, 255))],
+        #      'mode': 'rgb'})
+
+        # # Default color scheme but fading into white at high Q
+        # self._levels[-1] = (-10,2000)
+        # self._defaultColorScheme.append(
+        #     {'ticks': [(0000./2010, (255, 255, 255, 255)),
         #                # (0010./2010, (0, 15, 151, 205)),
         #                (0037./2010, (0, 181, 226, 255)),
         #                (0052./2010, (76, 140, 43, 255)),
@@ -139,11 +182,10 @@ class microboone(geometry):
         #                (1500./2010, (255, 0, 0, 025)),
         #                (2010./2010, (255, 0, 0, 000))],
         #      'mode': 'rgb'})
-
         # # Grayscale to logrithmic
         # self._levels[-1] = (-10,2010)
         # self._defaultColorScheme.append(
-        #     {'ticks': [(0000./2010, (000,000,000, 250)),
+        #     {'ticks': [(0000./2010, (000,000,000, 0)),
         #                (0010./2010, (000,000,000, 250)),
         #                # (0010./2010, (000,181,226, 250)),
         #                (0015./2010, (050,101,156, 250)),
