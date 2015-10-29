@@ -138,6 +138,27 @@ class microboone(geometry):
         # # print a
         # self._defaultColorScheme.append({'ticks': a, 'mode': 'rgb'})
 
+        # #   Using a package to generate the palette:
+        # self._levels[-1] = (-50,2000)
+        # import palettable
+        # from palettable.cubehelix import Cubehelix
+        # palette = Cubehelix.make(start=1,n=30,reverse=True,rotation=2,min_light=.2,max_light=0.8)
+        # # palette = palettable.cubehelix.perceptual_rainbow_16
+        # # palette = palettable.cubehelix.cubehelix3_16_r
+        # # palette = palettable.cubehelix.classic_16_r
+        # npoints = palette.number
+        # a = []
+        # power = 2
+        # a.append((0.0,(255,255,255)))
+        # for point in xrange(npoints):
+        #     step = (1.0*(point+1)**power) / (npoints**power)
+        #     # step = 1.0* (point+1) / npoints
+        #     # print "point, step", point, step
+        #     a.append((step, tuple(palette.colors[point])))
+
+        # # print a
+        # self._defaultColorScheme.append({'ticks': a, 'mode': 'rgb'})
+
 
         # # Default color scheme but fading into white at high Q
         # self._levels[-1] = (-10,2000)
