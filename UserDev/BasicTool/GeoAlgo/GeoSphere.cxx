@@ -190,13 +190,26 @@ namespace geoalgo {
     // let's make sure there aren't duplicates...if so -> call a
     // different constructor
     std::vector<geoalgo::Point_t> valid_points = {A};
-    if (A.SqDist(B) > 0.0001)
+    bool duplicate = false;
+    for (auto const& pt : valid_points){
+      if (pt.SqDist(B) < 0.0001)
+	duplicate = true;
+    }
+    if (duplicate == false)
       valid_points.push_back(B);
-    
-    if ( (C.SqDist(B) > 0.0001) and (C.SqDist(A) > 0.0001) )
+    duplicate = false;
+    for (auto const& pt : valid_points){
+      if (pt.SqDist(C) < 0.0001)
+	duplicate = true;
+    }
+    if (duplicate == false)
       valid_points.push_back(C);
-    
-    if ( (C.SqDist(D) > 0.0001) and (D.SqDist(B) > 0.0001) and (C.SqDist(A)> 0.0001) )
+    duplicate = false;
+    for (auto const& pt : valid_points){
+      if (pt.SqDist(D) < 0.0001)
+	duplicate = true;
+    }
+    if (duplicate == false)
       valid_points.push_back(D);
     
     // if we have less then 4 points -> call the appropriate constructor
