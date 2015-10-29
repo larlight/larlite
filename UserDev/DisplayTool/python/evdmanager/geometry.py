@@ -86,9 +86,9 @@ class microboone(geometry):
         # and then call the base class __init__
         larutil.LArUtilManager.Reconfigure(fmwk.geo.kMicroBooNE)
         super(microboone, self).__init__()
-        self._levels = [(-100, 10), (-10, 100), (-10, 100)]
+        self._levels = [(-100, 10), (-10, 100), (-10, 200)]
         # self._colorScheme =
-        # self._time2Cm = 0.05515
+        self._time2Cm = 0.05515
         self._aspectRatio = self._wire2Cm / self._time2Cm
         self._pedestals = [2000, 2000, 440]
         self._name = "uboone"
@@ -121,7 +121,9 @@ class microboone(geometry):
         # self._levels[-1] = (-50,2000)
         # import palettable
         # from palettable.cubehelix import Cubehelix
-        # palette = Cubehelix.make(start=1,n=30,reverse=True,rotation=2,min_light=.2,max_light=0.8)
+        # mymap2  = Cubehelix.make(start=0,reverse=True,rotation=2.1,min_light=0.1,max_light=0.9,name='evd_map',n=30)
+        # # palette = Cubehelix.make(start=1,n=30,reverse=True,rotation=2,min_light=.2,max_light=0.8)
+        # palette = mymap2
         # # palette = palettable.cubehelix.perceptual_rainbow_16
         # # palette = palettable.cubehelix.cubehelix3_16_r
         # # palette = palettable.cubehelix.classic_16_r
@@ -135,7 +137,7 @@ class microboone(geometry):
         #     # print "point, step", point, step
         #     a.append((step, tuple(palette.colors[point])))
 
-        # # print a
+        # # # print a
         # self._defaultColorScheme.append({'ticks': a, 'mode': 'rgb'})
 
         # #   Using a package to generate the palette:
