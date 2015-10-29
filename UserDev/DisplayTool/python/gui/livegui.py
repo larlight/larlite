@@ -1,6 +1,7 @@
 from gui import gui, view_manager
 from PyQt4 import QtCore, QtGui
 from evdmanager.ubdaq_fileglobber import *
+from evdmanager import ubdaq_manager
 # override the gui to give the live display special features:
 class livegui(gui):
 
@@ -9,8 +10,14 @@ class livegui(gui):
     fileUpdate = QtCore.pyqtSignal(str)
     toggleNoiseFilter = QtCore.pyqtSignal(bool)
 
-    def __init__(self, geometry):
+    def __init__(self, geometry, manager = None):
         super(livegui, self).__init__(geometry)
+        
+        # Make sure a manager is set up:
+        if manager is None:
+            manager = ubdaq_manager(geometry)
+        super(livegui, self).initManager(manager)
+
         self._timer = QtCore.QTimer()
         self._timer.timeout.connect(self.eventTimeoutTest)
         self._minEventUpdateTime = 3.0
@@ -71,7 +78,7 @@ class livegui(gui):
     # This function sets up the eastern widget
     def getEastLayout(self):
         # This function just makes a dummy eastern layout to use.
-        label1 = QtGui.QLabel("Larsoft Viewer")
+        label1 = QtGui.QLabel("UBDAQ Viewer")
         label2 = QtGui.QLabel("Online Monitor")
         font = label1.font()
         font.setBold(True)
@@ -85,6 +92,7 @@ class livegui(gui):
         self._noiseFilterCheck.stateChanged.connect(self.noiseFilterWorker)
 
         self._reprocessButton = QtGui.QPushButton("Redraw")
+        print self._event_manager
         self._reprocessButton.clicked.connect(self._event_manager.reprocessEvent)
         self._reprocessButton.setToolTip("Force this event to redraw.")
 

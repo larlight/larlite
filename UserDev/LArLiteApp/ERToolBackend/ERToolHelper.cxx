@@ -185,7 +185,7 @@ namespace larlite {
 	  auto& p = graph.CreateParticle();
 	  p.SetParticleInfo( mcp.PdgCode(),
 			     mcp.Mass()*1000.,
-			     ::geoalgo::Vector(mcp.Trajectory()[0].Position()),
+			     ::geoalgo::Vector(mcp.Trajectory()[0].Position()) + getXShift(mcp),
 			     ::geoalgo::Vector(mcp.Trajectory()[0].Momentum())*1.e3 );
 
 	  part_list[id] = p.ID();
@@ -486,7 +486,7 @@ namespace larlite {
       //If you want only initial kinetic energy, remember to subtract off mass.
       t._energy     = (*mct.begin()).Momentum().E() - (*mct.rbegin()).Momentum().E();
       t._cosmogenic = (double)(mct.Origin() == simb::kCosmicRay);
-      t._time = mct_v[i].End().T();
+      t._time = mct.at(0).T();
       
       if(abs(mct.PdgCode()) == 13 ) t._pid = ::ertool::Track::kMuon;
       if(mct.PdgCode() == 2212    ) t._pid = ::ertool::Track::kProton;
@@ -611,7 +611,8 @@ namespace larlite {
       //s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.05) : gRandom->Gaus(2,2*0.05));
       random_time+=fWatch.RealTime();
       s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
-      s._time = mcs_v[i].End().T();
+      s._time = mcs_v[i].Start().T();
+
       double mass = 0;
       if (mcs.PdgCode() == 11) { mass = 0.511; }
       fWatch.Start();
@@ -782,7 +783,19 @@ namespace larlite {
     shift.SetXYZT(shift_x, 0., 0., 0.);
     
     return shift;
+}
+
+  TLorentzVector ERToolHelper::getXShift(const mcpart& mcp) const {
+    // Implementation of position shift due to the electron drift in the TPC for mcparticles
+    TLorentzVector shift;
+
+    double event_time = mcp.Trajectory().front().T();
+    double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
+    shift.SetXYZT(shift_x, 0., 0., 0.);
+    
+    return shift;
   }
 }
+
 
 #endif
