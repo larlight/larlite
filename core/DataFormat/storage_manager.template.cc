@@ -104,6 +104,9 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_flashmatch> () const
   { return data::kFlashMatch; }
 
+  template<> data::DataType_t storage_manager::data_type<event_simphotons> () const
+  { return data::kSimPhotons; }
+
   template <class T>
   data::DataType_t storage_manager::data_type() const
   { 

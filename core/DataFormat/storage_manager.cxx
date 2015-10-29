@@ -37,6 +37,7 @@
 #include "event_ass.h"
 #include "fifo.h"
 #include "opdetwaveform.h"
+#include "simphotons.h"
 
 namespace larlite {
 
@@ -1156,6 +1157,9 @@ namespace larlite {
       break;
     case data::kOpDetWaveform:
       _ptr_data_array[type][name]=new event_opdetwaveform(name);
+      break;
+    case data::kSimPhotons:
+      _ptr_data_array[type][name]=new event_simphotons(name);
       break;
     default:
       print(msg::kERROR,__FUNCTION__,Form("Event-data identifier not supported: %d",(int)type));
