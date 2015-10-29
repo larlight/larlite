@@ -88,6 +88,7 @@ namespace larutil {
     fWirePitch.clear();
     fWireAngle.clear();
     fOpChannelVtx.clear();
+    fOpDetVtx.clear();
     fPlaneOriginVtx.clear();
   }
 
@@ -124,6 +125,7 @@ namespace larutil {
     if(!(ch->GetBranch("fWirePitch")))    error_msg += "      fWirePitch\n";
     if(!(ch->GetBranch("fWireAngle")))    error_msg += "      fWireAngle\n";
     if(!(ch->GetBranch("fOpChannelVtx"))) error_msg += "      fOpChannelVtx\n";
+    if(!(ch->GetBranch("fOpDetVtx")))     error_msg += "      fOpDetVtx\n";
     
     if(!(ch->GetBranch("fPlaneOriginVtx"))) error_msg += "      fPlaneOriginVtx\n";
 
@@ -154,6 +156,7 @@ namespace larutil {
     std::vector<Double_t> *pWireAngle = nullptr;
 
     std::vector<std::vector<Float_t> > *pOpChannelVtx = nullptr;
+    std::vector<std::vector<Float_t> > *pOpDetVtx = nullptr;
 
     ch->SetBranchAddress("fDetLength",&fDetLength);
     ch->SetBranchAddress("fDetHalfWidth",&fDetHalfWidth);
@@ -181,6 +184,7 @@ namespace larutil {
     ch->SetBranchAddress("fWireAngle",&pWireAngle);
 
     ch->SetBranchAddress("fOpChannelVtx",&pOpChannelVtx);
+    ch->SetBranchAddress("fOpDetVtx",&pOpDetVtx);
 
     ch->GetEntry(0);
 
@@ -232,6 +236,11 @@ namespace larutil {
     fOpChannelVtx.reserve(n_opchannel);
     for(size_t i=0; i<n_opchannel; ++i)
       fOpChannelVtx.push_back(pOpChannelVtx->at(i));
+
+    size_t n_opdet = pOpDetVtx->size();
+    fOpDetVtx.reserve(n_opdet);
+    for(size_t i=0; i<n_opdet; ++i)
+      fOpDetVtx.push_back(pOpDetVtx->at(i));
 
     delete ch;
     return true;
@@ -696,17 +705,17 @@ namespace larutil {
                             WireStart2, WireEnd2, y, z);
   }
 
-  UInt_t Geometry::GetClosestOpChannel(const Double_t *xyz) const
+  UInt_t Geometry::GetClosestOpDet(const Double_t *xyz) const
   {
     Double_t dist2      = 0;
     Double_t min_dist2  = larlite::data::kINVALID_DOUBLE;
     UInt_t   closest_ch = larlite::data::kINVALID_UINT;
-    for(size_t ch=0; ch<fOpChannelVtx.size(); ++ch) {
+    for(size_t ch=0; ch<fOpDetVtx.size(); ++ch) {
 
       dist2 = 
-        pow(xyz[0] - fOpChannelVtx.at(ch).at(0),2) + 
-        pow(xyz[1] - fOpChannelVtx.at(ch).at(1),2) +
-        pow(xyz[2] - fOpChannelVtx.at(ch).at(2),2); 
+        pow(xyz[0] - fOpDetVtx.at(ch).at(0),2) + 
+        pow(xyz[1] - fOpDetVtx.at(ch).at(1),2) +
+        pow(xyz[2] - fOpDetVtx.at(ch).at(2),2); 
         
       if( dist2 < min_dist2 ) {
         
@@ -719,16 +728,16 @@ namespace larutil {
     return closest_ch;
   }
 
-  UInt_t Geometry::GetClosestOpChannel(const Double_t *xyz, Double_t &dist) const
+  UInt_t Geometry::GetClosestOpDet(const Double_t *xyz, Double_t &dist) const
   {
     Double_t min_dist2  = larlite::data::kINVALID_DOUBLE;
     UInt_t   closest_ch = larlite::data::kINVALID_UINT;
-    for(size_t ch=0; ch<fOpChannelVtx.size(); ++ch) {
+    for(size_t ch=0; ch<fOpDetVtx.size(); ++ch) {
 
       dist = 
-        pow(xyz[0] - fOpChannelVtx.at(ch).at(0),2) + 
-        pow(xyz[1] - fOpChannelVtx.at(ch).at(1),2) +
-        pow(xyz[2] - fOpChannelVtx.at(ch).at(2),2); 
+        pow(xyz[0] - fOpDetVtx.at(ch).at(0),2) + 
+        pow(xyz[1] - fOpDetVtx.at(ch).at(1),2) +
+        pow(xyz[2] - fOpDetVtx.at(ch).at(2),2); 
         
       if( dist < min_dist2 ) {
         
@@ -754,6 +763,22 @@ namespace larutil {
     xyz[0] = fOpChannelVtx.at(i).at(0);
     xyz[1] = fOpChannelVtx.at(i).at(1);
     xyz[2] = fOpChannelVtx.at(i).at(2);
+    return;
+  }
+
+  void Geometry::GetOpDetPosition(const UInt_t i, Double_t *xyz) const
+  {
+    if( i >= fOpDetVtx.size() ) {
+      throw LArUtilException(Form("Invalid PMT channel number: %d",i));
+      xyz[0] = larlite::data::kINVALID_DOUBLE;
+      xyz[0] = larlite::data::kINVALID_DOUBLE;
+      xyz[0] = larlite::data::kINVALID_DOUBLE;
+      return;
+    }
+
+    xyz[0] = fOpDetVtx.at(i).at(0);
+    xyz[1] = fOpDetVtx.at(i).at(1);
+    xyz[2] = fOpDetVtx.at(i).at(2);
     return;
   }
 
