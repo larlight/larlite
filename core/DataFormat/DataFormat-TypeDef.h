@@ -110,6 +110,10 @@ namespace larlite{
 
   class opdetwaveform;
   class event_opdetwaveform;
+
+  class onephoton;
+  class simphotons;
+  class event_simphotons;
 }
 
 class treenode;
