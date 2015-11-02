@@ -52,16 +52,14 @@ class ubdaq_manager(manager, wire, QtCore.QObject):
 Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolors.ENDC
 
     def initProcess(self):
-        if self._process is None:
-            self._process = evd.DrawUbDaq()
-            # Set up the noise filter and initialize
-            self._process.SetCorrectData(False)
-            self._process.SetSaveData(False)
-            self._process.SetStepSizeByPlane(48, 0)
-            self._process.SetStepSizeByPlane(48, 1)
-            self._process.SetStepSizeByPlane(96, 2)
-            self._process.initialize()
-        print "set input to process being called."
+        self._process = evd.DrawUbDaq()
+        # Set up the noise filter and initialize
+        self._process.SetCorrectData(False)
+        self._process.SetSaveData(False)
+        self._process.SetStepSizeByPlane(48, 0)
+        self._process.SetStepSizeByPlane(48, 1)
+        self._process.SetStepSizeByPlane(96, 2)
+        self._process.initialize()
         self._process.setInput(self._file)
 
     def setEventNo(self, event_no):
