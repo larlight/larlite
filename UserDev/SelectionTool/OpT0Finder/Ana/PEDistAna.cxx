@@ -6,6 +6,7 @@
 #include "DataFormat/ophit.h"
 #include "DataFormat/opflash.h"
 #include "DataFormat/trigger.h"
+#include "DataFormat/simphotons.h"
 #include "LArUtil/TimeService.h"
 namespace larlite {
 
@@ -23,6 +24,11 @@ namespace larlite {
   bool PEDistAna::initialize() {
 
     // Initialize PE distribution if producer is specified
+    if( !_g4_producer.empty() ) {
+      _g4_event_pe.resize(32,0);
+      _g4_tot_pe.resize(32);
+    }
+    
     if( ! _opdigit_producer.empty() ) {
       if( _trigger_producer.empty() ) {
 	print(msg::kERROR,__FUNCTION__,"Trigger producer must be specified to use OpDetWaveform!");
@@ -56,6 +62,7 @@ namespace larlite {
     _event_tree->Branch( "run",    &_run,    "run/i"    );
     _event_tree->Branch( "subrun", &_subrun, "subrun/i" );
     _event_tree->Branch( "event",  &_event,  "event/i"  );
+    _event_tree->Branch("g4_pe_v",     "std::vector<double>", &_g4_event_pe    );
     _event_tree->Branch( "wf_pe_v",    "std::vector<double>", &_wf_event_pe    );
     _event_tree->Branch( "hit_pe_v",   "std::vector<double>", &_hit_event_pe   );
     _event_tree->Branch( "flash_pe_v", "std::vector<double>", &_flash_event_pe );
@@ -66,13 +73,15 @@ namespace larlite {
   bool PEDistAna::analyze(storage_manager* storage) {
 
     // Initialize PE distribution
-    for(auto& v : _wf_event_pe) v = 0;
-    for(auto& v : _hit_event_pe) v = 0;
+    for(auto& v : _g4_event_pe)    v = 0; 
+    for(auto& v : _wf_event_pe)    v = 0;
+    for(auto& v : _hit_event_pe)   v = 0;
     for(auto& v : _flash_event_pe) v = 0;
 
     // Some size reservation to reduce process time
     if(storage->get_index() % 1000 == 0) {
       for(size_t i=0; i<32; ++i) {
+	_g4_tot_pe[i].reserve    ( _g4_tot_pe[i].size()    + 1000 );
 	_wf_tot_pe[i].reserve    ( _wf_tot_pe[i].size()    + 1000 );
 	_hit_tot_pe[i].reserve   ( _hit_tot_pe[i].size()   + 1000 );
 	_flash_tot_pe[i].reserve ( _flash_tot_pe[i].size() + 1000 );
@@ -80,10 +89,37 @@ namespace larlite {
     }
 
     // Event id retrieval
-
     _run    = storage->run_id();
     _subrun = storage->subrun_id();
     _event  = storage->event_id();
+
+    //
+    // Analyze G4 photons
+    //
+    if(!_g4_producer.empty()) {
+      auto ev_simph = storage->get_data<event_simphotons>(_g4_producer);
+
+      if(!ev_simph || ev_simph->empty() )
+
+	print(msg::kERROR,__FUNCTION__,Form("G4 SimPhotons by %s not found!", _g4_producer.c_str()));
+
+      else {
+
+	for(auto const& simph : *ev_simph) {
+
+	  auto const ch = simph.OpChannel();
+
+	  if(ch>31) continue;
+
+	  _g4_event_pe[ch] += simph.size();
+	  
+	}
+
+	for(size_t i=0; i<_g4_event_pe.size(); ++i)
+
+	  _g4_tot_pe[i].push_back( _g4_event_pe[i] );
+      }
+    }
     
     //
     // Analyze waveform
@@ -225,9 +261,10 @@ namespace larlite {
       _run_tree->Branch( "hit_name",   "std::string", &_ophit_producer   );
       _run_tree->Branch( "flash_name", "std::string", &_opflash_producer );
       for(size_t i=0; i<32; ++i) {
-	_run_tree->Branch( Form( "wf_pe_ch%02zu_v",    i), "std::vector<double>", &_wf_tot_pe[i]    );
-	_run_tree->Branch( Form( "hit_pe_ch%02zu_v",   i), "std::vector<double>", &_hit_tot_pe[i]   );
-	_run_tree->Branch( Form( "flash_pe_ch%02zu_v", i), "std::vector<double>", &_flash_tot_pe[i] );
+	_run_tree->Branch( Form( "g4_pe_pmt%02zu_v",    i), "std::vector<double>", &_g4_tot_pe[i]    );
+	_run_tree->Branch( Form( "wf_pe_pmt%02zu_v",    i), "std::vector<double>", &_wf_tot_pe[i]    );
+	_run_tree->Branch( Form( "hit_pe_pmt%02zu_v",   i), "std::vector<double>", &_hit_tot_pe[i]   );
+	_run_tree->Branch( Form( "flash_pe_pmt%02zu_v", i), "std::vector<double>", &_flash_tot_pe[i] );
       }
       _run_tree->Fill();
 
