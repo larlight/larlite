@@ -2,6 +2,7 @@
 #define LARLITE_PEDISTANA_CXX
 
 #include "PEDistAna.h"
+#include "LArUtil/Geometry.h"
 #include "DataFormat/opdetwaveform.h"
 #include "DataFormat/ophit.h"
 #include "DataFormat/opflash.h"
@@ -149,7 +150,12 @@ namespace larlite {
 	for(auto const& wf : *ev_opdigit) {
 
 	  // Skip channel > 32
-	  if(wf.ChannelNumber()>32) continue;
+	  auto const ch = wf.ChannelNumber();
+	  if(ch > 32) continue;
+	  
+	  // Skip pmt_id > 32
+	  auto const pmt_id = ::larutil::Geometry::GetME()->OpDetFromOpChannel(ch);
+	  if(pmt_id > 32) continue;
 
 	  double wf_start = wf.TimeStamp() - trig_time;
 	  double wf_end   = wf.TimeStamp() + (double)(wf.size() * tick_period) - trig_time;
@@ -168,7 +174,8 @@ namespace larlite {
 
 	    q += wf[i] - ped_mean;
 	  }
-	  _wf_event_pe[wf.ChannelNumber()] += ( q / _spe_area );
+
+	  _wf_event_pe[pmt_id] += ( q / _spe_area );
 	}
 
 	for(size_t i=0; i<_wf_event_pe.size(); ++i)
@@ -195,14 +202,19 @@ namespace larlite {
 
 	// Loop over waveforms
 	for(auto const& h : *ev_ophit) {
-	  
+
 	  // Skip channel > 32
-	  if(h.OpChannel()>32) continue;
+	  auto const ch = h.OpChannel();
+	  if(ch > 32) continue;
+	  
+	  // Skip pmt_id > 32
+	  auto const pmt_id = ::larutil::Geometry::GetME()->OpDetFromOpChannel(ch);
+	  if(pmt_id > 32) continue;
 
 	  // Skip out-of-time waveforms
 	  if(h.PeakTime() < _min_time || h.PeakTime() > _max_time) continue;
 
-	  _hit_event_pe[h.OpChannel()] += h.PE();
+	  _hit_event_pe[pmt_id] += h.PE();
 
 	}
 
@@ -234,14 +246,22 @@ namespace larlite {
 	  // Skip out-of-time waveforms
 	  if(f.Time() < _min_time || f.Time() > _max_time) continue;
 
-	  for(size_t i=0; i<32; ++i)
+	  for(size_t ch=0; ch<32; ++ch) {
+
+	    // Skip pmt_id > 32
+	    auto const pmt_id = ::larutil::Geometry::GetME()->OpDetFromOpChannel(ch);
+	    if(pmt_id > 32) continue;
 	  
-	    _flash_event_pe[i] += f.PE(i);
+	    _flash_event_pe[pmt_id] += f.PE(ch);
+	  }
 	}
 
-	for(size_t i=0; i<_flash_event_pe.size(); ++i)
+	for(size_t i=0; i<_flash_event_pe.size(); ++i) {
 
+	  // Skip channel > 32
 	  _flash_tot_pe[i].push_back( _flash_event_pe[i] );
+
+	}
 	
       }
     }
