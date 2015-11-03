@@ -54,6 +54,10 @@ namespace larutil {
     UInt_t NOpChannels() const
     { return fOpChannelVtx.size(); }
 
+    /// Number of OpDet in the detector
+    UInt_t NOpDets() const
+    { return fOpDetVtx.size(); }
+
     /// Number of views (different wire orientations) in the detector
     UInt_t Nviews() const
     { return fWirePitch.size(); }
@@ -223,13 +227,19 @@ namespace larutil {
     //std::string OpDetGeoName(UInt_t c=0) const;
 
     /// Find the nearest OpChannel to some point, in the appropriate cryostat 
-    UInt_t  GetClosestOpChannel(const Double_t * xyz) const;
+    UInt_t  GetClosestOpDet(const Double_t * xyz) const;
 
     /// Find the nearest OpChannel to some point, in the appropriate cryostat 
-    UInt_t  GetClosestOpChannel(const Double_t * xyz, Double_t &dist) const;
+    UInt_t  GetClosestOpDet(const Double_t * xyz, Double_t &dist) const;
+
+    /// Return optical detector id from optical channel
+    UInt_t OpDetFromOpChannel(UInt_t ch) const;
 
     /// Return optical channel vertex
     void GetOpChannelPosition(const UInt_t i, Double_t *xyz) const;
+
+    /// Return optical detector vertex
+    void GetOpDetPosition(const UInt_t i, Double_t *xyz) const;
 
     const std::vector<Double_t>& PlaneOriginVtx(UChar_t plane);
 
@@ -267,6 +277,8 @@ namespace larutil {
     std::vector<Double_t> fWireAngle;
 
     std::vector<std::vector<Float_t> > fOpChannelVtx;
+    std::vector<std::vector<Float_t> > fOpDetVtx;
+    std::vector<unsigned int> fOpChannel2OpDet;
 
     //--- Variables to be computd based on TTree data ---//
     std::vector<Double_t> fOrthVectorsY;
