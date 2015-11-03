@@ -27,8 +27,8 @@
 // Ben Jones, MIT, 06/04/2010
 //
 
-#ifndef SimPhotons_h
-#define SimPhotons_h
+#ifndef LARLITE_SIMPHOTONS_H
+#define LARLITE_SIMPHOTONS_H
 
 #include <TLorentzVector.h>
 #include <vector>
