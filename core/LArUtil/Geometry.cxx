@@ -711,7 +711,7 @@ namespace larutil {
                             WireStart1, WireEnd1, 
                             WireStart2, WireEnd2, y, z);
   }
-
+  
   UInt_t Geometry::GetClosestOpDet(const Double_t *xyz) const
   {
     Double_t dist2      = 0;
