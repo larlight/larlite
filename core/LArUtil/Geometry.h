@@ -226,6 +226,12 @@ namespace larutil {
     /// Return gdml string which gives sensitive opdet name
     //std::string OpDetGeoName(UInt_t c=0) const;
 
+    bool IsValidOpChannel(unsigned int opch) const
+    {
+      if(opch < fOpChannelVtx.size()) return true;
+      return false;
+    }
+
     /// Find the nearest OpChannel to some point, in the appropriate cryostat 
     UInt_t  GetClosestOpDet(const Double_t * xyz) const;
 
