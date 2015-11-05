@@ -56,7 +56,7 @@ my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
 # Match Prohibit Algo
 timecompat = flashana.TimeCompatMatch()
 timecompat.SetFrameDriftTime(2200)
-my_unit.Manager().SetAlgo(timecompat))
+#my_unit.Manager().SetAlgo(timecompat)
 
 my_unit.Manager().SetVerbosity(3)
 
