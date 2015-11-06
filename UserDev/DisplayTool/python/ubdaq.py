@@ -37,7 +37,9 @@ def main():
     thisgui = gui.livegui(geom,manager)
     thisgui.initUI()
 
-
+    # Start looking for new files if the is not a new file:
+    if file is None:
+        thisgui.fileUpdateButtonHandler()
 
     # manager.goToEvent(0)
 
