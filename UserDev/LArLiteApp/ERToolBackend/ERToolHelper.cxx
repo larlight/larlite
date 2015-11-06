@@ -46,7 +46,7 @@ void ERToolHelper::FillMCInfo(const event_mcflux&    mcf_v,
 
 		// If energy is above threshold, create ertool::Shower
 		if (mcs.DetProfile().Momentum().E() >= _minEDep) {
-			::ertool::Shower s( (mcs.DetProfile().Position()),// + getXShift(mcs_v[i])),
+			::ertool::Shower s( (mcs.DetProfile().Position() + getXShift(mcs_v[i])),
 			                    mcs.DetProfile().Momentum(),
 			                    _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
 			                    _shrProfiler.ShowerRadius() );
@@ -102,7 +102,7 @@ void ERToolHelper::FillMCInfo(const event_mcflux&    mcf_v,
 		t.reserve(mct.size());
 		TLorentzVector shift = getXShift(mct);
 		for (auto const& step : mct)
-			t += (step.Position());// + shift);;
+			t += (step.Position() + shift);
 
 		::ertool::NodeID_t nodeID;
 		// Check minimum number of physical steps
@@ -185,7 +185,7 @@ void ERToolHelper::FillMCInfo(const event_mcflux&    mcf_v,
 				auto& p = graph.CreateParticle();
 				p.SetParticleInfo( mcp.PdgCode(),
 				                   mcp.Mass() * 1000.,
-				                   ::geoalgo::Vector(mcp.Trajectory()[0].Position()),// + getXShift(mcp),
+				                   ::geoalgo::Vector(mcp.Trajectory()[0].Position() + getXShift(mcp)),
 				                   ::geoalgo::Vector(mcp.Trajectory()[0].Momentum()) * 1.e3 );
 
 				part_list[id] = p.ID();
@@ -195,7 +195,6 @@ void ERToolHelper::FillMCInfo(const event_mcflux&    mcf_v,
 
 					int f = &mci - &mci_v[0];
 					if (mcf_v.size()) {
-						std::cout << "i shoyluntd get here" << std::endl;
 						if (mcf_v.at(f).fndecay == 1 ||
 						        mcf_v.at(f).fndecay == 2 ||
 						        mcf_v.at(f).fndecay == 3 ||
