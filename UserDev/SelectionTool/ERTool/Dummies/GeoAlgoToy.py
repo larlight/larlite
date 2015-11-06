@@ -4,6 +4,7 @@ from ROOT import geoalgo
 from basictool.geoviewer import GeoViewer
 import matplotlib.pyplot as plt
 import random as rnd
+import sys
 #
 # Make my fake data input
 #
@@ -23,9 +24,12 @@ shower2   = ertool.Shower(shrStart,shrDir,20,5)
 shower2._energy = 100
 shower2._dedx   = 2.2
 
+
+
 # load viewer
 plt.ion()
 viewer = GeoViewer()
+viewer._use_box = False;
 viewer.add(shower1,'shower1','b')
 viewer.add(shower2,'shower2','b')
 #viewer.add(track,'track','r')
@@ -61,3 +65,14 @@ except:
 
 
 
+# add a half-infinite line
+viewer.clear()
+halfLine = geoalgo.HalfLine(0,0,0,0.3,0.5,0.1)
+viewer.add(halfLine)
+viewer.show()
+try:
+    counter = input('Hit ENTER when you are ready to close the viewer')
+except:
+    print "done with this example..."
+
+sys.exit(0)
