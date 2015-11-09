@@ -20,6 +20,7 @@ namespace larlite {
     _max_time = 10;
     _event_tree = nullptr;
     _run_tree = nullptr;
+    _ch_tree = nullptr;
   }
 
   bool PEDistAna::initialize() {
@@ -27,7 +28,7 @@ namespace larlite {
     // Initialize PE distribution if producer is specified
     if( !_g4_producer.empty() ) {
       _g4_event_pe.resize(32,0);
-      _g4_tot_pe.resize(32);
+      _g4_run_pe.resize(32);
     }
     
     if( ! _opdigit_producer.empty() ) {
@@ -36,17 +37,17 @@ namespace larlite {
 	return false;
       }
       _wf_event_pe.resize(32,0);
-      _wf_tot_pe.resize(32);
+      _wf_run_pe.resize(32);
     }
 
     if( ! _ophit_producer.empty()   ) {
       _hit_event_pe.resize(32,0);
-      _hit_tot_pe.resize(32);
+      _hit_run_pe.resize(32);
     }
     
     if( ! _opflash_producer.empty() ) {
       _flash_event_pe.resize(32,0);
-      _flash_tot_pe.resize(32);
+      _flash_run_pe.resize(32);
     }
 
     if( _wf_event_pe.empty() && _hit_event_pe.empty() && _flash_event_pe.empty() ) {
@@ -68,6 +69,17 @@ namespace larlite {
     _event_tree->Branch( "hit_pe_v",   "std::vector<double>", &_hit_event_pe   );
     _event_tree->Branch( "flash_pe_v", "std::vector<double>", &_flash_event_pe );
 
+    if(_ch_tree) delete _ch_tree;
+    _ch_tree = new TTree("ch_tree","");
+    _ch_tree->Branch( "run",    &_run,    "run/i"    );
+    _ch_tree->Branch( "subrun", &_subrun, "subrun/i" );
+    _ch_tree->Branch( "event",  &_event,  "event/i"  );
+    _ch_tree->Branch( "ch",     &_ch,     "ch/i"     );
+    _ch_tree->Branch( "g4_sum_pe",    &_g4_sum_pe,    "g4_sum_pe/D"    );
+    _ch_tree->Branch( "wf_sum_pe",    &_wf_sum_pe,    "wf_sum_pe/D"    );
+    _ch_tree->Branch( "hit_sum_pe",   &_hit_sum_pe,   "hit_sum_pe/D"   );
+    _ch_tree->Branch( "flash_sum_pe", &_flash_sum_pe, "flash_sum_pe/D" );
+
     return true;
   }
   
@@ -79,13 +91,15 @@ namespace larlite {
     for(auto& v : _hit_event_pe)   v = 0;
     for(auto& v : _flash_event_pe) v = 0;
 
+    _g4_sum_pe = _wf_sum_pe = _hit_sum_pe = _flash_sum_pe = -1;
+
     // Some size reservation to reduce process time
     if(storage->get_index() % 1000 == 0) {
       for(size_t i=0; i<32; ++i) {
-	_g4_tot_pe[i].reserve    ( _g4_tot_pe[i].size()    + 1000 );
-	_wf_tot_pe[i].reserve    ( _wf_tot_pe[i].size()    + 1000 );
-	_hit_tot_pe[i].reserve   ( _hit_tot_pe[i].size()   + 1000 );
-	_flash_tot_pe[i].reserve ( _flash_tot_pe[i].size() + 1000 );
+	_g4_run_pe[i].reserve    ( _g4_run_pe[i].size()    + 1000 );
+	_wf_run_pe[i].reserve    ( _wf_run_pe[i].size()    + 1000 );
+	_hit_run_pe[i].reserve   ( _hit_run_pe[i].size()   + 1000 );
+	_flash_run_pe[i].reserve ( _flash_run_pe[i].size() + 1000 );
       }
     }
 
@@ -99,7 +113,7 @@ namespace larlite {
     //
     if(!_g4_producer.empty()) {
       auto ev_simph = storage->get_data<event_simphotons>(_g4_producer);
-
+      
       if(!ev_simph || ev_simph->empty() )
 
 	print(msg::kERROR,__FUNCTION__,Form("G4 SimPhotons by %s not found!", _g4_producer.c_str()));
@@ -112,13 +126,19 @@ namespace larlite {
 
 	  if(ch>31) continue;
 
-	  _g4_event_pe[ch] += simph.size();
+	  // Check time
+	  for(auto const& ph : simph) {
+
+	    if(ph.Time < _min_time || ph.Time > _max_time) continue;
+	    
+	    _g4_event_pe[ch] += 1;
+	  }
 	  
 	}
 
 	for(size_t i=0; i<_g4_event_pe.size(); ++i)
 
-	  _g4_tot_pe[i].push_back( _g4_event_pe[i] );
+	  _g4_run_pe[i].push_back( _g4_event_pe[i] );
       }
     }
     
@@ -180,7 +200,7 @@ namespace larlite {
 
 	for(size_t i=0; i<_wf_event_pe.size(); ++i)
 
-	  _wf_tot_pe[i].push_back( _wf_event_pe[i] );
+	  _wf_run_pe[i].push_back( _wf_event_pe[i] );
 
       }
     }
@@ -220,7 +240,7 @@ namespace larlite {
 
 	for(size_t i=0; i<_hit_event_pe.size(); ++i)
 
-	  _hit_tot_pe[i].push_back( _hit_event_pe[i] );
+	  _hit_run_pe[i].push_back( _hit_event_pe[i] );
 	
       }
     }
@@ -259,7 +279,7 @@ namespace larlite {
 	for(size_t i=0; i<_flash_event_pe.size(); ++i) {
 
 	  // Skip channel > 32
-	  _flash_tot_pe[i].push_back( _flash_event_pe[i] );
+	  _flash_run_pe[i].push_back( _flash_event_pe[i] );
 
 	}
 	
@@ -267,6 +287,18 @@ namespace larlite {
     }
 
     _event_tree->Fill();
+
+    // Fill ch-wise TTree
+    for(size_t i=0; i<32; ++i) {
+
+      _ch = i;
+      if(_g4_event_pe.size())    _g4_sum_pe    = _g4_event_pe[i];
+      if(_wf_event_pe.size())    _wf_sum_pe    = _wf_event_pe[i];
+      if(_hit_event_pe.size())   _hit_sum_pe   = _hit_event_pe[i];
+      if(_flash_event_pe.size()) _flash_sum_pe = _flash_event_pe[i];
+
+      _ch_tree->Fill();
+    }
     
     return true;
   }
@@ -281,14 +313,15 @@ namespace larlite {
       _run_tree->Branch( "hit_name",   "std::string", &_ophit_producer   );
       _run_tree->Branch( "flash_name", "std::string", &_opflash_producer );
       for(size_t i=0; i<32; ++i) {
-	_run_tree->Branch( Form( "g4_pe_pmt%02zu_v",    i), "std::vector<double>", &_g4_tot_pe[i]    );
-	_run_tree->Branch( Form( "wf_pe_pmt%02zu_v",    i), "std::vector<double>", &_wf_tot_pe[i]    );
-	_run_tree->Branch( Form( "hit_pe_pmt%02zu_v",   i), "std::vector<double>", &_hit_tot_pe[i]   );
-	_run_tree->Branch( Form( "flash_pe_pmt%02zu_v", i), "std::vector<double>", &_flash_tot_pe[i] );
+	_run_tree->Branch( Form( "g4_pe_pmt%02zu_v",    i), "std::vector<double>", &_g4_run_pe[i]    );
+	_run_tree->Branch( Form( "wf_pe_pmt%02zu_v",    i), "std::vector<double>", &_wf_run_pe[i]    );
+	_run_tree->Branch( Form( "hit_pe_pmt%02zu_v",   i), "std::vector<double>", &_hit_run_pe[i]   );
+	_run_tree->Branch( Form( "flash_pe_pmt%02zu_v", i), "std::vector<double>", &_flash_run_pe[i] );
       }
       _run_tree->Fill();
 
       _event_tree->Write();
+      _ch_tree->Write();
       _run_tree->Write();
     }
     
