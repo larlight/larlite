@@ -129,7 +129,7 @@ namespace larlite {
 	  // Check time
 	  for(auto const& ph : simph) {
 
-	    if(ph.Time < _min_time || ph.Time > _max_time) continue;
+	    if(ph.Time < _min_time * 1000 || ph.Time > _max_time * 1000) continue;
 	    
 	    _g4_event_pe[ch] += 1;
 	  }
