@@ -118,6 +118,7 @@ class GeoViewer(object):
         self._ax.scatter(data[0][1:-2],data[1][1:-2],data[2][1:-2],color=c,marker='o')
 
     def _add_linesegment(self,arg,c=''):
+
         if not c: c = self.rand_color()
         data = self._converter.Convert(arg)
 
@@ -134,6 +135,25 @@ class GeoViewer(object):
         self._ax.scatter(s[0],s[1],s[2],s=50, color=c,marker='x')
         self._ax.scatter(e[0],e[1],e[2],s=50, color=c,marker='o')
 
+    def _add_halfline(self,arg,c=''):
+        if not c : c = self.rand_color()
+        data = self._converter.Convert(arg)
+
+        s = arg.Start()
+        e = arg.Start() + arg.Dir()*1000
+
+        # update boundaries
+        for i in xrange(3):
+            for j in xrange(len(data[i])):
+                if data[i][j] < self._range_min[i]: self._range_min[i] = data[i][j]
+                if data[i][j] > self._range_max[i]: self._range_max[i] = data[i][j]
+
+        self._ax.plot(data[0],data[1],data[2],color=c)
+        self._ax.scatter(s[0],s[1],s[2],s=50, color=c,marker='x')
+        self._ax.scatter(e[0],e[1],e[2],s=50, color=c,marker='o')
+        
+
+    '''
     def _add_halfline(self,arg,c=''):
         if not c: c = self.rand_color()
         
@@ -177,7 +197,7 @@ class GeoViewer(object):
 
 
         self._ax.plot(xp,yp,zp,color=c)
-
+    '''
 
 
     def _add_cone(self,arg,c=''):

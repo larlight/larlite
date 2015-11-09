@@ -1,7 +1,8 @@
 from data import recoBase
 from ROOT import evd
 import pyqtgraph as pg
-
+from PyQt4 import QtCore, QtGui
+import math as mt
 
 # Shower drawing is currently "experimental"
 
