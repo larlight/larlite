@@ -17,9 +17,12 @@ namespace larlite {
   {
     _name="UBT0Finder";
     _fout=0;
+    _npe_test = 0; 
   }
 
   bool UBT0Finder::initialize() {
+
+    _flash_v_x = new TH2D("_flash_v_x","OpFlash Z Width vs TPC x point",100,0,256,100,0,1450);
 
     _track_tree = new TTree("track_tree","");
     _track_tree->Branch("trk_time",&_trk_time,"trk_time/D");
@@ -73,6 +76,16 @@ namespace larlite {
       return false;
     }
 
+    double maxPE = -1;
+
+    for ( auto & f : *ev_flash) {
+	if (f.TotalPE() > 50 ){
+	    maxPE = f.TotalPE(); 
+	    }
+	}
+
+    if( maxPE != - 1)
+	_npe_test++;
 
     //auto ev_track = storage->get_data<event_track>("pandoraCosmicKHit");
     auto ev_track = storage->get_data<event_track>("trackkalmanhit");
@@ -81,85 +94,122 @@ namespace larlite {
     if(!_use_mc) {
       if (!ev_track || ev_track->empty()) return false;
       for (size_t n=0; n < ev_track->size(); n++){
+	std::vector<int> ids ;
+
 	auto const& trk = ev_track->at(n);
 	    
 	::flashana::QCluster_t tpc_obj;
 	tpc_obj.reserve(trk.NumberTrajectoryPoints()-1);
+
 	for(size_t i=0; i < (trk.NumberTrajectoryPoints()-1); ++i) {
-	  
-	  auto const& pt1 = trk.LocationAtPoint(i);
-	  auto const& pt2 = trk.LocationAtPoint(i+1);
-	  
-	  ::flashana::QPoint_t pt;
-	  
-	  double dx = pt2[0] - pt1[0];
-	  double dy = pt2[1] - pt1[1];
-	  double dz = pt2[2] - pt1[2];
-	  
-	  double dist = sqrt(pow(dx,2)+pow(dy,2)+pow(dz,2));
-	  pt.q = (dist * 10. * 2.);
-	  pt.x = pt1[0] + dx/2.;
-	  pt.y = pt1[1] + dy/2.;
-	  pt.z = pt1[2] + dz/2.;
-	  
-	  tpc_obj.emplace_back(pt);
-	  tpc_obj.idx = n;
-	}
+	
+          auto const& pt1 = trk.LocationAtPoint(i);
+    	  auto const& pt2 = trk.LocationAtPoint(i+1);
+    	  
+    	  ::flashana::QPoint_t pt;
+    	  
+    	  double dx = pt2[0] - pt1[0];
+    	  double dy = pt2[1] - pt1[1];
+    	  double dz = pt2[2] - pt1[2];
+    	  
+    	  double dist = sqrt(pow(dx,2)+pow(dy,2)+pow(dz,2));
+    	  pt.q = (dist * 10. * 2.);
+    	  pt.x = pt1[0] + dx/2.;
+    	  pt.y = pt1[1] + dy/2.;
+    	  pt.z = pt1[2] + dz/2.;
+    	  
+    	  tpc_obj.emplace_back(pt);
+    	  tpc_obj.idx = n;
+	    }
 	_mgr.Emplace(std::move(tpc_obj));
       }
       
     }
     // use MC tracks
     else{
+      //ahack 110915
+      std::vector<int> usedIDs;
+      usedIDs.resize(0);
+
       if (!ev_mctrack || ev_mctrack->empty()) return false;
       for (size_t n=0; n < ev_mctrack->size(); n++){
-	auto const& trk = ev_mctrack->at(n);
 
-	::flashana::QCluster_t tpc_obj;
+	//ahack 110915, don't repeat study for used IDs
+	bool used = false ;
+	for(size_t u=0; u < usedIDs.size(); u++){
+	    if( n == usedIDs[u] )
+		used = true;
+	    }
 
-	if(trk.size()>=2) {
-	  
-	  // per track calculate the shift in x-direction
-	  // so that the x-position is what would be seen
-	  // in the TPC, not the truth x-position
-	  double event_time = trk[0].T(); // ns
-	  double det_drift_time = 1.6E6; // ns
-	  double det_width = 256.; // cm
-	  double shift_x = event_time * (det_width/det_drift_time);
-	  tpc_obj.reserve(trk.size()-1);
+	//ahack 110915
+	if(!used){
+	  auto const& trk = ev_mctrack->at(n);
+	  std::vector<int> ids ;
+	  ids.resize(0);
 
-	  _trk_time = trk[0].T()/1000.;
-	  _trk_x    = trk[0].X();
-	  _trk_shift = shift_x;
-	  _trk_min_x = 1036.;
-	  _trk_max_x = -1036.;
-	  for(size_t i=0; i < trk.size(); ++i) {
-	    if (trk[i].X() > _trk_max_x) { _trk_max_x = trk[i].X(); }
-	    if (trk[i].X() < _trk_min_x) { _trk_min_x = trk[i].X(); }
-	  }
-	  _track_tree->Fill();
-	  
-	  for(size_t i=0; i < (trk.size()-1); ++i) {
+	  ::flashana::QCluster_t tpc_obj;
 
-	    auto const& pt1 = trk[i].Position();
-	    auto const& pt2 = trk[i+1].Position();
+	  if(trk.size()>=2) {
 	    
-	    ::flashana::QPoint_t pt;
+	    // per track calculate the shift in x-direction
+	    // so that the x-position is what would be seen
+	    // in the TPC, not the truth x-position
+	    double event_time = trk[0].T(); // ns
+	    double det_drift_time = 1.6E6; // ns
+	    double det_width = 256.; // cm
+	    double shift_x = event_time * (det_width/det_drift_time);
+	    tpc_obj.reserve(trk.size()-1);
+
+	    _trk_time = trk[0].T()/1000.;
+	    _trk_x    = trk[0].X();
+	    _trk_shift = shift_x;
+	    _trk_min_x = 1036.;
+	    _trk_max_x = -1036.;
+	    for(size_t i=0; i < trk.size(); ++i) {
+	      if (trk[i].X() > _trk_max_x) { _trk_max_x = trk[i].X(); }
+	      if (trk[i].X() < _trk_min_x) { _trk_min_x = trk[i].X(); }
+	    }
+	    _track_tree->Fill();
+
+	  //ahack 11/09/15.  Find all tracks with same ancestor ID and add them to the tpc_obj
+	  auto const & ancID = trk.AncestorTrackID() ;
+	  for (size_t m=0; m < ev_mctrack->size(); m++){
+
+	      auto const & trk2 = ev_mctrack->at(m);
+
+	      if( ancID == trk2.AncestorTrackID()){
+		usedIDs.push_back(m);
+	  	ids.push_back(m) ;
+		std::cout<<"Used siez: "<<usedIDs.size()<<", "<<m<<std::endl ;
+		}
+	  	
+	      }
 	    
-	    double dx = pt2[0] - pt1[0];
-	    double dy = pt2[1] - pt1[1];
-	    double dz = pt2[2] - pt1[2];
-	    
-	    pt.q = (trk[i].E() - trk[i+1].E());
-	    pt.x = pt1[0] + dx/2. + shift_x;
-	    pt.y = pt1[1] + dy/2.;
-	    pt.z = pt1[2] + dz/2.;
-	    
-	  tpc_obj.push_back(pt);
-	  tpc_obj.idx = n;
-	  }
-	_mgr.Emplace(std::move(tpc_obj));
-	}// if the track is at least 2 elements long
+	  for(size_t j=0; j < ids.size(); j++) {
+	      auto const & trk = ev_mctrack->at(ids[j]);
+	    for(size_t i=0; i < (trk.size()-1); ++i) {
+
+	      auto const& pt1 = trk[i].Position();
+	      auto const& pt2 = trk[i+1].Position();
+	      
+	      ::flashana::QPoint_t pt;
+	      
+	      double dx = pt2[0] - pt1[0];
+	      double dy = pt2[1] - pt1[1];
+	      double dz = pt2[2] - pt1[2];
+	      
+	      pt.q = (trk[i].E() - trk[i+1].E());
+	      pt.x = pt1[0] + dx/2. + shift_x;
+	      pt.y = pt1[1] + dy/2.;
+	      pt.z = pt1[2] + dz/2.;
+	      
+	      tpc_obj.push_back(pt);
+	      tpc_obj.idx = n;
+	      }
+	    }
+	    _mgr.Emplace(std::move(tpc_obj));
+	  }// if the track is at least 2 elements long
+        }// if index has not already been used
       }// for all tracks
     }
 
@@ -209,7 +259,11 @@ namespace larlite {
       _score   = match.score;
       _flash_time = flash.Time();
       _mc_time = _mc_x = _mc_y = _mc_z = -1;
+	
+      _flash_v_x->Fill(match.tpc_point.x, flash.ZWidth());
+	
       if(_use_mc) {
+	
 	auto const& mct = (*ev_mctrack)[match.tpc_id];
 	_mc_time = mct[0].T() * 1.e-3;
 	double event_time = mct[0].T(); // ns
@@ -255,6 +309,7 @@ namespace larlite {
       // ignore tracks with < 2 steps
       if (mct.size() < 2) continue;
       // find the flash that was matched for this MCTrack (if any)
+
       _mc_time = mct[0].T() * 1.e-3;
       _mc_edep = mct[0].E()-mct[mct.size()-1].E();
       double event_time = mct[0].T(); // ns
@@ -281,8 +336,6 @@ namespace larlite {
 	if (x < _trk_min_x) _trk_min_x = x;			   
       }
 
-      _flash_time = -999;
-      _mc_time    = -999; 
       _matched    = 0 ;
       _npe        = 0;
       _npts = mct.size() ;
@@ -296,7 +349,6 @@ namespace larlite {
 	}
       }
 
-//	std::cout<<"Matched is now: "<<_matched<<"\n"<<std::endl ;
       _eff_tree->Fill();
     }// for all MCTracks
 
@@ -308,10 +360,17 @@ namespace larlite {
 
   bool UBT0Finder::finalize() {
     if(_fout) {
+    std::cout<<"\n\n Nuber of events with > 50 pe! "<<_npe_test<<std::endl ;
+
       _fout->cd();
+
+      _flash_v_x->GetXaxis()->SetTitle("TPC x position of match");
+      _flash_v_x->GetYaxis()->SetTitle("Flash Z Width");
+
       _tree->Write();
       _track_tree->Write();
       _eff_tree->Write();
+      _flash_v_x->Write();
     }
     return true;
   }
