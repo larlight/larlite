@@ -54,7 +54,9 @@ my_unit.Manager().SetAlgo(filter_ana)
 # PMT Filter Algo
 my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
 # Match Prohibit Algo
-my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
+timecompat = flashana.TimeCompatMatch()
+timecompat.SetFrameDriftTime(2200)
+#my_unit.Manager().SetAlgo(timecompat)
 
 my_unit.Manager().SetVerbosity(3)
 
