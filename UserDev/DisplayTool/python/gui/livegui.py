@@ -16,7 +16,7 @@ class livegui(gui):
         self._timer = QtCore.QTimer()
         self._timer.timeout.connect(self.eventTimeoutTest)
         self._minEventUpdateTime = 30.0
-        self._minFileUpdateTime = 1
+        self._minFileUpdateTime = 3
         self._fileChecker = UBDaqFileGlobber()
 
         # Make sure a manager is set up:
@@ -98,7 +98,7 @@ class livegui(gui):
         self._autoRunLabel = QtGui.QLabel("Event Update OFF")
         # This label is showing the delay between event updates
         self._eventUpdateDelayLabel = QtGui.QLabel("Delay (s):")
-        self._eventUpdateDelayEntry = QtGui.QLineEdit("60")
+        self._eventUpdateDelayEntry = QtGui.QLineEdit("45")
         self._eventUpdateDelayEntry.returnPressed.connect(self.eventUpdateEntryHandler)
         self._eventUpdateDelayEntry.setMaximumWidth(45)
         self._eventUpdatePauseButton = QtGui.QPushButton("START")
@@ -192,6 +192,7 @@ class livegui(gui):
                 delay = self._minFileUpdateTime
             if delay < self._minFileUpdateTime:
                 delay = self._minFileUpdateTime
+            self._fileUpdateDelayEntry.setText(str(delay))
             self._fileChecker.setPeriod(delay*60*1000)
             self._fileChecker.start()
             self._fileUpdatePauseButton.setText("PAUSE")
@@ -209,6 +210,7 @@ class livegui(gui):
                 delay = self._minEventUpdateTime
             if delay < self._minEventUpdateTime:
                 delay = self._minEventUpdateTime
+            self._eventUpdateDelayEntry.setText(str(delay))
             self._eventUpdatePauseButton.setText("PAUSE")
             self._timer.setInterval(delay*1000)
             self._timer.start()

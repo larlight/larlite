@@ -27,7 +27,7 @@ my_proc.set_ana_output_file("out.root")
 
 myana = fmwk.PEDistAna()
 myana.SetTimeRange(-0.1,10)
-myana.SetProducers("opFlash","opFlash","pmtreadout","triggersim")
+myana.SetProducers("largeant","opFlash","opFlash","pmtreadout","triggersim")
 my_proc.add_process(myana)
 
 print

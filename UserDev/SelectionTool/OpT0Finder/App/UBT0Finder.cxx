@@ -123,7 +123,7 @@ namespace larlite {
 	  // so that the x-position is what would be seen
 	  // in the TPC, not the truth x-position
 	  double event_time = trk[0].T(); // ns
-	  double det_drift_time = 1.6E6; // ns
+	  double det_drift_time = 2.2E6; // ns
 	  double det_width = 256.; // cm
 	  double shift_x = event_time * (det_width/det_drift_time);
 	  tpc_obj.reserve(trk.size()-1);
@@ -213,7 +213,7 @@ namespace larlite {
 	auto const& mct = (*ev_mctrack)[match.tpc_id];
 	_mc_time = mct[0].T() * 1.e-3;
 	double event_time = mct[0].T(); // ns
-	double det_drift_time = 1.6E6; // ns
+	double det_drift_time = 2.2E6; // ns
 	double det_width = 256.; // cm
 	_trk_shift = event_time * (det_width/det_drift_time);
 	double min_dist = 1e12;
@@ -258,7 +258,7 @@ namespace larlite {
       _mc_time = mct[0].T() * 1.e-3;
       _mc_edep = mct[0].E()-mct[mct.size()-1].E();
       double event_time = mct[0].T(); // ns
-      double det_drift_time = 1.6E6; // ns
+      double det_drift_time = 2.2E6; // ns
       double det_width = 256.; // cm
       _trk_shift = event_time * (det_width/det_drift_time);
       _trk_min_x =  1036.;
