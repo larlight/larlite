@@ -59,6 +59,8 @@ namespace larlite {
   class event_fifo;
   class event_opdetwaveform;
   class event_simphotons;
+  class event_Flash;
+  class event_SubEvent;
 }
 
 namespace larlite {

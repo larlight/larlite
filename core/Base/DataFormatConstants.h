@@ -89,6 +89,8 @@ namespace larlite{
       kTrackMomentum,      ///< track momentum
       kOpDetWaveform,      ///< optical detector waveform
       kSimPhotons,         ///< sim::SimPhotons
+      kFlash,              ///< subevent::Flash
+      kSubEvent,              ///< subevent::SubEvent
       kDATA_TYPE_MAX       ///< Event-wise enum boundary
     };
 
@@ -143,7 +145,9 @@ namespace larlite{
       "fmatch",
       "trackmom",
       "opdigit",
-      "simphotons"
+      "simphotons",
+      "Flash",
+      "SubEvent",
     };
 
     const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {

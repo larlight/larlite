@@ -202,6 +202,21 @@
 #pragma link C++ class std::vector<larlite::simphotons>+;
 #pragma link C++ class larlite::event_simphotons+;
 
+// Taritree's garbage
+#pragma link C++ class larlite::Flash+;
+#pragma link C++ class std::vector<larlite::Flash>+;
+#pragma link C++ class larlite::event_Flash+;
+//#pragma link C++ class larlite::FlashList+;
+
+#pragma link C++ class larlite::Flash+;
+#pragma link C++ class std::vector<larlite::Flash>+;
+#pragma link C++ class larlite::event_Flash+;
+
+#pragma link C++ class larlite::SubEvent+;
+#pragma link C++ class std::vector<larlite::SubEvent>+;
+#pragma link C++ class larlite::event_SubEvent+;
+
+
 #pragma link C++ class larlite::storage_manager+;
 
 /*

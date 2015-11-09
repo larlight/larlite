@@ -114,6 +114,12 @@ namespace larlite{
   class onephoton;
   class simphotons;
   class event_simphotons;
+
+  // Taritree's Mess
+  class Flash;
+  class event_Flash;
+  class SubEvent;
+  class event_SubEvent;
 }
 
 class treenode;
