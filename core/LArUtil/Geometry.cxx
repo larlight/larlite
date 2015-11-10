@@ -7,6 +7,18 @@ namespace larutil {
 
   Geometry* Geometry::_me = 0;
 
+  void Geometry::CryostatBoundaries(Double_t* boundaries) const
+  {
+    if( fCryostatBoundaries.size() != 6 )
+      throw LArUtilException("CryostatBoundaries not loaded (length != 6)... ");
+
+    //if( fCryostatBoundaries.size() != sizeof(boundaries)/8 )
+    // throw LArUtilException("Input argument for CryostatBoundaries must be length 6 double array!");
+
+    for(size_t i=0; i<fCryostatBoundaries.size(); ++i)
+      boundaries[i] = fCryostatBoundaries[i];
+  }
+
   Geometry::Geometry(bool default_load) : LArUtilBase()
   {
     _name = "Geometry";
@@ -74,6 +86,8 @@ namespace larutil {
     fCryoLength = larlite::data::kINVALID_DOUBLE;
     fCryoHalfWidth = larlite::data::kINVALID_DOUBLE;
     fCryoHalfHeight = larlite::data::kINVALID_DOUBLE;
+
+    fCryostatBoundaries.clear();
     
     fChannelToPlaneMap.clear();
     fChannelToWireMap.clear();
@@ -109,6 +123,8 @@ namespace larutil {
     if(!(ch->GetBranch("fCryoHalfWidth")))  error_msg += "      fCryoHalfWidth\n";
     if(!(ch->GetBranch("fCryoHalfHeight"))) error_msg += "      fCryoHalfHeight\n";
 
+    if(!(ch->GetBranch("fCryostatBoundaries"))) error_msg += "       fCryostatBoundaries\n";
+
     if(!(ch->GetBranch("fChannelToPlaneMap")))     error_msg += "      fChannelToPlaneMap\n";
     if(!(ch->GetBranch("fChannelToWireMap")))      error_msg += "      fChannelToWireMap\n";
     if(!(ch->GetBranch("fPlaneWireToChannelMap"))) error_msg += "      fPlaneWireToChannelMap\n";
@@ -137,6 +153,9 @@ namespace larutil {
 
       return false;
     }
+
+    // Cryo boundaries
+    std::vector<Double_t> *pCryostatBoundaries = nullptr;
 
     // Vectors with length = # channels
     std::vector<UChar_t>                *pChannelToPlaneMap = nullptr;
@@ -168,6 +187,8 @@ namespace larutil {
     ch->SetBranchAddress("fCryoHalfWidth",&fCryoHalfWidth);
     ch->SetBranchAddress("fCryoHalfHeight",&fCryoHalfHeight);
 
+    ch->SetBranchAddress("fCryostatBoundaries",&pCryostatBoundaries);
+
     ch->SetBranchAddress("fChannelToWireMap",  &pChannelToWireMap);
     ch->SetBranchAddress("fChannelToPlaneMap", &pChannelToPlaneMap);
     ch->SetBranchAddress("fPlaneWireToChannelMap",&pPlaneWireToChannelMap);
@@ -189,6 +210,11 @@ namespace larutil {
     ch->SetBranchAddress("fOpDetVtx",&pOpDetVtx);
     ch->SetBranchAddress("fOpChannel2OpDet",&pOpChannel2OpDet);
     ch->GetEntry(0);
+
+    fCryostatBoundaries.resize(pCryostatBoundaries->size());
+    for(size_t i=0; i<pCryostatBoundaries->size(); ++i) 
+
+      fCryostatBoundaries[i] = (*pCryostatBoundaries)[i];
 
     // Copy channelw-sie variables
     size_t n_channels = pChannelToPlaneMap->size();
