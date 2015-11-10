@@ -269,7 +269,6 @@ namespace larlite {
       f.time = flash.Time();
       f.idx = n;
 
-//      std::cout<<"flash PE : "<<flash.TotalPE()<<std::endl ;
       _mgr.Emplace(std::move(f));
     }
 
@@ -338,7 +337,6 @@ namespace larlite {
 	_mc_dx = max_x - min_x;
       if( mct[0].E() - mct[mct.size()-1].E() > _e_diff )
 	_time_diff->Fill(1000*(_flash_time - _mc_time)); //
-//	std::cout<<"Time diff: "<<((_flash_time - _mc_time))<<std::endl ; //
       }
       _tree->Fill();
 
@@ -399,8 +397,6 @@ namespace larlite {
     }// for all MCTracks
 
     _nflash_v_nint->Fill(n_int, n_flash);
-
-    std::cout<<"n int, n flash : "<<n_int<<", "<<n_flash<<std::endl ;
 
     if(_npts == 0 )
       _eff_tree->Fill();
