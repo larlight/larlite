@@ -18,6 +18,7 @@
 #include "Analysis/ana_base.h"
 #include "OpT0Finder/Base/FlashMatchManager.h"
 #include <TTree.h>
+#include <TH2D.h>
 
 namespace larlite {
   /**
@@ -56,6 +57,8 @@ namespace larlite {
     void SetROEnd(double t)   { _RO_end = t; }
 
     void SetTrigTime(double t) { _Trig_time = t; }
+
+    void SetEDiff(double e) { _e_diff = e ; }
 
   protected:
 
@@ -104,6 +107,16 @@ namespace larlite {
     int _matched;
     double _mc_edep;
     double _trk_max_abs_x, _trk_min_abs_x;
+
+    int _npe_test; 
+    TH2D * _flash_v_x ;
+
+    TH1D * _time_diff ;
+
+    int _n_int ;     //Total interactions > 10MeV
+    int _n_int_tot ; //Total interactions 
+    double _e_diff ; //Energy difference cut between start and end of track.  
+		     
 
   };
 }
