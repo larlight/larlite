@@ -78,6 +78,9 @@ namespace larlite {
 
     bool _use_mc;
 
+    TTree* _int_tree;
+    double _t0 ;
+
     TTree* _track_tree;
     double _trk_time;
     double _trk_shift;
@@ -110,12 +113,15 @@ namespace larlite {
 
     int _npe_test; 
     TH2D * _flash_v_x ;
+    TH2D * _nflash_v_nint ;
 
     TH1D * _time_diff ;
 
     int _n_int ;     //Total interactions > 10MeV
     int _n_int_tot ; //Total interactions 
     double _e_diff ; //Energy difference cut between start and end of track.  
+
+    int _n_matches ;
 		     
 
   };
