@@ -1,8 +1,9 @@
-from data import recoBase
+from database import recoBase
 from evdMatchDef import getMatchManager
 from ROOT import evd
 import pyqtgraph as pg
 from connectedObjects import connectedBox, connectedCircle, boxCollection
+from cluster import clusterParams
 
 class match(recoBase):
 
