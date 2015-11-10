@@ -405,8 +405,8 @@ namespace larlite {
       _flash_v_x->GetYaxis()->SetTitle("Flash Z Width");
       _time_diff->GetXaxis()->SetTitle("Delta T [ns]" );
 
-      std::cout<<"\nEfficiency of matching       : "<<_time_diff->GetEntries()/_n_int *100 <<"%"<<std::endl;
-      std::cout<<"Good matches within 40-120ns : "<<_time_diff->Integral(8,24)/_n_int *100<<"%"<<std::endl ;
+      std::cout<<"\n \% Total interactions that were matched : "<<_time_diff->GetEntries()/_n_int *100 <<"%"<<std::endl;
+      std::cout<<"\% Matches whose deltaT falls within 40-120ns: "<<_time_diff->Integral(8,24)/_n_int *100<<"%"<<std::endl ;
 
       _tree->Write();
       _track_tree->Write();
