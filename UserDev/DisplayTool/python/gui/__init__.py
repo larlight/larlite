@@ -1,6 +1,10 @@
 from gui import gui, view_manager
 from larlitegui import larlitegui
-from livegui import livegui
+try:
+    from livegui import livegui
+except:
+    pass
+    
 from viewport import viewport
 from larsoftgui import larsoftgui
 try:
@@ -9,4 +13,3 @@ try:
     from larlitegui3D import larlitegui3D
 except:
     pass
-    
