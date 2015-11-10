@@ -27,9 +27,6 @@ namespace larlite {
 
   bool UBT0Finder::initialize() {
 
-//    std::cout<<"E diff is: "<<_e_diff<<std::endl ;
-
-
     _time_diff = new TH1D("time_diff","Matched Flash vs. MCTrack",100,0,500);
 
     _flash_v_x = new TH2D("_flash_v_x","OpFlash Z Width vs TPC x point",100,0,256,100,0,1450);
@@ -400,7 +397,7 @@ namespace larlite {
   bool UBT0Finder::finalize() {
     if(_fout) {
 
-      std::cout<<"Number of int with > 10MeV and total : "<<_n_int<<", "<<_n_int_tot<<std::endl ;
+      std::cout<<"Number of int with > "<<_e_diff<<" MeV and total : "<<_n_int<<", "<<_n_int_tot<<std::endl ;
 
       _fout->cd();
 
