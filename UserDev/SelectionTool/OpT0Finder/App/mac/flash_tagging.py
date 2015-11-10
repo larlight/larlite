@@ -4,7 +4,7 @@ def pmt_pos():
     xv = ROOT.std.vector("double")()
     yv = ROOT.std.vector("double")()
     zv = ROOT.std.vector("double")()
-    for line in open('opt_geo.txt','r').read().split('\n'):
+    for line in open('opt_geo_fixed.txt','r').read().split('\n'):
         words = line.split()
         if not len(words) == 3: continue
         xv.push_back(float(words[0]))
@@ -41,6 +41,7 @@ my_proc.set_ana_output_file("ana.root")
 # Attach an analysis unit ... here we use a base class which does nothing.
 # Replace with your analysis unit if you wish.
 my_unit = fmwk.UBT0Finder()
+my_unit.SetEDiff(10.)
 my_unit.UseMC(True)
 my_unit.SetROStart(-3200.)
 my_unit.SetROEnd(3200.)
@@ -54,7 +55,9 @@ my_unit.Manager().SetAlgo(filter_ana)
 # PMT Filter Algo
 my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
 # Match Prohibit Algo
-my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
+timecompat = flashana.TimeCompatMatch()
+timecompat.SetFrameDriftTime(2200)
+#my_unit.Manager().SetAlgo(timecompat)
 
 my_unit.Manager().SetVerbosity(3)
 
@@ -74,7 +77,7 @@ match_alg.SetVerbosity(3)
 match_alg_1 = flashana.CommonAmps(xv,yv,zv,5)
 match_alg_1.UsePhotonLibrary(True)
 match_alg_1.SetScore(0.8)
-match_alg_1.SetPercent(0.6)
+match_alg_1.SetPercent(0.68)
 
 my_unit.Manager().SetAlgo(match_alg)
 
@@ -84,7 +87,7 @@ print  "Finished configuring ana_processor. Start event loop!"
 print
 
 # Let's run it.
-my_proc.run(0,1000);
+my_proc.run()
 
 # done!
 print
