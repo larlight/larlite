@@ -158,7 +158,7 @@ namespace larutil {
     { return fCryoLength; }
 
     /// boundaries of cryostat, 3 pairs of +/- coord
-    //void     CryostatBoundaries(Double_t* boundaries) const;
+    void     CryostatBoundaries(Double_t* boundaries) const;
 
   private:
 
@@ -169,6 +169,7 @@ namespace larutil {
     Double_t fCryoLength;
     Double_t fCryoHalfWidth;
     Double_t fCryoHalfHeight;
+    std::vector<Double_t> fCryostatBoundaries;
 
   public:
 
