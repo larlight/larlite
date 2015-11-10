@@ -129,23 +129,29 @@ namespace larlite {
     else{
       //ahack 110915
       std::vector<int> usedIDs;
+      std::vector<int> ancIDs ;
       usedIDs.resize(0);
+      ancIDs.resize(0);
+//      std::cout<<"\nNew event, size of usedIDs now: "<<usedIDs.size()<<std::endl;
 
       if (!ev_mctrack || ev_mctrack->empty()) return false;
+
       for (size_t n=0; n < ev_mctrack->size(); n++){
+
+
+	if (ev_mctrack->at(n).size() > 2) 
+	    ancIDs.push_back(ev_mctrack->at(n).AncestorTrackID());
 
 	//ahack 110915, don't repeat study for used IDs
 	bool used = false ;
 	for(size_t u=0; u < usedIDs.size(); u++){
-	    if( n == usedIDs[u] )
+	    if( ev_mctrack->at(n).AncestorTrackID() == usedIDs[u] )
 		used = true;
 	    }
 
 	//ahack 110915
 	if(!used){
 	  auto const& trk = ev_mctrack->at(n);
-	  std::vector<int> ids ;
-	  ids.resize(0);
 
 	  ::flashana::QCluster_t tpc_obj;
 
@@ -172,33 +178,35 @@ namespace larlite {
 	    _track_tree->Fill();
 
 	  //ahack 11/09/15.  Find all tracks with same ancestor ID and add them to the tpc_obj
+	  std::vector<int> ids ;
+	  ids.resize(0);
 	  auto const & ancID = trk.AncestorTrackID() ;
 	  for (size_t m=0; m < ev_mctrack->size(); m++){
 
 	      auto const & trk2 = ev_mctrack->at(m);
 
-	      if( ancID == trk2.AncestorTrackID()){
-		usedIDs.push_back(m);
+	      if( ancID == trk2.AncestorTrackID() && trk2.size() > 2){
+		usedIDs.push_back(ancID);
 	  	ids.push_back(m) ;
-		std::cout<<"Used siez: "<<usedIDs.size()<<", "<<m<<std::endl ;
 		}
-	  	
 	      }
 	    
-	  for(size_t j=0; j < ids.size(); j++) {
-	      auto const & trk = ev_mctrack->at(ids[j]);
-	    for(size_t i=0; i < (trk.size()-1); ++i) {
 
-	      auto const& pt1 = trk[i].Position();
-	      auto const& pt2 = trk[i+1].Position();
-	      
+	  for(size_t j=0; j < ids.size(); j++) {
+	      auto const & trk3 = ev_mctrack->at(ids[j]);
 	      ::flashana::QPoint_t pt;
+
+	    if( trk3.size() != 0 ){
+	    for(size_t i=0; i < (trk3.size()-1); ++i) {
+
+	      auto const& pt1 = trk3[i].Position();
+	      auto const& pt2 = trk3[i+1].Position();
 	      
 	      double dx = pt2[0] - pt1[0];
 	      double dy = pt2[1] - pt1[1];
 	      double dz = pt2[2] - pt1[2];
 	      
-	      pt.q = (trk[i].E() - trk[i+1].E());
+	      pt.q = (trk3[i].E() - trk3[i+1].E());
 	      pt.x = pt1[0] + dx/2. + shift_x;
 	      pt.y = pt1[1] + dy/2.;
 	      pt.z = pt1[2] + dz/2.;
@@ -206,11 +214,24 @@ namespace larlite {
 	      tpc_obj.push_back(pt);
 	      tpc_obj.idx = n;
 	      }
+	      }
 	    }
 	    _mgr.Emplace(std::move(tpc_obj));
+
 	  }// if the track is at least 2 elements long
         }// if index has not already been used
       }// for all tracks
+
+//      std::cout<<"Ancestor size: "<<ancIDs.size()<<" and IDs: ";
+//      for(size_t i =0; i < ancIDs.size(); i++){
+//	std::cout<<ancIDs[i]<<", " ;
+//	}
+//
+//      std::cout<<"\nUsedID size: "<<usedIDs.size()<<" and IDs: ";
+//      for(size_t i =0; i < usedIDs.size(); i++){
+//	std::cout<<usedIDs[i]<<", " ;
+//	}
+//      std::cout<<std::endl ;
     }
 
     for (size_t n=0; n < ev_flash->size(); n++){
