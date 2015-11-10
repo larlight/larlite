@@ -35,6 +35,7 @@ class Track2d {
 public:
     std::vector<std::pair<float, float> > _track;
     const std::vector<std::pair<float, float> > & track() {return _track;}
+    const std::vector<std::pair<float, float> > & direction() {return _track;}
 };
 
 // typedef std::vector<std::pair<float, float> > Track2d;

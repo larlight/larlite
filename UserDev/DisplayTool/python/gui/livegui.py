@@ -1,7 +1,11 @@
 from gui import gui, view_manager
 from PyQt4 import QtCore, QtGui
-from evdmanager.ubdaq_fileglobber import *
-from evdmanager import ubdaq_manager
+try:
+    from evdmanager.ubdaq_fileglobber import *
+    from evdmanager import ubdaq_manager
+except:
+    pass
+    
 # override the gui to give the live display special features:
 class livegui(gui):
 
