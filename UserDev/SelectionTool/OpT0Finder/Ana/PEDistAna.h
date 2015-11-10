@@ -66,11 +66,17 @@ namespace larlite {
 
   protected:
 
-    TTree *_event_tree, *_run_tree;
-    
+    TTree *_event_tree;
     unsigned int _run, _subrun, _event;
     std::vector<double> _g4_event_pe,_wf_event_pe, _hit_event_pe, _flash_event_pe;
-    std::vector< std::vector<double> > _g4_tot_pe, _wf_tot_pe, _hit_tot_pe, _flash_tot_pe;
+
+    TTree  *_run_tree;
+    std::vector< std::vector<double> > _g4_run_pe, _wf_run_pe, _hit_run_pe, _flash_run_pe;
+
+    TTree *_ch_tree;
+    unsigned int _ch;
+    double _g4_sum_pe, _wf_sum_pe, _hit_sum_pe, _flash_sum_pe;
+
     std::string _opdigit_producer, _g4_producer, _ophit_producer, _opflash_producer, _trigger_producer;
     double _min_time, _max_time;
     double _spe_area;
