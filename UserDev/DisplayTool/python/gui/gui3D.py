@@ -337,7 +337,7 @@ class gui3D(QtGui.QWidget):
     s = self._event_manager.subrun()
     name = "evd_" + self._geometry.name() + "_R" + str(r)
     name = name + "_S" + str(s)
-    name = name + "_E" + str(e) + ".png"
+    name = name + "_E" + str(e) + "3D.png"
     f = dialog.getSaveFileName(self,"Save File",name,
         "PNG (*.png);;JPG (*.jpg);;All Files (*)")
 
