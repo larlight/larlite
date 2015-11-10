@@ -41,6 +41,7 @@ class ubdaq_manager(manager, wire, QtCore.QObject):
         # override the wire drawing process
         self._type = None
         self._process = None
+        self._filterData = True
 
         self.setInputFile(file)
 
@@ -54,7 +55,7 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
     def initProcess(self):
         self._process = evd.DrawUbDaq()
         # Set up the noise filter and initialize
-        self._process.SetCorrectData(False)
+        self._process.SetCorrectData(self._filterData)
         self._process.SetSaveData(False)
         self._process.SetStepSizeByPlane(48, 0)
         self._process.SetStepSizeByPlane(48, 1)
@@ -166,6 +167,7 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
             return False
 
     def toggleNoiseFilter(self,doit):
+        self._filterData = doit
         if self._process is not None:
             self._process.SetCorrectData(doit)
 
