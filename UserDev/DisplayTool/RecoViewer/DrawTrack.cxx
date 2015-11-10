@@ -92,6 +92,7 @@ Track2d DrawTrack::getTrack2d(larlite::track track, unsigned int plane) {
     try {
       auto point = geoHelper->Point_3Dto2D(track.LocationAtPoint(i), plane);
       result._track.push_back(std::make_pair(point.w, point.t));
+      // auto 
     }
     catch (...) {
       continue;

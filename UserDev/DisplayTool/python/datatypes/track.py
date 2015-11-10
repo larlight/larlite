@@ -1,4 +1,4 @@
-from data import recoBase
+from database import recoBase
 from PyQt4 import QtGui, QtCore
 from ROOT import evd
 import pyqtgraph as pg
@@ -61,3 +61,53 @@ class track(recoBase):
                 view._view.addItem(thisPoly)
 
                 self._drawnObjects[view.plane()].append(thisPoly)
+
+
+from database import recoBase3D
+
+try:
+    import pyqtgraph.opengl as gl
+    import numpy as np
+    class track3D(recoBase3D):
+
+        def __init__(self):
+            super(track3D, self).__init__()
+            self._productName = 'track3D'
+            self._process = evd.DrawTrack3D()
+            self.init()
+
+
+        def drawObjects(self, view_manager):
+            geom = view_manager._geometry
+            view = view_manager.getView()
+
+            self
+            tracks = self._process.getData()
+
+            for track in tracks:
+
+                # construct a line for this track:
+                points = track.track()
+                x = np.zeros(points.size())
+                y = np.zeros(points.size())
+                z = np.zeros(points.size())
+                # x = numpy.ndarray()
+                # x = numpy.ndarray()
+                i = 0
+                for point in points:
+                    x[i] = point.X()
+                    y[i] = point.Y()
+                    z[i] = point.Z()
+                    i+= 1
+
+                pts = np.vstack([x,y,z]).transpose()
+                pen = pg.mkPen((255,0,0), width=2)
+                line = gl.GLLinePlotItem(pos=pts,color=(255,0,0,255))
+                view.addItem(line)
+                self._drawnObjects.append(line)
+
+    
+
+except Exception, e:
+    pass
+
