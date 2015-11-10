@@ -8,6 +8,7 @@
 #include "DataFormat/mctrack.h"
 #include "GeoAlgo/GeoAlgo.h"
 #include "GeoAlgo/GeoLineSegment.h"
+#include "LArUtil/Geometry.h"
 namespace larlite {
 
   UBT0Finder::UBT0Finder()
@@ -65,6 +66,7 @@ namespace larlite {
   bool UBT0Finder::analyze(storage_manager* storage) {
 
     _mgr.Reset();
+    const ::larutil::Geometry* g = ::larutil::Geometry::GetME();
 
     auto ev_flash = storage->get_data<event_opflash>("opflash");
 
@@ -173,9 +175,11 @@ namespace larlite {
       f.z = flash.ZCenter();
       f.y_err = flash.YWidth();
       f.z_err = flash.ZWidth();
-      f.pe_v.reserve(32);
-      for(unsigned int i=0; i<32; i++)
-	f.pe_v.push_back(flash.PE(i));
+      f.pe_v.resize(g->NOpDets());
+      for(unsigned int i=0; i<f.pe_v.size(); i++) {
+	unsigned int opdet = g->OpDetFromOpChannel(i);
+	f.pe_v[opdet] = flash.PE(i);
+      }
       f.time = flash.Time();
       f.idx = n;
 
