@@ -15,13 +15,22 @@ namespace larlite {
     : _track_tree(nullptr)
     , _tree(nullptr)
     , _eff_tree(nullptr)
+    , _time_diff(nullptr)
   {
     _name="UBT0Finder";
     _fout=0;
     _npe_test = 0; 
+    _n_int = 0;
+    _n_int_tot = 0;
+    _e_diff = 10;
   }
 
   bool UBT0Finder::initialize() {
+
+//    std::cout<<"E diff is: "<<_e_diff<<std::endl ;
+
+
+    _time_diff = new TH1D("time_diff","Matched Flash vs. MCTrack",100,0,500);
 
     _flash_v_x = new TH2D("_flash_v_x","OpFlash Z Width vs TPC x point",100,0,256,100,0,1450);
 
@@ -134,7 +143,6 @@ namespace larlite {
       std::vector<int> ancIDs ;
       usedIDs.resize(0);
       ancIDs.resize(0);
-//      std::cout<<"\nNew event, size of usedIDs now: "<<usedIDs.size()<<std::endl;
 
       if (!ev_mctrack || ev_mctrack->empty()) return false;
 
@@ -194,46 +202,49 @@ namespace larlite {
 	      }
 	    
 
+	  // Now loop over all mctracks that share an ancestor and treat
+	  // them as one interaction
+	  double e_diff = 0;
 	  for(size_t j=0; j < ids.size(); j++) {
 	      auto const & trk3 = ev_mctrack->at(ids[j]);
 	      ::flashana::QPoint_t pt;
 
 	    if( trk3.size() != 0 ){
-	    for(size_t i=0; i < (trk3.size()-1); ++i) {
+		for(size_t i=0; i < (trk3.size()-1); ++i) {
 
-	      auto const& pt1 = trk3[i].Position();
-	      auto const& pt2 = trk3[i+1].Position();
-	      
-	      double dx = pt2[0] - pt1[0];
-	      double dy = pt2[1] - pt1[1];
-	      double dz = pt2[2] - pt1[2];
-	      
-	      pt.q = (trk3[i].E() - trk3[i+1].E());
-	      pt.x = pt1[0] + dx/2. + shift_x;
-	      pt.y = pt1[1] + dy/2.;
-	      pt.z = pt1[2] + dz/2.;
-	      
-	      tpc_obj.push_back(pt);
-	      tpc_obj.idx = n;
+	    	  auto const& pt1 = trk3[i].Position();
+	    	  auto const& pt2 = trk3[i+1].Position();
+	    	  
+	    	  double dx = pt2[0] - pt1[0];
+	    	  double dy = pt2[1] - pt1[1];
+	    	  double dz = pt2[2] - pt1[2];
+	    	  
+	    	  pt.q = (trk3[i].E() - trk3[i+1].E());
+	    	  pt.x = pt1[0] + dx/2. + shift_x;
+	    	  pt.y = pt1[1] + dy/2.;
+	    	  pt.z = pt1[2] + dz/2.;
+	    	  
+	    	  tpc_obj.push_back(pt);
+	    	  tpc_obj.idx = n;
+	    	  }
 	      }
-	      }
+
+	      e_diff += (trk3[0].E() - trk3[trk3.size()-1].E()); 
+//	      std::cout<<"Ediff is: " <<e_diff<<", "<<trk3[trk3.size()-1].E()<<", "<<trk3[0].E()<<std::endl ;
 	    }
+	    
 	    _mgr.Emplace(std::move(tpc_obj));
+	    _n_int_tot++;
+	    
+	    if( e_diff > _e_diff )  
+		_n_int++ ;
+		
+
 
 	  }// if the track is at least 2 elements long
         }// if index has not already been used
       }// for all tracks
 
-//      std::cout<<"Ancestor size: "<<ancIDs.size()<<" and IDs: ";
-//      for(size_t i =0; i < ancIDs.size(); i++){
-//	std::cout<<ancIDs[i]<<", " ;
-//	}
-//
-//      std::cout<<"\nUsedID size: "<<usedIDs.size()<<" and IDs: ";
-//      for(size_t i =0; i < usedIDs.size(); i++){
-//	std::cout<<usedIDs[i]<<", " ;
-//	}
-//      std::cout<<std::endl ;
     }
 
     for (size_t n=0; n < ev_flash->size(); n++){
@@ -319,8 +330,11 @@ namespace larlite {
 	  if(step1.X() > max_x) max_x = step1.X();
 	}
 	_mc_dx = max_x - min_x;
+      if( mct[0].E() - mct[mct.size()-1].E() > _e_diff )
+	_time_diff->Fill(1000*(_flash_time - _mc_time)); //
       }
       _tree->Fill();
+
     }// for all matches
 
     
@@ -385,17 +399,23 @@ namespace larlite {
 
   bool UBT0Finder::finalize() {
     if(_fout) {
-    std::cout<<"\n\n Nuber of events with > 50 pe! "<<_npe_test<<std::endl ;
+
+      std::cout<<"Number of int with > 10MeV and total : "<<_n_int<<", "<<_n_int_tot<<std::endl ;
 
       _fout->cd();
 
       _flash_v_x->GetXaxis()->SetTitle("TPC x position of match");
       _flash_v_x->GetYaxis()->SetTitle("Flash Z Width");
+      _time_diff->GetXaxis()->SetTitle("Delta T [ns]" );
+
+      std::cout<<"\nEfficiency of matching       : "<<_time_diff->GetEntries()/_n_int *100 <<"%"<<std::endl;
+      std::cout<<"Good matches within 40-120ns : "<<_time_diff->Integral(8,24)/_n_int *100<<"%"<<std::endl ;
 
       _tree->Write();
       _track_tree->Write();
       _eff_tree->Write();
       _flash_v_x->Write();
+      _time_diff->Write();
     }
     return true;
   }
