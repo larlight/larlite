@@ -78,6 +78,9 @@ namespace larlite {
 
     bool _use_mc;
 
+    TTree* _ophit_tree; 
+    double _pktime;
+
     TTree* _int_tree;
     double _t0 ;
     double _n_pe ;
