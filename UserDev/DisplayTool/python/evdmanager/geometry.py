@@ -20,6 +20,18 @@ class geoBase(object):
         self._levels = [(-15, 15), (-10, 30)]
         self._name = "null"
         self._offset = [0, 0]
+        self._halfwidth = larutil.Geometry.GetME().DetHalfWidth()
+        self._halfheight = larutil.Geometry.GetME().DetHalfHeight()
+        self._length = larutil.Geometry.GetME().DetLength()
+
+    def halfwidth(self):
+       return self._halfwidth
+
+    def halfheight(self):
+       return self._halfheight
+
+    def length(self):
+       return self._length
 
     def nViews(self):
         return self._nViews
@@ -88,7 +100,7 @@ class microboone(geometry):
         super(microboone, self).__init__()
         self._levels = [(-100, 10), (-10, 100), (-10, 200)]
         # self._colorScheme =
-        self._time2Cm = 0.05515
+        # self._time2Cm = 0.05515
         self._aspectRatio = self._wire2Cm / self._time2Cm
         self._pedestals = [2000, 2000, 440]
         self._name = "uboone"
@@ -129,7 +141,7 @@ class microboone(geometry):
         # # palette = palettable.cubehelix.classic_16_r
         # npoints = palette.number
         # a = []
-        # power = 2
+        # power = 3
         # a.append((0.0,(255,255,255)))
         # for point in xrange(npoints):
         #     step = (1.0*(point+1)**power) / (npoints**power)
@@ -137,7 +149,7 @@ class microboone(geometry):
         #     # print "point, step", point, step
         #     a.append((step, tuple(palette.colors[point])))
 
-        # # # print a
+        # # print a
         # self._defaultColorScheme.append({'ticks': a, 'mode': 'rgb'})
 
         # #   Using a package to generate the palette:
