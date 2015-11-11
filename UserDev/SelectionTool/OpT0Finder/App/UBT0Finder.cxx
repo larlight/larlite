@@ -16,6 +16,7 @@ namespace larlite {
     : _track_tree(nullptr)
     , _tree(nullptr)
     , _int_tree(nullptr)
+    , _ophit_tree(nullptr)
     , _eff_tree(nullptr)
     , _time_diff(nullptr)
   {
@@ -35,6 +36,10 @@ namespace larlite {
 
     _flash_v_x = new TH2D("_flash_v_x","OpFlash Z Width vs TPC x point",100,0,256,100,0,1450);
     _nflash_v_nint = new TH2D("_nflash_v_nint","OpFlash with PE > 10 vs Nint/event ",50,0,50,30,0,30);
+
+
+    _ophit_tree = new TTree("ophit_tree","");
+    _ophit_tree->Branch("_pktime",&_pktime,"pktime/D");
 
     _int_tree = new TTree("int_tree","");
     _int_tree->Branch("_t0",&_t0,"t0/D");
@@ -98,8 +103,6 @@ namespace larlite {
 
     int n_flash = 0;
     int n_int = 0;
-
-
 
     for ( auto & f : *ev_flash) {
 	if (f.TotalPE() > 10 )
@@ -195,11 +198,15 @@ namespace larlite {
 	   _t0 = trk.AncestorStart().T() ;
 	   _n_pe = 0 ;
 
-	   for(auto const & f : *ev_hit ){
+	    std::cout<<"\n\n\nSize: "<<ev_hit->size()<<std::endl ;
+	   for(auto const & h : *ev_hit ){
 
-	      if(  f.PeakTime() >_t0/1000 -1 && f.PeakTime() < _t0/1000 +1)
-		_n_pe += f.PE();
-	   
+	      _pktime = h.PeakTime() ;
+	      if(  h.PeakTime() >(_t0/1000. -1) && h.PeakTime() < (_t0/1000 +1))
+		_n_pe += h.PE();
+		
+
+	     _ophit_tree->Fill(); 
 	    }
 
 	   std::vector<int> ids ;
@@ -435,6 +442,7 @@ namespace larlite {
 
       _tree->Write();
       _int_tree->Write();
+      _ophit_tree->Write();
       _track_tree->Write();
       _eff_tree->Write();
       _flash_v_x->Write();
