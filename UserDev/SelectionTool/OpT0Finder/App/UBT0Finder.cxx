@@ -4,6 +4,7 @@
 #include "UBT0Finder.h"
 #include "DataFormat/track.h"
 #include "DataFormat/opflash.h"
+#include "DataFormat/ophit.h"
 #include "DataFormat/calorimetry.h"
 #include "DataFormat/mctrack.h"
 #include "GeoAlgo/GeoAlgo.h"
@@ -37,6 +38,7 @@ namespace larlite {
 
     _int_tree = new TTree("int_tree","");
     _int_tree->Branch("_t0",&_t0,"t0/D");
+    _int_tree->Branch("_n_pe",&_n_pe,"n_pe/D");
 
     _track_tree = new TTree("track_tree","");
     _track_tree->Branch("trk_time",&_trk_time,"trk_time/D");
@@ -86,7 +88,8 @@ namespace larlite {
 
     std::cout<<"\nNew event!"<<std::endl ;
 
-    auto ev_flash = storage->get_data<event_opflash>("satOpFlash");// opflash");
+    auto ev_flash = storage->get_data<event_opflash>("opflash");// opflash");
+    auto ev_hit = storage->get_data<event_ophit>("satOpFlash");// opflash");
 
     if(!ev_flash || ev_flash->empty()) {
       std::cout<<"No opflash found. Skipping event: "<<storage->event_id()<<std::endl;
@@ -95,6 +98,7 @@ namespace larlite {
 
     int n_flash = 0;
     int n_int = 0;
+
 
 
     for ( auto & f : *ev_flash) {
@@ -189,6 +193,14 @@ namespace larlite {
 	 if(!used){
 
 	   _t0 = trk.AncestorStart().T() ;
+	   _n_pe = 0 ;
+
+	   for(auto const & f : *ev_hit ){
+
+	      if(  f.PeakTime() >_t0/1000 -1 && f.PeakTime() < _t0/1000 +1)
+		_n_pe += f.PE();
+	   
+	    }
 
 	   std::vector<int> ids ;
 	   ids.resize(0);
