@@ -37,17 +37,12 @@ namespace larlite {
     _flash_v_x = new TH2D("_flash_v_x","OpFlash Z Width vs TPC x point",100,0,256,100,0,1450);
     _nflash_v_nint = new TH2D("_nflash_v_nint","OpFlash with PE > 10 vs Nint/event ",50,0,50,30,0,30);
 
-    _int_tree = new TTree("int_tree","");
-    _int_tree->Branch("_t0",&_t0,"t0/D");
-=======
-
     _ophit_tree = new TTree("ophit_tree","");
     _ophit_tree->Branch("_pktime",&_pktime,"pktime/D");
 
     _int_tree = new TTree("int_tree","");
     _int_tree->Branch("_t0",&_t0,"t0/D");
     _int_tree->Branch("_n_pe",&_n_pe,"n_pe/D");
->>>>>>> b060fe6c4cda89e5893fb03bf1fdf79496a758de
 
     _track_tree = new TTree("track_tree","");
     _track_tree->Branch("trk_time",&_trk_time,"trk_time/D");
@@ -113,6 +108,7 @@ namespace larlite {
     //auto ev_track = storage->get_data<event_track>("pandoraCosmicKHit");
     auto ev_track = storage->get_data<event_track>("trackkalmanhit");
     auto ev_mctrack = storage->get_data<event_mctrack>("mcreco");
+    auto ev_hit = storage->get_data<event_ophit>("satOpFlash");
     
     if(!_use_mc) {
       if (!ev_track || ev_track->empty()) return false;
