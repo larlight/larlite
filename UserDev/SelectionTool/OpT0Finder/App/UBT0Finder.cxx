@@ -13,10 +13,14 @@
 namespace larlite {
 
   UBT0Finder::UBT0Finder()
-    : _track_tree(nullptr)
+    : _int_tree(nullptr)
+    , _track_tree(nullptr)
     , _tree(nullptr)
+<<<<<<< HEAD
     , _int_tree(nullptr)
     , _ophit_tree(nullptr)
+=======
+>>>>>>> 2ec7fad... int => unsigned int --kazu
     , _eff_tree(nullptr)
     , _time_diff(nullptr)
   {
@@ -150,7 +154,7 @@ namespace larlite {
     // use MC tracks
     else{
       //ahack 110915
-      std::vector<int> usedIDs;
+      std::vector<unsigned int> usedIDs;
       usedIDs.resize(0);
 
       if (!ev_mctrack || ev_mctrack->empty()) return false;
