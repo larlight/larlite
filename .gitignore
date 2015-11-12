@@ -34,3 +34,5 @@
 !/UserDev/LArLiteApp
 !/UserDev/DisplayTool
 !/UserDev/UBRawFileReader
+/UserDev/SelectionTool/OpT0Finder/OpTrackAlg/data/uboone_photon_library_v4.root
+/UserDev/SelectionTool/OpT0Finder/OpTrackAlg/data/*
