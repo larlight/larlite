@@ -81,6 +81,13 @@ namespace larlite {
     TTree* _int_tree;
     double _t0 ;
 
+    TTree* _ophit_tree; 
+    double _pktime;
+
+    TTree* _int_tree;
+    double _t0 ;
+    double _n_pe ;
+
     TTree* _track_tree;
     double _trk_time;
     double _trk_shift;

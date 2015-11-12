@@ -24,7 +24,7 @@ namespace flashana {
 
       auto const& flash = flash_v[index]; // Retrieve this flash
 
-      double npe = std::accumulate(flash.pe_v.begin(),flash.pe_v.end(),0); // Sum p.e.
+      double npe = std::accumulate(flash.pe_v.begin(),flash.pe_v.end(),0.0); // Sum p.e.
 
       if(npe < _npe_threshold) continue; // Ignore if below threshold
       

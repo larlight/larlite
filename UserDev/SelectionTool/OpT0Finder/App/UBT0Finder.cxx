@@ -4,6 +4,7 @@
 #include "UBT0Finder.h"
 #include "DataFormat/track.h"
 #include "DataFormat/opflash.h"
+#include "DataFormat/ophit.h"
 #include "DataFormat/calorimetry.h"
 #include "DataFormat/mctrack.h"
 #include "GeoAlgo/GeoAlgo.h"
@@ -15,6 +16,7 @@ namespace larlite {
     : _int_tree(nullptr)
     , _track_tree(nullptr)
     , _tree(nullptr)
+    , _ophit_tree(nullptr)
     , _eff_tree(nullptr)
     , _time_diff(nullptr)
   {
@@ -37,6 +39,15 @@ namespace larlite {
 
     _int_tree = new TTree("int_tree","");
     _int_tree->Branch("_t0",&_t0,"t0/D");
+=======
+
+    _ophit_tree = new TTree("ophit_tree","");
+    _ophit_tree->Branch("_pktime",&_pktime,"pktime/D");
+
+    _int_tree = new TTree("int_tree","");
+    _int_tree->Branch("_t0",&_t0,"t0/D");
+    _int_tree->Branch("_n_pe",&_n_pe,"n_pe/D");
+>>>>>>> b060fe6c4cda89e5893fb03bf1fdf79496a758de
 
     _track_tree = new TTree("track_tree","");
     _track_tree->Branch("trk_time",&_trk_time,"trk_time/D");
@@ -84,8 +95,6 @@ namespace larlite {
     _mgr.Reset();
     const ::larutil::Geometry* g = ::larutil::Geometry::GetME();
 
-    std::cout<<"\nNew event!"<<std::endl ;
-
     auto ev_flash = storage->get_data<event_opflash>("satOpFlash");// opflash");
 
     if(!ev_flash || ev_flash->empty()) {
@@ -95,7 +104,6 @@ namespace larlite {
 
     int n_flash = 0;
     int n_int = 0;
-
 
     for ( auto & f : *ev_flash) {
 	if (f.TotalPE() > 10 )
@@ -143,7 +151,9 @@ namespace larlite {
     // use MC tracks
     else{
       //ahack 110915
+
       std::vector<unsigned int> usedIDs;
+
       usedIDs.resize(0);
 
       if (!ev_mctrack || ev_mctrack->empty()) return false;
@@ -189,6 +199,19 @@ namespace larlite {
 	 if(!used){
 
 	   _t0 = trk.AncestorStart().T() ;
+
+	   _n_pe = 0 ;
+
+	    std::cout<<"\n\n\nSize: "<<ev_hit->size()<<std::endl ;
+	   for(auto const & h : *ev_hit ){
+
+	      _pktime = h.PeakTime() ;
+	      if(  h.PeakTime() >(_t0/1000. -1) && h.PeakTime() < (_t0/1000 +1))
+		_n_pe += h.PE();
+		
+
+	     _ophit_tree->Fill(); 
+	   }
 
 	   std::vector<int> ids ;
 	   ids.resize(0);
@@ -423,6 +446,7 @@ namespace larlite {
 
       _tree->Write();
       _int_tree->Write();
+      _ophit_tree->Write();
       _track_tree->Write();
       _eff_tree->Write();
       _flash_v_x->Write();
