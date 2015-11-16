@@ -28,6 +28,7 @@ namespace larlite {
     _n_int_tot = 0;
     _n_matches = 0;
     _e_diff    = 10;
+    UseAbsolutePE(false);
   }
 
   bool UBT0Finder::initialize() {
@@ -36,6 +37,7 @@ namespace larlite {
 
     _flash_v_x = new TH2D("_flash_v_x","OpFlash Z Width vs TPC x point",100,0,256,100,0,1450);
     _nflash_v_nint = new TH2D("_nflash_v_nint","OpFlash with PE > 10 vs Nint/event ",50,0,50,30,0,30);
+
 
     _ophit_tree = new TTree("ophit_tree","");
     _ophit_tree->Branch("_pktime",&_pktime,"pktime/D");
@@ -199,7 +201,6 @@ namespace larlite {
 	 if(!used){
 
 	   _t0 = trk.AncestorStart().T() ;
-
 	   _n_pe = 0 ;
 	   
 
@@ -215,7 +216,7 @@ namespace larlite {
 
 	   _n_pe = 0 ;
 
-	    std::cout<<"\n\n\nSize: "<<ev_hit->size()<<std::endl ;
+//	    std::cout<<"\n\n\nSize: "<<ev_hit->size()<<std::endl ;
 	   for(auto const & h : *ev_hit ){
 
 	      _pktime = h.PeakTime() ;
@@ -239,7 +240,7 @@ namespace larlite {
 		}
 	      }
 	    
-
+//	  auto const & phot = ::phot::PhotonVisibilityService::GetME();
 	  // Now loop over all mctracks that share an ancestor and treat
 	  // them as one interaction
 	  double e_diff = 0;
@@ -247,33 +248,61 @@ namespace larlite {
 	      auto const & trk3 = ev_mctrack->at(ids[j]);
 	      ::flashana::QPoint_t pt;
 
-//	    if( trk3.size() != 0 ){
 		for(size_t i=0; i < (trk3.size()-1); ++i) {
 
 	    	  auto const& pt1 = trk3[i].Position();
 	    	  auto const& pt2 = trk3[i+1].Position();
-	    	  
 	    	  double dx = pt2[0] - pt1[0];
 	    	  double dy = pt2[1] - pt1[1];
 	    	  double dz = pt2[2] - pt1[2];
+	    	  double e_diff = (trk3[i].E() - trk3[i+1].E());
+		  //std::cout<<"\nOld X, Y, Z, Q: "<<pt1[0] + dx/2. +shift_x<<", "<<pt1[1]+dy/2.<<", "<<pt1[2]+dz/2.<<", "<<(trk3[i].E() - trk3[i+1].E())<<std::endl ;
 	    	  
-	    	  pt.q = (trk3[i].E() - trk3[i+1].E());
-	    	  pt.x = pt1[0] + dx/2. + shift_x;
-	    	  pt.y = pt1[1] + dy/2.;
-	    	  pt.z = pt1[2] + dz/2.;
+		  if (_useAbsPE ){
+
+		      double step_length = pow(pow(dx,2) + pow(dy,2) + pow(dz,2),0.5) ;
+		      double step_it = 0.5;
+		      int n_pts = int ( step_length/ step_it ) + 1;
+		      double e_dep = e_diff / step_length ; //This is dedx
+		      e_dep *= step_it ; 		    //This is energy dep. This works for all but last, smaller step
+
+		      //std::cout<<"\nN points: "<<n_pts <<", "<<e_diff<<std::endl ;
+		      //std::cout<<"dx dy dz : "<<dx<<", "<<dy<<", "<<dz<<std::endl; 
+		      for(size_t ii=1; ii<= n_pts; ii++){
+
+		    	  //this_step stores 0.5 all times except last step
+		    	  if (ii*step_it > step_length)
+		    	      e_dep *= (step_length - (ii-1)*step_it)/step_it ;
+
+	    	      	  pt.q = e_dep * 29000; 
+	    	      	  pt.x = pt1[0] + dx/n_pts * (ii - 1 + 0.5) + shift_x;
+	    	      	  pt.y = pt1[1] + dy/n_pts * (ii - 1 + 0.5);
+	    	      	  pt.z = pt1[2] + dz/n_pts * (ii - 1 + 0.5);
+			  //std::cout<<"New X, Y, Z, Q: "<<", "<<pt.x<<", "<<pt.y<<", "<<pt.z<<", "<<pt.q/29000<<std::endl; 
+
+	    	      	  tpc_obj.push_back(pt);
+	    	      	  tpc_obj.idx = n;
+		    	  }	
+		     }
+		  else{
+
+	    	  	pt.q = (trk3[i].E() - trk3[i+1].E());
+	    	  	pt.x = pt1[0] + dx/2. + shift_x;
+	    	  	pt.y = pt1[1] + dy/2.;
+	    	  	pt.z = pt1[2] + dz/2.;
+
+	    	      	tpc_obj.push_back(pt);
+	    	      	tpc_obj.idx = n;
+			}
 	    	  
-	    	  tpc_obj.push_back(pt);
-	    	  tpc_obj.idx = n;
 	    	  }
 	        e_diff += (trk3[0].E() - trk3[trk3.size()-1].E()); 
 	      }
 
-//	    }
 	    
 	    _mgr.Emplace(std::move(tpc_obj));
 	    _n_int_tot++;
 	    
-//	    std::cout<<"What's ediff ? "<<e_diff<<std::endl ;
 	    if( e_diff > _e_diff ) { 
 		_n_int++ ;
 		n_int++;

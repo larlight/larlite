@@ -60,9 +60,14 @@ namespace larlite {
 
     void SetEDiff(double e) { _e_diff = e ; }
 
+    void UseAbsolutePE(bool tof) { _useAbsPE = tof ; }
+
+
   protected:
 
     ::flashana::FlashMatchManager _mgr;
+
+    bool _useAbsPE ;
 
     // readout start : 
     // time before the trigger when the RO start
@@ -84,6 +89,9 @@ namespace larlite {
     TTree* _int_tree;
     double _t0 ;
     double _n_pe ;
+    double _e ;
+    double _int;
+    double _flash ;
 
     TTree* _track_tree;
     double _trk_time;
