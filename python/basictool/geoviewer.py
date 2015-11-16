@@ -22,12 +22,12 @@ class GeoViewer(object):
     _tpc_box   = geoalgo.AABox(0,-126,0,256,116,1036)
     _use_box   = True;
 
-    def __init__(self):
+    def __init__(self,width=10,height=5,dpi=120,facecolor='w',edgecolor='k'):
         self._fig = plt.figure(#num=None,
-                               figsize=(10,5),
-                               dpi=120,
-                               facecolor="w",
-                               edgecolor='k')
+                               figsize=(width,height),
+                               dpi=dpi,
+                               facecolor=facecolor,
+                               edgecolor=edgecolor)
         self._fig.patch.set_alpha(0.5)
         #self._fig.set_size_inches(10,5)
         #self._fig.set_size_inches(10.5,5.5,forward=True)
@@ -306,6 +306,15 @@ class GeoViewer(object):
 
     def show(self):
 
+        self.construct()
+        self._ax.view_init(elev=10., azim=270)
+        self._fig.canvas.draw()#plt.show()
+        self._fig.show()
+        #help(self._fig.canvas)
+        #help(self._fig)
+
+    def construct(self):
+
         # Process GeoObj
         points = self._holder.Point()
         np = points.size()
@@ -366,10 +375,3 @@ class GeoViewer(object):
         self._ax.set_ylabel('Y [cm]')
         self._ax.set_zlabel('Z [cm]')
 
-        self._ax.view_init(elev=10., azim=270)
-
-        self._fig.canvas
-        self._fig.canvas.draw()#plt.show()
-        #self._fig.show()
-        #help(self._fig.canvas)
-        #help(self._fig)

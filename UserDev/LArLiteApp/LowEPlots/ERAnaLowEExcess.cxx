@@ -2,6 +2,7 @@
 #define ERTOOL_ERANALOWEEXCESS_CXX
 
 #include "ERAnaLowEExcess.h"
+#include "GeoAlgo/GeoVector.h"
 
 namespace ertool {
 
@@ -197,6 +198,46 @@ void ERAnaLowEExcess::ProcessEnd(TFile* fout)
 
 }
 
+  double ERAnaLowEExcess::EnuCaloMissingPt(const std::vector< ::ertool::NodeID_t >& Children, const ParticleGraph &graph){
+    
+  double Enu = 0;          //MeV
+  double Elep = 0;         //MeV
+  double Ehad = 0;         //MeV
+  double pT = 0;           //MeV
+  double Es = 30.5;        //MeV
+  double mAr = 37211.3261; //MeV
+  double mp =  938.28;     //MeV
+  double mn = 939.57;      //MeV
+  double Emdefect = 8.5;   //MeV //why 8.5? Because en.wikipedia.org/wiki/Nuclear_binding_energy, find something better.
+  int nP = 0, nN = 0;
+  auto XY = ::geoalgo::Vector(1, 1, 0);
+
+
+  for(auto const& d: Children){
+
+    auto daught = graph.GetParticle(d);
+
+    if(daught.PdgCode() == 11 || daught.PdgCode()){
+      Elep += daught.KineticEnergy();
+    }
+    else if(daught.RecoType() == kTrack || daught.RecoType() == kShower){
+      Ehad += daught.KineticEnergy();
+    }
+    
+    pT += daught.Momentum().Dot(XY);
+    
+    if(daught.PdgCode() == 2212){ nP++;}
+    if(daught.PdgCode() == 2112){ nN++;}
+  }
+  
+  mAr -= nP*mp + nN*mn + (nN+nP)*Emdefect;
+  
+  Enu = Elep + Ehad + Es + 
+    sqrt(pow(pT,2) + pow(mAr, 2)) - mAr;
+
+  return Enu;
+}
+  
 void ERAnaLowEExcess::PrepareTreeVariables() {
 
 	if (_result_tree) { delete _result_tree; }

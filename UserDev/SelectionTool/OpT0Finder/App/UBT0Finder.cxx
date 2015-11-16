@@ -95,8 +95,6 @@ namespace larlite {
     _mgr.Reset();
     const ::larutil::Geometry* g = ::larutil::Geometry::GetME();
 
-//    std::cout<<"\nNew event!"<<std::endl ;
-
     auto ev_flash = storage->get_data<event_opflash>("satOpFlash");// opflash");
     auto ev_hit = storage->get_data<event_ophit>("satOpFlash");// opflash");
 
@@ -116,6 +114,7 @@ namespace larlite {
     //auto ev_track = storage->get_data<event_track>("pandoraCosmicKHit");
     auto ev_track = storage->get_data<event_track>("trackkalmanhit");
     auto ev_mctrack = storage->get_data<event_mctrack>("mcreco");
+    auto ev_hit = storage->get_data<event_ophit>("satOpFlash");
     
     if(!_use_mc) {
       if (!ev_track || ev_track->empty()) return false;
@@ -154,7 +153,9 @@ namespace larlite {
     // use MC tracks
     else{
       //ahack 110915
+
       std::vector<unsigned int> usedIDs;
+
       usedIDs.resize(0);
 
       if (!ev_mctrack || ev_mctrack->empty()) return false;
@@ -212,6 +213,19 @@ namespace larlite {
 
 	     _ophit_tree->Fill(); 
 	    }
+
+	   _n_pe = 0 ;
+
+	    std::cout<<"\n\n\nSize: "<<ev_hit->size()<<std::endl ;
+	   for(auto const & h : *ev_hit ){
+
+	      _pktime = h.PeakTime() ;
+	      if(  h.PeakTime() >(_t0/1000. -1) && h.PeakTime() < (_t0/1000 +1))
+		_n_pe += h.PE();
+		
+
+	     _ophit_tree->Fill(); 
+	   }
 
 	   std::vector<int> ids ;
 	   ids.resize(0);
