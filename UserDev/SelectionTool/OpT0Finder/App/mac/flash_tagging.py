@@ -4,7 +4,7 @@ def pmt_pos():
     xv = ROOT.std.vector("double")()
     yv = ROOT.std.vector("double")()
     zv = ROOT.std.vector("double")()
-    for line in open('opt_geo_fixed.txt','r').read().split('\n'):
+    for line in open('opt_geo.txt','r').read().split('\n'):
         words = line.split()
         if not len(words) == 3: continue
         xv.push_back(float(words[0]))
@@ -36,7 +36,7 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
-my_proc.set_ana_output_file("ana.root")
+my_proc.set_ana_output_file("ana_mu10MeV_satOpFlash_QWFix.root")
 
 # Attach an analysis unit ... here we use a base class which does nothing.
 # Replace with your analysis unit if you wish.
