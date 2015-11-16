@@ -44,6 +44,10 @@ namespace larlite {
     _int_tree = new TTree("int_tree","");
     _int_tree->Branch("_t0",&_t0,"t0/D");
     _int_tree->Branch("_n_pe",&_n_pe,"n_pe/D");
+    _int_tree->Branch("_e",&_e,"e/D");
+    _int_tree->Branch("_int",&_int,"int/D");
+    _int_tree->Branch("_flash",&_flash,"flash/D");
+    _int_tree->Branch("_n_int",&_n_int,"n_int/D");
 
     _track_tree = new TTree("track_tree","");
     _track_tree->Branch("trk_time",&_trk_time,"trk_time/D");
@@ -91,9 +95,9 @@ namespace larlite {
     _mgr.Reset();
     const ::larutil::Geometry* g = ::larutil::Geometry::GetME();
 
-    std::cout<<"\nNew event!"<<std::endl ;
+//    std::cout<<"\nNew event!"<<std::endl ;
 
-    auto ev_flash = storage->get_data<event_opflash>("opflash");// opflash");
+    auto ev_flash = storage->get_data<event_opflash>("satOpFlash");// opflash");
     auto ev_hit = storage->get_data<event_ophit>("satOpFlash");// opflash");
 
     if(!ev_flash || ev_flash->empty()) {
@@ -197,14 +201,14 @@ namespace larlite {
 
 	   _t0 = trk.AncestorStart().T() ;
 	   _n_pe = 0 ;
+	   
 
-	    std::cout<<"\n\n\nSize: "<<ev_hit->size()<<std::endl ;
+
 	   for(auto const & h : *ev_hit ){
 
 	      _pktime = h.PeakTime() ;
-	      if(  h.PeakTime() >(_t0/1000. -1) && h.PeakTime() < (_t0/1000 +1))
+	      if(h.PeakTime() >(_t0/1000. -10.) && h.PeakTime() < (_t0/1000. +10.))
 		_n_pe += h.PE();
-		
 
 	     _ophit_tree->Fill(); 
 	    }
@@ -261,11 +265,14 @@ namespace larlite {
 		_n_int++ ;
 		n_int++;
 		}
+
+	  _e = e_diff ;
+	  _int = n_int ;
+	  _flash = n_flash;
 		
 	  _int_tree->Fill();		
           }// if index has not already been used
 	}// if the track is at least 2 elements long
-
       }// for all tracks
 
     }
