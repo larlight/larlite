@@ -21,14 +21,10 @@ namespace flashana {
 
         double q = pt.q;
         q *= ::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt);
-        flash_t[ipmt] += q;
+        flash_t.pe_v[ipmt] += q;
 
       }
     }
-
-    double qsum = 0;
-    for ( auto const& v : flash_t ) qsum += v;
-    for ( auto& v : flash_t ) v/= qsum;
 
     return;
   }
