@@ -9,20 +9,15 @@
 namespace larlite {
 
   bool LookPIDA::initialize() {
-
-    if(hPIDA) delete hPIDA;
-    hPIDA = new TH1D("hPIDA",
-		     "PIDA; hPIDA; Counts",
-		     200,0.,20.);
+    InitializeAnaTree();
     return true;
   }
   
   bool LookPIDA::analyze(storage_manager* storage) {
 
-    //auto const ev_calo = storage->get_data<event_calorimetry>("trackkalmanhitcalo");
-    //    auto const ev_pid = storage->get_data<event_partid>("trackkalmanhitpid");    
- 
-    
+    //Let's start by cleaning up the analysis TTree
+    ClearTreeVar();
+
     auto const ev_track = storage->get_data<event_track>("trackkalmanhit");
     
     for(size_t track_index=0; track_index<ev_track->size();++track_index){
@@ -72,6 +67,13 @@ namespace larlite {
       std::cout<<"Calo: "<< ev_calo->at(ass_calo_v[track_index][1]).dEdx()[0]<<"\n"; // and dEdx is a vector!
       std::cout<<"Calo: "<< ev_calo->at(ass_calo_v[track_index][2]).dEdx()[0]<<"\n"; // once again, we need to look into DataFormat
 
+      fPIDA_0.push_back(ev_pid->at(ass_pid_v[track_index][0]).PIDA());
+      fPIDA_1.push_back(ev_pid->at(ass_pid_v[track_index][1]).PIDA());
+      fPIDA_2.push_back(ev_pid->at(ass_pid_v[track_index][2]).PIDA());
+      
+      fdEdx_0.push_back(ev_calo->at(ass_calo_v[track_index][0]).dEdx()[0]);
+      fdEdx_1.push_back(ev_calo->at(ass_calo_v[track_index][1]).dEdx()[0]);
+      fdEdx_2.push_back(ev_calo->at(ass_calo_v[track_index][2]).dEdx()[0]);
     } // End on tracks loop
 
     //    for(auto const& pid : *ev_pid)
@@ -79,15 +81,40 @@ namespace larlite {
     //	hPIDA->Fill(pid.PIDA());
 	//std::cout<<"PIDA: "<<pid.PIDA()<<std::endl;
     //  }
+
+    fPIDATree->Fill();
     return true;
   }
 
   bool LookPIDA::finalize() {
     
     if(_fout) {
-      if(hPIDA->GetEntries()) hPIDA->Write();
+      if (fPIDATree) fPIDATree->Write();
     }
     return true;
+  }
+
+  void LookPIDA::ClearTreeVar(){
+    fPIDA_0.clear();
+    fPIDA_1.clear();
+    fPIDA_2.clear();
+    
+    fdEdx_0.clear();
+    fdEdx_1.clear();
+    fdEdx_2.clear();
+  }
+  
+  void LookPIDA::InitializeAnaTree()
+  {
+    if(fPIDATree) delete fPIDATree;
+    fPIDATree = new TTree("fPIDATree","");
+    fPIDATree->Branch("fPIDA_0","vector<double>", &fPIDA_0);
+    fPIDATree->Branch("fPIDA_1","vector<double>", &fPIDA_1);
+    fPIDATree->Branch("fPIDA_2","vector<double>", &fPIDA_2);
+		       	      			    	   
+    fPIDATree->Branch("fdEdx_0","vector<double>", &fdEdx_0);
+    fPIDATree->Branch("fdEdx_1","vector<double>", &fdEdx_1);
+    fPIDATree->Branch("fdEdx_2","vector<double>", &fdEdx_2);
   }
 
 }

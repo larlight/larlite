@@ -33,7 +33,16 @@ namespace larlite {
     LookPIDA(){ 
       _name="LookPIDA"; 
       _fout=0;
-      hPIDA = nullptr;
+      fPIDATree=nullptr;
+
+      fPIDA_0.clear();
+      fPIDA_1.clear();
+      fPIDA_2.clear();
+      
+      fdEdx_0.clear();
+      fdEdx_1.clear();
+      fdEdx_2.clear();
+      
     }
 
     /// Default destructor
@@ -54,10 +63,23 @@ namespace larlite {
     */
     virtual bool finalize();
 
-  protected:
+  protected:    
+    /// Function to prepare TTree
+    void InitializeAnaTree();
+    
+    /// Function to clear TTree
+    void ClearTreeVar();
 
-    /// Matching correctness
-    TH1D *hPIDA;
+    // My analysis TTree
+    TTree *fPIDATree;
+    std::vector<double> fPIDA_0;
+    std::vector<double> fPIDA_1;
+    std::vector<double> fPIDA_2;
+	              
+    std::vector<double> fdEdx_0;
+    std::vector<double> fdEdx_1;
+    std::vector<double> fdEdx_2;
+
     
   };
 }
