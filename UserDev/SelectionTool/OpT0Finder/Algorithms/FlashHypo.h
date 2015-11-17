@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
+#include "OpT0Finder/Base/OpT0FinderTypes.h"
 #include <numeric>
 #include "Analysis/ana_base.h"
 #include "DataFormat/track.h"
