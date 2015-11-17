@@ -36,9 +36,9 @@ namespace flashana {
     CommonAmps(const double x_step_size=-1);
     
     CommonAmps( const std::vector<double>& pos_x,
-		  const std::vector<double>& pos_y,
-		  const std::vector<double>& pos_z,
-		  const double x_step_size=-1);
+		const std::vector<double>& pos_y,
+		const std::vector<double>& pos_z,
+		const double x_step_size=-1);
     
     /// Default destructor
     ~CommonAmps(){}

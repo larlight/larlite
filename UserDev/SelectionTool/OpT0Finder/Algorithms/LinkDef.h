@@ -18,8 +18,10 @@
 #pragma link C++ class flashana::FilterArray+;
 #pragma link C++ class flashana::NPtFilter+;
 #pragma link C++ class flashana::QLLMatch+;
+
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 

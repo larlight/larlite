@@ -6,6 +6,7 @@
 #include <set>
 #include "FlashMatchManager.h"
 #include "OpT0FinderException.h"
+#include "FhiclLite/ConfigManager.h"
 namespace flashana {
   
   FlashMatchManager::FlashMatchManager()
@@ -13,12 +14,16 @@ namespace flashana {
     , _alg_tpc_filter(nullptr)
     , _alg_match_prohibit(nullptr)
     , _alg_flash_match(nullptr)
+    , _alg_flash_hypothesis(nullptr)
+    , _configured(false)
+    , _config_file("FlashMatch.fcl")
   {
     _allow_reuse_flash = true;
   }
 
   void FlashMatchManager::SetAlgo(BaseAlgorithm* alg)
   {
+    _configured = false;
     // Figure out the type of a provided algorithm
     switch(alg->AlgorithmType()) {
 
@@ -38,12 +43,100 @@ namespace flashana {
     case kFlashMatch:
       _alg_flash_match  = (BaseFlashMatch*)alg; break;
 
+      // Flash hypothesis
+    case kFlashHypothesis:
+      _alg_flash_hypothesis = (BaseFlashHypothesis*)alg; break;
+
       // Fuck it
     default:
       std::stringstream ss;
       ss << "Unsupported algorithm type: " << alg->AlgorithmType();
       throw OpT0FinderException(ss.str());
     }
+  }
+
+  void FlashMatchManager::Configure(const std::string cfg_file)
+  {
+    if(!cfg_file.empty()) {
+      if(!_config_file.empty())
+	Print(msg::kWARNING,__FUNCTION__,"Over-riding config file...");
+      _config_file = cfg_file;
+    }
+
+    ::fcllite::ConfigManager cfg_mgr("FlashMatchManager");
+
+    cfg_mgr.AddCfgFile(_config_file);
+    
+    auto const& main_cfg = cfg_mgr.Config();
+
+    auto const& pmt_pos_cfg = main_cfg.get_pset("PMT_POSITION");
+
+    auto const pmt_x_pos = pmt_pos_cfg.get<std::vector<double> >("X");
+    auto const pmt_y_pos = pmt_pos_cfg.get<std::vector<double> >("Y");
+    auto const pmt_z_pos = pmt_pos_cfg.get<std::vector<double> >("Z");
+
+    if(pmt_x_pos.size() != pmt_y_pos.size() ||
+       pmt_x_pos.size() != pmt_z_pos.size() )
+      throw OpT0FinderException("PMT position array length has a mismatch among x vs. y or x vs. z");
+    
+    if(_alg_flash_filter) {
+      _alg_flash_filter->Configure(main_cfg.get_pset(_alg_flash_filter->AlgorithmName()));
+      _alg_flash_filter->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
+    }
+    if(_alg_tpc_filter) {
+      _alg_tpc_filter->Configure(main_cfg.get_pset(_alg_tpc_filter->AlgorithmName()));
+      _alg_tpc_filter->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
+    }
+    if(_alg_match_prohibit) {
+      _alg_match_prohibit->Configure(main_cfg.get_pset(_alg_match_prohibit->AlgorithmName()));
+      _alg_match_prohibit->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
+    }
+    if(_alg_flash_match) {
+      _alg_flash_match->Configure(main_cfg.get_pset(_alg_flash_match->AlgorithmName()));
+      _alg_flash_match->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
+    }
+    if(_alg_flash_hypothesis) {
+      _alg_flash_hypothesis->Configure(main_cfg.get_pset(_alg_flash_hypothesis->AlgorithmName()));
+      _alg_flash_hypothesis->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
+    }    
+    _configured = true;
+  }
+
+  BaseAlgorithm* FlashMatchManager::GetAlgo(flashana::Algorithm_t type)
+  {
+    if(!_configured)
+      Print(msg::kWARNING,__FUNCTION__,"Algorithm may be not configured yet!");
+    
+    // Figure out the type of a provided algorithm
+    switch(type) {
+
+      // TPC filter
+    case kTPCFilter: 
+      return _alg_tpc_filter;
+
+      // Flash filter
+    case kFlashFilter:
+      return _alg_flash_filter;
+
+      // Match prohibit algo
+    case kMatchProhibit:
+      return _alg_match_prohibit;
+
+      // Flash matching
+    case kFlashMatch:
+      return _alg_flash_match;
+
+      // Flash hypothesis
+    case kFlashHypothesis:
+      return _alg_flash_hypothesis;
+
+      // Fuck it
+    default:
+      std::stringstream ss;
+      ss << "Unsupported algorithm type: " << type;
+      throw OpT0FinderException(ss.str());
+    }
+    return nullptr;
   }
 
   void FlashMatchManager::Add(flashana::QCluster_t& obj)
@@ -63,8 +156,13 @@ namespace flashana {
   {
     // check if required algorithms are provided or not
     if(!_alg_flash_match) 
-      throw OpT0FinderException("Flash matching algorithms are reuqired! (not attached)");
+      throw OpT0FinderException("Flash matching algorithm is reuqired! (not attached)");
+    if(!_alg_flash_hypothesis)
+      throw OpT0FinderException("Flash hypothesis algorithm is required! (not attached)");
 
+    if(!_configured)
+      Configure(_config_file);
+    
     //
     // Filter stage: for both TPC and Flash
     //

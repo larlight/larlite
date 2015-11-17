@@ -20,9 +20,12 @@
 #pragma link C++ class flashana::BaseTPCFilter+;
 #pragma link C++ class flashana::BaseFlashFilter+;
 #pragma link C++ class flashana::BaseFlashMatch+;
-
+#pragma link C++ class flashana::BaseFlashHypothesis+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
+
 
 
 

@@ -33,12 +33,14 @@ namespace flashana {
     /// Default destructor
     ~QLLMatch(){}
 
+    /// Singleton shared instance getter
     static QLLMatch& GetME()
     {
       if(!_me) _me = new QLLMatch;
       return *_me;
     }
 
+    /// Core function: execute matching
     FlashMatch_t Match(const QCluster_t&, const Flash_t&);
 
     void SetOpDetPositions( const std::vector<double>&,
@@ -51,9 +53,10 @@ namespace flashana {
 
     void UsePhotonLibrary(bool use=true);
 
-    const std::vector<double>& ChargeHypothesis(const QCluster_t&);
+    const std::vector<double>& ChargeHypothesis(const QCluster_t&,const double);
 
-    const  QCluster_t& VarTrack(double x);
+    //const  QCluster_t& VarTrack(double x);
+    const  QCluster_t& RawQCluster() const { return _raw_trk; }
 
     double QLL(const std::vector<double>&);
 
@@ -75,28 +78,27 @@ namespace flashana {
 
     static QLLMatch* _me;
 
-    bool _record;
-    bool _normalize;
-    std::vector<double> _pmt_x_v;
-    std::vector<double> _pmt_y_v;
-    std::vector<double> _pmt_z_v;
+    bool _record;      ///< Boolean switch to record minimizer history
+    std::vector<double> _pmt_x_v; ///< PMT X position
+    std::vector<double> _pmt_y_v; ///< PMT Y position
+    std::vector<double> _pmt_z_v; ///< PMT Z position
 
     QCluster_t _raw_trk;
-    QCluster_t _var_trk;
+    double _normalize;
 
-    std::vector<double> _qll_hypothesis_v;
-    std::vector<double> _flash_pe_v;
+    std::vector<double> _qll_hypothesis_v; ///< Hypothesis PE distribution over PMTs
+    std::vector<double> _flash_pe_v;       ///< Flash PE distribution over PMTs
 
-    std::vector<double> _minimizer_record_fval_v;
-    std::vector<double> _minimizer_record_x_v;
-    
-    double _reco_x;
-    double _reco_x_err;
-    double _qll;
+    std::vector<double> _minimizer_record_fval_v; ///< Minimizer record charge likelihood value
+    std::vector<double> _minimizer_record_x_v;    ///< Minimizer record X values
+
+    double _reco_x;      ///< reconstructed X
+    double _reco_x_err;  ///< reconstructed X w/ error
+    double _qll;         ///< Charge likelihood value
 
     TMinuit* _minuit_ptr;
 
-    bool _use_library;
+    bool _use_library; 
 
   };
 }
