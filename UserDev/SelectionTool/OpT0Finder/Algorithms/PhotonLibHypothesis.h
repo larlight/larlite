@@ -33,6 +33,8 @@ namespace flashana {
     /// Default destructor
     virtual ~PhotonLibHypothesis(){}
 
+    void FillEstimate(const QCluster_t&, Flash_t&);
+
   };
 }
 #endif
