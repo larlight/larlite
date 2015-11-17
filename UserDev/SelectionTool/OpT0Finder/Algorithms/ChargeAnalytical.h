@@ -25,7 +25,7 @@
    doxygen documentation!
  */
 namespace flashana {
-    class ChargeAnalytical : public BaseFlashMatch {
+    class ChargeAnalytical : public BaseFlashHypothesis {
 
     public:
 
