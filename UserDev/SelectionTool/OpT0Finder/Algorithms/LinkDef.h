@@ -21,6 +21,7 @@
 
 #pragma link C++ class larlite::PhotonLibHypothesis+;
 #pragma link C++ class ChargeAnalytical+;
+#pragma link C++ class flashana::FlashHypo+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
