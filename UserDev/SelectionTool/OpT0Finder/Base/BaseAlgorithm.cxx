@@ -13,6 +13,11 @@ namespace flashana {
   Algorithm_t BaseAlgorithm::AlgorithmType() const
   { return _type; }
 
+  size_t BaseAlgorithm::NOpDets() const
+  {
+    return _opdet_x_v.size();
+  }
+
   const std::string& BaseAlgorithm::AlgorithmName() const
   { return _name; }
 

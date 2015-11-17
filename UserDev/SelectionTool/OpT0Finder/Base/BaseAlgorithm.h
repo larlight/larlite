@@ -53,6 +53,8 @@ namespace flashana {
     const std::vector<double>& OpDetXArray() const; ///< PMT X position array getter
     const std::vector<double>& OpDetYArray() const; ///< PMT Y position array getter
     const std::vector<double>& OpDetZArray() const; ///< PMT Z position array getter
+
+    size_t NOpDets() const; ///< Getter for # of PMTs
     
   private:
     
