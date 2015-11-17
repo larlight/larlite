@@ -31,8 +31,8 @@ my_proc.set_output_file('')
 # Create analysis unit
 sq_module = fmwk.ShowerQuality_singleshowers()
 #sq_module.setMCShowerQuality(True)
-sq_module.SetShowerProducer("showerrecofuzzy")
-#sq_module.SetShowerProducer("showermergeall")
+# sq_module.SetShowerProducer("showerrecofuzzy")
+sq_module.SetShowerProducer("showermergeall")
 
 sq_module.SetMaxEnergyCut(99999999.)
 sq_module.SetMinEnergyCut(0.)
