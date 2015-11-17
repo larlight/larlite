@@ -33,26 +33,6 @@ namespace flashana {
     /// Default destructor
     virtual ~PhotonLibHypothesis(){}
 
-    /// Singleton shared instance getter
-    static PhotonLibHypothesis& GetME()
-    {
-      if(!_me) _me = new PhotonLibHypothesis;
-      return *_me;
-    }
-
-    void SetOpDetPositions( const std::vector<double>&,
-                            const std::vector<double>&,
-                            const std::vector<double>&);
-
-    const std::vector<double>& ChargeHypothesis(const QCluster_t&,const double);
-
-  protected:
-    std::vector<double> _pmt_x_v; ///< PMT X position
-    std::vector<double> _pmt_y_v; ///< PMT Y position
-    std::vector<double> _pmt_z_v; ///< PMT Z position
-
-    std::vector<double> _qll_hypothesis_v; ///< Hypothesis PE distribution over PMTs
-    std::vector<double> _flash_pe_v;       ///< Flash PE distribution over PMTs
   };
 }
 #endif
