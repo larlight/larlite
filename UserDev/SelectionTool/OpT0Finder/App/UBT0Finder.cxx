@@ -93,6 +93,8 @@ namespace larlite {
       return false;
     }
 
+    // For TH2D-- number of flash per event > x PE
+    // Number interactions per event > y MeV
     int n_flash = 0;
     int n_int = 0;
 
@@ -104,7 +106,7 @@ namespace larlite {
     //auto ev_track = storage->get_data<event_track>("pandoraCosmicKHit");
     auto ev_track = storage->get_data<event_track>("trackkalmanhit");
     auto ev_mctrack = storage->get_data<event_mctrack>("mcreco");
-    
+
     if(!_use_mc) {
       if (!ev_track || ev_track->empty()) return false;
       for (size_t n=0; n < ev_track->size(); n++){
@@ -141,30 +143,26 @@ namespace larlite {
     }
     // use MC tracks
     else{
-      //ahack 110915
-
-      std::vector<unsigned int> usedIDs;
-
-      usedIDs.resize(0);
 
       if (!ev_mctrack || ev_mctrack->empty()) return false;
 
-      for (size_t n=0; n < ev_mctrack->size(); n++){
+      // Look at tracks on 'per interaction' basis
+      std::vector<unsigned int> usedIDs;
+      usedIDs.resize(0);
 
+      for (size_t n=0; n < ev_mctrack->size(); n++){
 //	std::cout<<"Ancestors: "<<ev_mctrack->at(n).AncestorTrackID()<<std::endl;
-	//ahack 110915, don't repeat study for used IDs
 	bool used = false ;
 	for(size_t u=0; u < usedIDs.size(); u++){
 	    if( ev_mctrack->at(n).AncestorTrackID() == usedIDs[u] )
 		used = true;
 	    }
 
-	//ahack 110915
 	auto const& trk = ev_mctrack->at(n);
 
 	::flashana::QCluster_t tpc_obj;
 
-	if(trk.size()>=2) {
+	if(trk.size()>2) {
 	  
 	  // per track calculate the shift in x-direction
 	  // so that the x-position is what would be seen
@@ -186,31 +184,32 @@ namespace larlite {
 	  }
 
 	  _track_tree->Fill();
-	 //ahack 11/09/15.  Find all tracks with same ancestor ID and add them to the tpc_obj
+	 // Find all tracks with same ancestor ID and add them to the tpc_obj
 	 if(!used){
 
 	   _t0 = trk.AncestorStart().T() ;
 	   _n_pe = 0 ;
 	   
-
 	   for(auto const & h : *ev_hit ){
 
 	      if(h.PeakTime() >(_t0/1000. -10.) && h.PeakTime() < (_t0/1000. +10.))
 		_n_pe += h.PE();
 
-	    }
+	      }
 
+	   // Store used ancestor ids, so we do not double count energy dep assoc with this ancestor 
 	   std::vector<int> ids ;
 	   ids.resize(0);
 	   auto const & ancID = trk.AncestorTrackID() ;
+	   usedIDs.push_back(ancID);
+
 	   for (size_t m=0; m < ev_mctrack->size(); m++){
 
 	      auto const & trk2 = ev_mctrack->at(m);
 
-	      if( ancID == trk2.AncestorTrackID() && trk2.size() > 2){
-		usedIDs.push_back(ancID);
+	      if( ancID == trk2.AncestorTrackID() && trk2.size() >= 2)
 	  	ids.push_back(m) ;
-		}
+		
 	      }
 	    
 	  // Now loop over all mctracks that share an ancestor and treat
@@ -437,14 +436,23 @@ namespace larlite {
   bool UBT0Finder::finalize() {
     if(_fout) {
 
-      std::cout<<"Number of int with > "<<_e_diff<<" MeV and total : "<<_int_tree->GetEntries("_int_e > 10")<<", "<<_int_tree->GetEntries()<<std::endl ;
 
       _fout->cd();
       _time_diff->GetXaxis()->SetTitle("Delta T [ns]" );
 
-      std::cout<<"\n% Total interactions that were matched      : "<<float(_flashmatch_tree->GetEntries())/_int_tree->GetEntries("_int_e > 10") *100 <<"%, "<<_flashmatch_tree->GetEntries()<<", "<<_int_tree->GetEntries("_int_e > 10")<<std::endl;
-      std::cout<<"% Matches whose deltaT falls within 40-120ns: "<<_time_diff->Integral(8,24)/_int_tree->GetEntries("_int_e > 10") *100<<"%, "<<_time_diff->Integral(8,24)<<", "<<_int_tree->GetEntries("_int_e > 10")<<std::endl ;
-      std::cout<<"% Correctness (good matches/total matches)  : " <<_time_diff->Integral(8,24)/_flashmatch_tree->GetEntries()*100<<"%, "<<_time_diff->Integral(8,24)<<", "<<_flashmatch_tree->GetEntries()<<std::endl;
+      auto eligible_matches = _int_tree->GetEntries() ;
+
+//      std::cout<<"\n#flashes with > 10PE flash : "<<_int_tree->GetEntries("_n_flash > 0")<<std::endl ;
+
+      std::cout<<"\nEfficiency (#matches/#interactions)  : "<<float(_flashmatch_tree->GetEntries())/eligible_matches *100 <<"%, ("<<_flashmatch_tree->GetEntries()<<"/"<<eligible_matches<<")"<<std::endl;
+      std::cout<<"Correctness (#good matches/#matches) : " <<_time_diff->Integral(8,24)/_flashmatch_tree->GetEntries()*100<<"%, ("<<_time_diff->Integral(8,24)<<"/"<<_flashmatch_tree->GetEntries()<<")"<<std::endl;
+
+
+      
+//      std::cout<<"Number of int with > "<<_e_diff<<" MeV and total : "<<_int_tree->GetEntries("_int_e > 10")<<", "<<_int_tree->GetEntries()<<std::endl ;
+//      std::cout<<"\n% Total interactions that were matched      : "<<float(_flashmatch_tree->GetEntries())/_int_tree->GetEntries("_int_e > 10") *100 <<"%, "<<_flashmatch_tree->GetEntries()<<", "<<_int_tree->GetEntries("_int_e > 10")<<std::endl;
+//      std::cout<<"% Matches whose deltaT falls within 40-120ns: "<<_time_diff->Integral(8,24)/_int_tree->GetEntries("_int_e > 10") *100<<"%, "<<_time_diff->Integral(8,24)<<", "<<_int_tree->GetEntries("_int_e > 10")<<std::endl ;
+//      std::cout<<"% Correctness (good matches///total matches)  : " <<_time_diff->Integral(8,24)/_flashmatch_tree->GetEntries()*100<<"%, "<<_time_diff->Integral(8,24)<<", "<<_flashmatch_tree->GetEntries()<<std::endl;
 
 
 
