@@ -6,46 +6,34 @@
 #include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
 #include <cmath>
 #include <sstream>
+#include <numeric>
 namespace flashana {
 
-  CommonAmps::CommonAmps(const double x_step_size)
-    : BaseFlashMatch()
-    , _pos_x()
-    , _pos_y()
-    , _pos_z()
-    , _use_library( false )
+  CommonAmps::CommonAmps(const std::string name)
+    : BaseFlashMatch(name)
   {
-    _x_step_size=x_step_size;
     _percent = 0.5;
-    _score   = 0.8;
+    _score   = 0.8;    
   }
-    
-  CommonAmps::CommonAmps(const std::vector<double>& pos_x,
-			     const std::vector<double>& pos_y,
-			     const std::vector<double>& pos_z,
-			     const double x_step_size)
-    : _pos_x(pos_x)
-    , _pos_y(pos_y)
-    , _pos_z(pos_z)
-  {
-    if(_pos_x.size() != _pos_y.size() || _pos_x.size() != _pos_z.size() )
-      throw OpT0FinderException("Unmatching optical detector position array length!");
-    _x_step_size = x_step_size;
-    _percent = 0.5 ;
-    _score   = 0.8 ;
 
+  void CommonAmps::Configure(const ::fcllite::PSet &pset)
+  {
+    _percent = pset.get<double>("QFracThreshold");
+    _score   = pset.get<double>("ScoreThreshold");
+    _x_step_size = pset.get<double>("XStepSize");
   }
 
   FlashMatch_t CommonAmps::Match(const QCluster_t& pt_v, const Flash_t& flash)
   {
 
-    double integral_vis = 0;
-    double integral_op  = 0;
-    double maxRatio 	= -1; 
-    int    maxID 	= -1;
-
-    for(size_t k=0; k<32; k++)
-	integral_op += flash.pe_v[k]; 
+    double integral_op  = std::accumulate(std::begin(flash.pe_v),
+					  std::end(flash.pe_v),
+					  0.0);
+    double maxRatio 	= -1;
+    double maxX         = 0;
+    
+    if(_vis_array.pe_v.empty())
+      _vis_array.pe_v.resize(OpDetXArray().size());
 
     // Create multimap to hold the largest amplitudes in the first slots of map
     // Normalize each PE bin to the total # of PEs-- 1/x to put highest amps in front
@@ -61,87 +49,86 @@ namespace flashana {
     ids.resize(0);
 
     for( auto const & e : ampToOpDet ){
-        opAmpTotal += 1/e.first ;
-        ids.push_back(e.second) ;
-        if( opAmpTotal > _percent )
-            break;
-        }
+      opAmpTotal += 1/e.first ;
+      ids.push_back(e.second) ;
+      if( opAmpTotal > _percent )
+	break;
+    }
 
     // Prepare the return values (Mostly QWeightPoint)
     FlashMatch_t f;
-    QCluster_t flash_hypothesis_v;
-    if(pt_v.empty()){ std::cout<<"Not enough points!" <<std::endl ;  return f;}
+    if(pt_v.empty()){
+      std::cout<<"Not enough points!"<<std::endl;
+      return f;
+    }
     
-    _vis_array = {0};
-    _vis_array.resize(32,0);
+    _tpc_qcluster.resize(pt_v.size());
 
-   for(double x_step_size=1; x_step_size<250; x_step_size+=_x_step_size) {
-      QPoint_t pt; 
+    // Get min & max x value
+    double x_max = 0;
+    double x_min = 1e12;
 
-      pt.x = pt.y = pt.z = pt.q = 0;
-      double weight_tot = 0;
-      QPoint_t min_pt = pt_v[0];
+    for(auto const& pt : pt_v) {
+      if(pt.x > x_max) x_max = pt.x;
+      if(pt.x < x_min) x_min = pt.x;
+    }
 
-      for(auto const& tpc_pt : pt_v)
-        if(min_pt.x < tpc_pt.x) min_pt = tpc_pt;
+    for(double x_offset=0;
+	x_offset<(250.-(x_max-x_min));
+	x_offset+=_x_step_size) {
+      
+      // Create QCluster_t with this offset
 
-      if(_use_library) {
+      for(size_t i=0; i<_tpc_qcluster.size(); ++i) {
+	_tpc_qcluster[i].x = pt_v[i].x + x_offset - x_min;
+	_tpc_qcluster[i].y = pt_v[i].y;
+	_tpc_qcluster[i].z = pt_v[i].z;
+	_tpc_qcluster[i].q = pt_v[i].q;
+      }
+            
+      FillEstimate(_tpc_qcluster,_vis_array);
 
-        auto const& lib = ::phot::PhotonVisibilityService::GetME();
-        double weight = 0;
-        for(auto const& tpc_pt : pt_v) {
+      // Calculate amplitudes corresponding to max opdet amplitudes
+      double visAmpTotal = 0;
+      double vis_pe_sum = std::accumulate(std::begin(_vis_array.pe_v),
+					  std::end(_vis_array.pe_v),
+					  0.0);
+      for(size_t i=0; i<ids.size(); i++)
+	visAmpTotal += _vis_array.pe_v[ids[i]] / vis_pe_sum ;
+      
+      double ratio = 0;
+      if(opAmpTotal > visAmpTotal )
+	ratio = visAmpTotal/opAmpTotal ;
+      else
+	ratio = opAmpTotal/visAmpTotal ;
+      
+      if(ratio > maxRatio) {
+	maxRatio = ratio;
+	maxX     = x_offset;
 
-	    for(size_t i=0; i<lib.NOpChannels(); ++i){
-	      weight += tpc_pt.q * lib.GetVisibility(tpc_pt.x,tpc_pt.y,tpc_pt.z,i);
-	      _vis_array[i] += tpc_pt.q * lib.GetVisibility(tpc_pt.x,tpc_pt.y,tpc_pt.z,i) ;
-	      }
+	f.score = ratio;
+	f.tpc_point.x = f.tpc_point.y = f.tpc_point.z = 0;
+	f.tpc_point.q = vis_pe_sum;
 
-          pt.x += (tpc_pt.x - min_pt.x + x_step_size) * weight;
-          pt.y += (tpc_pt.y * weight);
-          pt.z += (tpc_pt.z * weight);
-          weight_tot += weight;
-	  }
-
-        pt.x /= weight_tot;
-        pt.y /= weight_tot;
-        pt.z /= weight_tot;
-
-	flash_hypothesis_v.push_back(pt); 
-
-	// Normalize by the sum of all hits, weight
-	for(size_t i=0; i<lib.NOpChannels(); i++)
-	    _vis_array[i] /= weight; 
-	
-	// Calculate amplitudes corresponding to max opdet amplitudes
-	double visAmpTotal = 0;
-	for(size_t i=0; i<ids.size(); i++)
-	    visAmpTotal += _vis_array[ids[i]] ;
-
-        double ratio = 0;
-        if(opAmpTotal > visAmpTotal )
-            ratio = visAmpTotal/opAmpTotal ;
-        else
-            ratio = opAmpTotal/visAmpTotal ;
-    
-        if(ratio > maxRatio ){	
-	   maxRatio = ratio;
-    	   maxID    = x_step_size-1 ;
-    	   }
-
-	  }
-      }//x loop
-
+	for(size_t pmt_index=0; pmt_index<NOpDets(); ++pmt_index) {
+	  
+	  f.tpc_point.x += OpDetX(pmt_index) * _vis_array.pe_v[pmt_index] / vis_pe_sum;
+	  f.tpc_point.y += OpDetY(pmt_index) * _vis_array.pe_v[pmt_index] / vis_pe_sum;
+	  f.tpc_point.z += OpDetZ(pmt_index) * _vis_array.pe_v[pmt_index] / vis_pe_sum;
+	}
+      }
+    }
+  
     // If min-diff is bigger than assigned max, return default match (score<0)
-    if( maxRatio < _score ) 
-	return f;
+    if( maxRatio < _score ) {
 
-    // Assign the score, return
-    f.score = maxRatio;
-    f.tpc_point = flash_hypothesis_v[maxID];
+      f.tpc_point.x = f.tpc_point.y = f.tpc_point.z = -1;
+      f.tpc_point.q = -1;
+      f.score = -1;
+      return f;
+    }
 
     return f;
   }
-
-
 }
 #endif

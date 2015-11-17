@@ -28,10 +28,14 @@ namespace flashana {
   public:
 
     /// Default constructor
-    PhotonLibHypothesis(){ _name="PhotonLibHypothesis"; _fout=0;}
+    PhotonLibHypothesis(const std::string name);
 
     /// Default destructor
     virtual ~PhotonLibHypothesis(){}
+
+    void Configure(const ::fcllite::PSet &pset);
+
+    void FillEstimate(const QCluster_t&, Flash_t&) const;
 
   };
 }

@@ -28,10 +28,12 @@ namespace flashana {
   public:
     
     /// Default constructor
-    QLLMatch();
+    QLLMatch(const std::string="QLLMatch");
     
     /// Default destructor
     ~QLLMatch(){}
+
+    void Configure(const ::fcllite::PSet &pset);
 
     /// Singleton shared instance getter
     static QLLMatch& GetME()
@@ -43,22 +45,11 @@ namespace flashana {
     /// Core function: execute matching
     FlashMatch_t Match(const QCluster_t&, const Flash_t&);
 
-    void SetOpDetPositions( const std::vector<double>&,
-			    const std::vector<double>&,
-			    const std::vector<double>&);
+    const Flash_t& ChargeHypothesis(const double);
+    const Flash_t& Measurement() const;
 
-    void Record(bool doit=true) { _record=doit;}
-
-    void Normalize(bool doit=true) { _normalize=doit;}
-
-    void UsePhotonLibrary(bool use=true);
-
-    const std::vector<double>& ChargeHypothesis(const QCluster_t&,const double);
-
-    //const  QCluster_t& VarTrack(double x);
-    const  QCluster_t& RawQCluster() const { return _raw_trk; }
-
-    double QLL(const std::vector<double>&);
+    double QLL(const flashana::Flash_t&,
+	       const flashana::Flash_t&);
 
     void Record(const double fval, const double x)
     {
@@ -79,26 +70,21 @@ namespace flashana {
     static QLLMatch* _me;
 
     bool _record;      ///< Boolean switch to record minimizer history
-    std::vector<double> _pmt_x_v; ///< PMT X position
-    std::vector<double> _pmt_y_v; ///< PMT Y position
-    std::vector<double> _pmt_z_v; ///< PMT Z position
+    double _normalize; ///< Noramalize hypothesis PE spectrum
 
-    QCluster_t _raw_trk;
-    double _normalize;
-
-    std::vector<double> _qll_hypothesis_v; ///< Hypothesis PE distribution over PMTs
-    std::vector<double> _flash_pe_v;       ///< Flash PE distribution over PMTs
+    flashana::QCluster_t _raw_trk;
+    flashana::QCluster_t _var_trk;
+    flashana::Flash_t    _hypothesis;  ///< Hypothesis PE distribution over PMTs
+    flashana::Flash_t    _measurement; ///< Flash PE distribution over PMTs
 
     std::vector<double> _minimizer_record_fval_v; ///< Minimizer record charge likelihood value
     std::vector<double> _minimizer_record_x_v;    ///< Minimizer record X values
 
-    double _reco_x;      ///< reconstructed X
-    double _reco_x_err;  ///< reconstructed X w/ error
-    double _qll;         ///< Charge likelihood value
+    double _reco_x_offset;     ///< reconstructed X offset (from wire-plane to min-x point)
+    double _reco_x_offset_err; ///< reconstructed X offset w/ error
+    double _qll;               ///< Charge likelihood value
 
     TMinuit* _minuit_ptr;
-
-    bool _use_library; 
 
   };
 }

@@ -19,24 +19,28 @@
 
 #include <iostream>
 
-/**
-   \class ChargeAnalytical
-   User defined class ChargeAnalytical ... these comments are used to generate
-   doxygen documentation!
- */
 namespace flashana {
-    class ChargeAnalytical : public BaseFlashHypothesis {
 
-    public:
+  /**
+     \class ChargeAnalytical
+     User defined class ChargeAnalytical ... these comments are used to generate
+     doxygen documentation!
+  */
+  class ChargeAnalytical : public BaseFlashHypothesis {
+    
+  public:
+    
+    /// Default constructor
+    ChargeAnalytical(const std::string name);
+    
+    /// Default destructor
+    ~ChargeAnalytical() { }
 
-        /// Default constructor
-        ChargeAnalytical() { }
-
-        /// Default destructor
-        ~ChargeAnalytical() { }
-
-        void FillEstimate(const QCluster_t&, Flash_t&);
-    };
+    void Configure(const ::fcllite::PSet &pset);
+    
+    void FillEstimate(const QCluster_t&, Flash_t&) const;
+    
+  };
 }
 
 #endif

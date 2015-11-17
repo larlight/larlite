@@ -7,13 +7,22 @@
 #endif
 
 namespace flashana {
+  
+  ChargeAnalytical::ChargeAnalytical(const std::string name)
+    : BaseFlashHypothesis(name)
+  {}
 
-    void ChargeAnalytical::FillEstimate(const QCluster_t &track, Flash_t &flash_t) {
+  void ChargeAnalytical::Configure(const ::fcllite::PSet &pset)
+  {}
+
+    void ChargeAnalytical::FillEstimate(const QCluster_t &track,
+					Flash_t &flash) const
+    {
 
         size_t n_pmt = BaseAlgorithm::NOpDets();
 
         for (size_t i = 0; i < n_pmt; ++i) {
-            flash_t.pe_v[i] = 0;
+            flash.pe_v[i] = 0;
         }
 
         for (size_t pmt_index = 0; pmt_index < n_pmt; ++pmt_index) {
@@ -32,7 +41,7 @@ namespace flashana {
 
                 if (angle < 0) angle *= -1;
 
-                flash_t.pe_v[pmt_index] += pt.q * angle / r2;
+                flash.pe_v[pmt_index] += pt.q * angle / r2;
 
             }
         }
