@@ -45,6 +45,10 @@ namespace flashana {
 			    const std::vector<double>&,
 			    const std::vector<double>&);
 
+    void Record(bool doit=true) { _record=doit;}
+
+    void Normalize(bool doit=true) { _normalize=doit;}
+
     void UsePhotonLibrary(bool use=true);
 
     const std::vector<double>& ChargeHypothesis(const QCluster_t&);
@@ -53,12 +57,26 @@ namespace flashana {
 
     double QLL(const std::vector<double>&);
 
+    void Record(const double fval, const double x)
+    {
+      if(_record) {
+	_minimizer_record_fval_v.push_back(fval);
+	_minimizer_record_x_v.push_back(x);
+      }
+    }
+
+    double CallMinuit(const QCluster_t& tpc,
+		      const Flash_t& pmt);
+
+    const std::vector<double>& HistoryQLL() const { return _minimizer_record_fval_v; }
+    const std::vector<double>& HistoryX()   const { return _minimizer_record_x_v;    }
+
   private:
 
-    void CallMinuit();
-
     static QLLMatch* _me;
-    
+
+    bool _record;
+    bool _normalize;
     std::vector<double> _pmt_x_v;
     std::vector<double> _pmt_y_v;
     std::vector<double> _pmt_z_v;
@@ -68,6 +86,9 @@ namespace flashana {
 
     std::vector<double> _qll_hypothesis_v;
     std::vector<double> _flash_pe_v;
+
+    std::vector<double> _minimizer_record_fval_v;
+    std::vector<double> _minimizer_record_x_v;
     
     double _reco_x;
     double _reco_x_err;
