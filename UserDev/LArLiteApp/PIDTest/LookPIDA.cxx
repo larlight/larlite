@@ -28,18 +28,26 @@ namespace larlite {
     for(size_t track_index=0; track_index<ev_track->size();++track_index){
       
       event_partid* ev_pid = nullptr;
-      auto const& ass_pid_v = storage->find_one_ass(ev_track->id(),ev_pid,ev_track->name());
+      auto const& ass_pid_v = storage->find_one_ass(ev_track->id(),
+                                                    ev_pid,
+                                                    Form("%spid",ev_track->name().c_str()));
       
       event_calorimetry* ev_calo = nullptr;
-      auto const& ass_calo_v = storage->find_one_ass(ev_track->id(),ev_calo,ev_track->name());
+      auto const& ass_calo_v = storage->find_one_ass(ev_track->id(),
+                                                     ev_calo,
+                                                     Form("%scalo",ev_track->name().c_str()));
+
+
+
       
       if(!ev_pid) {
 	std::cerr<<"no event_partid!"<<std::endl;
 	return false;
-      }else{        std::cerr<<"Puppa!"<<std::endl;}
+      }
       
+
       if(ev_pid->empty()) {
-	std::cout<<"event_partid empty..."<<std::endl;
+      	std::cout<<"event_partid empty..."<<std::endl;
 	return false;
       }
       
@@ -54,9 +62,17 @@ namespace larlite {
 	return false;
       }
     
-      std::cout<<"PIDA: "<< ev_pid->at(ass_pid_v[track_index][0]).PIDA()<<"\n";
-      
-    }
+      std::cout<<"ass_pid_v  Size: "<< ass_pid_v[track_index].size()<<"\n";
+      std::cout<<"PIDA: "<< ev_pid->at(ass_pid_v[track_index][0]).PIDA()<<"\n"; // it's one per plane 
+      std::cout<<"PIDA: "<< ev_pid->at(ass_pid_v[track_index][1]).PIDA()<<"\n"; // there should be a plane id object
+      std::cout<<"PIDA: "<< ev_pid->at(ass_pid_v[track_index][2]).PIDA()<<"\n"; // we need to check into DataFormat
+    
+      std::cout<<"ass_calo_v  Size: "<< ass_calo_v[track_index].size()<<"\n";
+      std::cout<<"Calo: "<< ev_calo->at(ass_calo_v[track_index][0]).dEdx()[0]<<"\n"; // it's one per plane
+      std::cout<<"Calo: "<< ev_calo->at(ass_calo_v[track_index][1]).dEdx()[0]<<"\n"; // and dEdx is a vector!
+      std::cout<<"Calo: "<< ev_calo->at(ass_calo_v[track_index][2]).dEdx()[0]<<"\n"; // once again, we need to look into DataFormat
+
+    } // End on tracks loop
 
     //    for(auto const& pid : *ev_pid)
     //  {
