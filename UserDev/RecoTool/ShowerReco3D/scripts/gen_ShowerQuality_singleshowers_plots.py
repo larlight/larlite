@@ -39,43 +39,58 @@ if not os.path.isdir(output_directory):
 shower_df = pd.DataFrame(root2array(fname,tshowername))
 event_df  = pd.DataFrame(root2array(fname,teventname) )
 
-#Plot of energy resolution
-fig = energy_res_plot(shower_df)
-plt.savefig('%s/energy_res.png'%output_directory)
-plt.show()
+# #Plot of energy resolution
+# fig = energy_res_plot(shower_df)
+# plt.savefig('%s/energy_res.png'%output_directory)
+# plt.show()
 
-#Plot of energy asymmetry
-fig = energy_res_plot(shower_df)
-plt.savefig('%s/energy_res.png'%output_directory)
-plt.show()
+# #Plot of energy asymmetry
+# fig = energy_res_plot(shower_df)
+# plt.savefig('%s/energy_res.png'%output_directory)
+# plt.show()
 
-#2D histogram of reco vs true energy
-for myplane in ['U','V','Y']:
-        fig = energy_corr_plot(shower_df,plane='%s'%myplane)
-        plt.savefig('%s/energy_correlation_%splane.png'%(output_directory,myplane))
-        plt.show()
+# #2D histogram of reco vs true energy
+# for myplane in ['U','V','Y']:
+#         fig = energy_corr_plot(shower_df,plane='%s'%myplane)
+#         plt.savefig('%s/energy_correlation_%splane.png'%(output_directory,myplane))
+#         plt.show()
 
 #Plot of start point accuracy
 fig = startpoint_acc_plot(shower_df)
 plt.savefig('%s/startpoint_accuracy.png'%output_directory)
 plt.show()
 
-# 3D direction angular resolution
-fig = anglediff_3d_plot(shower_df)
-plt.savefig('%s/3Ddir_accuracy.png'%output_directory)
-plt.show()
+# # 3D direction angular resolution
+# fig = anglediff_3d_plot(shower_df)
+# plt.savefig('%s/3Ddir_accuracy.png'%output_directory)
+# plt.show()
 
-# dEdx plots
-fig = dEdx_plot(shower_df)
-plt.savefig('%s/dEdx_resolution.png'%output_directory)
-plt.show()
+# # dEdx plots
+# fig = dEdx_plot(shower_df)
+# plt.savefig('%s/dEdx_resolution.png'%output_directory)
+# plt.show()
 
-# reco efficiency
-fig = reco_efficiency_vsenergy_plot(event_df)
-plt.savefig('%s/reco_efficiency_vsenergy.png'%output_directory)
-plt.show()
+# # dQdx plots
+# fig = dQdx_plot(shower_df)
+# plt.savefig('%s/dQdx_resolution.png'%output_directory)
+# plt.show()
 
-# Matched cluster efficiency
-fig = cluster_efficiency_perplane_plot(shower_df)
-plt.savefig('%s/cluster_efficiency_perplane.png'%output_directory)
-plt.show()
+# # Length plot
+# fig = length_plot(shower_df)
+# plt.savefig('%s/reco_shower_length.png'%output_directory)
+# plt.show()
+
+# # Length vs reco energy
+# fig = length_energy_corr_plot(shower_df,plane='Y')
+# plt.savefig('%s/length_energy_correlation_Yplane.png'%(output_directory))
+# plt.show()
+
+# # reco efficiency
+# fig = reco_efficiency_vsenergy_plot(event_df)
+# plt.savefig('%s/reco_efficiency_vsenergy.png'%output_directory)
+# plt.show()
+
+# # Matched cluster efficiency
+# fig = cluster_efficiency_perplane_plot(shower_df)
+# plt.savefig('%s/cluster_efficiency_perplane.png'%output_directory)
+# plt.show()
