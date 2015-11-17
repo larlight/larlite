@@ -78,15 +78,15 @@ def energy_corr_plot(df,plane='Y'):
 
 def startpoint_acc_plot(df):
 	fig = plt.figure(figsize=(10,6))
-	xmin, xmax, nbins = 0., 5., 100
+	xmin, xmax, nbins = 0., 100., 100
 	plt.title('Distance Between (3D) MC Start Point and Reco Start Point')
 	plt.xlabel('Distance in 3D [cm]')
 	plt.ylabel('Counts')
-	plt.yscale('log')
+	# plt.yscale('log')
 	n_total = len(df['mc_reco_dist'])
 	n_underflow = len(df.query('mc_reco_dist < %f'%xmin))
 	n_overflow  = len(df.query('mc_reco_dist > %f'%xmax))
-	df['mc_reco_dist'].hist(bins=np.linspace(xmin, xmax, nbins),label='Total entries: %d (%d underflow, %d overflow)'%(n_total,n_underflow,n_overflow))
+	df['mc_reco_dist'].hist(bins=np.linspace(xmin, xmax, nbins),label='Total entries: %d (%d underflow, %d overflow)\nMean = %0.3f, Std = %0.3f'%(n_total,n_underflow,n_overflow,df['mc_reco_dist'].mean(),df['mc_reco_dist'].std()))
 	plt.legend(loc=1)
 	return fig
 
@@ -102,9 +102,9 @@ def anglediff_3d_plot(df):
 	n_total = len(df['mc_reco_anglediff'])
 	n_underflow = len(df.query('mc_reco_anglediff < %f'%xmin))
 	n_overflow  = len(df.query('mc_reco_anglediff > %f'%xmax))
-	plt.hist(angular_res,bins,edgecolor=None,label='Total entries: %d (%d underflow, %d overflow)'%(n_total,n_underflow,n_overflow))
+	plt.hist(angular_res,bins,edgecolor=None,label='Total entries: %d (%d underflow, %d overflow)\nMean = %0.3f, Std = %0.3f'%(n_total,n_underflow,n_overflow,angular_res.mean(),angular_res.std()))
 	plt.legend(loc=1)
-	plt.yscale('log')
+	# plt.yscale('log')
 	return fig
 
 def dEdx_plot(df):
@@ -113,15 +113,40 @@ def dEdx_plot(df):
 	dedx_v = df['reco_dedx_V']
 	dedx_y = df['reco_dedx_Y']
 	bins = np.linspace(0,10,100)
-	plt.hist(dedx_u,bins=bins,edgecolor=None,alpha=0.5,color='b',label='U Plane')
-	plt.hist(dedx_v,bins=bins,edgecolor=None,alpha=0.5,color='g',label='V Plane')
-	plt.hist(dedx_y,bins=bins,edgecolor=None,alpha=0.5,color='r',label='Y Plane')
+	curvebins = np.linspace(1.5,3.5,300)
+	# entriesU, bin_edgesU, patchesU = plt.hist(eresU,bins=bins,label='U',alpha=0.5,color='b',edgecolor=None)
+	# params, errors = getGaussFit(entriesU,bin_edgesU)
+	entriesU, bin_edgesU, patchesU = plt.hist(dedx_u,bins=bins,edgecolor=None,alpha=0.5,color='b',label='U Plane')
+	entriesV, bin_edgesV, patchesV = plt.hist(dedx_v,bins=bins,edgecolor=None,alpha=0.5,color='g',label='V Plane')
+	entriesY, bin_edgesY, patchesY = plt.hist(dedx_y,bins=bins,edgecolor=None,alpha=0.5,color='r',label='Y Plane')
+	params, errors = getGaussFit(entriesY,bin_edgesY)
+	plt.plot(curvebins,gauss(curvebins,*params),'r-',lw=3,label='Y plane: mu = %.02f sigma = %.02f'%(params[1],params[2]))
 	plt.grid(True)
 	plt.legend(loc=1)
-	plt.title('dE/dx [ MeV/cm ] in each Plane')
+	plt.title('dE/dx [ MeV/cm ] in each Plane [Electrons Only]')
 	plt.xlabel('dE/dx [ MeV / cm ]')
 	plt.ylabel('Count')
 	return fig
+
+def dQdx_plot(df):
+	fig = plt.figure(figsize=(10,6))
+	dqdx_u = df['reco_dqdx_U']
+	dqdx_v = df['reco_dqdx_V']
+	dqdx_y = df['reco_dqdx_Y']
+	bins = np.linspace(0,200000,100)
+	# curvebins = np.linspace(44000,76000,100)
+	entriesU, bin_edgesU, patchesU = plt.hist(dqdx_u,bins=bins,edgecolor=None,alpha=0.5,color='b',label='U Plane')
+	entriesV, bin_edgesV, patchesV = plt.hist(dqdx_v,bins=bins,edgecolor=None,alpha=0.5,color='g',label='V Plane')
+	entriesY, bin_edgesY, patchesY = plt.hist(dqdx_y,bins=bins,edgecolor=None,alpha=0.5,color='r',label='Y Plane')
+	# params, errors = getGaussFit(entriesY,bin_edgesY)
+	# plt.plot(curvebins,gauss(curvebins,*params),'r-',lw=3,label='Y plane: mu = %.02f sigma = %.02f'%(params[1],params[2]))
+	plt.grid(True)
+	plt.legend(loc=1)
+	plt.title('dQ/dx [ fC/cm ] in each Plane [Electrons Only]')
+	plt.xlabel('dQ/dx [ fC / cm ]')
+	plt.ylabel('Count')
+	return fig
+
 
 def reco_efficiency_vsenergy_plot(df):
 	fig = plt.figure(figsize=(10,6))
@@ -158,4 +183,29 @@ def cluster_efficiency_perplane_plot(df):
 	plt.ylabel('Counts')
 	return fig
 
+def length_plot(df):
+	fig = plt.figure(figsize=(10,6))
+	xmin, xmax, nbins = 0., 400., 100
+	plt.title('Reconstructed Length of Shower')
+	plt.xlabel('Length in 3D [cm]')
+	plt.ylabel('Counts')
+	n_total = len(df['reco_length'])
+	n_underflow = len(df.query('reco_length < %f'%xmin))
+	n_overflow  = len(df.query('reco_length > %f'%xmax))
+	df['reco_length'].hist(bins=np.linspace(xmin, xmax, nbins),label='Total entries: %d (%d underflow, %d overflow)'%(n_total,n_underflow,n_overflow))
+	plt.legend(loc=1)
+	return fig
 
+def length_energy_corr_plot(df,plane='Y'):
+	#Plot of reco length vs reco energy (2d histo)
+	if plane not in ['U','V','Y']:
+		raise ValueError('energy_corr_plot() function requires plane that is either \'U\', \'V\', or \'Y\'')
+
+	# fig = plt.figure(figsize=(10,6))
+	fig = df.plot(x='reco_length',y='reco_energy_%s'%plane,
+		kind='hexbin',colormap='jet',gridsize=100,
+		title='Reco Length vs. Reco Energy',
+		figsize=(10,6))
+	plt.xlabel('Reconstructed Energy')
+	plt.ylabel('Reconstructed 3D Shower Length [cm]')
+	return fig

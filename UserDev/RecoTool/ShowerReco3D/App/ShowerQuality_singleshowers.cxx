@@ -455,6 +455,7 @@ void ShowerQuality_singleshowers::FillQualityInfo(const shower& reco_shower, con
   fShowerTreeParams.reco_dqdx_V = reco_shower.dQdx_v().at(1);                                                           
   fShowerTreeParams.reco_dqdx_Y = reco_shower.dQdx_v().at(2);
 
+  fShowerTreeParams.reco_length = reco_shower.Length();
 
 
   // Fill Tree
@@ -505,6 +506,7 @@ void ShowerQuality_singleshowers::InitializeAnaTrees()
   fShowerTree->Branch("cluster_pur_V", &fShowerTreeParams.cluster_pur_V, "cluster_pur_V/D");
   fShowerTree->Branch("cluster_pur_Y", &fShowerTreeParams.cluster_pur_Y, "cluster_pur_Y/D");
   fShowerTree->Branch("mc_containment", &fShowerTreeParams.mc_containment, "mc_containment/D");
+  fShowerTree->Branch("reco_length",&fShowerTreeParams.reco_length,"reco_length/D");
 
   //////////////////////////////////////////////////////
   // This tree is filled once per event
@@ -543,7 +545,7 @@ void ShowerQuality_singleshowers::ResetShowerTreeParams() {
   fShowerTreeParams.cluster_pur_V = -1.234;
   fShowerTreeParams.cluster_pur_Y = -1.234;
   fShowerTreeParams.mc_containment = -1.;
-
+  fShowerTreeParams.reco_length = -1.;
 }
 
 void ShowerQuality_singleshowers::ResetEventTreeParams() {
