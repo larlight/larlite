@@ -19,8 +19,11 @@
 #pragma link C++ class flashana::NPtFilter+;
 #pragma link C++ class flashana::QLLMatch+;
 
+#pragma link C++ class ChargeAnalytical+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
 
 
 
