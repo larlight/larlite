@@ -35,7 +35,7 @@ namespace flashana {
         /// Default destructor
         ~ChargeAnalytical() { }
 
-        void FillEstimate(const QCluster_t&, Flash_t&)
+        void FillEstimate(const QCluster_t&, Flash_t&);
     };
 }
 
