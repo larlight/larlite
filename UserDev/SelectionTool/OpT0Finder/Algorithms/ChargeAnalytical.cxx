@@ -12,7 +12,7 @@ namespace flashana {
 
         size_t n_pmt = BaseAlgorithm::NOpDets();
 
-        for ( int i = 0; i != n_pmt; i++ ) {
+        for (size_t i = 0; i < n_pmt; ++i) {
             flash_t.pe_v[i] = 0;
         }
 
