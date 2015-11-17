@@ -33,36 +33,13 @@ namespace flashana {
     _pmt_x_v = pos_x;
     _pmt_y_v = pos_y;
     _pmt_z_v = pos_z;
+
   }
 
   FlashMatch_t QLLMatch::Match(const QCluster_t& pt_v, const Flash_t& flash)
   {
-    if(_flash_pe_v.empty()) {
-      if(_pmt_x_v.empty()) throw OpT0FinderException("No optical detector found!");
-      _flash_pe_v.resize(_pmt_x_v.size(),0);
-    }else if(_flash_pe_v.size() != _pmt_x_v.size())
-      throw OpT0FinderException("PMT dimension has changed!");
 
-    _raw_trk.resize(pt_v.size());
-    _var_trk.resize(pt_v.size());
-
-    double min_x = 1e9;
-    for(size_t i=0; i<pt_v.size(); ++i) {
-      auto const& pt = pt_v[i];
-      _raw_trk[i] = pt;
-      if(pt.x < min_x) min_x = pt.x;
-    }
-
-    for(auto& pt : _raw_trk) pt.x -= min_x;
-
-    double max_pe = 0;
-    for(auto const& v : flash.pe_v) if(v > max_pe) max_pe = v;
-
-    for(size_t i=0; i<flash.pe_v.size(); ++i)
-
-      _flash_pe_v[i] = flash.pe_v[i] / max_pe;
-
-    this->CallMinuit();
+    this->CallMinuit(pt_v,flash);
 
     // Estimate position
     FlashMatch_t res;
@@ -169,8 +146,9 @@ namespace flashana {
       result += std::fabs( qll_hypothesis[pmt_index] - _flash_pe_v[pmt_index] ) * _flash_pe_v[pmt_index];
 
     }
+
     return result / nvalid_pmt;
-    
+
   }
   
   void MIN_vtx_qll(Int_t & /*Npar*/,
@@ -183,12 +161,51 @@ namespace flashana {
     auto const& qll_hypothesis = QLLMatch::GetME().ChargeHypothesis(var_trk);
     Fval = QLLMatch::GetME().QLL( qll_hypothesis );
 
+    QLLMatch::GetME().Record(Fval,Xval[0]);
+
     return;
   }  
 
+  double QLLMatch::CallMinuit(const QCluster_t& tpc, const Flash_t& pmt) {
 
-  void QLLMatch::CallMinuit() {
+    if(_flash_pe_v.empty()) {
+      if(_pmt_x_v.empty()) throw OpT0FinderException("No optical detector found!");
+      _flash_pe_v.resize(_pmt_x_v.size(),0);
+    }else if(_flash_pe_v.size() != _pmt_x_v.size())
+      throw OpT0FinderException("PMT dimension has changed!");
 
+    //
+    // Prepare TPC
+    //
+    _raw_trk.resize(tpc.size());
+    _var_trk.resize(tpc.size());
+
+    double min_x = 1e9;
+    for(size_t i=0; i<tpc.size(); ++i) {
+      auto const& pt = tpc[i];
+      _raw_trk[i] = pt;
+      if(pt.x < min_x) min_x = pt.x;
+    }
+
+    for(auto& pt : _raw_trk) pt.x -= min_x;
+
+    //
+    // Prepare PMT
+    //
+    double max_pe = 1.;
+
+    if(_normalize) {
+      max_pe = 0;
+      for(auto const& v : pmt.pe_v) if(v > max_pe) max_pe = v;
+    }
+
+    for(size_t i=0; i<pmt.pe_v.size(); ++i)
+
+      _flash_pe_v[i] = pmt.pe_v[i] / max_pe;
+
+    _minimizer_record_fval_v.clear();
+    _minimizer_record_x_v.clear();
+    
     if(!_minuit_ptr) _minuit_ptr = new TMinuit(4);
 
     double  reco_x = 128.;
@@ -242,7 +259,7 @@ namespace flashana {
     if (_minuit_ptr) delete _minuit_ptr;
     _minuit_ptr = 0;
 
-    return;
+    return _qll;
   }
 
 }
