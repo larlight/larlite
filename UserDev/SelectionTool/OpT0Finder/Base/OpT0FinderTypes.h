@@ -107,7 +107,7 @@ namespace flashana {
       kWARNING,
       kERROR,
       kEXCEPTION,
-            kMSG_TYPE_MAX
+      kMSG_TYPE_MAX
     };
     
     const std::string kColorPrefix[kMSG_TYPE_MAX] =

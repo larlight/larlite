@@ -18,10 +18,6 @@
 #include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
 #include "OpT0Finder/Base/OpT0FinderTypes.h"
 #include <numeric>
-#include "Analysis/ana_base.h"
-#include "DataFormat/track.h"
-#include "DataFormat/ophit.h"
-#include "DataFormat/opflash.h"
 #include "GeoAlgo/GeoAlgo.h"
 #include "LArUtil/Geometry.h"
 #include <functional>
@@ -38,7 +34,7 @@ namespace flashana{
   public:
     
     /// Default constructor
-    FlashHypo(){}
+    FlashHypo();
     
     /// Default destructor
     ~FlashHypo(){}
@@ -49,16 +45,24 @@ namespace flashana{
     double Set_Gap (double x){ _gap   =x; return _gap;}
     
     // Getter function
-    std::vector<std::vector<double>> FlashHypothesis(::geoalgo::Trajectory trj) const;
+    flashana::QCluster_t FlashHypothesis(::geoalgo::Trajectory trj) const;
     
     // Calculation fuction
-    std::vector<double> PhotonLibrary(::geoalgo::Vector pt_1, ::geoalgo::Vector pt_2, std::vector<double> pe) const;
-    std::vector<std::vector<double>> QCluster(::geoalgo::Vector pt_1, ::geoalgo::Vector pt_2, std::vector<std::vector<double>> Q_cluster) const;
+    std::vector<double> PhotonLibrary(::geoalgo::Vector pt_1,
+				      ::geoalgo::Vector pt_2,
+				      std::vector<double> pe) const;
+    
+    void QCluster(::geoalgo::Vector pt_1,
+		  ::geoalgo::Vector pt_2,
+		  flashana::QCluster_t& Q_cluster) const;
     
   protected:
     bool   _start_bool = true;
     bool   _end_bool   = true;
     double _gap   = 0.5;
+    double _xmax, _xmin;
+    double _ymax, _ymin;
+    double _zmax, _zmin;
   };
 }
 #endif

@@ -33,41 +33,22 @@ namespace flashana {
   public:
     
     /// Default constructor
-    CommonAmps(const double x_step_size=-1);
-    
-    CommonAmps( const std::vector<double>& pos_x,
-		const std::vector<double>& pos_y,
-		const std::vector<double>& pos_z,
-		const double x_step_size=-1);
+    CommonAmps(const std::string name="CommonAmps");
     
     /// Default destructor
     ~CommonAmps(){}
 
+    void Configure(const ::fcllite::PSet &pset);
+
     FlashMatch_t Match(const QCluster_t&, const Flash_t&);
-
-    void SetStepSize(const double x)  { _x_step_size = x; }
-
-    void SetPercent(float amp) { _percent = amp ; }
-
-    void SetScore(float score) { _score = score; }
-
-    void UsePhotonLibrary(bool doit=true) {_use_library=doit;}
 
   private:
 
-    std::vector<double> _pos_x;
-    std::vector<double> _pos_y;
-    std::vector<double> _pos_z;
-    double _x_step_size;
-    bool _use_library;
-
     float _percent;
     float _score ;
-
-    std::vector<double> _vis_array;
-    std::vector<double> _op_array;
-    std::vector<std::vector<double>> _vis ;
-    std::vector<std::vector<double>> _op ;
+    float _x_step_size;
+    flashana::QCluster_t _tpc_qcluster;
+    flashana::Flash_t    _vis_array;
 
   };
 }

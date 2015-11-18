@@ -27,11 +27,13 @@ namespace flashana {
   public:
     
     /// Default constructor
-    NPtFilter();
+    NPtFilter(const std::string name="NPtFilter");
     
     /// Default destructor
     ~NPtFilter(){}
 
+    void Configure(const ::fcllite::PSet &pset);
+    
     /// Implementation of virtualfunction
     IDArray_t Filter(const QClusterArray_t&);
 
@@ -39,6 +41,7 @@ namespace flashana {
     void SetMinNumPoints(size_t n) { _min_num_pt = n; }
 
   private:
+    
     size_t _min_num_pt; ///< mininum number of QPoint_t to pass the filter
     
   };

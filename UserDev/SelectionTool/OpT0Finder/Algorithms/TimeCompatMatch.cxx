@@ -10,10 +10,16 @@
 
 namespace flashana {
 
-  TimeCompatMatch::TimeCompatMatch()
+  TimeCompatMatch::TimeCompatMatch(const std::string name)
+    : BaseProhibitAlgo(name)
   {
     _frame_drift_time = 1600; // usec
-  };
+  }
+
+  void TimeCompatMatch::Configure(const ::fcllite::PSet &pset)
+  {
+    _frame_drift_time = pset.get<double>("FrameDriftTime");
+  }
 
   bool TimeCompatMatch::MatchCompatible(const QCluster_t& clus, const Flash_t& flash)
   {

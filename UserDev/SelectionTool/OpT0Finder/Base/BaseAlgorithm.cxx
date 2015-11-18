@@ -8,6 +8,8 @@ namespace flashana {
   BaseAlgorithm::BaseAlgorithm(const Algorithm_t type,const std::string name)
     : _type(type)
     , _name(name)
+    , _active_volume( 0.0,    -116.5,  0.0,
+		      256.35,  116.5,  1036.8 )
   {}
 
   Algorithm_t BaseAlgorithm::AlgorithmType() const
@@ -29,7 +31,21 @@ namespace flashana {
 
   double BaseAlgorithm::OpDetZ(size_t i) const
   { return _opdet_z_v.at(i); }
-    
+
+  double BaseAlgorithm::ActiveXMax() const
+  { return _active_volume.Max()[0]; }
+  double BaseAlgorithm::ActiveYMax() const
+  { return _active_volume.Max()[1]; }
+  double BaseAlgorithm::ActiveZMax() const
+  { return _active_volume.Max()[2]; }
+
+  double BaseAlgorithm::ActiveXMin() const
+  { return _active_volume.Min()[0]; }
+  double BaseAlgorithm::ActiveYMin() const
+  { return _active_volume.Min()[1]; }
+  double BaseAlgorithm::ActiveZMin() const
+  { return _active_volume.Min()[2]; }
+
   const std::vector<double>& BaseAlgorithm::OpDetXArray() const
   { return _opdet_x_v; }
   const std::vector<double>& BaseAlgorithm::OpDetYArray() const
@@ -47,6 +63,14 @@ namespace flashana {
     _opdet_y_v = pos_y;
     _opdet_z_v = pos_z;
 
+  }
+  
+  void BaseAlgorithm::SetActiveVolume( const double xmin, const double xmax,
+				       const double ymin, const double ymax,
+				       const double zmin, const double zmax )
+  {
+    _active_volume.Min(xmin,ymin,zmin);
+    _active_volume.Max(xmax,ymax,zmax);
   }
 }
 
