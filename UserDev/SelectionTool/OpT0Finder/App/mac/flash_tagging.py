@@ -1,4 +1,4 @@
-import sys,ROOT
+import sys,ROOT,os
 
 if len(sys.argv) < 2:
     msg  = '\n'
@@ -41,7 +41,7 @@ my_unit.Manager().SetAlgo(flashana.NPtFilter())
 # PMT Filter Algo
 my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
 # Match Prohibit Algo
-my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
+#my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
 # Hypothesis Algo
 my_unit.Manager().SetAlgo(flashana.PhotonLibHypothesis())
 # Match Algo
