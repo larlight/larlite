@@ -17,6 +17,9 @@
 #include "BaseAlgorithm.h"
 #include "BaseFlashHypothesis.h"
 namespace flashana {
+
+  class FlashMatchManager;
+
   /**
      \class BaseFlashMatch
      Algorithm base class for matching flashana::QCluster_t (TPC object) and \n
@@ -24,6 +27,7 @@ namespace flashana {
      matching infomration.
   */
   class BaseFlashMatch : public BaseAlgorithm{
+    friend class FlashMatchManager;
     
   public:
     
