@@ -1,0 +1,83 @@
+import sys,ROOT
+
+def pmt_pos():
+    xv = ROOT.std.vector("double")()
+    yv = ROOT.std.vector("double")()
+    zv = ROOT.std.vector("double")()
+    for line in open('opt_geo.txt','r').read().split('\n'):
+        words = line.split()
+        if not len(words) == 3: continue
+        xv.push_back(float(words[0]))
+        yv.push_back(float(words[1]))
+        zv.push_back(float(words[2]))
+    return (xv,yv,zv)
+
+import ROOT
+#ROOT.gSystem.Load("libOpFlashAna_OpT0FinderApp")
+from larlite import larlite as fmwk
+from ROOT import flashana,TChain,larutil
+
+PRODUCER_NAME="opFlash"
+
+infile = sys.argv[1]
+
+indir = infile.split('/')[-2]
+
+nphoton,x,y,z = ( int(indir.split('_')[1]),
+                  float(indir.split('_')[-3])/10.,
+                  float(indir.split('_')[-2])/10.,
+                  float(indir.split('_')[-1])/10.)
+
+print x,y,z
+
+geo = larutil.Geometry.GetME()
+
+xv,yv,zv = pmt_pos()
+match_alg = flashana.QLLMatch.GetME()
+match_alg.SetOpDetPositions(xv,yv,zv)
+match_alg.UsePhotonLibrary(True)
+match_alg.Record(True)
+
+tch = TChain("opflash_%s_tree" % PRODUCER_NAME)
+tch.AddFile(infile)
+
+for entry in xrange(tch.GetEntries()):
+
+    tch.GetEntry(entry)
+
+    br = None
+    exec('br = tch.opflash_%s_branch' % PRODUCER_NAME)
+
+    # Use highest OpFlash for now
+    flash = None
+    for flash_index in xrange(br.size()):
+
+        if not flash or flash.TotalPE() < br[flash_index].TotalPE():
+
+            flash = br[flash_index]
+
+    reco_flash = flashana.Flash_t()
+    reco_flash.pe_v.resize(geo.NOpDets())
+
+    for ch in xrange(32):
+
+        pmt_index = geo.OpDetFromOpChannel(ch)
+
+        if pmt_index >= 32: continue
+
+        reco_flash.pe_v[pmt_index] = flash.PE(ch)
+
+    mc_flash = flashana.QCluster_t()
+    mc_flash.push_back(flashana.QPoint_t(x,y,z,nphoton))
+
+    print "QLL:",match_alg.CallMinuit(mc_flash,reco_flash)
+    print "Look at a history..."
+    xval_history = match_alg.HistoryX()
+    qll_history  = match_alg.HistoryQLL()
+
+    for history_index in xrange(xval_history.size()):
+        print qll_history[history_index],'at x=',xval_history[history_index]
+
+    break
+
+    
