@@ -13,10 +13,10 @@
 namespace larlite {
 
   UBT0Finder::UBT0Finder()
-    : _int_tree(nullptr)
+    : _ophit_tree(nullptr)
+    , _int_tree(nullptr)
     , _track_tree(nullptr)
     , _tree(nullptr)
-    , _ophit_tree(nullptr)
     , _eff_tree(nullptr)
     , _time_diff(nullptr)
   {

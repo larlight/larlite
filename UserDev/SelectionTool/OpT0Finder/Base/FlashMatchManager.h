@@ -30,10 +30,13 @@ namespace flashana {
   public:
     
     /// Default constructor
-    FlashMatchManager();
+    FlashMatchManager(const std::string name="FlashMatchManager");
     
     /// Default destructor
     ~FlashMatchManager(){}
+
+    /// Name getter
+    const std::string& Name() const;
 
     /// Algorithm setter
     void SetAlgo(BaseAlgorithm* alg);
@@ -91,6 +94,8 @@ namespace flashana {
     bool _configured;
     /// Configuration file
     std::string _config_file;
+    /// Name
+    std::string _name;
   };
 }
 

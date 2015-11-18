@@ -9,7 +9,7 @@
 #include "FhiclLite/ConfigManager.h"
 namespace flashana {
   
-  FlashMatchManager::FlashMatchManager()
+  FlashMatchManager::FlashMatchManager(const std::string name)
     : _alg_flash_filter(nullptr)
     , _alg_tpc_filter(nullptr)
     , _alg_match_prohibit(nullptr)
@@ -17,9 +17,13 @@ namespace flashana {
     , _alg_flash_hypothesis(nullptr)
     , _configured(false)
     , _config_file("FlashMatch.fcl")
+    , _name(name)
   {
     _allow_reuse_flash = true;
   }
+
+  const std::string& FlashMatchManager::Name() const
+  { return _name; }
 
   void FlashMatchManager::SetAlgo(BaseAlgorithm* alg)
   {
@@ -69,36 +73,66 @@ namespace flashana {
     
     auto const& main_cfg = cfg_mgr.Config();
 
-    auto const& pmt_pos_cfg = main_cfg.get_pset("PMT_POSITION");
+    auto const& mgr_cfg = main_cfg.get_pset(Name());
+    _allow_reuse_flash = mgr_cfg.get<bool>("AllowReuseFlash");
+    _verbosity = (msg::MSGLevel_t)(mgr_cfg.get<unsigned int>("Verbosity"));
 
+    auto const& pmt_pos_cfg = main_cfg.get_pset("PMT_POSITION");
     auto const pmt_x_pos = pmt_pos_cfg.get<std::vector<double> >("X");
     auto const pmt_y_pos = pmt_pos_cfg.get<std::vector<double> >("Y");
     auto const pmt_z_pos = pmt_pos_cfg.get<std::vector<double> >("Z");
+
+    auto const& detector_boundary_cfg = main_cfg.get_pset("ACTIVE_VOLUME");
+    auto const det_xrange = detector_boundary_cfg.get<std::vector<double> >("X");
+    auto const det_yrange = detector_boundary_cfg.get<std::vector<double> >("Y");
+    auto const det_zrange = detector_boundary_cfg.get<std::vector<double> >("Z");
+    if(det_xrange.size() != 2 || det_yrange.size() != 2 || det_zrange.size() != 2)
+      throw OpT0FinderException("Detector volume range has wrong size!");
 
     if(pmt_x_pos.size() != pmt_y_pos.size() ||
        pmt_x_pos.size() != pmt_z_pos.size() )
       throw OpT0FinderException("PMT position array length has a mismatch among x vs. y or x vs. z");
     
     if(_alg_flash_filter) {
+      _alg_flash_filter->SetVerbosity(_verbosity);
       _alg_flash_filter->Configure(main_cfg.get_pset(_alg_flash_filter->AlgorithmName()));
       _alg_flash_filter->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
+      _alg_flash_filter->SetActiveVolume( det_xrange[0], det_xrange[1],
+					  det_yrange[0], det_yrange[1],
+					  det_zrange[0], det_zrange[1] );
     }
     if(_alg_tpc_filter) {
+      _alg_tpc_filter->SetVerbosity(_verbosity);
       _alg_tpc_filter->Configure(main_cfg.get_pset(_alg_tpc_filter->AlgorithmName()));
       _alg_tpc_filter->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
+      _alg_tpc_filter->SetActiveVolume( det_xrange[0], det_xrange[1],
+					det_yrange[0], det_yrange[1],
+					det_zrange[0], det_zrange[1] );
     }
     if(_alg_match_prohibit) {
+      _alg_match_prohibit->SetVerbosity(_verbosity);
       _alg_match_prohibit->Configure(main_cfg.get_pset(_alg_match_prohibit->AlgorithmName()));
       _alg_match_prohibit->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
+      _alg_match_prohibit->SetActiveVolume( det_xrange[0], det_xrange[1],
+					    det_yrange[0], det_yrange[1],
+					    det_zrange[0], det_zrange[1] );
     }
     if(_alg_flash_match) {
+      _alg_flash_match->SetVerbosity(_verbosity);
       _alg_flash_match->Configure(main_cfg.get_pset(_alg_flash_match->AlgorithmName()));
       _alg_flash_match->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
+      _alg_flash_match->SetActiveVolume( det_xrange[0], det_xrange[1],
+					 det_yrange[0], det_yrange[1],
+					 det_zrange[0], det_zrange[1] );
     }
     if(_alg_flash_hypothesis) {
+      _alg_flash_hypothesis->SetVerbosity(_verbosity);
       _alg_flash_hypothesis->Configure(main_cfg.get_pset(_alg_flash_hypothesis->AlgorithmName()));
       _alg_flash_hypothesis->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
-    }    
+      _alg_flash_hypothesis->SetActiveVolume( det_xrange[0], det_xrange[1],
+					      det_yrange[0], det_yrange[1],
+					      det_zrange[0], det_zrange[1] );
+    }
     _configured = true;
   }
 

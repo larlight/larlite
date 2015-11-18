@@ -29,7 +29,7 @@ namespace flashana {
   public:
     
     /// Default constructor
-    TimeCompatMatch(const std::string name);
+    TimeCompatMatch(const std::string name="TimeCompatMatch");
     
     /// Default destructor
     ~TimeCompatMatch(){}

@@ -19,6 +19,7 @@ namespace flashana {
   {
     _x_step_size = pset.get<double>("XStepSize");
     _zdiff_max   = pset.get<double>("ZDiffMax" );
+    _zdiff_max *= _zdiff_max; 
   }
   
   FlashMatch_t QWeightPoint::Match(const QCluster_t& pt_v, const Flash_t& flash)

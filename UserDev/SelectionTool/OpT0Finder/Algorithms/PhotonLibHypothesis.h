@@ -28,7 +28,7 @@ namespace flashana {
   public:
 
     /// Default constructor
-    PhotonLibHypothesis(const std::string name);
+    PhotonLibHypothesis(const std::string name="PhotonLibHypothesis");
 
     /// Default destructor
     virtual ~PhotonLibHypothesis(){}

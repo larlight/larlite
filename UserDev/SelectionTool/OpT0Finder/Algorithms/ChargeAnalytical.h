@@ -31,7 +31,7 @@ namespace flashana {
   public:
     
     /// Default constructor
-    ChargeAnalytical(const std::string name);
+    ChargeAnalytical(const std::string name="ChargeAnalytical");
     
     /// Default destructor
     ~ChargeAnalytical() { }
