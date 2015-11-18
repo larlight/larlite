@@ -20,6 +20,9 @@
 #include <vector>
 namespace larlite{
 
+  typedef size_t SegmentID_t; ///< Segment ID                                                                                                                                                          
+  const SegmentID_t InvalidSegmentID = -1;
+
   /**
      \class mctrack
      LArSoft MCTrack class equivalent data container
@@ -99,9 +102,10 @@ namespace larlite{
     void AncestorStart     ( const mcstep& s      ) { fAncestorStart   = s;  }
     void AncestorEnd       ( const mcstep& s      ) { fAncestorEnd     = s;  }
 
-
-    const std::vector<double> dEdx() const;
-
+    double   dEdx(const SegmentID_t id) const;
+    double   dX  (const SegmentID_t id) const ;
+    const std::vector<double> dEdx()    const;
+   
     const std::vector<TLorentzVector>  SegmentCenter() const;
 
 

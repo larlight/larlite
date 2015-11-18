@@ -62,25 +62,55 @@ namespace larlite {
   const mcstep&      mctrack::AncestorEnd       () const { return fAncestorEnd;     }
 
 
+  double   mctrack::dX(const SegmentID_t id) const {
+    if (id + 2 > this->size()) {
+      std::cerr<<"Invalid segment ID "<<id<<std::endl;
+      throw DataFormatException();
+    }
+
+
+    auto const& previousStep = (*this)[id];
+    auto const& nextStep     = (*this)[id+1];
+    double dX =
+      (previousStep.X() - nextStep.X())*(previousStep.X() - nextStep.X()) +
+      (previousStep.Y() - nextStep.Y())*(previousStep.Y() - nextStep.Y()) +
+      (previousStep.Z() - nextStep.Z())*(previousStep.Z() - nextStep.Z())  ;
+
+    dX = TMath::Sqrt(dX);
+    
+    return dX;
+  }
+
+
+  double   mctrack::dEdx(const SegmentID_t id) const {
+    if (id + 2 > this->size()) {
+      std::cerr<<"Invalid segment ID "<<id<<std::endl;
+      throw DataFormatException();
+    }
+
+    double dEdX;
+
+    auto const& previousStep = (*this)[id];
+    auto const& nextStep     = (*this)[id+1];
+    double stepDistance = dX(id);
+         
+    stepDistance = TMath::Sqrt(stepDistance);
+    double dE = TMath::Abs(nextStep.E() - previousStep.E());
+    dEdX  = dE/stepDistance;
+    
+    return dEdX;
+
+  }
+
+
   const std::vector<double>  mctrack::dEdx() const {
     std::vector<double> fdEdxComputed;
     if (this->size()<2) return fdEdxComputed;
     
     fdEdxComputed.reserve(this->size()-1);
-    for (unsigned int i = 1; i < this->size(); ++i)
+    for (SegmentID_t i = 0; i + 1 < this->size(); ++i)
       {
-	auto const& previousStep = (*this)[i-1];
-	auto const& nextStep     = (*this)[i];
-	double stepDistance =
-	  (previousStep.X() - nextStep.X())*(previousStep.X() - nextStep.X()) +
-	  (previousStep.Y() - nextStep.Y())*(previousStep.Y() - nextStep.Y()) +
-	  (previousStep.Z() - nextStep.Z())*(previousStep.Z() - nextStep.Z())  ;
-	
-	stepDistance = TMath::Sqrt(stepDistance);
-	double dE = TMath::Abs(nextStep.E() - previousStep.E());	    
-	double currentdEdx = dE/stepDistance;
-	fdEdxComputed.push_back(currentdEdx);
-	
+	fdEdxComputed.push_back(dEdx(i));
       }
     return fdEdxComputed;
   }
@@ -89,7 +119,7 @@ namespace larlite {
     std::vector<TLorentzVector> fsegmentCenter;
     if (this->size()<2) return fsegmentCenter;
 
-    fsegmentCenter.reserve(this->size()-1);
+    fsegmentCenter.reserve(size()-1);
     for (unsigned int i = 1; i < this->size(); ++i) {
       auto const& previousStep = (*this)[i-1];
       auto const& nextStep     = (*this)[i];

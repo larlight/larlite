@@ -16,6 +16,8 @@ namespace larlite {
   
   bool LookPIDA::analyze(storage_manager* storage) {
 
+    //    std::cout<<"@@@@@@@@ New Event @@@@@@@@"<<std::endl;
+    
     //Let's start by cleaning up the analysis TTree
     ClearTreeVar();
 
@@ -28,13 +30,18 @@ namespace larlite {
       print(msg::kERROR,__FUNCTION__,"MCTrack data product not found!");
       return false;
     }
-
+    
     for(auto const& mct : *ev_mct)
       {
-	if(mct.dEdx().size()) std::cout<<"Shower 0 dEdx: "<<mct.dEdx()[0]<<std::endl;
+	if(mct.dEdx().size()){
+	  for(unsigned int i = 0; i < mct.dEdx().size();++i)
+	    {
+	      if(mct.dEdx()[i]>100.)  std::cout<<"Track instant dEdx["<<i<<"] : "<<mct.dEdx()[i]<<" "<<mct.dEdx(i)<<" dX:  "<<mct.dX(i)<<std::endl;
+	    }      
+	}
+	std::cout<<"###### New Track #######"<<std::endl;
       }
-
-
+    
 
 
     auto const ev_track = storage->get_data<event_track>("trackkalmanhit");
@@ -96,12 +103,7 @@ namespace larlite {
     } // End on tracks loop
 
 
-    //    for(auto const& pid : *ev_pid)
-    //  {
-    //	hPIDA->Fill(pid.PIDA());
-	//std::cout<<"PIDA: "<<pid.PIDA()<<std::endl;
-    //  }
-
+    
     fPIDATree->Fill();
     return true;
   }
