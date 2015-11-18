@@ -49,7 +49,7 @@ my_unit.Manager().SetAlgo(flashana.PhotonLibHypothesis())
 #my_unit.Manager().SetAlgo( flashana.QWeightPoint()   )
 my_unit.Manager().SetAlgo( flashana.CommonAmps()      )
 
-my_unit.Manager().Configure( "flashmatch.fcl" )
+my_unit.Manager().Configure( "%s/SelectionTool/OpT0Finder/App/mac/flashmatch.fcl" % os.environ['LARLITE_USERDEVDIR'])
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
