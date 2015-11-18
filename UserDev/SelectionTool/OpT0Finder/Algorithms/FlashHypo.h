@@ -51,7 +51,6 @@ namespace flashana{
     std::vector<double> PhotonLibrary(::geoalgo::Vector pt_1,
 				      ::geoalgo::Vector pt_2,
 				      std::vector<double> pe) const;
-    
     void QCluster(::geoalgo::Vector pt_1,
 		  ::geoalgo::Vector pt_2,
 		  flashana::QCluster_t& Q_cluster) const;

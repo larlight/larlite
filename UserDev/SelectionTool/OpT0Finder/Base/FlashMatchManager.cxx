@@ -249,16 +249,16 @@ namespace flashana {
 
 	auto const& tpc   = _tpc_object_v[tpc_index]; // Retrieve TPC object
 	auto const& flash = _flash_v[flash_index];    // Retrieve flash
-
+	
 	// run the match-prohibit algo first
 	if (_alg_match_prohibit){
 	  bool compat = _alg_match_prohibit->MatchCompatible( tpc, flash);
 	  if (compat == false)
 	    continue;
-	}
+	    }
 	
 	auto res = _alg_flash_match->Match( tpc, flash ); // Run matching
-
+	
 	// ignore this match if the score is <= 0
 	if(res.score<=0) continue; 
 
