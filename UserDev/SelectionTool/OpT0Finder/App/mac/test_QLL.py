@@ -33,10 +33,12 @@ print x,y,z
 geo = larutil.Geometry.GetME()
 
 xv,yv,zv = pmt_pos()
+
 match_alg = flashana.QLLMatch.GetME()
-match_alg.SetOpDetPositions(xv,yv,zv)
-match_alg.UsePhotonLibrary(True)
-match_alg.Record(True)
+
+match_mgr = flashana.FlashMatchManager()
+match_mgr.SetAlgo(match_alg)
+match_mgr.Configure( "%s/SelectionTool/OpT0Finder/App/mac/flashmatch.fcl" % os.environ['LARLITE_USERDEVDIR'])
 
 tch = TChain("opflash_%s_tree" % PRODUCER_NAME)
 tch.AddFile(infile)
