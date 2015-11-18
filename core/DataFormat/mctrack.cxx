@@ -39,28 +39,73 @@ namespace larlite {
     
     fAncestorStart = invalid_step;
     fAncestorEnd   = invalid_step;
-
+  
   }
 
-  simb::Origin_t      mctrack::Origin     () const { return fOrigin;            }
-  int                 mctrack::PdgCode    () const { return fPDGCode;           }
-  unsigned int        mctrack::TrackID  () const { return fTrackID;         }
-  const std::string&  mctrack::Process    () const { return fProcess;           }
-  const mcstep&       mctrack::Start    () const { return fStart;           }
-  const mcstep&       mctrack::End      () const { return fEnd;             }
+  simb::Origin_t      mctrack::Origin     () const { return fOrigin;          }
+  int                 mctrack::PdgCode    () const { return fPDGCode;         }
+  unsigned int        mctrack::TrackID    () const { return fTrackID;         }
+  const std::string&  mctrack::Process    () const { return fProcess;         }
+  const mcstep&       mctrack::Start      () const { return fStart;           }
+  const mcstep&       mctrack::End        () const { return fEnd;             }
   
-  int                mctrack::MotherPdgCode   () const { return fMotherPDGCode;     }
+  int                mctrack::MotherPdgCode () const { return fMotherPDGCode;   }
   unsigned int       mctrack::MotherTrackID () const { return fMotherTrackID;   }
-  const std::string& mctrack::MotherProcess   () const { return fMotherProcess;     }
+  const std::string& mctrack::MotherProcess () const { return fMotherProcess;   }
   const mcstep&      mctrack::MotherStart   () const { return fMotherStart;     }
   const mcstep&      mctrack::MotherEnd     () const { return fMotherEnd;       }
   
-  int                mctrack::AncestorPdgCode   () const { return fAncestorPDGCode;   }
-  unsigned int       mctrack::AncestorTrackID () const { return fAncestorTrackID; }
-  const std::string& mctrack::AncestorProcess   () const { return fMotherProcess;     }
-  const mcstep&      mctrack::AncestorStart   () const { return fAncestorStart;   }
-  const mcstep&      mctrack::AncestorEnd     () const { return fAncestorEnd;     }
-  
+  int                mctrack::AncestorPdgCode   () const { return fAncestorPDGCode; }
+  unsigned int       mctrack::AncestorTrackID   () const { return fAncestorTrackID; }
+  const std::string& mctrack::AncestorProcess   () const { return fMotherProcess;   }
+  const mcstep&      mctrack::AncestorStart     () const { return fAncestorStart;   }
+  const mcstep&      mctrack::AncestorEnd       () const { return fAncestorEnd;     }
+
+
+  const std::vector<double>  mctrack::dEdx() const {
+    std::vector<double> fdEdxComputed;
+    if (this->size()<2) return fdEdxComputed;
+
+    fdEdxComputed.reserve(this->size()-1);
+    for (unsigned int i = 1; i < this->size(); ++i)
+      {
+	auto const& previousStep = (*this)[i-1];
+	auto const& nextStep     = (*this)[i];
+	double stepDistance =
+	  (previousStep.X() - nextStep.X())*(previousStep.X() - nextStep.X()) +
+	  (previousStep.Y() - nextStep.Y())*(previousStep.Y() - nextStep.Y()) +
+	  (previousStep.Z() - nextStep.Z())*(previousStep.Z() - nextStep.Z())  ;
+	
+	stepDistance = TMath::Sqrt(stepDistance);
+	double dE = TMath::Abs(nextStep.E() - previousStep.E());	    
+	double currentdEdx = dE/stepDistance;
+	fdEdxComputed.push_back(currentdEdx);
+
+      }
+    return fdEdxComputed;
+  }
+
+  const std::vector<TLorentzVector>  mctrack::SegmentCenter() const{
+    std::vector<TLorentzVector> fsegmentCenter;
+    if (this->size()<2) return fsegmentCenter;
+
+    fsegmentCenter.reserve(this->size()-1);
+    for (unsigned int i = 1; i < this->size(); ++i) {
+      auto const& previousStep = (*this)[i-1];
+      auto const& nextStep     = (*this)[i];
+
+      double xSegCenter = (previousStep.X() + nextStep.X())*0.5 ;
+      double ySegCenter = (previousStep.Y() + nextStep.Y())*0.5 ;
+      double zSegCenter = (previousStep.Z() + nextStep.Z())*0.5 ;
+      double tSegCenter = (previousStep.T() + nextStep.T())*0.5 ;
+
+      TLorentzVector currentSegCenter(xSegCenter,ySegCenter,zSegCenter,tSegCenter);
+      fsegmentCenter.emplace_back(currentSegCenter);
+    }
+    return fsegmentCenter;
+  }
+
+
 
 }
 #endif
