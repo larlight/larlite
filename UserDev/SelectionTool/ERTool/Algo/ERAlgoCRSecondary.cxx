@@ -93,10 +93,13 @@ bool ERAlgoCRSecondary::Reconstruct(const EventData &data, ParticleGraph& graph)
           // start point is less than some value, this candidate secondary is indeed a secondary)
           if (seed_trk[0].Dist(cand_trk[0]) < _min_dist_common_origin) {
             is_cosmic = true;
-            // If the seed track was Primary, set this secondary as primary as well???
-            if (seed_part.Primary()) graph.SetPrimary(id);
-            // If the seed track was not primary, set this secondary as a sibling with seed track.
-            else graph.SetSiblings(seed_id, id);
+            // If the start points of candidate secondary and seed track are very close,
+            // we don't need to use the IsCRSecondary function. Just set the candidate secondary
+            // as the child of the seed.
+            // If this were a neutrino interaction or something, they may both be primary and they
+            // may be siblings, but upstream of here we know the seed track is tagged as kCosmic
+            // so anything associated with this seed track is tagged as a child of the track.
+            graph.SetParentage(seed_id, id);
           }
           // Case if the candidate secondary track only has one point, it's useless...
           // there isn't enough information to identify it as a cosmic, or a secondary,
@@ -138,10 +141,13 @@ bool ERAlgoCRSecondary::Reconstruct(const EventData &data, ParticleGraph& graph)
           // point is less than some value, the candidate secondary is a cosmic.
           if (seed_trk[0].Dist(cand_shr.Start()) < _min_dist_common_origin) {
             is_cosmic = true;
-            // If the seed track was primary, we set the candidate secondary shower as a primary too???
-            if (seed_part.Primary()) graph.SetPrimary(id);
-            // If the seed track was not primary, set the candidate secondary shower as a sibling of the seed track
-            else graph.SetSiblings(seed_id, id);
+            // If the start points of candidate secondary and seed track are very close,
+            // we don't need to use the IsCRSecondary function. Just set the candidate secondary
+            // as the child of the seed.
+            // If this were a neutrino interaction or something, they may both be primary and they
+            // may be siblings, but upstream of here we know the seed track is tagged as kCosmic
+            // so anything associated with this seed track is tagged as a child of the track.
+            graph.SetParentage(seed_id, id);
           }
           // If the distance between the seed track start point and the candidate secondary (shower) start
           // point is greater than some value, we use the IsCRSecondary function to determine if the candidate
@@ -243,13 +249,13 @@ bool ERAlgoCRSecondary::IsCRSecondary(const ::geoalgo::Trajectory_t seed,
     // the candidate secondary is NOT a secondary.
     if ( sqrt(geo_alg.SqDist(cand.Start(), seed)) > _min_dist_trk_shr) return false;
 
-  } 
+  }
   // If user doesn't want to use perpendicular track-to-shower comparison
   else {
-    
+
     // If the distance between the closest approach mid-point and the subject trajectory is
     // larger than the cut value, ignore
-    
+
     ::geoalgo::Point_t pt;
     auto dist = rel_alg.FindClosestApproach(cand, seed, pt);
 
