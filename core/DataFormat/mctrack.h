@@ -101,7 +101,9 @@ namespace larlite{
 
 
     const std::vector<double> dEdx() const;
-    const std::vector<TLorentzVector>  segmentCenter() const;
+
+    const std::vector<TLorentzVector>  SegmentCenter() const;
+
 
     
   protected:

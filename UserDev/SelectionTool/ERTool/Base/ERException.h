@@ -32,6 +32,8 @@ namespace ertool {
 
     virtual const char* what() const throw();
 
+    const char* msg() const throw();
+    
   private:
 
     std::string _msg;

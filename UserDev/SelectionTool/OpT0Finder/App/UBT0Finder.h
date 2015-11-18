@@ -91,7 +91,6 @@ namespace larlite {
     double _t0 ;
     double _n_pe ;
     double _int_e ;
-    double _int;
     double _n_flash ;
 
     TTree* _track_tree;
@@ -126,9 +125,6 @@ namespace larlite {
 
     TH2D * _nflash_v_nint ;
     TH1D * _time_diff ;
-
-    int _n_int ;     //Total interactions > 10MeV
-
 
   };
 }

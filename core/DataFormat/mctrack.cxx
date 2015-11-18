@@ -64,55 +64,45 @@ namespace larlite {
 
   const std::vector<double>  mctrack::dEdx() const {
     std::vector<double> fdEdxComputed;
-    if (this->size()>2)
+    if (this->size()<2) return fdEdxComputed;
+    
+    fdEdxComputed.reserve(this->size()-1);
+    for (unsigned int i = 1; i < this->size(); ++i)
       {
-	mcstep previousStep = this->fStart;
-	for (unsigned int i = 1; i < this->size(); ++i)
-	  {
-	    double stepDistance =
-	      (previousStep.X() - this->at(i).X())*(previousStep.X() - this->at(i).X()) +
-	      (previousStep.Y() - this->at(i).Y())*(previousStep.Y() - this->at(i).Y()) +
-	      (previousStep.Z() - this->at(i).Z())*(previousStep.Z() - this->at(i).Z())  ;
-	    
-	    stepDistance = TMath::Sqrt(stepDistance);
-	    double dE = TMath::Abs(this->at(i).E() - previousStep.E());	    
-	    double currentdEdx = dE/stepDistance;
-	    fdEdxComputed.push_back(currentdEdx);
-	    previousStep = this->at(i);
-	  }
-      } else 
-      {
-	std::cerr << "\033[93m<<" << __FUNCTION__ << ">>\033[00m"
-		  <<"dEdX impossible to compute, the track is not long enough\n";
-	fdEdxComputed.clear();
-       
+	auto const& previousStep = (*this)[i-1];
+	auto const& nextStep     = (*this)[i];
+	double stepDistance =
+	  (previousStep.X() - nextStep.X())*(previousStep.X() - nextStep.X()) +
+	  (previousStep.Y() - nextStep.Y())*(previousStep.Y() - nextStep.Y()) +
+	  (previousStep.Z() - nextStep.Z())*(previousStep.Z() - nextStep.Z())  ;
+	
+	stepDistance = TMath::Sqrt(stepDistance);
+	double dE = TMath::Abs(nextStep.E() - previousStep.E());	    
+	double currentdEdx = dE/stepDistance;
+	fdEdxComputed.push_back(currentdEdx);
+	
       }
-    return fdEdxComputed; 
+    return fdEdxComputed;
   }
-
-
-  const std::vector<TLorentzVector>  mctrack::segmentCenter() const{
+  
+  const std::vector<TLorentzVector>  mctrack::SegmentCenter() const{
     std::vector<TLorentzVector> fsegmentCenter;
-    if (this->size()>2)
-      {
-        mcstep previousStep = this->fStart;
-        for (unsigned int i = 1; i < this->size(); ++i)
-          {
-            double xSegCenter = (previousStep.X() - this->at(i).X())*0.5 ;
-	    double ySegCenter = (previousStep.Y() - this->at(i).Y())*0.5 ;
-	    double zSegCenter = (previousStep.Z() - this->at(i).Z())*0.5 ;
-	    double tSegCenter = (previousStep.T() - this->at(i).T())*0.5 ;
+    if (this->size()<2) return fsegmentCenter;
 
-            TLorentzVector currentSegCenter(xSegCenter,ySegCenter,zSegCenter,tSegCenter);
-            fsegmentCenter.push_back(currentSegCenter);
-            previousStep = this->at(i);
-          }
-      } else
-      {
-	std::cerr << "\033[93m<<" << __FUNCTION__ << ">>\033[00m"
-		  <<"segment center impossible to compute, the track has < 2 mcsteps\n";
-	fsegmentCenter.clear();
-      }
+    fsegmentCenter.reserve(this->size()-1);
+    for (unsigned int i = 1; i < this->size(); ++i) {
+      auto const& previousStep = (*this)[i-1];
+      auto const& nextStep     = (*this)[i];
+
+      double xSegCenter = (previousStep.X() + nextStep.X())*0.5 ;
+      double ySegCenter = (previousStep.Y() + nextStep.Y())*0.5 ;
+      double zSegCenter = (previousStep.Z() + nextStep.Z())*0.5 ;
+      double tSegCenter = (previousStep.T() + nextStep.T())*0.5 ;
+
+      TLorentzVector currentSegCenter(xSegCenter,ySegCenter,zSegCenter,tSegCenter);
+      fsegmentCenter.emplace_back(currentSegCenter);
+    }
+
     return fsegmentCenter;
   }
 
