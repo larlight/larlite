@@ -66,7 +66,7 @@ namespace flashana {
     // Apply xoffset
     _var_trk.resize(_raw_trk.size());
     for(size_t pt_index=0;pt_index<_raw_trk.size();++pt_index) {
-      std::cout << "x point : " << _raw_trk[pt_index].x << "\t offset : " << xoffset << std::endl;
+      //std::cout << "x point : " << _raw_trk[pt_index].x << "\t offset : " << xoffset << std::endl;
       _var_trk[pt_index].x = _raw_trk[pt_index].x + xoffset;
       _var_trk[pt_index].y = _raw_trk[pt_index].y;
       _var_trk[pt_index].z = _raw_trk[pt_index].z;
@@ -119,7 +119,7 @@ namespace flashana {
 
     }
 
-    std::cout << "PE hyp : " << PEtot_Hyp << "\tPE Obs : " << PEtot_Obs << "\t Chi^2 : " << result << std::endl;
+    //std::cout << "PE hyp : " << PEtot_Hyp << "\tPE Obs : " << PEtot_Obs << "\t Chi^2 : " << result << std::endl;
 
     return result / nvalid_pmt;
   }
@@ -130,8 +130,8 @@ namespace flashana {
 		   Double_t * Xval,
 		   Int_t /*Flag*/){
 
-    std::cout << "minuit offset : " << Fval << std::endl;
-    std::cout << "minuit Xval?? : " << *Xval << std::endl;
+    //std::cout << "minuit offset : " << Fval << std::endl;
+    ///std::cout << "minuit Xval?? : " << *Xval << std::endl;
     
     auto const& hypothesis  = QLLMatch::GetME().ChargeHypothesis(Fval);
     auto const& measurement = QLLMatch::GetME().Measurement();

@@ -31,8 +31,8 @@ namespace flashana {
         q *= ::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt);
         flash.pe_v[ipmt] += q;
 
-	std::cout << "PMT : " << ipmt << " [x,y,z] -> [q] : [" << pt.x << ", "
-		  << pt.y << ", " << pt.z << "] -> [" << q << std::endl;
+	//std::cout << "PMT : " << ipmt << " [x,y,z] -> [q] : [" << pt.x << ", "
+	//		  << pt.y << ", " << pt.z << "] -> [" << q << std::endl;
 
       }
     }
