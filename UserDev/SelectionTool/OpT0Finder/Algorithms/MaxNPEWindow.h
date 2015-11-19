@@ -42,10 +42,12 @@ namespace flashana {
   public:
     
     /// Default constructor
-    MaxNPEWindow();
+    MaxNPEWindow(const std::string name="MaxNPEWindow");
     
     /// Default destructor
     ~MaxNPEWindow(){}
+
+    void Configure(const ::fcllite::PSet &pset);
 
     /// Implementation of a virtual function
     IDArray_t Filter(const FlashArray_t&);

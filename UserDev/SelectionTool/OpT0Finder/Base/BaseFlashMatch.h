@@ -15,8 +15,11 @@
 #define OPT0FINDER_BASEFLASHMATCH_H
 
 #include "BaseAlgorithm.h"
-
+#include "BaseFlashHypothesis.h"
 namespace flashana {
+
+  class FlashMatchManager;
+
   /**
      \class BaseFlashMatch
      Algorithm base class for matching flashana::QCluster_t (TPC object) and \n
@@ -24,11 +27,12 @@ namespace flashana {
      matching infomration.
   */
   class BaseFlashMatch : public BaseAlgorithm{
+    friend class FlashMatchManager;
     
   public:
     
     /// Default constructor
-    BaseFlashMatch() : BaseAlgorithm(kFlashMatch)
+    BaseFlashMatch(const std::string name="noname") : BaseAlgorithm(kFlashMatch,name)
     {}
     
     /// Default destructor
@@ -49,6 +53,18 @@ namespace flashana {
        in the return object is chosen.
      */
     virtual FlashMatch_t Match(const QCluster_t&, const Flash_t&) = 0;
+
+    /// Method to call flash hypothesis 
+    Flash_t GetEstimate(const QCluster_t&) const;
+
+    /// Method to simply fill provided reference of flashana::Flash_t
+    void FillEstimate(const QCluster_t&, Flash_t&) const;
+
+  private:
+
+    void SetFlashHypothesis(flashana::BaseFlashHypothesis*);
+
+    flashana::BaseFlashHypothesis* _flash_hypothesis;
 
   };
 }

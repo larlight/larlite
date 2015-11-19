@@ -1,16 +1,4 @@
-import sys,ROOT
-
-def pmt_pos():
-    xv = ROOT.std.vector("double")()
-    yv = ROOT.std.vector("double")()
-    zv = ROOT.std.vector("double")()
-    for line in open('opt_geo.txt','r').read().split('\n'):
-        words = line.split()
-        if not len(words) == 3: continue
-        xv.push_back(float(words[0]))
-        yv.push_back(float(words[1]))
-        zv.push_back(float(words[2]))
-    return (xv,yv,zv)
+import sys,ROOT,os
 
 if len(sys.argv) < 2:
     msg  = '\n'
@@ -47,40 +35,21 @@ my_unit.SetROStart(-3200.)
 my_unit.SetROEnd(3200.)
 my_unit.SetTrigTime(0.)
 my_proc.add_process(my_unit)
-# use an array of filters for the TPC
-filter_ana = flashana.FilterArray()
-filter_ana.AppendFilterAlgo(flashana.NPtFilter())
+
 # TPC Filter Algo
-my_unit.Manager().SetAlgo(filter_ana)
+my_unit.Manager().SetAlgo(flashana.NPtFilter())
 # PMT Filter Algo
 my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
 # Match Prohibit Algo
-timecompat = flashana.TimeCompatMatch()
-timecompat.SetFrameDriftTime(2200)
-#my_unit.Manager().SetAlgo(timecompat)
+#my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
+# Hypothesis Algo
+my_unit.Manager().SetAlgo(flashana.PhotonLibHypothesis())
+# Match Algo
+#my_unit.Manager().SetAlgo( flashana.QLLMatch.GetME() )
+#my_unit.Manager().SetAlgo( flashana.QWeightPoint()   )
+my_unit.Manager().SetAlgo( flashana.CommonAmps()      )
 
-my_unit.Manager().SetVerbosity(3)
-
-xv,yv,zv = pmt_pos()
-
-#match_alg = flashana.QWeightPoint(int(sys.argv[-1]))
-
-#match_alg = flashana.QWeightPoint(xv,yv,zv,int(sys.argv[-1]))
-#match_alg.UsePhotonLibrary(True)
-
-#match_alg = flashana.QLLMatch.GetME()
-#match_alg.SetOpDetPositions(xv,yv,zv)
-#match_alg.UsePhotonLibrary(True)
-match_alg = flashana.QWeightPoint(5)
-match_alg.SetVerbosity(3)
-
-match_alg_1 = flashana.CommonAmps(xv,yv,zv,5)
-match_alg_1.UsePhotonLibrary(True)
-match_alg_1.SetScore(0.8)
-match_alg_1.SetPercent(0.68)
-
-my_unit.Manager().SetAlgo(match_alg)
-
+my_unit.Manager().Configure( "%s/SelectionTool/OpT0Finder/App/mac/flashmatch.fcl" % os.environ['LARLITE_USERDEVDIR'])
 
 print
 print  "Finished configuring ana_processor. Start event loop!"

@@ -6,34 +6,24 @@
 #include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
 #include <TMinuit.h>
 #include <cmath>
-
+#include <numeric>
 namespace flashana {
 
   QLLMatch* QLLMatch::_me = nullptr;
 
   void  MIN_vtx_qll (Int_t &, Double_t *, Double_t &, Double_t *, Int_t);
 
-  QLLMatch::QLLMatch()
-    : _pmt_x_v()
-    , _pmt_y_v()
-    , _pmt_z_v()
+  QLLMatch::QLLMatch(const std::string name)
+    : BaseFlashMatch(name)
+    , _record(false)
+    , _normalize(false)
     , _minuit_ptr(nullptr)
-    , _use_library(false)
   {}
 
-  void QLLMatch::UsePhotonLibrary(bool use)
-  { _use_library = use;}
-
-  void QLLMatch::SetOpDetPositions( const std::vector<double>& pos_x,
-				    const std::vector<double>& pos_y,
-				    const std::vector<double>& pos_z )
+  void QLLMatch::Configure(const ::fcllite::PSet &pset)
   {
-    if(pos_x.size() != pos_y.size() || pos_x.size() != pos_z.size() )
-      throw OpT0FinderException("Unmatching optical detector position array length!");
-    _pmt_x_v = pos_x;
-    _pmt_y_v = pos_y;
-    _pmt_z_v = pos_z;
-
+    _record = pset.get<bool>("RecordHistory");
+    _normalize = pset.get<bool>("NormalizeHypothesis");
   }
 
   FlashMatch_t QLLMatch::Match(const QCluster_t& pt_v, const Flash_t& flash)
@@ -46,109 +36,92 @@ namespace flashana {
     if(isnan(_qll)) return res;
     res.tpc_point.x = res.tpc_point.y = res.tpc_point.z = 0;
     res.score = 1./_qll;
-    double weight_sum = 0;
-    for(auto const& pt : _var_trk) {
 
-      double weight = 0;
+    double weight=0;
+    for(size_t pmt_index = 0; pmt_index < NOpDets(); ++pmt_index) {
 
-      for(size_t pmt_index = 0; pmt_index < _pmt_x_v.size(); ++pmt_index) {
-	
-	double r2 = ( pow( _pmt_x_v[pmt_index] - pt.x, 2 ) +
-		      pow( _pmt_y_v[pmt_index] - pt.y, 2 ) +
-		      pow( _pmt_z_v[pmt_index] - pt.z, 2 ) );
-	
-	weight += pt.q / r2;
-      }
+      res.tpc_point.x += OpDetX(pmt_index) * _hypothesis.pe_v[pmt_index];
+      res.tpc_point.y += OpDetY(pmt_index) * _hypothesis.pe_v[pmt_index];
+      res.tpc_point.z += OpDetZ(pmt_index) * _hypothesis.pe_v[pmt_index];
 
-      res.tpc_point.x += pt.x * weight;
-      res.tpc_point.y += pt.y * weight;
-      res.tpc_point.z += pt.z * weight;
-
-      weight_sum += weight;
+      weight += _hypothesis.pe_v[pmt_index];
     }
-    res.tpc_point.x /= weight_sum;
-    res.tpc_point.y /= weight_sum;
-    res.tpc_point.z /= weight_sum;
+
+    res.tpc_point.x /= weight;
+    res.tpc_point.y /= weight;
+    res.tpc_point.z /= weight;
+    res.tpc_point.q = weight;
 
     return res;
   }
 
-  const std::vector<double>& QLLMatch::ChargeHypothesis(const QCluster_t& trk) {
-
-    double qmax = 0;
-    if(_pmt_x_v.empty()) Print(msg::kEXCEPTION,__FUNCTION__,"PMT Geometry not set!");
-    if(_qll_hypothesis_v.empty()) _qll_hypothesis_v.resize(_pmt_x_v.size(),0);
-    if(_qll_hypothesis_v.size() != _pmt_x_v.size())
+  const Flash_t& QLLMatch::ChargeHypothesis(const double xoffset)
+  {    
+    if(_hypothesis.pe_v.empty()) _hypothesis.pe_v.resize(NOpDets(),0.);
+    if(_hypothesis.pe_v.size() != NOpDets())
       Print(msg::kEXCEPTION,__FUNCTION__,"Hypothesis vector length != PMT count");
-
-    for(auto& v : _qll_hypothesis_v) v=0;
     
-    for(size_t pmt_index=0; pmt_index < _pmt_x_v.size(); ++pmt_index) {
+    for(auto& v : _hypothesis.pe_v) v=0;
 
-      for(size_t pt_index=0; pt_index < trk.size(); ++pt_index) {
-
-	auto const& pt = trk[pt_index];
-
-	if(!_use_library) {
-
-	  double dx = _pmt_x_v[pmt_index] - pt.x;
-	  double dy = _pmt_y_v[pmt_index] - pt.y;
-	  double dz = _pmt_z_v[pmt_index] - pt.z;
-	  
-	  double r2 = ( pow(dx,2) + pow(dy,2) + pow(dz,2) );
-	  
-	  double angle = dx / sqrt(r2);
-
-	  if(angle<0) angle *= -1;
-	
-	  _qll_hypothesis_v[pmt_index] += pt.q * angle / r2;
-	}else{
-
-	  double q = pt.q;
-	  q *= ::phot::PhotonVisibilityService::GetME().GetVisibility(pt.x,pt.y,pt.z,pmt_index);
-	  _qll_hypothesis_v[pmt_index] += q;
-	    
-	}
-      }
-      if(_qll_hypothesis_v[pmt_index] > qmax) qmax = _qll_hypothesis_v[pmt_index];
+    // Apply xoffset
+    _var_trk.resize(_raw_trk.size());
+    for(size_t pt_index=0;pt_index<_raw_trk.size();++pt_index) {
+      //std::cout << "x point : " << _raw_trk[pt_index].x << "\t offset : " << xoffset << std::endl;
+      _var_trk[pt_index].x = _raw_trk[pt_index].x + xoffset;
+      _var_trk[pt_index].y = _raw_trk[pt_index].y;
+      _var_trk[pt_index].z = _raw_trk[pt_index].z;
+      _var_trk[pt_index].q = _raw_trk[pt_index].q;
     }
-      
-    //for(auto& v : _qll_hypothesis_v) v /= qmax;
-    double qsum =0;
-    for(auto const& v : _qll_hypothesis_v) qsum += v;
-    for(auto& v : _qll_hypothesis_v) v/= qsum;
+
+    FillEstimate(_var_trk,_hypothesis);
+
+    if(_normalize) {
+      double qsum = std::accumulate(std::begin(_hypothesis.pe_v),
+				    std::end(_hypothesis.pe_v),
+				    0.0);
+      for(auto& v : _hypothesis.pe_v) v /= qsum;
+    }
     
-    return _qll_hypothesis_v;
+    return _hypothesis;
   }
 
-  const QCluster_t& QLLMatch::VarTrack(double x)
-  {
-    for(size_t i=0; i<_raw_trk.size(); ++i) {
+  const Flash_t& QLLMatch::Measurement() const
+  { return _measurement; }
 
-      _var_trk[i] = _raw_trk[i];
-
-      _var_trk[i].x += x;
-
-    }
-    return _var_trk;
-  }
-
-  double QLLMatch::QLL(const std::vector<double>& qll_hypothesis)
+  double QLLMatch::QLL(const Flash_t& hypothesis,
+		       const Flash_t& measurement)
   {
     double result = 0;
     double nvalid_pmt = 0;
-    for(size_t pmt_index=0; pmt_index < qll_hypothesis.size(); ++pmt_index) {
 
-      if( _flash_pe_v[pmt_index] < 0.01 ) continue;
+    double PEtot_Hyp = 0;
+    for (auto const& pe : hypothesis.pe_v)
+      PEtot_Hyp += pe;
+    double PEtot_Obs = 0;
+    for (auto const& pe : measurement.pe_v)
+      PEtot_Obs += pe;
+    
+
+    if(measurement.pe_v.size() != hypothesis.pe_v.size())
+      throw OpT0FinderException("Cannot compute QLL for unmatched length!");
+    for(size_t pmt_index=0; pmt_index < hypothesis.pe_v.size(); ++pmt_index) {
+
+      if( measurement.pe_v[pmt_index] < 0.01 ) continue;
 
       nvalid_pmt += 1;
+
+      auto O = measurement.pe_v[pmt_index]; // observation
+      auto H = hypothesis.pe_v[pmt_index];  // hypothesis
+
+      result += (O-H)*(O-H)/(O+H);
       
-      result += std::fabs( qll_hypothesis[pmt_index] - _flash_pe_v[pmt_index] ) * _flash_pe_v[pmt_index];
+      //result += std::fabs(  ) * measurement.pe_v[pmt_index];
 
     }
 
-    return result / nvalid_pmt;
+    //std::cout << "PE hyp : " << PEtot_Hyp << "\tPE Obs : " << PEtot_Obs << "\t Chi^2 : " << result << std::endl;
 
+    return result / nvalid_pmt;
   }
   
   void MIN_vtx_qll(Int_t & /*Npar*/,
@@ -157,9 +130,12 @@ namespace flashana {
 		   Double_t * Xval,
 		   Int_t /*Flag*/){
 
-    auto const& var_trk = QLLMatch::GetME().VarTrack(Xval[0]);
-    auto const& qll_hypothesis = QLLMatch::GetME().ChargeHypothesis(var_trk);
-    Fval = QLLMatch::GetME().QLL( qll_hypothesis );
+    //std::cout << "minuit offset : " << Fval << std::endl;
+    ///std::cout << "minuit Xval?? : " << *Xval << std::endl;
+    
+    auto const& hypothesis  = QLLMatch::GetME().ChargeHypothesis(Fval);
+    auto const& measurement = QLLMatch::GetME().Measurement();
+    Fval = QLLMatch::GetME().QLL( hypothesis, measurement );
 
     QLLMatch::GetME().Record(Fval,Xval[0]);
 
@@ -168,17 +144,16 @@ namespace flashana {
 
   double QLLMatch::CallMinuit(const QCluster_t& tpc, const Flash_t& pmt) {
 
-    if(_flash_pe_v.empty()) {
-      if(_pmt_x_v.empty()) throw OpT0FinderException("No optical detector found!");
-      _flash_pe_v.resize(_pmt_x_v.size(),0);
-    }else if(_flash_pe_v.size() != _pmt_x_v.size())
+    if(_measurement.pe_v.empty()) {
+      _measurement.pe_v.resize(NOpDets(),0.);
+    }
+    if(_measurement.pe_v.size() != pmt.pe_v.size())
       throw OpT0FinderException("PMT dimension has changed!");
 
     //
     // Prepare TPC
     //
     _raw_trk.resize(tpc.size());
-    _var_trk.resize(tpc.size());
 
     double min_x = 1e9;
     for(size_t i=0; i<tpc.size(); ++i) {
@@ -201,7 +176,7 @@ namespace flashana {
 
     for(size_t i=0; i<pmt.pe_v.size(); ++i)
 
-      _flash_pe_v[i] = pmt.pe_v[i] / max_pe;
+      _measurement.pe_v[i] = pmt.pe_v[i] / max_pe;
 
     _minimizer_record_fval_v.clear();
     _minimizer_record_x_v.clear();
@@ -215,13 +190,13 @@ namespace flashana {
     double  arglist[2],error[4],Fmin,Fedm,Errdef;
     ierrflag = npari = nparx = istat = 0;
 
-    _minuit_ptr->SetPrintLevel(-1);
+    _minuit_ptr->SetPrintLevel(3);
     arglist[0] = 1.0;
     _minuit_ptr->mnexcm("SET STR",arglist,1,ierrflag);
 
     _minuit_ptr->SetFCN(MIN_vtx_qll);
 
-    _minuit_ptr->DefineParameter (0,"X", reco_x, 10, 0.0, 256.);
+    _minuit_ptr->DefineParameter (0,"X", reco_x, 1, 0.0, 256.);
 
     _minuit_ptr->Command("SET NOW");
 
@@ -240,7 +215,7 @@ namespace flashana {
     // Transfer the minimization variables:
     MIN_vtx_qll(nPar, grad, Fmin,
 		fValue, ierrflag);
-    static bool show = true;
+    //static bool show = true;
     /*
     if(show){
       if(Fmin!=MinFval)std::cout<<"Fmin "<<Fmin<<" not equall to "<<MinFval<<std::endl;
@@ -249,8 +224,8 @@ namespace flashana {
     */
 
     // Transfer the minimization variables:
-    _reco_x = reco_x;
-    _reco_x_err = reco_x_err;
+    _reco_x_offset = reco_x;
+    _reco_x_offset_err = reco_x_err;
     _qll    = MinFval;
 
     // Clear:
