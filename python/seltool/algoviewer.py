@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 #viewers
 plt.ion()
 
-def getViewer(name):
-    display = ERViewer(name)
+def getViewer(name,w=4,h=8):
+    display = ERViewer(name,width=w,height=h)
     #display.set_window_title(name)
     return display
 
@@ -44,13 +44,14 @@ def viewAll(mcDisplay, mcData, mcPart, recoDisplay, recoData, recoPart):
 
 def view(display, data, part):
 
-    display_reco = ERViewer("view")
-    display_reco.set_window_title("Reco Objects")
+    display.clear()
+    
+    #display_reco = ERViewer("view")
+    #display_reco.set_window_title("Reco Objects")
 
    # del display_mc
 
-    display_reco.clear()
+    display.add(part,data,False)
 
-    display_reco.add(part,data,False)
-
-    display_reco.show()
+    display.show()
+    #return display

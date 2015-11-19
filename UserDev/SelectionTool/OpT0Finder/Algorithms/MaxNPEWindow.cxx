@@ -12,7 +12,7 @@ namespace flashana {
     : BaseFlashFilter(name)
     , _time_lower_bound(-0.1) // Default T1 in micro-second
     , _time_upper_bound(8.)   // Default T2 in micro-second
-    , _npe_threshold(50)       // Default # p.e. as a threshold
+    , _npe_threshold(10)       // Default # p.e. as a threshold
   {}
 
   void MaxNPEWindow::Configure(const ::fcllite::PSet &pset)
