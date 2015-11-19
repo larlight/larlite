@@ -34,7 +34,7 @@ namespace flashana {
   public:
     
     /// Default constructor
-    QWeightPoint(const std::string name);
+    QWeightPoint(const std::string name="QWeightPoint");
     
     /// Default destructor
     ~QWeightPoint(){}
