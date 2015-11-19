@@ -5,6 +5,7 @@
 #include "DataFormat/calorimetry.h"
 #include "DataFormat/partid.h"
 #include "DataFormat/track.h"
+#include "DataFormat/mctrack.h"
 
 namespace larlite {
 
@@ -15,8 +16,33 @@ namespace larlite {
   
   bool LookPIDA::analyze(storage_manager* storage) {
 
+    //    std::cout<<"@@@@@@@@ New Event @@@@@@@@"<<std::endl;
+    
     //Let's start by cleaning up the analysis TTree
     ClearTreeVar();
+
+
+
+    // Retrieve mctrack data product
+    auto ev_mct = storage->get_data<event_mctrack>("mcreco");
+    
+    if(!ev_mct || !(ev_mct->size())) {
+      print(msg::kERROR,__FUNCTION__,"MCTrack data product not found!");
+      return false;
+    }
+    
+    for(auto const& mct : *ev_mct)
+      {
+	if(mct.dEdx().size()){
+	  for(unsigned int i = 0; i < mct.dEdx().size();++i)
+	    {
+	      if(mct.dEdx()[i]>100.)  std::cout<<"Track instant dEdx["<<i<<"] : "<<mct.dEdx()[i]<<" "<<mct.dEdx(i)<<" dX:  "<<mct.dX(i)<<std::endl;
+	    }      
+	}
+	std::cout<<"###### New Track #######"<<std::endl;
+      }
+    
+
 
     auto const ev_track = storage->get_data<event_track>("trackkalmanhit");
     
@@ -57,15 +83,15 @@ namespace larlite {
 	return false;
       }
     
-      std::cout<<"ass_pid_v  Size: "<< ass_pid_v[track_index].size()<<"\n";
-      std::cout<<"PIDA: "<< ev_pid->at(ass_pid_v[track_index][0]).PIDA()<<"\n"; // it's one per plane 
-      std::cout<<"PIDA: "<< ev_pid->at(ass_pid_v[track_index][1]).PIDA()<<"\n"; // there should be a plane id object
-      std::cout<<"PIDA: "<< ev_pid->at(ass_pid_v[track_index][2]).PIDA()<<"\n"; // we need to check into DataFormat
+      //std::cout<<"ass_pid_v  Size: "<< ass_pid_v[track_index].size()<<"\n";
+      //std::cout<<"PIDA: "<< ev_pid->at(ass_pid_v[track_index][0]).PIDA()<<"\n"; // it's one per plane 
+      //std::cout<<"PIDA: "<< ev_pid->at(ass_pid_v[track_index][1]).PIDA()<<"\n"; // there should be a plane id object
+      //std::cout<<"PIDA: "<< ev_pid->at(ass_pid_v[track_index][2]).PIDA()<<"\n"; // we need to check into DataFormat
     
-      std::cout<<"ass_calo_v  Size: "<< ass_calo_v[track_index].size()<<"\n";
-      std::cout<<"Calo: "<< ev_calo->at(ass_calo_v[track_index][0]).dEdx()[0]<<"\n"; // it's one per plane
-      std::cout<<"Calo: "<< ev_calo->at(ass_calo_v[track_index][1]).dEdx()[0]<<"\n"; // and dEdx is a vector!
-      std::cout<<"Calo: "<< ev_calo->at(ass_calo_v[track_index][2]).dEdx()[0]<<"\n"; // once again, we need to look into DataFormat
+      //std::cout<<"ass_calo_v  Size: "<< ass_calo_v[track_index].size()<<"\n";
+      //std::cout<<"Calo size: "<< ev_calo->at(ass_calo_v[track_index][0]).dEdx().size()<<"\n"; // it's one per plane
+      //std::cout<<"Calo size: "<< ev_calo->at(ass_calo_v[track_index][1]).dEdx().size()<<"\n"; // and dEdx is a vector!
+      //std::cout<<"Calo size: "<< ev_calo->at(ass_calo_v[track_index][2]).dEdx().size()<<"\n"; // once again, we need to look into DataFormat
 
       fPIDA_0.push_back(ev_pid->at(ass_pid_v[track_index][0]).PIDA());
       fPIDA_1.push_back(ev_pid->at(ass_pid_v[track_index][1]).PIDA());
@@ -76,12 +102,8 @@ namespace larlite {
       fdEdx_2.push_back(ev_calo->at(ass_calo_v[track_index][2]).dEdx()[0]);
     } // End on tracks loop
 
-    //    for(auto const& pid : *ev_pid)
-    //  {
-    //	hPIDA->Fill(pid.PIDA());
-	//std::cout<<"PIDA: "<<pid.PIDA()<<std::endl;
-    //  }
 
+    
     fPIDATree->Fill();
     return true;
   }
