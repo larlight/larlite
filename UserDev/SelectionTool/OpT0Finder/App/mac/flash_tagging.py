@@ -1,4 +1,5 @@
 import sys,ROOT
+import pdb
 
 def pmt_pos():
     xv = ROOT.std.vector("double")()
@@ -25,6 +26,7 @@ from larlite import larlite as fmwk
 from ROOT import flashana
 
 # Create ana_processor instance
+pdb.set_trace()
 my_proc = fmwk.ana_processor()
 
 # Set input root file

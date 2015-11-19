@@ -33,7 +33,7 @@ namespace larlite{
   public:
     
     /// Default constructor
-    data_base(unsigned short type = data::kDATA_TYPE_MAX);
+    data_base(unsigned short type = larlite::data::kDATA_TYPE_MAX);
 
     /// Default copy constructor to avoid memory leak in ROOT streamer
     data_base(const data_base &original) : _type(original._type) {}

@@ -44,7 +44,7 @@ namespace larlite {
 	//loop over all particles to look topology 1 pi0 and no pi+/-
 	for(auto const& p : mcpart){
 		if(p.PdgCode()==111 && p.StatusCode()==1) totalpi0+=1;
-		if( abs( p.PdgCode() == 13 ) && p.StatusCode() == 1) mu+=1;  
+		if(abs(p.PdgCode()) == 13  && p.StatusCode() == 1) mu+=1;  
 		if(abs(p.PdgCode())==211 && p.StatusCode()==1) cmeson+=1;
 		   }// loop over mcparts
 
