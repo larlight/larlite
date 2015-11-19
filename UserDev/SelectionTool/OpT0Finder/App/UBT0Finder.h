@@ -60,6 +60,11 @@ namespace larlite {
 
     void SetEDiff(double e) { _e_diff = e ; }
 
+    void UseAbsolutePE(bool tof) { _useAbsPE = tof ; }
+
+    void SetStepLength(double step){ _step_len = step ; }
+
+
   protected:
 
     ::flashana::FlashMatchManager _mgr;
@@ -76,14 +81,17 @@ namespace larlite {
     // for MC this is generally 0
     double _Trig_time; // us
 
+    // Configurable params
     bool _use_mc;
-
-    TTree* _ophit_tree; 
-    double _pktime;
+    bool _useAbsPE ;
+    double _step_len ;
+    double _e_diff ; //Energy difference cut between start and end of track.  
 
     TTree* _int_tree;
     double _t0 ;
     double _n_pe ;
+    double _int_e ;
+    double _n_flash ;
 
     TTree* _track_tree;
     double _trk_time;
@@ -92,7 +100,7 @@ namespace larlite {
     double _trk_min_x;
     double _trk_x;
     
-    TTree* _tree;
+    TTree* _flashmatch_tree;
     double _npe;
     double _npts;
     double _flash_x;
@@ -115,18 +123,8 @@ namespace larlite {
     double _mc_edep;
     double _trk_max_abs_x, _trk_min_abs_x;
 
-    int _npe_test; 
-    TH2D * _flash_v_x ;
     TH2D * _nflash_v_nint ;
-
     TH1D * _time_diff ;
-
-    int _n_int ;     //Total interactions > 10MeV
-    int _n_int_tot ; //Total interactions 
-    double _e_diff ; //Energy difference cut between start and end of track.  
-
-    int _n_matches ;
-		     
 
   };
 }

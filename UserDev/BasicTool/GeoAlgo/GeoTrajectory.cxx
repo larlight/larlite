@@ -21,12 +21,20 @@ namespace geoalgo {
     for(auto const& p : obj) this->push_back(p);
   }
 
-  double Trajectory::Length() const {
-    
+  double Trajectory::Length(size_t start_step,size_t end_step) const {
+
+    if(end_step == 0) end_step = size() - 1; // By default end_step is 0. Then consider the whole trajectory()
+
+    // Sanity checks
+    if(start_step >= end_step) throw GeoAlgoException("Cannot have start step >= end step!");
+
+    if(end_step >= size()) throw GeoAlgoException("Requested step index bigger than size!");
+
+    // if length < 2, no length
     if(size()<2) return 0;
     
     double length = 0;
-    for(size_t i=0; i<size()-1; ++i) 
+    for(size_t i=start_step; i<end_step; ++i)
       
       length += (*this)[i]._Dist_((*this)[i+1]);
     

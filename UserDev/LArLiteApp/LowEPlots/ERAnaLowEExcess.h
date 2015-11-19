@@ -66,6 +66,9 @@ namespace ertool {
 
     geoalgo::AABox TPC;
 
+    // Calc new E_nu^calo, with missing pT cut
+    double EnuCaloMissingPt(const std::vector< ::ertool::NodeID_t >& Children, const ParticleGraph &graph);
+
     
   private:
 

@@ -8,12 +8,19 @@
 //#include <functional>
 namespace flashana {
 
-  MaxNPEWindow::MaxNPEWindow()
-    : BaseFlashFilter()
+  MaxNPEWindow::MaxNPEWindow(const std::string name)
+    : BaseFlashFilter(name)
     , _time_lower_bound(-0.1) // Default T1 in micro-second
     , _time_upper_bound(8.)   // Default T2 in micro-second
     , _npe_threshold(50)       // Default # p.e. as a threshold
   {}
+
+  void MaxNPEWindow::Configure(const ::fcllite::PSet &pset)
+  {
+    _time_lower_bound = pset.get<double>("TimeLowerBound");
+    _time_upper_bound = pset.get<double>("TimeUpperBound");
+    _npe_threshold    = pset.get<double>("NPEThreshold"  );
+  }
 
   IDArray_t MaxNPEWindow::Filter(const FlashArray_t& flash_v)
   {

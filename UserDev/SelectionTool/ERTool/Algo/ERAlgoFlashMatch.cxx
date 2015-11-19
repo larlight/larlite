@@ -3,11 +3,18 @@
 
 #include "ERAlgoFlashMatch.h"
 #include <set>
+#include <sstream>
 #include "OpT0Helper.h"
-#include "OpT0Finder/Algorithms/NPtFilter.h"
+#include "OpT0Finder/Algorithms/QLLMatch.h"
+#include "OpT0Finder/Algorithms/ChargeAnalytical.h"
+#include "OpT0Finder/Algorithms/PhotonLibHypothesis.h"
 #include "OpT0Finder/Algorithms/MaxNPEWindow.h"
 #include "OpT0Finder/Algorithms/QWeightPoint.h"
-#include "OpT0Finder/Algorithms/QLLMatch.h"
+#include "OpT0Finder/Algorithms/CommonAmps.h"
+#include "OpT0Finder/Algorithms/NPtFilter.h"
+#include "OpT0Finder/Algorithms/TimeCompatMatch.h"
+//#include "OpT0Finder/Algorithms/FlashHypo.h"
+
 namespace ertool {
 
   ERAlgoFlashMatch::ERAlgoFlashMatch(const std::string& name) : AlgoBase(name)
@@ -20,51 +27,67 @@ namespace ertool {
   {
 
     auto p = cfg.get_pset(Name());
-    std::vector<double> opdet_x_v = p.get< std::vector<double> >("OpDetPosition_X");
-    std::vector<double> opdet_y_v = p.get< std::vector<double> >("OpDetPosition_Y");
-    std::vector<double> opdet_z_v = p.get< std::vector<double> >("OpDetPosition_Z");
 
-    _beam_dt_min = p.get<double>("BeamDTMin");
-    _beam_dt_max = p.get<double>("BeamDTMax");
+    std::string ertool_cfg_file = p.get<std::string>("ConfigFile");
 
-    if(opdet_x_v.size() != opdet_y_v.size() || opdet_x_v.size() != opdet_z_v.size())
-      throw ERException("Optical Detector Position dimension does not match among x/y/z!");
+    ertool_cfg_file = std::string(getenv("LARLITE_BASEDIR")) + "/" + ertool_cfg_file;
 
-    _mgr.SetAlgo(new ::flashana::NPtFilter);
-    _mgr.SetAlgo(new ::flashana::MaxNPEWindow);
-
-    std::string match_algo = p.get<std::string>("MatchAlgo");
-
-    if(match_algo == "QWeightPoint") {
-      auto alg_pset = p.get_pset(match_algo);
-      double step_size   = alg_pset.get< double > ("StepSize");
-      double zdiff_max   = alg_pset.get< double > ("ZDiffMax");
-      bool   use_library = alg_pset.get< bool   > ("UseLibrary");
-      std::vector<double> xrange = alg_pset.get< std::vector<double> >("XRange"         );
-
-      if(xrange.size()!=2)
-	throw ERException("XRange must be length 2 vector!");
-      if(xrange[0]<=0)
-	throw ERException("XRange cannot be 0 or negative number!");
-      if(zdiff_max<=0)
-	throw ERException("ZDiffMax cannot be 0 or negative number!");
-      auto ptr = new ::flashana::QWeightPoint( opdet_x_v, opdet_y_v, opdet_z_v, step_size );
-      ptr->SetMaxZDiff(zdiff_max);
-      ptr->UsePhotonLibrary(use_library);
-      _mgr.SetAlgo(ptr);
+    std::stringstream ss;
+    //
+    // Flash Match algorithm (required)
+    //
+    std::string match_alg = p.get<std::string>( "Match" );      
+    if      ( match_alg == "QLLMatch"     ) _mgr.SetAlgo( new ::flashana::QLLMatch     () );
+    else if ( match_alg == "CommonAmps"   ) _mgr.SetAlgo( new ::flashana::CommonAmps   () );
+    else if ( match_alg == "QWeightPoint" ) _mgr.SetAlgo( new ::flashana::QWeightPoint () );
+    else {
+      ss << "Unknown Match algorithm: " << match_alg.c_str();
+      throw ERException(ss.str());
     }
-    else if(match_algo == "QLLMatch") {
-      auto alg_pset = p.get_pset(match_algo);
-      bool   use_library = alg_pset.get< bool   > ("UseLibrary");
-      auto ptr = new ::flashana::QLLMatch;
-      ptr->SetOpDetPositions(opdet_x_v,opdet_y_v,opdet_z_v);
-      ptr->UsePhotonLibrary(use_library);
-      _mgr.SetAlgo(ptr);
-    }else
-      Exception(__FUNCTION__,"FlashMatch algorithm invalid!");
-      
-    //ptr->SetVerbosity(::flashana::msg::kINFO);
 
+    //
+    // Flash Hypothesis algorithm (required)
+    //
+    std::string hypothesis_alg = p.get<std::string>( "Hypothesis" );    
+    if      ( hypothesis_alg == "PhotonLibHypothesis" ) _mgr.SetAlgo( new ::flashana::PhotonLibHypothesis () );
+    else if ( hypothesis_alg == "ChargeAnalytical"    ) _mgr.SetAlgo( new ::flashana::ChargeAnalytical    () );
+    else {
+      ss << "Unknown Hypothesis algorithm: " << hypothesis_alg.c_str();
+      throw ERException(ss.str());
+    }
+
+    //
+    // TPC filter algorithm (optional)
+    //
+    std::string tpc_filter = p.get<std::string>( "TPCFilter", "" );
+    if      ( tpc_filter == "NPtFilter" ) _mgr.SetAlgo( new ::flashana::NPtFilter () );
+    else if ( ! tpc_filter.empty()      ) {
+      ss << "Unknown TPCFilter algorithm: " << tpc_filter.c_str();
+      throw ERException(ss.str());
+    }
+
+    //
+    // Optical filter algorithm (optional)
+    //
+    std::string opt_filter = p.get<std::string>( "OpticalFilter", "" );
+    if      ( opt_filter == "MaxNPEWindow" ) _mgr.SetAlgo( new ::flashana::MaxNPEWindow () );
+    else if ( ! opt_filter.empty()      ) {
+      ss << "Unknown OpticalFilter algorithm: " << opt_filter.c_str();
+      throw ERException(ss.str());
+    }
+
+    //
+    // Match Prohibit algorithm (optional)
+    //
+    std::string prohibit_alg   = p.get<std::string>( "Prohibit", "" );
+    if      ( prohibit_alg == "TimeCompatMatch" ) _mgr.SetAlgo( new ::flashana::TimeCompatMatch () );
+    else if ( ! prohibit_alg.empty()      ) {
+      ss << "Unknown Prohibit algorithm: " << prohibit_alg.c_str();
+      throw ERException(ss.str());
+    }
+    
+    _mgr.Configure(ertool_cfg_file);
+      
   }
 
   void ERAlgoFlashMatch::ProcessBegin()

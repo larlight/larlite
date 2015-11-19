@@ -1,0 +1,66 @@
+
+#
+# Manager configuration
+#
+FlashMatchManager:{
+    Verbosity: 3
+    AllowReuseFlash: false
+}
+
+#
+# Algorithms
+#
+QLLMatch:{
+    RecordHistory: true
+    NormalizeHypothesis: false
+}
+
+QWeightPoint:{
+    XStepSize: 5.0
+    ZDiffMax:  50.0
+}
+
+CommonAmps:{
+    ScoreThreshold: 0.8
+    QFracThreshold: 0.5
+    XStepSize:      5.0
+}
+
+TimeCompatMatch:{
+    FrameDriftTime: 2.0
+}
+
+MaxNPEWindow:{
+    TimeUpperBound:  8.0
+    TimeLowerBound: -0.1
+    NPEThreshold:   10.0
+}
+
+NPtFilter:{
+    MinNumPoint: 2
+}
+
+PhotonLibHypothesis:
+{}
+
+ChargeAnalytical:
+{}
+
+#
+# Geometry (do not change by hand)
+#
+
+# PMT position arrays
+PMT_POSITION:{
+    X: [2.458,2.265,2.682,1.923,2.645,2.324,2.041,1.559,1.438,1.795,1.475,1.495,1.487,1.226,1.116,1.448,1.481,1.479,1.505,0.913,0.682,1.014,0.949,1.451,1.092,0.703,0.558,0.665,0.658,0.947,0.8211,0.862]
+    Y: [55.313,55.822,27.607,-0.722,-28.625,-56.514,-56.309,55.625,55.8,-0.502,-0.051,-56.284,-56.408,55.822,55.771,-0.549,-0.875,-56.205,-56.323,54.693,54.646,-0.706,-0.829,-57.022,-56.261,55.249,55.249,27.431,-0.303,-28.576,-56.203,-56.615]
+    Z: [951.862,911.065,989.711,865.599,990.356,951.865,911.94,751.883,711.073,796.208,664.203,751.906,711.274,540.93,500.134,585.284,453.095,540.617,500.22,328.212,287.977,373.839,242.014,328.341,287.639,128.355,87.7605,51.1015,173.743,50.4745,128.18,87.8695]
+}
+
+# Detector active volume boundary
+ACTIVE_VOLUME:{
+    X: [0.0,256.35]
+    Y: [-116.5,116.5]
+    Z: [0.0,1036.8]
+}
+

@@ -5,8 +5,14 @@
 
 namespace flashana {
 
-  NPtFilter::NPtFilter() : BaseTPCFilter()
+  NPtFilter::NPtFilter(const std::string name)
+    : BaseTPCFilter(name)
   { _min_num_pt = 2; }
+
+  void NPtFilter::Configure(const ::fcllite::PSet &pset)
+  {
+    _min_num_pt = pset.get<double>("MinNumPoint");
+  }
   
   IDArray_t NPtFilter::Filter(const QClusterArray_t& tpc_obj_v) {
 

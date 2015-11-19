@@ -15,34 +15,30 @@ namespace larlite {
   UBT0Finder::UBT0Finder()
     : _int_tree(nullptr)
     , _track_tree(nullptr)
-    , _tree(nullptr)
-    , _ophit_tree(nullptr)
+    , _flashmatch_tree(nullptr)
     , _eff_tree(nullptr)
+    , _nflash_v_nint(nullptr)
     , _time_diff(nullptr)
   {
     _name="UBT0Finder";
     _fout=0;
-    _npe_test = 0; 
 
-    _n_int     = 0;
-    _n_int_tot = 0;
-    _n_matches = 0;
     _e_diff    = 10;
+    UseAbsolutePE(false);
+    SetStepLength(0.5) ;
   }
 
   bool UBT0Finder::initialize() {
 
     _time_diff = new TH1D("time_diff","Matched Flash vs. MCTrack",100,0,500);
 
-    _flash_v_x = new TH2D("_flash_v_x","OpFlash Z Width vs TPC x point",100,0,256,100,0,1450);
     _nflash_v_nint = new TH2D("_nflash_v_nint","OpFlash with PE > 10 vs Nint/event ",50,0,50,30,0,30);
-
-    _ophit_tree = new TTree("ophit_tree","");
-    _ophit_tree->Branch("_pktime",&_pktime,"pktime/D");
 
     _int_tree = new TTree("int_tree","");
     _int_tree->Branch("_t0",&_t0,"t0/D");
     _int_tree->Branch("_n_pe",&_n_pe,"n_pe/D");
+    _int_tree->Branch("_int_e",&_int_e,"int_e/D");
+    _int_tree->Branch("_n_flash",&_n_flash,"n_flash/D");
 
     _track_tree = new TTree("track_tree","");
     _track_tree->Branch("trk_time",&_trk_time,"trk_time/D");
@@ -51,22 +47,22 @@ namespace larlite {
     _track_tree->Branch("trk_shift",&_trk_shift,"trk_shift/D");
     _track_tree->Branch("trk_x",&_trk_x,"trk_x/D");
 
-    _tree = new TTree("flash_tree","");
-    _tree->Branch("npe",&_npe,"npe/D");
-    _tree->Branch("fy",&_flash_y,"fy/D");
-    _tree->Branch("fz",&_flash_z,"fz/D");
-    _tree->Branch("tx",&_tpc_x,"tx/D");
-    _tree->Branch("ty",&_tpc_y,"ty/D");
-    _tree->Branch("tz",&_tpc_z,"tz/D");
-    _tree->Branch("ft",&_flash_time,"ft/D");
-    _tree->Branch("mct",&_mc_time,"mct/D");
-    _tree->Branch("mcE",&_mc_edep,"mcE/D");
-    _tree->Branch("mcx",&_mc_x,"mcx/D");
-    _tree->Branch("mcy",&_mc_y,"mcy/D");
-    _tree->Branch("mcz",&_mc_z,"mcz/D");
-    _tree->Branch("mc_dx",&_mc_dx,"mc_dx/D");
-    _tree->Branch("score",&_score,"score/D");
-    _tree->Branch("trk_shift",&_trk_shift,"trk_shift/D");
+    _flashmatch_tree = new TTree("flashmatch_tree","");
+    _flashmatch_tree->Branch("npe",&_npe,"npe/D");
+    _flashmatch_tree->Branch("fy",&_flash_y,"fy/D");
+    _flashmatch_tree->Branch("fz",&_flash_z,"fz/D");
+    _flashmatch_tree->Branch("tx",&_tpc_x,"tx/D");
+    _flashmatch_tree->Branch("ty",&_tpc_y,"ty/D");
+    _flashmatch_tree->Branch("tz",&_tpc_z,"tz/D");
+    _flashmatch_tree->Branch("ft",&_flash_time,"ft/D");
+    _flashmatch_tree->Branch("mct",&_mc_time,"mct/D");
+    _flashmatch_tree->Branch("mcE",&_mc_edep,"mcE/D");
+    _flashmatch_tree->Branch("mcx",&_mc_x,"mcx/D");
+    _flashmatch_tree->Branch("mcy",&_mc_y,"mcy/D");
+    _flashmatch_tree->Branch("mcz",&_mc_z,"mcz/D");
+    _flashmatch_tree->Branch("mc_dx",&_mc_dx,"mc_dx/D");
+    _flashmatch_tree->Branch("score",&_score,"score/D");
+    _flashmatch_tree->Branch("trk_shift",&_trk_shift,"trk_shift/D");
 
     if (_eff_tree) delete _eff_tree;
     _eff_tree = new TTree("_eff_tree","Efficiency Tree");
@@ -90,13 +86,16 @@ namespace larlite {
     _mgr.Reset();
     const ::larutil::Geometry* g = ::larutil::Geometry::GetME();
 
-    auto ev_flash = storage->get_data<event_opflash>("satOpFlash");// opflash");
+    auto ev_flash = storage->get_data<event_opflash>("opflash");// opflash");
+    auto ev_hit= storage->get_data<event_ophit>("satOpFlash");// opflash");
 
     if(!ev_flash || ev_flash->empty()) {
       std::cout<<"No opflash found. Skipping event: "<<storage->event_id()<<std::endl;
       return false;
     }
 
+    // For TH2D-- number of flash per event > x PE
+    // Number interactions per event > y MeV
     int n_flash = 0;
     int n_int = 0;
 
@@ -108,8 +107,7 @@ namespace larlite {
     //auto ev_track = storage->get_data<event_track>("pandoraCosmicKHit");
     auto ev_track = storage->get_data<event_track>("trackkalmanhit");
     auto ev_mctrack = storage->get_data<event_mctrack>("mcreco");
-    auto ev_hit = storage->get_data<event_ophit>("satOpFlash");
-    
+
     if(!_use_mc) {
       if (!ev_track || ev_track->empty()) return false;
       for (size_t n=0; n < ev_track->size(); n++){
@@ -138,7 +136,7 @@ namespace larlite {
     	  pt.z = pt1[2] + dz/2.;
     	  
     	  tpc_obj.emplace_back(pt);
-    	  tpc_obj.idx = n;
+	  tpc_obj.idx = n;
 	    }
 	_mgr.Emplace(std::move(tpc_obj));
       }
@@ -146,30 +144,26 @@ namespace larlite {
     }
     // use MC tracks
     else{
-      //ahack 110915
-
-      std::vector<unsigned int> usedIDs;
-
-      usedIDs.resize(0);
 
       if (!ev_mctrack || ev_mctrack->empty()) return false;
 
-      for (size_t n=0; n < ev_mctrack->size(); n++){
+      // Look at tracks on 'per interaction' basis
+      std::vector<unsigned int> usedIDs;
+      usedIDs.resize(0);
 
+      for (size_t n=0; n < ev_mctrack->size(); n++){
 //	std::cout<<"Ancestors: "<<ev_mctrack->at(n).AncestorTrackID()<<std::endl;
-	//ahack 110915, don't repeat study for used IDs
 	bool used = false ;
 	for(size_t u=0; u < usedIDs.size(); u++){
 	    if( ev_mctrack->at(n).AncestorTrackID() == usedIDs[u] )
 		used = true;
 	    }
 
-	//ahack 110915
 	auto const& trk = ev_mctrack->at(n);
 
 	::flashana::QCluster_t tpc_obj;
 
-	if(trk.size()>=2) {
+	if(trk.size()>2) {
 	  
 	  // per track calculate the shift in x-direction
 	  // so that the x-position is what would be seen
@@ -191,38 +185,34 @@ namespace larlite {
 	  }
 
 	  _track_tree->Fill();
-	 //ahack 11/09/15.  Find all tracks with same ancestor ID and add them to the tpc_obj
+	 // Find all tracks with same ancestor ID and add them to the tpc_obj
 	 if(!used){
 
 	   _t0 = trk.AncestorStart().T() ;
-
 	   _n_pe = 0 ;
-
-	    std::cout<<"\n\n\nSize: "<<ev_hit->size()<<std::endl ;
+	   
 	   for(auto const & h : *ev_hit ){
 
-	      _pktime = h.PeakTime() ;
-	      if(  h.PeakTime() >(_t0/1000. -1) && h.PeakTime() < (_t0/1000 +1))
+	      if(h.PeakTime() >(_t0/1000. -10.) && h.PeakTime() < (_t0/1000. +10.))
 		_n_pe += h.PE();
-		
 
-	     _ophit_tree->Fill(); 
-	   }
+	      }
 
+	   // Store used ancestor ids, so we do not double count energy dep assoc with this ancestor 
 	   std::vector<int> ids ;
 	   ids.resize(0);
 	   auto const & ancID = trk.AncestorTrackID() ;
+	   usedIDs.push_back(ancID);
+
 	   for (size_t m=0; m < ev_mctrack->size(); m++){
 
 	      auto const & trk2 = ev_mctrack->at(m);
 
-	      if( ancID == trk2.AncestorTrackID() && trk2.size() > 2){
-		usedIDs.push_back(ancID);
+	      if( ancID == trk2.AncestorTrackID() && trk2.size() >= 2)
 	  	ids.push_back(m) ;
-		}
+		
 	      }
 	    
-
 	  // Now loop over all mctracks that share an ancestor and treat
 	  // them as one interaction
 	  double e_diff = 0;
@@ -230,42 +220,66 @@ namespace larlite {
 	      auto const & trk3 = ev_mctrack->at(ids[j]);
 	      ::flashana::QPoint_t pt;
 
-//	    if( trk3.size() != 0 ){
 		for(size_t i=0; i < (trk3.size()-1); ++i) {
 
 	    	  auto const& pt1 = trk3[i].Position();
 	    	  auto const& pt2 = trk3[i+1].Position();
-	    	  
 	    	  double dx = pt2[0] - pt1[0];
 	    	  double dy = pt2[1] - pt1[1];
 	    	  double dz = pt2[2] - pt1[2];
+	    	  double e_diff = (trk3[i].E() - trk3[i+1].E());
+		  //std::cout<<"\nOld X, Y, Z, Q: "<<pt1[0] + dx/2. +shift_x<<", "<<pt1[1]+dy/2.<<", "<<pt1[2]+dz/2.<<", "<<(trk3[i].E() - trk3[i+1].E())<<std::endl ;
 	    	  
-	    	  pt.q = (trk3[i].E() - trk3[i+1].E());
-	    	  pt.x = pt1[0] + dx/2. + shift_x;
-	    	  pt.y = pt1[1] + dy/2.;
-	    	  pt.z = pt1[2] + dz/2.;
-	    	  
-	    	  tpc_obj.push_back(pt);
-	    	  tpc_obj.idx = n;
-	    	  }
-	        e_diff += (trk3[0].E() - trk3[trk3.size()-1].E()); 
-	      }
+		  if (_useAbsPE ){
 
-//	    }
-	    
-	    _mgr.Emplace(std::move(tpc_obj));
-	    _n_int_tot++;
-	    
-//	    std::cout<<"What's ediff ? "<<e_diff<<std::endl ;
-	    if( e_diff > _e_diff ) { 
-		_n_int++ ;
-		n_int++;
+		      double distance = pow(pow(dx,2) + pow(dy,2) + pow(dz,2),0.5) ;
+		      int n_steps = int ( distance/ _step_len ) + 1;
+		      double dedx = e_diff / distance ; //This is dedx
+		      double e_dep = dedx * _step_len ;  //This is energy dep for each step. This works for all but last, smaller step
+
+		      for(size_t ii=1; ii<= n_steps; ii++){
+
+		    	  //energy deposition is 0.5*e_dep all times except last step
+		    	  if (ii*_step_len > distance)
+		    	      e_dep *= (distance - (ii-1)*_step_len)/_step_len ;
+
+	    	      	  pt.q = e_dep * 29000; 
+	    	      	  pt.x = pt1[0] + dx/n_steps * (ii - 1 + 0.5) + shift_x;
+	    	      	  pt.y = pt1[1] + dy/n_steps * (ii - 1 + 0.5);
+	    	      	  pt.z = pt1[2] + dz/n_steps * (ii - 1 + 0.5);
+			  //std::cout<<"New X, Y, Z, Q: "<<", "<<pt.x<<", "<<pt.y<<", "<<pt.z<<", "<<pt.q/29000<<std::endl; 
+
+	    	      	  tpc_obj.push_back(pt);
+	    	      	  tpc_obj.idx = n;
+		    	  }	
+		     }
+		  else{
+
+	    	  	pt.q = (trk3[i].E() - trk3[i+1].E());
+	    	  	pt.x = pt1[0] + dx/2. + shift_x;
+	    	  	pt.y = pt1[1] + dy/2.;
+	    	  	pt.z = pt1[2] + dz/2.;
+
+	    	      	tpc_obj.push_back(pt);
+	    	      	tpc_obj.idx = n;
+			}
+		  
 		}
+	        e_diff += (trk3[0].E() - trk3[trk3.size()-1].E()); 
+	  }
+	  
+	  
+	    _mgr.Emplace(std::move(tpc_obj));
+	    
+	    if( e_diff > _e_diff ) 
+		n_int++;
+
+	  _int_e = e_diff ;
+	  _n_flash = n_flash;
 		
 	  _int_tree->Fill();		
-          }// if index has not already been used
+	 }// if index has not already been used
 	}// if the track is at least 2 elements long
-
       }// for all tracks
 
     }
@@ -308,7 +322,6 @@ namespace larlite {
     ::geoalgo::Point_t pt(0,0,0);
     ::geoalgo::GeoAlgo geoalg;
     for(auto const& match : res) {
-      _n_matches++;
       auto const& flash = (*ev_flash)[match.flash_id];
       _flash_y = flash.YCenter();
       _flash_z = flash.ZCenter();
@@ -319,8 +332,6 @@ namespace larlite {
       _score   = match.score;
       _flash_time = flash.Time();
       _mc_time = _mc_x = _mc_y = _mc_z = -1;
-	
-      _flash_v_x->Fill(match.tpc_point.x, flash.ZWidth());
 	
       if(_use_mc) {
 	
@@ -357,7 +368,7 @@ namespace larlite {
       if( mct[0].E() - mct[mct.size()-1].E() > _e_diff )
 	_time_diff->Fill(1000*(_flash_time - _mc_time)); //
       }
-      _tree->Fill();
+      _flashmatch_tree->Fill();
 
     }// for all matches
 
@@ -426,26 +437,30 @@ namespace larlite {
   bool UBT0Finder::finalize() {
     if(_fout) {
 
-      std::cout<<"Number of int with > "<<_e_diff<<" MeV and total : "<<_n_int<<", "<<_n_int_tot<<std::endl ;
 
       _fout->cd();
-
-      _flash_v_x->GetXaxis()->SetTitle("TPC x position of match");
-      _flash_v_x->GetYaxis()->SetTitle("Flash Z Width");
       _time_diff->GetXaxis()->SetTitle("Delta T [ns]" );
 
-      std::cout<<"\n% Total interactions that were matched      : "<<float(_n_matches)/_n_int *100 <<"%, "<<_n_matches<<", "<<_n_int<<std::endl;
-      std::cout<<"% Matches whose deltaT falls within 40-120ns: "<<_time_diff->Integral(8,24)/_n_int *100<<"%, "<<_time_diff->Integral(8,24)<<", "<<_n_int<<std::endl ;
-      std::cout<<"% Correctness (good matches/total matches)  : " <<_time_diff->Integral(8,24)/_n_matches*100<<"%, "<<_time_diff->Integral(8,24)<<", "<<_n_matches<<std::endl;
+      auto eligible_matches = _int_tree->GetEntries() ;
+
+//      std::cout<<"\n#flashes with > 10PE flash : "<<_int_tree->GetEntries("_n_flash > 0")<<std::endl ;
+
+      std::cout<<"\nEfficiency (#matches/#interactions)  : "<<float(_flashmatch_tree->GetEntries())/eligible_matches *100 <<"%, ("<<_flashmatch_tree->GetEntries()<<"/"<<eligible_matches<<")"<<std::endl;
+      std::cout<<"Correctness (#good matches/#matches) : " <<_time_diff->Integral(8,24)/_flashmatch_tree->GetEntries()*100<<"%, ("<<_time_diff->Integral(8,24)<<"/"<<_flashmatch_tree->GetEntries()<<")"<<std::endl;
+
+
+      
+//      std::cout<<"Number of int with > "<<_e_diff<<" MeV and total : "<<_int_tree->GetEntries("_int_e > 10")<<", "<<_int_tree->GetEntries()<<std::endl ;
+//      std::cout<<"\n% Total interactions that were matched      : "<<float(_flashmatch_tree->GetEntries())/_int_tree->GetEntries("_int_e > 10") *100 <<"%, "<<_flashmatch_tree->GetEntries()<<", "<<_int_tree->GetEntries("_int_e > 10")<<std::endl;
+//      std::cout<<"% Matches whose deltaT falls within 40-120ns: "<<_time_diff->Integral(8,24)/_int_tree->GetEntries("_int_e > 10") *100<<"%, "<<_time_diff->Integral(8,24)<<", "<<_int_tree->GetEntries("_int_e > 10")<<std::endl ;
+//      std::cout<<"% Correctness (good matches///total matches)  : " <<_time_diff->Integral(8,24)/_flashmatch_tree->GetEntries()*100<<"%, "<<_time_diff->Integral(8,24)<<", "<<_flashmatch_tree->GetEntries()<<std::endl;
 
 
 
-      _tree->Write();
+      _flashmatch_tree->Write();
       _int_tree->Write();
-      _ophit_tree->Write();
       _track_tree->Write();
       _eff_tree->Write();
-      _flash_v_x->Write();
       _nflash_v_nint->Write();
       _time_diff->Write();
     }
