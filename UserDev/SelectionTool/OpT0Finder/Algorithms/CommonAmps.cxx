@@ -22,10 +22,10 @@ namespace flashana {
     _score   = pset.get<double>("ScoreThreshold");
     _x_step_size = pset.get<double>("XStepSize");
   }
-
+  
   FlashMatch_t CommonAmps::Match(const QCluster_t& pt_v, const Flash_t& flash)
   {
-
+    
     double integral_op  = std::accumulate(std::begin(flash.pe_v),
 					  std::end(flash.pe_v),
 					  0.0);
@@ -40,7 +40,8 @@ namespace flashana {
     std::multimap<double,int> ampToOpDet ;
 
     for(size_t k=0; k<32; k++)
-        ampToOpDet.emplace(1/(flash.pe_v[k]/integral_op),k);
+      ampToOpDet.emplace(1./(flash.pe_v[k]/integral_op),k);
+    
 
     // Now that opdet hits are normalized and ordered, store indices for PMTs which 
     // had the greatest hit amplitudes up to _percent of total PMT hits

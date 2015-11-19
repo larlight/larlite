@@ -1,4 +1,5 @@
 import sys,ROOT
+import os
 
 def pmt_pos():
     xv = ROOT.std.vector("double")()
@@ -35,9 +36,9 @@ geo = larutil.Geometry.GetME()
 xv,yv,zv = pmt_pos()
 
 match_alg = flashana.QLLMatch.GetME()
-
 match_mgr = flashana.FlashMatchManager()
 match_mgr.SetAlgo(match_alg)
+match_mgr.SetAlgo(flashana.PhotonLibHypothesis())
 match_mgr.Configure( "%s/SelectionTool/OpT0Finder/App/mac/flashmatch.fcl" % os.environ['LARLITE_USERDEVDIR'])
 
 tch = TChain("opflash_%s_tree" % PRODUCER_NAME)

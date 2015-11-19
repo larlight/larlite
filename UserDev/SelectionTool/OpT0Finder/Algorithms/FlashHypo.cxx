@@ -94,7 +94,6 @@ namespace flashana{
     ::geoalgo::GeoAlgo _geoAlgo;
     std::vector<double> PE_PL;
     QCluster_t result;
-
     PE_PL.resize(32, 0.0);
     result.clear();
     ::geoalgo::AABox _vfiducial(_xmin, _ymin, _zmin,

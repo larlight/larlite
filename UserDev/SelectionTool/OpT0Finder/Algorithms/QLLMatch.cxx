@@ -66,6 +66,7 @@ namespace flashana {
     // Apply xoffset
     _var_trk.resize(_raw_trk.size());
     for(size_t pt_index=0;pt_index<_raw_trk.size();++pt_index) {
+      //std::cout << "x point : " << _raw_trk[pt_index].x << "\t offset : " << xoffset << std::endl;
       _var_trk[pt_index].x = _raw_trk[pt_index].x + xoffset;
       _var_trk[pt_index].y = _raw_trk[pt_index].y;
       _var_trk[pt_index].z = _raw_trk[pt_index].z;
@@ -92,6 +93,15 @@ namespace flashana {
   {
     double result = 0;
     double nvalid_pmt = 0;
+
+    double PEtot_Hyp = 0;
+    for (auto const& pe : hypothesis.pe_v)
+      PEtot_Hyp += pe;
+    double PEtot_Obs = 0;
+    for (auto const& pe : measurement.pe_v)
+      PEtot_Obs += pe;
+    
+
     if(measurement.pe_v.size() != hypothesis.pe_v.size())
       throw OpT0FinderException("Cannot compute QLL for unmatched length!");
     for(size_t pmt_index=0; pmt_index < hypothesis.pe_v.size(); ++pmt_index) {
@@ -99,13 +109,19 @@ namespace flashana {
       if( measurement.pe_v[pmt_index] < 0.01 ) continue;
 
       nvalid_pmt += 1;
+
+      auto O = measurement.pe_v[pmt_index]; // observation
+      auto H = hypothesis.pe_v[pmt_index];  // hypothesis
+
+      result += (O-H)*(O-H)/(O+H);
       
-      result += std::fabs( hypothesis.pe_v[pmt_index] - measurement.pe_v[pmt_index] ) * measurement.pe_v[pmt_index];
+      //result += std::fabs(  ) * measurement.pe_v[pmt_index];
 
     }
 
-    return result / nvalid_pmt;
+    //std::cout << "PE hyp : " << PEtot_Hyp << "\tPE Obs : " << PEtot_Obs << "\t Chi^2 : " << result << std::endl;
 
+    return result / nvalid_pmt;
   }
   
   void MIN_vtx_qll(Int_t & /*Npar*/,
@@ -114,6 +130,9 @@ namespace flashana {
 		   Double_t * Xval,
 		   Int_t /*Flag*/){
 
+    //std::cout << "minuit offset : " << Fval << std::endl;
+    ///std::cout << "minuit Xval?? : " << *Xval << std::endl;
+    
     auto const& hypothesis  = QLLMatch::GetME().ChargeHypothesis(Fval);
     auto const& measurement = QLLMatch::GetME().Measurement();
     Fval = QLLMatch::GetME().QLL( hypothesis, measurement );
@@ -171,13 +190,13 @@ namespace flashana {
     double  arglist[2],error[4],Fmin,Fedm,Errdef;
     ierrflag = npari = nparx = istat = 0;
 
-    _minuit_ptr->SetPrintLevel(-1);
+    _minuit_ptr->SetPrintLevel(3);
     arglist[0] = 1.0;
     _minuit_ptr->mnexcm("SET STR",arglist,1,ierrflag);
 
     _minuit_ptr->SetFCN(MIN_vtx_qll);
 
-    _minuit_ptr->DefineParameter (0,"X", reco_x, 10, 0.0, 256.);
+    _minuit_ptr->DefineParameter (0,"X", reco_x, 1, 0.0, 256.);
 
     _minuit_ptr->Command("SET NOW");
 

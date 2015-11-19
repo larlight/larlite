@@ -117,14 +117,6 @@ namespace flashana {
 					    det_yrange[0], det_yrange[1],
 					    det_zrange[0], det_zrange[1] );
     }
-    if(_alg_flash_match) {
-      _alg_flash_match->SetVerbosity(_verbosity);
-      _alg_flash_match->Configure(main_cfg.get_pset(_alg_flash_match->AlgorithmName()));
-      _alg_flash_match->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
-      _alg_flash_match->SetActiveVolume( det_xrange[0], det_xrange[1],
-					 det_yrange[0], det_yrange[1],
-					 det_zrange[0], det_zrange[1] );
-    }
     if(_alg_flash_hypothesis) {
       _alg_flash_hypothesis->SetVerbosity(_verbosity);
       _alg_flash_hypothesis->Configure(main_cfg.get_pset(_alg_flash_hypothesis->AlgorithmName()));
@@ -133,6 +125,16 @@ namespace flashana {
 					      det_yrange[0], det_yrange[1],
 					      det_zrange[0], det_zrange[1] );
     }
+    if(_alg_flash_match) {
+      _alg_flash_match->SetVerbosity(_verbosity);
+      _alg_flash_match->Configure(main_cfg.get_pset(_alg_flash_match->AlgorithmName()));
+      _alg_flash_match->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
+      _alg_flash_match->SetActiveVolume( det_xrange[0], det_xrange[1],
+					 det_yrange[0], det_yrange[1],
+					 det_zrange[0], det_zrange[1] );
+      _alg_flash_match->SetFlashHypothesis(_alg_flash_hypothesis);
+    }
+
     _configured = true;
   }
 
@@ -247,16 +249,16 @@ namespace flashana {
 
 	auto const& tpc   = _tpc_object_v[tpc_index]; // Retrieve TPC object
 	auto const& flash = _flash_v[flash_index];    // Retrieve flash
-
+	
 	// run the match-prohibit algo first
 	if (_alg_match_prohibit){
 	  bool compat = _alg_match_prohibit->MatchCompatible( tpc, flash);
 	  if (compat == false)
 	    continue;
-	}
+	    }
 	
 	auto res = _alg_flash_match->Match( tpc, flash ); // Run matching
-
+	
 	// ignore this match if the score is <= 0
 	if(res.score<=0) continue; 
 

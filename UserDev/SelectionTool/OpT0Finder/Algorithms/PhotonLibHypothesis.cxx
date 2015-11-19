@@ -16,20 +16,23 @@ namespace flashana {
   void PhotonLibHypothesis::FillEstimate(const QCluster_t& trk,
 					 Flash_t &flash) const
   {
-
+    
     size_t n_pmt = BaseAlgorithm::NOpDets();
-
+    
     for ( auto& v : flash.pe_v ) v = 0;
-
+    
     for ( size_t ipmt = 0; ipmt < n_pmt; ++ipmt) {
 
       for ( size_t ipt = 0; ipt < trk.size(); ++ipt) {
-
+	
         auto const& pt = trk[ipt];
-
+	
         double q = pt.q;
         q *= ::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt);
         flash.pe_v[ipmt] += q;
+
+	//std::cout << "PMT : " << ipmt << " [x,y,z] -> [q] : [" << pt.x << ", "
+	//		  << pt.y << ", " << pt.z << "] -> [" << q << std::endl;
 
       }
     }
