@@ -1,18 +1,18 @@
 /**
- * \file FlashHypo.h
+ * \file LightPath.h
  *
- * \ingroup FlashHypo
+ * \ingroup Algorithms
  * 
- * \brief Class def header for a class FlashHypo
+ * \brief Class def header for a class LightPath
  *
  * @author Rui
  */
 
-/** \addtogroup FlashHypo
+/** \addtogroup Algorithms
 
     @{*/
-#ifndef FLASHHYPO_H
-#define FLASHHYPO_H
+#ifndef LIGHTPATH_H
+#define LIGHTPATH_H
 
 #include <iostream>
 #include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
@@ -24,36 +24,38 @@
 #include <algorithm>
 
 namespace flashana{
-  /**
-     \class FlashHypo
-     User defined class FlashHypo ... these comments are used to generate
-     doxygen documentation!
-  */
-  class FlashHypo{
+/**
+   \class LightPath
+   User defined class LightPath ... these comments are used to generate
+   doxygen documentation!
+ */
+
+
+  class LightPath{
     
   public:
     
     /// Default constructor
-    FlashHypo();
+    LightPath();
     
     /// Default destructor
-    ~FlashHypo(){}
+    ~LightPath(){}
     
     // Setter function
     bool TrackStart( bool a) { _start_bool =a; return _start_bool;}
     bool TrackEnd  ( bool b) { _end_bool   =b; return _end_bool;}
     double Set_Gap (double x){ _gap   =x; return _gap;}
-    
+
     // Getter function
     flashana::QCluster_t FlashHypothesis(::geoalgo::Trajectory trj) const;
-    
+
     // Calculation fuction
     std::vector<double> PhotonLibrary(::geoalgo::Vector pt_1,
-				      ::geoalgo::Vector pt_2,
-				      std::vector<double> pe) const;
+                                      ::geoalgo::Vector pt_2,
+                                      std::vector<double> pe) const;
     void QCluster(::geoalgo::Vector pt_1,
-		  ::geoalgo::Vector pt_2,
-		  flashana::QCluster_t& Q_cluster) const;
+                  ::geoalgo::Vector pt_2,
+                  flashana::QCluster_t& Q_cluster) const;
     
   protected:
     bool   _start_bool = true;
@@ -63,7 +65,8 @@ namespace flashana{
     double _ymax, _ymin;
     double _zmax, _zmin;
   };
-}
+} 
+
 #endif
 /** @} */ // end of doxygen group 
 
