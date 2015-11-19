@@ -6,8 +6,27 @@ import argparse
 from PyQt4 import QtGui, QtCore
 import pyqtgraph as pg
 import numpy as np
-
+import math
 import evdmanager 
+
+# Wrap the spin box class to allow key signals to pass to the gui
+
+class ConnectedSpinBox(QtGui.QSpinBox):
+    """docstring for ConnectedSpinBox"""
+    quitRequested = QtCore.pyqtSignal()
+    def __init__(self):
+        super(ConnectedSpinBox, self).__init__()
+        
+
+    def keyPressEvent(self, e):
+        if e.key() == QtCore.Qt.Key_C:
+            # print "C was pressed"
+            if e.modifiers() and QtCore.Qt.ControlModifier :
+                self.quitRequested.emit()
+                return
+        else:
+            super(ConnectedSpinBox,self).keyPressEvent(e )
+
 
 # Import the class that manages the view windows
 from viewport3D import viewport3D
@@ -27,7 +46,14 @@ class view_manager3D(QtCore.QObject):
 
 
   def setCameraPosition(self, pos=None, distance=None, elevation=None, azimuth=None):
-    pass
+    if pos is not None:
+        self._view.setCameraPos(pos)
+    else:
+        self._view.setCameraPosition(distance=distance,elevation=elevation,azimuth=azimuth)
+
+  def setCenter(self, center=None):
+    if center is not None:
+        self._view.setCenter(center)
 
   def pan(self, dx, dy, dz, relative=False):
     pass
@@ -74,6 +100,71 @@ class gui3D(QtGui.QWidget):
     self._subrunLabel.setText(subrunLabel)
     
     self.autoRangeWorker()
+
+  def updateCameraInfo(self):
+    # UPdate all of the camera text entries:
+    cameraPos = self._view_manager.getView().cameraPosition()
+    worldPos = self._view_manager.getView().worldCenter()
+    orbit = self._view_manager.getView().getElevation()
+    azimuth = self._view_manager.getView().getAzimuth()
+    # distance = 
+    # To actually update these things corrently, we have to unplug 
+    # the signals from the slots, update the fields, and then plug everything back in
+    
+    # print self._cameraCenterX.valueChangedf[]
+
+    try:
+        self._cameraCenterX.valueChanged.disconnect()
+    except:
+        print "Failed to disconnect"
+        pass
+    try:
+        self._cameraCenterY.valueChanged.disconnect()
+    except:
+        pass
+    try:
+        self._cameraCenterZ.valueChanged.disconnect()
+    except:
+        pass
+    try:
+        self._worldCenterX.valueChanged.disconnect()
+    except:
+        pass
+    try:
+        self._worldCenterY.valueChanged.disconnect()
+    except:
+        pass
+    try:
+        self._worldCenterZ.valueChanged.disconnect()
+    except:
+        pass
+    try:
+        self._orbitControl.valueChanged.disconnect()
+    except:
+        pass
+    try:
+        self._azimuthControl.valueChanged.disconnect()
+    except:
+        pass
+
+    self._cameraCenterX.setValue(cameraPos.x())
+    self._cameraCenterY.setValue(cameraPos.y())
+    self._cameraCenterZ.setValue(cameraPos.z())
+    self._worldCenterX.setValue(worldPos.x())
+    self._worldCenterY.setValue(worldPos.y())
+    self._worldCenterZ.setValue(worldPos.z())
+    self._orbitControl.setValue(orbit)
+    self._azimuthControl.setValue(azimuth)
+
+    self._cameraCenterX.valueChanged.connect(self.cameraCenterWorker)
+    self._cameraCenterY.valueChanged.connect(self.cameraCenterWorker)
+    self._cameraCenterZ.valueChanged.connect(self.cameraCenterWorker)
+    self._worldCenterX.valueChanged.connect(self.worldCenterWorker)
+    self._worldCenterY.valueChanged.connect(self.worldCenterWorker)
+    self._worldCenterZ.valueChanged.connect(self.worldCenterWorker)
+    self._orbitControl.valueChanged.connect(self.orbitWorker)
+    self._azimuthControl.valueChanged.connect(self.azimuthWorker)
+
 
   # This function prepares the buttons such as prev, next, etc and returns a layout
   def getEventControlButtons(self):
@@ -154,14 +245,135 @@ class gui3D(QtGui.QWidget):
     self._restoreDefaults.clicked.connect(self.restoreDefaultsWorker)
 
 
+    # Add some controls to manage the camera
+    self._cameraControlLayout = QtGui.QHBoxLayout()
+    self._orbitControl = ConnectedSpinBox()
+    self._orbitControl.quitRequested.connect(self.quit)
+    self._orbitControl.setRange(-360,360)
+    self._orbitControl.setWrapping(True)
+    self._orbitControl.valueChanged.connect(self.orbitWorker)
+    self._azimuthControl = ConnectedSpinBox()
+    self._azimuthControl.quitRequested.connect(self.quit)
+    self._azimuthControl.setRange(-90,90)
+    self._azimuthControl.valueChanged.connect(self.azimuthWorker)
+    self._cameraControlLayout.addWidget(self._orbitControl)
+    self._cameraControlLayout.addWidget(self._azimuthControl)
+
+    halfwidth = self._geometry.halfwidth()
+    halfheight = self._geometry.halfheight()
+    length = self._geometry.length()
+
+    # Define the x,y,z location of the camera and world center
+    self._cameraCenterLayout = QtGui.QVBoxLayout()
+    self._cameraLabel = QtGui.QLabel("Camera")
+    self._cameraCenterLayout.addWidget(self._cameraLabel)
+    self._cameraCenterXLayout = QtGui.QHBoxLayout()
+    self._cameraCenterXLabel = QtGui.QLabel("X:")
+    self._cameraCenterX = ConnectedSpinBox()
+    self._cameraCenterX.setValue(0)
+    self._cameraCenterX.setRange(-20*halfwidth,20*halfwidth)
+    self._cameraCenterX.quitRequested.connect(self.quit)
+    self._cameraCenterX.valueChanged.connect(self.cameraCenterWorker)
+    self._cameraCenterXLayout.addWidget(self._cameraCenterXLabel)
+    self._cameraCenterXLayout.addWidget(self._cameraCenterX)
+
+    self._cameraCenterLayout.addLayout(self._cameraCenterXLayout)
+    self._cameraCenterYLayout = QtGui.QHBoxLayout()
+    self._cameraCenterYLabel = QtGui.QLabel("Y:")
+    self._cameraCenterY = ConnectedSpinBox()
+    self._cameraCenterY.setValue(0)
+    self._cameraCenterY.setRange(-20*halfheight,20*halfheight)
+    self._cameraCenterY.quitRequested.connect(self.quit)
+    self._cameraCenterY.valueChanged.connect(self.cameraCenterWorker)
+    self._cameraCenterYLayout.addWidget(self._cameraCenterYLabel)
+    self._cameraCenterYLayout.addWidget(self._cameraCenterY)
+
+    self._cameraCenterLayout.addLayout(self._cameraCenterYLayout)
+    self._cameraCenterZLayout = QtGui.QHBoxLayout()
+    self._cameraCenterZLabel = QtGui.QLabel("Z:")
+    self._cameraCenterZ = ConnectedSpinBox()
+    self._cameraCenterZ.setValue(0)
+    self._cameraCenterZ.setRange(-10*length,20*length)   
+    self._cameraCenterZ.quitRequested.connect(self.quit)
+    self._cameraCenterZ.valueChanged.connect(self.cameraCenterWorker)
+    self._cameraCenterZLayout.addWidget(self._cameraCenterZLabel)
+    self._cameraCenterZLayout.addWidget(self._cameraCenterZ)
+    self._cameraCenterLayout.addLayout(self._cameraCenterZLayout)
+
+
+    self._worldCenterLayout = QtGui.QVBoxLayout()
+    self._worldLabel = QtGui.QLabel("world")
+    self._worldCenterLayout.addWidget(self._worldLabel)
+    self._worldCenterXLayout = QtGui.QHBoxLayout()
+    self._worldCenterXLabel = QtGui.QLabel("X:")
+    self._worldCenterX = ConnectedSpinBox()
+    self._worldCenterX.setValue(0)
+    self._worldCenterX.setRange(-20*halfwidth,20*halfwidth)
+    self._worldCenterX.quitRequested.connect(self.quit)
+    self._worldCenterX.valueChanged.connect(self.worldCenterWorker)
+    self._worldCenterXLayout.addWidget(self._worldCenterXLabel)
+    self._worldCenterXLayout.addWidget(self._worldCenterX)
+
+    self._worldCenterLayout.addLayout(self._worldCenterXLayout)
+    self._worldCenterYLayout = QtGui.QHBoxLayout()
+    self._worldCenterYLabel = QtGui.QLabel("Y:")
+    self._worldCenterY = ConnectedSpinBox()
+    self._worldCenterY.setValue(0)
+    self._worldCenterY.setRange(-20*halfheight,20*halfheight)
+    self._worldCenterY.quitRequested.connect(self.quit)
+    self._worldCenterY.valueChanged.connect(self.worldCenterWorker)
+    self._worldCenterYLayout.addWidget(self._worldCenterYLabel)
+    self._worldCenterYLayout.addWidget(self._worldCenterY)
+
+    self._worldCenterLayout.addLayout(self._worldCenterYLayout)
+    self._worldCenterZLayout = QtGui.QHBoxLayout()
+    self._worldCenterZLabel = QtGui.QLabel("Z:")
+    self._worldCenterZ = ConnectedSpinBox()
+    self._worldCenterZ.setValue(0)
+    self._worldCenterZ.setRange(-10*length,20*length)   
+    self._worldCenterZ.quitRequested.connect(self.quit)
+    self._worldCenterZ.valueChanged.connect(self.worldCenterWorker)
+    self._worldCenterZLayout.addWidget(self._worldCenterZLabel)
+    self._worldCenterZLayout.addWidget(self._worldCenterZ)
+    self._worldCenterLayout.addLayout(self._worldCenterZLayout)
+
+
+
     # Pack the stuff into a layout
 
     self._drawingControlBox = QtGui.QVBoxLayout()
     self._drawingControlBox.addWidget(self._restoreDefaults)
     self._drawingControlBox.addWidget(self._maxRangeButton)
-    # self._drawingControlBox.addWidget(self._autoRangeBox)
+    self._drawingControlBox.addLayout(self._cameraControlLayout)
+
+    self._drawingControlBox.addLayout(self._cameraCenterLayout)
+    self._drawingControlBox.addLayout(self._worldCenterLayout)
+
 
     return self._drawingControlBox
+
+  def orbitWorker(self):
+    value = self._orbitControl.value()
+    self._view_manager.setCameraPosition(elevation=value)
+
+  def azimuthWorker(self):
+    value = self._azimuthControl.value()
+    self._view_manager.setCameraPosition(azimuth=value)
+
+
+  def worldCenterWorker(self):
+    x = float(self._worldCenterX.text())
+    y = float(self._worldCenterY.text())
+    z = float(self._worldCenterZ.text())
+    self._view_manager.setCenter((x,y,z))
+    pass
+
+  def cameraCenterWorker(self):
+    # assemble the camera position:
+    x = float(self._cameraCenterX.text())
+    y = float(self._cameraCenterY.text())
+    z = float(self._cameraCenterZ.text())
+    self._view_manager.setCameraPosition(pos = (x,y,z) )
 
   def autoRangeWorker(self):
     if self._autoRangeBox.isChecked():
@@ -279,8 +491,10 @@ class gui3D(QtGui.QWidget):
 
     # Area to hold data:
     self._view = self._view_manager.getView()
-    self._view.keyPressSignal.connect(self.keyPressEvent)
+    # self._view.keyPressSignal.connect(self.keyPressEvent)
     self.centerWidget = self._view
+    self._view.quitRequested.connect(self.quit)
+    self._view.viewChanged.connect(self.updateCameraInfo)
 
     # Put the layout together
 
@@ -298,6 +512,7 @@ class gui3D(QtGui.QWidget):
     # ask the view manager to draw the planes:
     # self._view_manager.drawPlanes(self._event_manager)
 
+    self.updateCameraInfo()
 
     self.setGeometry(0, 0, 2400, 1600)
     self.setWindowTitle('Event Display')    

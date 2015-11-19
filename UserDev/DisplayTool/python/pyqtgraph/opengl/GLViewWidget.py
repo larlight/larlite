@@ -17,7 +17,8 @@ class GLViewWidget(QtOpenGL.QGLWidget):
         - Export options
 
     """
-    
+    viewChanged = QtCore.pyqtSignal()
+
     def __init__(self, parent=None):
         global ShareWidget
 
@@ -229,6 +230,7 @@ class GLViewWidget(QtOpenGL.QGLWidget):
         if azimuth is not None:
             self.opts['azimuth'] = azimuth
         self.update()
+        self.viewChanged.emit()
         
         
         
@@ -251,8 +253,10 @@ class GLViewWidget(QtOpenGL.QGLWidget):
         """Orbits the camera around the center position. *azim* and *elev* are given in degrees."""
         self.opts['azimuth'] += azim
         #self.opts['elevation'] += elev
-        self.opts['elevation'] = np.clip(self.opts['elevation'] + elev, -90, 90)
+        self.opts['elevation'] = self.opts['elevation'] + elev
+        # self.opts['elevation'] = np.clip(self.opts['elevation'] + elev, -90, 90)
         self.update()
+        self.viewChanged.emit()
         
     def pan(self, dx, dy, dz, relative=False):
         """
@@ -278,6 +282,7 @@ class GLViewWidget(QtOpenGL.QGLWidget):
             yVec = QtGui.QVector3D.crossProduct(xVec, zVec).normalized()
             self.opts['center'] = self.opts['center'] + xVec * xScale * dx + yVec * xScale * dy + zVec * xScale * dz
         self.update()
+        self.viewChanged.emit()
         
     def pixelSize(self, pos):
         """
@@ -308,6 +313,7 @@ class GLViewWidget(QtOpenGL.QGLWidget):
                 self.pan(diff.x(), 0, diff.y(), relative=True)
             else:
                 self.pan(diff.x(), diff.y(), 0, relative=True)
+        # self.viewChanged.emit()
         
     def mouseReleaseEvent(self, ev):
         pass
@@ -329,6 +335,7 @@ class GLViewWidget(QtOpenGL.QGLWidget):
         else:
             self.opts['distance'] *= 0.999**ev.delta()
         self.update()
+        self.viewChanged.emit()
 
     def keyPressEvent(self, ev):
         if ev.key() in self.noRepeatKeys:

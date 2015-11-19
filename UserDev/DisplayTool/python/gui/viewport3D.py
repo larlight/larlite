@@ -13,19 +13,19 @@ import math
 
 class viewport3D(gl.GLViewWidget):
 
-  keyPressSignal = QtCore.pyqtSignal(QtGui.QKeyEvent)
+  quitRequested = QtCore.pyqtSignal()
 
   def __init__(self, geometry):
     super(viewport3D, self).__init__()
     # add a view box, which is a widget that allows an image to be shown
     # add an image item which handles drawing (and refreshing) the image
-    # self._item._setPen((0,0,0))
-    self.opts['distance'] = 1000
-    # g = gl.GLGridItem()
-    # g.scale(300, 300, 1000)
-    # self.addItem(g)
-
     self._geometry = geometry
+    gy = gl.GLGridItem()
+    gy.scale(0.1*self._geometry.length(),0.1*self._geometry.length(),0.1*self._geometry.length())
+    gy.rotate(90, 1, 0, 0)
+    gy.translate(0,-self._geometry.halfheight(), 0)
+    self.addItem(gy)
+
     self.buildDetector()
 
 
@@ -33,9 +33,12 @@ class viewport3D(gl.GLViewWidget):
       self.buildPaddleBox1()
       self.buildPaddleBox2()
 
+
+    self.pan(self._geometry.halfwidth(), 0, 0.5*self._geometry.length())
+
     # Set the camera to the correct starting position:
-    pos = (4*geometry.halfwidth(),2*geometry.halfheight(),-2*geometry.length())
-    self.setCameraPosition(pos=pos, distance=None, elevation=None, azimuth=None)
+    pos = (self._geometry.halfwidth(),5*self._geometry.halfheight(),0.5*geometry.length())
+    self.setCameraPos(pos=pos)
 
     # print self.cameraPosition()
     # self.orbit(0,180)
@@ -47,9 +50,17 @@ class viewport3D(gl.GLViewWidget):
     # self.pan(0,0,self._geometry.length())
     self.show()
 
-  def keyPressEvent(self,e):
-    self.keyPressSignal.emit(e)
+  def setCenter(self, center):
+    if len(center) != 3:
+        return
+    self.opts['center'][0] = center[0]
+    self.opts['center'][1] = center[1]
+    self.opts['center'][2] = center[2]
+    self.update()
 
+
+  def worldCenter(self):
+    return self.opts['center']
 
   def buildDetector(self):
 
@@ -87,6 +98,60 @@ class viewport3D(gl.GLViewWidget):
     self.drawLine((xmax,ymin,zmin),(xmax,ymin,zmax))
 
     return
+
+  def getAzimuth(self):
+    return self.opts['azimuth']
+
+
+  def getElevation(self):
+    return self.opts['elevation']
+
+  def setCameraPos(self,pos):
+    # calling set camera with pos doesn't actually do anything.  Convert spherical coordinates:
+    if pos is not None:
+        # Convert to relative coordinates to always leave the world center as the center point
+        worldCenter = self.opts['center']
+        X = pos[0] - worldCenter[0]
+        Y = pos[1] - worldCenter[1]
+        Z = pos[2] - worldCenter[2]
+        distance = X**2 + Y**2 + Z**2
+        distance = math.sqrt(distance)
+        if X != 0:
+            azimuth = math.atan(Y/X)
+        else:
+            azimuth = math.pi
+            if Y < 0:
+                azimuth = -1 * azimuth
+        if distance != 0:
+            elevation = math.acos(Z / distance)
+        else:
+            elevation = math.copysign(Z)
+        azimuth *= 180/math.pi
+        elevation *= 180/math.pi
+        self.setCameraPosition(distance=distance,elevation=elevation,azimuth=azimuth)
+
+
+  def keyPressEvent(self,e):
+    if e.key() == QtCore.Qt.Key_C:
+        # print "C was pressed"
+        if e.modifiers() and QtCore.Qt.ControlModifier :
+            self.quitRequested.emit()
+            return
+    elif e.modifiers():
+        if QtCore.Qt.ShiftModifier :
+            if e.key() == QtCore.Qt.Key_Up:
+                # This is supposed to pan upwards in the view
+                self.pan(0,20,0,True)
+            if e.key() == QtCore.Qt.Key_Down:
+                self.pan(0,-20,0,True)
+            if e.key() == QtCore.Qt.Key_Left:
+                self.pan(20,0,0,True)
+            if e.key() == QtCore.Qt.Key_Right:
+                self.pan(-20,0,0,True)
+    else:
+        super(viewport3D,self).keyPressEvent(e)
+  #       self.keyPressSignal.emit(e)
+
 
   def drawLine(self,point1,point2):
 
