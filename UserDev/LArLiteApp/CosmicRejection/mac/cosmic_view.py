@@ -11,6 +11,15 @@ from ROOT import gSystem
 from ROOT import larlite as fmwk
 from ROOT import ertool
 from seltool.algoviewer import viewAll, getViewer, view
+
+### catch ctrl c to exit ###
+import signal
+def signal_handler(signal, frame):
+        print('You pressed Ctrl+C!')
+        sys.exit(0)
+signal.signal(signal.SIGINT, signal_handler)
+### catch ctrl c to exit ###
+
 #ertool.Manager
 
 # Create ana_processor instance
