@@ -14,6 +14,7 @@ import math
 class viewport3D(gl.GLViewWidget):
 
   quitRequested = QtCore.pyqtSignal()
+  keyPressSignal = QtCore.pyqtSignal(QtGui.QKeyEvent)
 
   def __init__(self, geometry):
     super(viewport3D, self).__init__()
@@ -150,7 +151,10 @@ class viewport3D(gl.GLViewWidget):
                 self.pan(-20,0,0,True)
     else:
         super(viewport3D,self).keyPressEvent(e)
-  #       self.keyPressSignal.emit(e)
+   
+
+    # Pass this signal to the main gui, too
+    self.keyPressSignal.emit(e)
 
 
   def drawLine(self,point1,point2):

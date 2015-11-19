@@ -116,7 +116,6 @@ class gui3D(QtGui.QWidget):
     try:
         self._cameraCenterX.valueChanged.disconnect()
     except:
-        print "Failed to disconnect"
         pass
     try:
         self._cameraCenterY.valueChanged.disconnect()
@@ -491,7 +490,7 @@ class gui3D(QtGui.QWidget):
 
     # Area to hold data:
     self._view = self._view_manager.getView()
-    # self._view.keyPressSignal.connect(self.keyPressEvent)
+    self._view.keyPressSignal.connect(self.keyPressEvent)
     self.centerWidget = self._view
     self._view.quitRequested.connect(self.quit)
     self._view.viewChanged.connect(self.updateCameraInfo)
