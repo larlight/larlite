@@ -27,7 +27,7 @@ namespace flashana {
   public:
     
     /// Default constructor
-    BaseFlashFilter() : BaseAlgorithm(kFlashFilter)
+    BaseFlashFilter(const std::string name="noname") : BaseAlgorithm(kFlashFilter,name)
     {}
     
     /// Default destructor

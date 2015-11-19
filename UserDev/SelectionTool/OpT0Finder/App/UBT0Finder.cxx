@@ -17,6 +17,7 @@ namespace larlite {
     , _track_tree(nullptr)
     , _flashmatch_tree(nullptr)
     , _eff_tree(nullptr)
+    , _nflash_v_nint(nullptr)
     , _time_diff(nullptr)
   {
     _name="UBT0Finder";
@@ -135,7 +136,7 @@ namespace larlite {
     	  pt.z = pt1[2] + dz/2.;
     	  
     	  tpc_obj.emplace_back(pt);
-    	  tpc_obj.idx = n;
+	  tpc_obj.idx = n;
 	    }
 	_mgr.Emplace(std::move(tpc_obj));
       }
@@ -262,12 +263,12 @@ namespace larlite {
 	    	      	tpc_obj.push_back(pt);
 	    	      	tpc_obj.idx = n;
 			}
-	    	  
-	    	  }
+		  
+		}
 	        e_diff += (trk3[0].E() - trk3[trk3.size()-1].E()); 
-	      }
-
-	    
+	  }
+	  
+	  
 	    _mgr.Emplace(std::move(tpc_obj));
 	    
 	    if( e_diff > _e_diff ) 
@@ -277,7 +278,7 @@ namespace larlite {
 	  _n_flash = n_flash;
 		
 	  _int_tree->Fill();		
-          }// if index has not already been used
+	 }// if index has not already been used
 	}// if the track is at least 2 elements long
       }// for all tracks
 
