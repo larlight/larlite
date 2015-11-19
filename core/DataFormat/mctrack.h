@@ -20,6 +20,9 @@
 #include <vector>
 namespace larlite{
 
+  typedef size_t SegmentID_t; ///< Segment ID                                                                                                                                                          
+  const SegmentID_t InvalidSegmentID = -1;
+
   /**
      \class mctrack
      LArSoft MCTrack class equivalent data container
@@ -55,48 +58,58 @@ namespace larlite{
                                    fAncestorProcess(orig.fAncestorProcess),
                                    fAncestorStart(orig.fAncestorStart),
 				   fAncestorEnd(orig.fAncestorEnd)
+
     {}
 
     void clear_data();
 
-    simb::Origin_t      Origin     () const;
-    int                 PdgCode    () const;
+    simb::Origin_t      Origin   () const;
+    int                 PdgCode  () const;
     unsigned int        TrackID  () const;
-    const std::string&  Process    () const;
+    const std::string&  Process  () const;
     const mcstep&       Start    () const;
     const mcstep&       End      () const;
 
-    int                MotherPdgCode   () const;
+    int                MotherPdgCode () const;
     unsigned int       MotherTrackID () const;
-    const std::string& MotherProcess   () const;
+    const std::string& MotherProcess () const;
     const mcstep&      MotherStart   () const;
     const mcstep&      MotherEnd     () const;
 
-    int                AncestorPdgCode   () const;
-    unsigned int       AncestorTrackID () const;
-    const std::string& AncestorProcess   () const;
-    const mcstep&      AncestorStart   () const;
-    const mcstep&      AncestorEnd     () const;
+    int                AncestorPdgCode      () const;
+    unsigned int       AncestorTrackID      () const;
+    const std::string& AncestorProcess      () const;
+    const mcstep&      AncestorStart        () const;
+    const mcstep&      AncestorEnd          () const;
+    
 
-    void Origin          ( simb::Origin_t o ) { fOrigin    = o;        }
-    void PdgCode         ( int id           ) { fPDGCode   = id;       }
+    void Origin          ( simb::Origin_t o ) { fOrigin    = o;      }
+    void PdgCode         ( int id           ) { fPDGCode   = id;     }
     void TrackID         ( unsigned int id  ) { fTrackID = id;       }
-    void Process         ( std::string name ) { fProcess   = name;     }
+    void Process         ( std::string name ) { fProcess   = name;   }
     void Start           ( const mcstep s   ) { fStart   = s;        }
     void End             ( const mcstep s   ) { fEnd     = s;        }
 
-    void MotherPdgCode   ( int id               ) { fMotherPDGCode   = id; }
-    void MotherTrackID   ( unsigned int id      ) { fMotherTrackID = id; }
-    void MotherProcess   ( const std::string& n ) { fMotherProcess   = n;  }
-    void MotherStart     ( const mcstep& s      ) { fMotherStart   = s;  }
-    void MotherEnd       ( const mcstep& s      ) { fMotherEnd     = s;  }
+    void MotherPdgCode   ( int id               ) { fMotherPDGCode  = id; }
+    void MotherTrackID   ( unsigned int id      ) { fMotherTrackID  = id; }
+    void MotherProcess   ( const std::string& n ) { fMotherProcess  = n;  }
+    void MotherStart     ( const mcstep& s      ) { fMotherStart    = s;  }
+    void MotherEnd       ( const mcstep& s      ) { fMotherEnd      = s;  }
 
-    void AncestorPdgCode   ( int id               ) { fAncestorPDGCode   = id; }
+    void AncestorPdgCode   ( int id               ) { fAncestorPDGCode = id; }
     void AncestorTrackID   ( unsigned int id      ) { fAncestorTrackID = id; }
-    void AncestorProcess   ( const std::string& n ) { fAncestorProcess   = n;  }
+    void AncestorProcess   ( const std::string& n ) { fAncestorProcess = n;  }
     void AncestorStart     ( const mcstep& s      ) { fAncestorStart   = s;  }
     void AncestorEnd       ( const mcstep& s      ) { fAncestorEnd     = s;  }
 
+    double   dEdx(const SegmentID_t id) const;
+    double   dX  (const SegmentID_t id) const ;
+    const std::vector<double> dEdx()    const;
+   
+    const std::vector<TLorentzVector>  SegmentCenter() const;
+
+
+    
   protected:
 
     simb::Origin_t fOrigin;    ///< Origin of this particle (see simb::Origin_t)

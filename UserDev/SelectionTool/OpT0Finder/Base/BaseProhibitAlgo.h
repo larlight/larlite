@@ -27,7 +27,7 @@ namespace flashana {
   public:
     
     /// Default constructor
-    BaseProhibitAlgo() : BaseAlgorithm(kMatchProhibit)
+    BaseProhibitAlgo(const std::string name="noname") : BaseAlgorithm(kMatchProhibit,name)
     {}
  
     /// Default destructor

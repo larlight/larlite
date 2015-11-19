@@ -34,31 +34,20 @@ namespace flashana {
   public:
     
     /// Default constructor
-    QWeightPoint(const double x_step_size=-1);
-    
-    QWeightPoint( const std::vector<double>& pos_x,
-		  const std::vector<double>& pos_y,
-		  const std::vector<double>& pos_z,
-		  const double x_step_size=-1);
+    QWeightPoint(const std::string name="QWeightPoint");
     
     /// Default destructor
     ~QWeightPoint(){}
 
+    void Configure(const ::fcllite::PSet &pset);
+
     FlashMatch_t Match(const QCluster_t&, const Flash_t&);
 
-    void SetStepSize(const double x)  { _x_step_size = x; }
-
-    void SetMaxZDiff(const double dz) { _zdiff_max = dz;  }
-
-    void UsePhotonLibrary(bool doit=true) {_use_library=doit;}
   private:
-
-    std::vector<double> _pos_x;
-    std::vector<double> _pos_y;
-    std::vector<double> _pos_z;
-    double _x_step_size;
-    double _zdiff_max; ///< allowed diff in z-direction to be considered as a match
-    bool _use_library;
+    double _x_step_size; ///< step size in x-direction
+    double _zdiff_max;   ///< allowed diff in z-direction to be considered as a match
+    flashana::QCluster_t _tpc_qcluster;
+    flashana::Flash_t    _vis_array;
   };
 }
 #endif
