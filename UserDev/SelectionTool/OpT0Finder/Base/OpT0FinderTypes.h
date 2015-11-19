@@ -18,6 +18,7 @@ namespace flashana {
     kFlashMatch,      ///< Algorithm type to match flash hypothesis and reconstructed flash
     kMatchProhibit,   ///< Algorithm type to prohibit a match between a flash and a cluster
     kFlashHypothesis, ///< Algorithm type to make QCluster_t => Flash_t hypothesis
+    kCustomAlgo,      ///< Algorithm type that does not play a role in the framework execution but inherits from BaseAlgorithm
     kAlgorithmTypeMax ///< enum flag for algorithm type count & invalid type
   };
 

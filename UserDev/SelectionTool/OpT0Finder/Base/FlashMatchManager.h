@@ -41,6 +41,9 @@ namespace flashana {
     /// Algorithm setter
     void SetAlgo(BaseAlgorithm* alg);
 
+    /// Custom algorithm adder
+    void AddCustomAlgo(BaseAlgorithm* alg);
+
     /// Configuration
     void Configure(const std::string="");
 
@@ -83,6 +86,11 @@ namespace flashana {
     BaseProhibitAlgo*    _alg_match_prohibit;   ///< Flash matchinig prohibit algorithm
     BaseFlashMatch*      _alg_flash_match;      ///< Flash matching algorithm
     BaseFlashHypothesis* _alg_flash_hypothesis; ///< Flash hypothesis algorithm
+
+    /**
+       A set of custom algorithms (not to be executed but to be configured)
+    */
+    std::vector<BaseAlgorithm*> _custom_alg_v;
 
     /// TPC object information collection (provided by a user)
     QClusterArray_t _tpc_object_v;

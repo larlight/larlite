@@ -51,6 +51,10 @@ namespace flashana {
     case kFlashHypothesis:
       _alg_flash_hypothesis = (BaseFlashHypothesis*)alg; break;
 
+      // Other algorithms
+    case kCustomAlgo:
+
+      
       // Fuck it
     default:
       std::stringstream ss;
@@ -58,6 +62,10 @@ namespace flashana {
       throw OpT0FinderException(ss.str());
     }
   }
+
+  
+  void FlashMatchManager::AddCustomAlgo(BaseAlgorithm* alg)
+  { _custom_alg_v.push_back(alg); }
 
   void FlashMatchManager::Configure(const std::string cfg_file)
   {
@@ -133,6 +141,16 @@ namespace flashana {
 					 det_yrange[0], det_yrange[1],
 					 det_zrange[0], det_zrange[1] );
       _alg_flash_match->SetFlashHypothesis(_alg_flash_hypothesis);
+    }
+
+    for(auto& custom_alg : _custom_alg_v) {
+
+      custom_alg->Configure(main_cfg.get_pset(custom_alg->AlgorithmName()));
+      custom_alg->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
+      custom_alg->SetActiveVolume( det_xrange[0], det_xrange[1],
+				   det_yrange[0], det_yrange[1],
+				   det_zrange[0], det_zrange[1] );
+
     }
 
     _configured = true;
