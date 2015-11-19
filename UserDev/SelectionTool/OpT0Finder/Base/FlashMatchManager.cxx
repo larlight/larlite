@@ -53,7 +53,7 @@ namespace flashana {
 
       // Other algorithms
     case kCustomAlgo:
-
+      _custom_alg_v.push_back(alg);
       
       // Fuck it
     default:
