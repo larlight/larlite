@@ -2,7 +2,7 @@
  * \file RecoObjBase.h
  *
  * \ingroup Base
- * 
+ *
  * \brief Class def header for a class RecoObjBase
  *
  * @author kazuhiro
@@ -18,48 +18,51 @@
 #include "ERToolTypes.h"
 #include "ERToolConstants.h"
 namespace ertool {
-  class EventData;
+class EventData;
 
-  /**
-     \class RecoObjBase
-     User defined class ertool::RecoObjBase ... these comments are used to generate
-     doxygen documentation!
-  */
-  class RecoObjBase {
+/**
+   \class RecoObjBase
+   User defined class ertool::RecoObjBase ... these comments are used to generate
+   doxygen documentation!
+*/
+class RecoObjBase {
 
-    friend class EventData;
-    
-  public:
-    
-    /// Default constructor
-    RecoObjBase();
-    
-    /// Default destructor
-    virtual ~RecoObjBase(){}
+  friend class EventData;
 
-    /// Reset method (do nothing in the base class)
-    virtual void Reset(){};
-    
-    /// ID query
-    RecoID_t RecoID() const;
+public:
 
-    /// Type query
-    RecoType_t RecoType() const;
+  /// Default constructor
+  RecoObjBase();
 
-    /// Cosmogenic score
-    double _cosmogenic;
+  /// Default destructor
+  virtual ~RecoObjBase() {}
 
-  protected:
+  /// Reset method (do nothing in the base class)
+  virtual void Reset() {};
 
-    /// Function to set an id
-    void SetRecoInfo(const RecoID_t id, const RecoType_t type);
+  /// ID query
+  RecoID_t RecoID() const;
 
-    RecoID_t   _reco_id;   ///< Unique reco object identifier
-    RecoType_t _reco_type; ///< Reco object type
+  /// Type query
+  RecoType_t RecoType() const;
 
-  };
+  /// Cosmogenic score
+  double _cosmogenic;
+
+  /// Debug print functionality
+  virtual void PrintInfo() const = 0;
+
+protected:
+
+  /// Function to set an id
+  void SetRecoInfo(const RecoID_t id, const RecoType_t type);
+
+  RecoID_t   _reco_id;   ///< Unique reco object identifier
+  RecoType_t _reco_type; ///< Reco object type
+
+};
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

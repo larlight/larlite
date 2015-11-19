@@ -67,6 +67,9 @@ namespace ertool {
     double _energy;
     double _time;
 
+    /// Debug print functionality
+    void PrintInfo() const;
+
   };
 
 }

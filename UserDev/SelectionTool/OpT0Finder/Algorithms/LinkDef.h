@@ -21,9 +21,11 @@
 
 #pragma link C++ class flashana::PhotonLibHypothesis+;
 #pragma link C++ class flashana::ChargeAnalytical+;
-#pragma link C++ class flashana::FlashHypo+;
+#pragma link C++ class flashana::LightPath+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
 
 
 
