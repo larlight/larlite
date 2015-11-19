@@ -51,7 +51,7 @@ namespace flashana {
     double OpDetY(size_t i) const; ///< PMT Y position getter 
     double OpDetZ(size_t i) const; ///< PMT Z position getter
 
-    const ::geoalgo::AABox& ActiveVolume() const; ///< Detector active volume getter
+    const ::geoalgo::AABox& ActiveVolume() const { return _active_volume; } ///< Detector active volume getter
     
     double ActiveXMax() const; ///< Detector active volume's maximum x value
     double ActiveYMax() const; ///< Detector active volume's maximum x value
