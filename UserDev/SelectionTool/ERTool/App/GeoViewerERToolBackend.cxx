@@ -52,7 +52,8 @@ namespace ertool {
 	// add only if associated with a cosmic
 	if (p.RecoID() != kINVALID_RECO_ID){
 	  if (p.RecoType() == ::ertool::RecoType_t::kShower){
-	    if (p.ProcessType() == ::ertool::ProcessType_t::kCosmic){
+	    if ( (p.ProcessType() == ::ertool::ProcessType_t::kCosmic) or
+		 (particles.GetParticle(p.Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic) ){
 	      if (_show_cosmics)
 		GeoObjCollection::Add( data.Shower(p.RecoID()), "" , "cyan");
 	      used_obj[ p.RecoType() ][ p.RecoID() ] = true;
@@ -60,7 +61,8 @@ namespace ertool {
 	  }
 	  if (p.RecoType() == ::ertool::RecoType_t::kTrack){
 	    if (data.Track(p.RecoID()).size() >= 2){
-	      if (p.ProcessType() == ::ertool::ProcessType_t::kCosmic){
+	    if ( (p.ProcessType() == ::ertool::ProcessType_t::kCosmic) or
+		 (particles.GetParticle(p.Ancestor()).ProcessType() == ::ertool::ProcessType_t::kCosmic) ){
 		if (_show_cosmics)
 		  GeoObjCollection::Add( data.Track(p.RecoID()), "" , "magenta");
 		used_obj[ p.RecoType() ][ p.RecoID() ] = true;

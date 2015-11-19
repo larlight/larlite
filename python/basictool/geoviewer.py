@@ -117,6 +117,32 @@ class GeoViewer(object):
         self._ax.scatter(data[0][-1],data[1][-1],data[2][-1],s=50,color=c,marker='>')
         self._ax.scatter(data[0][1:-2],data[1][1:-2],data[2][1:-2],color=c,marker='o')
 
+
+    def _add_scatter(self,x_pts,y_pts,z_pts,E_pts):
+
+        self._ax.scatter(x_pts,y_pts,z_pts,s=20,color=E_pts,marker='o',edgecolors=None,linewidths=0)
+        
+        # update boundaries
+        minx = min(x_pts)
+        maxx = max(x_pts)
+        if (minx < self._range_min[0]):
+            self._range_min[0] = minx
+        if (maxx < self._range_max[0]):
+            self._range_max[0] = maxx
+        miny = min(y_pts)
+        maxy = max(y_pts)
+        if (miny < self._range_min[1]):
+            self._range_min[1] = miny
+        if (maxy < self._range_max[1]):
+            self._range_max[1] = maxy
+        minz = min(z_pts)
+        maxz = max(z_pts)
+        if (minz < self._range_min[2]):
+            self._range_min[2] = minz
+        if (maxz < self._range_max[2]):
+            self._range_max[2] = maxz
+
+
     def _add_linesegment(self,arg,c=''):
 
         if not c: c = self.rand_color()
