@@ -381,7 +381,7 @@ namespace larlite {
     for (size_t n=0; n < ev_mctrack->size(); n++){
       auto const& mct = ev_mctrack->at(n);
       // ignore tracks with < 2 steps
-      if (mct.size() < 2) continue;
+      if (mct.size() <= 2) continue;
       // find the flash that was matched for this MCTrack (if any)
 
       _mc_time = mct[0].T() * 1.e-3;
@@ -428,8 +428,8 @@ namespace larlite {
 
     _nflash_v_nint->Fill(n_int, n_flash);
 
-    if(_npts == 0 )
-      _eff_tree->Fill();
+//    if(_npts == 0 )
+//      _eff_tree->Fill();
 
     return true;
   }

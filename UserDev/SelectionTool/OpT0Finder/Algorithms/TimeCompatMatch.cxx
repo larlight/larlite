@@ -13,7 +13,7 @@ namespace flashana {
   TimeCompatMatch::TimeCompatMatch(const std::string name)
     : BaseProhibitAlgo(name)
   {
-    _frame_drift_time = 1600; // usec
+    _frame_drift_time = 2300; // usec
   }
 
   void TimeCompatMatch::Configure(const ::fcllite::PSet &pset)
