@@ -90,7 +90,7 @@ namespace flashana {
     /**
        A set of custom algorithms (not to be executed but to be configured)
     */
-    std::vector<BaseAlgorithm*> _custom_alg_v;
+    std::vector<flashana::BaseAlgorithm*> _custom_alg_v;
 
     /// TPC object information collection (provided by a user)
     QClusterArray_t _tpc_object_v;
