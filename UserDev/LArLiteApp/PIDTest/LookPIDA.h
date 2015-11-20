@@ -39,6 +39,9 @@ namespace larlite {
       fPIDA_1.clear();  
       fPIDA_2.clear();
       
+      fRecoPdg_0.clear();
+      fRecoPdg_1.clear();
+      fRecoPdg_2.clear();
       fTruePdg.clear();
       
       fdEdxReco_0.clear();
@@ -63,7 +66,9 @@ namespace larlite {
       fKInitReco.clear();
       fKInitTrue.clear();
       
-      fHitsNumbReco.clear();
+      fHitsNumbReco_0.clear();
+      fHitsNumbReco_1.clear();
+      fHitsNumbReco_2.clear();
       fHitsNumbTrue.clear();
       
       fTracksNumbReco.clear();
@@ -101,6 +106,9 @@ namespace larlite {
     std::vector<double> fPIDA_1        ; // Reco PIDA on plan 1?
     std::vector<double> fPIDA_2        ; // Reco PIDA on plan 2?
 
+    std::vector<double> fRecoPdg_0     ; // Reco pdg 0
+    std::vector<double> fRecoPdg_1     ; // Reco pdg 1
+    std::vector<double> fRecoPdg_2     ; // Reco pdg 2
     std::vector<double> fTruePdg       ; // True pdg
 	              
     std::vector<double> fdEdxReco_0    ; // Reco dEdx on plan 0?
@@ -125,7 +133,9 @@ namespace larlite {
     std::vector<double> fKInitReco     ; // Initial Reco Kinetic Energy 
     std::vector<double> fKInitTrue     ; // Initial True Kinetic Energy 
 
-    std::vector<double> fHitsNumbReco  ; // Number of Reco hits per track
+    std::vector<double> fHitsNumbReco_0; // Number of Reco hits per track 0
+    std::vector<double> fHitsNumbReco_1; // Number of Reco hits per track 1
+    std::vector<double> fHitsNumbReco_2; // Number of Reco hits per track 2
     std::vector<double> fHitsNumbTrue  ; // Number of True hits per track
 
     std::vector<double> fTracksNumbReco; // Number of Reco tracks per event

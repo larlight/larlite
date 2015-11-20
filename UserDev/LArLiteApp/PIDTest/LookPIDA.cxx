@@ -42,14 +42,17 @@ namespace larlite {
 	  fRangeTrue.push_back(length);
 	  fHitsNumbTrue.push_back(mct.dEdx().size());
 	}
-	fTracksNumbTrue.push_back(ev_mct->size());
-      }
-    
+	fTruePdg.push_back(mct.PdgCode());
+      } // end of loop on mctracks 
+    fTracksNumbTrue.push_back(ev_mct->size());    
 
     auto const ev_track = storage->get_data<event_track>("trackkalmanhit");
     fTracksNumbReco.push_back(ev_track->size());
-	
-    for(size_t track_index=0; track_index<ev_track->size();++track_index){
+    
+    size_t track_index=0;
+    for(auto const& t : *ev_track){
+      
+      //    for( track_index<ev_track->size();){ 
       
       event_partid* ev_pid = nullptr;
       auto const& ass_pid_v = storage->find_one_ass(ev_track->id(),
@@ -104,8 +107,19 @@ namespace larlite {
 	  fdEdxReco_2.push_back(ev_calo->at(ass_calo_v[track_index][2]).dEdx()[i]);
 	}
 
-      //      fStepEnergyReco.push_back();
 
+      
+      fRecoPdg_0.push_back(ev_pid->at(ass_pid_v[track_index][0]).Pdg());
+      fRecoPdg_1.push_back(ev_pid->at(ass_pid_v[track_index][1]).Pdg());
+      fRecoPdg_2.push_back(ev_pid->at(ass_pid_v[track_index][2]).Pdg());
+
+      fHitsNumbReco_0.push_back(ev_calo->at(ass_calo_v[track_index][0]).dEdx().size());
+      fHitsNumbReco_1.push_back(ev_calo->at(ass_calo_v[track_index][1]).dEdx().size());
+      fHitsNumbReco_2.push_back(ev_calo->at(ass_calo_v[track_index][2]).dEdx().size());
+
+      fRangeReco.push_back(t.Length());
+
+      ++track_index;
     } // End on tracks loop
 
 
@@ -127,6 +141,9 @@ namespace larlite {
       fPIDA_1.clear();  
       fPIDA_2.clear();
       
+      fRecoPdg_0.clear();
+      fRecoPdg_1.clear();
+      fRecoPdg_2.clear();
       fTruePdg.clear();
       
       fdEdxReco_0.clear();
@@ -148,7 +165,9 @@ namespace larlite {
       fKInitReco.clear();
       fKInitTrue.clear();
       
-      fHitsNumbReco.clear();
+      fHitsNumbReco_0.clear();
+      fHitsNumbReco_1.clear();
+      fHitsNumbReco_2.clear();
       fHitsNumbTrue.clear();
       
       fTracksNumbReco.clear();
@@ -163,7 +182,10 @@ namespace larlite {
     fPIDATree->Branch("fPIDA_0"        ,"vector<double> ", &fPIDA_0        );
     fPIDATree->Branch("fPIDA_1"        ,"vector<double> ", &fPIDA_1        );
     fPIDATree->Branch("fPIDA_2"        ,"vector<double> ", &fPIDA_2        );
-	 	   	      			   
+
+    fPIDATree->Branch("fRecoPdg_0"     ,"vector<double> ", &fRecoPdg_0     );
+    fPIDATree->Branch("fRecoPdg_1"     ,"vector<double> ", &fRecoPdg_1     );
+    fPIDATree->Branch("fRecoPdg_2"     ,"vector<double> ", &fRecoPdg_2     );	 	   	      			   
     fPIDATree->Branch("fTruePdg"       ,"vector<double> ", &fTruePdg       );
 	                 
     fPIDATree->Branch("fdEdxReco_0"    ,"vector<double> ", &fdEdxReco_0    );
@@ -188,7 +210,9 @@ namespace larlite {
     fPIDATree->Branch("fKInitReco"     ,"vector<double> ", &fKInitReco     );
     fPIDATree->Branch("fKInitTrue"     ,"vector<double> ", &fKInitTrue     );
 	                 	       	
-    fPIDATree->Branch("fHitsNumbReco"  ,"vector<double> ", &fHitsNumbReco  );
+    fPIDATree->Branch("fHitsNumbReco_0","vector<double> ", &fHitsNumbReco_0);
+    fPIDATree->Branch("fHitsNumbReco_1","vector<double> ", &fHitsNumbReco_1);
+    fPIDATree->Branch("fHitsNumbReco_2","vector<double> ", &fHitsNumbReco_2);
     fPIDATree->Branch("fHitsNumbTrue"  ,"vector<double> ", &fHitsNumbTrue  );
 	                 
     fPIDATree->Branch("fTracksNumbReco","vector<double> ", &fTracksNumbReco);
@@ -200,22 +224,15 @@ namespace larlite {
 #endif
 
 /*
-      fTruePdg.clear();
-            
-      fdEdxTrue.clear();
-      
       fdEdxDelta_0.clear();
       fdEdxDelta_1.clear();
       fdEdxDelta_2.clear();
-      
-      fRangeReco.clear();
-
-      
+          
       fResRangeReco.clear();
       fResRangeTrue.clear();
       
       fKInitReco.clear();
       fKInitTrue.clear();
       
-      fHitsNumbReco.clear();
+      fStepEnergyReco.push_back();
 */
