@@ -86,8 +86,8 @@ namespace larlite {
     _mgr.Reset();
     const ::larutil::Geometry* g = ::larutil::Geometry::GetME();
 
-    auto ev_flash = storage->get_data<event_opflash>("opflash");// opflash");
-    auto ev_hit= storage->get_data<event_ophit>("satOpFlash");// opflash");
+    auto ev_flash = storage->get_data<event_opflash>("opflashSat");// opflash");
+    auto ev_hit= storage->get_data<event_ophit>("opflashSat");// opflash");
 
     if(!ev_flash || ev_flash->empty()) {
       std::cout<<"No opflash found. Skipping event: "<<storage->event_id()<<std::endl;
