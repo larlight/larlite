@@ -29,10 +29,12 @@ namespace flashana {
   public:
     
     /// Default constructor
-    TimeCompatMatch();
+    TimeCompatMatch(const std::string name="TimeCompatMatch");
     
     /// Default destructor
     ~TimeCompatMatch(){}
+
+    void Configure(const ::fcllite::PSet &pset);
 
     bool MatchCompatible(const QCluster_t& clus, const Flash_t& flash);
 

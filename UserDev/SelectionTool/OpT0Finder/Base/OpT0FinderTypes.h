@@ -16,7 +16,9 @@ namespace flashana {
     kTPCFilter,       ///< Algorithm type to filter out TPC objects from matching candidate list
     kFlashFilter,     ///< Algorithm type to filter out flash from matching candidate list
     kFlashMatch,      ///< Algorithm type to match flash hypothesis and reconstructed flash
-    kMatchProhibit,   /// < Algorithm type to prohibit a match between a flash and a cluster
+    kMatchProhibit,   ///< Algorithm type to prohibit a match between a flash and a cluster
+    kFlashHypothesis, ///< Algorithm type to make QCluster_t => Flash_t hypothesis
+    kCustomAlgo,      ///< Algorithm type that does not play a role in the framework execution but inherits from BaseAlgorithm
     kAlgorithmTypeMax ///< enum flag for algorithm type count & invalid type
   };
 
@@ -69,6 +71,7 @@ namespace flashana {
     QCluster_t()
       : idx(kINVALID_ID)
     {}
+
   };
   /// Collection of 3D point clusters (one use case is TPC object representation for track(s) and shower(s))
   typedef std::vector<flashana::QCluster_t> QClusterArray_t;
@@ -105,7 +108,7 @@ namespace flashana {
       kWARNING,
       kERROR,
       kEXCEPTION,
-            kMSG_TYPE_MAX
+      kMSG_TYPE_MAX
     };
     
     const std::string kColorPrefix[kMSG_TYPE_MAX] =

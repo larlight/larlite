@@ -27,7 +27,7 @@ namespace flashana {
   public:
     
     /// Default constructor
-    BaseTPCFilter() : BaseAlgorithm(kTPCFilter)
+    BaseTPCFilter(const std::string name="noname") : BaseAlgorithm(kTPCFilter,name)
     {}
  
     /// Default destructor
