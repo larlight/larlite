@@ -17,6 +17,7 @@ namespace larlite {
     , _track_tree(nullptr)
     , _flashmatch_tree(nullptr)
     , _eff_tree(nullptr)
+    , _nflash_v_nint(nullptr)
     , _time_diff(nullptr)
   {
     _name="UBT0Finder";
@@ -85,8 +86,8 @@ namespace larlite {
     _mgr.Reset();
     const ::larutil::Geometry* g = ::larutil::Geometry::GetME();
 
-    auto ev_flash = storage->get_data<event_opflash>("opflash");// opflash");
-    auto ev_hit= storage->get_data<event_ophit>("satOpFlash");// opflash");
+    auto ev_flash = storage->get_data<event_opflash>("opflashSat");// opflash");
+    auto ev_hit= storage->get_data<event_ophit>("opflashSat");// opflash");
 
     if(!ev_flash || ev_flash->empty()) {
       std::cout<<"No opflash found. Skipping event: "<<storage->event_id()<<std::endl;
@@ -135,7 +136,7 @@ namespace larlite {
     	  pt.z = pt1[2] + dz/2.;
     	  
     	  tpc_obj.emplace_back(pt);
-    	  tpc_obj.idx = n;
+	  tpc_obj.idx = n;
 	    }
 	_mgr.Emplace(std::move(tpc_obj));
       }
@@ -262,12 +263,12 @@ namespace larlite {
 	    	      	tpc_obj.push_back(pt);
 	    	      	tpc_obj.idx = n;
 			}
-	    	  
-	    	  }
+		  
+		}
 	        e_diff += (trk3[0].E() - trk3[trk3.size()-1].E()); 
-	      }
-
-	    
+	  }
+	  
+	  
 	    _mgr.Emplace(std::move(tpc_obj));
 	    
 	    if( e_diff > _e_diff ) 
@@ -277,7 +278,7 @@ namespace larlite {
 	  _n_flash = n_flash;
 		
 	  _int_tree->Fill();		
-          }// if index has not already been used
+	 }// if index has not already been used
 	}// if the track is at least 2 elements long
       }// for all tracks
 
@@ -380,7 +381,7 @@ namespace larlite {
     for (size_t n=0; n < ev_mctrack->size(); n++){
       auto const& mct = ev_mctrack->at(n);
       // ignore tracks with < 2 steps
-      if (mct.size() < 2) continue;
+      if (mct.size() <= 2) continue;
       // find the flash that was matched for this MCTrack (if any)
 
       _mc_time = mct[0].T() * 1.e-3;
@@ -427,8 +428,8 @@ namespace larlite {
 
     _nflash_v_nint->Fill(n_int, n_flash);
 
-    if(_npts == 0 )
-      _eff_tree->Fill();
+//    if(_npts == 0 )
+//      _eff_tree->Fill();
 
     return true;
   }

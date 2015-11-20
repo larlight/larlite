@@ -18,6 +18,7 @@ ROOT.gErrorIgnoreLevel = orig_level
 try:
     ROOT.larlite
     ROOT.larutil
+    ROOT.larlite.ana_processor
 except AttributeError:
     error('No LArLite core library loaded!')
     raise

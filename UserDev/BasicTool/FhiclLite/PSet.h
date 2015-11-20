@@ -97,10 +97,20 @@ namespace fcllite {
     T get(const std::string& key) const{
       auto iter = _data_value.find(key);
       if( iter == _data_value.end() ) {
+	
 	std::string msg;
 	msg = "Key does not exist: \"" + key + "\"";
 	throw FhiclLiteException(msg);
       }
+      return FromString<T>((*iter).second);
+    }
+
+    /// Template getter w/ default value
+    template <class T>
+    T get(const std::string& key, const std::string default_value) const{
+      auto iter = _data_value.find(key);
+      if( iter == _data_value.end() )
+	return FromString<T>(default_value);
       return FromString<T>((*iter).second);
     }
 

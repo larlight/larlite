@@ -20,6 +20,7 @@
 #include "BaseFlashFilter.h"
 #include "BaseProhibitAlgo.h"
 #include "BaseFlashMatch.h"
+#include "BaseFlashHypothesis.h"
 namespace flashana {
   /**
      \class FlashMatchManager
@@ -29,13 +30,26 @@ namespace flashana {
   public:
     
     /// Default constructor
-    FlashMatchManager();
+    FlashMatchManager(const std::string name="FlashMatchManager");
     
     /// Default destructor
     ~FlashMatchManager(){}
 
+    /// Name getter
+    const std::string& Name() const;
+
     /// Algorithm setter
     void SetAlgo(BaseAlgorithm* alg);
+
+    /// Custom algorithm adder
+    void AddCustomAlgo(BaseAlgorithm* alg);
+
+    /// Configuration
+    void Configure(const std::string="");
+
+    /// Algorithm getter
+    flashana::BaseAlgorithm* GetAlgo(flashana::Algorithm_t type);
+		 
 #ifndef __CINT__
     /// Emplacer of a TPC object (hidden from ROOT5 CINT)
     void Emplace(flashana::QCluster_t&& obj);
@@ -67,10 +81,16 @@ namespace flashana {
     
   private:
 
-    BaseFlashFilter*     _alg_flash_filter;   ///< Flash filter algorithm
-    BaseTPCFilter*       _alg_tpc_filter;     ///< TPC filter algorithm
-    BaseProhibitAlgo*    _alg_match_prohibit; ///< Flash matchinig prohibit algorithm
-    BaseFlashMatch*      _alg_flash_match;    ///< Flash matching algorithm
+    BaseFlashFilter*     _alg_flash_filter;     ///< Flash filter algorithm
+    BaseTPCFilter*       _alg_tpc_filter;       ///< TPC filter algorithm
+    BaseProhibitAlgo*    _alg_match_prohibit;   ///< Flash matchinig prohibit algorithm
+    BaseFlashMatch*      _alg_flash_match;      ///< Flash matching algorithm
+    BaseFlashHypothesis* _alg_flash_hypothesis; ///< Flash hypothesis algorithm
+
+    /**
+       A set of custom algorithms (not to be executed but to be configured)
+    */
+    std::vector<flashana::BaseAlgorithm*> _custom_alg_v;
 
     /// TPC object information collection (provided by a user)
     QClusterArray_t _tpc_object_v;
@@ -78,7 +98,12 @@ namespace flashana {
     FlashArray_t _flash_v;
     /// Configuration option to allow re-use of a flash (i.e. 1 flash can be assigned to multiple TPC object)
     bool _allow_reuse_flash;
-
+    /// Configuration readiness flag
+    bool _configured;
+    /// Configuration file
+    std::string _config_file;
+    /// Name
+    std::string _name;
   };
 }
 

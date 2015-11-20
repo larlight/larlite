@@ -4,8 +4,8 @@ import os
 
 class ERViewer (GeoViewer):
 
-    def __init__(self,name):
-        super(ERViewer,self).__init__()
+    def __init__(self,name,width=10,height=5):
+        super(ERViewer,self).__init__(width,height)
         self._holder = ertool.GeoViewerERToolBackend()
         self._cfg_mgr = fcllite.ConfigManager()
         self.set_window_title(name)

@@ -15,11 +15,19 @@
 #pragma link C++ class flashana::MaxNPEWindow+;
 #pragma link C++ class flashana::TimeRange+;
 #pragma link C++ class flashana::TimeRangeSet+;
-#pragma link C++ class flashana::FilterArray+;
+//#pragma link C++ class flashana::FilterArray+;
 #pragma link C++ class flashana::NPtFilter+;
 #pragma link C++ class flashana::QLLMatch+;
+
+#pragma link C++ class flashana::PhotonLibHypothesis+;
+#pragma link C++ class flashana::ChargeAnalytical+;
+#pragma link C++ class flashana::LightPath+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
+
+
 
 
 
