@@ -10,7 +10,6 @@
 #pragma link off all functions;
 
 #pragma link C++ class larlite::UBT0Finder+;
-#pragma link C++ class MCInteraction+;
 #pragma link C++ class larlite::PaddleUBT0Finder+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
