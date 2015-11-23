@@ -18,34 +18,28 @@
 #include "DataFormat/mctrack.h"
 #include "DataFormat/mcshower.h"
 #include "OpT0Finder/Base/OpT0FinderTypes.h"
+#include "OpT0Finder/Base/BaseAlgorithm.h"
 
-namespace larlite {
+namespace flashana {
   /**
      \class MCQCluster
      User defined class MCQCluster ... these comments are used to generate
      doxygen documentation!
   */
-  class MCQCluster{
+  class MCQCluster : public flashana::BaseAlgorithm {
     
-  public:
-    enum MCQClusterSource_t {
-      kMCShowerAncestor,
-      kMCTrackAncestor,
-      kUnknownAncestor
-    };
-
-    typedef std::pair<larlite::MCQCluster::MCQClusterSource_t,int> MCQSourceID_t;
-
   public:
     
     /// Default constructor
-    MCQCluster();
+    MCQCluster(const std::string name="MCQCluster");
     
     /// Default destructor
     ~MCQCluster(){}
 
-    void Construct( const event_mctrack&,
-                    const event_mcshower& );
+    void Configure(const ::fcllite::PSet &pset);
+
+    void Construct( const larlite::event_mctrack&,
+                    const larlite::event_mcshower& );
 
     const std::vector<flashana::QCluster_t>& QClusters() const;
 
@@ -55,20 +49,23 @@ namespace larlite {
 
     size_t MCShower2QCluster(size_t) const;
 
-    const larlite::MCQCluster::MCQSourceID_t& MCObjectID(size_t) const;
+    const flashana::MCSource_t& MCObjectID(size_t) const;
+
+    void Swap(std::vector<flashana::QCluster_t>&,
+	      std::vector<flashana::MCSource_t>&);
 
   private:
   
-    MCQSourceID_t Identify( const unsigned int,
-                            const larlite::event_mctrack&,
-                            const larlite::event_mcshower& ) const;
-
+    flashana::MCSource_t Identify( const unsigned int,
+				   const larlite::event_mctrack&,
+				   const larlite::event_mcshower& ) const;
+    
     double _light_yield;
     double _step_size;
     std::vector<flashana::QCluster_t> _qcluster_v;
     std::vector<size_t> _mctrack_2_qcluster;
     std::vector<size_t> _mcshower_2_qcluster;
-    std::vector<larlite::MCQCluster::MCQSourceID_t> _qcluster_2_mcobject;
+    std::vector<flashana::MCSource_t> _qcluster_2_mcobject;
 
   };
 }

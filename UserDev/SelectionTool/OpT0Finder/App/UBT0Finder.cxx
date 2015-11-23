@@ -86,8 +86,8 @@ namespace larlite {
     _mgr.Reset();
     const ::larutil::Geometry* g = ::larutil::Geometry::GetME();
 
-    auto ev_flash = storage->get_data<event_opflash>("satOpFlash");// opflash");
-    auto ev_hit = storage->get_data<event_ophit>("satOpFlash"); // opflash");
+    auto ev_flash = storage->get_data<event_opflash>("opflashSat");// opflash");
+    auto ev_hit = storage->get_data<event_ophit>    ("opflashSat"); // opflash");
 
     if (!ev_flash || ev_flash->empty()) {
       std::cout << "No opflash found. Skipping event: " << storage->event_id() << std::endl;
@@ -107,6 +107,7 @@ namespace larlite {
     //auto ev_track = storage->get_data<event_track>("pandoraCosmicKHit");
     auto ev_track = storage->get_data<event_track>("trackkalmanhit");
     auto ev_mctrack = storage->get_data<event_mctrack>("mcreco");
+    auto ev_mcshower = storage->get_data<event_mcshower>("mcreco");
 
     if (!_use_mc) {
       if (!ev_track || ev_track->empty()) return false;
@@ -147,21 +148,9 @@ namespace larlite {
 
       if (!ev_mctrack || ev_mctrack->empty()) return false;
 
-      // Look at tracks on 'per interaction' basis
-      std::vector<unsigned int> usedIDs;
-      usedIDs.resize(0);
-
       for (size_t n = 0; n < ev_mctrack->size(); n++) {
-//  std::cout<<"Ancestors: "<<ev_mctrack->at(n).AncestorTrackID()<<std::endl;
-        bool used = false ;
-        for (size_t u = 0; u < usedIDs.size(); u++) {
-          if ( ev_mctrack->at(n).AncestorTrackID() == usedIDs[u] )
-            used = true;
-        }
 
         auto const& trk = ev_mctrack->at(n);
-
-        ::flashana::QCluster_t tpc_obj;
 
         if (trk.size() > 2) {
 
@@ -172,7 +161,6 @@ namespace larlite {
           double det_drift_time = 2.2E6; // ns
           double det_width = 256.; // cm
           double shift_x = event_time * (det_width / det_drift_time);
-          tpc_obj.reserve(trk.size() - 1);
 
           _trk_time = trk[0].T() / 1000.;
           _trk_x    = trk[0].X();
@@ -185,104 +173,43 @@ namespace larlite {
           }
 
           _track_tree->Fill();
-          // Find all tracks with same ancestor ID and add them to the tpc_obj
-          if (!used) {
+	}
+      }
 
-            _t0 = trk.AncestorStart().T() ;
-            _n_pe = 0 ;
+      // Get MC QCluster list
+      _interaction_algo.Construct(*ev_mctrack,*ev_mcshower);
+      
+      std::vector<flashana::QCluster_t> qcluster_v;
+      std::vector<flashana::MCSource_t> source_v;
+      _interaction_algo.Swap(qcluster_v,source_v);
 
-            for (auto const & h : *ev_hit ) {
+      for(auto& qcluster : qcluster_v)
 
-              if (h.PeakTime() > (_t0 / 1000. - 10.) && h.PeakTime() < (_t0 / 1000. + 10.))
-                _n_pe += h.PE();
+	_mgr.Emplace(std::move(qcluster));
 
-            }
+      for(auto const& s : source_v) {
 
-            // Store used ancestor ids, so we do not double count energy dep assoc with this ancestor
-            std::vector<int> ids ;
-            ids.resize(0);
-            auto const & ancID = trk.AncestorTrackID() ;
-            usedIDs.push_back(ancID);
+	if(s.g4_time == ::flashana::kINVALID_DOUBLE) {
 
-            for (size_t m = 0; m < ev_mctrack->size(); m++) {
+	  print(msg::kWARNING,__FUNCTION__,Form("Found unknown QCluster MC source (G4 T=%g)",s.g4_time));
+	  continue;
+	  
+	}
 
-              auto const & trk2 = ev_mctrack->at(m);
+	_t0 = s.g4_time;
+	_n_pe = 0;
+	_int_e = s.energy_deposit;
+	
+	for (auto const & h : *ev_hit ) {
 
-              if ( ancID == trk2.AncestorTrackID() && trk2.size() >= 2)
-                ids.push_back(m) ;
-
-            }
-
-            // Now loop over all mctracks that share an ancestor and treat
-            // them as one interaction
-            double e_diff = 0;
-            for (size_t j = 0; j < ids.size(); j++) {
-              auto const & trk3 = ev_mctrack->at(ids[j]);
-              ::flashana::QPoint_t pt;
-
-              for (size_t i = 0; i < (trk3.size() - 1); ++i) {
-
-                auto const& pt1 = trk3[i].Position();
-                auto const& pt2 = trk3[i + 1].Position();
-                double dx = pt2[0] - pt1[0];
-                double dy = pt2[1] - pt1[1];
-                double dz = pt2[2] - pt1[2];
-                double e_diff = (trk3[i].E() - trk3[i + 1].E());
-                //std::cout<<"\nOld X, Y, Z, Q: "<<pt1[0] + dx/2. +shift_x<<", "<<pt1[1]+dy/2.<<", "<<pt1[2]+dz/2.<<", "<<(trk3[i].E() - trk3[i+1].E())<<std::endl ;
-
-                if (_useAbsPE ) {
-
-                  double distance = pow(pow(dx, 2) + pow(dy, 2) + pow(dz, 2), 0.5) ;
-                  int n_steps = int ( distance / _step_len ) + 1;
-                  double dedx = e_diff / distance ; //This is dedx
-                  double e_dep = dedx * _step_len ;  //This is energy dep for each step. This works for all but last, smaller step
-
-                  for (size_t ii = 1; ii <= n_steps; ii++) {
-
-                    //energy deposition is 0.5*e_dep all times except last step
-                    if (ii * _step_len > distance)
-                      e_dep *= (distance - (ii - 1) * _step_len) / _step_len ;
-
-                    pt.q = e_dep * 29000;
-                    pt.x = pt1[0] + dx / n_steps * (ii - 1 + 0.5) + shift_x;
-                    pt.y = pt1[1] + dy / n_steps * (ii - 1 + 0.5);
-                    pt.z = pt1[2] + dz / n_steps * (ii - 1 + 0.5);
-                    //std::cout<<"New X, Y, Z, Q: "<<", "<<pt.x<<", "<<pt.y<<", "<<pt.z<<", "<<pt.q/29000<<std::endl;
-
-                    tpc_obj.push_back(pt);
-                    tpc_obj.idx = n;
-                  }
-                }
-                else {
-
-                  pt.q = (trk3[i].E() - trk3[i + 1].E());
-                  pt.x = pt1[0] + dx / 2. + shift_x;
-                  pt.y = pt1[1] + dy / 2.;
-                  pt.z = pt1[2] + dz / 2.;
-
-                  tpc_obj.push_back(pt);
-                  tpc_obj.idx = n;
-                }
-
-              }
-              e_diff += (trk3[0].E() - trk3[trk3.size() - 1].E());
-            }
-
-
-            _mgr.Emplace(std::move(tpc_obj));
-
-            if ( e_diff > _e_diff )
-              n_int++;
-
-            _int_e = e_diff ;
-            _n_flash = n_flash;
-
-            _int_tree->Fill();
-          }// if index has not already been used
-        }// if the track is at least 2 elements long
-      }// for all tracks
-
-    }
+	  if (h.PeakTime() > (_t0 / 1000. - 10.) && h.PeakTime() < (_t0 / 1000. + 10.))
+	    _n_pe += h.PE();
+	  
+	} // end looping over all hits for this interaction
+	
+	_int_tree->Fill();
+      } // end looping over all MC source
+    }// for all tracks
 
     for (size_t n = 0; n < ev_flash->size(); n++) {
 
