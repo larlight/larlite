@@ -8,8 +8,7 @@ namespace flashana {
 
   PhotonLibHypothesis::PhotonLibHypothesis(const std::string name)
     : BaseFlashHypothesis(name)
-  {}
-
+  
   void PhotonLibHypothesis::Configure(const ::fcllite::PSet &pset)
   {}
   
@@ -17,6 +16,7 @@ namespace flashana {
 					 Flash_t &flash) const
   {
     
+    std::cout<<"?????";
     size_t n_pmt = BaseAlgorithm::NOpDets();
     
     for ( auto& v : flash.pe_v ) v = 0;
@@ -27,8 +27,10 @@ namespace flashana {
 	
         auto const& pt = trk[ipt];
 	
-        double q = pt.q;
-        q *= ::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt);
+	double q = pt.q;
+	std::cout<<q;
+	
+	q *= ::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt);
         flash.pe_v[ipmt] += q;
 
 	//std::cout << "PMT : " << ipmt << " [x,y,z] -> [q] : [" << pt.x << ", "
