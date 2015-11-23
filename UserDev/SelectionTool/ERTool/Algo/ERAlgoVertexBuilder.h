@@ -32,6 +32,7 @@ namespace ertool {
 
     Double_t const tstart_prox;
     Double_t const tmax_rad;
+    Bool_t const twithTrackDir;
     Bool_t const tverbose;
 
     geoalgo::AABox volume;
@@ -42,6 +43,7 @@ namespace ertool {
     /// Default constructor
     ERAlgoVertexBuilder(Double_t const start_prox,
 			Double_t const max_rad,
+			Bool_t const withTrackDir = true,
 			const std::string& name="ERAlgoVertexBuilder");
 
     /// Default destructor
@@ -56,9 +58,11 @@ namespace ertool {
     /// Called @ before processing the first event sample
     void ProcessBegin();
 
-    std::list<NodeID_t> Smear();
-
     void EndReconstruct(ParticleGraph const & graph);
+
+    void WithTrackDir(const EventData &data, ParticleGraph& graph);
+
+    void WithoutTrackDir(const EventData &data, ParticleGraph& graph);
 
     /// Function to evaluate input showers and determine a score
     bool Reconstruct(const EventData &data, ParticleGraph& graph);
