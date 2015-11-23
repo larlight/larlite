@@ -15,6 +15,8 @@ namespace larlite {
   }
   
   bool LookPIDA::analyze(storage_manager* storage) {
+    
+    //    std::cout<<" New Event "<<std::endl<<std::endl;
     //Let's start by cleaning up the analysis TTree
     ClearTreeVar();
 
@@ -28,10 +30,11 @@ namespace larlite {
       return false;
     }
     
-
+    
     for(auto const& mct : *ev_mct)
       {
 	double length = 0;
+	//	std::cout<<"TRUE "<<mct.dEdx().size()<<std::endl;
 	if(mct.dEdx().size()){
 	  for(unsigned int i = 0; i < mct.dEdx().size();++i)
 	    {
@@ -46,6 +49,7 @@ namespace larlite {
       } // end of loop on mctracks 
     fTracksNumbTrue.push_back(ev_mct->size());    
 
+    
     auto const ev_track = storage->get_data<event_track>("trackkalmanhit");
     fTracksNumbReco.push_back(ev_track->size());
     
@@ -94,6 +98,10 @@ namespace larlite {
       fPIDA_1.push_back(ev_pid->at(ass_pid_v[track_index][1]).PIDA());
       fPIDA_2.push_back(ev_pid->at(ass_pid_v[track_index][2]).PIDA());
       
+      //      std::cout<<"Reco 0 "<<ev_calo->at(ass_calo_v[track_index][0]).dEdx().size()<<std::endl;
+      //std::cout<<"Reco 1 "<<ev_calo->at(ass_calo_v[track_index][0]).dEdx().size()<<std::endl;
+      //std::cout<<"Reco 2 "<<ev_calo->at(ass_calo_v[track_index][0]).dEdx().size()<<std::endl;
+
       for(unsigned int i = 0; i < ev_calo->at(ass_calo_v[track_index][0]).dEdx().size();++i)
 	{
 	  fdEdxReco_0.push_back(ev_calo->at(ass_calo_v[track_index][0]).dEdx()[i]);
@@ -122,7 +130,7 @@ namespace larlite {
       ++track_index;
     } // End on tracks loop
 
-
+    
     
     fPIDATree->Fill();
     return true;
@@ -137,42 +145,45 @@ namespace larlite {
   }
 
   void LookPIDA::ClearTreeVar(){
-      fPIDA_0.clear();
-      fPIDA_1.clear();  
-      fPIDA_2.clear();
-      
-      fRecoPdg_0.clear();
-      fRecoPdg_1.clear();
-      fRecoPdg_2.clear();
-      fTruePdg.clear();
-      
-      fdEdxReco_0.clear();
-      fdEdxReco_1.clear();
-      fdEdxReco_2.clear();
-      
-      fdEdxTrue.clear();
-      
-      fdEdxDelta_0.clear();
-      fdEdxDelta_1.clear();
-      fdEdxDelta_2.clear();
-      
-      fRangeReco.clear();
-      fRangeTrue.clear();
-      
-      fResRangeReco.clear();
-      fResRangeTrue.clear();
-      
-      fKInitReco.clear();
-      fKInitTrue.clear();
-      
-      fHitsNumbReco_0.clear();
-      fHitsNumbReco_1.clear();
-      fHitsNumbReco_2.clear();
-      fHitsNumbTrue.clear();
-      
-      fTracksNumbReco.clear();
-      fTracksNumbTrue.clear();      
-
+    
+    fPIDA_0.clear();        
+    fPIDA_1.clear();        
+    fPIDA_2.clear();        
+              
+    fRecoPdg_0.clear();     
+    fRecoPdg_1.clear();     
+    fRecoPdg_2.clear();     
+    fTruePdg.clear();       
+    
+    fdEdxReco_0.clear();    
+    fdEdxReco_1.clear();    
+    fdEdxReco_2.clear();    
+    
+    fdEdxTrue.clear();      
+              
+    fdEdxDelta_0.clear();   
+    fdEdxDelta_1.clear();   
+    fdEdxDelta_2.clear();   
+              
+    fStepEnergyReco.clear();
+    fStepEnergyTrue.clear();
+              
+    fRangeReco.clear();     
+    fRangeTrue.clear();     
+              
+    fResRangeReco.clear();  
+    fResRangeTrue.clear();  
+              
+    fKInitReco.clear();     
+    fKInitTrue.clear();     
+              
+    fHitsNumbReco_0.clear();
+    fHitsNumbReco_1.clear();
+    fHitsNumbReco_2.clear();
+    fHitsNumbTrue.clear();  
+              
+    fTracksNumbReco.clear();
+    fTracksNumbTrue.clear();
   }
   
   void LookPIDA::InitializeAnaTree()
@@ -182,39 +193,39 @@ namespace larlite {
     fPIDATree->Branch("fPIDA_0"        ,"vector<double> ", &fPIDA_0        );
     fPIDATree->Branch("fPIDA_1"        ,"vector<double> ", &fPIDA_1        );
     fPIDATree->Branch("fPIDA_2"        ,"vector<double> ", &fPIDA_2        );
-
+							                   
     fPIDATree->Branch("fRecoPdg_0"     ,"vector<double> ", &fRecoPdg_0     );
     fPIDATree->Branch("fRecoPdg_1"     ,"vector<double> ", &fRecoPdg_1     );
     fPIDATree->Branch("fRecoPdg_2"     ,"vector<double> ", &fRecoPdg_2     );	 	   	      			   
     fPIDATree->Branch("fTruePdg"       ,"vector<double> ", &fTruePdg       );
-	                 
+	                 				                   
     fPIDATree->Branch("fdEdxReco_0"    ,"vector<double> ", &fdEdxReco_0    );
     fPIDATree->Branch("fdEdxReco_1"    ,"vector<double> ", &fdEdxReco_1    );
     fPIDATree->Branch("fdEdxReco_2"    ,"vector<double> ", &fdEdxReco_2    );
-	                 
+	                 				                   
     fPIDATree->Branch("fdEdxTrue"      ,"vector<double> ", &fdEdxTrue      );
-	                 	       
+	                 	       			                   
     fPIDATree->Branch("fdEdxDelta_0"   ,"vector<double> ", &fdEdxDelta_0   );
     fPIDATree->Branch("fdEdxDelta_1"   ,"vector<double> ", &fdEdxDelta_1   );
     fPIDATree->Branch("fdEdxDelta_2"   ,"vector<double> ", &fdEdxDelta_2   );
-
+							                   
     fPIDATree->Branch("fStepEnergyReco","vector<double> ", &fStepEnergyReco);
     fPIDATree->Branch("fStepEnergyTrue","vector<double> ", &fStepEnergyTrue);
-	                 
+	                 				                   
     fPIDATree->Branch("fRangeReco"     ,"vector<double> ", &fRangeReco     );
     fPIDATree->Branch("fRangeTrue"     ,"vector<double> ", &fRangeTrue     );
-	                 		
+	                 				                   
     fPIDATree->Branch("fResRangeReco"  ,"vector<double> ", &fResRangeReco  );
     fPIDATree->Branch("fResRangeTrue"  ,"vector<double> ", &fResRangeTrue  );
-	                 	       
+	                 	       			                   
     fPIDATree->Branch("fKInitReco"     ,"vector<double> ", &fKInitReco     );
     fPIDATree->Branch("fKInitTrue"     ,"vector<double> ", &fKInitTrue     );
-	                 	       	
+	                 	       			                   
     fPIDATree->Branch("fHitsNumbReco_0","vector<double> ", &fHitsNumbReco_0);
     fPIDATree->Branch("fHitsNumbReco_1","vector<double> ", &fHitsNumbReco_1);
     fPIDATree->Branch("fHitsNumbReco_2","vector<double> ", &fHitsNumbReco_2);
     fPIDATree->Branch("fHitsNumbTrue"  ,"vector<double> ", &fHitsNumbTrue  );
-	                 
+	                 				                   
     fPIDATree->Branch("fTracksNumbReco","vector<double> ", &fTracksNumbReco);
     fPIDATree->Branch("fTracksNumbTrue","vector<double> ", &fTracksNumbTrue);
 

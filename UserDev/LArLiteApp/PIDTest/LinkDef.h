@@ -11,6 +11,7 @@
 
 
 #pragma link C++ class larlite::LookPIDA+;
+#pragma link C++ class larlite::MCTracksContainedFilter+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
