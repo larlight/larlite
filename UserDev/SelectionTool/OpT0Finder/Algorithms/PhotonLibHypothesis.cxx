@@ -19,6 +19,8 @@ namespace flashana {
     
     std::cout << "filling estimate..." << std::endl;
     std::cout << "number of track points: " << trk.size() << std::endl;
+    std::cout<<"?????";
+    size_t n_pmt = BaseAlgorithm::NOpDets();
     
     //size_t n_pmt = BaseAlgorithm::NOpDets();
 
@@ -33,8 +35,9 @@ namespace flashana {
         double q = pt.q;
 	std::cout << "q @ pt " << ipt << " is " << q << std::endl;
         q *= ::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt);
+	double q = pt.q;
+	std::cout<<q;
         flash.pe_v[ipmt] += q;
-
 	std::cout << "PMT : " << ipmt << " [x,y,z] -> [q] : [" << pt.x << ", "
 			  << pt.y << ", " << pt.z << "] -> [" << q << std::endl;
 
