@@ -168,8 +168,8 @@ namespace flashana {
     //
   }// EOF
 
-  void MCQCluster::Swap(std::vector<flashana::QCluster_t>& qcluster_v,
-			std::vector<flashana::MCSource_t>& source_v)
+  void MCQCluster::Swap(std::vector<flashana::QCluster_t>&& qcluster_v,
+			std::vector<flashana::MCSource_t>&& source_v)
   {
     std::swap(_qcluster_v,qcluster_v);
     std::swap(_qcluster_2_mcobject,source_v);

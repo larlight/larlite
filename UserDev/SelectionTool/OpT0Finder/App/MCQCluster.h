@@ -51,9 +51,10 @@ namespace flashana {
 
     const flashana::MCSource_t& MCObjectID(size_t) const;
 
-    void Swap(std::vector<flashana::QCluster_t>&,
-	      std::vector<flashana::MCSource_t>&);
-
+    #ifndef __CINT__
+    void Swap(std::vector<flashana::QCluster_t>&&,
+	      std::vector<flashana::MCSource_t>&&);
+    #endif
   private:
   
     flashana::MCSource_t Identify( const unsigned int,

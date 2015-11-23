@@ -181,7 +181,7 @@ namespace larlite {
       
       std::vector<flashana::QCluster_t> qcluster_v;
       std::vector<flashana::MCSource_t> source_v;
-      _interaction_algo.Swap(qcluster_v,source_v);
+      _interaction_algo.Swap(std::move(qcluster_v),std::move(source_v));
 
       for(auto& qcluster : qcluster_v)
 
