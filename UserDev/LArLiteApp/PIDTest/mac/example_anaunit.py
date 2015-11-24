@@ -24,8 +24,12 @@ my_proc.set_ana_output_file("PID_Test.root");
 
 # Attach an analysis unit ... here we use a base class which does nothing.
 # Replace with your analysis unit if you wish.
+one_proc = fmwk.TracksInclusiveEfficiency()
+one_proc.SetTrackProducer("trackkalmanhit")
 # Attach a template process
 my_proc.enable_filter(True);
+my_proc.add_process(fmwk.OneMCTrackFilter());
+my_proc.add_process(one_proc);
 my_proc.add_process(fmwk.MCTracksContainedFilter());
 my_proc.add_process(fmwk.LookPIDA())
 

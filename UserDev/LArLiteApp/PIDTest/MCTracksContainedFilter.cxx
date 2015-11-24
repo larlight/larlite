@@ -32,17 +32,6 @@ namespace larlite {
     //Make sure all MC tracks are fully contained
     for (auto &track : *ev_mctrack)
       {
-	/*
-	std::cout<<"Is Full Contained? "<<isFullyContained(track)<<std::endl;
-	std::cout<<"MC start: "<<std::endl
-		 <<track.Start().Position().X()<<" [     0., 256.35 ] "<<std::endl
-		 <<track.Start().Position().Y()<<" [-116.5 ,  116.5 ] "<<std::endl
-		 <<track.Start().Position().Z()<<" [     0., 1036.8 ] "<<std::endl;
-	std::cout<<"MC end  : "<<std::endl
-		 <<track.End().Position().X()<<"  [     0., 256.35 ] "<<std::endl
-		 <<track.End().Position().Y()<<"  [-116.5 ,  116.5 ] "<<std::endl
-		 <<track.End().Position().Z()<<"  [     0., 1036.8 ] "<<std::endl<<std::endl<<std::endl;
-	*/
 	if ( !isFullyContained(track) ) {countout++; return false;}
       }
     //Looks like you want to keep this event.
@@ -60,11 +49,6 @@ namespace larlite {
   bool MCTracksContainedFilter::isFullyContained(mctrack const & mytrack){
 
     //Make sure track MC start point and MC end point are in active volume
-
-    //   Point_t mypoint(mytrack.Start().Position());
-
-    //    if(_myGeoAABox.Contain(mytrack.Start().Position()) > 0 &&
-    //   _myGeoAABox.Contain(mytrack.End().Position()) > 0)     return true;
 
     ::geoalgo::Point_t mystartpoint(mytrack.Start().Position());
     ::geoalgo::Point_t myendpoint(mytrack.End().Position());
