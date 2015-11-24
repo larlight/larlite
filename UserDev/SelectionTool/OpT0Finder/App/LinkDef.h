@@ -11,6 +11,7 @@
 
 #pragma link C++ class larlite::UBT0Finder+;
 #pragma link C++ class larlite::PaddleUBT0Finder+;
+#pragma link C++ class flashana::MCQCluster+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
