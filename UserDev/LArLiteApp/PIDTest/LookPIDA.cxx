@@ -33,15 +33,19 @@ namespace larlite {
     for(auto const& mct : *ev_mct)
       {
 	double length = 0;
+	double averageDEdX = 0;
 	if(mct.dEdx().size()){
 	  for(unsigned int i = 0; i < mct.dEdx().size();++i)
 	    {
+	      averageDEdX+=mct.dEdx(i);
 	      fdEdxTrue.push_back(mct.dEdx(i));
 	      fStepEnergyTrue.push_back(mct[i+1].E());
 	      length += mct.dX(i);
 	    }      
 	  fRangeTrue.push_back(length);
 	  fHitsNumbTrue.push_back(mct.dEdx().size());
+	  faverageDEdXTrue.push_back((averageDEdX/(double)mct.dEdx().size()));
+	  
 	}
 	
 	fStartXTrue.push_back(mct.Start().X());
@@ -104,7 +108,7 @@ namespace larlite {
       fPIDA_0.push_back(ev_pid->at(ass_pid_v[track_index][0]).PIDA());
       fPIDA_1.push_back(ev_pid->at(ass_pid_v[track_index][1]).PIDA());
       fPIDA_2.push_back(ev_pid->at(ass_pid_v[track_index][2]).PIDA());
-      
+      double averageDEdX = 0;
 
       for(unsigned int i = 0; i < ev_calo->at(ass_calo_v[track_index][0]).dEdx().size();++i)
 	{
@@ -117,6 +121,7 @@ namespace larlite {
       for(unsigned int i = 0; i < ev_calo->at(ass_calo_v[track_index][2]).dEdx().size();++i)
 	{
 	  fdEdxReco_2.push_back(ev_calo->at(ass_calo_v[track_index][2]).dEdx()[i]);
+	  averageDEdX+=ev_calo->at(ass_calo_v[track_index][2]).dEdx().size();
 	}
 
 
@@ -139,6 +144,7 @@ namespace larlite {
       fEndYReco.push_back(t.End().Y());
       fEndZReco.push_back(t.End().Z());
 
+      faverageDEdXReco.push_back(averageDEdX/ (double)ev_calo->at(ass_calo_v[track_index][2]).dEdx().size());
       ++track_index;
     } // End on tracks loop
 
@@ -215,6 +221,10 @@ namespace larlite {
               
     fTracksNumbReco.clear();
     fTracksNumbTrue.clear();
+    
+    faverageDEdXTrue.clear();
+    faverageDEdXReco.clear();
+
   }
   
   void LookPIDA::InitializeAnaTree()
@@ -277,6 +287,10 @@ namespace larlite {
 	                 				                   
     fPIDATree->Branch("fTracksNumbReco","vector<double> ", &fTracksNumbReco);
     fPIDATree->Branch("fTracksNumbTrue","vector<double> ", &fTracksNumbTrue);
+
+    fPIDATree->Branch("faverageDEdXTrue","vector<double> ", &faverageDEdXTrue);
+    fPIDATree->Branch("faverageDEdXReco","vector<double> ", &faverageDEdXReco);
+
 
   }
 

@@ -89,7 +89,11 @@ namespace larlite {
       fHitsNumbTrue.clear();
       
       fTracksNumbReco.clear();
-      fTracksNumbTrue.clear();      
+      fTracksNumbTrue.clear();
+
+      faverageDEdXTrue.clear();
+      faverageDEdXReco.clear();
+      
     }
 
     /// Default destructor
@@ -150,6 +154,8 @@ namespace larlite {
     std::vector<double> fEndYReco    ;
     std::vector<double> fEndZReco    ;
 
+    std::vector<double> faverageDEdXTrue;
+    std::vector<double> faverageDEdXReco;
 
     /*
     std::vector<double> fdEdxDelta_0   ; // Delta Reco - True dEdx on plan 0?
