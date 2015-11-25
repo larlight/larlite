@@ -93,9 +93,11 @@ namespace flashana {
       if ( usedIDs_iter == usedIDs.end() ) {
 	qcluster_index = _qcluster_v.size();
 	usedIDs.emplace(trk.AncestorTrackID(), qcluster_index);
-	_qcluster_v.emplace_back();
 	// Search ancestor identity
 	_qcluster_2_mcobject.emplace_back(Identify(trk.AncestorTrackID(),ev_mct,ev_mcs));
+	QCluster_t qcluster;	
+	qcluster.idx = _qcluster_2_mcobject.back().index_id;
+	_qcluster_v.emplace_back(qcluster);
       }
       else
 	qcluster_index = usedIDs_iter->second;
