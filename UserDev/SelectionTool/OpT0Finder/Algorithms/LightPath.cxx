@@ -29,15 +29,18 @@ namespace flashana{
     
     double dist = pt_1.Dist(pt_2);
     QPoint_t q_pt;
+
+    auto const& _vfiducial = ActiveVolume();
+    if(_vfiducial.Contain(pt_1)*_vfiducial.Contain(pt_2)==0) return;
     
-      if(dist<_gap){
-	::geoalgo::Vector mid_pt((pt_1+pt_2)/2.);
-	q_pt.x = mid_pt[0];
-	q_pt.y = mid_pt[1];
-	q_pt.z = mid_pt[2];
-	q_pt.q = _dEdxMIP * _light_yield * dist/2.;
-	Q_cluster.emplace_back(q_pt);
-	return;
+    if(dist<_gap){
+      ::geoalgo::Vector mid_pt((pt_1+pt_2)/2.);
+      q_pt.x = mid_pt[0];
+      q_pt.y = mid_pt[1];
+      q_pt.z = mid_pt[2];
+      q_pt.q = _dEdxMIP * _light_yield * dist/2.;
+      Q_cluster.emplace_back(q_pt);
+      return;
       }
       
       int num_div = int(dist/_gap);
@@ -72,8 +75,8 @@ namespace flashana{
     
     QCluster_t result;
     result.clear();
-    
     auto const& _vfiducial = ActiveVolume();
+    
     if(_start_bool){
       double length = 0;
       int sample_index = 1;
@@ -111,11 +114,29 @@ namespace flashana{
       }
     }
     
+    
     for (int i = 0; i < trj.size()-2;i++){
       auto const& this_loc(trj[i]);
       auto const& last_loc(trj[i+1]);
       
       LightPath::QCluster(this_loc, last_loc, result);
+      /*double dist = this_loc.Dist(last_loc);
+      
+      if(dist>=0.5)LightPath::QCluster(this_loc, last_loc, result);
+      else{
+	size_t j = 2;
+	while(dist<0.5){
+	  auto const& next_loc(trj[i+j]);
+	  if((i+j)>=trj.size())break;
+	  dist = this_loc.Dist(next_loc);
+	  j++;
+	}
+	auto const& next_loc(trj[i+j-1]);
+	LightPath::QCluster(this_loc, next_loc, result);
+	i = i+j-1;
+      }*/
+      
+      
     }
     return result;
   }
