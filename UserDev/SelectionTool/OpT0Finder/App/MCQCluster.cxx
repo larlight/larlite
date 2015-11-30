@@ -14,6 +14,7 @@ namespace flashana {
     : BaseAlgorithm( kCustomAlgo, name )
     , _light_yield ( 29000 )
     , _step_size   ( 0.5   )
+    , _use_xshift  ( true  )
   {}
 
   void MCQCluster::Configure(const ::fcllite::PSet &pset)
@@ -119,6 +120,7 @@ namespace flashana {
       // Now loop over all mctracks that share an ancestor and treat
       // them as one interaction
       ::geoalgo::Point_t step_dir(0, 0, 0);
+      
       for (size_t step_index = 0; (step_index + 1) < trk.size(); ++step_index) {
 	
 	auto const& pt1 = trk[step_index];
@@ -149,14 +151,16 @@ namespace flashana {
 	  
 	  if (segment_index != n_segments) {
 	    pt.q = _light_yield * dedx * _step_size;
-	    pt.x = pt1.X() + step_dir[0] * _step_size * (segment_index - 0.5) + shift_x;
+	    if( _use_xshift)pt.x = pt1.X() + step_dir[0] * _step_size * (segment_index - 0.5) + shift_x;
+	    if(!_use_xshift)pt.x = pt1.X() + step_dir[0] * _step_size * (segment_index - 0.5);
 	    pt.y = pt1.Y() + step_dir[1] * _step_size * (segment_index - 0.5);
 	    pt.z = pt1.Z() + step_dir[2] * _step_size * (segment_index - 0.5);
 	  } else {
 	    double offset = _step_size * (segment_index - 1);
 	    double remain = distance - offset;
 	    pt.q = _light_yield * dedx * remain;
-	    pt.x = pt1.X() + step_dir[0] * (offset + remain / 2.) + shift_x;
+	    if( _use_xshift)pt.x = pt1.X() + step_dir[0] * (offset + remain / 2.) + shift_x;
+	    if(!_use_xshift)pt.x = pt1.X() + step_dir[0] * (offset + remain / 2.);
 	    pt.y = pt1.Y() + step_dir[1] * (offset + remain / 2.);
 	    pt.z = pt1.Z() + step_dir[2] * (offset + remain / 2.);
 	  }

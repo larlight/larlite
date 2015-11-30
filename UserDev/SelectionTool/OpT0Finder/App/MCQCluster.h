@@ -49,6 +49,8 @@ namespace flashana {
 
     size_t MCShower2QCluster(size_t) const;
 
+    bool UseXshift(bool use) { _use_xshift = use; return _use_xshift;}
+     
     const flashana::MCSource_t& MCObjectID(size_t) const;
 
     #ifndef __CINT__
@@ -63,6 +65,7 @@ namespace flashana {
     
     double _light_yield;
     double _step_size;
+    bool _use_xshift;
     std::vector<flashana::QCluster_t> _qcluster_v;
     std::vector<size_t> _mctrack_2_qcluster;
     std::vector<size_t> _mcshower_2_qcluster;
