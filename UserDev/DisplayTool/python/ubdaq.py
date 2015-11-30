@@ -2,7 +2,7 @@
 
 import argparse
 import sys
-from PyQt4 import QtGui, QtCore
+from pyqtgraph.Qt import QtGui, QtCore
 import evdmanager
 import gui
 import signal

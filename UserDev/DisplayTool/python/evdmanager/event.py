@@ -1,6 +1,5 @@
 
-from PyQt4.QtGui import QFileDialog
-from PyQt4 import QtGui
+from pyqtgraph.Qt import QtGui
 # from data import *
 # import ROOT
 # from larlite import larlite as fmwk
@@ -26,10 +25,10 @@ class event(object):
     self._lastProcessed = -1
 
   def next(self):
-    print "Called next event"
+    print("Called next event")
 
   def prev(self):
-    print "Called prev event"
+    print("Called prev event")
 
   def subrun(self):
     return self._subrun
@@ -70,21 +69,21 @@ class manager(event):
     self._view_manager = view_manager
 
   def next(self):
-    print "Called next"
+    print("Called next")
     # self._process.nextEvent()  
 
 
   def prev(self):
-    print "Called prev"
+    print("Called prev")
     # self._process.prevEvent()   
 
   def goToEvent(self,event):
-    print "Requested jump to event ", event
+    print("Requested jump to event ", event)
 
   def selectFile(self):
-    filePath = str(QFileDialog.getOpenFileName())
+    filePath = str(QtGui.QFileDialog.getOpenFileName())
     self.setInputFile(filePath)
-    print "Selected file is ", filePath
+    print("Selected file is ", filePath)
     return filePath
 
   def setInputFile(self,file):
