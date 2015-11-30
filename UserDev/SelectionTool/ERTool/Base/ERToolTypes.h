@@ -61,7 +61,6 @@ namespace ertool {
     kMuIoni,         //particles (electrons?) from muon ionization "muIoni"
     kCosmic,         //Cosmics
     kCosmicOrphan,   //Cosmic specifically tagged by an orphan-finding algo
-    kNeutronInduced, //particle induced by a neutron
     kPiZeroDecay,    //daughters of pizero decays (gammas usually)
     //Neutrino Production Processes
     kK0L,//Processes follow 

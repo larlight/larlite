@@ -44,20 +44,23 @@ namespace ertool {
       if ( part.ProcessType() == kCosmic || part.Descendant() )
         continue;
 
-      /// First look for neutron-induced short proton tracks, if the cfg file says to
+      /// First look for possibly-neutron-induced short proton tracks, if the cfg file says to
       if ( _tag_protons_from_neutrons ) {
         int possible_neutron_parent_nodeid = IsNeutronInduced( part, data, graph );
         // if nodeID -1 is returned, that means this particle wasn't neutron-induced
         if ( possible_neutron_parent_nodeid != -1 ) {
-          ///tag the particle as neutron-induced,
+          ///tag the particle as orphan
           part.SetParticleInfo( part.PdgCode(),
                                 part.Mass(),
                                 part.Vertex(),
                                 part.Momentum(),
                                 part.RecoScore(),
-                                kNeutronInduced);
-          ///set the parent to the nearest cosmic primary,
-          graph.SetParentage(possible_neutron_parent_nodeid, id);
+                                kCosmicOrphan);
+          /// (don't) set the particle as primary
+          // graph.SetPrimary(id);
+          /// (don't) set the parent to the nearest cosmic primary,
+          // graph.SetParentage(possible_neutron_parent_nodeid, id);
+
           //and skip the next step (continue to the next particle in the reco particle graph)
           continue;
         }
