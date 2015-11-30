@@ -141,25 +141,24 @@ namespace ertool {
     // If the track is too long, it's not neutron-induced (for now I'm looking for short proton tracks)
     if ( data.Track(p).Length() > _max_neutron_trklength ) return -1;
 
-    // Compute the shortest distance between this track and all tagged primary cosmic tracks
+    // Compute the shortest distance between this track and all other tracks and showers
     double _min_dist = 999999.;
     double _tmp_min_dist = 999999.;
 
-    for ( auto const &pnodeid2 : ps.GetPrimaryNodes() ) {
+    for ( auto const &pnodeid2 : ps.GetParticleNodes() ) {
 
       ertool::Particle p2 = ps.GetParticle(pnodeid2);
-
-      if (p2.ProcessType() != ProcessType_t::kCosmic) continue;
 
       // Don't compare yourself to yourself
       if (p2.ID() == p.ID()) continue;
 
-      if (p.RecoType() == RecoType_t::kTrack && p2.RecoType() == RecoType_t::kTrack)
+      if (p2.RecoType() == RecoType_t::kTrack)
         _tmp_min_dist =
           _findRel.FindClosestApproach(data.Track(p), data.Track(p2));
-      else if (p.RecoType() == RecoType_t::kTrack && p2.RecoType() == RecoType_t::kShower)
+      else if (p2.RecoType() == RecoType_t::kShower)
         _tmp_min_dist =
           _findRel.FindClosestApproach(data.Track(p), data.Shower(p2));
+
       else std::cout << "wtf" << std::endl;
 
       if (_tmp_min_dist < _min_dist)
