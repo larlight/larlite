@@ -1,5 +1,5 @@
 from gui import gui, view_manager
-from PyQt4 import QtCore, QtGui
+from pyqtgraph.Qt import QtGui, QtCore
 
 # override the gui to give the larsoft display any special features:
 class larsoftgui(gui):

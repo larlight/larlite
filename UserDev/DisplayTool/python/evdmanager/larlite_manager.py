@@ -1,4 +1,4 @@
-from PyQt4 import QtCore
+from pyqtgraph.Qt import QtCore
 from event import manager, event
 import datatypes
 from ROOT import larlite as fmwk
