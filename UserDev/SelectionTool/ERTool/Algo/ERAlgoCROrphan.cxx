@@ -133,10 +133,10 @@ namespace ertool {
   {
 
     // For now only tracks are neutron-induced, in this function
-    if ( p.RecoType() != RecoType_t::kTrack ) return false;
+    if ( p.RecoType() != RecoType_t::kTrack ) return -1;
 
     // If the track is too long, it's not neutron-induced (for now I'm looking for short proton tracks)
-    if ( data.Track(p).Length() > _max_neutron_trklength ) return false;
+    if ( data.Track(p).Length() > _max_neutron_trklength ) return -1;
 
     // Compute the shortest distance between this track and all tagged primary cosmic tracks
     double _min_dist = 999999.;
@@ -165,10 +165,10 @@ namespace ertool {
     }// End inner loop over particles to compare all permutations
 
     // If the track is too close to any other particles, it's not neutron-induced
-    if ( _min_dist > _min_neutron_dist ) return false;
+    if ( _min_dist > _min_neutron_dist ) return -1;
 
     // If the track wasn't found to be non-neutron induced... then it is neutron-induced!
-    return true;
+    return p.ID();
   }
 
   void ERAlgoCROrphan::ProcessEnd(TFile* fout)
