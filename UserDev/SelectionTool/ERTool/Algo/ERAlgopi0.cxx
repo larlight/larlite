@@ -84,13 +84,13 @@ namespace ertool {
 		//=======
 					if(shr1._energy< _energy_min  || shr2._energy<_energy_min) continue;
 		// CUT ON IP GOES HERE 
-					if(pow(_geoAlgo.SqDist(shr1, shr2),0.5)<_IPmax) continue;
+					if(pow(_geoAlgo.SqDist(shr1, shr2),0.5)>_IPmax) continue;
 		// CUT ON Any Other GOES HERE 
 					geoalgo::Point_t vertex(3);
 					geoalgo::Vector_t momentum(3);
 					LL(shr1, shr2, likelihood, mass, vertex, momentum);
 		// CUT ON LL GOES HERE 
-					if(likelihood<_LLmin) continue;
+				///	if(likelihood<_LLmin) continue;
 		// check if the ll is better... if it is... then save the shower info and ll
 					if(bestpi0ll<likelihood){
 						BestShr1 = shrID1;
