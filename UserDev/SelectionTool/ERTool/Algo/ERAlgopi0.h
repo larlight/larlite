@@ -71,6 +71,11 @@ namespace ertool {
     /// Set maximum shower energy
     void setMaxShrEnergy(double E) { _energy_max = E; }
 
+    /// Set maximum shower energy
+    void setMaxIP(double IPM) { _IPmax = IPM; }
+
+    /// Set maximum shower energy
+    void setMinLL(double MLL) { _LLmin = MLL; }
 
 
 	protected:
@@ -84,6 +89,8 @@ namespace ertool {
 
     double _energy_min =0;
     double _energy_max =1000000;
+    double _IPmax =2000;
+    double _LLmin = -5.;
 
 
     // TTree info 
