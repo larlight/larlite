@@ -46,8 +46,8 @@ void ERToolHelper::FillMCInfo(const event_mcflux&    mcf_v,
 
 		// If energy is above threshold, create ertool::Shower
 		if (mcs.DetProfile().Momentum().E() >= _minEDep) {
-			::ertool::Shower s( (mcs.DetProfile().Position() + getXShift(mcs_v[i])),
-			                    mcs.DetProfile().Momentum(),
+		       ::ertool::Shower s( (mcs.DetProfile().Position() + getXShift(mcs_v[i])),
+			                    mcs.StartDir(),//mcs.DetProfile().Momentum(),
 			                    _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
 			                    _shrProfiler.ShowerRadius() );
 			// Fill more info
@@ -611,7 +611,7 @@ void ERToolHelper::FillShowers ( const event_mcshower& mcs_v,
 		//if(mcs.DetProfile().Momentum().Mag2() == 0) continue;
 		fWatch.Start();
 		::ertool::Shower s( (mcs.DetProfile().Position() + getXShift(mcs_v[i])),
-		                    mcs.DetProfile().Momentum(),
+				    mcs.StartDir(),//mcs.DetProfile().Momentum(),
 		                    _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
 		                    _shrProfiler.ShowerRadius() );
 		create_time += fWatch.RealTime();
