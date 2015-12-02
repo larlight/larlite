@@ -771,8 +771,8 @@ TLorentzVector ERToolHelper::getXShift(const mctrack& mct) const {
 	double event_time = mct.at(0).T();
 	double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
 	shift.SetXYZT(shift_x, 0., 0., 0.);
-	// Uncomment this if you want to disable x-shift
-	// shift.SetXYZT(0., 0., 0., 0.);
+	if( _disable_xshift )
+		shift.SetXYZT(0., 0., 0., 0.);
 
 	return shift;
 }
@@ -796,8 +796,8 @@ TLorentzVector ERToolHelper::getXShift(const mcshower& mcs) const {
 	double event_time = mcs.DetProfile().T();//End().T(); <--- old usage (wrong)
 	double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
 	shift.SetXYZT(shift_x, 0., 0., 0.);
-	// Uncomment this if you want to disable x-shift
-	// shift.SetXYZT(0., 0., 0., 0.);
+	if( _disable_xshift )
+		shift.SetXYZT(0., 0., 0., 0.);
 	return shift;
 }
 
@@ -808,8 +808,8 @@ TLorentzVector ERToolHelper::getXShift(const mcpart& mcp) const {
 	double event_time = mcp.Trajectory().front().T();
 	double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
 	shift.SetXYZT(shift_x, 0., 0., 0.);
-	// Uncomment this if you want to disable x-shift
-	// shift.SetXYZT(0., 0., 0., 0.);
+	if( _disable_xshift )
+		shift.SetXYZT(0., 0., 0., 0.);
 
 	return shift;
 }
