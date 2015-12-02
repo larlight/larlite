@@ -17,23 +17,22 @@ namespace flashana {
 					 Flash_t &flash) const
   {
     
-    size_t n_pmt = BaseAlgorithm::NOpDets();
+    size_t n_pmt = BaseAlgorithm::NOpDets();//n_pmt returns 0 now, needs to be fixed
     
     for ( auto& v : flash.pe_v ) v = 0;
     
-    for ( size_t ipmt = 0; ipmt < n_pmt; ++ipmt) {
+    for ( size_t ipmt = 0; ipmt < 32; ++ipmt) {
 
       for ( size_t ipt = 0; ipt < trk.size(); ++ipt) {
 	
         auto const& pt = trk[ipt];
 	
         double q = pt.q;
-        q *= ::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt);
+	
+        q *= ::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt)*0.0093;
         flash.pe_v[ipmt] += q;
-
-	//std::cout << "PMT : " << ipmt << " [x,y,z] -> [q] : [" << pt.x << ", "
-	//		  << pt.y << ", " << pt.z << "] -> [" << q << std::endl;
-
+	//std::cout << "PMT : " << ipmt << " [x,y,z] -> [q] : [" << pt.x << ", " << pt.y << ", " << pt.z << "] -> [" << q << std::endl;
+	
       }
     }
 

@@ -1,77 +1,87 @@
 /**
- * \file UBT0Finder.h
+ * \file PaddleUBT0Finder.h
  *
  * \ingroup App
  * 
- * \brief Class def header for a class UBT0Finder
+ * \brief Class def header for a class PaddleUBT0Finder
  *
- * @author kazuhiro
+ * @author Rui
  */
 
 /** \addtogroup App
 
     @{*/
 
-#ifndef LARLITE_UBT0FINDER_H
-#define LARLITE_UBT0FINDER_H
+#ifndef LARLITE_PADDLEUBT0FINDER_H
+#define LARLITE_PADDLEUBT0FINDER_H
 
 #include "Analysis/ana_base.h"
-#include "MCQCluster.h"
 #include "OpT0Finder/Base/FlashMatchManager.h"
+#include "OpT0Finder/Algorithms/LightPath.h"
 #include <TTree.h>
 #include <TH2D.h>
+#include "DataFormat/track.h"
+#include "DataFormat/opflash.h"
+#include "DataFormat/ophit.h"
+#include "DataFormat/calorimetry.h"
+#include "DataFormat/mctrack.h"
+#include "GeoAlgo/GeoAlgo.h"
+#include "GeoAlgo/GeoLineSegment.h"
+#include "LArUtil/Geometry.h"
+
 
 namespace larlite {
   /**
-     \class UBT0Finder
+     \class PaddleUBT0Finder
      User custom analysis class made by SHELL_USER_NAME
    */
-  class UBT0Finder : public ana_base{
+  class PaddleUBT0Finder : public ana_base{
   
   public:
 
-    UBT0Finder();
+    /// Default constructor
+    PaddleUBT0Finder();
 
     /// Default destructor
-    virtual ~UBT0Finder(){_use_mc=false;}
+    virtual ~PaddleUBT0Finder(){_use_mc = false;}
 
-    /** IMPLEMENT in UBT0Finder.cc!
+    /** IMPLEMENT in PaddleUBT0Finder.cc!
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in UBT0Finder.cc! 
+    /** IMPLEMENT in PaddleUBT0Finder.cc! 
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in UBT0Finder.cc! 
+    /** IMPLEMENT in PaddleUBT0Finder.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
-
+    
     ::flashana::FlashMatchManager& Manager() { return _mgr;}
-
+    
     void UseMC(bool doit=true) { _use_mc = doit; }
-
+    
     void SetROStart(double t) { _RO_start = t; }
+
     void SetROEnd(double t)   { _RO_end = t; }
-
+    
     void SetTrigTime(double t) { _Trig_time = t; }
-
+    
     void SetEDiff(double e) { _e_diff = e ; }
-
+    
     void UseAbsolutePE(bool tof) { _useAbsPE = tof ; }
-
+    
     void SetStepLength(double step){ _step_len = step ; }
-
-
+    
+    void SetPaddle(double doit = true){_use_paddle = doit;}
   protected:
-
+    
     ::flashana::FlashMatchManager _mgr;
-    ::flashana::MCQCluster _interaction_algo;
 
-    // readout start : 
+    // readout start :
     // time before the trigger when the RO start
     double _RO_start; // us
     // readout end :
@@ -82,13 +92,14 @@ namespace larlite {
     // the trigger should arrive
     // for MC this is generally 0
     double _Trig_time; // us
-
+    
     // Configurable params
     bool _use_mc;
+    bool _use_paddle;
     bool _useAbsPE ;
     double _step_len ;
-    double _e_diff ; //Energy difference cut between start and end of track.  
-
+    double _e_diff ; //Energy difference cut between start and end of track
+    
     TTree* _int_tree;
     double _t0 ;
     double _n_pe ;
@@ -120,6 +131,7 @@ namespace larlite {
     double _mc_dx;
 
     // tree to measure efficiency of matching for MCTracks
+    
     TTree *_eff_tree;
     int _matched;
     double _mc_edep;
@@ -127,7 +139,7 @@ namespace larlite {
 
     TH2D * _nflash_v_nint ;
     TH1D * _time_diff ;
-
+    
   };
 }
 #endif

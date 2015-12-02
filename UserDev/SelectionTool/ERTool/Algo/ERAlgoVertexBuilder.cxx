@@ -263,293 +263,416 @@ namespace ertool {
 
 
 
+  class ParticleAssociation {
+
+    Int_t tcounter;
+
+    std::vector<Int_t> tindex;
+    std::vector< std::vector<NodeID_t> > tnodes;
+    std::vector< std::vector< std::vector<NodeID_t> > > tnodes_more;
+    std::vector< std::vector< std::vector<geoalgo::Point_t> > > tvertices;
+    std::vector< std::vector< geoalgo::Sphere > > tspheres;
+
+    std::map<NodeID_t, Int_t> tassociation;
+
+  public:
+
+    ParticleAssociation() : tcounter(0){}
+
+    void AddAssociation(std::vector<NodeID_t> const & nodes,
+			std::vector<geoalgo::Point_t> const & vertices,
+			geoalgo::Sphere const & sphere) {
+
+      tindex.push_back(tcounter);
+      tnodes.push_back(nodes);
+      tnodes_more.push_back(std::vector< std::vector<NodeID_t> >());
+      tnodes_more.at(tcounter).push_back(nodes);
+      tvertices.push_back(std::vector< std::vector<geoalgo::Point_t> >());
+      tvertices.at(tcounter).push_back(vertices);
+      tspheres.push_back(std::vector<geoalgo::Sphere>());
+      tspheres.at(tcounter).push_back(sphere);
+
+      for(NodeID_t const n : nodes) tassociation.emplace(n, tcounter);
+
+      ++tcounter;
+
+    }
+    
+    void AddToAssociation(Int_t const i,
+			  std::vector<NodeID_t> const & nodes,
+			  std::vector<geoalgo::Point_t> const & vertices,
+			  geoalgo::Sphere const & sphere) {
+
+      std::vector<NodeID_t> & association = tnodes.at(i);
+
+      for(NodeID_t const n : nodes) {
+
+	if(std::find(association.begin(), association.end(), n) ==
+	   association.end())
+	  association.push_back(n);
+
+      }
+
+      tnodes_more.at(i).push_back(nodes);
+      tvertices.at(i).push_back(vertices);
+      tspheres.at(i).push_back(sphere);
+
+      for(NodeID_t const n : nodes) tassociation.emplace(n, i);
+
+
+    }
+
+    Int_t GetAssociationIndex(NodeID_t const n) {
+
+      if(tassociation.find(n) == tassociation.end())
+	return -1;
+
+      return tassociation.find(n)->second;
+
+    }
+
+    std::vector< std::vector<NodeID_t> > const & GetNodes() {
+      return tnodes;
+    }
+
+    std::vector< std::vector< std::vector<NodeID_t> > > const & GetNodesMore(){
+      return tnodes_more;
+    }
+
+    std::vector< std::vector< geoalgo::Sphere > > const & GetSpheres() {
+      return tspheres;
+    }
+
+    void PrintNodes() {
+
+      for(std::vector<NodeID_t> nv : tnodes) {
+
+	Int_t counter = 0;
+
+	std::cout << "Association: " << counter << ":\n";
+
+	for(NodeID_t const n : nv) std::cout << "\t\t" << n << "\n";
+
+	++counter;
+
+      }
+
+    }
+
+    void PrintNodesMore() {
+
+      for(std::vector< std::vector<NodeID_t> > nvv : tnodes_more) {
+
+	Int_t counter = 0;
+	
+	std::cout << "Association: " << counter << ":\n";
+
+	for(std::vector<NodeID_t> nv : nvv) {
+
+	  std::cout << "\tNode Collections:\n";
+
+	  for(NodeID_t const n : nv) std::cout << "\t\t" << n << "\n";
+
+	  std::cout << "\n";
+
+	}
+
+	std::cout << "\n";
+
+	++counter;
+
+      }
+
+    }
+    
+  };
+
+
+
+  void EndReconstructPa(ParticleGraph const & graph, ParticleAssociation & pa) {
+
+    std::cout << "\n";
+
+    for(std::vector<NodeID_t> const & nv : pa.GetNodes()) {
+      
+      Int_t counter = 0;
+      
+      std::cout << "Association: " << counter << ":\n";
+
+      for(NodeID_t const n : nv)
+	std::cout << "\t\t" << graph.GetParticle(n).PdgCode() << "\n";
+
+    }
+
+    /*
+    std::cout << "\n";
+
+    for(std::vector< std::vector<NodeID_t> > const & nvv : pa.GetNodesMore()) {
+      
+      Int_t counter = 0;
+      
+      std::cout << "Association: " << counter << ":\n";
+      
+      for(std::vector<NodeID_t> const & nv : nvv) {
+	
+	std::cout << "\tNode Collections:\n";
+	
+	for(NodeID_t const n : nv)
+	  std::cout << "\t\t" << graph.GetParticle(n).PdgCode() << "\n";
+	
+	std::cout << "\n";
+	
+      }
+      
+      std::cout << "\n";
+      
+      ++counter;
+      
+    }
+    */
+
+    std::cout << "\n";
+
+  }
+
+
+
   void ERAlgoVertexBuilder::WithoutTrackDir(const EventData &data,
 					    ParticleGraph& graph) {
     
-    if(tverbose) std::cout << "Event: " << data.Event_ID() << "\n"
-			   << "============================================\n";
+    std::cout << "==================================\n";
+
+    if(tverbose)
+      std::cout << "Event: " << data.Event_ID() << "\n"
+		<< "=======================================================\n";
     
-    std::map<Int_t, std::vector<NodeID_t> > particle_family;
-    std::map<NodeID_t, Int_t> family_associate;
-
-    std::list<NodeID_t> pn;
-    std::vector<NodeID_t> pnc;
-
-    /*Loop over primary nodes and add them to pn, if the node corresponds to a
-      track only add it if the track start and end are contained within the
-      fiducial volume*/
+    std::multimap<NodeID_t, geoalgo::Point_t const *> pn;
+    std::multimap<NodeID_t, geoalgo::Point_t const *> pna;
 
     for(NodeID_t const n : graph.GetPrimaryNodes()) {
 
       Particle const & p = graph.GetParticle(n);
+      geoalgo::Point_t const * vert = &p.Vertex();      
 
       if(p.RecoType() == kTrack) {
 
-	Track const & t = data.Track(p.RecoID());
+	geoalgo::Point_t const * tf = &data.Track(p.RecoID()).front();
+	geoalgo::Point_t const * tb = &data.Track(p.RecoID()).back();
 
-	if(volume.Contain(t.front()) && volume.Contain(t.back())){	
-	  pn.push_back(n);
-	  pnc.push_back(n);
-	}
+	if(volume.Contain(*tf) && volume.Contain(*tb)) {
+	  pn.emplace(n, tf);
+	  pn.emplace(n, tb);
+	  pna.emplace(n, tf);
+	  pna.emplace(n, tb);
+	} 
 
+      }
+
+      else if(volume.Contain(*vert)) {
+	pn.emplace(n, vert);
+	pna.emplace(n, vert);
       }
 
     }
-    
-    std::map<NodeID_t const, geoalgo::Point_t const *> vertex_map_all;
-    
-    for(NodeID_t const mp : pn) {
+
+    /*
+    if(pn.size()) {
       
-      Particle const & mpp = graph.GetParticle(mp);
-      
-      if(mpp.RecoType() == kTrack) {
-	
-	Track const & mpt = data.Track(mpp.RecoID());
-	
-	vertex_map_all.emplace(mp, &mpt.front());
-	vertex_map_all.emplace(mp, &mpt.back());
-	
+      NodeID_t last_id = pn.end()->first;
+      for(auto p : pn) {
+	if(last_id != p.first) std::cout << "\n" << graph.GetParticle(p.first).PdgCode() << " " << *p.second;
+	else std::cout << " " << *p.second;
+	last_id = p.first;
       }
-      
-      else {
-	
-	vertex_map_all.emplace(mp, &mpp.Vertex());
-	
-      }
+
+      std::cout << "\n";
       
     }
-    
+    */
+
+    ParticleAssociation pa;
+
+    if(tverbose)
+      std::cout << "wloop, pn.size() == " << pn.size() << "\n";
+
     while(pn.size() > 0) {
-      
-      NodeID_t best_objectA = -1;
-      NodeID_t best_objectB = -1;
+
+      if(tverbose)
+	std::cout <<  "\twloop start, pn.size() == " << pn.size() << "\n";
+
+      NodeID_t best_objectA = kINVALID_NODE_ID;
+      NodeID_t best_objectB = kINVALID_NODE_ID;
       geoalgo::Point_t const * best_vertA = nullptr;
       geoalgo::Point_t const * best_vertB = nullptr;
       Double_t best_dist = tstart_prox;
-      
-      std::map<NodeID_t const, geoalgo::Point_t const *> vertex_map;
 
-      for(NodeID_t const mp : pn) {
+      if(tverbose)
+	std::cout << "\tFind the two closest vertices, pn.size() == "
+		  << pn.size() << "\n"; 
 
-	Particle const & mpp = graph.GetParticle(mp);
+      for(std::pair<NodeID_t, geoalgo::Point_t const *> const & mpair : pn) {
 
-	if(mpp.RecoType() == kTrack) {
+	 if(tverbose)
+	   std::cout << "\t\tMain loop start\n";
+	
+	NodeID_t const mid = mpair.first;
+	geoalgo::Point_t const * mvert = mpair.second;
+	
+	 if(tverbose)
+	   std::cout << "\t\tMain NodeID_t: " << mid << "\n"
+		     << "\t\tComparison loop, pna.size() == " << pna.size()
+		     << "\n";
 
-	  Track const & mpt = data.Track(mpp.RecoID());
+	for(std::pair<NodeID_t, geoalgo::Point_t const *> const & cpair : pna){
 
-	  vertex_map.emplace(mp, &mpt.front());
-	  vertex_map.emplace(mp, &mpt.back());
+	  if(tverbose)
+	   std::cout << "\t\t\tComparison NodeID_t: " << cpair.first << "\n";
+	
+	  if(cpair.first == mid) {
+	    if(tverbose)
+	      std::cout << "\t\t\t\tSkip\n";
+	    continue;
+	  }
+	  
+	  Double_t const dist = cpair.second->Dist(*mvert);
 
-	}
-
-	else {
-
-	  vertex_map.emplace(mp, &mpp.Vertex());
-
-	}
-
-      }
-
-      for(auto vm_it = vertex_map.begin();
-	  vm_it != vertex_map.end();
-	  vm_it = vertex_map.erase(vm_it)) {
-
-	geoalgo::Point_t const * mvert = vm_it->second;
-
-	for(std::pair<NodeID_t const, geoalgo::Point_t const *> const & pair :
-	    vertex_map_all) {
-
-	  if(pair.first == vm_it->first) continue;
-
-	  Double_t const dist = mvert->Dist(*pair.second);
+	   if(tverbose)
+	     std::cout << "\t\t\tdist: " << dist << " best_dist: "
+		       << best_dist << "\n";
 
 	  if(dist < best_dist) {
-	    best_objectA = vm_it->first;
-	    best_objectB = pair.first;
+	    if(tverbose)
+	      std::cout << "\t\t\t\tAccepted\n";
+	    best_objectA = mid;
+	    best_objectB = cpair.first;
 	    best_vertA = mvert;
-	    best_vertB = pair.second;
+	    best_vertB = cpair.second;
 	    best_dist = dist;
 	  }
 
 	}
 
+	if(tverbose)
+	  std::cout << "\t\tMain loop end\n";
+	
       }
 
-      if(best_objectA == -1) {
-	/*
-	for(auto pn_it = pn.begin();
-	    pn_it != pn.end();
-	    pn_it = pn.erase(pn_it)) {
-	  
-	  NodeID_t const n = *pn_it;
-	  Particle const & p = graph.GetParticle(n);
+      if(best_objectA == kINVALID_NODE_ID) {
+	if(tverbose)
+	  std::cout << "\tNo match found, ending\n";
+	pn.erase(best_objectA);
+	pn.erase(best_objectB);
 
-	  if(p.RecoType() != kTrack) continue;
-	  
-	  Particle & vp = graph.CreateParticle();
-	  graph.SetPrimary(vp.ID());
-	  vp.SetParticleInfo(0, RecoType_t::kInvisible, p.Vertex());
-	  graph.SetParentage(vp.ID(), n);
-	
-	}
-	*/
-	EndReconstruct(graph);
+	EndReconstructPa(graph, pa);
 	
 	return;
-	
       }
 
-      /*Make a vector to keep track of primary nodes associated with the vertex
-	candidate*/
+      if(tverbose)
+	std::cout << "\t Match found: " << best_objectA << " " << best_objectB
+		  << "\n\tErasing best objects\n";
+
+      pn.erase(best_objectA);
+      pn.erase(best_objectB);
+
       std::vector<NodeID_t> vc;
       vc.push_back(best_objectA);
       vc.push_back(best_objectB);
       
-      /*Make a vector to keep track of primary node positions associated with
-	the vertex candidate*/
       std::vector<geoalgo::Point_t> vcp;
       vcp.push_back(*best_vertA);
       vcp.push_back(*best_vertB);
- 
-      /*Create an initial minimally bounding sphere using the closest matching
-	pair positions*/
+      
       geoalgo::Sphere s(algo.boundingSphere(vcp));
 
+      if(tverbose)
+	std::cout << "\tAttempt to add objects to sphere\n";
+
       do {
-	
-	NodeID_t best_objectC = -1;
+
+	NodeID_t best_objectC = kINVALID_NODE_ID;
 	geoalgo::Point_t const * best_vertC = nullptr;
-	Double_t best_dist = tstart_prox;
-
-	//Get centre of current sphere
-
+	Double_t sbest_dist = tstart_prox;
+	
 	geoalgo::Point_t const & sv = s.Center();
 
-	for(NodeID_t const cp : pn) {
+	if(tverbose)
+	  std::cout << "\t\tFind distance between vertices and sphere centre, pn.size == " << pn.size() << "\n";
+
+	for(std::pair<NodeID_t, geoalgo::Point_t const *> const & pair : pn) {
+
+	  if(tverbose)
+	    std::cout << "\t\t\tNodeID_t: " << pair.first << "\n";
 	
-	  //Skip node in pn if it has already been added to the vertex
-	  
-	  if(std::find(vc.begin(), vc.end(), cp) != vc.end()) continue;
+	  if(std::find(vc.begin(), vc.end(), pair.first) != vc.end()) {
+	    if(tverbose)
+	      std::cout << "\t\t\t\tSkip\n";
+	    continue;
+	  }
+  
+	  Double_t const dist = pair.second->Dist(sv);
 
-	  Particle const & cpp = graph.GetParticle(cp);
+	  if(tverbose)
+	    std::cout << "\t\t\tdist: " << dist << " sbest_dist: "
+		      << sbest_dist << "\n";
 
-	  //Find distance between primary node position and sphere centre
-
-	  geoalgo::Point_t const * tempvertex = nullptr;
-	  Double_t dist = 0;
-
-	  if(cpp.RecoType() == kTrack) {
-	    
-	    geoalgo::Point_t const & tf = data.Track(cpp.RecoID()).front();
-	    geoalgo::Point_t const & tb = data.Track(cpp.RecoID()).back();
-
-	    tempvertex = &tf;
-	    dist = tf.Dist(sv);
-
-	    Double_t const otherdist = tb.Dist(sv);
-	    if(otherdist < dist) {
-	      tempvertex = &tb;
-	      dist = otherdist;
-	    }
-
+	  if(dist < sbest_dist) {
+	    if(tverbose)
+	      std::cout << "\t\t\t\tAccepted\n";
+	    best_objectC = pair.first;
+	    best_vertC = pair.second;
+	    sbest_dist = dist;
 	  }
 
-	  else {
-	    tempvertex = &cpp.Vertex();
-	    dist = cpp.Vertex().Dist(sv);
-	  }
-	
-	  //If primary node is closer to sphere centre, replace
-
-	  if(dist < best_dist) {
-	    
-	    best_objectC = cp;
-	    best_vertC = tempvertex;
-	    best_dist = dist;
-
-	  }
-	  
 	}
 	
-	/*If no primary node within tstart_prox of the sphere centre is found,
-	  end the loop*/ 
+	if(best_objectC == kINVALID_NODE_ID) {
+	  if(tverbose)
+	    std::cout << "\t\tNo match found, end loop\n";
+	  break;
+	}
 
-	if(best_objectC == -1) break;
-	
-	/*Add primary node closest to sphere centre to respective node and
-	  position vectors*/
-	
 	vc.push_back(best_objectC);
 	vcp.push_back(*best_vertC);
-	
-	//Recalculate sphere to include new primary node
-
-	s = algo.boundingSphere(vcp);
 
       } while(true);
 
-      //If sphere radius is too big, do something
-
       if(s.Radius() > tmax_rad) {
-	
-	//do stuff
-	std::cout << "Radius too big: " << s.Radius() << "\n";
-	
+
+	std::cout << "Radius too big\n";
+
       }
 
       else {
+	
+	Int_t index = -1;
 
-	auto pa_it = family_associate.end();
+	for(NodeID_t const n : vc) {
 
-	for(NodeID_t const nid : vc) {
-
-	  auto const temp_it = family_associate.find(nid);
-
-	  if(temp_it != pa_it) {
-	    pa_it = temp_it;
+	  if(pa.GetAssociationIndex(n) != -1) {
+	    index = pa.GetAssociationIndex(n);
 	    break;
-	  }
-
-	}
-
-	if(pa_it == family_associate.end()) {
-
-	  if(particle_family.size() == 0) {
-
-	    particle_family.emplace(1, vc);
-
-	  }
-
-	  else {
-
-	    particle_family.emplace((++particle_family.rend())->first + 1, vc);
 
 	  }
 
 	}
 
-	else {
+	if(index != -1) pa.AddToAssociation(index, vc, vcp, s);
 
-	  std::vector<NodeID_t> & family = 
-	    particle_family.find(pa_it->second)->second;
+	else pa.AddAssociation(vc, vcp, s);
 
-	  family.insert(family.end(), vc.begin(), vc.end());
-
-	}
+	for(NodeID_t const v : vc) pn.erase(v);
 
       }
 
-      for(NodeID_t const v : vc) {
-	
-	pn.erase(std::find(pn.begin(), pn.end(), v));
-	
-      }	
-      
     }
+
+    //EndReconstructPa(graph, pa);
     
-    EndReconstruct(graph);
+    
 
     return;
+
   }
 
 
