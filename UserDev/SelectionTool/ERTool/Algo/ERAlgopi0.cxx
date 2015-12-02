@@ -8,9 +8,9 @@ namespace ertool {
 	ERAlgopi0::ERAlgopi0(const std::string& name)
 	: AlgoBase(name)
 	, _ll_tree(nullptr)
+	, _pi0_tree(nullptr)
 	{
 	}
-
 	void ERAlgopi0::Reset()
 	{}
 
@@ -36,9 +36,27 @@ namespace ertool {
 		_ll_tree->Branch("_angle",&_angle,"angle/D");
 		_ll_tree->Branch("_E_A",&_E_A,"E_A/D");
 		_ll_tree->Branch("_E_B",&_E_B,"E_B/D");
-
 		_ll_tree->Branch("_ll_photon_A",&_ll_photon_A,"ll_photon_A/D");
 		_ll_tree->Branch("_ll_photon_B",&_ll_photon_B,"ll_photon_B/D");
+    // Selected Tree Tree
+		delete _pi0_tree;
+		_pi0_tree = new TTree("_pi0_tree","Pi0 Tree");
+		_pi0_tree->Branch("_Rmass",&_Rmass,"mass/D");
+		_pi0_tree->Branch("_Rmass",&_Rmass,"mass/D");
+		_pi0_tree->Branch("_RvertexX",&_RvertexX,"vertexX/D");
+		_pi0_tree->Branch("_RvertexY",&_RvertexY,"vertexY/D");
+		_pi0_tree->Branch("_RvertexZ",&_RvertexZ,"vertexZ/D");
+		_pi0_tree->Branch("_RvtxIP",&_RvtxIP,"vtxIP/D");
+		_pi0_tree->Branch("_RphotonE1",&_RphotonE1,"photonE1/D");
+		_pi0_tree->Branch("_RphotonE2",&_RphotonE2,"photonE2/D");
+		_pi0_tree->Branch("_RphotonDist1",&_RphotonDist1,"photonDist1/D");
+		_pi0_tree->Branch("_RphotonDist2",&_RphotonDist2,"photonDist2/D");
+		_pi0_tree->Branch("_RvertexXshr1",&_RvertexXbshr1,"vertexXbshr1/D");
+		_pi0_tree->Branch("_RvertexYbshr1",&_RvertexYbshr1,"vertexYbshr1/D");
+		_pi0_tree->Branch("_RvertexZbshr1",&_RvertexZbshr1,"vertexZbshr1/D");
+		_pi0_tree->Branch("_RvertexXshr2",&_RvertexXbshr2,"vertexXbshr2/D");
+		_pi0_tree->Branch("_RvertexYbshr2",&_RvertexYbshr2,"vertexYbshr2/D");
+		_pi0_tree->Branch("_RvertexZbshr2",&_RvertexZbshr2,"vertexZbshr2/D");
 	}
 
 	bool ERAlgopi0::Reconstruct(const EventData &data, ParticleGraph& graph)
@@ -88,7 +106,6 @@ namespace ertool {
 					if(!xs_a.size() || !xs_b.size()) continue;
 					double menergy_1 = shr1._energy / shower_prof.EnergyContainment( shr1.Start().Dist(xs_a[0]) );
 					double menergy_2 = shr2._energy / shower_prof.EnergyContainment( shr2.Start().Dist(xs_b[0]) );
-
 					geoalgo::Point_t vert(3);
 					double rdot = _geoAlgo.commonOrigin(shr1, shr2, vert, true);
 					double vDist_A = vert.Dist(shr1.Start());
@@ -143,7 +160,12 @@ namespace ertool {
 			double vtxDist_A = vert.Dist(bshr1.Start());
 			double vtxDist_B = vert.Dist(bshr2.Start());
 			double vtx_IP = -999;
-			vtx_IP = pow(_geoAlgo.SqDist(bshr1, bshr2),0.5);
+			geoalgo::Vector_t sdflipA(-1.*bshr1.Dir()[0],-1.*bshr1.Dir()[1],-1.*bshr1.Dir()[2]);
+			geoalgo::Vector_t sdflipB(-1.*bshr2.Dir()[0],-1.*bshr2.Dir()[1],-1.*bshr2.Dir()[2]);
+			auto bkshrA = ::geoalgo::HalfLine_t(bshr1.Start(),sdflipA);
+			auto bkshrB =::geoalgo::HalfLine_t(bshr2.Start(),sdflipB);
+			vtx_IP = pow(_geoAlgo.SqDist(bkshrA, bkshrB),0.5);
+
           // specify info for 1st gamma
 			auto const& gamma1vtx = bshr1.Start();
 			auto const& gamma1mom = bshr1.Dir()*Bestenergy_1;
@@ -156,7 +178,24 @@ namespace ertool {
           // create pi0
 			Particle& pi0 = graph.CreateParticle();
 			pi0.SetParticleInfo(111,Bestmass,Bestvertex,Bestmomentum);
-          //pi0.SetParticleInfo(111,mass,vertex,momentum);// score based on vertex IP? or LL
+	  // fill out the selected pi0 into the tree... this can be more elegant later instead of just copying things 
+			_Rmass = Bestmass;
+			_RvertexX = Bestvertex[0];
+			_RvertexY = Bestvertex[1];
+			_RvertexZ = Bestvertex[2];
+			_RvtxIP = vtx_IP;
+			_RphotonE1 =  Bestenergy_1;
+			_RphotonE2 =  Bestenergy_2;
+			_RphotonDist1= vtxDist_A;
+			_RphotonDist2= vtxDist_B;
+			_RvertexXbshr1 = bshr1.Start()[0];
+			_RvertexYbshr1 = bshr1.Start()[1];
+			_RvertexZbshr1 = bshr1.Start()[2];
+			_RvertexXbshr2 = bshr2.Start()[0];
+			_RvertexYbshr2 = bshr2.Start()[1];
+			_RvertexZbshr2 = bshr2.Start()[2];
+	// Fill the pi0 tree 
+			_pi0_tree->Fill();
           // Add relationships
 			graph.SetParentage(pi0.ID(),BestShr1);
 			graph.SetParentage(pi0.ID(),BestShr2);
@@ -174,6 +213,7 @@ namespace ertool {
 		if(fout) {
 			fout->cd();
 			_ll_tree->Write();
+			_pi0_tree->Write();
 	}//
 }
 
@@ -213,6 +253,7 @@ void ERAlgopi0::LL(const Shower& shower_a,
 	::EMShowerProfile shower_prof;
 	::geoalgo::AABox  volume(0,-116.5,0,256.35,116.5,1036.8);
 
+	
 	auto xs_a = _geoAlgo.Intersection(volume, ::geoalgo::HalfLine_t(shower_a.Start(),shower_a.Dir()));
 	auto xs_b = _geoAlgo.Intersection(volume, ::geoalgo::HalfLine_t(shower_b.Start(),shower_b.Dir()));
 
@@ -237,9 +278,13 @@ void ERAlgopi0::LL(const Shower& shower_a,
 	_dedx_A = shower_a._dedx;
 	_dedx_B = shower_b._dedx;
 
-    // calculate IP 
+    // calculate IP  using back going showers!
 	_vtx_IP = -999;
-	_vtx_IP = pow(_geoAlgo.SqDist(shower_a, shower_b),0.5);
+	geoalgo::Vector_t dirflipA(-1.*shower_a.Dir()[0],-1.*shower_a.Dir()[1],-1.*shower_a.Dir()[2]);
+	geoalgo::Vector_t dirflipB(-1.*shower_b.Dir()[0],-1.*shower_b.Dir()[1],-1.*shower_b.Dir()[2]);
+	auto bkshra = ::geoalgo::HalfLine_t(shower_a.Start(),dirflipA);
+	auto bkshrb =::geoalgo::HalfLine_t(shower_b.Start(),dirflipB);
+	_vtx_IP = pow(_geoAlgo.SqDist(bkshra, bkshrb),0.5);
 
     // likelihood of shower to be a gamma is based on dedx and vtx distance.
     // if vtx distance is nan then use just the dedx
