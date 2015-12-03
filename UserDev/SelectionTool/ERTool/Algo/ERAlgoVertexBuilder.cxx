@@ -17,11 +17,18 @@ namespace ertool {
     tstart_prox(start_prox),
     tmax_rad(max_rad),
     twithTrackDir(withTrackDir),
-    tverbose(false){}
+    tverbose(false) {
 
+    tree = new TTree("ERAlgoVertexBuilder", "");
 
+    tree->Branch("pn_size", &pn_size, "pn_size/I");
+    tree->Branch("association_number", &association_number, "association_number/I");
+    tree->Branch("cpa", &cpa, "cpa/D");
+    tree->Branch("vertx", &vertx, "vertx/D");
+    tree->Branch("verty", &verty, "verty/D");
+    tree->Branch("vertz", &vertz, "vertz/D");
 
-  void ERAlgoVertexBuilder::Reset(){}
+  }
 
 
 
@@ -33,9 +40,11 @@ namespace ertool {
 
     //Set up TPC fiducial volume
 
-    Double_t const xfid = 1;
-    Double_t const yfid = 1;
-    Double_t const zfid = 1;
+    Double_t const cut = 1;
+
+    Double_t const xfid = cut;
+    Double_t const yfid = cut;
+    Double_t const zfid = cut;
 
     larutil::Geometry const * geo = larutil::Geometry::GetME();
     
@@ -257,23 +266,22 @@ namespace ertool {
  
     }
 
-    EndReconstruct(graph);
-
   }
 
 
 
-  class ParticleAssociation {
+  class ERAlgoVertexBuilder::ParticleAssociation {
 
     Int_t tcounter;
 
     std::vector<Int_t> tindex;
     std::vector< std::vector<NodeID_t> > tnodes;
-    std::vector< std::vector< std::vector<NodeID_t> > > tnodes_more;
+    std::vector< std::vector< std::vector<NodeID_t> > > tassociation;
     std::vector< std::vector< std::vector<geoalgo::Point_t> > > tvertices;
     std::vector< std::vector< geoalgo::Sphere > > tspheres;
 
-    std::map<NodeID_t, Int_t> tassociation;
+    std::map<NodeID_t, Int_t> tnode_association;
+    std::vector< std::vector< std::vector<Int_t> > > tassociation_pairs;
 
   public:
 
@@ -285,14 +293,14 @@ namespace ertool {
 
       tindex.push_back(tcounter);
       tnodes.push_back(nodes);
-      tnodes_more.push_back(std::vector< std::vector<NodeID_t> >());
-      tnodes_more.at(tcounter).push_back(nodes);
+      tassociation.push_back(std::vector< std::vector<NodeID_t> >());
+      tassociation.at(tcounter).push_back(nodes);
       tvertices.push_back(std::vector< std::vector<geoalgo::Point_t> >());
       tvertices.at(tcounter).push_back(vertices);
       tspheres.push_back(std::vector<geoalgo::Sphere>());
       tspheres.at(tcounter).push_back(sphere);
 
-      for(NodeID_t const n : nodes) tassociation.emplace(n, tcounter);
+      for(NodeID_t const n : nodes) tnode_association.emplace(n, tcounter);
 
       ++tcounter;
 
@@ -313,21 +321,24 @@ namespace ertool {
 
       }
 
-      tnodes_more.at(i).push_back(nodes);
+      tassociation.at(i).push_back(nodes);
       tvertices.at(i).push_back(vertices);
       tspheres.at(i).push_back(sphere);
 
-      for(NodeID_t const n : nodes) tassociation.emplace(n, i);
-
+      for(NodeID_t const n : nodes) tnode_association.emplace(n, i);
 
     }
 
-    Int_t GetAssociationIndex(NodeID_t const n) {
+    std::vector<Int_t> const & GetNodeAssociationIndices() {
+      return tindex;
+    }
 
-      if(tassociation.find(n) == tassociation.end())
+    Int_t GetNodeAssociationIndex(NodeID_t const n) {
+
+      if(tnode_association.find(n) == tnode_association.end())
 	return -1;
 
-      return tassociation.find(n)->second;
+      return tnode_association.find(n)->second;
 
     }
 
@@ -335,8 +346,16 @@ namespace ertool {
       return tnodes;
     }
 
-    std::vector< std::vector< std::vector<NodeID_t> > > const & GetNodesMore(){
-      return tnodes_more;
+    std::vector< std::vector< std::vector<NodeID_t> > > const &
+    GetNodeAssociations(){
+      return tassociation;
+    }
+    
+    std::vector< std::vector<NodeID_t> > const &
+    GetNodeAssociation(Int_t const i){
+      
+      return tassociation.at(i);
+      
     }
 
     std::vector< std::vector< geoalgo::Sphere > > const & GetSpheres() {
@@ -359,9 +378,9 @@ namespace ertool {
 
     }
 
-    void PrintNodesMore() {
+    void PrintNodeAssociations() {
 
-      for(std::vector< std::vector<NodeID_t> > nvv : tnodes_more) {
+      for(std::vector< std::vector<NodeID_t> > nvv : tassociation) {
 
 	Int_t counter = 0;
 	
@@ -384,54 +403,126 @@ namespace ertool {
       }
 
     }
+
+    void PrintSpheres() {
+
+      Int_t counter = 0;
+
+      for(std::vector<geoalgo::Sphere> const & ss : tspheres) {
+
+	std::cout << "Association: " << counter << ":\n";
+
+	for(geoalgo::Sphere const & s : ss) {
+
+	  std::cout << s.Center() << "\n";
+
+	}
+
+	++counter;
+
+      }      
+
+    }
     
   };
 
 
 
-  void EndReconstructPa(ParticleGraph const & graph, ParticleAssociation & pa) {
+  void ERAlgoVertexBuilder::EndReconstructPa(const EventData &data,
+					     ParticleGraph & graph,
+					     ParticleAssociation & pa){
 
-    std::cout << "\n";
+    auto const & na = pa.GetNodeAssociations();
 
-    for(std::vector<NodeID_t> const & nv : pa.GetNodes()) {
+    association_number = na.size();
+    
+    Double_t counter = 0;
+
+    for(auto const & a : na) counter += a.size();
+
+    if(association_number) cpa = counter / association_number;
+   
+    std::vector< std::vector<geoalgo::Sphere> > const & spheres =
+      pa.GetSpheres();
+    
+    for(Size_t i = 0; i < spheres.size(); ++i) {
       
-      Int_t counter = 0;
-      
-      std::cout << "Association: " << counter << ":\n";
+      std::vector<geoalgo::Sphere> const & ss = spheres.at(i);
 
-      for(NodeID_t const n : nv)
-	std::cout << "\t\t" << graph.GetParticle(n).PdgCode() << "\n";
+      Double_t d = 2000;
+      geoalgo::Point_t const * centre = nullptr;
+      Size_t index = -1;
 
-    }
+      for(Size_t j = 0; j < ss.size(); ++j) {
 
-    /*
-    std::cout << "\n";
+	geoalgo::Sphere const & s = ss.at(j);
 
-    for(std::vector< std::vector<NodeID_t> > const & nvv : pa.GetNodesMore()) {
-      
-      Int_t counter = 0;
-      
-      std::cout << "Association: " << counter << ":\n";
-      
-      for(std::vector<NodeID_t> const & nv : nvv) {
+	Double_t const dist = s.Center().at(2);
+
+	if(dist < d) {
+	  centre = &s.Center();
+	  d = dist;
+	  index = j;
+	}
+
+      }
+
+      if(centre) {
 	
-	std::cout << "\tNode Collections:\n";
+	vertx = centre->at(0);
+	verty = centre->at(1);
+	vertz = centre->at(2);
 	
-	for(NodeID_t const n : nv)
-	  std::cout << "\t\t" << graph.GetParticle(n).PdgCode() << "\n";
+	Particle & p = graph.CreateParticle();
+	NodeID_t const pid = p.ID();
+	graph.SetPrimary(pid);
+	p.SetParticleInfo(0, RecoType_t::kInvisible, *centre);   
 	
-	std::cout << "\n";
+	std::vector< std::vector<NodeID_t> > const & na = pa.GetNodeAssociation(i);
+	std::vector<NodeID_t> const & nac = na.at(index);
+
+	for(NodeID_t const n : nac) graph.SetParentage(pid, n);
+
+	for(Int_t j = 0; j < na.size(); ++j) {
+	  
+	  if(j == index) continue;
+
+	  std::vector<NodeID_t> const & naa = na.at(j);
+
+	  for(NodeID_t const n : nac) {
+
+	    if(std::find(naa.begin(), naa.end(), n) != naa.end()) {
+
+	      /////////////////////////////////////////////////
+
+	    }
+
+	  }
+
+	}
 	
       }
-      
-      std::cout << "\n";
-      
-      ++counter;
-      
-    }
-    */
 
-    std::cout << "\n";
+      else std::cout << "No centre\n";
+
+    }
+
+    tree->Fill();
+
+    //if(ni.size() == 0) std::cout << data.Event_ID() << "\n";
+
+  }
+
+
+
+  void ERAlgoVertexBuilder::Reset() {
+
+    pn_size = 0;
+    association_number = 0;
+    cpa = 0;
+    vertx = 0;
+    verty = 0;
+    vertx = 0;
 
   }
 
@@ -439,9 +530,9 @@ namespace ertool {
 
   void ERAlgoVertexBuilder::WithoutTrackDir(const EventData &data,
 					    ParticleGraph& graph) {
-    
-    std::cout << "==================================\n";
 
+    Reset();
+   
     if(tverbose)
       std::cout << "Event: " << data.Event_ID() << "\n"
 		<< "=======================================================\n";
@@ -449,46 +540,54 @@ namespace ertool {
     std::multimap<NodeID_t, geoalgo::Point_t const *> pn;
     std::multimap<NodeID_t, geoalgo::Point_t const *> pna;
 
-    for(NodeID_t const n : graph.GetPrimaryNodes()) {
+    for(NodeID_t const n : graph.GetParticleNodes()) {
 
       Particle const & p = graph.GetParticle(n);
-      geoalgo::Point_t const * vert = &p.Vertex();      
-
+    
       if(p.RecoType() == kTrack) {
 
 	geoalgo::Point_t const * tf = &data.Track(p.RecoID()).front();
 	geoalgo::Point_t const * tb = &data.Track(p.RecoID()).back();
 
-	if(volume.Contain(*tf) && volume.Contain(*tb)) {
+	//if(volume.Contain(*tf) && volume.Contain(*tb)) {
 	  pn.emplace(n, tf);
 	  pn.emplace(n, tb);
 	  pna.emplace(n, tf);
 	  pna.emplace(n, tb);
-	} 
+	  //} 
 
       }
 
-      else if(volume.Contain(*vert)) {
-	pn.emplace(n, vert);
-	pna.emplace(n, vert);
+      else if(p.RecoType() == kShower) {
+	geoalgo::Point_t const * sv = &data.Shower(p.RecoID()).Start();
+	pn.emplace(n, sv);
+	pna.emplace(n, sv);
       }
 
     }
+    
+    pn_size = pn.size();
 
-    /*
-    if(pn.size()) {
+    if(tverbose) {
+
+      std::cout << "pn Objects:\n";
+
+      if(pn.size()) {
       
-      NodeID_t last_id = pn.end()->first;
-      for(auto p : pn) {
-	if(last_id != p.first) std::cout << "\n" << graph.GetParticle(p.first).PdgCode() << " " << *p.second;
-	else std::cout << " " << *p.second;
-	last_id = p.first;
+	NodeID_t last_id = pn.end()->first;
+	for(auto p : pn) {
+	  if(last_id != p.first)
+	    std::cout << "\n" << graph.GetParticle(p.first).PdgCode() << " "
+		      << *p.second;
+	  else std::cout << " " << *p.second;
+	  last_id = p.first;
+	}
+
       }
 
-      std::cout << "\n";
-      
+      std::cout << "\n\n";
+
     }
-    */
 
     ParticleAssociation pa;
 
@@ -560,11 +659,9 @@ namespace ertool {
       if(best_objectA == kINVALID_NODE_ID) {
 	if(tverbose)
 	  std::cout << "\tNo match found, ending\n";
-	pn.erase(best_objectA);
-	pn.erase(best_objectB);
 
-	EndReconstructPa(graph, pa);
-	
+	EndReconstructPa(data, graph, pa);
+
 	return;
       }
 
@@ -649,10 +746,9 @@ namespace ertool {
 
 	for(NodeID_t const n : vc) {
 
-	  if(pa.GetAssociationIndex(n) != -1) {
-	    index = pa.GetAssociationIndex(n);
+	  if(pa.GetNodeAssociationIndex(n) != -1) {
+	    index = pa.GetNodeAssociationIndex(n);
 	    break;
-
 	  }
 
 	}
@@ -667,9 +763,7 @@ namespace ertool {
 
     }
 
-    //EndReconstructPa(graph, pa);
-    
-    
+    EndReconstructPa(data, graph, pa);    
 
     return;
 
@@ -691,6 +785,8 @@ namespace ertool {
   
   
   void ERAlgoVertexBuilder::ProcessEnd(TFile* fout) {
+
+    tree->Write();
 
   }
   
