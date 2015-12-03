@@ -26,7 +26,7 @@
 
 #pragma link C++ class std::vector<larlite::geo::SigType_t>+;
 #pragma link C++ class std::vector<larlite::geo::View_t>+;
-
+#pragma link C++ class std::vector<std::string>+;
 #pragma link C++ enum larlite::data::DataType_t+;
 
 #pragma link C++ class larlite::Message+;
