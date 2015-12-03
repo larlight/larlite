@@ -110,6 +110,10 @@ namespace ertool {
 					double rdot = _geoAlgo.commonOrigin(shr1, shr2, vert, true);
 					double vDist_A = vert.Dist(shr1.Start());
 					double vDist_B = vert.Dist(shr2.Start());
+					geoalgo::Vector_t dflipA(-1.*shr1.Dir()[0],-1.*shr1.Dir()[1],-1.*shr1.Dir()[2]);
+					geoalgo::Vector_t dflipB(-1.*shr2.Dir()[0],-1.*shr2.Dir()[1],-1.*shr2.Dir()[2]);
+					auto bksa = ::geoalgo::HalfLine_t(shr1.Start(),dflipA);
+					auto bksb =::geoalgo::HalfLine_t(shr2.Start(),dflipB);
 	//==========
 		// CUT ON Any Other GOES HERE 
 					geoalgo::Point_t vertex(3);
@@ -121,7 +125,7 @@ namespace ertool {
 		//=======
 					if(shr1._energy< _energy_min  || shr2._energy<_energy_min) continue;
 		// CUT ON IP GOES HERE 
-					if(pow(_geoAlgo.SqDist(shr1, shr2),0.5)>_IPmax) continue;
+					if(pow(_geoAlgo.SqDist(bksa,bksb),0.5)>_IPmax) continue;
 		// CUT ON LL GOES HERE 
 					if(likelihood<_LLmin) continue;
 		// Cut on mass if desired 
