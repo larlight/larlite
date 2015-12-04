@@ -51,7 +51,6 @@ class UBDaqFileGlobber(QtCore.QObject):
     def FindFileAndEmitSignal(self):
         #This line checks for the newest file in the directory. It occasionally throws an OSError
         #in which case we just return (don't emit any signals)
-        print "Checking for new files."
         try:
             list_of_files = GetAvailableFileList(50)
             runid_v = list_of_files.keys()
@@ -63,6 +62,8 @@ class UBDaqFileGlobber(QtCore.QObject):
         except:
             return
 
+        newest = os.path.basename(newest)
+        newest = self.file_base_dir + newest
         #Sanity check: does file exist? If not, return (don't emit any signals)
         if not os.path.isfile(newest):
             return
