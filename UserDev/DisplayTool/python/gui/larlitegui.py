@@ -1,5 +1,5 @@
 from gui import gui
-from PyQt4 import QtGui, QtCore
+from pyqtgraph.Qt import QtGui, QtCore
 from evdmanager import larlite_manager
 
 

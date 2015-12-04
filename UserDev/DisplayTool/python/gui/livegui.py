@@ -1,5 +1,5 @@
 from gui import gui, view_manager
-from PyQt4 import QtCore, QtGui
+from pyqtgraph.Qt import QtGui, QtCore
 try:
     from evdmanager.ubdaq_fileglobber import *
     from evdmanager import ubdaq_manager

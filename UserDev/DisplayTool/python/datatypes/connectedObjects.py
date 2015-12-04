@@ -1,4 +1,4 @@
-from PyQt4 import QtGui, QtCore
+from pyqtgraph.Qt import QtGui, QtCore
 import pyqtgraph as pg
 
 # This class wraps the hit object to allow them to all function together

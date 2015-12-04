@@ -1,63 +1,71 @@
 /**
- * \file MC_dirt_Filter.h
+ * \file DrawWire.h
  *
- * \ingroup LowEPlots
+ * \ingroup EventViewer
  * 
- * \brief Class def header for a class MC_dirt_Filter
+ * \brief Class def header for a class DrawWire
  *
- * @author jzennamo
+ * @author cadams
  */
 
-/** \addtogroup LowEPlots
+/** \addtogroup EventViewer
 
     @{*/
 
-#ifndef LARLITE_MC_DIRT_FILTER_H
-#define LARLITE_MC_DIRT_FILTER_H
+#ifndef LARLITE_DRAWRAWWIRE_H
+#define LARLITE_DRAWRAWWIRE_H
 
 #include "Analysis/ana_base.h"
-#include "DataFormat/mctruth.h"
-#include "GeoAlgo/GeoAABox.h"
 #include "LArUtil/Geometry.h"
+#include "RawBase.h"
 
-namespace larlite {
+#include "TTree.h"
+#include "TGraph.h"
+
+struct _object;
+typedef _object PyObject;
+
+#ifndef __CINT__
+#include "Python.h"
+#include "numpy/arrayobject.h"
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#endif
+
+
+namespace evd {
   /**
-     \class MC_dirt_Filter
+     \class DrawWire
      User custom analysis class made by SHELL_USER_NAME
    */
-  class MC_dirt_Filter : public ana_base{
+  class DrawWire : public larlite::ana_base, public RawBase{
   
   public:
 
     /// Default constructor
-    MC_dirt_Filter(){ _name="MC_dirt_Filter"; _fout=0;}
+    DrawWire();
 
     /// Default destructor
-    virtual ~MC_dirt_Filter(){}
+    virtual ~DrawWire(){}
 
-    /** IMPLEMENT in MC_dirt_Filter.cc!
+    /** IMPLEMENT in DrawWire.cc!
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in MC_dirt_Filter.cc! 
+    /** IMPLEMENT in DrawWire.cc! 
         Analyze a data event-by-event  
     */
-    virtual bool analyze(storage_manager* storage);
+    virtual bool analyze(larlite::storage_manager* storage);
 
-    /** IMPLEMENT in MC_dirt_Filter.cc! 
+    /** IMPLEMENT in DrawWire.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
 
-    void flip(bool on) { _flip = on; }
 
-    geoalgo::AABox TPC;
-    
-  protected:
+  private:
 
-    // boolean to flip logical operation of algorithm
-    bool _flip;
+
 
 
   };

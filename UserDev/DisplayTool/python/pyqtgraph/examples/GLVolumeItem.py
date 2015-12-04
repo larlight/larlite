@@ -55,8 +55,6 @@ d2[:, 0, 0] = [255,0,0,100]
 d2[0, :, 0] = [0,255,0,100]
 d2[0, 0, :] = [0,0,255,100]
 
-print d2.shape
-
 v = gl.GLVolumeItem(d2)
 v.translate(-50,-50,-100)
 w.addItem(v)

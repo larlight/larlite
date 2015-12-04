@@ -44,10 +44,10 @@ void ERToolHelper::FillMCInfo(const event_mcflux&    mcf_v,
 
 		::ertool::NodeID_t nodeID;
 
-		// If energy is above threshold, create ertool::Shower
-		if (mcs.DetProfile().Momentum().E() >= _minEDep) {
-			::ertool::Shower s( (mcs.DetProfile().Position() + getXShift(mcs_v[i])),
-			                    mcs.DetProfile().Momentum(),
+		// If energy is above threshold, create ertool::Shower (also mcshower startdir must not be (0,0,0))
+		if (mcs.DetProfile().Momentum().E() >= _minEDep && mcs.StartDir().Mag2() ) {
+		       ::ertool::Shower s( (mcs.DetProfile().Position() + getXShift(mcs_v[i])),
+			                    mcs.StartDir(),//mcs.DetProfile().Momentum(),
 			                    _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
 			                    _shrProfiler.ShowerRadius() );
 			// Fill more info
@@ -605,13 +605,13 @@ void ERToolHelper::FillShowers ( const event_mcshower& mcs_v,
 	for (size_t i = 0; i < mcs_v.size(); ++i) {
 
 		auto const& mcs = mcs_v[i];
-		if (mcs.DetProfile().Momentum().E() < _minEDep) continue;
+		if (mcs.DetProfile().Momentum().E() < _minEDep || !mcs.StartDir().Mag2()) continue;
 		//if(isnan(mcs.DetProfile().Momentum().E())) continue;
 		//if(isnan(mcs.DetProfile().Momentum().Px())) continue;
 		//if(mcs.DetProfile().Momentum().Mag2() == 0) continue;
 		fWatch.Start();
 		::ertool::Shower s( (mcs.DetProfile().Position() + getXShift(mcs_v[i])),
-		                    mcs.DetProfile().Momentum(),
+				             mcs.StartDir(),//mcs.DetProfile().Momentum(),
 		                    _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
 		                    _shrProfiler.ShowerRadius() );
 		create_time += fWatch.RealTime();
@@ -771,8 +771,8 @@ TLorentzVector ERToolHelper::getXShift(const mctrack& mct) const {
 	double event_time = mct.at(0).T();
 	double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
 	shift.SetXYZT(shift_x, 0., 0., 0.);
-	// Uncomment this if you want to disable x-shift
-	// shift.SetXYZT(0., 0., 0., 0.);
+	if( _disable_xshift )
+		shift.SetXYZT(0., 0., 0., 0.);
 
 	return shift;
 }
@@ -796,8 +796,8 @@ TLorentzVector ERToolHelper::getXShift(const mcshower& mcs) const {
 	double event_time = mcs.DetProfile().T();//End().T(); <--- old usage (wrong)
 	double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
 	shift.SetXYZT(shift_x, 0., 0., 0.);
-	// Uncomment this if you want to disable x-shift
-	// shift.SetXYZT(0., 0., 0., 0.);
+	if( _disable_xshift )
+		shift.SetXYZT(0., 0., 0., 0.);
 	return shift;
 }
 
@@ -808,8 +808,8 @@ TLorentzVector ERToolHelper::getXShift(const mcpart& mcp) const {
 	double event_time = mcp.Trajectory().front().T();
 	double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
 	shift.SetXYZT(shift_x, 0., 0., 0.);
-	// Uncomment this if you want to disable x-shift
-	// shift.SetXYZT(0., 0., 0., 0.);
+	if( _disable_xshift )
+		shift.SetXYZT(0., 0., 0., 0.);
 
 	return shift;
 }

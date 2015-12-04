@@ -22,6 +22,8 @@
 #include "GeoAlgo/GeoAABox.h"
 #include "GeoAlgo/GeoAlgo.h"
 
+#include "TTree.h"
+
 namespace ertool {
 
   /**
@@ -34,6 +36,15 @@ namespace ertool {
     Double_t const tmax_rad;
     Bool_t const twithTrackDir;
     Bool_t const tverbose;
+
+    TTree * tree;
+
+    Int_t pn_size;
+    Int_t association_number;    
+    Double_t cpa;
+    Double_t vertx;
+    Double_t verty;
+    Double_t vertz;
 
     geoalgo::AABox volume;
     geoalgo::GeoAlgo const algo;
@@ -58,7 +69,12 @@ namespace ertool {
     /// Called @ before processing the first event sample
     void ProcessBegin();
 
+    class ParticleAssociation;
+
     void EndReconstruct(ParticleGraph const & graph);
+    void EndReconstructPa(const EventData &data,
+			  ParticleGraph & graph,
+			  ParticleAssociation & pa);
 
     void WithTrackDir(const EventData &data, ParticleGraph& graph);
 

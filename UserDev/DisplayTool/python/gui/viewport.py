@@ -1,5 +1,5 @@
 
-from PyQt4 import QtGui, QtCore
+from pyqtgraph.Qt import QtGui, QtCore
 import pyqtgraph as pg
 import numpy as np
 import math
