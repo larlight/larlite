@@ -143,8 +143,9 @@ void DrawUbDaq::readData(bool skipDataFetch) {
 
   // df.get_entry(_current_event);
 
-  if (!skipDataFetch)
+  if (!skipDataFetch){
     _storage.ProcessEvent();
+  }
   // This is an event viewer.  In particular, this handles raw wire signal drawing.
   // So, obviously, first thing to do is to get the wires.
   const larlite::event_rawdigit & RawDigitHandle = _storage.RawDigit();
