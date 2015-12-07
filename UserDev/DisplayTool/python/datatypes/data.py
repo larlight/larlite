@@ -1,5 +1,5 @@
 
-from PyQt4 import QtGui, QtCore
+from pyqtgraph.Qt import QtGui, QtCore
 from larlite import larlite as fmwk
 import ROOT
 from ROOT import *

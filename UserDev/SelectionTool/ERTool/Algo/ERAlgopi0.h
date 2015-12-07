@@ -77,6 +77,14 @@ namespace ertool {
     /// Set maximum shower energy
     void setMinLL(double MLL) { _LLmin = MLL; }
 
+    /// Set minmum mass 
+    void setMinMass(double massmin) { _minMass = massmin; }
+
+    /// Set maximum mass 
+    void setMaxMass(double massmax) { _maxMass = massmax; }
+
+    /// Set minmum sum of photon energy 
+    void setSumPhotonE(double msumE) { _minSumE = msumE; }
 
 	protected:
 
@@ -91,10 +99,12 @@ namespace ertool {
     double _energy_max =1000000;
     double _IPmax =2000;
     double _LLmin = -5.;
+    double _minMass = 0.0;
+    double _maxMass = 1000.0;
+    double _minSumE = 0.0;
 
-
-    // TTree info 
-    TTree *_ll_tree;
+    // TTree LL info 
+    TTree  *_ll_tree;
     double _dedx_A, _dedx_B;
     double _vtxDist_A, _vtxDist_B;
     double _vtx_IP;
@@ -106,7 +116,26 @@ namespace ertool {
     double _E_A, _E_B;
     double _mass;
     double _dot;
-	
+	    // TTree pi0 info
+    TTree *_pi0_tree;
+	double _Rmass;
+	double _RvertexX;
+	double _RvertexY;
+	double _RvertexZ;
+//	double _Rmomentum;
+	double _RvtxIP;
+	double _RphotonE1;
+	double _RphotonE2;
+	double _RphotonDist1;
+	double _RphotonDist2;
+	double _RvertexXbshr1;
+	double _RvertexYbshr1;
+	double _RvertexZbshr1;
+	double _RvertexXbshr2;
+	double _RvertexYbshr2;
+	double _RvertexZbshr2;
+
+
 
   };
 }

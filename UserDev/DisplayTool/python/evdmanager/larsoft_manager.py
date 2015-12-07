@@ -1,4 +1,4 @@
-from PyQt4 import QtCore, QtGui
+from pyqtgraph.Qt import QtGui, QtCore
 from event import manager, event
 from datatypes import wire
 # from ROOT import larlite as fmwk

@@ -36,8 +36,6 @@ LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_CMTAlgMatch
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_CMToolBase
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtil
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtilAlg
-LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_FANN
-LDFLAGS += -L$(LARLITE_LIBDIR) -lfloatfann
 
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 

@@ -11,6 +11,7 @@
 
 #pragma link C++ class evd::RawBase+;
 #pragma link C++ class evd::DrawRaw+;
+#pragma link C++ class evd::DrawWire+;
 #pragma link C++ class evd::DrawLariatDaq+;
 #pragma link C++ class evd::DrawRawDigit+;
 #pragma link C++ class evd::TreeElementReader+;

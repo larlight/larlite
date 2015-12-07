@@ -43,9 +43,6 @@ for i in range(n):
     plt = gl.GLLinePlotItem(pos=pts, color=pg.glColor((i,n*1.3)), width=(i+1)/10., antialias=True)
     w.addItem(plt)
     
-print pts
-print pts.shape
-print type(pts)
 
 
 ## Start Qt event loop unless running in interactive mode.

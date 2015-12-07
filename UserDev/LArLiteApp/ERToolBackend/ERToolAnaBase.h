@@ -94,6 +94,9 @@ namespace larlite {
     /// Selection manager class instance
     ::ertool::Manager _mgr;
 
+    /// Setter to disable x-shift in ertoolhelper
+    void setDisableXShift(bool flag) { _helper.setDisableXShift(flag); }
+
   protected:
 
     ERToolHelper _helper; ///< SPAHelper helps generating SPAData

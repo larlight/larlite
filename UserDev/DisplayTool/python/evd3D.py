@@ -10,7 +10,7 @@ from gui import larlitegui3D
 import argparse
 import sys
 import signal
-from PyQt4 import QtGui, QtCore
+from pyqtgraph.Qt import QtGui, QtCore
 
 from ROOT import evd
 
