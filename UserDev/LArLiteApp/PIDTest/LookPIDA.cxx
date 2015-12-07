@@ -11,6 +11,11 @@ namespace larlite {
 
   bool LookPIDA::initialize() {
     InitializeAnaTree();
+    if (fdEdXVsResRange) delete fdEdXVsResRange;
+    fdEdXVsResRange = new TH2D("fdEdXVsResRange",
+			       "dEdX vs Residual Range;  Residual Range [cm]; dEdX [MeV/cm]",
+			       351, -0.05, 35.05, 501, -0.05, 50.05);
+
     return true;
   }
   
@@ -102,37 +107,43 @@ namespace larlite {
 	return false;
       }
     
-     
+      auto const pidObj0 = ev_pid->at(ass_pid_v[track_index][0]);
+      auto const pidObj1 = ev_pid->at(ass_pid_v[track_index][1]);
+      auto const pidObj2 = ev_pid->at(ass_pid_v[track_index][2]);
+
+      auto const calObj0 = ev_calo->at(ass_calo_v[track_index][0]);
+      auto const calObj1 = ev_calo->at(ass_calo_v[track_index][1]);
+      auto const calObj2 = ev_calo->at(ass_calo_v[track_index][2]);
 
 
-      fPIDA_0.push_back(ev_pid->at(ass_pid_v[track_index][0]).PIDA());
-      fPIDA_1.push_back(ev_pid->at(ass_pid_v[track_index][1]).PIDA());
-      fPIDA_2.push_back(ev_pid->at(ass_pid_v[track_index][2]).PIDA());
+      fPIDA_0.push_back(pidObj0.PIDA());
+      fPIDA_1.push_back(pidObj1.PIDA());
+      fPIDA_2.push_back(pidObj2.PIDA());
       double averageDEdX = 0;
 
-      for(unsigned int i = 0; i < ev_calo->at(ass_calo_v[track_index][0]).dEdx().size();++i)
+      for(unsigned int i = 0; i < calObj0.dEdx().size();++i)
 	{
-	  fdEdxReco_0.push_back(ev_calo->at(ass_calo_v[track_index][0]).dEdx()[i]);
+	  fdEdxReco_0.push_back(calObj0.dEdx()[i]);
 	}
-      for(unsigned int i = 0; i < ev_calo->at(ass_calo_v[track_index][1]).dEdx().size();++i)
+      for(unsigned int i = 0; i < calObj1.dEdx().size();++i)
 	{
-	  fdEdxReco_1.push_back(ev_calo->at(ass_calo_v[track_index][1]).dEdx()[i]);
+	  fdEdxReco_1.push_back(calObj1.dEdx()[i]);
 	}
-      for(unsigned int i = 0; i < ev_calo->at(ass_calo_v[track_index][2]).dEdx().size();++i)
+      for(unsigned int i = 0; i < calObj2.dEdx().size();++i)
 	{
-	  fdEdxReco_2.push_back(ev_calo->at(ass_calo_v[track_index][2]).dEdx()[i]);
-	  averageDEdX+=ev_calo->at(ass_calo_v[track_index][2]).dEdx().size();
+	  fdEdxReco_2.push_back(calObj2.dEdx()[i]);
+	  averageDEdX+=calObj2.dEdx().size();
 	}
 
 
       
-      fRecoPdg_0.push_back(ev_pid->at(ass_pid_v[track_index][0]).Pdg());
-      fRecoPdg_1.push_back(ev_pid->at(ass_pid_v[track_index][1]).Pdg());
-      fRecoPdg_2.push_back(ev_pid->at(ass_pid_v[track_index][2]).Pdg());
+      fRecoPdg_0.push_back(pidObj0.Pdg());
+      fRecoPdg_1.push_back(pidObj1.Pdg());
+      fRecoPdg_2.push_back(pidObj2.Pdg());
 
-      fHitsNumbReco_0.push_back(ev_calo->at(ass_calo_v[track_index][0]).dEdx().size());
-      fHitsNumbReco_1.push_back(ev_calo->at(ass_calo_v[track_index][1]).dEdx().size());
-      fHitsNumbReco_2.push_back(ev_calo->at(ass_calo_v[track_index][2]).dEdx().size());
+      fHitsNumbReco_0.push_back(calObj0.dEdx().size());
+      fHitsNumbReco_1.push_back(calObj1.dEdx().size());
+      fHitsNumbReco_2.push_back(calObj2.dEdx().size());
 
       fRangeReco.push_back(t.Length());
       
@@ -144,8 +155,98 @@ namespace larlite {
       fEndYReco.push_back(t.End().Y());
       fEndZReco.push_back(t.End().Z());
 
-      faverageDEdXReco.push_back(averageDEdX/ (double)ev_calo->at(ass_calo_v[track_index][2]).dEdx().size());
+      faverageDEdXReco.push_back(averageDEdX/ (double)calObj2.dEdx().size());
       ++track_index;
+      /*
+      //############################################################################# 
+      //########## Some cout to understand the PID and Calorimetry objects ########## 
+      //############################################################################# 
+      std::cout<<std::endl<<std::endl;
+      std::cout<<std::endl;
+      std::cout<<"####################################################"<<std::endl;
+      std::cout<<"####################################################"<<std::endl;
+      std::cout<<"####################################################"<<std::endl;
+      std::cout<<"################# Track Points  ####################"<<std::endl;
+      std::cout<<"track size               : "<<t.NumberTrajectoryPoints()         <<std::endl;
+      std::cout<<"track length             : "<<t.Length()                         <<std::endl;
+      std::cout<<"track Projected length 0 : "<<t.ProjectedLength(geo::kU)         <<std::endl;
+      std::cout<<"track Projected length 1 : "<<t.ProjectedLength(geo::kV)         <<std::endl;
+      std::cout<<"track Projected length 2 : "<<t.ProjectedLength(geo::kZ)         <<std::endl;
+ 
+      std::cout<<std::endl<<"################# checks  ####################"<<std::endl;
+      std::cout<<"size 0             : "<<(t.NumberTrajectoryPoints()-calObj0.ResidualRange().size())<<std::endl;
+      std::cout<<"size 1             : "<<(t.NumberTrajectoryPoints()-calObj1.ResidualRange().size())<<std::endl;
+      std::cout<<"size 2             : "<<(t.NumberTrajectoryPoints()-calObj2.ResidualRange().size())<<std::endl;
+      std::cout<<"length 0           : "<<(t.Length()-calObj0.Range())                               <<std::endl;
+      std::cout<<"length 1           : "<<(t.Length()-calObj1.Range())                               <<std::endl;
+      std::cout<<"length 2           : "<<(t.Length()-calObj2.Range())                               <<std::endl;
+
+
+      std::cout<<std::endl<<"#################### Plane 0 ####################"<<std::endl;
+      std::cout<<"calObj0.dEdx()          size : "<<calObj0.dEdx().size()         <<std::endl;
+      std::cout<<"calObj0.dQdx()          size : "<<calObj0.dQdx().size()         <<std::endl;
+      std::cout<<"calObj0.ResidualRange() size : "<<calObj0.ResidualRange().size()<<std::endl;
+      std::cout<<"calObj0.DeadWireResRC() size : "<<calObj0.DeadWireResRC().size()<<std::endl;
+      std::cout<<"calObj0.KineticEnergy()      : "<<calObj0.KineticEnergy()       <<std::endl;
+      std::cout<<"calObj0.Range()              : "<<calObj0.Range()               <<std::endl;        
+      std::cout<<"calObj0.TrkPitchVec()   size : "<<calObj0.TrkPitchVec().size()  <<std::endl;
+      std::cout<<"calObj0.TrkPitchC()          : "<<calObj0.TrkPitchC()           <<std::endl;    
+      std::cout<<"calObj0.PlaneID().TPC        : "<<calObj0.PlaneID().TPC         <<std::endl;
+      std::cout<<"calObj0.PlaneID().Cryostat   : "<<calObj0.PlaneID().Cryostat    <<std::endl;
+      std::cout<<"calObj0.PlaneID().Plane      : "<<calObj0.PlaneID().Plane       <<std::endl;
+      std::cout<<"calObj0.XYZ()           size : "<<calObj0.XYZ().size()          <<std::endl;
+
+      std::cout<<std::endl<<"#################### Plane 1 ####################"<<std::endl;
+      std::cout<<"calObj1.dEdx()          size : "<<calObj1.dEdx().size()         <<std::endl;
+      std::cout<<"calObj1.dQdx()          size : "<<calObj1.dQdx().size()         <<std::endl;
+      std::cout<<"calObj1.ResidualRange() size : "<<calObj1.ResidualRange().size()<<std::endl;
+      std::cout<<"calObj1.DeadWireResRC() size : "<<calObj1.DeadWireResRC().size()<<std::endl;
+      std::cout<<"calObj1.KineticEnergy()      : "<<calObj1.KineticEnergy()       <<std::endl;
+      std::cout<<"calObj1.Range()              : "<<calObj1.Range()               <<std::endl;
+      std::cout<<"calObj1.TrkPitchVec()   size : "<<calObj1.TrkPitchVec().size()  <<std::endl;        
+      std::cout<<"calObj1.TrkPitchC()          : "<<calObj1.TrkPitchC()           <<std::endl;    
+      std::cout<<"calObj1.PlaneID().TPC        : "<<calObj1.PlaneID().TPC         <<std::endl;
+      std::cout<<"calObj1.PlaneID().Cryostat   : "<<calObj1.PlaneID().Cryostat    <<std::endl;
+      std::cout<<"calObj1.PlaneID().Plane      : "<<calObj1.PlaneID().Plane       <<std::endl;
+      std::cout<<"calObj1.XYZ()           size : "<<calObj1.XYZ().size()          <<std::endl;
+
+      std::cout<<std::endl<<"#################### Plane 2 ####################"<<std::endl;
+      std::cout<<"calObj2.dEdx()          size : "<<calObj2.dEdx().size()         <<std::endl;
+      std::cout<<"calObj2.dQdx()          size : "<<calObj2.dQdx().size()         <<std::endl;
+      std::cout<<"calObj2.ResidualRange() size : "<<calObj2.ResidualRange().size()<<std::endl;
+      std::cout<<"calObj2.DeadWireResRC() size : "<<calObj2.DeadWireResRC().size()<<std::endl;
+      std::cout<<"calObj2.KineticEnergy()      : "<<calObj2.KineticEnergy()       <<std::endl;
+      std::cout<<"calObj2.Range()              : "<<calObj2.Range()               <<std::endl;
+      std::cout<<"calObj2.TrkPitchVec()   size : "<<calObj2.TrkPitchVec().size()  <<std::endl;        
+      std::cout<<"calObj2.TrkPitchC()          : "<<calObj2.TrkPitchC()           <<std::endl;    
+      std::cout<<"calObj2.PlaneID().TPC        : "<<calObj2.PlaneID().TPC         <<std::endl;
+      std::cout<<"calObj2.PlaneID().Cryostat   : "<<calObj2.PlaneID().Cryostat    <<std::endl;
+      std::cout<<"calObj2.PlaneID().Plane      : "<<calObj2.PlaneID().Plane       <<std::endl;
+      std::cout<<"calObj2.XYZ()           size : "<<calObj2.XYZ().size()          <<std::endl;
+
+      
+      std::cout<<"##################################################################"<<std::endl;
+      std::cout<<"#################### Let's try to understand  ####################"<<std::endl;
+      std::cout<<"#################### the relationship between ####################"<<std::endl;
+      std::cout<<"#################### ResidualRange and Range  ####################"<<std::endl;
+      std::cout<<"##################################################################"<<std::endl;
+      */
+	if(calObj0.ResidualRange().size()){
+	  int lastIndex = calObj0.ResidualRange().size()-1;
+	  /*
+	  std::cout<<"Range()              : "<<calObj0.Range()               <<std::endl;  
+	  std::cout<<"ResidualRange 0      : "<<calObj0.ResidualRange()[0]        <<" "<<calObj0.dEdx()[0]        <<std::endl;  
+	  std::cout<<"ResidualRange 1      : "<<calObj0.ResidualRange()[1]        <<" "<<calObj0.dEdx()[1]        <<std::endl;  
+	  std::cout<<"ResidualRange size   : "<<calObj0.ResidualRange()[lastIndex]<<" "<<calObj0.dEdx()[lastIndex]<<std::endl<<std::endl;  
+	  */
+	  int dedexInt = 0;
+	  for(auto const& resRang : calObj1.ResidualRange()){
+	    //	std::cout<<"ResidualRanges              : "<<resRang<<std::endl;
+	    fdEdXVsResRange->Fill(resRang,calObj0.dEdx()[dedexInt]);        
+	    dedexInt++;
+	  }
+	}
+      
     } // End on tracks loop
 
     
@@ -157,7 +258,8 @@ namespace larlite {
   bool LookPIDA::finalize() {
     
     if(_fout) {
-      if (fPIDATree) fPIDATree->Write();
+      if (fPIDATree)       fPIDATree->Write();
+      if (fdEdXVsResRange) fdEdXVsResRange->Write();
     }
     return true;
   }
@@ -296,17 +398,3 @@ namespace larlite {
 
 }
 #endif
-
-/*
-      fdEdxDelta_0.clear();
-      fdEdxDelta_1.clear();
-      fdEdxDelta_2.clear();
-          
-      fResRangeReco.clear();
-      fResRangeTrue.clear();
-      
-      fKInitReco.clear();
-      fKInitTrue.clear();
-      
-      fStepEnergyReco.push_back();
-*/

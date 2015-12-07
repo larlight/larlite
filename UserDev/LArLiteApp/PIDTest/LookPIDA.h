@@ -33,7 +33,8 @@ namespace larlite {
     LookPIDA(){ 
       _name="LookPIDA"; 
       _fout=0;
-      fPIDATree=nullptr;
+      fPIDATree      = nullptr;
+      fdEdXVsResRange = nullptr; 
 
       fPIDA_0.clear();
       fPIDA_1.clear();  
@@ -121,6 +122,7 @@ namespace larlite {
     /// Function to clear TTree
     void ClearTreeVar();
 
+    TH2D *fdEdXVsResRange;
     // My analysis TTree
     TTree *fPIDATree;
     std::vector<double> fPIDA_0        ; // Reco PIDA on plan 0?

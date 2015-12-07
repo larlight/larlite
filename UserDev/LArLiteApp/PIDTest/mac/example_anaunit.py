@@ -29,8 +29,8 @@ one_proc.SetTrackProducer("trackkalmanhit")
 # Attach a template process
 my_proc.enable_filter(True);
 my_proc.add_process(fmwk.OneMCTrackFilter());
-my_proc.add_process(one_proc);
-my_proc.add_process(fmwk.MCTracksContainedFilter());
+#my_proc.add_process(one_proc);
+#my_proc.add_process(fmwk.MCTracksContainedFilter());
 my_proc.add_process(fmwk.LookPIDA())
 
 print
