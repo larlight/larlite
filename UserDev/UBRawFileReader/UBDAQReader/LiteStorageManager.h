@@ -58,7 +58,11 @@ namespace ubdaq {
     void Initialize();
     bool ProcessEvent();
 
-    ::larlite::storage_manager getManager(){return _mgr;}
+    size_t event() {return _event;}
+    size_t run()   {return _run;}
+    size_t subrun(){return _subrun;}
+
+    // ::larlite::storage_manager getManager(){return _mgr;}
 
 
   private:
@@ -70,6 +74,10 @@ namespace ubdaq {
     bool _read_fifo;
     bool _read_opdetwaveform;
     bool _read_rawdigit;
+
+    size_t _event;
+    size_t _run;
+    size_t _subrun;
 
     ::larlite::event_rawdigit*      _ev_rawdigit;
     ::larlite::event_fifo*          _ev_fifo;
@@ -83,7 +91,7 @@ namespace ubdaq {
 #endif
     size_t _event_ctr;
     std::string _outfile;
-    ::larlite::storage_manager _mgr;
+    // ::larlite::storage_manager _mgr;
     std::ifstream* _is;
     UBChannelMap_t fChannelMap;
     UBChannelReverseMap_t fChannelReverseMap;

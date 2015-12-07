@@ -151,9 +151,9 @@ void DrawUbDaq::readData(bool skipDataFetch) {
   const larlite::event_rawdigit & RawDigitHandle = _storage.RawDigit();
 
     
-  _run = _storage.getManager().run_id();
-  _subrun = _storage.getManager().subrun_id();
-  _event_no = _storage.getManager().event_id();
+  _run = _storage.run();
+  _subrun = _storage.subrun();
+  _event_no = _storage.event();
 
   // Initalize the space to hold the pedestal and RMS by Plane
   pedestalByPlane.clear();
