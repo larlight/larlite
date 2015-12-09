@@ -32,7 +32,7 @@ namespace flashana {
   {
     MCSource_t res;
 
-    for (size_t mct_index = 0; mct_index < ev_mct.size(); ++mct_index) {
+    for (size_t mct_index = 0; mct_index < ev_mct.size(); ++mct_index){
       
       auto const& mct = ev_mct[mct_index];
       
@@ -70,7 +70,7 @@ namespace flashana {
     // Look at tracks on 'per interaction' basis
     std::map<unsigned int, size_t> usedIDs;
     // Some constants needed
-    double det_drift_velocity = ::larutil::LArProperties::GetME()->DriftVelocity();
+    double det_drift_velocity = ::larutil::LArProperties::GetME()->DriftVelocity(); ///< cm/us
     
     // Clear attributes to be filled
     _mctrack_2_qcluster.clear();
@@ -114,7 +114,7 @@ namespace flashana {
       // so that the x-position is what would be seen
       // in the TPC, not the truth x-position
       double event_time = trk[0].T(); // ns
-      double shift_x = event_time * det_drift_velocity;
+      double shift_x = event_time * det_drift_velocity * pow(10,-3); //cm
       tpc_obj.reserve(tpc_obj.size() + trk.size());
       
       // Now loop over all mctracks that share an ancestor and treat
@@ -125,13 +125,13 @@ namespace flashana {
 	
 	auto const& pt1 = trk[step_index];
 	auto const& pt2 = trk[step_index + 1];
-	
+
 	double dx = pt2.X() - pt1.X();
 	double dy = pt2.Y() - pt1.Y();
 	double dz = pt2.Z() - pt1.Z();
 	double e_diff = pt1.E() - pt2.E();
 	tpc_src.energy_deposit += e_diff;
-	
+
 	//std::cout<<"\nOld X, Y, Z, Q: "<<pt1.X() + dx/2. +shift_x<<", "<<pt1.Y()+dy/2.<<", "<<pt1.Z()+dz/2.<<", "<<(pt1.E() - pt2.E())<<std::endl ;
 	
 	double distance = sqrt(pow(dx, 2) + pow(dy, 2) + pow(dz, 2));
@@ -155,17 +155,24 @@ namespace flashana {
 	    if(!_use_xshift)pt.x = pt1.X() + step_dir[0] * _step_size * (segment_index - 0.5);
 	    pt.y = pt1.Y() + step_dir[1] * _step_size * (segment_index - 0.5);
 	    pt.z = pt1.Z() + step_dir[2] * _step_size * (segment_index - 0.5);
-	  } else {
+//	    std::cout<<"pt.x in MCQCluster: "<<pt.x<<std::endl ;
+	    tpc_obj.emplace_back(pt);
+	  } else if(segment_index == n_segments && (distance - _step_size*(n_segments-1))!=0) {
 	    double offset = _step_size * (segment_index - 1);
 	    double remain = distance - offset;
+
 	    pt.q = _light_yield * dedx * remain;
 	    if( _use_xshift)pt.x = pt1.X() + step_dir[0] * (offset + remain / 2.) + shift_x;
 	    if(!_use_xshift)pt.x = pt1.X() + step_dir[0] * (offset + remain / 2.);
 	    pt.y = pt1.Y() + step_dir[1] * (offset + remain / 2.);
 	    pt.z = pt1.Z() + step_dir[2] * (offset + remain / 2.);
+//	    std::cout<<"pt.x in MCQCluster: "<<pt.x<<", "<<distance << std::endl ;
+	    tpc_obj.emplace_back(pt);
+	    break;
 	  }
+//	    std::cout<<"pt.x in MCQCluster: "<<pt.x<<", "<<segment_index<<std::endl ;
 	  
-	  tpc_obj.emplace_back(pt);
+
 	}// Finish looping over segments
       }// Finish looping over mctrack trajectory points
     } // Finish looping over mctracks
