@@ -106,6 +106,7 @@ namespace larlite{
     };
 
     const std::string kDATA_TREE_NAME[kDATA_TYPE_MAX] = {
+      //const std::vector<std::string> kDATA_TREE_NAME = {
       "unknown",
       "event",
       "gtruth",
@@ -147,10 +148,12 @@ namespace larlite{
     };
 
     const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {
+      //    const std::vector<std::string> kRUNDATA_TREE_NAME = {
       "undefined"
     };
     
     const std::string kSUBRUNDATA_TREE_NAME[kSUBRUNDATA_TYPE_MAX] = {
+      //    const std::vector<std::string> kSUBRUNDATA_TREE_NAME = {
       "undefined",
       "potsummary"
     };

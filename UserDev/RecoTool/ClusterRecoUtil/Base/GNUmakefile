@@ -26,9 +26,6 @@ OSNAMEMODE      = $(OSNAME)
 
 # linker flags
 LDFLAGS += $(shell larlite-config --libs)
-LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_FANN
-#LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtilAlg
-LDFLAGS += -L$(LARLITE_LIBDIR) -lfloatfann
 
 #SUBDIRS := Alg
 #

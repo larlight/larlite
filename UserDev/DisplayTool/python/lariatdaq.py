@@ -5,7 +5,7 @@ from evdmanager import manager
 from evdmanager.geometry import lariat
 from datatypes import wire
 import argparse, sys, signal
-from PyQt4 import QtGui, QtCore
+from pyqtgraph.Qt import QtGui, QtCore
 import os
 
 from ROOT import evd

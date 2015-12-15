@@ -22,7 +22,7 @@
 #include "LArUtil/Geometry.h"
 #include <functional>
 #include <algorithm>
-
+#include "OpT0Finder/Base/BaseAlgorithm.h"
 namespace flashana{
 /**
    \class LightPath
@@ -30,16 +30,17 @@ namespace flashana{
    doxygen documentation!
  */
 
-
-  class LightPath{
+  class LightPath : flashana::BaseAlgorithm {
     
   public:
     
     /// Default constructor
-    LightPath();
+    LightPath(const std::string name="LightPath");
     
     /// Default destructor
     ~LightPath(){}
+
+    void Configure(const ::fcllite::PSet &pset);
     
     // Setter function
     bool TrackStart( bool a) { _start_bool =a; return _start_bool;}
@@ -47,23 +48,20 @@ namespace flashana{
     double Set_Gap (double x){ _gap   =x; return _gap;}
 
     // Getter function
-    flashana::QCluster_t FlashHypothesis(::geoalgo::Trajectory trj) const;
+    flashana::QCluster_t FlashHypothesis(const ::geoalgo::Trajectory& trj) const;
 
-    // Calculation fuction
-    std::vector<double> PhotonLibrary(::geoalgo::Vector pt_1,
-                                      ::geoalgo::Vector pt_2,
-                                      std::vector<double> pe) const;
-    void QCluster(::geoalgo::Vector pt_1,
-                  ::geoalgo::Vector pt_2,
+    void QCluster(const ::geoalgo::Vector& pt_1,
+                  const ::geoalgo::Vector& pt_2,
                   flashana::QCluster_t& Q_cluster) const;
     
   protected:
-    bool   _start_bool = true;
-    bool   _end_bool   = true;
-    double _gap   = 0.5;
-    double _xmax, _xmin;
-    double _ymax, _ymin;
-    double _zmax, _zmin;
+    bool   _start_bool;
+    bool   _end_bool;
+    double _gap;
+    double _light_yield;
+    double _dEdxMIP;
+    ::geoalgo::GeoAlgo _geoAlgo;
+
   };
 } 
 

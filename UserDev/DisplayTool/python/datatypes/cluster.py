@@ -1,5 +1,5 @@
 from data import recoBase
-from PyQt4 import QtGui, QtCore
+from pyqtgraph.Qt import QtGui, QtCore
 from connectedObjects import connectedBox, connectedCircle, boxCollection
 from ROOT import evd
 import pyqtgraph as pg

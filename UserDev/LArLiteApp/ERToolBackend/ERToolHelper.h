@@ -47,6 +47,8 @@ public:
         auto geom = ::larutil::Geometry::GetME();
         _DetWidth = 2 * geom->DetHalfWidth();
         _DetFramePeriod = 1.6E6; //ns, TODO: Fill this not by hand but from a better source
+
+        _disable_xshift = false;
     };
 
     /// Default destructor
@@ -103,6 +105,8 @@ public:
     /// Calculates for each mc particle, based on the time of the event, the corresponding shift in x-direction
     TLorentzVector getXShift(const mcpart& mcp) const;
 
+    /// Setter to disable xshift
+    void setDisableXShift(bool flag) { _disable_xshift = flag; }
 
 private:
 
@@ -116,6 +120,7 @@ private:
 
     EMShowerProfile _shrProfiler;
 
+    bool _disable_xshift;
 };
 }
 

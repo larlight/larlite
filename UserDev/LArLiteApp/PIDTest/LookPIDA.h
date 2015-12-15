@@ -33,12 +33,16 @@ namespace larlite {
     LookPIDA(){ 
       _name="LookPIDA"; 
       _fout=0;
-      fPIDATree=nullptr;
+      fPIDATree      = nullptr;
+      fdEdXVsResRange = nullptr; 
 
       fPIDA_0.clear();
       fPIDA_1.clear();  
       fPIDA_2.clear();
       
+      fRecoPdg_0.clear();
+      fRecoPdg_1.clear();
+      fRecoPdg_2.clear();
       fTruePdg.clear();
       
       fdEdxReco_0.clear();
@@ -46,28 +50,51 @@ namespace larlite {
       fdEdxReco_2.clear();
       
       fdEdxTrue.clear();
+
+      fStartXTrue.clear();      
+      fStartYTrue.clear();      
+      fStartZTrue.clear();      
       
+      fStartXReco.clear();      
+      fStartYReco.clear();      
+      fStartZReco.clear();      
+      
+      fEndXTrue.clear();      
+      fEndYTrue.clear();      
+      fEndZTrue.clear();      
+      
+      fEndXReco.clear();      
+      fEndYReco.clear();      
+      fEndZReco.clear();      
+
+      /*      
       fdEdxDelta_0.clear();
       fdEdxDelta_1.clear();
       fdEdxDelta_2.clear();
-
+      */
       fStepEnergyReco.clear();
       fStepEnergyTrue.clear();
       
       fRangeReco.clear();
       fRangeTrue.clear();
-      
+      /*      
       fResRangeReco.clear();
       fResRangeTrue.clear();
       
       fKInitReco.clear();
       fKInitTrue.clear();
-      
-      fHitsNumbReco.clear();
+      */
+      fHitsNumbReco_0.clear();
+      fHitsNumbReco_1.clear();
+      fHitsNumbReco_2.clear();
       fHitsNumbTrue.clear();
       
       fTracksNumbReco.clear();
-      fTracksNumbTrue.clear();      
+      fTracksNumbTrue.clear();
+
+      faverageDEdXTrue.clear();
+      faverageDEdXReco.clear();
+      
     }
 
     /// Default destructor
@@ -95,12 +122,16 @@ namespace larlite {
     /// Function to clear TTree
     void ClearTreeVar();
 
+    TH2D *fdEdXVsResRange;
     // My analysis TTree
     TTree *fPIDATree;
     std::vector<double> fPIDA_0        ; // Reco PIDA on plan 0?
     std::vector<double> fPIDA_1        ; // Reco PIDA on plan 1?
     std::vector<double> fPIDA_2        ; // Reco PIDA on plan 2?
 
+    std::vector<double> fRecoPdg_0     ; // Reco pdg 0
+    std::vector<double> fRecoPdg_1     ; // Reco pdg 1
+    std::vector<double> fRecoPdg_2     ; // Reco pdg 2
     std::vector<double> fTruePdg       ; // True pdg
 	              
     std::vector<double> fdEdxReco_0    ; // Reco dEdx on plan 0?
@@ -109,23 +140,45 @@ namespace larlite {
 
     std::vector<double> fdEdxTrue      ; // True dEdx
 
+    std::vector<double> fStartXTrue    ;
+    std::vector<double> fStartYTrue    ;
+    std::vector<double> fStartZTrue    ;
+    	       	   
+    std::vector<double> fStartXReco    ;
+    std::vector<double> fStartYReco    ;
+    std::vector<double> fStartZReco    ;
+
+    std::vector<double> fEndXTrue    ;
+    std::vector<double> fEndYTrue    ;
+    std::vector<double> fEndZTrue    ;
+    	       	   
+    std::vector<double> fEndXReco    ;
+    std::vector<double> fEndYReco    ;
+    std::vector<double> fEndZReco    ;
+
+    std::vector<double> faverageDEdXTrue;
+    std::vector<double> faverageDEdXReco;
+
+    /*
     std::vector<double> fdEdxDelta_0   ; // Delta Reco - True dEdx on plan 0?
     std::vector<double> fdEdxDelta_1   ; // Delta Reco - True dEdx on plan 1?
     std::vector<double> fdEdxDelta_2   ; // Delta Reco - True dEdx on plan 2?
-
+    */
     std::vector<double> fStepEnergyReco; // Reco Step Energy
     std::vector<double> fStepEnergyTrue; // True Step Energy
 
     std::vector<double> fRangeReco     ; // Reco Range 
     std::vector<double> fRangeTrue     ; // Reco Range 
-
-    std::vector<double> fResRangeReco  ; // Reco Residual Range 
-    std::vector<double> fResRangeTrue  ; // True Residual Range 
-
-    std::vector<double> fKInitReco     ; // Initial Reco Kinetic Energy 
-    std::vector<double> fKInitTrue     ; // Initial True Kinetic Energy 
-
-    std::vector<double> fHitsNumbReco  ; // Number of Reco hits per track
+    /*
+      std::vector<double> fResRangeReco  ; // Reco Residual Range 
+      std::vector<double> fResRangeTrue  ; // True Residual Range 
+      
+      std::vector<double> fKInitReco     ; // Initial Reco Kinetic Energy 
+      std::vector<double> fKInitTrue     ; // Initial True Kinetic Energy 
+    */
+    std::vector<double> fHitsNumbReco_0; // Number of Reco hits per track 0
+    std::vector<double> fHitsNumbReco_1; // Number of Reco hits per track 1
+    std::vector<double> fHitsNumbReco_2; // Number of Reco hits per track 2
     std::vector<double> fHitsNumbTrue  ; // Number of True hits per track
 
     std::vector<double> fTracksNumbReco; // Number of Reco tracks per event

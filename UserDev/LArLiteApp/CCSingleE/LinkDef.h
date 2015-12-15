@@ -13,7 +13,7 @@
 #pragma link C++ class larlite::MC_CC1E_Filter+;
 #pragma link C++ class larlite::MC_CCQE_Filter+;
 #pragma link C++ class larlite::MC_Dirt_Filter+;
-#pragma link C++ class larlite::MC_NC_Filter+;
+
 //ADD_NEW_CLASS ... do not change this line
 
 #endif

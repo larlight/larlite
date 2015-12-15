@@ -1,0 +1,27 @@
+Shower Reco Plot Goals
+
+Plots for Tuesday, 9/22/15:
+3D Start Point
+3D Direction
+average dE/dx for electrons, also for photons
+energy
+profiling/time for computation
+
+Long term goals:
+Improve start point
+bad cluster tagging
+efficiency plots as a function of energy, angle, etc.
+space points for start of shower
+alternative input than clusters (spacepoints, etc)
+reclustering (including matching data products)
+
+
+Input from analysis:
+
+3D axis resolution requirements from pi0 traceback, neutrino vtx traceback (photon rejection)
+dE/dx resolution for e/gamma separation
+trackback to tracks for cosmic tagging
+track shower separation
+  -> ID overlaid showers for cosmics
+  
+

@@ -5,7 +5,7 @@ except:
     print "Error, must have open gl to use this viewer."
     exit(-1)
 
-from PyQt4 import QtGui, QtCore
+from pyqtgraph.Qt import QtGui, QtCore
 import pyqtgraph as pg
 import numpy as np
 import math

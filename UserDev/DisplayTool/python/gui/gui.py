@@ -3,7 +3,7 @@
 import sys, signal
 import argparse
 # import collections
-from PyQt4 import QtGui, QtCore
+from pyqtgraph.Qt import QtGui, QtCore
 import pyqtgraph as pg
 import numpy as np
 
@@ -278,7 +278,7 @@ class gui(QtGui.QWidget):
     try:
       event = int(self._larliteEventEntry.text())
     except:
-      print "Error, must enter an integer"
+      print("Error, must enter an integer")
       self._larliteEventEntry.setText(str(self._event_manager.event()))
       return
     self._event_manager.goToEvent(event)
@@ -590,7 +590,7 @@ class gui(QtGui.QWidget):
     super(gui, self).keyPressEvent(e)
 
   def screenCapture(self):
-    print "Screen Capture!"
+    print("Screen Capture!")
     dialog = QtGui.QFileDialog()
     r = self._event_manager.run()
     e = self._event_manager.event()
@@ -601,7 +601,7 @@ class gui(QtGui.QWidget):
     f = dialog.getSaveFileName(self,"Save File",name,
         "PNG (*.png);;JPG (*.jpg);;All Files (*)")
 
-    print f
+    print(f)
     # print filt
     # Print
     pixmapImage = QtGui.QPixmap.grabWidget(self)
