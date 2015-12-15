@@ -18,6 +18,7 @@ namespace flashana {
     kFlashMatch,      ///< Algorithm type to match flash hypothesis and reconstructed flash
     kMatchProhibit,   ///< Algorithm type to prohibit a match between a flash and a cluster
     kFlashHypothesis, ///< Algorithm type to make QCluster_t => Flash_t hypothesis
+    kCustomAlgo,      ///< Algorithm type that does not play a role in the framework execution but inherits from BaseAlgorithm
     kAlgorithmTypeMax ///< enum flag for algorithm type count & invalid type
   };
 
@@ -80,8 +81,6 @@ namespace flashana {
   /// Index collection
   typedef std::vector<flashana::ID_t> IDArray_t;
 
-
-
   /// Flash-TPC match info
   struct FlashMatch_t {
     ID_t tpc_id;   ///< matched TPC object ID
@@ -96,6 +95,27 @@ namespace flashana {
 		 const ID_t& flash_id_value,
 		 const double& score_value)
     { tpc_id = tpc_id_value; flash_id = flash_id_value; score = score_value; }
+  };
+
+  /// Enum to define MC source type (MCTrack or MCShower) for a given QCluster
+  enum MCAncestor_t {
+    kMCShowerAncestor,
+    kMCTrackAncestor,
+    kUnknownAncestor
+  };
+
+  /// Struct to represent the ancestor information for a specific interaction (QCluster)
+  struct MCSource_t {
+    int     index_id; ///< MCTrac/MCShower collection index ID of the ancestor
+    double  g4_time;  ///< Interaction G4 time in micro-seconds
+    double  energy_deposit;   ///< Deposited energy total
+    MCAncestor_t source_type; ///< Ancestor source type
+    MCSource_t()
+    {
+      index_id = -1;
+      g4_time  = kINVALID_DOUBLE;
+      source_type = kUnknownAncestor;
+    }
   };
   
   namespace msg {

@@ -24,24 +24,6 @@ export DIR=$LARLITE_USERDEVDIR/DisplayTool/
 PYTHONPATH_backup=$PYTHONPATH
 PATH_backup=$PATH
 
-# Test argparse
-if ! $(python -c "import argparse" &> /dev/null); then 
-  echo "Warning: can not use evd due to missing package argparse"
-  return
-fi
-
-# Test numpy
-if ! $(python -c "import numpy" &> /dev/null); then 
-  echo "Warning: can not use evd due to missing package numpy"
-  return
-fi
-
-# Test pyqt4
-if ! $(python -c "import PyQt4" &> /dev/null); then 
-  echo "Warning: can not use evd due to missing package PyQt4"
-  return
-fi
-
 if [[ ! ":$PATH:" == *":$DIR/python:"* ]]; then
   export PATH=$DIR/python:$PATH
 fi
@@ -49,6 +31,32 @@ fi
 if [[ ! ":$PYTHONPATH:" == *":$DIR/python:"* ]]; then
   export PYTHONPATH=$DIR/python/:$PYTHONPATH
 fi
+
+# Test argparse
+if ! $(python -c "import argparse" &> /dev/null); then 
+  echo "Warning: can not use evd due to missing package argparse"
+  export PATH=$PATH_backup
+  export PYTHONPATH=$PYTHONPATH_backup
+  return
+fi
+
+# Test numpy
+if ! $(python -c "import numpy" &> /dev/null); then 
+  echo "Warning: can not use evd due to missing package numpy"
+  export PATH=$PATH_backup
+  export PYTHONPATH=$PYTHONPATH_backup 
+  return
+fi
+
+# Test pyqt4
+if ! $(python -c "import pyqtgraph.Qt" &> /dev/null); then 
+  echo "Warning: can not use evd due to missing package PyQt"
+  export PATH=$PATH_backup
+  export PYTHONPATH=$PYTHONPATH_backup
+  return
+fi
+
+
 
 
 export BUILD_LARLITE_EVD=true

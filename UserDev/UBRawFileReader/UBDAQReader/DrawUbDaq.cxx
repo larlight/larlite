@@ -143,16 +143,17 @@ void DrawUbDaq::readData(bool skipDataFetch) {
 
   // df.get_entry(_current_event);
 
-  if (!skipDataFetch)
+  if (!skipDataFetch){
     _storage.ProcessEvent();
+  }
   // This is an event viewer.  In particular, this handles raw wire signal drawing.
   // So, obviously, first thing to do is to get the wires.
   const larlite::event_rawdigit & RawDigitHandle = _storage.RawDigit();
 
     
-  _run = _storage.getManager().run_id();
-  _subrun = _storage.getManager().subrun_id();
-  _event_no = _storage.getManager().event_id();
+  _run = _storage.run();
+  _subrun = _storage.subrun();
+  _event_no = _storage.event();
 
   // Initalize the space to hold the pedestal and RMS by Plane
   pedestalByPlane.clear();

@@ -74,8 +74,8 @@ namespace larlite{
 	return fTrkPitch[0];
       else return 0;
     }
-    inline const geo::PlaneID& PlaneID() const { return fPlaneID;}
-    inline const std::vector<TVector3>& XYZ() { return fXYZ; }
+    inline const geo::PlaneID& PlaneID()      const { return fPlaneID;}
+    inline const std::vector<TVector3>& XYZ() const { return fXYZ; }
 
   protected:
 

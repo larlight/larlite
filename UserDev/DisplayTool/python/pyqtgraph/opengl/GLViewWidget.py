@@ -1,4 +1,4 @@
-from ..Qt import QtCore, QtGui, QtOpenGL
+from ..Qt import QtCore, QtGui, QtOpenGL, USE_PYQT5
 from OpenGL.GL import *
 import OpenGL.GL.framebufferobjects as glfbo
 import numpy as np
@@ -73,9 +73,9 @@ class GLViewWidget(QtOpenGL.QGLWidget):
     def setBackgroundColor(self, *args, **kwds):
         """
         Set the background color of the widget. Accepts the same arguments as
-        pg.mkColor().
+        pg.mkColor() and pg.glColor().
         """
-        self.opts['bgcolor'] = fn.mkColor(*args, **kwds)
+        self.opts['bgcolor'] = fn.glColor(*args, **kwds)
         self.update()
         
     def getViewport(self):
@@ -175,7 +175,7 @@ class GLViewWidget(QtOpenGL.QGLWidget):
         self.setProjection(region=region)
         self.setModelview()
         bgcolor = self.opts['bgcolor']
-        glClearColor(bgcolor.red(), bgcolor.green(), bgcolor.blue(), 1.0)
+        glClearColor(*bgcolor)
         glClear( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT )
         self.drawItemTree(useItemNames=useItemNames)
         
@@ -232,7 +232,7 @@ class GLViewWidget(QtOpenGL.QGLWidget):
         self.update()
         self.viewChanged.emit()
         
-        
+
         
     def cameraPosition(self):
         """Return current position of camera based on center, dist, elevation, and azimuth"""
@@ -257,7 +257,7 @@ class GLViewWidget(QtOpenGL.QGLWidget):
         # self.opts['elevation'] = np.clip(self.opts['elevation'] + elev, -90, 90)
         self.update()
         self.viewChanged.emit()
-        
+
     def pan(self, dx, dy, dz, relative=False):
         """
         Moves the center (look-at) position while holding the camera in place. 
@@ -283,7 +283,7 @@ class GLViewWidget(QtOpenGL.QGLWidget):
             self.opts['center'] = self.opts['center'] + xVec * xScale * dx + yVec * xScale * dy + zVec * xScale * dz
         self.update()
         self.viewChanged.emit()
-        
+
     def pixelSize(self, pos):
         """
         Return the approximate size of a screen pixel at the location pos
@@ -313,7 +313,6 @@ class GLViewWidget(QtOpenGL.QGLWidget):
                 self.pan(diff.x(), 0, diff.y(), relative=True)
             else:
                 self.pan(diff.x(), diff.y(), 0, relative=True)
-        # self.viewChanged.emit()
         
     def mouseReleaseEvent(self, ev):
         pass
@@ -330,13 +329,20 @@ class GLViewWidget(QtOpenGL.QGLWidget):
         
         
     def wheelEvent(self, ev):
-        if (ev.modifiers() & QtCore.Qt.ControlModifier):
-            self.opts['fov'] *= 0.999**ev.delta()
+        delta = 0
+        if not USE_PYQT5:
+            delta = ev.delta()
         else:
-            self.opts['distance'] *= 0.999**ev.delta()
+            delta = ev.angleDelta().x()
+            if delta == 0:
+                delta = ev.angleDelta().y()
+        if (ev.modifiers() & QtCore.Qt.ControlModifier):
+            self.opts['fov'] *= 0.999**delta
+        else:
+            self.opts['distance'] *= 0.999**delta
         self.update()
         self.viewChanged.emit()
-
+        
     def keyPressEvent(self, ev):
         if ev.key() in self.noRepeatKeys:
             ev.accept()

@@ -16,6 +16,7 @@
 #define LARLITE_UBT0FINDER_H
 
 #include "Analysis/ana_base.h"
+#include "MCQCluster.h"
 #include "OpT0Finder/Base/FlashMatchManager.h"
 #include <TTree.h>
 #include <TH2D.h>
@@ -68,6 +69,7 @@ namespace larlite {
   protected:
 
     ::flashana::FlashMatchManager _mgr;
+    ::flashana::MCQCluster _interaction_algo;
 
     // readout start : 
     // time before the trigger when the RO start

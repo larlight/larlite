@@ -1,4 +1,4 @@
-from PyQt4 import QtCore, QtGui
+from pyqtgraph.Qt import QtGui, QtCore
 from event import manager, event
 from datatypes import wire
 
@@ -53,7 +53,8 @@ class ubdaq_manager(manager, wire, QtCore.QObject):
 Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolors.ENDC
 
     def initProcess(self):
-        self._process = evd.DrawUbDaq()
+        if self._process is None:
+            self._process = evd.DrawUbDaq()
         # Set up the noise filter and initialize
         self._process.SetCorrectData(self._filterData)
         self._process.SetSaveData(False)

@@ -1,5 +1,5 @@
 from gui import gui, view_manager
-from PyQt4 import QtCore, QtGui
+from pyqtgraph.Qt import QtGui, QtCore
 try:
     from evdmanager.ubdaq_fileglobber import *
     from evdmanager import ubdaq_manager
@@ -76,7 +76,10 @@ class livegui(gui):
             self._autoRunLabel.setText("Event update OFF")
 
     def quit(self):
+        self._fileChecker.stop()
         QtCore.QCoreApplication.instance().quit()
+        if self._timer.isActive():
+            self._timer.stop()
 
     # This function sets up the eastern widget
     def getEastLayout(self):

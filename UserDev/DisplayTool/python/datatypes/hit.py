@@ -1,6 +1,6 @@
 from database import recoBase
 from ROOT import evd
-from PyQt4 import QtGui
+from pyqtgraph.Qt import QtGui
 import pyqtgraph as pg
 
 

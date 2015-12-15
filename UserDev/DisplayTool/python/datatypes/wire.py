@@ -19,7 +19,7 @@ class recoWire(wire):
 
     def __init__(self):
         super(recoWire, self).__init__()
-        self._process = evd.DrawRaw()
+        self._process = evd.DrawWire()
         self._process.initialize()
 
 

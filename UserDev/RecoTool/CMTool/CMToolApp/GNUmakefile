@@ -29,8 +29,6 @@ LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_CMTAlgMatch
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_CMTAlgPriority
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_CMToolBase
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtil
-LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_FANN
-LDFLAGS += -L$(LARLITE_LIBDIR) -lfloatfann
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtilAlg
 
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}

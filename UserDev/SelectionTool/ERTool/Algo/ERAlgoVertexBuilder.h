@@ -22,6 +22,8 @@
 #include "GeoAlgo/GeoAABox.h"
 #include "GeoAlgo/GeoAlgo.h"
 
+#include "TTree.h"
+
 namespace ertool {
 
   /**
@@ -32,7 +34,17 @@ namespace ertool {
 
     Double_t const tstart_prox;
     Double_t const tmax_rad;
+    Bool_t const twithTrackDir;
     Bool_t const tverbose;
+
+    TTree * tree;
+
+    Int_t pn_size;
+    Int_t association_number;    
+    Double_t cpa;
+    Double_t vertx;
+    Double_t verty;
+    Double_t vertz;
 
     geoalgo::AABox volume;
     geoalgo::GeoAlgo const algo;
@@ -42,6 +54,7 @@ namespace ertool {
     /// Default constructor
     ERAlgoVertexBuilder(Double_t const start_prox,
 			Double_t const max_rad,
+			Bool_t const withTrackDir = true,
 			const std::string& name="ERAlgoVertexBuilder");
 
     /// Default destructor
@@ -56,9 +69,16 @@ namespace ertool {
     /// Called @ before processing the first event sample
     void ProcessBegin();
 
-    std::list<NodeID_t> Smear();
+    class ParticleAssociation;
 
     void EndReconstruct(ParticleGraph const & graph);
+    void EndReconstructPa(const EventData &data,
+			  ParticleGraph & graph,
+			  ParticleAssociation & pa);
+
+    void WithTrackDir(const EventData &data, ParticleGraph& graph);
+
+    void WithoutTrackDir(const EventData &data, ParticleGraph& graph);
 
     /// Function to evaluate input showers and determine a score
     bool Reconstruct(const EventData &data, ParticleGraph& graph);
