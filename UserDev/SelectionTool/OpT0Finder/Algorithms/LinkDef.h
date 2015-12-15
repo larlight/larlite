@@ -18,6 +18,7 @@
 //#pragma link C++ class flashana::FilterArray+;
 #pragma link C++ class flashana::NPtFilter+;
 #pragma link C++ class flashana::QLLMatch+;
+#pragma link C++ class flashana::LLMatch+;
 
 #pragma link C++ class flashana::PhotonLibHypothesis+;
 #pragma link C++ class flashana::ChargeAnalytical+;

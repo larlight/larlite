@@ -24,7 +24,7 @@ PRODUCER_NAME="opFlash"
 infile = sys.argv[1]
 
 indir = infile.split('/')[-2]
-# pdb.set_trace()
+
 nphoton,x,y,z = ( int(indir.split('_')[1]),
                   float(indir.split('_')[-3])/10.,
                   float(indir.split('_')[-2])/10.,
@@ -36,7 +36,7 @@ geo = larutil.Geometry.GetME()
 
 xv,yv,zv = pmt_pos()
 
-match_alg = flashana.QLLMatch.GetME()
+match_alg = flashana.LLMatch.GetME()
 match_mgr = flashana.FlashMatchManager()
 match_mgr.SetAlgo(match_alg)
 match_mgr.SetAlgo(flashana.PhotonLibHypothesis())
@@ -74,13 +74,16 @@ for entry in xrange(tch.GetEntries()):
     mc_flash = flashana.QCluster_t()
     mc_flash.push_back(flashana.QPoint_t(x,y,z,nphoton))
 
-    print "QLL:",match_alg.CallMinuit(mc_flash,reco_flash)
+    print "LL:",match_alg.CallMinuit(mc_flash,reco_flash)
     print "Look at a history..."
     xval_history = match_alg.HistoryX()
-    qll_history  = match_alg.HistoryQLL()
+    ll_history  = match_alg.HistoryLL()
 
     for history_index in xrange(xval_history.size()):
-        print qll_history[history_index],'at x=',xval_history[history_index]
+        print ll_history[history_index],'at x=',xval_history[history_index]
+
+#    print "Here are the flash/match hypothesis TPC origin x point and error."
+    print "LL: bestfitx, xerr: " + str(match_alg.Bestx()) + ", " + str(match_alg.Bestx_err())
 
     break
 

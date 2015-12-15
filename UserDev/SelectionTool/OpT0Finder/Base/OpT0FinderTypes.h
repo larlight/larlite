@@ -88,6 +88,7 @@ namespace flashana {
     ID_t flash_id; ///< matched Flash ID
     double score;  ///< floating point representing the "goodness" (algorithm dependent) 
     QPoint_t tpc_point; ///< estimated & matched 3D flash hypothesis point from TPC information
+    std::vector<double> tpc_point_err; // errors on those points
     /// Default ctor assigns invalid values
     FlashMatch_t()
     { tpc_id = kINVALID_ID; flash_id = kINVALID_ID; score = -1; }

@@ -5,6 +5,7 @@
 #include <set>
 #include <sstream>
 #include "OpT0Helper.h"
+#include "OpT0Finder/Algorithms/LLMatch.h"
 #include "OpT0Finder/Algorithms/QLLMatch.h"
 #include "OpT0Finder/Algorithms/ChargeAnalytical.h"
 #include "OpT0Finder/Algorithms/PhotonLibHypothesis.h"
@@ -38,6 +39,7 @@ namespace ertool {
     //
     std::string match_alg = p.get<std::string>( "Match" );      
     if      ( match_alg == "QLLMatch"     ) _mgr.SetAlgo( new ::flashana::QLLMatch     () );
+    else if ( match_alg == "LLMatch"      ) _mgr.SetAlgo( new ::flashana::LLMatch   () );
     else if ( match_alg == "CommonAmps"   ) _mgr.SetAlgo( new ::flashana::CommonAmps   () );
     else if ( match_alg == "QWeightPoint" ) _mgr.SetAlgo( new ::flashana::QWeightPoint () );
     else {

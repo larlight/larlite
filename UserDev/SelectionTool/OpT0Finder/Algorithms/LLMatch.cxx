@@ -1,36 +1,38 @@
-#ifndef QLLMATCH_CXX
-#define QLLMATCH_CXX
+#ifndef LLMATCH_CXX
+#define LLMATCH_CXX
 
-#include "QLLMatch.h"
+#include "LLMatch.h"
 #include "OpT0Finder/Base/OpT0FinderException.h"
 #include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
 #include <TMinuit.h>
+#include <TMath.h> // for poisson
 #include <cmath>
 #include <numeric>
 
 namespace flashana {
 
-    QLLMatch *QLLMatch::_me = nullptr;
+    LLMatch *LLMatch::_me = nullptr;
 
-    void MIN_vtx_qll(Int_t &, Double_t *, Double_t &, Double_t *, Int_t);
+    void MIN_vtx_ll(Int_t &, Double_t *, Double_t &, Double_t *, Int_t);
 
-    QLLMatch::QLLMatch(const std::string name)
+    LLMatch::LLMatch(const std::string name)
             : BaseFlashMatch(name), _record(false), _normalize(false), _minuit_ptr(nullptr) { }
 
-    void QLLMatch::Configure(const ::fcllite::PSet &pset) {
+    void LLMatch::Configure(const ::fcllite::PSet &pset) {
         _record = pset.get<bool>("RecordHistory");
         _normalize = pset.get<bool>("NormalizeHypothesis");
     }
 
-    FlashMatch_t QLLMatch::Match(const QCluster_t &pt_v, const Flash_t &flash) {
+    FlashMatch_t LLMatch::Match(const QCluster_t &pt_v, const Flash_t &flash) {
 
         this->CallMinuit(pt_v, flash);
 
         // Estimate position
         FlashMatch_t res;
-        if (isnan(_qll)) return res;
+        if (isnan(_ll)) return res;
         res.tpc_point.x = res.tpc_point.y = res.tpc_point.z = 0;
-        res.score = 1. / _qll;
+	res.tpc_point_err[0] = res.tpc_point_err[1] = res.tpc_point_err[2] = 0;
+        res.score = 1. / _ll;
 
         double weight = 0;
         for (size_t pmt_index = 0; pmt_index < NOpDets(); ++pmt_index) {
@@ -42,15 +44,25 @@ namespace flashana {
             weight += _hypothesis.pe_v[pmt_index];
         }
 
-        res.tpc_point.x /= weight;
+	res.tpc_point.x /= weight;
         res.tpc_point.y /= weight;
         res.tpc_point.z /= weight;
         res.tpc_point.q = weight;
 
+	/* 
+	   Why do the above for x? We went to the trouble to float x and determine its location. The above 
+	   writes over that effort.
+	 */
+
+	res.tpc_point.x = _reco_x_offset;
+	res.tpc_point_err[0] = _reco_x_offset_err;
+
+	std::cout << "LLMatch::Match() res.x, res.dx are " << res.tpc_point.x << ", " << res.tpc_point_err[0] << std::endl;
+
         return res;
     }
 
-    const Flash_t &QLLMatch::ChargeHypothesis(const double xoffset) {
+    const Flash_t &LLMatch::ChargeHypothesis(const double xoffset) {
         if (_hypothesis.pe_v.empty()) _hypothesis.pe_v.resize(NOpDets(), 0.);
         if (_hypothesis.pe_v.size() != NOpDets())
             Print(msg::kEXCEPTION, __FUNCTION__, "Hypothesis vector length != PMT count");
@@ -79,13 +91,14 @@ namespace flashana {
         return _hypothesis;
     }
 
-    const Flash_t &QLLMatch::Measurement() const { return _measurement; }
+    const Flash_t &LLMatch::Measurement() const { return _measurement; }
 
-    double QLLMatch::QLL(const Flash_t &hypothesis,
-                         const Flash_t &measurement) {
-        double result = 0;
-        double nvalid_pmt = 0;
+    std::vector<double> LLMatch::LL(const Flash_t &hypothesis,
+				  const Flash_t &measurement) {
 
+      std::vector<double> result (2,0.0);
+      double nvalid_pmt = 0;
+	
         double PEtot_Hyp = 0;
         for (auto const &pe : hypothesis.pe_v)
             PEtot_Hyp += pe;
@@ -95,46 +108,52 @@ namespace flashana {
 
 
         if (measurement.pe_v.size() != hypothesis.pe_v.size())
-            throw OpT0FinderException("Cannot compute QLL for unmatched length!");
+            throw OpT0FinderException("Cannot compute LL for unmatched length!");
         for (size_t pmt_index = 0; pmt_index < hypothesis.pe_v.size(); ++pmt_index) {
 
-            if (measurement.pe_v[pmt_index] < 0.01) continue;
+	  //            if (measurement.pe_v[pmt_index] < 0.01) continue;
+            if (hypothesis.pe_v[pmt_index] < 0.01) continue;
 
             nvalid_pmt += 1;
 
             auto O = measurement.pe_v[pmt_index]; // observation
             auto H = hypothesis.pe_v[pmt_index];  // hypothesis
 
-            result += std::pow((O - H), 2) / (O + H);
-
-            //result += std::fabs(  ) * measurement.pe_v[pmt_index];
+	    result.at(0) += std::pow((O - H), 2)/(O + H)  ;
+	    result.at(1) +=  -std::log10(TMath::Poisson(O,H))  ; // neg. log-likelihood
+	    if (isnan(result.at(1)) || isinf(result.at(1))) result.at(1) = 1.E3;
+	    // could instead use discrete std::poisson_distribution
+	    
+	    //	    std::cout << "LL(): ii chi2, llhd, O, H:" << pmt_index << ", " << std::pow((O - H), 2)/(O + H)  << ", " << -std::log10(TMath::Poisson(O,H)) << ", " << O << ", " << H << std::endl;
 
         }
 
-        std::cout << "PE hyp : " << PEtot_Hyp << "\tPE Obs : " << PEtot_Obs << "\t Chi^2 : " << result << std::endl;
+        std::cout << "PE hyp : " << PEtot_Hyp << "\tPE Obs : " << PEtot_Obs << "\t Chi^2, LLHD : " << result.at(0) << ", " << result.at(1) << std::endl;
 
-        return result / nvalid_pmt;
+        result.at(0) /= nvalid_pmt;
+        result.at(1) /= nvalid_pmt;
+        return result;
     }
 
-    void MIN_vtx_qll(Int_t & /*Npar*/,
+    void MIN_vtx_ll(Int_t & /*Npar*/,
                      Double_t * /*Grad*/,
                      Double_t &Fval,
                      Double_t *Xval,
                      Int_t /*Flag*/) {
 
-        //std::cout << "minuit offset : " << Fval << std::endl;
-        ///std::cout << "minuit Xval?? : " << *Xval << std::endl;
+        std::cout << "minuit offset : " << Fval << std::endl;
+        std::cout << "minuit Xval?? : " << *Xval << std::endl;
 
-        auto const &hypothesis = QLLMatch::GetME().ChargeHypothesis(*Xval);
-        auto const &measurement = QLLMatch::GetME().Measurement();
-        Fval = QLLMatch::GetME().QLL(hypothesis, measurement);
+        auto const &hypothesis = LLMatch::GetME().ChargeHypothesis(*Xval);
+        auto const &measurement = LLMatch::GetME().Measurement();
+        Fval = LLMatch::GetME().LL(hypothesis, measurement)[1]; // index 1 is the neg llhd, 0 is the chi2.
 
-        QLLMatch::GetME().Record(Fval, Xval[0]);
+        LLMatch::GetME().Record(Fval, Xval[1]);
 
         return;
     }
 
-    double QLLMatch::CallMinuit(const QCluster_t &tpc, const Flash_t &pmt) {
+    double LLMatch::CallMinuit(const QCluster_t &tpc, const Flash_t &pmt) {
 
         if (_measurement.pe_v.empty()) {
             _measurement.pe_v.resize(NOpDets(), 0.);
@@ -180,7 +199,7 @@ namespace flashana {
 
         if (!_minuit_ptr) _minuit_ptr = new TMinuit(4);
 
-        double reco_x = 128.;
+        double reco_x = 128.; // 128.;
         double reco_x_err = 0;
         double MinFval;
         int ierrflag, npari, nparx, istat;
@@ -191,7 +210,7 @@ namespace flashana {
         arglist[0] = 2.0;
         _minuit_ptr->mnexcm("SET STR", arglist, 1, ierrflag);
 
-        _minuit_ptr->SetFCN(MIN_vtx_qll);
+        _minuit_ptr->SetFCN(MIN_vtx_ll);
 
         _minuit_ptr->DefineParameter(0, "X", reco_x, 10, 0.0, 256.);
 
@@ -199,7 +218,7 @@ namespace flashana {
 
 
         // use Migrad minimizer
-        arglist[0] = 500;
+        arglist[0] = 5000;
         _minuit_ptr->mnexcm("MIGRAD", arglist, 1, ierrflag);
 
         //arglist[0]   = 5.0e+2;
@@ -225,7 +244,7 @@ namespace flashana {
         double fValue[1];
         fValue[0] = reco_x;
         // Transfer the minimization variables:
-        MIN_vtx_qll(nPar, grad, Fmin,
+        MIN_vtx_ll(nPar, grad, Fmin,
                     fValue, ierrflag);
         //static bool show = true;
         /*
@@ -238,7 +257,7 @@ namespace flashana {
         // Transfer the minimization variables:
         _reco_x_offset = reco_x;
         _reco_x_offset_err = reco_x_err;
-        _qll = MinFval;
+        _ll = MinFval;
 
         // Clear:
         _minuit_ptr->mnexcm("clear", arglist, 0, ierrflag);
@@ -246,7 +265,7 @@ namespace flashana {
         if (_minuit_ptr) delete _minuit_ptr;
         _minuit_ptr = 0;
 
-        return _qll;
+        return _ll;
     }
 
 }

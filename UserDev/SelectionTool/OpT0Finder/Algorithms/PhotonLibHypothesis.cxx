@@ -27,12 +27,12 @@ namespace flashana {
 	
         auto const& pt = trk[ipt];
 	
-        double q = pt.q;
+        double q = pt.q ;
         q *= ::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt);
         flash.pe_v[ipmt] += q;
 
-	//std::cout << "PMT : " << ipmt << " [x,y,z] -> [q] : [" << pt.x << ", "
-	//		  << pt.y << ", " << pt.z << "] -> [" << q << std::endl;
+	std::cout << "PhotonLibHypothesis: PMT : " << ipmt << " [x,y,z,q] -> [q] : [" << pt.x << ", "
+		  << pt.y << ", " << pt.z << ", " << pt.q <<"] -> [" << q << "]" << std::endl;
 
       }
     }

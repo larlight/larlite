@@ -26,7 +26,7 @@ from larlite import larlite as fmwk
 from ROOT import flashana
 
 # Create ana_processor instance
-pdb.set_trace()
+
 my_proc = fmwk.ana_processor()
 
 # Set input root file
@@ -64,9 +64,10 @@ my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
 # Hypothesis Algo
 my_unit.Manager().SetAlgo(flashana.PhotonLibHypothesis())
 # Match Algo
+my_unit.Manager().SetAlgo( flashana.LLMatch.GetME() )
 #my_unit.Manager().SetAlgo( flashana.QLLMatch.GetME() )
 #my_unit.Manager().SetAlgo( flashana.QWeightPoint()   )
-my_unit.Manager().SetAlgo( flashana.CommonAmps()      )
+#my_unit.Manager().SetAlgo( flashana.CommonAmps()      )
 
 my_unit.Manager().Configure( "%s/SelectionTool/OpT0Finder/App/mac/flashmatch.fcl" % os.environ['LARLITE_USERDEVDIR'])
 
