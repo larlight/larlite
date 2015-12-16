@@ -6,6 +6,7 @@ def pmt_pos():
     xv = ROOT.std.vector("double")()
     yv = ROOT.std.vector("double")()
     zv = ROOT.std.vector("double")()
+#    pdb.set_trace()
     for line in open('opt_geo.txt','r').read().split('\n'):
         words = line.split()
         if not len(words) == 3: continue
