@@ -41,6 +41,7 @@ namespace ertool {
 
 		_alg_emp.ProcessBegin();
 		_alg_emp.SetMode(true);
+		_alg_emp.setPlot(false); /// Toggle this to true to save output plots
 
 		if (_alg_tree) { delete _alg_tree; }
 		_alg_tree = new TTree("_alg_tree", "Algo SingleE Tree");
@@ -312,7 +313,7 @@ namespace ertool {
 				}
 				Particle& neutrino = graph.CreateParticle();
 				neutrinoMom += mom;//thisShower.Dir()*mom;
-				momdir += thisShower.Dir()*mom;
+				momdir += thisShower.Dir() * mom;
 				//neutrino.SetParticleInfo(12,0.,thisShower.Start(),thisShower.Dir()*mom);
 				if (Debug()) {
 					std::stringstream ss;
@@ -399,6 +400,7 @@ namespace ertool {
 				_alg_tree->Write();
 			if (_empart_tree)
 				_empart_tree->Write();
+			_alg_emp.ProcessEnd(fout);
 		}
 
 		return;
