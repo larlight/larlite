@@ -114,7 +114,7 @@ class viewport(pg.GraphicsLayoutWidget):
     if (pg.Qt.QT_LIB == 'PyQt4'):
       message= QtCore.QString()
     else:
-      message= QtCore.QByteArray()
+      message= str()
     if self._cmSpace:
       message.append("X: ")
       message.append("{0:.1f}".format(self.q.x()*self._geometry.wire2cm()))
