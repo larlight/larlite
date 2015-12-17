@@ -111,7 +111,10 @@ class viewport(pg.GraphicsLayoutWidget):
   def mouseMoved(self, pos):
     self.q = self._item.mapFromScene(pos)
     self._lastPos = self.q
-    message= QtCore.QString()
+    if (pg.Qt.QT_LIB == 'PyQt4'):
+      message= QtCore.QString()
+    else:
+      message= QtCore.QByteArray()
     if self._cmSpace:
       message.append("X: ")
       message.append("{0:.1f}".format(self.q.x()*self._geometry.wire2cm()))
