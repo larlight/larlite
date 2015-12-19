@@ -33,7 +33,7 @@ namespace flashana{
     auto const& _vfiducial = ActiveVolume();
     if(_vfiducial.Contain(pt_1)*_vfiducial.Contain(pt_2)==0) return;
     
-    if(dist<_gap){
+    if(dist<=_gap){
       ::geoalgo::Vector mid_pt((pt_1+pt_2)/2.);
       q_pt.x = mid_pt[0];
       q_pt.y = mid_pt[1];
@@ -41,33 +41,32 @@ namespace flashana{
       q_pt.q = _dEdxMIP * _light_yield * dist/2.;
       Q_cluster.emplace_back(q_pt);
       return;
+    }
+      
+    int num_div = int(dist/_gap);
+    ::geoalgo::Vector direction = pt_1 - pt_2;
+    ::geoalgo::Vector direct = direction.Dir();
+      
+    Q_cluster.reserve(Q_cluster.size() + num_div);
+    
+    for(int div_index = 0; div_index <num_div+1; div_index++){
+      if(div_index<num_div){
+	auto const mid_pt = pt_2 + direct * (_gap * div_index + _gap/2.);
+	q_pt.x = mid_pt[0];
+	q_pt.y = mid_pt[1];
+	q_pt.z = mid_pt[2];
+	q_pt.q = _gap * _dEdxMIP * _light_yield;
+	Q_cluster.emplace_back(q_pt);
       }
-      
-      int num_div = int(dist/_gap);
-      ::geoalgo::Vector direction = pt_1 - pt_2;
-      ::geoalgo::Vector direct = direction.Dir();
-      
-      Q_cluster.reserve(Q_cluster.size() + num_div);
-      
-      for(int div_index = 0; div_index <num_div+1; div_index++){
-	if(div_index<num_div){
-	  auto const mid_pt = pt_2 + direct * (_gap * div_index + _gap/2.);
-	  q_pt.x = mid_pt[0];
-	  q_pt.y = mid_pt[1];
-	  q_pt.z = mid_pt[2];
-	  q_pt.q = _gap * _dEdxMIP * _light_yield;
-	  Q_cluster.emplace_back(q_pt);
-	}
-	else{
-	  double weight = (dist - int(dist / _gap) * _gap);
-	  auto const mid_pt = pt_2 + direct * (_gap * div_index + weight/2.);
-	  q_pt.x = mid_pt[0];
-	  q_pt.y = mid_pt[1];
-	  q_pt.z = mid_pt[2];
-	  q_pt.q = _gap * _dEdxMIP * _light_yield;
-	  Q_cluster.emplace_back(q_pt);
-	}//Last segment less than gap
-	
+      else{
+	double weight = (dist - int(dist / _gap) * _gap);
+	auto const mid_pt = pt_2 + direct * (_gap * div_index + weight/2.);
+	q_pt.x = mid_pt[0];
+	q_pt.y = mid_pt[1];
+	q_pt.z = mid_pt[2];
+	q_pt.q = _gap * _dEdxMIP * _light_yield;
+	Q_cluster.emplace_back(q_pt);
+      }//Last segment less than gap
     }
   }
 
@@ -115,7 +114,7 @@ namespace flashana{
     }
     
     
-    for (int i = 0; i < trj.size()-2;i++){
+    for (int i = 0; i < trj.size()-1;i++){
       auto const& this_loc(trj[i]);
       auto const& last_loc(trj[i+1]);
       
