@@ -75,7 +75,6 @@ public:
     *
     * @param sm pointer to the storage manager
     */
-    void SetStorageManager(larlite::storage_manager * sm) {_storage = sm;}
 
 
 protected:
@@ -86,7 +85,6 @@ protected:
 
     TTree* _tree;
 
-    ::larlite::storage_manager * _storage;
 
 };
 

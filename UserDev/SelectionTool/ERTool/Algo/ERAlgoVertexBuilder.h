@@ -39,12 +39,9 @@ namespace ertool {
 
     TTree * tree;
 
-    Int_t pn_size;
-    Int_t association_number;    
-    Double_t cpa;
-    Double_t vertx;
-    Double_t verty;
-    Double_t vertz;
+    Int_t event_id;
+    Int_t association_number;
+    Int_t loop_counter;
 
     geoalgo::AABox volume;
     geoalgo::GeoAlgo const algo;
@@ -70,13 +67,25 @@ namespace ertool {
     void ProcessBegin();
 
     class ParticleAssociation;
+    class ParticleAssociations;
+    class ParticleGraphSetter;
+
+    friend ParticleAssociation;
+    friend ParticleAssociations;
+    friend ParticleGraphSetter;
 
     void EndReconstruct(ParticleGraph const & graph);
     void EndReconstructPa(const EventData &data,
 			  ParticleGraph & graph,
-			  ParticleAssociation & pa);
+			  ParticleAssociations const & pa);
 
     void WithTrackDir(const EventData &data, ParticleGraph& graph);
+
+    void Erase(EventData const & data,
+	       ParticleGraph const & graph,
+	       std::multimap<NodeID_t, const geoalgo::Point_t *> & pn,
+	       std::multimap<NodeID_t, const geoalgo::Point_t *>::iterator best_it,
+	       geoalgo::Point_t const & sv);
 
     void WithoutTrackDir(const EventData &data, ParticleGraph& graph);
 

@@ -121,6 +121,7 @@ namespace larlite {
 
     // tree to measure efficiency of matching for MCTracks
     TTree *_eff_tree;
+    TTree *_flash_tree;
     int _matched;
     double _mc_edep;
     double _trk_max_abs_x, _trk_min_abs_x;

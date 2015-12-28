@@ -43,7 +43,6 @@ Shower_t ShowerRecoAlgModular::RecoOneShower(const ShowerClusterSet_t& clusters)
 
   for (size_t n = 0; n < _modules.size(); n++) {
     _watch.Start();
-    _modules[n] -> SetStorageManager(_storage);
     _modules[n] -> do_reconstruction(clusters, result);
     _module_time_v[n] += _watch.RealTime();
     _module_ctr_v[n] += 1;

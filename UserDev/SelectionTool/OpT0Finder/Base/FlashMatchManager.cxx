@@ -216,7 +216,7 @@ namespace flashana {
 
     if(!_configured)
       Configure(_config_file);
-    
+
     //
     // Filter stage: for both TPC and Flash
     //
@@ -251,6 +251,9 @@ namespace flashana {
       Print(msg::kINFO,__FUNCTION__,ss.str());
     }
 
+//    std::cout<<"TPC: Before and after: "<<_tpc_object_v.size()<<", "<<tpc_index_v.size()<<std::endl ;
+//    std::cout<<"Flash: Before and after: "<<_flash_v.size()<<", "<<flash_index_v.size()<<std::endl ;
+
     //
     // Flash matching stage
     //
@@ -261,12 +264,14 @@ namespace flashana {
     // Double loop over a list of tpc object & flash
     // Call matching function to inspect the compatibility.
     for(size_t tpc_index=0; tpc_index < tpc_index_v.size(); ++tpc_index) {
-
       // Loop over flash list
       for(auto const& flash_index : flash_index_v) {
 
-	auto const& tpc   = _tpc_object_v[tpc_index]; // Retrieve TPC object
+	auto const& tpc   = _tpc_object_v[tpc_index_v[tpc_index]]; // Retrieve TPC object
 	auto const& flash = _flash_v[flash_index];    // Retrieve flash
+
+	if(tpc.size() == 0 )
+	  continue;
 	
 	// run the match-prohibit algo first
 	if (_alg_match_prohibit){
@@ -274,7 +279,7 @@ namespace flashana {
 	  if (compat == false)
 	    continue;
 	    }
-	
+//        std::cout<<"\n\n\nIn manager. TPC size is? "<<tpc.size()<<", flash time : "<<flash.time<<std::endl ;	
 	auto res = _alg_flash_match->Match( tpc, flash ); // Run matching
 	
 	// ignore this match if the score is <= 0
@@ -283,6 +288,7 @@ namespace flashana {
 	// Else we store this match. Assign TPC & flash index info
 	res.tpc_id = tpc.idx;//_index;
 	res.flash_id = flash.idx;//_index;
+
 	// For ordering purpose, take an inverse of the score for sorting
 	score_map.emplace( 1./res.score, res);
 
@@ -311,6 +317,8 @@ namespace flashana {
       auto&       match_info  = score_info.second;   // match information
       auto const& tpc_index   = match_info.tpc_id;   // matched tpc original id
       auto const& flash_index = match_info.flash_id; // matched flash original id
+
+//      std::cout<<"tpc_index and flash_index : "<<tpc_index<<", "<<flash_index<<std::endl ;
 
       // If this tpc object is already assigned (=better match found), ignore
       if(tpc_used.find(tpc_index) != tpc_used.end()) continue;

@@ -39,6 +39,7 @@ namespace flashana {
       if (mct.TrackID() == ancestor_track_id) {
 	res.index_id = (int)mct_index;
 	res.g4_time  = mct.Start().T();
+
 	res.source_type = kMCTrackAncestor;
 	return res;
       }
@@ -56,6 +57,8 @@ namespace flashana {
 	return res;
       }
     }
+
+//	std::cout<<"2) g4 time is: "<<ancestor_track_id<<", "<<res.g4_time<<", "<<res.index_id<<std::endl ;
     
     return res;
   }
@@ -63,20 +66,30 @@ namespace flashana {
   void MCQCluster::Construct( const ::larlite::event_mctrack& ev_mct,
 			      const ::larlite::event_mcshower& ev_mcs )
   {
+
+    std::cout<<"Number of tracks: "<<ev_mct.size()<<std::endl ;
     //
     // 0) Initialization
     //
-    
+
     // Look at tracks on 'per interaction' basis
     std::map<unsigned int, size_t> usedIDs;
-    // Some constants needed
-    double det_drift_velocity = ::larutil::LArProperties::GetME()->DriftVelocity(); ///< cm/us
     
     // Clear attributes to be filled
     _mctrack_2_qcluster.clear();
     _mcshower_2_qcluster.clear();
     _qcluster_v.clear();
-    
+
+//    std::cout<<"All track ancestors: "<<std::endl;
+//    for (size_t mct_index = 0; mct_index < ev_mct.size(); mct_index++) 
+//	std::cout<<ev_mct[mct_index].AncestorTrackID()<<", ";
+//
+//	std::cout<<"\n\nAll track ids: "<<std::endl;
+//    for (size_t mct_index = 0; mct_index < ev_mct.size(); mct_index++) {
+//        if (ev_mct[mct_index].size() )
+//	 std::cout<<", ("<<ev_mct[mct_index].TrackID()<<", "<<ev_mct[mct_index].AncestorTrackID()<<") ";
+//    }
+
     //
     // 1) Loop over mctrack
     //
@@ -87,6 +100,7 @@ namespace flashana {
       //  std::cout<<"Ancestors: "<<ev_mct.at(mct_index).AncestorTrackID()<<std::endl;
       
       auto const& trk = ev_mct[mct_index];
+      if (trk.size() <= 2) continue;
       
       auto usedIDs_iter = usedIDs.find(trk.AncestorTrackID());
       
@@ -104,19 +118,23 @@ namespace flashana {
 	qcluster_index = usedIDs_iter->second;
       
       _mctrack_2_qcluster.push_back(qcluster_index);
+
+//      std::cout<<" what's our idx: "<<_qcluster_2_mcobject.back().index_id<<", and size of thing: "<<_qcluster_2_mcobject.size()<<", "<<qcluster_index<<std::endl ;
       
       auto& tpc_obj = _qcluster_v[qcluster_index];
       auto& tpc_src = _qcluster_2_mcobject[qcluster_index];
-	
-      if (trk.size() < 2) continue;
-      
+
+      if (trk.size() <= 2) continue;
+
       // per track calculate the shift in x-direction
       // so that the x-position is what would be seen
       // in the TPC, not the truth x-position
+      // Some constants needed
+      double det_drift_velocity = ::larutil::LArProperties::GetME()->DriftVelocity(); ///< cm/us
       double event_time = trk[0].T(); // ns
       double shift_x = event_time * det_drift_velocity * pow(10,-3); //cm
       tpc_obj.reserve(tpc_obj.size() + trk.size());
-      
+
       // Now loop over all mctracks that share an ancestor and treat
       // them as one interaction
       ::geoalgo::Point_t step_dir(0, 0, 0);
@@ -151,7 +169,9 @@ namespace flashana {
 	  
 	  if (segment_index != n_segments) {
 	    pt.q = _light_yield * dedx * _step_size;
+
 	    if( _use_xshift)pt.x = pt1.X() + step_dir[0] * _step_size * (segment_index - 0.5) + shift_x;
+	    
 	    if(!_use_xshift)pt.x = pt1.X() + step_dir[0] * _step_size * (segment_index - 0.5);
 	    pt.y = pt1.Y() + step_dir[1] * _step_size * (segment_index - 0.5);
 	    pt.z = pt1.Z() + step_dir[2] * _step_size * (segment_index - 0.5);
