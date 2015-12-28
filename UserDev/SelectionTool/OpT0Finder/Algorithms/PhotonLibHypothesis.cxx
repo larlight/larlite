@@ -29,7 +29,7 @@ namespace flashana {
 	
 
         double q = pt.q ;
-        q *= ::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt); //EC, 16-Dec-2015 *0.5 recovers correct location! 
+        q *= ::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt)*0.5; //EC, 16-Dec-2015 *0.5 recovers correct location! 
 	//*0.0093;
         flash.pe_v[ipmt] += q;
 

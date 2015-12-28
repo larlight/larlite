@@ -111,8 +111,8 @@ namespace flashana {
             throw OpT0FinderException("Cannot compute LL for unmatched length!");
         for (size_t pmt_index = 0; pmt_index < hypothesis.pe_v.size(); ++pmt_index) {
 
-	  //            if (measurement.pe_v[pmt_index] < 0.01) continue;
-            if (hypothesis.pe_v[pmt_index] < 0.01) continue;
+
+	  if (hypothesis.pe_v[pmt_index] < 0.01) continue; // This seems to be always true of tubes 1 and 30 of 0-31.
 
             nvalid_pmt += 1;
 
@@ -121,10 +121,10 @@ namespace flashana {
 
 	    result.at(0) += std::pow((O - H), 2)/(O + H)  ;
 	    result.at(1) +=  -std::log10(TMath::Poisson(O,H))  ; // neg. log-likelihood
-	    if (isnan(result.at(1)) || isinf(result.at(1))) result.at(1) = 1.E3;
+	    if (isnan(result.at(1)) || isinf(result.at(1))) result.at(1) = 1.E6;
 	    // could instead use discrete std::poisson_distribution
 	    
-	    //	    std::cout << "LL(): ii chi2, llhd, O, H:" << pmt_index << ", " << std::pow((O - H), 2)/(O + H)  << ", " << -std::log10(TMath::Poisson(O,H)) << ", " << O << ", " << H << std::endl;
+	    std::cout << "LL(): ii chi2, llhd, O, H:" << pmt_index << ", " << std::pow((O - H), 2)/(O + H)  << ", " << -std::log10(TMath::Poisson(O,H)) << ", " << O << ", " << H << std::endl;
 
         }
 
@@ -148,7 +148,7 @@ namespace flashana {
         auto const &measurement = LLMatch::GetME().Measurement();
         Fval = LLMatch::GetME().LL(hypothesis, measurement)[1]; // index 1 is the neg llhd, 0 is the chi2.
 
-        LLMatch::GetME().Record(Fval, Xval[1]);
+        LLMatch::GetME().Record(Fval, Xval[0]);
 
         return;
     }

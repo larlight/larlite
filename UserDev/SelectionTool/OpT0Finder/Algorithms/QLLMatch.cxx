@@ -98,7 +98,7 @@ namespace flashana {
             throw OpT0FinderException("Cannot compute QLL for unmatched length!");
         for (size_t pmt_index = 0; pmt_index < hypothesis.pe_v.size(); ++pmt_index) {
 
-            if (measurement.pe_v[pmt_index] < 0.01) continue;
+	  if (measurement.pe_v[pmt_index] < 0.01) continue;
 
             nvalid_pmt += 1;
 
