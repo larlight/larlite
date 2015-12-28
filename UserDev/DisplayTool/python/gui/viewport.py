@@ -111,19 +111,39 @@ class viewport(pg.GraphicsLayoutWidget):
   def mouseMoved(self, pos):
     self.q = self._item.mapFromScene(pos)
     self._lastPos = self.q
-    message= QtCore.QString()
-    if self._cmSpace:
-      message.append("X: ")
-      message.append("{0:.1f}".format(self.q.x()*self._geometry.wire2cm()))
+    if (pg.Qt.QT_LIB == 'PyQt4'):
+      message= QtCore.QString()
     else:
-      message.append("W: ")
-      message.append(str(int(self.q.x())))
+      message= str()
     if self._cmSpace:
-      message.append(", Y: ")
-      message.append("{0:.1f}".format(self.q.y()*self._geometry.time2cm() - self._geometry.offset(self._plane)))
+      if type(message) != str:
+        message.append("X: ")
+        message.append("{0:.1f}".format(self.q.x()*self._geometry.wire2cm()))
+      else:
+        message += "X: "
+        message += "{0:.1f}".format(self.q.x()*self._geometry.wire2cm())
     else:
-      message.append(", T: ")
-      message.append(str(int(self.q.y())))
+      if type(message) != str:
+        message.append("W: ")
+        message.append(str(int(self.q.x())))
+      else:
+        message += "W: "
+        message += str(int(self.q.x()))
+    if self._cmSpace:
+      if type(message) != str:
+        message.append(", Y: ")
+        message.append("{0:.1f}".format(self.q.y()*self._geometry.time2cm() - self._geometry.offset(self._plane)))
+      else:
+        message += ", Y: "
+        message += "{0:.1f}".format(self.q.y()*self._geometry.time2cm() - self._geometry.offset(self._plane))
+    else:
+      if type(message) != str:
+        message.append(", T: ")
+        message.append(str(int(self.q.y())))
+      else:
+        message += ", T: "
+        message += str(int(self.q.y()))
+
     # print message
     if self.q.x() > 0 and self.q.x() < self._geometry.wRange(self._plane):
       if self.q.y() > 0 and self.q.y() < self._geometry.tRange():

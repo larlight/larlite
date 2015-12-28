@@ -62,7 +62,7 @@ class view_manager(QtCore.QObject):
     self._widget = QtGui.QWidget()
     self._layout = QtGui.QVBoxLayout()
     self._layout.setSpacing(0)
-    self._layout.setMargin(0)
+    # self._layout.setMargin(0)
     self._layout.setContentsMargins(0,0,0,0)
 
     self._planeWidgets = []

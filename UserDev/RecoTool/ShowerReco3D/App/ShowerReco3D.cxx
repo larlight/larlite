@@ -30,8 +30,6 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
   // Re-initialize tools
   fManager.Reset();
 
-  // Pass the storage manager to the reco manager to allow access to other data products.
-  fManager.SetStorageManager(storage);
 
   // Retrieve clusters and fed into the algorithm
   std::vector<::cluster::cluster_params > local_clusters;
