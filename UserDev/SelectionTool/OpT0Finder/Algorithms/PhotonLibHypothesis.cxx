@@ -33,8 +33,8 @@ namespace flashana {
 	//*0.0093;
         flash.pe_v[ipmt] += q;
 
-	std::cout << "PhotonLibHypothesis: PMT : " << ipmt << " [x,y,z,q] -> [q] : [" << pt.x << ", "
-		  << pt.y << ", " << pt.z << ", " << pt.q <<"] -> [" << q << "]" << std::endl;
+	//	std::cout << "PhotonLibHypothesis: PMT : " << ipmt << " [x,y,z,q] -> [q] : [" << pt.x << ", "
+	//		  << pt.y << ", " << pt.z << ", " << pt.q <<"] -> [" << q << "]" << std::endl;
 
       }
     }

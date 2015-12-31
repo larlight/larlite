@@ -25,9 +25,9 @@ namespace flashana {
 
     FlashMatch_t LLMatch::Match(const QCluster_t &pt_v, const Flash_t &flash) {
 
-	std::cout << "LLMatch::Match(): 0" << std::endl;
+
         this->CallMinuit(pt_v, flash);
-	std::cout << "LLMatch::Match(): 1" << std::endl;
+
         // Estimate position
         FlashMatch_t res;
         if (isnan(_ll)) return res;
@@ -37,7 +37,7 @@ namespace flashana {
 	res.tpc_point_err[0] = res.tpc_point_err[1] = res.tpc_point_err[2] = 0;
         res.score = 1. / _ll;
 
-	std::cout << "LLMatch::Match(): 2" << std::endl;
+
 
         double weight = 0;
         for (size_t pmt_index = 0; pmt_index < NOpDets(); ++pmt_index) {
@@ -59,11 +59,10 @@ namespace flashana {
 	   writes over that effort.
 	 */
 
-	std::cout << "LLMatch::Match(): 3" << std::endl;
+
 	res.tpc_point.x = _reco_x_offset;
-	std::cout << "LLMatch::Match(): 4" << std::endl;
 	res.tpc_point_err[0] = _reco_x_offset_err;
-	std::cout << "LLMatch::Match(): 5" << std::endl;
+
 	std::cout << "LLMatch::Match() res.x, res.dx are " << res.tpc_point.x << ", " << res.tpc_point_err[0] << std::endl;
 
         return res;
@@ -148,8 +147,8 @@ namespace flashana {
                      Double_t *Xval,
                      Int_t /*Flag*/) {
 
-        std::cout << "minuit offset : " << Fval << std::endl;
-        std::cout << "minuit Xval?? : " << *Xval << std::endl;
+      //        std::cout << "minuit offset : " << Fval << std::endl;
+      //        std::cout << "minuit Xval?? : " << *Xval << std::endl;
 
         auto const &hypothesis = LLMatch::GetME().ChargeHypothesis(*Xval);
         auto const &measurement = LLMatch::GetME().Measurement();
