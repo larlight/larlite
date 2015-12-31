@@ -63,6 +63,12 @@ namespace flashana {
     return res;
   }
   
+  void MCQCluster::Construct(const flashana::QCluster_t& q)
+  {
+    _qcluster_v.clear();
+    _qcluster_v.push_back(q);
+  }
+
   void MCQCluster::Construct( const ::larlite::event_mctrack& ev_mct,
 			      const ::larlite::event_mcshower& ev_mcs )
   {

@@ -30,7 +30,8 @@ namespace larlite {
   
   public:
 
-    UBT0Finder();
+    UBT0Finder () ;
+      
 
     /// Default destructor
     virtual ~UBT0Finder(){_use_mc=false;}
@@ -53,6 +54,8 @@ namespace larlite {
     ::flashana::FlashMatchManager& Manager() { return _mgr;}
 
     void UseMC(bool doit=true) { _use_mc = doit; }
+    void PhotonBomb (const double&, const double &, const double &, const int & ) ;
+    
 
     void SetROStart(double t) { _RO_start = t; }
     void SetROEnd(double t)   { _RO_end = t; }
@@ -85,6 +88,9 @@ namespace larlite {
 
     // Configurable params
     bool _use_mc;
+    bool _photon_bomb;
+    double _x_pb,_y_pb,_z_pb;
+    int _nphoton_pb;
     bool _useAbsPE ;
     double _step_len ;
     double _e_diff ; //Energy difference cut between start and end of track.  

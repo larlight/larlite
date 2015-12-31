@@ -1,9 +1,9 @@
 
 #
 # Manager configuration
-#
+# Verbosity: was 3
 FlashMatchManager:{
-    Verbosity: 3
+    Verbosity: 0
     AllowReuseFlash: false
 }
 
@@ -43,7 +43,8 @@ MaxNPEWindow:{
 }
 
 NPtFilter:{
-    MinNumPoint: 2
+# was 2, photon bomb requires that it be 1.
+    MinNumPoint: 0
 }
 
 PhotonLibHypothesis:

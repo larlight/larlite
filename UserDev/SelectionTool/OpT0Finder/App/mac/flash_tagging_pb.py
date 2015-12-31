@@ -34,6 +34,12 @@ for x in xrange(len(sys.argv)-1):
     print sys.argv[x+1]
     my_proc.add_input_file(sys.argv[x+1])
 
+infile = sys.argv[1]
+indir = infile.split('/')[-2]
+np,x,y,z = ( int(indir.split('_')[1]),
+             float(indir.split('_')[-3])/10.,
+             float(indir.split('_')[-2])/10.,
+             float(indir.split('_')[-1])/10.)
 
 # Specify IO mode
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
@@ -45,7 +51,8 @@ my_proc.set_ana_output_file("ana.root")
 # Replace with your analysis unit if you wish.
 my_unit = fmwk.UBT0Finder()
 my_unit.SetEDiff(10.)
-my_unit.UseMC(True)
+my_unit.UseMC(False)
+my_unit.PhotonBomb(x,y,z,np);
 my_unit.SetROStart(-3200.)
 my_unit.SetROEnd(3200.)
 my_unit.SetTrigTime(0.)
@@ -69,7 +76,7 @@ my_unit.Manager().SetAlgo( flashana.LLMatch.GetME() )
 # Other algorithms
 #
 
-my_unit.Manager().AddCustomAlgo( flashana.LightPath() )
+#my_unit.Manager().AddCustomAlgo( flashana.LightPath() )
 
 my_unit.Manager().Configure( "%s/SelectionTool/OpT0Finder/App/mac/flashmatch.fcl" % os.environ['LARLITE_USERDEVDIR'])
 

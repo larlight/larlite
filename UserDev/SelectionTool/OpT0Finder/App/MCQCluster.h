@@ -38,6 +38,7 @@ namespace flashana {
 
     void Configure(const ::fcllite::PSet &pset);
 
+    void Construct(const flashana::QCluster_t& );
     void Construct( const larlite::event_mctrack&,
                     const larlite::event_mcshower& );
 

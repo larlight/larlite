@@ -25,14 +25,19 @@ namespace flashana {
 
     FlashMatch_t LLMatch::Match(const QCluster_t &pt_v, const Flash_t &flash) {
 
+	std::cout << "LLMatch::Match(): 0" << std::endl;
         this->CallMinuit(pt_v, flash);
-
+	std::cout << "LLMatch::Match(): 1" << std::endl;
         // Estimate position
         FlashMatch_t res;
         if (isnan(_ll)) return res;
         res.tpc_point.x = res.tpc_point.y = res.tpc_point.z = 0;
+	res.tpc_point_err.clear();
+	res.tpc_point_err.resize(3);
 	res.tpc_point_err[0] = res.tpc_point_err[1] = res.tpc_point_err[2] = 0;
         res.score = 1. / _ll;
+
+	std::cout << "LLMatch::Match(): 2" << std::endl;
 
         double weight = 0;
         for (size_t pmt_index = 0; pmt_index < NOpDets(); ++pmt_index) {
@@ -54,9 +59,11 @@ namespace flashana {
 	   writes over that effort.
 	 */
 
+	std::cout << "LLMatch::Match(): 3" << std::endl;
 	res.tpc_point.x = _reco_x_offset;
+	std::cout << "LLMatch::Match(): 4" << std::endl;
 	res.tpc_point_err[0] = _reco_x_offset_err;
-
+	std::cout << "LLMatch::Match(): 5" << std::endl;
 	std::cout << "LLMatch::Match() res.x, res.dx are " << res.tpc_point.x << ", " << res.tpc_point_err[0] << std::endl;
 
         return res;
@@ -124,11 +131,11 @@ namespace flashana {
 	    if (isnan(result.at(1)) || isinf(result.at(1))) result.at(1) = 1.E6;
 	    // could instead use discrete std::poisson_distribution
 	    
-	    std::cout << "LL(): ii chi2, llhd, O, H:" << pmt_index << ", " << std::pow((O - H), 2)/(O + H)  << ", " << -std::log10(TMath::Poisson(O,H)) << ", " << O << ", " << H << std::endl;
+	    //	    std::cout << "LL(): ii chi2, llhd, O, H:" << pmt_index << ", " << std::pow((O - H), 2)/(O + H)  << ", " << -std::log10(TMath::Poisson(O,H)) << ", " << O << ", " << H << std::endl;
 
         }
 
-        std::cout << "PE hyp : " << PEtot_Hyp << "\tPE Obs : " << PEtot_Obs << "\t Chi^2, LLHD : " << result.at(0) << ", " << result.at(1) << std::endl;
+	//        std::cout << "PE hyp : " << PEtot_Hyp << "\tPE Obs : " << PEtot_Obs << "\t Chi^2, LLHD : " << result.at(0) << ", " << result.at(1) << std::endl;
 
         result.at(0) /= nvalid_pmt;
         result.at(1) /= nvalid_pmt;

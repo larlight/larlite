@@ -13,7 +13,8 @@
 namespace larlite {
 
   UBT0Finder::UBT0Finder()
-    : _int_tree(nullptr)
+    :  _photon_bomb(false),_x_pb(0.0),_y_pb(0.0),_z_pb(0.0),_nphoton_pb(0) 
+    , _int_tree(nullptr)
     , _track_tree(nullptr)
     , _flashmatch_tree(nullptr)
     , _eff_tree(nullptr)
@@ -27,6 +28,14 @@ namespace larlite {
     _e_diff    = 10;
     UseAbsolutePE(false);
     SetStepLength(0.5) ;
+  }
+
+  void UBT0Finder::PhotonBomb (const double& x, const double& y, const double& z, const int& n)
+  {
+    std::cout << "UBT0Finder:PhotonBomb(): Photon Bomb mode." << std::endl;
+    _photon_bomb = true;
+    _x_pb = x; _y_pb = y; _z_pb = z;
+    _nphoton_pb = n;
   }
 
   bool UBT0Finder::initialize() {
@@ -93,8 +102,9 @@ namespace larlite {
     _mgr.Reset();
     const ::larutil::Geometry* g = ::larutil::Geometry::GetME();
 
-    auto ev_flash = storage->get_data<event_opflash>("opflash");// opflash");
-    auto ev_hit = storage->get_data<event_ophit>    ("opflash"); // opflash");
+    auto ev_flash = storage->get_data<event_opflash>("opFlash");// opflash"); // EC: change capitalization in these 2 lines.
+    auto ev_hit = storage->get_data<event_ophit>    ("opFlash"); // opflash");
+
 
     if (!ev_flash || ev_flash->empty()) {
       std::cout << "No opflash found. Skipping event: " << storage->event_id() << std::endl;
@@ -121,7 +131,7 @@ namespace larlite {
     auto ev_mctrack = storage->get_data<event_mctrack>("mcreco");
     auto ev_mcshower = storage->get_data<event_mcshower>("mcreco");
 
-    if (!_use_mc) {
+    if (!_use_mc && !_photon_bomb) {
       if (!ev_track || ev_track->empty()) return false;
       for (size_t n = 0; n < ev_track->size(); n++) {
         std::vector<int> ids ;
@@ -155,13 +165,16 @@ namespace larlite {
       }
     }
     // use MC tracks
-    else {
+    else if (_use_mc && !_photon_bomb) {
 
-      if (!ev_mctrack || ev_mctrack->empty()) return false;
-
+      if (!ev_mctrack || ev_mctrack->empty()) 
+	{
+	  return false;
+	}
       for (size_t n = 0; n < ev_mctrack->size(); n++) {
 
         auto const& trk = ev_mctrack->at(n);
+
 
         if (trk.size() > 2) {
 
@@ -188,12 +201,12 @@ namespace larlite {
       }
 
       // Get MC QCluster list
-      // Fills _q_cluster_v inside MCQCluster
+      // Fills _qcluster_v inside MCQCluster
       _interaction_algo.Construct(*ev_mctrack,*ev_mcshower);
       
       std::vector<flashana::QCluster_t> qcluster_v;
       std::vector<flashana::MCSource_t> source_v;
-      // Fills qcluster_v with the content of _q_cluster_v which is filled above in Construct()
+      // Fills qcluster_v with the content of _qcluster_v which is filled above in Construct()
       _interaction_algo.Swap(std::move(qcluster_v),std::move(source_v));
 
       for(auto& qcluster : qcluster_v){
@@ -233,7 +246,27 @@ namespace larlite {
 	_int_tree->Fill();
 	}
       } // end looping over all MC source
-    }//else 
+    }//else if _use_mc
+    else if (_photon_bomb) {
+
+
+      flashana::QPoint_t qpt(_x_pb,_y_pb,_z_pb,_nphoton_pb);
+      flashana::QCluster_t qcluster;
+      qcluster.emplace_back(qpt);
+      _interaction_algo.Construct(qcluster);
+
+      //      for(auto& qcluster : qcluster_v){
+      //        if( qcluster.idx != -1)
+      _mgr.Emplace(std::move(qcluster));
+      //	}
+
+	_t0 = 0.0;
+	_n_pe = _nphoton_pb;
+	_int_e = _n_pe/29000.; // MeV
+	
+	_int_tree->Fill();
+
+    }//else if photon bomb
 
     for (size_t n = 0; n < ev_flash->size(); n++) {
 
@@ -269,6 +302,9 @@ namespace larlite {
     }
     */
     auto const res = _mgr.Match();
+
+    std::cout << "UBT0Finder::analyze(): Number of flashes, qclusters, matches is " << ev_flash->size() << ", " << _interaction_algo.QClusters().size() << ", " << res.size() << std::endl;
+    
     ::geoalgo::LineSegment line;
     ::geoalgo::Point_t pt(0, 0, 0);
     ::geoalgo::GeoAlgo geoalg;
@@ -284,21 +320,30 @@ namespace larlite {
       _flash_time = flash.Time();
       _mc_time = _mc_x = _mc_y = _mc_z = -1;
 
-      if (_use_mc) {
+      if (_use_mc || _photon_bomb) {
 
 //	std::cout<<"Match things...: "<<match.tpc_id<<", and size of ev_mctrk : "<<ev_mctrack->size()<<std::endl ;
-
-        auto const& mct = (*ev_mctrack)[match.tpc_id];
-        _mc_time = mct[0].T() * 1.e-3;
-        
-        if(_mc_time < -2050 || _mc_time > 2750)
-	  continue;
-
-        double event_time = mct[0].T(); // ns
         double det_drift_time = 2.3E6; // ns
         double det_width = 256.; // cm
-        _trk_shift = event_time * (det_width / det_drift_time);
-        double min_dist = 1e12;
+
+	if (_use_mc)
+	  {
+	    auto const& mct = (*ev_mctrack)[match.tpc_id];
+	    _mc_time = mct[0].T() * 1.e-3;
+	    
+	    if(_mc_time < -2050 || _mc_time > 2750)
+	      continue;
+
+	    double event_time = mct[0].T(); // ns
+	    if ( mct[0].E() - mct[mct.size() - 1].E() > _e_diff )
+	      _time_diff->Fill(1000 * (_flash_time - _mc_time)); //
+	    _trk_shift = event_time * (det_width / det_drift_time);
+	  }
+	else if (_photon_bomb)
+	      _time_diff->Fill(1000 * (_flash_time - 0 )); //
+
+
+	//        double min_dist = 1e12;
         pt[0] = _tpc_x;
         pt[1] = _tpc_y;
         pt[2] = _tpc_z;
@@ -323,8 +368,6 @@ namespace larlite {
         //  if (step1.X() > max_x) max_x = step1.X();
         //}
         //_mc_dx = max_x - min_x;
-        if ( mct[0].E() - mct[mct.size() - 1].E() > _e_diff )
-          _time_diff->Fill(1000 * (_flash_time - _mc_time)); //
       }
       _flashmatch_tree->Fill();
 
