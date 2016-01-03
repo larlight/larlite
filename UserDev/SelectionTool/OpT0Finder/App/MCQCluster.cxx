@@ -67,7 +67,7 @@ namespace flashana {
 			      const ::larlite::event_mcshower& ev_mcs )
   {
 
-    std::cout<<"Number of tracks: "<<ev_mct.size()<<std::endl ;
+    //std::cout<<"Number of tracks: "<<ev_mct.size()<<std::endl ;
     //
     // 0) Initialization
     //
