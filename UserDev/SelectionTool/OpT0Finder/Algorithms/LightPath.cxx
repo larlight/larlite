@@ -38,7 +38,7 @@ namespace flashana{
       q_pt.x = mid_pt[0];
       q_pt.y = mid_pt[1];
       q_pt.z = mid_pt[2];
-      q_pt.q = _dEdxMIP * _light_yield * dist/2.;
+      q_pt.q = _dEdxMIP * _light_yield * dist;
       Q_cluster.emplace_back(q_pt);
       return;
     }
