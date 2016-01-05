@@ -197,7 +197,7 @@ namespace flashana {
 	}// Finish looping over segments
       }// Finish looping over mctrack trajectory points
     } // Finish looping over mctracks
-    std::cout<<"size in MCQCluster output is "<<_n<<std::endl;
+    //std::cout<<"size in MCQCluster output is "<<_n<<std::endl;
     _n=0;
     //
     // MCShower treatment to be added
