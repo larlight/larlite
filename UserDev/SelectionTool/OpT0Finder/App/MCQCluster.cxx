@@ -40,6 +40,7 @@ namespace flashana {
 	res.index_id = (int)mct_index;
 	res.g4_time  = mct.Start().T();
 
+//	std::cout<<"1) g4 time is: "<<res.g4_time / 1000<<" size : "<<mct.size()<<std::endl ;
 	res.source_type = kMCTrackAncestor;
 	return res;
       }
@@ -67,7 +68,7 @@ namespace flashana {
 			      const ::larlite::event_mcshower& ev_mcs )
   {
 
-    std::cout<<"Number of tracks: "<<ev_mct.size()<<std::endl ;
+//    std::cout<<"Number of tracks: "<<ev_mct.size()<<std::endl ;
     //
     // 0) Initialization
     //
@@ -100,7 +101,7 @@ namespace flashana {
       //  std::cout<<"Ancestors: "<<ev_mct.at(mct_index).AncestorTrackID()<<std::endl;
       
       auto const& trk = ev_mct[mct_index];
-      if (trk.size() <= 2) continue;
+      if (trk.size() <= 2 || trk[0].T() < -2050000 || trk[0].T() > 2750000 ) continue;
       
       auto usedIDs_iter = usedIDs.find(trk.AncestorTrackID());
       
@@ -119,6 +120,7 @@ namespace flashana {
       
       _mctrack_2_qcluster.push_back(qcluster_index);
 
+      
 //      std::cout<<" what's our idx: "<<_qcluster_2_mcobject.back().index_id<<", and size of thing: "<<_qcluster_2_mcobject.size()<<", "<<qcluster_index<<std::endl ;
       
       auto& tpc_obj = _qcluster_v[qcluster_index];
