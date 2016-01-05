@@ -62,6 +62,8 @@ namespace flashana {
     flashana::MCSource_t Identify( const unsigned int,
 				   const larlite::event_mctrack&,
 				   const larlite::event_mcshower& ) const;
+
+    mutable int _n;
     
     double _light_yield;
     double _step_size;

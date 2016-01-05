@@ -40,10 +40,12 @@ namespace flashana{
       q_pt.z = mid_pt[2];
       q_pt.q = _dEdxMIP * _light_yield * dist;
       Q_cluster.emplace_back(q_pt);
+      _n++;
       return;
     }
       
     int num_div = int(dist/_gap);
+    _n = _n +num_div+1;
     ::geoalgo::Vector direction = pt_1 - pt_2;
     ::geoalgo::Vector direct = direction.Dir();
       
@@ -64,7 +66,7 @@ namespace flashana{
 	q_pt.x = mid_pt[0];
 	q_pt.y = mid_pt[1];
 	q_pt.z = mid_pt[2];
-	q_pt.q = _gap * _dEdxMIP * _light_yield;
+	q_pt.q = weight * _dEdxMIP * _light_yield;
 	Q_cluster.emplace_back(q_pt);
       }//Last segment less than gap
     }
@@ -134,9 +136,9 @@ namespace flashana{
 	LightPath::QCluster(this_loc, next_loc, result);
 	i = i+j-1;
       }*/
-      
-      
     }
+    //std::cout<<"size in LightPath output is "<<_n<<std::endl;
+    _n = 0;
     return result;
   }
 }
