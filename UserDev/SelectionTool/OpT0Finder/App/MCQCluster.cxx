@@ -68,7 +68,7 @@ namespace flashana {
 			      const ::larlite::event_mcshower& ev_mcs )
   {
 
-//    std::cout<<"Number of tracks: "<<ev_mct.size()<<std::endl ;
+    //std::cout<<"Number of tracks: "<<ev_mct.size()<<std::endl ;
     //
     // 0) Initialization
     //
@@ -156,7 +156,7 @@ namespace flashana {
 	
 	double distance = sqrt(pow(dx, 2) + pow(dy, 2) + pow(dz, 2));
 	double dedx = e_diff / distance;
-	
+	//dedx = 2.3;
 	step_dir[0] = dx;
 	step_dir[1] = dy;
 	step_dir[2] = dz;
@@ -164,6 +164,7 @@ namespace flashana {
 	
 	// Create individual points
 	size_t n_segments = size_t( distance / _step_size ) + 1;
+	_n = _n+n_segments;
 	tpc_obj.reserve(n_segments + tpc_obj.size());
 	for (size_t segment_index = 1; segment_index <= n_segments; ++segment_index) {
 	  
@@ -198,6 +199,8 @@ namespace flashana {
 	}// Finish looping over segments
       }// Finish looping over mctrack trajectory points
     } // Finish looping over mctracks
+    std::cout<<"size in MCQCluster output is "<<_n<<std::endl;
+    _n=0;
     //
     // MCShower treatment to be added
     //

@@ -62,6 +62,7 @@ namespace flashana{
     double _dEdxMIP;
     ::geoalgo::GeoAlgo _geoAlgo;
 
+    mutable int _n;
   };
 } 
 
