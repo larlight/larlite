@@ -67,6 +67,11 @@ namespace ertool {
     double _energy;
     double _time;
 
+    // Track calorimetry Objects
+    std::vector<double> _dedx; 
+
+
+
     /// Debug print functionality
     void PrintInfo() const;
 

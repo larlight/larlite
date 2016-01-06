@@ -118,7 +118,8 @@ void ERToolHelper::FillMCInfo(const event_mcflux&    mcf_v,
 			if (abs(mct.PdgCode()) == 211) t._pid = ::ertool::Track::kPion;
 			for (auto& v : t._pid_score) v = 100;
 			if (t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
-
+			//Add dEdx of track
+			t._dedx = mct.dEdx();
 			::ertool::RecoInputID_t in_id(i, mct_v.name());
 
 			// Emplace a track to EventData
@@ -507,6 +508,7 @@ void ERToolHelper::FillTracks ( const event_mctrack&  mct_v,
 		if (abs(mct.PdgCode()) == 211) t._pid = ::ertool::Track::kPion;
 		for (auto& v : t._pid_score) v = 100;
 		if (t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
+		t._dedx = mct.dEdx();
 
 		strm.Emplace(std::move(t), std::move(ertool::RecoInputID_t(i, mct_v.name())), false);
 		//strm.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
