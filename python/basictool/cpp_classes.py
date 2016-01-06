@@ -11,6 +11,7 @@ libs = [ 'libBasicTool_LArPyBackend',
 
 ROOT.gErrorIgnoreLevel = ROOT.kFatal
 for l in libs:
+    continue
     val = ROOT.gSystem.Load(l)
     if val < 0:
         warning('Skipping %s' % l)
