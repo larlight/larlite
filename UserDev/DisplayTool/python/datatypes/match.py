@@ -52,8 +52,8 @@ class match(recoBase):
 
             matchedClusters = self._process.getDataByPlane(thisPlane)
 
-            for cluster in matchedClusters:
-
+            for i in xrange(len(matchedClusters)):
+                cluster = matchedClusters[i]
 
 
 

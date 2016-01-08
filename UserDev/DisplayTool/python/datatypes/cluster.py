@@ -304,8 +304,8 @@ class cluster(recoBase):
 
             clusters = self._process.getDataByPlane(thisPlane)
 
-            for cluster in clusters:
-
+            for i in xrange(len(clusters)):
+                cluster = clusters[i]
                 # Now make the cluster
                 cluster_box_coll = boxCollection()
                 cluster_box_coll.setColor(self._clusterColors[colorIndex])
