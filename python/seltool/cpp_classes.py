@@ -9,6 +9,7 @@ ROOT.gErrorIgnoreLevel = ROOT.kFatal
 try:
     from ROOT import gSystem
     for l in libs:
+        continue
         val = gSystem.Load(l)
         if val < 0:
             warning('Skip loading %s' % l)
