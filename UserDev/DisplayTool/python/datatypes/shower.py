@@ -52,7 +52,8 @@ class shower(recoBase):
 
             i_color = 0
 
-            for shower in showers:
+            for i in xrange(len(showers)):
+                shower = showers[i]
 
                 if i_color > len(self._showerColors):
                     i_color = 0

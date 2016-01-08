@@ -25,7 +25,8 @@ class endpoint2d(recoBase):
             # First get the hit information:
             endpoints = self._process.getDataByPlane(thisPlane)
 
-            for point in endpoints:
+            for i in xrange(len(endpoints)):
+                point = endpoints[i]
                 # Draws a circle at (x,y,radius = 0.5cm)
                 radBigW = 0.5 / view_manager._geometry.wire2cm()
                 radBigT = (0.5) / view_manager._geometry.time2cm()
