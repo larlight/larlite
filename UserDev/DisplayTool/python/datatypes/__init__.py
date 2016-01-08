@@ -5,6 +5,7 @@ from shower import shower
 from track import track
 from wire import wire, rawDigit, recoWire
 from match import match
+from endpoint2d import endpoint2d
 from drawableItems import drawableItems
 try:
     import pyqtgraph.opengl as gl
