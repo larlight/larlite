@@ -167,6 +167,11 @@ bool ShowerQuality_multishowers::analyze(storage_manager* storage) {
     return false;
   }
 
+  // get event-information
+  _event  = ev_mcs->event_id();
+  _run    = ev_mcs->run();
+  _subrun = ev_mcs->subrun();
+
   // Retrieve simch data product
   auto ev_simch = storage->get_data<event_simch>("largeant");
   if (!ev_simch || !(ev_simch->size())) {
@@ -540,6 +545,11 @@ void ShowerQuality_multishowers::InitializeAnaTree()
   if (fTree) delete fTree;
 
   fTree = new TTree("fShowerQualityTree", "");
+
+  // event information
+  fTree->Branch("event",&_event,"event/I");
+  fTree->Branch("run",&_run,"run/I");
+  fTree->Branch("subrun",&_subrun,"subrun/I");
 
   fTree->Branch("reco_x", &fTreeParams.reco_x, "reco_x/D");
   fTree->Branch("reco_y", &fTreeParams.reco_y, "reco_y/D");
