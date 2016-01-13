@@ -30,13 +30,18 @@
 
 #pragma link C++ class evd::Track2d+;
 #pragma link C++ class std::vector<std::pair<float,float> >+;
-#pragma link C++ class std::vector<evd::Track2d>+;
+#pragma link C++ class std::vector<::evd::Track2d>+;
 #pragma link C++ class evd::RecoBase<evd::Track2d>+;
 #pragma link C++ class evd::DrawTrack+;
 
+#pragma link C++ class evd::Endpoint2D+;
+#pragma link C++ class std::vector<::evd::Endpoint2D>+;
+#pragma link C++ class evd::RecoBase<::evd::Endpoint2D>+;
+#pragma link C++ class evd::DrawEndpoint2d+;
+
+
 // Link the classes that are processors
 #pragma link C++ class larlite::DrawVertex+;
-#pragma link C++ class larlite::DrawEndpoint2d+;
 // #pragma link C++ class std::vector<std::vector<std::pair<float,float> > >+;
 //ADD_NEW_CLASS ... do not change this line
 #endif

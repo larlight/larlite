@@ -2,7 +2,7 @@
  * \file DrawEndpoint2d.h
  *
  * \ingroup RecoViewer
- * 
+ *
  * \brief Class def header for a class DrawEndpoint2d
  *
  * @author cadams
@@ -16,78 +16,77 @@
 #define LARLITE_DRAWENDPOINT2D_H
 
 #include "Analysis/ana_base.h"
-#include "LArUtil/Geometry.h"
+#include "RecoBase.h"
 
-namespace larlite {
-  /**
-     \class DrawEndpoint2d
-     User custom analysis class made by SHELL_USER_NAME
-   */
-  class DrawEndpoint2d : public ana_base{
-  
-  public:
+namespace evd {
 
-    /// Default constructor
-    DrawEndpoint2d();
+class Endpoint2D {
 
-    /// Default destructor
-    virtual ~DrawEndpoint2d();
+public:
+  Endpoint2D(){}
+  Endpoint2D(float w, float t, float c, float s) :
+    _wire(w),
+    _time(t),
+    _charge(c),
+    _strength(s)
+  {};
 
-    /** IMPLEMENT in DrawEndpoint2d.cc!
-        Initialization method to be called before the analysis event loop.
-    */ 
-    virtual bool initialize();
+  float wire()     {return _wire;}
+  float time()     {return _time;}
+  float charge()   {return _charge;}
+  float strength() {return _strength;}
 
-    /** IMPLEMENT in DrawEndpoint2d.cc! 
-        Analyze a data event-by-event  
-    */
-    virtual bool analyze(storage_manager* storage);
+private:
+  float _wire;
+  float _time;
+  float _charge;
+  float _strength;
 
-    /** IMPLEMENT in DrawEndpoint2d.cc! 
-        Finalize method to be called after all events processed.
-    */
-    virtual bool finalize();
+};
 
-    void setProducer(std::string s){producer = s;}
+/**
+   \class DrawEndpoint2d
+   User custom analysis class made by SHELL_USER_NAME
+ */
+class DrawEndpoint2d : public larlite::ana_base, public RecoBase<Endpoint2D> {
 
+public:
 
-    const std::vector<int>   & getWireByPlane(unsigned int p) const;
-    const std::vector<float> & getTimeByPlane(unsigned int p) const;
+  /// Default constructor
+  DrawEndpoint2d();
 
-    std::vector<float> GetWireRange(unsigned int p);
-    std::vector<float> GetTimeRange(unsigned int p);
+  // / Default destructor
+  // virtual ~DrawEndpoint2d();
 
-  protected:
-    
-  private:
+  /** IMPLEMENT in DrawEndpoint2d.cc!
+      Initialization method to be called before the analysis event loop.
+  */
+  virtual bool initialize();
 
-    const larutil::Geometry * geoService;
+  /** IMPLEMENT in DrawEndpoint2d.cc!
+      Analyze a data event-by-event
+  */
+  virtual bool analyze(larlite::storage_manager* storage);
 
-    std::string producer;
+  /** IMPLEMENT in DrawEndpoint2d.cc!
+      Finalize method to be called after all events processed.
+  */
+  virtual bool finalize();
 
+protected:
 
-    // Internally, keep the vertices sorted by plane
-    std::vector<std::vector<int>   > * wireByPlane;
-    std::vector<std::vector<float> > * timeByPlane;
+private:
 
-
-    // Store the bounding parameters of interest:
-    // highest and lowest wire, highest and lowest time
-    // Have to sort by plane still
-
-    std::vector<std::vector<float> > wireRange;
-    std::vector<std::vector<float> > timeRange;
-
-  };
+};
 }
 #endif
 
 //**************************************************************************
-// 
+//
 // For Analysis framework documentation, read Manual.pdf here:
 //
 // http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
 //
 //**************************************************************************
 
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
