@@ -484,14 +484,17 @@ void ShowerQuality_multishowers::FillQualityInfo(const shower& reco_shower, cons
   }
 
   // Reco energy & dedx info
-  fTreeParams.best_plane_id = reco_shower.best_plane();
+  int best_plane = reco_shower.best_plane();
+  fTreeParams.best_plane_id = best_plane;
+  if ((best_plane < 0) or (best_plane > 2))
+    best_plane = 2;
 
-  fTreeParams.reco_energy = reco_shower.Energy_v().at(reco_shower.best_plane());
+  fTreeParams.reco_energy = reco_shower.Energy_v().at(best_plane);
   fTreeParams.reco_energy_U = reco_shower.Energy_v().at(0);
   fTreeParams.reco_energy_V = reco_shower.Energy_v().at(1);
   fTreeParams.reco_energy_Y = reco_shower.Energy_v().at(2);
 
-  fTreeParams.reco_dedx     = reco_shower.dEdx_v().at(reco_shower.best_plane());
+  fTreeParams.reco_dedx     = reco_shower.dEdx_v().at(best_plane);
   fTreeParams.reco_dedx_U   = reco_shower.dEdx_v().at(0);
   fTreeParams.reco_dedx_V   = reco_shower.dEdx_v().at(1);
   fTreeParams.reco_dedx_Y   = reco_shower.dEdx_v().at(2);
