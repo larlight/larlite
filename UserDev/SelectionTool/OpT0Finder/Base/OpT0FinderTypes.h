@@ -65,12 +65,24 @@ namespace flashana {
   };
 
   /// Collection of charge deposition 3D point (cluster)
-  struct QCluster_t : public std::vector<QPoint_t>{
+  class QCluster_t : public std::vector<QPoint_t>{
+  public:
     ID_t idx;                 ///< index from original larlite vector
     /// Default constructor
-    QCluster_t()
-      : idx(kINVALID_ID)
-    {}
+    QCluster_t() : idx(kINVALID_ID) {}
+    ~QCluster_t() {}
+
+    inline QCluster_t& operator+=(const QCluster_t& rhs) {
+      this->reserve(rhs.size() + this->size());
+      for(auto const& pt : rhs) this->push_back(pt);
+      return (*this);
+    }
+
+    inline QCluster_t operator+(const QCluster_t& rhs) const {
+      QCluster_t res((*this));
+      res += rhs;
+      return res;
+    }
 
   };
   /// Collection of 3D point clusters (one use case is TPC object representation for track(s) and shower(s))

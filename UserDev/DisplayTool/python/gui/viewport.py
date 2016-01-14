@@ -30,7 +30,14 @@ class viewport(pg.GraphicsLayoutWidget):
     self._polyGraphicsItem = QtGui.QGraphicsPathItem(self._path)
     self._view.addItem(self._polyGraphicsItem)
 
-
+    # Connect scale changes to handle the scale bar correctly
+    self._view.sigYRangeChanged.connect(self.scaleHandler)
+    self._view.sigXRangeChanged.connect(self.scaleHandler)
+    self._xBar = None
+    self._xBarText = None
+    # self._yBar = None
+    # self._yBarText = None
+    self.useScaleBar = False
 
     # Set up the blank data:
     # self._blankData = np.ones((self._geometry.wRange(self._plane),self._geometry.tRange()))
@@ -76,6 +83,16 @@ class viewport(pg.GraphicsLayoutWidget):
     self._widget = QtGui.QWidget()
     self._widget.setLayout(self._totalLayout)
 
+  def toggleScale(self,scaleBool):
+    # If there is a scale, remove it:
+    if self._xBar in self._view.addedItems:
+      self._view.removeItem(self._xBar)
+      self._view.removeItem(self._xBarText)
+    # if self._yBar in self._view.addedItems:
+    #   self._view.removeItem(self._yBar)
+    #   self._view.removeItem(self._yBarText)
+    self.useScaleBar = scaleBool
+    self.refreshScaleBar()
 
   def restoreDefaults(self):
     self._lowerLevel.setText(str(self._geometry.getLevels(self._plane)[0]))
@@ -107,6 +124,7 @@ class viewport(pg.GraphicsLayoutWidget):
 
   def useCM(self,useCMBool):
     self._cmSpace = useCMBool
+    self.refreshScaleBar()
 
   def mouseMoved(self, pos):
     self.q = self._item.mapFromScene(pos)
@@ -190,6 +208,82 @@ class viewport(pg.GraphicsLayoutWidget):
     self._view.setRange(xRange=xR,yRange=yR, padding=0.002)
     pass
 
+
+  def scaleHandler(self):
+    # print self.sender()
+    if self.useScaleBar:
+      self.refreshScaleBar()
+
+
+  def refreshScaleBar(self):
+    if not self.useScaleBar:
+      return
+    # First, get the range in x and y:
+    # [[xmin, xmax], [ymin, ymax]]
+    dims = self._view.viewRange()
+
+    # The view bars get drawn on 10% of the lengths
+    # if ratio lock is set, only draw X
+
+    # Draw the X bar:
+    xMin = dims[0][0]
+    xMax = dims[0][1]
+    yMin = dims[1][0]
+    yMax = dims[1][1]
+    width = 0.1*(xMax - xMin)
+    height = 0.01*(yMax - yMin)
+    xLoc = xMin + 0.1*(xMax - xMin)
+    yLoc = yMin + 0.1*(yMax - yMin)
+
+
+    if self._xBar in self._view.addedItems:
+      self._view.removeItem(self._xBar)
+      self._view.removeItem(self._xBarText)
+
+    self._xBar = QtGui.QGraphicsRectItem(xLoc,yLoc,width,height)
+    self._xBar.setBrush(pg.mkColor(0,0,0))
+    self._view.addItem(self._xBar)
+
+    xString = ""
+    if self._cmSpace:
+      xString = "{0:.2f}".format(width*self._geometry.wire2cm())
+      xString = xString + " cm"
+    else:
+      xString = "{0:.2f}".format(width)
+      xString = xString + " wires"
+
+
+    # Add the text:
+    self._xBarText = QtGui.QGraphicsSimpleTextItem(xString)
+    xScale = 0.015* width
+    yScale = - 0.5* height
+    self._xBarText.setPos(xLoc,yLoc)
+    self._xBarText.scale(xScale,yScale)
+    self._xBarText.font().setPixelSize(15)
+    self._view.addItem(self._xBarText)
+
+    # # Now do the y Bar
+    # width = 0.01*(xMax - xMin)
+    # height = 0.1*(yMax - yMin)
+    # xLoc = xMin + 0.1*(xMax - xMin)
+    # yLoc = yMin + 0.1*(yMax - yMin)
+    # if self._yBar in self._view.addedItems:
+    #   self._view.removeItem(self._yBar)
+    #   self._view.removeItem(self._yBarText)
+
+    # self._yBar = QtGui.QGraphicsRectItem(xLoc,yLoc,width,height)
+    # self._yBar.setBrush(pg.mkColor(0,0,0))
+    # self._view.addItem(self._yBar)
+
+    # # Add the text:
+    # self._yBarText = QtGui.QGraphicsSimpleTextItem(xString)
+    # xScale = 0.015* width
+    # yScale = - 0.5* height
+    # self._yBarText.setPos(xLoc,yLoc)
+    # self._yBarText.scale(xScale,yScale)
+    # self._yBarText.setRotation(90)
+    # self._yBarText.font().setPixelSize(15)
+    # self._view.addItem(self._yBarText)
 
   def plane(self):
     return self._plane

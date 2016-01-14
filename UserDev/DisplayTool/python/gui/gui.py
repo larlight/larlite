@@ -116,6 +116,10 @@ class view_manager(QtCore.QObject):
   #         view._view.setRange
   #   print "range changed by ", self.sender()
 
+  def toggleScale(self,scaleBool):
+    for view in self._drawerList:
+      view.toggleScale(scaleBool)
+
   def setRangeToMax(self):
     for view in self._drawerList:
       view.setRangeToMax()
@@ -318,6 +322,12 @@ class gui(QtGui.QWidget):
     self._unitDisplayOption.setTristate(False)
     self._unitDisplayOption.stateChanged.connect(self.useCMWorker)
 
+    self._scaleBarOption = QtGui.QCheckBox("Draw Scale Bar")
+    self._scaleBarOption.setToolTip("Display a scale bar on each view showing the distance")
+    self._scaleBarOption.setTristate(False)
+    self._scaleBarOption.stateChanged.connect(self.scaleBarWorker)
+
+
 
     self._clearPointsButton = QtGui.QPushButton("ClearPoints")
     self._clearPointsButton.setToolTip("Clear all of the drawn points from the views")
@@ -344,6 +354,7 @@ class gui(QtGui.QWidget):
     self._drawingControlBox.addWidget(self._lockAspectRatio)
     self._drawingControlBox.addWidget(self._drawWireOption)
     self._drawingControlBox.addWidget(self._unitDisplayOption)
+    self._drawingControlBox.addWidget(self._scaleBarOption)
 
     return self._drawingControlBox
 
@@ -369,6 +380,13 @@ class gui(QtGui.QWidget):
       self._view_manager.selectPlane(-1)
       self._view_manager.refreshDrawListWidget()
       return
+
+  def scaleBarWorker(self):
+    if self._scaleBarOption.isChecked():
+      self._view_manager.toggleScale(True)
+    else:
+      self._view_manager.toggleScale(False)  
+
 
   def clearPointsWorker(self):
     self._view_manager.clearPoints()
