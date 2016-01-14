@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-
+import ROOT
+ROOT.PyConfig.IgnoreCommandLineOptions = True
 from gui import gui
 from evdmanager import manager
 from evdmanager.geometry import lariat
