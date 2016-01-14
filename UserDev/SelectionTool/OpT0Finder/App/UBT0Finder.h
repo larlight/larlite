@@ -18,7 +18,6 @@
 #include "Analysis/ana_base.h"
 #include "MCQCluster.h"
 #include "OpT0Finder/Base/FlashMatchManager.h"
-#include "OpT0Finder/Algorithms/LightPath.h"
 #include <TTree.h>
 #include <TH2D.h>
 
@@ -68,12 +67,10 @@ namespace larlite {
 
     void UseLightPathWithMC (bool yesOrNo ){ _use_light_path_w_mc = yesOrNo ; } 
 
-
   protected:
 
     ::flashana::FlashMatchManager _mgr;
     ::flashana::MCQCluster _mcqclustering;
-    ::flashana::LightPath  _lightpath_clustering ;
 
     //Switch -- if set to true, Light path will be used with mctrack
     bool _use_light_path_w_mc;

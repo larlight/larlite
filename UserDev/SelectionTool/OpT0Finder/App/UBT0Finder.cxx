@@ -10,6 +10,7 @@
 #include "GeoAlgo/GeoAlgo.h"
 #include "GeoAlgo/GeoLineSegment.h"
 #include "LArUtil/Geometry.h"
+#include "OpT0Finder/Base/OpT0FinderTypes.h"
 namespace larlite {
 
   UBT0Finder::UBT0Finder()
@@ -25,12 +26,14 @@ namespace larlite {
     _fout = 0;
 
     _e_diff    = 10;
-    UseLightPathWithMC(false);
     UseAbsolutePE(false);
     SetStepLength(0.5) ;
   }
 
   bool UBT0Finder::initialize() {
+
+    _mcqclustering.SetUseLightPath(_use_light_path_w_mc);
+    std::cout<<"Use light path? "<<_use_light_path_w_mc <<std::endl ;
 
     _time_diff = new TH1D("time_diff", "Matched Flash vs. MCTrack", 100, 0, 500);
 
@@ -161,15 +164,7 @@ namespace larlite {
 
       if (!ev_mctrack || ev_mctrack->empty()) return false;
 
-      // Get MC QCluster list-- declared here for adding in light path
-      // Fills _q_cluster_v inside MCQCluster
-      std::vector<flashana::QCluster_t> qcluster_v;
-      std::vector<flashana::MCSource_t> source_v;
 
-
-      if(_use_light_path_w_mc)
-        qcluster_v.reserve(ev_mctrack->size());
-        
       for (size_t n = 0; n < ev_mctrack->size(); n++) {
 
         auto const& trk = ev_mctrack->at(n);
@@ -190,36 +185,30 @@ namespace larlite {
           _trk_min_x = 1036.;
           _trk_max_x = -1036.;
 	  ::geoalgo::Trajectory mctraj;
-          for (size_t i = 0; i < trk.size(); ++i) {
+         for (size_t i = 0; i < trk.size(); ++i) {
             if (trk[i].X() > _trk_max_x) { _trk_max_x = trk[i].X(); }
             if (trk[i].X() < _trk_min_x) { _trk_min_x = trk[i].X(); }
         
-            mctraj.push_back(::geoalgo::Vector(trk.at(i).X(), trk.at(i).Y(), trk.at(i).Z()));
-
             }
-
-	  if(_use_light_path_w_mc)
-	    qcluster_v.emplace_back(_lightpath_clustering.FlashHypothesis(mctraj));
 
           _track_tree->Fill();
           } // If > 2 points
 	} // track loop
-//      } //else
 
+      // Get MC QCluster list-- declared here for adding in light path
+      // Fills _q_cluster_v inside MCQCluster
+      std::vector<flashana::QCluster_t> qcluster_v;
+      std::vector<flashana::MCSource_t> source_v;
 
-      if(!_use_light_path_w_mc){
-
-        _mcqclustering.Construct(*ev_mctrack,*ev_mcshower);
-        // Fills qcluster_v with the content of _q_cluster_v which is filled in Construct()
-        _mcqclustering.Swap(std::move(qcluster_v),std::move(source_v));
-	}
+      _mcqclustering.Construct(*ev_mctrack,*ev_mcshower);
+      _mcqclustering.Swap(std::move(qcluster_v),std::move(source_v));
 
       for(auto& qcluster : qcluster_v){
         if( qcluster.idx != -1 )
 	  _mgr.Emplace(std::move(qcluster));
+          
 	}
       
-     if( !_use_light_path_w_mc ){
        for(auto const& s : source_v) {
 
           if(s.g4_time == ::flashana::kINVALID_DOUBLE) {
@@ -252,7 +241,6 @@ namespace larlite {
           _int_tree->Fill();
           }
         } // end looping over all MC source
-      }// if we're not using light path 
     }//else 
 
     for (size_t n = 0; n < ev_flash->size(); n++) {
