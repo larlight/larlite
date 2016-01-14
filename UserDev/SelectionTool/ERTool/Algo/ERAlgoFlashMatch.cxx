@@ -100,6 +100,8 @@ namespace ertool {
   {
     OpT0Helper helper;
     ::flashana::LightPath LP;
+    //SetVolume must be called in LightPath otherwise all QClusters have 0 size
+    LP.SetVolume();
     _mgr.Reset();
 
     std::multimap<double, std::pair<NodeID_t, FlashID_t> > score_m;
