@@ -66,7 +66,7 @@ bool DrawCluster::analyze(larlite::storage_manager* storage) {
     return false;
   if (!ev_clus->size()) {
     // print(larlite::msg::kWARNING, __FUNCTION__,
-          // Form("Skipping event %d since no cluster found...", ev_clus->event_id()));
+    // Form("Skipping event %d since no cluster found...", ev_clus->event_id()));
     return false;
   }
 
@@ -145,8 +145,6 @@ bool DrawCluster::analyze(larlite::storage_manager* storage) {
         _timeRange.at(view).first = hit.PeakTime();
 
     }
-
-
 
     cluster_index[view] ++;
 
