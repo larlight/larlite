@@ -122,6 +122,25 @@ namespace ertool {
     return res;
   }
 
+  const std::vector<NodeID_t> ParticleGraph::GetBaseNodes
+  ( const RecoType_t type,
+    const bool unassessed_only,
+    const int pdg_code) const
+  {
+    std::vector<NodeID_t> res;
+    res.reserve(_particle_v.size());
+    for(auto const& p : _particle_v) {
+
+      if( (type == kINVALID_RECO_TYPE || p.RecoType() == type) &&
+	  (!unassessed_only || p.RelationAssessed()) &&
+	  (pdg_code == 0 || pdg_code == p.PdgCode()) &&
+	  !p.Descendant() )
+
+	res.push_back(p.ID());
+    }
+    return res;
+  }
+
   const CombinationSet_t ParticleGraph::GetNodeCombinations
   ( const size_t combination_size,
     const RecoType_t type,
