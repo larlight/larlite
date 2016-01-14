@@ -135,7 +135,7 @@ namespace ertool {
       else if (base_part.RecoType() == kShower) shower_v.push_back(base_part.RecoID());
 
       //auto cluster = helper.GetQCluster(data, shower_v, track_v);
-      //::flashana::QCluster_t cluster;
+      ::flashana::QCluster_t cluster;
       ::flashana::QCluster_t clusters;
       clusters.clear();
       // Implement LightPath
@@ -147,10 +147,9 @@ namespace ertool {
 
         if (!track.IsLonger(0.1)) continue;
 
-        //cluster.reserve(track.size());
-        //cluster = LP.FlashHypothesis(track);
-        clusters += LP.FlashHypothesis(track);
-        //clusters += cluster;
+        cluster.reserve(track.size());
+        cluster = LP.FlashHypothesis(track);
+        clusters += cluster;
       }
       //
 
