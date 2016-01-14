@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+import ROOT
+ROOT.PyConfig.IgnoreCommandLineOptions = True
+
 from gui import larsoftgui
 import argparse
 import sys
@@ -18,7 +21,7 @@ def sigintHandler(*args):
 
 def main():
 
-    parser = argparse.ArgumentParser(description='Python based event display.')
+    parser = argparse.ArgumentParser(description='Python based event display for drawing larsoft products.')
     parser.add_argument('file', nargs='?', help="Optional input file to use")
     geom = parser.add_mutually_exclusive_group()
     geom.add_argument('-A', '-a', '--argoneut',
