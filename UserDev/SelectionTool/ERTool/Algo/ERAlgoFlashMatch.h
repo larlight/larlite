@@ -17,6 +17,7 @@
 
 #include "ERTool/Base/AlgoBase.h"
 #include "OpT0Finder/Base/FlashMatchManager.h"
+#include "OpT0Finder/Algorithms/LightPath.h"
 
 namespace ertool {
 

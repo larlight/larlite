@@ -99,6 +99,7 @@ namespace ertool {
   bool ERAlgoFlashMatch::Reconstruct(const EventData &data, ParticleGraph& graph)
   {
     OpT0Helper helper;
+    ::flashana::LightPath LP;
     _mgr.Reset();
 
     std::multimap<double, std::pair<NodeID_t, FlashID_t> > score_m;
@@ -133,11 +134,29 @@ namespace ertool {
       if (primary_part.RecoType() == kTrack) track_v.push_back(primary_part.RecoID());
       else if (primary_part.RecoType() == kShower) shower_v.push_back(primary_part.RecoID());
 
-      auto cluster = helper.GetQCluster(data, shower_v, track_v);
-      cluster.idx = i; //primary_node_id;
-      //std::cout<<cluster.size()<<" ";
+      //auto cluster = helper.GetQCluster(data, shower_v, track_v);
+      ::flashana::QCluster_t cluster;
+      ::flashana::QCluster_t clusters;
+      clusters.clear();
+      // Implement LightPath
+      for(auto const& id : track_v) {
+
+	auto const& track = data.Track(id);
+
+	if(track.size()<2) continue;
+
+	if(!track.IsLonger(0.1)) continue;
+
+	cluster.reserve(track.size());
+	cluster = LP.FlashHypothesis(track);
+        clusters+= cluster;
+      }
+      //
+            
+      clusters.idx = i; //primary_node_id;
+      //std::cout<<clusters.size()<<" ";
       primary_id_v.push_back(primary_node_id);
-      _mgr.Emplace(std::move(cluster));
+      _mgr.Emplace(std::move(clusters));
       i++;
 
     }
