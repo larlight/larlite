@@ -50,6 +50,9 @@ namespace ertool {
     const std::vector<NodeID_t> GetPrimaryNodes ( const RecoType_t type = kINVALID_RECO_TYPE,
 						  const bool unassessed_only = false,
 						  const int pdg_code = 0) const;
+    const std::vector<NodeID_t> GetBaseNodes ( const RecoType_t type = kINVALID_RECO_TYPE,
+					       const bool unassessed_only = false,
+					       const int pdg_code = 0) const;
     const CombinationSet_t GetNodeCombinations( const size_t combination_size,
 						const RecoType_t type = kINVALID_RECO_TYPE,
 						const bool unassessed_only = false,
