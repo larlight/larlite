@@ -104,15 +104,15 @@ namespace ertool {
 
     std::multimap<double, std::pair<NodeID_t, FlashID_t> > score_m;
 
-    std::vector<NodeID_t> primary_id_v;
+    std::vector<NodeID_t> base_id_v;
 
     int i = 0;
 
-    for (auto const& primary_node_id : graph.GetBaseNodes() ) {
+    for (auto const& base_node_id : graph.GetBaseNodes() ) {
 
-      auto const& primary_part = graph.GetParticle(primary_node_id);
+      auto const& base_part = graph.GetParticle(base_node_id);
 
-      auto const& children_v = graph.GetAllDescendantNodes(primary_part.ID());
+      auto const& children_v = graph.GetAllDescendantNodes(base_part.ID());
 
       std::vector<NodeID_t> shower_v, track_v;
       shower_v.reserve(children_v.size());
@@ -131,31 +131,32 @@ namespace ertool {
           break;
         }
       }
-      if (primary_part.RecoType() == kTrack) track_v.push_back(primary_part.RecoID());
-      else if (primary_part.RecoType() == kShower) shower_v.push_back(primary_part.RecoID());
+      if (base_part.RecoType() == kTrack) track_v.push_back(base_part.RecoID());
+      else if (base_part.RecoType() == kShower) shower_v.push_back(base_part.RecoID());
 
       //auto cluster = helper.GetQCluster(data, shower_v, track_v);
-      ::flashana::QCluster_t cluster;
+      //::flashana::QCluster_t cluster;
       ::flashana::QCluster_t clusters;
       clusters.clear();
       // Implement LightPath
-      for(auto const& id : track_v) {
+      for (auto const& id : track_v) {
 
-	auto const& track = data.Track(id);
+        auto const& track = data.Track(id);
 
-	if(track.size()<2) continue;
+        if (track.size() < 2) continue;
 
-	if(!track.IsLonger(0.1)) continue;
+        if (!track.IsLonger(0.1)) continue;
 
-	cluster.reserve(track.size());
-	cluster = LP.FlashHypothesis(track);
-        clusters+= cluster;
+        //cluster.reserve(track.size());
+        //cluster = LP.FlashHypothesis(track);
+        clusters += LP.FlashHypothesis(track);
+        //clusters += cluster;
       }
       //
-            
-      clusters.idx = i; //primary_node_id;
+
+      clusters.idx = i; //base_node_id;
       //std::cout<<clusters.size()<<" ";
-      primary_id_v.push_back(primary_node_id);
+      base_id_v.push_back(base_node_id);
       _mgr.Emplace(std::move(clusters));
       i++;
 
@@ -186,13 +187,13 @@ namespace ertool {
     std::set<NodeID_t> nu_candidates;
     //std::cout<<res.size()<<" match found..."<<std::endl;
     for (auto const& match : res ) {
-      //std::cout<<"TPC: "<<match.tpc_id<<"/"<<primary_id_v.size()<<std::endl;
+      //std::cout<<"TPC: "<<match.tpc_id<<"/"<<base_id_v.size()<<std::endl;
       //std::cout<<"Flash: "<<match.flash_id<<"/"<<flash_id_v.size()<<std::endl;
-      auto const& nord_id  = primary_id_v[match.tpc_id];
+      auto const& nord_id  = base_id_v[match.tpc_id];
       auto const& flash_id = flash_id_v[match.flash_id];
 
       // The base particle's node is associated with the flash.
-      // It is also possible to loop through all children and 
+      // It is also possible to loop through all children and
       // associate each with the same flash... but for now, I'll
       // make the user do something like this if they want to
       // find the flash associated with an arbitrary particle:
