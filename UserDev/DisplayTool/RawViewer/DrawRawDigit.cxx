@@ -198,8 +198,8 @@ bool DrawRawDigit::finalize() {
   return true;
 }
 
-void DrawRawDigit::SetStepSizeByPlane(int step, int plane) {
-  if (plane < 0 || plane >= geoService -> Nviews()) {
+void DrawRawDigit::SetStepSizeByPlane(size_t step, size_t plane) {
+  if ( plane >= geoService -> Nviews()) {
     std::cerr << "ERROR: can't set step size for non existent plane " << plane << std::endl;
   }
   else {
@@ -228,8 +228,8 @@ void DrawRawDigit::correctData() {
 
 
   // Save one file per event ...
-  TFile * _out;
-  TTree * _tree;
+  TFile * _out = 0;
+  TTree * _tree = 0;
 
 
 
@@ -411,16 +411,16 @@ void DrawRawDigit::correctData() {
   if (_save_data) {
     int count = 0;
     // Loop over the waveforms and get the correlations:
-    for (unsigned int i = 0; i < _subtractionWaveForm.size(); i ++) {
-      for (int j = 0; j < _subtractionWaveForm.at(i).size(); j ++ )
+    for (size_t i = 0; i < _subtractionWaveForm.size(); i ++) {
+      for (size_t j = 0; j < _subtractionWaveForm.at(i).size(); j ++ )
       {
 
         // For each wave form, correlate it to all the other waveforms.
         // Increment the count here, and don't correlate if the correlation
         // has already been calculated
         int count2 = 0;
-        for (unsigned int i2 = 0; i2 < _subtractionWaveForm.size(); i2 ++) {
-          for (int j2 = 0; j2 < _subtractionWaveForm.at(i2).size(); j2 ++ ) {
+        for (size_t i2 = 0; i2 < _subtractionWaveForm.size(); i2 ++) {
+          for (size_t j2 = 0; j2 < _subtractionWaveForm.at(i2).size(); j2 ++ ) {
             if (correlationMatrix[count][count2] == 0) {
               // This entry unfilled.  See if the cross diagonal is filled:
               if (correlationMatrix[count2][count] != 0) {
