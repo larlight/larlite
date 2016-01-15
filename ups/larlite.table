@@ -49,9 +49,10 @@ Common:
 
     # add the bin directory to the path
     pathPrepend(PATH, ${UPS_PROD_DIR}/bin )
+    # add the python area to the pythonpath
+    pathPrepend(PYTHONPATH, ${UPS_PROD_DIR}/python )
 
-    pathPrepend(FW_DATA, /nusoft/data/flux/)
-    pathPrepend(FHICL_FILE_PATH, .:./job)
+
 
 End:
 # End Group definition
