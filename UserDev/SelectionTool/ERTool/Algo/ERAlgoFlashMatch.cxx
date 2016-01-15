@@ -4,7 +4,7 @@
 #include "ERAlgoFlashMatch.h"
 #include <set>
 #include <sstream>
-#include "OpT0Helper.h"
+// #include "OpT0Helper.h"
 #include "OpT0Finder/Algorithms/QLLMatch.h"
 #include "OpT0Finder/Algorithms/ChargeAnalytical.h"
 #include "OpT0Finder/Algorithms/PhotonLibHypothesis.h"
@@ -88,6 +88,9 @@ namespace ertool {
 
     _mgr.Configure(ertool_cfg_file);
 
+    // Kaleko can't get this to work. happy for someone else to implement instead of setter function.
+    // LP.Configure(cfg.get_pset("LightPath"));
+    LP.SetUseXOffset(false);
   }
 
   void ERAlgoFlashMatch::ProcessBegin()
@@ -98,10 +101,8 @@ namespace ertool {
 
   bool ERAlgoFlashMatch::Reconstruct(const EventData &data, ParticleGraph& graph)
   {
-    OpT0Helper helper;
-    ::flashana::LightPath LP;
-    //SetVolume must be called in LightPath otherwise all QClusters have 0 size
-    LP.SetVolume();
+    // OpT0Helper helper;
+
     _mgr.Reset();
 
     std::multimap<double, std::pair<NodeID_t, FlashID_t> > score_m;
@@ -186,7 +187,7 @@ namespace ertool {
     auto const res = _mgr.Match();
 
     std::set<NodeID_t> nu_candidates;
-    //std::cout<<res.size()<<" match found..."<<std::endl;
+    // std::cout << res.size() << " match found..." << std::endl;
     for (auto const& match : res ) {
       //std::cout<<"TPC: "<<match.tpc_id<<"/"<<base_id_v.size()<<std::endl;
       //std::cout<<"Flash: "<<match.flash_id<<"/"<<flash_id_v.size()<<std::endl;
@@ -199,10 +200,13 @@ namespace ertool {
       // make the user do something like this if they want to
       // find the flash associated with an arbitrary particle:
       // particlegraph.GetParticle( particle.Ancestor() ).FlashID()
+      // std::cout << "Setting the flashID for node " << nord_id << " to " << flash_id << std::endl;
       graph.SetFlashID(nord_id, flash_id);
 
       auto const& flash = data.Flash(flash_id);
       auto& part = graph.GetParticle(nord_id);
+      //std::cout << "Setting the flashID for the particle itself!"<<std::endl;
+      //part.SetFlashID(flash_id);
 
       if ( _beam_dt_min < flash._t && flash._t < _beam_dt_max ) {
         nu_candidates.insert(nord_id);

@@ -2,7 +2,7 @@
  * \file ERAlgoFlashMatch.h
  *
  * \ingroup Algo
- * 
+ *
  * \brief Class def header for a class ERAlgoFlashMatch
  *
  * @author kazuhiro
@@ -26,14 +26,14 @@ namespace ertool {
      User custom Algorithm class made by kazuhiro
    */
   class ERAlgoFlashMatch : public AlgoBase {
-  
+
   public:
 
     /// Default constructor
-    ERAlgoFlashMatch(const std::string& name="FlashMatch");
+    ERAlgoFlashMatch(const std::string& name = "FlashMatch");
 
     /// Default destructor
-    virtual ~ERAlgoFlashMatch(){};
+    virtual ~ERAlgoFlashMatch() {};
 
     /// Reset function
     void Reset();
@@ -48,7 +48,7 @@ namespace ertool {
     bool Reconstruct(const EventData &data, ParticleGraph& graph);
 
     /// Called after processing the last event sample
-    void ProcessEnd(TFile* fout=nullptr);
+    void ProcessEnd(TFile* fout = nullptr);
 
     /// Getter function to return the FlashMatchManager
     ::flashana::FlashMatchManager& Manager() { return _mgr;}
@@ -57,10 +57,12 @@ namespace ertool {
 
     ::flashana::FlashMatchManager _mgr;
 
+    ::flashana::LightPath LP;
+
     double _beam_dt_min, _beam_dt_max;
 
   };
 }
 #endif
 
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
