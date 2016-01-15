@@ -13,6 +13,7 @@ namespace flashana{
     , _gap         ( 0.5    )
     , _light_yield ( 29000. )
     , _dEdxMIP     ( 2.3    )//1.6 * 1.4 = 2.24
+    , _vfiducial   (ActiveVolume())
   {}
 
   void LightPath::Configure(const ::fcllite::PSet &pset)
