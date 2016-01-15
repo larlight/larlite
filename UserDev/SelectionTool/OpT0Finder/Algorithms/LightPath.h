@@ -59,6 +59,10 @@ namespace flashana{
 
     void SetXOffset(double offset ) { _offset = offset ; }
 
+    /// Setter to use offset (currently it is set to True by default...)
+    /// Seems like this should bet set to False if you are not running on cosmics
+    void SetUseXOffset(bool aoweifh) { _use_offset = aoweifh; }
+
   protected:
     bool   _start_bool;
     bool   _end_bool;
