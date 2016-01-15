@@ -33,7 +33,6 @@ namespace larlite {
   bool UBT0Finder::initialize() {
 
     _mcqclustering.SetUseLightPath(_use_light_path_w_mc);
-    std::cout<<"Use light path? "<<_use_light_path_w_mc <<std::endl ;
 
     _time_diff = new TH1D("time_diff", "Matched Flash vs. MCTrack", 100, 0, 500);
 
@@ -299,7 +298,7 @@ namespace larlite {
         auto const& mct = (*ev_mctrack)[match.tpc_id];
         _mc_time = mct[0].T() * 1.e-3;
         
-//        std::cout<<"mc and flash time for match : "<<_mc_time<<", "<<_flash_time<<std::endl;
+       // std::cout<<"mc and flash time for match : "<<_mc_time<<", "<<_flash_time<<std::endl;
 
         if(_mc_time < -2050 || _mc_time > 2750)
 	  continue;

@@ -56,7 +56,9 @@ namespace flashana{
                   flashana::QCluster_t& Q_cluster) const;
     
     void SetVolume ();
-    
+
+    void SetXOffset(double offset ) { _offset = offset ; }
+
   protected:
     bool   _start_bool;
     bool   _end_bool;
@@ -68,6 +70,9 @@ namespace flashana{
     ::geoalgo::AABox _vfiducial;
     
     mutable int _n;
+
+    mutable int _offset ;
+    bool _use_offset ;
   };
 } 
 

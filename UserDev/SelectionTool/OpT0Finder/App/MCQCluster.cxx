@@ -43,7 +43,7 @@ namespace flashana {
 	res.index_id = (int)mct_index;
 	res.g4_time  = mct.Start().T();
 
-//	std::cout<<"1) g4 time is: "<<res.g4_time / 1000<<" size : "<<mct.size()<<std::endl ;
+	//std::cout<<"1) g4 time is: "<<res.g4_time / 1000<<" size : "<<mct.size()<<std::endl ;
 	res.source_type = kMCTrackAncestor;
 	return res;
       }
@@ -141,16 +141,20 @@ namespace flashana {
 
 
       if(_use_light_path){
+         
+	 _lightpath_clustering.SetXOffset(shift_x);
+
         ::geoalgo::Trajectory mctraj;
 	for (size_t i = 0; i < trk.size(); ++i) 
 	  mctraj.push_back(::geoalgo::Vector(trk.at(i).X(), trk.at(i).Y(), trk.at(i).Z()));
 
-	  auto qclus = _lightpath_clustering.FlashHypothesis(mctraj);
+	auto qclus = _lightpath_clustering.FlashHypothesis(mctraj);
 	   
-	  for( auto const & c : qclus )
-	    tpc_obj.emplace_back(c) ;
-      
+	for( auto const & c : qclus )
+	  tpc_obj.emplace_back(c) ;
+
            }
+
       else {
 
       // Now loop over all mctracks that share an ancestor and treat
@@ -190,13 +194,13 @@ namespace flashana {
 	    pt.q = _light_yield * dedx * _step_size;
 
 	    if( _use_xshift)pt.x = pt1.X() + step_dir[0] * _step_size * (segment_index - 0.5) + shift_x;
-	    
 	    if(!_use_xshift)pt.x = pt1.X() + step_dir[0] * _step_size * (segment_index - 0.5);
 	    pt.y = pt1.Y() + step_dir[1] * _step_size * (segment_index - 0.5);
 	    pt.z = pt1.Z() + step_dir[2] * _step_size * (segment_index - 0.5);
 //	    std::cout<<"pt.x in MCQCluster: "<<pt.x<<std::endl ;
 	    tpc_obj.emplace_back(pt);
-	  } else if(segment_index == n_segments && (distance - _step_size*(n_segments-1))!=0) {
+	    } 
+	  else if(segment_index == n_segments && (distance - _step_size*(n_segments-1))!=0) {
 	    double offset = _step_size * (segment_index - 1);
 	    double remain = distance - offset;
 
@@ -210,7 +214,6 @@ namespace flashana {
 	    break;
 	  }
 //	    std::cout<<"pt.x in MCQCluster: "<<pt.x<<", "<<segment_index<<std::endl ;
-	  
 
 	}// Finish looping over segments
       }// Finish looping over mctrack trajectory points
