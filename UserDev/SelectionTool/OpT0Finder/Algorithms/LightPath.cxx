@@ -15,6 +15,7 @@ namespace flashana{
     , _dEdxMIP     ( 2.3    )//1.6 * 1.4 = 2.24
     , _n           (0       ) 
     , _use_offset  ( true   ) 
+    , _vfiducial   (ActiveVolume())
   {}
 
   void LightPath::Configure(const ::fcllite::PSet &pset)
