@@ -25,10 +25,10 @@
 struct _object;
 typedef _object PyObject;
 
+
 #ifndef __CINT__
 #include "Python.h"
 #include "numpy/arrayobject.h"
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #endif
 
 
@@ -65,7 +65,7 @@ namespace evd {
     void SetCorrectData(bool _doit = true){_correct_data = _doit;}
     void SetSaveData(bool _doit = true){_save_data = _doit;}
 
-    void SetStepSizeByPlane(int stepSize, int plane);
+    void SetStepSizeByPlane(size_t stepSize, size_t plane);
 
   private:
 
@@ -88,7 +88,7 @@ namespace evd {
 
     int run, subrun, event;
 
-    std::vector<int> stepSize;
+    std::vector<size_t> stepSize;
 
   };
 }

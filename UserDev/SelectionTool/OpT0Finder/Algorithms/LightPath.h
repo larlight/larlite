@@ -43,10 +43,11 @@ namespace flashana{
     void Configure(const ::fcllite::PSet &pset);
     
     // Setter function
-    bool TrackStart( bool a) { _start_bool =a; return _start_bool;}
-    bool TrackEnd  ( bool b) { _end_bool   =b; return _end_bool;}
-    double Set_Gap (double x){ _gap   =x; return _gap;}
-
+    bool   TrackStart   ( bool b  ) { _start_bool =b; return _start_bool;}//true, extend track at start
+    bool   TrackEnd     ( bool b  ) { _end_bool   =b; return _end_bool;}  //true, extend track at end
+    bool   PL_extension ( bool b  ) { _pl_ext = b;    return _pl_ext;}    //true, extend track to Photon Library volume; false to TPC FV
+    double Set_Gap      ( double x) { _gap   =x;      return _gap;}
+      
     // Getter function
     flashana::QCluster_t FlashHypothesis(const ::geoalgo::Trajectory& trj) const;
 
@@ -54,15 +55,24 @@ namespace flashana{
                   const ::geoalgo::Vector& pt_2,
                   flashana::QCluster_t& Q_cluster) const;
     
+    void SetVolume ();
+
+    void SetXOffset(double offset ) { _offset = offset ; }
+
   protected:
     bool   _start_bool;
     bool   _end_bool;
+    bool   _pl_ext;
     double _gap;
     double _light_yield;
     double _dEdxMIP;
     ::geoalgo::GeoAlgo _geoAlgo;
-
+    ::geoalgo::AABox _vfiducial;
+    
     mutable int _n;
+
+    mutable int _offset ;
+    bool _use_offset ;
   };
 } 
 

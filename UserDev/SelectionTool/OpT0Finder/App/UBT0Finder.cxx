@@ -10,6 +10,7 @@
 #include "GeoAlgo/GeoAlgo.h"
 #include "GeoAlgo/GeoLineSegment.h"
 #include "LArUtil/Geometry.h"
+#include "OpT0Finder/Base/OpT0FinderTypes.h"
 namespace larlite {
 
   UBT0Finder::UBT0Finder()
@@ -30,6 +31,8 @@ namespace larlite {
   }
 
   bool UBT0Finder::initialize() {
+
+    _mcqclustering.SetUseLightPath(_use_light_path_w_mc);
 
     _time_diff = new TH1D("time_diff", "Matched Flash vs. MCTrack", 100, 0, 500);
 
@@ -121,6 +124,7 @@ namespace larlite {
     auto ev_mctrack = storage->get_data<event_mctrack>("mcreco");
     auto ev_mcshower = storage->get_data<event_mcshower>("mcreco");
 
+
     if (!_use_mc) {
       if (!ev_track || ev_track->empty()) return false;
       for (size_t n = 0; n < ev_track->size(); n++) {
@@ -159,6 +163,7 @@ namespace larlite {
 
       if (!ev_mctrack || ev_mctrack->empty()) return false;
 
+
       for (size_t n = 0; n < ev_mctrack->size(); n++) {
 
         auto const& trk = ev_mctrack->at(n);
@@ -178,61 +183,63 @@ namespace larlite {
           _trk_shift = shift_x;
           _trk_min_x = 1036.;
           _trk_max_x = -1036.;
-          for (size_t i = 0; i < trk.size(); ++i) {
+	  ::geoalgo::Trajectory mctraj;
+         for (size_t i = 0; i < trk.size(); ++i) {
             if (trk[i].X() > _trk_max_x) { _trk_max_x = trk[i].X(); }
             if (trk[i].X() < _trk_min_x) { _trk_min_x = trk[i].X(); }
-          }
+        
+            }
 
           _track_tree->Fill();
-	}
-      }
+          } // If > 2 points
+	} // track loop
 
-      // Get MC QCluster list
+      // Get MC QCluster list-- declared here for adding in light path
       // Fills _q_cluster_v inside MCQCluster
-      _interaction_algo.Construct(*ev_mctrack,*ev_mcshower);
-      
       std::vector<flashana::QCluster_t> qcluster_v;
       std::vector<flashana::MCSource_t> source_v;
-      // Fills qcluster_v with the content of _q_cluster_v which is filled above in Construct()
-      _interaction_algo.Swap(std::move(qcluster_v),std::move(source_v));
+
+      _mcqclustering.Construct(*ev_mctrack,*ev_mcshower);
+      _mcqclustering.Swap(std::move(qcluster_v),std::move(source_v));
 
       for(auto& qcluster : qcluster_v){
-        if( qcluster.idx != -1)
+        if( qcluster.idx != -1 )
 	  _mgr.Emplace(std::move(qcluster));
+          
 	}
+      
+       for(auto const& s : source_v) {
 
-      for(auto const& s : source_v) {
+          if(s.g4_time == ::flashana::kINVALID_DOUBLE) {
+            print(msg::kWARNING,__FUNCTION__,Form("Found unknown QCluster MC source (G4 T=%g)",s.g4_time));
+            continue;
+            }
 
-	if(s.g4_time == ::flashana::kINVALID_DOUBLE) {
-	  print(msg::kWARNING,__FUNCTION__,Form("Found unknown QCluster MC source (G4 T=%g)",s.g4_time));
-	  continue;
-	  }
-
-	//  Need to check that the qcluster we're dealing with has greater than
-	//  2 energy dep points.  
-	bool good = true;
-	for(auto const& q : qcluster_v){
-	  if(q.idx == s.index_id){
-	    if(q.size() < 2 || q.idx == -1){
-	      good = false;
-	      break;
-	      }
-	    }
-	  }
-       
-        if( good ){
-	_t0 = s.g4_time;
-	_n_pe = 0;
-	_int_e = s.energy_deposit;
-	
-	for (auto const & h : *ev_hit ) {
-	  if (h.PeakTime() > (_t0 / 1000. - 10.) && h.PeakTime() < (_t0 / 1000. + 10.))
-	    _n_pe += h.PE();
-	   } // end looping over all hits for this interaction
-	
-	_int_tree->Fill();
-	}
-      } // end looping over all MC source
+          //  Need to check that the qcluster we're dealing with has greater than
+          //  2 energy dep points.  
+          bool good = true;
+          for(auto const& q : qcluster_v){
+            if(q.idx == s.index_id){
+              if(q.size() < 2 || q.idx == -1){
+                good = false;
+                break;
+                }
+              }
+            }
+         
+          if( good ){
+          _t0 = s.g4_time;
+          _n_pe = 0;
+          _int_e = s.energy_deposit;
+          
+          for (auto const & h : *ev_hit ) {
+            if (h.PeakTime() > (_t0 / 1000. - 10.) && h.PeakTime() < (_t0 / 1000. + 10.))
+              _n_pe += h.PE();
+             } // end looping over all hits for this interaction
+          
+          _int_tree->Fill();
+          }
+        } // end looping over all MC source
     }//else 
 
     for (size_t n = 0; n < ev_flash->size(); n++) {
@@ -291,6 +298,8 @@ namespace larlite {
         auto const& mct = (*ev_mctrack)[match.tpc_id];
         _mc_time = mct[0].T() * 1.e-3;
         
+       // std::cout<<"mc and flash time for match : "<<_mc_time<<", "<<_flash_time<<std::endl;
+
         if(_mc_time < -2050 || _mc_time > 2750)
 	  continue;
 
@@ -323,7 +332,7 @@ namespace larlite {
         //  if (step1.X() > max_x) max_x = step1.X();
         //}
         //_mc_dx = max_x - min_x;
-        if ( mct[0].E() - mct[mct.size() - 1].E() > _e_diff )
+//        if ( mct[0].E() - mct[mct.size() - 1].E() > _e_diff )
           _time_diff->Fill(1000 * (_flash_time - _mc_time)); //
       }
       _flashmatch_tree->Fill();
@@ -395,10 +404,10 @@ namespace larlite {
       _fout->cd();
       _time_diff->GetXaxis()->SetTitle("Delta T [ns]" );
 
-      auto eligible_matches = _int_tree->GetEntries("_t0>-2050000 && _t0 < 2750000") ;
+      auto eligible_matches = _int_tree->GetEntries(); //"_t0>-2050000 && _t0 < 2750000") ;
 
       std::cout << "\nEfficiency (#matches/#interactions)  : " << float(_flashmatch_tree->GetEntries()) / eligible_matches * 100 << "%, (" << _flashmatch_tree->GetEntries() << "/" << eligible_matches << ")" << std::endl;
-      std::cout << "Correctness (#good matches/#matches) : " << _time_diff->Integral(8, 24) / _flashmatch_tree->GetEntries() * 100 << "%, (" << _time_diff->Integral(8, 24) << "/" << _flashmatch_tree->GetEntries() << ")" << std::endl;
+      std::cout << "Correctness (#good matches/#matches) : " << float(_time_diff->Integral(1, 80)) / _flashmatch_tree->GetEntries() * 100 << "%, (" << _time_diff->Integral(1, 80) << "/" << _flashmatch_tree->GetEntries() << ")" << std::endl;
 
 
       _flashmatch_tree->Write();
