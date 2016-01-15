@@ -17,6 +17,7 @@
 
 #include "ERTool/Base/AlgoBase.h"
 #include "OpT0Finder/Base/FlashMatchManager.h"
+#include "OpT0Finder/Algorithms/LightPath.h"
 
 namespace ertool {
 
@@ -48,6 +49,9 @@ namespace ertool {
 
     /// Called after processing the last event sample
     void ProcessEnd(TFile* fout=nullptr);
+
+    /// Getter function to return the FlashMatchManager
+    ::flashana::FlashMatchManager& Manager() { return _mgr;}
 
   private:
 

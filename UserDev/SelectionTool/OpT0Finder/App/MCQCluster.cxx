@@ -15,12 +15,15 @@ namespace flashana {
     , _light_yield ( 29000 )
     , _step_size   ( 0.5   )
     , _use_xshift  ( true  )
-  {}
+  {
+    _lightpath_clustering.SetVolume();
+  }
 
   void MCQCluster::Configure(const ::fcllite::PSet &pset)
   {
     _light_yield = pset.get<double>("LightYield");
     _step_size   = pset.get<double>("StepSize");
+    _use_light_path = pset.get<bool>("UseLightPath");
   }
   
   const std::vector<flashana::QCluster_t>& MCQCluster::QClusters() const
@@ -40,6 +43,7 @@ namespace flashana {
 	res.index_id = (int)mct_index;
 	res.g4_time  = mct.Start().T();
 
+//	std::cout<<"1) g4 time is: "<<res.g4_time / 1000<<" size : "<<mct.size()<<std::endl ;
 	res.source_type = kMCTrackAncestor;
 	return res;
       }
@@ -67,7 +71,6 @@ namespace flashana {
 			      const ::larlite::event_mcshower& ev_mcs )
   {
 
-    //std::cout<<"Number of tracks: "<<ev_mct.size()<<std::endl ;
     //
     // 0) Initialization
     //
@@ -80,15 +83,15 @@ namespace flashana {
     _mcshower_2_qcluster.clear();
     _qcluster_v.clear();
 
-//    std::cout<<"All track ancestors: "<<std::endl;
-//    for (size_t mct_index = 0; mct_index < ev_mct.size(); mct_index++) 
-//	std::cout<<ev_mct[mct_index].AncestorTrackID()<<", ";
-//
-//	std::cout<<"\n\nAll track ids: "<<std::endl;
-//    for (size_t mct_index = 0; mct_index < ev_mct.size(); mct_index++) {
-//        if (ev_mct[mct_index].size() )
-//	 std::cout<<", ("<<ev_mct[mct_index].TrackID()<<", "<<ev_mct[mct_index].AncestorTrackID()<<") ";
-//    }
+    //  std::cout<<"All track ancestors: "<<std::endl;
+    //  for (size_t mct_index = 0; mct_index < ev_mct.size(); mct_index++) 
+    //    std::cout<<ev_mct[mct_index].AncestorTrackID()<<", ";
+    //
+    //    std::cout<<"\n\nAll track ids: "<<std::endl;
+    //  for (size_t mct_index = 0; mct_index < ev_mct.size(); mct_index++) {
+    //      if (ev_mct[mct_index].size() )
+    //     std::cout<<", ("<<ev_mct[mct_index].TrackID()<<", "<<ev_mct[mct_index].AncestorTrackID()<<") ";
+    //  }
 
     //
     // 1) Loop over mctrack
@@ -100,7 +103,7 @@ namespace flashana {
       //  std::cout<<"Ancestors: "<<ev_mct.at(mct_index).AncestorTrackID()<<std::endl;
       
       auto const& trk = ev_mct[mct_index];
-      if (trk.size() <= 2) continue;
+      if (trk.size() <= 2 || trk[0].T() < -2050000 || trk[0].T() > 2750000 ) continue;
       
       auto usedIDs_iter = usedIDs.find(trk.AncestorTrackID());
       
@@ -119,6 +122,7 @@ namespace flashana {
       
       _mctrack_2_qcluster.push_back(qcluster_index);
 
+      
 //      std::cout<<" what's our idx: "<<_qcluster_2_mcobject.back().index_id<<", and size of thing: "<<_qcluster_2_mcobject.size()<<", "<<qcluster_index<<std::endl ;
       
       auto& tpc_obj = _qcluster_v[qcluster_index];
@@ -134,6 +138,20 @@ namespace flashana {
       double event_time = trk[0].T(); // ns
       double shift_x = event_time * det_drift_velocity * pow(10,-3); //cm
       tpc_obj.reserve(tpc_obj.size() + trk.size());
+
+
+      if(_use_light_path){
+        ::geoalgo::Trajectory mctraj;
+	for (size_t i = 0; i < trk.size(); ++i) 
+	  mctraj.push_back(::geoalgo::Vector(trk.at(i).X(), trk.at(i).Y(), trk.at(i).Z()));
+
+	  auto qclus = _lightpath_clustering.FlashHypothesis(mctraj);
+	   
+	  for( auto const & c : qclus )
+	    tpc_obj.emplace_back(c) ;
+      
+           }
+      else {
 
       // Now loop over all mctracks that share an ancestor and treat
       // them as one interaction
@@ -196,6 +214,7 @@ namespace flashana {
 
 	}// Finish looping over segments
       }// Finish looping over mctrack trajectory points
+     }// Else if use mcqcluster
     } // Finish looping over mctracks
     //std::cout<<"size in MCQCluster output is "<<_n<<std::endl;
     _n=0;
