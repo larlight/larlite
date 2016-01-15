@@ -27,7 +27,10 @@ namespace larlite {
 
     _e_diff    = 10;
     UseAbsolutePE(false);
-    SetStepLength(0.5) ;
+    SetStepLength(0.5);
+
+    //Initialize _use_light_path_w_mc value to something
+    _use_light_path_w_mc = true;
   }
 
   bool UBT0Finder::initialize() {
@@ -114,10 +117,10 @@ namespace larlite {
         n_flash++;
     }
 
-    for (auto const & f : *ev_flash){
+    for (auto const & f : *ev_flash) {
       _npe = f.TotalPE();
       _flash_tree->Fill();
-      }
+    }
 
     //auto ev_track = storage->get_data<event_track>("pandoraCosmicKHit");
     auto ev_track = storage->get_data<event_track>("trackkalmanhit");
@@ -183,64 +186,64 @@ namespace larlite {
           _trk_shift = shift_x;
           _trk_min_x = 1036.;
           _trk_max_x = -1036.;
-	  ::geoalgo::Trajectory mctraj;
-         for (size_t i = 0; i < trk.size(); ++i) {
+          ::geoalgo::Trajectory mctraj;
+          for (size_t i = 0; i < trk.size(); ++i) {
             if (trk[i].X() > _trk_max_x) { _trk_max_x = trk[i].X(); }
             if (trk[i].X() < _trk_min_x) { _trk_min_x = trk[i].X(); }
-        
-            }
+
+          }
 
           _track_tree->Fill();
-          } // If > 2 points
-	} // track loop
+        } // If > 2 points
+      } // track loop
 
       // Get MC QCluster list-- declared here for adding in light path
       // Fills _q_cluster_v inside MCQCluster
       std::vector<flashana::QCluster_t> qcluster_v;
       std::vector<flashana::MCSource_t> source_v;
 
-      _mcqclustering.Construct(*ev_mctrack,*ev_mcshower);
-      _mcqclustering.Swap(std::move(qcluster_v),std::move(source_v));
+      _mcqclustering.Construct(*ev_mctrack, *ev_mcshower);
+      _mcqclustering.Swap(std::move(qcluster_v), std::move(source_v));
 
-      for(auto& qcluster : qcluster_v){
-        if( qcluster.idx != -1 )
-	  _mgr.Emplace(std::move(qcluster));
-          
-	}
-      
-       for(auto const& s : source_v) {
+      for (auto& qcluster : qcluster_v) {
+        if ( qcluster.idx != -1 )
+          _mgr.Emplace(std::move(qcluster));
 
-          if(s.g4_time == ::flashana::kINVALID_DOUBLE) {
-            print(msg::kWARNING,__FUNCTION__,Form("Found unknown QCluster MC source (G4 T=%g)",s.g4_time));
-            continue;
+      }
+
+      for (auto const& s : source_v) {
+
+        if (s.g4_time == ::flashana::kINVALID_DOUBLE) {
+          print(msg::kWARNING, __FUNCTION__, Form("Found unknown QCluster MC source (G4 T=%g)", s.g4_time));
+          continue;
+        }
+
+        //  Need to check that the qcluster we're dealing with has greater than
+        //  2 energy dep points.
+        bool good = true;
+        for (auto const& q : qcluster_v) {
+          if (q.idx == s.index_id) {
+            if (q.size() < 2 || q.idx == -1) {
+              good = false;
+              break;
             }
+          }
+        }
 
-          //  Need to check that the qcluster we're dealing with has greater than
-          //  2 energy dep points.  
-          bool good = true;
-          for(auto const& q : qcluster_v){
-            if(q.idx == s.index_id){
-              if(q.size() < 2 || q.idx == -1){
-                good = false;
-                break;
-                }
-              }
-            }
-         
-          if( good ){
+        if ( good ) {
           _t0 = s.g4_time;
           _n_pe = 0;
           _int_e = s.energy_deposit;
-          
+
           for (auto const & h : *ev_hit ) {
             if (h.PeakTime() > (_t0 / 1000. - 10.) && h.PeakTime() < (_t0 / 1000. + 10.))
               _n_pe += h.PE();
-             } // end looping over all hits for this interaction
-          
+          } // end looping over all hits for this interaction
+
           _int_tree->Fill();
-          }
-        } // end looping over all MC source
-    }//else 
+        }
+      } // end looping over all MC source
+    }//else
 
     for (size_t n = 0; n < ev_flash->size(); n++) {
 
@@ -293,15 +296,15 @@ namespace larlite {
 
       if (_use_mc) {
 
-//	std::cout<<"Match things...: "<<match.tpc_id<<", and size of ev_mctrk : "<<ev_mctrack->size()<<std::endl ;
+//  std::cout<<"Match things...: "<<match.tpc_id<<", and size of ev_mctrk : "<<ev_mctrack->size()<<std::endl ;
 
         auto const& mct = (*ev_mctrack)[match.tpc_id];
         _mc_time = mct[0].T() * 1.e-3;
-        
-       // std::cout<<"mc and flash time for match : "<<_mc_time<<", "<<_flash_time<<std::endl;
 
-        if(_mc_time < -2050 || _mc_time > 2750)
-	  continue;
+        // std::cout<<"mc and flash time for match : "<<_mc_time<<", "<<_flash_time<<std::endl;
+
+        if (_mc_time < -2050 || _mc_time > 2750)
+          continue;
 
         double event_time = mct[0].T(); // ns
         double det_drift_time = 2.3E6; // ns
@@ -316,7 +319,7 @@ namespace larlite {
         //for (size_t i = 0; i < mct.size() - 1; ++i) {
         //  auto const& step1 = mct[i];
         //  auto const& step2 = mct[i + 1];
-	//  std::cout<<"Step x y z: "<<step2.X()<<", "<<step2.Y()<<", "<<step2.Z()<<std::endl ;
+        //  std::cout<<"Step x y z: "<<step2.X()<<", "<<step2.Y()<<", "<<step2.Z()<<std::endl ;
         //  line.Start(step1.X(), step1.Y(), step1.Z());
         //  line.End(step2.X(), step2.Y(), step2.Z());
         //  auto const closest_pt = geoalg.ClosestPt(line, pt);
@@ -333,7 +336,7 @@ namespace larlite {
         //}
         //_mc_dx = max_x - min_x;
 //        if ( mct[0].E() - mct[mct.size() - 1].E() > _e_diff )
-          _time_diff->Fill(1000 * (_flash_time - _mc_time)); //
+        _time_diff->Fill(1000 * (_flash_time - _mc_time)); //
       }
       _flashmatch_tree->Fill();
 
