@@ -31,26 +31,25 @@ Common:
     # Set up required products, which is root
     exeActionRequired(GetProducts)
 
-    envSet(LARLITE_BASEDIR,UPS_PROD_FLAVOR)
+    envSet(LARLITE_BASEDIR,${UPS_PROD_DIR}/${${UPS_PROD_NAME_UC}_VERSION}/${UPS_PROD_FLAVOR})
     envSet(LARLITE_ROOT6,0)
-    envSet(LARLITE_COREDIR,UPS_PROD_FLAVOR/core)
-    envSet(LARLITE_LIBDIR,UPS_PROD_FLAVOR/lib)
-    envSet(LARLITE_USERDEVDIR,UPS_PROD_FLAVOR/UserDev)
+    envSet(LARLITE_COREDIR,${UPS_PROD_DIR}/${${UPS_PROD_NAME_UC}_VERSION}/${UPS_PROD_FLAVOR}/core)
+    envSet(LARLITE_LIBDIR,${UPS_PROD_DIR}/${${UPS_PROD_NAME_UC}_VERSION}/${UPS_PROD_FLAVOR}/lib)
+    envSet(LARLITE_USERDEVDIR,${UPS_PROD_DIR}/${${UPS_PROD_NAME_UC}_VERSION}/${UPS_PROD_FLAVOR}/UserDev)
     
 
-    envSet(${UPS_PROD_NAME_UC}_LIB, ${${UPS_PROD_NAME_UC}_FQ_DIR}/lib) 
     if ( test `uname` = "Darwin" )
       envSet(LARLITE_CXX,clang++)
-      pathPrepend(DYLD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB})
+      pathPrepend(DYLD_LIBRARY_PATH, ${LARLITE_LIBDIR})
     else()
       envSet(LARLITE_CXX,g++)
-      pathPrepend(LD_LIBRARY_PATH, ${${UPS_PROD_NAME_UC}_LIB})
+      pathPrepend(LD_LIBRARY_PATH, ${LARLITE_LIBDIR})
     endif ( test `uname` = "Darwin" )
 
     # add the bin directory to the path
-    pathPrepend(PATH, ${UPS_PROD_DIR}/bin )
+    pathPrepend(PATH, ${UPS_PROD_DIR}/${${UPS_PROD_NAME_UC}_VERSION}/${UPS_PROD_FLAVOR}/bin )
     # add the python area to the pythonpath
-    pathPrepend(PYTHONPATH, ${UPS_PROD_DIR}/python )
+    pathPrepend(PYTHONPATH, ${UPS_PROD_DIR}/${${UPS_PROD_NAME_UC}_VERSION}/${UPS_PROD_FLAVOR}/python )
 
 
 
