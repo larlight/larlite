@@ -15,7 +15,9 @@ namespace flashana {
     , _light_yield ( 29000 )
     , _step_size   ( 0.5   )
     , _use_xshift  ( true  )
-  {}
+  {
+    _lightpath_clustering.SetVolume();
+  }
 
   void MCQCluster::Configure(const ::fcllite::PSet &pset)
   {
@@ -139,7 +141,6 @@ namespace flashana {
 
 
       if(_use_light_path){
-        _lightpath_clustering.SetVolume();
         ::geoalgo::Trajectory mctraj;
 	for (size_t i = 0; i < trk.size(); ++i) 
 	  mctraj.push_back(::geoalgo::Vector(trk.at(i).X(), trk.at(i).Y(), trk.at(i).Z()));
