@@ -77,6 +77,7 @@ public:
   Polygon2D PolyObject;              ///< Polygon Object...see Polygon2D.hh
 
   Point2D start_point;               ///< start point
+  Point2D showering_point;           ///< point at which showering of cluster begins
   Point2D end_point;                 ///< end point
 
   std::vector<Point2D > start_point_cand;     ///<Worker variable saves the list of candidate start points between modules
@@ -84,7 +85,6 @@ public:
   std::vector<Point2D > start_dir_cand;       ///candidate start point directions
 
 
-  Point2D showering_point;           ///< point at which showering of cluster begins
 
   double sum_charge;                 ///< Sum charge of hits in ADC
   double mean_charge;                ///< Mean (average) charge of hits in ADC
