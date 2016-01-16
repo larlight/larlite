@@ -76,7 +76,7 @@ namespace ertool {
     Particle& CreateParticle (const RecoObjBase& reco_obj);
     void ValidNode           (const NodeID_t& id         ) const;
     void UpdateGeneration    (const NodeID_t target, const Generation_t gen );
-    void UpdateFlashID       (const NodeID_t target, const FlashID_t flash  );
+    // void UpdateFlashID       (const NodeID_t target, const FlashID_t flash  );
     void UpdateParentID      (const NodeID_t target, const NodeID_t parent  );
     void UpdateAncestorID    (const NodeID_t target, const NodeID_t ancestor);
     void UpdateRecoInfo      (const NodeID_t target, const RecoType_t reco_type, const RecoID_t reco_id );    
