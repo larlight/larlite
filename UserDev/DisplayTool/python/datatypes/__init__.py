@@ -6,6 +6,7 @@ from track import track
 from wire import wire, rawDigit, recoWire
 from match import match
 from endpoint2d import endpoint2d
+from vertex import vertex
 from drawableItems import drawableItems
 try:
     import pyqtgraph.opengl as gl
