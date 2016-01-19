@@ -18,7 +18,9 @@
 namespace ertool {
 
   ERAlgoFlashMatch::ERAlgoFlashMatch(const std::string& name) : AlgoBase(name)
-  {}
+  {
+  _match_tree=0;
+  }
 
   void ERAlgoFlashMatch::Reset()
   {}
@@ -94,10 +96,22 @@ namespace ertool {
   }
 
   void ERAlgoFlashMatch::ProcessBegin()
-  {}
+  {
+  if(!_match_tree){
+    _match_tree=new TTree("match_tree","match_tree");
+    _match_tree->Branch("_mct", &_mct, "mct/D");
+    _match_tree->Branch("_ft", &_ft, "ft/D");
+    _match_tree->Branch("_e", &_e, "e/D");
+     }
+  }
 
   void ERAlgoFlashMatch::ProcessEnd(TFile* fout)
-  {}
+  {
+  if (fout) {
+    fout->cd();
+    _match_tree->Write();
+    }
+   }
 
   bool ERAlgoFlashMatch::Reconstruct(const EventData &data, ParticleGraph& graph)
   {
@@ -113,7 +127,9 @@ namespace ertool {
 
     for (auto const& base_node_id : graph.GetBaseNodes() ) {
 
-      auto const& base_part = graph.GetParticle(base_node_id);
+       auto const& base_part = graph.GetParticle(base_node_id);
+
+      if (base_part.RecoType() == kShower) continue;
 
       auto const& children_v = graph.GetAllDescendantNodes(base_part.ID());
 
@@ -208,6 +224,13 @@ namespace ertool {
       //std::cout << "Setting the flashID for the particle itself!"<<std::endl;
       //part.SetFlashID(flash_id);
 
+
+      auto const& data_t = data.Track(part.RecoID());
+
+      _mct = data_t._time/1000 ;
+      _ft  = flash._t ;
+      _e   = data_t._energy ;
+
       if ( _beam_dt_min < flash._t && flash._t < _beam_dt_max ) {
         nu_candidates.insert(nord_id);
         //std::cout<<"Nu?! "<<flash._z<<" vs "<<match.tpc_point.z<<std::endl;
@@ -221,6 +244,9 @@ namespace ertool {
                              kCosmic);
         //std::cout<<"Cosmic.. "<<flash._z<<" vs "<<match.tpc_point.z<<" @ "<<flash._t<<std::endl;
       }
+
+    _match_tree->Fill();
+
     }
 
     //all base particles that were not matched to a flash are set as kCosmic
