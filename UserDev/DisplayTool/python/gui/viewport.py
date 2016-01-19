@@ -6,6 +6,9 @@ import math
 
 
 class viewport(pg.GraphicsLayoutWidget):
+
+  drawHitsRequested = QtCore.pyqtSignal(int, int)
+
   def __init__(self, geometry,plane=-1):
     super(viewport, self).__init__(border=None)
     # add a view box, which is a widget that allows an image to be shown
@@ -183,14 +186,17 @@ class viewport(pg.GraphicsLayoutWidget):
         self.processPoint(self._lastPos)
 
     # 
+    wire = int( self._lastPos.x())
     if self._item.image != None:
-      wire = int( self._lastPos.x())
       # get the data from the plot:
       data = self._item.image
       self._wireData = data[wire]
       self._wdf(self._wireData)
       # print "Plane: " + str(self._plane) + ", Wire: " + str(wire)
       # return self.plane,self.wire
+
+    # Make a request to draw the hits from this wire:
+    self.drawHitsRequested.emit(self._plane,wire)
 
 
   def connectWireDrawingFunction(self,func):

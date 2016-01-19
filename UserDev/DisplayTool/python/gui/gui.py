@@ -15,6 +15,9 @@ from viewport import viewport
 
 class view_manager(QtCore.QObject):
   """This class manages a collection of viewports"""
+
+  drawHitsRequested = QtCore.pyqtSignal(int, int)
+
   def __init__(self, geometry):
     super(view_manager, self).__init__()
     self._nviews = 0
@@ -32,6 +35,9 @@ class view_manager(QtCore.QObject):
     self._wireDrawer.setMaximumHeight(200)
     self._wireDrawer.setMinimumHeight(100)
 
+
+    self._plottedHits = []
+
     self._selectedPlane = -1
 
     self._autoRange = False
@@ -40,6 +46,7 @@ class view_manager(QtCore.QObject):
   def addEvdDrawer(self,plane):
     self._drawerList.append(viewport(self._geometry, plane))
     self._drawerList[-1].connectWireDrawingFunction(self.drawWireOnPlot)
+    self._drawerList[-1].drawHitsRequested.connect(self.hitOnWireHandler)
     self._nviews += 1
   
   def selectPlane(self,plane):
@@ -53,6 +60,15 @@ class view_manager(QtCore.QObject):
   def clearPoints(self):
     for view in self._drawerList:
       view.clearPoints()
+
+  def hitOnWireHandler(self,plane,wire):
+    if not self._wireDrawer.isVisible():
+      return
+    # Simply pass the info on to who ever is listening
+    # (hint: it's the manager)
+    for hit in self._plottedHits:
+      self._wirePlot.removeItem(hit)
+    self.drawHitsRequested.emit(plane,wire)
 
   def getDrawListWidget(self):
 
@@ -174,6 +190,18 @@ class view_manager(QtCore.QObject):
       #   self._wirePlotItem.setData(axisData,wireData)
       # else:
 
+  def drawHitsOnPlot(self,hits):
+    if not self._wireDrawer.isVisible():
+      return
+    for i in xrange(len(hits)):
+      hit = hits[i]
+      xPts = np.linspace(hit.start_time(), hit.end_time(), hit.end_time() - hit.start_time() + 1)
+      yPts = hit.peak_amplitude() * np.exp( - 0.5 * (xPts - hit.peak_time())**2 / hit.rms()**2  )
+      # self._plottedHits.append(self._wirePlot.plot(xPts,yPts))
+      self._plottedHits.append(self._wirePlot.plot(xPts,yPts,pen=pg.mkPen((255,0,0,200),width=2)))
+
+      # self._wirePlot.remove
+
 
   def plotFFT(self):
     # Take the fft of wire data and plot it in place of the wire signal
@@ -204,6 +232,7 @@ class gui(QtGui.QWidget):
     self._event_manager = manager
     self._event_manager.connectGui(self)
     self._event_manager.connectViewManager(self._view_manager)
+    self._view_manager.drawHitsRequested.connect(self._event_manager.drawHitsOnWire)
 
   def closeEvent(self, event):
     self.quit()  

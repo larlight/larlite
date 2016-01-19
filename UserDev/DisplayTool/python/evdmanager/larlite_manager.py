@@ -312,6 +312,13 @@ class larlite_manager(larlite_manager_base):
         else:
             return False
 
+    def drawHitsOnWire(self, plane, wire):
+        if not 'Hit' in self._drawnClasses:
+            return
+        else:
+            # Get the hits:
+            hits = self._drawnClasses['Hit'].getHitsOnWire(plane,wire)
+            self._view_manager.drawHitsOnPlot(hits)
 
 try:
     import pyqtgraph.opengl as gl

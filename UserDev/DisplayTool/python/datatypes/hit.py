@@ -42,3 +42,7 @@ class hit(recoBase):
                 # r.setBrush((0,0,0,opacity))
                 self._drawnObjects[thisPlane].append(r)
                 view._view.addItem(r)
+
+    def getHitsOnWire(self, plane, wire):
+        return self._process.getHitsOnWirePlane(wire,plane)
+        
