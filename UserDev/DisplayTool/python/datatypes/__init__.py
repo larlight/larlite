@@ -12,5 +12,6 @@ try:
     import pyqtgraph.opengl as gl
     from drawableItems import drawableItems3D
     from track import track3D
+    from mctrack import mctrack3D
 except:
     pass

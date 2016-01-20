@@ -1,9 +1,9 @@
 /**
- * \file DrawTrack3D.h
+ * \file DrawMCTrack3D.h
  *
  * \ingroup RecoViewer
  *
- * \brief Class def header for a class DrawTrack3D
+ * \brief Class def header for a class DrawMCTrack3D
  *
  * @author cadams
  */
@@ -11,19 +11,19 @@
 /** \addtogroup RecoViewer
 
     @{*/
-#ifndef LARLITE_DRAWTRACK3D_H
-#define LARLITE_DRAWTRACK3D_H
+#ifndef LARLITE_DRAWMCTRACK3D_H
+#define LARLITE_DRAWMCTRACK3D_H
 
 #include <iostream>
 #include "Analysis/ana_base.h"
 #include "LArUtil/Geometry.h"
 #include "LArUtil/GeometryUtilities.h"
-#include "DataFormat/track.h"
-
+#include "DataFormat/mctrack.h"
+#include "DrawTrack3D.h"
 #include "RecoBase3D.h"
 /**
-   \class DrawTrack3D
-   User defined class DrawTrack3D ... these comments are used to generate
+   \class DrawMCTrack3D
+   User defined class DrawMCTrack3D ... these comments are used to generate
    doxygen documentation!
  */
 
@@ -31,30 +31,18 @@
 
 namespace evd {
 
-class Track3D {
-
-public:
-    std::vector<TVector3 > _track;
-    const std::vector<TVector3 > & track() {return _track;}
-    // const std::vector<std::vector<float> > & direction() {return _track;}
-    TVector3 start_point(){return _start_point;}
-    TVector3 end_point(){return _end_point;}
-
-private:
-    TVector3 _start_point;
-    TVector3 _end_point;
-};
+typedef Track3D MCTrack3D;
 
 
-class DrawTrack3D : public larlite::ana_base, public RecoBase3D<Track3D> {
+class DrawMCTrack3D : public larlite::ana_base, public RecoBase3D<MCTrack3D> {
 
 public:
 
     /// Default constructor
-    DrawTrack3D();
+    DrawMCTrack3D();
 
     /// Default destructor
-    ~DrawTrack3D();
+    ~DrawMCTrack3D();
 
     /** IMPLEMENT in DrawCluster.cc!
         Initialization method to be called before the analysis event loop.
@@ -74,7 +62,7 @@ public:
 
 private:
 
-    Track3D getTrack3d(larlite::track track);
+    MCTrack3D getMCTrack3d(larlite::mctrack track);
 
 };
 
