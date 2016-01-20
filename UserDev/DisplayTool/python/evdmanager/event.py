@@ -97,4 +97,6 @@ class manager(event):
     yRange = [0,self._geom.tRange()]
     return xRange,yRange
 
+  def drawHitsOnWire(self,plane,wire):
+    pass
 

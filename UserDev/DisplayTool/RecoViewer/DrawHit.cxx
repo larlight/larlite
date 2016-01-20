@@ -63,8 +63,13 @@ bool DrawHit::analyze(larlite::storage_manager* storage) {
     _dataByPlane.at(view).emplace_back(
       Hit(hit.WireID().Wire,
           hit.PeakTime(),
-          hit.PeakAmplitude(),
-          hit.RMS() ));
+          hit.Integral(),
+          hit.RMS(),
+          hit.StartTick(),
+          hit.PeakTime(),
+          hit.EndTick(),
+          hit.PeakAmplitude()
+         ));
     if (_dataByPlane.at(view).back()._charge > _maxCharge.at(view))
       _maxCharge.at(view) = _dataByPlane.at(view).back()._charge;
     // Check the auto range values:
@@ -107,6 +112,24 @@ float DrawHit::maxCharge(size_t p) {
 
 
 }
+
+std::vector<Hit> DrawHit::getHitsOnWirePlane(size_t wire, size_t plane) {
+  std::vector<Hit> result;
+
+  if (plane >= geoService->Nviews() ) {
+    std::cerr << "ERROR: Request for nonexistent plane " << plane << std::endl;
+    return result;
+  }
+  else {
+    for (auto & hit : _dataByPlane.at(plane)) {
+      if (hit.wire() == wire)
+        result.emplace_back(hit);
+    }
+  }
+
+  return result;
+}
+
 
 bool DrawHit::finalize() {
 

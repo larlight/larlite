@@ -234,7 +234,6 @@ if __name__ == '__main__':
     # if len(sys.argv) < 2:
     #     print '\nUsage: %s larsoft_file.root [outputfile.fcl]\n'%sys.argv[0]
     #     quit()
-
     args=parser.parse_args()
 
     if args.argoneut:

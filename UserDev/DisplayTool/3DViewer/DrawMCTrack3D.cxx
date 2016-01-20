@@ -1,19 +1,18 @@
-#ifndef DRAWTRACK3D_CXX
-#define DRAWTRACK3D_CXX
+#ifndef DRAWMCMCTRACK3D_CXX
+#define DRAWMCTRACK3D_CXX
 
-#include "DrawTrack3D.h"
-#include "DataFormat/track.h"
+#include "DrawMCTrack3D.h"
 #include "LArUtil/DetectorProperties.h"
 
 namespace evd {
 
 
-DrawTrack3D::DrawTrack3D() {
-  _name = "DrawTrack3D";
+DrawMCTrack3D::DrawMCTrack3D() {
+  _name = "DrawMCTrack3D";
   _fout = 0;
 }
 
-bool DrawTrack3D::initialize() {
+bool DrawMCTrack3D::initialize() {
 
   // Resize data holder
   // if (_data.size() != geoService -> Nviews()) {
@@ -22,7 +21,7 @@ bool DrawTrack3D::initialize() {
   return true;
 }
 
-bool DrawTrack3D::analyze(larlite::storage_manager* storage) {
+bool DrawMCTrack3D::analyze(larlite::storage_manager* storage) {
 
   //
   // Do your event-by-event analysis here. This function is called for
@@ -46,25 +45,24 @@ bool DrawTrack3D::analyze(larlite::storage_manager* storage) {
 
 
   // get a handle to the tracks
-  auto trackHandle = storage->get_data<larlite::event_track>(_producer);
+  auto mctrackHandle = storage->get_data<larlite::event_mctrack>(_producer);
 
   // Clear out the hit data but reserve some space for the showers
   for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
     _data.clear();
-    _data.reserve(trackHandle -> size());
+    _data.reserve(mctrackHandle -> size());
   }
 
 
   // Populate the track vector:
-  for (auto & track : *trackHandle) {
-    _data.push_back(getTrack3d(track));
+  for (auto & mctrack : *mctrackHandle) {
+      _data.push_back(getMCTrack3d(mctrack));
   }
-
-
+  
   return true;
 }
 
-bool DrawTrack3D::finalize() {
+bool DrawMCTrack3D::finalize() {
 
   // This function is called at the end of event loop.
   // Do all variable finalization you wish to do here.
@@ -81,14 +79,14 @@ bool DrawTrack3D::finalize() {
   return true;
 }
 
-DrawTrack3D::~DrawTrack3D() {}
+DrawMCTrack3D::~DrawMCTrack3D(){}
 
-Track3D DrawTrack3D::getTrack3d(larlite::track track) {
-  Track3D result;
-  for (size_t i = 0; i < track.NumberTrajectoryPoints(); i++) {
+MCTrack3D DrawMCTrack3D::getMCTrack3d(larlite::mctrack mctrack) {
+  MCTrack3D result;
+  for (size_t i = 0; i < mctrack.size(); i++) {
     // project a point into 2D:
     try {
-      result._track.push_back(track.LocationAtPoint(i));
+      result._track.push_back(mctrack.at(i).Position().Vect());
     }
     catch (...) {
       continue;

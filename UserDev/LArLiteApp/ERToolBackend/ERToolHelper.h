@@ -44,7 +44,6 @@ public:
         _minEDep = 1.e-10;
 
         // get the detector width and total time of a singel fram
-        auto geom = ::larutil::Geometry::GetME();
         _DetWidth = 2 * geom->DetHalfWidth();
         _DetFramePeriod = 1.6E6; //ns, TODO: Fill this not by hand but from a better source
 
@@ -121,6 +120,8 @@ private:
     EMShowerProfile _shrProfiler;
 
     bool _disable_xshift;
+
+    const ::larutil::Geometry *geom = ::larutil::Geometry::GetME();
 };
 }
 
