@@ -35,6 +35,7 @@ namespace ertool {
       kPion,
       kMuon,
       kPIDA,
+      kMIPy,
       kTrackPartIDMax
     };
 
