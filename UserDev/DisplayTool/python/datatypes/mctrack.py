@@ -75,12 +75,11 @@ try:
             self._productName = 'mctrack3D'
             self._process = evd.DrawMCTrack3D()
             self.init()
-
+            self._mesh = gl.MeshData()
 
         def drawObjects(self, view_manager):
             geom = view_manager._geometry
             view = view_manager.getView()
-
 
 
             tracks = self._process.getData()
@@ -109,6 +108,13 @@ try:
                 self._drawnObjects.append(line)
 
     
+    # # Just be stupid and try to draw something:
+    # cylinderPoints = gl.MeshData.cylinder(2,50,radius=[0,1],length=1)
+    # cylinder = gl.GLMeshItem(meshdata=cylinderPoints,drawEdges=False,shader='shaded', glOptions='opaque')
+    # cylinder.scale(10,10,10)
+    # # cylinder.setGLOptions("additive")
+    # self.addItem(cylinder)
+
 
 except Exception, e:
     pass

@@ -91,6 +91,7 @@ class larlitegui(gui):
         self.initUI()
         self._event_manager.fileChanged.connect(self.drawableProductsChanged)
         self._event_manager.eventChanged.connect(self.update)
+        self._event_manager.truthLabelChanged.connect(self.updateMessageBar)
 
     # override the initUI function to change things:
     def initUI(self):
@@ -152,6 +153,12 @@ class larlitegui(gui):
         self._startDrawBox.stateChanged.connect(self.startDrawBoxWorker)
         self._eastLayout.addWidget(self._startDrawBox)
 
+        # Set a box for mcTruth Info
+        self._truthDrawBox = QtGui.QCheckBox("MC Truth")
+        self._truthDrawBox.stateChanged.connect(self.truthDrawBoxWorker)
+        self._eastLayout.addWidget(self._truthDrawBox)
+
+
         # Now we get the list of items that are drawable:
         drawableProducts = self._event_manager.getDrawableProducts()
         # print drawableProducts
@@ -209,6 +216,15 @@ class larlitegui(gui):
             self._event_manager.toggleParams(False)
 
         self._view_manager.drawPlanes(self._event_manager)
+
+    def truthDrawBoxWorker(self):
+        if self._truthDrawBox.isChecked():
+            self._event_manager.toggleTruth(True)
+        else:
+            self._event_manager.toggleTruth(False)
+
+        self._event_manager.drawFresh()
+        # gui.py defines the message bar and handler, connect it to this:
 
     def recoBoxHandler(self, text):
         sender = self.sender()

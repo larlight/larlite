@@ -100,7 +100,7 @@ class microboone(geometry):
         super(microboone, self).__init__()
         self._levels = [(-100, 10), (-10, 100), (-10, 200)]
         # self._colorScheme =
-        self._time2Cm = 0.05515
+        # self._time2Cm = 0.05515
         self._aspectRatio = self._wire2Cm / self._time2Cm
         self._pedestals = [2000, 2000, 440]
         self._name = "uboone"
@@ -311,7 +311,7 @@ class argoneut(geometry):
         # and then call the base class __init__
         larutil.LArUtilManager.Reconfigure(fmwk.geo.kArgoNeuT)
         super(argoneut, self).__init__()
-        self._levels = [(-15, 60), (-5, 80)]
+        self._levels = [(-15, 60), (-35, 100)]
         self._pedestals = [0, 0]
         self._name = "argoneut"
         self._offset = []

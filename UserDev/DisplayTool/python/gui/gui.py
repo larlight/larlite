@@ -508,7 +508,7 @@ class gui(QtGui.QWidget):
 
 
   def getSouthLayout(self):
-    # This layout contains the status bar and the capture screen buttons
+    # This layout contains the status bar, message bar, and the capture screen buttons
 
     # The screen capture button:
     self._screenCaptureButton = QtGui.QPushButton("Capture Screen")
@@ -520,11 +520,17 @@ class gui(QtGui.QWidget):
     self._statusBar = QtGui.QStatusBar()
     self._statusBar.showMessage("Test message")
     self._southLayout.addWidget(self._statusBar)
+    self._messageBar = QtGui.QStatusBar()
+    self._southLayout.addWidget(self._messageBar)
     # self._southLayout.addStretch(1)
     self._southLayout.addWidget(self._screenCaptureButton)
     self._southWidget.setLayout(self._southLayout)
 
     return self._southWidget
+
+  def updateMessageBar(self,message):
+    print "Received a message: {msg}".format(msg=message)
+    self._messageBar.showMessage(message)
 
   def getEastLayout(self):
     # This function just makes a dummy eastern layout to use.
