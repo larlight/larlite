@@ -501,6 +501,7 @@ void ERToolHelper::FillTracks ( const event_mctrack&  mct_v,
 		t._energy     = (*mct.begin()).Momentum().E() - (*mct.rbegin()).Momentum().E();
 		t._cosmogenic = (double)(mct.Origin() == simb::kCosmicRay);
 		t._time = mct.at(0).T();
+		t._dedx = mct.dEdx();
 
 		if (abs(mct.PdgCode()) == 13 ) t._pid = ::ertool::Track::kMuon;
 		if (mct.PdgCode() == 2212    ) t._pid = ::ertool::Track::kProton;
@@ -543,7 +544,7 @@ void ERToolHelper::FillTracks ( const event_track&  trk_v,
 			t += trk.LocationAtPoint(i);
 
 		t._cosmogenic = -1;
-		t._energy     = trk.MomentumAtPoint(0);
+		t._energy     = trk.MomentumAtPoint(0);		
 
 	}
 
