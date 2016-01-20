@@ -63,6 +63,7 @@ namespace ertool {
 
     TTree * _match_tree;
     double _mct;
+    double _mct_x;
     double _ft;
     double _e;
 
