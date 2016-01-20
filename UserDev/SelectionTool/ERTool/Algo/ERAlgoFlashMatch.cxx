@@ -19,7 +19,7 @@ namespace ertool {
 
   ERAlgoFlashMatch::ERAlgoFlashMatch(const std::string& name) : AlgoBase(name)
   {
-  _match_tree=0;
+    _match_tree = 0;
   }
 
   void ERAlgoFlashMatch::Reset()
@@ -35,28 +35,6 @@ namespace ertool {
     ertool_cfg_file = std::string(getenv("LARLITE_BASEDIR")) + "/" + ertool_cfg_file;
 
     std::stringstream ss;
-    //
-    // Flash Match algorithm (required)
-    //
-    std::string match_alg = p.get<std::string>( "Match" );
-    if      ( match_alg == "QLLMatch"     ) _mgr.SetAlgo( new ::flashana::QLLMatch     () );
-    else if ( match_alg == "CommonAmps"   ) _mgr.SetAlgo( new ::flashana::CommonAmps   () );
-    else if ( match_alg == "QWeightPoint" ) _mgr.SetAlgo( new ::flashana::QWeightPoint () );
-    else {
-      ss << "Unknown Match algorithm: " << match_alg.c_str();
-      throw ERException(ss.str());
-    }
-
-    //
-    // Flash Hypothesis algorithm (required)
-    //
-    std::string hypothesis_alg = p.get<std::string>( "Hypothesis" );
-    if      ( hypothesis_alg == "PhotonLibHypothesis" ) _mgr.SetAlgo( new ::flashana::PhotonLibHypothesis () );
-    else if ( hypothesis_alg == "ChargeAnalytical"    ) _mgr.SetAlgo( new ::flashana::ChargeAnalytical    () );
-    else {
-      ss << "Unknown Hypothesis algorithm: " << hypothesis_alg.c_str();
-      throw ERException(ss.str());
-    }
 
     //
     // TPC filter algorithm (optional)
@@ -78,6 +56,7 @@ namespace ertool {
       throw ERException(ss.str());
     }
 
+
     //
     // Match Prohibit algorithm (optional)
     //
@@ -88,36 +67,62 @@ namespace ertool {
       throw ERException(ss.str());
     }
 
+    //
+    // Flash Hypothesis algorithm (required)
+    //
+    std::string hypothesis_alg = p.get<std::string>( "Hypothesis" );
+    if      ( hypothesis_alg == "PhotonLibHypothesis" ) _mgr.SetAlgo( new ::flashana::PhotonLibHypothesis () );
+    else if ( hypothesis_alg == "ChargeAnalytical"    ) _mgr.SetAlgo( new ::flashana::ChargeAnalytical    () );
+    else {
+      ss << "Unknown Hypothesis algorithm: " << hypothesis_alg.c_str();
+      throw ERException(ss.str());
+    }
+
+    //
+    // Flash Match algorithm (required)
+    //
+    std::string match_alg = p.get<std::string>( "Match" );
+    if      ( match_alg == "QLLMatch"     ) _mgr.SetAlgo( new ::flashana::QLLMatch     () );
+    else if ( match_alg == "CommonAmps"   ) _mgr.SetAlgo( new ::flashana::CommonAmps   () );
+    else if ( match_alg == "QWeightPoint" ) _mgr.SetAlgo( new ::flashana::QWeightPoint () );
+    else {
+      ss << "Unknown Match algorithm: " << match_alg.c_str();
+      throw ERException(ss.str());
+    }
+
+
     _mgr.Configure(ertool_cfg_file);
 
     // Kaleko can't get this to work. happy for someone else to implement instead of setter function.
     // LP.Configure(cfg.get_pset("LightPath"));
-    LP.SetUseXOffset(false);
+    LP.SetUseXOffset(true);
   }
 
   void ERAlgoFlashMatch::ProcessBegin()
   {
-  if(!_match_tree){
-    _match_tree=new TTree("match_tree","match_tree");
-    _match_tree->Branch("_mct", &_mct, "mct/D");
-    _match_tree->Branch("_ft", &_ft, "ft/D");
-    _match_tree->Branch("_e", &_e, "e/D");
-     }
+    if (!_match_tree) {
+      _match_tree = new TTree("match_tree", "match_tree");
+      _match_tree->Branch("_mct", &_mct, "mct/D");
+      _match_tree->Branch("_mct_x", &_mct_x, "mct_x/D");
+      _match_tree->Branch("_ft", &_ft, "ft/D");
+      _match_tree->Branch("_e", &_e, "e/D");
+    }
   }
 
   void ERAlgoFlashMatch::ProcessEnd(TFile* fout)
   {
-  if (fout) {
-    fout->cd();
-    _match_tree->Write();
+    if (fout) {
+      fout->cd();
+      _match_tree->Write();
     }
-   }
+  }
 
   bool ERAlgoFlashMatch::Reconstruct(const EventData &data, ParticleGraph& graph)
   {
     // OpT0Helper helper;
 
     _mgr.Reset();
+    // _mgr.PrintConfig();
 
     std::multimap<double, std::pair<NodeID_t, FlashID_t> > score_m;
 
@@ -127,7 +132,7 @@ namespace ertool {
 
     for (auto const& base_node_id : graph.GetBaseNodes() ) {
 
-       auto const& base_part = graph.GetParticle(base_node_id);
+      auto const& base_part = graph.GetParticle(base_node_id);
 
       if (base_part.RecoType() == kShower) continue;
 
@@ -158,19 +163,34 @@ namespace ertool {
       ::flashana::QCluster_t clusters;
       clusters.clear();
       // Implement LightPath
+      // std::cout<<"size of track_v is "<<track_v.size()<<std::endl;
       for (auto const& id : track_v) {
 
         auto const& track = data.Track(id);
+
+        if ( track._time < -2050000 || track._time > 2750000 ) continue;
 
         if (track.size() < 2) continue;
 
         if (!track.IsLonger(0.1)) continue;
 
         cluster.reserve(track.size());
+
+        // per track calculate the shift in x-direction
+        // so that the x-position is what would be seen
+        // in the TPC, not the truth x-position
+        // Some constants needed
+        //double det_drift_velocity = ::larutil::LArProperties::GetME()->DriftVelocity(); ///< cm/us
+        double det_drift_velocity = 0.11143588585879627;
+        double event_time = track._time; // ns
+        double shift_x = event_time * det_drift_velocity * pow(10, -3); //cm
+        LP.SetXOffset(shift_x);
+
         cluster = LP.FlashHypothesis(track);
         clusters += cluster;
       }
       //
+      if (!clusters.size()) continue;
 
       clusters.idx = i; //base_node_id;
       //std::cout<<clusters.size()<<" ";
@@ -203,11 +223,11 @@ namespace ertool {
     auto const res = _mgr.Match();
 
     std::set<NodeID_t> nu_candidates;
-    // std::cout << res.size() << " match found..." << std::endl;
+    // std::cout << "ERAlgoFlashMatch: " << res.size() << " match found..." << std::endl;
     for (auto const& match : res ) {
       //std::cout<<"TPC: "<<match.tpc_id<<"/"<<base_id_v.size()<<std::endl;
       //std::cout<<"Flash: "<<match.flash_id<<"/"<<flash_id_v.size()<<std::endl;
-      auto const& nord_id  = base_id_v[match.tpc_id];
+      auto const& node_id  = base_id_v[match.tpc_id];
       auto const& flash_id = flash_id_v[match.flash_id];
 
       // The base particle's node is associated with the flash.
@@ -216,23 +236,24 @@ namespace ertool {
       // make the user do something like this if they want to
       // find the flash associated with an arbitrary particle:
       // particlegraph.GetParticle( particle.Ancestor() ).FlashID()
-      // std::cout << "Setting the flashID for node " << nord_id << " to " << flash_id << std::endl;
-      graph.SetFlashID(nord_id, flash_id);
+      // std::cout << "Setting the flashID for node " << node_id << " to " << flash_id << std::endl;
+      graph.SetFlashID(node_id, flash_id);
 
       auto const& flash = data.Flash(flash_id);
-      auto& part = graph.GetParticle(nord_id);
+      auto& part = graph.GetParticle(node_id);
       //std::cout << "Setting the flashID for the particle itself!"<<std::endl;
       //part.SetFlashID(flash_id);
 
 
       auto const& data_t = data.Track(part.RecoID());
 
-      _mct = data_t._time/1000 ;
+      _mct = data_t._time / 1000 ;
+      _mct_x = data_t.at(0).at(0);
       _ft  = flash._t ;
       _e   = data_t._energy ;
 
       if ( _beam_dt_min < flash._t && flash._t < _beam_dt_max ) {
-        nu_candidates.insert(nord_id);
+        nu_candidates.insert(node_id);
         //std::cout<<"Nu?! "<<flash._z<<" vs "<<match.tpc_point.z<<std::endl;
       }
       else {
@@ -245,7 +266,7 @@ namespace ertool {
         //std::cout<<"Cosmic.. "<<flash._z<<" vs "<<match.tpc_point.z<<" @ "<<flash._t<<std::endl;
       }
 
-    _match_tree->Fill();
+      _match_tree->Fill();
 
     }
 
