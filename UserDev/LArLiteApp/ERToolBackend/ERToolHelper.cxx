@@ -741,8 +741,14 @@ void ERToolHelper::FillFlashes ( const event_opflash& flash_v,
 		erflash._x = 0;
 		erflash._y = f.YCenter();
 		erflash._z = f.ZCenter();
-		erflash._npe_v.reserve(32);
-		for (size_t i = 0; i < 32; ++i) erflash._npe_v.push_back(f.PE(i));
+
+		/// _npe_v must be ordered in terms of OpDetChannel,
+		/// NOT just a loop over event_opflash.
+		erflash._npe_v.resize(geom->NOpDets());
+		for (unsigned int i = 0; i < geom->NOpDets(); i++) {
+			unsigned int opdet = geom->OpDetFromOpChannel(i);
+			erflash._npe_v[opdet] = f.PE(i);
+		}
 		erflash._t = f.Time();
 
 		::ertool::RecoInputID_t id(flash_index, flash_v.name());

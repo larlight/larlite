@@ -61,6 +61,13 @@ namespace ertool {
 
     double _beam_dt_min, _beam_dt_max;
 
+    TTree * _match_tree;
+    double _mct;
+    double _mct_x;
+    double _ft;
+    double _e;
+
+
   };
 }
 #endif

@@ -78,6 +78,8 @@ namespace flashana {
     /// Configuration option: true => allows an assignment of the same flash to multiple TPC objects
     void CanReuseFlash(bool ok=true)
     { _allow_reuse_flash = ok; }
+
+    void PrintConfig();
     
   private:
 
