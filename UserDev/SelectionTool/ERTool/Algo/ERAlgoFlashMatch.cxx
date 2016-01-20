@@ -20,6 +20,9 @@ namespace ertool {
   ERAlgoFlashMatch::ERAlgoFlashMatch(const std::string& name) : AlgoBase(name)
   {
     _match_tree = 0;
+    // This should come from config file... these are just guesses for right now.
+    _beam_dt_min = -10.;
+    _beam_dt_max = 100.;
   }
 
   void ERAlgoFlashMatch::Reset()
@@ -244,13 +247,20 @@ namespace ertool {
       //std::cout << "Setting the flashID for the particle itself!"<<std::endl;
       //part.SetFlashID(flash_id);
 
-
-      auto const& data_t = data.Track(part.RecoID());
-
-      _mct = data_t._time / 1000 ;
-      _mct_x = data_t.at(0).at(0);
-      _ft  = flash._t ;
-      _e   = data_t._energy ;
+      if (part.RecoType() == kTrack) {
+        auto const& data_t = data.Track(part.RecoID());
+        _mct = data_t._time / 1000 ;
+        _mct_x = data_t.at(0).at(0);
+        _ft  = flash._t ;
+        _e   = data_t._energy ;
+      }
+      else if (part.RecoType() == kShower) {
+        auto const& data_t = data.Shower(part.RecoID());
+        _mct = data_t._time / 1000 ;
+        _mct_x = data_t.Start().at(0);
+        _ft  = flash._t ;
+        _e   = data_t._energy ;
+      }
 
       if ( _beam_dt_min < flash._t && flash._t < _beam_dt_max ) {
         nu_candidates.insert(node_id);
@@ -268,10 +278,12 @@ namespace ertool {
 
       _match_tree->Fill();
 
+
     }
 
     //all base particles that were not matched to a flash are set as kCosmic
     for (auto const& node_id : graph.GetBaseNodes()) {
+      // std::cout << "Checking if node " << node_id << " is in potential nu candidates..." << std::endl;
 
       auto& part = graph.GetParticle(node_id);
 
@@ -284,6 +296,7 @@ namespace ertool {
                              part.Momentum(),
                              part.RecoScore(),
                              kCosmic);
+
     }
 
     return true;
