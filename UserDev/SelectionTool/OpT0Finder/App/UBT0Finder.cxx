@@ -97,6 +97,8 @@ namespace larlite {
   bool UBT0Finder::analyze(storage_manager* storage) {
 
     _mgr.Reset();
+    // _mgr.PrintConfig();
+
     const ::larutil::Geometry* g = ::larutil::Geometry::GetME();
 
     auto ev_flash = storage->get_data<event_opflash>("opflash");// opflash");
@@ -205,11 +207,9 @@ namespace larlite {
       _mcqclustering.Construct(*ev_mctrack, *ev_mcshower);
       _mcqclustering.Swap(std::move(qcluster_v), std::move(source_v));
 
-      for (auto& qcluster : qcluster_v) {
+      for (auto& qcluster : qcluster_v) 
         if ( qcluster.idx != -1 )
           _mgr.Emplace(std::move(qcluster));
-
-      }
 
       for (auto const& s : source_v) {
 
@@ -279,6 +279,7 @@ namespace larlite {
     }
     */
     auto const res = _mgr.Match();
+    // std::cout << "UBT0FINDER: " << res.size() << " matches found." << std::endl;
     ::geoalgo::LineSegment line;
     ::geoalgo::Point_t pt(0, 0, 0);
     ::geoalgo::GeoAlgo geoalg;
@@ -336,6 +337,8 @@ namespace larlite {
         //}
         //_mc_dx = max_x - min_x;
 //        if ( mct[0].E() - mct[mct.size() - 1].E() > _e_diff )
+       
+
         _time_diff->Fill(1000 * (_flash_time - _mc_time)); //
       }
       _flashmatch_tree->Fill();
