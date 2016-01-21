@@ -96,9 +96,6 @@ namespace ertool {
 
     _mgr.Configure(ertool_cfg_file);
 
-    // Kaleko can't get this to work. happy for someone else to implement instead of setter function.
-    // LP.Configure(cfg.get_pset("LightPath"));
-    LP.SetUseXOffset(true);
   }
 
   void ERAlgoFlashMatch::ProcessBegin()
@@ -178,16 +175,6 @@ namespace ertool {
         if (!track.IsLonger(0.1)) continue;
 
         cluster.reserve(track.size());
-
-        // per track calculate the shift in x-direction
-        // so that the x-position is what would be seen
-        // in the TPC, not the truth x-position
-        // Some constants needed
-        //double det_drift_velocity = ::larutil::LArProperties::GetME()->DriftVelocity(); ///< cm/us
-        double det_drift_velocity = 0.11143588585879627;
-        double event_time = track._time; // ns
-        double shift_x = event_time * det_drift_velocity * pow(10, -3); //cm
-        LP.SetXOffset(shift_x);
 
         cluster = LP.FlashHypothesis(track);
         clusters += cluster;
