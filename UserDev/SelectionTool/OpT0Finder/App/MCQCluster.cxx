@@ -142,11 +142,12 @@ namespace flashana {
 
       if (_use_light_path) {
 
-        _lightpath_clustering.SetXOffset(shift_x);
+        //_lightpath_clustering.SetXOffset(shift_x);
 
         ::geoalgo::Trajectory mctraj;
         for (size_t i = 0; i < trk.size(); ++i)
-          mctraj.push_back(::geoalgo::Vector(trk.at(i).X(), trk.at(i).Y(), trk.at(i).Z()));
+	  //Instead of adding x shift in LightPath, now add x shift line below
+	  mctraj.push_back(::geoalgo::Vector(trk.at(i).X()+shift_x, trk.at(i).Y(), trk.at(i).Z()));
 
         auto qclus = _lightpath_clustering.FlashHypothesis(mctraj);
 

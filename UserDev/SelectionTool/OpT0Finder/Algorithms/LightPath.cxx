@@ -13,9 +13,9 @@ namespace flashana {
     , _gap         ( 0.5    )
     , _light_yield ( 29000. )
     , _dEdxMIP     ( 2.3    )//1.6 * 1.4 = 2.24
-    , _n           (0       )
-    , _use_offset  ( true   )
     , _vfiducial   (ActiveVolume())
+    , _n           (0       )
+      //, _use_offset  ( true   )  
   {}
 
   void LightPath::Configure(const ::fcllite::PSet &pset)
@@ -26,7 +26,7 @@ namespace flashana {
     _gap         = pset.get< double > ( "SegmentSize" );
     _light_yield = pset.get< double > ( "LightYield"  );
     _dEdxMIP     = pset.get< double > ( "MIPdEdx"     );
-    _use_offset  = pset.get< bool   > ( "UseXOffset"  );
+    //_use_offset  = pset.get< bool   > ( "UseXOffset"  );
   }
 
   void LightPath::SetVolume () {
@@ -41,13 +41,13 @@ namespace flashana {
     double dist = pt_1.Dist(pt_2);
     QPoint_t q_pt;
 
-    if (_vfiducial.Contain(pt_1)*_vfiducial.Contain(pt_2) == 0) return;
+    //if (_vfiducial.Contain(pt_1)*_vfiducial.Contain(pt_2) == 0) return;
 
     if (dist <= _gap) {
       ::geoalgo::Vector mid_pt((pt_1 + pt_2) / 2.);
       q_pt.x = mid_pt[0];
-      if (_use_offset)
-        q_pt.x += _offset;
+      //if (_use_offset)
+      //q_pt.x += _offset;
       q_pt.y = mid_pt[1];
       q_pt.z = mid_pt[2];
       q_pt.q = _dEdxMIP * _light_yield * dist;
@@ -67,8 +67,8 @@ namespace flashana {
       if (div_index < num_div) {
         auto const mid_pt = pt_2 + direct * (_gap * div_index + _gap / 2.);
         q_pt.x = mid_pt[0] ;
-        if (_use_offset)
-          q_pt.x += _offset;
+        //if (_use_offset)
+	//q_pt.x += _offset;
 
         q_pt.y = mid_pt[1];
         q_pt.z = mid_pt[2];
@@ -79,9 +79,8 @@ namespace flashana {
         double weight = (dist - int(dist / _gap) * _gap);
         auto const mid_pt = pt_2 + direct * (_gap * div_index + weight / 2.);
         q_pt.x = mid_pt[0] ;
-        if (_use_offset)
-          q_pt.x += _offset;
-
+        //if (_use_offset)
+	//q_pt.x += _offset;
         q_pt.y = mid_pt[1];
         q_pt.z = mid_pt[2];
         q_pt.q = weight * _dEdxMIP * _light_yield;
