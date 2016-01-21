@@ -101,8 +101,20 @@ void ERToolHelper::FillMCInfo(const event_mcflux&    mcf_v,
 		// Fill track info
 		t.reserve(mct.size());
 		TLorentzVector shift = getXShift(mct);
-		for (auto const& step : mct)
-			t += (step.Position() + shift);
+		Size_t const mct_size = mct.size();
+		std::vector<double> const & mct_dedx = mct.dEdx();
+		std::vector<double> & ert_dedx = t._dedx;
+
+		for(Size_t i = 0; i < mct_size; ++i) {
+
+		  geoalgo::Point_t p(mct.at(i).Position() + shift);
+		  if(!(t.size() && t.back() == p) && i) {
+		    ert_dedx.push_back(mct_dedx.at(i-1));
+		  }
+		  
+		  t += (p);
+
+		}
 
 		::ertool::NodeID_t nodeID;
 		// Check minimum number of physical steps
@@ -118,8 +130,7 @@ void ERToolHelper::FillMCInfo(const event_mcflux&    mcf_v,
 			if (abs(mct.PdgCode()) == 211) t._pid = ::ertool::Track::kPion;
 			for (auto& v : t._pid_score) v = 100;
 			if (t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
-			//Add dEdx of track
-			t._dedx = mct.dEdx();
+		
 			::ertool::RecoInputID_t in_id(i, mct_v.name());
 
 			// Emplace a track to EventData
@@ -491,26 +502,36 @@ void ERToolHelper::FillTracks ( const event_mctrack&  mct_v,
 		::ertool::Track t;
 		t.reserve(mct.size());
 		TLorentzVector shift = getXShift(mct);
-		for (auto const& step : mct)
-			t += (step.Position() + shift);
+		Size_t const mct_size = mct.size();
+		std::vector<double> const & mct_dedx = mct.dEdx();
+		std::vector<double> & ert_dedx = t._dedx;
+		
+		for(Size_t i = 0; i < mct_size; ++i) {
+		  
+		  geoalgo::Point_t p(mct.at(i).Position() + shift);
+		  if(!(t.size() && t.back() == p) && i) {
+		    ert_dedx.push_back(mct_dedx.at(i-1));
+		  }
+		  
+		  t += (p);
+		  
+		}
 
 		if (t.size() < 2) continue;
-
+				
 		//This is the TOTAL energy minus TOTAL energy, so mass is removed.
 		//If you want only initial kinetic energy, remember to subtract off mass.
 		t._energy     = (*mct.begin()).Momentum().E() - (*mct.rbegin()).Momentum().E();
 		t._cosmogenic = (double)(mct.Origin() == simb::kCosmicRay);
 		t._time = mct.at(0).T();
-		t._dedx = mct.dEdx();
-
+	
 		if (abs(mct.PdgCode()) == 13 ) t._pid = ::ertool::Track::kMuon;
 		if (mct.PdgCode() == 2212    ) t._pid = ::ertool::Track::kProton;
 		if (abs(mct.PdgCode()) == 321) t._pid = ::ertool::Track::kKaon;
 		if (abs(mct.PdgCode()) == 211) t._pid = ::ertool::Track::kPion;
 		for (auto& v : t._pid_score) v = 100;
 		if (t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
-		t._dedx = mct.dEdx();
-
+	
 		strm.Emplace(std::move(t), std::move(ertool::RecoInputID_t(i, mct_v.name())), false);
 		//strm.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
 		/*
