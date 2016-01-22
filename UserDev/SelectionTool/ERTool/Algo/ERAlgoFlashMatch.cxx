@@ -93,6 +93,11 @@ namespace ertool {
       throw ERException(ss.str());
     }
 
+    //
+    // Custom algo (configured from fcl file but not executed)
+    //
+    std::string LP_alg =  p.get<std::string>( "Custom" );
+    if (LP_alg == "LightPath") _mgr.AddCustomAlgo( new ::flashana::LightPath() );
 
     _mgr.Configure(ertool_cfg_file);
 
