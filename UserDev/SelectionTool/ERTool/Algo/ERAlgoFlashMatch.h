@@ -58,6 +58,7 @@ namespace ertool {
     ::flashana::FlashMatchManager _mgr;
 
     ::flashana::LightPath LP;
+    double _light_yield; // Photons per MEV, gotten from LightPath configured instance
 
     double _beam_dt_min, _beam_dt_max;
 

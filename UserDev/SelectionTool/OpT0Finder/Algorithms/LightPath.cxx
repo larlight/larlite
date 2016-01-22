@@ -33,7 +33,7 @@ namespace flashana {
       q_pt.z = mid_pt[2];
       q_pt.q = _dEdxMIP * _light_yield * dist;
       Q_cluster.emplace_back(q_pt);
-      
+
       return;
     }
 
@@ -48,7 +48,7 @@ namespace flashana {
       if (div_index < num_div) {
         auto const mid_pt = pt_2 + direct * (_gap * div_index + _gap / 2.);
         q_pt.x = mid_pt[0] ;
-	q_pt.y = mid_pt[1];
+        q_pt.y = mid_pt[1];
         q_pt.z = mid_pt[2];
         q_pt.q = _gap * _dEdxMIP * _light_yield;
         Q_cluster.emplace_back(q_pt);
@@ -57,7 +57,7 @@ namespace flashana {
         double weight = (dist - int(dist / _gap) * _gap);
         auto const mid_pt = pt_2 + direct * (_gap * div_index + weight / 2.);
         q_pt.x = mid_pt[0] ;
-	q_pt.y = mid_pt[1];
+        q_pt.y = mid_pt[1];
         q_pt.z = mid_pt[2];
         q_pt.q = weight * _dEdxMIP * _light_yield;
         Q_cluster.emplace_back(q_pt);
@@ -76,10 +76,8 @@ namespace flashana {
 
       LightPath::QCluster(this_loc, last_loc, result);
     }
-    
     return result;
   }
-
 
 }
 

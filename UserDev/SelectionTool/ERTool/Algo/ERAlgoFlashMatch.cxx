@@ -101,6 +101,11 @@ namespace ertool {
 
     _mgr.Configure(ertool_cfg_file);
 
+    /// Get the photons-per-MEV light yield from configured LightPath instance.
+    // This is used for hacky flash matching for SHOWER particles done in this code
+    // rather than inside of LightPath
+    _light_yield = LP.GetLightYield();
+
   }
 
   void ERAlgoFlashMatch::ProcessBegin()
@@ -164,10 +169,10 @@ namespace ertool {
       else if (base_part.RecoType() == kShower) shower_v.push_back(base_part.RecoID());
 
       //auto cluster = helper.GetQCluster(data, shower_v, track_v);
-      ::flashana::QCluster_t cluster;
+
       ::flashana::QCluster_t clusters;
       clusters.clear();
-      // Implement LightPath
+      // Implement LightPath for track particles
       // std::cout<<"size of track_v is "<<track_v.size()<<std::endl;
       for (auto const& id : track_v) {
 
@@ -179,12 +184,24 @@ namespace ertool {
 
         if (!track.IsLonger(0.1)) continue;
 
-        cluster.reserve(track.size());
-
-        cluster = LP.FlashHypothesis(track);
-        clusters += cluster;
+        clusters += LP.FlashHypothesis(track);
       }
-      //
+
+      // Implement LightPath for shower particles
+      for (auto const& id : shower_v) {
+        auto const& shower = data.Shower(id);
+
+        ::flashana::QPoint_t q_pt;
+        // Shower Qcluster is a single point in the "center" of the shower
+        auto mypoint = shower.Start() + shower.Dir() * shower.Length() / 2;
+        q_pt.x = mypoint[0];
+        q_pt.y = mypoint[1];
+        q_pt.z = mypoint[2];
+        //energy * lightyield = charge
+        q_pt.q = shower._energy * _light_yield;
+        clusters.emplace_back(q_pt);
+      }
+
       if (!clusters.size()) continue;
 
       clusters.idx = i; //base_node_id;
