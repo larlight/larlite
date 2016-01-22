@@ -30,7 +30,7 @@ namespace flashana{
    doxygen documentation!
  */
 
-  class LightPath : flashana::BaseAlgorithm {
+  class LightPath : public flashana::BaseAlgorithm {
     
   public:
     
