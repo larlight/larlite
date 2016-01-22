@@ -7,8 +7,8 @@ namespace flashana {
 
   LightPath::LightPath(const std::string name)
     : BaseAlgorithm(kCustomAlgo, name)
-    , _start_bool  ( true   )
-    , _end_bool    ( true   )
+    , _start_bool  ( false  )
+    , _end_bool    ( false  )
     , _pl_ext      ( false  )
     , _gap         ( 0.5    )
     , _light_yield ( 29000. )
