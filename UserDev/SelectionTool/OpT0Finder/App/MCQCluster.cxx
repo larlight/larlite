@@ -15,9 +15,7 @@ namespace flashana {
     , _light_yield ( 29000 )
     , _step_size   ( 0.5   )
     , _use_xshift  ( true  )
-  {
-    _lightpath_clustering.SetVolume();
-  }
+  {}
 
   void MCQCluster::Configure(const ::fcllite::PSet &pset)
   {
