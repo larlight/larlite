@@ -29,7 +29,7 @@ namespace larlite {
     hMatchCorrectness = nullptr;
 
     fMMQualityTree = nullptr;
-
+    
     _mcshowerTot    = 0;
     _recoClusterTot = 0;
   }
@@ -174,14 +174,20 @@ namespace larlite {
 	return false;
       }
     }
-
+    
     event_cluster* ev_cluster = nullptr;
+    
+    // association vector
+    AssSet_t ass_cluster_v;
 
     if(ev_shower) {
     
-      auto const& ass_cluster_v = storage->find_one_ass(ev_shower->id(),ev_cluster,ev_shower->name());
-      if (!ev_cluster || (!ev_shower->empty() && ass_cluster_v.empty()))
+      ass_cluster_v = storage->find_one_ass(ev_shower->id(),ev_cluster,ev_shower->name());
+
+      if (!ev_cluster || (!ev_shower->empty() && ass_cluster_v.empty())){
 	print(msg::kERROR,__FUNCTION__,Form("No associated cluster found to a shower produced by \"%s\"",fShowerProducer.c_str()));
+	return false;
+      }
     }else{
       ev_cluster = storage->get_data<event_cluster>(fClusterProducer);
       if(!ev_cluster || !(ev_cluster->size())) {
@@ -192,7 +198,11 @@ namespace larlite {
 
     // get associated hits
     event_hit* ev_hit = nullptr;
-    auto const& ass_hit_v = storage->find_one_ass(ev_cluster->id(),ev_hit,ev_cluster->name());
+
+    // association vector (to clusters)
+    AssSet_t ass_hit_v;
+
+    ass_hit_v = storage->find_one_ass(ev_cluster->id(),ev_hit,ev_cluster->name());
     if (!ev_hit)
       print(msg::kERROR,__FUNCTION__,Form("No associated hit found to a cluster produced by \"%s\"",ev_cluster->name().c_str()));
 
@@ -268,10 +278,10 @@ namespace larlite {
       
       
       if(_purity&&_efficiency) {
-      
-      // get associated hits                                                                                                                                                     
-	event_hit* ev_hit = nullptr;
-	auto const& ass_hit_v = storage->find_one_ass(ev_cluster->id(),ev_hit,ev_cluster->name());
+	
+	// get associated hits                                                                                                                                                     
+	//event_hit* ev_hit = nullptr;
+	//ass_hit_v = storage->find_one_ass(ev_cluster->id(),ev_hit,ev_cluster->name());
 	if (!ev_hit)
 	  {
 	    print(msg::kERROR,__FUNCTION__,Form("No associated hit found to a cluster produced by \"%s\"",ev_cluster->name().c_str()));
@@ -333,13 +343,10 @@ namespace larlite {
 
     // If this is not for 3D shower comparison, return
     if(fShowerProducer.empty()) return true;
-    std::cout<<"Looking at shower..."<<std::endl;
-    auto const& ass_cluster_v = storage->find_one_ass(ev_shower->id(),ev_cluster,ev_shower->name());
+    //auto const& ass_cluster_v = storage->find_one_ass(ev_shower->id(),ev_cluster,ev_shower->name());
     
     for(size_t shower_index=0; shower_index < ass_cluster_v.size(); ++shower_index) {
-      
       auto res = fBTAlg.ShowerCorrectness(ass_cluster_v[shower_index]);
-      
       //
       // Fill histogram
       //
