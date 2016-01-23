@@ -60,21 +60,23 @@ namespace ertool {
 
       sum += sqrt(vec*vec);
 
-      rr.push_back(sum);
-      dedxr.push_back(dedx.at(i));
+      if(dedx.at(i) > 0) {
+	rr.push_back(sum);
+	dedxr.push_back(dedx.at(i));
+      }
 
     }
 
+    if(rr.size()) {
+      TGraph * g = new TGraph(rr.size(), &rr[0], &dedxr[0]);
+      Double_t const redchi2 = Chi2Test(g) / rr.size();    
+      delete g;
 
-
-    TGraph * g = new TGraph(rr.size(), &rr[0], &dedxr[0]);
-    Double_t const redchi2 = Chi2Test(g) / rr.size();    
-    delete g;
-
-    if(volume.Contain(t.front()) && volume.Contain(t.front()))
-      contained_chi2->Fill(redchi2);
-    else
-      uncontained_chi2->Fill(redchi2);
+      if(volume.Contain(t.front()) && volume.Contain(t.front()))
+	contained_chi2->Fill(redchi2);
+      else
+	uncontained_chi2->Fill(redchi2);
+    }
 
   }
 
