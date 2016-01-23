@@ -37,6 +37,7 @@ namespace ertool {
 
   Double_t ERAlgoTrackID::Chi2Test(TGraph * g) {
 
+    //
     TF1 * f1 =
       new TF1("f1","2.2",g->GetXaxis()->GetXmin(),g->GetXaxis()->GetXmax());
 
@@ -48,35 +49,51 @@ namespace ertool {
 
   void ERAlgoTrackID::FitTrack(Track const & t, Particle & p) {
 
+    // Residule Range
     std::vector<Double_t> rr;
+
+    // Reduced dedx
     std::vector<Double_t> dedxr;
+    
+    //Full dedx
     std::vector<Double_t> const & dedx = t._dedx;
 
     Double_t sum = 0;
 
+    //Backwards Loop through the track
     for(Size_t i = dedx.size() - 1; i >= 0; --i) {
 
+      //Measures each step-to-step length
       geoalgo::Point_t const vec(t.at(i) - t.at(i+1));
 
+      //Builds the residule range
       sum += sqrt(vec*vec);
-
+      
+      //Check that dEdx == 0 won't screw up the fit
       if(dedx.at(i) > 0) {
+	//Fill RR and dEdx
 	rr.push_back(sum);
 	dedxr.push_back(dedx.at(i));
       }
 
-    }
+    }//Backwards Loop through Track
 
+    //If the Residule Range vector is not zero (hence all dEdx values aren't zero)
     if(rr.size()) {
+      // Build a TGraph of the dEdx vs. Residule Range
       TGraph * g = new TGraph(rr.size(), &rr[0], &dedxr[0]);
+
+      // 
       Double_t const redchi2 = Chi2Test(g) / rr.size();    
       delete g;
 
-      if(volume.Contain(t.front()) && volume.Contain(t.front()))
-	contained_chi2->Fill(redchi2);
-      else
-	uncontained_chi2->Fill(redchi2);
-    }
+      //Check if the track is contained
+      //If not exlude the Bragg peak region 
+      if(volume.Contain(t.front()) && volume.Contain(t.front())){
+	contained_chi2->Fill(redchi2);}
+      else{
+	uncontained_chi2->Fill(redchi2);}
+    }// Res. Range Check
 
   }
 
