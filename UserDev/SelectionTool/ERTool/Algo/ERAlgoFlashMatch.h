@@ -53,6 +53,9 @@ namespace ertool {
     /// Getter function to return the FlashMatchManager
     ::flashana::FlashMatchManager& Manager() { return _mgr;}
 
+    /// Setter function to ignore shower particles (useful for validation scripts)
+    void SetIgnoreShowers(bool flag) { _ignore_showers = flag; }
+
   private:
 
     ::flashana::FlashMatchManager _mgr;
@@ -61,7 +64,8 @@ namespace ertool {
     double _light_yield; // Photons per MEV, gotten from LightPath configured instance
 
     double _beam_dt_min, _beam_dt_max;
-
+    bool _ignore_showers;
+    
     TTree * _match_tree;
     double _mct;
     double _mct_x;

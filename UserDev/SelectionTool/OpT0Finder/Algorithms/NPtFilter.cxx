@@ -24,7 +24,7 @@ namespace flashana {
       auto const& tpc_obj = tpc_obj_v[id]; // retrieve
 
       // if more # of QPoint_t than threshold, accept
-      if(tpc_obj.size() > _min_num_pt) res.push_back(id); 
+      if(tpc_obj.size() >= _min_num_pt) res.push_back(id); 
 
     }
 
