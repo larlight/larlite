@@ -52,14 +52,12 @@ namespace larlite {
 
     // grab results of matching
     auto res_ass = _mgr->GetBookKeeper().GetResult();
-    std::cout << "matches : " << res_ass.size() << std::endl;
 
     // store vector for the association of pfpart -> cluster
     std::vector<std::vector<unsigned int> > pfpart_cluster_ass_v;
     
     // loop through all output matched pairs produced
     for (auto const& pair : res_ass){
-      std::cout << "new PFPart!" << std::endl;
       pfpart match(13,0,0,std::vector<size_t>());
       pfpart_cluster_ass_v.push_back(pair);
       ev_pfpart->push_back(match);
