@@ -47,35 +47,39 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
     return false;
   }
 
-  auto ev_clus = storage->get_data<larlite::event_cluster>(_producer);
-  if (!ev_clus)
-    return false;
-  if (!ev_clus->size()) {
-    print(larlite::msg::kWARNING, __FUNCTION__,
-          Form("Skipping event %d since no cluster found...", ev_clus->event_id()));
+  // grab pf particle
+  auto ev_pfpart = storage->get_data<larlite::event_pfpart>(_producer);
+  
+  // if no pfparticle skip the event
+  if (!ev_pfpart or !ev_pfpart->size()){
+    print(larlite::msg::kWARNING, __FUNCTION__,"Skipping event since no pfparticle found...");
     return false;
   }
+
+  // grab clusters associated with the pfparticles
+  larlite::event_cluster *ev_cluster = nullptr;
   
+  auto const& cluster_ass_v = storage->find_one_ass(ev_pfpart->id(),ev_cluster,_producer);
+
+  // if no pfparticle skip the event
+  if (cluster_ass_v.size() == 0){
+    print(larlite::msg::kWARNING, __FUNCTION__,"Skipping event since no cluster found...");
+    return false;
+  }
+
   for (unsigned int p = 0; p < geoService -> Nviews(); p ++)
-    _dataByPlane.at(p).reserve(ev_clus -> size());
+    _dataByPlane.at(p).reserve(ev_cluster -> size());
 
   std::vector < Cluster2d> _pass;
-  _pass.reserve(ev_clus -> size());
+  _pass.reserve(ev_cluster -> size());
 
   ::larlite::event_hit* ev_hit = nullptr;
-  auto const& hit_index_v = storage->find_one_ass(ev_clus->id(), ev_hit, _producer);
+  auto const& hit_index_v = storage->find_one_ass(ev_cluster->id(), ev_hit, ev_cluster->name());
 
-  // std::cout << "Hit _producer is " << ev_hit -> name() << std::endl;
-
-  if (!ev_hit) {
-    std::cout << "Did not find hit data product"
-              << "!" << std::endl;
+  if (!ev_hit or !ev_hit->size()) {
+    print(larlite::msg::kWARNING, __FUNCTION__,"Skipping event since no hit found...");
     return false;
   }
-
-
-  if (!hit_index_v.size())
-    return false;
 
   // Loop over the clusters and fill the necessary vectors.
   // I don't know how clusters are stored so I'm taking a conservative
@@ -164,7 +168,7 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
   // _pass.at(2).back()._is_good = false;
 
   //std::cout<<"Hits for fake cluster: "<<_pass.at(2).back().params().N_Hits<<std::endl ;
-
+  
 
   _match_mgr -> Reset();
   _match_mgr->SetClusters(pass_clusters);
@@ -200,6 +204,21 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
   // Put the matched clusters into _dataByPlane
   // Keep track of how many matches are made
   size_t matches = 0;
+  for (auto& match : cluster_ass_v){
+    size_t copied = 0;
+    for (auto& cl : match){
+      auto& plane = pass_clusters.at(cl).plane_id.Plane;
+      _dataByPlane.at(plane).push_back(_pass.at(cl));
+      copied++;
+    }
+    matches++;
+    if (copied < geoService->Nviews()){
+      for (auto& vec : _dataByPlane)
+	vec.resize(matches);
+    }
+  }
+  /*
+  size_t matches = 0;
   for (auto & set : scores) {
     // The indexs in set are matched clusters, so copy the cluster2d objects
     // into _dataByPlane based on that indexing:
@@ -216,6 +235,7 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
       }
     }
   }
+  */
 
 //   for (int i = 0; i < new_scores.size(); i++) {
 //     for (int j = 0; j < new_scores.at(i).size(); j++) {
