@@ -427,7 +427,7 @@ void ShowerQuality_multishowers::FillQualityInfo(const shower& reco_shower, cons
                                     const AssSet_t& ass_cluster_v)
 {
 
-  auto res = fBTAlg.ShowerCorrectness(ass_cluster_v[shower_index]);
+  auto res = fBTAlg.MatchCorrectness(ass_cluster_v[shower_index]);
 
   fTreeParams.match_correctness = res.second;
 

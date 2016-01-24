@@ -40,18 +40,33 @@ namespace larlite {
 
     /**
        Setter function for a shower producer name.
-       Note you can only specify either shower producer or cluster producer.
-       If shower producer is set, cluster producer's name is looked up through
-       association.
+       Note you can only specify only one of the three possible (shower,
+       cluster,pfparticle) producer names. Otherwise it is ambiguous what
+       type of data-product the efficiency should be calculated for.
+       If showers or pfparticles are used, the cluster producer name
+       is looked up through associations
     */
     void SetShowerProducer(const std::string name)
     { fShowerProducer = name; }
 
     /**
+       Setter function for a PFParticle producer name.
+       Note you can only specify only one of the three possible (shower,
+       cluster,pfparticle) producer names. Otherwise it is ambiguous what
+       type of data-product the efficiency should be calculated for.
+       If showers or pfparticles are used, the cluster producer name
+       is looked up through associations
+    */
+    void SetPFParticleProducer(const std::string name)
+    { fPFParticleProducer = name; }
+
+    /**
        Setter function for a cluster producer name.
-       Note you can only specify either shower producer or cluster producer.
-       If shower producer is set, cluster producer's name is looked up through
-       association.
+       Note you can only specify only one of the three possible (shower,
+       cluster,pfparticle) producer names. Otherwise it is ambiguous what
+       type of data-product the efficiency should be calculated for.
+       If showers or pfparticles are used, the cluster producer name
+       is looked up through associations
     */
     void SetClusterProducer(const std::string name)
     { fClusterProducer = name; }
@@ -116,6 +131,9 @@ namespace larlite {
 
     /// Cluster Producer's Name
     std::string fClusterProducer;
+
+    /// PFParticle Producer's Name
+    std::string fPFParticleProducer;
 
     /// Cluster efficiency (entry per MCShower)
     //  std::vector<TH1D*> vShowerClusterEff;
