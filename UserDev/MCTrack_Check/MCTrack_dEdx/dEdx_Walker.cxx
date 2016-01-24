@@ -26,11 +26,7 @@ namespace larlite {
 
     for(auto track :  *tracks_v){
 
-      if(track.size() == 0) { 
-	for(int i = 0; i < track.dEdx().size(); i++){
-	  std::cout << "balls" << std::endl; 
-	}
-	  continue;} 
+      if(track.size() == 0) {continue;} 
 
       geoalgo::Point_t start(track.Start().Position());
       geoalgo::Point_t end(track.End().Position());

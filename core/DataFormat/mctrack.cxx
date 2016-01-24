@@ -34,8 +34,9 @@ namespace larlite {
     fStart = invalid_step;
     fEnd   = invalid_step;
 
-    fdEdx.clear();
     fdQdx.clear();
+    fdEdx.clear();
+    fOffLength.clear();
 
     fMotherStart = invalid_step;
     fMotherEnd   = invalid_step;
@@ -65,6 +66,7 @@ namespace larlite {
   const mcstep&      mctrack::AncestorEnd                 () const { return fAncestorEnd;     }
   const std::vector<double>& mctrack::dEdx                () const { return fdEdx;            }
   const std::vector<std::vector <double> >& mctrack::dQdx () const { return fdQdx;            }
+  const std::vector<std::vector <double> >& mctrack::OffLength () const { return fOffLength;       }
 
 
 

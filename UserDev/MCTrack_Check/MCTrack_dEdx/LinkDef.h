@@ -10,6 +10,8 @@
 #pragma link off all functions;
 
 #pragma link C++ class larlite::dEdx_Walker+;
+#pragma link C++ class larlite::Track_OffLength+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 

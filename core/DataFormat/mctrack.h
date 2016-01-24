@@ -50,6 +50,7 @@ namespace larlite{
 				   fEnd(orig.fEnd),
                                    fdQdx(orig.fdQdx),
                                    fdEdx(orig.fdEdx),
+                                   fOffLength(orig.fOffLength),
                                    fMotherPDGCode(orig.fMotherPDGCode),
 				   fMotherTrackID(orig.fMotherTrackID),
 				   fMotherProcess(orig.fMotherProcess),
@@ -73,7 +74,7 @@ namespace larlite{
     const mcstep&       End      () const;
     const std::vector< std::vector<double> >& dQdx() const;  // dQdx[# of MCSteps - 1][# of plane]
     const std::vector<double>& dEdx() const; // dEdx[# of MCSteps - 1]
-
+    const std::vector< std::vector<double> >& OffLength() const;  // dQdx[# of MCSteps - 1][# of plane]
 
     int                MotherPdgCode () const;
     unsigned int       MotherTrackID () const;
@@ -96,6 +97,7 @@ namespace larlite{
     void End             ( const mcstep s   ) { fEnd     = s;        }
     void dEdx            ( const std::vector<double> s) { fdEdx = s;}
     void dQdx            ( const std::vector<std::vector<double> > s) { fdQdx = s;}
+    void OffLength       ( const std::vector<std::vector<double> > s) { fOffLength = s;}
 
 
     void MotherPdgCode   ( int id               ) { fMotherPDGCode  = id; }
@@ -127,6 +129,7 @@ namespace larlite{
     mcstep         fEnd;       ///< G4 end position/momentum of this track particle
     std::vector<std::vector<double> > fdQdx; //< the G4 electron yeild at each wire plane between each step
     std::vector<double> fdEdx;//< the G4 energy loss between each step
+    std::vector<std::vector<double> > fOffLength; //< the G4 electron yeild at each wire plane between each step
 
     int            fMotherPDGCode;   ///< This particle's mother's PDG code
     unsigned int   fMotherTrackID;   ///< This particle's mother's G4 track ID
