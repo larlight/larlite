@@ -139,7 +139,7 @@ namespace larlite {
       double reco_dedx_Y;
       int    best_plane_id;
 
-      double mc_x, mc_y, mc_z;
+      double mc_x, mc_y, mc_z, mc_t;
       double mc_dcosx, mc_dcosy, mc_dcosz;
       double mc_energy;
       int    mc_pdgid;

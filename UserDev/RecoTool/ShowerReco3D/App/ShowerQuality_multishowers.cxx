@@ -442,6 +442,7 @@ void ShowerQuality_multishowers::FillQualityInfo(const shower& reco_shower, cons
   fTreeParams.mc_x = mc_shower.DetProfile().X();
   fTreeParams.mc_y = mc_shower.DetProfile().Y();
   fTreeParams.mc_z = mc_shower.DetProfile().Z();
+  fTreeParams.mc_t = mc_shower.DetProfile().T();
 
   fTreeParams.mc_energy = mc_shower.DetProfile().E();
   fTreeParams.mc_pdgid  = mc_shower.PdgCode();
@@ -570,6 +571,7 @@ void ShowerQuality_multishowers::InitializeAnaTree()
   fTree->Branch("mc_x", &fTreeParams.mc_x, "mc_x/D");
   fTree->Branch("mc_y", &fTreeParams.mc_y, "mc_y/D");
   fTree->Branch("mc_z", &fTreeParams.mc_z, "mc_z/D");
+  fTree->Branch("mc_t", &fTreeParams.mc_t, "mc_t/D");
   fTree->Branch("mc_dcosx", &fTreeParams.mc_dcosx, "mc_dcosx/D");
   fTree->Branch("mc_dcosy", &fTreeParams.mc_dcosy, "mc_dcosy/D");
   fTree->Branch("mc_dcosz", &fTreeParams.mc_dcosz, "mc_dcosz/D");

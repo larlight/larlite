@@ -60,9 +60,6 @@ namespace larlite {
     /// Function to set an output shower producer label
     void SetOutputProducer(std::string name) { fOutputProducer = name; }
 
-    /// Getter for MatchManager instance, to attach algorithms
-    ::cmtool::CMatchManager& GetManager() { return fManager.MatchManager(); }
-
   protected:
 
     /// Input producer name
