@@ -58,7 +58,7 @@ namespace larlite {
     
     // loop through all output matched pairs produced
     for (auto const& pair : res_ass){
-      pfpart match(13,0,0,std::vector<size_t>());
+      pfpart match(11,0,0,std::vector<size_t>());
       pfpart_cluster_ass_v.push_back(pair);
       ev_pfpart->push_back(match);
 
