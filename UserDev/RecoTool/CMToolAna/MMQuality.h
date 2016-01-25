@@ -15,6 +15,7 @@
 #ifndef LARLITE_MMQUALITY_H
 #define LARLITE_MMQUALITY_H
 
+#include <TH1I.h>
 #include <TH1D.h>
 #include <TH2D.h>
 #include <TTree.h>
@@ -158,6 +159,9 @@ namespace larlite {
 
     /// Matching correctness
     TH1D *hMatchCorrectness;
+
+    /// Number of matches per event
+    TH1I *hMatchesPerEvent;
 
     /// Number of hits
     //TH1D *hClusterHits;

@@ -29,8 +29,8 @@ namespace larlite {
     //vRecoShowerClusterEffVsPur.clear();
     //hClusterHits      = nullptr;
     hMatchCorrectness = nullptr;
-
-    fMMQualityTree = nullptr;
+    hMatchesPerEvent  = nullptr;
+    fMMQualityTree    = nullptr;
     
     _mcshowerTot    = 0;
     _recoClusterTot = 0;
@@ -57,75 +57,16 @@ namespace larlite {
       return false;
     }
 
-    // auto geo = larutil::Geometry::GetME();
 
-    //
-    // Cluster purity, efficiency histograms initialization
-    //
-
-    //for(auto& h : vShowerClusterEff) delete h;
-    //for(auto& h : vShowerClusterPur) delete h;
-    //for(auto& h : vShowerClusterEffVsPur) delete h;
-    //for(auto& h : vRecoShowerClusterEff) delete h;
-    //for(auto& h : vRecoShowerClusterPur) delete h;
-    //for(auto& h : vRecoShowerClusterEffVsPur) delete h;
-
-    //vShowerClusterEff.clear();
-    //vShowerClusterPur.clear();
-    //vShowerClusterEffVsPur.clear();
-    //vRecoShowerClusterEff.clear();
-    //vRecoShowerClusterPur.clear();
-    //vRecoShowerClusterEffVsPur.clear();
-
-    /*
-    for(size_t plane=0; plane<geo->Nplanes(); ++plane) {
-
-      vShowerClusterEff.push_back(new TH1D(Form("hShowerClusterEff_Plane%zu",plane),
-					   "Best Shower Cluster's Charge Efficiency; Efficiency; Clusters",
-					   101,-0.005,1.005));
-
-      vShowerClusterPur.push_back(new TH1D(Form("hShowerClusterPur_Plane%zu",plane),
-					   "Best Shower Cluster's Charge Purity; Purity; Clusters",
-					   101,-0.005,1.005));
-
-      vShowerClusterEffVsPur.push_back(new TH2D(Form("hShowerClusterEffVsPur_Plane%zu",plane),
-						"Best Shower Cluster's Charge Efficiency vs Purity; Efficiency ; Purity",
-						101,-0.005,1.005,101,-0.005,1.005));
-
-
-      vRecoShowerClusterEff.push_back(new TH1D(Form("hRecoShowerClusterEff_Plane%zu",plane),
-					       "Shower Cluster's Charge Efficiency; Efficiency; Clusters",
-					       101,-0.005,1.005));
-      
-      vRecoShowerClusterPur.push_back(new TH1D(Form("hRecoShowerClusterPur_Plane%zu",plane),
-					       "Shower Cluster's Charge Purity; Purity; Clusters",
-					       101,-0.005,1.005));
-      
-      vRecoShowerClusterEffVsPur.push_back(new TH2D(Form("hRecoShowerClusterEffVsPur_Plane%zu",plane),
-						    "Shower Cluster's Charge Efficiency vs Purity; Efficiency ; Purity",
-						    101,-0.005,1.005,101,-0.005,1.005));
-      
-
-    }
-    */
-    
-    //
-    // Matching correctness histogram initialization
-    //
     if(hMatchCorrectness) delete hMatchCorrectness;
     hMatchCorrectness = new TH1D("hMatchCorrectness",
 				 "Shower 2D Cluster Matching Correctness; Correctness; Showers",
 				 101,-0.005,1.005);
 
-    //
-    // Matching correctness histogram initialization
-    //
-    /*                                              
-    if(hClusterHits) delete hClusterHits;
-    hClusterHits = new TH1D("hClusterHits",
-			    "Number of hits per 2D cluster; Number of hits; Counts",
-                                 401,-0.5,400.5);
-    */
+    if (hMatchesPerEvent) delete hMatchesPerEvent;
+    hMatchesPerEvent = new TH1I("hMatchesPerEvent",
+				"Matched Sets of Clusters Per Event",6,-0.5,5.5);
+
 
     InitializeAnaTree();
 
@@ -354,6 +295,9 @@ namespace larlite {
     // -> return now
     if ( fShowerProducer.empty() and fPFParticleProducer.empty() )
       return true;
+    
+    // fill the number of cluster-matched groupings in the event
+    hMatchesPerEvent->Fill(ass_cluster_v.size());
 
     for(size_t match_index=0; match_index < ass_cluster_v.size(); match_index++) {
       auto res = fBTAlg.MatchCorrectness(ass_cluster_v[match_index]);
@@ -368,25 +312,11 @@ namespace larlite {
     
     if(_fout) {
       
-      // Write cluster histograms if any entry made
-      //if(vShowerClusterEff.size() && vShowerClusterEff[0]->GetEntries()) {
-
-      //for(auto& h : vShowerClusterEff) h->Write();
-      //for(auto& h : vShowerClusterPur) h->Write();
-      // for(auto& h : vShowerClusterEffVsPur) h->Write();
-      //}
-      
-      
-      //for(auto& h : vRecoShowerClusterEff) h->Write();
-      //for(auto& h : vRecoShowerClusterPur) h->Write();
-      //for(auto& h : vRecoShowerClusterEffVsPur) h->Write();
-      
-      
       // Write shower histograms if any entry made
       if(hMatchCorrectness->GetEntries()) hMatchCorrectness->Write();
-      //if(hClusterHits->GetEntries()) hClusterHits->Write();
+      if (hMatchesPerEvent->GetEntries()) hMatchesPerEvent->Write();
 
-      // Write Ttree histograms if any entry made                                                                                                                                 
+      // Write Ttree histograms if any entry made
       if (fMMQualityTree) fMMQualityTree->Write();
     }
    
