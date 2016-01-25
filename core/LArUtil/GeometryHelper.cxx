@@ -735,7 +735,142 @@ std::vector<unsigned int> GeometryHelper::SelectLocalPointList( const std::vecto
   return returnIndexes;
 }
 
+  int GeometryHelper::Get3DAxisN(const int& iplane0, const int& iplane1,
+				 const double& omega0, const double& omega1,
+				 double& phi, double& theta) const {
 
+    auto geom = larutil::Geometry::GetME();
+    
+    // prepare vertical angle information for the various planes
+    std::vector<double> vertangle;
+    vertangle.resize(3);
+    for(UInt_t ip=0;ip<3;ip++)
+      vertangle[ip]=geom->WireAngleToVertical(geom->PlaneToView(ip)) - TMath::Pi()/2; // wire angle
+
+    // y, z, x coordinates
+    Double_t ln(0),mn(0),nn(0);
+    Double_t phis(0),thetan(0);
+    
+    // Pretend collection and induction planes. 
+    // "Collection" is the plane with the vertical angle equal to zero. 
+    // If both are non-zero, collection is the one with the negative angle. 
+    UInt_t Cplane=0,Iplane=1;   
+
+    // angleC and angleI are the respective angles to vertical in C/I 
+    // planes and slopeC, slopeI are the tangents of the track.
+    Double_t angleC,angleI,slopeC,slopeI,omegaC,omegaI;
+    omegaC = larlite::data::kINVALID_DOUBLE;
+    omegaI = larlite::data::kINVALID_DOUBLE;
+    
+    // Don't know how to reconstruct these yet, so exit with error.
+    // In     
+    if(omega0==0 || omega1==0){
+      phi=0;
+      theta=-999;
+      return -1;
+    }
+    
+    //////insert check for existence of planes.
+    
+    //check if backwards going track
+    //Double_t backwards=0;
+    Double_t alt_backwards=0;
+    
+    if(fabs(omega0)>(TMath::Pi()/2.0) || fabs(omega1)>(TMath::Pi()/2.0) ) {
+      alt_backwards=1;
+    }
+    
+    if(vertangle[iplane0] == 0){   
+      // first plane is at 0 degrees
+      Cplane=iplane0;
+      Iplane=iplane1;
+      omegaC=omega0;
+      omegaI=omega1;
+    }
+    else if(vertangle[iplane1] == 0){  
+      // second plane is at 0 degrees
+      Cplane = iplane1;
+      Iplane = iplane0;
+      omegaC=omega1;
+      omegaI=omega0;
+    }
+    else if(vertangle[iplane0] != 0 && vertangle[iplane1] != 0){
+      //both planes are at non zero degree - find the one with deg<0
+      if(vertangle[iplane1] < vertangle[iplane0]){
+	Cplane = iplane1;
+	Iplane = iplane0;
+	omegaC=omega1;
+	omegaI=omega0;
+      }
+      else if(vertangle[iplane1] > vertangle[iplane0]){
+	Cplane = iplane0;
+	Iplane = iplane1;
+	omegaC=omega0;
+	omegaI=omega1;
+      }
+      else{
+	//throw error - same plane.
+	return -1;
+      }	
+      
+    }
+    
+    slopeC=tan(omegaC);
+    slopeI=tan(omegaI);
+    angleC=vertangle[Cplane];
+    angleI=vertangle[Iplane];
+    
+    
+    //0 -1 factor depending on if one of the planes is vertical.
+    bool nfact = !(vertangle[Cplane]);
+    
+    //ln represents y, omega is 2d angle -- in first 2 quadrants y is positive.
+    if(omegaC < TMath::Pi() && omegaC > 0 )
+      ln=1;
+    else
+      ln=-1;
+    
+    //calculate x and z using y ( ln )
+    mn = (ln/(2*sin(angleI)))*((cos(angleI)/(slopeC*cos(angleC)))-(1/slopeI) 
+			       +nfact*(  cos(angleI)/(cos(angleC)*slopeC)-1/slopeI  )     );
+    
+    nn = (ln/(2*cos(angleC)))*((1/slopeC)+(1/slopeI) +nfact*((1/slopeC)-(1/slopeI)));
+    
+    // Direction angles
+    if(fabs(omegaC)>0.01)  // catch numeric error values 
+      {
+	//phi=atan(ln/nn);
+	phis=asin(ln/TMath::Sqrt(ln*ln+nn*nn));
+        
+	if(fabs(slopeC+slopeI) < 0.001)
+	  phis=0;
+	else if( fabs(omegaI)>0.01 && (omegaI/fabs(omegaI) == -omegaC/fabs(omegaC) ) 
+		 && ( fabs(omegaC) < 1*TMath::Pi()/180 || fabs(omegaC) > 179*TMath::Pi()/180 ) ) // angles have 
+	  phis = (fabs(omegaC) > TMath::Pi()/2) ? TMath::Pi() : 0;    //angles are 
+	
+	
+	if(nn<0 && phis>0 && !(!alt_backwards && fabs(phis)<TMath::Pi()/4 ) )   // do not go back if track looks forward and phi is forward
+	  phis=(TMath::Pi())-phis;
+	else if(nn<0 && phis<0 && !(!alt_backwards && fabs(phis)<TMath::Pi()/4 ) )
+	  phis=(-TMath::Pi())-phis;
+	
+	
+	phi=phis;
+	
+      }
+    //If plane2 (collection), phi = 2d angle (omegaC in this case) 
+    else  
+      {
+	phis = omegaC;
+	phi = omegaC; 
+      }
+    
+    thetan = -asin ( mn / (sqrt(pow(ln,2)+pow(mn,2)+pow(nn,2)) ) ) ;
+    theta=thetan;
+    
+    return 0;   
+  }
+  
 
 } // larutil
 
