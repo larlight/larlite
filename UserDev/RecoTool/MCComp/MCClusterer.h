@@ -39,7 +39,7 @@ namespace larlite {
 
     virtual bool finalize();
 
-    void setHitProducer(std::string s) { _hit_producer = s; }
+    void setClusterProducer(std::string s) { _cluster_producer = s; }
     
     void setMinEnergy(double e) { _mc_energy_min = e; }
 
@@ -48,8 +48,8 @@ namespace larlite {
     // hit brack-tracking tool
     ::btutil::MCBTAlg _bt_algo;
 
-    // hit producer to be used
-    std::string _hit_producer;
+    // cluster producer to be used
+    std::string _cluster_producer;
 
     // minimum energy for a particle to be added to the map [MeV]
     double _mc_energy_min;

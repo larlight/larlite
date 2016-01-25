@@ -14,7 +14,7 @@ namespace larlite {
   MCClusterer::MCClusterer() {
     _name="MCClusterer";
     _fout=0;
-    _hit_producer="gaushit";
+    _cluster_producer="rawcluster";
     _mc_energy_min = 10; // MeV
   }
 
@@ -35,7 +35,7 @@ namespace larlite {
     auto ev_simch   = storage->get_data<event_simch>("largeant");
 
     // Retrieve cluster data product (output)
-    auto ev_rawcluster = storage->get_data<event_cluster>("rawcluster");
+    auto ev_rawcluster = storage->get_data<event_cluster>(_cluster_producer);
 
     // Retrieve cluster data product (output)
     auto ev_mccluster = storage->get_data<event_cluster>("mccluster");

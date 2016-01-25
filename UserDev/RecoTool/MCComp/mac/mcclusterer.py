@@ -1,5 +1,4 @@
 import sys
-
 if len(sys.argv) < 2:
     msg  = '\n'
     msg += "Usage 1: %s $INPUT_ROOT_FILE\n" % sys.argv[0]
@@ -28,15 +27,15 @@ my_proc.set_ana_output_file("");
 my_proc.set_output_file("larlite_mcclusters.root")
 
 #hitproducer = 'testhit'
-hitproducer = 'gaushit'
+clusterproducer = 'rawcluster'
 
 clusterer = fmwk.MCClusterer()
-clusterer.setHitProducer(hitproducer)
+clusterer.setClusterProducer(clusterproducer)
 clusterer.setMinEnergy(10) #MeV
 
 my_proc.add_process(clusterer)
 
-my_proc.set_data_to_write(fmwk.data.kHit,hitproducer)
+#my_proc.set_data_to_write(fmwk.data.kCluster,clusterproducer)
 my_proc.set_data_to_write(fmwk.data.kCluster,'mccluster')
 my_proc.set_data_to_write(fmwk.data.kAssociation,'mccluster')
 
