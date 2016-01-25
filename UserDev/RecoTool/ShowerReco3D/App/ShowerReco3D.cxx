@@ -12,7 +12,6 @@ ShowerReco3D::ShowerReco3D() : ana_base()
   _name = "ShowerReco3D";
   fInputProducer  = "fuzzycluster";
   fOutputProducer = "showerreco";
-  fUsePFParticle  = false;
 }
 
 bool ShowerReco3D::initialize() {
