@@ -172,21 +172,25 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
     // Easy easy way: figure out if one of the start points is much farther from the others in time.
     // This most often happens if a shower start point is backwards
     std::vector<float> startTimeDiffs;
-    for (size_t i = 0; i < planes.size(); i++) {
-      int point1, point2;
-      if (i == 0) {
-        point1 = 1;
-        point2 = 2;
+
+    // The following code should only run if we have clusters in all 3 planes -- jeremy
+    if (planes.size() > 2) {
+      for (size_t i = 0; i < planes.size(); i++) {
+        int point1, point2;
+        if (i == 0) {
+          point1 = 1;
+          point2 = 2;
+        }
+        else if ( i == 1) {
+          point1 = 0;
+          point2 = 2;
+        }
+        else {
+          point1 = 0;
+          point2 = 1;
+        }
+        startTimeDiffs.push_back(inputShowers.at(point1).start_point.t - inputShowers.at(point2).start_point.t);
       }
-      else if ( i == 1) {
-        point1 = 0;
-        point2 = 2;
-      }
-      else {
-        point1 = 0;
-        point2 = 1;
-      }
-      startTimeDiffs.push_back(inputShowers.at(point1).start_point.t - inputShowers.at(point2).start_point.t);
     }
     // Figure out is one is much smaller than the other two.  If so, keep that pair.
     float minVal(99999), nextMin(99999);
