@@ -30,7 +30,7 @@ namespace flashana{
    doxygen documentation!
  */
 
-  class LightPath : flashana::BaseAlgorithm {
+  class LightPath : public flashana::BaseAlgorithm {
     
   public:
     
@@ -43,26 +43,24 @@ namespace flashana{
     void Configure(const ::fcllite::PSet &pset);
     
     // Setter function
-    bool TrackStart( bool a) { _start_bool =a; return _start_bool;}
-    bool TrackEnd  ( bool b) { _end_bool   =b; return _end_bool;}
-    double Set_Gap (double x){ _gap   =x; return _gap;}
-
-    // Getter function
+    double Set_Gap      ( double x) { _gap   =x;      return _gap;}
+      
+    // Flash Hypothesis for Trajectory (Track)
     flashana::QCluster_t FlashHypothesis(const ::geoalgo::Trajectory& trj) const;
 
     void QCluster(const ::geoalgo::Vector& pt_1,
                   const ::geoalgo::Vector& pt_2,
                   flashana::QCluster_t& Q_cluster) const;
-    
+
+    // Getter for light yield configured paramater
+    double GetLightYield() const { return _light_yield; }
+
+
   protected:
-    bool   _start_bool;
-    bool   _end_bool;
     double _gap;
     double _light_yield;
     double _dEdxMIP;
     ::geoalgo::GeoAlgo _geoAlgo;
-
-    mutable int _n;
   };
 } 
 

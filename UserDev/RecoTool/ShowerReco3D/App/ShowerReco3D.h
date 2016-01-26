@@ -54,14 +54,11 @@ namespace larlite {
     void AddShowerAlgo(::showerreco::ShowerRecoAlgBase *alg) { fManager.AddAlgo(alg); }
 
     /// Function to set an input cluster/pfparticle producer name to work with
-    void SetInputProducer(std::string name, bool use_pfpart=false) 
-    { fInputProducer = name; fUsePFParticle = use_pfpart; }
+    void SetInputProducer(std::string name) 
+    { fInputProducer = name; }
 
     /// Function to set an output shower producer label
     void SetOutputProducer(std::string name) { fOutputProducer = name; }
-
-    /// Getter for MatchManager instance, to attach algorithms
-    ::cmtool::CMatchManager& GetManager() { return fManager.MatchManager(); }
 
   protected:
 
@@ -70,9 +67,6 @@ namespace larlite {
 
     /// Output producer name
     std::string fOutputProducer;
-
-    /// Boolean flag to use PFParticle as an input or not
-    bool fUsePFParticle;
 
     /// Shower reco core class instance
     ::showerreco::ShowerRecoManager fManager;

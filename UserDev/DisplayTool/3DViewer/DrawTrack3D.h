@@ -32,10 +32,17 @@
 namespace evd {
 
 class Track3D {
+
 public:
     std::vector<TVector3 > _track;
     const std::vector<TVector3 > & track() {return _track;}
     // const std::vector<std::vector<float> > & direction() {return _track;}
+    TVector3 start_point(){return _start_point;}
+    TVector3 end_point(){return _end_point;}
+
+private:
+    TVector3 _start_point;
+    TVector3 _end_point;
 };
 
 

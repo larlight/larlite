@@ -383,8 +383,8 @@ float Polygon2D::InteriorAngle(unsigned int p) const {
         if (point == otherPoints.back()) {
           point2 = otherPoints.front();
         }
-        else{
-          point2 = otherPoints[i+1];
+        else {
+          point2 = otherPoints[i + 1];
         }
         if (SegmentOverlap(vertices.at(p).first, vertices.at(p).second,
                            -10, -10, //Compare it to an unphysical point to ensure it's not in the polygon
@@ -397,13 +397,13 @@ float Polygon2D::InteriorAngle(unsigned int p) const {
         }
       }
 
-      if (hit_count % 2 == 0){
+      if (hit_count % 2 == 0) {
         // Then it crossed an even number of points and is therefore not in the subpolygon.  Convex
         // std::cout << "\tConvex, cosAngle is "
         //           << geoHelper -> GetCosAngleBetweenLines(point_p, point_next, point_prev)
         //           << ", returning "
         //           <<  acos(geoHelper -> GetCosAngleBetweenLines(point_p, point_next, point_prev)) << std::endl;
-        return acos(geoHelper -> GetCosAngleBetweenLines(point_p, point_next, point_prev));        
+        return acos(geoHelper -> GetCosAngleBetweenLines(point_p, point_next, point_prev));
       }
       else
       {
@@ -411,7 +411,7 @@ float Polygon2D::InteriorAngle(unsigned int p) const {
         //           << geoHelper -> GetCosAngleBetweenLines(point_p, point_next, point_prev)
         //           << ", returning "
         //           <<  2*M_PI - acos(geoHelper -> GetCosAngleBetweenLines(point_p, point_next, point_prev)) << std::endl;
-        return 2*M_PI - acos(geoHelper -> GetCosAngleBetweenLines(point_p, point_next, point_prev));
+        return 2 * M_PI - acos(geoHelper -> GetCosAngleBetweenLines(point_p, point_next, point_prev));
       }
     }
   }

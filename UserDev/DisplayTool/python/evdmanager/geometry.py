@@ -311,7 +311,7 @@ class argoneut(geometry):
         # and then call the base class __init__
         larutil.LArUtilManager.Reconfigure(fmwk.geo.kArgoNeuT)
         super(argoneut, self).__init__()
-        self._levels = [(-15, 60), (-5, 80)]
+        self._levels = [(-15, 60), (-35, 100)]
         self._pedestals = [0, 0]
         self._name = "argoneut"
         self._offset = []

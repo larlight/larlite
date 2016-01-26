@@ -4,7 +4,7 @@
 #include "ERAlgoFlashMatch.h"
 #include <set>
 #include <sstream>
-#include "OpT0Helper.h"
+// #include "OpT0Helper.h"
 #include "OpT0Finder/Algorithms/QLLMatch.h"
 #include "OpT0Finder/Algorithms/ChargeAnalytical.h"
 #include "OpT0Finder/Algorithms/PhotonLibHypothesis.h"
@@ -18,7 +18,13 @@
 namespace ertool {
 
   ERAlgoFlashMatch::ERAlgoFlashMatch(const std::string& name) : AlgoBase(name)
-  {}
+  {
+    _match_tree = 0;
+    // This should come from config file... these are just guesses for right now.
+    _beam_dt_min = -10.;
+    _beam_dt_max = 100.;
+    _ignore_showers = true;
+  }
 
   void ERAlgoFlashMatch::Reset()
   {}
@@ -33,28 +39,6 @@ namespace ertool {
     ertool_cfg_file = std::string(getenv("LARLITE_BASEDIR")) + "/" + ertool_cfg_file;
 
     std::stringstream ss;
-    //
-    // Flash Match algorithm (required)
-    //
-    std::string match_alg = p.get<std::string>( "Match" );      
-    if      ( match_alg == "QLLMatch"     ) _mgr.SetAlgo( new ::flashana::QLLMatch     () );
-    else if ( match_alg == "CommonAmps"   ) _mgr.SetAlgo( new ::flashana::CommonAmps   () );
-    else if ( match_alg == "QWeightPoint" ) _mgr.SetAlgo( new ::flashana::QWeightPoint () );
-    else {
-      ss << "Unknown Match algorithm: " << match_alg.c_str();
-      throw ERException(ss.str());
-    }
-
-    //
-    // Flash Hypothesis algorithm (required)
-    //
-    std::string hypothesis_alg = p.get<std::string>( "Hypothesis" );    
-    if      ( hypothesis_alg == "PhotonLibHypothesis" ) _mgr.SetAlgo( new ::flashana::PhotonLibHypothesis () );
-    else if ( hypothesis_alg == "ChargeAnalytical"    ) _mgr.SetAlgo( new ::flashana::ChargeAnalytical    () );
-    else {
-      ss << "Unknown Hypothesis algorithm: " << hypothesis_alg.c_str();
-      throw ERException(ss.str());
-    }
 
     //
     // TPC filter algorithm (optional)
@@ -76,6 +60,7 @@ namespace ertool {
       throw ERException(ss.str());
     }
 
+
     //
     // Match Prohibit algorithm (optional)
     //
@@ -85,67 +70,153 @@ namespace ertool {
       ss << "Unknown Prohibit algorithm: " << prohibit_alg.c_str();
       throw ERException(ss.str());
     }
-    
+
+    //
+    // Flash Hypothesis algorithm (required)
+    //
+    std::string hypothesis_alg = p.get<std::string>( "Hypothesis" );
+    if      ( hypothesis_alg == "PhotonLibHypothesis" ) _mgr.SetAlgo( new ::flashana::PhotonLibHypothesis () );
+    else if ( hypothesis_alg == "ChargeAnalytical"    ) _mgr.SetAlgo( new ::flashana::ChargeAnalytical    () );
+    else {
+      ss << "Unknown Hypothesis algorithm: " << hypothesis_alg.c_str();
+      throw ERException(ss.str());
+    }
+
+    //
+    // Flash Match algorithm (required)
+    //
+    std::string match_alg = p.get<std::string>( "Match" );
+    if      ( match_alg == "QLLMatch"     ) _mgr.SetAlgo( new ::flashana::QLLMatch     () );
+    else if ( match_alg == "CommonAmps"   ) _mgr.SetAlgo( new ::flashana::CommonAmps   () );
+    else if ( match_alg == "QWeightPoint" ) _mgr.SetAlgo( new ::flashana::QWeightPoint () );
+    else {
+      ss << "Unknown Match algorithm: " << match_alg.c_str();
+      throw ERException(ss.str());
+    }
+
+    //
+    // Custom algo (configured from fcl file but not executed)
+    //
+    std::string LP_alg =  p.get<std::string>( "Custom" );
+    if (LP_alg == "LightPath") _mgr.AddCustomAlgo( new ::flashana::LightPath() );
+
     _mgr.Configure(ertool_cfg_file);
-      
+
+    /// Get the photons-per-MEV light yield from configured LightPath instance.
+    // This is used for hacky flash matching for SHOWER particles done in this code
+    // rather than inside of LightPath
+    _light_yield = LP.GetLightYield();
+
   }
 
   void ERAlgoFlashMatch::ProcessBegin()
-  {}
+  {
+    if (!_match_tree) {
+      _match_tree = new TTree("match_tree", "match_tree");
+      _match_tree->Branch("_mct", &_mct, "mct/D");
+      _match_tree->Branch("_mct_x", &_mct_x, "mct_x/D");
+      _match_tree->Branch("_ft", &_ft, "ft/D");
+      _match_tree->Branch("_e", &_e, "e/D");
+    }
+  }
 
   void ERAlgoFlashMatch::ProcessEnd(TFile* fout)
-  {}
+  {
+    if (fout) {
+      fout->cd();
+      _match_tree->Write();
+    }
+  }
 
   bool ERAlgoFlashMatch::Reconstruct(const EventData &data, ParticleGraph& graph)
   {
-    OpT0Helper helper;
-    _mgr.Reset();
-    
-    std::multimap<double,std::pair<NodeID_t,FlashID_t> > score_m;
+    // OpT0Helper helper;
 
-    std::vector<NodeID_t> primary_id_v;
+    _mgr.Reset();
+    // _mgr.PrintConfig();
+
+    std::multimap<double, std::pair<NodeID_t, FlashID_t> > score_m;
+
+    std::vector<NodeID_t> base_id_v;
 
     int i = 0;
 
-    for(auto const& primary_node_id : graph.GetPrimaryNodes() ) {
+    for (auto const& base_node_id : graph.GetBaseNodes() ) {
 
-      auto const& primary_part = graph.GetParticle(primary_node_id);
+      auto const& base_part = graph.GetParticle(base_node_id);
 
-      auto const& children_v = graph.GetAllDescendantNodes(primary_part.ID());
+      if (_ignore_showers &&  base_part.RecoType() == kShower) continue;
+
+      auto const& children_v = graph.GetAllDescendantNodes(base_part.ID());
 
       std::vector<NodeID_t> shower_v, track_v;
       shower_v.reserve(children_v.size());
       track_v.reserve(children_v.size());
 
-      for(auto const& id : children_v) {
-	auto const& child_part = graph.GetParticle(id);
-	switch(child_part.RecoType()) {
-	case kShower:
-	  shower_v.push_back(child_part.RecoID());
-	  break;
-	case kTrack:
-	  track_v.push_back(child_part.RecoID());
-	  break;
-	default:
-	  break;
-	}
+      for (auto const& id : children_v) {
+        auto const& child_part = graph.GetParticle(id);
+        switch (child_part.RecoType()) {
+        case kShower:
+          shower_v.push_back(child_part.RecoID());
+          break;
+        case kTrack:
+          track_v.push_back(child_part.RecoID());
+          break;
+        default:
+          break;
+        }
       }
-      if(primary_part.RecoType()==kTrack) track_v.push_back(primary_part.RecoID());
-      else if(primary_part.RecoType()==kShower) shower_v.push_back(primary_part.RecoID());
-      
-      auto cluster = helper.GetQCluster(data,shower_v,track_v);
-      cluster.idx = i; //primary_node_id;
-      //std::cout<<cluster.size()<<" ";
-      primary_id_v.push_back(primary_node_id);
-      _mgr.Emplace(std::move(cluster));
+      if (base_part.RecoType() == kTrack) track_v.push_back(base_part.RecoID());
+      else if (base_part.RecoType() == kShower) shower_v.push_back(base_part.RecoID());
+
+      //auto cluster = helper.GetQCluster(data, shower_v, track_v);
+
+      ::flashana::QCluster_t clusters;
+      clusters.clear();
+      // Implement LightPath for track particles
+      // std::cout<<"size of track_v is "<<track_v.size()<<std::endl;
+      for (auto const& id : track_v) {
+
+        auto const& track = data.Track(id);
+
+        if ( track._time < -2050000 || track._time > 2750000 ) continue;
+
+        if (track.size() < 2) continue;
+
+        if (!track.IsLonger(0.1)) continue;
+
+        clusters += LP.FlashHypothesis(track);
+      }
+
+      // Implement LightPath for shower particles
+      for (auto const& id : shower_v) {
+        auto const& shower = data.Shower(id);
+
+        ::flashana::QPoint_t q_pt;
+        // Shower Qcluster is a single point in the "center" of the shower
+        auto mypoint = shower.Start() + shower.Dir() * shower.Length() / 2;
+        q_pt.x = mypoint[0];
+        q_pt.y = mypoint[1];
+        q_pt.z = mypoint[2];
+        //energy * lightyield = charge
+        q_pt.q = shower._energy * _light_yield;
+        clusters.emplace_back(q_pt);
+      }
+
+      if (!clusters.size()) continue;
+
+      clusters.idx = i; //base_node_id;
+      //std::cout<<clusters.size()<<" ";
+      base_id_v.push_back(base_node_id);
+      _mgr.Emplace(std::move(clusters));
       i++;
-      
+
     }
     //std::cout<<std::endl;
     std::vector<FlashID_t> flash_id_v;
     flash_id_v.reserve(data.Flash().size());
 
-    for (size_t i=0; i < data.Flash().size(); i++){
+    for (size_t i = 0; i < data.Flash().size(); i++) {
 
       auto const& erflash = data.Flash().at(i);
 
@@ -154,8 +225,8 @@ namespace ertool {
       f.y = erflash._y;
       f.z = erflash._z;
       f.pe_v.reserve(erflash._npe_v.size());
-      for(auto const& v : erflash._npe_v)
-	f.pe_v.push_back(v);
+      for (auto const& v : erflash._npe_v)
+        f.pe_v.push_back(v);
       f.time = erflash._t;
       f.idx  = i;
       flash_id_v.push_back(erflash.FlashID());
@@ -163,49 +234,81 @@ namespace ertool {
     }
     //_mgr.SetVerbosity(::flashana::msg::kDEBUG);
     auto const res = _mgr.Match();
-    
+
     std::set<NodeID_t> nu_candidates;
-    //std::cout<<res.size()<<" match found..."<<std::endl;
-    for(auto const& match : res ) {
-      //std::cout<<"TPC: "<<match.tpc_id<<"/"<<primary_id_v.size()<<std::endl;
+    // std::cout << "ERAlgoFlashMatch: " << res.size() << " match found..." << std::endl;
+    for (auto const& match : res ) {
+      //std::cout<<"TPC: "<<match.tpc_id<<"/"<<base_id_v.size()<<std::endl;
       //std::cout<<"Flash: "<<match.flash_id<<"/"<<flash_id_v.size()<<std::endl;
-      auto const& nord_id  = primary_id_v[match.tpc_id];
+      auto const& node_id  = base_id_v[match.tpc_id];
       auto const& flash_id = flash_id_v[match.flash_id];
-      graph.SetFlashID(nord_id,flash_id);
+
+      // The base particle's node is associated with the flash.
+      // It is also possible to loop through all children and
+      // associate each with the same flash... but for now, I'll
+      // make the user do something like this if they want to
+      // find the flash associated with an arbitrary particle:
+      // particlegraph.GetParticle( particle.Ancestor() ).FlashID()
+      // std::cout << "Setting the flashID for node " << node_id << " to " << flash_id << std::endl;
+      graph.SetFlashID(node_id, flash_id);
 
       auto const& flash = data.Flash(flash_id);
-      auto& part = graph.GetParticle(nord_id);
+      auto& part = graph.GetParticle(node_id);
+      //std::cout << "Setting the flashID for the particle itself!"<<std::endl;
+      //part.SetFlashID(flash_id);
 
-      if( _beam_dt_min < flash._t && flash._t < _beam_dt_max ) {
-	nu_candidates.insert(nord_id);
-	//std::cout<<"Nu?! "<<flash._z<<" vs "<<match.tpc_point.z<<std::endl;
+      if (part.RecoType() == kTrack) {
+        auto const& data_t = data.Track(part.RecoID());
+        _mct = data_t._time / 1000 ;
+        _mct_x = data_t.at(0).at(0);
+        _ft  = flash._t ;
+        _e   = data_t._energy ;
+      }
+      else if (part.RecoType() == kShower) {
+        auto const& data_t = data.Shower(part.RecoID());
+        _mct = data_t._time / 1000 ;
+        _mct_x = data_t.Start().at(0);
+        _ft  = flash._t ;
+        _e   = data_t._energy ;
+      }
+
+      if ( _beam_dt_min < flash._t && flash._t < _beam_dt_max ) {
+        nu_candidates.insert(node_id);
+        //std::cout<<"Nu?! "<<flash._z<<" vs "<<match.tpc_point.z<<std::endl;
       }
       else {
-	part.SetParticleInfo(part.PdgCode(),
-			     part.Mass(),
-			     part.Vertex(),
-			     part.Momentum(),
-			     part.RecoScore(),
-			     kCosmic);
-	//std::cout<<"Cosmic.. "<<flash._z<<" vs "<<match.tpc_point.z<<" @ "<<flash._t<<std::endl;
+        part.SetParticleInfo(part.PdgCode(),
+                             part.Mass(),
+                             part.Vertex(),
+                             part.Momentum(),
+                             part.RecoScore(),
+                             kCosmic);
+        //std::cout<<"Cosmic.. "<<flash._z<<" vs "<<match.tpc_point.z<<" @ "<<flash._t<<std::endl;
       }
+
+      _match_tree->Fill();
+
+
     }
 
-    for(auto const& node_id : graph.GetPrimaryNodes()) {
+    //all base particles that were not matched to a flash are set as kCosmic
+    for (auto const& node_id : graph.GetBaseNodes()) {
+      // std::cout << "Checking if node " << node_id << " is in potential nu candidates..." << std::endl;
 
       auto& part = graph.GetParticle(node_id);
 
-      if(part.ProcessType() == kCosmic) continue;
+      if (part.ProcessType() == kCosmic) continue;
 
-      if(nu_candidates.find(node_id) == nu_candidates.end())
-	part.SetParticleInfo(part.PdgCode(),
-			     part.Mass(),
-			     part.Vertex(),
-			     part.Momentum(),
-			     part.RecoScore(),
-			     kCosmic);
+      if (nu_candidates.find(node_id) == nu_candidates.end())
+        part.SetParticleInfo(part.PdgCode(),
+                             part.Mass(),
+                             part.Vertex(),
+                             part.Momentum(),
+                             part.RecoScore(),
+                             kCosmic);
+
     }
-    
+
     return true;
   }
 

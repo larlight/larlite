@@ -102,7 +102,7 @@ void MMQuality_Algo_Comparison( std::string dirName = "/uboone/app/users/elena/L
 	  auto PPlan1 = new TH1D("PPlan1","Purity Plane 1; Count ; Purity",101,-0.05,1.05);
 	  _TTree->Draw("BestPur_1>>PPlan1");
 	  C0->Update();  
-	  double figOfMeritP1 = (double) PPlan0->Integral(81,101)/((double)PPlan1->Integral());
+	  double figOfMeritP1 = (double) PPlan1->Integral(81,101)/((double)PPlan1->Integral());
 
 	  auto PPlan2 = new TH1D("PPlan2","Purity Plane 2; Count ; Purity",101,-0.05,1.05);
 	  _TTree->Draw("BestPur_2>>PPlan2");

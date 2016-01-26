@@ -48,6 +48,7 @@ class viewport3D(gl.GLViewWidget):
     # print self.cameraPosition()
 
 
+
     # self.pan(0,0,self._geometry.length())
     self.show()
 

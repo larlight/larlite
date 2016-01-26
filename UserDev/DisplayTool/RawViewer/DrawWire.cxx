@@ -62,8 +62,7 @@ bool DrawWire::analyze(larlite::storage_manager* storage) {
   // So, obviously, first thing to do is to get the wires.
   auto WireDigitHandle = storage->get_data<larlite::event_wire>(producer);
 
-  // std::cout << "Got data " << std::endl;
-
+  std::cout << WireDigitHandle -> size() << std::endl;
 
   for (auto const& wire : *WireDigitHandle) {
     unsigned int ch = wire.Channel();
@@ -71,11 +70,17 @@ bool DrawWire::analyze(larlite::storage_manager* storage) {
     unsigned int plane = geoService->ChannelToPlane(ch);
     int offset = detWire * detProp -> ReadOutWindowSize();
 
-    size_t i = 0;
-    for (auto & adc : wire.Signal()) {
-      // _planeData.at(plane).at(offset + i) = adc;
-      _planeData.at(plane).at(offset + i) = adc;
-      i++;
+
+    for (auto & iROI : wire.SignalROI().get_ranges()) {
+      // for (auto iROI = wire.SignalROI().begin_range(); wire.SignalROI().end_range(); ++iROI) {
+      const int FirstTick = iROI.begin_index();
+      size_t i = 0;
+      for (float ADC : iROI) {
+        _planeData.at(plane).at(offset + FirstTick + i) = ADC;
+        i ++;
+      }
+
+
     }
   }
 

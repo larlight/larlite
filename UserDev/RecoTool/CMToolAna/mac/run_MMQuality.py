@@ -8,7 +8,7 @@ if len(sys.argv) < 2:
     sys.exit(1)
 
 from ROOT import gSystem
-from ROOT import larlite as fmwk
+from larlite import larlite as fmwk
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
@@ -47,7 +47,8 @@ my_proc.set_ana_output_file(sOutputName)
 # Attach MMQuality process
 mmq = fmwk.MMQuality()
 #mmq.SetClusterProducer("mergedmergedfuzzycluster")
-mmq.SetClusterProducer(sProducerName) #I need to change this!
+#mmq.SetClusterProducer(sProducerName) #I need to change this!
+mmq.SetShowerProducer(sProducerName)
 #mmq.SetClusterProducer("Step1ShortestDist") #I need to change this!
 
 my_proc.add_process(mmq)

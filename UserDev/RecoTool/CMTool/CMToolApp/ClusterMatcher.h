@@ -52,13 +52,21 @@ namespace larlite {
 
     void SetClusterProducer(const std::string name) { _cluster_producer = name; }
 
+    void SetOutputProducer(std::string name) {_output_producer = name;}
+
+    void SaveOutputCluster(bool doit=true) { _write_output = doit; }
+
     ::cmtool::CMatchManager& GetManager() { return *_mgr; }
 
   protected:
 
+    bool _write_output;
+
     ::cmtool::CMatchManager *_mgr;
 
     std::string _cluster_producer;
+
+    std::string _output_producer;
 
     ::cluster::CRUHelper _cru_helper;
 

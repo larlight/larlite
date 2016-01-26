@@ -24,7 +24,6 @@ bool DrawEndpoint2d::initialize() {
     _dataByPlane.resize(geoService -> Nviews());
   }
   return true;
-  return true;
 }
 
 bool DrawEndpoint2d::analyze(larlite::storage_manager* storage) {

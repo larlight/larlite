@@ -1,9 +1,14 @@
 #!/usr/bin/env python
+import ROOT
+ROOT.PyConfig.IgnoreCommandLineOptions = True
+
+
 from gui import larlitegui
 import argparse
 import sys
 import signal
 from pyqtgraph.Qt import QtGui, QtCore
+
 
 from ROOT import evd
 

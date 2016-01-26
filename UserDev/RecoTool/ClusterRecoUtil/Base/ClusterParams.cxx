@@ -19,6 +19,7 @@ int cluster_params::SetHits(const std::vector< Hit2D> & inputHits) {
 }
 
 void cluster_params::Clear() {
+  hit_vector.clear();
   start_point.Clear();
   end_point.Clear();
   showering_point.Clear();
@@ -26,8 +27,14 @@ void cluster_params::Clear() {
   start_point_cand.clear(); start_point_cand.reserve(5);
   shwr_point_cand.clear(); shwr_point_cand.reserve(5);
   start_dir_cand.clear(); start_dir_cand.reserve(5);
+
+
   sum_charge                        = kDOUBLE_MIN ;
   mean_charge                       = kDOUBLE_MIN ;
+  rms_charge                        = kDOUBLE_MIN ;
+  sum_ADC                           = kDOUBLE_MIN ;
+  mean_ADC                          = kDOUBLE_MIN ;
+  rms_ADC                           = kDOUBLE_MIN ;
   mean_x                            = kDOUBLE_MIN ;
   mean_y                            = kDOUBLE_MIN ;
   rms_x                             = kDOUBLE_MIN ;
@@ -37,30 +44,40 @@ void cluster_params::Clear() {
   slope_2d_high_q                   = kDOUBLE_MIN ;
   slope_2d                          = kDOUBLE_MIN ;
   angle_2d                          = kDOUBLE_MIN ;
-  start_dir.clear(); start_dir.resize(2);
-  principal_dir.clear(); principal_dir.resize(2);
-  eigenvalue_principal              = kDOUBLE_MIN ;
-  eigenvalue_secondary              = kDOUBLE_MIN ;
-  multi_hit_wires                   = kDOUBLE_MIN ;
-  N_Wires                           = kDOUBLE_MIN ;
-  verticalness                      = kDOUBLE_MIN ;
   opening_angle                     = kDOUBLE_MIN ;
   opening_angle_charge_wgt          = kDOUBLE_MIN ;
   closing_angle                     = kDOUBLE_MIN ;
   closing_angle_charge_wgt          = kDOUBLE_MIN ;
-  offaxis_hits                      = kDOUBLE_MIN ;
-  modmeancharge                     = kDOUBLE_MIN ;
-  RMS_charge                        = kDOUBLE_MIN ;
+  start_charge                      = kDOUBLE_MIN ;
+  end_charge                        = kDOUBLE_MIN ;
+  eigenvalue_principal              = kDOUBLE_MIN ;
+  eigenvalue_secondary              = kDOUBLE_MIN ;
+  verticalness                      = kDOUBLE_MIN ;
+  start_dir.clear(); start_dir.resize(2);
+  principal_dir.clear(); principal_dir.resize(2);
+
+  length                            = kDOUBLE_MIN ;
+  width                             = kDOUBLE_MIN ;
+
+  hit_density_1D                    = kDOUBLE_MIN ;
+  hit_density_2D                    = kDOUBLE_MIN ;
+  multi_hit_wires                   = kDOUBLE_MIN ;
+  N_Wires                           = kDOUBLE_MIN ;
   modified_hit_density              = kDOUBLE_MIN ;
   N_Hits                            = kDOUBLE_MIN ;
   N_Hits_HC                         = kDOUBLE_MIN ;
-  length                            = kDOUBLE_MIN ;
-  width                             = kDOUBLE_MIN ;
-  hit_density_1D                    = kDOUBLE_MIN ;
-  hit_density_2D                    = kDOUBLE_MIN ;
+
+  modmeancharge                     = kDOUBLE_MIN ;
+  RMS_charge                        = kDOUBLE_MIN ;
+
   direction                         =  0       ;
+
   showerness                        = kDOUBLE_MIN ;
   trackness                         = kDOUBLE_MIN ;
+  offaxis_hits                      = kDOUBLE_MIN ;
+
+
+
 }
 
 void cluster_params::Report(std::ostream & os) const {
@@ -70,8 +87,13 @@ void cluster_params::Report(std::ostream & os) const {
      << "   start_point  .............. : (" << start_point.w << "," << start_point.t << ")\n"
      << "   end_point  ................ : (" << end_point.w << "," << end_point.t << ")\n"
      << "   showering_point  .......... : (" << showering_point.w << "," << showering_point.t << ")\n"
+
      << "   sum_charge  ............... : " << sum_charge << "\n"
      << "   mean_charge   ............. : " << mean_charge << "\n"
+     << "   rms_charge   .............. : " << rms_charge << "\n"
+     << "   sum_ADC  .................. : " << sum_ADC << "\n"
+     << "   mean_ADC  ................. : " << mean_ADC << "\n"
+     << "   rms_ADC  .................. : " << rms_ADC << "\n"
      << "   mean_x  ................... : " << mean_x << "\n"
      << "   mean_y  ................... : " << mean_y << "\n"
      << "   rms_x  .................... : " << rms_x << "\n"
@@ -81,30 +103,39 @@ void cluster_params::Report(std::ostream & os) const {
      << "   slope_2d_high_q  .......... : " << slope_2d_high_q << "\n"
      << "   slope_2d  ................. : " << slope_2d         << "\n"
      << "   angle_2d  ................. : " << angle_2d         << "\n"
-     << "   start_dir  ................ : (" << start_dir[0] << "," << start_dir[1] << ")\n"
-     << "   principal_dir  ............ : (" << principal_dir[0] << "," << principal_dir[1] << ")\n"
-     << "   eigenvalue_principal  ..... : " << eigenvalue_principal << "\n"
-     << "   eigenvalue_secondary  ..... : " << eigenvalue_secondary << "\n"
-     << "   multi_hit_wires  .......... : " << multi_hit_wires << "\n"
-     << "   N_Wires  .................. : " << N_Wires << "\n"
-     << "   N_Hits  ................... : " << N_Hits << "\n"
-     << "   N_Hits_HC  ................ : " << N_Hits_HC << "\n"
-     << "   verticalness  ............. : " << verticalness << "\n"
      << "   opening_angle  ............ : " << opening_angle << "\n"
      << "   opening_angle_charge_wgt  . : " << opening_angle_charge_wgt << "\n"
      << "   closing_angle  ............ : " << closing_angle << "\n"
      << "   closing_angle_charge_wgt  . : " << closing_angle_charge_wgt << "\n"
-     << "   offaxis_hits  ............. : " << offaxis_hits << "\n"
-     << "   modified_hit_density  ..... : " << modified_hit_density << "\n"
-     << "   modified mean charge ...... : " << modmeancharge << "\n"
-     << "   charge_RMS ................ : " << RMS_charge << "\n"
+     << "   start_charge  ............. : " << start_charge << "\n"
+     << "   end_charge  ..... ..........: " << end_charge << "\n"
+     << "   eigenvalue_principal  ..... : " << eigenvalue_principal << "\n"
+     << "   eigenvalue_secondary  ..... : " << eigenvalue_secondary << "\n"
+     << "   verticalness  ............. : " << verticalness << "\n"
+     << "   start_dir  ................ : (" << start_dir[0] << "," << start_dir[1] << ")\n"
+     << "   principal_dir  ............ : (" << principal_dir[0] << "," << principal_dir[1] << ")\n"
+
      << "   length  ................... : " << length << "\n"
      << "   width  .................... : " << width << "\n"
+
      << "   hit_density_1D  ........... : " << hit_density_1D << "\n"
      << "   hit_density_2D  ........... : " << hit_density_2D << "\n"
-     << "   showerness  ............... : " << showerness << "\n"
-     << "   trackness  ................ : " << trackness << "\n"
+     << "   multi_hit_wires  .......... : " << multi_hit_wires << "\n"
+     << "   N_Wires  .................. : " << N_Wires << "\n"
+     << "   modified_hit_density  ..... : " << modified_hit_density << "\n"
+     << "   N_Hits  ................... : " << N_Hits << "\n"
+     << "   N_Hits_HC  ................ : " << N_Hits_HC << "\n"
+
+     << "   modified mean charge ...... : " << modmeancharge << "\n"
+     << "   RMS_charge ................ : " << RMS_charge << "\n"
+
      << "   direction  ................ : " << direction << "\n"
+
+     << "   trackness  ................ : " << trackness << "\n"
+     << "   showerness  ............... : " << showerness << "\n"
+     << "   offaxis_hits  ............. : " << offaxis_hits << "\n"
+
+
      << "   Polygon  .................. : " << PolyObject << "\n";
 
 }
@@ -208,6 +239,26 @@ void cluster_params::ReportDiff(const cluster_params & otherCluster) {
               << this -> mean_charge << " vs. "
               << otherCluster.mean_charge << "\n";
   }
+  if (this -> rms_charge              != otherCluster.rms_charge) {
+    std::cout << "   rms_charge   ............. : "
+              << this -> rms_charge << " vs. "
+              << otherCluster.rms_charge << "\n";
+  }
+  if (this -> sum_ADC              != otherCluster.sum_ADC) {
+    std::cout << "   sum_ADC   ................ : "
+              << this -> sum_ADC << " vs. "
+              << otherCluster.sum_ADC << "\n";
+  }
+  if (this -> mean_ADC              != otherCluster.mean_ADC) {
+    std::cout << "   mean_ADC   ............... : "
+              << this -> mean_ADC << " vs. "
+              << otherCluster.mean_ADC << "\n";
+  }
+  if (this -> rms_ADC              != otherCluster.rms_ADC) {
+    std::cout << "   rms_ADC   ................ : "
+              << this -> rms_ADC << " vs. "
+              << otherCluster.rms_ADC << "\n";
+  }
   if (this -> mean_x                   != otherCluster.mean_x) {
     std::cout << "   mean_x  ................... : "
               << this -> mean_x << " vs. "
@@ -253,53 +304,6 @@ void cluster_params::ReportDiff(const cluster_params & otherCluster) {
               << this -> angle_2d << " vs. "
               << otherCluster.angle_2d << "\n";
   }
-  if (this -> start_dir[0] != otherCluster.start_dir[0] ||
-      this -> start_dir[1] != otherCluster.start_dir[1] ) {
-    std::cout << "   start_dir  ................ : "
-              << "(" << this->start_dir[0] << ", " << this->start_dir[1] << ") vs. "
-              << "(" << otherCluster.start_dir[0] << ", " << otherCluster.start_dir[1] << ")\n";
-  }
-  if (this -> principal_dir[0] != otherCluster.principal_dir[0] ||
-      this -> principal_dir[1] != otherCluster.principal_dir[1] ) {
-    std::cout << "   principal_dir  ............ : "
-              << "(" << this->principal_dir[0] << ", " << this->principal_dir[1] << ") vs. "
-              << "(" << otherCluster.principal_dir[0] << ", " << otherCluster.principal_dir[1] << ")\n";
-  }
-  if (this -> eigenvalue_principal     != otherCluster.eigenvalue_principal) {
-    std::cout << "   eigenvalue_principal  ..... : "
-              << this -> eigenvalue_principal << " vs. "
-              << otherCluster.eigenvalue_principal << "\n";
-  }
-  if (this -> eigenvalue_secondary     != otherCluster.eigenvalue_secondary) {
-    std::cout << "   eigenvalue_secondary  ..... : "
-              << this -> eigenvalue_secondary << " vs. "
-              << otherCluster.eigenvalue_secondary << "\n";
-  }
-  if (this -> multi_hit_wires          != otherCluster.multi_hit_wires) {
-    std::cout << "   multi_hit_wires  .......... : "
-              << this -> multi_hit_wires << " vs. "
-              << otherCluster.multi_hit_wires << "\n";
-  }
-  if (this -> N_Wires                  != otherCluster.N_Wires) {
-    std::cout << "   N_Wires  .................. : "
-              << this -> N_Wires << " vs. "
-              << otherCluster.N_Wires << "\n";
-  }
-  if (this -> N_Hits                   != otherCluster.N_Hits) {
-    std::cout << "   N_Hits  ................... : "
-              << this -> N_Hits << " vs. "
-              << otherCluster.N_Hits << "\n";
-  }
-  if (this -> N_Hits_HC                != otherCluster.N_Hits_HC) {
-    std::cout << "   N_Hits_HC  ................ : "
-              << this -> N_Hits_HC << " vs. "
-              << otherCluster.N_Hits_HC << "\n";
-  }
-  if (this -> verticalness             != otherCluster.verticalness) {
-    std::cout << "   verticalness  ............. : "
-              << this -> verticalness << " vs. "
-              << otherCluster.verticalness << "\n";
-  }
   if (this -> opening_angle            != otherCluster.opening_angle) {
     std::cout << "   opening_angle  ............ : "
               << this -> opening_angle << " vs. "
@@ -320,26 +324,44 @@ void cluster_params::ReportDiff(const cluster_params & otherCluster) {
               << this -> closing_angle_charge_wgt << " vs. "
               << otherCluster.closing_angle_charge_wgt << "\n";
   }
-  if (this -> offaxis_hits             != otherCluster.offaxis_hits) {
-    std::cout << "   offaxis_hits  ............. : "
-              << this -> offaxis_hits << " vs. "
-              << otherCluster.offaxis_hits << "\n";
+  if (this -> start_charge            != otherCluster.start_charge) {
+    std::cout << "   start_charge  ............. : "
+              << this -> start_charge << " vs. "
+              << otherCluster.start_charge << "\n";
   }
-  if (this -> modified_hit_density     != otherCluster.modified_hit_density) {
-    std::cout << "   modified_hit_density  ..... : "
-              << this -> modified_hit_density << " vs. "
-              << otherCluster.modified_hit_density << "\n";
+  if (this -> end_charge != otherCluster.end_charge) {
+    std::cout << "   end_charge  ............... : "
+              << this -> end_charge << " vs. "
+              << otherCluster.end_charge << "\n";
   }
-  if (this -> modmeancharge            != otherCluster.modmeancharge) {
-    std::cout << "   modified mean charge ...... : "
-              << this -> modmeancharge << " vs. "
-              << otherCluster.modmeancharge << "\n";
+  if (this -> eigenvalue_principal     != otherCluster.eigenvalue_principal) {
+    std::cout << "   eigenvalue_principal  ..... : "
+              << this -> eigenvalue_principal << " vs. "
+              << otherCluster.eigenvalue_principal << "\n";
   }
-  if (this -> RMS_charge               != otherCluster.RMS_charge) {
-    std::cout << "   charge_RMS ................ : "
-              << this -> RMS_charge << " vs. "
-              << otherCluster.RMS_charge << "\n";
+  if (this -> eigenvalue_secondary     != otherCluster.eigenvalue_secondary) {
+    std::cout << "   eigenvalue_secondary  ..... : "
+              << this -> eigenvalue_secondary << " vs. "
+              << otherCluster.eigenvalue_secondary << "\n";
   }
+  if (this -> verticalness             != otherCluster.verticalness) {
+    std::cout << "   verticalness  ............. : "
+              << this -> verticalness << " vs. "
+              << otherCluster.verticalness << "\n";
+  }
+  if (this -> start_dir[0] != otherCluster.start_dir[0] ||
+      this -> start_dir[1] != otherCluster.start_dir[1] ) {
+    std::cout << "   start_dir  ................ : "
+              << "(" << this->start_dir[0] << ", " << this->start_dir[1] << ") vs. "
+              << "(" << otherCluster.start_dir[0] << ", " << otherCluster.start_dir[1] << ")\n";
+  }
+  if (this -> principal_dir[0] != otherCluster.principal_dir[0] ||
+      this -> principal_dir[1] != otherCluster.principal_dir[1] ) {
+    std::cout << "   principal_dir  ............ : "
+              << "(" << this->principal_dir[0] << ", " << this->principal_dir[1] << ") vs. "
+              << "(" << otherCluster.principal_dir[0] << ", " << otherCluster.principal_dir[1] << ")\n";
+  }
+
   if (this -> length                   != otherCluster.length) {
     std::cout << "   length  ................... : "
               << this -> length << " vs. "
@@ -350,6 +372,8 @@ void cluster_params::ReportDiff(const cluster_params & otherCluster) {
               << this -> width << " vs. "
               << otherCluster.width << "\n";
   }
+
+
   if (this -> hit_density_1D           != otherCluster.hit_density_1D) {
     std::cout << "   hit_density_1D  ........... : "
               << this -> hit_density_1D << " vs. "
@@ -360,6 +384,51 @@ void cluster_params::ReportDiff(const cluster_params & otherCluster) {
               << this -> hit_density_2D << " vs. "
               << otherCluster.hit_density_2D << "\n";
   }
+  if (this -> multi_hit_wires          != otherCluster.multi_hit_wires) {
+    std::cout << "   multi_hit_wires  .......... : "
+              << this -> multi_hit_wires << " vs. "
+              << otherCluster.multi_hit_wires << "\n";
+  }
+  if (this -> N_Wires                  != otherCluster.N_Wires) {
+    std::cout << "   N_Wires  .................. : "
+              << this -> N_Wires << " vs. "
+              << otherCluster.N_Wires << "\n";
+  }
+  if (this -> modified_hit_density     != otherCluster.modified_hit_density) {
+    std::cout << "   modified_hit_density  ..... : "
+              << this -> modified_hit_density << " vs. "
+              << otherCluster.modified_hit_density << "\n";
+  }
+  if (this -> N_Hits                   != otherCluster.N_Hits) {
+    std::cout << "   N_Hits  ................... : "
+              << this -> N_Hits << " vs. "
+              << otherCluster.N_Hits << "\n";
+  }
+  if (this -> N_Hits_HC                != otherCluster.N_Hits_HC) {
+    std::cout << "   N_Hits_HC  ................ : "
+              << this -> N_Hits_HC << " vs. "
+              << otherCluster.N_Hits_HC << "\n";
+  }
+
+
+  if (this -> modmeancharge            != otherCluster.modmeancharge) {
+    std::cout << "   modified mean charge ...... : "
+              << this -> modmeancharge << " vs. "
+              << otherCluster.modmeancharge << "\n";
+  }
+  if (this -> RMS_charge               != otherCluster.RMS_charge) {
+    std::cout << "   charge_RMS ................ : "
+              << this -> RMS_charge << " vs. "
+              << otherCluster.RMS_charge << "\n";
+  }
+
+  if (this -> direction                != otherCluster.direction) {
+    std::cout << "   direction  ................ : "
+              << this -> direction << " vs. "
+              << otherCluster.direction << "\n";
+  }
+
+
   if (this -> showerness               != otherCluster.showerness) {
     std::cout << "   showerness  ............... : "
               << this -> showerness << " vs. "
@@ -370,11 +439,13 @@ void cluster_params::ReportDiff(const cluster_params & otherCluster) {
               << this -> trackness << " vs. "
               << otherCluster.trackness << "\n";
   }
-  if (this -> direction                != otherCluster.direction) {
-    std::cout << "   direction  ................ : "
-              << this -> direction << " vs. "
-              << otherCluster.direction << "\n";
+
+  if (this -> offaxis_hits             != otherCluster.offaxis_hits) {
+    std::cout << "   offaxis_hits  ............. : "
+              << this -> offaxis_hits << " vs. "
+              << otherCluster.offaxis_hits << "\n";
   }
+
 
   if (this -> PolyObject               != otherCluster.PolyObject) {
     std::cout << "   polygon ................... : "
