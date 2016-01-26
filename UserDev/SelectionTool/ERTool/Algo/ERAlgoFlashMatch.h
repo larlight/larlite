@@ -56,6 +56,9 @@ namespace ertool {
     /// Setter function to ignore shower particles (useful for validation scripts)
     void SetIgnoreShowers(bool flag) { _ignore_showers = flag; }
 
+    /// Setter function to ignore cosmic particles
+    void SetIgnoreCosmics(bool flag) { _ignore_cosmics = flag; }
+
   private:
 
     ::flashana::FlashMatchManager _mgr;
@@ -64,7 +67,8 @@ namespace ertool {
     double _light_yield; // Photons per MEV, gotten from LightPath configured instance
 
     double _beam_dt_min, _beam_dt_max;
-    bool _ignore_showers;
+    bool _ignore_showers; // Don't look for a flash for an intxn with base particle that is kShower
+    bool _ignore_cosmics; // Don't look for a flash for an intxn with base particle that is kCosmic
     
     TTree * _match_tree;
     double _mct;

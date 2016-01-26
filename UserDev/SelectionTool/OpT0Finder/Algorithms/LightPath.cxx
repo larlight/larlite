@@ -39,8 +39,7 @@ namespace flashana {
 
     int num_div = int(dist / _gap);
 
-    ::geoalgo::Vector direction = pt_1 - pt_2;
-    ::geoalgo::Vector direct = direction.Dir();
+    ::geoalgo::Vector direct = (pt_1 - pt_2).Dir();
 
     Q_cluster.reserve(Q_cluster.size() + num_div);
 
