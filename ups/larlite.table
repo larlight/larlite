@@ -26,16 +26,16 @@ Common:
   Action = setup
     prodDir()
     setupEnv()
-    envSet(${UPS_PROD_NAME_UC}_VERSION, v1_00_00)
+    envSet(${UPS_PROD_NAME_UC}_VERSION, v04_34_00)
 
     # Set up required products, which is root
     exeActionRequired(GetProducts)
 
-    envSet(LARLITE_BASEDIR,${UPS_PROD_DIR}/${${UPS_PROD_NAME_UC}_VERSION}/${UPS_PROD_FLAVOR})
+    envSet(LARLITE_BASEDIR,${UPS_PROD_DIR}/${UPS_PROD_FLAVOR})
     envSet(LARLITE_ROOT6,0)
-    envSet(LARLITE_COREDIR,${UPS_PROD_DIR}/${${UPS_PROD_NAME_UC}_VERSION}/${UPS_PROD_FLAVOR}/core)
-    envSet(LARLITE_LIBDIR,${UPS_PROD_DIR}/${${UPS_PROD_NAME_UC}_VERSION}/${UPS_PROD_FLAVOR}/lib)
-    envSet(LARLITE_USERDEVDIR,${UPS_PROD_DIR}/${${UPS_PROD_NAME_UC}_VERSION}/${UPS_PROD_FLAVOR}/UserDev)
+    envSet(LARLITE_COREDIR,${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/core)
+    envSet(LARLITE_LIBDIR,${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/lib)
+    envSet(LARLITE_USERDEVDIR,${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/UserDev)
     
 
     if ( test `uname` = "Darwin" )
@@ -56,3 +56,8 @@ Common:
 End:
 # End Group definition
 #*************************************************
+#
+# ups declare command that works on gpvm:
+# ups declare larlite v04_34_00 -r larlite/v04_34_00 -f Linux64bit+2.6-2.12 -m larlite.table -q e9:prof -U ups/
+#
+#
