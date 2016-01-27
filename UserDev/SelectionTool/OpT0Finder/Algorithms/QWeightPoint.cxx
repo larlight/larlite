@@ -47,9 +47,7 @@ namespace flashana {
     }
 
     double min_dz = 1e9;
-    for(double x_offset=0;
-	x_offset<(250.-(x_max-x_min));
-	x_offset+=_x_step_size) {
+    for(double x_offset=0; x_offset<(256.35-(x_max-x_min)); x_offset+=_x_step_size) {
       
       // Create QCluster_t with this offset
 

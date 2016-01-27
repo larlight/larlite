@@ -34,6 +34,7 @@ class larlite_manager_base(manager, QtCore.QObject):
         self._drawWires = False
         self._drawParams = False
         self._wireDrawer = None
+        self._truthDrawer = None
 
         # Lariat has special meanings to event/spill/run
         self._spill = 0
@@ -179,6 +180,8 @@ class larlite_manager_base(manager, QtCore.QObject):
 
 class larlite_manager(larlite_manager_base):
 
+
+    truthLabelChanged = QtCore.pyqtSignal(str)
     '''
     Class to handle the 2D specific aspects of larlite viewer
     '''
@@ -186,6 +189,7 @@ class larlite_manager(larlite_manager_base):
     def __init__(self, geom, file=None):
         super(larlite_manager, self).__init__(geom, file)
         self._drawableItems = datatypes.drawableItems()
+        self._drawTruth = False
 
     # this function is meant for the first request to draw an object or
     # when the producer changes
@@ -230,6 +234,7 @@ class larlite_manager(larlite_manager_base):
         for recoProduct in self._drawnClasses:
             self._drawnClasses[recoProduct].clearDrawnObjects(
                 self._view_manager)
+        self.clearTruth()
 
     def drawFresh(self):
         # # wires are special:
@@ -238,6 +243,7 @@ class larlite_manager(larlite_manager_base):
         self.clearAll()
         # Draw objects in a specific order defined by drawableItems
         order = self._drawableItems.getListOfTitles()
+        self.drawTruth()
         for item in order:
             if item in self._drawnClasses:
                 self._drawnClasses[item].drawObjects(self._view_manager)
@@ -296,6 +302,35 @@ class larlite_manager(larlite_manager_base):
             self._wireDrawer = None
             self._drawWires = False
 
+    def toggleTruth(self, truthBool):
+        if truthBool == False:
+            self.clearTruth()
+            self._drawTruth = False
+            self._truthDrawer = None
+            return
+        if 'mctruth' not in self._keyTable:
+            print "No truth information to display"
+            self._drawTruth = False
+            return
+        self._drawTruth = True
+        self._truthDrawer = datatypes.mctruth()
+        self._process.add_process(self._truthDrawer._process)
+
+    def clearTruth(self):
+        if self._truthDrawer is not None:
+            self._truthDrawer.clearDrawnObjects(self._view_manager)
+
+
+    def drawTruth(self):
+        if self._drawTruth:
+            print "Emiting this message: {msg}".format(msg=self._truthDrawer.getLabel())
+            self.truthLabelChanged.emit(self._truthDrawer.getLabel())
+            self._truthDrawer.drawObjects(self._view_manager)
+        else:
+            print "Emiting this message: {msg}".format(msg="")
+            self.truthLabelChanged.emit("")
+
+
     def toggleParams(self, paramsBool):
         self._drawParams = paramsBool
         self.clusterParamsChanged.emit(paramsBool)
@@ -312,6 +347,13 @@ class larlite_manager(larlite_manager_base):
         else:
             return False
 
+    def drawHitsOnWire(self, plane, wire):
+        if not 'Hit' in self._drawnClasses:
+            return
+        else:
+            # Get the hits:
+            hits = self._drawnClasses['Hit'].getHitsOnWire(plane,wire)
+            self._view_manager.drawHitsOnPlot(hits)
 
 try:
     import pyqtgraph.opengl as gl

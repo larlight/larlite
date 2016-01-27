@@ -57,9 +57,7 @@ bool DrawTrack3D::analyze(larlite::storage_manager* storage) {
 
   // Populate the track vector:
   for (auto & track : *trackHandle) {
-    for (unsigned int view = 0; view < geoService -> Nviews(); view++) {
-      _data.push_back(getTrack3d(track));
-    }
+    _data.push_back(getTrack3d(track));
   }
 
 
@@ -83,7 +81,7 @@ bool DrawTrack3D::finalize() {
   return true;
 }
 
-DrawTrack3D::~DrawTrack3D(){}
+DrawTrack3D::~DrawTrack3D() {}
 
 Track3D DrawTrack3D::getTrack3d(larlite::track track) {
   Track3D result;

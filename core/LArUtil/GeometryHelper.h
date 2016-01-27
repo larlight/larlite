@@ -417,6 +417,14 @@ public:
     bool Point_isInTPC(const TVector3 & pointIn3D) const;
 
     /**
+       @brief given 2 2D angles on 2 planes, get the corresponding 3D
+       angle in 3 dimensions.
+     */
+    int Get3DAxisN(const int& iplane0, const int& iplane1,
+		   const double& omega0, const double& omega1,
+		   double& phi, double& theta) const;
+
+    /**
      * @brief return the conversion from time tick to centimeters
      * @return Floating point conversion in the units [cm / time tick]
      */

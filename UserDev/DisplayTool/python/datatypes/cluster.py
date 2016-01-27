@@ -3,6 +3,8 @@ from pyqtgraph.Qt import QtGui, QtCore
 from connectedObjects import connectedBox, connectedCircle, boxCollection
 from ROOT import evd
 import pyqtgraph as pg
+import larlite as larlite
+from larlite import larutil
 
 
 class clusterParams(QtCore.QObject):  # recoBase):
@@ -89,17 +91,20 @@ class clusterParams(QtCore.QObject):  # recoBase):
         black = (0, 0, 0)
         blue = (0, 0, 255)
 
-        offset = self._geom.offset(
-            self._params.plane_id.Plane) / self._geom.time2cm()
+        planeOffset = larutil.Geometry.GetME().PlaneOriginVtx(self._params.plane_id.Plane)[0]
+        trigOffset  = larutil.DetectorProperties.GetME().TriggerOffset()
+        t2cm = larutil.GeometryHelper.GetME().TimeToCm();
+        w2cm = larutil.GeometryHelper.GetME().WireToCm();
+        #t2cm = self._geom.time2cm()
+        #w2cm = self._geom.wire2cm()
 
         # Draw the start and end points:
-        sW = self._params.start_point.w / self._geom.wire2cm()
-        sT = (self._params.start_point.t) / self._geom.time2cm() + offset
-        eW = self._params.end_point.w / self._geom.wire2cm()
-        eT = (self._params.end_point.t) / self._geom.time2cm() + offset
-        showeringW = self._params.showering_point.w / self._geom.wire2cm()
-        showeringT = (self._params.showering_point.t) / \
-            self._geom.time2cm() + offset
+        sW = self._params.start_point.w / w2cm
+        sT = (self._params.start_point.t - planeOffset) / t2cm + trigOffset
+        eW = self._params.end_point.w / w2cm
+        eT = (self._params.end_point.t - planeOffset) / t2cm + trigOffset
+        showeringW = self._params.showering_point.w / w2cm
+        showeringT = (self._params.showering_point.t - planeOffset) / t2cm + trigOffset
 
         radBigW = 0.5 / self._geom.wire2cm()
         radBigT = (0.5) / self._geom.time2cm()
@@ -170,9 +175,8 @@ class clusterParams(QtCore.QObject):  # recoBase):
         self._thisPolyF = QtGui.QPolygonF()
         for p in xrange(self._params.PolyObject.Size()):
             point = self._params.PolyObject.Point(p)
-            qpoint = QtCore.QPointF(
-                point.first/self._geom.wire2cm(),
-                point.second/self._geom.time2cm() + offset)
+            qpoint = QtCore.QPointF( point.first / w2cm,
+                                     (point.second - planeOffset) / t2cm + trigOffset)
             self._thisPolyF.append(qpoint)
 
         self._thisPoly = QtGui.QGraphicsPolygonItem(self._thisPolyF)

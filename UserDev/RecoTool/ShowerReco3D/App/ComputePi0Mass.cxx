@@ -169,7 +169,7 @@ namespace larlite {
 
       auto const& s = ev_shower->at(shower_index);
 
-      std::pair<size_t,double> res = fBTAlg.ShowerCorrectness(cluster_ass[shower_index]);
+      std::pair<size_t,double> res = fBTAlg.MatchCorrectness(cluster_ass[shower_index]);
       size_t mcs_index = res.first;
       double correctness = res.second;
 

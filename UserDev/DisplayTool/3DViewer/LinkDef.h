@@ -34,6 +34,12 @@
 #pragma link C++ class evd::RecoBase3D<evd::Track3D>+;
 #pragma link C++ class evd::DrawTrack3D+;
 
+#pragma link C++ class evd::MCTrack3D+;
+#pragma link C++ class std::vector<evd::MCTrack3D>+;
+#pragma link C++ class evd::RecoBase3D<evd::MCTrack3D>+;
+#pragma link C++ class evd::DrawMCTrack3D+;
+
+
 // Link the classes that are processors
 // #pragma link C++ class larlite::DrawVertex+;
 // #pragma link C++ class larlite::DrawEndpoint2d+;

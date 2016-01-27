@@ -45,8 +45,12 @@ def getShowerRecoAlgModular():
   axis3D.setThetaRangeMin(0.0005)
   axis3D.setNStepsStart(4)
   axis3D.setConvergeRate(0.85)
-  axis3D.setVerbosity(False)
+  axis3D.setVerbosity(True)
   axis3D.setSeedVectorErrorCutoff(0.1)
+
+  angle3D = showerreco.Angle3DFormula()
+  angle3D.setMaxAngleError(0.1)
+  angle3D.setVerbosity(False)
 
   energy = showerreco.LinearEnergy()
   energy.SetUseModBox(True)
@@ -58,7 +62,8 @@ def getShowerRecoAlgModular():
   dedx.SetUsePitch(False)
   dedx.setVerbosity(False)
 
-  alg.AddShowerRecoModule(axis3D)
+  #alg.AddShowerRecoModule(axis3D)
+  alg.AddShowerRecoModule(angle3D)
   alg.AddShowerRecoModule(showerreco.StartPoint3DModule()  )
   alg.AddShowerRecoModule(energy)
   alg.AddShowerRecoModule(dqdx)
@@ -118,8 +123,8 @@ def DefaultShowerReco3D():
     # Attach Matching algorithm
     #
     palgo_array, algo_array = DefaultMatch()
-    ana_unit.GetManager().AddPriorityAlgo(palgo_array)
-    ana_unit.GetManager().AddMatchAlgo(algo_array)
+    #ana_unit.GetManager().AddPriorityAlgo(palgo_array)
+    #ana_unit.GetManager().AddMatchAlgo(algo_array)
 
     return ana_unit
 
@@ -143,7 +148,7 @@ my_proc.set_output_file("showerRecoUboone.root")
 
 
 ana_unit=DefaultShowerReco3D()
-ana_unit.SetInputProducer("mergeall")
+ana_unit.SetInputProducer("fuzzyclustermerger",True)
 
 ana_unit.SetOutputProducer("showerreco")
 
@@ -153,7 +158,7 @@ print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
-my_proc.run(0,1000)
+my_proc.run()
 # my_proc.process_event(2)
 
 

@@ -19,6 +19,7 @@
 #include "LArUtil/Geometry.h"
 #include "LArUtil/GeometryHelper.h"
 #include "LArUtil/DetectorProperties.h"
+#include "DataFormat/pfpart.h"
 #include "DataFormat/cluster.h"
 #include "DataFormat/hit.h"
 
