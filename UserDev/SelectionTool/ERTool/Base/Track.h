@@ -35,6 +35,7 @@ namespace ertool {
       kPion,
       kMuon,
       kPIDA,
+      kMIPy,
       kTrackPartIDMax
     };
 
@@ -66,6 +67,11 @@ namespace ertool {
     /// Total deposited energy
     double _energy;
     double _time;
+
+    // Track calorimetry Objects
+    std::vector<double> _dedx; 
+
+
 
     /// Debug print functionality
     void PrintInfo() const;

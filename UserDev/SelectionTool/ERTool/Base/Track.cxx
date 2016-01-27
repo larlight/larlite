@@ -24,6 +24,7 @@ void Track::Reset()
   _pid = Track::kUnknown;
   _energy = kINVALID_DOUBLE;
   _time = kINVALID_DOUBLE;
+  _dedx.clear();  
 }
 
 void Track::PrintInfo() const {

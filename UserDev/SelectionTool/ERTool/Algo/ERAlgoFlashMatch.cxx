@@ -24,6 +24,7 @@ namespace ertool {
     _beam_dt_min = -10.;
     _beam_dt_max = 100.;
     _ignore_showers = true;
+    _ignore_cosmics = false;
   }
 
   void ERAlgoFlashMatch::Reset()
@@ -145,7 +146,12 @@ namespace ertool {
 
       auto const& base_part = graph.GetParticle(base_node_id);
 
-      if (_ignore_showers &&  base_part.RecoType() == kShower) continue;
+      if (_ignore_showers && base_part.RecoType() == kShower) continue;
+      if (_ignore_cosmics &&
+          ( base_part.ProcessType() == kCosmic ||
+            graph.GetParticle(base_part.Ancestor()).ProcessType() == kCosmic ) )
+
+        continue;
 
       auto const& children_v = graph.GetAllDescendantNodes(base_part.ID());
 

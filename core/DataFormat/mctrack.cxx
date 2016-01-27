@@ -34,6 +34,9 @@ namespace larlite {
     fStart = invalid_step;
     fEnd   = invalid_step;
 
+    fdEdx.clear();
+    fdQdx.clear();
+
     fMotherStart = invalid_step;
     fMotherEnd   = invalid_step;
     
@@ -55,14 +58,19 @@ namespace larlite {
   const mcstep&      mctrack::MotherStart   () const { return fMotherStart;     }
   const mcstep&      mctrack::MotherEnd     () const { return fMotherEnd;       }
   
-  int                mctrack::AncestorPdgCode   () const { return fAncestorPDGCode; }
-  unsigned int       mctrack::AncestorTrackID   () const { return fAncestorTrackID; }
-  const std::string& mctrack::AncestorProcess   () const { return fMotherProcess;   }
-  const mcstep&      mctrack::AncestorStart     () const { return fAncestorStart;   }
-  const mcstep&      mctrack::AncestorEnd       () const { return fAncestorEnd;     }
+  int                mctrack::AncestorPdgCode             () const { return fAncestorPDGCode; }
+  unsigned int       mctrack::AncestorTrackID             () const { return fAncestorTrackID; }
+  const std::string& mctrack::AncestorProcess             () const { return fMotherProcess;   }
+  const mcstep&      mctrack::AncestorStart               () const { return fAncestorStart;   }
+  const mcstep&      mctrack::AncestorEnd                 () const { return fAncestorEnd;     }
+  const std::vector<double>& mctrack::dEdx                () const { return fdEdx;            }
+  const std::vector<std::vector <double> >& mctrack::dQdx () const { return fdQdx;            }
 
 
-  double   mctrack::dX(const SegmentID_t id) const {
+
+
+  /*
+    double   mctrack::dX(const SegmentID_t id) const {
     if (id + 2 > this->size()) {
       std::cerr<<"Invalid segment ID "<<id<<std::endl;
       throw DataFormatException();
@@ -135,7 +143,7 @@ namespace larlite {
 
     return fsegmentCenter;
   }
-
+  */
 
 
 }
