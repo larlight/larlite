@@ -106,11 +106,22 @@ namespace fcllite {
     }
 
     /// Template getter w/ default value
+    /*
     template <class T>
     T get(const std::string& key, const std::string default_value) const{
       auto iter = _data_value.find(key);
       if( iter == _data_value.end() )
 	return FromString<T>(default_value);
+      return FromString<T>((*iter).second);
+    }
+    */
+    
+    /// Template getter w/ default value
+    template <class T>
+    T get(const std::string& key, const T default_value) const{
+      auto iter = _data_value.find(key);
+      if( iter == _data_value.end() )
+	return default_value;
       return FromString<T>((*iter).second);
     }
 

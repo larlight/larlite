@@ -41,6 +41,8 @@ namespace fcllite {
     
     const fcllite::PSet& SubConfig(const std::string& key)
     { return _data.get_pset(key); }
+
+    std::string dump() const { return _data.dump(); }
     
   protected:
     
