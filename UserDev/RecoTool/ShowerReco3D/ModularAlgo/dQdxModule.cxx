@@ -6,6 +6,9 @@
 #include "LArUtil/LArProperties.h"
 #include "LArUtil/DetectorProperties.h"
 #include "ShowerReco3D/Base/ShowerRecoException.h"
+#include "math.h"
+#include <algorithm>
+#include <functional>
 
 bool larger( std::pair<int,double> a,std::pair<int,double> b){
   return a.second<b.second;
@@ -23,11 +26,11 @@ namespace showerreco{
     // to go from mV to fC the ASIC gain and Shaping time
     // must be considered
     // fC -> mV *= ( shaping time * ASIC gain )
-    _charge_conversion = _ADC_to_mV * _fC_to_e / ( _shp_time * _asic_gain ) ;
     _shp_time  = 2.;  // in usec
     _asic_gain = 7.8; // in mV/fC
     _fC_to_e = 6250.; // a fC in units of the electron charge
     _ADC_to_mV = 0.5; // ADC -> mV conversion from gain measurements    
+    _charge_conversion = _ADC_to_mV * _fC_to_e / ( _shp_time * _asic_gain ) ;
     // Correction factr
     _tau = larutil::LArProperties::GetME()->ElectronLifetime();             //electron lifetime in usec
     _timetick = larutil::DetectorProperties::GetME()->SamplingRate()*1.e-3; //time sample in usec, 0.5us
@@ -111,7 +114,7 @@ namespace showerreco{
 	//correct for electron life time 
 	double hit_tick =hits[i].t/t2cm;
 	double lifetimeCorr = exp( hit_tick * _timetick / _tau );
-	double Q = hits[i].charge * _charge_conversion*lifetimeCorr;
+	double Q = hits[i].charge * _charge_conversion *lifetimeCorr;
 
 	if (dist_hit_clu<= 2.4 || dist_hit_clu<trunk_length[pl]){
 	  
@@ -131,7 +134,6 @@ namespace showerreco{
 	  }
 	}
       }
-    
       // Get median of dQdx
       std::nth_element(dQdxs[pl].begin(),dQdxs[pl].begin() + dQdxs[pl].size()/2, dQdxs[pl].end());
       if(dQdxs[pl].size()>0)median[pl]= dQdxs[pl].at((dQdxs[pl].size()/2)); 
@@ -167,7 +169,8 @@ namespace showerreco{
       resultShower.fBestdQdxPlane = _pl_best;
       resultShower.fdQdx_v[pl] = median[pl];
       
-    }
+    }// for all clusters (planes)
+
     return;
   }
 } //showerreco
