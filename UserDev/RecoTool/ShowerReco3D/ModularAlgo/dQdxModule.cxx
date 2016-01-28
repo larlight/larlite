@@ -60,7 +60,7 @@ namespace showerreco{
     auto geom = larutil::Geometry::GetME();
     auto geomHelper = larutil::GeometryHelper::GetME();
     const size_t nplanes = geom->Nplanes();
-    auto t2cm = geomHelper->TimeToCm();
+    //auto t2cm = geomHelper->TimeToCm();  //time to cm conversion for e lifetime correction
     auto const& dir3D = resultShower.fDCosStart;
 
     std::vector<double> trunk_length(nplanes,0);
@@ -111,11 +111,15 @@ namespace showerreco{
 			    (hits[i].t-clu_start.t)*(hits[i].t-clu_start.t));
 	dist_hit_shr = sqrt((hits[i].w-shr_start.w)*(hits[i].w-shr_start.w)+
 			    (hits[i].t-shr_start.t)*(hits[i].t-shr_start.t));
-	//correct for electron life time 
-	double hit_tick =hits[i].t/t2cm;
-	double lifetimeCorr = exp( hit_tick * _timetick / _tau );
-	double Q = hits[i].charge * _charge_conversion *lifetimeCorr;
-
+	/***
+	    Correction for electron life time, 
+	    Now removed since T0 is unknown.
+	    ---------------------------------
+	    double hit_tick =hits[i].t/t2cm;
+	    double lifetimeCorr = exp( hit_tick * _timetick / _tau );
+	    double Q = hits[i].charge * _charge_conversion*lifetimeCorr;
+	***/
+	double Q = hits[i].charge * _charge_conversion;
 	if (dist_hit_clu<= 2.4 || dist_hit_clu<trunk_length[pl]){
 	  
 	  if(trunk_length[pl]==0 || dist_hit_clu*dist_hit_shr==0){
