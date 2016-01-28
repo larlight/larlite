@@ -529,7 +529,7 @@ class gui(QtGui.QWidget):
     return self._southWidget
 
   def updateMessageBar(self,message):
-    print "Received a message: {msg}".format(msg=message)
+    # print "Received a message: {msg}".format(msg=message)
     self._messageBar.showMessage(message)
 
   def getEastLayout(self):

@@ -32,12 +32,14 @@ public:
   int outgoing_lepton_pdg() {return _outgoing_lepton_pdg;}
   int target_pdg() {return _target_pdg;}
   std::vector<int> outgoing_pdg_list() {return _outgoing_pdg_list;}
+  bool isCC(){return _isCC;}
 
   TVector3 _vertex;
   int _incoming_lepton_pdg;
   int _outgoing_lepton_pdg;
   int _target_pdg;
   std::vector<int> _outgoing_pdg_list;
+  bool _isCC;
 
 };
 

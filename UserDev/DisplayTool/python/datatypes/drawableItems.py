@@ -55,7 +55,7 @@ try:
             # self._drawableClasses.update({'Hit': [hit.hit,"hit"]})
             # self._drawableClasses.update({'Cluster': [cluster.cluster,"cluster"]})
             # self._drawableClasses.update({'Match': [match.match,"cluster"]})
-            # self._drawableClasses.update({'Shower': [shower.shower,"shower"]})
+            self._drawableClasses.update({'Shower': [shower.shower3D,"shower"]})
             self._drawableClasses.update({'Track': [track.track3D,"track"]})
             self._drawableClasses.update({'MCTrack': [mctrack.mctrack3D,"mctrack"]})
 
