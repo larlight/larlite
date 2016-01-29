@@ -17,11 +17,12 @@
 #pragma link C++ class std::vector<larutil::PxHit>+;
 #pragma link C++ class std::vector<const larutil::PxHit*>+;
 
-#pragma link C++ class cluster::ClusterParamsAlg+;
-#pragma link C++ class std::vector<::cluster::ClusterParamsAlg>+;
 
 #pragma link C++ class cluster::cluster_params+;
 #pragma link C++ class std::vector<cluster::cluster_params>+;
+
+#pragma link C++ class cluster::ClusterParamsAlg+;
+#pragma link C++ class std::vector<::cluster::ClusterParamsAlg>+;
 
 #pragma link C++ class cluster::CRUException+;
 #pragma link C++ class cluster::CRUHelper+;
@@ -30,6 +31,7 @@
 //#pragma link C++ class cluster::DefaultParamsAlg+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 
