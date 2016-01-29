@@ -14,7 +14,6 @@
 #ifndef BASICTOOL_GEOCYLINDER_H
 #define BASICTOOL_GEOCYLINDER_H
 
-#include "GeoVector.h"
 #include "GeoAlgo.h"
 #include "GeoLine.h"
 
@@ -22,6 +21,10 @@ namespace geoalgo {
   /**
      \class Cylinder
      @brief Representation of a 3D Cylinder volume.
+     A Cylinder object inherits from a geoalgo::Line
+     @input 2 points, which define the line representing
+     the central axis of the cylinder
+     @input a radius, defining the radius of the cylinder
   */
   class Cylinder : public Line {
     
@@ -43,6 +46,11 @@ namespace geoalgo {
     
     /// Containment evaluation
     bool Contain(const Point_t &pt) const; ///< Test if a point is contained within the box
+
+    /// Getters
+    double GetRadius() { return _radius; }
+    /// Setters
+    void SetRadius(double r) { _radius = r; }
     
   protected:
     
