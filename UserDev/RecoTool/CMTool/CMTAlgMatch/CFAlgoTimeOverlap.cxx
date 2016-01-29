@@ -10,7 +10,7 @@ namespace cmtool {
   //-------------------------------------------------------
   {
     SetRatioCut(0.001) ; //(0.095) ;  
-    SetStartTimeCut(2) ;
+    SetStartTimeCut(5) ;
     SetDebug(false) ;
     SetVerbose(false) ;
     RequireThreePlanes(true) ;
