@@ -41,12 +41,6 @@ namespace cmtool {
     
     void SetRatioCut(float ratio) { _time_ratio_cut = ratio ; } 
 
- 
-    //Order the theta, phi, hits per plane to make cuts convenient
-    /*
-    virtual void SetMaxMiddleMin(const double first, const double second, const double third, 
-				 double &most, double &middle, double &least) ;
-    */
     void SetDebug(bool debug) { _debug = debug ; }
     
     void SetVerbose(bool verbose) { _verbose = verbose ; }
