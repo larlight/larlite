@@ -1,7 +1,7 @@
 from data import recoBase
 from pyqtgraph.Qt import QtGui, QtCore
 from connectedObjects import connectedBox, connectedCircle, boxCollection
-from ROOT import evd
+from ROOT import evd, vector
 import pyqtgraph as pg
 import larlite as larlite
 from larlite import larutil
@@ -61,27 +61,34 @@ class clusterParams(QtCore.QObject):  # recoBase):
         return self.toolTip()
 
     def toolTip(self):
-        tip = "Hits: " + str(self._params.N_Hits) + "\n"
-        tip += "Start: (" + "{:.2f}".format(self._params.start_point.w) + ", "
+        tip =  "Hits: \t\t " + str(self._params.N_Hits) + "\n"
+        tip += "Start: \t\t (" + "{:.2f}".format(self._params.start_point.w) + ", "
         tip += "{:.2f}".format(self._params.start_point.t) + ")\n"
-        tip += ("Shower Start (" +
+        tip += ("Shower Start \t (" +
                 "{:.2f}".format(self._params.showering_point.w) + ", ")
         tip += "{:.2f}".format(self._params.showering_point.t) + ")\n"
-        tip += "End: (" + "{:.2f}".format(self._params.end_point.w) + ", "
+        tip += "End: \t\t (" + "{:.2f}".format(self._params.end_point.w) + ", "
         tip += "{:.2f}".format(self._params.end_point.t) + ")\n"
         if self._params.principal_dir[0] != 0:
             slope = self._params.principal_dir[1]/self._params.principal_dir[0]
-            tip += ("Slope: " + "{:.2f}".format(slope) + "\n")
+            tip += ("Slope: \t\t " + "{:.2f}".format(slope) + "\n")
         else:
-            tip += "Slope: inf\n"
+            tip += "Slope: \t\t inf\n"
         if self._params.start_dir[0] != 0:
-            tip += "Start Slope: " + \
+            tip += "Start Slope: \t " + \
                 "{:.2f}".format(
                     self._params.start_dir[1]/self._params.start_dir[0]) + "\n"
         else:
-            tip += "Start Slope: inf\n"
-        tip += "Angle: " + "{:.2f}".format(self._params.angle_2d) + "\n"
-        tip += "Add more in data.py:clusterParams:toolTip!"
+            tip += "Start Slope: \t inf\n"
+        tip += "Angle:  \t\t " + "{:.2f}".format(self._params.angle_2d) + "\n"
+        tip += "\n"
+        fannVec = vector(float)()
+        self._params.GetFANNVector(fannVec)
+        fannTitle = self._params.GetFANNVectorTitle()
+        for title, value in zip(fannTitle,fannVec):
+            tip += "{:.2f}: ".format(value) + "{title}\n".format(title=title)
+
+        tip += "\nAdd more in python/datatypes/cluster.py:clusterParams:toolTip!"
         return tip
 
     def draw(self, view):
