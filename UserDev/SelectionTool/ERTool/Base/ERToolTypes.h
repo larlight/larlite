@@ -81,6 +81,7 @@ namespace ertool {
     kPionDecay,//Processes follow
     // pi+ -> numu mu+
     // pi- -> numubar mu- 
+    kPiZeroMID,     //hacky addition for downstream algos that determine a nue is actually a pi0 MID
     kINVALID_PROCESS_TYPE
   };
 
