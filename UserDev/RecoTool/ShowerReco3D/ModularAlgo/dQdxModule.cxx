@@ -6,6 +6,9 @@
 #include "LArUtil/LArProperties.h"
 #include "LArUtil/DetectorProperties.h"
 #include "ShowerReco3D/Base/ShowerRecoException.h"
+#include "math.h"
+#include <algorithm>
+#include <functional>
 
 bool larger( std::pair<int,double> a,std::pair<int,double> b){
   return a.second<b.second;
@@ -20,42 +23,44 @@ namespace showerreco{
 
   void dQdxModule::initialize()
   {
-    _tau = larutil::LArProperties::GetME()->ElectronLifetime();             //electron lifetime in usec
-    _timetick = larutil::DetectorProperties::GetME()->SamplingRate()*1.e-3; //time sample in usec, 0.5us
-    _fC_to_e = 6250.; // a fC in units of the electron charge
-    _ADC_to_mV = 0.5; // ADC -> mV conversion from gain measurements
     // to go from mV to fC the ASIC gain and Shaping time
     // must be considered
     // fC -> mV *= ( shaping time * ASIC gain )
     _shp_time  = 2.;  // in usec
     _asic_gain = 7.8; // in mV/fC
+    _fC_to_e = 6250.; // a fC in units of the electron charge
+    _ADC_to_mV = 0.5; // ADC -> mV conversion from gain measurements    
     _charge_conversion = _ADC_to_mV * _fC_to_e / ( _shp_time * _asic_gain ) ;
-    
+    // Correction factr
+    _tau = larutil::LArProperties::GetME()->ElectronLifetime();             //electron lifetime in usec
+    _timetick = larutil::DetectorProperties::GetME()->SamplingRate()*1.e-3; //time sample in usec, 0.5us
+        
     return;
   }
 
   void dQdxModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Shower_t & resultShower){
 
-    // *****
-    // dQdx of each hit == hit charge / pitch
-    // dQdx of a shower is the median of dQdxs from all selected hits
-    // See calculation details down below. Line 84
-    // dQdx is calculated for each plane using its cluster
-    // information (contaions time and wire of hits in that cluster).
-    // All variables are initialized correspondly as
-    // a 3-dimensional vector.
-    // Within this Algorithm, the best plane is decided by choosing the plane
-    // w/ longest trunk length. Therefore here best plane does NOT refer to best dQdx.
-    // User should define their own best plane OUTSIDE this algorithm.
-    // *****
-    // In OCT 2015, develpers tried use sigma or rms to better calculate dQdx
-    // but results showed no improvements. Now this part is commented out.
-    // *****           
+    /***
+	dQdx = hit charge / pitch .
+	For details, see Doc-db 4909 .
+	dQdx of a shower is the median of dQdxs of hits along trunk .
+	Trunk connects cluster and shower start points . 
+	Calculation starts line 84 .
+	dQdx is calculated for 3 planes. All variables are initialized
+	correspondly as a 3-dimensional vector.
+	Note within this Algorithm, the best plane is defined as the
+	plane w/ longest trunk length. Therefore here best plane does
+	NOT refer to best dQdx.
+	User should define their own best plane OUTSIDE this algorithm.
+	--------------------------------------------------------------
+	In OCT 2015, develpers tried sigma or rms to better calculate
+	dQdx but results showed no improvements. Now this part is removed.
+    ***/
     
     auto geom = larutil::Geometry::GetME();
     auto geomHelper = larutil::GeometryHelper::GetME();
     const size_t nplanes = geom->Nplanes();
-    auto t2cm = geomHelper->TimeToCm();
+    //auto t2cm = geomHelper->TimeToCm();  //time to cm conversion for e lifetime correction
     auto const& dir3D = resultShower.fDCosStart;
 
     std::vector<double> trunk_length(nplanes,0);
@@ -81,18 +86,19 @@ namespace showerreco{
       
       if(pl >= nplanes) throw ShowerRecoException("Invalid plane found!");
       
-      // ALGORITHM DEVELOPMENT
-      // Find list of hits that are along the trunk of
-      // the shower. Grab all hits within 2.4cm w.r.t to cluster strat points
-      // and hits within trunk length to cluster start point.
-      // 2.4cm is just another magic number in uBooNE.
-      // ###
-      // For all these hits, calculate dQdx if cosine value at cluster start point
-      // is no larger than cosine value of shower open angle.
-      // ###
-      // "Trunk Length" is distance from cluster start point to shower start point
-      // Other detailsk, see Doc-db 4909
-
+      /***
+	  Find list of hits that are along the trunk of
+	  the shower. Grab all hits within 2.4cm w.r.t 
+	  to cluster strat points and hits within trunk 
+	  length compared to cluster start point.
+	  ---------------------------------------------
+	  2.4cm is just another magic number in uBooNE.
+	  If you found a better cut, should just modify it.
+	  ---------------------------------------------
+	  For all these hits, save dQdx into dQdx if tan
+	  value at cluster start point is no larger than
+	  tan value of shower open angle.
+      ***/
       double pitch = geomHelper->GetPitch(dir3D,(int)pl);
       double dist_hit_clu;
       double dist_hit_shr;
@@ -105,11 +111,15 @@ namespace showerreco{
 			    (hits[i].t-clu_start.t)*(hits[i].t-clu_start.t));
 	dist_hit_shr = sqrt((hits[i].w-shr_start.w)*(hits[i].w-shr_start.w)+
 			    (hits[i].t-shr_start.t)*(hits[i].t-shr_start.t));
-	//correct for electron life time 
-	double hit_tick =hits[i].t/t2cm;
-	double lifetimeCorr = exp( hit_tick * _timetick / _tau );
-	double Q = hits[i].charge * _charge_conversion*lifetimeCorr;
-
+	/***
+	    Correction for electron life time, 
+	    Now removed since T0 is unknown.
+	    ---------------------------------
+	    double hit_tick =hits[i].t/t2cm;
+	    double lifetimeCorr = exp( hit_tick * _timetick / _tau );
+	    double Q = hits[i].charge * _charge_conversion*lifetimeCorr;
+	***/
+	double Q = hits[i].charge * _charge_conversion;
 	if (dist_hit_clu<= 2.4 || dist_hit_clu<trunk_length[pl]){
 	  
 	  if(trunk_length[pl]==0 || dist_hit_clu*dist_hit_shr==0){
@@ -128,20 +138,20 @@ namespace showerreco{
 	  }
 	}
       }
-    
-      // Calculate median of dQdx
+      // Get median of dQdx
       std::nth_element(dQdxs[pl].begin(),dQdxs[pl].begin() + dQdxs[pl].size()/2, dQdxs[pl].end());
       if(dQdxs[pl].size()>0)median[pl]= dQdxs[pl].at((dQdxs[pl].size()/2)); 
             
-      //***
-      // Decide best plane corresponding to trunk_length
-      // The best_plane is selected by choosing the plane w/ longest trunk length
-      // Note that Some trunk length are 10cm due to
-      // mis-assigned cluster or shower start point
-      // Throw them away
-      // For users' convenience, set Y plane the best plane
-      //***
-      /*if(pl==2){
+      /***
+	  Best plane here refers to the plane w/ longest 
+	  trunk length. Note that Some trunk length are 
+	  larger than 10cm due to mis-assigned cluster
+	  or shower start point. Throw them away.
+	  --------------------------------------------------
+	  From previous study and for users' convenience,
+	  set Y plane the best plane.
+      ***/
+     /*if(pl==2){
 	std::vector<std::pair<int,double>> pl_best;
 	pl_best.resize(3);
 	pl_best.at(0).first=0;
@@ -163,7 +173,8 @@ namespace showerreco{
       resultShower.fBestdQdxPlane = _pl_best;
       resultShower.fdQdx_v[pl] = median[pl];
       
-    }
+    }// for all clusters (planes)
+
     return;
   }
 } //showerreco

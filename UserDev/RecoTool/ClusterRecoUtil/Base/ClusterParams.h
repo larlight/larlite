@@ -20,6 +20,7 @@
 #include <limits>
 #include "Polygon2D.h"
 #include "Base/GeoTypes.h"
+#include "TString.h"
 
 
 #include "LArUtil/PxUtils.h"
@@ -183,7 +184,26 @@ public:
    */
   void  GetFANNVector(std::vector<float> & data) const;
 
-  std::vector<std::string> GetFANNVectorTitle();
+  std::vector<std::string> GetFANNVectorTitle(){
+  std::vector<std::string> FannLegend;
+  FannLegend.push_back("Opening - Closing Angle (normalized)");
+  // FannLegend.push_back("Opening - Closing Angle charge weight");
+  // FannLegend.push_back("Closing Angle (normalized)");
+  // FannLegend.push_back("Closing Angle charge weight");
+  FannLegend.push_back("Principal Eigenvalue");
+  // FannLegend.push_back("Secondary Eigenvalue");
+  FannLegend.push_back("Width / Length");
+  // FannLegend.push_back("Hit Density / M.H.D.");
+  FannLegend.push_back("Percent MultiHit Wires");
+  // FannLegend.push_back("Percent High Charge Hits");
+  FannLegend.push_back("Modified Hit Density");
+  FannLegend.push_back("Charge RMS / Mean Charge");
+  FannLegend.push_back("log(Sum Charge / Length)");
+  return FannLegend;
+
+}
+
+
 
   /**
    * For debugging purposes, prints the result of GetFANNVector
@@ -194,7 +214,6 @@ public:
 
 
 };
-
 
 }
 

@@ -33,6 +33,8 @@ class larlite_manager_base(manager, QtCore.QObject):
         # Toggle whether or not to draw wires:
         self._drawWires = False
         self._drawParams = False
+        self._drawTruth = False
+
         self._wireDrawer = None
         self._truthDrawer = None
 
@@ -160,7 +162,7 @@ class larlite_manager_base(manager, QtCore.QObject):
             print "On the first event, can't go to previous."
 
     def processEvent(self, force=False):
-        if len(self._drawnClasses) == 0 and not self._drawWires:
+        if len(self._drawnClasses) == 0 and not ( self._drawWires or self._drawTruth) :
             self._mgr.go_to(self._event)
             return
         if self._lastProcessed != self._event or force:
@@ -189,7 +191,6 @@ class larlite_manager(larlite_manager_base):
     def __init__(self, geom, file=None):
         super(larlite_manager, self).__init__(geom, file)
         self._drawableItems = datatypes.drawableItems()
-        self._drawTruth = False
 
     # this function is meant for the first request to draw an object or
     # when the producer changes
@@ -314,7 +315,10 @@ class larlite_manager(larlite_manager_base):
             return
         self._drawTruth = True
         self._truthDrawer = datatypes.mctruth()
+        self._truthDrawer.setProducer(self._keyTable['mctruth'][0])
         self._process.add_process(self._truthDrawer._process)
+        self.processEvent(True)
+
 
     def clearTruth(self):
         if self._truthDrawer is not None:
@@ -323,11 +327,11 @@ class larlite_manager(larlite_manager_base):
 
     def drawTruth(self):
         if self._drawTruth:
-            print "Emiting this message: {msg}".format(msg=self._truthDrawer.getLabel())
+            # print "Emiting this message: {msg}".format(msg=self._truthDrawer.getLabel())
             self.truthLabelChanged.emit(self._truthDrawer.getLabel())
             self._truthDrawer.drawObjects(self._view_manager)
         else:
-            print "Emiting this message: {msg}".format(msg="")
+            # print "Emiting this message: {msg}".format(msg="")
             self.truthLabelChanged.emit("")
 
 
