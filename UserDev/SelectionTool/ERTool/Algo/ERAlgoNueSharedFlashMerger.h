@@ -23,6 +23,8 @@
 
 #include "ERTool/Base/AlgoBase.h"
 #include "GeoAlgo/GeoAlgo.h"
+#include "ERTool/Algo/AlgoEMPart.h"
+#include "ERTool/Algo/AlgoFindRelationship.h"
 
 namespace ertool {
 
@@ -56,6 +58,16 @@ namespace ertool {
     void ProcessEnd(TFile* fout = nullptr);
 
     void setDebug(bool flag) { _debug = flag; }
+
+    /// Function to check wether a shower is e- or gamma-like
+    /// Returns true if gamma-like
+    bool isGammaLike(const double dedx, double radlen,bool forceRadLen=false);
+
+
+  protected:
+
+    AlgoFindRelationship _findRel;
+    AlgoEMPart _alg_emp;
 
   private:
 
