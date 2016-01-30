@@ -38,6 +38,8 @@
 #include "fifo.h"
 #include "opdetwaveform.h"
 #include "simphotons.h"
+#include "mucsdata.h"
+#include "mucsreco.h"
 
 namespace larlite {
 
@@ -1160,6 +1162,12 @@ namespace larlite {
       break;
     case data::kSimPhotons:
       _ptr_data_array[type][name]=new event_simphotons(name);
+      break;
+    case data::kMuCSData:
+      _ptr_data_array[type][name]=new event_mucsdata(name);
+      break;
+    case data::kMuCSReco:
+      _ptr_data_array[type][name]=new event_mucsreco(name);
       break;
     default:
       print(msg::kERROR,__FUNCTION__,Form("Event-data identifier not supported: %d",(int)type));
