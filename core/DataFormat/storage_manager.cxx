@@ -523,8 +523,8 @@ namespace larlite {
 	    TIter key_iter(key_list);
 	    TObject* obj = nullptr;
 	    std::set<std::string> name_candidates;
-	    name_candidates.insert(data::kEVENT_ID_TREE);
 	    if(_use_read_bool) {
+	      name_candidates.insert(data::kEVENT_ID_TREE);
 	      for(int i=0; i<data::kDATA_TYPE_MAX; ++i) {
 		
 		for(auto const& name_bool : _read_data_array[i]) {
