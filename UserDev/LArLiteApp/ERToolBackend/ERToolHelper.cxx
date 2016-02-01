@@ -645,9 +645,12 @@ namespace larlite {
 			s._energy     = mcs.DetProfile().Momentum().E();
 			//s._energy = mcs.Start().Momentum().E();
 			fWatch.Start();
+			/*
 			if ( (mcs.dEdx() == 0) ||  (mcs.dEdx() > 100) )
-			{s._dedx = (mcs.PdgCode() == 22 ? gRandom->Gaus(4, 4 * 0.03) : gRandom->Gaus(2, 2 * 0.03));}
+			  {s._dedx = (mcs.PdgCode() == 22 ? gRandom->Gaus(4, 4 * 0.03) : gRandom->Gaus(2, 2 * 0.03));}
 			else {s._dedx =  mcs.dEdx();}
+			*/
+			s._dedx = (mcs.PdgCode() == 22 ? 4 : 2);
 			//s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.05) : gRandom->Gaus(2,2*0.05));
 			random_time += fWatch.RealTime();
 			s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);

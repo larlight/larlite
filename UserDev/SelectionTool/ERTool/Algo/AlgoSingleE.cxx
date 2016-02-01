@@ -409,6 +409,7 @@ namespace ertool {
 
 	bool AlgoSingleE::isGammaLike(const double dedx, double radlen, bool forceRadLen)
 	{
+	  return (dedx >3);
 		if ( !_useRadLength && !forceRadLen )
 			radlen = -1;
 		if ( _alg_emp.LL(true, dedx, radlen) < _alg_emp.LL(false, dedx, radlen) )
