@@ -18,8 +18,10 @@
 #pragma link C++ class larlite::ShowerAna+;
 #pragma link C++ class showerreco::ShowerClusterFinder+;
 
+#pragma link C++ class larlite::ClusterInfo+;
 //ADD_NEW_CLASS ... do not change this line
 //ADD_NEW_ALG_CLASS ... do not change this line
 #endif
+
 
 
