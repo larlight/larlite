@@ -15,9 +15,10 @@ from larlite import larutil
 from recotool import cmtool, showerreco
 
 from ROOT import calo
-# from recotool.showerDef import DefaultShowerReco3D
+from recotool.matchDef import * 
 
-
+# usage:
+# > python matchAndShowerRecoUboone.py cluster_file.root cluster_producer
 
 def getShowerRecoAlgModular():
   # This function returns the default shower reco module
@@ -86,15 +87,10 @@ def DefaultShowerReco3D():
     # Attach shower reco alg
     sralg = getShowerRecoAlgModular()
     # sralg.SetDebug()
-    # sralg.Verbose(False)
-    # sralg.Verbose(True)
-    # sralg.SetUseArea(True)
-    # Attach calo alg
     # calg = calo.CalorimetryAlg()
     # sralg.CaloAlgo(calg)
-    #sralg.SetUseModBox(True)
+    # sralg.SetUseModBox(True)
     ana_unit.AddShowerAlgo(sralg)
-
 
     return ana_unit
 
@@ -102,26 +98,35 @@ def DefaultShowerReco3D():
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
 
-
 # Set input root file
-for x in xrange(len(sys.argv)-1):
+for x in xrange(len(sys.argv)-2):
     my_proc.add_input_file(sys.argv[x+1])
 
 # Specify IO mode
 my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 
-# Specify analysis output root file name
-my_proc.set_ana_output_file("showerRecoUboone_ana.root")
-# Specify data output root file name
-my_proc.set_output_file("showerRecoUboone.root")
+my_proc.set_ana_output_file("ana.root")
+my_proc.set_output_file("showers.root")
 
+# DefaultMatch is the function called from $LARLITE/python/recot...
+palgo_array, algo_array = DefaultMatch()
 
+match_maker = fmwk.ClusterMatcher()
+match_producer = "MatchCluster"
+cluster_producer = sys.argv[-1]
+
+match_maker.GetManager().AddPriorityAlgo(palgo_array)
+match_maker.GetManager().AddMatchAlgo(algo_array)
+
+match_maker.SetClusterProducer(cluster_producer)
+match_maker.SetOutputProducer(match_producer)
+match_maker.SaveOutputCluster(True)
 
 ana_unit=DefaultShowerReco3D()
-ana_unit.SetInputProducer("fuzzyclustermerger",True)
-
+ana_unit.SetInputProducer(match_producer) #,True)
 ana_unit.SetOutputProducer("showerreco")
 
+my_proc.add_process(match_maker)
 my_proc.add_process(ana_unit)
 
 print
@@ -129,9 +134,6 @@ print  "Finished configuring ana_processor. Start event loop!"
 print
 
 my_proc.run()
-# my_proc.process_event(2)
-
-
 
 sys.exit()
 

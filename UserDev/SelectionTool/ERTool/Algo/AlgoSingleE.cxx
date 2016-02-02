@@ -25,6 +25,8 @@ namespace ertool {
 		_BDtW = 0;
 		_BDtTW = 0;
 		_neutrinos = 0;
+		h_isShowerGammaLike_IP = 0;
+		h_isShowerGammaLike_r = 0;
 
 	}
 
@@ -63,6 +65,11 @@ namespace ertool {
 		_empart_tree->Branch("_radlen", &_radlen, "radlen/D");
 		_empart_tree->Branch("_pdg", &_pdg, "pdg/I");
 
+		if (!h_isShowerGammaLike_r && !h_isShowerGammaLike_IP){
+			h_isShowerGammaLike_r = new TH1F("h_isShowerGammaLike_r","h_isShowerGammaLike_r",1000,0,100);
+			h_isShowerGammaLike_IP = new TH1F("h_isShowerGammaLike_IP","h_isShowerGammaLike_IP",1000,0,20);
+		}
+
 		return;
 	}
 
@@ -98,6 +105,12 @@ namespace ertool {
 			}
 
 			auto const& thisShower = data.Shower(graph.GetParticle(p).RecoID());
+
+			// Check if "thisshower" points back close to anything else in the event
+			// If it does point back close to anything, use that crossing
+			// point as a "vertex" and check if "thisshower" is gammalike
+			// using the distance to the vertex.
+			if (isShowerGammaLike(p, data, graph)) continue;
 
 			// keep track of whether it is single
 			bool single = true;
@@ -139,10 +152,18 @@ namespace ertool {
 					ss << "Comparing with shower (" << p2 << ")";
 					Debug(__FUNCTION__, ss.str());
 				}
+
 				// is "thatshower" gamma or e-like?
+				// Check if "thatshower" points back close to anything else in the event
+				// If it does point back close to anything, use that crossing
+				// point as a "vertex" and check if "thatshower" is gammalike
+				// using the distance to the vertex.
+				if (isShowerGammaLike(p2, data, graph)) continue;
+
 				// if gamma-like maybe a nearby pi0 -> ok if close
-				if (isGammaLike(thatShower._dedx, -1))
-					continue;
+				// if (isGammaLike(thatShower._dedx, -1))
+				// 	continue;
+
 				// "thatShower" is e-like. If the two are correlated and siblings
 				// then we have two e-like showers at the vertex -> do not count
 				// "thisShower" as a SingleE
@@ -271,12 +292,13 @@ namespace ertool {
 
 			// if still single (and no sister track) look at
 			// dEdx to determine if e-like
-			if (single && !_hassister) {
-				if ( isGammaLike(thisShower._dedx, -1) || (thisShower._dedx <= 0) || (thisShower._dedx > 10.) ) {
-					if (Debug()) Debug(__FUNCTION__, "Shower is single but gamma-like -> reject");
-					single = false;
-				}
-			}
+			/// kaleko implemented this now at the beginning and has verified it is redundant
+			// if (single && !_hassister) {
+			// 	if ( isGammaLike(thisShower._dedx, -1) || (thisShower._dedx <= 0) || (thisShower._dedx > 10.) ) {
+			// 		if (Debug()) Debug(__FUNCTION__, "Shower is single but gamma-like -> reject");
+			// 		single = false;
+			// 	}
+			// }
 
 			//If single still true -> we found it! Proceed!
 			// the particle with all it's info was already
@@ -400,6 +422,12 @@ namespace ertool {
 				_alg_tree->Write();
 			if (_empart_tree)
 				_empart_tree->Write();
+
+			if(h_isShowerGammaLike_IP && h_isShowerGammaLike_r){
+				h_isShowerGammaLike_r->Write();
+				h_isShowerGammaLike_IP->Write();
+			}
+
 			_alg_emp.ProcessEnd(fout);
 		}
 
@@ -409,6 +437,7 @@ namespace ertool {
 
 	bool AlgoSingleE::isGammaLike(const double dedx, double radlen, bool forceRadLen)
 	{
+		// return (dedx >3);
 		if ( !_useRadLength && !forceRadLen )
 			radlen = -1;
 		if ( _alg_emp.LL(true, dedx, radlen) < _alg_emp.LL(false, dedx, radlen) )
@@ -427,6 +456,56 @@ namespace ertool {
 		return false;
 	}
 
+	bool AlgoSingleE::isShowerGammaLike(const NodeID_t showernode, const EventData &data, const ParticleGraph& graph) {
+
+		/// This is the shower we are determining if is e- or gamma
+		auto shr1 = data.Shower(graph.GetParticle(showernode));
+
+		/// This is the potential vertex (closest point for this shower to back-project to something else)
+		::geoalgo::Point_t vtxMin(3);
+
+		// Loop through all other showers
+		// for every shower find the object with the smallest IP
+		double IPmin = 1036;
+		for (auto const& s : graph.GetParticleNodes(RecoType_t::kShower)) {			
+			/// Don't compare shower to itself
+			if (s == showernode) continue;		
+			auto const& shr2 = data.Shower(graph.GetParticle(s));
+			::geoalgo::Point_t vtx(3);
+			double IP = _findRel.FindClosestApproach(shr1, shr2, vtx);
+			if (IP < IPmin) {
+				IPmin = IP;
+				vtxMin = vtx;
+			}
+		}// loop over other showers
+
+		// loop over other tracks
+		for (auto const& t : graph.GetParticleNodes(RecoType_t::kTrack)) {
+			// make sure we are not comparing with itself
+			::geoalgo::Point_t vtx(3);
+			auto const& trk = data.Track(graph.GetParticle(t));
+			double IP = _findRel.FindClosestApproach(shr1, trk, vtx);
+			if (IP < IPmin) {
+				IPmin = IP;
+				vtxMin = vtx;
+			}
+		}// loop over other tracks
+
+
+		// Fill debug histos
+		h_isShowerGammaLike_IP->Fill(IPmin);
+		h_isShowerGammaLike_r->Fill(vtxMin.Dist(shr1.Start()));
+
+		// If this shower points back to within 10 cm of anything else
+		// And this shower start point is farther than 2cm from that vtx
+		// assume it is gamma like (no empart used!)
+		if(IPmin < 10. && vtxMin.Dist(shr1.Start()) > 1.)
+			return true;
+
+		// If not, use algo empart with no radiation length
+		return isGammaLike(shr1._dedx, -1);
+
+	}// end isShowerGammaLike
 
 
 	void AlgoSingleE::ClearTree() {

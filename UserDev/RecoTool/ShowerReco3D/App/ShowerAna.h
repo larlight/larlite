@@ -17,8 +17,7 @@
 
 #include "Analysis/ana_base.h"
 
-#include "TH1F.h"
-#include "TVector3.h"
+#include <TTree.h>
 
 namespace larlite {
   /**
@@ -30,46 +29,34 @@ namespace larlite {
   public:
 
     /// Default constructor
-    ShowerAna(){ _name="ShowerAna"; _fout=0;}
+    ShowerAna();
 
     /// Default destructor
     virtual ~ShowerAna(){}
 
-    /** IMPLEMENT in ShowerAna.cc!
-        Initialization method to be called before the analysis event loop.
-    */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in ShowerAna.cc! 
-        Analyze a data event-by-event  
-    */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in ShowerAna.cc! 
-        Finalize method to be called after all events processed.
-    */
     virtual bool finalize();
 
-    bool isFiducial(const TVector3 & vertex);
-
+    void setShowerProducer(std::string s) { _producer = s; }
 
   protected:
+
+    std::string _producer;
     
-    // Histograms to compare vertex information, dE/dx, direction:
-    TH1F * vertex_X;
-    TH1F * vertex_Y;
-    TH1F * vertex_Z;
-    TH1F * vertex_abs;
+    TTree* _shower_tree;
+    
+    double _energy_U, _energy_V, _energy_Y;
+    double _dedx_U, _dedx_V, _dedx_Y;
+    double _dqdx_U, _dqdx_V, _dqdx_Y;
+    double _x, _y, _z;
+    double _px, _py, _pz;
+    double _theta, _phi;
+    double _opening_angle;
+    double _length;
 
-    TH1F * direction_X;
-    TH1F * direction_Y;
-    TH1F * direction_Z;
-    TH1F * direction_angle;
-
-    TH1F * dEdx;
-    TH1F * dEdx_fid;
-
-    std::vector<int> _good_event_list;
   };
 }
 #endif

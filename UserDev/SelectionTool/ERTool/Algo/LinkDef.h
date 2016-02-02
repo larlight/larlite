@@ -32,6 +32,8 @@
 #pragma link C++ class ertool::ERAlgoVertexBuilder+;
 #pragma link C++ class ertool::ERAlgoTrackID+;
 #pragma link C++ class ertool::ERAlgoOpT0Tender+;
+#pragma link C++ class ertool::ERAlgoNueSharedFlashMerger+;
 
 #endif
+
 

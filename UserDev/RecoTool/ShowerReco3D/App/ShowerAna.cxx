@@ -6,39 +6,45 @@
 #include <cmath>
 #include <iostream>
 #include "ShowerAna.h"
-#include "DataFormat/mctruth.h"
-#include "DataFormat/mcshower.h"
 #include "DataFormat/shower.h"
-#include "LArUtil/Geometry.h"
-//use function NearestWire()
-//takes 3d point and plane as an argument and returns wire nearest to it
-//get time by scaling x
-#include "LArUtil/GeometryUtilities.h"
 
 namespace larlite {
 
+  ShowerAna::ShowerAna() 
+    : _shower_tree(nullptr)
+  {
+    _producer = "showerreco";
+    _name     = "ShowerAna";
+    _fout     = 0;
+  }
+
   bool ShowerAna::initialize() {
 
-    //
-    // This function is called in the beggining of event loop
-    // Do all variable initialization you wish to do here.
-    // If you have a histogram to fill in the event loop, for example,
-    // here is a good place to create one on the heap (i.e. "new TH1D"). 
-    //
+    if (_shower_tree) { delete _shower_tree; }
 
-    // Histograms to compare vertex information, dE/dx, direction:
-    vertex_X = new TH1F("vertex_x","X vertex True - reco",100,-25,25);
-    vertex_Y = new TH1F("vertex_y","Y vertex True - reco",100,-25,25);
-    vertex_Z = new TH1F("vertex_z","Z vertex True - reco",100,-25,25);
-    vertex_abs = new TH1F("vertex_abs","Abs vertex True - reco",100,-25,25);
+    _shower_tree = new TTree("_shower_tree","Reco Shower Info Tree");
 
-    direction_X = new TH1F("direction_x","X direction True - reco",100,-25,25);
-    direction_Y = new TH1F("direction_y","Y direction True - reco",100,-25,25);
-    direction_Z = new TH1F("direction_z","Z direction True - reco",100,-25,25);
-    direction_angle = new TH1F("direction_angle","Angle Between True and reco",100,-3.14,3.14);
-
-    dEdx = new TH1F("dEdx","Reconstructed dEdx",50,-2,20);
-    dEdx_fid = new TH1F("dEdx_fid","Reconstructed dEdx",50,-2,20);
+    _shower_tree->Branch("_energy_Y",&_energy_Y,"energy_Y/D");
+    _shower_tree->Branch("_energy_V",&_energy_V,"energy_V/D");
+    _shower_tree->Branch("_energy_U",&_energy_U,"energy_U/D");
+    _shower_tree->Branch("_dedx_Y",&_dedx_Y,"dedx_Y/D");
+    _shower_tree->Branch("_dedx_V",&_dedx_V,"dedx_V/D");
+    _shower_tree->Branch("_dedx_U",&_dedx_U,"dedx_U/D");
+    _shower_tree->Branch("_dqdx_Y",&_dqdx_Y,"dqdx_Y/D");
+    _shower_tree->Branch("_dqdx_V",&_dqdx_V,"dqdx_V/D");
+    _shower_tree->Branch("_dqdx_U",&_dqdx_U,"dqdx_U/D");
+    _shower_tree->Branch("_x",&_x,"x/D");
+    _shower_tree->Branch("_y",&_y,"y/D");
+    _shower_tree->Branch("_z",&_z,"z/D");
+    _shower_tree->Branch("_px",&_px,"px/D");
+    _shower_tree->Branch("_py",&_py,"py/D");
+    _shower_tree->Branch("_pz",&_pz,"pz/D");
+    // theta is the angle w.r.t. the Z direction
+    _shower_tree->Branch("_theta",&_theta,"theta/D");
+    // phi is the angle w.r.t. the XY plane (0 if aligned w/ positive X axis)
+    _shower_tree->Branch("_phi",&_phi,"phi/D");
+    _shower_tree->Branch("_opening_angle",&_opening_angle,"opening_angle/D");
+    _shower_tree->Branch("_length",&_length,"length/D");
 
     return true;
   }
@@ -46,181 +52,48 @@ namespace larlite {
   
   
   bool ShowerAna::analyze(storage_manager* storage) {
-    auto geom = larutil::Geometry::GetME();
-    auto geomUtil = larutil::GeometryUtilities::GetME();
-  
-    //
-    // Do your event-by-event analysis here. This function is called for 
-    // each event in the loop. You have "storage" pointer which contains 
-    // event-wise data. To see what is available, check the "Manual.pdf":
-    //
-    // http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
-    // 
-    // Or you can refer to Base/DataFormatConstants.hh for available data type
-    // enum values. Here is one example of getting PMT waveform collection.
-    //
-    // event_fifo* my_pmtfifo_v = (event_fifo*)(storage->get_data(DATA::PMFIFO));
-    //
-    // if( event_fifo )
-    //
-    //   std::cout << "Event ID: " << my_pmtfifo_v->event_id() << std::endl;
-    //
 
+    event_shower * ev_shower = storage -> get_data<event_shower>(_producer);
 
-    event_mctruth * event_truth = storage -> get_data<event_mctruth>("generator");
+    if (!ev_shower or (ev_shower->size() == 0) )
+      return true;
     
-    if (!event_truth){
-      print(msg::kERROR,__FUNCTION__,
-        "MCTruth info not found in the event!\nLikely you didn't include the mcinfo files, which are necessary.\n");
-      throw std::exception();
-    }
-    if (!event_truth->size()){
-      print(msg::kERROR,__FUNCTION__,
-        "For some reason, MCTruth has size zero. Figure out why!\n");
-      throw std::exception();
-    }
-    
-    auto truth = event_truth -> at(0);
-    if ( truth.GetNeutrino().CCNC() == 1){
-      return false;
-    }
-
-
-    auto neutrino = truth.GetNeutrino().Nu();
-    auto lep = truth.GetNeutrino().Lepton();
-  
-    TLorentzVector trueVertex = neutrino.Trajectory().front().Position();
-    TLorentzVector trueDirection = lep.Trajectory().front().Momentum();
-
-    // Only look at electron neutrino events?
-
-    // get the mc showers:
-    event_mcshower * ev_shower = storage -> get_data<event_mcshower>("mcreco");
-    event_shower * reco_shower = storage -> get_data<event_shower>("showerreco");
-    
-    if (reco_shower -> size() == 0) return false;
-
-    // Normalize the direction:
-    TVector3 trueDirNorm = trueDirection.Vect();
-    trueDirNorm *= 1.0/trueDirNorm.Mag(); 
-
-    int shower_number = 1;
-
-    // std::cout << "\n\n\nThis event ("<< storage -> event_id() << ") has " << ev_shower->size() << " mc showers.\n";
     for (auto & shower : * ev_shower){
-      //if (shower.DetProfile().E() < 10) continue;
-        if (abs(shower.PdgCode()) == 11)
-        // {
-        //   std::cout << "shower number: " << shower_number << '\n';
-        //   std::cout << "\tPDG: ........ " << shower.PdgCode() << "\n"
-        //             << "\tTrack ID: ... " << shower.TrackID() << "\n"
-        //             << "\tMother ID: .. " << shower.MotherTrackID() << "\n"
-        //             << "\tTotal E: .... " << shower.MotherStart().E() << "\n"
-        //             << "\tDep E: ...... " << shower.DetProfile().E() << "\n";
-        //   std::cout << "\tvertex: (" << trueVertex.X() << ", " << trueVertex.Y() << ", " << trueVertex.Z() << ")\n"
-        //               << "\tdirection: (" << trueDirNorm.X() << ", " << trueDirNorm.Y() << ", " << trueDirNorm.Z() << ")" << '\n';
-        //   std::cout << "\tWire (Vertex) @ Plane 0: " << geom->NearestWire(trueVertex.Vect(), 0) * 0.4 << '\n';
-        //   std::cout << "\tWire (Vertex) @ Plane 1: " << geom->NearestWire(trueVertex.Vect(), 1) * 0.4 << '\n';
-        //   std::cout << "\tTime (Vertex): " << trueVertex.X() << '\n';
-        //   std::cout << "\t2D Angle @ plane 0: " << geomUtil -> Get2DangleFrom3D(0, trueDirNorm) * 180/M_PI << '\n';
-        //   std::cout << "\t2D Angle @ plane 1: " << geomUtil -> Get2DangleFrom3D(1, trueDirNorm) * 180/M_PI << '\n';
-        //   std::cout << std::endl;
-        // }
-        // else {
-        //   std::cout << "shower number " << shower_number << " is not an electron or positron shower." << '\n';
-        // }
-        shower_number++ ;
-        // std::cout << std:: endl;
-    }
 
-    // std::cout << "This event ("<< storage -> event_id() << ") has " << reco_shower->size() << " reco showers.\n";
-    //std::cout << "PDG of the outgoing lepton is " << lep.PdgCode() << std::endl;
+      _energy_U = shower.Energy_v()[0];
+      _energy_V = shower.Energy_v()[1];
+      _energy_Y = shower.Energy_v()[2];
+      _dqdx_U   = shower.dQdx_v()[0];
+      _dqdx_V   = shower.dQdx_v()[1];
+      _dqdx_Y   = shower.dQdx_v()[2];
+      _dedx_U   = shower.dEdx_v()[0];
+      _dedx_V   = shower.dEdx_v()[1];
+      _dedx_Y   = shower.dEdx_v()[2];
+      _x        = shower.ShowerStart()[0];
+      _y        = shower.ShowerStart()[1];
+      _z        = shower.ShowerStart()[2];
+      _px       = shower.Direction()[0];
+      _py       = shower.Direction()[1];
+      _pz       = shower.Direction()[2];
+      _length   = shower.Length();
+      _phi      = 0.;
+      _theta    = 0.;
+      _opening_angle = shower.OpeningAngle();
 
-    for (auto & shower : * reco_shower){
-      TVector3 start = shower.ShowerStart();
-      TVector3 dir   = shower.Direction();
-      if (dir.Mag() == 0) continue;
-      std::vector<double> dedx = shower.dEdx_v();
-      std::vector<double> energy = shower.Energy_v();
-      // std::cout << "Start point of the shower: ("
-      //           << start.X() << ", " << start.Y() << ", " << start.Z() << ")\n"
-      //           << "\tDirection: "
-      //           << dir.X() << ", " << dir.Y() << ", " << dir.Z() << ")\n"
-      //           << "\tdEdx: " << dedx[1] << "\n"
-      //           << "\tenergy: " << energy[1] << "\n";
-      // std::cout << "\tWire (Vertex) @ Plane 0: " << geom->NearestWire(shower.ShowerStart(), 0) * 0.4 << '\n';
-      // std::cout << "\tWire (Vertex) @ Plane 1: " << geom->NearestWire(shower.ShowerStart(), 1) * 0.4 << '\n';
-      // std::cout << "\tTime (Vertex): " << shower.ShowerStart().X() << '\n';
-      // std::cout << "\t2D Angle @ plane 0: " << geomUtil -> Get2DangleFrom3D(0, shower.Direction()) * 180/M_PI << '\n';
-      // std::cout << "\t2D Angle @ plane 1: " << geomUtil -> Get2DangleFrom3D(1, shower.Direction()) * 180/M_PI << '\n';
+      _shower_tree->Fill();
 
-     
-      // Fill in the histograms:
-      vertex_X      -> Fill(trueVertex.X() - start.X());
-      vertex_Y      -> Fill(trueVertex.Y() - start.Y());
-      vertex_Z      -> Fill(trueVertex.Z() - start.Z());
-      // vertex_abs    -> Fill();
-      direction_X   -> Fill(trueDirNorm.X() - dir.X());
-      direction_Y   -> Fill(trueDirNorm.Y() - dir.Y());
-      direction_Z   -> Fill(trueDirNorm.Z() - dir.Z());
-      float theta = dir.Dot(trueDirection.Vect()) / (dir.Mag() * trueDirection.Vect().Mag());
-      theta = acos(theta);
-      // std::cout << "Theta is " << theta << std::endl;
-      direction_angle -> Fill(theta);
-      dEdx          -> Fill(dedx[1]);
-      if (isFiducial(start)){
-        dEdx_fid -> Fill(dedx[1]);
-        if (dedx[1] > 1.5 && dedx[1] < 5.0) _good_event_list.push_back(storage->event_id());
-      }
-    }
+    }// for all showers
 
     return true;
   }
 
   bool ShowerAna::finalize() {
 
-    // This function is called at the end of event loop.
-    // Do all variable finalization you wish to do here.
-    // If you need, you can store your ROOT class instance in the output
-    // file. You have an access to the output file through "_fout" pointer.
-    //
-    // Say you made a histogram pointer h1 to store. You can do this:
-    //
-    // if(_fout) { _fout->cd(); h1->Write(); }
-    //
-    // else 
-    //   print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
-    //
-  
     if (_fout){
       _fout -> cd();
-      vertex_X      -> Write();
-      vertex_Y      -> Write();
-      vertex_Z      -> Write();
-      vertex_abs    -> Write();
-      direction_X   -> Write();
-      direction_Y   -> Write();
-      direction_Z   -> Write();
-      direction_angle -> Write();
-      dEdx          -> Write() ;
-      dEdx_fid      -> Write() ;
+      _shower_tree->Write();
     }
 
-    std::cout << "Printing good events: \n";
-    for (auto event : _good_event_list){
-      std::cout << event << '\n';
-    }
-
-
-    return true;
-  }
-
-  bool ShowerAna::isFiducial(const TVector3 & vertex){
-    // Argoneut specific
-    if (vertex.X() > 23.5 || vertex.X() < -23.5) return false;
-    if (vertex.Y() > 20 || vertex.Y() < -20) return false;
-    if (vertex.Z() > 90 || vertex.Z() < 0) return false;
-  
     return true;
   }
 
