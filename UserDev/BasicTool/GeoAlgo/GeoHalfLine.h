@@ -46,6 +46,9 @@ namespace geoalgo {
     void Start(const double x, const double y, const double z); ///< Start setter
     void Dir  (const double x, const double y, const double z); ///< Dir setter
 
+    void Start(const TVector3& pt ); ///< Start setter
+    void Dir  (const TVector3& dir); ///< Dir setter
+
   protected:
 
     void Normalize(); ///< Normalize direction

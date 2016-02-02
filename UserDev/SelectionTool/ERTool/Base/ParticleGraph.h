@@ -67,8 +67,7 @@ namespace ertool {
 			   const float score = kDEFAULT_SCORE);
     void SetPrimary      ( const NodeID_t node );
     void SameParticle    ( const NodeID_t a,      const NodeID_t b      );
-
-
+    NodeID_t NodeID(const RecoObjBase& p) const;
     std::string Diagram() const;
     std::string Diagram(const NodeID_t id) const;
 
