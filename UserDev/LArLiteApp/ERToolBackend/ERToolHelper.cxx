@@ -46,7 +46,7 @@ namespace larlite {
 
 			// If energy is above threshold, create ertool::Shower (also mcshower startdir must not be (0,0,0))
 			if (mcs.DetProfile().Momentum().E() >= _minEDep && mcs.StartDir().Mag2() ) {
-				::ertool::Shower s( (mcs.DetProfile().Position() + getXShift(mcs_v[i])),
+				::ertool::Shower s( (mcs.DetProfile().Position()),
 				                    mcs.StartDir(),//mcs.DetProfile().Momentum(),
 				                    _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
 				                    _shrProfiler.ShowerRadius() );
@@ -100,14 +100,13 @@ namespace larlite {
 			::ertool::Track t;
 			// Fill track info
 			t.reserve(mct.size());
-			TLorentzVector shift = getXShift(mct);
 			Size_t const mct_size = mct.size();
 			std::vector<double> const & mct_dedx = mct.dEdx();
 			std::vector<double> & ert_dedx = t._dedx;
 
 			for (size_t i = 0; i < mct_size; ++i) {
 
-				geoalgo::Point_t p(mct.at(i).Position() + shift);
+				geoalgo::Point_t p(mct.at(i).Position());
 				if (mct_dedx.size()) {
 					if (!(t.size() && t.back() == p) && i) {
 						ert_dedx.push_back(mct_dedx.at(i - 1));
@@ -199,7 +198,7 @@ namespace larlite {
 					auto& p = graph.CreateParticle();
 					p.SetParticleInfo( mcp.PdgCode(),
 					                   mcp.Mass() * 1000.,
-					                   ::geoalgo::Vector(mcp.Trajectory()[0].Position() + getXShift(mcp)),
+					                   ::geoalgo::Vector(mcp.Trajectory()[0].Position()),
 					                   ::geoalgo::Vector(mcp.Trajectory()[0].Momentum()) * 1.e3 );
 
 					part_list[id] = p.ID();
@@ -645,9 +644,16 @@ namespace larlite {
 			s._energy     = mcs.DetProfile().Momentum().E();
 			//s._energy = mcs.Start().Momentum().E();
 			fWatch.Start();
-			if ( (mcs.dEdx() == 0) ||  (mcs.dEdx() > 100) )
-			{s._dedx = (mcs.PdgCode() == 22 ? gRandom->Gaus(4, 4 * 0.03) : gRandom->Gaus(2, 2 * 0.03));}
+			
+			// Gammas that compton-scatter have artificially low dEdx.
+			// If this is the case, do an artificial draw from a gaussian
+			// This is simply fixing an artifact of MCShower and is therefore
+			// legitimate to expect to not have this problem in real reconstruction.
+			if ( (mcs.dEdx() < 0.5) ||  (mcs.dEdx() > 100) )
+			  {s._dedx = (mcs.PdgCode() == 22 ? gRandom->Gaus(4, 4 * 0.03) : gRandom->Gaus(2, 2 * 0.03));}
 			else {s._dedx =  mcs.dEdx();}
+			
+			//s._dedx = (mcs.PdgCode() == 22 ? 4 : 2);
 			//s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.05) : gRandom->Gaus(2,2*0.05));
 			random_time += fWatch.RealTime();
 			s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);

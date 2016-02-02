@@ -8,6 +8,18 @@
 #include "UtilFunc.h"
 namespace ertool {
 
+  NodeID_t ParticleGraph::NodeID(const RecoObjBase& obj) const
+  {
+    for (auto const& p : _particle_v) {
+
+      if ( p.RecoType() == obj.RecoType() && p.RecoID() == obj.RecoID() ) return p.ID();
+
+    }
+
+    throw ERException("Requested RecoObject do not have an associated particle!");
+    return kINVALID_NODE_ID;
+  }
+
   void ParticleGraph::ValidNode(const NodeID_t& id) const
   {
     if (id >= _particle_v.size()) throw ERException("Invalid particle ID!");

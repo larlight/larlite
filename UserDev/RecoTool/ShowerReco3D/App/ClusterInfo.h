@@ -1,62 +1,54 @@
 /**
- * \file ShowerAna.h
+ * \file ClusterInfo.h
  *
- * \ingroup analysis
+ * \ingroup App
  * 
- * \brief Class def header for a class ShowerAna
+ * \brief Class def header for a class ClusterInfo
  *
- * @author cadams
+ * @author jhewes15
  */
 
-/** \addtogroup analysis
+/** \addtogroup App
 
     @{*/
 
-#ifndef LARLITE_SHOWERANA_H
-#define LARLITE_SHOWERANA_H
+#ifndef LARLITE_CLUSTERINFO_H
+#define LARLITE_CLUSTERINFO_H
 
 #include "Analysis/ana_base.h"
 
-#include <TTree.h>
-
 namespace larlite {
   /**
-     \class ShowerAna
+     \class ClusterInfo
      User custom analysis class made by SHELL_USER_NAME
    */
-  class ShowerAna : public ana_base{
+  class ClusterInfo : public ana_base{
   
   public:
 
     /// Default constructor
-    ShowerAna();
+    ClusterInfo(){ _name="ClusterInfo"; _fout=0;}
 
     /// Default destructor
-    virtual ~ShowerAna(){}
+    virtual ~ClusterInfo(){}
 
+    /** IMPLEMENT in ClusterInfo.cc!
+        Initialization method to be called before the analysis event loop.
+    */ 
     virtual bool initialize();
 
+    /** IMPLEMENT in ClusterInfo.cc! 
+        Analyze a data event-by-event  
+    */
     virtual bool analyze(storage_manager* storage);
 
+    /** IMPLEMENT in ClusterInfo.cc! 
+        Finalize method to be called after all events processed.
+    */
     virtual bool finalize();
 
-    void setShowerProducer(std::string s) { _producer = s; }
-
   protected:
-
-    std::string _producer;
     
-    TTree* _shower_tree;
-    
-    double _energy_U, _energy_V, _energy_Y;
-    double _dedx_U, _dedx_V, _dedx_Y;
-    double _dqdx_U, _dqdx_V, _dqdx_Y;
-    double _x, _y, _z;
-    double _px, _py, _pz;
-    double _theta, _phi;
-    double _opening_angle;
-    double _length;
-
   };
 }
 #endif

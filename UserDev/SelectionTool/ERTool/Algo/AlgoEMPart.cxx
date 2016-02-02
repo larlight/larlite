@@ -187,6 +187,7 @@ namespace ertool {
          << "dEdx Landau mean : " << meanL->getVal() << " sigma : " << sigmaL->getVal() << std::endl
          << "dEdx Gaus mean   : " << meanG->getVal() << " sigma : " << sigmaG->getVal() << std::endl
          << "Frac: " << frac->getVal() << std::endl;
+      Info(__FUNCTION__, ss.str());
     }
 
     if (p.contains_value("e_params")) {
