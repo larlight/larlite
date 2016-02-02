@@ -27,7 +27,7 @@ bool DrawShower::initialize() {
 
 
   // // Resize data holder to accommodate planes and wires:
-  if (_dataByPlane.size() != geoService -> Nviews()){
+  if (_dataByPlane.size() != geoService -> Nviews()) {
     // std::cout << "resizing vectors to: " << geoService -> Nviews() << std::endl;
     _dataByPlane.resize(geoService -> Nviews());
   }
@@ -58,16 +58,16 @@ bool DrawShower::analyze(larlite::storage_manager* storage) {
   auto showerHandle = storage->get_data<larlite::event_shower>(_producer);
 
   // Clear out the hit data but reserve some space for the showers
-  for (unsigned int p = 0; p < geoService -> Nviews(); p ++){
+  for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
     _dataByPlane.at(p).clear();
     _dataByPlane.at(p).reserve(showerHandle -> size());
   }
 
 
   // Populate the shower vector:
-  for (auto & shower: *showerHandle){
-    for (unsigned int view = 0; view < geoService -> Nviews(); view++){
-      _dataByPlane.at(view).push_back(getShower2d(shower,view));
+  for (auto & shower : *showerHandle) {
+    for (unsigned int view = 0; view < geoService -> Nviews(); view++) {
+      _dataByPlane.at(view).push_back(getShower2d(shower, view));
     }
   }
 
@@ -94,7 +94,7 @@ bool DrawShower::finalize() {
 
 
 
-Shower2d DrawShower::getShower2d(larlite::shower shower, unsigned int plane){
+Shower2d DrawShower::getShower2d(larlite::shower shower, unsigned int plane) {
 
   auto detProp = larutil::DetectorProperties::GetME();
 
@@ -105,7 +105,7 @@ Shower2d DrawShower::getShower2d(larlite::shower shower, unsigned int plane){
   // Fill out the parameters of the 2d shower
   float _wire = 0;
   try {
-    _wire = geoService->NearestWire(shower.ShowerStart(), plane);
+    _wire = geoService->WireCoordinate(shower.ShowerStart(), plane);
   }
   catch (...) {
     // std::cerr << "Caught exception trying to find nearest shower.  There is a junk shower.\n";
@@ -135,34 +135,39 @@ Shower2d DrawShower::getShower2d(larlite::shower shower, unsigned int plane){
   // std::cout << "Start point in plane " << plane << " (" << _wire << ", " << _time << ")\n";
 
   // Next get the direction:
-  result._angleInPlane = geoHelper->Slope_3Dto2D(shower.Direction(),plane);
+  result._angleInPlane = geoHelper->Slope_3Dto2D(shower.Direction(), plane);
 
   // Get the opening Angle:
   result._openingAngle = shower.OpeningAngle();
 
-  // Get the length:
-  float length = shower.Length();
-  auto secondPoint = shower.ShowerStart() + length * shower.Direction();
 
-  // project the second point into the plane:
+  auto secondPoint = shower.ShowerStart() + shower.Length() * shower.Direction();
 
-  float _second_wire = 0;
   try {
-    _second_wire = geoHelper->WireToCm() * geoService->NearestWire(secondPoint, plane);
+    _wire = geoService->WireCoordinate(secondPoint, plane);
   }
   catch (...) {
-    // std::cerr << "another exception" << '\n';
+    // std::cerr << "Caught exception trying to find nearest shower.  There is a junk shower.\n";
     return result;
   }
-  float _second_time = geoHelper->TimeToCm() * secondPoint.X();
-  _second_time += detProp -> TriggerOffset() * geoHelper -> TimeToCm();
+  
+  _time = secondPoint.X();
+  _time += detProp -> TriggerOffset() * geoHelper -> TimeToCm();
   if (plane == 0) {
-    _second_time += detProp -> TimeOffsetU() * geoHelper -> TimeToCm();
+    _time += detProp -> TimeOffsetU() * geoHelper -> TimeToCm();
   }
   if (plane == 1) {
-    _second_time += detProp -> TimeOffsetV() * geoHelper -> TimeToCm();
+    _time += detProp -> TimeOffsetV() * geoHelper -> TimeToCm();
   }
-  result._length = sqrt(pow(_wire - _second_wire, 2) + pow(_time - _second_time, 2));
+
+  // Convert wire to cm:
+  _wire *= geoHelper->WireToCm();
+  result._endPoint = larutil::Point2D();
+  result._endPoint.w = _wire;
+  result._endPoint.t = _time;
+
+  result._length = sqrt(pow(result.startPoint().w - result.endPoint().w, 2) +
+                        pow(result.startPoint().t - result.endPoint().t, 2));
 
   result._dedx = shower.dEdx();
 
