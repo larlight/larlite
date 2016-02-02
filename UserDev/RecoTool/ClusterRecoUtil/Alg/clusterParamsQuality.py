@@ -1,4 +1,8 @@
 import sys
+from larlite import larlite
+import larlite
+import ROOT
+from ROOT import larlite
 
 if len(sys.argv) < 2:
     msg  = '\n'
