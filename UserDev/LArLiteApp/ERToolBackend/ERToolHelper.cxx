@@ -46,7 +46,7 @@ namespace larlite {
 
 			// If energy is above threshold, create ertool::Shower (also mcshower startdir must not be (0,0,0))
 			if (mcs.DetProfile().Momentum().E() >= _minEDep && mcs.StartDir().Mag2() ) {
-				::ertool::Shower s( (mcs.DetProfile().Position()), // + getXShift(mcs_v[i])),
+				::ertool::Shower s( (mcs.DetProfile().Position()),
 				                    mcs.StartDir(),//mcs.DetProfile().Momentum(),
 				                    _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
 				                    _shrProfiler.ShowerRadius() );
@@ -100,14 +100,13 @@ namespace larlite {
 			::ertool::Track t;
 			// Fill track info
 			t.reserve(mct.size());
-			TLorentzVector shift = getXShift(mct);
 			Size_t const mct_size = mct.size();
 			std::vector<double> const & mct_dedx = mct.dEdx();
 			std::vector<double> & ert_dedx = t._dedx;
 
 			for (size_t i = 0; i < mct_size; ++i) {
 
-				geoalgo::Point_t p(mct.at(i).Position()); //+ shift);
+				geoalgo::Point_t p(mct.at(i).Position());
 				if (mct_dedx.size()) {
 					if (!(t.size() && t.back() == p) && i) {
 						ert_dedx.push_back(mct_dedx.at(i - 1));
@@ -199,7 +198,7 @@ namespace larlite {
 					auto& p = graph.CreateParticle();
 					p.SetParticleInfo( mcp.PdgCode(),
 					                   mcp.Mass() * 1000.,
-					                   ::geoalgo::Vector(mcp.Trajectory()[0].Position()),// + getXShift(mcp)),
+					                   ::geoalgo::Vector(mcp.Trajectory()[0].Position()),
 					                   ::geoalgo::Vector(mcp.Trajectory()[0].Momentum()) * 1.e3 );
 
 					part_list[id] = p.ID();
