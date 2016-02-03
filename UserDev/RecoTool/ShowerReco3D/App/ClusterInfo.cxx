@@ -2,57 +2,92 @@
 #define LARLITE_CLUSTERINFO_CXX
 
 #include "ClusterInfo.h"
+#include "DataFormat/cluster.h"
+#include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
 
-namespace larlite {
+namespace showerreco {
 
   bool ClusterInfo::initialize() {
-
-    //
-    // This function is called in the beggining of event loop
-    // Do all variable initialization you wish to do here.
-    // If you have a histogram to fill in the event loop, for example,
-    // here is a good place to create one on the heap (i.e. "new TH1D"). 
-    //
-
+    
+    if(_tree) delete _tree;
+    _tree = new TTree(_name.c_str(),"Cluster params info");
+    _tree->Branch("_fann","std::vector<float>",&_fann);
+    std::cout << "done initialising!" << std::endl;
     return true;
+
   }
   
-  bool ClusterInfo::analyze(storage_manager* storage) {
-  
-    //
-    // Do your event-by-event analysis here. This function is called for 
-    // each event in the loop. You have "storage" pointer which contains 
-    // event-wise data. To see what is available, check the "Manual.pdf":
-    //
-    // http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
-    // 
-    // Or you can refer to Base/DataFormatConstants.hh for available data type
-    // enum values. Here is one example of getting PMT waveform collection.
-    //
-    // event_fifo* my_pmtfifo_v = (event_fifo*)(storage->get_data(DATA::PMFIFO));
-    //
-    // if( event_fifo )
-    //
-    //   std::cout << "Event ID: " << my_pmtfifo_v->event_id() << std::endl;
-    //
-  
+  bool ClusterInfo::analyze(larlite::storage_manager* storage) {
+
+    // Get all of the clusters from this event:
+    auto ev_clus = storage->get_data<larlite::event_cluster>(_input_producer);
+    if (!ev_clus) {
+      std::cout << "ev_clus is == 0, returning.\n";
+      return false;
+    }
+
+    ::larlite::event_hit* ev_hit = nullptr;
+    auto const& hit_index_v = storage->find_one_ass(ev_clus->id(), ev_hit, _input_producer);
+
+    if (!ev_hit) {
+      std::cout << "Did not find hit data product"
+      << "!" << std::endl;
+      return false;
+    }
+    
+    
+    if (!hit_index_v.size())
+      return false;
+    
+    
+    // std::cout << "reset  id is " << out_cluster_v -> event_id() << std::endl;
+    
+    if (!ev_clus->size()) {
+      
+      print(larlite::msg::kWARNING, __FUNCTION__,
+            Form("Skipping event %d since no cluster found...", ev_clus->event_id()));
+      return false;
+    }
+    
+    // Loop over the clusters, and save only the ones that have potential to be a shower
+    
+    
+    ::cluster::DefaultParamsAlg params_alg ;
+    ::cluster::cluster_params params;
+    params_alg.SetVerbose(false);
+    params_alg.SetDebug(false);
+    params_alg.SetMinHits(50);
+    
+    
+    size_t index = 0;
+    
+    larlite::AssSet_t hit_ass;
+    
+    for (auto const& hit_indices : hit_index_v) {
+      
+      if (hit_indices.size() < 50) {
+        index ++;
+        continue;
+      }
+
+      // Fill the cluster params alg
+      _cru_helper.GenerateParams( hit_indices, ev_hit, params);
+      
+      params_alg.FillParams(params);
+      
+      // ok let's test to see if this worked
+      
+      params.GetFANNVector(_fann);
+      
+      _tree->Fill();
+    }
+    
     return true;
   }
 
   bool ClusterInfo::finalize() {
 
-    // This function is called at the end of event loop.
-    // Do all variable finalization you wish to do here.
-    // If you need, you can store your ROOT class instance in the output
-    // file. You have an access to the output file through "_fout" pointer.
-    //
-    // Say you made a histogram pointer h1 to store. You can do this:
-    //
-    // if(_fout) { _fout->cd(); h1->Write(); }
-    //
-    // else 
-    //   print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
-    //
+    _fout->Write();
   
     return true;
   }
