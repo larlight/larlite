@@ -48,6 +48,7 @@ namespace showerreco {
     std::string _input_producer;
     std::string _output_producer;
     
+    float _closing_angle_charge_wgt;
     std::vector<float> _fann;
     
     TTree * _tree;

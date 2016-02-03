@@ -11,8 +11,8 @@ namespace showerreco {
     
     if(_tree) delete _tree;
     _tree = new TTree(_name.c_str(),"Cluster params info");
+    _tree->Branch("_closing_angle_charge_wgt",&_closing_angle_charge_wgt,"_closing_angle_charge_wgt/F");
     _tree->Branch("_fann","std::vector<float>",&_fann);
-    std::cout << "done initialising!" << std::endl;
     return true;
 
   }
@@ -78,6 +78,8 @@ namespace showerreco {
       // ok let's test to see if this worked
       
       params.GetFANNVector(_fann);
+      
+      _closing_angle_charge_wgt = params.closing_angle_charge_wgt;
       
       _tree->Fill();
     }
