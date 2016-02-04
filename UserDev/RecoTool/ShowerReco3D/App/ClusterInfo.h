@@ -5,7 +5,7 @@
  * 
  * \brief Class def header for a class ClusterInfo
  *
- * @author jhewes15
+ * @author jhewes
  */
 
 /** \addtogroup App
@@ -16,13 +16,14 @@
 #define LARLITE_CLUSTERINFO_H
 
 #include "Analysis/ana_base.h"
+#include "ClusterRecoUtil/Base/CRUHelper.h"
 
-namespace larlite {
+namespace showerreco {
   /**
      \class ClusterInfo
-     User custom analysis class made by SHELL_USER_NAME
+     User custom analysis class made by jhewes
    */
-  class ClusterInfo : public ana_base{
+  class ClusterInfo : public larlite::ana_base{
   
   public:
 
@@ -32,22 +33,25 @@ namespace larlite {
     /// Default destructor
     virtual ~ClusterInfo(){}
 
-    /** IMPLEMENT in ClusterInfo.cc!
-        Initialization method to be called before the analysis event loop.
-    */ 
     virtual bool initialize();
-
-    /** IMPLEMENT in ClusterInfo.cc! 
-        Analyze a data event-by-event  
-    */
-    virtual bool analyze(storage_manager* storage);
-
-    /** IMPLEMENT in ClusterInfo.cc! 
-        Finalize method to be called after all events processed.
-    */
+    virtual bool analyze(larlite::storage_manager* storage);
     virtual bool finalize();
+    
+    void SetInputProducer(std::string s) {_input_producer = s;}
+    void SetOutputProducer(std::string s) {_output_producer = s;}
+    
 
   protected:
+
+    ::cluster::CRUHelper _cru_helper;
+
+    std::string _input_producer;
+    std::string _output_producer;
+    
+    float _closing_angle_charge_wgt;
+    std::vector<float> _fann;
+    
+    TTree * _tree;
     
   };
 }
