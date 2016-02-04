@@ -336,8 +336,14 @@ namespace ertool {
 	  id = 4;
 	}
 
-	if(id == 1 || 2) p.SetParticleInfo(2212);
-	if(id == 3 || 4) p.SetParticleInfo(Track::kMIPy);
+	if(id == 1 || 2) p.SetParticleInfo(2212,
+					   p.Mass(),
+					   p.Vertex(),
+					   p.Momentum());
+	if(id == 3 || 4) p.SetParticleInfo(Track::kMIPy,
+					   p.Mass(),
+					   p.Vertex(),
+					   p.Momentum());
 
 	tpid = id;
 	
