@@ -1,5 +1,5 @@
-#ifndef DRAWTRACK3D_CXX
-#define DRAWTRACK3D_CXX
+#ifndef DRAWSHOWER3D_CXX
+#define DRAWSHOWER3D_CXX
 
 #include "DrawShower3D.h"
 #include "DataFormat/shower.h"
