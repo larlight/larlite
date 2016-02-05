@@ -25,6 +25,9 @@
 #pragma link C++ class evd::RecoBase3D<evd::Shower3D>+;
 #pragma link C++ class evd::DrawShower3D+;
 
+#pragma link C++ class evd::Spacepoint3D+;
+#pragma link C++ class std::vector<evd::Spacepoint3D>+;
+#pragma link C++ class evd::RecoBase3D<evd::Spacepoint3D>+;
 #pragma link C++ class evd::DrawSpacepoint3D+;
 
 
