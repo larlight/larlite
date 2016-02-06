@@ -8,8 +8,8 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef MUCSDATA_H
-#define MUCSDATA_H
+#ifndef LARLITE_MUCSDATA_H
+#define LARLITE_MUCSDATA_H
 
 #include <vector>
 #include "data_base.h"
