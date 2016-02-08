@@ -1,22 +1,22 @@
-#ifndef DRAWSPACEPOINT3D_CXX
-#define DRAWSPACEPOINT3D_CXX
+#ifndef DRAWOPFLASH_CXX
+#define DRAWOPFLASH_CXX
 
-#include "DrawSpacepoint3D.h"
+#include "DrawOpflash3D.h"
 
 namespace evd {
 
 
-DrawSpacepoint3D::DrawSpacepoint3D() {
-  _name = "DrawSpacepoint3D";
+DrawOpflash3D::DrawOpflash3D() {
+  _name = "DrawOpflash3D";
   _fout = 0;
 }
 
-bool DrawSpacepoint3D::initialize() {
+bool DrawOpflash3D::initialize() {
 
   return true;
 }
 
-bool DrawSpacepoint3D::analyze(larlite::storage_manager* storage) {
+bool DrawOpflash3D::analyze(larlite::storage_manager* storage) {
 
   //
   // Do your event-by-event analysis here. This function is called for
@@ -39,25 +39,30 @@ bool DrawSpacepoint3D::analyze(larlite::storage_manager* storage) {
 
 
 
-  // get a handle to the tracks
-  auto spacepointHandle = storage->get_data<larlite::event_spacepoint>(_producer);
+  // get a handle to the flashes
+  auto opflashHandle = storage->get_data<larlite::event_opflash>(_producer);
 
-  // Clear out the data but reserve some space
   _data.clear();
-  _data.reserve(spacepointHandle -> size());
+  _data.reserve(opflashHandle -> size());
 
 
   // Populate the shower vector:
-  for (auto & spt : *spacepointHandle) {
-    TVector3 temp(spt.XYZ());
-    _data.push_back(temp);
+  for (auto & opf : *opflashHandle) {
+    Opflash3D _temp;
+    _temp._y = opf.YCenter();
+    _temp._z = opf.ZCenter();
+    _temp._time = opf.Time();
+    _temp._y_width = opf.YWidth();
+    _temp._z_width = opf.ZWidth();
+    _temp._time_width = opf.TimeWidth();
+    _data.push_back(_temp);
   }
 
 
   return true;
 }
 
-bool DrawSpacepoint3D::finalize() {
+bool DrawOpflash3D::finalize() {
 
   // This function is called at the end of event loop.
   // Do all variable finalization you wish to do here.
@@ -74,7 +79,7 @@ bool DrawSpacepoint3D::finalize() {
   return true;
 }
 
-DrawSpacepoint3D::~DrawSpacepoint3D() {}
+DrawOpflash3D::~DrawOpflash3D() {}
 
 
 } // evd

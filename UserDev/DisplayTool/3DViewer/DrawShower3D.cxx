@@ -44,11 +44,9 @@ bool DrawShower3D::analyze(larlite::storage_manager* storage) {
   // get a handle to the tracks
   auto showerHandle = storage->get_data<larlite::event_shower>(_producer);
 
-  // Clear out the hit data but reserve some space for the showers
-  for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
+  // Clear out the data but reserve some space
     _data.clear();
     _data.reserve(showerHandle -> size());
-  }
 
 
   // Populate the shower vector:

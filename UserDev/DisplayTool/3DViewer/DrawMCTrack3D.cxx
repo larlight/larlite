@@ -1,4 +1,4 @@
-#ifndef DRAWMCMCTRACK3D_CXX
+#ifndef DRAWMCTRACK3D_CXX
 #define DRAWMCTRACK3D_CXX
 
 #include "DrawMCTrack3D.h"
@@ -47,18 +47,16 @@ bool DrawMCTrack3D::analyze(larlite::storage_manager* storage) {
   // get a handle to the tracks
   auto mctrackHandle = storage->get_data<larlite::event_mctrack>(_producer);
 
-  // Clear out the hit data but reserve some space for the showers
-  for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
-    _data.clear();
-    _data.reserve(mctrackHandle -> size());
-  }
+  // Clear out the data but reserve some space
+  _data.clear();
+  _data.reserve(mctrackHandle -> size());
 
 
   // Populate the track vector:
   for (auto & mctrack : *mctrackHandle) {
-      _data.push_back(getMCTrack3d(mctrack));
+    _data.push_back(getMCTrack3d(mctrack));
   }
-  
+
   return true;
 }
 
@@ -79,7 +77,7 @@ bool DrawMCTrack3D::finalize() {
   return true;
 }
 
-DrawMCTrack3D::~DrawMCTrack3D(){}
+DrawMCTrack3D::~DrawMCTrack3D() {}
 
 MCTrack3D DrawMCTrack3D::getMCTrack3d(larlite::mctrack mctrack) {
   MCTrack3D result;
