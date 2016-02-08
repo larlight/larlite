@@ -8,6 +8,7 @@ import endpoint2d
 import vertex
 import mctrack
 import spacepoint
+import opflash
 
 # This is the class that maintains the list of drawable items.
 # If your class isn't here, it can't be drawn
@@ -59,6 +60,7 @@ try:
             self._drawableClasses.update({'Shower': [shower.shower3D,"shower"]})
             self._drawableClasses.update({'Track': [track.track3D,"track"]})
             self._drawableClasses.update({'Spacepoints': [spacepoint.spacepoint3D,"sps"]})
+            self._drawableClasses.update({'Opflash': [opflash.opflash3D,"opflash"]})
             self._drawableClasses.update({'MCTrack': [mctrack.mctrack3D,"mctrack"]})
 
         def getListOfTitles(self):

@@ -16,5 +16,6 @@ try:
     from shower import shower3D
     from mctrack import mctrack3D
     from spacepoint import spacepoint3D
+    from opflash import opflash3D
 except:
     pass
