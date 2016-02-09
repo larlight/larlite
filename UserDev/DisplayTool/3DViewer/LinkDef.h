@@ -45,6 +45,11 @@
 #pragma link C++ class evd::RecoBase3D<evd::Vertex3D>+;
 #pragma link C++ class evd::DrawVertex3D+;
 
+#pragma link C++ class evd::PFParticle3D+;
+#pragma link C++ class std::vector<evd::PFParticle3D>+;
+#pragma link C++ class evd::RecoBase3D<evd::PFParticle3D>+;
+#pragma link C++ class evd::DrawPFParticle3D+;
+
 // Link the classes that are processors
 
 //ADD_NEW_CLASS ... do not change this line
