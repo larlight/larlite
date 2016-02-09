@@ -20,6 +20,7 @@ class viewport3D(gl.GLViewWidget):
     super(viewport3D, self).__init__()
     # add a view box, which is a widget that allows an image to be shown
     # add an image item which handles drawing (and refreshing) the image
+    self.setBackgroundColor((50,50,50,255))
     self._geometry = geometry
     gy = gl.GLGridItem()
     gy.scale(0.1*self._geometry.length(),0.1*self._geometry.length(),0.1*self._geometry.length())
