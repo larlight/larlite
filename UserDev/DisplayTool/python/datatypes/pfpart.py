@@ -74,6 +74,11 @@ try:
                 self._drawnObjects.append(glPointsCollection)
 
                 if self._drawParams:
+
+                    # Let's find out what's in the params:
+                    thisPart.params().Report()
+
+                    # Draw the axis of the 
                     pass
 
                 i_color += 1
