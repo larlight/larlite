@@ -32,6 +32,12 @@ public:
   Point3D(){x = y = z = 0.0;}
   ~Point3D(){}
 
+  Point3D(float x, float y, float z) :
+  x(x),
+  y(y),
+  z(z)
+  {}
+
   float X() const {return x;}
   float Y() const {return y;}
   float Z() const {return z;}
