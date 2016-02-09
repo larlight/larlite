@@ -49,8 +49,10 @@ bool DrawSpacepoint3D::analyze(larlite::storage_manager* storage) {
 
   // Populate the shower vector:
   for (auto & spt : *spacepointHandle) {
-    TVector3 temp(spt.XYZ());
-    _data.push_back(temp);
+    _data.push_back(cluster3D::Point3D(spt.XYZ()[0],
+                                       spt.XYZ()[1],
+                                       spt.XYZ()[2]
+                                      ));
   }
 
 

@@ -11,13 +11,13 @@
 /** \addtogroup RecoViewer
 
     @{*/
-#ifndef LARLITE_DRAWSPACEPOINT_H
-#define LARLITE_DRAWSPACEPOINT_H
+#ifndef LARLITE_DRAWSPACEPOINT3D_H
+#define LARLITE_DRAWSPACEPOINT3D_H
 
 #include <iostream>
 #include "Analysis/ana_base.h"
 #include "DataFormat/spacepoint.h"
-#include "TVector3.h"
+#include "Cluster3DRecoUtil/Base/Cluster3DParams.h"
 
 #include "RecoBase3D.h"
 /**
@@ -30,28 +30,7 @@
 
 namespace evd {
 
-typedef TVector3 Spacepoint3D;
-
-// class Shower3D {
-
-// friend class DrawSpacepoint3D;
-
-// public:
-//     // std::vector<TVector3 > _track;
-//     // const std::vector<TVector3 > & shower() {return _track;}
-//     // const std::vector<std::vector<float> > & direction() {return _track;}
-//     TVector3 start_point(){return _start_point;}
-//     TVector3 direction(){return _direction;}
-//     float length(){return _length;}
-//     float opening_angle(){return _opening_angle;}
-
-// private:
-//     TVector3 _start_point;
-//     TVector3 _direction;
-//     float _length;
-//     float _opening_angle;
-// };
-
+typedef cluster3D::Point3D Spacepoint3D;
 
 class DrawSpacepoint3D : public larlite::ana_base, public RecoBase3D<Spacepoint3D> {
 
