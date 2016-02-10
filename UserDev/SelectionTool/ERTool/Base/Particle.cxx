@@ -106,6 +106,11 @@ namespace ertool {
     _flash_id = id;
   }
 
+  void Particle::SetParticlePdgCode( const int pdg_code)
+  {
+    _pdg_code  = pdg_code;
+  }
+  
   void Particle::SetParticleInfo( const int pdg_code,
 				  const double mass,
 				  const ::geoalgo::Vector& vtx,

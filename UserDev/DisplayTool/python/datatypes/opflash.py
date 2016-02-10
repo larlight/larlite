@@ -1,7 +1,6 @@
 from database import recoBase
 from ROOT import evd, TVector3
 import pyqtgraph as pg
-import pyqtgraph.opengl as gl
 from pyqtgraph.Qt import QtGui, QtCore
 import math as mt
 from ROOT import larutil

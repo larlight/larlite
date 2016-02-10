@@ -1,0 +1,10 @@
+
+EmuDriver: {
+    MCTrackProducer:  mcreco
+    MCShowerProducer: mcreco
+    TrackEmulator:    TrackEmuToy
+    ShowerEmulator:   ShowerEmuToy
+
+    TrackEmuToy:  {}
+    ShowerEmuToy: {}
+}

@@ -73,6 +73,8 @@ namespace ertool {
 			  const float score = 0,
 			  const ProcessType_t process = kUnknown);
 
+    void SetParticlePdgCode( const int pdg_code = kINVALID_INT);
+
     void SetProcess(const ProcessType_t process){ _process = process; }
     
     std::string Print() const;

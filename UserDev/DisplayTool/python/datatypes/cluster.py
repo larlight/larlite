@@ -1,4 +1,4 @@
-from data import recoBase
+from database import recoBase
 from pyqtgraph.Qt import QtGui, QtCore
 from connectedObjects import connectedBox, connectedCircle, boxCollection
 from ROOT import evd, vector
