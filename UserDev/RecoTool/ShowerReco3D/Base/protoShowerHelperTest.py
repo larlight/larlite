@@ -24,9 +24,12 @@ protoShowerVec = ROOT.vector(showerreco.ProtoShower)()
 
 psh.GenerateProtoShowers(_mgr,producer_name,protoShowerVec)
 
-print protoShowerVec.size()
 
 for shower in protoShowerVec:
-  for params in shower.params():
-    params.Report()
-    print "\n\n\n"
+  print "This shower has {N} params associated.".format(N=shower.params().size())
+  print "shower.hasCluster2D(): ", shower.hasCluster2D()
+  print "shower.hasCluster3D(): ", shower.hasCluster3D()
+  shower.params3D().Report()
+  # for params in shower.params():
+    # params.Report()
+    # print "\n\n\n"

@@ -85,7 +85,7 @@ void cluster3D_params::Report(std::ostream & os) const {
      << "   width_secondary  .......... : " << width_secondary << "\n"
      << "   width_tertiary  ........... : " << width_tertiary << "\n"
 
-     << "   N_points  ................... : " << N_points << "\n";
+     << "   N_points  ................. : " << N_points << "\n";
 
 
 

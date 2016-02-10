@@ -37,14 +37,16 @@ class ProtoShower
   friend class ProtoShowerHelper;
 
 public:
-  ProtoShower(){};
-  ~ProtoShower(){};
+  ProtoShower() {};
+  ~ProtoShower() {};
 
   const std::vector<cluster::cluster_params> & params() const {return _params;}
   const cluster3D::cluster3D_params & params3D() const {return _params3D;}
+  const std::vector<TVector3> & vertexes() const {return _vertexes;}
 
   bool hasCluster2D() {return _hasCluster2D;}
   bool hasCluster3D() {return _hasCluster3D;}
+  bool hasVertex()    {return _hasVertex;}
 
 protected:
 
@@ -56,6 +58,8 @@ protected:
   std::vector<cluster::cluster_params> _params;
   // This is the 3D cluster params, just one set of spacepoints
   cluster3D::cluster3D_params _params3D;
+
+  std::vector<TVector3>  _vertexes;
 
   // Not sure what to do with vertexes yet
 
