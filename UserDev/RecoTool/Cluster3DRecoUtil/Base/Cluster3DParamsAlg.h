@@ -17,7 +17,7 @@
 #include <iostream>
 #include <vector>
 #include "Cluster3DParams.h"
-#include "ParamsAlgBase.h"
+#include "Params3DAlgBase.h"
 #include "DataFormat/hit.h"
 #include "TStopwatch.h"
 
