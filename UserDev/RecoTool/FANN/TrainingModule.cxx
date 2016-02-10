@@ -27,6 +27,7 @@ namespace cluster{
     std::cout << "Initializing data from file " << file << "\n";
     trainingData.read_train_from_file(file);
 
+    fNumHiddenLayers = fHiddenLayerLength.size();
 
     if( _use_cascade){
       ann.create_shortcut(2, trainingData.num_input_train_data(), trainingData.num_output_train_data()); 
@@ -37,9 +38,11 @@ namespace cluster{
       layers[0] = fFeatureVectorLength;
       for (int i = 1; i <= fNumHiddenLayers; i++)
         layers[i] = fHiddenLayerLength[i-1];
-      layers[fNumHiddenLayers+1] = fOutputVectorLength;     
+      layers[fNumHiddenLayers+1] = fOutputVectorLength;
       ann.create_standard_array(fNumHiddenLayers + 2, layers);
     }
+
+    std::cout << ann.get_num_layers() << std::endl;
     ann.print_parameters();
     return;
   }
@@ -68,8 +71,8 @@ namespace cluster{
     }
     else{
       const float desired_error = 0.001;
-      const unsigned int max_epochs = 100000;
-      const unsigned int epochs_between_reports = 1000;
+      const unsigned int max_epochs = 10000;
+      const unsigned int epochs_between_reports = 500;
 
       ann.train_on_data(trainingData, max_epochs,
           epochs_between_reports, desired_error);

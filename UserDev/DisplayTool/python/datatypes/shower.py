@@ -1,5 +1,5 @@
 from database import recoBase
-from ROOT import evd
+from ROOT import evd, TVector3
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui, QtCore
 import math as mt
@@ -70,16 +70,33 @@ class shower(recoBase):
                 points.append(QtCore.QPoint(x, y))
                 # next connect the two points at the end of the shower to make
                 # a cone
-                x1, y1 = shower.startPoint().w, shower.startPoint().t
-                x2, y2 = shower.startPoint().w, shower.startPoint().t
-                x1 = x1 + shower.length() * \
-                    mt.cos(shower.angleInPlane() - shower.openingAngle()/2)
-                y1 = y1 + shower.length() * \
-                    mt.sin(shower.angleInPlane() - shower.openingAngle()/2)
-                x2 = x2 + shower.length() * \
-                    mt.cos(shower.angleInPlane() + shower.openingAngle()/2)
-                y2 = y2 + shower.length() * \
-                    mt.sin(shower.angleInPlane() + shower.openingAngle()/2)
+                #
+                # We need the vector that's perpendicular to the axis, to make the cone.
+                # Use 3D vectors to allow the cross product:
+                zAxis = TVector3(0, 0, 1)
+                showerAxis = TVector3(shower.endPoint().w - shower.startPoint().w,
+                                      shower.endPoint().t -
+                                      shower.startPoint().t,
+                                      0.0)
+                perpAxis = zAxis.Cross(showerAxis)
+
+                length = showerAxis.Mag() * np.tan(shower.openingAngle()/2)
+                perpAxis *= length / perpAxis.Mag()
+
+
+                x1, y1 = shower.endPoint().w + perpAxis.X(), shower.endPoint().t + \
+                    perpAxis.Y()
+                x2, y2 = shower.endPoint().w - perpAxis.X(), shower.endPoint().t - \
+                    perpAxis.Y()
+                # x2, y2 = shower.endPoint().w, shower.endPoint().t
+                # x1 = x1 + shower.length() * \
+                #     mt.cos(shower.angleInPlane() - shower.openingAngle()/2)
+                # y1 = y1 + shower.length() * \
+                #     mt.sin(shower.angleInPlane() - shower.openingAngle()/2)
+                # x2 = x2 + shower.length() * \
+                #     mt.cos(shower.angleInPlane() + shower.openingAngle()/2)
+                # y2 = y2 + shower.length() * \
+                #     mt.sin(shower.angleInPlane() + shower.openingAngle()/2)
 
                 # Scale everything to wire/time:
                 x1 /= geom.wire2cm()
@@ -89,6 +106,7 @@ class shower(recoBase):
 
                 points.append(QtCore.QPoint(x1, y1))
                 points.append(QtCore.QPoint(x2, y2))
+
 
                 thisPolyF = QtGui.QPolygonF(points)
                 thisPoly = QtGui.QGraphicsPolygonItem(thisPolyF)
@@ -150,7 +168,6 @@ try:
             showers = self._process.getData()
             i_color = 0
 
-
             for i in xrange(len(showers)):
                 shower = showers[i]
 
@@ -170,7 +187,7 @@ try:
                 cylinder = gl.GLMeshItem(meshdata=cylinderPoints,
                                          drawEdges=False,
                                          shader='shaded',
-                                         color = color,
+                                         color=color,
                                          glOptions='opaque')
                 # We need to get this cyliner's axis to match the actual axis
                 # we can rotate it around an axis.

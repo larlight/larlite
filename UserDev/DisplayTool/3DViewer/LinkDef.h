@@ -25,6 +25,16 @@
 #pragma link C++ class evd::RecoBase3D<evd::Shower3D>+;
 #pragma link C++ class evd::DrawShower3D+;
 
+#pragma link C++ class evd::Spacepoint3D+;
+#pragma link C++ class std::vector<evd::Spacepoint3D>+;
+#pragma link C++ class evd::RecoBase3D<evd::Spacepoint3D>+;
+#pragma link C++ class evd::DrawSpacepoint3D+;
+
+#pragma link C++ class evd::Opflash3D+;
+#pragma link C++ class std::vector<evd::Opflash3D>+;
+#pragma link C++ class evd::RecoBase3D<evd::Opflash3D>+;
+#pragma link C++ class evd::DrawOpflash3D+;
+
 // Link the classes that are processors
 
 //ADD_NEW_CLASS ... do not change this line

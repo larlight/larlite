@@ -1,9 +1,9 @@
 /**
- * \file DrawTrack3D.h
+ * \file DrawOpflash3D.h
  *
  * \ingroup RecoViewer
  *
- * \brief Class def header for a class DrawTrack3D
+ * \brief Class def header for a class DrawOpflash3D
  *
  * @author cadams
  */
@@ -11,48 +11,57 @@
 /** \addtogroup RecoViewer
 
     @{*/
-#ifndef LARLITE_DRAWTRACK3D_H
-#define LARLITE_DRAWTRACK3D_H
+#ifndef LARLITE_DRAWOPFLASH_H
+#define LARLITE_DRAWOPFLASH_H
 
 #include <iostream>
 #include "Analysis/ana_base.h"
-#include "DataFormat/track.h"
+#include "DataFormat/opflash.h"
+#include "TVector3.h"
 
 #include "RecoBase3D.h"
 /**
-   \class DrawTrack3D
-   User defined class DrawTrack3D ... these comments are used to generate
+   \class DrawOpflash3D
+   User defined class DrawOpflash3D ... these comments are used to generate
    doxygen documentation!
  */
 
-// typedef std::vector< std::pair<float,float> > evd::Track2d;
 
 namespace evd {
 
-class Track3D {
+
+class Opflash3D {
+
+friend class DrawOpflash3D;
 
 public:
-    std::vector<TVector3 > _track;
-    const std::vector<TVector3 > & track() {return _track;}
-    // const std::vector<std::vector<float> > & direction() {return _track;}
-    TVector3 start_point(){return _start_point;}
-    TVector3 end_point(){return _end_point;}
+
+    float y(){return _y;}
+    float y_width(){return _y_width;}
+    float z(){return _z;}
+    float z_width(){return _z_width;}
+    float time(){return _time;}
+    float time_width(){return _time_width;}
 
 private:
-    TVector3 _start_point;
-    TVector3 _end_point;
+    float _y;
+    float _y_width;
+    float _z;
+    float _z_width;
+    float _time;
+    float _time_width;
 };
 
 
-class DrawTrack3D : public larlite::ana_base, public RecoBase3D<Track3D> {
+class DrawOpflash3D : public larlite::ana_base, public RecoBase3D<Opflash3D> {
 
 public:
 
     /// Default constructor
-    DrawTrack3D();
+    DrawOpflash3D();
 
     /// Default destructor
-    ~DrawTrack3D();
+    ~DrawOpflash3D();
 
     /** IMPLEMENT in DrawCluster.cc!
         Initialization method to be called before the analysis event loop.
@@ -72,7 +81,6 @@ public:
 
 private:
 
-    Track3D getTrack3d(larlite::track track);
 
 };
 

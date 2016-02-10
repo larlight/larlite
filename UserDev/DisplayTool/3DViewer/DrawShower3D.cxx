@@ -1,5 +1,5 @@
-#ifndef DRAWTRACK3D_CXX
-#define DRAWTRACK3D_CXX
+#ifndef DRAWSHOWER3D_CXX
+#define DRAWSHOWER3D_CXX
 
 #include "DrawShower3D.h"
 #include "DataFormat/shower.h"
@@ -44,11 +44,9 @@ bool DrawShower3D::analyze(larlite::storage_manager* storage) {
   // get a handle to the tracks
   auto showerHandle = storage->get_data<larlite::event_shower>(_producer);
 
-  // Clear out the hit data but reserve some space for the showers
-  for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
+  // Clear out the data but reserve some space
     _data.clear();
     _data.reserve(showerHandle -> size());
-  }
 
 
   // Populate the shower vector:

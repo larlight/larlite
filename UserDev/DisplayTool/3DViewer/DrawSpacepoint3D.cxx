@@ -1,27 +1,22 @@
-#ifndef DRAWMCTRACK3D_CXX
-#define DRAWMCTRACK3D_CXX
+#ifndef DRAWSPACEPOINT3D_CXX
+#define DRAWSPACEPOINT3D_CXX
 
-#include "DrawMCTrack3D.h"
-#include "LArUtil/DetectorProperties.h"
+#include "DrawSpacepoint3D.h"
 
 namespace evd {
 
 
-DrawMCTrack3D::DrawMCTrack3D() {
-  _name = "DrawMCTrack3D";
+DrawSpacepoint3D::DrawSpacepoint3D() {
+  _name = "DrawSpacepoint3D";
   _fout = 0;
 }
 
-bool DrawMCTrack3D::initialize() {
+bool DrawSpacepoint3D::initialize() {
 
-  // Resize data holder
-  // if (_data.size() != geoService -> Nviews()) {
-  //   _data.resize(geoService -> Nviews());
-  // }
   return true;
 }
 
-bool DrawMCTrack3D::analyze(larlite::storage_manager* storage) {
+bool DrawSpacepoint3D::analyze(larlite::storage_manager* storage) {
 
   //
   // Do your event-by-event analysis here. This function is called for
@@ -45,22 +40,24 @@ bool DrawMCTrack3D::analyze(larlite::storage_manager* storage) {
 
 
   // get a handle to the tracks
-  auto mctrackHandle = storage->get_data<larlite::event_mctrack>(_producer);
+  auto spacepointHandle = storage->get_data<larlite::event_spacepoint>(_producer);
 
   // Clear out the data but reserve some space
   _data.clear();
-  _data.reserve(mctrackHandle -> size());
+  _data.reserve(spacepointHandle -> size());
 
 
-  // Populate the track vector:
-  for (auto & mctrack : *mctrackHandle) {
-    _data.push_back(getMCTrack3d(mctrack));
+  // Populate the shower vector:
+  for (auto & spt : *spacepointHandle) {
+    TVector3 temp(spt.XYZ());
+    _data.push_back(temp);
   }
+
 
   return true;
 }
 
-bool DrawMCTrack3D::finalize() {
+bool DrawSpacepoint3D::finalize() {
 
   // This function is called at the end of event loop.
   // Do all variable finalization you wish to do here.
@@ -77,23 +74,7 @@ bool DrawMCTrack3D::finalize() {
   return true;
 }
 
-DrawMCTrack3D::~DrawMCTrack3D() {}
-
-MCTrack3D DrawMCTrack3D::getMCTrack3d(larlite::mctrack mctrack) {
-  MCTrack3D result;
-  for (size_t i = 0; i < mctrack.size(); i++) {
-    // project a point into 2D:
-    try {
-      result._track.push_back(mctrack.at(i).Position().Vect());
-    }
-    catch (...) {
-      continue;
-    }
-
-  }
-
-  return result;
-}
+DrawSpacepoint3D::~DrawSpacepoint3D() {}
 
 
 } // evd
