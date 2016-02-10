@@ -1,0 +1,32 @@
+import ROOT
+import larlite
+
+from ROOT import larlite, showerreco
+
+filename="/data_linux/pfp_v2_pandoraNu.root"
+
+psh = showerreco.ProtoShowerHelper()
+
+_mgr = larlite.storage_manager()
+
+# Get the pfparticles from the storage manager:
+_mgr.reset()
+_mgr.add_in_filename(filename)
+_mgr.set_io_mode(larlite.storage_manager.kREAD)
+_mgr.open()
+_mgr.next_event()
+
+producer_name="pandoraNu"
+
+# ev_pfp = _mgr.get_data(larlite.event_pfpart)(larlite.data.kPFParticle,"pandoraNu")
+
+protoShowerVec = ROOT.vector(showerreco.ProtoShower)()
+
+psh.GenerateProtoShowers(_mgr,producer_name,protoShowerVec)
+
+print protoShowerVec.size()
+
+for shower in protoShowerVec:
+  for params in shower.params():
+    params.Report()
+    print "\n\n\n"
