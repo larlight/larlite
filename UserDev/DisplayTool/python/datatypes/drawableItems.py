@@ -7,6 +7,7 @@ import cluster
 import endpoint2d
 import vertex
 import mctrack
+import mcshower
 import spacepoint
 import opflash
 import seed
@@ -64,6 +65,7 @@ try:
             self._drawableClasses.update({'Track': [track.track3D,"track"]})
             self._drawableClasses.update({'Opflash': [opflash.opflash3D,"opflash"]})
             self._drawableClasses.update({'MCTrack': [mctrack.mctrack3D,"mctrack"]})
+            self._drawableClasses.update({'MCShower': [mcshower.mcshower3D,"mcshower"]})
 
         def getListOfTitles(self):
             return self._drawableClasses.keys()
