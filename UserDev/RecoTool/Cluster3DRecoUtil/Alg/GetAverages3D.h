@@ -15,7 +15,7 @@
 #define GETAVERAGES3D_H
 
 #include <iostream>
-#include "Cluster3DRecoUtil/Base/ParamsAlgBase.h"
+#include "Cluster3DRecoUtil/Base/Params3DAlgBase.h"
 
 namespace cluster3D {
 
