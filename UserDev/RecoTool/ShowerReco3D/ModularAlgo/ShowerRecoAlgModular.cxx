@@ -18,7 +18,7 @@ void ShowerRecoAlgModular::Initialize()
   return;
 }
 
-Shower_t ShowerRecoAlgModular::RecoOneShower(const ShowerClusterSet_t& clusters) {
+Shower_t ShowerRecoAlgModular::RecoOneShower(const ProtoShower& proto_shower) {
   // Run over the shower reco modules:
   Shower_t result;
 
@@ -43,7 +43,7 @@ Shower_t ShowerRecoAlgModular::RecoOneShower(const ShowerClusterSet_t& clusters)
 
   for (size_t n = 0; n < _modules.size(); n++) {
     _watch.Start();
-    _modules[n] -> do_reconstruction(clusters, result);
+    _modules[n] -> do_reconstruction(proto_shower, result);
     _module_time_v[n] += _watch.RealTime();
     _module_ctr_v[n] += 1;
     if (_debug) {
@@ -203,11 +203,11 @@ void ShowerRecoAlgModular::printChanges(const Shower_t & localCopy, const Shower
   // Total Energy
   changed = false;
   if (localCopy.fTotalEnergy != result.fTotalEnergy)
-      changed = true;
+    changed = true;
   if (changed) {
     std::cout << "\tfTotalEnergy has changed from "
-	      << localCopy.fTotalEnergy << " to "
-	      << result.fTotalEnergy << std::endl;
+              << localCopy.fTotalEnergy << " to "
+              << result.fTotalEnergy << std::endl;
   }
 
   //Total Energy vector
@@ -231,11 +231,11 @@ void ShowerRecoAlgModular::printChanges(const Shower_t & localCopy, const Shower
   // Sigma Total Energy
   changed = false;
   if (localCopy.fSigmaTotalEnergy != result.fSigmaTotalEnergy)
-      changed = true;
+    changed = true;
   if (changed) {
     std::cout << "\tfSigmaTotalEnergy has changed from "
-	      << localCopy.fSigmaTotalEnergy << " to "
-	      << result.fSigmaTotalEnergy << std::endl;
+              << localCopy.fSigmaTotalEnergy << " to "
+              << result.fSigmaTotalEnergy << std::endl;
   }
 
   // Sigma Total Energy vector
@@ -260,8 +260,8 @@ void ShowerRecoAlgModular::printChanges(const Shower_t & localCopy, const Shower
     changed = true;
   if (changed) {
     std::cout << "\tfdEdx has changed from "
-	      << localCopy.fdEdx << " to " 
-	      << result.fdEdx << std::endl;
+              << localCopy.fdEdx << " to "
+              << result.fdEdx << std::endl;
   }
 
   // dEdx_v
@@ -283,11 +283,11 @@ void ShowerRecoAlgModular::printChanges(const Shower_t & localCopy, const Shower
   // dQdx
   changed = false;
   if (localCopy.fdQdx_v != result.fdQdx_v)
-      changed = true;
+    changed = true;
   if (changed) {
     std::cout << "\tfdQdx has changed from"
-	      << localCopy.fdQdx << " to "
-	      << result.fdQdx << std::endl;
+              << localCopy.fdQdx << " to "
+              << result.fdQdx << std::endl;
   }
 
   // dQdx_v
@@ -333,8 +333,8 @@ void ShowerRecoAlgModular::printChanges(const Shower_t & localCopy, const Shower
     changed = true;
   if (changed) {
     std::cout << "\tfSigmadEdx has changed from "
-	      << localCopy.fSigmadEdx << " to "
-	      << result.fSigmadEdx << std::endl;
+              << localCopy.fSigmadEdx << " to "
+              << result.fSigmadEdx << std::endl;
   }
 
   // sigma dEdx_v
@@ -360,8 +360,8 @@ void ShowerRecoAlgModular::printChanges(const Shower_t & localCopy, const Shower
     changed = true;
   if (changed) {
     std::cout << "\tfSigmadQdx has changed from "
-	      << localCopy.fSigmadQdx << " to "
-	      << result.fSigmadQdx << std::endl;
+              << localCopy.fSigmadQdx << " to "
+              << result.fSigmadQdx << std::endl;
   }
 
   // sigma dQdx_v
@@ -432,9 +432,9 @@ void ShowerRecoAlgModular::Finalize(TFile* fout)
             << "=================== Time Report =====================" << std::endl;
   for (size_t n = 0; n < _modules.size(); n++) {
     double module_time = _module_time_v[n] / ((double)_module_ctr_v[n]);
-    std::cout <<  std::setw(25) << _modules[n]->name() << "\t Algo Time: " 
-	      << std::setw(10) << module_time * 1.e6     << " [us/cluster]"
-              << "\t Clusters Scanned: " << _module_ctr_v[n] << std::endl;
+    std::cout <<  std::setw(25) << _modules[n]->name() << "\t Algo Time: "
+              << std::setw(10) << module_time * 1.e6     << " [us/proto_shower]"
+              << "\t Proto-Showers Scanned: " << _module_ctr_v[n] << std::endl;
   }
 
   std::cout << "=====================================================" << std::endl

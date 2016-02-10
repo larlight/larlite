@@ -36,7 +36,7 @@ namespace showerreco {
     virtual ~ShowerAnaBase(){}
 
     virtual void Analyze( const Shower_t& shower,
-			  const ShowerClusterSet_t& clusters ) = 0;
+			  const ProtoShower& proto_shower ) = 0;
 
     TTree* GetTree();
 

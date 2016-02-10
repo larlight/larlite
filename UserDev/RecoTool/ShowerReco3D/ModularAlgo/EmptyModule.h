@@ -2,7 +2,7 @@
  * \file EmptyModule.h
  *
  * \ingroup ModularAlgo
- * 
+ *
  * \brief Class def header for a class EmptyModule
  *
  * @author cadams
@@ -23,25 +23,25 @@
  */
 namespace showerreco {
 
-  class EmptyModule : ShowerRecoModuleBase{
+class EmptyModule : ShowerRecoModuleBase {
 
-  public:
+public:
 
-    /// Default constructor
-    EmptyModule(){_name = "EmptyModule";}
+  /// Default constructor
+  EmptyModule() {_name = "EmptyModule";}
 
-    /// Default destructor
-    ~EmptyModule(){}
+  /// Default destructor
+  ~EmptyModule() {}
 
 
-    void do_reconstruction(const ShowerClusterSet_t &, Shower_t &);
+  void do_reconstruction(const ProtoShower &, Shower_t &);
 
-  private:
+private:
 
-  };
+};
 
 } // showerreco
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

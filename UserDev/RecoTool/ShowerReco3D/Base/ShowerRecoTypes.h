@@ -68,6 +68,8 @@ protected:
 /// Output shower representation from shower reco algorithms
 struct Shower_t {
 
+  bool fPassedReconstruction;
+
   TVector3 fDCosStart;                        ///< direction cosines at start of shower
   TVector3 fSigmaDCosStart;                   ///< uncertainty on initial direction cosines
   TVector3 fXYZStart;                         ///< 3D start point of shower
@@ -109,6 +111,8 @@ struct Shower_t {
   { Reset(); }
 
   void Reset() {
+
+    fPassedReconstruction = false;
 
     fDCosStart[0] = fDCosStart[1] = fDCosStart[2] = kDOUBLE_MIN;
     fSigmaDCosStart[0] = fSigmaDCosStart[1] = fSigmaDCosStart[2] = kDOUBLE_MIN;

@@ -32,7 +32,10 @@ const double & dist               ) {
   return tempCoords;
 }
 
-void OtherStartPoint3D::do_reconstruction(const ShowerClusterSet_t & inputShowers, Shower_t & resultShower) {
+void OtherStartPoint3D::do_reconstruction(const ProtoShower & proto_shower,
+    Shower_t& resultShower) {
+
+  auto & clusters = proto_shower.params();
 
 //  std::cout<<"\n\n********************************New event!***************************** "<<std::endl ;
 
@@ -48,7 +51,7 @@ void OtherStartPoint3D::do_reconstruction(const ShowerClusterSet_t & inputShower
   float minClusDist      =  999999 ;
   int worstPlane  = -1      ;
   int planeTemp   =  0      ;
-  for ( auto const & c : inputShowers ) {
+  for ( auto const & c : clusters ) {
     float distTemp = abs ( c.start_point.w - c.end_point.w );
 
     if ( distTemp < minClusDist ) {
@@ -59,7 +62,7 @@ void OtherStartPoint3D::do_reconstruction(const ShowerClusterSet_t & inputShower
   }
 
   double time = 0. ;
-  for ( auto const & c : inputShowers ) {
+  for ( auto const & c : clusters ) {
     if (c.plane_id.Plane != worstPlane) time += c.start_point.t;
   }
 
@@ -79,7 +82,7 @@ void OtherStartPoint3D::do_reconstruction(const ShowerClusterSet_t & inputShower
 
   while ( distFromStart > 0.5 ) {
     minDist  = 99999999. ;
-    for ( auto const c : inputShowers ) {
+    for ( auto const c : clusters ) {
       if (c.plane_id.Plane != worstPlane ) {
         for (int i = 0; i < pts.size(); i++) {
 

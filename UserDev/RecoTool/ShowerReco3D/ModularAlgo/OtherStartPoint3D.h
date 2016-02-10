@@ -34,15 +34,15 @@ public:
   ~OtherStartPoint3D() {}
 
   /// Inherited/overloaded function from ShowerRecoModuleBase
-  void do_reconstruction(const ShowerClusterSet_t &, Shower_t &);
+  void do_reconstruction(const ProtoShower &, Shower_t &);
 
- /// Pass center point-- you have initDist 
-  std::vector<std::vector<double>> calculatePoints(const std::vector<double> & centerPoint,const double & dist) ;
+  /// Pass center point-- you have initDist
+  std::vector<std::vector<double>> calculatePoints(const std::vector<double> & centerPoint, const double & dist) ;
 
   bool inTPC( const TVector3 & pt );
 
 
-private: 
+private:
 
   std::vector<double> _xCoords ;
   std::vector<double> _yCoords ;

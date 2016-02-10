@@ -55,8 +55,7 @@ public:
   /**
    * @brief Reconstruct showers
    */
-  void Reconstruct (const ClusterAss_t& ass,
-                    std::vector< ::showerreco::Shower_t>& showers);
+  void Reconstruct (std::vector< ::showerreco::Shower_t>& showers);
 
   /// Finalize: provide TFile access so that anything that needs to be stored can be stored
   void Finalize(TFile* fout = nullptr);
@@ -67,9 +66,9 @@ public:
   /**
      @brief set clusters for the current event
    */
-  void SetClusters(const std::vector<::cluster::cluster_params>& clusters)
-  { _clusters = clusters; }
-  
+  void SetProtoShowers(const std::vector<ProtoShower>& proto_showers)
+  { _proto_showers = proto_showers; }
+
 
 private:
 
@@ -82,18 +81,10 @@ private:
   void Process(const ClusterAss_t& ass,
                std::vector< ::showerreco::Shower_t >& showers);
 
-  ::cluster::DefaultParamsAlg _params_alg;
-
   // vector of input clusters to be used for reconstruction
-  std::vector<::cluster::cluster_params> _clusters;
+  std::vector<ProtoShower> _proto_showers;
 
-  // stopwatch for time-profiling
-  TStopwatch _watch;
-  // keep track of number of calls
-  double _CPAN_times;
-  double _CPAN_calls;
 
-  ::larlite::storage_manager * _storage;
 
 };
 }

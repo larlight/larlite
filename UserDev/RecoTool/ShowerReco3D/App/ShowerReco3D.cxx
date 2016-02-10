@@ -2,9 +2,10 @@
 #define RECOTOOL_SHOWERRECO3D_CXX
 
 #include "ShowerReco3D.h"
-#include "DataFormat/pfpart.h"
-#include "DataFormat/shower.h"
+
+
 #include "DataFormat/DataFormat-TypeDef.h"
+
 namespace larlite {
 
 ShowerReco3D::ShowerReco3D() : ana_base()
@@ -36,95 +37,146 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
   auto shower_v = storage->get_data<event_shower>(fOutputProducer);
   shower_v->clear();
   // create association for showers -> pfparticle
-  auto shower_pfpart_ass_v = storage->get_data<event_ass>(shower_v->name());
+  larlite::event_ass * shower_pfpart_ass_v  = storage->get_data<event_ass>(shower_v->name());
   // create association for showers -> cluster
-  auto shower_cluster_ass_v = storage->get_data<event_ass>(shower_v->name());
+  larlite::event_ass * shower_cluster_ass_v = 0;
+  // create association for showers -> spacepoints
+  larlite::event_ass * shower_sps_ass_v = 0;
+  // create association for showers -> vertex
+  larlite::event_ass * shower_vertex_ass_v = 0;
+
 
   // set event ID through storage manager
   storage->set_id(storage->run_id(),
                   storage->subrun_id(),
                   storage->event_id());
 
-  if (!ev_pfpart or (ev_pfpart->size() == 0) ){
-    print(msg::kERROR,__FUNCTION__,Form("PFPart producer %s product not found!",fInputProducer.c_str()));
+  if (!ev_pfpart or (ev_pfpart->size() == 0) ) {
+    print(msg::kERROR, __FUNCTION__, Form("PFPart producer %s product not found!", fInputProducer.c_str()));
     return false;
   }
 
+
   // retrieve clusters associated with this pfpart
+  // Cluster are retrieved for saving the associations at the end.
   event_cluster *ev_cluster = nullptr;
   // association vector
   AssSet_t ass_cluster_v;
-  ass_cluster_v = storage->find_one_ass(ev_pfpart->id(),ev_cluster,ev_pfpart->name());
+  ass_cluster_v = storage->find_one_ass(ev_pfpart->id(), ev_cluster, ev_pfpart->name());
 
   // if associated clusters not found -> quit and exit
-  if ( !ev_cluster or (ev_cluster->size() == 0) ){
-    print(msg::kERROR,__FUNCTION__,Form("No clusters found associated to PFPart w/ producer %s",fInputProducer.c_str()));
-    return false;
+  if ( !ev_cluster or (ev_cluster->size() == 0) ) {
+    print(msg::kERROR, __FUNCTION__, Form("No clusters found associated to PFPart w/ producer %s", fInputProducer.c_str()));
+    // return false;
+  }
+  else {
+    shower_cluster_ass_v = storage->get_data<event_ass>(shower_v->name());
   }
 
-  // Retrieve clusters and feed into the algorithm
-  std::vector<::cluster::cluster_params > local_clusters;
-  fCRUHelper.GenerateParams(storage, ev_cluster->name(), local_clusters);
 
-  // set clusters for the manager
-  fManager.SetClusters(local_clusters);
+  // retrieve vertexes associated with this pfpart
+  // Vertexes are retrieved for saving the associations at the end.
+  event_vertex *ev_vertex = nullptr;
+  // association vector
+  AssSet_t ass_vertex_v;
+  ass_vertex_v = storage->find_one_ass(ev_pfpart->id(), ev_vertex, ev_pfpart->name());
 
-  for (auto & clust : local_clusters)
-    _params_alg.FillParams(clust);
+  // if associated clusters not found -> quit and exit
+  if ( !ev_vertex or (ev_vertex->size() == 0) ) {
+    print(msg::kERROR, __FUNCTION__, Form("No vertexs found associated to PFPart w/ producer %s", fInputProducer.c_str()));
+    // return false;
+  }
+  else {
+    shower_vertex_ass_v  = storage->get_data<event_ass>(shower_v->name());
+  }
+
+  // retrieve spacepoints associated with this pfpart
+  // Spacepoints are retrieved for saving the associations at the end.
+  event_spacepoint *ev_sps = nullptr;
+  // association vector
+  AssSet_t ass_sps_v;
+  ass_sps_v = storage->find_one_ass(ev_pfpart->id(), ev_sps, ev_pfpart->name());
+
+  // if associated clusters not found -> quit and exit
+  if ( !ev_sps or (ev_sps->size() == 0) ) {
+    print(msg::kERROR, __FUNCTION__, Form("No spacepoints found associated to PFPart w/ producer %s", fInputProducer.c_str()));
+    // return false;
+  }
+  else {
+    shower_sps_ass_v = storage->get_data<event_ass>(shower_v->name());
+  }
+
+
+  // Now use ProtoShowerHelper to generate the ProtoShowers:
+
+  std::vector<showerreco::ProtoShower> proto_showers;
+
+  _ps_helper.GenerateProtoShowers( storage,
+                                   fInputProducer,
+                                   proto_showers);
+
+  /*  _____ ___  ____   ___
+     |_   _/ _ \|  _ \ / _ \ 
+       | || | | | | | | | | |
+       | || |_| | |_| | |_| |
+       |_| \___/|____/ \___/
+
+  We need a way to control and manage the flow of pfparticles into shower reco
+  There is no reason to run them all through, and in fact proto_shower_helper shouldn't
+  even make protoshowers for them.
+
+  Right now I've left this unimplemented.  A possible scheme is to cut on pfpart PdgCode,
+  or make some other selection that is fed into protoshowers.  We need to construct a list 
+  of indexes of pfpart that are used to handle the associations later.
+
+  Actually after writing that note that's totally the way to go.  
+  I'll do it after the rest of the framework change is done.
+  */
 
 
   // Result shower holder
   std::vector< ::showerreco::Shower_t> res_shower_v;
 
-  // vector to hold matched pairs
-  std::vector<std::vector<unsigned int> > matched_pairs;
-  // vector to hold pfpart indices that are actually used to try and reconstruct showers
-  // this is used then to create the correct shower -> pfpart association
-  std::vector<unsigned int> pfpart_indices;
-  
-  // Loop over pfparticles
-  for (size_t pfpart_index = 0; pfpart_index < ev_pfpart->size(); ++pfpart_index) {
-    
-    auto const& pfp = (*ev_pfpart)[pfpart_index];
 
-    
-    // If this is not pdg=11 pfparticle, ignore
-    if (pfp.PdgCode() != 11) continue;
-    
-    // Otherwise we store the association information in matched_pair
-    matched_pairs.push_back(std::vector<unsigned int>());
-    
-    auto& last_pair = (*matched_pairs.rbegin());
-    
-    last_pair.reserve(ass_cluster_v[pfpart_index].size());
-    
-    // Loop over associated index for *this* pfparticle
-    for (auto const& ass_index : ass_cluster_v[pfpart_index])
-      last_pair.push_back(ass_index);
 
-    pfpart_indices.push_back(pfpart_index);
-    
-  }//for all matches in the event
-  fManager.Reconstruct(matched_pairs, res_shower_v);
+
+  fManager.Reconstruct(res_shower_v);
 
   // vector for shower -> cluster association
-  std::vector<std::vector<unsigned int> > recod_matched_pairs;
+  std::vector<std::vector<unsigned int> > shower_cluster_v;
+
   // vector for shower -> pfpart association
   std::vector<std::vector<unsigned int> > shower_pfpart_v;
 
-  // counter for reco'd showers
-  int ctr = 0;
+  // vector for shower -> vertex association
+  std::vector<std::vector<unsigned int> > shower_vertex_v;
+
+  // vector for shower -> sps association
+  std::vector<std::vector<unsigned int> > shower_sps_v;
 
   for (size_t i = 0; i < res_shower_v.size(); i++) {
+
+    // The res_shower_v vector is equal in length to the
+    // pfparticle set.
+    // So associations from Shower -> X can be copied from
+    // the associations from pfpart -> X
 
     auto const& res_shower = res_shower_v[i];
 
 
+    if (res_shower.fPassedReconstruction == false) {
+      continue;
+    }
+
+
+
     // filter out showers with garbage values
-    if (res_shower.fXYZStart.Mag2()  == 0)
+    if (res_shower.fXYZStart.Mag2()  == 0) {
       continue;
-    if (res_shower.fDCosStart.Mag2() == 0)
+    }
+    if (res_shower.fDCosStart.Mag2() == 0) {
       continue;
+    }
 
 
     shower s;
@@ -152,13 +204,13 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     s.set_opening_angle         ( res_shower.fOpeningAngle          );
 
     shower_v->push_back(s);
-    //(*shower_v)[i].set_id(ctr);
-    ctr += 1;
 
-    recod_matched_pairs.push_back(matched_pairs[i]);
-    std::vector<unsigned int> pfpart_ass = { pfpart_indices[i] };
+    shower_cluster_v.push_back(ass_cluster_v[i]);
+    shower_vertex_v.push_back(ass_vertex_v[i]);
+    shower_sps_v.push_back(ass_sps_v[i]);
+
+    std::vector<unsigned int> pfpart_ass = { (unsigned int) i };
     shower_pfpart_v.push_back( pfpart_ass);
-
 
   }// for all input cluster-paris
 
@@ -166,8 +218,29 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     return true;
 
   // set shower -> cluster and shower -> pfpart associations
-  shower_cluster_ass_v->set_association(shower_v->id(), product_id(data::kCluster, ev_cluster->name()), recod_matched_pairs);
-  shower_pfpart_ass_v->set_association(shower_v->id(), product_id(data::kPFParticle, ev_pfpart->name()), shower_pfpart_v);
+
+  shower_pfpart_ass_v->set_association(shower_v->id(),
+                                       product_id(data::kPFParticle,
+                                           ev_pfpart->name()),
+                                       shower_pfpart_v);
+  if ( shower_cluster_ass_v ) {
+    shower_cluster_ass_v->set_association(shower_v->id(),
+                                          product_id(data::kCluster,
+                                              ev_cluster->name()),
+                                          shower_cluster_v);
+  }
+  if ( shower_vertex_ass_v ) {
+    shower_vertex_ass_v->set_association(shower_v->id(),
+                                         product_id(data::kVertex,
+                                             ev_pfpart->name()),
+                                         shower_pfpart_v);
+  }
+  if ( shower_sps_ass_v ) {
+    shower_sps_ass_v->set_association(shower_v->id(),
+                                      product_id(data::kSpacePoint,
+                                          ev_pfpart->name()),
+                                      shower_pfpart_v);
+  }
   return true;
 }
 

@@ -16,9 +16,18 @@
 #define RECOTOOL_SHOWERRECO3D_H
 
 #include "Analysis/ana_base.h"
-#include "ClusterRecoUtil/Base/CRUHelper.h"
-#include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
+#include "DataFormat/pfpart.h"
+#include "DataFormat/shower.h"
+#include "DataFormat/vertex.h"
+#include "DataFormat/spacepoint.h"
+#include "DataFormat/cluster.h"
+
+ 
+#include "ShowerReco3D/Base/ShowerRecoTypes.h"
+#include "ShowerReco3D/Base/ProtoShowerHelper.h"
+
 #include "ShowerReco3D/Base/ShowerRecoManager.h"
+#include "ShowerReco3D/Base/ProtoShowerHelper.h"
 
 namespace larlite {
   /**
@@ -71,11 +80,8 @@ namespace larlite {
     /// Shower reco core class instance
     ::showerreco::ShowerRecoManager fManager;
 
-    /// CRUHelper converts framework dependent data product to PxUtil
-    ::cluster::CRUHelper fCRUHelper;
-
-    ::cluster::DefaultParamsAlg _params_alg;
-
+    // ProtoShowerHelper converts data products into protoshowers
+    ::showerreco::ProtoShowerHelper _ps_helper;
   };
 }
 #endif

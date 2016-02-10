@@ -45,7 +45,7 @@ public:
 
 
     /// Function to reconstruct a shower
-    Shower_t RecoOneShower(const ShowerClusterSet_t& clusters);
+    Shower_t RecoOneShower(const ProtoShower& proto_shower);
 
     /**
      * @brief Add a module to the list of modules that run shower reconstruction

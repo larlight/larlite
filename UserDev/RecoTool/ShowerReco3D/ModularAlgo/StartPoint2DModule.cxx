@@ -3,14 +3,17 @@
 
 #include "StartPoint2DModule.h"
 
-namespace showerreco{
+namespace showerreco {
 
-  void StartPoint2DModule::do_reconstruction(const ShowerClusterSet_t &, Shower_t &){
-    
-    // This function takes the shower cluster set and computes the best fit 3D axis
-    // and then assigns it to the shower
+void StartPoint2DModule::do_reconstruction(const ProtoShower & proto_shower,
+    Shower_t& resultShower) {
 
-  }
+  auto & clusters = proto_shower.params();
+
+  // This function takes the shower cluster set and computes the best fit 3D axis
+  // and then assigns it to the shower
+
+}
 
 
 } //showerreco

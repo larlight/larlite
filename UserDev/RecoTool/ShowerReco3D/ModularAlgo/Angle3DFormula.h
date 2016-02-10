@@ -2,7 +2,7 @@
  * \file Angle3DFormula.h
  *
  * \ingroup ModularAlgo
- * 
+ *
  * \brief Class def header for a class Angle3DFormula
  *
  * @author david caratelli
@@ -23,31 +23,30 @@
  */
 namespace showerreco {
 
-  class Angle3DFormula : ShowerRecoModuleBase{
+class Angle3DFormula : ShowerRecoModuleBase {
 
-  public:
+public:
 
-    /// Default constructor
-    Angle3DFormula(){_name = "Angle3DFormula"; _max_err = 0.1;}
+  /// Default constructor
+  Angle3DFormula() {_name = "Angle3DFormula"; _max_err = 0.1;}
 
-    /// Default destructor
-    ~Angle3DFormula(){}
+  /// Default destructor
+  ~Angle3DFormula() {}
 
-    /// set the maximum angle that is allowed as an error (radians)
-    void setMaxAngleError(double err) { _max_err = err; }
+  /// set the maximum angle that is allowed as an error (radians)
+  void setMaxAngleError(double err) { _max_err = err; }
 
+  void do_reconstruction(const ProtoShower &, Shower_t &);
 
-    void do_reconstruction(const ShowerClusterSet_t &, Shower_t &);
+private:
 
-  private:
+  // maximum error in the angle that is allowed
+  double _max_err;
 
-    // maximum error in the angle that is allowed
-    double _max_err;
-
-  };
+};
 
 } // showerreco
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

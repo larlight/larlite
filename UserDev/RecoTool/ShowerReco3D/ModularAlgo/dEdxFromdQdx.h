@@ -2,7 +2,7 @@
  * \file dEdxFromdQdx.h
  *
  * \ingroup ModularAlgo
- * 
+ *
  * \brief Class def header for a class dQdx2DModule
  *
  * @authors David Caratelli
@@ -18,36 +18,36 @@
 #include "ShowerRecoModuleBase.h"
 /**
    \class dEdxFromdQdx : ShowerRecoModuleBase
-   This is meant to compute the 2D dQdx along the start of the shower. 
+   This is meant to compute the 2D dQdx along the start of the shower.
  */
 namespace showerreco {
 
-  class dEdxFromdQdx : ShowerRecoModuleBase{
+class dEdxFromdQdx : ShowerRecoModuleBase {
 
-  public:
+public:
 
-    /// Default constructor
-    dEdxFromdQdx();
+  /// Default constructor
+  dEdxFromdQdx();
 
-    /// Default destructor
-    ~dEdxFromdQdx(){}
+  /// Default destructor
+  ~dEdxFromdQdx() {}
 
-    void do_reconstruction(const ShowerClusterSet_t &, Shower_t &);
-    
-    void initialize();
+  void do_reconstruction(const ProtoShower &, Shower_t &);
 
-    void SetUsePitch(bool on) { _use_pitch = on; }
+  void initialize();
 
-  private:
+  void SetUsePitch(bool on) { _use_pitch = on; }
 
-    bool _use_pitch;
-    double _dEdx;
-    int _pl_best;
-    int _pl;
-  };
+private:
+
+  bool _use_pitch;
+  double _dEdx;
+  int _pl_best;
+  int _pl;
+};
 
 } // showerreco
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 
