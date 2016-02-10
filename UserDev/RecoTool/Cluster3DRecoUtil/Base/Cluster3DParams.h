@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef RECOTOOL_CLUSTERPARAMS_H
-#define RECOTOOL_CLUSTERPARAMS_H
+#ifndef RECOTOOL_CLUSTER3DPARAMS_H
+#define RECOTOOL_CLUSTER3DPARAMS_H
 
 #include <iostream>
 #include <climits>
@@ -53,10 +53,6 @@ public:
   bool operator!=(const Point3D & other){return !(*this == other);}
 
 };
-
-}
-
-namespace cluster3D {
 
 
 /// Utility: maximum value for double

@@ -11,8 +11,8 @@
 /** \addtogroup Cluster3DRecoUtil
 
     @{*/
-#ifndef PARAMSALGBASE_H
-#define PARAMSALGBASE_H
+#ifndef PARAMS3DALGBASE_H
+#define PARAMS3DALGBASE_H
 
 #include <iostream>
 #include <string>
