@@ -11,8 +11,8 @@
 /** \addtogroup ClusterRecoUtil
 
     @{*/
-#ifndef RECOTOOL_CRUHELPER_H
-#define RECOTOOL_CRUHELPER_H
+#ifndef RECOTOOL_CRU3DHELPER_H
+#define RECOTOOL_CRU3DHELPER_H
 
 #include <iostream>
 #include "DataFormat/storage_manager.h"
