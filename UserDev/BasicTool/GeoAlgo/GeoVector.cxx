@@ -134,6 +134,46 @@ namespace geoalgo {
   double Vector::_Angle_(const Vector& obj) const
   { return acos( _Dot_(obj) / Length() / obj.Length() ); }
   
+
+  void Vector::RotateX(const double& theta)
+  {
+
+    double c = cos(theta);
+    double s = sin(theta);
+    
+    (*this)[1] = (*this)[1] * c - (*this)[2] * s;
+    (*this)[2] = (*this)[1] * s + (*this)[2] * c;
+    
+    return;
+  }
+
+
+  void Vector::RotateY(const double& theta)
+  {
+
+    double c = cos(theta);
+    double s = sin(theta);
+    
+    (*this)[0] =   (*this)[0] * c + (*this)[2] * s;
+    (*this)[2] = - (*this)[0] * s + (*this)[2] * c;
+    
+    return;
+  }
+
+
+  void Vector::RotateZ(const double& theta)
+  {
+
+    double c = cos(theta);
+    double s = sin(theta);
+    
+    (*this)[0] = (*this)[0] * c - (*this)[1] * s;
+    (*this)[1] = (*this)[0] * s + (*this)[1] * c;
+    
+    return;
+  }
+
+
 }
 
 #endif
