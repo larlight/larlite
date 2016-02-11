@@ -68,11 +68,17 @@ namespace larlite {
 
     // Emulate tracks
     for (auto const& mct : *ev_mctrack) {
-      // Skip all mctracks that have zero size (deposit zero energy in the TPC) (nothing to emulate)
-      if ( !mct.size() )
+      // Skip all mctracks that have zero or 1 size (deposit zero energy in the TPC) (nothing to emulate)
+      if ( mct.size() < 2 )
         continue;
       // Convert mctrack => recoemu::Track_t
       auto emu_input = MCTrack2EmuTrack(mct);
+      
+      // Track_t.trajectory doesn't necessarily have the same # of points as mctrack
+      // (GeoTrajectory won't push_back the same point twice, and many mctracks end with a duplicate point)
+      if ( emu_input.trajectory.size() < 2 )
+        continue;
+
       // Emulate and retrieve emulated output
       auto emu_output = _track_emu->Emulate(emu_input);
       // Convert recoemu::Track_t => track
@@ -82,8 +88,8 @@ namespace larlite {
     }
 
     for (auto const& mcs : *ev_mcshower) {
-      // Skip all mcshowers that deposit zero energy (nothing to emulate)
-      if ( mcs.DetProfile().E() <= 0 )
+      // Skip all mcshowers that deposit zero energy (nothing to emulate) or have ill-defined startdir
+      if ( mcs.DetProfile().E() <= 0 || !mcs.StartDir().Mag2() )
         continue;
       // Convert mcshower => recoemu::Shower_t
       auto emu_input = MCShower2EmuShower(mcs);
@@ -110,8 +116,9 @@ namespace larlite {
     // Convert a provided mctrack into recoemu::Track_t
     ::recoemu::Track_t result;
     result.trajectory.reserve(mct.size());
-    for (auto const& step : mct)
+    for (auto const& step : mct){
       result.trajectory.push_back(::geoalgo::Point_t(step.X(), step.Y(), step.Z()));
+    }
     result.energy = mct.front().E() - mct.back().E();
     result.dedx = mct.dEdx();
     return result;
@@ -124,7 +131,6 @@ namespace larlite {
 
     //Add_momentum as track's deposited energy to 0th step
     result.add_momentum(trk.energy);
-
     for (size_t ipt = 0; ipt < trk.trajectory.size(); ++ipt) {
       auto const& pt = trk.trajectory[ipt];
       result.add_vertex(TVector3(pt[0], pt[1], pt[2]));
@@ -133,6 +139,11 @@ namespace larlite {
       if (ipt < trk.trajectory.size() - 1) {
         auto const& nextpt = trk.trajectory[ipt + 1];
         result.add_direction(TVector3(nextpt[0] - pt[0], nextpt[1] - pt[1], nextpt[2] - pt[2]));
+      }
+      //To make # of direction points == size of track, do this for last point:
+      else{
+        auto const& lastpt = trk.trajectory[ipt-1];
+        result.add_direction(TVector3(pt[0]-lastpt[0], pt[1]-lastpt[1], pt[2]-lastpt[2]));
       }
 
     }
