@@ -25,6 +25,8 @@ void RandomDrawTool::SetDistribution(const std::vector<double>& values,
   _xmin = min;
   _xmax = max;
 
+  _bin_width = (_xmax-_xmin) / ( (float) _distribution.size() );
+
   return;  
 }
 
@@ -58,10 +60,18 @@ double RandomDrawTool::Draw(){
     int xrand = rand() % samples;
 
     // draw a random value between [0,1]
-    double yrand = ( (rand() % 100000) / 100000. );
+    double yrand = ( (double) rand() ) / RAND_MAX;
 
     if (_distribution[xrand] > yrand){
+      
       result = _xmin + (_xmax-_xmin) * ((float)xrand/(float)samples);
+      
+      // finally, smear by randomly samling within this bin
+      double binsmear = ( (double) rand() ) / RAND_MAX - 1.;
+      binsmear *= _bin_width;
+
+      result += binsmear;
+
       break;
     }
 
