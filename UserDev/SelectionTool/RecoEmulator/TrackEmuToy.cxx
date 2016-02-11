@@ -11,7 +11,8 @@ namespace recoemu {
   recoemu::Track_t TrackEmuToy::Emulate(const recoemu::Track_t& mc)
   {
     Track_t result;
-    return result;
+    // return result;
+    return mc;
   }
 
 }

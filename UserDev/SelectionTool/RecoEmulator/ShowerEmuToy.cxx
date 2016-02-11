@@ -11,7 +11,8 @@ namespace recoemu {
   recoemu::Shower_t ShowerEmuToy::Emulate(const recoemu::Shower_t& mc)
   {
     Shower_t result;
-    return result;
+    // return result;
+    return mc;
   }
 
 }
