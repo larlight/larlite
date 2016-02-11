@@ -562,7 +562,6 @@ namespace larlite {
 			t_v.push_back(::ertool::Track());
 			id_v.emplace_back(i, trk_v.name());
 			auto &t = t_v.back();
-
 			for (size_t i = 0; i < trk.NumberTrajectoryPoints(); ++i)
 				t += trk.LocationAtPoint(i);
 
@@ -722,9 +721,10 @@ namespace larlite {
 		for (size_t i = 0; i < shw_v.size(); ++i) {
 			auto const& shw = shw_v[i];
 			id_v.emplace_back(i, shw_v.name());
+			double mylength = shw.Length() <= 0 ? _shrProfiler.Length( shw.Energy() ) : shw.Length();
 			s_v.emplace_back( ::ertool::Shower(shw.ShowerStart(),
 			                                   shw.Direction(),
-			                                   shw.Length(),
+			                                   mylength,//shw.Length(),
 			                                   _shrProfiler.ShowerRadius()) );
 			auto& s = (*s_v.rbegin());
 			if ( (shw.best_plane() > 0) && (shw.best_plane() <= 2) ) {
