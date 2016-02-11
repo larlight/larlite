@@ -54,7 +54,7 @@ public:
   void countNodes(int& count);
 
   /// Get node index
-  int getNodeIndex() { return _index; }
+  int getNodeIndex() const { return _index; }
 
   /// Get closest brother (parent's child that is next in the list)
   //treenode* getClosestBrother();
@@ -73,8 +73,12 @@ public:
 
   int getAncestorId() { return _ancestorID; }
 
-
+  // return the tree diagram for this node
+  std::string getTreeDiagram() const;
+  
 protected:
+
+  void getTreeDiagram(std::string& res, std::string prefix) const;
 
   //when using this class for MCparticles index should be TrackId
   int _index;
