@@ -10,14 +10,21 @@
 #pragma link off all functions;
 
 // Using factory design, none of these need to be exposed to Python but feel free to change it --kazu
-//#pragma link C++ namespace recoemu+;
-//#pragma link C++ class recoemu::RecoEmulatorBase+;
-//#pragma link C++ class recoemu::TrackEmulatorBase+;
-//#pragma link C++ class recoemu::ShowerEmulatorBase+;
-//#pragma link C++ class recoemu::TrackEmuToy+;
-//#pragma link C++ class recoemu::ShowerEmuToy+;
+#pragma link C++ namespace recoemu+;
+#pragma link C++ class recoemu::RecoEmulatorBase+;
+#pragma link C++ class recoemu::TrackEmulatorBase+;
+#pragma link C++ class recoemu::ShowerEmulatorBase+;
+#pragma link C++ class recoemu::TrackEmuToy+;
+#pragma link C++ class recoemu::ShowerEmuToy+;
+#pragma link C++ class recoemu::ShowerEmuSmearing+;
+#pragma link C++ class RandomDrawTool+;
+#pragma link C++ class FunctionFactory+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
+
+
 
 
 

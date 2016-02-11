@@ -29,6 +29,7 @@ namespace recoemu {
   struct Shower_t {
     ::geoalgo::Cone_t cone;
     double energy;
+    double dedx; // [MeV/cm]
   };
 
 }

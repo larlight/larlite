@@ -141,8 +141,11 @@ namespace geoalgo {
     double c = cos(theta);
     double s = sin(theta);
     
-    (*this)[1] = (*this)[1] * c - (*this)[2] * s;
-    (*this)[2] = (*this)[1] * s + (*this)[2] * c;
+    double ynew = (*this)[1] * c - (*this)[2] * s;
+    double znew = (*this)[1] * s + (*this)[2] * c;
+
+    (*this)[1] = ynew;
+    (*this)[2] = znew;
     
     return;
   }
@@ -154,9 +157,12 @@ namespace geoalgo {
     double c = cos(theta);
     double s = sin(theta);
     
-    (*this)[0] =   (*this)[0] * c + (*this)[2] * s;
-    (*this)[2] = - (*this)[0] * s + (*this)[2] * c;
+    double xnew =   (*this)[0] * c + (*this)[2] * s;
+    double znew = - (*this)[0] * s + (*this)[2] * c;
     
+    (*this)[0] = xnew;
+    (*this)[2] = znew;
+
     return;
   }
 
@@ -167,8 +173,11 @@ namespace geoalgo {
     double c = cos(theta);
     double s = sin(theta);
     
-    (*this)[0] = (*this)[0] * c - (*this)[1] * s;
-    (*this)[1] = (*this)[0] * s + (*this)[1] * c;
+    double xnew = (*this)[0] * c - (*this)[1] * s;
+    double ynew = (*this)[0] * s + (*this)[1] * c;
+
+    (*this)[0] = xnew;
+    (*this)[1] = ynew;
     
     return;
   }
