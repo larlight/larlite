@@ -48,7 +48,7 @@ namespace ertool {
     //_g_dEdxPdf   = _factory.LandauPlusLandau(part_name,*_dEdxVar);
     _g_radLenPdf = _factory.RadiationLength(part_name, *_radLenVar);
 
-    SetDefaultParams();
+    // SetDefaultParams();
   }
 
   void AlgoEMPart::SetFitRange_dEdx(double min, double max, bool gamma)
