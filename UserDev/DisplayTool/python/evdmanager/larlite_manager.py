@@ -69,7 +69,6 @@ class larlite_manager_base(manager, QtCore.QObject):
             # if len(thisKeyList) is not 3:
             #     continue
 
-            print key
 
             # gets three items in thisKeyList, which is a list
             # [dataProduct, producer, 'tree'] (don't care about 'tree')
