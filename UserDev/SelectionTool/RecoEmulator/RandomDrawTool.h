@@ -66,6 +66,9 @@ public:
   double _xmin;
   double _xmax;
 
+  // also store the bin width
+  double _bin_width;
+
   /**
    * @brief function to normalize the distribution values
    */
