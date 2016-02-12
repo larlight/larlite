@@ -41,12 +41,7 @@ public:
 
     /// Default constructor
     ERToolHelper() {
-        _minEDep = 1.e-10;
-
-        // get the detector width and total time of a singel fram
-        _DetWidth = 2 * geom->DetHalfWidth();
-        _DetFramePeriod = 1.6E6; //ns, TODO: Fill this not by hand but from a better source
-
+        // _minEDep = 1.e-10;
         _hutil = new ERToolHelperUtil();
     };
 
@@ -93,7 +88,7 @@ public:
                              ::ertool::io::EmptyInput& strm ) const;
 
     /// Set minimum EDep amount for shower to be added to EventData
-    void SetMinEDep(double E) { if (E < 1.e-10) E = 1.e-10; _hutil->SetMinEDep(E); _minEDep = E; }
+    void SetMinEDep(double E) { if (E < 1.e-10) E = 1.e-10; _hutil->SetMinEDep(E);}// _minEDep = E; }
 
     /// Setter to disable xshift
     void setDisableXShift(bool flag) { _hutil->setDisableXShift(flag); }
@@ -102,11 +97,8 @@ private:
 
     // Minimum deposited energy for showers in order to
     // be added to EventData
-    double _minEDep;
-
-    // detector width and time size of a frame used for calculations of shift
-    double _DetWidth;  //cm
-    double _DetFramePeriod;
+    // THIS IS NOW STORED IN ERTOOLHELPERUTIL
+    // double _minEDep;
 
     EMShowerProfile _shrProfiler;
 

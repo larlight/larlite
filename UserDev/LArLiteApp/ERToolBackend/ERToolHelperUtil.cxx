@@ -1,26 +1,10 @@
 #ifndef LARLITE_ERTOOLHELPERUTIL_CXX
 #define LARLITE_ERTOOLHELPERUTIL_CXX
 
-#include <TStopwatch.h>
-#include "DataFormat/mcflux.h"
 #include "DataFormat/mctruth.h"
 #include "DataFormat/mcshower.h"
 #include "DataFormat/mctrack.h"
-#include "DataFormat/storage_manager.h"
-#include "DataFormat/shower.h"
-#include "DataFormat/track.h"
-#include "DataFormat/vertex.h"
-#include "DataFormat/cosmictag.h"
-#include "DataFormat/calorimetry.h"
-#include "DataFormat/partid.h"
-#include "DataFormat/event_ass.h"
-#include "DataFormat/opflash.h"
-#include "ParticleID.h"
 #include "ERToolHelperUtil.h"
-#include "ERTool/Base/UtilFunc.h"
-#include "ERTool/Base/EmptyInput.h"
-#include <limits>
-#include <climits>
 
 namespace larlite {
 

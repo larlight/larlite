@@ -16,19 +16,9 @@
 #define LARLITE_ERTOOLHELPERUTIL_H
 
 #include <iostream>
-#include <map>
 #include <TRandom.h>
 #include "DataFormat/DataFormat-TypeDef.h"
-#include "ERTool/Base/EmptyInput.h"
-
-#include "LArUtil/ElecClock.h"
 #include "LArUtil/Geometry.h"
-
-//#include "ERTool/Base/EventData.h"
-//#include "ERTool/Base/ParticleGraph.h"
-
-//Use ShowerProfile to calculate Height & Radius from Energy
-#include "EMShowerTools/EMShowerProfile.h"
 
 namespace larlite {
 
