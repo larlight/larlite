@@ -10,6 +10,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class larlite::ERToolHelper+;
+#pragma link C++ class larlite::ERToolHelperUtil+;
 #pragma link C++ class larlite::ERToolAnaBase+;
 #pragma link C++ class larlite::ExampleERSelection+;
 #pragma link C++ class ertool_helper::ParticleID+;
