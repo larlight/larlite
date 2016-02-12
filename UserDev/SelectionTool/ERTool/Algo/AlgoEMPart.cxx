@@ -175,6 +175,9 @@ namespace ertool {
 
       meanG  = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_Gaus_mean"));
       meanG->setVal  ( darray[5] );
+      /// Kaleko adding this cout commented because sometimes it is self-inconsistent
+      /// unless SetDefaultParams() is commented out.
+      // std::cout<<"set meanG to "<<darray[5]<<", get val is "<<gmeanG->getVal()<<std::endl;
       sigmaG = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_Gaus_sigma"));
       sigmaG->setVal ( darray[6] );
 
