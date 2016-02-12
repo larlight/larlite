@@ -727,13 +727,13 @@ namespace larlite {
 			                                   mylength,//shw.Length(),
 			                                   _shrProfiler.ShowerRadius()) );
 			auto& s = (*s_v.rbegin());
-			if ( (shw.best_plane() > 0) && (shw.best_plane() <= 2) ) {
+			if ( (shw.best_plane() >= 0) && (shw.best_plane() <= 2) ) {
 				s._energy = shw.Energy_v()[shw.best_plane()];
 				s._dedx   = shw.dEdx_v()[shw.best_plane()];
 			} else {
-				// default to collection plane
-				s._energy = shw.Energy_v()[2];
-				s._dedx   = shw.dEdx_v()[2];
+				// default
+				s._energy = shw.Energy();
+				s._dedx   = shw.dEdx();
 			}
 			// by default. Add cosmic score for showers to edit
 			s._cosmogenic = -1;
