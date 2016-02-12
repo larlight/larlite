@@ -161,6 +161,8 @@ namespace larlite {
                       mcs.DetProfile().Z());
     result.cone.Dir(mcs.StartDir()[0], mcs.StartDir()[1], mcs.StartDir()[2]);
     result.energy = mcs.DetProfile().E();
+    result.dedx = mcs.dEdx();
+    
     return result;
   }
 
@@ -171,6 +173,8 @@ namespace larlite {
     result.set_total_energy(shr.energy);
     result.set_start_point(TVector3(shr.cone.Start()[0], shr.cone.Start()[1], shr.cone.Start()[2]));
     result.set_direction(TVector3(shr.cone.Dir()[0], shr.cone.Dir()[1], shr.cone.Dir()[2]));
+    result.set_dedx(shr.dedx);
+
     return result;
   }
 
