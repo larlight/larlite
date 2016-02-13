@@ -15,8 +15,8 @@ namespace larlite {
     _shower_emu = nullptr;
     _configured = false;
     _hutil = new ERToolHelperUtil();
-    _hutil->setDisableXShift(true);
     _hutil->SetMinEDep(10.);
+    _disable_xshift = false;
 
   }
 
@@ -54,6 +54,9 @@ namespace larlite {
     _track_emu->Configure(main_cfg.get_pset(_track_emu->Name()));
     _shower_emu->Configure(main_cfg.get_pset(_shower_emu->Name()));
 
+    _disable_xshift = main_cfg.get<bool>("DisableXShift");
+    _hutil->setDisableXShift(_disable_xshift);
+    
     // Set config bool and exit
     _configured = true;
   }
@@ -120,9 +123,9 @@ namespace larlite {
     // Convert a provided mctrack into recoemu::Track_t
     ::recoemu::Track_t result;
     result.trajectory.reserve(mct.size());
+    ::geoalgo::Point_t this_xshift = ::geoalgo::Point_t(_hutil->getXShift(mct));
     for (auto const& step : mct) {
-      result.trajectory.push_back(::geoalgo::Point_t(step.X(), step.Y(), step.Z()) +
-                                  ::geoalgo::Point_t(_hutil->getXShift(mct)));
+      result.trajectory.push_back(::geoalgo::Point_t(step.X(), step.Y(), step.Z()) + this_xshift);
     }
     result.energy = mct.front().E() - mct.back().E();
     result.dedx = mct.dEdx();

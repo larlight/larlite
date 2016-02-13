@@ -91,6 +91,7 @@ namespace larlite {
 
     ERToolHelperUtil *_hutil;
 
+    bool _disable_xshift;
   };
 }
 #endif

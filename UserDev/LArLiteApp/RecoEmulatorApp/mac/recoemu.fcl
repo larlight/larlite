@@ -2,6 +2,7 @@
 EmuDriver: {
     MCTrackProducer:  mcreco
     MCShowerProducer: mcreco
+    DisableXShift:    0
     TrackEmulator:    TrackEmuToy
     ShowerEmulator:   ShowerEmuToy
 

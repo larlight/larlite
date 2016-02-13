@@ -185,7 +185,7 @@ namespace ertool {
 
         auto const& track = data.Track(id);
 
-        if ( track._time < -2050000 || track._time > 2750000 ) continue;
+        // if ( track._time < -2050000 || track._time > 2750000 ) continue;
 
         if (track.size() < 2) continue;
 
