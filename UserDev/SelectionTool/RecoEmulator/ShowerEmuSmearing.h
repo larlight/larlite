@@ -43,12 +43,15 @@ namespace recoemu {
   private:
     
     // smearing functions
-
     RandomDrawTool _energySmear;
     RandomDrawTool _angleSmear;
     RandomDrawTool _xSmear;
     RandomDrawTool _ySmear;
     RandomDrawTool _zSmear;
+    RandomDrawTool _dedxSmear;
+
+    // offset from central value of dEdx (assumed 2 & 4 for e-/gamma)
+    double _dEdxResolutionOffset;
     
   };
 
