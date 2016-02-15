@@ -97,7 +97,7 @@ plt.savefig('%s/angleres_vsenergy_matrix.png'%output_directory)
 #plt.show()
 
 # dEdx plots
-fig = dEdx_plot(shower_df)
+fig = dEdx_plot(shower_df,fout)
 plt.savefig('%s/dEdx_resolution.png'%output_directory)
 #plt.show()
 

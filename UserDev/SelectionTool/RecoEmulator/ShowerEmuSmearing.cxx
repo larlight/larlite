@@ -49,6 +49,14 @@ namespace recoemu {
     auto AngleResolutionMax    = pset.get<double>("AngleResolutionMax");
 
     _angleSmear.SetDistribution(AngleResolutionValues,AngleResolutionMin,AngleResolutionMax);
+
+    auto dEdxResolutionValues = pset.get< std::vector<double> >("dEdxResolutionValues");
+    auto dEdxResolutionMin    = pset.get<double>("dEdxResolutionMin");
+    auto dEdxResolutionMax    = pset.get<double>("dEdxResolutionMax");
+    _dEdxResolutionOffset     = (2 - pset.get<double>("dEdxResolutionMean")) / 2.;
+    std::cout << "dedx offset is " << _dEdxResolutionOffset << std::endl;
+
+    _dedxSmear.SetDistribution(dEdxResolutionValues,dEdxResolutionMin, dEdxResolutionMax);
     
   }
   
@@ -83,8 +91,6 @@ namespace recoemu {
     if ( (px !=0) and (py != 0) )
       theta = acos( pz / sqrt(px*px+py*py+pz*pz) );
 
-    //std::cout << "rotation angles are phi : " << phi << "\t theta : " << theta << std::endl;
-
     // generate a 3D vector with an angle = anglesmear
     // w.r.t. the z-direction, and a random phase
     // in the phi direction
@@ -103,33 +109,28 @@ namespace recoemu {
     px_new *= p_perp_mag;
     py_new *= p_perp_mag;
 
-    //std::cout << "smeared vector still aligned w/ z-direction is : [" << px_new << ", " << py_new << ", " << pz_new << "] -> "
-    //	      << px_new*px_new + py_new*py_new + pz_new*pz_new << std::endl;
-
     ::geoalgo::Vector_t dir(px_new,py_new,pz_new);
 
     // now rotatte by the inverse angles
     dir.RotateY(theta);
     dir.RotateZ(phi);
 
-    //std::cout << "smeared vector now is (after rotation) : [" << dir[0] << ", " << dir[1] << ", " << dir[2] << "] -> "
-    //	      << dir[0]*dir[0] + dir[1]*dir[1] + dir[2]*dir[2] << std::endl;
-
-
-    //std::cout << "new dot product is : " << acos( dir.Dot(mc.cone.Dir()) ) * 180. / 3.1415 << std::endl;
-
     ::geoalgo::Cone_t cone(start,dir,mc.cone.Length(),mc.cone.Radius());
     
     result.cone = cone;
     
-    // smear x position:
-    //std::cout << "xpos : " << mc.cone.Start()[0] << " -> " << result.cone.Start()[0] << std::endl;
-
-    // smear y position:
-    //std::cout << "ypos : " << mc.cone.Start()[1] << " -> " << result.cone.Start()[1] << std::endl;
-
-    // smear z position:
-    //std::cout << "zpos : " << mc.cone.Start()[2] << " -> " << result.cone.Start()[2] << std::endl;
+    // smear dEdx
+    // draw a random value from the dEdx smearing distribution
+    double dedx_smeared = _dedxSmear.Draw();
+    // calculate offset w.r.t. central value (2 for e-, 4 for gamma)
+    if (mc.pdg == 11)
+      dedx_smeared *= ( 2 * (1 - _dEdxResolutionOffset) );
+    if (mc.pdg == 22)
+      dedx_smeared *= ( 4 * (1 - _dEdxResolutionOffset) );
+    
+    result.dedx = dedx_smeared;
+    result.pdg  = mc.pdg; 
+    result.time = mc.time;
 
     return result;
   }

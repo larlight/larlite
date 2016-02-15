@@ -35,6 +35,10 @@
 #pragma link C++ class evd::RecoBase3D<evd::Spacepoint3D>+;
 #pragma link C++ class evd::DrawSpacepoint3D+;
 
+#pragma link C++ class std::vector<evd::Simch>+;
+#pragma link C++ class evd::RecoBase3D<evd::Simch>+;
+#pragma link C++ class evd::DrawSimch+;
+
 #pragma link C++ class evd::Opflash3D+;
 #pragma link C++ class std::vector<evd::Opflash3D>+;
 #pragma link C++ class evd::RecoBase3D<evd::Opflash3D>+;

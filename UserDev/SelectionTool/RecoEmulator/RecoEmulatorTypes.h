@@ -26,6 +26,7 @@ namespace recoemu {
     std::vector<double> dedx;
     int pdg; // used for artificial track PID in ertoolhelper
     double time; // needed for xshift in ertoolhelper
+    bool mark_for_deletion = false;
   };
 
   struct Shower_t {
@@ -34,6 +35,7 @@ namespace recoemu {
     double dedx; // [MeV/cm]
     int pdg; // used for artificially filling dedx for poorly reconstructed mcshowers
     double time; // needed for xshift in ertoolhelper
+    bool mark_for_deletion = false;
   };
 
 }

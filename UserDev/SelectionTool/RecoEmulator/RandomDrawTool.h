@@ -18,6 +18,7 @@
 #include <vector>
 #include <stdlib.h>
 #include <time.h>
+#include "RecoEmulatorException.h"
 
 /**
    \class RandomDrawTool
@@ -56,6 +57,13 @@ public:
    *@brief function to sample randomly from the distribution
    */
   double Draw();
+
+  /**
+   *@brief Given an input from [0,1], this fn draws a random number and
+   * returns TRUE if that random number is LESS THAN the input value
+   * this is useful for implementing efficiencies
+   */
+  bool DrawFlat(double myval);
 
  private:
 

@@ -31,7 +31,7 @@ namespace larlite {
       shr.StartDir(TVector3(sqrt3,sqrt3,sqrt3));
       shr.DetProfile(start);
       shr.dQdx( 5e4 );
-      shr.dEdx( 2.3 );
+      shr.dEdx( 2.0 );
 
       ev_shr->push_back(shr);
     }
