@@ -86,14 +86,14 @@ public:
   ~cluster3D_params() {};
 
   /// Hold the list of spacepoints for this particular cluster, for convenience
-  std::vector< Point3D > point_vector;
+  std::vector< ::cluster3D::Point3D > point_vector;
 
   Point3D start_point;               ///< start point
   Point3D showering_point;           ///< point at which showering of cluster begins
   Point3D end_point;                 ///< end point
 
-  std::vector<Point3D >  start_point_cand;     ///<Worker variable saves the list of candidate start points between modules
-  std::vector<Point3D >  shwr_point_cand;     ///<Worker variable saves the list of candidate start points between modules
+  std::vector<::cluster3D::Point3D >  start_point_cand;     ///<Worker variable saves the list of candidate start points between modules
+  std::vector<::cluster3D::Point3D >  shwr_point_cand;     ///<Worker variable saves the list of candidate start points between modules
   std::vector<TVector3 > start_dir_cand;       ///candidate start point directions
 
   // Keep an orderd list of the indexes of the points at the start of the cluster3D

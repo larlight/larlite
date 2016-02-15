@@ -12,7 +12,7 @@
 
 #pragma link C++ namespace cluster3D+;
 
-#pragma link C++ class cluster3D::Point3D+;
+#pragma link C++ class ::cluster3D::Point3D+;
 #pragma link C++ class std::vector<::cluster3D::Point3D>+;
 
 
