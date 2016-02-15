@@ -49,7 +49,7 @@ double RandomDrawTool::Draw(){
   bool drawn = false;
 
   // draw result
-  double result;
+  double result = 0.;
 
   // number of samples to draw from
   int samples = _distribution.size();
@@ -72,12 +72,23 @@ double RandomDrawTool::Draw(){
 
       result += binsmear;
 
-      break;
+      drawn = true;
     }
 
   }// while we are trying to find a value
   
   return result;
+}
+
+bool RandomDrawTool::DrawFlat(double myval){
+
+  // Draw a random value between [0,1].
+  // If this random value is less than "myval", return true
+
+  if ( myval < 0. || myval > 1. )
+    throw recoemu::RecoEmulatorException("RandomDrawTool::DrawFlat handed an efficiency less than zero or greater than 1!");
+
+  return ( (double) rand() ) / RAND_MAX < myval ? true : false;
 }
 
 
