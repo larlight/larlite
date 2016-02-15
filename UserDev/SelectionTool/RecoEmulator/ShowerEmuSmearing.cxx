@@ -131,6 +131,11 @@ namespace recoemu {
     // smear z position:
     //std::cout << "zpos : " << mc.cone.Start()[2] << " -> " << result.cone.Start()[2] << std::endl;
 
+    // Directly copy the remaining un-emulated members of the recoemu::Shower_t type
+    result.dedx = mc.dedx;
+    result.pdg  = mc.pdg; 
+    result.time = mc.time;
+
     return result;
   }
 
