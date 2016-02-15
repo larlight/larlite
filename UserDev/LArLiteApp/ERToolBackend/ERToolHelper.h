@@ -19,7 +19,7 @@
 #include <TRandom.h>
 #include "DataFormat/DataFormat-TypeDef.h"
 #include "ERTool/Base/EmptyInput.h"
-
+#include "ERToolHelperUtil.h"
 #include "LArUtil/ElecClock.h"
 #include "LArUtil/Geometry.h"
 
@@ -41,13 +41,8 @@ public:
 
     /// Default constructor
     ERToolHelper() {
-        _minEDep = 1.e-10;
-
-        // get the detector width and total time of a singel fram
-        _DetWidth = 2 * geom->DetHalfWidth();
-        _DetFramePeriod = 1.6E6; //ns, TODO: Fill this not by hand but from a better source
-
-        _disable_xshift = false;
+        // _minEDep = 1.e-10;
+        _hutil = new ERToolHelperUtil();
     };
 
     /// Default destructor
@@ -93,35 +88,23 @@ public:
                              ::ertool::io::EmptyInput& strm ) const;
 
     /// Set minimum EDep amount for shower to be added to EventData
-    void SetMinEDep(double E) { if (E < 1.e-10) E = 1.e-10; _minEDep = E; }
-
-    /// Calculates for each mc track, based on the time of the event, the corresponding shift in x-direction
-    TLorentzVector getXShift(const mctrack& mct) const;
-
-    /// Calculates for each mc shower, based on the time of the event, the corresponding shift in x-direction
-    TLorentzVector getXShift(const mcshower& mcs) const;
-
-    /// Calculates for each mc particle, based on the time of the event, the corresponding shift in x-direction
-    TLorentzVector getXShift(const mcpart& mcp) const;
+    void SetMinEDep(double E) { if (E < 1.e-10) E = 1.e-10; _hutil->SetMinEDep(E);}// _minEDep = E; }
 
     /// Setter to disable xshift
-    void setDisableXShift(bool flag) { _disable_xshift = flag; }
+    void setDisableXShift(bool flag) { _hutil->setDisableXShift(flag); }
 
 private:
 
     // Minimum deposited energy for showers in order to
     // be added to EventData
-    double _minEDep;
-
-    // detector width and time size of a frame used for calculations of shift
-    double _DetWidth;  //cm
-    double _DetFramePeriod;
+    // THIS IS NOW STORED IN ERTOOLHELPERUTIL
+    // double _minEDep;
 
     EMShowerProfile _shrProfiler;
 
-    bool _disable_xshift;
-
     const ::larutil::Geometry *geom = ::larutil::Geometry::GetME();
+
+    ERToolHelperUtil *_hutil;
 };
 }
 

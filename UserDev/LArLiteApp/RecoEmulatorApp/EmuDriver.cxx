@@ -14,6 +14,10 @@ namespace larlite {
     _track_emu = nullptr;
     _shower_emu = nullptr;
     _configured = false;
+    _hutil = new ERToolHelperUtil();
+    _hutil->SetMinEDep(10.);
+    _disable_xshift = false;
+
   }
 
   bool EmuDriver::initialize() {
@@ -50,6 +54,9 @@ namespace larlite {
     _track_emu->Configure(main_cfg.get_pset(_track_emu->Name()));
     _shower_emu->Configure(main_cfg.get_pset(_shower_emu->Name()));
 
+    _disable_xshift = main_cfg.get<bool>("DisableXShift");
+    _hutil->setDisableXShift(_disable_xshift);
+    
     // Set config bool and exit
     _configured = true;
   }
@@ -73,7 +80,7 @@ namespace larlite {
         continue;
       // Convert mctrack => recoemu::Track_t
       auto emu_input = MCTrack2EmuTrack(mct);
-      
+
       // Track_t.trajectory doesn't necessarily have the same # of points as mctrack
       // (GeoTrajectory won't push_back the same point twice, and many mctracks end with a duplicate point)
       if ( emu_input.trajectory.size() < 2 )
@@ -89,8 +96,8 @@ namespace larlite {
 
     for (auto const& mcs : *ev_mcshower) {
       // Skip all mcshowers that deposit zero energy (nothing to emulate) or have ill-defined startdir
-      if ( mcs.DetProfile().E() <= 0 || !mcs.StartDir().Mag2() )
-        continue;
+      // this "10" should match _minEdep in ertoolhelper
+      if (!_hutil->isViable(mcs)) continue;
       // Convert mcshower => recoemu::Shower_t
       auto emu_input = MCShower2EmuShower(mcs);
       // Emulate and retrieve emulated output
@@ -116,11 +123,15 @@ namespace larlite {
     // Convert a provided mctrack into recoemu::Track_t
     ::recoemu::Track_t result;
     result.trajectory.reserve(mct.size());
-    for (auto const& step : mct){
-      result.trajectory.push_back(::geoalgo::Point_t(step.X(), step.Y(), step.Z()));
+    ::geoalgo::Point_t this_xshift = ::geoalgo::Point_t(_hutil->getXShift(mct));
+    for (auto const& step : mct) {
+      result.trajectory.push_back(::geoalgo::Point_t(step.X(), step.Y(), step.Z()) + this_xshift);
     }
     result.energy = mct.front().E() - mct.back().E();
     result.dedx = mct.dEdx();
+    result.time = mct.front().T();
+    result.pdg = mct.PdgCode();
+
     return result;
   }
 
@@ -141,12 +152,14 @@ namespace larlite {
         result.add_direction(TVector3(nextpt[0] - pt[0], nextpt[1] - pt[1], nextpt[2] - pt[2]));
       }
       //To make # of direction points == size of track, do this for last point:
-      else{
-        auto const& lastpt = trk.trajectory[ipt-1];
-        result.add_direction(TVector3(pt[0]-lastpt[0], pt[1]-lastpt[1], pt[2]-lastpt[2]));
+      else {
+        auto const& lastpt = trk.trajectory[ipt - 1];
+        result.add_direction(TVector3(pt[0] - lastpt[0], pt[1] - lastpt[1], pt[2] - lastpt[2]));
       }
 
     }
+
+    result.set_track_id(trk.pdg);
 
 
     return result;
@@ -156,13 +169,15 @@ namespace larlite {
   {
     // Convert a provided mcshower into recoemu::Shower_t
     ::recoemu::Shower_t result;
-    result.cone.Start(mcs.DetProfile().X(),
+    result.cone.Start(mcs.DetProfile().X() + _hutil->getXShift(mcs).X(),
                       mcs.DetProfile().Y(),
                       mcs.DetProfile().Z());
     result.cone.Dir(mcs.StartDir()[0], mcs.StartDir()[1], mcs.StartDir()[2]);
     result.energy = mcs.DetProfile().E();
-    result.dedx = mcs.dEdx();
-    
+    result.dedx = _hutil->getMCShowerdEdX(mcs);
+    result.time = mcs.Start().T();
+    result.pdg = mcs.PdgCode();
+
     return result;
   }
 
@@ -173,7 +188,15 @@ namespace larlite {
     result.set_total_energy(shr.energy);
     result.set_start_point(TVector3(shr.cone.Start()[0], shr.cone.Start()[1], shr.cone.Start()[2]));
     result.set_direction(TVector3(shr.cone.Dir()[0], shr.cone.Dir()[1], shr.cone.Dir()[2]));
-    result.set_dedx(shr.dedx);
+
+    // // this if-statement matches ertoolhelper
+    ////// NOTE: this has to be done IN ertool helper so the same gRandom instance is used
+    ////// otherwise you will get different results when comparing reco emu to MC
+    // if ( (shr.dedx < 0.5) ||  (shr.dedx > 100) )
+    //   result.set_dedx( shr.pdg == 22 ? gRandom->Gaus(4, 4 * 0.03) : gRandom->Gaus(2, 2 * 0.03) );
+    // else
+    result.set_dedx( shr.dedx );
+    result.set_id( shr.pdg );
 
     return result;
   }

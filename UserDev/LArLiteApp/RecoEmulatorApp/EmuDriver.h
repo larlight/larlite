@@ -22,6 +22,8 @@
 #include "DataFormat/shower.h"
 #include "DataFormat/mctrack.h"
 #include "DataFormat/mcshower.h"
+#include <TRandom.h>
+#include "ERToolBackend/ERToolHelperUtil.h"
 
 namespace larlite {
 
@@ -87,6 +89,9 @@ namespace larlite {
     /// Method to create larlite::shower from recoemu::Shower_t
     shower EmuShower2RecoShower(const ::recoemu::Shower_t& trk);
 
+    ERToolHelperUtil *_hutil;
+
+    bool _disable_xshift;
   };
 }
 #endif
