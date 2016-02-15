@@ -9,6 +9,7 @@ import vertex
 import mctrack
 import mcshower
 import spacepoint
+import simch
 import opflash
 import seed
 import pfpart
@@ -58,6 +59,7 @@ try:
             # items are stored as pointers to the classes (not instances)
             self._drawableClasses = collections.OrderedDict()
             self._drawableClasses.update({'Spacepoints': [spacepoint.spacepoint3D,"sps"]})
+            self._drawableClasses.update({'Simch': [simch.simch3D,"simch"]})
             self._drawableClasses.update({'PFParticle': [pfpart.pfpart3D,"pfpart"]})
             self._drawableClasses.update({'Seed': [seed.seed3D,"seed"]})
             self._drawableClasses.update({'Vertex': [vertex.vertex3D,"vertex"]})
