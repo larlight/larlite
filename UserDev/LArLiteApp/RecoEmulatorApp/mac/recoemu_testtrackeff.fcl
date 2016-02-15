@@ -1,0 +1,16 @@
+
+EmuDriver: {
+    MCTrackProducer:  mcreco
+    MCShowerProducer: mcreco
+    DisableXShift:    0
+    TrackEmulator:    TrackEmuApplyLengthEff
+    ShowerEmulator:   ShowerEmuToy
+
+    TrackEmuApplyLengthEff:  {
+        LengthEffParam0: 5.
+        LengthEffParam1: 0.5
+        LengthEffParam2: 0.95
+    }
+    
+    ShowerEmuToy: {}
+}
