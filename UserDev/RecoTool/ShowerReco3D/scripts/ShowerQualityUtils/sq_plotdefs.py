@@ -186,7 +186,6 @@ def anglediff_3d_plot(df,maxangle=180,fout=None):
 
                 fout.write(string)
 
-
 	return fig
 
 def dEdx_plot(df,fout=None):
@@ -195,19 +194,44 @@ def dEdx_plot(df,fout=None):
 	dedx_v = df['reco_dedx_V']
 	dedx_y = df['reco_dedx_Y']
 	bins = np.linspace(0,10,100)
-	curvebins = np.linspace(1.5,3.5,300)
 	# entriesU, bin_edgesU, patchesU = plt.hist(eresU,bins=bins,label='U',alpha=0.5,color='b',histtype='stepfilled')
 	# params, errors = getGaussFit(entriesU,bin_edgesU)
 	entriesU, bin_edgesU, patchesU = plt.hist(dedx_u,bins=bins,histtype='stepfilled',alpha=0.5,color='b',label='U Plane')
 	entriesV, bin_edgesV, patchesV = plt.hist(dedx_v,bins=bins,histtype='stepfilled',alpha=0.5,color='g',label='V Plane')
 	entriesY, bin_edgesY, patchesY = plt.hist(dedx_y,bins=bins,histtype='stepfilled',alpha=0.5,color='r',label='Y Plane')
 	#params, errors = getGaussFit(entriesY,bin_edgesY)
-	#plt.plot(curvebins,gauss(curvebins,*params),'r-',lw=3,label='Y plane: mu = %.02f sigma = %.02f'%(params[1],params[2]))
 	plt.grid(True)
 	plt.legend(loc=1)
 	plt.title('dE/dx [ MeV/cm ] in each Plane [Electrons Only]')
 	plt.xlabel('dE/dx [ MeV / cm ]')
 	plt.ylabel('Count')
+
+        # if output file is set -> save resolution values
+        if (fout != None):
+
+                maxdedx = 2.0
+                maxentries = 0
+                bin_centers = 0.5*(bin_edgesY[1:]+bin_edgesY[:-1])
+                for i,entries in enumerate(entriesY[1:]):
+                        if (entries > maxentries):
+                                maxentries = entries
+                                maxdedx = bin_centers[i+1]
+                print 'max dedx is ',maxdedx
+                bins = np.linspace(maxdedx-1,maxdedx+1,50)
+                dedx_res, bins = np.histogram(dedx_y,bins)
+
+                string  = 'dEdxResolutionMean: %.02f\n'%maxdedx
+                string += 'dEdxResolutionMin: %.02f\n'%((maxdedx-1)/maxdedx)
+                string += 'dEdxResolutionMax: %.02f\n'%((maxdedx+1)/maxdedx)
+                string += 'dEdxResolutionValues: ['
+                for idx,entry in enumerate(dedx_res):
+                        string += str(entry)
+                        if (idx != len(dedx_res)-1):
+                                string += ','
+                string += ']\n'
+
+                fout.write(string)
+
 	return fig
 
 def dQdx_plot(df,fout=None):
@@ -216,12 +240,10 @@ def dQdx_plot(df,fout=None):
 	dqdx_v = df['reco_dqdx_V']
 	dqdx_y = df['reco_dqdx_Y']
 	bins = np.linspace(0,200000,100)
-	# curvebins = np.linspace(44000,76000,100)
 	entriesU, bin_edgesU, patchesU = plt.hist(dqdx_u,bins=bins,histtype='stepfilled',alpha=0.5,color='b',label='U Plane')
 	entriesV, bin_edgesV, patchesV = plt.hist(dqdx_v,bins=bins,histtype='stepfilled',alpha=0.5,color='g',label='V Plane')
 	entriesY, bin_edgesY, patchesY = plt.hist(dqdx_y,bins=bins,histtype='stepfilled',alpha=0.5,color='r',label='Y Plane')
 	# params, errors = getGaussFit(entriesY,bin_edgesY)
-	# plt.plot(curvebins,gauss(curvebins,*params),'r-',lw=3,label='Y plane: mu = %.02f sigma = %.02f'%(params[1],params[2]))
 	plt.grid(True)
 	plt.legend(loc=1)
 	plt.title('dQ/dx [ fC/cm ] in each Plane [Electrons Only]')
