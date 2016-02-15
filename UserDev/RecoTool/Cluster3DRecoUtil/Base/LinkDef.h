@@ -17,12 +17,12 @@
 
 
 #pragma link C++ class cluster3D::cluster3D_params+;
-#pragma link C++ class std::vector<cluster3D::cluster_params>+;
+#pragma link C++ class std::vector<cluster3D::cluster3D_params>+;
 
-#pragma link C++ class cluster3D::ClusterParamsAlg+;
+#pragma link C++ class cluster3D::Cluster3DParamsAlg+;
 
-#pragma link C++ class cluster3D::CRUException+;
-#pragma link C++ class cluster3D::CRUHelper+;
+#pragma link C++ class cluster3D::CRU3DException+;
+#pragma link C++ class cluster3D::CRU3DHelper+;
 
 
 //#pragma link C++ class cluster::DefaultParamsAlg+;
