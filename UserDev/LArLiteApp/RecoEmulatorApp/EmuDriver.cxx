@@ -88,7 +88,8 @@ namespace larlite {
 
       // Emulate and retrieve emulated output
       auto emu_output = _track_emu->Emulate(emu_input);
-      // Convert recoemu::Track_t => track
+      // Convert recoemu::Track_t => track, if not marked for deletion
+      if( emu_output.mark_for_deletion ) continue;
       auto reco_track = EmuTrack2RecoTrack(emu_output);
       // If output data holder exists, record the result
       if (ev_track) ev_track->emplace_back(reco_track);
@@ -102,7 +103,8 @@ namespace larlite {
       auto emu_input = MCShower2EmuShower(mcs);
       // Emulate and retrieve emulated output
       auto emu_output = _shower_emu->Emulate(emu_input);
-      // Convert recoemu::Shower_t => shower
+      // Convert recoemu::Shower_t => shower, if not marked for deletion
+      if( emu_output.mark_for_deletion ) continue;
       auto reco_shower = EmuShower2RecoShower(emu_output);
       // If output data holder exists, record the result
       if (ev_shower) ev_shower->emplace_back(reco_shower);
@@ -131,6 +133,7 @@ namespace larlite {
     result.dedx = mct.dEdx();
     result.time = mct.front().T();
     result.pdg = mct.PdgCode();
+    result.mark_for_deletion = false;
 
     return result;
   }
@@ -160,8 +163,6 @@ namespace larlite {
     }
 
     result.set_track_id(trk.pdg);
-
-
     return result;
   }
 
@@ -177,6 +178,7 @@ namespace larlite {
     result.dedx = _hutil->getMCShowerdEdX(mcs);
     result.time = mcs.Start().T();
     result.pdg = mcs.PdgCode();
+    result.mark_for_deletion = false;
 
     return result;
   }
