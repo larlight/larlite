@@ -17,8 +17,10 @@
 #pragma link C++ class recoemu::TrackEmuToy+;
 #pragma link C++ class recoemu::ShowerEmuToy+;
 #pragma link C++ class recoemu::ShowerEmuSmearing+;
+//#pragma link C++ class recoemu::TrackEmuApplyLengthEff+;
 #pragma link C++ class RandomDrawTool+;
 #pragma link C++ class FunctionFactory+;
+#pragma link C++ class recoemu::RecoEmulatorException+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
