@@ -1,23 +1,20 @@
-#ifndef __TRACKEMUSMEARING_CXX__
-#define __TRACKEMUSMEARING_CXX__
+#ifndef __SHOWEREMUSMEARINGRECOBASED_CXX__
+#define __SHOWEREMUSMEARINGRECOBASED_CXX__
 
-#include "ShowerEmuSmearing.h"
+#include "ShowerEmuSmearingRecoBased.h"
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
 
 namespace recoemu {
   
-  ShowerEmuSmearing::ShowerEmuSmearing()
-    : ShowerEmulatorBase("ShowerEmuSmearing")
-      //, _energySmear(nullptr)
-      //, _angleSmear(nullptr)
-      //, _startSmear(nullptr)
+  ShowerEmuSmearingRecoBased::ShowerEmuSmearingRecoBased()
+    : ShowerEmulatorBase("ShowerEmuSmearingRecoBased")
   { 
     srand( time(NULL) ); 
   }
 
-  void ShowerEmuSmearing::Configure(const ::fcllite::PSet &pset)
+  void ShowerEmuSmearingRecoBased::Configure(const ::fcllite::PSet &pset)
   {
     
     auto EnergyResolutionValues = pset.get< std::vector<double> >("EnergyResolutionValues");
@@ -60,7 +57,7 @@ namespace recoemu {
     
   }
   
-  recoemu::Shower_t ShowerEmuSmearing::Emulate(const recoemu::Shower_t& mc)
+  recoemu::Shower_t ShowerEmuSmearingRecoBased::Emulate(const recoemu::Shower_t& mc)
   {
 
 

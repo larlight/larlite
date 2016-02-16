@@ -16,7 +16,8 @@
 #pragma link C++ class recoemu::ShowerEmulatorBase+;
 #pragma link C++ class recoemu::TrackEmuToy+;
 #pragma link C++ class recoemu::ShowerEmuToy+;
-#pragma link C++ class recoemu::ShowerEmuSmearing+;
+#pragma link C++ class recoemu::ShowerEmuSmearingRecoBased+;
+#pragma link C++ class recoemu::ShowerEmuSmearingParametrized+;
 #pragma link C++ class recoemu::TrackEmuApplyLengthEff+;
 #pragma link C++ class recoemu::TrackEmuTrackDeviation+;
 #pragma link C++ class recoemu::TrackEmuTrackFlip+;
@@ -26,6 +27,7 @@
 #pragma link C++ class recoemu::RecoEmulatorException+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 
