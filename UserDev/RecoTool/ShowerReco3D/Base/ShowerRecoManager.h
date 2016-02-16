@@ -66,7 +66,7 @@ public:
   /**
      @brief set clusters for the current event
    */
-  void SetProtoShowers(const std::vector<ProtoShower>& proto_showers)
+  void SetProtoShowers(const std::vector< ::showerreco::ProtoShower >& proto_showers)
   { _proto_showers = proto_showers; }
 
 
@@ -82,7 +82,7 @@ private:
                std::vector< ::showerreco::Shower_t >& showers);
 
   // vector of input clusters to be used for reconstruction
-  std::vector<ProtoShower> _proto_showers;
+  std::vector< ::showerreco::ProtoShower > _proto_showers;
 
 
 
