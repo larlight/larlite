@@ -7,7 +7,7 @@ EmuDriver: {
     ShowerEmulator:   ShowerEmuToy
 
     TrackEmuTrackFlip:  {
-        FlipProbability: 0.50
+        FlipProbability: 0.10
     }
     
     ShowerEmuToy: {}

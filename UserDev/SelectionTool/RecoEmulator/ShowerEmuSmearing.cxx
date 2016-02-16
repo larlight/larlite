@@ -54,7 +54,7 @@ namespace recoemu {
     auto dEdxResolutionMin    = pset.get<double>("dEdxResolutionMin");
     auto dEdxResolutionMax    = pset.get<double>("dEdxResolutionMax");
     _dEdxResolutionOffset     = (2 - pset.get<double>("dEdxResolutionMean")) / 2.;
-    std::cout << "dedx offset is " << _dEdxResolutionOffset << std::endl;
+    // std::cout << "dedx offset is " << _dEdxResolutionOffset << std::endl;
 
     _dedxSmear.SetDistribution(dEdxResolutionValues,dEdxResolutionMin, dEdxResolutionMax);
     

@@ -40,9 +40,9 @@ namespace recoemu {
 
         //Loop through the Track_t trajectory and smear each point
         for (auto &step : result.trajectory) {
-            step[0] = step[0] + step[0] * _xres.Draw();
-            step[1] = step[1] + step[1] * _yres.Draw();
-            step[2] = step[2] + step[2] * _zres.Draw();
+            step[0] = step[0] + _xres.Draw();
+            step[1] = step[1] + _yres.Draw();
+            step[2] = step[2] + _zres.Draw();
         }
 
         return result;
