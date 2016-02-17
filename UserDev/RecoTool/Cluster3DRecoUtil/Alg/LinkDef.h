@@ -13,6 +13,7 @@
 #pragma link C++ class cluster3D::GetAverages3D+;
 #pragma link C++ class cluster3D::Default3DParamsAlg+;
 #pragma link C++ class cluster3D::Cluster3DParamsAna+;
+#pragma link C++ class cluster3D::Find3DShoweringPoint+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
