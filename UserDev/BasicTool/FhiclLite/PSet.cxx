@@ -66,13 +66,17 @@ namespace fcllite {
     }
   }
 
-  void PSet::no_space(std::string& txt){
+  void PSet::trim_space(std::string& txt){
     strip  ( txt, " "  );
     strip  ( txt, "\t" );
     strip  ( txt, " "  );
     rstrip ( txt, " "  );
     rstrip ( txt, "\t" );
     rstrip ( txt, " "  );
+  }
+  
+  void PSet::no_space(std::string& txt){
+    trim_space(txt);
     if(txt.find(" ") < txt.size()) {
       std::stringstream ss;
       ss << " Processing: " << txt.c_str() << " ... Space not allowed!";
@@ -116,7 +120,8 @@ namespace fcllite {
     }
     no_space(key);
     if(key.empty()) throw FhiclLiteException("Empty key cannot be registered!");
-    no_space(value);
+    //std::cout<<"value: @"<<value<<"@"<<std::endl;
+    trim_space(value);
     if(value.empty()) throw FhiclLiteException("Empty value cannot be registered!");
     _data_value[key]=value;
   }
@@ -175,7 +180,7 @@ namespace fcllite {
       std::cout<<"type  : "<<next_marker.first<<std::endl;
       std::cout<<"last  : "<<last_mark<<std::endl;
       std::cout<<"Inspecting: "<<"\""<<contents.substr(index,(next_marker.second-index))<<"\""<<std::endl;
-      */      
+      */
       if(next_marker.first == kParamDef) {
 	if(last_mark ==  kNone || last_mark == kBlockEnd){
 	  key = contents.substr(index,(next_marker.second-index));
@@ -186,7 +191,7 @@ namespace fcllite {
 	  //std::cout<<"Inspecting: \""<<tmp<<"\"" <<std::endl;
 	  strip(tmp," ");
 	  rstrip(tmp," ");
-	  size_t sep_index = tmp.find(" ");
+	  size_t sep_index = tmp.rfind(" ");
 	  if(sep_index >= tmp.size())
 	    throw FhiclLiteException("Invalid format (key:value)");
 	  
@@ -248,7 +253,8 @@ namespace fcllite {
       if(key.empty()) throw FhiclLiteException("Empty key @ process-end!");
       
       tmp = contents.substr(index+1,end_index-index);
-      no_space(tmp);
+      //no_space(tmp);
+      trim_space(tmp);
       if(tmp.empty()) throw FhiclLiteException("Empty value @ end!");
       value = tmp;
       this->add_value(key,value);
@@ -292,6 +298,10 @@ namespace fcllite {
     return (*iter).second;
 
   }
+
+  template<>
+  PSet PSet::get<fcllite::PSet>(const std::string& key) const
+  { return this->get_pset(key); }
 
 }
 

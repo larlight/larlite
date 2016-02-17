@@ -105,16 +105,8 @@ namespace fcllite {
       return FromString<T>((*iter).second);
     }
 
-    /// Template getter w/ default value
-    /*
-    template <class T>
-    T get(const std::string& key, const std::string default_value) const{
-      auto iter = _data_value.find(key);
-      if( iter == _data_value.end() )
-	return FromString<T>(default_value);
-      return FromString<T>((*iter).second);
-    }
-    */
+    //template <class T>
+    //T get(const std::string& key) const;
     
     /// Template getter w/ default value
     template <class T>
@@ -146,6 +138,7 @@ namespace fcllite {
     std::pair<PSet::KeyChar_t,size_t> search(const std::string& txt, const size_t start) const;
     void strip(std::string& str, const std::string& key);
     void rstrip(std::string& str, const std::string& key);
+    void trim_space(std::string& txt);
     void no_space(std::string& txt);
 
     std::string _name;
@@ -155,6 +148,8 @@ namespace fcllite {
 
   };
 
+  template<> PSet PSet::get<fcllite::PSet>(const std::string& key) const;
+  
 }
 
 #endif

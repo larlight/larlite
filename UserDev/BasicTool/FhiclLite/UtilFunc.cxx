@@ -6,7 +6,16 @@
 namespace fcllite {
 
   template<> std::string FromString( const std::string& value)
-  { return value; }
+  {
+    std::string res(value);
+    if(res.empty()) return res;
+    
+    if(res.find("\"") == 0) res = res.substr(1);
+    if(res.empty()) return res;
+    
+    if(res.rfind("\"") == (res.length()-1)) res = res.substr(0,res.length()-1);
+    return res;
+  }
 
   template<> float FromString( const std::string& value )
   { return std::stof(value); }
@@ -154,7 +163,16 @@ namespace fcllite {
   }
 
   template<> std::string ToString<std::string>(const std::string& value)
-  { return std::string(value); }
+  {
+    std::string res(value);
+    if(res.empty()) return res;
+    
+    if(res.find("\"") == 0) res = res.substr(1);
+    if(res.empty()) return res;
+    
+    if(res.rfind("\"") == (res.length()-1)) res = res.substr(0,res.length()-1);
+    return res;
+  }
 
 }
 #endif
