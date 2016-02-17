@@ -2,6 +2,7 @@
 #define OPT0FINDER_OPT0FINDERTYPES_H
 
 #include <vector>
+#include <numeric>
 #include "OpT0FinderConstants.h"
 #include <string>
 namespace flashana {
@@ -27,6 +28,9 @@ namespace flashana {
   public:
 
     std::vector<double> pe_v; ///< PE distribution over photo-detectors
+
+    double TotalPE() const{ return std::accumulate(pe_v.begin(),pe_v.end(),0.0);}
+    
     double x,y,z;             ///< Flash position 
     double x_err,y_err,z_err; ///< Flash timing, a candidate T0
     double time;

@@ -17,6 +17,7 @@ while test $# -gt 0; do
 	  out+=" -L${LARLITE_LIBDIR}"
 	  out+=" -lSelectionTool_ERApp -lSelectionTool_ERAlgo -lSelectionTool_ERBase"
 	  out+=" -lSelectionTool_OpT0FinderApp -lSelectionTool_OpT0FinderAlgorithms -lSelectionTool_OpT0FinderBase -lSelectionTool_OpT0PhotonLibrary "
+	  out+=" -lSelectionTool_RecoEmulator "
 	  out+=-L`root-config --libdir` 
 	  out+=" -lEG -lRooFit -lRooFitCore -lRooStats -lMinuit"
 	  ;;

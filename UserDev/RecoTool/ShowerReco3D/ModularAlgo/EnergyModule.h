@@ -2,7 +2,7 @@
  * \file EnergyModule.h
  *
  * \ingroup ModularAlgo
- * 
+ *
  * \brief Class def header for a class EnergyModule
  *
  * @author david caratelli
@@ -25,45 +25,45 @@
  */
 namespace showerreco {
 
-  class EnergyModule : ShowerRecoModuleBase{
+class EnergyModule : ShowerRecoModuleBase {
 
-  public:
+public:
 
-    /// Default constructor
-    EnergyModule();
+  /// Default constructor
+  EnergyModule();
 
-    /// Default destructor
-    ~EnergyModule(){}
+  /// Default destructor
+  ~EnergyModule() {}
 
-    void do_reconstruction(const ShowerClusterSet_t &, Shower_t &);
+  void do_reconstruction(const ProtoShower &, Shower_t &);
 
-    void SetUseArea(bool on) { _useArea = on; }
+  void SetUseArea(bool on) { _useArea = on; }
 
-    void SetUseBirks(bool on=true) { _caloAlg.setUseModBox(!on); }
+  void SetUseBirks(bool on = true) { _caloAlg.setUseModBox(!on); }
 
-    void SetUseBox(bool on = true) { _caloAlg.setUseModBox(on); }
+  void SetUseBox(bool on = true) { _caloAlg.setUseModBox(on); }
 
-    void initialize();
+  void initialize();
 
-  private:
+private:
 
-    /// Calorimetry algorithm
-    ::calo::CalorimetryAlg _caloAlg;
+  /// Calorimetry algorithm
+  ::calo::CalorimetryAlg _caloAlg;
 
-    /// flag for whether to decide if we should use the hit area or amplitude for energy calculations
-    bool _useArea;
+  /// flag for whether to decide if we should use the hit area or amplitude for energy calculations
+  bool _useArea;
 
-    /// flag to decide which ionization module to use
-    bool _useBirks;
+  /// flag to decide which ionization module to use
+  bool _useBirks;
 
-    // tree variables
-    std::vector<double> _dEdx_v;
-    int _pl;
-    std::vector<double> _timetick_v;
+  // tree variables
+  std::vector<double> _dEdx_v;
+  int _pl;
+  std::vector<double> _timetick_v;
 
-  };
-  
+};
+
 } // showerreco
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group

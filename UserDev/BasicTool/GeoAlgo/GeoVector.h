@@ -79,6 +79,11 @@ namespace geoalgo {
     /// Dimensional check for a compatibility
     void compat(const Vector& obj) const;
 
+    /// rotation operations
+    void RotateX(const double& theta);
+    void RotateY(const double& theta);
+    void RotateZ(const double& theta);
+
   protected:
 
     /// Compute the squared-distance to another vector w/o dimension check

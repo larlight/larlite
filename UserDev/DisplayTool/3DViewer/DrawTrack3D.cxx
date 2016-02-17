@@ -48,11 +48,9 @@ bool DrawTrack3D::analyze(larlite::storage_manager* storage) {
   // get a handle to the tracks
   auto trackHandle = storage->get_data<larlite::event_track>(_producer);
 
-  // Clear out the hit data but reserve some space for the showers
-  for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
-    _data.clear();
-    _data.reserve(trackHandle -> size());
-  }
+  // Clear out the data but reserve some space 
+  _data.clear();
+  _data.reserve(trackHandle -> size());
 
 
   // Populate the track vector:

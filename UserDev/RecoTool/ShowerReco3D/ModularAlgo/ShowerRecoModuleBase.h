@@ -17,7 +17,6 @@
 #include <iostream>
 #include "ShowerReco3D/Base/ShowerRecoTypes.h"
 #include "TTree.h"
-#include "DataFormat/storage_manager.h"
 
 /**
    \class ShowerRecoModuleBase
@@ -48,10 +47,10 @@ public:
      * class however you like, with as many private or non private functions as needed, but this particular
      * function is the one that is called by ShowerRecoAlgModular.
      *
-     * @param t clusters The set of shower clusters
+     * @param t proto_shower The set of shower inputs
      * @param t shower The shower that is passed by reference.  Make edits to this object
      */
-    virtual void do_reconstruction(const ShowerClusterSet_t & clusters, Shower_t & shower) = 0;
+    virtual void do_reconstruction(const ProtoShower & proto_shower, Shower_t & shower) = 0;
 
     /**
      * @brief Verbosity setter function for each Modular Algo

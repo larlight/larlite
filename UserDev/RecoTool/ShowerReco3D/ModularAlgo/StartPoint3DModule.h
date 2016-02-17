@@ -5,7 +5,7 @@
  *
  * \brief Class def header for a class StartPoint3DModule
  *
- * @author ariana Hackenburg 
+ * @author ariana Hackenburg
  */
 
 /** \addtogroup ModularAlgo
@@ -34,7 +34,7 @@ public:
   ~StartPoint3DModule() {}
 
   /// Inherited/overloaded function from ShowerRecoModuleBase
-  void do_reconstruction(const ShowerClusterSet_t &, Shower_t &);
+  void do_reconstruction(const ProtoShower &, Shower_t &);
 
 };
 

@@ -2,7 +2,7 @@
  * \file AxisFromTracks.h
  *
  * \ingroup ModularAlgo
- * 
+ *
  * \brief Class def header for a class AxisFromTracks
  *
  * @author cadams
@@ -23,25 +23,25 @@
  */
 namespace showerreco {
 
-  class AxisFromTracks : ShowerRecoModuleBase{
+class AxisFromTracks : ShowerRecoModuleBase {
 
-  public:
+public:
 
-    /// Default constructor
-    AxisFromTracks(){_name = "AxisFromTracks";}
+  /// Default constructor
+  AxisFromTracks() {_name = "AxisFromTracks";}
 
-    /// Default destructor
-    ~AxisFromTracks(){}
+  /// Default destructor
+  ~AxisFromTracks() {}
 
 
-    void do_reconstruction(const ShowerClusterSet_t &, Shower_t &);
+  void do_reconstruction(const ProtoShower &, Shower_t &);
 
-  private:
+private:
 
-  };
+};
 
 } // showerreco
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

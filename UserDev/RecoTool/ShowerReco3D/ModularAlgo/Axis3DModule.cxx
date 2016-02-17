@@ -11,9 +11,9 @@
 namespace showerreco {
 
 void Axis3DModule::initialize() {
-  
+
   if (_tree) delete _tree;
-  _tree = new TTree(_name.c_str(),"Axis3D info tree");
+  _tree = new TTree(_name.c_str(), "Axis3D info tree");
   _tree->Branch("_vec_exists",   &_vec_exists,   "_vec_exists/B");
   _tree->Branch("_vec_error",    &_vec_error,    "_vec_error/F");
   _tree->Branch("_vec_status",   &_vec_status,   "_vec_status/I");
@@ -27,8 +27,11 @@ void Axis3DModule::initialize() {
   _tree->Branch("_slope_1_true", &_slope_1_true, "_slope_1_true/F");
   _tree->Branch("_slope_2_true", &_slope_2_true, "_slope_2_true/F");
 }
-  
-void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Shower_t & resultShower) {
+
+void Axis3DModule::do_reconstruction(const ProtoShower & proto_shower,
+                                     Shower_t& resultShower) {
+
+  auto & clusters = proto_shower.params();
 
   // This function takes the shower cluster set and computes the best fit 3D axis
   // and then assigns it to the shower.
@@ -56,8 +59,8 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   // TVector3 knownAxis(0.5, 0.5, 0.5);
   // knownAxis *= 1.0 / knownAxis.Mag();
 
-  // for (unsigned int i = 0; i < inputShowers.size(); i++) {
-  //   planes.push_back(inputShowers.at(i).plane_id.Plane);
+  // for (unsigned int i = 0; i < clusters.size(); i++) {
+  //   planes.push_back(clusters.at(i).plane_id.Plane);
   //   float slope = geomHelper -> Slope_3Dto2D(knownAxis, planes[i]);
   //   slopeByPlane.push_back(slope);
   //   std::cout << "Pushed back slope == " << slopeByPlane.back() << std::endl;
@@ -74,13 +77,13 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   //For real
   //########################################################
   int goodSlopes = 0;
-  for (unsigned int i = 0; i < inputShowers.size(); i++) {
-    planes.push_back(inputShowers.at(i).plane_id.Plane);
-    // float slope = inputShowers.at(i).angle_2d;
+  for (unsigned int i = 0; i < clusters.size(); i++) {
+    planes.push_back(clusters.at(i).plane_id.Plane);
+    // float slope = clusters.at(i).angle_2d;
     float slope = 0;
-    if (inputShowers.at(i).start_dir[0] != 0) {
-      // std::cout << "Using (" << inputShowers.at(i).start_dir[0] << ", " << inputShowers.at(i).start_dir[1] << ")\n";
-      slope = inputShowers.at(i).start_dir[1] / inputShowers.at(i).start_dir[0];
+    if (clusters.at(i).start_dir[0] != 0) {
+      // std::cout << "Using (" << clusters.at(i).start_dir[0] << ", " << clusters.at(i).start_dir[1] << ")\n";
+      slope = clusters.at(i).start_dir[1] / clusters.at(i).start_dir[0];
     }
     if (slope != 0) goodSlopes ++;
     // std::cout << "Slope is " << slope << std::endl;
@@ -111,7 +114,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   optimizeSeedVectors(seedVectors, planes, slopeByPlane);
   printVectors(seedVectors, planes, slopeByPlane);
   bestVector = findOptimalVector(seedVectors);
-  
+
   // Set the best vector to direction:
   if (bestVector._exists)
     resultShower.fDCosStart = bestVector._vector;
@@ -146,7 +149,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
         }
       }
 
-      if (_verbose){
+      if (_verbose) {
         std::cout << "Omitting plane " << planes.at(i) << std::endl;
       }
 
@@ -189,7 +192,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
           point1 = 0;
           point2 = 1;
         }
-        startTimeDiffs.push_back(inputShowers.at(point1).start_point.t - inputShowers.at(point2).start_point.t);
+        startTimeDiffs.push_back(clusters.at(point1).start_point.t - clusters.at(point2).start_point.t);
       }
     }
     // Figure out is one is much smaller than the other two.  If so, keep that pair.
@@ -218,7 +221,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
       resultShower.fDCosStart.SetX(0.0);
       resultShower.fDCosStart.SetY(0.0);
       resultShower.fDCosStart.SetZ(0.0);
-      
+
       bool averaged = false;
       for (auto & vec : bestVectorAlt) {
         if (vec._exists) {
@@ -227,13 +230,13 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
         }
       }
       if (averaged == true) {
-        resultShower.fDCosStart *= 1.0/resultShower.fDCosStart.Mag();
+        resultShower.fDCosStart *= 1.0 / resultShower.fDCosStart.Mag();
         bestVector._vector = resultShower.fDCosStart;
         bestVector._status = kAveraged;
         bestVector._exists = true;
       }
     }
-    
+
     // and if that doesn't work, just get the best candidate, even if it's a bad one
     if (!bestVector._exists) {
       bestVector._status = kNotOptFit;
@@ -245,7 +248,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
       }
       resultShower.fDCosStart = bestVector._vector;
     }
-    
+
   } // alternate fitting options
 
 
@@ -263,7 +266,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
         << resultShower.fDCosStart.Z() << ").\n";
     // << " Difference is " << acos(knownAxis.Dot(resultShower.fDCosStart)) << " radians.\n";
 
-    for (unsigned int i = 0; i < inputShowers.size(); i++) {
+    for (unsigned int i = 0; i < clusters.size(); i++) {
       larutil::PxPoint start2D, dir2D;
       float slope = geomHelper -> Slope_3Dto2D(resultShower.fDCosStart, planes[i]);
       std::cout << "\tIn plane " << planes[i] << ", the projection is "
@@ -271,7 +274,7 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
                 << slopeByPlane[i] << ".\n";
     }
   }
-  
+
   /*
   // Save info on best vector to tree
   _vec_exists = bestVector._exists;
@@ -292,29 +295,29 @@ void Axis3DModule::do_reconstruction(const ShowerClusterSet_t & inputShowers, Sh
   return;
 
 }
-  
-  // ok i've been staring at code too long, here's a playlist
-  // feel free to delete this if you find it
-  
-  //                                  MAYFLOWER DRIVE                                   //
-  // 1.                                  ooo -- karen o                                 //
-  // 2.                             the move -- laura stevenson                         //
-  // 3.                        i saw my twin -- hop along                               //
-  // 4.                  phones and machines -- b. fleischmann                          //
-  // 5.                         closing time -- tom waits                               //
-  // 6.                           nighthawks -- erik friedlander                        //
-  // 7.                       sunday morning -- noname gypsy                            //
-  // 8.                           levitation -- beach house                             //
-  // 9.                              nervous -- wavves x cloud nothings                 //
-  // 10.                                 car -- built to spill                          //
-  // 11. the rabbit, the bat, & the reindeer -- dr. dog                                 //
-  // 12.                          ethiopians -- bomb the music industry!                //
-  
+
+// ok i've been staring at code too long, here's a playlist
+// feel free to delete this if you find it
+
+//                                  MAYFLOWER DRIVE                                   //
+// 1.                                  ooo -- karen o                                 //
+// 2.                             the move -- laura stevenson                         //
+// 3.                        i saw my twin -- hop along                               //
+// 4.                  phones and machines -- b. fleischmann                          //
+// 5.                         closing time -- tom waits                               //
+// 6.                           nighthawks -- erik friedlander                        //
+// 7.                       sunday morning -- noname gypsy                            //
+// 8.                           levitation -- beach house                             //
+// 9.                              nervous -- wavves x cloud nothings                 //
+// 10.                                 car -- built to spill                          //
+// 11. the rabbit, the bat, & the reindeer -- dr. dog                                 //
+// 12.                          ethiopians -- bomb the music industry!                //
+
 float Axis3DModule::optimizeVector(TVector3 & inputVector,
-                                  Status & exitStatus,
-                                  int & n_iterations,
-                                  const std::vector<float> & slopeByPlane,
-                                  const std::vector<int> & planes )
+                                   Status & exitStatus,
+                                   int & n_iterations,
+                                   const std::vector<float> & slopeByPlane,
+                                   const std::vector<int> & planes )
 {
 
   // Some variables needed for this loop:
@@ -542,13 +545,13 @@ float Axis3DModule::getErrorOfProjection( const TVector3 & inputVector,
   return err;
 
 }
-  
+
 void Axis3DModule::findSeedVectors(std::vector<SeedVector> & seedVectors,
-    const std::vector<int> & planes,
-    const std::vector<float> & slopeByPlane)
+                                   const std::vector<int> & planes,
+                                   const std::vector<float> & slopeByPlane)
 {
   float errorCutoff = _seedVectorErrorCutoff;
-    
+
   // Find out the seed vectors with reasonable error, and reject all the others
   while (seedVectors.size() == 0) {
     for (auto & vec : _globalSeedVectors) {
@@ -561,10 +564,10 @@ void Axis3DModule::findSeedVectors(std::vector<SeedVector> & seedVectors,
     errorCutoff += _seedVectorErrorCutoff;
   }
 }
-  
+
 void Axis3DModule::optimizeSeedVectors(std::vector<SeedVector> & seedVectors,
-    const std::vector<int> & planes,
-    const std::vector<float> & slopeByPlane)
+                                       const std::vector<int> & planes,
+                                       const std::vector<float> & slopeByPlane)
 {
   int n_converged(0);
   // Loop over each candidate vector
@@ -579,10 +582,10 @@ void Axis3DModule::optimizeSeedVectors(std::vector<SeedVector> & seedVectors,
       n_converged++;
   }
 }
-  
+
 void Axis3DModule::printVectors(std::vector<SeedVector> & seedVectors,
-    const std::vector<int> & planes,
-    const std::vector<float> & slopeByPlane)
+                                const std::vector<int> & planes,
+                                const std::vector<float> & slopeByPlane)
 {
   auto geomHelper = larutil::GeometryHelper::GetME();
   // Print out the final vectors and their errors:
@@ -590,10 +593,10 @@ void Axis3DModule::printVectors(std::vector<SeedVector> & seedVectors,
     // Print out info about this vector:
     if (_verbose) {
       std::cout << "Error: " << vec._error
-      << "\tVec: (" << vec._vector.X() << ", "
-      << vec._vector.Y() << ", "
-      << vec._vector.Z() << ")"
-      << "\tStatus: ";
+                << "\tVec: (" << vec._vector.X() << ", "
+                << vec._vector.Y() << ", "
+                << vec._vector.Z() << ")"
+                << "\tStatus: ";
       if (vec._status == kNormal)
         std::cout << "normal";
       if (vec._status == kIterMaxOut)
@@ -609,7 +612,7 @@ void Axis3DModule::printVectors(std::vector<SeedVector> & seedVectors,
     }
   }
 }
-  
+
 SeedVector Axis3DModule::findOptimalVector(std::vector<SeedVector> & seedVectors)
 {
   SeedVector bestVector;
@@ -623,7 +626,7 @@ SeedVector Axis3DModule::findOptimalVector(std::vector<SeedVector> & seedVectors
   }
   return bestVector;
 }
-  
+
 } //showerreco
 
 #endif

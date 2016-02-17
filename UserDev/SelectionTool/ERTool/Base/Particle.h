@@ -59,8 +59,8 @@ namespace ertool {
 
     const int&    PdgCode() const;
     const double& Mass() const;
-    double Energy() const;
-    double KineticEnergy() const;
+    double Energy() const; // in MeV
+    double KineticEnergy() const; // in MeV
     const ::geoalgo::Vector& Vertex()   const;
     const ::geoalgo::Vector& Momentum() const;
     float RecoScore() const;
@@ -72,6 +72,8 @@ namespace ertool {
 			  const ::geoalgo::Vector& mom = kINVALID_MOMENTUM,
 			  const float score = 0,
 			  const ProcessType_t process = kUnknown);
+
+    void SetParticlePdgCode( const int pdg_code = kINVALID_INT);
 
     void SetProcess(const ProcessType_t process){ _process = process; }
     
@@ -93,7 +95,7 @@ namespace ertool {
     int    _pdg_code;       ///< PDG code of a particle
     double _mass;           ///< Particle's mass
     ::geoalgo::Vector _vtx; ///< Creation vertex of a particle
-    ::geoalgo::Vector _mom; ///< Creation momentum of a particle
+    ::geoalgo::Vector _mom; ///< Creation momentum of a particle in MeV/c
     ProcessType_t _process; ///< Creation process (enum) of a particle
     
     // Graph structure information

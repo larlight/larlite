@@ -7,8 +7,8 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef MuCSReco_H
-#define MuCSReco_H
+#ifndef LARLITE_MuCSReco_H
+#define LARLITE_MuCSReco_H
 
 #include "data_base.h"
 

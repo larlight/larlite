@@ -149,9 +149,9 @@ class larlitegui(gui):
         # Set the default to be no wires
         self._noneWireButton.toggle()
 
-        self._startDrawBox = QtGui.QCheckBox("Draw Params.")
-        self._startDrawBox.stateChanged.connect(self.startDrawBoxWorker)
-        self._eastLayout.addWidget(self._startDrawBox)
+        self._paramsDrawBox = QtGui.QCheckBox("Draw Params.")
+        self._paramsDrawBox.stateChanged.connect(self.paramsDrawBoxWorker)
+        self._eastLayout.addWidget(self._paramsDrawBox)
 
         # Set a box for mcTruth Info
         self._truthDrawBox = QtGui.QCheckBox("MC Truth")
@@ -209,8 +209,8 @@ class larlitegui(gui):
 
         # self._view_manager.drawPlanes(self._event_manager)
 
-    def startDrawBoxWorker(self):
-        if self._startDrawBox.isChecked():
+    def paramsDrawBoxWorker(self):
+        if self._paramsDrawBox.isChecked():
             self._event_manager.toggleParams(True)
         else:
             self._event_manager.toggleParams(False)

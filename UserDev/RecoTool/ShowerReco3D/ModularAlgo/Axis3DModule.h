@@ -22,37 +22,37 @@
    doxygen documentation!
  */
 namespace showerreco {
-  
+
 enum Status {kNormal, kNotOptFit, kTwoPlane, kAveraged, kIterMaxOut, kNStatus};
-  
+
 class SeedVector {
-  
+
 public:
-  
-  bool     _exists = false;
-  TVector3 _vector;
-  float    _error;
-  Status   _status;
-  int      _iterations;
-  
-  /// Default constructor
-  SeedVector() {}
-  
-  /// Constructor
-  SeedVector(TVector3 vector, float error) {_exists = true; _vector = vector; _error = error;}
-  
-  /// Copy constructor
-  SeedVector(const SeedVector & vec) {
-    _exists     = vec._exists;
-    _vector     = vec._vector;
-    _error      = vec._error;
-    _status     = vec._status;
-    _iterations = vec._iterations;
-  }
-  
-  /// Default destructor
-  ~SeedVector() {}
-  
+
+    bool     _exists = false;
+    TVector3 _vector;
+    float    _error;
+    Status   _status;
+    int      _iterations;
+
+    /// Default constructor
+    SeedVector() {}
+
+    /// Constructor
+    SeedVector(TVector3 vector, float error) {_exists = true; _vector = vector; _error = error;}
+
+    /// Copy constructor
+    SeedVector(const SeedVector & vec) {
+        _exists     = vec._exists;
+        _vector     = vec._vector;
+        _error      = vec._error;
+        _status     = vec._status;
+        _iterations = vec._iterations;
+    }
+
+    /// Default destructor
+    ~SeedVector() {}
+
 };
 
 class Axis3DModule : ShowerRecoModuleBase {
@@ -66,7 +66,7 @@ public:
     ~Axis3DModule() {}
 
 
-    void do_reconstruction(const ShowerClusterSet_t &, Shower_t &);
+    void do_reconstruction(const ProtoShower &, Shower_t &);
 
     /**
      * @brief Set the value of maximum number of iterations per shower
@@ -210,10 +210,10 @@ private:
      * @return The error of the performed fit.
      */
     float optimizeVector(TVector3 & inputVector,
-                        Status & exitStatus,
-                        int & n_iterations,
-                        const std::vector<float> & slopeByPlane,
-                        const std::vector<int> & planes );
+                         Status & exitStatus,
+                         int & n_iterations,
+                         const std::vector<float> & slopeByPlane,
+                         const std::vector<int> & planes );
 
     /**
      * @brief Identifies good seed vector candidates from the initial globalSeedVectors list
@@ -230,7 +230,7 @@ private:
     void findSeedVectors(std::vector<SeedVector> & seedVectors,
                          const std::vector<int> & planes,
                          const std::vector<float> & slopeByPlane);
-  
+
     /**
      * @brief Optimizes all seed vectors contained in input vector
      * @details The algorithm takes an input vector which contains all candidates for a vector. It then attempts
@@ -244,7 +244,7 @@ private:
     void optimizeSeedVectors(std::vector<SeedVector> & seedVectors,
                              const std::vector<int> & planes,
                              const std::vector<float> & slopeByPlane);
-  
+
     /**
      * @brief Prints out all candidate vectors, and their errors
      * @details Takes in a vector of all candidate seed vectors, and prints out the error and vector for each one,
@@ -257,7 +257,7 @@ private:
     void printVectors(std::vector<SeedVector> & seedVectors,
                       const std::vector<int> & planes,
                       const std::vector<float> & slopeByPlane);
-  
+
     /**
      * @brief Finds the one optimal vector from the vector of candidates
      * @details Algorithm which loops through the vector containing all candidates, and checks the error on each one.
@@ -268,7 +268,7 @@ private:
      * @return The optimal vector candidate
      */
     SeedVector findOptimalVector(std::vector<SeedVector> & seedVectors);
-  
+
     // Info on best vector (ie. module output) for writing to tree
     bool  _vec_exists;
     float _vec_error;
@@ -282,7 +282,7 @@ private:
     float _slope_0_true;
     float _slope_1_true;
     float _slope_2_true;
-  
+
     // Function to initialise output tree
     void initialize();
 

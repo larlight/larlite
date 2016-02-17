@@ -43,7 +43,7 @@ class larlite_manager_base(manager, QtCore.QObject):
 
     def pingFile(self, file):
         """
-        this function opens the file and 
+        this function opens the file and
         determines what is available to draw
         """
         # This function opens the file to see
@@ -58,7 +58,18 @@ class larlite_manager_base(manager, QtCore.QObject):
         # Loop over the keys (list of trees)
         for key in f.GetListOfKeys():
             # keys are dataproduct_producer_tree
+            # Make sure the ttrees being looked at are larlite trees
+            if "_" not in key.GetName():
+                # For now, just skip anything that doesn't have "_"
+                continue
+
             thisKeyList = key.GetName().split('_')
+
+            # # ALso skip things that aren't broken into 3 pieces:
+            # if len(thisKeyList) is not 3:
+            #     continue
+
+
             # gets three items in thisKeyList, which is a list
             # [dataProduct, producer, 'tree'] (don't care about 'tree')
             # check if the data product is in the dict:
@@ -162,7 +173,7 @@ class larlite_manager_base(manager, QtCore.QObject):
             print "On the first event, can't go to previous."
 
     def processEvent(self, force=False):
-        if len(self._drawnClasses) == 0 and not ( self._drawWires or self._drawTruth) :
+        if len(self._drawnClasses) == 0 and not (self._drawWires or self._drawTruth):
             self._mgr.go_to(self._event)
             return
         if self._lastProcessed != self._event or force:
@@ -181,7 +192,6 @@ class larlite_manager_base(manager, QtCore.QObject):
 
 
 class larlite_manager(larlite_manager_base):
-
 
     truthLabelChanged = QtCore.pyqtSignal(str)
     '''
@@ -319,21 +329,19 @@ class larlite_manager(larlite_manager_base):
         self._process.add_process(self._truthDrawer._process)
         self.processEvent(True)
 
-
     def clearTruth(self):
         if self._truthDrawer is not None:
             self._truthDrawer.clearDrawnObjects(self._view_manager)
 
-
     def drawTruth(self):
         if self._drawTruth:
-            # print "Emiting this message: {msg}".format(msg=self._truthDrawer.getLabel())
+            # print "Emiting this message:
+            # {msg}".format(msg=self._truthDrawer.getLabel())
             self.truthLabelChanged.emit(self._truthDrawer.getLabel())
             self._truthDrawer.drawObjects(self._view_manager)
         else:
             # print "Emiting this message: {msg}".format(msg="")
             self.truthLabelChanged.emit("")
-
 
     def toggleParams(self, paramsBool):
         self._drawParams = paramsBool
@@ -356,7 +364,7 @@ class larlite_manager(larlite_manager_base):
             return
         else:
             # Get the hits:
-            hits = self._drawnClasses['Hit'].getHitsOnWire(plane,wire)
+            hits = self._drawnClasses['Hit'].getHitsOnWire(plane, wire)
             self._view_manager.drawHitsOnPlot(hits)
 
 try:
@@ -397,12 +405,12 @@ try:
             if name in self._drawableItems.getListOfTitles():
                 # drawable items contains a reference to the class, so
                 # instantiate it
-                drawingClass = self._drawableItems.getDict()[name][0]()
+                drawingClass=self._drawableItems.getDict()[name][0]()
                 # Special case for clusters, connect it to the signal:
-                # if name == 'Cluster':
-                #     self.clusterParamsChanged.connect(
-                #         drawingClass.setParamsDrawing)
-                #     drawingClass.setParamsDrawing(self._drawParams)
+                if name is 'PFParticle':
+                    self.clusterParamsChanged.connect(
+                        drawingClass.setParamsDrawing)
+                    drawingClass.setParamsDrawing(self._drawParams)
                 # if name == 'Match':
                 #     self.clusterParamsChanged.connect(
                 #         drawingClass.setParamsDrawing)
@@ -420,13 +428,19 @@ try:
                 self._drawnClasses[recoProduct].clearDrawnObjects(
                     self._view_manager)
 
+        def toggleParams(self, paramsBool):
+            self._drawParams=paramsBool
+            self.clusterParamsChanged.emit(paramsBool)
+            if 'PFParticle' in self._drawnClasses:
+                self.drawFresh()
+
         def drawFresh(self):
             # # wires are special:
             # if self._drawWires:
             #   self._view_manager.drawPlanes(self)
             self.clearAll()
             # Draw objects in a specific order defined by drawableItems
-            order = self._drawableItems.getListOfTitles()
+            order=self._drawableItems.getListOfTitles()
             for item in order:
                 if item in self._drawnClasses:
                     self._drawnClasses[item].drawObjects(self._view_manager)

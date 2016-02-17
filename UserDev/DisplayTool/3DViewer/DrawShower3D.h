@@ -16,8 +16,6 @@
 
 #include <iostream>
 #include "Analysis/ana_base.h"
-#include "LArUtil/Geometry.h"
-#include "LArUtil/GeometryUtilities.h"
 #include "DataFormat/shower.h"
 
 #include "RecoBase3D.h"
@@ -44,7 +42,7 @@ public:
     float length(){return _length;}
     float opening_angle(){return _opening_angle;}
 
-private:
+protected:
     TVector3 _start_point;
     TVector3 _direction;
     float _length;

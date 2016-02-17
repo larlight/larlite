@@ -34,7 +34,7 @@ public:
   ~GeoModule() {}
 
 
-  void do_reconstruction(const ShowerClusterSet_t &, Shower_t &);
+  void do_reconstruction(const ProtoShower &, Shower_t &);
 
 private:
 

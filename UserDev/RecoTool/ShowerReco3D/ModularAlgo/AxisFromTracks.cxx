@@ -7,7 +7,10 @@
 
 namespace showerreco {
 
-void AxisFromTracks::do_reconstruction(const ShowerClusterSet_t & inputClusters, Shower_t & shower) {
+void AxisFromTracks::do_reconstruction(const ProtoShower & proto_shower,
+                                       Shower_t& resultShower) {
+
+  auto & clusters = proto_shower.params();
 
   // // This function takes the shower cluster set and computes the best fit 3D axis
   // // and then assigns it to the shower
@@ -26,8 +29,8 @@ void AxisFromTracks::do_reconstruction(const ShowerClusterSet_t & inputClusters,
   //   return;
   // }
 
-  // // Get the clusters associated to these tracks  
-  
+  // // Get the clusters associated to these tracks
+
   // _storage -> set_id(1, 0, ev_track->event_id());
 
 

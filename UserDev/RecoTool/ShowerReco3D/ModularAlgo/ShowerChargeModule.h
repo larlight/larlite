@@ -2,7 +2,7 @@
  * \file ShowerChargeModule.h
  *
  * \ingroup ModularAlgo
- * 
+ *
  * \brief Class def header for a class ShowerChargeModule
  *
  * @author cadams
@@ -23,25 +23,25 @@
  */
 namespace showerreco {
 
-  class ShowerChargeModule : ShowerRecoModuleBase{
+class ShowerChargeModule : ShowerRecoModuleBase {
 
-  public:
+public:
 
-    /// Default constructor
-    ShowerChargeModule(){_name = "ShowerChargeModule";}
+  /// Default constructor
+  ShowerChargeModule() {_name = "ShowerChargeModule";}
 
-    /// Default destructor
-    ~ShowerChargeModule(){}
+  /// Default destructor
+  ~ShowerChargeModule() {}
 
 
-    void do_reconstruction(const ShowerClusterSet_t &, Shower_t &);
+  void do_reconstruction(const ProtoShower &, Shower_t &);
 
-  private:
+private:
 
-  };
+};
 
 } // showerreco
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 
