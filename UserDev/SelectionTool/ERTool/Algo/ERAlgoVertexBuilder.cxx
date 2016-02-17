@@ -13,13 +13,25 @@ namespace ertool {
 					   Double_t const max_rad,
 					   Double_t const lone_track_length,
 					   Bool_t const withTrackDir,
+					   std::string const primary_vertex_selection,
 					   const std::string& name) :
     AlgoBase(name),
     tstart_prox(start_prox),
     tmax_rad(max_rad),
     tlone_track_length(lone_track_length),
+    tprimary_vertex_selection(primary_vertex_selection),
     twithTrackDir(withTrackDir),
     tverbose(false) {
+
+    if(tprimary_vertex_selection != mostupstream &&
+       tprimary_vertex_selection != mostchildren &&
+       tprimary_vertex_selection != mostenergy &&
+       tprimary_vertex_selection != smallestsphere) {
+
+      std::cout << "Primary vertex selection option not valid\n";
+      exit(0);
+
+    }
 
     tree = new TTree("ERAlgoVertexBuilder", "");
     tree->Branch("event_id", &event_id, "event_id/I");
@@ -29,7 +41,7 @@ namespace ertool {
     tree->Branch("lone_track_counter", &lone_track_counter, "lone_track_counter/I");
     tree->Branch("vertices_lonetracks", &vertices_lonetracks, "vertices_lonetracks/I");
     tree->Branch("radius", &radius, "radius/D");
-
+   
   }
 
 
@@ -844,9 +856,16 @@ namespace ertool {
       while(skip.size() != pav.size()) {
 
 	Int_t index = -1;
-	geoalgo::Point_t const * sc = GetUpstreamPrimary(pas, skip, index);
-	//geoalgo::Point_t const * sc = GetMostChildrenPrimary(pas, skip, index);
-	//geoalgo::Point_t const * sc = GetMostEnergyPrimary(data, graph, pas, skip, index);
+	geoalgo::Point_t const * sc = nullptr;
+	
+	if(tprimary_vertex_selection == mostupstream)
+	  sc = GetUpstreamPrimary(pas, skip, index);
+	else if(tprimary_vertex_selection == mostchildren)
+	  sc = GetMostChildrenPrimary(pas, skip, index);
+	else if(tprimary_vertex_selection == mostenergy)
+	  sc = GetMostEnergyPrimary(data, graph, pas, skip, index);
+	else if(tprimary_vertex_selection == smallestsphere)
+	  sc = GetSmallestSpherePrimary(pas, skip, index);
 
 	if(sc == nullptr) {
 	  std::cout << "No sc\n";
@@ -921,7 +940,7 @@ namespace ertool {
     lone_track_counter = 0;
     vertices_lonetracks = 0;
     radius = 2000;
-
+   
   }
 
 
