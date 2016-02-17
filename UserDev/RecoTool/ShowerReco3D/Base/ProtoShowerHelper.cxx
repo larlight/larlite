@@ -46,9 +46,10 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
 
   }
 
-  if (showerLikePFParts.size() == 0){
+  if (showerLikePFParts.size() == 0) {
     return;
   }
+
 
   proto_showers.resize(showerLikePFParts.size());
 
@@ -64,6 +65,8 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
   auto const& ass_cluster_v
     = storage->find_one_ass(ev_pfpart->id(), ev_clust, ev_pfpart->name());
 
+  // std::cout << "doing clusters" << std::endl;
+
   // Now, check to see if there are clusters:
   if (ev_clust != 0  && ev_clust -> size() != 0) {
 
@@ -71,6 +74,8 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
     ::larlite::event_hit * ev_hit = nullptr;
     auto const& ass_hit_v
       = storage->find_one_ass(ev_clust->id(), ev_hit, ev_clust->name());
+
+    // std::cout << "Found " << ev_clust -> size() << " clusters" << std::endl;
 
     // Check that the cluster associations are the same length as the pfparticle list
     if (ass_cluster_v.size() == ev_pfpart -> size()) {
@@ -81,24 +86,56 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
 
 
       // use the indexes stored in showerLikePFParts to loop through the clusters
-      for (auto i : showerLikePFParts ) {
-        // for (size_t i = 0; i < ass_cluster_v.size(); i ++) {
+      for (size_t i = 0; i < showerLikePFParts.size(); i ++ ) {
+        size_t proto_shower_pfpart = showerLikePFParts.at(i);
+
+        // std::cout << "On particle " << i << "("
+        //           << "pfparticle " << proto_shower_pfpart
+        //           << "), this particle has "
+        //           << ass_cluster_v.at(proto_shower_pfpart).size()
+        //           << " of " << ev_clust->size()
+        //           << " clusters."
+        //           << std::endl;
 
         // If there are some, set the cluster2D bool to true
         // Else, set it to false
-        if (ass_cluster_v.at(i).size() == 0)
+        if (ass_cluster_v.at(proto_shower_pfpart).size() == 0) {
           proto_showers.at(i)._hasCluster2D = false;
+          // Don't keep going if there are no clusters.
+          // std::cout << ""
+          continue;
+        }
         else {
           proto_showers.at(i)._hasCluster2D = true;
         }
         // Make space for the params in this protoshower:
-        proto_showers.at(i)._params.resize(ass_cluster_v.at(i).size());
-        for (auto j_clust : ass_cluster_v.at(i)) {
+        proto_showers.at(i)._params.resize(ass_cluster_v.at(proto_shower_pfpart).size());
+        size_t internal_cluster_index = 0;
+        for (auto j_clust : ass_cluster_v.at(proto_shower_pfpart)) {
+          // std::cout << "On cluster " << j_clust << ","
+          //           << " this cluster has " << ass_hit_v.at(j_clust).size()
+          //           << " hits." << std::endl;
+
+          // std::cout << "proto_showers.at(i)._params.size() is "
+          //           << proto_showers.at(i)._params.size()
+          //           << ", index is " << internal_cluster_index
+          //           << std::endl;
+
           _cru_helper.GenerateParams(ass_hit_v.at(j_clust),
                                      ev_hit,
-                                     proto_showers.at(i)._params.at(j_clust));
+                                     proto_showers.at(i)._params.at(internal_cluster_index));
+
+
+          // std::cout << "params are generated, hit_vector.size() is "
+          // << proto_showers.at(i)._params.at(internal_cluster_index).hit_vector.size()
+          // << std::endl;
           // Now fill in the parameters:
-          _params_alg.FillParams(proto_showers.at(i)._params.at(j_clust));
+          _params_alg.FillParams(proto_showers.at(i)._params.at(internal_cluster_index));
+          // std::cout << "params filling finished." << std::endl;
+          internal_cluster_index ++;
+          // std::cout << "Finished making params for cluster " << j_clust
+          // << "which had " << ass_hit_v.at(j_clust).size() << " hits."
+          // << std::endl;
         }
       }
     }
@@ -110,6 +147,7 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
     }
   }
 
+  // std::cout << "doing spacepoints" << std::endl;
 
   // Now the 2D clusters are finished.  Move on to the 3D clusters (spacepoints)
   //
@@ -125,9 +163,10 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
     // This is simpler than 2D clusters since there should be just one set
     // per pfparticle, and we don't have to get another data product.
 
-    for (auto i : showerLikePFParts ) {
-      // for (auto & sps_v : ass_sps_v) {
-      auto & sps_v = ass_sps_v.at(i);
+    for (size_t i = 0; i < showerLikePFParts.size(); i ++ ) {
+      size_t proto_shower_pfpart = showerLikePFParts.at(i);
+
+      auto & sps_v = ass_sps_v.at(proto_shower_pfpart);
       if (sps_v.size() != 0) {
         /// Generate: from 1 set of sps => 1 Params3D using indexes (association)
         _cru3D_helper.GenerateParams3D(sps_v,
@@ -152,6 +191,10 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
     }
   }
 
+
+  // std::cout << "doing vertexes" << std::endl;
+
+
   // Do the vertex:
 
   larlite::event_vertex * ev_vertex = nullptr;
@@ -165,14 +208,15 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
 
     // This is simpler than 2D clusters since there should be just one set
     // per pfparticle, and we don't have to get another data product.
-    for (auto i : showerLikePFParts ) {
-      // for (auto & vertex_v : ass_vertex_v) {
-      auto & vertex_v = ass_vertex_v.at(i);
+    for (size_t i = 0; i < showerLikePFParts.size(); i ++ ) {
+      size_t proto_shower_pfpart = showerLikePFParts.at(i);
+
+      auto & vertex_v = ass_vertex_v.at(proto_shower_pfpart);
       if (vertex_v.size() != 0) {
         for (auto index : vertex_v) {
           double xyz[3];
           ev_vertex -> at(index).XYZ(xyz);
-          proto_showers.at(index)._vertexes.push_back(TVector3(xyz[0], xyz[1], xyz[2]));
+          proto_showers.at(i)._vertexes.push_back(TVector3(xyz[0], xyz[1], xyz[2]));
         }
         proto_showers.at(i)._hasVertex = true;
       }

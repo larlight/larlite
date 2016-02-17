@@ -52,7 +52,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
                   storage->event_id());
 
   if (!ev_pfpart or (ev_pfpart->size() == 0) ) {
-    print(msg::kERROR, __FUNCTION__, Form("PFPart producer %s product not found!", fInputProducer.c_str()));
+    print(msg::kERROR, __FUNCTION__,
+          Form("PFPart producer %s product not found!",
+               fInputProducer.c_str()));
     return false;
   }
 
@@ -66,7 +68,12 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     if (part.PdgCode() == 11) {
       showerLikePFParts.push_back(index);
     }
+    index ++;
   }
+
+  // std::cout << "This event has " << showerLikePFParts.size()
+  //           << " particles of " << ev_pfpart->size()
+  //           <<  "tagged as showers." << std::endl;
 
 
   // retrieve clusters associated with this pfpart
@@ -78,7 +85,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   // if associated clusters not found -> quit and exit
   if ( !ev_cluster or (ev_cluster->size() == 0) ) {
-    print(msg::kERROR, __FUNCTION__, Form("No clusters found associated to PFPart w/ producer %s", fInputProducer.c_str()));
+    print(msg::kERROR, __FUNCTION__,
+          Form("No clusters found associated to PFPart w/ producer %s",
+               fInputProducer.c_str()));
     // return false;
   }
   else {
@@ -95,7 +104,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   // if associated clusters not found -> quit and exit
   if ( !ev_vertex or (ev_vertex->size() == 0) ) {
-    print(msg::kERROR, __FUNCTION__, Form("No vertexs found associated to PFPart w/ producer %s", fInputProducer.c_str()));
+    print(msg::kERROR, __FUNCTION__,
+          Form("No vertexes found associated to PFPart w/ producer %s",
+               fInputProducer.c_str()));
     // return false;
   }
   else {
@@ -111,7 +122,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   // if associated clusters not found -> quit and exit
   if ( !ev_sps or (ev_sps->size() == 0) ) {
-    print(msg::kERROR, __FUNCTION__, Form("No spacepoints found associated to PFPart w/ producer %s", fInputProducer.c_str()));
+    print(msg::kERROR, __FUNCTION__,
+          Form("No spacepoints found associated to PFPart w/ producer %s",
+               fInputProducer.c_str()));
     // return false;
   }
   else {
@@ -123,16 +136,36 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   std::vector<showerreco::ProtoShower> proto_showers;
 
+
   _ps_helper.GenerateProtoShowers( storage,
                                    fInputProducer,
                                    proto_showers,
                                    showerLikePFParts);
 
+
+
+  // // Let's do a little debugging:
+  // std::cout << "In this event ( " << storage -> event_id() << "), there are "
+  //           << ev_pfpart -> size() << " pfparticles.\n"
+  //           << "\tOf the pfparticles, the following are tagged as showers:\n\t";
+  // for (auto i : showerLikePFParts) {
+  //   std::cout << i << " ";
+  // }
+  // std::cout << "\n\tFor the shower-like pfparticles, we have:\n";
+  // size_t debug_index = 0;
+  // for (auto i : showerLikePFParts) {
+  //   std::cout << "\tOn particle " << i << ": \n"
+  //             << "\tHas cluster2D: " << proto_showers.at(debug_index).hasCluster2D() << "\n"
+  //             << "\t\tcluster2D.size(): " << proto_showers.at(debug_index).params().size() << "\n"
+  //             << "\tHas cluster3D: " << proto_showers.at(debug_index).hasCluster3D() << "\n"
+  //             << "\tHas vertexes: " << proto_showers.at(debug_index).hasVertex() << "\n"
+  //             << "\t\tvertexes.size(): " << proto_showers.at(debug_index).vertexes().size() << "\n";
+  //   debug_index ++;
+  // }
+
+
   // Result shower holder
   std::vector< ::showerreco::Shower_t> res_shower_v;
-
-  std::cout << "proto_showers.size() " << proto_showers.size() << std::endl;
-  std::cout << "showerLikePFParts.size() " << showerLikePFParts.size() << std::endl;
 
   fManager.SetProtoShowers(proto_showers);
 
@@ -202,9 +235,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
     shower_v->push_back(s);
 
-    std::cout << "ass_cluster_v.size() " << ass_cluster_v.size()
-              << " showerLikePFParts[i] " << showerLikePFParts[i]
-              << std::endl;
+    // std::cout << "ass_cluster_v.size() " << ass_cluster_v.size()
+    //           << " showerLikePFParts[i] " << showerLikePFParts[i]
+    //           << std::endl;
 
 
     shower_cluster_v.push_back(ass_cluster_v[showerLikePFParts[i]]);
@@ -216,7 +249,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   }// for all input cluster-paris
 
-  std::cout << "shower_v -> size() is " << shower_v -> size() << std::endl;
+  // std::cout << "shower_v -> size() is " << shower_v -> size() << std::endl;
 
   if (shower_v->size() == 0)
     return true;
@@ -245,6 +278,8 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
                                           ev_pfpart->name()),
                                       shower_pfpart_v);
   }
+
+  // std::cout << "Finished the event!" << std::endl;
   return true;
 }
 
