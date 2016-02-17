@@ -57,7 +57,7 @@ namespace larlite {
 				else {s._dedx =  mcs.dEdx();}
 				//s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
 				s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
-
+				s._time = mcs.DetProfile().T();
 				::ertool::RecoInputID_t in_id(i, mcs_v.name());
 
 				// Emplace this shower, and get corresponding particle unique ID
@@ -132,6 +132,7 @@ namespace larlite {
 				for (auto& v : t._pid_score) v = 100;
 				if (t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
 
+				t._time = mct.at(0).T();
 				::ertool::RecoInputID_t in_id(i, mct_v.name());
 
 				// Emplace a track to EventData
