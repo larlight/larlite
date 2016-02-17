@@ -1,0 +1,11 @@
+
+a : {
+  j: [1 ,
+     2 ,
+       3]
+  x: "tako"
+}
+b : { }
+
+
+# Selection a: input = 1000 events output = 500 events
