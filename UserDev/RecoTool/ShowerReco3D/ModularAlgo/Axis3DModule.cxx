@@ -207,7 +207,7 @@ void Axis3DModule::do_reconstruction(const ProtoShower & proto_shower,
       }
       i++;
     }
-    if (i != -1 && 3 * minVal < nextMin && bestVectorAlt.at(min_index)._exists) {
+    if ( 3 * minVal < nextMin && bestVectorAlt.at(min_index)._exists) {
       // In this case, there is clearly a shower with a bad start point
       // Pick the vector that ignores it.
       bestVector = bestVectorAlt.at(min_index);

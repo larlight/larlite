@@ -91,11 +91,11 @@ void LinearEnergy::do_reconstruction(const ProtoShower & proto_shower,
   _dE_v.clear();
   _dEdx_v.clear();
 
-  auto geom       = larutil::Geometry::GetME();
+  // auto geom       = larutil::Geometry::GetME();
   auto geomHelper = larutil::GeometryHelper::GetME();
 
-  double y;
-  double z;
+  // double y;
+  // double z;
 
   auto t2cm = geomHelper->TimeToCm();
 

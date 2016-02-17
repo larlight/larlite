@@ -30,10 +30,10 @@ void dEdxFromdQdx::do_reconstruction(const ProtoShower & proto_shower,
   auto & clusters = proto_shower.params();
 
 
-  auto geomHelper = larutil::GeometryHelper::GetME();
+  // auto geomHelper = larutil::GeometryHelper::GetME();
 
-  // get the 3D direction reconstructed hopefully in a previous step
-  auto const& dir3D = resultShower.fDCosStart;
+  // // get the 3D direction reconstructed hopefully in a previous step
+  // auto const& dir3D = resultShower.fDCosStart;
 
   // get the vector of dQdx filled by someone else
   auto const& dQdx_v = resultShower.fdQdx_v;

@@ -186,7 +186,7 @@ void dQdx2DModule::do_reconstruction(const ProtoShower & proto_shower,
 
       //  std::cout << "Tab " << std::endl;
 
-      for (int i = 0; i < HitDist_toStart.size() - 1; i++) {
+      for (unsigned int i = 0; i < HitDist_toStart.size() - 1; i++) {
 
 
         HitdeltaQdeltax_v[pl].push_back(
@@ -275,7 +275,7 @@ void dQdx2DModule::do_reconstruction(const ProtoShower & proto_shower,
   /// we are using the best value.
   if (_BestdQdx == 0) {
     std::vector< double> Len2;
-    for ( int L = 0; L < Len.size(); L++) {
+    for (unsigned int L = 0; L < Len.size(); L++) {
       if (Len.at(L) != *std::max_element(Len.begin(), Len.end()))
         Len2.push_back(Len.at(L));
     }
@@ -284,7 +284,7 @@ void dQdx2DModule::do_reconstruction(const ProtoShower & proto_shower,
 
   if (_BestdQdx_smooth == 0) {
     std::vector< double> Len2;
-    for ( int L = 0; L < Len.size(); L++) {
+    for (unsigned int L = 0; L < Len.size(); L++) {
       if (Len.at(L) != *std::max_element(Len.begin(), Len.end()))
         Len2.push_back(Len.at(L));
     }

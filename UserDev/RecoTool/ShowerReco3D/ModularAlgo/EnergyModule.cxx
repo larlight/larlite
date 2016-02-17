@@ -47,7 +47,7 @@ void EnergyModule::do_reconstruction(const ProtoShower & proto_shower,
   //_dEdx_v.clear();
   //_timetick_v.clear();
 
-  auto geom       = larutil::Geometry::GetME();
+  // auto geom       = larutil::Geometry::GetME();
   auto geomHelper = larutil::GeometryHelper::GetME();
 
   auto t2cm = geomHelper->TimeToCm();

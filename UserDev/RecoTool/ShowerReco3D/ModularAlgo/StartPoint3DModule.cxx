@@ -48,7 +48,7 @@ void StartPoint3DModule::do_reconstruction(const ProtoShower & proto_shower,
 
     for ( auto const c : clusters ) {
 
-        if (c.plane_id.Plane != worstPlane) {
+        if ((int) c.plane_id.Plane != worstPlane) {
             wireStarts.emplace_back( int(c.start_point.w / 0.3) ) ;
             planes.emplace_back( c.plane_id.Plane ) ;
             sX += c.start_point.t;
