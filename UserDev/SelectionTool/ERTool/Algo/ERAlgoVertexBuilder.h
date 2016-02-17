@@ -36,6 +36,7 @@ namespace ertool {
     Double_t const tmax_rad;
     Double_t const tlone_track_length;
     Bool_t const twithTrackDir;
+    std::string const tprimary_vertex_selection;    
     Bool_t const tverbose;
 
     TTree * tree;
@@ -51,13 +52,19 @@ namespace ertool {
     geoalgo::AABox volume;
     geoalgo::GeoAlgo const algo;
 
+    std::string const mostupstream = "mostupstream";
+    std::string const mostchildren = "mostchildren";
+    std::string const mostenergy = "mostenergy";
+    std::string const smallestsphere = "smallestsphere";
+
   public:
 
     /// Default constructor
     ERAlgoVertexBuilder(Double_t const start_prox,
 			Double_t const max_rad,
 			Double_t const lone_track_length,
-			Bool_t const withTrackDir = true,
+			Bool_t const withTrackDir = false,
+			std::string const primary_vertex_selection = "upstream",
 			const std::string& name="ERAlgoVertexBuilder");
 
     /// Default destructor
