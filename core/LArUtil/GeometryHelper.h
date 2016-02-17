@@ -365,11 +365,14 @@ public:
 
 
     /**
-     * @brief This function takes in a hit list and some parameters describing a box around that hit list,
+     * @brief This function takes in a hit list and some parameters describing a box
+     *        around that hit list,
      *        returns the hits inside the box
-     * @details The list of input hits is looped over to find hits inside of the box.  The box is defined to be of the
-     *          length "distanceAlongLine" and the width of "distancePerpToLine."  The axis of the box starts at startingHit
-     *          and continues for the length "distanceAlongLine" in the direction specified by "lineSlope"
+     * @details The list of input hits is looped over to find hits inside of the box.  
+     *          The box is defined to be of the length "distanceAlongLine" and the
+     *          width of "distancePerpToLine."  The axis of the box starts at startingHit
+     *          and continues for the length "distanceAlongLine" in the direction specified
+     *          by "lineSlope"
      *
      * @param inputHits The list of hits to loop over
      * @param startingHit The hit that defines the start of the box
@@ -421,8 +424,8 @@ public:
        angle in 3 dimensions.
      */
     int Get3DAxisN(const int& iplane0, const int& iplane1,
-		   const double& omega0, const double& omega1,
-		   double& phi, double& theta) const;
+                   const double& omega0, const double& omega1,
+                   double& phi, double& theta) const;
 
     /**
      * @brief return the conversion from time tick to centimeters

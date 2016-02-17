@@ -9,7 +9,8 @@ namespace showerreco {
 // a vector of all the protoshowers in the event.
 void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage,
     const std::string &pfpart_producer_name,
-    std::vector<ProtoShower> & proto_showers) {
+    std::vector<ProtoShower> & proto_showers,
+    std::vector<unsigned int> showerLikePFParts) {
 
   // Clear the current proto-shower container.
   proto_showers.clear();
@@ -27,7 +28,31 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
 
   // Now we have pfparticles, so start to build protoshowers
 
-  proto_showers.resize(ev_pfpart->size());
+  // In general, only build the ones with index specified by showerLikePFParts.
+  // If it's not specified, build them all.
+
+
+  if (showerLikePFParts.size() == 1) {
+
+    if (showerLikePFParts.at(0) == 999999) {
+
+
+      showerLikePFParts.resize(ev_pfpart -> size());
+      for (unsigned int i = 0; i < showerLikePFParts.size(); ++i)
+      {
+        showerLikePFParts.at(i) = i;
+      }
+    }
+
+  }
+
+  if (showerLikePFParts.size() == 0){
+    return;
+  }
+
+  proto_showers.resize(showerLikePFParts.size());
+
+
 
   // For each data product, fetch it and feed
   // it into the proto showers if possible
@@ -55,7 +80,9 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
       // We should have two to three sets of clusters per pfparticle
 
 
-      for (size_t i = 0; i < ass_cluster_v.size(); i ++) {
+      // use the indexes stored in showerLikePFParts to loop through the clusters
+      for (auto i : showerLikePFParts ) {
+        // for (size_t i = 0; i < ass_cluster_v.size(); i ++) {
 
         // If there are some, set the cluster2D bool to true
         // Else, set it to false
@@ -83,6 +110,7 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
     }
   }
 
+
   // Now the 2D clusters are finished.  Move on to the 3D clusters (spacepoints)
   //
   larlite::event_spacepoint * ev_sps = nullptr;
@@ -93,29 +121,28 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
 
   if ( ev_sps && ev_sps -> size() != 0) {
 
-    std::cout << "Number of sps associations: " << ass_sps_v.size() << std::endl;
 
     // This is simpler than 2D clusters since there should be just one set
     // per pfparticle, and we don't have to get another data product.
-    size_t index = 0;
-    for (auto & sps_v : ass_sps_v) {
+
+    for (auto i : showerLikePFParts ) {
+      // for (auto & sps_v : ass_sps_v) {
+      auto & sps_v = ass_sps_v.at(i);
       if (sps_v.size() != 0) {
-        std::cout << "Number of spacepoints: " << sps_v.size() << std::endl;
         /// Generate: from 1 set of sps => 1 Params3D using indexes (association)
         _cru3D_helper.GenerateParams3D(sps_v,
                                        ev_sps,
-                                       proto_showers.at(index)._params3D);
-        // std::cout << "proto_showers.at(index)._params3D.point_vector.size() "
-        // << proto_showers.at(index)._params3D.point_vector.size()
+                                       proto_showers.at(i)._params3D);
+        // std::cout << "proto_showers.at(i)._params3D.point_vector.size() "
+        // << proto_showers.at(i)._params3D.point_vector.size()
         // << std::endl;
         // Now, fill the params:
-        _params3D_alg.FillParams(proto_showers.at(index)._params3D);
-        proto_showers.at(index)._hasCluster3D = true;
+        _params3D_alg.FillParams(proto_showers.at(i)._params3D);
+        proto_showers.at(i)._hasCluster3D = true;
       }
       else {
-        proto_showers.at(index)._hasCluster3D = false;
+        proto_showers.at(i)._hasCluster3D = false;
       }
-      index ++;
     }
   }
   else {
@@ -135,29 +162,27 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
 
   if ( ev_vertex && ev_vertex -> size() != 0) {
 
-    std::cout << "Number of vertex associations: " << ass_vertex_v.size() << std::endl;
 
     // This is simpler than 2D clusters since there should be just one set
     // per pfparticle, and we don't have to get another data product.
-    size_t index = 0;
-    for (auto & vertex_v : ass_vertex_v) {
+    for (auto i : showerLikePFParts ) {
+      // for (auto & vertex_v : ass_vertex_v) {
+      auto & vertex_v = ass_vertex_v.at(i);
       if (vertex_v.size() != 0) {
-        std::cout << "Number of vertexes: " << vertex_v.size() << std::endl;
-        for (auto index : vertex_v){
+        for (auto index : vertex_v) {
           double xyz[3];
           ev_vertex -> at(index).XYZ(xyz);
-          proto_showers.at(index)._vertexes.push_back(TVector3(xyz[0],xyz[1],xyz[2]));
+          proto_showers.at(index)._vertexes.push_back(TVector3(xyz[0], xyz[1], xyz[2]));
         }
-        proto_showers.at(index)._hasVertex = true;
+        proto_showers.at(i)._hasVertex = true;
       }
       else {
-        proto_showers.at(index)._hasVertex = false;
+        proto_showers.at(i)._hasVertex = false;
       }
-      index ++;
     }
   }
   else {
-    // if there are no spacepoints, set the bool false:
+    // if there are no vertexes, set the bool false:
     for (auto & ps : proto_showers) {
       ps._hasVertex = false;
     }
@@ -166,7 +191,7 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
   // Do the seeds:
   // \TODO
   /*  _____ ___  ____   ___
-     |_   _/ _ \|  _ \ / _ \ 
+     |_   _/ _ \|  _ \ / _ \
        | || | | | | | | | | |
        | || |_| | |_| | |_| |
        |_| \___/|____/ \___/

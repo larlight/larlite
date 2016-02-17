@@ -29,7 +29,8 @@ for shower in protoShowerVec:
   print "This shower has {N} params associated.".format(N=shower.params().size())
   print "shower.hasCluster2D(): ", shower.hasCluster2D()
   print "shower.hasCluster3D(): ", shower.hasCluster3D()
+  print "shower.hasVertex(): ", shower.hasVertex()
   shower.params3D().Report()
-  # for params in shower.params():
-    # params.Report()
+  for vertex in shower.vertexes():
+    print "vertex is ({x},{y},{z})".format(x=vertex.X(), y=vertex.Y(), z=vertex.Z())
     # print "\n\n\n"

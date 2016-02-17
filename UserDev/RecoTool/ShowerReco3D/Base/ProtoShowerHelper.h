@@ -51,7 +51,8 @@ public:
   // a vector of all the protoshowers in the event.
   void GenerateProtoShowers(::larlite::storage_manager* storage,
                             const std::string &pfpart_producer_name,
-                            std::vector< ::showerreco::ProtoShower > & proto_showers);
+                            std::vector<::showerreco::ProtoShower> & proto_showers,
+                            std::vector<unsigned int> showerLikePFParts=std::vector<unsigned int>(1,999999));
 
 private:
 

@@ -56,6 +56,18 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     return false;
   }
 
+  // This item holds the list of PFParticles tagged as showers (11)
+  // We only run reco on particles tagged that way.
+
+  std::vector<unsigned int> showerLikePFParts;
+
+  unsigned int index = 0;
+  for (auto & part : *ev_pfpart) {
+    if (part.PdgCode() == 11) {
+      showerLikePFParts.push_back(index);
+    }
+  }
+
 
   // retrieve clusters associated with this pfpart
   // Cluster are retrieved for saving the associations at the end.
@@ -113,31 +125,16 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   _ps_helper.GenerateProtoShowers( storage,
                                    fInputProducer,
-                                   proto_showers);
-
-  /*  _____ ___  ____   ___
-     |_   _/ _ \|  _ \ / _ \ 
-       | || | | | | | | | | |
-       | || |_| | |_| | |_| |
-       |_| \___/|____/ \___/
-
-  We need a way to control and manage the flow of pfparticles into shower reco
-  There is no reason to run them all through, and in fact proto_shower_helper shouldn't
-  even make protoshowers for them.
-
-  Right now I've left this unimplemented.  A possible scheme is to cut on pfpart PdgCode,
-  or make some other selection that is fed into protoshowers.  We need to construct a list 
-  of indexes of pfpart that are used to handle the associations later.
-
-  Actually after writing that note that's totally the way to go.  
-  I'll do it after the rest of the framework change is done.
-  */
-
+                                   proto_showers,
+                                   showerLikePFParts);
 
   // Result shower holder
   std::vector< ::showerreco::Shower_t> res_shower_v;
 
+  std::cout << "proto_showers.size() " << proto_showers.size() << std::endl;
+  std::cout << "showerLikePFParts.size() " << showerLikePFParts.size() << std::endl;
 
+  fManager.SetProtoShowers(proto_showers);
 
 
   fManager.Reconstruct(res_shower_v);
@@ -205,14 +202,21 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
     shower_v->push_back(s);
 
-    shower_cluster_v.push_back(ass_cluster_v[i]);
-    shower_vertex_v.push_back(ass_vertex_v[i]);
-    shower_sps_v.push_back(ass_sps_v[i]);
+    std::cout << "ass_cluster_v.size() " << ass_cluster_v.size()
+              << " showerLikePFParts[i] " << showerLikePFParts[i]
+              << std::endl;
 
-    std::vector<unsigned int> pfpart_ass = { (unsigned int) i };
+
+    shower_cluster_v.push_back(ass_cluster_v[showerLikePFParts[i]]);
+    shower_vertex_v.push_back(ass_vertex_v[showerLikePFParts[i]]);
+    shower_sps_v.push_back(ass_sps_v[showerLikePFParts[i]]);
+
+    std::vector<unsigned int> pfpart_ass = { (unsigned int) showerLikePFParts[i] };
     shower_pfpart_v.push_back( pfpart_ass);
 
   }// for all input cluster-paris
+
+  std::cout << "shower_v -> size() is " << shower_v -> size() << std::endl;
 
   if (shower_v->size() == 0)
     return true;

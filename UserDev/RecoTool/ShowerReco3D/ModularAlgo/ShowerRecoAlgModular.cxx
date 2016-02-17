@@ -43,7 +43,13 @@ Shower_t ShowerRecoAlgModular::RecoOneShower(const ProtoShower& proto_shower) {
 
   for (size_t n = 0; n < _modules.size(); n++) {
     _watch.Start();
-    _modules[n] -> do_reconstruction(proto_shower, result);
+    try{
+      _modules[n] -> do_reconstruction(proto_shower, result);
+    }
+    catch(ShowerRecoException e){
+      result.fPassedReconstruction = false;
+      return result;
+    }
     _module_time_v[n] += _watch.RealTime();
     _module_ctr_v[n] += 1;
     if (_debug) {
@@ -52,6 +58,9 @@ Shower_t ShowerRecoAlgModular::RecoOneShower(const ProtoShower& proto_shower) {
     }
 
   }
+
+  // If things are this far, then set the flag to true for passing reco
+  result.fPassedReconstruction = true;
 
   return result;
 }
