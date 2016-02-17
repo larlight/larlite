@@ -138,9 +138,9 @@ try:
             self._productName = 'mcshower3D'
             self._process = evd.DrawMCShower3D()
             self.init()
-            self.electronColor = [0,255,0,255]
-            self.photonColor   = [255,0,0,255]
-            self.unknownColor  = [255,255,0,255]
+            self.electronColor = [0.1,   0.5, 1.0 , 1.0]
+            self.photonColor   = [1.0, 0,   0,   1.0]
+            self.unknownColor  = [0.75, 0.75, 0,   1.0]
 
         # def clearDrawnObjects(self,view_manager):
         #   pass
@@ -158,9 +158,9 @@ try:
             for i in xrange(len(showers)):
                 shower = showers[i]
 
-                if shower.pdg() == 11:
+                if abs(shower.pdg()) == 11:
                     color = self.electronColor
-                if shower.pdg() == 22:
+                elif shower.pdg() == 22:
                     color = self.photonColor
                 else:
                     color = self.unknownColor
