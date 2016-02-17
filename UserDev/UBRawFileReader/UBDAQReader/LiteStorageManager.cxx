@@ -66,8 +66,9 @@ namespace ubdaq {
 
   void LiteStorageManager::Initialize()
   {
-    if(_current_input_index>=0)
-      throw std::exception();
+
+ //   if(_current_input_index>=0)
+ //     throw std::exception();
     if(_input_v.empty()) 
       throw std::exception();
 
@@ -78,7 +79,7 @@ namespace ubdaq {
     //   if(!_mgr.is_open()) throw std::exception();
     // }
     LoadUBChannelMap(fChannelMap,fChannelReverseMap);
-    
+
     _current_input_index = 0;
     _eof = true;
     _event_ctr = 0;
@@ -146,6 +147,7 @@ namespace ubdaq {
     }
 
     //try{
+
     ::boost::archive::binary_iarchive ia(*_is);
     ub_EventRecord  eventRecord;
     ia >> eventRecord;
