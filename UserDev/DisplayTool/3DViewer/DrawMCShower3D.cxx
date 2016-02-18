@@ -54,7 +54,9 @@ bool DrawMCShower3D::analyze(larlite::storage_manager* storage) {
 
   // Populate the track vector:
   for (auto & mcshower : *mcshowerHandle) {
-    _data.push_back(getMCShower3D(mcshower));
+    if (mcshower.DetProfile().E() > 0){
+      _data.push_back(getMCShower3D(mcshower));
+    }
   }
 
   return true;
@@ -82,12 +84,12 @@ DrawMCShower3D::~DrawMCShower3D() {}
 MCShower3D DrawMCShower3D::getMCShower3D(larlite::mcshower mcshower) {
   MCShower3D result;
 
-  result._start_point = mcshower.Start().Position().Vect();
-  result._direction = mcshower.StartDir();
+  result._start_point = mcshower.DetProfile().Position().Vect();
+  result._direction = mcshower.DetProfile().Momentum().Vect();
   result._pdg = mcshower.PdgCode();
-  float energy = mcshower.Start().E();
+  float energy = mcshower.DetProfile().E();
   result._length = 13.8874 + 0.121734 * energy - (3.75571e-05) * energy * energy;;
-  result._opening_angle = 15 * atan(10.1 / energy);
+  result._opening_angle = atan(10.1 / result._length);
 
   return result;
 

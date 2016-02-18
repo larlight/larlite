@@ -1,0 +1,36 @@
+
+EmuDriver: {
+    MCTrackProducer:  mcreco
+    MCShowerProducer: fakeshower
+    TrackEmulator:    TrackEmuToy
+    ShowerEmulator:   ShowerEmuSmearingParametrized
+    DisableXShift:  0
+
+    TrackEmuToy:  {}
+
+ShowerEmuSmearingParametrized: {
+
+EResFunc: "TMath::Gaus(x,[0],[1],1)"
+EResParams: [0,0.2]
+EResMin: -1
+EResMax: 1
+
+AngleResFunc: "TMath::Landau(x,[0],[1],1)"
+AngleResParams: [5,5]
+AngleResMin: 0
+AngleResMax: 180
+
+PosResFunc: "TMath::Gaus(x,[0],[1],1)"
+PosResParams: [0,0.3]
+PosResMin: -3
+PosResMax: 3
+
+dEdxResFunc: "TMath::Gaus(x,[0],[1],1)"
+dEdxResParams: [0,1]
+dEdxResMin: -10
+dEdxResMax: 10
+
+}
+
+
+}
