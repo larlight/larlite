@@ -369,7 +369,7 @@ namespace ertool {
     if ( (IP < _maxIP)                             // good correlation
 	 && (IPthatStart > _vtxToTrkStartDist)     // vertex far enough away from track start
 	 && (IPtrkBody < _vtxToTrkDist)            // vertex close to track body
-	 && (_IPthisStart < _vtxToShrStartDist) )   // vertex not unreasonably far from shower start
+	 && (IPthisStart < _vtxToShrStartDist) )   // vertex not unreasonably far from shower start
       {
 	// our shower comes from t -> not interested
 	return true;

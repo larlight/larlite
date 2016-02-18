@@ -1,0 +1,14 @@
+
+EmuDriver: {
+    MCTrackProducer:  mcreco
+    MCShowerProducer: mcreco
+    DisableXShift:    0
+    TrackEmulator:    TrackEmuTrackFlip
+    ShowerEmulator:   ShowerEmuToy
+
+    TrackEmuTrackFlip:  {
+        FlipProbability: 0.10
+    }
+    
+    ShowerEmuToy: {}
+}

@@ -53,10 +53,11 @@ bool DrawUbDaq::initialize() {
 }
 
 void DrawUbDaq::setInput(std::string s) {
+
   // if the file isn't new, do nothing:
   if (s == _input_file) return;
   // check to see if this file exists.
-  std::cout << "Attempting to open file " << s << std::endl;
+
   std::ifstream ifile(s);
   if (!fileExists(s)) {
     std::cerr << "ERROR: Input file failed to open.\n";
@@ -68,6 +69,7 @@ void DrawUbDaq::setInput(std::string s) {
     _current_event = 0;
     _storage.Reset();
     _storage.AddInputFile(s);
+
     _storage.Initialize();
 
     // _n_events  = _storage.entries();
@@ -79,6 +81,7 @@ void DrawUbDaq::setInput(std::string s) {
     }
     // readData();
   }
+
 }
 
 
@@ -149,6 +152,8 @@ void DrawUbDaq::readData(bool skipDataFetch) {
   // This is an event viewer.  In particular, this handles raw wire signal drawing.
   // So, obviously, first thing to do is to get the wires.
   const larlite::event_rawdigit & RawDigitHandle = _storage.RawDigit();
+
+
 
     
   _run = _storage.run();

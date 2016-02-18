@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include "ShowerReco3D/Base/ShowerRecoTypes.h"
+#include "ShowerReco3D/Base/ShowerRecoException.h"
 #include "TTree.h"
 
 /**

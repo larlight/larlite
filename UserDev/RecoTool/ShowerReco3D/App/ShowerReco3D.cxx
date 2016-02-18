@@ -52,9 +52,28 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
                   storage->event_id());
 
   if (!ev_pfpart or (ev_pfpart->size() == 0) ) {
-    print(msg::kERROR, __FUNCTION__, Form("PFPart producer %s product not found!", fInputProducer.c_str()));
+    print(msg::kERROR, __FUNCTION__,
+          Form("PFPart producer %s product not found!",
+               fInputProducer.c_str()));
     return false;
   }
+
+  // This item holds the list of PFParticles tagged as showers (11)
+  // We only run reco on particles tagged that way.
+
+  std::vector<unsigned int> showerLikePFParts;
+
+  unsigned int index = 0;
+  for (auto & part : *ev_pfpart) {
+    if (part.PdgCode() == 11) {
+      showerLikePFParts.push_back(index);
+    }
+    index ++;
+  }
+
+  // std::cout << "This event has " << showerLikePFParts.size()
+  //           << " particles of " << ev_pfpart->size()
+  //           <<  "tagged as showers." << std::endl;
 
 
   // retrieve clusters associated with this pfpart
@@ -66,7 +85,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   // if associated clusters not found -> quit and exit
   if ( !ev_cluster or (ev_cluster->size() == 0) ) {
-    print(msg::kERROR, __FUNCTION__, Form("No clusters found associated to PFPart w/ producer %s", fInputProducer.c_str()));
+    print(msg::kERROR, __FUNCTION__,
+          Form("No clusters found associated to PFPart w/ producer %s",
+               fInputProducer.c_str()));
     // return false;
   }
   else {
@@ -83,7 +104,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   // if associated clusters not found -> quit and exit
   if ( !ev_vertex or (ev_vertex->size() == 0) ) {
-    print(msg::kERROR, __FUNCTION__, Form("No vertexs found associated to PFPart w/ producer %s", fInputProducer.c_str()));
+    print(msg::kERROR, __FUNCTION__,
+          Form("No vertexes found associated to PFPart w/ producer %s",
+               fInputProducer.c_str()));
     // return false;
   }
   else {
@@ -99,7 +122,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   // if associated clusters not found -> quit and exit
   if ( !ev_sps or (ev_sps->size() == 0) ) {
-    print(msg::kERROR, __FUNCTION__, Form("No spacepoints found associated to PFPart w/ producer %s", fInputProducer.c_str()));
+    print(msg::kERROR, __FUNCTION__,
+          Form("No spacepoints found associated to PFPart w/ producer %s",
+               fInputProducer.c_str()));
     // return false;
   }
   else {
@@ -111,33 +136,38 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   std::vector<showerreco::ProtoShower> proto_showers;
 
+
   _ps_helper.GenerateProtoShowers( storage,
                                    fInputProducer,
-                                   proto_showers);
+                                   proto_showers,
+                                   showerLikePFParts);
 
-  /*  _____ ___  ____   ___
-     |_   _/ _ \|  _ \ / _ \ 
-       | || | | | | | | | | |
-       | || |_| | |_| | |_| |
-       |_| \___/|____/ \___/
 
-  We need a way to control and manage the flow of pfparticles into shower reco
-  There is no reason to run them all through, and in fact proto_shower_helper shouldn't
-  even make protoshowers for them.
 
-  Right now I've left this unimplemented.  A possible scheme is to cut on pfpart PdgCode,
-  or make some other selection that is fed into protoshowers.  We need to construct a list 
-  of indexes of pfpart that are used to handle the associations later.
-
-  Actually after writing that note that's totally the way to go.  
-  I'll do it after the rest of the framework change is done.
-  */
+  // // Let's do a little debugging:
+  // std::cout << "In this event ( " << storage -> event_id() << "), there are "
+  //           << ev_pfpart -> size() << " pfparticles.\n"
+  //           << "\tOf the pfparticles, the following are tagged as showers:\n\t";
+  // for (auto i : showerLikePFParts) {
+  //   std::cout << i << " ";
+  // }
+  // std::cout << "\n\tFor the shower-like pfparticles, we have:\n";
+  // size_t debug_index = 0;
+  // for (auto i : showerLikePFParts) {
+  //   std::cout << "\tOn particle " << i << ": \n"
+  //             << "\tHas cluster2D: " << proto_showers.at(debug_index).hasCluster2D() << "\n"
+  //             << "\t\tcluster2D.size(): " << proto_showers.at(debug_index).params().size() << "\n"
+  //             << "\tHas cluster3D: " << proto_showers.at(debug_index).hasCluster3D() << "\n"
+  //             << "\tHas vertexes: " << proto_showers.at(debug_index).hasVertex() << "\n"
+  //             << "\t\tvertexes.size(): " << proto_showers.at(debug_index).vertexes().size() << "\n";
+  //   debug_index ++;
+  // }
 
 
   // Result shower holder
   std::vector< ::showerreco::Shower_t> res_shower_v;
 
-
+  fManager.SetProtoShowers(proto_showers);
 
 
   fManager.Reconstruct(res_shower_v);
@@ -205,14 +235,21 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
     shower_v->push_back(s);
 
-    shower_cluster_v.push_back(ass_cluster_v[i]);
-    shower_vertex_v.push_back(ass_vertex_v[i]);
-    shower_sps_v.push_back(ass_sps_v[i]);
+    // std::cout << "ass_cluster_v.size() " << ass_cluster_v.size()
+    //           << " showerLikePFParts[i] " << showerLikePFParts[i]
+    //           << std::endl;
 
-    std::vector<unsigned int> pfpart_ass = { (unsigned int) i };
+
+    shower_cluster_v.push_back(ass_cluster_v[showerLikePFParts[i]]);
+    shower_vertex_v.push_back(ass_vertex_v[showerLikePFParts[i]]);
+    shower_sps_v.push_back(ass_sps_v[showerLikePFParts[i]]);
+
+    std::vector<unsigned int> pfpart_ass = { (unsigned int) showerLikePFParts[i] };
     shower_pfpart_v.push_back( pfpart_ass);
 
   }// for all input cluster-paris
+
+  // std::cout << "shower_v -> size() is " << shower_v -> size() << std::endl;
 
   if (shower_v->size() == 0)
     return true;
@@ -241,6 +278,8 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
                                           ev_pfpart->name()),
                                       shower_pfpart_v);
   }
+
+  // std::cout << "Finished the event!" << std::endl;
   return true;
 }
 

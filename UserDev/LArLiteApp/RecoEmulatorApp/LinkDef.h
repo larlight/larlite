@@ -10,5 +10,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class larlite::EmuDriver+;
+#pragma link C++ class larlite::MakeFakeShowers+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+

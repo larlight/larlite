@@ -132,6 +132,7 @@ namespace fcllite {
       kParamDef,
       kBlockStart,
       kBlockEnd,
+      kString,
       kNone
     };
 

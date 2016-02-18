@@ -58,7 +58,18 @@ class larlite_manager_base(manager, QtCore.QObject):
         # Loop over the keys (list of trees)
         for key in f.GetListOfKeys():
             # keys are dataproduct_producer_tree
+            # Make sure the ttrees being looked at are larlite trees
+            if "_" not in key.GetName():
+                # For now, just skip anything that doesn't have "_"
+                continue
+
             thisKeyList = key.GetName().split('_')
+
+            # # ALso skip things that aren't broken into 3 pieces:
+            # if len(thisKeyList) is not 3:
+            #     continue
+
+
             # gets three items in thisKeyList, which is a list
             # [dataProduct, producer, 'tree'] (don't care about 'tree')
             # check if the data product is in the dict:

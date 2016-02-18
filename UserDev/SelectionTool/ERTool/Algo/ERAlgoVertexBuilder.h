@@ -34,24 +34,37 @@ namespace ertool {
 
     Double_t const tstart_prox;
     Double_t const tmax_rad;
+    Double_t const tlone_track_length;
     Bool_t const twithTrackDir;
+    std::string const tprimary_vertex_selection;    
     Bool_t const tverbose;
 
     TTree * tree;
 
     Int_t event_id;
     Int_t association_number;
+    Int_t found_vertices;
     Int_t loop_counter;
+    Int_t lone_track_counter;
+    Int_t vertices_lonetracks;
+    Double_t radius;
 
     geoalgo::AABox volume;
     geoalgo::GeoAlgo const algo;
-  
+
+    std::string const mostupstream = "mostupstream";
+    std::string const mostchildren = "mostchildren";
+    std::string const mostenergy = "mostenergy";
+    std::string const smallestsphere = "smallestsphere";
+
   public:
 
     /// Default constructor
     ERAlgoVertexBuilder(Double_t const start_prox,
 			Double_t const max_rad,
-			Bool_t const withTrackDir = true,
+			Double_t const lone_track_length,
+			Bool_t const withTrackDir = false,
+			std::string const primary_vertex_selection = "upstream",
 			const std::string& name="ERAlgoVertexBuilder");
 
     /// Default destructor
@@ -75,6 +88,39 @@ namespace ertool {
     friend ParticleGraphSetter;
 
     void EndReconstruct(ParticleGraph const & graph);
+
+    geoalgo::Point_t const * GetUpstreamPrimary
+      (ParticleAssociations const & pas, 
+       std::vector<Int_t> const & skip,
+       Int_t & index);
+
+    geoalgo::Point_t const * GetMostChildrenPrimary
+      (ParticleAssociations const & pas, 
+       std::vector<Int_t> const & skip,
+       Int_t & index);
+
+    geoalgo::Point_t const * GetSmallestSpherePrimary
+      (ParticleAssociations const & pas, 
+       std::vector<Int_t> const & skip,
+       Int_t & index);
+
+    geoalgo::Point_t const * GetMostEnergyPrimary
+      (EventData const & data,
+       ParticleGraph const & graph,
+       ParticleAssociations const & pas, 
+       std::vector<Int_t> const & skip,
+       Int_t & index);
+    
+    void AddAllLoneTracks
+      (const EventData &data,
+       ParticleGraph & graph,
+       ParticleAssociations const & pas);
+
+    void AddUpstreamLoneTrack
+      (const EventData &data,
+       ParticleGraph & graph,
+       ParticleAssociations const & pas); 
+    
     void EndReconstructPa(const EventData &data,
 			  ParticleGraph & graph,
 			  ParticleAssociations const & pa);

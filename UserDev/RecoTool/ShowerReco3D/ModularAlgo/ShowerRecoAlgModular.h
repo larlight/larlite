@@ -41,7 +41,8 @@ public:
 
 
     /// Function to reset algorithm, to be called @ beginning of each event
-    void Reset() { ShowerRecoAlgBase::Reset(); }
+    //void Reset() { ShowerRecoAlgBase::Reset(); }
+    void Reset() {}
 
 
     /// Function to reconstruct a shower

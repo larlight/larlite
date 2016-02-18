@@ -42,7 +42,6 @@ class shower(recoBase):
 
         # Showers can get messed up so only draw "good" showers
         # This means that if either projection is bad, don't draw that shower
-        print ""
 
         for view in view_manager.getViewPorts():
             # get the showers from the process:

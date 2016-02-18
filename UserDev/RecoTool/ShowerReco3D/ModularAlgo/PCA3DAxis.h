@@ -1,9 +1,9 @@
 /**
- * \file AxisFromTracks.h
+ * \file PCA3DAxis.h
  *
  * \ingroup ModularAlgo
  *
- * \brief Class def header for a class AxisFromTracks
+ * \brief Class def header for a class PCA3DAxis
  *
  * @author cadams
  */
@@ -11,8 +11,8 @@
 /** \addtogroup ModularAlgo
 
     @{*/
-#ifndef AXISFROMTRACKS_H
-#define AXISFROMTRACKS_H
+#ifndef PCA3DMODULE_H
+#define PCA3DMODULE_H
 
 #include <iostream>
 #include "ShowerRecoModuleBase.h"
@@ -23,15 +23,15 @@
  */
 namespace showerreco {
 
-class AxisFromTracks : ShowerRecoModuleBase {
+class PCA3DAxis : ShowerRecoModuleBase {
 
 public:
 
   /// Default constructor
-  AxisFromTracks() {_name = "AxisFromTracks";}
+  PCA3DAxis() {_name = "PCA3DAxis";}
 
   /// Default destructor
-  ~AxisFromTracks() {}
+  ~PCA3DAxis() {}
 
 
   void do_reconstruction(const ProtoShower &, Shower_t &);

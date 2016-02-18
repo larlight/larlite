@@ -45,19 +45,19 @@ namespace larlite {
 			::ertool::NodeID_t nodeID;
 
 			// If energy is above threshold, create ertool::Shower (also mcshower startdir must not be (0,0,0))
-			if (mcs.DetProfile().Momentum().E() >= _minEDep && mcs.StartDir().Mag2() ) {
+			//if (mcs.DetProfile().Momentum().E() >= _minEDep && mcs.StartDir().Mag2() ) {
+			if (_hutil->isViable(mcs) ){
 				::ertool::Shower s( (mcs.DetProfile().Position()),
 				                    mcs.StartDir(),//mcs.DetProfile().Momentum(),
 				                    _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
 				                    _shrProfiler.ShowerRadius() );
 				// Fill more info
 				s._energy     = mcs.DetProfile().Momentum().E();
-				if ( (mcs.dEdx() == 0) ||  (mcs.dEdx() > 100) )
-				{s._dedx = (mcs.PdgCode() == 22 ? gRandom->Gaus(4, 4 * 0.03) : gRandom->Gaus(2, 2 * 0.03));}
-				else {s._dedx =  mcs.dEdx();}
+				s._dedx = _hutil->getMCShowerdEdX(mcs);
+				
 				//s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.03) : gRandom->Gaus(2,2*0.03));
 				s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
-
+				s._time = mcs.DetProfile().T();
 				::ertool::RecoInputID_t in_id(i, mcs_v.name());
 
 				// Emplace this shower, and get corresponding particle unique ID
@@ -132,6 +132,7 @@ namespace larlite {
 				for (auto& v : t._pid_score) v = 100;
 				if (t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
 
+				t._time = mct.at(0).T();
 				::ertool::RecoInputID_t in_id(i, mct_v.name());
 
 				// Emplace a track to EventData
@@ -502,7 +503,7 @@ namespace larlite {
 
 			::ertool::Track t;
 			t.reserve(mct.size());
-			TLorentzVector shift = getXShift(mct);
+			TLorentzVector shift = _hutil->getXShift(mct);
 			Size_t const mct_size = mct.size();
 			std::vector<double> const & mct_dedx = mct.dEdx();
 			std::vector<double> & ert_dedx = t._dedx;
@@ -534,6 +535,8 @@ namespace larlite {
 			for (auto& v : t._pid_score) v = 100;
 			if (t._pid < t._pid_score.size()) t._pid_score[t._pid] = 0.1;
 
+			// std::cout << "ERToolHelper created ERToolTrack from MCTRACK. Here's the info:" << std::endl;
+			// t.PrintInfo();
 			strm.Emplace(std::move(t), std::move(ertool::RecoInputID_t(i, mct_v.name())), false);
 			//strm.Add(t,ertool::RecoInputID_t(i,mct_v.name()),false);
 			/*
@@ -568,6 +571,14 @@ namespace larlite {
 			t._cosmogenic = -1;
 			t._energy     = trk.MomentumAtPoint(0);
 
+			/// If reco track has ID set to specific things, fill ertool track PID
+			if (abs(trk.ID()) == 13 ) t._pid = ::ertool::Track::kMuon;
+			if (trk.ID() == 2212    ) t._pid = ::ertool::Track::kProton;
+			if (abs(trk.ID()) == 321) t._pid = ::ertool::Track::kKaon;
+			if (abs(trk.ID()) == 211) t._pid = ::ertool::Track::kPion;
+
+			// std::cout << "ERToolHelper created ERToolTrack from RECOTRACK. Here's the info:" << std::endl;
+			// t.PrintInfo();
 		}
 
 		event_cosmictag* ctag_trk_v = nullptr;
@@ -621,6 +632,7 @@ namespace larlite {
 	void ERToolHelper::FillShowers ( const event_mcshower& mcs_v,
 	                                 ::ertool::io::EmptyInput& strm) const
 	{
+		// std::cout<<"START OF ERTOOLHELEPR FILLSHOWERS FOR MCSHOWERS"<<std::endl;
 		strm.ReserveShowerArray(mcs_v.size());
 		double create_time = 0;
 		double emplace_time = 0;
@@ -630,12 +642,11 @@ namespace larlite {
 		for (size_t i = 0; i < mcs_v.size(); ++i) {
 
 			auto const& mcs = mcs_v[i];
-			if (mcs.DetProfile().Momentum().E() < _minEDep || !mcs.StartDir().Mag2()) continue;
-			//if(isnan(mcs.DetProfile().Momentum().E())) continue;
-			//if(isnan(mcs.DetProfile().Momentum().Px())) continue;
-			//if(mcs.DetProfile().Momentum().Mag2() == 0) continue;
+			if(!_hutil->isViable(mcs)) continue;
+			// if (mcs.DetProfile().Momentum().E() < _minEDep || !mcs.StartDir().Mag2()) continue;
+			
 			fWatch.Start();
-			::ertool::Shower s( (mcs.DetProfile().Position() + getXShift(mcs_v[i])),
+			::ertool::Shower s( (mcs.DetProfile().Position() + _hutil->getXShift(mcs_v[i])),
 			                    mcs.StartDir(),//mcs.DetProfile().Momentum(),
 			                    _shrProfiler.Length( mcs.DetProfile().Momentum().E()),
 			                    _shrProfiler.ShowerRadius() );
@@ -643,17 +654,13 @@ namespace larlite {
 			s._energy     = mcs.DetProfile().Momentum().E();
 			//s._energy = mcs.Start().Momentum().E();
 			fWatch.Start();
-			
+
 			// Gammas that compton-scatter have artificially low dEdx.
 			// If this is the case, do an artificial draw from a gaussian
 			// This is simply fixing an artifact of MCShower and is therefore
 			// legitimate to expect to not have this problem in real reconstruction.
-			if ( (mcs.dEdx() < 0.5) ||  (mcs.dEdx() > 100) )
-			  {s._dedx = (mcs.PdgCode() == 22 ? gRandom->Gaus(4, 4 * 0.03) : gRandom->Gaus(2, 2 * 0.03));}
-			else {s._dedx =  mcs.dEdx();}
-			
-			//s._dedx = (mcs.PdgCode() == 22 ? 4 : 2);
-			//s._dedx       = (mcs.PdgCode() == 22 ? gRandom->Gaus(4,4*0.05) : gRandom->Gaus(2,2*0.05));
+			s._dedx = _hutil->getMCShowerdEdX(mcs);
+		
 			random_time += fWatch.RealTime();
 			s._cosmogenic = (double)(mcs.Origin() == simb::kCosmicRay);
 			s._time = mcs_v[i].Start().T();
@@ -670,6 +677,8 @@ namespace larlite {
 								      mcs.Start().Position(),
 								      ::geoalgo::Vector(mcs.Start().Momentum()));
 			*/
+			// std::cout << "ERToolHelper created ERToolShower from MCSHOWER. Here's the info:" << std::endl;
+			// s.PrintInfo();
 		}
 		/*
 		std::cout<<"Create  time: "<<create_time<<std::endl;
@@ -712,6 +721,7 @@ namespace larlite {
 	                               storage_manager& storage,
 	                               ::ertool::io::EmptyInput& strm ) const
 	{
+		// std::cout<<"START OF ERTOOLHELEPR FILLSHOWERS FOR RECOSHOWERS"<<std::endl;
 
 		// Fill shower
 		std::vector< ::ertool::Shower> s_v;
@@ -727,16 +737,19 @@ namespace larlite {
 			                                   mylength,//shw.Length(),
 			                                   _shrProfiler.ShowerRadius()) );
 			auto& s = (*s_v.rbegin());
-			if ( (shw.best_plane() > 0) && (shw.best_plane() <= 2) ) {
+			if ( (shw.best_plane() >= 0) && (shw.best_plane() <= 2) ) {
 				s._energy = shw.Energy_v()[shw.best_plane()];
 				s._dedx   = shw.dEdx_v()[shw.best_plane()];
 			} else {
-				// default to collection plane
-				s._energy = shw.Energy_v()[2];
-				s._dedx   = shw.dEdx_v()[2];
+				// default
+				s._energy = shw.Energy();
+				s._dedx =  shw.dEdx();
 			}
 			// by default. Add cosmic score for showers to edit
 			s._cosmogenic = -1;
+
+			// std::cout << "ERToolHelper created ERToolShower from RECOSHOWER. Here's the info:" << std::endl;
+			// s.PrintInfo();
 		}
 
 		event_cosmictag* ctag_shw_v = nullptr;
@@ -763,8 +776,8 @@ namespace larlite {
 		return;
 	}
 
-	void ERToolHelper::FillFlashes ( const event_opflash& flash_v,
-	                                 ::ertool::io::EmptyInput& strm) const
+	void ERToolHelper::FillFlashes ( const event_opflash & flash_v,
+	                                 ::ertool::io::EmptyInput & strm) const
 	{
 		for (size_t flash_index = 0; flash_index < flash_v.size(); ++flash_index) {
 
@@ -789,69 +802,6 @@ namespace larlite {
 		}
 	}
 
-	TLorentzVector ERToolHelper::getXShift(const mctrack& mct) const {
-
-		// Calculates for each mc track, based on the time of the event, the corresponding shift in x-direction
-		TLorentzVector shift;
-
-		//Check if track as no energy deposition points in the detector, return 0 or something if so
-		if (!mct.size()) {
-			//Beware: this block is satisfied a LOT for cosmics events.
-			//Any cosmic that doesn't go through the detector has a Start() and End() point, but has zero size.
-			//Hopefully setting the xshift as zero means we won't shift the cosmic INTO the detector,
-			//So this should be fine.
-			shift.SetXYZT(0., 0., 0., 0.);
-			return shift;
-		}
-
-		// double event_time = mct.End().T();
-		///Use first energy deposition point in the detector, because for cosmics,
-		///Start().T() is way in the upper atmosphere, End().T() is at bottom of world volume
-		double event_time = mct.at(0).T();
-		double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
-		shift.SetXYZT(shift_x, 0., 0., 0.);
-		if ( _disable_xshift )
-			shift.SetXYZT(0., 0., 0., 0.);
-
-		return shift;
-	}
-
-	TLorentzVector ERToolHelper::getXShift(const mcshower& mcs) const {
-		// Calculates for each mc shower, based on the time of the event, the corresponding shift in x-direction
-		TLorentzVector shift;
-
-		//Check if mcshower has no energy deposition points in the detector
-		// (it seems mcshower.DetProfile().T() is 1e308 when there are none ... this should be initialized better)
-		// consider this a hotfix!
-		if (abs(mcs.DetProfile().T()) > 1e10  || abs(mcs.DetProfile().T()) < 1e-10) {
-			//Beware: this block is satisfied a LOT for cosmics events.
-			//Any mcshower (from a cosmic) that doesn't go through the detector has a Start() and End() point,
-			//but has a weirdly undefined DetProfile(), which I try to identify with the above if() statement.
-			//Hopefully setting the xshift as zero means we won't shift the cosmic INTO the detector,
-			//So this should be fine.
-			shift.SetXYZT(0., 0., 0., 0.);
-			return shift;
-		}
-		double event_time = mcs.DetProfile().T();//End().T(); <--- old usage (wrong)
-		double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
-		shift.SetXYZT(shift_x, 0., 0., 0.);
-		if ( _disable_xshift )
-			shift.SetXYZT(0., 0., 0., 0.);
-		return shift;
-	}
-
-	TLorentzVector ERToolHelper::getXShift(const mcpart& mcp) const {
-		// Implementation of position shift due to the electron drift in the TPC for mcparticles
-		TLorentzVector shift;
-
-		double event_time = mcp.Trajectory().front().T();
-		double shift_x = (event_time / _DetFramePeriod) * _DetWidth;
-		shift.SetXYZT(shift_x, 0., 0., 0.);
-		if ( _disable_xshift )
-			shift.SetXYZT(0., 0., 0., 0.);
-
-		return shift;
-	}
 }
 
 

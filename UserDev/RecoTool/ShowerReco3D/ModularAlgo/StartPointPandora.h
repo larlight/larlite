@@ -1,9 +1,9 @@
 /**
- * \file ShowerChargeModule.h
+ * \file StartPointPandora.h
  *
  * \ingroup ModularAlgo
  *
- * \brief Class def header for a class ShowerChargeModule
+ * \brief Class def header for a class StartPointPandora
  *
  * @author cadams
  */
@@ -11,8 +11,8 @@
 /** \addtogroup ModularAlgo
 
     @{*/
-#ifndef SHOWERCHARGEMODULE_H
-#define SHOWERCHARGEMODULE_H
+#ifndef STARTPOINTPANDORAMODULE_H
+#define STARTPOINTPANDORAMODULE_H
 
 #include <iostream>
 #include "ShowerRecoModuleBase.h"
@@ -23,15 +23,15 @@
  */
 namespace showerreco {
 
-class ShowerChargeModule : ShowerRecoModuleBase {
+class StartPointPandora : ShowerRecoModuleBase {
 
 public:
 
   /// Default constructor
-  ShowerChargeModule() {_name = "ShowerChargeModule";}
+  StartPointPandora() {_name = "StartPointPandora";}
 
   /// Default destructor
-  ~ShowerChargeModule() {}
+  ~StartPointPandora() {}
 
 
   void do_reconstruction(const ProtoShower &, Shower_t &);

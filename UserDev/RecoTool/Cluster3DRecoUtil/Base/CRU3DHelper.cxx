@@ -11,7 +11,7 @@ void CRU3DHelper::GenerateParams3D(const std::vector<unsigned int>& point_index,
                                    const larlite::event_spacepoint* points,
                                    cluster3D_params &params) const
 {
-  std::vector<Point3D> points3D;
+  std::vector<::cluster3D::Point3D> points3D;
   GeneratePoint3D(point_index, points, points3D);
   params.SetPoints(points3D);
 

@@ -63,7 +63,7 @@ void OtherStartPoint3D::do_reconstruction(const ProtoShower & proto_shower,
 
   double time = 0. ;
   for ( auto const & c : clusters ) {
-    if (c.plane_id.Plane != worstPlane) time += c.start_point.t;
+    if ((int) c.plane_id.Plane != worstPlane) time += c.start_point.t;
   }
 
   /**
@@ -83,8 +83,8 @@ void OtherStartPoint3D::do_reconstruction(const ProtoShower & proto_shower,
   while ( distFromStart > 0.5 ) {
     minDist  = 99999999. ;
     for ( auto const c : clusters ) {
-      if (c.plane_id.Plane != worstPlane ) {
-        for (int i = 0; i < pts.size(); i++) {
+      if ((int) c.plane_id.Plane != worstPlane ) {
+        for (unsigned int i = 0; i < pts.size(); i++) {
 
           auto testPoint = geomHelper->Point_3Dto2D(pts[i], c.plane_id.Plane) ;
           auto dist = sqrt ( pow(c.start_point.t - testPoint.t, 2) +

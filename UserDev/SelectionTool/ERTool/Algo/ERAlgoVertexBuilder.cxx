@@ -11,19 +11,37 @@ namespace ertool {
 
   ERAlgoVertexBuilder::ERAlgoVertexBuilder(Double_t const start_prox,
 					   Double_t const max_rad,
+					   Double_t const lone_track_length,
 					   Bool_t const withTrackDir,
+					   std::string const primary_vertex_selection,
 					   const std::string& name) :
     AlgoBase(name),
     tstart_prox(start_prox),
     tmax_rad(max_rad),
+    tlone_track_length(lone_track_length),
+    tprimary_vertex_selection(primary_vertex_selection),
     twithTrackDir(withTrackDir),
     tverbose(false) {
+
+    if(tprimary_vertex_selection != mostupstream &&
+       tprimary_vertex_selection != mostchildren &&
+       tprimary_vertex_selection != mostenergy &&
+       tprimary_vertex_selection != smallestsphere) {
+
+      std::cout << "Primary vertex selection option not valid\n";
+      exit(0);
+
+    }
 
     tree = new TTree("ERAlgoVertexBuilder", "");
     tree->Branch("event_id", &event_id, "event_id/I");
     tree->Branch("association_number", &association_number, "association_number/I");
+    tree->Branch("found_vertices", &found_vertices, "found_vertices/I");
     tree->Branch("loop_counter", &loop_counter, "loop_counter/I");
-
+    tree->Branch("lone_track_counter", &lone_track_counter, "lone_track_counter/I");
+    tree->Branch("vertices_lonetracks", &vertices_lonetracks, "vertices_lonetracks/I");
+    tree->Branch("radius", &radius, "radius/D");
+   
   }
 
 
@@ -147,7 +165,7 @@ namespace ertool {
 	  
 	  Particle & vp = graph.CreateParticle();
 	  graph.SetPrimary(vp.ID());
-	  vp.SetParticleInfo(0, RecoType_t::kInvisible, p.Vertex());
+	  vp.SetParticleInfo(0, vp.Mass(), vp.Vertex(), vp.Momentum());
 	  graph.SetParentage(vp.ID(), n);
 	  
 	}
@@ -246,7 +264,7 @@ namespace ertool {
 	Particle & p = graph.CreateParticle();
 	NodeID_t const pid = p.ID();
 	graph.SetPrimary(pid);
-	p.SetParticleInfo(0, RecoType_t::kInvisible, s.Center());
+	p.SetParticleInfo(0, p.Mass(), s.Center(), p.Momentum());
 
 	for(NodeID_t const v : vc) {
 	  
@@ -370,6 +388,10 @@ namespace ertool {
       return tassociations;
     }
 
+    std::vector<NodeID_t> const & GetNodes() const  {
+      return tnode_vec;
+    }
+
     void PrintAssociations() const {
 
       std::cout << "----------------------------------------\n\n";
@@ -483,7 +505,7 @@ namespace ertool {
 
 	else {
 	  Particle & p = tgraph->GetParticle(n);
-	  p.SetParticleInfo(p.PdgCode(), p.Mass(), v.at(j));
+	  p.SetParticleInfo(p.PdgCode(), p.Mass(), v.at(j), p.Momentum());
 	  tgraph->SetParentage(parent, n);
 	}	  
 
@@ -505,6 +527,56 @@ namespace ertool {
       
     }
     
+    void runstartempty(NodeID_t const parent,
+		       Int_t const i) {
+      
+      tnodelist.clear();
+      runrecempty(parent, i);
+      
+    }
+ 
+    void runrecempty(NodeID_t const parent,
+		     Int_t const i) {
+      
+      std::vector<NodeID_t> bad_nodes;
+      
+      //std::cout << "\trun: parent: " << parent << " index: " << i << "\n";
+
+      tskip.push_back(i);
+
+      ParticleAssociation const & pae = tpa->GetAssociations().at(i);
+
+      std::vector<NodeID_t> const & c = pae.GetCluster();
+      std::vector<geoalgo::Point_t> const & v = pae.GetVertices();
+      for(Size_t j = 0; j < c.size(); ++j) {
+	
+	NodeID_t const n = c.at(j);
+
+	if(n == parent) continue;
+	auto it = std::find(tnodelist.begin(), tnodelist.end(), n);
+	if(it != tnodelist.end()) {
+	  ++tloopcounter;
+	  bad_nodes.push_back(*it);
+	} 
+
+	tnodelist.push_back(n);
+
+      }
+
+      for(std::pair<Int_t, NodeID_t> const & pair : pae.GetConnections()) {
+	
+	if(std::find(tskip.begin(), tskip.end(), pair.first) != tskip.end())
+	  continue;
+	if(std::find(bad_nodes.begin(), bad_nodes.end(), pair.second) !=
+	   bad_nodes.end())
+	  continue;
+	
+	runrecempty(tgraph->GetParticle(pair.second).ID(), pair.first);
+	
+      }
+      
+    }
+    
     std::vector<Int_t> const & GetSkip() const {
       return tskip;
     }
@@ -516,73 +588,359 @@ namespace ertool {
   };
 
 
+  
+  geoalgo::Point_t const * ERAlgoVertexBuilder::GetUpstreamPrimary
+  (ParticleAssociations const & pas, 
+   std::vector<Int_t> const & skip,
+   Int_t & index) {
+
+    std::vector<ParticleAssociation> const & pav = pas.GetAssociations();
+
+    index = -1;
+    geoalgo::Point_t const * sc = nullptr;
+    Double_t zmin = 2000;
+    
+    for(Size_t i = 0; i < pav.size(); ++i) {
+      
+      if(std::find(skip.begin(), skip.end(), i) != skip.end()) {
+	continue;
+      }
+      
+      geoalgo::Point_t const * const s = &pav.at(i).GetSphere().Center();
+      Double_t const z = s->at(2);
+      
+      if(z < zmin) {
+	index = i;
+	sc = s;
+	zmin = z;
+      }
+      
+    }
+    
+    return sc;
+    
+  }
+
+
+
+  geoalgo::Point_t const * ERAlgoVertexBuilder::GetMostChildrenPrimary
+  (ParticleAssociations const & pas, 
+   std::vector<Int_t> const & skip,
+   Int_t & index) {
+
+    std::vector<ParticleAssociation> const & pav = pas.GetAssociations();
+    
+    index = -1;
+    geoalgo::Point_t const * sc = nullptr;
+    Size_t most_children = 0;
+  
+    for(Size_t i = 0; i < pav.size(); ++i) {
+      
+      if(std::find(skip.begin(), skip.end(), i) != skip.end()) {
+	continue;
+      }
+    
+      Size_t const children = pav.at(i).GetCluster().size();
+
+      if(children > most_children) {
+	index = i;
+	sc = &pav.at(i).GetSphere().Center();
+	most_children = children;
+      }
+
+    }
+    
+    return sc;
+
+  }
+
+
+
+  geoalgo::Point_t const * ERAlgoVertexBuilder::GetSmallestSpherePrimary
+  (ParticleAssociations const & pas, 
+   std::vector<Int_t> const & skip,
+   Int_t & index) {
+
+    std::vector<ParticleAssociation> const & pav = pas.GetAssociations();
+    
+    index = -1;
+    geoalgo::Point_t const * sc = nullptr;
+    Double_t smallest_radius = 2000;
+  
+    for(Size_t i = 0; i < pav.size(); ++i) {
+      
+      if(std::find(skip.begin(), skip.end(), i) != skip.end()) {
+	continue;
+      }
+    
+      Double_t const radius = pav.at(i).GetSphere().Radius();
+
+      if(radius < smallest_radius) {
+	index = i;
+	sc = &pav.at(i).GetSphere().Center();
+	smallest_radius = radius;
+      }
+
+    }
+    
+    return sc;
+
+  }
+
+
+
+  geoalgo::Point_t const * ERAlgoVertexBuilder::GetMostEnergyPrimary
+  (EventData const & data,
+   ParticleGraph const & graph,
+   ParticleAssociations const & pas, 
+   std::vector<Int_t> const & skip,
+   Int_t & index) {
+
+    std::vector<ParticleAssociation> const & pav = pas.GetAssociations();
+    
+    index = -1;
+    geoalgo::Point_t const * sc = nullptr;
+    Double_t most_energy = 0;
+  
+    for(Size_t i = 0; i < pav.size(); ++i) {
+      
+      if(std::find(skip.begin(), skip.end(), i) != skip.end()) {
+	continue;
+      }
+    
+      Double_t energy = 0;
+
+      for(NodeID_t const n : pav.at(i).GetCluster()) {
+
+	Particle const & p = graph.GetParticle(n);
+
+	if(p.RecoType() == kTrack) energy += data.Track(p.RecoID())._energy;
+	else if (p.RecoType() == kShower)
+	  energy += data.Shower(p.RecoID())._energy;
+
+      }
+
+      if(energy > most_energy) {
+	index = i;
+	sc = &pav.at(i).GetSphere().Center();
+	most_energy = energy;	
+      }
+
+    }
+    
+    return sc;
+
+  }
+  
+
+
+  void ERAlgoVertexBuilder::AddAllLoneTracks
+  (const EventData &data,
+   ParticleGraph & graph,
+   ParticleAssociations const & pas) {
+
+    std::vector<NodeID_t> const & pa_nodes = pas.GetNodes();
+
+    for(NodeID_t const gn : graph.GetParticleNodes()) {
+      
+      Particle & p = graph.GetParticle(gn);
+      
+      if(p.RecoType() != kTrack) continue;
+      
+      if(std::find(pa_nodes.begin(), pa_nodes.end(), gn) != pa_nodes.end())
+	continue;
+      
+      Track const & t = data.Track(p.RecoID());
+    
+      if(t.Length() < tlone_track_length) continue;
+
+      geoalgo::Point_t const * track_end = nullptr;
+      Double_t zmin = 2000;
+      if(t.front().at(2) < zmin) {
+	track_end = &t.front();
+	zmin = t.front().at(2);
+      }
+      if(t.back().at(2) < zmin) {
+	track_end = &t.back();
+	zmin = t.back().at(2);
+      }
+      if(track_end) {
+	
+	Particle & vert = graph.CreateParticle();
+	NodeID_t const pid = vert.ID();
+	graph.SetPrimary(pid);
+	vert.SetParticleInfo(0, vert.Mass(), *track_end, vert.Momentum());    
+	p.SetParticleInfo(p.PdgCode(), p.Mass(), *track_end, p.Momentum());
+	graph.SetParentage(pid, gn);
+
+      }
+      
+      else std::cout << "Warning: No track end pointer\n";
+      
+    }
+    
+  }
+
+
+
+  void ERAlgoVertexBuilder::AddUpstreamLoneTrack
+  (const EventData &data,
+   ParticleGraph & graph,
+   ParticleAssociations const & pas) {
+    
+    std::vector<NodeID_t> const & pa_nodes = pas.GetNodes();
+
+    Double_t zmin = 2000;
+    NodeID_t upstream_track_node = kINVALID_NODE_ID;
+    geoalgo::Point_t const * track_end = nullptr;
+
+    for(NodeID_t const gn : graph.GetParticleNodes()) {
+      
+      Particle & p = graph.GetParticle(gn);
+      
+      if(p.RecoType() != kTrack) continue;
+      
+      if(std::find(pa_nodes.begin(), pa_nodes.end(), gn) != pa_nodes.end())
+	continue;
+      
+      Track const & t = data.Track(p.RecoID());
+    
+      if(t.Length() < tlone_track_length) continue;
+
+      if(t.front().at(2) < zmin) {
+	track_end = &t.front();
+	upstream_track_node = gn;
+	zmin = t.front().at(2);
+      }
+      if(t.back().at(2) < zmin) {
+	track_end = &t.back();
+	upstream_track_node = gn;
+	zmin = t.back().at(2);
+      }
+  
+    }
+
+    if(track_end) {
+
+      Particle & vert = graph.CreateParticle();
+      NodeID_t const pid = vert.ID();
+      graph.SetPrimary(pid);
+      vert.SetParticleInfo(0, vert.Mass(), *track_end, vert.Momentum());    
+      Particle & p = graph.GetParticle(upstream_track_node);
+      p.SetParticleInfo(p.PdgCode(), p.Mass(), *track_end, p.Momentum());
+      graph.SetParentage(pid, upstream_track_node);
+      
+    }
+    
+  }
+
+
 
   void ERAlgoVertexBuilder::EndReconstructPa(const EventData &data,
 					     ParticleGraph & graph,
-					     ParticleAssociations const & pa){
+					     ParticleAssociations const & pas){
 
-    std::vector<ParticleAssociation> const & pav = pa.GetAssociations();
+    std::vector<ParticleAssociation> const & pav = pas.GetAssociations();
     association_number = pav.size();
-    Int_t loops = 0;
-
+    Int_t vertex_counter = 0;
+   
     if(pav.size()) {
       
-      ParticleGraphSetter setter(data, graph, pa);
+      ParticleGraphSetter setter(data, graph, pas);
       std::vector<Int_t> const & skip = setter.GetSkip();
    
-      if(tverbose) pa.PrintAssociations();
+      if(tverbose) pas.PrintAssociations();
+
+      Bool_t first = true;
 
       while(skip.size() != pav.size()) {
 
 	Int_t index = -1;
 	geoalgo::Point_t const * sc = nullptr;
-	Double_t zmin = 2000;
-
-	for(Size_t i = 0; i < pav.size(); ++i) {
-
-	  if(std::find(skip.begin(), skip.end(), i) != skip.end()) {
-	    continue;
-	  }
-	  
-	  geoalgo::Point_t const * const s = &pav.at(i).GetSphere().Center();
-	  Double_t const z = s->at(2);
-	  
-	  if(z < zmin) {
-	    index = i;
-	    sc = s;
-	    zmin = z;
-	  }
-	  
-	}
 	
+	if(tprimary_vertex_selection == mostupstream)
+	  sc = GetUpstreamPrimary(pas, skip, index);
+	else if(tprimary_vertex_selection == mostchildren)
+	  sc = GetMostChildrenPrimary(pas, skip, index);
+	else if(tprimary_vertex_selection == mostenergy)
+	  sc = GetMostEnergyPrimary(data, graph, pas, skip, index);
+	else if(tprimary_vertex_selection == smallestsphere)
+	  sc = GetSmallestSpherePrimary(pas, skip, index);
+
 	if(sc == nullptr) {
 	  std::cout << "No sc\n";
 	  return;
 	}
 	
+	/*
 	Particle & p = graph.CreateParticle();
 	NodeID_t const pid = p.ID();
 	graph.SetPrimary(pid);
-	p.SetParticleInfo(0, RecoType_t::kInvisible, *sc);    
-	
+	p.SetParticleInfo(0, p.Mass(), *sc, p.Momentum());
+    	
 	setter.runstart(pid, index);
-	loops += setter.GetLoopCounter();
+	*/
+
+	if(first) {
+	  Particle & p = graph.CreateParticle();
+	  NodeID_t const pid = p.ID();
+	  graph.SetPrimary(pid);
+	  p.SetParticleInfo(0, p.Mass(), *sc, p.Momentum());    	
+	  setter.runstart(pid, index);
+
+	  radius = pav.at(index).GetSphere().Radius();
+
+	  first = false;
+	}
+	else setter.runstartempty(kINVALID_NODE_ID, index);
+
+	++vertex_counter;
+	loop_counter += setter.GetLoopCounter();
 	
       }
 
     }
+
+    std::vector<NodeID_t> const & pa_nodes = pas.GetNodes();
+    Int_t track_counter = 0;
+    for(NodeID_t const gn : graph.GetParticleNodes()) {
       
-    loop_counter = loops;
-    tree->Fill();
+      Particle & p = graph.GetParticle(gn);
       
+      if(p.RecoType() != kTrack) continue;
+      
+      if(std::find(pa_nodes.begin(), pa_nodes.end(), gn) != pa_nodes.end())
+	continue;
+     
+      ++track_counter;
+
+    }
+
+    found_vertices = vertex_counter;  
+    lone_track_counter = track_counter;
+    vertices_lonetracks = vertex_counter + track_counter;
+    tree->Fill();   
+
+    if(vertex_counter > 0) {
+      return;
+    }      
+
+    //AddAllLoneTracks(data, graph, pas);
+    AddUpstreamLoneTrack(data, graph, pas);
+
   }
  
 
 
   void ERAlgoVertexBuilder::Reset() {
 
+    event_id = -1;
+    found_vertices = 0;
     loop_counter = 0;
-
+    lone_track_counter = 0;
+    vertices_lonetracks = 0;
+    radius = 2000;
+   
   }
 
 
@@ -620,9 +978,9 @@ namespace ertool {
 
     //if(data.Event_ID() != 53181) return;
 
-    event_id = data.Event_ID();
-
     Reset();
+
+    event_id = data.Event_ID();
    
     if(tverbose)
       std::cout << "Event: " << data.Event_ID() << "\n"
