@@ -46,6 +46,9 @@ namespace recoemu {
     TF1* _fAngleres;
     TF1* _fdEdxres;
     TF1* _fPosres;
+
+    // direction flip fraction probability
+    double _DirectionFlipFrac;
   
   };
 

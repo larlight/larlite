@@ -1,7 +1,7 @@
-
+	
 EmuDriver: {
     MCTrackProducer:  mcreco
-    MCShowerProducer: fakeshower
+    MCShowerProducer: mcreco
     TrackEmulator:    TrackEmuToy
     ShowerEmulator:   ShowerEmuSmearingParametrized
     DisableXShift:  0
@@ -11,7 +11,7 @@ EmuDriver: {
 ShowerEmuSmearingParametrized: {
 
 EResFunc: "TMath::Gaus(x,[0],[1],1)"
-EResParams: [0,0.2]
+EResParams: [0,0.1]
 EResMin: -1
 EResMax: 1
 
@@ -25,8 +25,10 @@ PosResParams: [0,0.3]
 PosResMin: -3
 PosResMax: 3
 
+DirectionFlipFrac: 0.3
+
 dEdxResFunc: "TMath::Gaus(x,[0],[1],1)"
-dEdxResParams: [0,1]
+dEdxResParams: [0,0.5]
 dEdxResMin: -10
 dEdxResMax: 10
 

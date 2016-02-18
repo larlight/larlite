@@ -16,7 +16,7 @@ namespace recoemu {
 
   void ShowerEmuSmearingParametrized::Configure(const ::fcllite::PSet &pset)
   {
-    
+
     auto EResFunc   = pset.get< std::string >("EResFunc");
     auto EResParams = pset.get< std::vector<double> >("EResParams");
     auto EResMin    = pset.get< double >("EResMin");
@@ -49,17 +49,23 @@ namespace recoemu {
     for (size_t i=0; i < PosResParams.size(); i++)
       _fPosres->SetParameter(i,PosResParams[i]);
 
+    // direction flip
+    _DirectionFlipFrac = pset.get< double >("DirectionFlipFrac");
+
   }
   
   recoemu::Shower_t ShowerEmuSmearingParametrized::Emulate(const recoemu::Shower_t& mc)
   {
 
-
-
     Shower_t result;
 
     // smear energy
-    result.energy = mc.energy + mc.energy * _fEres->GetRandom();
+    // resolution is energy rependent:
+    // Eres = frac / sqrt(E [1 GeV] )
+    double fracres = _fEres->GetRandom() / ( mc.energy / 1000. );
+    result.energy = mc.energy + ( mc.energy * _fEres->GetRandom() );
+    if (result.energy < 0)
+      result.energy = 0;
 
     // smear start point
     ::geoalgo::Point_t start( mc.cone.Start()[0] + _fPosres->GetRandom(),
@@ -87,8 +93,6 @@ namespace recoemu {
     // in the phi direction
     double random_phase = 2 * 3.1415 * ( (double) rand() ) / RAND_MAX;
 
-    //std::cout << "random angle phase is : " << random_phase << std::endl;
-    
     double px_new = cos(random_phase);
     double py_new = sin(random_phase);
     
@@ -106,6 +110,11 @@ namespace recoemu {
     dir.RotateY(theta);
     dir.RotateZ(phi);
 
+    // flip direction if necessary
+    double randnum = ( (double) rand() ) / RAND_MAX;
+    if (randnum < _DirectionFlipFrac)
+      dir *= -1;
+
     ::geoalgo::Cone_t cone(start,dir,mc.cone.Length(),mc.cone.Radius());
     
     result.cone = cone;
@@ -113,13 +122,10 @@ namespace recoemu {
     // smear dEdx
     // draw a random value from the dEdx smearing distribution
     double dedx_smeared = _fdEdxres->GetRandom();
-    // calculate offset w.r.t. central value (2 for e-, 4 for gamma)
-    if (mc.pdg == 11)
-      dedx_smeared *= 2;
-    if (mc.pdg == 22)
-      dedx_smeared *= 4;
+    result.dedx = mc.dedx + ( mc.dedx * dedx_smeared );
+    if (result.dedx < 0)
+      result.dedx = 0;
     
-    result.dedx = dedx_smeared;
     result.pdg  = mc.pdg; 
     result.time = mc.time;
 
