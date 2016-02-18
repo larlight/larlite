@@ -64,11 +64,12 @@ namespace ertool {
     ::flashana::FlashMatchManager _mgr;
 
     ::flashana::LightPath LP;
-    double _light_yield; // Photons per MEV, gotten from LightPath configured instance
+    double _light_yield; ///< Photons per MEV, gotten from LightPath configured instance
 
     double _beam_dt_min, _beam_dt_max;
-    bool _ignore_showers; // Don't look for a flash for an intxn with base particle that is kShower
-    bool _ignore_cosmics; // Don't look for a flash for an intxn with base particle that is kCosmic
+    bool _ignore_showers; ///< Don't look for a flash for an intxn with base particle that is kShower
+    bool _ignore_cosmics; ///< Don't look for a flash for an intxn with base particle that is kCosmic
+    bool _match_primary_only; ///< Primary particle only
     
     TTree * _match_tree;
     double _mct;

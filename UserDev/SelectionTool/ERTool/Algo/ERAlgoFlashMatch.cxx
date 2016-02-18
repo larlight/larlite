@@ -25,6 +25,7 @@ namespace ertool {
     _beam_dt_max = 100.;
     _ignore_showers = true;
     _ignore_cosmics = false;
+    _match_primary_only = false;
   }
 
   void ERAlgoFlashMatch::Reset()
@@ -108,6 +109,11 @@ namespace ertool {
     // rather than inside of LightPath
     _light_yield = LP.GetLightYield();
 
+    //
+    // Set if we should use primary particle only
+    //
+    _match_primary_only = p.get("MatchPrimaryOnly",false);
+    
   }
 
   void ERAlgoFlashMatch::ProcessBegin()
@@ -138,11 +144,16 @@ namespace ertool {
 
     std::multimap<double, std::pair<NodeID_t, FlashID_t> > score_m;
 
-    std::vector<NodeID_t> base_id_v;
+    std::vector<NodeID_t> used_base_node_id_v;
 
     int i = 0;
 
-    for (auto const& base_node_id : graph.GetBaseNodes() ) {
+    std::vector<NodeID_t> base_node_id_v;
+
+    if(_match_primary_only) base_node_id_v = graph.GetPrimaryNodes();
+    else base_node_id_v = graph.GetBaseNodes();
+    
+    for (auto const& base_node_id : base_node_id_v) {
 
       auto const& base_part = graph.GetParticle(base_node_id);
 
@@ -213,7 +224,7 @@ namespace ertool {
 
       clusters.idx = i; //base_node_id;
       //std::cout<<clusters.size()<<" ";
-      base_id_v.push_back(base_node_id);
+      used_base_node_id_v.push_back(base_node_id);
       _mgr.Emplace(std::move(clusters));
       i++;
 
@@ -244,9 +255,9 @@ namespace ertool {
     std::set<NodeID_t> nu_candidates;
     // std::cout << "ERAlgoFlashMatch: " << res.size() << " match found..." << std::endl;
     for (auto const& match : res ) {
-      //std::cout<<"TPC: "<<match.tpc_id<<"/"<<base_id_v.size()<<std::endl;
+      //std::cout<<"TPC: "<<match.tpc_id<<"/"<<used_base_node_id_v.size()<<std::endl;
       //std::cout<<"Flash: "<<match.flash_id<<"/"<<flash_id_v.size()<<std::endl;
-      auto const& node_id  = base_id_v[match.tpc_id];
+      auto const& node_id  = used_base_node_id_v[match.tpc_id];
       auto const& flash_id = flash_id_v[match.flash_id];
 
       // The base particle's node is associated with the flash.
