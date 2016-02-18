@@ -90,6 +90,10 @@ namespace fcllite {
   {
     std::pair<KeyChar_t,size_t> res(kNone,size_t(-1));
     size_t index = 0;
+
+    //
+    // kParamDef
+    //
     index = txt.find(":",start);
     if(index != std::string::npos && index < res.second) {
       res.first  = kParamDef;
@@ -103,6 +107,11 @@ namespace fcllite {
     index = txt.find("}",start);
     if(index != std::string::npos && index < res.second) {
       res.first  = kBlockEnd;
+      res.second = index;
+    }
+    index = txt.find("\"",start);    
+    if(index != std::string::npos && index < res.second) {
+      res.first  = kString;
       res.second = index;
     }
     return res;
@@ -164,6 +173,7 @@ namespace fcllite {
     size_t end_index=contents.size()-1;
     while(contents.rfind(" ",end_index) == end_index)
       end_index -= 1;
+
     if(end_index <= index || end_index > contents.size()) return;
 
     std::string key,value,tmp;
@@ -172,6 +182,16 @@ namespace fcllite {
     while(index <= end_index) {
       
       auto next_marker = this->search(contents,index);
+
+      if(next_marker.first == kString) {
+
+	while(next_marker.first != kString && next_marker.second < end_index) 
+
+	  next_marker = this->search(contents,next_marker.second+1);
+      }
+
+      if(next_marker.first == kString) next_marker.first = kNone;
+      
       if(next_marker.second > end_index) break;
       if(next_marker.first == kNone) break;
       /*
@@ -217,6 +237,14 @@ namespace fcllite {
 	while(start_ctr && next_marker.second <= end_index) {
 	  
 	  next_marker = this->search(contents,next_marker.second+1);
+
+	  if(next_marker.first == kString) {
+	    
+	    while(next_marker.first != kString && next_marker.second < end_index) 
+	      
+	      next_marker = this->search(contents,next_marker.second+1);
+	  }
+	  
 	  switch(next_marker.first){
 	  case kBlockStart:
 	    start_ctr +=1;
