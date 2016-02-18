@@ -8,7 +8,12 @@ namespace ertool {
   ERAnaSingleE::ERAnaSingleE(const std::string& name)
     : AnaBase(name)
     , _result_tree(nullptr)
-    , fTPC(0.,-115.5,0.,254.8,117.5,1036.92)
+    , fTPC(0,
+	   -larutil::Geometry::GetME()->DetHalfHeight(),
+	   0,
+	   2 * larutil::Geometry::GetME()->DetHalfWidth(),
+	   larutil::Geometry::GetME()->DetHalfHeight(),
+	   larutil::Geometry::GetME()->DetLength())
 
   {
 
