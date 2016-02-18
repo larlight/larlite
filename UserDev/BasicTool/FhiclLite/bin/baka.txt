@@ -3,7 +3,7 @@ a : {
   j: [1 ,
      2 ,
        3]
-  x: "tako::aho:boke{}"
+  x: "{tako}" #tako::aho:boke{}
 }
 b : { }
 

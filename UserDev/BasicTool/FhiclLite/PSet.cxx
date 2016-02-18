@@ -185,12 +185,19 @@ namespace fcllite {
 
       if(next_marker.first == kString) {
 
-	while(next_marker.first != kString && next_marker.second < end_index) 
+	//std::cout<<"String found in here: "<<contents.substr(index,(next_marker.second-index))<<std::endl;
+
+	while(next_marker.second < end_index+1) {
 
 	  next_marker = this->search(contents,next_marker.second+1);
-      }
 
-      if(next_marker.first == kString) next_marker.first = kNone;
+	  if(next_marker.first == kString) {
+	    next_marker = this->search(contents,next_marker.second+1);
+	    break;
+	  }
+	}
+	//std::cout<<"String found in here: "<<contents.substr(index,next_marker.second-index)<<std::endl;
+      }
       
       if(next_marker.second > end_index) break;
       if(next_marker.first == kNone) break;
@@ -206,7 +213,7 @@ namespace fcllite {
 	  key = contents.substr(index,(next_marker.second-index));
 	  no_space(key);
 	}
-	else if(last_mark == kParamDef) {
+	else if(last_mark == kParamDef || last_mark == kString) {
 	  tmp = contents.substr(index,(next_marker.second-index));
 	  //std::cout<<"Inspecting: \""<<tmp<<"\"" <<std::endl;
 	  strip(tmp," ");
@@ -214,11 +221,11 @@ namespace fcllite {
 	  size_t sep_index = tmp.rfind(" ");
 	  if(sep_index >= tmp.size())
 	    throw FhiclLiteException("Invalid format (key:value)");
-	  
+
 	  value = tmp.substr(0,sep_index);
 	  // complete pair
 	  this->add_value(key,value);
-	  
+	  //std::cout<<"Found value: "<<value<<std::endl;	  
 	  key = value = "";
 	  key = tmp.substr(sep_index+1,(tmp.size()-sep_index-1));
 	  no_space(key);
@@ -226,6 +233,7 @@ namespace fcllite {
 	
       }else if(next_marker.first == kBlockEnd)
 	throw FhiclLiteException("Block end logic error!");
+
       else if(next_marker.first == kBlockStart){
 	//std::cout<<"Block start!"<<std::endl;
 	if(last_mark != kParamDef)
@@ -239,12 +247,23 @@ namespace fcllite {
 	  next_marker = this->search(contents,next_marker.second+1);
 
 	  if(next_marker.first == kString) {
-	    
-	    while(next_marker.first != kString && next_marker.second < end_index) 
-	      
+
+	    while(next_marker.second < end_index+1) {
+
 	      next_marker = this->search(contents,next_marker.second+1);
+
+	      auto tmp_next_marker = this->search(contents,next_marker.second+1);
+
+	      if(next_marker.first == kString && tmp_next_marker.second != kString) {
+
+		next_marker = tmp_next_marker;
+		break;
+	      }
+
+	    }
+	    //std::cout<<"Found string :"<<contents.substr(index,next_marker.second)<<std::endl;
 	  }
-	  
+
 	  switch(next_marker.first){
 	  case kBlockStart:
 	    start_ctr +=1;
