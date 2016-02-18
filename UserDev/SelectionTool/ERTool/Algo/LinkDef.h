@@ -33,6 +33,9 @@
 #pragma link C++ class ertool::ERAlgoTrackID+;
 #pragma link C++ class ertool::ERAlgoOpT0Tender+;
 #pragma link C++ class ertool::ERAlgoNueSharedFlashMerger+;
+#pragma link C++ class ertool::ERAlgoNCPi0+;
+#pragma link C++ class ertool::AlgoNCPi0Finder+;
+
 
 #endif
 
