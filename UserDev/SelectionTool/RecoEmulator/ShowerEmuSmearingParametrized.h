@@ -16,6 +16,7 @@
 
 #include "ShowerEmulatorBase.h"
 #include "RecoEmulatorFactory.h"
+#include "EMShowerTools/EMShowerProfile.h"
 #include "TF1.h"
 
 namespace recoemu {
@@ -41,7 +42,12 @@ namespace recoemu {
     recoemu::Shower_t Emulate(const recoemu::Shower_t&);
 
   private:
+
+    // EMShowerProfile class with utilities to get shower info
+    EMShowerProfile _EMprofile;
     
+    // TTrees
+    TF1* _fEff;
     TF1* _fEres;
     TF1* _fAngleres;
     TF1* _fdEdxres;
