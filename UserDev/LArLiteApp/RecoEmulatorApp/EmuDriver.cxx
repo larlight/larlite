@@ -6,7 +6,9 @@
 #include "RecoEmulator/RecoEmulatorFactory.h"
 namespace larlite {
 
-  EmuDriver::EmuDriver(const std::string name) : ana_base()
+  EmuDriver::EmuDriver(const std::string name)
+    : ana_base()
+    , _shower_smearing_tree(nullptr)
   {
     _name = name;
     _fout = 0;
@@ -21,6 +23,30 @@ namespace larlite {
   }
 
   bool EmuDriver::initialize() {
+
+    // TTree setup
+    if (_shower_smearing_tree) delete _shower_smearing_tree;
+    
+    _shower_smearing_tree = new TTree("shower_smearing_tree", "Shower Smearing Tree");
+    _shower_smearing_tree->Branch("_dedx_in",&_dedx_in,"dedx_in/D");
+    _shower_smearing_tree->Branch("_dedx_out",&_dedx_out,"dedx_out/D");
+    _shower_smearing_tree->Branch("_x_in",&_x_in,"x_in/D");
+    _shower_smearing_tree->Branch("_y_in",&_y_in,"y_in/D");
+    _shower_smearing_tree->Branch("_z_in",&_z_in,"z_in/D");
+    _shower_smearing_tree->Branch("_x_out",&_x_out,"x_out/D");
+    _shower_smearing_tree->Branch("_y_out",&_y_out,"y_out/D");
+    _shower_smearing_tree->Branch("_z_out",&_z_out,"z_out/D");
+    _shower_smearing_tree->Branch("_px_in",&_px_in,"px_in/D");
+    _shower_smearing_tree->Branch("_py_in",&_py_in,"py_in/D");
+    _shower_smearing_tree->Branch("_pz_in",&_pz_in,"pz_in/D");
+    _shower_smearing_tree->Branch("_px_out",&_px_out,"px_out/D");
+    _shower_smearing_tree->Branch("_py_out",&_py_out,"py_out/D");
+    _shower_smearing_tree->Branch("_pz_out",&_pz_out,"pz_out/D");
+    _shower_smearing_tree->Branch("_e_in",&_e_in,"e_in/D");
+    _shower_smearing_tree->Branch("_e_out",&_e_out,"e_out/D");
+
+
+    
 
     // make sure the instance is already configured
     if (!_configured)
@@ -101,8 +127,26 @@ namespace larlite {
       if (!_hutil->isViable(mcs)) continue;
       // Convert mcshower => recoemu::Shower_t
       auto emu_input = MCShower2EmuShower(mcs);
+      _e_in    = emu_input.energy;
+      _x_in    = emu_input.cone.Start()[0];
+      _y_in    = emu_input.cone.Start()[1];
+      _z_in    = emu_input.cone.Start()[2];
+      _px_in   = emu_input.cone.Dir()[0];
+      _py_in   = emu_input.cone.Dir()[1];
+      _pz_in   = emu_input.cone.Dir()[2];
+      _dedx_in = emu_input.dedx;
       // Emulate and retrieve emulated output
       auto emu_output = _shower_emu->Emulate(emu_input);
+      _e_out    = emu_output.energy;
+      _x_out    = emu_output.cone.Start()[0];
+      _y_out    = emu_output.cone.Start()[1];
+      _z_out    = emu_output.cone.Start()[2];
+      _px_out   = emu_output.cone.Dir()[0];
+      _py_out   = emu_output.cone.Dir()[1];
+      _pz_out   = emu_output.cone.Dir()[2];
+      _dedx_out = emu_output.dedx;
+      _shower_smearing_tree->Fill();
+
       // Convert recoemu::Shower_t => shower, if not marked for deletion
       if( emu_output.mark_for_deletion ) continue;
       auto reco_shower = EmuShower2RecoShower(emu_output);
@@ -117,6 +161,11 @@ namespace larlite {
   }
 
   bool EmuDriver::finalize() {
+
+    _fout->cd();
+
+    _shower_smearing_tree->Write();
+    
     return true;
   }
 
