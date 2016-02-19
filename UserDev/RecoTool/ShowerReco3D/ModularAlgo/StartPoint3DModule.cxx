@@ -45,11 +45,13 @@ void StartPoint3DModule::do_reconstruction(const ProtoShower & proto_shower,
 
     std::vector<int> wireStarts(0) ;
     std::vector<int> planes(0) ;
+    auto geom  = larutil::Geometry::GetME();
 
     for ( auto const c : clusters ) {
 
         if ((int) c.plane_id.Plane != worstPlane) {
-            wireStarts.emplace_back( int(c.start_point.w / 0.3) ) ;
+            wireStarts.emplace_back( 
+                int(c.start_point.w / geom -> WirePitch(0) ) ) ;
             planes.emplace_back( c.plane_id.Plane ) ;
             sX += c.start_point.t;
         }
@@ -59,7 +61,6 @@ void StartPoint3DModule::do_reconstruction(const ProtoShower & proto_shower,
     *  Caluclate intersection point in Y,Z of the 2 best planes.
     *  Calculate their average start time
     */
-    auto geom  = larutil::Geometry::GetME();
     geom->IntersectionPoint(wireStarts[0], wireStarts[1], planes[0], planes[1], sY, sZ );
 
     resultShower.fXYZStart = {sX / 2, sY, sZ} ;

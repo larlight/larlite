@@ -241,8 +241,13 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
 
     shower_cluster_v.push_back(ass_cluster_v[showerLikePFParts[i]]);
-    shower_vertex_v.push_back(ass_vertex_v[showerLikePFParts[i]]);
-    shower_sps_v.push_back(ass_sps_v[showerLikePFParts[i]]);
+    
+    if (shower_vertex_ass_v){
+      shower_vertex_v.push_back(ass_vertex_v[showerLikePFParts[i]]);
+    }
+    if (shower_sps_ass_v){
+      shower_sps_v.push_back(ass_sps_v[showerLikePFParts[i]]);
+    }
 
     std::vector<unsigned int> pfpart_ass = { (unsigned int) showerLikePFParts[i] };
     shower_pfpart_v.push_back( pfpart_ass);
@@ -253,6 +258,8 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   if (shower_v->size() == 0)
     return true;
+
+  std::cout << "Saving associations" << std::endl;
 
   // set shower -> cluster and shower -> pfpart associations
 
@@ -279,7 +286,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
                                       shower_pfpart_v);
   }
 
-  // std::cout << "Finished the event!" << std::endl;
+  std::cout << "Finished the event!" << std::endl;
   return true;
 }
 

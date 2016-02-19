@@ -23,6 +23,7 @@
 #include "GeoAlgo/GeoAlgo.h"
 #include "ERTool/Algo/AlgoFindRelationship.h"
 #include "DataFormat/mctruth.h"
+#include "LArUtil/Geometry.h"
 
 namespace ertool {
 

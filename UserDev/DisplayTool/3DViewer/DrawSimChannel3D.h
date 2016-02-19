@@ -1,9 +1,9 @@
 /**
- * \file DrawSimch.h
+ * \file DrawSimChannel3D.h
  *
  * \ingroup RecoViewer
  *
- * \brief Class def header for a class DrawSimch
+ * \brief Class def header for a class DrawSimChannel3D
  *
  * @author cadams
  */
@@ -21,8 +21,8 @@
 
 #include "RecoBase3D.h"
 /**
-   \class DrawSimch
-   User defined class DrawSimch ... these comments are used to generate
+   \class DrawSimChannel3D
+   User defined class DrawSimChannel3D ... these comments are used to generate
    doxygen documentation!
  */
 
@@ -30,17 +30,17 @@
 
 namespace evd {
 
-typedef cluster3D::Point3D Spacepoint3D;
+typedef cluster3D::Point3D SimChannel3D;
 
-class DrawSimch : public larlite::ana_base, public RecoBase3D<Spacepoint3D> {
+class DrawSimChannel3D : public larlite::ana_base, public RecoBase3D<SimChannel3D> {
 
 public:
 
     /// Default constructor
-    DrawSimch();
+    DrawSimChannel3D();
 
     /// Default destructor
-    ~DrawSimch();
+    ~DrawSimChannel3D();
 
     /** IMPLEMENT in DrawCluster.cc!
         Initialization method to be called before the analysis event loop.
