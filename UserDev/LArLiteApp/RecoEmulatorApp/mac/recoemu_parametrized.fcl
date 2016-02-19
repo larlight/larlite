@@ -1,4 +1,4 @@
-	
+
 EmuDriver: {
     MCTrackProducer:  mcreco
     MCShowerProducer: mcreco
@@ -68,7 +68,7 @@ dEdxResFunc: "TMath::Gaus(x,[0],[1],1)"
 # params:
 # 1st param: mean of gaussian smearing (0 -> no offset)
 # 2nd param: smearing width
-dEdxResParams: [0,0.5]
+dEdxResParams: [5,0.5]
 # minimum of function (since relative smearing -1 is good)
 dEdxResMin: -1
 # maximum of function (since relative smearing +1 is good)
