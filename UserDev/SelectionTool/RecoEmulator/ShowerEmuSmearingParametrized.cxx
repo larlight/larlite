@@ -112,7 +112,7 @@ namespace recoemu {
     // resolution is energy rependent:
     // Eres = frac / sqrt(E [1 GeV] )
     double fracres = _fEres->GetRandom() / sqrt( mc.energy / 1000. );
-    result.energy = mc.energy + ( mc.energy * _fEres->GetRandom() );
+    result.energy = mc.energy * ( 1 + fracres );
     if (result.energy < 0)
       result.energy = 0;
 
