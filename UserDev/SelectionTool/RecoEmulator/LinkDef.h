@@ -19,7 +19,9 @@
 #pragma link C++ class recoemu::ShowerEmuSmearingRecoBased+;
 #pragma link C++ class recoemu::ShowerEmuSmearingParametrized+;
 #pragma link C++ class recoemu::TrackEmuApplyLengthEff+;
+#pragma link C++ class recoemu::TrackEmuApplyTotalEff+;
 #pragma link C++ class recoemu::TrackEmuTrackDeviation+;
+#pragma link C++ class recoemu::TrackEmuTrackDeviationParametrized+;
 #pragma link C++ class recoemu::TrackEmuTrackFlip+;
 #pragma link C++ class recoemu::TrackEmuMaster+;
 #pragma link C++ class RandomDrawTool+;

@@ -26,27 +26,27 @@ namespace larlite {
 
     // TTree setup
     if (_shower_smearing_tree) delete _shower_smearing_tree;
-    
+
     _shower_smearing_tree = new TTree("shower_smearing_tree", "Shower Smearing Tree");
-    _shower_smearing_tree->Branch("_dedx_in",&_dedx_in,"dedx_in/D");
-    _shower_smearing_tree->Branch("_dedx_out",&_dedx_out,"dedx_out/D");
-    _shower_smearing_tree->Branch("_x_in",&_x_in,"x_in/D");
-    _shower_smearing_tree->Branch("_y_in",&_y_in,"y_in/D");
-    _shower_smearing_tree->Branch("_z_in",&_z_in,"z_in/D");
-    _shower_smearing_tree->Branch("_x_out",&_x_out,"x_out/D");
-    _shower_smearing_tree->Branch("_y_out",&_y_out,"y_out/D");
-    _shower_smearing_tree->Branch("_z_out",&_z_out,"z_out/D");
-    _shower_smearing_tree->Branch("_px_in",&_px_in,"px_in/D");
-    _shower_smearing_tree->Branch("_py_in",&_py_in,"py_in/D");
-    _shower_smearing_tree->Branch("_pz_in",&_pz_in,"pz_in/D");
-    _shower_smearing_tree->Branch("_px_out",&_px_out,"px_out/D");
-    _shower_smearing_tree->Branch("_py_out",&_py_out,"py_out/D");
-    _shower_smearing_tree->Branch("_pz_out",&_pz_out,"pz_out/D");
-    _shower_smearing_tree->Branch("_e_in",&_e_in,"e_in/D");
-    _shower_smearing_tree->Branch("_e_out",&_e_out,"e_out/D");
+    _shower_smearing_tree->Branch("_dedx_in", &_dedx_in, "dedx_in/D");
+    _shower_smearing_tree->Branch("_dedx_out", &_dedx_out, "dedx_out/D");
+    _shower_smearing_tree->Branch("_x_in", &_x_in, "x_in/D");
+    _shower_smearing_tree->Branch("_y_in", &_y_in, "y_in/D");
+    _shower_smearing_tree->Branch("_z_in", &_z_in, "z_in/D");
+    _shower_smearing_tree->Branch("_x_out", &_x_out, "x_out/D");
+    _shower_smearing_tree->Branch("_y_out", &_y_out, "y_out/D");
+    _shower_smearing_tree->Branch("_z_out", &_z_out, "z_out/D");
+    _shower_smearing_tree->Branch("_px_in", &_px_in, "px_in/D");
+    _shower_smearing_tree->Branch("_py_in", &_py_in, "py_in/D");
+    _shower_smearing_tree->Branch("_pz_in", &_pz_in, "pz_in/D");
+    _shower_smearing_tree->Branch("_px_out", &_px_out, "px_out/D");
+    _shower_smearing_tree->Branch("_py_out", &_py_out, "py_out/D");
+    _shower_smearing_tree->Branch("_pz_out", &_pz_out, "pz_out/D");
+    _shower_smearing_tree->Branch("_e_in", &_e_in, "e_in/D");
+    _shower_smearing_tree->Branch("_e_out", &_e_out, "e_out/D");
 
 
-    
+
 
     // make sure the instance is already configured
     if (!_configured)
@@ -82,7 +82,7 @@ namespace larlite {
 
     _disable_xshift = main_cfg.get<bool>("DisableXShift");
     _hutil->setDisableXShift(_disable_xshift);
-    
+
     // Set config bool and exit
     _configured = true;
   }
@@ -115,7 +115,7 @@ namespace larlite {
       // Emulate and retrieve emulated output
       auto emu_output = _track_emu->Emulate(emu_input);
       // Convert recoemu::Track_t => track, if not marked for deletion
-      if( emu_output.mark_for_deletion ) continue;
+      if ( emu_output.mark_for_deletion ) continue;
       auto reco_track = EmuTrack2RecoTrack(emu_output);
       // If output data holder exists, record the result
       if (ev_track) ev_track->emplace_back(reco_track);
@@ -148,7 +148,7 @@ namespace larlite {
       _shower_smearing_tree->Fill();
 
       // Convert recoemu::Shower_t => shower, if not marked for deletion
-      if( emu_output.mark_for_deletion ) continue;
+      if ( emu_output.mark_for_deletion ) continue;
       auto reco_shower = EmuShower2RecoShower(emu_output);
       // If output data holder exists, record the result
       if (ev_shower) ev_shower->emplace_back(reco_shower);
@@ -162,10 +162,11 @@ namespace larlite {
 
   bool EmuDriver::finalize() {
 
-    _fout->cd();
+    if (_fout) {
+      _fout->cd();
+      _shower_smearing_tree->Write();
+    }
 
-    _shower_smearing_tree->Write();
-    
     return true;
   }
 

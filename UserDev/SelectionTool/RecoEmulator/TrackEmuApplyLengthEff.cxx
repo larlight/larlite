@@ -1,5 +1,5 @@
-#ifndef __TRACKEMUSMEARING_CXX__
-#define __TRACKEMUSMEARING_CXX__
+#ifndef __TRACKEMUAPPLYLENGTHEFF_CXX__
+#define __TRACKEMUAPPLYLENGTHEFF_CXX__
 
 #include "TrackEmuApplyLengthEff.h"
 #include <stdlib.h>

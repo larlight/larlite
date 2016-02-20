@@ -15,7 +15,7 @@ EffFunc:   "((atan([1]*(x-[0]))/pi) + 0.5)"
 # params
 # 1st: slope at halfway point (actually gives the gradient at this point)
 # 2nd: position of halfway point
-EffParams: [0.5,0.2] 
+EffParams: [5.0,0.5] 
 EffMin:   0         # minimum energy
 EffMax:   5000      # maximum energy to use in eff function
 
@@ -68,7 +68,7 @@ dEdxResFunc: "TMath::Gaus(x,[0],[1],1)"
 # params:
 # 1st param: mean of gaussian smearing (0 -> no offset)
 # 2nd param: smearing width
-dEdxResParams: [5,0.5]
+dEdxResParams: [0,0.2]
 # minimum of function (since relative smearing -1 is good)
 dEdxResMin: -1
 # maximum of function (since relative smearing +1 is good)

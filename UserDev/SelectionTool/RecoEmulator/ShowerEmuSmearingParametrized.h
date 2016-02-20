@@ -46,7 +46,7 @@ namespace recoemu {
     // EMShowerProfile class with utilities to get shower info
     EMShowerProfile _EMprofile;
     
-    // TTrees
+    // TF1s
     TF1* _fEff;
     TF1* _fEres;
     TF1* _fAngleres;
