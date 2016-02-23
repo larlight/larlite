@@ -13,7 +13,7 @@ data_maker=ertool.ToyDataMaker()
 my_shower1=data_maker.MakeShower(100,1,100, 40,40,40, 11)
 my_shower2=data_maker.MakeShower(100,0,100, 20,20,20, 11)
 # Fake ID
-myid=ROOT.std.pair("size_t","string")()
+myid=ertool.RecoInputID_t()
 
 #
 # Configure ERTool
@@ -21,6 +21,9 @@ myid=ROOT.std.pair("size_t","string")()
 
 # My ERTool manager
 mgr=ertool.Manager()
+# Get IO handler (to add shower/track toy data)
+io=mgr.GetIOHandle()
+in_handle=io.InputStream()
 # Add algorithm
 mgr.AddAlgo(ertool.ERAlgoToy())
 # Add my algorithm's config file
@@ -30,11 +33,12 @@ mgr.AddCfgFile('dummy.cfg')
 # Run it
 #
 mgr.Initialize()
+io.Open()
 
 # Fake "event" 1
 mgr.ClearData()
-mgr.Add(my_shower1,myid)
-mgr.Add(my_shower2,myid)
+in_handle.Add(my_shower1,myid)
+in_handle.Add(my_shower2,myid)
 mgr.Process()
 
 #
@@ -46,6 +50,9 @@ viewer = getViewer("Reco")
 # Call view function to draw on the viewer
 view( viewer, mgr.EventData(), mgr.ParticleGraph() )
 # Wait for a user's "hit-enter"
-sys.stdin.readline()
+try:
+    input('')
+except Exception:
+    pass
 # Finalize
 mgr.Finalize()
