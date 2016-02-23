@@ -24,11 +24,15 @@ namespace flashana {
      doxygen documentation!
   */
   class QLLMatch : public BaseFlashMatch {
+
+  private:
+    /// Valid ctor hidden (singleton)
+    QLLMatch(const std::string);
     
   public:
     
-    /// Default constructor
-    QLLMatch(const std::string="QLLMatch");
+    /// Default ctor throws exception (singleton)
+    QLLMatch();
     
     /// Default destructor
     ~QLLMatch(){}
@@ -38,7 +42,7 @@ namespace flashana {
     /// Singleton shared instance getter
     static QLLMatch& GetME()
     {
-      if(!_me) _me = new QLLMatch;
+      if(!_me) _me = new QLLMatch("QLLMatch");
       return *_me;
     }
 
