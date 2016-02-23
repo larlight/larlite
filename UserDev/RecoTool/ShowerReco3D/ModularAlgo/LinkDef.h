@@ -23,11 +23,13 @@
 #pragma link C++ class showerreco::PCA3DAxis+;
 #pragma link C++ class showerreco::StartPointPandora+;
 #pragma link C++ class showerreco::EmptyModule+;
+#pragma link C++ class showerreco::ToyGeoModule+;
 //ADD_NEW_CLASS ... do not change this line
 
 #pragma link C++ class showerreco::ShowerRecoAlgModular+;
 //ADD_NEW_ALG_CLASS ... do not change this line
 #endif
+
 
 
 

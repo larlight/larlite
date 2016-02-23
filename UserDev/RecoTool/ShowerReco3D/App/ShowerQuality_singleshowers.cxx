@@ -232,12 +232,18 @@ bool ShowerQuality_singleshowers::analyze(storage_manager* storage) {
 //       associated_clusters.push_back( & ev_cluster->at(ass_cluster_v[shower_index][i]) );
 // }
 
+  // double maxRecoShowerEnergyY = 0.;
+  // size_t iMostEnergeticShower = 0;
   for (size_t shower_index = 0; shower_index < ev_shower->size(); ++shower_index) {
     auto const& myrecoshower = ev_shower->at(shower_index);
     auto const& mymcshower = ev_mcs->at(0);
+    // if ( myrecoshower.Energy_v().at(2) > maxRecoShowerEnergyY ) iMostEnergeticShower = shower_index;
     FillQualityInfo(myrecoshower, mymcshower, shower_index);//, associated_clusters);
   }
 
+  // auto const& myrecoshower = ev_shower->at(iMostEnergeticShower);
+  // auto const& mymcshower = ev_mcs->at(0);
+  // FillQualityInfo(myrecoshower, mymcshower, iMostEnergeticShower);
 
   // // get associated hits
   // event_hit* ev_hit = nullptr;

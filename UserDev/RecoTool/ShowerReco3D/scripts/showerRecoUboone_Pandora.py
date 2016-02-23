@@ -59,7 +59,8 @@ def getShowerRecoAlgModular():
   #alg.AddShowerRecoModule(showerreco.OtherStartPoint3D()  )
   # alg.AddShowerRecoModule(showerreco.ShowerChargeModule()  )
 
-  alg.AddShowerRecoModule(showerreco.GeoModule())
+  # alg.AddShowerRecoModule(showerreco.GeoModule())
+  alg.AddShowerRecoModule(showerreco.ToyGeoModule())
 
   alg.PrintModuleList()
 
@@ -98,16 +99,16 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 
 # Specify analysis output root file name
-my_proc.set_ana_output_file("showerRecoUboonePandora_ana.root")
+my_proc.set_ana_output_file("results/showerRecoUboone_pandoraNu3D_v3_ana.root")
 # Specify data output root file name
-my_proc.set_output_file("showerRecoUboonePandora.root")
+my_proc.set_output_file("results/showerRecoUboone_pandoraNu3D_v3.root")
 
 
 
 ana_unit=DefaultShowerReco3D()
 ana_unit.SetInputProducer("pandoraNu")
 
-ana_unit.SetOutputProducer("showerrecoPandora")
+ana_unit.SetOutputProducer("showerreco")
 
 my_proc.add_process(ana_unit)
 

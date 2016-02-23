@@ -2,6 +2,7 @@
 #define PCA3DAXISMODULE_CXX
 
 #include "PCA3DAxis.h"
+#include "TVector3.h"
 
 namespace showerreco {
 
@@ -19,6 +20,12 @@ void PCA3DAxis::do_reconstruction(const ProtoShower & proto_shower,
   // 
   if (proto_shower.hasCluster3D()){
     resultShower.fDCosStart = proto_shower.params3D().principal_dir;
+    // Determine the direction
+    TVector3 ShowerMean( proto_shower.params3D().mean_x, proto_shower.params3D().mean_y, proto_shower.params3D().mean_z );
+    TVector3 DiffPlus = ShowerMean - 0.5 * proto_shower.params3D().eigenvalue_principal * proto_shower.params3D().principal_dir - proto_shower.vertexes().front();
+    TVector3 DiffMinus = ShowerMean + 0.5 * proto_shower.params3D().eigenvalue_principal * proto_shower.params3D().principal_dir - proto_shower.vertexes().front();
+    if ( DiffPlus.Mag() > DiffMinus.Mag() ) resultShower.fDCosStart *= -1.;
+
   }
   else{
     throw ShowerRecoException("PCA3DAxis requires 3D cluster but has none.");

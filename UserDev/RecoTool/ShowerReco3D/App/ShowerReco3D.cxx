@@ -259,7 +259,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
   if (shower_v->size() == 0)
     return true;
 
-  std::cout << "Saving associations" << std::endl;
+  // std::cout << "Saving associations" << std::endl;
 
   // set shower -> cluster and shower -> pfpart associations
 
@@ -286,7 +286,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
                                       shower_pfpart_v);
   }
 
-  std::cout << "Finished the event!" << std::endl;
+  // std::cout << "Finished the event!" << std::endl;
   return true;
 }
 
