@@ -447,7 +447,7 @@ namespace ertool {
 				ss << std::endl
 				   << "\tShower has dEdx = " << dedx << std::endl
 				   << "\tRadLen = " << radlen << std::endl
-				   << "\tIgnore for comparison.";
+				   << "\tShower is Gamma Like! (ignore for comparison)";
 				Debug(__FUNCTION__, ss.str());
 			}
 			return true;
@@ -499,6 +499,15 @@ namespace ertool {
 		// If this shower points back to within 10 cm of anything else
 		// And this shower start point is farther than 2cm from that vtx
 		// assume it is gamma like (no empart used!)
+		if (Debug()) {
+				std::stringstream ss;
+				ss << std::endl
+				   << "\tShower has IPmin = " << IPmin << std::endl
+				   << "\tand vtxMin.Dist(shr1.Start()) = " << vtxMin.Dist(shr1.Start()) << std::endl
+				   << "\tif IPmin < 10 and vtxdist > 1, shower is GAMMA LIKE!";
+				Debug(__FUNCTION__, ss.str());
+			}
+
 		if(IPmin < 10. && vtxMin.Dist(shr1.Start()) > 1.)
 			return true;
 

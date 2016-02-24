@@ -3,9 +3,9 @@ EmuDriver: {
 
     MCTrackProducer:  mcreco
     MCShowerProducer: mcreco
-    DisableXShift:    0
+    DisableXShift:    1
     TrackEmulator:    TrackEmuMaster
-    ShowerEmulator:   ShowerEmuSmearing
+    ShowerEmulator:   ShowerEmuSmearingParametrized
 
     TrackEmuMaster: {
 
@@ -27,10 +27,31 @@ EmuDriver: {
 
         }
 
-        TrackEmuApplyLengthEff:  {
-            LengthEffParam0: 5.
-            LengthEffParam1: 0.5
-            LengthEffParam2: 0.95
+        TrackEmuTrackDeviationParametrized: {
+            SmearFunc: "TMath::Gaus(x,[0],[1],1)"
+            # 1st param: center of gaussian
+            # 2nd param: width of gaussian
+            XSmearParams: [-0.06,0.03]
+            XSmearMin: -1
+            XSmearMax: 1
+            YSmearParams: [0,0.03]
+            YSmearMin: -1
+            YSmearMax: 1
+            ZSmearParams: [0,0.03]
+            ZSmearMin: -1
+            ZSmearMax: 1
+        }
+
+        TrackEmuApplyTotalEff:  {
+            #LengthEff is a weird arctan function
+            LengthEffParam0: 5. #"slope at halfway point (actually gives the gradient at this point)"
+            LengthEffParam1: 0.5 #"position of halfway point"
+            
+            #Theta and Phi eff is a very complicated 2D function
+            AngleEffParam0: 0.9 #"maximum (at phi = 90)"
+            AngleEffParam1: 0.4 #"minimum of distribution (along x)"
+            AngleEffParam2: 0.69 #"maximum at (theta -> 0, phi = 0)"
+            
         }
 
         TrackEmuTrackFlip:  {
@@ -66,5 +87,73 @@ EmuDriver: {
         dEdxResolutionValues: [8,7,9,11,15,8,12,15,14,10,17,11,14,16,17,24,29,38,38,69,73,91,106,124,164,129,136,130,144,120,112,108,93,82,66,60,42,45,32,28,25,30,13,18,14,8,18,16,16]
 
         }
+
+    ShowerEmuSmearingParametrized: {
+
+        # efficiency function x-axis is energy [MeV], y-axis is reconstruction eff (0,1) 
+        EffFunc:   "((atan([1]*(x-[0]))/pi) + 0.5)"
+        # params
+        # 1st: slope at halfway point (actually gives the gradient at this point)
+        # 2nd: position of halfway point
+        EffParams: [5.0,0.5] 
+        EffMin:   0         # minimum energy
+        EffMax:   5000      # maximum energy to use in eff function
+
+        # energy resolution function. This is a relative resolution
+        # this parametrization represents the energy resolution @ 1 GeV of energy
+        # the energy resolution will be energy dependent and follow the form:
+        # Eres (E) = Eres(1GeV) / sqrt (E / 1 GeV)
+        EResFunc: "TMath::Gaus(x,[0],[1],1)"
+        # params:
+        # 1st param: center of gaussian ( 0 -> no offset in enerergy resolution)
+        # 2nd param: width of gaussian
+        EResParams: [0,0.1]
+        # minimum of function : -1 since this is a relative energy resolution
+        EResMin: -1
+        # maximum of function: +1 since this is a relative energy resolution
+        EResMax: 1
+
+        # angular resolution function.
+        # this is the smearing to be applied, in degrees, to the input angle
+        AngleResFunc: "TMath::Landau(x,[0],[1],1)"
+        # 1st param: MPV of lanadau (the "peak" smeaing angle)
+        # 2nd param: the width of the landau (how large the tail of the distribution will be)
+        AngleResParams: [5,5]
+        # miimum angle, should always be 0
+        AngleResMin: 0
+        # maximum angle, should always be 180
+        AngleResMax: 180
+
+        # position resolution function.
+        # this is an absolute resolution (in cm) and is gaussian.
+        # ( pos += pos_smearing )
+        PosResFunc: "TMath::Gaus(x,[0],[1],1)"
+        # params:
+        # 1st param: mean of gaussian (0 -> no offset)
+        # 2nd param: sigma of gaussian (0.3 would be a smearing = to wire-spacing)
+        PosResParams: [0,0.3]
+        # minimum of function (in cm)
+        PosResMin: -3
+        # maximum of function (in cm)
+        PosResMax: 3
+
+        # shower direction flipping
+        # this is the fraction of times the shower direction will be flipped
+        # this factor is applied uniformly for all showers. no energy depedence
+        DirectionFlipFrac: 0.05
+
+        # dedx resolution function.
+        # this is a fractional resolution ( dedx += dedx * frac_smearing )
+        dEdxResFunc: "TMath::Gaus(x,[0],[1],1)"
+        # params:
+        # 1st param: mean of gaussian smearing (0 -> no offset)
+        # 2nd param: smearing width
+        dEdxResParams: [0,0.2]
+        # minimum of function (since relative smearing -1 is good)
+        dEdxResMin: -1
+        # maximum of function (since relative smearing +1 is good)
+        dEdxResMax: 1
+
+    }
 
 }

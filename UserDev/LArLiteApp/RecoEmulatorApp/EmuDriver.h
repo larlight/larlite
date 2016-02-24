@@ -24,6 +24,7 @@
 #include "DataFormat/mcshower.h"
 #include <TRandom.h>
 #include "ERToolBackend/ERToolHelperUtil.h"
+#include "TTree.h"
 
 namespace larlite {
 
@@ -69,6 +70,13 @@ namespace larlite {
     const std::string& mcshower_producer() const { return _mcshower_producer; }
 
   private:
+
+    /// TTree where to show smearing results
+    TTree* _shower_smearing_tree;
+    double _dedx_in, _dedx_out;
+    double _x_in, _y_in, _z_in, _px_in, _py_in, _pz_in;
+    double _x_out, _y_out, _z_out, _px_out, _py_out, _pz_out;
+    double _e_in, _e_out;
 
     /// Configuration method called by EmuDriver::set_config public method
     void Configure(const std::string&);

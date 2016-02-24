@@ -18,8 +18,10 @@
 #include "RecoEmulatorFactory.h"
 #include "RandomDrawTool.h"
 #include "TrackEmuTrackFlip.h"
-#include "TrackEmuTrackDeviation.h"
-#include "TrackEmuApplyLengthEff.h"
+// #include "TrackEmuTrackDeviation.h"
+// #include "TrackEmuApplyLengthEff.h"
+#include "TrackEmuApplyTotalEff.h"
+#include "TrackEmuTrackDeviationParametrized.h"
 
 namespace recoemu {
   /**
@@ -45,9 +47,9 @@ namespace recoemu {
 
   private:
 
-    TrackEmuTrackDeviation _trackdeviation;
+    TrackEmuTrackDeviationParametrized _trackdeviation;
     TrackEmuTrackFlip      _trackflip;
-    TrackEmuApplyLengthEff _tracklengtheff;
+    TrackEmuApplyTotalEff _tracktotaleff;
 
   };
 

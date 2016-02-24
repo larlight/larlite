@@ -17,9 +17,9 @@ namespace recoemu {
 
     void TrackEmuMaster::Configure(const ::fcllite::PSet &pset)
     {
-        _trackdeviation.Configure(pset.get_pset("TrackEmuTrackDeviation"));
+        _trackdeviation.Configure(pset.get_pset("TrackEmuTrackDeviationParametrized"));
         _trackflip.Configure(pset.get_pset("TrackEmuTrackFlip"));
-        _tracklengtheff.Configure(pset.get_pset("TrackEmuApplyLengthEff"));
+        _tracktotaleff.Configure(pset.get_pset("TrackEmuApplyTotalEff"));
     }
 
     recoemu::Track_t TrackEmuMaster::Emulate(const recoemu::Track_t& mc)
@@ -31,7 +31,7 @@ namespace recoemu {
         // order matters! Should think about this more...
         result = _trackdeviation.Emulate(result);
         result = _trackflip.Emulate(result);
-        result = _tracklengtheff.Emulate(result);
+        result = _tracktotaleff.Emulate(result);
 
         return result;
     }
