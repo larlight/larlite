@@ -17,7 +17,7 @@ try:
         def __init__(self):
             super(simch3D, self).__init__()
             self._productName = 'simch3D'
-            self._process = evd.DrawSimch()
+            self._process = evd.DrawSimChannel3D()
             self.init()
 
         def drawObjects(self, view_manager):
