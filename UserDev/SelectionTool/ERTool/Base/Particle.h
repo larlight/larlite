@@ -65,7 +65,8 @@ namespace ertool {
     const ::geoalgo::Vector& Momentum() const;
     float RecoScore() const;
     const ProcessType_t& ProcessType() const;
-    
+    const Origin_t& Origin() const;
+
     void SetParticleInfo( const int pdg_code = kINVALID_INT,
 			  const double mass  = kINVALID_DOUBLE,
 			  const ::geoalgo::Vector& vtx = kINVALID_VERTEX,
@@ -77,6 +78,8 @@ namespace ertool {
 
     void SetProcess(const ProcessType_t process){ _process = process; }
     
+    void SetOrigin(const Origin_t origin) { _origin = origin; }
+
     std::string Print() const;
 
   private:
@@ -111,6 +114,8 @@ namespace ertool {
     RecoType_t   _reco_type;   ///< Associated reco object type 
     RecoID_t     _reco_id;     ///< Associated reco ojbect id
     FlashID_t    _flash_id;    ///< Associated flash id
+
+    Origin_t     _origin; /// MC Truth generator origin
   };
 
 }
