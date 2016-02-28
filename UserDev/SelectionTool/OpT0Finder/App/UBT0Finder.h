@@ -110,6 +110,8 @@ namespace larlite {
     
     TTree* _flashmatch_tree;
     double _npe;
+    int _tpcID;
+    int _event;
     double _npts;
     double _flash_x;
     double _flash_y;
@@ -117,6 +119,7 @@ namespace larlite {
     double _tpc_x;
     double _tpc_y;
     double _tpc_z;
+    double _tpc_t;
     double _score;
     double _flash_time;
     double _mc_time;
@@ -124,6 +127,10 @@ namespace larlite {
     double _mc_y;
     double _mc_z;
     double _mc_dx;
+    double _mc_length;
+    std::vector<double> _mc_trajx;
+    std::vector<double> _mc_trajy;
+    std::vector<double> _mc_trajz;
 
     // tree to measure efficiency of matching for MCTracks
     TTree *_eff_tree;

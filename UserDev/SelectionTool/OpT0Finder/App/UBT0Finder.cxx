@@ -59,11 +59,14 @@ namespace larlite {
 
     _flashmatch_tree = new TTree("flashmatch_tree", "");
     _flashmatch_tree->Branch("npe", &_npe, "npe/D");
+    _flashmatch_tree->Branch("tpcID", &_tpcID, "tpcID/I");
+    _flashmatch_tree->Branch("event", &_event, "event/I");
     _flashmatch_tree->Branch("fy", &_flash_y, "fy/D");
     _flashmatch_tree->Branch("fz", &_flash_z, "fz/D");
     _flashmatch_tree->Branch("tx", &_tpc_x, "tx/D");
     _flashmatch_tree->Branch("ty", &_tpc_y, "ty/D");
     _flashmatch_tree->Branch("tz", &_tpc_z, "tz/D");
+    _flashmatch_tree->Branch("tt", &_tpc_t, "tt/D");
     _flashmatch_tree->Branch("ft", &_flash_time, "ft/D");
     _flashmatch_tree->Branch("mct", &_mc_time, "mct/D");
     _flashmatch_tree->Branch("mcE", &_mc_edep, "mcE/D");
@@ -71,6 +74,10 @@ namespace larlite {
     _flashmatch_tree->Branch("mcy", &_mc_y, "mcy/D");
     _flashmatch_tree->Branch("mcz", &_mc_z, "mcz/D");
     _flashmatch_tree->Branch("mc_dx", &_mc_dx, "mc_dx/D");
+    _flashmatch_tree->Branch("length", &_mc_length, "length/D");
+    _flashmatch_tree->Branch("trajx", &_mc_trajx);
+    _flashmatch_tree->Branch("trajy", &_mc_trajy);
+    _flashmatch_tree->Branch("trajz", &_mc_trajz);
     _flashmatch_tree->Branch("score", &_score, "score/D");
     _flashmatch_tree->Branch("trk_shift", &_trk_shift, "trk_shift/D");
 
@@ -102,14 +109,19 @@ namespace larlite {
     _mgr.Reset();
     const ::larutil::Geometry* g = ::larutil::Geometry::GetME();
 
-    auto ev_flash = storage->get_data<event_opflash>("opFlash");// opflash"); // EC: change capitalization in these 2 lines.
-    auto ev_hit = storage->get_data<event_ophit>    ("opFlash"); // opflash");
+    auto ev_flash = storage->get_data<event_opflash>("opflash");// opFlash"); // EC: change capitalization in these 2 lines.
+    auto ev_hit = storage->get_data<event_ophit>    ("opflash"); // opFlash");
+
 
 
     if (!ev_flash || ev_flash->empty()) {
       std::cout << "No opflash found. Skipping event: " << storage->event_id() << std::endl;
       return false;
     }
+
+    const double det_drift_time = 2.3E6; // ns
+    const double det_width = 256.35; // cm
+
 
     // For TH2D-- number of flash per event > x PE
     // Number interactions per event > y MeV
@@ -121,6 +133,7 @@ namespace larlite {
         n_flash++;
     }
 
+
     for (auto const & f : *ev_flash){
       _npe = f.TotalPE();
       _flash_tree->Fill();
@@ -130,6 +143,8 @@ namespace larlite {
     auto ev_track = storage->get_data<event_track>("trackkalmanhit");
     auto ev_mctrack = storage->get_data<event_mctrack>("mcreco");
     auto ev_mcshower = storage->get_data<event_mcshower>("mcreco");
+
+
 
     if (!_use_mc && !_photon_bomb) {
       if (!ev_track || ev_track->empty()) return false;
@@ -158,9 +173,12 @@ namespace larlite {
           pt.y = pt1[1] + dy / 2.;
           pt.z = pt1[2] + dz / 2.;
 
+	  pt.t = pt.x/(det_width/det_drift_time) ; // this is an upper bound on the drift time
+
           tpc_obj.emplace_back(pt);
           tpc_obj.idx = n;
         }
+
         _mgr.Emplace(std::move(tpc_obj));
       }
     }
@@ -175,15 +193,12 @@ namespace larlite {
 
         auto const& trk = ev_mctrack->at(n);
 
-
         if (trk.size() > 2) {
 
           // per track calculate the shift in x-direction
           // so that the x-position is what would be seen
           // in the TPC, not the truth x-position
           double event_time = trk[0].T(); // ns
-          double det_drift_time = 2.3E6; // ns
-          double det_width = 256.35; // cm
           double shift_x = event_time * (det_width / det_drift_time);
 
           _trk_time = trk[0].T() / 1000.;
@@ -211,6 +226,10 @@ namespace larlite {
 
       for(auto& qcluster : qcluster_v){
         if( qcluster.idx != -1)
+	  for (size_t ii = 0;  ii<qcluster.size(); ++ii)
+	    {
+	      qcluster[ii].t = qcluster[ii].x/(det_width/det_drift_time) ; // this is an upper bound, which we will enforce later in PhotonLibHypothesis::FillEstimate().
+	    }
 	  _mgr.Emplace(std::move(qcluster));
 	}
 
@@ -225,6 +244,7 @@ namespace larlite {
 	//  2 energy dep points.  
 	bool good = true;
 	for(auto const& q : qcluster_v){
+	  n_int++;
 	  if(q.idx == s.index_id){
 	    if(q.size() < 2 || q.idx == -1){
 	      good = false;
@@ -249,7 +269,7 @@ namespace larlite {
     }//else if _use_mc
     else if (_photon_bomb) {
 
-
+      n_int++;
       flashana::QPoint_t qpt(_x_pb,_y_pb,_z_pb,_nphoton_pb);
       flashana::QCluster_t qcluster;
       qcluster.emplace_back(qpt);
@@ -315,6 +335,7 @@ namespace larlite {
       _tpc_x   = match.tpc_point.x;
       _tpc_y   = match.tpc_point.y;
       _tpc_z   = match.tpc_point.z;
+      _tpc_t   = match.tpc_point.t;
       _npe     = flash.TotalPE();
       _score   = match.score;
       _flash_time = flash.Time();
@@ -323,14 +344,15 @@ namespace larlite {
       if (_use_mc || _photon_bomb) {
 
 //	std::cout<<"Match things...: "<<match.tpc_id<<", and size of ev_mctrk : "<<ev_mctrack->size()<<std::endl ;
-        double det_drift_time = 2.3E6; // ns
-        double det_width = 256.; // cm
 
 	if (_use_mc)
 	  {
 	    auto const& mct = (*ev_mctrack)[match.tpc_id];
 	    _mc_time = mct[0].T() * 1.e-3;
-	    
+	    _mc_x = mct[0].X();
+	    _mc_y = mct[0].Y();
+	    _mc_z = mct[0].Z();
+
 	    if(_mc_time < -2050 || _mc_time > 2750)
 	      continue;
 
@@ -338,6 +360,20 @@ namespace larlite {
 	    if ( mct[0].E() - mct[mct.size() - 1].E() > _e_diff )
 	      _time_diff->Fill(1000 * (_flash_time - _mc_time)); //
 	    _trk_shift = event_time * (det_width / det_drift_time);
+
+	    _mc_length = std::sqrt(std::pow(mct.Start().X()-mct.End().X(),2.)+std::pow(mct.Start().Y()-mct.End().Y(),2.)+std::pow(mct.Start().Z()-mct.End().Z(),2.));
+
+	    _mc_trajx.clear(); _mc_trajy.clear(); _mc_trajz.clear();
+	    _mc_trajx.reserve(mct.SegmentCenter().size());
+	    _mc_trajy.reserve(mct.SegmentCenter().size());
+	    _mc_trajz.reserve(mct.SegmentCenter().size());
+	    for ( auto const& pt :  mct.SegmentCenter())
+	      {
+		_mc_trajx.emplace_back(pt[0]);
+		_mc_trajy.emplace_back(pt[1]);
+		_mc_trajz.emplace_back(pt[2]);
+	      }
+		
 	  }
 	else if (_photon_bomb)
 	      _time_diff->Fill(1000 * (_flash_time - 0 )); //
@@ -347,6 +383,7 @@ namespace larlite {
         pt[0] = _tpc_x;
         pt[1] = _tpc_y;
         pt[2] = _tpc_z;
+
         //double min_x = 1e9;
         //double max_x = 0;
         //for (size_t i = 0; i < mct.size() - 1; ++i) {
@@ -368,7 +405,11 @@ namespace larlite {
         //  if (step1.X() > max_x) max_x = step1.X();
         //}
         //_mc_dx = max_x - min_x;
+
       }
+
+      _tpcID = match.tpc_id;
+      _event = storage->event_id();
       _flashmatch_tree->Fill();
 
     }// for all matches

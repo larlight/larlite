@@ -67,8 +67,8 @@ my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
 # Hypothesis Algo
 my_unit.Manager().SetAlgo(flashana.PhotonLibHypothesis())
 # Match Algo
-my_unit.Manager().SetAlgo( flashana.LLMatch.GetME() )
-#my_unit.Manager().SetAlgo( flashana.QLLMatch.GetME() )
+#my_unit.Manager().SetAlgo( flashana.LLMatch.GetME() )
+my_unit.Manager().SetAlgo( flashana.QLLMatch.GetME() )
 #my_unit.Manager().SetAlgo( flashana.QWeightPoint()   )
 #my_unit.Manager().SetAlgo( flashana.CommonAmps()      )
 

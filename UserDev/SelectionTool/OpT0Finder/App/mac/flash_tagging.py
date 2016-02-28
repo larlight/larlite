@@ -39,7 +39,8 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
-my_proc.set_ana_output_file("ana.root")
+my_proc.set_ana_output_file("ana_LL.root")
+#my_proc.set_ana_output_file("ana_QLL.root")
 
 # Attach an analysis unit ... here we use a base class which does nothing.
 # Replace with your analysis unit if you wish.
@@ -56,7 +57,7 @@ my_unit.Manager().SetAlgo(flashana.NPtFilter())
 # PMT Filter Algo
 my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
 # Match Prohibit Algo
-#my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
+my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
 # Hypothesis Algo
 my_unit.Manager().SetAlgo(flashana.PhotonLibHypothesis())
 # Match Algo
@@ -69,7 +70,7 @@ my_unit.Manager().SetAlgo( flashana.LLMatch.GetME() )
 # Other algorithms
 #
 
-my_unit.Manager().AddCustomAlgo( flashana.LightPath() )
+#my_unit.Manager().AddCustomAlgo( flashana.LightPath() )
 
 my_unit.Manager().Configure( "%s/SelectionTool/OpT0Finder/App/mac/flashmatch.fcl" % os.environ['LARLITE_USERDEVDIR'])
 
@@ -78,6 +79,7 @@ print  "Finished configuring ana_processor. Start event loop!"
 print
 
 # Let's run it.
+#my_proc.run(6,1)
 my_proc.run()
 
 # done!

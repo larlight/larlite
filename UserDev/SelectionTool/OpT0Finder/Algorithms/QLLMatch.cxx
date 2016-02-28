@@ -20,6 +20,7 @@ namespace flashana {
     void QLLMatch::Configure(const ::fcllite::PSet &pset) {
         _record = pset.get<bool>("RecordHistory");
         _normalize = pset.get<bool>("NormalizeHypothesis");
+
     }
 
     FlashMatch_t QLLMatch::Match(const QCluster_t &pt_v, const Flash_t &flash) {
@@ -30,6 +31,9 @@ namespace flashana {
         FlashMatch_t res;
         if (isnan(_qll)) return res;
         res.tpc_point.x = res.tpc_point.y = res.tpc_point.z = 0;
+	res.tpc_point_err.clear();
+	res.tpc_point_err.resize(3);
+	res.tpc_point_err[0] = res.tpc_point_err[1] = res.tpc_point_err[2] = 0;
         res.score = 1. / _qll;
 
         double weight = 0;
@@ -47,6 +51,11 @@ namespace flashana {
         res.tpc_point.z /= weight;
         res.tpc_point.q = weight;
 
+	//  This is the TPC x, even if the y,z are for a Flash location
+	res.tpc_point.x = _reco_x_offset;
+	res.tpc_point_err[0] = _reco_x_offset_err;
+
+
         return res;
     }
 
@@ -54,6 +63,8 @@ namespace flashana {
         if (_hypothesis.pe_v.empty()) _hypothesis.pe_v.resize(NOpDets(), 0.);
         if (_hypothesis.pe_v.size() != NOpDets())
             Print(msg::kEXCEPTION, __FUNCTION__, "Hypothesis vector length != PMT count");
+
+
 
         for (auto &v : _hypothesis.pe_v) v = 0;
 
@@ -108,10 +119,11 @@ namespace flashana {
             result += std::pow((O - H), 2) / (O + H);
 
             //result += std::fabs(  ) * measurement.pe_v[pmt_index];
-
+	    //	    std::cout << "QLL(): ii chi2,  O, H:" << pmt_index << ", " << std::pow((O - H), 2)/(O + H)  << ", "<< O << ", " << H << std::endl;
         }
 
-        std::cout << "PE hyp : " << PEtot_Hyp << "\tPE Obs : " << PEtot_Obs << "\t Chi^2 : " << result << std::endl;
+	
+	//	std::cout << "PE hyp : " << PEtot_Hyp << "\tPE Obs : " << PEtot_Obs << "\t Chi^2 : " << result << std::endl;
 
         return result / nvalid_pmt;
     }
@@ -122,8 +134,8 @@ namespace flashana {
                      Double_t *Xval,
                      Int_t /*Flag*/) {
 
-        //std::cout << "minuit offset : " << Fval << std::endl;
-        ///std::cout << "minuit Xval?? : " << *Xval << std::endl;
+      //        std::cout << "minuit offset : " << Fval << std::endl;
+      //        std::cout << "minuit Xval?? : " << *Xval << std::endl;
 
         auto const &hypothesis = QLLMatch::GetME().ChargeHypothesis(*Xval);
         auto const &measurement = QLLMatch::GetME().Measurement();

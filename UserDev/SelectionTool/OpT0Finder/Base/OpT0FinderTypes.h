@@ -43,16 +43,28 @@ namespace flashana {
   /// Struct to represent an energy deposition point in 3D space
   struct QPoint_t{
 
-    double x,y,z; ///< Spatial position in [cm]
+    double x,y,z,t; ///< Spatial,time position in [cm],[musec]
     double q;     ///< Charge in an arbitrary unit
     /// Default ctor assigns invalid values
     QPoint_t()
       : x(kINVALID_DOUBLE)
       , y(kINVALID_DOUBLE)
       , z(kINVALID_DOUBLE)
+      , t(kINVALID_DOUBLE)
       , q(kINVALID_DOUBLE)
     {}
-    /// Alternative ctor
+    /// Alternative ctors
+    QPoint_t(double xvalue,
+	     double yvalue,
+	     double zvalue,
+	     double tvalue,
+	     double qvalue)
+      : x(xvalue)
+      , y(yvalue)
+      , z(zvalue)
+      , t(zvalue)
+      , q(qvalue)
+    {}
     QPoint_t(double xvalue,
 	     double yvalue,
 	     double zvalue,

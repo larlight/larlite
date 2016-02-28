@@ -21,6 +21,7 @@ namespace flashana {
     void LLMatch::Configure(const ::fcllite::PSet &pset) {
         _record = pset.get<bool>("RecordHistory");
         _normalize = pset.get<bool>("NormalizeHypothesis");
+	std::cout << "LLMatch.cxx: _normalize is " << _normalize << std::endl;
     }
 
     FlashMatch_t LLMatch::Match(const QCluster_t &pt_v, const Flash_t &flash) {
@@ -60,10 +61,11 @@ namespace flashana {
 	 */
 
 
+	//  This is the TPC x, een if the y,z are for a Flash location
 	res.tpc_point.x = _reco_x_offset;
 	res.tpc_point_err[0] = _reco_x_offset_err;
 
-	std::cout << "LLMatch::Match() res.x, res.dx are " << res.tpc_point.x << ", " << res.tpc_point_err[0] << std::endl;
+       	//	std::cout << "LLMatch::Match() res.x, res.dx are " << res.tpc_point.x << ", " << res.tpc_point_err[0] << std::endl;
 
         return res;
     }
@@ -73,15 +75,20 @@ namespace flashana {
         if (_hypothesis.pe_v.size() != NOpDets())
             Print(msg::kEXCEPTION, __FUNCTION__, "Hypothesis vector length != PMT count");
 
+	//	std::cout << "ChargeHypothesis: xoffset: " << xoffset << std::endl;
+
         for (auto &v : _hypothesis.pe_v) v = 0;
 
         // Apply xoffset
         _var_trk.resize(_raw_trk.size());
         for (size_t pt_index = 0; pt_index < _raw_trk.size(); ++pt_index) {
-            //std::cout << "x point : " << _raw_trk[pt_index].x << "\t offset : " << xoffset << std::endl;
+	  //            std::cout << "x point : " << _raw_trk[pt_index].x << "\t offset : " << xoffset << std::endl;
+
+	  // This means xoffset is the actual trk doca from the x=0 plane, since we've moved it to x=0 previously.
             _var_trk[pt_index].x = _raw_trk[pt_index].x + xoffset;
             _var_trk[pt_index].y = _raw_trk[pt_index].y;
             _var_trk[pt_index].z = _raw_trk[pt_index].z;
+            _var_trk[pt_index].t = _raw_trk[pt_index].t;
             _var_trk[pt_index].q = _raw_trk[pt_index].q;
         }
 
@@ -117,8 +124,8 @@ namespace flashana {
             throw OpT0FinderException("Cannot compute LL for unmatched length!");
         for (size_t pmt_index = 0; pmt_index < hypothesis.pe_v.size(); ++pmt_index) {
 
-
 	  if (hypothesis.pe_v[pmt_index] < 0.01) continue; // This seems to be always true of tubes 1 and 30 of 0-31.
+	  //	  if ( pmt_index==1) continue; // Is Observed always 0 for this tube?, EC, 14-Feb-2016
 
             nvalid_pmt += 1;
 
@@ -129,12 +136,10 @@ namespace flashana {
 	    result.at(1) +=  -std::log10(TMath::Poisson(O,H))  ; // neg. log-likelihood
 	    if (isnan(result.at(1)) || isinf(result.at(1))) result.at(1) = 1.E6;
 	    // could instead use discrete std::poisson_distribution
-	    
 	    //	    std::cout << "LL(): ii chi2, llhd, O, H:" << pmt_index << ", " << std::pow((O - H), 2)/(O + H)  << ", " << -std::log10(TMath::Poisson(O,H)) << ", " << O << ", " << H << std::endl;
-
         }
 
-	//        std::cout << "PE hyp : " << PEtot_Hyp << "\tPE Obs : " << PEtot_Obs << "\t Chi^2, LLHD : " << result.at(0) << ", " << result.at(1) << std::endl;
+	//std::cout << "PE hyp : " << PEtot_Hyp << "\tPE Obs : " << PEtot_Obs << "\t Chi^2, LLHD : " << result.at(0) << ", " << result.at(1) << std::endl;
 
         result.at(0) /= nvalid_pmt;
         result.at(1) /= nvalid_pmt;
@@ -147,8 +152,8 @@ namespace flashana {
                      Double_t *Xval,
                      Int_t /*Flag*/) {
 
-      //        std::cout << "minuit offset : " << Fval << std::endl;
-      //        std::cout << "minuit Xval?? : " << *Xval << std::endl;
+      //              std::cout << "minuit offset : " << Fval << std::endl;
+      //              std::cout << "minuit Xval?? : " << *Xval << std::endl;
 
         auto const &hypothesis = LLMatch::GetME().ChargeHypothesis(*Xval);
         auto const &measurement = LLMatch::GetME().Measurement();
@@ -179,6 +184,7 @@ namespace flashana {
             if (pt.x < min_x) min_x = pt.x;
         }
 
+	// This shifts the track so that it touches x=0 plane 
         for (auto &pt : _raw_trk) pt.x -= min_x;
 
         //

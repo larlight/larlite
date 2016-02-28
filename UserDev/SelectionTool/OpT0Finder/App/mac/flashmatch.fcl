@@ -13,7 +13,7 @@ FlashMatchManager:{
 
 LLMatch:{
     RecordHistory: true
-    NormalizeHypothesis: false
+    NormalizeHypothesis: true
 }
 
 QLLMatch:{
@@ -44,7 +44,7 @@ MaxNPEWindow:{
 
 NPtFilter:{
 # was 2, photon bomb requires that it be 1.
-    MinNumPoint: 0
+    MinNumPoint: 2
 }
 
 PhotonLibHypothesis:
