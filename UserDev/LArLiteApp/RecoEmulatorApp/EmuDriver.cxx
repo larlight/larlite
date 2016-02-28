@@ -115,7 +115,13 @@ namespace larlite {
       // Emulate and retrieve emulated output
       auto emu_output = _track_emu->Emulate(emu_input);
       // Convert recoemu::Track_t => track, if not marked for deletion
-      if ( emu_output.mark_for_deletion ) continue;
+      if ( emu_output.mark_for_deletion ) {
+        // HACK: If track should be "deleted", instead shift it 100 meters in the -y direction
+        // This is so that RecoID's will match up between ertool reco particle graphs
+        // and mc particle graphs. These tracks will be cut out by fiducial volume cuts.
+        shiftTrackHack(emu_output);
+        //continue;
+      }
       auto reco_track = EmuTrack2RecoTrack(emu_output);
       // If output data holder exists, record the result
       if (ev_track) ev_track->emplace_back(reco_track);
@@ -148,7 +154,14 @@ namespace larlite {
       _shower_smearing_tree->Fill();
 
       // Convert recoemu::Shower_t => shower, if not marked for deletion
-      if ( emu_output.mark_for_deletion ) continue;
+      if ( emu_output.mark_for_deletion ) {
+        // HACK: If track should be "deleted", instead shift it 100 meters in the -y direction
+        // This is so that RecoID's will match up between ertool reco particle graphs
+        // and mc particle graphs. These tracks will be cut out by fiducial volume cuts.
+        shiftShowerHack(emu_output);
+        //continue;
+      }
+
       auto reco_shower = EmuShower2RecoShower(emu_output);
       // If output data holder exists, record the result
       if (ev_shower) ev_shower->emplace_back(reco_shower);
@@ -251,6 +264,19 @@ namespace larlite {
     result.set_id( shr.pdg );
 
     return result;
+  }
+
+  void EmuDriver::shiftTrackHack(::recoemu::Track_t& trk){
+    // Shift the entire track 100 meters in the negative y direction
+    //Loop through the Track_t trajectory and smear each point
+    for (auto &step : trk.trajectory)
+      step[1] = step[1] - 10000.;
+
+  }
+  void EmuDriver::shiftShowerHack(::recoemu::Shower_t& shr) {
+    //Shift the shower start point 100 meters in the negative y direction
+    ::geoalgo::Point_t oldstart = shr.cone.Start();
+    shr.cone.Start(oldstart[0], oldstart[1] - 10000., oldstart[2]);
   }
 
 }

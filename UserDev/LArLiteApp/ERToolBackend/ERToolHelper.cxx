@@ -74,8 +74,12 @@ namespace larlite {
 			p.SetParticleInfo(mcs.PdgCode(),
 			                  ::ertool::ParticleMass(mcs.PdgCode()),
 			                  mcs.Start().Position(),
-			                  mcs.Start().Momentum());
-//      std::cout<<"\nSetting the particle info of shower.."<<std::endl ;
+			                  mcs.Start().Momentum() );
+
+			// also set Origin_t
+			p.SetOrigin(::ertool::Origin_t(mcs.Origin()));
+
+ //      std::cout<<"\nSetting the particle info of shower.."<<std::endl ;
 //      std::cout<<"particle graph node size : "<<graph.GetParticleNodes(ertool::RecoType_t::kShower).size()<<std::endl ;
 
 			// Create ParticleID
@@ -152,7 +156,10 @@ namespace larlite {
 			p.SetParticleInfo(mct.PdgCode(),
 			                  ::ertool::ParticleMass(mct.PdgCode()),
 			                  ::geoalgo::Vector(mct.Start().Position()),
-			                  ::geoalgo::Vector(mct.Start().Momentum()));
+			                  ::geoalgo::Vector(mct.Start().Momentum())); 
+
+			// set Origin_t
+			p.SetOrigin(::ertool::Origin_t(mct.Origin()));
 
 			// Create ParticleID
 			::ertool_helper::ParticleID id(mct);
@@ -200,7 +207,10 @@ namespace larlite {
 					p.SetParticleInfo( mcp.PdgCode(),
 					                   mcp.Mass() * 1000.,
 					                   ::geoalgo::Vector(mcp.Trajectory()[0].Position()),
-					                   ::geoalgo::Vector(mcp.Trajectory()[0].Momentum()) * 1.e3 );
+					                   ::geoalgo::Vector(mcp.Trajectory()[0].Momentum()) * 1.e3 ); 
+
+					// Set Origin_t
+					p.SetOrigin(::ertool::Origin_t(mci.Origin()));
 
 					part_list[id] = p.ID();
 

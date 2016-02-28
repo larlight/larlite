@@ -97,6 +97,9 @@ namespace larlite {
     /// Method to create larlite::shower from recoemu::Shower_t
     shower EmuShower2RecoShower(const ::recoemu::Shower_t& trk);
 
+    void shiftTrackHack(::recoemu::Track_t& trk);
+    void shiftShowerHack(::recoemu::Shower_t& shr);
+    
     ERToolHelperUtil *_hutil;
 
     bool _disable_xshift;

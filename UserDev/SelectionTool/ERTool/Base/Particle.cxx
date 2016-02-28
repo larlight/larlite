@@ -38,6 +38,7 @@ namespace ertool {
   }
 
   const ProcessType_t& Particle::ProcessType() const { return _process;   }
+  const Origin_t& Particle::Origin()           const { return _origin;    }
   const RecoType_t& Particle::RecoType()       const { return _reco_type; }
   const RecoID_t&  Particle:: RecoID()         const { return _reco_id;   }
   const FlashID_t&  Particle::FlashID()        const { return _flash_id;  }

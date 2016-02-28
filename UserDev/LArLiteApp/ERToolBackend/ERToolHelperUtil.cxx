@@ -78,8 +78,8 @@ namespace larlite {
 	}
 
 	double ERToolHelperUtil::getMCShowerdEdX(const mcshower & mcs) const {
-		if ( (mcs.dEdx() < 0.5 ) ||  (mcs.dEdx() > 100) )
-			return (mcs.PdgCode() == 22 ? gRandom->Gaus(4, 4 * 0.03) : gRandom->Gaus(2, 2 * 0.03));
+		// if ( (mcs.dEdx() < 0.5 ) ||  (mcs.dEdx() > 100) )
+		// return (mcs.PdgCode() == 22 ? gRandom->Gaus(4, 4 * 0.03) : gRandom->Gaus(2, 2 * 0.03));
 		return mcs.dEdx();
 	}
 }

@@ -90,20 +90,6 @@ namespace recoemu {
 
     Shower_t result;
 
-    // 1st, use the reconstruction efficiency function to determine if the shower
-    // should be reconstructed in the first place
-    // convert from energy (MeV) to length (cm) because this functional form
-    // takes as input cm length. To convert use 2.3 MeV/cm assumption
-    // which is reasonable for the single muon tracks the function was fitted to
-    double eff = _fEff->Eval( mc.energy / 2.3 );
-    // random number
-    double randeff = ( (double) rand() ) / RAND_MAX;
-
-    // if we sample a number above the efficiency value -> mark for deletion
-    if (randeff > eff) {
-      result.mark_for_deletion = true;
-      return result;
-    }
 
     // output dedx = input dedx (for now)
     result.dedx = mc.dedx;
@@ -115,6 +101,22 @@ namespace recoemu {
     result.energy = mc.energy * ( 1 + fracres );
     if (result.energy < 0)
       result.energy = 0;
+
+    // Now, use the reconstruction efficiency function to determine if the shower
+    // should be reconstructed (based on the SMEARED energy)
+    // convert from energy (MeV) to length (cm) because this functional form
+    // takes as input cm length. To convert use 2.3 MeV/cm assumption
+    // which is reasonable for the single muon tracks the function was fitted to
+    double eff = _fEff->Eval( result.energy / 2.3 );
+
+    // random number
+    double randeff = ( (double) rand() ) / RAND_MAX;
+
+    // if we sample a number above the efficiency value -> mark for deletion
+    if (randeff > eff) {
+      result.mark_for_deletion = true;
+      return result;
+    }
 
     // smear start point
     ::geoalgo::Point_t start( mc.cone.Start()[0] + _fPosres->GetRandom(),

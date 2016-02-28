@@ -14,10 +14,10 @@ namespace ertool {
   typedef int    Generation_t; ///< A layer number in particle graph (0 = Primary, kDefaultLayer = not yet assessed )
 
   /// Defines an input shower/track original product information
-  typedef std::pair<size_t,std::string> RecoInputID_t;
+  typedef std::pair<size_t, std::string> RecoInputID_t;
 
   /// Defines a process information container
-  typedef std::map<std::string,std::string> ProcInfo_t;
+  typedef std::map<std::string, std::string> ProcInfo_t;
 
   /// Defines a type for a combinatory index expression
   typedef std::vector<NodeID_t> Combination_t;
@@ -31,6 +31,16 @@ namespace ertool {
     kShower,    ///< Associated with a shower object
     kTrack,     ///< Associated with a track object
     kINVALID_RECO_TYPE
+  };
+
+  /// Origin type, directly copied from mcshower + mctrack + mctruth Origin_t
+  /// This is truth whether the origin is Genie (neutrino) or CRY/Corsika (cosmic)
+  enum Origin_t {
+    kUnknownOrigin,           ///< ???
+    kBeamNeutrino,      ///< Beam neutrinos
+    kCosmicRay,         ///< Cosmic rays
+    kSuperNovaNeutrino, ///< Supernova neutrinos
+    kSingleParticle     ///< single particles thrown at the detector
   };
 
   /// Relation Type
@@ -63,10 +73,10 @@ namespace ertool {
     kCosmicOrphan,   //Cosmic specifically tagged by an orphan-finding algo
     kPiZeroDecay,    //daughters of pizero decays (gammas usually)
     //Neutrino Production Processes
-    kK0L,//Processes follow 
-    // K0L -> nue pi- e+, 
-    // K0L -> nuebar pi+ e- 
-    // K0L -> numu pi- mu+ 
+    kK0L,//Processes follow
+    // K0L -> nue pi- e+,
+    // K0L -> nuebar pi+ e-
+    // K0L -> numu pi- mu+
     // K0L -> numubar pi+ mu-
     kKCharged,//Processes follow
     // K+  -> numu mu+
@@ -80,7 +90,7 @@ namespace ertool {
     // mu- -> numu nuebar e-
     kPionDecay,//Processes follow
     // pi+ -> numu mu+
-    // pi- -> numubar mu- 
+    // pi- -> numubar mu-
     kPiZeroMID,     //hacky addition for downstream algos that determine a nue is actually a pi0 MID
     kINVALID_PROCESS_TYPE
   };
@@ -102,7 +112,7 @@ namespace ertool {
 
   namespace msg {
     enum Level_t {
-      kDEBUG=0,      ///< Message level ... useful to debug a crash
+      kDEBUG = 0,    ///< Message level ... useful to debug a crash
       kINFO,         ///< Debug info but not the lowest level
       kNORMAL,       ///< Normal stdout
       kWARNING,      ///< notify a user in the standard operation mode for an important finding.
@@ -111,6 +121,6 @@ namespace ertool {
       kMSG_TYPE_MAX
     };
   }
-} 
+}
 
 #endif
