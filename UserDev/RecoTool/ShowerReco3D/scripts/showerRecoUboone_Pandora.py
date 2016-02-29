@@ -61,7 +61,6 @@ def getShowerRecoAlgModular():
 
   # alg.AddShowerRecoModule(showerreco.GeoModule())
   alg.AddShowerRecoModule(showerreco.ToyGeoModule())
-
   alg.PrintModuleList()
 
   return alg
@@ -99,9 +98,9 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 
 # Specify analysis output root file name
-my_proc.set_ana_output_file("results/showerRecoUboone_pandoraNu3D_v3_ana.root")
+my_proc.set_ana_output_file("showerRecoUboonePandora_ana.root")
 # Specify data output root file name
-my_proc.set_output_file("results/showerRecoUboone_pandoraNu3D_v3.root")
+my_proc.set_output_file("showerRecoUboonePandora.root")
 
 
 
