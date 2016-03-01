@@ -40,6 +40,7 @@
 #include "simphotons.h"
 #include "mucsdata.h"
 #include "mucsreco.h"
+#include "PiZeroROI.h"
 
 namespace larlite {
 
@@ -1142,6 +1143,9 @@ namespace larlite {
       break;
     case data::kMCTrack:
       _ptr_data_array[type][name]=new event_mctrack(name);
+      break;
+    case data::kPiZeroROI:
+      _ptr_data_array[type][name]=new event_PiZeroROI(name);
       break;
     case data::kMCTree:
       _ptr_data_array[type][name]=new event_mctree(name);

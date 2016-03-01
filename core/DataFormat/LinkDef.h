@@ -27,6 +27,7 @@
 #pragma link C++ class std::vector<TVector3>+;
 #pragma link C++ class std::vector<TMatrixD>+;
 #pragma link C++ class std::vector<TLorentzVector>+;
+#pragma link C++ class std::vector<std::pair<int, int > >+;
 
 //#pragma link C++ class std::vector<unsigned int>+;
 //#pragma link C++ class std::vector<std::vector<unsigned int> >+;
@@ -156,6 +157,11 @@
 #pragma link C++ class larlite::mctrack+;
 #pragma link C++ class std::vector<larlite::mctrack>+;
 #pragma link C++ class larlite::event_mctrack+;
+
+#pragma link C++ class larlite::PiZeroROI+;
+#pragma link C++ class std::vector<larlite::PiZeroROI>+;
+#pragma link C++ class larlite::event_PiZeroROI+;
+
 
 #pragma link C++ class larlite::mcnu+;
 #pragma link C++ class std::vector<larlite::mcnu>+;

@@ -61,6 +61,7 @@ namespace larlite {
   class event_simphotons;
   class event_mucsdata;
   class event_mucsreco;
+  class event_PiZeroROI;
 }
 
 namespace larlite {
@@ -525,6 +526,7 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_pfpart> () const;
   template<> data::DataType_t storage_manager::data_type<event_user> () const;
   template<> data::DataType_t storage_manager::data_type<event_mctrack> () const;
+  template<> data::DataType_t storage_manager::data_type<event_PiZeroROI> () const;
   template<> data::DataType_t storage_manager::data_type<event_mctree> () const;
   template<> data::DataType_t storage_manager::data_type<event_minos> () const;
   template<> data::DataType_t storage_manager::data_type<event_cosmictag>() const;
