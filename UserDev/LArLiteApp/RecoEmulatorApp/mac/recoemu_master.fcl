@@ -44,13 +44,13 @@ EmuDriver: {
 
         TrackEmuApplyTotalEff:  {
             #LengthEff is a weird arctan function
-            LengthEffParam0: 5. #"slope at halfway point (actually gives the gradient at this point)"
-            LengthEffParam1: 0.5 #"position of halfway point"
+            LengthEffParam0: 1. #"slope at halfway point (actually gives the gradient at this point)"
+            LengthEffParam1: 1. #"position of halfway point"
             
             #Theta and Phi eff is a very complicated 2D function
-            AngleEffParam0: 0.9 #"maximum (at phi = 90)"
-            AngleEffParam1: 0.4 #"minimum of distribution (along x)"
-            AngleEffParam2: 0.69 #"maximum at (theta -> 0, phi = 0)"
+            AngleEffParam0: 0.95 #"maximum (at phi = 90)"
+            AngleEffParam1: 0.8 #"minimum of distribution (along x)"
+            AngleEffParam2: 0.9 #"maximum at (theta -> 0, phi = 0)"
             
         }
 
@@ -107,7 +107,7 @@ EmuDriver: {
         # params:
         # 1st param: center of gaussian ( 0 -> no offset in enerergy resolution)
         # 2nd param: width of gaussian
-        EResParams: [0,0.1]
+        EResParams: [0,0.05]
         # minimum of function : -1 since this is a relative energy resolution
         EResMin: -1
         # maximum of function: +1 since this is a relative energy resolution
@@ -118,7 +118,7 @@ EmuDriver: {
         AngleResFunc: "TMath::Landau(x,[0],[1],1)"
         # 1st param: MPV of lanadau (the "peak" smeaing angle)
         # 2nd param: the width of the landau (how large the tail of the distribution will be)
-        AngleResParams: [5,5]
+        AngleResParams: [2.,1.]
         # miimum angle, should always be 0
         AngleResMin: 0
         # maximum angle, should always be 180
@@ -148,7 +148,7 @@ EmuDriver: {
         # params:
         # 1st param: mean of gaussian smearing (0 -> no offset)
         # 2nd param: smearing width
-        dEdxResParams: [0,0.2]
+        dEdxResParams: [0,0.1]
         # minimum of function (since relative smearing -1 is good)
         dEdxResMin: -1
         # maximum of function (since relative smearing +1 is good)
