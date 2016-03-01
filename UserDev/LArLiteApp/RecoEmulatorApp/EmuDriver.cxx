@@ -99,6 +99,9 @@ namespace larlite {
     auto ev_track  = storage->get_data<event_track>("recoemu");
     auto ev_shower = storage->get_data<event_shower>("recoemu");
 
+    if(ev_track) ev_track->clear_data();
+    if(ev_shower) ev_shower->clear_data();
+
     // Emulate tracks
     for (auto const& mct : *ev_mctrack) {
       // Skip all mctracks that have zero or 1 size (deposit zero energy in the TPC) (nothing to emulate)
