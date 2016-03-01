@@ -31,7 +31,7 @@ EmuDriver: {
             SmearFunc: "TMath::Gaus(x,[0],[1],1)"
             # 1st param: center of gaussian
             # 2nd param: width of gaussian
-            XSmearParams: [-0.06,0.03]
+            XSmearParams: [0.06,0.03]
             XSmearMin: -1
             XSmearMax: 1
             YSmearParams: [0,0.03]
