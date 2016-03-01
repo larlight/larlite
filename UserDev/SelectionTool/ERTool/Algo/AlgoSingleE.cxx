@@ -174,7 +174,7 @@ namespace ertool {
 				_IP = IP;
 				_IPthisStart = vtx.Dist(thisShower.Start());
 				_IPthatStart = vtx.Dist(thatShower.Start());
-				_alg_tree->Fill();
+				// _alg_tree->Fill();
 
 				if (Debug()) {
 					std::stringstream ss;
@@ -226,7 +226,7 @@ namespace ertool {
 				_IPthisStart = vtx.Dist(thisShower.Start());
 				_IPthatStart = vtx.Dist(thatTrack.front());
 				_IPtrkBody = sqrt(_geoAlgo.SqDist(vtx, thatTrack));
-				_alg_tree->Fill();
+				// _alg_tree->Fill();
 				if (Debug()) {
 					std::stringstream ss;
 					ss << std::endl
@@ -261,7 +261,7 @@ namespace ertool {
 						_pdg    = 11;
 						single = true;
 					}
-					_empart_tree->Fill();
+					// _empart_tree->Fill();
 
 				}// if common origin with primary!
 			}// for all tracks
@@ -418,15 +418,15 @@ namespace ertool {
 		if (fout) {
 			fout->cd();
 
-			if (_alg_tree)
-				_alg_tree->Write();
-			if (_empart_tree)
-				_empart_tree->Write();
+			// if (_alg_tree)
+			// 	_alg_tree->Write();
+			// if (_empart_tree)
+			// 	_empart_tree->Write();
 
-			if(h_isShowerGammaLike_IP && h_isShowerGammaLike_r){
-				h_isShowerGammaLike_r->Write();
-				h_isShowerGammaLike_IP->Write();
-			}
+			// if(h_isShowerGammaLike_IP && h_isShowerGammaLike_r){
+			// 	h_isShowerGammaLike_r->Write();
+			// 	h_isShowerGammaLike_IP->Write();
+			// }
 
 			_alg_emp.ProcessEnd(fout);
 		}
