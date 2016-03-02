@@ -21,6 +21,11 @@
 #pragma link C++ class evd::RecoBase<evd::Hit>+;
 #pragma link C++ class evd::DrawHit+;
 
+#pragma link C++ class evd::roi2d+;
+#pragma link C++ class std::vector<::evd::roi2d>+;
+#pragma link C++ class evd::RecoBase<evd::roi2d>+;
+#pragma link C++ class evd::DrawPiZeroROI+;
+
 #pragma link C++ class evd::Cluster2d+;
 #pragma link C++ class std::vector<::evd::Cluster2d>+;
 #pragma link C++ class evd::RecoBase<evd::Cluster2d>+;
