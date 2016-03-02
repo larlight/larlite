@@ -61,13 +61,15 @@ class roi2d(recoBase):
                 y2 = roi2d.minminPoint().t
 
                 points.append(QtCore.QPoint(x1, y1))
+                points.append(QtCore.QPoint(x1, y2))
                 points.append(QtCore.QPoint(x2, y2))
+                points.append(QtCore.QPoint(x2, y1))
 
                 thisPolyF = QtGui.QPolygonF(points)
                 thisPoly = QtGui.QGraphicsPolygonItem(thisPolyF)
 
-                thisPoly.setPen(pg.mkPen(None))
-                thisPoly.setBrush(pg.mkColor(color))
+                thisPoly.setPen(pg.mkPen(pg.mkColor((252, 127, 0, 100))))
+                thisPoly.setBrush(pg.mkBrush(None))
 
                 view._view.addItem(thisPoly)
                 self._drawnObjects[view.plane()].append(thisPoly)
