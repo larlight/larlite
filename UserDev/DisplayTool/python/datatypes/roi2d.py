@@ -74,5 +74,3 @@ class roi2d(recoBase):
 
                 i_color += 1
 
-except Exception, e:
-    pass
