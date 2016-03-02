@@ -62,6 +62,9 @@ bool DrawWire::analyze(larlite::storage_manager* storage) {
   // So, obviously, first thing to do is to get the wires.
   auto WireDigitHandle = storage->get_data<larlite::event_wire>(producer);
 
+  _planeData.clear();
+  initDataHolder();
+
 
   for (auto const& wire : *WireDigitHandle) {
     unsigned int ch = wire.Channel();
