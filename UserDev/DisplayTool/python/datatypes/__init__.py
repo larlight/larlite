@@ -8,6 +8,7 @@ from match import match
 from endpoint2d import endpoint2d
 from vertex import vertex
 from mctruth import mctruth
+from roi2d import roi2d
 from drawableItems import drawableItems
 try:
     import pyqtgraph.opengl as gl

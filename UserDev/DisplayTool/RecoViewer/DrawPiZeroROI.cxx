@@ -13,7 +13,6 @@ DrawPiZeroROI::DrawPiZeroROI()
 {
   _name = "DrawPiZeroROI";
   _fout = 0;
-  // showerVectorByPlane = new std::vector<std::vector<roi2s> >;
 }
 
 bool DrawPiZeroROI::initialize() {
@@ -54,17 +53,17 @@ bool DrawPiZeroROI::analyze(larlite::storage_manager* storage) {
   //   std::cout << "Event ID: " << my_pmtfifo_v->event_id() << std::endl;
   //
 
-  // get a handle to the showers
+  // get a handle to the ROIs
   auto roiHandle = storage->get_data<larlite::event_PiZeroROI>(_producer);
 
-  // Clear out the hit data but reserve some space for the showers
+  // Clear out the hit data but reserve some space for the rois
   for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
     _dataByPlane.at(p).clear();
     _dataByPlane.at(p).reserve(roiHandle -> size());
   }
 
 
-  // Populate the shower vector:
+  // Populate the roi vector:
   for (auto & roi : *roiHandle) {
     for (unsigned int view = 0; view < geoService -> Nviews(); view++) {
       _dataByPlane.at(view).push_back(getroi2d(roi, view));
