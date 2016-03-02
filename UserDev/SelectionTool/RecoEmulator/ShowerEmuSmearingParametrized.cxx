@@ -115,7 +115,7 @@ namespace recoemu {
     // if we sample a number above the efficiency value -> mark for deletion
     if (randeff > eff) {
       result.mark_for_deletion = true;
-      return result;
+      //return result;
     }
 
     // smear start point

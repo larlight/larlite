@@ -742,10 +742,17 @@ namespace larlite {
 			auto const& shw = shw_v[i];
 			id_v.emplace_back(i, shw_v.name());
 			double mylength = shw.Length() <= 0 ? _shrProfiler.Length( shw.Energy() ) : shw.Length();
+			try{
 			s_v.emplace_back( ::ertool::Shower(shw.ShowerStart(),
 			                                   shw.Direction(),
 			                                   mylength,//shw.Length(),
 			                                   _shrProfiler.ShowerRadius()) );
+		}
+		catch(...){
+			std::cout<<"ERTOOLHELPER CAUGHT EXCEPTION. HERE IS SHOWER INFO:"<<std::endl;
+			std::cout<<"\t start is "<<shw.ShowerStart().X()<<","<<shw.ShowerStart().Y()<<","<<shw.ShowerStart().Z()<<std::endl;
+			std::cout<<"\t dir is "<<shw.Direction().X()<<","<<shw.Direction().Y()<<","<<shw.Direction().Z()<<std::endl;
+		}
 			auto& s = (*s_v.rbegin());
 			if ( (shw.best_plane() >= 0) && (shw.best_plane() <= 2) ) {
 				s._energy = shw.Energy_v()[shw.best_plane()];
