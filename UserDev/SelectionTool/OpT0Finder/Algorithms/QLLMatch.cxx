@@ -20,7 +20,7 @@ namespace flashana {
     void QLLMatch::Configure(const ::fcllite::PSet &pset) {
         _record = pset.get<bool>("RecordHistory");
         _normalize = pset.get<bool>("NormalizeHypothesis");
-
+	std::cout << "QLLMatch.cxx: _normalize is " << _normalize << std::endl;
     }
 
     FlashMatch_t QLLMatch::Match(const QCluster_t &pt_v, const Flash_t &flash) {
@@ -75,6 +75,7 @@ namespace flashana {
             _var_trk[pt_index].x = _raw_trk[pt_index].x + xoffset;
             _var_trk[pt_index].y = _raw_trk[pt_index].y;
             _var_trk[pt_index].z = _raw_trk[pt_index].z;
+            _var_trk[pt_index].t = _raw_trk[pt_index].t;
             _var_trk[pt_index].q = _raw_trk[pt_index].q;
         }
 
@@ -116,7 +117,7 @@ namespace flashana {
             auto O = measurement.pe_v[pmt_index]; // observation
             auto H = hypothesis.pe_v[pmt_index];  // hypothesis
 
-            result += std::pow((O - H), 2) / (O + H);
+            result += std::pow((O - H), 2) / (H); // not O+H
 
             //result += std::fabs(  ) * measurement.pe_v[pmt_index];
 	    //	    std::cout << "QLL(): ii chi2,  O, H:" << pmt_index << ", " << std::pow((O - H), 2)/(O + H)  << ", "<< O << ", " << H << std::endl;

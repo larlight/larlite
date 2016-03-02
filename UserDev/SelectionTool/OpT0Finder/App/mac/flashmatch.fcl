@@ -13,7 +13,7 @@ FlashMatchManager:{
 
 LLMatch:{
     RecordHistory: true
-    NormalizeHypothesis: true
+    NormalizeHypothesis: false
 }
 
 QLLMatch:{

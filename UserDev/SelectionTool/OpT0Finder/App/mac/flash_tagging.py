@@ -1,5 +1,7 @@
 import sys,ROOT,os
 import pdb
+import numpy as np
+from ctypes import c_uint
 
 def pmt_pos():
     xv = ROOT.std.vector("double")()
@@ -79,8 +81,14 @@ print  "Finished configuring ana_processor. Start event loop!"
 print
 
 # Let's run it.
-#my_proc.run(6,1)
-my_proc.run()
+#my_proc.run()
+ev = ROOT.std.vector("int")()
+ev.push_back(int(904))
+ev.push_back(int(905))
+ev.push_back(int(907))
+
+my_proc.run_events(ev)
+
 
 # done!
 print

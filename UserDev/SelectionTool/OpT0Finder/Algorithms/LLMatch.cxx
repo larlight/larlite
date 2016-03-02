@@ -132,8 +132,8 @@ namespace flashana {
             auto O = measurement.pe_v[pmt_index]; // observation
             auto H = hypothesis.pe_v[pmt_index];  // hypothesis
 
-	    result.at(0) += std::pow((O - H), 2)/(O + H)  ;
-	    result.at(1) +=  -std::log10(TMath::Poisson(O,H))  ; // neg. log-likelihood
+	    result.at(0) += std::pow((O - H), 2)/(O + H)  ; // will maximize 1/this
+	    result.at(1) +=  -std::log10(TMath::Poisson(O,H))  ; // will maximize 1/this
 	    if (isnan(result.at(1)) || isinf(result.at(1))) result.at(1) = 1.E6;
 	    // could instead use discrete std::poisson_distribution
 	    //	    std::cout << "LL(): ii chi2, llhd, O, H:" << pmt_index << ", " << std::pow((O - H), 2)/(O + H)  << ", " << -std::log10(TMath::Poisson(O,H)) << ", " << O << ", " << H << std::endl;

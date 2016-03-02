@@ -143,6 +143,7 @@ namespace larlite {
     auto ev_track = storage->get_data<event_track>("trackkalmanhit");
     auto ev_mctrack = storage->get_data<event_mctrack>("mcreco");
     auto ev_mcshower = storage->get_data<event_mcshower>("mcreco");
+    auto ev_mcphotons = storage->get_data<event_simphotons>("mcreco");
 
 
 
@@ -228,7 +229,7 @@ namespace larlite {
         if( qcluster.idx != -1)
 	  for (size_t ii = 0;  ii<qcluster.size(); ++ii)
 	    {
-	      qcluster[ii].t = qcluster[ii].x/(det_width/det_drift_time) ; // this is an upper bound, which we will enforce later in PhotonLibHypothesis::FillEstimate().
+	      qcluster[ii].t = qcluster[ii].x/(det_width/det_drift_time) ; // this is dift time, which will create an upper bound on where track could have been in x, which we will enforce later in PhotonLibHypothesis::FillEstimate().
 	    }
 	  _mgr.Emplace(std::move(qcluster));
 	}

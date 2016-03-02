@@ -190,13 +190,26 @@ namespace larlite {
     }
   }
   
-  Bool_t ana_processor::run(UInt_t start_index, UInt_t nevents){
-    
+  Bool_t ana_processor::run_events(const std::vector<int> &evtsi){
+
+    const std::vector<UInt_t> evts(evtsi.begin(),evtsi.end());
+    std::cout << "ana_processor::run_events: num events passed in is " << evts.size() << ". They are: " << std::endl;
+    for (auto const & ii : evts)
+      {
+	if (ii!=evts.at(evts.size()-1)) std::cout <<  ii << ", ";
+      } 
+    std::cout << std::endl;
+
     if(_verbosity[msg::kDEBUG])
       Message::send(msg::kDEBUG,__PRETTY_FUNCTION__,"called...");
-    
-    Bool_t status=true;
-    
+
+    Bool_t status=true;    
+    if (!evts.size()) 
+      {
+	std::cout << "ana_processor::run_events: Use run(), else pass a non-zero length vector of events to run over." << std::endl;
+	return false;
+      }
+
     if(_process==kINIT) status = initialize();
     
     if(!status){
@@ -205,22 +218,89 @@ namespace larlite {
       
       return false;
     }
-    
-    _index=start_index;
-    
-    if(!nevents)
-      nevents=_storage->get_entries();
-    if(nevents > (_storage->get_entries() - _index))
-      nevents=_storage->get_entries() - _index;
-    
-    sprintf(_buf,"Processing %d events from entry %d...",nevents, _index);
+
+      
+    UInt_t nevents (_storage->get_entries());
+    sprintf(_buf,"Looping on %d events from entry to build the vector of indices for desired events...",nevents);
     Message::send(msg::kNORMAL,__FUNCTION__,_buf);
+
+    std::vector<UInt_t> indices;
+    UInt_t ev;
+    for (UInt_t ii=0; ii<nevents; ii++)
+      {
+	if(_filter_enable)
+	  _storage->next_event(_ana_unit_status);
+	else
+	  _storage->next_event();
+
+	ev = _storage->event_id();
+	for (auto const& ev_req : evts)
+	  {
+	    if (ev == ev_req) 
+	      {
+		indices.push_back(ii);
+		std::cout << "ana_processor: run_events(): event " << ev << " found at index " << ii  << std::endl;
+	      }
+	  }
+      }
+
+    UInt_t ii(0);
+    while(status && ii<indices.size())
+      {
+	status=process_event(indices.at(ii));
+	ii++;
+	if(_process!=kPROCESSING) break;
+      }
+
+    
+    if(_filter_enable)
+      _storage->next_event(_ana_unit_status);
+    else
+      _storage->next_event();
+      
+    if(_process != kFINISHED)
+      status = finalize();
+    
+    return status;
+
+  }
+
+
+
+
+  Bool_t ana_processor::run(UInt_t start_index, UInt_t nevents){
+    
+
+    if(_verbosity[msg::kDEBUG])
+      Message::send(msg::kDEBUG,__PRETTY_FUNCTION__,"called...");
+    Bool_t status=true;    
+    if(_process==kINIT) status = initialize();
+    
+    if(!status){
+      
+      Message::send(msg::kERROR,__PRETTY_FUNCTION__,"Aborting.");
+      
+      return false;
+    }
+
+      _index=start_index;
+      
+      if(!nevents)
+	nevents=_storage->get_entries();
+      if(nevents > (_storage->get_entries() - _index))
+	nevents=_storage->get_entries() - _index;
+      
+      sprintf(_buf,"Processing %d events from entry %d...",nevents, _index);
+      Message::send(msg::kNORMAL,__FUNCTION__,_buf);
+
+
     
     int ten_percent_ctr=0;
     
     while(status){
 
       status=process_event(_index);
+
 
       if( nevents >= 10 && (_nevents >= ten_percent_ctr * nevents/10.) ) {
 

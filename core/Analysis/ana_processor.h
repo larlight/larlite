@@ -89,6 +89,9 @@ namespace larlite {
     
     /// A method to run a batch process 
     Bool_t run(UInt_t start_index=0, UInt_t nevents=0);
+
+    /// A method to run a batch process  over a vector of particular events, identified by event number.
+    Bool_t run_events(const std::vector<int> &evts=std::vector<int>() );
     
     /// A method to process just one event.
     Bool_t process_event(UInt_t index=data::kINVALID_UINT);

@@ -33,10 +33,14 @@ namespace flashana {
     double clus_x_min =  1036.; // cm
     double clus_x_max =  -1036.; // cm
     double clus_tdrift_min = 1E9; //nsec, independent of translation of track's x
+
+
+    int ii(0);
     for (auto const& pt : trk){
       if (pt.x < clus_x_min) { clus_x_min = pt.x; }
       if (pt.x > clus_x_max) { clus_x_max = pt.x; }
       if (pt.t < clus_tdrift_min) { clus_tdrift_min = pt.t; }
+      ii++;
     }
 
     // The earliest part of the track can not arrive after the upper bound measured drift time if it is to belong to this flash.
@@ -46,7 +50,9 @@ namespace flashana {
 	 ||  clus_x_min < 0.0
 	 )  // us
       oob = true;
-
+    // zero the flash if the track was translated till it stepped out of TPC 
+    if (oob)   
+      for ( auto& v : flash.pe_v ) v = 0; 
     if (oob) 
       std::cout << "PLH: out of bounds. clus_t_min, clus_tdrift_min: " << clus_t_min <<", " << clus_tdrift_min/1000.  << std::endl;
 
@@ -81,8 +87,6 @@ namespace flashana {
 
     }
 
-    // zero the flash if the track was translated till it stepped out of TPC 
-    if (oob)   for ( auto& v : flash.pe_v ) v = 0; 
 
     return;
   }
