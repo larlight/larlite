@@ -68,7 +68,7 @@ class roi2d(recoBase):
                 thisPolyF = QtGui.QPolygonF(points)
                 thisPoly = QtGui.QGraphicsPolygonItem(thisPolyF)
 
-                thisPoly.setPen(pg.mkPen(pg.mkColor((252, 127, 0, 100))))
+                thisPoly.setPen(pg.mkPen(pg.mkColor((255, 255, 0, 100)), width = 4))
                 thisPoly.setBrush(pg.mkBrush(None))
 
                 view._view.addItem(thisPoly)
