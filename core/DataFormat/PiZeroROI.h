@@ -46,9 +46,9 @@ namespace larlite{
     void SetVertex( const std::vector< std::pair <int, int> > vtx);
 
     // Here are the Getters
-    std::vector < std::pair <int, int > > GetVertex();
-    std::vector < std::pair< int, int > > GetWireROI();
-    std::vector < std::pair< int, int > > GetTimeROI();
+    std::vector < std::pair <int, int > > GetVertex() const;
+    std::vector < std::pair< int, int > > GetWireROI() const;
+    std::vector < std::pair< int, int > > GetTimeROI() const;
     
 
   private:
