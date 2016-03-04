@@ -7,12 +7,8 @@ namespace showerreco {
 
 ProtoShowerHelper::ProtoShowerHelper() {
 
-  if (!_params_alg){
-    _params_alg = new ::cluster::DefaultParamsAlg();
-  }
-  if (!_params3D_alg){
-    _params3D_alg = new ::cluster3D::Default3DParamsAlg();
-  }
+  _params_alg = 0;
+  _params3D_alg = 0;
 
 }
 
@@ -54,6 +50,13 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
     const std::string &pfpart_producer_name,
     std::vector<ProtoShower> & proto_showers,
     std::vector<unsigned int> showerLikePFParts) {
+
+  if (!_params_alg) {
+    _params_alg = new ::cluster::DefaultParamsAlg();
+  }
+  if (!_params3D_alg) {
+    _params3D_alg = new ::cluster3D::Default3DParamsAlg();
+  }
 
   // Clear the current proto-shower container.
   proto_showers.clear();
