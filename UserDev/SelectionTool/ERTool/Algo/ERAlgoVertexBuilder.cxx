@@ -1126,6 +1126,8 @@ namespace ertool {
    ParticleGraph & graph,
    ParticleAssociations & pas) {    
     
+    if(tverbose) std::cout << "Shower Projection\n";
+
     std::map<NodeID_t, geoalgo::Cone> cone_map;
 
     for(NodeID_t const n : graph.GetParticleNodes(kShower)) {
@@ -1144,6 +1146,9 @@ namespace ertool {
 
     while(cone_map.size()) {
 
+      if(tverbose)
+	std::cout << "\tcone_map wloop, size: " << cone_map.size() << "\n";
+
       NodeID_t best_shower_id = kINVALID_NODE_ID;
       NodeID_t best_other_id = kINVALID_NODE_ID;
       Int_t index = -1;
@@ -1152,17 +1157,33 @@ namespace ertool {
   
       for(auto const & c : cone_map) {
 	
+	if(tverbose)
+	  std::cout << "\t\tcone_map primary floop, id: " << c.first << "\n"; 
+
 	geoalgo::Point_t temp_vert(2000, 2000, 2000);
 	
 	for(auto const & c2 : cone_map) {
-	  
-	  if(c2.first == c.first) continue;
+
+	  if(tverbose)
+	    std::cout << "\t\t\tcone_map secondary floop, id: " << c2.first
+		      << "\n";
+
+	  if(c2.first == c.first) {
+	    if(tverbose) std::cout << "\t\t\t\tmatching id, continue\n";
+	    continue;
+	  }
 	  
 	  Double_t const dist =
 	    findrel.FindClosestApproach(c2.second, c.second, temp_vert);
 	  
+	  if(tverbose)
+	    std::cout << "\t\t\tdist: " << dist << " < best-dist: "
+		      << best_dist << " ?\n";
+
 	  if(dist < best_dist) {
 	    
+	    if(tverbose) std::cout << "\t\t\t\tyes\n";
+
 	    best_shower_id = c.first;
 	    best_other_id = c2.first;
 	    best_vert = temp_vert;
@@ -1173,15 +1194,26 @@ namespace ertool {
 	  
 	}
 
+	if(tverbose) std::cout << "\t\tcone_map secondary floop end\n";
+
 	for(NodeID_t const n : graph.GetParticleNodes(kTrack)) {
+
+	  if(tverbose)
+	    std::cout << "\t\t\ttrack secondary floop, id: " << n << "\n";
 
 	  Track const & t = data.Track(graph.GetParticle(n).RecoID());
 
 	  Double_t const dist =
 	    findrel.FindClosestApproach(t, c.second, temp_vert);
+
+	  if(tverbose)
+	    std::cout << "\t\t\tdist: " << dist << " < best-dist: "
+		      << best_dist << " ?\n";
 	  
 	  if(dist < best_dist) {
 	    
+	    if(tverbose) std::cout << "\t\t\t\tyes\n";
+
 	    best_shower_id = c.first;
 	    best_other_id = n;
 	    best_vert = temp_vert;
@@ -1192,13 +1224,25 @@ namespace ertool {
 
 	}
 
+	if(tverbose) std::cout << "\t\ttrack secondary floop end\n";
+
 	for(Size_t i = 0; i < associations.size(); ++i) {
+
+	  if(tverbose)
+	    std::cout << "\t\t\tassociation secondary floop, index: "
+		      << i << "\n";
 
 	  ParticleAssociation const & pa = associations.at(i);
 
 	  Double_t const dist = algo.SqDist(pa.GetSphere().Center(), c.second);
 
+	  if(tverbose)
+	    std::cout << "\t\t\tdist: " << dist << " < best-dist: "
+		      << best_dist << " ?\n";
+
 	  if(dist < best_dist) {
+
+	    if(tverbose) std::cout << "\t\t\t\tyes\n";
 
 	    best_shower_id = c.first;
 	    index = i;
@@ -1209,10 +1253,19 @@ namespace ertool {
 	  }
 
 	}
+
+	if(tverbose) std::cout << "\t\tassociation secondary floop end\n";
 	
       }
       
-      if(best_dist >= tshower_prox) return;
+      if(tverbose) std::cout << "\tcone_map primary floop end\n"
+			     << "best_dist: " << best_dist << " < "
+			     << tshower_prox << " ?\n";
+
+      if(best_dist >= tshower_prox) {
+	if(tverbose) std::cout << "\t\tyes, return\n";	
+	return;
+      }
 
       if(index == -1) {
 
@@ -1510,7 +1563,7 @@ namespace ertool {
   void ERAlgoVertexBuilder::WithoutTrackDir(const EventData &data,
 					    ParticleGraph& graph) {
 
-    //if(data.Event_ID() != 53181) return;
+    if(data.Event_ID() != 69114) return;
 
     Reset();
 
