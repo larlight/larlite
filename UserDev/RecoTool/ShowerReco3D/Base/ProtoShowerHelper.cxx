@@ -5,6 +5,49 @@
 
 namespace showerreco {
 
+ProtoShowerHelper::ProtoShowerHelper() {
+
+  if (!_params_alg){
+    _params_alg = new ::cluster::DefaultParamsAlg();
+  }
+  if (!_params3D_alg){
+    _params3D_alg = new ::cluster3D::Default3DParamsAlg();
+  }
+
+}
+
+ProtoShowerHelper::~ProtoShowerHelper() {
+
+  if (_params_alg) {
+    delete _params_alg;
+  }
+
+  if (_params3D_alg) {
+    delete _params3D_alg;
+  }
+
+}
+
+void ProtoShowerHelper::SetClusterParamsAlg(::cluster::ClusterParamsAlg * _new_params_alg) {
+
+  if (_params_alg) {
+    delete _params_alg;
+  }
+  _params_alg = _new_params_alg;
+
+}
+
+void ProtoShowerHelper::SetCluster3DParamsAlg(::cluster3D::Cluster3DParamsAlg * _new_params3D_alg) {
+
+  if (_params3D_alg) {
+    delete _params3D_alg;
+  }
+  _params3D_alg = _new_params3D_alg;
+
+
+}
+
+
 // From the storage manager, and with the pfpart producer name, generate
 // a vector of all the protoshowers in the event.
 void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage,
@@ -75,7 +118,7 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
     auto const& ass_hit_v
       = storage->find_one_ass(ev_clust->id(), ev_hit, ev_clust->name());
 
-    // std::cout << "Found " << ev_clust -> size() << " clusters" << std::endl;
+    std::cout << "Found " << ev_clust -> size() << " clusters" << std::endl;
 
     // Check that the cluster associations are the same length as the pfparticle list
     if (ass_cluster_v.size() == ev_pfpart -> size()) {
@@ -130,7 +173,7 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
           // << proto_showers.at(i)._params.at(internal_cluster_index).hit_vector.size()
           // << std::endl;
           // Now fill in the parameters:
-          _params_alg.FillParams(proto_showers.at(i)._params.at(internal_cluster_index));
+          _params_alg->FillParams(proto_showers.at(i)._params.at(internal_cluster_index));
           // std::cout << "params filling finished." << std::endl;
           internal_cluster_index ++;
           // std::cout << "Finished making params for cluster " << j_clust
@@ -176,7 +219,7 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
         // << proto_showers.at(i)._params3D.point_vector.size()
         // << std::endl;
         // Now, fill the params:
-        _params3D_alg.FillParams(proto_showers.at(i)._params3D);
+        _params3D_alg->FillParams(proto_showers.at(i)._params3D);
         proto_showers.at(i)._hasCluster3D = true;
       }
       else {
