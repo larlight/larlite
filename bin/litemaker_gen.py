@@ -84,7 +84,7 @@ lookUpTable={
   "raw::Trigger": "trigger",
   "sim::MCTrack": "mctrack",
   "": "mctree",
-  "": "minos",
+  "t962::MINOS": "minos",
   "optdata::FIFOChannel": "fifo",
   "": "ass",
   "recob::PCAxis": "pcaxis",
