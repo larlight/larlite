@@ -28,7 +28,7 @@ namespace cmtool {
      The book-keeping of merged cluster sets are done by CMergeBookKeeper.
   */
   class CMergeManager : public CMManagerBase {
-    friend class CMergeManager;
+
   public:
     
     /// Default constructor
