@@ -6,6 +6,8 @@
 namespace ertool {
 
   EREffCorrectAna::EREffCorrectAna(const std::string& name) : AnaBase(name)
+  , _ProdNeutrino(nullptr)
+  , _ProdNeutrinoX(nullptr)
   , _1pi0MassReco(nullptr)
   , _1pi0MomentumReco(nullptr)
   , _1pi0MomentumRecoX(nullptr)
@@ -17,9 +19,15 @@ namespace ertool {
   , _1pi0CosBeamMC(nullptr)
   , _1pi0MomentumEFF(nullptr)
   , _1pi0CosBeamEFF(nullptr)
+  , _nutree(nullptr)
+  , _atree(nullptr)
   {
 	
 if(_recon){	
+    delete _ProdNeutrino;
+    _ProdNeutrino = new TH1D("ProductionNeutrino","Prod Neutrino ; PdgCode; Events",30,-15,15);
+    delete _ProdNeutrinoX;
+    _ProdNeutrinoX = new TH1D("NeutrinoX ","Prod Neutrino x ; x cm; Events",100,-1000,1000);
     delete _1pi0MassReco;
     _1pi0MassReco = new TH1D("MASSRECO","#pi^{0} Mass ; Mass [MeV]; Events/MeV ",25,0,500);
     //_1pi0MassReco = new TH1D("MASSRECO","#pi^{0} Mass ; Mass [MeV]; Events/MeV ",200,0,500);
@@ -44,6 +52,22 @@ if(_recon){
     _1pi0MomentumEFF = new TH1D("MOMENTUMEFF","#pi^{0} Momentum ; Momentum [MeV]; Events/MeV ",12,0.,1200.);
     delete _1pi0CosBeamEFF;
     _1pi0CosBeamEFF = new TH1D("COSBEAMEFF","#pi^{0} CosBeam ; Cos(theta); Events ",10,-1.,1.);
+    delete _nutree;
+    _nutree = new TTree("nutree","nut");
+    _nutree->Branch("nutype",&_nutype,"nutype/I");
+    _nutree->Branch("nux",&_nux,"nux/D");
+    _nutree->Branch("nuy",&_nuy,"nuy/D");
+    _nutree->Branch("nuz",&_nuz,"nuz/D");
+
+    delete _atree;
+    _atree = new TTree("atree","att");
+    _atree->Branch("nutype",&_nutype,"nutype/I");
+    _atree->Branch("nux",&_nux,"nux/D");
+    _atree->Branch("nuy",&_nuy,"nuy/D");
+    _atree->Branch("nuz",&_nuz,"nuz/D");
+    _atree->Branch("pi0x",&_pi0x,"pi0x/D");
+    _atree->Branch("pi0y",&_pi0y,"pi0y/D");
+    _atree->Branch("pi0z",&_pi0z,"pi0z/D");
 }
 
 	}
@@ -72,10 +96,20 @@ if(_recon){
 	unsigned int pi0id =-999;	
 	int  pi0counter = 0;
 	// check to see if we have reco a pi0 that is primary 
-//	for(auto const & p : particles){if(p.PdgCode()==111 && p.Primary() ){pi0id = p.ID(); pi0counter++;}}
+        int unmatch = 18446744073709551615;
+
 	for(auto const & p : particles){
-//		if(p.PdgCode()==111  ){	
-		if(p.PdgCode()==111 && p.Primary() ){	
+		if(p.PdgCode()==111  ){	
+//		if(p.PdgCode()==111 && p.Primary() ){	
+
+//                if(p.FlashID()==unmatch) continue;
+ //       std::cout<<" flash match info "<<p.FlashID() <<std::endl;
+//        auto theflash = data.Flash(p.FlashID());
+  //      std::cout<<" the flash X "<<theflash._x<<std::endl;
+    //    std::cout<<" the flash Y "<<theflash._y<<std::endl;
+      //  std::cout<<" the flash Z "<<theflash._z<<std::endl;
+        //std::cout<<" the flash time "<<theflash._t<<std::endl;
+
 				auto sibs = graph.GetSiblingNodes(p.ID());
 				for( auto const  sib: sibs){
 					auto sibpart = graph.GetParticle(sib);
@@ -87,11 +121,7 @@ auto DetL = larutil::Geometry::GetME()->DetLength();
                 double x = p.Vertex()[0];
                 double y = p.Vertex()[1];
                 double z = p.Vertex()[2];
-		std::cout<< " ###x "<< x <<std::endl;
-		std::cout<< " ###y "<< y <<std::endl;
-		std::cout<< " ###z "<< z <<std::endl;
                 if(x<2.*DetW-_fid && x>0.+_fid && y<DetH-_fid && y>-DetH+_fid && z<DetL-_fid && z> 0.0 +_fid){
-		std::cout<<"IN HERE NOW RG BREAK CHECK "<<std::endl;
 				pi0id = p.ID(); pi0counter++;}
 				}
 }
@@ -103,6 +133,16 @@ auto DetL = larutil::Geometry::GetME()->DetLength();
 	unsigned int mcid =-999;	
 	int mcpi0counter = 0;
 	for(auto const & m : mcp){
+		if(abs(m.PdgCode())==12|| abs(m.PdgCode())==14){
+		double nux = m.Vertex()[0];
+		_ProdNeutrinoX->Fill(nux);
+		_ProdNeutrino->Fill(m.PdgCode());
+		_nutype = m.PdgCode();
+                _nux = m.Vertex()[0];
+                _nuy = m.Vertex()[1];
+                _nuz = m.Vertex()[2];
+		
+		}
 		if(m.PdgCode()==111 && m.Generation()==1){
 		auto DetW = larutil::Geometry::GetME()->DetHalfWidth();
 		auto DetH = larutil::Geometry::GetME()->DetHalfHeight();
@@ -129,6 +169,12 @@ auto DetL = larutil::Geometry::GetME()->DetLength();
 	_1pi0MomentumRecoY->Fill(pi0.Momentum()[1]/pi0.Momentum().Length());
 	_1pi0MomentumRecoZ->Fill(pi0.Momentum()[2]/pi0.Momentum().Length());
 	_1pi0CosBeamReco->Fill(CosBeam);
+		// Fill the neutrino tree that is selecgted
+		_pi0x = pi0.Vertex()[0];
+		_pi0y = pi0.Vertex()[1];
+		_pi0z = pi0.Vertex()[2];
+		_nutree->Fill();
+		_atree->Fill();
 	}
 	// FIll For MC
 	if(mcpi0counter==1){ 
@@ -138,48 +184,16 @@ auto DetL = larutil::Geometry::GetME()->DetLength();
 	_1pi0MomentumMC->Fill(mcpi0.Momentum().Length());
 	_1pi0CosBeamMC->Fill(MCCosBeam);
 	}
-	
 	// For filtering out bg events use line below
-	if(mcpi0counter!=1) return false;
-
+//	if(mcpi0counter!=1) return false;
 	return true; }
-
-
-
-			 //        auto pi0 = graph.GetParticle(recopi0id);
-		//		 auto dr = mcpi0.Vertex() - pi0.Vertex();
-		//		auto pad = acos(pi0.Momentum()[2]/pi0.Momentum().Length())-acos(mcpi0.Momentum()[2]/mcpi0.Momentum().Length());
-		//		 auto dmass = mcpi0.Mass() - pi0.Mass();
-		//		auto massval = pi0.Mass();
-		//		 auto dmomentum = mcpi0.Momentum().Length() - pi0.Momentum().Length();
-//
-//
-//				 _VertexResolution3D->Fill(dr.Length());
-//				 _VertexResolutionX->Fill(dr[0]);
-//				 _VertexResolutionY->Fill(dr[1]);
-//				 _VertexResolutionZ->Fill(dr[2]);
-//				 _ProductionAngleResolution->Fill(pad*180./3.14159265);	
-//				 _MASS->Fill(massval);	
-//				 _MassResolution->Fill(dmass);	
-//				 _MomentumResolution->Fill(dmomentum);	
-//
-//	
-//				_Pi0EffvsMomentumRECO->Fill(mcpi0.Momentum().Length());
-
-
-
-
-
-
-
 
   void EREffCorrectAna::ProcessEnd(TFile* fout)
   {
 	//--Perm. Histos--
 if(_recon){
-
-
-
+	_ProdNeutrino->Write();
+	_ProdNeutrinoX->Write();
 	_1pi0MassReco->SetLineWidth(2);
 	_1pi0MassReco->SetLineColor(2);
 	_1pi0MassReco->Write();
@@ -209,13 +223,7 @@ if(_recon){
 	_1pi0CosBeamMC->SetLineColor(1);
 	_1pi0CosBeamMC->Write();
 
-
-
-
-
-
 	// Calculate Eff Histograms
-
 	_1pi0MomentumEFF->Add(_1pi0MomentumReco);
 	_1pi0MomentumEFF->Divide(_1pi0MomentumMC);
 	_1pi0MomentumEFF->SetMinimum(0.0);
@@ -228,33 +236,9 @@ if(_recon){
 	_1pi0CosBeamEFF->SetMaximum(1.0);
 	_1pi0CosBeamEFF->Write();
 
-/*
-	_MASS->SetLineWidth(2);
-	_MASS->SetLineColor(2);
-	_MASS->Write();
-	_MassResolution->SetLineWidth(2);
-	_MassResolution->SetLineColor(2);
-	_MassResolution->Write();
-	_MomentumResolution->SetLineWidth(2);
-	_MomentumResolution->SetLineColor(2);
-	_MomentumResolution->Write();
-	_VertexResolution3D->SetLineWidth(2);
-	_VertexResolution3D->SetLineColor(2);
-	_VertexResolution3D->Write();
-	_VertexResolutionX->SetLineWidth(2);
-	_VertexResolutionX->SetLineColor(2);
-	_VertexResolutionX->Write();
-	_VertexResolutionY->SetLineWidth(2);
-	_VertexResolutionY->SetLineColor(2);
-	_VertexResolutionY->Write();
-	_VertexResolutionZ->SetLineWidth(2);
-	_VertexResolutionZ->SetLineColor(2);
-	_VertexResolutionZ->Write();
-	 _ProductionAngleResolution->SetLineWidth(2);
-	 _ProductionAngleResolution->SetLineColor(2);
-	 _ProductionAngleResolution->Write();
+	_nutree->Write();
+	_atree->Write();
 
-*/
 }
 	
 

@@ -70,6 +70,8 @@ namespace ertool {
 	bool _recon = true;
 
 	//--Perm. Histos--
+	TH1D* _ProdNeutrino;
+	TH1D* _ProdNeutrinoX;
 	TH1D* _1pi0MassReco;
 	TH1D* _1pi0MomentumReco;
 	TH1D* _1pi0MomentumRecoX;
@@ -84,21 +86,16 @@ namespace ertool {
 
 	TH1D* _1pi0MomentumEFF;
 	TH1D* _1pi0CosBeamEFF;
-/*
-	TH1D* _MASS;
-	TH1D* _MASS;
-	TH1D* _MassResolution;
-	TH1D* _MomentumResolution;
-	TH1D* _VertexResolution3D;
-	TH1D* _VertexResolutionX;
-	TH1D* _VertexResolutionY;
-	TH1D* _VertexResolutionZ;
-	TH1D* _ProductionAngleResolution;
-	
-	TH1D* _Pi0EffvsMomentumMC;
-	TH1D* _Pi0EffvsMomentumRECO;
-	TH1D* _Pi0EffvsMomentum;
-*/
+	TTree* _nutree;
+	int _nutype;
+	double _nux;
+	double _nuy;
+	double _nuz;
+	TTree* _atree;
+	double _pi0x;
+	double _pi0y;
+	double _pi0z;
+
 	//---------------
      int _nEvents = 0;
      int _nGoodEvents = 0;
