@@ -45,7 +45,6 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
   // create association for showers -> vertex
   larlite::event_ass * shower_vertex_ass_v = 0;
 
-
   // set event ID through storage manager
   storage->set_id(storage->run_id(),
                   storage->subrun_id(),
@@ -65,9 +64,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   unsigned int index = 0;
   for (auto & part : *ev_pfpart) {
-    if (part.PdgCode() == 11) {
+    // if (part.PdgCode() == 11) {
       showerLikePFParts.push_back(index);
-    }
+    // }
     index ++;
   }
 
@@ -265,12 +264,12 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   shower_pfpart_ass_v->set_association(shower_v->id(),
                                        product_id(data::kPFParticle,
-                                           ev_pfpart->name()),
+				       ev_pfpart->name()),
                                        shower_pfpart_v);
   if ( shower_cluster_ass_v ) {
     shower_cluster_ass_v->set_association(shower_v->id(),
                                           product_id(data::kCluster,
-                                              ev_cluster->name()),
+                                          ev_cluster->name()),
                                           shower_cluster_v);
   }
   if ( shower_vertex_ass_v ) {
