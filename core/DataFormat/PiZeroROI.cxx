@@ -75,11 +75,11 @@ namespace larlite{
     
   }
   
-  std::vector < std::pair <int, int > > PiZeroROI::GetVertex(){ return _vtx; }
+  std::vector < std::pair <int, int > > PiZeroROI::GetVertex() const { return _vtx; }
     
-  std::vector < std::pair< int, int > > PiZeroROI::GetWireROI(){ return _wire_range; }
+  std::vector < std::pair< int, int > > PiZeroROI::GetWireROI() const { return _wire_range; }
   
-  std::vector < std::pair< int, int > > PiZeroROI::GetTimeROI(){ return  _t_range; }
+  std::vector < std::pair< int, int > > PiZeroROI::GetTimeROI() const { return  _t_range; }
   
   
 }
