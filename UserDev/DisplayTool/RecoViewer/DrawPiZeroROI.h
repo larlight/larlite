@@ -43,12 +43,14 @@ public:
     int plane() {return _plane;}
     larutil::Point2D maxmaxPoint() {return _maxmaxPoint;}
     larutil::Point2D minminPoint() {return _minminPoint;}
+    larutil::Point2D vtxPoint() {return _vtxPoint;}
     bool is_good() {return _is_good;}
 
     // ALL OF THESE VARIABLES ARE THE PROJECTION INTO THE PLANE
     int _plane;                ///< The Plane of the shower
     larutil::Point2D _minminPoint;      ///< Wire time start point (units in cm)
     larutil::Point2D _maxmaxPoint;      ///< Wire time start point (units in cm)
+    larutil::Point2D _vtxPoint;      ///< Wire time start point (units in cm)
     bool _is_good;             ///< Whether or not the projection succeeded
 };
 
