@@ -5,6 +5,9 @@
 #include "LArUtil/Geometry.h"
 // #include "DataFormat/cluster.h"
 // #include "DataFormat/hit.h"
+#include "EMShowerTools/EMShowerProfile.h"
+#include "TVector3.h"
+
 namespace larlite {
 
 ShowerQuality_singleshowers::ShowerQuality_singleshowers() {
@@ -413,7 +416,12 @@ void ShowerQuality_singleshowers::FillQualityInfo(const shower& reco_shower, con
   fShowerTreeParams.mc_dcosx = mc_shower.Start().Px() / mc_shower.Start().E();
   fShowerTreeParams.mc_dcosy = mc_shower.Start().Py() / mc_shower.Start().E();
   fShowerTreeParams.mc_dcosz = mc_shower.Start().Pz() / mc_shower.Start().E();
-    
+
+  EMShowerProfile::EMShowerProfile mcshower_helper;
+  fShowerTreeParams.mc_length = mcshower_helper.Length( mc_shower.DetProfile().E() );
+  TVector3 WildShowerDir( mc_shower.End().X() - mc_shower.Start().X(), mc_shower.End().Y() - mc_shower.Start().Y(), mc_shower.End().Z() - mc_shower.Start().Z() );
+  fShowerTreeParams.mc_wildlength = WildShowerDir.Mag();
+
   // Reco vtx
   fShowerTreeParams.reco_x = reco_shower.ShowerStart()[0];
   fShowerTreeParams.reco_y = reco_shower.ShowerStart()[1];
@@ -513,6 +521,8 @@ void ShowerQuality_singleshowers::InitializeAnaTrees()
   fShowerTree->Branch("cluster_pur_Y", &fShowerTreeParams.cluster_pur_Y, "cluster_pur_Y/D");
   fShowerTree->Branch("mc_containment", &fShowerTreeParams.mc_containment, "mc_containment/D");
   fShowerTree->Branch("reco_length",&fShowerTreeParams.reco_length,"reco_length/D");
+  fShowerTree->Branch("mc_length",  &fShowerTreeParams.mc_length,  "mc_length/D");
+  fShowerTree->Branch("mc_wildlength", &fShowerTreeParams.mc_wildlength, "mc_wildlength/D");
 
   //////////////////////////////////////////////////////
   // This tree is filled once per event
@@ -552,6 +562,8 @@ void ShowerQuality_singleshowers::ResetShowerTreeParams() {
   fShowerTreeParams.cluster_pur_Y = -1.234;
   fShowerTreeParams.mc_containment = -1.;
   fShowerTreeParams.reco_length = -1.;
+  fShowerTreeParams.mc_length   = -1.;
+  fShowerTreeParams.mc_wildlength  = -1.;
 }
 
 void ShowerQuality_singleshowers::ResetEventTreeParams() {
