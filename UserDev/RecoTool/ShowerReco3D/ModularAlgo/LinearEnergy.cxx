@@ -98,6 +98,7 @@ void LinearEnergy::do_reconstruction(const ProtoShower & proto_shower,
   // double z;
 
   auto t2cm = geomHelper->TimeToCm();
+  double MaxE = 0.;
 
   // we want an energy for each plane
   for (size_t n = 0; n < clusters.size(); n++) {
@@ -153,8 +154,11 @@ void LinearEnergy::do_reconstruction(const ProtoShower & proto_shower,
 
     // set the energy for this plane
     resultShower.fTotalEnergy_v[pl] = E;
+    if ( E > MaxE ) MaxE = E;
 
   }// for all input clusters
+
+  resultShower.fTotalEnergy = MaxE;
 
   return;
 
