@@ -48,26 +48,39 @@ Point2D GeometryHelper::Point_3Dto2D(const TVector3 & _3D_position, unsigned int
 
   // The wire position can be gotten with Geometry::NearestWire()
   // Convert result to centimeters as part of the unit convention
-  // Previously used nearest wire functions, but they are slightly inaccurate
+  // Previously used nearest wire functions, but they are
+  // slightly inaccurate
   // If you want the nearest wire, use the nearest wire function!
   returnPoint.w = geom->WireCoordinate(_3D_position, plane) * fWireToCm;
   // std::cout << "wire is " << returnPoint.w << " (cm)" << std::endl;
 
-  // The time position is the X coordinate, corrected for trigger offset and the offset of the plane
-  auto detp = DetectorProperties::GetME();
+  // The time position is the X coordinate, corrected for
+  // trigger offset and the offset of the plane
+  // auto detp = DetectorProperties::GetME();
   returnPoint.t = _3D_position.X();
   // Add in the trigger offset:
-  // (Trigger offset is time that the data is recorded before the actual spill.
-  // So, it moves the "0" farther away from the actual time and is an addition)
-  // returnPoint.t -= detp -> TriggerOffset() * fTimeToCm;
+  // (Trigger offset is time that the data is recorded
+  // before the actual spill.
+  // So, it moves the "0" farther away from the actual
+  // time and is an addition)
+  // returnPoint.t += detp -> TriggerOffset() * fTimeToCm;
+  // std::cout << "trigger offset, plane " << plane
+  //           << ": " << detp -> TriggerOffset() * fTimeToCm << std::endl;
+  //
   //Get the origin point of this plane:
-  Double_t planeOrigin[3];
-  geom -> PlaneOriginVtx(plane, planeOrigin);
+  // Double_t planeOrigin[3];
+  // geom -> PlaneOriginVtx(plane, planeOrigin);
   // Correct for the origin of the planes
-  // X = 0 is at the very first wire plane, so the values of the coords of the planes are either 0 or negative
-  // because the planes are negative, the extra distance beyond 0 needs to make the time coordinate larger
-  // Therefore, subtract the offest (which is already in centimeters)
-  // returnPoint.t += planeOrigin[0];
+  // X = 0 is at the very first wire plane, so the values
+  // of the coords of the planes are either 0 or negative
+  // because the planes are negative, the extra distance
+  // beyond 0 needs to make the time coordinate larger
+  // Therefore, subtract the offest (which is already
+  // in centimeters)
+  // returnPoint.t -= planeOrigin[0];
+
+// std::cout << "origin offset, plane " << plane
+//             << ": " << planeOrigin[0] << std::endl;
 
   // Set the plane of the Point2D:
   returnPoint.plane = plane;
@@ -140,79 +153,79 @@ float GeometryHelper::Slope_3Dto2D(const TVector3 & inputVector, unsigned int pl
   Line_3Dto2D(startPoint3D, inputVector, plane, p1, slope);
   return slope.t / slope.w;
 }
-  
-  
-  TVector3 GeometryHelper::Project_3DLine_OnPlane(const TVector3& inputVector, const TVector3& planeNormal) const {
-    
-    // calculate the equivalent vector projected on the plane of interest
-    
-    // V is the original vector in 3D
-    // N is the normal to the plane
-    // the component on the plane then is
-    // V - ( V dot N ) * N
-    
-    auto ret = inputVector - inputVector.Dot(planeNormal) * planeNormal;
-  
-    return ret;
-  }
 
 
-  TVector3 GeometryHelper::Project_3DLine_OnPlane(const TVector3& inputVector, const int& pl) const {
-    
-    // NOTE: use 0.866025404 for sqrt(3)/2 to avoid sqrt computation
-    TVector3 plane(1.,1.,1.);
+TVector3 GeometryHelper::Project_3DLine_OnPlane(const TVector3& inputVector, const TVector3& planeNormal) const {
 
-    // get the TVector3 corresponding to the normal in (w,t) space for the plane we are interested in
-    if (pl == 0)
-      plane = {0,0.866025404,-0.5};
-    else if (pl == 1)
-      plane = {0,0.866025404,0.5};
-    else if (pl == 2)
-      plane = {0,1.,0};
-    else
-      throw LArUtilException("Invalid plane! this plane number does not exist");
-    
-    return Project_3DLine_OnPlane(inputVector,plane);  
-  }
+  // calculate the equivalent vector projected on the plane of interest
+
+  // V is the original vector in 3D
+  // N is the normal to the plane
+  // the component on the plane then is
+  // V - ( V dot N ) * N
+
+  auto ret = inputVector - inputVector.Dot(planeNormal) * planeNormal;
+
+  return ret;
+}
 
 
-  std::vector<double> GeometryHelper::Project_3DLine_OnPlane(const std::vector<double>& V, const std::vector<double>& N) const {
-    
-    if ( (V.size() != 3) or (N.size() != 3) )
-      throw LArUtilException("Project_3DLine_OnPlane failed due to unrecognized vector size");
+TVector3 GeometryHelper::Project_3DLine_OnPlane(const TVector3& inputVector, const int& pl) const {
 
-    // calculate the equivalent vector projected on the plane of interest
-    
-    // V is the original vector in 3D
-    // N is the normal to the plane
-    // the component on the plane then is
-    // V - ( V dot N ) * N
-    
-    double dot = V[0] * N[0] + V[1] * N[1] + V[2] * N[2];
+  // NOTE: use 0.866025404 for sqrt(3)/2 to avoid sqrt computation
+  TVector3 plane(1., 1., 1.);
 
-    std::vector<double> ret = { V[0] - dot * N[0], V[1] - dot * N[1], V[2] - dot * N[2]};
-    return ret;
-  }
-  
-  std::vector<double> GeometryHelper::Project_3DLine_OnPlane(const std::vector<double>& V, const int& pl) const {
-    
-    // NOTE: use 0.866025404 for sqrt(3)/2 to avoid sqrt computation
+  // get the TVector3 corresponding to the normal in (w,t) space for the plane we are interested in
+  if (pl == 0)
+    plane = {0, 0.866025404, -0.5};
+  else if (pl == 1)
+    plane = {0, 0.866025404, 0.5};
+  else if (pl == 2)
+    plane = {0, 1., 0};
+  else
+    throw LArUtilException("Invalid plane! this plane number does not exist");
 
-    std::vector<double> plane = {1.,1.,1.};
+  return Project_3DLine_OnPlane(inputVector, plane);
+}
 
-    // get the vector corresponding to the normal in (w,t) space for the plane we are interested in
-    if (pl == 0)
-      plane = {0,0.866025404,-0.5};
-    else if (pl == 1)
-      plane = {0,0.866025404,0.5};
-    else if (pl == 2)
-      plane = {0,1.,0};
-    else
-      throw LArUtilException("Invalid plane! this plane number does not exist");
-  
-      return Project_3DLine_OnPlane(V,plane);
-  }
-  
+
+std::vector<double> GeometryHelper::Project_3DLine_OnPlane(const std::vector<double>& V, const std::vector<double>& N) const {
+
+  if ( (V.size() != 3) or (N.size() != 3) )
+    throw LArUtilException("Project_3DLine_OnPlane failed due to unrecognized vector size");
+
+  // calculate the equivalent vector projected on the plane of interest
+
+  // V is the original vector in 3D
+  // N is the normal to the plane
+  // the component on the plane then is
+  // V - ( V dot N ) * N
+
+  double dot = V[0] * N[0] + V[1] * N[1] + V[2] * N[2];
+
+  std::vector<double> ret = { V[0] - dot * N[0], V[1] - dot * N[1], V[2] - dot * N[2]};
+  return ret;
+}
+
+std::vector<double> GeometryHelper::Project_3DLine_OnPlane(const std::vector<double>& V, const int& pl) const {
+
+  // NOTE: use 0.866025404 for sqrt(3)/2 to avoid sqrt computation
+
+  std::vector<double> plane = {1., 1., 1.};
+
+  // get the vector corresponding to the normal in (w,t) space for the plane we are interested in
+  if (pl == 0)
+    plane = {0, 0.866025404, -0.5};
+  else if (pl == 1)
+    plane = {0, 0.866025404, 0.5};
+  else if (pl == 2)
+    plane = {0, 1., 0};
+  else
+    throw LArUtilException("Invalid plane! this plane number does not exist");
+
+  return Project_3DLine_OnPlane(V, plane);
+}
+
 
 float GeometryHelper::DistanceToLine2D( const Point2D & pointOnLine, const Point2D & directionOfLine,
                                         const Point2D & targetPoint) const
@@ -626,31 +639,31 @@ bool GeometryHelper::Clockwise(const double& Ax, const double& Ay,
   return (Cy - Ay) * (Bx - Ax) > (By - Ay) * (Cx - Ax);
 }
 
-  double GeometryHelper::PerpendicularDistance(const Point2D& pt,
-					       const double& slope,
-					       const double& intercept) const
-  {
+double GeometryHelper::PerpendicularDistance(const Point2D& pt,
+    const double& slope,
+    const double& intercept) const
+{
 
-    // line assumed to be of form :
-    // y = slope * x + intercept
+  // line assumed to be of form :
+  // y = slope * x + intercept
 
-    if (slope == 0)
-      return fabs ( pt.t - intercept );
+  if (slope == 0)
+    return fabs ( pt.t - intercept );
 
-    double d_perp = fabs ( pt.t - slope * pt.w - intercept ) / fabs(slope);
+  double d_perp = fabs ( pt.t - slope * pt.w - intercept ) / fabs(slope);
 
-    return d_perp;
-  }
+  return d_perp;
+}
 
-  double GeometryHelper::PerpendicularDistance(const Point2D& pt,
-					       const double& slope,
-					       const Point2D& anchor) const
-  {
+double GeometryHelper::PerpendicularDistance(const Point2D& pt,
+    const double& slope,
+    const Point2D& anchor) const
+{
 
-    double intercept = anchor.t - slope * anchor.w;
+  double intercept = anchor.t - slope * anchor.w;
 
-    return PerpendicularDistance(pt,slope,intercept);
-  }
+  return PerpendicularDistance(pt, slope, intercept);
+}
 
 bool GeometryHelper::Point_isInTPC(const TVector3 & pointIn3D) const {
   // Use the geometry class to determine if this point is in the TPC
@@ -659,7 +672,7 @@ bool GeometryHelper::Point_isInTPC(const TVector3 & pointIn3D) const {
   auto detProp = larutil::DetectorProperties::GetME();
   // Check against the 3 coordinates:
   if (pointIn3D.X() > geom -> DetHalfWidth() + detProp -> TriggerOffset() * geoHelper -> TimeToCm()
-   || pointIn3D.X() < - geom -> DetHalfWidth() - detProp -> TriggerOffset() * geoHelper -> TimeToCm())
+      || pointIn3D.X() < - geom -> DetHalfWidth() - detProp -> TriggerOffset() * geoHelper -> TimeToCm())
   {
     return false;
   }
@@ -735,142 +748,142 @@ std::vector<unsigned int> GeometryHelper::SelectLocalPointList( const std::vecto
   return returnIndexes;
 }
 
-  int GeometryHelper::Get3DAxisN(const int& iplane0, const int& iplane1,
-				 const double& omega0, const double& omega1,
-				 double& phi, double& theta) const {
+int GeometryHelper::Get3DAxisN(const int& iplane0, const int& iplane1,
+                               const double& omega0, const double& omega1,
+                               double& phi, double& theta) const {
 
-    auto geom = larutil::Geometry::GetME();
-    
-    // prepare vertical angle information for the various planes
-    std::vector<double> vertangle;
-    vertangle.resize(3);
-    for(UInt_t ip=0;ip<3;ip++)
-      vertangle[ip]=geom->WireAngleToVertical(geom->PlaneToView(ip)) - TMath::Pi()/2; // wire angle
+  auto geom = larutil::Geometry::GetME();
 
-    // y, z, x coordinates
-    Double_t ln(0),mn(0),nn(0);
-    Double_t phis(0),thetan(0);
-    
-    // Pretend collection and induction planes. 
-    // "Collection" is the plane with the vertical angle equal to zero. 
-    // If both are non-zero, collection is the one with the negative angle. 
-    UInt_t Cplane=0,Iplane=1;   
+  // prepare vertical angle information for the various planes
+  std::vector<double> vertangle;
+  vertangle.resize(3);
+  for (UInt_t ip = 0; ip < 3; ip++)
+    vertangle[ip] = geom->WireAngleToVertical(geom->PlaneToView(ip)) - TMath::Pi() / 2; // wire angle
 
-    // angleC and angleI are the respective angles to vertical in C/I 
-    // planes and slopeC, slopeI are the tangents of the track.
-    Double_t angleC,angleI,slopeC,slopeI,omegaC,omegaI;
-    omegaC = larlite::data::kINVALID_DOUBLE;
-    omegaI = larlite::data::kINVALID_DOUBLE;
-    
-    // Don't know how to reconstruct these yet, so exit with error.
-    // In     
-    if(omega0==0 || omega1==0){
-      phi=0;
-      theta=-999;
-      return -1;
-    }
-    
-    //////insert check for existence of planes.
-    
-    //check if backwards going track
-    //Double_t backwards=0;
-    Double_t alt_backwards=0;
-    
-    if(fabs(omega0)>(TMath::Pi()/2.0) || fabs(omega1)>(TMath::Pi()/2.0) ) {
-      alt_backwards=1;
-    }
-    
-    if(vertangle[iplane0] == 0){   
-      // first plane is at 0 degrees
-      Cplane=iplane0;
-      Iplane=iplane1;
-      omegaC=omega0;
-      omegaI=omega1;
-    }
-    else if(vertangle[iplane1] == 0){  
-      // second plane is at 0 degrees
+  // y, z, x coordinates
+  Double_t ln(0), mn(0), nn(0);
+  Double_t phis(0), thetan(0);
+
+  // Pretend collection and induction planes.
+  // "Collection" is the plane with the vertical angle equal to zero.
+  // If both are non-zero, collection is the one with the negative angle.
+  UInt_t Cplane = 0, Iplane = 1;
+
+  // angleC and angleI are the respective angles to vertical in C/I
+  // planes and slopeC, slopeI are the tangents of the track.
+  Double_t angleC, angleI, slopeC, slopeI, omegaC, omegaI;
+  omegaC = larlite::data::kINVALID_DOUBLE;
+  omegaI = larlite::data::kINVALID_DOUBLE;
+
+  // Don't know how to reconstruct these yet, so exit with error.
+  // In
+  if (omega0 == 0 || omega1 == 0) {
+    phi = 0;
+    theta = -999;
+    return -1;
+  }
+
+  //////insert check for existence of planes.
+
+  //check if backwards going track
+  //Double_t backwards=0;
+  Double_t alt_backwards = 0;
+
+  if (fabs(omega0) > (TMath::Pi() / 2.0) || fabs(omega1) > (TMath::Pi() / 2.0) ) {
+    alt_backwards = 1;
+  }
+
+  if (vertangle[iplane0] == 0) {
+    // first plane is at 0 degrees
+    Cplane = iplane0;
+    Iplane = iplane1;
+    omegaC = omega0;
+    omegaI = omega1;
+  }
+  else if (vertangle[iplane1] == 0) {
+    // second plane is at 0 degrees
+    Cplane = iplane1;
+    Iplane = iplane0;
+    omegaC = omega1;
+    omegaI = omega0;
+  }
+  else if (vertangle[iplane0] != 0 && vertangle[iplane1] != 0) {
+    //both planes are at non zero degree - find the one with deg<0
+    if (vertangle[iplane1] < vertangle[iplane0]) {
       Cplane = iplane1;
       Iplane = iplane0;
-      omegaC=omega1;
-      omegaI=omega0;
+      omegaC = omega1;
+      omegaI = omega0;
     }
-    else if(vertangle[iplane0] != 0 && vertangle[iplane1] != 0){
-      //both planes are at non zero degree - find the one with deg<0
-      if(vertangle[iplane1] < vertangle[iplane0]){
-	Cplane = iplane1;
-	Iplane = iplane0;
-	omegaC=omega1;
-	omegaI=omega0;
-      }
-      else if(vertangle[iplane1] > vertangle[iplane0]){
-	Cplane = iplane0;
-	Iplane = iplane1;
-	omegaC=omega0;
-	omegaI=omega1;
-      }
-      else{
-	//throw error - same plane.
-	return -1;
-      }	
-      
+    else if (vertangle[iplane1] > vertangle[iplane0]) {
+      Cplane = iplane0;
+      Iplane = iplane1;
+      omegaC = omega0;
+      omegaI = omega1;
     }
-    
-    slopeC=tan(omegaC);
-    slopeI=tan(omegaI);
-    angleC=vertangle[Cplane];
-    angleI=vertangle[Iplane];
-    
-    
-    //0 -1 factor depending on if one of the planes is vertical.
-    bool nfact = !(vertangle[Cplane]);
-    
-    //ln represents y, omega is 2d angle -- in first 2 quadrants y is positive.
-    if(omegaC < TMath::Pi() && omegaC > 0 )
-      ln=1;
-    else
-      ln=-1;
-    
-    //calculate x and z using y ( ln )
-    mn = (ln/(2*sin(angleI)))*((cos(angleI)/(slopeC*cos(angleC)))-(1/slopeI) 
-			       +nfact*(  cos(angleI)/(cos(angleC)*slopeC)-1/slopeI  )     );
-    
-    nn = (ln/(2*cos(angleC)))*((1/slopeC)+(1/slopeI) +nfact*((1/slopeC)-(1/slopeI)));
-    
-    // Direction angles
-    if(fabs(omegaC)>0.01)  // catch numeric error values 
-      {
-	//phi=atan(ln/nn);
-	phis=asin(ln/TMath::Sqrt(ln*ln+nn*nn));
-        
-	if(fabs(slopeC+slopeI) < 0.001)
-	  phis=0;
-	else if( fabs(omegaI)>0.01 && (omegaI/fabs(omegaI) == -omegaC/fabs(omegaC) ) 
-		 && ( fabs(omegaC) < 1*TMath::Pi()/180 || fabs(omegaC) > 179*TMath::Pi()/180 ) ) // angles have 
-	  phis = (fabs(omegaC) > TMath::Pi()/2) ? TMath::Pi() : 0;    //angles are 
-	
-	
-	if(nn<0 && phis>0 && !(!alt_backwards && fabs(phis)<TMath::Pi()/4 ) )   // do not go back if track looks forward and phi is forward
-	  phis=(TMath::Pi())-phis;
-	else if(nn<0 && phis<0 && !(!alt_backwards && fabs(phis)<TMath::Pi()/4 ) )
-	  phis=(-TMath::Pi())-phis;
-	
-	
-	phi=phis;
-	
-      }
-    //If plane2 (collection), phi = 2d angle (omegaC in this case) 
-    else  
-      {
-	phis = omegaC;
-	phi = omegaC; 
-      }
-    
-    thetan = -asin ( mn / (sqrt(pow(ln,2)+pow(mn,2)+pow(nn,2)) ) ) ;
-    theta=thetan;
-    
-    return 0;   
+    else {
+      //throw error - same plane.
+      return -1;
+    }
+
   }
-  
+
+  slopeC = tan(omegaC);
+  slopeI = tan(omegaI);
+  angleC = vertangle[Cplane];
+  angleI = vertangle[Iplane];
+
+
+  //0 -1 factor depending on if one of the planes is vertical.
+  bool nfact = !(vertangle[Cplane]);
+
+  //ln represents y, omega is 2d angle -- in first 2 quadrants y is positive.
+  if (omegaC < TMath::Pi() && omegaC > 0 )
+    ln = 1;
+  else
+    ln = -1;
+
+  //calculate x and z using y ( ln )
+  mn = (ln / (2 * sin(angleI))) * ((cos(angleI) / (slopeC * cos(angleC))) - (1 / slopeI)
+                                   + nfact * (  cos(angleI) / (cos(angleC) * slopeC) - 1 / slopeI  )     );
+
+  nn = (ln / (2 * cos(angleC))) * ((1 / slopeC) + (1 / slopeI) + nfact * ((1 / slopeC) - (1 / slopeI)));
+
+  // Direction angles
+  if (fabs(omegaC) > 0.01) // catch numeric error values
+  {
+    //phi=atan(ln/nn);
+    phis = asin(ln / TMath::Sqrt(ln * ln + nn * nn));
+
+    if (fabs(slopeC + slopeI) < 0.001)
+      phis = 0;
+    else if ( fabs(omegaI) > 0.01 && (omegaI / fabs(omegaI) == -omegaC / fabs(omegaC) )
+              && ( fabs(omegaC) < 1 * TMath::Pi() / 180 || fabs(omegaC) > 179 * TMath::Pi() / 180 ) ) // angles have
+      phis = (fabs(omegaC) > TMath::Pi() / 2) ? TMath::Pi() : 0;  //angles are
+
+
+    if (nn < 0 && phis > 0 && !(!alt_backwards && fabs(phis) < TMath::Pi() / 4 ) ) // do not go back if track looks forward and phi is forward
+      phis = (TMath::Pi()) - phis;
+    else if (nn < 0 && phis < 0 && !(!alt_backwards && fabs(phis) < TMath::Pi() / 4 ) )
+      phis = (-TMath::Pi()) - phis;
+
+
+    phi = phis;
+
+  }
+  //If plane2 (collection), phi = 2d angle (omegaC in this case)
+  else
+  {
+    phis = omegaC;
+    phi = omegaC;
+  }
+
+  thetan = -asin ( mn / (sqrt(pow(ln, 2) + pow(mn, 2) + pow(nn, 2)) ) ) ;
+  theta = thetan;
+
+  return 0;
+}
+
 
 } // larutil
 

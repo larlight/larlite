@@ -104,7 +104,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   // if associated clusters not found -> quit and exit
   if ( !ev_vertex or (ev_vertex->size() == 0) ) {
-    print(msg::kERROR, __FUNCTION__,
+    print(msg::kWARNING, __FUNCTION__,
           Form("No vertexes found associated to PFPart w/ producer %s",
                fInputProducer.c_str()));
     // return false;
@@ -122,7 +122,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   // if associated clusters not found -> quit and exit
   if ( !ev_sps or (ev_sps->size() == 0) ) {
-    print(msg::kERROR, __FUNCTION__,
+    print(msg::kWARNING, __FUNCTION__,
           Form("No spacepoints found associated to PFPart w/ producer %s",
                fInputProducer.c_str()));
     // return false;

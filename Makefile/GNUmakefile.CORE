@@ -21,7 +21,7 @@ ifdef LARLITE_ROOT6
 # root class dictionary
 $(DICT).cxx: $(HEADERS) LinkDef.h
 	@echo '<< generating dict >>'
-	@rootcling -f $(DICT).cxx -s $(LARLITE_LIBDIR)/$(SHLIB) -rml $(SHLIB) -rmf $(LARLITE_LIBDIR)/$(ROOTMAP) $(CINTFLAGS) $(INCFLAGS) -inlineInputHeader $(HEADERS) LinkDef.h	
+	@rootcling -f $(DICT).cxx -s $(LARLITE_LIBDIR)/$(SHLIB) -rml $(SHLIB) -rmf $(LARLITE_LIBDIR)/$(ROOTMAP) $(CINTFLAGS) -c $(INCFLAGS) $(HEADERS) LinkDef.h	
 
 # rule for making shareable library
 $(LARLITE_LIBDIR)/$(SHLIB): $(OBJECTS) $(DICT).cxx $(DICT).o

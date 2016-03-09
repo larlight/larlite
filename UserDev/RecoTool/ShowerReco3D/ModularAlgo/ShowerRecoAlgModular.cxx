@@ -43,10 +43,10 @@ Shower_t ShowerRecoAlgModular::RecoOneShower(const ProtoShower& proto_shower) {
 
   for (size_t n = 0; n < _modules.size(); n++) {
     _watch.Start();
-    try{
+    try {
       _modules[n] -> do_reconstruction(proto_shower, result);
     }
-    catch(ShowerRecoException e){
+    catch (ShowerRecoException e) {
       result.fPassedReconstruction = false;
       return result;
     }

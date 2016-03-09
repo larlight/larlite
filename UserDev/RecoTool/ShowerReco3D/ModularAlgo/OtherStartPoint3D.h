@@ -16,6 +16,8 @@
 
 #include <iostream>
 #include "ShowerRecoModuleBase.h"
+#include "TVector3.h"
+
 /**
    \class ShowerRecoModuleBase
    User defined class ShowerRecoModuleBase ... these comments are used to generate
@@ -28,7 +30,7 @@ class OtherStartPoint3D : ShowerRecoModuleBase {
 public:
 
   /// Default constructor
-  OtherStartPoint3D() {_name = "OtherStartPoint3D"; _coords.resize(7); _initDist = 50; }
+  OtherStartPoint3D();
 
   /// Default destructor
   ~OtherStartPoint3D() {}
@@ -37,18 +39,13 @@ public:
   void do_reconstruction(const ProtoShower &, Shower_t &);
 
   /// Pass center point-- you have initDist
-  std::vector<std::vector<double>> calculatePoints(const std::vector<double> & centerPoint, const double & dist) ;
+  std::vector<TVector3> calculatePoints(const TVector3 & centerPoint,
+                                        const double & dist) ;
 
-  bool inTPC( const TVector3 & pt );
 
 
 private:
 
-  std::vector<double> _xCoords ;
-  std::vector<double> _yCoords ;
-  std::vector<double> _zCoords ;
-
-  std::vector<std::vector<double>> _coords ;
 
   double _initDist ;
 

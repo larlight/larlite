@@ -69,6 +69,9 @@ namespace larlite {
     /// Function to set an output shower producer label
     void SetOutputProducer(std::string name) { fOutputProducer = name; }
 
+    ::showerreco::ProtoShowerHelper GetProtoShowerHelper(){return _ps_helper;}
+
+
   protected:
 
     /// Input producer name

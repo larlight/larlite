@@ -532,6 +532,9 @@ namespace larlite {
 
 			if (t.size() < 2) continue;
 
+			//Now neutrons make mctracks. do not create ertool::Tracks for these
+			if (mct.PdgCode() == 2112) continue;
+
 			//This is the TOTAL energy minus TOTAL energy, so mass is removed.
 			//If you want only initial kinetic energy, remember to subtract off mass.
 			t._energy     = (*mct.begin()).Momentum().E() - (*mct.rbegin()).Momentum().E();
