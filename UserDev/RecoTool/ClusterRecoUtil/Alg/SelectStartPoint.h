@@ -29,22 +29,14 @@ namespace cluster {
   public:
 
     /// Default constructor
-    SelectStartPoint(){_name = "SelectStartPoint"; _frac = 0.95;}
+    SelectStartPoint(){_name = "SelectStartPoint";}
 
     /// Default destructor
     ~SelectStartPoint(){}
 
     void do_params_fill(cluster_params &);
 
-    /**
-     * @brief Set fraction of charge that needs to be enclosed by polygon
-     */
-    void setFrac(const double f) { _frac = f; }
-
   private:
-
-    /// Fraction of cluster charge that needs to be included in the polygon
-    double _frac;
     
   };
 

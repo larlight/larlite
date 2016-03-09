@@ -14,6 +14,7 @@ ProtoShowerHelper::ProtoShowerHelper() {
 
 ProtoShowerHelper::~ProtoShowerHelper() {
 
+
   if (_params_alg) {
     delete _params_alg;
   }
@@ -30,6 +31,7 @@ void ProtoShowerHelper::SetClusterParamsAlg(::cluster::ClusterParamsAlg * _new_p
     delete _params_alg;
   }
   _params_alg = _new_params_alg;
+
 
 }
 
@@ -50,6 +52,7 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
     const std::string &pfpart_producer_name,
     std::vector<ProtoShower> & proto_showers,
     std::vector<unsigned int> showerLikePFParts) {
+
 
   if (!_params_alg) {
     _params_alg = new ::cluster::DefaultParamsAlg();
@@ -121,7 +124,7 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
     auto const& ass_hit_v
       = storage->find_one_ass(ev_clust->id(), ev_hit, ev_clust->name());
 
-    std::cout << "Found " << ev_clust -> size() << " clusters" << std::endl;
+    // std::cout << "Found " << ev_clust -> size() << " clusters" << std::endl;
 
     // Check that the cluster associations are the same length as the pfparticle list
     if (ass_cluster_v.size() == ev_pfpart -> size()) {
