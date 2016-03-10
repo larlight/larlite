@@ -2,7 +2,7 @@
  * \file DrawLariatDaq.h
  *
  * \ingroup EventViewer
- * 
+ *
  * \brief Class def header for a class DrawLariatDaq
  *
  * @author cadams
@@ -21,25 +21,25 @@
 #include "RawBase.h"
 
 namespace evd {
-  
+
 class boardSet
 {
 public:
     // boardSet(){}
     // ~boardSet(){}
-    
+
     std::vector<size_t> ttree_entries;
     std::vector<int> board_ids;
     int event_co;
 };
 
-  /**
-     \class DrawLariatDaq
-     User custom analysis class made by SHELL_USER_NAME
-   */
-  class DrawLariatDaq : public RawBase {
-  
-  public:
+/**
+   \class DrawLariatDaq
+   User custom analysis class made by SHELL_USER_NAME
+ */
+class DrawLariatDaq : public RawBase {
+
+public:
 
     /// Default constructor
     DrawLariatDaq(int ticks = -1);
@@ -50,7 +50,7 @@ public:
     // functions that would be necessary to do this on a larlite file
     /** IMPLEMENT in DrawLariatDaq.cc!
         Initialization method to be called before the analysis event loop.
-    */ 
+    */
     void initialize();
 
 
@@ -63,18 +63,18 @@ public:
     void goToEvent(int e);
 
 
-    unsigned int run(){return _run;}
-    unsigned int event_no(){return _event_no;}
-    unsigned int spill(){return _spill;}
-    int current_event() const{return _current_event;}
-    int n_events() const{return _n_events;}
+    unsigned int run() {return _run;}
+    unsigned int event_no() {return _event_no;}
+    unsigned int spill() {return _spill;}
+    int current_event() const {return _current_event;}
+    int n_events() const {return _n_events;}
 
-  protected:
+protected:
 
 
     std::vector< TBranch *> branches;
 
-    std::map< unsigned int, boardSet > _event_set;
+    std::map< unsigned int, boardSet > ::evd::_event_set;
 
 
     std::string producer;
@@ -104,16 +104,16 @@ public:
     void prepareFile();
 
     int getLarsoftChannel(int & asic, int & channelOnAsic);
-  };
+};
 }
 #endif
 
 //**************************************************************************
-// 
+//
 // For Analysis framework documentation, read Manual.pdf here:
 //
 // http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
 //
 //**************************************************************************
 
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
