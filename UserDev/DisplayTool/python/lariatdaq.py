@@ -27,7 +27,7 @@ class lariat_manager(manager, wire, QtCore.QObject):
     self.setInputFile(file)
 
     # Lariat has special meanings to event/spill/run
-    self._spill = 0
+    self._spill = 1
 
     # The lariat manager handles watching files and sending signals
     self._watcher = None
@@ -59,12 +59,12 @@ class lariat_manager(manager, wire, QtCore.QObject):
     if self._event < self._process.n_events() - 1:
       self.goToEvent(self._event + 1)
     elif self._cycling:
-      self.goToEvent(0)
+      self.goToEvent(1)
     else:
       print "On the last event, can't go to next."
 
   def prev(self):
-    if self._event != 0:
+    if self._event != 1:
       self.goToEvent(self._event - 1)
     elif self._cycling:
       self.goToEvent(self._process.n_events() -1)  
@@ -88,8 +88,7 @@ class lariat_manager(manager, wire, QtCore.QObject):
       file = str(file)
       self._process.setInput(file)
       self._hasFile = True
-      self.goToEvent(0)
-      # self._gui.update()
+      self.goToEvent(1)
 
   def parseFileName(self,fileName):
 
@@ -230,7 +229,7 @@ class lariatgui(gui):
     self._watcher = None
     self._stopFlag = None
     self._running = False
-
+    # self.update()
 
   # override the initUI function to change things:
   def initUI(self):
@@ -243,14 +242,13 @@ class lariatgui(gui):
   # override the update function for lariat:
   def update(self):
     # set the text boxes correctly:
-    eventLabel = "Ev: " 
+    eventLabel = "Ev: " + str(self._event_manager.event())
     self._eventLabel.setText(eventLabel)
     runLabel = "Run: " + str(self._event_manager.run())
     self._runLabel.setText(runLabel)
     spillLabel = "Spill: "  + str(self._event_manager.spill())
     self._subrunLabel.setText(spillLabel)
     self._view_manager.drawPlanes(self._event_manager)
-    self._eventEntry.setText(str(self._event_manager.event()))
     # Also update the lariat text boxes, just in case:
     if self._event_manager.isRunning():
       self._spillUpdatePauseButton.setText("PAUSE")

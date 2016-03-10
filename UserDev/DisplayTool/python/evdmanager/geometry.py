@@ -188,7 +188,7 @@ class lariat(geometry):
         # lariat has a different number of time ticks
         # fix it directly:
         self._tRange = 3072
-        self._levels = [(-20, 200), (-20, 200)]
+        self._levels = [(-40, 160), (-80, 320)]
         self._pedestals = [0, 0]
         self._name = "lariat"
         # Make default color schemes here:

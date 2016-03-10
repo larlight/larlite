@@ -21,6 +21,18 @@
 #include "RawBase.h"
 
 namespace evd {
+  
+class boardSet
+{
+public:
+    // boardSet(){}
+    // ~boardSet(){}
+    
+    std::vector<size_t> ttree_entries;
+    std::vector<int> board_ids;
+    int event_co;
+};
+
   /**
      \class DrawLariatDaq
      User custom analysis class made by SHELL_USER_NAME
@@ -62,6 +74,8 @@ namespace evd {
 
     std::vector< TBranch *> branches;
 
+    std::map< unsigned int, boardSet > _event_set;
+
 
     std::string producer;
 
@@ -72,12 +86,12 @@ namespace evd {
     unsigned int _current_event;
     // this is the official event:
     unsigned int _event_no;
-    unsigned int _run;
-    unsigned int _spill;
+    int _run;
+    int _spill;
     unsigned int _board_id;
 
     const int _n_cards = 8;
-    const int _card_offset = 1;
+    const int _card_offset = 0;
     const int _n_channels = 64;
 
     std::vector<unsigned int> board_start_index;
@@ -86,6 +100,8 @@ namespace evd {
 
     // Need some private worker functions to handle file i/o
     void readData();
+
+    void prepareFile();
 
     int getLarsoftChannel(int & asic, int & channelOnAsic);
   };
