@@ -74,7 +74,7 @@ protected:
 
     std::vector< TBranch *> branches;
 
-    std::map< unsigned int, boardSet > ::evd::_event_set;
+    std::map< unsigned int, ::evd::boardSet > _event_set;
 
 
     std::string producer;
