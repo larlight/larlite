@@ -224,6 +224,8 @@ void DrawLariatDaq::setInput(std::string s) {
 
 void DrawLariatDaq::prepareFile() {
 
+  _event_set.clear();
+
   c -> SetBranchAddress("run", &_run);
   c -> SetBranchAddress("event_counter", &_event_no);
   c -> SetBranchAddress("spill", &_spill);
