@@ -107,7 +107,9 @@ namespace recoemu {
     // convert from energy (MeV) to length (cm) because this functional form
     // takes as input cm length. To convert use 2.3 MeV/cm assumption
     // which is reasonable for the single muon tracks the function was fitted to
-    double eff = _fEff->Eval( result.energy / 2.3 );
+
+    /// uhhhh functional form has input variable == shower energy
+    double eff = _fEff->Eval( result.energy );// / 2.3 );
 
     // random number
     double randeff = ( (double) rand() ) / RAND_MAX;
@@ -118,20 +120,28 @@ namespace recoemu {
       //return result;
     }
 
+    /*
     // smear start point
     ::geoalgo::Point_t start( mc.cone.Start()[0] + _fPosres->GetRandom(),
                               mc.cone.Start()[1] + _fPosres->GetRandom(),
                               mc.cone.Start()[2] + _fPosres->GetRandom() );
+    */
+    //don't smear start point
+    ::geoalgo::Point_t start( mc.cone.Start()[0],
+                              mc.cone.Start()[1],
+                              mc.cone.Start()[2]);
 
+    /*
     // smear direction
     // result is in degrees
     double anglesmear = _fAngleres->GetRandom();
+    */
 
     // current momentum components
     double px = mc.cone.Dir()[0];
     double py = mc.cone.Dir()[1];
     double pz = mc.cone.Dir()[2];
-
+    /*
     // find rotation angles to bring momentum vector to z-direction
     double phi   = 0.;
     if ( px != 0)
@@ -155,13 +165,17 @@ namespace recoemu {
     double p_perp_mag = sqrt( 1 - pz_new * pz_new);
     px_new *= p_perp_mag;
     py_new *= p_perp_mag;
-
+    
     ::geoalgo::Vector_t dir(px_new, py_new, pz_new);
-
+    */
+    ::geoalgo::Vector_t dir(px, py, pz);
+    /*
     // now rotatte by the inverse angles
     dir.RotateY(theta);
     dir.RotateZ(phi);
+    */
 
+    /*
     // flip direction if necessary
     double randnum = ( (double) rand() ) / RAND_MAX;
     if (randnum < _DirectionFlipFrac) {
@@ -183,18 +197,19 @@ namespace recoemu {
       dir *= -1.;
 
     }// if the direction should be flipped
-
+    */
     ::geoalgo::Cone_t cone(start, dir, mc.cone.Length(), mc.cone.Radius());
 
     result.cone = cone;
 
+    /*
     // smear dEdx
     // draw a random value from the dEdx smearing distribution
     double dedx_smeared = _fdEdxres->GetRandom();
     result.dedx = mc.dedx + ( mc.dedx * dedx_smeared );
     if (result.dedx < 0)
       result.dedx = 0;
-
+    */
     result.pdg  = mc.pdg;
     result.time = mc.time;
 

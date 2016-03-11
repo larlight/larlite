@@ -180,7 +180,7 @@ namespace larlite {
 
     if (_fout) {
       _fout->cd();
-      _shower_smearing_tree->Write();
+      //_shower_smearing_tree->Write();
     }
 
     return true;
