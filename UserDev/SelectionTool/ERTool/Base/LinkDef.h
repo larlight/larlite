@@ -9,6 +9,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+#pragma link C++ class ertool::RecoInputID_t+;
 #pragma link C++ class std::vector<size_t>+;
 #pragma link C++ class std::vector<std::vector<size_t> >+;
 #pragma link C++ class std::pair<size_t,string>+;

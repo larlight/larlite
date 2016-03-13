@@ -102,11 +102,14 @@ namespace cluster{
 
     /**
      * @brief add a hidden layer
-     * @details call this function to add a hidden layer. Layers are added to the back of the previous layer
+     * @details call this function to add a hidden layer. 
+     * Layers are added to the back of the previous layer
      * 
      * @param nodes number of nodes in this layer
      */
     void addLayer(int nodes);
+
+    void setUseCascade(bool b){_use_cascade = b;}
 
   private:
     double fFeatureVectorLength;

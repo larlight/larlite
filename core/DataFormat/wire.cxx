@@ -48,7 +48,7 @@ namespace larlite{
     std::vector<float> res;
     if(!fSignalROI.size()) return res;
     auto const& rois = fSignalROI.get_ranges();
-    res.resize(rois.back().begin_index()+rois.back().size()-1);
+    res.resize(rois.back().begin_index()+rois.back().size());
     for(auto const& roi : rois) {
       for(size_t index=0; index<roi.size(); ++index)
 	res[roi.begin_index() + index] = roi.data()[index];

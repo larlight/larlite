@@ -34,6 +34,12 @@ namespace geoalgo {
   void HalfLine::Dir(const double x, const double y, const double z)
   { _dir[0] = x; _dir[1] = y; _dir[2] = z; Normalize(); }
 
+  void HalfLine::Start(const TVector3& pt)
+  { _start[0] = pt[0]; _start[1] = pt[1]; _start[2] = pt[2]; }
+
+  void HalfLine::Dir(const TVector3& dir)
+  { _dir[0] = dir[0]; _dir[1] = dir[1]; _dir[2] = dir[2]; Normalize(); }
+
   void HalfLine::Normalize()
   {
     auto l = _dir.Length();

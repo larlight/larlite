@@ -5,8 +5,10 @@
 #include "DataFormat/mcshower.h"
 #include "DataFormat/simch.h"
 #include "DataFormat/shower.h"
+#include "DataFormat/pfpart.h"
 #include "DataFormat/cluster.h"
 #include "DataFormat/hit.h"
+
 namespace larlite {
   MMQuality::MMQuality() {
     
@@ -27,102 +29,44 @@ namespace larlite {
     //vRecoShowerClusterEffVsPur.clear();
     //hClusterHits      = nullptr;
     hMatchCorrectness = nullptr;
-
-    fMMQualityTree = nullptr;
-
+    hMatchesPerEvent  = nullptr;
+    fMMQualityTree    = nullptr;
+    
     _mcshowerTot    = 0;
     _recoClusterTot = 0;
   }
 
   bool MMQuality::initialize() {
 
-    if(fClusterProducer.empty() && fShowerProducer.empty()) {
-
-      print(msg::kERROR,__FUNCTION__,
-	    "Cluster & Shower producer's name is not set!");
-      return false;
-
-    }
-
-    if(!(fClusterProducer.empty()) && !(fShowerProducer.empty())) {
-
-      print(msg::kERROR,__FUNCTION__,
-	    Form("Shower producer (\"%s\") and Cluster producer (\"%s\") both set! (can only set one of two)",
-		 fShowerProducer.c_str(),
-		 fClusterProducer.c_str())
-	    );
+    // at least 1 of the three (shower,pfpart,cluster) producer names needs to be specified
+    if(fClusterProducer.empty() && fShowerProducer.empty() && fPFParticleProducer.empty()) {
+      print(msg::kERROR,__FUNCTION__,"Cluster, PFParticle & Shower producer's name are all empty!");
       return false;
     }
 
-    // auto geo = larutil::Geometry::GetME();
-
-    //
-    // Cluster purity, efficiency histograms initialization
-    //
-
-    //for(auto& h : vShowerClusterEff) delete h;
-    //for(auto& h : vShowerClusterPur) delete h;
-    //for(auto& h : vShowerClusterEffVsPur) delete h;
-    //for(auto& h : vRecoShowerClusterEff) delete h;
-    //for(auto& h : vRecoShowerClusterPur) delete h;
-    //for(auto& h : vRecoShowerClusterEffVsPur) delete h;
-
-    //vShowerClusterEff.clear();
-    //vShowerClusterPur.clear();
-    //vShowerClusterEffVsPur.clear();
-    //vRecoShowerClusterEff.clear();
-    //vRecoShowerClusterPur.clear();
-    //vRecoShowerClusterEffVsPur.clear();
-
-    /*
-    for(size_t plane=0; plane<geo->Nplanes(); ++plane) {
-
-      vShowerClusterEff.push_back(new TH1D(Form("hShowerClusterEff_Plane%zu",plane),
-					   "Best Shower Cluster's Charge Efficiency; Efficiency; Clusters",
-					   101,-0.005,1.005));
-
-      vShowerClusterPur.push_back(new TH1D(Form("hShowerClusterPur_Plane%zu",plane),
-					   "Best Shower Cluster's Charge Purity; Purity; Clusters",
-					   101,-0.005,1.005));
-
-      vShowerClusterEffVsPur.push_back(new TH2D(Form("hShowerClusterEffVsPur_Plane%zu",plane),
-						"Best Shower Cluster's Charge Efficiency vs Purity; Efficiency ; Purity",
-						101,-0.005,1.005,101,-0.005,1.005));
-
-
-      vRecoShowerClusterEff.push_back(new TH1D(Form("hRecoShowerClusterEff_Plane%zu",plane),
-					       "Shower Cluster's Charge Efficiency; Efficiency; Clusters",
-					       101,-0.005,1.005));
-      
-      vRecoShowerClusterPur.push_back(new TH1D(Form("hRecoShowerClusterPur_Plane%zu",plane),
-					       "Shower Cluster's Charge Purity; Purity; Clusters",
-					       101,-0.005,1.005));
-      
-      vRecoShowerClusterEffVsPur.push_back(new TH2D(Form("hRecoShowerClusterEffVsPur_Plane%zu",plane),
-						    "Shower Cluster's Charge Efficiency vs Purity; Efficiency ; Purity",
-						    101,-0.005,1.005,101,-0.005,1.005));
-      
-
+    // only one of the three (shower,pfpart,cluster) producer names need to be specified
+    int producers_set = 0;
+    if ( !fClusterProducer.empty() )
+      producers_set += 1;
+    if ( !fShowerProducer.empty() )
+      producers_set += 1;
+    if ( !fPFParticleProducer.empty() )
+      producers_set += 1;
+    if (producers_set != 1){
+      print(msg::kERROR,__FUNCTION__,"Please sepcify producer name for only one data-product amongst (Cluster,PFParticle,Shower)");
+      return false;
     }
-    */
-    
-    //
-    // Matching correctness histogram initialization
-    //
+
+
     if(hMatchCorrectness) delete hMatchCorrectness;
     hMatchCorrectness = new TH1D("hMatchCorrectness",
 				 "Shower 2D Cluster Matching Correctness; Correctness; Showers",
 				 101,-0.005,1.005);
 
-    //
-    // Matching correctness histogram initialization
-    //
-    /*                                              
-    if(hClusterHits) delete hClusterHits;
-    hClusterHits = new TH1D("hClusterHits",
-			    "Number of hits per 2D cluster; Number of hits; Counts",
-                                 401,-0.5,400.5);
-    */
+    if (hMatchesPerEvent) delete hMatchesPerEvent;
+    hMatchesPerEvent = new TH1I("hMatchesPerEvent",
+				"Matched Sets of Clusters Per Event",6,-0.5,5.5);
+
 
     InitializeAnaTree();
 
@@ -150,23 +94,10 @@ namespace larlite {
       print(msg::kERROR,__FUNCTION__,"SimChannel data product not found!");
       return false;
     }      
-
-    /*
-    if(fClusterProducer.empty()) {
-
-      auto ass_keys = ev_shower->association_keys(data::kCluster);
-      
-      if(!(ass_keys.size())) {
-	print(msg::kERROR,__FUNCTION__,
-	      Form("No associated cluster found to a shower produced by \"%s\"",
-		   fShowerProducer.c_str())
-	      );
-      }
-      fClusterProducer = ass_keys[0];
-    }
-    */
-
+    
+    // Retrieve shower data product
     event_shower* ev_shower = nullptr;
+    // if no shower producer specified -> don't bother to get the shower data-product
     if(!fShowerProducer.empty()) {
       ev_shower = storage->get_data<event_shower>(fShowerProducer);
       if(!ev_shower) {
@@ -175,14 +106,40 @@ namespace larlite {
       }
     }
 
-    event_cluster* ev_cluster = nullptr;
-
-    if(ev_shower) {
+    // Retrieve pfparticle data product
+    event_pfpart* ev_pfpart = nullptr;
+    // if no shower producer specified -> don't bother to get the shower data-product
+    if(!fPFParticleProducer.empty()) {
+      ev_pfpart = storage->get_data<event_pfpart>(fPFParticleProducer);
+      if(!ev_pfpart) {
+	print(msg::kERROR,__FUNCTION__,Form("Did not find PFParticle produced by \"%s\"",fPFParticleProducer.c_str()));
+	return false;
+      }
+    }
     
-      auto const& ass_cluster_v = storage->find_one_ass(ev_shower->id(),ev_cluster,ev_shower->name());
-      if (!ev_cluster || (!ev_shower->empty() && ass_cluster_v.empty()))
+    // Retrieve cluster data-product
+    event_cluster* ev_cluster = nullptr;
+    // association vector
+    AssSet_t ass_cluster_v;
+
+    // if a shower data-product was loaded -> get the clusters associated w/ the showers
+    if(ev_shower) {
+      ass_cluster_v = storage->find_one_ass(ev_shower->id(),ev_cluster,ev_shower->name());
+      if (!ev_cluster || (!ev_shower->empty() && ass_cluster_v.empty())){
 	print(msg::kERROR,__FUNCTION__,Form("No associated cluster found to a shower produced by \"%s\"",fShowerProducer.c_str()));
-    }else{
+	return false;
+      }
+    }
+    // if a PFParticle data-product was loaded -> load the clusters through this association
+    else if (ev_pfpart) {
+      ass_cluster_v = storage->find_one_ass(ev_pfpart->id(),ev_cluster,ev_pfpart->name());
+      if (!ev_cluster || (!ev_pfpart->empty() && ass_cluster_v.empty())){
+	print(msg::kERROR,__FUNCTION__,Form("No associated cluster found to a PFParticle produced by \"%s\"",fPFParticleProducer.c_str()));
+	return false;
+      }
+    }
+    // finally, if clusters are to be loaded directly from the producer name
+    else{
       ev_cluster = storage->get_data<event_cluster>(fClusterProducer);
       if(!ev_cluster || !(ev_cluster->size())) {
 	print(msg::kERROR,__FUNCTION__,"Could not retrieve a reconstructed cluster!");
@@ -192,9 +149,14 @@ namespace larlite {
 
     // get associated hits
     event_hit* ev_hit = nullptr;
-    auto const& ass_hit_v = storage->find_one_ass(ev_cluster->id(),ev_hit,ev_cluster->name());
-    if (!ev_hit)
+    // association vector (to clusters)
+    AssSet_t ass_hit_v;
+
+    ass_hit_v = storage->find_one_ass(ev_cluster->id(),ev_hit,ev_cluster->name());
+    if ( !ev_hit or (ev_hit->size() == 0) or (ass_hit_v.size() == 0) ){
       print(msg::kERROR,__FUNCTION__,Form("No associated hit found to a cluster produced by \"%s\"",ev_cluster->name().c_str()));
+      return false;
+    }
 
     /*
     // Retrieve shower => cluster association
@@ -244,10 +206,6 @@ namespace larlite {
     
     auto geo = larutil::Geometry::GetME();
    
-    //if(fShowerProducer.empty()) return true;
-    //std::cout<<"Looking at shower..."<<std::endl;
-    // auto const& ass_cluster_v = storage->find_one_ass(ev_shower->id(),ev_cluster,ev_shower->name());
-    
     // Fill cluster quality plots
     for(size_t cluster_index=0; cluster_index<ev_cluster->size();++cluster_index){
       
@@ -268,10 +226,10 @@ namespace larlite {
       
       
       if(_purity&&_efficiency) {
-      
-      // get associated hits                                                                                                                                                     
-	event_hit* ev_hit = nullptr;
-	auto const& ass_hit_v = storage->find_one_ass(ev_cluster->id(),ev_hit,ev_cluster->name());
+	
+	// get associated hits                                                                                                                                                     
+	//event_hit* ev_hit = nullptr;
+	//ass_hit_v = storage->find_one_ass(ev_cluster->id(),ev_hit,ev_cluster->name());
 	if (!ev_hit)
 	  {
 	    print(msg::kERROR,__FUNCTION__,Form("No associated hit found to a cluster produced by \"%s\"",ev_cluster->name().c_str()));
@@ -331,22 +289,21 @@ namespace larlite {
     fMCShower.push_back(mc_index_v.size());
     fMMQualityTree->Fill();
 
-    // If this is not for 3D shower comparison, return
-    if(fShowerProducer.empty()) return true;
-    std::cout<<"Looking at shower..."<<std::endl;
-    auto const& ass_cluster_v = storage->find_one_ass(ev_shower->id(),ev_cluster,ev_shower->name());
+    // if no shower / PFParticle producer was set
+    // we have no information on cross-plane cluster
+    // matches -> we cannot evaluate matching performance
+    // -> return now
+    if ( fShowerProducer.empty() and fPFParticleProducer.empty() )
+      return true;
     
-    for(size_t shower_index=0; shower_index < ass_cluster_v.size(); ++shower_index) {
-      
-      auto res = fBTAlg.ShowerCorrectness(ass_cluster_v[shower_index]);
-      
-      //
-      // Fill histogram
-      //
-      hMatchCorrectness->Fill(res.second);
+    // fill the number of cluster-matched groupings in the event
+    hMatchesPerEvent->Fill(ass_cluster_v.size());
 
+    for(size_t match_index=0; match_index < ass_cluster_v.size(); match_index++) {
+      auto res = fBTAlg.MatchCorrectness(ass_cluster_v[match_index]);
+      hMatchCorrectness->Fill(res.second);
     }
-  
+    
     ClearTreeVar();
     return true;
   }
@@ -355,25 +312,11 @@ namespace larlite {
     
     if(_fout) {
       
-      // Write cluster histograms if any entry made
-      //if(vShowerClusterEff.size() && vShowerClusterEff[0]->GetEntries()) {
-
-      //for(auto& h : vShowerClusterEff) h->Write();
-      //for(auto& h : vShowerClusterPur) h->Write();
-      // for(auto& h : vShowerClusterEffVsPur) h->Write();
-      //}
-      
-      
-      //for(auto& h : vRecoShowerClusterEff) h->Write();
-      //for(auto& h : vRecoShowerClusterPur) h->Write();
-      //for(auto& h : vRecoShowerClusterEffVsPur) h->Write();
-      
-      
       // Write shower histograms if any entry made
       if(hMatchCorrectness->GetEntries()) hMatchCorrectness->Write();
-      //if(hClusterHits->GetEntries()) hClusterHits->Write();
+      if (hMatchesPerEvent->GetEntries()) hMatchesPerEvent->Write();
 
-      // Write Ttree histograms if any entry made                                                                                                                                 
+      // Write Ttree histograms if any entry made
       if (fMMQualityTree) fMMQualityTree->Write();
     }
    

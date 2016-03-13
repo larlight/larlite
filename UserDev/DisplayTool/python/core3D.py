@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-
+import ROOT
+ROOT.PyConfig.IgnoreCommandLineOptions = True
 import argparse
 import sys
 from pyqtgraph.Qt import QtGui, QtCore
@@ -15,7 +16,7 @@ def sigintHandler(*args):
 
 def main():
 
-    parser = argparse.ArgumentParser(description='Python based event display.')
+    parser = argparse.ArgumentParser(description='Python based 3D event display core, doesn\'t draw data.')
     geom = parser.add_mutually_exclusive_group()
     geom.add_argument('-A', '-a', '--argoneut',
                       action='store_true',

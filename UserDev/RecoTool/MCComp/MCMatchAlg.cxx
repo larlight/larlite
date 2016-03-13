@@ -154,7 +154,7 @@ namespace btutil {
 
   }
 
-  std::pair<size_t,double> MCMatchAlg::ShowerCorrectness(const std::vector<unsigned int> cluster_indices) const
+  std::pair<size_t,double> MCMatchAlg::MatchCorrectness(const std::vector<unsigned int> cluster_indices) const
   {
 
     if(!_bmatch_id.size()) 

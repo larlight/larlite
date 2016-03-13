@@ -48,6 +48,7 @@ my_unit.UseMC(True)
 my_unit.SetROStart(-3200.)
 my_unit.SetROEnd(3200.)
 my_unit.SetTrigTime(0.)
+my_unit.UseLightPathWithMC(False)
 my_proc.add_process(my_unit)
 
 # TPC Filter Algo
@@ -55,18 +56,18 @@ my_unit.Manager().SetAlgo(flashana.NPtFilter())
 # PMT Filter Algo
 my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
 # Match Prohibit Algo
-#my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
+my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
 # Hypothesis Algo
 my_unit.Manager().SetAlgo(flashana.PhotonLibHypothesis())
 # Match Algo
 #my_unit.Manager().SetAlgo( flashana.QLLMatch.GetME() )
-#my_unit.Manager().SetAlgo( flashana.QWeightPoint()   )
-my_unit.Manager().SetAlgo( flashana.CommonAmps()      )
+my_unit.Manager().SetAlgo( flashana.QWeightPoint()   )
+#my_unit.Manager().SetAlgo( flashana.CommonAmps()      )
 
 #
 # Other algorithms
 #
-my_unit.Manager().AddCustomAlgo( flashana.LightPath() )
+#my_unit.Manager().AddCustomAlgo( flashana.LightPath() )
 
 my_unit.Manager().Configure( "%s/SelectionTool/OpT0Finder/App/mac/flashmatch.fcl" % os.environ['LARLITE_USERDEVDIR'])
 

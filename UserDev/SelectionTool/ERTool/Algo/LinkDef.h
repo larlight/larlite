@@ -30,9 +30,12 @@
 #pragma link C++ class ertool::ERAlgoTrackDresser+;
 #pragma link C++ class ertool::ERAlgopi0+;
 #pragma link C++ class ertool::ERAlgoVertexBuilder+;
-//ADD_NEW_CLASS ... do not change this line
+#pragma link C++ class ertool::ERAlgoTrackID+;
+#pragma link C++ class ertool::ERAlgoOpT0Tender+;
+#pragma link C++ class ertool::ERAlgoNueSharedFlashMerger+;
 
 #endif
+
 
 
 

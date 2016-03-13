@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-#
+import ROOT
+ROOT.PyConfig.IgnoreCommandLineOptions = True
+
 try:
     import pyqtgraph.opengl as gl
 except:
@@ -29,7 +31,7 @@ def sigintHandler(*args):
 
 def main():
 
-    parser = argparse.ArgumentParser(description='Python based event display.')
+    parser = argparse.ArgumentParser(description='Python based 3D event display.  Requires opengl.')
     geom = parser.add_mutually_exclusive_group()
     geom.add_argument('-A', '-a', '--argoneut',
                       action='store_true',

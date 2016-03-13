@@ -40,8 +40,8 @@ class track(recoBase):
             tracks = self._process.getDataByPlane(view.plane())
             offset = geom.offset(view.plane()) / geom.time2cm()
 
-            for track in tracks:
-
+            for i in xrange(len(tracks)):
+                track = tracks[i]
                 # construct a polygon for this track:
                 points = []
                 # Remeber - everything is in cm, but the display is in

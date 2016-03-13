@@ -2,6 +2,7 @@
 #define OPT0FINDER_OPT0FINDERTYPES_H
 
 #include <vector>
+#include <numeric>
 #include "OpT0FinderConstants.h"
 #include <string>
 namespace flashana {
@@ -27,6 +28,9 @@ namespace flashana {
   public:
 
     std::vector<double> pe_v; ///< PE distribution over photo-detectors
+
+    double TotalPE() const{ return std::accumulate(pe_v.begin(),pe_v.end(),0.0);}
+    
     double x,y,z;             ///< Flash position 
     double x_err,y_err,z_err; ///< Flash timing, a candidate T0
     double time;
@@ -65,12 +69,24 @@ namespace flashana {
   };
 
   /// Collection of charge deposition 3D point (cluster)
-  struct QCluster_t : public std::vector<QPoint_t>{
+  class QCluster_t : public std::vector<QPoint_t>{
+  public:
     ID_t idx;                 ///< index from original larlite vector
     /// Default constructor
-    QCluster_t()
-      : idx(kINVALID_ID)
-    {}
+    QCluster_t() : idx(kINVALID_ID) {}
+    ~QCluster_t() {}
+
+    inline QCluster_t& operator+=(const QCluster_t& rhs) {
+      this->reserve(rhs.size() + this->size());
+      for(auto const& pt : rhs) this->push_back(pt);
+      return (*this);
+    }
+
+    inline QCluster_t operator+(const QCluster_t& rhs) const {
+      QCluster_t res((*this));
+      res += rhs;
+      return res;
+    }
 
   };
   /// Collection of 3D point clusters (one use case is TPC object representation for track(s) and shower(s))

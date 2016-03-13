@@ -22,11 +22,11 @@ namespace larutil {
 
   void TimeService::ClearData()
   {
-    fG4RefTime        = -3.2e3;
+    fG4RefTime        = -3.65e3;
     fFramePeriod      =  1.6e3;
     fTriggerOffsetTPC = -1.6e3;
-    fTriggerTime      =  3.2e3;
-    fBeamGateTime     =  3.2e3;
+    fTriggerTime      =  3.65e3;
+    fBeamGateTime     =  3.6e3;
 
     fTPCClock     = ElecClock(fTriggerTime, fFramePeriod, 2);
     fOpticalClock = ElecClock(fTriggerTime, fFramePeriod, 64);

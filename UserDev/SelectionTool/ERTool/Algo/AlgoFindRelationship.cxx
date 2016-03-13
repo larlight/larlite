@@ -37,6 +37,8 @@ namespace ertool {
   }
 
 
+
+
   double AlgoFindRelationship::FindClosestApproach(const geoalgo::HalfLine_t& shr,
       const geoalgo::Trajectory_t& trk,
       geoalgo::Point_t& vtx) const
@@ -142,6 +144,20 @@ namespace ertool {
     geoalgo::Point_t vtx(3);
     return FindClosestApproach(shr1, shr2, vtx);
   }
+  
+  double AlgoFindRelationship::FindClosestApproach(const ::ertool::Shower& shr,
+						   const geoalgo::Vector& trk_point) const
+  {
+
+    // Create a half-line pointing backwards from the shower
+    geoalgo::HalfLine_t shrBkwd(shr.Start(), shr.Dir() * (-1));
+    
+    double IP = _geoAlgo.SqDist(shrBkwd, trk_point);
+    
+
+    return sqrt(IP);
+  }
+
 
 
   double AlgoFindRelationship::FindClosestApproach(const geoalgo::HalfLine_t& shr,

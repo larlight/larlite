@@ -72,7 +72,7 @@ namespace btutil {
        across plane to represent one 3D reco object. The return is a pair of best-matched MC object
        and correctness.
      */
-    std::pair<size_t,double> ShowerCorrectness(const std::vector<unsigned int> cluster_indices) const;
+    std::pair<size_t,double> MatchCorrectness(const std::vector<unsigned int> cluster_indices) const;
 
 
     ///For a specified cluster, compute cluster efficiency and purity in terms of specified MC object

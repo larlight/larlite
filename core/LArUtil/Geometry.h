@@ -2,7 +2,7 @@
  * \file Geometry.h
  *
  * \ingroup LArUtil
- * 
+ *
  * \brief Class def header for a class Geometry
  *
  * @author kazuhiro
@@ -20,33 +20,33 @@
 #include <set>
 
 namespace larutil {
-  /**
-     \class Geometry
-  */
-  class Geometry : public LArUtilBase{
-    
-  private:
+/**
+   \class Geometry
+*/
+class Geometry : public LArUtilBase {
+
+private:
 
     /// Singleton constructor
-    Geometry(bool default_load=true);
+    Geometry(bool default_load = true);
 
     /// Default destructor
-    virtual ~Geometry(){};
+    virtual ~Geometry() {};
 
     static Geometry* _me;
-    
-  public:
+
+public:
 
     /// Singleton getter
-    static const Geometry* GetME(bool default_load=true)
+    static const Geometry* GetME(bool default_load = true)
     {
-      if(!_me) _me = new Geometry(default_load);
-      return _me;
+        if (!_me) _me = new Geometry(default_load);
+        return _me;
     }
 
     //--- LArSoft Implementation ---//
 
-    /// Number of readout channels in the detector 
+    /// Number of readout channels in the detector
     UInt_t     Nchannels() const
     { return fChannelToWireMap.size(); }
 
@@ -68,46 +68,46 @@ namespace larutil {
 
     /// Number of wires in plane "p" of TPC "tpc" of cryostat "cstat".
     UInt_t Nwires(UInt_t p) const;
-    
+
     /// convert channel number to list of possible WireIDs
-    larlite::geo::WireID ChannelToWireID(const UInt_t channel) const; 
+    larlite::geo::WireID ChannelToWireID(const UInt_t channel) const;
 
     /// return the signal type for a given channel
-    larlite::geo::SigType_t SignalType(const UInt_t channel)  const; 
+    larlite::geo::SigType_t SignalType(const UInt_t channel)  const;
 
     /// return the signal type for a given plane
-    larlite::geo::SigType_t PlaneToSignalType(const UChar_t plane)  const; 
+    larlite::geo::SigType_t PlaneToSignalType(const UChar_t plane)  const;
 
     /// return the view type for a given channel
-    larlite::geo::View_t View(const UInt_t channel)  const; 
+    larlite::geo::View_t View(const UInt_t channel)  const;
 
     /// return the view type for a given plane
     larlite::geo::View_t PlaneToView(const UChar_t plane) const;
 
     /// return vector of possible views in the detector
-    std::set<larlite::geo::View_t>  const Views() const; 
+    std::set<larlite::geo::View_t>  const Views() const;
 
-    /// convert plane, wire to channel 
+    /// convert plane, wire to channel
     UInt_t   PlaneWireToChannel(const UInt_t plane,
-				const UInt_t wire) const;
-    
+                                const UInt_t wire) const;
+
     /// convert channel to plane
     UChar_t  ChannelToPlane(const UInt_t ch) const;
 
     /// Convert channel to wire
     UInt_t   ChannelToWire(const UInt_t ch)const;
-    
+
     /// find the nearest channel to input world coordinates
     UInt_t   NearestChannel(const Double_t worldLoc[3],
-			    const UInt_t   PlaneNo) const;
+                            const UInt_t   PlaneNo) const;
 
-    /// find the nearest channel to input world coordinates 
+    /// find the nearest channel to input world coordinates
     UInt_t   NearestChannel(const std::vector<Double_t> &worldLoc,
-			    const UInt_t PlaneNo) const;
+                            const UInt_t PlaneNo) const;
 
     /// find the nearest channel to input world coordinates
     UInt_t   NearestChannel(const TVector3& worldLoc,
-			    const UInt_t    PlaneNo) const;
+                            const UInt_t    PlaneNo) const;
 
     /// nearest wire to input world coordinates
     UInt_t NearestWire(const Double_t worldLoc[3],
@@ -137,11 +137,11 @@ namespace larutil {
     Double_t   DetHalfWidth() const
     { return fDetHalfWidth; }
 
-    /// half height of the TPC 
+    /// half height of the TPC
     Double_t   DetHalfHeight() const
     { return fDetHalfHeight; }
 
-    /// length of the TPC 
+    /// length of the TPC
     Double_t   DetLength() const
     { return fDetLength; }
 
@@ -153,14 +153,14 @@ namespace larutil {
     Double_t   CryostatHalfHeight() const
     { return fCryoHalfHeight; }
 
-    /// length of the cryostat 
+    /// length of the cryostat
     Double_t   CryostatLength() const
     { return fCryoLength; }
 
     /// boundaries of cryostat, 3 pairs of +/- coord
     void     CryostatBoundaries(Double_t* boundaries) const;
 
-  private:
+private:
 
     Double_t fDetLength;
     Double_t fDetHalfWidth;
@@ -171,15 +171,15 @@ namespace larutil {
     Double_t fCryoHalfHeight;
     std::vector<Double_t> fCryostatBoundaries;
 
-  public:
+public:
 
     /// distance between planes p1 < p2
-    Double_t   PlanePitch(const UChar_t p1 = 0,const UChar_t p2 = 1) const;
+    Double_t   PlanePitch(const UChar_t p1 = 0, const UChar_t p2 = 1) const;
 
     /// distance between wires on the same plane w1 < w2
-    Double_t   WirePitch(const UInt_t  w1=0,
-			 const UInt_t  w2=1,
-			 const UChar_t plane = 0) const;
+    Double_t   WirePitch(const UInt_t  w1 = 0,
+                         const UInt_t  w2 = 1,
+                         const UChar_t plane = 0) const;
 
     /// assumes all planes in a view have the same pitch
     Double_t   WirePitch(const larlite::geo::View_t view) const;
@@ -190,11 +190,11 @@ namespace larutil {
     /// volume box
     /*
     void  WorldBox(Double_t* xlo,
-		   Double_t* xhi,
-		   Double_t* ylo,
-		   Double_t* yhi,
-		   Double_t* zlo,
-		   Double_t* zhi)  const; 
+           Double_t* xhi,
+           Double_t* ylo,
+           Double_t* yhi,
+           Double_t* zlo,
+           Double_t* zhi)  const;
     */
 
     /**
@@ -204,7 +204,7 @@ namespace larutil {
        Starting point of wire is end with lower z-coordinate.
     */
     bool ValueInRange(const Double_t value, Double_t min, Double_t max) const
-    {  if(min>max) std::swap(min,max); return ( (min <= value) && (value <= max) ); }
+    {  if (min > max) std::swap(min, max); return ( (min <= value) && (value <= max) ); }
 
     void WireEndPoints(const UChar_t plane,
                        const UInt_t wire,
@@ -212,31 +212,31 @@ namespace larutil {
                        Double_t *xyzEnd) const;
 
     bool ChannelsIntersect(const UInt_t c1, const UInt_t c2, Double_t &y, Double_t &z) const;
-    
-    void IntersectionPoint(const UInt_t  wire1,  const UInt_t  wire2,
-			   const UChar_t plane1, const UChar_t plane2,
-			   Double_t start_w1[3], Double_t end_w1[3],
-			   Double_t start_w2[3], Double_t end_w2[3],
-			   Double_t &y, Double_t &z) const;
 
     void IntersectionPoint(const UInt_t  wire1,  const UInt_t  wire2,
-			   const UChar_t plane1, const UChar_t plane2,
-			   Double_t &y, Double_t &z) const;
+                           const UChar_t plane1, const UChar_t plane2,
+                           Double_t start_w1[3], Double_t end_w1[3],
+                           Double_t start_w2[3], Double_t end_w2[3],
+                           Double_t &y, Double_t &z) const;
 
-    
+    void IntersectionPoint(const UInt_t  wire1,  const UInt_t  wire2,
+                           const UChar_t plane1, const UChar_t plane2,
+                           Double_t &y, Double_t &z) const;
+
+
     /// Return gdml string which gives sensitive opdet name
     //std::string OpDetGeoName(UInt_t c=0) const;
 
     bool IsValidOpChannel(unsigned int opch) const
     {
-      if(opch < fOpChannelVtx.size()) return true;
-      return false;
+        if (opch < fOpChannelVtx.size()) return true;
+        return false;
     }
 
-    /// Find the nearest OpChannel to some point, in the appropriate cryostat 
+    /// Find the nearest OpChannel to some point, in the appropriate cryostat
     UInt_t  GetClosestOpDet(const Double_t * xyz) const;
 
-    /// Find the nearest OpChannel to some point, in the appropriate cryostat 
+    /// Find the nearest OpChannel to some point, in the appropriate cryostat
     UInt_t  GetClosestOpDet(const Double_t * xyz, Double_t &dist) const;
 
     /// Return optical detector id from optical channel
@@ -252,15 +252,15 @@ namespace larutil {
 
     void PlaneOriginVtx(UChar_t plane, Double_t *vtx) const;
 
-    virtual bool LoadData(bool force_reload=false);
+    virtual bool LoadData(bool force_reload = false);
 
-  protected:
-    
+protected:
+
     virtual bool ReadTree();
 
     virtual void ClearData();
 
-  private:
+private:
 
     // Vectors with length = # channels
     std::vector<UChar_t>                fChannelToPlaneMap;
@@ -291,9 +291,9 @@ namespace larutil {
     std::vector<Double_t> fOrthVectorsY;
     std::vector<Double_t> fOrthVectorsZ;
     std::vector<Double_t> fFirstWireProj;
-  };
+};
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

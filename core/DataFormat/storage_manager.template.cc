@@ -107,6 +107,12 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_simphotons> () const
   { return data::kSimPhotons; }
 
+  template<> data::DataType_t storage_manager::data_type<event_mucsdata> () const
+  { return data::kMuCSData; }
+
+  template<> data::DataType_t storage_manager::data_type<event_mucsreco> () const
+  { return data::kMuCSReco; }
+
   template <class T>
   data::DataType_t storage_manager::data_type() const
   { 

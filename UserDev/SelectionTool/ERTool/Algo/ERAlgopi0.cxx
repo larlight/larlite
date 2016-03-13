@@ -23,6 +23,8 @@ namespace ertool {
 
 	void ERAlgopi0::ProcessBegin()
 	{
+		_alg_emp.ProcessBegin();
+		_alg_emp.setPlot(false);
 
     // Initialize LL Tree
 		delete _ll_tree;
@@ -216,8 +218,9 @@ namespace ertool {
 	{
 		if(fout) {
 			fout->cd();
-			_ll_tree->Write();
-			_pi0_tree->Write();
+			//_ll_tree->Write();
+			//_pi0_tree->Write();
+			_alg_emp.ProcessEnd(fout);
 	}//
 }
 

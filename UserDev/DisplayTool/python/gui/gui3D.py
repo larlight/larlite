@@ -58,6 +58,8 @@ class view_manager3D(QtCore.QObject):
   def pan(self, dx, dy, dz, relative=False):
     pass
 
+  def update(self):
+    self._view.update()
 
   def restoreDefaults(self):
     print "restoreDefaults called but not implemented"
@@ -101,17 +103,22 @@ class gui3D(QtGui.QWidget):
     
     self.autoRangeWorker()
 
-  def updateCameraInfo(self):
+  def updateCameraInfo(self, cameraPos=None,worldPos=None):
+
+    # This function is not for changing the view when the text boxes are changed
+    # It is for keeping the text boxes in sync with the view as the user changes the view.
+
     # UPdate all of the camera text entries:
-    cameraPos = self._view_manager.getView().cameraPosition()
-    worldPos = self._view_manager.getView().worldCenter()
-    orbit = self._view_manager.getView().getElevation()
-    azimuth = self._view_manager.getView().getAzimuth()
-    # distance = 
+    if cameraPos is None:
+        cameraPos = self._view_manager.getView().cameraPosition()
+    if worldPos is None:
+        worldPos = self._view_manager.getView().worldCenter()
+
     # To actually update these things corrently, we have to unplug 
     # the signals from the slots, update the fields, and then plug everything back in
     
     # print self._cameraCenterX.valueChangedf[]
+
 
     try:
         self._cameraCenterX.valueChanged.disconnect()
@@ -137,14 +144,6 @@ class gui3D(QtGui.QWidget):
         self._worldCenterZ.valueChanged.disconnect()
     except:
         pass
-    try:
-        self._orbitControl.valueChanged.disconnect()
-    except:
-        pass
-    try:
-        self._azimuthControl.valueChanged.disconnect()
-    except:
-        pass
 
     self._cameraCenterX.setValue(cameraPos.x())
     self._cameraCenterY.setValue(cameraPos.y())
@@ -152,8 +151,6 @@ class gui3D(QtGui.QWidget):
     self._worldCenterX.setValue(worldPos.x())
     self._worldCenterY.setValue(worldPos.y())
     self._worldCenterZ.setValue(worldPos.z())
-    self._orbitControl.setValue(orbit)
-    self._azimuthControl.setValue(azimuth)
 
     self._cameraCenterX.valueChanged.connect(self.cameraCenterWorker)
     self._cameraCenterY.valueChanged.connect(self.cameraCenterWorker)
@@ -161,8 +158,6 @@ class gui3D(QtGui.QWidget):
     self._worldCenterX.valueChanged.connect(self.worldCenterWorker)
     self._worldCenterY.valueChanged.connect(self.worldCenterWorker)
     self._worldCenterZ.valueChanged.connect(self.worldCenterWorker)
-    self._orbitControl.valueChanged.connect(self.orbitWorker)
-    self._azimuthControl.valueChanged.connect(self.azimuthWorker)
 
 
   # This function prepares the buttons such as prev, next, etc and returns a layout
@@ -246,17 +241,6 @@ class gui3D(QtGui.QWidget):
 
     # Add some controls to manage the camera
     self._cameraControlLayout = QtGui.QHBoxLayout()
-    self._orbitControl = ConnectedSpinBox()
-    self._orbitControl.quitRequested.connect(self.quit)
-    self._orbitControl.setRange(-360,360)
-    self._orbitControl.setWrapping(True)
-    self._orbitControl.valueChanged.connect(self.orbitWorker)
-    self._azimuthControl = ConnectedSpinBox()
-    self._azimuthControl.quitRequested.connect(self.quit)
-    self._azimuthControl.setRange(-90,90)
-    self._azimuthControl.valueChanged.connect(self.azimuthWorker)
-    self._cameraControlLayout.addWidget(self._orbitControl)
-    self._cameraControlLayout.addWidget(self._azimuthControl)
 
     halfwidth = self._geometry.halfwidth()
     halfheight = self._geometry.halfheight()
@@ -351,27 +335,18 @@ class gui3D(QtGui.QWidget):
 
     return self._drawingControlBox
 
-  def orbitWorker(self):
-    value = self._orbitControl.value()
-    self._view_manager.setCameraPosition(elevation=value)
-
-  def azimuthWorker(self):
-    value = self._azimuthControl.value()
-    self._view_manager.setCameraPosition(azimuth=value)
-
-
   def worldCenterWorker(self):
     x = float(self._worldCenterX.text())
     y = float(self._worldCenterY.text())
     z = float(self._worldCenterZ.text())
     self._view_manager.setCenter((x,y,z))
-    pass
 
   def cameraCenterWorker(self):
     # assemble the camera position:
     x = float(self._cameraCenterX.text())
     y = float(self._cameraCenterY.text())
     z = float(self._cameraCenterZ.text())
+    # self.updateCameraInfo(cameraPos=QtGui.QVector3D(x,y,z))
     self._view_manager.setCameraPosition(pos = (x,y,z) )
 
   def autoRangeWorker(self):

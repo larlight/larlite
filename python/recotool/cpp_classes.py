@@ -21,6 +21,7 @@ libs = [ 'libRecoTool_ShowerRecoAlgo.so',
          
 
 for l in libs:
+    continue
     val = ROOT.gSystem.Load(l)
     if val < 0:
         warning('Skipping %s' % l)

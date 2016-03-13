@@ -63,6 +63,10 @@ namespace ertool {
     double FindClosestApproach(const geoalgo::HalfLine_t& shr,
                                const geoalgo::Trajectory_t& trk) const;
 
+    //Just Feed it a shower and track point, i.e. Track.front()
+    double FindClosestApproach(const ::ertool::Shower& shr,
+                               const geoalgo::Vector& trk_point) const;
+
     double FindClosestApproach(const geoalgo::Trajectory_t& trk,
                                const geoalgo::HalfLine_t& shr) const;
 

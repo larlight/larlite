@@ -38,6 +38,8 @@
 #include "fifo.h"
 #include "opdetwaveform.h"
 #include "simphotons.h"
+#include "mucsdata.h"
+#include "mucsreco.h"
 
 namespace larlite {
 
@@ -332,6 +334,7 @@ namespace larlite {
 	result_ptr->set_run(_run_id);
 	result_ptr->set_subrun(_subrun_id);
 	result_ptr->set_event_id(_event_id);
+	//std::cout<<"Setting "<<_run_id<<" "<<_subrun_id<<" "<<_event_id<<std::endl;
 
 	if(!_name_out_tdirectory.empty())
 	  _fout->cd(_name_out_tdirectory.c_str());
@@ -521,6 +524,7 @@ namespace larlite {
 	    TObject* obj = nullptr;
 	    std::set<std::string> name_candidates;
 	    if(_use_read_bool) {
+	      name_candidates.insert(data::kEVENT_ID_TREE);
 	      for(int i=0; i<data::kDATA_TYPE_MAX; ++i) {
 		
 		for(auto const& name_bool : _read_data_array[i]) {
@@ -715,6 +719,7 @@ namespace larlite {
 		"Failed to read larlite_id_tree ... removing read pointer...");
 	  delete _in_id_ch;
 	  _in_id_ch=nullptr;
+	  //std::cout<<"id tree does not exist... "<<std::endl;
 	}else{
 	  if( !_in_id_ch->GetBranch( "_run_id"    ) ||
 	      !_in_id_ch->GetBranch( "_subrun_id" ) ||
@@ -723,6 +728,7 @@ namespace larlite {
 	  _in_id_ch->SetBranchAddress("_run_id",    &_run_id    );
 	  _in_id_ch->SetBranchAddress("_subrun_id", &_subrun_id );
 	  _in_id_ch->SetBranchAddress("_event_id",  &_event_id  );
+	  //std::cout<<"Set id chain addresses..."<<std::endl;
 	}
       }
       // For event data tree
@@ -1161,6 +1167,12 @@ namespace larlite {
     case data::kSimPhotons:
       _ptr_data_array[type][name]=new event_simphotons(name);
       break;
+    case data::kMuCSData:
+      _ptr_data_array[type][name]=new event_mucsdata(name);
+      break;
+    case data::kMuCSReco:
+      _ptr_data_array[type][name]=new event_mucsreco(name);
+      break;
     default:
       print(msg::kERROR,__FUNCTION__,Form("Event-data identifier not supported: %d",(int)type));
       break;
@@ -1510,6 +1522,7 @@ namespace larlite {
     }
 
     if(_in_id_ch) _in_id_ch->GetEntry(_index);
+    //std::cout<<_index<<" ID chain raed-in: "<<_run_id<<" "<<_subrun_id<<" "<<_event_id<<std::endl;
 
     // If this is kBOTH mode, then read all relevant data products & check alignment here
     if( _mode == kBOTH ) {
@@ -1550,6 +1563,7 @@ namespace larlite {
 		return false;
 		
 	      }
+	      //std::cout<<_run_id<<" : "<<_subrun_id<<" : "<<_event_id<<" "<<name_ptr.first<<std::endl;
 	    } // end check event alignment
 	  } // ptr exists
 	} // loop over all trees of type i

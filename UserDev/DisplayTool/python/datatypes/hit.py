@@ -24,7 +24,8 @@ class hit(recoBase):
             # First get the hit information:
             hits = self._process.getDataByPlane(thisPlane)
 
-            for hit in hits:
+            for i in xrange(len(hits)):
+                hit = hits[i]
                 # Draws a rectangle at (x,y,xlength, ylength)
                 r = QtGui.QGraphicsRectItem(
                     hit.wire(), hit.time(), 1, hit.rms())
@@ -41,3 +42,7 @@ class hit(recoBase):
                 # r.setBrush((0,0,0,opacity))
                 self._drawnObjects[thisPlane].append(r)
                 view._view.addItem(r)
+
+    def getHitsOnWire(self, plane, wire):
+        return self._process.getHitsOnWirePlane(wire,plane)
+        

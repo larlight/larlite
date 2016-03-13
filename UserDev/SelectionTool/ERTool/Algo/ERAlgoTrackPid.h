@@ -16,7 +16,6 @@
 #define ERTOOL_ERALGOTRACKPID_H
 
 #include "ERTool/Base/AlgoBase.h"
-#include "ERTool/Algo/AlgoEMPart.h"
 #include "ERTool/Algo/AlgoFindRelationship.h"
 #include "GeoAlgo/GeoAlgo.h"
 #include "GeoAlgo/GeoAABox.h"
@@ -74,10 +73,7 @@ namespace ertool {
 
     
   protected:
-    
-    // Instance of EMPart Algorithm
-    // AlgoEMPart _alg_emp;
-    
+
     // histograms to be filled in Algo
 
     /*

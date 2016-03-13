@@ -16,9 +16,18 @@
 #define RECOTOOL_SHOWERRECO3D_H
 
 #include "Analysis/ana_base.h"
-#include "ClusterRecoUtil/Base/CRUHelper.h"
-#include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
+#include "DataFormat/pfpart.h"
+#include "DataFormat/shower.h"
+#include "DataFormat/vertex.h"
+#include "DataFormat/spacepoint.h"
+#include "DataFormat/cluster.h"
+
+ 
+#include "ShowerReco3D/Base/ShowerRecoTypes.h"
+#include "ShowerReco3D/Base/ProtoShowerHelper.h"
+
 #include "ShowerReco3D/Base/ShowerRecoManager.h"
+#include "ShowerReco3D/Base/ProtoShowerHelper.h"
 
 namespace larlite {
   /**
@@ -54,14 +63,14 @@ namespace larlite {
     void AddShowerAlgo(::showerreco::ShowerRecoAlgBase *alg) { fManager.AddAlgo(alg); }
 
     /// Function to set an input cluster/pfparticle producer name to work with
-    void SetInputProducer(std::string name, bool use_pfpart=false) 
-    { fInputProducer = name; fUsePFParticle = use_pfpart; }
+    void SetInputProducer(std::string name) 
+    { fInputProducer = name; }
 
     /// Function to set an output shower producer label
     void SetOutputProducer(std::string name) { fOutputProducer = name; }
 
-    /// Getter for MatchManager instance, to attach algorithms
-    ::cmtool::CMatchManager& GetManager() { return fManager.MatchManager(); }
+    ::showerreco::ProtoShowerHelper & GetProtoShowerHelper(){return _ps_helper;}
+
 
   protected:
 
@@ -71,17 +80,11 @@ namespace larlite {
     /// Output producer name
     std::string fOutputProducer;
 
-    /// Boolean flag to use PFParticle as an input or not
-    bool fUsePFParticle;
-
     /// Shower reco core class instance
     ::showerreco::ShowerRecoManager fManager;
 
-    /// CRUHelper converts framework dependent data product to PxUtil
-    ::cluster::CRUHelper fCRUHelper;
-
-    ::cluster::DefaultParamsAlg _params_alg;
-
+    // ProtoShowerHelper converts data products into protoshowers
+    ::showerreco::ProtoShowerHelper _ps_helper;
   };
 }
 #endif

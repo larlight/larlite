@@ -121,7 +121,11 @@ class larlitegui3D(gui3D):
         self._eastLayout.addWidget(label1)
         self._eastLayout.addWidget(label2)
         self._eastLayout.addStretch(1)
-
+        
+        self._paramsDrawBox = QtGui.QCheckBox("Draw Params.")
+        self._paramsDrawBox.stateChanged.connect(self.paramsDrawBoxWorker)
+        self._eastLayout.addWidget(self._paramsDrawBox)
+        self._eastLayout.addStretch(1)
 
         # Now we get the list of items that are drawable:
         drawableProducts = self._event_manager.getDrawableProducts()
@@ -151,6 +155,14 @@ class larlitegui3D(gui3D):
 
         # self._eastLayout.setVisible(False)
         # self._eastLayout.setVisible(True)
+    
+    def paramsDrawBoxWorker(self):
+        if self._paramsDrawBox.isChecked():
+            self._event_manager.toggleParams(True)
+        else:
+            self._event_manager.toggleParams(False)
+
+        # self._view_manager.drawFresh(self._event_manager)
 
 
     def recoBoxHandler(self, text):

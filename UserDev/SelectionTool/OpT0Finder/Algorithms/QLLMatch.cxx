@@ -10,46 +10,53 @@
 
 namespace flashana {
 
-    QLLMatch *QLLMatch::_me = nullptr;
+  QLLMatch *QLLMatch::_me = nullptr;
+  
+  void MIN_vtx_qll(Int_t &, Double_t *, Double_t &, Double_t *, Int_t);
+  
+  QLLMatch::QLLMatch(const std::string name)
+    : BaseFlashMatch(name), _record(false), _normalize(false), _minuit_ptr(nullptr)
+  {}
 
-    void MIN_vtx_qll(Int_t &, Double_t *, Double_t &, Double_t *, Int_t);
+  QLLMatch::QLLMatch()
+  { throw OpT0FinderException("Use QLLMatch::GetME() to obtain singleton pointer!"); }
+  
+  void QLLMatch::Configure(const ::fcllite::PSet &pset) {
+    _record = pset.get<bool>("RecordHistory");
+    _normalize = pset.get<bool>("NormalizeHypothesis");
+  }
+  
+  FlashMatch_t QLLMatch::Match(const QCluster_t &pt_v, const Flash_t &flash) {
+    
+    this->CallMinuit(pt_v, flash);
+    // Shit happens line above in CallMinuit
+    
+    // Estimate position
+    FlashMatch_t res;
+    if (isnan(_qll)) return res;
+    
+    res.tpc_point.x = res.tpc_point.y = res.tpc_point.z = 0;
+    res.score = 1. / _qll;
+    
+    double weight = 0;
+    
+    for (size_t pmt_index = 0; pmt_index < NOpDets(); ++pmt_index) {
 
-    QLLMatch::QLLMatch(const std::string name)
-            : BaseFlashMatch(name), _record(false), _normalize(false), _minuit_ptr(nullptr) { }
-
-    void QLLMatch::Configure(const ::fcllite::PSet &pset) {
-        _record = pset.get<bool>("RecordHistory");
-        _normalize = pset.get<bool>("NormalizeHypothesis");
+      res.tpc_point.x += OpDetX(pmt_index) * _hypothesis.pe_v[pmt_index];
+      res.tpc_point.y += OpDetY(pmt_index) * _hypothesis.pe_v[pmt_index];
+      res.tpc_point.z += OpDetZ(pmt_index) * _hypothesis.pe_v[pmt_index];
+      
+      weight += _hypothesis.pe_v[pmt_index];
     }
+    
+    res.tpc_point.x /= weight;
+    res.tpc_point.y /= weight;
+    res.tpc_point.z /= weight;
+    res.tpc_point.q = weight;
 
-    FlashMatch_t QLLMatch::Match(const QCluster_t &pt_v, const Flash_t &flash) {
-
-        this->CallMinuit(pt_v, flash);
-
-        // Estimate position
-        FlashMatch_t res;
-        if (isnan(_qll)) return res;
-        res.tpc_point.x = res.tpc_point.y = res.tpc_point.z = 0;
-        res.score = 1. / _qll;
-
-        double weight = 0;
-        for (size_t pmt_index = 0; pmt_index < NOpDets(); ++pmt_index) {
-
-            res.tpc_point.x += OpDetX(pmt_index) * _hypothesis.pe_v[pmt_index];
-            res.tpc_point.y += OpDetY(pmt_index) * _hypothesis.pe_v[pmt_index];
-            res.tpc_point.z += OpDetZ(pmt_index) * _hypothesis.pe_v[pmt_index];
-
-            weight += _hypothesis.pe_v[pmt_index];
-        }
-
-        res.tpc_point.x /= weight;
-        res.tpc_point.y /= weight;
-        res.tpc_point.z /= weight;
-        res.tpc_point.q = weight;
-
-        return res;
-    }
-
+    return res;
+  }
+  
     const Flash_t &QLLMatch::ChargeHypothesis(const double xoffset) {
         if (_hypothesis.pe_v.empty()) _hypothesis.pe_v.resize(NOpDets(), 0.);
         if (_hypothesis.pe_v.size() != NOpDets())
@@ -141,12 +148,12 @@ namespace flashana {
         }
         if (_measurement.pe_v.size() != pmt.pe_v.size())
             throw OpT0FinderException("PMT dimension has changed!");
-
+	
         //
         // Prepare TPC
         //
         _raw_trk.resize(tpc.size());
-
+	
         double min_x = 1e9;
         for (size_t i = 0; i < tpc.size(); ++i) {
             auto const &pt = tpc[i];
@@ -155,7 +162,7 @@ namespace flashana {
         }
 
         for (auto &pt : _raw_trk) pt.x -= min_x;
-
+	
         //
         // Prepare PMT
         //
@@ -170,16 +177,14 @@ namespace flashana {
             max_pe = 0;
             for (auto const &v : pmt.pe_v) if (v > max_pe) max_pe = v;
         }
-
-        for (size_t i = 0; i < pmt.pe_v.size(); ++i)
-
-            _measurement.pe_v[i] = pmt.pe_v[i] / max_pe;
-
+	
+        for (size_t i = 0; i < pmt.pe_v.size(); ++i)  _measurement.pe_v[i] = pmt.pe_v[i] / max_pe;
+		
         _minimizer_record_fval_v.clear();
         _minimizer_record_x_v.clear();
-
+	
         if (!_minuit_ptr) _minuit_ptr = new TMinuit(4);
-
+	
         double reco_x = 128.;
         double reco_x_err = 0;
         double MinFval;
@@ -197,8 +202,8 @@ namespace flashana {
 
         _minuit_ptr->Command("SET NOW");
 
-
         // use Migrad minimizer
+
         arglist[0] = 500;
         _minuit_ptr->mnexcm("MIGRAD", arglist, 1, ierrflag);
 
@@ -209,7 +214,6 @@ namespace flashana {
         _minuit_ptr->GetParameter(0, reco_x, reco_x_err);
 
         _minuit_ptr->mnstat(Fmin, Fedm, Errdef, npari, nparx, istat);
-
 
         // use this for debugging, maybe uncomment the actual minimzing function (MIGRAD / simplex calls)
         // scanning the parameter set

@@ -38,6 +38,7 @@ namespace ertool {
   }
 
   const ProcessType_t& Particle::ProcessType() const { return _process;   }
+  const Origin_t& Particle::Origin()           const { return _origin;    }
   const RecoType_t& Particle::RecoType()       const { return _reco_type; }
   const RecoID_t&  Particle:: RecoID()         const { return _reco_id;   }
   const FlashID_t&  Particle::FlashID()        const { return _flash_id;  }
@@ -106,6 +107,11 @@ namespace ertool {
     _flash_id = id;
   }
 
+  void Particle::SetParticlePdgCode( const int pdg_code)
+  {
+    _pdg_code  = pdg_code;
+  }
+  
   void Particle::SetParticleInfo( const int pdg_code,
 				  const double mass,
 				  const ::geoalgo::Vector& vtx,

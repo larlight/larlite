@@ -48,7 +48,7 @@ namespace ertool {
     //_g_dEdxPdf   = _factory.LandauPlusLandau(part_name,*_dEdxVar);
     _g_radLenPdf = _factory.RadiationLength(part_name, *_radLenVar);
 
-    SetDefaultParams();
+    // SetDefaultParams();
   }
 
   void AlgoEMPart::SetFitRange_dEdx(double min, double max, bool gamma)
@@ -175,6 +175,9 @@ namespace ertool {
 
       meanG  = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_Gaus_mean"));
       meanG->setVal  ( darray[5] );
+      /// Kaleko adding this cout commented because sometimes it is self-inconsistent
+      /// unless SetDefaultParams() is commented out.
+      // std::cout<<"set meanG to "<<darray[5]<<", get val is "<<gmeanG->getVal()<<std::endl;
       sigmaG = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_Gaus_sigma"));
       sigmaG->setVal ( darray[6] );
 
@@ -187,6 +190,7 @@ namespace ertool {
          << "dEdx Landau mean : " << meanL->getVal() << " sigma : " << sigmaL->getVal() << std::endl
          << "dEdx Gaus mean   : " << meanG->getVal() << " sigma : " << sigmaG->getVal() << std::endl
          << "Frac: " << frac->getVal() << std::endl;
+      Info(__FUNCTION__, ss.str());
     }
 
     if (p.contains_value("e_params")) {

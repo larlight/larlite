@@ -50,6 +50,9 @@ namespace ertool {
     const std::vector<NodeID_t> GetPrimaryNodes ( const RecoType_t type = kINVALID_RECO_TYPE,
 						  const bool unassessed_only = false,
 						  const int pdg_code = 0) const;
+    const std::vector<NodeID_t> GetBaseNodes ( const RecoType_t type = kINVALID_RECO_TYPE,
+					       const bool unassessed_only = false,
+					       const int pdg_code = 0) const;
     const CombinationSet_t GetNodeCombinations( const size_t combination_size,
 						const RecoType_t type = kINVALID_RECO_TYPE,
 						const bool unassessed_only = false,
@@ -64,8 +67,7 @@ namespace ertool {
 			   const float score = kDEFAULT_SCORE);
     void SetPrimary      ( const NodeID_t node );
     void SameParticle    ( const NodeID_t a,      const NodeID_t b      );
-
-
+    NodeID_t NodeID(const RecoObjBase& p) const;
     std::string Diagram() const;
     std::string Diagram(const NodeID_t id) const;
 
@@ -73,7 +75,7 @@ namespace ertool {
     Particle& CreateParticle (const RecoObjBase& reco_obj);
     void ValidNode           (const NodeID_t& id         ) const;
     void UpdateGeneration    (const NodeID_t target, const Generation_t gen );
-    void UpdateFlashID       (const NodeID_t target, const FlashID_t flash  );
+    // void UpdateFlashID       (const NodeID_t target, const FlashID_t flash  );
     void UpdateParentID      (const NodeID_t target, const NodeID_t parent  );
     void UpdateAncestorID    (const NodeID_t target, const NodeID_t ancestor);
     void UpdateRecoInfo      (const NodeID_t target, const RecoType_t reco_type, const RecoID_t reco_id );    

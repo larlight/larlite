@@ -1,8 +1,10 @@
-from data import recoBase
+from database import recoBase
 from pyqtgraph.Qt import QtGui, QtCore
 from connectedObjects import connectedBox, connectedCircle, boxCollection
-from ROOT import evd
+from ROOT import evd, vector
 import pyqtgraph as pg
+import larlite as larlite
+from larlite import larutil
 
 
 class clusterParams(QtCore.QObject):  # recoBase):
@@ -59,27 +61,34 @@ class clusterParams(QtCore.QObject):  # recoBase):
         return self.toolTip()
 
     def toolTip(self):
-        tip = "Hits: " + str(self._params.N_Hits) + "\n"
-        tip += "Start: (" + "{:.2f}".format(self._params.start_point.w) + ", "
+        tip =  "Hits: \t\t " + str(self._params.N_Hits) + "\n"
+        tip += "Start: \t\t (" + "{:.2f}".format(self._params.start_point.w) + ", "
         tip += "{:.2f}".format(self._params.start_point.t) + ")\n"
-        tip += ("Shower Start (" +
+        tip += ("Shower Start \t (" +
                 "{:.2f}".format(self._params.showering_point.w) + ", ")
         tip += "{:.2f}".format(self._params.showering_point.t) + ")\n"
-        tip += "End: (" + "{:.2f}".format(self._params.end_point.w) + ", "
+        tip += "End: \t\t (" + "{:.2f}".format(self._params.end_point.w) + ", "
         tip += "{:.2f}".format(self._params.end_point.t) + ")\n"
         if self._params.principal_dir[0] != 0:
             slope = self._params.principal_dir[1]/self._params.principal_dir[0]
-            tip += ("Slope: " + "{:.2f}".format(slope) + "\n")
+            tip += ("Slope: \t\t " + "{:.2f}".format(slope) + "\n")
         else:
-            tip += "Slope: inf\n"
+            tip += "Slope: \t\t inf\n"
         if self._params.start_dir[0] != 0:
-            tip += "Start Slope: " + \
+            tip += "Start Slope: \t " + \
                 "{:.2f}".format(
                     self._params.start_dir[1]/self._params.start_dir[0]) + "\n"
         else:
-            tip += "Start Slope: inf\n"
-        tip += "Angle: " + "{:.2f}".format(self._params.angle_2d) + "\n"
-        tip += "Add more in data.py:clusterParams:toolTip!"
+            tip += "Start Slope: \t inf\n"
+        tip += "Angle:  \t\t " + "{:.2f}".format(self._params.angle_2d) + "\n"
+        tip += "\n"
+        fannVec = vector(float)()
+        self._params.GetFANNVector(fannVec)
+        fannTitle = self._params.GetFANNVectorTitle()
+        for title, value in zip(fannTitle,fannVec):
+            tip += "{:.2f}: ".format(value) + "{title}\n".format(title=title)
+
+        tip += "\nAdd more in python/datatypes/cluster.py:clusterParams:toolTip!"
         return tip
 
     def draw(self, view):
@@ -89,17 +98,20 @@ class clusterParams(QtCore.QObject):  # recoBase):
         black = (0, 0, 0)
         blue = (0, 0, 255)
 
-        offset = self._geom.offset(
-            self._params.plane_id.Plane) / self._geom.time2cm()
+        planeOffset = larutil.Geometry.GetME().PlaneOriginVtx(self._params.plane_id.Plane)[0]
+        trigOffset  = larutil.DetectorProperties.GetME().TriggerOffset()
+        t2cm = larutil.GeometryHelper.GetME().TimeToCm();
+        w2cm = larutil.GeometryHelper.GetME().WireToCm();
+        #t2cm = self._geom.time2cm()
+        #w2cm = self._geom.wire2cm()
 
         # Draw the start and end points:
-        sW = self._params.start_point.w / self._geom.wire2cm()
-        sT = (self._params.start_point.t) / self._geom.time2cm() + offset
-        eW = self._params.end_point.w / self._geom.wire2cm()
-        eT = (self._params.end_point.t) / self._geom.time2cm() + offset
-        showeringW = self._params.showering_point.w / self._geom.wire2cm()
-        showeringT = (self._params.showering_point.t) / \
-            self._geom.time2cm() + offset
+        sW = self._params.start_point.w / w2cm
+        sT = (self._params.start_point.t - planeOffset) / t2cm + trigOffset
+        eW = self._params.end_point.w / w2cm
+        eT = (self._params.end_point.t - planeOffset) / t2cm + trigOffset
+        showeringW = self._params.showering_point.w / w2cm
+        showeringT = (self._params.showering_point.t - planeOffset) / t2cm + trigOffset
 
         radBigW = 0.5 / self._geom.wire2cm()
         radBigT = (0.5) / self._geom.time2cm()
@@ -170,9 +182,8 @@ class clusterParams(QtCore.QObject):  # recoBase):
         self._thisPolyF = QtGui.QPolygonF()
         for p in xrange(self._params.PolyObject.Size()):
             point = self._params.PolyObject.Point(p)
-            qpoint = QtCore.QPointF(
-                point.first/self._geom.wire2cm(),
-                point.second/self._geom.time2cm() + offset)
+            qpoint = QtCore.QPointF( point.first / w2cm,
+                                     (point.second - planeOffset) / t2cm + trigOffset)
             self._thisPolyF.append(qpoint)
 
         self._thisPoly = QtGui.QGraphicsPolygonItem(self._thisPolyF)
@@ -304,8 +315,8 @@ class cluster(recoBase):
 
             clusters = self._process.getDataByPlane(thisPlane)
 
-            for cluster in clusters:
-
+            for i in xrange(len(clusters)):
+                cluster = clusters[i]
                 # Now make the cluster
                 cluster_box_coll = boxCollection()
                 cluster_box_coll.setColor(self._clusterColors[colorIndex])

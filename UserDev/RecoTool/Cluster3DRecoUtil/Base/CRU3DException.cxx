@@ -1,0 +1,6 @@
+#ifndef RECOTOOL_CRU3DEXCEPTION_CXX
+#define RECOTOOL_CRU3DEXCEPTION_CXX
+
+#include "CRU3DException.h"
+
+#endif
