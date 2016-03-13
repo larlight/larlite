@@ -39,7 +39,7 @@ namespace ertool {
     Double_t const tshower_prox;
     Double_t const tcpoa_vert_prox;
     Double_t const tcpoa_trackend_prox;
-    Bool_t const tverbose;
+    Bool_t tverbose;
 
     TTree * tree;
 
@@ -71,8 +71,8 @@ namespace ertool {
        Double_t const max_rad,
        Double_t const lone_track_length,
        Bool_t const withTrackDir,
-       std::string const primary_vertex_selection,
-       Bool_t const showerproj,
+       std::string const primary_vertex_selection = "mostupstream",
+       Bool_t const showerproj = false,
        Double_t const shower_prox = 0,
        Double_t const cpoa_vert_prox = 0,
        Double_t const cpoa_trackend_prox = 0,
@@ -159,6 +159,11 @@ namespace ertool {
        ParticleAssociations const & pas); 
 
     void ShowerProjection
+      (const EventData &data,
+       ParticleGraph & graph,
+       ParticleAssociations & pas);
+
+    void ShowerProjectionPrioritiseAssociations
       (const EventData &data,
        ParticleGraph & graph,
        ParticleAssociations & pas);
