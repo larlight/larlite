@@ -75,11 +75,17 @@ namespace flashana {
     */
     // if the cluster comes before the flash entirely ->
     // impossible match
+        std::cout<<" TimeCompatMatch::MatchCompatible(): clus_t_min and flash_time are "<<clus_t_min+20.<<", "<<flash_time<<", "<<std::endl; 
     if ( (clus_t_min+20.) < flash_time) {
   //    std::cout<<"min failur! "<<clus_t_min+20.<<", "<<flash_time<<", "<<std::endl; 
       return false;
       }
-    
+    else if (std::abs(flash_time) > larlite::data::kINVALID_DOUBLE/1.E6)
+      {
+	std::cout<<"TimeCompatMatch::MatchCompatible(): This flash is f'd. flash.time is in the ballpark of default value of k_INVALID_DOUBLE!" << std::endl; 
+	return false;
+
+      }    
     return true;
   }
 

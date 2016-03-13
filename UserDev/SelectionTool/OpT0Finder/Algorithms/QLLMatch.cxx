@@ -80,6 +80,8 @@ namespace flashana {
         }
 
         FillEstimate(_var_trk, _hypothesis);
+	// zeroes the hypothesis if qcluster is too late wrt flash, or if this xoffset steps the qcluster out of the TPC in x.
+	OOBCheck(_var_trk, _hypothesis, _measurement); 
 
         if (_normalize) {
             double qsum = std::accumulate(std::begin(_hypothesis.pe_v),

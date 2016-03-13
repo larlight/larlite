@@ -13,6 +13,10 @@ OBJECTS = $(SOURCES:.cxx=.o)
 # include options for this package
 INCFLAGS  = -I.                       #Include itself
 INCFLAGS += $(shell basictool-config --includes)
+INCFLAGS += $(shell larlite-config --includes)
+
+
+LDFLAGS += $(shell larlite-config --libs)
 
 # platform-specific options
 OSNAME          = $(shell uname -s)

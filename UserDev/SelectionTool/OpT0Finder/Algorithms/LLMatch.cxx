@@ -61,7 +61,7 @@ namespace flashana {
 	 */
 
 
-	//  This is the TPC x, een if the y,z are for a Flash location
+	//  This is the TPC x, even if the y,z are for a Flash location
 	res.tpc_point.x = _reco_x_offset;
 	res.tpc_point_err[0] = _reco_x_offset_err;
 
@@ -75,7 +75,7 @@ namespace flashana {
         if (_hypothesis.pe_v.size() != NOpDets())
             Print(msg::kEXCEPTION, __FUNCTION__, "Hypothesis vector length != PMT count");
 
-	//	std::cout << "ChargeHypothesis: xoffset: " << xoffset << std::endl;
+	std::cout << "ChargeHypothesis: xoffset: " << xoffset << std::endl;
 
         for (auto &v : _hypothesis.pe_v) v = 0;
 
@@ -93,6 +93,7 @@ namespace flashana {
         }
 
         FillEstimate(_var_trk, _hypothesis);
+	OOBCheck(_var_trk, _hypothesis, _measurement);
 
         if (_normalize) {
             double qsum = std::accumulate(std::begin(_hypothesis.pe_v),
@@ -136,10 +137,10 @@ namespace flashana {
 	    result.at(1) +=  -std::log10(TMath::Poisson(O,H))  ; // will maximize 1/this
 	    if (isnan(result.at(1)) || isinf(result.at(1))) result.at(1) = 1.E6;
 	    // could instead use discrete std::poisson_distribution
-	    //	    std::cout << "LL(): ii chi2, llhd, O, H:" << pmt_index << ", " << std::pow((O - H), 2)/(O + H)  << ", " << -std::log10(TMath::Poisson(O,H)) << ", " << O << ", " << H << std::endl;
+	    std::cout << "LL(): ii chi2, llhd, O, H:" << pmt_index << ", " << std::pow((O - H), 2)/(O + H)  << ", " << -std::log10(TMath::Poisson(O,H)) << ", " << O << ", " << H << std::endl;
         }
 
-	//std::cout << "PE hyp : " << PEtot_Hyp << "\tPE Obs : " << PEtot_Obs << "\t Chi^2, LLHD : " << result.at(0) << ", " << result.at(1) << std::endl;
+	std::cout << "PE hyp : " << PEtot_Hyp << "\tPE Obs : " << PEtot_Obs << "\t Chi^2, LLHD : " << result.at(0) << ", " << result.at(1) << std::endl;
 
         result.at(0) /= nvalid_pmt;
         result.at(1) /= nvalid_pmt;

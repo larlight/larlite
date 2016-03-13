@@ -8,6 +8,14 @@ FlashMatchManager:{
 }
 
 #
+# Apps
+#
+
+UBT0Finder:{
+    PhotonLibTTree: true
+}
+
+#
 # Algorithms
 #
 

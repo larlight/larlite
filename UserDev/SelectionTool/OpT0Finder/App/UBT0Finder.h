@@ -16,10 +16,13 @@
 #define LARLITE_UBT0FINDER_H
 
 #include "Analysis/ana_base.h"
+#include "LArUtil/Geometry.h"
 #include "MCQCluster.h"
 #include "OpT0Finder/Base/FlashMatchManager.h"
+#include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
 #include <TTree.h>
 #include <TH2D.h>
+
 
 namespace larlite {
   /**
@@ -40,7 +43,7 @@ namespace larlite {
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
-
+    void Configure(const ::fcllite::PSet &pset);
     /** IMPLEMENT in UBT0Finder.cc! 
         Analyze a data event-by-event  
     */
@@ -132,6 +135,18 @@ namespace larlite {
     std::vector<double> _mc_trajy;
     std::vector<double> _mc_trajz;
 
+
+    bool _photlib_tree_config;
+    TTree* _photlib_tree;
+    double _pvl_x;
+    double _pvl_y;
+    double _pvl_z;
+    int    _pvl_pmt;
+    double _pvl_vis;
+
+  private:
+
+    void Fill_PVL_Tree();
     // tree to measure efficiency of matching for MCTracks
     TTree *_eff_tree;
     TTree *_flash_tree;

@@ -23,6 +23,8 @@ namespace flashana {
      User defined class FlashHypothesis ... these comments are used to generate
      doxygen documentation!
   */
+
+
   class BaseFlashHypothesis : public flashana::BaseAlgorithm {
     
   public:
@@ -39,6 +41,7 @@ namespace flashana {
     Flash_t GetEstimate(const QCluster_t&) const;
 
     /// Method to simply fill provided reference of flashana::Flash_t
+
     virtual void FillEstimate(const QCluster_t&, Flash_t&) const = 0;
 
   };

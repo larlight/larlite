@@ -60,6 +60,8 @@ namespace flashana {
     /// Method to simply fill provided reference of flashana::Flash_t
     void FillEstimate(const QCluster_t&, Flash_t&) const;
 
+    virtual void OOBCheck(const QCluster_t&, Flash_t&, const Flash_t&) const;
+
   private:
 
     void SetFlashHypothesis(flashana::BaseFlashHypothesis*);

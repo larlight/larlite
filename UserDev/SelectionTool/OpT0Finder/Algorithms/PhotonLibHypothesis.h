@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include "OpT0Finder/Base/BaseFlashHypothesis.h"
+#include <TTree.h>
 
 namespace flashana {
   /**
