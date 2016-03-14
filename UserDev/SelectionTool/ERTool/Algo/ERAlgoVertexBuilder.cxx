@@ -30,7 +30,8 @@ namespace ertool {
     tshower_prox(shower_prox),
     tcpoa_vert_prox(cpoa_vert_prox),
     tcpoa_trackend_prox(cpoa_trackend_prox),
-    tverbose(false) {
+    tverbose(false),
+    tevent(-1) {
 
     if(tprimary_vertex_selection != mostupstream &&
        tprimary_vertex_selection != mostchildren &&
@@ -617,7 +618,9 @@ namespace ertool {
 	NodeID_t const n = c.at(j);
 
 	if(n == parent) continue;
+
 	auto it = std::find(tnodelist.begin(), tnodelist.end(), n);
+
 	if(it != tnodelist.end()) {
 	  ++tloopcounter;
 	  bad_nodes.push_back(*it);
@@ -625,7 +628,16 @@ namespace ertool {
 
 	else {
 	  Particle & p = tgraph->GetParticle(n);
-	  p.SetParticleInfo(p.PdgCode(), p.Mass(), v.at(j), p.Momentum());
+	  //ugly way of setting energy
+	  Double_t energy = 0;
+	  if(p.RecoType() == kTrack)
+	    energy = tdata->Track(p.RecoID())._energy; 
+	  if(p.RecoType() == kShower)
+	    energy = tdata->Shower(p.RecoID())._energy;
+	  p.SetParticleInfo(p.PdgCode(),
+			    p.Mass(),
+			    v.at(j),
+			    geoalgo::Point_t(energy, 0, 0));
 	  tgraph->SetParentage(parent, n);
 	}	  
 
@@ -1131,7 +1143,7 @@ namespace ertool {
     if(tverbose) std::cout << "Shower Projection\n";
 
     std::map<NodeID_t, Shower const *> shower_map;
-
+  
     for(NodeID_t const n : graph.GetParticleNodes(kShower))
       shower_map.emplace(n, &data.Shower(graph.GetParticle(n).RecoID()));
   
@@ -1442,8 +1454,20 @@ namespace ertool {
 	    
 	  }
 	
-	  else
+	  else {
+	    Particle & p = graph.GetParticle(best_shower_id);
+	    //Ugly way of setting the energy
+	    Double_t energy = 0;
+	    if(p.RecoType() == kTrack)
+	      energy = data.Track(p.RecoID())._energy; 
+	    if(p.RecoType() == kShower)
+	      energy = data.Shower(p.RecoID())._energy;
+	    p.SetParticleInfo(p.PdgCode(),
+			      p.Mass(),
+			      best_vert,
+			      geoalgo::Point_t(energy, 0, 0));
 	    graph.SetParentage(best_other_id, best_shower_id);
+	  }
 	
 	}
 
@@ -1455,6 +1479,8 @@ namespace ertool {
       shower_map.erase(best_shower_id);
 
     }
+
+    tverbose = false;
 
   }
 
@@ -1816,7 +1842,7 @@ namespace ertool {
   void ERAlgoVertexBuilder::WithoutTrackDir(const EventData &data,
 					    ParticleGraph& graph) {
 
-    if(data.Event_ID() != 69114) return;
+    if(data.Event_ID() != tevent && tevent != -1) return;
 
     Reset();
 
