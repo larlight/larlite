@@ -113,7 +113,7 @@ namespace larlite{
 
   //----------------------------------------------------------------------------
   std::pair<int,int> auxsimch::MergeAuxDetSimChannel(const auxsimch& chan, 
-							     int offset)
+						     int offset)
   {
     if(this->fAuxDetID != chan.AuxDetID() && this->fAuxDetSensitiveID != chan.AuxDetSensitiveID())
       throw std::runtime_error("ERROR AuxDetSimChannel Merge: Trying to merge different channels!");
@@ -121,7 +121,7 @@ namespace larlite{
     std::pair<int,int> range_trackID(std::numeric_limits<int>::max(),
 				     std::numeric_limits<int>::min());
 
-    for(auto const& ide : fAuxDetIDEs){
+    for(auto const& ide : auxides()) {
       this->fAuxDetIDEs.emplace_back(ide,offset);
 
       if( ide.trackID+offset < range_trackID.first  )
