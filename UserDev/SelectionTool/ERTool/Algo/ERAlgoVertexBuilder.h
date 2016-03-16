@@ -41,6 +41,8 @@ namespace ertool {
     Double_t const tcpoa_trackend_prox;
     Bool_t tverbose;
 
+    Int_t tevent;
+
     TTree * tree;
 
     Int_t event_id;
@@ -80,6 +82,10 @@ namespace ertool {
        
     /// Default destructor
     virtual ~ERAlgoVertexBuilder(){};
+
+    void SpecifyEvent(Int_t const event) {
+      tevent = event;
+    }
 
     /// Reset function
     void Reset();
