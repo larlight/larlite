@@ -217,7 +217,7 @@ namespace ertool {
       ss << "Loaded electron parameters..." << std::endl
          << "Rad Length       : " << -1. / tau->getVal() << " [" << -1. / tau->getMax() << " => " << -1. / tau->getMin() << "]" << std:: endl
          << "dEdx Landau mean : " << meanL->getVal() << " sigma : " << sigmaL->getVal() << std::endl
-         << "dEdx Gaus mean   : " << meanG->getVal() << " sigma : " << sigmaG->getVal() << std::endl;
+         << "dEdx Gaus mean   : " << meanG->getVal() << " sigma : " << sigmaG->getVal() << std::endl
          << "Frac: " << frac->getVal() << std::endl;
       Info(__FUNCTION__, ss.str());
 
