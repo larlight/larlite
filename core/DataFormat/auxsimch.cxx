@@ -75,15 +75,15 @@ namespace larlite{
   //----------------------------------------------------------------------------
   auxsimch::auxsimch()
     : data_base(data::kAuxDetSimChannel)
-    , fAuxDetID(std::numeric_limits<uint32_t>::max())
-    , fAuxDetSensitiveID(std::numeric_limits<uint32_t>::max())
+    , fAuxDetID(std::numeric_limits<unsigned int>::max())
+    , fAuxDetSensitiveID(std::numeric_limits<unsigned int>::max())
   {
     clear_data();
   }
 
   //----------------------------------------------------------------------------
-  auxsimch::auxsimch(uint32_t inputAuxDetID,
-		     uint32_t inputAuxDetSensitiveID)
+  auxsimch::auxsimch(unsigned int inputAuxDetID,
+		     unsigned int inputAuxDetSensitiveID)
     : data_base(data::kAuxDetSimChannel) 
     , fAuxDetID(inputAuxDetID)
     , fAuxDetSensitiveID(inputAuxDetSensitiveID)
@@ -92,9 +92,9 @@ namespace larlite{
   }
   
   //----------------------------------------------------------------------------
-  auxsimch::auxsimch(uint32_t inputAuxDetID, 
+  auxsimch::auxsimch(unsigned int inputAuxDetID, 
 		     const std::vector<larlite::auxide>& inputAuxDetIDEs,
-		     uint32_t inputAuxDetSensitiveID)
+		     unsigned int inputAuxDetSensitiveID)
     : data_base(data::kAuxDetSimChannel)
     , fAuxDetID(inputAuxDetID)
     , fAuxDetSensitiveID(inputAuxDetSensitiveID)
@@ -102,9 +102,9 @@ namespace larlite{
   {}
 
   //----------------------------------------------------------------------------
-  auxsimch::auxsimch(uint32_t inputAuxDetID, 
+  auxsimch::auxsimch(unsigned int inputAuxDetID, 
 		     std::vector<larlite::auxide>&& inputAuxDetIDEs,
-		     uint32_t inputAuxDetSensitiveID)
+		     unsigned int inputAuxDetSensitiveID)
     : data_base(data::kAuxDetSimChannel)
     , fAuxDetID(inputAuxDetID)
     , fAuxDetSensitiveID(inputAuxDetSensitiveID)
