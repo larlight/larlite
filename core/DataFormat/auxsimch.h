@@ -7,8 +7,8 @@
 /// \author  miceli@fnal.gov
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef SIM_AUXDETSIMCHANNEL_H
-#define SIM_AUXDETSIMCHANNEL_H
+#ifndef LARLITE_SIM_AUXDETSIMCHANNEL_H
+#define LARLITE_SIM_AUXDETSIMCHANNEL_H
 
 // C/C++ standard libraries
 //#include <stdint.h> // C header (need to be compatible with Reflex)
