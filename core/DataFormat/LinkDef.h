@@ -171,6 +171,13 @@
 #pragma link C++ class std::vector<larlite::simch>+;
 #pragma link C++ class larlite::event_simch+;
 
+#pragma link C++ class larlite::auxide+;
+#pragma link C++ class larlite::auxsimch+;
+#pragma link C++ class std::vector<larlite::auxide>+;
+#pragma link C++ class std::map<UShort_t,larlite::auxsimch>+;
+#pragma link C++ class std::vector<larlite::auxsimch>+;
+#pragma link C++ class larlite::event_auxsimch+;
+
 #pragma link C++ class treenode+;
 
 #pragma link C++ class larlite::trigger+;
