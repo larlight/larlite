@@ -210,7 +210,7 @@ namespace ertool {
       sigmaG = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_Gaus_sigma"));
       sigmaG->setVal ( darray[6] );
 
-      frac = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("e_fraction"));
+      frac = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_fraction"));
       frac->setVal ( darray[7] );
 
       std::stringstream ss;
@@ -219,6 +219,7 @@ namespace ertool {
          << "dEdx Landau mean : " << meanL->getVal() << " sigma : " << sigmaL->getVal() << std::endl
          << "dEdx Gaus mean   : " << meanG->getVal() << " sigma : " << sigmaG->getVal() << std::endl
          << "Frac: " << frac->getVal() << std::endl;
+
       Info(__FUNCTION__, ss.str());
 
     }
