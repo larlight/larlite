@@ -23,6 +23,9 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_simch> () const
   { return data::kSimChannel; }
 
+  template<> data::DataType_t storage_manager::data_type<event_auxsimch> () const
+  { return data::kAuxDetSimChannel; }
+
   template<> data::DataType_t storage_manager::data_type<event_mcshower> () const
   { return data::kMCShower; }
 
