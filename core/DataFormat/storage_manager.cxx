@@ -40,7 +40,7 @@
 #include "simphotons.h"
 #include "mucsdata.h"
 #include "mucsreco.h"
-
+#include "auxsimch.h"
 namespace larlite {
 
   storage_manager* storage_manager::me=0;
@@ -1070,6 +1070,9 @@ namespace larlite {
       break;
     case data::kSimChannel:
       _ptr_data_array[type][name]=new event_simch(name);
+      break;
+    case data::kAuxDetSimChannel:
+      _ptr_data_array[type][name]=new event_auxsimch(name);
       break;
     case data::kMCShower:
       _ptr_data_array[type][name]=new event_mcshower(name);

@@ -210,15 +210,18 @@ namespace ertool {
       sigmaG = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_Gaus_sigma"));
       sigmaG->setVal ( darray[6] );
 
-      frac = (RooRealVar*)(_g_dEdxPdf->getVariables()->find("g_fraction"));
+      frac = (RooRealVar*)(_e_dEdxPdf->getVariables()->find("e_fraction"));
       frac->setVal ( darray[7] );
 
       std::stringstream ss;
       ss << "Loaded electron parameters..." << std::endl
          << "Rad Length       : " << -1. / tau->getVal() << " [" << -1. / tau->getMax() << " => " << -1. / tau->getMin() << "]" << std:: endl
          << "dEdx Landau mean : " << meanL->getVal() << " sigma : " << sigmaL->getVal() << std::endl
-         << "dEdx Gaus mean   : " << meanG->getVal() << " sigma : " << sigmaG->getVal() << std::endl;
+         << "dEdx Gaus mean   : " << meanG->getVal() << " sigma : " << sigmaG->getVal() << std::endl
+         << "Frac: " << frac->getVal() << std::endl;
+
       Info(__FUNCTION__, ss.str());
+
     }
 
   }
@@ -560,7 +563,8 @@ namespace ertool {
     if (_plot) {
 
       TCanvas *c = new TCanvas("c", "", 1000, 500);
-
+      c->SetLogx(1);
+      c->SetLogy(0);
       // Rad Length likelyhood
       TH1D *h11_radLen = new TH1D("h11_radLen", "Electron vs. Gamma Likelihood; Rad. Length [cm]; Likelihood", 100, 0, 20);
       TH1D *h22_radLen = new TH1D("h22_radLen", "Electron vs. Gamma Likelihood; Rad. Length [cm]; Likelihood", 100, 0, 20);
@@ -582,6 +586,8 @@ namespace ertool {
       h22_radLen->SetFillStyle(3003);
       h22_radLen->SetFillColor(kRed);
       h22_radLen->GetYaxis()->SetRangeUser(0., 1.);
+      h22_radLen->SetStats(0);
+      h11_radLen->SetStats(0);
 
       h11_radLen->Draw();
       h22_radLen->Draw("sames");
@@ -593,13 +599,15 @@ namespace ertool {
 
       TH1D *h11_dEdx = new TH1D("h11_dEdx", "Electron vs. Gamma Likelihood; dEdx [MeV/cm]; Likelihood", 100, 0, 8);
       TH1D *h22_dEdx = new TH1D("h22_dEdx", "Electron vs. Gamma Likelihood; dEdx [MeV/cm]; Likelihood", 100, 0, 8);
-
+      c->SetLogy(0);
+      c->SetLogx(0);
       for (size_t i = 0; i < 100; ++i) {
         _dEdxVar->setVal(8 * i / 100.);
 
         h11_dEdx->SetBinContent(i, _e_dEdxPdf->getVal(*_dEdxVar) / (_e_dEdxPdf->getVal(*_dEdxVar) + _g_dEdxPdf->getVal(*_dEdxVar)));
         h22_dEdx->SetBinContent(i, _g_dEdxPdf->getVal(*_dEdxVar) / (_e_dEdxPdf->getVal(*_dEdxVar) + _g_dEdxPdf->getVal(*_dEdxVar)));
       }
+
 
       h11_dEdx->SetLineWidth(2);
       h11_dEdx->SetLineColor(kBlue);
@@ -611,6 +619,8 @@ namespace ertool {
       h22_dEdx->SetFillStyle(3003);
       h22_dEdx->SetFillColor(kRed);
       h22_dEdx->GetYaxis()->SetRangeUser(0., 1.);
+      h11_dEdx->SetStats(0);
+      h22_dEdx->SetStats(0);
 
       h11_dEdx->Draw();
       h22_dEdx->Draw("sames");
@@ -624,7 +634,7 @@ namespace ertool {
       delete h22_dEdx;
 
       // 2D ratio map
-      TH2D *h_2DRatio = new TH2D("_h2DRatio", "2D Likelyhood; dEdx [MeV/cm]; Rad Len [cm]", 100, 0, 8, 100, 0, 20);
+      TH2D *h_2DRatio = new TH2D("_h2DRatio", "2D Likelihood; dEdx [MeV/cm]; Rad Len [cm]", 100, 0, 8, 100, 0, 20);
 
       for (size_t dedx = 0; dedx < 100; dedx++) {
         for (size_t radlen = 0; radlen < 100; radlen++) {
@@ -646,7 +656,9 @@ namespace ertool {
 
         }
       }
-
+      h_2DRatio->SetStats(0);
+      c->SetLogy(1);
+      c->SetLogx(0);
       h_2DRatio->Draw("COLZ");
       c->SaveAs("2DRatio.png");
       if (fout) { h_2DRatio->Write(); }
@@ -701,6 +713,8 @@ namespace ertool {
       frame_radLen->SetYTitle("Number of Showers");
       frame_radLen->SetTitleFont(50, "X");
       frame_radLen->SetTitleFont(50, "Y");
+      c->SetLogx(1);
+      c->SetLogy(0);
       c->SaveAs(Form("RadLength_Selected_%s.png", part_letter.c_str()));
       c->SetTitle("dEdx Selection");
       frame_dEdx->Draw();
@@ -713,6 +727,9 @@ namespace ertool {
       frame_radLen->SetYTitle("Number of Showers");
       frame_radLen->SetTitleFont(50, "X");
       frame_radLen->SetTitleFont(50, "Y");
+      c->SetLogx(0);
+      c->SetLogy(0);
+
       c->SaveAs(Form("dEdx_Selected_%s.png", part_letter.c_str()));
 
       delete c;
