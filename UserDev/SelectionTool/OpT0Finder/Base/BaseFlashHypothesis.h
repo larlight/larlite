@@ -43,6 +43,7 @@ namespace flashana {
     /// Method to simply fill provided reference of flashana::Flash_t
 
     virtual void FillEstimate(const QCluster_t&, Flash_t&) const = 0;
+    virtual void FillTree(const QCluster_t&) = 0;
 
   };
 }

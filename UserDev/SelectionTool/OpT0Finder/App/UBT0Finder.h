@@ -136,7 +136,7 @@ namespace larlite {
     std::vector<double> _mc_trajz;
 
 
-    bool _photlib_tree_config;
+    std::string _photlib_tree_config;
     TTree* _photlib_tree;
     double _pvl_x;
     double _pvl_y;
@@ -146,7 +146,8 @@ namespace larlite {
 
   private:
 
-    void Fill_PVL_Tree();
+    void Fill_PVL_Tree(); // fills the pvl
+    void Fill_PVL_Tree(const flashana::QCluster_t& ); // fills only the pvl values sampled by our not-translated-in-x QClusters
     // tree to measure efficiency of matching for MCTracks
     TTree *_eff_tree;
     TTree *_flash_tree;

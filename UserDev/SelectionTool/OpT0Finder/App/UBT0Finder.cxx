@@ -17,7 +17,7 @@ namespace larlite {
     , _int_tree(nullptr)
     , _track_tree(nullptr)
     , _flashmatch_tree(nullptr)
-    , _photlib_tree_config(true)
+    , _photlib_tree_config("")
     , _photlib_tree(nullptr)
     , _eff_tree(nullptr)
     , _flash_tree(nullptr)
@@ -104,26 +104,29 @@ namespace larlite {
 
     std::cout << "UBT0Finder.cxx: In inititalize(): "  << std::endl;
     Configure((const ::fcllite::PSet )"UBT0Finder"); 
-    if (_photlib_tree_config)
-      Fill_PVL_Tree();
+    if (_photlib_tree_config != NULL) 
+      {
+	if (_photlib_tree) delete _photlib_tree;
+	_photlib_tree = new TTree("_photlib_tree", "PhotonLibrary Tree");
+	_photlib_tree->Branch("pvl_x", &_pvl_x, "pvl_x/D");
+	_photlib_tree->Branch("pvl_y", &_pvl_y, "pvl_y/D");
+	_photlib_tree->Branch("pvl_z", &_pvl_z, "pvl_z/D");
+	_photlib_tree->Branch("pvl_pmt", &_pvl_pmt, "pvl_pmt/I");
+	_photlib_tree->Branch("pvl_vis", &_pvl_vis, "pvl_vis/D");
+	if (_photlib_tree_config == "lib") 
+	  Fill_PVL_Tree(); // Fill the (badly-binned) PVL, as from input file.
+      }
     return true;
   }
 
   void UBT0Finder::Configure(const ::fcllite::PSet &pset) {
-    // This doesn't work, cuz .... not finding actual fcl file, as set in _config_file of Manager. So, default to true.
-    _photlib_tree_config = pset.get<bool>("PhotonLibTTree","true"); 
+    // This doesn't work, cuz .... not finding actual fcl file, as set in _config_file of Manager. So, default to false.
+    _photlib_tree_config = pset.get<std::string>("PhotonLibTTree",std::string("seen"));  // "lib" or "seen" or ""
     std::cout << "UBT0Finder.cxx: PhotonVisLibrary Tree ?: " << _photlib_tree_config << std::endl;
   }
 
   void UBT0Finder::Fill_PVL_Tree() {
 
-    if (_photlib_tree) delete _photlib_tree;
-    _photlib_tree = new TTree("_photlib_tree", "PhotonLibrary Tree");
-    _photlib_tree->Branch("pvl_x", &_pvl_x, "pvl_x/D");
-    _photlib_tree->Branch("pvl_y", &_pvl_y, "pvl_y/D");
-    _photlib_tree->Branch("pvl_z", &_pvl_z, "pvl_z/D");
-    _photlib_tree->Branch("pvl_pmt", &_pvl_pmt, "pvl_pmt/I");
-    _photlib_tree->Branch("pvl_vis", &_pvl_vis, "pvl_vis/D");
 
     auto geom = ::larutil::Geometry::GetME();
     double dw = 2 * geom->DetHalfWidth();
@@ -132,17 +135,34 @@ namespace larlite {
 
 
     for ( size_t ipmt = 0; ipmt < 32; ++ipmt) {
-    for ( size_t ix = 0; ix <= 100; ++ix) {
-    for ( size_t iy = 0; iy <= 100; ++iy) {
-    for ( size_t iz = 0; iz <= 100; ++iz) {
-      _pvl_x = dw/100.0*ix; _pvl_y = dh/100.*iy - dh/2.; _pvl_z = dl/100.0*iz; _pvl_pmt = ipmt; 
-      _pvl_vis = ::phot::PhotonVisibilityService::GetME().GetVisibility( _pvl_x, _pvl_y, _pvl_z, _pvl_pmt) ;
-      _photlib_tree->Fill();
-    }
-    }
-    }
+      for ( size_t ix = 0; ix <= 100; ++ix) {
+	for ( size_t iy = 0; iy <= 100; ++iy) {
+	  for ( size_t iz = 0; iz <= 100; ++iz) {
+	    _pvl_x = dw/100.0*ix; _pvl_y = dh/100.*iy - dh/2.; _pvl_z = dl/100.0*iz; _pvl_pmt = ipmt; 
+	    _pvl_vis = ::phot::PhotonVisibilityService::GetME().GetVisibility( _pvl_x, _pvl_y, _pvl_z, _pvl_pmt) ;
+	    _photlib_tree->Fill();
+	  }
+	}
+      }
     }
 
+
+  }
+
+  void UBT0Finder::Fill_PVL_Tree(const flashana::QCluster_t& qcl) {
+
+    for (auto const & qpt : qcl)
+    {
+      _pvl_x = qpt.x;
+      _pvl_y = qpt.y;
+      _pvl_z = qpt.z;
+      for (int ipmt=0; ipmt<32; ipmt++)
+	{
+	  _pvl_pmt = ipmt;
+	  _pvl_vis = ::phot::PhotonVisibilityService::GetME().GetVisibility( _pvl_x, _pvl_y, _pvl_z, _pvl_pmt) ;
+	  _photlib_tree->Fill();
+	}
+    }
 
   }
 
@@ -271,9 +291,15 @@ namespace larlite {
         if( qcluster.idx != -1)
 	  for (size_t ii = 0;  ii<qcluster.size(); ++ii)
 	    {
-	      qcluster[ii].t = qcluster[ii].x/(det_width/det_drift_time) ; // this is drift time, which will create an upper bound on where track could have been in x, which we will enforce later in PhotonLibHypothesis::FillEstimate().
+	      qcluster[ii].t = qcluster[ii].x/(det_width/det_drift_time) ; // this is drift time, which will create an upper bound on where track could have been in x; will enforce the bound later in PhotonLibHypothesis::FillEstimate().
 	    }
 	  _mgr.Emplace(std::move(qcluster));
+	  if ( _photlib_tree_config == "seen" )
+	    {
+	      auto const& qcc(qcluster);
+	      Fill_PVL_Tree(qcc);
+	    }
+
 	}
 
       for(auto const& s : source_v) {
@@ -535,7 +561,7 @@ namespace larlite {
       _flash_tree->Write();
       _nflash_v_nint->Write();
       _time_diff->Write();
-      if (_photlib_tree_config)
+      if (_photlib_tree_config!=NULL)
 	_photlib_tree->Write();
 
     }

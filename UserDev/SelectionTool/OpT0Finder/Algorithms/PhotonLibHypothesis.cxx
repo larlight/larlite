@@ -8,15 +8,25 @@
 namespace flashana {
 
   PhotonLibHypothesis::PhotonLibHypothesis(const std::string name)
-    : BaseFlashHypothesis(name)
-  {}
+    : BaseFlashHypothesis(name), _photlib_tree(nullptr)
+  {
+
+    if (_photlib_tree) delete _photlib_tree;
+    _photlib_tree = new TTree("_photlib_tree", "PhotonLibrary_PLHcxx Tree");
+    _photlib_tree->Branch("pvl_x", &_pvl_x, "pvl_x/D");
+    _photlib_tree->Branch("pvl_y", &_pvl_y, "pvl_y/D");
+    _photlib_tree->Branch("pvl_z", &_pvl_z, "pvl_z/D");
+    _photlib_tree->Branch("pvl_pmt", &_pvl_pmt, "pvl_pmt/I");
+    _photlib_tree->Branch("pvl_vis", &_pvl_vis, "pvl_vis/D");
+
+
+  }
 
   void PhotonLibHypothesis::Configure(const ::fcllite::PSet &pset)
   {
   }
   
-  void PhotonLibHypothesis::FillEstimate(const QCluster_t& trk,
-					        Flash_t &flash) const
+  void PhotonLibHypothesis::FillEstimate(const QCluster_t& trk, Flash_t &flash) const
   {
         
     size_t n_pmt = BaseAlgorithm::NOpDets();//n_pmt returns 0 now, needs to be fixed    
@@ -40,7 +50,8 @@ namespace flashana {
 	//	std::cout << "PhotonLibHypothesis: PMT : " << ipmt << " [x,y,z,t,q] -> [q_corr] : [" << pt.x << ", "
 	//  << pt.y << ", " << pt.z << ", , " << pt.t<< ", " << pt.q <<"] -> [" << q_corr << "]" << std::endl;
 	//std::cout << "PhotonLibHypothesis: PMT : dist to last point is " <<  dist << std::endl;
-	//std::cout << "PhotonLibHypothesis: PMT : Look-up lib val is " <<  ::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt) << std::endl;
+	if (::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt) == 0.)
+	  std::cout << "PhotonLibHypothesis: PMT : Look-up lib val is 0 for x,y,z,ipmt: " << pt.x << ", " << pt.y << ", " << pt.z << ", " << ipmt << std::endl;
 
         q *= ::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt)*0.23*0.0093; //Should be 0.23. //EC, 16-Dec-2015 
 	//*0.0093;
@@ -56,5 +67,27 @@ namespace flashana {
 
     return;
   }
+
+
+  void PhotonLibHypothesis::FillTree(const QCluster_t& trk) 
+  {
+        
+    for ( size_t ipmt = 0; ipmt < 32; ++ipmt) {
+      
+      std::vector<double> pt_last;
+      for ( size_t ipt = 0; ipt < trk.size(); ++ipt) {
+	
+        auto const& pt = trk[ipt];
+	_pvl_x = pt.x; _pvl_y = pt.y; _pvl_z =pt.z; _pvl_pmt = ipmt;
+	_pvl_vis = ::phot::PhotonVisibilityService::GetME().GetVisibility( _pvl_x, _pvl_y, _pvl_z, _pvl_pmt) ;
+	_photlib_tree->Fill();
+
+      }
+    }
+    return;
+  }
+
+
+
 }
 #endif

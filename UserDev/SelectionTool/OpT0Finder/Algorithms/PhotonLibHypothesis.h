@@ -31,15 +31,29 @@ namespace flashana {
     /// Default constructor
     PhotonLibHypothesis(const std::string name="PhotonLibHypothesis");
 
-    /// Default destructor
-    virtual ~PhotonLibHypothesis(){}
+    /// Default destructor. Somehow not writing out my TTree. Meh, EC, 17-Mar-2017
+    virtual ~PhotonLibHypothesis(){ 
+      std::cout << "PhotonLibHypothesis():~PhotonLibHypothesis(): Where am I Write()'ing the *seen-by-track* pvlib _photlib_tree? Nowhere Eric can find it, it would seem." << std::endl;
+      _photlib_tree->Write(); 
+      if (_photlib_tree) delete _photlib_tree; 
+    }
 
     void Configure(const ::fcllite::PSet &pset);
 
     void FillEstimate(const QCluster_t&, Flash_t&) const;
+    void FillTree(const QCluster_t&);
 
-  };
-}
+    TTree* _photlib_tree;
+    double _pvl_x;
+    double _pvl_y;
+    double _pvl_z;
+    double _pvl_vis;
+    int  _pvl_pmt;
+
+			
+			
+  };			
+}			
 #endif
 
 /** @} */ // end of doxygen group 
