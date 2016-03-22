@@ -756,8 +756,8 @@ int GeometryHelper::Get3DAxisN(const int& iplane0, const int& iplane1,
 
   // prepare vertical angle information for the various planes
   std::vector<double> vertangle;
-  vertangle.resize(3);
-  for (UInt_t ip = 0; ip < 3; ip++)
+  vertangle.resize(geom->Nplanes());
+  for (UInt_t ip = 0; ip < geom->Nplanes(); ip++)
     vertangle[ip] = geom->WireAngleToVertical(geom->PlaneToView(ip)) - TMath::Pi() / 2; // wire angle
 
   // y, z, x coordinates
