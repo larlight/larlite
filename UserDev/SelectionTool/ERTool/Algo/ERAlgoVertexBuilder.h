@@ -172,11 +172,6 @@ namespace ertool {
        ParticleGraph & graph,
        ParticleAssociations & pas);
 
-    void ShowerProjectionPrioritiseAssociations
-      (const EventData &data,
-       ParticleGraph & graph,
-       ParticleAssociations & pas);
-    
     void EndReconstructPa(const EventData &data,
 			  ParticleGraph & graph,
 			  ParticleAssociations & pa);

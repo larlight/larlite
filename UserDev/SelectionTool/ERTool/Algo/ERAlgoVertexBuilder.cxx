@@ -1379,15 +1379,46 @@ namespace ertool {
 	  }
 
 	  else {
+
+	    NodeID_t best_track = kINVALID_NODE_ID;
+	    geoalgo::Point_t const * best_tp = nullptr;
+	    Double_t best_showerp_dist = tcpoa_vert_prox;
+
+	    for(NodeID_t const n : graph.GetParticleNodes(kTrack)) {
+
+	      Track const & t = data.Track(graph.GetParticle(n).RecoID());
+
+	      Double_t const trackend_dist = t.back().Dist(best_vert);
+	      if(trackend_dist < best_showerp_dist) {
+		best_track = n;
+		best_tp = &t.back();
+		best_showerp_dist = trackend_dist;
+	      }
+	   
+	      Double_t const trackstart_dist = t.front().Dist(best_vert);
+	      if(trackstart_dist < best_showerp_dist) {
+		best_track = n;
+		best_tp = &t.front();
+		best_showerp_dist = trackstart_dist;
+	      }
+	      
+	    }
+	      
 	    if(tverbose) std::cout << "\t\t\t\tno, create new association\n";
 	    std::vector<NodeID_t> showers;
 	    showers.push_back(best_shower_id);
 	    showers.push_back(best_other_id);
+	    if(best_showerp_dist < tcpoa_vert_prox) showers.push_back(best_track);
 	    std::vector<geoalgo::Point_t> verts(2, best_vert);
+	    if(best_showerp_dist < tcpoa_vert_prox) {
+	      if(best_tp == nullptr) std::cout << "best_tp == nullptr\n";
+	      verts.push_back(*best_tp);
+	    }
 	    pas.AddAssociation(showers,
-			   verts,
-			   geoalgo::Sphere(best_vert, best_dist),
-			   best_dist);
+			       verts,
+			       geoalgo::Sphere(best_vert, best_dist),
+			       best_dist);
+	  
 	  }
 
 	  if(tverbose)
@@ -1478,17 +1509,25 @@ namespace ertool {
 	      
 	      if(otherpoint_dist < point_dist) {
 
-		std::vector<NodeID_t> objects;
-		objects.push_back(best_shower_id);
-		objects.push_back(best_other_id);
-		std::vector<geoalgo::Point_t> verts;
-		verts.push_back(best_vert);	
-		verts.push_back(*point);
-		pas.AddAssociation(objects,
-				   verts,
-				   geoalgo::Sphere(best_vert, best_dist),
-				   best_dist);	      
+		if(associations.at(index).GetSphere().Center().
+		   Dist(*otherpoint) < tstart_prox) 
+		  pas.AddObject(index, best_shower_id, best_vert);
+
+		else {
+
+		  std::vector<NodeID_t> objects;
+		  objects.push_back(best_shower_id);
+		  objects.push_back(best_other_id);
+		  std::vector<geoalgo::Point_t> verts;
+		  verts.push_back(best_vert);	
+		  verts.push_back(*point);
+		  pas.AddAssociation(objects,
+				     verts,
+				     geoalgo::Sphere(best_vert, best_dist),
+				     best_dist);	      
 	      
+		}
+
 	      }
 	      
 	      else 
@@ -1555,214 +1594,6 @@ namespace ertool {
     //pas.PrintAssociations();
 
     tverbose = false;
-
-  }
-
-
-
-   void ERAlgoVertexBuilder::ShowerProjectionPrioritiseAssociations
-  (const EventData & data,
-   ParticleGraph & graph,
-   ParticleAssociations & pas) {    
-    
-     //tverbose = true;
-
-    if(tverbose) std::cout << "Shower Projection\n";
-
-    std::map<NodeID_t, Shower const *> shower_map;
-
-    for(NodeID_t const n : graph.GetParticleNodes(kShower))
-      shower_map.emplace(n, &data.Shower(graph.GetParticle(n).RecoID()));
-    
-    std::vector<ParticleAssociation> const & associations =
-      pas.GetAssociations();
-
-    if(tverbose)
-      std::cout << "shower_map wloop, size: " << shower_map.size() << "\n";
-    
-    while(shower_map.size()) {
-
-      if(tverbose)
-	std::cout << "\tshower_map wloop start, size: " << shower_map.size()
-		  << "\n";
-
-      NodeID_t best_shower_id = kINVALID_NODE_ID;
-      Int_t index = -1;
-      Double_t best_association_dist = tcpoa_vert_prox;
-      geoalgo::Point_t best_vert(2000, 2000, 2000);    
- 
-      if(tverbose)
-	std::cout << "\tshower_map primary size: " << shower_map.size() << "\n";
-
-      for(auto const & s : shower_map) {
-	
-	if(tverbose)
-	  std::cout << "\t\tshower_map primary floop, id: " << s.first << "\n" 
-		    << "\t\tassociation secondary size: "
-		    << associations.size() << "\n";
-
-	for(Size_t i = 0; i < associations.size(); ++i) {
-
-	  if(tverbose)
-	    std::cout << "\t\t\tassociation secondary floop, index: "
-		      << i << "\n";
-
-	  ParticleAssociation const & pa = associations.at(i);
-
-	  Double_t const dist =
-	    sqrt(algo.SqDist(pa.GetSphere().Center(), 
-			     geoalgo::HalfLine(s.second->Start(),
-					       s.second->Dir()*-1)));
-
-	  if(tverbose)
-	    std::cout << "\t\t\tdist: " << dist << " < best_association_dist: "
-		      << best_association_dist << " ?\n";
-
-	  if(dist < best_association_dist) {
-
-	    if(tverbose) std::cout << "\t\t\t\tyes\n";
-
-	    best_shower_id = s.first;
-	    index = i;
-	    best_vert = algo.ClosestPt(pa.GetSphere().Center(), *s.second);
-	    best_association_dist = dist;
-	  
-	  }
-
-	}
-
-      }
-
-      if(tverbose)
-	std::cout << "\tbest_association_dist: "
-		  << best_association_dist << " < tcpoa_vert_prox: "
-		  << tcpoa_vert_prox << " ?\n";
-
-      if(best_association_dist < tcpoa_vert_prox) {
-	if(tverbose)
-	  std::cout << "\t\tyes, add shower to association: "
-		    << index << ", continue\n";
-	pas.AddObject(index, best_shower_id, best_vert);
-	shower_map.erase(best_shower_id);
-	continue;
-      }
-      
-      if(tverbose)
-	std::cout << "\t\tno, try other showers and tracks\n"
-		  << "\tshower_map primary size: " << shower_map.size() << "\n";
-
-      NodeID_t best_other_id = kINVALID_NODE_ID;
-      Double_t best_dist = tshower_prox;
-
-      geoalgo::Point_t temp_vert(2000, 2000, 2000);
-
-      for(auto const & s : shower_map) {
-	
-	if(tverbose)
-	  std::cout << "\t\tshower_map primary floop, id: " << s.first << "\n" 
-		    << "\t\tshower secondary size: "
-		    << shower_map.size() << "\n";
-
-	for(auto const & s2 : shower_map) {
-
-	  if(tverbose)
-	    std::cout << "\t\t\tshower secondary floop, id: "
-		      << s2.second << "\n";
-
-	  if(s2.first == s.first) {
-	    if(tverbose)
-	      std::cout << "\t\t\t\tsame id, continue\n";
-	    continue;
-	  }	    
-
-	  Double_t const dist =
-	    findrel.FindClosestApproach(*s.second, *s2.second, temp_vert);
-
-	  if(tverbose)
-	    std::cout << "\t\t\tdist: " << dist << " < best_dist: "
-		      << best_dist << " ?\n";
-
-	  if(dist < best_dist) {
-
-	    if(tverbose) std::cout << "\t\t\t\tyes\n";
-
-	    best_shower_id = s.first;
-	    best_other_id = s2.first;
-	    best_vert = temp_vert;
-	    best_association_dist = dist;
-	  
-	  }
-
-	}	
-
-	if(tverbose)
-	  std::cout << "\t\ttrack secondary size: "
-		    << graph.GetParticleNodes(kTrack).size() << "\n";
-	
-	for(NodeID_t const n : graph.GetParticleNodes(kTrack)) {
-	  
-	  if(tverbose)
-	    std::cout << "\t\t\ttrack secondary floop, id: "
-		      << n << "\n";
-
-	  Track const & t = data.Track(graph.GetParticle(n).RecoID());
-	  geoalgo::HalfLine const hl(s.second->Start(), s.second->Dir()*-1);
-	  
-	  geoalgo::Point_t dont_care;
-
-	  Double_t const dist =
-	    sqrt(algo.SqDist(t, hl, temp_vert, dont_care));
-			    
-	  if(tverbose)
-	    std::cout << "\t\t\tdist: " << dist << " < best_dist: "
-		      << best_dist << " ?\n";
-
-	  if(dist < best_dist) {
-
-	    if(tverbose) std::cout << "\t\t\t\tyes\n";
-
-	    best_shower_id = s.first;
-	    best_other_id = n;
-	    best_vert = temp_vert;
-	    best_dist = dist;
-	  
-	  }
-
-	}
-
-      }
-
-      if(tverbose)
-	std::cout << "\tbest_dist: "
-		  << best_dist << " < tshower_prox: "
-		  << tshower_prox << " ?\n";
-
-      if(best_dist < tshower_prox) {
-
-	Particle const & p2 = graph.GetParticle(best_other_id);
-
-	if(p2.RecoType() == kShower) {
-	  std::vector<NodeID_t> showers;
-	  showers.push_back(best_shower_id);
-	  showers.push_back(best_other_id);
-	  std::vector<geoalgo::Point_t> verts(2, best_vert);
-	  pas.AddAssociation(showers,
-			 verts,
-			 geoalgo::Sphere(best_vert, best_dist),
-			 best_dist);
-	}
-
-	else if(p2.RecoType() == kTrack) {
-
-	  
-
-	}
-
-      }
-     
-    }
-
-    if(tverbose) std::cout << "shower_map wloop end\n";
 
   }
 
