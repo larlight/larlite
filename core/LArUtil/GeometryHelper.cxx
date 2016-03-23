@@ -461,7 +461,7 @@ void GeometryHelper::SelectPolygonHitList(const std::vector<Hit2D> &inputHits,
   // Also fill corner edge points
   std::vector<larutil::Point2D> edges(4, Point2D(plane, 0, 0));
   double wire_max = geom->Nwires(plane) * fWireToCm;
-  double time_max = (detp->NumberTimeSamples() - detp -> TriggerOffset()) * fTimeToCm;
+  double time_max = (detp->NumberTimeSamples()) * fTimeToCm;
 
   for (size_t index = 0; index < ordered_hits.size(); ++index) {
 
