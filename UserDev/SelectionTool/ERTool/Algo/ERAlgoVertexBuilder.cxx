@@ -990,91 +990,36 @@ namespace ertool {
     return sc;
 
   }
-  
 
-
-  geoalgo::Point_t const * ERAlgoVertexBuilder::GetTrackDirectionPrimary
-  (EventData const & data,
-   ParticleGraph const & graph,
-   ParticleAssociations const & pas, 
-   std::vector<Int_t> const & skip,
-   Int_t & index) {
-    
-    std::vector<ParticleAssociation> const & pav = pas.GetAssociations();
-    
-    index = -1;
-    geoalgo::Point_t const * sc = nullptr;
-  
-    for(Size_t i = 0; i < pav.size(); ++i) {
-      
-      if(std::find(skip.begin(), skip.end(), i) != skip.end()) {
-	continue;
-      }
-    
-      Int_t track_end_counter = 0;
-
-      std::vector<NodeID_t> const & cluster = pav.at(i).GetCluster();
-      std::vector<geoalgo::Point_t> const & vertices =
-	pav.at(i).GetVertices();
-
-      for(Size_t j = 0; j < cluster.size(); ++j) {
-
-	Particle const & p = graph.GetParticle(cluster.at(j));
-
-	if(p.RecoType() != kTrack) continue;
-
-	Track const & t = data.Track(p.RecoID());
-
-	geoalgo::Point_t const & start = t.front();
-	geoalgo::Point_t const & end = t.back();
-
-	Double_t const dist = vertices.at(i).Dist(start);
-	if(vertices.at(i).Dist(end) < dist) ++track_end_counter;
-
-      }
-
-      if(track_end_counter == 0) {
-
-	
-
-      }
-
-      else if(track_end_counter > 1) ++multi_track_end_vertex;
-
-    }
-    
-    return sc;
-    
-  }
- 
 
 
   void ERAlgoVertexBuilder::AddAllLoneTracks
   (const EventData &data,
    ParticleGraph & graph,
-   ParticleAssociations const & pas) {
-
-    std::vector<NodeID_t> const & pa_nodes = pas.GetNodes();
+   NodeID_t const n) {
 
     for(NodeID_t const gn : graph.GetParticleNodes(kTrack)) {
       
       Particle & p = graph.GetParticle(gn);
       
-      if(p.Parent() != gn)
+      if(p.Parent() != gn || gn == n)
 	continue;
       
       Track const & t = data.Track(p.RecoID());
     
       geoalgo::Point_t const * track_end = nullptr;
       Double_t zmin = 2000;
+
       if(t.front().at(2) < zmin) {
 	track_end = &t.front();
 	zmin = t.front().at(2);
       }
+
       if(t.back().at(2) < zmin) {
 	track_end = &t.back();
 	zmin = t.back().at(2);
       }
+
       if(track_end) {
 	
 	Particle & vert = graph.CreateParticle();
@@ -1096,11 +1041,8 @@ namespace ertool {
 
   void ERAlgoVertexBuilder::AddUpstreamLoneTrack
   (const EventData &data,
-   ParticleGraph & graph,
-   ParticleAssociations const & pas) {
+   ParticleGraph & graph) {
     
-    std::vector<NodeID_t> const & pa_nodes = pas.GetNodes();
-
     Double_t zmin = 2000;
     NodeID_t upstream_track_node = kINVALID_NODE_ID;
     geoalgo::Point_t const * track_end = nullptr;
@@ -1119,6 +1061,7 @@ namespace ertool {
 	upstream_track_node = gn;
 	zmin = t.front().at(2);
       }
+
       if(t.back().at(2) < zmin) {
 	track_end = &t.back();
 	upstream_track_node = gn;
@@ -1146,15 +1089,13 @@ namespace ertool {
   void ERAlgoVertexBuilder::AddAllLoneShowers
   (const EventData &data,
    ParticleGraph & graph,
-   ParticleAssociations const & pas) {
-
-    std::vector<NodeID_t> const & pa_nodes = pas.GetNodes();
+   NodeID_t const n) {
 
     for(NodeID_t const gn : graph.GetParticleNodes(kShower)) {
       
       Particle & p = graph.GetParticle(gn);
       
-      if(p.Parent() != gn)
+      if(p.Parent() != gn || gn == n)
 	continue;
      
       Shower const & s = data.Shower(p.RecoID());
@@ -1168,6 +1109,73 @@ namespace ertool {
       
     }
     
+  }
+
+  
+
+  void ERAlgoVertexBuilder::AddTracksAndShowers
+  (const EventData &data,
+   ParticleGraph & graph) {
+    
+    Double_t zmin = 2000;
+    NodeID_t upstream_node = kINVALID_NODE_ID;
+    geoalgo::Point_t const * end = nullptr;
+
+    for(NodeID_t const gn : graph.GetParticleNodes(kTrack)) {
+      
+      Particle & p = graph.GetParticle(gn);
+            
+      if(p.Parent() != gn)
+	continue;
+      
+      Track const & t = data.Track(p.RecoID());
+    
+      if(t.front().at(2) < zmin) {
+	end = &t.front();
+	upstream_node = gn;
+	zmin = t.front().at(2);
+      }
+
+      if(t.back().at(2) < zmin) {
+	end = &t.back();
+	upstream_node = gn;
+	zmin = t.back().at(2);
+      }
+
+    }
+
+    for(NodeID_t const gn : graph.GetParticleNodes(kShower)) {
+      
+      Particle & p = graph.GetParticle(gn);
+            
+      if(p.Parent() != gn)
+	continue;
+      
+      Shower const & s = data.Shower(p.RecoID());
+    
+      if(s.Start().at(2) < zmin) {
+	end = &s.Start();
+	upstream_node = gn;
+	zmin = s.Start().at(2);
+      }
+   
+    }
+
+    if(end) {
+
+      Particle & vert = graph.CreateParticle();
+      NodeID_t const pid = vert.ID();
+      graph.SetPrimary(pid);
+      vert.SetParticleInfo(1, vert.Mass(), *end, vert.Momentum());    
+      Particle & p = graph.GetParticle(upstream_node);
+      p.SetParticleInfo(p.PdgCode(), p.Mass(), *end, p.Momentum());
+      graph.SetParentage(pid, upstream_node);
+      
+      AddAllLoneTracks(data, graph, upstream_node);
+      AddAllLoneTracks(data, graph, upstream_node);
+      
+    }
+
   }
 
 
@@ -1540,7 +1548,8 @@ namespace ertool {
 	      if(tverbose)
 		std::cout << "\t\t\t\t\tsize 2\n";	      
 	      
-	      Int_t const indexa = pas.GetIndices().at(index_positions.front());
+	      Int_t const indexa =
+		pas.GetIndices().at(index_positions.front());
 	      Double_t dista = 
 		associations.at(indexa).GetSphere().Center().Dist(best_vert);
 	   
@@ -1636,7 +1645,7 @@ namespace ertool {
 	else if(tprimary_vertex_selection == smallestsphere)
 	  sc = GetSmallestSpherePrimary(pas, skip, index);
 	else if(tprimary_vertex_selection == trackdirection)
-	  sc = GetTrackDirectionPrimary(data, graph, pas, skip, index);
+	  //sc = GetTrackDirectionPrimary(data, graph, pas, skip, index);
 	
 	if(sc == nullptr) {
 	  std::cout << "No sc\n";
@@ -1661,9 +1670,14 @@ namespace ertool {
 	loop_counter += setter.GetLoopCounter();
 	
       }
+      
+      AddAllLoneTracks(data, graph);
+      AddAllLoneShowers(data, graph);
 
     }
 
+    else AddTracksAndShowers(data, graph);
+   
     std::vector<NodeID_t> const & pa_nodes = pas.GetNodes();
     Int_t track_counter = 0;
     for(NodeID_t const gn : graph.GetParticleNodes()) {
@@ -1683,9 +1697,6 @@ namespace ertool {
     lone_track_counter = track_counter;
     vertices_lonetracks = vertex_counter + track_counter;
     tree->Fill();   
-
-    AddAllLoneTracks(data, graph, pas);
-    AddAllLoneShowers(data, graph, pas);
 
     tverbose = false;
 

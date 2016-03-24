@@ -144,28 +144,24 @@ namespace ertool {
        ParticleAssociations const & pas, 
        std::vector<Int_t> const & skip,
        Int_t & index);
-
-    geoalgo::Point_t const * GetTrackDirectionPrimary
-      (EventData const & data,
-       ParticleGraph const & graph,
-       ParticleAssociations const & pas, 
-       std::vector<Int_t> const & skip,
-       Int_t & index);
     
     void AddAllLoneTracks
       (const EventData &data,
        ParticleGraph & graph,
-       ParticleAssociations const & pas);
+       NodeID_t const n = kINVALID_NODE_ID);
 
     void AddUpstreamLoneTrack
       (const EventData &data,
-       ParticleGraph & graph,
-       ParticleAssociations const & pas); 
+       ParticleGraph & graph);
 
     void AddAllLoneShowers
       (const EventData &data,
        ParticleGraph & graph,
-       ParticleAssociations const & pas);
+       NodeID_t const n = kINVALID_NODE_ID);
+
+    void AddTracksAndShowers
+      (const EventData &data,
+       ParticleGraph & graph);
 
     void ShowerProjection
       (const EventData &data,
