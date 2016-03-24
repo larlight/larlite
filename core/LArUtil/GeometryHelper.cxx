@@ -522,7 +522,8 @@ double GeometryHelper::GetPitch(const TVector3& direction, const int& pl) const
     double time_max = (detp->NumberTimeSamples()) * fTimeToCm;
     
     for (size_t index = 0; index < ordered_hits.size(); ++index) {
-      
+
+      /* Deprecated: do not throw exceptions if out of TPC bounds...
       if (ordered_hits.at(index)->t < -detp -> TriggerOffset() ||
 	  ordered_hits.at(index)->w < 0 ||
 	  ordered_hits.at(index)->t > time_max ||
@@ -537,6 +538,7 @@ double GeometryHelper::GetPitch(const TVector3& direction, const int& pl) const
 			       );
 	return;
       }
+      */
       
       double dist = 0;
       
