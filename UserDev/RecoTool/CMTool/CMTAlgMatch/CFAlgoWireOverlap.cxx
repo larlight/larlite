@@ -2,7 +2,7 @@
 #define RECOTOOL_CFALGOWIREOVERLAP_CXX
 
 #include "CFAlgoWireOverlap.h"
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/GeometryHelper.h"
 #include "LArUtil/Geometry.h"
 #include <algorithm>
 
@@ -12,8 +12,8 @@ namespace cmtool {
   CFAlgoWireOverlap::CFAlgoWireOverlap() : CFloatAlgoBase()
   //-------------------------------------------------------
   {
-    _w2cm = larutil::GeometryUtilities::GetME()->WireToCm();
-    _t2cm = larutil::GeometryUtilities::GetME()->TimeToCm();
+    _w2cm = larutil::GeometryHelper::GetME()->WireToCm();
+    _t2cm = larutil::GeometryHelper::GetME()->TimeToCm();
     SetVerbose(false);
     SetDebug(false);
     SetUseAllPlanes(false); // Any plane combination OK
