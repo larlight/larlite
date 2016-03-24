@@ -2,6 +2,7 @@
 #define RECOTOOL_CLUSTERVIEWER_CXX
 
 #include "ClusterViewer.h"
+#include "LArUtil/GeometryHelper.h"
 #include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
 
 namespace larlite {
@@ -53,11 +54,11 @@ bool ClusterViewer::analyze(storage_manager* storage)
   _algo.Reset();
 
   const ::larutil::Geometry* geo = ::larutil::Geometry::GetME();
-  const ::larutil::GeometryUtilities* geo_util = ::larutil::GeometryUtilities::GetME();
+  const ::larutil::GeometryHelper* geo_help = ::larutil::GeometryHelper::GetME();
 
   UChar_t nplanes = geo->Nplanes();
-  double  wire2cm = geo_util->WireToCm();
-  double  time2cm = geo_util->TimeToCm();
+  double  wire2cm = geo_help->WireToCm();
+  double  time2cm = geo_help->TimeToCm();
 
   //
   // Obtain event-wise data object pointers

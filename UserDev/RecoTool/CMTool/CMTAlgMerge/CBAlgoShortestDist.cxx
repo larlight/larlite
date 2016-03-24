@@ -2,6 +2,7 @@
 #define RECOTOOL_CBALGOSHORTESTDIST_CXX
 
 #include "CBAlgoShortestDist.h"
+#include "LArUtil/GeometryHelper.h"
 
 namespace cmtool {
 
@@ -18,8 +19,8 @@ namespace cmtool {
     if(_verbose or _debug)
       std::cout << "wire2cm: " << _wire_2_cm << " time2cm: " << _time_2_cm << std::endl;
 
-    _wire_2_cm = larutil::GeometryUtilities::GetME()->WireToCm();
-    _time_2_cm = larutil::GeometryUtilities::GetME()->TimeToCm();
+    _wire_2_cm = larutil::GeometryHelper::GetME()->WireToCm();
+    _time_2_cm = larutil::GeometryHelper::GetME()->TimeToCm();
 
     //shortest allowable length of a cluster (distance start->end point)
     //this is used in cases where the start/end points basically overlap

@@ -17,7 +17,7 @@
 
 #include "ViewerException.h"
 #include "LArUtil/Geometry.h"
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/GeometryHelper.h"
 #include <TH2D.h>
 #include <TGraph.h>
 #include <TCanvas.h>

@@ -1,7 +1,7 @@
 #ifndef RECOTOOL_CFALGOTIMEPROF_CXX
 #define RECOTOOL_CFALGOTIMEPROF_CXX
 
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/GeometryHelper.h"
 #include "CFAlgoTimeProf.h"
 // ROOT includes
 #include "TF1.h"
@@ -147,7 +147,7 @@ namespace cmtool {
 // Making a function to do the profile test
  float CFAlgoTimeProf::TProfCompare(std::vector<larutil::PxHit> hita ,std::vector<larutil::PxHit> hitb)
  {
-//   int nts = larutil::DetectorProperties::GetME()->NumberTimeSamples()*larutil::GeometryUtilities::GetME()->TimeToCm();
+//   int nts = larutil::DetectorProperties::GetME()->NumberTimeSamples()*larutil::GeometryHelper::GetME()->TimeToCm();
    // Where is this?
    //int nplanes = geom->Nplanes();
    int nplanes = 3;
@@ -156,10 +156,10 @@ namespace cmtool {
    std::vector< std::vector<TH1D*> > pulses(nplanes);
    
    double time_diff = ( larutil::DetectorProperties::GetME()->GetXTicksOffset(hita.at(0).plane) - 
-			larutil::DetectorProperties::GetME()->GetXTicksOffset(hitb.at(0).plane) ) * larutil::GeometryUtilities::GetME()->TimeToCm();
+			larutil::DetectorProperties::GetME()->GetXTicksOffset(hitb.at(0).plane) ) * larutil::GeometryHelper::GetME()->TimeToCm();
    
    // First go look for the min & max of hits 
-   double min_time = larutil::DetectorProperties::GetME()->NumberTimeSamples()*larutil::GeometryUtilities::GetME()->TimeToCm();
+   double min_time = larutil::DetectorProperties::GetME()->NumberTimeSamples()*larutil::GeometryHelper::GetME()->TimeToCm();
    double max_time = 0;
    for(auto const& h : hita) {
      if(h.t > max_time) max_time = h.t;
@@ -179,7 +179,7 @@ namespace cmtool {
    // in this case let's just use plane 0,1
    for( auto const& ha : hita){
      double time = ha.t;
-     //time -= larutil::DetectorProperties::GetME()->GetXTicksOffset(ha.plane)*larutil::GeometryUtilities::GetME()->TimeToCm();
+     //time -= larutil::DetectorProperties::GetME()->GetXTicksOffset(ha.plane)*larutil::GeometryHelper::GetME()->TimeToCm();
      double charge = ha.charge;
 
      int bin = histo_a.FindBin(time);
@@ -191,7 +191,7 @@ namespace cmtool {
    if (histo_inta.Integral()) histo_inta.Scale(1./histo_inta.GetBinContent(histo_inta.GetNbinsX()));
    for( auto const& hb : hitb){
      double time = hb.t + time_diff;
-     //time -= larutil::DetectorProperties::GetME()->GetXTicksOffset(hb.plane)*larutil::GeometryUtilities::GetME()->TimeToCm();
+     //time -= larutil::DetectorProperties::GetME()->GetXTicksOffset(hb.plane)*larutil::GeometryHelper::GetME()->TimeToCm();
      double charge = hb.charge;
      int bin = histo_b.FindBin(time);
      histo_b.SetBinContent(bin,histo_b.GetBinContent(bin)+charge);

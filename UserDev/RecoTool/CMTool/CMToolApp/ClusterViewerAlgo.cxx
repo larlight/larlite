@@ -14,8 +14,8 @@ ClusterViewerAlgo::ClusterViewerAlgo(std::string name) : _name(name)
   _cTwoClusters = nullptr;
   _hits_log_z = true;
   ShowShowers(false);
-  time2cm = larutil::GeometryUtilities::GetME()->TimeToCm();
-  wire2cm = larutil::GeometryUtilities::GetME()->WireToCm();
+  time2cm = larutil::GeometryHelper::GetME()->TimeToCm();
+  wire2cm = larutil::GeometryHelper::GetME()->WireToCm();
 }
 
 //#############################
