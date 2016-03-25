@@ -1390,6 +1390,7 @@ namespace ertool {
 
 	    NodeID_t best_track = kINVALID_NODE_ID;
 	    geoalgo::Point_t const * best_tp = nullptr;
+	    geoalgo::Point_t const * best_other_tp = nullptr;
 	    Double_t best_showerp_dist = tcpoa_vert_prox;
 
 	    for(NodeID_t const n : graph.GetParticleNodes(kTrack)) {
@@ -1400,6 +1401,7 @@ namespace ertool {
 	      if(trackend_dist < best_showerp_dist) {
 		best_track = n;
 		best_tp = &t.back();
+		best_other_tp = &t.front();
 		best_showerp_dist = trackend_dist;
 	      }
 	   
@@ -1407,26 +1409,117 @@ namespace ertool {
 	      if(trackstart_dist < best_showerp_dist) {
 		best_track = n;
 		best_tp = &t.front();
+		best_other_tp = &t.back();
 		best_showerp_dist = trackstart_dist;
 	      }
 	      
 	    }
-	      
-	    if(tverbose) std::cout << "\t\t\t\tno, create new association\n";
-	    std::vector<NodeID_t> showers;
-	    showers.push_back(best_shower_id);
-	    showers.push_back(best_other_id);
-	    if(best_showerp_dist < tcpoa_vert_prox) showers.push_back(best_track);
-	    std::vector<geoalgo::Point_t> verts(2, best_vert);
+	   
 	    if(best_showerp_dist < tcpoa_vert_prox) {
-	      if(best_tp == nullptr) std::cout << "best_tp == nullptr\n";
-	      verts.push_back(*best_tp);
+
+	      std::vector<Size_t> const index_positions =
+		pas.GetIndicesFromNode(best_track);
+	      
+	      if(index_positions.size() == 0) {
+		
+		if(tverbose) std::cout << "\t\t\t\tno, create new association\n";
+		std::vector<NodeID_t> showers;
+		showers.push_back(best_shower_id);
+		showers.push_back(best_other_id);
+		showers.push_back(best_track);
+		std::vector<geoalgo::Point_t> verts(2, best_vert);
+		if(best_tp == nullptr) std::cout << "best_tp == nullptr\n";
+		verts.push_back(*best_tp);
+		pas.AddAssociation(showers,
+				   verts,
+				   geoalgo::Sphere(*best_tp, best_dist),
+				   best_dist);
+		
+	      }
+
+	      else if(index_positions.size() == 1) {
+
+		Size_t const index =
+		  pas.GetIndices().at(index_positions.front());
+		
+		geoalgo::Point_t const & added_point =
+		  associations.at(index).GetVertexFromNode(best_track);
+		
+		Double_t const point_dist = added_point.Dist(*best_tp);
+		Double_t const otherpoint_dist = added_point.Dist(*best_other_tp);
+			      
+		if(otherpoint_dist < point_dist) {
+		  
+		  if(associations.at(index).GetSphere().Center().
+		     Dist(*best_other_tp) < tstart_prox) {
+		    pas.AddObject(index, best_shower_id, best_vert);
+		    pas.AddObject(index, best_other_id, best_vert);
+		  }
+
+		  else {
+
+		    if(tverbose) std::cout << "\t\t\t\tno, create new association\n";
+		    std::vector<NodeID_t> showers;
+		    showers.push_back(best_shower_id);
+		    showers.push_back(best_other_id);
+		    showers.push_back(best_track);
+		    std::vector<geoalgo::Point_t> verts(2, best_vert);
+		    if(best_tp == nullptr) std::cout << "best_tp == nullptr\n";
+		    verts.push_back(*best_tp);
+		    pas.AddAssociation(showers,
+				       verts,
+				       geoalgo::Sphere(*best_tp, best_dist),
+				       best_dist);
+		   
+		  }
+		  
+		}
+		
+		else {
+		  pas.AddObject(index, best_shower_id, best_vert);	
+		  pas.AddObject(index, best_other_id, best_vert);
+		}
+
+	      }
+
+	      else if(index_positions.size() == 2) {
+		
+		Int_t const indexa =
+		  pas.GetIndices().at(index_positions.front());
+		Double_t dista = 
+		  associations.at(indexa).GetSphere().Center().Dist(best_vert);
+		
+		Int_t const indexb = pas.GetIndices().at(index_positions.back());   
+		Double_t distb = 
+		  associations.at(indexb).GetSphere().Center().Dist(best_vert);
+		
+		if(dista < distb) {
+		  pas.AddObject(indexa, best_shower_id, best_vert);	
+		  pas.AddObject(indexa, best_other_id, best_vert);
+		}
+
+		else {
+		  pas.AddObject(indexb, best_shower_id, best_vert);			
+		  pas.AddObject(indexb, best_other_id, best_vert);
+		}		
+
+	      }
+	     
 	    }
-	    pas.AddAssociation(showers,
-			       verts,
-			       geoalgo::Sphere(best_vert, best_dist),
-			       best_dist);
-	  
+
+	    else {
+
+	      std::vector<NodeID_t> showers;
+	      showers.push_back(best_shower_id);
+	      showers.push_back(best_other_id);
+	      std::vector<geoalgo::Point_t> verts(2, best_vert);
+	      pas.AddAssociation(showers,
+				 verts,
+				 geoalgo::Sphere(best_vert, best_dist),
+				 best_dist);
+
+	    }
+
 	  }
 
 	  if(tverbose)
@@ -1570,7 +1663,9 @@ namespace ertool {
 	    }
 	    
 	    else if(index_positions.size() > 2)
-	      std::cout << "Warning: more than two indices found\n";
+	      std::cout << "Warning: more than two indices found, node: "
+			<< best_other_id << " event: " 
+			<< data.Event_ID() << "\n";
 	    
 	  }
 	
