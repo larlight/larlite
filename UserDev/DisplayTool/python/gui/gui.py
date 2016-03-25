@@ -35,7 +35,7 @@ class view_manager(QtCore.QObject):
     self._wireDrawer.setMaximumHeight(200)
     self._wireDrawer.setMinimumHeight(100)
 
-
+    self._drawLogo = False
     self._plottedHits = []
 
     self._selectedPlane = -1
@@ -93,18 +93,46 @@ class view_manager(QtCore.QObject):
 
   def refreshDrawListWidget(self):
 
+    # Draw all planes:
     if self._selectedPlane == -1:
+      i = 0
       for widget in self._planeWidgets:
         widget.setVisible(True)
+        if i == 0:
+          # Draw the logo on the first plane, maybe
+          self._drawerList[i].toggleLogo(self._drawLogo)
+        else:
+          # Definitely don't draw it on the other planes
+          self._drawerList[i].toggleLogo(False)
+        i += 1
 
     else:
       i = 0
       for widget in self._planeWidgets:
         if i == self._selectedPlane:
           widget.setVisible(True)
+          self._drawerList[i].toggleLogo(self._drawLogo)
         else:
+          # If there is a logo, remove it first!
+          self._drawerList[i].toggleLogo(False)
           widget.setVisible(False)
         i += 1
+
+  def toggleLogo(self,tl):
+    # Draw the logo on the top plane OR the selected plane
+    # 
+    self._drawLogo = tl
+    if not tl:
+      for view in self._drawerList:
+        # Turn everything off, just in case.
+        view.toggleLogo(tl)
+    else:
+      # If drawing just one plane, use that one.
+      # Else, use plane 0
+      plane = self._selectedPlane
+      if plane == -1:
+        plane = 0
+      self._drawerList[plane].toggleLogo(tl)
 
 
   def connectStatusBar(self,statusBar):
@@ -356,6 +384,10 @@ class gui(QtGui.QWidget):
     self._scaleBarOption.setTristate(False)
     self._scaleBarOption.stateChanged.connect(self.scaleBarWorker)
 
+    self._logoOption = QtGui.QCheckBox("Draw Logo")
+    self._logoOption.setToolTip("Display the experiment logo on the window.")
+    self._logoOption.setTristate(False)
+    self._logoOption.stateChanged.connect(self.logoWorker)
 
 
     self._clearPointsButton = QtGui.QPushButton("ClearPoints")
@@ -384,6 +416,7 @@ class gui(QtGui.QWidget):
     self._drawingControlBox.addWidget(self._drawWireOption)
     self._drawingControlBox.addWidget(self._unitDisplayOption)
     self._drawingControlBox.addWidget(self._scaleBarOption)
+    self._drawingControlBox.addWidget(self._logoOption)
 
     return self._drawingControlBox
 
@@ -416,6 +449,11 @@ class gui(QtGui.QWidget):
     else:
       self._view_manager.toggleScale(False)  
 
+  def logoWorker(self):
+    if self._logoOption.isChecked():
+      self._view_manager.toggleLogo(True)
+    else:
+      self._view_manager.toggleLogo(False)  
 
   def clearPointsWorker(self):
     self._view_manager.clearPoints()

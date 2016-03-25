@@ -16,7 +16,7 @@
 
 #include "ShowerReco3D/Base/ShowerRecoAlgBase.h"
 #include "ShowerReco3D/Base/ShowerCalo.h"
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/GeometryHelper.h"
 #include "AnalysisAlg/CalorimetryAlg.h"
 
 namespace showerreco {
@@ -58,7 +58,7 @@ namespace showerreco {
 
   protected:
 
-    larutil::GeometryUtilities  *fGSer;
+    larutil::GeometryHelper  *fGSer;
    
   private:
 

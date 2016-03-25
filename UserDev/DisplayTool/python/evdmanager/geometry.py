@@ -4,6 +4,7 @@ import ROOT
 from larlite import larutil
 import numpy as np
 
+import os
 
 class geoBase(object):
 
@@ -23,6 +24,11 @@ class geoBase(object):
         self._halfwidth = 1.0
         self._halfheight = 1.0
         self._length = 1.0
+        self._haslogo = False
+        self._logo = None
+        self._path = os.path.dirname(os.path.realpath(__file__))
+        self._logopos = [0,0]
+        self._logoscale = 1.0
 
     def halfwidth(self):
        return self._halfwidth
@@ -63,6 +69,17 @@ class geoBase(object):
     def offset(self, plane):
         return self._offset[plane]
 
+    def hasLogo(self):
+        return self._haslogo
+
+    def logo(self):
+        return self._logo
+
+    def logoScale(self):
+        return self._logoscale
+
+    def logoPos(self):
+        return self._logopos
 
 class geometry(geoBase):
 
@@ -111,6 +128,11 @@ class microboone(geometry):
         # self._time2Cm = 0.05515
         self._pedestals = [2000, 2000, 440]
         self._name = "uboone"
+        self._logo = self._path + "/logos/uboone_logo_bw_transparent.png"
+        self._logoRatio = 1.0
+        self._haslogo = True
+        self._logopos = [1250,10]
+        self._logoscale = 0.1
         # remove = larutil.DetectorProperties.GetME().TriggerOffset() \
         #           * larutil.GeometryHelper.GetME().TimeToCm()
         # self._offset[:] = [x - remove for x in self._offset]
@@ -188,21 +210,25 @@ class lariat(geometry):
         # lariat has a different number of time ticks
         # fix it directly:
         self._tRange = 3072
-        self._levels = [(-20, 200), (-20, 200)]
+        self._levels = [(-40, 160), (-80, 320)]
         self._pedestals = [0, 0]
         self._name = "lariat"
+        # Get the logo too!
+        self._logo = self._path + "/logos/LArIAT_simple_outline.png"
+        self._haslogo = True
+        self._logopos = [1200,10]
+        self._logoscale = 0.2
         # Make default color schemes here:
         self._defaultColorScheme = [
-            {'ticks': [(0.0,  (30,  30, 255, 255)),
-                       (0.15, (30,  30, 255, 255)),
-                       (0.6,  (0,  255, 255, 255)),
-                       (0.8,  (0,  255, 0,   255)),
-                       (1,    (255,  0, 0,   255))],
+            {'ticks': [(0, (30, 30, 255, 255)),
+                       (0.33333, (0, 255, 255, 255)), 
+                       (0.66666, (255,255,100,255)), 
+                       (1, (255, 0, 0, 255))], 
              'mode': 'rgb'}]
         self._defaultColorScheme.append(
-            {'ticks': [(0.0,  (30,  30, 255, 255)),
-                       (0.15, (30,  30, 255, 255)),
-                       (0.6,  (0,  255, 255, 255)),
-                       (0.8,  (0,  255, 0,   255)),
-                       (1,    (255,  0, 0,   255))],
+            {'ticks': [(0, (30, 30, 255, 255)),
+                       (0.33333, (0, 255, 255, 255)), 
+                       (0.66666, (255,255,100,255)), 
+                       (1, (255, 0, 0, 255))], 
              'mode': 'rgb'})
+

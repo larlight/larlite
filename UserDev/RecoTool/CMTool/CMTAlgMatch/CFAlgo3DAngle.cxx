@@ -2,7 +2,7 @@
 #define RECOTOOL_CFALGO3DANGLE_CXX
 
 #include "CFAlgo3DAngle.h"
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/GeometryHelper.h"
 
 namespace cmtool {
 
@@ -69,9 +69,9 @@ namespace cmtool {
 //	double max_hits1(0), middle_hits1(0), min_hits1(0) ;
 
 	//Calculate phi and theta from first 2 planes; check if third plane is consistent
-	larutil::GeometryUtilities::GetME()->Get3DaxisN(plane_0,plane_1,angle_2d_0,angle_2d_1,phi_01,theta_01);	
-	larutil::GeometryUtilities::GetME()->Get3DaxisN(plane_1,plane_2,angle_2d_1,angle_2d_2,phi_12,theta_12);	
-	larutil::GeometryUtilities::GetME()->Get3DaxisN(plane_2,plane_0,angle_2d_2,angle_2d_0,phi_02,theta_02);
+	larutil::GeometryHelper::GetME()->Get3DAxisN(plane_0,plane_1,angle_2d_0,angle_2d_1,phi_01,theta_01);	
+	larutil::GeometryHelper::GetME()->Get3DAxisN(plane_1,plane_2,angle_2d_1,angle_2d_2,phi_12,theta_12);	
+	larutil::GeometryHelper::GetME()->Get3DAxisN(plane_2,plane_0,angle_2d_2,angle_2d_0,phi_02,theta_02);
 
 	//Adjust the range of phis/thetas that are bigger than 360 or less than 0.
 	FixPhiTheta(phi_01,theta_01);
