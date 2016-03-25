@@ -151,11 +151,8 @@ namespace larlite{
       "simphotons",
       "mucsdata",
       "mucsreco",
-<<<<<<< HEAD
       "PiZeroROI"
-=======
       "auxsimch"
->>>>>>> trunk
     };
 
     const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {
