@@ -22,6 +22,9 @@
 
 #include "LArUtil/PxUtils.h"
 
+#include "DetectorProperties.h"
+#include "LArProperties.h"
+
 namespace larutil {
 
 
@@ -295,6 +298,35 @@ public:
     double GetPitch(const TVector3& direction, const int& pl) const;
 
     /**
+     * @brief get pitch on specific plane given phi and theta directions
+     * This is the preferred pitch function to be called. The others are carried over.
+     * @param pl -> unsigned integer : plane for which to calculate pitch
+     * @param theta -> double : angle with beam direction (this is not unambiguous definition)
+     * @param phi   -> double : angle with XY plane (this is not unambigous definition)
+     * @return pitch in cm
+     */
+    double CalculatePitch(UInt_t pl, double phi, double theta) const;
+
+    /**
+     * @brief get pitch on specific plane given phi and theta directions
+     * This is the preferred pitch function to be called. The others are carried over.
+     * @param pl -> unsigned integer : plane for which to calculate pitch
+     * @param theta -> double : angle with beam direction (this is not unambiguous definition)
+     * @param phi   -> double : angle with XY plane (this is not unambigous definition)
+     * @return pitch in cm
+     */
+    double PitchInView(UInt_t pl, double phi, double theta) const;
+
+
+    /**
+     * @brief given phi and theta, get the projection of this 3D vector on the coordinate axes
+     * @param theta -> double : angle with beam direction (this is not unambiguous definition)
+     * @param phi   -> double : angle with XY plane (this is not unambigous definition)
+     * @param dirst -> double array : value to be edited and filled
+     */
+    void GetDirectionCosines(double phi, double theta, Double_t *dirs) const;
+
+    /**
      * @brief Get cosine of angle between two lines defined by their slope
      * @param slope1 : slope of first line
      * @param slope2 : slope of second line
@@ -428,22 +460,53 @@ public:
                    double& phi, double& theta) const;
 
     /**
+     * @brief given 2 2D points on two planes, find the XYZ coordinate they correspond to
+     * @input Point2D p0 (const)
+     * @input Point2D p1 (const)
+     * @input reference to dzy double[] array (output)
+     */
+    int GetXYZ(const Point2D *p0, const Point2D *p1, Double_t* xyz) const;
+
+    /**
+     * @brief given 2 2D points on two planes, find the YZ coordinate they correspond to
+     * @input Point2D p0 (const)
+     * @input Point2D p1 (const)
+     * @input reference to dzy double[] array (output)
+     */
+    int GetYZ(const Point2D *p0, const Point2D *p1, Double_t* xy) const;
+
+    /**
      * @brief return the conversion from time tick to centimeters
      * @return Floating point conversion in the units [cm / time tick]
      */
-    float TimeToCm() const {return fTimeToCm;}
+    float TimeToCm() const { return fTimeToCm; }
 
     /**
      * @brief return conversion from wires to centimeters
      * @return Floating point conversion in the units [ wire / cm ]
      */
-    float WireToCm() const {return fWireToCm;}
+    float WireToCm() const { return fWireToCm; }
+
+    /**
+     * @brief get number of wire-planes in the geometry
+     * @return unsigned integer for the number of planes
+     */
+    UInt_t Nplanes() const { return fNPlanes; }
 
 private:
 
+    // services to be used
+    larutil::Geometry* geom;
+    larutil::DetectorProperties* detp;
+    larutil::LArProperties* larp;
 
     float fTimeToCm;
     float fWireToCm;
+
+    // number of planes in the geometry
+    UInt_t fNPlanes;
+    // angle w.r.t. veritcal per plane
+    std::vector<double> vertangle;
 
 };
 

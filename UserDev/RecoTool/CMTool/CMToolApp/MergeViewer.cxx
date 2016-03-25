@@ -2,7 +2,7 @@
 #define RECOTOOL_MERGEVIEWER_CXX
 
 #include "MergeViewer.h"
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/GeometryHelper.h"
 
 namespace larlite {
   
@@ -38,11 +38,11 @@ namespace larlite {
     _algo.Reset();
     
     const ::larutil::Geometry* geo = ::larutil::Geometry::GetME();
-    const ::larutil::GeometryUtilities* geo_util = ::larutil::GeometryUtilities::GetME();
+    const ::larutil::GeometryHelper* geo_help = ::larutil::GeometryHelper::GetME();
     
     UChar_t nplanes = geo->Nplanes();
-    double  wire2cm = geo_util->WireToCm();
-    double  time2cm = geo_util->TimeToCm();
+    double  wire2cm = geo_help->WireToCm();
+    double  time2cm = geo_help->TimeToCm();
     
     //
     // Obtain event-wise data object pointers

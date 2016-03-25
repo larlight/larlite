@@ -2,7 +2,7 @@
  * \file DrawLariatDaq.h
  *
  * \ingroup EventViewer
- * 
+ *
  * \brief Class def header for a class DrawLariatDaq
  *
  * @author cadams
@@ -21,13 +21,25 @@
 #include "RawBase.h"
 
 namespace evd {
-  /**
-     \class DrawLariatDaq
-     User custom analysis class made by SHELL_USER_NAME
-   */
-  class DrawLariatDaq : public RawBase {
-  
-  public:
+
+class boardSet
+{
+public:
+    // boardSet(){}
+    // ~boardSet(){}
+
+    std::vector<size_t> ttree_entries;
+    std::vector<int> board_ids;
+    int event_co;
+};
+
+/**
+   \class DrawLariatDaq
+   User custom analysis class made by SHELL_USER_NAME
+ */
+class DrawLariatDaq : public RawBase {
+
+public:
 
     /// Default constructor
     DrawLariatDaq(int ticks = -1);
@@ -38,7 +50,7 @@ namespace evd {
     // functions that would be necessary to do this on a larlite file
     /** IMPLEMENT in DrawLariatDaq.cc!
         Initialization method to be called before the analysis event loop.
-    */ 
+    */
     void initialize();
 
 
@@ -51,16 +63,18 @@ namespace evd {
     void goToEvent(int e);
 
 
-    unsigned int run(){return _run;}
-    unsigned int event_no(){return _event_no;}
-    unsigned int spill(){return _spill;}
-    int current_event() const{return _current_event;}
-    int n_events() const{return _n_events;}
+    unsigned int run() {return _run;}
+    unsigned int event_no() {return _event_no;}
+    unsigned int spill() {return _spill;}
+    int current_event() const {return _current_event;}
+    int n_events() const {return _n_events;}
 
-  protected:
+protected:
 
 
     std::vector< TBranch *> branches;
+
+    std::map< unsigned int, ::evd::boardSet > _event_set;
 
 
     std::string producer;
@@ -72,12 +86,12 @@ namespace evd {
     unsigned int _current_event;
     // this is the official event:
     unsigned int _event_no;
-    unsigned int _run;
-    unsigned int _spill;
+    int _run;
+    int _spill;
     unsigned int _board_id;
 
     const int _n_cards = 8;
-    const int _card_offset = 1;
+    const int _card_offset = 0;
     const int _n_channels = 64;
 
     std::vector<unsigned int> board_start_index;
@@ -87,17 +101,19 @@ namespace evd {
     // Need some private worker functions to handle file i/o
     void readData();
 
+    void prepareFile();
+
     int getLarsoftChannel(int & asic, int & channelOnAsic);
-  };
+};
 }
 #endif
 
 //**************************************************************************
-// 
+//
 // For Analysis framework documentation, read Manual.pdf here:
 //
 // http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
 //
 //**************************************************************************
 
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group

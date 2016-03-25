@@ -297,6 +297,7 @@ class larlite_manager(larlite_manager_base):
                 return
             self._drawWires = True
             self._wireDrawer = datatypes.recoWire()
+            self._wireDrawer.setProducer(self._keyTable['wire'][0])
             self._process.add_process(self._wireDrawer._process)
             self.processEvent(True)
 
@@ -305,8 +306,10 @@ class larlite_manager(larlite_manager_base):
                 print "No raw digit data available to draw"
                 self._drawWires = False
                 return
+            print self._keyTable['rawdigit']
             self._drawWires = True
             self._wireDrawer = datatypes.rawDigit(self._geom)
+            self._wireDrawer.setProducer(self._keyTable['rawdigit'][0])
             self._process.add_process(self._wireDrawer._process)
             self.processEvent(True)
         else:

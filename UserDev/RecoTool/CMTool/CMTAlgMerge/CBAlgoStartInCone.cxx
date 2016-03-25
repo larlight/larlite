@@ -2,6 +2,7 @@
 #define RECOTOOL_CBALGOSTARTINCONE_CXX
 
 #include "CBAlgoStartInCone.h"
+#include "LArUtil/GeometryHelper.h"
 
 namespace cmtool {
 
@@ -10,8 +11,8 @@ namespace cmtool {
     // Nothing to be done in the base class
     this->reconfigure();
 
-    _wire_2_cm = larutil::GeometryUtilities::GetME()->WireToCm();
-    _time_2_cm = larutil::GeometryUtilities::GetME()->TimeToCm();
+    _wire_2_cm = larutil::GeometryHelper::GetME()->WireToCm();
+    _time_2_cm = larutil::GeometryHelper::GetME()->TimeToCm();
 
     SetMinHits(40);
     SetMinLen(10);

@@ -2,8 +2,6 @@
 #define GEOMETRYHELPER_CXX
 
 #include "GeometryHelper.h"
-#include "DetectorProperties.h"
-#include "LArProperties.h"
 
 namespace larutil {
 
@@ -13,18 +11,17 @@ GeometryHelper* GeometryHelper::_me = 0;
 // Function to load any parameters for convenience :
 void GeometryHelper::Reconfigure()
 {
-  // Need the geometry for wire pitch
-  auto geom = larutil::Geometry::GetME();
-  // Need detector properties and lar properties for time to cm conversion
-  auto detp = larutil::DetectorProperties::GetME();
-  auto larp = larutil::LArProperties::GetME();
 
-  // fNPlanes = geom->Nplanes();
-  // vertangle.resize(fNPlanes);
-  // for(UInt_t ip=0;ip<fNPlanes;ip++)
-  //   vertangle[ip]=geom->WireAngleToVertical(geom->PlaneToView(ip)) - TMath::Pi()/2; // wire angle
+  geom = (larutil::Geometry*)(larutil::Geometry::GetME());
+  detp = (larutil::DetectorProperties*)(larutil::DetectorProperties::GetME());
+  larp = (larutil::LArProperties*)(larutil::LArProperties::GetME());
 
+  fNPlanes = geom->Nplanes();
+  vertangle.resize(fNPlanes);
+  for(UInt_t ip=0;ip<fNPlanes;ip++)
+    vertangle[ip]=geom->WireAngleToVertical(geom->PlaneToView(ip)) - TMath::Pi()/2; // wire angle
 
+  
   fWireToCm = geom->WirePitch(0, 1, 0);
   fTimeToCm = detp->SamplingRate() / 1000.0 * larp->DriftVelocity(larp->Efield(), larp->Temperature());
 }
@@ -33,8 +30,6 @@ void GeometryHelper::Reconfigure()
 // The next set of functions is the collection of functions to convert 3D Point to 2D point
 // The first function is maintained, and the rest convert their arguments and call it
 Point2D GeometryHelper::Point_3Dto2D(const TVector3 & _3D_position, unsigned int plane) const {
-
-  auto geom = larutil::Geometry::GetME();
 
   // Make a check on the plane:
   if (plane > geom -> Nplanes()) {
@@ -146,7 +141,6 @@ void GeometryHelper::Line_3Dto2D( const TVector3 & startPoint3D, const TVector3 
 float GeometryHelper::Slope_3Dto2D(const TVector3 & inputVector, unsigned int plane) const {
   // Do this by projecting the line:
   // Generate a start point right in the middle of the detector:
-  auto geom = larutil::Geometry::GetME();
   TVector3 startPoint3D(0, 0, 0);
   startPoint3D.SetZ(0.5 * geom -> DetLength());
   larutil::Point2D p1, slope;
@@ -360,237 +354,303 @@ double GeometryHelper::GetPitch(const TVector3& direction, const int& pl) const
   return pitch;
 }
 
-double GeometryHelper::GetCosAngleBetweenLines(const double& s1, const double& s2) const
-{
 
-  double den = sqrt(1 + s1 * s1) + sqrt(1 + s2 * s2);
-  return (s1 * s2 + 1) / den;
-}
+  double GeometryHelper::CalculatePitch(UInt_t pl, double phi, double theta) const
+  {
 
-double GeometryHelper::GetCosAngleBetweenLines(const Point2D& p1, const Point2D& p2, const Point2D& p3) const
-{
+    double pitch = -1.;
+    
+    if(geom->PlaneToView(pl) == larlite::geo::kUnknown || 
+       geom->PlaneToView(pl) == larlite::geo::k3D){
+      print(larlite::msg::kERROR,__FUNCTION__,Form("Warning :  no Pitch foreseen for view %d", geom->PlaneToView(pl)));
+      return pitch;
+    }
+    else if ( pl >= geom->Nplanes() ) {
+      print(larlite::msg::kERROR,__FUNCTION__,"Plane number larger than max. number of planes");
+      return pitch;
+    }
+    else{
+      
+      double pi=TMath::Pi();
+      double fTheta=pi/2-theta;
+      double fPhi=-(phi+pi/2);
+      double wirePitch = geom->WirePitch(0,1,pl);
+      double angleToVert =0.5*TMath::Pi() - geom->WireAngleToVertical(geom->PlaneToView(pl));
+      double cosgamma = TMath::Abs(TMath::Sin(angleToVert)*TMath::Cos(fTheta)
+				   +TMath::Cos(angleToVert)*TMath::Sin(fTheta)*TMath::Sin(fPhi));
+      
+      if (cosgamma>0) pitch = wirePitch/cosgamma;     
+    } // end if a reasonable view
+    
+    return pitch;
+  }
 
-  if ( ( (p1.w == p2.w) and (p1.t == p2.t) ) or
-       ( (p1.w == p3.w) and (p1.t == p3.t) ) )
-    throw LArUtilException("Trying to calculate dot-product using a zero-length vector!");
+  double GeometryHelper::PitchInView(UInt_t plane, double phi, double theta) const
+  {
+    
+    Double_t dirs[3] = {0.};
+    GetDirectionCosines(phi,theta,dirs); 
+    
+    /// \todo switch to using new Geometry::WireAngleToVertical(geo::View_t) 
+    /// \todo and Geometry::WirePitch(geo::View_t) methods
+    Double_t wirePitch   = 0.;
+    Double_t angleToVert = 0.;
+    
+    wirePitch = geom->WirePitch(0,1,plane);
+    angleToVert = geom->WireAngleToVertical(geom->PlaneToView(plane)) - 0.5*TMath::Pi();
+    
+    //(sin(angleToVert),std::cos(angleToVert)) is the direction perpendicular to wire
+    //fDir.front() is the direction of the track at the beginning of its trajectory
+    Double_t cosgamma = TMath::Abs(TMath::Sin(angleToVert)*dirs[1] + 
+				   TMath::Cos(angleToVert)*dirs[2]);
+    
+    if(cosgamma < 1.e-5) 
+      throw LArUtilException("cosgamma is basically 0, that can't be right");
+    
+    return wirePitch/cosgamma;
+  }
 
-  double den = sqrt( ( (p2.w - p1.w) * (p2.w - p1.w) + (p2.t - p1.t) * (p2.t - p1.t) ) *
-                     ( (p3.w - p1.w) * (p3.w - p1.w) + (p3.t - p1.t) * (p3.t - p1.t) ) );
+  void GeometryHelper::GetDirectionCosines(double phi, double theta, Double_t *dirs) const
 
-  return ( (p2.w - p1.w) * (p3.w - p1.w) + (p2.t - p1.t) * (p3.t - p1.t) ) / den;
-}
+  {
+    theta*=(TMath::Pi()/180);
+    phi*=(TMath::Pi()/180); // working on copies, it's ok.
+    dirs[0]=TMath::Cos(theta)*TMath::Sin(phi);
+    dirs[1]=TMath::Sin(theta);
+    dirs[2]=TMath::Cos(theta)*TMath::Cos(phi);
 
-
-double GeometryHelper::GetCosAngleBetweenLines(const Point2D& p1, const Point2D& p2,
-    const Point2D& p3, const Point2D& p4) const
-{
-
-  if ( ( (p1.w == p2.w) and (p1.t == p2.t) ) or
-       ( (p4.w == p3.w) and (p4.t == p3.t) ) )
-    throw LArUtilException("Trying to calculate dot-product using a zero-length vector!");
-
-  double den = sqrt( ( (p2.w - p1.w) * (p2.w - p1.w) + (p2.t - p1.t) * (p2.t - p1.t) ) *
-                     ( (p4.w - p3.w) * (p4.w - p3.w) + (p4.t - p3.t) * (p4.t - p3.t) ) );
-
-  return ( (p2.w - p1.w) * (p4.w - p3.w) + (p2.t - p1.t) * (p4.t - p3.t) ) / den;
-}
-
-double GeometryHelper::GetTanAngleBetweenLines(const double& s1, const double& s2) const
-{
-
-  // see this: http://planetmath.org/anglebetweentwolines
-
-  // if the slopes are the same -> the angle is 0
-  // if slope1 * slope2 == -1 -> perpendicular lines -> 90 degrees
-  if (s1 * s2 == -1)
-    return kDOUBLE_MAX;
-
-  return (s1 - s2) / (1 + s1 * s2);
-}
-
-
-void GeometryHelper::SelectPolygonHitList(const std::vector<Hit2D> &inputHits,
-    std::vector <const Hit2D*> &edgeHits,
-    double frac) const
-{
-
-  // if hit list is empty get out of here!
-  if (!(inputHits.size())) {
-    throw LArUtilException("Provided empty hit list!");
     return;
   }
-
-  // Utilities
-  auto geom = larutil::Geometry::GetME();
-  auto detp = DetectorProperties::GetME();
-
-  // if the fraction is > 1 then use 1...should not be larger
-  // frac is the fraction of charge in the hit list
-  // than needs to be included in the Polygon
-  if (frac > 1) { frac = 1; }
-
-  // clear list of hits that define the edges of the polygon
-  edgeHits.clear();
-
-  // determine the plane for this cluster (assumes all hits from the same cluster)
-  unsigned char plane = (inputHits[0]).plane;
-
-  // Define subset of hits to define polygon
-  std::map<double, const Hit2D*> hitmap;
-
-  // define a parameter that stores the total charge in the cluster
-  double qtotal = 0;
-  for (auto const &h : inputHits) {
-    hitmap.insert(std::pair<double, const Hit2D*>(h.charge, &h));
-    qtotal += h.charge;
+  
+  double GeometryHelper::GetCosAngleBetweenLines(const double& s1, const double& s2) const
+  {
+    
+    double den = sqrt(1 + s1 * s1) + sqrt(1 + s2 * s2);
+    return (s1 * s2 + 1) / den;
   }
-  // define a parameter to store the charge that will be within the polygon
-  double qintegral = 0;
-  std::vector<const Hit2D*> ordered_hits;
-  ordered_hits.reserve(inputHits.size());
-  for (auto hiter = hitmap.rbegin(); qintegral <= qtotal * frac && hiter != hitmap.rend(); ++hiter) {
-    qintegral += (*hiter).first;
-    ordered_hits.push_back((*hiter).second);
+  
+  double GeometryHelper::GetCosAngleBetweenLines(const Point2D& p1, const Point2D& p2, const Point2D& p3) const
+  {
+    
+    if ( ( (p1.w == p2.w) and (p1.t == p2.t) ) or
+	 ( (p1.w == p3.w) and (p1.t == p3.t) ) )
+      throw LArUtilException("Trying to calculate dot-product using a zero-length vector!");
+    
+    double den = sqrt( ( (p2.w - p1.w) * (p2.w - p1.w) + (p2.t - p1.t) * (p2.t - p1.t) ) *
+		       ( (p3.w - p1.w) * (p3.w - p1.w) + (p3.t - p1.t) * (p3.t - p1.t) ) );
+    
+    return ( (p2.w - p1.w) * (p3.w - p1.w) + (p2.t - p1.t) * (p3.t - p1.t) ) / den;
   }
-
-  // Define container to hold found polygon corner PxHit index & distance
-  std::vector<size_t> hit_index(8, 0);
-  std::vector<double> hit_distance(8, 1e9);
-
-  // Loop over hits and find corner points in the plane view
-  // Also fill corner edge points
-  std::vector<larutil::Point2D> edges(4, Point2D(plane, 0, 0));
-  double wire_max = geom->Nwires(plane) * fWireToCm;
-  double time_max = (detp->NumberTimeSamples() - detp -> TriggerOffset()) * fTimeToCm;
-
-  for (size_t index = 0; index < ordered_hits.size(); ++index) {
-
-    if (ordered_hits.at(index)->t < -detp -> TriggerOffset() ||
-        ordered_hits.at(index)->w < 0 ||
-        ordered_hits.at(index)->t > time_max ||
-        ordered_hits.at(index)->w > wire_max ) {
-
-      throw LArUtilException(Form("Invalid wire/time (%g,%g) for plane %i ... range is (0=>%g,0=>%g)",
-                                  ordered_hits.at(index)->w,
-                                  ordered_hits.at(index)->t,
-                                  plane,
-                                  wire_max,
-                                  time_max)
-                            );
+  
+  
+  double GeometryHelper::GetCosAngleBetweenLines(const Point2D& p1, const Point2D& p2,
+						 const Point2D& p3, const Point2D& p4) const
+  {
+    
+    if ( ( (p1.w == p2.w) and (p1.t == p2.t) ) or
+	 ( (p4.w == p3.w) and (p4.t == p3.t) ) )
+      throw LArUtilException("Trying to calculate dot-product using a zero-length vector!");
+    
+    double den = sqrt( ( (p2.w - p1.w) * (p2.w - p1.w) + (p2.t - p1.t) * (p2.t - p1.t) ) *
+		       ( (p4.w - p3.w) * (p4.w - p3.w) + (p4.t - p3.t) * (p4.t - p3.t) ) );
+    
+    return ( (p2.w - p1.w) * (p4.w - p3.w) + (p2.t - p1.t) * (p4.t - p3.t) ) / den;
+  }
+  
+  double GeometryHelper::GetTanAngleBetweenLines(const double& s1, const double& s2) const
+  {
+    
+    // see this: http://planetmath.org/anglebetweentwolines
+    
+    // if the slopes are the same -> the angle is 0
+    // if slope1 * slope2 == -1 -> perpendicular lines -> 90 degrees
+    if (s1 * s2 == -1)
+      return kDOUBLE_MAX;
+    
+    return (s1 - s2) / (1 + s1 * s2);
+  }
+  
+  
+  void GeometryHelper::SelectPolygonHitList(const std::vector<Hit2D> &inputHits,
+					    std::vector <const Hit2D*> &edgeHits,
+					    double frac) const
+  {
+    
+    // if hit list is empty get out of here!
+    if (!(inputHits.size())) {
+      throw LArUtilException("Provided empty hit list!");
       return;
     }
-
-    double dist = 0;
-
-    // First thing to do:
-    // Find the hits that have the largest/smallest wire number and time
-    // these will define the first (up to) 4 boundaries of our polygon
-
-    // Comparison w/ (Wire,0)
-    dist = ordered_hits.at(index)->t;
-    if (dist < hit_distance.at(1)) {
-      hit_distance.at(1) = dist;
-      hit_index.at(1) = index;
-      edges.at(0).t = ordered_hits.at(index)->t;
-      edges.at(1).t = ordered_hits.at(index)->t;
+    
+    // if the fraction is > 1 then use 1...should not be larger
+    // frac is the fraction of charge in the hit list
+    // than needs to be included in the Polygon
+    if (frac > 1) { frac = 1; }
+    
+    // clear list of hits that define the edges of the polygon
+    edgeHits.clear();
+    
+    // determine the plane for this cluster (assumes all hits from the same cluster)
+    unsigned char plane = (inputHits[0]).plane;
+    
+    // Define subset of hits to define polygon
+    std::map<double, const Hit2D*> hitmap;
+    
+    // define a parameter that stores the total charge in the cluster
+    double qtotal = 0;
+    for (auto const &h : inputHits) {
+      hitmap.insert(std::pair<double, const Hit2D*>(h.charge, &h));
+      qtotal += h.charge;
     }
-
-    // Comparison w/ (WireMax,Time)
-    dist = wire_max - ordered_hits.at(index)->w;
-    if (dist < hit_distance.at(3)) {
-      hit_distance.at(3) = dist;
-      hit_index.at(3) = index;
-      edges.at(1).w = ordered_hits.at(index)->w;
-      edges.at(2).w = ordered_hits.at(index)->w;
+    // define a parameter to store the charge that will be within the polygon
+    double qintegral = 0;
+    std::vector<const Hit2D*> ordered_hits;
+    ordered_hits.reserve(inputHits.size());
+    for (auto hiter = hitmap.rbegin(); qintegral <= qtotal * frac && hiter != hitmap.rend(); ++hiter) {
+      qintegral += (*hiter).first;
+      ordered_hits.push_back((*hiter).second);
     }
+    
+    // Define container to hold found polygon corner PxHit index & distance
+    std::vector<size_t> hit_index(8, 0);
+    std::vector<double> hit_distance(8, 1e9);
+    
+    // Loop over hits and find corner points in the plane view
+    // Also fill corner edge points
+    std::vector<larutil::Point2D> edges(4, Point2D(plane, 0, 0));
+    double wire_max = geom->Nwires(plane) * fWireToCm;
+    double time_max = (detp->NumberTimeSamples()) * fTimeToCm;
+    
+    for (size_t index = 0; index < ordered_hits.size(); ++index) {
 
-    // Comparison w/ (Wire,TimeMax)
-    dist = time_max - ordered_hits.at(index)->t;
-    if (dist < hit_distance.at(5)) {
-      hit_distance.at(5) = dist;
-      hit_index.at(5) = index;
-      edges.at(2).t = ordered_hits.at(index)->t;
-      edges.at(3).t = ordered_hits.at(index)->t;
+      /* Deprecated: do not throw exceptions if out of TPC bounds...
+      if (ordered_hits.at(index)->t < -detp -> TriggerOffset() ||
+	  ordered_hits.at(index)->w < 0 ||
+	  ordered_hits.at(index)->t > time_max ||
+	  ordered_hits.at(index)->w > wire_max ) {
+	
+	throw LArUtilException(Form("Invalid wire/time (%g,%g) for plane %i ... range is (0=>%g,0=>%g)",
+				    ordered_hits.at(index)->w,
+				    ordered_hits.at(index)->t,
+				    plane,
+				    wire_max,
+				    time_max)
+			       );
+	return;
+      }
+      */
+      
+      double dist = 0;
+      
+      // First thing to do:
+      // Find the hits that have the largest/smallest wire number and time
+      // these will define the first (up to) 4 boundaries of our polygon
+      
+      // Comparison w/ (Wire,0)
+      dist = ordered_hits.at(index)->t;
+      if (dist < hit_distance.at(1)) {
+	hit_distance.at(1) = dist;
+	hit_index.at(1) = index;
+	edges.at(0).t = ordered_hits.at(index)->t;
+	edges.at(1).t = ordered_hits.at(index)->t;
+      }
+      
+      // Comparison w/ (WireMax,Time)
+      dist = wire_max - ordered_hits.at(index)->w;
+      if (dist < hit_distance.at(3)) {
+	hit_distance.at(3) = dist;
+	hit_index.at(3) = index;
+	edges.at(1).w = ordered_hits.at(index)->w;
+	edges.at(2).w = ordered_hits.at(index)->w;
+      }
+      
+      // Comparison w/ (Wire,TimeMax)
+      dist = time_max - ordered_hits.at(index)->t;
+      if (dist < hit_distance.at(5)) {
+	hit_distance.at(5) = dist;
+	hit_index.at(5) = index;
+	edges.at(2).t = ordered_hits.at(index)->t;
+	edges.at(3).t = ordered_hits.at(index)->t;
+      }
+      
+      // Comparison w/ (0,Time)
+      dist = ordered_hits.at(index)->w;
+      if (dist < hit_distance.at(7)) {
+	hit_distance.at(7) = dist;
+	hit_index.at(7) = index;
+	edges.at(0).w = ordered_hits.at(index)->w;
+	edges.at(3).w = ordered_hits.at(index)->w;
+      }
     }
-
-    // Comparison w/ (0,Time)
-    dist = ordered_hits.at(index)->w;
-    if (dist < hit_distance.at(7)) {
-      hit_distance.at(7) = dist;
-      hit_index.at(7) = index;
-      edges.at(0).w = ordered_hits.at(index)->w;
-      edges.at(3).w = ordered_hits.at(index)->w;
+    
+    // next find the hits that are closest to the 3 corners of the rectangle
+    for (size_t index = 0; index < ordered_hits.size(); ++index) {
+      
+      double dist = 0;
+      // Comparison w/ (0,0)
+      dist = pow((ordered_hits.at(index)->t - edges.at(0).t), 2) + pow((ordered_hits.at(index)->w - edges.at(0).w), 2);
+      if (dist < hit_distance.at(0)) {
+	hit_distance.at(0) = dist;
+	hit_index.at(0) = index;
+      }
+      
+      // Comparison w/ (WireMax,0)
+      dist = pow((ordered_hits.at(index)->t - edges.at(1).t), 2) + pow((ordered_hits.at(index)->w - edges.at(1).w), 2);
+      if (dist < hit_distance.at(2)) {
+	hit_distance.at(2) = dist;
+	hit_index.at(2) = index;
+      }
+      
+      // Comparison w/ (WireMax,TimeMax)
+      dist = pow((ordered_hits.at(index)->t - edges.at(2).t), 2) + pow((ordered_hits.at(index)->w - edges.at(2).w), 2);
+      if (dist < hit_distance.at(4)) {
+	hit_distance.at(4) = dist;
+	hit_index.at(4) = index;
+      }
+      
+      // Comparison w/ (0,TimeMax)
+      dist = pow((ordered_hits.at(index)->t - edges.at(3).t), 2) + pow((ordered_hits.at(index)->w - edges.at(3).w), 2);
+      if (dist < hit_distance.at(6)) {
+	hit_distance.at(6) = dist;
+	hit_index.at(6) = index;
+      }
+      
     }
-  }
-
-  // next find the hits that are closest to the 3 corners of the rectangle
-  for (size_t index = 0; index < ordered_hits.size(); ++index) {
-
-    double dist = 0;
-    // Comparison w/ (0,0)
-    dist = pow((ordered_hits.at(index)->t - edges.at(0).t), 2) + pow((ordered_hits.at(index)->w - edges.at(0).w), 2);
-    if (dist < hit_distance.at(0)) {
-      hit_distance.at(0) = dist;
-      hit_index.at(0) = index;
+    // Loop over the resulting hit indexes and append unique hits to define the polygon to the return hit list
+    std::set<size_t> unique_index;
+    std::vector<size_t> candidate_polygon;
+    candidate_polygon.reserve(9);
+    //    std::cout << "Original polygon: " << std::endl;
+    for (auto &index : hit_index) {
+      
+      if (unique_index.find(index) == unique_index.end()) {
+	//        hitlistlocal.push_back((const Hit2D*)(ordered_hits.at(index)));
+	//std::cout << "(" << ordered_hits.at(index)->w << ", " << ordered_hits.at(index)->t << ")" << std::endl;
+	unique_index.insert(index);
+	candidate_polygon.push_back(index);
+      }
     }
-
-    // Comparison w/ (WireMax,0)
-    dist = pow((ordered_hits.at(index)->t - edges.at(1).t), 2) + pow((ordered_hits.at(index)->w - edges.at(1).w), 2);
-    if (dist < hit_distance.at(2)) {
-      hit_distance.at(2) = dist;
-      hit_index.at(2) = index;
-    }
-
-    // Comparison w/ (WireMax,TimeMax)
-    dist = pow((ordered_hits.at(index)->t - edges.at(2).t), 2) + pow((ordered_hits.at(index)->w - edges.at(2).w), 2);
-    if (dist < hit_distance.at(4)) {
-      hit_distance.at(4) = dist;
-      hit_index.at(4) = index;
-    }
-
-    // Comparison w/ (0,TimeMax)
-    dist = pow((ordered_hits.at(index)->t - edges.at(3).t), 2) + pow((ordered_hits.at(index)->w - edges.at(3).w), 2);
-    if (dist < hit_distance.at(6)) {
-      hit_distance.at(6) = dist;
-      hit_index.at(6) = index;
-    }
-
-  }
-  // Loop over the resulting hit indexes and append unique hits to define the polygon to the return hit list
-  std::set<size_t> unique_index;
-  std::vector<size_t> candidate_polygon;
-  candidate_polygon.reserve(9);
-  //    std::cout << "Original polygon: " << std::endl;
-  for (auto &index : hit_index) {
-
-    if (unique_index.find(index) == unique_index.end()) {
-      //        hitlistlocal.push_back((const Hit2D*)(ordered_hits.at(index)));
-      //std::cout << "(" << ordered_hits.at(index)->w << ", " << ordered_hits.at(index)->t << ")" << std::endl;
-      unique_index.insert(index);
+    for (auto &index : hit_index) {
       candidate_polygon.push_back(index);
+      break;
     }
+    
+    // we should only have a maximum of 8 edges for the polygon!
+    if (unique_index.size() > 8) throw LArUtilException("Size of the polygon > 8!");
+    
+    //Untangle Polygon
+    candidate_polygon = OrderPolygonEdges( ordered_hits, candidate_polygon);
+    
+    edgeHits.clear();
+    for ( unsigned int i = 0; i < (candidate_polygon.size() - 1); i++) {
+      edgeHits.push_back((const Hit2D*)(ordered_hits.at(candidate_polygon.at(i))));
+    }
+    
+    //check that polygon does not have more than 8 sides
+    if (unique_index.size() > 8) throw LArUtilException("Size of the polygon > 8!");
+    
+    return;
   }
-  for (auto &index : hit_index) {
-    candidate_polygon.push_back(index);
-    break;
-  }
-
-  // we should only have a maximum of 8 edges for the polygon!
-  if (unique_index.size() > 8) throw LArUtilException("Size of the polygon > 8!");
-
-  //Untangle Polygon
-  candidate_polygon = OrderPolygonEdges( ordered_hits, candidate_polygon);
-
-  edgeHits.clear();
-  for ( unsigned int i = 0; i < (candidate_polygon.size() - 1); i++) {
-    edgeHits.push_back((const Hit2D*)(ordered_hits.at(candidate_polygon.at(i))));
-  }
-
-  //check that polygon does not have more than 8 sides
-  if (unique_index.size() > 8) throw LArUtilException("Size of the polygon > 8!");
-
-  return;
-}
 
 
 std::vector<size_t>  GeometryHelper::OrderPolygonEdges( std::vector<const Hit2D*> ordered_hits ,
@@ -666,13 +726,10 @@ double GeometryHelper::PerpendicularDistance(const Point2D& pt,
 }
 
 bool GeometryHelper::Point_isInTPC(const TVector3 & pointIn3D) const {
-  // Use the geometry class to determine if this point is in the TPC
-  auto geom = larutil::Geometry::GetME();
-  auto geoHelper = larutil::GeometryHelper::GetME();
-  auto detProp = larutil::DetectorProperties::GetME();
+
   // Check against the 3 coordinates:
-  if (pointIn3D.X() > geom -> DetHalfWidth() + detProp -> TriggerOffset() * geoHelper -> TimeToCm()
-      || pointIn3D.X() < - geom -> DetHalfWidth() - detProp -> TriggerOffset() * geoHelper -> TimeToCm())
+  if (pointIn3D.X() > geom -> DetHalfWidth() + detp -> TriggerOffset() * TimeToCm()
+      || pointIn3D.X() < - geom -> DetHalfWidth() - detp -> TriggerOffset() * TimeToCm())
   {
     return false;
   }
@@ -752,12 +809,10 @@ int GeometryHelper::Get3DAxisN(const int& iplane0, const int& iplane1,
                                const double& omega0, const double& omega1,
                                double& phi, double& theta) const {
 
-  auto geom = larutil::Geometry::GetME();
-
   // prepare vertical angle information for the various planes
   std::vector<double> vertangle;
-  vertangle.resize(3);
-  for (UInt_t ip = 0; ip < 3; ip++)
+  vertangle.resize(geom->Nplanes());
+  for (UInt_t ip = 0; ip < geom->Nplanes(); ip++)
     vertangle[ip] = geom->WireAngleToVertical(geom->PlaneToView(ip)) - TMath::Pi() / 2; // wire angle
 
   // y, z, x coordinates
@@ -884,6 +939,76 @@ int GeometryHelper::Get3DAxisN(const int& iplane0, const int& iplane1,
   return 0;
 }
 
+
+  int GeometryHelper::GetXYZ(const Point2D *p0, const Point2D *p1, Double_t* xyz) const
+  {
+
+    Double_t pos[3]={0.};
+    geom->PlaneOriginVtx(p0->plane, pos);
+    Double_t x=(p0->t) - detp->TriggerOffset()*fTimeToCm+pos[0];
+    double yz[2];
+    
+    GetYZ(p0,p1,yz);
+    
+    
+    xyz[0]=x;
+    xyz[1]=yz[0];
+    xyz[2]=yz[1];
+  
+    return 0;
+  }
+
+
+  int GeometryHelper::GetYZ(const Point2D *p0, const Point2D *p1, Double_t* yz) const
+  {
+    
+    Double_t y,z;
+  
+    // Force to the closest wires if not in the range
+    int z0 = p0->w / fWireToCm;
+    int z1 = p1-> w/ fWireToCm;
+    if(z0 < 0) {
+      std::cout << "\033[93mWarning\033[00m \033[95m<<GeometryHelper::GetYZ>>\033[00m" << std::endl
+		<< " 2D wire position " << p0->w << " [cm] corresponds to negative wire number." << std::endl
+		<< " Forcing it to wire=0..." << std::endl
+		<< "\033[93mWarning ends...\033[00m"<<std::endl;
+      z0 = 0;
+    }
+    else if(z0 >= (int)(geom->Nwires(p0->plane))){
+      std::cout << "\033[93mWarning\033[00m \033[95m<<GeometryHelper::GetYZ>>\033[00m" << std::endl
+		<< " 2D wire position " << p0->w << " [cm] exceeds max wire number " << (geom->Nwires(p0->plane)-1) <<std::endl
+		<< " Forcing it to the max wire number..." << std::endl
+		<< "\033[93mWarning ends...\033[00m"<<std::endl;
+      z0 = geom->Nwires(p0->plane) - 1;
+    }
+    if(z1 < 0) {
+      std::cout << "\033[93mWarning\033[00m \033[95m<<GeometryHelper::GetYZ>>\033[00m" << std::endl
+		<< " 2D wire position " << p1->w << " [cm] corresponds to negative wire number." << std::endl
+		<< " Forcing it to wire=0..." << std::endl
+		<< "\033[93mWarning ends...\033[00m"<<std::endl;
+      z1 = 0;
+    }
+    if(z1 >= (int)(geom->Nwires(p1->plane))){
+      std::cout << "\033[93mWarning\033[00m \033[95m<<GeometryHelper::GetYZ>>\033[00m" << std::endl
+		<< " 2D wire position " << p1->w << " [cm] exceeds max wire number " << (geom->Nwires(p0->plane)-1) <<std::endl
+		<< " Forcing it to the max wire number..." << std::endl
+		<< "\033[93mWarning ends...\033[00m"<<std::endl;
+      z1 = geom->Nwires(p1->plane) - 1;
+    }
+
+    UInt_t chan1 = geom->PlaneWireToChannel(p0->plane, z0);
+    UInt_t chan2 = geom->PlaneWireToChannel(p1->plane, z1);
+
+    if(! geom->ChannelsIntersect(chan1,chan2,y,z) )
+      return -1;
+  
+    
+    yz[0]=y;
+    yz[1]=z;
+  
+    return 0;
+  }
+  
 
 } // larutil
 

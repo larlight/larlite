@@ -41,6 +41,7 @@
 #include "mucsdata.h"
 #include "mucsreco.h"
 #include "PiZeroROI.h"
+#include "auxsimch.h"
 
 namespace larlite {
 
@@ -1071,6 +1072,9 @@ namespace larlite {
       break;
     case data::kSimChannel:
       _ptr_data_array[type][name]=new event_simch(name);
+      break;
+    case data::kAuxDetSimChannel:
+      _ptr_data_array[type][name]=new event_auxsimch(name);
       break;
     case data::kMCShower:
       _ptr_data_array[type][name]=new event_mcshower(name);

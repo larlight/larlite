@@ -32,14 +32,15 @@ namespace ertool {
 
     Double_t const tstart_prox;
     Double_t const tmax_rad;
-    Double_t const tlone_track_length;
     Bool_t const twithTrackDir;
     std::string const tprimary_vertex_selection;    
     Bool_t const tshowerproj;
     Double_t const tshower_prox;
     Double_t const tcpoa_vert_prox;
     Double_t const tcpoa_trackend_prox;
-    Bool_t const tverbose;
+    Bool_t tverbose;
+
+    Int_t tevent;
 
     TTree * tree;
 
@@ -69,10 +70,9 @@ namespace ertool {
     ERAlgoVertexBuilder
       (Double_t const start_prox,
        Double_t const max_rad,
-       Double_t const lone_track_length,
        Bool_t const withTrackDir,
-       std::string const primary_vertex_selection,
-       Bool_t const showerproj,
+       std::string const primary_vertex_selection = "mostupstream",
+       Bool_t const showerproj = false,
        Double_t const shower_prox = 0,
        Double_t const cpoa_vert_prox = 0,
        Double_t const cpoa_trackend_prox = 0,
@@ -80,6 +80,10 @@ namespace ertool {
        
     /// Default destructor
     virtual ~ERAlgoVertexBuilder(){};
+
+    void SpecifyEvent(Int_t const event) {
+      tevent = event;
+    }
 
     /// Reset function
     void Reset();
@@ -140,29 +144,30 @@ namespace ertool {
        ParticleAssociations const & pas, 
        std::vector<Int_t> const & skip,
        Int_t & index);
-
-    geoalgo::Point_t const * GetTrackDirectionPrimary
-      (EventData const & data,
-       ParticleGraph const & graph,
-       ParticleAssociations const & pas, 
-       std::vector<Int_t> const & skip,
-       Int_t & index);
     
     void AddAllLoneTracks
       (const EventData &data,
        ParticleGraph & graph,
-       ParticleAssociations const & pas);
+       NodeID_t const n = kINVALID_NODE_ID);
 
     void AddUpstreamLoneTrack
       (const EventData &data,
+       ParticleGraph & graph);
+
+    void AddAllLoneShowers
+      (const EventData &data,
        ParticleGraph & graph,
-       ParticleAssociations const & pas); 
+       NodeID_t const n = kINVALID_NODE_ID);
+
+    void AddTracksAndShowers
+      (const EventData &data,
+       ParticleGraph & graph);
 
     void ShowerProjection
       (const EventData &data,
        ParticleGraph & graph,
        ParticleAssociations & pas);
-    
+
     void EndReconstructPa(const EventData &data,
 			  ParticleGraph & graph,
 			  ParticleAssociations & pa);

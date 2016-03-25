@@ -82,7 +82,7 @@ namespace phot{
     fLibraryBuildJob(false),
     fDoNotLoadLibrary(false),
     fParameterization(false),
-    fLibraryFile("uboone_photon_library_v4.root"),
+    fLibraryFile("uboone_photon_library_v5.root"),
     fTheLibrary(nullptr)
   {
     fVoxelDef = sim::PhotonVoxelDef(fXmin, fXmax, fNx, fYmin, fYmax, fNy, fZmin, fZmax, fNz);
