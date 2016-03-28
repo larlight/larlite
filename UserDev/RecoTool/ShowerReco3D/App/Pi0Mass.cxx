@@ -74,7 +74,7 @@ bool Pi0Mass::analyze(storage_manager* storage) {
                             ev_mcs->at(0).Start().Pz() / ev_mcs->at(0).Start().E() );
   }
 
-  fEventTreeParams.PerfectRecoCosTheta = PerfectRecoDir1 * PerfectRecoDir2;
+  fEventTreeParams.PerfectRecoCosTheta = cos( PerfectRecoDir1.Angle( PerfectRecoDir2 ) );
   fEventTreeParams.PerfectRecoPi0Mass = sqrt( 2.*fEventTreeParams.PerfectRecoE1*fEventTreeParams.PerfectRecoE2* ( 1. - fEventTreeParams.PerfectRecoCosTheta ) );
   // fEventTreeParams.mcs_E = ev_mcs->at(0).DetProfile().E();
   // fEventTreeParams.mc_containment = ev_mcs->at(0).DetProfile().E() / ev_mcs->at(0).Start().E();
@@ -94,7 +94,7 @@ bool Pi0Mass::analyze(storage_manager* storage) {
     return false;
   }
 
-  if ( ev_shower->size() != 2 ) return false;
+  if ( ev_shower->size() < 2 ) return false;
 
   // // Get associated clusters
   event_cluster* ev_cluster = nullptr;
@@ -160,15 +160,17 @@ bool Pi0Mass::analyze(storage_manager* storage) {
   */
 
   if ( shower1.Energy_v().at(2) > 0.1 ) E1 = shower1.Energy_v().at(2);
-  else E1 = shower1.Energy_v().at(0);
+  else if ( shower1.Energy_v().at(0) > 0.1 ) E1 = shower1.Energy_v().at(0);
+  else E1 = shower1.Energy_v().at(1);
   if ( shower2.Energy_v().at(2) > 0.1 ) E2 = shower2.Energy_v().at(2);
-  else E2 = shower2.Energy_v().at(0);
+  else if ( shower2.Energy_v().at(0) > 0.1 ) E2 = shower2.Energy_v().at(0);
+  else E2 = shower2.Energy_v().at(1);
   if ( E1 == 0. || E2 == 0. ) return false;
+  if ( E1 > 100000. || E2 > 100000. ) return false;
 
-  if ( shower1.Direction().Mag() == 1. && shower2.Direction().Mag() == 1. )
-    CosTheta = shower1.Direction() * shower2.Direction();
-  else
-    CosTheta = ( shower1.Direction() * shower2.Direction() ) / ( shower1.Direction().Mag() * shower2.Direction().Mag() );
+  std::cout << "E1: " << E1 << ", E2: " << E2 << std::endl;
+
+  CosTheta = cos( shower1.Direction().Angle( shower2.Direction() ) );
 
 
   fEventTreeParams.RecoE1 = E1;
