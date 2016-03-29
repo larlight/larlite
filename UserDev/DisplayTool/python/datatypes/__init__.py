@@ -9,6 +9,7 @@ from endpoint2d import endpoint2d
 from vertex import vertex
 from mctruth import mctruth
 from drawableItems import drawableItems
+from spacepoint import spacepoint
 try:
     import pyqtgraph.opengl as gl
     from drawableItems import drawableItems3D

@@ -36,6 +36,7 @@ class drawableItems(object):
         self._drawableClasses.update({'Track': [track.track,"track"]})
         self._drawableClasses.update({'Endpoint 2D': [endpoint2d.endpoint2d,"endpoint2d"]})
         self._drawableClasses.update({'Vertex': [vertex.vertex,"vertex"]})
+        self._drawableClasses.update({'SPS': [spacepoint.spacepoint,"sps"]})
 
     def getListOfTitles(self):
         return self._drawableClasses.keys()
