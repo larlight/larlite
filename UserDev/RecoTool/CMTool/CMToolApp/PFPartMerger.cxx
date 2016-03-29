@@ -175,6 +175,10 @@ bool PFPartMerger::analyze(storage_manager* storage) {
   std::vector< std::vector< unsigned int > > pfpart_cluster_ass_v;
   std::vector< std::vector< unsigned int > > cluster_hit_ass_v;
 
+  pfpart_sps_ass_v.resize( pfpart_sets.size() );
+  pfpart_vertex_ass_v.resize( pfpart_sets.size() );
+  pfpart_cluster_ass_v.resize( pfpart_sets.size() );
+
   // Merging the PFParticles
   for ( size_t ipfparts = 0; ipfparts < pfpart_sets.size(); ++ipfparts ) {
     auto pfparts = pfpart_sets[ipfparts];
@@ -188,19 +192,19 @@ bool PFPartMerger::analyze(storage_manager* storage) {
       if ( ev_pfpart->at(pfparts[ipfp]).PdgCode() == 11 ) pdgCode = 11;
 
       // Fill the space points
-      if ( ipfp < ass_sps_v.size() && !ass_sps_v[ipfp].empty() ) {
-        for ( auto isps : ass_sps_v[ipfp] ) 
+      if ( pfparts[ipfp] < ass_sps_v.size() && !ass_sps_v[pfparts[ipfp]].empty() ) {
+        for ( auto isps : ass_sps_v[pfparts[ipfp]] ) 
           sps.push_back( isps );
       }
 
       // Fill the vertices
-      if ( ipfp < ass_vertex_v.size() && !ass_vertex_v[ipfp].empty() ) {
-        for ( auto iver : ass_vertex_v[ipfp] )
+      if ( pfparts[ipfp] < ass_vertex_v.size() && !ass_vertex_v[pfparts[ipfp]].empty() ) {
+        for ( auto iver : ass_vertex_v[pfparts[ipfp]] )
           vertex.push_back( iver );
       }
 
-      if ( ipfp < ass_cluster_v.size() && !ass_cluster_v[ipfp].empty() ) {
-        for ( auto iclu : ass_cluster_v[ipfp] ) {
+      if ( pfparts[ipfp] < ass_cluster_v.size() && !ass_cluster_v[pfparts[ipfp]].empty() ) {
+        for ( auto iclu : ass_cluster_v[pfparts[ipfp]] ) {
           if ( iclu < ass_hits_v.size() && !ass_hits_v[iclu].empty() ) {
             const auto ihits = ass_hits_v[iclu];
             larlite::geo::View_t iview = ev_cluster->at(iclu).View();
@@ -214,8 +218,8 @@ bool PFPartMerger::analyze(storage_manager* storage) {
     larlite::pfpart pfparticle( pdgCode, ipfparts, ev_pfpart->at(pfparts[0]).Parent(), 
                                 ev_pfpart->at(pfparts[0]).Daughters() );
     pfpart_v->push_back( pfparticle );
-    pfpart_sps_ass_v.push_back( sps );
-    pfpart_vertex_ass_v.push_back( vertex );
+    pfpart_sps_ass_v[ipfparts] = sps;
+    pfpart_vertex_ass_v[ipfparts] = vertex;
 
     std::vector< unsigned int > iclusters;
     std::map< larlite::geo::View_t, std::vector< unsigned int > >::iterator it;
@@ -229,13 +233,20 @@ bool PFPartMerger::analyze(storage_manager* storage) {
       cluster_hit_ass_v.push_back( hits_per_plane );
     } // for ( auto it = hits.begin(); it != hits.end(); ++it )
 
-    pfpart_cluster_ass_v.push_back( iclusters );
+    pfpart_cluster_ass_v[ipfparts] = iclusters;
 
   } // for ( size_t ipfpart = 0; ipfpart < pfpart_sets.size(); ++ipfpart )
 
-  std::cout << "Number of merged pfparticles: " << pfpart_v->size() << std::endl;
-  std::cout << "Number of merged clusters: " << cluster_v->size() << std::endl;
-
+  // std::cout << "Number of merged pfparticles: " << pfpart_v->size() << std::endl;
+  // std::cout << "Number of merged clusters: " << cluster_v->size() << std::endl;
+/*
+  if ( pfpart_v->size() > 1 ) {
+    std::cout << "run: " << ev_pfpart->run() << ", subrun: " << ev_pfpart->subrun()
+              << ", event: " << ev_pfpart->event_id() << std::endl;
+    std::cout << "Number of original pfparticles: " << ev_pfpart->size() << std::endl;
+    std::cout << "Number of merged pfparticles:   " << pfpart_v->size() << std::endl;
+  }
+*/
   cluster_hit_ass->set_association( cluster_v->id(), 
                    product_id( data::kHit, ev_hits->name() ), cluster_hit_ass_v );
   pfpart_cluster_ass->set_association( pfpart_v->id(),
