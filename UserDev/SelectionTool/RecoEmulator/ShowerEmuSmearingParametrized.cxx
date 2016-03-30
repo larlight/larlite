@@ -111,6 +111,9 @@ namespace recoemu {
     /// uhhhh functional form has input variable == shower energy
     double eff = _fEff->Eval( result.energy );// / 2.3 );
 
+    //QUICK HACK. EFFICIENCY MAXES OUT AT 85% TO MATCH ICARUS
+    eff *= 0.85;
+
     // random number
     double randeff = ( (double) rand() ) / RAND_MAX;
 

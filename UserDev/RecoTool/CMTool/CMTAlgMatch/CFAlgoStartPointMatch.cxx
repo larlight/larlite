@@ -2,7 +2,7 @@
 #define RECOTOOL_CFALGOSTARTPOINTMATCH_CXX
 
 #include "CFAlgoStartPointMatch.h"
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/GeometryHelper.h"
 
 namespace cmtool {
 
@@ -11,8 +11,8 @@ namespace cmtool {
   //-------------------------------------------------------
   {
 
-    _w2cm = larutil::GeometryUtilities::GetME()->WireToCm();
-    _t2cm = larutil::GeometryUtilities::GetME()->TimeToCm();
+    _w2cm = larutil::GeometryHelper::GetME()->WireToCm();
+    _t2cm = larutil::GeometryHelper::GetME()->TimeToCm();
     UseTime(true);
     SetMaxArea(100.);
     

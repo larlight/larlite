@@ -25,7 +25,6 @@ namespace larlite {
   bool MCShowerClusterer::analyze(storage_manager* storage) {
 
     auto geo = ::larutil::Geometry::GetME();
-    //auto geoutil = ::larutil::GeometryUtilities::GetME();
 
     // Get MCShower objects from storage
     auto mcshower_v = (event_mcshower* )(storage->get_data(data::kMCShower,"mcshower") );

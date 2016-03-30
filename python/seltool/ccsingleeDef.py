@@ -10,7 +10,7 @@ def GetCCSingleEInstance():
     my_algo.setVtxToTrkDist(1)
     my_algo.setVtxToShrStartDist(50)
     my_algo.setMaxIP(1)
-    my_algo.setVtxProximityCut(5)
+    my_algo.setVtxProximityCut(0)
     my_algo.setEThreshold(0.)
 
     # Return Algorithm Instance

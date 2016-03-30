@@ -48,7 +48,7 @@ namespace larlite {
     virtual ~geoconic(){};
 
 	//$ Is a 3D point Contained in TPC
-	bool TPCContained( const TLorentzVector& pos);
+	bool TPCContained( const TVector3& pos);
 
 	//$ Are the 3d Cone Edges Contained in the tpc?
 	bool ConeInTPC(const TLorentzVector& Pos, const TLorentzVector& dir, double Length, double OpeningAngle, int smoothness);

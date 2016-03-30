@@ -32,7 +32,6 @@ namespace ertool {
 
     Double_t const tstart_prox;
     Double_t const tmax_rad;
-    Double_t const tlone_track_length;
     Bool_t const twithTrackDir;
     std::string const tprimary_vertex_selection;    
     Bool_t const tshowerproj;
@@ -71,7 +70,6 @@ namespace ertool {
     ERAlgoVertexBuilder
       (Double_t const start_prox,
        Double_t const max_rad,
-       Double_t const lone_track_length,
        Bool_t const withTrackDir,
        std::string const primary_vertex_selection = "mostupstream",
        Bool_t const showerproj = false,
@@ -146,34 +144,30 @@ namespace ertool {
        ParticleAssociations const & pas, 
        std::vector<Int_t> const & skip,
        Int_t & index);
-
-    geoalgo::Point_t const * GetTrackDirectionPrimary
-      (EventData const & data,
-       ParticleGraph const & graph,
-       ParticleAssociations const & pas, 
-       std::vector<Int_t> const & skip,
-       Int_t & index);
     
     void AddAllLoneTracks
       (const EventData &data,
        ParticleGraph & graph,
-       ParticleAssociations const & pas);
+       NodeID_t const n = kINVALID_NODE_ID);
 
     void AddUpstreamLoneTrack
       (const EventData &data,
+       ParticleGraph & graph);
+
+    void AddAllLoneShowers
+      (const EventData &data,
        ParticleGraph & graph,
-       ParticleAssociations const & pas); 
+       NodeID_t const n = kINVALID_NODE_ID);
+
+    void AddTracksAndShowers
+      (const EventData &data,
+       ParticleGraph & graph);
 
     void ShowerProjection
       (const EventData &data,
        ParticleGraph & graph,
        ParticleAssociations & pas);
 
-    void ShowerProjectionPrioritiseAssociations
-      (const EventData &data,
-       ParticleGraph & graph,
-       ParticleAssociations & pas);
-    
     void EndReconstructPa(const EventData &data,
 			  ParticleGraph & graph,
 			  ParticleAssociations & pa);

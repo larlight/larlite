@@ -7,8 +7,8 @@
 /// \author  miceli@fnal.gov
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef SIM_AUXDETSIMCHANNEL_H
-#define SIM_AUXDETSIMCHANNEL_H
+#ifndef LARLITE_SIM_AUXDETSIMCHANNEL_H
+#define LARLITE_SIM_AUXDETSIMCHANNEL_H
 
 // C/C++ standard libraries
 //#include <stdint.h> // C header (need to be compatible with Reflex)
@@ -70,32 +70,32 @@ namespace larlite {
     auxsimch();
 
   private:
-    uint32_t                    fAuxDetID;          ///< geo->AuxDet(auxDetID), integer used to retrieve AuxDetGeo objec   
-    uint32_t                    fAuxDetSensitiveID; ///< integer used to retrieve AuxDetSensitiveGeo object
+    unsigned int                    fAuxDetID;          ///< geo->AuxDet(auxDetID), integer used to retrieve AuxDetGeo objec   
+    unsigned int                    fAuxDetSensitiveID; ///< integer used to retrieve AuxDetSensitiveGeo object
     std::vector<larlite::auxide> fAuxDetIDEs;        ///< one larlite::auxide for each G4 track id
 
     //#ifndef __GCCXML__
   public:
 
-    auxsimch(uint32_t inputAuxDetID, 
-	     uint32_t inputAuxDetSensitiveID);
+    auxsimch(unsigned int inputAuxDetID, 
+	     unsigned int inputAuxDetSensitiveID);
     
     /// Constructor: copies from the specified IDE vector
-    auxsimch(uint32_t inputAuxDetID, 
+    auxsimch(unsigned int inputAuxDetID, 
 	     const std::vector<larlite::auxide>& inputAuxDetIDEs,
-	     uint32_t inputAuxDetSensitiveID=0);
+	     unsigned int inputAuxDetSensitiveID=0);
     
     /// Constructor: moves data from the specified IDE vector
-    auxsimch(uint32_t inputAuxDetID, 
+    auxsimch(unsigned int inputAuxDetID, 
 	     std::vector<larlite::auxide>&& inputAuxDetIDEs,
-	     uint32_t inputAuxDetSensitiveID=0);
+	     unsigned int inputAuxDetSensitiveID=0);
     
     std::pair<int,int> MergeAuxDetSimChannel(const auxsimch&, int);
 
     ///@name Getters
     ///@{
-    uint32_t AuxDetID()          const;
-    uint32_t AuxDetSensitiveID() const;
+    unsigned int AuxDetID()          const;
+    unsigned int AuxDetSensitiveID() const;
 
     bool operator<  (const auxsimch& other)     const;
     bool operator== (const auxsimch& other)     const;
@@ -142,8 +142,8 @@ namespace larlite {
 
 inline bool      larlite::auxide::operator<  (const auxide& other) const { return trackID < other.trackID;  }
 inline bool      larlite::auxide::operator== (const auxide& other) const { return other.trackID == trackID; }
-inline uint32_t  larlite::auxsimch::AuxDetID()                   const { return fAuxDetID;                }
-inline uint32_t  larlite::auxsimch::AuxDetSensitiveID()          const { return fAuxDetSensitiveID;       }
+inline unsigned int  larlite::auxsimch::AuxDetID()                   const { return fAuxDetID;                }
+inline unsigned int  larlite::auxsimch::AuxDetSensitiveID()          const { return fAuxDetSensitiveID;       }
 inline std::vector<larlite::auxide> const& larlite::auxsimch::auxides() const { return fAuxDetIDEs; }
 //#endif
 
