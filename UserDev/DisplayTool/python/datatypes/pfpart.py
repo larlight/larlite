@@ -75,14 +75,57 @@ try:
                 if self._drawParams:
 
                     # Let's find out what's in the params:
-                    thisPart.params().Report()
+                    # thisPart.params().Report()
+                    # Want to draw lines for the 3D Axis
+                    # set the principal axis length equal to the params length,
+                    # and scale the others accordingly
+                    center = TVector3(thisPart.params().mean_x,
+                                      thisPart.params().mean_y,
+                                      thisPart.params().mean_z)
 
-                    # Draw the axis of the 
-                    pass
+                    # Draw the main axis:
+                    halflength = 0.5*thisPart.params().length
+                    startPoint = center - halflength * \
+                        thisPart.params().principal_dir
+                    endPoint = center + halflength * \
+                        thisPart.params().principal_dir
+                    self.drawLine(startPoint, endPoint, view)
+
+                    # Draw the secondary axis:
+                    halflength = 0.5*thisPart.params().length * \
+                        (thisPart.params().eigenvalue_secondary /
+                         thisPart.params().eigenvalue_principal)
+                    startPoint = center - halflength * \
+                        thisPart.params().secondary_dir
+                    endPoint = center + halflength * \
+                        thisPart.params().secondary_dir
+                    self.drawLine(startPoint, endPoint, view)
+
+                    # Draw the tertiary axis:
+                    halflength = 0.5*thisPart.params().length * \
+                        (thisPart.params().eigenvalue_tertiary /
+                         thisPart.params().eigenvalue_principal)
+                    startPoint = center - halflength * \
+                        thisPart.params().tertiary_dir
+                    endPoint = center + halflength * \
+                        thisPart.params().tertiary_dir
+                    self.drawLine(startPoint, endPoint, view)
 
                 i_color += 1
                 if i_color >= len(self._pfpartColors):
                     i_color = 0
+
+        def drawLine(self, point1, point2, view):
+
+            x = np.linspace(point1.X(), point2.X(), 100)
+            y = np.linspace(point1.Y(), point2.Y(), 100)
+            z = np.linspace(point1.Z(), point2.Z(), 100)
+
+            pts = np.vstack([x, y, z]).transpose()
+            line = gl.GLLinePlotItem(pos=pts)
+            view.addItem(line)
+            self._drawnObjects.append(line)
+            return
 
 except Exception, e:
     pass
