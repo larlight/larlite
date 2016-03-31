@@ -56,14 +56,14 @@ bool DrawSpacepoint::analyze(larlite::storage_manager* storage) {
 
 
       // Determine if this hit should change the view range:
-      if (point.w > _wireRange.at(p).second)
-        _wireRange.at(p).second = point.w;
-      if (point.w < _wireRange.at(p).first)
-        _wireRange.at(p).first = point.w;
-      if (point.t > _timeRange.at(p).second)
-        _timeRange.at(p).second = point.t;
-      if (point.t < _timeRange.at(p).first)
-        _timeRange.at(p).first = point.t;
+      if (point.w / geoHelper->WireToCm() > _wireRange.at(p).second)
+        _wireRange.at(p).second = point.w / geoHelper->WireToCm();
+      if (point.w / geoHelper->WireToCm() < _wireRange.at(p).first)
+        _wireRange.at(p).first = point.w / geoHelper->WireToCm();
+      if (point.t / geoHelper->TimeToCm() > _timeRange.at(p).second)
+        _timeRange.at(p).second = point.t / geoHelper->TimeToCm();
+      if (point.t / geoHelper->TimeToCm() < _timeRange.at(p).first)
+        _timeRange.at(p).first = point.t / geoHelper->TimeToCm();
     }
   }
 
