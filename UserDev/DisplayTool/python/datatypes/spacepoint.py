@@ -13,14 +13,13 @@ class spacepoint(recoBase):
     def __init__(self):
         super(spacepoint, self).__init__()
         self._productName = 'spacepoint'
-        self._process = evd.DrawSpacepoint3D()
+        self._process = evd.DrawSpacepoint()
         self.init()
 
     def drawObjects(self, view_manager):
 
         geom = view_manager._geometry
 
-        spts = self._process.getData()
 
         geoHelper = larutil.GeometryHelper.GetME()
      
@@ -28,6 +27,7 @@ class spacepoint(recoBase):
 
             thisPlane = view.plane()
             self._drawnObjects.append([])
+            spts = self._process.getDataByPlane(thisPlane)
 
 
             radBigW = 0.2 / view_manager._geometry.wire2cm()
@@ -38,13 +38,11 @@ class spacepoint(recoBase):
             for i in xrange(len(spts)):
                 thisPoint = spts[i]
 
-                projection = geoHelper.Point_3Dto2D(thisPoint.X(), thisPoint.Y(),thisPoint.Z(),thisPlane);
-
                 # Need to scale back into wire time coordinates:
 
                 
-                sW = projection.w / view_manager._geometry.wire2cm()
-                sT = projection.t / view_manager._geometry.time2cm() + offset
+                sW = thisPoint.w / view_manager._geometry.wire2cm()
+                sT = thisPoint.t / view_manager._geometry.time2cm() + offset
                 r = QtGui.QGraphicsEllipseItem(
                     sW -radBigW, sT-radBigT, 2*radBigW, 2*radBigT)
 
