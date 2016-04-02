@@ -47,8 +47,8 @@ my_proc.set_ana_output_file(sOutputName)
 # Attach MMQuality process
 mmq = fmwk.MMQuality()
 #mmq.SetClusterProducer("mergedmergedfuzzycluster")
-#mmq.SetClusterProducer(sProducerName) #I need to change this!
-mmq.SetShowerProducer(sProducerName)
+mmq.SetClusterProducer(sProducerName) #I need to change this!
+#mmq.SetShowerProducer(sProducerName)
 #mmq.SetClusterProducer("Step1ShortestDist") #I need to change this!
 
 my_proc.add_process(mmq)

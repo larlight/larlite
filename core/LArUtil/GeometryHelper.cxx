@@ -91,6 +91,10 @@ Point2D GeometryHelper::Point_3Dto2D(float * xyz, unsigned int plane) const {
   TVector3 vec(xyz);
   return Point_3Dto2D(vec, plane);
 }
+Point2D GeometryHelper::Point_3Dto2D(float x, float y, float z, unsigned int plane) const {
+  TVector3 vec(x,y,z);
+  return Point_3Dto2D(vec, plane);
+}
 Point2D GeometryHelper::Point_3Dto2D(const std::vector<double> & xyz, unsigned int plane) const {
   TVector3 vec(&(xyz[0]));
   return Point_3Dto2D(vec, plane);

@@ -52,7 +52,7 @@ class vertex(recoBase):
 
                 # Old Way:
                 r.setPen(pg.mkPen(None))
-                r.setBrush(pg.mkColor(0))
+                r.setBrush(pg.mkColor(0,255,255))
                 # r.setBrush((0,0,0,opacity))
                 self._drawnObjects[thisPlane].append(r)
                 view._view.addItem(r)

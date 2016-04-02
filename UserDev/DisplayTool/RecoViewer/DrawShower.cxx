@@ -109,6 +109,9 @@ Shower2d DrawShower::getShower2d(larlite::shower shower, unsigned int plane) {
   // std::cout << "3D Start point is (" << shower.ShowerStart().X()
   //           << ", " << shower.ShowerStart().Y()
   //           << ", " << shower.ShowerStart().Z() << ")\n";
+  // std::cout << "3D Direction is (" << shower.Direction().X()
+  //           << ", " << shower.Direction().Y()
+  //           << ", " << shower.Direction().Z() << ")\n";
   // std::cout << "2D Start point is (" << result._startPoint.w
   //           << ", " << result._startPoint.t << ")\n";
 

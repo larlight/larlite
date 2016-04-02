@@ -42,6 +42,7 @@ public:
   ::cluster::cluster_params params() {return _params;}
   bool _is_good;
   bool is_good() {return _is_good;}
+  std::vector<float> _start;
 };
 
 class DrawCluster : public larlite::ana_base, public RecoBase<Cluster2d> {

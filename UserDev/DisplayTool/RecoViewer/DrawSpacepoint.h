@@ -1,9 +1,9 @@
 /**
- * \file DrawTrack.h
+ * \file DrawSpacepoint.h
  *
  * \ingroup RecoViewer
  *
- * \brief Class def header for a class DrawTrack
+ * \brief Class def header for a class DrawSpacepoint
  *
  * @author cadams
  */
@@ -11,18 +11,18 @@
 /** \addtogroup RecoViewer
 
     @{*/
-#ifndef LARLITE_DRAWTRACK_H
-#define LARLITE_DRAWTRACK_H
+#ifndef LARLITE_DRAWSPACEPOINT_H
+#define LARLITE_DRAWSPACEPOINT_H
 
 #include <iostream>
 #include "Analysis/ana_base.h"
-#include "LArUtil/Geometry.h"
-#include "DataFormat/track.h"
+#include "DataFormat/spacepoint.h"
+#include "ClusterRecoUtil/Base/ClusterParams.h"
 
 #include "RecoBase.h"
 /**
-   \class DrawTrack
-   User defined class DrawTrack ... these comments are used to generate
+   \class DrawSpacepoint
+   User defined class DrawSpacepoint ... these comments are used to generate
    doxygen documentation!
  */
 
@@ -30,24 +30,16 @@
 
 namespace evd {
 
-class Track2d {
-public:
-    std::vector<std::pair<float, float> > _track;
-    const std::vector<std::pair<float, float> > & track() {return _track;}
-    const std::vector<std::pair<float, float> > & direction() {return _track;}
-};
 
-// typedef std::vector<std::pair<float, float> > Track2d;
-
-class DrawTrack : public larlite::ana_base, public RecoBase<Track2d> {
+class DrawSpacepoint : public larlite::ana_base, public RecoBase<Point2D> {
 
 public:
 
     /// Default constructor
-    DrawTrack();
+    DrawSpacepoint();
 
     /// Default destructor
-    ~DrawTrack();
+    ~DrawSpacepoint();
 
     /** IMPLEMENT in DrawCluster.cc!
         Initialization method to be called before the analysis event loop.
@@ -67,7 +59,6 @@ public:
 
 private:
 
-    Track2d getTrack2d(larlite::track track, unsigned int plane);
 
 };
 

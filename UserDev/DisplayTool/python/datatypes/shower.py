@@ -4,6 +4,8 @@ import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui, QtCore
 import math as mt
 
+import numpy as np
+
 # Shower drawing is currently "experimental"
 
 

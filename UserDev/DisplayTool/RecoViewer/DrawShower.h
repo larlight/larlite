@@ -17,7 +17,6 @@
 #include <iostream>
 #include "Analysis/ana_base.h"
 #include "LArUtil/Geometry.h"
-#include "LArUtil/GeometryUtilities.h"
 #include "DataFormat/shower.h"
 #include "RecoBase.h"
 

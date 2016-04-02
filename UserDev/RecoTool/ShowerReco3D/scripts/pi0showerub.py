@@ -31,7 +31,7 @@ def getShowerRecoAlgModular():
 
   # It should be noted, however, that this "default" set of modules is not yet developed
   # and if you are developing you ought to be updating it here!
-
+    
   alg = showerreco.ShowerRecoAlgModular()
   alg.SetDebug(False)
 
@@ -111,16 +111,15 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 
 # Specify analysis output root file name
-my_proc.set_ana_output_file("showerRecoUboone_ana.root")
+my_proc.set_ana_output_file("pinotshowerub_ana.root")
 # Specify data output root file name
-my_proc.set_output_file("showerRecoUboone.root")
-
+my_proc.set_output_file("pinotshowerub.root")
 
 
 ana_unit=DefaultShowerReco3D()
-ana_unit.SetInputProducer("ImageClusterHit")
 
-ana_unit.SetOutputProducer("showerreco")
+ana_unit.SetInputProducer ("ImageClusterHit")
+ana_unit.SetOutputProducer("pinotshowerreco")
 
 my_proc.add_process(ana_unit)
 
