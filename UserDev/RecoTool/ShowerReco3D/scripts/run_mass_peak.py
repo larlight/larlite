@@ -133,8 +133,8 @@ ana_showerreco = ShowerReco()
 
 #ana_showerreco.SetInputProducer("pandoraNu")
 ana_showerreco.SetInputProducer("ImageClusterHit")
-
 ana_showerreco.SetOutputProducer("showerreco")
+
 ana_processor.add_process(ana_showerreco)
 
 # add in ertool processes
