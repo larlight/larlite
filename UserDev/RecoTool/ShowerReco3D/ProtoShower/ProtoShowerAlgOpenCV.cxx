@@ -2,7 +2,9 @@
 #define PROTOSHOWERALGOPENCV_CXX
 
 #include "ProtoShowerAlgOpenCV.h"
+#include "LArUtil/Geometry.h"
 #include "LArUtil/GeometryHelper.h"
+#include "LArUtil/DetectorProperties.h"
 #include "TVector3.h"
 #include <math.h>
 
@@ -37,7 +39,9 @@ namespace showerreco {
 
     // larlite::cluster data-products in wire-time
     // need to convert them to cm space
-    auto geomH = ::larutil::GeometryHelper::GetME();
+    auto geom    = ::larutil::Geometry::GetME();
+    auto geomH   = ::larutil::GeometryHelper::GetME();
+    auto detProp = ::larutil::DetectorProperties::GetME();
 
     for (size_t i=0; i < clus_v.size(); i++){
 
@@ -45,13 +49,20 @@ namespace showerreco {
       _cru_helper.GenerateParams( hit_v[i], proto_shower._params.at( i ) );
       _params_alg->FillParams( proto_shower._params.at( i ) );
 
+
       // now fill quantities specifically to LArOpenCV
       auto const& clus = clus_v[i];
+      
+      double * origin;
+      origin = new double[3];
+      geom->PlaneOriginVtx( clus.Plane().Plane, origin);
+      float planeOffset = origin[0];
+
 
       auto const& sw = clus.StartWire() * geomH->WireToCm();
       auto const& ew = clus.EndWire()   * geomH->WireToCm();
-      auto const& st = clus.StartTick() * geomH->TimeToCm();
-      auto const& et = clus.EndTick()   * geomH->TimeToCm();
+      auto const& st = ( clus.StartTick() - detProp->TriggerOffset() ) * geomH->TimeToCm() + planeOffset;
+      auto const& et = ( clus.EndTick()   - detProp->TriggerOffset() )  * geomH->TimeToCm() + planeOffset;
 
       // start point
       proto_shower._params.at(i).start_point.w = sw;
