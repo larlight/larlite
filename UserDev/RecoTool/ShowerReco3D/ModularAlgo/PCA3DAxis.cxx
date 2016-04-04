@@ -18,7 +18,16 @@ void PCA3DAxis::do_reconstruction(const ProtoShower & proto_shower,
   // If there is no 3D params, throw an exception.
   // 
   if (proto_shower.hasCluster3D()){
-    resultShower.fDCosStart = proto_shower.params3D().principal_dir;
+    double dir = 1.;
+    if ( proto_shower.hasVertex() ) {
+      resultShower.fXYZStart = proto_shower.vertexes().front();
+
+      TVector3 mean( proto_shower.params3D().mean_x, proto_shower.params3D().mean_y, proto_shower.params3D().mean_z );
+      TVector3 distPos = mean - 0.5*resultShower.fLength*proto_shower.params3D().principal_dir - resultShower.fXYZStart;
+      TVector3 distNeg = mean + 0.5*resultShower.fLength*proto_shower.params3D().principal_dir - resultShower.fXYZStart;
+      if ( distPos.Mag() > distNeg.Mag() ) dir = -1.;
+    }
+    resultShower.fDCosStart = dir * proto_shower.params3D().principal_dir;
   }
   else{
     throw ShowerRecoException("PCA3DAxis requires 3D cluster but has none.");
