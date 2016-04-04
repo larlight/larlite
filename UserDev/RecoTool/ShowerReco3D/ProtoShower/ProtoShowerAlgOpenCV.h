@@ -19,9 +19,6 @@
 #include "ShowerReco3D/Base/ProtoShowerAlgBase.h"
 
 #include "ClusterRecoUtil/Base/CRUHelper.h"
-#include "Cluster3DRecoUtil/Base/CRU3DHelper.h"
-
-#include "Cluster3DRecoUtil/Alg/Default3DParamsAlg.h"
 #include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
 
 /**
@@ -50,6 +47,9 @@ namespace showerreco {
     
 
   private:
+
+    ::cluster::ClusterParamsAlg * _params_alg;
+    ::cluster::CRUHelper _cru_helper;
 
   };
   

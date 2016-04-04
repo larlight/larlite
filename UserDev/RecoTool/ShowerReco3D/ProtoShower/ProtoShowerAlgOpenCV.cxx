@@ -7,8 +7,14 @@
 #include <math.h>
 
 namespace showerreco {
-
-  ProtoShowerAlgOpenCV::ProtoShowerAlgOpenCV() {
+  
+  ProtoShowerAlgOpenCV::ProtoShowerAlgOpenCV()
+    : _params_alg(nullptr)
+  {
+    // if no algo for calculating cluster params -> set up default ones
+    if (!_params_alg) {
+      _params_alg = new ::cluster::DefaultParamsAlg();
+    }
   }
 
   void ProtoShowerAlgOpenCV::GenerateProtoShower(const std::vector<::larlite::cluster> &clus_v,
@@ -35,6 +41,11 @@ namespace showerreco {
 
     for (size_t i=0; i < clus_v.size(); i++){
 
+      // first fill parameters the default way (this fills many many things)
+      _cru_helper.GenerateParams( hit_v[i], proto_shower._params.at( i ) );
+      _params_alg->FillParams( proto_shower._params.at( i ) );
+
+      // now fill quantities specifically to LArOpenCV
       auto const& clus = clus_v[i];
 
       auto const& sw = clus.StartWire() * geomH->WireToCm();
