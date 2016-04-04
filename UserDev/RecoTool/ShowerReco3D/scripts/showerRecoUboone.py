@@ -118,7 +118,11 @@ my_proc.set_output_file("showerRecoUboone.root")
 
 
 ana_unit=DefaultShowerReco3D()
-ana_unit.SetInputProducer("fuzzyclustermerger")
+# set ProtoShower Algo to go from data-products to a ProtoShower object
+protoshoweralg = showerreco.ProtoShowerAlgClusterParams()
+ana_unit.GetProtoShowerHelper().setProtoShowerAlg( protoshoweralg )
+#ana_unit.SetInputProducer("fuzzyclustermerger")
+ana_unit.SetInputProducer("timeoverlap")
 
 ana_unit.SetOutputProducer("showerreco")
 
