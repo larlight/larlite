@@ -56,14 +56,8 @@ void dEdxFromdQdx::do_reconstruction(const ProtoShower & proto_shower,
 
     if (_verbose) { std::cout << "dQdx on plane : " << pl << " -> " << dqdx << std::endl; }
 
-    //if (_use_pitch)
-    //dqdx *= (pitch/0.3);
-    if (dqdx < 105000) {
-      dedx = larutil::LArProperties::GetME()->ModBoxCorrection(dqdx);
-    }
-    else {
-      dedx = (larutil::LArProperties::GetME()->ModBoxCorrection(dqdx / 2)) * 2;
-    }
+    dedx = larutil::LArProperties::GetME()->ModBoxCorrection(dqdx);
+
     if (_verbose) { std::cout << "dEdx on plane : " << pl << " -> " << dedx << std::endl; }
 
     // take the dQdx measured on each plane and convert
