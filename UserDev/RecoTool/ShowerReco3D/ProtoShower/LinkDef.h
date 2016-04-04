@@ -13,6 +13,7 @@
 #pragma link C++ namespace showerreco::energy;
 
 #pragma link C++ class showerreco::ProtoShowerAlgClusterParams+;
+#pragma link C++ class showerreco::ProtoShowerAlgOpenCV+;
 //ADD_NEW_CLASS ... do not change this line
 //ADD_NEW_ALG_CLASS ... do not change this line
 #endif
