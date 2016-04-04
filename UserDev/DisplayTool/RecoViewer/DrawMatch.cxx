@@ -98,6 +98,9 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
   std::vector<::cluster::cluster_params> pass_clusters;
 
   for (auto const& hit_indices : hit_index_v) {
+
+    if ( ! hit_indices.size() ) continue;
+
     view = ev_hit->at(hit_indices[0]).View();
 
     // Make a new cluster in the data:
