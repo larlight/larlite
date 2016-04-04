@@ -12,6 +12,9 @@
 #pragma link C++ namespace showerreco;
 #pragma link C++ namespace showerreco::energy;
 
+//The hack
+#pragma link C++ struct showerreco::Hack+;
+
 //ADD_NEW_CLASS ... do not change this line
 #pragma link C++ class showerreco::ShowerClusterSet_t+;
 #pragma link C++ class showerreco::ProtoShower+;
@@ -23,6 +26,7 @@
 #pragma link C++ class showerreco::ShowerRecoManager+;
 #pragma link C++ class showerreco::ProtoShowerHelper+;
 //ADD_NEW_ALG_CLASS ... do not change this line
+
 #endif
 
 

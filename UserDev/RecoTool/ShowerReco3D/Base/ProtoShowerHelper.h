@@ -30,43 +30,48 @@
 #include "Cluster3DRecoUtil/Alg/Default3DParamsAlg.h"
 #include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
 
+// Hack: convertor to cparms wire/tick
+#include "Hack.h"
+
 /**
    \class ProtoShowerHelper
    User defined class ProtoShowerHelper ... these comments are used to generate
    doxygen documentation!
- */
+*/
 namespace showerreco {
 
-class ProtoShowerHelper {
+  class ProtoShowerHelper {
 
-public:
+  public:
 
-  /// Default constructor
-  ProtoShowerHelper();
+    /// Default constructor
+    ProtoShowerHelper();
 
-  /// Default destructor
-  ~ProtoShowerHelper();
+    /// Default destructor
+    ~ProtoShowerHelper();
 
-  // From the storage manager, and with the pfpart producer name, generate
-  // a vector of all the protoshowers in the event.
-  void GenerateProtoShowers(::larlite::storage_manager* storage,
-                            const std::string &pfpart_producer_name,
-                            std::vector<::showerreco::ProtoShower> & proto_showers,
-                            std::vector<unsigned int> showerLikePFParts=std::vector<unsigned int>(1,999999));
+    // From the storage manager, and with the pfpart producer name, generate
+    // a vector of all the protoshowers in the event.
+    void GenerateProtoShowers(::larlite::storage_manager* storage,
+			      const std::string &pfpart_producer_name,
+			      std::vector<::showerreco::ProtoShower> & proto_showers,
+			      std::vector<unsigned int> showerLikePFParts=std::vector<unsigned int>(1,999999));
 
-  void SetClusterParamsAlg(::cluster::ClusterParamsAlg * _new_params_alg);
-  void SetCluster3DParamsAlg(::cluster3D::Cluster3DParamsAlg * _new_params3D_alg);
+    void SetClusterParamsAlg(::cluster::ClusterParamsAlg * _new_params_alg);
+    void SetCluster3DParamsAlg(::cluster3D::Cluster3DParamsAlg * _new_params3D_alg);
 
-private:
+  private:
 
-  ::cluster3D::Cluster3DParamsAlg * _params3D_alg;
-  ::cluster::ClusterParamsAlg * _params_alg;
+    ::cluster3D::Cluster3DParamsAlg * _params3D_alg;
+    ::cluster::ClusterParamsAlg * _params_alg;
 
-  // Use the CRU Helpers to build cluster params:
-  ::cluster3D::CRU3DHelper _cru3D_helper;
-  ::cluster::CRUHelper _cru_helper;
+    // Use the CRU Helpers to build cluster params:
+    ::cluster3D::CRU3DHelper _cru3D_helper;
+    ::cluster::CRUHelper _cru_helper;
 
-};
+    Hack hack;
+    
+  };
 
 } // showerreco
 

@@ -77,11 +77,13 @@ class roi2d(recoBase):
                 radBigW = 0.5 / view_manager._geometry.wire2cm()
                 radBigT = (0.5) / view_manager._geometry.time2cm()
                 
-                otherPoly = QtGui.QGraphicsEllipseItem(
-                    vx-radBigW, vy-radBigT, 2*radBigW, 2*radBigT)
-                #otherPoly = QtGui.QGraphicsPolygonItem(otherPolyF)
-                otherPoly.setPen(pg.mkPen(pg.mkColor((255, 0, 0, 100)), width = 1))
-                otherPoly.setBrush(pg.mkBrush(pg.mkColor((255, 0, 0, 100))))                
+                otherPoly = QtGui.QGraphicsEllipseItem(vx-radBigW, vy-radBigT, 20*radBigW, 20*radBigT)
+                #otherPoly = QtGui.QGraphicsEllipseItem( vy-radBigT, vx-radBigW,2*radBigW,2*radBigT)
+
+                print "(vx,vy): {},{}".format(vx,vy)
+                
+                otherPoly.setPen(pg.mkPen(pg.mkColor((255, 0, 100, 100)), width = 1))
+                otherPoly.setBrush(pg.mkBrush(pg.mkColor((255, 0, 100, 100))))                
 
                 view._view.addItem(thisPoly)
                 view._view.addItem(otherPoly)
@@ -90,4 +92,3 @@ class roi2d(recoBase):
                 self._drawnObjects[view.plane()].append(otherPoly)
 
                 i_color += 1
-
