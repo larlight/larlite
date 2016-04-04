@@ -11,8 +11,8 @@
 /** \addtogroup ProtoShower
 
     @{*/
-#ifndef PROTOSHOWERALGCLUSTERPARAMS_H
-#define PROTOSHOWERALGCLUSTERPARAMS_H
+#ifndef PROTOSHOWERALGOPENCV_H
+#define PROTOSHOWERALGOPENCV_H
 
 #include <iostream>
 
