@@ -183,13 +183,13 @@ namespace showerreco {
 	    auto const& cluster = ev_clust->at(j_clust);
 	    auto      & this_one= proto_showers.at(i)._params.at(internal_cluster_index);
 	    
-	    std::cout << "\t>>> Override cluster params start+end point <<<\n";
-	    std::cout << "(w,t) : (" << this_one.start_point.w << "," << this_one.end_point.t << ") --> ";
+	    // std::cout << "\t>>> Override cluster params start+end point <<<\n";
+	    // std::cout << "(w,t) : (" << this_one.start_point.w << "," << this_one.end_point.t << ") --> ";
 
-	    this_one.start_point = hack.convertCSP(cluster);
-	    std::cout << "(w',t') : (" << this_one.start_point.w << "," << this_one.end_point.t << ")\n";
+	    // this_one.start_point = hack.convertCSP(cluster);
+	    // std::cout << "(w',t') : (" << this_one.start_point.w << "," << this_one.end_point.t << ")\n";
 
-	    this_one.end_point = hack.convertCEP(cluster);
+	    // this_one.end_point = hack.convertCEP(cluster);
 
 	    
 

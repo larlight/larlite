@@ -45,7 +45,7 @@ def getShowerRecoAlgModular():
   axis3D.setThetaRangeMin(0.0005)
   axis3D.setNStepsStart(4)
   axis3D.setConvergeRate(0.85)
-  axis3D.setVerbosity(True)
+  axis3D.setVerbosity(False)
   axis3D.setSeedVectorErrorCutoff(0.1)
 
   angle3D = showerreco.Angle3DFormula()
@@ -57,6 +57,7 @@ def getShowerRecoAlgModular():
   energy.setVerbosity(False)
 
   dqdx = showerreco.dQdxModule()
+  dqdx.setVerbosity(False)
 
   dedx = showerreco.dEdxFromdQdx()
   dedx.SetUsePitch(False)
@@ -129,8 +130,6 @@ print
 
 my_proc.run()
 # my_proc.process_event(2)
-
-
 
 sys.exit()
 

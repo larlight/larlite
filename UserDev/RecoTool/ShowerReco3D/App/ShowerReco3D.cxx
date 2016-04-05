@@ -71,9 +71,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     index ++;
   }
 
-  std::cout << "This event has " << showerLikePFParts.size()
-            << " particles of " << ev_pfpart->size()
-            <<  "tagged as showers." << std::endl;
+  // std::cout << "This event has " << showerLikePFParts.size()
+  //           << " particles of " << ev_pfpart->size()
+  //           <<  "tagged as showers." << std::endl;
 
 
   // retrieve clusters associated with this pfpart
@@ -138,7 +138,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
 
 
-  std::cout << "\t>>> Generating protoshowers\n";
+  // std::cout << "\t>>> Generating protoshowers\n";
   _ps_helper.GenerateProtoShowers( storage,
                                    fInputProducer,
                                    proto_showers,
@@ -147,23 +147,23 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
 
   // Let's do a little debugging:
-  std::cout << "In this event ( " << storage -> event_id() << "), there are "
-            << ev_pfpart -> size() << " pfparticles.\n"
-            << "\tOf the pfparticles, the following are tagged as showers:\n\t";
-  for (auto i : showerLikePFParts) {
-    std::cout << i << " ";
-  }
-  std::cout << "\n\tFor the shower-like pfparticles, we have:\n";
-  size_t debug_index = 0;
-  for (auto i : showerLikePFParts) {
-    std::cout << "\tOn particle " << i << ": \n"
-              << "\tHas cluster2D: " << proto_showers.at(debug_index).hasCluster2D() << "\n"
-              << "\t\tcluster2D.size(): " << proto_showers.at(debug_index).params().size() << "\n"
-              << "\tHas cluster3D: " << proto_showers.at(debug_index).hasCluster3D() << "\n"
-              << "\tHas vertexes: " << proto_showers.at(debug_index).hasVertex() << "\n"
-              << "\t\tvertexes.size(): " << proto_showers.at(debug_index).vertexes().size() << "\n";
-    debug_index ++;
-  }
+  // std::cout << "In this event ( " << storage -> event_id() << "), there are "
+  //           << ev_pfpart -> size() << " pfparticles.\n"
+  //           << "\tOf the pfparticles, the following are tagged as showers:\n\t";
+  // for (auto i : showerLikePFParts) {
+  //   std::cout << i << " ";
+  // }
+  // std::cout << "\n\tFor the shower-like pfparticles, we have:\n";
+  // size_t debug_index = 0;
+  // for (auto i : showerLikePFParts) {
+  //   std::cout << "\tOn particle " << i << ": \n"
+  //             << "\tHas cluster2D: " << proto_showers.at(debug_index).hasCluster2D() << "\n"
+  //             << "\t\tcluster2D.size(): " << proto_showers.at(debug_index).params().size() << "\n"
+  //             << "\tHas cluster3D: " << proto_showers.at(debug_index).hasCluster3D() << "\n"
+  //             << "\tHas vertexes: " << proto_showers.at(debug_index).hasVertex() << "\n"
+  //             << "\t\tvertexes.size(): " << proto_showers.at(debug_index).vertexes().size() << "\n";
+  //   debug_index ++;
+  // }
 
 
   // Result shower holder
@@ -207,7 +207,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     if (res_shower.fDCosStart.Mag2() == 0) {
       continue;
     }
-    std::cout << "\t>>> fuck i passed\n";
+    // std::cout << "\t>>> fuck i passed\n";
 
 	
 
