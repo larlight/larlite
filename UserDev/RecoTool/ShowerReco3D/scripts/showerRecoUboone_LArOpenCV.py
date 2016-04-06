@@ -48,6 +48,8 @@ def getShowerRecoAlgModular():
   axis3D.setVerbosity(True)
   axis3D.setSeedVectorErrorCutoff(0.1)
 
+  axis3D = showerreco.Angle3DFromVtx()
+
   angle3D = showerreco.Angle3DFormula()
   angle3D.setMaxAngleError(0.1)
   angle3D.setVerbosity(False)
@@ -72,7 +74,7 @@ def getShowerRecoAlgModular():
   #alg.AddShowerRecoModule(showerreco.OtherStartPoint3D()  )
   # alg.AddShowerRecoModule(showerreco.ShowerChargeModule()  )
 
-  #alg.AddShowerRecoModule(showerreco.GeoModule())
+  alg.AddShowerRecoModule(showerreco.GeoModule())
 
   alg.PrintModuleList()
 

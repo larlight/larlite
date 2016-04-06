@@ -42,10 +42,9 @@ namespace showerreco {
     /// Default destructor
     ~ProtoShowerAlgClusterParams(){}
 
-    void GenerateProtoShower(const std::vector<::larlite::cluster> &clus_v, 
-			     const std::vector< std::vector<::larlite::hit> > &hit_v,
-			     const std::vector<::larlite::spacepoint> &sps_v,
-			     const std::vector<::larlite::vertex> &vtx,
+    void GenerateProtoShower(::larlite::storage_manager* storage,
+			     ::larlite::event_pfpart* ev_pfpart,
+			     const size_t proto_shower_pfpart,
 			     showerreco::ProtoShower & proto_shower);
     
 
