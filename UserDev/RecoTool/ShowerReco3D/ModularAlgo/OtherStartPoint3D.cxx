@@ -4,7 +4,6 @@
 #include "OtherStartPoint3D.h"
 #include "LArUtil/Geometry.h"
 #include "LArUtil/GeometryHelper.h"
-#include "LArUtil/GeometryUtilities.h"
 #include "LArUtil/DetectorProperties.h"
 
 namespace showerreco {

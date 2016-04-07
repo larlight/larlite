@@ -2,7 +2,7 @@
 #define LARLITE_GEOMETRY_CXX
 
 #include "Geometry.h"
-
+#include "InvalidWireError.h"
 namespace larutil {
 
 Geometry* Geometry::_me = 0;
@@ -441,9 +441,11 @@ UInt_t Geometry::NearestWire(const TVector3 &worldLoc,
     if (NearestWireNumber < 0) wireNumber = 0;
     else wireNumber = this->Nwires(PlaneNo) - 1;
 
-    throw larutil::LArUtilException(Form("Can't find nearest wire for (%g,%g,%g)",
-                                         worldLoc[0], worldLoc[1], worldLoc[2]));
+    larutil::InvalidWireError err(Form("Can't find nearest wire for (%g,%g,%g)",
+				       worldLoc[0], worldLoc[1], worldLoc[2]));
+    err.better_wire_number = wireNumber;
 
+    throw err;
   }
   /*
   std::cout<<"NearestWireID"<<std::endl;
