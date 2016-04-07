@@ -4,8 +4,15 @@
 #include <vector>
 namespace calo {
 
-  static const double kCalAmpConstants_ARGONEUT[2]  = {0.588726e-3 , 1.18998e-3};
-  static const double kCalAreaConstants_ARGONEUT[2] = {0.773887e-2 , 1.78186e-2};
+
+  // CalAmpConstants:    [ 0.582554e-3 , 1.16594e-3 ]
+
+  // CalAreaConstants:   [ 0.544391e-2 , 2.0376e-2 ]
+
+  static const double kCalAmpConstants_ARGONEUT[2]  = {0.582554e-3, 1.16594e-3};
+  // static const double kCalAmpConstants_ARGONEUT[2]  = {0.588726e-3 , 1.18998e-3};
+  static const double kCalAreaConstants_ARGONEUT[2] = {0.544391e-2 , 2.0376e-2};
+  // static const double kCalAreaConstants_ARGONEUT[2] = {0.773887e-2 , 1.78186e-2};
   static const bool kCaloUseModBox_ARGONEUT = false;
   
   // MCC4 constants
