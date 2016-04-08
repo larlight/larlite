@@ -363,7 +363,7 @@ class viewport(pg.GraphicsLayoutWidget):
     if len(self._dataPoints) < 2:
       return None
 
-    if self._item.image == None:
+    if self._item.image is None:
       return None
 
     data = self._item.image
