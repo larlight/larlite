@@ -77,6 +77,9 @@ namespace larlite {
     int                  Rescatter()    const;
     const std::vector<std::pair<size_t,size_t> >& FiducialTrack() const;
 
+    const TLorentzVector& Position(size_t i=0) const;
+    const TLorentzVector& Momentum(size_t i=0) const;
+
     ///--- Setters ---///
     void AddDaughter     (const int trackID);
     void SetPolarization (TVector3 const& p);

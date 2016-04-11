@@ -38,6 +38,8 @@ namespace larlite {
     virtual void clear_data();
 
     ///--- Getters ---///
+    size_t                               NParticles()          const;
+    const larlite::mcpart&               GetParticle(size_t i) const;
     const std::vector<larlite::mcpart>&  GetParticles() const;
     const mcnu&                          GetNeutrino()  const;
     simb::Origin_t                       Origin()       const;
