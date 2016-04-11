@@ -63,11 +63,12 @@ namespace showerreco {
       
       // this is the index of the PFParticle for the protoshower we are trying to build
       size_t proto_shower_pfpart = showerLikePFParts.at(i);
-      
+
       _proto_shower_alg->GenerateProtoShower( storage,
 					      ev_pfpart,
 					      proto_shower_pfpart,
 					      proto_showers.at(i) );
+      
     }// for all PFParticles
   
     // Do the seeds:

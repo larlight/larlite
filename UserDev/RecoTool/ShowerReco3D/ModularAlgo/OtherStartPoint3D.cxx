@@ -43,6 +43,13 @@ void OtherStartPoint3D::do_reconstruction(
   Shower_t& resultShower)
 {
 
+  //if the module does not have 2D cluster info -> fail the reconstruction
+  if (!proto_shower.hasCluster2D()){
+    std::stringstream ss;
+    ss << "Fail @ algo " << this->name() << " due to missing 2D cluster";
+    throw ShowerRecoException(ss.str());
+  }
+
   auto & clusters = proto_shower.params();
 
 //  std::cout<<"\n\n********************************New event!***************************** "<<std::endl ;

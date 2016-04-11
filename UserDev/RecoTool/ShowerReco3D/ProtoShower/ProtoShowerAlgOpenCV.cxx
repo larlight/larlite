@@ -24,6 +24,7 @@ namespace showerreco {
     if (!_params_alg) {
       _params_alg = new ::cluster::DefaultParamsAlg();
     }
+    _name = "ProtoShowerAlgOpenCV";
   }
 
   void ProtoShowerAlgOpenCV::GenerateProtoShower(::larlite::storage_manager* storage,
