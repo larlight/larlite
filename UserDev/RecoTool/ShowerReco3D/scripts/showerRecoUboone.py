@@ -118,6 +118,7 @@ my_proc.set_output_file("showerRecoUboone.root")
 
 
 ana_unit=DefaultShowerReco3D()
+
 # set ProtoShower Algo to go from data-products to a ProtoShower object
 protoshoweralg = showerreco.ProtoShowerAlgClusterParams()
 ana_unit.GetProtoShowerHelper().setProtoShowerAlg( protoshoweralg )

@@ -15,7 +15,7 @@ namespace showerreco {
 					       const std::string &pfpart_producer_name,
 					       std::vector<ProtoShower> & proto_showers,
 					       std::vector<unsigned int> showerLikePFParts) {
-
+    
     // Clear the current proto-shower container.
     proto_showers.clear();
     
@@ -49,34 +49,6 @@ namespace showerreco {
       }
       
     }
-    
-    if (showerLikePFParts.size() == 0) {
-      return;
-    }
-    
-    
-    proto_showers.resize(showerLikePFParts.size());
-    
-    for (size_t i = 0; i < showerLikePFParts.size(); i ++ ) {
-      
-      // this is the index of the PFParticle for the protoshower we are trying to build
-      size_t proto_shower_pfpart = showerLikePFParts.at(i);
-
-      _proto_shower_alg->GenerateProtoShower( storage,
-					      ev_pfpart,
-					      proto_shower_pfpart,
-					      proto_showers.at(i) );
-      
-    }// for all PFParticles
-  
-    // Do the seeds:
-    // \TODO
-    /*  _____ ___  ____   ___
-	|_   _/ _ \|  _ \ / _			\
-	| || | | | | | | | | |
-	| || |_| | |_| | |_| |
-	|_| \___/|____/ \___/
-    */
 
     return;
   }
