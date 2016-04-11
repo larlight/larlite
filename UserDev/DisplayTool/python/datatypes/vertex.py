@@ -111,11 +111,11 @@ try:
                 # pts = np.vstack([x, y, z]).transpose()
                 # pen = pg.mkPen((255, 0, 0), width=2)
                 xglline = gl.GLLinePlotItem(pos=xline, width=3,
-                                            color=(0, 0, 255, 255))
+                                            color=(0.6, 0.51, 1.0, 1.0))
                 yglline = gl.GLLinePlotItem(pos=yline, width=3,
-                                            color=(0, 0, 255, 255))
+                                            color=(0.6, 0.51, 1.0, 1.0))
                 zglline = gl.GLLinePlotItem(pos=zline, width=3,
-                                            color=(0, 0, 255, 255))
+                                            color=(0.6, 0.51, 1.0, 1.0))
                 view.addItem(xglline)
                 view.addItem(yglline)
                 view.addItem(zglline)

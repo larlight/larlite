@@ -212,43 +212,6 @@ bool ShowerQuality_multishowers::analyze(storage_manager* storage) {
     return false;
   }
 
-  /*
-  // Get cluster
-  auto shower_cluster_ass_keys = ev_shower->association_keys(data::kCluster);
-  if(!(shower_cluster_ass_keys.size())) {
-    print(msg::kERROR,__FUNCTION__,
-    Form("No associated cluster found to a shower produced by \"%s\"",
-   fShowerProducer.c_str())
-    );
-  }
-
-  auto ev_cluster = storage->get_data<event_cluster>(shower_cluster_ass_keys[0]);
-  if(!ev_cluster || !(ev_cluster->size())) {
-    print(msg::kERROR,__FUNCTION__,"Could not retrieve a reconstructed cluster!");
-    return false;
-  }
-
-  // Retrieve shower => cluster association
-  auto ass_cluster_v = ev_shower->association(ev_cluster->id());
-
-  // Get hits
-  auto cluster_hit_ass_keys = ev_cluster->association_keys(data::kHit);
-  if(!(cluster_hit_ass_keys.size())) {
-    print(msg::kERROR,__FUNCTION__,
-    Form("No cluster=>hit association found for \"%s\"!",ev_cluster->name().c_str())
-    );
-    return false;
-  }
-
-  auto ev_hit = storage->get_data<event_hit>(cluster_hit_ass_keys[0]);
-  if(!ev_hit || !(ev_hit->size())) {
-    print(msg::kERROR,__FUNCTION__,"Could not retrieve a reconstructed hit!");
-    return false;
-  }
-
-  // Retrieve cluster=>hit association
-  auto ass_hit_v = ev_cluster->association(ev_hit->id());
-  */
 
   // Create G4 track ID vector for which we are interested in
   std::vector<std::vector<unsigned int> > g4_trackid_v;
@@ -294,10 +257,9 @@ bool ShowerQuality_multishowers::analyze(storage_manager* storage) {
 
         auto const& h = (*ev_hit)[hit_index];
 
-        w_v.push_back( ::btutil::WireRange_t( h.Channel(),
-                                              h.StartTick(),
-                                              h.EndTick() )
-                     );
+        //w_v.push_back( ::btutil::WireRange_t( h.Channel(), h.StartTick(), h.EndTick()) );
+	w_v.push_back( ::btutil::WireRange_t(h.Channel(),h.PeakTime()-h.RMS()+3050,h.PeakTime()+h.RMS()+3050) );
+		       
       }
     }
 

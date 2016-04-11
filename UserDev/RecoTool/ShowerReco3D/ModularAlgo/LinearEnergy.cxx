@@ -83,6 +83,13 @@ void LinearEnergy::initialize()
 void LinearEnergy::do_reconstruction(const ProtoShower & proto_shower,
                                      Shower_t& resultShower) {
 
+  //if the module does not have 2D cluster info -> fail the reconstruction
+  if (!proto_shower.hasCluster2D()){
+    std::stringstream ss;
+    ss << "Fail @ algo " << this->name() << " due to missing 2D cluster";
+    throw ShowerRecoException(ss.str());
+  }
+
   auto & clusters = proto_shower.params();
 
   // This function takes the shower cluster set and calculates an energy in MeV for each plane
@@ -94,9 +101,11 @@ void LinearEnergy::do_reconstruction(const ProtoShower & proto_shower,
   // auto geom       = larutil::Geometry::GetME();
   auto geomHelper = larutil::GeometryHelper::GetME();
 
-  // double y;
-  // double z;
-
+  // check if plane 2 has been used.
+  // if so, we will fill the global energy with that from plane 2
+  // otherwise, average the other two planes
+  bool hasPl2 = false;
+  
   auto t2cm = geomHelper->TimeToCm();
 
   // we want an energy for each plane
@@ -108,6 +117,9 @@ void LinearEnergy::do_reconstruction(const ProtoShower & proto_shower,
     // get the plane associated with this cluster
     auto const& pl = clusters.at(n).plane_id.Plane;
     _pl = pl;
+
+    if (pl == 2)
+      hasPl2 = true;
 
     auto const& dir3D = resultShower.fDCosStart;
     double pitch = geomHelper->GetPitch(dir3D, (int)pl);
@@ -155,6 +167,11 @@ void LinearEnergy::do_reconstruction(const ProtoShower & proto_shower,
     resultShower.fTotalEnergy_v[pl] = E;
 
   }// for all input clusters
+
+  if (hasPl2)
+    resultShower.fTotalEnergy = resultShower.fTotalEnergy_v[2];
+  else
+    resultShower.fTotalEnergy = ( resultShower.fTotalEnergy_v[0] + resultShower.fTotalEnergy_v[1] ) / 2.;
 
   return;
 

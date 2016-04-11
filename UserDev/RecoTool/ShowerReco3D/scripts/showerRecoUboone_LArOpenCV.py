@@ -48,6 +48,8 @@ def getShowerRecoAlgModular():
   axis3D.setVerbosity(True)
   axis3D.setSeedVectorErrorCutoff(0.1)
 
+  axis3D = showerreco.Angle3DFromVtx()
+
   angle3D = showerreco.Angle3DFormula()
   angle3D.setMaxAngleError(0.1)
   angle3D.setVerbosity(False)
@@ -56,21 +58,21 @@ def getShowerRecoAlgModular():
   energy.SetUseModBox(True)
   energy.setVerbosity(False)
 
-  dqdx = showerreco.dQdxModule()
+  #dqdx = showerreco.dQdxModule()
 
-  dedx = showerreco.dEdxFromdQdx()
-  dedx.SetUsePitch(False)
-  dedx.setVerbosity(False)
+  #dedx = showerreco.dEdxFromdQdx()
+  #dedx.SetUsePitch(False)
+  #dedx.setVerbosity(False)
 
   #alg.AddShowerRecoModule(axis3D)
   alg.AddShowerRecoModule(angle3D)
   alg.AddShowerRecoModule(showerreco.StartPoint3DModule()  )
   alg.AddShowerRecoModule(energy)
-  alg.AddShowerRecoModule(dqdx)
-  alg.AddShowerRecoModule(dedx)
-  #alg.AddShowerRecoModule(showerreco.StartPoint2DModule()  )
+  #alg.AddShowerRecoModule(dqdx)
+  #alg.AddShowerRecoModule(dedx)
+  # alg.AddShowerRecoModule(showerreco.StartPoint2DModule()  )
   #alg.AddShowerRecoModule(showerreco.OtherStartPoint3D()  )
-  #alg.AddShowerRecoModule(showerreco.ShowerChargeModule()  )
+  # alg.AddShowerRecoModule(showerreco.ShowerChargeModule()  )
 
   alg.AddShowerRecoModule(showerreco.GeoModule())
 
@@ -118,9 +120,9 @@ my_proc.set_output_file("showerRecoUboone.root")
 
 
 ana_unit=DefaultShowerReco3D()
-
 # set ProtoShower Algo to go from data-products to a ProtoShower object
-protoshoweralg = showerreco.ProtoShowerAlgClusterParams()
+#protoshoweralg = showerreco.ProtoShowerAlgClusterParams()
+protoshoweralg = showerreco.ProtoShowerAlgOpenCV()
 ana_unit.GetProtoShowerHelper().setProtoShowerAlg( protoshoweralg )
 #ana_unit.SetInputProducer("fuzzyclustermerger")
 ana_unit.SetInputProducer("timeoverlap")

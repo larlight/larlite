@@ -61,6 +61,7 @@ namespace ertool {
     std::string const mostupstream = "mostupstream";
     std::string const mostchildren = "mostchildren";
     std::string const mostenergy = "mostenergy";
+    std::string const mostenergy_lone = "mostenergylone";
     std::string const smallestsphere = "smallestsphere";
     std::string const trackdirection = "trackdirection";
 
@@ -140,11 +141,13 @@ namespace ertool {
 
     geoalgo::Point_t const * GetMostEnergyPrimary
       (EventData const & data,
-       ParticleGraph const & graph,
-       ParticleAssociations const & pas, 
+       ParticleGraph & graph,
+       ParticleAssociations & pas, 
        std::vector<Int_t> const & skip,
-       Int_t & index);
-    
+       Int_t & index,
+       Bool_t const lone = false,
+       Bool_t * first = nullptr);
+
     void AddAllLoneTracks
       (const EventData &data,
        ParticleGraph & graph,
@@ -159,7 +162,11 @@ namespace ertool {
        ParticleGraph & graph,
        NodeID_t const n = kINVALID_NODE_ID);
 
-    void AddTracksAndShowers
+    void AddTracksAndShowersUpstream
+      (const EventData &data,
+       ParticleGraph & graph);
+
+    void AddTracksAndShowersEnergy
       (const EventData &data,
        ParticleGraph & graph);
 
