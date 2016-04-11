@@ -9,6 +9,14 @@ namespace showerreco {
 void Angle3DFormula::do_reconstruction(const ProtoShower & proto_shower,
                                        Shower_t& resultShower) {
 
+
+  //if the module does not have 2D cluster info -> fail the reconstruction
+  if (!proto_shower.hasCluster2D()){
+    std::stringstream ss;
+    ss << "Fail @ algo " << this->name() << " due to missing 2D cluster";
+    throw ShowerRecoException(ss.str());
+  }
+
   auto & clusters = proto_shower.params();
 
   auto geomHelper = larutil::GeometryHelper::GetME();

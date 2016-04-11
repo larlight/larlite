@@ -15,13 +15,9 @@
 #define PROTOSHOWERALGBASE_H
 
 #include <iostream>
+#include "DataFormat/storage_manager.h"
+#include "ShowerRecoException.h"
 
-#include "DataFormat/pfpart.h"
-#include "DataFormat/cluster.h"
-#include "DataFormat/hit.h"
-#include "DataFormat/spacepoint.h"
-#include "DataFormat/seed.h"
-#include "DataFormat/vertex.h"
 
 #include "ShowerReco3D/Base/ShowerRecoTypes.h"
 
@@ -38,17 +34,22 @@ namespace showerreco {
   public:
     
     /// Default constructor
-    ProtoShowerAlgBase(){}
+    ProtoShowerAlgBase(){ _name = "ProtoShowerAlgBase"; }
     
     /// Default destructor
     ~ProtoShowerAlgBase(){}
     
-    virtual void GenerateProtoShower(const std::vector<::larlite::cluster> &clus_v, 
-				     const std::vector< std::vector<::larlite::hit> > &hit_v,
-				     const std::vector<::larlite::spacepoint> &sps_v,
-				     const std::vector<::larlite::vertex> &vtx,
+    virtual void GenerateProtoShower(::larlite::storage_manager* storage,
+				     ::larlite::event_pfpart* ev_pfpart,
+				     const size_t proto_shower_pfpart,
 				     showerreco::ProtoShower & proto_shower) = 0;
     
+
+    std::string name() { return _name; }
+    
+  protected:
+
+    std::string _name;
     
   };
   

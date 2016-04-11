@@ -61,7 +61,7 @@ namespace ertool {
     std::string const mostupstream = "mostupstream";
     std::string const mostchildren = "mostchildren";
     std::string const mostenergy = "mostenergy";
-    std::string const mostenergy_lone = "mostenergy_lone";
+    std::string const mostenergy_lone = "mostenergylone";
     std::string const smallestsphere = "smallestsphere";
     std::string const trackdirection = "trackdirection";
 
