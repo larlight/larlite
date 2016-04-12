@@ -43,6 +43,8 @@ namespace larlite {
     
     void setMinEnergy(double e) { _mc_energy_min = e; }
 
+    void setMinInputClusterSize(size_t n) { _min_input_cluster_n_hits = n; }
+
   protected:
 
     // hit brack-tracking tool
@@ -53,6 +55,11 @@ namespace larlite {
 
     // minimum energy for a particle to be added to the map [MeV]
     double _mc_energy_min;
+
+    // minimum number of hits in a cluster, for hits in that cluster
+    // to be used by the MCClusterer
+    // this is to avoid clustering small lumps of a shower and "deform" the clusters
+    size_t _min_input_cluster_n_hits;
     
 
     

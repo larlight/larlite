@@ -16,19 +16,16 @@
 
 #include <iostream>
 
-#include "ShowerRecoTypes.h"
-
+#include "DataFormat/storage_manager.h"
 #include "DataFormat/pfpart.h"
 #include "DataFormat/cluster.h"
 #include "DataFormat/spacepoint.h"
 #include "DataFormat/seed.h"
 #include "DataFormat/vertex.h"
 
-#include "ClusterRecoUtil/Base/CRUHelper.h"
-#include "Cluster3DRecoUtil/Base/CRU3DHelper.h"
+#include "ShowerReco3D/Base/ShowerRecoTypes.h"
 
-#include "Cluster3DRecoUtil/Alg/Default3DParamsAlg.h"
-#include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
+#include "ProtoShowerAlgBase.h"
 
 /**
    \class ProtoShowerHelper
@@ -45,7 +42,7 @@ public:
   ProtoShowerHelper();
 
   /// Default destructor
-  ~ProtoShowerHelper();
+  ~ProtoShowerHelper(){}
 
   // From the storage manager, and with the pfpart producer name, generate
   // a vector of all the protoshowers in the event.
@@ -54,17 +51,13 @@ public:
                             std::vector<::showerreco::ProtoShower> & proto_showers,
                             std::vector<unsigned int> showerLikePFParts=std::vector<unsigned int>(1,999999));
 
-  void SetClusterParamsAlg(::cluster::ClusterParamsAlg * _new_params_alg);
-  void SetCluster3DParamsAlg(::cluster3D::Cluster3DParamsAlg * _new_params3D_alg);
+  // set algorithm to use to create ProtoShowers from LArLite data-products
+  void setProtoShowerAlg(ProtoShowerAlgBase *alg) { _proto_shower_alg = alg; }
 
 private:
 
-  ::cluster3D::Cluster3DParamsAlg * _params3D_alg;
-  ::cluster::ClusterParamsAlg * _params_alg;
-
-  // Use the CRU Helpers to build cluster params:
-  ::cluster3D::CRU3DHelper _cru3D_helper;
-  ::cluster::CRUHelper _cru_helper;
+  // base class for Proto Shower algorithm
+  ProtoShowerAlgBase *_proto_shower_alg;
 
 };
 

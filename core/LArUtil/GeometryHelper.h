@@ -158,6 +158,19 @@ public:
 
 
     /**
+     * @brief Convert a 3D point in the detector to 2D point on a plane
+     * @details Conversion is done by setting the time to the X coordinated, minus any corrections from trigger offset and plane offset.
+     * The wire coordinate is a combination of Y, Z coordinates that depends on the angle of the wires WRT vertical
+     *
+     * @param xyz Pointer to float of the point in 3D to project into 2D.  Caller is responsible for creating and deleting this array
+     * @param plane The index of the plane to project into.  Ranges from 0 to Nplanes -1 (Nplanes available in Geometry::Nplanes() )
+     *
+     * @return Returns a Point2D of the 2D projection into the plane
+     */
+    Point2D Point_3Dto2D(float x, float y, float z, unsigned int plane) const;
+
+
+    /**
      * @brief Take a line (start point and direction) and project that into 2D
      * @details This function will return the start point and direction of a line segment projected into 2D
      *  It works by using the Point_3Dto2D function to project the start point into 2D.  Then, it finds a second

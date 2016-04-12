@@ -19,30 +19,6 @@ ShowerQuality_singleshowers::ShowerQuality_singleshowers() {
 
   _single_particle_quality = true;
 
-  //_mcShowerQuality_singleshowers = true;
-
-  // hMatchCorrectness = nullptr;
-
-  // hVtxDX = nullptr;
-  // hVtxDY = nullptr;
-  // hVtxDZ = nullptr;
-  // hVtxDR = nullptr;
-
-  // hDCosX = nullptr;
-  // hDCosY = nullptr;
-  // hDCosZ = nullptr;
-  // h3DAngleDiff = nullptr;
-
-  // hEnergyCorr  = nullptr;
-  // hEnergyAssym = nullptr;
-  // hEnergyDiff  = nullptr;
-
-  // hMatchedClusterPur = nullptr;
-  // hMatchedClusterEff = nullptr;
-
-  // mDEDX.clear();
-  // hBestPlane = nullptr;
-
   fShowerTree = nullptr;
   fEventTree = nullptr;
 
@@ -55,106 +31,6 @@ bool ShowerQuality_singleshowers::initialize() {
     print(msg::kERROR, __FUNCTION__, "Shower producer's name is not set!");
     return false;
   }
-
-//  auto geo = larutil::Geometry::GetME();
-
-
-  // //
-  // // Matching correctness histogram initialization
-  // //
-  // if (hMatchCorrectness) delete hMatchCorrectness;
-  // hMatchCorrectness = new TH1D("hMatchCorrectness",
-  //                              "Shower 2D Cluster Matching Correctness; Correctness; Showers",
-  //                              101, -0.005, 1.005);
-
-  // //
-  // // 3D Vtx (start point) MC/Reco comparison histogram initialization
-  // //
-  // if (hVtxDX) delete hVtxDX;
-  // if (hVtxDY) delete hVtxDY;
-  // if (hVtxDZ) delete hVtxDZ;
-  //if (hVtxDR) delete hVtxDR;
-
-  // hVtxDX = new TH1D("hVtxDX",
-  //                   "Reco - MC Start X [cm] Displacement; #DeltaX [cm]; Showers",
-  //                   200, -100, 100);
-
-  // hVtxDY = new TH1D("hVtxDY",
-  //                   "Reco - MC Start Y [cm] Displacement; #DeltaY [cm]; Showers",
-  //                   200, -100, 100);
-
-  // hVtxDZ = new TH1D("hVtxDZ",
-  //                   "Reco - MC Start Z [cm] Displacement; #DeltaZ [cm]; Showers",
-  //                   200, -100, 100);
-
-  // hVtxDR = new TH1D("hVtxDR",
-  //                   "Reco - MC Start 3D Vtx Displacement; #DeltaR [cm]; Showers",
-  //                   200, -100, 100);
-
-  // //
-  // // 3D Angular MC/Reco comparison histogram initialization
-  // //
-  // if (hDCosX) delete hDCosX;
-  // if (hDCosY) delete hDCosY;
-  // if (hDCosZ) delete hDCosZ;
-  // if (h3DAngleDiff) delete h3DAngleDiff;
-
-  // hDCosX = new TH1D("hDCosX",
-  //                   "Direction Unit Vector Reco - MC #DeltaX; #DeltaCosX; Showers",
-  //                   100, -2, 2);
-
-  // hDCosY = new TH1D("hDCosY",
-  //                   "Direction Unit Vector Reco - MC #DeltaY; #DeltaCosY; Showers",
-  //                   100, -2, 2);
-
-  // hDCosZ = new TH1D("hDCosZ",
-  //                   "Direction Unit Vector Reco - MC #DeltaZ; #DeltaCosZ; Showers",
-  //                   100, -2, 2);
-
-  // h3DAngleDiff = new TH1D("h3DAngleDiff",
-  //                         "3D Opening Angle Between Reco & MC; Opening Angle [degrees]; Showers",
-  //                         181, -0.5, 180.5);
-
-  // //
-  // // Energy MC/Reco comparison histogram initialization
-  // //
-  // if (hEnergyCorr)  delete hEnergyCorr;
-  // if (hEnergyAssym) delete hEnergyAssym;
-  // if (hEnergyDiff)  delete hEnergyDiff;
-
-  // hEnergyCorr = new TH2D("hEnergyCorr",
-  //                        "Reco (x) vs. MC (y) Energy Comparison; Reco Energy [MeV]; MC Energy [MeV]",
-  //                        200, 0, 1000, 200, 0, 1000);
-
-  // hEnergyAssym = new TH1D("hEnergyAssym",
-  //                         "MC - Reco Energy Fractional Difference; Assymetry; Showers",
-  //                         201, -1.005, 1.005);
-
-  // hEnergyDiff = new TH1D("hEnergyDiff",
-  //                        "MC - Reco Energy Difference; Energy Difference [MeV]; Showers",
-  //                        200, 0, 1000);
-
-  // //
-  // // Shower cluster purity & efficiency histograms initialization
-  // //
-  // if (hMatchedClusterEff) delete hMatchedClusterEff;
-  // if (hMatchedClusterPur) delete hMatchedClusterPur;
-
-  // hMatchedClusterEff = new TH1D("hMatchedClusterEff_PlaneCombo",
-  //                               "Matched Shower Cluster's Charge Efficiency; Efficiency; Clusters",
-  //                               101, -0.005, 1.005);
-
-  // hMatchedClusterPur = new TH1D("hMatchedClusterPur_PlaneCombo",
-  //                               "Matched Shower Cluster's Charge Purity; Purity; Clusters",
-  //                               101, -0.005, 1.005);
-
-
-  // //
-  // // Best plane ID histogram initialization
-  // //
-  // hBestPlane = new TH1D("hBestPlane",
-  //                       "Best Plane (for energy & dE/dx estimate); Plane ID; Showers",
-  //                       geo->Nplanes(), -0.5, geo->Nplanes() - 0.5);
 
   InitializeAnaTrees();
 
@@ -207,33 +83,11 @@ bool ShowerQuality_singleshowers::analyze(storage_manager* storage) {
     return false;
   }
 
-  // // Get associated clusters
-  // event_cluster* ev_cluster = nullptr;
-  // auto const& ass_cluster_v = storage->find_one_ass(ev_shower->id(), ev_cluster, ev_shower->name());
-
-  // if (!ev_cluster)
-  //   print(msg::kERROR, __FUNCTION__, Form("No associated cluster found to a shower produced by \"%s\"", fShowerProducer.c_str()));
-  // else if (ev_cluster->size() < 1) {
-  //   print(msg::kERROR, __FUNCTION__, Form("There are 0 clusters in this event! Skipping......"));
-  //   return false;
-  // }
-
   /// Check there is only one mcshower in single particle mode
   if (_single_particle_quality && ev_mcs->size() != 1) {
     print(msg::kERROR, __FUNCTION__, Form("The number of mcshowers in this event != 1, and you are running in single_particle_quality! Something is wrong!"));
     return false;
   }
-
-  // Loop over reconstructed showers and fill quality TTree for each
-  // for (size_t shower_index = 0; shower_index < ass_cluster_v.size(); ++shower_index) {
-
-//     //QualityInfo needs the reco shower, the mcshower, and the associated clusters (necessary for cluster efficiency)
-//     std::vector< const larlite::cluster * > associated_clusters;
-//     for (size_t i = 0; i < ass_cluster_v[shower_index].size(); ++i){
-//       // std::cout<<ass_cluster_v[shower_index][i]<<std::endl;
-//       // std::cout<<"Test fuck me in the ass "<<ev_cluster->at(ass_cluster_v[shower_index][i]).Integral()<<std::endl;
-//       associated_clusters.push_back( & ev_cluster->at(ass_cluster_v[shower_index][i]) );
-// }
 
   // double maxRecoShowerEnergyY = 0.;
   // size_t iMostEnergeticShower = 0;
@@ -244,146 +98,7 @@ bool ShowerQuality_singleshowers::analyze(storage_manager* storage) {
     FillQualityInfo(myrecoshower, mymcshower, shower_index);//, associated_clusters);
   }
 
-  // auto const& myrecoshower = ev_shower->at(iMostEnergeticShower);
-  // auto const& mymcshower = ev_mcs->at(0);
-  // FillQualityInfo(myrecoshower, mymcshower, iMostEnergeticShower);
-
-  // // get associated hits
-  // event_hit* ev_hit = nullptr;
-  // auto const& ass_hit_v = storage->find_one_ass(ev_cluster->id(), ev_hit, ev_cluster->name());
-
-  // if (!ev_hit)
-  //   print(msg::kERROR, __FUNCTION__, Form("No associated hit found to a shower produced by \"%s\"", ev_cluster->name().c_str()));
-  // else if (ev_hit->size() < 1) {
-  //   print(msg::kERROR, __FUNCTION__, Form("There are 0 hits in this event! Skipping......"));
-  //   return false;
-  // }
-
-
-  // // Create G4 track ID vector for which we are interested in
-  // std::vector<std::vector<unsigned int> > g4_trackid_v;
-  // std::vector<unsigned int> mc_index_v;
-  // g4_trackid_v.reserve(ev_mcs->size());
-  // for (size_t mc_index = 0; mc_index < ev_mcs->size(); ++mc_index) {
-  //   auto const& mcs = (*ev_mcs)[mc_index];
-  //   double energy = mcs.DetProfile().E();
-  //   std::vector<unsigned int> id_v;
-  //   id_v.reserve(mcs.DaughterTrackID().size());
-  //   if ( _mc_energy_min < energy && energy < _mc_energy_max ) {
-  //     for (auto const& id : mcs.DaughterTrackID()) {
-  //       if (id == mcs.TrackID()) continue;
-  //       id_v.push_back(id);
-  //     }
-  //     id_v.push_back(mcs.TrackID());
-  //     g4_trackid_v.push_back(id_v);
-  //     mc_index_v.push_back(mc_index);
-  //   }
-  // }
-
-  // // Find the best-representative reco-ed Shower given an MCShower
-  // std::vector<std::vector<double> > shower_mcq_vv(ev_shower->size(), std::vector<double>(mc_index_v.size(), 0));
-
-  // for (size_t shower_index = 0; shower_index < ass_cluster_v.size(); ++shower_index) {
-
-  //   auto const& ass_cluster = ass_cluster_v[shower_index];
-
-  //   std::vector< ::btutil::WireRange_t> w_v;
-
-  //   for (auto const& cluster_index : ass_cluster) {
-
-  //     auto const& ass_hit = ass_hit_v[cluster_index];
-
-  //     w_v.reserve(ass_hit.size() + w_v.size());
-
-  //     for (auto const& hit_index : ass_hit) {
-
-  //       auto const& h = (*ev_hit)[hit_index];
-
-  //       w_v.push_back( ::btutil::WireRange_t( h.Channel(),
-  //                                             h.StartTick(),
-  //                                             h.EndTick() )
-  //                    );
-  //     }
-  //   }
-
-  //auto mcq_v = fBTAlg.BTAlg().MCQ(w_v);
-
-  // auto& shower_mcq_v = shower_mcq_vv[shower_index];
-
-  // for (size_t mcs_index = 0; mcs_index < (mcq_v.size() - 1); ++mcs_index) {
-
-  //   shower_mcq_v[mcs_index] = mcq_v[mcs_index];
-
-  // }
-// }
-
-// // are we filling once per Reco shower or once per MC shower?
-// mcshower mc_shower;
-// shower reco_shower;
-// size_t best_index;
-// size_t mcs_index;
-// size_t shower_index;
-// // if filling once per MC shower
-// if (_mcShowerQuality_singleshowers)
-// {
-//   // Loop over MCShower and inspect corresponding shower quality
-//   for (mcs_index = 0; mcs_index < mc_index_v.size(); ++mcs_index) {
-
-//     mc_shower = (*ev_mcs)[mc_index_v[mcs_index]];
-
-//     // Search for the best representative shower
-//     best_index = shower_mcq_vv.size();
-//     double max_mcq = 0;
-//     for (shower_index = 0; shower_index < shower_mcq_vv.size(); ++shower_index) {
-
-//       if ( shower_mcq_vv[shower_index][mcs_index] > max_mcq)
-//         best_index = shower_index;
-//     }
-
-//     if (best_index == shower_mcq_vv.size()) {
-//       print(msg::kERROR, __FUNCTION__,
-//             Form("Failed to find a corresponding shower for MCShower %d", mc_index_v[mcs_index])
-//            );
-//       continue;
-//     }
-
-//     reco_shower = (*ev_shower)[best_index];
-
-//     FillQualityInfo(reco_shower, mc_shower, best_index, mcs_index, ass_cluster_v);
-//   }
-// }// if filling once per MC shower
-
-
-// if filling once per RECO shower
-// else {
-
-// // Loop over RECOShower and inspect corresponding shower quality
-// for (shower_index = 0; shower_index < shower_mcq_vv.size(); ++shower_index) {
-
-//   reco_shower = (*ev_shower)[shower_index];
-
-//   // search for the best representative mc shower
-//   best_index = mc_index_v.size();
-//   double max_mcq = 0;
-
-//   for (size_t mcs_index = 0; mcs_index < mc_index_v.size(); ++mcs_index) {
-
-//     if ( shower_mcq_vv[shower_index][mcs_index] > max_mcq)
-//       best_index = mcs_index;
-//   }
-
-//   if (best_index == mc_index_v.size()) {
-//     continue;
-//   }
-
-//   mc_shower = (*ev_mcs)[mc_index_v[best_index]];
-
-//   FillQualityInfo(reco_shower, mc_shower, shower_index, best_index, ass_cluster_v);
-// }// if filling once per RECO shower
-
-// }
-
-//Fill the once-per-event TTree
+  //Fill the once-per-event TTree
   fEventTree->Fill();
 
 

@@ -24,10 +24,17 @@ namespace larlite {
     fOrigin=simb::kUnknown;
   }
 
+  size_t                               mctruth::NParticles()   const { return fPartList.size(); }
   const std::vector<larlite::mcpart>&  mctruth::GetParticles() const { return fPartList;    }
   const mcnu&                          mctruth::GetNeutrino()  const { return fMCNeutrino;  }
   simb::Origin_t                       mctruth::Origin()       const { return fOrigin;      }
   Bool_t                               mctruth::NeutrinoSet()  const { return fNeutrinoSet; }
+
+  const larlite::mcpart&  mctruth::GetParticle(size_t i) const
+  {
+    if(i >= fPartList.size()) throw DataFormatException("Invalid particle index requested!");
+    return fPartList[i];
+  }
 
   //*************************************
   void mctruth::SetNeutrino(Int_t CCNC,

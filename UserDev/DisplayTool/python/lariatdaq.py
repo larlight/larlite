@@ -118,7 +118,6 @@ class lariat_manager(manager, wire, QtCore.QObject):
       # this function can be triggered by a button push, which implies it was stopped before;
       # In that case, refresh the thread and start over.
       # It can also be called by the parsefileName function, which implies a file is ready
-      self._running = True
       if self._watcher == None and fileName == None:
           print "ERROR: there is no file to watch, can not start a run."
           return
@@ -127,11 +126,12 @@ class lariat_manager(manager, wire, QtCore.QObject):
       self._watcher.fileChanged.connect(self.setInputFile)
       self._running = True
       self._watcher.start()
-      pass
+      
 
   def stopSpillRun(self):
     self._running = False
-    self._stopFlag.set()
+    if self._stopFlag is not None:
+      self._stopFlag.set()
     return
 
   def startCycle(self,delay=None):
@@ -277,6 +277,7 @@ class lariatgui(gui):
     # This function just makes a dummy eastern layout to use.
     label1 = QtGui.QLabel("Lariat DQM")
     label2 = QtGui.QLabel("Online Monitor")
+
     font = label1.font()
     font.setBold(True)
     label1.setFont(font)
@@ -290,7 +291,7 @@ class lariatgui(gui):
     self._eventUpdatePauseButton = QtGui.QPushButton("START")
     self._eventUpdatePauseButton.clicked.connect(self.eventUpdateButtonHandler)
 
-    self._spillUpdateLabel = QtGui.QLabel("Spill Update ON")
+    self._spillUpdateLabel = QtGui.QLabel("Spill Update OFF")
     self._spillUpdatePauseButton = QtGui.QPushButton("START")
     self._spillUpdatePauseButton.clicked.connect(self.spillUpdateButtonHandler)
 
@@ -325,17 +326,18 @@ class lariatgui(gui):
     if self._event_manager.isRunning():
       self._event_manager.stopSpillRun()
       self._spillUpdatePauseButton.setText("START")
-      self._spillUpdateLabel.setText("Spill update OFF")
+      self._spillUpdateLabel.setText("Spill Update OFF")
     else:
       self._event_manager.startSpillRun()
-      self._spillUpdatePauseButton.setText("PAUSE")
-      self._spillUpdateLabel.setText("Spill update ON")
+      if self._event_manager.isRunning():
+        self._spillUpdatePauseButton.setText("PAUSE")
+        self._spillUpdateLabel.setText("Spill Update ON")
 
   def eventUpdateButtonHandler(self):
     if self._event_manager.isCycling():
       self._event_manager.stopCycle()
       self._eventUpdatePauseButton.setText("START")
-      self._autoRunLabel.setText("Event update OFF")
+      self._autoRunLabel.setText("Event Update OFF")
     else:
       try:
         delay = float(self._eventUpdateDelayEntry.text())
@@ -345,7 +347,7 @@ class lariatgui(gui):
         delay = 0.1
       self._eventUpdatePauseButton.setText("PAUSE")
       self._event_manager.startCycle(delay)
-      self._autoRunLabel.setText("Event update ON")
+      self._autoRunLabel.setText("Event Update ON")
 
 def sigintHandler(*args):
     """Handler for the SIGINT signal."""

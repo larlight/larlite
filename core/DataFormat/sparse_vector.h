@@ -38,6 +38,8 @@ namespace larlite {
     inline bool operator< (const unsigned int tick) const
     { return _start_tick < tick; }
 
+    const std::vector<float>& data() const { return (*this); }
+
   };
 
   template <class T>

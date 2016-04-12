@@ -30,12 +30,12 @@ class drawableItems(object):
         self._drawableClasses = collections.OrderedDict()
         self._drawableClasses.update({'Hit': [hit.hit,"hit"]})
         self._drawableClasses.update({'Cluster': [cluster.cluster,"cluster"]})
-        #self._drawableClasses.update({'Match': [match.match,"cluster"]})
         self._drawableClasses.update({'Match': [match.match,"pfpart"]})
         self._drawableClasses.update({'Shower': [shower.shower,"shower"]})
         self._drawableClasses.update({'Track': [track.track,"track"]})
         self._drawableClasses.update({'Endpoint 2D': [endpoint2d.endpoint2d,"endpoint2d"]})
         self._drawableClasses.update({'Vertex': [vertex.vertex,"vertex"]})
+        self._drawableClasses.update({'SPS': [spacepoint.spacepoint,"sps"]})
 
     def getListOfTitles(self):
         return self._drawableClasses.keys()
@@ -59,7 +59,6 @@ try:
             # items are stored as pointers to the classes (not instances)
             self._drawableClasses = collections.OrderedDict()
             self._drawableClasses.update({'Spacepoints': [spacepoint.spacepoint3D,"sps"]})
-            self._drawableClasses.update({'Simch': [simch.simch3D,"simch"]})
             self._drawableClasses.update({'PFParticle': [pfpart.pfpart3D,"pfpart"]})
             self._drawableClasses.update({'Seed': [seed.seed3D,"seed"]})
             self._drawableClasses.update({'Vertex': [vertex.vertex3D,"vertex"]})
@@ -68,6 +67,7 @@ try:
             self._drawableClasses.update({'Opflash': [opflash.opflash3D,"opflash"]})
             self._drawableClasses.update({'MCTrack': [mctrack.mctrack3D,"mctrack"]})
             self._drawableClasses.update({'MCShower': [mcshower.mcshower3D,"mcshower"]})
+            self._drawableClasses.update({'Simch': [simch.simch3D,"simch"]})
 
         def getListOfTitles(self):
             return self._drawableClasses.keys()

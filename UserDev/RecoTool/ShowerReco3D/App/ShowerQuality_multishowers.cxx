@@ -212,43 +212,6 @@ bool ShowerQuality_multishowers::analyze(storage_manager* storage) {
     return false;
   }
 
-  /*
-  // Get cluster
-  auto shower_cluster_ass_keys = ev_shower->association_keys(data::kCluster);
-  if(!(shower_cluster_ass_keys.size())) {
-    print(msg::kERROR,__FUNCTION__,
-    Form("No associated cluster found to a shower produced by \"%s\"",
-   fShowerProducer.c_str())
-    );
-  }
-
-  auto ev_cluster = storage->get_data<event_cluster>(shower_cluster_ass_keys[0]);
-  if(!ev_cluster || !(ev_cluster->size())) {
-    print(msg::kERROR,__FUNCTION__,"Could not retrieve a reconstructed cluster!");
-    return false;
-  }
-
-  // Retrieve shower => cluster association
-  auto ass_cluster_v = ev_shower->association(ev_cluster->id());
-
-  // Get hits
-  auto cluster_hit_ass_keys = ev_cluster->association_keys(data::kHit);
-  if(!(cluster_hit_ass_keys.size())) {
-    print(msg::kERROR,__FUNCTION__,
-    Form("No cluster=>hit association found for \"%s\"!",ev_cluster->name().c_str())
-    );
-    return false;
-  }
-
-  auto ev_hit = storage->get_data<event_hit>(cluster_hit_ass_keys[0]);
-  if(!ev_hit || !(ev_hit->size())) {
-    print(msg::kERROR,__FUNCTION__,"Could not retrieve a reconstructed hit!");
-    return false;
-  }
-
-  // Retrieve cluster=>hit association
-  auto ass_hit_v = ev_cluster->association(ev_hit->id());
-  */
 
   // Create G4 track ID vector for which we are interested in
   std::vector<std::vector<unsigned int> > g4_trackid_v;
@@ -294,10 +257,9 @@ bool ShowerQuality_multishowers::analyze(storage_manager* storage) {
 
         auto const& h = (*ev_hit)[hit_index];
 
-        w_v.push_back( ::btutil::WireRange_t( h.Channel(),
-                                              h.StartTick(),
-                                              h.EndTick() )
-                     );
+        //w_v.push_back( ::btutil::WireRange_t( h.Channel(), h.StartTick(), h.EndTick()) );
+	w_v.push_back( ::btutil::WireRange_t(h.Channel(),h.PeakTime()-h.RMS()+3050,h.PeakTime()+h.RMS()+3050) );
+		       
       }
     }
 
@@ -331,9 +293,14 @@ bool ShowerQuality_multishowers::analyze(storage_manager* storage) {
       double max_mcq = 0;
       for (shower_index = 0; shower_index < shower_mcq_vv.size(); ++shower_index) {
 
-        if ( shower_mcq_vv[shower_index][mcs_index] > max_mcq)
+	std::cout << "Found MC shower w/" <<  shower_mcq_vv[shower_index][mcs_index] << std::endl;
+        if (shower_mcq_vv[shower_index][mcs_index] > max_mcq){
+	  max_mcq = shower_mcq_vv[shower_index][mcs_index];
           best_index = shower_index;
+	}
+
       }
+      std::cout << "Max Q : " << max_mcq << std::endl << std::endl;
 
       if (best_index == shower_mcq_vv.size()) {
         print(msg::kERROR, __FUNCTION__,
@@ -344,7 +311,7 @@ bool ShowerQuality_multishowers::analyze(storage_manager* storage) {
 
       reco_shower = (*ev_shower)[best_index];
 
-      FillQualityInfo(reco_shower, mc_shower, best_index, mcs_index, ass_cluster_v);
+      FillQualityInfo(reco_shower, mc_shower, best_index, mcs_index, max_mcq, ass_cluster_v);
     }
   }// if filling once per MC shower
   // if filling once per RECO shower
@@ -361,8 +328,12 @@ bool ShowerQuality_multishowers::analyze(storage_manager* storage) {
 
       for (size_t mcs_index = 0; mcs_index < mc_index_v.size(); ++mcs_index) {
 
-        if ( shower_mcq_vv[shower_index][mcs_index] > max_mcq)
+	std::cout << "Found MC shower w/" <<  shower_mcq_vv[shower_index][mcs_index] << std::endl;
+        if ( shower_mcq_vv[shower_index][mcs_index] > max_mcq){
+	  max_mcq = shower_mcq_vv[shower_index][mcs_index];
           best_index = mcs_index;
+	}
+	std::cout << "Largest Q is " << max_mcq << std::endl;
       }
 
       if (best_index == mc_index_v.size()) {
@@ -371,7 +342,7 @@ bool ShowerQuality_multishowers::analyze(storage_manager* storage) {
 
       mc_shower = (*ev_mcs)[mc_index_v[best_index]];
 
-      FillQualityInfo(reco_shower, mc_shower, shower_index, best_index, ass_cluster_v);
+      FillQualityInfo(reco_shower, mc_shower, shower_index, best_index, max_mcq, ass_cluster_v);
     }// if filling once per RECO shower
 
   }
@@ -422,9 +393,10 @@ bool ShowerQuality_multishowers::finalize() {
   return true;
 }
 
-void ShowerQuality_multishowers::FillQualityInfo(const shower& reco_shower, const mcshower& mc_shower,
-                                    const size_t& shower_index, const size_t& mcshower_index,
-                                    const AssSet_t& ass_cluster_v)
+  void ShowerQuality_multishowers::FillQualityInfo(const shower& reco_shower, const mcshower& mc_shower,
+						   const size_t& shower_index, const size_t& mcshower_index,
+						   const double& mcq,
+						   const AssSet_t& ass_cluster_v)
 {
 
   auto res = fBTAlg.MatchCorrectness(ass_cluster_v[shower_index]);
@@ -443,6 +415,9 @@ void ShowerQuality_multishowers::FillQualityInfo(const shower& reco_shower, cons
   fTreeParams.mc_y = mc_shower.DetProfile().Y();
   fTreeParams.mc_z = mc_shower.DetProfile().Z();
   fTreeParams.mc_t = mc_shower.DetProfile().T();
+
+  fTreeParams.mc_q    = mc_shower.Charge(2);
+  fTreeParams.mc_q_bt = mcq; // the charge identified when using the back-tracker
 
   fTreeParams.mc_energy = mc_shower.DetProfile().E();
   fTreeParams.mc_pdgid  = mc_shower.PdgCode();
@@ -572,6 +547,8 @@ void ShowerQuality_multishowers::InitializeAnaTree()
   fTree->Branch("mc_y", &fTreeParams.mc_y, "mc_y/D");
   fTree->Branch("mc_z", &fTreeParams.mc_z, "mc_z/D");
   fTree->Branch("mc_t", &fTreeParams.mc_t, "mc_t/D");
+  fTree->Branch("mc_q", &fTreeParams.mc_q, "mc_q/D");
+  fTree->Branch("mc_q_bt", &fTreeParams.mc_q_bt, "mc_q_bt/D");
   fTree->Branch("mc_dcosx", &fTreeParams.mc_dcosx, "mc_dcosx/D");
   fTree->Branch("mc_dcosy", &fTreeParams.mc_dcosy, "mc_dcosy/D");
   fTree->Branch("mc_dcosz", &fTreeParams.mc_dcosz, "mc_dcosz/D");

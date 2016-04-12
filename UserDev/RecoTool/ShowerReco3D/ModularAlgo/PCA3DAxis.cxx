@@ -6,16 +6,6 @@
 // #include <algorithm>
 
 namespace showerreco {
-
-void PCA3DAxis::do_reconstruction(const ProtoShower & proto_shower,
-                                    Shower_t& resultShower) {
-
-  // auto & clusters = proto_shower.params();
-
-
-  // This is really simple.  Read in the 3D params and use that to
-  // set the 3D axis of the shower.  Right now, no checks against the
-  // 2D projection but should be added somewhere.
   
   // If there is no 3D params, throw an exception.
   // 
