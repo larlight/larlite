@@ -115,6 +115,10 @@ namespace showerreco {
     //*********************************
     // 3D Cluster Params reconstruction
     //*********************************
+
+
+    if (!_params3D_alg)
+      _params3D_alg = new ::cluster3D::Default3DParamsAlg();
     
     // Get any possible spacepoints
     larlite::event_spacepoint * ev_sps = nullptr;
@@ -169,6 +173,10 @@ namespace showerreco {
       }// if there is vertex info
       else
 	proto_shower.hasVertex(false);
+
+    std::cout << "has cluster2D : " << proto_shower.hasCluster2D() << std::endl;
+    std::cout << "has cluster3D : " << proto_shower.hasCluster3D() << std::endl;
+    std::cout << "has vertex    : " << proto_shower.hasVertex() << std::endl;
     
     return;
   }
