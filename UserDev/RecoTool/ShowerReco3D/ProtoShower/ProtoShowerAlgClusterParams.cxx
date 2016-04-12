@@ -140,6 +140,7 @@ namespace showerreco {
       else{
 	proto_shower.hasCluster3D(true);
 	_cru3D_helper.GenerateParams3D( sps_v, proto_shower._params3D);
+        _params3D_alg->FillParams(proto_shower._params3D);
       }
     }// if there are spacepoints
     else
@@ -174,10 +175,6 @@ namespace showerreco {
       else
 	proto_shower.hasVertex(false);
 
-    std::cout << "has cluster2D : " << proto_shower.hasCluster2D() << std::endl;
-    std::cout << "has cluster3D : " << proto_shower.hasCluster3D() << std::endl;
-    std::cout << "has vertex    : " << proto_shower.hasVertex() << std::endl;
-    
     return;
   }
   
