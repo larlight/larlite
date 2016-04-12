@@ -19,7 +19,7 @@ void ToyGeoModule::do_reconstruction(const ProtoShower & proto_shower,
 
   if ( proto_shower.hasCluster3D() ) {
     // Length:
-    resultShower.fLength = 3. * sqrt(proto_shower.params3D().eigenvalue_principal);
+    resultShower.fLength = 6. * sqrt(proto_shower.params3D().eigenvalue_principal);
 
     // Get the opening angle:
     double openAngle = 0.;
