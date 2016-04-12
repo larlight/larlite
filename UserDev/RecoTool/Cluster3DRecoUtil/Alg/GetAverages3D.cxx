@@ -16,6 +16,7 @@ void GetAverages3D::do_params_fill(cluster3D_params & cluster) {
 
   // Set the total number of hits
   cluster.N_points = cluster.point_vector.size();
+  std::cout << "N space points: " << cluster.N_points << std::endl;
 
   // Find out the mean,  etc.
   for (auto& point : cluster.point_vector) {
@@ -65,6 +66,8 @@ void GetAverages3D::do_params_fill(cluster3D_params & cluster) {
   cluster.tertiary_dir[1] = (* fPrincipal.GetEigenVectors())[1][2];
   cluster.tertiary_dir[2] = (* fPrincipal.GetEigenVectors())[2][2];
 
+  std::cout << "PCA: ( " << cluster.principal_dir[0] << ", " << cluster.principal_dir[1] << ", "
+            << cluster.principal_dir[2] << " )" << std::endl;
 
   double rmsx = 0.0;
   double rmsy = 0.0;

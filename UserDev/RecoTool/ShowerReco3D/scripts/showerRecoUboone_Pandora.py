@@ -97,13 +97,16 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 
 # Specify analysis output root file name
-my_proc.set_ana_output_file("showerRecoUboone_pandoraNu_ana.root")
+my_proc.set_ana_output_file("results/showerRecoUboone_pandoraNu3D_v9_01_ana.root")
 # Specify data output root file name
-my_proc.set_output_file("showerRecoUboone_pandoraNu.root")
-
+my_proc.set_output_file("results/showerRecoUboone_pandoraNu3D_v9_01.root")
 
 
 ana_unit=DefaultShowerReco3D()
+# set ProtoShower Algo to go from data-products to a ProtoShower object
+protoshoweralg = showerreco.ProtoShowerAlgClusterParams()
+ana_unit.GetProtoShowerHelper().setProtoShowerAlg( protoshoweralg )
+
 ana_unit.SetInputProducer("pandoraNu")
 
 ana_unit.SetOutputProducer("showerreco")
