@@ -42,7 +42,7 @@ namespace larlite {
 
     // get hits associated with the clusters
     larlite::event_hit *ev_hit = nullptr;
-    auto & hits_ass_to_cluster    = storage->find_one_ass(ev_pfpart->id(), ev_hit, ev_pfpart->name());
+    auto & hits_ass_to_cluster    = storage->find_one_ass(ev_clus->id(), ev_hit, ev_clus->name());
 
     // if no hits -> return false
     if ( (!ev_hit) or (ev_hit->size() == 0) ){
@@ -50,7 +50,6 @@ namespace larlite {
       return false;
     }
 
-    /*
     // loop through PFParticles
     for (size_t pfp_i = 0; pfp_i < ev_pfpart->size(); pfp_i++){
 
@@ -65,19 +64,14 @@ namespace larlite {
 
       for (auto const& ass_clus_idx : ass_clus_idx_v){
 
-	std::cout << "Added cluster..." << std::endl;
-
 	// and finally the hits associated to that PFPart
 	auto ass_hit_idx_v = hits_ass_to_cluster[ass_clus_idx];
-	std::cout << "w/ " << ass_hit_idx_v.size() << " hits" << std::endl;
-
 	// add all these hits to the new producer
 	for (auto const& hit_idx : ass_hit_idx_v)
 	  ev_shr_hits->emplace_back( ev_hit->at( hit_idx ) );
 
       }// for all clusters
     }// for all PFParts
-    */
   
     return true;
   }
