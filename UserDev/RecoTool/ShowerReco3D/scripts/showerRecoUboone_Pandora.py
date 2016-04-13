@@ -35,11 +35,14 @@ def getShowerRecoAlgModular():
   alg = showerreco.ShowerRecoAlgModular()
   alg.SetDebug(False)
 
-  axis = showerreco.PCA3DAxis()
-
   startPoint = showerreco.StartPointPandora()
 
+  axis = showerreco.PCA3DAxis()
+
   energy = showerreco.LinearEnergy()
+  energy.SetGainU(1./0.69)
+  energy.SetGainV(1./0.70)
+  energy.SetGainY(1./.64)
   energy.SetUseModBox(True)
   energy.setVerbosity(False)
 
@@ -49,9 +52,9 @@ def getShowerRecoAlgModular():
   dedx.SetUsePitch(False)
   dedx.setVerbosity(False)
 
-  #alg.AddShowerRecoModule(axis3D)
+  # alg.AddShowerRecoModule(startPoint)
+  alg.AddShowerRecoModule(showerreco.ToyGeoModule())
   alg.AddShowerRecoModule(axis)
-  alg.AddShowerRecoModule(startPoint)
   alg.AddShowerRecoModule(energy)
   alg.AddShowerRecoModule(dqdx)
   alg.AddShowerRecoModule(dedx)
@@ -60,7 +63,6 @@ def getShowerRecoAlgModular():
   # alg.AddShowerRecoModule(showerreco.ShowerChargeModule()  )
 
   # alg.AddShowerRecoModule(showerreco.GeoModule())
-  alg.AddShowerRecoModule(showerreco.ToyGeoModule())
   alg.PrintModuleList()
 
   return alg
@@ -98,13 +100,16 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 
 # Specify analysis output root file name
-my_proc.set_ana_output_file("showerRecoUboonePandora_ana.root")
+my_proc.set_ana_output_file("results/showerRecoUboone_pandoraNu3D_v9_01_ana.root")
 # Specify data output root file name
-my_proc.set_output_file("showerRecoUboonePandora.root")
-
+my_proc.set_output_file("results/showerRecoUboone_pandoraNu3D_v9_01.root")
 
 
 ana_unit=DefaultShowerReco3D()
+# set ProtoShower Algo to go from data-products to a ProtoShower object
+protoshoweralg = showerreco.ProtoShowerAlgClusterParams()
+ana_unit.GetProtoShowerHelper().setProtoShowerAlg( protoshoweralg )
+
 ana_unit.SetInputProducer("pandoraNu")
 
 ana_unit.SetOutputProducer("showerreco")

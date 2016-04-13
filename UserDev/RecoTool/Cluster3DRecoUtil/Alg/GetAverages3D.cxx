@@ -45,11 +45,13 @@ void GetAverages3D::do_params_fill(cluster3D_params & cluster) {
 
   // Run the PCA analysis
   fPrincipal.MakePrincipals();
+  const TVectorD *Sigmas = fPrincipal.GetSigmas();
+  double norm = (*Sigmas)[0] * (*Sigmas)[0]  + (*Sigmas)[1] * (*Sigmas)[1] + (*Sigmas)[2] * (*Sigmas)[2];
 
   // Save the output eigen vectors
-  cluster.eigenvalue_principal = (* fPrincipal.GetEigenValues() )[0];
-  cluster.eigenvalue_secondary = (* fPrincipal.GetEigenValues() )[1];
-  cluster.eigenvalue_tertiary  = (* fPrincipal.GetEigenValues() )[2];
+  cluster.eigenvalue_principal = (* fPrincipal.GetEigenValues() )[0] * norm;
+  cluster.eigenvalue_secondary = (* fPrincipal.GetEigenValues() )[1] * norm;
+  cluster.eigenvalue_tertiary  = (* fPrincipal.GetEigenValues() )[2] * norm;
 
   cluster.principal_dir[0] = (* fPrincipal.GetEigenVectors())[0][0];
   cluster.principal_dir[1] = (* fPrincipal.GetEigenVectors())[1][0];
