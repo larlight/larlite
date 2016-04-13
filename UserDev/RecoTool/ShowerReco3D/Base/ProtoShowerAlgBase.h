@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include "DataFormat/storage_manager.h"
+#include "ShowerRecoException.h"
 
 
 #include "ShowerReco3D/Base/ShowerRecoTypes.h"
@@ -33,7 +34,7 @@ namespace showerreco {
   public:
     
     /// Default constructor
-    ProtoShowerAlgBase(){}
+    ProtoShowerAlgBase(){ _name = "ProtoShowerAlgBase"; }
     
     /// Default destructor
     ~ProtoShowerAlgBase(){}
@@ -43,6 +44,12 @@ namespace showerreco {
 				     const size_t proto_shower_pfpart,
 				     showerreco::ProtoShower & proto_shower) = 0;
     
+
+    std::string name() { return _name; }
+    
+  protected:
+
+    std::string _name;
     
   };
   

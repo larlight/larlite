@@ -58,6 +58,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     return false;
   }
 
+  std::cout << "Run: " << storage->run_id() << ", Subrun: " << storage->subrun_id()
+            << ", Event: " << storage->event_id() << std::endl;
+
   // This item holds the list of PFParticles tagged as showers (11)
   // We only run reco on particles tagged that way.
 
