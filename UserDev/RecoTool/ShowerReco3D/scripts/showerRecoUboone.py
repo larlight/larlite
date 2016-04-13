@@ -53,7 +53,11 @@ def getShowerRecoAlgModular():
   angle3D.setVerbosity(False)
 
   energy = showerreco.LinearEnergy()
+  energy.SetGainU(1./0.69)
+  energy.SetGainV(1./0.70)
+  energy.SetGainY(1./.64)
   energy.SetUseModBox(True)
+  energy.SetUseArea(True)
   energy.setVerbosity(False)
 
   dqdx = showerreco.dQdxModule()
@@ -123,6 +127,7 @@ protoshoweralg = showerreco.ProtoShowerAlgClusterParams()
 ana_unit.GetProtoShowerHelper().setProtoShowerAlg( protoshoweralg )
 #ana_unit.SetInputProducer("fuzzyclustermerger")
 ana_unit.SetInputProducer("timeoverlap")
+#ana_unit.SetInputProducer("pandoraCosmic")
 
 ana_unit.SetOutputProducer("showerreco")
 

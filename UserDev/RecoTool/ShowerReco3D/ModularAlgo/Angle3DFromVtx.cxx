@@ -3,11 +3,19 @@
 
 #include "Angle3DFromVtx.h"
 #include <math.h>
+#include <sstream>
 
 namespace showerreco {
   
   void Angle3DFromVtx::do_reconstruction(const ProtoShower & proto_shower,
 					 Shower_t& resultShower) {
+
+    //if the module does not have 2D cluster info -> fail the reconstruction
+    if (!proto_shower.hasVertex()){
+      std::stringstream ss;
+      ss << "Fail @ algo " << this->name() << " due to missing Vertex";
+      throw ShowerRecoException(ss.str());
+    }
     
     // get the 3D start point of the shower
     auto const& start3D = resultShower.fXYZStart;

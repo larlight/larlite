@@ -16,6 +16,7 @@
 #pragma link C++ class larlite::ClusterViewer::cluster_unique_id+;
 #pragma link C++ class larlite::MergeViewer+;
 #pragma link C++ class larlite::ClusterMerger+;
+#pragma link C++ class larlite::PFPartMerger+;
 #pragma link C++ class larlite::ClusterMatcher+;
 #pragma link C++ class larlite::MatchViewer+;
 #pragma link C++ class larlite::FuzzyClusterShower+;

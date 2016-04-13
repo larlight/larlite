@@ -152,6 +152,8 @@ protected:
     double cluster_pur_Y;
     double mc_containment;
     double reco_length;
+    double mc_length;
+    double mc_wildlength;
 
   } fShowerTreeParams;
 
