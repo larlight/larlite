@@ -104,6 +104,8 @@ my_proc.set_output_file("showerRecoUboone_pandoraNu.root")
 
 
 ana_unit=DefaultShowerReco3D()
+protoshoweralg = showerreco.ProtoShowerAlgClusterParams()
+ana_unit.GetProtoShowerHelper().setProtoShowerAlg( protoshoweralg )
 ana_unit.SetInputProducer("pandoraNu")
 
 ana_unit.SetOutputProducer("showerreco")
