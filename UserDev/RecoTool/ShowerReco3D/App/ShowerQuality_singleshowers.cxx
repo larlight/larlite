@@ -132,7 +132,7 @@ void ShowerQuality_singleshowers::FillQualityInfo(const shower& reco_shower, con
   fShowerTreeParams.mc_dcosy = mc_shower.Start().Py() / mc_shower.Start().E();
   fShowerTreeParams.mc_dcosz = mc_shower.Start().Pz() / mc_shower.Start().E();
 
-  EMShowerProfile::EMShowerProfile mcshower_helper;
+  EMShowerProfile mcshower_helper;
   fShowerTreeParams.mc_length = mcshower_helper.Length( mc_shower.DetProfile().E() );
   TVector3 WildShowerDir( mc_shower.End().X() - mc_shower.Start().X(), mc_shower.End().Y() - mc_shower.Start().Y(), mc_shower.End().Z() - mc_shower.Start().Z() );
   fShowerTreeParams.mc_wildlength = WildShowerDir.Mag();
