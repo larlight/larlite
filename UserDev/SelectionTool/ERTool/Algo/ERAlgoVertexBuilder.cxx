@@ -655,7 +655,8 @@ namespace ertool {
 	    energy = tdata->Shower(p.RecoID())._energy;
 	  p.SetParticleInfo(p.PdgCode(),
 			    p.Mass(),
-			    v.at(j),
+			    pa.GetSphere().Center(),
+			    //v.at(j),
 			    geoalgo::Point_t(energy, 0, 0));
 	  tgraph->SetParentage(parent, n);
 	}	  
