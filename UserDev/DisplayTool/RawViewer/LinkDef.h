@@ -17,8 +17,10 @@
 #pragma link C++ class evd::TreeElementReader+;
 #pragma link C++ class evd::DataFetcher+;
 #pragma link C++ class evd::DrawUbSwiz+;
+#pragma link C++ class evd::NoiseFilter+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 
