@@ -19,6 +19,8 @@
 #include "LArUtil/Geometry.h"
 #include "RawBase.h"
 
+#include "UbooneNoiseFilter.h"
+
 #include "TTree.h"
 #include "TGraph.h"
 
@@ -85,6 +87,8 @@ namespace evd {
 
   private:
 
+    evd::UbooneNoiseFilter _noise_filter;
+
     void readData();
 
     size_t _n_events;
@@ -108,11 +112,11 @@ namespace evd {
 
     std::string _input_file;
 
-    std::vector<std::vector<float> > pedestalByPlane;
-    std::vector<std::vector<float> > rmsByPlane;
-    std::vector<std::vector<float> > rmsByPlaneCorrected;
+    // std::vector<std::vector<float> > pedestalByPlane;
+    // std::vector<std::vector<float> > rmsByPlane;
+    // std::vector<std::vector<float> > rmsByPlaneCorrected;
 
-    std::vector<std::vector<wireStatus > > wireStatusByPlane;
+    // std::vector<std::vector<wireStatus > > wireStatusByPlane;
 
     // int run, subrun, event;
 

@@ -54,6 +54,7 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include <map>
 
 /**
@@ -61,6 +62,19 @@
    User defined class UbooneNoiseFilter ... these comments are used to generate
    doxygen documentation!
  */
+
+namespace larlite{
+
+  class detPropFetcher{
+
+  public:
+
+    unsigned int n_wires(unsigned int plane);
+    unsigned int n_planes();
+
+  };
+
+}
 
 namespace evd {
 
@@ -84,7 +98,7 @@ class UbooneNoiseFilter {
 public:
 
   /// Default constructor
-  UbooneNoiseFilter() {}
+  UbooneNoiseFilter();
 
   /// Default destructor
   ~UbooneNoiseFilter() {}
@@ -201,11 +215,23 @@ private:
 
 private:
 
+  const float _lowRMS_cutoff = 0.8*0.8;
+  const float _highRMS_cutoff = 20.0*20.0;
+
+  
+
+  // All of the detector properties are encapsulated in this object
+  // This allows larlite <-> larsoft transitions to be a little less painful
+  larlite::detPropFetcher _detector_properties_interface;
+
+
   // This class filters noise out so it needs access to the data.  It does the
   // filtering in place so it takes a pointer to the data.
   std::vector<std::vector<float> > * _data_by_plane;
 
-  unsigned int _n_time_ticks;
+  unsigned int _n_time_ticks_data;
+  unsigned int _n_planes;
+  std::vector<unsigned int> _n_wires_per_plane;
 
   std::vector<std::vector<float> > _pedestal_by_plane;
   std::vector<std::vector<float> > _rms_by_plane;
@@ -215,6 +241,8 @@ private:
   // this is store in a map to allow sparseness
   std::vector<std::map<int, ::evd::chirp_info> > _chirp_info_by_plane;
 
+  // This vector deals with the wire status:
+  std::vector<std::vector<wireStatus> > _wire_status_by_plane;
 
 };
 
