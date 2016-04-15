@@ -45,6 +45,10 @@ public:
 
     void initialize();
 
+    void SetGainU(double g) { _gain_U = g; }
+    void SetGainV(double g) { _gain_V = g; }
+    void SetGainY(double g) { _gain_Y = g; }
+
 private:
 
     /// Calorimetry algorithm
@@ -77,6 +81,9 @@ private:
     std::vector<double> _dEdx_v;
     std::vector<double> _dQ_v;
     int _pl;
+
+    // per-plane shower reco calibrations
+    double _gain_U, _gain_V, _gain_Y;
 
 };
 
