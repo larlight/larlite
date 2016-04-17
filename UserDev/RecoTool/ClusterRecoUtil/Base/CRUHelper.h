@@ -44,11 +44,19 @@ namespace cluster {
     void GenerateParams(const std::vector<unsigned int>& hit_index,
                         const larlite::event_hit* hits,
                         cluster_params &Params) const;
+
+    /// Generate: from hit vector
+    void GenerateParams(const std::vector<::larlite::hit>& hit_v,
+                        cluster_params &Params) const;
     
     /// Generate: Params vector from event storage by specifying cluster type
     void GenerateParams(::larlite::storage_manager* storage,
                         const std::string &cluster_producer_name,
                         std::vector<cluster::cluster_params> &Params_v) const;
+
+    /// Generate: from hit vector
+    void GenerateHit2D(const std::vector<::larlite::hit>& hit_v,
+                       std::vector<Hit2D> &pxhits) const;
     
     /// Generate: from 1 set of hits => 1 set of PxHits using indexes (association)
     void GenerateHit2D(const std::vector<unsigned int>& hit_index,

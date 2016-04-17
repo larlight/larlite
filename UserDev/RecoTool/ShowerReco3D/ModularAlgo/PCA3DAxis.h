@@ -36,6 +36,8 @@ public:
 
   void do_reconstruction(const ProtoShower &, Shower_t &);
 
+  TVector3 PointProjectedToLine( const TVector3& point, const TVector3& line );
+
 private:
 
 };

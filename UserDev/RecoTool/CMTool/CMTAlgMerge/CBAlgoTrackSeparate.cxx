@@ -2,7 +2,7 @@
 #define RECOTOOL_CBALGOTRACKSEPARATE_CXX
 
 #include "CBAlgoTrackSeparate.h"
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/GeometryHelper.h"
 
 namespace cmtool {
 
@@ -31,8 +31,8 @@ namespace cmtool {
     SetUseEP(true);
     SetEPCutoff(0.99000);
 
-    _wire_2_cm = larutil::GeometryUtilities::GetME()->WireToCm();
-    _time_2_cm = larutil::GeometryUtilities::GetME()->TimeToCm();
+    _wire_2_cm = larutil::GeometryHelper::GetME()->WireToCm();
+    _time_2_cm = larutil::GeometryHelper::GetME()->TimeToCm();
 
   }
 

@@ -3,7 +3,7 @@
 
 
 #include "ForceRegions.h"
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/GeometryHelper.h"
 #include "LArUtil/Geometry.h"
 //#include "ClusterParamsAlg.hh"
 //#include "LArUtilBase.hh"
@@ -14,8 +14,8 @@ namespace cluster {
 
 
   std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  ForceRegions::ForceTwoRegions(const std::vector<larlite::hit>& hits, std::vector<std::pair<double,double>> APP) {
-    double T2CM = larutil::GeometryUtilities::GetME()->TimeToCm();
-    double W2CM = larutil::GeometryUtilities::GetME()->WireToCm();
+    double T2CM = larutil::GeometryHelper::GetME()->TimeToCm();
+    double W2CM = larutil::GeometryHelper::GetME()->WireToCm();
     std::vector<unsigned int> startervector;
     std::pair<std::vector<unsigned int>,std::vector<unsigned int>> planepair(startervector,startervector);
     std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> vectplanepair(3,planepair);
@@ -36,8 +36,8 @@ namespace cluster {
 //--------------------------------------------------------------------------------------------------------------------------------------
 
   std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  ForceRegions::ForceTwoFlipRegions(const std::vector<larlite::hit>& hits, std::vector<std::pair<double,double>> APP) {
-    double T2CM = larutil::GeometryUtilities::GetME()->TimeToCm();
-    double W2CM = larutil::GeometryUtilities::GetME()->WireToCm();
+    double T2CM = larutil::GeometryHelper::GetME()->TimeToCm();
+    double W2CM = larutil::GeometryHelper::GetME()->WireToCm();
     std::vector<unsigned int> startervector;
     std::pair<std::vector<unsigned int>,std::vector<unsigned int>> planepair(startervector,startervector);
     std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>> vectplanepair(3,planepair);
@@ -58,8 +58,8 @@ namespace cluster {
 //--------------------------------------------------------------------------------------------------------------------------------------
 
   std::vector<std::pair<std::vector<unsigned int>,std::vector<unsigned int>>>  ForceRegions::ForceTwoRotateRegions(const std::vector<larlite::hit>& hits, std::vector<std::pair<double,double>> APP, double angle) {
-    double T2CM = larutil::GeometryUtilities::GetME()->TimeToCm();
-    double W2CM = larutil::GeometryUtilities::GetME()->WireToCm();
+    double T2CM = larutil::GeometryHelper::GetME()->TimeToCm();
+    double W2CM = larutil::GeometryHelper::GetME()->WireToCm();
     int nplanes = larutil::Geometry::GetME()->Nplanes();
     std::vector<unsigned int> startervector;
     std::pair<std::vector<unsigned int>,std::vector<unsigned int>> planepair(startervector,startervector);

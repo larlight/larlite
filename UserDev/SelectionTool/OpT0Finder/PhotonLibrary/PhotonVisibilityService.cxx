@@ -65,7 +65,7 @@ namespace phot{
 
   //--------------------------------------------------------------------
   //void PhotonVisibilityService::reconfigure(fhicl::ParameterSet const& p)
-  PhotonVisibilityService::PhotonVisibilityService() :
+  PhotonVisibilityService::PhotonVisibilityService(std::string library) :
     fCurrentVoxel(0),
     fCurrentValue(0.),
     fXmin(  -63.435 ),
@@ -82,7 +82,7 @@ namespace phot{
     fLibraryBuildJob(false),
     fDoNotLoadLibrary(false),
     fParameterization(false),
-    fLibraryFile("uboone_photon_library_v4.root"),
+    fLibraryFile(library),
     fTheLibrary(nullptr)
   {
     fVoxelDef = sim::PhotonVoxelDef(fXmin, fXmax, fNx, fYmin, fYmax, fNy, fZmin, fZmax, fNz);

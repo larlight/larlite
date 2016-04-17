@@ -75,6 +75,7 @@ namespace larlite {
     void FillQualityInfo(const shower& reco_shower,
 			 const mcshower& mc_shower,
 			 const size_t& shower_index, const size_t& best_index,
+			 const double& mcq,
 			 const AssSet_t& ass_cluster_v);
 
 
@@ -140,6 +141,7 @@ namespace larlite {
       int    best_plane_id;
 
       double mc_x, mc_y, mc_z, mc_t;
+      double mc_q, mc_q_bt;
       double mc_dcosx, mc_dcosy, mc_dcosz;
       double mc_energy;
       int    mc_pdgid;

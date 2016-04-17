@@ -4,6 +4,8 @@ import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui, QtCore
 import math as mt
 
+import numpy as np
+
 # Shower drawing is currently "experimental"
 
 
@@ -81,7 +83,7 @@ class shower(recoBase):
                                       0.0)
                 perpAxis = zAxis.Cross(showerAxis)
 
-                length = showerAxis.Mag() * np.tan(shower.openingAngle()/2)
+                length = showerAxis.Mag() * mt.tan(shower.openingAngle()/2)
                 perpAxis *= length / perpAxis.Mag()
 
 

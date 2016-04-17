@@ -38,7 +38,7 @@ public:
 
   void initialize();
 
-private:
+protected:
   //This variable will contain the average dQdx from the start of a shower projected into the 3 planes.
   //it is inteded to be filled such that element 0 contains the average dQdx for the U-plane,
   //element 1 contains the same for the V-plane, and element 2 will be for the Y-plane.

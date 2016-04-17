@@ -16,54 +16,55 @@
 
 #include <iostream>
 
-#include "ShowerRecoTypes.h"
-
+#include "DataFormat/storage_manager.h"
 #include "DataFormat/pfpart.h"
 #include "DataFormat/cluster.h"
 #include "DataFormat/spacepoint.h"
 #include "DataFormat/seed.h"
 #include "DataFormat/vertex.h"
 
-#include "ClusterRecoUtil/Base/CRUHelper.h"
-#include "Cluster3DRecoUtil/Base/CRU3DHelper.h"
+#include "ShowerReco3D/Base/ShowerRecoTypes.h"
 
-#include "Cluster3DRecoUtil/Alg/Default3DParamsAlg.h"
-#include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
+#include "ProtoShowerAlgBase.h"
+
+// Hack: convertor to cparms wire/tick
+#include "Hack.h"
 
 /**
    \class ProtoShowerHelper
    User defined class ProtoShowerHelper ... these comments are used to generate
    doxygen documentation!
- */
+*/
 namespace showerreco {
 
-class ProtoShowerHelper {
+  class ProtoShowerHelper {
 
-public:
+  public:
 
-  /// Default constructor
-  ProtoShowerHelper() {}
+    /// Default constructor
+    ProtoShowerHelper();
 
   /// Default destructor
-  ~ProtoShowerHelper() {}
+  ~ProtoShowerHelper(){}
 
-  // From the storage manager, and with the pfpart producer name, generate
-  // a vector of all the protoshowers in the event.
-  void GenerateProtoShowers(::larlite::storage_manager* storage,
-                            const std::string &pfpart_producer_name,
-                            std::vector<::showerreco::ProtoShower> & proto_showers,
-                            std::vector<unsigned int> showerLikePFParts=std::vector<unsigned int>(1,999999));
+    // From the storage manager, and with the pfpart producer name, generate
+    // a vector of all the protoshowers in the event.
+    void GenerateProtoShowers(::larlite::storage_manager* storage,
+			      const std::string &pfpart_producer_name,
+			      std::vector<::showerreco::ProtoShower> & proto_showers,
+			      std::vector<unsigned int> showerLikePFParts=std::vector<unsigned int>(1,999999));
 
-private:
+  // set algorithm to use to create ProtoShowers from LArLite data-products
+  void setProtoShowerAlg(ProtoShowerAlgBase *alg) { _proto_shower_alg = alg; }
 
-  ::cluster3D::Default3DParamsAlg _params3D_alg;
-  ::cluster::DefaultParamsAlg _params_alg;
+  private:
 
-  // Use the CRU Helpers to build cluster params:
-  ::cluster3D::CRU3DHelper _cru3D_helper;
-  ::cluster::CRUHelper _cru_helper;
+  // base class for Proto Shower algorithm
+  ProtoShowerAlgBase *_proto_shower_alg;
 
-};
+    Hack hack;
+    
+  };
 
 } // showerreco
 

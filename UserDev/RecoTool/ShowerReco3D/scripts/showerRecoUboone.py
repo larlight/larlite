@@ -53,7 +53,11 @@ def getShowerRecoAlgModular():
   angle3D.setVerbosity(False)
 
   energy = showerreco.LinearEnergy()
+  energy.SetGainU(1./0.69)
+  energy.SetGainV(1./0.70)
+  energy.SetGainY(1./.64)
   energy.SetUseModBox(True)
+  energy.SetUseArea(True)
   energy.setVerbosity(False)
 
   dqdx = showerreco.dQdxModule()
@@ -68,9 +72,9 @@ def getShowerRecoAlgModular():
   alg.AddShowerRecoModule(energy)
   alg.AddShowerRecoModule(dqdx)
   alg.AddShowerRecoModule(dedx)
-  # alg.AddShowerRecoModule(showerreco.StartPoint2DModule()  )
+  #alg.AddShowerRecoModule(showerreco.StartPoint2DModule()  )
   #alg.AddShowerRecoModule(showerreco.OtherStartPoint3D()  )
-  # alg.AddShowerRecoModule(showerreco.ShowerChargeModule()  )
+  #alg.AddShowerRecoModule(showerreco.ShowerChargeModule()  )
 
   alg.AddShowerRecoModule(showerreco.GeoModule())
 
@@ -118,7 +122,13 @@ my_proc.set_output_file("showerRecoUboone.root")
 
 
 ana_unit=DefaultShowerReco3D()
-ana_unit.SetInputProducer("fuzzyclustermerger")
+
+# set ProtoShower Algo to go from data-products to a ProtoShower object
+protoshoweralg = showerreco.ProtoShowerAlgClusterParams()
+ana_unit.GetProtoShowerHelper().setProtoShowerAlg( protoshoweralg )
+#ana_unit.SetInputProducer("fuzzyclustermerger")
+ana_unit.SetInputProducer("timeoverlap")
+#ana_unit.SetInputProducer("pandoraCosmic")
 
 ana_unit.SetOutputProducer("showerreco")
 

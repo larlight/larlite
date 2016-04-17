@@ -81,6 +81,18 @@ namespace larlite {
   int                  mcpart::Rescatter()    const { return frescatter;    }
   const std::vector<std::pair<size_t,size_t> >& mcpart::FiducialTrack() const 
   {return ftrackFiducial;}
+
+  const TLorentzVector& mcpart::Position(size_t i) const
+  {
+    if(i>=ftrajectory.size()) throw DataFormatException("Invalid index requested!");
+    return ftrajectory[i].Position();
+  }
+
+  const TLorentzVector& mcpart::Momentum(size_t i) const
+  {
+    if(i>=ftrajectory.size()) throw DataFormatException("Invalid index requested!");
+    return ftrajectory[i].Momentum();
+  }
 }
 
 #endif

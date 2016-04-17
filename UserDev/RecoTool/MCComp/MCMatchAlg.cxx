@@ -36,11 +36,13 @@ namespace btutil {
 			    const std::vector<std::vector<unsigned int> > &cluster_hit_association)
   {
     if(hit_v.empty() || cluster_hit_association.empty())
-      throw MCBTException("Hit or HitAssociation Empty!");
+      return false;
+    //throw MCBTException("Hit or HitAssociation Empty!");
 
     size_t num_mcobj = fBTAlgo.NumParts();
     if(!num_mcobj)
-      throw MCBTException("MCShower or MCTrack empty!");
+      return false;
+    //    throw MCBTException("MCShower or MCTrack empty!");
 
     size_t num_cluster = cluster_hit_association.size();
     auto geo = ::larutil::Geometry::GetME();

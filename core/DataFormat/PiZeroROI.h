@@ -21,7 +21,6 @@ namespace larlite{
   class PiZeroROI : public data_base
   {
     
-    
   public:
     
     /// Default destructor

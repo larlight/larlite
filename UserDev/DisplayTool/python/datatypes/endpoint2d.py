@@ -35,7 +35,8 @@ class endpoint2d(recoBase):
                     thisPlane) / view_manager._geometry.time2cm()
 
                 sW = point.wire()
-                sT = point.time() + offset
+                sT = point.time()
+                # sT = point.time() + offset
 
                 r = QtGui.QGraphicsEllipseItem(
                     sW-radBigW, sT-radBigT, 2*radBigW, 2*radBigT)

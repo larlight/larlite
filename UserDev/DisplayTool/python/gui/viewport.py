@@ -46,6 +46,8 @@ class viewport(pg.GraphicsLayoutWidget):
     # self._blankData = np.ones((self._geometry.wRange(self._plane),self._geometry.tRange()))
     self.setBackground('w')
 
+    self._useLogo = False
+    self._logo = None
 
     # each drawer contains its own color gradient and levels
     # this class can return a widget containing the right layout for everything
@@ -96,6 +98,31 @@ class viewport(pg.GraphicsLayoutWidget):
     #   self._view.removeItem(self._yBarText)
     self.useScaleBar = scaleBool
     self.refreshScaleBar()
+
+  def toggleLogo(self,logoBool):
+
+    if self._logo in self.scene().items():
+        self.scene().removeItem(self._logo)
+
+    self._useLogo = logoBool
+    self.refreshLogo()
+
+  def refreshLogo(self):
+    if not self._useLogo:
+      return
+
+    self._logo = QtGui.QGraphicsPixmapItem(QtGui.QPixmap(self._geometry.logo()))
+    self.scene().addItem(self._logo)
+    self._logo.setX(self._geometry.logoPos()[0])
+    self._logo.setY(self._geometry.logoPos()[1])
+    self._logo.setScale(self._geometry.logoScale())
+
+
+    # self._logo.scale(1.0*(width/rectW),-1*(height/rectH))
+    # self._view.addItem(self._logo)
+
+    # self._logo.setY(0.7)
+
 
   def restoreDefaults(self):
     self._lowerLevel.setText(str(self._geometry.getLevels(self._plane)[0]))
@@ -182,12 +209,12 @@ class viewport(pg.GraphicsLayoutWidget):
     # For this function, a click should get the wire that is
     # being hovered over and draw it at the bottom
     if event.modifiers() == QtCore.Qt.ShiftModifier:
-      if event.pos() != None:
+      if event.pos() is not  None:
         self.processPoint(self._lastPos)
 
     # 
     wire = int( self._lastPos.x())
-    if self._item.image != None:
+    if self._item.image is not None:
       # get the data from the plot:
       data = self._item.image
       self._wireData = data[wire]
@@ -247,20 +274,21 @@ class viewport(pg.GraphicsLayoutWidget):
       self._view.removeItem(self._xBarText)
 
     self._xBar = QtGui.QGraphicsRectItem(xLoc,yLoc,width,height)
-    self._xBar.setBrush(pg.mkColor(0,0,0))
+    self._xBar.setBrush(pg.mkColor(255,255,255))
     self._view.addItem(self._xBar)
 
     xString = ""
     if self._cmSpace:
-      xString = "{0:.2f}".format(width*self._geometry.wire2cm())
+      xString = "{0:.0f}".format(round(width*self._geometry.wire2cm()))
       xString = xString + " cm"
     else:
-      xString = "{0:.2f}".format(width)
+      xString = "{0:.0f}".format(round(width))
       xString = xString + " wires"
 
 
     # Add the text:
     self._xBarText = QtGui.QGraphicsSimpleTextItem(xString)
+    self._xBarText.setBrush(pg.mkColor(255,255,255))
     xScale = 0.015* width
     yScale = - 0.5* height
     self._xBarText.setPos(xLoc,yLoc)
@@ -335,7 +363,7 @@ class viewport(pg.GraphicsLayoutWidget):
     if len(self._dataPoints) < 2:
       return None
 
-    if self._item.image == None:
+    if self._item.image is None:
       return None
 
     data = self._item.image

@@ -47,12 +47,18 @@ namespace recoemu {
 
         // First make a copy to modify
         Track_t result = mc;
+	
+	double mylength = mc.trajectory.Length();
+        double lengtheff = GetLengthEff(mylength);
+	double totaleff = lengtheff;
 
-        double lengtheff = GetLengthEff(mc.trajectory.Length());
-        double mytheta = (mc.trajectory.back() - mc.trajectory.front()).Theta() * 180./3.14159;
-        double myphi = (mc.trajectory.back() - mc.trajectory.front()).Phi() * 180./3.14159;
-        double angleeff = GetAngleEff(mytheta,myphi);
-        double totaleff = lengtheff*angleeff;
+	// Hack: Only apply angle efficiency if track length is shorter than 5 cm
+	if( mylength < 5. ){
+	  double mytheta = (mc.trajectory.back() - mc.trajectory.front()).Theta() * 180./3.14159;
+	  double myphi = (mc.trajectory.back() - mc.trajectory.front()).Phi() * 180./3.14159;
+	  double angleeff = GetAngleEff(mytheta,myphi);
+	  totaleff *= angleeff;
+	}
         bool keep_track = _totalEff.DrawFlat(totaleff);
 
         // Mark the track for deletion if keep_track is false

@@ -58,6 +58,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     return false;
   }
 
+  std::cout << "Run: " << storage->run_id() << ", Subrun: " << storage->subrun_id()
+            << ", Event: " << storage->event_id() << std::endl;
+
   // This item holds the list of PFParticles tagged as showers (11)
   // We only run reco on particles tagged that way.
 
@@ -65,9 +68,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   unsigned int index = 0;
   for (auto & part : *ev_pfpart) {
-    if (part.PdgCode() == 11) {
+    // if (part.PdgCode() == 11) {
       showerLikePFParts.push_back(index);
-    }
+  // }
     index ++;
   }
 
@@ -104,7 +107,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   // if associated clusters not found -> quit and exit
   if ( !ev_vertex or (ev_vertex->size() == 0) ) {
-    print(msg::kERROR, __FUNCTION__,
+    print(msg::kDEBUG, __FUNCTION__,
           Form("No vertexes found associated to PFPart w/ producer %s",
                fInputProducer.c_str()));
     // return false;
@@ -122,7 +125,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   // if associated clusters not found -> quit and exit
   if ( !ev_sps or (ev_sps->size() == 0) ) {
-    print(msg::kERROR, __FUNCTION__,
+    print(msg::kDEBUG, __FUNCTION__,
           Form("No spacepoints found associated to PFPart w/ producer %s",
                fInputProducer.c_str()));
     // return false;
@@ -137,14 +140,16 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
   std::vector<showerreco::ProtoShower> proto_showers;
 
 
+
+  // std::cout << "\t>>> Generating protoshowers\n";
   _ps_helper.GenerateProtoShowers( storage,
                                    fInputProducer,
                                    proto_showers,
-                                   showerLikePFParts);
+                                   showerLikePFParts );
 
 
 
-  // // Let's do a little debugging:
+  // Let's do a little debugging:
   // std::cout << "In this event ( " << storage -> event_id() << "), there are "
   //           << ev_pfpart -> size() << " pfparticles.\n"
   //           << "\tOf the pfparticles, the following are tagged as showers:\n\t";
@@ -168,7 +173,6 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
   std::vector< ::showerreco::Shower_t> res_shower_v;
 
   fManager.SetProtoShowers(proto_showers);
-
 
   fManager.Reconstruct(res_shower_v);
 
@@ -199,7 +203,6 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     }
 
 
-
     // filter out showers with garbage values
     if (res_shower.fXYZStart.Mag2()  == 0) {
       continue;
@@ -207,7 +210,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     if (res_shower.fDCosStart.Mag2() == 0) {
       continue;
     }
+    // std::cout << "\t>>> fuck i passed\n";
 
+	
 
     shower s;
     s.set_id ( shower_v->size() );

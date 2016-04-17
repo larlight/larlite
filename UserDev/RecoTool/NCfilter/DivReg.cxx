@@ -2,7 +2,7 @@
 #define RECOTOOL_DIVREG_CXX
 
 #include "DivReg.h"
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/GeometryHelper.h"
 #include "LArUtil/Geometry.h"
 //#include "ClusterParamsAlg.hh"
 //#include "LArUtilBase.hh"
@@ -35,8 +35,8 @@ namespace cluster {
       //auto const& hit_index_array = c.association(hit_type);
       if(hitvect.size()>15){
 	// calculate slope and cept in cm
-	// double T2CM = larutil::GeometryUtilities::GetME()->TimeToCm();
-        //double W2CM = larutil::GeometryUtilities::GetME()->WireToCm();
+	// double T2CM = larutil::GeometryHelper::GetME()->TimeToCm();
+        //double W2CM = larutil::GeometryHelper::GetME()->WireToCm();
         double totcharge  = 0;
         double avgcharge = 0;
         double awiretime=  0;
@@ -124,8 +124,8 @@ namespace cluster {
     int nplanes = larutil::Geometry::GetME()->Nplanes();
     std::vector<std::pair<double,double>> AvgPairSI(nplanes);
     // calculate slope and cept in cm
-    double T2CM = larutil::GeometryUtilities::GetME()->TimeToCm();
-    double W2CM = larutil::GeometryUtilities::GetME()->WireToCm();
+    double T2CM = larutil::GeometryHelper::GetME()->TimeToCm();
+    double W2CM = larutil::GeometryHelper::GetME()->WireToCm();
     double S0 = 0;
     double S1 = 0;
     double S2 = 0;
@@ -220,8 +220,8 @@ namespace cluster {
     int nplanes = larutil::Geometry::GetME()->Nplanes();
     std::vector<std::pair<double,double>> AvgPairSI(nplanes);
     // calculate slope and cept in cm
-    double T2CM = larutil::GeometryUtilities::GetME()->TimeToCm();
-    double W2CM = larutil::GeometryUtilities::GetME()->WireToCm();
+    double T2CM = larutil::GeometryHelper::GetME()->TimeToCm();
+    double W2CM = larutil::GeometryHelper::GetME()->WireToCm();
     double S0 = 0;
     double S1 = 0;
     double S2 = 0;
@@ -312,8 +312,8 @@ namespace cluster {
     int nplanes = larutil::Geometry::GetME()->Nplanes();
     std::vector<std::pair<double,double>> AvgPairSI(nplanes);
     // calculate slope and cept in cm
-    double T2CM = larutil::GeometryUtilities::GetME()->TimeToCm();
-    double W2CM = larutil::GeometryUtilities::GetME()->WireToCm();
+    double T2CM = larutil::GeometryHelper::GetME()->TimeToCm();
+    double W2CM = larutil::GeometryHelper::GetME()->WireToCm();
     double S0 = 0;
     double S1 = 0;
     double S2 = 0;

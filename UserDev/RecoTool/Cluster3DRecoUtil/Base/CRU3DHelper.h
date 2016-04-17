@@ -45,6 +45,10 @@ public:
                         const larlite::event_spacepoint* points,
                         ::cluster3D::cluster3D_params &params) const;
 
+  /// Generate: from sps vector
+  void GenerateParams3D(const std::vector<::larlite::spacepoint>& sps_v,
+                        ::cluster3D::cluster3D_params &params) const;
+
   /// Generate: Params vector from event storage by specifying pfpart type
   void GenerateParams3D(::larlite::storage_manager* storage,
                         const std::string &pfpart_producer_name,
@@ -53,6 +57,10 @@ public:
   /// Generate: from 1 set of sps => 1 set of Point3D using indexes (association)
   void GeneratePoint3D(const std::vector<unsigned int>& sps_index,
                        const larlite::event_spacepoint* hits,
+                       std::vector<::cluster3D::Point3D> &point3D_set) const;
+
+    /// Generate: from sps vector
+  void GeneratePoint3D(const std::vector<::larlite::spacepoint>& sps_v,
                        std::vector<::cluster3D::Point3D> &point3D_set) const;
 
   /// Generate: vector of Point3D sets from event storage by specifying pfpart type

@@ -40,6 +40,13 @@ void dQdxModule::initialize()
 
 void dQdxModule::do_reconstruction(const ProtoShower & proto_shower, Shower_t & resultShower) {
 
+  //if the module does not have 2D cluster info -> fail the reconstruction
+  if (!proto_shower.hasCluster2D()){
+    std::stringstream ss;
+    ss << "Fail @ algo " << this->name() << " due to missing 2D cluster";
+    throw ShowerRecoException(ss.str());
+    }
+    
   auto & clusters = proto_shower.params();
 
   /***
@@ -49,13 +56,13 @@ void dQdxModule::do_reconstruction(const ProtoShower & proto_shower, Shower_t & 
   Trunk connects cluster and shower start points .
   Calculation starts line 84 .
   dQdx is calculated for 3 planes. All variables are initialized
-  correspondly as a 3-dimensional vector.
+  correspondingly as a 3-dimensional vector.
   Note within this Algorithm, the best plane is defined as the
   plane w/ longest trunk length. Therefore here best plane does
   NOT refer to best dQdx.
   User should define their own best plane OUTSIDE this algorithm.
   --------------------------------------------------------------
-  In OCT 2015, develpers tried sigma or rms to better calculate
+  In OCT 2015, developers tried sigma or rms to better calculate
   dQdx but results showed no improvements. Now this part is removed.
   ***/
 

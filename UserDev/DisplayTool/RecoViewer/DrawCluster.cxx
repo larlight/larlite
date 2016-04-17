@@ -62,6 +62,7 @@ bool DrawCluster::analyze(larlite::storage_manager* storage) {
   }
 
   auto ev_clus = storage->get_data<larlite::event_cluster>(_producer);
+  
   if (!ev_clus)
     return false;
   if (!ev_clus->size()) {
@@ -101,8 +102,12 @@ bool DrawCluster::analyze(larlite::storage_manager* storage) {
   params_alg.SetVerbose(false);
   params_alg.SetDebug(false);
   params_alg.SetMinHits(10);
-
+  
+  int c = -1;
   for (auto const& hit_indices : hit_index_v) {
+    c+=1;
+    if ( ! hit_indices.size() ) continue;
+    
     view = ev_hit->at(hit_indices[0]).View();
 
     // Make a new cluster in the data:
@@ -116,6 +121,8 @@ bool DrawCluster::analyze(larlite::storage_manager* storage) {
     // Set the params:
     _dataByPlane.at(view).back()._params = params;
 
+    _dataByPlane.at(view).back()._start = {ev_clus->at(c).StartWire(),ev_clus->at(c).StartTick()};
+ 
     for (auto const& hit_index : hit_indices) {
 
       auto & hit = ev_hit->at(hit_index);

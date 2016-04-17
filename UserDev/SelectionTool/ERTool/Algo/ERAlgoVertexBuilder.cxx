@@ -9,24 +9,34 @@ namespace ertool {
 
 
 
-  ERAlgoVertexBuilder::ERAlgoVertexBuilder(Double_t const start_prox,
-					   Double_t const max_rad,
-					   Double_t const lone_track_length,
-					   Bool_t const withTrackDir,
-					   std::string const primary_vertex_selection,
-					   const std::string& name) :
+  ERAlgoVertexBuilder::ERAlgoVertexBuilder
+  (Double_t const start_prox,
+   Double_t const max_rad,
+   Bool_t const withTrackDir,
+   std::string const primary_vertex_selection,
+   Bool_t const showerproj,
+   Double_t const shower_prox,
+   Double_t const cpoa_vert_prox,
+   Double_t const cpoa_trackend_prox,
+   const std::string& name) :
     AlgoBase(name),
     tstart_prox(start_prox),
     tmax_rad(max_rad),
-    tlone_track_length(lone_track_length),
-    tprimary_vertex_selection(primary_vertex_selection),
     twithTrackDir(withTrackDir),
-    tverbose(false) {
+    tprimary_vertex_selection(primary_vertex_selection),
+    tshowerproj(showerproj),
+    tshower_prox(shower_prox),
+    tcpoa_vert_prox(cpoa_vert_prox),
+    tcpoa_trackend_prox(cpoa_trackend_prox),
+    tverbose(false),
+    tevent(-1) {
 
     if(tprimary_vertex_selection != mostupstream &&
        tprimary_vertex_selection != mostchildren &&
        tprimary_vertex_selection != mostenergy &&
-       tprimary_vertex_selection != smallestsphere) {
+       tprimary_vertex_selection != mostenergy_lone &&
+       tprimary_vertex_selection != smallestsphere && 
+       tprimary_vertex_selection != trackdirection) {
 
       std::cout << "Primary vertex selection option not valid\n";
       exit(0);
@@ -41,7 +51,10 @@ namespace ertool {
     tree->Branch("lone_track_counter", &lone_track_counter, "lone_track_counter/I");
     tree->Branch("vertices_lonetracks", &vertices_lonetracks, "vertices_lonetracks/I");
     tree->Branch("radius", &radius, "radius/D");
-   
+    tree->Branch("multi_track_end_vertex",
+		 &multi_track_end_vertex,
+		 "multi_track_end_vertex/I");
+
   }
 
 
@@ -289,22 +302,30 @@ namespace ertool {
     std::vector<NodeID_t> tcluster;
     std::vector<geoalgo::Point_t> tvertices;
     geoalgo::Sphere tsphere;
-    
+    Double_t tgoodness;
+
     std::multimap<Int_t, NodeID_t> tcluster_connection;
     
   public:
     
     ParticleAssociation(std::vector<NodeID_t> const & cluster,
 			std::vector<geoalgo::Point_t> const & vertices,
-			geoalgo::Sphere const & sphere) :
+			geoalgo::Sphere const & sphere,
+			Double_t const goodness) :
       tcluster(cluster),
       tvertices(vertices),
-      tsphere(sphere){}
+      tsphere(sphere),
+      tgoodness(goodness){}
     
     void AddConnection(Int_t const i, NodeID_t const n) {
       tcluster_connection.emplace(i, n);
     }
     
+    void AddObject(NodeID_t const n, geoalgo::Point_t const & vert) {
+      tcluster.push_back(n);
+      tvertices.push_back(vert);
+    }
+
     std::vector<NodeID_t> const & GetCluster() const {
       return tcluster;
     }
@@ -313,8 +334,21 @@ namespace ertool {
       return tvertices;
     }
 
+    geoalgo::Point_t const & GetVertexFromNode(NodeID_t const n) const {
+
+      auto const nv_itb = tcluster.begin();
+      auto const nv_ite = tcluster.end();
+
+      return tvertices.at(std::find(nv_itb, nv_ite, n) - nv_itb);
+
+    }
+
     geoalgo::Sphere const & GetSphere() const {
       return tsphere;
+    }
+
+    Double_t GetGoodness() const {
+      return tgoodness;
     }
 
     std::multimap<Int_t, NodeID_t> const & GetConnections() const {
@@ -322,9 +356,9 @@ namespace ertool {
     }
 
     void PrintAssociation() const {
-      
+            
       for(Size_t i = 0; i < tcluster.size(); ++i)
-	std::cout << "Nodes: " << tcluster.at(i) << " Vertices: " 
+	std::cout << "Node: " << tcluster.at(i) << " Vertices: " 
 		  << tvertices.at(i) << "\n";
       
       std::cout << "\nSphere: " << tsphere.Center() << ", "
@@ -348,11 +382,14 @@ namespace ertool {
 
   public:
 
-    void AddCluster(std::vector<NodeID_t> const & nodes,
-		    std::vector<geoalgo::Point_t> const & vertices,
-		    geoalgo::Sphere const & sphere) {
+    void AddAssociation(std::vector<NodeID_t> const & nodes,
+			std::vector<geoalgo::Point_t> const & vertices,
+			geoalgo::Sphere const & sphere,
+			Double_t const goodness) {
       
-      tassociations.push_back(ParticleAssociation(nodes, vertices, sphere));
+      tassociations.push_back
+	(ParticleAssociation(nodes, vertices, sphere, goodness));
+     
       Int_t const pos = tassociations.size() - 1;
 
       for(NodeID_t const n : nodes) {
@@ -384,12 +421,82 @@ namespace ertool {
 
     }
 
+    void AddObject(Int_t const index,
+		   NodeID_t const n,
+		   geoalgo::Point_t const & vert) {
+	
+      if(index > tassociations.size() - 1 || index < 0) {
+	std::cout << "No association with index: " << index << "\n";
+	return;
+      }
+
+      ParticleAssociation & association = tassociations.at(index);
+      std::vector<NodeID_t> const & group = association.GetCluster();
+
+      if(std::find(group.begin(), group.end(), n) != group.end()) {
+	return;
+      }
+
+      tnode_vec.push_back(n);
+      tindex_vec.push_back(index);
+
+      association.AddObject(n, vert);
+
+      auto const nv_itb = tnode_vec.begin();
+      auto const nv_ite = tnode_vec.end();
+      
+      for(auto nv_it = nv_itb; nv_it != nv_ite; ++nv_it) {
+	
+	nv_it = std::find(nv_it, nv_ite, n);
+	
+	if(nv_it != nv_ite) {
+	  
+	  Int_t const index_other = tindex_vec.at(nv_it - nv_itb);
+	  
+	  tassociations.at(index_other).AddConnection(index, n);
+	  tassociations.at(index).AddConnection(index_other, n);
+	  
+	}
+	
+	else break;
+	
+      } 
+      
+    }
+
     std::vector<ParticleAssociation> const & GetAssociations() const {
       return tassociations;
     }
 
-    std::vector<NodeID_t> const & GetNodes() const  {
+    std::vector<NodeID_t> const & GetNodes() const {
       return tnode_vec;
+    }
+    
+    std::vector<Int_t> const & GetIndices() const {
+      return tindex_vec;
+    }
+
+    std::vector<Size_t> GetIndicesFromNode(NodeID_t const n) {
+
+      auto const nv_itb = tnode_vec.begin();
+      auto const nv_ite = tnode_vec.end();
+      auto nv_it = nv_itb;
+
+      std::vector<Size_t> indices;
+
+      while(nv_it != nv_ite) {
+
+	nv_it = std::find(nv_it, nv_ite, n);
+
+	if(nv_it != nv_ite) {
+	  indices.push_back(nv_it - nv_itb);
+	  ++nv_it;
+	}
+
+      }
+
+      return indices;
+      
     }
 
     void PrintAssociations() const {
@@ -406,6 +513,8 @@ namespace ertool {
 
       }
 
+      std::cout << "\n";
+
     }
 
     void PrintNodes() const  {
@@ -418,6 +527,7 @@ namespace ertool {
 
     }
 
+ 
     void Test() const {                                                        
       
       for(ParticleAssociation const & pae : tassociations) {
@@ -444,6 +554,38 @@ namespace ertool {
 	  
 	}
 	
+      }
+
+    }
+
+    /*Check to see if a shower has been added more than once and a track has
+      been added more than twice (neither of which should happen)*/
+    void NodeCheck(ParticleGraph const & graph) {
+
+      std::vector<NodeID_t> nodes;
+
+      for(NodeID_t const n : tnode_vec) {
+	
+	if(nodes.size() < n+1) nodes.resize(n+1, 0);
+	
+	++nodes.at(n);
+	
+      }
+
+      for(Size_t i = 0; i < nodes.size(); ++i) {
+
+        Size_t const s = nodes.at(i);
+
+	if(s == 0) continue;
+
+	Particle const & p = graph.GetParticle(i);
+
+	if(p.RecoType() == kTrack && s > 2) 
+	  std::cout << "track > 2 entries: " << s << "\n";
+
+	else if(p.RecoType() == kShower && s > 1)
+	  std::cout << "shower > 1 entries: " << s << "\n";
+
       }
 
     }
@@ -484,20 +626,20 @@ namespace ertool {
       
       std::vector<NodeID_t> bad_nodes;
 
-      //std::cout << "\trun: parent: " << parent << " index: " << i << "\n";
-
       tskip.push_back(i);
 
-      ParticleAssociation const & pae = tpa->GetAssociations().at(i);
+      ParticleAssociation const & pa = tpa->GetAssociations().at(i);
 
-      std::vector<NodeID_t> const & c = pae.GetCluster();
-      std::vector<geoalgo::Point_t> const & v = pae.GetVertices();
+      std::vector<NodeID_t> const & c = pa.GetCluster();
+      std::vector<geoalgo::Point_t> const & v = pa.GetVertices();
       for(Size_t j = 0; j < c.size(); ++j) {
 	
 	NodeID_t const n = c.at(j);
 
 	if(n == parent) continue;
+
 	auto it = std::find(tnodelist.begin(), tnodelist.end(), n);
+
 	if(it != tnodelist.end()) {
 	  ++tloopcounter;
 	  bad_nodes.push_back(*it);
@@ -505,7 +647,16 @@ namespace ertool {
 
 	else {
 	  Particle & p = tgraph->GetParticle(n);
-	  p.SetParticleInfo(p.PdgCode(), p.Mass(), v.at(j), p.Momentum());
+	  //ugly way of setting energy
+	  Double_t energy = 0;
+	  if(p.RecoType() == kTrack)
+	    energy = tdata->Track(p.RecoID())._energy; 
+	  if(p.RecoType() == kShower)
+	    energy = tdata->Shower(p.RecoID())._energy;
+	  p.SetParticleInfo(p.PdgCode(),
+			    p.Mass(),
+			    v.at(j),
+			    geoalgo::Point_t(energy, 0, 0));
 	  tgraph->SetParentage(parent, n);
 	}	  
 
@@ -513,7 +664,7 @@ namespace ertool {
 
       }
 
-      for(std::pair<Int_t, NodeID_t> const & pair : pae.GetConnections()) {
+      for(std::pair<Int_t, NodeID_t> const & pair : pa.GetConnections()) {
 	
 	if(std::find(tskip.begin(), tskip.end(), pair.first) != tskip.end())
 	  continue;
@@ -539,15 +690,12 @@ namespace ertool {
 		     Int_t const i) {
       
       std::vector<NodeID_t> bad_nodes;
-      
-      //std::cout << "\trun: parent: " << parent << " index: " << i << "\n";
-
+    
       tskip.push_back(i);
 
-      ParticleAssociation const & pae = tpa->GetAssociations().at(i);
+      ParticleAssociation const & pa = tpa->GetAssociations().at(i);
 
-      std::vector<NodeID_t> const & c = pae.GetCluster();
-      std::vector<geoalgo::Point_t> const & v = pae.GetVertices();
+      std::vector<NodeID_t> const & c = pa.GetCluster();
       for(Size_t j = 0; j < c.size(); ++j) {
 	
 	NodeID_t const n = c.at(j);
@@ -563,7 +711,7 @@ namespace ertool {
 
       }
 
-      for(std::pair<Int_t, NodeID_t> const & pair : pae.GetConnections()) {
+      for(std::pair<Int_t, NodeID_t> const & pair : pa.GetConnections()) {
 	
 	if(std::find(tskip.begin(), tskip.end(), pair.first) != tskip.end())
 	  continue;
@@ -623,17 +771,119 @@ namespace ertool {
 
 
 
-  geoalgo::Point_t const * ERAlgoVertexBuilder::GetMostChildrenPrimary
-  (ParticleAssociations const & pas, 
-   std::vector<Int_t> const & skip,
+  geoalgo::Point_t const * ERAlgoVertexBuilder::SubGetUpstream
+  (ParticleAssociations const & pas,
+   std::vector<Int_t> const & indices,
+   Int_t & index) {
+
+    std::vector<ParticleAssociation> const & pav = pas.GetAssociations();
+
+    index = -1;
+    geoalgo::Point_t const * sc = nullptr;
+    Double_t zmin = 2000;
+    
+    for(Int_t const i : indices) {
+      
+      geoalgo::Point_t const * const s = &pav.at(i).GetSphere().Center();
+      Double_t const z = s->at(2);
+      
+      if(z < zmin) {
+	index = i;
+	sc = s;
+	zmin = z;
+      }
+      
+    }
+    
+    return sc;
+    
+  }
+
+
+  
+  geoalgo::Point_t const * ERAlgoVertexBuilder::SubSmallestSphere
+  (ParticleAssociations const & pas,
+   std::vector<Int_t> const & indices,
+   Int_t & index) {
+
+    std::vector<ParticleAssociation> const & pav = pas.GetAssociations();
+ 
+    index = -1;
+    geoalgo::Point_t const * sc = nullptr;
+    Double_t smallest_radius = 2000;
+  
+    for(Int_t const i : indices) {
+    
+      Double_t const gradius = pav.at(i).GetGoodness();
+
+      if(gradius < smallest_radius) {
+	index = i;
+	sc = &pav.at(i).GetSphere().Center();
+	smallest_radius = gradius;
+      }
+
+    }
+    
+    return sc;
+    
+  }
+
+
+
+  geoalgo::Point_t const * ERAlgoVertexBuilder::SubMostEnergy
+  (EventData const & data,
+   ParticleGraph const & graph,
+   ParticleAssociations const & pas,
+   std::vector<Int_t> const & indices,
    Int_t & index) {
 
     std::vector<ParticleAssociation> const & pav = pas.GetAssociations();
     
     index = -1;
     geoalgo::Point_t const * sc = nullptr;
-    Size_t most_children = 0;
+    Double_t most_energy = 0;
   
+    for(Int_t const i : indices) {
+        
+      Double_t energy = 0;
+
+      for(NodeID_t const n : pav.at(i).GetCluster()) {
+
+	Particle const & p = graph.GetParticle(n);
+
+	if(p.RecoType() == kTrack) energy += data.Track(p.RecoID())._energy;
+	else if (p.RecoType() == kShower)
+	  energy += data.Shower(p.RecoID())._energy;
+
+      }
+
+      if(energy > most_energy) {
+	index = i;
+	sc = &pav.at(i).GetSphere().Center();
+	most_energy = energy;	
+      }
+
+    }
+    
+    return sc;
+    
+  }
+ 
+
+
+  geoalgo::Point_t const * ERAlgoVertexBuilder::GetMostChildrenPrimary
+  (EventData const & data,
+   ParticleGraph const & graph,
+   ParticleAssociations const & pas, 
+   std::vector<Int_t> const & skip,
+   Int_t & index) {
+
+    std::vector<ParticleAssociation> const & pav = pas.GetAssociations();
+    
+    index = -1;
+    Size_t most_children = 0;
+    std::vector<Int_t> index_vec;
+
     for(Size_t i = 0; i < pav.size(); ++i) {
       
       if(std::find(skip.begin(), skip.end(), i) != skip.end()) {
@@ -642,15 +892,25 @@ namespace ertool {
     
       Size_t const children = pav.at(i).GetCluster().size();
 
-      if(children > most_children) {
-	index = i;
-	sc = &pav.at(i).GetSphere().Center();
+      if(children >= most_children) {
+
+	if(most_children != children) index_vec.clear();
+	 
 	most_children = children;
+	index_vec.push_back(i);
+     
       }
 
     }
-    
-    return sc;
+
+    if(index_vec.size() == 1) {
+      index = index_vec.front();
+      return &pav.at(index).GetSphere().Center();
+    }
+
+    //return SubGetUpstream(pas, index_vec, index);
+    //return SubSmallestSphere(pas, index_vec, index);
+    return SubMostEnergy(data, graph, pas, index_vec, index);
 
   }
 
@@ -673,12 +933,12 @@ namespace ertool {
 	continue;
       }
     
-      Double_t const radius = pav.at(i).GetSphere().Radius();
+      Double_t const gradius = pav.at(i).GetGoodness();
 
-      if(radius < smallest_radius) {
+      if(gradius < smallest_radius) {
 	index = i;
 	sc = &pav.at(i).GetSphere().Center();
-	smallest_radius = radius;
+	smallest_radius = gradius;
       }
 
     }
@@ -691,11 +951,13 @@ namespace ertool {
 
   geoalgo::Point_t const * ERAlgoVertexBuilder::GetMostEnergyPrimary
   (EventData const & data,
-   ParticleGraph const & graph,
-   ParticleAssociations const & pas, 
+   ParticleGraph & graph,
+   ParticleAssociations & pas, 
    std::vector<Int_t> const & skip,
-   Int_t & index) {
-
+   Int_t & index,
+   Bool_t const lone,
+   Bool_t * first) {
+ 
     std::vector<ParticleAssociation> const & pav = pas.GetAssociations();
     
     index = -1;
@@ -727,50 +989,124 @@ namespace ertool {
       }
 
     }
+  
+    if(!lone || !*first) return sc;
+	      
+    NodeID_t energy_node = kINVALID_NODE_ID;
+  
+    for(NodeID_t const gn : graph.GetParticleNodes(kTrack)) {
+      
+      if(pas.GetIndicesFromNode(gn).size()) continue;
+
+      Particle & p = graph.GetParticle(gn);
+
+      if(gn != p.Parent()) continue;
+           
+      Track const & t = data.Track(p.RecoID());
     
-    return sc;
+      if(t._energy > most_energy) {
+
+	energy_node = gn;
+	most_energy = t._energy;
+
+	Double_t zmin = 2000;
+
+	if(t.front().at(2) < zmin) {
+	  sc = &t.front();
+	  zmin = t.front().at(2);
+	}
+	
+	if(t.back().at(2) < zmin) {
+	  sc = &t.back();
+	}
+
+      }
+	
+    }
+
+    for(NodeID_t const gn : graph.GetParticleNodes(kShower)) {
+    
+      if(pas.GetIndicesFromNode(gn).size()) continue;
+
+      Particle & p = graph.GetParticle(gn);
+    
+      if(gn != p.Parent()) continue;
+  
+      Shower const & s = data.Shower(p.RecoID());
+    
+      if(s._energy > most_energy) {
+	sc = &s.Start();
+	energy_node = gn;
+	most_energy = s._energy;
+      }
+   
+    }
+
+    if(energy_node == kINVALID_NODE_ID) return sc;
+    if(!sc) std::cout << "!sc\n";
+
+    Particle & vert = graph.CreateParticle();
+    NodeID_t const pid = vert.ID();
+    graph.SetPrimary(pid);
+    vert.SetParticleInfo(1, vert.Mass(), *sc, vert.Momentum());    
+    Particle & p = graph.GetParticle(energy_node);
+    
+    p.SetParticleInfo(p.PdgCode(),
+		      p.Mass(),
+		      *sc,
+		      geoalgo::Point_t(most_energy, 0, 0));
+    
+    graph.SetParentage(pid, energy_node);
+
+    *first = false;
+
+    return GetMostEnergyPrimary(data, graph, pas, skip, index);
 
   }
-  
-
+ 
+ 
 
   void ERAlgoVertexBuilder::AddAllLoneTracks
   (const EventData &data,
    ParticleGraph & graph,
-   ParticleAssociations const & pas) {
+   NodeID_t const n) {
 
-    std::vector<NodeID_t> const & pa_nodes = pas.GetNodes();
-
-    for(NodeID_t const gn : graph.GetParticleNodes()) {
+    for(NodeID_t const gn : graph.GetParticleNodes(kTrack)) {
       
       Particle & p = graph.GetParticle(gn);
       
-      if(p.RecoType() != kTrack) continue;
-      
-      if(std::find(pa_nodes.begin(), pa_nodes.end(), gn) != pa_nodes.end())
+      if(p.Parent() != gn || gn == n)
 	continue;
       
       Track const & t = data.Track(p.RecoID());
     
-      if(t.Length() < tlone_track_length) continue;
-
       geoalgo::Point_t const * track_end = nullptr;
       Double_t zmin = 2000;
+
       if(t.front().at(2) < zmin) {
 	track_end = &t.front();
 	zmin = t.front().at(2);
       }
+
       if(t.back().at(2) < zmin) {
 	track_end = &t.back();
 	zmin = t.back().at(2);
       }
+
       if(track_end) {
 	
 	Particle & vert = graph.CreateParticle();
 	NodeID_t const pid = vert.ID();
 	graph.SetPrimary(pid);
 	vert.SetParticleInfo(0, vert.Mass(), *track_end, vert.Momentum());    
-	p.SetParticleInfo(p.PdgCode(), p.Mass(), *track_end, p.Momentum());
+
+	p.SetParticleInfo(p.PdgCode(),
+			  p.Mass(),
+			  *track_end,
+			  geoalgo::Point_t(data.Track(p.RecoID())._energy,
+					   0,
+					   0));
+
 	graph.SetParentage(pid, gn);
 
       }
@@ -785,33 +1121,27 @@ namespace ertool {
 
   void ERAlgoVertexBuilder::AddUpstreamLoneTrack
   (const EventData &data,
-   ParticleGraph & graph,
-   ParticleAssociations const & pas) {
+   ParticleGraph & graph) {
     
-    std::vector<NodeID_t> const & pa_nodes = pas.GetNodes();
-
     Double_t zmin = 2000;
     NodeID_t upstream_track_node = kINVALID_NODE_ID;
     geoalgo::Point_t const * track_end = nullptr;
 
-    for(NodeID_t const gn : graph.GetParticleNodes()) {
+    for(NodeID_t const gn : graph.GetParticleNodes(kTrack)) {
       
       Particle & p = graph.GetParticle(gn);
-      
-      if(p.RecoType() != kTrack) continue;
-      
-      if(std::find(pa_nodes.begin(), pa_nodes.end(), gn) != pa_nodes.end())
+            
+      if(p.Parent() != gn)
 	continue;
       
       Track const & t = data.Track(p.RecoID());
     
-      if(t.Length() < tlone_track_length) continue;
-
       if(t.front().at(2) < zmin) {
 	track_end = &t.front();
 	upstream_track_node = gn;
 	zmin = t.front().at(2);
       }
+
       if(t.back().at(2) < zmin) {
 	track_end = &t.back();
 	upstream_track_node = gn;
@@ -827,7 +1157,12 @@ namespace ertool {
       graph.SetPrimary(pid);
       vert.SetParticleInfo(0, vert.Mass(), *track_end, vert.Momentum());    
       Particle & p = graph.GetParticle(upstream_track_node);
-      p.SetParticleInfo(p.PdgCode(), p.Mass(), *track_end, p.Momentum());
+      
+      p.SetParticleInfo(p.PdgCode(),
+			p.Mass(),
+			*track_end,
+			geoalgo::Point_t(data.Track(p.RecoID())._energy, 0, 0));
+
       graph.SetParentage(pid, upstream_track_node);
       
     }
@@ -836,9 +1171,727 @@ namespace ertool {
 
 
 
+  void ERAlgoVertexBuilder::AddAllLoneShowers
+  (const EventData &data,
+   ParticleGraph & graph,
+   NodeID_t const n) {
+
+    for(NodeID_t const gn : graph.GetParticleNodes(kShower)) {
+      
+      Particle & p = graph.GetParticle(gn);
+      
+      if(p.Parent() != gn || gn == n)
+	continue;
+     
+      Shower const & s = data.Shower(p.RecoID());
+    
+      Particle & vert = graph.CreateParticle();
+      NodeID_t const pid = vert.ID();
+      graph.SetPrimary(pid);
+      vert.SetParticleInfo(0, vert.Mass(), s.Start(), vert.Momentum());    
+
+      p.SetParticleInfo(p.PdgCode(),
+			p.Mass(),
+			s.Start(),
+			geoalgo::Point_t(data.Shower(p.RecoID())._energy, 0, 0));
+      
+      graph.SetParentage(pid, gn);
+      
+    }
+    
+  }
+
+  
+
+  void ERAlgoVertexBuilder::AddTracksAndShowersUpstream
+  (const EventData &data,
+   ParticleGraph & graph) {
+    
+    Double_t zmin = 2000;
+    NodeID_t upstream_node = kINVALID_NODE_ID;
+    geoalgo::Point_t const * end = nullptr;
+
+    for(NodeID_t const gn : graph.GetParticleNodes(kTrack)) {
+      
+      Particle & p = graph.GetParticle(gn);
+            
+      if(p.Parent() != gn)
+	continue;
+      
+      Track const & t = data.Track(p.RecoID());
+    
+      if(t.front().at(2) < zmin) {
+	end = &t.front();
+	upstream_node = gn;
+	zmin = t.front().at(2);
+      }
+
+      if(t.back().at(2) < zmin) {
+	end = &t.back();
+	upstream_node = gn;
+	zmin = t.back().at(2);
+      }
+
+    }
+
+    for(NodeID_t const gn : graph.GetParticleNodes(kShower)) {
+      
+      Particle & p = graph.GetParticle(gn);
+            
+      if(p.Parent() != gn)
+	continue;
+      
+      Shower const & s = data.Shower(p.RecoID());
+    
+      if(s.Start().at(2) < zmin) {
+	end = &s.Start();
+	upstream_node = gn;
+	zmin = s.Start().at(2);
+      }
+   
+    }
+
+    if(end) {
+
+      Particle & vert = graph.CreateParticle();
+      NodeID_t const pid = vert.ID();
+      graph.SetPrimary(pid);
+      vert.SetParticleInfo(1, vert.Mass(), *end, vert.Momentum());    
+      Particle & p = graph.GetParticle(upstream_node);
+ 
+      Double_t energy = 0;
+      if(p.RecoType() == kTrack)
+	energy = data.Track(p.RecoID())._energy; 
+      if(p.RecoType() == kShower)
+	energy = data.Shower(p.RecoID())._energy;
+      p.SetParticleInfo(p.PdgCode(),
+			p.Mass(),
+			*end,
+			geoalgo::Point_t(energy, 0, 0));
+     
+      graph.SetParentage(pid, upstream_node);
+      
+      AddAllLoneTracks(data, graph, upstream_node);
+      AddAllLoneShowers(data, graph, upstream_node);
+      
+    }
+
+  }
+
+
+  
+  
+  void ERAlgoVertexBuilder::AddTracksAndShowersEnergy
+  (const EventData &data,
+   ParticleGraph & graph) {
+    
+    Double_t energy = 0;
+    NodeID_t energy_node = kINVALID_NODE_ID;
+    geoalgo::Point_t const * end = nullptr;
+
+    for(NodeID_t const gn : graph.GetParticleNodes(kTrack)) {
+      
+      Particle & p = graph.GetParticle(gn);
+            
+      if(p.Parent() != gn)
+	continue;
+      
+      Track const & t = data.Track(p.RecoID());
+    
+      if(t._energy > energy) {
+
+	energy_node = gn;
+	energy = t._energy;
+
+	Double_t zmin = 2000;
+
+	if(t.front().at(2) < zmin) {
+	  end = &t.front();
+	  zmin = t.front().at(2);
+	}
+	
+	if(t.back().at(2) < zmin) {
+	  end = &t.back();
+	}
+
+      }
+	
+    }
+
+    for(NodeID_t const gn : graph.GetParticleNodes(kShower)) {
+      
+      Particle & p = graph.GetParticle(gn);
+            
+      if(p.Parent() != gn)
+	continue;
+      
+      Shower const & s = data.Shower(p.RecoID());
+    
+      if(s._energy > energy) {
+	end = &s.Start();
+	energy_node = gn;
+	energy = s._energy;
+      }
+   
+    }
+
+    if(end) {
+
+      Particle & vert = graph.CreateParticle();
+      NodeID_t const pid = vert.ID();
+      graph.SetPrimary(pid);
+      vert.SetParticleInfo(1, vert.Mass(), *end, vert.Momentum());    
+      Particle & p = graph.GetParticle(energy_node);
+ 
+      p.SetParticleInfo(p.PdgCode(),
+			p.Mass(),
+			*end,
+			geoalgo::Point_t(energy, 0, 0));
+     
+      graph.SetParentage(pid, energy_node);
+      
+      AddAllLoneTracks(data, graph, energy_node);
+      AddAllLoneShowers(data, graph, energy_node);
+      
+    }
+
+  }
+
+
+
+  void ERAlgoVertexBuilder::ShowerProjection
+  (const EventData & data,
+   ParticleGraph & graph,
+   ParticleAssociations & pas) {    
+    
+    //tverbose = true;
+
+    if(tverbose) std::cout << "Shower Projection\n";
+
+    std::map<NodeID_t, Shower const *> shower_map;
+  
+    for(NodeID_t const n : graph.GetParticleNodes(kShower))
+      shower_map.emplace(n, &data.Shower(graph.GetParticle(n).RecoID()));
+  
+    std::vector<ParticleAssociation> const & associations =
+      pas.GetAssociations();
+
+    while(shower_map.size()) {
+
+      if(tverbose)
+	std::cout << "\tshower_map wloop, size: " << shower_map.size() << "\n";
+
+      NodeID_t best_shower_id = kINVALID_NODE_ID;
+      NodeID_t best_other_id = kINVALID_NODE_ID;
+      Int_t index = -1;
+      Double_t best_dist = tshower_prox;
+      geoalgo::Point_t best_vert(2000, 2000, 2000);    
+      geoalgo::Point_t temp_vert(2000, 2000, 2000);
+  
+      for(auto const & c : shower_map) {
+	
+	if(tverbose)
+	  std::cout << "\t\tshower_map primary floop, id: " << c.first << "\n";
+
+	for(auto const & c2 : shower_map) {
+
+	  if(tverbose)
+	    std::cout << "\t\t\tshower_map secondary floop, id: " << c2.first
+		      << "\n";
+
+	  if(c2.first == c.first) {
+	    if(tverbose) std::cout << "\t\t\t\tmatching id, continue\n";
+	    continue;
+	  }
+	  
+	  Double_t const dist =
+	    findrel.FindClosestApproach(*c2.second, *c.second, temp_vert);
+	  
+	  if(tverbose)
+	    std::cout << "\t\t\tdist: " << dist << " < best-dist: "
+		      << best_dist << " ?\n";
+
+	  Double_t temp_dist = best_dist;
+	  //if(best_shower_id == kINVALID_NODE_ID) temp_dist *= 2;
+	  if(dist < temp_dist) {
+	    
+	    if(tverbose) std::cout << "\t\t\t\tyes\n";
+
+	    best_shower_id = c.first;
+	    best_other_id = c2.first;
+	    best_vert = temp_vert;
+	    best_dist = dist;
+	    index = -1;
+	    
+	  }
+	  
+	}
+
+	if(tverbose) std::cout << "\t\tshower_map secondary floop end\n";
+
+	for(NodeID_t const n : graph.GetParticleNodes(kTrack)) {
+
+	  if(tverbose)
+	    std::cout << "\t\t\ttrack secondary floop, id: " << n << "\n";
+
+	  Track const & t = data.Track(graph.GetParticle(n).RecoID());
+		  
+	  geoalgo::Point_t dont_care;
+
+	  Double_t const dist =
+	    sqrt(algo.SqDist(t, 
+			     geoalgo::HalfLine(c.second->Start(),
+					       c.second->Dir()*-1),
+			     temp_vert,
+			     dont_care));
+
+	  if(tverbose)
+	    std::cout << "\t\t\tdist: " << dist << " < best_dist: "
+		      << best_dist << " ?\n";
+	  
+	  if(dist < best_dist) {
+	    
+	    if(tverbose) std::cout << "\t\t\t\tyes\n";
+
+	    best_shower_id = c.first;
+	    best_other_id = n;
+	    best_vert = temp_vert;
+	    best_dist = dist;
+	    index  = -1;
+
+	  }
+
+	}
+
+	if(tverbose) std::cout << "\t\ttrack secondary floop end\n";
+
+	for(Size_t i = 0; i < associations.size(); ++i) {
+
+	  if(tverbose)
+	    std::cout << "\t\t\tassociation secondary floop, index: "
+		      << i << "\n";
+
+	  ParticleAssociation const & pa = associations.at(i);
+
+	  Double_t const dist =
+	    sqrt(algo.SqDist(pa.GetSphere().Center(), *c.second));
+
+	  if(tverbose)
+	    std::cout << "\t\t\tdist: " << dist << " < best-dist: "
+		      << best_dist << " ?\n";
+
+	  if(dist < best_dist) {
+
+	    if(tverbose) std::cout << "\t\t\t\tyes\n";
+
+	    best_shower_id = c.first;
+	    index = i;
+	    best_vert = algo.ClosestPt(pa.GetSphere().Center(), *c.second);
+	    best_dist = dist;
+	    best_other_id = kINVALID_NODE_ID;
+
+	  }
+
+	}
+
+	if(tverbose) std::cout << "\t\tassociation secondary floop end\n";
+	
+      }
+      
+      if(tverbose) std::cout << "\tshower_map primary floop end\n"
+			     << "\tbest_dist: " << best_dist << " >= "
+			     << tshower_prox << " ?\n";
+
+      if(best_dist >= tshower_prox) {
+	if(tverbose) std::cout << "\t\tyes, return\n";	
+	return;
+      }
+
+      if(tverbose) std::cout << "\tindex: " << index << " == -1 ?\n";
+
+      if(index == -1) {
+
+	if(tverbose) std::cout << "\t\tyes\n";
+
+	Particle const & p1 = graph.GetParticle(best_shower_id);
+	Particle const & p2 = graph.GetParticle(best_other_id);
+
+	Int_t association_index = -1;
+	Double_t best_association_dist = tcpoa_vert_prox;
+
+	if(tverbose)
+	  std::cout << "\t\tassociation floop, size: "
+		    << associations.size() << "\n";
+
+	for(Size_t i = 0; i < associations.size(); ++i) {
+
+	  if(tverbose)
+	    std::cout << "\t\t\tassociation floop, index: "
+		      << i << "\n";
+
+	  Double_t const dist =
+	    best_vert.Dist(associations.at(i).GetSphere().Center());
+
+	  if(tverbose)
+	    std::cout << "\t\t\tdist: " << dist
+		      << " < best_association_dist: "
+		      << best_association_dist << "\n";
+
+	  if(dist < best_association_dist) {
+	    
+	    if(tverbose)
+	      std::cout << "\t\t\t\tyes\n";
+	    
+	    association_index = i;
+	    best_association_dist = dist;
+
+	  }
+
+	}
+
+	if(tverbose) std::cout << "\t\tOther reco type:\n";	
+
+	if(p2.RecoType() == kShower) {
+
+	  if(tverbose)
+	    std::cout << "\t\t\tshower\n"
+		      << "\t\t\tbest_association_dist: "
+		      << best_association_dist
+		      << " < tcpoa_vert_prox: "
+		      << tcpoa_vert_prox << " ?\n";	
+
+	  if(best_association_dist < tcpoa_vert_prox) {
+	    if(tverbose) std::cout << "\t\t\t\tyes, add showers to association: "
+				   << association_index << "\n";	
+	    pas.AddObject(association_index, best_shower_id, best_vert);
+	    pas.AddObject(association_index, best_other_id, best_vert);
+	  }
+
+	  else {
+
+	    NodeID_t best_track = kINVALID_NODE_ID;
+	    geoalgo::Point_t const * best_tp = nullptr;
+	    geoalgo::Point_t const * best_other_tp = nullptr;
+	    Double_t best_showerp_dist = tcpoa_vert_prox;
+
+	    for(NodeID_t const n : graph.GetParticleNodes(kTrack)) {
+
+	      Track const & t = data.Track(graph.GetParticle(n).RecoID());
+
+	      Double_t const trackend_dist = t.back().Dist(best_vert);
+	      if(trackend_dist < best_showerp_dist) {
+		best_track = n;
+		best_tp = &t.back();
+		best_other_tp = &t.front();
+		best_showerp_dist = trackend_dist;
+	      }
+	   
+	      Double_t const trackstart_dist = t.front().Dist(best_vert);
+	      if(trackstart_dist < best_showerp_dist) {
+		best_track = n;
+		best_tp = &t.front();
+		best_other_tp = &t.back();
+		best_showerp_dist = trackstart_dist;
+	      }
+	      
+	    }
+	   
+	    if(best_showerp_dist < tcpoa_vert_prox) {
+
+	      std::vector<Size_t> const index_positions =
+		pas.GetIndicesFromNode(best_track);
+	      
+	      if(index_positions.size() == 0) {
+		
+		if(tverbose) std::cout << "\t\t\t\tno, create new association\n";
+		std::vector<NodeID_t> showers;
+		showers.push_back(best_shower_id);
+		showers.push_back(best_other_id);
+		showers.push_back(best_track);
+		std::vector<geoalgo::Point_t> verts(2, best_vert);
+		if(best_tp == nullptr) std::cout << "best_tp == nullptr\n";
+		verts.push_back(*best_tp);
+		pas.AddAssociation(showers,
+				   verts,
+				   geoalgo::Sphere(*best_tp, best_dist),
+				   best_dist);
+		
+	      }
+
+	      else if(index_positions.size() == 1) {
+
+		Size_t const index =
+		  pas.GetIndices().at(index_positions.front());
+		
+		geoalgo::Point_t const & added_point =
+		  associations.at(index).GetVertexFromNode(best_track);
+		
+		Double_t const point_dist = added_point.Dist(*best_tp);
+		Double_t const otherpoint_dist = added_point.Dist(*best_other_tp);
+			      
+		if(otherpoint_dist < point_dist) {
+		  
+		  if(associations.at(index).GetSphere().Center().
+		     Dist(*best_other_tp) < tstart_prox) {
+		    pas.AddObject(index, best_shower_id, best_vert);
+		    pas.AddObject(index, best_other_id, best_vert);
+		  }
+
+		  else {
+
+		    if(tverbose) std::cout << "\t\t\t\tno, create new association\n";
+		    std::vector<NodeID_t> showers;
+		    showers.push_back(best_shower_id);
+		    showers.push_back(best_other_id);
+		    showers.push_back(best_track);
+		    std::vector<geoalgo::Point_t> verts(2, best_vert);
+		    if(best_tp == nullptr) std::cout << "best_tp == nullptr\n";
+		    verts.push_back(*best_tp);
+		    pas.AddAssociation(showers,
+				       verts,
+				       geoalgo::Sphere(*best_tp, best_dist),
+				       best_dist);
+		   
+		  }
+		  
+		}
+		
+		else {
+		  pas.AddObject(index, best_shower_id, best_vert);	
+		  pas.AddObject(index, best_other_id, best_vert);
+		}
+
+	      }
+
+	      else if(index_positions.size() == 2) {
+		
+		Int_t const indexa =
+		  pas.GetIndices().at(index_positions.front());
+		Double_t dista = 
+		  associations.at(indexa).GetSphere().Center().Dist(best_vert);
+		
+		Int_t const indexb =
+		  pas.GetIndices().at(index_positions.back());   
+		Double_t distb = 
+		  associations.at(indexb).GetSphere().Center().Dist(best_vert);
+		
+		if(dista < distb) {
+		  pas.AddObject(indexa, best_shower_id, best_vert);	
+		  pas.AddObject(indexa, best_other_id, best_vert);
+		}
+
+		else {
+		  pas.AddObject(indexb, best_shower_id, best_vert);	      
+		  pas.AddObject(indexb, best_other_id, best_vert);
+		}		
+
+	      }
+	     
+	    }
+
+	    else {
+
+	      std::vector<NodeID_t> showers;
+	      showers.push_back(best_shower_id);
+	      showers.push_back(best_other_id);
+	      std::vector<geoalgo::Point_t> verts(2, best_vert);
+	      pas.AddAssociation(showers,
+				 verts,
+				 geoalgo::Sphere(best_vert, best_dist),
+				 best_dist);
+
+	    }
+
+	  }
+
+	  if(tverbose)
+	    std::cout << "\t\t\terase other: " << best_other_id << "\n";
+	  shower_map.erase(best_other_id);
+
+	}
+
+	else if(p2.RecoType() == kTrack) {
+
+	  if(tverbose) std::cout << "\t\t\ttrack\n";
+		     	  
+	  Track const & t = data.Track(p2.RecoID());
+	  
+	  Double_t best_trackend_dist = t.front().Dist(best_vert);
+	  geoalgo::Point_t const * point = &t.front();
+	  geoalgo::Point_t const * otherpoint = &t.back();
+
+	  Double_t const trackend_dist = t.back().Dist(best_vert);
+	  if(trackend_dist < best_trackend_dist) {
+	    best_trackend_dist = trackend_dist;
+	    point = &t.back();
+	    otherpoint = &t.front();
+	  }
+	  
+	  if(tverbose)
+	    std::cout << "\t\t\tbest_trackend_dist: "
+		      << best_trackend_dist
+		      << " < tcpoa_vert_prox: "
+		      << tcpoa_vert_prox << " ?\n";	
+
+	  if(best_trackend_dist < tcpoa_trackend_prox) {
+
+	    std::vector<Size_t> const index_positions =
+	      pas.GetIndicesFromNode(best_other_id);
+	     
+	    if(tverbose)
+	      std::cout << "\t\t\t\tyes\n"
+			<< "\t\t\t\tindex_positions.size(): "
+			<< index_positions.size() << "\n";
+	    
+	    if(index_positions.size() == 0) {
+
+	      if(tverbose)
+		std::cout << "\t\t\t\t\tsize 0\n";	      
+
+	      /*
+	      if(best_association_dist < tcpoa_vert_prox) {
+		pas.AddObject(association_index, best_shower_id, best_vert);
+		pas.AddObject(association_index, best_other_id, *point);
+	      }
+	      */	    
+
+	      std::vector<NodeID_t> objects;
+	      objects.push_back(best_shower_id);
+	      objects.push_back(best_other_id);
+	      std::vector<geoalgo::Point_t> verts;
+	      verts.push_back(best_vert);
+	      verts.push_back(*point);
+	      pas.AddAssociation(objects,
+				 verts,
+				 geoalgo::Sphere(*point, best_dist),
+				 best_dist);	      
+
+	    }
+
+	    else if(index_positions.size() == 1) {
+
+	      if(tverbose)
+		std::cout << "\t\t\t\t\tsize 1\n";	      
+	      
+	      Size_t const index =
+		pas.GetIndices().at(index_positions.front());
+	      
+	      geoalgo::Point_t const & added_point =
+		associations.at(index).GetVertexFromNode(best_other_id);
+	      
+	      Double_t const point_dist = added_point.Dist(*point);
+	      Double_t const otherpoint_dist = added_point.Dist(*otherpoint);
+
+	      if(tverbose)
+		std::cout << "\t\t\t\t\totherpoint_dist: "
+			  << otherpoint_dist
+			  << " < point_dist: "
+			  << point_dist << " ?\n";	
+	      
+	      if(otherpoint_dist < point_dist) {
+
+		if(associations.at(index).GetSphere().Center().
+		   Dist(*otherpoint) < tstart_prox) 
+		  pas.AddObject(index, best_shower_id, best_vert);
+
+		else {
+
+		  std::vector<NodeID_t> objects;
+		  objects.push_back(best_shower_id);
+		  objects.push_back(best_other_id);
+		  std::vector<geoalgo::Point_t> verts;
+		  verts.push_back(best_vert);	
+		  verts.push_back(*point);
+		  pas.AddAssociation(objects,
+				     verts,
+				     geoalgo::Sphere(*point, best_dist),
+				     best_dist);	      
+	      
+		}
+
+	      }
+	      
+	      else 
+		pas.AddObject(index, best_shower_id, best_vert);	
+
+	    }
+
+	    else if(index_positions.size() == 2) {
+
+	      if(tverbose)
+		std::cout << "\t\t\t\t\tsize 2\n";	      
+	      
+	      Int_t const indexa =
+		pas.GetIndices().at(index_positions.front());
+	      Double_t dista = 
+		associations.at(indexa).GetSphere().Center().Dist(best_vert);
+	   
+	      Int_t const indexb = pas.GetIndices().at(index_positions.back());   
+	      Double_t distb = 
+		associations.at(indexb).GetSphere().Center().Dist(best_vert);
+	      
+	      if(dista < distb)
+		pas.AddObject(indexa,
+			      best_shower_id,
+			      best_vert);	
+	      
+	      else
+		pas.AddObject(indexb,
+			      best_shower_id,
+			      best_vert);	
+
+	    }
+	    
+	    else if(index_positions.size() > 2)
+	      std::cout << "Warning: more than two indices found, node: "
+			<< best_other_id << " event: " 
+			<< data.Event_ID() << "\n";
+	    
+	  }
+	
+	  else {
+	    Particle & p = graph.GetParticle(best_shower_id);
+	    //Ugly way of setting the energy
+	    Double_t energy = 0;
+	    if(p.RecoType() == kTrack)
+	      energy = data.Track(p.RecoID())._energy; 
+	    if(p.RecoType() == kShower)
+	      energy = data.Shower(p.RecoID())._energy;
+	    p.SetParticleInfo(p.PdgCode(),
+			      p.Mass(),
+			      best_vert,
+			      geoalgo::Point_t(energy, 0, 0));
+	    graph.SetParentage(best_other_id, best_shower_id);
+	  }
+	
+	}
+
+      }
+
+      else
+	pas.AddObject(index, best_shower_id, best_vert);
+     
+      shower_map.erase(best_shower_id);
+
+    }
+ 
+    //pas.PrintAssociations();
+
+    tverbose = false;
+
+  }
+
+
+
   void ERAlgoVertexBuilder::EndReconstructPa(const EventData &data,
 					     ParticleGraph & graph,
-					     ParticleAssociations const & pas){
+					     ParticleAssociations & pas){
+
+    //tverbose = true;
+
+    if(tshowerproj) ShowerProjection(data, graph, pas);
+
+    pas.NodeCheck(graph);
 
     std::vector<ParticleAssociation> const & pav = pas.GetAssociations();
     association_number = pav.size();
@@ -850,57 +1903,62 @@ namespace ertool {
       std::vector<Int_t> const & skip = setter.GetSkip();
    
       if(tverbose) pas.PrintAssociations();
-
+      
       Bool_t first = true;
 
       while(skip.size() != pav.size()) {
 
 	Int_t index = -1;
 	geoalgo::Point_t const * sc = nullptr;
-	
+
 	if(tprimary_vertex_selection == mostupstream)
 	  sc = GetUpstreamPrimary(pas, skip, index);
 	else if(tprimary_vertex_selection == mostchildren)
-	  sc = GetMostChildrenPrimary(pas, skip, index);
+	  sc = GetMostChildrenPrimary(data, graph, pas, skip, index);
 	else if(tprimary_vertex_selection == mostenergy)
 	  sc = GetMostEnergyPrimary(data, graph, pas, skip, index);
+	else if(tprimary_vertex_selection == mostenergy_lone)
+	  sc =
+	    GetMostEnergyPrimary(data, graph, pas, skip, index, true, &first);
 	else if(tprimary_vertex_selection == smallestsphere)
 	  sc = GetSmallestSpherePrimary(pas, skip, index);
+	/*
+	else if(tprimary_vertex_selection == trackdirection)
+	  sc = GetTrackDirectionPrimary(data, graph, pas, skip, index);
+	*/	
 
 	if(sc == nullptr) {
 	  std::cout << "No sc\n";
 	  return;
 	}
 	
-	/*
 	Particle & p = graph.CreateParticle();
 	NodeID_t const pid = p.ID();
 	graph.SetPrimary(pid);
-	p.SetParticleInfo(0, p.Mass(), *sc, p.Momentum());
-    	
-	setter.runstart(pid, index);
-	*/
 
+	Int_t pdg = 0;
 	if(first) {
-	  Particle & p = graph.CreateParticle();
-	  NodeID_t const pid = p.ID();
-	  graph.SetPrimary(pid);
-	  p.SetParticleInfo(0, p.Mass(), *sc, p.Momentum());    	
-	  setter.runstart(pid, index);
-
-	  radius = pav.at(index).GetSphere().Radius();
-
+	  pdg = 1;
 	  first = false;
 	}
-	else setter.runstartempty(kINVALID_NODE_ID, index);
+
+	p.SetParticleInfo(pdg, p.Mass(), *sc, p.Momentum());
+    	
+	setter.runstart(pid, index);
 
 	++vertex_counter;
 	loop_counter += setter.GetLoopCounter();
 	
       }
+      
+      AddAllLoneTracks(data, graph);
+      AddAllLoneShowers(data, graph);
 
     }
 
+    else AddTracksAndShowersUpstream(data, graph);
+    //else AddTracksAndShowersEnergy(data, graph);
+    
     std::vector<NodeID_t> const & pa_nodes = pas.GetNodes();
     Int_t track_counter = 0;
     for(NodeID_t const gn : graph.GetParticleNodes()) {
@@ -921,12 +1979,7 @@ namespace ertool {
     vertices_lonetracks = vertex_counter + track_counter;
     tree->Fill();   
 
-    if(vertex_counter > 0) {
-      return;
-    }      
-
-    //AddAllLoneTracks(data, graph, pas);
-    AddUpstreamLoneTrack(data, graph, pas);
+    tverbose = false;
 
   }
  
@@ -940,7 +1993,8 @@ namespace ertool {
     lone_track_counter = 0;
     vertices_lonetracks = 0;
     radius = 2000;
-   
+    multi_track_end_vertex = 0;
+
   }
 
 
@@ -976,7 +2030,7 @@ namespace ertool {
   void ERAlgoVertexBuilder::WithoutTrackDir(const EventData &data,
 					    ParticleGraph& graph) {
 
-    //if(data.Event_ID() != 53181) return;
+    if(data.Event_ID() != tevent && tevent != -1) return;
 
     Reset();
 
@@ -987,7 +2041,6 @@ namespace ertool {
 		<< "=======================================================\n";
     
     std::multimap<NodeID_t, geoalgo::Point_t const *> pn;
-    //std::multimap<NodeID_t, geoalgo::Point_t const *> pna;
 
     for(NodeID_t const n : graph.GetParticleNodes()) {
 
@@ -1001,16 +2054,8 @@ namespace ertool {
 	//if(volume.Contain(*tf) && volume.Contain(*tb)) {
 	  pn.emplace(n, tf);
 	  pn.emplace(n, tb);
-	  //pna.emplace(n, tf);
-	  //pna.emplace(n, tb);
 	  //} 
 
-      }
-
-      else if(p.RecoType() == kShower) {
-	geoalgo::Point_t const * sv = &data.Shower(p.RecoID()).Start();
-	pn.emplace(n, sv);
-	//pna.emplace(n, sv);
       }
 
     }
@@ -1029,7 +2074,8 @@ namespace ertool {
 		      << part.PdgCode() << " "
 		      << *p.second;
 	  else std::cout << " " << *p.second;
-	  if(part.RecoType() == kTrack) std::cout << data.Track(part.RecoID()).Length();
+	  if(part.RecoType() == kTrack)
+	    std::cout << data.Track(part.RecoID()).Length();
 	  last_id = p.first;
 	}
 
@@ -1044,20 +2090,13 @@ namespace ertool {
     if(tverbose)
       std::cout << "wloop, pn.size() == " << pn.size() << "\n";
 
-    while(pn.size() > 0) {
+    while(pn.size() > 1) {
 
       if(tverbose)
 	std::cout <<  "\twloop start, pn.size() == " << pn.size() << "\n";
 
       auto best_m = pn.end();
       auto best_c = best_m;
-
-      /*
-	NodeID_t best_objectA = kINVALID_NODE_ID;
-	NodeID_t best_objectB = kINVALID_NODE_ID;
-	geoalgo::Point_t const * best_vertA = nullptr;
-	geoalgo::Point_t const * best_vertB = nullptr;
-      */
      
       Double_t best_dist = tstart_prox;
 
@@ -1075,7 +2114,6 @@ namespace ertool {
 	
 	 if(tverbose)
 	   std::cout << "\t\tMain NodeID_t: " << mid << "\n";
-	     //<< "\t\tComparison loop, pna.size() == " << pna.size()
 
 	for(auto c_it = pn.begin(); c_it != pn.end(); ++c_it) {
 
@@ -1184,20 +2222,26 @@ namespace ertool {
 
 	Erase(data, graph, pn, best_o, *best_o->second);
 
+	//s = algo.boundingSphere(vcp);
+
       } while(true);
-
+      
+      /*
       if(s.Radius() > tmax_rad) {
-
+	
 	std::cout << "\tRadius too big\n";
 
       }
       
       else {
 
-	pa.AddCluster(vc, vcp, s);
+	pa.AddAssociation(vc, vcp, s, algo.boundingSphere(vcp).Radius());
 
       }
-      
+      */      
+
+      pa.AddAssociation(vc, vcp, s, algo.boundingSphere(vcp).Radius());
+
     }
 
     EndReconstructPa(data, graph, pa);    

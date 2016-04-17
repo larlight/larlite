@@ -314,9 +314,19 @@ class cluster(recoBase):
             self._listOfCParams.append([])
 
             clusters = self._process.getDataByPlane(thisPlane)
-
+            
             for i in xrange(len(clusters)):
                 cluster = clusters[i]
+
+                radBigW = 0.5 / view_manager._geometry.wire2cm()
+                radBigT = 0.5 / view_manager._geometry.time2cm()
+                
+                #otherPoly = QtGui.QGraphicsEllipseItem( cluster._start[0]-radBigW, cluster._start[1]-radBigT,2*radBigW,2*radBigT)
+                otherPoly = QtGui.QGraphicsEllipseItem( cluster._start[0], cluster._start[1],2*radBigW,2*radBigT)
+                otherPoly.setPen(pg.mkPen(pg.mkColor((255, 0, 0, 100)), width = 1))
+                otherPoly.setBrush(pg.mkBrush(pg.mkColor((255, 0, 0, 100))))                
+                view._view.addItem(otherPoly)
+
                 # Now make the cluster
                 cluster_box_coll = boxCollection()
                 cluster_box_coll.setColor(self._clusterColors[colorIndex])
@@ -328,7 +338,7 @@ class cluster(recoBase):
 
                 # draw the hits in this cluster:
                 cluster_box_coll.drawHits(view, cluster)
-
+                
                 colorIndex += 1
                 if colorIndex >= len(self._clusterColors):
                     colorIndex = 0
