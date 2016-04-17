@@ -24,6 +24,9 @@ namespace larlite{
   template<> const ::larlite::data::DataType_t storage_manager::data_type<::larlite::event_rawdigit> () const
   { return data::kRawDigit; }
 
+  template<> const ::larlite::data::DataType_t storage_manager::data_type<::larlite::event_PiZeroROI> () const
+  { return data::kPiZeroROI; }
+
   template<> const ::larlite::data::DataType_t storage_manager::data_type<::larlite::event_wire> () const
   { return data::kWire; }
 
