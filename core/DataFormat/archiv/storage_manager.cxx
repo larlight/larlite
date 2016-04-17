@@ -526,6 +526,9 @@ namespace larlite {
     case data::kRawDigit:
       _ptr_data_array[type][name]=(event_base*)(new event_rawdigit(name));
       break;
+    case data::kPiZeroROI:
+      _ptr_data_array[type][name]=(event_base*)(new event_PiZeroROI(name));
+      break;
     case data::kSimChannel:
       _ptr_data_array[type][name]=(event_base*)(new event_simch(name));
       break;
@@ -853,6 +856,9 @@ namespace larlite {
 
   template<> const ::larlite::data::DataType_t storage_manager::data_type<::larlite::event_mcshower> () const
   { return data::kMCShower; }
+
+  template<> const ::larlite::data::DataType_t storage_manager::data_type<::larlite::event_PiZeroROI> () const
+  { return data::kPiZeroROI; }
 
   template<> const ::larlite::data::DataType_t storage_manager::data_type<::larlite::event_rawdigit> () const
   { return data::kRawDigit; }
