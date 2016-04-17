@@ -107,9 +107,17 @@ roi2d DrawPiZeroROI::getroi2d(larlite::PiZeroROI roi, unsigned int plane) {
   result._maxmaxPoint.w = roi.GetWireROI().at(plane).second;
   result._maxmaxPoint.t = roi.GetTimeROI().at(plane).second;
 
+  result._pi0maxmaxPoint = larutil::Point2D();
+  result._pi0maxmaxPoint.w = roi.GetPiZeroWireROI().at(plane).second;
+  result._pi0maxmaxPoint.t = roi.GetPiZeroTimeROI().at(plane).second;
+
   result._minminPoint = larutil::Point2D();
   result._minminPoint.w = roi.GetWireROI().at(plane).first;
   result._minminPoint.t = roi.GetTimeROI().at(plane).first;
+
+  result._pi0minminPoint = larutil::Point2D();
+  result._pi0minminPoint.w = roi.GetPiZeroWireROI().at(plane).first;
+  result._pi0minminPoint.t = roi.GetPiZeroTimeROI().at(plane).first;
 
   result._vtxPoint = larutil::Point2D();
   result._vtxPoint.w = roi.GetVertex().at(plane).first;

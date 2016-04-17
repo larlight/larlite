@@ -43,6 +43,8 @@ public:
     int plane() {return _plane;}
     larutil::Point2D maxmaxPoint() {return _maxmaxPoint;}
     larutil::Point2D minminPoint() {return _minminPoint;}
+    larutil::Point2D pi0maxmaxPoint() {return _pi0maxmaxPoint;}
+    larutil::Point2D pi0minminPoint() {return _pi0minminPoint;}
     larutil::Point2D vtxPoint() {return _vtxPoint;}
     bool is_good() {return _is_good;}
 
@@ -50,6 +52,8 @@ public:
     int _plane;                ///< The Plane of the shower
     larutil::Point2D _minminPoint;      ///< Wire time start point (units in cm)
     larutil::Point2D _maxmaxPoint;      ///< Wire time start point (units in cm)
+    larutil::Point2D _pi0minminPoint;   ///< Wire time start point (units in cm)
+    larutil::Point2D _pi0maxmaxPoint;   ///< Wire time start point (units in cm)
     larutil::Point2D _vtxPoint;      ///< Wire time start point (units in cm)
     bool _is_good;             ///< Whether or not the projection succeeded
 };
