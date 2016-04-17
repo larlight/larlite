@@ -22,11 +22,18 @@ for x in xrange(len(sys.argv)-2):
 my_proc.set_ana_output_file("ana.root")
 my_proc.set_output_file(sys.argv[-1])
 
-hitremoval = fmwk.RemoveTrkLikeHits()
-hitremoval.setPFPartProducer("pandoraCosmic")
+hitremoval = fmwk.RmTrksNearVtx()
+#hitremoval.setPFPartProducer("pandoraCosmic")
+hitremoval.setPFPartProducer("pandoraNu")
+hitremoval.setVtxProducer("mcroi")
 my_proc.add_process(hitremoval)
 
 my_proc.set_data_to_write(fmwk.data.kHit,"shrlike")
+my_proc.set_data_to_write(fmwk.data.kHit,"gaushit")
+my_proc.set_data_to_write(fmwk.data.kCluster,"pandoraNu")
+my_proc.set_data_to_write(fmwk.data.kAssociation,"pandoraNu") 
+my_proc.set_data_to_write(fmwk.data.kCluster,"pandoraCosmic")
+my_proc.set_data_to_write(fmwk.data.kAssociation,"pandoraCosmic") 
 
 my_proc.run()
 sys.exit(0);

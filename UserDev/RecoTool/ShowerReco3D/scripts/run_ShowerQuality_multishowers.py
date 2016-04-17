@@ -7,8 +7,7 @@ if len(sys.argv) < 2:
     sys.stderr.write(msg)
     sys.exit(1)
 
-#from ROOT import larlite as fmwk
-from larlite import larlite as fmwk
+from ROOT import larlite as fmwk
 
 
 # Create ana_processor instance
@@ -31,8 +30,9 @@ my_proc.set_output_file('')
 
 # Create analysis unit
 sq_module = fmwk.ShowerQuality_multishowers()
-sq_module.SetShowerProducer("pinotshowerreco")
-
+#sq_module.setMCShowerQuality(True)
+sq_module.SetShowerProducer("showerrecofuzzy")
+#sq_module.SetShowerProducer("showermergeall")
 
 sq_module.SetMaxEnergyCut(99999999.)
 sq_module.SetMinEnergyCut(0.)
