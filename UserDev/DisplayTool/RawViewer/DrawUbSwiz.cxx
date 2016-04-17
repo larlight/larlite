@@ -172,7 +172,7 @@ void DrawUbSwiz::readData() {
   watch.Start();
 
   size_t digitSize = 9595;
-  int nPedPoints = 200;
+  int nPedPoints = 201;
 
   for (size_t i_channel = 0; i_channel < channel.size(); i_channel ++) {
     unsigned int ch = channel.at(i_channel);
@@ -202,8 +202,11 @@ void DrawUbSwiz::readData() {
     for (int j = 0; j < nPedPoints; j++) {
       pedestal.at(j) = adc.at(i_channel * digitSize + j * pedStepSize);
     }
-    std::sort(pedestal.begin(), pedestal.end());
-    float ped = 0.5 * pedestal.at(nPedPoints / 2 - 1) + 0.5 * pedestal.at(nPedPoints / 2);
+
+    std::nth_element(pedestal.begin(), pedestal.begin() + pedestal.size()/2, pedestal.end());
+    float ped = pedestal[pedestal.size()/2];
+    // std::sort(pedestal.begin(), pedestal.end());
+    // float ped = 0.5 * pedestal.at(nPedPoints / 2 - 1) + 0.5 * pedestal.at(nPedPoints / 2);
 
     // Set the pedestal to be stored, if needed
     pedestalByPlane.at(plane).at(wire) = ped;
@@ -241,16 +244,16 @@ void DrawUbSwiz::readData() {
   float second_pass = watch.RealTime();
 
 
-  // std::cout << "Time to read data:    " << init_time  << std::endl;
-  // std::cout << "Time to arrange data: " << first_pass << std::endl;
-  // std::cout << "Time to clean data:   " << second_pass << std::endl;
+  std::cout << "Time to read data:    " << init_time  << std::endl;
+  std::cout << "Time to arrange data: " << first_pass << std::endl;
+  std::cout << "Time to clean data:   " << second_pass << std::endl;
 
   // std::cout << "_planeData.size() " << _planeData.size() << std::endl;
   // std::cout << "_planeData.at(0).at(0) " << _planeData.at(0).at(0) << std::endl;
   // std::cout << "_planeData.at(0).at(1) " << _planeData.at(0).at(1) << std::endl;
   // std::cout << "_planeData.at(0).at(2) " << _planeData.at(0).at(2) << std::endl;
 
-  // std::cout << "done reading data.\n";
+  std::cout << "done reading data.\n";
 
   return;
 }
@@ -603,16 +606,22 @@ float DrawUbSwiz::getMedian(std::vector<float> & vals) {
   // return max->first;
   ////Old style:
   // Calculate the median:
-  sort(vals.begin(), vals.end());
-  float median = 0;
-  if (vals.size() % 2 == 0) {
-    median =  0.5 * vals.at(vals.size() / 2)
-              + 0.5 * vals.at(vals.size() / 2 - 1);
-  }
-  else {
-    median = vals.at((int)vals.size() / 2);
-  }
-  return median;
+  // sort(vals.begin(), vals.end());
+  // float median = 0;
+  // if (vals.size() % 2 == 0) {
+  //   median =  0.5 * vals.at(vals.size() / 2)
+  //             + 0.5 * vals.at(vals.size() / 2 - 1);
+  // }
+  // else {
+  //   median = vals.at((int)vals.size() / 2);
+  // }
+  // return median;
+
+  // This way gives a 25% decrease in execution time:
+  std::nth_element(vals.begin(), vals.begin() + vals.size()/2, vals.end());
+  return vals[vals.size()/2];
+
+
 }
 }
 #endif

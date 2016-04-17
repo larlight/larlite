@@ -28,7 +28,7 @@ my_proc.set_ana_output_file("ClusterInfo_ana.root")
 #my_proc.set_output_file("ClusterInfo.root")
 
 cluster_info = showerreco.ClusterInfo()
-cluster_info.SetInputProducer("ImageClusterHit")
+cluster_info.SetInputProducer("fuzzycluster")
 my_proc.add_process(cluster_info)
 
 print

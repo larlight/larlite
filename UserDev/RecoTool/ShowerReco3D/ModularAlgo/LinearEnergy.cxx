@@ -171,7 +171,7 @@ void LinearEnergy::do_reconstruction(const ProtoShower & proto_shower,
     if (_fill_tree)
       _tree->Fill();
 
-    // if (_verbose)
+    if (_verbose)
       std::cout << "energy on plane " << pl << " is : " << E << std::endl;
 
     // set the energy for this plane
