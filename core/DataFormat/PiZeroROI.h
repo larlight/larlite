@@ -25,35 +25,56 @@ namespace larlite{
     
     /// Default destructor
     virtual ~PiZeroROI(){};
-
+    
   PiZeroROI() : data_base(data::kPiZeroROI)
       { clear_data(); }
     
     PiZeroROI(const std::vector < std::pair< int, int > > Wire,
 	      const std::vector < std::pair< int, int > > Time);
     
-    PiZeroROI(const PiZeroROI& orig) : _wire_range(orig._wire_range),
-                                       _t_range(orig._t_range),
-                                       _vtx(orig._vtx)
-					 {}
-
+    PiZeroROI(const std::vector < std::pair< int, int > > Wire,
+	      const std::vector < std::pair< int, int > > Time,
+	      const std::vector < std::pair< int, int > > PiZeroWire,
+	      const std::vector < std::pair< int, int > > PiZeroTime);
+    
+  PiZeroROI(const PiZeroROI& orig) : _wire_range(orig._wire_range),
+                                     _t_range(orig._t_range),
+                                     _pi0_wire_range(orig._pi0_wire_range),
+                                     _pi0_t_range(orig._pi0_t_range),      
+                                     _vtx(orig._vtx)
+	                             {}
+    
     void clear_data();
 
     // Here are the Setters    
     void SetROI(const std::vector < std::pair< int, int > > Wire,
 		const std::vector < std::pair< int, int > > Time);
+
+    void SetROI(const std::vector < std::pair< int, int > > Wire,
+		const std::vector < std::pair< int, int > > Time,
+		const std::vector < std::pair< int, int > > PiZeroWire,
+		const std::vector < std::pair< int, int > > PiZeroTime);
+    
+    
+    void SetPiZeroROI(const std::vector < std::pair< int, int > > PiZeroWire,
+		      const std::vector < std::pair< int, int > > PiZeroTime);
+
     void SetVertex( const std::vector< std::pair <int, int> > vtx);
 
     // Here are the Getters
     std::vector < std::pair <int, int > > GetVertex() const;
     std::vector < std::pair< int, int > > GetWireROI() const;
     std::vector < std::pair< int, int > > GetTimeROI() const;
-    
+    std::vector < std::pair< int, int > > GetPiZeroWireROI() const;
+    std::vector < std::pair< int, int > > GetPiZeroTimeROI() const;
+
 
   private:
     
     std::vector < std::pair< int, int > > _wire_range; // size 3 planes, min then max
     std::vector < std::pair< int, int > > _t_range; // size 3 planes, min then max
+    std::vector < std::pair< int, int > > _pi0_wire_range; // size 3 planes, min then max
+    std::vector < std::pair< int, int > > _pi0_t_range; // size 3 planes, min then max
     std::vector < std::pair <int, int > > _vtx; // size 3 plane, pair with tick, wire for vertex
     
   };

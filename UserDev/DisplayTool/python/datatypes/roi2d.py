@@ -52,6 +52,7 @@ class roi2d(recoBase):
 
                 # construct a polygon for this roi2d:
                 points = []
+                pi0points = []
                 vtx = []
                 # Remember - everything is in cm, but the display is in
                 # wire/time!
@@ -60,6 +61,12 @@ class roi2d(recoBase):
                 y1 = roi2d.maxmaxPoint().t
                 x2 = roi2d.minminPoint().w
                 y2 = roi2d.minminPoint().t
+
+                pi0x1 = roi2d.pi0maxmaxPoint().w
+                pi0y1 = roi2d.pi0maxmaxPoint().t
+                pi0x2 = roi2d.pi0minminPoint().w
+                pi0y2 = roi2d.pi0minminPoint().t
+
                 vx = (roi2d.vtxPoint().w)
                 vy = (roi2d.vtxPoint().t)
                 
@@ -68,11 +75,23 @@ class roi2d(recoBase):
                 points.append(QtCore.QPoint(x2, y2))
                 points.append(QtCore.QPoint(x2, y1))
 
+                pi0points.append(QtCore.QPoint(pi0x1, pi0y1))
+                pi0points.append(QtCore.QPoint(pi0x1, pi0y2))
+                pi0points.append(QtCore.QPoint(pi0x2, pi0y2))
+                pi0points.append(QtCore.QPoint(pi0x2, pi0y1))
+
                 thisPolyF = QtGui.QPolygonF(points)
                 thisPoly = QtGui.QGraphicsPolygonItem(thisPolyF)
 
                 thisPoly.setPen(pg.mkPen(pg.mkColor((255, 255, 0, 100)), width = 4))
                 thisPoly.setBrush(pg.mkBrush(None))
+
+                pi0PolyF = QtGui.QPolygonF(pi0points)
+                pi0Poly = QtGui.QGraphicsPolygonItem(pi0PolyF)
+
+                pi0Poly.setPen(pg.mkPen(pg.mkColor((255, 0, 255, 100)), width = 4))
+                pi0Poly.setBrush(pg.mkBrush(None))
+
 
                 radBigW = 0.5 / view_manager._geometry.wire2cm()
                 radBigT = (0.5) / view_manager._geometry.time2cm()
@@ -80,15 +99,17 @@ class roi2d(recoBase):
                 otherPoly = QtGui.QGraphicsEllipseItem(vx-radBigW, vy-radBigT, 20*radBigW, 20*radBigT)
                 #otherPoly = QtGui.QGraphicsEllipseItem( vy-radBigT, vx-radBigW,2*radBigW,2*radBigT)
 
-                print "(vx,vy): {},{}".format(vx,vy)
+                #                print "(vx,vy): {},{}".format(vx,vy)
                 
                 otherPoly.setPen(pg.mkPen(pg.mkColor((255, 0, 100, 100)), width = 1))
                 otherPoly.setBrush(pg.mkBrush(pg.mkColor((255, 0, 100, 100))))                
 
                 view._view.addItem(thisPoly)
+                view._view.addItem(pi0Poly)
                 view._view.addItem(otherPoly)
 
                 self._drawnObjects[view.plane()].append(thisPoly)
+                self._drawnObjects[view.plane()].append(pi0Poly)
                 self._drawnObjects[view.plane()].append(otherPoly)
 
                 i_color += 1
