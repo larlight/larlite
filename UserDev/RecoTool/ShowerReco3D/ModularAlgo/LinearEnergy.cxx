@@ -20,7 +20,7 @@ LinearEnergy::LinearEnergy()
   _useModBox = true;
   _fill_tree = false;
   _caloAlg = ::calo::CalorimetryAlg();
-  _caloAlg.setUseModBox(false);
+  _caloAlg.setUseModBox(true);
   _fC_to_e = 6250.; // a fC in units of the electron charge
   _e_to_eV = 23.6;  // ionization energy of Ar in eV
   _eV_to_MeV = 1e-6; // eV -> MeV conversion

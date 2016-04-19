@@ -92,6 +92,7 @@ namespace larlite{
       kMuCSData,           ///< MuCS::MuCSData
       kMuCSReco,           ///< MuCS::MuCSReco
       kAuxDetSimChannel,   ///< sim::AuxDetSimChannel
+      kChStatus,           ///< larlite::chstatus
       kDATA_TYPE_MAX       ///< Event-wise enum boundary
     };
 
@@ -108,6 +109,8 @@ namespace larlite{
       kSUBRUNDATA_TYPE_MAX ///< SubRun-data type enum boundary
     };
 
+    #ifndef __CINT__
+    #ifndef __CLINT__
     const std::string kDATA_TREE_NAME[kDATA_TYPE_MAX] = {
       //const std::vector<std::string> kDATA_TREE_NAME = {
       "unknown",
@@ -150,7 +153,8 @@ namespace larlite{
       "simphotons",
       "mucsdata",
       "mucsreco",
-      "auxsimch"
+      "auxsimch",
+      "chstatus"
     };
 
     const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {
@@ -163,7 +167,8 @@ namespace larlite{
       "undefined",
       "potsummary"
     };
-
+    #endif
+    #endif
     static const std::string kEVENT_ID_TREE("larlite_id_tree");
   }
   
