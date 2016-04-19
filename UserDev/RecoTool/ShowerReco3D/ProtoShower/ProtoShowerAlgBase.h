@@ -37,7 +37,7 @@ public:
   ProtoShowerAlgBase() { _name = "ProtoShowerAlgBase"; }
 
   /// Default destructor
-  ~ProtoShowerAlgBase() {}
+  virtual ~ProtoShowerAlgBase() {}
 
   virtual void GenerateProtoShower(::larlite::storage_manager* storage,
                                    ::larlite::event_pfpart* ev_pfpart,
