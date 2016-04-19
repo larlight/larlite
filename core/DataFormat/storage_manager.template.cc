@@ -116,6 +116,9 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_mucsreco> () const
   { return data::kMuCSReco; }
 
+  template<> data::DataType_t storage_manager::data_type<event_chstatus> () const
+  { return data::kChStatus; }
+
   template <class T>
   data::DataType_t storage_manager::data_type() const
   { 

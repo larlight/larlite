@@ -92,6 +92,7 @@ namespace larlite{
       kMuCSData,           ///< MuCS::MuCSData
       kMuCSReco,           ///< MuCS::MuCSReco
       kAuxDetSimChannel,   ///< sim::AuxDetSimChannel
+      kChStatus,           ///< larlite::chstatus
       kDATA_TYPE_MAX       ///< Event-wise enum boundary
     };
 
@@ -152,7 +153,8 @@ namespace larlite{
       "simphotons",
       "mucsdata",
       "mucsreco",
-      "auxsimch"
+      "auxsimch",
+      "chstatus"
     };
 
     const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {
