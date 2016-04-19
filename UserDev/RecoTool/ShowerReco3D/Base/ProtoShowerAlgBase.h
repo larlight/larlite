@@ -2,7 +2,7 @@
  * \file ProtoShowerAlgBase.h
  *
  * \ingroup ProtoShower
- * 
+ *
  * \brief Class def header for a class ProtoShowerAlgBase
  *
  * @author david caratelli
@@ -27,34 +27,34 @@
    doxygen documentation!
  */
 
-namespace showerreco {  
+namespace showerreco {
 
-  class ProtoShowerAlgBase{
-    
-  public:
-    
-    /// Default constructor
-    ProtoShowerAlgBase(){ _name = "ProtoShowerAlgBase"; }
-    
-    /// Default destructor
-    ~ProtoShowerAlgBase(){}
-    
-    virtual void GenerateProtoShower(::larlite::storage_manager* storage,
-				     ::larlite::event_pfpart* ev_pfpart,
-				     const size_t proto_shower_pfpart,
-				     showerreco::ProtoShower & proto_shower) = 0;
-    
+class ProtoShowerAlgBase {
 
-    std::string name() { return _name; }
-    
-  protected:
+public:
 
-    std::string _name;
-    
-  };
-  
+  /// Default constructor
+  ProtoShowerAlgBase() { _name = "ProtoShowerAlgBase"; }
+
+  /// Default destructor
+  ~ProtoShowerAlgBase() {}
+
+  virtual void GenerateProtoShower(::larlite::storage_manager* storage,
+                                   ::larlite::event_pfpart* ev_pfpart,
+                                   const size_t proto_shower_pfpart,
+                                   showerreco::ProtoShower & proto_shower) = 0;
+
+
+  std::string name() { return _name; }
+
+protected:
+
+  std::string _name;
+
+};
+
 }// namespace
-    
+
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 
