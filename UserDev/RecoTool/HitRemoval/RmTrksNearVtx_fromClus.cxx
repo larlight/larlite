@@ -30,7 +30,7 @@ namespace larlite {
     auto *ev_clus_hit_ass = storage->get_data<event_ass>("shrlike");
     std::vector<std::vector<unsigned int> > shr_clus_hit_ass;
 
-    // grab vtx to be used to guide polar-coordinates
+    // grab vtx to be used
     auto *ev_vtx = storage->get_data<event_vertex>(_vtx_producer);
 
     storage->set_id(storage->run_id(), storage->subrun_id(), storage->event_id());

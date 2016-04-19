@@ -30,7 +30,7 @@ namespace larlite {
     // get PFParticles
     auto ev_pfpart = storage->get_data<event_pfpart>(_pfpart_producer);
 
-    // grab vtx to be used to guide polar-coordinates
+    // grab vtx to be used
     auto *ev_vtx = storage->get_data<event_vertex>(_vtx_producer);
 
     storage->set_id(storage->run_id(), storage->subrun_id(), storage->event_id());
