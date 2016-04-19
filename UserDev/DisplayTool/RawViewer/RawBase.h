@@ -46,7 +46,7 @@ namespace evd {
     RawBase();
 
     /// Default destructor
-    ~RawBase();
+    virtual ~RawBase();
 
     // This function sets the input target
     // for larlite, this can be used to set the producer
