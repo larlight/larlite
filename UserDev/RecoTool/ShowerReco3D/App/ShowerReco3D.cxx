@@ -52,14 +52,11 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
                   storage->event_id());
 
   if (!ev_pfpart or (ev_pfpart->size() == 0) ) {
-    print(msg::kERROR, __FUNCTION__,
-          Form("PFPart producer %s product not found!",
-               fInputProducer.c_str()));
+    //print(msg::kERROR, __FUNCTION__,
+    //    Form("PFPart producer %s product not found!",
+    //         fInputProducer.c_str()));
     return false;
   }
-
-  std::cout << "Run: " << storage->run_id() << ", Subrun: " << storage->subrun_id()
-            << ", Event: " << storage->event_id() << std::endl;
 
   // This item holds the list of PFParticles tagged as showers (11)
   // We only run reco on particles tagged that way.
