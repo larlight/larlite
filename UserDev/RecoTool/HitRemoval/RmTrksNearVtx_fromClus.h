@@ -3,34 +3,34 @@
  *
  * \ingroup HitRemoval
  * 
- * \brief Class def header for a class RmTrksNearVtx
+ * \brief Class def header for a class RmTrksNearVtx_fromClus
  *
- * @author david
+ * @author david caratelli
  */
 
 /** \addtogroup HitRemoval
 
     @{*/
 
-#ifndef LARLITE_RMTRKSNEARVTX_H
-#define LARLITE_RMTRKSNEARVTX_H
+#ifndef LARLITE_RMTRKSNEARVTX_NEARCLUS_H
+#define LARLITE_RMTRKSNEARVTX_NEARCLUS_H
 
 #include "Analysis/ana_base.h"
 
 namespace larlite {
   /**
-     \class RmTrksNearVtx
+     \class RmTrksNearVtx_fromClus
      User custom analysis class made by SHELL_USER_NAME
    */
-  class RmTrksNearVtx : public ana_base{
+  class RmTrksNearVtx_fromClus : public ana_base{
   
   public:
 
     /// Default constructor
-    RmTrksNearVtx(){ _name="RmTrksNearVtx"; _fout=0;}
+    RmTrksNearVtx_fromClus(){ _name="RmTrksNearVtx_fromClus"; _fout=0;}
 
     /// Default destructor
-    virtual ~RmTrksNearVtx(){}
+    virtual ~RmTrksNearVtx_fromClus(){}
 
     virtual bool initialize();
 
@@ -38,12 +38,12 @@ namespace larlite {
 
     virtual bool finalize();
 
-    void setVtxProducer(std::string s) { _vtx_producer = s; }
-    void setPFPartProducer(std::string s) { _pfpart_producer = s; }
+    void setClusProducer(std::string s) { _clus_producer = s; }
+    void setVtxProducer(std::string s)  { _vtx_producer = s;  }
 
   protected:
 
-    std::string _pfpart_producer;
+    std::string _clus_producer;
     std::string _vtx_producer;
 
     std::vector<double> vtx_w_cm;

@@ -1,7 +1,7 @@
-#ifndef LARLITE_RMTRKSNEARVTX_CXX
-#define LARLITE_RMTRKSNEARVTX_CXX
+#ifndef LARLITE_RMTRKSNEARVTX_FROMPFPART_CXX
+#define LARLITE_RMTRKSNEARVTX_FROMPFPART_CXX
 
-#include "RmTrksNearVtx.h"
+#include "RmTrksNearVtx_fromPFPart.h"
 #include "DataFormat/pfpart.h"
 #include "DataFormat/cluster.h"
 #include "DataFormat/hit.h"
@@ -10,15 +10,22 @@
 
 namespace larlite {
 
-  bool RmTrksNearVtx::initialize() {
+  bool RmTrksNearVtx_fromPFPart::initialize() {
 
     return true;
   }
   
-  bool RmTrksNearVtx::analyze(storage_manager* storage) {
+  bool RmTrksNearVtx_fromPFPart::analyze(storage_manager* storage) {
 
     // produce new shower-like hits
     auto ev_shr_hits = storage->get_data<event_hit>("shrlike");
+
+    // produce new shower-like clusters
+    auto ev_shr_clus = storage->get_data<event_cluster>("shrlike");
+
+    // produce cluster -> hit association
+    auto *ev_clus_hit_ass = storage->get_data<event_ass>("shrlike");
+    std::vector<std::vector<unsigned int> > shr_clus_hit_ass;
 
     // get PFParticles
     auto ev_pfpart = storage->get_data<event_pfpart>(_pfpart_producer);
@@ -132,17 +139,23 @@ namespace larlite {
 	    for (auto const& hit_idx : ass_hit_idx_v)
 	      ev_shr_hits->emplace_back( ev_hit->at( hit_idx ) );
 	  }// for all associated clusters
+
+	  //add cluster & cluster -> hit association to the output "shrlike" clusters
+	  ev_shr_clus->emplace_back( ev_clus->at(ass_clus_idx) );
+	  shr_clus_hit_ass.push_back( ass_hit_idx_v );
 	
 	}// if track is false
 	
       }// for all clusters associated to this PFParticle
       
     }// loop through PFParticles
+
+    ev_clus_hit_ass->set_association(ev_shr_clus->id(),product_id(data::kHit,ev_hit->name()), shr_clus_hit_ass);    
   
     return true;
   }
 
-  bool RmTrksNearVtx::finalize() {
+  bool RmTrksNearVtx_fromPFPart::finalize() {
 
     return true;
   }
