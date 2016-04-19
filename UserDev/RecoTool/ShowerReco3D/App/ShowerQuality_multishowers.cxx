@@ -431,7 +431,7 @@ bool ShowerQuality_multishowers::finalize() {
   fTreeParams.mc_dcosz = mc_shower.Start().Pz() / mc_shower.Start().E();
 
   // Reco vtx
-  fTreeParams.reco_x = reco_shower.ShowerStart()[0];
+  fTreeParams.reco_x = reco_shower.ShowerStart()[0] + 124.5;
   fTreeParams.reco_y = reco_shower.ShowerStart()[1];
   fTreeParams.reco_z = reco_shower.ShowerStart()[2];
 
@@ -470,6 +470,10 @@ bool ShowerQuality_multishowers::finalize() {
   fTreeParams.reco_energy_V = reco_shower.Energy_v().at(1);
   fTreeParams.reco_energy_Y = reco_shower.Energy_v().at(2);
 
+  fTreeParams.reco_dqdx_U   = reco_shower.dQdx_v().at(0);
+  fTreeParams.reco_dqdx_V   = reco_shower.dQdx_v().at(1);
+  fTreeParams.reco_dqdx_Y   = reco_shower.dQdx_v().at(2);
+  
   fTreeParams.reco_dedx     = reco_shower.dEdx_v().at(best_plane);
   fTreeParams.reco_dedx_U   = reco_shower.dEdx_v().at(0);
   fTreeParams.reco_dedx_V   = reco_shower.dEdx_v().at(1);
@@ -554,6 +558,10 @@ void ShowerQuality_multishowers::InitializeAnaTree()
   fTree->Branch("mc_dcosz", &fTreeParams.mc_dcosz, "mc_dcosz/D");
   fTree->Branch("mc_energy", &fTreeParams.mc_energy, "mc_energy/D");
 
+  fTree->Branch("reco_dqdx_U", &fTreeParams.reco_dqdx_U, "reco_dqdx_U/D");
+  fTree->Branch("reco_dqdx_V", &fTreeParams.reco_dqdx_V, "reco_dqdx_V/D");
+  fTree->Branch("reco_dqdx_Y", &fTreeParams.reco_dqdx_Y, "reco_dqdx_Y/D");
+  
   fTree->Branch("reco_dedx", &fTreeParams.reco_dedx, "reco_dedx_/D");
   fTree->Branch("reco_dedx_U", &fTreeParams.reco_dedx_U, "reco_dedx_U/D");
   fTree->Branch("reco_dedx_V", &fTreeParams.reco_dedx_V, "reco_dedx_V/D");
