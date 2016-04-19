@@ -161,7 +161,7 @@ void ProtoShowerAlgClusterParams::GenerateProtoShower(::larlite::storage_manager
     if ( ev_vertex && ev_vertex -> size() != 0) {
       auto & vtx_idx_v = ass_vertex_v.at(proto_shower_pfpart);
       for (auto idx : vtx_idx_v) {
-        double xyz[3];
+        // double xyz[3];
         vtx_v.push_back( ev_vertex->at(idx) );
       }
     }// if there are vertices

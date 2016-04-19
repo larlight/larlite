@@ -16,7 +16,7 @@
 
 #include <iostream>
 
-#include "ShowerReco3D/Base/ProtoShowerAlgBase.h"
+#include "ProtoShowerAlgBase.h"
 
 #include "ClusterRecoUtil/Base/CRUHelper.h"
 #include "Cluster3DRecoUtil/Base/CRU3DHelper.h"
