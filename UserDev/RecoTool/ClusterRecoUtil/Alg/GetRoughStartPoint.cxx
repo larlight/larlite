@@ -12,9 +12,6 @@ namespace cluster {
 GetRoughStartPoint::GetRoughStartPoint()
 {
   _name = "GetRoughStartPoint";
-  _N    = 20;
-  _angleMatrix = std::vector<std::vector<float> >(_N, std::vector<float>(_N));
-
 }
 
 void GetRoughStartPoint::do_params_fill(cluster_params & cluster) {
@@ -56,51 +53,8 @@ void GetRoughStartPoint::do_params_fill(cluster_params & cluster) {
     // std::cout << "InteriorAngle is " << interiorAngles.at(n1) <<std::endl;
   }// for 1st loop over Poly points
 
-  /*
-  // get hit-list
-  auto const& hits = cluster.hit_vector;
-
-  // get ordered hit list (from highest to lowest Q)
-  // and save only the first N (or up to the last hit in the cluster)
-  // Map[Charge] -> position of hit in hit vector
-  std::map<double,size_t> hitmap;
-  for(size_t i=0; i < hits.size(); i++)
-    hitmap.insert(std::pair<double,size_t>(hits[i].charge,i));
-
-  size_t nadded = 0;
-  _highQT.clear();
-  _highQW.clear();
-  for (auto hiter = hitmap.rbegin(); hiter != hitmap.rend() && nadded < _N; hiter++){
-    _highQT.push_back(hits[hiter->second].t);
-    _highQW.push_back(hits[hiter->second].w);
-    nadded += 1;
-  }
-
-  size_t nScanned1 = 0;
-  size_t nScanned2 = 0;
-  // loop through map of Q->hit in reverse order
-  for (auto hiter1 = hitmap.rbegin(); hiter1 != hitmap.rend() && nScanned1 < _N; hiter1++){
-    nScanned2 = 0;
-    // second loop over hits
-    for (auto hiter2 = hitmap.rbegin(); hiter2 != hitmap.rend() && nScanned2 < _N; hiter2++){
-      // if same iterator -> angle is 0
-      if (hiter1 == hiter2){
-        _angleMatrix[nScanned1][nScanned2] = 0;
-        continue;
-      }
-      // calculate tha angle between these two hits of interest
-      //if (_verbose) { std::cout << "Checking entry in matrix: (" << nScanned1 << ", " << nScanned2 << ")" << std::endl; }
-      //if (_verbose) { std::cout << "compare hits (" << hiter1->second << ", " << hiter2->second << ")"; }
-      auto const tanangle = GetAngle(hits[hiter1->second],hits[hiter2->second],cluster.slope_2d);
-      //if (_verbose) { std::cout << "\ttan(angle): " << tanangle << std::endl; }
-      _angleMatrix[nScanned1][nScanned2] = tanangle;
-      nScanned2 += 1;
-    }// 2nd loop over hits
-    nScanned1 += 1;
-  }// 1st loop over hits
-  */
-
-  std::cout << std::setprecision(4) << std::fixed;
+  if (_verbose)
+    std::cout << std::setprecision(4) << std::fixed;
 
   // print out matrix
   if (_verbose) {
