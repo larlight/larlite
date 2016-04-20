@@ -37,6 +37,7 @@ namespace larlite {
     fSigmadEdx_v.clear();
     fSigmadEdx_v.resize(3);
     fLength = -1;
+    fWidth[0] = fWidth[1] = -1.;
     fBestPlane = -1;
   }
   
@@ -73,6 +74,7 @@ namespace larlite {
 
   int    shower::best_plane()               const { return fBestPlane;    }
   double shower::Length()                   const { return fLength;       }
+  const double* shower::Width()             const { return fWidth;        }
   double shower::OpeningAngle()             const { return fOpeningAngle; }
 
   const  double& shower::dEdx(int pl)  const {
