@@ -178,6 +178,10 @@
 #pragma link C++ class std::vector<larlite::auxsimch>+;
 #pragma link C++ class larlite::event_auxsimch+;
 
+#pragma link C++ class larlite::chstatus+;
+#pragma link C++ class std::vector<larlite::chstatus>+;
+#pragma link C++ class larlite::event_chstatus+;
+
 #pragma link C++ class treenode+;
 
 #pragma link C++ class larlite::trigger+;
