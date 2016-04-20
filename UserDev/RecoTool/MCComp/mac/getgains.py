@@ -37,7 +37,9 @@ print
 
 import matplotlib.pyplot as plt
 import numpy as np
-plt.ion()
+#plt.ion()
+
+plt.rcParams.update({'font.size': 16})
 
 def gauss(mu,sigma):
     timeticks = []
@@ -50,7 +52,14 @@ def gauss(mu,sigma):
         amps.append( adc )
     return timeticks,amps
 
-fig, ax = plt.subplots(1,1,figsize=(20,8))
+#fig, ax = plt.subplots(1,1,figsize=(20,8))
+
+
+ADC2e_Y = []
+ADC2e_V = []
+ADC2e_U = []
+
+offset = 7150
 
 while ( my_proc.process_event() ):
     
@@ -61,9 +70,6 @@ while ( my_proc.process_event() ):
         if (hitcheck.hasHits(chan) == False):
             continue
             
-        ax.cla()
-        fig.gca()
-        
         hits = hitcheck.getHits(chan)
         ides = hitcheck.getIDEs(chan)
 
@@ -78,17 +84,20 @@ while ( my_proc.process_event() ):
         maxhittick = 0
 
         hitIntegral = 0.
+        hitPlane = 0
         
         for hit in hits:
+            hitPlane = hit.WireID().Plane
+            print 'Hit plane : ',hitPlane
             print 'hit time : %i'%hit.PeakTime()
             maxhittick = hit.PeakTime()
             times,adcs = gauss(hit.PeakTime(),hit.RMS())
             hitIntegral = hit.Integral()
             print 'Hit integral : %.02f'%hitIntegral
-            plt.plot(times,adcs,'ro',label='Hit Gauss Fit')
-            plt.axvspan(hit.PeakTime()-3*hit.RMS(),hit.PeakTime()+3*hit.RMS(),color='r',alpha=0.5,label='Simch integration Region')
+            #plt.plot(times,adcs,'ro')
 
         qtot = 0
+        qhit = 0 # charge in simch ides that is at the same time as the hit time
         ideTime   = []
         ideCharge = []
         maxtick   = 0
@@ -101,34 +110,64 @@ while ( my_proc.process_event() ):
                 maxq    = ide.second
                 maxtick = ide.first
             qtot += ide.second
+            if ( ( (ide.first-offset) > (hit.PeakTime() - 3*hit.RMS()) ) and ( (ide.first-offset) < (hit.PeakTime() + 3*hit.RMS()) ) ):
+                qhit += ide.second
+            
 
-        offset = maxtick - maxhittick
+        #offset = maxtick - maxhittick
         print 'offset (ticks) is ',offset
 
         ideTime   = np.array(ideTime)-offset
-        
-        print 'IDE Q = %.02f'%(np.sum(ideCharge))
-        ideCharge = np.array(ideCharge)/float(qtot)
+
         if (qtot == 0):
             continue
-        print 'Hit Q / # e- = %.02f 10^3'%(1000*hitIntegral/qtot)
-
         
-        plt.plot(ideTime,ideCharge,'bo',label='Simch IDEs')
+        print 'IDE Q = %.02f'%(qtot)
+        ideCharge = np.array(ideCharge)/float(qtot)
+        print 'Hit Q / # e- = %.02f 10^-3'%(1000*hitIntegral/qtot)
 
-        plt.grid()
-        plt.legend(fontsize=16)
-        plt.xlabel('Tick Number [Hit Scale]',fontsize=16)
-        plt.ylabel('Relative Amplitude',fontsize=16)
-
-        fig.canvas
-        fig.canvas.draw()
+        if (hitPlane == 0):
+            ADC2e_U.append(hitIntegral/qtot)
+        if (hitPlane == 1):
+            ADC2e_V.append(hitIntegral/qtot)
+        if (hitPlane == 2):
+            ADC2e_Y.append(hitIntegral/qtot)
         
-        usrinput = raw_input("Hit Enter: next channel  || int: go to channel number ||  q: exit viewer\n")                        
-        if ( usrinput == "q" ):                                                          
-            sys.exit(0)
-        elif ( usrinput.isdigit() == True):
-            chan = int(usrinput)
+        #plt.plot(ideTime,ideCharge,'bo')
 
+        #plt.grid()
+        #plt.xlabel('Tick Number [Hit Scale]')
+        #plt.ylabel('Relative Amplitude')
+
+        #fig.canvas
+        #fig.canvas.draw()
+        
+        #usrinput = raw_input("Hit Enter: next channel  || int: go to channel number ||  q: exit viewer\n")                        
+        #if ( usrinput == "q" ):                                                          
+        #    sys.exit(0)
+        #elif ( usrinput.isdigit() == True):
+        #    chan = int(usrinput)
+
+fig = plt.figure(figsize=(8,8))
+plt.hist(1000.*np.array(ADC2e_Y),bins=np.linspace(3,7,100),histtype='stepfilled')
+plt.grid()
+plt.xlabel('ADC / $e^-$ [$10^3$]')
+plt.title('Y Plane')
+plt.show()
+
+fig = plt.figure(figsize=(8,8))
+plt.hist(1000*np.array(ADC2e_V),bins=np.linspace(3,7,100),histtype='stepfilled')
+plt.grid()
+plt.title('V Plane')
+plt.xlabel('ADC / $e^-$ [$10^3$]')
+plt.show()
+
+fig = plt.figure(figsize=(8,8))
+plt.hist(1000*np.array(ADC2e_U),bins=np.linspace(3,7,100),histtype='stepfilled')
+plt.grid()
+plt.title('U Plane')
+plt.xlabel('ADC / $e^-$ [$10^3$]')
+plt.show()
+        
 sys.exit()
 

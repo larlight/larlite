@@ -93,7 +93,19 @@ namespace larlite {
     */
     virtual bool finalize();
 
+    // use trigger time
+    void setUseTrigger(bool on) { _use_trigger = on; }
+
   protected:
+
+    // time offset to account for neutrino / particle generation time
+    int _generation_tick;
+
+    // time offset due to trigger simulation time
+    int _trigger_tick;
+
+    // use trigger offset?
+    bool _use_trigger;
 
     int _mcshowerTot ;
     int _recoClusterTot ;
@@ -159,6 +171,8 @@ namespace larlite {
 
     /// Matching correctness
     TH1D *hMatchCorrectness;
+    TH1D *hMatchEff;
+    TH1D *hMatchPur;
 
     /// Number of matches per event
     TH1I *hMatchesPerEvent;

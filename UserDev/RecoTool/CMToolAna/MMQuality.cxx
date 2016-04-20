@@ -1,19 +1,24 @@
+
 #ifndef RECOTOOL_MMQUALITY_CXX
 #define RECOTOOL_MMQUALITY_CXX
 
 #include "MMQuality.h"
 #include "DataFormat/mcshower.h"
+#include "DataFormat/mctruth.h"
 #include "DataFormat/simch.h"
 #include "DataFormat/shower.h"
 #include "DataFormat/pfpart.h"
 #include "DataFormat/cluster.h"
 #include "DataFormat/hit.h"
+#include "DataFormat/trigger.h"
 
 namespace larlite {
   MMQuality::MMQuality() {
     
     _name="MMQuality"; 
     _fout=0;
+
+    _use_trigger = true;
 
     _mc_energy_min = 1;
     _mc_energy_max = 1000000;
@@ -29,6 +34,8 @@ namespace larlite {
     //vRecoShowerClusterEffVsPur.clear();
     //hClusterHits      = nullptr;
     hMatchCorrectness = nullptr;
+    hMatchEff         = nullptr;
+    hMatchPur         = nullptr;
     hMatchesPerEvent  = nullptr;
     fMMQualityTree    = nullptr;
     
@@ -63,6 +70,17 @@ namespace larlite {
 				 "Shower 2D Cluster Matching Correctness; Correctness; Showers",
 				 101,-0.005,1.005);
 
+    if(hMatchEff) delete hMatchEff;
+    hMatchEff = new TH1D("hMatchEff",
+				 "Shower 2D Cluster Matching Eff; Eff; Showers",
+				 101,-0.005,1.005);
+
+
+        if(hMatchPur) delete hMatchPur;
+    hMatchPur = new TH1D("hMatchPur",
+				 "Shower 2D Cluster Matching Pur; Pur; Showers",
+				 101,-0.005,1.005);
+
     if (hMatchesPerEvent) delete hMatchesPerEvent;
     hMatchesPerEvent = new TH1I("hMatchesPerEvent",
 				"Matched Sets of Clusters Per Event",6,-0.5,5.5);
@@ -80,6 +98,35 @@ namespace larlite {
     
     //event_shower* ev_shower = nullptr;
 
+    // retrieve MCTruth if available
+    auto ev_mctruth = storage->get_data<event_mctruth>("generator");
+    if (ev_mctruth && (ev_mctruth->size() > 0) ){
+      auto const& parts = ev_mctruth->at(0).GetParticles();
+      for (auto const& part : parts){
+	if (part.StatusCode() == 1){
+	  //std::cout << "Interaction time : " << part.Trajectory()[0].T()
+	  //	    << "\t w/ PDG " << part.PdgCode() << std::endl;
+	  _generation_tick = (int)(part.Trajectory()[0].T() / 500.);
+	  break;
+	}
+      }
+    }
+
+    // retrieve trigger time
+    if (_use_trigger){
+      auto trig = storage->get_data<trigger>("triggersim");
+      if (!trig){
+	print(msg::kERROR,__FUNCTION__,"Trigger data product not found! Required to figure out hit <-> simch offset. Use setUseTrigger(False) to not use a trigger time-offset");
+	return true;
+      }
+      //std::cout << "Trigger time @ " << trig->TriggerTime() << std::endl;
+      _trigger_tick = (int)(-343.75 / 500.);
+    }// if we should use the trigger time
+
+    //std::cout << "Total offset is " << _generation_tick + _trigger_tick << std::endl;
+
+    fBTAlg.setTickOffset( 2255 + _trigger_tick + _generation_tick );
+    
     // Retrieve mcshower data product
     auto ev_mcs = storage->get_data<event_mcshower>("mcreco");
     
@@ -93,8 +140,9 @@ namespace larlite {
     if(!ev_simch || !(ev_simch->size())) {
       print(msg::kERROR,__FUNCTION__,"SimChannel data product not found!");
       return false;
-    }      
-    
+    }
+
+
     // Retrieve shower data product
     event_shower* ev_shower = nullptr;
     // if no shower producer specified -> don't bother to get the shower data-product
@@ -181,6 +229,7 @@ namespace larlite {
     auto ass_hit_v = ev_cluster->association(ev_hit->id());
     */
 
+    //std::cout << "Creating MCShower maps for BackTracker" << std::endl;
     // Create G4 track ID vector for which we are interested in
     std::vector<std::vector<unsigned int> > g4_trackid_v;
     std::vector<unsigned int> mc_index_v;
@@ -188,6 +237,7 @@ namespace larlite {
     for(size_t mc_index=0; mc_index<ev_mcs->size(); ++mc_index) {
       auto const& mcs = (*ev_mcs)[mc_index];
       auto energy = mcs.DetProfile().E();
+      //std::cout << "Found MCShower w/ Etot : " << mcs.Start().E() << " & Edep : " << mcs.DetProfile().E() << std::endl;
       if( _mc_energy_min < energy && energy < _mc_energy_max ) {
 	g4_trackid_v.push_back(mcs.DaughterTrackID());
 	mc_index_v.push_back(mc_index);
@@ -203,7 +253,7 @@ namespace larlite {
       print(msg::kERROR,__FUNCTION__,"Failed to build back-tracking map for MC...");
       return false;
     }
-    
+
     auto geo = larutil::Geometry::GetME();
    
     // Fill cluster quality plots
@@ -300,8 +350,15 @@ namespace larlite {
     hMatchesPerEvent->Fill(ass_cluster_v.size());
 
     for(size_t match_index=0; match_index < ass_cluster_v.size(); match_index++) {
-      auto res = fBTAlg.MatchCorrectness(ass_cluster_v[match_index]);
-      hMatchCorrectness->Fill(res.second);
+
+      //std::cout << "About to compute Match Correctness..." << std::endl;
+      auto resCorr = fBTAlg.MatchCorrectness(ass_cluster_v[match_index]);
+      hMatchCorrectness->Fill(resCorr.second);
+      auto resEP  = fBTAlg.MatchEP(ass_cluster_v[match_index]);
+      //std::cout << "Matc Eff : " << resEP.second.first << "\t Pur : " << resEP.second.second << std::endl;
+      //std::cout << std::endl << std::endl;
+      hMatchEff->Fill(resEP.second.first);
+      hMatchPur->Fill(resEP.second.second);
     }
     
     ClearTreeVar();
@@ -314,6 +371,8 @@ namespace larlite {
       
       // Write shower histograms if any entry made
       if(hMatchCorrectness->GetEntries()) hMatchCorrectness->Write();
+      if(hMatchEff->GetEntries()) hMatchEff->Write();
+      if(hMatchPur->GetEntries()) hMatchPur->Write();
       if (hMatchesPerEvent->GetEntries()) hMatchesPerEvent->Write();
 
       // Write Ttree histograms if any entry made

@@ -133,9 +133,11 @@ protected:
     double reco_energy_U;
     double reco_energy_V;
     double reco_energy_Y;
+    double reco_dedx;
     double reco_dedx_U;
     double reco_dedx_V;
     double reco_dedx_Y;
+    double reco_dqdx;
     double reco_dqdx_U;
     double reco_dqdx_V;
     double reco_dqdx_Y;

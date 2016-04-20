@@ -52,9 +52,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
                   storage->event_id());
 
   if (!ev_pfpart or (ev_pfpart->size() == 0) ) {
-    print(msg::kERROR, __FUNCTION__,
-          Form("PFPart producer %s product not found!",
-               fInputProducer.c_str()));
+    //print(msg::kERROR, __FUNCTION__,
+    //    Form("PFPart producer %s product not found!",
+    //         fInputProducer.c_str()));
     return false;
   }
 

@@ -27,7 +27,7 @@ namespace ertool {
     _name_v.clear();
     _time_ana_v.clear();
     _time_algo_v.clear();
-
+    _selection_mode = false;
   }
 
   void Manager::AddCfgFile(const std::string cfg_fname)
@@ -376,8 +376,9 @@ namespace ertool {
       if(_mc_for_ana) ana->SetMCData(_io_handle.GetEventData(true),
 				     _io_handle.GetParticleGraph(true)
 				     );
-      status = ana->Analyze(_io_handle.GetEventData(),_io_handle.GetParticleGraph());
+      status = status && ana->Analyze(_io_handle.GetEventData(),_io_handle.GetParticleGraph());
       ana->UnsetMCData();
+      if(_selection_mode && !status) break;
       if(_profile_mode) _time_ana_v[i]._time_proc += fWatch.RealTime();
     }
 
