@@ -25,19 +25,15 @@ mgr.set_io_mode(fmwk.storage_manager.kBOTH)
 
 mgr.set_ana_output_file("")
 
-prelim = fmwk.PFPartMerger()
-prelim.SetInputProducer("pandoraNu")
-prelim.SetOutputProducer("pandoraNuMerged")
-prelim.SetMergeByPCAndVertex( True )
-prelim.SetPrimaryConeFactor( 1. )
-prelim.SetSecondaryConeFactor( 1. )
+prelim = fmwk.HitCluster()
+# prelim.SetInputProducer("gaushit")
+prelim.SetInputProducer("pandoraCosmicKHitRemoval")
+prelim.SetInputVertexProducer("pandoraNu")
+prelim.SetInputSpacePointProducer("pandoraNu")
+# prelim.SetOutputProducer("Mergedgaushit")
+prelim.SetOutputProducer("pandoraCosmicKHitRemoval")
 mgr.add_process(prelim)
 
-#merge_all = GetMergeAllInstance()
-#merge_all.SetOutputProducer("mergedfuzzy")
-# mgr.set_data_to_write(fmwk.data.kCluster,"pandoraNumerged")
-# mgr.set_data_to_write(fmwk.data.kAssociation,"pandoraNumerged")
-#mgr.add_process(merge_all)
 
 mgr.run()
 
