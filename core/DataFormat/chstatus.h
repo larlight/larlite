@@ -18,6 +18,7 @@
 #include <vector>
 #include "Base/AnalysisConstants.h"
 #include "Base/GeoTypes.h"
+#include "Base/DetectorStatusTypes.h"
 #include "data_base.h"
 
 namespace larlite {
