@@ -20,8 +20,7 @@
 #pragma link C++ class showerreco::ShowerRecoAlgBase+;
 #pragma link C++ class showerreco::ShowerAnaBase+;
 #pragma link C++ class showerreco::ShowerRecoManager+;
-#pragma link C++ class showerreco::ProtoShowerHelper+;
-#pragma link C++ class showerreco::ProtoShowerAlgBase+;
+
 //ADD_NEW_ALG_CLASS ... do not change this line
 #endif
 
