@@ -16,6 +16,8 @@ PFPartMerger::PFPartMerger()
   _write_output = false;
   _doMergeByHierarchy = false;
   _doMergeByPCAndVertex = false;
+  _primary_cone_factor   = 0.5;
+  _secondary_cone_factor = 0.5;
 }
 
 bool PFPartMerger::initialize() {
@@ -414,13 +416,10 @@ bool PFPartMerger::IsVertexAligned( const TVector3& ivertex, const cluster3D::cl
   TVector3 dist = jvertex - ivertex;
   double openAngle = 0.;
   if ( icluster3D.eigenvalue_principal != 0. && icluster3D.eigenvalue_secondary != 0. ) {
-    double Theta = icluster3D.principal_dir.Angle( icluster3D.secondary_dir );
-    double sinTheta = sin( Theta );
-    openAngle = 2.* atan( sqrt( icluster3D.eigenvalue_secondary ) * sinTheta /
-                          sqrt( icluster3D.eigenvalue_principal ) );
-
+    openAngle = OpenAngle( icluster3D.principal_dir, icluster3D.secondary_dir,
+                           icluster3D.eigenvalue_principal, icluster3D.eigenvalue_secondary );
   }
-  if ( icluster3D.principal_dir.Angle( dist ) < openAngle ) return true;
+  if ( icluster3D.principal_dir.Angle( dist ) < _primary_cone_factor*openAngle ) return true;
   
   return false;
 }
@@ -431,25 +430,28 @@ bool PFPartMerger::IsPCAAligned( const TVector3& ivertex, const cluster3D::clust
   TVector3 dist = jvertex - ivertex;
   double iopenAngle = 0., jopenAngle = 0.;
   if ( icluster3D.eigenvalue_principal != 0. && icluster3D.eigenvalue_secondary != 0. ) {
-    double Theta = icluster3D.principal_dir.Angle( icluster3D.secondary_dir );
-    double sinTheta = sin( Theta );
-    iopenAngle = 2.* atan( sqrt( icluster3D.eigenvalue_secondary ) * sinTheta /
-                           sqrt( icluster3D.eigenvalue_principal ) );
+    iopenAngle = OpenAngle( icluster3D.principal_dir, icluster3D.secondary_dir,
+                            icluster3D.eigenvalue_principal, icluster3D.eigenvalue_secondary );
 
   }
-  if ( icluster3D.principal_dir.Angle( jcluster3D.principal_dir ) < iopenAngle ) return true;
+  if ( icluster3D.principal_dir.Angle( jcluster3D.principal_dir ) < _primary_cone_factor*iopenAngle ) return true;
   if ( jcluster3D.eigenvalue_principal != 0. && jcluster3D.eigenvalue_secondary != 0. ) {
-    double Theta = jcluster3D.principal_dir.Angle( jcluster3D.secondary_dir );
-    double sinTheta = sin( Theta );
-    jopenAngle = 2.* atan( sqrt( jcluster3D.eigenvalue_secondary ) * sinTheta /
-                           sqrt( jcluster3D.eigenvalue_principal ) );
+    jopenAngle = OpenAngle( jcluster3D.principal_dir, jcluster3D.secondary_dir, 
+                            jcluster3D.eigenvalue_principal, jcluster3D.eigenvalue_secondary );
 
   }
 
-  if ( icluster3D.principal_dir.Angle( jcluster3D.principal_dir ) < jopenAngle ) return true;
-  else if ( icluster3D.principal_dir.Angle( dist ) < jopenAngle ) return true;
+  if ( icluster3D.principal_dir.Angle( jcluster3D.principal_dir ) < _secondary_cone_factor*jopenAngle ) return true;
+  else if ( icluster3D.principal_dir.Angle( dist ) < _secondary_cone_factor*jopenAngle ) return true;
 
   return false;
+}
+
+double PFPartMerger::OpenAngle( const TVector3& principal_dir, const TVector3& secondary_dir,
+                                const double principal_eigenvalue, const double secondary_eigenvalue ) {
+  double Theta = principal_dir.Angle( secondary_dir );
+  double sinTheta = sin( Theta );
+  return 2.* atan( sqrt( secondary_eigenvalue ) * sinTheta / sqrt( principal_eigenvalue ) );
 }
 }
 #endif
