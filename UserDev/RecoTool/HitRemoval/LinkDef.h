@@ -10,7 +10,8 @@
 #pragma link off all functions;
 
 #pragma link C++ class larlite::RemoveTrkLikeHits+;
-#pragma link C++ class larlite::RmTrksNearVtx+;
+#pragma link C++ class larlite::RmTrksNearVtx_fromPFPart+;
+#pragma link C++ class larlite::RmTrksNearVtx_fromClus+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
