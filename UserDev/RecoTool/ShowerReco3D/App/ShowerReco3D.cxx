@@ -58,8 +58,8 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     return false;
   }
 
-  std::cout << "Run: " << storage->run_id() << ", Subrun: " << storage->subrun_id()
-            << ", Event: " << storage->event_id() << std::endl;
+  // std::cout << "Run: " << storage->run_id() << ", Subrun: " << storage->subrun_id()
+  //           << ", Event: " << storage->event_id() << std::endl;
 
   // This item holds the list of PFParticles tagged as showers (11)
   // We only run reco on particles tagged that way.
@@ -234,6 +234,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     s.set_dqdx_v                ( res_shower.fdQdx_v                );
     s.set_dqdx_err_v            ( res_shower.fSigmadQdx_v           );
     s.set_length                ( res_shower.fLength                );
+    s.set_width                 ( res_shower.fWidth                 );
     s.set_opening_angle         ( res_shower.fOpeningAngle          );
 
     shower_v->push_back(s);
