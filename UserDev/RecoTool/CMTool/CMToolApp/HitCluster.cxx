@@ -47,8 +47,8 @@ bool HitCluster::analyze(storage_manager* storage) {
 
   // set event ID through storage manager
   storage->set_id( ev_hits->run(), ev_hits->subrun(), ev_hits->event_id() );
-  std::cout << "Run: " << ev_hits->run() << ", Subrun: " << ev_hits->subrun() 
-            << ", Event: " << ev_hits->event_id() << std::endl;
+  // std::cout << "Run: " << ev_hits->run() << ", Subrun: " << ev_hits->subrun() 
+  //           << ", Event: " << ev_hits->event_id() << std::endl;
 
   // retrieve spacepoints associated with this pfpart
   // Spacepoints are retrieved for saving the associations at the end.
@@ -72,6 +72,7 @@ bool HitCluster::analyze(storage_manager* storage) {
 
   if ( !ev_vertex or ( ev_vertex->size() == 0 ) ) {
     print( msg::kWARNING, __FUNCTION__, Form("No input vertex!"));
+    return false;
   } else {
     pfpart_vertex_ass = storage->get_data<event_ass>( pfpart_v->name() );
   }
