@@ -6,6 +6,9 @@
 #include "DataFormat/simch.h"
 #include "DataFormat/cluster.h"
 #include "DataFormat/hit.h"
+#include "DataFormat/trigger.h"
+#include "DataFormat/mctruth.h"
+
 namespace larlite {
 
 ShowerQuality_multishowers::ShowerQuality_multishowers() {
@@ -159,6 +162,35 @@ bool ShowerQuality_multishowers::analyze(storage_manager* storage) {
 
   //auto geo = larutil::Geometry::GetME();
 
+  // retrieve MCTruth if available
+  int generation_tick = 0;
+  auto ev_mctruth = storage->get_data<event_mctruth>("generator");
+  if (ev_mctruth && (ev_mctruth->size() > 0) ){
+    auto const& parts = ev_mctruth->at(0).GetParticles();
+    for (auto const& part : parts){
+      if (part.StatusCode() == 1){
+	//std::cout << "Interaction time : " << part.Trajectory()[0].T()
+	//	    << "\t w/ PDG " << part.PdgCode() << std::endl;
+	generation_tick = (int)(part.Trajectory()[0].T() / 500.);
+	break;
+      }
+    }
+  }
+  
+  // retrieve trigger time
+  int trigger_tick = 0;
+  if (_use_trigger){
+    auto trig = storage->get_data<trigger>("triggersim");
+    if (!trig){
+      print(msg::kERROR,__FUNCTION__,"Trigger data product not found! Required to figure out hit <-> simch offset. Use setUseTrigger(False) to not use a trigger time-offset");
+      return true;
+    }
+    //std::cout << "Trigger time @ " << trig->TriggerTime() << std::endl;
+    trigger_tick = (int)(-343.75 / 500.);
+  }// if we should use the trigger time
+
+  fBTAlg.setTickOffset( 2255 + trigger_tick + generation_tick );
+  
   // Retrieve mcshower data product
   auto ev_mcs = storage->get_data<event_mcshower>("mcreco");
 
@@ -258,7 +290,9 @@ bool ShowerQuality_multishowers::analyze(storage_manager* storage) {
         auto const& h = (*ev_hit)[hit_index];
 
         //w_v.push_back( ::btutil::WireRange_t( h.Channel(), h.StartTick(), h.EndTick()) );
-	w_v.push_back( ::btutil::WireRange_t(h.Channel(),h.PeakTime()-h.RMS()+3050,h.PeakTime()+h.RMS()+3050) );
+	w_v.push_back( ::btutil::WireRange_t( h.Channel(),
+					      h.PeakTime() - h.RMS() + 2255 + trigger_tick + generation_tick,
+					      h.PeakTime() + h.RMS() + 2255 + trigger_tick + generation_tick) );
 		       
       }
     }
