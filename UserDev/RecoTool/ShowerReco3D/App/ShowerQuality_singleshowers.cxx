@@ -187,6 +187,8 @@ void ShowerQuality_singleshowers::FillQualityInfo(const shower& reco_shower, con
   fShowerTreeParams.reco_dqdx_Y = reco_shower.dQdx_v().at(2);
 
   fShowerTreeParams.reco_length = reco_shower.Length();
+  fShowerTreeParams.reco_width1 = reco_shower.Width()[0];
+  fShowerTreeParams.reco_width2 = reco_shower.Width()[1];
 
 
   // Fill Tree
@@ -240,6 +242,8 @@ void ShowerQuality_singleshowers::InitializeAnaTrees()
   fShowerTree->Branch("cluster_pur_Y", &fShowerTreeParams.cluster_pur_Y, "cluster_pur_Y/D");
   fShowerTree->Branch("mc_containment", &fShowerTreeParams.mc_containment, "mc_containment/D");
   fShowerTree->Branch("reco_length",&fShowerTreeParams.reco_length,"reco_length/D");
+  fShowerTree->Branch("reco_width1",&fShowerTreeParams.reco_width1,"reco_width1/D");
+  fShowerTree->Branch("reco_width2",&fShowerTreeParams.reco_width2,"reco_width2/D");
   fShowerTree->Branch("mc_length",  &fShowerTreeParams.mc_length,  "mc_length/D");
   fShowerTree->Branch("mc_wildlength", &fShowerTreeParams.mc_wildlength, "mc_wildlength/D");
 
@@ -281,6 +285,8 @@ void ShowerQuality_singleshowers::ResetShowerTreeParams() {
   fShowerTreeParams.cluster_pur_Y = -1.234;
   fShowerTreeParams.mc_containment = -1.;
   fShowerTreeParams.reco_length = -1.;
+  fShowerTreeParams.reco_width1 = -1.;
+  fShowerTreeParams.reco_width2 = -1.;
   fShowerTreeParams.mc_length   = -1.;
   fShowerTreeParams.mc_wildlength  = -1.;
 }

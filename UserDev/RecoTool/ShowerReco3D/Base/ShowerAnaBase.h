@@ -2,7 +2,7 @@
  * \file ShowerAnaBase.h
  *
  * \ingroup Base
- * 
+ *
  * \brief Class def header for a class ShowerAnaBase
  *
  * @author kazuhiro
@@ -20,33 +20,33 @@
 
 
 namespace showerreco {
-  /**
-     \class ShowerAna
-     User defined class ShowerAna ... these comments are used to generate
-     doxygen documentation!
-  */
-  class ShowerAnaBase {
-    
-  public:
-    
-    /// Default constructor
-    ShowerAnaBase();
-    
-    /// Default destructor
-    virtual ~ShowerAnaBase(){}
+/**
+   \class ShowerAna
+   User defined class ShowerAna ... these comments are used to generate
+   doxygen documentation!
+*/
+class ShowerAnaBase {
 
-    virtual void Analyze( const Shower_t& shower,
-			  const ProtoShower& proto_shower ) = 0;
+public:
 
-    TTree* GetTree();
+  /// Default constructor
+  ShowerAnaBase();
 
-  protected:
+  /// Default destructor
+  virtual ~ShowerAnaBase() {}
 
-    TTree *_tree;
-    
-  };
+  virtual void Analyze( const Shower_t& shower,
+                        const ::protoshower::ProtoShower& proto_shower ) = 0;
+
+  TTree* GetTree();
+
+protected:
+
+  TTree *_tree;
+
+};
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

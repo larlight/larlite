@@ -49,7 +49,7 @@ namespace larlite {
     // since we are creating a new data product,
     // reload the event information
     storage->set_id(ev_hit->run(),ev_hit->subrun(),ev_hit->event_id()); 
-
+    
     if (!ev_simch or ev_simch->size() == 0){
       std::cout << "No simch data-product -> exit" << std::endl;
       return false;
@@ -132,7 +132,7 @@ namespace larlite {
     // only use hits from association to rawclusters
     for (size_t i=0; i < ass_hit_v.size(); i ++){
       // ignore cluster with < some number of hits
-      std::cout << "associated hits : " << ass_hit_v[i].size() << std::endl;
+      //std::cout << "associated hits : " << ass_hit_v[i].size() << std::endl;
       if (ass_hit_v[i].size() < _min_input_cluster_n_hits) continue;
       for (size_t k=0; k < ass_hit_v[i].size(); k++){
 	
@@ -140,8 +140,8 @@ namespace larlite {
 	auto const& hit    = ev_hit->at(hit_idx);
 	
 	auto const& ch     = hit.Channel();
-	auto const& tstart = hit.PeakTime() - 3*hit.RMS() + 3050;
-	auto const& tend   = hit.PeakTime() + 3*hit.RMS() + 3050;
+	auto const& tstart = hit.PeakTime() - 3*hit.RMS() + 2255;//3050;
+	auto const& tend   = hit.PeakTime() + 3*hit.RMS() + 2255;//3050;
 	auto const& pl     = hit.View();
 	// create a wire-range object with channel + (start,end) time info for the hit
 	::btutil::WireRange_t wr(ch,tstart,tend);
@@ -162,7 +162,7 @@ namespace larlite {
 	    idx  = j;
 	  }
 	}
-	std::cout << "Edep for this hit : " << max_edep << std::endl;
+	//std::cout << "Edep for this hit : " << max_edep << std::endl;
 	// if the maximum amount of charge is 0
 	// ignore this hit
 	if (max_edep == 0)
@@ -191,7 +191,7 @@ namespace larlite {
     std::vector<std::vector<unsigned int> > cluster_hit_ass_v;
     for (size_t idx=0; idx < cluster_hit_v.size(); idx++){
 
-      std::cout << "saving cluster w/ "  << cluster_hit_v[idx].size() << std::endl;
+      //std::cout << "saving cluster w/ "  << cluster_hit_v[idx].size() << std::endl;
       
       // if the hits for this cluster is > some threshold
       if (cluster_hit_v[idx].size() < 10)
@@ -204,8 +204,6 @@ namespace larlite {
       ev_mccluster->push_back(clus);
       cluster_hit_ass_v.push_back(cluster_hit_v[idx]);
 
-      std::cout << "saving cluster w/ "  << cluster_hit_v[idx].size() << std::endl;
-      
     }// for all clusters created
 
     // now save the associations for the cluster

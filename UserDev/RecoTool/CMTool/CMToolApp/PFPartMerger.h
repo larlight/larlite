@@ -66,6 +66,9 @@ namespace larlite {
 
     void SaveOutputCluster(bool doit=true) { _write_output = doit; }
 
+    void SetPrimaryConeFactor( double factor = 0.5 ) { _primary_cone_factor = factor; }
+    void SetSecondaryConeFactor( double factor = 0.5 ) { _secondary_cone_factor = factor; }
+
     void ListByHierarchy( const larlite::event_pfpart& ev_pfpart, 
                           std::vector< std::vector < size_t > >& pfpart_sets );
  
@@ -89,6 +92,9 @@ namespace larlite {
     bool IsPCAAligned( const TVector3& ivertex, const cluster3D::cluster3D_params& icluster3D,
                        const TVector3& jvertex, const cluster3D::cluster3D_params& jcluster3D ); 
 
+    double OpenAngle( const TVector3& principal_dir, const TVector3& secondary_dir,
+                      const double principal_eigenvalue, const double secondary_eigenvalue );
+
   protected:
 
     bool _write_output;
@@ -100,6 +106,10 @@ namespace larlite {
 
     ::cluster3D::Default3DParamsAlg _params3D_alg;
     ::cluster3D::CRU3DHelper _cru3D_helper;
+
+    double _primary_cone_factor;
+    double _secondary_cone_factor;
+
   };
 }
 #endif

@@ -2,7 +2,7 @@
  * \file ProtoShowerAlgOpenCV.h
  *
  * \ingroup ProtoShower
- * 
+ *
  * \brief Class def header for a class ProtoShowerAlgOpenCV
  *
  * @author david caratelli
@@ -16,7 +16,7 @@
 
 #include <iostream>
 
-#include "ShowerReco3D/Base/ProtoShowerAlgBase.h"
+#include "ProtoShowerAlgBase.h"
 
 #include "ClusterRecoUtil/Base/CRUHelper.h"
 #include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
@@ -27,33 +27,33 @@
    doxygen documentation!
  */
 
-namespace showerreco {  
+namespace protoshower {
 
-  class ProtoShowerAlgOpenCV : ProtoShowerAlgBase {
-    
-  public:
-    
-    /// Default constructor
-    ProtoShowerAlgOpenCV();
-    
-    /// Default destructor
-    ~ProtoShowerAlgOpenCV(){}
+class ProtoShowerAlgOpenCV : ProtoShowerAlgBase {
 
-    void GenerateProtoShower(::larlite::storage_manager* storage,
-			     ::larlite::event_pfpart* ev_pfpart,
-			     const size_t proto_shower_pfpart,
-			     showerreco::ProtoShower & proto_shower);
-    
+public:
 
-  private:
+  /// Default constructor
+  ProtoShowerAlgOpenCV();
 
-    ::cluster::ClusterParamsAlg * _params_alg;
-    ::cluster::CRUHelper _cru_helper;
+  /// Default destructor
+  ~ProtoShowerAlgOpenCV() {}
 
-  };
-  
+  void GenerateProtoShower(::larlite::storage_manager* storage,
+                           ::larlite::event_pfpart* ev_pfpart,
+                           const size_t proto_shower_pfpart,
+                           protoshower::ProtoShower & proto_shower);
+
+
+private:
+
+  ::cluster::ClusterParamsAlg * _params_alg;
+  ::cluster::CRUHelper _cru_helper;
+
+};
+
 }// namespace
-    
+
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

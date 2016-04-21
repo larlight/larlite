@@ -33,7 +33,7 @@ void EnergyModule::initialize()
   return;
 }
 
-void EnergyModule::do_reconstruction(const ProtoShower & proto_shower,
+void EnergyModule::do_reconstruction(const ::protoshower::ProtoShower & proto_shower,
                                      Shower_t& resultShower) {
 
   auto & clusters = proto_shower.params();

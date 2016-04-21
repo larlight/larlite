@@ -6,7 +6,7 @@
 
 namespace showerreco {
 
-void Angle3DFormula::do_reconstruction(const ProtoShower & proto_shower,
+void Angle3DFormula::do_reconstruction(const ::protoshower::ProtoShower & proto_shower,
                                        Shower_t& resultShower) {
 
 

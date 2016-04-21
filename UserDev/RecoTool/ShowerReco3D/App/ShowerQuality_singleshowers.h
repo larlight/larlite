@@ -154,6 +154,8 @@ protected:
     double cluster_pur_Y;
     double mc_containment;
     double reco_length;
+    double reco_width1;
+    double reco_width2;
     double mc_length;
     double mc_wildlength;
 

@@ -32,7 +32,7 @@ public:
   /// Default destructor
   ~dEdxFromdQdx() {}
 
-  void do_reconstruction(const ProtoShower &, Shower_t &);
+  void do_reconstruction(const ::protoshower::ProtoShower &, Shower_t &);
 
   void initialize();
 

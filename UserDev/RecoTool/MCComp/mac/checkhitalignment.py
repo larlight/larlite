@@ -63,8 +63,6 @@ while ( my_proc.process_event() ):
             
         ax.cla()
         fig.gca()
-
-
         
         hits = hitcheck.getHits(chan)
         ides = hitcheck.getIDEs(chan)
@@ -79,11 +77,16 @@ while ( my_proc.process_event() ):
 
         maxhittick = 0
 
+        hitIntegral = 0.
+        
         for hit in hits:
             print 'hit time : %i'%hit.PeakTime()
             maxhittick = hit.PeakTime()
             times,adcs = gauss(hit.PeakTime(),hit.RMS())
-            plt.plot(times,adcs,'ro')
+            hitIntegral = hit.Integral()
+            print 'Hit integral : %.02f'%hitIntegral
+            plt.plot(times,adcs,'ro',label='Hit Gauss Fit')
+            plt.axvspan(hit.PeakTime()-3*hit.RMS(),hit.PeakTime()+3*hit.RMS(),color='r',alpha=0.5,label='Simch integration Region')
 
         qtot = 0
         ideTime   = []
@@ -91,7 +94,7 @@ while ( my_proc.process_event() ):
         maxtick   = 0
         maxq      = 0
         for ide in ides:
-            print 'ide time : %i -> charge : %.02f'%(ide.first, ide.second)
+            #print 'ide time : %i -> charge : %.02f'%(ide.first, ide.second)
             ideTime.append(ide.first)
             ideCharge.append(ide.second)
             if (ide.second > maxq):
@@ -103,13 +106,20 @@ while ( my_proc.process_event() ):
         print 'offset (ticks) is ',offset
 
         ideTime   = np.array(ideTime)-offset
-        ideCharge = np.array(ideCharge)/float(qtot)
         
-        plt.plot(ideTime,ideCharge,'bo')
+        print 'IDE Q = %.02f'%(np.sum(ideCharge))
+        ideCharge = np.array(ideCharge)/float(qtot)
+        if (qtot == 0):
+            continue
+        print 'Hit Q / # e- = %.02f 10^3'%(1000*hitIntegral/qtot)
+
+        
+        plt.plot(ideTime,ideCharge,'bo',label='Simch IDEs')
 
         plt.grid()
-        plt.xlabel('Tick Number [Hit Scale]')
-        plt.ylabel('Relative Amplitude')
+        plt.legend(fontsize=16)
+        plt.xlabel('Tick Number [Hit Scale]',fontsize=16)
+        plt.ylabel('Relative Amplitude',fontsize=16)
 
         fig.canvas
         fig.canvas.draw()
