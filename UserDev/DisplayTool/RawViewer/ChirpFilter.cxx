@@ -8,12 +8,8 @@ namespace ub_noise_filter {
 
 
 
-void ChirpFilterAlg(std::vector<float> &wf)
+void ChirpFilter::ChirpFilterAlg(float * wf, int numTicks)
 {
-  const int windowSize = 20;
-  const float chirpMinRMS = 0.90;
-  const float chirpMinRMS2 = 0.66;
-  const float maxNormalNeighborFrac = 0.20;
 
   int counter = 0;
   float ADCval;
@@ -27,10 +23,10 @@ void ChirpFilterAlg(std::vector<float> &wf)
   float RMSsecond = 0.0;
   float RMSthird = 0.0;
   int numNormalNeighbors = 0;
-  int numTicks = wf.size();
+
   for (int i = 0; i < numTicks; i++)
   {
-    ADCval = wf.at(i);
+    ADCval = wf[i];
     runningAmpMean += ADCval;
     runningAmpRMS += pow(ADCval, 2.0);
 
@@ -121,7 +117,7 @@ void ChirpFilterAlg(std::vector<float> &wf)
     {
       if ((i + 1 >= firstLowRMSBin) && (i + 1 <= lastLowRMSBin))
       {
-        wf.at(i) = 10000.0;
+        wf[i] = 10000.0;
       }
     }
   }
@@ -129,16 +125,15 @@ void ChirpFilterAlg(std::vector<float> &wf)
   return;
 }
 
-void ZigzagFilterAlg(std::vector<float> &wf)
+void ChirpFilter::ZigzagFilterAlg(float * wf, int numTicks)
 {
   float meanVal = 0.0;
   float rmsVal = 0.0;
-  int numTicks = wf.size();
   int counter = 0;
   float ADCval, ADCval2;
   for (int i = 0; i < numTicks; i++)
   {
-    ADCval = wf.at(i);
+    ADCval = wf[i];
 
     if (ADCval < 4096.0)
     {
@@ -164,27 +159,26 @@ void ZigzagFilterAlg(std::vector<float> &wf)
 
   for (int i = 0; i < numTicks - 1; i++)
   {
-    ADCval = wf.at(i);
-    ADCval2 = wf.at(i + 1);
+    ADCval = wf[i];
+    ADCval2 = wf[i + 1];
     if ((ADCval != 10000.0) && (ADCval2 != 10000.0))
     {
-      wf.at(i) = ((ADCval + ADCval2) / 2.0) - meanVal;
+      wf[i] = ((ADCval + ADCval2) / 2.0) - meanVal;
     }
     else if (ADCval != 10000.0)
     {
-      wf.at(i) = ADCval - meanVal;
+      wf[i] = ADCval - meanVal;
     }
   }
-  wf.at(numTicks - 1) -= meanVal;
+  wf[numTicks - 1] -= meanVal;
 
   return;
 }
 
-void RawAdaptiveBaselineAlg(std::vector<float> &wf)
+void ChirpFilter::RawAdaptiveBaselineAlg(float * wf, int numTicks)
 {
   const int windowSize = 20;
 
-  int numTicks = wf.size();
   int minWindowBins = windowSize / 2;
 
   float baselineVec[numTicks];
@@ -193,7 +187,7 @@ void RawAdaptiveBaselineAlg(std::vector<float> &wf)
   int numFlaggedBins = 0;
   for (int j = 0; j < numTicks; j++)
   {
-    if (wf.at(j) == 10000.0)
+    if (wf[j] == 10000.0)
     {
       numFlaggedBins++;
     }
@@ -206,7 +200,7 @@ void RawAdaptiveBaselineAlg(std::vector<float> &wf)
   float ADCval;
   for (int j = 0; j <= windowSize / 2; j++)
   {
-    ADCval = wf.at(j);
+    ADCval = wf[j];
     if (ADCval < 4096.0)
     {
       baselineVal += ADCval;
@@ -233,20 +227,20 @@ void RawAdaptiveBaselineAlg(std::vector<float> &wf)
 
     if (oldIndex >= 0)
     {
-      ADCval = wf.at(oldIndex);
+      ADCval = wf[oldIndex];
       if (ADCval < 4096.0)
       {
-        baselineVal -= wf.at(oldIndex);
+        baselineVal -= wf[oldIndex];
         windowBins--;
       }
     }
 
     if (newIndex < numTicks)
     {
-      ADCval = wf.at(newIndex);
+      ADCval = wf[newIndex];
       if (ADCval < 4096)
       {
-        baselineVal += wf.at(newIndex);
+        baselineVal += wf[newIndex];
         windowBins++;
       }
     }
@@ -271,13 +265,13 @@ void RawAdaptiveBaselineAlg(std::vector<float> &wf)
     downFlag = false;
     upFlag = false;
 
-    ADCval = wf.at(j);
+    ADCval = wf[j];
     if (ADCval != 10000.0)
     {
       if (isFilledVec[j] == false)
       {
         downIndex = j;
-        while ((isFilledVec[downIndex] == false) && (downIndex > 0) && (wf.at(downIndex) != 10000.0))
+        while ((isFilledVec[downIndex] == false) && (downIndex > 0) && (wf[downIndex] != 10000.0))
         {
           downIndex--;
         }
@@ -286,7 +280,7 @@ void RawAdaptiveBaselineAlg(std::vector<float> &wf)
           downFlag = true;
 
         upIndex = j;
-        while ((isFilledVec[upIndex] == false) && (upIndex < numTicks - 1) && (wf.at(upIndex) != 10000.0))
+        while ((isFilledVec[upIndex] == false) && (upIndex < numTicks - 1) && (wf[upIndex] != 10000.0))
         {
           upIndex++;
         }
@@ -304,15 +298,14 @@ void RawAdaptiveBaselineAlg(std::vector<float> &wf)
           baselineVec[j] = 0.0;
       }
 
-      wf.at(j) = ADCval - baselineVec[j];
+      wf[j] = ADCval - baselineVec[j];
     }
   }
 }
 
-void RemoveChannelFlags(std::vector<float> &wf)
+void ChirpFilter::RemoveChannelFlags(float * wf, int numTicks)
 {
   float ADCval;
-  int numTicks = wf.size();
 
   /////////////////////////////////////
   // Do stuff here to set chirp_info //
@@ -320,11 +313,11 @@ void RemoveChannelFlags(std::vector<float> &wf)
 
   for (int i = 0; i < numTicks; i++)
   {
-    ADCval = wf.at(i);
+    ADCval = wf[i];
 
     if (ADCval == 10000.0)
     {
-      wf.at(i) = 0.0;
+      wf[i] = 0.0;
     }
   }
 

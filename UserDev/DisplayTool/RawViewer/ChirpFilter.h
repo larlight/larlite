@@ -75,11 +75,18 @@ public:
   /// Default destructor
   ~ChirpFilter() {}
 
-  void ChirpFilterAlg(std::vector<float> &wf);
-  void ZigzagFilterAlg(std::vector<float> &wf);
+  void ChirpFilterAlg(float * wf, int numTicks);
+  void ZigzagFilterAlg(float * wf, int numTicks);
 
-  void RawAdaptiveBaselineAlg(std::vector<float> &wf);
-  void RemoveChannelFlags(std::vector<float> &wf);
+  void RawAdaptiveBaselineAlg(float * wf, int numTicks);
+  void RemoveChannelFlags(float * wf, int numTicks);
+
+private:
+  const int windowSize = 20;
+  const float chirpMinRMS = 0.90;
+  const float chirpMinRMS2 = 0.66;
+  const float maxNormalNeighborFrac = 0.20;
+
 
 };
 
