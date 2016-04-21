@@ -24,7 +24,7 @@ void dEdxFromdQdx::initialize()
   return;
 }
 
-void dEdxFromdQdx::do_reconstruction(const ProtoShower & proto_shower,
+void dEdxFromdQdx::do_reconstruction(const ::protoshower::ProtoShower & proto_shower,
                                      Shower_t& resultShower) {
 
   auto & clusters = proto_shower.params();

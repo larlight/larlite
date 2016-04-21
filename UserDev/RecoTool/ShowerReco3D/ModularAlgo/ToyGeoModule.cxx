@@ -6,7 +6,7 @@
 
 namespace showerreco {
 
-void ToyGeoModule::do_reconstruction(const ProtoShower & proto_shower,
+void ToyGeoModule::do_reconstruction(const ::protoshower::ProtoShower & proto_shower,
                                      Shower_t& resultShower) {
   
   // This function takes the shower cluster set and computes the best fit 3D axis
