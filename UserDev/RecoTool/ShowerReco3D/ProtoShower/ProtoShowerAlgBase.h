@@ -16,10 +16,10 @@
 
 #include <iostream>
 #include "DataFormat/storage_manager.h"
-#include "ShowerReco3D/Base/ShowerRecoException.h"
+// #include "ShowerReco3D/Base/ShowerRecoException.h"
 
 
-#include "ShowerReco3D/Base/ShowerRecoTypes.h"
+#include "ProtoShower.h"
 
 /**
    \class ProtoShowerAlgBase

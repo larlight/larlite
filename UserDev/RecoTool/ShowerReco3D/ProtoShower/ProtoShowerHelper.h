@@ -23,9 +23,9 @@
 #include "DataFormat/seed.h"
 #include "DataFormat/vertex.h"
 
-#include "ShowerReco3D/Base/ShowerRecoTypes.h"
+#include "ProtoShower.h"
 
-#include "ShowerReco3D/ProtoShower/ProtoShowerAlgBase.h"
+#include "ProtoShowerAlgBase.h"
 
 /**
    \class ProtoShowerHelper
