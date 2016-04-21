@@ -87,7 +87,7 @@ namespace evd {
 
   private:
 
-    evd::UbooneNoiseFilter _noise_filter;
+    ub_noise_filter::UbooneNoiseFilter _noise_filter;
 
     void readData();
 

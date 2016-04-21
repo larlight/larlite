@@ -57,6 +57,8 @@
 #include <algorithm>
 #include <map>
 
+#include "ChirpFilter.h"
+
 /**
    \class UbooneNoiseFilter
    User defined class UbooneNoiseFilter ... these comments are used to generate
@@ -76,21 +78,13 @@ namespace larlite{
 
 }
 
-namespace evd {
+namespace ub_noise_filter {
 
 enum wireStatus {kNormal, kLowRMS, kHighRMS, kChirping, kNStatus};
 
 
 // This chirp_info class is meant to package chirping
 // data up into a small but flexible container.
-class chirp_info {
-
-public:
-  unsigned int _chirp_multiplicity;
-  std::vector<unsigned int> _transition_ticks;
-  bool _start_section_is_chirping;
-};
-
 
 class UbooneNoiseFilter {
 
@@ -141,6 +135,8 @@ public:
 
 
 private:
+
+
 
 
   /**
@@ -239,7 +235,7 @@ private:
   // This object contains the chirping info
   // Since chirping is not really a common occurrence, 
   // this is store in a map to allow sparseness
-  std::vector<std::map<int, ::evd::chirp_info> > _chirp_info_by_plane;
+  std::vector<std::map<int, ::ub_noise_filter::chirp_info> > _chirp_info_by_plane;
 
   // This vector deals with the wire status:
   std::vector<std::vector<wireStatus> > _wire_status_by_plane;

@@ -19,7 +19,7 @@ unsigned int detPropFetcher::n_planes() {
 
 }
 
-namespace evd {
+namespace ub_noise_filter {
 
 UbooneNoiseFilter::UbooneNoiseFilter() {
 
