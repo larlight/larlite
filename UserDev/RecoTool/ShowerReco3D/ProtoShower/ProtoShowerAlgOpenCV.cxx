@@ -15,7 +15,7 @@
 #include "DataFormat/seed.h"
 #include "DataFormat/vertex.h"
 
-namespace showerreco {
+namespace protoshower {
 
 ProtoShowerAlgOpenCV::ProtoShowerAlgOpenCV()
   : _params_alg(nullptr)
@@ -30,7 +30,7 @@ ProtoShowerAlgOpenCV::ProtoShowerAlgOpenCV()
 void ProtoShowerAlgOpenCV::GenerateProtoShower(::larlite::storage_manager* storage,
     ::larlite::event_pfpart* ev_pfpart,
     const size_t proto_shower_pfpart,
-    showerreco::ProtoShower & proto_shower)
+    protoshower::ProtoShower & proto_shower)
 {
 
   // larlite::cluster data-products in wire-time

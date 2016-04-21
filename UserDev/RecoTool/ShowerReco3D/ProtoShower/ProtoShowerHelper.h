@@ -32,7 +32,7 @@
    User defined class ProtoShowerHelper ... these comments are used to generate
    doxygen documentation!
  */
-namespace showerreco {
+namespace protoshower {
 
 class ProtoShowerHelper {
 
@@ -48,7 +48,7 @@ public:
   // a vector of all the protoshowers in the event.
   void GenerateProtoShowers(::larlite::storage_manager* storage,
                             const std::string &pfpart_producer_name,
-                            std::vector<::showerreco::ProtoShower> & proto_showers,
+                            std::vector<::protoshower::ProtoShower> & proto_showers,
                             std::vector<unsigned int> showerLikePFParts = std::vector<unsigned int>(1, 999999));
 
   // set algorithm to use to create ProtoShowers from LArLite data-products
@@ -61,7 +61,7 @@ private:
 
 };
 
-} // showerreco
+} // protoshower
 
 
 #endif

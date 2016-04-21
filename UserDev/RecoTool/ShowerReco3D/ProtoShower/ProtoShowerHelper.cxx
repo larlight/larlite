@@ -3,7 +3,7 @@
 
 #include "ProtoShowerHelper.h"
 
-namespace showerreco {
+namespace protoshower {
 
 ProtoShowerHelper::ProtoShowerHelper()
   : _proto_shower_alg(nullptr)
@@ -83,6 +83,6 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
   return;
 }
 
-} // showerreco
+} // protoshower
 
 #endif

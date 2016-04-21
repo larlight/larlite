@@ -11,7 +11,7 @@
 #include "DataFormat/seed.h"
 #include "DataFormat/vertex.h"
 
-namespace showerreco {
+namespace protoshower {
 
 ProtoShowerAlgClusterParams::ProtoShowerAlgClusterParams() {
 
@@ -57,7 +57,7 @@ void ProtoShowerAlgClusterParams::GenerateProtoShower(
   ::larlite::storage_manager* storage,
   ::larlite::event_pfpart* ev_pfpart,
   const size_t proto_shower_pfpart,
-  showerreco::ProtoShower & proto_shower)
+  protoshower::ProtoShower & proto_shower)
 {
 
 

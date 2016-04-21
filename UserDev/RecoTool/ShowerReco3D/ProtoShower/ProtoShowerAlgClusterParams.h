@@ -30,7 +30,7 @@
    doxygen documentation!
  */
 
-namespace showerreco {
+namespace protoshower {
 
 class ProtoShowerAlgClusterParams : ProtoShowerAlgBase {
 
@@ -45,7 +45,7 @@ public:
   void GenerateProtoShower(::larlite::storage_manager* storage,
                            ::larlite::event_pfpart* ev_pfpart,
                            const size_t proto_shower_pfpart,
-                           showerreco::ProtoShower & proto_shower);
+                           protoshower::ProtoShower & proto_shower);
 
 
   void SetClusterParamsAlg(::cluster::ClusterParamsAlg * _new_params_alg);

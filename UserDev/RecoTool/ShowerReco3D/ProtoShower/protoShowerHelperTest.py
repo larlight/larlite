@@ -1,14 +1,14 @@
 import ROOT
 import larlite
 
-from ROOT import larlite, showerreco, larutil
+from ROOT import larlite, protoshower, larutil
 
 filename="/data_linux/dedx_files/electron_sample_bootleg_matched.root"
 
 larutil.LArUtilManager.Reconfigure(larlite.geo.kArgoNeuT)
 
-psh = showerreco.ProtoShowerHelper()
-pshalg = showerreco.ProtoShowerAlgArgoNeuT()
+psh = protoshower.ProtoShowerHelper()
+pshalg = protoshower.ProtoShowerAlgArgoNeuT()
 
 psh.setProtoShowerAlg(pshalg)
 
@@ -27,7 +27,7 @@ producer_name="bootlegMatched"
 
 # ev_pfp = _mgr.get_data(larlite.event_pfpart)(larlite.data.kPFParticle,"pandoraNu")
 
-protoShowerVec = ROOT.vector(showerreco.ProtoShower)()
+protoShowerVec = ROOT.vector(protoshower.ProtoShower)()
 
 psh.GenerateProtoShowers(_mgr,producer_name,protoShowerVec)
 

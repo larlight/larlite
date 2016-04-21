@@ -8,7 +8,7 @@
 #include "ClusterRecoUtil/Base/ClusterParams.h"
 #include "Cluster3DRecoUtil/Base/Cluster3DParams.h"
 
-namespace showerreco {
+namespace protoshower {
 
 
 class ProtoShower
