@@ -27,8 +27,10 @@
 
 #include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
 #include "ClusterRecoUtil/Base/CRUHelper.h"
-#include "CMTool/CMToolBase/CMatchManager.h"
 
+#include "ShowerReco3D/ProtoShower/ProtoShower.h"
+#include "ShowerReco3D/ProtoShower/ProtoShowerHelper.h"
+#include "ShowerReco3D/ProtoShower/ProtoShowerAlgBase.h"
 
 namespace evd {
   /**
@@ -62,19 +64,13 @@ namespace evd {
     */
     virtual bool finalize();
 
-    void setManager(::cmtool::CMatchManager * mgr){ _match_mgr = mgr;}
+    void set_proto_shower_alg(::protoshower::ProtoShowerAlgBase * alg);
 
   protected:
 
     ::cluster::CRUHelper    _cru_helper;
 
-    float _time_ratio_cut ;
-    float _start_time_cut ;
-    bool _debug ;
-    bool _verbose ;
-    bool _require_3planes;
-
-    ::cmtool::CMatchManager * _match_mgr;
+    ::protoshower::ProtoShowerHelper _ps_helper;
 
   };
 }
