@@ -20,7 +20,7 @@ LinearEnergy::LinearEnergy()
   _useModBox = true;
   _fill_tree = false;
   _caloAlg = ::calo::CalorimetryAlg();
-  _caloAlg.setUseModBox(false);
+  _caloAlg.setUseModBox(true);
   _fC_to_e = 6250.; // a fC in units of the electron charge
   _e_to_eV = 23.6;  // ionization energy of Ar in eV
   _eV_to_MeV = 1e-6; // eV -> MeV conversion
@@ -82,7 +82,7 @@ void LinearEnergy::initialize()
   return;
 }
 
-void LinearEnergy::do_reconstruction(const ProtoShower & proto_shower,
+void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_shower,
                                      Shower_t& resultShower) {
 
   //if the module does not have 2D cluster info -> fail the reconstruction

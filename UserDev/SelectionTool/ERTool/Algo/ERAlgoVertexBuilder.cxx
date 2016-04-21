@@ -1633,7 +1633,7 @@ namespace ertool {
 		if(otherpoint_dist < point_dist) {
 		  
 		  if(associations.at(index).GetSphere().Center().
-		     Dist(*best_other_tp) < tstart_prox) {
+		     Dist(*best_tp) < tstart_prox) {
 		    pas.AddObject(index, best_shower_id, best_vert);
 		    pas.AddObject(index, best_other_id, best_vert);
 		  }
@@ -1791,9 +1791,16 @@ namespace ertool {
 	      
 	      if(otherpoint_dist < point_dist) {
 
+		if(tverbose)
+		  std::cout << "\t\t\t\t\t\tcenter_point_dist: "
+			    << associations.at(index).GetSphere().Center().Dist(*point)
+			    << " < tstart_prox: " << tstart_prox << " ?\n";	
+
 		if(associations.at(index).GetSphere().Center().
-		   Dist(*otherpoint) < tstart_prox) 
+		   Dist(*point) < tstart_prox) {
+		  if(tverbose) std::cout << "\t\t\t\t\t\t\tyes\n";
 		  pas.AddObject(index, best_shower_id, best_vert);
+		}
 
 		else {
 

@@ -32,10 +32,8 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 LDFLAGS += $(shell larlite-config --libs)
 LDFLAGS += $(shell recotool-config --libs)
 LDFLAGS += -L$(LARLITE_BASEDIR)/lib -lRecoTool_ClusterRecoUtil
-LDFLAGS += -L$(LARLITE_BASEDIR)/lib -lRecoTool_CMToolBase
-LDFLAGS += -L$(LARLITE_BASEDIR)/lib -lRecoTool_CMTAlgPriority
-LDFLAGS += -L$(LARLITE_BASEDIR)/lib -lRecoTool_CMTAlgMatch
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtilAlg
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ShowerRecoProtoShower
 LDFLAGS += -L.
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE
 

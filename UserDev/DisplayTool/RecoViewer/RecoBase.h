@@ -45,7 +45,7 @@ public:
   RecoBase();
 
   /// Default destructor
-  ~RecoBase() {}
+  virtual ~RecoBase() {}
 
   std::pair<float, float> getWireRange(size_t p);
   std::pair<float, float> getTimeRange(size_t p);

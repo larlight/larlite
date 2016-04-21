@@ -24,8 +24,7 @@
 
  
 #include "ShowerReco3D/Base/ShowerRecoTypes.h"
-#include "ShowerReco3D/Base/ProtoShowerHelper.h"
-#include "ShowerReco3D/Base/ProtoShowerAlgBase.h"
+#include "ShowerReco3D/ProtoShower/ProtoShowerHelper.h"
 
 #include "ShowerReco3D/Base/ShowerRecoManager.h"
 
@@ -70,7 +69,7 @@ namespace larlite {
     void SetOutputProducer(std::string name) { fOutputProducer = name; }
 
     // Proto Shower Helper getter
-    ::showerreco::ProtoShowerHelper& GetProtoShowerHelper() { return _ps_helper; }
+    ::protoshower::ProtoShowerHelper& GetProtoShowerHelper() { return _ps_helper; }
 
 
   protected:
@@ -85,7 +84,7 @@ namespace larlite {
     ::showerreco::ShowerRecoManager fManager;
 
     // ProtoShowerHelper converts data products into protoshowers
-    ::showerreco::ProtoShowerHelper _ps_helper;
+    ::protoshower::ProtoShowerHelper _ps_helper;
   };
 }
 #endif

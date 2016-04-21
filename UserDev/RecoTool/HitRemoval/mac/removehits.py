@@ -16,15 +16,17 @@ my_proc=fmwk.ana_processor()
 # Specify IO mode
 my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 
-for x in xrange(len(sys.argv)-1):
+for x in xrange(len(sys.argv)-2):
     my_proc.add_input_file(sys.argv[x+1])
 
 my_proc.set_ana_output_file("ana.root")
-my_proc.set_output_file("shr_hits.root")
+my_proc.set_output_file(sys.argv[-1])
 
 hitremoval = fmwk.RemoveTrkLikeHits()
-hitremoval.setPFPartProducer("PandoraCosmic")
+hitremoval.setPFPartProducer("pandoraCosmic")
 my_proc.add_process(hitremoval)
+
+my_proc.set_data_to_write(fmwk.data.kHit,"shrlike")
 
 my_proc.run()
 sys.exit(0);

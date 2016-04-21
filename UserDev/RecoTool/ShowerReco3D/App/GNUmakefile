@@ -28,6 +28,7 @@ CINTFLAGS += "-p"
 
 LDFLAGS += $(shell larlite-config --libs)
 LDFLAGS += $(shell basictool-config --libs)
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ShowerRecoProtoShower
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ShowerRecoAlgo
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ShowerRecoBase
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_AnalysisAlg

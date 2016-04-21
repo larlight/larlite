@@ -75,9 +75,16 @@ namespace btutil {
     std::pair<size_t,double> MatchCorrectness(const std::vector<unsigned int> cluster_indices) const;
 
 
-    ///For a specified cluster, compute cluster efficiency and purity in terms of specified MC object
+    /**
+       For a specified cluster, compute cluster efficiency and purity in terms of specified MC object
+    */
     std::pair<double,double>  ClusterEP(const size_t cluster_index,
 					const size_t mcshower_index) const;
+
+    /**
+       Calculate Efficiency/Purity of a Match
+     */
+    std::pair<size_t,std::pair<double,double> >  MatchEP(const std::vector<unsigned int> cluster_indices) const;
 
     /**
        For a specified MC object, compute the best-matched cluster's efficiency and purity from 
@@ -90,7 +97,16 @@ namespace btutil {
     /// BTAlgo getter
     const MCBTAlg& BTAlg() const { return fBTAlgo; }
 
+    // set time offset
+    void setTickOffset(int ticks) { _tick_offset = ticks; }
+
+    // set verbosity
+    void setVerbose(bool on) { _verbose = on; }
+
   protected:
+
+    // verbosity
+    bool _verbose;
 
     bool BuildMap(const std::vector< ::larlite::hit>   &hit_v,
 		  const std::vector<std::vector<unsigned int> > &cluster_hit_association);
@@ -98,12 +114,15 @@ namespace btutil {
     /// MCBTAlg instance 
     MCBTAlg fBTAlgo;
 
+    // time offset to be applied
+    int _tick_offset;
+
     std::vector<size_t> _view_to_plane;
 
     std::vector<std::vector<double> > _summed_mcq;
     std::vector<std::vector<double> > _cluster_mcq_v;
 
-    std::vector<unsigned char> _cluster_plane_id;
+    std::vector<unsigned int> _cluster_plane_id;
     std::vector<std::vector<int> > _bmatch_id;
 
   };

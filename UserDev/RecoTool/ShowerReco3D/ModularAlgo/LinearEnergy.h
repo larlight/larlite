@@ -35,7 +35,7 @@ public:
     /// Default destructor
     ~LinearEnergy() {}
 
-    void do_reconstruction(const ProtoShower &, Shower_t &);
+    void do_reconstruction(const ::protoshower::ProtoShower &, Shower_t &);
 
     void SetUseArea(bool on) { _useArea = on; }
 
