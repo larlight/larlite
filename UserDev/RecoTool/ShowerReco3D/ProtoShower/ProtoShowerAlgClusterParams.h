@@ -2,7 +2,7 @@
  * \file ProtoShowerAlgClusterParams.h
  *
  * \ingroup ProtoShower
- * 
+ *
  * \brief Class def header for a class ProtoShowerAlgClusterParams
  *
  * @author david caratelli
@@ -30,40 +30,40 @@
    doxygen documentation!
  */
 
-namespace showerreco {  
+namespace showerreco {
 
-  class ProtoShowerAlgClusterParams : ProtoShowerAlgBase {
-    
-  public:
-    
-    /// Default constructor
-    ProtoShowerAlgClusterParams();
-    
-    /// Default destructor
-    ~ProtoShowerAlgClusterParams(){}
+class ProtoShowerAlgClusterParams : ProtoShowerAlgBase {
 
-    void GenerateProtoShower(::larlite::storage_manager* storage,
-			     ::larlite::event_pfpart* ev_pfpart,
-			     const size_t proto_shower_pfpart,
-			     showerreco::ProtoShower & proto_shower);
-    
+public:
 
-    void SetClusterParamsAlg(::cluster::ClusterParamsAlg * _new_params_alg);
-    void SetCluster3DParamsAlg(::cluster3D::Cluster3DParamsAlg * _new_params3D_alg);
-    
-  private:
+  /// Default constructor
+  ProtoShowerAlgClusterParams();
 
-    ::cluster3D::Cluster3DParamsAlg * _params3D_alg;
-    ::cluster::ClusterParamsAlg * _params_alg;
-    
-    // Use the CRU Helpers to build cluster params:
-    ::cluster3D::CRU3DHelper _cru3D_helper;
-    ::cluster::CRUHelper _cru_helper;
-    
-  };
-  
+  /// Default destructor
+  ~ProtoShowerAlgClusterParams();
+
+  void GenerateProtoShower(::larlite::storage_manager* storage,
+                           ::larlite::event_pfpart* ev_pfpart,
+                           const size_t proto_shower_pfpart,
+                           showerreco::ProtoShower & proto_shower);
+
+
+  void SetClusterParamsAlg(::cluster::ClusterParamsAlg * _new_params_alg);
+  void SetCluster3DParamsAlg(::cluster3D::Cluster3DParamsAlg * _new_params3D_alg);
+
+private:
+
+  ::cluster3D::Cluster3DParamsAlg * _params3D_alg;
+  ::cluster::ClusterParamsAlg * _params_alg;
+
+  // Use the CRU Helpers to build cluster params:
+  ::cluster3D::CRU3DHelper _cru3D_helper;
+  ::cluster::CRUHelper _cru_helper;
+
+};
+
 }// namespace
-    
+
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

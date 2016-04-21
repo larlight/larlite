@@ -13,7 +13,7 @@ InformedStartPoint::InformedStartPoint()
 {
   _name = "InformedStartPoint";
   _has_current_guess = false;
-  _min_distance = 1.0;
+  _min_distance = 2.0;
 }
 
 void InformedStartPoint::set_start_point_guess(const Hit2D & point) {
@@ -47,12 +47,19 @@ void InformedStartPoint::do_params_fill(cluster_params & cluster) {
   // The one that is actually closest is set to the start point, while the rest are
   // set as candidate start points
 
+  if (_verbose) {
+    std::cout << "Start point suggestion is (" << _guess_start_point.w
+              << ", " << _guess_start_point.t  << ")"
+              << std::endl;
+  }
+
   Hit2D best_hit;
   float _closest_dist = 9999;
 
   float dist_sqrd = _min_distance * _min_distance;
   for (auto & hit : cluster.hit_vector) {
     float dist = geomHelper -> Get2DDistanceSqrd(hit, _guess_start_point);
+    // std::cout << "Dist is " << dist << std::endl;
     if (dist < dist_sqrd) {
       cluster.start_point_cand.push_back(hit);
       if (dist < _closest_dist) {

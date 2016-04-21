@@ -24,7 +24,7 @@
 
  
 #include "ShowerReco3D/Base/ShowerRecoTypes.h"
-#include "ShowerReco3D/Base/ProtoShowerHelper.h"
+#include "ShowerReco3D/ProtoShower/ProtoShowerHelper.h"
 
 #include "ShowerReco3D/Base/ShowerRecoManager.h"
 
