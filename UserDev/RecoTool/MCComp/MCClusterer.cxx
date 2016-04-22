@@ -16,6 +16,7 @@ namespace larlite {
     _fout=0;
     _cluster_producer="rawcluster";
     _mc_energy_min = 10; // MeV
+    _min_input_cluster_n_hits; // number of hits
   }
 
   bool MCClusterer::initialize() {
@@ -48,7 +49,7 @@ namespace larlite {
     // since we are creating a new data product,
     // reload the event information
     storage->set_id(ev_hit->run(),ev_hit->subrun(),ev_hit->event_id()); 
-
+    
     if (!ev_simch or ev_simch->size() == 0){
       std::cout << "No simch data-product -> exit" << std::endl;
       return false;
@@ -77,14 +78,20 @@ namespace larlite {
 	for (auto const& id : mcs.DaughterTrackID()) {
 	  if (id == mcs.TrackID()) continue;
 	  used_trk_id.push_back(id);
+	  if (id == 1)
+	    std::cout << "ENTERING TrackID == 1!" << std::endl;
 	  id_v.push_back(id);
 	}
 	id_v.push_back(mcs.TrackID());
+	std::cout << "MCShower id : "  << mcs.TrackID()
+		  << " w/ PDG code : " << mcs.PdgCode()
+		  << " w/ energy : "   << energy << std::endl;
 	used_trk_id.push_back(mcs.TrackID());
 	g4_trackid_v.push_back(id_v);
 	mc_index_v.push_back(mc_index);
       }// if this shower has enough energy
     }
+
     // for each mctrack, add it's track id info to the list of IDs to look at
     for (size_t mc_index = 0; mc_index < ev_mct->size(); ++mc_index) {
       auto const& mct = (*ev_mct)[mc_index];
@@ -98,14 +105,15 @@ namespace larlite {
       // the track's trackID.
       std::vector<unsigned int> id_v = {mct_id};
       if ( _mc_energy_min < energy ) {
-	std::cout << "mctrack id " << mct_id << std::endl;
-	std::cout << "Track is " << mct.PdgCode() << std::endl;
-	std::cout << "energy is " << energy << std::endl;
-	id_v.push_back(mct_id);
+	std::cout << "MCTrack id : "   << mct_id
+		  << " w/ PDG code : " << mct.PdgCode()
+		  << " w/ energy : "   << energy << std::endl;
 	g4_trackid_v.push_back(id_v);
 	mc_index_v.push_back(mc_index+ev_mcs->size());
       }
     }
+
+    std::cout << "Finished registering all Track IDs" << std::endl;
 
     // reset MCBTAlg
     _bt_algo.Reset(g4_trackid_v,*ev_simch);
@@ -124,15 +132,16 @@ namespace larlite {
     // only use hits from association to rawclusters
     for (size_t i=0; i < ass_hit_v.size(); i ++){
       // ignore cluster with < some number of hits
-      if (ass_hit_v[i].size() < 20) continue;
+      //std::cout << "associated hits : " << ass_hit_v[i].size() << std::endl;
+      if (ass_hit_v[i].size() < _min_input_cluster_n_hits) continue;
       for (size_t k=0; k < ass_hit_v[i].size(); k++){
 	
 	auto const& hit_idx = ass_hit_v[i][k];
 	auto const& hit    = ev_hit->at(hit_idx);
 	
 	auto const& ch     = hit.Channel();
-	auto const& tstart = hit.StartTick();
-	auto const& tend   = hit.EndTick();
+	auto const& tstart = hit.PeakTime() - 3*hit.RMS() + 2255;//3050;
+	auto const& tend   = hit.PeakTime() + 3*hit.RMS() + 2255;//3050;
 	auto const& pl     = hit.View();
 	// create a wire-range object with channel + (start,end) time info for the hit
 	::btutil::WireRange_t wr(ch,tstart,tend);
@@ -153,6 +162,7 @@ namespace larlite {
 	    idx  = j;
 	  }
 	}
+	//std::cout << "Edep for this hit : " << max_edep << std::endl;
 	// if the maximum amount of charge is 0
 	// ignore this hit
 	if (max_edep == 0)
@@ -181,6 +191,8 @@ namespace larlite {
     std::vector<std::vector<unsigned int> > cluster_hit_ass_v;
     for (size_t idx=0; idx < cluster_hit_v.size(); idx++){
 
+      //std::cout << "saving cluster w/ "  << cluster_hit_v[idx].size() << std::endl;
+      
       // if the hits for this cluster is > some threshold
       if (cluster_hit_v[idx].size() < 10)
 	continue;
@@ -191,7 +203,7 @@ namespace larlite {
       clus.set_view(cluster_plane_v[idx]);
       ev_mccluster->push_back(clus);
       cluster_hit_ass_v.push_back(cluster_hit_v[idx]);
-      
+
     }// for all clusters created
 
     // now save the associations for the cluster

@@ -35,7 +35,7 @@ public:
     /// Default destructor
     ~LinearEnergy() {}
 
-    void do_reconstruction(const ProtoShower &, Shower_t &);
+    void do_reconstruction(const ::protoshower::ProtoShower &, Shower_t &);
 
     void SetUseArea(bool on) { _useArea = on; }
 
@@ -44,6 +44,10 @@ public:
     void SetFillTree(bool on) { _fill_tree = on; }
 
     void initialize();
+
+    void SetGainU(double g) { _gain_U = g; }
+    void SetGainV(double g) { _gain_V = g; }
+    void SetGainY(double g) { _gain_Y = g; }
 
 private:
 
@@ -77,6 +81,9 @@ private:
     std::vector<double> _dEdx_v;
     std::vector<double> _dQ_v;
     int _pl;
+
+    // per-plane shower reco calibrations
+    double _gain_U, _gain_V, _gain_Y;
 
 };
 

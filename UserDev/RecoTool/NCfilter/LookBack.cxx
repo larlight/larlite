@@ -2,14 +2,14 @@
 #define RECOTOOL_LOOKBACK_CXX
 
 #include "LookBack.h"
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/GeometryHelper.h"
 
 namespace cluster {
 
 
   std::pair<double,double> LookBack::CWAngle(std::vector<unsigned int> hitindex, std::vector<larlite::hit> hitsvect){
-    double T2CM = larutil::GeometryUtilities::GetME()->TimeToCm();
-    double W2CM = larutil::GeometryUtilities::GetME()->WireToCm();
+    double T2CM = larutil::GeometryHelper::GetME()->TimeToCm();
+    double W2CM = larutil::GeometryHelper::GetME()->WireToCm();
 
 	if(hitindex.size()>=4){
 
@@ -50,8 +50,8 @@ namespace cluster {
 
   std::pair<std::vector<unsigned int>,std::vector<unsigned int>> LookBack::ClusterRefine(std::pair<std::vector<unsigned int>,std::vector<unsigned int>> hitpair, std::vector<larlite::hit> hitsvect){
 
-    double T2CM = larutil::GeometryUtilities::GetME()->TimeToCm();
-    double W2CM = larutil::GeometryUtilities::GetME()->WireToCm();
+    double T2CM = larutil::GeometryHelper::GetME()->TimeToCm();
+    double W2CM = larutil::GeometryHelper::GetME()->WireToCm();
 		std::vector<std::pair<unsigned int,double>> hits_distance;
                 std::vector<unsigned int> inspecting_cluster;
                 std::vector<unsigned int> looping_cluster;

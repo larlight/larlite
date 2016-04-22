@@ -17,7 +17,7 @@
 
 #include "ClusterViewerAlgo.h"
 
-#include "LArUtil/GeometryUtilities.h"
+
 #include "DataFormat/simch.h"
 #include "Analysis/ana_base.h"
 #include "ClusterRecoUtil/Base/CRUHelper.h"

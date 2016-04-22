@@ -15,6 +15,7 @@
 #pragma link C++ class cluster::FillPolygon+;
 #pragma link C++ class cluster::RefineStartPoints+;
 #pragma link C++ class cluster::GetRoughStartPoint+;
+#pragma link C++ class cluster::InformedStartPoint+;
 #pragma link C++ class cluster::SelectStartPoint+;
 #pragma link C++ class cluster::FindShoweringPoint+;
 #pragma link C++ class cluster::DefaultParamsAlg+;

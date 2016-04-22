@@ -36,7 +36,7 @@ public:
   /// set the maximum angle that is allowed as an error (radians)
   void setMaxAngleError(double err) { _max_err = err; }
 
-  void do_reconstruction(const ProtoShower &, Shower_t &);
+  void do_reconstruction(const ::protoshower::ProtoShower &, Shower_t &);
 
 private:
 

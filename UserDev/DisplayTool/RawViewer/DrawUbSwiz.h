@@ -91,10 +91,10 @@ namespace evd {
     // this is the event in the file (0 -> n_events)
     size_t _current_event;
     // this is the official event:
-    size_t _event_no;
-    size_t _run;
-    size_t _spill;
-    size_t _subrun;
+    unsigned int _event_no;
+    unsigned int _run;
+    unsigned int _spill;
+    unsigned int _subrun;
 
     // This function corrects the data by removing correlated noise
     // It can also save out the information

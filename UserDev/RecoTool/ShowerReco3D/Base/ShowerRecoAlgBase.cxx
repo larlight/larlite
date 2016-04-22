@@ -4,17 +4,17 @@
 #include "ShowerRecoAlgBase.h"
 
 namespace showerreco {
-  
-  ShowerRecoAlgBase::ShowerRecoAlgBase()
-  {
-    _verbosity = false;
-  }
 
-  void ShowerRecoAlgBase::Reset()
-  {}
+ShowerRecoAlgBase::ShowerRecoAlgBase()
+{
+  _verbosity = false;
+}
 
-  void ShowerRecoAlgBase::Verbose(bool on)
-  { _verbosity=on; }
+void ShowerRecoAlgBase::Reset()
+{}
+
+void ShowerRecoAlgBase::Verbose(bool on)
+{ _verbosity = on; }
 
 }
 

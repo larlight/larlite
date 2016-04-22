@@ -2,7 +2,7 @@
 #define RECOTOOL_CFALGOSTARTTIMECOMPAT_CXX
 
 #include "CFAlgoStartTimeCompat.h"
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/GeometryHelper.h"
 #include <algorithm>
 
 namespace cmtool {
@@ -11,8 +11,8 @@ namespace cmtool {
   CFAlgoStartTimeCompat::CFAlgoStartTimeCompat() : CFloatAlgoBase()
   //-------------------------------------------------------
   {
-    _w2cm = larutil::GeometryUtilities::GetME()->WireToCm();
-    _t2cm = larutil::GeometryUtilities::GetME()->TimeToCm();
+    _w2cm = larutil::GeometryHelper::GetME()->WireToCm();
+    _t2cm = larutil::GeometryHelper::GetME()->TimeToCm();
     SetVerbose(false);
     SetTimeDist(5.);//in cm
   }

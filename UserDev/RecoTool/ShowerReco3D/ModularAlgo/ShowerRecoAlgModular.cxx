@@ -18,7 +18,7 @@ void ShowerRecoAlgModular::Initialize()
   return;
 }
 
-Shower_t ShowerRecoAlgModular::RecoOneShower(const ProtoShower& proto_shower) {
+Shower_t ShowerRecoAlgModular::RecoOneShower(const ::protoshower::ProtoShower& proto_shower) {
   // Run over the shower reco modules:
   Shower_t result;
 

@@ -3,7 +3,7 @@
 
 #include "TimeCompatMatch.h"
 #include "OpT0Finder/Base/OpT0FinderException.h"
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/GeometryHelper.h"
 #include "LArUtil/DetectorProperties.h"
 #include <cmath>
 #include <sstream>
@@ -28,7 +28,7 @@ namespace flashana {
     _frame_drift_time = 2319 ;
 
     // conversion quantities
-    double t2cm   = larutil::GeometryUtilities::GetME()->TimeToCm();
+    double t2cm   = larutil::GeometryHelper::GetME()->TimeToCm();
     double ROrate = larutil::DetectorProperties::GetME()->SamplingRate(); // ns
 
     if(clus.empty()) return false; 

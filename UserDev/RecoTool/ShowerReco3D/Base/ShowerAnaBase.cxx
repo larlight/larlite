@@ -5,14 +5,14 @@
 
 namespace showerreco {
 
-  ShowerAnaBase::ShowerAnaBase() : _tree(nullptr)
-  {
-  }
+ShowerAnaBase::ShowerAnaBase() : _tree(nullptr)
+{
+}
 
-  TTree* ShowerAnaBase::GetTree()
-  {
-    return _tree;
-  }
+TTree* ShowerAnaBase::GetTree()
+{
+  return _tree;
+}
 
 }
 #endif

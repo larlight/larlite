@@ -127,6 +127,9 @@ namespace ertool {
     /// Make MC info available to ana
     bool _mc_for_ana;
 
+    /// Selection mode
+    bool _selection_mode;
+
     /// struct for time profiling
     struct _tprof_t {
       /// ctor

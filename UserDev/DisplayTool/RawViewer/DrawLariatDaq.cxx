@@ -132,10 +132,15 @@ void DrawLariatDaq::readData() {
       }
       auto & wireVec = wiredataIN2 -> at(channel);
       float pedestal = 0;
-      for (auto & tick : * wireVec) {
-        pedestal += tick;
+      int N = 300;
+      std::vector<double> pedestal_vec(N,0.0);
+      int stepsize = wireVec->size() / N;
+      for (size_t i = 0; i < N; i ++) {
+        pedestal_vec.at(i) = (wireVec->at(i*stepsize));
       }
-      pedestal /= _n_time_ticks;
+      std::sort(pedestal_vec.begin(),pedestal_vec.end());
+      pedestal = pedestal_vec.at(N/2);
+      // pedestal /= _n_time_ticks;
       for (unsigned int tick = 0; tick < wireVec->size(); tick++) {
         _planeData.at(plane).at(wire * _y_dimensions.at(plane) + tick) = wireVec->at(tick) - pedestal;
         // And, delete the data that was just copied:

@@ -41,6 +41,8 @@
 #include "mucsdata.h"
 #include "mucsreco.h"
 #include "auxsimch.h"
+#include "chstatus.h"
+
 namespace larlite {
 
   storage_manager* storage_manager::me=0;
@@ -1175,6 +1177,9 @@ namespace larlite {
       break;
     case data::kMuCSReco:
       _ptr_data_array[type][name]=new event_mucsreco(name);
+      break;
+    case data::kChStatus:
+      _ptr_data_array[type][name]=new event_chstatus(name);
       break;
     default:
       print(msg::kERROR,__FUNCTION__,Form("Event-data identifier not supported: %d",(int)type));

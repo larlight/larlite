@@ -45,11 +45,13 @@ void GetAverages3D::do_params_fill(cluster3D_params & cluster) {
 
   // Run the PCA analysis
   fPrincipal.MakePrincipals();
+  const TVectorD *Sigmas = fPrincipal.GetSigmas();
+  double norm = (*Sigmas)[0] * (*Sigmas)[0]  + (*Sigmas)[1] * (*Sigmas)[1] + (*Sigmas)[2] * (*Sigmas)[2];
 
   // Save the output eigen vectors
-  cluster.eigenvalue_principal = (* fPrincipal.GetEigenValues() )[0];
-  cluster.eigenvalue_secondary = (* fPrincipal.GetEigenValues() )[1];
-  cluster.eigenvalue_tertiary  = (* fPrincipal.GetEigenValues() )[2];
+  cluster.eigenvalue_principal = (* fPrincipal.GetEigenValues() )[0] * norm;
+  cluster.eigenvalue_secondary = (* fPrincipal.GetEigenValues() )[1] * norm;
+  cluster.eigenvalue_tertiary  = (* fPrincipal.GetEigenValues() )[2] * norm;
 
   cluster.principal_dir[0] = (* fPrincipal.GetEigenVectors())[0][0];
   cluster.principal_dir[1] = (* fPrincipal.GetEigenVectors())[1][0];
@@ -68,13 +70,51 @@ void GetAverages3D::do_params_fill(cluster3D_params & cluster) {
   double rmsy = 0.0;
   double rmsz = 0.0;
 
+  double min_p = 9999;
+  double min_s = 9999;
+  double min_t = 9999;
+
+  double max_p = -9999;
+  double max_s = -9999;
+  double max_t = -9999;
+
+
   for (auto& point : cluster.point_vector) {
     // First, abuse this loop to calculate rms in x and y
     rmsx += pow(cluster.mean_x - point.X(), 2) / cluster.N_points;
     rmsy += pow(cluster.mean_y - point.Y(), 2) / cluster.N_points;
     rmsz += pow(cluster.mean_z - point.Z(), 2) / cluster.N_points;
 
+    double x[3], p[3];
+    x[0] = point.X();
+    x[1] = point.Y();
+    x[2] = point.Z();
+    fPrincipal.X2P(x, p);
+
+    if (p[0] < min_p) {
+      min_p = p[0];
+    }
+    if (p[0] > max_p) {
+      max_p = p[0];
+    }
+    if (p[1] < min_s) {
+      min_s = p[1];
+    }
+    if (p[1] > max_s) {
+      max_s = p[1];
+    }
+    if (p[2] < min_t) {
+      min_t = p[2];
+    }
+    if (p[2] > max_t) {
+      max_t = p[2];
+    }
+
   }
+
+  cluster.length = max_p - min_p;
+  cluster.width_secondary = max_s - min_s;
+  cluster.width_tertiary = max_t - min_t;
 
   cluster.rms_x = sqrt(rmsx);
   cluster.rms_y = sqrt(rmsy);
