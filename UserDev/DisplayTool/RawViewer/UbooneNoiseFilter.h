@@ -80,7 +80,7 @@ namespace larlite{
 
 namespace ub_noise_filter {
 
-enum wireStatus {kNormal, kLowRMS, kHighRMS, kChirping, kNStatus};
+enum wireStatus {kNormal, kDead, kHighNoise, kChirping, kNStatus};
 
 
 // This chirp_info class is meant to package chirping
@@ -137,7 +137,34 @@ public:
 private:
 
 
+  /**
+   * @brief Applying a moving average to this wire.
+   * @details Every bin gets replaced by the average of it and it's 
+   *          next neighbor.  This essentially downsamples the wire.
+   *          This is targeted to remove zig zag noise, so call it with 
+   *          sample_size = 2.
+   *          Wire and plane info is used to deal with chirping wires
+   * 
+   * @param _data_arr The array of data to smooth
+   * @param N The number of ticks to smooth
+   * @param wire The wire number
+   * @param plane The plane number
+   */
+  void apply_moving_average(float * _data_arr, int N, int wire, int plane, int sample_size = 2);
 
+  /**
+   * @brief Calculate the pedestal and it's width
+   * @details Calculates the mean of median pedestals.
+   *          This gets the median of ~20 regions of the wire, 
+   *          and takes the mean of them to achieve sub integer
+   *          precision.
+   * 
+   * @param _data_arr The wire data
+   * @param N Number of ticks in the wire
+   * @param wire Wire number
+   * @param plane Plane number
+   */
+  void get_pedestal_info(float * _data_arr, int N, int wire, int plane);
 
   /**
    * @brief Reset all of the internal data to prepare for the next event.
