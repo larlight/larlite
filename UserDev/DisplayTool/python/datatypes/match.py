@@ -1,6 +1,5 @@
 from database import recoBase
-from evdMatchDef import getMatchManager
-from ROOT import evd
+from ROOT import evd, protoshower
 import pyqtgraph as pg
 from connectedObjects import connectedBox, connectedCircle, boxCollection
 from cluster import clusterParams
@@ -13,8 +12,10 @@ class match(recoBase):
         super(match, self).__init__()
         self._process = evd.DrawMatch()
         self.init()
-        self._manager = getMatchManager()
-        self._process.setManager(self._manager)
+        self._alg = protoshower.ProtoShowerAlgClusterParams()
+        # self._alg = protoshower.ProtoShowerAlgArgoNeuT()
+        # self._alg = protoshower.ProtoShowerAlgOpenCV()
+        self._process.set_proto_shower_alg(self._alg)
 
 
         self._listOfClusters = []

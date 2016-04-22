@@ -28,7 +28,7 @@ void Axis3DModule::initialize() {
   _tree->Branch("_slope_2_true", &_slope_2_true, "_slope_2_true/F");
 }
 
-void Axis3DModule::do_reconstruction(const ProtoShower & proto_shower,
+void Axis3DModule::do_reconstruction(const ::protoshower::ProtoShower & proto_shower,
                                      Shower_t& resultShower) {
 
   //if the module does not have 2D cluster info -> fail the reconstruction

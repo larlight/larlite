@@ -5,7 +5,7 @@
 
 namespace showerreco {
 
-void EmptyModule::do_reconstruction(const ProtoShower & proto_shower,
+void EmptyModule::do_reconstruction(const ::protoshower::ProtoShower & proto_shower,
                                     Shower_t& resultShower) {
 
   auto & clusters = proto_shower.params();

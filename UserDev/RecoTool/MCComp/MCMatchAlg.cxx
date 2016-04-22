@@ -7,6 +7,8 @@ namespace btutil {
 
   MCMatchAlg::MCMatchAlg() {
     _view_to_plane.clear();
+    _tick_offset = 0.;
+    _verbose = false;
   }
 
   bool MCMatchAlg::BuildMap(const std::vector< unsigned int>     &g4_trackid_v,
@@ -36,14 +38,17 @@ namespace btutil {
 			    const std::vector<std::vector<unsigned int> > &cluster_hit_association)
   {
     if(hit_v.empty() || cluster_hit_association.empty())
-      return false;
-    //throw MCBTException("Hit or HitAssociation Empty!");
+      //  return false;
+      throw MCBTException("Hit or HitAssociation Empty!");
 
     size_t num_mcobj = fBTAlgo.NumParts();
     if(!num_mcobj)
-      return false;
-    //    throw MCBTException("MCShower or MCTrack empty!");
+      //return false;
+      throw MCBTException("MCShower or MCTrack empty!");
 
+    if (_verbose)
+      std::cout << "Building MAP " << std::endl;
+    
     size_t num_cluster = cluster_hit_association.size();
     auto geo = ::larutil::Geometry::GetME();
     //art::ServiceHandle<geo::Geometry> geo;
@@ -77,12 +82,17 @@ namespace btutil {
 	WireRange_t wr;
 	auto const& h = hit_v.at(index);
 	wr.ch    = h.Channel();
-	wr.start = h.StartTick();
-	wr.end   = h.EndTick();
+	wr.start = h.PeakTime() - 3 * h.RMS() + _tick_offset;
+	//wr.start = h.StartTick();
+	wr.end   = h.PeakTime() + 3 * h.RMS() + _tick_offset;
+	//wr.end   = h.EndTick();
 	wr_v.push_back(wr);
-	//if(plane==geo->Nplanes()) plane = h.WireID().Plane;
-	if(plane==geo->Nplanes()) plane = h.View();
+	if(plane==geo->Nplanes()) plane = h.WireID().Plane;
+	//if(plane==geo->Nplanes()) plane = h.View();
       }
+
+      if (_verbose)
+	std::cout << "plane is " << plane << " for cluster index " << _cluster_plane_id.size() << std::endl;
 
       _cluster_plane_id.push_back(plane);
 
@@ -114,6 +124,9 @@ namespace btutil {
 	auto plane = _cluster_plane_id.at(cluster_index);
 	
 	double q = _cluster_mcq_v[cluster_index][mc_index];
+
+	if (_verbose)
+	  std::cout << "Charge for cluster idx " << cluster_index << " & mcs index " << mc_index << " : " << q << std::endl;  
 	
 	if( bmatch_mcq[mc_index][plane] < q ) {
 
@@ -178,6 +191,8 @@ namespace btutil {
       for(size_t mc_index=0; mc_index < _bmatch_id.size(); ++mc_index) {
 
 	double correctness = ClusterCorrectness(cluster_index, mc_index);
+	if (_verbose)
+	  std::cout  << "Cluster correctnes @ mc idx " << mc_index << " & clus idx " << cluster_index << " : " << correctness << std::endl;
 	
 	if(correctness>=0)
 	  match_eff.at(mc_index) *= correctness;
@@ -189,6 +204,9 @@ namespace btutil {
     
     // Find the best qratio
     for(size_t mc_index=0; mc_index < match_eff.size(); ++mc_index) {
+
+      if (_verbose)
+	std::cout << "match eff @ mc idx " << mc_index << " is " << match_eff.at(mc_index) << std::endl;
       
       if(match_eff.at(mc_index) < result.second) continue;
 
@@ -223,15 +241,89 @@ namespace btutil {
 
     std::pair<double,double> result;
 
-    auto plane = _cluster_plane_id[cluster_index];
+    auto plane = _cluster_plane_id.at(cluster_index);
 
-    result.first  = _cluster_mcq_v[cluster_index][mc_index] / _summed_mcq[mc_index][plane];
+    if (_verbose){
+      std::cout << "Cluster idx : " << cluster_index << " w/ plane : " << plane << std::endl;
+      std::cout << "Summed MCQ for mc idx " << mc_index << " @ plane " << plane << " : " << _summed_mcq[mc_index][plane] << std::endl;
+    }
+
+    // total charge deposited by MC object in this plane
+    double mcq_tot = _summed_mcq[mc_index][plane];
+    if (mcq_tot > 0)
+      result.first = _cluster_mcq_v[cluster_index][mc_index] / mcq_tot;
+    else
+      result.first = 0.;
 
     double cluster_mcq_total = 0;
     for(auto const& q : _cluster_mcq_v[cluster_index]) cluster_mcq_total += q;
 
-    result.second =  _cluster_mcq_v[cluster_index][mc_index] / cluster_mcq_total;
+    if (cluster_mcq_total > 0)
+      result.second =  _cluster_mcq_v[cluster_index][mc_index] / cluster_mcq_total;
+    else
+      result.second = 0.;
 
+    return result;
+  }
+
+
+  std::pair<size_t,std::pair<double,double>> MCMatchAlg::MatchEP(const std::vector<unsigned int> cluster_indices) const
+  {
+    
+    if(!_bmatch_id.size()) 
+      throw MCBTException("Preparation not done yet!");
+    
+    if( cluster_indices.size() > _cluster_mcq_v.size()) 
+      throw MCBTException(Form("Input cluster indices length (%zu) > # of registered clusters (%zu)!",
+			       cluster_indices.size(),
+			       _cluster_mcq_v.size())
+			  );
+    
+    if(!cluster_indices.size()) throw MCBTException("Input cluster indices empty!");
+    
+    // Compute efficiency/purity per MC
+    std::vector<double> match_eff(_bmatch_id.size(),1);
+    std::vector<double> match_pur(_bmatch_id.size(),1);
+    
+    for(auto const& cluster_index : cluster_indices) {
+      
+      for(size_t mc_index=0; mc_index < _bmatch_id.size(); ++mc_index) {
+
+	auto EffPur = ClusterEP(cluster_index,mc_index);
+	if (_verbose){
+	  std::cout  << "Cluster efficiency @ mc idx " << mc_index << " & clus idx " << cluster_index << " : " << EffPur.first << std::endl;
+	  std::cout  << "Cluster purity     @ mc idx " << mc_index << " & clus idx " << cluster_index << " : " << EffPur.second << std::endl;
+	}
+	
+	match_eff.at(mc_index) *= EffPur.first;
+	match_pur.at(mc_index) *= EffPur.second;
+	
+      }
+    }
+
+    // [best MC index, [ efficiency, purity ] ]
+    std::pair<size_t, std::pair<double,double> > result(0, std::make_pair(0.,0.) );
+    
+    // Find the best qratio
+    for(size_t mc_index=0; mc_index < match_eff.size(); ++mc_index) {
+
+      if (_verbose){
+	std::cout << "match eff @ mc idx " << mc_index << " is " << match_eff.at(mc_index) << std::endl;
+	std::cout << "match pur @ mc idx " << mc_index << " is " << match_pur.at(mc_index) << std::endl;
+	std::cout << "Current best purity : " << result.second.second << std::endl;
+      }
+      
+      // if we have a better purity -> update results
+      if(match_pur.at(mc_index) > result.second.second){
+	// set efficiency and purity
+	result.second.first  = match_eff.at(mc_index);
+	result.second.second = match_pur.at(mc_index);
+	if (_verbose)
+	  std::cout << "Updating Eff & Purity w/ " << result.second.first << " & " << result.second.second << std::endl;
+	// set MC index
+	result.first  = mc_index;
+      }// if we have a better purity
+    }// for all MC indices
     return result;
   }
 

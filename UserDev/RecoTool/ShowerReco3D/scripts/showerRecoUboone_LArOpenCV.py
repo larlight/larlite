@@ -13,7 +13,7 @@ from ROOT import gSystem,TMath
 from larlite import larlite as fmwk
 from larlite import larutil
 from recotool import cmtool, showerreco
-
+from ROOT import protoshower
 from ROOT import calo
 # from recotool.showerDef import DefaultShowerReco3D
 
@@ -126,10 +126,10 @@ my_proc.set_output_file("showerRecoUboone.root")
 ana_unit=DefaultShowerReco3D()
 # set ProtoShower Algo to go from data-products to a ProtoShower object
 #protoshoweralg = showerreco.ProtoShowerAlgClusterParams()
-protoshoweralg = showerreco.ProtoShowerAlgOpenCV()
+protoshoweralg = protoshower.ProtoShowerAlgOpenCV()
 ana_unit.GetProtoShowerHelper().setProtoShowerAlg( protoshoweralg )
 #ana_unit.SetInputProducer("fuzzyclustermerger")
-ana_unit.SetInputProducer("timeoverlap")
+ana_unit.SetInputProducer("ImageClusterHit")
 
 ana_unit.SetOutputProducer("showerreco")
 

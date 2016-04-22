@@ -20,6 +20,7 @@
 #pragma link C++ class larlite::ClusterMatcher+;
 #pragma link C++ class larlite::MatchViewer+;
 #pragma link C++ class larlite::FuzzyClusterShower+;
+#pragma link C++ class larlite::HitCluster+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 

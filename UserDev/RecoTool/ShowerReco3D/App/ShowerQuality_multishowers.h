@@ -69,6 +69,9 @@ namespace larlite {
     /// set whether to fill quality info per MC or per reco shower
     void setMCShowerQuality_multishowers(bool on) { _mcShowerQuality = on; }
 
+    // use trigger time
+    void setUseTrigger(bool on) { _use_trigger = on; }
+
   protected:
 
     // Function to fill TTree
@@ -82,6 +85,9 @@ namespace larlite {
     // boolean to decide if to fill the tree once per MC shower
     // or once per RECO shower
     bool _mcShowerQuality;
+
+    // use trigger offset?
+    bool _use_trigger;
 
     /// Shower back tracking algorithm
     ::btutil::MCMatchAlg fBTAlg;

@@ -53,7 +53,7 @@ void dQdxModule::initialize()
   return;
 }
 
-void dQdxModule::do_reconstruction(const ProtoShower & proto_shower, Shower_t & resultShower) {
+void dQdxModule::do_reconstruction(const ::protoshower::ProtoShower & proto_shower, Shower_t & resultShower) {
 
   //if the module does not have 2D cluster info -> fail the reconstruction
   if (!proto_shower.hasCluster2D()){

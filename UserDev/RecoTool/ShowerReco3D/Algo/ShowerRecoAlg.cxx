@@ -21,7 +21,7 @@ namespace showerreco {
   }
 
 
-  Shower_t ShowerRecoAlg::RecoOneShower(const ProtoShower& proto_shower)
+  Shower_t ShowerRecoAlg::RecoOneShower(const ::protoshower::ProtoShower& proto_shower)
   {
    
     auto clusters = proto_shower.params();

@@ -6,7 +6,7 @@
 
 namespace showerreco {
 
-void ToyGeoModule::do_reconstruction(const ProtoShower & proto_shower,
+void ToyGeoModule::do_reconstruction(const ::protoshower::ProtoShower & proto_shower,
                                      Shower_t& resultShower) {
   
   // This function takes the shower cluster set and computes the best fit 3D axis
@@ -20,6 +20,8 @@ void ToyGeoModule::do_reconstruction(const ProtoShower & proto_shower,
   if ( proto_shower.hasCluster3D() ) {
     // Length:
     resultShower.fLength = 6. * sqrt(proto_shower.params3D().eigenvalue_principal);
+    resultShower.fWidth[0] = 6. * sqrt(proto_shower.params3D().eigenvalue_secondary);
+    resultShower.fWidth[1] = 6. * sqrt(proto_shower.params3D().eigenvalue_tertiary);
 
     // Get the opening angle:
     double openAngle = 0.;

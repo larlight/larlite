@@ -6,7 +6,7 @@
 namespace showerreco {
 
 void StartPointPandora::do_reconstruction(
-  const ProtoShower & proto_shower,
+  const ::protoshower::ProtoShower & proto_shower,
   Shower_t& resultShower) {
 
 

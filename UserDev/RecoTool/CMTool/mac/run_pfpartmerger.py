@@ -29,6 +29,8 @@ prelim = fmwk.PFPartMerger()
 prelim.SetInputProducer("pandoraNu")
 prelim.SetOutputProducer("pandoraNuMerged")
 prelim.SetMergeByPCAndVertex( True )
+prelim.SetPrimaryConeFactor( 1. )
+prelim.SetSecondaryConeFactor( 1. )
 mgr.add_process(prelim)
 
 #merge_all = GetMergeAllInstance()
