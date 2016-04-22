@@ -70,6 +70,10 @@ void InformedStartPoint::do_params_fill(cluster_params & cluster) {
 
   }
 
+  if (_closest_dist == 9999){
+    throw CRUException("Close hit not found to suggested start point!");
+
+  }
 
 
 
