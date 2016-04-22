@@ -7,7 +7,7 @@ namespace larlite {
 
 //-----------------------------------------------------------------------------------------------------------
 	// Is the 3d point in the tpc?
-bool geoconic::TPCContained(const TLorentzVector& pos  ){
+bool geoconic::TPCContained(const TVector3& pos  ){
         auto geo = larutil::Geometry::GetME();
 	auto x = geo->DetHalfWidth();
 	auto y = geo->DetHalfHeight();
@@ -116,7 +116,7 @@ std::vector<larutil::PxPoint> geoconic::ConicalEdge(std::vector<larutil::PxPoint
 	std::vector<larutil::PxPoint> ret;
 	// Calculate the radius at a given length and opening angle 
  	double Radius = Length*tan(OpeningAngle/2 *PI/180);
-        auto geom = larutil::GeometryUtilities::GetME();
+        auto geom = larutil::GeometryHelper::GetME();
 		// Fill up the vertex 2d point FullList
                  std::vector<larutil::PxPoint> pConeFullHits;
 		// Fill up the Final 2d point Multiple points List
@@ -124,7 +124,7 @@ std::vector<larutil::PxPoint> geoconic::ConicalEdge(std::vector<larutil::PxPoint
 		// Fill up the Final 2d point Collinear points List
                  std::vector<larutil::PxPoint> CFH;
 
-		TLorentzVector pos = Pos;
+		TVector3 pos = Pos;
                 TVector3 Axis;
                 double axisnorm = sqrt(dir.Px()*dir.Px()+dir.Py()*dir.Py()+dir.Pz()*dir.Pz());
                 Axis.SetX(dir.Px()/axisnorm);
@@ -138,7 +138,7 @@ std::vector<larutil::PxPoint> geoconic::ConicalEdge(std::vector<larutil::PxPoint
                 bvec = Axis.Cross(avec);
 
 		// Fill the the vertex point
-                auto vert = geom->Get2DPointProjectionCM(&pos,plane);
+                auto vert = geom->Point_3Dto2D(pos,plane);
                 pConeFullHits.push_back(vert);
 
 	// Get some points that are on the edge of the cone
@@ -146,11 +146,11 @@ std::vector<larutil::PxPoint> geoconic::ConicalEdge(std::vector<larutil::PxPoint
                 double paramx = Pos.X() + Length*Axis.X()/Axis.Mag() + Radius*cos(theta)*avec.X() + Radius*sin(theta)*bvec.X();
                 double paramy = Pos.Y() + Length*Axis.Y()/Axis.Mag() + Radius*cos(theta)*avec.Y() + Radius*sin(theta)*bvec.Y();
                 double paramz = Pos.Z() + Length*Axis.Z()/Axis.Mag() + Radius*cos(theta)*avec.Z() + Radius*sin(theta)*bvec.Z();
-		TLorentzVector FillPoint;
+		TVector3 FillPoint;
                 FillPoint.SetX(paramx);
                 FillPoint.SetY(paramy);
                 FillPoint.SetZ(paramz);
-                auto pt =geom->Get2DPointProjectionCM(&FillPoint,plane);
+                auto pt =geom->Point_3Dto2D(FillPoint,plane);
 		// might need a bail here
                 pConeFullHits.push_back(pt);
                 }
@@ -334,7 +334,7 @@ return rethits;
        //std::vector<larlite::hit> geoconic::PolyContainHit(std::vector<larlite::hit> hits, std::vector<larutil::PxPoint> polygon ){
        std::vector<unsigned int> geoconic::PolyContainHit(std::vector<larlite::hit> hits, std::vector<larutil::PxPoint> polygon , unsigned int plane){
 	double InfAdd = 10000000;
-        auto geom = larutil::GeometryUtilities::GetME();
+        auto geom = larutil::GeometryHelper::GetME();
         auto tservice = larutil::TimeService::GetME();
         auto const& tpc_clock = tservice->TPCClock();
         double tick_offset = tservice->TriggerOffsetTPC() * tpc_clock.Frequency();// Kazu's fix
@@ -424,7 +424,7 @@ bool geoconic::doIntersect(larutil::PxPoint p1, larutil::PxPoint q1, larutil::Px
 bool geoconic::walkable(const TLorentzVector& Pos, const TLorentzVector& dir, double Length, double OpeningAngle, int plane, int smoothness){
 	// Calculate the radius at a given length and opening angle 
  	double Radius = Length*tan(OpeningAngle/2 *PI/180);
-        auto geom = larutil::GeometryUtilities::GetME();
+        auto geom = larutil::GeometryHelper::GetME();
 		// Fill up the vertex 2d point FullList
                  std::vector<larutil::PxPoint> pConeFullHits;
 		// Fill up the Final 2d point Multiple points List
@@ -432,7 +432,7 @@ bool geoconic::walkable(const TLorentzVector& Pos, const TLorentzVector& dir, do
 		// Fill up the Final 2d point Collinear points List
                  std::vector<larutil::PxPoint> CFH;
 
-		TLorentzVector pos = Pos;
+		TVector3 pos = Pos;
                 TVector3 Axis;
                 double axisnorm = sqrt(dir.Px()*dir.Px()+dir.Py()*dir.Py()+dir.Pz()*dir.Pz());
                 Axis.SetX(dir.Px()/axisnorm);
@@ -446,7 +446,7 @@ bool geoconic::walkable(const TLorentzVector& Pos, const TLorentzVector& dir, do
                 bvec = Axis.Cross(avec);
 
 		// Fill the the vertex point
-                auto vert = geom->Get2DPointProjectionCM(&pos,plane);
+                auto vert = geom->Point_3Dto2D(pos,plane);
                 pConeFullHits.push_back(vert);
 
 	// Get some points that are on the edge of the cone
@@ -454,13 +454,13 @@ bool geoconic::walkable(const TLorentzVector& Pos, const TLorentzVector& dir, do
                 double paramx = Pos.X() + Length*Axis.X()/Axis.Mag() + Radius*cos(theta)*avec.X() + Radius*sin(theta)*bvec.X();
                 double paramy = Pos.Y() + Length*Axis.Y()/Axis.Mag() + Radius*cos(theta)*avec.Y() + Radius*sin(theta)*bvec.Y();
                 double paramz = Pos.Z() + Length*Axis.Z()/Axis.Mag() + Radius*cos(theta)*avec.Z() + Radius*sin(theta)*bvec.Z();
-		TLorentzVector FillPoint;
+		TVector3 FillPoint;
                 FillPoint.SetX(paramx);
                 FillPoint.SetY(paramy);
                 FillPoint.SetZ(paramz);
                 bool cont = TPCContained(FillPoint);
                         if(!cont) return false;
-                auto pt =geom->Get2DPointProjectionCM(&FillPoint,plane);
+                auto pt =geom->Point_3Dto2D(FillPoint,plane);
 		// might need a bail here
                 pConeFullHits.push_back(pt);
                 }

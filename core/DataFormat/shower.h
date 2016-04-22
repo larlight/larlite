@@ -51,6 +51,7 @@ namespace larlite{
 
     int    best_plane() const;
     double Length() const;
+    const double* Width() const;
     double OpeningAngle() const;
 
     const double& dEdx(int pl=-1)    const;
@@ -101,6 +102,9 @@ namespace larlite{
     // Length setter function
     void set_length(const double& l) { fLength = l; }
 
+    // Width setter function
+    void set_width( const double* w ) { fWidth[0] = w[0]; fWidth[1] = w[1]; }
+
     // Opening Angle setter function
     void set_opening_angle(const double& oa) { fOpeningAngle = oa; }
 
@@ -131,6 +135,7 @@ namespace larlite{
 
     int fBestPlane;
     double fLength;
+    double fWidth[2];
     double fOpeningAngle;
     
   };

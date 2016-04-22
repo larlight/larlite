@@ -45,7 +45,7 @@ public:
   RecoBase3D();
 
   /// Default destructor
-  ~RecoBase3D() {}
+  virtual ~RecoBase3D() {}
 
   std::pair<float, float> getXRange();
   std::pair<float, float> getYRange();

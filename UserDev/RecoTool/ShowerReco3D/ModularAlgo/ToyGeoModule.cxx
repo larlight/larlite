@@ -2,10 +2,11 @@
 #define TOYGEOMODULE_CXX
 
 #include "ToyGeoModule.h"
+#include "TVector3.h"
 
 namespace showerreco {
 
-void ToyGeoModule::do_reconstruction(const ProtoShower & proto_shower,
+void ToyGeoModule::do_reconstruction(const ::protoshower::ProtoShower & proto_shower,
                                      Shower_t& resultShower) {
   
   // This function takes the shower cluster set and computes the best fit 3D axis
@@ -18,12 +19,19 @@ void ToyGeoModule::do_reconstruction(const ProtoShower & proto_shower,
 
   if ( proto_shower.hasCluster3D() ) {
     // Length:
-    resultShower.fLength = proto_shower.params3D().eigenvalue_principal * proto_shower.params3D().N_points;
+    resultShower.fLength = 6. * sqrt(proto_shower.params3D().eigenvalue_principal);
+    resultShower.fWidth[0] = 6. * sqrt(proto_shower.params3D().eigenvalue_secondary);
+    resultShower.fWidth[1] = 6. * sqrt(proto_shower.params3D().eigenvalue_tertiary);
 
     // Get the opening angle:
     double openAngle = 0.;
-    if ( proto_shower.params3D().eigenvalue_principal != 0. )
-      openAngle = 2.* proto_shower.params3D().eigenvalue_secondary / proto_shower.params3D().eigenvalue_principal;
+    if ( proto_shower.params3D().eigenvalue_principal != 0. && proto_shower.params3D().eigenvalue_secondary != 0. ) {
+      double Theta = proto_shower.params3D().principal_dir.Angle( proto_shower.params3D().secondary_dir );
+      double sinTheta = sin( Theta );
+      openAngle = 2.* atan( sqrt( proto_shower.params3D().eigenvalue_secondary ) * sinTheta / 
+                            sqrt( proto_shower.params3D().eigenvalue_principal ) );
+
+    }
     resultShower.fOpeningAngle = openAngle;
   }
   else{

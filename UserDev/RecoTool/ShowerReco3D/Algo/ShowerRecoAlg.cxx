@@ -8,7 +8,7 @@ namespace showerreco {
   ShowerRecoAlg::ShowerRecoAlg() : ShowerRecoAlgBase(), fGSer(nullptr)
   {
     
-    if(!fGSer) fGSer = (larutil::GeometryUtilities*)(larutil::GeometryUtilities::GetME());
+    if(!fGSer) fGSer = (larutil::GeometryHelper*)(larutil::GeometryHelper::GetME());
     
     fcalodEdxlength=1000;
     fdEdxlength  =2.4;
@@ -21,7 +21,7 @@ namespace showerreco {
   }
 
 
-  Shower_t ShowerRecoAlg::RecoOneShower(const ProtoShower& proto_shower)
+  Shower_t ShowerRecoAlg::RecoOneShower(const ::protoshower::ProtoShower& proto_shower)
   {
    
     auto clusters = proto_shower.params();
@@ -94,12 +94,16 @@ namespace showerreco {
     // Second Calculate 3D angle and effective pitch and start point 
     double xphi=0,xtheta=0;
     
-    fGSer->Get3DaxisN(fPlaneID[index_to_use[0]],
+    fGSer->Get3DAxisN(fPlaneID[index_to_use[0]],
                       fPlaneID[index_to_use[1]],
                       fOmega2D[index_to_use[0]]*TMath::Pi()/180.,
                       fOmega2D[index_to_use[1]]*TMath::Pi()/180.,
                       xphi,
                       xtheta);
+
+    // convert to degrees
+    xphi   *= 180. / TMath::Pi();
+    xtheta *= 180. / TMath::Pi();
     
     if(_verbosity)
       std::cout << " new angles: " << xphi << " " << xtheta << std::endl; 
@@ -192,12 +196,12 @@ namespace showerreco {
           larutil::PxPoint OnlinePoint; 
           // calculate the wire,time coordinates of the hit projection on to the 2D shower axis
           fGSer->GetPointOnLine(fOmega2D.at(cl_index),
-                                &(fStartPoint.at(cl_index)),
-                                &theHit,
+                                fStartPoint.at(cl_index),
+                                theHit,
                                 OnlinePoint);
           
-          double ortdist=fGSer->Get2DDistance(&OnlinePoint,&theHit);
-          double linedist=fGSer->Get2DDistance(&OnlinePoint,&(fStartPoint.at(cl_index)));
+          double ortdist=fGSer->Get2DDistance(OnlinePoint,theHit);
+          double linedist=fGSer->Get2DDistance(OnlinePoint,fStartPoint.at(cl_index));
           
           //calculate the distance from the vertex using the effective pitch metric 
           double wdist=((theHit.w-fStartPoint.at(cl_index).w)*newpitch)*direction;  //wdist is always positive

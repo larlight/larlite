@@ -81,7 +81,7 @@ class shower(recoBase):
                                       0.0)
                 perpAxis = zAxis.Cross(showerAxis)
 
-                length = showerAxis.Mag() * np.tan(shower.openingAngle()/2)
+                length = showerAxis.Mag() * mt.tan(shower.openingAngle()/2)
                 perpAxis *= length / perpAxis.Mag()
 
 

@@ -78,7 +78,6 @@ bool DrawPFParticle3D::analyze(larlite::storage_manager* storage) {
 
     // Here is where the params are filled and stored:
     _params_alg.FillParams(temp._params);
-    temp._params.length = 100;
     
     // Save the output:
     _data.emplace_back(temp);

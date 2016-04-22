@@ -52,11 +52,14 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
                   storage->event_id());
 
   if (!ev_pfpart or (ev_pfpart->size() == 0) ) {
-    print(msg::kERROR, __FUNCTION__,
-          Form("PFPart producer %s product not found!",
-               fInputProducer.c_str()));
+    //print(msg::kERROR, __FUNCTION__,
+    //    Form("PFPart producer %s product not found!",
+    //         fInputProducer.c_str()));
     return false;
   }
+
+  // std::cout << "Run: " << storage->run_id() << ", Subrun: " << storage->subrun_id()
+  //           << ", Event: " << storage->event_id() << std::endl;
 
   // This item holds the list of PFParticles tagged as showers (11)
   // We only run reco on particles tagged that way.
@@ -104,7 +107,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   // if associated clusters not found -> quit and exit
   if ( !ev_vertex or (ev_vertex->size() == 0) ) {
-    print(msg::kWARNING, __FUNCTION__,
+    print(msg::kDEBUG, __FUNCTION__,
           Form("No vertexes found associated to PFPart w/ producer %s",
                fInputProducer.c_str()));
     // return false;
@@ -122,7 +125,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   // if associated clusters not found -> quit and exit
   if ( !ev_sps or (ev_sps->size() == 0) ) {
-    print(msg::kWARNING, __FUNCTION__,
+    print(msg::kDEBUG, __FUNCTION__,
           Form("No spacepoints found associated to PFPart w/ producer %s",
                fInputProducer.c_str()));
     // return false;
@@ -134,7 +137,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   // Now use ProtoShowerHelper to generate the ProtoShowers:
 
-  std::vector<showerreco::ProtoShower> proto_showers;
+  std::vector<protoshower::ProtoShower> proto_showers;
 
 
   _ps_helper.GenerateProtoShowers( storage,
@@ -231,6 +234,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     s.set_dqdx_v                ( res_shower.fdQdx_v                );
     s.set_dqdx_err_v            ( res_shower.fSigmadQdx_v           );
     s.set_length                ( res_shower.fLength                );
+    s.set_width                 ( res_shower.fWidth                 );
     s.set_opening_angle         ( res_shower.fOpeningAngle          );
 
     shower_v->push_back(s);

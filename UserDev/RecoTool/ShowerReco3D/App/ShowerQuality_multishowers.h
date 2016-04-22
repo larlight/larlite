@@ -69,18 +69,25 @@ namespace larlite {
     /// set whether to fill quality info per MC or per reco shower
     void setMCShowerQuality_multishowers(bool on) { _mcShowerQuality = on; }
 
+    // use trigger time
+    void setUseTrigger(bool on) { _use_trigger = on; }
+
   protected:
 
     // Function to fill TTree
     void FillQualityInfo(const shower& reco_shower,
 			 const mcshower& mc_shower,
 			 const size_t& shower_index, const size_t& best_index,
+			 const double& mcq,
 			 const AssSet_t& ass_cluster_v);
 
 
     // boolean to decide if to fill the tree once per MC shower
     // or once per RECO shower
     bool _mcShowerQuality;
+
+    // use trigger offset?
+    bool _use_trigger;
 
     /// Shower back tracking algorithm
     ::btutil::MCMatchAlg fBTAlg;
@@ -134,12 +141,16 @@ namespace larlite {
       double reco_energy_V;
       double reco_energy_Y;
       double reco_dedx;
+      double reco_dqdx_U;
+      double reco_dqdx_V;
+      double reco_dqdx_Y;
       double reco_dedx_U;
       double reco_dedx_V;
       double reco_dedx_Y;
       int    best_plane_id;
 
       double mc_x, mc_y, mc_z, mc_t;
+      double mc_q, mc_q_bt;
       double mc_dcosx, mc_dcosy, mc_dcosz;
       double mc_energy;
       int    mc_pdgid;

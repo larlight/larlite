@@ -16,7 +16,7 @@
 
 #include "ShowerReco3D/Base/ShowerRecoAlgBase.h"
 #include "ShowerReco3D/Base/ShowerCalo.h"
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/GeometryHelper.h"
 #include "AnalysisAlg/CalorimetryAlg.h"
 
 namespace showerreco {
@@ -40,7 +40,7 @@ namespace showerreco {
     void Reset() { ShowerRecoAlgBase::Reset(); }
 
     /// Function to reconstruct a shower
-    Shower_t RecoOneShower(const ProtoShower & );
+    Shower_t RecoOneShower(const ::protoshower::ProtoShower & );
 
     /// Function to decide if to use Area or Pulse Amplitude for calculations
     void SetUseArea(bool on) { fUseArea = on; }
@@ -58,7 +58,7 @@ namespace showerreco {
 
   protected:
 
-    larutil::GeometryUtilities  *fGSer;
+    larutil::GeometryHelper  *fGSer;
    
   private:
 

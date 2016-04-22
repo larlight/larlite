@@ -77,7 +77,7 @@ namespace larlite {
 //=================================================
 //Define some things 
 //=================================================
-        auto geom = larutil::GeometryUtilities::GetME();
+        auto geom = larutil::GeometryHelper::GetME();
         auto tservice = larutil::TimeService::GetME();
 	auto const& tpc_clock = tservice->TPCClock();
 	double tick_offset = tservice->TriggerOffsetTPC() * tpc_clock.Frequency();// Kazu's fix

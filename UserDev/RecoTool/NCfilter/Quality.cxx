@@ -2,7 +2,7 @@
 #define RECOTOOL_FORCEREGIONS_CXX
 
 #include "Quality.h"
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/GeometryHelper.h"
 #include "LArUtil/Geometry.h"
 
 namespace cluster {
@@ -10,18 +10,18 @@ namespace cluster {
 
   double Quality::TimeProf( std::vector<larutil::PxHit> hita , std::vector<larutil::PxHit> hitb) {
 
-//    double T2CM = larutil::GeometryUtilities::GetME()->TimeToCm();
-  //  double W2CM = larutil::GeometryUtilities::GetME()->WireToCm();
+//    double T2CM = larutil::GeometryHelper::GetME()->TimeToCm();
+  //  double W2CM = larutil::GeometryHelper::GetME()->WireToCm();
    int nplanes = 3;
    double ks = 0.0;
    std::vector< std::vector<TH1D*> > signals(nplanes);
    std::vector< std::vector<TH1D*> > pulses(nplanes);
 
 double time_diff = ( larutil::DetectorProperties::GetME()->GetXTicksOffset(hita.at(0).plane) -
-                        larutil::DetectorProperties::GetME()->GetXTicksOffset(hitb.at(0).plane) ) * larutil::GeometryUtilities::GetME()->TimeToCm();
+                        larutil::DetectorProperties::GetME()->GetXTicksOffset(hitb.at(0).plane) ) * larutil::GeometryHelper::GetME()->TimeToCm();
 
    // First go look for the min & max of hits 
-   double min_time = larutil::DetectorProperties::GetME()->NumberTimeSamples()*larutil::GeometryUtilities::GetME()->TimeToCm();
+   double min_time = larutil::DetectorProperties::GetME()->NumberTimeSamples()*larutil::GeometryHelper::GetME()->TimeToCm();
    double max_time = 0;
    for(auto const& h : hita) {
      if(h.t > max_time) max_time = h.t;
@@ -42,7 +42,7 @@ double time_diff = ( larutil::DetectorProperties::GetME()->GetXTicksOffset(hita.
    // in this case let's just use plane 0,1
    for( auto const& ha : hita){
      double time = ha.t;
-     //time -= larutil::DetectorProperties::GetME()->GetXTicksOffset(ha.plane)*larutil::GeometryUtilities::GetME()->TimeToCm();
+     //time -= larutil::DetectorProperties::GetME()->GetXTicksOffset(ha.plane)*larutil::GeometryHelper::GetME()->TimeToCm();
      double charge = ha.charge;
 
      int bin = histo_a.FindBin(time);
@@ -54,7 +54,7 @@ double time_diff = ( larutil::DetectorProperties::GetME()->GetXTicksOffset(hita.
    if (histo_inta.Integral()) histo_inta.Scale(1./histo_inta.GetBinContent(histo_inta.GetNbinsX()));
    for( auto const& hb : hitb){
      double time = hb.t + time_diff;
-     //time -= larutil::DetectorProperties::GetME()->GetXTicksOffset(hb.plane)*larutil::GeometryUtilities::GetME()->TimeToCm();
+     //time -= larutil::DetectorProperties::GetME()->GetXTicksOffset(hb.plane)*larutil::GeometryHelper::GetME()->TimeToCm();
      double charge = hb.charge;
      int bin = histo_b.FindBin(time);
      histo_b.SetBinContent(bin,histo_b.GetBinContent(bin)+charge);
@@ -88,8 +88,8 @@ double time_diff = ( larutil::DetectorProperties::GetME()->GetXTicksOffset(hita.
 	unsigned int nplanes =3;
 	std::vector<std::pair<double,double>> returnPV(nplanes);
 
-//    double T2CM = larutil::GeometryUtilities::GetME()->TimeToCm();
-  //  double W2CM = larutil::GeometryUtilities::GetME()->WireToCm();
+//    double T2CM = larutil::GeometryHelper::GetME()->TimeToCm();
+  //  double W2CM = larutil::GeometryHelper::GetME()->WireToCm();
 
 
 	for(unsigned int k=0; k<nplanes;k++) {

@@ -20,7 +20,7 @@ LinearEnergy::LinearEnergy()
   _useModBox = true;
   _fill_tree = false;
   _caloAlg = ::calo::CalorimetryAlg();
-  _caloAlg.setUseModBox(false);
+  _caloAlg.setUseModBox(true);
   _fC_to_e = 6250.; // a fC in units of the electron charge
   _e_to_eV = 23.6;  // ionization energy of Ar in eV
   _eV_to_MeV = 1e-6; // eV -> MeV conversion
@@ -30,7 +30,8 @@ LinearEnergy::LinearEnergy()
   // fC -> mV *= ( shaping time * ASIC gain )
   _shp_time  = 2.; // in usec
   _asic_gain = 7.8; // in mV/fC
-
+  _gain_U = _gain_V = _gain_Y = 1.;
+  
   return;
 }
 
@@ -52,9 +53,10 @@ void LinearEnergy::initialize()
   _energy_conversion = _charge_conversion * _fC_to_e * _e_to_eV * _eV_to_MeV;
 
   _tau = larutil::LArProperties::GetME()->ElectronLifetime();        // electron lifetime in usec
+  std::cout << "Lifetime = " << _tau << std::endl;
   _recomb_factor = 1.;
   double MeV_to_fC = 1. / ( _e_to_eV * _eV_to_MeV );
-  double MIP = 2.3; // MeV
+  double MIP = 2.3; // MeV/cm
   if (_useModBox)
     _recomb_factor = larutil::LArProperties::GetME()->ModBoxInverse(MIP) / ( MIP * MeV_to_fC );
   else
@@ -80,8 +82,15 @@ void LinearEnergy::initialize()
   return;
 }
 
-void LinearEnergy::do_reconstruction(const ProtoShower & proto_shower,
+void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_shower,
                                      Shower_t& resultShower) {
+
+  //if the module does not have 2D cluster info -> fail the reconstruction
+  if (!proto_shower.hasCluster2D()){
+    std::stringstream ss;
+    ss << "Fail @ algo " << this->name() << " due to missing 2D cluster";
+    throw ShowerRecoException(ss.str());
+  }
 
   auto & clusters = proto_shower.params();
 
@@ -94,9 +103,11 @@ void LinearEnergy::do_reconstruction(const ProtoShower & proto_shower,
   // auto geom       = larutil::Geometry::GetME();
   auto geomHelper = larutil::GeometryHelper::GetME();
 
-  // double y;
-  // double z;
-
+  // check if plane 2 has been used.
+  // if so, we will fill the global energy with that from plane 2
+  // otherwise, average the other two planes
+  bool hasPl2 = false;
+  
   auto t2cm = geomHelper->TimeToCm();
 
   // we want an energy for each plane
@@ -108,6 +119,9 @@ void LinearEnergy::do_reconstruction(const ProtoShower & proto_shower,
     // get the plane associated with this cluster
     auto const& pl = clusters.at(n).plane_id.Plane;
     _pl = pl;
+
+    if (pl == 2)
+      hasPl2 = true;
 
     auto const& dir3D = resultShower.fDCosStart;
     double pitch = geomHelper->GetPitch(dir3D, (int)pl);
@@ -123,6 +137,7 @@ void LinearEnergy::do_reconstruction(const ProtoShower & proto_shower,
       // lifetime correction
       double hit_tick = h.t / t2cm ;
       double lifetimeCorr = exp( hit_tick * _timetick / _tau );
+      //double lifetimeCorr = 1.15;
 
       if (_useArea) {
         dQ = _caloAlg.ElectronsFromADCArea(h.charge, pl);
@@ -145,6 +160,14 @@ void LinearEnergy::do_reconstruction(const ProtoShower & proto_shower,
 
     E /= _recomb_factor;
 
+    // correct for plane-dependent shower reco energy calibration
+    if (pl == 2)
+      E *= _gain_Y;
+    if (pl == 1)
+      E *= _gain_V;
+    if (pl == 0)
+      E *= _gain_U;
+
     if (_fill_tree)
       _tree->Fill();
 
@@ -155,6 +178,11 @@ void LinearEnergy::do_reconstruction(const ProtoShower & proto_shower,
     resultShower.fTotalEnergy_v[pl] = E;
 
   }// for all input clusters
+
+  if (hasPl2)
+    resultShower.fTotalEnergy = resultShower.fTotalEnergy_v[2];
+  else
+    resultShower.fTotalEnergy = ( resultShower.fTotalEnergy_v[0] + resultShower.fTotalEnergy_v[1] ) / 2.;
 
   return;
 

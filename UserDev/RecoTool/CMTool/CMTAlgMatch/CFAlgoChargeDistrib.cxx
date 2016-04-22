@@ -2,7 +2,7 @@
 #define RECOTOOL_CFALGOCHARGEDISTRIB_CXX
 
 #include "CFAlgoChargeDistrib.h"
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/GeometryHelper.h"
 
 namespace cmtool {
 
@@ -88,7 +88,7 @@ namespace cmtool {
   // Function to calculate the "convolution"
   float CFAlgoChargeDistrib::TProfConvol(std::vector<larutil::PxHit> hA ,std::vector<larutil::PxHit> hB)
   {
-    int NumTimeSamples = larutil::DetectorProperties::GetME()->NumberTimeSamples()*larutil::GeometryUtilities::GetME()->TimeToCm();
+    int NumTimeSamples = larutil::DetectorProperties::GetME()->NumberTimeSamples()*larutil::GeometryHelper::GetME()->TimeToCm();
     
     double Tmin = NumTimeSamples;
     double Tmax = 0;

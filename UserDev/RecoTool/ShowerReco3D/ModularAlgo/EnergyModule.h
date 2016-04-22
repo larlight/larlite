@@ -35,7 +35,7 @@ public:
   /// Default destructor
   ~EnergyModule() {}
 
-  void do_reconstruction(const ProtoShower &, Shower_t &);
+  void do_reconstruction(const ::protoshower::ProtoShower &, Shower_t &);
 
   void SetUseArea(bool on) { _useArea = on; }
 

@@ -2,8 +2,6 @@
 #define GEOMETRYHELPER_CXX
 
 #include "GeometryHelper.h"
-#include "DetectorProperties.h"
-#include "LArProperties.h"
 
 namespace larutil {
 
@@ -13,16 +11,15 @@ GeometryHelper* GeometryHelper::_me = 0;
 // Function to load any parameters for convenience :
 void GeometryHelper::Reconfigure()
 {
-  // Need the geometry for wire pitch
-  auto geom = larutil::Geometry::GetME();
-  // Need detector properties and lar properties for time to cm conversion
-  auto detp = larutil::DetectorProperties::GetME();
-  auto larp = larutil::LArProperties::GetME();
 
-  // fNPlanes = geom->Nplanes();
-  // vertangle.resize(fNPlanes);
-  // for(UInt_t ip=0;ip<fNPlanes;ip++)
-  //   vertangle[ip]=geom->WireAngleToVertical(geom->PlaneToView(ip)) - TMath::Pi()/2; // wire angle
+  geom = (larutil::Geometry*)(larutil::Geometry::GetME());
+  detp = (larutil::DetectorProperties*)(larutil::DetectorProperties::GetME());
+  larp = (larutil::LArProperties*)(larutil::LArProperties::GetME());
+
+  fNPlanes = geom->Nplanes();
+  vertangle.resize(fNPlanes);
+  for (UInt_t ip = 0; ip < fNPlanes; ip++)
+    vertangle[ip] = geom->WireAngleToVertical(geom->PlaneToView(ip)) - TMath::Pi() / 2; // wire angle
 
 
   fWireToCm = geom->WirePitch(0, 1, 0);
@@ -33,8 +30,6 @@ void GeometryHelper::Reconfigure()
 // The next set of functions is the collection of functions to convert 3D Point to 2D point
 // The first function is maintained, and the rest convert their arguments and call it
 Point2D GeometryHelper::Point_3Dto2D(const TVector3 & _3D_position, unsigned int plane) const {
-
-  auto geom = larutil::Geometry::GetME();
 
   // Make a check on the plane:
   if (plane > geom -> Nplanes()) {
@@ -96,6 +91,10 @@ Point2D GeometryHelper::Point_3Dto2D(float * xyz, unsigned int plane) const {
   TVector3 vec(xyz);
   return Point_3Dto2D(vec, plane);
 }
+Point2D GeometryHelper::Point_3Dto2D(float x, float y, float z, unsigned int plane) const {
+  TVector3 vec(x, y, z);
+  return Point_3Dto2D(vec, plane);
+}
 Point2D GeometryHelper::Point_3Dto2D(const std::vector<double> & xyz, unsigned int plane) const {
   TVector3 vec(&(xyz[0]));
   return Point_3Dto2D(vec, plane);
@@ -146,7 +145,6 @@ void GeometryHelper::Line_3Dto2D( const TVector3 & startPoint3D, const TVector3 
 float GeometryHelper::Slope_3Dto2D(const TVector3 & inputVector, unsigned int plane) const {
   // Do this by projecting the line:
   // Generate a start point right in the middle of the detector:
-  auto geom = larutil::Geometry::GetME();
   TVector3 startPoint3D(0, 0, 0);
   startPoint3D.SetZ(0.5 * geom -> DetLength());
   larutil::Point2D p1, slope;
@@ -360,6 +358,74 @@ double GeometryHelper::GetPitch(const TVector3& direction, const int& pl) const
   return pitch;
 }
 
+
+double GeometryHelper::CalculatePitch(UInt_t pl, double phi, double theta) const
+{
+
+  double pitch = -1.;
+
+  if (geom->PlaneToView(pl) == larlite::geo::kUnknown ||
+      geom->PlaneToView(pl) == larlite::geo::k3D) {
+    print(larlite::msg::kERROR, __FUNCTION__, Form("Warning :  no Pitch foreseen for view %d", geom->PlaneToView(pl)));
+    return pitch;
+  }
+  else if ( pl >= geom->Nplanes() ) {
+    print(larlite::msg::kERROR, __FUNCTION__, "Plane number larger than max. number of planes");
+    return pitch;
+  }
+  else {
+
+    double pi = TMath::Pi();
+    double fTheta = pi / 2 - theta;
+    double fPhi = -(phi + pi / 2);
+    double wirePitch = geom->WirePitch(0, 1, pl);
+    double angleToVert = 0.5 * TMath::Pi() - geom->WireAngleToVertical(geom->PlaneToView(pl));
+    double cosgamma = TMath::Abs(TMath::Sin(angleToVert) * TMath::Cos(fTheta)
+                                 + TMath::Cos(angleToVert) * TMath::Sin(fTheta) * TMath::Sin(fPhi));
+
+    if (cosgamma > 0) pitch = wirePitch / cosgamma;
+  } // end if a reasonable view
+
+  return pitch;
+}
+
+double GeometryHelper::PitchInView(UInt_t plane, double phi, double theta) const
+{
+
+  Double_t dirs[3] = {0.};
+  GetDirectionCosines(phi, theta, dirs);
+
+  /// \todo switch to using new Geometry::WireAngleToVertical(geo::View_t)
+  /// \todo and Geometry::WirePitch(geo::View_t) methods
+  Double_t wirePitch   = 0.;
+  Double_t angleToVert = 0.;
+
+  wirePitch = geom->WirePitch(0, 1, plane);
+  angleToVert = geom->WireAngleToVertical(geom->PlaneToView(plane)) - 0.5 * TMath::Pi();
+
+  //(sin(angleToVert),std::cos(angleToVert)) is the direction perpendicular to wire
+  //fDir.front() is the direction of the track at the beginning of its trajectory
+  Double_t cosgamma = TMath::Abs(TMath::Sin(angleToVert) * dirs[1] +
+                                 TMath::Cos(angleToVert) * dirs[2]);
+
+  if (cosgamma < 1.e-5)
+    throw LArUtilException("cosgamma is basically 0, that can't be right");
+
+  return wirePitch / cosgamma;
+}
+
+void GeometryHelper::GetDirectionCosines(double phi, double theta, Double_t *dirs) const
+
+{
+  theta *= (TMath::Pi() / 180);
+  phi *= (TMath::Pi() / 180); // working on copies, it's ok.
+  dirs[0] = TMath::Cos(theta) * TMath::Sin(phi);
+  dirs[1] = TMath::Sin(theta);
+  dirs[2] = TMath::Cos(theta) * TMath::Cos(phi);
+
+  return;
+}
+
 double GeometryHelper::GetCosAngleBetweenLines(const double& s1, const double& s2) const
 {
 
@@ -420,10 +486,6 @@ void GeometryHelper::SelectPolygonHitList(const std::vector<Hit2D> &inputHits,
     return;
   }
 
-  // Utilities
-  auto geom = larutil::Geometry::GetME();
-  auto detp = DetectorProperties::GetME();
-
   // if the fraction is > 1 then use 1...should not be larger
   // frac is the fraction of charge in the hit list
   // than needs to be included in the Polygon
@@ -461,24 +523,26 @@ void GeometryHelper::SelectPolygonHitList(const std::vector<Hit2D> &inputHits,
   // Also fill corner edge points
   std::vector<larutil::Point2D> edges(4, Point2D(plane, 0, 0));
   double wire_max = geom->Nwires(plane) * fWireToCm;
-  double time_max = (detp->NumberTimeSamples() - detp -> TriggerOffset()) * fTimeToCm;
+  double time_max = (detp->NumberTimeSamples()) * fTimeToCm;
 
   for (size_t index = 0; index < ordered_hits.size(); ++index) {
 
+    /* Deprecated: do not throw exceptions if out of TPC bounds...
     if (ordered_hits.at(index)->t < -detp -> TriggerOffset() ||
-        ordered_hits.at(index)->w < 0 ||
-        ordered_hits.at(index)->t > time_max ||
-        ordered_hits.at(index)->w > wire_max ) {
+    ordered_hits.at(index)->w < 0 ||
+    ordered_hits.at(index)->t > time_max ||
+    ordered_hits.at(index)->w > wire_max ) {
 
-      throw LArUtilException(Form("Invalid wire/time (%g,%g) for plane %i ... range is (0=>%g,0=>%g)",
-                                  ordered_hits.at(index)->w,
-                                  ordered_hits.at(index)->t,
-                                  plane,
-                                  wire_max,
-                                  time_max)
-                            );
-      return;
+    throw LArUtilException(Form("Invalid wire/time (%g,%g) for plane %i ... range is (0=>%g,0=>%g)",
+          ordered_hits.at(index)->w,
+          ordered_hits.at(index)->t,
+          plane,
+          wire_max,
+          time_max)
+           );
+    return;
     }
+    */
 
     double dist = 0;
 
@@ -666,13 +730,10 @@ double GeometryHelper::PerpendicularDistance(const Point2D& pt,
 }
 
 bool GeometryHelper::Point_isInTPC(const TVector3 & pointIn3D) const {
-  // Use the geometry class to determine if this point is in the TPC
-  auto geom = larutil::Geometry::GetME();
-  auto geoHelper = larutil::GeometryHelper::GetME();
-  auto detProp = larutil::DetectorProperties::GetME();
+
   // Check against the 3 coordinates:
-  if (pointIn3D.X() > geom -> DetHalfWidth() + detProp -> TriggerOffset() * geoHelper -> TimeToCm()
-      || pointIn3D.X() < - geom -> DetHalfWidth() - detProp -> TriggerOffset() * geoHelper -> TimeToCm())
+  if (pointIn3D.X() > geom -> DetHalfWidth() + detp -> TriggerOffset() * TimeToCm()
+      || pointIn3D.X() < - geom -> DetHalfWidth() - detp -> TriggerOffset() * TimeToCm())
   {
     return false;
   }
@@ -751,8 +812,6 @@ std::vector<unsigned int> GeometryHelper::SelectLocalPointList( const std::vecto
 int GeometryHelper::Get3DAxisN(const int& iplane0, const int& iplane1,
                                const double& omega0, const double& omega1,
                                double& phi, double& theta) const {
-
-  auto geom = larutil::Geometry::GetME();
 
   // prepare vertical angle information for the various planes
   std::vector<double> vertangle;
@@ -880,6 +939,76 @@ int GeometryHelper::Get3DAxisN(const int& iplane0, const int& iplane1,
 
   thetan = -asin ( mn / (sqrt(pow(ln, 2) + pow(mn, 2) + pow(nn, 2)) ) ) ;
   theta = thetan;
+
+  return 0;
+}
+
+
+int GeometryHelper::GetXYZ(const Point2D *p0, const Point2D *p1, Double_t* xyz) const
+{
+
+  Double_t pos[3] = {0.};
+  geom->PlaneOriginVtx(p0->plane, pos);
+  Double_t x = (p0->t) - detp->TriggerOffset() * fTimeToCm + pos[0];
+  double yz[2];
+
+  GetYZ(p0, p1, yz);
+
+
+  xyz[0] = x;
+  xyz[1] = yz[0];
+  xyz[2] = yz[1];
+
+  return 0;
+}
+
+
+int GeometryHelper::GetYZ(const Point2D *p0, const Point2D *p1, Double_t* yz) const
+{
+
+  Double_t y, z;
+
+  // Force to the closest wires if not in the range
+  int z0 = p0->w / fWireToCm;
+  int z1 = p1-> w / fWireToCm;
+  if (z0 < 0) {
+    std::cout << "\033[93mWarning\033[00m \033[95m<<GeometryHelper::GetYZ>>\033[00m" << std::endl
+              << " 2D wire position " << p0->w << " [cm] corresponds to negative wire number." << std::endl
+              << " Forcing it to wire=0..." << std::endl
+              << "\033[93mWarning ends...\033[00m" << std::endl;
+    z0 = 0;
+  }
+  else if (z0 >= (int)(geom->Nwires(p0->plane))) {
+    std::cout << "\033[93mWarning\033[00m \033[95m<<GeometryHelper::GetYZ>>\033[00m" << std::endl
+              << " 2D wire position " << p0->w << " [cm] exceeds max wire number " << (geom->Nwires(p0->plane) - 1) << std::endl
+              << " Forcing it to the max wire number..." << std::endl
+              << "\033[93mWarning ends...\033[00m" << std::endl;
+    z0 = geom->Nwires(p0->plane) - 1;
+  }
+  if (z1 < 0) {
+    std::cout << "\033[93mWarning\033[00m \033[95m<<GeometryHelper::GetYZ>>\033[00m" << std::endl
+              << " 2D wire position " << p1->w << " [cm] corresponds to negative wire number." << std::endl
+              << " Forcing it to wire=0..." << std::endl
+              << "\033[93mWarning ends...\033[00m" << std::endl;
+    z1 = 0;
+  }
+  if (z1 >= (int)(geom->Nwires(p1->plane))) {
+    std::cout << "\033[93mWarning\033[00m \033[95m<<GeometryHelper::GetYZ>>\033[00m" << std::endl
+              << " 2D wire position " << p1->w << " [cm] exceeds max wire number " << (geom->Nwires(p0->plane) - 1) << std::endl
+              << " Forcing it to the max wire number..." << std::endl
+              << "\033[93mWarning ends...\033[00m" << std::endl;
+    z1 = geom->Nwires(p1->plane) - 1;
+  }
+
+  UInt_t chan1 = geom->PlaneWireToChannel(p0->plane, z0);
+  UInt_t chan2 = geom->PlaneWireToChannel(p1->plane, z1);
+
+  if (! geom->ChannelsIntersect(chan1, chan2, y, z) )
+    return -1;
+
+
+  yz[0] = y;
+  yz[1] = z;
 
   return 0;
 }
