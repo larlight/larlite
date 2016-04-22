@@ -122,11 +122,11 @@ namespace ertool {
     ::geoalgo::GeoAlgo _geoAlgo;
 
     // quantities calculated for correlation determination:
-    double _IP; // Impact Paramter with other object
-    double _IPthisStart; // distance from IP to this shower start point
-    double _IPthatStart; // distance from IP to that shower/track start point
-    double _IPthatTrunk; // distance from IP to taht shower's trunk
-    double _IPtrkBody; // distance from IP to body of track (if comparing with track)
+    // double _IP; // Impact Paramter with other object
+    // double _IPthisStart; // distance from IP to this shower start point
+    // double _IPthatStart; // distance from IP to that shower/track start point
+    // double _IPthatTrunk; // distance from IP to taht shower's trunk
+    // double _IPtrkBody; // distance from IP to body of track (if comparing with track)
 
   };
 }

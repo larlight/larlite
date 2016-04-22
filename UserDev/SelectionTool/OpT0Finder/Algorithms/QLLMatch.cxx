@@ -10,6 +10,7 @@
 
 namespace flashana {
 
+
     QLLMatch *QLLMatch::_me = nullptr;
 
     void MIN_vtx_qll(Int_t &, Double_t *, Double_t &, Double_t *, Int_t);
@@ -56,9 +57,9 @@ namespace flashana {
 	res.tpc_point_err[0] = _reco_x_offset_err;
 
 
-        return res;
-    }
-
+    return res;
+  }
+  
     const Flash_t &QLLMatch::ChargeHypothesis(const double xoffset) {
         if (_hypothesis.pe_v.empty()) _hypothesis.pe_v.resize(NOpDets(), 0.);
         if (_hypothesis.pe_v.size() != NOpDets())
@@ -80,7 +81,6 @@ namespace flashana {
         }
 
         FillEstimate(_var_trk, _hypothesis);
-        FillTree(_var_trk);
 	// zeroes the hypothesis if qcluster is too late wrt flash, or if this xoffset steps the qcluster out of the TPC in x.
 	OOBCheck(_var_trk, _hypothesis, _measurement); 
 
@@ -157,12 +157,12 @@ namespace flashana {
         }
         if (_measurement.pe_v.size() != pmt.pe_v.size())
             throw OpT0FinderException("PMT dimension has changed!");
-
+	
         //
         // Prepare TPC
         //
         _raw_trk.resize(tpc.size());
-
+	
         double min_x = 1e9;
         for (size_t i = 0; i < tpc.size(); ++i) {
             auto const &pt = tpc[i];
@@ -171,7 +171,7 @@ namespace flashana {
         }
 
         for (auto &pt : _raw_trk) pt.x -= min_x;
-
+	
         //
         // Prepare PMT
         //
@@ -186,16 +186,14 @@ namespace flashana {
             max_pe = 0;
             for (auto const &v : pmt.pe_v) if (v > max_pe) max_pe = v;
         }
-
-        for (size_t i = 0; i < pmt.pe_v.size(); ++i)
-
-            _measurement.pe_v[i] = pmt.pe_v[i] / max_pe;
-
+	
+        for (size_t i = 0; i < pmt.pe_v.size(); ++i)  _measurement.pe_v[i] = pmt.pe_v[i] / max_pe;
+		
         _minimizer_record_fval_v.clear();
         _minimizer_record_x_v.clear();
-
+	
         if (!_minuit_ptr) _minuit_ptr = new TMinuit(4);
-
+	
         double reco_x = 128.;
         double reco_x_err = 0;
         double MinFval;
@@ -213,8 +211,8 @@ namespace flashana {
 
         _minuit_ptr->Command("SET NOW");
 
-
         // use Migrad minimizer
+
         arglist[0] = 500;
         _minuit_ptr->mnexcm("MIGRAD", arglist, 1, ierrflag);
 
@@ -225,7 +223,6 @@ namespace flashana {
         _minuit_ptr->GetParameter(0, reco_x, reco_x_err);
 
         _minuit_ptr->mnstat(Fmin, Fedm, Errdef, npari, nparx, istat);
-
 
         // use this for debugging, maybe uncomment the actual minimzing function (MIGRAD / simplex calls)
         // scanning the parameter set

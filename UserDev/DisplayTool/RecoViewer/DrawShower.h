@@ -42,6 +42,7 @@ public:
 
     int plane() {return _plane;}
     larutil::Point2D startPoint() {return _startPoint;}
+    larutil::Point2D endPoint() {return _endPoint;}
     float angleInPlane() {return _angleInPlane;}
     float openingAngle() {return _openingAngle;}
     float length() {return _length;}
@@ -51,6 +52,7 @@ public:
     // ALL OF THESE VARIABLES ARE THE PROJECTION INTO THE PLANE
     int _plane;                ///< The Plane of the shower
     larutil::Point2D _startPoint;      ///< Wire time start point (units in cm)
+    larutil::Point2D _endPoint;      ///< Wire time start point (units in cm)
     float _angleInPlane;       ///< Angle in the plane
     float _openingAngle;       ///< Opening angle
     float _length;             ///< Length in cm

@@ -107,7 +107,7 @@ namespace phot{
 	if(!f) {
 	  std::cerr<<"\033[95m<<"<<__FUNCTION__<<">>\033[00m " << "Failed to open a ROOT file: " << LibraryFile.c_str()<<std::endl;
 	  std::cerr<<"If you don't have photon library data file, download from below URL..."<<std::endl;
-	  std::cerr<<"/grid/fermiapp/larsoft/products/larsoft_data/v0_04_00/PhotonPropagation/LibraryData/uboone_photon_library_v4.root"<<std::endl;
+	  std::cerr<<"/grid/fermiapp/products/uboone/uboone_data/v01_04_00/PhotonPropagation/LibraryData/uboone_photon_library_v5.root"<<std::endl;
 	  throw std::exception();
 	}
 	tt =  (TTree*)f->Get("PhotonLibraryData");

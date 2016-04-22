@@ -92,7 +92,7 @@ void RawBase::setPedestal(float pedestal, unsigned int plane) {
 
 void RawBase::initDataHolder() {
   _planeData.resize(_x_dimensions.size());
-  for (int i = 0; i < _x_dimensions.size(); i ++ ) {
+  for (size_t i = 0; i < _x_dimensions.size(); i ++ ) {
     _planeData.at(i).resize(_x_dimensions.at(i) * _y_dimensions.at(i));
   }
   return;

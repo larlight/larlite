@@ -15,6 +15,11 @@
 #pragma link C++ class btutil::MCBTAlg+;
 #pragma link C++ class btutil::MCMatchAlg+;
 #pragma link C++ class larlite::MCSingleShowerCompAlg+;
+#pragma link C++ class larlite::MCClusterer+;
+#pragma link C++ class larlite::CheckHitAlignment+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
+
 

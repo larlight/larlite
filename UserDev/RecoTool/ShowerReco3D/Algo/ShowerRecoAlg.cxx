@@ -21,10 +21,11 @@ namespace showerreco {
   }
 
 
-  Shower_t ShowerRecoAlg::RecoOneShower(const ShowerClusterSet_t& clusters)
+  Shower_t ShowerRecoAlg::RecoOneShower(const ProtoShower& proto_shower)
   {
    
-
+    auto clusters = proto_shower.params();
+    
     Shower_t result;
     //
     // Reconstruct and store

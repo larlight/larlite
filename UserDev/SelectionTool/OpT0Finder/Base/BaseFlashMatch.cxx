@@ -17,11 +17,6 @@ namespace flashana {
     _flash_hypothesis->FillEstimate(tpc,opdet);
   }
 
-  void BaseFlashMatch::FillTree(const QCluster_t& tpc) 
-  {
-    _flash_hypothesis->FillTree(tpc);
-  }
-
   void BaseFlashMatch::OOBCheck(const QCluster_t& tpc, Flash_t& opdet, const Flash_t& opmeas) const
   {
 

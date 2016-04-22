@@ -19,6 +19,7 @@
 #include "DataFormat/mcshower.h"
 #include "OpT0Finder/Base/OpT0FinderTypes.h"
 #include "OpT0Finder/Base/BaseAlgorithm.h"
+#include "OpT0Finder/Algorithms/LightPath.h"
 
 namespace flashana {
   /**
@@ -54,6 +55,8 @@ namespace flashana {
      
     const flashana::MCSource_t& MCObjectID(size_t) const;
 
+    void SetUseLightPath ( bool use_light_path ) { _use_light_path = use_light_path ; } 
+
     #ifndef __CINT__
     void Swap(std::vector<flashana::QCluster_t>&&,
 	      std::vector<flashana::MCSource_t>&&);
@@ -63,6 +66,8 @@ namespace flashana {
     flashana::MCSource_t Identify( const unsigned int,
 				   const larlite::event_mctrack&,
 				   const larlite::event_mcshower& ) const;
+
+    mutable int _n;
     
     double _light_yield;
     double _step_size;
@@ -71,6 +76,9 @@ namespace flashana {
     std::vector<size_t> _mctrack_2_qcluster;
     std::vector<size_t> _mcshower_2_qcluster;
     std::vector<flashana::MCSource_t> _qcluster_2_mcobject;
+
+    flashana::LightPath _lightpath_clustering ;
+    bool _use_light_path ;
 
   };
 }

@@ -5,11 +5,13 @@
 #include "DataFormat/track.h"
 #include "DataFormat/opflash.h"
 #include "DataFormat/ophit.h"
+#include "DataFormat/simphotons.h"
 #include "DataFormat/calorimetry.h"
 #include "DataFormat/mctrack.h"
 #include "GeoAlgo/GeoAlgo.h"
 #include "GeoAlgo/GeoLineSegment.h"
 #include "LArUtil/Geometry.h"
+#include "OpT0Finder/Base/OpT0FinderTypes.h"
 namespace larlite {
 
   UBT0Finder::UBT0Finder()
@@ -17,7 +19,7 @@ namespace larlite {
     , _int_tree(nullptr)
     , _track_tree(nullptr)
     , _flashmatch_tree(nullptr)
-    , _photlib_tree_config("")
+    , _photlib_tree_config("meh")
     , _photlib_tree(nullptr)
     , _eff_tree(nullptr)
     , _flash_tree(nullptr)
@@ -29,7 +31,10 @@ namespace larlite {
 
     _e_diff    = 10;
     UseAbsolutePE(false);
-    SetStepLength(0.5) ;
+    SetStepLength(0.5);
+
+    //Initialize _use_light_path_w_mc value to something
+    _use_light_path_w_mc = false; // Was true, EC: 3-April-2016
   }
 
   void UBT0Finder::PhotonBomb (const double& x, const double& y, const double& z, const int& n)
@@ -41,6 +46,8 @@ namespace larlite {
   }
 
   bool UBT0Finder::initialize() {
+
+    _mcqclustering.SetUseLightPath(_use_light_path_w_mc);
 
     _time_diff = new TH1D("time_diff", "Matched Flash vs. MCTrack", 100, 0, 500);
 
@@ -61,6 +68,7 @@ namespace larlite {
 
     _flashmatch_tree = new TTree("flashmatch_tree", "");
     _flashmatch_tree->Branch("npe", &_npe, "npe/D");
+    _flashmatch_tree->Branch("_npetot", &_npetot, "npetot/D");
     _flashmatch_tree->Branch("tpcID", &_tpcID, "tpcID/I");
     _flashmatch_tree->Branch("event", &_event, "event/I");
     _flashmatch_tree->Branch("fy", &_flash_y, "fy/D");
@@ -82,6 +90,12 @@ namespace larlite {
     _flashmatch_tree->Branch("trajz", &_mc_trajz);
     _flashmatch_tree->Branch("score", &_score, "score/D");
     _flashmatch_tree->Branch("trk_shift", &_trk_shift, "trk_shift/D");
+    _flashmatch_tree->Branch( "g4_pe_v", "std::vector<double>", &_g4_pe );
+    // only pick up first track's pe's for now, EC, 27-Mar-2016.
+    _flashmatch_tree->Branch( "mc_calc_pe_v", " std::vector<float> ", &_mc_calc_pe ); 
+    _flashmatch_tree->Branch("g4pesum", &_g4pesum, "g4pesum/D");
+    _flashmatch_tree->Branch("mcpesum", &_mcpesum, "mcpesum/D");
+
 
     if (_eff_tree) delete _eff_tree;
     _eff_tree = new TTree("_eff_tree", "Efficiency Tree");
@@ -102,6 +116,8 @@ namespace larlite {
 //    _flash_tree->Branch("_nflash", &_nflash, "nflash/I");
     _flash_tree->Branch("_npe", &_npe, "npe/D");
 
+
+
     std::cout << "UBT0Finder.cxx: In inititalize(): "  << std::endl;
     Configure((const ::fcllite::PSet )"UBT0Finder"); 
     if (_photlib_tree_config != NULL) 
@@ -120,7 +136,7 @@ namespace larlite {
   }
 
   void UBT0Finder::Configure(const ::fcllite::PSet &pset) {
-    // This doesn't work, cuz .... not finding actual fcl file, as set in _config_file of Manager. So, default to false.
+    // This doesn't work, cuz .... not finding actual fcl file, as set in _config_file of Manager. So, use compiled-in default here.
     _photlib_tree_config = pset.get<std::string>("PhotonLibTTree",std::string("seen"));  // "lib" or "seen" or ""
     std::cout << "UBT0Finder.cxx: PhotonVisLibrary Tree ?: " << _photlib_tree_config << std::endl;
   }
@@ -169,6 +185,8 @@ namespace larlite {
   bool UBT0Finder::analyze(storage_manager* storage) {
 
     _mgr.Reset();
+    // _mgr.PrintConfig();
+
     const ::larutil::Geometry* g = ::larutil::Geometry::GetME();
 
     auto ev_flash = storage->get_data<event_opflash>("opflash");// opFlash"); // EC: change capitalization in these 2 lines.
@@ -189,24 +207,25 @@ namespace larlite {
     // Number interactions per event > y MeV
     int n_flash = 0;
     int n_int = 0;
+    _npe = 0;
+    _npetot = 0;
 
     for ( auto & f : *ev_flash) {
       if (f.TotalPE() > 10 )
         n_flash++;
     }
 
-
-    for (auto const & f : *ev_flash){
+    for (auto const & f : *ev_flash) {
       _npe = f.TotalPE();
+      _npetot += _npe;
       _flash_tree->Fill();
-      }
+    }
 
     //auto ev_track = storage->get_data<event_track>("pandoraCosmicKHit");
     auto ev_track = storage->get_data<event_track>("trackkalmanhit");
     auto ev_mctrack = storage->get_data<event_mctrack>("mcreco");
     auto ev_mcshower = storage->get_data<event_mcshower>("mcreco");
-    auto ev_mcphotons = storage->get_data<event_simphotons>("mcreco");
-
+    auto ev_mcphotons = storage->get_data<event_simphotons>("largeant");
 
 
     if (!_use_mc && !_photon_bomb) {
@@ -243,19 +262,22 @@ namespace larlite {
         }
 
         _mgr.Emplace(std::move(tpc_obj));
+	std::cout << " _mgr qcluster being Emplaced 4 ... " << std::endl;
       }
     }
     // use MC tracks
     else if (_use_mc && !_photon_bomb) {
 
+
       if (!ev_mctrack || ev_mctrack->empty()) 
 	{
 	  return false;
 	}
+      std::cout << "UBT0Finder::analyze(): There are " << ev_mctrack->size() << " tracks in this event." << std::endl;
+      _mc_calc_pe.clear();
+      _mc_calc_pe.resize(32,0.0);
       for (size_t n = 0; n < ev_mctrack->size(); n++) {
-
         auto const& trk = ev_mctrack->at(n);
-
         if (trk.size() > 2) {
 
           // per track calculate the shift in x-direction
@@ -269,12 +291,35 @@ namespace larlite {
           _trk_shift = shift_x;
           _trk_min_x = 1036.;
           _trk_max_x = -1036.;
+          ::geoalgo::Trajectory mctraj;
           for (size_t i = 0; i < trk.size(); ++i) {
             if (trk[i].X() > _trk_max_x) { _trk_max_x = trk[i].X(); }
             if (trk[i].X() < _trk_min_x) { _trk_min_x = trk[i].X(); }
+
           }
 
           _track_tree->Fill();
+        } // If > 2 points
+      } // track loop
+
+      double _min_time = -2;
+      double _max_time = 10;
+
+      if(!ev_mcphotons || ev_mcphotons->empty() )
+	print(msg::kERROR,__FUNCTION__,"G4 SimPhotons not found!");
+      else {
+	_g4_pe.clear();
+	_g4_pe.resize(32,0.);
+	_g4pesum=0.;
+	for(auto const& simph : *ev_mcphotons) {
+	  auto const ch = simph.OpChannel();
+	  if(ch>31) continue;
+	  // Check time
+	  for(auto const& ph : simph) {
+	    if(ph.Time < _min_time * 1000 || ph.Time > _max_time * 1000) continue;
+	    _g4_pe[ch] += 1;
+	    _g4pesum++;
+	  }
 	}
       }
 
@@ -287,19 +332,32 @@ namespace larlite {
       // Fills qcluster_v with the content of _qcluster_v which is filled above in Construct()
       _interaction_algo.Swap(std::move(qcluster_v),std::move(source_v));
 
+      _mcpesum=0;
       for(auto& qcluster : qcluster_v){
+	flashana::Flash_t hyp;
+	for (auto &v : hyp.pe_v) v = 0;
+	((flashana::BaseFlashMatch *)_mgr.GetAlgo(flashana::kFlashMatch))->FillEstimate(qcluster, hyp);
+	for ( size_t ipmt = 0; ipmt < 32; ++ipmt) {
+	  _mc_calc_pe[ipmt] += hyp.pe_v[ipmt];
+	  _mcpesum+=hyp.pe_v[ipmt];
+	}
+
+	std::cout << "UBT0Finder:analyze(): qcluster_v.size() is " << qcluster_v.size() << std::endl;
         if( qcluster.idx != -1)
 	  for (size_t ii = 0;  ii<qcluster.size(); ++ii)
 	    {
 	      qcluster[ii].t = qcluster[ii].x/(det_width/det_drift_time) ; // this is drift time, which will create an upper bound on where track could have been in x; will enforce the bound later in PhotonLibHypothesis::FillEstimate().
 	    }
+	std::cout << " _mgr qcluster being Emplaced 0... " << std::endl;
 	  _mgr.Emplace(std::move(qcluster));
+	std::cout << " _mgr qcluster Emplaced 0... " << std::endl;
 	  if ( _photlib_tree_config == "seen" )
 	    {
 	      auto const& qcc(qcluster);
 	      Fill_PVL_Tree(qcc);
 	    }
-
+	std::cout << " back from fill_pvl_tree... " << std::endl;
+	  
 	}
 
       for(auto const& s : source_v) {
@@ -347,6 +405,7 @@ namespace larlite {
       //      for(auto& qcluster : qcluster_v){
       //        if( qcluster.idx != -1)
       _mgr.Emplace(std::move(qcluster));
+      std::cout << " _mgr qcluster being Emplaced 3 ... " << std::endl;
       //	}
 
 	_t0 = 0.0;
@@ -357,7 +416,51 @@ namespace larlite {
 
     }//else if photon bomb
 
-    for (size_t n = 0; n < ev_flash->size(); n++) {
+      // Get MC QCluster list-- declared here for adding in light path
+      // Fills _q_cluster_v inside MCQCluster
+      std::vector<flashana::QCluster_t> qcluster_v;
+      std::vector<flashana::MCSource_t> source_v;
+
+      _mcqclustering.Construct(*ev_mctrack, *ev_mcshower);
+      _mcqclustering.Swap(std::move(qcluster_v), std::move(source_v));
+
+
+      for (auto const& s : source_v) {
+
+        if (s.g4_time == ::flashana::kINVALID_DOUBLE) {
+          print(msg::kWARNING, __FUNCTION__, Form("Found unknown QCluster MC source (G4 T=%g)", s.g4_time));
+          continue;
+        }
+
+        //  Need to check that the qcluster we're dealing with has greater than
+        //  2 energy dep points.
+        bool good = true;
+        for (auto const& q : qcluster_v) {
+          if (q.idx == s.index_id) {
+            if (q.size() < 2 || q.idx == -1) {
+              good = false;
+              break;
+            }
+          }
+        }
+
+        if ( good ) {
+          _t0 = s.g4_time;
+          _n_pe = 0;
+          _int_e = s.energy_deposit;
+
+          for (auto const & h : *ev_hit ) {
+            if (h.PeakTime() > (_t0 / 1000. - 10.) && h.PeakTime() < (_t0 / 1000. + 10.))
+              _n_pe += h.PE();
+          } // end looping over all hits for this interaction
+
+          _int_tree->Fill();
+        }
+      } // end looping over all MC source
+      //}//else
+
+
+  for (size_t n = 0; n < ev_flash->size(); n++) {
 
       auto const& flash = ev_flash->at(n);
 
@@ -392,6 +495,7 @@ namespace larlite {
     */
     auto const res = _mgr.Match();
 
+
     std::cout << "UBT0Finder::analyze(): Number of flashes, qclusters, matches is " << ev_flash->size() << ", " << _interaction_algo.QClusters().size() << ", " << res.size() << std::endl;
     
     ::geoalgo::LineSegment line;
@@ -412,7 +516,8 @@ namespace larlite {
 
       if (_use_mc || _photon_bomb) {
 
-//	std::cout<<"Match things...: "<<match.tpc_id<<", and size of ev_mctrk : "<<ev_mctrack->size()<<std::endl ;
+//  std::cout<<"Match things...: "<<match.tpc_id<<", and size of ev_mctrk : "<<ev_mctrack->size()<<std::endl ;
+
 
 	if (_use_mc)
 	  {
@@ -448,6 +553,15 @@ namespace larlite {
 	      _time_diff->Fill(1000 * (_flash_time - 0 )); //
 
 
+        auto const& mct = (*ev_mctrack)[match.tpc_id];
+        _mc_time = mct[0].T() * 1.e-3;
+
+        // std::cout<<"mc and flash time for match : "<<_mc_time<<", "<<_flash_time<<std::endl;
+
+        if (_mc_time < -2050 || _mc_time > 2750)
+          continue;
+
+
 	//        double min_dist = 1e12;
         pt[0] = _tpc_x;
         pt[1] = _tpc_y;
@@ -458,7 +572,7 @@ namespace larlite {
         //for (size_t i = 0; i < mct.size() - 1; ++i) {
         //  auto const& step1 = mct[i];
         //  auto const& step2 = mct[i + 1];
-	//  std::cout<<"Step x y z: "<<step2.X()<<", "<<step2.Y()<<", "<<step2.Z()<<std::endl ;
+        //  std::cout<<"Step x y z: "<<step2.X()<<", "<<step2.Y()<<", "<<step2.Z()<<std::endl ;
         //  line.Start(step1.X(), step1.Y(), step1.Z());
         //  line.End(step2.X(), step2.Y(), step2.Z());
         //  auto const closest_pt = geoalg.ClosestPt(line, pt);
@@ -474,6 +588,10 @@ namespace larlite {
         //  if (step1.X() > max_x) max_x = step1.X();
         //}
         //_mc_dx = max_x - min_x;
+//        if ( mct[0].E() - mct[mct.size() - 1].E() > _e_diff )
+       
+
+
 
       }
 
@@ -548,10 +666,10 @@ namespace larlite {
       _fout->cd();
       _time_diff->GetXaxis()->SetTitle("Delta T [ns]" );
 
-      auto eligible_matches = _int_tree->GetEntries("_t0>-2050000 && _t0 < 2750000") ;
+      auto eligible_matches = _int_tree->GetEntries(); //"_t0>-2050000 && _t0 < 2750000") ;
 
       std::cout << "\nEfficiency (#matches/#interactions)  : " << float(_flashmatch_tree->GetEntries()) / eligible_matches * 100 << "%, (" << _flashmatch_tree->GetEntries() << "/" << eligible_matches << ")" << std::endl;
-      std::cout << "Correctness (#good matches/#matches) : " << _time_diff->Integral(8, 24) / _flashmatch_tree->GetEntries() * 100 << "%, (" << _time_diff->Integral(8, 24) << "/" << _flashmatch_tree->GetEntries() << ")" << std::endl;
+      std::cout << "Correctness (#good matches/#matches) : " << float(_time_diff->Integral(1, 80)) / _flashmatch_tree->GetEntries() * 100 << "%, (" << _time_diff->Integral(1, 80) << "/" << _flashmatch_tree->GetEntries() << ")" << std::endl;
 
 
       _flashmatch_tree->Write();
@@ -567,6 +685,6 @@ namespace larlite {
     }
     return true;
   }
-
 }
+
 #endif

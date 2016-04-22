@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import ROOT
+ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 import argparse
 import sys
@@ -14,7 +16,7 @@ def sigintHandler(*args):
     sys.exit()
 
 def main():
-    parser = argparse.ArgumentParser(description='Python based event display.')
+    parser = argparse.ArgumentParser(description='Python based event display for live ub data.  Only draws raw data.')
     parser.add_argument('file', nargs='*', help="Optional input file to use")
 
     args = parser.parse_args()

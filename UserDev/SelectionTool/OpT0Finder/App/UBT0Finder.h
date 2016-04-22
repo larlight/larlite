@@ -71,11 +71,17 @@ namespace larlite {
 
     void SetStepLength(double step){ _step_len = step ; }
 
+    void UseLightPathWithMC (bool yesOrNo ){ _use_light_path_w_mc = yesOrNo ; } 
 
   protected:
 
     ::flashana::FlashMatchManager _mgr;
+    ::flashana::MCQCluster _mcqclustering;
     ::flashana::MCQCluster _interaction_algo;
+
+
+    //Switch -- if set to true, Light path will be used with mctrack
+    bool _use_light_path_w_mc;
 
     // readout start : 
     // time before the trigger when the RO start
@@ -113,6 +119,7 @@ namespace larlite {
     
     TTree* _flashmatch_tree;
     double _npe;
+    double _npetot;
     int _tpcID;
     int _event;
     double _npts;
@@ -134,7 +141,10 @@ namespace larlite {
     std::vector<double> _mc_trajx;
     std::vector<double> _mc_trajy;
     std::vector<double> _mc_trajz;
-
+    std::vector<double> _g4_pe;
+    std::vector<float> _mc_calc_pe;
+    double _g4pesum;
+    double _mcpesum;
 
     std::string _photlib_tree_config;
     TTree* _photlib_tree;

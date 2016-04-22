@@ -16,7 +16,6 @@
 
 #include <iostream>
 #include <TFile.h>
-#include "CMTool/CMToolBase/CMatchManager.h"
 #include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
 #include "ShowerRecoException.h"
 #include "ShowerRecoAlgBase.h"
@@ -54,26 +53,21 @@ public:
   void Reset();
 
   /**
-   * @brief Reconstruct shower w/ matching: return is a matched cluster association
+   * @brief Reconstruct showers
    */
-  ClusterAss_t Reconstruct (const std::vector<::cluster::cluster_params >& clusters,
-                            std::vector< ::showerreco::Shower_t>& showers);
-
-  /**
-   * @brief Reconstruct shower w/ matching
-   */
-  void Reconstruct (const std::vector<::cluster::cluster_params >& clusters,
-                    const ClusterAss_t& ass,
-                    std::vector< ::showerreco::Shower_t>& showers);
-
-  /// Access to MatchManager
-  ::cmtool::CMatchManager& MatchManager() { return *fMatchMgr; }
+  void Reconstruct (std::vector< ::showerreco::Shower_t>& showers);
 
   /// Finalize: provide TFile access so that anything that needs to be stored can be stored
   void Finalize(TFile* fout = nullptr);
 
   // initalize function
   void Initialize();
+
+  /**
+     @brief set clusters for the current event
+   */
+  void SetProtoShowers(const std::vector< ::showerreco::ProtoShower >& proto_showers)
+  { _proto_showers = proto_showers; }
 
 
 private:
@@ -84,23 +78,13 @@ private:
   /// Shower analysis code
   std::vector< ::showerreco::ShowerAnaBase* > _ana_v;
 
-  /// Cluster matching code
-  ::cmtool::CMatchManager *fMatchMgr;
-
   void Process(const ClusterAss_t& ass,
                std::vector< ::showerreco::Shower_t >& showers);
 
-  ::cluster::DefaultParamsAlg _params_alg;
+  // vector of input clusters to be used for reconstruction
+  std::vector< ::showerreco::ProtoShower > _proto_showers;
 
-  // stopwatch for time-profiling
-  TStopwatch _watch;
-  // keep track of number of calls
-  double _matching_times;
-  double _matching_calls;
-  double _CPAN_times;
-  double _CPAN_calls;
 
-  ::larlite::storage_manager * _storage;
 
 };
 }

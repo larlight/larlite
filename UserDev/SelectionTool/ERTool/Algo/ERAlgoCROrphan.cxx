@@ -55,7 +55,7 @@ namespace ertool {
                                 part.Vertex(),
                                 part.Momentum(),
                                 part.RecoScore(),
-                                kCosmicOrphan);
+                                kCosmic);
           /// (don't) set the particle as primary
           // graph.SetPrimary(id);
           /// (don't) set the parent to the nearest cosmic primary,
@@ -105,7 +105,7 @@ namespace ertool {
                               part.Vertex(),
                               part.Momentum(),
                               part.RecoScore(),
-                              kCosmicOrphan);
+                              kCosmic);
       }
     }
     return true;

@@ -52,6 +52,7 @@ my_unit.UseMC(True)
 my_unit.SetROStart(-3200.)
 my_unit.SetROEnd(3200.)
 my_unit.SetTrigTime(0.)
+my_unit.UseLightPathWithMC(False)
 my_proc.add_process(my_unit)
 
 # TPC Filter Algo
@@ -63,6 +64,7 @@ my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
 # Hypothesis Algo
 my_unit.Manager().SetAlgo(flashana.PhotonLibHypothesis())
 # Match Algo
+
 #my_unit.Manager().SetAlgo( flashana.LLMatch.GetME() )
 my_unit.Manager().SetAlgo( flashana.QLLMatch.GetME() )
 #my_unit.Manager().SetAlgo( flashana.QWeightPoint()   )
@@ -71,7 +73,6 @@ my_unit.Manager().SetAlgo( flashana.QLLMatch.GetME() )
 #
 # Other algorithms
 #
-
 #my_unit.Manager().AddCustomAlgo( flashana.LightPath() )
 
 my_unit.Manager().Configure( "%s/SelectionTool/OpT0Finder/App/mac/flashmatch.fcl" % os.environ['LARLITE_USERDEVDIR'])
@@ -81,13 +82,13 @@ print  "Finished configuring ana_processor. Start event loop!"
 print
 
 # Let's run it.
-#my_proc.run()
+my_proc.run()
 ev = ROOT.std.vector("int")()
 #ev.push_back(int(904))
 ev.push_back(int(905))
 #ev.push_back(int(907))
 
-my_proc.run_events(ev)
+#my_proc.run_events(ev)
 #my_proc.run(0,4)
 
 

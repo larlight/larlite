@@ -93,7 +93,6 @@ namespace flashana {
         }
 
         FillEstimate(_var_trk, _hypothesis);
-        FillTree(_var_trk);
 	OOBCheck(_var_trk, _hypothesis, _measurement);
 
         if (_normalize) {

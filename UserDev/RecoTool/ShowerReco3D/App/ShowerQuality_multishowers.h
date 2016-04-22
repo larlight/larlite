@@ -121,9 +121,12 @@ namespace larlite {
     /// Best plane id
     TH1D *hBestPlane;
 
+    /// event variables
+    int _event, _subrun, _run;
+
     /// For convenience: struct to define a set of parameters per shower to be stored in TTree
     struct TreeParams_t {
-      
+
       double reco_x, reco_y, reco_z;
       double reco_dcosx, reco_dcosy, reco_dcosz;
       double reco_energy;
@@ -136,7 +139,7 @@ namespace larlite {
       double reco_dedx_Y;
       int    best_plane_id;
 
-      double mc_x, mc_y, mc_z;
+      double mc_x, mc_y, mc_z, mc_t;
       double mc_dcosx, mc_dcosy, mc_dcosz;
       double mc_energy;
       int    mc_pdgid;

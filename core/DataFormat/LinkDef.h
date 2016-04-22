@@ -10,6 +10,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class std::vector<std::vector<float> >+;
+#pragma link C++ class std::vector<std::vector<double> >+;
 
 #pragma link C++ class std::pair<size_t,size_t>+;
 #pragma link C++ class std::pair<unsigned short,string>+;
@@ -170,6 +171,13 @@
 #pragma link C++ class std::vector<larlite::simch>+;
 #pragma link C++ class larlite::event_simch+;
 
+#pragma link C++ class larlite::auxide+;
+#pragma link C++ class larlite::auxsimch+;
+#pragma link C++ class std::vector<larlite::auxide>+;
+#pragma link C++ class std::map<UShort_t,larlite::auxsimch>+;
+#pragma link C++ class std::vector<larlite::auxsimch>+;
+#pragma link C++ class larlite::event_auxsimch+;
+
 #pragma link C++ class treenode+;
 
 #pragma link C++ class larlite::trigger+;
@@ -201,6 +209,13 @@
 #pragma link C++ class larlite::simphotons+;
 #pragma link C++ class std::vector<larlite::simphotons>+;
 #pragma link C++ class larlite::event_simphotons+;
+
+#pragma link C++ class larlite::mucsdata+;
+#pragma link C++ class std::vector<larlite::mucsdata>+;
+#pragma link C++ class larlite::event_mucsdata+;
+#pragma link C++ class larlite::mucsreco+;
+#pragma link C++ class std::vector<larlite::mucsreco>+;
+#pragma link C++ class larlite::event_mucsreco+;
 
 #pragma link C++ class larlite::storage_manager+;
 

@@ -31,6 +31,8 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 # call the common GNUmakefile
 LDFLAGS += $(shell larlite-config --libs)
 LDFLAGS += $(shell recotool-config --libs)
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_Cluster3DRecoUtil
+LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_Cluster3DRecoUtilAlg
 LDFLAGS += -L.
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE
 

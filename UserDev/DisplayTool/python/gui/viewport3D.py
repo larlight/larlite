@@ -20,6 +20,7 @@ class viewport3D(gl.GLViewWidget):
     super(viewport3D, self).__init__()
     # add a view box, which is a widget that allows an image to be shown
     # add an image item which handles drawing (and refreshing) the image
+    self.setBackgroundColor((50,50,50,255))
     self._geometry = geometry
     gy = gl.GLGridItem()
     gy.scale(0.1*self._geometry.length(),0.1*self._geometry.length(),0.1*self._geometry.length())
@@ -48,15 +49,15 @@ class viewport3D(gl.GLViewWidget):
     # print self.cameraPosition()
 
 
+
     # self.pan(0,0,self._geometry.length())
     self.show()
 
   def setCenter(self, center):
     if len(center) != 3:
         return
-    self.opts['center'][0] = center[0]
-    self.opts['center'][1] = center[1]
-    self.opts['center'][2] = center[2]
+    cVec = QtGui.QVector3D(center[0],center[1],center[2])
+    self.opts['center'] = cVec
     self.update()
 
 
@@ -112,23 +113,30 @@ class viewport3D(gl.GLViewWidget):
     if pos is not None:
         # Convert to relative coordinates to always leave the world center as the center point
         worldCenter = self.opts['center']
-        X = pos[0] - worldCenter[0]
-        Y = pos[1] - worldCenter[1]
-        Z = pos[2] - worldCenter[2]
+        # Check the type:
+        if type(worldCenter) is QtGui.QVector3D:
+            X = pos[0] - worldCenter.x()
+            Y = pos[1] - worldCenter.y()
+            Z = pos[2] - worldCenter.z()
+        else:
+            X = pos[0] - worldCenter[0]
+            Y = pos[1] - worldCenter[1]
+            Z = pos[2] - worldCenter[2]
+
         distance = X**2 + Y**2 + Z**2
         distance = math.sqrt(distance)
         if X != 0:
-            azimuth = math.atan(Y/X)
+            azimuth = math.atan2(Y,X)
         else:
             azimuth = math.pi
             if Y < 0:
                 azimuth = -1 * azimuth
         if distance != 0:
-            elevation = math.acos(Z / distance)
+            elevation = math.asin(Z / distance)
         else:
             elevation = math.copysign(Z)
-        azimuth *= 180/math.pi
-        elevation *= 180/math.pi
+        azimuth *= 180./math.pi
+        elevation *= 180./math.pi
         self.setCameraPosition(distance=distance,elevation=elevation,azimuth=azimuth)
 
 

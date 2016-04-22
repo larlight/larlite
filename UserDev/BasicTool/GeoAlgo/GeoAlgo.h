@@ -19,6 +19,7 @@
 #include "GeoHalfLine.h"
 #include "GeoLineSegment.h"
 #include "GeoTrajectory.h"
+#include "GeoCone.h"
 #include "GeoAABox.h"
 #include "GeoSphere.h"
 

@@ -2,7 +2,7 @@
  * \file LinearEnergy.h
  *
  * \ingroup ModularAlgo
- * 
+ *
  * \brief Class def header for a class LinearEnergy
  *
  * @author david caratelli
@@ -25,27 +25,27 @@
  */
 namespace showerreco {
 
-  class LinearEnergy : ShowerRecoModuleBase{
+class LinearEnergy : ShowerRecoModuleBase {
 
-  public:
+public:
 
     /// Default constructor
     LinearEnergy();
 
     /// Default destructor
-    ~LinearEnergy(){}
+    ~LinearEnergy() {}
 
-    void do_reconstruction(const ShowerClusterSet_t &, Shower_t &);
+    void do_reconstruction(const ProtoShower &, Shower_t &);
 
     void SetUseArea(bool on) { _useArea = on; }
 
     void SetUseModBox(bool on) { _useModBox = on; }
-    
+
     void SetFillTree(bool on) { _fill_tree = on; }
 
     void initialize();
 
-  private:
+private:
 
     /// Calorimetry algorithm
     ::calo::CalorimetryAlg _caloAlg;
@@ -55,7 +55,7 @@ namespace showerreco {
 
     /// flag to decide if to use the ModBox or Birks models
     bool _useModBox;
-    
+
     /// boolean on whether to fill tree or not
     bool _fill_tree;
 
@@ -78,9 +78,9 @@ namespace showerreco {
     std::vector<double> _dQ_v;
     int _pl;
 
-  };
-  
+};
+
 } // showerreco
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group

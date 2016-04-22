@@ -48,7 +48,9 @@ namespace larlite{
 				   fProcess(orig.fProcess),
 				   fStart(orig.fStart),
 				   fEnd(orig.fEnd),
-				   fMotherPDGCode(orig.fMotherPDGCode),
+                                   fdQdx(orig.fdQdx),
+                                   fdEdx(orig.fdEdx),
+                                   fMotherPDGCode(orig.fMotherPDGCode),
 				   fMotherTrackID(orig.fMotherTrackID),
 				   fMotherProcess(orig.fMotherProcess),
 				   fMotherStart(orig.fMotherStart),
@@ -69,6 +71,9 @@ namespace larlite{
     const std::string&  Process  () const;
     const mcstep&       Start    () const;
     const mcstep&       End      () const;
+    const std::vector< std::vector<double> >& dQdx() const;  // dQdx[# of MCSteps - 1][# of plane]
+    const std::vector<double>& dEdx() const; // dEdx[# of MCSteps - 1]
+
 
     int                MotherPdgCode () const;
     unsigned int       MotherTrackID () const;
@@ -89,6 +94,9 @@ namespace larlite{
     void Process         ( std::string name ) { fProcess   = name;   }
     void Start           ( const mcstep s   ) { fStart   = s;        }
     void End             ( const mcstep s   ) { fEnd     = s;        }
+    void dEdx            ( const std::vector<double> s) { fdEdx = s;}
+    void dQdx            ( const std::vector<std::vector<double> > s) { fdQdx = s;}
+
 
     void MotherPdgCode   ( int id               ) { fMotherPDGCode  = id; }
     void MotherTrackID   ( unsigned int id      ) { fMotherTrackID  = id; }
@@ -102,10 +110,9 @@ namespace larlite{
     void AncestorStart     ( const mcstep& s      ) { fAncestorStart   = s;  }
     void AncestorEnd       ( const mcstep& s      ) { fAncestorEnd     = s;  }
 
-    double   dEdx(const SegmentID_t id) const;
-    double   dX  (const SegmentID_t id) const ;
-    const std::vector<double> dEdx()    const;
-   
+    //    double   dEdx(const SegmentID_t id) const;
+    //    double   dX  (const SegmentID_t id) const ;
+    //    const std::vector<double> dEdx()    const;   
     const std::vector<TLorentzVector>  SegmentCenter() const;
 
 
@@ -118,6 +125,8 @@ namespace larlite{
     std::string    fProcess;   ///< Creation process of this track particle
     mcstep         fStart;     ///< G4 start position/momentum of this track particle
     mcstep         fEnd;       ///< G4 end position/momentum of this track particle
+    std::vector<std::vector<double> > fdQdx; //< the G4 electron yeild at each wire plane between each step
+    std::vector<double> fdEdx;//< the G4 energy loss between each step
 
     int            fMotherPDGCode;   ///< This particle's mother's PDG code
     unsigned int   fMotherTrackID;   ///< This particle's mother's G4 track ID

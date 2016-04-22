@@ -89,6 +89,9 @@ namespace larlite{
       kTrackMomentum,      ///< track momentum
       kOpDetWaveform,      ///< optical detector waveform
       kSimPhotons,         ///< sim::SimPhotons
+      kMuCSData,           ///< MuCS::MuCSData
+      kMuCSReco,           ///< MuCS::MuCSReco
+      kAuxDetSimChannel,   ///< sim::AuxDetSimChannel
       kDATA_TYPE_MAX       ///< Event-wise enum boundary
     };
 
@@ -144,7 +147,10 @@ namespace larlite{
       "fmatch",
       "trackmom",
       "opdigit",
-      "simphotons"
+      "simphotons",
+      "mucsdata",
+      "mucsreco",
+      "auxsimch"
     };
 
     const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {

@@ -18,8 +18,6 @@ namespace ertool {
 
   void ERAlgoTrackPid::AcceptPSet(const ::fcllite::PSet& cfg)
   {
-    // Load singleE params
-    //_alg_emp.AcceptPSet(cfg);
 
     return;
   }
