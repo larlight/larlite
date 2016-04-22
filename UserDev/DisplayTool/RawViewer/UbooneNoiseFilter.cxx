@@ -240,7 +240,12 @@ bool UbooneNoiseFilter::is_chirping(float * _data_arr,
                                     int N,
                                     unsigned int wire,
                                     unsigned int plane) {
-  return false;
+  // Run through the chirp filter stuff here.
+  // 
+  
+  // This function comes first, and determines if the waveform is chirping or not.
+  _chirp_filter.ChirpFilterAlg(_data_arr, N);
+  
 }
 
 

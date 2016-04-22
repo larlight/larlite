@@ -8,8 +8,10 @@ namespace ub_noise_filter {
 
 
 
-void ChirpFilter::ChirpFilterAlg(float * wf, int numTicks)
+bool ChirpFilter::ChirpFilterAlg(float * wf, int numTicks)
 {
+
+  _current_chirp_info = chirp_info();
 
   int counter = 0;
   float ADCval;
@@ -111,6 +113,10 @@ void ChirpFilter::ChirpFilterAlg(float * wf, int numTicks)
       ///////////////////////////////////////////////
       // Set channel status to "MID-CHIRPING" here //
       ///////////////////////////////////////////////
+      _current_chirp_info.chirp_start = firstLowRMSBin;
+      _current_chirp_info.chirp_stop = lastLowRMSBin;
+      _current_chirp_info.chirp_frac = chirpFrac;
+
     }
 
     for (int i = 0; i < numTicks; i++)
@@ -120,9 +126,11 @@ void ChirpFilter::ChirpFilterAlg(float * wf, int numTicks)
         wf[i] = 10000.0;
       }
     }
+  } else{
+    return false;
   }
 
-  return;
+  return true;
 }
 
 void ChirpFilter::ZigzagFilterAlg(float * wf, int numTicks)

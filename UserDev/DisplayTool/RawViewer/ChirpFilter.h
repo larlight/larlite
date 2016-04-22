@@ -58,9 +58,9 @@ namespace ub_noise_filter {
 class chirp_info {
 
 public:
-  unsigned int _chirp_multiplicity;
-  std::vector<unsigned int> _transition_ticks;
-  bool _start_section_is_chirping;
+  size_t chirp_start;
+  size_t chirp_stop;
+  float chirp_frac;
 };
 
 
@@ -75,18 +75,23 @@ public:
   /// Default destructor
   ~ChirpFilter() {}
 
-  void ChirpFilterAlg(float * wf, int numTicks);
+  bool ChirpFilterAlg(float * wf, int numTicks);
   void ZigzagFilterAlg(float * wf, int numTicks);
 
   void RawAdaptiveBaselineAlg(float * wf, int numTicks);
   void RemoveChannelFlags(float * wf, int numTicks);
 
+  chirp_info & get_current_chirp_info() {return _current_chirp_info;}
+
 private:
+
   const int windowSize = 20;
   const float chirpMinRMS = 0.90;
   const float chirpMinRMS2 = 0.66;
   const float maxNormalNeighborFrac = 0.20;
 
+
+  chirp_info _current_chirp_info;
 
 };
 

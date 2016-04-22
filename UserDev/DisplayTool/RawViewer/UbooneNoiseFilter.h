@@ -214,6 +214,9 @@ private:
   const float _lowRMS_cutoff = 0.8*0.8;
   const float _highRMS_cutoff = 20.0*20.0;
 
+  // This is the chirping removal algorithm:
+  ChirpFilter _chirp_filter;
+
   
 
   // All of the detector properties are encapsulated in this object
