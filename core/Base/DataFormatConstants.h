@@ -155,7 +155,7 @@ namespace larlite{
       "mucsdata",
       "mucsreco",
       "PiZeroROI",
-      "auxsimch"
+      "auxsimch",
       "chstatus"
     };
 
