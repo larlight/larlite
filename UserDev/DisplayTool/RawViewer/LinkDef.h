@@ -19,8 +19,10 @@
 #pragma link C++ class evd::DrawUbSwiz+;
 #pragma link C++ class ub_noise_filter::NoiseFilter+;
 #pragma link C++ class ub_noise_filter::ChirpFilter+;
+#pragma link C++ class CorrelatedNoiseFilter+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 
