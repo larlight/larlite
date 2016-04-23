@@ -133,14 +133,18 @@ protected:
     //Detprofile energy of the FIRST (for now, only) mcshower
     // double mcs_E;
     // double mc_containment;
+    double PerfectRecoERecoThetaPi0Mass;
+    double RecoEPerfectRecoThetaPi0Mass;
     double PerfectRecoPi0Mass;
     double PerfectRecoE1;
     double PerfectRecoE2;
     double PerfectRecoCosTheta;
+    double PerfectRecoTheta;
     double RecoPi0Mass;
     double RecoE1;
     double RecoE2;
     double RecoCosTheta;
+    double RecoTheta;
 
   } fEventTreeParams;
 

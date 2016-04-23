@@ -50,6 +50,10 @@ bool Pi0Mass::analyze(storage_manager* storage) {
   _run    = storage->run_id();
   _subrun = storage->subrun_id();
 
+  if ( ev_mcs->size() > 2 ) {
+    print(msg::kWARNING, __FUNCTION__, Form("Run %d, subrun %d, event %d has %d mc showers!", _run, _subrun, _event, ev_mcs->size() ) );
+  }
+
   // Before getting the reconstructed showers, we store some true (mcshower) information
   // to be used as the denominator in efficiency calculations (n reco showers / n true showers, etc)
   fEventTreeParams.n_mcshowers = ev_mcs->size();
@@ -74,7 +78,8 @@ bool Pi0Mass::analyze(storage_manager* storage) {
                             ev_mcs->at(0).Start().Pz() / ev_mcs->at(0).Start().E() );
   }
 
-  fEventTreeParams.PerfectRecoCosTheta = cos( PerfectRecoDir1.Angle( PerfectRecoDir2 ) );
+  fEventTreeParams.PerfectRecoTheta = PerfectRecoDir1.Angle( PerfectRecoDir2 );
+  fEventTreeParams.PerfectRecoCosTheta = cos( fEventTreeParams.PerfectRecoTheta );
   fEventTreeParams.PerfectRecoPi0Mass = sqrt( 2.*fEventTreeParams.PerfectRecoE1*fEventTreeParams.PerfectRecoE2* ( 1. - fEventTreeParams.PerfectRecoCosTheta ) );
   // fEventTreeParams.mcs_E = ev_mcs->at(0).DetProfile().E();
   // fEventTreeParams.mc_containment = ev_mcs->at(0).DetProfile().E() / ev_mcs->at(0).Start().E();
@@ -170,13 +175,18 @@ bool Pi0Mass::analyze(storage_manager* storage) {
 
   std::cout << "E1: " << E1 << ", E2: " << E2 << std::endl;
 
-  CosTheta = cos( shower1.Direction().Angle( shower2.Direction() ) );
+  fEventTreeParams.RecoTheta = shower1.Direction().Angle( shower2.Direction() );
+  CosTheta = cos( fEventTreeParams.RecoTheta );
 
 
   fEventTreeParams.RecoE1 = E1;
   fEventTreeParams.RecoE2 = E2;
   fEventTreeParams.RecoCosTheta = CosTheta;
   fEventTreeParams.RecoPi0Mass = sqrt( 2.*E1*E2* ( 1. - CosTheta) );
+
+  fEventTreeParams.PerfectRecoERecoThetaPi0Mass = sqrt( 2.*fEventTreeParams.PerfectRecoE1*fEventTreeParams.PerfectRecoE2*( 1. - CosTheta ) );
+
+  fEventTreeParams.RecoEPerfectRecoThetaPi0Mass = sqrt( 2.*E1*E2* fEventTreeParams.PerfectRecoCosTheta );
 
 //Fill the once-per-event TTree
   fEventTree->Fill();
@@ -324,14 +334,18 @@ void Pi0Mass::InitializeAnaTrees()
   fEventTree->Branch("n_mcshowers", &fEventTreeParams.n_mcshowers, "n_mcshowers/I");
   // fEventTree->Branch("mcs_E", &fEventTreeParams.mcs_E, "mcs_E/D");
   // fEventTree->Branch("mc_containment", &fEventTreeParams.mc_containment, "mc_containment/D");
+  fEventTree->Branch("PerfectRecoERecoThetaPi0Mass", &fEventTreeParams.PerfectRecoERecoThetaPi0Mass, "PerfectRecoERecoThetaPi0Mass/D");
+  fEventTree->Branch("RecoEPerfectRecoThetaPi0Mass", &fEventTreeParams.RecoEPerfectRecoThetaPi0Mass, "RecoEPerfectRecoThetaPi0Mass/D");
   fEventTree->Branch("PerfectRecoPi0Mass", &fEventTreeParams.PerfectRecoPi0Mass, "PerfectRecoPi0Mass/D");
   fEventTree->Branch("PerfectRecoE1", &fEventTreeParams.PerfectRecoE1, "PerfectRecoE1/D");
   fEventTree->Branch("PerfectRecoE2", &fEventTreeParams.PerfectRecoE2, "PerfectRecoE2/D");
   fEventTree->Branch("PerfectRecoCosTheta", &fEventTreeParams.PerfectRecoCosTheta, "PerfectRecoCosTheta/D");
+  fEventTree->Branch("PerfectRecoTheta", &fEventTreeParams.PerfectRecoTheta, "PerfectRecoTheta/D");
   fEventTree->Branch("RecoPi0Mass", &fEventTreeParams.RecoPi0Mass, "RecoPi0Mass/D");
   fEventTree->Branch("RecoE1", &fEventTreeParams.RecoE1, "RecoE1/D");
   fEventTree->Branch("RecoE2", &fEventTreeParams.RecoE2, "RecoE2/D");
   fEventTree->Branch("RecoCosTheta", &fEventTreeParams.RecoCosTheta, "RecoCosTheta/D");
+  fEventTree->Branch("RecoTheta", &fEventTreeParams.RecoTheta, "RecoTheta/D");
 }
 /*
 void Pi0Mass::ResetShowerTreeParams() {
@@ -367,14 +381,18 @@ void Pi0Mass::ResetEventTreeParams() {
   fEventTreeParams.n_recoshowers = 0;
   // fEventTreeParams.mcs_E = -1.;
   // fEventTreeParams.mc_containment = -1.;
+  fEventTreeParams.PerfectRecoERecoThetaPi0Mass = 0.;
+  fEventTreeParams.RecoEPerfectRecoThetaPi0Mass = 0.;
   fEventTreeParams.PerfectRecoPi0Mass = 0.;
   fEventTreeParams.PerfectRecoE1 = 0.;
   fEventTreeParams.PerfectRecoE2 = 0.;
-  fEventTreeParams.PerfectRecoCosTheta = 0.;
+  fEventTreeParams.PerfectRecoCosTheta = -2.;
+  fEventTreeParams.PerfectRecoTheta = -1000.;
   fEventTreeParams.RecoPi0Mass = 0.;
   fEventTreeParams.RecoE1 = 0.;
   fEventTreeParams.RecoE2 = 0.;
-  fEventTreeParams.RecoCosTheta = 0.;
+  fEventTreeParams.RecoCosTheta = -2.;
+  fEventTreeParams.RecoTheta = -1000.;
 }
 
 
