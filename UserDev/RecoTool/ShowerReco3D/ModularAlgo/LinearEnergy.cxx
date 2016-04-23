@@ -31,6 +31,10 @@ LinearEnergy::LinearEnergy()
   _shp_time  = 2.; // in usec
   _asic_gain = 7.8; // in mV/fC
   _gain_U = _gain_V = _gain_Y = 1.;
+  // MCC7 v05_08 gains
+  _gain_U = (1-0.127)/0.69;
+  _gain_V = (1-0.076)/0.70;
+  _gain_Y = (1-0.169)/0.64;
   
   return;
 }
@@ -82,7 +86,7 @@ void LinearEnergy::initialize()
   return;
 }
 
-void LinearEnergy::do_reconstruction(const ProtoShower & proto_shower,
+void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_shower,
                                      Shower_t& resultShower) {
 
   //if the module does not have 2D cluster info -> fail the reconstruction

@@ -11,7 +11,7 @@
 #include "DataFormat/seed.h"
 #include "DataFormat/vertex.h"
 
-namespace showerreco {
+namespace protoshower {
 
 ProtoShowerAlgClusterParams::ProtoShowerAlgClusterParams() {
 
@@ -21,7 +21,18 @@ ProtoShowerAlgClusterParams::ProtoShowerAlgClusterParams() {
 
 }
 
-void ProtoShowerAlgClusterParams::SetClusterParamsAlg(::cluster::ClusterParamsAlg * _new_params_alg) {
+ProtoShowerAlgClusterParams::~ProtoShowerAlgClusterParams() {
+  if (_params_alg) {
+    delete _params_alg;
+  }
+  if (_params3D_alg) {
+    delete _params3D_alg;
+  }
+}
+
+
+void ProtoShowerAlgClusterParams::SetClusterParamsAlg(
+  ::cluster::ClusterParamsAlg * _new_params_alg) {
 
   if (_params_alg) {
     delete _params_alg;
@@ -31,7 +42,8 @@ void ProtoShowerAlgClusterParams::SetClusterParamsAlg(::cluster::ClusterParamsAl
   return;
 }
 
-void ProtoShowerAlgClusterParams::SetCluster3DParamsAlg(::cluster3D::Cluster3DParamsAlg * _new_params3D_alg) {
+void ProtoShowerAlgClusterParams::SetCluster3DParamsAlg(
+  ::cluster3D::Cluster3DParamsAlg * _new_params3D_alg) {
 
   if (_params3D_alg) {
     delete _params3D_alg;
@@ -41,10 +53,11 @@ void ProtoShowerAlgClusterParams::SetCluster3DParamsAlg(::cluster3D::Cluster3DPa
   return;
 }
 
-void ProtoShowerAlgClusterParams::GenerateProtoShower(::larlite::storage_manager* storage,
-    ::larlite::event_pfpart* ev_pfpart,
-    const size_t proto_shower_pfpart,
-    showerreco::ProtoShower & proto_shower)
+void ProtoShowerAlgClusterParams::GenerateProtoShower(
+  ::larlite::storage_manager* storage,
+  ::larlite::event_pfpart* ev_pfpart,
+  const size_t proto_shower_pfpart,
+  protoshower::ProtoShower & proto_shower)
 {
 
 
@@ -63,7 +76,10 @@ void ProtoShowerAlgClusterParams::GenerateProtoShower(::larlite::storage_manager
 
   // Try to get the clusters if they are there
   ::larlite::event_cluster * ev_clust = nullptr;
-  auto const& ass_cluster_v = storage->find_one_ass(ev_pfpart->id(), ev_clust, ev_pfpart->name());
+  auto const& ass_cluster_v
+    = storage->find_one_ass(ev_pfpart->id(),
+                            ev_clust,
+                            ev_pfpart->name());
 
   if (ev_clust and (ev_clust->size() != 0) ) {
 
@@ -100,7 +116,8 @@ void ProtoShowerAlgClusterParams::GenerateProtoShower(::larlite::storage_manager
 
       // fill 2D information, if available
       for (size_t i = 0; i < cluster_v.size(); i++) {
-        _cru_helper.GenerateParams( cluster_hits_v_v[i], proto_shower._params.at( i ) );
+        _cru_helper.GenerateParams( cluster_hits_v_v[i],
+                                    proto_shower._params.at( i ) );
         _params_alg->FillParams( proto_shower._params.at( i ) );
       }// for all input clusters
 
@@ -122,7 +139,10 @@ void ProtoShowerAlgClusterParams::GenerateProtoShower(::larlite::storage_manager
 
   // Get any possible spacepoints
   larlite::event_spacepoint * ev_sps = nullptr;
-  auto const& ass_sps_v = storage->find_one_ass(ev_pfpart->id(), ev_sps, ev_pfpart->name());
+  auto const& ass_sps_v
+    = storage->find_one_ass(ev_pfpart->id(),
+                            ev_sps,
+                            ev_pfpart->name());
 
   if (ev_sps and (ev_sps->size() != 0) ) {
     // fill vector fo spacepoints to be passed on to algorithm
@@ -153,7 +173,10 @@ void ProtoShowerAlgClusterParams::GenerateProtoShower(::larlite::storage_manager
 
   // Do the vertex:
   larlite::event_vertex * ev_vertex = nullptr;
-  auto const& ass_vertex_v = storage->find_one_ass(ev_pfpart->id(), ev_vertex, ev_pfpart->name());
+  auto const& ass_vertex_v
+    = storage->find_one_ass(ev_pfpart->id(),
+                            ev_vertex,
+                            ev_pfpart->name());
 
   if (ev_vertex and (ev_vertex->size() != 0) ) {
     // fill vertices, if any associated

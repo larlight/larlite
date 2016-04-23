@@ -23,16 +23,16 @@
 #include "DataFormat/seed.h"
 #include "DataFormat/vertex.h"
 
-#include "ShowerReco3D/Base/ShowerRecoTypes.h"
+#include "ProtoShower.h"
 
-#include "ShowerReco3D/ProtoShower/ProtoShowerAlgBase.h"
+#include "ProtoShowerAlgBase.h"
 
 /**
    \class ProtoShowerHelper
    User defined class ProtoShowerHelper ... these comments are used to generate
    doxygen documentation!
  */
-namespace showerreco {
+namespace protoshower {
 
 class ProtoShowerHelper {
 
@@ -42,17 +42,17 @@ public:
   ProtoShowerHelper();
 
   /// Default destructor
-  ~ProtoShowerHelper() {}
+  ~ProtoShowerHelper();
 
   // From the storage manager, and with the pfpart producer name, generate
   // a vector of all the protoshowers in the event.
   void GenerateProtoShowers(::larlite::storage_manager* storage,
                             const std::string &pfpart_producer_name,
-                            std::vector<::showerreco::ProtoShower> & proto_showers,
+                            std::vector<::protoshower::ProtoShower> & proto_showers,
                             std::vector<unsigned int> showerLikePFParts = std::vector<unsigned int>(1, 999999));
 
   // set algorithm to use to create ProtoShowers from LArLite data-products
-  void setProtoShowerAlg(ProtoShowerAlgBase *alg) { _proto_shower_alg = alg; }
+  void setProtoShowerAlg(ProtoShowerAlgBase *alg);
 
 private:
 
@@ -61,7 +61,7 @@ private:
 
 };
 
-} // showerreco
+} // protoshower
 
 
 #endif

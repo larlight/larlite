@@ -40,7 +40,7 @@ namespace showerreco {
     void Reset() { ShowerRecoAlgBase::Reset(); }
 
     /// Function to reconstruct a shower
-    Shower_t RecoOneShower(const ProtoShower & );
+    Shower_t RecoOneShower(const ::protoshower::ProtoShower & );
 
     /// Function to decide if to use Area or Pulse Amplitude for calculations
     void SetUseArea(bool on) { fUseArea = on; }

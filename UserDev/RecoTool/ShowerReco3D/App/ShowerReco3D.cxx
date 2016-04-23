@@ -137,7 +137,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   // Now use ProtoShowerHelper to generate the ProtoShowers:
 
-  std::vector<showerreco::ProtoShower> proto_showers;
+  std::vector<protoshower::ProtoShower> proto_showers;
 
 
   _ps_helper.GenerateProtoShowers( storage,

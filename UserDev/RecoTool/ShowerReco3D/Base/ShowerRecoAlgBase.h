@@ -44,7 +44,7 @@ public:
   virtual void Reset() = 0;
 
   /// Function to reconstruct one shower
-  virtual Shower_t RecoOneShower(const ProtoShower & proto_shower) = 0;
+  virtual Shower_t RecoOneShower(const ::protoshower::ProtoShower & proto_shower) = 0;
 
   /// Verbosity switch
   void Verbose(bool on = true);

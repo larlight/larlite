@@ -36,7 +36,7 @@ public:
   ~OtherStartPoint3D() {}
 
   /// Inherited/overloaded function from ShowerRecoModuleBase
-  void do_reconstruction(const ProtoShower &, Shower_t &);
+  void do_reconstruction(const ::protoshower::ProtoShower &, Shower_t &);
 
   /// Pass center point-- you have initDist
   std::vector<TVector3> calculatePoints(const TVector3 & centerPoint,

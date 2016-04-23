@@ -62,8 +62,9 @@ namespace larlite {
   class event_mucsdata;
   class event_mucsreco;
   class event_auxsimch;
-  class event_chstatus;
+  //class event_chstatus;
 }
+#include "chstatus.h"
 
 namespace larlite {
   /**

@@ -16,10 +16,10 @@
 
 #include <iostream>
 #include "DataFormat/storage_manager.h"
-#include "ShowerReco3D/Base/ShowerRecoException.h"
+// #include "ShowerReco3D/Base/ShowerRecoException.h"
 
 
-#include "ShowerReco3D/Base/ShowerRecoTypes.h"
+#include "ProtoShower.h"
 
 /**
    \class ProtoShowerAlgBase
@@ -27,7 +27,7 @@
    doxygen documentation!
  */
 
-namespace showerreco {
+namespace protoshower {
 
 class ProtoShowerAlgBase {
 
@@ -42,7 +42,7 @@ public:
   virtual void GenerateProtoShower(::larlite::storage_manager* storage,
                                    ::larlite::event_pfpart* ev_pfpart,
                                    const size_t proto_shower_pfpart,
-                                   showerreco::ProtoShower & proto_shower) = 0;
+                                   protoshower::ProtoShower & proto_shower) = 0;
 
 
   std::string name() { return _name; }

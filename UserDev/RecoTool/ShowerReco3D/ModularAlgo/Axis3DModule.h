@@ -66,7 +66,7 @@ public:
     ~Axis3DModule() {}
 
 
-    void do_reconstruction(const ProtoShower &, Shower_t &);
+    void do_reconstruction(const ::protoshower::ProtoShower &, Shower_t &);
 
     /**
      * @brief Set the value of maximum number of iterations per shower

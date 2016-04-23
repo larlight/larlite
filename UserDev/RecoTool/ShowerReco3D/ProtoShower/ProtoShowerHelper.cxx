@@ -3,11 +3,27 @@
 
 #include "ProtoShowerHelper.h"
 
-namespace showerreco {
+namespace protoshower {
 
 ProtoShowerHelper::ProtoShowerHelper()
   : _proto_shower_alg(nullptr)
 {}
+
+ProtoShowerHelper::~ProtoShowerHelper() {
+  if (_proto_shower_alg) {
+    delete _proto_shower_alg;
+  }
+}
+
+
+void ProtoShowerHelper::setProtoShowerAlg(ProtoShowerAlgBase *alg) {
+  if (_proto_shower_alg) {
+    delete _proto_shower_alg;
+  }
+  _proto_shower_alg = alg;
+}
+
+
 
 // From the storage manager, and with the pfpart producer name, generate
 // a vector of all the protoshowers in the event.
@@ -83,6 +99,6 @@ void ProtoShowerHelper::GenerateProtoShowers(::larlite::storage_manager* storage
   return;
 }
 
-} // showerreco
+} // protoshower
 
 #endif
