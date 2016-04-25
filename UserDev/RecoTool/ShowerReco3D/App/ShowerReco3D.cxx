@@ -11,8 +11,9 @@ namespace larlite {
 ShowerReco3D::ShowerReco3D() : ana_base()
 {
   _name = "ShowerReco3D";
-  fInputProducer  = "fuzzycluster";
-  fOutputProducer = "showerreco";
+  fInputProducer   = "fuzzycluster";
+  fOutputProducer  = "showerreco";
+  _require_shrlike = true;
 }
 
 bool ShowerReco3D::initialize() {
@@ -68,7 +69,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   unsigned int index = 0;
   for (auto & part : *ev_pfpart) {
-    if (part.PdgCode() == 11) {
+    if ( (part.PdgCode() == 11) || (!_require_shrlike) ) {
       showerLikePFParts.push_back(index);
     }
     index ++;

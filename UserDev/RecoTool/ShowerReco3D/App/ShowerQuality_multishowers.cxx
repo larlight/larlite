@@ -327,22 +327,22 @@ bool ShowerQuality_multishowers::analyze(storage_manager* storage) {
       double max_mcq = 0;
       for (shower_index = 0; shower_index < shower_mcq_vv.size(); ++shower_index) {
 
-	std::cout << "Found MC shower w/" <<  shower_mcq_vv[shower_index][mcs_index] << std::endl;
+	//std::cout << "Found MC shower w/" <<  shower_mcq_vv[shower_index][mcs_index] << std::endl;
         if (shower_mcq_vv[shower_index][mcs_index] > max_mcq){
 	  max_mcq = shower_mcq_vv[shower_index][mcs_index];
           best_index = shower_index;
 	}
 
       }
-      std::cout << "Max Q : " << max_mcq << std::endl << std::endl;
+      //std::cout << "Max Q : " << max_mcq << std::endl << std::endl;
 
       if (best_index == shower_mcq_vv.size()) {
-        print(msg::kERROR, __FUNCTION__,
-              Form("Failed to find a corresponding shower for MCShower %d", mc_index_v[mcs_index])
-             );
-        continue;
+	// fill quality info only for MC shower
+	FillQualityInfo(mc_shower);
+        //print(msg::kERROR, __FUNCTION__,"Failed to find a corresponding shower for MCShower");
+	continue;
       }
-
+      
       reco_shower = (*ev_shower)[best_index];
 
       FillQualityInfo(reco_shower, mc_shower, best_index, mcs_index, max_mcq, ass_cluster_v);
@@ -362,12 +362,10 @@ bool ShowerQuality_multishowers::analyze(storage_manager* storage) {
 
       for (size_t mcs_index = 0; mcs_index < mc_index_v.size(); ++mcs_index) {
 
-	std::cout << "Found MC shower w/" <<  shower_mcq_vv[shower_index][mcs_index] << std::endl;
         if ( shower_mcq_vv[shower_index][mcs_index] > max_mcq){
 	  max_mcq = shower_mcq_vv[shower_index][mcs_index];
           best_index = mcs_index;
 	}
-	std::cout << "Largest Q is " << max_mcq << std::endl;
       }
 
       if (best_index == mc_index_v.size()) {
@@ -552,18 +550,53 @@ bool ShowerQuality_multishowers::finalize() {
 
   hBestPlane->Fill(fTreeParams.best_plane_id);
 
+    // reco match?
+  fTreeParams.match = 1;
+
   // Fill Tree
   fTree->Fill();
 
 }
 
-void ShowerQuality_multishowers::InitializeAnaTree()
-{
-  if (fTree) delete fTree;
 
-  fTree = new TTree("fShowerQualityTree", "");
-
-  // event information
+  
+  void ShowerQuality_multishowers::FillQualityInfo(const mcshower& mc_shower) {
+    
+    // MC Info
+    fTreeParams.mc_x = mc_shower.DetProfile().X();
+    fTreeParams.mc_y = mc_shower.DetProfile().Y();
+    fTreeParams.mc_z = mc_shower.DetProfile().Z();
+    fTreeParams.mc_t = mc_shower.DetProfile().T();
+    
+    fTreeParams.mc_q    = mc_shower.Charge(2);
+    
+    fTreeParams.mc_energy = mc_shower.DetProfile().E();
+    fTreeParams.mc_pdgid  = mc_shower.PdgCode();
+    fTreeParams.mc_containment = mc_shower.DetProfile().E() / mc_shower.Start().E();
+    
+    fTreeParams.mc_dcosx = mc_shower.Start().Px() / mc_shower.Start().E();
+    fTreeParams.mc_dcosy = mc_shower.Start().Py() / mc_shower.Start().E();
+    fTreeParams.mc_dcosz = mc_shower.Start().Pz() / mc_shower.Start().E();
+    
+    
+    // reco match?
+    fTreeParams.match = 0;
+    
+    // Fill Tree
+    fTree->Fill();
+    
+  }
+  
+  
+  
+  
+  void ShowerQuality_multishowers::InitializeAnaTree()
+  {
+    if (fTree) delete fTree;
+    
+    fTree = new TTree("fShowerQualityTree", "");
+    
+    // event information
   fTree->Branch("event",&_event,"event/I");
   fTree->Branch("run",&_run,"run/I");
   fTree->Branch("subrun",&_subrun,"subrun/I");
@@ -610,6 +643,8 @@ void ShowerQuality_multishowers::InitializeAnaTree()
   fTree->Branch("match_correctness", &fTreeParams.match_correctness, "match_correctness/D");
   fTree->Branch("cluster_eff", &fTreeParams.cluster_eff, "cluster_eff/D");
   fTree->Branch("cluster_pur", &fTreeParams.cluster_pur, "cluster_pur/D");
+
+  fTree->Branch("match",&fTreeParams.match,"match/I");
 
 }
 

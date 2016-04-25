@@ -81,6 +81,9 @@ namespace larlite {
 			 const double& mcq,
 			 const AssSet_t& ass_cluster_v);
 
+    // Function to fill TTree (when MCShower info only is available)
+    void FillQualityInfo(const mcshower& mc_shower);
+
 
     // boolean to decide if to fill the tree once per MC shower
     // or once per RECO shower
@@ -148,6 +151,9 @@ namespace larlite {
       double reco_dedx_V;
       double reco_dedx_Y;
       int    best_plane_id;
+
+      // is there a reconstructed match?
+      int    match;
 
       double mc_x, mc_y, mc_z, mc_t;
       double mc_q, mc_q_bt;

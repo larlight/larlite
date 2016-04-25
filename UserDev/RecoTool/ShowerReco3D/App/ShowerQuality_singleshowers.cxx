@@ -190,6 +190,7 @@ void ShowerQuality_singleshowers::FillQualityInfo(const shower& reco_shower, con
   fShowerTreeParams.reco_width1 = reco_shower.Width()[0];
   fShowerTreeParams.reco_width2 = reco_shower.Width()[1];
 
+  fShowerTreeParams.match = 1;
 
   // Fill Tree
   fShowerTree->Fill();
@@ -246,6 +247,7 @@ void ShowerQuality_singleshowers::InitializeAnaTrees()
   fShowerTree->Branch("reco_width2",&fShowerTreeParams.reco_width2,"reco_width2/D");
   fShowerTree->Branch("mc_length",  &fShowerTreeParams.mc_length,  "mc_length/D");
   fShowerTree->Branch("mc_wildlength", &fShowerTreeParams.mc_wildlength, "mc_wildlength/D");
+  fShowerTree->Branch("match", &fShowerTreeParams.match, "match/I");
 
   //////////////////////////////////////////////////////
   // This tree is filled once per event
