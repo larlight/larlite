@@ -71,8 +71,14 @@ namespace larlite {
     // Proto Shower Helper getter
     ::protoshower::ProtoShowerHelper& GetProtoShowerHelper() { return _ps_helper; }
 
+    // Require shower-like PFParticles (i.e. PDG == 11)?
+    void SetRequirePDG11(bool on) { _require_shrlike = on; }
+
 
   protected:
+
+    /// boolean for whether to require PFPArticles to be shower like (i.e. PDG == 11)
+    bool _require_shrlike;
 
     /// Input producer name
     std::string fInputProducer;

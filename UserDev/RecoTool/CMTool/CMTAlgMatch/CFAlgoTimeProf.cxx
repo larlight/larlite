@@ -212,7 +212,7 @@ namespace cmtool {
    if (histo_intb.Integral()) histo_intb.Scale(1./histo_intb.GetBinContent(histo_intb.GetNbinsX()));
    ks = histo_inta.KolmogorovTest(&histo_intb);
 
-   std::cout<<ks<<std::endl;
+   //std::cout<<ks<<std::endl;
    return ks;
  }
 
