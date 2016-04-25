@@ -68,9 +68,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
   unsigned int index = 0;
   for (auto & part : *ev_pfpart) {
-    if (part.PdgCode() == 11) {
+    // if (part.PdgCode() == 11) {
       showerLikePFParts.push_back(index);
-    }
+    // }
     index ++;
   }
 
