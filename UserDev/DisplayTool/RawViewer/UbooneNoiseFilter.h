@@ -17,28 +17,28 @@
  *
  * To do this algorithm quickly, and with flexibility, it goes over the data
  * in multiple passes.  First, it must pedestal subtract each wire or the other
- * noise effects can not be cleanly removed.  In this stage, wires are also 
+ * noise effects can not be cleanly removed.  In this stage, wires are also
  * classified as one of the following:
  *   kNormal   - no observed issues with the wire
  *   kLowRMS   - the wire has lower than expected RMS, indicating problems
  *   kHighRMS  - the wire has higher than expected RMS
  *   kChirping - the wire is observed to be in a chirping state
- * 
+ *
  * For chirping wires, the waveform that is chirping is zeroed while the
  * rest of the waveform is kept in tact.
- * 
+ *
  * Next, it determines the noise waveforms for the correlated noise.  Since
- * this involves a median across a set of ticks, which are not quite in consecutive 
+ * this involves a median across a set of ticks, which are not quite in consecutive
  * memory, this part of the algorithm is the slowest.
- * 
+ *
  * While it is possible to subtract the correlated noise waveforms from the ticks
- * on the fly, this is not done.  Instead we remove the harmonic noise component 
- * from the correlated noise, and then build a correlated noise waveform across 
+ * on the fly, this is not done.  Instead we remove the harmonic noise component
+ * from the correlated noise, and then build a correlated noise waveform across
  * the planes.
- * 
- * Finally, the harmonic noise and the correlated noise are subtracted from the 
+ *
+ * Finally, the harmonic noise and the correlated noise are subtracted from the
  * waveforms, and the filtering can return.
- * 
+ *
  * While this class doesn't save the noise waveforms, pedestals, etc, it does
  * provide access to these metrics for a calling class to save if desired.
  *
@@ -65,16 +65,16 @@
    doxygen documentation!
  */
 
-namespace larlite{
+namespace larlite {
 
-  class detPropFetcher{
+class detPropFetcher {
 
-  public:
+public:
 
-    unsigned int n_wires(unsigned int plane);
-    unsigned int n_planes();
+  unsigned int n_wires(unsigned int plane);
+  unsigned int n_planes();
 
-  };
+};
 
 }
 
@@ -115,7 +115,7 @@ public:
   void set_data(std::vector<std::vector<float> > * _wire_data);
 
   /**
-   * @brief This function activates the noise filter and runs the subroutines 
+   * @brief This function activates the noise filter and runs the subroutines
    *        in the proper way
    * @details See the top of the header file, UbooneNoiseFilter.h, for a detailed
    *          description of the order of noise removal operations
@@ -139,26 +139,25 @@ private:
 
   /**
    * @brief Applying a moving average to this wire.
-   * @details Every bin gets replaced by the average of it and it's 
+   * @details Every bin gets replaced by the average of it and it's
    *          next neighbor.  This essentially downsamples the wire.
-   *          This is targeted to remove zig zag noise, so call it with 
-   *          sample_size = 2.
+   *          This is targeted to remove zig zag noise.
    *          Wire and plane info is used to deal with chirping wires
-   * 
+   *
    * @param _data_arr The array of data to smooth
    * @param N The number of ticks to smooth
    * @param wire The wire number
    * @param plane The plane number
    */
-  void apply_moving_average(float * _data_arr, int N, int wire, int plane, int sample_size = 2);
+  void apply_moving_average(float * _data_arr, int N, int wire, int plane);
 
   /**
    * @brief Calculate the pedestal and it's width
    * @details Calculates the mean of median pedestals.
-   *          This gets the median of ~20 regions of the wire, 
+   *          This gets the median of ~20 regions of the wire,
    *          and takes the mean of them to achieve sub integer
    *          precision.
-   * 
+   *
    * @param _data_arr The wire data
    * @param N Number of ticks in the wire
    * @param wire Wire number
@@ -188,7 +187,7 @@ private:
    * @brief Get the correlation between two vectors of float
    * @details Computes the correlation using the standard method:
    *          C = sum_O^N (x_i - <x>) * (y_i - <y>) / (sigma_x * sigma_y * N)
-   * 
+   *
    * @param r [description]
    * @return [description]
    */
@@ -199,28 +198,28 @@ private:
    * @details The median calculation is a slow task - naively it requires sorting
    *          the data, but that is a very slow process.  Instead, this function
    *          uses std::nth_element to find the median more quickly.
-   *          
+   *
    *          It could be optimized further.
-   * 
+   *
    * @param vals A vector of floating point numbers to find the median for.
    * @return  The median of the input vector.  If the input size is even, this may not
-   *          be a value in the input array   
+   *          be a value in the input array
    */
   float get_median(const std::vector<float> & vals);
 
 
   /**
    * @brief Determine if a waveform is chirping.
-   * @details This function takes an input waveform, _data_arr, 
+   * @details This function takes an input waveform, _data_arr,
    *          and determines if chirping occurs anywhere along it.
    *          If it does, it fills the internal data member _chirp_info_by_plane
-   *          at [plane][wire], while if it's not chirping _chirp_info_by_plane 
+   *          at [plane][wire], while if it's not chirping _chirp_info_by_plane
    *          is not modified.
-   *          
-   *          The pointer to the data is the address of the start of the 
-   *          wire in question.  So, if the wire is chirping, this function will 
+   *
+   *          The pointer to the data is the address of the start of the
+   *          wire in question.  So, if the wire is chirping, this function will
    *          correct the chirping as much as possible
-   * 
+   *
    * @param _data_arr Pointer to array of data.  This points to the internal
    *                  data array so modify with caution.
    * @param N Length of the wire segment, nominally equal to _n_time_ticks.
@@ -231,6 +230,12 @@ private:
    */
   bool is_chirping(float * _data_arr, int N, unsigned int wire, unsigned int plane);
 
+  void rescale_by_rms(float * _data_arr, int N, unsigned int wire, unsigned int plane);
+
+
+  void build_correlated_noise_waveforms(float * _plane_arr, int n_wires, int n_ticks_per_wire, int block_size)
+
+
   /*
   Below are the private data members, many of which can be accessed with getter
   functions.
@@ -238,13 +243,14 @@ private:
 
 private:
 
-  const float _lowRMS_cutoff = 0.8*0.8;
-  const float _highRMS_cutoff = 20.0*20.0;
+  const float _lowRMS_cutoff = 0.4 * 0.4;
+  const float _highRMS_cutoff = 10.0 * 10.0;
 
   // This is the chirping removal algorithm:
   ChirpFilter _chirp_filter;
 
-  
+  // This objects holds the correlated noise waveforms by [plane][wireblock][tick]
+  std::vector<std::vector<std::vector<float> > > correlatedNoiseWaveforms;
 
   // All of the detector properties are encapsulated in this object
   // This allows larlite <-> larsoft transitions to be a little less painful
@@ -263,7 +269,7 @@ private:
   std::vector<std::vector<float> > _rms_by_plane;
 
   // This object contains the chirping info
-  // Since chirping is not really a common occurrence, 
+  // Since chirping is not really a common occurrence,
   // this is store in a map to allow sparseness
   std::vector<std::map<int, ::ub_noise_filter::chirp_info> > _chirp_info_by_plane;
 

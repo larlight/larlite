@@ -112,7 +112,9 @@ void UbooneNoiseFilter::clean_data() {
       // Do the full pedestal subtraction:
       get_pedestal_info(_wire_arr, _n_time_ticks_data, wire, plane);
 
+      apply_moving_average(_wire_arr, _n_time_ticks_data, wire, plane);
 
+      rescale_by_rms(_wire_arr, _n_time_ticks_data, wire, plane);
 
     }
 
@@ -131,24 +133,37 @@ void UbooneNoiseFilter::get_pedestal_info(float * _data_arr, int N, int wire, in
   int start_tick = 0;
   int end_tick = N;
 
+
   if (_chirp_info_by_plane[plane].find(wire) != _chirp_info_by_plane[plane].end()) {
-    // Then this wire is not chirping, use the whole range for pedestal subtraction
-  }
-  else {
     // this wire IS chirping, so only use the good range:
     start_tick = _chirp_info_by_plane[plane][wire].chirp_start;
     end_tick = _chirp_info_by_plane[plane][wire].chirp_stop;
+  }
+  else {
+    // Then this wire is not chirping, use the whole range for pedestal subtraction
+
   }
 
   int total_ticks = end_tick - start_tick;
 
   int n_ranges = total_ticks / min_subrange_n;
 
+  // If there are less than the min number of ticks, set pedestal and rms to zero
+  // and declare this wire dead.
+
+  if (total_ticks < min_subrange_n) {
+    _pedestal_by_plane[plane][wire] = 0.0;
+    _rms_by_plane[plane][wire] = 0.0;
+    _wire_status_by_plane[plane][wire] = kDead;
+    return;
+  }
+
 
   // Loop over the n ranges and sample evenly within each range to
   // accumulate a list of medians
 
   std::vector<float> median_list;
+
 
   for (int i = 0; i < n_ranges; i ++) {
     std::vector<float> _median_accumulator;
@@ -171,8 +186,15 @@ void UbooneNoiseFilter::get_pedestal_info(float * _data_arr, int N, int wire, in
   // Now, take the mean of the medians as the pedestal:
   _pedestal_by_plane[plane][wire] = std::accumulate(median_list.begin(), median_list.end(), 0.0) / (float) n_ranges;
 
+
   // Now, go through and do the pedestal subtraction.
   // Calculate the rms as it goes:
+
+
+  if (_pedestal_by_plane[plane][wire] != _pedestal_by_plane[plane][wire]) {
+    std::cout << "nan encountered in plane " << plane << " on wire " << wire << "!" << std::endl;
+    exit(-1);
+  }
 
   float rms_accumulator = 0;
   int n_rms;
@@ -184,12 +206,12 @@ void UbooneNoiseFilter::get_pedestal_info(float * _data_arr, int N, int wire, in
     // Only take a few hundred points for the rms,
     // and skip around so that they aren't all from the same spot
     if (tick % step_size == 0) {
-      rms_accumulator += _data_arr[tick];
+      rms_accumulator += _data_arr[tick] * _data_arr[tick];
       n_rms ++;
     }
   }
 
-  _rms_by_plane[plane][wire] = rms_accumulator / n_rms;
+  _rms_by_plane[plane][wire] = sqrt(rms_accumulator / n_rms);
 
   // Here, do the cuts on being dead, high RMS, etc.
 
@@ -198,11 +220,80 @@ void UbooneNoiseFilter::get_pedestal_info(float * _data_arr, int N, int wire, in
   }
   if (_rms_by_plane[plane][wire] > _highRMS_cutoff) {
     _wire_status_by_plane[plane][wire] = kHighNoise;
+    // Zero out the wire:
+    for (int tick = start_tick; tick < end_tick; tick ++) {
+      _data_arr[tick] = 0.0;
+    }
   }
 
 
 
 }
+
+
+void UbooneNoiseFilter::rescale_by_rms(float * _data_arr, int N, unsigned int wire, unsigned int plane) {
+
+  // If the wire status is normal or chirping, rescale the wire by the rms to set the RMS to 1.0
+
+
+  if (_wire_status_by_plane[plane][wire] == kNormal) {
+    float scale = 1.0 / _rms_by_plane[plane][wire];
+    for (int tick = 0; tick < N; tick ++) {
+      _data_arr[tick] *= scale;
+    }
+  }
+}
+
+void UbooneNoiseFilter::build_correlated_noise_waveforms(
+  float * _plane_arr,
+  int n_wires,
+  int n_ticks_per_wire,
+  int block_size)
+{
+
+}
+
+
+void UbooneNoiseFilter::apply_moving_average(
+  float * _data_arr,
+  int N,
+  int wire,
+  int plane)
+{
+
+  // // Skip if the wire is dead
+  // if (_wire_status_by_plane[plane][wire] == kDead) {
+  //   return;
+  // }
+
+  int start_tick = 0;
+  int end_tick = N;
+
+
+  if (_chirp_info_by_plane[plane].find(wire) != _chirp_info_by_plane[plane].end()) {
+    // this wire IS chirping, so only use the good range:
+    start_tick = _chirp_info_by_plane[plane][wire].chirp_start;
+    end_tick = _chirp_info_by_plane[plane][wire].chirp_stop;
+  }
+  else {
+    // Then this wire is not chirping, use the whole range for zig zag removal
+
+  }
+
+  // Each bin is replaced by the average of it and the next bin;
+  // Default is 2 bins to remove zig zag noise.
+
+  int i;
+  for (int tick = start_tick; tick < end_tick - 1 ; tick ++) {
+
+    _data_arr[tick] = 0.5 * (_data_arr[tick] + _data_arr[tick + 1]);
+
+  }
+
+
+}
+
+
 
 bool UbooneNoiseFilter::is_chirping(float * _data_arr,
                                     int N,
@@ -217,12 +308,12 @@ bool UbooneNoiseFilter::is_chirping(float * _data_arr,
     _chirp_info_by_plane[plane][wire] = _chirp_filter.get_current_chirp_info();
     _wire_status_by_plane[plane][wire] = kChirping;
     // then this channel is chirping, and we deal with it.
-    _chirp_filter.ZigzagFilterAlg(_data_arr, N);
+    // _chirp_filter.ZigzagFilterAlg(_data_arr, N);
     _chirp_filter.RawAdaptiveBaselineAlg(_data_arr, N);
     _chirp_filter.RemoveChannelFlags(_data_arr, N);
     return true;
   } else {
-    _chirp_filter.ZigzagFilterAlg(_data_arr, N);
+    // _chirp_filter.ZigzagFilterAlg(_data_arr, N);
     return false;
 
   }
