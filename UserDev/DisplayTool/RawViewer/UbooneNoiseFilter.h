@@ -233,7 +233,7 @@ private:
   void rescale_by_rms(float * _data_arr, int N, unsigned int wire, unsigned int plane);
 
 
-  void build_correlated_noise_waveforms(float * _plane_arr, int n_wires, int n_ticks_per_wire, int block_size)
+  void build_correlated_noise_waveforms(float * _plane_arr, int n_wires, int n_ticks_per_wire, int block_size);
 
 
   /*
@@ -245,6 +245,8 @@ private:
 
   const float _lowRMS_cutoff = 0.4 * 0.4;
   const float _highRMS_cutoff = 10.0 * 10.0;
+
+  // const std::vector<int> _correlated_noise_steps = {48,48,96}
 
   // This is the chirping removal algorithm:
   ChirpFilter _chirp_filter;

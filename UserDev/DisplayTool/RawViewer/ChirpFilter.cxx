@@ -91,7 +91,7 @@ bool ChirpFilter::ChirpFilterAlg(float * wf, int numTicks)
 
   if (((normalNeighborFrac < maxNormalNeighborFrac) || ((numLowRMS < 2.0 / maxNormalNeighborFrac) && (lastLowRMSBin - firstLowRMSBin == numLowRMS * windowSize))) && (numLowRMS > 4))
   {
-    firstLowRMSBin = std::max(1, firstLowRMSBin - windowSize);
+    firstLowRMSBin = std::max(0, firstLowRMSBin - windowSize);
     lastLowRMSBin = std::min(numTicks, lastLowRMSBin + 2 * windowSize);
 
     if ((numTicks - lastLowRMSBin) < windowSize)
@@ -107,12 +107,19 @@ bool ChirpFilter::ChirpFilterAlg(float * wf, int numTicks)
       //////////////////////////////////////////////////
       // Set channel status to "DEAD" (LOW-RMS?) here //
       //////////////////////////////////////////////////
+      _current_chirp_info.chirp_start = 0;
+      _current_chirp_info.chirp_stop = numTicks;
+      _current_chirp_info.chirp_frac = chirpFrac;
     }
     else
     {
       ///////////////////////////////////////////////
       // Set channel status to "MID-CHIRPING" here //
       ///////////////////////////////////////////////
+      if ( firstLowRMSBin != 0){
+        lastLowRMSBin = numTicks;
+      }
+      else if (lastLowRMSBin <)
       _current_chirp_info.chirp_start = firstLowRMSBin;
       _current_chirp_info.chirp_stop = lastLowRMSBin;
       _current_chirp_info.chirp_frac = chirpFrac;
@@ -126,7 +133,7 @@ bool ChirpFilter::ChirpFilterAlg(float * wf, int numTicks)
         wf[i] = 10000.0;
       }
     }
-  } else{
+  } else {
     return false;
   }
 

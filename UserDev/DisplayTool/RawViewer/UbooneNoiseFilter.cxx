@@ -87,6 +87,9 @@ void UbooneNoiseFilter::set_n_time_ticks(unsigned int _n_time_ticks) {
 
 void UbooneNoiseFilter::clean_data() {
 
+  // Make sure everything is cleaned up:
+  reset_internal_data();
+
   // This function cleans the data up.
   //
   // First, do pedestal subtraction and determine if the wire is chirping:
@@ -110,16 +113,21 @@ void UbooneNoiseFilter::clean_data() {
                                           plane);
 
       // Do the full pedestal subtraction:
-      get_pedestal_info(_wire_arr, _n_time_ticks_data, wire, plane);
+      // get_pedestal_info(_wire_arr, _n_time_ticks_data, wire, plane);
 
-      apply_moving_average(_wire_arr, _n_time_ticks_data, wire, plane);
+      // apply_moving_average(_wire_arr, _n_time_ticks_data, wire, plane);
 
-      rescale_by_rms(_wire_arr, _n_time_ticks_data, wire, plane);
+      // rescale_by_rms(_wire_arr, _n_time_ticks_data, wire, plane);
 
     }
 
 
   }
+
+  // Print out the chirping info for a known wire:
+  std::cout << "Wire 1696 chirp start: " << _chirp_info_by_plane[1][1696].chirp_start << std::endl;
+  std::cout << "Wire 1696 chirp stop: " << _chirp_info_by_plane[1][1696].chirp_stop << std::endl;
+  std::cout << "Wire 1696 chirp frac: " << _chirp_info_by_plane[1][1696].chirp_frac << std::endl;
 
 
   return;
@@ -244,14 +252,14 @@ void UbooneNoiseFilter::rescale_by_rms(float * _data_arr, int N, unsigned int wi
   }
 }
 
-void UbooneNoiseFilter::build_correlated_noise_waveforms(
-  float * _plane_arr,
-  int n_wires,
-  int n_ticks_per_wire,
-  int block_size)
-{
+// void UbooneNoiseFilter::build_correlated_noise_waveforms(
+//   float * _plane_arr,
+//   int n_wires,
+//   int n_ticks_per_wire,
+//   int block_size)
+// {
 
-}
+// }
 
 
 void UbooneNoiseFilter::apply_moving_average(
