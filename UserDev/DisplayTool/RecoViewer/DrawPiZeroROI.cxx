@@ -54,6 +54,8 @@ bool DrawPiZeroROI::analyze(larlite::storage_manager* storage) {
   //
 
   // get a handle to the ROIs
+
+
   auto roiHandle = storage->get_data<larlite::event_PiZeroROI>(_producer);
 
   // Clear out the hit data but reserve some space for the rois
@@ -95,6 +97,7 @@ bool DrawPiZeroROI::finalize() {
 
 roi2d DrawPiZeroROI::getroi2d(larlite::PiZeroROI roi, unsigned int plane) {
 
+
   //  auto detProp = larutil::DetectorProperties::GetME();
 
   roi2d result;
@@ -120,8 +123,8 @@ roi2d DrawPiZeroROI::getroi2d(larlite::PiZeroROI roi, unsigned int plane) {
   result._pi0minminPoint.t = roi.GetPiZeroTimeROI().at(plane).first;
 
   result._vtxPoint = larutil::Point2D();
-  result._vtxPoint.w = roi.GetVertex().at(plane).first;
-  result._vtxPoint.t = roi.GetVertex().at(plane).second;
+  result._vtxPoint.t = roi.GetVertex().at(plane).first;
+  result._vtxPoint.w = roi.GetVertex().at(plane).second;
     
   result._is_good = true;
   return result;
