@@ -28,12 +28,18 @@ hitremoval.setClusProducer("pandoraNu")
 hitremoval.setVtxProducer("mcroi")
 my_proc.add_process(hitremoval)
 
-my_proc.set_data_to_write(fmwk.data.kHit,"shrlike")
+my_proc.set_data_to_write(fmwk.data.kPiZeroROI,"mcroi")
+my_proc.set_data_to_write(fmwk.data.kVertex,"mcroi")
+my_proc.set_data_to_write(fmwk.data.kAssociation,"mcroi")
+
 my_proc.set_data_to_write(fmwk.data.kHit,"gaushit")
+
+my_proc.set_data_to_write(fmwk.data.kHit,"shrlike")
 my_proc.set_data_to_write(fmwk.data.kCluster,"shrlike")
 my_proc.set_data_to_write(fmwk.data.kAssociation,"shrlike")
+
 my_proc.set_data_to_write(fmwk.data.kCluster,"pandoraNu")
 my_proc.set_data_to_write(fmwk.data.kAssociation,"pandoraNu")
 
-my_proc.run()
+my_proc.run(0,1000)
 sys.exit(0);
