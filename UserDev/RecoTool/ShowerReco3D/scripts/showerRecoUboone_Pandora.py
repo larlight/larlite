@@ -13,6 +13,7 @@ from ROOT import gSystem,TMath
 from larlite import larlite as fmwk
 from larlite import larutil
 from recotool import cmtool, showerreco
+from ROOT import protoshower
 
 from ROOT import calo
 # from recotool.showerDef import DefaultShowerReco3D
@@ -40,9 +41,9 @@ def getShowerRecoAlgModular():
   axis = showerreco.PCA3DAxis()
 
   energy = showerreco.LinearEnergy()
-  energy.SetGainU(1./0.69)
-  energy.SetGainV(1./0.70)
-  energy.SetGainY(1./.64)
+  # energy.SetGainU(1./0.69)
+  # energy.SetGainV(1./0.70)
+  # energy.SetGainY(1./.64)
   energy.SetUseModBox(True)
   energy.setVerbosity(False)
 
@@ -100,17 +101,22 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 
 # Specify analysis output root file name
-my_proc.set_ana_output_file("results/showerRecoUboone_pandoraNu3D_v9_01_ana.root")
+# my_proc.set_ana_output_file("results/showerRecoUboone_pandoraNuMerged3D_v9_ana.root")
+my_proc.set_ana_output_file("test.root")
 # Specify data output root file name
-my_proc.set_output_file("results/showerRecoUboone_pandoraNu3D_v9_01.root")
+# my_proc.set_output_file("results/showerRecoUboone_pandoraNuMerged3D_v9.root")
+my_proc.set_output_file("test.root")
 
 
 ana_unit=DefaultShowerReco3D()
 # set ProtoShower Algo to go from data-products to a ProtoShower object
-protoshoweralg = showerreco.ProtoShowerAlgClusterParams()
+protoshoweralg = protoshower.ProtoShowerAlgClusterParams()
 ana_unit.GetProtoShowerHelper().setProtoShowerAlg( protoshoweralg )
 
-ana_unit.SetInputProducer("pandoraNu")
+# ana_unit.SetInputProducer("pandoraNu")
+ana_unit.SetInputProducer("pandoraNuMerged")
+# ana_unit.SetInputProducer("Mergedgaushit")
+# ana_unit.SetInputProducer("MergedpandoraCosmicKHitRemoval")
 
 ana_unit.SetOutputProducer("showerreco")
 

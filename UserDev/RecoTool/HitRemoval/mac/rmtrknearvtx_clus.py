@@ -41,5 +41,5 @@ my_proc.set_data_to_write(fmwk.data.kAssociation,"shrlike")
 my_proc.set_data_to_write(fmwk.data.kCluster,"pandoraNu")
 my_proc.set_data_to_write(fmwk.data.kAssociation,"pandoraNu")
 
-my_proc.run(0,1000)
+my_proc.run()
 sys.exit(0);

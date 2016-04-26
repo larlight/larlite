@@ -36,9 +36,10 @@ class roi2d(recoBase):
 
         for view in view_manager.getViewPorts():
             # get the showers from the process:
+            thisPlane = view.plane()
             self._drawnObjects.append([])
 
-            roi2ds = self._process.getDataByPlane(view.plane())
+            roi2ds = self._process.getDataByPlane(thisPlane)
 
             i_color = 0
 
@@ -54,6 +55,7 @@ class roi2d(recoBase):
                 points = []
                 pi0points = []
                 vtx = []
+                trkend = []
                 # Remember - everything is in cm, but the display is in
                 # wire/time!
                 geom = view_manager._geometry
@@ -69,6 +71,9 @@ class roi2d(recoBase):
 
                 vx = (roi2d.vtxPoint().w)
                 vy = (roi2d.vtxPoint().t)
+                
+                trkendx = (roi2d.trkendPoint().w)
+                trkendy = (roi2d.trkendPoint().t)
                 
                 points.append(QtCore.QPoint(x1, y1))
                 points.append(QtCore.QPoint(x1, y2))
@@ -95,21 +100,27 @@ class roi2d(recoBase):
 
                 radBigW = 0.5 / view_manager._geometry.wire2cm()
                 radBigT = (0.5) / view_manager._geometry.time2cm()
-                
-                otherPoly = QtGui.QGraphicsEllipseItem(vx-radBigW, vy-radBigT, 20*radBigW, 20*radBigT)
+
+                otherPoly = QtGui.QGraphicsEllipseItem(vx-radBigW, vy-radBigW, 2*radBigW, 2*radBigT)
+                trkEndPoly = QtGui.QGraphicsEllipseItem(trkendx-radBigW, trkendy-radBigW, 2*radBigW, 2*radBigT)
                 #otherPoly = QtGui.QGraphicsEllipseItem( vy-radBigT, vx-radBigW,2*radBigW,2*radBigT)
 
                 #                print "(vx,vy): {},{}".format(vx,vy)
                 
-                otherPoly.setPen(pg.mkPen(pg.mkColor((255, 0, 100, 100)), width = 1))
-                otherPoly.setBrush(pg.mkBrush(pg.mkColor((255, 0, 100, 100))))                
+                otherPoly.setPen(pg.mkPen(pg.mkColor((100, 253, 0, 100)), width = 1))
+                otherPoly.setBrush(pg.mkBrush(pg.mkColor((100, 253, 0, 100))))                
+
+                trkEndPoly.setPen(pg.mkPen(pg.mkColor((255, 0, 100, 100)), width = 1))
+                trkEndPoly.setBrush(pg.mkBrush(pg.mkColor((255, 0, 100, 100))))                
 
                 view._view.addItem(thisPoly)
                 view._view.addItem(pi0Poly)
                 view._view.addItem(otherPoly)
+                view._view.addItem(trkEndPoly)
 
                 self._drawnObjects[view.plane()].append(thisPoly)
                 self._drawnObjects[view.plane()].append(pi0Poly)
                 self._drawnObjects[view.plane()].append(otherPoly)
+                self._drawnObjects[view.plane()].append(trkEndPoly)
 
                 i_color += 1
