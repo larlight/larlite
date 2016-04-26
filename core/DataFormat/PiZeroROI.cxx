@@ -189,6 +189,21 @@ namespace larlite{
     
   }
 
+  void PiZeroROI::SetVertex( const std::vector< std::pair < int, int > > vtx){
+    
+    if(vtx.size() > 3){
+      try{ 
+	throw vtx.size();
+      }
+      catch(int e){
+	std::cout << "Too many vertexes, " << e << std::endl; 
+      }
+    }
+    
+    _vtx = vtx;
+    
+  }
+
   
   std::vector < std::pair <int, int > > PiZeroROI::GetVertex() const { return _vtx; }
 
