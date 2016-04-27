@@ -24,7 +24,7 @@ my_proc.set_output_file(sys.argv[-1])
 
 hitremoval = fmwk.RmTrksNearVtx_fromPFPart()
 hitremoval.setUseMC(False)
-#hitremoval.setPFPartProducer("pandoraCosmic")
+hitremoval.setSaveUnclusteredHits(False)
 
 hitremoval.setPFPartProducer("pandoraNu")
 hitremoval.setVtxProducer("pandoraNu")

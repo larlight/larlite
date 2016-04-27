@@ -11,6 +11,13 @@
 
 namespace larlite {
 
+  RmTrksNearVtx_fromPFPart::RmTrksNearVtx_fromPFPart() {
+    _name="RmTrksNearVtx_fromPFPart";
+    _fout=0;
+    _use_mc = false;
+    _save_unclustered_hits = true;
+  }
+
   bool RmTrksNearVtx_fromPFPart::initialize() {
 
     return true;
@@ -106,6 +113,10 @@ namespace larlite {
       std::cout << "No Hit -> skip event" << std::endl;
       return false;
     }
+    
+    // prepare a list of hit indices to be skipped. We will add all hits in the event
+    // but not these hits, which come from clusters considered "trk-like"
+    std::vector<size_t> hits_tobe_removed;
 
     // loop through PFParticles
     for (size_t pfp_i = 0; pfp_i < ev_pfpart->size(); pfp_i++){
@@ -138,9 +149,16 @@ namespace larlite {
 	    track = true;
 	    break;
 	  }
-	}// for all hits
+	}// for all hits associated to the cluster
+	
+	// if it is track-like, re-loop over hit indices and add them
+	// to lise of to-be-removed hits
+	if ( (track == true) && _save_unclustered_hits ){
+	  for (auto const& hit_idx : ass_hit_idx_v)
+	    hits_tobe_removed.push_back(hit_idx);
+	}
 
-	if (track == false){
+	if ( (track == false) && !_save_unclustered_hits ){
 	  // save hits to output cluster
 	  
 	  for (auto const& ass_clus_idx : ass_clus_idx_v){
@@ -161,6 +179,17 @@ namespace larlite {
       }// for all clusters associated to this PFParticle
       
     }// loop through PFParticles
+
+    // if we are interested in saving all un-clustered hits
+    if (_save_unclustered_hits){
+      
+      for (size_t idx = 0; idx < ev_hit->size(); idx++){
+	
+	if ( std::find(hits_tobe_removed.begin(), hits_tobe_removed.end(), idx) == hits_tobe_removed.end() )
+	  ev_shr_hits->emplace_back( ev_hit->at( idx ) );
+	
+      }// for all hits
+    }// if we want to save unclustered hits
 
     ev_clus_hit_ass->set_association(ev_shr_clus->id(),product_id(data::kHit,ev_hit->name()), shr_clus_hit_ass);    
   

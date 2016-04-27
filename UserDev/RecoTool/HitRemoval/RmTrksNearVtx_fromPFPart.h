@@ -27,7 +27,7 @@ namespace larlite {
   public:
 
     /// Default constructor
-    RmTrksNearVtx_fromPFPart(){ _name="RmTrksNearVtx_fromPFPart"; _fout=0;}
+    RmTrksNearVtx_fromPFPart();
 
     /// Default destructor
     virtual ~RmTrksNearVtx_fromPFPart(){}
@@ -43,6 +43,7 @@ namespace larlite {
     void setROIProducer(std::string s)  { _roi_producer = s;  }
 
     void setUseMC(bool on) { _use_mc = on; }
+    void setSaveUnclusteredHits(bool on) { _save_unclustered_hits = on; }
 
   protected:
 
@@ -54,6 +55,7 @@ namespace larlite {
     std::vector<double> vtx_t_cm;
 
     bool _use_mc;
+    bool _save_unclustered_hits;
     
   };
 }
