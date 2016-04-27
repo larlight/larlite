@@ -42,6 +42,7 @@ namespace evd {
 
     }
 
+  // Loop over the clusters and fill the necessary vectors.
     // grab pf particle
     auto ev_pfpart = storage->get_data<larlite::event_pfpart>(_producer);
 

@@ -133,6 +133,8 @@ ana_unit.SetInputProducer("ImageClusterHit")
 
 ana_unit.SetOutputProducer("showerreco")
 
+#my_proc.enable_event_alignment(False)
+    
 my_proc.add_process(ana_unit)
 
 print
@@ -140,7 +142,7 @@ print  "Finished configuring ana_processor. Start event loop!"
 print
 
 my_proc.run()
-# my_proc.process_event(2)
+#my_proc.process_event(2)
 
 
 
