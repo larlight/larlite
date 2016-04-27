@@ -131,16 +131,28 @@ protected:
     int n_mcshowers;
     int n_recoshowers;
     //Detprofile energy of the FIRST (for now, only) mcshower
-    // double mcs_E;
-    // double mc_containment;
+    double mcs_E1;
+    double mcs_E2;
+    double mc_containment1;
+    double mc_containment2;
+    double PerfectRecoERecoThetaPi0Mass;
+    double RecoEPerfectRecoThetaPi0Mass;
     double PerfectRecoPi0Mass;
     double PerfectRecoE1;
     double PerfectRecoE2;
     double PerfectRecoCosTheta;
+    double PerfectRecoTheta;
     double RecoPi0Mass;
     double RecoE1;
     double RecoE2;
     double RecoCosTheta;
+    double RecoTheta;
+    double mc_reco_anglediff1;
+    double mc_reco_anglediff2;
+    // double shower1MatchedDir;
+    // double shower2MatchedDir;
+    // int notMatchedShower1;
+    // int notMatchedShower2;
 
   } fEventTreeParams;
 

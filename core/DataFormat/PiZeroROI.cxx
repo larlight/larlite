@@ -12,7 +12,7 @@ namespace larlite{
     _pi0_wire_range.clear();
     _pi0_t_range.clear();
     _vtx.clear();
-    
+    _trk_end.clear();
   }
   
   PiZeroROI::PiZeroROI(const std::vector < std::pair< int, int > > Wire,
@@ -174,6 +174,21 @@ namespace larlite{
     _pi0_t_range = PiZeroTime;
   }
   
+  void PiZeroROI::SetTrackEnd( const std::vector< std::pair < int, int > > trk_end){
+    
+    if(trk_end.size() > 3){
+      try{ 
+	throw trk_end.size();
+      }
+      catch(int e){
+	std::cout << "Too many track endneseses, " << e << std::endl; 
+      }
+    }
+    
+    _trk_end = trk_end;
+    
+  }
+
   void PiZeroROI::SetVertex( const std::vector< std::pair < int, int > > vtx){
     
     if(vtx.size() > 3){
@@ -181,15 +196,18 @@ namespace larlite{
 	throw vtx.size();
       }
       catch(int e){
-	std::cout << "Too many vertices, " << e << std::endl; 
+	std::cout << "Too many vertexes, " << e << std::endl; 
       }
     }
     
     _vtx = vtx;
     
   }
+
   
   std::vector < std::pair <int, int > > PiZeroROI::GetVertex() const { return _vtx; }
+
+  std::vector < std::pair <int, int > > PiZeroROI::GetTrackEnd() const { return _trk_end; }
     
   std::vector < std::pair< int, int > > PiZeroROI::GetWireROI() const { return _wire_range; }
   
