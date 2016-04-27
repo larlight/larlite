@@ -27,7 +27,7 @@ namespace larlite {
   public:
 
     /// Default constructor
-    RmTrksNearVtx_fromClus(){ _name="RmTrksNearVtx_fromClus"; _fout=0;}
+    RmTrksNearVtx_fromClus(){ _name="RmTrksNearVtx_fromClus"; _fout=0; _use_mc = false;}
 
     /// Default destructor
     virtual ~RmTrksNearVtx_fromClus(){}
@@ -40,14 +40,20 @@ namespace larlite {
 
     void setClusProducer(std::string s) { _clus_producer = s; }
     void setVtxProducer(std::string s)  { _vtx_producer = s;  }
+    void setROIProducer(std::string s)  { _roi_producer = s;  }
+
+    void setUseMC(bool on) { _use_mc = on; }
 
   protected:
 
     std::string _clus_producer;
     std::string _vtx_producer;
+    std::string _roi_producer;
 
     std::vector<double> vtx_w_cm;
     std::vector<double> vtx_t_cm;
+
+    bool _use_mc;
     
   };
 }

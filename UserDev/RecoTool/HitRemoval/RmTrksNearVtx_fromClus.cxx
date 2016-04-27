@@ -6,6 +6,7 @@
 #include "DataFormat/cluster.h"
 #include "DataFormat/hit.h"
 #include "DataFormat/vertex.h"
+#include "DataFormat/PiZeroROI.h"
 #include "LArUtil/GeometryHelper.h"
 
 namespace larlite {
@@ -30,8 +31,11 @@ namespace larlite {
     auto *ev_clus_hit_ass = storage->get_data<event_ass>("shrlike");
     std::vector<std::vector<unsigned int> > shr_clus_hit_ass;
 
-    // grab vtx to be used
+    // grab vtx to be used (when using MC)
     auto *ev_vtx = storage->get_data<event_vertex>(_vtx_producer);
+
+    // grab Pi0ROI to be used for vtx (when using RECO)
+    auto *ev_roi = storage->get_data<event_PiZeroROI>(_roi_producer);
 
     storage->set_id(storage->run_id(), storage->subrun_id(), storage->event_id());
 
@@ -41,9 +45,13 @@ namespace larlite {
       return false;
     }
 
-
-    if ( !ev_vtx or (ev_vtx->size() == 0) ){
+    if ( ( !ev_vtx or (ev_vtx->size() == 0) ) and _use_mc ){
       std::cout << "No Vertex -> return" << std::endl;
+      return false;
+    }
+
+    if ( ( !ev_roi or (ev_roi->size() == 0) ) and !_use_mc ){
+      std::cout << "No Pi0ROI -> return" << std::endl;
       return false;
     }
 
@@ -54,26 +62,35 @@ namespace larlite {
     auto const& w2cm = geom->WireToCm();
     // get t -> cm
     auto const& t2cm = geom->TimeToCm();
+    
+    if (_use_mc){
+      // get vertex position on the various planes (in cm)
+      std::vector<double> xyz(3,0);
+      auto const& vtx = ev_vtx->at(0);
+      xyz = {vtx.X() + 960 * t2cm ,vtx.Y(),vtx.Z()};
+      vtx_w_cm = {0.,0.,0.};
+      vtx_t_cm = {0.,0.,0.};
+      for (size_t pl=0; pl < 3; pl++){
+	auto const& vtx_pl = geom->Point_3Dto2D(xyz,pl);
+	vtx_w_cm[pl] = vtx_pl.w;
+	vtx_t_cm[pl] = vtx_pl.t;
+      }
+    }
+    else{
+      auto const& roi = ev_roi->at(0);
+      vtx_w_cm = {0.,0.,0.};
+      vtx_t_cm = {0.,0.,0.};
+      for (size_t pl=0; pl < 3; pl++){
+	vtx_t_cm[pl] = roi.GetVertex().at(pl).first * t2cm;
+	vtx_w_cm[pl] = roi.GetVertex().at(pl).second * w2cm;
+      }
+    }
 
-    // get vertex position on the various planes (in cm)
-    auto const& vtx = ev_vtx->at(0);
-
-    std::vector<double> xyz = {vtx.X() + 960 * t2cm ,vtx.Y(),vtx.Z()};
-
-    vtx_w_cm = {0.,0.,0.};
-    vtx_t_cm = {0.,0.,0.};
-
-    auto const& vtx_U = geom->Point_3Dto2D(xyz,0);
-    vtx_w_cm[0] = vtx_U.w;
-    vtx_t_cm[0] = vtx_U.t;
-
-    auto const& vtx_V = geom->Point_3Dto2D(xyz,1);
-    vtx_w_cm[1] = vtx_V.w;
-    vtx_t_cm[1] = vtx_V.t;
-
-    auto const& vtx_Y = geom->Point_3Dto2D(xyz,2);
-    vtx_w_cm[2] = vtx_Y.w;
-    vtx_t_cm[2] = vtx_Y.t;
+    /*
+    std::cout << "Vtx U [" << vtx_w_cm[0] << ", " << vtx_t_cm[0] << "].\t"
+	      << "Vtx V [" << vtx_w_cm[1] << ", " << vtx_t_cm[1] << "].\t"
+	      << "Vtx Y [" << vtx_w_cm[2] << ", " << vtx_t_cm[2] << "].\t" << std::endl;
+    */
 
     // get hits associated with the clusters
     larlite::event_hit *ev_hit = nullptr;
@@ -81,7 +98,7 @@ namespace larlite {
 
     // if no hits -> return false
     if ( (!ev_hit) or (ev_hit->size() == 0) ){
-      std::cout << "No Hit -> skip event" << std::endl;
+      std::cout << "No hit associated to cluster " << ev_clus->name() <<  " -> skip event" << std::endl;
       return false;
     }
 
@@ -110,6 +127,7 @@ namespace larlite {
 	
 	if (r < 2){
 	  track = true;
+	  //std::cout << "Found cluster to be removed..." << std::endl;
 	  break;
 	}
       }// for all hits
