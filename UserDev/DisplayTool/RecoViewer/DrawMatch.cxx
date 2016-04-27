@@ -83,7 +83,6 @@ namespace evd {
     _ps_helper.GenerateProtoShowers( storage,
 				     _producer,
 				     proto_showers);
->>>>>>> 20c9660535a8e6259fad67fac96c737be633acd2
 
     // Now, build the evd clusters out of these events.
     int i_pfpart = 0;
