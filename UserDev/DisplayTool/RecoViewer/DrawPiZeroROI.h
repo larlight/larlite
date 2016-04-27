@@ -46,6 +46,7 @@ public:
     larutil::Point2D pi0maxmaxPoint() {return _pi0maxmaxPoint;}
     larutil::Point2D pi0minminPoint() {return _pi0minminPoint;}
     larutil::Point2D vtxPoint() {return _vtxPoint;}
+    larutil::Point2D trkendPoint() {return _trkendPoint;}
     bool is_good() {return _is_good;}
 
     // ALL OF THESE VARIABLES ARE THE PROJECTION INTO THE PLANE
@@ -55,6 +56,7 @@ public:
     larutil::Point2D _pi0minminPoint;   ///< Wire time start point (units in cm)
     larutil::Point2D _pi0maxmaxPoint;   ///< Wire time start point (units in cm)
     larutil::Point2D _vtxPoint;      ///< Wire time start point (units in cm)
+    larutil::Point2D _trkendPoint;      ///< Wire time start point (units in cm)
     bool _is_good;             ///< Whether or not the projection succeeded
 };
 
