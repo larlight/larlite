@@ -25,6 +25,7 @@ namespace ertool {
     twithTrackDir(withTrackDir),
     tprimary_vertex_selection(primary_vertex_selection),
     tshowerproj(showerproj),
+    tshowerdir(false),
     tshower_prox(shower_prox),
     tcpoa_vert_prox(cpoa_vert_prox),
     tcpoa_trackend_prox(cpoa_trackend_prox),
@@ -321,7 +322,7 @@ namespace ertool {
       tcluster_connection.emplace(i, n);
     }
     
-    void AddObject(NodeID_t const n, geoalgo::Point_t const & vert) {
+    void AddShower(NodeID_t const n, geoalgo::Point_t const & vert) {
       tcluster.push_back(n);
       tvertices.push_back(vert);
     }
@@ -421,7 +422,7 @@ namespace ertool {
 
     }
 
-    void AddObject(Int_t const index,
+    void AddShower(Int_t const index,
 		   NodeID_t const n,
 		   geoalgo::Point_t const & vert) {
 	
@@ -434,33 +435,14 @@ namespace ertool {
       std::vector<NodeID_t> const & group = association.GetCluster();
 
       if(std::find(group.begin(), group.end(), n) != group.end()) {
+	std::cout << "NodeID: " << n << " already added\n";
 	return;
       }
 
       tnode_vec.push_back(n);
       tindex_vec.push_back(index);
 
-      association.AddObject(n, vert);
-
-      auto const nv_itb = tnode_vec.begin();
-      auto const nv_ite = tnode_vec.end();
-      
-      for(auto nv_it = nv_itb; nv_it != nv_ite; ++nv_it) {
-	
-	nv_it = std::find(nv_it, nv_ite, n);
-	
-	if(nv_it != nv_ite) {
-	  
-	  Int_t const index_other = tindex_vec.at(nv_it - nv_itb);
-	  
-	  tassociations.at(index_other).AddConnection(index, n);
-	  tassociations.at(index).AddConnection(index_other, n);
-	  
-	}
-	
-	else break;
-	
-      } 
+      association.AddShower(n, vert);
       
     }
 
@@ -948,7 +930,7 @@ namespace ertool {
 
   }
 
-
+  
 
   geoalgo::Point_t const * ERAlgoVertexBuilder::GetMostEnergyPrimary
   (EventData const & data,
@@ -1365,7 +1347,7 @@ namespace ertool {
    ParticleGraph & graph,
    ParticleAssociations & pas) {    
     
-    //tverbose = true;
+    tverbose = true;
 
     if(tverbose) std::cout << "Shower Projection\n";
 
@@ -1405,9 +1387,18 @@ namespace ertool {
 	    continue;
 	  }
 	  
-	  Double_t const dist =
+	  Double_t dist =
 	    findrel.FindClosestApproach(*c2.second, *c.second, temp_vert);
-	  
+
+	  if(tshowerdir) {
+	    Double_t const temp_dist =
+	      findrel.FindClosestApproach(*c2.second, *c.second, temp_vert);
+	    if(temp_dist < dist) {
+	      dist = temp_dist;
+	    }
+
+	  }
+
 	  if(tverbose)
 	    std::cout << "\t\t\tdist: " << dist << " < best-dist: "
 		      << best_dist << " ?\n";
@@ -1475,7 +1466,9 @@ namespace ertool {
 	  ParticleAssociation const & pa = associations.at(i);
 
 	  Double_t const dist =
-	    sqrt(algo.SqDist(pa.GetSphere().Center(), *c.second));
+	    sqrt(algo.SqDist(pa.GetSphere().Center(),
+			     geoalgo::HalfLine(c.second->Start(),
+					       c.second->Dir()*-1)));
 
 	  if(tverbose)
 	    std::cout << "\t\t\tdist: " << dist << " < best-dist: "
@@ -1506,12 +1499,14 @@ namespace ertool {
       if(best_dist >= tshower_prox) {
 	if(tverbose) std::cout << "\t\tyes, return\n";	
 	return;
-      }
+      }      
 
-      if(tverbose) std::cout << "\tindex: " << index << " == -1 ?\n";
-
+      if(tverbose) std::cout << "\tbest_shower_id: " << best_shower_id
+			     << " best_dist: " << best_dist
+			     << "\n\tindex: " << index << " == -1 ?\n";
+      
       if(index == -1) {
-
+	
 	if(tverbose) std::cout << "\t\tyes\n";
 
 	Particle const & p1 = graph.GetParticle(best_shower_id);
@@ -1564,8 +1559,8 @@ namespace ertool {
 	  if(best_association_dist < tcpoa_vert_prox) {
 	    if(tverbose) std::cout << "\t\t\t\tyes, add showers to association: "
 				   << association_index << "\n";	
-	    pas.AddObject(association_index, best_shower_id, best_vert);
-	    pas.AddObject(association_index, best_other_id, best_vert);
+	    pas.AddShower(association_index, best_shower_id, best_vert);
+	    pas.AddShower(association_index, best_other_id, best_vert);
 	  }
 
 	  else {
@@ -1634,8 +1629,8 @@ namespace ertool {
 		  
 		  if(associations.at(index).GetSphere().Center().
 		     Dist(*best_tp) < tstart_prox) {
-		    pas.AddObject(index, best_shower_id, best_vert);
-		    pas.AddObject(index, best_other_id, best_vert);
+		    pas.AddShower(index, best_shower_id, best_vert);
+		    pas.AddShower(index, best_other_id, best_vert);
 		  }
 
 		  else {
@@ -1658,8 +1653,8 @@ namespace ertool {
 		}
 		
 		else {
-		  pas.AddObject(index, best_shower_id, best_vert);	
-		  pas.AddObject(index, best_other_id, best_vert);
+		  pas.AddShower(index, best_shower_id, best_vert);	
+		  pas.AddShower(index, best_other_id, best_vert);
 		}
 
 	      }
@@ -1677,13 +1672,13 @@ namespace ertool {
 		  associations.at(indexb).GetSphere().Center().Dist(best_vert);
 		
 		if(dista < distb) {
-		  pas.AddObject(indexa, best_shower_id, best_vert);	
-		  pas.AddObject(indexa, best_other_id, best_vert);
+		  pas.AddShower(indexa, best_shower_id, best_vert);	
+		  pas.AddShower(indexa, best_other_id, best_vert);
 		}
 
 		else {
-		  pas.AddObject(indexb, best_shower_id, best_vert);	      
-		  pas.AddObject(indexb, best_other_id, best_vert);
+		  pas.AddShower(indexb, best_shower_id, best_vert);	      
+		  pas.AddShower(indexb, best_other_id, best_vert);
 		}		
 
 	      }
@@ -1751,8 +1746,8 @@ namespace ertool {
 
 	      /*
 	      if(best_association_dist < tcpoa_vert_prox) {
-		pas.AddObject(association_index, best_shower_id, best_vert);
-		pas.AddObject(association_index, best_other_id, *point);
+		pas.AddShower(association_index, best_shower_id, best_vert);
+		pas.AddShower(association_index, best_other_id, *point);
 	      }
 	      */	    
 
@@ -1792,14 +1787,15 @@ namespace ertool {
 	      if(otherpoint_dist < point_dist) {
 
 		if(tverbose)
-		  std::cout << "\t\t\t\t\t\tcenter_point_dist: "
+		  std::cout << "\t\t\t\t\t\tyes\n"
+			    << "\t\t\t\t\t\tcenter_point_dist: "
 			    << associations.at(index).GetSphere().Center().Dist(*point)
 			    << " < tstart_prox: " << tstart_prox << " ?\n";	
 
 		if(associations.at(index).GetSphere().Center().
 		   Dist(*point) < tstart_prox) {
 		  if(tverbose) std::cout << "\t\t\t\t\t\t\tyes\n";
-		  pas.AddObject(index, best_shower_id, best_vert);
+		  pas.AddShower(index, best_shower_id, best_vert);
 		}
 
 		else {
@@ -1819,8 +1815,16 @@ namespace ertool {
 
 	      }
 	      
-	      else 
-		pas.AddObject(index, best_shower_id, best_vert);	
+	      else {
+
+		if(tverbose)
+		  std::cout << "\t\t\t\t\t\tno\n"
+			    << "\t\t\t\t\t\tadd id: " << best_shower_id
+			    << " to association: " << index << "\n";
+
+		pas.AddShower(index, best_shower_id, best_vert);	
+	     
+	      }
 
 	    }
 
@@ -1839,12 +1843,12 @@ namespace ertool {
 		associations.at(indexb).GetSphere().Center().Dist(best_vert);
 	      
 	      if(dista < distb)
-		pas.AddObject(indexa,
+		pas.AddShower(indexa,
 			      best_shower_id,
 			      best_vert);	
 	      
 	      else
-		pas.AddObject(indexb,
+		pas.AddShower(indexb,
 			      best_shower_id,
 			      best_vert);	
 
@@ -1858,6 +1862,9 @@ namespace ertool {
 	  }
 	
 	  else {
+
+	    if(tverbose) std::cout << "\t\t\t\tno\n";
+
 	    Particle & p = graph.GetParticle(best_shower_id);
 	    //Ugly way of setting the energy
 	    Double_t energy = 0;
@@ -1877,7 +1884,7 @@ namespace ertool {
       }
 
       else
-	pas.AddObject(index, best_shower_id, best_vert);
+	pas.AddShower(index, best_shower_id, best_vert);
      
       shower_map.erase(best_shower_id);
 
