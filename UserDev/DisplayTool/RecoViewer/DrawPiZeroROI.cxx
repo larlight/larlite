@@ -125,6 +125,11 @@ roi2d DrawPiZeroROI::getroi2d(larlite::PiZeroROI roi, unsigned int plane) {
   result._vtxPoint = larutil::Point2D();
   result._vtxPoint.t = roi.GetVertex().at(plane).first;
   result._vtxPoint.w = roi.GetVertex().at(plane).second;
+
+  result._trkendPoint = larutil::Point2D();
+  result._trkendPoint.t = roi.GetTrackEnd().at(plane).first;
+  result._trkendPoint.w = roi.GetTrackEnd().at(plane).second;
+
     
   result._is_good = true;
   return result;
