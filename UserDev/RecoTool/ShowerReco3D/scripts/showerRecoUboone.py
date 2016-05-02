@@ -86,6 +86,9 @@ def DefaultShowerReco3D():
 
     # Create analysis unit
     ana_unit = fmwk.ShowerReco3D()
+
+    # require PDG == 11 for PFParticles
+    ana_unit.SetRequirePDG11(False)
     
     # Attach shower reco alg
     sralg = getShowerRecoAlgModular()
@@ -120,7 +123,6 @@ my_proc.set_ana_output_file("showerRecoUboone_ana.root")
 my_proc.set_output_file("showerRecoUboone.root")
 
 
-
 ana_unit=DefaultShowerReco3D()
 # set ProtoShower Algo to go from data-products to a ProtoShower object
 protoshoweralg = protoshower.ProtoShowerAlgClusterParams()
@@ -134,6 +136,10 @@ ana_unit.SetInputProducer("timeoverlap")
 ana_unit.SetOutputProducer("showerreco")
 
 my_proc.add_process(ana_unit)
+
+
+my_proc.set_data_to_write(fmwk.data.kShower,      "showerreco")
+my_proc.set_data_to_write(fmwk.data.kAssociation, "showerreco")
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
