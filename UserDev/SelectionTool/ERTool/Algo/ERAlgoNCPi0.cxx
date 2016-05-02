@@ -44,11 +44,14 @@ namespace ertool {
 		_pi0_selected_tree->Branch("_Rvtx_X_S",&_Rvtx_X_S,"vtx_X_S/D");
 		_pi0_selected_tree->Branch("_Rvtx_Y_S",&_Rvtx_Y_S,"vtx_Y_S/D");
 		_pi0_selected_tree->Branch("_Rvtx_Z_S",&_Rvtx_Z_S,"vtx_Z_S/D");
+		_pi0_selected_tree->Branch("_RadL_A",&_RadL_A,"RadL_A_S/D");
+		_pi0_selected_tree->Branch("_RadL_B",&_RadL_B,"RadL_B_S/D");
    // Candidate tree
 		CandTree = new TTree("CandTree","CandTree");
 		CandTree->Branch("Rnshowers",&_Rnshowers,"Rnshowers/I");
 		CandTree->Branch("Candsize",&_Candsize,"Candsize/I");
 //		CandTree->Branch("EDet_B",&_EDet_B,"EDet_B/D");
+		CandTree->Branch("mass_C",&_mass_C,"mass_C/D");
 		CandTree->Branch("C_X",&_C_X,"C_X/D");
 		CandTree->Branch("C_Y",&_C_Y,"C_Y/D");
 		CandTree->Branch("C_Z",&_C_Z,"C_Z/D");
@@ -71,7 +74,7 @@ namespace ertool {
 		auto DetL = larutil::Geometry::GetME()->DetLength();
 	// Algoo that returns a pi0 if there are ONLY two good corelated showers
 	// This would not depend the selection on dEdx
-        ::geoalgo::AABox  volume(0,-116.5,0,256.35,116.5,1036.8);// What are the actual numbers? // fill in with detector properties
+        ::geoalgo::AABox  volume(0,-DetH,0,2.*DetW,DetH,DetL);// fill in with detector properties
 
 	// Storage of the two ID's that pass
         std::vector<std::pair<NodeID_t,NodeID_t>> CandidatePairs;
@@ -85,7 +88,9 @@ namespace ertool {
 	// quick loop to check the number of avaliable showers to use 
         _Anshowers = 0;
         for (auto const& shrID1 : shrIDs){
+		// If they are cosmic showers we can't use them
         	if(graph.GetParticle(shrID1).ProcessType()==kCosmic) continue;
+		// If they are showers from showers 
         	if(graph.GetParticle(shrID1).Descendant()==1) continue;
         	_Anshowers++;	
         }
@@ -225,7 +230,8 @@ namespace ertool {
 				if(momentum[2]/momentum.Length() >_PDZ_max ||momentum[2]/momentum.Length() <_PDZ_min) continue;
 			//####################################
 
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Only important if running cosmic algo's prior to this algo.
 			//+*+*+*+*Cut on assosiated tracks at the vertex 
 			// loop over all cosmics tracks.
 			// first make a sphere of the vertex 
@@ -234,6 +240,7 @@ namespace ertool {
 				bool cosmicass= false;
 				geoalgo::Point_t pi0vpt(vertex[0],vertex[1],vertex[2]);
 			// hard code for now
+			// This should not be seen if no previous cosmic algo's 
 				double _vtxsphere_radius = 5;
 				auto vtxsphere = ::geoalgo::Sphere(pi0vpt, _vtxsphere_radius);
 				auto const& trkIDs = graph.GetParticleNodes(RecoType_t::kTrack);
@@ -248,6 +255,7 @@ namespace ertool {
 				//+*+*+*+*Cut on assosiated tracks at the vertex 
 			// try with long cc
 			bool ccass= false;
+			// hard code needs to fix
 			double _tLencut = 50;
 			for (auto const& tk : trkIDs){
 				if(graph.GetParticle(tk).ProcessType()==kCosmic) continue;
@@ -258,8 +266,9 @@ namespace ertool {
 				if(vtxsphere.Contain(trk_start) && tk1.Length()>_tLencut)  ccass=true;
 				if(vtxsphere.Contain(trk_end) && tk1.Length()>_tLencut)  ccass=true;
 		}// for loop on tracks
-		
 		if(ccass) continue;
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 				// if there is a cosmic track inside the sphere get rid of the event
 				//===========================================
 				// If we make it to here we have passed 
@@ -379,6 +388,7 @@ namespace ertool {
                         _C_X = vertex[0];
                         _C_Y = vertex[1];
                         _C_Z = vertex[2];
+			_mass_C = sqrt(2*_CE_A*_CE_B*(1-cos(_COangle)));
                         CandTree->Fill();
                 }// loop over over CandidatePairs
 
