@@ -27,6 +27,8 @@ algo_pi0.setMinShrEnergy(50.)
 algo_pi0.setMinOpeningAngle(0.3)
 algo_pi0.setMaxEnergyAsy(0.8)
 algo_pi0.setMaxIP(10)
+algo_pi0.setFidXmin(-113)
+algo_pi0.setFidXmax(140)
 
 #my_ana = ertool.ERAnaPi0Chain()
 #my_ana._mode =True # True = Select. False = Fill mode
