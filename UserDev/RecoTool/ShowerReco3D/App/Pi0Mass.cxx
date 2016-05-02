@@ -57,7 +57,7 @@ bool Pi0Mass::analyze(storage_manager* storage) {
   // Before getting the reconstructed showers, we store some true (mcshower) information
   // to be used as the denominator in efficiency calculations (n reco showers / n true showers, etc)
   fEventTreeParams.n_mcshowers = ev_mcs->size();
-  TVector3 PerfectRecoDir1, PerfectRecoDir2;
+  TVector3 PerfectRecoDir1, PerfectRecoDir2, MCStartPoint1, MCStartPoint2;
   if ( ev_mcs->at(0).DetProfile().E() > ev_mcs->at(1).DetProfile().E() ) { 
     fEventTreeParams.PerfectRecoE1 = ev_mcs->at(0).DetProfile().E();
     fEventTreeParams.PerfectRecoE2 = ev_mcs->at(1).DetProfile().E();
@@ -71,6 +71,11 @@ bool Pi0Mass::analyze(storage_manager* storage) {
     fEventTreeParams.mcs_E2 = ev_mcs->at(1).Start().E();
     fEventTreeParams.mc_containment1 = ev_mcs->at(0).DetProfile().E() / ev_mcs->at(0).Start().E();
     fEventTreeParams.mc_containment2 = ev_mcs->at(1).DetProfile().E() / ev_mcs->at(1).Start().E();
+    MCStartPoint1.SetXYZ( ev_mcs->at(0).Start().X(), ev_mcs->at(0).Start().Y(),
+                          ev_mcs->at(0).Start().Z() );
+    MCStartPoint2.SetXYZ( ev_mcs->at(1).Start().X(), ev_mcs->at(1).Start().Y(),
+                          ev_mcs->at(1).Start().Z() );
+
   } else {
     fEventTreeParams.PerfectRecoE1 = ev_mcs->at(1).DetProfile().E();
     fEventTreeParams.PerfectRecoE2 = ev_mcs->at(0).DetProfile().E();
@@ -84,13 +89,17 @@ bool Pi0Mass::analyze(storage_manager* storage) {
     fEventTreeParams.mcs_E2 = ev_mcs->at(0).Start().E();
     fEventTreeParams.mc_containment1 = ev_mcs->at(1).DetProfile().E() / ev_mcs->at(1).Start().E();
     fEventTreeParams.mc_containment2 = ev_mcs->at(0).DetProfile().E() / ev_mcs->at(0).Start().E();
+    MCStartPoint1.SetXYZ( ev_mcs->at(1).Start().X(), ev_mcs->at(1).Start().Y(),
+                          ev_mcs->at(1).Start().Z() );
+    MCStartPoint2.SetXYZ( ev_mcs->at(0).Start().X(), ev_mcs->at(0).Start().Y(),
+                          ev_mcs->at(0).Start().Z() );
   }
 
   fEventTreeParams.PerfectRecoTheta = PerfectRecoDir1.Angle( PerfectRecoDir2 );
   fEventTreeParams.PerfectRecoCosTheta = cos( fEventTreeParams.PerfectRecoTheta );
   fEventTreeParams.PerfectRecoPi0Mass = sqrt( 2.*fEventTreeParams.PerfectRecoE1*fEventTreeParams.PerfectRecoE2* ( 1. - fEventTreeParams.PerfectRecoCosTheta ) );
-  // fEventTreeParams.mcs_E = ev_mcs->at(0).DetProfile().E();
-  // fEventTreeParams.mc_containment = ev_mcs->at(0).DetProfile().E() / ev_mcs->at(0).Start().E();
+  TVector3 MCStartDist = MCStartPoint1 - MCStartPoint2;
+  fEventTreeParams.mc_start_dist = MCStartDist.Mag();
 
   // Retrieve shower data product
   auto ev_shower = storage->get_data<event_shower>(fShowerProducer);
@@ -181,7 +190,7 @@ bool Pi0Mass::analyze(storage_manager* storage) {
   if ( E1 == 0. || E2 == 0. ) return false;
   if ( E1 > 100000. || E2 > 100000. ) return false;
 
-  std::cout << "E1: " << E1 << ", E2: " << E2 << std::endl;
+  // std::cout << "E1: " << E1 << ", E2: " << E2 << std::endl;
 
   fEventTreeParams.RecoTheta = shower1.Direction().Angle( shower2.Direction() );
   CosTheta = cos( fEventTreeParams.RecoTheta );
@@ -199,6 +208,21 @@ bool Pi0Mass::analyze(storage_manager* storage) {
   // The reconstructed showers which match the direction of MCshowers
   fEventTreeParams.mc_reco_anglediff1 = shower1.Direction().Angle( PerfectRecoDir1 );
   fEventTreeParams.mc_reco_anglediff2 = shower2.Direction().Angle( PerfectRecoDir2 );
+
+  TVector3 MCRecoStartDiff1 = shower1.ShowerStart() - MCStartPoint1;
+  TVector3 MCRecoStartDiff2 = shower2.ShowerStart() - MCStartPoint2;
+
+  fEventTreeParams.mc_reco_start_dist1 = MCRecoStartDiff1.Mag();
+  fEventTreeParams.mc_reco_start_dist2 = MCRecoStartDiff2.Mag();
+
+  double t1 = -1.*MCRecoStartDiff1*shower1.Direction() / shower1.Direction().Mag2();
+  TVector3 dca1 = shower1.ShowerStart() + t1*shower1.Direction() - MCStartPoint1;
+
+  double t2 = -1.*MCRecoStartDiff2*shower2.Direction() / shower2.Direction().Mag2();
+  TVector3 dca2 = shower2.ShowerStart() + t2*shower2.Direction() - MCStartPoint2;
+
+  fEventTreeParams.mc_reco_dca1 = dca1.Mag();
+  fEventTreeParams.mc_reco_dca2 = dca2.Mag();
 
 //Fill the once-per-event TTree
   fEventTree->Fill();
@@ -362,8 +386,11 @@ void Pi0Mass::InitializeAnaTrees()
   fEventTree->Branch("RecoTheta", &fEventTreeParams.RecoTheta, "RecoTheta/D");
   fEventTree->Branch("mc_reco_anglediff1", &fEventTreeParams.mc_reco_anglediff1, "mc_reco_anglediff1/D");
   fEventTree->Branch("mc_reco_anglediff2", &fEventTreeParams.mc_reco_anglediff2, "mc_reco_anglediff2/D");
-  // fEventTree->Branch("shower1MatchedDir", &fEventTreeParams.shower1MatchedDir, "shower1MatchedDir/D");
-  // fEventTree->Branch("shower2MatchedDir", &fEventTreeParams.shower2MatchedDir, "shower2MatchedDir/D");
+  fEventTree->Branch("mc_start_dist", &fEventTreeParams.mc_start_dist, "mc_start_dist/D");
+  fEventTree->Branch("mc_reco_start_dist1", &fEventTreeParams.mc_reco_start_dist1, "mc_reco_start_dist1/D");
+  fEventTree->Branch("mc_reco_start_dist2", &fEventTreeParams.mc_reco_start_dist2, "mc_reco_start_dist2/D");
+  fEventTree->Branch("mc_reco_dca1", &fEventTreeParams.mc_reco_dca1, "mc_reco_dca1/D");
+  fEventTree->Branch("mc_reco_dca2", &fEventTreeParams.mc_reco_dca2, "mc_reco_dca2/D");
 }
 /*
 void Pi0Mass::ResetShowerTreeParams() {
@@ -416,10 +443,11 @@ void Pi0Mass::ResetEventTreeParams() {
   
   fEventTreeParams.mc_reco_anglediff1 = -1.;
   fEventTreeParams.mc_reco_anglediff2 = -1.;
-  // fEventTreeParams.shower1MatchedDir = -1.;
-  // fEventTreeParams.shower2MatchedDir = -1.;
-  // fEventTreeParams.notMatchedShower1 = 0;
-  // fEventTreeParams.notMatchedShower2 = 0;
+  fEventTreeParams.mc_start_dist = -1.;
+  fEventTreeParams.mc_reco_start_dist1 = -1.;
+  fEventTreeParams.mc_reco_start_dist2 = -1.;
+  fEventTreeParams.mc_reco_dca1 = -1.;
+  fEventTreeParams.mc_reco_dca2 = -1.;
 }
 
 
