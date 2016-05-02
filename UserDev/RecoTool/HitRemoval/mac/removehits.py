@@ -23,10 +23,25 @@ my_proc.set_ana_output_file("ana.root")
 my_proc.set_output_file(sys.argv[-1])
 
 hitremoval = fmwk.RemoveTrkLikeHits()
-hitremoval.setPFPartProducer("pandoraCosmic")
+
+hitremoval.setPFPartProducer("pandoraNu")
 my_proc.add_process(hitremoval)
 
+my_proc.set_data_to_write(fmwk.data.kPiZeroROI,"pizerofilter")
+my_proc.set_data_to_write(fmwk.data.kVertex,"pizerofilter")
+my_proc.set_data_to_write(fmwk.data.kAssociation,"pizerofilter")
+
+my_proc.set_data_to_write(fmwk.data.kHit,"gaushit")
+my_proc.set_data_to_write(fmwk.data.kHit,"pandoraCosmicKHitRemoval")
+
 my_proc.set_data_to_write(fmwk.data.kHit,"shrlike")
+my_proc.set_data_to_write(fmwk.data.kCluster,"shrlike")
+my_proc.set_data_to_write(fmwk.data.kAssociation,"shrlike")
+
+my_proc.set_data_to_write(fmwk.data.kCluster,"pandoraNu")
+my_proc.set_data_to_write(fmwk.data.kAssociation,"pandoraNu")
+my_proc.set_data_to_write(fmwk.data.kVertex,"pandoraNu")
+
 
 my_proc.run()
 sys.exit(0);

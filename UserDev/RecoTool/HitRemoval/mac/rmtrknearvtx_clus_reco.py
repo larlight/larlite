@@ -29,6 +29,7 @@ hitremoval.setSaveUnclusteredHits(False)
 hitremoval.setClusProducer("pandoraNu")
 hitremoval.setVtxProducer("pandoraNu")
 hitremoval.setROIProducer("pizerofilter")
+
 my_proc.add_process(hitremoval)
 
 my_proc.set_data_to_write(fmwk.data.kPiZeroROI,"pizerofilter")
@@ -45,9 +46,6 @@ my_proc.set_data_to_write(fmwk.data.kAssociation,"shrlike")
 my_proc.set_data_to_write(fmwk.data.kCluster,"pandoraNu")
 my_proc.set_data_to_write(fmwk.data.kAssociation,"pandoraNu")
 my_proc.set_data_to_write(fmwk.data.kVertex,"pandoraNu")
-
-#my_proc.set_data_to_write(fmwk.data.kCluster,"pandoraCosmic")
-#my_proc.set_data_to_write(fmwk.data.kAssociation,"pandoraCosmic")
 
 my_proc.run()
 sys.exit(0);
