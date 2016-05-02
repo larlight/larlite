@@ -41,6 +41,8 @@ namespace larlite{
                                      _t_range(orig._t_range),
                                      _pi0_wire_range(orig._pi0_wire_range),
                                      _pi0_t_range(orig._pi0_t_range),      
+                                     _muon_vtx(orig._muon_vtx),
+                                     _nu_vtx(orig._nu_vtx),
                                      _vtx(orig._vtx),
                                      _trk_end(orig._trk_end)
 	                             {}
@@ -60,12 +62,17 @@ namespace larlite{
     void SetPiZeroROI(const std::vector < std::pair< int, int > > PiZeroWire,
 		      const std::vector < std::pair< int, int > > PiZeroTime);
 
+    void SetMuonVertex( const std::vector<float> vtx);
+    void SetNeutrinoVertex( const std::vector<float> vtx);
+
     void SetVertex( const std::vector< std::pair <int, int> > vtx);
 
     void SetTrackEnd( const std::vector< std::pair <int, int> > trk_end);
 
 
     // Here are the Getters
+    std::vector<float> GetMuonVertex() const;
+    std::vector<float> GetNeutrinoVertex() const;
     std::vector < std::pair <int, int > > GetVertex() const;
     std::vector < std::pair <int, int > > GetTrackEnd() const;
     std::vector < std::pair< int, int > > GetWireROI() const;
@@ -80,6 +87,8 @@ namespace larlite{
     std::vector < std::pair< int, int > > _t_range; // size 3 planes, min then max
     std::vector < std::pair< int, int > > _pi0_wire_range; // size 3 planes, min then max
     std::vector < std::pair< int, int > > _pi0_t_range; // size 3 planes, min then max
+    std::vector<float> _muon_vtx; // size 3 plane, pair with tick, wire for vertex
+    std::vector<float> _nu_vtx; // size 3 plane, pair with tick, wire for vertex
     std::vector < std::pair <int, int > > _vtx; // size 3 plane, pair with tick, wire for vertex
     std::vector < std::pair <int, int > > _trk_end; // size 3 plane, pair with tick, wire for track-end
     

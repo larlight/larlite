@@ -11,6 +11,8 @@ namespace larlite{
     _wire_range.clear();
     _pi0_wire_range.clear();
     _pi0_t_range.clear();
+    _muon_vtx.clear();
+    _nu_vtx.clear();
     _vtx.clear();
     _trk_end.clear();
   }
@@ -189,6 +191,18 @@ namespace larlite{
     
   }
 
+  void PiZeroROI::SetMuonVertex( const std::vector<float> vtx){
+    
+    _muon_vtx = vtx;
+    
+  }
+
+  void PiZeroROI::SetNeutrinoVertex( const std::vector<float> vtx){
+    
+    _nu_vtx = vtx;
+    
+  }
+
   void PiZeroROI::SetVertex( const std::vector< std::pair < int, int > > vtx){
     
     if(vtx.size() > 3){
@@ -205,6 +219,9 @@ namespace larlite{
   }
 
   
+  std::vector<float> PiZeroROI::GetMuonVertex() const { return _muon_vtx; }
+  std::vector<float> PiZeroROI::GetNeutrinoVertex() const { return _nu_vtx; }
+
   std::vector < std::pair <int, int > > PiZeroROI::GetVertex() const { return _vtx; }
 
   std::vector < std::pair <int, int > > PiZeroROI::GetTrackEnd() const { return _trk_end; }
