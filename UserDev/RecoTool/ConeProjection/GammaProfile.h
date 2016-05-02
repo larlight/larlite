@@ -44,8 +44,8 @@
 //#include "coneprofile.h"
 
 
-#include "ClusterRecoUtil/ClusterParamsAlg.h"
-#include "ClusterRecoUtil/CRUHelper.h"
+#include "ClusterRecoUtil/Base/ClusterParamsAlg.h"
+#include "ClusterRecoUtil/Base/CRUHelper.h"
 #include "EMShowerTools/EMShowerProfile.h"
 
 namespace larlite {
