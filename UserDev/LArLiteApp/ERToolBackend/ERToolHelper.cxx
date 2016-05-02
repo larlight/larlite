@@ -759,20 +759,23 @@ namespace larlite {
 		}
 			auto& s = (*s_v.rbegin());
 			// std::cout << "\t>> best plane: " << shw.best_plane() << "\n";
-			if ( (shw.best_plane() >= 0) && (shw.best_plane() <= 2) ) {
-				s._energy = shw.Energy_v()[shw.best_plane()];
-				s._dedx   = shw.dEdx_v()[shw.best_plane()];
-				// std::cout << "\t>> bish, not default: " << s._energy << "\n";
-			} else {
+			//if ( (shw.best_plane() >= 0) && (shw.best_plane() <= 2) ) {
+			//	s._energy = shw.Energy_v()[shw.best_plane()];
+			//	s._dedx   = shw.dEdx_v()[shw.best_plane()];
+			//	std::cout << "\t>> bish, not default: " << s._energy << "\n";
+			//} else {
 
-			  // default
-			  s._energy = shw.Energy_v()[0];
-			  s._dedx   = shw.dEdx_v()[0];
+			  // default 
+			  // Note : shower function Energy(plane) checks that plane is not -1 (the default
+			  // for best_plane); if it is -1, it returns fTotalEnergy calculated in showerreco 
+			  // energy modules. Else returns energy of best plane. --ahack
+			  s._energy = shw.Energy(shw.best_plane()); //shw.Energy_v()[0];
+			  s._dedx   = shw.dEdx(shw.best_plane()); //shw.dEdx_v()[0];
 
-			  // std::cout << "\t>> default!!: " << s._energy << "\n";
+			   //std::cout << "\t>> default!!: " << s._energy << "\n";
 			  // s._energy =  shw.Energy();
 			  // s._dedx   =  shw.dEdx();
-			}
+			//}
 			// by default. Add cosmic score for showers to edit
 			s._cosmogenic = -1;
 
