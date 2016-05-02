@@ -6,7 +6,15 @@
 
 namespace ub_noise_filter {
 
-
+ChirpFilter::ChirpFilter() {
+  // Initialize the exponential here, out until it has
+  // fallen to below 1% amplitude
+  // At 835 tick time constant, that's about 4000 ticks
+  chirp_exponential.resize(4000);
+  for (size_t tick = 0; tick < chirp_exponential.size(); tick ++) {
+    chirp_exponential[tick] = exp(-1.0 * tick / chirp_rc_const);
+  }
+}
 
 bool ChirpFilter::ChirpFilterAlg(float * wf, int numTicks)
 {
@@ -42,13 +50,13 @@ bool ChirpFilter::ChirpFilterAlg(float * wf, int numTicks)
     if (counter == windowSize)
     {
       // counter == windowSize means we've hit the tick at the edge of the window
-      
-      // Finish Calculating the mean and RMS 
+
+      // Finish Calculating the mean and RMS
       runningAmpMean /= (double)windowSize;
       runningAmpRMS /= (double)windowSize;
       // std::cout << "runningAmpRMS - runningAmpMean * runningAmpMean  " << runningAmpRMS - runningAmpMean * runningAmpMean << std::endl;
 
-      if (runningAmpRMS - runningAmpMean * runningAmpMean < 0){
+      if (runningAmpRMS - runningAmpMean * runningAmpMean < 0) {
         std::cout << runningAmpRMS - runningAmpMean * runningAmpMean << std::endl;
         exit(-1);
       }
@@ -68,7 +76,7 @@ bool ChirpFilter::ChirpFilterAlg(float * wf, int numTicks)
 
       // This asks if we are in a window that is at least 3 windows in from the edge
       if (i >= 3 * windowSize )
-      // if (i >= 3 * windowSize - 1)
+        // if (i >= 3 * windowSize - 1)
       {
         // This asks if the middle RMS is below chirp threshold while either of it's
         // neighbors are above threshold.
@@ -148,17 +156,29 @@ bool ChirpFilter::ChirpFilterAlg(float * wf, int numTicks)
     firstLowRMSBin = std::max(0, firstLowRMSBin - windowSize);
     lastLowRMSBin = std::min(numTicks, lastLowRMSBin + 2 * windowSize);
 
-    if (firstLowRMSBin < 100)
+    if (firstLowRMSBin < 100) {
       firstLowRMSBin = 0;
+      // Be conservative and avoid the chirping region
+      lastLowRMSBin = std::min(numTicks, lastLowRMSBin + 100);
+    }
 
-    if (numTicks - lastLowRMSBin < 100)
+    if (numTicks - lastLowRMSBin < 100) {
       lastLowRMSBin = numTicks;
+      // Be conservative and avoid the chirping region
+      firstLowRMSBin = std::max(0, firstLowRMSBin - 100);
+    }
+
+
 
     // if ((numTicks - lastLowRMSBin) < windowSize)
     // {
     //   lastLowRMSBin = numTicks;
     // }
     // chirpFrac = 1.0 * (lastLowRMSBin - firstLowRMSBin) / numTicks;
+
+    if (lastLowRMSBin - firstLowRMSBin > 0.9 * numTicks) {
+      chirpFrac = 1.0;
+    }
 
     if (chirpFrac > 0.990)
     {
@@ -198,203 +218,65 @@ bool ChirpFilter::ChirpFilterAlg(float * wf, int numTicks)
   return true;
 }
 
-void ChirpFilter::ZigzagFilterAlg(float * wf, int numTicks)
-{
-  float meanVal = 0.0;
-  float rmsVal = 0.0;
-  int counter = 0;
-  float ADCval, ADCval2;
-  for (int i = 0; i < numTicks; i++)
-  {
-    ADCval = wf[i];
+void ChirpFilter::remove_baseline_deviation(float * wf, int numTicks) const {
 
-    if (ADCval < 4096.0)
-    {
-      meanVal += ADCval;
-      rmsVal += pow(ADCval, 2.0);
-      counter++;
-    }
-  }
+  // Remove the baseline deviation in this wire caused by chirping.
+  //
+  // If the wire starts ok, and then starts chriping, that's
 
-  if (counter == 0)
-  {
-    meanVal = 0.0;
-    rmsVal = 0.0;
-  }
-  else
-  {
-    meanVal /= (float)counter;
-    rmsVal /= (float)counter;
-    rmsVal = pow(rmsVal - pow(meanVal, 2.0), 0.5);
-  }
+  // If the wire is chirping at the start, fix it.  Otherwise, return
+  if ( _current_chirp_info.chirp_start == 0 &&
+       _current_chirp_info.chirp_stop != 9595 ) {
 
-  if (rmsVal < 0.5) return;
+    // take the amplitude at the start of the chirping
+    // and subtract the exponential from the start.
 
-  for (int i = 0; i < numTicks - 1; i++)
-  {
-    ADCval = wf[i];
-    ADCval2 = wf[i + 1];
-    if ((ADCval != 10000.0) && (ADCval2 != 10000.0))
-    {
-      wf[i] = ((ADCval + ADCval2) / 2.0) - meanVal;
-    }
-    else if (ADCval != 10000.0)
-    {
-      wf[i] = ADCval - meanVal;
-    }
-  }
-  wf[numTicks - 1] -= meanVal;
-
-  return;
-}
-
-void ChirpFilter::RawAdaptiveBaselineAlg(float * wf, int numTicks)
-{
-  const int windowSize = 20;
-
-  int minWindowBins = windowSize / 2;
-
-  float baselineVec[numTicks];
-  bool isFilledVec[numTicks];
-
-  int numFlaggedBins = 0;
-  for (int j = 0; j < numTicks; j++)
-  {
-    if (wf[j] == 10000.0)
-    {
-      numFlaggedBins++;
-    }
-  }
-  if (numFlaggedBins == numTicks) return;
-  if (numFlaggedBins == 0) return;
-
-  float baselineVal = 0.0;
-  int windowBins = 0;
-  float ADCval;
-  for (int j = 0; j <= windowSize / 2; j++)
-  {
-    ADCval = wf[j];
-    if (ADCval < 4096.0)
-    {
-      baselineVal += ADCval;
-      windowBins++;
-    }
-  }
-
-  if (windowBins == 0)
-    baselineVec[0] = 0.0;
-  else
-    baselineVec[0] = baselineVal / ((float) windowBins);
-
-  if (windowBins < minWindowBins)
-    isFilledVec[0] = false;
-  else
-    isFilledVec[0] = true;
-
-  int oldIndex;
-  int newIndex;
-  for (int j = 1; j < numTicks; j++)
-  {
-    oldIndex = j - windowSize / 2 - 1;
-    newIndex = j + windowSize / 2;
-
-    if (oldIndex >= 0)
-    {
-      ADCval = wf[oldIndex];
-      if (ADCval < 4096.0)
-      {
-        baselineVal -= wf[oldIndex];
-        windowBins--;
+    // Get the start amplitude:
+    double integral = 0.0;
+    double n_integral = 0;
+    double baseline = 0.0;
+    double n_baseline = 0;
+    // Find the amplitude by integrating the first time-constant range
+    // of the waveform.
+    for (int tick = 0; tick < chirp_rc_const; tick ++ ) {
+      if (_current_chirp_info.chirp_stop + tick < numTicks) {
+        integral += wf[_current_chirp_info.chirp_stop + tick];
+        n_integral ++;
       }
     }
 
-    if (newIndex < numTicks)
-    {
-      ADCval = wf[newIndex];
-      if (ADCval < 4096)
-      {
-        baselineVal += wf[newIndex];
-        windowBins++;
-      }
+    for (int tick = numTicks;
+         tick > _current_chirp_info.chirp_stop + chirp_rc_const &&
+         tick > numTicks - chirp_rc_const;
+         tick --) {
+      baseline += wf[tick];
+      n_baseline ++;
     }
 
-    if (windowBins == 0)
-      baselineVec[j] = 0.0;
-    else
-      baselineVec[j] = baselineVal / windowBins;
+    // If the amplitude of the exponential is A, then the integral is A*tau*(1 - e^-(n/tau))
+    // In this case, there is a baseline correction as well.
+    // So, the integral is baseline*N + A*tau*(1-e^(-n/tau))
 
-    if (windowBins < minWindowBins)
-      isFilledVec[j] = false;
-    else
-      isFilledVec[j] = true;
-  }
+    baseline /= n_baseline;
 
-  int downIndex;
-  int upIndex;
-  bool downFlag;
-  bool upFlag;
-  for (int j = 0; j < numTicks; j++)
-  {
-    downFlag = false;
-    upFlag = false;
+    double amplitude = integral - n_integral * baseline;
 
-    ADCval = wf[j];
-    if (ADCval != 10000.0)
-    {
-      if (isFilledVec[j] == false)
-      {
-        downIndex = j;
-        while ((isFilledVec[downIndex] == false) && (downIndex > 0) && (wf[downIndex] != 10000.0))
-        {
-          downIndex--;
-        }
+    amplitude /= (chirp_rc_const * (1 - exp(-n_integral / chirp_rc_const))  );  // Now == A
 
-        if (isFilledVec[downIndex] == false)
-          downFlag = true;
 
-        upIndex = j;
-        while ((isFilledVec[upIndex] == false) && (upIndex < numTicks - 1) && (wf[upIndex] != 10000.0))
-        {
-          upIndex++;
-        }
-
-        if (isFilledVec[upIndex] == false)
-          upFlag = true;
-
-        if ((downFlag == false) && (upFlag == false))
-          baselineVec[j] = ((j - downIndex) * baselineVec[downIndex] + (upIndex - j) * baselineVec[upIndex]) / ((float) upIndex - downIndex);
-        else if ((downFlag == true) && (upFlag == false))
-          baselineVec[j] = baselineVec[upIndex];
-        else if ((downFlag == false) && (upFlag == true))
-          baselineVec[j] = baselineVec[downIndex];
-        else
-          baselineVec[j] = 0.0;
-      }
-
-      wf[j] = ADCval - baselineVec[j];
+    // Now subtract the exponential from the waveform:
+    for (int tick = _current_chirp_info.chirp_stop; tick < numTicks; tick ++ ) {
+      size_t exp_tick = tick - _current_chirp_info.chirp_stop;
+      if (exp_tick >= 4000)
+        break;
+      wf[tick] -= (amplitude) * chirp_exponential[exp_tick];
     }
-  }
-}
 
-void ChirpFilter::RemoveChannelFlags(float * wf, int numTicks)
-{
-  float ADCval;
 
-  /////////////////////////////////////
-  // Do stuff here to set chirp_info //
-  /////////////////////////////////////
-
-  for (int i = 0; i < numTicks; i++)
-  {
-    ADCval = wf[i];
-
-    if (ADCval == 10000.0)
-    {
-      wf[i] = 0.0;
-    }
   }
 
   return;
+
 }
 
 

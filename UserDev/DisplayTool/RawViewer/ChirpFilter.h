@@ -70,16 +70,14 @@ class ChirpFilter {
 public:
 
   /// Default constructor
-  ChirpFilter() {}
+  ChirpFilter();
 
   /// Default destructor
   ~ChirpFilter() {}
 
   bool ChirpFilterAlg(float * wf, int numTicks);
-  void ZigzagFilterAlg(float * wf, int numTicks);
 
-  void RawAdaptiveBaselineAlg(float * wf, int numTicks);
-  void RemoveChannelFlags(float * wf, int numTicks);
+  void remove_baseline_deviation(float * wf, int numTicks) const;
 
   chirp_info & get_current_chirp_info() {return _current_chirp_info;}
 
@@ -90,6 +88,9 @@ private:
   const float chirpMinRMS2 = 0.66;
   const float maxNormalNeighborFrac = 0.20;
 
+  const float chirp_rc_const = 835.0; // in ticks
+
+  std::vector<float> chirp_exponential;
 
   chirp_info _current_chirp_info;
 

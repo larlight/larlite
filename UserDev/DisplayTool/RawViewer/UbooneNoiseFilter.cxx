@@ -139,6 +139,7 @@ void UbooneNoiseFilter::clean_data() {
 
       apply_moving_average(_wire_arr, _n_time_ticks_data, wire, plane);
 
+
       // rescale_by_rms(_wire_arr, _n_time_ticks_data, wire, plane);
 
     }
@@ -176,6 +177,9 @@ void UbooneNoiseFilter::clean_data() {
       float * _wire_arr = &(_data_by_plane->at(plane).at(offset));
 
       remove_correlated_noise(_wire_arr, _n_time_ticks_data, wire, plane);
+
+      // rescale_by_rms(_wire_arr, _n_time_ticks_data, wire, plane, true);
+
     }
   }
 
@@ -199,6 +203,7 @@ void UbooneNoiseFilter::clean_data() {
   }
   return;
 }
+
 
 void UbooneNoiseFilter::get_pedestal_info(float * _data_arr, int N, int wire, int plane) {
 
@@ -324,13 +329,23 @@ void UbooneNoiseFilter::get_pedestal_info(float * _data_arr, int N, int wire, in
 }
 
 
-void UbooneNoiseFilter::rescale_by_rms(float * _data_arr, int N, unsigned int wire, unsigned int plane) {
+void UbooneNoiseFilter::rescale_by_rms(float * _data_arr,
+                                       int N,
+                                       unsigned int wire,
+                                       unsigned int plane,
+                                       bool inverse) {
 
   // If the wire status is normal or chirping, rescale the wire by the rms to set the RMS to 1.0
 
 
   if (_wire_status_by_plane[plane][wire] == kNormal) {
-    float scale = 1.0 / _rms_by_plane[plane][wire];
+    float scale;
+    if (inverse) {
+      scale  = _rms_by_plane[plane][wire];
+    }
+    else {
+      scale = 1.0 / _rms_by_plane[plane][wire];
+    }
     for (int tick = 0; tick < N; tick ++) {
       _data_arr[tick] *= scale;
     }
@@ -526,10 +541,17 @@ bool UbooneNoiseFilter::is_chirping(float * _data_arr,
 
     _chirp_info_by_plane[plane][wire] = _chirp_filter.get_current_chirp_info();
     _wire_status_by_plane[plane][wire] = kChirping;
+
+    // if (_chirp_info_by_plane[plane][wire].chirp_start == 0 &&
+    //     _chirp_info_by_plane[plane][wire].chirp_stop != 9595 ) {
+    //   std::cout << "Wire " << wire << " on plane " << plane
+    //             << " chirps at the start." << std::endl;
+    // }
+
     // then this channel is chirping, and we deal with it.
-    // _chirp_filter.ZigzagFilterAlg(_data_arr, N);
-    // _chirp_filter.RawAdaptiveBaselineAlg(_data_arr, N);
-    // _chirp_filter.RemoveChannelFlags(_data_arr, N);
+    _chirp_filter.remove_baseline_deviation(_data_arr, N);
+
+
     return true;
   } else {
     // _chirp_filter.ZigzagFilterAlg(_data_arr, N);

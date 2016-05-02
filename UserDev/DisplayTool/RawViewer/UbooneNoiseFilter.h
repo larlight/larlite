@@ -230,7 +230,7 @@ private:
    */
   bool is_chirping(float * _data_arr, int N, unsigned int wire, unsigned int plane);
 
-  void rescale_by_rms(float * _data_arr, int N, unsigned int wire, unsigned int plane);
+  void rescale_by_rms(float * _data_arr, int N, unsigned int wire, unsigned int plane, bool inverse = false);
 
   void tag_special_wire_statuses();
 
