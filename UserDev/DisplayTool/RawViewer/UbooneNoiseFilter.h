@@ -232,9 +232,15 @@ private:
 
   void rescale_by_rms(float * _data_arr, int N, unsigned int wire, unsigned int plane);
 
+  void tag_special_wire_statuses();
 
-  void build_correlated_noise_waveforms(float * _plane_arr, int n_wires, int n_ticks_per_wire, int block_size);
+  void build_correlated_noise_waveforms(
+    float * _wire_block,
+    int i_block,
+    int plane,
+    int _n_time_ticks_data);
 
+  void remove_correlated_noise(float * _data_arr, int N, unsigned int wire, unsigned int plane);
 
   /*
   Below are the private data members, many of which can be accessed with getter
@@ -243,8 +249,8 @@ private:
 
 private:
 
-  const float _lowRMS_cutoff = 0.4 * 0.4;
-  const float _highRMS_cutoff = 10.0 * 10.0;
+  const std::vector<float> _lowRMS_cutoff = {0.4, 1.0, 1.0};
+  const std::vector<float> _highRMS_cutoff = {20.0, 20.0, 10.0};
 
   // const std::vector<int> _correlated_noise_steps = {48,48,96}
 
@@ -253,6 +259,52 @@ private:
 
   // This objects holds the correlated noise waveforms by [plane][wireblock][tick]
   std::vector<std::vector<std::vector<float> > > correlatedNoiseWaveforms;
+
+
+  // This is the service board boundaries enumerated as
+  // hardcoded constants
+  // std::vector<std::vector<float> > correlated_noise_blocks = {
+  //   {
+  //     0, 96, 192, 288, 384, 480, 576, 672, 768, 864, 960, 1056,
+  //     1152, 1248, 1344, 1440, 1536, 1632, 1728, 1824,
+  //     2016, 2112, 2208, 2304, 2400
+  //   },
+  //   { 0, 384, 576, 672, 768, 864, 960, 1056, 1152, 1248, 1344,
+  //     1440, 1536, 1632, 1728, 1824, 1920, 2016, 2112, 2208,
+  //     2304, 2400
+  //   },
+  //   {
+  //     0, 192, 384, 576, 768, 960, 1152, 1344, 1536, 1728, 1920,
+  //     2112, 2304, 2496, 2688, 2880, 3072, 3264, 3456
+  //   }
+  // };
+
+  std::vector<std::vector<float> > correlated_noise_blocks = {
+    {
+      0, 48, 96, 144, 192, 240, 288, 336, 384, 432, 480,
+      528, 576, 624, 672, 720, 768, 816, 864, 912, 960,
+      1008, 1056, 1104, 1152, 1200, 1248, 1296, 1344, 1392,
+      1440, 1488, 1536, 1584, 1632, 1680, 1728, 1776, 1824,
+      1872, 1920, 1968, 2016, 2064, 2112, 2160, 2208,
+      2256, 2304, 2352, 2400
+    },
+    {
+      0, 48, 96, 144, 192, 240, 288, 336, 384, 432, 480,
+      528, 576, 624, 672, 720, 768, 816, 864, 912, 960,
+      1008, 1056, 1104, 1152, 1200, 1248, 1296, 1344, 1392,
+      1440, 1488, 1536, 1584, 1632, 1680, 1728, 1776, 1824,
+      1872, 1920, 1968, 2016, 2064, 2112, 2160, 2208,
+      2256, 2304, 2352, 2400
+    },
+    {
+      0, 96, 192, 288, 384, 480, 576, 672, 768, 864, 960,
+      1056, 1152, 1248, 1344, 1440, 1536, 1632, 1728, 1824,
+      1920, 2016, 2112, 2208, 2304, 2400, 2496, 2592, 2688,
+      2784, 2880, 2976, 3072, 3168, 3264, 3360, 3456
+    }
+  };
+
+
 
   // All of the detector properties are encapsulated in this object
   // This allows larlite <-> larsoft transitions to be a little less painful

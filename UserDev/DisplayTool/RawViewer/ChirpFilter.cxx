@@ -14,57 +14,92 @@ bool ChirpFilter::ChirpFilterAlg(float * wf, int numTicks)
   _current_chirp_info = chirp_info();
 
   int counter = 0;
-  float ADCval;
-  float runningAmpMean = 0.0;
-  float runningAmpRMS = 0.0;
+  double ADCval;
+  double runningAmpMean = 0.0;
+  double runningAmpRMS = 0.0;
   int numLowRMS = 0;
   int firstLowRMSBin = -1;
   int lastLowRMSBin = -1;
   bool lowRMSFlag = false;
-  float RMSfirst = 0.0;
-  float RMSsecond = 0.0;
-  float RMSthird = 0.0;
+  double RMSfirst = 0.0;
+  double RMSsecond = 0.0;
+  double RMSthird = 0.0;
   int numNormalNeighbors = 0;
 
+
+  // Loop over the whole waveform.
   for (int i = 0; i < numTicks; i++)
   {
+    // Get the current tick value
     ADCval = wf[i];
-    runningAmpMean += ADCval;
-    runningAmpRMS += pow(ADCval, 2.0);
 
+    // The running mean and RMS are used to compare mean and rms between windows
+    runningAmpMean += ADCval;
+    runningAmpRMS += ADCval * ADCval;
+
+    // Counter keeps track of where within the window this tick is
     counter++;
     if (counter == windowSize)
     {
-      runningAmpMean /= (float)windowSize;
-      runningAmpRMS /= (float)windowSize;
-      runningAmpRMS = pow(runningAmpRMS - pow(runningAmpMean, 2.0), 0.5);
+      // counter == windowSize means we've hit the tick at the edge of the window
+      
+      // Finish Calculating the mean and RMS 
+      runningAmpMean /= (double)windowSize;
+      runningAmpRMS /= (double)windowSize;
+      // std::cout << "runningAmpRMS - runningAmpMean * runningAmpMean  " << runningAmpRMS - runningAmpMean * runningAmpMean << std::endl;
+
+      if (runningAmpRMS - runningAmpMean * runningAmpMean < 0){
+        std::cout << runningAmpRMS - runningAmpMean * runningAmpMean << std::endl;
+        exit(-1);
+      }
+
+      runningAmpRMS = sqrt(runningAmpRMS - runningAmpMean * runningAmpMean);
 
       RMSfirst = RMSsecond;
       RMSsecond = RMSthird;
       RMSthird = runningAmpRMS;
 
+      // A very low RMS indicates chirping (or otherwise dead wire) in this region
+      // std::cout << "runningAmpRMS 2 " << runningAmpRMS << std::endl;
       if (runningAmpRMS < chirpMinRMS)
       {
         numLowRMS++;
       }
 
-      if (i >= 3 * windowSize - 1)
+      // This asks if we are in a window that is at least 3 windows in from the edge
+      if (i >= 3 * windowSize )
+      // if (i >= 3 * windowSize - 1)
       {
-        if ((RMSsecond < chirpMinRMS) && ((RMSfirst > chirpMinRMS) || (RMSthird > chirpMinRMS)))
+        // This asks if the middle RMS is below chirp threshold while either of it's
+        // neighbors are above threshold.
+        // This indicates a chirping transition I think
+        if ( (RMSsecond < chirpMinRMS) &&
+             ((RMSfirst > chirpMinRMS) ||
+              (RMSthird > chirpMinRMS)
+             )
+           )
         {
           numNormalNeighbors++;
         }
 
         if (lowRMSFlag == false)
         {
-          if (((RMSsecond < chirpMinRMS) && (RMSthird < chirpMinRMS2)) || ((RMSsecond < chirpMinRMS2) && (RMSthird < chirpMinRMS)))
+          if (((RMSsecond < chirpMinRMS) &&
+               (RMSthird < chirpMinRMS2)) ||
+              ((RMSsecond < chirpMinRMS2) &&
+               (RMSthird < chirpMinRMS))
+             )
           {
             lowRMSFlag = true;
             firstLowRMSBin = i - 2 * windowSize + 1;
             lastLowRMSBin = i - windowSize + 1;
           }
 
-          if ((i == 3 * windowSize - 1) && (((RMSfirst < chirpMinRMS) && (RMSsecond < chirpMinRMS2)) || ((RMSfirst < chirpMinRMS2) && (RMSsecond < chirpMinRMS))))
+          if ((i == 3 * windowSize) &&
+              (((RMSfirst < chirpMinRMS) &&
+                (RMSsecond < chirpMinRMS2)) ||
+               ((RMSfirst < chirpMinRMS2) &&
+                (RMSsecond < chirpMinRMS))))
           {
             lowRMSFlag = true;
             firstLowRMSBin = i - 3 * windowSize + 1;
@@ -73,7 +108,10 @@ bool ChirpFilter::ChirpFilterAlg(float * wf, int numTicks)
         }
         else
         {
-          if (((RMSsecond < chirpMinRMS) && (RMSthird < chirpMinRMS2)) || ((RMSsecond < chirpMinRMS2) && (RMSthird < chirpMinRMS)))
+          if (((RMSsecond < chirpMinRMS) &&
+               (RMSthird < chirpMinRMS2)) ||
+              ((RMSsecond < chirpMinRMS2) &&
+               (RMSthird < chirpMinRMS)))
           {
             lastLowRMSBin = i - windowSize + 1;
           }
@@ -86,22 +124,45 @@ bool ChirpFilter::ChirpFilterAlg(float * wf, int numTicks)
     }
   }
 
+
   float chirpFrac = ((float) numLowRMS) / (((float) numTicks) / ((float) windowSize));
   float normalNeighborFrac = ((float) numNormalNeighbors) / ((float) numLowRMS);
 
-  if (((normalNeighborFrac < maxNormalNeighborFrac) || ((numLowRMS < 2.0 / maxNormalNeighborFrac) && (lastLowRMSBin - firstLowRMSBin == numLowRMS * windowSize))) && (numLowRMS > 4))
+  // std::cout << "numTicks " << numTicks << std::endl;
+  // std::cout << "windowSize " << windowSize << std::endl;
+  // std::cout << "numNormalNeighbors " << numNormalNeighbors << std::endl;
+  // std::cout << "numLowRMS " << numLowRMS << std::endl;
+
+  // std::cout << "chirpFrac " << chirpFrac << std::endl;
+  // std::cout << "normalNeighborFrac " << normalNeighborFrac << std::endl;
+  // std::cout << "lastLowRMSBin " << lastLowRMSBin << std::endl;
+  // std::cout << "firstLowRMSBin " << firstLowRMSBin << std::endl;
+
+
+  if (((normalNeighborFrac < maxNormalNeighborFrac) ||
+       ((numLowRMS < 2.0 / maxNormalNeighborFrac) &&
+        (lastLowRMSBin - firstLowRMSBin == numLowRMS * windowSize))
+      ) &&
+      (numLowRMS > 4))
   {
     firstLowRMSBin = std::max(0, firstLowRMSBin - windowSize);
     lastLowRMSBin = std::min(numTicks, lastLowRMSBin + 2 * windowSize);
 
-    if ((numTicks - lastLowRMSBin) < windowSize)
-    {
-      lastLowRMSBin = numTicks;
-    }
+    if (firstLowRMSBin < 100)
+      firstLowRMSBin = 0;
 
-    if (chirpFrac > 0.99)
+    if (numTicks - lastLowRMSBin < 100)
+      lastLowRMSBin = numTicks;
+
+    // if ((numTicks - lastLowRMSBin) < windowSize)
+    // {
+    //   lastLowRMSBin = numTicks;
+    // }
+    // chirpFrac = 1.0 * (lastLowRMSBin - firstLowRMSBin) / numTicks;
+
+    if (chirpFrac > 0.990)
     {
-      firstLowRMSBin = 1;
+      firstLowRMSBin = 0;
       lastLowRMSBin = numTicks;
 
       //////////////////////////////////////////////////
@@ -109,17 +170,14 @@ bool ChirpFilter::ChirpFilterAlg(float * wf, int numTicks)
       //////////////////////////////////////////////////
       _current_chirp_info.chirp_start = 0;
       _current_chirp_info.chirp_stop = numTicks;
-      _current_chirp_info.chirp_frac = chirpFrac;
+      _current_chirp_info.chirp_frac = 1.0;
     }
     else
     {
       ///////////////////////////////////////////////
       // Set channel status to "MID-CHIRPING" here //
       ///////////////////////////////////////////////
-      if ( firstLowRMSBin != 0){
-        lastLowRMSBin = numTicks;
-      }
-      else if (lastLowRMSBin <)
+
       _current_chirp_info.chirp_start = firstLowRMSBin;
       _current_chirp_info.chirp_stop = lastLowRMSBin;
       _current_chirp_info.chirp_frac = chirpFrac;
@@ -128,9 +186,9 @@ bool ChirpFilter::ChirpFilterAlg(float * wf, int numTicks)
 
     for (int i = 0; i < numTicks; i++)
     {
-      if ((i + 1 >= firstLowRMSBin) && (i + 1 <= lastLowRMSBin))
+      if ((i >= firstLowRMSBin) && (i < lastLowRMSBin))
       {
-        wf[i] = 10000.0;
+        wf[i] = 0.0;
       }
     }
   } else {
