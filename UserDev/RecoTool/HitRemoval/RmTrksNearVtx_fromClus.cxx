@@ -44,6 +44,13 @@ namespace larlite {
     // grab Pi0ROI to be used for vtx (when using RECO)
     auto *ev_roi = storage->get_data<event_PiZeroROI>(_roi_producer);
 
+    // additionally, save a vtx object associated with the neutrino-vtx stored in the Pi0ROI
+    auto *ev_vtx_roi = storage->get_data<event_vertex>(_roi_producer);
+
+    // produce ROIT -> vtx association
+    auto *ev_roi_vtx_ass = storage->get_data<event_ass>(_roi_producer);
+    std::vector<std::vector<unsigned int> > roi_vtx_ass;
+
     storage->set_id(storage->run_id(), storage->subrun_id(), storage->event_id());
 
     // if no clusters -> exit
@@ -91,6 +98,17 @@ namespace larlite {
 	vtx_t_cm[pl] = roi.GetVertex().at(pl).first * t2cm;
 	vtx_w_cm[pl] = roi.GetVertex().at(pl).second * w2cm;
       }
+      // get neutrino 3D vertex
+      auto const& nuvtxROI = roi.GetNeutrinoVertex();
+      // create a larlite vertex object that should store the information
+      // of the neutrino vertex stored in the PiZeroROI object
+      double vtx[3];
+      for (size_t pl = 0; pl < 3; pl++)
+	vtx[pl] = (double)nuvtxROI[pl];
+      larlite::vertex nuvtx(vtx);
+      ev_vtx_roi->emplace_back(nuvtx);
+      std::vector<unsigned int> ass = {0};
+      roi_vtx_ass.push_back( ass );
     }
 
     /*
@@ -181,8 +199,12 @@ namespace larlite {
 	
       }// for all hits
     }// if we want to save unclustered hits
-    
-    ev_clus_hit_ass->set_association(ev_shr_clus->id(),product_id(data::kHit,ev_hit->name()), shr_clus_hit_ass);    
+
+    // save cluster -> hit associations
+    ev_clus_hit_ass->set_association(ev_shr_clus->id(),product_id(data::kHit,ev_hit->name()), shr_clus_hit_ass);
+
+    // save PiZeroROI -> vtx association
+    ev_roi_vtx_ass->set_association(ev_roi->id(), product_id(data::kVertex,ev_vtx_roi->name()), roi_vtx_ass);
   
     return true;
   }
