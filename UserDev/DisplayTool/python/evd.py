@@ -49,7 +49,7 @@ def main():
 
     if args.uboone:
         geom = geometry.microboone()
-    if args.uboonetruncated:
+    elif args.uboonetruncated:
         geom = geometry.microboonetruncated()
     elif args.lariat:
         geom = geometry.lariat()
