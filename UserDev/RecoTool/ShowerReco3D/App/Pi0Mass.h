@@ -149,6 +149,11 @@ protected:
     double RecoTheta;
     double mc_reco_anglediff1;
     double mc_reco_anglediff2;
+    double mc_start_dist;
+    double mc_reco_start_dist1;
+    double mc_reco_start_dist2;
+    double mc_reco_dca1;
+    double mc_reco_dca2;
     // double shower1MatchedDir;
     // double shower2MatchedDir;
     // int notMatchedShower1;

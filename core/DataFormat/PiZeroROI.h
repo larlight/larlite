@@ -51,7 +51,7 @@ namespace larlite{
 
     // Here are the Setters    
     void SetROI(const std::vector < std::pair< int, int > > Wire,
-		const std::vector < std::pair< int, int > > Time);
+                const std::vector < std::pair< int, int> > Time); 
 
     void SetROI(const std::vector < std::pair< int, int > > Wire,
 		const std::vector < std::pair< int, int > > Time,

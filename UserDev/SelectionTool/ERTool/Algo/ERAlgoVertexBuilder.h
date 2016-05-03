@@ -35,6 +35,7 @@ namespace ertool {
     Bool_t const twithTrackDir;
     std::string const tprimary_vertex_selection;    
     Bool_t const tshowerproj;
+    Bool_t const tshowerdir;
     Double_t const tshower_prox;
     Double_t const tcpoa_vert_prox;
     Double_t const tcpoa_trackend_prox;

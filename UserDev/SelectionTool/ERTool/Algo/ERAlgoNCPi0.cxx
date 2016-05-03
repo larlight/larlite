@@ -51,7 +51,7 @@ namespace ertool {
 		CandTree->Branch("Rnshowers",&_Rnshowers,"Rnshowers/I");
 		CandTree->Branch("Candsize",&_Candsize,"Candsize/I");
 //		CandTree->Branch("EDet_B",&_EDet_B,"EDet_B/D");
-                CandTree->Branch("mass_C",&_mass_C,"mass_C/D");
+		CandTree->Branch("mass_C",&_mass_C,"mass_C/D");
 		CandTree->Branch("C_X",&_C_X,"C_X/D");
 		CandTree->Branch("C_Y",&_C_Y,"C_Y/D");
 		CandTree->Branch("C_Z",&_C_Z,"C_Z/D");
@@ -74,7 +74,7 @@ namespace ertool {
 		auto DetL = larutil::Geometry::GetME()->DetLength();
 	// Algoo that returns a pi0 if there are ONLY two good corelated showers
 	// This would not depend the selection on dEdx
-	::geoalgo::AABox  volume(0,-DetH,0,2.*DetW,DetH,DetL);// fill in with detector properties
+        ::geoalgo::AABox  volume(0,-DetH,0,2.*DetW,DetH,DetL);// fill in with detector properties
 
 	// Storage of the two ID's that pass
         std::vector<std::pair<NodeID_t,NodeID_t>> CandidatePairs;
@@ -88,7 +88,7 @@ namespace ertool {
 	// quick loop to check the number of avaliable showers to use 
         _Anshowers = 0;
         for (auto const& shrID1 : shrIDs){
-	        // If they are cosmic showers we can't use them
+		// If they are cosmic showers we can't use them
         	if(graph.GetParticle(shrID1).ProcessType()==kCosmic) continue;
 		// If they are showers from showers 
         	if(graph.GetParticle(shrID1).Descendant()==1) continue;
@@ -230,10 +230,8 @@ namespace ertool {
 				if(momentum[2]/momentum.Length() >_PDZ_max ||momentum[2]/momentum.Length() <_PDZ_min) continue;
 			//####################################
 
-			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// Only important if running cosmic algo's prior to this algo.
-
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Only important if running cosmic algo's prior to this algo.
 			//+*+*+*+*Cut on assosiated tracks at the vertex 
 			// loop over all cosmics tracks.
 			// first make a sphere of the vertex 
@@ -268,9 +266,9 @@ namespace ertool {
 				if(vtxsphere.Contain(trk_start) && tk1.Length()>_tLencut)  ccass=true;
 				if(vtxsphere.Contain(trk_end) && tk1.Length()>_tLencut)  ccass=true;
 		}// for loop on tracks
-		
 		if(ccass) continue;
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 				// if there is a cosmic track inside the sphere get rid of the event
 				//===========================================
 				// If we make it to here we have passed 

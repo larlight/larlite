@@ -26,6 +26,7 @@ namespace larlite{
       }
       catch(int e){
 	std::cout << "ROI vector sizes do not match, size "<< e << std::endl;
+    
       }
       return;
     }

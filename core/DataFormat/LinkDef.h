@@ -162,7 +162,6 @@
 #pragma link C++ class std::vector<larlite::PiZeroROI>+;
 #pragma link C++ class larlite::event_PiZeroROI+;
 
-
 #pragma link C++ class larlite::mcnu+;
 #pragma link C++ class std::vector<larlite::mcnu>+;
 
