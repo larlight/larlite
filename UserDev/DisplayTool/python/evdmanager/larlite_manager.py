@@ -299,7 +299,7 @@ class larlite_manager(larlite_manager_base):
                 self._drawWires = False
                 return
             self._drawWires = True
-            self._wireDrawer = datatypes.recoWire()
+            self._wireDrawer = datatypes.recoWire(self._geom)
             self._wireDrawer.setProducer(self._keyTable['wire'][0])
             self._process.add_process(self._wireDrawer._process)
             self.processEvent(True)

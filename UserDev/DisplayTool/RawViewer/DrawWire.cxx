@@ -70,7 +70,8 @@ bool DrawWire::analyze(larlite::storage_manager* storage) {
     unsigned int ch = wire.Channel();
     unsigned int detWire = geoService->ChannelToWire(ch);
     unsigned int plane = geoService->ChannelToPlane(ch);
-    int offset = detWire * detProp -> ReadOutWindowSize();
+    int offset = detWire * _y_dimensions[plane];
+
 
 
     for (auto & iROI : wire.SignalROI().get_ranges()) {

@@ -17,10 +17,12 @@ class wire(dataBase):
 
 class recoWire(wire):
 
-    def __init__(self):
+    def __init__(self, geom):
         super(recoWire, self).__init__()
         self._process = evd.DrawWire()
         self._process.initialize()
+        for plane in xrange(geom.nViews()):
+            self._process.setYDimension(geom.readoutWindowSize(),plane)
 
 
 class rawDigit(wire):
