@@ -24,6 +24,7 @@
 /doc/dOxy*
 /bin/larlite
 /bin/llhadd
+/bin/combine_ass
 /GNUmakefile
 /UserDev/*
 !/UserDev/bin

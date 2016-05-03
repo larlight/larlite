@@ -154,6 +154,7 @@ namespace larlite{
       "simphotons",
       "mucsdata",
       "mucsreco",
+      "PiZeroROI",
       "auxsimch",
       "chstatus"
     };
