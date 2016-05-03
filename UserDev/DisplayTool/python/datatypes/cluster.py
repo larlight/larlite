@@ -275,6 +275,7 @@ class cluster(recoBase):
         self._productName = 'cluster'
         self._process = evd.DrawCluster()
         self.init()
+        self._listOfStartPoints = []
 
         self.setParamsDrawing(False)
 
@@ -310,8 +311,8 @@ class cluster(recoBase):
 
             # extend the list of clusters
             self._listOfClusters.append([])
-
             self._listOfCParams.append([])
+            self._listOfStartPoints.append([])
 
             clusters = self._process.getDataByPlane(thisPlane)
             
@@ -321,7 +322,7 @@ class cluster(recoBase):
                 radBigW = 0.5 / view_manager._geometry.wire2cm()
                 radBigT = 0.5 / view_manager._geometry.time2cm()
                 
-                #otherPoly = QtGui.QGraphicsEllipseItem( cluster._start[0]-radBigW, cluster._start[1]-radBigT,2*radBigW,2*radBigT)
+                otherPoly = QtGui.QGraphicsEllipseItem( cluster._start[0]-radBigW, cluster._start[1]-radBigT,2*radBigW,2*radBigT)
                 otherPoly = QtGui.QGraphicsEllipseItem( cluster._start[0], cluster._start[1],2*radBigW,2*radBigT)
                 otherPoly.setPen(pg.mkPen(pg.mkColor((255, 0, 0, 100)), width = 1))
                 otherPoly.setBrush(pg.mkBrush(pg.mkColor((255, 0, 0, 100))))                
@@ -335,6 +336,7 @@ class cluster(recoBase):
                 # Keep track of the cluster for drawing management
                 self._listOfClusters[thisPlane].append(cluster_box_coll)
                 self._listOfCParams[thisPlane].append(None)
+                self._listOfStartPoints[thisPlane].append(otherPoly)
 
                 # draw the hits in this cluster:
                 cluster_box_coll.drawHits(view, cluster)
@@ -380,6 +382,15 @@ class cluster(recoBase):
 
         self._listOfClusters = []
         self._listOfCParams = []
+
+        i_plane = 0
+        for plane in self._listOfStartPoints:
+            view = view_manager.getViewPorts()[i_plane]
+            i_plane += 1
+            for startpt in plane:
+                view._view.removeItem(startpt)
+
+        self._listOfStartPoints = []
 
     def getAutoRange(self, plane):
         w = self._process.getWireRange(plane)

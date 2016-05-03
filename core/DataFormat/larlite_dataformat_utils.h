@@ -60,6 +60,13 @@ namespace larlite{
     product_id(const product_id& original) : product_id(original.first,original.second)
     {}
 
+    /// For checking
+    inline bool operator==(const product_id& rhs) const
+    { return (this->first == rhs.first && this->second == rhs.second); }
+
+    inline bool operator!=(const product_id& rhs) const
+    { return !(*this == rhs); }
+
     /// For sorting
     inline bool operator< ( const product_id& rhs ) const 
     { 
