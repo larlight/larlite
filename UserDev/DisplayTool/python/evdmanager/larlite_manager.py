@@ -63,21 +63,24 @@ class larlite_manager_base(manager, QtCore.QObject):
                 # For now, just skip anything that doesn't have "_"
                 continue
 
-            thisKeyList = key.GetName().split('_')
+            name = key.GetName().replace("_tree","")
 
-            # # ALso skip things that aren't broken into 3 pieces:
-            # if len(thisKeyList) is not 3:
-            #     continue
+            # Find the last remaining underscore:
+            product = name.split("_")[0]
+            producerName = "_".join(name.split("_")[1:])
+
+
+            thisKeyList = key.GetName().split('_')
 
 
             # gets three items in thisKeyList, which is a list
             # [dataProduct, producer, 'tree'] (don't care about 'tree')
             # check if the data product is in the dict:
-            if thisKeyList[0] in lookUpTable:
+            if product in lookUpTable:
                 # extend the list:
-                lookUpTable[thisKeyList[0]] += (thisKeyList[1], )
+                lookUpTable[product] += (producerName, )
             else:
-                lookUpTable.update({thisKeyList[0]: (thisKeyList[1],)})
+                lookUpTable.update({product: (producerName,)})
 
         self._keyTable.update(lookUpTable)
 
