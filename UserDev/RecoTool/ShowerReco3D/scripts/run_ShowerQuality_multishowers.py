@@ -7,7 +7,7 @@ if len(sys.argv) < 2:
     sys.stderr.write(msg)
     sys.exit(1)
 
-from ROOT import larlite as fmwk
+from larlite import larlite as fmwk
 
 
 # Create ana_processor instance
@@ -23,7 +23,7 @@ for x in xrange(len(sys.argv)):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify analysis output root file name
-my_proc.set_ana_output_file("ShowerQuality_multishowers_ana_out.root");
+my_proc.set_ana_output_file("ShowerQuality_multishowers_ana_out.root")
 
 # Specify data output root file name
 my_proc.set_output_file('')
@@ -31,11 +31,12 @@ my_proc.set_output_file('')
 # Create analysis unit
 sq_module = fmwk.ShowerQuality_multishowers()
 #sq_module.setMCShowerQuality(True)
-sq_module.SetShowerProducer("showerrecofuzzy")
+sq_module.SetShowerProducer("showerreco")
 #sq_module.SetShowerProducer("showermergeall")
 
 sq_module.SetMaxEnergyCut(99999999.)
 sq_module.SetMinEnergyCut(0.)
+sq_module.setFillSinglePi0Tree( True )
 my_proc.add_process(sq_module)
 
 print

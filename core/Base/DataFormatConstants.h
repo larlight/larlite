@@ -91,6 +91,7 @@ namespace larlite{
       kSimPhotons,         ///< sim::SimPhotons
       kMuCSData,           ///< MuCS::MuCSData
       kMuCSReco,           ///< MuCS::MuCSReco
+      kPiZeroROI,
       kAuxDetSimChannel,   ///< sim::AuxDetSimChannel
       kChStatus,           ///< larlite::chstatus
       kDATA_TYPE_MAX       ///< Event-wise enum boundary
@@ -153,6 +154,7 @@ namespace larlite{
       "simphotons",
       "mucsdata",
       "mucsreco",
+      "PiZeroROI",
       "auxsimch",
       "chstatus"
     };

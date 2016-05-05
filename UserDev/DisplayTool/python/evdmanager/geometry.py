@@ -29,6 +29,10 @@ class geoBase(object):
         self._path = os.path.dirname(os.path.realpath(__file__))
         self._logopos = [0,0]
         self._logoscale = 1.0
+        self._triggerOffset = 60
+        self._readoutWindowSize = 2408
+        self._planeOriginX = [-0.2, -0.6] 
+
 
     def halfwidth(self):
        return self._halfwidth
@@ -81,6 +85,15 @@ class geoBase(object):
     def logoPos(self):
         return self._logopos
 
+    def readoutWindowSize(self):
+        return self._readoutWindowSize
+
+    def triggerOffset(self):
+        return self._triggerOffset
+    
+    def planeOriginX(self, plane):
+        return self._planeOriginX[plane]
+
 class geometry(geoBase):
 
     def __init__(self):
@@ -95,21 +108,11 @@ class geometry(geoBase):
         self._wire2Cm = larutil.GeometryHelper.GetME().WireToCm()
         self._aspectRatio = self._wire2Cm / self._time2Cm
         self._nViews = larutil.Geometry.GetME().Nviews()
-        self._tRange = larutil.DetectorProperties.GetME().ReadOutWindowSize()
+        # self._tRange = larutil.DetectorProperties.GetME().ReadOutWindowSize()
         self._wRange = []
         self._offset = []
         for v in range(0, self._nViews):
             self._wRange.append(larutil.Geometry.GetME().Nwires(v))
-            # Set up the correct drift time offset.
-            # Offset is returned in terms of centimeters.
-
-            self._offset.append(
-                larutil.DetectorProperties.GetME().TriggerOffset()
-                * larutil.GeometryHelper.GetME().TimeToCm()
-                - larutil.Geometry.GetME().PlaneOriginVtx(v)[0])
-
-            # print larutil.DetectorProperties.GetME().TriggerOffset() * larutil.GeometryHelper.GetME().TimeToCm()
-            # print larutil.Geometry.GetME().PlaneOriginVtx(v)[0]
 
     def colorMap(self, plane):
         return self._defaultColorScheme[plane]
@@ -133,6 +136,10 @@ class microboone(geometry):
         self._haslogo = True
         self._logopos = [1250,10]
         self._logoscale = 0.1
+        self._tRange = 4800
+        self._triggerOffset = 3200
+        self._readoutWindowSize = 9600
+        self._planeOriginX = [0.0, -0.3, -0.6] 
         # remove = larutil.DetectorProperties.GetME().TriggerOffset() \
         #           * larutil.GeometryHelper.GetME().TimeToCm()
         # self._offset[:] = [x - remove for x in self._offset]
@@ -161,6 +168,38 @@ class microboone(geometry):
                        (1, (255, 0, 0, 255))],
              'mode': 'rgb'})
 
+        self._offset = []
+        for v in range(0, self._nViews):
+            # Set up the correct drift time offset.
+            # Offset is returned in terms of centimeters.
+
+            self._offset.append(
+                self.triggerOffset()
+                * self.time2cm()
+                - self.planeOriginX(v) )
+
+
+class microboonetruncated(microboone):
+
+    def __init__(self):
+        super(microboonetruncated, self).__init__()
+
+        # The truncated readouts change the trigger offset and 
+        self._tRange = 4800
+        self._triggerOffset = 800
+        self._planeOriginX = [0.0, -0.3, -0.6] 
+        self._readoutWindowSize = 6400
+
+        self._offset = []
+        for v in range(0, self._nViews):
+            # Set up the correct drift time offset.
+            # Offset is returned in terms of centimeters.
+
+            self._offset.append(
+                self.triggerOffset()
+                * self.time2cm()
+                - self.planeOriginX(v) )
+
 class argoneut(geometry):
 
     def __init__(self):
@@ -173,14 +212,22 @@ class argoneut(geometry):
         self._pedestals = [0, 0]
         self._name = "argoneut"
         self._offset = []
+
+        self._tRange = 1800
+        self._triggerOffset = 60
+        self._planeOriginX = [-0.2, -0.6] 
+        self._readoutWindowSize = 2048
+
+        self._offset = []
+
         for v in range(0, self._nViews):
             # Set up the correct drift time offset.
             # Offset is returned in terms of centimeters.
 
             self._offset.append(
-                larutil.DetectorProperties.GetME().TriggerOffset()
-                * larutil.GeometryHelper.GetME().TimeToCm()
-                - larutil.Geometry.GetME().PlaneOriginVtx(v)[0])
+                self.triggerOffset()
+                * self.time2cm()
+                - self.planeOriginX(v) )
 
         self._defaultColorScheme = [
             {'ticks': [(0.0,  (30,  30, 255, 255)),

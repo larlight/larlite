@@ -29,6 +29,7 @@
 #pragma link C++ class ertool::OpT0Helper+;
 #pragma link C++ class ertool::ERAlgoTrackDresser+;
 #pragma link C++ class ertool::ERAlgopi0+;
+#pragma link C++ class ertool::ERAlgoNCPi0+;
 #pragma link C++ class ertool::ERAlgoVertexBuilder+;
 #pragma link C++ class ertool::ERAlgoTrackID+;
 #pragma link C++ class ertool::ERAlgoOpT0Tender+;

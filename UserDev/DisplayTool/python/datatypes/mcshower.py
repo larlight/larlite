@@ -175,7 +175,7 @@ try:
 
                 radius = shower.length() * np.tan(shower.opening_angle()/2)
 
-                # Just be stupid and try to draw something:
+
                 cylinderPoints = gl.MeshData.cylinder(
                     2, 50, radius=[0, radius], length=shower.length())
                 cylinder = gl.GLMeshItem(meshdata=cylinderPoints,
