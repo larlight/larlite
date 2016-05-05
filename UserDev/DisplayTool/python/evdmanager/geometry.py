@@ -213,7 +213,7 @@ class argoneut(geometry):
         self._name = "argoneut"
         self._offset = []
 
-        self._tRange = 1600
+        self._tRange = 1800
         self._triggerOffset = 60
         self._planeOriginX = [-0.2, -0.6] 
         self._readoutWindowSize = 2048
