@@ -41,7 +41,7 @@
 
 namespace protoshower {
 
-class ProtoShowerAlgArgoNeuT : ProtoShowerAlgBase {
+class ProtoShowerAlgArgoNeuT : public ProtoShowerAlgBase {
 
 public:
 
