@@ -8,9 +8,9 @@ namespace larlite {
 unsigned int detPropFetcher::n_wires(unsigned int plane) {
   if (plane == 0)
     return 2400;
-  if (plane == 1)
+  else if (plane == 1)
     return 2400;
-  if (plane == 2)
+  else
     return 3456;
 }
 unsigned int detPropFetcher::n_planes() {
@@ -28,7 +28,7 @@ UbooneNoiseFilter::UbooneNoiseFilter() {
   _wire_status_by_plane.resize(_detector_properties_interface.n_planes());
   _chirp_info_by_plane.resize(_detector_properties_interface.n_planes());
 
-  for (int plane = 0; plane < _detector_properties_interface.n_planes(); plane ++) {
+  for (size_t plane = 0; plane < _detector_properties_interface.n_planes(); plane ++) {
     _pedestal_by_plane.at(plane).resize(_detector_properties_interface.n_wires(plane));
     _rms_by_plane.at(plane).resize(_detector_properties_interface.n_wires(plane));
     _wire_status_by_plane.at(plane).resize(_detector_properties_interface.n_wires(plane));
@@ -79,7 +79,7 @@ void UbooneNoiseFilter::reset_internal_data() {
 
   correlatedNoiseWaveforms.clear();
   correlatedNoiseWaveforms.resize(correlated_noise_blocks.size());
-  for (int i = 0; i < correlated_noise_blocks.size(); i ++) {
+  for (size_t i = 0; i < correlated_noise_blocks.size(); i ++) {
     correlatedNoiseWaveforms.at(i).resize(correlated_noise_blocks.at(i).size() - 1);
   }
 
@@ -389,7 +389,6 @@ void UbooneNoiseFilter::apply_moving_average(
   // Each bin is replaced by the average of it and the next bin;
   // Default is 2 bins to remove zig zag noise.
 
-  int i;
   for (int tick = start_tick; tick < end_tick - 1 ; tick ++) {
 
     _data_arr[tick] = 0.5 * (_data_arr[tick] + _data_arr[tick + 1]);
@@ -415,7 +414,7 @@ void UbooneNoiseFilter::remove_correlated_noise(
   }
 
   // First, need to know what block this wire came from:
-  int i_block;
+  size_t i_block;
   for (i_block = 0;
        i_block < correlated_noise_blocks.at(plane).size();
        i_block ++)
@@ -429,6 +428,7 @@ void UbooneNoiseFilter::remove_correlated_noise(
   // Now subtract the waveform from this wire
   int start_tick = 0;
   int end_tick = _n_time_ticks_data;
+
 
 
   if (_chirp_info_by_plane[plane].find(wire) != _chirp_info_by_plane[plane].end()) {
@@ -448,8 +448,31 @@ void UbooneNoiseFilter::remove_correlated_noise(
 
   }
 
+  float scale = 1.0;
+  // Determine the RMS of the correlated waveform to subtract:
+
+
+  // Get the typical RMS of wires within this block, and the RMS of this particular wire.
+  // Then scale this noise waveform to match the wire.  But only if this is at the edge of a block
+  if (wire == correlated_noise_blocks[plane][i_block] ||
+      wire == correlated_noise_blocks[plane][i_block + 1] - 1) {
+    // Get the typical RMS of the rest of this block:
+    double mean_of_rms = 0.0;
+    int n = 0;
+    for (int i_wire = correlated_noise_blocks[plane][i_block] + 2;
+         i_wire < correlated_noise_blocks[plane][i_block + 1] - 2;
+         i_wire ++) {
+      mean_of_rms += _rms_by_plane[plane][i_wire];
+      n ++;
+    }
+    mean_of_rms /= n;
+    scale = _rms_by_plane[plane][wire]/mean_of_rms;
+    std::cout << "scale is " << scale << std::endl;
+  }
+
+
   for (int tick = start_tick; tick < end_tick; tick ++) {
-    _data_arr[tick] -= correlatedNoiseWaveforms[plane][i_block][tick];
+    _data_arr[tick] -= scale * correlatedNoiseWaveforms[plane][i_block][tick];
   }
 
   return;

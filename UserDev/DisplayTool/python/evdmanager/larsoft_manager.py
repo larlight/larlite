@@ -22,8 +22,8 @@ class larsoft_manager(manager, wire, QtCore.QObject):
         self._process = evd.DrawUbSwiz()
 
         # Set up the noise filter and initialize
-        self._process.SetCorrectData(False)
-        self._process.SetSaveData(False)
+        self._process.SetCorrectData(True)
+        self._process.SetSaveData(True)
         self._process.SetStepSizeByPlane(48, 0)
         self._process.SetStepSizeByPlane(48, 1)
         self._process.SetStepSizeByPlane(96, 2)

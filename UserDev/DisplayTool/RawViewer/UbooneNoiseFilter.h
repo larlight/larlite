@@ -242,6 +242,22 @@ private:
 
   void remove_correlated_noise(float * _data_arr, int N, unsigned int wire, unsigned int plane);
 
+
+  // These functions are temporary to give access to the correlated noise info:
+public:
+  const std::vector<std::vector<std::vector<float> > >&
+  getCorrelatedNoiseWaveforms() {return correlatedNoiseWaveforms;}
+
+  const std::vector<std::vector<float> >
+  getCorrelatedNoiseBlocks() {return correlated_noise_blocks;}
+
+  const std::vector<std::vector<float> > &
+  get_pedestal_by_plane() {return  _pedestal_by_plane;}
+  const std::vector<std::vector<float> > &
+  get_rms_by_plane() {return _rms_by_plane;}
+  const std::vector<std::vector<wireStatus> > &
+  get_wire_status_by_plane() {return _wire_status_by_plane;}
+
   /*
   Below are the private data members, many of which can be accessed with getter
   functions.

@@ -185,10 +185,97 @@ void DrawUbSwiz::readData() {
 
   float first_pass = watch.RealTime();
   watch.Start();
-  if (_correct_data || _save_data){
+  if (_correct_data || _save_data) {
     _noise_filter.set_data(&_planeData);
     _noise_filter.clean_data();
   }
+
+
+  // Initialize all of the variables and branches possible
+  if (_save_data) {
+
+    // Setup the file and the ttree
+    char nameFile[100];
+    sprintf(nameFile, "RawDigitAna_%zu_%zu_%zu.root", _run, _subrun, _event_no);
+
+    TFile* _out = new TFile(nameFile, "RECREATE");
+    _out -> cd();
+    TTree* _tree = new TTree("waveformsub", "waveformsub");
+
+    // Save the run, subrun, and event number for redundancy
+    _tree -> Branch("run", &_run);
+    _tree -> Branch("subrun", &_subrun);
+    _tree -> Branch("event", &_event_no);
+
+    // Save the stepSize too
+    _tree -> Branch("stepSize", &stepSize);
+
+    auto pedestalByPlane = _noise_filter.get_pedestal_by_plane();
+    auto rmsByPlane = _noise_filter.get_rms_by_plane();
+
+    auto correlatedNoiseWaveforms = _noise_filter.getCorrelatedNoiseWaveforms();
+    auto correlatedNoiseBlocks = _noise_filter.getCorrelatedNoiseBlocks();
+    auto _wire_status_by_plane = _noise_filter.get_wire_status_by_plane();
+
+    int totalWaveforms = 0;
+
+    // Save the pedestals, rms, and corrected rms by plane
+    for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
+      _tree -> Branch(Form("pedestal_%u", p), &(pedestalByPlane.at(p)));
+      _tree -> Branch(Form("rms_%u", p),      &(rmsByPlane.at(p)));
+      totalWaveforms += correlatedNoiseWaveforms.at(p).size();
+      _tree -> Branch(Form("correlatedNoiseWaveforms_%u", p), &(correlatedNoiseWaveforms.at(p)));
+      _tree -> Branch(Form("correlatedNoiseBlocks_%u", p), &(correlatedNoiseBlocks.at(p)));
+    }
+
+    std::vector<std::vector<float> > correlationMatrix(totalWaveforms, std::vector<float>(totalWaveforms, 0.0));
+
+
+    int count = 0;
+    // Loop over the waveforms and get the correlations:
+    for (unsigned int i = 0; i < correlatedNoiseWaveforms.size(); i ++) {
+      for (int j = 0; j < correlatedNoiseWaveforms.at(i).size(); j ++ )
+      {
+
+        // For each wave form, correlate it to all the other waveforms.
+        // Increment the count here, and don't correlate if the correlation
+        // has already been calculated
+        int count2 = 0;
+        for (unsigned int i2 = 0; i2 < correlatedNoiseWaveforms.size(); i2 ++) {
+          for (int j2 = 0; j2 < correlatedNoiseWaveforms.at(i2).size(); j2 ++ ) {
+            if (correlationMatrix[count][count2] == 0) {
+              // This entry unfilled.  See if the cross diagonal is filled:
+              if (correlationMatrix[count2][count] != 0) {
+                correlationMatrix[count][count2] = correlationMatrix[count2][count];
+                count2 ++;
+                continue;
+              }
+              else {
+                correlationMatrix[count][count2] = getCorrelation(correlatedNoiseWaveforms[i][j], correlatedNoiseWaveforms[i2][j2]);
+                correlationMatrix[count2][count] = correlationMatrix[count][count2];
+                count2 ++;
+                continue;
+              }
+            }
+            count2++;
+          } // j2
+        } // i2
+        // Increment the number of counts
+        count ++;
+      }
+    }
+
+    // Save the correlation matrix
+    _tree -> Branch("correlationMatrix", &(correlationMatrix));
+
+
+    _tree -> Fill();
+    _tree -> Write();
+    _out -> Close();
+
+  }
+
+
 
   float second_pass = watch.RealTime();
 
@@ -469,42 +556,42 @@ void DrawUbSwiz::SetStepSizeByPlane(int step, int plane) {
 
 // }
 
-// float DrawUbSwiz::getCorrelation(const std::vector<float> & vec1, const std::vector<float> & vec2)
-// {
+float DrawUbSwiz::getCorrelation(const std::vector<float> & vec1, const std::vector<float> & vec2)
+{
 
-//   if (vec1.size() != vec2.size()) {
-//     std::cerr << "ERROR: vector sizes do not match" << std::endl;
-//     return 0.0;
-//   }
+  if (vec1.size() != vec2.size()) {
+    std::cerr << "ERROR: vector sizes do not match" << std::endl;
+    return 0.0;
+  }
 
-//   float rms_1  = 0.0;
-//   float rms_2  = 0.0;
-//   float mean_1 = 0.0;
-//   float mean_2 = 0.0;
+  float rms_1  = 0.0;
+  float rms_2  = 0.0;
+  float mean_1 = 0.0;
+  float mean_2 = 0.0;
 
-//   for (unsigned int i = 0; i < vec1.size(); i++) {
-//     mean_1 += vec1.at(i);
-//     mean_2 += vec2.at(i);
-//   }
+  for (unsigned int i = 0; i < vec1.size(); i++) {
+    mean_1 += vec1.at(i);
+    mean_2 += vec2.at(i);
+  }
 
-//   mean_1 /= vec1.size();
-//   mean_2 /= vec2.size();
+  mean_1 /= vec1.size();
+  mean_2 /= vec2.size();
 
-//   float corr = 0.0;
+  float corr = 0.0;
 
-//   for (unsigned int i = 0; i < vec1.size(); i++) {
-//     rms_1 += pow(mean_1 - vec1.at(i), 2);
-//     rms_2 += pow(mean_2 - vec2.at(i), 2);
-//     corr += (mean_1 - vec1.at(i)) * (mean_2 - vec2.at(i));
-//   }
+  for (unsigned int i = 0; i < vec1.size(); i++) {
+    rms_1 += pow(mean_1 - vec1.at(i), 2);
+    rms_2 += pow(mean_2 - vec2.at(i), 2);
+    corr += (mean_1 - vec1.at(i)) * (mean_2 - vec2.at(i));
+  }
 
-//   rms_1 = sqrt(rms_1 / vec1.size());
-//   rms_2 = sqrt(rms_2 / vec2.size());
+  rms_1 = sqrt(rms_1 / vec1.size());
+  rms_2 = sqrt(rms_2 / vec2.size());
 
-//   corr /= (rms_1 * rms_2 * vec1.size());
-//   return corr;
+  corr /= (rms_1 * rms_2 * vec1.size());
+  return corr;
 
-// }
+}
 
 // float DrawUbSwiz::getMedian(std::vector<float> & vals) {
 //   // std::map<float, int> mode_finder;
