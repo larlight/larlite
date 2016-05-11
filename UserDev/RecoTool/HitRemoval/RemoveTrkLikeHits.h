@@ -40,10 +40,13 @@ namespace larlite {
 
     // set pfpart producer
     void setPFPartProducer(std::string s) { _pfpart_producer = s; }
+    // set roi producer
+    void setROIProducer(std::string s) { _roi_producer = s; }
 
   protected:
 
     std::string _pfpart_producer;
+    std::string _roi_producer;
     
   };
 }
