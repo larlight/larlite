@@ -130,7 +130,11 @@ roi2d DrawPiZeroROI::getroi2d(larlite::PiZeroROI roi, unsigned int plane) {
   result._trkendPoint.t = roi.GetTrackEnd().at(plane).first;
   result._trkendPoint.w = roi.GetTrackEnd().at(plane).second;
 
-    
+  // save neutrino vertex
+  auto nuvtx  = roi.GetNeutrinoVertex();
+  auto point  = geoHelper->Point_3Dto2D( nuvtx , plane);
+  result._nuvtxPoint = point;
+
   result._is_good = true;
   return result;
 }
