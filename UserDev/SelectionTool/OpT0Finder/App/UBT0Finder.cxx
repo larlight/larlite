@@ -28,6 +28,9 @@ namespace larlite {
     _e_diff    = 10;
     UseAbsolutePE(false);
     SetStepLength(0.5);
+    _n_bins = 100 ;
+    _max_time = 1000;
+    _use_bnb_correctness_window = true ; 
 
     //Initialize _use_light_path_w_mc value to something
     _use_light_path_w_mc = true;
@@ -37,7 +40,7 @@ namespace larlite {
 
     _mcqclustering.SetUseLightPath(_use_light_path_w_mc);
 
-    _time_diff = new TH1D("time_diff", "Matched Flash vs. MCTrack", 100, 0, 500);
+    _time_diff = new TH1D("time_diff", "Matched Flash vs. MCTrack", _n_bins, 0, _max_time);
 
     _nflash_v_nint = new TH2D("_nflash_v_nint", "OpFlash with PE > 10 vs Nint/event ", 50, 0, 50, 30, 0, 30);
 
@@ -300,6 +303,8 @@ namespace larlite {
 //  std::cout<<"Match things...: "<<match.tpc_id<<", and size of ev_mctrk : "<<ev_mctrack->size()<<std::endl ;
 
         auto const& mct = (*ev_mctrack)[match.tpc_id];
+	if( !mct.size() ) continue;
+
         _mc_time = mct[0].T() * 1.e-3;
 
         // std::cout<<"mc and flash time for match : "<<_mc_time<<", "<<_flash_time<<std::endl;
@@ -412,8 +417,20 @@ namespace larlite {
 
       auto eligible_matches = _int_tree->GetEntries(); //"_t0>-2050000 && _t0 < 2750000") ;
 
+      //This will give us a time range of 0 - 400 ns, 60ns shaping time + 15ns intervals of electronics offsets
+      int min_time_bin = 1;
+      int max_time_bin = 40;
+
+      if( _use_bnb_correctness_window){
+        // This will give us a range of 340 - 500 ns, in accordance with BNB offset
+        min_time_bin = 34 ;//int (_min_time_window * ( _n_bins / _max_bin ) ) + 1
+        max_time_bin = 50 ; 
+        }
+
+	std::cout<<"Correctness time window is : "<<min_time_bin * _max_time / _n_bins <<" to " <<max_time_bin * _max_time / _n_bins <<std::endl ;
+
       std::cout << "\nEfficiency (#matches/#interactions)  : " << float(_flashmatch_tree->GetEntries()) / eligible_matches * 100 << "%, (" << _flashmatch_tree->GetEntries() << "/" << eligible_matches << ")" << std::endl;
-      std::cout << "Correctness (#good matches/#matches) : " << float(_time_diff->Integral(1, 80)) / _flashmatch_tree->GetEntries() * 100 << "%, (" << _time_diff->Integral(1, 80) << "/" << _flashmatch_tree->GetEntries() << ")" << std::endl;
+      std::cout << "Correctness (#good matches/#matches) : " << float(_time_diff->Integral(min_time_bin, max_time_bin)) / _flashmatch_tree->GetEntries() * 100 << "%, (" << _time_diff->Integral(min_time_bin, max_time_bin) << "/" << _flashmatch_tree->GetEntries() << ")" << std::endl;
 
 
       _flashmatch_tree->Write();

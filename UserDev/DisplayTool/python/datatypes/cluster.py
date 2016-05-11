@@ -99,8 +99,8 @@ class clusterParams(QtCore.QObject):  # recoBase):
 
         planeOffset = view._geometry.planeOriginX(self._params.plane_id.Plane)
         trigOffset  = view._geometry.triggerOffset()
-        t2cm = view._geometry.time2Cm();
-        w2cm = view._geometry.wire2Cm();
+        t2cm = view._geometry.time2cm();
+        w2cm = view._geometry.wire2cm();
 
 
         # Draw the start and end points:
