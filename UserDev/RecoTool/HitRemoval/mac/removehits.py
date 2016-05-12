@@ -24,7 +24,9 @@ my_proc.set_output_file(sys.argv[-1])
 
 hitremoval = fmwk.RemoveTrkLikeHits()
 
-hitremoval.setPFPartProducer("pandoraNu")
+#hitremoval.setPFPartProducer("pandoraNu")
+hitremoval.setPFPartProducer("ImageClusterHit")
+hitremoval.setROIProducer("pizerofilterpad")
 my_proc.add_process(hitremoval)
 
 my_proc.set_data_to_write(fmwk.data.kPiZeroROI,"pizerofilter")
