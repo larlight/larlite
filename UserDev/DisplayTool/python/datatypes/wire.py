@@ -17,10 +17,12 @@ class wire(dataBase):
 
 class recoWire(wire):
 
-    def __init__(self):
+    def __init__(self, geom):
         super(recoWire, self).__init__()
         self._process = evd.DrawWire()
         self._process.initialize()
+        for plane in xrange(geom.nViews()):
+            self._process.setYDimension(geom.readoutWindowSize(),plane)
 
 
 class rawDigit(wire):
@@ -34,5 +36,9 @@ class rawDigit(wire):
         self._process.SetStepSizeByPlane(48, 0)
         self._process.SetStepSizeByPlane(48, 1)
         self._process.SetStepSizeByPlane(96, 2)
-        self._process.SetCorrectData(True)
-        self._process.SetSaveData(False)
+        if "boone" in geom.name():
+            self._process.SetCorrectData(True)
+            self._process.SetSaveData(False)
+        else:
+            self._process.SetCorrectData(False)
+            self._process.SetSaveData(False)

@@ -53,9 +53,9 @@ def getShowerRecoAlgModular():
   angle3D.setVerbosity(False)
 
   energy = showerreco.LinearEnergy()
-  energy.SetGainU((1.-.127)/0.69)
-  energy.SetGainV((1.-.076)/0.70)
-  energy.SetGainY((1.-.169)/0.64)
+  energy.SetHitRecoCorrection(1.289, 0)
+  energy.SetHitRecoCorrection(1.323, 1)
+  energy.SetHitRecoCorrection(1.336, 2)
   energy.SetUseModBox(True)
   energy.SetUseArea(True)
   energy.setVerbosity(False)

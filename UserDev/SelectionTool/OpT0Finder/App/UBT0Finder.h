@@ -67,6 +67,8 @@ namespace larlite {
 
     void UseLightPathWithMC (bool yesOrNo ){ _use_light_path_w_mc = yesOrNo ; } 
 
+    void UseBNBCorrectnessWindow (bool yesOrNo){ _use_bnb_correctness_window = yesOrNo; }
+
   protected:
 
     ::flashana::FlashMatchManager _mgr;
@@ -132,6 +134,10 @@ namespace larlite {
 
     TH2D * _nflash_v_nint ;
     TH1D * _time_diff ;
+    int _n_bins ;
+    int _max_time ;
+
+    int _use_bnb_correctness_window ;
 
   };
 }

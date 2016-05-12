@@ -30,11 +30,10 @@ LinearEnergy::LinearEnergy()
   // fC -> mV *= ( shaping time * ASIC gain )
   _shp_time  = 2.; // in usec
   _asic_gain = 7.8; // in mV/fC
-  _gain_U = _gain_V = _gain_Y = 1.;
-  // MCC7 v05_08 gains
-  _gain_U = (1-0.127)/0.69;
-  _gain_V = (1-0.076)/0.70;
-  _gain_Y = (1-0.169)/0.64;
+
+  //  set calibrations to be equal to 1 for now
+  _HitRecoCorrection_v    = std::vector<double>(3,1.);
+  _ClusteringCorrection_v = std::vector<double>(3,1.);
   
   return;
 }
@@ -49,6 +48,7 @@ void LinearEnergy::initialize()
     _tree->Branch("_dEdx_v", "std::vector<double>", &_dEdx_v);
     _tree->Branch("_dQ_v", "std::vector<double>", &_dQ_v);
     _tree->Branch("_pl", &_pl, "_pl/I");
+    _tree->Branch("_tick_v","std::vector<double>",&_tick_v);
   }
 
   _charge_conversion = _ADC_to_mV / ( _shp_time * _asic_gain ) ;
@@ -103,6 +103,7 @@ void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
   _dQ_v.clear();
   _dE_v.clear();
   _dEdx_v.clear();
+  _tick_v.clear();
 
   // auto geom       = larutil::Geometry::GetME();
   auto geomHelper = larutil::GeometryHelper::GetME();
@@ -131,7 +132,7 @@ void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
     double pitch = geomHelper->GetPitch(dir3D, (int)pl);
 
     // store calculated energy
-    double E = 0.;
+    double E  = 0.;
     double dQ = 0.;
     double dE = 0.;
 
@@ -139,9 +140,9 @@ void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
     for (auto const &h : hits) {
 
       // lifetime correction
-      double hit_tick = h.t / t2cm ;
+      double hit_tick = h.t / t2cm;
+      _tick_v.push_back(hit_tick);
       double lifetimeCorr = exp( hit_tick * _timetick / _tau );
-      //double lifetimeCorr = 1.15;
 
       if (_useArea) {
         dQ = _caloAlg.ElectronsFromADCArea(h.charge, pl);
@@ -165,12 +166,8 @@ void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
     E /= _recomb_factor;
 
     // correct for plane-dependent shower reco energy calibration
-    if (pl == 2)
-      E *= _gain_Y;
-    if (pl == 1)
-      E *= _gain_V;
-    if (pl == 0)
-      E *= _gain_U;
+    E *= _HitRecoCorrection_v[pl];
+    E *= _ClusteringCorrection_v[pl];
 
     if (_fill_tree)
       _tree->Fill();

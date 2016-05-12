@@ -34,6 +34,7 @@ my_unit.UseMC(True)
 my_unit.SetROStart(-3200.)
 my_unit.SetROEnd(3200.)
 my_unit.SetTrigTime(0.)
+my_unit.UseBNBCorrectnessWindow(False)
 my_unit.UseLightPathWithMC(False)
 my_proc.add_process(my_unit)
 
@@ -62,7 +63,7 @@ print  "Finished configuring ana_processor. Start event loop!"
 print
 
 # Let's run it.
-my_proc.run()
+my_proc.run(0,50)
 
 # done!
 print

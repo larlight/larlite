@@ -4,7 +4,6 @@ from connectedObjects import connectedBox, connectedCircle, boxCollection
 from ROOT import evd, vector
 import pyqtgraph as pg
 import larlite as larlite
-from larlite import larutil
 
 
 class clusterParams(QtCore.QObject):  # recoBase):
@@ -98,12 +97,11 @@ class clusterParams(QtCore.QObject):  # recoBase):
         black = (0, 0, 0)
         blue = (0, 0, 255)
 
-        planeOffset = larutil.Geometry.GetME().PlaneOriginVtx(self._params.plane_id.Plane)[0]
-        trigOffset  = larutil.DetectorProperties.GetME().TriggerOffset()
-        t2cm = larutil.GeometryHelper.GetME().TimeToCm();
-        w2cm = larutil.GeometryHelper.GetME().WireToCm();
-        #t2cm = self._geom.time2cm()
-        #w2cm = self._geom.wire2cm()
+        planeOffset = view._geometry.planeOriginX(self._params.plane_id.Plane)
+        trigOffset  = view._geometry.triggerOffset()
+        t2cm = view._geometry.time2cm();
+        w2cm = view._geometry.wire2cm();
+
 
         # Draw the start and end points:
         sW = self._params.start_point.w / w2cm

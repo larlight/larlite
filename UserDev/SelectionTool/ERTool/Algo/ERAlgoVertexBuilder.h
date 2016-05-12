@@ -41,8 +41,6 @@ namespace ertool {
     Double_t const tcpoa_trackend_prox;
     Bool_t tverbose;
 
-    Int_t tevent;
-
     TTree * tree;
 
     Int_t event_id;
@@ -75,6 +73,7 @@ namespace ertool {
        Bool_t const withTrackDir,
        std::string const primary_vertex_selection = "mostupstream",
        Bool_t const showerproj = false,
+       Bool_t const showerdir = false,
        Double_t const shower_prox = 0,
        Double_t const cpoa_vert_prox = 0,
        Double_t const cpoa_trackend_prox = 0,
@@ -82,10 +81,6 @@ namespace ertool {
        
     /// Default destructor
     virtual ~ERAlgoVertexBuilder(){};
-
-    void SpecifyEvent(Int_t const event) {
-      tevent = event;
-    }
 
     /// Reset function
     void Reset();
