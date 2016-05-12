@@ -11,6 +11,7 @@ namespace larlite{
     _wire_range.clear();
     _pi0_wire_range.clear();
     _pi0_t_range.clear();
+    _cc_inc_vtx.clear();
     _muon_vtx.clear();
     _nu_vtx.clear();
     _vtx.clear();
@@ -26,7 +27,6 @@ namespace larlite{
       }
       catch(int e){
 	std::cout << "ROI vector sizes do not match, size "<< e << std::endl;
-    
       }
       return;
     }
@@ -198,6 +198,12 @@ namespace larlite{
     
   }
 
+  void PiZeroROI::SetCCIncVertex( const std::vector<float> vtx){
+    
+    _cc_inc_vtx = vtx;
+    
+  }
+
   void PiZeroROI::SetNeutrinoVertex( const std::vector<float> vtx){
     
     _nu_vtx = vtx;
@@ -220,6 +226,7 @@ namespace larlite{
   }
 
   
+  std::vector<float> PiZeroROI::GetCCIncVertex() const { return _cc_inc_vtx; }
   std::vector<float> PiZeroROI::GetMuonVertex() const { return _muon_vtx; }
   std::vector<float> PiZeroROI::GetNeutrinoVertex() const { return _nu_vtx; }
 

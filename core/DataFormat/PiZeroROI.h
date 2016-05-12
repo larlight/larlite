@@ -41,6 +41,7 @@ namespace larlite{
                                      _t_range(orig._t_range),
                                      _pi0_wire_range(orig._pi0_wire_range),
                                      _pi0_t_range(orig._pi0_t_range),      
+                                     _cc_inc_vtx(orig._cc_inc_vtx),
                                      _muon_vtx(orig._muon_vtx),
                                      _nu_vtx(orig._nu_vtx),
                                      _vtx(orig._vtx),
@@ -51,7 +52,7 @@ namespace larlite{
 
     // Here are the Setters    
     void SetROI(const std::vector < std::pair< int, int > > Wire,
-                const std::vector < std::pair< int, int> > Time); 
+		const std::vector < std::pair< int, int > > Time);
 
     void SetROI(const std::vector < std::pair< int, int > > Wire,
 		const std::vector < std::pair< int, int > > Time,
@@ -62,6 +63,7 @@ namespace larlite{
     void SetPiZeroROI(const std::vector < std::pair< int, int > > PiZeroWire,
 		      const std::vector < std::pair< int, int > > PiZeroTime);
 
+    void SetCCIncVertex( const std::vector<float> vtx);
     void SetMuonVertex( const std::vector<float> vtx);
     void SetNeutrinoVertex( const std::vector<float> vtx);
 
@@ -71,6 +73,7 @@ namespace larlite{
 
 
     // Here are the Getters
+    std::vector<float> GetCCIncVertex() const;
     std::vector<float> GetMuonVertex() const;
     std::vector<float> GetNeutrinoVertex() const;
     std::vector < std::pair <int, int > > GetVertex() const;
@@ -87,6 +90,7 @@ namespace larlite{
     std::vector < std::pair< int, int > > _t_range; // size 3 planes, min then max
     std::vector < std::pair< int, int > > _pi0_wire_range; // size 3 planes, min then max
     std::vector < std::pair< int, int > > _pi0_t_range; // size 3 planes, min then max
+    std::vector<float> _cc_inc_vtx; // size 3 plane, pair with tick, wire for vertex
     std::vector<float> _muon_vtx; // size 3 plane, pair with tick, wire for vertex
     std::vector<float> _nu_vtx; // size 3 plane, pair with tick, wire for vertex
     std::vector < std::pair <int, int > > _vtx; // size 3 plane, pair with tick, wire for vertex
