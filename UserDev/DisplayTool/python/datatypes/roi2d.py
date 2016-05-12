@@ -123,4 +123,32 @@ class roi2d(recoBase):
                 self._drawnObjects[view.plane()].append(otherPoly)
                 self._drawnObjects[view.plane()].append(trkEndPoly)
 
+                # draw the neutrino vertex
+                nuvtx = roi2d.nuvtxPoint()
+
+                # Draws a circle at (x,y,radius = 0.5 cm)
+                radBigW = 0.5 / view_manager._geometry.wire2cm()
+                radBigT = (0.5) / view_manager._geometry.time2cm()
+
+                offset = view_manager._geometry.offset(
+                    view.plane()) / view_manager._geometry.time2cm()
+
+                sW = nuvtx.w / view_manager._geometry.wire2cm()
+                sT = nuvtx.t / view_manager._geometry.time2cm() + offset
+
+                r = QtGui.QGraphicsEllipseItem(
+                    sW-radBigW, sT-radBigT, 2*radBigW, 2*radBigT)
+
+                # opacity = point.charge() / self._process.maxCharge(view.plane())
+                opacity = 0.5
+
+                # Old Way:
+                r.setPen(pg.mkPen(None))
+                #r.setBrush(pg.mkColor(0,255,255))
+                #r.setBrush(pg.mkColor(0,0,0))
+                r.setBrush( pg.mkBrush(pg.mkColor( (0,0,0, 50) ) ) )
+                self._drawnObjects[view.plane()].append(r)
+                view._view.addItem(r)
+                
+
                 i_color += 1

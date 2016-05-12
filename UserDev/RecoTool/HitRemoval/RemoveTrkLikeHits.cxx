@@ -7,6 +7,7 @@
 #include "DataFormat/hit.h"
 #include "DataFormat/vertex.h"
 #include "DataFormat/PiZeroROI.h"
+
 namespace larlite {
 
 bool RemoveTrkLikeHits::initialize() {
@@ -30,13 +31,11 @@ bool RemoveTrkLikeHits::analyze(storage_manager* storage) {
   // get PFParticles
   auto ev_pfpart = storage->get_data<event_pfpart>(_pfpart_producer);
 
-  // additionally, save a vtx object associated with the neutrino-vtx stored in the Pi0ROI
-  auto _roi_producer = "pizerofilter";
   auto *ev_roi = storage->get_data<event_PiZeroROI>(_roi_producer);
 
   auto *ev_vtx_roi = storage->get_data<event_vertex>(_roi_producer);
 
-  // produce ROIT -> vtx association
+  // produce ROI -> vtx association
   auto *ev_roi_vtx_ass = storage->get_data<event_ass>(_roi_producer);
   std::vector<std::vector<unsigned int> > roi_vtx_ass;
 
@@ -73,6 +72,29 @@ bool RemoveTrkLikeHits::analyze(storage_manager* storage) {
   } else { std::cout << "Hit found: " << ev_hit->name() << "\n";}
 
 
+  if (ev_roi->size() > 0){
+    //std::cout << "ROI exists!" << std::endl;
+    // if an ROI is present, load & save the neutrino vtx information
+    auto const& roi = ev_roi->at(0);
+    // get neutrino 3D vertex
+    auto const& nuvtxROI = roi.GetNeutrinoVertex();
+    // create a larlite vertex object that should store the information
+    // of the neutrino vertex stored in the PiZeroROI object
+    double vtx[3] = { -1, -1, -1};
+    // if the vtx information is properly stored
+    if (nuvtxROI.size() > 0){
+      for (size_t pl = 0; pl < nuvtxROI.size(); pl++){
+	//std::cout << "vtx pos @ pl " << pl << " is " << nuvtxROI[pl] << std::endl;
+	vtx[pl] = (double)nuvtxROI[pl];
+      }
+      larlite::vertex nuvtx(vtx);
+      ev_vtx_roi->emplace_back(nuvtx);
+      std::vector<unsigned int> ass = {0};
+      roi_vtx_ass.push_back( ass );
+    }//if the 3D nu vtx vector has size > 0.
+  }
+    
+    
   bool _save_unclustered_hits = true;
   std::vector<size_t> hits_tobe_removed;
 
