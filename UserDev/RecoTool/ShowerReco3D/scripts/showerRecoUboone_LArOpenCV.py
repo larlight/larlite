@@ -55,9 +55,9 @@ def getShowerRecoAlgModular():
   angle3D.setVerbosity(False)
 
   energy = showerreco.LinearEnergy()
-  energy.SetGainU(1./0.69)
-  energy.SetGainV(1./0.70)
-  energy.SetGainY(1./.64)
+  energy.SetHitRecoCorrection(1.289, 0)
+  energy.SetHitRecoCorrection(1.323, 1)
+  energy.SetHitRecoCorrection(1.336, 2)
   energy.SetUseModBox(True)
   energy.SetUseArea(True)
   energy.setVerbosity(False)
@@ -88,6 +88,9 @@ def DefaultShowerReco3D():
 
     # Create analysis unit
     ana_unit = fmwk.ShowerReco3D()
+
+    # require PDG == 11 for PFParticles
+    ana_unit.SetRequirePDG11(False)
     
     # Attach shower reco alg
     sralg = getShowerRecoAlgModular()

@@ -45,12 +45,25 @@ public:
 
     void initialize();
 
-    void SetGainU(double g) { _gain_U = g; }
-    void SetGainV(double g) { _gain_V = g; }
-    void SetGainY(double g) { _gain_Y = g; }
+    // set plane-dependent gains
+    void SetHitRecoCorrection(double f, int pl)
+    {
+      if ( pl >= _HitRecoCorrection_v.size() )
+	{ std::cout << "Cannot set gain @ this plane..." << std::endl; return; }
+      _HitRecoCorrection_v[pl] = f;
+      return;
+    }
 
-private:
-
+    void SetClusteringCorrection(double f, int pl)
+    {
+      if ( pl >= _HitRecoCorrection_v.size() )
+	{ std::cout << "Cannot set gain @ this plane..." << std::endl; return; }
+      _ClusteringCorrection_v[pl] = f;
+      return;
+    }
+    
+ private:
+    
     /// Calorimetry algorithm
     ::calo::CalorimetryAlg _caloAlg;
 
@@ -81,9 +94,17 @@ private:
     std::vector<double> _dEdx_v;
     std::vector<double> _dQ_v;
     int _pl;
+    std::vector<double> _tick_v;
 
     // per-plane shower reco calibrations
-    double _gain_U, _gain_V, _gain_Y;
+    // calibration for hit reconstruction efficiency.
+    // calculated by summing all the charge in the hits in an event (for single particle showers)
+    // and seeing how much charge is missing to get the "true" shower energy
+    std::vector<double> _HitRecoCorrection_v;
+    // calibration for clustering efficiency
+    // this is clustering-algirhm specific. how much charge misses, on average, for a cluster?
+    // account for this factor using this calibration constant
+    std::vector<double> _ClusteringCorrection_v;
 
 };
 

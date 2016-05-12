@@ -41,9 +41,9 @@ def getShowerRecoAlgModular():
   axis = showerreco.PCA3DAxis()
 
   energy = showerreco.LinearEnergy()
-  # energy.SetGainU(1.158)
-  # energy.SetGainV(1.194)
-  # energy.SetGainY(1.15)
+  #energy.SetHitRecoCorrection(1.289, 0)
+  #energy.SetHitRecoCorrection(1.323, 1)
+  #energy.SetHitRecoCorrection(1.336, 2)
   energy.SetUseModBox(True)
   energy.setVerbosity(False)
 
