@@ -1,5 +1,5 @@
-#ifndef LARLITE_DRAWVERTEX_CXX
-#define LARLITE_DRAWVERTEX_CXX
+#ifndef EVD_DRAWVERTEX_CXX
+#define EVD_DRAWVERTEX_CXX
 
 #include "DrawVertex.h"
 #include "DataFormat/vertex.h"

@@ -1,5 +1,5 @@
-#ifndef LARLITE_DRAWMATCH_CXX
-#define LARLITE_DRAWMATCH_CXX
+#ifndef EVD_DRAWMATCH_CXX
+#define EVD_DRAWMATCH_CXX
 
 #include "DrawMatch.h"
 #include "CMTool/CMTAlgMatch/CFAlgoTimeOverlap.h"
@@ -88,10 +88,10 @@ namespace evd {
     int i_pfpart = 0;
     for (auto & pfpart_clust_set : cluster_ass_v) {
 
-      // Make sure that the cluster set is evenly padded
-      for (int p = 0; p < geoService->Nplanes(); p ++) {
-	_dataByPlane.at(p).push_back(Cluster2d());
-      }
+    // Make sure that the cluster set is evenly padded
+    for (int p = 0; p < geoService->Nplanes(); p ++) {
+      _dataByPlane.at(p).push_back(Cluster2D());
+    }
 
       // Loop over the clusters and build the cluster2D:
       for (auto & i_clust : pfpart_clust_set) {
@@ -130,16 +130,16 @@ namespace evd {
 	  // }
 	  // Hit(float w, float t, float c, float r) :
 
-	  _dataByPlane.at(view).back().emplace_back(
-						    Hit(hit.WireID().Wire,
-							hit.PeakTime(),
-							hit.Integral(),
-							hit.RMS(),
-							hit.StartTick(),
-							hit.PeakTime(),
-							hit.EndTick(),
-							hit.PeakAmplitude()
-							));
+        _dataByPlane.at(view).back().emplace_back(
+          Hit2D(hit.WireID().Wire,
+              hit.PeakTime(),
+              hit.Integral(),
+              hit.RMS(),
+              hit.StartTick(),
+              hit.PeakTime(),
+              hit.EndTick(),
+              hit.PeakAmplitude()
+             ));
 
 
 	  // Determine if this hit should change the view range:
@@ -162,9 +162,9 @@ namespace evd {
       // for (auto const& hit_indices : hit_index_v) {
       //   int view = ev_hit->at(hit_indices[0]).View();
 
-      //   // Make a new cluster in the data:
-      //   _pass.push_back(Cluster2d());
-      //   _pass.back()._is_good = true;
+    //   // Make a new cluster in the data:
+    //   _pass.push_back(Cluster2D());
+    //   _pass.back()._is_good = true;
 
       //   // Fill the cluster params alg
       //   _cru_helper.GenerateParams( hit_indices, ev_hit, params);

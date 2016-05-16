@@ -11,8 +11,8 @@
 /** \addtogroup RecoViewer
 
     @{*/
-#ifndef LARLITE_DRAWTRACK_H
-#define LARLITE_DRAWTRACK_H
+#ifndef EVD_LARLITE_DRAWTRACK_H
+#define EVD_LARLITE_DRAWTRACK_H
 
 #include <iostream>
 #include "Analysis/ana_base.h"
@@ -26,20 +26,20 @@
    doxygen documentation!
  */
 
-// typedef std::vector< std::pair<float,float> > evd::Track2d;
+// typedef std::vector< std::pair<float,float> > evd::Track2D;
 
 namespace evd {
 
-class Track2d {
+class Track2D {
 public:
     std::vector<std::pair<float, float> > _track;
     const std::vector<std::pair<float, float> > & track() {return _track;}
     const std::vector<std::pair<float, float> > & direction() {return _track;}
 };
 
-// typedef std::vector<std::pair<float, float> > Track2d;
+// typedef std::vector<std::pair<float, float> > Track2D;
 
-class DrawTrack : public larlite::ana_base, public RecoBase<Track2d> {
+class DrawTrack : public larlite::ana_base, public RecoBase<Track2D> {
 
 public:
 
@@ -64,10 +64,10 @@ public:
     */
     virtual bool finalize();
 
+    Track2D getTrack2D(larlite::track track, unsigned int plane);
 
 private:
 
-    Track2d getTrack2d(larlite::track track, unsigned int plane);
 
 };
 

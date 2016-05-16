@@ -265,28 +265,28 @@ class larlite_manager(larlite_manager_base):
     def getAutoRange(self, plane):
         # This gets the max bounds
         xRangeMax, yRangeMax = super(larlite_manager, self).getAutoRange(plane)
-        xRange = xRangeMax
-        yRange = yRangeMax
+        xRange = [999,-999]
+        yRange = [99999,-99999]
         for process in self._drawnClasses:
             x, y = self._drawnClasses[process].getAutoRange(plane)
             # Check against all four of the parameters:
-            if x != None:
-                if x[0] > xRange[0]:
+            if x is not None:
+                if x[0] < xRange[0]:
                     xRange[0] = x[0]
-                if x[1] < xRange[1]:
+                if x[1] > xRange[1]:
                     xRange[1] = x[1]
-            if y != None:
-                if y[0] > yRange[0]:
+            if y is not None:
+                if y[0] < yRange[0]:
                     yRange[0] = y[0]
-                if y[1] < yRange[1]:
+                if y[1] > yRange[1]:
                     yRange[1] = y[1]
 
         # Pad the ranges by 1 cm to accommodate
-        padding = 1
-        xRange[0] = min(xRangeMax[0], xRange[0] - padding/self._geom.wire2cm())
-        xRange[1] = max(xRangeMax[1], xRange[1] + padding/self._geom.wire2cm())
-        yRange[0] = min(yRangeMax[0], yRange[0] - padding/self._geom.time2cm())
-        yRange[1] = max(yRangeMax[1], yRange[1] + padding/self._geom.time2cm())
+        padding = 5
+        xRange[0] = max(xRangeMax[0], xRange[0] - padding/self._geom.wire2cm())
+        xRange[1] = min(xRangeMax[1], xRange[1] + padding/self._geom.wire2cm())
+        yRange[0] = max(yRangeMax[0], yRange[0] - padding/self._geom.time2cm())
+        yRange[1] = min(yRangeMax[1], yRange[1] + padding/self._geom.time2cm())
         return xRange, yRange
 
     # handle all the wire stuff:

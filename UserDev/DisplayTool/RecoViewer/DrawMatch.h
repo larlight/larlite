@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef LARLITE_DRAWMATCH_H
-#define LARLITE_DRAWMATCH_H
+#ifndef EVD_DRAWMATCH_H
+#define EVD_DRAWMATCH_H
 
 #include "Analysis/ana_base.h"
 #include "LArUtil/Geometry.h"
@@ -39,7 +39,7 @@ namespace evd {
    */
 
 
-  class DrawMatch : public larlite::ana_base, public RecoBase<Cluster2d>{
+  class DrawMatch : public larlite::ana_base, public RecoBase<Cluster2D>{
   
   public:
 
