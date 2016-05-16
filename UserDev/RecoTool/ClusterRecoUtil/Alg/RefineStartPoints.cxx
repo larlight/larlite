@@ -2,7 +2,6 @@
 #define REFINESTARTPOINTS_CXX
 
 #include "RefineStartPoints.h"
-#include "LArUtil/GeometryUtilities.h"
 #include "LArUtil/GeometryHelper.h"
 
 namespace cluster {
