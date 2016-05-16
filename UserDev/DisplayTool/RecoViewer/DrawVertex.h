@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef LARLITE_DRAWVERTEX_H
-#define LARLITE_DRAWVERTEX_H
+#ifndef EVD_DRAWVERTEX_H
+#define EVD_DRAWVERTEX_H
 
 #include "Analysis/ana_base.h"
 #include "RecoBase.h"
@@ -23,11 +23,13 @@
 
 namespace evd {
 
+  typedef Point2D Vertex2D;
+
   /**
      \class DrawVertex
      User custom analysis class made by SHELL_USER_NAME
    */
-  class DrawVertex : public larlite::ana_base, public RecoBase<Point2D>{
+  class DrawVertex : public larlite::ana_base, public RecoBase<Vertex2D>{
   
   public:
 
@@ -51,6 +53,8 @@ namespace evd {
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
+
+
 
   protected:
     

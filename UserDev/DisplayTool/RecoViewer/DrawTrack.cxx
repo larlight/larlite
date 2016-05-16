@@ -1,5 +1,5 @@
-#ifndef DRAWTRACK_CXX
-#define DRAWTRACK_CXX
+#ifndef EVD_DRAWTRACK_CXX
+#define EVD_DRAWTRACK_CXX
 
 #include "DrawTrack.h"
 #include "DataFormat/track.h"
@@ -58,7 +58,7 @@ bool DrawTrack::analyze(larlite::storage_manager* storage) {
   // Populate the track vector:
   for (auto & track : *trackHandle) {
     for (unsigned int view = 0; view < geoService -> Nviews(); view++) {
-      _dataByPlane.at(view).push_back(getTrack2d(track, view));
+      _dataByPlane.at(view).push_back(getTrack2D(track, view));
     }
   }
 
@@ -85,8 +85,8 @@ bool DrawTrack::finalize() {
 
 DrawTrack::~DrawTrack(){}
 
-Track2d DrawTrack::getTrack2d(larlite::track track, unsigned int plane) {
-  Track2d result;
+Track2D DrawTrack::getTrack2D(larlite::track track, unsigned int plane) {
+  Track2D result;
   for (unsigned int i = 0; i < track.NumberTrajectoryPoints(); i++) {
     // project a point into 2D:
     try {

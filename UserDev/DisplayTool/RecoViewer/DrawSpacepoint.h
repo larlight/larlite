@@ -11,8 +11,8 @@
 /** \addtogroup RecoViewer
 
     @{*/
-#ifndef LARLITE_DRAWSPACEPOINT_H
-#define LARLITE_DRAWSPACEPOINT_H
+#ifndef EVD_DRAWSPACEPOINT_H
+#define EVD_DRAWSPACEPOINT_H
 
 #include <iostream>
 #include "Analysis/ana_base.h"

@@ -1,5 +1,5 @@
-#ifndef DRAWSHOWER_CXX
-#define DRAWSHOWER_CXX
+#ifndef EVD_DRAWSHOWER_CXX
+#define EVD_DRAWSHOWER_CXX
 
 #include "DrawShower.h"
 #include "DataFormat/shower.h"
@@ -9,11 +9,11 @@ namespace evd {
 
 
 DrawShower::DrawShower()
-  : RecoBase<Shower2d>()
+  : RecoBase<Shower2D>()
 {
   _name = "DrawShower";
   _fout = 0;
-  // showerVectorByPlane = new std::vector<std::vector<Shower2d> >;
+  // showerVectorByPlane = new std::vector<std::vector<Shower2D> >;
 }
 
 bool DrawShower::initialize() {
@@ -94,12 +94,12 @@ bool DrawShower::finalize() {
 
 
 
-Shower2d DrawShower::getShower2d(larlite::shower shower, unsigned int plane) {
+Shower2D DrawShower::getShower2d(larlite::shower shower, unsigned int plane) {
 
   auto detProp = larutil::DetectorProperties::GetME();
 
 
-  Shower2d result;
+  Shower2D result;
   result._is_good = false;
   result._plane = plane;
   // Fill out the parameters of the 2d shower

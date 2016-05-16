@@ -1,5 +1,5 @@
-#ifndef DRAWSPACEPOINT3D_CXX
-#define DRAWSPACEPOINT3D_CXX
+#ifndef EVD_DRAWSPACEPOINT3D_CXX
+#define EVD_DRAWSPACEPOINT3D_CXX
 
 #include "DrawSpacepoint.h"
 #include "LArUtil/GeometryHelper.h"

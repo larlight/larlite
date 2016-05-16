@@ -1,7 +1,7 @@
-#ifndef LARLITE_DRAWENDPOINT2D_CXX
-#define LARLITE_DRAWENDPOINT2D_CXX
+#ifndef EVD_DRAWENDPOINT_CXX
+#define EVD_DRAWENDPOINT_CXX
 
-#include "DrawEndpoint2d.h"
+#include "DrawEndpoint.h"
 #include "DataFormat/endpoint2d.h"
 
 namespace evd {

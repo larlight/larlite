@@ -1,5 +1,5 @@
 /**
- * \file DrawEndpoint2d.h
+ * \file DrawEndpoint.h
  *
  * \ingroup RecoViewer
  *
@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef LARLITE_DRAWENDPOINT2D_H
-#define LARLITE_DRAWENDPOINT2D_H
+#ifndef LARLITE_DRAWENDPOINT_H
+#define LARLITE_DRAWENDPOINT_H
 
 #include "Analysis/ana_base.h"
 #include "RecoBase.h"
