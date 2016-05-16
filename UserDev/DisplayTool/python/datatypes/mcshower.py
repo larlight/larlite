@@ -138,10 +138,10 @@ try:
             self._productName = 'mcshower3D'
             self._process = evd.DrawMCShower3D()
             self.init()
-            self.electronColor = [0.10, 0.50, 1.00 ,1.00]
-            self.photonColor   = [1.00, 0.00, 0.00, 1.00]
-            self.unknownColor  = [0.75, 0.75, 0.00, 1.00]
-            self.kaleKolor     = [0.04, 0.78, 0.31, 1.00]
+            self.electronColor = (0.10, 0.50, 1.00, 0.25)
+            self.photonColor   = (1.00, 0.00, 0.00, 0.25)
+            self.unknownColor  = (0.75, 0.75, 0.00, 0.25)
+            self.kaleKolor     = (0.04, 0.78, 0.31, 0.25)
 
         # def clearDrawnObjects(self,view_manager):
         #   pass
@@ -182,7 +182,7 @@ try:
                                          drawEdges=False,
                                          shader='shaded',
                                          color=color,
-                                         glOptions='opaque')
+                                         glOptions='additive')
                 # We need to get this cyliner's axis to match the actual axis
                 # we can rotate it around an axis.
                 # Find the axis to rotate it around, which is the axis perpendicular to it's current axis
