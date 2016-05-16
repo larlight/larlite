@@ -28,17 +28,21 @@ bool DrawEmpty::analyze(larlite::storage_manager* storage) {
   // get a handle to the tracks
   auto emptyHandle = storage->get_data<larlite::event_empty>(_producer);
 
-  // Clear out the hit data but reserve some space for the showers
+  // Clear out the data but reserve some space
   for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
     _dataByPlane.at(p).clear();
-    _dataByPlane.at(p).reserve(trackHandle -> size());
+    _dataByPlane.at(p).reserve(emptyHandle -> size());
+    _wireRange.at(p).first  = 99999;
+    _timeRange.at(p).first  = 99999;
+    _timeRange.at(p).second = -1.0;
+    _wireRange.at(p).second = -1.0;
   }
 
 
-  // Populate the track vector:
-  for (auto & track : *trackHandle) {
+  // Populate the empty vector:
+  for (auto & empty : *emptyHandle) {
     for (unsigned int view = 0; view < geoService -> Nviews(); view++) {
-      _dataByPlane.at(view).push_back(getEmpty2D(track, view));
+      _dataByPlane.at(view).push_back(getEmpty2D(empty, view));
     }
   }
 
@@ -53,7 +57,7 @@ bool DrawEmpty::finalize() {
 
 DrawEmpty::~DrawEmpty(){}
 
-Empty2D DrawEmpty::getEmpty2D(larlite::track track, unsigned int plane) {
+Empty2D DrawEmpty::getEmpty2D(larlite::empty empty, unsigned int plane) {
   Empty2D result;
   
   /*

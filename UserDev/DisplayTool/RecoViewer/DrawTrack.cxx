@@ -52,6 +52,10 @@ bool DrawTrack::analyze(larlite::storage_manager* storage) {
   for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
     _dataByPlane.at(p).clear();
     _dataByPlane.at(p).reserve(trackHandle -> size());
+    _wireRange.at(p).first  = 99999;
+    _timeRange.at(p).first  = 99999;
+    _timeRange.at(p).second = -1.0;
+    _wireRange.at(p).second = -1.0;
   }
 
 
