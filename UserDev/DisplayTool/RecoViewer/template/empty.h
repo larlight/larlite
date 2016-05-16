@@ -3,7 +3,7 @@
  *
  * \ingroup RecoViewer
  *
- * \brief Class def header for a class DrawTrack
+ * \brief Class def header for a class DrawEmpty
  *
  * @author cadams
  */
@@ -25,22 +25,20 @@ namespace evd {
 
 class Empty2D {
 public:
-    std::vector<std::pair<float, float> > _track;
-    const std::vector<std::pair<float, float> > & track() {return _track;}
-    const std::vector<std::pair<float, float> > & direction() {return _track;}
+
 };
 
 // typedef std::vector<std::pair<float, float> > Empty2D;
 
-class DrawTrack : public larlite::ana_base, public RecoBase<Empty2D> {
+class DrawEmpty : public larlite::ana_base, public RecoBase<Empty2D> {
 
 public:
 
     /// Default constructor
-    DrawTrack();
+    DrawEmpty();
 
     /// Default destructor
-    ~DrawTrack();
+    ~DrawEmpty();
 
     /** IMPLEMENT in DrawCluster.cc!
         Initialization method to be called before the analysis event loop.
