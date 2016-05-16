@@ -19,7 +19,7 @@
 #define RECOTOOL_MCSHOWERCLUSTERER_HH
 
 #include "Analysis/ana_base.h"
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/Geometry.h"
 
 namespace larlite {
   /**
