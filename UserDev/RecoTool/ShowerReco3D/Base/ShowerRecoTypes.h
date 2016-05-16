@@ -44,6 +44,8 @@ struct Shower_t {
   TVector3 fSigmaDCosStart;                   ///< uncertainty on initial direction cosines
   TVector3 fXYZStart;                         ///< 3D start point of shower
   TVector3 fSigmaXYZStart;                    ///< uncertainty on 3D start point
+  TVector3 fCentroid;                         ///< 3D centroid of shower
+  TVector3 fSigmaCentroid;                    ///< uncertainty on 3D centroid
   double   fLength;                           ///< 3D length of a shower
   double   fWidth[2];                         ///< 3D width of a shower (2 directions)
   double   fOpeningAngle;                     ///< 3D opening angle of a shower
@@ -90,6 +92,9 @@ struct Shower_t {
 
     fXYZStart[0] = fXYZStart[1] = fXYZStart[2] = kDOUBLE_MIN;
     fSigmaXYZStart[0] = fSigmaXYZStart[1] = fSigmaXYZStart[2] = kDOUBLE_MIN;
+
+    fCentroid[0] = fCentroid[1] = fCentroid[2] = kDOUBLE_MIN;
+    fSigmaCentroid[0] = fSigmaCentroid[1] = fSigmaCentroid[2] = kDOUBLE_MIN;
 
     fLength = kDOUBLE_MIN;
     fWidth[0] = fWidth[1] = kDOUBLE_MIN;
