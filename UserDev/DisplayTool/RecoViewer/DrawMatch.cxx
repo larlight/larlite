@@ -1,5 +1,5 @@
-#ifndef LARLITE_DRAWMATCH_CXX
-#define LARLITE_DRAWMATCH_CXX
+#ifndef EVD_DRAWMATCH_CXX
+#define EVD_DRAWMATCH_CXX
 
 #include "DrawMatch.h"
 #include "CMTool/CMTAlgMatch/CFAlgoTimeOverlap.h"
@@ -89,7 +89,7 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
 
     // Make sure that the cluster set is evenly padded
     for (int p = 0; p < geoService->Nplanes(); p ++) {
-      _dataByPlane.at(p).push_back(Cluster2d());
+      _dataByPlane.at(p).push_back(Cluster2D());
     }
 
     // Loop over the clusters and build the cluster2D:
@@ -130,7 +130,7 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
         // Hit(float w, float t, float c, float r) :
 
         _dataByPlane.at(view).back().emplace_back(
-          Hit(hit.WireID().Wire,
+          Hit2D(hit.WireID().Wire,
               hit.PeakTime(),
               hit.Integral(),
               hit.RMS(),
@@ -162,7 +162,7 @@ bool DrawMatch::analyze(larlite::storage_manager* storage) {
     //   int view = ev_hit->at(hit_indices[0]).View();
 
     //   // Make a new cluster in the data:
-    //   _pass.push_back(Cluster2d());
+    //   _pass.push_back(Cluster2D());
     //   _pass.back()._is_good = true;
 
     //   // Fill the cluster params alg
