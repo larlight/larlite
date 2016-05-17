@@ -3,7 +3,7 @@
  *
  * \ingroup RecoViewer
  *
- * \brief Class def header for a class DrawEndpoint2d
+ * \brief Class def header for a class DrawEndpoint
  *
  * @author cadams
  */
@@ -45,30 +45,30 @@ private:
 };
 
 /**
-   \class DrawEndpoint2d
+   \class DrawEndpoint
    User custom analysis class made by SHELL_USER_NAME
  */
-class DrawEndpoint2d : public larlite::ana_base, public RecoBase<Endpoint2D> {
+class DrawEndpoint : public larlite::ana_base, public RecoBase<Endpoint2D> {
 
 public:
 
   /// Default constructor
-  DrawEndpoint2d();
+  DrawEndpoint();
 
   // / Default destructor
-  // virtual ~DrawEndpoint2d();
+  // virtual ~DrawEndpoint();
 
-  /** IMPLEMENT in DrawEndpoint2d.cc!
+  /** IMPLEMENT in DrawEndpoint.cc!
       Initialization method to be called before the analysis event loop.
   */
   virtual bool initialize();
 
-  /** IMPLEMENT in DrawEndpoint2d.cc!
+  /** IMPLEMENT in DrawEndpoint.cc!
       Analyze a data event-by-event
   */
   virtual bool analyze(larlite::storage_manager* storage);
 
-  /** IMPLEMENT in DrawEndpoint2d.cc!
+  /** IMPLEMENT in DrawEndpoint.cc!
       Finalize method to be called after all events processed.
   */
   virtual bool finalize();
