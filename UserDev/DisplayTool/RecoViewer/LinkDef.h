@@ -48,6 +48,10 @@
 // Link the classes that are processors
 #pragma link C++ class evd::DrawVertex+;
 #pragma link C++ class evd::DrawSpacepoint+;
+
+#pragma link C++ class evd::DrawNeutrino+;
+#pragma link C++ class evd::Neutrino2D+;
+
 // #pragma link C++ class std::vector<std::vector<std::pair<float,float> > >+;
 //ADD_NEW_CLASS ... do not change this line
 #endif

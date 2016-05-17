@@ -39,19 +39,10 @@ namespace evd {
     /// Default destructor
     virtual ~DrawVertex(){};
 
-    /** IMPLEMENT in DrawVertex.cc!
-        Initialization method to be called before the analysis event loop.
-    */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in DrawVertex.cc! 
-        Analyze a data event-by-event  
-    */
     virtual bool analyze(larlite::storage_manager* storage);
 
-    /** IMPLEMENT in DrawVertex.cc! 
-        Finalize method to be called after all events processed.
-    */
     virtual bool finalize();
 
 
