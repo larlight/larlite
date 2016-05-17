@@ -136,7 +136,7 @@ class microboone(geometry):
         self._haslogo = True
         self._logopos = [1250,10]
         self._logoscale = 0.1
-        self._tRange = 4800
+        self._tRange = 9600
         self._triggerOffset = 3200
         self._readoutWindowSize = 9600
         self._planeOriginX = [0.0, -0.3, -0.6] 
@@ -185,7 +185,7 @@ class microboonetruncated(microboone):
         super(microboonetruncated, self).__init__()
 
         # The truncated readouts change the trigger offset and 
-        self._tRange = 4800
+        self._tRange = 6400
         self._triggerOffset = 800
         self._planeOriginX = [0.0, -0.3, -0.6] 
         self._readoutWindowSize = 6400
