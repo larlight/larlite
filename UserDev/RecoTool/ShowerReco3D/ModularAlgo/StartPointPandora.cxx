@@ -5,6 +5,12 @@
 
 namespace showerreco {
 
+StartPointPandora::StartPointPandora() {
+  _name = "StartPointPandora";
+  _range = 5.;
+  return;
+}
+
 void StartPointPandora::do_reconstruction(
   const ::protoshower::ProtoShower & proto_shower,
   Shower_t& resultShower) {
@@ -28,6 +34,7 @@ void StartPointPandora::do_reconstruction(
     auto vertexes = proto_shower.vertexes();
     auto pca = proto_shower.params3D().principal_dir;
 
+    // This is mainly aiming to get the right vertex from a merged pfparticle
     std::sort( vertexes.begin(), vertexes.end(),
          [ &pca ]( TVector3 const & a, TVector3 const & b) { return (a * pca) < (b * pca); } );
 
@@ -55,8 +62,34 @@ void StartPointPandora::do_reconstruction(
         dir = -1.;
       }
     }
-
     if ( dir < 0. ) resultShower.fDCosStart *= dir;
+
+    // Now focus on the situation where pandora doesn't find the vertex in the
+    // shower starting region (or it finds a vertex in the end of the shower)
+    TVector3 CentroidOnPCA = resultShower.fXYZStart + PointProjectedToLine( resultShower.fCentroid, resultShower.fDCosStart );
+    TVector3 halfLength = CentroidOnPCA - resultShower.fXYZStart;
+    TVector3 candStart = CentroidOnPCA + halfLength;
+    if ( _range > halfLength.Mag() ) _range = halfLength.Mag();
+
+    double spreadStart = 0., spreadCandStart = 0.;
+    int nStart = 0, nCandStart = 0;
+    for ( auto & sps : sortedSPS ) {
+      TVector3 p( sps.X(), sps.Y(), sps.Z() );
+      TVector3 projP = resultShower.fXYZStart + PointProjectedToLine( p, resultShower.fDCosStart );
+      TVector3 diffStart = projP - resultShower.fXYZStart;
+      TVector3 diffCandStart = projP - candStart;
+      if ( diffStart.Mag() < _range ) {
+        spreadStart += pow( DCAPointToLine( p, resultShower.fXYZStart, resultShower.fDCosStart ), 2 );
+        nStart += 1;
+      } else if ( diffCandStart.Mag() < _range ) {
+        spreadCandStart += pow( DCAPointToLine( p, candStart, resultShower.fDCosStart ), 2 );
+        nCandStart += 1;
+      }
+    }
+    if ( spreadCandStart/(double)nCandStart < spreadStart/(double)nStart ) {
+      resultShower.fXYZStart = candStart;
+      resultShower.fDCosStart *= -1.;
+    }
 
   }
   else {
@@ -66,6 +99,13 @@ void StartPointPandora::do_reconstruction(
 
 TVector3 StartPointPandora::PointProjectedToLine( const TVector3& point, const TVector3& line ) {
   return ( point * line / ( line * line ) ) * line;
+}
+
+double StartPointPandora::DCAPointToLine( const TVector3& p, const TVector3& c, const TVector3& m ) {
+  TVector3 diff = c - p;
+  double t = -1.*diff*m/ m.Mag2();
+  TVector3 dca = c + t*m - p;
+  return dca.Mag();
 }
 
 } //showerreco

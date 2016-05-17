@@ -28,18 +28,21 @@ class StartPointPandora : ShowerRecoModuleBase {
 public:
 
   /// Default constructor
-  StartPointPandora() {_name = "StartPointPandora";}
+  StartPointPandora();
 
   /// Default destructor
   ~StartPointPandora() {}
 
-
   void do_reconstruction(const ::protoshower::ProtoShower &, Shower_t &);
 
   TVector3 PointProjectedToLine( const TVector3& point, const TVector3& line );
+  double DCAPointToLine( const TVector3& p, const TVector3& c, const TVector3& m );
+
+  void SetRange( double range ) { _range = range; }
 
 private:
 
+  double _range;
 };
 
 } // showerreco
