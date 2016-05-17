@@ -30,12 +30,16 @@
 
 namespace evd {
 
+
+
 class Track2D {
 public:
-    std::vector<std::pair<float, float> > _track;
-    const std::vector<std::pair<float, float> > & track() {return _track;}
-    const std::vector<std::pair<float, float> > & direction() {return _track;}
+  std::vector<std::pair<float, float> > _track;
+  const std::vector<std::pair<float, float> > & track() {return _track;}
+  const std::vector<std::pair<float, float> > & direction() {return _track;}
 };
+
+Track2D getTrack2D(larlite::track track, unsigned int plane);
 
 // typedef std::vector<std::pair<float, float> > Track2D;
 
@@ -43,28 +47,19 @@ class DrawTrack : public larlite::ana_base, public RecoBase<Track2D> {
 
 public:
 
-    /// Default constructor
-    DrawTrack();
+  /// Default constructor
+  DrawTrack();
 
-    /// Default destructor
-    ~DrawTrack();
+  /// Default destructor
+  ~DrawTrack();
 
-    /** IMPLEMENT in DrawCluster.cc!
-        Initialization method to be called before the analysis event loop.
-    */
-    virtual bool initialize();
+  virtual bool initialize();
 
-    /** IMPLEMENT in DrawCluster.cc!
-        Analyze a data event-by-event
-    */
-    virtual bool analyze(larlite::storage_manager* storage);
+  virtual bool analyze(larlite::storage_manager* storage);
 
-    /** IMPLEMENT in DrawCluster.cc!
-        Finalize method to be called after all events processed.
-    */
-    virtual bool finalize();
+  virtual bool finalize();
 
-    Track2D getTrack2D(larlite::track track, unsigned int plane);
+
 
 private:
 

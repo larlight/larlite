@@ -130,16 +130,16 @@ bool DrawCluster::analyze(larlite::storage_manager* storage) {
 
       _dataByPlane.at(view).back().emplace_back(
         Hit2D(hit.WireID().Wire,
-            hit.PeakTime(),
-            hit.Integral(),
-            hit.RMS(),
-            hit.StartTick(),
-            hit.PeakTime(),
-            hit.EndTick(),
-            hit.PeakAmplitude()
-           ));
+              hit.PeakTime(),
+              hit.Integral(),
+              hit.RMS(),
+              hit.StartTick(),
+              hit.PeakTime(),
+              hit.EndTick(),
+              hit.PeakAmplitude()
+             ));
 
-  
+
       // Determine if this hit should change the view range:
       if (hit.WireID().Wire > _wireRange.at(view).second)
         _wireRange.at(view).second = hit.WireID().Wire;
