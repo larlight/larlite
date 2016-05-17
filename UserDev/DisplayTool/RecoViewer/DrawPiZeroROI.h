@@ -17,7 +17,7 @@
 #include <iostream>
 #include "Analysis/ana_base.h"
 #include "LArUtil/Geometry.h"
-#include "LArUtil/GeometryUtilities.h"
+#include "LArUtil/GeometryHelper.h"
 #include "DataFormat/PiZeroROI.h"
 #include "RecoBase.h"
 
