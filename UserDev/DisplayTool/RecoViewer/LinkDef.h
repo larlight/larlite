@@ -16,9 +16,9 @@
 #pragma link C++ class evd::RecoBase<evd::Shower2D>+;
 #pragma link C++ class evd::DrawShower+;
 
-#pragma link C++ class evd::Hit+;
-#pragma link C++ class std::vector<::evd::Hit>+;
-#pragma link C++ class evd::RecoBase<evd::Hit>+;
+#pragma link C++ class evd::Hit2D+;
+#pragma link C++ class std::vector<::evd::Hit2D>+;
+#pragma link C++ class evd::RecoBase<evd::Hit2D>+;
 #pragma link C++ class evd::DrawHit+;
 
 #pragma link C++ class evd::Cluster2D+;
