@@ -32,34 +32,34 @@ namespace evd {
 
 
 
-  class Track2D {
-  public:
-    std::vector<std::pair<float, float> > _track;
-    const std::vector<std::pair<float, float> > & track() {return _track;}
-    const std::vector<std::pair<float, float> > & direction() {return _track;}
-  };
-  
-  Track2D getTrack2D(larlite::track track, unsigned int plane);
-  
-  // typedef std::vector<std::pair<float, float> > Track2D;
-  
-  class DrawTrack : public larlite::ana_base, public RecoBase<Track2D> {
-    
-  public:
-    
-    /// Default constructor
-    DrawTrack();
+class Track2D {
+public:
+  std::vector<std::pair<float, float> > _track;
+  const std::vector<std::pair<float, float> > & track() {return _track;}
+  const std::vector<std::pair<float, float> > & direction() {return _track;}
+};
 
-    /// Default destructor
-    ~DrawTrack();
+Track2D getTrack2D(larlite::track track, unsigned int plane);
 
-    virtual bool initialize();
+// typedef std::vector<std::pair<float, float> > Track2D;
 
-    virtual bool analyze(larlite::storage_manager* storage);
+class DrawTrack : public larlite::ana_base, public RecoBase<Track2D> {
 
-    virtual bool finalize();
+public:
 
-    
+  /// Default constructor
+  DrawTrack();
+
+  /// Default destructor
+  ~DrawTrack();
+
+  virtual bool initialize();
+
+  virtual bool analyze(larlite::storage_manager* storage);
+
+  virtual bool finalize();
+
+
 
 private:
 

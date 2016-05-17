@@ -54,7 +54,7 @@ bool DrawEndpoint2d::analyze(larlite::storage_manager* storage) {
 
 
 
-  // Clear out the data but reserve some space 
+  // Clear out the data but reserve some space
   for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
     _dataByPlane.at(p).clear();
     _dataByPlane.at(p).reserve(ev_end2d -> size());

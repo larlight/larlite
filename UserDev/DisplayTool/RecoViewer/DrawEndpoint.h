@@ -23,7 +23,7 @@ namespace evd {
 class Endpoint2D {
 
 public:
-  Endpoint2D(){}
+  Endpoint2D() {}
   Endpoint2D(float w, float t, float c, float s) :
     _wire(w),
     _time(t),

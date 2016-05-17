@@ -24,36 +24,36 @@
 
 namespace evd {
 
-  class Neutrino2D {
-    
-  public:
-    
-    Vertex2D _vtx;
-    Track2D  _trk;
-    
-  };
-  
-  class DrawNeutrino : public larlite::ana_base, public RecoBase<Neutrino2D> {
-    
-  public:
-    
-    /// Default constructor
-    DrawNeutrino();
-    
-    /// Default destructor
-    ~DrawNeutrino(){}
-    
-    virtual bool initialize();
+class Neutrino2D {
 
-    virtual bool analyze(larlite::storage_manager* storage);
+public:
 
-    virtual bool finalize();
+  Vertex2D _vtx;
+  Track2D  _trk;
 
-  private:
-    
-    
-  };
-  
+};
+
+class DrawNeutrino : public larlite::ana_base, public RecoBase<Neutrino2D> {
+
+public:
+
+  /// Default constructor
+  DrawNeutrino();
+
+  /// Default destructor
+  ~DrawNeutrino() {}
+
+  virtual bool initialize();
+
+  virtual bool analyze(larlite::storage_manager* storage);
+
+  virtual bool finalize();
+
+private:
+
+
+};
+
 } // evd
 
 #endif
