@@ -3,21 +3,6 @@
 
 #include "UbooneNoiseFilter.h"
 
-namespace larlite {
-
-unsigned int detPropFetcher::n_wires(unsigned int plane) {
-  if (plane == 0)
-    return 2400;
-  else if (plane == 1)
-    return 2400;
-  else
-    return 3456;
-}
-unsigned int detPropFetcher::n_planes() {
-  return 3;
-}
-
-}
 
 namespace ub_noise_filter {
 
@@ -77,11 +62,9 @@ void UbooneNoiseFilter::reset_internal_data() {
     _chirp_map.clear();
   }
 
-  correlatedNoiseWaveforms.clear();
-  correlatedNoiseWaveforms.resize(correlated_noise_blocks.size());
-  for (size_t i = 0; i < correlated_noise_blocks.size(); i ++) {
-    correlatedNoiseWaveforms.at(i).resize(correlated_noise_blocks.at(i).size() - 1);
-  }
+
+  _corr_filter.reset();
+
 
 
 }
@@ -143,29 +126,25 @@ void UbooneNoiseFilter::clean_data() {
       // rescale_by_rms(_wire_arr, _n_time_ticks_data, wire, plane);
 
     }
-
-
-    // To remove the correlated noise, loop over blocks of wires:
-    for (unsigned int plane = 0; plane < _detector_properties_interface.n_planes(); plane ++) {
-      for (size_t i_block = 0; i_block < correlated_noise_blocks.at(plane).size() - 1; i_block ++) {
-        int block_wire_start = correlated_noise_blocks.at(plane).at(i_block);
-
-        // std::cout << "Plane " << plane << ", i_block " << i_block << std::endl;
-
-        size_t offset = block_wire_start * _n_time_ticks_data;
-
-
-        float * _wire_block = &(_data_by_plane->at(plane).at(offset));
-
-
-        build_correlated_noise_waveforms(_wire_block,
-                                         i_block,
-                                         plane,
-                                         _n_time_ticks_data);
-      }
-    }
   }
 
+
+  // Pass the chirping info and the wire status info to the correlated
+  // noise filter
+  _corr_filter.set_wire_status_pointer(&(_wire_status_by_plane) );
+  _corr_filter.set_chirp_info_pointer(&(_chirp_info_by_plane) );
+
+  // To build the correlated noise, pass each plane to the correlated noise filter:
+  for (unsigned int plane = 0; plane < _detector_properties_interface.n_planes(); plane ++) {
+
+    float * _wire_block = &(_data_by_plane->at(plane).front());
+
+    _corr_filter.build_noise_waveforms(_wire_block,
+        plane,
+        _n_time_ticks_data);
+  }
+
+  // Now clean up the wires from the correlated noise:
   for (unsigned int plane = 0; plane < _detector_properties_interface.n_planes(); plane ++) {
 
     // Loop over the wires within the plane
@@ -175,8 +154,7 @@ void UbooneNoiseFilter::clean_data() {
       size_t offset = wire * _n_time_ticks_data;
 
       float * _wire_arr = &(_data_by_plane->at(plane).at(offset));
-
-      remove_correlated_noise(_wire_arr, _n_time_ticks_data, wire, plane);
+      _corr_filter.remove_correlated_noise(_wire_arr, _n_time_ticks_data, wire, plane);
 
       // rescale_by_rms(_wire_arr, _n_time_ticks_data, wire, plane, true);
 
@@ -329,30 +307,6 @@ void UbooneNoiseFilter::get_pedestal_info(float * _data_arr, int N, int wire, in
 }
 
 
-void UbooneNoiseFilter::rescale_by_rms(float * _data_arr,
-                                       int N,
-                                       unsigned int wire,
-                                       unsigned int plane,
-                                       bool inverse) {
-
-  // If the wire status is normal or chirping, rescale the wire by the rms to set the RMS to 1.0
-
-
-  if (_wire_status_by_plane[plane][wire] == kNormal) {
-    float scale;
-    if (inverse) {
-      scale  = _rms_by_plane[plane][wire];
-    }
-    else {
-      scale = 1.0 / _rms_by_plane[plane][wire];
-    }
-    for (int tick = 0; tick < N; tick ++) {
-      _data_arr[tick] *= scale;
-    }
-  }
-}
-
-
 void UbooneNoiseFilter::apply_moving_average(
   float * _data_arr,
   int N,
@@ -398,157 +352,8 @@ void UbooneNoiseFilter::apply_moving_average(
 
 }
 
-void UbooneNoiseFilter::remove_correlated_noise(
-  float * _data_arr,
-  int N,
-  unsigned int wire,
-  unsigned int plane) {
-
-  if (_wire_status_by_plane[plane][wire] == kDead ||
-      _wire_status_by_plane[plane][wire] == kHighNoise) {
-    // Make sure all the ticks are zeroed out:
-    for (int tick = 0; tick < N; tick ++) {
-      _data_arr[tick] = 0.0;
-    }
-    return;
-  }
-
-  // First, need to know what block this wire came from:
-  size_t i_block;
-  for (i_block = 0;
-       i_block < correlated_noise_blocks.at(plane).size();
-       i_block ++)
-  {
-    if (correlated_noise_blocks.at(plane).at(i_block + 1) > wire) {
-      // Then the block is the correct one!
-      break;
-    }
-  }
-
-  // Now subtract the waveform from this wire
-  int start_tick = 0;
-  int end_tick = _n_time_ticks_data;
 
 
-
-  if (_chirp_info_by_plane[plane].find(wire) != _chirp_info_by_plane[plane].end()) {
-    // this wire IS chirping, so only use the good range:
-    // Either start or the end of the wire will be one range of the chirping.
-    if (_chirp_info_by_plane[plane][wire].chirp_start == 0) {
-      start_tick = _chirp_info_by_plane[plane][wire].chirp_stop;
-      end_tick = _n_time_ticks_data;
-    }
-    else {
-      start_tick = 0.0;
-      end_tick = _chirp_info_by_plane[plane][wire].chirp_start;
-    }
-  }
-  else {
-    // Then this wire is not chirping, use the whole range for pedestal subtraction
-
-  }
-
-  float scale = 1.0;
-  // Determine the RMS of the correlated waveform to subtract:
-
-
-  // Get the typical RMS of wires within this block, and the RMS of this particular wire.
-  // Then scale this noise waveform to match the wire.  But only if this is at the edge of a block
-  if (wire == correlated_noise_blocks[plane][i_block] ||
-      wire == correlated_noise_blocks[plane][i_block + 1] - 1) {
-    // Get the typical RMS of the rest of this block:
-    double mean_of_rms = 0.0;
-    int n = 0;
-    for (int i_wire = correlated_noise_blocks[plane][i_block] + 2;
-         i_wire < correlated_noise_blocks[plane][i_block + 1] - 2;
-         i_wire ++) {
-      mean_of_rms += _rms_by_plane[plane][i_wire];
-      n ++;
-    }
-    mean_of_rms /= n;
-    scale = _rms_by_plane[plane][wire]/mean_of_rms;
-    std::cout << "scale is " << scale << std::endl;
-  }
-
-
-  for (int tick = start_tick; tick < end_tick; tick ++) {
-    _data_arr[tick] -= scale * correlatedNoiseWaveforms[plane][i_block][tick];
-  }
-
-  return;
-
-}
-
-
-
-void UbooneNoiseFilter::build_correlated_noise_waveforms(
-  float * _wire_block,
-  int i_block,
-  int plane,
-  int _n_time_ticks_data)
-{
-
-
-  // std::cout << "correlatedNoiseWaveforms.size() " << correlatedNoiseWaveforms.size() << std::endl;
-  // std::cout << "correlatedNoiseWaveforms.at(plane).size() " << correlatedNoiseWaveforms.at(plane).size() << std::endl;
-  correlatedNoiseWaveforms.at(plane).at(i_block).clear();
-  correlatedNoiseWaveforms.at(plane).at(i_block).resize(_n_time_ticks_data);
-
-  int block_wire_start = correlated_noise_blocks.at(plane).at(i_block);
-  // std::cout << "block_wire_start " << block_wire_start << std::endl;
-  int block_wire_end = correlated_noise_blocks.at(plane).at(i_block + 1);
-  // std::cout << "block_wire_end " << block_wire_end << std::endl;
-
-  // Loop over the wires in this block and build a correlated noise waveform from them.
-  std::vector<float> _median_accumulator;
-
-  // Loop over every tick in this block, which takes some time ...
-  int offset;
-  for (int tick = 0; tick < _n_time_ticks_data; tick ++) {
-    _median_accumulator.clear();
-    _median_accumulator.reserve(block_wire_end - block_wire_start);
-    for (int wire = 0; wire < block_wire_end - block_wire_start ; wire ++) {
-      if (_wire_status_by_plane[plane][wire] == kNormal) {
-        offset = tick + wire * _n_time_ticks_data;
-        // std::cout << "Accessing at wire " << wire << ", offset " << offset << std::endl;
-        _median_accumulator.push_back(_wire_block[offset]);
-        // std::cout << "Success!" << std::endl;
-
-
-      }
-    }
-
-    // std::cout << "_median_accumulator.size() " << _median_accumulator.size() << std::endl;
-
-    // Now find the median of this tick:
-
-    if (_median_accumulator.size() < 8) {
-      continue;
-    }
-
-    std::nth_element(_median_accumulator.begin(),
-                     _median_accumulator.begin() + _median_accumulator.size() / 2,
-                     _median_accumulator.end());
-    float median = _median_accumulator.at(_median_accumulator.size() / 2);
-
-    // std::cout << "median is " << median << std::endl;
-    // if (_median_accumulator.size() % 2 == 0) {
-    //   std::nth_element(_median_accumulator.begin(),
-    //                    _median_accumulator.begin() + _median_accumulator.size() / 2 - 1,
-    //                    _median_accumulator.end());
-    //   median += _median_accumulator.at(_median_accumulator.size() / 2 - 1);
-    //   median /= 2.0;
-    // }
-    // std::cout << "median is " << median << std::endl;
-
-    correlatedNoiseWaveforms.at(plane).at(i_block).at(tick) = median;
-    // if (tick > 3000)
-    // return;
-
-  }
-
-
-}
 
 
 bool UbooneNoiseFilter::is_chirping(float * _data_arr,

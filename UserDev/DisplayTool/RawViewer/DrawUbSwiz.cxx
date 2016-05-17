@@ -196,7 +196,7 @@ void DrawUbSwiz::readData() {
 
     // Setup the file and the ttree
     char nameFile[100];
-    sprintf(nameFile, "RawDigitAna_%zu_%zu_%zu.root", _run, _subrun, _event_no);
+    sprintf(nameFile, "RawDigitAna_%u_%u_%u.root", _run, _subrun, _event_no);
 
     TFile* _out = new TFile(nameFile, "RECREATE");
     _out -> cd();
@@ -213,8 +213,8 @@ void DrawUbSwiz::readData() {
     auto pedestalByPlane = _noise_filter.get_pedestal_by_plane();
     auto rmsByPlane = _noise_filter.get_rms_by_plane();
 
-    auto correlatedNoiseWaveforms = _noise_filter.getCorrelatedNoiseWaveforms();
-    auto correlatedNoiseBlocks = _noise_filter.getCorrelatedNoiseBlocks();
+    auto correlatedNoiseWaveforms = _noise_filter.get_correlated_filter().getCorrelatedNoiseWaveforms();
+    auto correlatedNoiseBlocks = _noise_filter.get_correlated_filter().getCorrelatedNoiseBlocks();
     auto _wire_status_by_plane = _noise_filter.get_wire_status_by_plane();
 
     int totalWaveforms = 0;
@@ -234,7 +234,7 @@ void DrawUbSwiz::readData() {
     int count = 0;
     // Loop over the waveforms and get the correlations:
     for (unsigned int i = 0; i < correlatedNoiseWaveforms.size(); i ++) {
-      for (int j = 0; j < correlatedNoiseWaveforms.at(i).size(); j ++ )
+      for (unsigned int j = 0; j < correlatedNoiseWaveforms.at(i).size(); j ++ )
       {
 
         // For each wave form, correlate it to all the other waveforms.
@@ -242,7 +242,7 @@ void DrawUbSwiz::readData() {
         // has already been calculated
         int count2 = 0;
         for (unsigned int i2 = 0; i2 < correlatedNoiseWaveforms.size(); i2 ++) {
-          for (int j2 = 0; j2 < correlatedNoiseWaveforms.at(i2).size(); j2 ++ ) {
+          for (unsigned int j2 = 0; j2 < correlatedNoiseWaveforms.at(i2).size(); j2 ++ ) {
             if (correlationMatrix[count][count2] == 0) {
               // This entry unfilled.  See if the cross diagonal is filled:
               if (correlationMatrix[count2][count] != 0) {
@@ -302,7 +302,7 @@ bool DrawUbSwiz::finalize() {
 
 
 void DrawUbSwiz::SetStepSizeByPlane(int step, int plane) {
-  if (plane < 0 || plane >= geoService -> Nviews()) {
+  if (plane < 0 || plane >= (int) geoService -> Nviews()) {
     std::cerr << "ERROR: can't set step size for non existent plane " << plane << std::endl;
   }
   else {

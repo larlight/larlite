@@ -47,6 +47,8 @@
 #include <vector>
 #include <math.h>
 
+#include "NoiseFilterTypes.h"
+
 /**
    \class ChirpFilter
    User defined class ChirpFilter ... these comments are used to generate
@@ -54,16 +56,6 @@
  */
 
 namespace ub_noise_filter {
-
-class chirp_info {
-
-public:
-  size_t chirp_start;
-  size_t chirp_stop;
-  float chirp_frac;
-};
-
-
 
 class ChirpFilter {
 

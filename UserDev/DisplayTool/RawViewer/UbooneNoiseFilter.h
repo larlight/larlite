@@ -31,10 +31,10 @@
  * this involves a median across a set of ticks, which are not quite in consecutive
  * memory, this part of the algorithm is the slowest.
  *
- * While it is possible to subtract the correlated noise waveforms from the ticks
- * on the fly, this is not done.  Instead we remove the harmonic noise component
- * from the correlated noise, and then build a correlated noise waveform across
- * the planes.
+ * While it is possible (and faster) to subtract the correlated noise waveforms
+ * from the ticks on the fly, this is not done.  Instead we remove the harmonic
+ * noise component from the correlated noise, and then build a correlated noise
+ * waveform across the planes.
  *
  * Finally, the harmonic noise and the correlated noise are subtracted from the
  * waveforms, and the filtering can return.
@@ -57,30 +57,17 @@
 #include <algorithm>
 #include <map>
 
-#include "ChirpFilter.h"
+#include "NoiseFilterTypes.h"
 
+#include "ChirpFilter.h"
+#include "CorrelatedNoiseFilter.h"
 /**
    \class UbooneNoiseFilter
    User defined class UbooneNoiseFilter ... these comments are used to generate
    doxygen documentation!
  */
 
-namespace larlite {
-
-class detPropFetcher {
-
-public:
-
-  unsigned int n_wires(unsigned int plane);
-  unsigned int n_planes();
-
-};
-
-}
-
 namespace ub_noise_filter {
-
-enum wireStatus {kNormal, kDead, kHighNoise, kChirping, kNStatus};
 
 
 // This chirp_info class is meant to package chirping
@@ -230,27 +217,25 @@ private:
    */
   bool is_chirping(float * _data_arr, int N, unsigned int wire, unsigned int plane);
 
-  void rescale_by_rms(float * _data_arr, int N, unsigned int wire, unsigned int plane, bool inverse = false);
 
+
+  /**
+   * @brief Override certain wires to always be dead, chirping, etc.
+   * @details Sets some wires that have known, unrecoverable hardware issues to be "dead"
+   *          Examples include the wires where the motherboard is plugged in incorrectly, and the
+   *          wrapped wires at the edges of the inductions planes.
+   */
   void tag_special_wire_statuses();
 
-  void build_correlated_noise_waveforms(
-    float * _wire_block,
-    int i_block,
-    int plane,
-    int _n_time_ticks_data);
-
-  void remove_correlated_noise(float * _data_arr, int N, unsigned int wire, unsigned int plane);
 
 
-  // These functions are temporary to give access to the correlated noise info:
+
+  /*
+    Temporary functions to give access to items for data analysis
+
+   */
+
 public:
-  const std::vector<std::vector<std::vector<float> > >&
-  getCorrelatedNoiseWaveforms() {return correlatedNoiseWaveforms;}
-
-  const std::vector<std::vector<float> >
-  getCorrelatedNoiseBlocks() {return correlated_noise_blocks;}
-
   const std::vector<std::vector<float> > &
   get_pedestal_by_plane() {return  _pedestal_by_plane;}
   const std::vector<std::vector<float> > &
@@ -258,9 +243,12 @@ public:
   const std::vector<std::vector<wireStatus> > &
   get_wire_status_by_plane() {return _wire_status_by_plane;}
 
+  const CorrelatedNoiseFilter & get_correlated_filter() const {return _corr_filter;}
+
+
   /*
-  Below are the private data members, many of which can be accessed with getter
-  functions.
+    Below are the private data members, many of which can be accessed with getter 
+    functions.
    */
 
 private:
@@ -273,58 +261,11 @@ private:
   // This is the chirping removal algorithm:
   ChirpFilter _chirp_filter;
 
-  // This objects holds the correlated noise waveforms by [plane][wireblock][tick]
-  std::vector<std::vector<std::vector<float> > > correlatedNoiseWaveforms;
-
-
-  // This is the service board boundaries enumerated as
-  // hardcoded constants
-  // std::vector<std::vector<float> > correlated_noise_blocks = {
-  //   {
-  //     0, 96, 192, 288, 384, 480, 576, 672, 768, 864, 960, 1056,
-  //     1152, 1248, 1344, 1440, 1536, 1632, 1728, 1824,
-  //     2016, 2112, 2208, 2304, 2400
-  //   },
-  //   { 0, 384, 576, 672, 768, 864, 960, 1056, 1152, 1248, 1344,
-  //     1440, 1536, 1632, 1728, 1824, 1920, 2016, 2112, 2208,
-  //     2304, 2400
-  //   },
-  //   {
-  //     0, 192, 384, 576, 768, 960, 1152, 1344, 1536, 1728, 1920,
-  //     2112, 2304, 2496, 2688, 2880, 3072, 3264, 3456
-  //   }
-  // };
-
-  std::vector<std::vector<float> > correlated_noise_blocks = {
-    {
-      0, 48, 96, 144, 192, 240, 288, 336, 384, 432, 480,
-      528, 576, 624, 672, 720, 768, 816, 864, 912, 960,
-      1008, 1056, 1104, 1152, 1200, 1248, 1296, 1344, 1392,
-      1440, 1488, 1536, 1584, 1632, 1680, 1728, 1776, 1824,
-      1872, 1920, 1968, 2016, 2064, 2112, 2160, 2208,
-      2256, 2304, 2352, 2400
-    },
-    {
-      0, 48, 96, 144, 192, 240, 288, 336, 384, 432, 480,
-      528, 576, 624, 672, 720, 768, 816, 864, 912, 960,
-      1008, 1056, 1104, 1152, 1200, 1248, 1296, 1344, 1392,
-      1440, 1488, 1536, 1584, 1632, 1680, 1728, 1776, 1824,
-      1872, 1920, 1968, 2016, 2064, 2112, 2160, 2208,
-      2256, 2304, 2352, 2400
-    },
-    {
-      0, 96, 192, 288, 384, 480, 576, 672, 768, 864, 960,
-      1056, 1152, 1248, 1344, 1440, 1536, 1632, 1728, 1824,
-      1920, 2016, 2112, 2208, 2304, 2400, 2496, 2592, 2688,
-      2784, 2880, 2976, 3072, 3168, 3264, 3360, 3456
-    }
-  };
-
-
+  CorrelatedNoiseFilter _corr_filter;
 
   // All of the detector properties are encapsulated in this object
   // This allows larlite <-> larsoft transitions to be a little less painful
-  larlite::detPropFetcher _detector_properties_interface;
+  ub_noise_filter::detPropFetcher _detector_properties_interface;
 
 
   // This class filters noise out so it needs access to the data.  It does the
