@@ -67,9 +67,9 @@ void StartPointPandora::do_reconstruction(
     // Now focus on the situation where pandora doesn't find the vertex in the
     // shower starting region (or it finds a vertex in the end of the shower)
     TVector3 CentroidOnPCA = resultShower.fXYZStart + PointProjectedToLine( resultShower.fCentroid, resultShower.fDCosStart );
-    TVector3 halfLength = CentroidOnPCA - resultShower.fXYZStart;
-    TVector3 candStart = CentroidOnPCA + halfLength;
-    if ( _range > halfLength.Mag() ) _range = halfLength.Mag();
+    // TVector3 halfLength = CentroidOnPCA - resultShower.fXYZStart;
+    TVector3 candStart = resultShower.fXYZStart + resultShower.fLength*resultShower.fDCosStart;
+    if ( _range > 0.5*resultShower.fLength ) _range = 0.5*resultShower.fLength;
 
     double spreadStart = 0., spreadCandStart = 0.;
     int nStart = 0, nCandStart = 0;
@@ -86,9 +86,14 @@ void StartPointPandora::do_reconstruction(
         nCandStart += 1;
       }
     }
-    if ( spreadCandStart/(double)nCandStart < spreadStart/(double)nStart ) {
+    std::cout << "Starting point: spread: " << spreadStart/(double)nStart << " ( " << spreadStart << " / "
+              << nStart << " )" << std::endl;
+    std::cout << "End point: spread: " << spreadCandStart/(double)nCandStart << " ( " << spreadCandStart
+              << " / " << nCandStart << " )" << std::endl;
+    if ( spreadCandStart/(double)nCandStart < spreadStart/(double)nStart || ( nStart == 0 && nCandStart > 0 ) ) {
       resultShower.fXYZStart = candStart;
       resultShower.fDCosStart *= -1.;
+      std::cout << "Reversed!" << std::endl;
     }
 
   }
