@@ -66,26 +66,62 @@ void StartPointPandora::do_reconstruction(
 
     // Now focus on the situation where pandora doesn't find the vertex in the
     // shower starting region (or it finds a vertex in the end of the shower)
+    TVector3 start = resultShower.fCentroid - 0.5*resultShower.fLength*resultShower.fDCosStart.Unit();
     TVector3 candStart = resultShower.fCentroid + 0.5*resultShower.fLength*resultShower.fDCosStart.Unit();
     // if ( _range > 0.5*resultShower.fLength ) _range = 0.5*resultShower.fLength;
-    _range = resultShower.fLength / 4.;
+    int nSections = 6;
+    _range = resultShower.fLength / (double)nSections;
 
-    double spreadStart = 0., spreadCandStart = 0.;
-    int nStart = 0, nCandStart = 0;
-    for ( auto & sps : sortedSPS ) {
+    double spreads[nSections], spreadsDOF[nSections];
+    int nSpreads[nSections];
+    for ( int iRange = 0; iRange < nSections; ++iRange ) {
+      spreads[iRange] = 0.;
+      nSpreads[iRange] = 0;
+      spreadsDOF[iRange] = 0.;
+    }
+
+    for ( size_t isp = 0; isp < sortedSPS.size(); ++isp ) {
+      auto & sps = sortedSPS[isp];
       TVector3 p( sps.X(), sps.Y(), sps.Z() );
-      TVector3 pp = p - resultShower.fXYZStart;
-      TVector3 projP = resultShower.fXYZStart + PointProjectedToLine( pp, resultShower.fDCosStart );
-      TVector3 diffStart = projP - resultShower.fXYZStart;
+      TVector3 pp = p - resultShower.fCentroid;
+      TVector3 projP = resultShower.fCentroid + PointProjectedToLine( pp, resultShower.fDCosStart );
+      TVector3 diffStart = projP - start;
       TVector3 diffCandStart = projP - candStart;
-      if ( diffStart.Mag() < _range ) {
-        spreadStart += pow( DCAPointToLine( p, resultShower.fXYZStart, resultShower.fDCosStart ), 2 );
-        nStart += 1;
-      } else if ( diffCandStart.Mag() < _range ) {
-        spreadCandStart += pow( DCAPointToLine( p, candStart, resultShower.fDCosStart ), 2 );
-        nCandStart += 1;
+      bool counted = false;
+      for ( int iRange = 1; iRange < nSections + 1; ++iRange ) {
+        if ( diffStart.Mag() < _range*(double)iRange ) {
+          spreads[iRange-1] += pow( DCAPointToLine( p, resultShower.fCentroid, resultShower.fDCosStart ), 2 );
+          nSpreads[iRange-1] += 1;
+          counted = true;
+          break;
+        } 
+      }
+      if ( !counted ) {
+          spreads[nSections-1] += pow( DCAPointToLine( p, resultShower.fCentroid, resultShower.fDCosStart ), 2 );
+          nSpreads[nSections-1] += 1;
+          counted = true;
       }
     }
+
+    for ( int iRange = 0; iRange < nSections; ++iRange ) {
+      spreadsDOF[iRange] = spreads[iRange]/(double)nSpreads[iRange];
+      std::cout << "  " << iRange << ": " << spreadsDOF[iRange] << " ( " << spreads[iRange] << " / " 
+                << nSpreads[iRange] << " )" << std::endl;
+    }
+
+    int nSlope[2] = { 0, 0 };
+    for ( int iRange = 0; iRange < nSections-1; ++iRange ) {
+      if ( nSpreads[iRange] == 0 || nSpreads[iRange+1] == 0 ) continue;
+      if ( spreadsDOF[iRange] < spreadsDOF[iRange+1] ) nSlope[0] += 1;
+      else nSlope[1] += 1;
+    }
+
+    if ( nSlope[1] > nSlope[0] ) {
+      resultShower.fXYZStart = candStart;
+      resultShower.fDCosStart *= -1.;
+      std::cout << "  Reversed!" << std::endl;
+    }
+/*
     std::cout << "  Starting point: spread: " << spreadStart/(double)nStart << " ( " << spreadStart << " / "
               << nStart << " )" << std::endl;
     std::cout << "  End point: spread: " << spreadCandStart/(double)nCandStart << " ( " << spreadCandStart
@@ -97,7 +133,7 @@ void StartPointPandora::do_reconstruction(
       resultShower.fDCosStart *= -1.;
       std::cout << "  Reversed!" << std::endl;
     }
-
+*/
   }
   else {
     throw ShowerRecoException("StartPointPandora requires vertexes but has none.");
