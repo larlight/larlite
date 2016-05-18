@@ -66,7 +66,6 @@ void StartPointPandora::do_reconstruction(
 
     // Now focus on the situation where pandora doesn't find the vertex in the
     // shower starting region (or it finds a vertex in the end of the shower)
-    TVector3 start = resultShower.fCentroid - 0.5*resultShower.fLength*resultShower.fDCosStart.Unit();
     TVector3 candStart = resultShower.fCentroid + 0.5*resultShower.fLength*resultShower.fDCosStart.Unit();
     // if ( _range > 0.5*resultShower.fLength ) _range = 0.5*resultShower.fLength;
     _range = resultShower.fLength / 4.;
@@ -75,12 +74,12 @@ void StartPointPandora::do_reconstruction(
     int nStart = 0, nCandStart = 0;
     for ( auto & sps : sortedSPS ) {
       TVector3 p( sps.X(), sps.Y(), sps.Z() );
-      TVector3 pp = p - resultShower.fCentroid;
-      TVector3 projP = resultShower.fCentroid + PointProjectedToLine( pp, resultShower.fDCosStart );
-      TVector3 diffStart = projP - start;
+      TVector3 pp = p - resultShower.fXYZStart;
+      TVector3 projP = resultShower.fXYZStart + PointProjectedToLine( pp, resultShower.fDCosStart );
+      TVector3 diffStart = projP - resultShower.fXYZStart;
       TVector3 diffCandStart = projP - candStart;
       if ( diffStart.Mag() < _range ) {
-        spreadStart += pow( DCAPointToLine( p, start, resultShower.fDCosStart ), 2 );
+        spreadStart += pow( DCAPointToLine( p, resultShower.fXYZStart, resultShower.fDCosStart ), 2 );
         nStart += 1;
       } else if ( diffCandStart.Mag() < _range ) {
         spreadCandStart += pow( DCAPointToLine( p, candStart, resultShower.fDCosStart ), 2 );
@@ -91,7 +90,9 @@ void StartPointPandora::do_reconstruction(
               << nStart << " )" << std::endl;
     std::cout << "  End point: spread: " << spreadCandStart/(double)nCandStart << " ( " << spreadCandStart
               << " / " << nCandStart << " )" << std::endl;
-    if ( spreadCandStart/(double)nCandStart < spreadStart/(double)nStart || ( nStart == 0 && nCandStart > 0 ) ) {
+    double aveSpreadCandStart = spreadCandStart/(double)nCandStart;
+    double aveSpreadStart = spreadStart/(double)nStart;
+    if ( aveSpreadCandStart + sqrt(aveSpreadCandStart) < aveSpreadStart || ( nStart == 0 && nCandStart > 0 ) ) {
       resultShower.fXYZStart = candStart;
       resultShower.fDCosStart *= -1.;
       std::cout << "  Reversed!" << std::endl;
