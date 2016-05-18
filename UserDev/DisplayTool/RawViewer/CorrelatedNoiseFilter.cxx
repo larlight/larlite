@@ -73,7 +73,7 @@ void CorrelatedNoiseFilter::remove_correlated_noise(
   for (int tick = start_tick; tick < end_tick; tick ++) {
     // Scale the harmonic noise by wire length:
     _data_arr[tick] -=
-      _detector_properties_interface.wire_scale(plane,wire) *
+      _detector_properties_interface.wire_scale(plane, wire) *
       _harmonicNoiseWaveforms[plane][tick];
     // _data_arr[tick] -= _harmonicNoiseWaveforms[plane][tick];
     _data_arr[tick] -= _correlatedNoiseWaveforms[plane][i_block][tick];
@@ -233,7 +233,7 @@ void CorrelatedNoiseFilter::build_harmonic_noise_waveform(
 
 }
 
-void find_correlated_noise_errors() {
+void CorrelatedNoiseFilter::find_correlated_noise_errors() {
 
   // Here's the strategy:  Look at each correlated noise waveform and
   // its correlation to every other waveform that it has a strong correlation with.
@@ -245,6 +245,56 @@ void find_correlated_noise_errors() {
   // Also, break each correlation into pieces of 200 ticks to help find anomalous correlations
 
   // For right now, only looking at known locations of problems
+
+  // Let's just look at one block to see how the block making works
+
+  int target_plane = 2;
+  int target_block = 22;
+
+  auto correlated_blocks
+    = _detector_properties_interface.service_board_block(target_plane, target_block);
+  // for (size_t i_plane = 0;
+  //      i_plane < correlated_blocks.size();
+  //      i_plane ++)
+  // {
+  //   std::cout << "correlated_blocks.at(" << i_plane << ").size() "
+  //             << correlated_blocks.at(i_plane).size()
+  //             << std::endl;
+  // for (size_t i_plane = 0;
+  //      i_plane < correlated_blocks.size();
+  //      i_plane ++)
+  // {
+  //     int this_plane = i_plane;
+  //     int this_block = correlated_blocks.at(i_plane).at(i_block);
+
+  //     std::cout << "_correlatedNoiseWaveforms["
+  //               << this_plane << "][" << this_block << "].size() "
+  //               << _correlatedNoiseWaveforms[this_plane][this_block].size() << std::endl;
+  //     std::cout << "_correlatedNoiseWaveforms["
+  //               << target_plane << "][" << target_block << "].size() "
+  //               << _correlatedNoiseWaveforms[target_plane][target_block].size() << std::endl;
+  //     std::cout << "correlation between (" << target_plane << ", " << target_block
+  //               << ") and (" << this_plane << ", " << this_block << ") is "
+  //               << getCorrelation(_correlatedNoiseWaveforms[this_plane][this_block],
+  //                                 _correlatedNoiseWaveforms[target_plane][target_block])
+  //               << std::endl
+  //               << std::endl;
+  //   }
+  // }
+
+  for (size_t i_plane = 0;
+       i_plane < correlated_blocks.size();
+       i_plane ++)
+  {
+    for (size_t i_plane = 0;
+         i_plane < correlated_blocks.size();
+         i_plane ++)
+    {
+
+      // Break it into blocks of 
+
+    }
+  }
 
 }
 

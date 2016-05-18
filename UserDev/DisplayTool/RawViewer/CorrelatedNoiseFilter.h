@@ -121,6 +121,15 @@ public:
   const std::vector<std::vector<std::vector<float> > >&
   getCorrelatedNoiseWaveforms() const {return _correlatedNoiseWaveforms;}
 
+  std::vector<std::vector<float > >
+  getCorrelatedNoiseBlocks() const {
+    std::vector<std::vector<float> > _blocks;
+    _blocks.push_back(_detector_properties_interface.correlated_noise_blocks(0));
+    _blocks.push_back(_detector_properties_interface.correlated_noise_blocks(1));
+    _blocks.push_back(_detector_properties_interface.correlated_noise_blocks(2));
+    return _blocks;
+  }
+
 
 
 private:

@@ -215,8 +215,9 @@ void DrawUbSwiz::readData() {
 
     auto correlatedNoiseWaveforms = _noise_filter.get_correlated_filter().getCorrelatedNoiseWaveforms();
   
+    
 
-    // auto correlatedNoiseBlocks = _noise_filter.get_correlated_filter().getCorrelatedNoiseBlocks();
+    auto correlatedNoiseBlocks = _noise_filter.get_correlated_filter().getCorrelatedNoiseBlocks();
     auto _wire_status_by_plane = _noise_filter.get_wire_status_by_plane();
 
     int totalWaveforms = 0;
@@ -227,7 +228,7 @@ void DrawUbSwiz::readData() {
       _tree -> Branch(Form("rms_%u", p),      &(rmsByPlane.at(p)));
       totalWaveforms += correlatedNoiseWaveforms.at(p).size();
       _tree -> Branch(Form("correlatedNoiseWaveforms_%u", p), &(correlatedNoiseWaveforms.at(p)));
-      // _tree -> Branch(Form("correlatedNoiseBlocks_%u", p), &(correlatedNoiseBlocks.at(p)));
+      _tree -> Branch(Form("correlatedNoiseBlocks_%u", p), &(correlatedNoiseBlocks.at(p)));
     }
 
     std::vector<std::vector<float> > correlationMatrix(totalWaveforms, std::vector<float>(totalWaveforms, 0.0));

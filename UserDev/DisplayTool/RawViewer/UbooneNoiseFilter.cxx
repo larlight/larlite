@@ -144,6 +144,9 @@ void UbooneNoiseFilter::clean_data() {
         _n_time_ticks_data);
   }
 
+
+  _corr_filter.find_correlated_noise_errors();
+
   // Now clean up the wires from the correlated noise:
   for (unsigned int plane = 0; plane < _detector_properties_interface.n_planes(); plane ++) {
 

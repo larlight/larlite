@@ -202,7 +202,7 @@ detPropFetcher::detPropFetcher() {
   }
 
 }
-std::vector<std::vector<float> > service_board_block(int plane, int block) {
+std::vector<std::vector<float> > detPropFetcher::service_board_block(int plane, int block) {
 
   std::vector< std::vector<float> > ret;
 
@@ -219,20 +219,42 @@ std::vector<std::vector<float> > service_board_block(int plane, int block) {
     }
 
     // Catch the edge cases:
-    if (block > 36) {
+    if (block > 35) {
+
+      if (block < 41) {
+        ret[0].push_back(36);
+        ret[0].push_back(37);
+        ret[0].push_back(38);
+        ret[0].push_back(39);
+        ret[0].push_back(40);
+        ret[0].push_back(41);
+        return ret;
+      }
+      else {
+        ret[0].push_back(42);
+        ret[0].push_back(43);
+        ret[0].push_back(44);
+        ret[0].push_back(45);
+        ret[0].push_back(46);
+        ret[0].push_back(47);
+        ret[0].push_back(48);
+        ret[0].push_back(49);
+        return ret;
+      }
+
 
     }
     else {
 
       // Figure out which pair of blocks this goes with in the same plane:
-      if (block % 2 ) {
+      if (block % 2 == 0) {
         second_block = block + 1;
       }
       else {
         second_block = block - 1;
       }
 
-      if (block > second_block){
+      if (block > second_block) {
         std::swap(block, second_block);
       }
 
@@ -240,6 +262,14 @@ std::vector<std::vector<float> > service_board_block(int plane, int block) {
       // This is plane 0, so that's easy:
       ret[0].push_back(block);
       ret[0].push_back(second_block);
+
+      // This is plane 0, so that's easy:
+      ret[1].push_back(block + 14);
+      ret[1].push_back(second_block + 14);
+
+      // This is plane 0, so that's easy:
+      ret[2].push_back(block);
+      ret[2].push_back(second_block);
 
     }
 
@@ -253,6 +283,57 @@ std::vector<std::vector<float> > service_board_block(int plane, int block) {
     }
 
 
+    if (block < 14) {
+      if (block < 8) {
+        ret[1].push_back(0);
+        ret[1].push_back(1);
+        ret[1].push_back(2);
+        ret[1].push_back(3);
+        ret[1].push_back(4);
+        ret[1].push_back(5);
+        ret[1].push_back(6);
+        ret[1].push_back(7);
+        return ret;
+      }
+      else {
+        ret[1].push_back(8);
+        ret[1].push_back(9);
+        ret[1].push_back(10);
+        ret[1].push_back(11);
+        ret[1].push_back(12);
+        ret[1].push_back(13);
+        return ret;
+      }
+    }
+    else {
+
+      // Figure out which pair of blocks this goes with in the same plane:
+      if (block % 2 == 0) {
+        second_block = block + 1;
+      }
+      else {
+        second_block = block - 1;
+      }
+
+      if (block > second_block) {
+        std::swap(block, second_block);
+      }
+
+      // Now build up the vectors:
+      // This is plane 0, so that's easy:
+      ret[0].push_back(block - 14);
+      ret[0].push_back(second_block - 14);
+
+      // This is plane 0, so that's easy:
+      ret[1].push_back(block);
+      ret[1].push_back(second_block);
+
+      // This is plane 0, so that's easy:
+      ret[2].push_back(block - 14);
+      ret[2].push_back(second_block - 14);
+    }
+
+
   }
   else if (plane == 2) {
 
@@ -261,6 +342,32 @@ std::vector<std::vector<float> > service_board_block(int plane, int block) {
       std::cerr << "Requested block is too high." << std::endl;
       return ret;
     }
+
+    // Figure out which pair of blocks this goes with in the same plane:
+    if (block % 2 == 0) {
+      second_block = block + 1;
+    }
+    else {
+      second_block = block - 1;
+    }
+
+    if (block > second_block) {
+      std::swap(block, second_block);
+    }
+
+    // Now build up the vectors:
+    // This is plane 0, so that's easy:
+    ret[0].push_back(block);
+    ret[0].push_back(second_block);
+
+    // This is plane 0, so that's easy:
+    ret[1].push_back(block + 14);
+    ret[1].push_back(second_block + 14);
+
+    // This is plane 0, so that's easy:
+    ret[2].push_back(block);
+    ret[2].push_back(second_block);
+
 
   }
 
