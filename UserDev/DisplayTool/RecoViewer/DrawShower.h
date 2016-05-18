@@ -11,8 +11,8 @@
 /** \addtogroup RecoViewer
 
     @{*/
-#ifndef LARLITE_DRAWSHOWER_H
-#define LARLITE_DRAWSHOWER_H
+#ifndef EVD_DRAWSHOWER_H
+#define EVD_DRAWSHOWER_H
 
 #include <iostream>
 #include "Analysis/ana_base.h"
@@ -29,15 +29,15 @@
 
 namespace evd {
 
-class Shower2d  {
+class Shower2D  {
 
 public:
 
     /// Default constructo
-    Shower2d() {}
+    Shower2D() {}
 
     /// Default destructor
-    ~Shower2d() {}
+    ~Shower2D() {}
 
     int plane() {return _plane;}
     larutil::Point2D startPoint() {return _startPoint;}
@@ -60,7 +60,7 @@ public:
 };
 
 
-class DrawShower : public larlite::ana_base, public RecoBase<Shower2d> {
+class DrawShower : public larlite::ana_base, public RecoBase<Shower2D> {
 
 public:
 
@@ -89,19 +89,17 @@ public:
     // void setProducer(std::string s){producer = s;}
 
 
-    // const std::vector< ::evd::Shower2d >   & getShowersByPlane(unsigned int p) const;
-    // const shower2d getShower(unsigned int plane, unsigned int index) const;
-
-private:
+    // const std::vector< ::evd::Shower2D >   & getShowersByPlane(unsigned int p) const;
+    // const shower2D getShower(unsigned int plane, unsigned int index) const;
 
     // Showers get drawn as cones.  Need a start point, and start direction
     // Also need an opening angle and the length
-    // Return these as shower2d objects
+    // Return these as shower2D objects
     // This shows how to handle abstract objects in the viewer
 
 
 
-    Shower2d getShower2d(larlite::shower shower, unsigned int plane);
+    Shower2D getShower2d(larlite::shower shower, unsigned int plane);
 
 };
 

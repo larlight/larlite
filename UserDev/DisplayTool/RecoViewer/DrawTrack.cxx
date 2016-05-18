@@ -1,11 +1,33 @@
-#ifndef DRAWTRACK_CXX
-#define DRAWTRACK_CXX
+#ifndef EVD_DRAWTRACK_CXX
+#define EVD_DRAWTRACK_CXX
 
 #include "DrawTrack.h"
 #include "DataFormat/track.h"
 #include "LArUtil/DetectorProperties.h"
+#include "LArUtil/GeometryHelper.h"
 
 namespace evd {
+
+Track2D getTrack2D(larlite::track track, unsigned int plane) {
+  Track2D result;
+  auto geoHelper = larutil::GeometryHelper::GetME();
+  for (unsigned int i = 0; i < track.NumberTrajectoryPoints(); i++) {
+    // project a point into 2D:
+    try {
+      auto point = geoHelper->Point_3Dto2D(track.LocationAtPoint(i), plane);
+      result._track.push_back(std::make_pair(point.w, point.t));
+      // auto
+    }
+    catch (...) {
+      continue;
+    }
+
+  }
+
+  return result;
+}
+
+
 
 
 DrawTrack::DrawTrack() {
@@ -52,13 +74,17 @@ bool DrawTrack::analyze(larlite::storage_manager* storage) {
   for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
     _dataByPlane.at(p).clear();
     _dataByPlane.at(p).reserve(trackHandle -> size());
+    _wireRange.at(p).first  = 99999;
+    _timeRange.at(p).first  = 99999;
+    _timeRange.at(p).second = -1.0;
+    _wireRange.at(p).second = -1.0;
   }
 
 
   // Populate the track vector:
   for (auto & track : *trackHandle) {
     for (unsigned int view = 0; view < geoService -> Nviews(); view++) {
-      _dataByPlane.at(view).push_back(getTrack2d(track, view));
+      _dataByPlane.at(view).push_back(getTrack2D(track, view));
     }
   }
 
@@ -83,25 +109,8 @@ bool DrawTrack::finalize() {
   return true;
 }
 
-DrawTrack::~DrawTrack(){}
+DrawTrack::~DrawTrack() {}
 
-Track2d DrawTrack::getTrack2d(larlite::track track, unsigned int plane) {
-  Track2d result;
-  for (unsigned int i = 0; i < track.NumberTrajectoryPoints(); i++) {
-    // project a point into 2D:
-    try {
-      auto point = geoHelper->Point_3Dto2D(track.LocationAtPoint(i), plane);
-      result._track.push_back(std::make_pair(point.w, point.t));
-      // auto 
-    }
-    catch (...) {
-      continue;
-    }
-
-  }
-
-  return result;
-}
 
 
 } // larlite

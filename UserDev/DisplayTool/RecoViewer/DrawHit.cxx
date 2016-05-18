@@ -1,5 +1,5 @@
-#ifndef DRAWHIT_CXX
-#define DRAWHIT_CXX
+#ifndef EVD_DRAWHIT_CXX
+#define EVD_DRAWHIT_CXX
 
 #include "DrawHit.h"
 #include "DataFormat/hit.h"
@@ -61,15 +61,15 @@ bool DrawHit::analyze(larlite::storage_manager* storage) {
   for (auto & hit : *hitHandle) {
     unsigned int view = hit.View();
     _dataByPlane.at(view).emplace_back(
-      Hit(hit.WireID().Wire,
-          hit.PeakTime(),
-          hit.Integral(),
-          hit.RMS(),
-          hit.StartTick(),
-          hit.PeakTime(),
-          hit.EndTick(),
-          hit.PeakAmplitude()
-         ));
+      Hit2D(hit.WireID().Wire,
+            hit.PeakTime(),
+            hit.Integral(),
+            hit.RMS(),
+            hit.StartTick(),
+            hit.PeakTime(),
+            hit.EndTick(),
+            hit.PeakAmplitude()
+           ));
     if (_dataByPlane.at(view).back()._charge > _maxCharge.at(view))
       _maxCharge.at(view) = _dataByPlane.at(view).back()._charge;
     // Check the auto range values:
@@ -113,8 +113,8 @@ float DrawHit::maxCharge(size_t p) {
 
 }
 
-std::vector<Hit> DrawHit::getHitsOnWirePlane(size_t wire, size_t plane) {
-  std::vector<Hit> result;
+std::vector<Hit2D> DrawHit::getHitsOnWirePlane(size_t wire, size_t plane) {
+  std::vector<Hit2D> result;
 
   if (plane >= geoService->Nviews() ) {
     std::cerr << "ERROR: Request for nonexistent plane " << plane << std::endl;

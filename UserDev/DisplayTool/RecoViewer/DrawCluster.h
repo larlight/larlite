@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef LARLITE_DRAWCLUSTER_H
-#define LARLITE_DRAWCLUSTER_H
+#ifndef EVD_DRAWCLUSTER_H
+#define EVD_DRAWCLUSTER_H
 
 #include "Analysis/ana_base.h"
 #include "LArUtil/Geometry.h"
@@ -34,17 +34,17 @@ namespace evd {
    User custom analysis class made by SHELL_USER_NAME
  */
 
-class Cluster2d : public std::vector<Hit> {
+class Cluster2D : public std::vector<Hit2D> {
 
 public:
-  Cluster2d(){_is_good = false;}
+  Cluster2D() {_is_good = false;}
   ::cluster::cluster_params _params;
   ::cluster::cluster_params params() {return _params;}
   bool _is_good;
   bool is_good() {return _is_good;}
 };
 
-class DrawCluster : public larlite::ana_base, public RecoBase<Cluster2d> {
+class DrawCluster : public larlite::ana_base, public RecoBase<Cluster2D> {
 
 public:
 

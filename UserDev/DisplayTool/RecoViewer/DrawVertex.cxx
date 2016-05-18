@@ -1,5 +1,5 @@
-#ifndef LARLITE_DRAWVERTEX_CXX
-#define LARLITE_DRAWVERTEX_CXX
+#ifndef EVD_DRAWVERTEX_CXX
+#define EVD_DRAWVERTEX_CXX
 
 #include "DrawVertex.h"
 #include "DataFormat/vertex.h"
@@ -28,27 +28,6 @@ bool DrawVertex::initialize() {
 }
 
 bool DrawVertex::analyze(larlite::storage_manager* storage) {
-
-  //
-  // Do your event-by-event analysis here. This function is called for
-  // each event in the loop. You have "storage" pointer which contains
-  // event-wise data. To see what is available, check the "Manual.pdf":
-  //
-  // http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
-  //
-  // Or you can refer to Base/DataFormatConstants.hh for available data type
-  // enum values. Here is one example of getting PMT waveform collection.
-  //
-  // event_fifo* my_pmtfifo_v = (event_fifo*)(storage->get_data(DATA::PMFIFO));
-  //
-  // if( event_fifo )
-  //
-  //   std::cout << "Event ID: " << my_pmtfifo_v->event_id() << std::endl;
-  //
-
-  // clear the spots that hold the data:
-  // Obtain event-wise data object pointers
-  //
 
   // get a handle to the vertexes
   auto vertexHandle = storage->get_data<larlite::event_vertex>(_producer);

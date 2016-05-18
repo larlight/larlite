@@ -13,6 +13,7 @@ import simch
 import opflash
 import seed
 import pfpart
+import neutrino
 
 # This is the class that maintains the list of drawable items.
 # If your class isn't here, it can't be drawn
@@ -33,6 +34,7 @@ class drawableItems(object):
         self._drawableClasses.update({'Match': [match.match,"pfpart"]})
         self._drawableClasses.update({'Shower': [shower.shower,"shower"]})
         self._drawableClasses.update({'Track': [track.track,"track"]})
+        self._drawableClasses.update({'Neutrino': [neutrino.neutrino,"ass"]})
         self._drawableClasses.update({'Endpoint 2D': [endpoint2d.endpoint2d,"endpoint2d"]})
         self._drawableClasses.update({'Vertex': [vertex.vertex,"vertex"]})
         self._drawableClasses.update({'SPS': [spacepoint.spacepoint,"sps"]})
