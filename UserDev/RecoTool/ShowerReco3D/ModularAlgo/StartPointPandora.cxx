@@ -64,22 +64,65 @@ void StartPointPandora::do_reconstruction(
     }
     if ( dir < 0. ) resultShower.fDCosStart *= dir;
 
-    // Now focus on the situation where pandora doesn't find the vertex in the
-    // shower starting region (or it finds a vertex in the end of the shower)
+    /* ************************************************
+       Now focus on the situation where pandora doesn't find the vertex in the
+       shower starting region (or it finds a vertex in the end of the shower)
+    ************************************************ */
     TVector3 start = resultShower.fCentroid - 0.5*resultShower.fLength*resultShower.fDCosStart.Unit();
     TVector3 candStart = resultShower.fCentroid + 0.5*resultShower.fLength*resultShower.fDCosStart.Unit();
     // if ( _range > 0.5*resultShower.fLength ) _range = 0.5*resultShower.fLength;
-    int nSections = 6;
+    constexpr int nSections = 4;
     _range = resultShower.fLength / (double)nSections;
+
+    std::cout << "  Starting: ( " << start[0] << ", " << start[1] << ", " << start[2] << " )" << std::endl;
+    std::cout << "  Ending:   ( " << candStart[0] <<  ", " << candStart[1] << ", " << candStart[2] << " )" << std::endl;
+    std::cout << "  Center:   ( " << resultShower.fCentroid[0] << ", " << resultShower.fCentroid[1] << ", "
+              << resultShower.fCentroid[2] << " )" << std::endl;
 
     double spreads[nSections], spreadsDOF[nSections];
     int nSpreads[nSections];
+    TVector3 centroids[nSections];
     for ( int iRange = 0; iRange < nSections; ++iRange ) {
       spreads[iRange] = 0.;
       nSpreads[iRange] = 0;
       spreadsDOF[iRange] = 0.;
+      centroids[iRange].SetXYZ( 0., 0., 0. );
     }
 
+    // Calculate the centroid for each section
+    for ( size_t isp = 0; isp < sortedSPS.size(); ++isp ) {
+      auto & sps = sortedSPS[isp];
+      TVector3 p( sps.X(), sps.Y(), sps.Z() );
+      TVector3 pp = p - resultShower.fCentroid;
+      TVector3 projP = resultShower.fCentroid + PointProjectedToLine( pp, resultShower.fDCosStart );
+      TVector3 diffStart = projP - start;
+      bool counted = false;
+      for ( int iRange = 0; iRange < nSections; ++iRange ) {
+        if ( diffStart.Mag() < _range*(double)(iRange + 1) ) {
+          centroids[iRange][0] += p.X();
+          centroids[iRange][1] += p.Y();
+          centroids[iRange][2] += p.Z();
+          nSpreads[iRange] += 1;
+          counted = true;
+          break;
+        }
+      }
+
+      if ( !counted ) {
+          centroids[nSections-1][0] += p.X();
+          centroids[nSections-1][1] += p.Y();
+          centroids[nSections-1][2] += p.Z();
+          nSpreads[nSections-1] += 1;
+          counted = true;
+      }
+    }
+    for ( int iRange = 0; iRange < nSections; ++iRange ) {
+      for ( int i = 0; i < 3; ++i ) centroids[iRange][i] /= (double)nSpreads[iRange];
+      std::cout << "  Section " << iRange << ": ( " << centroids[iRange][0] << ", " << centroids[iRange][1]
+                << ", " << centroids[iRange][2] << " )" << std::endl;
+    }
+
+    // Calculate DCA
     for ( size_t isp = 0; isp < sortedSPS.size(); ++isp ) {
       auto & sps = sortedSPS[isp];
       TVector3 p( sps.X(), sps.Y(), sps.Z() );
@@ -88,17 +131,15 @@ void StartPointPandora::do_reconstruction(
       TVector3 diffStart = projP - start;
       TVector3 diffCandStart = projP - candStart;
       bool counted = false;
-      for ( int iRange = 1; iRange < nSections + 1; ++iRange ) {
-        if ( diffStart.Mag() < _range*(double)iRange ) {
-          spreads[iRange-1] += pow( DCAPointToLine( p, resultShower.fCentroid, resultShower.fDCosStart ), 2 );
-          nSpreads[iRange-1] += 1;
+      for ( int iRange = 0; iRange < nSections; ++iRange ) {
+        if ( diffStart.Mag() < _range*(double)(iRange + 1) ) {
+          spreads[iRange] += pow( DCAPointToLine( p, centroids[iRange], resultShower.fDCosStart ), 2 );
           counted = true;
           break;
-        } 
+        }
       }
       if ( !counted ) {
-          spreads[nSections-1] += pow( DCAPointToLine( p, resultShower.fCentroid, resultShower.fDCosStart ), 2 );
-          nSpreads[nSections-1] += 1;
+          spreads[nSections-1] += pow( DCAPointToLine( p, centroids[nSections-1], resultShower.fDCosStart ), 2 );
           counted = true;
       }
     }
@@ -109,6 +150,17 @@ void StartPointPandora::do_reconstruction(
                 << nSpreads[iRange] << " )" << std::endl;
     }
 
+    for ( int iRange = 0; iRange < nSections; ++iRange ) {
+      if ( nSpreads[iRange] == 0 ) continue;
+      if ( spreadsDOF[iRange+1] > spreadsDOF[iRange+2] + 0.2 ) {
+        resultShower.fXYZStart = candStart;
+        resultShower.fDCosStart *= -1.;
+        std::cout << "  Reversed!" << std::endl;
+      }
+      break;
+    }
+
+/* v11_08
     int nSlope[2] = { 0, 0 };
     for ( int iRange = 0; iRange < nSections-1; ++iRange ) {
       if ( nSpreads[iRange] == 0 || nSpreads[iRange+1] == 0 ) continue;
@@ -121,7 +173,8 @@ void StartPointPandora::do_reconstruction(
       resultShower.fDCosStart *= -1.;
       std::cout << "  Reversed!" << std::endl;
     }
-/*
+*/
+/* v11_07 before
     std::cout << "  Starting point: spread: " << spreadStart/(double)nStart << " ( " << spreadStart << " / "
               << nStart << " )" << std::endl;
     std::cout << "  End point: spread: " << spreadCandStart/(double)nCandStart << " ( " << spreadCandStart
