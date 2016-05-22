@@ -18,6 +18,7 @@
 #include "Analysis/ana_base.h"
 #include "LArUtil/Geometry.h"
 #include "DrawTrack.h"
+#include "DrawCluster.h"
 #include "DrawVertex.h"
 #include "RecoBase.h"
 
@@ -29,7 +30,9 @@ namespace evd {
   public:
     
     Vertex2D _vtx;
-    Track2D  _trk;
+    Track2D  _muon;
+    std::vector<evd::Track2D> _trk_v;
+    std::vector< evd::Cluster2D > _clus_v;
     
   };
   

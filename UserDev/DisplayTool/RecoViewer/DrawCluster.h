@@ -37,7 +37,7 @@ namespace evd {
 class Cluster2D : public std::vector<Hit2D> {
 
 public:
-  Cluster2D(){_is_good = false;}
+  Cluster2D() {_is_good = false;}
   ::cluster::cluster_params _params;
   ::cluster::cluster_params params() {return _params;}
   bool _is_good;

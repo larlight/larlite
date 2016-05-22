@@ -6,12 +6,12 @@
 
 namespace evd {
 
-DrawEndpoint2d::DrawEndpoint2d() {
-  _name = "DrawEndpoint2d";
+DrawEndpoint::DrawEndpoint() {
+  _name = "DrawEndpoint";
   _fout = 0;
 }
 
-bool DrawEndpoint2d::initialize() {
+bool DrawEndpoint::initialize() {
 
   //
   // This function is called in the beginning of event loop
@@ -26,7 +26,7 @@ bool DrawEndpoint2d::initialize() {
   return true;
 }
 
-bool DrawEndpoint2d::analyze(larlite::storage_manager* storage) {
+bool DrawEndpoint::analyze(larlite::storage_manager* storage) {
 
   //
   // Do your event-by-event analysis here. This function is called for
@@ -54,7 +54,7 @@ bool DrawEndpoint2d::analyze(larlite::storage_manager* storage) {
 
 
 
-  // Clear out the data but reserve some space 
+  // Clear out the data but reserve some space
   for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
     _dataByPlane.at(p).clear();
     _dataByPlane.at(p).reserve(ev_end2d -> size());
@@ -106,7 +106,7 @@ bool DrawEndpoint2d::analyze(larlite::storage_manager* storage) {
   return true;
 }
 
-bool DrawEndpoint2d::finalize() {
+bool DrawEndpoint::finalize() {
 
   // This function is called at the end of event loop.
   // Do all variable finalization you wish to do here.

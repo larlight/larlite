@@ -7,27 +7,27 @@
 #include "LArUtil/GeometryHelper.h"
 
 namespace evd {
-  
-  Track2D getTrack2D(larlite::track track, unsigned int plane) {
-    Track2D result;
-    auto geoHelper = larutil::GeometryHelper::GetME();
-    for (unsigned int i = 0; i < track.NumberTrajectoryPoints(); i++) {
-      // project a point into 2D:
-      try {
-	auto point = geoHelper->Point_3Dto2D(track.LocationAtPoint(i), plane);
-	result._track.push_back(std::make_pair(point.w, point.t));
-	// auto 
-      }
-      catch (...) {
-	continue;
-      }
-      
+
+Track2D getTrack2D(larlite::track track, unsigned int plane) {
+  Track2D result;
+  auto geoHelper = larutil::GeometryHelper::GetME();
+  for (unsigned int i = 0; i < track.NumberTrajectoryPoints(); i++) {
+    // project a point into 2D:
+    try {
+      auto point = geoHelper->Point_3Dto2D(track.LocationAtPoint(i), plane);
+      result._track.push_back(std::make_pair(point.w, point.t));
+      // auto
     }
-    
-    return result;
+    catch (...) {
+      continue;
+    }
+
   }
-  
-  
+
+  return result;
+}
+
+
 
 
 DrawTrack::DrawTrack() {
@@ -109,7 +109,7 @@ bool DrawTrack::finalize() {
   return true;
 }
 
-DrawTrack::~DrawTrack(){}
+DrawTrack::~DrawTrack() {}
 
 
 
