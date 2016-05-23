@@ -14,6 +14,7 @@
 #include "DataFormat/spacepoint.h"
 #include "DataFormat/seed.h"
 #include "DataFormat/vertex.h"
+#include "DataFormat/PiZeroROI.h"
 
 namespace protoshower {
 
@@ -98,7 +99,7 @@ void ProtoShowerAlgOpenCV::GenerateProtoShower(::larlite::storage_manager* stora
         auto const& sw = clus.StartWire() * geomH->WireToCm();
         auto const& ew = clus.EndWire()   * geomH->WireToCm();
         auto const& st = ( clus.StartTick() - detProp->TriggerOffset() ) * geomH->TimeToCm() + planeOffset;
-        auto const& et = ( clus.EndTick()   - detProp->TriggerOffset() )  * geomH->TimeToCm() + planeOffset;
+        auto const& et = ( clus.EndTick()   - detProp->TriggerOffset() ) * geomH->TimeToCm() + planeOffset;
 
         // start point
         proto_shower._params.at(i).start_point.w = sw;
@@ -118,27 +119,28 @@ void ProtoShowerAlgOpenCV::GenerateProtoShower(::larlite::storage_manager* stora
     else
       proto_shower.hasCluster2D(false);
 
-    // get vertex associated to cluster
-    ::larlite::event_vertex * ev_vtx = nullptr;
-    auto const& ass_vtx_v = storage->find_one_ass(ev_clust->id(), ev_vtx, ev_clust->name());
+    // get vertex saved in PiZeroROI
+    auto ev_pi0 = storage->get_data<larlite::event_PiZeroROI>("pizerofilter");
 
-    // fill vertex information
-    if (!ev_vtx or (ev_vtx->size() == 0) )
+    if (ev_pi0){
+
+      if (ev_pi0->size() == 1){
+
+	auto const& pi0roi = ev_pi0->at(0);
+
+	auto nuvtx = pi0roi.GetNeutrinoVertex();
+	//std::cout << "nuvtx X-coord before : " << nuvtx[0] << std::endl;
+	//nuvtx[0] -= (detProp->TriggerOffset() * geomH->TimeToCm() );
+	//std::cout << "nuvtx X-coord after  : " << nuvtx[0] << std::endl;
+	proto_shower._vertexes.push_back(TVector3(nuvtx[0], nuvtx[1], nuvtx[2]));
+	std::cout << "Added vertex!" <<std::endl;
+	proto_shower.hasVertex(true);
+      }// if 1 pi0roi
+      else
+	proto_shower.hasVertex(false);
+    }// if there are pi0rois
+    else
       proto_shower.hasVertex(false);
-    else {
-      for (auto j_clust : ass_cluster_v.at(proto_shower_pfpart)) {
-        // associated vtx indices for this cluster
-        auto const& vtx_idx_v = ass_vtx_v[ j_clust ];
-        if (vtx_idx_v.size() != 0) {
-          for (auto const& vtx_idx : vtx_idx_v) {
-            auto const& vtx = ev_vtx->at(vtx_idx);
-            double xyz[3];
-            vtx.XYZ(xyz);
-            proto_shower._vertexes.push_back(TVector3(xyz[0], xyz[1], xyz[2]));
-          }// for all associated vertices
-        }// if there are associated vertices
-      }// for all clusters
-    }// if there are vertices
 
 
   }// if there are associated clusters

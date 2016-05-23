@@ -43,6 +43,10 @@ namespace showerreco {
     dir3D[0] /= mag;
     dir3D[1] /= mag;
     dir3D[2] /= mag;
+
+    std::cout << "Vtx : [" << vtx[0] << ", " << vtx[1] << ", " << vtx[2] << "]" << std::endl;
+    std::cout << "srt : [" << start3D[0] << ", " << start3D[1] << ", " << start3D[2] << "]" << std::endl;
+    std::cout << "3d distance between vtx and shr start " << mag << std::endl;
     
     // projet to fDCosStart values
     resultShower.fDCosStart[0] = dir3D[0];
