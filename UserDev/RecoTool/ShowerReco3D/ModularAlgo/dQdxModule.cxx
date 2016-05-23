@@ -84,7 +84,7 @@ void dQdxModule::do_reconstruction(const ::protoshower::ProtoShower & proto_show
   auto geom = larutil::Geometry::GetME();
   auto geomHelper = larutil::GeometryHelper::GetME();
   const size_t nplanes = geom->Nplanes();
-  //auto t2cm = geomHelper->TimeToCm();  //time to cm conversion for e lifetime correction
+  auto t2cm = geomHelper->TimeToCm();  //time to cm conversion for e lifetime correction
   auto const& dir3D = resultShower.fDCosStart;
 
   _px = dir3D[0];
@@ -152,9 +152,10 @@ void dQdxModule::do_reconstruction(const ::protoshower::ProtoShower & proto_show
       //  ---------------------------------
       double hit_tick =hit.t/t2cm;
       double lifetimeCorr = exp( hit_tick * _timetick / _tau );
-      double Q = hit.charge * _charge_conversion*lifetimeCorr;
+      //double Q = hit.charge * _charge_conversion*lifetimeCorr;
 
       double Q = _caloAlg.ElectronsFromADCArea( hit.charge, pl);
+      Q *= lifetimeCorr;
       //double Q = hit.charge * _charge_conversion;
       if (dist_hit_clu <= 2.4 || dist_hit_clu < trunk_length[pl]) {
 
