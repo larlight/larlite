@@ -42,7 +42,7 @@
 #pragma link C++ class evd::Endpoint2D+;
 #pragma link C++ class std::vector<::evd::Endpoint2D>+;
 #pragma link C++ class evd::RecoBase<::evd::Endpoint2D>+;
-#pragma link C++ class evd::DrawEndpoint+;
+#pragma link C++ class evd::DrawEndpoint2d+;
 
 
 // Link the classes that are processors
