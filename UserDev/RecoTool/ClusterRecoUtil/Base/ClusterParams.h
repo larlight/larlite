@@ -59,7 +59,7 @@ public:
   ~cluster_params() {};
 
   /// Hold the list of hits for this particular cluster, for convenience
-  std::vector< Hit2D > hit_vector;
+  std::vector< larutil::Hit2D > hit_vector;
   // The plane of this cluster, all hits are from this plane
   ::larlite::geo::PlaneID     plane_id;
 
@@ -75,13 +75,13 @@ public:
 
   Polygon2D PolyObject;              ///< Polygon Object...see Polygon2D.hh
 
-  Point2D start_point;               ///< start point
-  Point2D showering_point;           ///< point at which showering of cluster begins
-  Point2D end_point;                 ///< end point
+  larutil::Point2D start_point;               ///< start point
+  larutil::Point2D showering_point;           ///< point at which showering of cluster begins
+  larutil::Point2D end_point;                 ///< end point
 
-  std::vector<Point2D > start_point_cand;     ///<Worker variable saves the list of candidate start points between modules
-  std::vector<Point2D > shwr_point_cand;     ///<Worker variable saves the list of candidate start points between modules
-  std::vector<Point2D > start_dir_cand;       ///candidate start point directions
+  std::vector<larutil::Point2D > start_point_cand;     ///<Worker variable saves the list of candidate start points between modules
+  std::vector<larutil::Point2D > shwr_point_cand;     ///<Worker variable saves the list of candidate start points between modules
+  std::vector<larutil::Point2D > start_dir_cand;       ///candidate start point directions
 
 
 
@@ -143,10 +143,10 @@ public:
    * @details These functions will convert, if necessary, the hits and
    * then save them into the params object
    *
-   * @param a vector of hits, either pointer to larlite hits, Hit2D
+   * @param a vector of hits, either pointer to larlite hits, larutil::Hit2D
    */
 
-  int SetHits(const std::vector< Hit2D> & inputHits);
+  int SetHits(const std::vector< larutil::Hit2D> & inputHits);
 
 
   /**

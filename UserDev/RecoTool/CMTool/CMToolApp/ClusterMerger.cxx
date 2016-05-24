@@ -25,7 +25,7 @@ bool ClusterMerger::initialize() {
 
 bool ClusterMerger::analyze(storage_manager* storage) {
 
-  std::vector<std::vector<Hit2D> > local_clusters;
+  std::vector<std::vector<larutil::Hit2D> > local_clusters;
 
   _cru_helper.GenerateHit2D(storage, _input_producer, local_clusters);
 
