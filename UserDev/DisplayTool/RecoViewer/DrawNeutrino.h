@@ -44,7 +44,7 @@ namespace evd {
     DrawNeutrino();
     
     /// Default destructor
-    ~DrawNeutrino(){}
+    ~DrawNeutrino();
     
     virtual bool initialize();
 

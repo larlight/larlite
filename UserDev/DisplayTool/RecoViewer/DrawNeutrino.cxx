@@ -234,6 +234,8 @@ namespace evd {
     
     return true;
   }
+
+  DrawNeutrino::~DrawNeutrino(){}
   
   
 } // larlite
