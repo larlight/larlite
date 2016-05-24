@@ -31,7 +31,7 @@
 namespace evd {
 
 
-class DrawSpacepoint : public larlite::ana_base, public RecoBase<Point2D> {
+  class DrawSpacepoint : public larlite::ana_base, public RecoBase<larutil::Point2D> {
 
 public:
 
