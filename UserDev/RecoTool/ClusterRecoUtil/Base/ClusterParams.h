@@ -24,8 +24,6 @@
 
 
 #include "LArUtil/PxUtils.h"
-typedef larutil::PxHit Hit2D;
-typedef larutil::PxPoint Point2D;
 
 namespace cluster {
 
