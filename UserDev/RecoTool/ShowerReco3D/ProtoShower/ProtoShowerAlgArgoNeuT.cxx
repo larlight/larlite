@@ -66,16 +66,18 @@ void ProtoShowerAlgArgoNeuT::fill_params(
   try {
     informedStartPoint -> set_start_point_guess(start_point_guess);
     informedStartPoint -> do_params_fill(params);
+    showeringpoint -> do_params_fill(params);
   }
   catch ( ... ) {
-    std::cout << "Informed start point failed!" << std::endl;
+    // std::cout << "Informed start point failed!" << std::endl;
     roughStartPoint -> do_params_fill(params);
+    showeringpoint -> do_params_fill(params);
+    refineStartPoint -> do_params_fill(params);
+    selectStartPoint -> do_params_fill(params);
   }
 
 
   showeringpoint -> do_params_fill(params);
-  selectStartPoint -> do_params_fill(params);
-  refineStartPoint -> do_params_fill(params);
   fillGeomParams -> do_params_fill(params);
 }
 
