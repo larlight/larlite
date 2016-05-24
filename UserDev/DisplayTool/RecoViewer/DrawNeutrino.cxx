@@ -129,7 +129,7 @@ namespace evd {
       auto const& nutrk = ev_trk->at(i);
       auto const& nuvtx = ev_vtx->at( ass_vtx_trk_v[i][0] );
 
-      Point2D point;
+      larutil::Point2D point;
       double * xyz = new double[3];
       
       // add the track & vertex to the event
