@@ -101,7 +101,7 @@ bool ClusterParamsAna::analyze(::larlite::storage_manager* storage) {
         _params_alg.FillParams(clust);
         _plane = clust.plane_id.Plane;
         // Get the mc info:
-        Point2D mcStartPoint = geoHelper -> Point_3Dto2D(mcShower.Start().Position().Vect(), _plane);
+        larutil::Point2D mcStartPoint = geoHelper -> Point_3Dto2D(mcShower.Start().Position().Vect(), _plane);
         float mcSlope = geoHelper -> Slope_3Dto2D(mcShower.Start().Momentum().Vect(), _plane);
         if (clust.start_point.w == 0) {
             continue;

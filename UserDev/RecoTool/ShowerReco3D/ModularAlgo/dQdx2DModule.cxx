@@ -136,8 +136,8 @@ void dQdx2DModule::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
 
     // set the energy for this plane
     // Because GeoHelper needs these...will fix soon
-    Hit2D strtHit;
-    Hit2D avg;
+    larutil::Hit2D strtHit;
+    larutil::Hit2D avg;
 
     strtHit.w = cluster.start_point.w;
     strtHit.t = cluster.start_point.t;

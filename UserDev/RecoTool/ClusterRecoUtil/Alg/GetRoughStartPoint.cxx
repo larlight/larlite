@@ -44,8 +44,8 @@ void GetRoughStartPoint::do_params_fill(cluster_params & cluster) {
         _angleMatrix[n1][n2] = 0;
         continue;
       }
-      Point2D p1(0, poly.Point(n1).first, poly.Point(n1).second);
-      Point2D p2(0, poly.Point(n2).first, poly.Point(n2).second);
+      larutil::Point2D p1(0, poly.Point(n1).first, poly.Point(n1).second);
+      larutil::Point2D p2(0, poly.Point(n2).first, poly.Point(n2).second);
       auto const tanangle = GetAngle(p1, p2, cluster.slope_2d);
       _angleMatrix[n1][n2] = tanangle;
     }// for second loop over Poly points
@@ -70,7 +70,7 @@ void GetRoughStartPoint::do_params_fill(cluster_params & cluster) {
 
   // NEXT STEP:
   // now find the point with the smallest average tanangle entries
-  Point2D start;
+  larutil::Point2D start;
   size_t nStart = 0;
   std::vector<float> averageList;
   averageList.reserve(poly.Size());
@@ -101,10 +101,10 @@ void GetRoughStartPoint::do_params_fill(cluster_params & cluster) {
     //           << " at (" << poly.Point(n1).first
     //           << ", " << poly.Point(n1).second << ")" << std::endl;
     if (averageList[n1] < cutoffAvg && interiorAngles[n1] < M_PI / 2.0) {
-      cluster.start_point_cand.push_back(Point2D(plane, poly.Point(n1).first, poly.Point(n1).second));
+      cluster.start_point_cand.push_back(larutil::Point2D(plane, poly.Point(n1).first, poly.Point(n1).second));
     }
     if (averageList[n1] == minAvg && interiorAngles[n1] < M_PI / 2.0) {
-      start = Point2D(plane, poly.Point(n1).first, poly.Point(n1).second);
+      start = larutil::Point2D(plane, poly.Point(n1).first, poly.Point(n1).second);
       nStart = n1;
     }
   }
@@ -133,9 +133,9 @@ void GetRoughStartPoint::do_params_fill(cluster_params & cluster) {
       endEdge = n;
     }
   }
-  Point2D endPolyPoint(plane, poly.Point(endEdge).first, poly.Point(endEdge).second);
+  larutil::Point2D endPolyPoint(plane, poly.Point(endEdge).first, poly.Point(endEdge).second);
   // project this point onto the line determined by the slope and the start-point
-  Point2D endPoint;
+  larutil::Point2D endPoint;
   geomHelper->GetPointOnLine(cluster.slope_2d, cluster.start_point, endPolyPoint, endPoint);
   cluster.end_point = endPoint;
 
@@ -144,7 +144,7 @@ void GetRoughStartPoint::do_params_fill(cluster_params & cluster) {
   return;
 }
 
-double GetRoughStartPoint::GetAngle(const Point2D& h1, const Point2D& h2, const double& slope) {
+double GetRoughStartPoint::GetAngle(const larutil::Point2D& h1, const larutil::Point2D& h2, const double& slope) {
 
   // Geometry Utilities
   auto geomHelper = ::larutil::GeometryHelper::GetME();

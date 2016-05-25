@@ -16,12 +16,12 @@ InformedStartPoint::InformedStartPoint()
   _min_distance = 2.0;
 }
 
-void InformedStartPoint::set_start_point_guess(const Hit2D & point) {
+void InformedStartPoint::set_start_point_guess(const larutil::Hit2D & point) {
   _guess_start_point.w = point.w;
   _guess_start_point.t = point.t;
   _has_current_guess = true;
 }
-void InformedStartPoint::set_start_point_guess(const Point2D & point) {
+void InformedStartPoint::set_start_point_guess(const larutil::Point2D & point) {
   _guess_start_point.w = point.w;
   _guess_start_point.t = point.t;
   _has_current_guess = true;
@@ -53,7 +53,7 @@ void InformedStartPoint::do_params_fill(cluster_params & cluster) {
               << std::endl;
   }
 
-  Hit2D best_hit;
+  larutil::Hit2D best_hit;
   float _closest_dist = 9999;
 
   float dist_sqrd = _min_distance * _min_distance;
@@ -95,11 +95,11 @@ void InformedStartPoint::do_params_fill(cluster_params & cluster) {
       endEdge = n;
     }
   }
-  Point2D endPolyPoint(cluster.plane_id.Plane,
+  larutil::Point2D endPolyPoint(cluster.plane_id.Plane,
                        cluster.PolyObject.Point(endEdge).first,
                        cluster.PolyObject.Point(endEdge).second);
   // project this point onto the line determined by the slope and the start-point
-  Point2D endPoint;
+  larutil::Point2D endPoint;
   geomHelper->GetPointOnLine(cluster.slope_2d,
                              cluster.start_point,
                              endPolyPoint,

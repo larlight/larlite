@@ -2,6 +2,7 @@
 #define STARTPOINTPANDORAMODULE_CXX
 
 #include "StartPointPandora.h"
+#include <algorithm>
 
 namespace showerreco {
 

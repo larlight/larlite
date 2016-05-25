@@ -81,7 +81,7 @@ void FillGeomParams::do_params_fill(cluster_params & cluster) {
     index ++;
 
     // keep information on a hit's projected point on the cluster's slope
-    Point2D hitProjectedOnLine;
+    larutil::Point2D hitProjectedOnLine;
     geomHelper->GetPointOnLine(cluster.slope_2d, cluster.start_point, hit, hitProjectedOnLine);
 
     /// Distance between this hit and its projection onto the cluster axis

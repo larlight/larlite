@@ -26,7 +26,7 @@ namespace showerreco {
 
 typedef std::vector<std::vector<unsigned int> > ClusterAss_t;
 
-typedef std::vector< ::Hit2D> PxHitSet_t;
+typedef std::vector< larutil::Hit2D> PxHitSet_t;
 
 /**
    \class ShowerRecoManager
