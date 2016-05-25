@@ -68,6 +68,7 @@ void StartPointPandora::do_reconstruction(
        Now focus on the situation where pandora doesn't find the vertex in the
        shower starting region (or it finds a vertex in the end of the shower)
     ************************************************ */
+/*
     TVector3 start = resultShower.fCentroid - 0.5*resultShower.fLength*resultShower.fDCosStart.Unit();
     TVector3 candStart = resultShower.fCentroid + 0.5*resultShower.fLength*resultShower.fDCosStart.Unit();
     // if ( _range > 0.5*resultShower.fLength ) _range = 0.5*resultShower.fLength;
@@ -159,7 +160,7 @@ void StartPointPandora::do_reconstruction(
       }
       break;
     }
-
+*/
 /* v11_08
     int nSlope[2] = { 0, 0 };
     for ( int iRange = 0; iRange < nSections-1; ++iRange ) {
