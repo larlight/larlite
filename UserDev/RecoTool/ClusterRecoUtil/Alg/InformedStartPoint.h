@@ -46,8 +46,8 @@ namespace cluster {
 
     void do_params_fill(cluster_params &);
 
-    void set_start_point_guess(const Hit2D & point);
-    void set_start_point_guess(const Point2D & point);
+    void set_start_point_guess(const larutil::Hit2D & point);
+    void set_start_point_guess(const larutil::Point2D & point);
 
     // This function returns whether or not there is a guess
     // to the start point.
@@ -57,7 +57,7 @@ namespace cluster {
 
   private:
     
-    Hit2D _guess_start_point;
+    larutil::Hit2D _guess_start_point;
 
     bool _has_current_guess;
 

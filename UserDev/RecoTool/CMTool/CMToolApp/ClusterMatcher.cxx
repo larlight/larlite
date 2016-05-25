@@ -26,7 +26,7 @@ namespace larlite {
   
   bool ClusterMatcher::analyze(storage_manager* storage) {
 
-    std::vector<std::vector<Hit2D> > local_clusters;
+    std::vector<std::vector<larutil::Hit2D> > local_clusters;
     
     // grab the clusters
     auto ev_cluster = storage->get_data<event_cluster>(_cluster_producer);

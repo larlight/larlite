@@ -47,7 +47,7 @@ bool DrawVertex::analyze(larlite::storage_manager* storage) {
 
 
   // Loop over the vertices and fill the necessary vectors.
-  Point2D point;
+  larutil::Point2D point;
   double * xyz = new double[3];
 
   for (auto & vertex : * vertexHandle) {
