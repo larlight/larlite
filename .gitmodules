@@ -1,0 +1,3 @@
+[submodule "UserDev/DisplayTool/UbooneNoiseFilter"]
+	path = UserDev/DisplayTool/UbooneNoiseFilter
+	url = git@github.com:coreyjadams/UbooneNoiseFilter.git
