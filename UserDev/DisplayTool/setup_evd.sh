@@ -18,6 +18,8 @@ fi
 # This section extends the path and python path to run from anywhere
 export DIR=$LARLITE_USERDEVDIR/DisplayTool/
 
+git submodule init 
+git submodule update
 
 # This section verifies that python dependences are setup 
 
