@@ -75,6 +75,13 @@ public:
                              int _n_time_ticks_data);
 
 
+  void fix_medium_angle_tracks(float * _plane_data,
+                               int plane,
+                               int _n_time_ticks_data);
+
+
+
+
   /**
    * @brief Builds the harmonic noise waveform for this plane
    * @details Iterates over the wires in this plane to construct the base
@@ -100,6 +107,7 @@ public:
   void build_coherent_noise_waveforms(float * _plane_data,
                                       int plane,
                                       int _n_time_ticks_data);
+
 
 
 
@@ -132,7 +140,11 @@ public:
 
 
 
+
 private:
+
+  /*some private functions here are used in correcting the correlated noise waveforms*/
+
 
 
   // All of the detector properties are encapsulated in this object

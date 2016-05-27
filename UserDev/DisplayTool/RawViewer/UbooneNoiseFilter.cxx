@@ -140,12 +140,18 @@ void UbooneNoiseFilter::clean_data() {
     float * _wire_block = &(_data_by_plane->at(plane).front());
 
     _corr_filter.build_noise_waveforms(_wire_block,
-        plane,
-        _n_time_ticks_data);
+                                       plane,
+                                       _n_time_ticks_data);
+
+    _corr_filter.fix_medium_angle_tracks(_wire_block,
+                                         plane,
+                                         _n_time_ticks_data);
+
   }
 
 
   _corr_filter.find_correlated_noise_errors();
+
 
   // Now clean up the wires from the correlated noise:
   for (unsigned int plane = 0; plane < _detector_properties_interface.n_planes(); plane ++) {
@@ -164,24 +170,24 @@ void UbooneNoiseFilter::clean_data() {
     }
   }
 
-  // Print out a few values just for debugging:
-  int plane = 2;
-  for (int wire = 287; wire < 310; wire ++) {
-    std::cout << "Plane " << plane << ", wire " << wire << " status is ";
-    if (_wire_status_by_plane[plane][wire] == kNormal) {
-      std::cout << "Normal";
-    }
-    else if (_wire_status_by_plane[plane][wire] == kChirping) {
-      std::cout << "Chirping";
-    }
-    else if (_wire_status_by_plane[plane][wire] == kDead) {
-      std::cout << "Dead";
-    }
-    else if (_wire_status_by_plane[plane][wire] == kHighNoise) {
-      std::cout << "HighNoise";
-    }
-    std::cout << ", RMS is " << _rms_by_plane[plane][wire] << std::endl;
-  }
+  // // Print out a few values just for debugging:
+  // int plane = 2;
+  // for (int wire = 287; wire < 310; wire ++) {
+  //   std::cout << "Plane " << plane << ", wire " << wire << " status is ";
+  //   if (_wire_status_by_plane[plane][wire] == kNormal) {
+  //     std::cout << "Normal";
+  //   }
+  //   else if (_wire_status_by_plane[plane][wire] == kChirping) {
+  //     std::cout << "Chirping";
+  //   }
+  //   else if (_wire_status_by_plane[plane][wire] == kDead) {
+  //     std::cout << "Dead";
+  //   }
+  //   else if (_wire_status_by_plane[plane][wire] == kHighNoise) {
+  //     std::cout << "HighNoise";
+  //   }
+  //   std::cout << ", RMS is " << _rms_by_plane[plane][wire] << std::endl;
+  // }
   return;
 }
 

@@ -12,34 +12,38 @@ float getCorrelation(const std::vector<float> & _input1, const std::vector<float
     std::cerr << "ERROR: vector sizes do not match" << std::endl;
     return 0.0;
   }
+  return getCorrelation(&(_input1[0]), &(_input2[0]), _input1.size());
+
+}
+
+float getCorrelation(const float * _input1, const float * _input2, unsigned int N) {
 
   float rms_1  = 0.0;
   float rms_2  = 0.0;
   float mean_1 = 0.0;
   float mean_2 = 0.0;
 
-  for (unsigned int i = 0; i < _input1.size(); i++) {
-    mean_1 += _input1.at(i);
-    mean_2 += _input2.at(i);
+  for (unsigned int i = 0; i < N; i++) {
+    mean_1 += _input1[i];
+    mean_2 += _input2[i];
   }
 
-  mean_1 /= _input1.size();
-  mean_2 /= _input2.size();
+  mean_1 /= (float) N;
+  mean_2 /= (float) N;
 
   float corr = 0.0;
 
-  for (unsigned int i = 0; i < _input1.size(); i++) {
-    rms_1 += pow(mean_1 - _input1.at(i), 2);
-    rms_2 += pow(mean_2 - _input2.at(i), 2);
-    corr += (mean_1 - _input1.at(i)) * (mean_2 - _input2.at(i));
+  for (unsigned int i = 0; i < N; i++) {
+    rms_1 += pow(mean_1 - _input1[i], 2);
+    rms_2 += pow(mean_2 - _input2[i], 2);
+    corr += (mean_1 - _input1[i]) * (mean_2 - _input2[i]);
   }
 
-  rms_1 = sqrt(rms_1 / _input1.size());
-  rms_2 = sqrt(rms_2 / _input2.size());
+  rms_1 = sqrt(rms_1 / (float) N);
+  rms_2 = sqrt(rms_2 / (float) N);
 
-  corr /= (rms_1 * rms_2 * _input1.size());
+  corr /= (rms_1 * rms_2 * N);
   return corr;
-
 }
 
 
@@ -97,6 +101,9 @@ float getMode(const std::vector<float> & _input,
 
 float getMedian( std::vector<float> & _input) {
 
+  if (_input.size() == 0){
+    return 0;
+  }
 
   if (_input.size() % 2 == 1) {
     std::nth_element(_input.begin(),
@@ -202,6 +209,25 @@ detPropFetcher::detPropFetcher() {
   }
 
 }
+
+int detPropFetcher::same_plane_pair(int plane, int block){
+  // if (plane == 0 && block > 41){
+  //   return -1;
+  // }  
+  // if (plane == 1 && block < 14){
+  //   return -1;
+  // }
+
+  if (block % 2 == 0){
+    return block + 1;
+  }
+  else{
+    return block -1;
+  }
+}
+
+
+
 std::vector<std::vector<float> > detPropFetcher::service_board_block(int plane, int block) {
 
   std::vector< std::vector<float> > ret;

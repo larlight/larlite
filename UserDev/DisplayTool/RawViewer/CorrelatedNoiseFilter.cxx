@@ -233,6 +233,160 @@ void CorrelatedNoiseFilter::build_harmonic_noise_waveform(
 
 }
 
+void CorrelatedNoiseFilter::fix_medium_angle_tracks(float * _plane_data,
+    int plane,
+    int _n_time_ticks_data)
+{
+
+  // Loop over every same plane pair of correlated waveforms.
+  // For the sides of the TPC, do something different.
+  //
+  // measure the correlation between small blocks of waveforms that *ought*
+  // to be very highly correlated
+  //
+  // If there is a big drop in the correlation, recalculate the correlated noise
+  // waveform in that region
+
+  std::vector< int > windows_to_fix;
+
+  std::vector< int > windows_to_investigate;
+  int windowsize = 200;
+  int n_windows = _correlatedNoiseWaveforms[0][0].size() / windowsize;
+
+
+  for (size_t i_block = 0;
+       i_block < _detector_properties_interface.correlated_noise_blocks(plane).size();
+       i_block ++)
+  {
+
+    int current_block = i_block;
+    int matched_block = _detector_properties_interface.same_plane_pair(plane, i_block);
+
+    auto & waveform1 = _correlatedNoiseWaveforms[plane][current_block];
+    auto & waveform2 = _correlatedNoiseWaveforms[plane][matched_block];
+
+    // Break it into blocks of N ticks
+    float windowsize = 200;
+    int n_windows = waveform1.size() / windowsize;
+
+    // For each block, get the correlation of this block to the corresponding block
+    // on the other cross correlated waveforms
+
+    // keep track of which windows need to be investigated:
+
+
+    std::vector<int> windows_to_investigate;
+    std::vector<float> correlations;
+
+    for (int i_window = 0; i_window < n_windows - 1; i_window ++ ) {
+      float * _this_block_data = &(waveform1[i_window * windowsize]);
+      float * _cross_data      = &(waveform2[i_window * windowsize]);
+      float _corr = getCorrelation(_this_block_data, _cross_data, windowsize);
+
+      if (_corr < 0.7) {
+
+        windows_to_investigate.push_back(i_window);
+        correlations.push_back(_corr);
+      }
+    }
+
+    // Now fix the windows that are broken
+    // This involves remaking the median estimate, for this window, using
+    for (int i_window = 0; i_window < windows_to_investigate.size(); i_window ++ ) {
+      int window = windows_to_investigate[i_window];
+      // std::cout << "Looking at block of wires from "
+      //           << _detector_properties_interface.correlated_noise_blocks(plane)[i_block]
+      //           << " to "
+      //           << _detector_properties_interface.correlated_noise_blocks(plane)[i_block + 1]
+      //           << std::endl;
+      // std::cout << "Ticks  " << windowsize*window <<  " to " << windowsize*(window + 1)
+      //           << ", the correlation between "
+      //           << "(" << plane << ", " << current_block << ") and "
+      //           << "(" << plane << ", " << matched_block << ") is " << correlations[i_window] << std::endl;
+
+      // Have to loop over every tick in the combined range, and recalculate the median.  Naturally,
+      // that also involves subtracting harmonic noise too.
+
+      int wire_start = std::min(_detector_properties_interface.correlated_noise_blocks(plane)[current_block],
+                                _detector_properties_interface.correlated_noise_blocks(plane)[matched_block]);
+
+      int wire_end = std::max(_detector_properties_interface.correlated_noise_blocks(plane)[current_block + 1],
+                              _detector_properties_interface.correlated_noise_blocks(plane)[matched_block + 1]);
+
+
+      // Actually break this into 4 different medians, and then we'll take the median of THAT
+      std::vector<std::vector<float> > _median_accumulator;
+
+
+      int offset;
+      for (int tick = windowsize * window; tick < windowsize * (window + 1); tick ++) {
+        _median_accumulator.clear();
+        _median_accumulator.resize(5);
+        // _median_accumulator.reserve(wire_end - wire_start);
+        for (int wire = wire_start; wire < wire_end ; wire ++) {
+          int n = (5 * (wire - wire_start)) / (wire_end  - wire_start);
+
+          if (_wire_status_by_plane->at(plane)[wire] == kNormal) {
+            offset = tick + wire * _n_time_ticks_data;
+            // std::cout << "Accessing at wire " << wire << ", offset " << offset << std::endl;
+            float scale = _detector_properties_interface.wire_scale(plane, wire);
+            _median_accumulator.at(n).push_back(_plane_data[offset] -
+                                                scale * _harmonicNoiseWaveforms[plane][tick]);
+            // std::cout << "Success!" << std::endl;
+
+
+          }
+
+        }
+
+        // std::cout << "_median_accumulator.size() " << _median_accumulator.size() << std::endl;
+
+        // Now find the median of this tick:
+        // if (_median_accumulator.size() < 8) {
+        // continue;
+        // }
+        std::vector<float > medians;
+        for (auto & vec : _median_accumulator) {
+          if (_median_accumulator.size() > 4)
+            medians.push_back(getMedian(vec));
+        }
+
+        std::sort (medians.begin(), medians.end());
+
+        float _final_median = getMedian(medians);
+
+        // Some care needs to be taken here.  Because there are clearly so many points
+        // that have high charge, the median is already sure to be offset.
+
+        // So, we can compute (approximately) the most probable value
+        // in this list.  Then, compute the rms, and exclude all points
+        // that are more than 1.5 sigma away from the mode.
+        //
+        // Then, compute the median, and use that.
+
+
+        if (_final_median != 0.0) {
+          _correlatedNoiseWaveforms.at(plane).at(current_block).at(tick)
+            = _final_median;
+          _correlatedNoiseWaveforms.at(plane).at(matched_block).at(tick)
+            = _final_median;
+        }
+
+      }
+
+
+
+    }
+
+  }
+
+
+
+
+}
+
+
+
 void CorrelatedNoiseFilter::find_correlated_noise_errors() {
 
   // Here's the strategy:  Look at each correlated noise waveform and
@@ -248,53 +402,120 @@ void CorrelatedNoiseFilter::find_correlated_noise_errors() {
 
   // Let's just look at one block to see how the block making works
 
-  int target_plane = 2;
+  int target_plane = 0;
   int target_block = 22;
 
   auto correlated_blocks
     = _detector_properties_interface.service_board_block(target_plane, target_block);
-  // for (size_t i_plane = 0;
-  //      i_plane < correlated_blocks.size();
-  //      i_plane ++)
-  // {
-  //   std::cout << "correlated_blocks.at(" << i_plane << ").size() "
-  //             << correlated_blocks.at(i_plane).size()
-  //             << std::endl;
-  // for (size_t i_plane = 0;
-  //      i_plane < correlated_blocks.size();
-  //      i_plane ++)
-  // {
-  //     int this_plane = i_plane;
-  //     int this_block = correlated_blocks.at(i_plane).at(i_block);
 
-  //     std::cout << "_correlatedNoiseWaveforms["
-  //               << this_plane << "][" << this_block << "].size() "
-  //               << _correlatedNoiseWaveforms[this_plane][this_block].size() << std::endl;
-  //     std::cout << "_correlatedNoiseWaveforms["
-  //               << target_plane << "][" << target_block << "].size() "
-  //               << _correlatedNoiseWaveforms[target_plane][target_block].size() << std::endl;
-  //     std::cout << "correlation between (" << target_plane << ", " << target_block
-  //               << ") and (" << this_plane << ", " << this_block << ") is "
-  //               << getCorrelation(_correlatedNoiseWaveforms[this_plane][this_block],
-  //                                 _correlatedNoiseWaveforms[target_plane][target_block])
-  //               << std::endl
-  //               << std::endl;
-  //   }
-  // }
+  std::vector< int > windows_to_fix;
+
+  std::vector< int > windows_to_investigate;
+  int windowsize = 390;
+  int n_windows = _correlatedNoiseWaveforms[target_plane][target_block].size() / windowsize;
+
+  windows_to_investigate.resize(n_windows);
 
   for (size_t i_plane = 0;
        i_plane < correlated_blocks.size();
        i_plane ++)
   {
-    for (size_t i_plane = 0;
-         i_plane < correlated_blocks.size();
-         i_plane ++)
+    for (size_t i_block = 0;
+         i_block < correlated_blocks.at(i_plane).size();
+         i_block ++)
     {
 
-      // Break it into blocks of 
+      int current_block = correlated_blocks.at(i_plane).at(i_block);
+
+      if (i_plane == target_plane && current_block == target_block) {
+        continue;
+      }
+
+      // Break it into blocks of 195 ticks
+
+      // For each block, get the correlation of this block to the corresponding block
+      // on the other cross correlated waveforms
+
+      // keep track of which windows need to be investigated:
+
+      for (int i_window = 0; i_window < n_windows; i_window ++ ) {
+        float * _this_block_data = &(_correlatedNoiseWaveforms[target_plane][target_block][i_window * windowsize]);
+        float * _cross_data = &(_correlatedNoiseWaveforms[i_plane][current_block][i_window * windowsize]);
+        float _corr = getCorrelation(_this_block_data, _cross_data, windowsize);
+        // std::cout << "Window " << i_window << ", the correlation between "
+        //           << "(" << target_plane << ", " << target_block << ") and "
+        //           << "(" << i_plane << ", " << current_block << ") is " << _corr << std::endl;
+        if (_corr < 0.5) {
+          windows_to_investigate.at(i_window) ++ ;
+        }
+      }
+
+
 
     }
   }
+
+
+  // Print out what regions of this block are under revision:
+  // std::cout << "Comparing at plane " << target_plane << " wires "
+  //           << _detector_properties_interface.correlated_noise_blocks(target_plane).at(target_block)
+  //           << " to "
+  //           << _detector_properties_interface.correlated_noise_blocks(target_plane).at(target_block + 1)
+  //           << " TO \n plane " << i_plane << " wires "
+  //           << _detector_properties_interface.correlated_noise_blocks(i_plane).at(current_block)
+  //           << " to "
+  //           << _detector_properties_interface.correlated_noise_blocks(i_plane).at(current_block + 1)
+  //           << std::endl;
+
+
+  std::cout << "In plane " << target_plane << " wires "
+            << _detector_properties_interface.correlated_noise_blocks(target_plane).at(target_block)
+            << " to "
+            << _detector_properties_interface.correlated_noise_blocks(target_plane).at(target_block + 1)
+            << ": \n";
+  for (int i_window = 0; i_window < windows_to_investigate.size(); i_window ++ ) {
+    if (windows_to_investigate.at(i_window) > 1) {
+      std::cout << "  Examine ticks " << i_window*windowsize
+                << " to " << (i_window + 1)*(windowsize)
+                << " (strength == " << windows_to_investigate.at(i_window) << ")"
+                << std::endl;
+      float prev_rms = 0.0;
+      float rms = 0.0;
+      float next_rms = 0.0;
+      for (int tick = 0; tick < windowsize; tick ++) {
+        if (i_window != 0) {
+          prev_rms
+          += _correlatedNoiseWaveforms[target_plane][target_block][windowsize * (i_window - 1) + tick] *
+             _correlatedNoiseWaveforms[target_plane][target_block][windowsize * (i_window - 1) + tick];
+        }
+        rms
+        += _correlatedNoiseWaveforms[target_plane][target_block][windowsize * (i_window) + tick] *
+           _correlatedNoiseWaveforms[target_plane][target_block][windowsize * (i_window) + tick];
+
+        if (i_window != n_windows - 1) {
+          next_rms
+          += _correlatedNoiseWaveforms[target_plane][target_block][windowsize * (i_window + 1) + tick] *
+             _correlatedNoiseWaveforms[target_plane][target_block][windowsize * (i_window + 1) + tick];
+        }
+      }
+      prev_rms /= (float) windowsize;
+      rms /= (float) windowsize;
+      next_rms /= (float) windowsize;
+      std::cout << "    RMS  of previous window: " << prev_rms << "\n"
+                << "    RMS  of this window: " << rms << "\n"
+                << "    RMS  of next window: " << next_rms << "\n";
+
+      if (
+        ( i_window != 0 && rms > 3 * prev_rms) ||
+        ( i_window != n_windows - 1 && rms > 3 * next_rms)
+      ) {
+        windows_to_fix.push_back(i_window);
+        std::cout << "this window tagged to be fixed." << std::endl;
+      }
+
+    }
+  }
+
 
 }
 

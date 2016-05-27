@@ -35,7 +35,7 @@ float getMean(const std::vector<float> &);
 
 float getCorrelation(const std::vector<float> & _input1, const std::vector<float> & _input2);
 
-
+float getCorrelation(const float * _input1, const float * _input2, unsigned int N);
 
 class detPropFetcher {
 
@@ -51,6 +51,8 @@ public:
   const std::vector<float> & correlated_noise_blocks(int plane) const {
     return _correlated_noise_blocks.at(plane);
   }
+
+  int same_plane_pair(int plane, int block);
 
   std::vector<std::vector<float> > service_board_block(int plane, int block);
 
