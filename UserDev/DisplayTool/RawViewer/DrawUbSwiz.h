@@ -19,7 +19,7 @@
 #include "LArUtil/Geometry.h"
 #include "RawBase.h"
 
-#include "UbooneNoiseFilter.h"
+#include "UbooneNoiseFilter/UbooneNoiseFilter.h"
 
 #include "TTree.h"
 #include "TGraph.h"

@@ -30,7 +30,7 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 CXXFLAGS +=  `root-config --cflags`
 
 # call the common GNUmakefile
-LDFLAGS += $(shell larlite-config --libs)
+LDFLAGS += $(shell larlite-config --libs) -lub_noise_filter_NoiseFilter
 LDFLAGS += -L$(shell python-config --prefix)/lib/
 LDFLAGS += $(shell python-config --ldflags)
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE
