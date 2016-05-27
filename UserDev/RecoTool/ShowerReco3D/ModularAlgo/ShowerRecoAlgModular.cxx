@@ -47,6 +47,7 @@ Shower_t ShowerRecoAlgModular::RecoOneShower(const ::protoshower::ProtoShower& p
       _modules[n] -> do_reconstruction(proto_shower, result);
     }
     catch (ShowerRecoException e) {
+      std::cout << "Reconstruction failed: message is " << e.what() << std::endl;
       result.fPassedReconstruction = false;
       return result;
     }

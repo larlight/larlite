@@ -152,11 +152,10 @@ void dQdxModule::do_reconstruction(const ::protoshower::ProtoShower & proto_show
       //  ---------------------------------
       double hit_tick =hit.t/t2cm;
       double lifetimeCorr = exp( hit_tick * _timetick / _tau );
-      //double Q = hit.charge * _charge_conversion*lifetimeCorr;
 
       double Q = _caloAlg.ElectronsFromADCArea( hit.charge, pl);
       Q *= lifetimeCorr;
-      //double Q = hit.charge * _charge_conversion;
+
       if (dist_hit_clu <= 2.4 || dist_hit_clu < trunk_length[pl]) {
 
         if (trunk_length[pl] == 0 || dist_hit_clu * dist_hit_shr == 0) {
@@ -182,33 +181,6 @@ void dQdxModule::do_reconstruction(const ::protoshower::ProtoShower & proto_show
     if (dQdx_v[pl].size() > 0)
       median[pl] = dQdx_v[pl].at((dQdx_v[pl].size() / 2));
 
-    /***
-    Best plane here refers to the plane w/ longest
-    trunk length. Note that Some trunk length are
-    larger than 10cm due to mis-assigned cluster
-    or shower start point. Throw them away.
-    --------------------------------------------------
-    From previous study and for users' convenience,
-    set Y plane the best plane.
-    ***/
-    /*if(pl==2){
-    std::vector<std::pair<int,double>> pl_best;
-    pl_best.resize(3);
-    pl_best.at(0).first=0;
-    pl_best.at(0).second=trunk_length[0];
-    pl_best.at(1).first=1;
-    pl_best.at(1).second=trunk_length[1];
-    pl_best.at(2).first=2;
-    pl_best.at(2).second=trunk_length[2];
-
-    std::sort(pl_best.begin(),pl_best.end(),larger);
-
-    if(pl_best.at(2).second<10)_pl_best=pl_best.at(2).first;
-    else if(pl_best.at(1).second<10)_pl_best=pl_best.at(1).first;
-    else if(pl_best.at(0).second<10)_pl_best=pl_best.at(0).first;
-    else break;
-    resultShower.fBestdQdxPlane = _pl_best;
-    }*/
     _pl_best = nplanes - 1;
     resultShower.fBestdQdxPlane = _pl_best;
     resultShower.fdQdx_v[pl] = median[pl];

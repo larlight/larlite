@@ -61,6 +61,8 @@ public:
       _ClusteringCorrection_v[pl] = f;
       return;
     }
+
+    void SetMinNumHits(int n) { _n_hit_min = n; }
     
  private:
     
@@ -96,6 +98,10 @@ public:
     int _pl;
     std::vector<double> _tick_v;
 
+    double _adc;
+    double _q;
+    double _e;
+
     // per-plane shower reco calibrations
     // calibration for hit reconstruction efficiency.
     // calculated by summing all the charge in the hits in an event (for single particle showers)
@@ -105,6 +111,9 @@ public:
     // this is clustering-algirhm specific. how much charge misses, on average, for a cluster?
     // account for this factor using this calibration constant
     std::vector<double> _ClusteringCorrection_v;
+
+    // minimum number of hits
+    int _n_hit_min;
 
 };
 

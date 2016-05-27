@@ -34,6 +34,15 @@ LinearEnergy::LinearEnergy()
   //  set calibrations to be equal to 1 for now
   _HitRecoCorrection_v    = std::vector<double>(3,1.);
   _ClusteringCorrection_v = std::vector<double>(3,1.);
+
+  if (_tree) delete _tree;
+  _tree = new TTree(_name.c_str(), "LinearEnergy");
+  _tree->Branch("_adc", &_adc, "adc/D");
+  _tree->Branch("_q", &_q, "q/D");
+  _tree->Branch("_e", &_e, "e/D");
+  _tree->Branch("_pl",&_pl,"pl/I");
+
+  _n_hit_min = 0;
   
   return;
 }
@@ -41,6 +50,7 @@ LinearEnergy::LinearEnergy()
 void LinearEnergy::initialize()
 {
 
+  /*
   if (_fill_tree) {
     if (_tree) delete _tree;
     _tree = new TTree(_name.c_str(), "dQdx Info Tree");
@@ -50,6 +60,7 @@ void LinearEnergy::initialize()
     _tree->Branch("_pl", &_pl, "_pl/I");
     _tree->Branch("_tick_v","std::vector<double>",&_tick_v);
   }
+  */
 
   _charge_conversion = _ADC_to_mV / ( _shp_time * _asic_gain ) ;
   //_charge_conversion = _ADC_to_mV / _asic_gain;
@@ -98,6 +109,14 @@ void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
 
   auto & clusters = proto_shower.params();
 
+  auto startpoint = resultShower.fXYZStart;
+  /*
+  std::cout << "Input shower start point : [ "
+	    << startpoint[0] << ", "
+	    << startpoint[1] << ", "
+	    << startpoint[2] << "]" << std::endl;
+  */
+
   // This function takes the shower cluster set and calculates an energy in MeV for each plane
 
   _dQ_v.clear();
@@ -120,6 +139,13 @@ void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
 
     // get the hits associated with this cluster
     auto const& hits = clusters.at(n).hit_vector;
+
+    // if there are too few hits -> remove entier shower
+    if ( hits.size() < _n_hit_min ){
+      std::stringstream ss;
+      ss << "Fail @ algo " << this->name() << " due to too few hits (" << hits.size() << ")";
+      throw ShowerRecoException(ss.str());
+    }
 
     // get the plane associated with this cluster
     auto const& pl = clusters.at(n).plane_id.Plane;
@@ -144,6 +170,8 @@ void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
       _tick_v.push_back(hit_tick);
       double lifetimeCorr = exp( hit_tick * _timetick / _tau );
 
+      _adc = h.charge;
+      
       if (_useArea) {
         dQ = _caloAlg.ElectronsFromADCArea(h.charge, pl);
         dE = dQ * lifetimeCorr * _e_to_eV * _eV_to_MeV;
@@ -153,6 +181,11 @@ void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
         dE = dQ * lifetimeCorr * _e_to_eV * _eV_to_MeV;
       }
 
+      _q = dQ;
+      _e = dE;
+
+      _tree->Fill();
+
       if (_fill_tree) {
         _dQ_v.push_back(dQ);
         _dE_v.push_back(dE);
@@ -161,9 +194,13 @@ void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
 
       E += dE;
 
+      //std::cout << "\tADC " << h.charge << " -> E " << dE << std::endl;
+
     }// loop over all hits
 
     E /= _recomb_factor;
+
+
 
     // correct for plane-dependent shower reco energy calibration
     E *= _HitRecoCorrection_v[pl];
@@ -174,6 +211,8 @@ void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
 
     if (_verbose)
       std::cout << "energy on plane " << pl << " is : " << E << std::endl;
+
+    //std::cout << "Total energy on plane " << _pl << " = " << E << std::endl;
 
     // set the energy for this plane
     resultShower.fTotalEnergy_v[pl] = E;

@@ -41,7 +41,7 @@ public:
 private:
 
   bool _use_pitch;
-  double _dEdx;
+  double _dedx_u, _dedx_v, _dedx_y;
   int _pl_best;
   int _pl;
 };

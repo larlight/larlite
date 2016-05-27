@@ -18,9 +18,10 @@ void dEdxFromdQdx::initialize()
 {
   if (_tree) delete _tree;
   _tree = new TTree(_name.c_str(), "dQdx Info Tree");
-  _tree->Branch("_dEdx", &_dEdx, "dEdx/D");
-  _tree->Branch("_pl", &_pl, "pl/I");
-  _tree->Branch("_pl_best", &_pl_best, "pl_best/I");
+  _tree->Branch("_dedx_u", &_dedx_u, "dedx_u/D");
+  _tree->Branch("_dedx_v", &_dedx_v, "dedx_v/D");
+  _tree->Branch("_dedx_y", &_dedx_y, "dedx_y/D");
+  _tree->Branch("_event");
   return;
 }
 
@@ -29,6 +30,7 @@ void dEdxFromdQdx::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
 
   auto & clusters = proto_shower.params();
 
+  _dedx_u = _dedx_v = _dedx_y = 0;
 
   // auto geomHelper = larutil::GeometryHelper::GetME();
 
@@ -63,13 +65,18 @@ void dEdxFromdQdx::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
     // take the dQdx measured on each plane and convert
     // to dEdx using a recombination model
 
-    _dEdx = dedx;
-    _pl = pl;
-    _pl_best = pl_best;
-    _tree->Fill();
+    if (pl == 0)
+      _dedx_u = dedx;
+    if (pl == 1)
+      _dedx_v = dedx;
+    if (pl == 2)
+      _dedx_y = dedx;
+
     resultShower.fdEdx_v[pl] = dedx;
 
-  }
+  } // for all input clusters
+
+  _tree->Fill();
 
   return;
 }
