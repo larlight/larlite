@@ -1,7 +1,7 @@
-#ifndef PROTOSHOWERALGOPENCV_CXX
-#define PROTOSHOWERALGOPENCV_CXX
+#ifndef PROTOSHOWERALGLOADVERTEX_CXX
+#define PROTOSHOWERALGLOADVERTEX_CXX
 
-#include "ProtoShowerAlgOpenCV.h"
+#include "ProtoShowerAlgLoadVertex.h"
 #include "LArUtil/Geometry.h"
 #include "LArUtil/GeometryHelper.h"
 #include "LArUtil/DetectorProperties.h"
@@ -18,17 +18,17 @@
 
 namespace protoshower {
 
-ProtoShowerAlgOpenCV::ProtoShowerAlgOpenCV()
+ProtoShowerAlgLoadVertex::ProtoShowerAlgLoadVertex()
   : _params_alg(nullptr)
 {
   // if no algo for calculating cluster params -> set up default ones
   if (!_params_alg) {
     _params_alg = new ::cluster::DefaultParamsAlg();
   }
-  _name = "ProtoShowerAlgOpenCV";
+  _name = "ProtoShowerAlgLoadVertex";
 }
 
-void ProtoShowerAlgOpenCV::GenerateProtoShower(::larlite::storage_manager* storage,
+void ProtoShowerAlgLoadVertex::GenerateProtoShower(::larlite::storage_manager* storage,
     ::larlite::event_pfpart* ev_pfpart,
     const size_t proto_shower_pfpart,
     protoshower::ProtoShower & proto_shower)
@@ -71,7 +71,13 @@ void ProtoShowerAlgOpenCV::GenerateProtoShower(::larlite::storage_manager* stora
           auto const& ass_hits = ass_hit_v.at(j_clust);
           for (auto const&  hit_idx : ass_hits)
             cluster_hits_v.push_back( ev_hit->at(hit_idx) );
-          cluster_hits_v_v.push_back( cluster_hits_v );
+	  // make sure hit vector is not empty
+	  if (cluster_hits_v.size() > 0)
+	    cluster_hits_v_v.push_back( cluster_hits_v );
+	  else{
+	    proto_shower.hasCluster2D(false);
+	    return;
+	  }
         }// for all clusters associated to the PFParticle
       }// if clusters were found
       // if no clusters for this PFParticle -> no 2D information
@@ -98,8 +104,10 @@ void ProtoShowerAlgOpenCV::GenerateProtoShower(::larlite::storage_manager* stora
 
         auto const& sw = clus.StartWire() * geomH->WireToCm();
         auto const& ew = clus.EndWire()   * geomH->WireToCm();
-        auto const& st = ( clus.StartTick() - detProp->TriggerOffset() ) * geomH->TimeToCm() + planeOffset;
-        auto const& et = ( clus.EndTick()   - detProp->TriggerOffset() ) * geomH->TimeToCm() + planeOffset;
+        //auto const& st = ( clus.StartTick() - detProp->TriggerOffset() ) * geomH->TimeToCm() + planeOffset;
+        //auto const& et = ( clus.EndTick()   - detProp->TriggerOffset() ) * geomH->TimeToCm() + planeOffset;
+	auto const& st = ( clus.StartTick() - 3200 ) * geomH->TimeToCm() + planeOffset;
+        auto const& et = ( clus.EndTick()   - 3200 ) * geomH->TimeToCm() + planeOffset;
 
         // start point
         proto_shower._params.at(i).start_point.w = sw;
@@ -120,22 +128,18 @@ void ProtoShowerAlgOpenCV::GenerateProtoShower(::larlite::storage_manager* stora
       proto_shower.hasCluster2D(false);
 
     // get vertex saved in PiZeroROI
-    //auto ev_pi0 = storage->get_data<larlite::event_PiZeroROI>("pizerofilter");
-    auto ev_pi0 = storage->get_data<larlite::event_PiZeroROI>("pizerofilter");
+    auto ev_vtx = storage->get_data<larlite::event_vertex>("mcroi");
 
-    if (ev_pi0){
+    if (ev_vtx){
 
-      if (ev_pi0->size() == 1){
+      if (ev_vtx->size() == 1){
 
-	auto const& pi0roi = ev_pi0->at(0);
+	auto const& pi0vtx = ev_vtx->at(0);
 
-	auto nuvtx = pi0roi.GetNeutrinoVertex();
-	std::cout << "nuvtx : " << nuvtx[0] << std::endl;
-	//std::cout << "nuvtx X-coord before : " << nuvtx[0] << std::endl;
-	//nuvtx[0] -= (detProp->TriggerOffset() * geomH->TimeToCm() );
-	//std::cout << "nuvtx X-coord after  : " << nuvtx[0] << std::endl;
-	proto_shower._vertexes.push_back(TVector3(nuvtx[0], nuvtx[1], nuvtx[2]));
-	std::cout << "Added vertex!" <<std::endl;
+	double xyz[3];
+	pi0vtx.XYZ(xyz);
+	proto_shower._vertexes.push_back(TVector3(xyz[0], xyz[1], xyz[2]));
+	//std::cout << "Added vertex!" <<std::endl;
 	proto_shower.hasVertex(true);
       }// if 1 pi0roi
       else
@@ -143,8 +147,8 @@ void ProtoShowerAlgOpenCV::GenerateProtoShower(::larlite::storage_manager* stora
     }// if there are pi0rois
     else
       proto_shower.hasVertex(false);
-
-
+    
+    
   }// if there are associated clusters
   else
     proto_shower.hasCluster2D(false);

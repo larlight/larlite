@@ -36,10 +36,11 @@ LinearEnergy::LinearEnergy()
   _ClusteringCorrection_v = std::vector<double>(3,1.);
 
   if (_tree) delete _tree;
-  _tree = new TTree(_name.c_str(), "LinearEnergy");
+  _tree = new TTree(_name.c_str(), "LinearEnergy tree");
   _tree->Branch("_adc", &_adc, "adc/D");
   _tree->Branch("_q", &_q, "q/D");
   _tree->Branch("_e", &_e, "e/D");
+  _tree->Branch("_dedx", &_dedx, "dedx/D");
   _tree->Branch("_pl",&_pl,"pl/I");
 
   _n_hit_min = 0;
@@ -67,7 +68,7 @@ void LinearEnergy::initialize()
 
   _energy_conversion = _charge_conversion * _fC_to_e * _e_to_eV * _eV_to_MeV;
 
-  _tau = larutil::LArProperties::GetME()->ElectronLifetime();        // electron lifetime in usec
+  _tau = 6000;//larutil::LArProperties::GetME()->ElectronLifetime();        // electron lifetime in usec
   std::cout << "Lifetime = " << _tau << std::endl;
   _recomb_factor = 1.;
   double MeV_to_fC = 1. / ( _e_to_eV * _eV_to_MeV );
@@ -110,6 +111,7 @@ void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
   auto & clusters = proto_shower.params();
 
   auto startpoint = resultShower.fXYZStart;
+
   /*
   std::cout << "Input shower start point : [ "
 	    << startpoint[0] << ", "
@@ -184,6 +186,8 @@ void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
       _q = dQ;
       _e = dE;
 
+      _dedx = _e / pitch;
+
       _tree->Fill();
 
       if (_fill_tree) {
@@ -205,9 +209,6 @@ void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
     // correct for plane-dependent shower reco energy calibration
     E *= _HitRecoCorrection_v[pl];
     E *= _ClusteringCorrection_v[pl];
-
-    if (_fill_tree)
-      _tree->Fill();
 
     if (_verbose)
       std::cout << "energy on plane " << pl << " is : " << E << std::endl;

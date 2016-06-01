@@ -55,7 +55,7 @@ void Filter3DDir::do_reconstruction(const ::protoshower::ProtoShower & proto_sho
   // otherwise reject
 
   double dot = dir3D[0]*seg3D[0] + dir3D[1]*seg3D[1] + dir3D[2]*seg3D[2];
-  std::cout << "dot product is " << dot << std::endl;
+  //std::cout << "dot product is " << dot << std::endl;
 
   if ( fabs(dot) < _dot_cut){
     std::stringstream ss;

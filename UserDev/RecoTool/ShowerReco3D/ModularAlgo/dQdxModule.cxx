@@ -81,6 +81,8 @@ void dQdxModule::do_reconstruction(const ::protoshower::ProtoShower & proto_show
   dQdx but results showed no improvements. Now this part is removed.
   ***/
 
+  //std::cout << "Reconstructing shower!" << std::endl;
+
   auto geom = larutil::Geometry::GetME();
   auto geomHelper = larutil::GeometryHelper::GetME();
   const size_t nplanes = geom->Nplanes();
@@ -129,6 +131,8 @@ void dQdxModule::do_reconstruction(const ::protoshower::ProtoShower & proto_show
     ***/
     _pitch = geomHelper->GetPitch(dir3D, (int)pl);
 
+    //std::cout << "Plane : " << pl << std::endl;
+
     double dist_hit_clu;
     double dist_hit_shr;
     trunk_length[pl] = sqrt ( (shr_start.w - clu_start.w) * (shr_start.w - clu_start.w) +
@@ -170,6 +174,7 @@ void dQdxModule::do_reconstruction(const ::protoshower::ProtoShower & proto_show
 
           if (tan(acos(cos_hit_angle)) <= tan(cluster_open_angle)) {
             dQdx_v[pl].push_back(Q / _pitch);
+	    if (_verbose) { std::cout << "\t dQ/dx : " << Q/_pitch << std::endl; }
           }
         }
       }
@@ -178,9 +183,10 @@ void dQdxModule::do_reconstruction(const ::protoshower::ProtoShower & proto_show
     
     // Get median of dQdx
     std::nth_element(dQdx_v[pl].begin(), dQdx_v[pl].begin() + dQdx_v[pl].size() / 2, dQdx_v[pl].end());
-    if (dQdx_v[pl].size() > 0)
+    if (dQdx_v[pl].size() > 0){
       median[pl] = dQdx_v[pl].at((dQdx_v[pl].size() / 2));
-
+      if (_verbose) { std::cout << "dQ/dx for plane " << pl << " = " << median[pl] << std::endl << std::endl << std::endl; }
+    }
     _pl_best = nplanes - 1;
     resultShower.fBestdQdxPlane = _pl_best;
     resultShower.fdQdx_v[pl] = median[pl];

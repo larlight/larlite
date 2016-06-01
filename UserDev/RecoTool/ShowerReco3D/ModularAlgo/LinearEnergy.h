@@ -101,6 +101,7 @@ public:
     double _adc;
     double _q;
     double _e;
+    double _dedx;
 
     // per-plane shower reco calibrations
     // calibration for hit reconstruction efficiency.

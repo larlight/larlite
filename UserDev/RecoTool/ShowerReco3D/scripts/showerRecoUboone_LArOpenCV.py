@@ -35,49 +35,29 @@ def getShowerRecoAlgModular():
   alg = showerreco.ShowerRecoAlgModular()
   alg.SetDebug(False)
 
-  # 3D Axis Module:
-  axis3D = showerreco.Axis3DModule()
-  axis3D.setMaxIterations(100)
-  axis3D.setNStepsInitial(25)
-  axis3D.setTargetError(0.001)
-  axis3D.setNormalErrorRange(0.01)
-  axis3D.setThetaRangeStart(0.1)
-  axis3D.setThetaRangeMin(0.0005)
-  axis3D.setNStepsStart(4)
-  axis3D.setConvergeRate(0.85)
-  axis3D.setVerbosity(True)
-  axis3D.setSeedVectorErrorCutoff(0.1)
-
-  axis3D = showerreco.Angle3DFromVtx()
-
-  #angle3D = showerreco.Angle3DFormula()
-  #angle3D.setMaxAngleError(0.1)
-  #angle3D.setVerbosity(False)
-  angle3D = showerreco.Angle3DFromVtx()
+  angle3D = showerreco.Angle3DFromVtxQweighted()
 
   energy = showerreco.LinearEnergy()
-  energy.SetHitRecoCorrection(1.289, 0)
-  energy.SetHitRecoCorrection(1.323, 1)
-  energy.SetHitRecoCorrection(1.336, 2)
   energy.SetUseModBox(True)
   energy.SetUseArea(True)
   energy.setVerbosity(False)
+  energy.SetFillTree(True)
+  energy.SetMinNumHits(20)
 
   dqdx = showerreco.dQdxModule()
+  dqdx.setVerbosity(False)
 
   dedx = showerreco.dEdxFromdQdx()
-  #dedx.SetUsePitch(False)
-  #dedx.setVerbosity(False)
-
-  #alg.AddShowerRecoModule(axis3D)
+  dedx.setVerbosity(False)
+  
   alg.AddShowerRecoModule(showerreco.StartPoint3DModule()  )
   alg.AddShowerRecoModule(angle3D)
+  filter = showerreco.Filter3DDir()
+  filter.SetDotProdCut(0.5)
+  alg.AddShowerRecoModule(filter)
   alg.AddShowerRecoModule(energy)
   alg.AddShowerRecoModule(dqdx)
   alg.AddShowerRecoModule(dedx)
-  # alg.AddShowerRecoModule(showerreco.StartPoint2DModule()  )
-  #alg.AddShowerRecoModule(showerreco.OtherStartPoint3D()  )
-  # alg.AddShowerRecoModule(showerreco.ShowerChargeModule()  )
 
   alg.AddShowerRecoModule(showerreco.GeoModule())
 
@@ -123,19 +103,19 @@ my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 # Specify analysis output root file name
 my_proc.set_ana_output_file("showerRecoUboone_ana.root")
 # Specify data output root file name
-my_proc.set_output_file("showerRecoUboone.root")
+my_proc.set_output_file("showerreco3.root")
 
 
 
 ana_unit=DefaultShowerReco3D()
 # set ProtoShower Algo to go from data-products to a ProtoShower object
-#protoshoweralg = showerreco.ProtoShowerAlgClusterParams()
-protoshoweralg = protoshower.ProtoShowerAlgOpenCV()
+protoshoweralg = protoshower.ProtoShowerAlgLoadVertex()
+#protoshoweralg = protoshower.ProtoShowerAlgOpenCV()
 ana_unit.GetProtoShowerHelper().setProtoShowerAlg( protoshoweralg )
 #ana_unit.SetInputProducer("fuzzyclustermerger")
 ana_unit.SetInputProducer("ImageClusterHit")
 
-ana_unit.SetOutputProducer("showerreco2")
+ana_unit.SetOutputProducer("showerreco")
 
 #my_proc.enable_event_alignment(False)
     
