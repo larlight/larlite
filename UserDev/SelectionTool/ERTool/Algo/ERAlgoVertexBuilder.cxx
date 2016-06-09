@@ -980,6 +980,8 @@ namespace ertool {
       if(tverbose)
 	std::cout << "\tenergy: " << energy << " > most_energy: " << most_energy << "?\n";    
 
+      if(energy < 0) std::cout << "Warning: summed association energy < 0\n";
+
       if(energy > most_energy) {	
 	if(tverbose) std::cout << "\t\tyes\n";
   	index = i;
