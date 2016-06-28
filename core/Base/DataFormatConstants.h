@@ -148,6 +148,8 @@ namespace larlite{
       "mctree",
       "minos",
       "fifo",
+      "pmtfifo",
+      "tpcfifo",
       "ass",
       "pcaxis",
       "fmatch",
