@@ -41,12 +41,12 @@ namespace larlite {
   ////////////////////////////////////////////////////////
 
   //***************************************************************************
-  event_pmtfifo::event_pmtfifo(data::DataType_t type) : std::vector<larlite::pmtfifo>(), 
-    event_base(type)
-  //***************************************************************************
-  { 
-    clear_data();
-  }
+  // event_pmtfifo::event_pmtfifo(data::DataType_t type) : std::vector<larlite::pmtfifo>(), 
+  //   event_base(type)
+  // //***************************************************************************
+  // { 
+  //   clear_data();
+  // }
 
   //***************************************************************************  
   void event_pmtfifo::clear_data(){

@@ -42,12 +42,12 @@ namespace larlite {
   ////////////////////////////////////////////////////////
 
   //***************************************************************************
-  event_tpcfifo::event_tpcfifo(data::DataType_t type) : std::vector<larlite::tpcfifo>(), 
-    event_base(type)
-  //***************************************************************************
-  { 
-    clear_data();
-  }
+  // event_tpcfifo::event_tpcfifo(data::DataType_t type) : std::vector<larlite::tpcfifo>(), 
+  //   event_base(type)
+  // //***************************************************************************
+  // { 
+  //   clear_data();
+  // }
 
   //***************************************************************************  
   void event_tpcfifo::clear_data(){

@@ -101,6 +101,12 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_fifo> () const
   { return data::kFIFO; }
 
+  template<> data::DataType_t storage_manager::data_type<event_pmtfifo> () const
+  { return data::kPMTFIFO; }
+
+  template<> data::DataType_t storage_manager::data_type<event_tpcfifo> () const
+  { return data::kTPCFIFO; }
+
   template<> data::DataType_t storage_manager::data_type<event_pcaxis> () const
   { return data::kPCAxis; }
 

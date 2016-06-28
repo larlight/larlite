@@ -100,7 +100,8 @@ namespace larlite {
   public:
     
     /// Default constructor ... provide an option to set the length of ch-wise data
-    event_tpcfifo(data::DataType_t type=data::kFIFO);
+    event_tpcfifo(std::string name="noname") : event_base(data::kTPCFIFO,name) { clear_data(); }
+    //event_tpcfifo(data::DataType_t type=data::kFIFO);
     
     /// Default copy constructor needed to avoid memory leak in ROOT streamer
     event_tpcfifo(const event_tpcfifo& original)

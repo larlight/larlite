@@ -1172,6 +1172,12 @@ namespace larlite {
     case data::kFIFO:
       _ptr_data_array[type][name]=(event_fifo*)(new event_fifo(name));
       break;
+    case data::kPMTFIFO:
+      _ptr_data_array[type][name]=(event_pmtfifo*)(new event_pmtfifo(name));
+      break;
+    case data::kTPCFIFO:
+      _ptr_data_array[type][name]=(event_tpcfifo*)(new event_tpcfifo(name));
+      break;
     case data::kOpDetWaveform:
       _ptr_data_array[type][name]=new event_opdetwaveform(name);
       break;
