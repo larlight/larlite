@@ -2,6 +2,7 @@
 #define LARLITE_MESSENGER_CXX
 
 #include "messenger.h"
+
 namespace larlite {
   Message* Message::me = 0;
   
@@ -29,6 +30,7 @@ namespace larlite {
       << msg.c_str()
       << std::endl;
   }
+
 
 }
 #endif

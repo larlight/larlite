@@ -36,6 +36,8 @@
 #include "flashmatch.h"
 #include "event_ass.h"
 #include "fifo.h"
+#include "pmtfifo.h"
+#include "tpcfifo.h"
 #include "opdetwaveform.h"
 #include "simphotons.h"
 #include "mucsdata.h"

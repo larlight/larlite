@@ -20,6 +20,7 @@
 #include "Base/larlite_base.h"
 #include "data_base.h"
 #include "event_ass.h"
+
 namespace larlite {
   class trigger;
   class potsummary;

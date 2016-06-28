@@ -30,6 +30,8 @@
 #pragma link C++ class std::vector<std::string>+;
 #pragma link C++ enum larlite::data::DataType_t+;
 
+#pragma link C++ enum larlite::Aho_t+;
+
 #pragma link C++ class larlite::Message+;
 #pragma link C++ class larlite::larlite_base+;
 

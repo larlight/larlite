@@ -1,24 +1,24 @@
 /**
- * \file fifo.h
+ * \file tpcfifo.h
  *
  * \ingroup DataFormat
  * 
  * \brief Class def header for base FEM data container
  *
- * @author Kazu - Nevis 2013
+ * @author David Caratelli - 02/2014
  */
 
 /** \addtogroup DataFormat
 
     @{*/
 
-#ifndef LARLITE_FIFO_H
-#define LARLITE_FIFO_H
+#ifndef TPCFIFO_H
+#define TPCFIFO_H
 
 #include "data_base.h"
-#include "Base/MCConstants.h"
-#include "Base/FEMConstants.h"
-#include <vector>
+#include "fifo.h"
+#include "Base/GeoConstants.h"
+#include "Base/GeoTypes.h"
 
 namespace larlite {
 
@@ -26,109 +26,68 @@ namespace larlite {
      \class fifo 
      Channel-wise data member class to hold a collection of ADC samples.
   */
-  class fifo : public std::vector<unsigned short>, 
-	       public data_base {
+  class tpcfifo : public fifo {
     
   public:
 
     /// Default constructor
-    fifo();
+    tpcfifo();
     
     /// Default copy constructor
-    fifo(const fifo& original)
-      : std::vector<unsigned short>(original)
-      , data_base(original)
-      , _channel_number(original._channel_number)
-      , _module_address(original._module_address)
-      , _module_id(original._module_id)
-      , _readout_frame_number(original._readout_frame_number)
-      , _readout_sample_number(original._readout_sample_number)
-      , _disc_id(original._disc_id)
-    {}
+    tpcfifo(const tpcfifo& original)
+      : fifo::fifo(original)
+    { _plane = original._plane ; _signal = original._signal; }
 
     /// Fast vector copy constructor
-    fifo(UInt_t  ch,
-	 UInt_t  frame,
-	 UInt_t  sample,
-	 UChar_t module_address,
-	 UChar_t module_id,
-	 fem::Discriminator_t disc_id,
-	 std::vector<unsigned short> wf)
-      : std::vector<unsigned short>(wf)
-      , data_base(data::kFIFO)
-      , _channel_number(ch)
-      , _module_address(module_address)
-      , _module_id(module_id)
-      , _readout_frame_number(frame)
-      , _readout_sample_number(sample)
-      , _disc_id(disc_id)
-    {}
+    tpcfifo(UShort_t ch,
+	    UInt_t   frame,
+	    UInt_t   sample,
+	    UChar_t  module_address,
+	    UChar_t  module_id,
+	    larlite::geo::View_t plane,
+	    larlite::geo::SigType_t signaltype,
+	    //DATA::DATA_TYPE type,
+	    std::vector<UShort_t> wf) : fifo::fifo(ch,
+						   frame,
+						   sample,
+						   module_address,
+						   module_id,
+						   fem::kDISC_MAX,
+						   //type,
+						   wf)
+    { _plane = plane;  _signal = signaltype; }
     
-    /// Setter for the channel number
-    void set_channel_number (UInt_t ch)     {_channel_number=ch;}
+    
+    /// plane info setter
+    void set_plane ( larlite::geo::View_t plane ) { _plane=plane;}
+    
+    /// signal type setter
+    void set_signal ( larlite::geo::SigType_t signal ) { _signal=signal;}
 
-    /// Setter for the channel frame ID number
-    void set_readout_frame_number (UInt_t id) {_readout_frame_number=id;}
+    /// plane info getter
+    larlite::geo::View_t plane() const { return _plane; }
     
-    /// Setter for the readout_sample_number number
-    void set_readout_sample_number (UInt_t t) {_readout_sample_number=t;}
+    /// signal type getter
+    larlite::geo::SigType_t signal() const {return _signal; }
 
-    /// Setter for the module address
-    void set_module_address(UChar_t n) { _module_address = n;}
-
-    /// Setter for the module id
-    void set_module_id(UChar_t n) { _module_id = n;}
-
-    /// Setter for the channel discriminator ID number
-    void set_disc_id (fem::Discriminator_t id)  {_disc_id=id;}
-    
-    /// Getter for the channel frame ID number
-    UInt_t readout_frame_number() const {return _readout_frame_number;}
-    
-    /// Getter for a RAW readout sample number
-    UInt_t readout_sample_number_RAW() const { return _readout_sample_number; }
-    
-    /// Getter for the readout_sample_number number
-    inline UInt_t readout_sample_number_2MHz() const  
-    {return _readout_sample_number/32; }
-
-    /// Getter for the readout_sample_number number
-    inline UInt_t readout_sample_number_16MHz() const  
-    {return _readout_sample_number/8; }
-
-    /// Getter for the readout_sample_number number
-    inline UInt_t readout_sample_number_64MHz() const  
-    {return _readout_sample_number; }
-    
-    /// Getter for the channel number
-    UInt_t channel_number() const {return _channel_number;}
-    
-    /// Getter for the module address
-    UInt_t module_address() const { return (UInt_t)(_module_address);}
-    
-    /// Getter for the module id
-    UInt_t module_id() const {return (UInt_t)(_module_id);}
-
-    /// Getter for the discriminator ID number
-    fem::Discriminator_t disc_id() const  {return _disc_id;}
-    
     /// Method to clear currently held data contents in the buffer
     virtual void clear_data();
     
     /// Default destructor
-    ~fifo(){}
+    ~tpcfifo(){}
+    
     
   protected:
     
     /// Internal function to reset variables.
     virtual void init_vars();
 
-    UInt_t  _channel_number;            ///< Channel number
-    UChar_t _module_address;            ///< Module number
-    UChar_t _module_id;                 ///< Module ID
-    UInt_t  _readout_frame_number;      ///< Frame number 
-    UInt_t  _readout_sample_number;     ///< Sample number in 64 MHz clock
-    fem::Discriminator_t _disc_id;      ///< Discriminator ID (only for PMT)
+    larlite::geo::View_t      _plane;    ///< Plane Projection
+    larlite::geo::SigType_t   _signal;   ///< Signal Type
+    
+    ////////////////////////
+    //ClassDef(tpcfifo,6)
+    ////////////////////////
   };
   
   
@@ -136,16 +95,16 @@ namespace larlite {
      \class event_fifo 
      Event-wise data member class to hold a collection of ch-wise data members
   */
-  class event_fifo : public std::vector<larlite::fifo>, public event_base {
+  class event_tpcfifo : public std::vector<larlite::tpcfifo>, public event_base {
     
   public:
     
     /// Default constructor ... provide an option to set the length of ch-wise data
-  event_fifo(std::string name="noname") : event_base(data::kFIFO,name) { clear_data(); }
+    event_tpcfifo(data::DataType_t type=data::kFIFO);
     
     /// Default copy constructor needed to avoid memory leak in ROOT streamer
-    event_fifo(const event_fifo& original)
-      : std::vector<larlite::fifo>(original),
+    event_tpcfifo(const event_tpcfifo& original)
+      : std::vector<larlite::tpcfifo>(original),
 	event_base(original),
 	_event_number(original._event_number),
 	_event_frame_number(original._event_frame_number),
@@ -158,7 +117,7 @@ namespace larlite {
     {}
     
     /// Default destructor
-    ~event_fifo(){}
+    ~event_tpcfifo(){}
 
     /// Setter for the evnet number
     void set_event_number(UInt_t n) { _event_number = n; }
@@ -191,10 +150,10 @@ namespace larlite {
     UInt_t event_frame_number() const {return _event_frame_number;}
     
     /// Getter for the module address
-    UInt_t module_address() const {return (UInt_t)(_module_address);}
+    UChar_t module_address() const {return _module_address;}
     
     /// Getter for the module ID
-    UInt_t module_id()      const {return (UInt_t)(_module_id);}
+    UChar_t module_id()      const {return _module_id;}
     
     /// Getter for the checksum
     UInt_t checksum()       const {return _checksum;} 
@@ -236,6 +195,9 @@ namespace larlite {
     UInt_t _checksum;                  ///< checksum of readout events
     UInt_t _nwords;                    ///< # of event words readout
     
+    ///////////////////////////
+    //ClassDef(event_tpcfifo,7)
+    //////////////////////////
   };
 }
 #endif
