@@ -40,10 +40,10 @@ namespace larlite {
 
     /// Fast vector copy constructor
     tpcfifo(UShort_t ch,
-	    UInt_t   frame,
-	    UInt_t   sample,
-	    UChar_t  module_address,
-	    UChar_t  module_id,
+	    unsigned   frame,
+	    unsigned   sample,
+	    unsigned char  module_address,
+	    unsigned char  module_id,
 	    larlite::geo::View_t plane,
 	    larlite::geo::SigType_t signaltype,
 	    //DATA::DATA_TYPE type,
@@ -121,61 +121,61 @@ namespace larlite {
     ~event_tpcfifo(){}
 
     /// Setter for the evnet number
-    void set_event_number(UInt_t n) { _event_number = n; }
+    void set_event_number(unsigned n) { _event_number = n; }
     
     /// Setter for the event frame number
-    void set_event_frame_number(UInt_t n) {_event_frame_number=n;}
+    void set_event_frame_number(unsigned n) {_event_frame_number=n;}
     
     /// Setter for the module address from which this event is read-out
-    void set_module_address(UChar_t n) {_module_address=n;}
+    void set_module_address(unsigned char n) {_module_address=n;}
     
     /// Setter for the module ID
-    void set_module_id(UChar_t id)      {_module_id=id;}
+    void set_module_id(unsigned char id)      {_module_id=id;}
     
     /// Setter for the checksum
-    void set_checksum(UInt_t sum)      {_checksum=sum;}
+    void set_checksum(unsigned sum)      {_checksum=sum;}
     
     /// Setter for the # words read out
-    void set_nwords(UInt_t n)          {_nwords=n;}
+    void set_nwords(unsigned n)          {_nwords=n;}
     
     /// Setter for the trigger frame id
-    void set_fem_trig_frame_number(UInt_t n) {_fem_trig_frame_number=n;}
+    void set_fem_trig_frame_number(unsigned n) {_fem_trig_frame_number=n;}
     
     /// Setter for the trigger timeslice
-    void set_fem_trig_sample_number(UInt_t n) {_fem_trig_sample_number=n;}
+    void set_fem_trig_sample_number(unsigned n) {_fem_trig_sample_number=n;}
 
     /// Getter for the event number
-    UInt_t event_number() const { return _event_number;}
+    unsigned event_number() const { return _event_number;}
     
     /// Getter for the frame ID
-    UInt_t event_frame_number() const {return _event_frame_number;}
+    unsigned event_frame_number() const {return _event_frame_number;}
     
     /// Getter for the module address
-    UChar_t module_address() const {return _module_address;}
+    unsigned char module_address() const {return _module_address;}
     
     /// Getter for the module ID
-    UChar_t module_id()      const {return _module_id;}
+    unsigned char module_id()      const {return _module_id;}
     
     /// Getter for the checksum
-    UInt_t checksum()       const {return _checksum;} 
+    unsigned checksum()       const {return _checksum;} 
     
     /// Getter for the number of read words
-    UInt_t nwords()         const {return _nwords;}
+    unsigned nwords()         const {return _nwords;}
     
     /// Getter for the trigger frame number
-    UInt_t fem_trig_frame_number() const {return _fem_trig_frame_number;}
+    unsigned fem_trig_frame_number() const {return _fem_trig_frame_number;}
 
     /// Getter for the fem trigger sample number RAW
-    inline UInt_t fem_trig_sample_number_RAW() const {return _fem_trig_sample_number;}
+    inline unsigned fem_trig_sample_number_RAW() const {return _fem_trig_sample_number;}
     
     /// Getter for the fem trigger sample number in 2 MHz
-    inline UInt_t fem_trig_sample_number_2MHz() const {return _fem_trig_sample_number;}    
+    inline unsigned fem_trig_sample_number_2MHz() const {return _fem_trig_sample_number;}    
 
     /// Getter for the fem trigger sample number in 16 MHz
-    inline UInt_t fem_trig_sample_number_16MHz() const {return _fem_trig_sample_number*8;}
+    inline unsigned fem_trig_sample_number_16MHz() const {return _fem_trig_sample_number*8;}
 
     /// Getter for the fem trigger sample number in 64 MHz
-    inline UInt_t fem_trig_sample_number_64MHz() const {return _fem_trig_sample_number*32;}
+    inline unsigned fem_trig_sample_number_64MHz() const {return _fem_trig_sample_number*32;}
     
     /// A function to reset data member variables
     virtual void clear_data();
@@ -185,16 +185,16 @@ namespace larlite {
     
     virtual void init_vars();
     /// Actual implementation function of resetting variables
-    UInt_t  _event_number;              ///< event number counter
-    UInt_t  _event_frame_number;        ///< event frame ID number
-    UChar_t _module_address;            ///< module address number
-    UChar_t _module_id;                 ///< module ID number
+    unsigned  _event_number;              ///< event number counter
+    unsigned  _event_frame_number;        ///< event frame ID number
+    unsigned char _module_address;            ///< module address number
+    unsigned char _module_id;                 ///< module ID number
     
-    UInt_t _fem_trig_frame_number;     ///< trigger frame id
-    UInt_t _fem_trig_sample_number;    ///< trigger time slice
+    unsigned _fem_trig_frame_number;     ///< trigger frame id
+    unsigned _fem_trig_sample_number;    ///< trigger time slice
     
-    UInt_t _checksum;                  ///< checksum of readout events
-    UInt_t _nwords;                    ///< # of event words readout
+    unsigned _checksum;                  ///< checksum of readout events
+    unsigned _nwords;                    ///< # of event words readout
     
     ///////////////////////////
     //ClassDef(event_tpcfifo,7)

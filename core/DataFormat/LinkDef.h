@@ -209,6 +209,14 @@
 #pragma link C++ class std::vector<larlite::fifo>+;
 #pragma link C++ class larlite::event_fifo+;
 
+#pragma link C++ class larlite::pmtfifo+;
+#pragma link C++ class std::vector<larlite::pmtfifo>+;
+#pragma link C++ class larlite::event_pmtfifo+;
+
+#pragma link C++ class larlite::tpcfifo+;
+#pragma link C++ class std::vector<larlite::tpcfifo>+;
+#pragma link C++ class larlite::event_tpcfifo+;
+
 #pragma link C++ class larlite::opdetwaveform+;
 #pragma link C++ class std::vector<larlite::opdetwaveform>+;
 #pragma link C++ class larlite::event_opdetwaveform+;
