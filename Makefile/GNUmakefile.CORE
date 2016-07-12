@@ -11,8 +11,12 @@ pre_build:
 
 main_build: pre_build .depend $(DICT).cxx $(LARLITE_LIBDIR)/$(SHLIB) $(LARLITE_LIBDIR)/$(ROOTMAP) 
 
-# default rule for making .o files from .cxx files
+# default rule for making .o files from .cxx and .cc files
 %.o: %.cxx
+	@echo '<< compiling' $< '>>'
+	@$(CXX) $(CXXFLAGS) $(LARLITE_BASIC_ROOTINC) $(INCFLAGS) -c $<
+
+%.o: %.cc
 	@echo '<< compiling' $< '>>'
 	@$(CXX) $(CXXFLAGS) $(LARLITE_BASIC_ROOTINC) $(INCFLAGS) -c $<
 
