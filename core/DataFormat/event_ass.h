@@ -28,7 +28,7 @@ namespace larlite{
 
   private:
 
-    std::map<larlite::product_id,std::map<larlite::product_id,size_t> > _ass_map_key;
+    //std::map<larlite::product_id,std::map<larlite::product_id,size_t> > _ass_map_key;
     std::vector<larlite::AssSet_t> _ass_data;
     std::vector<std::pair<larlite::product_id,larlite::product_id> > _ass_ids;
   public:
@@ -44,11 +44,12 @@ namespace larlite{
     // Setter functions
     //
     /// Association setter
+    /*
     void set_association(const product_id& id_a,
 			 const product_id& id_b,
 			 const AssSet_t& ass_a2b,
 			 const bool overwrite=true);
-
+*/
     //
     // Info getter functions
     //
@@ -65,14 +66,14 @@ namespace larlite{
     const std::pair<larlite::product_id,larlite::product_id>& association_keys(const AssID_t id) const;
 
     /// List association
-    void list_association() const;
+    //void list_association() const;
 
     /**
        larlite::AssSet_t getter given an explicit larlite::product_id combination. \n
        larlite::DataFormatException thrown if not found.
     */
-    const AssSet_t& association(const product_id& id_a,
-				const product_id& id_b) const;
+    //const AssSet_t& association(const product_id& id_a,
+//				const product_id& id_b) const;
     /**
        larlite::AssSet_t getter given an explicit larlite::product_id combination. \n
        larlite::DataFormatException thrown if not found.
@@ -83,8 +84,8 @@ namespace larlite{
        Query the key for AssSet_t object that maps association of id_a => id_b. \n
        If the return is kINVALID_ASS, then there is no proper association found. \n
     */
-    AssID_t assid(const product_id& id_a, const product_id& id_b) const;
-
+    //AssID_t assid(const product_id& id_a, const product_id& id_b) const;
+/*
     AssID_t find_one_assid(const data::DataType_t type_a,
 			   const data::DataType_t type_b) const;
     
@@ -111,7 +112,7 @@ namespace larlite{
     
     std::vector<AssID_t> find_all_assid(const data::DataType_t type_a,
 					const product_id& id_b) const;
-    
+   */ 
   };
 }
 #endif

@@ -89,6 +89,11 @@ namespace larlite{
       kTrackMomentum,      ///< track momentum
       kOpDetWaveform,      ///< optical detector waveform
       kSimPhotons,         ///< sim::SimPhotons
+      kHit1,               ///< Custom Class
+      kInt,                ///< Custom Class
+      kMapIntDouble,       ///< Custom Class
+      kLarSoftHit,         ///< recob::Cluster
+      kLarSoftCluster,     ///< recob::Cluster      
       kMuCSData,           ///< MuCS::MuCSData
       kMuCSReco,           ///< MuCS::MuCSReco
       kPiZeroROI,
@@ -152,6 +157,11 @@ namespace larlite{
       "trackmom",
       "opdigit",
       "simphotons",
+      "hit1",
+      "int",
+      "mapintdouble",
+      "larsofthit",
+      "larsoftcluster",
       "mucsdata",
       "mucsreco",
       "PiZeroROI",

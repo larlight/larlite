@@ -13,7 +13,8 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 # Add your program below with a space after the previous one.
 # This makefile compiles all binaries specified below.
 
-all: ../bin/larlite ../bin/llhadd ../bin/combine_ass
+all: ../bin/larlite ../bin/llhadd 
+# ../bin/combine_ass
 
 ../bin/larlite:
 	@echo '<<compiling' $@'>>'
@@ -27,13 +28,13 @@ all: ../bin/larlite ../bin/llhadd ../bin/combine_ass
 	@$(CXX) llhadd.cc -o ../bin/$@ $(CXXFLAGS) $(LDFLAGS)
 	@rm -rf ../bin/*.dSYM
 
-../bin/combine_ass:
-	@echo '<<compiling' $@'>>'
-	@mkdir -p ../bin
-	@$(CXX) combine_ass.cc -o ../bin/$@ $(CXXFLAGS) $(LDFLAGS)
-	@rm -rf ../bin/*.dSYM	
+#../bin/combine_ass:
+#	@echo '<<compiling' $@'>>'
+#	@mkdir -p ../bin
+#	@$(CXX) combine_ass.cc -o ../bin/$@ $(CXXFLAGS) $(LDFLAGS)
+#	@rm -rf ../bin/*.dSYM	
 
 clean:	
 	rm -f ../bin/larlite
 	rm -f ../bin/llhadd
-	rm -f ../bin/combine_ass
+#	rm -f ../bin/combine_ass

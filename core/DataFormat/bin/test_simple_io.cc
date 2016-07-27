@@ -26,7 +26,7 @@ int main()
   man.open();
   for(int i=0; i<10; i++) {
 
-    for(int j=0; j<larlite::data::kDATA_TYPE_MAX; ++j) {
+    for(int j=1; j<larlite::data::kDATA_TYPE_MAX; ++j) {
 
       if( j == larlite::data::kSeed ||
 	  j == larlite::data::kEvent ||

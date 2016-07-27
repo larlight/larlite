@@ -31,7 +31,7 @@ export LARLITE_COREDIR
 #
 # Define directories to be compile upon a global "make"...
 #
-SUBDIRS :=  Base LArUtil DataFormat Analysis
+SUBDIRS :=  Base LArUtil DataFormat Analysis WrappedLarSoftDictionaries
 
 #####################################################################################
 #

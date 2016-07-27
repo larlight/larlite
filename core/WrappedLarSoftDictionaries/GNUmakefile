@@ -3,8 +3,8 @@
 #
 
 # specific names for this package
-DICT  = LArLite_DataFormatDict
-SHLIB = libLArLite_DataFormat.so
+DICT  = LArLite_WrappedLarSoftDictionaries
+SHLIB = libLArLite_WrappedLarSoftDictionaries.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
 HEADERS = $(filter-out $(FMWK_HEADERS), $(wildcard *.h))
