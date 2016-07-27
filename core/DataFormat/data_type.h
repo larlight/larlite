@@ -5,7 +5,6 @@
 #include "Base/messenger.h"
 #include <exception>
 #include <vector>
-#include <map>
 
 namespace recob {
   class Hit;
@@ -58,7 +57,6 @@ namespace larlite {
   class event_auxsimch;
   class event_chstatus;
   template <typename T> class wrapper;
-  class hit1;
 
   /// Run data product class => enum type converter
   template <class T>
@@ -129,9 +127,6 @@ namespace larlite {
   template<> data::DataType_t data_type<event_pizeroroi> ();
   template<> data::DataType_t data_type<event_auxsimch> ();
   template<> data::DataType_t data_type<event_chstatus> ();
-  template<> data::DataType_t data_type<wrapper<std::vector<hit1> > > ();
-  template<> data::DataType_t data_type<wrapper<int> > ();
-  template<> data::DataType_t data_type<wrapper<std::map<int,double> > > ();
   template<> data::DataType_t data_type<wrapper<std::vector<recob::Hit> > > ();
   template<> data::DataType_t data_type<wrapper<std::vector<recob::Cluster> > > ();
   template<> data::SubRunDataType_t subrundata_type<potsummary>();

@@ -44,10 +44,8 @@
 #include "auxsimch.h"
 #include "chstatus.h"
 #include "wrapper.h"
-#include "hit1.h"
 #include "lardataobj/RecoBase/Hit.h"
 #include "lardataobj/RecoBase/Cluster.h"
-#include <map>
 #include <vector>
 
 namespace larlite {
@@ -1190,15 +1188,6 @@ namespace larlite {
       break;
     case data::kChStatus:
       _ptr_data_array[type][name]=new event_chstatus(name);
-      break;
-    case data::kHit1:
-      _ptr_data_array[type][name]=new wrapper<std::vector<hit1> >(name);
-      break;
-    case data::kInt:
-      _ptr_data_array[type][name]=new wrapper<int>(name);
-      break;
-    case data::kMapIntDouble:
-      _ptr_data_array[type][name]=new wrapper<std::map<int,double> >(name);
       break;
     case data::kLarSoftHit:
       _ptr_data_array[type][name]=new wrapper<std::vector<recob::Hit> >(name);

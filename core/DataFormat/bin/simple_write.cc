@@ -3,7 +3,6 @@
 #include "DataFormat/storage_manager.h"
 
 
-#include "DataFormat/hit1.h"
 #include "DataFormat/track.h"
 #include "DataFormat/wrapper.h"
 #include "lardataobj/RecoBase/Hit.h"
@@ -11,7 +10,6 @@
 
 #include <iostream>
 #include <vector>
-#include <map>
 
 int main(){
 
@@ -50,9 +48,6 @@ int main(){
   // Let's fill event_track for 100 events.
   //auto my_event_track = my_storage.get_data<larlite::event_track>("test");
   auto my_event_track = (::larlite::event_track*)(my_storage.get_data(larlite::data::kTrack,"test"));
-  auto my_v_hit1 = (::larlite::wrapper<std::vector<larlite::hit1> >*)(my_storage.get_data(larlite::data::kHit1,"test"));
-  auto my_int = (::larlite::wrapper<int>*)(my_storage.get_data(larlite::data::kInt,"test"));
-  auto my_m_intdouble = (::larlite::wrapper<std::map<int,double> >*)(my_storage.get_data(larlite::data::kMapIntDouble,"test"));
   auto my_larsofthits = (::larlite::wrapper<std::vector<recob::Hit> >*)(my_storage.get_data(larlite::data::kLarSoftHit,"test"));
   auto my_larsoftclusters = (::larlite::wrapper<std::vector<recob::Cluster> >*)(my_storage.get_data(larlite::data::kLarSoftCluster,"test"));
 
@@ -81,12 +76,6 @@ int main(){
       // Append to the event track array
       my_event_track->push_back(t);
 
-      larlite::hit1 h;
-      // The argument value is arbitrary, just writing something
-      // so that I can read it back later and check that I read
-      // what I wrote.
-      h.set_rms(11.0 + j);
-      my_v_hit1->product()->push_back(h);
 
       // All values same as default constructor except the RMS
       // where I put in an arbitrary test value
@@ -139,10 +128,6 @@ int main(){
 
       my_larsoftclusters->product()->push_back(larsoftCluster);
     }
-    my_int->set(21);
-
-    my_m_intdouble->product()->insert(std::make_pair<int,double>(31, 101.0));
-
 
     larlite::AssSet_t ass;
     ass.push_back(larlite::AssUnit_t(1,0));
