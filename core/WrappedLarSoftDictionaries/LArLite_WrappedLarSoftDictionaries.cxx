@@ -138,6 +138,53 @@ namespace ROOT {
 } // end of namespace ROOT
 
 namespace ROOT {
+   static TClass *larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR_Dictionary();
+   static void larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR_TClassManip(TClass*);
+   static void *new_larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR(void *p = 0);
+   static void *newArray_larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR(Long_t size, void *p);
+   static void delete_larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR(void *p);
+   static void deleteArray_larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR(void *p);
+   static void destruct_larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR(void *p);
+
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::larlite::wrapper<vector<sim::MCShower> >*)
+   {
+      ::larlite::wrapper<vector<sim::MCShower> > *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::larlite::wrapper<vector<sim::MCShower> >));
+      static ::ROOT::TGenericClassInfo 
+         instance("larlite::wrapper<vector<sim::MCShower> >", "DataFormat/wrapper.h", 47,
+                  typeid(::larlite::wrapper<vector<sim::MCShower> >), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR_Dictionary, isa_proxy, 4,
+                  sizeof(::larlite::wrapper<vector<sim::MCShower> >) );
+      instance.SetNew(&new_larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR);
+      instance.SetNewArray(&newArray_larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR);
+      instance.SetDelete(&delete_larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR);
+      instance.SetDeleteArray(&deleteArray_larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR);
+      instance.SetDestructor(&destruct_larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR);
+
+      ::ROOT::AddClassAlternate("larlite::wrapper<vector<sim::MCShower> >","larlite::wrapper<std::vector<sim::MCShower> >");
+      return &instance;
+   }
+   TGenericClassInfo *GenerateInitInstance(const ::larlite::wrapper<vector<sim::MCShower> >*)
+   {
+      return GenerateInitInstanceLocal((::larlite::wrapper<vector<sim::MCShower> >*)0);
+   }
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::larlite::wrapper<vector<sim::MCShower> >*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+
+   // Dictionary for non-ClassDef classes
+   static TClass *larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR_Dictionary() {
+      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::larlite::wrapper<vector<sim::MCShower> >*)0x0)->GetClass();
+      larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR_TClassManip(theClass);
+   return theClass;
+   }
+
+   static void larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR_TClassManip(TClass* ){
+   }
+
+} // end of namespace ROOT
+
+namespace ROOT {
    // Wrappers around operator new
    static void *new_larlitecLcLwrapperlEvectorlErecobcLcLHitgRsPgR(void *p) {
       return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::larlite::wrapper<vector<recob::Hit> > : new ::larlite::wrapper<vector<recob::Hit> >;
@@ -178,6 +225,90 @@ namespace ROOT {
       ((current_t*)p)->~current_t();
    }
 } // end of namespace ROOT for class ::larlite::wrapper<vector<recob::Cluster> >
+
+namespace ROOT {
+   // Wrappers around operator new
+   static void *new_larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR(void *p) {
+      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::larlite::wrapper<vector<sim::MCShower> > : new ::larlite::wrapper<vector<sim::MCShower> >;
+   }
+   static void *newArray_larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR(Long_t nElements, void *p) {
+      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::larlite::wrapper<vector<sim::MCShower> >[nElements] : new ::larlite::wrapper<vector<sim::MCShower> >[nElements];
+   }
+   // Wrapper around operator delete
+   static void delete_larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR(void *p) {
+      delete ((::larlite::wrapper<vector<sim::MCShower> >*)p);
+   }
+   static void deleteArray_larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR(void *p) {
+      delete [] ((::larlite::wrapper<vector<sim::MCShower> >*)p);
+   }
+   static void destruct_larlitecLcLwrapperlEvectorlEsimcLcLMCShowergRsPgR(void *p) {
+      typedef ::larlite::wrapper<vector<sim::MCShower> > current_t;
+      ((current_t*)p)->~current_t();
+   }
+} // end of namespace ROOT for class ::larlite::wrapper<vector<sim::MCShower> >
+
+namespace ROOT {
+   static TClass *vectorlEsimcLcLMCShowergR_Dictionary();
+   static void vectorlEsimcLcLMCShowergR_TClassManip(TClass*);
+   static void *new_vectorlEsimcLcLMCShowergR(void *p = 0);
+   static void *newArray_vectorlEsimcLcLMCShowergR(Long_t size, void *p);
+   static void delete_vectorlEsimcLcLMCShowergR(void *p);
+   static void deleteArray_vectorlEsimcLcLMCShowergR(void *p);
+   static void destruct_vectorlEsimcLcLMCShowergR(void *p);
+
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const vector<sim::MCShower>*)
+   {
+      vector<sim::MCShower> *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<sim::MCShower>));
+      static ::ROOT::TGenericClassInfo 
+         instance("vector<sim::MCShower>", -2, "vector", 214,
+                  typeid(vector<sim::MCShower>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &vectorlEsimcLcLMCShowergR_Dictionary, isa_proxy, 0,
+                  sizeof(vector<sim::MCShower>) );
+      instance.SetNew(&new_vectorlEsimcLcLMCShowergR);
+      instance.SetNewArray(&newArray_vectorlEsimcLcLMCShowergR);
+      instance.SetDelete(&delete_vectorlEsimcLcLMCShowergR);
+      instance.SetDeleteArray(&deleteArray_vectorlEsimcLcLMCShowergR);
+      instance.SetDestructor(&destruct_vectorlEsimcLcLMCShowergR);
+      instance.AdoptCollectionProxyInfo(TCollectionProxyInfo::Generate(TCollectionProxyInfo::Pushback< vector<sim::MCShower> >()));
+      return &instance;
+   }
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const vector<sim::MCShower>*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+
+   // Dictionary for non-ClassDef classes
+   static TClass *vectorlEsimcLcLMCShowergR_Dictionary() {
+      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const vector<sim::MCShower>*)0x0)->GetClass();
+      vectorlEsimcLcLMCShowergR_TClassManip(theClass);
+   return theClass;
+   }
+
+   static void vectorlEsimcLcLMCShowergR_TClassManip(TClass* ){
+   }
+
+} // end of namespace ROOT
+
+namespace ROOT {
+   // Wrappers around operator new
+   static void *new_vectorlEsimcLcLMCShowergR(void *p) {
+      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<sim::MCShower> : new vector<sim::MCShower>;
+   }
+   static void *newArray_vectorlEsimcLcLMCShowergR(Long_t nElements, void *p) {
+      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<sim::MCShower>[nElements] : new vector<sim::MCShower>[nElements];
+   }
+   // Wrapper around operator delete
+   static void delete_vectorlEsimcLcLMCShowergR(void *p) {
+      delete ((vector<sim::MCShower>*)p);
+   }
+   static void deleteArray_vectorlEsimcLcLMCShowergR(void *p) {
+      delete [] ((vector<sim::MCShower>*)p);
+   }
+   static void destruct_vectorlEsimcLcLMCShowergR(void *p) {
+      typedef vector<sim::MCShower> current_t;
+      ((current_t*)p)->~current_t();
+   }
+} // end of namespace ROOT for class vector<sim::MCShower>
 
 namespace ROOT {
    static TClass *vectorlErecobcLcLHitgR_Dictionary();
@@ -314,9 +445,9 @@ namespace {
     };
     static const char* includePaths[] = {
 "/home/lsimons/scratch/LArLite_LArSoft_Int/larlite/core",
-"/products/lardataobj/v1_00_00/include",
-"/products/larcoreobj/v1_00_00/include",
-"/products/root/v6_06_02/Linux64bit+2.6-2.12-e9-prof/include",
+"/products/lardataobj/v1_04_00/include",
+"/products/larcoreobj/v1_04_00/include",
+"/products/root/v6_06_04b/Linux64bit+2.6-2.12-e10-nu-prof/include",
 "/scratch/lsimons/LArLite_LArSoft_Int/larlite/core/WrappedLarSoftDictionaries/",
 0
     };
@@ -330,6 +461,7 @@ namespace recob{class __attribute__((annotate("$clingAutoload$classes.h")))  Hit
 namespace std{template <typename _Tp> class __attribute__((annotate("$clingAutoload$string")))  allocator;
 }
 namespace recob{class __attribute__((annotate("$clingAutoload$classes.h")))  Cluster;}
+namespace sim{class __attribute__((annotate("$clingAutoload$classes.h")))  MCShower;}
 )DICTFWDDCLS";
     static const char* payloadCode = R"DICTPAYLOAD(
 #line 1 "libLArLite_WrappedLarSoftDictionaries dictionary payload"
@@ -347,8 +479,10 @@ namespace recob{class __attribute__((annotate("$clingAutoload$classes.h")))  Clu
     static const char* classesHeaders[]={
 "larlite::wrapper<std::vector<recob::Cluster> >", payloadCode, "@",
 "larlite::wrapper<std::vector<recob::Hit> >", payloadCode, "@",
+"larlite::wrapper<std::vector<sim::MCShower> >", payloadCode, "@",
 "larlite::wrapper<vector<recob::Cluster> >", payloadCode, "@",
 "larlite::wrapper<vector<recob::Hit> >", payloadCode, "@",
+"larlite::wrapper<vector<sim::MCShower> >", payloadCode, "@",
 nullptr};
 
     static bool isInitialized = false;

@@ -91,6 +91,7 @@ namespace larlite{
       kSimPhotons,         ///< sim::SimPhotons
       kLarSoftHit,         ///< recob::Cluster
       kLarSoftCluster,     ///< recob::Cluster      
+      kLarSoftMCShower,    ///< sim::MCShower
       kMuCSData,           ///< MuCS::MuCSData
       kMuCSReco,           ///< MuCS::MuCSReco
       kPiZeroROI,
@@ -156,6 +157,7 @@ namespace larlite{
       "simphotons",
       "larsofthit",
       "larsoftcluster",
+      "larsoftmcshower",
       "mucsdata",
       "mucsreco",
       "PiZeroROI",

@@ -46,6 +46,7 @@
 #include "wrapper.h"
 #include "lardataobj/RecoBase/Hit.h"
 #include "lardataobj/RecoBase/Cluster.h"
+#include "lardataobj/MCBase/MCShower.h"
 #include <vector>
 
 namespace larlite {

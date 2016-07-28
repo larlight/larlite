@@ -1,8 +1,6 @@
 #include <TSystem.h>
 #include <TVector3.h>
 #include "DataFormat/storage_manager.h"
-
-
 #include "DataFormat/track.h"
 #include "DataFormat/wrapper.h"
 #include "lardataobj/RecoBase/Hit.h"

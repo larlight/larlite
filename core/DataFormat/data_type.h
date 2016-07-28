@@ -11,6 +11,10 @@ namespace recob {
   class Cluster;
 }
 
+namespace sim {
+  class MCShower;
+}
+
 namespace larlite {
 
   class trigger;
@@ -129,6 +133,7 @@ namespace larlite {
   template<> data::DataType_t data_type<event_chstatus> ();
   template<> data::DataType_t data_type<wrapper<std::vector<recob::Hit> > > ();
   template<> data::DataType_t data_type<wrapper<std::vector<recob::Cluster> > > ();
+  template<> data::DataType_t data_type<wrapper<std::vector<sim::MCShower> > > ();
   template<> data::SubRunDataType_t subrundata_type<potsummary>();
 }
 #endif

@@ -122,6 +122,9 @@ namespace larlite {
   template<> data::DataType_t data_type<wrapper<std::vector<recob::Cluster> > > ()
   { return data::kLarSoftCluster; }
 
+  template<> data::DataType_t data_type<wrapper<std::vector<sim::MCShower> > > ()
+  { return data::kLarSoftMCShower; }
+
   template<> data::SubRunDataType_t subrundata_type<potsummary>()
   { return data::kPOTSummary; }
 }

@@ -77,11 +77,22 @@ clearCINT:
 
 ###################################################
 # auto-generate dependencies using g++ -M
+#.depend: $(SOURCES) $(HEADERS)
+#	@#rm .depend
+#	@echo '<< checking dependencies >>'
+#	@$(CXX) -M $(CXXFLAGS) $(LARLITE_BASIC_ROOTINC) $(INCFLAGS) $(SOURCES) > .depend
+
+#-include .depend
+ifneq ($(STRIP $(SOURCES)),)
+dummy := $(shell echo "SOURCES=$(SOURCES)" 1>&2 )
 .depend: $(SOURCES) $(HEADERS)
-	@#rm .depend
+	@#rm .dep@echo '<< checking dependencies >>'
 	@echo '<< checking dependencies >>'
 	@$(CXX) -M $(CXXFLAGS) $(LARLITE_BASIC_ROOTINC) $(INCFLAGS) $(SOURCES) > .depend
-
+else
+.depend:
+	@touch $@
+endif
 -include .depend
 
 #ALWAYS:

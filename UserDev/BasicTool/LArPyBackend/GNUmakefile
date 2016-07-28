@@ -27,7 +27,7 @@ CINTFLAGS += -p
 
 LDFLAGS += -L$(shell python-config --prefix)/lib 
 LDFLAGS += $(shell python-config --libs)
-LDFLAGS += -L$(LARLITE_LIBDIR) -lBasicTool_GeoAlgo
+LDFLAGS += -L$(LARLITE_LIBDIR) -llarcoreobj_GeoAlgo  # THIS NEEDS TO BE CHANGED TO AUTOMATICALLY LOOK FOR ENVIRONMENT VARIABLE $LARCOREOBJ_LIB
 
 # call the common GNUmakefile
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE

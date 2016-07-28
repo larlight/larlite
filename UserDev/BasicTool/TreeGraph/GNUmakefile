@@ -19,7 +19,7 @@ OSNAME          = $(shell uname -s)
 HOST            = $(shell uname -n)
 OSNAMEMODE      = $(OSNAME)
 
-LDFLAGS += -L$(LARLITE_LIBDIR) -lBasicTool_GeoAlgo
+LDFLAGS += -L$(LARLITE_LIBDIR) -llarcoreobj_GeoAlgo # THIS NEEDS TO BE CHANGED TO AUTOMATICALLY LOOK FOR ENVIRONMENT VARIABLE $LARCOREOBJ_LIB
 
 # call kernel specific compiler setup
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
