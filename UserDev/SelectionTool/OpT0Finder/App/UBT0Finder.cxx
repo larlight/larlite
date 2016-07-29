@@ -90,7 +90,9 @@ namespace larlite {
     _flashmatch_tree->Branch("trajz", &_mc_trajz);
     _flashmatch_tree->Branch("score", &_score, "score/D");
     _flashmatch_tree->Branch("trk_shift", &_trk_shift, "trk_shift/D");
+    _flashmatch_tree->Branch("trk_min_x_fm", &_trk_min_x_fm, "trk_min_x_fm/D");
     _flashmatch_tree->Branch( "g4_pe_v", "std::vector<double>", &_g4_pe );
+    _flashmatch_tree->Branch( "g4_pe_t", "std::vector<double>", &_g4_pe_t );
     // only pick up first track's pe's for now, EC, 27-Mar-2016.
     _flashmatch_tree->Branch( "mc_calc_pe_v", " std::vector<float> ", &_mc_calc_pe ); 
     _flashmatch_tree->Branch("g4pesum", &_g4pesum, "g4pesum/D");
@@ -115,7 +117,7 @@ namespace larlite {
     _flash_tree = new TTree("_flash_tree", "Efficiency Tree");
 //    _flash_tree->Branch("_nflash", &_nflash, "nflash/I");
     _flash_tree->Branch("_npe", &_npe, "npe/D");
-
+    _flash_tree->Branch("event", &_event, "event/I");
 
 
     std::cout << "UBT0Finder.cxx: In inititalize(): "  << std::endl;
@@ -137,7 +139,7 @@ namespace larlite {
 
   void UBT0Finder::Configure(const ::fcllite::PSet &pset) {
     // This doesn't work, cuz .... not finding actual fcl file, as set in _config_file of Manager. So, use compiled-in default here.
-    _photlib_tree_config = pset.get<std::string>("PhotonLibTTree",std::string("seen"));  // "lib" or "seen" or ""
+    _photlib_tree_config = pset.get<std::string>("PhotonLibTTree",std::string("lib"));  // "lib" or "seen" or ""
     std::cout << "UBT0Finder.cxx: PhotonVisLibrary Tree ?: " << _photlib_tree_config << std::endl;
   }
 
@@ -172,7 +174,7 @@ namespace larlite {
       _pvl_x = qpt.x;
       _pvl_y = qpt.y;
       _pvl_z = qpt.z;
-      for (int ipmt=0; ipmt<32; ipmt++)
+      for (int ipmt=0; ipmt<36; ipmt++)
 	{
 	  _pvl_pmt = ipmt;
 	  _pvl_vis = ::phot::PhotonVisibilityService::GetME().GetVisibility( _pvl_x, _pvl_y, _pvl_z, _pvl_pmt) ;
@@ -190,7 +192,8 @@ namespace larlite {
     const ::larutil::Geometry* g = ::larutil::Geometry::GetME();
 
     auto ev_flash = storage->get_data<event_opflash>("opflash");// opFlash"); // EC: change capitalization in these 2 lines.
-    auto ev_hit = storage->get_data<event_ophit>    ("opflash"); // opFlash");
+    //    auto ev_hit = storage->get_data<event_ophit>    ("opflash"); // opFlash");
+    auto ev_hit = storage->get_data<event_ophit>    ("ophit"); 
 
 
 
@@ -262,7 +265,7 @@ namespace larlite {
         }
 
         _mgr.Emplace(std::move(tpc_obj));
-	std::cout << " _mgr qcluster being Emplaced 4 ... " << std::endl;
+
       }
     }
     // use MC tracks
@@ -309,13 +312,17 @@ namespace larlite {
 	print(msg::kERROR,__FUNCTION__,"G4 SimPhotons not found!");
       else {
 	_g4_pe.clear();
+	_g4_pe_t.clear();
 	_g4_pe.resize(32,0.);
 	_g4pesum=0.;
+	//	_g4_pe_t.resize(ev_mcphotons->size(),0.);
+	//	size_t nph(0);
 	for(auto const& simph : *ev_mcphotons) {
 	  auto const ch = simph.OpChannel();
 	  if(ch>31) continue;
 	  // Check time
 	  for(auto const& ph : simph) {
+	    _g4_pe_t.push_back(ph.Time);
 	    if(ph.Time < _min_time * 1000 || ph.Time > _max_time * 1000) continue;
 	    _g4_pe[ch] += 1;
 	    _g4pesum++;
@@ -348,9 +355,8 @@ namespace larlite {
 	    {
 	      qcluster[ii].t = qcluster[ii].x/(det_width/det_drift_time) ; // this is drift time, which will create an upper bound on where track could have been in x; will enforce the bound later in PhotonLibHypothesis::FillEstimate().
 	    }
-	std::cout << " _mgr qcluster being Emplaced 0... " << std::endl;
+
 	  _mgr.Emplace(std::move(qcluster));
-	std::cout << " _mgr qcluster Emplaced 0... " << std::endl;
 	  if ( _photlib_tree_config == "seen" )
 	    {
 	      auto const& qcc(qcluster);
@@ -359,6 +365,7 @@ namespace larlite {
 	std::cout << " back from fill_pvl_tree... " << std::endl;
 	  
 	}
+
 
       for(auto const& s : source_v) {
 
@@ -390,6 +397,7 @@ namespace larlite {
 	    _n_pe += h.PE();
 	   } // end looping over all hits for this interaction
 	
+
 	_int_tree->Fill();
 	}
       } // end looping over all MC source
@@ -405,7 +413,7 @@ namespace larlite {
       //      for(auto& qcluster : qcluster_v){
       //        if( qcluster.idx != -1)
       _mgr.Emplace(std::move(qcluster));
-      std::cout << " _mgr qcluster being Emplaced 3 ... " << std::endl;
+
       //	}
 
 	_t0 = 0.0;
@@ -454,7 +462,6 @@ namespace larlite {
               _n_pe += h.PE();
           } // end looping over all hits for this interaction
 
-          _int_tree->Fill();
         }
       } // end looping over all MC source
       //}//else
@@ -521,7 +528,15 @@ namespace larlite {
 
 	if (_use_mc)
 	  {
+
+	    std::cout << "UBT0Finder::analyze(): match.tpc_id" <<  match.tpc_id << std::endl;
 	    auto const& mct = (*ev_mctrack)[match.tpc_id];
+	    /*
+	    if (mct.size()) 
+	      std::cout << "UBT0Finder::analyze(): This matched mctrack doesn't exist. Bailing from event, which seems severe." << std::endl;
+	      return false;
+	    */
+
 	    _mc_time = mct[0].T() * 1.e-3;
 	    _mc_x = mct[0].X();
 	    _mc_y = mct[0].Y();
@@ -532,7 +547,7 @@ namespace larlite {
 
 	    double event_time = mct[0].T(); // ns
 	    if ( mct[0].E() - mct[mct.size() - 1].E() > _e_diff )
-	      _time_diff->Fill(1000 * (_flash_time - _mc_time)); //
+	      _time_diff->Fill(_flash_time - _mc_time); //
 	    _trk_shift = event_time * (det_width / det_drift_time);
 
 	    _mc_length = std::sqrt(std::pow(mct.Start().X()-mct.End().X(),2.)+std::pow(mct.Start().Y()-mct.End().Y(),2.)+std::pow(mct.Start().Z()-mct.End().Z(),2.));
@@ -541,13 +556,19 @@ namespace larlite {
 	    _mc_trajx.reserve(mct.SegmentCenter().size());
 	    _mc_trajy.reserve(mct.SegmentCenter().size());
 	    _mc_trajz.reserve(mct.SegmentCenter().size());
+
+	    std::cout << "UBT0Finder:: start, end x point: " << mct[0].X() << ", " << mct.End().X() << std::endl;
+
+	    _trk_min_x_fm = 1036.;
 	    for ( auto const& pt :  mct.SegmentCenter())
 	      {
+		if (pt[0]<_trk_min_x_fm) _trk_min_x_fm = pt[0];
 		_mc_trajx.emplace_back(pt[0]);
 		_mc_trajy.emplace_back(pt[1]);
 		_mc_trajz.emplace_back(pt[2]);
 	      }
-		
+	    std::cout << "UBT0Finder:: whereas SegmentCenter start, end x points are: " << _mc_trajx[0] << ", " << _mc_trajx[_mc_trajx.size()-1] << std::endl;		
+
 	  }
 	else if (_photon_bomb)
 	      _time_diff->Fill(1000 * (_flash_time - 0 )); //

@@ -140,6 +140,7 @@ namespace flashana {
       // in the TPC, not the truth x-position
       // Some constants needed
       double det_drift_velocity = ::larutil::LArProperties::GetME()->DriftVelocity(); ///< cm/us
+      std::cout << "MCQCluster::Construct(): drift_velocity is " << det_drift_velocity << std::endl;
       double event_time = trk[0].T(); // ns
       double shift_x = event_time * det_drift_velocity * pow(10, -3); //cm
       tpc_obj.reserve(tpc_obj.size() + trk.size());

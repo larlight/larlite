@@ -75,7 +75,7 @@ namespace flashana {
         if (_hypothesis.pe_v.size() != NOpDets())
             Print(msg::kEXCEPTION, __FUNCTION__, "Hypothesis vector length != PMT count");
 
-	std::cout << "ChargeHypothesis: xoffset: " << xoffset << std::endl;
+	//	std::cout << "ChargeHypothesis: xoffset: " << xoffset << std::endl;
 
         for (auto &v : _hypothesis.pe_v) v = 0;
 
@@ -117,15 +117,25 @@ namespace flashana {
         for (auto const &pe : hypothesis.pe_v)
             PEtot_Hyp += pe;
         double PEtot_Obs = 0;
-        for (auto const &pe : measurement.pe_v)
-            PEtot_Obs += pe;
 
+	// EC, 19-May-2016. We will add to the neg llhd a term which captures the overall probability of 
+	// fluctuating from the total pe_hyp to total pe_meas, and weight that by the total pe_meas.
+	// The reason for this is that it is possible that tracks are shoved to large x values where the probability of a robust track
+	// producing a couple photon prediction at each tube gives a probability of observation at each tube that is really not so
+	// very unlikely. These bkgd or late-late pmt hits forming small flashes may lead to a flash-match that is (barely) preferred over the true match.
+	// However, if we penalize the overall excursion from say 30 hypothesized pe's  to a few measured and reward the 210 excursion to 190, e.g., we may
+	// hope to capture the right flash-match.
+
+        for (auto const &pe : measurement.pe_v)
+	  {
+            PEtot_Obs += pe;
+	  }
 
         if (measurement.pe_v.size() != hypothesis.pe_v.size())
             throw OpT0FinderException("Cannot compute LL for unmatched length!");
         for (size_t pmt_index = 0; pmt_index < hypothesis.pe_v.size(); ++pmt_index) {
 
-	  if (hypothesis.pe_v[pmt_index] < 0.01) continue; // This seems to be always true of tubes 1 and 30 of 0-31.
+	  // if (hypothesis.pe_v[pmt_index] < 0.01) continue; // This seems to be always true of tubes 1 and 30 of 0-31.
 	  //	  if ( pmt_index==1) continue; // Is Observed always 0 for this tube?, EC, 14-Feb-2016
 
             nvalid_pmt += 1;
@@ -135,15 +145,18 @@ namespace flashana {
 
 	    result.at(0) += std::pow((O - H), 2)/(O + H)  ; // will maximize 1/this
 	    result.at(1) +=  -std::log10(TMath::Poisson(O,H))  ; // will maximize 1/this
-	    if (isnan(result.at(1)) || isinf(result.at(1))) result.at(1) = 1.E6;
+	    if (isnan(result.at(1)) || isinf(result.at(1))) result.at(1) = 1.E50;
 	    // could instead use discrete std::poisson_distribution
-	    std::cout << "LL(): ii chi2, llhd, O, H:" << pmt_index << ", " << std::pow((O - H), 2)/(O + H)  << ", " << -std::log10(TMath::Poisson(O,H)) << ", " << O << ", " << H << std::endl;
+	    //	    std::cout << "LL(): ii chi2, llhd, O, H:" << pmt_index << ", " << std::pow((O - H), 2)/(O + H)  << ", " << -std::log10(TMath::Poisson(O,H)) << ", " << O << ", " << H << std::endl;
         }
 
-	std::cout << "PE hyp : " << PEtot_Hyp << "\tPE Obs : " << PEtot_Obs << "\t Chi^2, LLHD : " << result.at(0) << ", " << result.at(1) << std::endl;
+	//	std::cout << "PE hyp : " << PEtot_Hyp << "\tPE Obs : " << PEtot_Obs << "\t Chi^2, LLHD : " << result.at(0) << ", " << result.at(1) << std::endl;
+	//	result.at(1) +=  -std::log10(TMath::Poisson(PEtot_Obs,PEtot_Hyp))*nvalid_pmt   ; // will maximize 1/this
+	//	std::cout << "For which the neg llhd of fluctuatation is " <<  -std::log10(TMath::Poisson(PEtot_Obs,PEtot_Hyp)) << std::endl;
+	//	result.at(0) += pow(PEtot_Obs-PEtot_Hyp,2.)/(PEtot_Obs+PEtot_Hyp);
 
-        result.at(0) /= nvalid_pmt;
-        result.at(1) /= nvalid_pmt;
+	result.at(0) /= (nvalid_pmt ); // *2
+        result.at(1) /= (nvalid_pmt + 1); // + 1 for the extra total PE prob
         return result;
     }
 
@@ -203,9 +216,9 @@ namespace flashana {
             for (auto const &v : pmt.pe_v) if (v > max_pe) max_pe = v;
         }
 
-        for (size_t i = 0; i < pmt.pe_v.size(); ++i)
 
-            _measurement.pe_v[i] = pmt.pe_v[i] / max_pe;
+        for (size_t i = 0; i < pmt.pe_v.size(); ++i)
+	  _measurement.pe_v[i] = pmt.pe_v[i] / max_pe;
 
         _minimizer_record_fval_v.clear();
         _minimizer_record_x_v.clear();
@@ -225,7 +238,7 @@ namespace flashana {
 
         _minuit_ptr->SetFCN(MIN_vtx_ll);
 
-        _minuit_ptr->DefineParameter(0, "X", reco_x, 10, 0.0, 256.);
+        _minuit_ptr->DefineParameter(0, "X", reco_x, 10, 0.0, 255.);
 
         _minuit_ptr->Command("SET NOW");
 

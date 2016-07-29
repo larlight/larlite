@@ -45,9 +45,11 @@ namespace flashana {
 	//  << pt.y << ", " << pt.z << ", " << pt.t<< ", " << pt.q <<"] -> [" << q_corr << "]" << std::endl;
 	//std::cout << "PhotonLibHypothesis: PMT : dist to last point is " <<  dist << std::endl;
 	//if (::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt) == 0.)
-	//  	  std::cout << "PhotonLibHypothesis: PMT : Look-up lib val is 0 for x,y,z,ipmt: " << pt.x << ", " << pt.y << ", " << pt.z << ", " << ipmt << std::endl;
+	//  std::cout << "PhotonLibHypothesis: PMT : Look-up lib val is 0 for x,y,z,ipmt: " << pt.x << ", " << pt.y << ", " << pt.z << ", " << ipmt << std::endl;
+	// q = q_corr;
+	q *= ::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt)*0.0093; // qe-only //EC, 16-Dec-2015, 20-May-2016 
 
-        q *= ::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt)*0.23*0.0093; //Should be 0.23. //EC, 16-Dec-2015 
+
 	//*0.0093;
         flash.pe_v[ipmt] += q;
 	

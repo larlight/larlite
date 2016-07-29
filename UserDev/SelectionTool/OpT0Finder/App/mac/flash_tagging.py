@@ -41,8 +41,8 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
-#my_proc.set_ana_output_file("ana_LL.root")
-my_proc.set_ana_output_file("ana_QLL.root")
+my_proc.set_ana_output_file("ana_LL.root")
+#my_proc.set_ana_output_file("ana_QLL.root")
 
 # Attach an analysis unit ... here we use a base class which does nothing.
 # Replace with your analysis unit if you wish.
@@ -65,8 +65,8 @@ my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
 my_unit.Manager().SetAlgo(flashana.PhotonLibHypothesis())
 # Match Algo
 
-#my_unit.Manager().SetAlgo( flashana.LLMatch.GetME() )
-my_unit.Manager().SetAlgo( flashana.QLLMatch.GetME() )
+my_unit.Manager().SetAlgo( flashana.LLMatch.GetME() )
+#my_unit.Manager().SetAlgo( flashana.QLLMatch.GetME() )
 #my_unit.Manager().SetAlgo( flashana.QWeightPoint()   )
 #my_unit.Manager().SetAlgo( flashana.CommonAmps()      )
 
@@ -84,8 +84,9 @@ print
 # Let's run it.
 my_proc.run()
 ev = ROOT.std.vector("int")()
-#ev.push_back(int(904))
-ev.push_back(int(905))
+#ev.push_back(int(49951))
+ev.push_back(int(49966))
+#ev.push_back(int(905))
 #ev.push_back(int(907))
 
 #my_proc.run_events(ev)

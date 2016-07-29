@@ -138,10 +138,12 @@ namespace larlite {
     double _mc_z;
     double _mc_dx;
     double _mc_length;
+    double _trk_min_x_fm;
     std::vector<double> _mc_trajx;
     std::vector<double> _mc_trajy;
     std::vector<double> _mc_trajz;
     std::vector<double> _g4_pe;
+    std::vector<double> _g4_pe_t;
     std::vector<float> _mc_calc_pe;
     double _g4pesum;
     double _mcpesum;
