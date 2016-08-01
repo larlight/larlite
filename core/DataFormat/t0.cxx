@@ -5,6 +5,12 @@
 
 namespace larlite {
 
+  t0::t0()
+    : data_base(data::kT0)
+  {
+    clear_data();
+  }
+
   //----------------------------------------------------------------------
   t0::t0(double Time,
 	 unsigned int TriggerType,
@@ -19,7 +25,20 @@ namespace larlite {
   {
     
   }
-     
+
+  //----------------------------------------------------------------------
+  // copy constructor
+  t0::t0(const t0& origin)
+  {
+    clear_data();
+    fTime              = origin.Time();
+    fTriggerType       = origin.TriggerType();
+    fTriggerBits       = origin.TriggerBits();
+    fID                = origin.ID();
+    fTriggerConfidence = origin.TriggerConfidence();
+  }
+
+
   //----------------------------------------------------------------------
   // ostream operator.
   //

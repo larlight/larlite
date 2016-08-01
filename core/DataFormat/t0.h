@@ -15,7 +15,7 @@
 #ifndef LARLITE_T0_H
 #define LARLITE_T0_H
 
-#include "mcpart.h"
+#include "data_base.h"
 
 namespace larlite {
   /**
@@ -27,18 +27,18 @@ namespace larlite {
   public:
 
     /// Default constructor
-    t0() : data_base(data::kT0) {clear_data();}
+    t0();
 
     /// Alternative contructor
     t0(double Time, unsigned int TriggerType, int TriggerBits, int ID=-1, double TriggerConfidence=-1);
+
+    /// Copy constructor
+    t0(const t0& origin);
 
     /// Default destructor
     virtual ~t0(){}
 
     friend std::ostream& operator << (std::ostream &o, t0 const& a);
-
-    /// Copy constructor
-    t0(const t0& origin);
 
     ///--- Getters ---///
     const double&          Time()              const;
