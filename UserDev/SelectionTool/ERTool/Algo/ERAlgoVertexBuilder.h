@@ -82,6 +82,8 @@ namespace ertool {
     /// Default destructor
     virtual ~ERAlgoVertexBuilder(){};
 
+    void SetVerbose(Bool_t const verbose = true) {tverbose = verbose;}
+
     /// Reset function
     void Reset();
 

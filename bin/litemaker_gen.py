@@ -18,6 +18,8 @@ def get_file_base(experiment="microboone",path="all"):
     store_association: true
     # output file name
     out_filename:      \"larlite_{path}.root\"
+    stream: "empty"
+    unique_filename: false
   }}
 
   """.format(exp=experiment,path=path)

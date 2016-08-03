@@ -65,7 +65,7 @@ namespace cmtool {
   } // end Merge function 
   
 
-  double CBAlgoHighQLineCompat::ComputeSlope(const std::vector<Hit2D> &pxhit_vector){
+  double CBAlgoHighQLineCompat::ComputeSlope(const std::vector<larutil::Hit2D> &pxhit_vector){
     
     double slope = -1.;
     //Clear all points from the TGraphErrors

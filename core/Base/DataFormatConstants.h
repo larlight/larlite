@@ -94,6 +94,7 @@ namespace larlite{
       kPiZeroROI,
       kAuxDetSimChannel,   ///< sim::AuxDetSimChannel
       kChStatus,           ///< larlite::chstatus
+      kT0,                 ///< larlite::t0
       kDATA_TYPE_MAX       ///< Event-wise enum boundary
     };
 

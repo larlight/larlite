@@ -23,7 +23,7 @@
 
 namespace evd {
 
-typedef Point2D Vertex2D;
+  typedef larutil::Point2D Vertex2D;
 
 /**
    \class DrawVertex

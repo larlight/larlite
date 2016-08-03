@@ -34,7 +34,7 @@ namespace evd {
    User custom analysis class made by SHELL_USER_NAME
  */
 
-class Cluster2D : public std::vector<Hit2D> {
+class Cluster2D : public std::vector<evd::Hit2D> {
 
 public:
   Cluster2D() {_is_good = false;}

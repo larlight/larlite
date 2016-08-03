@@ -116,7 +116,7 @@ void OtherStartPoint3D::do_reconstruction(
   int minDistIt = -1 ; //Keep track of the iterator with smallest error
   double minDist ;
 
-  int max_interations = 200;
+  int max_interations = 500;
   int iteration_counter = 0;
 
   while ( distFromStart > 0.01  && iteration_counter < max_interations) {
@@ -146,12 +146,17 @@ void OtherStartPoint3D::do_reconstruction(
     }
 
     if ( minDistIt == 0 ) {
-      distFromStart = _initDist / (level + 1);
+      distFromStart = _initDist * pow(0.98,level);
       pts = calculatePoints(pts[minDistIt], distFromStart ) ;
       level++;
+      if (level >= 20){
+        level = 15;
+      } 
     }
-    else
-      pts = calculatePoints(pts[minDistIt], _initDist / level) ;
+    else{
+
+      pts = calculatePoints(pts[minDistIt], _initDist * pow(0.98,level)) ;
+    }
 
     iteration_counter ++;
   }

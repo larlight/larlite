@@ -88,6 +88,16 @@ bool DrawRawDigit::analyze(larlite::storage_manager* storage) {
   // So, obviously, first thing to do is to get the wires.
   auto RawDigitHandle = storage->get_data<larlite::event_rawdigit>(producer);
 
+  // if the tick-length set is different from what is actually stored in the ADC vector -> fix.
+  if (RawDigitHandle->size() > 0){
+    for (size_t pl = 0; pl < geoService->Nplanes(); pl++) {
+      if (_y_dimensions[pl] != RawDigitHandle->at(0).ADCs().size()) {
+	_y_dimensions[pl] = RawDigitHandle->at(0).ADCs().size();
+      }
+    }
+  }
+  initDataHolder();
+  
   run = RawDigitHandle->run();
   subrun = RawDigitHandle->subrun();
   event = RawDigitHandle->event_id();
@@ -131,9 +141,7 @@ bool DrawRawDigit::analyze(larlite::storage_manager* storage) {
 
     // }
 
-
-
-    int offset = wire * detProp -> ReadOutWindowSize();
+    int offset = wire * rawdigit.ADCs().size();//detProp -> ReadOutWindowSize();
     // convert short ADCs to float
 
     // Get the pedestal for this channel:
@@ -142,7 +150,7 @@ bool DrawRawDigit::analyze(larlite::storage_manager* storage) {
     pedestal.resize(nPedPoints);
 
     // Determine the distance between the pedestal points allowed:
-    int pedStepSize =  detProp->ReadOutWindowSize() / nPedPoints;
+    int pedStepSize =  rawdigit.ADCs().size() / nPedPoints;
 
     for (int j = 0; j < nPedPoints; j++) {
       pedestal.at(j) = rawdigit.ADC(j * pedStepSize);
@@ -213,7 +221,7 @@ void DrawRawDigit::correctData() {
   // Loops over the data, figures out the coherent noise, and removes it.
   // If requested, it saves out the pedestal, rms, and badChannelFlag for each wire
   // If requested, it saves the subtracted wave form for each block as well as the
-  //  size of the blocks in each plane (so that the blocks can be determined later)
+  // size of the blocks in each plane (so that the blocks can be determined later)
   // If _correct_data is true, it saves out the corrected rms as well as
   //  the uncorrected rms
 
@@ -241,7 +249,8 @@ void DrawRawDigit::correctData() {
       int nSteps = geoService -> Nwires(p) / stepSize.at(p);
       _subtractionWaveForm.at(p).resize(nSteps);
       for (auto & vec : _subtractionWaveForm.at(p))
-        vec.resize(detProp->ReadOutWindowSize());
+	vec.resize(_y_dimensions[0]);
+      //vec.resize(detProp->ReadOutWindowSize());
     }
   }
 
@@ -300,7 +309,7 @@ void DrawRawDigit::correctData() {
         // For each tick, loop over each wire and find the median.
         // Then, subtract the median from each tick.
 
-        for (unsigned int tick = 0; tick < detProp -> ReadOutWindowSize(); tick ++) {
+        for (unsigned int tick = 0; tick < _y_dimensions[plane]; tick ++) {
 
           // Get the median across this step's set of wires.
           unsigned int wireStart = step * stepSize.at(plane);
@@ -316,7 +325,7 @@ void DrawRawDigit::correctData() {
           for (unsigned int wire = wireStart; wire < wireStart + stepSize.at(plane); wire ++) {
             // skip bad wires
             if (badWireMapByPlane.at(plane)[wire]) continue;
-            int offset = wire * detProp->ReadOutWindowSize();
+            int offset = wire * _y_dimensions[plane];
             // if (plane != 2)
             vals.push_back(_planeData.at(plane).at(offset + tick));
 
@@ -346,7 +355,7 @@ void DrawRawDigit::correctData() {
           // Now subtract the median from the values:
           for (unsigned int wire = wireStart; wire < wireStart + stepSize.at(plane); wire ++) {
             // Skip bad wires
-            int offset = wire * detProp->ReadOutWindowSize();
+            int offset = wire * _y_dimensions[plane];
 
             if (badWireMapByPlane.at(plane)[wire]) {
               rmsByPlaneCorrected.at(plane).at(wire)

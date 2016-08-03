@@ -57,7 +57,7 @@ namespace cluster {
        * @param slope is the slope_2d of the cluster previously calculated
        * @return angle between (h1->h2) and slope
      */
-    double GetAngle(const Point2D& h1, const Point2D& h2, const double& slope);
+    double GetAngle(const larutil::Point2D& h1, const larutil::Point2D& h2, const double& slope);
 
     /// Number of hits to be used for angle calculation
     size_t _N;
