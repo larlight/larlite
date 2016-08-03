@@ -41,11 +41,11 @@ namespace larlite {
     friend std::ostream& operator << (std::ostream &o, t0 const& a);
 
     ///--- Getters ---///
-    const double&          Time()              const;
-    const unsigned int&    TriggerType()       const;
-    const int&             TriggerBits()       const;
-    const int&             ID()                const;
-    const double&          TriggerConfidence() const;
+    double          Time()              const;
+    unsigned int    TriggerType()       const;
+    int             TriggerBits()       const;
+    int             ID()                const;
+    double          TriggerConfidence() const;
     
     ///--- Setters ---///
 

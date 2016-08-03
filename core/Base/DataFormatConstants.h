@@ -157,7 +157,8 @@ namespace larlite{
       "mucsreco",
       "PiZeroROI",
       "auxsimch",
-      "chstatus"
+      "chstatus",
+      "t0"
     };
 
     const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {

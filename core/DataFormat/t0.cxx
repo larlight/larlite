@@ -68,11 +68,11 @@ namespace larlite {
   }
   
   
-  inline const double&          t0::Time()              const { return fTime;              }
-  inline const unsigned int&    t0::TriggerType()       const { return fTriggerType;       }
-  inline const int&             t0::TriggerBits()       const { return fTriggerBits;       }
-  inline const int&             t0::ID()                const { return fID;                }
-  inline const double&          t0::TriggerConfidence() const { return fTriggerConfidence; }
+  double          t0::Time()              const { return fTime;              }
+  unsigned int    t0::TriggerType()       const { return fTriggerType;       }
+  int             t0::TriggerBits()       const { return fTriggerBits;       }
+  int             t0::ID()                const { return fID;                }
+  double          t0::TriggerConfidence() const { return fTriggerConfidence; }
   
 }
 
