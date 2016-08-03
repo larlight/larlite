@@ -9,10 +9,20 @@
 namespace recob {
   class Hit;
   class Cluster;
+  class OpHit;
+  class OpFlash;
+  class PFParticle;
+  class Track;
+}
+
+namespace raw {
+  class OpDetWaveform;
+  class Trigger;
 }
 
 namespace sim {
   class MCShower;
+  class SimPhotons;
 }
 
 namespace larlite {
@@ -133,7 +143,14 @@ namespace larlite {
   template<> data::DataType_t data_type<event_chstatus> ();
   template<> data::DataType_t data_type<wrapper<std::vector<recob::Hit> > > ();
   template<> data::DataType_t data_type<wrapper<std::vector<recob::Cluster> > > ();
+  template<> data::DataType_t data_type<wrapper<std::vector<recob::OpHit> > > ();
+  template<> data::DataType_t data_type<wrapper<std::vector<recob::OpFlash> > > ();  
+  template<> data::DataType_t data_type<wrapper<std::vector<recob::PFParticle> > > ();
+  template<> data::DataType_t data_type<wrapper<std::vector<recob::Track> > > ();
   template<> data::DataType_t data_type<wrapper<std::vector<sim::MCShower> > > ();
+  template<> data::DataType_t data_type<wrapper<std::vector<sim::SimPhotons> > > ();
+  template<> data::DataType_t data_type<wrapper<std::vector<::raw::OpDetWaveform> > > ();
+  template<> data::DataType_t data_type<wrapper<std::vector<::raw::Trigger> > > ();
   template<> data::SubRunDataType_t subrundata_type<potsummary>();
 }
 #endif

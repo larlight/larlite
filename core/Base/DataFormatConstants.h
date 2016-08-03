@@ -89,9 +89,16 @@ namespace larlite{
       kTrackMomentum,      ///< track momentum
       kOpDetWaveform,      ///< optical detector waveform
       kSimPhotons,         ///< sim::SimPhotons
-      kLarSoftHit,         ///< recob::Cluster
+      kLarSoftHit,         ///< recob::Hit
       kLarSoftCluster,     ///< recob::Cluster      
       kLarSoftMCShower,    ///< sim::MCShower
+      kLarSoftOpHit,       ///< recob::OpHit
+      kLarSoftOpFlash,     ///< recob::OpFlash      
+      kLarSoftOpDetWaveform,///< raw::OpDetWaveform
+      kLarSoftPFParticle,  ///< recob::PFParticle
+      kLarSoftSimPhotons,  ///< sim::SimPhotons
+      kLarSoftTrack,       ///< recob::Track
+      kLarSoftTrigger,     ///< raw::TriggerData
       kMuCSData,           ///< MuCS::MuCSData
       kMuCSReco,           ///< MuCS::MuCSReco
       kPiZeroROI,
@@ -158,6 +165,13 @@ namespace larlite{
       "larsofthit",
       "larsoftcluster",
       "larsoftmcshower",
+      "larsoftophit",
+      "larsoftopflash",
+      "larsoftopdetwaveform",
+      "larsoftpfparticle",
+      "larsoftsimphotons",
+      "larsofttrack",
+      "larsofttrigger",
       "mucsdata",
       "mucsreco",
       "PiZeroROI",

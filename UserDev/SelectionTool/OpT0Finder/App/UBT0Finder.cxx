@@ -105,12 +105,17 @@ namespace larlite {
     const ::larutil::Geometry* g = ::larutil::Geometry::GetME();
 
     auto ev_flash = storage->get_data<event_opflash>("opflash");// opflash");
-    auto ev_hit = storage->get_data<event_ophit>    ("opflash"); // opflash");
+    auto ev_hit = storage->get_data<event_ophit>    ("ophit"); // opflash");
 
     if (!ev_flash || ev_flash->empty()) {
       std::cout << "No opflash found. Skipping event: " << storage->event_id() << std::endl;
       return false;
     }
+    if (!ev_hit || ev_hit->empty()) {
+      std::cout << "No ophit found. Skipping event: " << storage->event_id() << std::endl;
+      return false;
+    }
+
 
     // For TH2D-- number of flash per event > x PE
     // Number interactions per event > y MeV

@@ -122,8 +122,29 @@ namespace larlite {
   template<> data::DataType_t data_type<wrapper<std::vector<recob::Cluster> > > ()
   { return data::kLarSoftCluster; }
 
+  template<> data::DataType_t data_type<wrapper<std::vector<recob::OpHit> > > ()
+  { return data::kLarSoftOpHit; }
+
+  template<> data::DataType_t data_type<wrapper<std::vector<recob::OpFlash> > > ()
+  { return data::kLarSoftOpFlash; }
+
+  template<> data::DataType_t data_type<wrapper<std::vector<recob::PFParticle> > > ()
+  { return data::kLarSoftPFParticle; }
+
+  template<> data::DataType_t data_type<wrapper<std::vector<recob::Track> > > ()
+  { return data::kLarSoftTrack; }
+
   template<> data::DataType_t data_type<wrapper<std::vector<sim::MCShower> > > ()
   { return data::kLarSoftMCShower; }
+
+  template<> data::DataType_t data_type<wrapper<std::vector<sim::SimPhotons> > > ()
+  { return data::kLarSoftSimPhotons; }
+
+  template<> data::DataType_t data_type<wrapper<std::vector<raw::OpDetWaveform> > > ()
+  { return data::kLarSoftOpDetWaveform; }
+
+  template<> data::DataType_t data_type<wrapper<std::vector<raw::Trigger> > > ()
+  { return data::kLarSoftTrigger; }
 
   template<> data::SubRunDataType_t subrundata_type<potsummary>()
   { return data::kPOTSummary; }

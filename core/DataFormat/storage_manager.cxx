@@ -46,7 +46,14 @@
 #include "wrapper.h"
 #include "lardataobj/RecoBase/Hit.h"
 #include "lardataobj/RecoBase/Cluster.h"
+#include "lardataobj/RecoBase/OpHit.h"
+#include "lardataobj/RecoBase/OpFlash.h"
 #include "lardataobj/MCBase/MCShower.h"
+#include "lardataobj/RawData/OpDetWaveform.h"
+#include "lardataobj/RecoBase/PFParticle.h"
+#include "lardataobj/RecoBase/Track.h"
+#include "lardataobj/RawData/TriggerData.h"
+#include "larsimobj/Simulation/SimPhotons.h"
 #include <vector>
 
 namespace larlite {
@@ -1196,7 +1203,31 @@ namespace larlite {
     case data::kLarSoftCluster:
       _ptr_data_array[type][name]=new wrapper<std::vector<recob::Cluster> >(name);
       break;
-    default:
+    case data::kLarSoftOpHit:
+      _ptr_data_array[type][name]=new wrapper<std::vector<recob::OpHit> >(name);
+      break;
+    case data::kLarSoftOpFlash:
+      _ptr_data_array[type][name]=new wrapper<std::vector<recob::OpFlash> >(name);
+      break;
+    case data::kLarSoftPFParticle:
+      _ptr_data_array[type][name]=new wrapper<std::vector<recob::PFParticle> >(name);
+      break;
+    case data::kLarSoftTrack:
+      _ptr_data_array[type][name]=new wrapper<std::vector<recob::Track> >(name);
+      break;
+    case data::kLarSoftMCShower:
+      _ptr_data_array[type][name]=new wrapper<std::vector<sim::MCShower> >(name);
+      break;
+    case data::kLarSoftSimPhotons:
+      _ptr_data_array[type][name]=new wrapper<std::vector<sim::SimPhotons> >(name);
+      break;
+    case data::kLarSoftOpDetWaveform:
+      _ptr_data_array[type][name]=new wrapper<std::vector<::raw::OpDetWaveform> >(name);
+      break;
+    case data::kLarSoftTrigger:
+      _ptr_data_array[type][name]=new wrapper<std::vector<::raw::Trigger> >(name);
+      break;
+     default:
       print(msg::kERROR,__FUNCTION__,Form("Event-data identifier not supported: %d",(int)type));
       break;
     }
