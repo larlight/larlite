@@ -47,6 +47,7 @@
 #include "lardataobj/RecoBase/Hit.h"
 #include "lardataobj/RecoBase/Cluster.h"
 #include "lardataobj/MCBase/MCShower.h"
+#include "lardataobj/MCBase/MCTrack.h"
 #include <vector>
 
 namespace larlite {
@@ -283,14 +284,14 @@ namespace larlite {
 		    Form("IO is not ready (file not opened and/or TTree has not read-in yet!"));
       throw DataFormatException("Cannot retrieve data yet.");
     }
-    
+
     // Read entry _index-1
     if(!_index && _mode != kWRITE) {
       Message::send(msg::kERROR,__FUNCTION__,
 		    Form("Call next_event() before calling %s", __FUNCTION__));
       throw DataFormatException("Cannot retrieve data yet.");
     }
-    
+
     event_base* result_ptr = nullptr;
     auto inch_ptr_iter = _in_ch[type].find(name);
     auto data_ptr_iter = _ptr_data_array[type].find(name);
@@ -1195,6 +1196,12 @@ namespace larlite {
       break;
     case data::kLarSoftCluster:
       _ptr_data_array[type][name]=new wrapper<std::vector<recob::Cluster> >(name);
+      break;
+    case data::kLarSoftMCShower:
+      _ptr_data_array[type][name]=new wrapper<std::vector<sim::MCShower> >(name);
+      break;
+    case data::kLarSoftMCTrack:
+      _ptr_data_array[type][name]=new wrapper<std::vector<sim::MCTrack> >(name);
       break;
     default:
       print(msg::kERROR,__FUNCTION__,Form("Event-data identifier not supported: %d",(int)type));

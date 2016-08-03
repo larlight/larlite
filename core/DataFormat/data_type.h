@@ -13,6 +13,7 @@ namespace recob {
 
 namespace sim {
   class MCShower;
+  class MCTrack;
 }
 
 namespace larlite {
@@ -134,6 +135,7 @@ namespace larlite {
   template<> data::DataType_t data_type<wrapper<std::vector<recob::Hit> > > ();
   template<> data::DataType_t data_type<wrapper<std::vector<recob::Cluster> > > ();
   template<> data::DataType_t data_type<wrapper<std::vector<sim::MCShower> > > ();
+  template<> data::DataType_t data_type<wrapper<std::vector<sim::MCTrack> > > ();
   template<> data::SubRunDataType_t subrundata_type<potsummary>();
 }
 #endif

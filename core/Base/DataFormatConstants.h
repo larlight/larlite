@@ -92,6 +92,7 @@ namespace larlite{
       kLarSoftHit,         ///< recob::Cluster
       kLarSoftCluster,     ///< recob::Cluster      
       kLarSoftMCShower,    ///< sim::MCShower
+      kLarSoftMCTrack,     ///< sim::MCTrack
       kMuCSData,           ///< MuCS::MuCSData
       kMuCSReco,           ///< MuCS::MuCSReco
       kPiZeroROI,
@@ -158,6 +159,7 @@ namespace larlite{
       "larsofthit",
       "larsoftcluster",
       "larsoftmcshower",
+      "larsoftmctrack",
       "mucsdata",
       "mucsreco",
       "PiZeroROI",
