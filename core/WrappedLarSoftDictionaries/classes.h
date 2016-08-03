@@ -5,11 +5,11 @@
 #include "lardataobj/RecoBase/OpFlash.h"
 #include "lardataobj/RecoBase/PFParticle.h"
 #include "lardataobj/RecoBase/Track.h"
-#include "lardataobj/MCBase/MCShower.h"
-#include "larsimobj/Simulation/SimPhotons.h"
 #include "lardataobj/RawData/TriggerData.h"
 #include "lardataobj/RawData/OpDetWaveform.h"
-
+#include "lardataobj/MCBase/MCShower.h"
+#include "lardataobj/MCBase/MCTrack.h"
+#include "larsimobj/Simulation/SimPhotons.h"
 
 namespace DataFormats_Common {
   struct dictionary {
@@ -21,6 +21,7 @@ namespace DataFormats_Common {
     larlite::wrapper<std::vector<recob::Track> > dummytr;
     larlite::wrapper<std::vector<sim::SimPhotons> > dummyspt;
     larlite::wrapper<std::vector<sim::MCShower> > dummyws;
+    larlite::wrapper<std::vector<sim::MCTrack> > dummywt;
     larlite::wrapper<std::vector<raw::Trigger> > dummytrg;
     larlite::wrapper<std::vector<raw::OpDetWaveform> > dummyodw;
   };

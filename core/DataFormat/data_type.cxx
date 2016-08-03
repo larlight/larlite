@@ -140,6 +140,9 @@ namespace larlite {
   template<> data::DataType_t data_type<wrapper<std::vector<sim::SimPhotons> > > ()
   { return data::kLarSoftSimPhotons; }
 
+  template<> data::DataType_t data_type<wrapper<std::vector<sim::MCTrack> > > ()
+  { return data::kLarSoftMCTrack; }
+
   template<> data::DataType_t data_type<wrapper<std::vector<raw::OpDetWaveform> > > ()
   { return data::kLarSoftOpDetWaveform; }
 

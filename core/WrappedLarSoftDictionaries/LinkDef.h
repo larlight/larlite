@@ -6,6 +6,6 @@
 #pragma link C++ class larlite::wrapper<std::vector<recob::Track> >+;
 #pragma link C++ class larlite::wrapper<std::vector<sim::MCShower> >+;
 #pragma link C++ class larlite::wrapper<std::vector<sim::SimPhotons> >+;
+#pragma link C++ class larlite::wrapper<std::vector<sim::MCTrack> >+;
 #pragma link C++ class larlite::wrapper<std::vector<raw::OpDetWaveform> >+;
 #pragma link C++ class larlite::wrapper<std::vector<raw::Trigger> >+;
-

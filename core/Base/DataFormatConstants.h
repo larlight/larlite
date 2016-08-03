@@ -99,6 +99,7 @@ namespace larlite{
       kLarSoftSimPhotons,  ///< sim::SimPhotons
       kLarSoftTrack,       ///< recob::Track
       kLarSoftTrigger,     ///< raw::TriggerData
+      kLarSoftMCTrack,     ///< sim::MCTrack
       kMuCSData,           ///< MuCS::MuCSData
       kMuCSReco,           ///< MuCS::MuCSReco
       kPiZeroROI,
@@ -172,6 +173,7 @@ namespace larlite{
       "larsoftsimphotons",
       "larsofttrack",
       "larsofttrigger",
+      "larsoftmctrack",
       "mucsdata",
       "mucsreco",
       "PiZeroROI",

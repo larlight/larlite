@@ -48,10 +48,11 @@
 #include "lardataobj/RecoBase/Cluster.h"
 #include "lardataobj/RecoBase/OpHit.h"
 #include "lardataobj/RecoBase/OpFlash.h"
-#include "lardataobj/MCBase/MCShower.h"
-#include "lardataobj/RawData/OpDetWaveform.h"
 #include "lardataobj/RecoBase/PFParticle.h"
 #include "lardataobj/RecoBase/Track.h"
+#include "lardataobj/MCBase/MCShower.h"
+#include "lardataobj/MCBase/MCTrack.h"
+#include "lardataobj/RawData/OpDetWaveform.h"
 #include "lardataobj/RawData/TriggerData.h"
 #include "larsimobj/Simulation/SimPhotons.h"
 #include <vector>
@@ -290,14 +291,14 @@ namespace larlite {
 		    Form("IO is not ready (file not opened and/or TTree has not read-in yet!"));
       throw DataFormatException("Cannot retrieve data yet.");
     }
-    
+
     // Read entry _index-1
     if(!_index && _mode != kWRITE) {
       Message::send(msg::kERROR,__FUNCTION__,
 		    Form("Call next_event() before calling %s", __FUNCTION__));
       throw DataFormatException("Cannot retrieve data yet.");
     }
-    
+
     event_base* result_ptr = nullptr;
     auto inch_ptr_iter = _in_ch[type].find(name);
     auto data_ptr_iter = _ptr_data_array[type].find(name);
@@ -1215,9 +1216,6 @@ namespace larlite {
     case data::kLarSoftTrack:
       _ptr_data_array[type][name]=new wrapper<std::vector<recob::Track> >(name);
       break;
-    case data::kLarSoftMCShower:
-      _ptr_data_array[type][name]=new wrapper<std::vector<sim::MCShower> >(name);
-      break;
     case data::kLarSoftSimPhotons:
       _ptr_data_array[type][name]=new wrapper<std::vector<sim::SimPhotons> >(name);
       break;
@@ -1227,7 +1225,13 @@ namespace larlite {
     case data::kLarSoftTrigger:
       _ptr_data_array[type][name]=new wrapper<std::vector<::raw::Trigger> >(name);
       break;
-     default:
+    case data::kLarSoftMCShower:
+      _ptr_data_array[type][name]=new wrapper<std::vector<sim::MCShower> >(name);
+      break;
+    case data::kLarSoftMCTrack:
+      _ptr_data_array[type][name]=new wrapper<std::vector<sim::MCTrack> >(name);
+      break;
+    default:
       print(msg::kERROR,__FUNCTION__,Form("Event-data identifier not supported: %d",(int)type));
       break;
     }

@@ -23,6 +23,7 @@ namespace raw {
 namespace sim {
   class MCShower;
   class SimPhotons;
+  class MCTrack;
 }
 
 namespace larlite {
@@ -149,6 +150,7 @@ namespace larlite {
   template<> data::DataType_t data_type<wrapper<std::vector<recob::Track> > > ();
   template<> data::DataType_t data_type<wrapper<std::vector<sim::MCShower> > > ();
   template<> data::DataType_t data_type<wrapper<std::vector<sim::SimPhotons> > > ();
+  template<> data::DataType_t data_type<wrapper<std::vector<sim::MCTrack> > > ();
   template<> data::DataType_t data_type<wrapper<std::vector<::raw::OpDetWaveform> > > ();
   template<> data::DataType_t data_type<wrapper<std::vector<::raw::Trigger> > > ();
   template<> data::SubRunDataType_t subrundata_type<potsummary>();
