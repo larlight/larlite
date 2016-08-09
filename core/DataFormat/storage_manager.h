@@ -197,7 +197,7 @@ namespace larlite {
     */
 
 #ifndef __CINT__
-/*
+
     template <class T, class U>
     const AssInfo_t find_one_assid(const T& a, const U& b,
 				   const std::string& ass_producer)
@@ -292,7 +292,7 @@ namespace larlite {
     {
       if(b) throw DataFormatException("Valid pointer provided (should be nullptr)!");
 
-      auto type_b = this->larlite::data_type<U>();
+      auto type_b = data_type<U>();
       AssInfo_t ass_info;
       if(ass_producer.empty())
 	ass_info = this->find_one_assid(a,type_b);
@@ -312,7 +312,7 @@ namespace larlite {
     {
       if(b) throw DataFormatException("Valid pointer provided (should be nullptr)!");
 
-      auto type_b = this->larlite::data_type<U>();
+      auto type_b = data_type<U>();
       AssInfo_t ass_info;
       if(ass_producer.empty())
 	ass_info = this->find_unique_assid(a,type_b);
@@ -326,7 +326,7 @@ namespace larlite {
       
       return ass_info.first->association(ass_info.second);
     }
-*/
+
 #endif
     
     /// Getter for a shared object instance pointer. Not limited to be a singleton.
@@ -447,7 +447,7 @@ namespace larlite {
   };
 
 }
-/*
+
 
 #ifndef __CINT__
 //#include "storage_manager.template.hh"
@@ -490,6 +490,6 @@ namespace larlite {
 
 }
 #endif
-*/
+
 #endif
 /** @} */ // end of doxygen group larlite::storage_manager
