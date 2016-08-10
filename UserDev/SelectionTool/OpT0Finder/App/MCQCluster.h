@@ -78,6 +78,8 @@ namespace flashana {
 
     flashana::LightPath _lightpath_clustering ;
     bool _use_light_path ;
+    float _op_RO_start ;
+    float _op_RO_end ;
 
   };
 }
