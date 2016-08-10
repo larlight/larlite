@@ -40,8 +40,11 @@ def test_dAlgo():
             p1 = geoalgo.Vector(random(),random(),random())
             # second point on line
             p2 = geoalgo.Vector(random(),random(),random())
+            # back-project pt1 so that we crate a line starting from an earlier position
+            pDir = p2-p1
+            p0 = p1 - pDir.Dir() * 3;
             # generate random line
-            l = geoalgo.Line(p1,p2)
+            l = geoalgo.Line(p0,p2)
             # generate a point in a direction transverse to the line
             transX = random()
             transY = random()
@@ -68,7 +71,7 @@ def test_dAlgo():
                 if not ( np.abs(p1[x]-pAnswer1[x]) < _epsilon) : success = 0
                 if not ( np.abs(p1[x]-pAnswer2[x]) < _epsilon) : success = 0
             totSuccess += success
-        if ( float(totSuccess)/tests < 1):
+        if ( float(totSuccess)/tests < 0.999):
             info(NO + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
         else:
             info(OK + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
@@ -163,7 +166,7 @@ def test_dAlgo():
                 if not ( (l.End()[x]-point2[x]) < _epsilon ) : success = 0
                 
             if (success == 1) : totSuccess += 1
-        if ( float(totSuccess)/tests < 1):
+        if ( float(totSuccess)/tests < 0.999):
             info(NO + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
         else:
             info(OK + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
@@ -244,7 +247,7 @@ def test_dAlgo():
                 if not ( (pAns[x]-point2[x]) < _epsilon ) : success = 0
 
             if (success == 1) : totSuccess += 1
-        if ( float(totSuccess)/tests < 1):
+        if ( float(totSuccess)/tests < 0.999):
             info(NO + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
         else:
             info(OK + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
@@ -300,7 +303,7 @@ def test_dAlgo():
                 if not ( np.abs(ptL2[x]-l2.Pt1()[x]) < _epsilon ) : success = 0
 
             if (success == 1) : totSuccess += 1
-        if ( float(totSuccess)/tests < 1):
+        if ( float(totSuccess)/tests < 0.999):
             info(NO + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
         else:
             info(OK + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
@@ -367,7 +370,7 @@ def test_dAlgo():
                     if not (L2[x]-l2.Start()[x] < _epsilon) : success = 0
 
             if (success == 1) : totSuccess += 1
-        if ( float(totSuccess)/tests < 1):
+        if ( float(totSuccess)/tests < 0.999):
             info(NO + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
         else:
             info(OK + "Success: {0}%".format(100*float(totSuccess)/tests) + ENDC)
@@ -482,22 +485,22 @@ def test_dAlgo():
                 if not (L2[x]-pivot[x] < _epsilon) : success4 = 0
             if (success4 == 1) : totSuccess4 += 1
 
-        if ( float(totSuccess1)/tests < 1):
+        if ( float(totSuccess1)/tests < 0.999):
             info(NO + "Success: {0}%".format(100*float(totSuccess1)/tests) + ENDC)
         else:
             info(OK + "Success: {0}%".format(100*float(totSuccess1)/tests) + ENDC)
         info("Time for SqDist (Case 1)              : {0:.3f} us".format(1E6*sqdistT1/tests))
-        if ( float(totSuccess2)/tests < 1):
+        if ( float(totSuccess2)/tests < 0.999):
             info(NO + "Success: {0}%".format(100*float(totSuccess2)/tests) + ENDC)
         else:
             info(OK + "Success: {0}%".format(100*float(totSuccess2)/tests) + ENDC)
         info("Time for SqDist (Case 2)              : {0:.3f} us".format(1E6*sqdistT2/tests))
-        if ( float(totSuccess3)/tests < 1):
+        if ( float(totSuccess3)/tests < 0.999):
             info(NO + "Success: {0}%".format(100*float(totSuccess3)/tests) + ENDC)
         else:
             info(OK + "Success: {0}%".format(100*float(totSuccess3)/tests) + ENDC)
         info("Time for SqDist (Case 3)              : {0:.3f} us".format(1E6*sqdistT3/tests))
-        if ( float(totSuccess4)/tests < 1):
+        if ( float(totSuccess4)/tests < 0.999):
             info(NO + "Success: {0}%".format(100*float(totSuccess4)/tests) + ENDC)
         else:
             info(OK + "Success: {0}%".format(100*float(totSuccess4)/tests) + ENDC)
@@ -614,22 +617,22 @@ def test_dAlgo():
                 if not (L2[x]-pivot[x] < _epsilon) : success4 = 0
             if (success4 == 1) : totSuccess4 += 1
 
-        if ( float(totSuccess1)/tests < 1):
+        if ( float(totSuccess1)/tests < 0.999):
             info(NO + "Success: {0}%".format(100*float(totSuccess1)/tests) + ENDC)
         else:
             info(OK + "Success: {0}%".format(100*float(totSuccess1)/tests) + ENDC)
         info("Time for SqDist (Case 1)              : {0:.3f} us".format(1E6*sqdistT1/tests))
-        if ( float(totSuccess2)/tests < 1):
+        if ( float(totSuccess2)/tests < 0.999):
             info(NO + "Success: {0}%".format(100*float(totSuccess2)/tests) + ENDC)
         else:
             info(OK + "Success: {0}%".format(100*float(totSuccess2)/tests) + ENDC)
         info("Time for SqDist (Case 2)              : {0:.3f} us".format(1E6*sqdistT2/tests))
-        if ( float(totSuccess3)/tests < 1):
+        if ( float(totSuccess3)/tests < 0.999):
             info(NO + "Success: {0}%".format(100*float(totSuccess3)/tests) + ENDC)
         else:
             info(OK + "Success: {0}%".format(100*float(totSuccess3)/tests) + ENDC)
         info("Time for SqDist (Case 3)              : {0:.3f} us".format(1E6*sqdistT3/tests))
-        if ( float(totSuccess4)/tests < 1):
+        if ( float(totSuccess4)/tests < 0.999):
             info(NO + "Success: {0}%".format(100*float(totSuccess4)/float(tests)) + ENDC)
         else:
             info(OK + "Success: {0}%".format(100*float(totSuccess4)/float(tests)) + ENDC)
@@ -762,13 +765,13 @@ def test_dAlgo():
             #info("Success: {0}".format(success2))
             if (success2 == 1) : totSuccess2 += 1
 
-        if ( float(totSuccess1)/tests < 1):
+        if ( float(totSuccess1)/tests < 0.999):
             info(NO + "Success: {0}%".format(100*float(totSuccess1)/tests) + ENDC)
         else:
             info(OK + "Success: {0}%".format(100*float(totSuccess1)/tests) + ENDC)
         info("Time for SqDist (Case 1)              : {0:.3f} us".format(1E6*sqdistT1/tests))
         info("Time for ClosestPt (Case 1)           : {0:.3f} us".format(1E6*closestT1/tests))
-        if ( float(totSuccess2)/tests < 1):
+        if ( float(totSuccess2)/tests < 0.999):
             info(NO + "Success: {0}%".format(100*float(totSuccess2)/tests) + ENDC)
         else:
             info(OK + "Success: {0}%".format(100*float(totSuccess2)/tests) + ENDC)

@@ -1,4 +1,4 @@
-#ifndef DEFAULTPARAMSALG_CXX
+#ifndef DEFAULT3DPARAMSALG_CXX
 #define DEFAULT3DPARAMSALG_CXX
 
 #include "Default3DParamsAlg.h"

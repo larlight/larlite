@@ -94,6 +94,7 @@ namespace larlite{
       kPiZeroROI,
       kAuxDetSimChannel,   ///< sim::AuxDetSimChannel
       kChStatus,           ///< larlite::chstatus
+      kT0,                 ///< larlite::t0
       kDATA_TYPE_MAX       ///< Event-wise enum boundary
     };
 
@@ -156,7 +157,8 @@ namespace larlite{
       "mucsreco",
       "PiZeroROI",
       "auxsimch",
-      "chstatus"
+      "chstatus",
+      "t0"
     };
 
     const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {
