@@ -134,6 +134,18 @@ namespace larlite {
   template<> data::DataType_t data_type<wrapper<std::vector<recob::Track> > > ()
   { return data::kLarSoftTrack; }
 
+  template<> data::DataType_t data_type<wrapper<std::vector<recob::Shower> > > ()
+  { return data::kLarSoftShower; }
+
+  template<> data::DataType_t data_type<wrapper<std::vector<recob::EndPoint2D> > > ()
+  { return data::kLarSoftEndPoint2D; }
+
+  template<> data::DataType_t data_type<wrapper<std::vector<recob::Vertex> > > ()
+  { return data::kLarSoftVertex; }
+
+  template<> data::DataType_t data_type<wrapper<std::vector<recob::SpacePoint> > > ()
+  { return data::kLarSoftSpacePoint; }
+
   template<> data::DataType_t data_type<wrapper<std::vector<sim::MCShower> > > ()
   { return data::kLarSoftMCShower; }
 
@@ -143,11 +155,20 @@ namespace larlite {
   template<> data::DataType_t data_type<wrapper<std::vector<sim::MCTrack> > > ()
   { return data::kLarSoftMCTrack; }
 
+  template<> data::DataType_t data_type<wrapper<std::vector<sim::SimChannel> > > ()
+  { return data::kLarSoftSimChannel; }
+
   template<> data::DataType_t data_type<wrapper<std::vector<raw::OpDetWaveform> > > ()
   { return data::kLarSoftOpDetWaveform; }
 
   template<> data::DataType_t data_type<wrapper<std::vector<raw::Trigger> > > ()
   { return data::kLarSoftTrigger; }
+
+  template<> data::DataType_t data_type<wrapper<std::vector<::simb::MCTruth> > > ()
+  { return data::kLarSoftMCTruth; }
+
+  template<> data::DataType_t data_type<wrapper<std::vector<::simb::MCParticle> > > ()
+  { return data::kLarSoftMCParticle; }
 
   template<> data::SubRunDataType_t subrundata_type<potsummary>()
   { return data::kPOTSummary; }

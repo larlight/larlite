@@ -13,6 +13,10 @@ namespace recob {
   class OpFlash;
   class PFParticle;
   class Track;
+  class Shower;
+  class EndPoint2D;
+  class Vertex;
+  class SpacePoint;
 }
 
 namespace raw {
@@ -24,6 +28,12 @@ namespace sim {
   class MCShower;
   class SimPhotons;
   class MCTrack;
+  class SimChannel;
+}
+
+namespace simb {
+  class MCTruth;
+  class MCParticle;
 }
 
 namespace larlite {
@@ -148,11 +158,18 @@ namespace larlite {
   template<> data::DataType_t data_type<wrapper<std::vector<recob::OpFlash> > > ();  
   template<> data::DataType_t data_type<wrapper<std::vector<recob::PFParticle> > > ();
   template<> data::DataType_t data_type<wrapper<std::vector<recob::Track> > > ();
+  template<> data::DataType_t data_type<wrapper<std::vector<recob::Shower> > > ();
+  template<> data::DataType_t data_type<wrapper<std::vector<recob::EndPoint2D> > > ();  
+  template<> data::DataType_t data_type<wrapper<std::vector<recob::Vertex> > > ();
+  template<> data::DataType_t data_type<wrapper<std::vector<recob::SpacePoint> > > ();
   template<> data::DataType_t data_type<wrapper<std::vector<sim::MCShower> > > ();
   template<> data::DataType_t data_type<wrapper<std::vector<sim::SimPhotons> > > ();
   template<> data::DataType_t data_type<wrapper<std::vector<sim::MCTrack> > > ();
+  template<> data::DataType_t data_type<wrapper<std::vector<sim::SimChannel> > > ();
   template<> data::DataType_t data_type<wrapper<std::vector<::raw::OpDetWaveform> > > ();
   template<> data::DataType_t data_type<wrapper<std::vector<::raw::Trigger> > > ();
+  template<> data::DataType_t data_type<wrapper<std::vector<::simb::MCTruth> > > ();
+  template<> data::DataType_t data_type<wrapper<std::vector<::simb::MCParticle> > > ();
   template<> data::SubRunDataType_t subrundata_type<potsummary>();
 }
 #endif

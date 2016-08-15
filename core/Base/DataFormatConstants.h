@@ -100,6 +100,13 @@ namespace larlite{
       kLarSoftTrack,       ///< recob::Track
       kLarSoftTrigger,     ///< raw::TriggerData
       kLarSoftMCTrack,     ///< sim::MCTrack
+      kLarSoftSimChannel,  ///< sim::SimChannel
+      kLarSoftShower,  	   ///< recob::Shower
+      kLarSoftEndPoint2D,  ///< recob::EndPoint2D
+      kLarSoftMCTruth,     ///< simb::MCTruth
+      kLarSoftMCParticle,  ///< simb::MCParticle
+      kLarSoftVertex,      ///< recob::Vertex
+      kLarSoftSpacePoint,  ///< recob::SpacePoint
       kMuCSData,           ///< MuCS::MuCSData
       kMuCSReco,           ///< MuCS::MuCSReco
       kPiZeroROI,
@@ -174,6 +181,13 @@ namespace larlite{
       "larsofttrack",
       "larsofttrigger",
       "larsoftmctrack",
+      "larsoftsimchannel",
+      "larsoftshower",
+      "larsoftendpoint2d",
+      "larsoftmctruth",
+      "larsoftmcparticle",
+      "larsoftvertex",
+      "larsoftspacepoint",
       "mucsdata",
       "mucsreco",
       "PiZeroROI",

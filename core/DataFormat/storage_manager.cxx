@@ -55,6 +55,13 @@
 #include "lardataobj/RawData/OpDetWaveform.h"
 #include "lardataobj/RawData/TriggerData.h"
 #include "larsimobj/Simulation/SimPhotons.h"
+#include "larsimobj/Simulation/SimChannel.h"
+#include "lardataobj/RecoBase/Shower.h"
+#include "lardataobj/RecoBase/EndPoint2D.h"
+#include "nusimdata/SimulationBase/MCTruth.h"
+#include "nusimdata/SimulationBase/MCParticle.h"
+#include "lardataobj/RecoBase/Vertex.h"
+#include "lardataobj/RecoBase/SpacePoint.h"
 #include <vector>
 
 namespace larlite {
@@ -1230,6 +1237,27 @@ namespace larlite {
       break;
     case data::kLarSoftMCTrack:
       _ptr_data_array[type][name]=new wrapper<std::vector<sim::MCTrack> >(name);
+      break;
+    case data::kLarSoftSimChannel:
+      _ptr_data_array[type][name]=new wrapper<std::vector<sim::SimChannel> >(name);
+      break;
+    case data::kLarSoftShower:
+      _ptr_data_array[type][name]=new wrapper<std::vector<recob::Shower> >(name);
+      break;
+    case data::kLarSoftEndPoint2D:
+      _ptr_data_array[type][name]=new wrapper<std::vector<recob::EndPoint2D> >(name);
+      break;
+    case data::kLarSoftVertex:
+      _ptr_data_array[type][name]=new wrapper<std::vector<recob::Vertex> >(name);
+      break;
+    case data::kLarSoftSpacePoint:
+      _ptr_data_array[type][name]=new wrapper<std::vector<recob::SpacePoint> >(name);
+      break;
+    case data::kLarSoftMCTruth:
+      _ptr_data_array[type][name]=new wrapper<std::vector<::simb::MCTruth> >(name);
+      break;
+    case data::kLarSoftMCParticle:
+      _ptr_data_array[type][name]=new wrapper<std::vector<::simb::MCParticle> >(name);
       break;
     default:
       print(msg::kERROR,__FUNCTION__,Form("Event-data identifier not supported: %d",(int)type));
