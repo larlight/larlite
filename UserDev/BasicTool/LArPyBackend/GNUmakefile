@@ -14,6 +14,7 @@ OBJECTS = $(SOURCES:.cxx=.o)
 INCFLAGS  = -I.                       #Include itself
 INCFLAGS += $(shell basictool-config --includes)
 INCFLAGS += $(shell python-config --includes)
+INCFLAGS += -I$(LARLITE_USERDEVDIR)/larcoreobj/larcoreobj
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
