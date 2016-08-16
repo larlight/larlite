@@ -47,6 +47,22 @@ export LARLITE_LIBDIR=$LARLITE_BASEDIR/lib
 export LARLITE_COREDIR=$LARLITE_BASEDIR/core
 export LARLITE_USERDEVDIR=$LARLITE_BASEDIR/UserDev
 
+if [ -z "$LARSIMOBJ_DIR" ]; then
+    echo "larsimobj not setup as a ups product. LARSIMOBJ_DIR=$LARSIMOBJ_DIR"
+    echo
+    echo "WARNING: Attempting setup of larsimobj v1_04_00"
+    echo
+    echo "setup larsimobj v1_04_00 -q e10:prof"
+    setup larsimobj v1_04_00 -q e10:prof
+    if [ -z "$LARSIMOBJ_DIR" ]; then
+        echo
+        echo "ERROR: SETUP OF LARSIMOBJ FAILED"
+        echo
+        exit 1
+    fi
+    echo "Setup Successful"
+fi
+
 if [[ -z $USER_MODULE ]]; then
     export USER_MODULE=""
 fi
