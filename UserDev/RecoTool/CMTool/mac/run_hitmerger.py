@@ -26,12 +26,12 @@ mgr.set_io_mode(fmwk.storage_manager.kBOTH)
 mgr.set_ana_output_file("")
 
 prelim = fmwk.HitCluster()
-# prelim.SetInputProducer("gaushit")
-prelim.SetInputProducer("pandoraCosmicKHitRemoval")
+prelim.SetInputProducer("gaushit")
+# prelim.SetInputProducer("pandoraCosmicKHitRemoval")
 prelim.SetInputVertexProducer("pandoraNu")
 prelim.SetInputSpacePointProducer("pandoraNu")
-# prelim.SetOutputProducer("Mergedgaushit")
-prelim.SetOutputProducer("pandoraCosmicKHitRemoval")
+prelim.SetOutputProducer("Mergedgaushit")
+# prelim.SetOutputProducer("MergedpandoraCosmicKHitRemoval")
 mgr.add_process(prelim)
 
 
