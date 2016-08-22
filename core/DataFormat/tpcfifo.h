@@ -46,7 +46,6 @@ namespace larlite {
 	    unsigned char  module_id,
 	    larlite::geo::View_t plane,
 	    larlite::geo::SigType_t signaltype,
-	    //DATA::DATA_TYPE type,
 	    std::vector<UShort_t> wf) : fifo::fifo(ch,
 						   frame,
 						   sample,
@@ -85,9 +84,6 @@ namespace larlite {
     larlite::geo::View_t      _plane;    ///< Plane Projection
     larlite::geo::SigType_t   _signal;   ///< Signal Type
     
-    ////////////////////////
-    //ClassDef(tpcfifo,6)
-    ////////////////////////
   };
   
   
@@ -106,15 +102,15 @@ namespace larlite {
     /// Default copy constructor needed to avoid memory leak in ROOT streamer
     event_tpcfifo(const event_tpcfifo& original)
       : std::vector<larlite::tpcfifo>(original),
-	event_base(original),
-	_event_number(original._event_number),
-	_event_frame_number(original._event_frame_number),
-	_module_address(original._module_address),
-	_module_id(original._module_id),
-	_fem_trig_frame_number(original._fem_trig_frame_number),
-	_fem_trig_sample_number(original._fem_trig_sample_number),
-	_checksum(original._checksum),
-	_nwords(original._nwords)
+      event_base(original),
+      _event_number(original._event_number),
+      _event_frame_number(original._event_frame_number),
+      _module_address(original._module_address),
+      _module_id(original._module_id),
+      _fem_trig_frame_number(original._fem_trig_frame_number),
+      _fem_trig_sample_number(original._fem_trig_sample_number),
+      _checksum(original._checksum),
+      _nwords(original._nwords)
     {}
     
     /// Default destructor
