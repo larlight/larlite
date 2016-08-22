@@ -34,7 +34,7 @@ namespace calo {
 
   // MCC7 constants [v04_35]
   static const double kCalAmpConstants_UB[3] =  { 5.9e-4, 7.30e-3, 7.60e-3};
-  static const double kCalAreaConstants_UB[3] = { 5.1e-3, 5.28e-3, 5.32e-3 };
+  // static const double kCalAreaConstants_UB[3] = { 5.1e-3, 5.28e-3, 5.32e-3 };
   static const bool kCaloUseModBox_UB = false;
 
   //MCC7 constants [v04_35]
@@ -42,6 +42,8 @@ namespace calo {
   //static const double kCalAreaConstants_UB[3] = { 5.1e-3 * (1+0.127), 5.28e-3 * (1+0.076), 5.32e-3 * (1+0.169)};
   //static const bool kCaloUseModBox_UB = false;
   
+  static const double kCalAreaConstants_UB[3] = { 4.76e-3, 4.73e-3, 4.91e-3 };
+
 }
 
 #endif
