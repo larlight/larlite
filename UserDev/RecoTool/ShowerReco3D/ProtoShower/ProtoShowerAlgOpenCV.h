@@ -29,7 +29,7 @@
 
 namespace protoshower {
 
-class ProtoShowerAlgOpenCV : ProtoShowerAlgBase {
+class ProtoShowerAlgOpenCV : public ProtoShowerAlgBase {
 
 public:
 

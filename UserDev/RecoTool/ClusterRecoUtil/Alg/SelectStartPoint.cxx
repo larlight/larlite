@@ -111,9 +111,9 @@ void SelectStartPoint::do_params_fill(cluster_params & cluster) {
         endEdge = n;
       }
     }
-    Point2D endPolyPoint(cluster.plane_id.Plane, poly.Point(endEdge).first, poly.Point(endEdge).second);
+    larutil::Point2D endPolyPoint(cluster.plane_id.Plane, poly.Point(endEdge).first, poly.Point(endEdge).second);
     // project this point onto the line determined by the slope and the start-point
-    Point2D endPoint;
+    larutil::Point2D endPoint;
     geoHelper->GetPointOnLine(cluster.slope_2d, cluster.start_point, endPolyPoint, endPoint);
     cluster.end_point = endPoint;
 
@@ -162,9 +162,9 @@ void SelectStartPoint::do_params_fill(cluster_params & cluster) {
       endEdge = n;
     }
   }
-  Point2D endPolyPoint(cluster.plane_id.Plane, poly.Point(endEdge).first, poly.Point(endEdge).second);
+  larutil::Point2D endPolyPoint(cluster.plane_id.Plane, poly.Point(endEdge).first, poly.Point(endEdge).second);
   // project this point onto the line determined by the slope and the start-point
-  Point2D endPoint;
+  larutil::Point2D endPoint;
   geoHelper->GetPointOnLine(cluster.slope_2d, cluster.start_point, endPolyPoint, endPoint);
   cluster.end_point = endPoint;
 

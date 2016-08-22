@@ -208,7 +208,7 @@ class argoneut(geometry):
         super(argoneut, self).__init__()
         larutil.LArUtilManager.Reconfigure(fmwk.geo.kArgoNeuT)
         self.configure()
-        self._levels = [(-15, 60), (-35, 100)]
+        self._levels = [(-15, 60), (-25, 100)]
         self._pedestals = [0, 0]
         self._name = "argoneut"
         self._offset = []
@@ -231,15 +231,13 @@ class argoneut(geometry):
 
         self._defaultColorScheme = [
             {'ticks': [(0.0,  (30,  30, 255, 255)),
-                       (0.15, (30,  30, 255, 255)),
-                       (0.6,  (0,  255, 255, 255)),
+                       (0.32,  (0,  255, 255, 255)),
                        (0.8,  (0,  255, 0,   255)),
                        (1,    (255,  0, 0,   255))],
              'mode': 'rgb'}]
         self._defaultColorScheme.append(
             {'ticks': [(0.0,  (30,  30, 255, 255)),
-                       (0.15, (30,  30, 255, 255)),
-                       (0.6,  (0,  255, 255, 255)),
+                       (0.4,  (0,  255, 255, 255)),
                        (0.8,  (0,  255, 0,   255)),
                        (1,    (255,  0, 0,   255))],
              'mode': 'rgb'})

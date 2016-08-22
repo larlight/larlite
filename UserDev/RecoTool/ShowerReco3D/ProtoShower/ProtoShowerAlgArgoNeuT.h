@@ -41,7 +41,7 @@
 
 namespace protoshower {
 
-class ProtoShowerAlgArgoNeuT : ProtoShowerAlgBase {
+class ProtoShowerAlgArgoNeuT : public ProtoShowerAlgBase {
 
 public:
 
@@ -64,7 +64,7 @@ private:
 
   void init_params();
 
-  void fill_params(::cluster::cluster_params &, Point2D );
+  void fill_params(::cluster::cluster_params &, larutil::Point2D );
 
   // ::cluster3D::Cluster3DParamsAlg * _params3D_alg;
   // ::cluster::ClusterParamsAlg * _params_alg;

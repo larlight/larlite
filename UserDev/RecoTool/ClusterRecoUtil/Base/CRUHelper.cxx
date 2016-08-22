@@ -13,7 +13,7 @@ namespace cluster {
   void CRUHelper::GenerateParams(const std::vector<::larlite::hit>& hit_v,
 				 cluster_params &params) const
   {
-    std::vector<Hit2D> hits2d;
+    std::vector<larutil::Hit2D> hits2d;
     GenerateHit2D(hit_v, hits2d);
     params.SetHits(hits2d);
     
@@ -25,7 +25,7 @@ namespace cluster {
 				 const ::larlite::event_hit* hits,
 				 cluster_params &params) const
   {
-    std::vector<Hit2D> hits2d;
+    std::vector<larutil::Hit2D> hits2d;
     GenerateHit2D(hit_index, hits, hits2d);
     params.SetHits(hits2d);
     
@@ -66,7 +66,7 @@ namespace cluster {
       
       auto &hit_index = hit_index_v[i];
       
-      std::vector<Hit2D> hits2d;
+      std::vector<larutil::Hit2D> hits2d;
       
       GenerateHit2D(hit_index, ev_hits, hits2d);
       
@@ -78,10 +78,10 @@ namespace cluster {
     return;
   }
   
-  /// Generate: from 1 set of hits => 1 set of Hit2D using indexes (association)
+  /// Generate: from 1 set of hits => 1 set of larutil::Hit2D using indexes (association)
   void CRUHelper::GenerateHit2D(const std::vector<unsigned int>& hit_index,
 				const ::larlite::event_hit* hits,
-				std::vector<Hit2D> &hits2d) const
+				std::vector<larutil::Hit2D> &hits2d) const
   {
     
     if (!(hit_index.size())) throw CRUException(Form("Hit list empty! (%s)", __FUNCTION__));
@@ -104,7 +104,7 @@ namespace cluster {
       
       auto const& hit = hits->at(index);
       
-      ::Hit2D h;
+      ::larutil::Hit2D h;
       
       h.t = (hit.PeakTime() - detProp->TriggerOffset()) * geoH->TimeToCm() + planeOffset;
       h.w = hit.WireID().Wire * geoH->WireToCm();
@@ -124,7 +124,7 @@ namespace cluster {
   
   /// Generate: from hit vector
   void CRUHelper::GenerateHit2D(const std::vector<::larlite::hit>& hit_v,
-				std::vector<Hit2D> &hits2d) const
+				std::vector<larutil::Hit2D> &hits2d) const
   {
     
     if (!(hit_v.size())) throw CRUException(Form("Hit list empty! (%s)", __FUNCTION__));
@@ -145,7 +145,7 @@ namespace cluster {
     
     for (auto const& hit : hit_v) {
       
-      ::Hit2D h;
+      ::larutil::Hit2D h;
       
       h.t = (hit.PeakTime() - detProp->TriggerOffset()) * geoH->TimeToCm() + planeOffset;
       h.w = hit.WireID().Wire * geoH->WireToCm();
@@ -165,7 +165,7 @@ namespace cluster {
   /// Generate: vector of PxHit sets from event storage by specifying cluster type
   void CRUHelper::GenerateHit2D(::larlite::storage_manager* storage,
 				const std::string &cluster_producer_name,
-				std::vector<std::vector<Hit2D> > &hits2d_v) const
+				std::vector<std::vector<larutil::Hit2D> > &hits2d_v) const
   {
     
     hits2d_v.clear();
@@ -195,7 +195,7 @@ namespace cluster {
       
       auto &hit_index = hit_index_v[i];
       
-      std::vector<Hit2D> hits2d;
+      std::vector<larutil::Hit2D> hits2d;
       
       GenerateHit2D(hit_index, ev_hits, hits2d);
       

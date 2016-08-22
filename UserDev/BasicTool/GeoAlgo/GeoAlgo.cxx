@@ -444,7 +444,7 @@ namespace geoalgo {
   {
     auto const& ab = line.Pt2()-line.Pt1();
     auto t = (pt - line.Pt1()) * ab;
-    auto denom = ab.Length();
+    auto denom = ab.SqLength();
     return (line.Pt1() + ab * (t/denom));
   }
 

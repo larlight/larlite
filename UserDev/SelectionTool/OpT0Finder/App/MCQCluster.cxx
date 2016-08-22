@@ -22,6 +22,8 @@ namespace flashana {
     _light_yield = pset.get<double>("LightYield");
     _step_size   = pset.get<double>("StepSize");
     _use_light_path = pset.get<bool>("UseLightPath");
+    _op_RO_start = pset.get<float>("OpROStart");
+    _op_RO_end   = pset.get<float>("OpROEnd");
   }
 
   const std::vector<flashana::QCluster_t>& MCQCluster::QClusters() const
@@ -98,10 +100,9 @@ namespace flashana {
     _mctrack_2_qcluster.reserve(ev_mct.size());
     _qcluster_v.reserve(ev_mct.size());
     for (size_t mct_index = 0; mct_index < ev_mct.size(); mct_index++) {
-      //  std::cout<<"Ancestors: "<<ev_mct.at(mct_index).AncestorTrackID()<<std::endl;
 
       auto const& trk = ev_mct[mct_index];
-      if (trk.size() <= 2 || trk[0].T() < -2050000 || trk[0].T() > 2750000 ) continue;
+      if (trk.size() <= 2 || trk[0].T() < _op_RO_start || trk[0].T() > _op_RO_end ) continue;
 
       auto usedIDs_iter = usedIDs.find(trk.AncestorTrackID());
 

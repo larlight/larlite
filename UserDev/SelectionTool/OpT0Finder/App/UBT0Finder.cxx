@@ -32,6 +32,9 @@ namespace larlite {
     _max_time = 1000;
     _use_bnb_correctness_window = true ; 
 
+    _tpc_id = -9;
+    _flash_id = -9;
+
     //Initialize _use_light_path_w_mc value to something
     _use_light_path_w_mc = true;
   }
@@ -73,6 +76,8 @@ namespace larlite {
     _flashmatch_tree->Branch("mc_dx", &_mc_dx, "mc_dx/D");
     _flashmatch_tree->Branch("score", &_score, "score/D");
     _flashmatch_tree->Branch("trk_shift", &_trk_shift, "trk_shift/D");
+    _flashmatch_tree->Branch("tpc_id", &_tpc_id, "tpc_id/I");
+    _flashmatch_tree->Branch("flash_id", &_flash_id, "flash_id/I");
 
     if (_eff_tree) delete _eff_tree;
     _eff_tree = new TTree("_eff_tree", "Efficiency Tree");
@@ -99,39 +104,44 @@ namespace larlite {
 
   bool UBT0Finder::analyze(storage_manager* storage) {
 
+
     _mgr.Reset();
     // _mgr.PrintConfig();
 
     const ::larutil::Geometry* g = ::larutil::Geometry::GetME();
 
-    auto ev_flash = storage->get_data<event_opflash>("opflash");// opflash");
-    auto ev_hit = storage->get_data<event_ophit>    ("opflash"); // opflash");
+    auto ev_flash = storage->get_data<event_opflash>("opflashSat");// opflash");
+    auto ev_hit = storage->get_data<event_ophit>    ("ophitSat"); // opflash");
+
 
     if (!ev_flash || ev_flash->empty()) {
       std::cout << "No opflash found. Skipping event: " << storage->event_id() << std::endl;
       return false;
     }
 
+    if (!ev_hit || ev_hit->empty()) {
+      std::cout << "No ophit found. Skipping event: " << storage->event_id() << std::endl;
+      return false;
+    }
+
+    //std::cout<<"\n\nEvent ID: "<<ev_hit->event_id()<<std::endl; 
+
     // For TH2D-- number of flash per event > x PE
     // Number interactions per event > y MeV
     int n_flash = 0;
     int n_int = 0;
 
-    for ( auto & f : *ev_flash) {
-      if (f.TotalPE() > 10 )
-        n_flash++;
-    }
-
     for (auto const & f : *ev_flash) {
       _npe = f.TotalPE();
       _flash_tree->Fill();
+      if (f.TotalPE() > 10 )
+        n_flash++;
     }
 
     //auto ev_track = storage->get_data<event_track>("pandoraCosmicKHit");
     auto ev_track = storage->get_data<event_track>("trackkalmanhit");
     auto ev_mctrack = storage->get_data<event_mctrack>("mcreco");
     auto ev_mcshower = storage->get_data<event_mcshower>("mcreco");
-
 
     if (!_use_mc) {
       if (!ev_track || ev_track->empty()) return false;
@@ -278,14 +288,11 @@ namespace larlite {
       auto const& dx   = calo.TrkPitchVec();
 
       std::cout<<dedx.size()<<" : "<<dx.size()<<std::endl;
-
     }
     */
+
     auto const res = _mgr.Match();
     // std::cout << "UBT0FINDER: " << res.size() << " matches found." << std::endl;
-    ::geoalgo::LineSegment line;
-    ::geoalgo::Point_t pt(0, 0, 0);
-    ::geoalgo::GeoAlgo geoalg;
     for (auto const& match : res) {
       auto const& flash = (*ev_flash)[match.flash_id];
       _flash_y = flash.YCenter();
@@ -300,56 +307,28 @@ namespace larlite {
 
       if (_use_mc) {
 
-//  std::cout<<"Match things...: "<<match.tpc_id<<", and size of ev_mctrk : "<<ev_mctrack->size()<<std::endl ;
-
         auto const& mct = (*ev_mctrack)[match.tpc_id];
 	if( !mct.size() ) continue;
 
         _mc_time = mct[0].T() * 1.e-3;
 
-        // std::cout<<"mc and flash time for match : "<<_mc_time<<", "<<_flash_time<<std::endl;
+        _flash_id = match.flash_id ;
+	_tpc_id = match.tpc_id ;
 
-        if (_mc_time < -2050 || _mc_time > 2750)
-          continue;
+	//std::cout<<"Flash and TPC IDs: "<<_flash_id<<", "<<_tpc_id<<std::endl ;
+        //std::cout<<"mc and flash time for match : "<<_mc_time<<", "<<_flash_time<<std::endl;
 
-        double event_time = mct[0].T(); // ns
+        double event_time = mct[0].T();// ns
         double det_drift_time = 2.3E6; // ns
-        double det_width = 256.; // cm
+        double det_width = 256.;       // cm
         _trk_shift = event_time * (det_width / det_drift_time);
         double min_dist = 1e12;
-        pt[0] = _tpc_x;
-        pt[1] = _tpc_y;
-        pt[2] = _tpc_z;
-        //double min_x = 1e9;
-        //double max_x = 0;
-        //for (size_t i = 0; i < mct.size() - 1; ++i) {
-        //  auto const& step1 = mct[i];
-        //  auto const& step2 = mct[i + 1];
-        //  std::cout<<"Step x y z: "<<step2.X()<<", "<<step2.Y()<<", "<<step2.Z()<<std::endl ;
-        //  line.Start(step1.X(), step1.Y(), step1.Z());
-        //  line.End(step2.X(), step2.Y(), step2.Z());
-        //  auto const closest_pt = geoalg.ClosestPt(line, pt);
-        //  double dist = closest_pt.SqDist(pt);
-        //  if (dist < min_dist) {
-        //    min_dist = dist;
-        //    _mc_x = closest_pt[0];
-        //    _mc_y = closest_pt[1];
-        //    _mc_z = closest_pt[2];
-        //  }
-
-        //  if (step1.X() < min_x) min_x = step1.X();
-        //  if (step1.X() > max_x) max_x = step1.X();
-        //}
-        //_mc_dx = max_x - min_x;
-//        if ( mct[0].E() - mct[mct.size() - 1].E() > _e_diff )
-       
 
         _time_diff->Fill(1000 * (_flash_time - _mc_time)); //
       }
       _flashmatch_tree->Fill();
 
     }// for all matches
-
 
     // make an entry of the flash-matching results for every MCTrack
     if (!_use_mc)
@@ -415,7 +394,7 @@ namespace larlite {
       _fout->cd();
       _time_diff->GetXaxis()->SetTitle("Delta T [ns]" );
 
-      auto eligible_matches = _int_tree->GetEntries(); //"_t0>-2050000 && _t0 < 2750000") ;
+      auto eligible_matches = _int_tree->GetEntries(); 
 
       //This will give us a time range of 0 - 400 ns, 60ns shaping time + 15ns intervals of electronics offsets
       int min_time_bin = 1;

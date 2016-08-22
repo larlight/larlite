@@ -49,6 +49,7 @@ namespace larlite {
   class event_cosmictag;
   class event_opflash;
   class event_ophit;
+  class event_t0;
   class event_mcflux;
   class event_pfpart;
   class event_partid;
@@ -518,6 +519,7 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_wire> () const;
   template<> data::DataType_t storage_manager::data_type<event_hit> () const;
   template<> data::DataType_t storage_manager::data_type<event_ophit> () const;
+  template<> data::DataType_t storage_manager::data_type<event_t0> () const;
   template<> data::DataType_t storage_manager::data_type<event_opflash> () const;
   template<> data::DataType_t storage_manager::data_type<event_cluster> () const;
   template<> data::DataType_t storage_manager::data_type<event_seed> () const;

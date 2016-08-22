@@ -9,12 +9,12 @@
 
 namespace cluster {
 
-  FindShoweringPoint::FindShoweringPoint()
-  {
-    _name = "FindShoweringPoint";
-    _dMax = 5; // cm
-    _minCosine = 0.7;
-  }
+FindShoweringPoint::FindShoweringPoint()
+{
+  _name = "FindShoweringPoint";
+  _dMax = 5; // cm
+  _minCosine = 0.7;
+}
 
 void FindShoweringPoint::do_params_fill(cluster_params & cluster) {
 
@@ -96,9 +96,9 @@ void FindShoweringPoint::do_params_fill(cluster_params & cluster) {
     // Find the showering point for this group.
     // To check forwardness, need to get a second point that is down the axis
     // Use the mean of the selected hits to draw a line from start point to mean.
-    Point2D mean(cluster.plane_id.Plane,
-                 tPrincipalArray.at(j)->GetMeanValues()[0][0],
-                 tPrincipalArray.at(j)->GetMeanValues()[0][1]);
+    larutil::Point2D mean(cluster.plane_id.Plane,
+                          tPrincipalArray.at(j)->GetMeanValues()[0][0],
+                          tPrincipalArray.at(j)->GetMeanValues()[0][1]);
     // std::cout << "mean is " << mean.w << ", " << mean.t << std::endl;
 
     // Remove all the points from consideration if the point is behind the start point:

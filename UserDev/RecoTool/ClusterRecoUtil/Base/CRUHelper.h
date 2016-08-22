@@ -56,17 +56,17 @@ namespace cluster {
 
     /// Generate: from hit vector
     void GenerateHit2D(const std::vector<::larlite::hit>& hit_v,
-                       std::vector<Hit2D> &pxhits) const;
+                       std::vector<larutil::Hit2D> &pxhits) const;
     
     /// Generate: from 1 set of hits => 1 set of PxHits using indexes (association)
     void GenerateHit2D(const std::vector<unsigned int>& hit_index,
                        const larlite::event_hit* hits,
-                       std::vector<Hit2D> &pxhits) const;
+                       std::vector<larutil::Hit2D> &pxhits) const;
 
     /// Generate: vector of PxHit sets from event storage by specifying cluster type
     void GenerateHit2D(larlite::storage_manager* storage,
                        const std::string &cluster_producer_name,
-                       std::vector<std::vector<Hit2D> > &pxhits_v) const;
+                       std::vector<std::vector<larutil::Hit2D> > &pxhits_v) const;
     
   };
 

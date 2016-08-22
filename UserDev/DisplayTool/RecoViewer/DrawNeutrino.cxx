@@ -42,14 +42,10 @@ namespace evd {
     std::cout << "Found " << ass_keys.size() << " ass keys" << std::endl;
 
 
-    //std::cout << "key 0 first  int : " << ass_keys[0].first.first << " string : "<< ass_keys[0].first.second << std::endl;
-    //std::cout << "key 0 second int : " << ass_keys[0].second.first << " string : "<< ass_keys[0].second.second << std::endl;    
-    //std::cout << "key 1 first  int : " << ass_keys[1].first.first << " string : "<< ass_keys[1].first.second << std::endl;
-    //std::cout << "key 1 second int : " << ass_keys[1].second.first << " string : "<< ass_keys[1].second.second << std::endl;
-
-    larlite::AssSet_t ass_trk_vtx_v;
     larlite::event_track *ev_trk = nullptr;
+    larlite::AssSet_t ass_trk_vtx_v;
     ass_trk_vtx_v = storage->find_one_ass( ass_keys[0].second, ev_trk, ev_ass->name() );
+
 
     larlite::AssSet_t ass_vtx_trk_v;
     larlite::event_vertex *ev_vtx = nullptr;
@@ -57,11 +53,11 @@ namespace evd {
 
     // are there tracks? are there vertices?
     if (!ev_trk or (ev_trk->size() == 0)){
-      std::cout << "No track! exit" << std::endl;
+      print(larlite::msg::kWARNING,__FUNCTION__,"no track producer associated to neutrino interaction...skip event");
       return false;
     }
     if (!ev_vtx or (ev_vtx->size() == 0)){
-      std::cout << "No vertex! exit" << std::endl;
+      print(larlite::msg::kWARNING,__FUNCTION__,"no vertex producer associated to neutrino interaction...skip event");
       return false;
     }
 
@@ -96,7 +92,7 @@ namespace evd {
     
     larlite::AssSet_t ass_pfpart_clus_v;
     larlite::event_cluster *ev_clus = nullptr;
-    if (showers){
+    if (pfpart){
       ass_pfpart_clus_v = storage->find_one_ass( ev_pfpart->id(), ev_clus, ev_pfpart->name() );
       if (!ev_clus or (ev_clus->size() == 0)){
 	std::cout << "No clusters associated to PFPart! exit" << std::endl;
@@ -104,11 +100,9 @@ namespace evd {
       }
     }
 
-    std::cout << "Found cluster " << ev_clus->name() << " associated w/ PFPart " << ev_pfpart->name() << std::endl;
-
     larlite::AssSet_t ass_clus_hit_v;
     larlite::event_hit *ev_hit = nullptr;
-    if (showers){
+    if (showers && pfpart){
       ass_clus_hit_v = storage->find_one_ass( ev_clus->id(), ev_hit, ev_clus->name() );
       if (!ev_hit or (ev_hit->size() == 0)){
 	std::cout << "No hits associated to PFPart! exit" << std::endl;
@@ -129,7 +123,7 @@ namespace evd {
       auto const& nutrk = ev_trk->at(i);
       auto const& nuvtx = ev_vtx->at( ass_vtx_trk_v[i][0] );
 
-      Point2D point;
+      larutil::Point2D point;
       double * xyz = new double[3];
       
       // add the track & vertex to the event
@@ -234,6 +228,8 @@ namespace evd {
     
     return true;
   }
+
+  DrawNeutrino::~DrawNeutrino(){}
   
   
 } // larlite

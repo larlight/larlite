@@ -27,6 +27,7 @@
 #include "cosmictag.h"
 #include "opflash.h"
 #include "ophit.h"
+#include "t0.h"
 #include "mcflux.h"
 #include "pfpart.h"
 #include "partid.h"
@@ -1141,6 +1142,9 @@ namespace larlite {
       break;
     case data::kOpHit:
       _ptr_data_array[type][name]=new event_ophit(name);
+      break;
+    case data::kT0:
+      _ptr_data_array[type][name]=new event_t0(name);
       break;
     case data::kPFParticle:
       _ptr_data_array[type][name]=new event_pfpart(name);

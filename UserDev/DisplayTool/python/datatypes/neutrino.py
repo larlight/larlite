@@ -30,6 +30,8 @@ class neutrino(recoBase):
             self._drawnObjects.append([])
             nu_v = self._process.getDataByPlane(view.plane())
 
+            print 'looking at neutrinos!'
+
             for nu in nu_v:
 
                 offset = geom.offset(view.plane()) / geom.time2cm()
@@ -46,7 +48,7 @@ class neutrino(recoBase):
                         points.append(QtCore.QPointF(x, y))
                     
                     thisPoly = polyLine(points)
-                    pen = pg.mkPen((0, 0, 255), width=4)
+                    pen = pg.mkPen((255, 127, 36), width=4)
                     thisPoly.setPen(pen)
                     
                     view._view.addItem(thisPoly)
