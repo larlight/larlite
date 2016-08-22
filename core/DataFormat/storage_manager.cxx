@@ -40,12 +40,14 @@
 #include "pmtfifo.h"
 #include "tpcfifo.h"
 #include "opdetwaveform.h"
+#include "tpcdetwaveform.h"
 #include "simphotons.h"
 #include "mucsdata.h"
 #include "mucsreco.h"
 #include "PiZeroROI.h"
 #include "auxsimch.h"
 #include "chstatus.h"
+#include "tpcdetwaveform.h"
 
 namespace larlite {
 
@@ -1184,6 +1186,9 @@ namespace larlite {
       break;
     case data::kOpDetWaveform:
       _ptr_data_array[type][name]=new event_opdetwaveform(name);
+      break;
+    case data::kTPCDetWaveform:
+      _ptr_data_array[type][name]=new event_tpcdetwaveform(name);
       break;
     case data::kSimPhotons:
       _ptr_data_array[type][name]=new event_simphotons(name);

@@ -62,6 +62,7 @@ namespace larlite {
   class event_pmtfifo;
   class event_tpcfifo;
   class event_opdetwaveform;
+  class event_tpcdetwaveform;
   class event_simphotons;
   class event_mucsdata;
   class event_mucsreco;
@@ -544,6 +545,7 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_pcaxis>() const;
   template<> data::DataType_t storage_manager::data_type<event_flashmatch>() const;
   template<> data::DataType_t storage_manager::data_type<event_opdetwaveform> () const;
+  template<> data::DataType_t storage_manager::data_type<event_tpcdetwaveform> () const;
   template<> data::DataType_t storage_manager::data_type<event_simphotons> () const;
   template<> data::DataType_t storage_manager::data_type<event_mucsdata> () const;
   template<> data::DataType_t storage_manager::data_type<event_mucsreco> () const;

@@ -90,6 +90,7 @@ namespace larlite{
       kFlashMatch,         ///< anab::FlashMatch
       kTrackMomentum,      ///< track momentum
       kOpDetWaveform,      ///< optical detector waveform
+      kTPCDetWaveform,      ///< optical detector waveform
       kSimPhotons,         ///< sim::SimPhotons
       kMuCSData,           ///< MuCS::MuCSData
       kMuCSReco,           ///< MuCS::MuCSReco

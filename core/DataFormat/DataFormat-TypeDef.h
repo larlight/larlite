@@ -111,6 +111,9 @@ namespace larlite{
   class opdetwaveform;
   class event_opdetwaveform;
 
+  class tpcdetwaveform;
+  class event_tpcdetwaveform;
+
   class onephoton;
   class simphotons;
   class event_simphotons;

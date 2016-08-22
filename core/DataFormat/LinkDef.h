@@ -225,6 +225,10 @@
 #pragma link C++ class std::vector<larlite::opdetwaveform>+;
 #pragma link C++ class larlite::event_opdetwaveform+;
 
+#pragma link C++ class larlite::tpcdetwaveform+;
+#pragma link C++ class std::vector<larlite::tpcdetwaveform>+;
+#pragma link C++ class larlite::event_tpcdetwaveform+;
+
 #pragma link C++ class larlite::onephoton+;
 #pragma link C++ class std::vector<larlite::onephoton>+;
 #pragma link C++ class larlite::simphotons+;
@@ -240,59 +244,5 @@
 
 #pragma link C++ class larlite::storage_manager+;
 
-/*
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_gtruth>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_mctruth>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_mcpart>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_mcflux>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_simch>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_mcshower>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_rawdigit>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_wire>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_hit>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_ophit>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_opflash>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_cluster>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_seed>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_spacepoint>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_track>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_shower>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_vertex>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_endpoint2d>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_calorimetry>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_partid>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_pfpart>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_user>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_minos>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_ass>();
-#pragma link C++ function larlite::storage_manager::data_type<larlite::event_fifo>();
 
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_gtruth>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_mctruth>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_mcpart>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_mcflux>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_simch>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_mcshower>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_rawdigit>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_wire>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_hit>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_ophit>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_opflash>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_cluster>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_seed>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_spacepoint>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_track>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_shower>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_vertex>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_endpoint2d>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_calorimetry>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_partid>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_pfpart>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_user>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_minos>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_ass>(string);
-#pragma link C++ function larlite::storage_manager::get_data<larlite::event_fifo>(string);
-#pragma link C++ function larlite::storage_manager::subrundata_type<larlite::potsummary>();
-#pragma link C++ function larlite::storage_manager::get_subrundata<larlite::potsummary>(string);
-*/
 #endif
