@@ -15,6 +15,9 @@ main_build: pre_build .depend $(DICT).cxx $(LARLITE_LIBDIR)/$(SHLIB) $(LARLITE_L
 %.o: %.cxx
 	@echo '<< compiling' $< '>>'
 	@$(CXX) $(CXXFLAGS) $(LARLITE_BASIC_ROOTINC) $(INCFLAGS) -c $<
+%.o: %.cc
+	@echo '<< compiling' $< '>>'
+	@$(CXX) $(CXXFLAGS) $(LARLITE_BASIC_ROOTINC) $(INCFLAGS) -c $<
 
 ifdef LARLITE_ROOT6
 

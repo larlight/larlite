@@ -30,13 +30,26 @@ SUBDIRS := EMShowerTools LArPyBackend TreeGraph FhiclLite #ADD_NEW_SUBDIR ... do
 .phony: all clean
 
 all:
-	@for i in $(SUBDIRS); do ( echo "" && echo "Compiling $$i..." && cd $(LARLITE_USERDEVDIR)/BasicTool/$$i && $(MAKE) ) || exit $$?; done
+	@echo '' ; \
+	echo 'Warning: Assuming you want to compile GeoAlgo in UserDev/larcorealg' ; \
+	echo '' ; \
+	echo 'Compiling GeoAlgo...' ; \
+	cd $(LARLITE_USERDEVDIR)/larcorealg ; \
+	$(MAKE) ; \
+	cd $(LARLITE_USERDEVDIR)/Basictool ; \
+	for i in $(SUBDIRS); do ( echo "" && echo "Compiling $$i..." && cd $(LARLITE_USERDEVDIR)/BasicTool/$$i && $(MAKE) ) || exit $$?; done
+
 #####################################################################################
 #
 # CLEANs...
 #
 clean:
-	@for i in $(SUBDIRS); do ( echo "" && echo "Cleaning $$i..." && cd $(LARLITE_USERDEVDIR)/BasicTool/$$i && $(MAKE) clean && rm -f $(LARLITE_LIBDIR)/$$i.* ) || exit $$?; done
+	@echo '' ; \
+	echo 'Cleaning GeoAlgo...' ; \
+	cd $(LARLITE_USERDEVDIR)/larcorealg ; \
+	$(MAKE) clean ; \
+	rm -f $(LARLITE_LIBDIR)/liblarcorealgGeoAlgo* ; \
+	for i in $(SUBDIRS); do ( echo "" && echo "Cleaning $$i..." && cd $(LARLITE_USERDEVDIR)/BasicTool/$$i && $(MAKE) clean && rm -f $(LARLITE_LIBDIR)/$$i.* ) || exit $$?; done
 
 #####################################################################################
 #

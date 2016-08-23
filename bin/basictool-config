@@ -9,11 +9,11 @@ while test $# -gt 0; do
 
   case $1 in
       --includes)
-	  out="-I${LARLITE_USERDEVDIR}/BasicTool"
+	  out="-I${LARLITE_USERDEVDIR}/BasicTool -I${LARLITE_USERDEVDIR}/larcorealg/larcorealg"
 	  ;;
       --libs)
-          ### CHANGED FROM -lBasicTool_GeoAlgo TO -llarcoreobj_GeoAlgo
-	  out="-L${LARLITE_LIBDIR} -lBasicTool_LArPyBackend -lBasicTool_EMShowerTools -llarcoreobj_GeoAlgo -lBasicTool_FhiclLite -BasicTool_TreeGraph"
+          ### CHANGED FROM -lBasicTool_GeoAlgo TO -llarcorealg_GeoAlgo
+	  out="-L${LARLITE_LIBDIR} -lBasicTool_LArPyBackend -lBasicTool_EMShowerTools -llarcorealg_GeoAlgo -lBasicTool_FhiclLite -BasicTool_TreeGraph"
 	  ;;
       --help)
 	  ### Print a help message

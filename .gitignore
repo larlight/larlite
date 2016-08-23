@@ -27,6 +27,7 @@
 /bin/combine_ass
 /GNUmakefile
 /UserDev/*
+!/UserDev/larcorealg
 !/UserDev/bin
 !/UserDev/RecoTool
 !/UserDev/BasicTool
