@@ -118,6 +118,12 @@ namespace btutil {
 
     std::vector< ::btutil::ch_info_t> _event_info;
     std::vector<size_t> _trkid_to_index;
+
+    /**
+       vector of MC charge associated to each MCX object.
+       1st entry is the plane number.
+       2nd entry is the MCX index.
+     */
     std::vector<std::vector<double> > _sum_mcq;
     size_t _num_parts;
   };
