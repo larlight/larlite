@@ -25,6 +25,7 @@
 #pragma link C++ class showerreco::EmptyModule+;
 #pragma link C++ class showerreco::ToyGeoModule+;
 #pragma link C++ class showerreco::Angle3DFromVtx+;
+#pragma link C++ class showerreco::CheckVtxAlignment+;
 //ADD_NEW_CLASS ... do not change this line
 
 #pragma link C++ class showerreco::ShowerRecoAlgModular+;
