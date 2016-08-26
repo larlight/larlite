@@ -57,6 +57,7 @@ void LinearEnergy::initialize()
   _energy_conversion = _charge_conversion * _fC_to_e * _e_to_eV * _eV_to_MeV;
 
   _tau = larutil::LArProperties::GetME()->ElectronLifetime();        // electron lifetime in usec
+  _tau = 1e7;
   std::cout << "Lifetime = " << _tau << std::endl;
   _recomb_factor = 1.;
   double MeV_to_fC = 1. / ( _e_to_eV * _eV_to_MeV );
@@ -163,7 +164,7 @@ void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
 
     }// loop over all hits
 
-    E /= _recomb_factor;
+    // E /= _recomb_factor;
 
     // correct for plane-dependent shower reco energy calibration
     E *= _HitRecoCorrection_v[pl];
