@@ -41,8 +41,13 @@ namespace calo {
   //static const double kCalAmpConstants_UB[3]  = { 5.9e-4 * (1+0.127), 7.30e-3 * (1+0.076), 7.60e-3 * (1+0.169)};
   //static const double kCalAreaConstants_UB[3] = { 5.1e-3 * (1+0.127), 5.28e-3 * (1+0.076), 5.32e-3 * (1+0.169)};
   //static const bool kCaloUseModBox_UB = false;
-  
-  static const double kCalAreaConstants_UB[3] = { 4.76e-3, 4.73e-3, 4.91e-3 };
+
+  // LArSoft v06_03_00, nominal single electron sample  
+  // static const double kCalAreaConstants_UB[3] = { 4.76e-3, 4.73e-3, 4.91e-3 };
+  // LArSoft v06_03_00, single muon sample with no recombination, long lifetime, and no noise
+  static const double kCalAreaConstants_UB[3] = { 4.91e-3, 4.76e-3, 4.99e-3 };
+
+
 
 }
 
