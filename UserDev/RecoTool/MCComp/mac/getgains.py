@@ -21,7 +21,7 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify analysis output root file name
-my_proc.set_ana_output_file("");
+my_proc.set_ana_output_file("larlite_getgians_ana.root");
 
 # Specify data output root file name
 my_proc.set_output_file("larlite_getgains.root")
@@ -38,6 +38,7 @@ print
 import matplotlib.pyplot as plt
 import numpy as np
 #plt.ion()
+from scipy.optimize import curve_fit
 
 plt.rcParams.update({'font.size': 16})
 
@@ -54,6 +55,21 @@ def gauss(mu,sigma):
 
 #fig, ax = plt.subplots(1,1,figsize=(20,8))
 
+def gaussFunction(x,A,mu,sigma):
+
+        return A/(sigma*np.sqrt(2*np.pi)) * np.exp(-((x-mu)/sigma)**2)
+
+def getGaussFit(entries,bin_edges):
+
+        bin_centers = 0.5*(bin_edges[1:] + bin_edges[:-1])
+
+        # guess should be, for the area the number of entris
+        # and for the mean the bin with the highest num. of entries
+        ntot = np.sum(entries)
+        median = bin_centers[np.argmax(entries)]
+        parameters, cov_matrix = curve_fit(gaussFunction, bin_centers, entries, p0=[ntot,median,0.2])
+
+        return parameters,cov_matrix
 
 ADC2e_Y = []
 ADC2e_V = []
@@ -65,7 +81,7 @@ offset = 7298
 while ( my_proc.process_event() ):
     
     # loop through all channels
-    for chan in xrange(5000,8256):
+    for chan in xrange(0,8256):
 
         # make sure there is information stored at this channel
         if (hitcheck.hasHits(chan) == False):
@@ -119,8 +135,8 @@ while ( my_proc.process_event() ):
                     qhit += ide.second
             
 
-            #offset = maxtick - maxhittick
-            #print 'offset (ticks) is ',offset
+            offset = maxtick - maxhittick
+            print 'offset (ticks) is ',offset
 
             ideTime   = np.array(ideTime)-offset
             
@@ -155,22 +171,32 @@ while ( my_proc.process_event() ):
             #elif ( usrinput.isdigit() == True):
             #    chan = int(usrinput)
 
+curvebins=np.linspace(0,10,100)
 fig = plt.figure(figsize=(8,8))
-plt.hist(1000.*np.array(ADC2e_Y),bins=np.linspace(0,10,100),histtype='stepfilled')
+entriesY, bin_edgesY, patchesY = plt.hist(1000.*np.array(ADC2e_Y),bins=np.linspace(0,10,100),histtype='stepfilled')
+params, errors = getGaussFit( entriesY, bin_edgesY )
+print 'Y plane: mu = %f, sigma = %f' % ( params[1], params[2] )
+plt.plot(curvebins,gaussFunction(curvebins,*params),'ro--',lw=2,label='mu = %.02f sigma = %.02f'%(params[1],params[2]))
 plt.grid()
 plt.xlabel('ADC / $e^-$ [$10^3$]')
 plt.title('Y Plane')
 plt.show()
 
 fig = plt.figure(figsize=(8,8))
-plt.hist(1000*np.array(ADC2e_V),bins=np.linspace(3,7,100),histtype='stepfilled')
+entriesV, bin_edgesV, patchesV = plt.hist(1000*np.array(ADC2e_V),bins=np.linspace(3,7,100),histtype='stepfilled')
+params, errors = getGaussFit( entriesV, bin_edgesV )
+print 'V plane: mu = %f, sigma = %f' % ( params[1], params[2] )
+plt.plot(curvebins,gaussFunction(curvebins,*params),'ro--',lw=2,label='mu = %.02f sigma = %.02f'%(params[1],params[2]))
 plt.grid()
 plt.title('V Plane')
 plt.xlabel('ADC / $e^-$ [$10^3$]')
 plt.show()
 
 fig = plt.figure(figsize=(8,8))
-plt.hist(1000*np.array(ADC2e_U),bins=np.linspace(3,7,100),histtype='stepfilled')
+entriesU, bin_edgesU, patchesU = plt.hist(1000*np.array(ADC2e_U),bins=np.linspace(3,7,100),histtype='stepfilled')
+params, errors = getGaussFit( entriesU, bin_edgesU )
+print 'U plane: mu = %f, sigma = %f' % ( params[1], params[2] )
+plt.plot(curvebins,gaussFunction(curvebins,*params),'ro--',lw=2,label='mu = %.02f sigma = %.02f'%(params[1],params[2]))
 plt.grid()
 plt.title('U Plane')
 plt.xlabel('ADC / $e^-$ [$10^3$]')
