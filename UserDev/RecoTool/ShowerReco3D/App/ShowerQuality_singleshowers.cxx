@@ -138,7 +138,8 @@ void ShowerQuality_singleshowers::FillQualityInfo(const shower& reco_shower, con
   fShowerTreeParams.mc_wildlength = WildShowerDir.Mag();
 
   // Reco vtx
-  fShowerTreeParams.reco_x = reco_shower.ShowerStart()[0] + 125.4;
+  // fShowerTreeParams.reco_x = reco_shower.ShowerStart()[0] + 125.4;
+  fShowerTreeParams.reco_x = reco_shower.ShowerStart()[0];
   fShowerTreeParams.reco_y = reco_shower.ShowerStart()[1];
   fShowerTreeParams.reco_z = reco_shower.ShowerStart()[2];
 
