@@ -518,6 +518,12 @@ public:
      */
     UInt_t Nplanes() const { return fNPlanes; }
 
+    /**
+     * @brief return whether a point is contained in the TPC boundaries as defined by Geometry.h
+     * @return boolean: true -> contained
+     */
+    bool Contained(const double& x, const double& y, const double& z) const;
+
 private:
 
     // services to be used
