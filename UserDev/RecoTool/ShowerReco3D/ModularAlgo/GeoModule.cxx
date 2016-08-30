@@ -126,7 +126,7 @@ void GeoModule::fillLength(const ShowerClusterSet_t & clusters, Shower_t & resul
 
   if (length < 0) {
     resultShower.fLength = - length;
-    resultShower.fDCosStart *= -1;
+    //resultShower.fDCosStart *= -1;
   }
   else {
     resultShower.fLength = length;
