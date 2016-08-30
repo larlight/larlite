@@ -299,7 +299,7 @@ namespace flashana {
           std::stringstream ss;
           ss << "Candidate Match: " << " TPC=" << tpc_index << " Flash=" << flash_index
              << " Score=" << res.score;
-          Print(msg::kINFO, __FUNCTION__, ss.str());
+	  //          Print(msg::kINFO, __FUNCTION__, ss.str());
         }
 
       }

@@ -75,7 +75,7 @@ namespace flashana {
     */
     // if the cluster comes before the flash entirely ->
     // impossible match
-        std::cout<<" TimeCompatMatch::MatchCompatible(): clus_t_min and flash_time are "<<clus_t_min+20.<<", "<<flash_time<<", "<<std::endl; 
+    //        std::cout<<" TimeCompatMatch::MatchCompatible(): clus_t_min and flash_time are "<<clus_t_min+20.<<", "<<flash_time<<", "<<std::endl; 
     if ( (clus_t_min+20.) < flash_time) {
   //    std::cout<<"min failur! "<<clus_t_min+20.<<", "<<flash_time<<", "<<std::endl; 
       return false;

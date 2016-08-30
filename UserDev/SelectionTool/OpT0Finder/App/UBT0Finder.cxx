@@ -337,6 +337,7 @@ namespace larlite {
       std::vector<flashana::QCluster_t> qcluster_v;
       std::vector<flashana::MCSource_t> source_v;
       // Fills qcluster_v with the content of _qcluster_v which is filled above in Construct()
+
       _interaction_algo.Swap(std::move(qcluster_v),std::move(source_v));
 
       _mcpesum=0;
@@ -349,19 +350,25 @@ namespace larlite {
 	  _mcpesum+=hyp.pe_v[ipmt];
 	}
 
-	std::cout << "UBT0Finder:analyze(): qcluster_v.size() is " << qcluster_v.size() << std::endl;
-        if( qcluster.idx != -1)
+
+        if( (qcluster.idx != -1) && (qcluster.idx != std::pow(2.,32)-1) )
+	  {
 	  for (size_t ii = 0;  ii<qcluster.size(); ++ii)
 	    {
 	      qcluster[ii].t = qcluster[ii].x/(det_width/det_drift_time) ; // this is drift time, which will create an upper bound on where track could have been in x; will enforce the bound later in PhotonLibHypothesis::FillEstimate().
 	    }
-
 	  _mgr.Emplace(std::move(qcluster));
-	  if ( _photlib_tree_config == "seen" )
-	    {
-	      auto const& qcc(qcluster);
-	      Fill_PVL_Tree(qcc);
-	    }
+	  std::cout << "UBT0Finder:analyze(): qcluster.idx is " << qcluster.idx << std::endl;
+	  }
+	else 
+	  std::cout << "UBT0Finder:analyze(): qcluster.idx is ridiculous " << qcluster.idx << ". Don't use it." << std::endl;
+
+
+	if ( _photlib_tree_config == "seen" )
+	  {
+	    auto const& qcc(qcluster);
+	    Fill_PVL_Tree(qcc);
+	  }
 	std::cout << " back from fill_pvl_tree... " << std::endl;
 	  
 	}
@@ -503,7 +510,7 @@ namespace larlite {
     auto const res = _mgr.Match();
 
 
-    std::cout << "UBT0Finder::analyze(): Number of flashes, qclusters, matches is " << ev_flash->size() << ", " << _interaction_algo.QClusters().size() << ", " << res.size() << std::endl;
+    std::cout << "UBT0Finder::analyze(): Number of flashes, _int_algo.QCluster.size (qcluster_v.size), matches is " << ev_flash->size() << ", " << _interaction_algo.QClusters().size() << " (" << qcluster_v.size() << ")"<< ", " << res.size() << std::endl;
     
     ::geoalgo::LineSegment line;
     ::geoalgo::Point_t pt(0, 0, 0);
@@ -529,13 +536,14 @@ namespace larlite {
 	if (_use_mc)
 	  {
 
-	    std::cout << "UBT0Finder::analyze(): match.tpc_id" <<  match.tpc_id << std::endl;
+	    std::cout << "UBT0Finder::analyze(): match.tpc_id: " <<  match.tpc_id << std::endl;
 	    auto const& mct = (*ev_mctrack)[match.tpc_id];
-	    /*
-	    if (mct.size()) 
-	      std::cout << "UBT0Finder::analyze(): This matched mctrack doesn't exist. Bailing from event, which seems severe." << std::endl;
-	      return false;
-	    */
+	    
+	    if (!mct.size()) 
+	      {
+		std::cout << "UBT0Finder::analyze(): This matched mctrack doesn't exist. Bailing from this match candidate." << std::endl;
+		continue;
+	      }
 
 	    _mc_time = mct[0].T() * 1.e-3;
 	    _mc_x = mct[0].X();

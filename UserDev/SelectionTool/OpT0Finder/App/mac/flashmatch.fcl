@@ -35,7 +35,7 @@ QWeightPoint:{
 }
 
 CommonAmps:{
-    ScoreThreshold: 0.8
+    ScoreThreshold: 0.1
     QFracThreshold: 0.5
     XStepSize:      5.0
 }
@@ -47,12 +47,12 @@ TimeCompatMatch:{
 MaxNPEWindow:{
     TimeUpperBound:  8.0
     TimeLowerBound: -0.1
-    NPEThreshold:   2.0
+    NPEThreshold:    5.0
 }
 
 NPtFilter:{
 # was 2, photon bomb requires that it be 1.
-    MinNumPoint: 10
+    MinNumPoint: 4
 }
 
 PhotonLibHypothesis:
