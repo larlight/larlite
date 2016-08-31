@@ -49,6 +49,9 @@ namespace flashana {
 
     /// Algorithm getter
     flashana::BaseAlgorithm* GetAlgo(flashana::Algorithm_t type);
+
+    /// Custom algorithm getter
+    flashana::BaseAlgorithm* GetCustomAlgo(std::string name);
 		 
 #ifndef __CINT__
     /// Emplacer of a TPC object (hidden from ROOT5 CINT)
@@ -98,7 +101,7 @@ namespace flashana {
     /**
        A set of custom algorithms (not to be executed but to be configured)
     */
-    std::vector<flashana::BaseAlgorithm*> _custom_alg_v;
+    std::map<std::string,flashana::BaseAlgorithm*> _custom_alg_m;
 
     /// TPC object information collection (provided by a user)
     QClusterArray_t _tpc_object_v;
