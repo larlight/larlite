@@ -111,13 +111,7 @@ namespace flashana {
     /// Alternative ctor
     FlashMatch_t(const ID_t& tpc_id_value,
 		 const ID_t& flash_id_value,
-		 const double& score_value)
-    { tpc_id = tpc_id_value; flash_id = flash_id_value; score = score_value; }
-    /// Alternative ctor
-    FlashMatch_t(const ID_t& tpc_id_value,
-		 const ID_t& flash_id_value,
-		 const double& score_value,
-		 const std::vector<double>& hypo) : hypothesis(hypo)
+		 const double& score_value) : hypothesis()
     { tpc_id = tpc_id_value; flash_id = flash_id_value; score = score_value; }
 #ifndef __CINT__ // hyde move from fucking CINT cuz it's fucked
     /// Alternative ctor

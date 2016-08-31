@@ -96,7 +96,7 @@ namespace flashana {
 
     double _reco_x_offset;     ///< reconstructed X offset (from wire-plane to min-x point)
     double _reco_x_offset_err; ///< reconstructed X offset w/ error
-    double _qll;               ///< Charge likelihood value
+    double _qll;               ///< Minimizer return value
 
     TMinuit* _minuit_ptr;
 
