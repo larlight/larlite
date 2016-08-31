@@ -25,6 +25,10 @@ namespace flashana {
   */
   class QLLMatch : public BaseFlashMatch {
 
+  public:
+
+    enum QLLMode_t { kChi2, kLLHD };
+
   private:
     /// Valid ctor hidden (singleton)
     QLLMatch(const std::string);
@@ -55,10 +59,11 @@ namespace flashana {
     double QLL(const flashana::Flash_t&,
 	       const flashana::Flash_t&);
 
-    void Record(const double fval, const double x)
+    void Record(const double x)
     {
       if(_record) {
-	_minimizer_record_fval_v.push_back(fval);
+	_minimizer_record_chi2_v.push_back(_current_chi2);
+	_minimizer_record_llhd_v.push_back(_current_llhd);
 	_minimizer_record_x_v.push_back(x);
       }
     }
@@ -66,13 +71,15 @@ namespace flashana {
     double CallMinuit(const QCluster_t& tpc,
 		      const Flash_t& pmt);
 
-    const std::vector<double>& HistoryQLL() const { return _minimizer_record_fval_v; }
-    const std::vector<double>& HistoryX()   const { return _minimizer_record_x_v;    }
+    const std::vector<double>& HistoryLLHD() const { return _minimizer_record_llhd_v; }
+    const std::vector<double>& HistoryChi2() const { return _minimizer_record_chi2_v; }
+    const std::vector<double>& HistoryX()    const { return _minimizer_record_x_v;    }
     
   private:
 
     static QLLMatch* _me;
 
+    QLLMode_t _mode;   ///< Minimizer mode
     bool _record;      ///< Boolean switch to record minimizer history
     double _normalize; ///< Noramalize hypothesis PE spectrum
 
@@ -81,7 +88,10 @@ namespace flashana {
     flashana::Flash_t    _hypothesis;  ///< Hypothesis PE distribution over PMTs
     flashana::Flash_t    _measurement; ///< Flash PE distribution over PMTs
 
-    std::vector<double> _minimizer_record_fval_v; ///< Minimizer record charge likelihood value
+    double _current_chi2;
+    double _current_llhd;
+    std::vector<double> _minimizer_record_chi2_v; ///< Minimizer record chi2 value
+    std::vector<double> _minimizer_record_llhd_v; ///< Minimizer record llhd value
     std::vector<double> _minimizer_record_x_v;    ///< Minimizer record X values
 
     double _reco_x_offset;     ///< reconstructed X offset (from wire-plane to min-x point)
