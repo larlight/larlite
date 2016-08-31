@@ -80,7 +80,13 @@ namespace flashana {
     { _allow_reuse_flash = ok; }
 
     void PrintConfig();
-    
+
+    /// Access to an input: TPC objects in the form of QClusterArray_t
+    const QClusterArray_t& QClusterArray() const { return _tpc_object_v; }
+
+    /// Access to an input: PMT objects in the form of FlashArray_t
+    const FlashArray_t& FlashArray() const { return _flash_v; }
+
   private:
 
     BaseFlashFilter*     _alg_flash_filter;     ///< Flash filter algorithm
