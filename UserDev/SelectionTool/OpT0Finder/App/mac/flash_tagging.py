@@ -31,11 +31,6 @@ my_proc.set_ana_output_file("ana.root")
 my_unit = fmwk.UBT0Finder()
 my_unit.SetEDiff(10.)
 my_unit.UseMC(True)
-my_unit.SetROStart(-3200.)
-my_unit.SetROEnd(3200.)
-my_unit.SetTrigTime(0.)
-my_unit.UseBNBCorrectnessWindow(False)
-my_unit.UseLightPathWithMC(False)
 my_proc.add_process(my_unit)
 
 # TPC Filter Algo
@@ -50,6 +45,9 @@ my_unit.Manager().SetAlgo(flashana.PhotonLibHypothesis())
 #my_unit.Manager().SetAlgo( flashana.QLLMatch.GetME() )
 my_unit.Manager().SetAlgo( flashana.QWeightPoint()   )
 #my_unit.Manager().SetAlgo( flashana.CommonAmps()      )
+# Custom Algo
+my_unit.Manager().SetAlgo( flashana.LightPath()  )
+my_unit.Manager().SetAlgo( flashana.MCQCluster() )
 
 #
 # Other algorithms
