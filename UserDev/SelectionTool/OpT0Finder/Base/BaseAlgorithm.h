@@ -38,9 +38,6 @@ namespace flashana {
     /// Default destructor
     ~BaseAlgorithm(){}
 
-    /// Name getter
-    const std::string& Name() const { return _name; }
-
     /// Function to accept configuration
     virtual void Configure(const ::fcllite::PSet &pset) = 0;
 
