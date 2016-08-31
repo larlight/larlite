@@ -24,10 +24,9 @@ namespace larlite {
   {
     _name = "UBT0Finder";
     _fout = 0;
-
-    _e_diff    = 10;
-    UseAbsolutePE(false);
-    SetStepLength(0.5);
+    _shift_flash_time = 0.;
+    //UseAbsolutePE(false);
+    //SetStepLength(0.5);
     _n_bins = 100 ;
     _max_time = 1000;
     _use_bnb_correctness_window = true ; 
@@ -104,15 +103,16 @@ namespace larlite {
 
   bool UBT0Finder::analyze(storage_manager* storage) {
 
-
     _mgr.Reset();
     // _mgr.PrintConfig();
 
     const ::larutil::Geometry* g = ::larutil::Geometry::GetME();
 
-    auto ev_flash = storage->get_data<event_opflash>("opflashSat");// opflash");
+    //auto ev_flash = storage->get_data<event_opflash>("opflashSat");// opflash");
+    auto ev_flash = storage->get_data<event_opflash>("FlashFinder");// opflash");
     auto ev_hit = storage->get_data<event_ophit>    ("ophitSat"); // opflash");
-
+    auto ev_mcflash = storage->get_data<event_opflash>("mcflash");
+    auto ev_cheatflash = storage->get_data<event_opflash>("cheatFlash");
 
     if (!ev_flash || ev_flash->empty()) {
       std::cout << "No opflash found. Skipping event: " << storage->event_id() << std::endl;
@@ -122,6 +122,24 @@ namespace larlite {
     if (!ev_hit || ev_hit->empty()) {
       std::cout << "No ophit found. Skipping event: " << storage->event_id() << std::endl;
       return false;
+    }
+
+    _mcflash_v.clear();
+    if(ev_mcflash) {
+      for(auto const& mcf : *ev_mcflash) {
+	std::vector<double> pe_v(g->NOpDets());
+	for(size_t i=0; i<pe_v.size(); ++i) pe_v[i] = mcf.PE(i);
+	_mcflash_v.emplace_back(std::move(pe_v));
+      }
+    }
+
+    _cheatflash_v.clear();
+    if(ev_cheatflash) {
+      for(auto const& mcf : *ev_cheatflash) {
+	std::vector<double> pe_v(g->NOpDets());
+	for(size_t i=0; i<pe_v.size(); ++i) pe_v[i] = mcf.PE(i);
+	_cheatflash_v.emplace_back(std::move(pe_v));
+      }
     }
 
     //std::cout<<"\n\nEvent ID: "<<ev_hit->event_id()<<std::endl; 
@@ -201,7 +219,6 @@ namespace larlite {
           _trk_shift = shift_x;
           _trk_min_x = 1036.;
           _trk_max_x = -1036.;
-          ::geoalgo::Trajectory mctraj;
           for (size_t i = 0; i < trk.size(); ++i) {
             if (trk[i].X() > _trk_max_x) { _trk_max_x = trk[i].X(); }
             if (trk[i].X() < _trk_min_x) { _trk_min_x = trk[i].X(); }
@@ -273,7 +290,7 @@ namespace larlite {
         unsigned int opdet = g->OpDetFromOpChannel(i);
         f.pe_v[opdet] = flash.PE(i);
       }
-      f.time = flash.Time();
+      f.time = flash.Time() + _shift_flash_time;
       f.idx = n;
 
       _mgr.Emplace(std::move(f));
@@ -291,9 +308,9 @@ namespace larlite {
     }
     */
 
-    auto const res = _mgr.Match();
-    // std::cout << "UBT0FINDER: " << res.size() << " matches found." << std::endl;
-    for (auto const& match : res) {
+    _result = _mgr.Match();
+    // std::cout << "UBT0FINDER: " << _result.size() << " matches found." << std::endl;
+    for (auto const& match : _result) {
       auto const& flash = (*ev_flash)[match.flash_id];
       _flash_y = flash.YCenter();
       _flash_z = flash.ZCenter();
@@ -370,7 +387,7 @@ namespace larlite {
       _npe        = 0;
       _npts = mct.size() ;
 
-      for (auto const& match : res) {
+      for (auto const& match : _result) {
         if (match.tpc_id == n) {
           _matched = 1;
           auto const& flash = (*ev_flash)[match.flash_id];

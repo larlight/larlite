@@ -54,46 +54,56 @@ namespace larlite {
 
     void UseMC(bool doit=true) { _use_mc = doit; }
 
-    void SetROStart(double t) { _RO_start = t; }
-    void SetROEnd(double t)   { _RO_end = t; }
+    //void SetROStart(double t) { _RO_start = t; }
+    
+    //void SetROEnd(double t)   { _RO_end = t; }
 
-    void SetTrigTime(double t) { _Trig_time = t; }
+    //void SetTrigTime(double t) { _Trig_time = t; }
 
-    void SetEDiff(double e) { _e_diff = e ; }
+    //void UseAbsolutePE(bool tof) { _useAbsPE = tof ; }
 
-    void UseAbsolutePE(bool tof) { _useAbsPE = tof ; }
+    //void SetStepLength(double step){ _step_len = step ; }
 
-    void SetStepLength(double step){ _step_len = step ; }
+    const std::vector<std::vector<double> >& MCPEArray() const { return _mcflash_v; }
+    const std::vector<std::vector<double> >& CheatPEArray() const { return _cheatflash_v; }
 
     void UseLightPathWithMC (bool yesOrNo ){ _use_light_path_w_mc = yesOrNo ; } 
 
     void UseBNBCorrectnessWindow (bool yesOrNo){ _use_bnb_correctness_window = yesOrNo; }
 
+    const std::vector<flashana::FlashMatch_t> MatchResult() const { return _result; }
+
+    void ShiftFlashTime(double v) {_shift_flash_time=v;}
+
   protected:
 
     ::flashana::FlashMatchManager _mgr;
     ::flashana::MCQCluster _mcqclustering;
+    std::vector<std::vector<double> > _mcflash_v;
+    std::vector<std::vector<double> > _cheatflash_v;
+    double _shift_flash_time;
+
+    std::vector<flashana::FlashMatch_t> _result;
 
     //Switch -- if set to true, Light path will be used with mctrack
     bool _use_light_path_w_mc;
 
     // readout start : 
     // time before the trigger when the RO start
-    double _RO_start; // us
+    //double _RO_start; // us
     // readout end :
     // time after the trigger when the RO ends
-    double _RO_end; // us
+    //double _RO_end; // us
     // trigger time
     // the time at which, within the TPC readout
     // the trigger should arrive
     // for MC this is generally 0
-    double _Trig_time; // us
+    // _Trig_time;
 
     // Configurable params
     bool _use_mc;
-    bool _useAbsPE ;
-    double _step_len ;
-    double _e_diff ; //Energy difference cut between start and end of track.  
+    //bool _useAbsPE ;
+    //double _step_len ;
 
     TTree* _int_tree;
     double _t0 ;
