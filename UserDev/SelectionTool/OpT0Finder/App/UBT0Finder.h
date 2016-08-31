@@ -54,29 +54,29 @@ namespace larlite {
 
     void UseMC(bool doit=true) { _use_mc = doit; }
 
-    void UseLightPathWithMC (bool yesOrNo ){ _use_light_path_w_mc = yesOrNo ; } 
-
     void UseBNBCorrectnessWindow (bool yesOrNo){ _use_bnb_correctness_window = yesOrNo; }
 
     const std::vector<flashana::FlashMatch_t> MatchResult() const { return _result; }
 
     void ShiftFlashTime(double v) {_shift_flash_time=v;}
 
+    void OpHitProducer(const std::string name) { _ophit_producer = name; }
+
+    void OpFlashProducer(const std::string name) { _opflash_producer = name; }
+
   protected:
 
     ::flashana::FlashMatchManager _mgr;
-    ::flashana::MCQCluster _mcqclustering;
     double _shift_flash_time;
 
     std::vector<flashana::FlashMatch_t> _result;
-
-    //Switch -- if set to true, Light path will be used with mctrack
-    bool _use_light_path_w_mc;
 
     // Configurable params
     bool _use_mc;
     //bool _useAbsPE ;
     //double _step_len ;
+    std::string _opflash_producer;
+    std::string _ophit_producer;
 
     TTree* _int_tree;
     double _t0 ;

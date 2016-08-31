@@ -14,7 +14,9 @@
 namespace larlite {
 
   UBT0Finder::UBT0Finder()
-    : _int_tree(nullptr)
+    : _opflash_producer("opflashSat")
+    , _ophit_producer("ophitSat")
+    , _int_tree(nullptr)
     , _track_tree(nullptr)
     , _flashmatch_tree(nullptr)
     , _eff_tree(nullptr)
@@ -33,14 +35,11 @@ namespace larlite {
 
     _tpc_id = -9;
     _flash_id = -9;
-
-    //Initialize _use_light_path_w_mc value to something
-    _use_light_path_w_mc = true;
   }
 
   bool UBT0Finder::initialize() {
 
-    _mcqclustering.SetUseLightPath(_use_light_path_w_mc);
+    auto mcqclustering = _mgr.GetCustomAlgo("MCQCluster");
 
     _time_diff = new TH1D("time_diff", "Matched Flash vs. MCTrack", _n_bins, 0, _max_time);
 
@@ -104,13 +103,13 @@ namespace larlite {
   bool UBT0Finder::analyze(storage_manager* storage) {
 
     _mgr.Reset();
+    _result.clear();
     // _mgr.PrintConfig();
 
     const ::larutil::Geometry* g = ::larutil::Geometry::GetME();
 
-    auto ev_flash = storage->get_data<event_opflash>("opflashSat");// opflash");
-    //auto ev_flash = storage->get_data<event_opflash>("FlashFinder");// opflash");
-    auto ev_hit = storage->get_data<event_ophit>    ("ophitSat"); // opflash");
+    auto ev_flash = storage->get_data<event_opflash> ( _opflash_producer ); // opflash");
+    auto ev_hit   = storage->get_data<event_ophit  > ( _ophit_producer   ); // opflash");
 
     if (!ev_flash || ev_flash->empty()) {
       std::cout << "No opflash found. Skipping event: " << storage->event_id() << std::endl;
@@ -179,7 +178,6 @@ namespace larlite {
 
       if (!ev_mctrack || ev_mctrack->empty()) return false;
 
-
       for (size_t n = 0; n < ev_mctrack->size(); n++) {
 
         auto const& trk = ev_mctrack->at(n);
@@ -214,8 +212,10 @@ namespace larlite {
       std::vector<flashana::QCluster_t> qcluster_v;
       std::vector<flashana::MCSource_t> source_v;
 
-      _mcqclustering.Construct(*ev_mctrack, *ev_mcshower);
-      _mcqclustering.Swap(std::move(qcluster_v), std::move(source_v));
+      auto mcqclustering = (flashana::MCQCluster*)(_mgr.GetCustomAlgo("MCQCluster"));
+      auto const& lightpath = *((flashana::LightPath*)(_mgr.GetCustomAlgo("LightPath")));
+      mcqclustering->Construct(*ev_mctrack, *ev_mcshower, lightpath);
+      mcqclustering->Swap(std::move(qcluster_v), std::move(source_v));
 
       for (auto& qcluster : qcluster_v) 
         if ( qcluster.idx != -1 )
