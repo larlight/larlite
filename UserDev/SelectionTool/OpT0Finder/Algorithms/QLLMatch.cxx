@@ -53,6 +53,7 @@ namespace flashana {
     res.tpc_point.y /= weight;
     res.tpc_point.z /= weight;
     res.tpc_point.q = weight;
+    res.hypothesis = _hypothesis.pe_v;
 
     return res;
   }

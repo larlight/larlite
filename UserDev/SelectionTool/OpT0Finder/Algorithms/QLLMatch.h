@@ -68,7 +68,7 @@ namespace flashana {
 
     const std::vector<double>& HistoryQLL() const { return _minimizer_record_fval_v; }
     const std::vector<double>& HistoryX()   const { return _minimizer_record_x_v;    }
-
+    
   private:
 
     static QLLMatch* _me;

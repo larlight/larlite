@@ -8,7 +8,7 @@ namespace flashana {
   LightPath::LightPath(const std::string name)
     : BaseAlgorithm(kCustomAlgo, name)
     , _gap         ( 0.5    )
-    , _light_yield ( 29000. )
+    , _light_yield ( 40000. )
     , _dEdxMIP     ( 2.07    ) //1.42[Mev*cm^2*g]*1.4[g/cm^3]=2.004MeV/cm
   {}
 

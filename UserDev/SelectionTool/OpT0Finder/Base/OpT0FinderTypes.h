@@ -32,11 +32,11 @@ namespace flashana {
     double TotalPE() const{ return std::accumulate(pe_v.begin(),pe_v.end(),0.0);}
     
     double x,y,z;             ///< Flash position 
-    double x_err,y_err,z_err; ///< Flash timing, a candidate T0
-    double time;
+    double x_err,y_err,z_err; ///< Flash position error
+    double time;              ///< Flash timing, a candidate T0
     ID_t idx;                 ///< index from original larlite vector
     /// Default ctor assigns invalid values
-    Flash_t() {
+    Flash_t() : pe_v() {
       x = y = z = kINVALID_DOUBLE;
       x_err = y_err = z_err = kINVALID_DOUBLE;
       time = kINVALID_DOUBLE;
@@ -103,14 +103,29 @@ namespace flashana {
     ID_t flash_id; ///< matched Flash ID
     double score;  ///< floating point representing the "goodness" (algorithm dependent) 
     QPoint_t tpc_point; ///< estimated & matched 3D flash hypothesis point from TPC information
+    std::vector<double> hypothesis;       ///< Hypothesis flash object
     /// Default ctor assigns invalid values
-    FlashMatch_t()
+    FlashMatch_t() : hypothesis()
     { tpc_id = kINVALID_ID; flash_id = kINVALID_ID; score = -1; }
     /// Alternative ctor
     FlashMatch_t(const ID_t& tpc_id_value,
 		 const ID_t& flash_id_value,
 		 const double& score_value)
     { tpc_id = tpc_id_value; flash_id = flash_id_value; score = score_value; }
+    /// Alternative ctor
+    FlashMatch_t(const ID_t& tpc_id_value,
+		 const ID_t& flash_id_value,
+		 const double& score_value,
+		 const std::vector<double>& hypo) : hypothesis(hypo)
+    { tpc_id = tpc_id_value; flash_id = flash_id_value; score = score_value; }
+#ifndef __CINT__ // hyde move from fucking CINT cuz it's fucked
+    /// Alternative ctor
+    FlashMatch_t(const ID_t& tpc_id_value,
+		 const ID_t& flash_id_value,
+		 const double& score_value,
+		 std::vector<double>&& hypo) : hypothesis(std::move(hypo))
+    { tpc_id = tpc_id_value; flash_id = flash_id_value; score = score_value; }
+#endif
   };
 
   /// Enum to define MC source type (MCTrack or MCShower) for a given QCluster
