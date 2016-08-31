@@ -50,7 +50,8 @@ namespace flashana{
 
     void QCluster(const ::geoalgo::Vector& pt_1,
                   const ::geoalgo::Vector& pt_2,
-                  flashana::QCluster_t& Q_cluster) const;
+                  flashana::QCluster_t& Q_cluster,
+		  double dedx=-1) const;
 
     // Getter for light yield configured paramater
     double GetLightYield() const { return _light_yield; }
