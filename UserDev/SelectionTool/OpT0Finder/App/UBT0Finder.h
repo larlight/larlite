@@ -54,19 +54,6 @@ namespace larlite {
 
     void UseMC(bool doit=true) { _use_mc = doit; }
 
-    //void SetROStart(double t) { _RO_start = t; }
-    
-    //void SetROEnd(double t)   { _RO_end = t; }
-
-    //void SetTrigTime(double t) { _Trig_time = t; }
-
-    //void UseAbsolutePE(bool tof) { _useAbsPE = tof ; }
-
-    //void SetStepLength(double step){ _step_len = step ; }
-
-    const std::vector<std::vector<double> >& MCPEArray() const { return _mcflash_v; }
-    const std::vector<std::vector<double> >& CheatPEArray() const { return _cheatflash_v; }
-
     void UseLightPathWithMC (bool yesOrNo ){ _use_light_path_w_mc = yesOrNo ; } 
 
     void UseBNBCorrectnessWindow (bool yesOrNo){ _use_bnb_correctness_window = yesOrNo; }
@@ -79,26 +66,12 @@ namespace larlite {
 
     ::flashana::FlashMatchManager _mgr;
     ::flashana::MCQCluster _mcqclustering;
-    std::vector<std::vector<double> > _mcflash_v;
-    std::vector<std::vector<double> > _cheatflash_v;
     double _shift_flash_time;
 
     std::vector<flashana::FlashMatch_t> _result;
 
     //Switch -- if set to true, Light path will be used with mctrack
     bool _use_light_path_w_mc;
-
-    // readout start : 
-    // time before the trigger when the RO start
-    //double _RO_start; // us
-    // readout end :
-    // time after the trigger when the RO ends
-    //double _RO_end; // us
-    // trigger time
-    // the time at which, within the TPC readout
-    // the trigger should arrive
-    // for MC this is generally 0
-    // _Trig_time;
 
     // Configurable params
     bool _use_mc;

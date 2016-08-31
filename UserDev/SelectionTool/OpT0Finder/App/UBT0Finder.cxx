@@ -108,11 +108,9 @@ namespace larlite {
 
     const ::larutil::Geometry* g = ::larutil::Geometry::GetME();
 
-    //auto ev_flash = storage->get_data<event_opflash>("opflashSat");// opflash");
-    auto ev_flash = storage->get_data<event_opflash>("FlashFinder");// opflash");
+    auto ev_flash = storage->get_data<event_opflash>("opflashSat");// opflash");
+    //auto ev_flash = storage->get_data<event_opflash>("FlashFinder");// opflash");
     auto ev_hit = storage->get_data<event_ophit>    ("ophitSat"); // opflash");
-    auto ev_mcflash = storage->get_data<event_opflash>("mcflash");
-    auto ev_cheatflash = storage->get_data<event_opflash>("cheatFlash");
 
     if (!ev_flash || ev_flash->empty()) {
       std::cout << "No opflash found. Skipping event: " << storage->event_id() << std::endl;
@@ -122,24 +120,6 @@ namespace larlite {
     if (!ev_hit || ev_hit->empty()) {
       std::cout << "No ophit found. Skipping event: " << storage->event_id() << std::endl;
       return false;
-    }
-
-    _mcflash_v.clear();
-    if(ev_mcflash) {
-      for(auto const& mcf : *ev_mcflash) {
-	std::vector<double> pe_v(g->NOpDets());
-	for(size_t i=0; i<pe_v.size(); ++i) pe_v[i] = mcf.PE(i);
-	_mcflash_v.emplace_back(std::move(pe_v));
-      }
-    }
-
-    _cheatflash_v.clear();
-    if(ev_cheatflash) {
-      for(auto const& mcf : *ev_cheatflash) {
-	std::vector<double> pe_v(g->NOpDets());
-	for(size_t i=0; i<pe_v.size(); ++i) pe_v[i] = mcf.PE(i);
-	_cheatflash_v.emplace_back(std::move(pe_v));
-      }
     }
 
     //std::cout<<"\n\nEvent ID: "<<ev_hit->event_id()<<std::endl; 
