@@ -7,6 +7,7 @@
 #include <TMinuit.h>
 #include <cmath>
 #include <numeric>
+#include <TMath.h>
 
 namespace flashana {
 
@@ -15,8 +16,8 @@ namespace flashana {
   void MIN_vtx_qll(Int_t &, Double_t *, Double_t &, Double_t *, Int_t);
   
   QLLMatch::QLLMatch(const std::string name)
-    : BaseFlashMatch(name), _record(false), _normalize(false), _minuit_ptr(nullptr)
-  {}
+    : BaseFlashMatch(name), _mode(kChi2), _record(false), _normalize(false), _minuit_ptr(nullptr)
+  { _current_llhd = _current_chi2 = -1.0; }
 
   QLLMatch::QLLMatch()
   { throw OpT0FinderException("Use QLLMatch::GetME() to obtain singleton pointer!"); }
@@ -24,6 +25,7 @@ namespace flashana {
   void QLLMatch::Configure(const ::fcllite::PSet &pset) {
     _record = pset.get<bool>("RecordHistory");
     _normalize = pset.get<bool>("NormalizeHypothesis");
+    _mode   = (QLLMode_t)(pset.get<unsigned short>("QLLMode"));
   }
   
   FlashMatch_t QLLMatch::Match(const QCluster_t &pt_v, const Flash_t &flash) {
@@ -42,17 +44,19 @@ namespace flashana {
     
     for (size_t pmt_index = 0; pmt_index < NOpDets(); ++pmt_index) {
 
-      res.tpc_point.x += OpDetX(pmt_index) * _hypothesis.pe_v[pmt_index];
       res.tpc_point.y += OpDetY(pmt_index) * _hypothesis.pe_v[pmt_index];
       res.tpc_point.z += OpDetZ(pmt_index) * _hypothesis.pe_v[pmt_index];
       
       weight += _hypothesis.pe_v[pmt_index];
     }
     
-    res.tpc_point.x /= weight;
     res.tpc_point.y /= weight;
     res.tpc_point.z /= weight;
     res.tpc_point.q = weight;
+
+    res.tpc_point.x = _reco_x_offset;
+    res.tpc_point_err.x = _reco_x_offset_err;
+    res.hypothesis  = _hypothesis.pe_v;
 
     return res;
   }
@@ -90,7 +94,7 @@ namespace flashana {
 
     double QLLMatch::QLL(const Flash_t &hypothesis,
                          const Flash_t &measurement) {
-        double result = 0;
+
         double nvalid_pmt = 0;
 
         double PEtot_Hyp = 0;
@@ -100,19 +104,32 @@ namespace flashana {
         for (auto const &pe : measurement.pe_v)
             PEtot_Obs += pe;
 
+	_current_chi2 = _current_llhd = 0.;
 
         if (measurement.pe_v.size() != hypothesis.pe_v.size())
             throw OpT0FinderException("Cannot compute QLL for unmatched length!");
+	
         for (size_t pmt_index = 0; pmt_index < hypothesis.pe_v.size(); ++pmt_index) {
 
             if (measurement.pe_v[pmt_index] < 0.01) continue;
 
             nvalid_pmt += 1;
-
+	    
             auto O = measurement.pe_v[pmt_index]; // observation
             auto H = hypothesis.pe_v[pmt_index];  // hypothesis
 
-            result += std::pow((O - H), 2) / (O + H);
+	    switch(_mode) {
+
+	    case kLLHD:
+	      _current_llhd -= std::log10(TMath::Poisson(O,H));
+	      if(isnan(_current_llhd) || isinf(_current_llhd)) _current_llhd = 1.e20; // 1.e50 exceeds double precision point accuracy
+	    case kChi2:
+	      _current_chi2 += std::pow((O - H), 2) / (O + H);
+	      break;
+	    default:
+	      std::cout<<"Unexpected mode"<<std::endl;
+	      throw std::exception();
+	    }
 
             //result += std::fabs(  ) * measurement.pe_v[pmt_index];
 
@@ -120,7 +137,10 @@ namespace flashana {
 
         //std::cout << "PE hyp : " << PEtot_Hyp << "\tPE Obs : " << PEtot_Obs << "\t Chi^2 : " << result << std::endl;
 
-        return result / nvalid_pmt;
+	_current_chi2 /= nvalid_pmt;
+	_current_llhd /= (nvalid_pmt +1);
+
+	return (_mode == kChi2 ? _current_chi2 : _current_llhd);
     }
 
     void MIN_vtx_qll(Int_t & /*Npar*/,
@@ -136,7 +156,7 @@ namespace flashana {
         auto const &measurement = QLLMatch::GetME().Measurement();
         Fval = QLLMatch::GetME().QLL(hypothesis, measurement);
 
-        QLLMatch::GetME().Record(Fval, Xval[0]);
+        QLLMatch::GetME().Record(Xval[0]);
 
         return;
     }
@@ -180,7 +200,8 @@ namespace flashana {
 	
         for (size_t i = 0; i < pmt.pe_v.size(); ++i)  _measurement.pe_v[i] = pmt.pe_v[i] / max_pe;
 		
-        _minimizer_record_fval_v.clear();
+        _minimizer_record_chi2_v.clear();
+	_minimizer_record_llhd_v.clear();
         _minimizer_record_x_v.clear();
 	
         if (!_minuit_ptr) _minuit_ptr = new TMinuit(4);

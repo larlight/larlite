@@ -106,20 +106,30 @@ void ProtoShowerAlgClusterParams::GenerateProtoShower(
           cluster_hits_v_v.push_back( cluster_hits_v );
         }// for all clusters associated to the PFParticle
       }// if clusters were found
-      // if no clusters for this PFParticle -> no 2D information
-      proto_shower.hasCluster2D(true);
-      if (cluster_v.size() == 0)
-        proto_shower.hasCluster2D(false);
 
-      // resize _params according to number of clusters
-      proto_shower._params.resize( cluster_v.size() );
+      bool clusters_have_hits = true;
+      for (auto const& clus_hits_v : cluster_hits_v_v)
+	if (clus_hits_v.size() == 0) { clusters_have_hits = false; break; }
 
-      // fill 2D information, if available
-      for (size_t i = 0; i < cluster_v.size(); i++) {
-        _cru_helper.GenerateParams( cluster_hits_v_v[i],
-                                    proto_shower._params.at( i ) );
-        _params_alg->FillParams( proto_shower._params.at( i ) );
-      }// for all input clusters
+      if (clusters_have_hits == false)
+	proto_shower.hasCluster2D(false);
+      else{
+	// if no clusters for this PFParticle -> no 2D information
+	proto_shower.hasCluster2D(true);
+	
+	if (cluster_v.size() == 0)
+	  proto_shower.hasCluster2D(false);
+	
+	// resize _params according to number of clusters
+	proto_shower._params.resize( cluster_v.size() );
+	
+	// fill 2D information, if available
+	for (size_t i = 0; i < cluster_v.size(); i++) {
+	  _cru_helper.GenerateParams( cluster_hits_v_v[i],
+				      proto_shower._params.at( i ) );
+	  _params_alg->FillParams( proto_shower._params.at( i ) );
+	}// for all input clusters
+      }// if not all clusters have hits
 
     }// if there are associated hits
     else

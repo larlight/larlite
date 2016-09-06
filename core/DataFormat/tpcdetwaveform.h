@@ -14,13 +14,12 @@
 namespace larlite {
   
   // Define the types used
-  typedef short        ADC_Count_t;
-  typedef double       TimeStamp_t;  ///< us since 1970, based on TimeService
-  typedef unsigned int Channel_t;
-  typedef unsigned int Event_t;
-  typedef unsigned int Frame_t;
+  typedef short    ADC_Count_t;
+  typedef double   TimeStamp_t;  ///< us since 1970, based on TimeService
+  typedef unsigned Channel_t;
+  typedef unsigned Event_t;
+  typedef unsigned Frame_t;
 
-  
   class tpcdetwaveform : public std::vector< larlite::ADC_Count_t >,
 			 public data_base {
     
@@ -31,32 +30,20 @@ namespace larlite {
     virtual ~tpcdetwaveform(){}
     
     // Functions included for backwards compatability with previous data types
-    std::vector<ADC_Count_t>& Waveform()         { return *this;  }
+    std::vector<ADC_Count_t>& Waveform() { return *this;  }
     
-    Channel_t   ChannelNumber() const            { return fChannel; }
-    TimeStamp_t TimeStamp() const                { return fTimeStamp; }
-    Event_t   Event() const { return fTimeStamp; }
-    Frame_t   Frame() const { return fTimeStamp; }
+    Channel_t ChannelNumber() const { return fChannel; }
+    TimeStamp_t TimeStamp() const { return fTimeStamp; }
+    Frame_t Frame() const { return fFrame; }
     
     void SetChannelNumber(Channel_t chan) { fChannel = chan; }
     void SetTimeStamp(TimeStamp_t time)   { fTimeStamp = time; }
-    void SetEvent(Channel_t chan)         { fChannel = chan; }
-    void SetFrame(TimeStamp_t time)       { fTimeStamp = time; }
+    void SetFrame(Frame_t frame) { fFrame = frame; }
 
-    inline bool operator< (const tpcdetwaveform& rhs) const
-    {
-      // Sort by channel, then time
-      if ( fChannel < rhs.ChannelNumber() ) return true;
-      if ( fChannel > rhs.ChannelNumber() ) return false;
-      
-      return ( fTimeStamp < rhs.TimeStamp() );
-    }
-    
   private:
-    
-    Channel_t   fChannel;
+
+    Channel_t fChannel;
     TimeStamp_t fTimeStamp;
-    Event_t fEvent;
     Frame_t fFrame;
   };
   
@@ -78,8 +65,17 @@ namespace larlite {
     /// Method to clear currently held data contents in the buffer
     virtual void clear_data(){event_base::clear_data(); clear();}
 
-  private:
+    const Event_t Event() const { return fEvent; }
+    const Frame_t Frame() const { return fFrame; }
+    
+    void SetEvent(Event_t event) { fEvent = event; }
+    void SetFrame(Frame_t frame) { fFrame = frame; }
 
+  private:
+    
+    Event_t fEvent;
+    Frame_t fFrame;
+    
   };
 
 }

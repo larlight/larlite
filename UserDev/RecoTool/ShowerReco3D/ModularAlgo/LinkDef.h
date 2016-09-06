@@ -27,9 +27,9 @@
 #pragma link C++ class showerreco::Angle3DFromVtx+;
 #pragma link C++ class showerreco::Angle3DFromVtxQweighted+;
 #pragma link C++ class showerreco::Filter3DDir+;
-//ADD_NEW_CLASS ... do not change this line
-
+#pragma link C++ class showerreco::CheckVtxAlignment+;
 #pragma link C++ class showerreco::ShowerRecoAlgModular+;
+
 //ADD_NEW_ALG_CLASS ... do not change this line
 #endif
 

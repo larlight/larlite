@@ -129,6 +129,7 @@ namespace flashana {
       return f;
     }
 
+    f.hypothesis = _vis_array.pe_v;
     return f;
   }
 }

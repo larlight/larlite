@@ -29,4 +29,3 @@ debug   = colored_msg.debug
 info    = colored_msg.info
 warning = colored_msg.warning
 error   = colored_msg.error
-

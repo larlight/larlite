@@ -12,7 +12,7 @@
 #pragma link C++ class std::vector<std::vector<float> >+;
 #pragma link C++ class std::vector<std::vector<double> >+;
 
-#pragma link C++ class std::pair<size_t,size_t>+;
+//#pragma link C++ class std::pair<size_t,size_t>+;
 #pragma link C++ class std::pair<unsigned short,string>+;
 #pragma link C++ class std::pair<string,bool>+;
 #pragma link C++ class std::pair<string,string>+;

@@ -89,15 +89,15 @@ bool DrawRawDigit::analyze(larlite::storage_manager* storage) {
   auto RawDigitHandle = storage->get_data<larlite::event_rawdigit>(producer);
 
   // if the tick-length set is different from what is actually stored in the ADC vector -> fix.
-  if (RawDigitHandle->size() > 0){
+  if (RawDigitHandle->size() > 0) {
     for (size_t pl = 0; pl < geoService->Nplanes(); pl++) {
       if (_y_dimensions[pl] != RawDigitHandle->at(0).ADCs().size()) {
-	_y_dimensions[pl] = RawDigitHandle->at(0).ADCs().size();
+        _y_dimensions[pl] = RawDigitHandle->at(0).ADCs().size();
       }
     }
   }
   initDataHolder();
-  
+
   run = RawDigitHandle->run();
   subrun = RawDigitHandle->subrun();
   event = RawDigitHandle->event_id();
@@ -249,7 +249,7 @@ void DrawRawDigit::correctData() {
       int nSteps = geoService -> Nwires(p) / stepSize.at(p);
       _subtractionWaveForm.at(p).resize(nSteps);
       for (auto & vec : _subtractionWaveForm.at(p))
-	vec.resize(_y_dimensions[0]);
+        vec.resize(_y_dimensions[0]);
       //vec.resize(detProp->ReadOutWindowSize());
     }
   }

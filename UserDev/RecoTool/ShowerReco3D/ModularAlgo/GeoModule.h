@@ -28,13 +28,15 @@ class GeoModule : ShowerRecoModuleBase {
 public:
 
   /// Default constructor
-  GeoModule() {_name = "GeoModule";}
+  GeoModule();
 
   /// Default destructor
   ~GeoModule() {}
 
 
   void do_reconstruction(const ::protoshower::ProtoShower &, Shower_t &);
+
+  void setFlipShowerDirection(bool on) { _flip_showers = on; }
 
 private:
 
@@ -46,6 +48,9 @@ private:
 
   // Get the opening angle:
   void fillAngle(const ShowerClusterSet_t & inClusters, Shower_t & result);
+
+  // allow for the option to flip shower direction
+  bool _flip_showers;
 
 };
 

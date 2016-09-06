@@ -1036,7 +1036,24 @@ int GeometryHelper::GetYZ(const Point2D *p0, const Point2D *p1, Double_t* yz) co
 
   return 0;
 }
+  
+  bool GeometryHelper::Contained(const double& x, const double& y, const double& z) const {
 
+    // if x out of bounds
+    if ( (x < 0) or (x > 2*geom->DetHalfWidth()) )
+      return false;
+
+    // if y out of bounds
+    if ( (y < -geom->DetHalfHeight()) or (y> geom->DetHalfHeight()) )
+      return false;
+
+    // if z out of bounds
+    if ( (z < 0) or (z > geom->DetLength()) )
+      return false;
+
+    return true;
+  }
+  
 
 } // larutil
 

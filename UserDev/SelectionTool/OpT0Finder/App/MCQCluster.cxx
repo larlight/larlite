@@ -2,28 +2,27 @@
 #define MCQCLUSTER_CXX
 
 #include "MCQCluster.h"
+#include "OpT0Finder/Base/OpT0FinderException.h"
 #include "LArUtil/LArProperties.h"
 #include "DataFormat/mctrack.h"
 #include "DataFormat/mcshower.h"
 #include "OpT0Finder/Base/OpT0FinderTypes.h"
 #include "GeoAlgo/GeoVector.h"
-
+#include "GeoAlgo/GeoAlgo.h"
 namespace flashana {
 
   MCQCluster::MCQCluster(const std::string name)
     : BaseAlgorithm( kCustomAlgo, name )
-    , _light_yield ( 29000 )
-    , _step_size   ( 0.5   )
     , _use_xshift  ( true  )
   {}
 
   void MCQCluster::Configure(const ::fcllite::PSet &pset)
   {
-    _light_yield = pset.get<double>("LightYield");
-    _step_size   = pset.get<double>("StepSize");
-    _use_light_path = pset.get<bool>("UseLightPath");
+    _use_mc_dedx = pset.get<bool>("UseMCdEdX");
+    _use_xshift  = pset.get<bool>("UseXShift");
     _op_RO_start = pset.get<float>("OpROStart");
     _op_RO_end   = pset.get<float>("OpROEnd");
+    _extension   = pset.get<double>("Extension");
   }
 
   const std::vector<flashana::QCluster_t>& MCQCluster::QClusters() const
@@ -68,7 +67,8 @@ namespace flashana {
   }
 
   void MCQCluster::Construct( const ::larlite::event_mctrack& ev_mct,
-                              const ::larlite::event_mcshower& ev_mcs )
+                              const ::larlite::event_mcshower& ev_mcs,
+			      const ::flashana::LightPath& lightpath)
   {
 
     //
@@ -82,16 +82,6 @@ namespace flashana {
     _mctrack_2_qcluster.clear();
     _mcshower_2_qcluster.clear();
     _qcluster_v.clear();
-
-    //  std::cout<<"All track ancestors: "<<std::endl;
-    //  for (size_t mct_index = 0; mct_index < ev_mct.size(); mct_index++)
-    //    std::cout<<ev_mct[mct_index].AncestorTrackID()<<", ";
-    //
-    //    std::cout<<"\n\nAll track ids: "<<std::endl;
-    //  for (size_t mct_index = 0; mct_index < ev_mct.size(); mct_index++) {
-    //      if (ev_mct[mct_index].size() )
-    //     std::cout<<", ("<<ev_mct[mct_index].TrackID()<<", "<<ev_mct[mct_index].AncestorTrackID()<<") ";
-    //  }
 
     //
     // 1) Loop over mctrack
@@ -121,110 +111,182 @@ namespace flashana {
 
       _mctrack_2_qcluster.push_back(qcluster_index);
 
-
-//      std::cout<<" what's our idx: "<<_qcluster_2_mcobject.back().index_id<<", and size of thing: "<<_qcluster_2_mcobject.size()<<", "<<qcluster_index<<std::endl ;
-
       auto& tpc_obj = _qcluster_v[qcluster_index];
       auto& tpc_src = _qcluster_2_mcobject[qcluster_index];
 
       if (trk.size() <= 2) continue;
 
-      // per track calculate the shift in x-direction
-      // so that the x-position is what would be seen
-      // in the TPC, not the truth x-position
-      // Some constants needed
-      double det_drift_velocity = ::larutil::LArProperties::GetME()->DriftVelocity(); ///< cm/us
-      double event_time = trk[0].T(); // ns
-      double shift_x = event_time * det_drift_velocity * pow(10, -3); //cm
       tpc_obj.reserve(tpc_obj.size() + trk.size());
 
-
-      if (_use_light_path) {
-
-        //_lightpath_clustering.SetXOffset(shift_x);
-
-        ::geoalgo::Trajectory mctraj;
-        for (size_t i = 0; i < trk.size(); ++i)
-	  //Instead of adding x shift in LightPath, now add x shift line below
-	  mctraj.push_back(::geoalgo::Vector(trk.at(i).X()+shift_x, trk.at(i).Y(), trk.at(i).Z()));
-
-        auto qclus = _lightpath_clustering.FlashHypothesis(mctraj);
-
-        for ( auto const & c : qclus )
-          tpc_obj.emplace_back(c) ;
-
-      }
-
-      else {
-
-        // Now loop over all mctracks that share an ancestor and treat
-        // them as one interaction
-        ::geoalgo::Point_t step_dir(0, 0, 0);
-
-        for (size_t step_index = 0; (step_index + 1) < trk.size(); ++step_index) {
-
-          auto const& pt1 = trk[step_index];
-          auto const& pt2 = trk[step_index + 1];
-
-          double dx = pt2.X() - pt1.X();
-          double dy = pt2.Y() - pt1.Y();
-          double dz = pt2.Z() - pt1.Z();
-          double e_diff = pt1.E() - pt2.E();
-          tpc_src.energy_deposit += e_diff;
-
-          //std::cout<<"\nOld X, Y, Z, Q: "<<pt1.X() + dx/2. +shift_x<<", "<<pt1.Y()+dy/2.<<", "<<pt1.Z()+dz/2.<<", "<<(pt1.E() - pt2.E())<<std::endl ;
-
-          double distance = sqrt(pow(dx, 2) + pow(dy, 2) + pow(dz, 2));
-          double dedx = e_diff / distance;
-          //dedx = 2.3;
-          step_dir[0] = dx;
-          step_dir[1] = dy;
-          step_dir[2] = dz;
-          step_dir.Normalize();
-
-          // Create individual points
-          size_t n_segments = size_t( distance / _step_size ) + 1;
-          _n = _n + n_segments;
-          tpc_obj.reserve(n_segments + tpc_obj.size());
-          for (size_t segment_index = 1; segment_index <= n_segments; ++segment_index) {
-
-            QPoint_t pt;
-
-            if (segment_index != n_segments) {
-              pt.q = _light_yield * dedx * _step_size;
-
-              if ( _use_xshift)pt.x = pt1.X() + step_dir[0] * _step_size * (segment_index - 0.5) + shift_x;
-              if (!_use_xshift)pt.x = pt1.X() + step_dir[0] * _step_size * (segment_index - 0.5);
-              pt.y = pt1.Y() + step_dir[1] * _step_size * (segment_index - 0.5);
-              pt.z = pt1.Z() + step_dir[2] * _step_size * (segment_index - 0.5);
-//      std::cout<<"pt.x in MCQCluster: "<<pt.x<<std::endl ;
-              tpc_obj.emplace_back(pt);
-            }
-            else if (segment_index == n_segments && (distance - _step_size * (n_segments - 1)) != 0) {
-              double offset = _step_size * (segment_index - 1);
-              double remain = distance - offset;
-
-              pt.q = _light_yield * dedx * remain;
-              if ( _use_xshift)pt.x = pt1.X() + step_dir[0] * (offset + remain / 2.) + shift_x;
-              if (!_use_xshift)pt.x = pt1.X() + step_dir[0] * (offset + remain / 2.);
-              pt.y = pt1.Y() + step_dir[1] * (offset + remain / 2.);
-              pt.z = pt1.Z() + step_dir[2] * (offset + remain / 2.);
-//      std::cout<<"pt.x in MCQCluster: "<<pt.x<<", "<<distance << std::endl ;
-              tpc_obj.emplace_back(pt);
-              break;
-            }
-//      std::cout<<"pt.x in MCQCluster: "<<pt.x<<", "<<segment_index<<std::endl ;
-
-          }// Finish looping over segments
-        }// Finish looping over mctrack trajectory points
-      }// Else if use mcqcluster
+      ExpandQCluster(lightpath,trk,tpc_obj);
+      
     } // Finish looping over mctracks
-    //std::cout<<"size in MCQCluster output is "<<_n<<std::endl;
-    _n = 0;
+
     //
     // MCShower treatment to be added
     //
   }// EOF
+
+  void MCQCluster::ExpandQCluster(const flashana::LightPath& lightpath,
+				  const larlite::mctrack& mct,
+				  flashana::QCluster_t& tpc_obj) {
+
+    if(mct.size() < 2) return;
+    // per track calculate the shift in x-direction
+    // so that the x-position is what would be seen
+    // in the TPC, not the truth x-position
+    // Some constants needed
+    double det_drift_velocity = ::larutil::LArProperties::GetME()->DriftVelocity(); ///< cm/us
+    double event_time = mct[0].T(); // ns
+    double shift_x = event_time * det_drift_velocity * pow(10, -3); //cm
+
+    ::geoalgo::Vector pt0(0.,0.,0.); // variable to be used in this function
+    ::geoalgo::Vector pt1(0.,0.,0.); // variable to be used in this function
+
+    //
+    // Add body
+    //
+    for(size_t step_idx=0; step_idx<(mct.size()-1); ++step_idx) {
+
+      pt0[0] = mct[step_idx].X();
+      pt0[1] = mct[step_idx].Y();
+      pt0[2] = mct[step_idx].Z();
+
+      pt1[0] = mct[step_idx+1].X();
+      pt1[1] = mct[step_idx+1].Y();
+      pt1[2] = mct[step_idx+1].Z();
+
+      if(_use_xshift) {
+	pt0[0] += shift_x;
+	pt1[0] += shift_x;
+      }
+
+      if(!_use_mc_dedx) lightpath.QCluster(pt0,pt1,tpc_obj);
+      else {
+	double dedx = (mct[step_idx].E() - mct[step_idx+1].E())/pt1.Dist(pt0);
+	lightpath.QCluster(pt0,pt1,tpc_obj,dedx);
+      }
+    }
+
+    //
+    // Inspect "start edge"
+    //
+    ::geoalgo::GeoAlgo alg;
+    auto const& tpc_vol = ActiveVolume();
+    pt0[0] = mct[0].X(); pt0[1] = mct[0].Y(); pt0[2] = mct[0].Z();
+    if(!tpc_vol.Contain(pt0)) {
+      // start point outside TPC! Make sure to include enough distance
+      // 0) find first contained point
+      // 1) find crossing point
+      // 2) calculate cumulative distance from 1st point to crossing point
+      // 3) if needed, add an extra point to cover distance to be _extend_range
+
+      // 0) find 1st contained point
+      size_t idx=1;
+      for(idx=1; idx<mct.size(); ++idx) {
+	auto const& step = mct[idx];
+	pt1[0] = step.X(); pt1[1] = step.Y(); pt1[2] = step.Z();
+	if(tpc_vol.Contain(pt1)) break;
+      }
+      if(idx==mct.size()) throw OpT0FinderException("All points outside the active volume!");
+      
+      // 1) find crossing point
+      pt0[0] = mct[idx-1].X(); pt0[1] = mct[idx-1].Y(); pt0[2] = mct[idx-1].Z();
+      auto xs_pt_v = alg.Intersection(tpc_vol,::geoalgo::LineSegment(pt0,pt1));
+      if(xs_pt_v.empty()) throw OpT0FinderException("Logic error: crossing point not found!");
+      auto const& xs_pt = xs_pt_v[0];
+
+      // 2) calculate cumulative distance
+      double dist_sum=0;
+      pt1[0] = mct[0].X(); pt1[1] = mct[0].Y(); pt1[2] = mct[0].Z();
+      for(size_t i=0; i<(idx-1); ++i) {
+	pt0[0] = mct[i  ].X(); pt0[1] = mct[i  ].Y(); pt0[2] = mct[i  ].Z();
+	pt1[0] = mct[i+1].X(); pt1[1] = mct[i+1].Y(); pt1[2] = mct[i+1].Z();
+	dist_sum += pt0.Dist(pt1);
+      }
+      dist_sum += pt1.Dist(xs_pt);
+
+      // 3) see if we need to extend
+      if(dist_sum < _extension) {
+	//Extend in first 2 points' direction
+	pt0[0] = mct[0].X(); pt0[1] = mct[0].Y(); pt0[2] = mct[0].Z();
+	pt1[0] = mct[1].X(); pt1[1] = mct[1].Y(); pt1[2] = mct[1].Z();
+	pt1 = pt0 - pt1; // now pt1 is a direction vector (not normalized)
+	pt0 = pt0 + pt1.Dir() * (_extension - dist_sum); // pt0 is not extended point
+	pt1[0] = mct[0].X(); pt1[1] = mct[0].Y(); pt1[2] = mct[0].Z(); // pt1 is now start point
+	if(!_use_mc_dedx) lightpath.QCluster(pt0,pt1,tpc_obj);
+	else {
+	  double step_dist = sqrt(pow(mct[0].X() - mct[1].X(),2) +
+				  pow(mct[0].Y() - mct[1].Y(),2) +
+				  pow(mct[0].Z() - mct[1].Z(),2));
+	  double dedx = -1;
+	  if(step_dist > 0.1)
+	    dedx = (mct[0].E() - mct[1].E()) / step_dist;
+	  lightpath.QCluster(pt0,pt1,tpc_obj,dedx);
+	}
+      }
+    }
+
+    //
+    // Inspect "end edge"
+    //
+    const size_t end_idx=mct.size()-1;
+    pt0[0] = mct[end_idx].X(); pt0[1] = mct[end_idx].Y(); pt0[2] = mct[end_idx].Z();
+    if(!tpc_vol.Contain(pt0)) {
+      // start point outside TPC! Make sure to include enough distance
+      // 0) find first contained point
+      // 1) find crossing point
+      // 2) calculate cumulative distance from 1st point to crossing point
+      // 3) if needed, add an extra point to cover distance to be _extend_range
+
+      // 0) find 1st contained point
+      size_t idx=mct.size()-2;
+      for(idx=mct.size()-2; idx>=0; --idx) {
+	auto const& step = mct[idx];
+	pt1[0] = step.X(); pt1[1] = step.Y(); pt1[2] = step.Z();
+	if(tpc_vol.Contain(pt1)) break;
+	if(!idx) break;
+      }
+      if(idx==mct.size()) throw OpT0FinderException("All points outside the active volume!");
+      
+      // 1) find crossing point
+      pt0[0] = mct[idx+1].X(); pt0[1] = mct[idx+1].Y(); pt0[2] = mct[idx+1].Z();
+      auto xs_pt_v = alg.Intersection(tpc_vol,::geoalgo::LineSegment(pt0,pt1));
+      if(xs_pt_v.empty()) throw OpT0FinderException("Logic error: crossing point not found!");
+      auto const& xs_pt = xs_pt_v[0];
+
+      // 2) calculate cumulative distance
+      double dist_sum=0;
+      pt1[0] = mct[end_idx].X(); pt1[1] = mct[end_idx].Y(); pt1[2] = mct[end_idx].Z();
+      for(size_t i=end_idx; i>idx; --i) {
+	pt0[0] = mct[i  ].X(); pt0[1] = mct[i  ].Y(); pt0[2] = mct[i  ].Z();
+	pt1[0] = mct[i-1].X(); pt1[1] = mct[i-1].Y(); pt1[2] = mct[i-1].Z();
+	dist_sum += pt0.Dist(pt1);
+      }
+      dist_sum += pt1.Dist(xs_pt);
+
+      // 3) see if we need to extend
+      if(dist_sum < _extension) {
+	//Extend in first 2 points' direction
+	pt0[0] = mct[end_idx  ].X(); pt0[1] = mct[end_idx  ].Y(); pt0[2] = mct[end_idx  ].Z();
+	pt1[0] = mct[end_idx-1].X(); pt1[1] = mct[end_idx-1].Y(); pt1[2] = mct[end_idx-1].Z();
+	pt1 = pt0 - pt1; // now pt1 is a direction vector (not normalized)
+	pt0 = pt0 + pt1.Dir() * (_extension - dist_sum); // pt0 is not extended point
+	pt1[0] = mct[end_idx].X(); pt1[1] = mct[end_idx].Y(); pt1[2] = mct[end_idx].Z(); // pt1 is now end point
+	if(!_use_mc_dedx) lightpath.QCluster(pt0,pt1,tpc_obj);
+	else {
+	  double step_dist = sqrt(pow(mct[end_idx].X() - mct[end_idx-1].X(),2) +
+				  pow(mct[end_idx].Y() - mct[end_idx-1].Y(),2) +
+				  pow(mct[end_idx].Z() - mct[end_idx-1].Z(),2));
+	  double dedx = -1;
+	  if(step_dist>0.1)
+	    dedx = (mct[end_idx-1].E() - mct[end_idx].E()) / step_dist;
+	  lightpath.QCluster(pt0,pt1,tpc_obj,dedx);
+	}
+      }
+    }
+    
+  }
 
   void MCQCluster::Swap(std::vector<flashana::QCluster_t>&& qcluster_v,
                         std::vector<flashana::MCSource_t>&& source_v)

@@ -55,7 +55,7 @@ fig, ax = plt.subplots(1,1,figsize=(20,8))
 while ( my_proc.process_event() ):
     
     # loop through all channels
-    for chan in xrange(8256):
+    for chan in xrange(4800,8256):
         
         # make sure there is information stored at this channel
         if (hitcheck.hasHits(chan) == False):
@@ -87,6 +87,7 @@ while ( my_proc.process_event() ):
             print 'Hit integral : %.02f'%hitIntegral
             plt.plot(times,adcs,'ro',label='Hit Gauss Fit')
             plt.axvspan(hit.PeakTime()-3*hit.RMS(),hit.PeakTime()+3*hit.RMS(),color='r',alpha=0.5,label='Simch integration Region')
+            plt.xlim([hit.PeakTime()-10*hit.RMS(),hit.PeakTime()+10*hit.RMS()])
 
         qtot = 0
         ideTime   = []

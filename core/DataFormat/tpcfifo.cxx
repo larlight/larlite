@@ -9,14 +9,6 @@ namespace larlite {
   tpcfifo::tpcfifo() : fifo::fifo()
   //***************************************************************************
   {
-
-    // if(_type!=DATA::TPCFIFO) {
-      
-    //   Message::send(MSG::ERROR,__FUNCTION__,
-    // 		    Form("Provided data type (%s) not supported! Reset to default.",DATA::DATA_TREE_NAME[_type].c_str()));
-    //   _type=DATA::TPCFIFO;
-    // }
-
     clear_data();
   }
 
@@ -38,16 +30,6 @@ namespace larlite {
     _plane=larlite::geo::kUnknown;
     _signal=larlite::geo::kMysteryType;
   }
-
-  ////////////////////////////////////////////////////////
-
-  //***************************************************************************
-  // event_tpcfifo::event_tpcfifo(data::DataType_t type) : std::vector<larlite::tpcfifo>(), 
-  //   event_base(type)
-  // //***************************************************************************
-  // { 
-  //   clear_data();
-  // }
 
   //***************************************************************************  
   void event_tpcfifo::clear_data(){

@@ -17,6 +17,7 @@
 
 #pragma link C++ class protoshower::ProtoShowerAlgArgoNeuT+;
 #pragma link C++ class protoshower::ProtoShowerAlgClusterParams+;
+#pragma link C++ class protoshower::ProtoShowerAlgClusterParams_Vtx+;
 #pragma link C++ class protoshower::ProtoShowerAlgOpenCV+;
 #pragma link C++ class protoshower::ProtoShowerAlgLoadVertex+;
 //ADD_NEW_CLASS ... do not change this line

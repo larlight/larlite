@@ -54,46 +54,29 @@ namespace larlite {
 
     void UseMC(bool doit=true) { _use_mc = doit; }
 
-    void SetROStart(double t) { _RO_start = t; }
-    void SetROEnd(double t)   { _RO_end = t; }
-
-    void SetTrigTime(double t) { _Trig_time = t; }
-
-    void SetEDiff(double e) { _e_diff = e ; }
-
-    void UseAbsolutePE(bool tof) { _useAbsPE = tof ; }
-
-    void SetStepLength(double step){ _step_len = step ; }
-
-    void UseLightPathWithMC (bool yesOrNo ){ _use_light_path_w_mc = yesOrNo ; } 
-
     void UseBNBCorrectnessWindow (bool yesOrNo){ _use_bnb_correctness_window = yesOrNo; }
+
+    const std::vector<flashana::FlashMatch_t> MatchResult() const { return _result; }
+
+    void ShiftFlashTime(double v) {_shift_flash_time=v;}
+
+    void OpHitProducer(const std::string name) { _ophit_producer = name; }
+
+    void OpFlashProducer(const std::string name) { _opflash_producer = name; }
 
   protected:
 
     ::flashana::FlashMatchManager _mgr;
-    ::flashana::MCQCluster _mcqclustering;
+    double _shift_flash_time;
 
-    //Switch -- if set to true, Light path will be used with mctrack
-    bool _use_light_path_w_mc;
-
-    // readout start : 
-    // time before the trigger when the RO start
-    double _RO_start; // us
-    // readout end :
-    // time after the trigger when the RO ends
-    double _RO_end; // us
-    // trigger time
-    // the time at which, within the TPC readout
-    // the trigger should arrive
-    // for MC this is generally 0
-    double _Trig_time; // us
+    std::vector<flashana::FlashMatch_t> _result;
 
     // Configurable params
     bool _use_mc;
-    bool _useAbsPE ;
-    double _step_len ;
-    double _e_diff ; //Energy difference cut between start and end of track.  
+    //bool _useAbsPE ;
+    //double _step_len ;
+    std::string _opflash_producer;
+    std::string _ophit_producer;
 
     TTree* _int_tree;
     double _t0 ;

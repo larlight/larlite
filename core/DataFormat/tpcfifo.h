@@ -52,7 +52,6 @@ namespace larlite {
 						   module_address,
 						   module_id,
 						   fem::kDISC_MAX,
-						   //type,
 						   wf)
     { _plane = plane;  _signal = signaltype; }
     

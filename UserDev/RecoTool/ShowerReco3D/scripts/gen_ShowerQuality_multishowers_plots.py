@@ -113,6 +113,10 @@ plt.savefig('%s/dEdx_resolution_multishower.png'%output_directory)
 #plt.savefig('%s/length_energy_correlation_Yplane_multishower.png'%(output_directory))
 #plt.show()
 
+# reco efficiency for good angle & good dir showers
+fig = reco_efficiency_vsenergy_multishower_plot(shower_df)
+plt.savefig('%s/reco_efficiency_vsenergy_goodangle_gooddir_multishower.png'%output_directory)
+
 # reco efficiency for good angle showers
 fig = reco_efficiency_vsenergy_goodangle_plot(shower_df)
 plt.savefig('%s/reco_efficiency_vsenergy_goodangle_multishower.png'%output_directory)
