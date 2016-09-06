@@ -84,6 +84,13 @@ namespace protoshower {
 
 	// fill 2D information, if available
 	for (size_t i = 0; i < cluster_v.size(); i++) {
+
+	  // are there hits?
+	  if (cluster_hits_v_v[i].size() == 0){
+	    proto_shower.hasCluster2D(false);
+	    break;
+	  }
+	  
 	  _cru_helper.GenerateParams( cluster_hits_v_v[i], proto_shower._params.at( i ) );
 	  _params_alg->FillParams( proto_shower._params.at( i ) );
 
