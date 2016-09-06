@@ -78,7 +78,6 @@ namespace larlite {
     std::string _pfpart_producer;
 
     ::flashana::FlashMatchManager _mgr;
-    ::flashana::MCQCluster _mcqclustering;
 
     // set minimum PE required for a flash to be used
     double _min_PE;

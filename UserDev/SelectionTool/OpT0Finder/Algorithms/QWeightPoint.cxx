@@ -80,15 +80,16 @@ namespace flashana {
 	f.tpc_point.x = f.tpc_point.y = 0;
 	f.tpc_point.q = vis_pe_sum;
 
-	for(size_t pmt_index=0; pmt_index<NOpDets(); ++pmt_index) {
-	  
-	  f.tpc_point.x += OpDetX(pmt_index) * _vis_array.pe_v[pmt_index] / vis_pe_sum;
-	  f.tpc_point.y += OpDetY(pmt_index) * _vis_array.pe_v[pmt_index] / vis_pe_sum;
-	}
+	f.tpc_point.x = x_offset;
 
-	f.tpc_point.z = weighted_z;
+	for(size_t pmt_index=0; pmt_index<NOpDets(); ++pmt_index)
+	  f.tpc_point.y += OpDetY(pmt_index) * _vis_array.pe_v[pmt_index] / vis_pe_sum;
+
+	f.tpc_point.z = weighted_z;	
       }
     }
+
+    f.hypothesis.clear();
     
     if(_verbosity <= msg::kINFO) {
       std::stringstream ss1;
@@ -101,13 +102,13 @@ namespace flashana {
   
     // If min-diff is bigger than assigned max, return default match (score<0)
     if( min_dz > _zdiff_max ) {
-      
       f.tpc_point.x = f.tpc_point.y = f.tpc_point.z = -1;
       f.tpc_point.q = -1;
       f.score = -1;
       return f;
     }
 
+    f.hypothesis = _vis_array.pe_v;
     return f;
 
   }

@@ -53,8 +53,13 @@ namespace flashana {
 
     // Other algorithms
     case kCustomAlgo:
-      _custom_alg_v.push_back(alg);
-
+      if(_custom_alg_m.find(alg->AlgorithmName()) != _custom_alg_m.end()) {
+	std::stringstream ss;
+	ss << "Duplicate name: " << alg->AlgorithmName() << std::endl;
+	throw OpT0FinderException(ss.str());
+      }
+      _custom_alg_m[alg->AlgorithmName()] = alg;
+      break;
     // Fuck it
     default:
       std::stringstream ss;
@@ -65,7 +70,14 @@ namespace flashana {
 
 
   void FlashMatchManager::AddCustomAlgo(BaseAlgorithm* alg)
-  { _custom_alg_v.push_back(alg); }
+  {
+    if(_custom_alg_m.find(alg->AlgorithmName()) != _custom_alg_m.end()) {
+      std::stringstream ss;
+      ss << "Duplicate name: " << alg->AlgorithmName() << std::endl;
+      throw OpT0FinderException(ss.str());
+      }
+    _custom_alg_m[alg->AlgorithmName()] = alg;
+  }
 
   void FlashMatchManager::Configure(const std::string cfg_file)
   {
@@ -145,14 +157,14 @@ namespace flashana {
       _alg_flash_match->SetFlashHypothesis(_alg_flash_hypothesis);
     }
 
-    for (auto& custom_alg : _custom_alg_v) {
+    for (auto& name_ptr : _custom_alg_m) {
 
-      custom_alg->Configure(main_cfg.get_pset(custom_alg->AlgorithmName()));
-      custom_alg->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
-      custom_alg->SetActiveVolume( det_xrange[0], det_xrange[1],
-                                   det_yrange[0], det_yrange[1],
-                                   det_zrange[0], det_zrange[1] );
-
+      name_ptr.second->Configure(main_cfg.get_pset(name_ptr.first));
+      name_ptr.second->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
+      name_ptr.second->SetActiveVolume( det_xrange[0], det_xrange[1],
+					det_yrange[0], det_yrange[1],
+					det_zrange[0], det_zrange[1] );
+      
     }
 
     _configured = true;
@@ -195,6 +207,15 @@ namespace flashana {
     return nullptr;
   }
 
+  flashana::BaseAlgorithm* FlashMatchManager::GetCustomAlgo(std::string name)
+  {
+    if(_custom_alg_m.find(name) == _custom_alg_m.end()) {
+      Print(msg::kERROR,__FUNCTION__,Form("Algorithm name %s not found!",name.c_str()));
+      throw OpT0FinderException();
+    }
+    return _custom_alg_m[name];
+  }
+
   void FlashMatchManager::Add(flashana::QCluster_t& obj)
   { _tpc_object_v.push_back(obj); }
 
@@ -210,7 +231,9 @@ namespace flashana {
   // CORE FUNCTION
   std::vector<FlashMatch_t> FlashMatchManager::Match()
   {
-
+    // Create also a result container
+    std::vector<FlashMatch_t> result;
+    
     if (!_alg_flash_match)
       throw OpT0FinderException("Flash matching algorithm is reuqired! (not attached)");
     if (!_alg_flash_hypothesis)
@@ -218,6 +241,8 @@ namespace flashana {
 
     if (!_configured)
       Configure(_config_file);
+
+    if(_tpc_object_v.empty() || _flash_v.empty()) return result;
 
     //
     // Filter stage: for both TPC and Flash
@@ -311,8 +336,6 @@ namespace flashana {
 
     // Create a std::set of tpc/flash IDs to keep track of already-matched tpc/flash input.
     std::set<ID_t> tpc_used, flash_used;
-    // Create also a result container
-    std::vector<FlashMatch_t> result;
     result.reserve(tpc_index_v.size());
     // Loop over score map created with matching algorithm
     for (auto& score_info : score_map) {
@@ -370,9 +393,9 @@ namespace flashana {
     std::cout << "_alg_flash_match?" << std::endl;
     if (_alg_flash_match)
       std::cout << "\t" << _alg_flash_match->AlgorithmName() << std::endl;
-    std::cout << "_custom_alg_v?" << std::endl;
-    for (auto& custom_alg : _custom_alg_v)
-      std::cout << "\t" << custom_alg->AlgorithmName() << std::endl;
+    std::cout << "_custom_alg_m?" << std::endl;
+    for (auto& name_ptr : _custom_alg_m)
+      std::cout << "\t" << name_ptr.first << std::endl;
     std::cout << "---- END FLASH MATCH MANAGER PRINTING CONFIG ----" << std::endl;
 
 

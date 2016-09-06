@@ -40,7 +40,8 @@ namespace flashana {
     void Configure(const ::fcllite::PSet &pset);
 
     void Construct( const larlite::event_mctrack&,
-                    const larlite::event_mcshower& );
+                    const larlite::event_mcshower&,
+		    const flashana::LightPath&);
 
     const std::vector<flashana::QCluster_t>& QClusters() const;
 
@@ -54,8 +55,6 @@ namespace flashana {
      
     const flashana::MCSource_t& MCObjectID(size_t) const;
 
-    void SetUseLightPath ( bool use_light_path ) { _use_light_path = use_light_path ; } 
-
     #ifndef __CINT__
     void Swap(std::vector<flashana::QCluster_t>&&,
 	      std::vector<flashana::MCSource_t>&&);
@@ -66,18 +65,18 @@ namespace flashana {
 				   const larlite::event_mctrack&,
 				   const larlite::event_mcshower& ) const;
 
-    mutable int _n;
-    
-    double _light_yield;
-    double _step_size;
+    void ExpandQCluster(const flashana::LightPath& lightpath,
+			const larlite::mctrack& mct,
+			flashana::QCluster_t& tpc_obj);
+
     bool _use_xshift;
+    double _extension;
     std::vector<flashana::QCluster_t> _qcluster_v;
     std::vector<size_t> _mctrack_2_qcluster;
     std::vector<size_t> _mcshower_2_qcluster;
     std::vector<flashana::MCSource_t> _qcluster_2_mcobject;
 
-    flashana::LightPath _lightpath_clustering ;
-    bool _use_light_path ;
+    bool  _use_mc_dedx;
     float _op_RO_start ;
     float _op_RO_end ;
 

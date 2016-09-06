@@ -6,6 +6,12 @@
 
 namespace showerreco {
 
+  GeoModule::GeoModule()
+  {
+    _name        = "GeoModule";
+    _flip_showers = true;
+  }
+
 void GeoModule::do_reconstruction(const ::protoshower::ProtoShower & proto_shower,
                                   Shower_t& resultShower) {
   
@@ -126,7 +132,8 @@ void GeoModule::fillLength(const ShowerClusterSet_t & clusters, Shower_t & resul
 
   if (length < 0) {
     resultShower.fLength = - length;
-    resultShower.fDCosStart *= -1;
+    if (_flip_showers)
+      resultShower.fDCosStart *= -1;
   }
   else {
     resultShower.fLength = length;

@@ -24,7 +24,7 @@ namespace larutil {
   {
     fG4RefTime        = -4.05e3;
     fFramePeriod      =  1.6e3;
-    fTriggerOffsetTPC = -1.6e3;
+    fTriggerOffsetTPC = -0.4e3;
     fTriggerTime      =  4.05e3;
     fBeamGateTime     =  4.05e3;
 
