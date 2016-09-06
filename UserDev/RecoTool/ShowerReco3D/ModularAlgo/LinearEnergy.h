@@ -43,6 +43,15 @@ public:
 
     void SetFillTree(bool on) { _fill_tree = on; }
 
+    /// set electron lifetime [ms]
+    void SetElectronLifetime(double t) { _tau = t; }
+
+    /// set recombination factor
+    void SetRecombFactor(double r) { _recomb_factor = r; }
+
+    /// use custom calibration constants [ ADC to fC ]
+    void SetCalibrationConst(double c) { _ADC_to_fC = c; CalculateEnergyConversion(); _custom_calib = true; }
+
     void initialize();
 
     // set plane-dependent gains
@@ -72,6 +81,8 @@ public:
 
     /// flag to decide if to use the ModBox or Birks models
     bool _useModBox;
+    /// use custom calibration constants
+    bool _custom_calib;
 
     /// boolean on whether to fill tree or not
     bool _fill_tree;
@@ -83,8 +94,8 @@ public:
     double _ADC_to_mV;
     double _shp_time;
     double _asic_gain;
-    double _energy_conversion;
-    double _charge_conversion;
+    double _ADC_to_MeV;
+    double _ADC_to_fC;
     double _tau; // electron lifetime in usec
     double _timetick; // sampling size in usec
     double _recomb_factor; // factor by which charge should be suppresse0d due to recombination effects...
@@ -105,6 +116,10 @@ public:
     // this is clustering-algirhm specific. how much charge misses, on average, for a cluster?
     // account for this factor using this calibration constant
     std::vector<double> _ClusteringCorrection_v;
+
+
+    // calculate ADC (per-hit) to MeV conversion factor
+    void CalculateEnergyConversion() { _ADC_to_MeV = _ADC_to_fC * _fC_to_e * _e_to_eV * _eV_to_MeV; }
 
 };
 

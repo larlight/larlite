@@ -16,24 +16,41 @@ LinearEnergy::LinearEnergy()
 {
 
   _name = "LinearEnergy";
-  _useArea = true;
-  _useModBox = true;
-  _fill_tree = false;
+  _useArea     = true;
+  _useModBox   = true;
+  _custom_calib = false;
+  _fill_tree   = false;
   _caloAlg = ::calo::CalorimetryAlg();
   _caloAlg.setUseModBox(true);
-  _fC_to_e = 6250.; // a fC in units of the electron charge
-  _e_to_eV = 23.6;  // ionization energy of Ar in eV
-  _eV_to_MeV = 1e-6; // eV -> MeV conversion
+  _fC_to_e = 6250.; // e- / fC
+  _e_to_eV = 23.6;  // eV / e-
+  _eV_to_MeV = 1e-6;// eV / MeV 
   _ADC_to_mV = 0.5; // ADC -> mV conversion from gain measurements
   // to go from mV to fC the ASIC gain and Shaping time
   // must be considered
   // fC -> mV *= ( shaping time * ASIC gain )
   _shp_time  = 2.; // in usec
-  _asic_gain = 7.8; // in mV/fC
-
+  _asic_gain = 14; // in mV/fC
+  _ADC_to_fC = _ADC_to_mV / ( _shp_time * _asic_gain ) ;
+  CalculateEnergyConversion();
+    
   //  set calibrations to be equal to 1 for now
   _HitRecoCorrection_v    = std::vector<double>(3,1.);
   _ClusteringCorrection_v = std::vector<double>(3,1.);
+
+  // ELECTRON LIFETIME
+  _tau = larutil::LArProperties::GetME()->ElectronLifetime();
+  std::cout << "Lifetime = " << _tau << std::endl;
+
+  // RECOMBINATION FACTOR
+  _recomb_factor = 1.;
+  double MeV_to_fC = 1. / ( _e_to_eV * _eV_to_MeV );
+  double MIP = 2.3; // MeV/cm
+  if (_useModBox)
+    _recomb_factor = larutil::LArProperties::GetME()->ModBoxInverse(MIP) / ( MIP * MeV_to_fC );
+  else
+    _recomb_factor = larutil::LArProperties::GetME()->BirksInverse(MIP) / ( MIP * MeV_to_fC );
+
   
   return;
 }
@@ -51,35 +68,15 @@ void LinearEnergy::initialize()
     _tree->Branch("_tick_v","std::vector<double>",&_tick_v);
   }
 
-  _charge_conversion = _ADC_to_mV / ( _shp_time * _asic_gain ) ;
-  //_charge_conversion = _ADC_to_mV / _asic_gain;
 
-  _energy_conversion = _charge_conversion * _fC_to_e * _e_to_eV * _eV_to_MeV;
 
-  _tau = larutil::LArProperties::GetME()->ElectronLifetime();        // electron lifetime in usec
-  std::cout << "Lifetime = " << _tau << std::endl;
-  _recomb_factor = 1.;
-  double MeV_to_fC = 1. / ( _e_to_eV * _eV_to_MeV );
-  double MIP = 2.3; // MeV/cm
-  if (_useModBox)
-    _recomb_factor = larutil::LArProperties::GetME()->ModBoxInverse(MIP) / ( MIP * MeV_to_fC );
-  else
-    _recomb_factor = larutil::LArProperties::GetME()->BirksInverse(MIP) / ( MIP * MeV_to_fC );
-
-  if (_verbose)
-    std::cout << "Recombination factor is : " << _recomb_factor << std::endl;
-
-  if (_verbose) {
-    std::cout << "do inverse functions work?" << std::endl;
-    std::cout << "ModBox: " << std::endl;
-    double dqdx = larutil::LArProperties::GetME()->ModBoxInverse(MIP);
-    double dedx = larutil::LArProperties::GetME()->ModBoxCorrection(dqdx);
-    std::cout << "MIP : " << MIP << " -> dQdx : " << dqdx << " -> dEdx : " << dedx << std::endl;
-    std::cout << "Birks: " << std::endl;
-    dqdx = larutil::LArProperties::GetME()->BirksInverse(MIP);
-    dedx = larutil::LArProperties::GetME()->BirksCorrection(dqdx);
-    std::cout << "MIP : " << MIP << " -> dQdx : " << dqdx << " -> dEdx : " << dedx << std::endl;
-  }
+  std::cout << "Electron lifetime : " << _tau << " [ms]" << std::endl
+	    << "Recomb factor     : " << _recomb_factor << std::endl
+	    << "ADC -> fC         : " << _ADC_to_fC << std::endl
+	    << "fC  -> e-         : " << _fC_to_e << std::endl
+	    << "e-  -> eV         : " << _e_to_eV << std::endl
+	    << "eV  -> MeV        : " << _eV_to_MeV << std::endl
+	    << "ADC -> MeV        : " << _ADC_to_MeV << std::endl;
 
   _timetick = larutil::DetectorProperties::GetME()->SamplingRate() * 1.e-3; //time sample in usec
 
@@ -144,15 +141,21 @@ void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
       _tick_v.push_back(hit_tick);
       double lifetimeCorr = exp( hit_tick * _timetick / _tau );
 
-      if (_useArea) {
-        dQ = _caloAlg.ElectronsFromADCArea(h.charge, pl);
-        dE = dQ * lifetimeCorr * _e_to_eV * _eV_to_MeV;
+      if (_custom_calib){
+	if (_useArea)
+	  dQ = h.charge * _ADC_to_fC * _fC_to_e;
+	else
+	  dQ = h.peak   * _ADC_to_fC * _fC_to_e;
       }
-      else {
-        dQ = _caloAlg.ElectronsFromADCPeak(h.peak, pl);
-        dE = dQ * lifetimeCorr * _e_to_eV * _eV_to_MeV;
+      else{
+	if (_useArea) 
+	  dQ = _caloAlg.ElectronsFromADCArea(h.charge, pl);
+	else 
+	  dQ = _caloAlg.ElectronsFromADCPeak(h.peak, pl);
       }
-
+      
+      dE = dQ * lifetimeCorr * _e_to_eV * _eV_to_MeV;
+      
       if (_fill_tree) {
         _dQ_v.push_back(dQ);
         _dE_v.push_back(dE);
