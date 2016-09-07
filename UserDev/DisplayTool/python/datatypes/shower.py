@@ -36,7 +36,7 @@ class shower_polygon(QtGui.QGraphicsPolygonItem):
     def genToolTip(self):
         tip = ''
         if (self._larliteshower != None):
-            tip += 'Energy %i MeV \n'%(int(self._larliteshower.energy()))
+            tip += 'Energy %i MeV'%(int(self._larliteshower.energy()))
         return tip
 
 # Shower drawing is currently "experimental"
@@ -49,6 +49,7 @@ class shower(recoBase):
         self._productName = 'shower'
         self._process = evd.DrawShower()
         self.init()
+        self._clusters = [ [], [], []]
 
         # Defining the cluster colors:
         self._showerColors = [
@@ -72,6 +73,13 @@ class shower(recoBase):
     #   pass
 
     def drawObjects(self, view_manager):
+
+        # clear any clusters that may be present
+        for view in view_manager.getViewPorts():
+            plane = view.plane()
+            clusters = self._clusters[plane]
+            for cluster in clusters:
+                cluster.clearHits(view)
 
         # Showers can get messed up so only draw "good" showers
         # This means that if either projection is bad, don't draw that shower
@@ -161,11 +169,12 @@ class shower(recoBase):
 
                 # are there hits associated? if so draw
                 if (shower._hits.size() > 0):
+                    plane = view.plane()
                     cluster = shower._hits
-                    cluster_box_coll = boxCollection()
-                    cluster_box_coll.setColor( color )
-                    cluster_box_coll.setPlane( view.plane() )
-                    cluster_box_coll.drawHits( view, cluster )
+                    self._clusters[plane].append( boxCollection() )
+                    self._clusters[plane][-1].setColor( color )
+                    self._clusters[plane][-1].setPlane( plane )
+                    self._clusters[plane][-1].drawHits( view, cluster )
 
                 i_color += 1
 
