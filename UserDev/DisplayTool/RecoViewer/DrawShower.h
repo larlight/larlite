@@ -47,6 +47,7 @@ public:
     float length() {return _length;}
     bool is_good() {return _is_good;}
     float dedx() {return _dedx;}
+    float energy() { return _energy; }
 
     // ALL OF THESE VARIABLES ARE THE PROJECTION INTO THE PLANE
     int _plane;                ///< The Plane of the shower
@@ -55,6 +56,7 @@ public:
     float _angleInPlane;       ///< Angle in the plane
     float _openingAngle;       ///< Opening angle
     float _length;             ///< Length in cm
+    float _energy;             ///< Energy in MeV
     bool _is_good;             ///< Whether or not the projection succeeded
     float _dedx;                ///< dedx in collection plane, for printout
 };
