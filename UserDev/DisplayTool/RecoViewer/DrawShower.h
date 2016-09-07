@@ -19,6 +19,7 @@
 #include "LArUtil/Geometry.h"
 #include "DataFormat/shower.h"
 #include "RecoBase.h"
+#include "DrawCluster.h"
 
 /**
    \class DrawShower
@@ -59,6 +60,9 @@ public:
     float _energy;             ///< Energy in MeV
     bool _is_good;             ///< Whether or not the projection succeeded
     float _dedx;                ///< dedx in collection plane, for printout
+
+    // save 2D cluster for the hits associated
+    Cluster2D _hits;
 };
 
 

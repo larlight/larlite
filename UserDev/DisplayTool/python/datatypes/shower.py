@@ -3,6 +3,7 @@ from ROOT import evd, TVector3
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui, QtCore
 import math as mt
+from connectedObjects import boxCollection
 
 
 # add shower polygon Qt object
@@ -84,6 +85,7 @@ class shower(recoBase):
             i_color = 0
 
             for i in xrange(len(showers)):
+                
                 shower = showers[i]
 
                 if i_color > len(self._showerColors):
@@ -156,6 +158,14 @@ class shower(recoBase):
 
                 # if view.plane() == 0:
                 #   print "dedx: ", shower.dedx()
+
+                # are there hits associated? if so draw
+                if (shower._hits.size() > 0):
+                    cluster = shower._hits
+                    cluster_box_coll = boxCollection()
+                    cluster_box_coll.setColor( color )
+                    cluster_box_coll.setPlane( view.plane() )
+                    cluster_box_coll.drawHits( view, cluster )
 
                 i_color += 1
 
