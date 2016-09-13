@@ -12,20 +12,15 @@ namespace flashana {
 
   TimeCompatMatch::TimeCompatMatch(const std::string name)
     : BaseProhibitAlgo(name)
-  {
-    _frame_drift_time = 2300.; // usec
-  }
+  {}
 
   void TimeCompatMatch::Configure(const ::fcllite::PSet &pset)
   {
-    _frame_drift_time = pset.get<double>("FrameDriftTime");
+    _time_buffer = pset.get<double>("TimeBuffer");
   }
 
   bool TimeCompatMatch::MatchCompatible(const QCluster_t& clus, const Flash_t& flash)
   {
-
-
-    _frame_drift_time = 2319 ;
 
     // conversion quantities
     double t2cm   = larutil::GeometryHelper::GetME()->TimeToCm();
@@ -44,26 +39,18 @@ namespace flashana {
       if (pt.x < clus_x_min) { clus_x_min = pt.x; }
     }
 
-    // convert both quantities to time (usec)
-    double clus_t_min = (clus_x_min/t2cm)*(ROrate/1000.); // us
-    double clus_t_max = (clus_x_max/t2cm)*(ROrate/1000.); // us
+    // Earliest flash time => assume clus_x_max is @ detector X-max boundary
+    double clus_t_min = (clus_x_max - ActiveXMax()) / DriftVelocity();
+    double clus_t_max = clus_x_min / DriftVelocity();
 
-    // find the largest distance in time between the flash
-    // and the cluster's time
-    // if the cluster's time is more than a drift-window larger
-    // then the flash -> impossible coincidence
-    if ( fabs(clus_t_max - flash_time) > _frame_drift_time ){
-//      std::cout<<"Failed clus t min, max: "<<clus_t_min<<", "<<clus_t_max<<", "<<flash_time<<", "<<_frame_drift_time<<std::endl;
-      return false;
-      }
-    // if the cluster comes before the flash entirely ->
-    // impossible match
-    if ( (clus_t_min+20.) < flash_time) {
-  //    std::cout<<"min failur! "<<clus_t_min+20.<<", "<<flash_time<<", "<<std::endl; 
-      return false;
-      }
-    
-    return true;
+    /*
+    std::cout<< "Inspecting TPC object @ " << clus.time << std::endl;
+    std::cout<< "xmin = " << clus_x_min << " ... xmax = " << clus_x_max << std::endl;
+    std::cout<< "tmin = " << clus_t_min << " ... tmax = " << clus_t_max << std::endl;
+    std::cout<< "Flash time @ " << flash_time << std::endl;
+    */    
+    return ((clus_t_min - _time_buffer) < flash_time && flash_time < (clus_t_max + _time_buffer));
+
   }
 
 

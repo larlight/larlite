@@ -28,9 +28,7 @@ namespace flashana {
   public:
 
     std::vector<double> pe_v; ///< PE distribution over photo-detectors
-
-    double TotalPE() const{ return std::accumulate(pe_v.begin(),pe_v.end(),0.0);}
-    
+    std::vector<double> pe_err_v; ///< PE value error
     double x,y,z;             ///< Flash position 
     double x_err,y_err,z_err; ///< Flash position error
     double time;              ///< Flash timing, a candidate T0
@@ -42,6 +40,17 @@ namespace flashana {
       time = kINVALID_DOUBLE;
       idx = kINVALID_ID;
     }
+    /// Total PE calcualtion
+    double TotalPE() const {
+      double res=0.;
+      for(auto const& v : pe_v) if(v>=0.) res+=v;
+      return res;
+    }
+    /// Check validity
+    bool Valid(size_t nopdet=0) const {
+      return (nopdet ? (pe_v.size() == nopdet && pe_err_v.size() == nopdet) : (pe_v.size() == pe_err_v.size()));
+    }
+    //double TotalPE() const{ return std::accumulate(pe_v.begin(),pe_v.end(),0.0);}
   };
 
   /// Struct to represent an energy deposition point in 3D space
@@ -71,9 +80,11 @@ namespace flashana {
   /// Collection of charge deposition 3D point (cluster)
   class QCluster_t : public std::vector<QPoint_t>{
   public:
-    ID_t idx;                 ///< index from original larlite vector
+    ID_t idx;     ///< index from original larlite vector
+    double time;  ///< assumed time w.r.t. trigger for reconstruction
+    
     /// Default constructor
-    QCluster_t() : idx(kINVALID_ID) {}
+    QCluster_t() : idx(kINVALID_ID), time(0) {}
     ~QCluster_t() {}
 
     inline QCluster_t& operator+=(const QCluster_t& rhs) {
@@ -101,7 +112,7 @@ namespace flashana {
   struct FlashMatch_t {
     ID_t tpc_id;   ///< matched TPC object ID
     ID_t flash_id; ///< matched Flash ID
-    double score;  ///< floating point representing the "goodness" (algorithm dependent) 
+    double score;  ///< floating point representing the "goodness" (algorithm dependent)
     QPoint_t tpc_point; ///< estimated & matched 3D flash hypothesis point from TPC information
     QPoint_t tpc_point_err; ///< error on the estimated point
     std::vector<double> hypothesis;       ///< Hypothesis flash object

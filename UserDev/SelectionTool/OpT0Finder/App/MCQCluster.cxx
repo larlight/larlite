@@ -4,6 +4,7 @@
 #include "MCQCluster.h"
 #include "OpT0Finder/Base/OpT0FinderException.h"
 #include "LArUtil/LArProperties.h"
+#include "LArUtil/TimeService.h"
 #include "DataFormat/mctrack.h"
 #include "DataFormat/mcshower.h"
 #include "OpT0Finder/Base/OpT0FinderTypes.h"
@@ -23,6 +24,7 @@ namespace flashana {
     _op_RO_start = pset.get<float>("OpROStart");
     _op_RO_end   = pset.get<float>("OpROEnd");
     _extension   = pset.get<double>("Extension");
+    _trigger_time = pset.get<double>("DefaultTriggerTime");
   }
 
   const std::vector<flashana::QCluster_t>& MCQCluster::QClusters() const
@@ -104,6 +106,7 @@ namespace flashana {
         _qcluster_2_mcobject.emplace_back(Identify(trk.AncestorTrackID(), ev_mct, ev_mcs));
         QCluster_t qcluster;
         qcluster.idx = _qcluster_2_mcobject.back().index_id;
+	qcluster.time = ::larutil::TimeService::GetME()->G4ToElecTime(trk[0].T()) - _trigger_time;
         _qcluster_v.emplace_back(qcluster);
       }
       else
@@ -137,9 +140,9 @@ namespace flashana {
     // in the TPC, not the truth x-position
     // Some constants needed
     double det_drift_velocity = ::larutil::LArProperties::GetME()->DriftVelocity(); ///< cm/us
-    double event_time = mct[0].T(); // ns
-    double shift_x = event_time * det_drift_velocity * pow(10, -3); //cm
-
+    double event_time = ::larutil::TimeService::GetME()->G4ToElecTime(mct[0].T()) - _trigger_time; // ns
+    double shift_x = event_time * det_drift_velocity; //cm
+    
     ::geoalgo::Vector pt0(0.,0.,0.); // variable to be used in this function
     ::geoalgo::Vector pt1(0.,0.,0.); // variable to be used in this function
 
@@ -157,6 +160,7 @@ namespace flashana {
       pt1[2] = mct[step_idx+1].Z();
 
       if(_use_xshift) {
+	//std::cout<<"shifting " << pt0[0] << " => " << pt0[0] + shift_x << std::endl;
 	pt0[0] += shift_x;
 	pt1[0] += shift_x;
       }
@@ -214,6 +218,8 @@ namespace flashana {
 	pt1 = pt0 - pt1; // now pt1 is a direction vector (not normalized)
 	pt0 = pt0 + pt1.Dir() * (_extension - dist_sum); // pt0 is not extended point
 	pt1[0] = mct[0].X(); pt1[1] = mct[0].Y(); pt1[2] = mct[0].Z(); // pt1 is now start point
+	// shift x
+	if(_use_xshift) { pt0[0] += shift_x; pt1[0] += shift_x; }
 	if(!_use_mc_dedx) lightpath.QCluster(pt0,pt1,tpc_obj);
 	else {
 	  double step_dist = sqrt(pow(mct[0].X() - mct[1].X(),2) +
@@ -273,6 +279,7 @@ namespace flashana {
 	pt1 = pt0 - pt1; // now pt1 is a direction vector (not normalized)
 	pt0 = pt0 + pt1.Dir() * (_extension - dist_sum); // pt0 is not extended point
 	pt1[0] = mct[end_idx].X(); pt1[1] = mct[end_idx].Y(); pt1[2] = mct[end_idx].Z(); // pt1 is now end point
+	if(_use_xshift) { pt0[0] += shift_x; pt1[0] += shift_x; }
 	if(!_use_mc_dedx) lightpath.QCluster(pt0,pt1,tpc_obj);
 	else {
 	  double step_dist = sqrt(pow(mct[end_idx].X() - mct[end_idx-1].X(),2) +

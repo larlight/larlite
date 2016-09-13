@@ -10,6 +10,7 @@ namespace flashana {
     , _name(name)
     , _active_volume( 0.0,    -116.5,  0.0,
 		      256.35,  116.5,  1036.8 )
+    , _drift_velocity(0.1114359)
   {}
 
   Algorithm_t BaseAlgorithm::AlgorithmType() const
@@ -22,6 +23,9 @@ namespace flashana {
 
   const std::string& BaseAlgorithm::AlgorithmName() const
   { return _name; }
+
+  double BaseAlgorithm::DriftVelocity() const
+  { return _drift_velocity; }
 
   double BaseAlgorithm::OpDetX(size_t i) const
   { return _opdet_x_v.at(i); }
@@ -72,6 +76,10 @@ namespace flashana {
     _active_volume.Min(xmin,ymin,zmin);
     _active_volume.Max(xmax,ymax,zmax);
   }
+
+  void BaseAlgorithm::SetDriftVelocity( const double v )
+  { _drift_velocity = v; }
+  
 }
 
 #endif

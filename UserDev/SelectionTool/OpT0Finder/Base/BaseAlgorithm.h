@@ -65,6 +65,8 @@ namespace flashana {
     const std::vector<double>& OpDetZArray() const; ///< PMT Z position array getter
 
     size_t NOpDets() const; ///< Getter for # of PMTs
+
+    double DriftVelocity() const;
     
   private:
     
@@ -75,6 +77,8 @@ namespace flashana {
     void SetActiveVolume( const double xmin, const double xmax,
 			  const double ymin, const double ymax,
 			  const double zmin, const double zmax );
+
+    void SetDriftVelocity( const double v );
     
     Algorithm_t _type; ///< Algorithm type
     std::string _name; ///< Algorithm name
@@ -82,6 +86,7 @@ namespace flashana {
     std::vector<double> _opdet_y_v;  ///< OpticalDetector Y position array
     std::vector<double> _opdet_z_v;  ///< OpticalDetector Z position array
     ::geoalgo::AABox _active_volume; ///< Detector active volume
+    double _drift_velocity; ///< Drift velocity in [cm/us]
   };
 }
 #endif

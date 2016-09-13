@@ -98,16 +98,23 @@ namespace flashana {
     auto const& mgr_cfg = main_cfg.get_pset(Name());
     _allow_reuse_flash = mgr_cfg.get<bool>("AllowReuseFlash");
     _verbosity = (msg::MSGLevel_t)(mgr_cfg.get<unsigned int>("Verbosity"));
+    _store_full = mgr_cfg.get<bool>("StoreFullResult");
 
-    auto const& pmt_pos_cfg = main_cfg.get_pset("PMT_POSITION");
+    auto const& detector_cfg = main_cfg.get_pset("DetectorConfiguration");
+
+    auto const& pmt_pos_cfg = detector_cfg.get_pset("PMTPosition");
     auto const pmt_x_pos = pmt_pos_cfg.get<std::vector<double> >("X");
     auto const pmt_y_pos = pmt_pos_cfg.get<std::vector<double> >("Y");
     auto const pmt_z_pos = pmt_pos_cfg.get<std::vector<double> >("Z");
 
-    auto const& detector_boundary_cfg = main_cfg.get_pset("ACTIVE_VOLUME");
+    auto const& detector_boundary_cfg = detector_cfg.get_pset("ActiveVolume");
     auto const det_xrange = detector_boundary_cfg.get<std::vector<double> >("X");
     auto const det_yrange = detector_boundary_cfg.get<std::vector<double> >("Y");
     auto const det_zrange = detector_boundary_cfg.get<std::vector<double> >("Z");
+
+    auto const drift_velocity = detector_cfg.get<double>("DriftVelocity");
+    
+    // checks
     if (det_xrange.size() != 2 || det_yrange.size() != 2 || det_zrange.size() != 2)
       throw OpT0FinderException("Detector volume range has wrong size!");
 
@@ -122,6 +129,7 @@ namespace flashana {
       _alg_flash_filter->SetActiveVolume( det_xrange[0], det_xrange[1],
                                           det_yrange[0], det_yrange[1],
                                           det_zrange[0], det_zrange[1] );
+      _alg_flash_filter->SetDriftVelocity( drift_velocity );
     }
     if (_alg_tpc_filter) {
       _alg_tpc_filter->SetVerbosity(_verbosity);
@@ -130,6 +138,7 @@ namespace flashana {
       _alg_tpc_filter->SetActiveVolume( det_xrange[0], det_xrange[1],
                                         det_yrange[0], det_yrange[1],
                                         det_zrange[0], det_zrange[1] );
+      _alg_tpc_filter->SetDriftVelocity( drift_velocity );
     }
     if (_alg_match_prohibit) {
       _alg_match_prohibit->SetVerbosity(_verbosity);
@@ -138,6 +147,7 @@ namespace flashana {
       _alg_match_prohibit->SetActiveVolume( det_xrange[0], det_xrange[1],
                                             det_yrange[0], det_yrange[1],
                                             det_zrange[0], det_zrange[1] );
+      _alg_match_prohibit->SetDriftVelocity( drift_velocity );
     }
     if (_alg_flash_hypothesis) {
       _alg_flash_hypothesis->SetVerbosity(_verbosity);
@@ -146,6 +156,7 @@ namespace flashana {
       _alg_flash_hypothesis->SetActiveVolume( det_xrange[0], det_xrange[1],
                                               det_yrange[0], det_yrange[1],
                                               det_zrange[0], det_zrange[1] );
+      _alg_flash_hypothesis->SetDriftVelocity( drift_velocity );
     }
     if (_alg_flash_match) {
       _alg_flash_match->SetVerbosity(_verbosity);
@@ -155,6 +166,7 @@ namespace flashana {
                                          det_yrange[0], det_yrange[1],
                                          det_zrange[0], det_zrange[1] );
       _alg_flash_match->SetFlashHypothesis(_alg_flash_hypothesis);
+      _alg_flash_match->SetDriftVelocity( drift_velocity );
     }
 
     for (auto& name_ptr : _custom_alg_m) {
@@ -164,7 +176,7 @@ namespace flashana {
       name_ptr.second->SetActiveVolume( det_xrange[0], det_xrange[1],
 					det_yrange[0], det_yrange[1],
 					det_zrange[0], det_zrange[1] );
-      
+      name_ptr.second->SetDriftVelocity( drift_velocity );
     }
 
     _configured = true;
@@ -220,17 +232,31 @@ namespace flashana {
   { _tpc_object_v.push_back(obj); }
 
   void FlashMatchManager::Emplace(flashana::QCluster_t&& obj)
-  { _tpc_object_v.emplace_back(obj); }
+  { _tpc_object_v.emplace_back(std::move(obj)); }
 
   void FlashMatchManager::Add(flashana::Flash_t& obj)
-  { _flash_v.push_back(obj); }
+  {
+    if(!obj.Valid()) throw OpT0FinderException("Invalid Flash_t object cannot be registered!");
+    _flash_v.push_back(obj);
+  }
 
   void FlashMatchManager::Emplace(flashana::Flash_t&& obj)
-  { _flash_v.emplace_back(obj); }
-
+  {
+    if(!obj.Valid()) throw OpT0FinderException("Invalid Flash_t object cannot be registered!");
+    _flash_v.emplace_back(std::move(obj));
+  }
+  
   // CORE FUNCTION
   std::vector<FlashMatch_t> FlashMatchManager::Match()
   {
+    // Clear some history variables
+    _res_tpc_flash_v.clear();
+    _res_flash_tpc_v.clear();
+    if(_store_full) {
+      _res_tpc_flash_v.resize(_tpc_object_v.size(),std::vector<flashana::FlashMatch_t>(_flash_v.size()));
+      _res_flash_tpc_v.resize(_flash_v.size(),std::vector<flashana::FlashMatch_t>(_tpc_object_v.size()));
+    }
+    
     // Create also a result container
     std::vector<FlashMatch_t> result;
     
@@ -278,16 +304,12 @@ namespace flashana {
       Print(msg::kINFO, __FUNCTION__, ss.str());
     }
 
-//    std::cout<<"TPC: Before and after: "<<_tpc_object_v.size()<<", "<<tpc_index_v.size()<<std::endl ;
-//    std::cout<<"Flash: Before and after: "<<_flash_v.size()<<", "<<flash_index_v.size()<<std::endl ;
-
     //
     // Flash matching stage
     //
 
     // use multi-map for possible equally-scored matches
     std::multimap<double, FlashMatch_t> score_map;
-
 
     // Double loop over a list of tpc object & flash
     // Call matching function to inspect the compatibility.
@@ -307,23 +329,30 @@ namespace flashana {
           if (compat == false)
             continue;
         }
-//        std::cout<<"\n\n\nIn manager. TPC size is? "<<tpc.size()<<", flash time : "<<flash.time<<std::endl ;
+
         auto res = _alg_flash_match->Match( tpc, flash ); // Run matching
 
         // ignore this match if the score is <= 0
         if (res.score <= 0) continue;
 
         // Else we store this match. Assign TPC & flash index info
-        res.tpc_id = tpc.idx;//_index;
-        res.flash_id = flash.idx;//_index;
+        res.tpc_id = tpc_index_v[tpc_index];//_index;
+        res.flash_id = flash_index;//_index;
 
+	if(_store_full) {
+	  _res_tpc_flash_v[res.tpc_id][res.flash_id] = res;
+	  _res_flash_tpc_v[res.flash_id][res.tpc_id] = res;
+	}
         // For ordering purpose, take an inverse of the score for sorting
         score_map.emplace( 1. / res.score, res);
 
         if (_verbosity <= msg::kDEBUG) {
           std::stringstream ss;
-          ss << "Candidate Match: " << " TPC=" << tpc_index << " Flash=" << flash_index
-             << " Score=" << res.score;
+          ss << "Candidate Match: "
+	     << " TPC=" << tpc_index << " @ " << tpc.time
+	     << " with Flash=" << flash_index << " @ " << flash.time
+             << " ... Score=" << res.score
+	     << " ... PE=" << flash.TotalPE();
           Print(msg::kINFO, __FUNCTION__, ss.str());
         }
 

@@ -91,11 +91,12 @@ namespace flashana {
 
       // Calculate amplitudes corresponding to max opdet amplitudes
       double visAmpTotal = 0;
-      double vis_pe_sum = std::accumulate(std::begin(_vis_array.pe_v),
-					  std::end(_vis_array.pe_v),
-					  0.0);
-      for(size_t i=0; i<ids.size(); i++)
+      double vis_pe_sum = _vis_array.TotalPE();
+
+      for(size_t i=0; i<ids.size(); i++) {
+	if(_vis_array.pe_v[ids[i]]<0) continue;
 	visAmpTotal += _vis_array.pe_v[ids[i]] / vis_pe_sum ;
+      }
       
       double ratio = 0;
       if(opAmpTotal > visAmpTotal )
@@ -112,10 +113,11 @@ namespace flashana {
 	f.tpc_point.q = vis_pe_sum;
 
 	for(size_t pmt_index=0; pmt_index<NOpDets(); ++pmt_index) {
-	  
-	  f.tpc_point.x += OpDetX(pmt_index) * _vis_array.pe_v[pmt_index] / vis_pe_sum;
-	  f.tpc_point.y += OpDetY(pmt_index) * _vis_array.pe_v[pmt_index] / vis_pe_sum;
-	  f.tpc_point.z += OpDetZ(pmt_index) * _vis_array.pe_v[pmt_index] / vis_pe_sum;
+	  double pe = _vis_array.pe_v[pmt_index];
+	  if(pe<0) continue;
+	  f.tpc_point.x += OpDetX(pmt_index) * pe / vis_pe_sum;
+	  f.tpc_point.y += OpDetY(pmt_index) * pe / vis_pe_sum;
+	  f.tpc_point.z += OpDetZ(pmt_index) * pe / vis_pe_sum;
 	}
       }
     }

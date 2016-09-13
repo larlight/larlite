@@ -173,7 +173,7 @@ while ctr < mcflash_ch.GetEntries():
     plt.tick_params(labelsize=20)
     plt.grid()
     plt.ylabel('PE Count',fontsize=20,fontweight='bold')
-    plt.xlabel('PMT (OpChannel)',fontsize=20,fontweight='bold')
+    plt.xlabel('PMT (OpDet ID)',fontsize=20,fontweight='bold')
     leg=plt.legend(fontsize=20,loc=1)
     leg_frame=leg.get_frame()
     leg_frame.set_facecolor('white')

@@ -51,7 +51,7 @@ namespace flashana {
 
     size_t MCShower2QCluster(size_t) const;
 
-    bool UseXshift(bool use) { _use_xshift = use; return _use_xshift;}
+    void SetTriggerTime(const double time) { _trigger_time = time; }
      
     const flashana::MCSource_t& MCObjectID(size_t) const;
 
@@ -70,6 +70,7 @@ namespace flashana {
 			flashana::QCluster_t& tpc_obj);
 
     bool _use_xshift;
+    double _trigger_time;
     double _extension;
     std::vector<flashana::QCluster_t> _qcluster_v;
     std::vector<size_t> _mctrack_2_qcluster;

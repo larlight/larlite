@@ -61,14 +61,15 @@ namespace flashana {
       FillEstimate(_tpc_qcluster,_vis_array);
 
       // Calculate amplitudes corresponding to max opdet amplitudes
-      double vis_pe_sum = std::accumulate(std::begin(_vis_array.pe_v),
-					  std::end(_vis_array.pe_v),
-					  0.0);
+      double vis_pe_sum = _vis_array.TotalPE();
 
       double weighted_z = 0;
-      for(size_t pmt_index=0; pmt_index<NOpDets(); ++pmt_index)
+      for(size_t pmt_index=0; pmt_index<NOpDets(); ++pmt_index) {
 
+	if(_vis_array.pe_v[pmt_index]<0) continue;
 	weighted_z += OpDetZ(pmt_index) * _vis_array.pe_v[pmt_index] / vis_pe_sum;
+
+      }
 
       double dz = std::fabs(weighted_z - flash.z);
       
@@ -82,8 +83,10 @@ namespace flashana {
 
 	f.tpc_point.x = x_offset;
 
-	for(size_t pmt_index=0; pmt_index<NOpDets(); ++pmt_index)
+	for(size_t pmt_index=0; pmt_index<NOpDets(); ++pmt_index) {
+	  if(_vis_array.pe_v[pmt_index]<0) continue;
 	  f.tpc_point.y += OpDetY(pmt_index) * _vis_array.pe_v[pmt_index] / vis_pe_sum;
+	}
 
 	f.tpc_point.z = weighted_z;	
       }

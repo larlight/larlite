@@ -90,6 +90,14 @@ namespace flashana {
     /// Access to an input: PMT objects in the form of FlashArray_t
     const FlashArray_t& FlashArray() const { return _flash_v; }
 
+    /// Access to a full results (if configured to store) for [tpc][flash] indexing
+    const std::vector<std::vector<flashana::FlashMatch_t> > FullResultTPCFlash() const
+    { return _res_tpc_flash_v; }
+
+    /// Access to a full results (if configured to store) for [flash][tpc] indexing
+    const std::vector<std::vector<flashana::FlashMatch_t> > FullResultFlashTPC() const
+    { return _res_flash_tpc_v; }
+
   private:
 
     BaseFlashFilter*     _alg_flash_filter;     ///< Flash filter algorithm
@@ -115,6 +123,12 @@ namespace flashana {
     std::string _config_file;
     /// Name
     std::string _name;
+    /// Request boolean to store full matching result (per Match function call)
+    bool _store_full;
+    /// Full result container indexed by [tpc][flash]
+    std::vector<std::vector<flashana::FlashMatch_t> > _res_tpc_flash_v;
+    /// Full result container indexed by [flash][tpc]
+    std::vector<std::vector<flashana::FlashMatch_t> > _res_flash_tpc_v;    
   };
 }
 

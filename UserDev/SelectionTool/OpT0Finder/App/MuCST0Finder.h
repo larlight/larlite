@@ -1,9 +1,9 @@
 /**
- * \file UBT0Finder.h
+ * \file MuCST0Finder.h
  *
  * \ingroup App
  * 
- * \brief Class def header for a class UBT0Finder
+ * \brief Class def header for a class MuCST0Finder
  *
  * @author kazuhiro
  */
@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef LARLITE_UBT0FINDER_H
-#define LARLITE_UBT0FINDER_H
+#ifndef LARLITE_MuCST0FINDER_H
+#define LARLITE_MuCST0FINDER_H
 
 #include "Analysis/ana_base.h"
 #include "MCQCluster.h"
@@ -23,66 +23,55 @@
 
 namespace larlite {
   /**
-     \class UBT0Finder
+     \class MuCST0Finder
      User custom analysis class made by SHELL_USER_NAME
    */
-  class UBT0Finder : public ana_base{
+  class MuCST0Finder : public ana_base{
   
   public:
 
-    UBT0Finder();
+    MuCST0Finder();
 
     /// Default destructor
-    virtual ~UBT0Finder(){_use_mc=false;}
+    virtual ~MuCST0Finder(){}
 
-    /** IMPLEMENT in UBT0Finder.cc!
+    /** IMPLEMENT in MuCST0Finder.cc!
         Initialization method to be called before the analysis event loop.
     */ 
     virtual bool initialize();
 
-    /** IMPLEMENT in UBT0Finder.cc! 
+    /** IMPLEMENT in MuCST0Finder.cc! 
         Analyze a data event-by-event  
     */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in UBT0Finder.cc! 
+    /** IMPLEMENT in MuCST0Finder.cc! 
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
 
     ::flashana::FlashMatchManager& Manager() { return _mgr;}
 
-    void UseMC(bool doit=true) { _use_mc = doit; }
-
-    void UseBNBCorrectnessWindow (bool yesOrNo){ _use_bnb_correctness_window = yesOrNo; }
-
     const std::vector<flashana::FlashMatch_t> MatchResult() const { return _result; }
 
-    void ShiftFlashTime(double v) {_shift_flash_time=v;}
-
-    void OpFlashBeamProducer(const std::string name) { _opflash_producer_beam = name; }
-
-    void OpFlashCosmicProducer(const std::string name) { _opflash_producer_cosmic = name; }
-
-    void TriggerProducer(const std::string name) { _trigger_producer = name; }
+    void SetConfigFile(std::string name) { _config_file = name; }
 
   protected:
 
     ::flashana::FlashMatchManager _mgr;
-    double _shift_flash_time;
 
     std::vector<flashana::FlashMatch_t> _result;
 
     // Configurable params
-    bool _use_mc;
-    //bool _useAbsPE ;
-    //double _step_len ;
+    std::string _config_file;
+    std::string _track_producer;
     std::string _opflash_producer_beam;
     std::string _opflash_producer_cosmic;
     std::string _trigger_producer;
-
-    int _use_bnb_correctness_window ;
-
+    double _flash_trange_start;
+    double _flash_trange_end;
+    size_t _num_tracks;
+    std::vector<double> _gain_correction;
   };
 }
 #endif

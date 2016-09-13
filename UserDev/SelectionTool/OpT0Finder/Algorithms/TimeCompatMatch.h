@@ -38,13 +38,10 @@ namespace flashana {
 
     bool MatchCompatible(const QCluster_t& clus, const Flash_t& flash);
 
-    /// set the time it takes to drift across the TPC
-    void SetFrameDriftTime(double t) { _frame_drift_time = t; }
-
   private:
 
-    /// time it takes for charge to drift the entire drift-length
-    double _frame_drift_time;
+    /// Buffer time to allow some uncertainty [us]
+    double _time_buffer;
 
   };
 }

@@ -1,6 +1,6 @@
 import sys,ROOT,os
 
-if len(sys.argv) < 4:
+if len(sys.argv) < 3:
     msg  = '\n'
     msg += "Usage 1: %s $INPUT_ROOT_FILE(s)\n" % sys.argv[0]
     msg += '\n'
@@ -16,11 +16,17 @@ from ROOT import flashana
 my_proc = fmwk.ana_processor()
 
 # Set input root file
-for x in xrange(len(sys.argv)-3):
-    if not sys.argv[x+3].endswith('.root'):
+cfg_name = ''
+for x in xrange(len(sys.argv)):
+    if sys.argv[x].endswith('.fcl') or sys.argv[x].endswith('.cfg'):
+        cfg_name = sys.argv[x]
+    if not sys.argv[x].endswith('.root'):
         continue
-    print sys.argv[x+3]
-    my_proc.add_input_file(sys.argv[x+3])
+    print sys.argv[x]
+    my_proc.add_input_file(sys.argv[x])
+if not cfg_name:
+    print 'No config file given in input arguments'
+    sys.exit(1)
 
 # Specify IO mode
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
@@ -30,17 +36,13 @@ my_proc.set_ana_output_file("ana.root")
 
 # Attach an analysis unit ... here we use a base class which does nothing.
 # Replace with your analysis unit if you wish.
-my_unit = fmwk.UBT0Finder()
-#my_unit.SetEDiff(10.)
-my_unit.UseMC(True)
-my_unit.UseBNBCorrectnessWindow(False)
+my_unit = fmwk.MuCST0Finder()
 my_proc.add_process(my_unit)
-#my_unit.ShiftFlashTime(-500)
 
 # TPC Filter Algo
 my_unit.Manager().SetAlgo(flashana.NPtFilter())
 # PMT Filter Algo
-#my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
+my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
 # Match Prohibit Algo
 my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
 # Hypothesis Algo
@@ -53,25 +55,26 @@ my_unit.Manager().SetAlgo( algo )
 
 # Custom Algo
 my_unit.Manager().SetAlgo( flashana.LightPath()  )
-my_unit.Manager().SetAlgo( flashana.MCQCluster() )
 
-my_unit.OpFlashBeamProducer(sys.argv[1])
-my_unit.OpFlashCosmicProducer(sys.argv[2])
-
-#
-# Other algorithms
-#
-#my_unit.Manager().AddCustomAlgo( flashana.LightPath() )
-
-my_unit.Manager().Configure( "%s/SelectionTool/OpT0Finder/App/mac/flashmatch.fcl" % os.environ['LARLITE_USERDEVDIR'])
+my_unit.SetConfigFile(cfg_name)
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
 print
+fout_pe=open('pespec.txt','w')
+line_pe=''
+for x in xrange(32):
+    line_pe += 'hypo%02d,' % x
+for x in xrange(32):
+    line_pe += 'flash%02d,' % x
+line_pe=line_pe.rstrip(',')
+line_pe+='\n'
+fout_pe.write(line_pe)
+
 fout=open('data.txt','w')
-fout.write('xmin,xmax,time,x,t,q,oppe,hypope\n')
-ctr=4400
-while 1:
+fout.write('tpcid,xmin,xmax,time,x,t,q,oppe,hypope,mult\n')
+ctr=0
+while ctr<2270:
     my_proc.process_event(ctr)
 
     match_v = my_unit.MatchResult()
@@ -106,15 +109,32 @@ while 1:
 
         #print 'xmin:',xmin,'xmax:',xmax
         flash = flash_v[match_v[index].flash_id]
-        pesum = 0
-        for pe in flash.pe_v: pesum += pe
+        line_pe=''
+        
         hyposum=0
-        for pe in match.hypothesis: hyposum += pe
-        fout.write('%g,%g,%g,%g,%g,%g,%g,%g\n' % (xmin,xmax,qc.time,match.tpc_point.x,flash.time,match.score,pesum,hyposum))
+        for pe in match.hypothesis:
+            hyposum += pe
+            line_pe += '%g,' % pe
+
+        pesum = 0
+        for pe in flash.pe_v:
+            pesum += pe
+            line_pe += '%g,' % pe
+
+        line_pe  = line_pe.rstrip(',')
+        line_pe += '\n'
+
+        fout_pe.write(line_pe)
+
+        mult = 0
+        for pe in flash.pe_v:
+            if pe > 0: mult+=1
+        fout.write('%g,%g,%g,%g,%g,%g,%g,%g,%g,%g\n' % (match.tpc_id,xmin,xmax,qc.time,match.tpc_point.x,flash.time,match.score,pesum,hyposum,mult))
 
     proc_status = my_proc.get_process_status()
     if proc_status == my_proc.kFINISHED:
         break
+
     ctr+=1
     sys.stdout.write('%d\r' % ctr)
     sys.stdout.flush()
@@ -127,4 +147,5 @@ print
 print "Finished running ana_processor event loop!"
 print
 fout.close()
+fout_pe.close()
 sys.exit(0)

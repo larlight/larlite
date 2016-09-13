@@ -6,9 +6,10 @@ MuCST0Finder: {
   BeamOpFlashProducer:   "simpleFlashBeam"
   CosmicOpFlashProducer: "simpleFlashCosmic"
   TriggerProducer:       "daq"
-  FlashVetoTimeStart:    -5000.
-  FlashVetoTimeEnd:      5000.
-  MaxTrackCount:         40
+  FlashVetoTimeStart:    -1.5
+  FlashVetoTimeEnd:      -0.5
+  MaxTrackCount:         1
+  GainCorrection: [1.09331,1.0278,1.04057,0.986795,1.07759,1.09017,1.10477,1.14167,1.01527,1.11422,0.950291,0.977529,1.05703,0.952964,0.966842,0.991664,1.00079,0.91388,1.11111,1.08502,1.23453,1.07951,0.94202,0.990522,1.02483,1.04599,nan,1.02311,0.758705,1.11797,1.0592,1.01436]
 }
 
 #
@@ -17,17 +18,26 @@ MuCST0Finder: {
 FlashMatchManager: {
     Verbosity: 3
     AllowReuseFlash: false
+    StoreFullResult: false
 }
 
 #
 # Algorithms
 #
 QLLMatch: {
-    RecordHistory: false
-    NormalizeHypothesis: false
-    QLLMode: 0 # 0 for Chi2, 1 for LLHD
-    PenaltyThreshold: [10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10]
-    PenaltyValue: [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
+  RecordHistory: false
+  NormalizeHypothesis: false
+  QLLMode: 1 # 0 for Chi2, 1 for LLHD
+  PEPenaltyThreshold: [6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6]
+  PEPenaltyValue: [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
+  #PEPenaltyThreshold: [10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10]
+  #PEPenaltyValue: [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
+  XPenaltyThreshold: 30
+  ZPenaltyThreshold: 30
+  OnePMTScoreThreshold:  0.00001
+  OnePMTXDiffThreshold:  35.;
+  OnePMTPESumThreshold:  500
+  OnePMTPEFracThreshold: 0.3
 }
 
 QWeightPoint: {
@@ -97,4 +107,3 @@ DetectorConfiguration: {
       Z: [0.0,1036.8]
   }
 }
-
