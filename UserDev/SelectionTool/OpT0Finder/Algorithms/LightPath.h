@@ -55,7 +55,7 @@ namespace flashana{
 
   protected:
 
-    void _Configure_(const ::fcllite::PSet &pset);
+    void _Configure_(const Config_t &pset);
     
     double _gap;
     double _light_yield;

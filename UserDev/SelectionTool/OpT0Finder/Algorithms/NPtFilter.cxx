@@ -11,7 +11,7 @@ namespace flashana {
     : BaseTPCFilter(name)
   { _min_num_pt = 2; }
 
-  void NPtFilter::_Configure_(const ::fcllite::PSet &pset)
+  void NPtFilter::_Configure_(const Config_t &pset)
   {
     _min_num_pt = pset.get<double>("MinNumPoint");
   }

@@ -16,7 +16,7 @@ namespace flashana {
     , _zdiff_max   ( 50*50 )
   {}
 
-  void QWeightPoint::_Configure_(const ::fcllite::PSet &pset)
+  void QWeightPoint::_Configure_(const Config_t &pset)
   {
     _x_step_size = pset.get<double>("XStepSize");
     _zdiff_max   = pset.get<double>("ZDiffMax" );

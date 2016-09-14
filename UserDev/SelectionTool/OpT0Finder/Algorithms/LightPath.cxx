@@ -14,7 +14,7 @@ namespace flashana {
     , _dEdxMIP     ( 2.07    ) //1.42[Mev*cm^2*g]*1.4[g/cm^3]=2.004MeV/cm
   {}
 
-  void LightPath::_Configure_(const ::fcllite::PSet &pset)
+  void LightPath::_Configure_(const Config_t &pset)
   {
     _gap          = pset.get< double > ( "SegmentSize" );
     _light_yield  = pset.get< double > ( "LightYield"  );

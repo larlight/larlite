@@ -17,7 +17,7 @@ namespace flashana {
     , _npe_threshold(10)       // Default # p.e. as a threshold
   {}
 
-  void MaxNPEWindow::_Configure_(const ::fcllite::PSet &pset)
+  void MaxNPEWindow::_Configure_(const Config_t &pset)
   {
     _time_lower_bound = pset.get<double>("TimeLowerBound");
     _time_upper_bound = pset.get<double>("TimeUpperBound");

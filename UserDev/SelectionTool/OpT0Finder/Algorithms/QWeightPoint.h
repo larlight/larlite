@@ -44,7 +44,7 @@ namespace flashana {
 
   protected:
 
-    void _Configure_(const ::fcllite::PSet &pset);
+    void _Configure_(const Config_t &pset);
 
   private:
     double _x_step_size; ///< step size in x-direction
