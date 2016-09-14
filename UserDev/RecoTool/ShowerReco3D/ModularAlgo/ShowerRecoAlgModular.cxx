@@ -49,7 +49,7 @@ Shower_t ShowerRecoAlgModular::RecoOneShower(const ::protoshower::ProtoShower& p
     catch (ShowerRecoException e) {
       result.fPassedReconstruction = false;
       if (_debug)
-	std::cout << "Reco failed @ algo " << _modules[n]->name() << std::endl;
+	std::cout << e.what() << std::endl;
       return result;
     }
     _module_time_v[n] += _watch.RealTime();
