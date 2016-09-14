@@ -347,7 +347,7 @@ namespace flashana {
     double reco_x_err = (ActiveXMax() - (_raw_xmax_pt.x - _raw_xmin_pt.x)) / 2.;
     double MinFval;
     int ierrflag, npari, nparx, istat;
-    double arglist[4], error[4], Fmin, Fedm, Errdef;
+    double arglist[4], Fmin, Fedm, Errdef;
     ierrflag = npari = nparx = istat = 0;
     
     _minuit_ptr->SetPrintLevel(-1);

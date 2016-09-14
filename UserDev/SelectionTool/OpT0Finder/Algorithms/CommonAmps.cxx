@@ -31,7 +31,7 @@ namespace flashana {
 					  std::end(flash.pe_v),
 					  0.0);
     double maxRatio 	= -1;
-    double maxX         = 0;
+    //double maxX         = 0;
     
     if(_vis_array.pe_v.empty())
       _vis_array.pe_v.resize(OpDetXArray().size());
@@ -107,7 +107,7 @@ namespace flashana {
       
       if(ratio > maxRatio) {
 	maxRatio = ratio;
-	maxX     = x_offset;
+	//maxX     = x_offset;
 
 	f.score = ratio;
 	f.tpc_point.x = f.tpc_point.y = f.tpc_point.z = 0;

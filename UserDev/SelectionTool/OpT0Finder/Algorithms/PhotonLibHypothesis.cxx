@@ -23,7 +23,7 @@ namespace flashana {
     
     for ( auto& v : flash.pe_v ) v = 0;
     
-    for ( size_t ipmt = 0; ipmt < 32; ++ipmt) {
+    for ( size_t ipmt = 0; ipmt < n_pmt; ++ipmt) {
 
       for ( size_t ipt = 0; ipt < trk.size(); ++ipt) {
 	
