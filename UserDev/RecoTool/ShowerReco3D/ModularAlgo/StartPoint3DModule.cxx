@@ -80,7 +80,7 @@ void StartPoint3DModule::do_reconstruction(
     // check if reconstructed start point is outside of TPC volume
     auto geomH = larutil::GeometryHelper::GetME();
     
-    if (geomH->Contained( sX/2., sY, sZ) == false){
+    if (geomH->ContainedYZ(sY, sZ) == false){
       std::stringstream ss;
       ss << "Fail @ algo " << this->name() << " due to start point reconstructed out of TPC bouns";
       throw ShowerRecoException(ss.str());

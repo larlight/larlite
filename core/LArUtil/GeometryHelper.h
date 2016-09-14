@@ -520,6 +520,13 @@ public:
 
     /**
      * @brief return whether a point is contained in the TPC boundaries as defined by Geometry.h
+     * only check Y and Z coordinates with this function
+     * @return boolean: true -> contained
+     */
+    bool ContainedYZ(const double& y, const double& z) const;
+    
+    /**
+     * @brief return whether a point is contained in the TPC boundaries as defined by Geometry.h
      * @return boolean: true -> contained
      */
     bool Contained(const double& x, const double& y, const double& z) const;
