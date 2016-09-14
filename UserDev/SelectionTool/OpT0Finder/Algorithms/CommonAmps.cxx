@@ -3,7 +3,6 @@
 
 #include "CommonAmps.h"
 #include "OpT0Finder/Base/OpT0FinderException.h"
-#include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
 #include <cmath>
 #include <sstream>
 #include <numeric>

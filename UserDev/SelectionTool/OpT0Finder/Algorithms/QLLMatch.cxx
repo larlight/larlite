@@ -3,7 +3,6 @@
 
 #include "QLLMatch.h"
 #include "OpT0Finder/Base/OpT0FinderException.h"
-#include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
 #include <TMinuit.h>
 #include <cmath>
 #include <numeric>
