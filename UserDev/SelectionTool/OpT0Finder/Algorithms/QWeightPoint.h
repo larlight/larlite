@@ -15,6 +15,7 @@
 #define OPT0FINDER_QWEIGHTPOINT_H
 
 #include "OpT0Finder/Base/BaseFlashMatch.h"
+#include "OpT0Finder/Base/FlashMatchFactory.h"
 
 namespace flashana {
   
@@ -39,9 +40,11 @@ namespace flashana {
     /// Default destructor
     ~QWeightPoint(){}
 
-    void Configure(const ::fcllite::PSet &pset);
-
     FlashMatch_t Match(const QCluster_t&, const Flash_t&);
+
+  protected:
+
+    void _Configure_(const ::fcllite::PSet &pset);
 
   private:
     double _x_step_size; ///< step size in x-direction
@@ -49,6 +52,20 @@ namespace flashana {
     flashana::QCluster_t _tpc_qcluster;
     flashana::Flash_t    _vis_array;
   };
+
+  /**
+     \class flashana::QWeightPointFactory
+  */
+  class QWeightPointFactory : public FlashMatchFactoryBase {
+  public:
+    /// ctor
+    QWeightPointFactory() { FlashMatchFactory::get().add_factory("QWeightPoint",this); }
+    /// dtor
+    ~QWeightPointFactory() {}
+    /// creation method
+    BaseFlashMatch* create(const std::string instance_name) { return new QWeightPoint(instance_name); }
+  };
+  
 }
 #endif
 /** @} */ // end of doxygen group 

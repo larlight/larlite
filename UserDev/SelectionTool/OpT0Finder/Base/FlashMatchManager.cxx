@@ -6,7 +6,12 @@
 #include <set>
 #include "FlashMatchManager.h"
 #include "OpT0FinderException.h"
-#include "FhiclLite/ConfigManager.h"
+#include "FlashFilterFactory.h"
+#include "TPCFilterFactory.h"
+#include "FlashMatchFactory.h"
+#include "FlashHypothesisFactory.h"
+#include "FlashProhibitFactory.h"
+#include "CustomAlgoFactory.h"
 namespace flashana {
 
   FlashMatchManager::FlashMatchManager(const std::string name)
@@ -16,7 +21,6 @@ namespace flashana {
     , _alg_flash_match(nullptr)
     , _alg_flash_hypothesis(nullptr)
     , _configured(false)
-    , _config_file("FlashMatch.fcl")
     , _name(name)
   {
     _allow_reuse_flash = true;
@@ -25,6 +29,7 @@ namespace flashana {
   const std::string& FlashMatchManager::Name() const
   { return _name; }
 
+  /*
   void FlashMatchManager::SetAlgo(BaseAlgorithm* alg)
   {
     _configured = false;
@@ -68,6 +73,7 @@ namespace flashana {
     }
   }
 
+  */
 
   void FlashMatchManager::AddCustomAlgo(BaseAlgorithm* alg)
   {
@@ -78,41 +84,51 @@ namespace flashana {
       }
     _custom_alg_m[alg->AlgorithmName()] = alg;
   }
-
-  void FlashMatchManager::Configure(const std::string cfg_file)
+  
+  void FlashMatchManager::Configure(const Config_t& main_cfg) 
   {
-    if (!cfg_file.empty()) {
-      if (!_config_file.empty())
-        Print(msg::kWARNING, __FUNCTION__, "Over-riding config file...");
-      _config_file = cfg_file;
-    }
-
-    Print(msg::kINFO, __FUNCTION__, Form("Configuring with configuration file: %s",cfg_file.c_str()));
-
+    /*
     ::fcllite::ConfigManager cfg_mgr("FlashMatchManager");
 
     cfg_mgr.AddCfgFile(_config_file);
 
     auto const& main_cfg = cfg_mgr.Config();
+    */
+    auto const& mgr_cfg = main_cfg.get<flashana::Config_t>(Name());
 
-    auto const& mgr_cfg = main_cfg.get_pset(Name());
     _allow_reuse_flash = mgr_cfg.get<bool>("AllowReuseFlash");
-    _verbosity = (msg::MSGLevel_t)(mgr_cfg.get<unsigned int>("Verbosity"));
+    this->set_verbosity((msg::Level_t)(mgr_cfg.get<unsigned int>("Verbosity")));
     _store_full = mgr_cfg.get<bool>("StoreFullResult");
 
-    auto const& detector_cfg = main_cfg.get_pset("DetectorConfiguration");
+    auto const& detector_cfg = main_cfg.get<flashana::Config_t>("DetectorConfiguration");
 
-    auto const& pmt_pos_cfg = detector_cfg.get_pset("PMTPosition");
+    auto const& pmt_pos_cfg = detector_cfg.get<flashana::Config_t>("PMTPosition");
     auto const pmt_x_pos = pmt_pos_cfg.get<std::vector<double> >("X");
     auto const pmt_y_pos = pmt_pos_cfg.get<std::vector<double> >("Y");
     auto const pmt_z_pos = pmt_pos_cfg.get<std::vector<double> >("Z");
 
-    auto const& detector_boundary_cfg = detector_cfg.get_pset("ActiveVolume");
+    auto const& detector_boundary_cfg = detector_cfg.get<flashana::Config_t>("ActiveVolume");
     auto const det_xrange = detector_boundary_cfg.get<std::vector<double> >("X");
     auto const det_yrange = detector_boundary_cfg.get<std::vector<double> >("Y");
     auto const det_zrange = detector_boundary_cfg.get<std::vector<double> >("Z");
 
     auto const drift_velocity = detector_cfg.get<double>("DriftVelocity");
+
+    auto const flash_filter_name = mgr_cfg.get<std::string>("FlashFilterAlgo","");
+    auto const tpc_filter_name   = mgr_cfg.get<std::string>("TPCFilterAlgo","");
+    auto const prohibit_name     = mgr_cfg.get<std::string>("ProhibitAlgo","");
+    auto const hypothesis_name   = mgr_cfg.get<std::string>("HypothesisAlgo","");
+    auto const match_name        = mgr_cfg.get<std::string>("MatchAlgo","");
+    std::vector<std::string> custom_algo_v;
+    custom_algo_v = mgr_cfg.get<std::vector<std::string> >("CustomAlgo",custom_algo_v);
+
+    if(!flash_filter_name.empty()) _alg_flash_filter     = FlashFilterFactory::get().create(flash_filter_name,flash_filter_name);
+    if(!tpc_filter_name.empty()  ) _alg_tpc_filter       = TPCFilterFactory::get().create(tpc_filter_name,tpc_filter_name);
+    if(!prohibit_name.empty()    ) _alg_match_prohibit   = FlashProhibitFactory::get().create(prohibit_name,prohibit_name);
+    if(!hypothesis_name.empty()  ) _alg_flash_hypothesis = FlashHypothesisFactory::get().create(hypothesis_name,hypothesis_name);
+    if(!match_name.empty()       ) _alg_flash_match      = FlashMatchFactory::get().create(match_name,match_name);
+    for(auto const& name : custom_algo_v)
+      if(!name.empty()) AddCustomAlgo(CustomAlgoFactory::get().create(name,name));
     
     // checks
     if (det_xrange.size() != 2 || det_yrange.size() != 2 || det_zrange.size() != 2)
@@ -123,8 +139,8 @@ namespace flashana {
       throw OpT0FinderException("PMT position array length has a mismatch among x vs. y or x vs. z");
 
     if (_alg_flash_filter) {
-      _alg_flash_filter->SetVerbosity(_verbosity);
-      _alg_flash_filter->Configure(main_cfg.get_pset(_alg_flash_filter->AlgorithmName()));
+
+      _alg_flash_filter->Configure(main_cfg.get<flashana::Config_t>(_alg_flash_filter->AlgorithmName()));
       _alg_flash_filter->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
       _alg_flash_filter->SetActiveVolume( det_xrange[0], det_xrange[1],
                                           det_yrange[0], det_yrange[1],
@@ -132,8 +148,8 @@ namespace flashana {
       _alg_flash_filter->SetDriftVelocity( drift_velocity );
     }
     if (_alg_tpc_filter) {
-      _alg_tpc_filter->SetVerbosity(_verbosity);
-      _alg_tpc_filter->Configure(main_cfg.get_pset(_alg_tpc_filter->AlgorithmName()));
+
+      _alg_tpc_filter->Configure(main_cfg.get<flashana::Config_t>(_alg_tpc_filter->AlgorithmName()));
       _alg_tpc_filter->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
       _alg_tpc_filter->SetActiveVolume( det_xrange[0], det_xrange[1],
                                         det_yrange[0], det_yrange[1],
@@ -141,8 +157,8 @@ namespace flashana {
       _alg_tpc_filter->SetDriftVelocity( drift_velocity );
     }
     if (_alg_match_prohibit) {
-      _alg_match_prohibit->SetVerbosity(_verbosity);
-      _alg_match_prohibit->Configure(main_cfg.get_pset(_alg_match_prohibit->AlgorithmName()));
+
+      _alg_match_prohibit->Configure(main_cfg.get<flashana::Config_t>(_alg_match_prohibit->AlgorithmName()));
       _alg_match_prohibit->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
       _alg_match_prohibit->SetActiveVolume( det_xrange[0], det_xrange[1],
                                             det_yrange[0], det_yrange[1],
@@ -150,8 +166,8 @@ namespace flashana {
       _alg_match_prohibit->SetDriftVelocity( drift_velocity );
     }
     if (_alg_flash_hypothesis) {
-      _alg_flash_hypothesis->SetVerbosity(_verbosity);
-      _alg_flash_hypothesis->Configure(main_cfg.get_pset(_alg_flash_hypothesis->AlgorithmName()));
+
+      _alg_flash_hypothesis->Configure(main_cfg.get<flashana::Config_t>(_alg_flash_hypothesis->AlgorithmName()));
       _alg_flash_hypothesis->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
       _alg_flash_hypothesis->SetActiveVolume( det_xrange[0], det_xrange[1],
                                               det_yrange[0], det_yrange[1],
@@ -159,8 +175,8 @@ namespace flashana {
       _alg_flash_hypothesis->SetDriftVelocity( drift_velocity );
     }
     if (_alg_flash_match) {
-      _alg_flash_match->SetVerbosity(_verbosity);
-      _alg_flash_match->Configure(main_cfg.get_pset(_alg_flash_match->AlgorithmName()));
+
+      _alg_flash_match->Configure(main_cfg.get<flashana::Config_t>(_alg_flash_match->AlgorithmName()));
       _alg_flash_match->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
       _alg_flash_match->SetActiveVolume( det_xrange[0], det_xrange[1],
                                          det_yrange[0], det_yrange[1],
@@ -171,7 +187,7 @@ namespace flashana {
 
     for (auto& name_ptr : _custom_alg_m) {
 
-      name_ptr.second->Configure(main_cfg.get_pset(name_ptr.first));
+      name_ptr.second->Configure(main_cfg.get<flashana::Config_t>(name_ptr.first));
       name_ptr.second->SetOpDetPositions(pmt_x_pos, pmt_y_pos, pmt_z_pos);
       name_ptr.second->SetActiveVolume( det_xrange[0], det_xrange[1],
 					det_yrange[0], det_yrange[1],
@@ -185,7 +201,7 @@ namespace flashana {
   BaseAlgorithm* FlashMatchManager::GetAlgo(flashana::Algorithm_t type)
   {
     if (!_configured)
-      Print(msg::kWARNING, __FUNCTION__, "Algorithm may be not configured yet!");
+      FLASH_WARNING() << "Algorithm may be not configured yet!" << std::endl;
 
     // Figure out the type of a provided algorithm
     switch (type) {
@@ -222,7 +238,7 @@ namespace flashana {
   flashana::BaseAlgorithm* FlashMatchManager::GetCustomAlgo(std::string name)
   {
     if(_custom_alg_m.find(name) == _custom_alg_m.end()) {
-      Print(msg::kERROR,__FUNCTION__,Form("Algorithm name %s not found!",name.c_str()));
+      FLASH_ERROR() << Form("Algorithm name %s not found!",name.c_str()) << std::endl;
       throw OpT0FinderException();
     }
     return _custom_alg_m[name];
@@ -266,7 +282,7 @@ namespace flashana {
       throw OpT0FinderException("Flash hypothesis algorithm is required! (not attached)");
 
     if (!_configured)
-      Configure(_config_file);
+      throw OpT0FinderException("Have not configured yet!");
 
     if(_tpc_object_v.empty() || _flash_v.empty()) return result;
 
@@ -285,11 +301,8 @@ namespace flashana {
       tpc_index_v.reserve(_tpc_object_v.size());
       for (size_t i = 0; i < _tpc_object_v.size(); ++i) tpc_index_v.push_back(i);
     }
-    if (_verbosity <= msg::kINFO) {
-      std::stringstream ss;
-      ss << "TPC Filter: " << _tpc_object_v.size() << " => " << tpc_index_v.size();
-      Print(msg::kINFO, __FUNCTION__, ss.str());
-    }
+
+    FLASH_INFO() << "TPC Filter: " << _tpc_object_v.size() << " => " << tpc_index_v.size() << std::endl;
 
     // Figure out which flash to use: if algorithm provided, ask it. Else use all
     if (_alg_flash_filter)
@@ -298,11 +311,7 @@ namespace flashana {
       flash_index_v.reserve(_flash_v.size());
       for (size_t i = 0; i < _flash_v.size(); ++i) flash_index_v.push_back(i);
     }
-    if (_verbosity <= msg::kINFO) {
-      std::stringstream ss;
-      ss << "Flash Filter: " << _flash_v.size() << " => " << flash_index_v.size();
-      Print(msg::kINFO, __FUNCTION__, ss.str());
-    }
+    FLASH_INFO() << "Flash Filter: " << _flash_v.size() << " => " << flash_index_v.size() << std::endl;
 
     //
     // Flash matching stage
@@ -346,16 +355,12 @@ namespace flashana {
         // For ordering purpose, take an inverse of the score for sorting
         score_map.emplace( 1. / res.score, res);
 
-        if (_verbosity <= msg::kDEBUG) {
-          std::stringstream ss;
-          ss << "Candidate Match: "
-	     << " TPC=" << tpc_index << " @ " << tpc.time
-	     << " with Flash=" << flash_index << " @ " << flash.time
-             << " ... Score=" << res.score
-	     << " ... PE=" << flash.TotalPE();
-          Print(msg::kINFO, __FUNCTION__, ss.str());
-        }
-
+        FLASH_DEBUG() << "Candidate Match: "
+		      << " TPC=" << tpc_index << " @ " << tpc.time
+		      << " with Flash=" << flash_index << " @ " << flash.time
+		      << " ... Score=" << res.score
+		      << " ... PE=" << flash.TotalPE()
+		      << std::endl;
       }
     }
 
@@ -382,13 +387,10 @@ namespace flashana {
       if (!_allow_reuse_flash && flash_used.find(flash_index) != flash_used.end()) continue;
 
       // Reaching this point means a new match. Yay!
-      if (_verbosity <= msg::kINFO) {
-        std::stringstream ss;
-        ss << "Concrete Match: " << " TPC=" << tpc_index << " Flash=" << flash_index
-           << " Score=" << match_info.score;
-        Print(msg::kINFO, __FUNCTION__, ss.str());
-      }
-
+      FLASH_INFO () << "Concrete Match: " << " TPC=" << tpc_index << " Flash=" << flash_index
+		    << " Score=" << match_info.score
+		    << std::endl;
+      
       // Register to a list of a "used" flash and tpc info
       tpc_used.insert(tpc_index);
       flash_used.insert(flash_index);
@@ -403,11 +405,11 @@ namespace flashana {
   }
 
   void FlashMatchManager::PrintConfig() {
-    std::cout << "---- FLASH MATCH MANAGER PRINTING CONFIG     ----" << std::endl;
-    std::cout << "_allow_reuse_flash = " << _allow_reuse_flash << std::endl;
-    std::cout << "_config_file = " << _config_file << std::endl;
-    std::cout << "_name = " << _name << std::endl;
-    std::cout << "_alg_flash_filter?" << std::endl;
+    
+    std::cout << "---- FLASH MATCH MANAGER PRINTING CONFIG     ----" << std::endl
+	      << "_allow_reuse_flash = " << _allow_reuse_flash << std::endl
+	      << "_name = " << _name << std::endl
+	      << "_alg_flash_filter?" << std::endl;
     if (_alg_flash_filter)
       std::cout << "\t" << _alg_flash_filter->AlgorithmName() << std::endl;
     std::cout << "_alg_tpc_filter?" << std::endl;
@@ -426,8 +428,6 @@ namespace flashana {
     for (auto& name_ptr : _custom_alg_m)
       std::cout << "\t" << name_ptr.first << std::endl;
     std::cout << "---- END FLASH MATCH MANAGER PRINTING CONFIG ----" << std::endl;
-
-
   }
 }
 

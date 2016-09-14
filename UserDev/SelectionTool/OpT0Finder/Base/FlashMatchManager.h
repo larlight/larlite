@@ -14,7 +14,8 @@
 #ifndef OPT0FINDER_FLASHMATCHMANAGER_H
 #define OPT0FINDER_FLASHMATCHMANAGER_H
 
-#include "ColorPrint.h"
+#include "LoggerFeature.h"
+#include "OpT0FinderFMWKInterface.h"
 #include "BaseAlgorithm.h"
 #include "BaseTPCFilter.h"
 #include "BaseFlashFilter.h"
@@ -25,7 +26,7 @@ namespace flashana {
   /**
      \class FlashMatchManager
   */
-  class FlashMatchManager : public ColorPrint {
+  class FlashMatchManager : public LoggerFeature {
 
   public:
     
@@ -38,14 +39,8 @@ namespace flashana {
     /// Name getter
     const std::string& Name() const;
 
-    /// Algorithm setter
-    void SetAlgo(BaseAlgorithm* alg);
-
-    /// Custom algorithm adder
-    void AddCustomAlgo(BaseAlgorithm* alg);
-
     /// Configuration
-    void Configure(const std::string="");
+    void Configure(const Config_t& cfg);
 
     /// Algorithm getter
     flashana::BaseAlgorithm* GetAlgo(flashana::Algorithm_t type);
@@ -99,6 +94,8 @@ namespace flashana {
     { return _res_flash_tpc_v; }
 
   private:
+
+    void AddCustomAlgo(BaseAlgorithm* alg);
 
     BaseFlashFilter*     _alg_flash_filter;     ///< Flash filter algorithm
     BaseTPCFilter*       _alg_tpc_filter;       ///< TPC filter algorithm

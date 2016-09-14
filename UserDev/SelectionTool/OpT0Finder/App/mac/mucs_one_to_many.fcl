@@ -16,9 +16,15 @@ MuCST0Finder: {
 # Manager configuration
 #
 FlashMatchManager: {
-    Verbosity: 3
-    AllowReuseFlash: false
-    StoreFullResult: true
+  Verbosity: 3
+  AllowReuseFlash: false
+  StoreFullResult: true
+  FlashFilterAlgo: ""
+  TPCFilterAlgo:   "NPtFilter"
+  ProhibitAlgo:    "TimeCompatMatch"
+  HypothesisAlgo:  "PhotonLibHypothesis"
+  MatchAlgo:       "QLLMatch"
+  CustomAlgo:      ["LightPath","MCQCluster"]
 }
 
 #

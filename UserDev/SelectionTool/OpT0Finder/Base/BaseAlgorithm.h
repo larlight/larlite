@@ -15,9 +15,9 @@
 #define OPT0FINDER_BASEALGORITHM_H
 
 #include "OpT0FinderTypes.h"
-#include "ColorPrint.h"
+#include "OpT0FinderFMWKInterface.h"
+#include "LoggerFeature.h"
 #include "GeoAlgo/GeoAABox.h"
-#include "FhiclLite/PSet.h"
 #include <vector>
 namespace flashana {
 
@@ -26,7 +26,7 @@ namespace flashana {
   /**
      \class BaseAlgorithm
   */
-  class BaseAlgorithm : public ColorPrint {
+  class BaseAlgorithm : public LoggerFeature {
 
     friend class FlashMatchManager;
     
@@ -39,7 +39,7 @@ namespace flashana {
     ~BaseAlgorithm(){}
 
     /// Function to accept configuration
-    virtual void Configure(const ::fcllite::PSet &pset) = 0;
+    void Configure(const Config_t &pset);
 
     /// Algorithm type
     Algorithm_t AlgorithmType() const;
@@ -68,6 +68,10 @@ namespace flashana {
 
     double DriftVelocity() const;
     
+  protected:
+
+    virtual void _Configure_(const Config_t &pset) = 0;
+
   private:
     
     void SetOpDetPositions( const std::vector<double>& pos_x,

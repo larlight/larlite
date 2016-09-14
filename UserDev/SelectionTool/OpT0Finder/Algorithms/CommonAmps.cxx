@@ -9,6 +9,8 @@
 #include <numeric>
 namespace flashana {
 
+  static CommonAmpsFactory __global_CommonAmpsFactory__;
+
   CommonAmps::CommonAmps(const std::string name)
     : BaseFlashMatch(name)
   {
@@ -16,7 +18,7 @@ namespace flashana {
     _score   = 0.8;    
   }
 
-  void CommonAmps::Configure(const ::fcllite::PSet &pset)
+  void CommonAmps::_Configure_(const Config_t &pset)
   {
     _percent = pset.get<double>("QFracThreshold");
     _score   = pset.get<double>("ScoreThreshold");

@@ -3,28 +3,24 @@
 
 #include "TimeCompatMatch.h"
 #include "OpT0Finder/Base/OpT0FinderException.h"
-#include "LArUtil/GeometryHelper.h"
-#include "LArUtil/DetectorProperties.h"
 #include <cmath>
 #include <sstream>
 
 namespace flashana {
 
+  static TimeCompatMatchFactory __global_TimeCompatMatchFactory__;
+
   TimeCompatMatch::TimeCompatMatch(const std::string name)
     : BaseProhibitAlgo(name)
   {}
 
-  void TimeCompatMatch::Configure(const ::fcllite::PSet &pset)
+  void TimeCompatMatch::_Configure_(const Config_t &pset)
   {
     _time_buffer = pset.get<double>("TimeBuffer");
   }
 
   bool TimeCompatMatch::MatchCompatible(const QCluster_t& clus, const Flash_t& flash)
   {
-
-    // conversion quantities
-    double t2cm   = larutil::GeometryHelper::GetME()->TimeToCm();
-    double ROrate = larutil::DetectorProperties::GetME()->SamplingRate(); // ns
 
     if(clus.empty()) return false; 
 

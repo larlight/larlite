@@ -12,12 +12,14 @@
 #include "GeoAlgo/GeoAlgo.h"
 namespace flashana {
 
+  static MCQClusterFactory __global_MCQClusterFactory__;
+
   MCQCluster::MCQCluster(const std::string name)
     : BaseAlgorithm( kCustomAlgo, name )
     , _use_xshift  ( true  )
   {}
 
-  void MCQCluster::Configure(const ::fcllite::PSet &pset)
+  void MCQCluster::_Configure_(const ::fcllite::PSet &pset)
   {
     _use_mc_dedx = pset.get<bool>("UseMCdEdX");
     _use_xshift  = pset.get<bool>("UseXShift");

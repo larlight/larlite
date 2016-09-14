@@ -15,6 +15,8 @@
 #define OPT0FINDER_NPTFILTER_H
 
 #include "OpT0Finder/Base/BaseTPCFilter.h"
+#include "OpT0Finder/Base/TPCFilterFactory.h"
+
 namespace flashana {
   /**
      \class NPtFilter
@@ -32,19 +34,35 @@ namespace flashana {
     /// Default destructor
     ~NPtFilter(){}
 
-    void Configure(const ::fcllite::PSet &pset);
-    
     /// Implementation of virtualfunction
     IDArray_t Filter(const QClusterArray_t&);
 
     /// set minimum number of point in TPC track
     void SetMinNumPoints(size_t n) { _min_num_pt = n; }
 
+  protected:
+
+    void _Configure_(const ::fcllite::PSet &pset);
+
   private:
     
     size_t _min_num_pt; ///< mininum number of QPoint_t to pass the filter
     
   };
+
+  /**
+     \class flashana::NPtFilterFactory
+  */
+  class NPtFilterFactory : public TPCFilterFactoryBase {
+  public:
+    /// ctor
+    NPtFilterFactory() { TPCFilterFactory::get().add_factory("NPtFilter",this); }
+    /// dtor
+    ~NPtFilterFactory() {}
+    /// creation method
+    BaseTPCFilter* create(const std::string instance_name) { return new NPtFilter(instance_name); }
+  };
+  
 }
 
 #endif

@@ -50,21 +50,21 @@ my_proc.add_process(my_unit)
 #my_unit.ShiftFlashTime(-500)
 
 # TPC Filter Algo
-my_unit.Manager().SetAlgo(flashana.NPtFilter())
+#my_unit.Manager().SetAlgo(flashana.NPtFilter())
 # PMT Filter Algo
-my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
+#my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
 # Match Prohibit Algo
-my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
+#my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
 # Hypothesis Algo
-my_unit.Manager().SetAlgo(flashana.PhotonLibHypothesis())
+#my_unit.Manager().SetAlgo(flashana.PhotonLibHypothesis())
 # Match Algo
-algo = flashana.QLLMatch.GetME()
+#algo = flashana.QLLMatch.GetME()
 #algo = flashana.QWeightPoint()
 #algo = flashana.CommonAmps()
-my_unit.Manager().SetAlgo( algo )
+#my_unit.Manager().SetAlgo( algo )
 
 # Custom Algo
-my_unit.Manager().SetAlgo( flashana.LightPath()  )
+#my_unit.Manager().SetAlgo( flashana.LightPath()  )
 
 # producer
 my_unit.SetConfigFile(cfg_file)

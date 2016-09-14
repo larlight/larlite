@@ -16,6 +16,12 @@ namespace flashana {
   Algorithm_t BaseAlgorithm::AlgorithmType() const
   { return _type; }
 
+  void BaseAlgorithm::Configure(const Config_t &pset)
+  {
+    this->set_verbosity((msg::Level_t)(pset.get<unsigned int>("Verbosity",(unsigned int)(msg::kNORMAL))));
+    this->_Configure_(pset);
+  }
+
   size_t BaseAlgorithm::NOpDets() const
   {
     return _opdet_x_v.size();

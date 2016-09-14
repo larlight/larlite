@@ -157,7 +157,7 @@ namespace flashana {
   
   namespace msg {
     /// Verbosity message level
-    enum MSGLevel_t {
+    enum Level_t {
       kDEBUG,
       kINFO,
       kNORMAL,
@@ -167,25 +167,14 @@ namespace flashana {
       kMSG_TYPE_MAX
     };
     
-    const std::string kColorPrefix[kMSG_TYPE_MAX] =
-      {
-	"\033[94m", ///< blue ... DEBUG
-	"\033[92m", ///< green ... INFO
-	"\033[95m", ///< magenta ... NORMAL
-	"\033[93m", ///< yellow ... WARNING
-	"\033[91m", ///< red ... ERROR
-	"\033[5;1;33;41m" ///< red with yellow background ... CRITICAL
-      };
-    ///< Color coding of message
-    
     const std::string kStringPrefix[kMSG_TYPE_MAX] =
       {
-	"     [DEBUG]  ", ///< DEBUG message prefix
-	"      [INFO]  ", ///< INFO message prefix
-	"    [NORMAL]  ", ///< NORMAL message prefix
-	"   [WARNING]  ", ///< WARNING message prefix
-	"     [ERROR]  ", ///< ERROR message prefix
-	" [EXCEPTION]  "  ///< CRITICAL message prefix
+	"\033[94m     [DEBUG]  \033[00m", ///< DEBUG message prefix
+	"\033[92m      [INFO]  \033[00m", ///< INFO message prefix
+	"\033[95m    [NORMAL]  \033[00m", ///< NORMAL message prefix
+	"\033[93m   [WARNING]  \033[00m", ///< WARNING message prefix
+	"\033[91m     [ERROR]  \033[00m", ///< ERROR message prefix
+	"\033[5;1;33;41m [EXCEPTION]  \033[00m"  ///< CRITICAL message prefix
       };
     ///< Prefix of message
   }

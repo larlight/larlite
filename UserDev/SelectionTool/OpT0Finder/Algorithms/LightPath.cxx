@@ -5,6 +5,8 @@
 
 namespace flashana {
 
+  static LightPathFactory __global_LightPathFactory__;
+
   LightPath::LightPath(const std::string name)
     : BaseAlgorithm(kCustomAlgo, name)
     , _gap         ( 0.5    )
@@ -12,7 +14,7 @@ namespace flashana {
     , _dEdxMIP     ( 2.07    ) //1.42[Mev*cm^2*g]*1.4[g/cm^3]=2.004MeV/cm
   {}
 
-  void LightPath::Configure(const ::fcllite::PSet &pset)
+  void LightPath::_Configure_(const ::fcllite::PSet &pset)
   {
     _gap          = pset.get< double > ( "SegmentSize" );
     _light_yield  = pset.get< double > ( "LightYield"  );

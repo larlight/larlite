@@ -23,6 +23,8 @@
 #include <functional>
 #include <algorithm>
 #include "OpT0Finder/Base/BaseAlgorithm.h"
+#include "OpT0Finder/Base/CustomAlgoFactory.h"
+
 namespace flashana{
 /**
    \class LightPath
@@ -40,8 +42,6 @@ namespace flashana{
     /// Default destructor
     ~LightPath(){}
 
-    void Configure(const ::fcllite::PSet &pset);
-    
     // Setter function
     double Set_Gap      ( double x) { _gap   =x;      return _gap;}
       
@@ -58,10 +58,26 @@ namespace flashana{
 
 
   protected:
+
+    void _Configure_(const ::fcllite::PSet &pset);
+    
     double _gap;
     double _light_yield;
     double _dEdxMIP;
     ::geoalgo::GeoAlgo _geoAlgo;
+  };
+  
+  /**
+     \class flashana::LightPathFactory
+  */
+  class LightPathFactory : public CustomAlgoFactoryBase {
+  public:
+    /// ctor
+    LightPathFactory() { CustomAlgoFactory::get().add_factory("LightPath",this); }
+    /// dtor
+    ~LightPathFactory() {}
+    /// creation method
+    BaseAlgorithm* create(const std::string instance_name) { return new LightPath(instance_name); }
   };
 } 
 

@@ -6,11 +6,13 @@
 
 namespace flashana {
 
+  static PhotonLibHypothesisFactory __global_PhotonLibHypothesisFactory__;
+
   PhotonLibHypothesis::PhotonLibHypothesis(const std::string name)
     : BaseFlashHypothesis(name)
   {}
 
-  void PhotonLibHypothesis::Configure(const ::fcllite::PSet &pset)
+  void PhotonLibHypothesis::_Configure_(const Config_t &pset)
   {}
   
   void PhotonLibHypothesis::FillEstimate(const QCluster_t& trk,

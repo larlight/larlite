@@ -11,6 +11,8 @@
 
 namespace flashana {
 
+  static QLLMatchFactory __global_QLLMatchFactory__;
+
   QLLMatch *QLLMatch::_me = nullptr;
   
   void MIN_vtx_qll(Int_t &, Double_t *, Double_t &, Double_t *, Int_t);
@@ -22,7 +24,7 @@ namespace flashana {
   QLLMatch::QLLMatch()
   { throw OpT0FinderException("Use QLLMatch::GetME() to obtain singleton pointer!"); }
   
-  void QLLMatch::Configure(const ::fcllite::PSet &pset) {
+  void QLLMatch::_Configure_(const Config_t &pset) {
     _record = pset.get<bool>("RecordHistory");
     _normalize = pset.get<bool>("NormalizeHypothesis");
     _mode   = (QLLMode_t)(pset.get<unsigned short>("QLLMode"));
@@ -194,8 +196,9 @@ namespace flashana {
   
   const Flash_t &QLLMatch::ChargeHypothesis(const double xoffset) {
     if (_hypothesis.pe_v.empty()) _hypothesis.pe_v.resize(NOpDets(), 0.);
-    if (_hypothesis.pe_v.size() != NOpDets())
-      Print(msg::kEXCEPTION, __FUNCTION__, "Hypothesis vector length != PMT count");
+    if (_hypothesis.pe_v.size() != NOpDets()) {
+      throw OpT0FinderException("Hypothesis vector length != PMT count");
+    }
     
     for (auto &v : _hypothesis.pe_v) v = 0;
     
@@ -291,11 +294,11 @@ namespace flashana {
     //std::cout << "minuit offset : " << Fval << std::endl;
     ///std::cout << "minuit Xval?? : " << *Xval << std::endl;
     
-    auto const &hypothesis = QLLMatch::GetME().ChargeHypothesis(*Xval);
-    auto const &measurement = QLLMatch::GetME().Measurement();
-    Fval = QLLMatch::GetME().QLL(hypothesis, measurement);
+    auto const &hypothesis = QLLMatch::GetME()->ChargeHypothesis(*Xval);
+    auto const &measurement = QLLMatch::GetME()->Measurement();
+    Fval = QLLMatch::GetME()->QLL(hypothesis, measurement);
     
-    QLLMatch::GetME().Record(Xval[0]);
+    QLLMatch::GetME()->Record(Xval[0]);
     
     return;
   }

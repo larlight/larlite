@@ -15,6 +15,7 @@
 #define OPT0FINDER_TIMECOMPATMATCH_H
 
 #include "OpT0Finder/Base/BaseProhibitAlgo.h"
+#include "OpT0Finder/Base/FlashProhibitFactory.h"
 
 namespace flashana {
   
@@ -34,9 +35,11 @@ namespace flashana {
     /// Default destructor
     ~TimeCompatMatch(){}
 
-    void Configure(const ::fcllite::PSet &pset);
-
     bool MatchCompatible(const QCluster_t& clus, const Flash_t& flash);
+
+  protected:
+
+    void _Configure_(const Config_t &pset);
 
   private:
 
@@ -44,6 +47,20 @@ namespace flashana {
     double _time_buffer;
 
   };
+
+  /**
+     \class flashana::TimeCompatMatchFactory
+  */
+  class TimeCompatMatchFactory : public FlashProhibitFactoryBase {
+  public:
+    /// ctor
+    TimeCompatMatchFactory() { FlashProhibitFactory::get().add_factory("TimeCompatMatch",this); }
+    /// dtor
+    ~TimeCompatMatchFactory() {}
+    /// creation method
+    BaseProhibitAlgo* create(const std::string instance_name) { return new TimeCompatMatch(instance_name); }
+  };
+  
 }
 #endif
 /** @} */ // end of doxygen group 

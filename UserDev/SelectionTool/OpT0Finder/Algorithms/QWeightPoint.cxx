@@ -9,13 +9,15 @@
 #include <numeric>
 namespace flashana {
 
+  static QWeightPointFactory __global_QWeightPointFactory__;
+
   QWeightPoint::QWeightPoint(const std::string name)
     : BaseFlashMatch(name)
     , _x_step_size ( 0.5   )
     , _zdiff_max   ( 50*50 )
   {}
 
-  void QWeightPoint::Configure(const ::fcllite::PSet &pset)
+  void QWeightPoint::_Configure_(const ::fcllite::PSet &pset)
   {
     _x_step_size = pset.get<double>("XStepSize");
     _zdiff_max   = pset.get<double>("ZDiffMax" );
@@ -94,14 +96,11 @@ namespace flashana {
 
     f.hypothesis.clear();
     
-    if(_verbosity <= msg::kINFO) {
-      std::stringstream ss1;
-      ss1 << "Best match Hypothesis: "
-	  << f.tpc_point.x << " : "
-	  << f.tpc_point.y << " : "
-	  << f.tpc_point.z << " ... min dist : " << min_dz;
-      Print(msg::kINFO,__FUNCTION__,ss1.str());
-    }
+    FLASH_INFO() << "Best match Hypothesis: "
+		 << f.tpc_point.x << " : "
+		 << f.tpc_point.y << " : "
+		 << f.tpc_point.z << " ... min dist : " << min_dz
+		 << std::endl;
   
     // If min-diff is bigger than assigned max, return default match (score<0)
     if( min_dz > _zdiff_max ) {

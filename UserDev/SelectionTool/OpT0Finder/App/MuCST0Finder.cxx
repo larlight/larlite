@@ -40,7 +40,7 @@ namespace larlite {
       return false;
     }
 
-    _mgr.Configure(_config_file);
+    _mgr.Configure(main_cfg);
 
     return true;
   }

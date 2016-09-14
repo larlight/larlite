@@ -15,6 +15,7 @@
 #define OPT0FINDER_MAXNPEWINDOW_H
 
 #include "OpT0Finder/Base/BaseFlashFilter.h"
+#include "OpT0Finder/Base/FlashFilterFactory.h"
 
 namespace flashana {
   /**
@@ -47,10 +48,12 @@ namespace flashana {
     /// Default destructor
     ~MaxNPEWindow(){}
 
-    void Configure(const ::fcllite::PSet &pset);
-
     /// Implementation of a virtual function
     IDArray_t Filter(const FlashArray_t&);
+
+  protected:
+
+    void _Configure_(const ::fcllite::PSet &pset);
 
   private:
 
@@ -59,6 +62,20 @@ namespace flashana {
     double _npe_threshold;    ///< threshold [p.e.]: to ignore any flash below this value
     
   };
+
+  /**
+     \class flashana::MaxNPEWindowFactory
+  */
+  class MaxNPEWindowFactory : public FlashFilterFactoryBase {
+  public:
+    /// ctor
+    MaxNPEWindowFactory() { FlashFilterFactory::get().add_factory("MaxNPEWindow",this); }
+    /// dtor
+    ~MaxNPEWindowFactory() {}
+    /// creation method
+    BaseFlashFilter* create(const std::string instance_name) { return new MaxNPEWindow(instance_name); }
+  };
+  
 }
 
 #endif

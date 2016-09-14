@@ -15,6 +15,7 @@
 #define QLLMATCH_H
 
 #include <iostream>
+#include "OpT0Finder/Base/FlashMatchFactory.h"
 #include "OpT0Finder/Base/BaseFlashMatch.h"
 #include <TMinuit.h>
 namespace flashana {
@@ -41,13 +42,11 @@ namespace flashana {
     /// Default destructor
     ~QLLMatch(){}
 
-    void Configure(const ::fcllite::PSet &pset);
-
     /// Singleton shared instance getter
-    static QLLMatch& GetME()
+    static QLLMatch* GetME()
     {
       if(!_me) _me = new QLLMatch("QLLMatch");
-      return *_me;
+      return _me;
     }
 
     /// Core function: execute matching
@@ -75,6 +74,10 @@ namespace flashana {
     const std::vector<double>& HistoryLLHD() const { return _minimizer_record_llhd_v; }
     const std::vector<double>& HistoryChi2() const { return _minimizer_record_chi2_v; }
     const std::vector<double>& HistoryX()    const { return _minimizer_record_x_v;    }
+
+  protected:
+
+    void _Configure_(const Config_t &pset);
     
   private:
 
@@ -117,7 +120,21 @@ namespace flashana {
     double _onepmt_xdiff_threshold;
     double _onepmt_pesum_threshold;
     double _onepmt_pefrac_threshold;
-  };    
+  };
+
+  /**
+     \class flashana::QLLMatchFactory
+  */
+  class QLLMatchFactory : public FlashMatchFactoryBase {
+  public:
+    /// ctor
+    QLLMatchFactory() { FlashMatchFactory::get().add_factory("QLLMatch",this); }
+    /// dtor
+    ~QLLMatchFactory() {}
+    /// creation method
+    BaseFlashMatch* create(const std::string instance_name) { return QLLMatch::GetME(); }
+  };
+  
 }
 
 #endif
