@@ -15,11 +15,7 @@
 #define LIGHTPATH_H
 
 #include <iostream>
-#include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
-#include "OpT0Finder/Base/OpT0FinderTypes.h"
 #include <numeric>
-#include "GeoAlgo/GeoAlgo.h"
-#include "LArUtil/Geometry.h"
 #include <functional>
 #include <algorithm>
 #include "OpT0Finder/Base/BaseAlgorithm.h"
@@ -64,7 +60,7 @@ namespace flashana{
     double _gap;
     double _light_yield;
     double _dEdxMIP;
-    ::geoalgo::GeoAlgo _geoAlgo;
+
   };
   
   /**

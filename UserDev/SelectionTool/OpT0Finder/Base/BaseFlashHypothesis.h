@@ -15,7 +15,6 @@
 #define BASEFLASHHYPOTHESIS_H
 
 #include "BaseAlgorithm.h"
-#include "FhiclLite/PSet.h"
 
 namespace flashana {
   /**

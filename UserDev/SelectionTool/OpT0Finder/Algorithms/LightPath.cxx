@@ -2,7 +2,7 @@
 #define LIGHTPATH_CXX
 
 #include "LightPath.h"
-
+#include "GeoAlgo/GeoTrajectory.h"
 namespace flashana {
 
   static LightPathFactory __global_LightPathFactory__;
