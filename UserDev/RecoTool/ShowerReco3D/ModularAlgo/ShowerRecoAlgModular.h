@@ -34,7 +34,7 @@ class ShowerRecoAlgModular : public ShowerRecoAlgBase {
 public:
 
     /// Default constructor
-    ShowerRecoAlgModular() {_debug = false;}
+  ShowerRecoAlgModular() {_debug = false; _verbose= false; }
 
     /// Default destructor
     ~ShowerRecoAlgModular() {}
@@ -117,6 +117,11 @@ public:
     void SetDebug(bool b = true) {_debug = b;}
 
     /**
+     * @brief set verbosity mode
+     */
+    void SetVerbose(bool b = true) { _verbose = b; }
+
+    /**
      * @brief function to finalize the algorithm -> basically used to write each modular algo's trees
      */
     void Finalize(TFile* fout);
@@ -136,6 +141,8 @@ private:
     std::vector<ShowerRecoModuleBase * > _modules;
 
     bool _debug;
+
+    bool _verbose;
 
     // Time profilers
     TStopwatch _watch; ///< For profiling
