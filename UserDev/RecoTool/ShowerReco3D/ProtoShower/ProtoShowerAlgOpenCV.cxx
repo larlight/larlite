@@ -132,7 +132,6 @@ namespace protoshower {
       proto_shower.hasCluster2D(false);
     
     // Do the vertex:
-    std::cout << "ev_pfpar name " << ev_pfpart->name() << "\n";
     larlite::event_vertex * ev_vertex = nullptr;
     auto const& ass_vertex_v
       = storage->find_one_ass(ev_pfpart->id(),
