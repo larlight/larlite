@@ -60,9 +60,11 @@ namespace larlite {
 
     void ShiftFlashTime(double v) {_shift_flash_time=v;}
 
-    void OpHitProducer(const std::string name) { _ophit_producer = name; }
+    void OpFlashBeamProducer(const std::string name) { _opflash_producer_beam = name; }
 
-    void OpFlashProducer(const std::string name) { _opflash_producer = name; }
+    void OpFlashCosmicProducer(const std::string name) { _opflash_producer_cosmic = name; }
+
+    void TriggerProducer(const std::string name) { _trigger_producer = name; }
 
   protected:
 
@@ -75,52 +77,9 @@ namespace larlite {
     bool _use_mc;
     //bool _useAbsPE ;
     //double _step_len ;
-    std::string _opflash_producer;
-    std::string _ophit_producer;
-
-    TTree* _int_tree;
-    double _t0 ;
-    double _n_pe ;
-    double _int_e ;
-    double _n_flash ;
-
-    TTree* _track_tree;
-    double _trk_time;
-    double _trk_shift;
-    double _trk_max_x;
-    double _trk_min_x;
-    double _trk_x;
-    
-    TTree* _flashmatch_tree;
-    double _npe;
-    double _npts;
-    double _flash_x;
-    double _flash_y;
-    double _flash_z;
-    double _tpc_x;
-    double _tpc_y;
-    double _tpc_z;
-    double _score;
-    double _flash_time;
-    double _mc_time;
-    double _mc_x;
-    double _mc_y;
-    double _mc_z;
-    double _mc_dx;
-    int _tpc_id ;
-    int _flash_id ;
-
-    // tree to measure efficiency of matching for MCTracks
-    TTree *_eff_tree;
-    TTree *_flash_tree;
-    int _matched;
-    double _mc_edep;
-    double _trk_max_abs_x, _trk_min_abs_x;
-
-    TH2D * _nflash_v_nint ;
-    TH1D * _time_diff ;
-    int _n_bins ;
-    int _max_time ;
+    std::string _opflash_producer_beam;
+    std::string _opflash_producer_cosmic;
+    std::string _trigger_producer;
 
     int _use_bnb_correctness_window ;
 

@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include "OpT0Finder/Base/BaseFlashHypothesis.h"
+#include "OpT0Finder/Base/FlashHypothesisFactory.h"
 
 namespace flashana {
   /**
@@ -33,10 +34,25 @@ namespace flashana {
     /// Default destructor
     virtual ~PhotonLibHypothesis(){}
 
-    void Configure(const ::fcllite::PSet &pset);
-
     void FillEstimate(const QCluster_t&, Flash_t&) const;
 
+  protected:
+
+    void _Configure_(const Config_t &pset);
+    
+  };
+  
+  /**
+     \class flashana::PhotonLibHypothesisFactory
+  */
+  class PhotonLibHypothesisFactory : public FlashHypothesisFactoryBase {
+  public:
+    /// ctor
+    PhotonLibHypothesisFactory() { FlashHypothesisFactory::get().add_factory("PhotonLibHypothesis",this); }
+    /// dtor
+    ~PhotonLibHypothesisFactory() {}
+    /// creation method
+    BaseFlashHypothesis* create(const std::string instance_name) { return new PhotonLibHypothesis(instance_name); }
   };
 }
 #endif

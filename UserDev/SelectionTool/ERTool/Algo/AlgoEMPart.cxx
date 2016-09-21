@@ -523,7 +523,7 @@ namespace ertool {
            << "dEdx: MeanL: " << meanL->getVal() << " SigmaL: " << sigmaL->getVal() << std::endl
            << "dEdx: MeanG: " << meanG->getVal() << " SigmaG: " << sigmaG->getVal() << std::endl
            << "fraction   : " << frac->getVal() << std::endl;
-        params.add_value(Form("%s_params", part_letter.c_str()), ::fcllite::VecToString<double>(darray));
+        params.add_value(Form("%s_params", part_letter.c_str()), ::fcllite::parser::VecToString<double>(darray));
         Normal(__FUNCTION__, ss.str());
       }
       if (_mode) {
@@ -554,7 +554,7 @@ namespace ertool {
            << "[" << __FUNCTION__ << "] "
            << "fraction         : " << frac->getVal() << std::endl;
         Normal(__FUNCTION__, ss.str());
-        params.add_value(Form("%s_params", part_letter.c_str()), ::fcllite::VecToString(darray));
+        params.add_value(Form("%s_params", part_letter.c_str()), ::fcllite::parser::VecToString(darray));
       }
 
     }// if in traning mode

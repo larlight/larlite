@@ -6,11 +6,13 @@
 
 namespace flashana {
 
+  static PhotonLibHypothesisFactory __global_PhotonLibHypothesisFactory__;
+
   PhotonLibHypothesis::PhotonLibHypothesis(const std::string name)
     : BaseFlashHypothesis(name)
   {}
 
-  void PhotonLibHypothesis::Configure(const ::fcllite::PSet &pset)
+  void PhotonLibHypothesis::_Configure_(const Config_t &pset)
   {}
   
   void PhotonLibHypothesis::FillEstimate(const QCluster_t& trk,
@@ -21,7 +23,7 @@ namespace flashana {
     
     for ( auto& v : flash.pe_v ) v = 0;
     
-    for ( size_t ipmt = 0; ipmt < 32; ++ipmt) {
+    for ( size_t ipmt = 0; ipmt < n_pmt; ++ipmt) {
 
       for ( size_t ipt = 0; ipt < trk.size(); ++ipt) {
 	

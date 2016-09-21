@@ -1,6 +1,6 @@
 import sys,ROOT,os
 
-if len(sys.argv) < 2:
+if len(sys.argv) < 4:
     msg  = '\n'
     msg += "Usage 1: %s $INPUT_ROOT_FILE(s)\n" % sys.argv[0]
     msg += '\n'
@@ -16,9 +16,11 @@ from ROOT import flashana
 my_proc = fmwk.ana_processor()
 
 # Set input root file
-for x in xrange(len(sys.argv)-1):
-    print sys.argv[x+1]
-    my_proc.add_input_file(sys.argv[x+1])
+for x in xrange(len(sys.argv)-3):
+    if not sys.argv[x+3].endswith('.root'):
+        continue
+    print sys.argv[x+3]
+    my_proc.add_input_file(sys.argv[x+3])
 
 # Specify IO mode
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
@@ -38,7 +40,7 @@ my_proc.add_process(my_unit)
 # TPC Filter Algo
 my_unit.Manager().SetAlgo(flashana.NPtFilter())
 # PMT Filter Algo
-my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
+#my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
 # Match Prohibit Algo
 my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
 # Hypothesis Algo
@@ -53,6 +55,9 @@ my_unit.Manager().SetAlgo( algo )
 my_unit.Manager().SetAlgo( flashana.LightPath()  )
 my_unit.Manager().SetAlgo( flashana.MCQCluster() )
 
+my_unit.OpFlashBeamProducer(sys.argv[1])
+my_unit.OpFlashCosmicProducer(sys.argv[2])
+
 #
 # Other algorithms
 #
@@ -64,9 +69,10 @@ print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 fout=open('data.txt','w')
-fout.write('xmin,xmax,x,q,oppe,hypope\n')
+fout.write('xmin,xmax,time,x,t,q,oppe,hypope\n')
+ctr=4400
 while 1:
-    my_proc.process_event()
+    my_proc.process_event(ctr)
 
     match_v = my_unit.MatchResult()
 
@@ -85,10 +91,13 @@ while 1:
 
         xmin = 1e4
         xmax = 0
+        qc=None
         try:
             qc = qcluster_v[match.tpc_id]
         except IndexError:
+            print
             print match.tpc_id,'/',qcluster_v.size()
+            print
             raise IndexError
         for pt_idx in xrange(qc.size()):
             pt = qc[pt_idx]
@@ -96,18 +105,23 @@ while 1:
             if pt.x < xmin: xmin = pt.x
 
         #print 'xmin:',xmin,'xmax:',xmax
-        flash = flash_v[match_v[0].flash_id]
+        flash = flash_v[match_v[index].flash_id]
         pesum = 0
         for pe in flash.pe_v: pesum += pe
         hyposum=0
         for pe in match.hypothesis: hyposum += pe
-        fout.write('%g,%g,%g,%g,%g,%g\n' % (xmin,xmax,match.tpc_point.x,match.score,pesum,hyposum))
+        fout.write('%g,%g,%g,%g,%g,%g,%g,%g\n' % (xmin,xmax,qc.time,match.tpc_point.x,flash.time,match.score,pesum,hyposum))
 
     proc_status = my_proc.get_process_status()
     if proc_status == my_proc.kFINISHED:
         break
+    ctr+=1
+    sys.stdout.write('%d\r' % ctr)
+    sys.stdout.flush()
 
-
+    if 'debug' in sys.argv:
+        cmd=sys.stdin.readline().rstrip('\n')
+        if cmd.lower() in ['n','no']: break
 # done!
 print
 print "Finished running ana_processor event loop!"

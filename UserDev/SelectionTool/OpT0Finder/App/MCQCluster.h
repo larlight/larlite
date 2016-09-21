@@ -37,8 +37,6 @@ namespace flashana {
     /// Default destructor
     ~MCQCluster(){}
 
-    void Configure(const ::fcllite::PSet &pset);
-
     void Construct( const larlite::event_mctrack&,
                     const larlite::event_mcshower&,
 		    const flashana::LightPath&);
@@ -51,7 +49,7 @@ namespace flashana {
 
     size_t MCShower2QCluster(size_t) const;
 
-    bool UseXshift(bool use) { _use_xshift = use; return _use_xshift;}
+    void SetTriggerTime(const double time) { _trigger_time = time; }
      
     const flashana::MCSource_t& MCObjectID(size_t) const;
 
@@ -59,6 +57,11 @@ namespace flashana {
     void Swap(std::vector<flashana::QCluster_t>&&,
 	      std::vector<flashana::MCSource_t>&&);
     #endif
+
+  protected:
+    
+    void _Configure_(const ::fcllite::PSet &pset);
+    
   private:
   
     flashana::MCSource_t Identify( const unsigned int,
@@ -70,6 +73,7 @@ namespace flashana {
 			flashana::QCluster_t& tpc_obj);
 
     bool _use_xshift;
+    double _trigger_time;
     double _extension;
     std::vector<flashana::QCluster_t> _qcluster_v;
     std::vector<size_t> _mctrack_2_qcluster;
@@ -81,6 +85,21 @@ namespace flashana {
     float _op_RO_end ;
 
   };
+
+  /**
+     \class flashana::MCQClusterFactory
+  */
+  class MCQClusterFactory : public CustomAlgoFactoryBase {
+  public:
+    /// ctor
+    MCQClusterFactory() { CustomAlgoFactory::get().add_factory("MCQCluster",this); }
+    /// dtor
+    ~MCQClusterFactory() {}
+    /// creation method
+    BaseAlgorithm* create(const std::string instance_name) { return new MCQCluster(instance_name); }
+  };
+
+  
 }
 
 #endif

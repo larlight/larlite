@@ -7,12 +7,14 @@
 #endif
 
 namespace flashana {
+
+  static ChargeAnalyticalFactory __global_ChargeAnalyticalFactory__;
   
   ChargeAnalytical::ChargeAnalytical(const std::string name)
     : BaseFlashHypothesis(name)
   {}
 
-  void ChargeAnalytical::Configure(const ::fcllite::PSet &pset)
+  void ChargeAnalytical::_Configure_(const Config_t &pset)
   {}
 
     void ChargeAnalytical::FillEstimate(const QCluster_t &track,

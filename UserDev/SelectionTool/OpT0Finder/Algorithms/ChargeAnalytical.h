@@ -14,8 +14,8 @@
 #ifndef CHARGEANALYTICAL_H
 #define CHARGEANALYTICAL_H
 
-#include "OpT0Finder/Base/BaseFlashMatch.h"
-
+#include "OpT0Finder/Base/BaseFlashHypothesis.h"
+#include "OpT0Finder/Base/FlashHypothesisFactory.h"
 
 #include <iostream>
 
@@ -35,12 +35,28 @@ namespace flashana {
     
     /// Default destructor
     ~ChargeAnalytical() { }
-
-    void Configure(const ::fcllite::PSet &pset);
     
     void FillEstimate(const QCluster_t&, Flash_t&) const;
+
+  protected:
+
+    void _Configure_(const Config_t &pset);
     
   };
+
+  /**
+     \class flashana::ChargeAnalyticalFactory
+  */
+  class ChargeAnalyticalFactory : public FlashHypothesisFactoryBase {
+  public:
+    /// ctor
+    ChargeAnalyticalFactory() { FlashHypothesisFactory::get().add_factory("ChargeAnalytical",this); }
+    /// dtor
+    ~ChargeAnalyticalFactory() {}
+    /// creation method
+    BaseFlashHypothesis* create(const std::string instance_name) { return new ChargeAnalytical(instance_name); }
+  };
+  
 }
 
 #endif
