@@ -230,6 +230,7 @@
 #pragma link C++ class larlite::event_mucsreco+;
 
 #pragma link C++ class larlite::storage_manager+;
+#pragma link C++ class larlite::storage_store+;
 
 /*
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_gtruth>();

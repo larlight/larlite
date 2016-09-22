@@ -497,6 +497,7 @@ namespace larlite {
     std::vector<std::map<std::string,bool> > _write_rundata_array;
     /// Boolean to record what subrun-data to be written out from a file
     std::vector<std::map<std::string,bool> > _write_subrundata_array;
+
   };
 
 }
@@ -585,6 +586,8 @@ namespace larlite {
 
 }
 #endif
+
+
 
 #endif
 /** @} */ // end of doxygen group larlite::storage_manager
