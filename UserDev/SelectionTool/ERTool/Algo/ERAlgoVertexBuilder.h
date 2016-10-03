@@ -69,7 +69,6 @@ namespace ertool {
     /// Default constructor
     ERAlgoVertexBuilder
       (Double_t const start_prox,
-       Double_t const max_rad,
        Bool_t const withTrackDir,
        std::string const primary_vertex_selection = "mostupstream",
        Bool_t const showerproj = false,
