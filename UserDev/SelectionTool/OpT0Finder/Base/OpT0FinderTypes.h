@@ -163,7 +163,7 @@ namespace flashana {
       kNORMAL,
       kWARNING,
       kERROR,
-      kEXCEPTION,
+      kCRITICAL,
       kMSG_TYPE_MAX
     };
     
