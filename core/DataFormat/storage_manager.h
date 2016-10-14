@@ -404,7 +404,7 @@ namespace larlite {
 
     /// Utility method: given a type, returns a data product name
     const std::string& product_name(data::DataType_t const type) const
-    { return data::kDATA_TREE_NAME[type]; }
+    { return data::GET_DATA_TREE_NAME(type); }
 
   private:
     static storage_manager* me; ///< shared object instance pointer
