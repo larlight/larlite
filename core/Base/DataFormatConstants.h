@@ -174,8 +174,6 @@ namespace larlite{
     #endif
     #endif
     static const std::string kEVENT_ID_TREE("larlite_id_tree");
-
-    const std::string& GET_DATA_TREE_NAME( larlite::data::DataType_t t );
   }
   
 }

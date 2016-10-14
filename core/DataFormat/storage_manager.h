@@ -18,6 +18,7 @@
 #include <TChain.h>
 #include <TError.h>
 #include "Base/larlite_base.h"
+#include "Base/UtilFunc.h"
 #include "data_base.h"
 #include "event_ass.h"
 namespace larlite {
@@ -404,7 +405,7 @@ namespace larlite {
 
     /// Utility method: given a type, returns a data product name
     const std::string& product_name(data::DataType_t const type) const
-    { return data::GET_DATA_TREE_NAME(type); }
+    { return ::larlite::GetProductName(type); }
 
   private:
     static storage_manager* me; ///< shared object instance pointer
