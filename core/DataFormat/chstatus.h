@@ -64,7 +64,7 @@ namespace larlite {
   public:
 
     /// Default constructor
-    event_chstatus(std::string name="noname") : event_base(data::kChStatus,name) { clear_data();}
+    event_chstatus(std::string name="noname");
     
     /// Default copy constructor
     event_chstatus(const event_chstatus& original) : std::vector<larlite::chstatus>(original),

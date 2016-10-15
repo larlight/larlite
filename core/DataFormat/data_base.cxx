@@ -8,7 +8,8 @@ namespace larlite {
   //
   // data_base
   //
-  
+  data_base::data_base() : _type( data::kDATA_TYPE_MAX ) { clear_data(); }
+
   data_base::data_base(unsigned short type)
     : _type(type)
   { clear_data(); }
@@ -19,6 +20,7 @@ namespace larlite {
   //
   // output_base
   //
+  output_base::output_base() : data_base(data::kDATA_TYPE_MAX), _id(data::kDATA_TYPE_MAX,"noname") { clear_data(); }
 
   output_base::output_base(unsigned short type,
 			   const std::string name)
@@ -95,7 +97,7 @@ namespace larlite {
   //
   // event_base
   //
-
+  event_base::event_base() : output_base(data::kDATA_TYPE_MAX,"noname") { clear_data(); }
   event_base::event_base(unsigned short    type,
 			 const std::string name)
     : output_base(type,name)
