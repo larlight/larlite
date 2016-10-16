@@ -3,7 +3,7 @@
 #
 
 # specific names for this package
-DICT  = FhiclLiteCint
+DICT = BasicTool_FhiclLiteDict
 SHLIB = libBasicTool_FhiclLite.so
 SOURCES = $(filter-out $(DICT).cxx, $(wildcard *.cxx))
 FMWK_HEADERS = LinkDef.h $(DICT).h
