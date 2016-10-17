@@ -14,7 +14,7 @@
 
 //#pragma link C++ class std::pair<size_t,size_t>+;
 #pragma link C++ class std::pair<unsigned short,string>+;
-#pragma link C++ class std::pair<string,bool>+;
+//#pragma link C++ class std::pair<string,bool>+;
 #pragma link C++ class std::pair<string,string>+;
 
 #pragma link C++ class std::map<string,bool>+;
