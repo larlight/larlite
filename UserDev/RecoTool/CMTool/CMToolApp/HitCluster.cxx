@@ -3,6 +3,7 @@
 
 #include "HitCluster.h"
 
+#include <algorithm>
 
 namespace larlite {
 
