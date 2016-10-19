@@ -12,9 +12,9 @@ from scipy import interpolate
 import pandas as pd
 import itertools
 
-if len(sys.argv) < 3:
+if len(sys.argv) < 2:
     msg  = '\n'
-    msg += "Usage 1: %s PRODUCER $INPUT_ROOT_FILE(s)\n" % sys.argv[0]
+    msg += "Usage 1: %s $INPUT_ROOT_FILE(s)\n" % sys.argv[0]
     msg += '\n'
     sys.stderr.write(msg)
     sys.exit(1)
@@ -28,16 +28,15 @@ from ROOT import flashana,TChain
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
 
-producer = sys.argv[1]
-
 mcflash_ch=TChain("opflash_mcflash_tree")
-cheater_ch=TChain("opflash_cheatFlash_tree")
+cheater_ch=TChain("opflash_cheatFlashCosmic_tree")
 # Set input root file
-for x in xrange(len(sys.argv)-2):
-    print sys.argv[x+2]
-    my_proc.add_input_file(sys.argv[x+2])
-    mcflash_ch.AddFile(sys.argv[x+2])
-    cheater_ch.AddFile(sys.argv[x+2])
+for x in xrange(len(sys.argv)):
+    fname = sys.argv[x]
+    if not fname.endswith('.root'): continue
+    my_proc.add_input_file(fname)
+    mcflash_ch.AddFile(fname)
+    cheater_ch.AddFile(fname)
 
 if not mcflash_ch.GetEntries():
     print 'OpFlash w/ name mcflash not found...'
@@ -55,39 +54,8 @@ my_proc.set_ana_output_file("ana.root")
 # Attach an analysis unit ... here we use a base class which does nothing.
 # Replace with your analysis unit if you wish.
 my_unit = fmwk.UBT0Finder()
-#my_unit.SetEDiff(10.)
-my_unit.UseMC(True)
-my_unit.UseBNBCorrectnessWindow(False)
 my_proc.add_process(my_unit)
-#my_unit.ShiftFlashTime(-500)
-
-# TPC Filter Algo
-my_unit.Manager().SetAlgo(flashana.NPtFilter())
-# PMT Filter Algo
-my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
-# Match Prohibit Algo
-my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
-# Hypothesis Algo
-my_unit.Manager().SetAlgo(flashana.PhotonLibHypothesis())
-# Match Algo
-algo = flashana.QLLMatch.GetME()
-#algo = flashana.QWeightPoint()
-#algo = flashana.CommonAmps()
-my_unit.Manager().SetAlgo( algo )
-
-# Custom Algo
-my_unit.Manager().SetAlgo( flashana.LightPath()  )
-my_unit.Manager().SetAlgo( flashana.MCQCluster() )
-
-# producer
-my_unit.OpFlashProducer(producer)
-
-#
-# Other algorithms
-#
-#my_unit.Manager().AddCustomAlgo( flashana.LightPath() )
-
-my_unit.Manager().Configure( "%s/SelectionTool/OpT0Finder/App/mac/flashmatch.fcl" % os.environ['LARLITE_USERDEVDIR'])
+my_unit.SetConfigFile("%s/SelectionTool/OpT0Finder/App/mac/flashmatch.fcl" % os.environ['LARLITE_USERDEVDIR'])
 
 print
 print  "Finished configuring ana_processor. Start event loop!"

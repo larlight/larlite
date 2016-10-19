@@ -44,7 +44,7 @@ my_proc.set_ana_output_file("ana.root")
 
 # Attach an analysis unit ... here we use a base class which does nothing.
 # Replace with your analysis unit if you wish.
-my_unit = fmwk.MuCST0Finder()
+my_unit = fmwk.FlashMatch2D()
 #my_unit.SetEDiff(10.)
 my_proc.add_process(my_unit)
 #my_unit.ShiftFlashTime(-500)
@@ -72,7 +72,7 @@ my_unit.SetConfigFile(cfg_file)
 print
 print  "Finished configuring ana_processor. Start event loop!"
 print
-ctr=0
+ctr=11
 max_ctr=20
 geo=larutil.Geometry.GetME()
 while ctr<max_ctr:
@@ -80,7 +80,7 @@ while ctr<max_ctr:
     print
     print 'Entry',ctr,'processing...'
     my_proc.process_event(ctr)
-
+    print 'processed!'
     match_v = my_unit.MatchResult()
     
     mgr = my_unit.Manager()
@@ -125,6 +125,8 @@ while ctr<max_ctr:
         
             flash = np.array(flash.pe_v)
             hypothesis = np.array(res.hypothesis)
+            print 'flash:',flash
+            print 'hypo:',hypothesis
             
             ymax = np.array((flash.max(),hypothesis.max())).max()
 
@@ -159,6 +161,13 @@ while ctr<max_ctr:
         print 'Match #',match_idx,
         print 'TPC:',match.tpc_id,'PMT:',match.flash_id,'Score:',match.score,'TPC point:',match.tpc_point.x,match.tpc_point.y,match.tpc_point.z
 
+        subvolume_wires = my_unit.SubVolumeWires()
+        subvolume_ticks = my_unit.SubVolumeTicks()
+
+        nsubh = 3456 / subvolume_wires
+        if nsubh * subvolume_wires % 3456: nsubh += 1
+        
+        print 'HBox:',  match.tpc_id % nsubh, 'VBox:', match.tpc_id / nsubh
         xmin = 1e4
         xmax = 0
         qc = qcluster_v[match.tpc_id]
@@ -176,6 +185,8 @@ while ctr<max_ctr:
         print 'Max PE @',flash.argmax(),'fraction',flash[flash.argmax()]/flash.sum()
         
         hypothesis = np.array(match.hypothesis)
+        print 'flash:',flash
+        print 'hypo:',hypothesis        
 
         ymax = np.array((flash.max(),hypothesis.max())).max()
 

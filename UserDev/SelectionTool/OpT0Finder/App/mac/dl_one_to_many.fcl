@@ -1,15 +1,16 @@
 #
 # Module configuration
 #
-MuCST0Finder: {
-  TrackProducer:         "stitchkalmanhit"
+FlashMatch2D: {
+  WireProducer:          "caldata"
   BeamOpFlashProducer:   "simpleFlashBeam"
   CosmicOpFlashProducer: "simpleFlashCosmic"
-  TriggerProducer:       "daq"
-  FlashVetoTimeStart:    -5000
-  FlashVetoTimeEnd:       5000
-  MaxTrackCount:         40
-  GainCorrection: [1.09331,1.0278,1.04057,0.986795,1.07759,1.09017,1.10477,1.14167,1.01527,1.11422,0.950291,0.977529,1.05703,0.952964,0.966842,0.991664,1.00079,0.91388,1.11111,1.08502,1.23453,1.07951,0.94202,0.990522,1.02483,1.04599,nan,1.02311,0.758705,1.11797,1.0592,1.01436]
+  FlashVetoTimeStart:    6
+  FlashVetoTimeEnd:      12
+  SubVolumeWires: 576
+  SubVolumeTicks: 575
+  GainCorrection: [1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.]
+
 }
 
 #
@@ -18,6 +19,7 @@ MuCST0Finder: {
 FlashMatchManager: {
   Verbosity: 3
   AllowReuseFlash: false
+  StoreFullResult: true
   FlashFilterAlgo: ""
   TPCFilterAlgo:   "NPtFilter"
   ProhibitAlgo:    "TimeCompatMatch"
@@ -37,10 +39,10 @@ QLLMatch: {
   PEPenaltyValue: [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
   #PEPenaltyThreshold: [10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10]
   #PEPenaltyValue: [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
-  XPenaltyThreshold: 30
-  ZPenaltyThreshold: 30
+  XPenaltyThreshold: 60
+  ZPenaltyThreshold: 60
   OnePMTScoreThreshold:  0.00001
-  OnePMTXDiffThreshold:  35.;
+  OnePMTXDiffThreshold:  50.;
   OnePMTPESumThreshold:  500
   OnePMTPEFracThreshold: 0.3
 }
@@ -75,12 +77,14 @@ PhotonLibHypothesis:
 {
   GlobalQE: 0.0093
   CCVCorrection: [0.656443,0.761686,0.689592,0.599153,0.593247,0.746357,0.882511,0.593937,0.849077,0.590143,0.842237,0.893646,0.951683,0.771261,0.843007,1,0.74487,0.795869,0.865311,0.711999,0.836771,0.77377,0.637613,0.727361,0.964722,1,0.764331,1.12045,1.39804,1,0.922092,0.750253]
+  #CCVCorrection: [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]
 }
 
 ChargeAnalytical:
 {
   GlobalQE: 0.0093
   CCVCorrection: [0.656443,0.761686,0.689592,0.599153,0.593247,0.746357,0.882511,0.593937,0.849077,0.590143,0.842237,0.893646,0.951683,0.771261,0.843007,1,0.74487,0.795869,0.865311,0.711999,0.836771,0.77377,0.637613,0.727361,0.964722,1,0.764331,1.12045,1.39804,1,0.922092,0.750253]
+  #CCVCorrection: [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]
 }
 
 MCQCluster: {
