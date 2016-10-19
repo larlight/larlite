@@ -107,7 +107,6 @@ if [[ -z $ROOTSYS ]]; then
 	    ;;
 	esac
 else
-    export LARLITE_CXXSTDFLAG=`python $LARLITE_BASEDIR/config/python/get_stdflag.py`
     export PYTHONPATH=$ROOTSYS/lib:$PYTHONPATH;
 fi
 

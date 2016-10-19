@@ -73,13 +73,13 @@ print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 ctr=0
-max_ctr=20
+max_ctr=50
 geo=larutil.Geometry.GetME()
 while ctr<max_ctr:
 
     print
     print 'Entry',ctr,'processing...'
-    my_proc.process_event(ctr)
+    my_proc.process_event()
 
     match_v = my_unit.MatchResult()
     
@@ -128,7 +128,7 @@ while ctr<max_ctr:
             
             ymax = np.array((flash.max(),hypothesis.max())).max()
 
-            fig, ax = plt.subplots(figsize=(12, 8),facecolor='w')
+            fig, ax = plt.subplots(figsize=(16, 8),facecolor='w')
             
             ax.plot(np.arange(0,len(flash),1),flash,
                     marker='o',color='blue',label='OpFlash PE Spec.')
@@ -145,7 +145,6 @@ while ctr<max_ctr:
             leg_frame=leg.get_frame()
             leg_frame.set_facecolor('white')
             plt.title('Flash PE Distribution',fontsize=24,fontweight='bold')
-            plt.xlim(-0.5,31.5)
             plt.show()
             break
             
@@ -196,14 +195,10 @@ while ctr<max_ctr:
         leg_frame=leg.get_frame()
         leg_frame.set_facecolor('white')
         plt.title('Flash PE Distribution',fontsize=24,fontweight='bold')
-        plt.xlim(-0.5,31.5)
         plt.show()
         
         #sys.stdin.readline()
-    print 'Type event entry or hit enter'
-    entry=sys.stdin.readline().rstrip('\n')
-    if entry: ctr=int(entry)
-    
+
 # done!
 print
 print "Finished running ana_processor event loop!"

@@ -7,13 +7,13 @@
 // C++ includes
 #include <cmath>
 
-EMShowerContainment::EMShowerContainment(const double detwidth, const double detheight, const double detlength)
+EMShowerContainment::EMShowerContainment()
 {
 
   // get dimensions of TPC
-  _detector_length = detlength;
-  _detector_width  = detwidth;
-  _detector_height = detheight;
+  _detector_length = geom->DetLength();
+  _detector_width  = 2. * geom->DetHalfWidth();
+  _detector_height = 2. * geom->DetHalfHeight();
 
   // get lower boundaries of TPC
   _tpc_boundary_lower_x = 0;

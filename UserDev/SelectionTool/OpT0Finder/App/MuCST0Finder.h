@@ -67,11 +67,11 @@ namespace larlite {
     std::string _track_producer;
     std::string _opflash_producer_beam;
     std::string _opflash_producer_cosmic;
+    std::string _trigger_producer;
     double _flash_trange_start;
     double _flash_trange_end;
     size_t _num_tracks;
     std::vector<double> _gain_correction;
-    std::string _out_track_producer;
   };
 }
 #endif

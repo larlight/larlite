@@ -18,7 +18,6 @@
 #include <TChain.h>
 #include <TError.h>
 #include "Base/larlite_base.h"
-#include "Base/UtilFunc.h"
 #include "data_base.h"
 #include "event_ass.h"
 namespace larlite {
@@ -405,7 +404,7 @@ namespace larlite {
 
     /// Utility method: given a type, returns a data product name
     const std::string& product_name(data::DataType_t const type) const
-    { return ::larlite::GetProductName(type); }
+    { return data::kDATA_TREE_NAME[type]; }
 
   private:
     static storage_manager* me; ///< shared object instance pointer
@@ -498,7 +497,6 @@ namespace larlite {
     std::vector<std::map<std::string,bool> > _write_rundata_array;
     /// Boolean to record what subrun-data to be written out from a file
     std::vector<std::map<std::string,bool> > _write_subrundata_array;
-
   };
 
 }
@@ -587,8 +585,6 @@ namespace larlite {
 
 }
 #endif
-
-
 
 #endif
 /** @} */ // end of doxygen group larlite::storage_manager

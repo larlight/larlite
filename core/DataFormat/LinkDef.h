@@ -14,7 +14,7 @@
 
 //#pragma link C++ class std::pair<size_t,size_t>+;
 #pragma link C++ class std::pair<unsigned short,string>+;
-//#pragma link C++ class std::pair<string,bool>+;
+#pragma link C++ class std::pair<string,bool>+;
 #pragma link C++ class std::pair<string,string>+;
 
 #pragma link C++ class std::map<string,bool>+;
@@ -230,7 +230,6 @@
 #pragma link C++ class larlite::event_mucsreco+;
 
 #pragma link C++ class larlite::storage_manager+;
-#pragma link C++ class larlite::storage_store+;
 
 /*
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_gtruth>();

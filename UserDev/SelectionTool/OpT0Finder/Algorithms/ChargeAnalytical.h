@@ -41,9 +41,6 @@ namespace flashana {
   protected:
 
     void _Configure_(const Config_t &pset);
-
-    double _global_qe;         ///< Global QE
-    std::vector<double> _qe_v; ///< PMT-wise relative QE
     
   };
 

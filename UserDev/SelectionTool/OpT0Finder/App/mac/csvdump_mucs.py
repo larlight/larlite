@@ -29,9 +29,7 @@ if not cfg_name:
     sys.exit(1)
 
 # Specify IO mode
-#my_proc.set_io_mode(fmwk.storage_manager.kREAD)
-my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
-my_proc.set_output_file("aho.root")
+my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
 my_proc.set_ana_output_file("ana.root")
@@ -42,21 +40,21 @@ my_unit = fmwk.MuCST0Finder()
 my_proc.add_process(my_unit)
 
 # TPC Filter Algo
-#my_unit.Manager().SetAlgo(flashana.NPtFilter())
+my_unit.Manager().SetAlgo(flashana.NPtFilter())
 # PMT Filter Algo
-#my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
+my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
 # Match Prohibit Algo
-#my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
+my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
 # Hypothesis Algo
-#my_unit.Manager().SetAlgo(flashana.PhotonLibHypothesis())
+my_unit.Manager().SetAlgo(flashana.PhotonLibHypothesis())
 # Match Algo
-#algo = flashana.QLLMatch.GetME()
+algo = flashana.QLLMatch.GetME()
 #algo = flashana.QWeightPoint()
 #algo = flashana.CommonAmps()
-#my_unit.Manager().SetAlgo( algo )
+my_unit.Manager().SetAlgo( algo )
 
 # Custom Algo
-#my_unit.Manager().SetAlgo( flashana.LightPath()  )
+my_unit.Manager().SetAlgo( flashana.LightPath()  )
 
 my_unit.SetConfigFile(cfg_name)
 
@@ -74,9 +72,9 @@ line_pe+='\n'
 fout_pe.write(line_pe)
 
 fout=open('data.txt','w')
-fout.write('entry,tpcid,xmin,xmax,time,x,t,q,oppe,hypope,mult\n')
+fout.write('tpcid,xmin,xmax,time,x,t,q,oppe,hypope,mult\n')
 ctr=0
-while ctr < 500:
+while ctr<2270:
     my_proc.process_event(ctr)
 
     match_v = my_unit.MatchResult()
@@ -131,7 +129,7 @@ while ctr < 500:
         mult = 0
         for pe in flash.pe_v:
             if pe > 0: mult+=1
-        fout.write('%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g\n' % (ctr,match.tpc_id,xmin,xmax,qc.time,match.tpc_point.x,flash.time,match.score,pesum,hyposum,mult))
+        fout.write('%g,%g,%g,%g,%g,%g,%g,%g,%g,%g\n' % (match.tpc_id,xmin,xmax,qc.time,match.tpc_point.x,flash.time,match.score,pesum,hyposum,mult))
 
     proc_status = my_proc.get_process_status()
     if proc_status == my_proc.kFINISHED:
@@ -150,7 +148,4 @@ print "Finished running ana_processor event loop!"
 print
 fout.close()
 fout_pe.close()
-
-my_proc.finalize()
-
 sys.exit(0)

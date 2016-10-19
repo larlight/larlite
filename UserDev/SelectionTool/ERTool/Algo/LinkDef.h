@@ -25,7 +25,7 @@
 #pragma link C++ class ertool::ERAlgoCRPrimary+;
 #pragma link C++ class ertool::ERAlgoCRSecondary+;
 #pragma link C++ class ertool::ERAlgoCROrphan+;
-//#pragma link C++ class ertool::ERAlgoFlashMatch+;
+#pragma link C++ class ertool::ERAlgoFlashMatch+;
 #pragma link C++ class ertool::OpT0Helper+;
 #pragma link C++ class ertool::ERAlgoTrackDresser+;
 #pragma link C++ class ertool::ERAlgopi0+;

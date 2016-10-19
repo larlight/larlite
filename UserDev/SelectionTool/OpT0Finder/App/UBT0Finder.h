@@ -52,24 +52,37 @@ namespace larlite {
 
     ::flashana::FlashMatchManager& Manager() { return _mgr;}
 
+    void UseMC(bool doit=true) { _use_mc = doit; }
+
+    void UseBNBCorrectnessWindow (bool yesOrNo){ _use_bnb_correctness_window = yesOrNo; }
+
     const std::vector<flashana::FlashMatch_t> MatchResult() const { return _result; }
 
-    void SetConfigFile(std::string name) { _config_file = name; }
+    void ShiftFlashTime(double v) {_shift_flash_time=v;}
+
+    void OpFlashBeamProducer(const std::string name) { _opflash_producer_beam = name; }
+
+    void OpFlashCosmicProducer(const std::string name) { _opflash_producer_cosmic = name; }
+
+    void TriggerProducer(const std::string name) { _trigger_producer = name; }
 
   protected:
 
     ::flashana::FlashMatchManager _mgr;
-    std::string _config_file;
     double _shift_flash_time;
 
     std::vector<flashana::FlashMatch_t> _result;
 
     // Configurable params
     bool _use_mc;
+    //bool _useAbsPE ;
+    //double _step_len ;
     std::string _opflash_producer_beam;
     std::string _opflash_producer_cosmic;
     std::string _trigger_producer;
-    std::string _track_producer;
+
+    int _use_bnb_correctness_window ;
+
   };
 }
 #endif

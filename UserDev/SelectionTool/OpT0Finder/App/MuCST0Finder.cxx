@@ -4,6 +4,7 @@
 #include "MuCST0Finder.h"
 #include "DataFormat/track.h"
 #include "DataFormat/opflash.h"
+#include "DataFormat/trigger.h"
 #include "DataFormat/cosmictag.h"
 #include "GeoAlgo/GeoAlgo.h"
 #include "GeoAlgo/GeoLineSegment.h"
@@ -27,12 +28,12 @@ namespace larlite {
     _track_producer          = p.get<std::string>("TrackProducer");
     _opflash_producer_beam   = p.get<std::string>("BeamOpFlashProducer");
     _opflash_producer_cosmic = p.get<std::string>("CosmicOpFlashProducer");
+    _trigger_producer        = p.get<std::string>("TriggerProducer");
     _flash_trange_start      = p.get<double>("FlashVetoTimeStart");
     _flash_trange_end        = p.get<double>("FlashVetoTimeEnd");
     _num_tracks              = p.get<size_t>("MaxTrackCount");
     _gain_correction         = p.get<std::vector<double> >("GainCorrection");
-    _out_track_producer      = p.get<std::string>("OutTrackProducer","");
-    
+
     auto const geo = ::larutil::Geometry::GetME();
     if(geo->NOpDets() != _gain_correction.size()) {
       std::cout << "GainCorrection array size is " << _gain_correction.size() << " != # OpDet " << geo->NOpDets() << std::endl;
@@ -41,22 +42,10 @@ namespace larlite {
 
     _mgr.Configure(main_cfg);
 
-    if(!_out_track_producer.empty())
-      std::cout << "Saving tagged track into a producer: " << _out_track_producer << std::endl;
-
     return true;
   }
 
   bool MuCST0Finder::analyze(storage_manager* storage) {
-
-    if(!_out_track_producer.empty()) {
-      auto ev_track_out = storage->get_data<event_track>(_out_track_producer);
-      if(!ev_track_out) {
-	std::cerr << "Could not allocate output track data product!" << std::endl;
-	return false;
-      }
-      storage->set_id(storage->run_id(),storage->subrun_id(),storage->event_id());
-    }
 
     _mgr.Reset();
     _result.clear();
@@ -95,8 +84,8 @@ namespace larlite {
 	f.pe_err_v.resize(geo->NOpDets());
 	for (unsigned int i = 0; i < f.pe_v.size(); i++) {
 	  unsigned int opdet = geo->OpDetFromOpChannel(i);
-	  f.pe_v[opdet] = flash.PE(i) / _gain_correction[i];
-	  f.pe_err_v[opdet] = sqrt(flash.PE(i) / _gain_correction[i]);
+	  f.pe_v[opdet] = flash.PE(i) * _gain_correction[i];
+	  f.pe_err_v[opdet] = sqrt(flash.PE(i) * _gain_correction[i]);
 	}
 	f.time = flash.Time();
 	f.idx = flash_id;
@@ -126,8 +115,8 @@ namespace larlite {
 	    f.pe_v[opdet]=-1.;
 	    f.pe_err_v[opdet]=-1.;
 	  }else{
-	    f.pe_v[opdet] = flash.PE(i) / _gain_correction[i] / 0.424;
-	    f.pe_err_v[opdet] = sqrt(flash.PE(i) / _gain_correction[i]) / 0.424;
+	    f.pe_v[opdet] = flash.PE(i) * _gain_correction[i] / 0.424;
+	    f.pe_err_v[opdet] = sqrt(flash.PE(i) * _gain_correction[i]) / 0.424;
 	  }
 	}
 	f.time = flash.Time();
@@ -179,7 +168,6 @@ namespace larlite {
       mucs_geotrj.emplace_back(std::move(pt));
     }
     auto mucs_qcluster = ((flashana::LightPath*)(_mgr.GetCustomAlgo("LightPath")))->FlashHypothesis(mucs_geotrj);
-    mucs_qcluster.idx = mucs_track.ID();
     _mgr.Emplace(std::move(mucs_qcluster));
 
     for (size_t trk_idx=0; trk_idx<ev_track->size(); trk_idx++) {
@@ -195,30 +183,12 @@ namespace larlite {
 	mucs_geotrj[pt_idx][2] = pt[2];
       }
       auto qcluster = ((flashana::LightPath*)(_mgr.GetCustomAlgo("LightPath")))->FlashHypothesis(mucs_geotrj);
-      qcluster.idx = trk.ID();
       _mgr.Emplace(std::move(qcluster));
-      
     }
 
     _result = _mgr.Match();
     
-    if(_out_track_producer.empty()) return true;
 
-    auto ev_track_out = storage->get_data<event_track>(_out_track_producer);
-
-    for(auto const& res : _result) {
-      int trk_id = _mgr.QClusterArray()[res.tpc_id].idx;
-      bool found=false;
-      for(auto const& trk : *ev_track) {
-	if(trk.ID() != trk_id) continue;
-	found=true;
-	ev_track_out->push_back(trk);
-      }
-      if(!found) {
-	std::cerr << "Did not find matched track!?" << std::endl;
-	throw std::exception();
-      }
-    }
     return true;
   }
 

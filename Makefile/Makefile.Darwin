@@ -57,7 +57,7 @@ DLLFLAGS        += -fPIC
 CFLAGS          += -fsigned-char -pipe -DHAVE_LONG_LONG  
 CFLAGS          += -fno-common -O3 -D_CORE_$(shell uname -s)_
 CXXFLAGS        += -fsigned-char -pipe -DHAVE_LONG_LONG  
-CXXFLAGS        += -fno-common $(LARLITE_CXXSTDFLAG) -O3 -Wno-deprecated -D_CORE_$(shell uname -s)_
+CXXFLAGS        += -fno-common -O3 -Wno-deprecated -D_CORE_$(shell uname -s)_
 
 
 ##########
