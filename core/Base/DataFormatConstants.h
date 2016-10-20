@@ -112,7 +112,7 @@ namespace larlite{
     };
 
     #ifndef __CINT__
-    #ifndef __CLINT__
+    #ifndef __CLING__
     const std::string kDATA_TREE_NAME[kDATA_TYPE_MAX] = {
       //const std::vector<std::string> kDATA_TREE_NAME = {
       "unknown",

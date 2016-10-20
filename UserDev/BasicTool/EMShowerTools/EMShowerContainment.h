@@ -17,9 +17,6 @@
 // C++ includes
 #include <iostream>
 
-// larlite core includes
-#include "LArUtil/Geometry.h"
-
 // ROOT includes
 #include "TVector3.h"
 
@@ -29,10 +26,10 @@
  */
 class EMShowerContainment {
 
- public:
-
   // constructor
-  EMShowerContainment();
+  EMShowerContainment(const double detwidth = 256.35,
+		      const double detheight = 233.0,
+		      const double detlength = 1036.8);
 
   // destructor
   virtual ~EMShowerContainment() {}
@@ -48,7 +45,7 @@ class EMShowerContainment {
 
  protected:
 
-  larutil::Geometry* geom = (larutil::Geometry*) (larutil::Geometry::GetME());
+  //larutil::Geometry* geom = (larutil::Geometry*) (larutil::Geometry::GetME());
 
   double _detector_length;
   double _detector_width;

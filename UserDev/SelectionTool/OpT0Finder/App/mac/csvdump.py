@@ -1,6 +1,6 @@
 import sys,ROOT,os
 
-if len(sys.argv) < 4:
+if len(sys.argv) < 2:
     msg  = '\n'
     msg += "Usage 1: %s $INPUT_ROOT_FILE(s)\n" % sys.argv[0]
     msg += '\n'
@@ -16,11 +16,11 @@ from ROOT import flashana
 my_proc = fmwk.ana_processor()
 
 # Set input root file
-for x in xrange(len(sys.argv)-3):
-    if not sys.argv[x+3].endswith('.root'):
+for x in xrange(len(sys.argv)):
+    if not sys.argv[x].endswith('.root'):
         continue
-    print sys.argv[x+3]
-    my_proc.add_input_file(sys.argv[x+3])
+    print sys.argv[x]
+    my_proc.add_input_file(sys.argv[x])
 
 # Specify IO mode
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
@@ -31,47 +31,17 @@ my_proc.set_ana_output_file("ana.root")
 # Attach an analysis unit ... here we use a base class which does nothing.
 # Replace with your analysis unit if you wish.
 my_unit = fmwk.UBT0Finder()
-#my_unit.SetEDiff(10.)
-my_unit.UseMC(True)
-my_unit.UseBNBCorrectnessWindow(False)
 my_proc.add_process(my_unit)
-#my_unit.ShiftFlashTime(-500)
-
-# TPC Filter Algo
-my_unit.Manager().SetAlgo(flashana.NPtFilter())
-# PMT Filter Algo
-#my_unit.Manager().SetAlgo(flashana.MaxNPEWindow())
-# Match Prohibit Algo
-my_unit.Manager().SetAlgo(flashana.TimeCompatMatch())
-# Hypothesis Algo
-my_unit.Manager().SetAlgo(flashana.PhotonLibHypothesis())
-# Match Algo
-algo = flashana.QLLMatch.GetME()
-#algo = flashana.QWeightPoint()
-#algo = flashana.CommonAmps()
-my_unit.Manager().SetAlgo( algo )
-
-# Custom Algo
-my_unit.Manager().SetAlgo( flashana.LightPath()  )
-my_unit.Manager().SetAlgo( flashana.MCQCluster() )
-
-my_unit.OpFlashBeamProducer(sys.argv[1])
-my_unit.OpFlashCosmicProducer(sys.argv[2])
-
-#
-# Other algorithms
-#
-#my_unit.Manager().AddCustomAlgo( flashana.LightPath() )
-
-my_unit.Manager().Configure( "%s/SelectionTool/OpT0Finder/App/mac/flashmatch.fcl" % os.environ['LARLITE_USERDEVDIR'])
+my_unit.SetConfigFile("%s/SelectionTool/OpT0Finder/App/mac/flashmatch.fcl" % os.environ['LARLITE_USERDEVDIR'])
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
 print
-fout=open('data.txt','w')
-fout.write('xmin,xmax,time,x,t,q,oppe,hypope\n')
-ctr=4400
+fout1=open('data.txt','w')
+fout1.write('xmin,xmax,time,x,t,q,oppe,hypope\n')
+ctr=0
 while 1:
+    
     my_proc.process_event(ctr)
 
     match_v = my_unit.MatchResult()

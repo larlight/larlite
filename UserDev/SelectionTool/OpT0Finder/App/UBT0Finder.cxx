@@ -16,14 +16,22 @@ namespace larlite {
   {
     _name = "UBT0Finder";
     _shift_flash_time = 0.;
-    //UseAbsolutePE(false);
-    //SetStepLength(0.5);
-    _use_bnb_correctness_window = true ; 
   }
 
   bool UBT0Finder::initialize() {
 
-    auto mcqclustering = _mgr.GetCustomAlgo("MCQCluster");
+    ::fcllite::ConfigManager cfg_mgr;
+    cfg_mgr.AddCfgFile(_config_file);
+    auto const& main_cfg = cfg_mgr.Config();
+    auto const p = main_cfg.get_pset(_name);
+
+    _use_mc = p.get<bool>("UseMC");
+    _opflash_producer_beam = p.get<std::string>("BeamOpFlashProducer");
+    _opflash_producer_cosmic = p.get<std::string>("CosmicOpFlashProducer");
+    _trigger_producer = p.get<std::string>("TriggerProducer");
+    _track_producer = p.get<std::string>("TrackProducer");
+
+    _mgr.Configure(main_cfg);
 
     return true;
   }
@@ -47,7 +55,7 @@ namespace larlite {
     if (!_use_mc) {
 
       //auto ev_track = storage->get_data<event_track>("pandoraCosmicKHit");
-      auto ev_track = storage->get_data<event_track>("trackkalmanhit");
+      auto ev_track = storage->get_data<event_track>(_track_producer);
 
       if (!ev_track || ev_track->empty()) return false;
 
