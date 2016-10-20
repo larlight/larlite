@@ -59,13 +59,13 @@ namespace larlite {
      Collection of chstatus objects to be stored per event
   */
   class event_chstatus : public std::vector<larlite::chstatus>,
-			  public event_base {
-    
+    public event_base {
+      
   public:
-
-    /// Default constructor
-    event_chstatus(std::string name="noname") : event_base(data::kChStatus,name) { clear_data();}
-    
+      
+      /// Default constructor
+      event_chstatus(std::string name="noname");
+      
     /// Default copy constructor
     event_chstatus(const event_chstatus& original) : std::vector<larlite::chstatus>(original),
       event_base(original)

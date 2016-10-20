@@ -241,6 +241,7 @@ namespace larlite {
     */
 
 #ifndef __CINT__
+#ifndef __CLING__
     template <class T, class U>
     const AssInfo_t find_one_assid(const T& a, const U& b,
 				   const std::string& ass_producer)
@@ -369,6 +370,7 @@ namespace larlite {
       
       return ass_info.first->association(ass_info.second);
     }
+#endif
 #endif
     
     /// Getter for a shared object instance pointer. Not limited to be a singleton.
@@ -505,6 +507,7 @@ namespace larlite {
 
 
 #ifndef __CINT__
+#ifndef __CLING__
 //#include "storage_manager.template.hh"
 namespace larlite {
   template<> data::DataType_t storage_manager::data_type<trigger> () const;
@@ -587,7 +590,7 @@ namespace larlite {
 
 }
 #endif
-
+#endif
 
 
 #endif
