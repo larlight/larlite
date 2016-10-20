@@ -33,7 +33,8 @@ namespace larlite{
   public:
     
     /// Default constructor
-    data_base(unsigned short type = data::kDATA_TYPE_MAX);
+    data_base();
+    data_base(unsigned short type);// = data::kDATA_TYPE_MAX);
 
     /// Default copy constructor to avoid memory leak in ROOT streamer
     data_base(const data_base &original) : _type(original._type) {}
@@ -63,7 +64,8 @@ namespace larlite{
   class output_base : public data_base {
   public:
     /// Default ctor
-    output_base(unsigned short type = data::kDATA_TYPE_MAX,
+    output_base();
+    output_base(unsigned short type,// = data::kDATA_TYPE_MAX,
 		const std::string name = "noname");
     /// Copy ctor
     output_base(const output_base& orig);
@@ -167,7 +169,8 @@ namespace larlite{
   public:
     
     /// Default constructor
-    event_base(unsigned short    type = data::kDATA_TYPE_MAX,
+    event_base();
+    event_base(unsigned short    type,// = data::kDATA_TYPE_MAX,
 	       const std::string name = "noname");
     
     /// Default copy constructor to avoid memory leak in ROOT streamer
