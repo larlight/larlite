@@ -118,7 +118,8 @@ namespace larlite {
   public:
     
     /// Default constructor
-    event_auxsimch(std::string name="noname") : event_base(data::kAuxDetSimChannel,name) {clear_data();}
+    event_auxsimch(std::string name="noname");
+    //event_auxsimch(std::string name="noname") : event_base(data::kAuxDetSimChannel,name) {clear_data();}
     
     /// Default copy constructor
     event_auxsimch(const event_auxsimch& original)

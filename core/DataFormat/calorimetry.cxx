@@ -5,6 +5,11 @@
 
 namespace larlite {
 
+  calorimetry::calorimetry() : data_base(data::kCalorimetry) 
+  {
+    clear_data();
+  } 
+
   //*************************************
   void calorimetry::clear_data() 
   //*************************************
@@ -16,6 +21,11 @@ namespace larlite {
     fDeadWireResR.clear();
     fTrkPitch.clear();
     fRange = -1;
+  }
+
+  event_calorimetry::event_calorimetry(std::string name) : event_base(data::kCalorimetry,name)
+  {
+    clear_data();
   }
 
 }

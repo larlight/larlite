@@ -28,7 +28,8 @@ namespace larlite{
   public:
     
     /// Default constructor
-    calorimetry() : data_base(data::kCalorimetry) {clear_data();}
+    //calorimetry() : data_base(data::kCalorimetry) {clear_data();}
+    calorimetry();
 
     /// Copy constructor
     calorimetry(const calorimetry& original) : data_base(original),
@@ -103,8 +104,9 @@ namespace larlite{
   public:
     
     /// Default constructor
-    event_calorimetry(std::string name="noname") : event_base(data::kCalorimetry,name) {clear_data();}
-    
+    //event_calorimetry(std::string name="noname") : event_base(data::kCalorimetry,name) {clear_data();}
+    event_calorimetry(std::string name="noname");
+
     /// Default copy constructor
     event_calorimetry(const event_calorimetry& original) : std::vector<larlite::calorimetry>(original),
 							   event_base(original)

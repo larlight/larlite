@@ -6,6 +6,11 @@
 
 namespace larlite{
 
+  PiZeroROI::PiZeroROI() : data_base(data::kPiZeroROI)
+  { 
+    clear_data(); 
+  }
+  
   void PiZeroROI::clear_data(){
     _t_range.clear();
     _wire_range.clear();
@@ -217,7 +222,10 @@ namespace larlite{
   
   std::vector < std::pair< int, int > > PiZeroROI::GetPiZeroTimeROI() const { return _pi0_t_range; }
   
-  
+  event_PiZeroROI::event_PiZeroROI(std::string name) : event_base(data::kPiZeroROI,name) 
+  {
+    clear_data(); 
+  } 
   
 }
 

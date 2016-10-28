@@ -147,5 +147,10 @@ namespace larlite{
     return (fAuxDetID == other.AuxDetID() && fAuxDetSensitiveID == other.AuxDetSensitiveID()); 
   }
 
+  event_auxsimch::event_auxsimch( std::string name ) : event_base(data::kAuxDetSimChannel,name) 
+  {
+    clear_data();
+  }
+
   
 }//namespace sim

@@ -5,6 +5,11 @@
 
 namespace larlite{
 
+  cluster::cluster() : data_base(data::kCluster) 
+  {
+    clear_data();
+  }
+
   void cluster::clear_data()
   {
     data_base::clear_data();
@@ -89,6 +94,11 @@ namespace larlite{
     
     return false; // they are equal enough
   } // operator < (Cluster, Cluster)
+
+  event_cluster::event_cluster(std::string name) : event_base(data::kCluster,name)
+  {
+    clear_data();
+  }
   
 }
 

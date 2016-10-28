@@ -22,12 +22,12 @@ namespace larlite{
   {
     
   public:
-    
+   
+    PiZeroROI();
+ 
     /// Default destructor
     virtual ~PiZeroROI(){};
-    
-  PiZeroROI() : data_base(data::kPiZeroROI)
-      { clear_data(); }
+   
     
     PiZeroROI(const std::vector < std::pair< int, int > > Wire,
           const std::vector < std::pair< int, int > > Time);
@@ -95,7 +95,8 @@ namespace larlite{
   public:
     
     /// Default constructor
-    event_PiZeroROI(std::string name="noname") : event_base(data::kPiZeroROI,name) { clear_data(); }
+    event_PiZeroROI(std::string name="noname");
+    //event_PiZeroROI(std::string name="noname") : event_base(data::kPiZeroROI,name) { clear_data(); }
     
     /// Default copy constructor
     event_PiZeroROI(const event_PiZeroROI& original) : std::vector<larlite::PiZeroROI>(original), event_base(original)

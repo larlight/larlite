@@ -46,7 +46,8 @@ namespace larlite{
   public:
     
     /// Default constructor
-    cluster() : data_base(data::kCluster) { clear_data(); }
+    //cluster() : data_base(data::kCluster) { clear_data(); }
+    cluster();
     
     /// Default destructor
     virtual ~cluster(){}
@@ -681,8 +682,9 @@ namespace larlite{
   public:
     
     /// Default constructor
-    event_cluster(std::string name="noname") : event_base(data::kCluster,name) {clear_data();}
-    
+			  //event_cluster(std::string name="noname") : event_base(data::kCluster,name) {clear_data();}
+    event_cluster(std::string name="noname");
+			  
     /// Default copy constructor
     event_cluster(const event_cluster& original)
       : std::vector<larlite::cluster>(original), event_base(original)
