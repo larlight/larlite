@@ -2,7 +2,9 @@
 #define RECOTOOL_HITCLUSTER_CXX
 
 #include "HitCluster.h"
+#include <algorithm>
 
+#include <algorithm>
 
 namespace larlite {
 

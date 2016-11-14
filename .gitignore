@@ -1,4 +1,6 @@
 .DS_Store
+*.C
+*.txt
 *.o
 *Cint.h
 *Cint.cxx
@@ -24,6 +26,7 @@
 /doc/dOxy*
 /bin/larlite
 /bin/llhadd
+/bin/combine_ass
 /GNUmakefile
 /UserDev/*
 !/UserDev/bin

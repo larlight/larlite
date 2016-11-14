@@ -2,7 +2,6 @@ from database import recoBase
 from ROOT import evd
 from pyqtgraph.Qt import QtGui
 import pyqtgraph as pg
-from ROOT import larutil
 
 
 class vertex(recoBase):

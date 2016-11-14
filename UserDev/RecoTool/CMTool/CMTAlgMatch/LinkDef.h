@@ -23,6 +23,7 @@
 #pragma link C++ class cmtool::CFAlgoChargeDistrib+;
 #pragma link C++ class cmtool::CFAlgoShowerCompat+;
 #pragma link C++ class cmtool::CFAlgoProhibitPlane+;
+#pragma link C++ class cmtool::CFAlgoIoU+;
 //ADD_CFALGO_CLASS ... do not change this line
 //ADD_NEW_CLASS ... do not change this line
 #endif

@@ -3,11 +3,12 @@
 
 #include "CommonAmps.h"
 #include "OpT0Finder/Base/OpT0FinderException.h"
-#include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
 #include <cmath>
 #include <sstream>
 #include <numeric>
 namespace flashana {
+
+  static CommonAmpsFactory __global_CommonAmpsFactory__;
 
   CommonAmps::CommonAmps(const std::string name)
     : BaseFlashMatch(name)
@@ -16,7 +17,7 @@ namespace flashana {
     _score   = 0.8;    
   }
 
-  void CommonAmps::Configure(const ::fcllite::PSet &pset)
+  void CommonAmps::_Configure_(const Config_t &pset)
   {
     _percent = pset.get<double>("QFracThreshold");
     _score   = pset.get<double>("ScoreThreshold");
@@ -30,7 +31,7 @@ namespace flashana {
 					  std::end(flash.pe_v),
 					  0.0);
     double maxRatio 	= -1;
-    double maxX         = 0;
+    //double maxX         = 0;
     
     if(_vis_array.pe_v.empty())
       _vis_array.pe_v.resize(OpDetXArray().size());
@@ -91,11 +92,12 @@ namespace flashana {
 
       // Calculate amplitudes corresponding to max opdet amplitudes
       double visAmpTotal = 0;
-      double vis_pe_sum = std::accumulate(std::begin(_vis_array.pe_v),
-					  std::end(_vis_array.pe_v),
-					  0.0);
-      for(size_t i=0; i<ids.size(); i++)
+      double vis_pe_sum = _vis_array.TotalPE();
+
+      for(size_t i=0; i<ids.size(); i++) {
+	if(_vis_array.pe_v[ids[i]]<0) continue;
 	visAmpTotal += _vis_array.pe_v[ids[i]] / vis_pe_sum ;
+      }
       
       double ratio = 0;
       if(opAmpTotal > visAmpTotal )
@@ -105,17 +107,18 @@ namespace flashana {
       
       if(ratio > maxRatio) {
 	maxRatio = ratio;
-	maxX     = x_offset;
+	//maxX     = x_offset;
 
 	f.score = ratio;
 	f.tpc_point.x = f.tpc_point.y = f.tpc_point.z = 0;
 	f.tpc_point.q = vis_pe_sum;
 
 	for(size_t pmt_index=0; pmt_index<NOpDets(); ++pmt_index) {
-	  
-	  f.tpc_point.x += OpDetX(pmt_index) * _vis_array.pe_v[pmt_index] / vis_pe_sum;
-	  f.tpc_point.y += OpDetY(pmt_index) * _vis_array.pe_v[pmt_index] / vis_pe_sum;
-	  f.tpc_point.z += OpDetZ(pmt_index) * _vis_array.pe_v[pmt_index] / vis_pe_sum;
+	  double pe = _vis_array.pe_v[pmt_index];
+	  if(pe<0) continue;
+	  f.tpc_point.x += OpDetX(pmt_index) * pe / vis_pe_sum;
+	  f.tpc_point.y += OpDetY(pmt_index) * pe / vis_pe_sum;
+	  f.tpc_point.z += OpDetZ(pmt_index) * pe / vis_pe_sum;
 	}
       }
     }
@@ -129,6 +132,7 @@ namespace flashana {
       return f;
     }
 
+    f.hypothesis = _vis_array.pe_v;
     return f;
   }
 }

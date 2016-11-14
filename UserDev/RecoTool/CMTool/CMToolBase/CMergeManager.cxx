@@ -202,7 +202,7 @@ namespace cmtool {
         size_t tmp_hit_counts=0;
         for(auto const& index : indexes_v) 
           tmp_hit_counts += _tmp_merged_clusters.at(index).hit_vector.size();
-        std::vector<Hit2D> tmp_hits;
+        std::vector<larutil::Hit2D> tmp_hits;
         tmp_hits.reserve(tmp_hit_counts);
         
         for(auto const& index : indexes_v) {

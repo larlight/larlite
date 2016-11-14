@@ -11,8 +11,8 @@
 /** \addtogroup RecoViewer
 
     @{*/
-#ifndef LARLITE_DRAWHIT_H
-#define LARLITE_DRAWHIT_H
+#ifndef EVD_DRAWHIT_H
+#define EVD_DRAWHIT_H
 
 #include <iostream>
 #include "Analysis/ana_base.h"
@@ -26,11 +26,11 @@
 
 namespace evd {
 
-class Hit {
+class Hit2D {
 
 public:
-    Hit() {}
-    Hit(float w, float t, float c, float r, float st, float pt, float et, float pa) :
+    Hit2D() {}
+    Hit2D(float w, float t, float c, float r, float st, float pt, float et, float pa) :
         _wire(w),
         _time(t),
         _charge(c),
@@ -40,7 +40,7 @@ public:
         _end_time(et),
         _peak_amplitude(pa)
     {}
-    ~Hit() {}
+    ~Hit2D() {}
     float _wire;
     float _time;
     float _charge;
@@ -60,7 +60,7 @@ public:
     float peak_amplitude()  {return _peak_amplitude;}
 };
 
-class DrawHit : public larlite::ana_base, public RecoBase<Hit> {
+class DrawHit : public larlite::ana_base, public RecoBase<Hit2D> {
 
 public:
 
@@ -87,7 +87,7 @@ public:
 
     float maxCharge(size_t plane);
 
-    std::vector<Hit> getHitsOnWirePlane(size_t wire, size_t plane);
+    std::vector<Hit2D> getHitsOnWirePlane(size_t wire, size_t plane);
 
 private:
 

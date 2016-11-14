@@ -3,11 +3,12 @@
 
 #include "QWeightPoint.h"
 #include "OpT0Finder/Base/OpT0FinderException.h"
-#include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
 #include <cmath>
 #include <sstream>
 #include <numeric>
 namespace flashana {
+
+  static QWeightPointFactory __global_QWeightPointFactory__;
 
   QWeightPoint::QWeightPoint(const std::string name)
     : BaseFlashMatch(name)
@@ -15,7 +16,7 @@ namespace flashana {
     , _zdiff_max   ( 50*50 )
   {}
 
-  void QWeightPoint::Configure(const ::fcllite::PSet &pset)
+  void QWeightPoint::_Configure_(const Config_t &pset)
   {
     _x_step_size = pset.get<double>("XStepSize");
     _zdiff_max   = pset.get<double>("ZDiffMax" );
@@ -61,14 +62,15 @@ namespace flashana {
       FillEstimate(_tpc_qcluster,_vis_array);
 
       // Calculate amplitudes corresponding to max opdet amplitudes
-      double vis_pe_sum = std::accumulate(std::begin(_vis_array.pe_v),
-					  std::end(_vis_array.pe_v),
-					  0.0);
+      double vis_pe_sum = _vis_array.TotalPE();
 
       double weighted_z = 0;
-      for(size_t pmt_index=0; pmt_index<NOpDets(); ++pmt_index)
+      for(size_t pmt_index=0; pmt_index<NOpDets(); ++pmt_index) {
 
+	if(_vis_array.pe_v[pmt_index]<0) continue;
 	weighted_z += OpDetZ(pmt_index) * _vis_array.pe_v[pmt_index] / vis_pe_sum;
+
+      }
 
       double dz = std::fabs(weighted_z - flash.z);
       
@@ -80,34 +82,34 @@ namespace flashana {
 	f.tpc_point.x = f.tpc_point.y = 0;
 	f.tpc_point.q = vis_pe_sum;
 
+	f.tpc_point.x = x_offset;
+
 	for(size_t pmt_index=0; pmt_index<NOpDets(); ++pmt_index) {
-	  
-	  f.tpc_point.x += OpDetX(pmt_index) * _vis_array.pe_v[pmt_index] / vis_pe_sum;
+	  if(_vis_array.pe_v[pmt_index]<0) continue;
 	  f.tpc_point.y += OpDetY(pmt_index) * _vis_array.pe_v[pmt_index] / vis_pe_sum;
 	}
 
-	f.tpc_point.z = weighted_z;
+	f.tpc_point.z = weighted_z;	
       }
     }
+
+    f.hypothesis.clear();
     
-    if(_verbosity <= msg::kINFO) {
-      std::stringstream ss1;
-      ss1 << "Best match Hypothesis: "
-	  << f.tpc_point.x << " : "
-	  << f.tpc_point.y << " : "
-	  << f.tpc_point.z << " ... min dist : " << min_dz;
-      Print(msg::kINFO,__FUNCTION__,ss1.str());
-    }
+    FLASH_INFO() << "Best match Hypothesis: "
+		 << f.tpc_point.x << " : "
+		 << f.tpc_point.y << " : "
+		 << f.tpc_point.z << " ... min dist : " << min_dz
+		 << std::endl;
   
     // If min-diff is bigger than assigned max, return default match (score<0)
     if( min_dz > _zdiff_max ) {
-      
       f.tpc_point.x = f.tpc_point.y = f.tpc_point.z = -1;
       f.tpc_point.q = -1;
       f.score = -1;
       return f;
     }
 
+    f.hypothesis = _vis_array.pe_v;
     return f;
 
   }

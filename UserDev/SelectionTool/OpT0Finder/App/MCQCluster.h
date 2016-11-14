@@ -37,11 +37,9 @@ namespace flashana {
     /// Default destructor
     ~MCQCluster(){}
 
-    void Configure(const ::fcllite::PSet &pset);
-
-    void Construct(const flashana::QCluster_t& );
     void Construct( const larlite::event_mctrack&,
-                    const larlite::event_mcshower& );
+                    const larlite::event_mcshower&,
+		    const flashana::LightPath&);
 
     const std::vector<flashana::QCluster_t>& QClusters() const;
 
@@ -51,36 +49,57 @@ namespace flashana {
 
     size_t MCShower2QCluster(size_t) const;
 
-    bool UseXshift(bool use) { _use_xshift = use; return _use_xshift;}
+    void SetTriggerTime(const double time) { _trigger_time = time; }
      
     const flashana::MCSource_t& MCObjectID(size_t) const;
-
-    void SetUseLightPath ( bool use_light_path ) { _use_light_path = use_light_path ; } 
 
     #ifndef __CINT__
     void Swap(std::vector<flashana::QCluster_t>&&,
 	      std::vector<flashana::MCSource_t>&&);
     #endif
+
+  protected:
+    
+    void _Configure_(const ::fcllite::PSet &pset);
+    
   private:
   
     flashana::MCSource_t Identify( const unsigned int,
 				   const larlite::event_mctrack&,
 				   const larlite::event_mcshower& ) const;
 
-    mutable int _n;
-    
-    double _light_yield;
-    double _step_size;
+    void ExpandQCluster(const flashana::LightPath& lightpath,
+			const larlite::mctrack& mct,
+			flashana::QCluster_t& tpc_obj);
+
     bool _use_xshift;
+    double _trigger_time;
+    double _extension;
     std::vector<flashana::QCluster_t> _qcluster_v;
     std::vector<size_t> _mctrack_2_qcluster;
     std::vector<size_t> _mcshower_2_qcluster;
     std::vector<flashana::MCSource_t> _qcluster_2_mcobject;
 
-    flashana::LightPath _lightpath_clustering ;
-    bool _use_light_path ;
+    bool  _use_mc_dedx;
+    float _op_RO_start ;
+    float _op_RO_end ;
 
   };
+
+  /**
+     \class flashana::MCQClusterFactory
+  */
+  class MCQClusterFactory : public CustomAlgoFactoryBase {
+  public:
+    /// ctor
+    MCQClusterFactory() { CustomAlgoFactory::get().add_factory("MCQCluster",this); }
+    /// dtor
+    ~MCQClusterFactory() {}
+    /// creation method
+    BaseAlgorithm* create(const std::string instance_name) { return new MCQCluster(instance_name); }
+  };
+
+  
 }
 
 #endif

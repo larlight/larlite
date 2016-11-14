@@ -17,7 +17,7 @@ void FillPolygon::do_params_fill(cluster_params & cluster) {
   auto const& hits = cluster.hit_vector;
 
   if (hits.size()) {
-    std::vector<const Hit2D*> polygonEdges;
+    std::vector<const larutil::Hit2D*> polygonEdges;
     geomHelper->SelectPolygonHitList(hits, polygonEdges, _frac);
     //now making Polygon Object
     std::pair<float, float> tmpvertex;

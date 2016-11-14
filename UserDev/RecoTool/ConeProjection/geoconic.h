@@ -51,7 +51,7 @@ namespace larlite {
 	bool TPCContained( const TVector3& pos);
 
 	//$ Are the 3d Cone Edges Contained in the tpc?
-	bool ConeInTPC(const TLorentzVector& Pos, const TLorentzVector& dir, double Length, double OpeningAngle, int smoothness);
+	bool ConeInTPC(const TVector3& Pos, const TVector3& dir, double Length, double OpeningAngle, int smoothness);
 
 	//$ This returns Polygon edges for the cone If you already have the cone points
 	std::vector<larutil::PxPoint> ConicalEdge(std::vector<larutil::PxPoint> incone);
@@ -63,7 +63,7 @@ namespace larlite {
                 // 4 Opening Angle 
                 // 5 Plane
                 // 6 smoothness 
-        std::vector<larutil::PxPoint> ConicalFeatures(const TLorentzVector& Pos, const TLorentzVector& dir, double Length, double OpeningAngle, int plane , int smoothness);
+        std::vector<larutil::PxPoint> ConicalFeatures(const TVector3& Pos, const TVector3& dir, double Length, double OpeningAngle, int plane , int smoothness);
 
         bool ConicalOverlap(const std::vector<larutil::PxPoint> conea,const std::vector<larutil::PxPoint> coneb);
 	//$ This returns the hits contained in the polygon
@@ -76,7 +76,7 @@ namespace larlite {
 	std::vector<unsigned int> PolyContainHit(std::vector<larlite::hit> hits, std::vector<larutil::PxPoint> polygon , unsigned int plane);
 
 	//$ This tells you if the walk is possible with given params
-	bool walkable(const TLorentzVector& Pos, const TLorentzVector& dir, double Length, double OpeningAngle, int plane, int smoothness);
+	bool walkable(const TVector3& Pos, const TVector3& dir, double Length, double OpeningAngle, int plane, int smoothness);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////

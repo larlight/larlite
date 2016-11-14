@@ -27,6 +27,7 @@
 #include "cosmictag.h"
 #include "opflash.h"
 #include "ophit.h"
+#include "t0.h"
 #include "mcflux.h"
 #include "pfpart.h"
 #include "partid.h"
@@ -40,6 +41,7 @@
 #include "simphotons.h"
 #include "mucsdata.h"
 #include "mucsreco.h"
+#include "PiZeroROI.h"
 #include "auxsimch.h"
 #include "chstatus.h"
 
@@ -1139,6 +1141,9 @@ namespace larlite {
     case data::kOpHit:
       _ptr_data_array[type][name]=new event_ophit(name);
       break;
+    case data::kT0:
+      _ptr_data_array[type][name]=new event_t0(name);
+      break;
     case data::kPFParticle:
       _ptr_data_array[type][name]=new event_pfpart(name);
       break;
@@ -1147,6 +1152,9 @@ namespace larlite {
       break;
     case data::kMCTrack:
       _ptr_data_array[type][name]=new event_mctrack(name);
+      break;
+    case data::kPiZeroROI:
+      _ptr_data_array[type][name]=new event_PiZeroROI(name);
       break;
     case data::kMCTree:
       _ptr_data_array[type][name]=new event_mctree(name);

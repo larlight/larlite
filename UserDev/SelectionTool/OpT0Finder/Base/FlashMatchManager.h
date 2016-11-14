@@ -14,7 +14,8 @@
 #ifndef OPT0FINDER_FLASHMATCHMANAGER_H
 #define OPT0FINDER_FLASHMATCHMANAGER_H
 
-#include "ColorPrint.h"
+#include "LoggerFeature.h"
+#include "OpT0FinderFMWKInterface.h"
 #include "BaseAlgorithm.h"
 #include "BaseTPCFilter.h"
 #include "BaseFlashFilter.h"
@@ -25,7 +26,7 @@ namespace flashana {
   /**
      \class FlashMatchManager
   */
-  class FlashMatchManager : public ColorPrint {
+  class FlashMatchManager : public LoggerFeature {
 
   public:
     
@@ -38,17 +39,14 @@ namespace flashana {
     /// Name getter
     const std::string& Name() const;
 
-    /// Algorithm setter
-    void SetAlgo(BaseAlgorithm* alg);
-
-    /// Custom algorithm adder
-    void AddCustomAlgo(BaseAlgorithm* alg);
-
     /// Configuration
-    void Configure(const std::string="");
+    void Configure(const Config_t& cfg);
 
     /// Algorithm getter
     flashana::BaseAlgorithm* GetAlgo(flashana::Algorithm_t type);
+
+    /// Custom algorithm getter
+    flashana::BaseAlgorithm* GetCustomAlgo(std::string name);
 		 
 #ifndef __CINT__
     /// Emplacer of a TPC object (hidden from ROOT5 CINT)
@@ -80,8 +78,24 @@ namespace flashana {
     { _allow_reuse_flash = ok; }
 
     void PrintConfig();
-    
+
+    /// Access to an input: TPC objects in the form of QClusterArray_t
+    const QClusterArray_t& QClusterArray() const { return _tpc_object_v; }
+
+    /// Access to an input: PMT objects in the form of FlashArray_t
+    const FlashArray_t& FlashArray() const { return _flash_v; }
+
+    /// Access to a full results (if configured to store) for [tpc][flash] indexing
+    const std::vector<std::vector<flashana::FlashMatch_t> > FullResultTPCFlash() const
+    { return _res_tpc_flash_v; }
+
+    /// Access to a full results (if configured to store) for [flash][tpc] indexing
+    const std::vector<std::vector<flashana::FlashMatch_t> > FullResultFlashTPC() const
+    { return _res_flash_tpc_v; }
+
   private:
+
+    void AddCustomAlgo(BaseAlgorithm* alg);
 
     BaseFlashFilter*     _alg_flash_filter;     ///< Flash filter algorithm
     BaseTPCFilter*       _alg_tpc_filter;       ///< TPC filter algorithm
@@ -92,7 +106,7 @@ namespace flashana {
     /**
        A set of custom algorithms (not to be executed but to be configured)
     */
-    std::vector<flashana::BaseAlgorithm*> _custom_alg_v;
+    std::map<std::string,flashana::BaseAlgorithm*> _custom_alg_m;
 
     /// TPC object information collection (provided by a user)
     QClusterArray_t _tpc_object_v;
@@ -106,6 +120,12 @@ namespace flashana {
     std::string _config_file;
     /// Name
     std::string _name;
+    /// Request boolean to store full matching result (per Match function call)
+    bool _store_full;
+    /// Full result container indexed by [tpc][flash]
+    std::vector<std::vector<flashana::FlashMatch_t> > _res_tpc_flash_v;
+    /// Full result container indexed by [flash][tpc]
+    std::vector<std::vector<flashana::FlashMatch_t> > _res_flash_tpc_v;    
   };
 }
 

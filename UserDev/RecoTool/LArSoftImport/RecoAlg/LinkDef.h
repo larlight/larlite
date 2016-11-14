@@ -9,7 +9,9 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class trkf::TrackMomentumCalculator+;
+#pragma link C++ class larlite::TrackMomentumCalculator+;
+#pragma link C++ class larlite::TrackMomentumSplines+;
+#pragma link C++ class larlite::TestSpline+;
 
 //ADD_NEW_CLASS ... do not change this line
 #endif

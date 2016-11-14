@@ -6,6 +6,12 @@
 
 namespace showerreco {
 
+  GeoModule::GeoModule()
+  {
+    _name        = "GeoModule";
+    _flip_showers = true;
+  }
+
 void GeoModule::do_reconstruction(const ::protoshower::ProtoShower & proto_shower,
                                   Shower_t& resultShower) {
   
@@ -55,7 +61,7 @@ void GeoModule::do_reconstruction(const ::protoshower::ProtoShower & proto_showe
 //     if (resultShower.fPlaneIsBad.at(i))
 //       continue;
 //     // Now it's confirmed good plane
-//     // Get the 3 Point2D needed:
+//     // Get the 3 larutil::Point2D needed:
 //     auto startPoint2D = geoHelper->Point_3Dto2D(resultShower.fXYZStart);
 //     auto secondPoint2D = geoHelper -> Point_3Dto2D(secondPoint);
 
@@ -98,7 +104,7 @@ void GeoModule::fillLength(const ShowerClusterSet_t & clusters, Shower_t & resul
       if (resultShower.fPlaneIsBad.at(i))
         continue;
       else {
-        Point2D tempPoint = geoHelper->Point_3Dto2D(endPoint3D, clusters.at(i).plane_id.Plane);
+        larutil::Point2D tempPoint = geoHelper->Point_3Dto2D(endPoint3D, clusters.at(i).plane_id.Plane);
         error += geoHelper -> Get2DDistanceSqrd(tempPoint, clusters.at(i).end_point);
       }
     }
@@ -126,7 +132,8 @@ void GeoModule::fillLength(const ShowerClusterSet_t & clusters, Shower_t & resul
 
   if (length < 0) {
     resultShower.fLength = - length;
-    resultShower.fDCosStart *= -1;
+    if (_flip_showers)
+      resultShower.fDCosStart *= -1;
   }
   else {
     resultShower.fLength = length;

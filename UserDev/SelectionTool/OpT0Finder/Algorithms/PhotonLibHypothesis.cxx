@@ -3,9 +3,10 @@
 
 #include "PhotonLibHypothesis.h"
 #include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
-
-
+#include "OpT0Finder/Base/OpT0FinderException.h"
 namespace flashana {
+
+  static PhotonLibHypothesisFactory __global_PhotonLibHypothesisFactory__;
 
   PhotonLibHypothesis::PhotonLibHypothesis(const std::string name)
     : BaseFlashHypothesis(name)
@@ -14,13 +15,25 @@ namespace flashana {
     std::cout << "PhotonLibHyp: Constructor: _n_pmt is " << _n_pmt << std::endl;
   }
 
-  void PhotonLibHypothesis::Configure(const ::fcllite::PSet &pset)
+  void PhotonLibHypothesis::_Configure_(const Config_t &pset)
   {
+    _global_qe = pset.get<double>("GlobalQE");
+    _qe_v      = pset.get<std::vector<double> >("CCVCorrection");
+    if(_qe_v.size() != NOpDets()) {
+      FLASH_CRITICAL() << "CCVCorrection factor array has size " << _qe_v.size()
+		       << " != number of opdet (" << NOpDets() << ")!" << std::endl;
+      throw OpT0FinderException();
+    }
   }
   
   void PhotonLibHypothesis::FillEstimate(const QCluster_t& trk, Flash_t &flash) const
   {
-        
+    
+    size_t n_pmt = BaseAlgorithm::NOpDets();//n_pmt returns 0 now, needs to be fixed
+    
+    for ( auto& v : flash.pe_v ) v = 0;
+    
+    for ( size_t ipmt = 0; ipmt < n_pmt; ++ipmt) {
 
     flash.pe_v.resize(32,0.);
     for (auto &v : flash.pe_v) v = 0;
@@ -31,26 +44,10 @@ namespace flashana {
       for ( size_t ipt = 0; ipt < trk.size(); ++ipt) {
 	
         auto const& pt = trk[ipt];
-
-	double dist(0.0);
-	if (pt_last.size() == 3 )
-	  dist = std::sqrt(std::pow(pt_last.at(0)-pt.x,2.)+std::pow(pt_last.at(1)-pt.y,2.)+std::pow(pt_last.at(2)-pt.z,2.));
-	pt_last.clear();
-	pt_last.push_back(pt.x); pt_last.push_back(pt.y); pt_last.push_back(pt.z);
-
-        double q = pt.q ;
-	double q_corr = dist*2.2*29000;// *0.7; // cm * MeV/cm * photons/MeV * quenching(Efield)
-
-	//		std::cout << "PhotonLibHypothesis: PMT : " << ipmt << " [x,y,z,t,q] -> [q_corr] : [" << pt.x << ", "
-	//  << pt.y << ", " << pt.z << ", " << pt.t<< ", " << pt.q <<"] -> [" << q_corr << "]" << std::endl;
-	//std::cout << "PhotonLibHypothesis: PMT : dist to last point is " <<  dist << std::endl;
-	//if (::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt) == 0.)
-	//  std::cout << "PhotonLibHypothesis: PMT : Look-up lib val is 0 for x,y,z,ipmt: " << pt.x << ", " << pt.y << ", " << pt.z << ", " << ipmt << std::endl;
-	// q = q_corr;
-	q *= ::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt)*0.0093; // qe-only //EC, 16-Dec-2015, 20-May-2016 
-
-
-	//*0.0093;
+	
+        double q = pt.q;
+	
+        q *= ::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt) * _global_qe / _qe_v[ipmt];
         flash.pe_v[ipmt] += q;
 	
 	//std::cout << "PhotonLibHypothesis: PMT : " << ipmt << " [x,y,z,q] -> [q] : [" << pt.x << ", "

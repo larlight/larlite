@@ -2,27 +2,32 @@
 #define LIGHTPATH_CXX
 
 #include "LightPath.h"
-
+#include "GeoAlgo/GeoTrajectory.h"
 namespace flashana {
+
+  static LightPathFactory __global_LightPathFactory__;
 
   LightPath::LightPath(const std::string name)
     : BaseAlgorithm(kCustomAlgo, name)
     , _gap         ( 0.5    )
-    , _light_yield ( 29000. )
+    , _light_yield ( 40000. )
     , _dEdxMIP     ( 2.07    ) //1.42[Mev*cm^2*g]*1.4[g/cm^3]=2.004MeV/cm
   {}
 
-  void LightPath::Configure(const ::fcllite::PSet &pset)
+  void LightPath::_Configure_(const Config_t &pset)
   {
-    _gap         = pset.get< double > ( "SegmentSize" );
-    _light_yield = pset.get< double > ( "LightYield"  );
-    _dEdxMIP     = pset.get< double > ( "MIPdEdx"     );
+    _gap          = pset.get< double > ( "SegmentSize" );
+    _light_yield  = pset.get< double > ( "LightYield"  );
+    _dEdxMIP      = pset.get< double > ( "MIPdEdx"     );
   }
 
   void LightPath::QCluster(const ::geoalgo::Vector& pt_1,
                            const ::geoalgo::Vector& pt_2,
-                           QCluster_t& Q_cluster) const {
+                           QCluster_t& Q_cluster,
+			   double dedx) const {
 
+    if(dedx < 0) dedx = _dEdxMIP;
+    
     double dist = pt_1.Dist(pt_2);
     QPoint_t q_pt;
 
@@ -31,7 +36,7 @@ namespace flashana {
       q_pt.x = mid_pt[0];
       q_pt.y = mid_pt[1];
       q_pt.z = mid_pt[2];
-      q_pt.q = _dEdxMIP * _light_yield * dist;
+      q_pt.q = dedx * _light_yield * dist;
       Q_cluster.emplace_back(q_pt);
 
       return;
@@ -49,7 +54,7 @@ namespace flashana {
         q_pt.x = mid_pt[0] ;
         q_pt.y = mid_pt[1];
         q_pt.z = mid_pt[2];
-        q_pt.q = _gap * _dEdxMIP * _light_yield;
+        q_pt.q = _gap * dedx * _light_yield;
         Q_cluster.emplace_back(q_pt);
       }
       else {
@@ -58,7 +63,7 @@ namespace flashana {
         q_pt.x = mid_pt[0] ;
         q_pt.y = mid_pt[1];
         q_pt.z = mid_pt[2];
-        q_pt.q = weight * _dEdxMIP * _light_yield;
+        q_pt.q = weight * dedx * _light_yield;
         Q_cluster.emplace_back(q_pt);
       }//Last segment less than gap
     }
@@ -69,12 +74,13 @@ namespace flashana {
     QCluster_t result;
     result.clear();
 
-    for (int i = 0; i < trj.size() - 1; i++) {
+    for (size_t i = 0; i < trj.size() - 1; i++) {
       auto const& this_loc(trj[i]);
       auto const& last_loc(trj[i + 1]);
 
       LightPath::QCluster(this_loc, last_loc, result);
     }
+
     return result;
   }
 

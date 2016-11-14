@@ -23,7 +23,7 @@ namespace cmtool {
     if(_priority_algo) _priority_algo->Reset();
   }
 
-  void CMManagerBase::SetClusters(const std::vector<std::vector<Hit2D> > &clusters)
+  void CMManagerBase::SetClusters(const std::vector<std::vector<larutil::Hit2D> > &clusters)
   {
 
     TStopwatch localWatch;

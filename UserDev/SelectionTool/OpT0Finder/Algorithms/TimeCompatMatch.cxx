@@ -3,33 +3,24 @@
 
 #include "TimeCompatMatch.h"
 #include "OpT0Finder/Base/OpT0FinderException.h"
-#include "LArUtil/GeometryHelper.h"
-#include "LArUtil/DetectorProperties.h"
 #include <cmath>
 #include <sstream>
 
 namespace flashana {
 
+  static TimeCompatMatchFactory __global_TimeCompatMatchFactory__;
+
   TimeCompatMatch::TimeCompatMatch(const std::string name)
     : BaseProhibitAlgo(name)
-  {
-    _frame_drift_time = 2300.; // usec
-  }
+  {}
 
-  void TimeCompatMatch::Configure(const ::fcllite::PSet &pset)
+  void TimeCompatMatch::_Configure_(const Config_t &pset)
   {
-    _frame_drift_time = pset.get<double>("FrameDriftTime");
+    _time_buffer = pset.get<double>("TimeBuffer");
   }
 
   bool TimeCompatMatch::MatchCompatible(const QCluster_t& clus, const Flash_t& flash)
   {
-
-
-    _frame_drift_time = 2319 ;
-
-    // conversion quantities
-    double t2cm   = larutil::GeometryHelper::GetME()->TimeToCm();
-    double ROrate = larutil::DetectorProperties::GetME()->SamplingRate(); // ns
 
     if(clus.empty()) return false; 
 
@@ -46,47 +37,18 @@ namespace flashana {
       if (pt.t < clus_tdrift_min) { clus_tdrift_min = pt.t; }
     }
 
-    double det_width = 256.35; // cm
-    bool tpc_bound (true);
-    if ( clus_x_min<0. || clus_x_max>det_width ) tpc_bound=false; // we have translated any one of the trk points out of the TPC.
-    // convert both quantities to time (usec)
-    double clus_t_min = (clus_x_min/t2cm)*(ROrate/1000.); // us
-    double clus_t_max = (clus_x_max/t2cm)*(ROrate/1000.); // us
+    // Earliest flash time => assume clus_x_max is @ detector X-max boundary
+    double clus_t_min = (clus_x_max - ActiveXMax()) / DriftVelocity();
+    double clus_t_max = clus_x_min / DriftVelocity();
 
-    // find the largest distance in time between the flash
-    // and the cluster's time
-    // if the cluster's time is more than a drift-window larger
-    // then the flash -> impossible coincidence
-    //
-
-
-    // This condition is moved to PhotonLibHypothesis.cxx, since the question must be asked with each step in the 
-    // translation of x, which does not happen here: here we only check global track - flash compatibility issues.
     /*
-    if ( (fabs(clus_t_max - flash_time) > _frame_drift_time)  
-	 //	 || ( (clus_t_min - clus_tdrift_min*1000.) - flash_time > 0 )  
-	 //	 ||         !tpc_bound
-	 )
-      {
-	std::cout<<"Failed clus t min, t max, clus_tdrift_min, flash_time, frame_drift_time [all usec]: "<<clus_t_min<<", "<<clus_t_max<<", "<<clus_tdrift_min*1000.<<", "<<flash_time<<", "<<_frame_drift_time<<std::endl;
-	return false;
-      
-    }
-    */
-    // if the cluster comes before the flash entirely ->
-    // impossible match
-    //        std::cout<<" TimeCompatMatch::MatchCompatible(): clus_t_min and flash_time are "<<clus_t_min+20.<<", "<<flash_time<<", "<<std::endl; 
-    if ( (clus_t_min+20.) < flash_time) {
-  //    std::cout<<"min failur! "<<clus_t_min+20.<<", "<<flash_time<<", "<<std::endl; 
-      return false;
-      }
-    else if (std::abs(flash_time) > larlite::data::kINVALID_DOUBLE/1.E6)
-      {
-	std::cout<<"TimeCompatMatch::MatchCompatible(): This flash is f'd. flash.time is in the ballpark of default value of k_INVALID_DOUBLE!" << std::endl; 
-	return false;
+    std::cout<< "Inspecting TPC object @ " << clus.time << std::endl;
+    std::cout<< "xmin = " << clus_x_min << " ... xmax = " << clus_x_max << std::endl;
+    std::cout<< "tmin = " << clus_t_min << " ... tmax = " << clus_t_max << std::endl;
+    std::cout<< "Flash time @ " << flash_time << std::endl;
+    */    
+    return ((clus_t_min - _time_buffer) < flash_time && flash_time < (clus_t_max + _time_buffer));
 
-      }    
-    return true;
   }
 
 
