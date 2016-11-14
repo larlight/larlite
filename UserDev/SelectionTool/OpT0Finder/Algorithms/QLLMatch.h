@@ -2,7 +2,7 @@
  * \file QLLMatch.h
  *
  * \ingroup Algorithms
- * 
+ *
  * \brief Class def header for a class QLLMatch
  *
  * @author kazuhiro
@@ -31,14 +31,14 @@ namespace flashana {
     enum QLLMode_t { kChi2, kLLHD };
 
   private:
-    
+
   public:
-    
+
     /// Valid ctor hidden (singleton)
     QLLMatch(const std::string);
     /// Default ctor throws exception (singleton)
-    QLLMatch(){}
-    
+    QLLMatch();
+
     /// Default destructor
     ~QLLMatch(){}
 
@@ -78,7 +78,7 @@ namespace flashana {
   protected:
 
     void _Configure_(const Config_t &pset);
-    
+
   private:
 
     FlashMatch_t PESpectrumMatch(const QCluster_t &pt_v, const Flash_t &flash, const bool init_x0);
@@ -86,7 +86,7 @@ namespace flashana {
     FlashMatch_t OnePMTMatch(const Flash_t &flash);
 
     static QLLMatch* _me;
-    
+
     QLLMode_t _mode;   ///< Minimizer mode
     bool _record;      ///< Boolean switch to record minimizer history
     double _normalize; ///< Noramalize hypothesis PE spectrum
@@ -134,9 +134,8 @@ namespace flashana {
     /// creation method
     BaseFlashMatch* create(const std::string instance_name) { return QLLMatch::GetME(); }
   };
-  
+
 }
 
 #endif
-/** @} */ // end of doxygen group 
-
+/** @} */ // end of doxygen group

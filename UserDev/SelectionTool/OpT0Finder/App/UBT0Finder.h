@@ -2,7 +2,7 @@
  * \file UBT0Finder.h
  *
  * \ingroup App
- * 
+ *
  * \brief Class def header for a class UBT0Finder
  *
  * @author kazuhiro
@@ -30,26 +30,26 @@ namespace larlite {
      User custom analysis class made by SHELL_USER_NAME
    */
   class UBT0Finder : public ana_base{
-  
+
   public:
 
     UBT0Finder () ;
-      
+
 
     /// Default destructor
     virtual ~UBT0Finder(){_use_mc=false;}
 
     /** IMPLEMENT in UBT0Finder.cc!
         Initialization method to be called before the analysis event loop.
-    */ 
+    */
     virtual bool initialize();
     void Configure(const ::fcllite::PSet &pset);
-    /** IMPLEMENT in UBT0Finder.cc! 
-        Analyze a data event-by-event  
+    /** IMPLEMENT in UBT0Finder.cc!
+        Analyze a data event-by-event
     */
     virtual bool analyze(storage_manager* storage);
 
-    /** IMPLEMENT in UBT0Finder.cc! 
+    /** IMPLEMENT in UBT0Finder.cc!
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
@@ -59,6 +59,8 @@ namespace larlite {
     const std::vector<flashana::FlashMatch_t> MatchResult() const { return _result; }
 
     void SetConfigFile(std::string name) { _config_file = name; }
+
+    //void Fill_PVL_Tree(const flashana::QCluster_t& qcl);
 
   protected:
 
@@ -79,11 +81,11 @@ namespace larlite {
 #endif
 
 //**************************************************************************
-// 
+//
 // For Analysis framework documentation, read Manual.pdf here:
 //
 // http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
 //
 //**************************************************************************
 
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group

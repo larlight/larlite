@@ -2,6 +2,7 @@
 #define LLMATCH_CXX
 
 #include "LLMatch.h"
+#include "Base/messenger.h"
 #include "OpT0Finder/Base/OpT0FinderException.h"
 #include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
 #include <TMinuit.h>
@@ -24,6 +25,10 @@ namespace flashana {
 	std::cout << "LLMatch.cxx: _normalize is " << _normalize << std::endl;
     }
 
+    void LLMatch::_Configure_(const Config_t &pset){
+      this->Configure(pset);
+    }
+
     FlashMatch_t LLMatch::Match(const QCluster_t &pt_v, const Flash_t &flash) {
 
 
@@ -33,9 +38,9 @@ namespace flashana {
         FlashMatch_t res;
         if (isnan(_ll)) return res;
         res.tpc_point.x = res.tpc_point.y = res.tpc_point.z = 0;
-	res.tpc_point_err.clear();
-	res.tpc_point_err.resize(3);
-	res.tpc_point_err[0] = res.tpc_point_err[1] = res.tpc_point_err[2] = 0;
+	//res.tpc_point_err.clear();
+	//res.tpc_point_err.resize(3);
+	res.tpc_point_err.x = res.tpc_point_err.y = res.tpc_point_err.z = 0;
         res.score = 1. / _ll;
 
 
@@ -55,15 +60,15 @@ namespace flashana {
         res.tpc_point.z /= weight;
         res.tpc_point.q = weight;
 
-	/* 
-	   Why do the above for x? We went to the trouble to float x and determine its location. The above 
+	/*
+	   Why do the above for x? We went to the trouble to float x and determine its location. The above
 	   writes over that effort.
 	 */
 
 
 	//  This is the TPC x, even if the y,z are for a Flash location
 	res.tpc_point.x = _reco_x_offset;
-	res.tpc_point_err[0] = _reco_x_offset_err;
+	res.tpc_point_err.x = _reco_x_offset_err;
 
        	//	std::cout << "LLMatch::Match() res.x, res.dx are " << res.tpc_point.x << ", " << res.tpc_point_err[0] << std::endl;
 
@@ -73,7 +78,7 @@ namespace flashana {
     const Flash_t &LLMatch::ChargeHypothesis(const double xoffset) {
         if (_hypothesis.pe_v.empty()) _hypothesis.pe_v.resize(NOpDets(), 0.);
         if (_hypothesis.pe_v.size() != NOpDets())
-            Print(msg::kEXCEPTION, __FUNCTION__, "Hypothesis vector length != PMT count");
+          larlite::Message::get()->send( larlite::msg::kERROR, "Hypothesis vector length != PMT count");
 
 	//	std::cout << "ChargeHypothesis: xoffset: " << xoffset << std::endl;
 
@@ -112,13 +117,13 @@ namespace flashana {
 
       std::vector<double> result (2,0.0);
       double nvalid_pmt = 0;
-	
+
         double PEtot_Hyp = 0;
         for (auto const &pe : hypothesis.pe_v)
             PEtot_Hyp += pe;
         double PEtot_Obs = 0;
 
-	// EC, 19-May-2016. We will add to the neg llhd a term which captures the overall probability of 
+	// EC, 19-May-2016. We will add to the neg llhd a term which captures the overall probability of
 	// fluctuating from the total pe_hyp to total pe_meas, and weight that by the total pe_meas.
 	// The reason for this is that it is possible that tracks are shoved to large x values where the probability of a robust track
 	// producing a couple photon prediction at each tube gives a probability of observation at each tube that is really not so
@@ -198,7 +203,7 @@ namespace flashana {
             if (pt.x < min_x) min_x = pt.x;
         }
 
-	// This shifts the track so that it touches x=0 plane 
+	// This shifts the track so that it touches x=0 plane
         for (auto &pt : _raw_trk) pt.x -= min_x;
 
         //

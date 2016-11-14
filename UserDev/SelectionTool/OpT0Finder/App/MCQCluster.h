@@ -2,7 +2,7 @@
  * \file MCQCluster.h
  *
  * \ingroup App
- * 
+ *
  * \brief Class def header for a class MCQCluster
  *
  * @author kazuhiro
@@ -28,14 +28,16 @@ namespace flashana {
      doxygen documentation!
   */
   class MCQCluster : public flashana::BaseAlgorithm {
-    
+
   public:
-    
+
     /// Default constructor
     MCQCluster(const std::string name="MCQCluster");
-    
+
     /// Default destructor
     ~MCQCluster(){}
+
+    void Construct(const flashana::QCluster_t& q);
 
     void Construct( const larlite::event_mctrack&,
                     const larlite::event_mcshower&,
@@ -50,7 +52,7 @@ namespace flashana {
     size_t MCShower2QCluster(size_t) const;
 
     void SetTriggerTime(const double time) { _trigger_time = time; }
-     
+
     const flashana::MCSource_t& MCObjectID(size_t) const;
 
     #ifndef __CINT__
@@ -59,11 +61,11 @@ namespace flashana {
     #endif
 
   protected:
-    
+
     void _Configure_(const ::fcllite::PSet &pset);
-    
+
   private:
-  
+
     flashana::MCSource_t Identify( const unsigned int,
 				   const larlite::event_mctrack&,
 				   const larlite::event_mcshower& ) const;
@@ -99,9 +101,8 @@ namespace flashana {
     BaseAlgorithm* create(const std::string instance_name) { return new MCQCluster(instance_name); }
   };
 
-  
+
 }
 
 #endif
-/** @} */ // end of doxygen group 
-
+/** @} */ // end of doxygen group

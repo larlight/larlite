@@ -2,7 +2,7 @@
  * \file LLMatch.h
  *
  * \ingroup Algorithms
- * 
+ *
  * \brief Class def header for a class LLMatch
  *
  * @author echurch
@@ -24,12 +24,12 @@ namespace flashana {
      doxygen documentation!
   */
   class LLMatch : public BaseFlashMatch {
-    
+
   public:
-    
+
     /// Default constructor
     LLMatch(const std::string="LLMatch");
-    
+
     /// Default destructor
     ~LLMatch(){}
 
@@ -68,6 +68,10 @@ namespace flashana {
     const double Bestx() { return _reco_x_offset; }
     const double Bestx_err() { return _reco_x_offset_err; }
 
+  protected:
+
+    void _Configure_(const Config_t &pset);
+
   private:
 
     static LLMatch* _me;
@@ -93,5 +97,4 @@ namespace flashana {
 }
 
 #endif
-/** @} */ // end of doxygen group 
-
+/** @} */ // end of doxygen group

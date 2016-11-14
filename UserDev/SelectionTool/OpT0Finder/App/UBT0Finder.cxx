@@ -33,8 +33,10 @@ namespace larlite {
 
     _mgr.Configure(main_cfg);
 
+    return true;
   }
 
+  /*
   void UBT0Finder::Fill_PVL_Tree(const flashana::QCluster_t& qcl) {
 
     for (auto const & qpt : qcl)
@@ -51,6 +53,7 @@ namespace larlite {
     }
 
   }
+  */
 
   bool UBT0Finder::analyze(storage_manager* storage) {
 
@@ -100,7 +103,7 @@ namespace larlite {
           pt.y = pt1[1] + dy / 2.;
           pt.z = pt1[2] + dz / 2.;
 
-	  pt.t = pt.x/(det_width/det_drift_time) ; // this is an upper bound on the drift time
+	        //pt.t = pt.x/(det_width/det_drift_time) ; // this is an upper bound on the drift time
 
           tpc_obj.emplace_back(pt);
           tpc_obj.idx = n;
@@ -129,7 +132,7 @@ namespace larlite {
       if(ev_trigger) {
 	mcqclustering->SetTriggerTime(ev_trigger->TriggerTime());
       }
-      
+
       mcqclustering->Construct(*ev_mctrack, *ev_mcshower, lightpath);
       mcqclustering->Swap(std::move(qcluster_v), std::move(source_v));
 
@@ -139,9 +142,9 @@ namespace larlite {
     size_t flash_id=0;
     if(ev_flash_beam) {
       for (size_t n = 0; n < ev_flash_beam->size(); n++) {
-	
+
 	auto const& flash = ev_flash_beam->at(n);
-	
+
 	::flashana::Flash_t f;
 	f.x = f.x_err = 0;
 	f.y = flash.YCenter();
@@ -164,9 +167,9 @@ namespace larlite {
 
     if(ev_flash_cosmic) {
       for (size_t n = 0; n < ev_flash_cosmic->size(); n++) {
-	
+
 	auto const& flash = ev_flash_cosmic->at(n);
-	
+
 	::flashana::Flash_t f;
 	f.x = f.x_err = 0;
 	f.y = flash.YCenter();
