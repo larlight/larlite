@@ -86,9 +86,10 @@ MCShower3D DrawMCShower3D::getMCShower3D(larlite::mcshower mcshower) {
 
   result._start_point = mcshower.DetProfile().Position().Vect();
   result._direction = mcshower.DetProfile().Momentum().Vect();
+  result._direction *= 1.0/result._direction.Mag();
   result._pdg = mcshower.PdgCode();
   float energy = mcshower.DetProfile().E();
-  result._length = 13.8874 + 0.121734 * energy - (3.75571e-05) * energy * energy;;
+  result._length = fabs(13.8874 + 0.121734 * energy - (3.75571e-05) * energy * energy);
   result._opening_angle = atan(10.1 / result._length);
 
   return result;

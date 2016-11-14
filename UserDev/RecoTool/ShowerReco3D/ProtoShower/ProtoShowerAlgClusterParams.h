@@ -32,7 +32,7 @@
 
 namespace protoshower {
 
-class ProtoShowerAlgClusterParams : ProtoShowerAlgBase {
+class ProtoShowerAlgClusterParams : public ProtoShowerAlgBase {
 
 public:
 

@@ -15,9 +15,9 @@
 #define OPT0FINDER_BASEALGORITHM_H
 
 #include "OpT0FinderTypes.h"
-#include "ColorPrint.h"
+#include "OpT0FinderFMWKInterface.h"
+#include "LoggerFeature.h"
 #include "GeoAlgo/GeoAABox.h"
-#include "FhiclLite/PSet.h"
 #include <vector>
 namespace flashana {
 
@@ -26,7 +26,7 @@ namespace flashana {
   /**
      \class BaseAlgorithm
   */
-  class BaseAlgorithm : public ColorPrint {
+  class BaseAlgorithm : public LoggerFeature {
 
     friend class FlashMatchManager;
     
@@ -39,7 +39,7 @@ namespace flashana {
     ~BaseAlgorithm(){}
 
     /// Function to accept configuration
-    virtual void Configure(const ::fcllite::PSet &pset) = 0;
+    void Configure(const Config_t &pset);
 
     /// Algorithm type
     Algorithm_t AlgorithmType() const;
@@ -65,7 +65,13 @@ namespace flashana {
     const std::vector<double>& OpDetZArray() const; ///< PMT Z position array getter
 
     size_t NOpDets() const; ///< Getter for # of PMTs
+
+    double DriftVelocity() const;
     
+  protected:
+
+    virtual void _Configure_(const Config_t &pset) = 0;
+
   private:
     
     void SetOpDetPositions( const std::vector<double>& pos_x,
@@ -75,6 +81,8 @@ namespace flashana {
     void SetActiveVolume( const double xmin, const double xmax,
 			  const double ymin, const double ymax,
 			  const double zmin, const double zmax );
+
+    void SetDriftVelocity( const double v );
     
     Algorithm_t _type; ///< Algorithm type
     std::string _name; ///< Algorithm name
@@ -82,6 +90,7 @@ namespace flashana {
     std::vector<double> _opdet_y_v;  ///< OpticalDetector Y position array
     std::vector<double> _opdet_z_v;  ///< OpticalDetector Z position array
     ::geoalgo::AABox _active_volume; ///< Detector active volume
+    double _drift_velocity; ///< Drift velocity in [cm/us]
   };
 }
 #endif

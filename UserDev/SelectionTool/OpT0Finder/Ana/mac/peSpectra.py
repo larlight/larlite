@@ -1,6 +1,12 @@
 import sys,array
 from ROOT import *
-#from pylab import *
+
+# This script runs on the output (out.root) of running anaunit PEDistAna: 
+# > python run_mcflashana.py INPUT_FILE
+# INPUT_FILE needs to contain simch, ophit, opflash, opdigit,trigger information.
+# Be sure to set the proper producers in run_mcflashana
+# > python peSpectra.py out.root
+# This script produces plots like those in docdb# 5026 slides 17,18
 
 fout=TFile.Open("plots.root","RECREATE")
 
@@ -10,7 +16,7 @@ event.AddFile(sys.argv[1])
 x_array = [x for x in xrange(32)]
 
 c=TCanvas("c","",600,500)
-#Producers for this file: "largeant","opFlash","opFlash","pmtreadout","triggersim"
+
 
 j = 0
 
@@ -53,6 +59,8 @@ for e in event:
     flash_graph.Draw("P")
 
     c.Update()
+    gStyle.SetOptStat(0)
+    gApplication.Run()
     sys.stdin.readline()
 
 

@@ -43,14 +43,36 @@ public:
 
     void SetFillTree(bool on) { _fill_tree = on; }
 
+    /// set electron lifetime [ms]
+    void SetElectronLifetime(double t) { _tau = t; }
+
+    /// set recombination factor
+    void SetRecombFactor(double r) { _recomb_factor = r; }
+
+    /// use custom calibration constants [ ADC to fC ]
+    void SetCalibrationConst(double c) { _ADC_to_fC = c; CalculateEnergyConversion(); _custom_calib = true; }
+
     void initialize();
 
-    void SetGainU(double g) { _gain_U = g; }
-    void SetGainV(double g) { _gain_V = g; }
-    void SetGainY(double g) { _gain_Y = g; }
+    // set plane-dependent gains
+    void SetHitRecoCorrection(double f, int pl)
+    {
+      if ( pl >= _HitRecoCorrection_v.size() )
+	{ std::cout << "Cannot set gain @ this plane..." << std::endl; return; }
+      _HitRecoCorrection_v[pl] = f;
+      return;
+    }
 
-private:
-
+    void SetClusteringCorrection(double f, int pl)
+    {
+      if ( pl >= _HitRecoCorrection_v.size() )
+	{ std::cout << "Cannot set gain @ this plane..." << std::endl; return; }
+      _ClusteringCorrection_v[pl] = f;
+      return;
+    }
+    
+ private:
+    
     /// Calorimetry algorithm
     ::calo::CalorimetryAlg _caloAlg;
 
@@ -59,6 +81,8 @@ private:
 
     /// flag to decide if to use the ModBox or Birks models
     bool _useModBox;
+    /// use custom calibration constants
+    bool _custom_calib;
 
     /// boolean on whether to fill tree or not
     bool _fill_tree;
@@ -70,8 +94,8 @@ private:
     double _ADC_to_mV;
     double _shp_time;
     double _asic_gain;
-    double _energy_conversion;
-    double _charge_conversion;
+    double _ADC_to_MeV;
+    double _ADC_to_fC;
     double _tau; // electron lifetime in usec
     double _timetick; // sampling size in usec
     double _recomb_factor; // factor by which charge should be suppresse0d due to recombination effects...
@@ -81,9 +105,21 @@ private:
     std::vector<double> _dEdx_v;
     std::vector<double> _dQ_v;
     int _pl;
+    std::vector<double> _tick_v;
 
     // per-plane shower reco calibrations
-    double _gain_U, _gain_V, _gain_Y;
+    // calibration for hit reconstruction efficiency.
+    // calculated by summing all the charge in the hits in an event (for single particle showers)
+    // and seeing how much charge is missing to get the "true" shower energy
+    std::vector<double> _HitRecoCorrection_v;
+    // calibration for clustering efficiency
+    // this is clustering-algirhm specific. how much charge misses, on average, for a cluster?
+    // account for this factor using this calibration constant
+    std::vector<double> _ClusteringCorrection_v;
+
+
+    // calculate ADC (per-hit) to MeV conversion factor
+    void CalculateEnergyConversion() { _ADC_to_MeV = _ADC_to_fC * _fC_to_e * _e_to_eV * _eV_to_MeV; }
 
 };
 

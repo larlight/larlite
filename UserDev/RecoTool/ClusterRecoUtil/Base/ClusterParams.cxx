@@ -6,7 +6,7 @@
 namespace cluster {
 
 
-int cluster_params::SetHits(const std::vector< Hit2D> & inputHits) {
+int cluster_params::SetHits(const std::vector< larutil::Hit2D> & inputHits) {
 
   Clear();
 

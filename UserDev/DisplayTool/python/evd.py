@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import ROOT
+from ROOT import larlite
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 
@@ -35,6 +36,9 @@ def main():
     geom.add_argument('-U', '-u', '--uboone',
                       action='store_true',
                       help="Run with the microboone geometry")
+    geom.add_argument('-T', '-t', '--uboonetruncated',
+                      action='store_true',
+                      help="Run with the truncated microboone geometry")
     geom.add_argument('-L', '-l', '--lariat',
                       action='store_true',
                       help="Run with the lariat geometry")
@@ -46,6 +50,8 @@ def main():
 
     if args.uboone:
         geom = geometry.microboone()
+    elif args.uboonetruncated:
+        geom = geometry.microboonetruncated()
     elif args.lariat:
         geom = geometry.lariat()
     else:

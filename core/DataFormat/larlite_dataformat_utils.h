@@ -48,7 +48,7 @@ namespace larlite{
   public:
 
     /// Default ctor
-    product_id(const unsigned short type = larlite::data::kDATA_TYPE_MAX,
+    product_id(const unsigned short type = larlite::data::kINVALID_USHORT,
 	       const std::string name = "noname")
       : std::pair<unsigned short,std::string>(type,name)
     {}

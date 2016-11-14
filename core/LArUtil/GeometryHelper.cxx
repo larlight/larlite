@@ -269,10 +269,10 @@ float GeometryHelper::DistanceToLine3D( const TVector3 & pointOnLine, const TVec
   // Line is defined by the vectors pointOnLine and directionOfLine.
   // So, any point on the line can be parametrized as (pointOnLine + t * directionOfLine)
   // This distance between any point on the line and the target point is thus:
-  // L = |(pointOnLine + t*directionOfLine) . targetPoint |
+  // L = |(pointOnLine + t*directionOfLine) - targetPoint |
   //
   // Using this, minimize the distance with respect to t (actually, minimize the distance squared since it's easier):
-  // d(L^2)/dt = 2 * ( (pointOnLine + t*directionOfLine) . targetPoint ) * directionOfLine
+  // d(L^2)/dt = 2 * ( (pointOnLine + t*directionOfLine) - targetPoint ) * directionOfLine
   //
   // Set equal to 0 and solve for t:
   // pointOnLine . directionOfLine + t * directionOfLine^2 - targetPoint . directionOfLine = 0;
@@ -284,6 +284,30 @@ float GeometryHelper::DistanceToLine3D( const TVector3 & pointOnLine, const TVec
 
   closestApproach -= targetPoint;
   return closestApproach.Mag();
+
+}
+
+float GeometryHelper::DistanceAlongLine3D(
+  const TVector3 & pointOnLine, const TVector3 & directionOfLine,
+  const TVector3 & targetPoint) const
+{
+  // This algorithm finds the distance between a point and a line by finding the closest point on the line
+  // Using minimization techniques from calculus.
+
+  // Line is defined by the vectors pointOnLine and directionOfLine.
+  // So, any point on the line can be parametrized as (pointOnLine + t * directionOfLine)
+  // This distance between any point on the line and the target point is thus:
+  // L = |(pointOnLine + t*directionOfLine) - targetPoint |
+  //
+  // Using this, minimize the distance with respect to t (actually, minimize the distance squared since it's easier):
+  // d(L^2)/dt = 2 * ( (pointOnLine + t*directionOfLine) - targetPoint ) * directionOfLine
+  //
+  // Set equal to 0 and solve for t:
+  // pointOnLine . directionOfLine + t * directionOfLine^2 - targetPoint . directionOfLine = 0;
+  // Therefore:
+  return ( targetPoint.Dot(directionOfLine) - pointOnLine.Dot(directionOfLine) ) / (directionOfLine.Dot(directionOfLine));
+
+
 
 }
 
@@ -1013,6 +1037,36 @@ int GeometryHelper::GetYZ(const Point2D *p0, const Point2D *p1, Double_t* yz) co
   return 0;
 }
 
+  bool GeometryHelper::ContainedYZ(const double& y, const double& z) const {
+
+    // if y out of bounds
+    if ( (y < -geom->DetHalfHeight()) or (y> geom->DetHalfHeight()) )
+      return false;
+    
+    // if z out of bounds
+    if ( (z < 0) or (z > geom->DetLength()) )
+      return false;
+    
+    return true;
+  }
+  
+  bool GeometryHelper::Contained(const double& x, const double& y, const double& z) const {
+
+    // if x out of bounds
+    if ( (x < 0) or (x > 2*geom->DetHalfWidth()) )
+      return false;
+
+    // if y out of bounds
+    if ( (y < -geom->DetHalfHeight()) or (y> geom->DetHalfHeight()) )
+      return false;
+
+    // if z out of bounds
+    if ( (z < 0) or (z > geom->DetLength()) )
+      return false;
+
+    return true;
+  }
+  
 
 } // larutil
 

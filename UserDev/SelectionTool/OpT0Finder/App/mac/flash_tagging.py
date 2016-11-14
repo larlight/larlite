@@ -49,10 +49,6 @@ my_proc.set_ana_output_file("ana_LL.root")
 my_unit = fmwk.UBT0Finder()
 my_unit.SetEDiff(10.)
 my_unit.UseMC(True)
-my_unit.SetROStart(-3200.)
-my_unit.SetROEnd(3200.)
-my_unit.SetTrigTime(0.)
-my_unit.UseLightPathWithMC(False)
 my_proc.add_process(my_unit)
 
 # TPC Filter Algo
@@ -69,6 +65,9 @@ my_unit.Manager().SetAlgo( flashana.LLMatch.GetME() )
 #my_unit.Manager().SetAlgo( flashana.QLLMatch.GetME() )
 #my_unit.Manager().SetAlgo( flashana.QWeightPoint()   )
 #my_unit.Manager().SetAlgo( flashana.CommonAmps()      )
+# Custom Algo
+my_unit.Manager().SetAlgo( flashana.LightPath()  )
+my_unit.Manager().SetAlgo( flashana.MCQCluster() )
 
 #
 # Other algorithms
@@ -82,16 +81,7 @@ print  "Finished configuring ana_processor. Start event loop!"
 print
 
 # Let's run it.
-my_proc.run()
-ev = ROOT.std.vector("int")()
-#ev.push_back(int(49951))
-ev.push_back(int(49966))
-#ev.push_back(int(905))
-#ev.push_back(int(907))
-
-#my_proc.run_events(ev)
-#my_proc.run(0,4)
-
+my_proc.run(0,50)
 
 # done!
 print

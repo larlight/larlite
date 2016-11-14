@@ -12,9 +12,9 @@
 #pragma link C++ class std::vector<std::vector<float> >+;
 #pragma link C++ class std::vector<std::vector<double> >+;
 
-#pragma link C++ class std::pair<size_t,size_t>+;
+//#pragma link C++ class std::pair<size_t,size_t>+;
 #pragma link C++ class std::pair<unsigned short,string>+;
-#pragma link C++ class std::pair<string,bool>+;
+//#pragma link C++ class std::pair<string,bool>+;
 #pragma link C++ class std::pair<string,string>+;
 
 #pragma link C++ class std::map<string,bool>+;
@@ -66,6 +66,10 @@
 #pragma link C++ class larlite::hit+;
 #pragma link C++ class std::vector<larlite::hit>+;
 #pragma link C++ class larlite::event_hit+;
+
+#pragma link C++ class larlite::t0+;
+#pragma link C++ class std::vector<larlite::t0>+;
+#pragma link C++ class larlite::event_t0+;
 
 #pragma link C++ class larlite::ophit+;
 #pragma link C++ class std::vector<larlite::ophit>+;
@@ -157,6 +161,10 @@
 #pragma link C++ class std::vector<larlite::mctrack>+;
 #pragma link C++ class larlite::event_mctrack+;
 
+#pragma link C++ class larlite::PiZeroROI+;
+#pragma link C++ class std::vector<larlite::PiZeroROI>+;
+#pragma link C++ class larlite::event_PiZeroROI+;
+
 #pragma link C++ class larlite::mcnu+;
 #pragma link C++ class std::vector<larlite::mcnu>+;
 
@@ -222,6 +230,7 @@
 #pragma link C++ class larlite::event_mucsreco+;
 
 #pragma link C++ class larlite::storage_manager+;
+#pragma link C++ class larlite::storage_store+;
 
 /*
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_gtruth>();

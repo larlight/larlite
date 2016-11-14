@@ -158,6 +158,7 @@ protected:
     double reco_width2;
     double mc_length;
     double mc_wildlength;
+    int    match;
 
   } fShowerTreeParams;
 

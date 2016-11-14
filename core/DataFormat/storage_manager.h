@@ -18,6 +18,7 @@
 #include <TChain.h>
 #include <TError.h>
 #include "Base/larlite_base.h"
+#include "Base/UtilFunc.h"
 #include "data_base.h"
 #include "event_ass.h"
 namespace larlite {
@@ -48,6 +49,7 @@ namespace larlite {
   class event_cosmictag;
   class event_opflash;
   class event_ophit;
+  class event_t0;
   class event_mcflux;
   class event_pfpart;
   class event_partid;
@@ -61,6 +63,7 @@ namespace larlite {
   class event_simphotons;
   class event_mucsdata;
   class event_mucsreco;
+  class event_PiZeroROI;
   class event_auxsimch;
   //class event_chstatus;
 }
@@ -238,6 +241,7 @@ namespace larlite {
     */
 
 #ifndef __CINT__
+#ifndef __CLING__
     template <class T, class U>
     const AssInfo_t find_one_assid(const T& a, const U& b,
 				   const std::string& ass_producer)
@@ -367,6 +371,7 @@ namespace larlite {
       return ass_info.first->association(ass_info.second);
     }
 #endif
+#endif
     
     /// Getter for a shared object instance pointer. Not limited to be a singleton.
     static storage_manager* get() 
@@ -402,7 +407,7 @@ namespace larlite {
 
     /// Utility method: given a type, returns a data product name
     const std::string& product_name(data::DataType_t const type) const
-    { return data::kDATA_TREE_NAME[type]; }
+    { return ::larlite::GetProductName(type); }
 
   private:
     static storage_manager* me; ///< shared object instance pointer
@@ -495,12 +500,14 @@ namespace larlite {
     std::vector<std::map<std::string,bool> > _write_rundata_array;
     /// Boolean to record what subrun-data to be written out from a file
     std::vector<std::map<std::string,bool> > _write_subrundata_array;
+
   };
 
 }
 
 
 #ifndef __CINT__
+#ifndef __CLING__
 //#include "storage_manager.template.hh"
 namespace larlite {
   template<> data::DataType_t storage_manager::data_type<trigger> () const;
@@ -514,6 +521,7 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_wire> () const;
   template<> data::DataType_t storage_manager::data_type<event_hit> () const;
   template<> data::DataType_t storage_manager::data_type<event_ophit> () const;
+  template<> data::DataType_t storage_manager::data_type<event_t0> () const;
   template<> data::DataType_t storage_manager::data_type<event_opflash> () const;
   template<> data::DataType_t storage_manager::data_type<event_cluster> () const;
   template<> data::DataType_t storage_manager::data_type<event_seed> () const;
@@ -539,6 +547,7 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_simphotons> () const;
   template<> data::DataType_t storage_manager::data_type<event_mucsdata> () const;
   template<> data::DataType_t storage_manager::data_type<event_mucsreco> () const;
+  template<> data::DataType_t storage_manager::data_type<event_PiZeroROI> () const;
   template<> data::DataType_t storage_manager::data_type<event_auxsimch> () const;
   template<> data::DataType_t storage_manager::data_type<event_chstatus> () const;
   template<> data::SubRunDataType_t storage_manager::subrundata_type<potsummary>() const;
@@ -581,6 +590,8 @@ namespace larlite {
 
 }
 #endif
+#endif
+
 
 #endif
 /** @} */ // end of doxygen group larlite::storage_manager

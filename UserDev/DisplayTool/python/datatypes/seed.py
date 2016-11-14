@@ -3,7 +3,7 @@ from ROOT import evd, TVector3
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui, QtCore
 import math as mt
-from ROOT import larutil
+
 
 from database import recoBase3D
 

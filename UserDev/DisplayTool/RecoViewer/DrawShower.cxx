@@ -1,34 +1,28 @@
-#ifndef DRAWSHOWER_CXX
-#define DRAWSHOWER_CXX
+#ifndef EVD_DRAWSHOWER_CXX
+#define EVD_DRAWSHOWER_CXX
 
 #include "DrawShower.h"
 #include "DataFormat/shower.h"
+#include "DataFormat/cluster.h"
+#include "DataFormat/hit.h"
+#include "DataFormat/event_ass.h"
 #include "LArUtil/DetectorProperties.h"
 
 namespace evd {
 
 
 DrawShower::DrawShower()
-  : RecoBase<Shower2d>()
+  : RecoBase<Shower2D>()
 {
   _name = "DrawShower";
   _fout = 0;
-  // showerVectorByPlane = new std::vector<std::vector<Shower2d> >;
+  // showerVectorByPlane = new std::vector<std::vector<Shower2D> >;
 }
 
 bool DrawShower::initialize() {
 
-  //
-  // This function is called in the beggining of event loop
-  // Do all variable initialization you wish to do here.
-  // If you have a histogram to fill in the event loop, for example,
-  // here is a good place to create one on the heap (i.e. "new TH1D").
-  //
-
-
   // // Resize data holder to accommodate planes and wires:
   if (_dataByPlane.size() != geoService -> Nviews()) {
-    // std::cout << "resizing vectors to: " << geoService -> Nviews() << std::endl;
     _dataByPlane.resize(geoService -> Nviews());
   }
   return true;
@@ -37,37 +31,67 @@ bool DrawShower::initialize() {
 
 bool DrawShower::analyze(larlite::storage_manager* storage) {
 
-  //
-  // Do your event-by-event analysis here. This function is called for
-  // each event in the loop. You have "storage" pointer which contains
-  // event-wise data. To see what is available, check the "Manual.pdf":
-  //
-  // http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=3183
-  //
-  // Or you can refer to Base/DataFormatConstants.hh for available data type
-  // enum values. Here is one example of getting PMT waveform collection.
-  //
-  // event_fifo* my_pmtfifo_v = (event_fifo*)(storage->get_data(DATA::PMFIFO));
-  //
-  // if( event_fifo )
-  //
-  //   std::cout << "Event ID: " << my_pmtfifo_v->event_id() << std::endl;
-  //
-
   // get a handle to the showers
   auto showerHandle = storage->get_data<larlite::event_shower>(_producer);
 
+  // are there associated clusters / hits?
+  larlite::event_cluster* clusterHandle = nullptr;
+  larlite::event_hit*     hitHandle     = nullptr;
+
+  larlite::AssSet_t ass_cluster_v;
+  larlite::AssSet_t ass_hit_v;
+
+  bool hits = false;
+
+  ass_cluster_v = storage->find_one_ass( showerHandle->id(), clusterHandle, showerHandle->name());
+
+  if (clusterHandle)
+    ass_hit_v = storage->find_one_ass( clusterHandle->id(), hitHandle, clusterHandle->name() );
+
+  if (hitHandle and (hitHandle->size() > 0) )
+    hits = true;
+  
   // Clear out the hit data but reserve some space for the showers
   for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
     _dataByPlane.at(p).clear();
     _dataByPlane.at(p).reserve(showerHandle -> size());
+    _wireRange.at(p).first  = 99999;
+    _timeRange.at(p).first  = 99999;
+    _timeRange.at(p).second = -1.0;
+    _wireRange.at(p).second = -1.0;
   }
 
 
   // Populate the shower vector:
-  for (auto & shower : *showerHandle) {
+  for (size_t s = 0; s < showerHandle->size(); s++){
+    
+    auto const& shower = showerHandle->at(s);
+
+    std::vector<evd::Cluster2D> clusters;
+    clusters.resize(3);
+    // find hits associated to this shower on this plane, if any, and add
+    if (hits){
+      auto const& clus_idx_v = ass_cluster_v[s];
+      for (auto const& clus_idx : clus_idx_v){
+	auto const& hit_idx_v = ass_hit_v[ clus_idx ];
+	if (hit_idx_v.size() == 0) continue;
+	auto const& plane = hitHandle->at( hit_idx_v[0] ).WireID().Plane;
+	for (auto const& hit_idx : hit_idx_v){
+	  auto const& hit = hitHandle->at(hit_idx);
+	  Hit2D hit2d(hit.WireID().Wire, hit.PeakTime(), hit.Integral(), hit.RMS(),
+		      hit.StartTick(),   hit.PeakTime(), hit.EndTick(), hit.PeakAmplitude() );
+	  clusters[plane].push_back( hit2d );
+	}// for all hits
+      }// for all clusters
+    }// if there are associated hits
+    
     for (unsigned int view = 0; view < geoService -> Nviews(); view++) {
-      _dataByPlane.at(view).push_back(getShower2d(shower, view));
+      // get the reconstructed shower for this plane
+      auto shr2D = getShower2d(shower,view);
+      if (clusters[view].size() > 0){
+	shr2D._hits = clusters[view];
+      }
+      _dataByPlane.at(view).push_back( shr2D );
     }
   }
 
@@ -77,48 +101,22 @@ bool DrawShower::analyze(larlite::storage_manager* storage) {
 
 bool DrawShower::finalize() {
 
-  // This function is called at the end of event loop.
-  // Do all variable finalization you wish to do here.
-  // If you need, you can store your ROOT class instance in the output
-  // file. You have an access to the output file through "_fout" pointer.
-  //
-  // Say you made a histogram pointer h1 to store. You can do this:
-  //
-  // if(_fout) { _fout->cd(); h1->Write(); }
-  //
-  // else
-  //   print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
-  //
   return true;
 }
 
 
 
-Shower2d DrawShower::getShower2d(larlite::shower shower, unsigned int plane) {
+Shower2D DrawShower::getShower2d(larlite::shower shower, unsigned int plane) {
 
   auto detProp = larutil::DetectorProperties::GetME();
 
 
-  Shower2d result;
+  Shower2D result;
   result._is_good = false;
   result._plane = plane;
   // Fill out the parameters of the 2d shower
   result._startPoint
     = geoHelper -> Point_3Dto2D(shower.ShowerStart(), plane);
-
-  // std::cout << "3D Start point is (" << shower.ShowerStart().X()
-  //           << ", " << shower.ShowerStart().Y()
-  //           << ", " << shower.ShowerStart().Z() << ")\n";
-  // std::cout << "3D Direction is (" << shower.Direction().X()
-  //           << ", " << shower.Direction().Y()
-  //           << ", " << shower.Direction().Z() << ")\n";
-  // std::cout << "2D Start point is (" << result._startPoint.w
-  //           << ", " << result._startPoint.t << ")\n";
-
-  // std::cout << "dE/dx is: \n"
-  //           << "\tPlane 0: " << shower.dEdx_v().at(0)
-  //           << "\tPlane 1: " << shower.dEdx_v().at(1)
-  //           << std::endl;
 
   // Next get the direction:
   result._angleInPlane = geoHelper->Slope_3Dto2D(shower.Direction(), plane);
@@ -137,6 +135,8 @@ Shower2d DrawShower::getShower2d(larlite::shower shower, unsigned int plane) {
                         pow(result.startPoint().t - result.endPoint().t, 2));
 
   result._dedx = shower.dEdx();
+
+  result._energy = shower.Energy();
 
   result._is_good = true;
   return result;

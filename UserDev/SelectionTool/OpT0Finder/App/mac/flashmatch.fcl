@@ -13,6 +13,14 @@ FlashMatchManager:{
 
 UBT0Finder:{
     PhotonLibTTree: true
+    SetEDiff: 10.
+    UseMC: false
+    PhotonBomb: 0,0,0,10
+    SetROStart: -3200.
+    SetROEnd: 3200.
+    SetTrigTime: 0.
+    BeamOpFlashProducer: {}
+    CosmicOpFlashProducer: {}
 }
 
 #
@@ -78,4 +86,3 @@ ACTIVE_VOLUME:{
     Y: [-116.5,116.5]
     Z: [0.0,1036.8]
 }
-

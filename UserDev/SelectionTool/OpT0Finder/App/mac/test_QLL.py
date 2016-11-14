@@ -1,21 +1,5 @@
 import sys,ROOT
 import os
-import pdb
-
-def pmt_pos():
-    xv = ROOT.std.vector("double")()
-    yv = ROOT.std.vector("double")()
-    zv = ROOT.std.vector("double")()
-#    pdb.set_trace()
-    for line in open('opt_geo.txt','r').read().split('\n'):
-        words = line.split()
-        if not len(words) == 3: continue
-        xv.push_back(float(words[0]))
-        yv.push_back(float(words[1]))
-        zv.push_back(float(words[2]))
-    return (xv,yv,zv)
-
-import ROOT
 #ROOT.gSystem.Load("libOpFlashAna_OpT0FinderApp")
 from larlite import larlite as fmwk
 from ROOT import flashana,TChain,larutil
@@ -34,8 +18,6 @@ nphoton,x,y,z = ( int(indir.split('_')[1]),
 print x,y,z
 
 geo = larutil.Geometry.GetME()
-
-xv,yv,zv = pmt_pos()
 
 match_alg = flashana.QLLMatch.GetME()
 match_mgr = flashana.FlashMatchManager()

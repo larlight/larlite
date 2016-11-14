@@ -1,5 +1,5 @@
-#ifndef LARLITE_DRAWCLUSTER_CXX
-#define LARLITE_DRAWCLUSTER_CXX
+#ifndef EVD_DRAWCLUSTER_CXX
+#define EVD_DRAWCLUSTER_CXX
 
 #include "DrawCluster.h"
 
@@ -106,7 +106,7 @@ bool DrawCluster::analyze(larlite::storage_manager* storage) {
     view = ev_hit->at(hit_indices[0]).View();
 
     // Make a new cluster in the data:
-    _dataByPlane.at(view).push_back(Cluster2d());
+    _dataByPlane.at(view).push_back(Cluster2D());
     _dataByPlane.at(view).back()._is_good = true;
 
     // Fill the cluster params alg
@@ -129,17 +129,17 @@ bool DrawCluster::analyze(larlite::storage_manager* storage) {
       // Hit(float w, float t, float c, float r) :
 
       _dataByPlane.at(view).back().emplace_back(
-        Hit(hit.WireID().Wire,
-            hit.PeakTime(),
-            hit.Integral(),
-            hit.RMS(),
-            hit.StartTick(),
-            hit.PeakTime(),
-            hit.EndTick(),
-            hit.PeakAmplitude()
-           ));
+        Hit2D(hit.WireID().Wire,
+              hit.PeakTime(),
+              hit.Integral(),
+              hit.RMS(),
+              hit.StartTick(),
+              hit.PeakTime(),
+              hit.EndTick(),
+              hit.PeakAmplitude()
+             ));
 
-  
+
       // Determine if this hit should change the view range:
       if (hit.WireID().Wire > _wireRange.at(view).second)
         _wireRange.at(view).second = hit.WireID().Wire;

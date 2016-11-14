@@ -15,14 +15,12 @@
 #define LIGHTPATH_H
 
 #include <iostream>
-#include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
-#include "OpT0Finder/Base/OpT0FinderTypes.h"
 #include <numeric>
-#include "GeoAlgo/GeoAlgo.h"
-#include "LArUtil/Geometry.h"
 #include <functional>
 #include <algorithm>
 #include "OpT0Finder/Base/BaseAlgorithm.h"
+#include "OpT0Finder/Base/CustomAlgoFactory.h"
+
 namespace flashana{
 /**
    \class LightPath
@@ -40,8 +38,6 @@ namespace flashana{
     /// Default destructor
     ~LightPath(){}
 
-    void Configure(const ::fcllite::PSet &pset);
-    
     // Setter function
     double Set_Gap      ( double x) { _gap   =x;      return _gap;}
       
@@ -50,17 +46,34 @@ namespace flashana{
 
     void QCluster(const ::geoalgo::Vector& pt_1,
                   const ::geoalgo::Vector& pt_2,
-                  flashana::QCluster_t& Q_cluster) const;
+                  flashana::QCluster_t& Q_cluster,
+		  double dedx=-1) const;
 
     // Getter for light yield configured paramater
     double GetLightYield() const { return _light_yield; }
 
 
   protected:
+
+    void _Configure_(const Config_t &pset);
+    
     double _gap;
     double _light_yield;
     double _dEdxMIP;
-    ::geoalgo::GeoAlgo _geoAlgo;
+
+  };
+  
+  /**
+     \class flashana::LightPathFactory
+  */
+  class LightPathFactory : public CustomAlgoFactoryBase {
+  public:
+    /// ctor
+    LightPathFactory() { CustomAlgoFactory::get().add_factory("LightPath",this); }
+    /// dtor
+    ~LightPathFactory() {}
+    /// creation method
+    BaseAlgorithm* create(const std::string instance_name) { return new LightPath(instance_name); }
   };
 } 
 

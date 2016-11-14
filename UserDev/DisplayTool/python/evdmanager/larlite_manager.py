@@ -63,21 +63,24 @@ class larlite_manager_base(manager, QtCore.QObject):
                 # For now, just skip anything that doesn't have "_"
                 continue
 
-            thisKeyList = key.GetName().split('_')
+            name = key.GetName().replace("_tree","")
 
-            # # ALso skip things that aren't broken into 3 pieces:
-            # if len(thisKeyList) is not 3:
-            #     continue
+            # Find the last remaining underscore:
+            product = name.split("_")[0]
+            producerName = "_".join(name.split("_")[1:])
+
+
+            thisKeyList = key.GetName().split('_')
 
 
             # gets three items in thisKeyList, which is a list
             # [dataProduct, producer, 'tree'] (don't care about 'tree')
             # check if the data product is in the dict:
-            if thisKeyList[0] in lookUpTable:
+            if product in lookUpTable:
                 # extend the list:
-                lookUpTable[thisKeyList[0]] += (thisKeyList[1], )
+                lookUpTable[product] += (producerName, )
             else:
-                lookUpTable.update({thisKeyList[0]: (thisKeyList[1],)})
+                lookUpTable.update({product: (producerName,)})
 
         self._keyTable.update(lookUpTable)
 
@@ -262,28 +265,28 @@ class larlite_manager(larlite_manager_base):
     def getAutoRange(self, plane):
         # This gets the max bounds
         xRangeMax, yRangeMax = super(larlite_manager, self).getAutoRange(plane)
-        xRange = xRangeMax
-        yRange = yRangeMax
+        xRange = [999,-999]
+        yRange = [99999,-99999]
         for process in self._drawnClasses:
             x, y = self._drawnClasses[process].getAutoRange(plane)
             # Check against all four of the parameters:
-            if x != None:
-                if x[0] > xRange[0]:
+            if x is not None:
+                if x[0] < xRange[0]:
                     xRange[0] = x[0]
-                if x[1] < xRange[1]:
+                if x[1] > xRange[1]:
                     xRange[1] = x[1]
-            if y != None:
-                if y[0] > yRange[0]:
+            if y is not None:
+                if y[0] < yRange[0]:
                     yRange[0] = y[0]
-                if y[1] < yRange[1]:
+                if y[1] > yRange[1]:
                     yRange[1] = y[1]
 
         # Pad the ranges by 1 cm to accommodate
-        padding = 1
-        xRange[0] = min(xRangeMax[0], xRange[0] - padding/self._geom.wire2cm())
-        xRange[1] = max(xRangeMax[1], xRange[1] + padding/self._geom.wire2cm())
-        yRange[0] = min(yRangeMax[0], yRange[0] - padding/self._geom.time2cm())
-        yRange[1] = max(yRangeMax[1], yRange[1] + padding/self._geom.time2cm())
+        padding = 5
+        xRange[0] = max(xRangeMax[0], xRange[0] - padding/self._geom.wire2cm())
+        xRange[1] = min(xRangeMax[1], xRange[1] + padding/self._geom.wire2cm())
+        yRange[0] = max(yRangeMax[0], yRange[0] - padding/self._geom.time2cm())
+        yRange[1] = min(yRangeMax[1], yRange[1] + padding/self._geom.time2cm())
         return xRange, yRange
 
     # handle all the wire stuff:
@@ -296,7 +299,7 @@ class larlite_manager(larlite_manager_base):
                 self._drawWires = False
                 return
             self._drawWires = True
-            self._wireDrawer = datatypes.recoWire()
+            self._wireDrawer = datatypes.recoWire(self._geom)
             self._wireDrawer.setProducer(self._keyTable['wire'][0])
             self._process.add_process(self._wireDrawer._process)
             self.processEvent(True)

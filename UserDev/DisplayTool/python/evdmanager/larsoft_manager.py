@@ -27,6 +27,8 @@ class larsoft_manager(manager, wire, QtCore.QObject):
         self._process.SetStepSizeByPlane(48, 0)
         self._process.SetStepSizeByPlane(48, 1)
         self._process.SetStepSizeByPlane(96, 2)
+        for plane in xrange(geom.nViews()):
+            self._process.setYDimension(geom.readoutWindowSize(), plane)
         self._process.initialize()
         self.setInputFile(file)
 

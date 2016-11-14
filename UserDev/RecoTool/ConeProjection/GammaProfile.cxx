@@ -113,8 +113,8 @@ namespace larlite {
 		//coneintpc = fgeoconic.ConeInTPC(StartConePos,StartConeDir,ConeLength,angle, smoothness);
 		bool showerintpc =  false;
 		try{
-		showerintpc = fgeoconic.ConeInTPC(StartShowerPos,StartShowerDir,ConeLength,angle, smoothness);
-		showerintpc = fgeoconic.ConeInTPC(StartShowerPos,StartShowerDir,2,angle, smoothness);
+		showerintpc = fgeoconic.ConeInTPC(StartShowerPos.Vect(),StartShowerDir.Vect(),ConeLength,angle, smoothness);
+		showerintpc = fgeoconic.ConeInTPC(StartShowerPos.Vect(),StartShowerDir.Vect(),2,angle, smoothness);
 		}catch(const ::larutil::LArUtilException& e){
 		return false;
 		showerintpc = false;
@@ -138,7 +138,7 @@ namespace larlite {
 			//auto polyproj = fgeoconic.ConicalFeatures(StartConePos, StartConeDir,a, angle, plane ,smoothness);
 			std::vector<larutil::PxHit> contp;
 			try{
-			auto polyproj = fgeoconic.ConicalFeatures(StartShowerPos, StartShowerDir,a, angle, plane ,smoothness);
+			auto polyproj = fgeoconic.ConicalFeatures(StartShowerPos.Vect(),StartShowerDir.Vect(),a, angle, plane ,smoothness);
 			contp = fgeoconic.PolyContain(PxHitsVect[plane], polyproj);
 			}catch(const ::larutil::LArUtilException& e){
 			continue;}

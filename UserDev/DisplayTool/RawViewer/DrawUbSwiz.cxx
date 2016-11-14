@@ -44,7 +44,7 @@ bool DrawUbSwiz::initialize() {
 
   for (unsigned int p = 0; p < geoService -> Nviews(); p ++) {
     setXDimension(geoService->Nwires(p), p);
-    setYDimension(detProp -> ReadOutWindowSize(), p);
+    // setYDimension(detProp -> ReadOutWindowSize(), p);
   }
   initDataHolder();
 
@@ -189,7 +189,7 @@ void DrawUbSwiz::readData() {
     if (wire > geoService -> Nwires(plane))
       continue;
 
-    int offset = wire * detProp -> ReadOutWindowSize();
+    int offset = wire * _y_dimensions[plane];
     // convert short ADCs to float
 
     // Get the pedestal for this channel:
@@ -197,7 +197,7 @@ void DrawUbSwiz::readData() {
     pedestal.resize(nPedPoints);
 
     // Determine the distance between the pedestal points allowed:
-    int pedStepSize =  detProp->ReadOutWindowSize() / nPedPoints - 2;
+    int pedStepSize =  _y_dimensions[plane] / nPedPoints - 2;
 
     for (int j = 0; j < nPedPoints; j++) {
       pedestal.at(j) = adc.at(i_channel * digitSize + j * pedStepSize);
@@ -348,7 +348,7 @@ void DrawUbSwiz::correctData() {
       int nSteps = geoService -> Nwires(p) / stepSize.at(p);
       _subtractionWaveForm.at(p).resize(nSteps);
       for (auto & vec : _subtractionWaveForm.at(p))
-        vec.resize(detProp->ReadOutWindowSize());
+        vec.resize(_y_dimensions[p]);
     }
   }
 
@@ -407,7 +407,7 @@ void DrawUbSwiz::correctData() {
         // For each tick, loop over each wire and find the median.
         // Then, subtract the median from each tick.
 
-        for (unsigned int tick = 0; tick < detProp -> ReadOutWindowSize(); tick ++) {
+        for (unsigned int tick = 0; tick < _y_dimensions[plane]; tick ++) {
 
           // Get the median across this step's set of wires.
           unsigned int wireStart = step * stepSize.at(plane);
@@ -422,7 +422,7 @@ void DrawUbSwiz::correctData() {
           // Loop over this block of wires and get the median value for that tick
           for (unsigned int wire = wireStart; wire < wireStart + stepSize.at(plane); wire ++) {
             // skip bad wires
-            int offset = wire * detProp->ReadOutWindowSize();
+            int offset = wire * _y_dimensions[plane];
             if ( wireStatusByPlane.at(plane)[wire] != kNormal ) {
               // For now, set the tick to zero:
               _planeData.at(plane).at(offset + tick) = 0.0;
@@ -436,7 +436,7 @@ void DrawUbSwiz::correctData() {
 
             // else{
             //   unsigned int averageSize = 0;
-            //   if (tick < averageSize || tick >= detProp->ReadOutWindowSize() - averageSize)
+            //   if (tick < averageSize || tick >= _y_dimensions[plane] - averageSize)
             //     vals.at(wire-wireStart) = _planeData.at(plane).at(offset + tick);
             //   else{
             //     for (unsigned int workingTick = tick - averageSize; workingTick <= tick + averageSize; workingTick ++ )
@@ -457,7 +457,7 @@ void DrawUbSwiz::correctData() {
           // Now subtract the median from the values:
           for (unsigned int wire = wireStart; wire < wireStart + stepSize.at(plane); wire ++) {
             // Skip bad wires
-            int offset = wire * detProp->ReadOutWindowSize();
+            int offset = wire * _y_dimensions[plane];
 
             if (wireStatusByPlane.at(plane)[wire] != kNormal) {
               rmsByPlaneCorrected.at(plane).at(wire)

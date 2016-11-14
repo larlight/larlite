@@ -12,7 +12,7 @@ class endpoint2d(recoBase):
     def __init__(self):
         super(endpoint2d, self).__init__()
         self._productName = 'endpoint2d'
-        self._process = evd.DrawEndpoint2d()
+        self._process = evd.DrawEndpoint()
         self._brush = (0, 0, 0)
         self.init()
 

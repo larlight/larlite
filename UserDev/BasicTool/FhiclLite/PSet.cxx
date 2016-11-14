@@ -1,5 +1,5 @@
-#ifndef BASICTOOL_FHICLLITE_PSET_CXX
-#define BASICTOOL_FHICLLITE_PSET_CXX
+#ifndef FHICLLITE_CXX
+#define FHICLLITE_CXX
 
 #include "PSet.h"
 #include <sstream>
@@ -109,11 +109,13 @@ namespace fcllite {
       res.first  = kBlockEnd;
       res.second = index;
     }
+    /*
     index = txt.find("\"",start);    
     if(index != std::string::npos && index < res.second) {
       res.first  = kString;
       res.second = index;
     }
+    */
     return res;
   }
 
@@ -131,7 +133,7 @@ namespace fcllite {
     if(key.empty()) throw FhiclLiteException("Empty key cannot be registered!");
     //std::cout<<"value: @"<<value<<"@"<<std::endl;
     trim_space(value);
-    if(value.empty()) throw FhiclLiteException("Empty value cannot be registered!");
+    //if(value.empty()) throw FhiclLiteException("Empty value cannot be registered!");
     _data_value[key]=value;
   }
 

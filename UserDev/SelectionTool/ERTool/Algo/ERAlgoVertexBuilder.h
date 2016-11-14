@@ -35,12 +35,11 @@ namespace ertool {
     Bool_t const twithTrackDir;
     std::string const tprimary_vertex_selection;    
     Bool_t const tshowerproj;
+    Bool_t const tshowerdir;
     Double_t const tshower_prox;
     Double_t const tcpoa_vert_prox;
     Double_t const tcpoa_trackend_prox;
     Bool_t tverbose;
-
-    Int_t tevent;
 
     TTree * tree;
 
@@ -70,10 +69,10 @@ namespace ertool {
     /// Default constructor
     ERAlgoVertexBuilder
       (Double_t const start_prox,
-       Double_t const max_rad,
        Bool_t const withTrackDir,
        std::string const primary_vertex_selection = "mostupstream",
        Bool_t const showerproj = false,
+       Bool_t const showerdir = false,
        Double_t const shower_prox = 0,
        Double_t const cpoa_vert_prox = 0,
        Double_t const cpoa_trackend_prox = 0,
@@ -82,9 +81,7 @@ namespace ertool {
     /// Default destructor
     virtual ~ERAlgoVertexBuilder(){};
 
-    void SpecifyEvent(Int_t const event) {
-      tevent = event;
-    }
+    void SetVerbose(Bool_t const verbose = true) {tverbose = verbose;}
 
     /// Reset function
     void Reset();

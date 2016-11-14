@@ -70,7 +70,7 @@ namespace cmtool {
     void MergeTillConverge(bool doit=true) {_merge_till_converge = doit;}
 
     /// A simple method to add a cluster
-    void SetClusters(const std::vector<std::vector<Hit2D> > &clusters);
+    void SetClusters(const std::vector<std::vector<larutil::Hit2D> > &clusters);
 
     /// A simple method to add a cluster
     void SetClusters(const std::vector<::cluster::cluster_params> &clusters);

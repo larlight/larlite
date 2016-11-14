@@ -1,5 +1,5 @@
 from database import recoBase
-from ROOT import evd, TVector3, larutil
+from ROOT import evd, TVector3
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui, QtCore
 import math as mt
@@ -19,9 +19,6 @@ class spacepoint(recoBase):
     def drawObjects(self, view_manager):
 
         geom = view_manager._geometry
-
-
-        geoHelper = larutil.GeometryHelper.GetME()
      
         for view in view_manager.getViewPorts():
 

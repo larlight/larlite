@@ -4,12 +4,14 @@
 #include "NPtFilter.h"
 
 namespace flashana {
+  
+  static NPtFilterFactory __global_NPtFilterFactory__;
 
   NPtFilter::NPtFilter(const std::string name)
     : BaseTPCFilter(name)
   { _min_num_pt = 2; }
 
-  void NPtFilter::Configure(const ::fcllite::PSet &pset)
+  void NPtFilter::_Configure_(const Config_t &pset)
   {
     _min_num_pt = pset.get<double>("MinNumPoint");
   }

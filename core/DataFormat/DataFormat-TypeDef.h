@@ -114,6 +114,9 @@ namespace larlite{
   class onephoton;
   class simphotons;
   class event_simphotons;
+
+  class PiZeroROI;
+  class event_PiZeroROI;
 }
 
 class treenode;

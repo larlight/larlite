@@ -265,6 +265,18 @@ public:
     float DistanceToLine3D( const TVector3 & pointOnLine, const TVector3 & directionOfLine,
                             const TVector3 & targetPoint) const;
 
+    /**
+     * @brief Calculate the distance along a line to the closest approach to a point of that line
+     *
+     * @param pointOnLine TVector3 - Starting point on the line of interest
+     * @param directionOfLine TVector3 - The direction of the line of interest
+     * @param targetPoint TVector3 - The point from which the closest distance is calculated
+     * @return the distance between the starting point and the closest approach in centimeters
+     */
+    float DistanceAlongLine3D( const TVector3 & pointOnLine, const TVector3 & directionOfLine,
+                               const TVector3 & targetPoint) const;
+
+
 
     /**
      * @brief Get 2D distance squared between two points
@@ -413,7 +425,7 @@ public:
      * @brief This function takes in a hit list and some parameters describing a box
      *        around that hit list,
      *        returns the hits inside the box
-     * @details The list of input hits is looped over to find hits inside of the box.  
+     * @details The list of input hits is looped over to find hits inside of the box.
      *          The box is defined to be of the length "distanceAlongLine" and the
      *          width of "distancePerpToLine."  The axis of the box starts at startingHit
      *          and continues for the length "distanceAlongLine" in the direction specified
@@ -505,6 +517,19 @@ public:
      * @return unsigned integer for the number of planes
      */
     UInt_t Nplanes() const { return fNPlanes; }
+
+    /**
+     * @brief return whether a point is contained in the TPC boundaries as defined by Geometry.h
+     * only check Y and Z coordinates with this function
+     * @return boolean: true -> contained
+     */
+    bool ContainedYZ(const double& y, const double& z) const;
+    
+    /**
+     * @brief return whether a point is contained in the TPC boundaries as defined by Geometry.h
+     * @return boolean: true -> contained
+     */
+    bool Contained(const double& x, const double& y, const double& z) const;
 
 private:
 

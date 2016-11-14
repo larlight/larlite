@@ -11,8 +11,8 @@
 /** \addtogroup RecoViewer
 
     @{*/
-#ifndef LARLITE_DRAWTRACK_H
-#define LARLITE_DRAWTRACK_H
+#ifndef EVD_LARLITE_DRAWTRACK_H
+#define EVD_LARLITE_DRAWTRACK_H
 
 #include <iostream>
 #include "Analysis/ana_base.h"
@@ -26,48 +26,43 @@
    doxygen documentation!
  */
 
-// typedef std::vector< std::pair<float,float> > evd::Track2d;
+// typedef std::vector< std::pair<float,float> > evd::Track2D;
 
 namespace evd {
 
-class Track2d {
+
+
+class Track2D {
 public:
-    std::vector<std::pair<float, float> > _track;
-    const std::vector<std::pair<float, float> > & track() {return _track;}
-    const std::vector<std::pair<float, float> > & direction() {return _track;}
+  std::vector<std::pair<float, float> > _track;
+  const std::vector<std::pair<float, float> > & track() {return _track;}
+  const std::vector<std::pair<float, float> > & direction() {return _track;}
 };
 
-// typedef std::vector<std::pair<float, float> > Track2d;
+Track2D getTrack2D(larlite::track track, unsigned int plane);
 
-class DrawTrack : public larlite::ana_base, public RecoBase<Track2d> {
+// typedef std::vector<std::pair<float, float> > Track2D;
+
+class DrawTrack : public larlite::ana_base, public RecoBase<Track2D> {
 
 public:
 
-    /// Default constructor
-    DrawTrack();
+  /// Default constructor
+  DrawTrack();
 
-    /// Default destructor
-    ~DrawTrack();
+  /// Default destructor
+  ~DrawTrack();
 
-    /** IMPLEMENT in DrawCluster.cc!
-        Initialization method to be called before the analysis event loop.
-    */
-    virtual bool initialize();
+  virtual bool initialize();
 
-    /** IMPLEMENT in DrawCluster.cc!
-        Analyze a data event-by-event
-    */
-    virtual bool analyze(larlite::storage_manager* storage);
+  virtual bool analyze(larlite::storage_manager* storage);
 
-    /** IMPLEMENT in DrawCluster.cc!
-        Finalize method to be called after all events processed.
-    */
-    virtual bool finalize();
+  virtual bool finalize();
+
 
 
 private:
 
-    Track2d getTrack2d(larlite::track track, unsigned int plane);
 
 };
 

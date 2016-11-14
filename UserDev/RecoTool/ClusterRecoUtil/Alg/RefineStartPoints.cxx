@@ -2,7 +2,6 @@
 #define REFINESTARTPOINTS_CXX
 
 #include "RefineStartPoints.h"
-#include "LArUtil/GeometryUtilities.h"
 #include "LArUtil/GeometryHelper.h"
 
 namespace cluster {
@@ -31,7 +30,7 @@ void RefineStartPoints::do_params_fill(cluster_params & cluster) {
   auto const& dir   = cluster.start_dir[1] / cluster.start_dir[0];
 
   // first find a subset of hits close to the start point
-  std::vector<Point2D> close_hits;
+  std::vector<larutil::Point2D> close_hits;
   for (auto const& h : hits) {
     double distSq = ( (h.w - cluster.start_point.w) * (h.w - cluster.start_point.w) +
                       (h.t - cluster.start_point.t) * (h.t - cluster.start_point.t) );

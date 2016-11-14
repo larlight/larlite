@@ -11,7 +11,7 @@
 
 #pragma link C++ class larlite::GammaContainment+;
 #pragma link C++ class larlite::GammaProfile+;
-
+#pragma link C++ class larlite::geoconic+;
 
 //ADD_NEW_CLASS ... do not change this line
 #endif

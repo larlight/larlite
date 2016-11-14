@@ -56,7 +56,7 @@ void ProtoShowerAlgArgoNeuT::init_params() {
 
 void ProtoShowerAlgArgoNeuT::fill_params(
   ::cluster::cluster_params & params,
-  Point2D start_point_guess)
+  larutil::Point2D start_point_guess)
 {
   // Fill the params while suggesting a start point:
 
@@ -66,16 +66,18 @@ void ProtoShowerAlgArgoNeuT::fill_params(
   try {
     informedStartPoint -> set_start_point_guess(start_point_guess);
     informedStartPoint -> do_params_fill(params);
+    showeringpoint -> do_params_fill(params);
   }
   catch ( ... ) {
-    std::cout << "Informed start point failed!" << std::endl;
+    // std::cout << "Informed start point failed!" << std::endl;
     roughStartPoint -> do_params_fill(params);
+    showeringpoint -> do_params_fill(params);
+    refineStartPoint -> do_params_fill(params);
+    selectStartPoint -> do_params_fill(params);
   }
 
 
   showeringpoint -> do_params_fill(params);
-  selectStartPoint -> do_params_fill(params);
-  refineStartPoint -> do_params_fill(params);
   fillGeomParams -> do_params_fill(params);
 }
 
@@ -166,7 +168,7 @@ void ProtoShowerAlgArgoNeuT::GenerateProtoShower(
         delete planeorigin;
 
         // Get the endpoint if it has it:
-        Point2D _end_point;
+        larutil::Point2D _end_point;
         _end_point.w = _clust_endpoint.Wire() * geoHelper ->WireToCm();
         _end_point.t =  (_clust_endpoint.DriftTime() - detProp->TriggerOffset())
                         * geoHelper->TimeToCm() + planeOffset;
