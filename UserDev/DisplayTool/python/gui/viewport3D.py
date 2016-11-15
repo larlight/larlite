@@ -13,8 +13,8 @@ import math
 
 class viewport3D(gl.GLViewWidget):
 
-  quitRequested = QtCore.pyqtSignal()
-  keyPressSignal = QtCore.pyqtSignal(QtGui.QKeyEvent)
+  quitRequested = QtCore.Signal()
+  keyPressSignal = QtCore.Signal(QtGui.QKeyEvent)
 
   def __init__(self, geometry):
     super(viewport3D, self).__init__()

@@ -10,9 +10,9 @@ from connectedObjects import boxCollection
 class shower_polygon(QtGui.QGraphicsPolygonItem):
 
     # Provide some signals to communicate with cluster params
-    mouseEnter = QtCore.pyqtSignal(QtGui.QGraphicsSceneHoverEvent)
-    mouseExit = QtCore.pyqtSignal( QtGui.QGraphicsSceneHoverEvent)
-    highlightChange = QtCore.pyqtSignal()
+    mouseEnter = QtCore.Signal(QtGui.QGraphicsSceneHoverEvent)
+    mouseExit = QtCore.Signal( QtGui.QGraphicsSceneHoverEvent)
+    highlightChange = QtCore.Signal()
 
     def __init__(self, *args, **kwargs):
         super(shower_polygon, self).__init__(*args)

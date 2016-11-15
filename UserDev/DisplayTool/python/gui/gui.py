@@ -16,7 +16,7 @@ from viewport import viewport
 class view_manager(QtCore.QObject):
   """This class manages a collection of viewports"""
 
-  drawHitsRequested = QtCore.pyqtSignal(int, int)
+  drawHitsRequested = QtCore.Signal(int, int)
 
   def __init__(self, geometry):
     super(view_manager, self).__init__()

@@ -15,7 +15,9 @@ from pyqtgraph.Qt import QtGui
 class event(object):
   """docstring for event"""
   def __init__(self):
-    super(event, self).__init__()
+#    15-Nov-2016 WGS: The following line causes problems with PySide,
+#    and it's not clear to me it's necessary in a base class. 
+#    super(event, self).__init__()
     self._run = 0
     self._event = 0
     self._subrun = 0

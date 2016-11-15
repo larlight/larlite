@@ -19,7 +19,7 @@ class SignalProxy(QtCore.QObject):
     
     def __init__(self, signal, delay=0.3, rateLimit=0, slot=None):
         """Initialization arguments:
-        signal - a bound Signal or pyqtSignal instance
+        signal - a bound Signal or Signal instance
         delay - Time (in seconds) to wait for signals to stop before emitting (default 0.3s)
         slot - Optional function to connect sigDelayed to.
         rateLimit - (signals/sec) if greater than 0, this allows signals to stream out at a 

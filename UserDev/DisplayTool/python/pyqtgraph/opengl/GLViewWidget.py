@@ -17,7 +17,7 @@ class GLViewWidget(QtOpenGL.QGLWidget):
         - Export options
 
     """
-    viewChanged = QtCore.pyqtSignal()
+    viewChanged = QtCore.Signal()
 
     def __init__(self, parent=None):
         global ShareWidget

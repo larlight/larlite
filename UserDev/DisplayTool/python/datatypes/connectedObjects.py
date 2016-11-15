@@ -71,9 +71,9 @@ class boxCollection(QtCore.QObject):
     # it can draw and delete itself when provided with view_manage
     #
     # Provide some signals to communicate with cluster params
-    mouseEnter = QtCore.pyqtSignal(QtGui.QGraphicsSceneHoverEvent)
-    mouseExit = QtCore.pyqtSignal(QtGui.QGraphicsSceneHoverEvent)
-    highlightChange = QtCore.pyqtSignal()
+    mouseEnter = QtCore.Signal(QtGui.QGraphicsSceneHoverEvent)
+    mouseExit = QtCore.Signal(QtGui.QGraphicsSceneHoverEvent)
+    highlightChange = QtCore.Signal()
 
     def __init__(self):
         super(boxCollection, self).__init__()

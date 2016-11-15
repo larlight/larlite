@@ -5,9 +5,9 @@ from pyqtgraph.Qt import QtGui, QtCore
 class larsoftgui(gui):
 
     """special live gui"""
-    eventUpdate = QtCore.pyqtSignal(bool)
-    fileUpdate = QtCore.pyqtSignal(str)
-    toggleNoiseFilter = QtCore.pyqtSignal(bool)
+    eventUpdate = QtCore.Signal(bool)
+    fileUpdate = QtCore.Signal(str)
+    toggleNoiseFilter = QtCore.Signal(bool)
 
     def __init__(self, geometry,manager = None):
         super(larsoftgui, self).__init__(geometry)

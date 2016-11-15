@@ -10,9 +10,9 @@ class clusterParams(QtCore.QObject):  # recoBase):
 
     """docstring for clusterParams"""
 
-    mouseEnter = QtCore.pyqtSignal(QtGui.QGraphicsSceneHoverEvent)
-    mouseExit = QtCore.pyqtSignal(QtGui.QGraphicsSceneHoverEvent)
-    highlightChange = QtCore.pyqtSignal()
+    mouseEnter = QtCore.Signal(QtGui.QGraphicsSceneHoverEvent)
+    mouseExit = QtCore.Signal(QtGui.QGraphicsSceneHoverEvent)
+    highlightChange = QtCore.Signal()
 
     def __init__(self, params, geom):
         super(clusterParams, self).__init__()

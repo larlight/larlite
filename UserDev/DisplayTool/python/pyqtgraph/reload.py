@@ -241,7 +241,7 @@ if __name__ == '__main__':
     try:
         from PyQt4 import QtCore
         if not hasattr(QtCore, 'Signal'):
-            QtCore.Signal = QtCore.pyqtSignal
+            QtCore.Signal = QtCore.Signal
         #app = QtGui.QApplication([])
         class Btn(QtCore.QObject):
             sig = QtCore.Signal()

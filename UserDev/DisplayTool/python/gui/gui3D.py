@@ -13,7 +13,7 @@ import evdmanager
 
 class ConnectedSpinBox(QtGui.QSpinBox):
     """docstring for ConnectedSpinBox"""
-    quitRequested = QtCore.pyqtSignal()
+    quitRequested = QtCore.Signal()
     def __init__(self):
         super(ConnectedSpinBox, self).__init__()
         

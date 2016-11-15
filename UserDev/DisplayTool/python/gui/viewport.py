@@ -7,7 +7,7 @@ import math
 
 class viewport(pg.GraphicsLayoutWidget):
 
-  drawHitsRequested = QtCore.pyqtSignal(int, int)
+  drawHitsRequested = QtCore.Signal(int, int)
 
   def __init__(self, geometry,plane=-1):
     super(viewport, self).__init__(border=None)

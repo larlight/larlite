@@ -14,7 +14,7 @@ class UBDaqFileGlobber(QtCore.QObject):
     # Class to constantly glob the ubdaq pnfs file directory and emit a signal if a new file is found
     # assuming that new files has nonzero size.
 
-    new_file_ready = QtCore.pyqtSignal(str)
+    new_file_ready = QtCore.Signal(str)
 
     def __init__(self):
         QtCore.QObject.__init__(self)

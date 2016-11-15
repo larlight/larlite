@@ -26,9 +26,9 @@ class bcolors:
 
 class ubdaq_manager(manager, wire, QtCore.QObject):
 
-    eventChanged = QtCore.pyqtSignal()
-    processLockUpdate = QtCore.pyqtSignal(bool)
-    runStarted = QtCore.pyqtSignal()
+    eventChanged = QtCore.Signal()
+    processLockUpdate = QtCore.Signal(bool)
+    runStarted = QtCore.Signal()
 
     """docstring for ubdaq_manager"""
 

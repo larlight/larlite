@@ -198,7 +198,7 @@ if QT_LIB.startswith('PyQt'):
         return not sip.isdeleted(obj)
     loadUiType = uic.loadUiType
 
-    QtCore.Signal = QtCore.pyqtSignal
+    QtCore.Signal = QtCore.Signal
     
 
     

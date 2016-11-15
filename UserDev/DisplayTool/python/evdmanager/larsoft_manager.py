@@ -6,8 +6,8 @@ from ROOT import evd
 
 class larsoft_manager(manager, wire, QtCore.QObject):
 
-    eventChanged = QtCore.pyqtSignal()
-    runStarted = QtCore.pyqtSignal()
+    eventChanged = QtCore.Signal()
+    runStarted = QtCore.Signal()
 
     """docstring for larsoft_manager"""
 

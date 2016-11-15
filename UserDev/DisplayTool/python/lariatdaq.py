@@ -169,7 +169,7 @@ class lariat_manager(manager, wire, QtCore.QObject):
 import threading
 class fileWatcher(QtCore.QObject,threading.Thread):
   """This file watcher class monitors a file and calls a function when it's contents change"""
-  fileChanged = QtCore.pyqtSignal(str)
+  fileChanged = QtCore.Signal(str)
   def __init__(self, event,file):
     QtCore.QObject.__init__(self)
     threading.Thread.__init__(self)
@@ -178,7 +178,7 @@ class fileWatcher(QtCore.QObject,threading.Thread):
     # keep track of the last file displayed, only send a signal when it changes
     self._prevFile=None
     self._fileToWatch = file
-    # self.fileChanged = QtCore.pyqtSignal()
+    # self.fileChanged = QtCore.Signal()
 
   def run(self):
     while not self._stopped.wait(1.5):
@@ -206,7 +206,7 @@ class fileWatcher(QtCore.QObject,threading.Thread):
 
 class delayTimer(QtCore.QObject,threading.Thread):
   """docstring for funcCaller"""
-  delayExpired = QtCore.pyqtSignal()
+  delayExpired = QtCore.Signal()
   def __init__(self, event, delay):
     QtCore.QObject.__init__(self)
     threading.Thread.__init__(self)

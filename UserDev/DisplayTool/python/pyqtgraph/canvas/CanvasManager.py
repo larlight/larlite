@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from ..Qt import QtCore, QtGui
 if not hasattr(QtCore, 'Signal'):
-    QtCore.Signal = QtCore.pyqtSignal
+    QtCore.Signal = QtCore.Signal
 import weakref
 
 class CanvasManager(QtCore.QObject):

@@ -7,9 +7,9 @@ from ROOT import TFile
 
 
 class larlite_manager_base(manager, QtCore.QObject):
-    fileChanged = QtCore.pyqtSignal()
-    eventChanged = QtCore.pyqtSignal()
-    clusterParamsChanged = QtCore.pyqtSignal(bool)
+    fileChanged = QtCore.Signal()
+    eventChanged = QtCore.Signal()
+    clusterParamsChanged = QtCore.Signal(bool)
 
     """docstring for lariat_manager"""
 
@@ -196,7 +196,7 @@ class larlite_manager_base(manager, QtCore.QObject):
 
 class larlite_manager(larlite_manager_base):
 
-    truthLabelChanged = QtCore.pyqtSignal(str)
+    truthLabelChanged = QtCore.Signal(str)
     '''
     Class to handle the 2D specific aspects of larlite viewer
     '''

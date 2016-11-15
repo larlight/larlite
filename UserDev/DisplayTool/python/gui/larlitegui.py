@@ -35,7 +35,7 @@ class ComboBoxWithKeyConnect(QtGui.QComboBox):
 
 
 class recoBox(QtGui.QWidget):
-    activated = QtCore.pyqtSignal(str)
+    activated = QtCore.Signal(str)
 
     """docstring for recoBox"""
 
