@@ -5,6 +5,10 @@
 
 namespace larlite {
 
+  vertex::vertex()
+    : data_base(data::kVertex)
+  {clear_data();}
+
   //************************************************************
   vertex::vertex(Double_t* xyz,
 		 Int_t      id)
@@ -41,6 +45,10 @@ namespace larlite {
   double vertex::X() const { return fXYZ[0]; }
   double vertex::Y() const { return fXYZ[1]; }
   double vertex::Z() const { return fXYZ[2]; }
+
+  event_vertex::event_vertex(std::string name)
+    : event_base(data::kVertex,name)
+  {clear_data();}
 }
 
 #endif

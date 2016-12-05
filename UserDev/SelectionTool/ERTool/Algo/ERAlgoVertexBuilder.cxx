@@ -890,9 +890,9 @@ namespace ertool {
       return &pav.at(index).GetSphere().Center();
     }
 
-    return SubGetUpstream(pas, index_vec, index);
+    //return SubGetUpstream(pas, index_vec, index);
     //return SubSmallestSphere(pas, index_vec, index);
-    //return SubMostEnergy(data, graph, pas, index_vec, index);
+    return SubMostEnergy(data, graph, pas, index_vec, index);
 
   }
 

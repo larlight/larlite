@@ -4,6 +4,7 @@
 #include "HitCluster.h"
 #include <algorithm>
 
+#include <algorithm>
 
 namespace larlite {
 
