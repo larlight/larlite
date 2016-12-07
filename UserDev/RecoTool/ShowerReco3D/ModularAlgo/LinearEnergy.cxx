@@ -16,42 +16,18 @@ LinearEnergy::LinearEnergy()
 {
 
   _name = "LinearEnergy";
-  _useArea     = true;
-  _useModBox   = true;
-  _custom_calib = false;
   _fill_tree   = false;
-  _caloAlg = ::calo::CalorimetryAlg();
-  _caloAlg.setUseModBox(true);
   _fC_to_e = 6250.; // e- / fC
   _e_to_eV = 23.6;  // eV / e-
   _eV_to_MeV = 1e-6;// eV / MeV 
   _ADC_to_mV = 0.5; // ADC -> mV conversion from gain measurements
-  // to go from mV to fC the ASIC gain and Shaping time
-  // must be considered
-  // fC -> mV *= ( shaping time * ASIC gain )
-  _shp_time  = 2.; // in usec
-  _asic_gain = 14; // in mV/fC
-  _ADC_to_fC = _ADC_to_mV / ( _shp_time * _asic_gain ) ;
-  CalculateEnergyConversion();
     
-  //  set calibrations to be equal to 1 for now
-  _HitRecoCorrection_v    = std::vector<double>(3,1.);
-  _ClusteringCorrection_v = std::vector<double>(3,1.);
-
   // ELECTRON LIFETIME
   _tau = larutil::LArProperties::GetME()->ElectronLifetime();
-  std::cout << "Lifetime = " << _tau << std::endl;
 
   // RECOMBINATION FACTOR
   _recomb_factor = 1.;
-  double MeV_to_fC = 1. / ( _e_to_eV * _eV_to_MeV );
-  double MIP = 2.3; // MeV/cm
-  if (_useModBox)
-    _recomb_factor = larutil::LArProperties::GetME()->ModBoxInverse(MIP) / ( MIP * MeV_to_fC );
-  else
-    _recomb_factor = larutil::LArProperties::GetME()->BirksInverse(MIP) / ( MIP * MeV_to_fC );
 
-  
   return;
 }
 
@@ -61,14 +37,12 @@ void LinearEnergy::initialize()
   if (_fill_tree) {
     if (_tree) delete _tree;
     _tree = new TTree(_name.c_str(), "dQdx Info Tree");
-    _tree->Branch("_dE_v", "std::vector<double>", &_dE_v);
-    _tree->Branch("_dEdx_v", "std::vector<double>", &_dEdx_v);
-    _tree->Branch("_dQ_v", "std::vector<double>", &_dQ_v);
-    _tree->Branch("_pl", &_pl, "_pl/I");
-    _tree->Branch("_tick_v","std::vector<double>",&_tick_v);
+    _tree->Branch("_dE", &_dE, "dE/D");
+    _tree->Branch("_dQ", &_dQ, "dQ/D");
+    _tree->Branch("_lifetime_corr", &_lifetime_corr, "lifetime_corr/D");
+    _tree->Branch("_electrons",&_electrons,"electrons/D");
+    _tree->Branch("_tick",&_tick,"tick/D");
   }
-
-
 
   std::cout << "Electron lifetime : " << _tau << " [ms]" << std::endl
 	    << "Recomb factor     : " << _recomb_factor << std::endl
@@ -78,7 +52,7 @@ void LinearEnergy::initialize()
 	    << "eV  -> MeV        : " << _eV_to_MeV << std::endl
 	    << "ADC -> MeV        : " << _ADC_to_MeV << std::endl;
 
-  _timetick = larutil::DetectorProperties::GetME()->SamplingRate() * 1.e-3; //time sample in usec
+  _clocktick = larutil::DetectorProperties::GetME()->SamplingRate() * 1.e-3; //time sample in usec
 
   return;
 }
@@ -96,11 +70,6 @@ void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
   auto & clusters = proto_shower.params();
 
   // This function takes the shower cluster set and calculates an energy in MeV for each plane
-
-  _dQ_v.clear();
-  _dE_v.clear();
-  _dEdx_v.clear();
-  _tick_v.clear();
 
   // auto geom       = larutil::Geometry::GetME();
   auto geomHelper = larutil::GeometryHelper::GetME();
@@ -120,60 +89,32 @@ void LinearEnergy::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
 
     // get the plane associated with this cluster
     auto const& pl = clusters.at(n).plane_id.Plane;
-    _pl = pl;
 
     if (pl == 2)
       hasPl2 = true;
 
-    auto const& dir3D = resultShower.fDCosStart;
-    double pitch = geomHelper->GetPitch(dir3D, (int)pl);
-
     // store calculated energy
     double E  = 0.;
-    double dQ = 0.;
-    double dE = 0.;
 
     // loop over hits
     for (auto const &h : hits) {
 
       // lifetime correction
-      double hit_tick = h.t / t2cm;
-      _tick_v.push_back(hit_tick);
-      double lifetimeCorr = exp( hit_tick * _timetick / _tau );
+      _tick = h.t / t2cm;
 
-      if (_custom_calib){
-	if (_useArea)
-	  dQ = h.charge * _ADC_to_fC * _fC_to_e;
-	else
-	  dQ = h.peak   * _ADC_to_fC * _fC_to_e;
-      }
-      else{
-	if (_useArea) 
-	  dQ = _caloAlg.ElectronsFromADCArea(h.charge, pl);
-	else 
-	  dQ = _caloAlg.ElectronsFromADCPeak(h.peak, pl);
-      }
-      
-      dE = dQ * lifetimeCorr * _e_to_eV * _eV_to_MeV;
-      
-      if (_fill_tree) {
-        _dQ_v.push_back(dQ);
-        _dE_v.push_back(dE);
-        _dEdx_v.push_back(dE / pitch / _recomb_factor);
-      }
+      _lifetime_corr = exp( _tick * _clocktick / _tau );
 
-      E += dE;
+      _electrons = h.charge * _elec_gain;
+
+      _dQ = _electrons * _lifetime_corr * _e_to_eV * _eV_to_MeV;
+
+      _dE = _dQ / _recomb_factor;
+
+      _tree->Fill();
+
+      E += _dE;
 
     }// loop over all hits
-
-    E /= _recomb_factor;
-
-    // correct for plane-dependent shower reco energy calibration
-    E *= _HitRecoCorrection_v[pl];
-    E *= _ClusteringCorrection_v[pl];
-
-    if (_fill_tree)
-      _tree->Fill();
 
     if (_verbose)
       std::cout << "energy on plane " << pl << " is : " << E << std::endl;
