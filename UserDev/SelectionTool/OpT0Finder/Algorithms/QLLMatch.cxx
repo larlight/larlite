@@ -55,8 +55,8 @@ namespace flashana {
     }
     for (auto &pt : _raw_trk) pt.x -= min_x;
 
-    auto res1 = PESpectrumMatch(pt_v,flash,true  );
-    auto res2 = PESpectrumMatch(pt_v,flash,false );
+    auto res1 = PESpectrumMatch(pt_v,flash,true);
+    auto res2 = PESpectrumMatch(pt_v,flash,false);
     /*
     std::cout << "Using   mid-x-init: " << res1.tpc_point.x << " [cm] @ " << res1.score << std::endl;
     std::cout << "Without mid-x-init: " << res2.tpc_point.x << " [cm] @ " << res2.score << std::endl;
@@ -260,12 +260,8 @@ namespace flashana {
       switch(_mode) {
 	
       case kLLHD:
-	double arg = TMath::Poisson(O,H);
-	if (arg > 0. && !std::isnan(arg))
-	  _current_llhd -= std::log10(arg);
-	else
-	  _current_llhd = 1.e6;
-	if(std::isinf(_current_llhd)) _current_llhd = 1.e6;
+	_current_llhd -= std::log10(TMath::Poisson(O,H));
+	if(isnan(_current_llhd) || isinf(_current_llhd)) _current_llhd = 1.e6;
       case kChi2:
 	Error = O;
 	if( Error < 1.0 ) Error = 1.0;
