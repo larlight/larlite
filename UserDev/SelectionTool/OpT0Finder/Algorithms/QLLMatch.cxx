@@ -256,20 +256,28 @@ namespace flashana {
       }
       
       nvalid_pmt += 1;
-      
-      switch(_mode) {
-	
-      case kLLHD:
+
+      if(_mode == kLLHD) {
+	/* Replaced block to be used in uboonecode
 	_current_llhd -= std::log10(TMath::Poisson(O,H));
 	if(isnan(_current_llhd) || isinf(_current_llhd)) _current_llhd = 1.e6;
-      case kChi2:
+	*/
+	// Updated block
+	double arg = TMath::Poisson(O,H);
+	if(arg > 0. && !std::isnan(arg))
+	  _current_llhd -= std::log10(arg);
+	else
+	  _current_llhd = 1.e6;
+	// Updated block ends
+	break;
+      } else if (_mode == kChi2) {
 	Error = O;
 	if( Error < 1.0 ) Error = 1.0;
 	_current_chi2 += std::pow((O - H), 2) / (Error);
 	break;
-      default:
-	std::cout<<"Unexpected mode"<<std::endl;
-	throw std::exception();
+      } else {
+	FLASH_ERROR() << "Unexpected mode" << std::endl;
+	throw OpT0FinderException();
       }
       
       //result += std::fabs(  ) * measurement.pe_v[pmt_index];
