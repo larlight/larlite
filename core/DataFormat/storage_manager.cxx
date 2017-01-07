@@ -43,6 +43,7 @@
 #include "PiZeroROI.h"
 #include "auxsimch.h"
 #include "chstatus.h"
+#include "mceventweight.h"
 
 namespace larlite {
 
@@ -1184,6 +1185,9 @@ namespace larlite {
       break;
     case data::kChStatus:
       _ptr_data_array[type][name]=new event_chstatus(name);
+      break;
+    case data::kMCEventWeight:
+      _ptr_data_array[type][name]=new event_mceventweight(name);
       break;
     default:
       print(msg::kERROR,__FUNCTION__,Form("Event-data identifier not supported: %d",(int)type));
