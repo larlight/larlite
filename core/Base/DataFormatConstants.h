@@ -95,6 +95,7 @@ namespace larlite{
       kAuxDetSimChannel,   ///< sim::AuxDetSimChannel
       kChStatus,           ///< larlite::chstatus
       kT0,                 ///< larlite::t0
+      kMCEventWeight,      ///< evwgh::MCEventWeight
       kDATA_TYPE_MAX       ///< Event-wise enum boundary
     };
 
