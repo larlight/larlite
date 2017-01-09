@@ -1,6 +1,6 @@
 /**
  * \file mceventweight.h
- * 
+ *
  * \brief This data product stores the weights applied to MC events
  *
  * @author A. Mastbaum, mastbaum@uchicago.edu
@@ -10,7 +10,7 @@
 #define LARLITE_MCEVENTWEIGHT_H
 
 #include "TTree.h"
-#include "Base/MCConstants.h" 
+#include "Base/MCConstants.h"
 #include <vector>
 #include <utility>
 #include "data_base.h"
@@ -20,7 +20,7 @@ namespace larlite {
   class mceventweight : public data_base {
 
   public:
-    
+
     mceventweight() : data_base(data::kMCEventWeight) {
       clear_data();
     }
@@ -32,7 +32,7 @@ namespace larlite {
 
     void clear_data();
 
-    // Setters    
+    // Setters
     void SetWeights(const std::map<std::string, std::vector<double> > weights);
 
     // Getters
@@ -47,9 +47,9 @@ namespace larlite {
      * string name. For some of them, you run lots of trials (universes).
      * This is a mapping from the name to a vector full of the weights
      * obtained in the trials.
-     */  
+     */
     std::map<std::string, std::vector<double> > _weights;
-    
+
   };
 
   /**
@@ -71,10 +71,10 @@ namespace larlite {
     /// Default copy constructor
     event_mceventweight(const event_mceventweight& original)
         : std::vector<larlite::mceventweight>(original), event_base(original) {}
-    
+
     /// Default destructor
-    ~event_mceventweight(){}
-    
+    ~event_mceventweight() {}
+
     /// Method to clear currently held data contents in the buffer
     virtual void clear_data() {
       event_base::clear_data();

@@ -13,12 +13,12 @@ namespace larlite {
     _weights = weights;
   }
 
-  // Setter Function Definitions 
+  // Setter Function Definitions
   void mceventweight::SetWeights(const std::map<std::string, std::vector<double> > weights) {
     _weights = weights;
   }
 
-  // Getter Function Definitions 
+  // Getter Function Definitions
   std::map<std::string, std::vector<double> > mceventweight::GetWeights() const {
     return _weights;
   }
