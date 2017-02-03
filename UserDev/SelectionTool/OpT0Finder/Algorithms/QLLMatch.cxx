@@ -274,7 +274,6 @@ namespace flashana {
 	Error = O;
 	if( Error < 1.0 ) Error = 1.0;
 	_current_chi2 += std::pow((O - H), 2) / (Error);
-	break;
       } else {
 	FLASH_ERROR() << "Unexpected mode" << std::endl;
 	throw OpT0FinderException();
