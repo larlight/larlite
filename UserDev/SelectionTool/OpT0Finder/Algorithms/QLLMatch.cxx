@@ -270,7 +270,6 @@ namespace flashana {
 	  _current_llhd = 1.e6;
 	if(std::isinf(_current_llhd)) _current_llhd = 1.e6;
 	// Updated block ends
-	break;
       } else if (_mode == kChi2) {
 	Error = O;
 	if( Error < 1.0 ) Error = 1.0;
