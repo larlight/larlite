@@ -27,7 +27,7 @@ namespace larlite {
   public:
     
     /// Default constructor
-    vertex() : data_base(data::kVertex) {clear_data();}
+    vertex();
 
     /// Alternative constructor
     vertex(double* xyz,
@@ -68,7 +68,7 @@ namespace larlite {
   public:
     
     /// Default constructor
-    event_vertex(std::string name="noname") : event_base(data::kVertex,name) {clear_data();}
+    event_vertex(std::string name="noname");
     
     /// Default copy constructor
     event_vertex(const event_vertex& original) : std::vector<larlite::vertex>(original),

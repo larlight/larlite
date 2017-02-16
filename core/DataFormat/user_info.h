@@ -43,7 +43,7 @@ namespace larlite {
     void dump_contents();
     
     /// Default constructor
-    user_info() : data_base(data::kUserInfo) {clear_data();}
+    user_info();
     
     /// setter for a single double variable
     inline void store(std::string key, double value)      {_d_map[key]=value;};
@@ -131,7 +131,7 @@ namespace larlite {
   public:
     
     /// Default constructor
-    event_user(std::string name="noname") : event_base(data::kUserInfo,name) {clear_data();}
+    event_user(std::string name="noname");
     
     /// Default copy constructor
     event_user(const event_user& original) : std::vector<larlite::user_info>(original),

@@ -33,7 +33,7 @@ namespace larlite{
   public:
     
     /// Default constructor
-    data_base(unsigned short type = data::kDATA_TYPE_MAX);
+    data_base(unsigned short type = data::kINVALID_USHORT);
 
     /// Default copy constructor to avoid memory leak in ROOT streamer
     data_base(const data_base &original) : _type(original._type) {}
@@ -63,7 +63,7 @@ namespace larlite{
   class output_base : public data_base {
   public:
     /// Default ctor
-    output_base(unsigned short type = data::kDATA_TYPE_MAX,
+    output_base(unsigned short type = data::kINVALID_USHORT,
 		const std::string name = "noname");
     /// Copy ctor
     output_base(const output_base& orig);
@@ -92,7 +92,7 @@ namespace larlite{
     friend class storage_manager;
   public:
     /// Default ctor
-    run_base(const unsigned short type = data::kRUNDATA_TYPE_MAX,
+    run_base(const unsigned short type = data::kINVALID_USHORT,
 	     const std::string name = "noname");
     /// Copy ctor
     run_base(const run_base& origin);
@@ -126,7 +126,7 @@ namespace larlite{
     friend class storage_manager;
   public:
     /// Default ctor
-    subrun_base(const unsigned short type = data::kSUBRUNDATA_TYPE_MAX,
+    subrun_base(const unsigned short type = data::kINVALID_USHORT,
 		const std::string name = "noname");
 
     /// Copy ctor
@@ -167,7 +167,7 @@ namespace larlite{
   public:
     
     /// Default constructor
-    event_base(unsigned short    type = data::kDATA_TYPE_MAX,
+    event_base(unsigned short    type = data::kINVALID_USHORT,
 	       const std::string name = "noname");
     
     /// Default copy constructor to avoid memory leak in ROOT streamer

@@ -11,7 +11,6 @@ namespace ertool {
 
   ERAlgoVertexBuilder::ERAlgoVertexBuilder
   (Double_t const start_prox,
-   Double_t const max_rad,
    Bool_t const withTrackDir,
    std::string const primary_vertex_selection,
    Bool_t const showerproj,
@@ -22,7 +21,7 @@ namespace ertool {
    const std::string& name) :
     AlgoBase(name),
     tstart_prox(start_prox),
-    tmax_rad(max_rad),
+    tmax_rad(start_prox),
     twithTrackDir(withTrackDir),
     tprimary_vertex_selection(primary_vertex_selection),
     tshowerproj(showerproj),
@@ -2375,20 +2374,10 @@ namespace ertool {
 
       } while(true);
       
-      /*
-      if(s.Radius() > tmax_rad) {
-	
+      if(s.Radius() > tmax_rad) {	
 	std::cout << "\tRadius too big\n";
-
       }
       
-      else {
-
-	pa.AddAssociation(vc, vcp, s, algo.boundingSphere(vcp).Radius());
-
-      }
-      */      
-
       pa.AddAssociation(vc, vcp, s, algo.boundingSphere(vcp).Radius());
 
     }

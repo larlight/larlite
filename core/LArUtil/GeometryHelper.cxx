@@ -358,9 +358,9 @@ double GeometryHelper::GetPitch(const TVector3& direction, const int& pl) const
   // basically this is the vector perpendicular to the wire length direction,
   // and still in the wire-plane direction
   if (pl == 0)
-    wireDir = {0., -1 / 2., sqrt(3) / 2.};
+    wireDir = {0., -sqrt(3) / 2., 1 / 2.};
   else if (pl == 1)
-    wireDir = {0., 1 / 2., sqrt(3) / 2.};
+    wireDir = {0.,  sqrt(3) / 2., 1 / 2.};
   else if (pl == 2)
     wireDir = {0., 0., 1.};
   else
@@ -1036,6 +1036,19 @@ int GeometryHelper::GetYZ(const Point2D *p0, const Point2D *p1, Double_t* yz) co
 
   return 0;
 }
+
+  bool GeometryHelper::ContainedYZ(const double& y, const double& z) const {
+
+    // if y out of bounds
+    if ( (y < -geom->DetHalfHeight()) or (y> geom->DetHalfHeight()) )
+      return false;
+    
+    // if z out of bounds
+    if ( (z < 0) or (z > geom->DetLength()) )
+      return false;
+    
+    return true;
+  }
   
   bool GeometryHelper::Contained(const double& x, const double& y, const double& z) const {
 

@@ -69,12 +69,18 @@ void StartPoint3DModule::do_reconstruction(
     *  Caluclate intersection point in Y,Z of the 2 best planes.
     *  Calculate their average start time
     */
-    geom->IntersectionPoint(wireStarts[0], wireStarts[1], planes[0], planes[1], sY, sZ );
+    if (planes.size() < 2){
+      std::stringstream ss;
+      ss << "Fail @ algo " << this->name() << " due to too few (1) 2D start points";
+      throw ShowerRecoException(ss.str());
+    }
+    
+    geom->IntersectionPoint(wireStarts.at(0) , wireStarts.at(1) , planes.at(0), planes.at(1), sY, sZ );
 
     // check if reconstructed start point is outside of TPC volume
     auto geomH = larutil::GeometryHelper::GetME();
     
-    if (geomH->Contained( sX/2., sY, sZ) == false){
+    if (geomH->ContainedYZ(sY, sZ) == false){
       std::stringstream ss;
       ss << "Fail @ algo " << this->name() << " due to start point reconstructed out of TPC bouns";
       throw ShowerRecoException(ss.str());

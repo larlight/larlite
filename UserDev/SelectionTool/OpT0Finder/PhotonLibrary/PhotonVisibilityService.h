@@ -24,7 +24,8 @@ namespace phot{
   public:
    
     //PhotonVisibilityService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
-    PhotonVisibilityService(const std::string library="uboone_photon_library_v5.root");
+    //PhotonVisibilityService(const std::string library="uboone_photon_library_v5.root");
+    PhotonVisibilityService(const std::string library="uboone_photon_library_v6_efield.root");
     
     //void reconfigure(fhicl::ParameterSet const& p);
     

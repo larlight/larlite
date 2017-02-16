@@ -15,6 +15,7 @@
 #define OPT0FINDER_COMMONAMPS_H
 
 #include "OpT0Finder/Base/BaseFlashMatch.h"
+#include "OpT0Finder/Base/FlashMatchFactory.h"
 #include "TH1D.h"
 
 namespace flashana {
@@ -38,9 +39,11 @@ namespace flashana {
     /// Default destructor
     ~CommonAmps(){}
 
-    void Configure(const ::fcllite::PSet &pset);
-
     FlashMatch_t Match(const QCluster_t&, const Flash_t&);
+
+  protected:
+
+    void _Configure_(const Config_t &pset);
 
   private:
 
@@ -50,6 +53,19 @@ namespace flashana {
     flashana::QCluster_t _tpc_qcluster;
     flashana::Flash_t    _vis_array;
 
+  };
+
+  /**
+     \class flashana::CommonAmpsFactory
+  */
+  class CommonAmpsFactory : public FlashMatchFactoryBase {
+  public:
+    /// ctor
+    CommonAmpsFactory() { FlashMatchFactory::get().add_factory("CommonAmps",this); }
+    /// dtor
+    ~CommonAmpsFactory() {}
+    /// creation method
+    BaseFlashMatch* create(const std::string instance_name) { return new CommonAmps(instance_name); }
   };
 }
 #endif

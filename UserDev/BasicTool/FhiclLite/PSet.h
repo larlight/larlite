@@ -1,25 +1,24 @@
 /**
  * \file PSet.h
  *
- * \ingroup FhiclLite
+ * \ingroup CVFhicl
  * 
  * \brief Class def header for a class PSet
  *
  * @author kazuhiro
  */
 
-/** \addtogroup FhiclLite
+/** \addtogroup CVFhicl
 
     @{*/
-#ifndef BASICTOOL_FHICLLITE_PSET_H
-#define BASICTOOL_FHICLLITE_PSET_H
+#ifndef __FHICLLITE_PSET_H__
+#define __FHICLLITE_PSET_H__
 
 #include <iostream>
 #include <string>
 #include <map>
-#include <TString.h>
 #include "FhiclLiteException.h"
-#include "UtilFunc.h"
+#include "Parser.h"
 namespace fcllite {
   /**
      \class PSet
@@ -53,18 +52,18 @@ namespace fcllite {
       auto const v_keys = this->value_keys();
       if(v_keys.size() != rhs.value_keys().size()) return false;
       for(auto const& key : v_keys) {
-	if(!rhs.contains_value(key))
-	  return false;
-	if(this->get<std::string>(key) != rhs.get<std::string>(key))
-	  return false;
+        if(!rhs.contains_value(key))
+          return false;
+        if(this->get<std::string>(key) != rhs.get<std::string>(key))
+          return false;
       }
       auto const p_keys = this->pset_keys();
       if(p_keys.size() != rhs.pset_keys().size()) return false;
       for(auto const& key : p_keys) {
-	if(!rhs.contains_pset(key))
-	  return false;
-	if(this->get_pset(key) != rhs.get_pset(key))
-	  return false;
+        if(!rhs.contains_pset(key))
+          return false;
+        if(this->get_pset(key) != rhs.get_pset(key))
+          return false;
       }
       return true;
     }
@@ -97,36 +96,40 @@ namespace fcllite {
     T get(const std::string& key) const{
       auto iter = _data_value.find(key);
       if( iter == _data_value.end() ) {
-	
-	std::string msg;
-	msg = "Key does not exist: \"" + key + "\"";
-	throw FhiclLiteException(msg);
+        std::string msg;
+        msg = "Key does not exist: \"" + key + "\"";
+	std::cout<<dump()<<std::endl;
+        throw FhiclLiteException(msg);
       }
-      return FromString<T>((*iter).second);
+      return parser::FromString<T>((*iter).second);
     }
 
-    //template <class T>
-    //T get(const std::string& key) const;
-    
     /// Template getter w/ default value
     template <class T>
     T get(const std::string& key, const T default_value) const{
       auto iter = _data_value.find(key);
       if( iter == _data_value.end() )
-	return default_value;
-      return FromString<T>((*iter).second);
+        return default_value;
+      return parser::FromString<T>((*iter).second);
     }
 
+    /// None-template function to retrieve parameter set (deprecated)
     const PSet& get_pset(const std::string& key) const;
 
+    /// Returns # of parameters
     size_t size() const;
+    /// Returns a vector of all parameter keys
     const std::vector<std::string> keys() const;
+    /// Returns a vector of keys for key-value pairs
     const std::vector<std::string> value_keys () const;
+    /// Returns a vector of keys for key-PSet pairs
     const std::vector<std::string> pset_keys  () const;
+    /// Check if a specified key exists for key-value pairs
     bool  contains_value (const std::string& key) const;
+    /// Check if a specified key exists for key-PSet pairs
     bool  contains_pset  (const std::string& key) const;
 
-  protected:
+  private:
 
     enum KeyChar_t {
       kParamDef,
@@ -142,9 +145,11 @@ namespace fcllite {
     void trim_space(std::string& txt);
     void no_space(std::string& txt);
 
+    /// The name of this fcllite::PSet
     std::string _name;
-
+    /// Key-Value pairs
     std::map<std::string,std::string> _data_value;
+    /// Key-PSet pairs
     std::map<std::string,::fcllite::PSet> _data_pset;
 
   };

@@ -48,11 +48,13 @@ Shower_t ShowerRecoAlgModular::RecoOneShower(const ::protoshower::ProtoShower& p
     }
     catch (ShowerRecoException e) {
       result.fPassedReconstruction = false;
+      if (_debug)
+	std::cout << e.what() << std::endl;
       return result;
     }
     _module_time_v[n] += _watch.RealTime();
     _module_ctr_v[n] += 1;
-    if (_debug) {
+    if (_debug && _verbose) {
       printChanges(localCopy, result, _modules[n]->name());
       localCopy = result;
     }

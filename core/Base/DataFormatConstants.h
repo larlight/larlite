@@ -95,6 +95,7 @@ namespace larlite{
       kAuxDetSimChannel,   ///< sim::AuxDetSimChannel
       kChStatus,           ///< larlite::chstatus
       kT0,                 ///< larlite::t0
+      kMCEventWeight,      ///< evwgh::MCEventWeight
       kDATA_TYPE_MAX       ///< Event-wise enum boundary
     };
 
@@ -112,7 +113,7 @@ namespace larlite{
     };
 
     #ifndef __CINT__
-    #ifndef __CLINT__
+    #ifndef __CLING__
     const std::string kDATA_TREE_NAME[kDATA_TYPE_MAX] = {
       //const std::vector<std::string> kDATA_TREE_NAME = {
       "unknown",
@@ -158,7 +159,8 @@ namespace larlite{
       "PiZeroROI",
       "auxsimch",
       "chstatus",
-      "t0"
+      "t0",
+      "mceventweight"
     };
 
     const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {

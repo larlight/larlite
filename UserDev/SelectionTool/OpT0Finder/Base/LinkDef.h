@@ -13,7 +13,6 @@
 #pragma link C++ namespace flashana::msg;
 #pragma link C++ class flashana::QPoint_t+;
 #pragma link C++ class flashana::QCluster_t+;
-#pragma link C++ class flashana::ColorPrint+;
 #pragma link C++ class flashana::Flash_t+;
 #pragma link C++ class flashana::QPoint_t+;
 #pragma link C++ class flashana::QCluster_t+;

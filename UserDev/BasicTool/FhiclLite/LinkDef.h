@@ -14,6 +14,7 @@
 #pragma link C++ class fcllite::PSet+;
 #pragma link C++ class fcllite::ConfigManager+;
 #pragma link C++ function fcllite::PSet::get< string > (const string&)+;
+#pragma link C++ function fcllite::CreatePSetFromFile(const string)+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 

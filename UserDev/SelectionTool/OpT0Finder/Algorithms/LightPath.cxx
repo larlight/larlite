@@ -2,8 +2,10 @@
 #define LIGHTPATH_CXX
 
 #include "LightPath.h"
-
+#include "GeoAlgo/GeoTrajectory.h"
 namespace flashana {
+
+  static LightPathFactory __global_LightPathFactory__;
 
   LightPath::LightPath(const std::string name)
     : BaseAlgorithm(kCustomAlgo, name)
@@ -12,7 +14,7 @@ namespace flashana {
     , _dEdxMIP     ( 2.07    ) //1.42[Mev*cm^2*g]*1.4[g/cm^3]=2.004MeV/cm
   {}
 
-  void LightPath::Configure(const ::fcllite::PSet &pset)
+  void LightPath::_Configure_(const Config_t &pset)
   {
     _gap          = pset.get< double > ( "SegmentSize" );
     _light_yield  = pset.get< double > ( "LightYield"  );
@@ -72,7 +74,7 @@ namespace flashana {
     QCluster_t result;
     result.clear();
 
-    for (int i = 0; i < trj.size() - 1; i++) {
+    for (size_t i = 0; i < trj.size() - 1; i++) {
       auto const& this_loc(trj[i]);
       auto const& last_loc(trj[i + 1]);
 

@@ -5,6 +5,10 @@
 
 namespace larlite {
 
+  user_info::user_info()
+    : data_base(data::kUserInfo)
+  {clear_data();}
+  
   //**********************************************************  
   void user_info::clear_data()
   //**********************************************************
@@ -284,6 +288,9 @@ namespace larlite {
     }
     return &((*item).second);
   }
+
+  event_user::event_user(std::string name) : event_base(data::kUserInfo,name)
+  {clear_data();}
 
 }
   
