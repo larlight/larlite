@@ -5,20 +5,20 @@
  * 
  * \brief Class def header for a class Linearity
  *
- * @author david
+ * @author david caratelli
  */
 
 /** \addtogroup Clusterer
 
     @{*/
-#ifndef LINEARITY_H
-#define LINEARITY_H
+#ifndef TWODIM_LINEARITY_H
+#define TWODIM_LINEARITY_H
 
 #include <iostream>
 #include <vector>
 #include <cmath>
 
-namespace twodim {
+namespace twodimtools {
   
   /**
      \class Linearity

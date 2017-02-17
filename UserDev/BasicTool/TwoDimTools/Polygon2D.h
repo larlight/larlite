@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef RECOTOOL_POLYGON2D_H
-#define RECOTOOL_POLYGON2D_H
+#ifndef TWODIM_POLYGON2D_H
+#define TWODIM_POLYGON2D_H
 
 #include <vector>
 #include <utility>
@@ -31,7 +31,7 @@
 //n   = first vertex again
 //>n  = invalid...return error message
 
-namespace twodim {
+namespace twodimtools {
   
   //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
   //                BEGIN POLYGON CLASS               //

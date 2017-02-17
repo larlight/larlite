@@ -9,7 +9,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class twodim::Linearity+;
-#pragma link C++ class twodim::Polygon2D+;
+#pragma link C++ class twodimtools::Linearity+;
+#pragma link C++ class twodimtools::Polygon2D+;
 //ADD_NEW_CLASS ... do not change this line
 #endif

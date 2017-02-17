@@ -1,10 +1,10 @@
-#ifndef LINEARITY_CXX
-#define LINEARITY_CXX
+#ifndef TWODIM_LINEARITY_CXX
+#define TWODIM_LINEARITY_CXX
 
 #include "Linearity.h"
 #include <algorithm>
 
-namespace twodim {
+namespace twodimtools {
   
   Linearity::Linearity()
   {

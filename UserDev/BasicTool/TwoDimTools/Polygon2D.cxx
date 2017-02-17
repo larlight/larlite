@@ -1,7 +1,10 @@
+#ifndef TWODIM_POLYGON2D_CXX
+#define TWODIM_POLYGON2D_CXX
+
 #include "Polygon2D.h"
 #include "LArUtil/GeometryHelper.h"
 
-namespace twodim {
+namespace twodimtools {
   
   //------------------------------------------------
   // returns slope of line uniting points p1 and p2
@@ -445,3 +448,5 @@ namespace twodim {
   }
 
 }// namespace
+
+#endif
