@@ -117,6 +117,9 @@ namespace larlite{
 
   class PiZeroROI;
   class event_PiZeroROI;
+
+  class mceventweight;
+  class event_mceventweight;
 }
 
 class treenode;

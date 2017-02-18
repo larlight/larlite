@@ -20,7 +20,7 @@ endif
 #
 # Define directories to be compile upon a global "make"...
 #
-SUBDIRS := GeoAlgo EMShowerTools LArPyBackend TreeGraph FhiclLite #ADD_NEW_SUBDIR ... do not remove this comment from this line
+SUBDIRS := GeoAlgo EMShowerTools LArPyBackend TreeGraph FhiclLite TwoDimTools #ADD_NEW_SUBDIR ... do not remove this comment from this line
 
 #####################################################################################
 #

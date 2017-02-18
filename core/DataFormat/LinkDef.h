@@ -165,6 +165,10 @@
 #pragma link C++ class std::vector<larlite::PiZeroROI>+;
 #pragma link C++ class larlite::event_PiZeroROI+;
 
+#pragma link C++ class larlite::mceventweight+;
+#pragma link C++ class std::vector<larlite::mceventweight>+;
+#pragma link C++ class larlite::event_mceventweight+;
+
 #pragma link C++ class larlite::mcnu+;
 #pragma link C++ class std::vector<larlite::mcnu>+;
 
