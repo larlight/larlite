@@ -41,7 +41,7 @@ namespace twodimtools {
   public:
     
     /// default constructor
-    Polygon2D() { }
+    Polygon2D();
     /// default destructor
     ~Polygon2D(){}
     /// constructor starting from list of edges for polygon

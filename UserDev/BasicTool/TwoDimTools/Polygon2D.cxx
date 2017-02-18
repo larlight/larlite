@@ -5,6 +5,9 @@
 #include "LArUtil/GeometryHelper.h"
 
 namespace twodimtools {
+
+  Polygon2D::Polygon2D()
+  { vertices.clear(); }
   
   //------------------------------------------------
   // returns slope of line uniting points p1 and p2
