@@ -5,7 +5,7 @@
  * 
  * \brief Class def header for a class ConeOverlapTag
  *
- * @author david
+ * @author david caratelli
  */
 
 /** \addtogroup PhotonTagging
@@ -30,7 +30,7 @@ namespace larlite {
   public:
 
     /// Default constructor
-    ConeOverlapTag(){ _name="ConeOverlapTag"; _fout=0;}
+    ConeOverlapTag(){ _name="ConeOverlapTag"; _fout=0; _debug=false;}
 
     /// Default destructor
     virtual ~ConeOverlapTag(){}
@@ -49,6 +49,15 @@ namespace larlite {
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
+
+    // producer setters
+    void setShowerProducer    (std::string s) { _shower_producer = s;      }
+    void setPhotonProducer    (std::string s) { _photon_producer = s;      }
+    void setOutPFPartProducer (std::string s) { _out_pfpart_producer = s;  }
+    void setOutClusterProducer(std::string s) { _out_cluster_producer = s; }
+
+    // set debug mode
+    void setDebug(bool on) { _debug = on; }
 
   protected:
 
@@ -73,6 +82,11 @@ namespace larlite {
     // producers
     std::string _shower_producer;
     std::string _photon_producer;
+    std::string _out_pfpart_producer;
+    std::string _out_cluster_producer;
+
+    // debug
+    bool _debug;
 
     // t2cm and wtcm constants
     double _t2cm, _w2cm;
