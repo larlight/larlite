@@ -42,6 +42,8 @@ namespace twodimtools {
     
     /// default constructor
     Polygon2D() { }
+    /// default destructor
+    ~Polygon2D(){}
     /// constructor starting from list of edges for polygon
     Polygon2D(const std::vector< std::pair<float,float> > &points) { vertices = points; }
     /// Create Intersection Polygon from 2 polygons
