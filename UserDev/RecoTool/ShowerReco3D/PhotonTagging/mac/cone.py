@@ -9,6 +9,9 @@ if len(sys.argv) < 2:
 
 
 from larlite import larlite as fmwk
+from ROOT import twodimtools
+a = twodimtools.Poly2D()
+print a
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()

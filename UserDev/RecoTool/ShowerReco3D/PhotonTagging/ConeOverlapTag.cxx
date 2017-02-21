@@ -37,21 +37,19 @@ namespace larlite {
 
     // grab already reconstructed showers
     auto ev_shower = storage->get_data<event_shower>(_shower_producer);
+    if (_debug) { std::cout << "event has " << ev_shower->size() << " showers" << std::endl; }
+    if (_debug) { std::cout << "Shower producer : " << ev_shower->name() << std::endl; }
     // grab associated pfparticles
     larlite::event_pfpart* ev_pfpart = nullptr;
-    auto const& ass_shr_pfpart_v = storage->find_one_ass(ev_shower->id(), ev_pfpart, ev_shower->name());
     // grab associated clusters
     larlite::event_cluster* ev_cluster = nullptr;
-    auto const& ass_pfpart_clus_v = storage->find_one_ass(ev_pfpart->id(), ev_cluster, ev_pfpart->name());
     // grab associated hits
     larlite::event_hit* ev_hit_shower = nullptr;
-    auto const& ass_clus_hit_v = storage->find_one_ass(ev_cluster->id(), ev_hit_shower, ev_cluster->name());
 
     // grab reconstructed photon clusters
     auto ev_photon = storage->get_data<event_cluster>(_photon_producer);
     // grab associated hits
     larlite::event_hit* ev_hit_photon = nullptr;
-    auto const& ass_photon_hit_v = storage->find_one_ass(ev_photon->id(), ev_hit_photon, ev_photon->name());
 
     // create a new PFParticle to store the newly clustered showers
     auto  ev_pfpart_new  = storage->get_data<event_pfpart>(_out_pfpart_producer);
@@ -62,13 +60,26 @@ namespace larlite {
     // create a new cluster -> hit association
     larlite::event_ass* ev_cluster_hit_ass_v_new    = storage->get_data<event_ass>( ev_cluster_new->name() );
 
+    //set event ID through storage manager
+    storage->set_id(storage->run_id(),storage->subrun_id(),storage->event_id());
+
+    // if no imput showers -> quit
+    if ( !ev_shower || (ev_shower->size() == 0) )
+      return true;
+
+    auto const& ass_shr_pfpart_v = storage->find_one_ass(ev_shower->id(), ev_pfpart, ev_shower->name());
+    if (_debug) { std::cout << "PFPart producer : " << ev_pfpart->name() << std::endl; }
+    auto const& ass_pfpart_clus_v = storage->find_one_ass(ev_pfpart->id(), ev_cluster, ev_pfpart->name());
+    if (_debug) { std::cout << "Cluster producer : " << ev_cluster->name() << std::endl; }
+    auto const& ass_clus_hit_v = storage->find_one_ass(ev_cluster->id(), ev_hit_shower, ev_cluster->name());
+    if (_debug) { std::cout << "Shower Hit producer : " << ev_hit_shower->name() << std::endl; }
+    auto const& ass_photon_hit_v = storage->find_one_ass(ev_photon->id(), ev_hit_photon, ev_photon->name());
+    if (_debug) { std::cout << "Photon Hit producer : " << ev_hit_photon->name() << std::endl; }
+
     // vector to hold associated hits to cluster
     std::vector< std::vector< unsigned int> > clus_hit_ass_holder_new;
     // vector to hold pfpart -> cluster ass
     std::vector< std::vector< unsigned int> > pfpart_clus_ass_holder_new;
-
-    //set event ID through storage manager
-    storage->set_id(storage->run_id(),storage->subrun_id(),storage->event_id());
 
     // if hits associated with showers and those associated with photon clusters
     // are from different producers -> exit.
@@ -98,7 +109,7 @@ namespace larlite {
 	larutil::Hit2D hit2d;
 	hit2d.plane  = (unsigned char)hit.WireID().Plane;
 	hit2d.w      = hit.WireID().Wire * _w2cm;
-	hit2d.t      = hit.PeakTime() * _t2cm;
+	hit2d.t      = (hit.PeakTime() - 800) * _t2cm;
 	hit2d.charge = hit.Integral();
 	hit2d.peak   = hit.PeakAmplitude();
 	photon_hit2d_v.push_back( hit2d );
@@ -116,8 +127,8 @@ namespace larlite {
 	vertices.push_back( tmpvertex );
       }// for all polygon edges
       if (_debug) { std::cout << "making polygon with " << vertices.size() << " vertices" << std::endl; }
-      Polygon2D thispoly( vertices );
-      std::pair<size_t, Polygon2D> polyinfo(p, thispoly);
+      twodimtools::Poly2D thispoly( vertices );
+      std::pair<size_t, twodimtools::Poly2D> polyinfo(p, thispoly);
       _photon_poly_v.at( photon_hit2d_v.at(0).plane ).push_back( polyinfo );
       
     }// for all photon clusters
@@ -159,7 +170,7 @@ namespace larlite {
 	for (auto const& hit_idx : hit_idx_v)
 	  shr_hit_ass_idx_v.at(pl).push_back(hit_idx);
       }// for all clusters associated to shower
-      
+
       // project shower on the 3 planes
       if (_debug) { std::cout << "projecting shower on planes" << std::endl; }
       projectShower(shr);
@@ -170,27 +181,31 @@ namespace larlite {
 	if (_debug) { std::cout << "get shower polygon for plane " << pl << std::endl; }
 	auto const& shrPoly = _shr_polygon_v.at(pl);
 
-	// if this polygon is undeclared, skip this plane
-	if (shrPoly.Size() == 0) continue;
+	if (_debug) { std::cout << "hits on plane before merging : " << shr_hit_ass_idx_v.at(pl).size() << std::endl; }
+
+	if (_debug) { std::cout << "polygon has size : " << shrPoly.Size() << std::endl; }
+	// if no hits associated on this plane -> skip
+	if (shr_hit_ass_idx_v.at(pl).size() == 0) continue;
 	
 	// loop over photons for this plane
+	if (_debug) { std::cout << "loop over photons " << std::endl; }
 	for (auto const& photonPoly : _photon_poly_v.at(pl) ) {
-	  
+
 	  // are they compatible?
-	  if (shrPoly.PolyOverlap(photonPoly.second) == true) {
-	    
+	  if ( (shrPoly.PolyOverlap(photonPoly.second) == true) || shrPoly.Contained(photonPoly.second) ) {
+	    if (_debug) { std::cout << "photon and polygon overlap! " << std::endl; }
 	    // get set of hits to add (removing potential duplicates)
-	    mergeHits( shr_hit_ass_idx_v.at(pl),
-		       ass_photon_hit_v.at(photonPoly.first) );
+	    mergeHits( shr_hit_ass_idx_v.at(pl), ass_photon_hit_v.at(photonPoly.first) );
+	    if (_debug) { std::cout << "hits merged. there are " << shr_hit_ass_idx_v.at(pl).size() << " hits." << std::endl; }
 	    
 	  }// compatible showers
-
 	}// for all photon clusters
 
 	// create cluster with newly identified shower hits on this plane
 	// new hit indices for this cluster
 	auto const& new_hit_idx_v = shr_hit_ass_idx_v.at(pl);
 	larlite::cluster shr_clus_new;
+	if (_debug) { std::cout << "creating new cluster with " << new_hit_idx_v.size() << " hits" << std::endl; }
 	shr_clus_new.set_n_hits( new_hit_idx_v.size() );
 	shr_clus_new.set_view( ev_hit_shower->at( new_hit_idx_v.at(0) ).View() );
 	std::vector<unsigned int> new_clus_ass_hit_idx_v;
@@ -200,6 +215,7 @@ namespace larlite {
 	clus_hit_ass_holder_new.push_back( new_clus_ass_hit_idx_v);
 	ev_cluster_new->emplace_back( shr_clus_new );
 	pfpart_ass_holder.push_back( ev_cluster_new->size() - 1 );
+	if (_debug) { std::cout << "done creating new cluster" << std::endl; }
 	
       }// for all 3 planes
 
@@ -250,7 +266,7 @@ namespace larlite {
       triangle_coordinates.push_back( std::pair<float,float>(start_pl.w, start_pl.t) );
 
       // figure out how far to go on each side.
-      double shrWidth = shrLen * tan(oangle);
+      double shrWidth = shrLen * tan(oangle * 2.);
 
       // unlike length, width is not stretched or compressed on projection.
       // extend end-point "left" and "right" by one width to complete triangle
@@ -267,7 +283,14 @@ namespace larlite {
       double pt2_t = end_pl.t - slope * sqrt( shrWidth / (1 + slope*slope) );
       triangle_coordinates.push_back( std::pair<float,float>( pt2_w, pt2_t) );
 
-      Polygon2D triangle(triangle_coordinates);
+      if (_debug){
+	std::cout << "SHOWER COORDINATES @ PLANE " << pl <<  " : " << std::endl
+		  << "\t Vertex @ [ " << start_pl.w << ", " << start_pl.t << " ]" << std::endl
+		  << "\t Pt1    @ [ " << pt1_w      << ", " << pt1_t      << " ]" << std::endl
+		  << "\t Pt2    @ [ " << pt2_w      << ", " << pt2_t      << " ]" << std::endl;
+      }
+
+      twodimtools::Poly2D triangle(triangle_coordinates);
       _shr_polygon_v[pl] = triangle;
       
 
@@ -283,13 +306,30 @@ namespace larlite {
     std::vector<unsigned int> shr_hit_idx_v_old = shr_hit_idx_v;
     
     for(auto const& photon_hit_idx : photon_hit_idx_v) {
+      bool duplicate = false;
       for (auto const& shr_hit_idx : shr_hit_idx_v_old) {
-	if (photon_hit_idx != shr_hit_idx)
-	  shr_hit_idx_v.push_back(photon_hit_idx);
+	if (photon_hit_idx == shr_hit_idx) {
+	  duplicate = true;
+	  continue;
+	}// if duplicate
       }// for all shower hits
+      if (duplicate == false)
+	shr_hit_idx_v.push_back(photon_hit_idx);
     }// for all photon hits
 
     return;
+  }
+
+  std::vector<twodimtools::Poly2D> ConeOverlapTag::getPhotonPolygon(int pl) {
+
+    std::vector<twodimtools::Poly2D> poly_v;
+
+    auto polypair = _photon_poly_v.at(pl);
+
+    for (auto const& poly : polypair)
+      poly_v.push_back( poly.second );
+
+    return poly_v;
   }
 
 
