@@ -43,9 +43,15 @@ clusterer.setShowerProducer("showerreco")
 clusterer.setPhotonProducer("rawcluster")
 clusterer.setOutPFPartProducer("coneshower")
 clusterer.setOutClusterProducer("coneshower")
-clusterer.setDebug(True)
+clusterer.setDebug(False)
+clusterer.setTickOffset(800)
+clusterer.setShrLen(100.)
 
 my_proc.add_process(clusterer)
+
+my_proc.set_data_to_write(fmwk.data.kPFParticle,  "coneshower")
+my_proc.set_data_to_write(fmwk.data.kCluster,     "coneshower")
+my_proc.set_data_to_write(fmwk.data.kAssociation, "coneshower")
 
 print
 print  "Finished configuring ana_processor. Start event loop!"

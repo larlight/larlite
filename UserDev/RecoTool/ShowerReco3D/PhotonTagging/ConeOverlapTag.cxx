@@ -22,6 +22,9 @@ namespace larlite {
     _w2cm = geomH->WireToCm();
     _t2cm = geomH->TimeToCm();
 
+    _shrLen = 100.;
+    _tick_offset = 800;
+
     return true;
   }
   
@@ -101,7 +104,7 @@ namespace larlite {
 
       // get assciated hits
       auto const& photon_hit_idx_v = ass_photon_hit_v.at(p);
-      
+
       // get polygon
       std::vector<larutil::Hit2D> photon_hit2d_v;
       for (auto const& hit_idx: photon_hit_idx_v){
@@ -109,7 +112,7 @@ namespace larlite {
 	larutil::Hit2D hit2d;
 	hit2d.plane  = (unsigned char)hit.WireID().Plane;
 	hit2d.w      = hit.WireID().Wire * _w2cm;
-	hit2d.t      = (hit.PeakTime() - 800) * _t2cm;
+	hit2d.t      = (hit.PeakTime() - _tick_offset) * _t2cm;
 	hit2d.charge = hit.Integral();
 	hit2d.peak   = hit.PeakAmplitude();
 	photon_hit2d_v.push_back( hit2d );
@@ -155,10 +158,16 @@ namespace larlite {
       // on the various planes
       std::vector< std::vector<unsigned int> > shr_hit_ass_idx_v;
       shr_hit_ass_idx_v.resize(3); // one entry per plane
+      // vector of larlite clusters associated to the shower (per plane)
+      std::vector< larlite::cluster > old_cluster_v;
+      old_cluster_v.resize(3);
 
       for (auto const& clus_idx : ass_clus_idx_v){
 
 	if (_debug) { std::cout << "new cluster" << std::endl; }
+
+	// grab associated cluster
+	auto const& old_cluster = ev_cluster->at(clus_idx);
 	
 	// hits associated with this cluster
 	auto const& hit_idx_v = ass_clus_hit_v.at(clus_idx);
@@ -169,6 +178,9 @@ namespace larlite {
 	// loop over hits and add the indices:
 	for (auto const& hit_idx : hit_idx_v)
 	  shr_hit_ass_idx_v.at(pl).push_back(hit_idx);
+
+	old_cluster_v.at(pl) = old_cluster;
+	
       }// for all clusters associated to shower
 
       // project shower on the 3 planes
@@ -208,6 +220,14 @@ namespace larlite {
 	if (_debug) { std::cout << "creating new cluster with " << new_hit_idx_v.size() << " hits" << std::endl; }
 	shr_clus_new.set_n_hits( new_hit_idx_v.size() );
 	shr_clus_new.set_view( ev_hit_shower->at( new_hit_idx_v.at(0) ).View() );
+	// get info from old cluster
+	auto const& old_cluster = old_cluster_v.at(pl);
+	shr_clus_new.set_start_wire ( old_cluster.StartWire(),  1. );
+	shr_clus_new.set_end_wire   ( old_cluster.EndWire(),    1. );
+	shr_clus_new.set_start_tick ( old_cluster.StartTick(),  1. );
+	shr_clus_new.set_end_tick   ( old_cluster.EndTick(),    1. );
+	shr_clus_new.set_start_angle( old_cluster.StartAngle()     );
+	shr_clus_new.set_planeID    ( old_cluster.Plane()          );
 	std::vector<unsigned int> new_clus_ass_hit_idx_v;
 	for (auto const& hit_idx : new_hit_idx_v)
 	  new_clus_ass_hit_idx_v.push_back( hit_idx );
@@ -248,9 +268,7 @@ namespace larlite {
     auto const& dir    = shr.Direction();
     auto const& oangle = shr.OpeningAngle();
 
-    // end point, 1 meter away from start in shower direction [TEMPORARY]
-    double shrLen = 100.; // cm
-    auto const& end = start + shrLen * dir;
+    auto const& end = start + _shrLen * dir;
 
     for (size_t pl=0; pl < geom->Nplanes(); pl++){
 

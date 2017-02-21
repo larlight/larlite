@@ -59,6 +59,11 @@ namespace larlite {
     // set debug mode
     void setDebug(bool on) { _debug = on; }
 
+    // set shower length
+    void setShrLen(double d) { _shr_len = d; }
+    // set tick offset
+    vodi setTickOffset(double t) { _tick_offset = t; }
+
     // get the polygon clusters
     twodimtools::Poly2D getShowerPolygon(int pl) { return _shr_polygon_v[pl]; }
     std::vector<twodimtools::Poly2D> getPhotonPolygon(int pl);
@@ -94,6 +99,12 @@ namespace larlite {
 
     // t2cm and wtcm constants
     double _t2cm, _w2cm;
+
+    // how far to extend the shower? user-determined
+    double _shrLen; // cm
+
+    // tick offset?
+    double _tick_offset;
 
   };
 }
