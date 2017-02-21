@@ -202,16 +202,27 @@ namespace larlite {
 	// loop over photons for this plane
 	if (_debug) { std::cout << "loop over photons " << std::endl; }
 	for (auto const& photonPoly : _photon_poly_v.at(pl) ) {
-
+	  if (_debug) { std::cout << "\t\t new photon with " << photonPoly.second.Area() << " area" << std::endl; }
 	  // are they compatible?
-	  if ( (shrPoly.PolyOverlap(photonPoly.second) == true) || shrPoly.Contained(photonPoly.second) ) {
-	    if (_debug) { std::cout << "photon and polygon overlap! " << std::endl; }
+	  bool overlap = false;
+	  for (size_t j=0; j < photonPoly.second.Size(); j++){
+	    if ( shrPoly.PointInside(photonPoly.second.Point(j)) == true) {
+	      overlap = true;
+	      if (_debug) { std::cout << "\t\t overlap!" << std::endl; }
+	      break;
+	    }
+	  }
+	  if ( shrPoly.Contained(photonPoly.second) ) {
+	    overlap = true;
+	    if (_debug) { std::cout << "\t\t contained!" << std::endl; }
+	  }
+	  if (overlap){
 	    // get set of hits to add (removing potential duplicates)
 	    mergeHits( shr_hit_ass_idx_v.at(pl), ass_photon_hit_v.at(photonPoly.first) );
-	    if (_debug) { std::cout << "hits merged. there are " << shr_hit_ass_idx_v.at(pl).size() << " hits." << std::endl; }
-	    
-	  }// compatible showers
-	}// for all photon clusters
+	    if (_debug) { std::cout << "\t\t hits merged. there are " << shr_hit_ass_idx_v.at(pl).size() << " hits." << std::endl; }
+	  }//if ovelrap
+	  
+	}// compatible showers
 
 	// create cluster with newly identified shower hits on this plane
 	// new hit indices for this cluster
@@ -232,7 +243,7 @@ namespace larlite {
 	for (auto const& hit_idx : new_hit_idx_v)
 	  new_clus_ass_hit_idx_v.push_back( hit_idx );
 	// add
-	clus_hit_ass_holder_new.push_back( new_clus_ass_hit_idx_v);
+	clus_hit_ass_holder_new.push_back( new_clus_ass_hit_idx_v );
 	ev_cluster_new->emplace_back( shr_clus_new );
 	pfpart_ass_holder.push_back( ev_cluster_new->size() - 1 );
 	if (_debug) { std::cout << "done creating new cluster" << std::endl; }
@@ -284,7 +295,7 @@ namespace larlite {
       triangle_coordinates.push_back( std::pair<float,float>(start_pl.w, start_pl.t) );
 
       // figure out how far to go on each side.
-      double shrWidth = shrLen * tan(oangle * 2.);
+      double shrWidth = _shrLen * tan(oangle * 2.);
 
       // unlike length, width is not stretched or compressed on projection.
       // extend end-point "left" and "right" by one width to complete triangle

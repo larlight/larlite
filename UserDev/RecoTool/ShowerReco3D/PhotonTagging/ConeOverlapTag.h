@@ -60,9 +60,9 @@ namespace larlite {
     void setDebug(bool on) { _debug = on; }
 
     // set shower length
-    void setShrLen(double d) { _shr_len = d; }
+    void setShrLen(double d) { _shrLen = d; }
     // set tick offset
-    vodi setTickOffset(double t) { _tick_offset = t; }
+    void setTickOffset(double t) { _tick_offset = t; }
 
     // get the polygon clusters
     twodimtools::Poly2D getShowerPolygon(int pl) { return _shr_polygon_v[pl]; }
