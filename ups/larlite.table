@@ -58,6 +58,6 @@ End:
 #*************************************************
 #
 # ups declare command that works on gpvm:
-# ups declare larlite v06_09_00 -r larlite/v06_09_00 -f Linux64bit+2.6-2.12 -m larlite.table -q e10:prof -U ups/
+# ups declare larlite v06_20_00 -r larlite/v06_20_00 -f Linux64bit+2.6-2.12 -m larlite.table -q e10:prof -U ups/
 #
 #
