@@ -18,7 +18,7 @@
 #include "Analysis/ana_base.h"
 #include "DataFormat/shower.h"
 
-#include "ClusterRecoUtil/Base/Polygon2D.h"
+#include "TwoDimTools/Poly2D.h"
 
 namespace larlite {
   /**
@@ -59,6 +59,15 @@ namespace larlite {
     // set debug mode
     void setDebug(bool on) { _debug = on; }
 
+    // set shower length
+    void setShrLen(double d) { _shr_len = d; }
+    // set tick offset
+    vodi setTickOffset(double t) { _tick_offset = t; }
+
+    // get the polygon clusters
+    twodimtools::Poly2D getShowerPolygon(int pl) { return _shr_polygon_v[pl]; }
+    std::vector<twodimtools::Poly2D> getPhotonPolygon(int pl);
+
   protected:
 
     // function that projects reconstructed 3D shower
@@ -70,14 +79,14 @@ namespace larlite {
 		   const std::vector<unsigned int>& photon_hit_idx_v);
 
     // store 2D triangles representing shower cones.
-    std::vector<Polygon2D> _shr_polygon_v;
+    std::vector<twodimtools::Poly2D> _shr_polygon_v;
 
     // store 2D polygons representing photon clusters
     // vector of vectors:
     // 1st vector is for the 3 planes
     // pairs hold idex of cluster in original clus vector (.first)
     //            polygon object 
-    std::vector< std::vector< std::pair<size_t, Polygon2D > > > _photon_poly_v;
+    std::vector< std::vector< std::pair<size_t, twodimtools::Poly2D > > > _photon_poly_v;
 
     // producers
     std::string _shower_producer;
@@ -90,6 +99,12 @@ namespace larlite {
 
     // t2cm and wtcm constants
     double _t2cm, _w2cm;
+
+    // how far to extend the shower? user-determined
+    double _shrLen; // cm
+
+    // tick offset?
+    double _tick_offset;
 
   };
 }
