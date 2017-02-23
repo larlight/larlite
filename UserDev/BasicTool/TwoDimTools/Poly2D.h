@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef TWODIM_POLYGON2D_H
-#define TWODIM_POLYGON2D_H
+#ifndef TWODIM_POLY2D_H
+#define TWODIM_POLY2D_H
 
 #include <vector>
 #include <utility>
@@ -36,18 +36,18 @@ namespace twodimtools {
   //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
   //                BEGIN POLYGON CLASS               //
   //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
-  class Polygon2D{
+  class Poly2D{
     
   public:
     
     /// default constructor
-    Polygon2D();
+    Poly2D();
     /// default destructor
-    ~Polygon2D(){}
+    ~Poly2D(){}
     /// constructor starting from list of edges for polygon
-    Polygon2D(const std::vector< std::pair<float,float> > &points) { vertices = points; }
+    Poly2D(const std::vector< std::pair<float,float> > &points) { vertices = points; }
     /// Create Intersection Polygon from 2 polygons
-    Polygon2D(const Polygon2D &poly1, const Polygon2D &poly2); 
+    Poly2D(const Poly2D &poly1, const Poly2D &poly2); 
     /// return number of edges in polygon
     unsigned int Size() const { return vertices.size(); } 
     /// return pair with information for a specific edge
@@ -59,11 +59,11 @@ namespace twodimtools {
     /// return polygon perimeter
     float Perimeter() const;
     /// boolean: do these polygons overlap?
-    bool PolyOverlap(const Polygon2D &poly2) const;
+    bool PolyOverlap(const Poly2D &poly2) const;
     /// boolean: is a point inside the polygon?
     bool PointInside(const std::pair<float,float> &point) const;
     /// check if poly2 is fully contained in poly1
-    bool Contained(const Polygon2D &poly2) const; 
+    bool Contained(const Poly2D &poly2) const; 
     /// untangle polygon
     void UntanglePolygon();
     /// clear polygon's points
@@ -72,9 +72,9 @@ namespace twodimtools {
     ///Calculate the opening angle at the specified vertex:
     float InteriorAngle(unsigned int p) const;
     
-    friend bool operator==(const Polygon2D& lhs, const Polygon2D& rhs);
-    friend bool operator!=(const Polygon2D& lhs, const Polygon2D& rhs);
-    friend std::ostream &operator<<(std::ostream &out, Polygon2D poly);     //output
+    friend bool operator==(const Poly2D& lhs, const Poly2D& rhs);
+    friend bool operator!=(const Poly2D& lhs, const Poly2D& rhs);
+    friend std::ostream &operator<<(std::ostream &out, Poly2D poly);     //output
     
     
   private:
@@ -83,10 +83,10 @@ namespace twodimtools {
     std::vector< std::pair<float,float> > vertices;
     
     /// utility function used by PolyOverlap to determine overlap
-    bool Overlap(float slope, const Polygon2D &poly2, const std::pair<float,float> &origin) const;
+    bool Overlap(float slope, const Poly2D &poly2, const std::pair<float,float> &origin) const;
     
     /// utility function used in polygon overlap determination
-    bool PolyOverlapSegments(const Polygon2D &poly2) const;
+    bool PolyOverlapSegments(const Poly2D &poly2) const;
     
   };
   
