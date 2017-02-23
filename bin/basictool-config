@@ -12,7 +12,7 @@ while test $# -gt 0; do
 	  out="-I${LARLITE_USERDEVDIR}/BasicTool "
 	  ;;
       --libs)
-	  out="-L${LARLITE_LIBDIR} -lBasicTool_LArPyBackend -lBasicTool_EMShowerTools -lBasicTool_GeoAlgo -lBasicTool_FhiclLite -BasicTool_TreeGraph"
+	  out="-L${LARLITE_LIBDIR} -lBasicTool_LArPyBackend -lBasicTool_EMShowerTools -lBasicTool_GeoAlgo -lBasicTool_FhiclLite -BasicTool_TreeGraph -lBasicTool_TwoDimTools"
 	  ;;
       --help)
 	  ### Print a help message
