@@ -10,6 +10,6 @@
 #pragma link off all functions;
 
 #pragma link C++ class twodimtools::Linearity+;
-#pragma link C++ class twodimtools::Polygon2D+;
+#pragma link C++ class twodimtools::Poly2D+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
