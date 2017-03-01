@@ -1,7 +1,7 @@
 #ifndef ERTOOL_ALGOSINGLEMU_CXX
 #define ERTOOL_ALGOSINGLEMU_CXX
 
-#include "AlgoSinglemu.h"
+#include "AlgoSingleMu.h"
 #include <sstream>
 namespace ertool {
 
