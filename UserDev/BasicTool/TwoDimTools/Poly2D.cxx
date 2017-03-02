@@ -1,12 +1,12 @@
-#ifndef TWODIM_POLYGON2D_CXX
-#define TWODIM_POLYGON2D_CXX
+#ifndef TWODIM_POLY2D_CXX
+#define TWODIM_POLY2D_CXX
 
-#include "Polygon2D.h"
+#include "Poly2D.h"
 #include "LArUtil/GeometryHelper.h"
 
 namespace twodimtools {
 
-  Polygon2D::Polygon2D()
+  Poly2D::Poly2D()
   { vertices.clear(); }
   
   //------------------------------------------------
@@ -59,8 +59,8 @@ namespace twodimtools {
   }
   
   //------------------------------------------------------------------
-  // Polygon2D constructor returning intersection of 2 polygons
-  Polygon2D::Polygon2D(const Polygon2D &poly1, const Polygon2D &poly2)
+  // Poly2D constructor returning intersection of 2 polygons
+  Poly2D::Poly2D(const Poly2D &poly1, const Poly2D &poly2)
   {
     
     //figure out if the two polygons overlap at all
@@ -107,7 +107,7 @@ namespace twodimtools {
   }
   
   //---------------------------
-  float Polygon2D::Area() const
+  float Poly2D::Area() const
   {
     //how? here:
     //http://www.mathsisfun.com/geometry/area-irregular-polygons.html
@@ -124,7 +124,7 @@ namespace twodimtools {
   }
   
   //--------------------------------
-  float Polygon2D::Perimeter() const
+  float Poly2D::Perimeter() const
   {
     
     float perimeter = 0.;
@@ -146,7 +146,7 @@ namespace twodimtools {
   }
   
   //------------------------------------------------------------------
-  const std::pair<float, float>& Polygon2D::Point(unsigned int p) const
+  const std::pair<float, float>& Poly2D::Point(unsigned int p) const
   {
     //This function returns the vertex under consideration
     //as a std::pair<float,float> Returns vertex for argument
@@ -165,7 +165,7 @@ namespace twodimtools {
   
   //------------------------------------------------------------------------
   // apply translation and rotation to a polygon
-  std::pair<float, float> Polygon2D::Project(const std::pair<float, float> &p,
+  std::pair<float, float> Poly2D::Project(const std::pair<float, float> &p,
 					     float theta) const
   {
     
@@ -192,8 +192,8 @@ namespace twodimtools {
   }
   
   //---------------------------------------------------------------
-  bool Polygon2D::Overlap(float slope,
-			  const Polygon2D &poly2,
+  bool Poly2D::Overlap(float slope,
+			  const Poly2D &poly2,
 			  const std::pair<float, float> &origin) const
   {
     //translate and rotate both polygons
@@ -211,7 +211,7 @@ namespace twodimtools {
   }
   
   //-------------------------------------------------------
-  bool Polygon2D::PolyOverlap(const Polygon2D &poly2) const
+  bool Poly2D::PolyOverlap(const Poly2D &poly2) const
   {
     
     //start from first pair in vector then check all edges.
@@ -239,7 +239,7 @@ namespace twodimtools {
   }
   
   //---------------------------------------------------------------
-  bool Polygon2D::PolyOverlapSegments(const Polygon2D &poly2) const
+  bool Poly2D::PolyOverlapSegments(const Poly2D &poly2) const
   {
     //if contained in one another then they also overlap:
     if ( (this->Contained(poly2)) or (poly2.Contained(*this)) ) {
@@ -261,7 +261,7 @@ namespace twodimtools {
   }
   
   //--------------------------------------------------------------------
-  bool Polygon2D::PointInside(const std::pair<float, float> &point) const
+  bool Poly2D::PointInside(const std::pair<float, float> &point) const
   {
     
     //any ray originating at point will cross polygon
@@ -283,7 +283,7 @@ namespace twodimtools {
   }
   
   //-----------------------------------------------------
-  bool Polygon2D::Contained(const Polygon2D &poly2) const
+  bool Poly2D::Contained(const Poly2D &poly2) const
   {
     
     //loop over poly2 checking wehther
@@ -298,7 +298,7 @@ namespace twodimtools {
   }
   
   //-------------------------------
-  void Polygon2D::UntanglePolygon()
+  void Poly2D::UntanglePolygon()
   {
     
     //loop over edges
@@ -332,7 +332,7 @@ namespace twodimtools {
   }
   
   ///Calculate the opening angle at the specified vertex:
-  float Polygon2D::InteriorAngle(unsigned int p) const {
+  float Poly2D::InteriorAngle(unsigned int p) const {
     // Get the specified point and the two adjacent points
     if (p > vertices.size()) {
       return -9999999;
@@ -425,15 +425,15 @@ namespace twodimtools {
     }
   }
   
-  bool operator==(const Polygon2D& lhs, const Polygon2D& rhs) {
+  bool operator==(const Poly2D& lhs, const Poly2D& rhs) {
     return lhs.vertices == rhs.vertices;
   }
   
-  bool operator!=(const Polygon2D& lhs, const Polygon2D& rhs) {
+  bool operator!=(const Poly2D& lhs, const Poly2D& rhs) {
     return !(lhs == rhs);
   }
   
-  std::ostream &operator<<(std::ostream &out, Polygon2D poly) {
+  std::ostream &operator<<(std::ostream &out, Poly2D poly) {
     
     if (poly.vertices.size( ) == 0) {
       out << "(NULL POLYGON)";
