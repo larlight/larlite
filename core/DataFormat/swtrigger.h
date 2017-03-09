@@ -1,5 +1,5 @@
-#ifndef _UBOONETYPES_DAQSWTRIGGERDATA_H
-#define _UBOONETYPES_DAQSWTRIGGERDATA_H
+#ifndef _LARLITE_DAQSWTRIGGERDATA_H
+#define _LARLITE_DAQSWTRIGGERDATA_H
 //#include <sys/types.h>
 //#include <inttypes.h>
 //#include "evttypes.h"
