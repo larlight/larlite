@@ -1,0 +1,3 @@
+[submodule "UserDev/SelectionTool/LEEPreCuts/algosrc"]
+	path = UserDev/SelectionTool/LEEPreCuts/algosrc
+	url = https://github.com/LArbys/LEEPreCutAlgo
