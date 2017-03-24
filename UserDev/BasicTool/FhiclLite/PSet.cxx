@@ -304,7 +304,11 @@ namespace fcllite {
       tmp = contents.substr(index+1,end_index-index);
       //no_space(tmp);
       trim_space(tmp);
-      if(tmp.empty()) throw FhiclLiteException("Empty value @ end!");
+      if(tmp.empty()) {
+	std::stringstream ss;
+	ss << "Empty value for key " << key;
+	throw FhiclLiteException(ss.str());
+      }
       value = tmp;
       this->add_value(key,value);
 
