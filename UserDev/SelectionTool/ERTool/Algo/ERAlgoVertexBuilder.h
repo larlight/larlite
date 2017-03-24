@@ -24,6 +24,8 @@
 
 #include "ERTool/Algo/AlgoFindRelationship.h"
 
+#include "ParticleAssociations.h"
+
 #include "TTree.h"
 
 namespace ertool {
@@ -64,7 +66,11 @@ namespace ertool {
     std::string const smallestsphere = "smallestsphere";
     std::string const trackdirection = "trackdirection";
 
+    ParticleAssociations pa;
+
   public:
+
+
 
     /// Default constructor
     ERAlgoVertexBuilder
@@ -86,20 +92,20 @@ namespace ertool {
     /// Reset function
     void Reset();
 
+    ParticleAssociations const & GetParticleAssociations() {return pa;}
+
     /// Function to accept fclite::PSet
     void AcceptPSet(const ::fcllite::PSet& cfg);
 
     /// Called @ before processing the first event sample
     void ProcessBegin();
 
-    class ParticleAssociation;
-    class ParticleAssociations;
-    class ParticleGraphSetter;
-
     friend ParticleAssociation;
     friend ParticleAssociations;
-    friend ParticleGraphSetter;
 
+    class ParticleGraphSetter;
+    friend ParticleGraphSetter;
+    
     void EndReconstruct(ParticleGraph const & graph);
 
     geoalgo::Point_t const * GetUpstreamPrimary
