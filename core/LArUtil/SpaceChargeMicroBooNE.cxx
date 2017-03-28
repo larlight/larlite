@@ -1,3 +1,5 @@
+#ifndef __SPACECHARGEMICROBOONE_CXX__
+#define __SPACECHARGEMICROBOONE_CXX__
 ////////////////////////////////////////////////////////////////////////
 // \file SpaceChargeMicroBooNE.C
 //
@@ -491,3 +493,5 @@ namespace larutil{
   }
   
 }
+
+#endif

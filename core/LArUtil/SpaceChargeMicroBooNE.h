@@ -1,3 +1,5 @@
+#ifndef __SPACECHARGEMICROBOONE_H__
+#define __SPACECHARGEMICROBOONE_H__
 ////////////////////////////////////////////////////////////////////////
 // \file SpaceChargeMicroBooNE.h
 //
@@ -32,8 +34,8 @@ namespace larutil{
       std::vector<double> GetEfieldOffsets(double xVal, double yVal, double zVal) const;
  
     private:
-    protected:
-
+#ifndef __CINT__
+#ifndef __CLING__
       std::vector<double> GetPosOffsetsParametric(double xVal, double yVal, double zVal) const;
       double GetOnePosOffsetParametric(double xVal, double yVal, double zVal, std::string axis) const;
       std::vector<double> GetEfieldOffsetsParametric(double xVal, double yVal, double zVal) const;
@@ -124,6 +126,8 @@ namespace larutil{
       TF1 *f3_Ez = new TF1("f3_Ez","pol4");
       TF1 *f4_Ez = new TF1("f4_Ez","pol4");
       TF1 *fFinal_Ez = new TF1("fFinal_Ez","pol3");
-    
+    #endif
+    #endif
   }; // class SpaceChargeMicroBooNE
 }
+#endif
