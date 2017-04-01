@@ -64,7 +64,7 @@ namespace ertool {
     std::string const mostenergy = "mostenergy";
     std::string const mostenergy_lone = "mostenergylone";
     std::string const smallestsphere = "smallestsphere";
-    std::string const trackdirection = "trackdirection";
+    std::string const withshower = "withshower";
 
     ParticleAssociations pa;
 
@@ -92,7 +92,7 @@ namespace ertool {
     /// Reset function
     void Reset();
 
-    ParticleAssociations const & GetParticleAssociations() {return pa;}
+    ParticleAssociations const * GetParticleAssociations() const {return &pa;}
 
     /// Function to accept fclite::PSet
     void AcceptPSet(const ::fcllite::PSet& cfg);
@@ -151,6 +151,12 @@ namespace ertool {
        Bool_t const lone = false,
        Bool_t * first = nullptr);
 
+    geoalgo::Point_t const * GetShowerVertex
+      (ParticleGraph & graph,
+       ParticleAssociations const & pas, 
+       std::vector<Int_t> const & skip,
+       Int_t & index);
+    
     void AddAllLoneTracks
       (const EventData &data,
        ParticleGraph & graph,

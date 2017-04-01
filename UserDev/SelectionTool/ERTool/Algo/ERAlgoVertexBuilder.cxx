@@ -36,7 +36,7 @@ namespace ertool {
        tprimary_vertex_selection != mostenergy &&
        tprimary_vertex_selection != mostenergy_lone &&
        tprimary_vertex_selection != smallestsphere && 
-       tprimary_vertex_selection != trackdirection) {
+       tprimary_vertex_selection != withshower) {
 
       std::cout << "Primary vertex selection option not valid\n";
       exit(0);
@@ -460,7 +460,10 @@ namespace ertool {
       
       geoalgo::Point_t const * const s = &pav.at(i).GetSphere().Center();
       Double_t const z = s->at(2);
-      
+    
+      if(z > larutil::Geometry::GetME()->DetLength())
+	std::cout << "Vertex outside of TPC, z: " << z << "\n";
+  
       if(z < zmin) {
 	index = i;
 	sc = s;
@@ -651,7 +654,7 @@ namespace ertool {
 
   }
 
-  
+
 
   geoalgo::Point_t const * ERAlgoVertexBuilder::GetMostEnergyPrimary
   (EventData const & data,
@@ -786,6 +789,50 @@ namespace ertool {
 
   }
  
+
+
+  geoalgo::Point_t const * ERAlgoVertexBuilder::GetShowerVertex(ParticleGraph & graph,
+								ParticleAssociations const & pas, 
+								std::vector<Int_t> const & skip,
+								Int_t & index) {
+
+    std::vector<ParticleAssociation> const & pav = pas.GetAssociations();
+    
+    index = -1;
+    geoalgo::Point_t const * sc = nullptr;
+   
+    if(tverbose)
+      std::cout << "pav.size(): " << pav.size() << "\n";
+    
+    double zdist = 2000;
+    for(Size_t i = 0; i < pav.size(); ++i) {
+     
+      if(std::find(skip.begin(), skip.end(), i) != skip.end()) {
+	if(tverbose) std::cout << "\tskip index: " << i << "\n";
+	continue;
+      }
+
+      geoalgo::Point_t const & v = pav.at(i).GetSphere().Center();
+
+      size_t shower_counter = 0;
+      for(NodeID_t const n : pav.at(i).GetCluster()) {
+	Particle const & p = graph.GetParticle(n);
+	if(p.RecoType() == kShower) {
+	  ++shower_counter;
+	}      
+      }
+
+      if(shower_counter == 1 && v.at(2) < zdist) {
+	index = i;
+	sc = &v;
+      }
+      
+    }
+
+    return sc;
+
+  }
+
  
 
   //Add all lone tracks not associated with anything
@@ -817,6 +864,8 @@ namespace ertool {
       }
 
       if(track_end) {
+
+	//Add to particlegraph
 	
 	Particle & vert = graph.CreateParticle();
 	NodeID_t const pid = vert.ID();
@@ -831,6 +880,13 @@ namespace ertool {
 					   0));
 
 	graph.SetParentage(pid, gn);
+
+	//Add to particle associations
+
+	pa.AddAssociation(std::vector<NodeID_t>(1, gn),
+			  std::vector<geoalgo::Point_t>(1, *track_end),
+			  geoalgo::Sphere(*track_end, 0),
+			  0);
 
       }
       
@@ -940,8 +996,13 @@ namespace ertool {
 			*shower_end,
 			geoalgo::Point_t(s._energy, 0, 0));
       
-      graph.SetParentage(pid, gn);
+      graph.SetParentage(pid, gn);     
       
+      pa.AddAssociation(std::vector<NodeID_t>(1, gn),
+			std::vector<geoalgo::Point_t>(1, *shower_end),
+			geoalgo::Sphere(*shower_end, 0),
+			0);
+ 
     }
     
   }
@@ -1029,6 +1090,11 @@ namespace ertool {
 			geoalgo::Point_t(energy, 0, 0));
      
       graph.SetParentage(pid, upstream_node);
+
+      pa.AddAssociation(std::vector<NodeID_t>(1, upstream_node),
+			std::vector<geoalgo::Point_t>(1, *end),
+			geoalgo::Sphere(*end, 0),
+			0);
       
       AddAllLoneTracks(data, graph, upstream_node);
       AddAllLoneShowers(data, graph, upstream_node);
@@ -1768,14 +1834,13 @@ namespace ertool {
     pas.NodeCheck(graph);
 
     std::vector<ParticleAssociation> const & pav = pas.GetAssociations();
-    association_number = pav.size();
     Int_t vertex_counter = 0;
    
     if(pav.size()) {
       
       ParticleGraphSetter setter(data, graph, pas);
       std::vector<Int_t> const & skip = setter.GetSkip();
-   
+
       if(tverbose) pas.PrintAssociations();
       
       Bool_t first = true;
@@ -1792,14 +1857,15 @@ namespace ertool {
 	else if(tprimary_vertex_selection == mostenergy)
 	  sc = GetMostEnergyPrimary(data, graph, pas, skip, index);
 	else if(tprimary_vertex_selection == mostenergy_lone)
-	  sc =
-	    GetMostEnergyPrimary(data, graph, pas, skip, index, true, &first);
+	  sc = GetMostEnergyPrimary(data, graph, pas, skip, index, true, &first);
 	else if(tprimary_vertex_selection == smallestsphere)
 	  sc = GetSmallestSpherePrimary(pas, skip, index);
+	else if(tprimary_vertex_selection == withshower)
+	  sc = GetShowerVertex(graph, pas, skip, index);
 	/*
 	else if(tprimary_vertex_selection == trackdirection)
 	  sc = GetTrackDirectionPrimary(data, graph, pas, skip, index);
-	*/	
+	*/
 
 	if(sc == nullptr) {
 	  std::cout << "No sc\n";
@@ -1848,7 +1914,8 @@ namespace ertool {
 
     }
 
-    found_vertices = vertex_counter;  
+    association_number = pav.size();
+    found_vertices = vertex_counter;
     lone_track_counter = track_counter;
     vertices_lonetracks = vertex_counter + track_counter;
     tree->Fill();   
