@@ -22,11 +22,12 @@ namespace larlite {
   void LEEPreCut::configure( const fcllite::PSet& ps ) {
     fOpHitProducer = ps.get< std::string >("OpHitProducer");
     fBinTickWidth  = ps.get< int >("BinTickWidth",     6);
-    fWinStartTick  = ps.get< int >("WinStartTick",   220);
-    fWinEndTick    = ps.get< int >("WinEndTick",     350);
+    fWinStartTick  = ps.get< int >("WinStartTick",   190);
+    fWinEndTick    = ps.get< int >("WinEndTick",     320);
     fPEThreshold   = ps.get< float >("PEThreshold", 20.0);
-    fVetoStartTick = ps.get< int >("VetoStartTick",  120);
-    fVetoEndTick   = ps.get< int >("VetoEndTick",    220);
+    fVetoStartTick = ps.get< int >("VetoStartTick",  60);
+    fVetoEndTick   = ps.get< int >("VetoEndTick",    190);
+    fPMTMaxFrac    = ps.get< float > ("PMTMaxFrac",  0.6);
   }
   
   bool LEEPreCut::analyze(storage_manager* storage) {
@@ -61,12 +62,14 @@ namespace larlite {
     }
 
     std::vector<float> flashbins = m_algo.MakeTimeBin( ophit_peaktime_v, ophit_pe_v, fBinTickWidth, fWinStartTick, fWinEndTick );
-    float maxfrac     = m_algo.PMTMaxFrac( ophit_peaktime_v, ophit_pe_v, ophit_femch_v, flashbins, fPEThreshold, fWinStartTick, fWinEndTick );
-
     std::vector<float> vetobins  = m_algo.MakeTimeBin( ophit_peaktime_v, ophit_pe_v, fBinTickWidth, fVetoStartTick, fVetoEndTick );
-    float vetomaxfrac = m_algo.PMTMaxFrac( ophit_peaktime_v, ophit_pe_v, ophit_femch_v, vetobins, fPEThreshold, fVetoStartTick, fVetoEndTick );
 
-    if ( maxfrac>fPEThreshold && vetomaxfrac<fPEThreshold )
+    std::vector<float> beamPEinfo = m_algo.GetTotalPE( fPEThreshold , flashbins );
+    std::vector<float> vetoPEinfo = m_algo.GetTotalPE( fPEThreshold , vetobins );
+
+    float maxfrac     = m_algo.PMTMaxFrac( ophit_peaktime_v, ophit_pe_v, ophit_femch_v, beamPEinfo, fBinTickWidth,  fWinStartTick);
+
+    if ( beamPEinfo[0]>fPEThreshold && vetoPEinfo[0]<fPEThreshold && maxfrac < fPMTMaxFrac )
       return true;
   
     return false;

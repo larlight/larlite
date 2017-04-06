@@ -62,8 +62,7 @@ namespace larlite {
     int fVetoStartTick;
     int fVetoEndTick;    
     float fPEThreshold;    
-    
-    
+    float fPMTMaxFrac;
   };
 }
 #endif

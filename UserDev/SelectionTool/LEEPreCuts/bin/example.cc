@@ -24,7 +24,7 @@ int main(int argc, char** argv){
   man->open();
 
   int nevents = man->get_entries();
-  for ( int ientry=0; ientry<nevents; ientry++ ) {
+  for ( int ientry=0; ientry<100; ientry++ ) {
     man->go_to( ientry );
     bool pass = algo.analyze( man );
 
