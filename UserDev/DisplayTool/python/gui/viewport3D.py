@@ -73,12 +73,13 @@ class viewport3D(gl.GLViewWidget):
 
     self.drawBox(0,-halfheight,0,2*halfwidth,halfheight,length)
 
-
   def buildPaddleBox1(self):
-    self.drawBox(-71.795, 398.351, 531.45, -23.695, 398.451, 579.45)
+    self.drawBox(-71.795, 398.351, 531.45, -23.695, 398.451, 579.45) # regular
+    #self.drawBox(-75.19,391.55,971.12,-27.19,392.55,1019.12) # run 181
 
   def buildPaddleBox2(self):
-    self.drawBox(-19.6948, 320.05, 533.25, 28.3052, 320.15, 581.25)
+    self.drawBox(-19.6948, 320.05, 533.25, 28.3052, 320.15, 581.25) # regular
+    #self.drawBox(-27.19,319.551,971.12,20.81,320.551,1019.12)
 
   def drawBox(self, xmin, ymin, zmin, xmax, ymax, zmax):
 

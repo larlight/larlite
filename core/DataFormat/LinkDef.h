@@ -197,6 +197,7 @@
 #pragma link C++ class treenode+;
 
 #pragma link C++ class larlite::trigger+;
+#pragma link C++ class larlite::swtrigger+;
 
 #pragma link C++ class larlite::minos+;
 #pragma link C++ class std::vector<larlite::minos>+;

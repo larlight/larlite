@@ -836,6 +836,20 @@ void Geometry::GetOpDetPosition(const UInt_t i, Double_t *xyz) const
   return;
 }
 
+void Geometry::GetOpChannelPosition(const UInt_t i, std::vector<double>& xyz) const
+{
+  xyz.resize(3,0.);
+  GetOpChannelPosition(i,&xyz[0]);
+  return;
+}
+
+void Geometry::GetOpDetPosition(const UInt_t i, std::vector<double>& xyz) const
+{
+  xyz.resize(3,0.);
+  GetOpDetPosition(i,&xyz[0]);
+  return;
+}
+
 const std::vector<Double_t>& Geometry::PlaneOriginVtx(UChar_t plane)
 {
   if (plane >= fPlaneOriginVtx.size()) {

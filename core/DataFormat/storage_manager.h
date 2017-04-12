@@ -23,6 +23,7 @@
 #include "event_ass.h"
 namespace larlite {
   class trigger;
+  class swtrigger;
   class potsummary;
   class event_hit;
   class hit;
@@ -552,6 +553,7 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_mceventweight> () const;
   template<> data::DataType_t storage_manager::data_type<event_auxsimch> () const;
   template<> data::DataType_t storage_manager::data_type<event_chstatus> () const;
+  template<> data::DataType_t storage_manager::data_type<swtrigger> () const;
   template<> data::SubRunDataType_t storage_manager::subrundata_type<potsummary>() const;
 
   template<>

@@ -114,14 +114,13 @@ namespace larlite {
     /// A method to reset members
     void reset();
     
-  private:
-    
     /// A method to initialize and prepare for running analysis
     Bool_t initialize();
     
     /// A method to finalize data processing
     Bool_t finalize();
-    
+
+  private:
     std::vector<ana_base*>   _analyzers;  ///< A vector of analysis modules
     std::vector<bool>        _ana_status; ///< A vector of analysis modules' status
     std::vector<bool>   _filter_marker_v; ///< A vector to mark specific analysis unit as a filter
