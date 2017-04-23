@@ -28,6 +28,7 @@
 #pragma link C++ class larutil::LArUtilConfig+;
 #pragma link C++ class larutil::LArUtilManager+;
 #pragma link C++ class larutil::GeometryHelper+;
+#pragma link C++ class larutil::SpaceChargeMicroBooNE+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
