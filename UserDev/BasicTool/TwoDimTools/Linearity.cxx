@@ -8,13 +8,17 @@ namespace twodimtools {
   
   Linearity::Linearity()
   {
-    
+    _x_v.clear();
+    _y_v.clear();
     _r = 3.; // cm
   }
   
   Linearity::Linearity(const std::vector<double>& x_v, const std::vector<double>& y_v)
     :  Linearity()
   {
+
+    _x_v = x_v;
+    _y_v = y_v;
     
     linearity(x_v,y_v,true);
     
@@ -99,6 +103,9 @@ namespace twodimtools {
       r = r_num / r_den;
     if (r > 1.) r = 1.;
     if (r < -1) r = -1;
+
+    if (save)
+    _pearson = r;
     
     auto dof = datax.size() - 2;
     if (save)
@@ -124,11 +131,27 @@ namespace twodimtools {
     for (size_t i=0; i < datax.size(); i++){
       auto x = datax[i];
       auto y = datay[i];
-      sq += ( y - (intercept + slope * x) ) * ( y - (intercept + slope * x) ) * f * f;
+      auto sqval = ( y - (intercept + slope * x) ) * ( y - (intercept + slope * x) ) * f * f;
+      sq += sqval;
     }
-    
-    auto summed_square_variance = sqrt( sq / dof );
-    return summed_square_variance;
+    if (save)
+      _summed_square_variance = sqrt( sq / dof );
+
+    /*
+    // truncate SSV vector
+    //std::sort( _sq_v.begin(), _sq_v.end() );
+    _ssv_truncated = 0;
+    size_t n = _sq_v.size();
+    int ctr = 0;
+    for (size_t i = (size_t)(n * 0.5); i < _sq_v.size(); i++){
+      std::cout << "val = " << _sq_v[i] << std::endl;
+      _ssv_truncated += _sq_v[i];
+      ctr += 1;
+    }
+    _ssv_truncated = sqrt( _ssv_truncated / ctr );
+    */
+
+    return sqrt( sq / dof );
   }
   
   

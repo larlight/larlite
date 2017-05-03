@@ -36,6 +36,8 @@ namespace twodimtools {
     
     /// Default destructor
     ~Linearity(){}
+
+    void add_point(double x, double y) { _x_v.push_back(x); _y_v.push_back(y); }
     
     /// covariance, standard deviation, mean
     double cov (const std::vector<double>& data1,
@@ -49,9 +51,13 @@ namespace twodimtools {
     double linearity(const std::vector<double>& data1,
 		     const std::vector<double>& data2,
 		     bool save=false);
+
+    double linearity() { return linearity(_x_v,_y_v,true); }
     
     void local_linearity(const std::vector<double>& data1,
 			 const std::vector<double>& data2);
+
+    void local_linearity() { return local_linearity(_x_v,_y_v); }
     
     // local linearity radius
     double _r;
@@ -61,6 +67,7 @@ namespace twodimtools {
     double _covxx;
     double _covyy;
     double _covxy;
+    double _pearson;
     double _lin;
     double _meanx;
     double _meany;
@@ -70,6 +77,10 @@ namespace twodimtools {
     std::vector<double> _lin_v; // from local linearity
     double _local_lin_avg;
     double _local_lin_truncated_avg;
+    double _summed_square_variance;
+
+    std::vector<double> _x_v;
+    std::vector<double> _y_v;
     
     
   };
