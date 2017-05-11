@@ -126,16 +126,32 @@ namespace twodimtools {
     // calculate sum of squared
     // factor to offset vertical square disance
     // instad of perpendicular one
+    // also calculate uncertainty on slope (from: https://en.wikipedia.org/wiki/Simple_linear_regression)
     double f = cos( atan( slope ) );
     double sq = 0.;
+    double slope_err = 0.;
+    double ressum = 0.;
+    double xvarsum = 0.;
+    double xavg = 0.;
+    
+    for (auto const& x : datax) xavg += x;
+    xavg /= datax.size();
+    
     for (size_t i=0; i < datax.size(); i++){
       auto x = datax[i];
       auto y = datay[i];
-      auto sqval = ( y - (intercept + slope * x) ) * ( y - (intercept + slope * x) ) * f * f;
+      double res = y - (intercept + slope * x);
+      xvarsum += (x-xavg)*(x-xavg);
+      ressum += res*res;
+      auto sqval = res * res * f * f;
       sq += sqval;
     }
-    if (save)
+    slope_err = sqrt( 1 / (datax.size() - 2.) * ressum / xvarsum );
+    slope_err *= ::TMath::StudentQuantile(0.95,datax.size());
+    if (save){
       _summed_square_variance = sqrt( sq / dof );
+      _slope_err = slope_err;
+    }
 
     /*
     // truncate SSV vector

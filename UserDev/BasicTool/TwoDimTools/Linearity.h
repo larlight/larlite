@@ -17,6 +17,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include "TMath.h"
 
 namespace twodimtools {
   
@@ -63,6 +64,7 @@ namespace twodimtools {
     double _r;
     
     double _slope;
+    double _slope_err;
     double _intercept;
     double _covxx;
     double _covyy;
@@ -81,8 +83,7 @@ namespace twodimtools {
 
     std::vector<double> _x_v;
     std::vector<double> _y_v;
-    
-    
+
   };
 
 }
