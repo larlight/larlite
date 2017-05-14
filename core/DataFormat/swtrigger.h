@@ -17,6 +17,9 @@ namespace larlite {
  public:
     swtrigger(std::string name="noname"); // standard constructor
 
+    /// Clear method
+    void clear_data();
+
   void addAlgorithm(std::string name, bool pass, bool pass_prescale,
 		    uint32_t phmax, uint32_t multiplicity, uint32_t triggerTick, double triggerTime, float prescale);
 

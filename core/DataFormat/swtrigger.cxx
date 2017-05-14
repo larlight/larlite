@@ -9,6 +9,18 @@ larlite::swtrigger::swtrigger(std::string name)
   : event_base(data::kSWTrigger,name)
 {}
 
+void larlite::swtrigger::clear_data()
+{
+  event_base::clear_data();
+  passAlgo.clear();
+  passPrescale.clear();
+  PHMAX.clear();
+  multiplicity.clear();
+  triggerTick.clear();
+  triggerTime.clear();
+  prescale_weight.clear();
+}
+
 void larlite::swtrigger::addAlgorithm(std::string name_, bool pass_, bool pass_prescale_, uint32_t phmax_, uint32_t multiplicity_, uint32_t triggerTick_, double triggerTime_, float prescale_){
   std::pair<std::string, bool> tmp_pair;
   std::pair<std::string, bool> tmp_pair_prescale;
