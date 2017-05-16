@@ -79,8 +79,9 @@ bool DrawWire::analyze(larlite::storage_manager* storage) {
       const int FirstTick = iROI.begin_index();
       size_t i = 0;
       for (float ADC : iROI) {
-        _planeData.at(plane).at(offset + FirstTick + i) = ADC;
-        i ++;
+	if ( (offset + FirstTick + i) < _planeData.at(plane).size() )
+	  _planeData.at(plane).at(offset + FirstTick + i) = ADC;
+        i++;
       }
 
 

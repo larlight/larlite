@@ -22,7 +22,7 @@ QT_LIB = None
 ## Automatically determine whether to use PyQt or PySide.
 ## This is done by first checking to see whether one of the libraries
 ## is already imported. If not, then attempt to import PyQt4, then PySide.
-libOrder = [PYQT4, PYSIDE, PYQT5]
+libOrder = [PYSIDE, PYQT4, PYQT5]
 
 for lib in libOrder:
     if lib in sys.modules:
