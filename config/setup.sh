@@ -52,7 +52,16 @@ if [[ -z $USER_MODULE ]]; then
 fi
 
 # Check compiler availability for clang++ and g++
-LARLITE_CXX=clang++
+
+# are we running under a UPS system that has set up gcc explicitly?
+if [ -x "$GCC_FQ_DIR" ] ; then
+  # We're running a UPS distribution, likely build root with it. So let's use GCC
+  LARLITE_CXX=g++
+else
+  # Try the OSX default install
+  LARLITE_CXX=clang++
+fi
+
 if [ `command -v $LARLITE_CXX` ]; then
     export LARLITE_CXX="$LARLITE_CXX -std=c++11";
 else
