@@ -1,5 +1,5 @@
 #ifndef LARLITE_ROI_CXX
-#define LARLITE_roi_CXX
+#define LARLITE_ROI_CXX
 
 #include "roi.h"
 #include <iostream>
