@@ -115,8 +115,8 @@ namespace larlite{
   class simphotons;
   class event_simphotons;
 
-  class PiZeroROI;
-  class event_PiZeroROI;
+  class roi;
+  class event_roi;
 
   class mceventweight;
   class event_mceventweight;

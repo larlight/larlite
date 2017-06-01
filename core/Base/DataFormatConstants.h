@@ -91,7 +91,7 @@ namespace larlite{
       kSimPhotons,         ///< sim::SimPhotons
       kMuCSData,           ///< MuCS::MuCSData
       kMuCSReco,           ///< MuCS::MuCSReco
-      kPiZeroROI,
+      kROI,
       kAuxDetSimChannel,   ///< sim::AuxDetSimChannel
       kChStatus,           ///< larlite::chstatus
       kT0,                 ///< larlite::t0
@@ -157,7 +157,7 @@ namespace larlite{
       "simphotons",
       "mucsdata",
       "mucsreco",
-      "PiZeroROI",
+      "ROI",
       "auxsimch",
       "chstatus",
       "t0",
