@@ -148,7 +148,7 @@ namespace flashana {
     
     // Estimate position
     FlashMatch_t res;
-    if (isnan(_qll)) return res;
+    if (std::isnan(_qll)) return res;
     
     res.tpc_point.x = res.tpc_point.y = res.tpc_point.z = 0;
     
