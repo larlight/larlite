@@ -5,7 +5,7 @@
  * 
  * \brief Class def header for a class MCPi0Clusterer
  *
- * @author david caratelli, + adjusted for spcecharge ahack
+ * @author david caratelli
  */
 
 /** \addtogroup MCComp
