@@ -220,7 +220,7 @@ namespace twodimtools {
     size_t n = _lin_v.size();
     int ctr = 0;
     for (size_t i = (size_t)(n * 0.25); i < (size_t)(n * 0.75); i++){
-      if ( isnan(_lin_v[i]) ) continue;
+      if ( std::isnan(_lin_v[i]) ) continue;
       _local_lin_truncated_avg += _lin_v[i];
       ctr += 1;
     }
