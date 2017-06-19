@@ -59,6 +59,10 @@ namespace twodimtools {
 			 const std::vector<double>& data2);
 
     void local_linearity() { return local_linearity(_x_v,_y_v); }
+
+    std::pair<double,double> IPrange(const double& xval, const double& yval);
+  
+    double IP(const double& xval, const double& yval);
     
     // local linearity radius
     double _r;
