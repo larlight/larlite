@@ -220,7 +220,7 @@ namespace twodimtools {
     size_t n = _lin_v.size();
     int ctr = 0;
     for (size_t i = (size_t)(n * 0.25); i < (size_t)(n * 0.75); i++){
-      if ( isnan(_lin_v[i]) ) continue;
+      if ( std::isnan(_lin_v[i]) ) continue;
       _local_lin_truncated_avg += _lin_v[i];
       ctr += 1;
     }
@@ -231,6 +231,21 @@ namespace twodimtools {
       _local_lin_truncated_avg = 1.0;
 
     return;
+  }
+
+  std::pair<double,double> Linearity::IPrange(const double& xval, const double& yval) {
+
+    double IPup = ( - (_slope + _slope_err) * xval + yval - _intercept ) / sqrt( (_slope + _slope_err) * (_slope + _slope_err) + 1 );
+    double IPdn = ( - (_slope - _slope_err) * xval + yval - _intercept ) / sqrt( (_slope - _slope_err) * (_slope - _slope_err) + 1 );
+    
+    if (IPup > IPdn) return std::make_pair(IPdn,IPup);
+    return std::make_pair(IPup,IPdn);
+  }
+  
+  double Linearity::IP(const double& xval, const double& yval) {
+
+    double IP = ( - _slope * xval + yval - _intercept ) / sqrt( _slope * _slope + 1 );
+    return IP;
   }
 
 }// namespace
