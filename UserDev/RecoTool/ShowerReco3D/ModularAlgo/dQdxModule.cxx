@@ -156,8 +156,12 @@ void dQdxModule::do_reconstruction(const ::protoshower::ProtoShower & proto_show
 
       double Q = _caloAlg.ElectronsFromADCArea( hit.charge, pl);
       Q *= lifetimeCorr;
+
+      Q = hit.charge * 0.0077;
+      
       //double Q = hit.charge * _charge_conversion;
-      if (dist_hit_clu <= 2.4 || dist_hit_clu < trunk_length[pl]) {
+      //if (dist_hit_clu <= 2.4 || dist_hit_clu < trunk_length[pl]) {
+      if (dist_hit_clu <= 2.4){
 
         if (trunk_length[pl] == 0 || dist_hit_clu * dist_hit_shr == 0) {
           dQdx_v[pl].push_back(Q / _pitch);

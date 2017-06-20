@@ -180,35 +180,16 @@ void ProtoShowerAlgClusterParams::GenerateProtoShower(
   // 3D Vertex reconstruction
   //*********************************
 
-
   // Do the vertex:
-  larlite::event_vertex * ev_vertex = nullptr;
-  auto const& ass_vertex_v
-    = storage->find_one_ass(ev_pfpart->id(),
-                            ev_vertex,
-                            ev_pfpart->name());
+  auto ev_vertex = storage->get_data<::larlite::event_vertex>("mcvertex");
 
-  if (ev_vertex and (ev_vertex->size() != 0) ) {
-    // fill vertices, if any associated
-    std::vector< ::larlite::vertex > vtx_v;
-    if ( ev_vertex && ev_vertex -> size() != 0) {
-      auto & vtx_idx_v = ass_vertex_v.at(proto_shower_pfpart);
-      for (auto idx : vtx_idx_v) {
-        // double xyz[3];
-        vtx_v.push_back( ev_vertex->at(idx) );
-      }
-    }// if there are vertices
-    // fill vertex information
-    if (vtx_v.size() == 0)
-      proto_shower.hasVertex(false);
-    else {
-      for (auto const& vtx : vtx_v) {
-        double xyz[3];
-        vtx.XYZ(xyz);
-        proto_shower._vertexes.push_back(TVector3(xyz[0], xyz[1], xyz[2]));
-      }
-      proto_shower.hasVertex(true);
-    }
+  if (ev_vertex and (ev_vertex->size() == 1) ) {
+
+    proto_shower.hasVertex(true);
+    auto const& vtx = ev_vertex->at(0);
+    double xyz[3];
+    vtx.XYZ(xyz);
+    proto_shower._vertexes.push_back( TVector3(xyz[0],xyz[1],xyz[2]) );
   }// if there is vertex info
   else
     proto_shower.hasVertex(false);

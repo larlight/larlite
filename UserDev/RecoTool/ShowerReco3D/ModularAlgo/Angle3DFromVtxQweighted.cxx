@@ -37,7 +37,7 @@ namespace showerreco {
       return;
     }
 
-    // take the vtx -> start point direction as the 3D direction
+    // take the vtx for the neutrino interaction
     auto const& vtx = vtx3D_v[0];
 
     std::vector<double> dir3D = {0,0,0};

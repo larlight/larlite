@@ -2,15 +2,15 @@
 #define STARTPOINT3DMODULE_CXX
 
 #include "StartPoint3DModule.h"
+
 #include "LArUtil/Geometry.h"
 #include "LArUtil/GeometryHelper.h"
 #include "LArUtil/DetectorProperties.h"
 
 namespace showerreco {
 
-void StartPoint3DModule::do_reconstruction(
-    const ::protoshower::ProtoShower & proto_shower,
-    Shower_t& resultShower)
+  void StartPoint3DModule::do_reconstruction( const ::protoshower::ProtoShower & proto_shower,
+					      Shower_t& resultShower)
 {
 
     //if the module does not have 2D cluster info -> fail the reconstruction
@@ -53,7 +53,9 @@ void StartPoint3DModule::do_reconstruction(
 
     std::vector<int> wireStarts(0) ;
     std::vector<int> planes(0) ;
+    
     auto geom  = larutil::Geometry::GetME();
+    auto geomH = larutil::GeometryHelper::GetME();
 
     for ( auto const c : clusters ) {
 
@@ -74,12 +76,18 @@ void StartPoint3DModule::do_reconstruction(
       ss << "Fail @ algo " << this->name() << " due to too few (1) 2D start points";
       throw ShowerRecoException(ss.str());
     }
-    
+
+    // check start/end point range
+    if ( (wireStarts.at(0) < 0) or (wireStarts.at(0) > geom->Nwires(planes.at(0))) or
+	 (wireStarts.at(1) < 0) or (wireStarts.at(1) > geom->Nwires(planes.at(1))) ) {
+      std::stringstream ss;
+      ss << "Fail @ algo " << this->name() << " due to wires out of range";
+      throw ShowerRecoException(ss.str());
+    } 
+
     geom->IntersectionPoint(wireStarts.at(0) , wireStarts.at(1) , planes.at(0), planes.at(1), sY, sZ );
 
-    // check if reconstructed start point is outside of TPC volume
-    auto geomH = larutil::GeometryHelper::GetME();
-    
+    // check if reconstructed start point is outside of TPC volume    
     if (geomH->ContainedYZ(sY, sZ) == false){
       std::stringstream ss;
       ss << "Fail @ algo " << this->name() << " due to start point reconstructed out of TPC bouns";
