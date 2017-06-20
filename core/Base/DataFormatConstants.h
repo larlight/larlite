@@ -91,11 +91,12 @@ namespace larlite{
       kSimPhotons,         ///< sim::SimPhotons
       kMuCSData,           ///< MuCS::MuCSData
       kMuCSReco,           ///< MuCS::MuCSReco
-      kPiZeroROI,
+      kROI,
       kAuxDetSimChannel,   ///< sim::AuxDetSimChannel
       kChStatus,           ///< larlite::chstatus
       kT0,                 ///< larlite::t0
       kMCEventWeight,      ///< evwgh::MCEventWeight
+      kSWTrigger,          ///< larlite::swtrigger
       kDATA_TYPE_MAX       ///< Event-wise enum boundary
     };
 
@@ -156,11 +157,12 @@ namespace larlite{
       "simphotons",
       "mucsdata",
       "mucsreco",
-      "PiZeroROI",
+      "ROI",
       "auxsimch",
       "chstatus",
       "t0",
-      "mceventweight"
+      "mceventweight",
+      "swtrigger"
     };
 
     const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {

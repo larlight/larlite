@@ -57,8 +57,9 @@ robertmurrells@gmail.com
     
     Double_t bin_size;
     
-    std::vector<Double_t> gs[4][4];
-    std::vector<Double_t> mb[4][4];
+    double fCV[4][4][200];
+    double fRW[4][4][200];
+
     
   };
 

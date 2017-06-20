@@ -41,11 +41,11 @@
 #include "simphotons.h"
 #include "mucsdata.h"
 #include "mucsreco.h"
-#include "PiZeroROI.h"
+#include "roi.h"
 #include "auxsimch.h"
 #include "chstatus.h"
 #include "mceventweight.h"
-
+#include "swtrigger.h"
 namespace larlite {
 
   storage_manager* storage_manager::me=0;
@@ -1154,8 +1154,8 @@ namespace larlite {
     case data::kMCTrack:
       _ptr_data_array[type][name]=new event_mctrack(name);
       break;
-    case data::kPiZeroROI:
-      _ptr_data_array[type][name]=new event_PiZeroROI(name);
+    case data::kROI:
+      _ptr_data_array[type][name]=new event_roi(name);
       break;
     case data::kMCTree:
       _ptr_data_array[type][name]=new event_mctree(name);
@@ -1192,6 +1192,9 @@ namespace larlite {
       break;
     case data::kMCEventWeight:
       _ptr_data_array[type][name]=new event_mceventweight(name);
+      break;
+    case data::kSWTrigger:
+      _ptr_data_array[type][name]=new swtrigger(name);
       break;
     default:
       print(msg::kERROR,__FUNCTION__,Form("Event-data identifier not supported: %d",(int)type));

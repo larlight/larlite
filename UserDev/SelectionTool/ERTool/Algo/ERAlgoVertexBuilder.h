@@ -24,6 +24,8 @@
 
 #include "ERTool/Algo/AlgoFindRelationship.h"
 
+#include "ParticleAssociations.h"
+
 #include "TTree.h"
 
 namespace ertool {
@@ -62,9 +64,13 @@ namespace ertool {
     std::string const mostenergy = "mostenergy";
     std::string const mostenergy_lone = "mostenergylone";
     std::string const smallestsphere = "smallestsphere";
-    std::string const trackdirection = "trackdirection";
+    std::string const withshower = "withshower";
+
+    ParticleAssociations pa;
 
   public:
+
+
 
     /// Default constructor
     ERAlgoVertexBuilder
@@ -86,20 +92,20 @@ namespace ertool {
     /// Reset function
     void Reset();
 
+    ParticleAssociations const * GetParticleAssociations() const {return &pa;}
+
     /// Function to accept fclite::PSet
     void AcceptPSet(const ::fcllite::PSet& cfg);
 
     /// Called @ before processing the first event sample
     void ProcessBegin();
 
-    class ParticleAssociation;
-    class ParticleAssociations;
-    class ParticleGraphSetter;
-
     friend ParticleAssociation;
     friend ParticleAssociations;
-    friend ParticleGraphSetter;
 
+    class ParticleGraphSetter;
+    friend ParticleGraphSetter;
+    
     void EndReconstruct(ParticleGraph const & graph);
 
     geoalgo::Point_t const * GetUpstreamPrimary
@@ -145,6 +151,12 @@ namespace ertool {
        Bool_t const lone = false,
        Bool_t * first = nullptr);
 
+    geoalgo::Point_t const * GetShowerVertex
+      (ParticleGraph & graph,
+       ParticleAssociations const & pas, 
+       std::vector<Int_t> const & skip,
+       Int_t & index);
+    
     void AddAllLoneTracks
       (const EventData &data,
        ParticleGraph & graph,

@@ -248,6 +248,12 @@ public:
     /// Return optical detector vertex
     void GetOpDetPosition(const UInt_t i, Double_t *xyz) const;
 
+    /// Return optical channel vertex
+    void GetOpChannelPosition(const UInt_t i, std::vector<double>& xyz) const;
+
+    /// Return optical detector vertex
+    void GetOpDetPosition(const UInt_t i, std::vector<double>& xyz) const;
+
     const std::vector<Double_t>& PlaneOriginVtx(UChar_t plane);
 
     void PlaneOriginVtx(UChar_t plane, Double_t *vtx) const;

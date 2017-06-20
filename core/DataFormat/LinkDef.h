@@ -161,9 +161,9 @@
 #pragma link C++ class std::vector<larlite::mctrack>+;
 #pragma link C++ class larlite::event_mctrack+;
 
-#pragma link C++ class larlite::PiZeroROI+;
-#pragma link C++ class std::vector<larlite::PiZeroROI>+;
-#pragma link C++ class larlite::event_PiZeroROI+;
+#pragma link C++ class larlite::roi+;
+#pragma link C++ class std::vector<larlite::roi>+;
+#pragma link C++ class larlite::event_roi+;
 
 #pragma link C++ class larlite::mceventweight+;
 #pragma link C++ class std::vector<larlite::mceventweight>+;
@@ -197,6 +197,7 @@
 #pragma link C++ class treenode+;
 
 #pragma link C++ class larlite::trigger+;
+#pragma link C++ class larlite::swtrigger+;
 
 #pragma link C++ class larlite::minos+;
 #pragma link C++ class std::vector<larlite::minos>+;
