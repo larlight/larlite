@@ -14,7 +14,6 @@
 #include "DataFormat/spacepoint.h"
 #include "DataFormat/seed.h"
 #include "DataFormat/vertex.h"
-#include "DataFormat/PiZeroROI.h"
 
 namespace protoshower {
 
