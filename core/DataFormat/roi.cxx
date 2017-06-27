@@ -9,6 +9,9 @@
 
 namespace larlite{
 
+  roi::roi() : data_base(data::kROI)
+  { clear_data(); }
+
   void roi::clear_data(){
     _time_range.clear();
     _wire_range.clear();
@@ -120,11 +123,13 @@ namespace larlite{
   }
   
   
-  std::vector < std::pair <int, int > > roi::GetVertex() const { return _vtx; }
-
-  std::vector < std::pair< int, int > > roi::GetWireROI() const { return _wire_range; }
+  const std::vector < std::pair <int, int > >& roi::GetVertex() const { return _vtx; }
   
-  std::vector < std::pair< int, int > > roi::GetTimeROI() const { return  _time_range; }
+  const std::vector < std::pair< int, int > >& roi::GetWireROI() const { return _wire_range; }
+  
+  const std::vector < std::pair< int, int > >& roi::GetTimeROI() const { return  _time_range; }
+
+  event_roi::event_roi(std::string name) : event_base(data::kROI,name) { clear_data(); }
 
 }
 

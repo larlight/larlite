@@ -28,8 +28,7 @@ namespace larlite{
     /// Default destructor
     virtual ~roi(){};
     
-  roi() : data_base(data::kROI)
-      { clear_data(); }
+    roi();
     
     roi(const std::vector < std::pair< int, int > > Wire,
 	const std::vector < std::pair< int, int > > Time);
@@ -51,9 +50,9 @@ namespace larlite{
     void SetVertex( const std::vector< std::pair <int, int> > vtx);
     
     // Here are the Getters
-    std::vector < std::pair< int, int > > GetVertex()  const;
-    std::vector < std::pair< int, int > > GetWireROI() const;
-    std::vector < std::pair< int, int > > GetTimeROI() const;
+    const std::vector < std::pair< int, int > >& GetVertex()  const;
+    const std::vector < std::pair< int, int > >& GetWireROI() const;
+    const std::vector < std::pair< int, int > >& GetTimeROI() const;
 
 
   private:
@@ -74,7 +73,7 @@ namespace larlite{
   public:
     
     /// Default constructor
-    event_roi(std::string name="noname") : event_base(data::kROI,name) { clear_data(); }
+    event_roi(std::string name="noname");
     
     /// Default copy constructor
     event_roi(const event_roi& original) : std::vector<larlite::roi>(original), event_base(original)
