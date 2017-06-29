@@ -66,7 +66,7 @@ def getShowerRecoAlgModular():
 
     shrFilter = showerreco.FilterShowers()
     shrFilter.setAngleCut(15.)
-    shrFilter.setVerbosity(False)
+    shrFilter.setVerbosity(True)
 
     alg.AddShowerRecoModule( filteralgo )
     alg.AddShowerRecoModule(angle3D)
@@ -133,18 +133,18 @@ ana_unit.SetOutputProducer("showerreco")
 
 my_proc.add_process(ana_unit)
 
-my_proc.set_data_to_write(fmwk.data.kMCTruth,     "generator")
-my_proc.set_data_to_write(fmwk.data.kMCShower,    "mcreco")
-my_proc.set_data_to_write(fmwk.data.kMCShower,     "mcreco")
-my_proc.set_data_to_write(fmwk.data.kVertex,       "sel2")
-my_proc.set_data_to_write(fmwk.data.kShower,       "showerreco")
-my_proc.set_data_to_write(fmwk.data.kAssociation,  "showerreco")
+#my_proc.set_data_to_write(fmwk.data.kMCTruth,     "generator")
+#my_proc.set_data_to_write(fmwk.data.kMCShower,    "mcreco")
+#my_proc.set_data_to_write(fmwk.data.kMCShower,     "mcreco")
+#my_proc.set_data_to_write(fmwk.data.kVertex,       "sel2")
+#my_proc.set_data_to_write(fmwk.data.kShower,       "showerreco")
+#my_proc.set_data_to_write(fmwk.data.kAssociation,  "showerreco")
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
-my_proc.run()
+my_proc.run(324,1)
 # my_proc.process_event(2)
 
 

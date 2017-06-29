@@ -133,14 +133,19 @@ namespace showerreco {
       std::stringstream ss;
       ss << "Fail @ algo " << this->name() << " due to wires out of range";
       throw ShowerRecoException(ss.str());
-    } 
+    }
 
+    if (_verbose)
+      std::cout << "pl " << pl0 << " wire : " << w0
+		<< "pl " << pl1 << " wire : " << w1 << std::endl;
+    
     geom->IntersectionPoint( w0, w1, pl0, pl1, sY, sZ);
 
     // check if reconstructed start point is outside of TPC volume    
     if (geomH->ContainedYZ(sY, sZ) == false){
       std::stringstream ss;
-      ss << "Fail @ algo " << this->name() << " due to start point reconstructed out of TPC bouns";
+      ss << "Fail @ algo " << this->name() << " due to start point reconstructed out of TPC bouns : [Y,Z] -> ["
+	 << sY << ", " << sZ << " ]" ; 
       throw ShowerRecoException(ss.str());
     }
 

@@ -131,7 +131,7 @@ namespace protoshower {
 
 
     // Do the vertex:
-    auto ev_vertex = storage->get_data<::larlite::event_vertex>("mcvertex");
+    auto ev_vertex = storage->get_data<::larlite::event_vertex>("sel2");
     
     if (ev_vertex and (ev_vertex->size() == 1) ) {
       
