@@ -59,6 +59,8 @@ namespace twodimtools {
     /// return polygon perimeter
     float Perimeter() const;
     /// boolean: do these polygons overlap?
+    bool Overlap(const Poly2D &poly2) const;
+    /// boolean: do these polygons overlap?
     bool PolyOverlap(const Poly2D &poly2) const;
     /// boolean: is a point inside the polygon?
     bool PointInside(const std::pair<float,float> &point) const;

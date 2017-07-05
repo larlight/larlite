@@ -190,11 +190,30 @@ namespace twodimtools {
     }
     return range;
   }
+
+  //---------------------------------------------------------------
+  bool Poly2D::Overlap(const Poly2D& poly2) const
+    
+  {
+    
+    bool overlap = false;
+
+    
+    for (size_t j=0; j < poly2.Size(); j++){
+      
+      if ( this->PointInside(poly2.Point(j)) == true) {
+	overlap = true;
+	break;
+      }
+    }
+
+    return overlap;
+  }
   
   //---------------------------------------------------------------
   bool Poly2D::Overlap(float slope,
-			  const Poly2D &poly2,
-			  const std::pair<float, float> &origin) const
+		       const Poly2D &poly2,
+		       const std::pair<float, float> &origin) const
   {
     //translate and rotate both polygons
     float theta = tan(slope);
