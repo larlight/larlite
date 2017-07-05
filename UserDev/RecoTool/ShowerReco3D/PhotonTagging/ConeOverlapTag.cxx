@@ -112,11 +112,12 @@ namespace larlite {
     // create polygon objects for each photon cluster.
     for (size_t p=0; p < ev_photon->size(); p++){
 
-      if (_debug) { std::cout << "new photon" << std::endl; }
-
       // get assciated hits
       auto const& photon_hit_idx_v = ass_photon_hit_v.at(p);
 
+      // is this photon on the collection-plane? if not skip
+      if (ev_hit_photon->at( photon_hit_idx_v[0] ).WireID().Plane != 2) continue;
+      
       // create linearity objects
       std::vector<double> hit_w_v;
       std::vector<double> hit_t_v;
@@ -206,7 +207,7 @@ namespace larlite {
       projectShower(shr);
       
       // loop over 3 planes
-      for (size_t pl=2; pl < 3; pl++) {
+      for (size_t pl=0; pl < 3; pl++) {
 
 	if (_debug) { std::cout << "get shower polygon for plane " << pl << std::endl; }
 
@@ -221,7 +222,7 @@ namespace larlite {
 	
 	// loop over photons for this plane
 	if (_debug) { std::cout << "loop over photons " << std::endl; }
-	
+
 	for (auto const& photonPoly : _photon_poly_v.at(pl) ) {
 	  
 	  // check the number of hits in the cluster

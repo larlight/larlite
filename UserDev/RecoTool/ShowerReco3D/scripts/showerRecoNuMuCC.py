@@ -123,12 +123,13 @@ my_proc.set_output_file("showerRecoUboone_data_debug.root")
 ana_unit=DefaultShowerReco3D()
 # set ProtoShower Algo to go from data-products to a ProtoShower object
 protoshoweralg = protoshower.ProtoShowerAlgCMTool()
-protoshoweralgo.SetVertexProducer("mcvertex")
+protoshoweralg.SetVertexProducer("mcvertex")
 #protoshoweralg = protoshower.ProtoShowerAlgOpenCV()
 ana_unit.GetProtoShowerHelper().setProtoShowerAlg( protoshoweralg )
 
 #ana_unit.SetInputProducer("ImageClusterHit")
-ana_unit.SetInputProducer("iou")
+#ana_unit.SetInputProducer("iou")
+ana_unit.SetInputProducer("coneshower")
 
 ana_unit.SetOutputProducer("showerreco")
 
@@ -137,7 +138,7 @@ my_proc.add_process(ana_unit)
 my_proc.set_data_to_write(fmwk.data.kMCTruth,     "generator")
 my_proc.set_data_to_write(fmwk.data.kMCShower,    "mcreco")
 my_proc.set_data_to_write(fmwk.data.kMCShower,     "mcreco")
-my_proc.set_data_to_write(fmwk.data.kVertex,       "sel2")
+my_proc.set_data_to_write(fmwk.data.kVertex,       "mcvertex")
 my_proc.set_data_to_write(fmwk.data.kShower,       "showerreco")
 my_proc.set_data_to_write(fmwk.data.kAssociation,  "showerreco")
 
