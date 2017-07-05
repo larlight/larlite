@@ -40,12 +40,15 @@ hitproducer = 'gaushit'
 
 clusterer = fmwk.ConeOverlapTag()
 clusterer.setShowerProducer("showerreco")
-clusterer.setPhotonProducer("rawcluster")
+clusterer.setPhotonProducer("photon")
 clusterer.setOutPFPartProducer("coneshower")
 clusterer.setOutClusterProducer("coneshower")
 clusterer.setDebug(False)
 clusterer.setTickOffset(800)
-clusterer.setShrLen(100.)
+clusterer.setShrLen(150.)
+clusterer.setShrWidth(20)
+clusterer.setMaxQFracAdd(0.5)
+clusterer.setMaxPhotonAngle(50)
 
 my_proc.add_process(clusterer)
 
