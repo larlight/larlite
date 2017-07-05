@@ -53,8 +53,8 @@ def getShowerRecoAlgModular():
     energy = showerreco.LinearEnergy()
     energy.SetElectronLifetime(1e6  ) # in us DATA value
     energy.SetRecombFactor(0.62)
-    energy.SetElecGain(243.) # MCC8.0 data
-    #energy.SetElecGain(200.) # MCC8.0 value
+    #energy.SetElecGain(243.) # MCC8.0 data
+    energy.SetElecGain(200.) # MCC8.0 value
     energy.setVerbosity(False)
     energy.SetFillTree(True)
 
@@ -123,6 +123,7 @@ my_proc.set_output_file("showerRecoUboone_data_debug.root")
 ana_unit=DefaultShowerReco3D()
 # set ProtoShower Algo to go from data-products to a ProtoShower object
 protoshoweralg = protoshower.ProtoShowerAlgCMTool()
+protoshoweralgo.SetVertexProducer("mcvertex")
 #protoshoweralg = protoshower.ProtoShowerAlgOpenCV()
 ana_unit.GetProtoShowerHelper().setProtoShowerAlg( protoshoweralg )
 

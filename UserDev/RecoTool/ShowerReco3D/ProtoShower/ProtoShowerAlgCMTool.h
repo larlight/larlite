@@ -44,11 +44,15 @@ public:
                            const size_t proto_shower_pfpart,
                            protoshower::ProtoShower & proto_shower);
 
+  void SetVertexProducer(std::string s) { _vtx_producer = s; }
 
 private:
 
   ::cluster::ClusterParamsAlg * _params_alg;
   ::cluster::CRUHelper _cru_helper;
+
+  // vertex producer
+  std::string _vtx_producer;
 
 };
 
