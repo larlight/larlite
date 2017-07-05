@@ -15,7 +15,13 @@
 
 namespace larlite {
 
-  bool ConeOverlapTag::initialize() {
+  ConeOverlapTag::ConeOverlapTag() {
+
+    _name="ConeOverlapTag";
+
+    _fout=0;
+
+    _debug=false;
 
     auto geomH = larutil::GeometryHelper::GetME();
     
@@ -23,7 +29,13 @@ namespace larlite {
     _t2cm = geomH->TimeToCm();
 
     _shrLen = 100.;
+    _width  = -1;
     _tick_offset = 800;
+    _max_slope_angle = 90;
+
+  }
+
+  bool ConeOverlapTag::initialize() {
 
     return true;
   }
@@ -105,6 +117,10 @@ namespace larlite {
       // get assciated hits
       auto const& photon_hit_idx_v = ass_photon_hit_v.at(p);
 
+      // create linearity objects
+      std::vector<double> hit_w_v;
+      std::vector<double> hit_t_v;
+      
       // get polygon
       std::vector<larutil::Hit2D> photon_hit2d_v;
       for (auto const& hit_idx: photon_hit_idx_v){
@@ -116,9 +132,10 @@ namespace larlite {
 	hit2d.charge = hit.Integral();
 	hit2d.peak   = hit.PeakAmplitude();
 	photon_hit2d_v.push_back( hit2d );
+	hit_w_v.push_back( hit2d.w);
+	hit_t_v.push_back( hit2d.t);
       }// for all hits in photon cluster
       std::vector<const larutil::Hit2D*> polygonEdges;
-      if (_debug) { std::cout << "find edges for polygon of " << photon_hit2d_v.size() << " hits" << std::endl; }
       geomH->SelectPolygonHitList(photon_hit2d_v, polygonEdges, 0.95);
       //now making Polygon Object
       std::pair<float, float> tmpvertex;
@@ -129,10 +146,11 @@ namespace larlite {
 				    polygonEdges.at(i)->t );
 	vertices.push_back( tmpvertex );
       }// for all polygon edges
-      if (_debug) { std::cout << "making polygon with " << vertices.size() << " vertices" << std::endl; }
-      twodimtools::Poly2D thispoly( vertices );
-      std::pair<size_t, twodimtools::Poly2D> polyinfo(p, thispoly);
+      twodimtools::Poly2D    thispoly( vertices );
+      twodimtools::Linearity thislin( hit_w_v, hit_t_v );
+      std::pair<size_t, twodimtools::Poly2D>    polyinfo(p, thispoly);
       _photon_poly_v.at( photon_hit2d_v.at(0).plane ).push_back( polyinfo );
+      _photon_lin_map[ p ] = thislin;
       
     }// for all photon clusters
       
@@ -188,42 +206,62 @@ namespace larlite {
       projectShower(shr);
       
       // loop over 3 planes
-      for (size_t pl=0; pl < 3; pl++) {
+      for (size_t pl=2; pl < 3; pl++) {
 
 	if (_debug) { std::cout << "get shower polygon for plane " << pl << std::endl; }
+
 	auto const& shrPoly = _shr_polygon_v.at(pl);
 
 	if (_debug) { std::cout << "hits on plane before merging : " << shr_hit_ass_idx_v.at(pl).size() << std::endl; }
 
 	if (_debug) { std::cout << "polygon has size : " << shrPoly.Size() << std::endl; }
+	
 	// if no hits associated on this plane -> skip
 	if (shr_hit_ass_idx_v.at(pl).size() == 0) continue;
 	
 	// loop over photons for this plane
 	if (_debug) { std::cout << "loop over photons " << std::endl; }
+	
 	for (auto const& photonPoly : _photon_poly_v.at(pl) ) {
-	  if (_debug) { std::cout << "\t\t new photon with " << photonPoly.second.Area() << " area" << std::endl; }
-	  // are they compatible?
-	  bool overlap = false;
-	  for (size_t j=0; j < photonPoly.second.Size(); j++){
-	    if ( shrPoly.PointInside(photonPoly.second.Point(j)) == true) {
-	      overlap = true;
-	      if (_debug) { std::cout << "\t\t overlap!" << std::endl; }
-	      break;
-	    }
+	  
+	  // check the number of hits in the cluster
+	  auto nhits = ass_photon_hit_v.at(photonPoly.first).size();
+
+	  if (_debug) { std::cout << "\n\n\t\t new photon with " << nhits << " hits" << std::endl; }
+	  
+	  // apply cut on fraction of photon chareg (# of hits here) that can be added to existing shower
+	  if (nhits > (shr_hit_ass_idx_v.at(pl).size() * _frac_shr_q) ) continue;
+
+	  // get linearity
+	  auto photonLin = _photon_lin_map[ photonPoly.first ];
+
+	  // do the polygons overlap?
+	  bool overlap = ( shrPoly.Overlap( photonPoly.second) || shrPoly.Contained( photonPoly.second) );
+
+	  if (overlap == false) {
+	    if (_debug) std::cout << "\t no overlap w/ shower cone... continue" << std::endl;
+	    continue;
 	  }
-	  if ( shrPoly.Contained(photonPoly.second) ) {
-	    overlap = true;
-	    if (_debug) { std::cout << "\t\t contained!" << std::endl; }
-	  }
-	  if (overlap){
-	    // get set of hits to add (removing potential duplicates)
-	    mergeHits( shr_hit_ass_idx_v.at(pl), ass_photon_hit_v.at(photonPoly.first) );
-	    if (_debug) { std::cout << "\t\t hits merged. there are " << shr_hit_ass_idx_v.at(pl).size() << " hits." << std::endl; }
-	  }//if ovelrap
+
+	  // for large clusters, add extra checks
+	  if (nhits > 8) {
+	    
+	    // apply cut on slope agreement
+	    if (slopeCompat( shrPoly, photonLin) > _max_slope_angle) continue;
+	    
+	    // make sure the photon doesn't extend on both sides of the shower cone
+	    if (photonCrossesShower(shrPoly, photonPoly.second) == true) continue;
+
+	  }// if cluster is large
+
+	  // made it this far -> merge the photon with the shower
+	  
+	  // get set of hits to add (removing potential duplicates)
+	  mergeHits( shr_hit_ass_idx_v.at(pl), ass_photon_hit_v.at(photonPoly.first) );
+	  if (_debug) { std::cout << "\t\t hits merged. there are " << shr_hit_ass_idx_v.at(pl).size() << " hits." << std::endl; }
 	  
 	}// compatible showers
-
+	
 	// create cluster with newly identified shower hits on this plane
 	// new hit indices for this cluster
 	auto const& new_hit_idx_v = shr_hit_ass_idx_v.at(pl);
@@ -260,7 +298,7 @@ namespace larlite {
     
     return true;
   }
-
+  
   bool ConeOverlapTag::finalize() {
 
     return true;
@@ -275,9 +313,11 @@ namespace larlite {
     _shr_polygon_v.clear();
     _shr_polygon_v.resize(geom->Nplanes());
 
-    auto const& start  = shr.ShowerStart();
-    auto const& dir    = shr.Direction();
-    auto const& oangle = shr.OpeningAngle();
+    auto start  = shr.ShowerStart();
+    auto dir    = shr.Direction();
+    auto oangle = shr.OpeningAngle();
+    if (_width > 0) oangle = _width * 3.14 / 180.;
+      
 
     auto const& end = start + _shrLen * dir;
 
@@ -295,13 +335,18 @@ namespace larlite {
       triangle_coordinates.push_back( std::pair<float,float>(start_pl.w, start_pl.t) );
 
       // figure out how far to go on each side.
-      double shrWidth = _shrLen * tan(oangle * 2.);
+      double shrWidth = _shrLen * fabs(tan(oangle));
 
       // unlike length, width is not stretched or compressed on projection.
       // extend end-point "left" and "right" by one width to complete triangle
       // extend in direction perpendicular to line connecting start_pl and end_pl
       double slope = -1. / ( (end_pl.t - start_pl.t) / (end_pl.w - start_pl.t) );
-      //double intrc = end_pl.t - slope * end_pl.w;
+      if (_debug)
+	{
+	  std::cout << "\t End pt  = [ "  << end_pl.w << ", " << end_pl.t << " ]" << std::endl;
+	  std::cout << "\t SLOPE = " << slope << std::endl;
+	  std::cout << "\t WIDTH = " << shrWidth << std::endl;
+	}
 
       // find triangle base coordinate points
       double pt1_w = end_pl.w + sqrt( shrWidth / (1 + slope*slope) );
@@ -318,16 +363,111 @@ namespace larlite {
 		  << "\t Pt1    @ [ " << pt1_w      << ", " << pt1_t      << " ]" << std::endl
 		  << "\t Pt2    @ [ " << pt2_w      << ", " << pt2_t      << " ]" << std::endl;
       }
-
+      
       twodimtools::Poly2D triangle(triangle_coordinates);
       _shr_polygon_v[pl] = triangle;
       
-
+      
     }// for all 3 planes
     
     return;
   }
+  
+  double ConeOverlapTag::slopeCompat(const twodimtools::Poly2D& shr,
+				     const twodimtools::Linearity& photon) {
+    
+    
+    // get slope of photon
+    auto const& photon_slope_val = photon._slope;
+    // and error
+    auto const& photon_slope_err = photon._slope_err;
 
+    // get shower slope
+    double shr_slope_val;
+
+    double ydiff = ( (shr.Point(2).second + shr.Point(1).second) / 2. ) - shr.Point(0).second;
+    double xdiff = ( (shr.Point(2).first + shr.Point(1).first) / 2. ) - shr.Point(0).first;
+
+    shr_slope_val = ydiff/xdiff;
+
+    // and error
+    double shr_slope_max = (shr.Point(2).second - shr.Point(0).second) / (shr.Point(2).first - shr.Point(0).first);
+
+    double shr_slope_err = fabs( shr_slope_max - shr_slope_val );
+
+    double angle = fabs ( atan( ( shr_slope_val - photon_slope_val ) / ( 1 + photon_slope_val * shr_slope_val ) ) );
+
+    angle *= (180./3.14);
+
+    if (_debug) { std::cout << "\t photon slope angle = " << angle << std::endl; }
+
+    return angle;
+
+    /*
+    if (_debug) {
+      std::cout << "Shower slope = " << shr_slope_val    << " +/- " << shr_slope_err << std::endl
+		<< "Photon slope = " << photon_slope_val << " +/- " << photon_slope_err << " w/ NHits = "  << photon._dof + 2 << std::endl;
+    }
+
+    // is the slope difference larger than the sum of the errors? if so not compatible
+    if ( fabs( shr_slope_val - photon_slope_val) > (shr_slope_err + photon_slope_err) ) return false;
+
+    if (_debug) { std::cout << "slopes are compatible! " << std::endl; }
+    
+    return true;
+    */
+    
+  }
+
+  bool ConeOverlapTag::photonCrossesShower(const twodimtools::Poly2D& shr,
+					   const twodimtools::Poly2D& photon) {
+
+    // get the triangle points
+    double Ox = shr.Point(0).first;
+    double Oy = shr.Point(0).second;
+    double Ax = shr.Point(1).first;
+    double Ay = shr.Point(1).second;
+    double Bx = shr.Point(2).first;
+    double By = shr.Point(2).second;
+
+    // check where the shower end-point lies
+    double Ex = (Ax+Bx)/2.;
+    double Ey = (Ay+By)/2.;
+
+    double signEA = (Ex-Ox)*(Ay-Oy) - (Ey-Oy)*(Ax-Ox);
+    double signEB = (Ex-Ox)*(By-Oy) - (Ey-Oy)*(Bx-Ox);
+    
+    // how many photon edges are on the left or right of the cone?
+    int slope_left  = 0;
+    int slope_right = 0;
+
+    // being on one side or another of the segments OA and OB depends on the sign
+    // of the equations used to compute signEA and signEB
+    // to check if points are on either side of the cone compare their sign
+    // with the signs of EA and EB knowing that these two are in the center.
+
+    for (size_t i=0; i < photon.Size(); i++) {
+
+      auto const& pt = photon.Point(i);
+
+      double signA = (pt.first-Ox)*(Ay-Oy) - (pt.second-Oy)*(Ax-Ox);
+      double signB = (pt.first-Ox)*(By-Oy) - (pt.second-Oy)*(Bx-Ox);
+
+      if ( ((signA*signEA) < 0) && ((signB*signEB) > 0) ) slope_left  += 1;
+      if ( ((signA*signEA) > 0) && ((signB*signEB) < 0) ) slope_right += 1;
+
+    }// for all photon points
+
+    if ( (slope_left > 0) and (slope_right > 0) ){
+
+      if (_debug) std::cout << "\t photon crosses shower" << std::endl;
+      return true;
+    }
+
+    return false;
+  }
+    
+  
   void ConeOverlapTag::mergeHits(std::vector<unsigned int>& shr_hit_idx_v,
 				 const std::vector<unsigned int>& photon_hit_idx_v) {
 

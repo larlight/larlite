@@ -19,6 +19,9 @@
 #include "DataFormat/shower.h"
 
 #include "TwoDimTools/Poly2D.h"
+#include "TwoDimTools/Linearity.h"
+
+#include <map>
 
 namespace larlite {
   /**
@@ -30,7 +33,7 @@ namespace larlite {
   public:
 
     /// Default constructor
-    ConeOverlapTag(){ _name="ConeOverlapTag"; _fout=0; _debug=false;}
+    ConeOverlapTag();
 
     /// Default destructor
     virtual ~ConeOverlapTag(){}
@@ -49,7 +52,7 @@ namespace larlite {
         Finalize method to be called after all events processed.
     */
     virtual bool finalize();
-
+    
     // producer setters
     void setShowerProducer    (std::string s) { _shower_producer = s;      }
     void setPhotonProducer    (std::string s) { _photon_producer = s;      }
@@ -59,34 +62,51 @@ namespace larlite {
     // set debug mode
     void setDebug(bool on) { _debug = on; }
 
-    // set shower length
+    // set shower length [cm]
     void setShrLen(double d) { _shrLen = d; }
+    // set shower width [degrees]
+    void setShrWidth(double a) { _width = a; }
     // set tick offset
     void setTickOffset(double t) { _tick_offset = t; }
+    // set max frac of shower (measured in number of hits) charge photon can add
+    void setMaxQFracAdd(double f) { _frac_shr_q = f; }
+    // set max photon angle
+    void setMaxPhotonAngle(double a) { _max_slope_angle = a; }
 
     // get the polygon clusters
     twodimtools::Poly2D getShowerPolygon(int pl) { return _shr_polygon_v[pl]; }
     std::vector<twodimtools::Poly2D> getPhotonPolygon(int pl);
-
+    
   protected:
-
+    
     // function that projects reconstructed 3D shower
     // into 3 2D triangles, one per plane.
     void projectShower(const larlite::shower& shr);
+    
+    // do the shower and cluster agree in slope?
+    double slopeCompat(const twodimtools::Poly2D& shr,
+		       const twodimtools::Linearity& photon);
 
+    // does the photon cross the shower on both sides of the cone?
+    bool photonCrossesShower(const twodimtools::Poly2D& shr,
+			     const twodimtools::Poly2D& photon);
+    
     // merge hits from shower and polygon
     void mergeHits(std::vector<unsigned int>& shr_hit_idx_v,
 		   const std::vector<unsigned int>& photon_hit_idx_v);
-
+    
     // store 2D triangles representing shower cones.
     std::vector<twodimtools::Poly2D> _shr_polygon_v;
-
+    
     // store 2D polygons representing photon clusters
     // vector of vectors:
     // 1st vector is for the 3 planes
-    // pairs hold idex of cluster in original clus vector (.first)
-    //            polygon object 
+    // pairs hold index of cluster in original clus vector (.first)
+    //            polygon object (.second)
     std::vector< std::vector< std::pair<size_t, twodimtools::Poly2D > > > _photon_poly_v;
+    
+    // map connecting cluster index to linearity object
+    std::map< size_t, twodimtools::Linearity > _photon_lin_map;
 
     // producers
     std::string _shower_producer;
@@ -102,15 +122,27 @@ namespace larlite {
 
     // how far to extend the shower? user-determined
     double _shrLen; // cm
+    // how wide should the shower be? 3D angle [degrees]
+    // if unspecified -> use opening width
+    double _width;
+
+    // max photon angle
+    double _max_slope_angle;
+    
+    // maximum cluster linearity allowed
+    double _minLin;
+
+    // max frac of shower's hits that can be added
+    float _frac_shr_q;
 
     // tick offset?
     double _tick_offset;
-
+    
   };
 }
 #endif
 
-//**************************************************************************
+  //**************************************************************************
 // 
 // For Analysis framework documentation, read Manual.pdf here:
 //
