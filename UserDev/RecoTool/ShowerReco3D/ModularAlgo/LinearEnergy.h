@@ -15,7 +15,11 @@
 #define LINEARENERGY_H
 
 #include <iostream>
+
 #include "ShowerRecoModuleBase.h"
+
+#include "LArUtil/Geometry.h"
+
 #include "AnalysisAlg/CalorimetryAlg.h"
 
 /**
@@ -50,6 +54,18 @@ public:
 
     void initialize();
 
+    /// 3D charge correction function
+    double ChargeCorrection(const larutil::Hit2D& h,const TVector3& dir,const TVector3& vtx);
+
+    // create a map for calorimetric corrections for position-dependent response variations
+    void CreateResponseMap(const double& stepsize);
+
+    // set response map value
+    void SetResponse(const double& x, const double& y, const double& z, const double& q);
+
+    /// find nearest cell response value (by averaging)
+    double NearestCell(const size_t& i, const size_t& j, const size_t& k);
+
  private:
     
     /// boolean on whether to fill tree or not
@@ -77,6 +93,11 @@ public:
     double _lifetime_corr;
     double _electrons;
     double _tick;
+
+    // position-dependent response map
+    std::vector< std::vector< std::vector< double > > >_responseMap;
+    double _responseStep;
+
 
 };
 
