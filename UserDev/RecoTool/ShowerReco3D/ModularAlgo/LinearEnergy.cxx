@@ -141,11 +141,11 @@ namespace showerreco {
 
     auto geom = larutil::Geometry::GetME();
     
-    int nx = int((geom->DetHalfWidth() * 2)  / _responseStep);
-    int ny = int((geom->DetHalfHeight() * 2) / _responseStep);
-    int nz = int((geom->DetLength())         / _responseStep);
+    int nx = int((geom->DetHalfWidth() * 2)  / _responseStep) + 1;
+    int ny = int((geom->DetHalfHeight() * 2) / _responseStep) + 1;
+    int nz = int((geom->DetLength())         / _responseStep) + 1;
     
-    _responseMap = std::vector< std::vector< std::vector<double> > >(nx,std::vector< std::vector<double> >(ny, std::vector<double>(nz,0) ) );
+    _responseMap = std::vector< std::vector< std::vector<double> > >(nx,std::vector< std::vector<double> >(ny, std::vector<double>(nz,-1) ) );
     
     return;
   }
@@ -166,29 +166,31 @@ namespace showerreco {
 
     double y = xyz[1];
 
-    std::cout << "hit x = " << x << "\t z = " << z << std::endl;
-    std::cout << "3D point x = "<< xyz[0] << ", y = " << xyz[1] << ", z = " << xyz[2] << std::endl;
+    //std::cout << "hit x = " << x << "\t z = " << z << std::endl;
+    //std::cout << "3D point x = "<< xyz[0] << ", y = " << xyz[1] << ", z = " << xyz[2] << std::endl;
 
     // find cells in map
-    size_t i = ( (geom->DetHalfWidth()  * 2) - x) / _responseStep;
-    size_t j = ( (2 * geom->DetHalfHeight()) - (geom->DetHalfHeight() + y) ) / _responseStep;
-    size_t k = (geom->DetLength() - z) / _responseStep;
+    size_t i = x / _responseStep;
+    size_t j = (geom->DetHalfHeight() + y) / _responseStep;
+    size_t k = z / _responseStep;
 
     // make sure not out of bounds:
-    if ( (i >= 0) or (j > 0) or (k > 0) or
-	 (i < _responseMap.size()) or
-	 (j < _responseMap[0].size()) or
-	 (k < _responseMap[0][0].size()) ) {
+    if ( (i < 0) or (j < 0) or (k < 0) or
+	 (i >= _responseMap.size()) or
+	 (j >= _responseMap[0].size()) or
+	 (k >= _responseMap[0][0].size()) ) {
       return h.charge;
     }
 
     double corr = _responseMap[i][j][k];
 
-    if (corr < 0) {
-      std::cout << "No correction available..." << std::endl;
+    if (corr <= 0) {
+      //std::cout << "No correction available..." << std::endl;
       // find nearest non-empty box
       corr = NearestCell(i,j,k);
     }
+
+    //std::cout << "correction = " << corr << std::endl;
 
     return h.charge * corr;
     
@@ -217,9 +219,11 @@ namespace showerreco {
     }
 
     // find vector position
-    size_t i = ( (geom->DetHalfWidth()  * 2) - x) / _responseStep;
-    size_t j = ( (2 * geom->DetHalfHeight()) - (geom->DetHalfHeight() + y) ) / _responseStep;
-    size_t k = (geom->DetLength() - z) / _responseStep;
+    size_t i = x / _responseStep;
+    size_t j = (geom->DetHalfHeight() + y) / _responseStep;
+    size_t k = z / _responseStep;
+
+    //std::cout << "x, y, z " << x << ", " << y << ", " << z << "\t i, j, k " << i << ", " << j << ", "  << k << std::endl;
     
     _responseMap[i][j][k] = q;
 
@@ -239,9 +243,9 @@ namespace showerreco {
       ctr = 0;
 
       cellspan.clear();
-      for (int n=1; n <= cellsize; n++){
-	cellspan.push_back(-n);
-	cellspan.push_back(n);
+      for (int n=1; n < cellsize; n++){
+	cellspan.push_back(-(n+1));
+	cellspan.push_back(n+1);
       }
       
       for (auto const& xd : cellspan) {
@@ -266,14 +270,14 @@ namespace showerreco {
 
       if (val != 0) {
 	val /= ctr;
-	std::cout << "val is " << val << std::endl;
+	//std::cout << "val is " << val << std::endl;
 	return val;
       }
       
     }// for all cell-sizes
 
     // if we never found non-zero correction, return 1
-    std::cout << "no neighboring correction found..return 1" << std::endl;
+    //std::cout << "no neighboring correction found..return 1" << std::endl;
     return 1;
   }
 

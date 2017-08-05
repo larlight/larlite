@@ -109,11 +109,17 @@ namespace larlite {
     _photon_poly_v.clear();
     _photon_poly_v.resize(3);
 
+    if (_debug) { std::cout << "Start looping through photons. " << std::endl; }
+
     // create polygon objects for each photon cluster.
     for (size_t p=0; p < ev_photon->size(); p++){
 
+      if (_debug) { std::cout << "... new photon" << std::endl; }
+
       // get assciated hits
       auto const& photon_hit_idx_v = ass_photon_hit_v.at(p);
+
+      if (photon_hit_idx_v.size() == 0) continue;
 
       // is this photon on the collection-plane? if not skip
       if (ev_hit_photon->at( photon_hit_idx_v[0] ).WireID().Plane != 2) continue;
@@ -136,8 +142,18 @@ namespace larlite {
 	hit_w_v.push_back( hit2d.w);
 	hit_t_v.push_back( hit2d.t);
       }// for all hits in photon cluster
+
       std::vector<const larutil::Hit2D*> polygonEdges;
-      geomH->SelectPolygonHitList(photon_hit2d_v, polygonEdges, 0.95);
+
+      try {
+	geomH->SelectPolygonHitList(photon_hit2d_v, polygonEdges, 0.95);
+      }
+      catch (larutil::LArUtilException e) {
+	if (_debug) std::cout << e.what() << std::endl;
+	if (_debug) { std::cout << "skip this photon" << std::endl; }
+	continue;
+      }
+
       //now making Polygon Object
       std::pair<float, float> tmpvertex;
       //make Polygon Object as in mac/PolyOverlap.cc
@@ -147,16 +163,15 @@ namespace larlite {
 				    polygonEdges.at(i)->t );
 	vertices.push_back( tmpvertex );
       }// for all polygon edges
+
       twodimtools::Poly2D    thispoly( vertices );
       twodimtools::Linearity thislin( hit_w_v, hit_t_v );
       std::pair<size_t, twodimtools::Poly2D>    polyinfo(p, thispoly);
       _photon_poly_v.at( photon_hit2d_v.at(0).plane ).push_back( polyinfo );
       _photon_lin_map[ p ] = thislin;
-      
+
     }// for all photon clusters
       
-    if (_debug) { std::cout << "now loop through showers" << std::endl; }
-    
     // loop through reconstructed showers.
     for (size_t s=0; s < ev_shower->size(); s++) {
 
