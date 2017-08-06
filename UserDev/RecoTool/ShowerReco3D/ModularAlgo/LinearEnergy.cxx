@@ -36,6 +36,7 @@ namespace showerreco {
       if (_tree) delete _tree;
       _tree = new TTree(_name.c_str(), "dQdx Info Tree");
       _tree->Branch("_dE", &_dE, "dE/D");
+      _tree->Branch("_dEdx", &_dEdx, "dEdx/D");
       _tree->Branch("_dQ", &_dQ, "dQ/D");
       _tree->Branch("_lifetime_corr", &_lifetime_corr, "lifetime_corr/D");
       _tree->Branch("_electrons",&_electrons,"electrons/D");
@@ -81,12 +82,14 @@ namespace showerreco {
     
     // we want an energy for each plane
     for (size_t n = 0; n < clusters.size(); n++) {
+
+      auto const& clus = clusters.at(n);
       
       // get the hits associated with this cluster
-      auto const& hits = clusters.at(n).hit_vector;
+      auto const& hits = clus.hit_vector;
       
       // get the plane associated with this cluster
-      auto const& pl = clusters.at(n).plane_id.Plane;
+      auto const& pl = clus.plane_id.Plane;
       
       if (pl == 2)
 	hasPl2 = true;
@@ -102,7 +105,7 @@ namespace showerreco {
 	
 	_lifetime_corr = exp( _tick * _clocktick / _tau );
 
-	double qcorr = ChargeCorrection(h,resultShower.fDCosStart,resultShower.fXYZStart);
+	double qcorr = ChargeCorrection(h.charge,h.w,h.t,resultShower.fDCosStart,resultShower.fXYZStart);
 	
 	_electrons = qcorr * _elec_gain;
 	
@@ -122,6 +125,15 @@ namespace showerreco {
       
       // set the energy for this plane
       resultShower.fTotalEnergy_v[pl] = E;
+
+      double dqdx = resultShower.fdQdx_v[pl];
+
+      dqdx = ChargeCorrection(dqdx, clus.start_point.w, clus.start_point.t, resultShower.fDCosStart,resultShower.fXYZStart);
+
+      _dEdx = dqdx * _elec_gain * _e_to_eV * _eV_to_MeV / _recomb_factor;
+      
+      // get dEdx from dQdx
+      resultShower.fdEdx_v[pl] = _dEdx;
       
     }// for all input clusters
     
@@ -129,9 +141,8 @@ namespace showerreco {
       resultShower.fTotalEnergy = resultShower.fTotalEnergy_v[2];
     else
       resultShower.fTotalEnergy = ( resultShower.fTotalEnergy_v[0] + resultShower.fTotalEnergy_v[1] ) / 2.;
-    
+
     return;
-    
   }
   
   void LinearEnergy::CreateResponseMap(const double& stepsize) {
@@ -150,13 +161,13 @@ namespace showerreco {
     return;
   }
 
-  double LinearEnergy::ChargeCorrection(const larutil::Hit2D& h,const TVector3& dir,const TVector3& vtx){
+  double LinearEnergy::ChargeCorrection(const double& q, const double& w, const double& t, const TVector3& dir, const TVector3& vtx){
 
     auto geom = larutil::Geometry::GetME();
 
     // find 3D position of hit
-    double z = h.w;
-    double x = h.t;
+    double z = w;
+    double x = t;
 
     // get 2D distance of hit to vtx
     double r2D = sqrt( ( (z-vtx.Z()) * (z-vtx.Z()) ) + ( (x-vtx.X()) * (x-vtx.X()) ) );
@@ -165,9 +176,6 @@ namespace showerreco {
     auto xyz = vtx + dir * r3D;
 
     double y = xyz[1];
-
-    //std::cout << "hit x = " << x << "\t z = " << z << std::endl;
-    //std::cout << "3D point x = "<< xyz[0] << ", y = " << xyz[1] << ", z = " << xyz[2] << std::endl;
 
     // find cells in map
     size_t i = x / _responseStep;
@@ -179,7 +187,7 @@ namespace showerreco {
 	 (i >= _responseMap.size()) or
 	 (j >= _responseMap[0].size()) or
 	 (k >= _responseMap[0][0].size()) ) {
-      return h.charge;
+      return q;
     }
 
     double corr = _responseMap[i][j][k];
@@ -190,10 +198,7 @@ namespace showerreco {
       corr = NearestCell(i,j,k);
     }
 
-    //std::cout << "correction = " << corr << std::endl;
-
-    return h.charge * corr;
-    
+    return q * corr;
   }
   
   

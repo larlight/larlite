@@ -1,4 +1,4 @@
-import sys
+import sys,os
 
 if len(sys.argv) < 2:
     msg  = '\n'
@@ -51,6 +51,19 @@ def getShowerRecoAlgModular():
     startPt.setVerbosity(False)
 
     energy = showerreco.LinearEnergy()
+
+    # implement position-dependent calibration
+    energy.CreateResponseMap(20)
+    dQdsAVG = 248.
+    fin = open('/a/share/westside/dcaratelli/ll_shower/UserDev/RecoTool/ShowerReco3D/dqds_mc_xyz.txt','r')
+    for line in fin:
+        words = line.split()
+        x = float(words[0])
+        y = float(words[1])
+        z = float(words[2])
+        q = float(words[3])
+        energy.SetResponse(x,y,z,dQdsAVG/q)
+
     energy.SetElectronLifetime(1e6  ) # in us DATA value
     energy.SetRecombFactor(0.62)
     #energy.SetElecGain(243.) # MCC8.0 data
@@ -59,11 +72,9 @@ def getShowerRecoAlgModular():
     energy.SetFillTree(True)
 
     dqdx = showerreco.dQdxModule()
+    dqdx.setTrunkLength(3.)
+    #dqdx.SetFillTree(True)
     
-    dedx = showerreco.dEdxFromdQdx()
-    dedx.SetUsePitch(False)
-    dedx.setVerbosity(True)
-
     shrFilter = showerreco.FilterShowers()
     shrFilter.setAngleCut(15.)
     shrFilter.setVerbosity(False)
@@ -73,6 +84,7 @@ def getShowerRecoAlgModular():
     #alg.AddShowerRecoModule( showerreco.StartPoint3DModule() )
     #alg.AddShowerRecoModule( showerreco.NearestStartPoint3D() )
     alg.AddShowerRecoModule( startPt )#showerreco.YPlaneStartPoint3D() )
+    alg.AddShowerRecoModule( dqdx )
     alg.AddShowerRecoModule(energy)
     alg.AddShowerRecoModule( showerreco.FillLength() )
     alg.AddShowerRecoModule( shrFilter )
@@ -108,7 +120,7 @@ def DefaultShowerReco3D():
 my_proc = fmwk.ana_processor()
 
 # Set input root file
-for x in xrange(len(sys.argv)-1):
+for x in xrange(len(sys.argv)-2):
     my_proc.add_input_file(sys.argv[x+1])
 
 # Specify IO mode
@@ -117,7 +129,11 @@ my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 # Specify analysis output root file name
 my_proc.set_ana_output_file("showerRecoUboone_ana.root")
 # Specify data output root file name
-my_proc.set_output_file("showerRecoUboone_data_debug.root")
+fout = sys.argv[-1]
+if (os.path.isfile(fout) == True):
+    print 'File %s already exists! exit'%fout
+    sys.exit(0)
+my_proc.set_output_file(fout)
 
 
 ana_unit=DefaultShowerReco3D()
@@ -135,12 +151,13 @@ ana_unit.SetOutputProducer("showerreco")
 
 my_proc.add_process(ana_unit)
 
-my_proc.set_data_to_write(fmwk.data.kMCTruth,     "generator")
-my_proc.set_data_to_write(fmwk.data.kMCShower,    "mcreco")
+my_proc.set_data_to_write(fmwk.data.kMCTruth,      "generator")
+my_proc.set_data_to_write(fmwk.data.kMCShower,     "mcreco")
 my_proc.set_data_to_write(fmwk.data.kMCShower,     "mcreco")
 my_proc.set_data_to_write(fmwk.data.kVertex,       "mcvertex")
 my_proc.set_data_to_write(fmwk.data.kShower,       "showerreco")
 my_proc.set_data_to_write(fmwk.data.kAssociation,  "showerreco")
+#my_proc.set_data_to_write(fmwk.data.kSimChannel,   "largeant")
 
 print
 print  "Finished configuring ana_processor. Start event loop!"

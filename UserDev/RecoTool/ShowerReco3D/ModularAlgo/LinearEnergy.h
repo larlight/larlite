@@ -55,7 +55,7 @@ public:
     void initialize();
 
     /// 3D charge correction function
-    double ChargeCorrection(const larutil::Hit2D& h,const TVector3& dir,const TVector3& vtx);
+    double ChargeCorrection(const double& q, const double& w, const double& t, const TVector3& dir, const TVector3& vtx);
 
     // create a map for calorimetric corrections for position-dependent response variations
     void CreateResponseMap(const double& stepsize);
@@ -89,6 +89,7 @@ public:
 
     // tree variables
     double _dE;
+    double _dEdx;
     double _dQ;
     double _lifetime_corr;
     double _electrons;
