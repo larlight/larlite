@@ -51,6 +51,7 @@ namespace showerreco {
     
     // debugging tree
     double _dqdx;
+    std::vector<double> _dqdx_v;
     double _pitch;
     double _dmax;
     int    _nhits;

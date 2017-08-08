@@ -27,6 +27,7 @@ namespace showerreco {
     _tree = new TTree(_name.c_str(),"dQdx tree");
     _tree->Branch("_pitch",&_pitch,"pitch/D");
     _tree->Branch("_dqdx",&_dqdx,"dqdx/D");
+    _tree->Branch("_dqdx_v","std::vector<double>",&_dqdx_v);
     _tree->Branch("_dmax",&_dmax,"dmax/D");
     _tree->Branch("_nhits",&_nhits,"nhits/I");
     _tree->Branch("_ntot",&_ntot,"ntot/I");
@@ -77,12 +78,11 @@ namespace showerreco {
 
       _pitch = geomHelper->GetPitch(dir3D, (int)pl);
       
-      // store summed charge over initial shower trunk
-      double Q  = 0.;
-
       _dmax = 0.;
 
       _nhits = 0;
+      
+      _dqdx_v.clear();
       
       // loop through hits and find those within some radial distance of the start point
       
@@ -95,13 +95,15 @@ namespace showerreco {
 
 	if (d2D > _dmax) _dmax = d2D;
 	
-	Q += h.charge;
+	_dqdx_v.push_back( h.charge );
 	
 	_nhits += 1;
 	
       }// loop over all hits
 
-      _dqdx = Q / (_pitch * _nhits);
+      std::nth_element(_dqdx_v.begin(), _dqdx_v.end(), _dqdx_v.end() );
+
+      _dqdx = _dqdx_v[_dqdx_v.size()/2.] / _pitch;
 
       _ntot = hits.size();
 
