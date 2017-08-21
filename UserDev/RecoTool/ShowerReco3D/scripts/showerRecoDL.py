@@ -7,15 +7,11 @@ if len(sys.argv) < 2:
     sys.stderr.write(msg)
     sys.exit(1)
 
-
 # Import the needed modules.  Need larlite and several of it's namespaces
 from ROOT import gSystem,TMath
 from larlite import larlite as fmwk
-from larlite import larutil
-from recotool import cmtool, showerreco
+from recotool import showerreco
 from ROOT import protoshower
-from ROOT import calo
-# from recotool.showerDef import DefaultShowerReco3D
 
 def getShowerRecoAlgModular():
     # This function returns the default shower reco module
@@ -108,7 +104,9 @@ def DefaultShowerReco3D():
     # sralg.Verbose(True)
     # sralg.SetUseArea(True)
 
+
     # Attach calo alg
+    # from ROOT import calo
     # calg = calo.CalorimetryAlg()
     # sralg.CaloAlgo(calg)
     #sralg.SetUseModBox(True)
@@ -138,11 +136,10 @@ my_proc.set_output_file(fout)
 
 
 shower_ana_unit=DefaultShowerReco3D()
+
 # set ProtoShower Algo to go from data-products to a ProtoShower object
-#protoshoweralg = protoshower.ProtoShowerAlgCMTool()
 protoshoweralg = protoshower.ProtoShowerAlgDL()
 protoshoweralg.SetVertexProducer("dl")
-# protoshoweralg = protoshower.ProtoShowerAlgOpenCV()
 shower_ana_unit.GetProtoShowerHelper().setProtoShowerAlg( protoshoweralg )
 
 # shower_ana_unit.SetInputProducer("ImageClusterHit")

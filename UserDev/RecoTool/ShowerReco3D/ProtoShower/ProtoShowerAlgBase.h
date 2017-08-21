@@ -34,7 +34,7 @@ class ProtoShowerAlgBase {
 public:
 
   /// Default constructor
-  ProtoShowerAlgBase() { _name = "ProtoShowerAlgBase"; }
+  ProtoShowerAlgBase() { _name = "ProtoShowerAlgBase"; _debug = false;}
 
   /// Default destructor
   virtual ~ProtoShowerAlgBase() {}
@@ -47,9 +47,15 @@ public:
 
   std::string name() { return _name; }
 
+  bool debug() const { return _debug; }
+
+  void setDebug(bool on) { _debug = on; }
+
 protected:
 
   std::string _name;
+
+  bool _debug;
 
 };
 
