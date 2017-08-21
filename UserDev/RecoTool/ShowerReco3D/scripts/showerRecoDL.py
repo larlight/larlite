@@ -1,12 +1,5 @@
 import sys,os
 
-if len(sys.argv) < 2:
-    msg  = '\n'
-    msg += "Usage 1: %s $INPUT_ROOT_FILE\n" % sys.argv[0]
-    msg += '\n'
-    sys.stderr.write(msg)
-    sys.exit(1)
-
 # Import the needed modules.  Need larlite and several of it's namespaces
 from ROOT import gSystem,TMath
 from larlite import larlite as fmwk
@@ -30,7 +23,6 @@ def getShowerRecoAlgModular():
     alg.SetDebug(True)
     alg.SetVerbose(False)
 
-    
     # filteralgo = showerreco.FilterPFPart()
     # filteralgo.setMinNHitsAbsolute(5)
     # filteralgo.setMinNHitsLargest(10)
@@ -51,7 +43,7 @@ def getShowerRecoAlgModular():
     energy.CreateResponseMap(20)
     dQdsAVG = 248.
     #fin = open('/a/share/westside/dcaratelli/ll_shower/UserDev/RecoTool/ShowerReco3D/dqds_mc_xyz.txt','r')
-    fin = open('/home/vgenty/1e1p/out_week080717/handshake/shower_reco/ShowerReco3D/dqds_mc_xyz.txt','r')
+    fin = open('/home/vgenty/sw/larlite/UserDev/RecoTool/ShowerReco3D/dqds_mc_xyz.txt','r')
     for line in fin:
         words = line.split()
         x = float(words[0])
@@ -60,7 +52,7 @@ def getShowerRecoAlgModular():
         q = float(words[3])
         energy.SetResponse(x,y,z,dQdsAVG/q)
 
-    energy.SetElectronLifetime(1e6  ) # in us DATA value
+    energy.SetElectronLifetime(1e6) # in us DATA value
     energy.SetRecombFactor(0.62)
     #energy.SetElecGain(243.) # MCC8.0 data
     energy.SetElecGain(200.) # MCC8.0 value
@@ -95,7 +87,7 @@ def DefaultShowerReco3D():
     ana_unit = fmwk.ShowerReco3D()
     
     # require PDG == 11 for PFParticles
-    ana_unit.SetRequirePDG11(False)
+    ana_unit.SetRequirePDG11(True)
     
     # Attach shower reco alg
     sralg = getShowerRecoAlgModular()
@@ -118,54 +110,40 @@ def DefaultShowerReco3D():
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
 
+# Suffix for output
+suffix = str(sys.argv[1])
+
 # Set input root file
-for x in xrange(len(sys.argv)-2):
-    my_proc.add_input_file(sys.argv[x+1])
+my_proc.add_input_file(sys.argv[2])
 
 # Specify IO mode
 my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 
-# Specify analysis output root file name
-my_proc.set_ana_output_file("showerRecoUboone_ana.root")
-# Specify data output root file name
-fout = sys.argv[-1]
-if (os.path.isfile(fout) == True):
-    print 'File %s already exists! exit'%fout
-    sys.exit(0)
-my_proc.set_output_file(fout)
-
-
 shower_ana_unit=DefaultShowerReco3D()
+print "Load DefaultShowerReco3D @ ",shower_ana_unit
+
+# Specify data output root file name
+my_proc.set_output_file("out/out_out_%s.root"%suffix)
+my_proc.set_ana_output_file("ana/ana_out_%s.root" % suffix)
 
 # set ProtoShower Algo to go from data-products to a ProtoShower object
 protoshoweralg = protoshower.ProtoShowerAlgDL()
 protoshoweralg.SetVertexProducer("dl")
 shower_ana_unit.GetProtoShowerHelper().setProtoShowerAlg( protoshoweralg )
 
-# shower_ana_unit.SetInputProducer("ImageClusterHit")
-# shower_ana_unit.SetInputProducer("iou")
-
 shower_ana_unit.SetInputProducer("dl")
 shower_ana_unit.SetOutputProducer("showerreco")
 
 my_proc.add_process(shower_ana_unit)
 
-#my_proc.set_data_to_write(fmwk.data.kMCTruth,      "generator")
-#my_proc.set_data_to_write(fmwk.data.kMCShower,     "mcreco")
-#my_proc.set_data_to_write(fmwk.data.kMCShower,     "mcreco")
-my_proc.set_data_to_write(fmwk.data.kVertex,       "dl")
-my_proc.set_data_to_write(fmwk.data.kShower,       "showerreco")
-my_proc.set_data_to_write(fmwk.data.kAssociation,  "showerreco")
-#my_proc.set_data_to_write(fmwk.data.kSimChannel,   "largeant")
+#my_proc.set_data_to_write(fmwk.data.kShower,       "showerreco")
+#my_proc.set_data_to_write(fmwk.data.kAssociation,  "showerreco")
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
 my_proc.run()
-# my_proc.process_event(2)
-
-
 
 sys.exit()
 

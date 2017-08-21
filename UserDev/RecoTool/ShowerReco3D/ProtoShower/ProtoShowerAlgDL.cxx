@@ -9,6 +9,7 @@
 #include <math.h>
 #include <array>
 #include <limits>
+#include <cassert>
 
 #include "DataFormat/pfpart.h"
 #include "DataFormat/cluster.h"
@@ -27,6 +28,7 @@ namespace protoshower {
       _params_alg = new ::cluster::DefaultParamsAlg();
     }
     _name = "ProtoShowerAlgDL";
+    _debug = false;
   }
 
   void ProtoShowerAlgDL::GenerateProtoShower(::larlite::storage_manager* storage,
@@ -127,6 +129,9 @@ namespace protoshower {
 	  auto const& clus = cluster_v[i];
 
 	  double* origin = new double[3];
+	  assert ((int)clus->Plane().Plane >= 0);
+	  assert ((int)clus->Plane().Plane <= 2);
+
 	  geom->PlaneOriginVtx( clus->Plane().Plane, origin);
 	  float planeOffset = origin[0];
 
