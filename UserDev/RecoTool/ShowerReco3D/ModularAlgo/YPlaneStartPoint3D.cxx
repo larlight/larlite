@@ -33,7 +33,7 @@ namespace showerreco {
     }
 
     // take the vtx for the neutrino interaction
-    auto const& vtx = vtx3D_v[0];
+    auto const& vtx = vtx3D_v.front();
 
     auto & clusters = proto_shower.params();
 
