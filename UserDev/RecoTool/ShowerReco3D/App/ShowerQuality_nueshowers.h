@@ -127,7 +127,7 @@ protected:
 
   /// For convenience: struct to define a set of parameters per shower to be stored in per-reconstructed-shower TTree
   struct ShowerTreeParams_t {
-
+    int run, subrun, event;
     double reco_x, reco_y, reco_z;
     double reco_dcosx, reco_dcosy, reco_dcosz;
     double reco_energy_U;

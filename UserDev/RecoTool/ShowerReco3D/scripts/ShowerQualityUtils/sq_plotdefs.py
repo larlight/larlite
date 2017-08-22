@@ -525,9 +525,9 @@ def angleres_vsenergy_matrix(df,fout=None):
 def cluster_efficiency_perplane_plot(df,fout=None):
         this_df = df.query('match == 1')
 	fig = plt.figure(figsize=(10,6))
-	cluseff_u = this_df['cluster_eff_U']
-	cluseff_v = this_df['cluster_eff_V']
-	cluseff_y = this_df['cluster_eff_Y']
+	cluseff_u = np.nan_to_num(this_df['cluster_eff_U'])
+	cluseff_v = np.nan_to_num(this_df['cluster_eff_V'])
+	cluseff_y = np.nan_to_num(this_df['cluster_eff_Y'])
 	bins = np.linspace(0,1,100)
 	plt.hist(cluseff_u,bins=bins,histtype='stepfilled',alpha=0.5,color='b',label='U Plane')
 	plt.hist(cluseff_v,bins=bins,histtype='stepfilled',alpha=0.5,color='g',label='V Plane')

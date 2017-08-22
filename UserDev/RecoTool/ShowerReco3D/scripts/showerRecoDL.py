@@ -137,8 +137,8 @@ shower_ana_unit.SetOutputProducer("showerreco")
 
 my_proc.add_process(shower_ana_unit)
 
-my_proc.set_data_to_write(fmwk.data.kShower,       "showerreco")
-my_proc.set_data_to_write(fmwk.data.kAssociation,  "showerreco")
+# my_proc.set_data_to_write(fmwk.data.kShower,       "showerreco")
+# my_proc.set_data_to_write(fmwk.data.kAssociation,  "showerreco")
 
 print
 print  "Finished configuring ana_processor. Start event loop!"

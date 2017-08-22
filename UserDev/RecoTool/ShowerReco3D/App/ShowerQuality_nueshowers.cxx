@@ -144,6 +144,10 @@ void ShowerQuality_nueshowers::FillQualityInfo(const shower& reco_shower, const 
 
   ResetShowerTreeParams();
 
+  fShowerTreeParams.event = _event;
+  fShowerTreeParams.run = _run;
+  fShowerTreeParams.event = _event;
+
   // MC Info
   fShowerTreeParams.mc_x = mc_shower.DetProfile().X();
   fShowerTreeParams.mc_y = mc_shower.DetProfile().Y();
@@ -278,7 +282,9 @@ void ShowerQuality_nueshowers::InitializeAnaTrees()
   //////////////////////////////////////////////////////
   if (fEventTree) delete fEventTree;
   fEventTree = new TTree("fEventTree_nueshowers", "");
-
+  fEventTree->Branch("event", &_event, "event/I");
+  fEventTree->Branch("run", &_run, "run/I");
+  fEventTree->Branch("subrun", &_subrun, "subrun/I");
   fEventTree->Branch("n_recoshowers", &fEventTreeParams.n_recoshowers, "n_recoshowers/I");
   fEventTree->Branch("n_mcshowers", &fEventTreeParams.n_mcshowers, "n_mcshowers/I");
   fEventTree->Branch("mcs_E", &fEventTreeParams.mcs_E, "mcs_E/D");

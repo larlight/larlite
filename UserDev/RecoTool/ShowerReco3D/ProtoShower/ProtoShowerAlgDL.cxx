@@ -74,7 +74,8 @@ namespace protoshower {
     // Try to get the clusters if they are there
     ::larlite::event_cluster * ev_clust = nullptr;
     auto const& ass_cluster_v = storage->find_one_ass(ev_pfpart->id(), ev_clust, ev_pfpart->name());
-
+    
+    std::cout << "GOT: " << ass_cluster_v.size() << " associated clusters" << std::endl;
     if (ev_clust and (!ev_clust->empty()) ) {
 
       // Want to get the hits from the cluster too:
@@ -110,20 +111,34 @@ namespace protoshower {
 	  proto_shower.hasCluster2D(false);
 	}
 
-	// resize _params according to number of clusters
-	proto_shower._params.resize( cluster_v.size() );
 	
+	size_t n_filled_cluster = 0;
+	std::vector<bool> valid_cluster_v(cluster_v.size(),false);
+	// valid_cluster_v.resize(cluster_v.size());
+	// for(auto& v : valid_cluster_v) v = false;
+
+	for (size_t i = 0; i < cluster_v.size(); i++) {
+	  if (!cluster_hits_vv[i].empty()) {
+	    n_filled_cluster += 1;
+	    valid_cluster_v[i] = true;
+	  }
+	}
+
+	// resize _params according to number of clusters
+	proto_shower._params.resize( n_filled_cluster );
+
+	int proto_idx = -1;
 	// fill 2D information, if available
 	for (size_t i = 0; i < cluster_v.size(); i++) {
 
-	  // are there hits?
-	  if (cluster_hits_vv[i].empty()) {
-	    proto_shower.hasCluster2D(false);
-	    break;
-	  }
+	  if (!valid_cluster_v[i]) continue;
 	  
-	  _cru_helper.GenerateParams( cluster_hits_vv[i], proto_shower._params.at( i ) );
-	  _params_alg->FillParams( proto_shower._params.at( i ) );
+	  proto_idx += 1;
+	  
+	  assert (proto_idx < proto_shower._params.size());
+
+	  _cru_helper.GenerateParams( cluster_hits_vv[i], proto_shower._params.at( proto_idx ) );
+	  _params_alg->FillParams( proto_shower._params.at( proto_idx ) );
 
 	  // now fill quantities specifically to LArDL
 	  auto const& clus = cluster_v[i];
@@ -202,21 +217,22 @@ namespace protoshower {
 
 
 	  // start point
-	  proto_shower._params.at(i).start_point.w = sw;
-	  proto_shower._params.at(i).start_point.t = st;
+	  proto_shower._params.at(proto_idx).start_point.w = sw;
+	  proto_shower._params.at(proto_idx).start_point.t = st;
 
 	  // end point
-	  proto_shower._params.at(i).end_point.w = ew;
-	  proto_shower._params.at(i).end_point.t = et;
+	  proto_shower._params.at(proto_idx).end_point.w = ew;
+	  proto_shower._params.at(proto_idx).end_point.t = et;
 
 	  // is this really needed?
-	  proto_shower._params.at(i).slope_2d = (et - st) / (ew - sw);
+	  proto_shower._params.at(proto_idx).slope_2d = (et - st) / (ew - sw);
 
 	  // angle calculated in the same way as in ClusterParams, as the
 	  // arc-tangent of the slope
-	  proto_shower._params.at(i).angle_2d = clus->StartAngle();
+	  proto_shower._params.at(proto_idx).angle_2d = clus->StartAngle();
 
 	}// for all input clusters
+
 
       }// if there are associated hits
       else {
