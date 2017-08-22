@@ -14,6 +14,7 @@
 #pragma link C++ class larlite::Pi0Mass+;
 #pragma link C++ class larlite::Pi0Quality+;
 #pragma link C++ class larlite::ShowerQuality_singleshowers+;
+#pragma link C++ class larlite::ShowerQuality_nueshowers+;
 #pragma link C++ class larlite::ShowerQuality_multishowers+;
 #pragma link C++ class larlite::HitCalibration+;
 #pragma link C++ class larlite::ToyShowerGenerator+;

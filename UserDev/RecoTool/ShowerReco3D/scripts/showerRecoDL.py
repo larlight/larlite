@@ -27,17 +27,19 @@ def getShowerRecoAlgModular():
     # filteralgo.setMinNHitsAbsolute(5)
     # filteralgo.setMinNHitsLargest(10)
     
-    angle3D = showerreco.Angle3DFormula()
-    angle3D.setMaxAngleError(0.1)
-    angle3D.setValidateDirection(True)
-    angle3D.setVerbosity(False)
+    # angle3D = showerreco.Angle3DFormula()
+    # angle3D.setMaxAngleError(0.1)
+    # angle3D.setValidateDirection(True)
+    # angle3D.setVerbosity(True)
 
     angle3D = showerreco.Angle3DFromVtxQweighted()
-
+    angle3D.setVerbosity(True)
+    
     startPt = showerreco.YPlaneStartPoint3D()
-    startPt.setVerbosity(False)
+    startPt.setVerbosity(True)
 
     energy = showerreco.LinearEnergy()
+    energy.setVerbosity(True)
 
     # implement position-dependent calibration
     energy.CreateResponseMap(20)
@@ -96,7 +98,6 @@ def DefaultShowerReco3D():
     # sralg.Verbose(True)
     # sralg.SetUseArea(True)
 
-
     # Attach calo alg
     # from ROOT import calo
     # calg = calo.CalorimetryAlg()
@@ -136,8 +137,8 @@ shower_ana_unit.SetOutputProducer("showerreco")
 
 my_proc.add_process(shower_ana_unit)
 
-#my_proc.set_data_to_write(fmwk.data.kShower,       "showerreco")
-#my_proc.set_data_to_write(fmwk.data.kAssociation,  "showerreco")
+my_proc.set_data_to_write(fmwk.data.kShower,       "showerreco")
+my_proc.set_data_to_write(fmwk.data.kAssociation,  "showerreco")
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
