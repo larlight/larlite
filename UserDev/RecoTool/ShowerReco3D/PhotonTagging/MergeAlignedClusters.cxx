@@ -252,6 +252,19 @@ namespace larlite {
       auto const& parent_clus_hit_idx_v = ass_clus_hit_v.at( parent_clus_idx );
       for (auto const& hit_idx : parent_clus_hit_idx_v) 
 	new_clus_hit_idx_v.push_back( hit_idx );
+
+      // end wire and tick are those for the furthest cluster
+      double endW = ev_cluster->at( parent_clus_idx ).EndWire();
+      double endT = ev_cluster->at( parent_clus_idx ).EndTick();
+      double rmax = 0.;
+      for (auto const& clus : children_v) {
+	double r = _clus_pos[clus].second;
+	if (r > rmax) {
+	  rmax = r;
+	  endW = ev_cluster->at( _pfp_clus_map[ clus ] ).EndWire();
+	  endT = ev_cluster->at( _pfp_clus_map[ clus ] ).EndTick();
+	}
+      }
       
       for (auto const& child : children_v){
 	auto const& child_clus_idx = _pfp_clus_map[child];
@@ -265,8 +278,8 @@ namespace larlite {
       auto const& parent_clus = ev_cluster->at( parent_clus_idx );
       new_clus.set_start_wire ( parent_clus.StartWire(), 1);
       new_clus.set_start_tick ( parent_clus.StartTick(), 1);
-      new_clus.set_end_wire   ( parent_clus.EndWire()  , 1);
-      new_clus.set_end_tick   ( parent_clus.EndTick()  , 1);
+      new_clus.set_end_wire   ( endW                   , 1);
+      new_clus.set_end_tick   ( endT                   , 1);
       new_clus.set_start_angle( parent_clus.StartAngle()  );
       new_clus.set_planeID    ( parent_clus.Plane()       );
 
