@@ -66,13 +66,13 @@ def getShowerRecoAlgModular():
 
     energy.SetElectronLifetime(1e6  ) # in us DATA value
     energy.SetRecombFactor(0.62)
-    #energy.SetElecGain(243.) # MCC8.0 data
-    energy.SetElecGain(200.) # MCC8.0 value
+    energy.SetElecGain(243.) # MCC8.0 data
+    #energy.SetElecGain(200.) # MCC8.0 value
     energy.setVerbosity(False)
     energy.SetFillTree(True)
 
     dqdx = showerreco.dQdxModule()
-    dqdx.setTrunkLength(3.)
+    dqdx.setTrunkLength(2.)
     #dqdx.SetFillTree(True)
     
     shrFilter = showerreco.FilterShowers()
@@ -139,13 +139,13 @@ my_proc.set_output_file(fout)
 ana_unit=DefaultShowerReco3D()
 # set ProtoShower Algo to go from data-products to a ProtoShower object
 protoshoweralg = protoshower.ProtoShowerAlgCMTool()
-protoshoweralg.SetVertexProducer("mcvertex")
+protoshoweralg.SetVertexProducer("numuCC_vertex")
 #protoshoweralg = protoshower.ProtoShowerAlgOpenCV()
 ana_unit.GetProtoShowerHelper().setProtoShowerAlg( protoshoweralg )
 
 #ana_unit.SetInputProducer("ImageClusterHit")
-#ana_unit.SetInputProducer("iou")
-ana_unit.SetInputProducer("coneshower")
+ana_unit.SetInputProducer("iou")
+#ana_unit.SetInputProducer("coneshower")
 
 ana_unit.SetOutputProducer("showerreco")
 
@@ -154,7 +154,7 @@ my_proc.add_process(ana_unit)
 my_proc.set_data_to_write(fmwk.data.kMCTruth,      "generator")
 my_proc.set_data_to_write(fmwk.data.kMCShower,     "mcreco")
 my_proc.set_data_to_write(fmwk.data.kMCShower,     "mcreco")
-my_proc.set_data_to_write(fmwk.data.kVertex,       "mcvertex")
+my_proc.set_data_to_write(fmwk.data.kVertex,       "numuCC_vertex")
 my_proc.set_data_to_write(fmwk.data.kShower,       "showerreco")
 my_proc.set_data_to_write(fmwk.data.kAssociation,  "showerreco")
 #my_proc.set_data_to_write(fmwk.data.kSimChannel,   "largeant")
