@@ -10,9 +10,13 @@
 #pragma link off all functions;
 
 #pragma link C++ class larlite::ConeOverlapTag+;
+#pragma link C++ class larlite::PhotonMerge+;
+#pragma link C++ class larlite::MergeAlignedClusters+;
 //ADD_NEW_CLASS ... do not change this line
 //ADD_NEW_ALG_CLASS ... do not change this line
 #endif
+
+
 
 
 
