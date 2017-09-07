@@ -53,9 +53,18 @@ def getShowerRecoAlgModular():
     energy = showerreco.LinearEnergy()
 
     # implement position-dependent calibration
-    energy.CreateResponseMap(20)
-    dQdsAVG = 248.
-    fin = open('/a/share/westside/dcaratelli/ll_shower/UserDev/RecoTool/ShowerReco3D/dqds_mc_xyz.txt','r')
+    energy.CreateResponseMap(15)
+    dQdsAVG = 0.
+    ctr = 0.
+    fin = open('/home/david/Dropbox/Neutrinos/Calorimetry/3DCorrection/MCC82_0903/dqds_0903_data_xyz.txt','r')
+    for line in fin:
+        words = line.split()
+        q = float(words[3])
+        dQdsAVG += q
+        ctr += 1
+    dQdsAVG /= ctr
+    print 'dQdsAVG = %.02f'%dQdsAVG
+    fin.seek(0)
     for line in fin:
         words = line.split()
         x = float(words[0])
@@ -64,7 +73,7 @@ def getShowerRecoAlgModular():
         q = float(words[3])
         energy.SetResponse(x,y,z,dQdsAVG/q)
 
-    energy.SetElectronLifetime(1e6  ) # in us DATA value
+    energy.SetElectronLifetime(1e6) # in us DATA value
     energy.SetRecombFactor(0.62)
     energy.SetElecGain(243.) # MCC8.0 data
     #energy.SetElecGain(200.) # MCC8.0 value
@@ -76,7 +85,7 @@ def getShowerRecoAlgModular():
     #dqdx.SetFillTree(True)
     
     shrFilter = showerreco.FilterShowers()
-    shrFilter.setAngleCut(15.)
+    shrFilter.setAngleCut(25.)
     shrFilter.setVerbosity(False)
 
     alg.AddShowerRecoModule( filteralgo )
@@ -151,19 +160,19 @@ ana_unit.SetOutputProducer("showerreco")
 
 my_proc.add_process(ana_unit)
 
-my_proc.set_data_to_write(fmwk.data.kMCTruth,      "generator")
-my_proc.set_data_to_write(fmwk.data.kMCShower,     "mcreco")
-my_proc.set_data_to_write(fmwk.data.kMCShower,     "mcreco")
-my_proc.set_data_to_write(fmwk.data.kVertex,       "numuCC_vertex")
-my_proc.set_data_to_write(fmwk.data.kShower,       "showerreco")
-my_proc.set_data_to_write(fmwk.data.kAssociation,  "showerreco")
+#my_proc.set_data_to_write(fmwk.data.kMCTruth,      "generator")
+#my_proc.set_data_to_write(fmwk.data.kMCShower,     "mcreco")
+#my_proc.set_data_to_write(fmwk.data.kMCShower,     "mcreco")
+#my_proc.set_data_to_write(fmwk.data.kVertex,       "numuCC_vertex")
+#my_proc.set_data_to_write(fmwk.data.kShower,       "showerreco")
+#my_proc.set_data_to_write(fmwk.data.kAssociation,  "showerreco")
 #my_proc.set_data_to_write(fmwk.data.kSimChannel,   "largeant")
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
-my_proc.run()
+my_proc.run(114,1)
 # my_proc.process_event(2)
 
 
