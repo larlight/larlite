@@ -123,8 +123,13 @@ namespace showerreco {
       _dqdx = _dqdx_v[_dqdx_v.size()/2.] / _pitch;
       */
 
-      std::nth_element(_dqdx_nonzero_v.begin(), _dqdx_nonzero_v.end(), _dqdx_nonzero_v.end() );
-      _dqdx = _dqdx_nonzero_v[ _dqdx_nonzero_v.size()/2.] / _pitch;
+      if (_dqdx_nonzero_v.size() == 0)
+	_dqdx = 0.;
+
+      else {
+	std::nth_element(_dqdx_nonzero_v.begin(), _dqdx_nonzero_v.end(), _dqdx_nonzero_v.end() );
+	_dqdx = _dqdx_nonzero_v[ _dqdx_nonzero_v.size()/2.] / _pitch;
+      }
 
       _ntot = hits.size();
 
