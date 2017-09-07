@@ -74,6 +74,8 @@ namespace showerreco {
       // grab the pitch for this plane
       //_pitch = geomHelper->GetPitch(dir3D, (int)pl);
 
+      double f = (1 - dir3D[1]*dir3D[1] );
+
       double dmax2D = _dtrunk * (1 - dir3D[1]*dir3D[1] );
 
       _pitch = geomHelper->GetPitch(dir3D, (int)pl);
@@ -83,6 +85,8 @@ namespace showerreco {
       _nhits = 0;
       
       _dqdx_v.clear();
+
+      _dqdx_v = std::vector<double>(3 * _dtrunk, 0.);
       
       // loop through hits and find those within some radial distance of the start point
       
@@ -91,19 +95,36 @@ namespace showerreco {
 	
 	double d2D = sqrt( pow(h.w - start2D.w, 2) + pow(h.t - start2D.t, 2) );
 
+	/* OLD
 	if (d2D > dmax2D) continue;
 
 	if (d2D > _dmax) _dmax = d2D;
 	
 	_dqdx_v.push_back( h.charge );
+	*/
+	
+	// NEW
+	double d3D = d2D / f;
+
+	if (d3D >= _dtrunk) continue;
+
+	_dqdx_v[ d3D * 3 ] += h.charge;
 	
 	_nhits += 1;
 	
       }// loop over all hits
 
+      std::vector<double> _dqdx_nonzero_v;
+      for (auto const& dqdx : _dqdx_v)
+	if (dqdx != 0) { _dqdx_nonzero_v.push_back(dqdx); }
+      
+      /* OLD
       std::nth_element(_dqdx_v.begin(), _dqdx_v.end(), _dqdx_v.end() );
-
       _dqdx = _dqdx_v[_dqdx_v.size()/2.] / _pitch;
+      */
+
+      std::nth_element(_dqdx_nonzero_v.begin(), _dqdx_nonzero_v.end(), _dqdx_nonzero_v.end() );
+      _dqdx = _dqdx_nonzero_v[ _dqdx_nonzero_v.size()/2.] / _pitch;
 
       _ntot = hits.size();
 
