@@ -16,8 +16,8 @@ namespace flashana {
   {
     _global_qe = pset.get<double>("GlobalQE");
     _qe_v      = pset.get<std::vector<double> >("CCVCorrection");
-    _libraryfile = pset.get<std::string>("LibraryFile","__PHOTONLIB_FILE_NOT_SET__");
-    if (_libraryfile=="__PHOTONLIB_FILE_NOT_SET__")
+    _libraryfile = pset.get<std::string>("LibraryFile","");
+    if (_libraryfile.empty())
       fLibrarySet = false;
     else
       fLibrarySet = true;

@@ -56,7 +56,7 @@ namespace phot{
     sim::PhotonVoxelDef GetVoxelDef() const {return fVoxelDef; }
     int NOpChannels() const { return fNOpDetChannels; }
 
-    std::string GetLibraryFilename() { return fLibraryFile; }; // Allows one to check loaded filename
+    const std::string& GetLibraryFilename() { return fLibraryFile; }; // Allows one to check loaded filename
 
     static PhotonVisibilityService& GetME(std::string filename="uboone_photon_library_v6_efield.root")
     {
