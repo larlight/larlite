@@ -42,6 +42,8 @@ namespace flashana {
 
     double _global_qe;         ///< Global QE
     std::vector<double> _qe_v; ///< PMT-wise relative QE
+    std::string _libraryfile;
+    bool fLibrarySet;
   };
   
   /**
