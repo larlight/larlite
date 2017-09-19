@@ -100,20 +100,30 @@ namespace phot{
 
 
       if((!fLibraryBuildJob)&&(!fDoNotLoadLibrary)) {
-	std::string LibraryFileWithPath = std::string(getenv("LARLITE_USERDEVDIR"));
-	LibraryFileWithPath += "/SelectionTool/OpT0Finder/PhotonLibrary/dat/";
-	LibraryFileWithPath += fLibraryFile;
+
+	std::string LibraryFileWithPath;
+	if ( fLibraryFile.front()!='/' ) {
+	  // relative path provided. use designated folder in larlite
+	  LibraryFileWithPath = std::string(getenv("LARLITE_USERDEVDIR"));
+	  LibraryFileWithPath += "/SelectionTool/OpT0Finder/PhotonLibrary/dat/";
+	  LibraryFileWithPath += fLibraryFile;
+	}
+	else {
+	  // absolute path
+	  LibraryFileWithPath = fLibraryFile;
+	}
 	if(!fParameterization) {
 	  std::cout << "PhotonVisibilityService Loading photon library from file "
 		    << LibraryFileWithPath
 		    << std::endl;
 	  size_t NVoxels = GetVoxelDef().GetNVoxels();
 	  fTheLibrary->LoadLibraryFromFile(LibraryFileWithPath, NVoxels);
-	}
+	} 
       }
       else {
+	// building library, so creating an empty one
         //art::ServiceHandle<geo::Geometry> geom;
-
+	
         size_t NVoxels = GetVoxelDef().GetNVoxels();
 	std::cout << " Vis service running library build job.  Please ensure " 
 		  << " job contains LightSource, LArG4, SimPhotonCounter"<<std::endl;
