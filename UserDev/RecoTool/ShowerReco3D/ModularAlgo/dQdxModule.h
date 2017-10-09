@@ -41,6 +41,18 @@ namespace showerreco {
     
     // set distance along which to calculate dE/dx
     void setTrunkLength(double d) { _dtrunk = d; }
+
+    /// 3D charge correction function
+    double ChargeCorrection(const double& q, const TVector3& vtx);
+
+    // create a map for calorimetric corrections for position-dependent response variations
+    void CreateResponseMap(const double& stepsize);
+
+    // set response map value
+    void SetResponse(const double& x, const double& y, const double& z, const double& q);
+
+    /// find nearest cell response value (by averaging)
+    double NearestCell(const size_t& i, const size_t& j, const size_t& k);
     
   protected:
     
@@ -52,10 +64,16 @@ namespace showerreco {
     // debugging tree
     double _dqdx;
     std::vector<double> _dqdx_v;
+    std::vector<double> _dist_v;
     double _pitch;
     double _dmax;
     int    _nhits;
     int    _ntot;
+    double _start_w, _start_t;
+
+    // position-dependent response map
+    std::vector< std::vector< std::vector< double > > >_responseMap;
+    double _responseStep;
     
   };
   

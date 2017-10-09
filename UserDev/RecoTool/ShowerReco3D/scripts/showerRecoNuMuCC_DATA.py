@@ -74,7 +74,7 @@ def getShowerRecoAlgModular():
         energy.SetResponse(x,y,z,dQdsAVG/q)
 
     energy.SetElectronLifetime(1e6) # in us DATA value
-    energy.SetRecombFactor(0.62)
+    energy.SetRecombFactor(0.572)
     energy.SetElecGain(243.) # MCC8.0 data
     #energy.SetElecGain(200.) # MCC8.0 value
     energy.setVerbosity(False)
@@ -153,8 +153,8 @@ protoshoweralg.SetVertexProducer("numuCC_vertex")
 ana_unit.GetProtoShowerHelper().setProtoShowerAlg( protoshoweralg )
 
 #ana_unit.SetInputProducer("ImageClusterHit")
-ana_unit.SetInputProducer("iou")
-#ana_unit.SetInputProducer("coneshower")
+#ana_unit.SetInputProducer("iou")
+ana_unit.SetInputProducer("coneshower")
 
 ana_unit.SetOutputProducer("showerreco")
 
@@ -172,7 +172,7 @@ print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
-my_proc.run(114,1)
+my_proc.run()
 # my_proc.process_event(2)
 
 
