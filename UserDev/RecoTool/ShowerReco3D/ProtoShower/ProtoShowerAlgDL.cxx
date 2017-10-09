@@ -56,7 +56,7 @@ namespace protoshower {
 
     if (ev_vertex and (ev_vertex->size() == 1) ) {
       proto_shower.hasVertex(true);
-      auto const& vtx = ev_vertex->at(0); // only 1 vertex @ a time?
+      auto const& vtx = ev_vertex->front(); // only 1 vertex @ a time?
       vtx.XYZ(xyz.data());
       proto_shower._vertexes.push_back( TVector3(xyz[0],xyz[1],xyz[2]) );
 
