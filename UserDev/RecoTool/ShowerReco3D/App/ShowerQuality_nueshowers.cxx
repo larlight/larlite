@@ -47,8 +47,9 @@ namespace larlite {
     _subrun = storage->subrun_id();
 
     larlite::mcshower nue_shower;
+    nue_shower.PdgCode(data::kINVALID_INT);
 
-    if (!ev_mcs->empty()) {
+    if (ev_mc and !ev_mcs->empty()) {
 
       // Before getting the reconstructed showers, we store some true (mcshower) information
       // to be used as the denominator in efficiency calculations (n reco showers / n true showers, etc)
@@ -155,6 +156,17 @@ namespace larlite {
       fShowerTreeParams.mc_charge_Y = mc_shower.Charge(2);
       
       fShowerTreeParams.mc_pdg_code = mc_shower.PdgCode();
+
+
+      // Reco cluster efficiency & purity
+      auto eff_purs = _alg.ClusterEP(shower_index);
+      fShowerTreeParams.cluster_eff_U = eff_purs.at(0).first;
+      fShowerTreeParams.cluster_eff_V = eff_purs.at(1).first;
+      fShowerTreeParams.cluster_eff_Y = eff_purs.at(2).first;
+      fShowerTreeParams.cluster_pur_U = eff_purs.at(0).second;
+      fShowerTreeParams.cluster_pur_V = eff_purs.at(1).second;
+      fShowerTreeParams.cluster_pur_Y = eff_purs.at(2).second;
+
     }
 
     // Reco vtx
@@ -166,16 +178,6 @@ namespace larlite {
     fShowerTreeParams.reco_dcosx = reco_shower.Direction()[0];
     fShowerTreeParams.reco_dcosy = reco_shower.Direction()[1];
     fShowerTreeParams.reco_dcosz = reco_shower.Direction()[2];
-
-
-    // Reco cluster efficiency & purity
-    auto eff_purs = _alg.ClusterEP(shower_index);
-    fShowerTreeParams.cluster_eff_U = eff_purs.at(0).first;
-    fShowerTreeParams.cluster_eff_V = eff_purs.at(1).first;
-    fShowerTreeParams.cluster_eff_Y = eff_purs.at(2).first;
-    fShowerTreeParams.cluster_pur_U = eff_purs.at(0).second;
-    fShowerTreeParams.cluster_pur_V = eff_purs.at(1).second;
-    fShowerTreeParams.cluster_pur_Y = eff_purs.at(2).second;
 
     fShowerTreeParams.reco_energy_U = reco_shower.Energy_v().at(0);
     fShowerTreeParams.reco_energy_V = reco_shower.Energy_v().at(1);
