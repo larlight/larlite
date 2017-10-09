@@ -49,7 +49,7 @@ namespace larlite {
     larlite::mcshower nue_shower;
     nue_shower.PdgCode(data::kINVALID_INT);
 
-    if (ev_mc and !ev_mcs->empty()) {
+    if (ev_mcs and !ev_mcs->empty()) {
 
       // Before getting the reconstructed showers, we store some true (mcshower) information
       // to be used as the denominator in efficiency calculations (n reco showers / n true showers, etc)
