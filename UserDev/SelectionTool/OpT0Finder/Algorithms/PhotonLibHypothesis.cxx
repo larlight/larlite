@@ -35,9 +35,9 @@ namespace flashana {
     size_t n_pmt = BaseAlgorithm::NOpDets();//n_pmt returns 0 now, needs to be fixed
     const ::phot::PhotonVisibilityService*  pPhotonLib = NULL;
     if ( fLibrarySet )
-      pPhotonLib = &(::phot::PhotonVisibilityService::GetME());
-    else
       pPhotonLib = &(::phot::PhotonVisibilityService::GetME(_libraryfile));
+    else
+      pPhotonLib = &(::phot::PhotonVisibilityService::GetME());
     
     for ( auto& v : flash.pe_v ) v = 0;
     
