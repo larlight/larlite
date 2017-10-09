@@ -22,164 +22,170 @@
 
 #include <map>
 #include "Analysis/ana_base.h"
-// #include "MCComp/MCMatchAlg.h"
 #include "ShowerReco3D/Base/ShowerRecoException.h"
 #include "DataFormat/shower.h"
 #include "DataFormat/mcshower.h"
-// #include "DataFormat/cluster.h"
 
 #include "MCSingleShowerCompAlg.h"
 
-
-
 namespace larlite {
-/**
-   \class ShowerQuality_nueshowers
-   User custom analysis class made by kazuhiro/kaleko
- */
-class ShowerQuality_nueshowers : public ana_base {
-
-public:
-
-  /// Default constructor
-  ShowerQuality_nueshowers();
-
-  /// Default destructor
-  virtual ~ShowerQuality_nueshowers() {};
-
   /**
-     Setter function for a shower producer name.
+     \class ShowerQuality_nueshowers
+     User custom analysis class made by kazuhiro/kaleko
   */
-  void SetShowerProducer(const std::string name)
-  { fShowerProducer = name; }
+  class ShowerQuality_nueshowers : public ana_base {
 
-  /// Set maximum energy for MCShowers to be considered
-  void SetMaxEnergyCut(const double energy) { _mc_energy_max = energy; }
+  public:
 
-  /// Set minimum energy for MCShowers to be considered
-  void SetMinEnergyCut(const double energy) { _mc_energy_min = energy; }
+    /// Default constructor
+    ShowerQuality_nueshowers();
 
-  /**
-      Initialization method to be called before the analysis event loop.
-  */
-  virtual bool initialize();
+    /// Default destructor
+    virtual ~ShowerQuality_nueshowers() {};
 
-  /**
-      Analyze a data event-by-event
-  */
-  virtual bool analyze(storage_manager* storage);
+    /**
+       Setter function for a shower producer name.
+    */
+    void SetShowerProducer(const std::string name)
+    { fShowerProducer = name; }
 
-  /**
-      Finalize method to be called after all events processed.
-  */
-  virtual bool finalize();
+    /// Set maximum energy for MCShowers to be considered
+    void SetMaxEnergyCut(const double energy) { _mc_energy_max = energy; }
 
-  /// Setter to toggle if you are running on a single particle file
-  void SetSingleParticleQuality(bool flag) { _single_particle_quality = flag; }
+    /// Set minimum energy for MCShowers to be considered
+    void SetMinEnergyCut(const double energy) { _mc_energy_min = energy; }
+
+    /**
+       Initialization method to be called before the analysis event loop.
+    */
+    virtual bool initialize();
+
+    /**
+       Analyze a data event-by-event
+    */
+    virtual bool analyze(storage_manager* storage);
+
+    /**
+       Finalize method to be called after all events processed.
+    */
+    virtual bool finalize();
+
+    /// Setter to toggle if you are running on a single particle file
+    void SetSingleParticleQuality(bool flag) { _single_particle_quality = flag; }
 
 
-protected:
+  protected:
 
-  // Function to fill TTree
-  void FillQualityInfo(const shower& reco_shower,
-                       const mcshower& mc_shower,
-                       size_t shower_index);
-  // const std::vector< const larlite::cluster * > associated_clusters);
+    // Function to fill TTree
+    void FillQualityInfo(const shower& reco_shower,
+			 const mcshower& mc_shower,
+			 size_t shower_index);
+    // const std::vector< const larlite::cluster * > associated_clusters);
 
-  /// Function to set all of once-per-shower tree parameters to default values
-  void ResetShowerTreeParams();
+    /// Function to set all of once-per-shower tree parameters to default values
+    void ResetShowerTreeParams();
 
-  /// Function to set all of once-per-event tree parameters to default values
-  void ResetEventTreeParams();
+    /// Function to set all of once-per-event tree parameters to default values
+    void ResetEventTreeParams();
 
-  /// Boolean to toggle if you are looking for shower quality on single generated particle (simple)
-  /// or on a multi-particle realistic event (complicated, needs simchannel)
-  bool _single_particle_quality;
+    /// Boolean to toggle if you are looking for shower quality on single generated particle (simple)
+    /// or on a multi-particle realistic event (complicated, needs simchannel)
+    bool _single_particle_quality;
 
-  /// Minimum MC shower energy cut
-  double _mc_energy_min;
+    /// Minimum MC shower energy cut
+    double _mc_energy_min;
 
-  /// Maximum MC shower energy cut
-  double _mc_energy_max;
+    /// Maximum MC shower energy cut
+    double _mc_energy_max;
 
-  /// Shower Producer's Name
-  std::string fShowerProducer;
+    /// Shower Producer's Name
+    std::string fShowerProducer;
 
-  // /// Matching correctness
-  // All "MatchCorrectness" histograms depend on simchannel.
-  // TH1D *hMatchCorrectness;
+    // /// Matching correctness
+    // All "MatchCorrectness" histograms depend on simchannel.
+    // TH1D *hMatchCorrectness;
 
-  // "cluster efficiency" is the cluster's charge divided by all hit charge associated with that mcshower
-  // (IE the Q summed over all hits in the event, for single particle events)
-  // TH1D *hMatchedClusterEff; ///< Matched 3D shower's cluster efficiency (combined across planes)
+    // "cluster efficiency" is the cluster's charge divided by all hit charge associated with that mcshower
+    // (IE the Q summed over all hits in the event, for single particle events)
+    // TH1D *hMatchedClusterEff; ///< Matched 3D shower's cluster efficiency (combined across planes)
 
-  // "cluster purity" is the fraction of that cluster's Q belonging to the MCShower
-  // for single-particle events, purity is always == 1 for every cluster.
-  // TH1D *hMatchedClusterPur; ///< Matched 3D shower's cluster purity (combined across planes)
+    // "cluster purity" is the fraction of that cluster's Q belonging to the MCShower
+    // for single-particle events, purity is always == 1 for every cluster.
+    // TH1D *hMatchedClusterPur; ///< Matched 3D shower's cluster purity (combined across planes)
 
-  /// Analysis TTree. Filled once per reconstructed shower.
-  TTree *fShowerTree;
+    /// Analysis TTree. Filled once per reconstructed shower.
+    TTree *fShowerTree;
 
-  /// Analysis TTree. Filled once per event.
-  TTree *fEventTree;
+    /// Analysis TTree. Filled once per event.
+    TTree *fEventTree;
 
-  int _event, _subrun, _run;
+    int _event, _subrun, _run;
 
-  /// For convenience: struct to define a set of parameters per shower to be stored in per-reconstructed-shower TTree
-  struct ShowerTreeParams_t {
-    int run, subrun, event;
-    double reco_x, reco_y, reco_z;
-    double reco_dcosx, reco_dcosy, reco_dcosz;
-    double reco_energy_U;
-    double reco_energy_V;
-    double reco_energy_Y;
-    double reco_dedx;
-    double reco_dedx_U;
-    double reco_dedx_V;
-    double reco_dedx_Y;
-    double reco_dqdx;
-    double reco_dqdx_U;
-    double reco_dqdx_V;
-    double reco_dqdx_Y;
-    double mc_x, mc_y, mc_z;
-    double mc_dcosx, mc_dcosy, mc_dcosz;
-    double mc_energy;
-    double mc_reco_anglediff;
-    double mc_reco_dist;
-    double cluster_eff_U;
-    double cluster_eff_V;
-    double cluster_eff_Y;
-    double cluster_pur_U;
-    double cluster_pur_V;
-    double cluster_pur_Y;
-    double mc_containment;
-    double reco_length;
-    double reco_width1;
-    double reco_width2;
-    double mc_length;
-    double mc_wildlength;
-    int    match;
+    /// For convenience: struct to define a set of parameters per shower to be stored in per-reconstructed-shower TTree
+    struct ShowerTreeParams_t {
+      int run, subrun, event;
+      double reco_x, reco_y, reco_z;
+      double reco_dcosx, reco_dcosy, reco_dcosz;
+      double reco_energy_U;
+      double reco_energy_V;
+      double reco_energy_Y;
+      double reco_dedx;
+      double reco_dedx_U;
+      double reco_dedx_V;
+      double reco_dedx_Y;
+      double reco_dqdx;
+      double reco_dqdx_U;
+      double reco_dqdx_V;
+      double reco_dqdx_Y;
+      double mc_x, mc_y, mc_z;
+      double mc_dcosx, mc_dcosy, mc_dcosz;
+      double mc_energy;
+      double mc_reco_anglediff;
+      double mc_reco_dist;
+      // START: new
+      double mc_dedx;
+      double mc_dqdx_U;
+      double mc_dqdx_V;
+      double mc_dqdx_Y;
+      double mc_charge_U;
+      double mc_charge_V;
+      double mc_charge_Y;
+      int mc_pdg_code;
+      // END: new
+      double cluster_eff_U;
+      double cluster_eff_V;
+      double cluster_eff_Y;
+      double cluster_pur_U;
+      double cluster_pur_V;
+      double cluster_pur_Y;
+      double mc_containment;
+      double reco_length;
+      double reco_width1;
+      double reco_width2;
+      double mc_length;
+      double mc_wildlength;
+      int    match;
 
-  } fShowerTreeParams;
+    } fShowerTreeParams;
 
-  struct EventTreeParams_t {
+    struct EventTreeParams_t {
 
-    int n_mcshowers;
-    int n_recoshowers;
-    //Detprofile energy of the FIRST (for now, only) mcshower
-    double mcs_E;
-    double mc_containment;
+      int n_mcshowers;
+      int n_recoshowers;
+      //Detprofile energy of the FIRST (for now, only) mcshower
+      double mcs_E;
+      double mc_containment;
 
-  } fEventTreeParams;
+    } fEventTreeParams;
 
-  /// Function to prepare TTrees
-  void InitializeAnaTrees();
+    /// Function to prepare TTrees
+    void InitializeAnaTrees();
 
-  /// Algorithm to compute cluster efficiency/purity WITHOUT simchannel usage
-  /// (only usable on single-mcshower events (single e, single gamma))
-  MCSingleShowerCompAlg _alg;
+    /// Algorithm to compute cluster efficiency/purity WITHOUT simchannel usage
+    /// (only usable on single-mcshower events (single e, single gamma))
+    MCSingleShowerCompAlg _alg;
 
-};
+  };
 }
 #endif
 
