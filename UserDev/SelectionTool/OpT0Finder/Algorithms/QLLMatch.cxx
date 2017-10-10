@@ -27,6 +27,7 @@ namespace flashana {
     _record = pset.get<bool>("RecordHistory");
     _normalize = pset.get<bool>("NormalizeHypothesis");
     _mode   = (QLLMode_t)(pset.get<unsigned short>("QLLMode"));
+    _cosmic_disc_correction = pset.get<bool>("ApplyCosmicDiscCorrection");
     _penalty_threshold_v = pset.get<std::vector<double> >("PEPenaltyThreshold");
     _penalty_value_v = pset.get<std::vector<double> >("PEPenaltyValue");
 
@@ -37,6 +38,8 @@ namespace flashana {
     _onepmt_xdiff_threshold = pset.get<double>("OnePMTXDiffThreshold");
     _onepmt_pesum_threshold = pset.get<double>("OnePMTPESumThreshold");
     _onepmt_pefrac_threshold = pset.get<double>("OnePMTPEFracThreshold");
+
+    _current_flash_isfrom_cosmicdisc = false;
   }
   
   FlashMatch_t QLLMatch::Match(const QCluster_t &pt_v, const Flash_t &flash) {
@@ -210,8 +213,20 @@ namespace flashana {
       _var_trk[pt_index].z = _raw_trk[pt_index].z;
       _var_trk[pt_index].q = _raw_trk[pt_index].q;
     }
-    
+
+    // go out to photonlibary and calculate flash hypothesis
     FillEstimate(_var_trk, _hypothesis);
+
+    if (_cosmic_disc_correction && _current_flash_isfrom_cosmicdisc ) {
+      for (size_t ich=0; ich<_hypothesis.pe_v.size(); ich++ ) {
+	float pe = _hypothesis.pe_v.at(ich);
+	if ( pe < 60.0 ) 
+	  pe *= 0.424;
+	else if ( pe > 60.0 )
+	  pe *= 0.354;
+	_hypothesis.pe_v[ich] = pe;
+      }
+    }
     
     if (_normalize) {
       double qsum = std::accumulate(std::begin(_hypothesis.pe_v),
