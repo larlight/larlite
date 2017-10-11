@@ -75,7 +75,6 @@ namespace flashana {
     const std::vector<double>& HistoryChi2() const { return _minimizer_record_chi2_v; }
     const std::vector<double>& HistoryX()    const { return _minimizer_record_x_v;    }
 
-    void setCosmicTagForFlash( bool iscosmic ) { _current_flash_isfrom_cosmicdisc=iscosmic; };
 
   protected:
 
@@ -122,11 +121,10 @@ namespace flashana {
     double _onepmt_xdiff_threshold;
     double _onepmt_pesum_threshold;
     double _onepmt_pefrac_threshold;
-
+    
     // flags to indicate when cosmic discriminator corrections should be applied
     bool _cosmic_disc_correction;
-    bool _current_flash_isfrom_cosmicdisc;
-    
+    bool _skip_nodata_bins;
     
   };
 

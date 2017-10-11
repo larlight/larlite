@@ -60,6 +60,14 @@ namespace flashana {
     /// Method to simply fill provided reference of flashana::Flash_t
     void FillEstimate(const QCluster_t&, Flash_t&) const;
 
+    /// Method to tag if flash being match should be assumed as coming from the cosmic readout
+    void setCosmicTagForFlash( bool iscosmic ) { _current_flash_isfrom_cosmicdisc=iscosmic; };
+
+
+  protected:
+    /// If flag is true, treat as cosmic disc. Concrete classes can choose to employ this correction or not
+    bool _current_flash_isfrom_cosmicdisc;
+    
   private:
 
     void SetFlashHypothesis(flashana::BaseFlashHypothesis*);

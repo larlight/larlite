@@ -17,7 +17,7 @@ namespace flashana {
   void MIN_vtx_qll(Int_t &, Double_t *, Double_t &, Double_t *, Int_t);
   
   QLLMatch::QLLMatch(const std::string name)
-    : BaseFlashMatch(name), _mode(kChi2), _record(false), _normalize(false), _minuit_ptr(nullptr)
+    : BaseFlashMatch(name), _mode(kChi2), _record(false), _normalize(false), _cosmic_disc_correction(false), _minuit_ptr(nullptr)
   { _current_llhd = _current_chi2 = -1.0; }
 
   QLLMatch::QLLMatch()
@@ -28,6 +28,7 @@ namespace flashana {
     _normalize = pset.get<bool>("NormalizeHypothesis");
     _mode   = (QLLMode_t)(pset.get<unsigned short>("QLLMode"));
     _cosmic_disc_correction = pset.get<bool>("ApplyCosmicDiscCorrection");
+    _skip_nodata_bins = pset.get<bool>("SkipZeroFlashBins");    
     _penalty_threshold_v = pset.get<std::vector<double> >("PEPenaltyThreshold");
     _penalty_value_v = pset.get<std::vector<double> >("PEPenaltyValue");
 
@@ -40,6 +41,7 @@ namespace flashana {
     _onepmt_pefrac_threshold = pset.get<double>("OnePMTPEFracThreshold");
 
     _current_flash_isfrom_cosmicdisc = false;
+
   }
   
   FlashMatch_t QLLMatch::Match(const QCluster_t &pt_v, const Flash_t &flash) {
@@ -222,7 +224,7 @@ namespace flashana {
 	float pe = _hypothesis.pe_v.at(ich);
 	if ( pe < 60.0 ) 
 	  pe *= 0.424;
-	else if ( pe > 60.0 )
+	else if ( pe >= 60.0 )
 	  pe *= 0.354;
 	_hypothesis.pe_v[ich] = pe;
       }
@@ -279,10 +281,22 @@ namespace flashana {
 	*/
 	// Updated block
 	double arg = TMath::Poisson(O,H);
-	if(arg > 0. && !std::isnan(arg))
-	  _current_llhd -= std::log10(arg);
-	else
-	  _current_llhd = 1.e6;
+	if ( !_skip_nodata_bins ) {
+	  // include all bins
+	  if(arg > 0. && !std::isnan(arg) )
+	    _current_llhd -= std::log10(arg);
+	  else
+	    _current_llhd = 1.e6;
+	}
+	else {
+	  // only include non-zero bins
+	  if ( O>0 ) {
+	    if(arg > 0. && !std::isnan(arg) )
+	      _current_llhd -= std::log10(arg);
+	    else
+	      _current_llhd = 1.e6;	    
+	  }
+	}
 	if(std::isinf(_current_llhd)) _current_llhd = 1.e6;
 	// Updated block ends
       } else if (_mode == kChi2) {
