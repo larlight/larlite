@@ -55,6 +55,8 @@ namespace flashana {
     for (size_t i = 0; i < pt_v.size(); ++i) {
       auto const &pt = pt_v[i];
       _raw_trk[i] = pt;
+      if ( pt.y<ActiveYMin() || pt.y>ActiveYMax() || pt.z<ActiveZMin() || pt.z>ActiveZMax() )
+	continue;
       if (pt.x < min_x) { min_x = pt.x; _raw_xmin_pt = pt; }
       if (pt.x > max_x) { max_x = pt.x; _raw_xmax_pt = pt; }
     }
