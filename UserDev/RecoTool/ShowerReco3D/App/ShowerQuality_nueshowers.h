@@ -121,6 +121,9 @@ namespace larlite {
 
     int _event, _subrun, _run;
 
+    int _mcinfoInteractionType;
+    int _mcinfoMode;
+
     /// For convenience: struct to define a set of parameters per shower to be stored in per-reconstructed-shower TTree
     struct ShowerTreeParams_t {
       int run, subrun, event;

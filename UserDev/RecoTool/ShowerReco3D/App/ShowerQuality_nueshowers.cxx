@@ -5,6 +5,7 @@
 #include "LArUtil/Geometry.h"
 #include "EMShowerTools/EMShowerProfile.h"
 #include "TVector3.h"
+#include <cassert>
 
 namespace larlite {
 
@@ -41,6 +42,7 @@ namespace larlite {
 
     // Retrieve mcshower data product
     auto ev_mcs = storage->get_data<event_mcshower>("mcreco");
+    auto ev_truth = (event_mctruth*)storage->get_data<event_mctruth>("generator");
 
     _event  = storage->event_id();
     _run    = storage->run_id();
@@ -50,6 +52,16 @@ namespace larlite {
     nue_shower.PdgCode(data::kINVALID_INT);
 
     if (ev_mcs and !ev_mcs->empty()) {
+
+      assert(ev_truth);
+      assert(!ev_truth->empty());
+
+      //
+      // Read out some nu shits
+      //
+      _mcinfoInteractionType =  (int)   nu.InteractionType();
+      _mcinfoMode            =  (int)   nu.Mode();
+
 
       // Before getting the reconstructed showers, we store some true (mcshower) information
       // to be used as the denominator in efficiency calculations (n reco showers / n true showers, etc)
@@ -213,33 +225,45 @@ namespace larlite {
     if (fShowerTree) delete fShowerTree;
     fShowerTree = new TTree("fShowerTree_nueshowers", "");
 
-    fShowerTree->Branch("event", &_event, "event/I");
-    fShowerTree->Branch("run", &_run, "run/I");
-    fShowerTree->Branch("subrun", &_subrun, "subrun/I");
+    fShowerTree->Branch("event" , &_event  , "event/I");
+    fShowerTree->Branch("run"   , &_run    , "run/I");
+    fShowerTree->Branch("subrun", &_subrun , "subrun/I");
+
+    fShowerTree->Branch("interactiontype", &_mcinfoInteractionType , "interactiontype/I");
+    fShowerTree->Branch("mode"           , &_mcinfoMode            , "mode/I");
+
     fShowerTree->Branch("reco_x", &fShowerTreeParams.reco_x, "reco_x/D");
     fShowerTree->Branch("reco_y", &fShowerTreeParams.reco_y, "reco_y/D");
     fShowerTree->Branch("reco_z", &fShowerTreeParams.reco_z, "reco_z/D");
+
     fShowerTree->Branch("reco_dcosx", &fShowerTreeParams.reco_dcosx, "reco_dcosx/D");
     fShowerTree->Branch("reco_dcosy", &fShowerTreeParams.reco_dcosy, "reco_dcosy/D");
     fShowerTree->Branch("reco_dcosz", &fShowerTreeParams.reco_dcosz, "reco_dcosz/D");
+
     fShowerTree->Branch("reco_energy_U", &fShowerTreeParams.reco_energy_U, "reco_energy_U/D");
     fShowerTree->Branch("reco_energy_V", &fShowerTreeParams.reco_energy_V, "reco_energy_V/D");
     fShowerTree->Branch("reco_energy_Y", &fShowerTreeParams.reco_energy_Y, "reco_energy_Y/D");
+
     fShowerTree->Branch("mc_x", &fShowerTreeParams.mc_x, "mc_x/D");
     fShowerTree->Branch("mc_y", &fShowerTreeParams.mc_y, "mc_y/D");
     fShowerTree->Branch("mc_z", &fShowerTreeParams.mc_z, "mc_z/D");
+
     fShowerTree->Branch("mc_dcosx", &fShowerTreeParams.mc_dcosx, "mc_dcosx/D");
     fShowerTree->Branch("mc_dcosy", &fShowerTreeParams.mc_dcosy, "mc_dcosy/D");
     fShowerTree->Branch("mc_dcosz", &fShowerTreeParams.mc_dcosz, "mc_dcosz/D");
+
     fShowerTree->Branch("reco_dqdx", &fShowerTreeParams.reco_dqdx, "reco_dqdx/D");
     fShowerTree->Branch("reco_dqdx_U", &fShowerTreeParams.reco_dqdx_U, "reco_dqdx_U/D");
     fShowerTree->Branch("reco_dqdx_V", &fShowerTreeParams.reco_dqdx_V, "reco_dqdx_V/D");
     fShowerTree->Branch("reco_dqdx_Y", &fShowerTreeParams.reco_dqdx_Y, "reco_dqdx_Y/D");
+
     fShowerTree->Branch("mc_energy", &fShowerTreeParams.mc_energy, "mc_energy/D");
+
     fShowerTree->Branch("reco_dedx", &fShowerTreeParams.reco_dedx, "reco_dedx/D");
     fShowerTree->Branch("reco_dedx_U", &fShowerTreeParams.reco_dedx_U, "reco_dedx_U/D");
     fShowerTree->Branch("reco_dedx_V", &fShowerTreeParams.reco_dedx_V, "reco_dedx_V/D");
     fShowerTree->Branch("reco_dedx_Y", &fShowerTreeParams.reco_dedx_Y, "reco_dedx_Y/D");
+
     fShowerTree->Branch("mc_reco_anglediff", &fShowerTreeParams.mc_reco_anglediff, "mc_reco_anglediff/D");
     fShowerTree->Branch("mc_reco_dist", &fShowerTreeParams.mc_reco_dist, "mc_reco_dist/D");
     fShowerTree->Branch("cluster_eff_U", &fShowerTreeParams.cluster_eff_U, "cluster_eff_U/D");
@@ -255,7 +279,6 @@ namespace larlite {
     fShowerTree->Branch("mc_length",  &fShowerTreeParams.mc_length,  "mc_length/D");
     fShowerTree->Branch("mc_wildlength", &fShowerTreeParams.mc_wildlength, "mc_wildlength/D");
     fShowerTree->Branch("match", &fShowerTreeParams.match, "match/I");
-
     fShowerTree->Branch("mc_dedx"     , &fShowerTreeParams.mc_dedx     , "mc_dedx/D");
     fShowerTree->Branch("mc_dqdx_U"   , &fShowerTreeParams.mc_dqdx_U   , "mc_dqdx_U/D");
     fShowerTree->Branch("mc_dqdx_V"   , &fShowerTreeParams.mc_dqdx_V   , "mc_dqdx_V/D");
@@ -343,6 +366,9 @@ namespace larlite {
     fShowerTreeParams.mc_charge_Y = -1.0*data::kINVALID_DOUBLE;
 
     fShowerTreeParams.mc_pdg_code = -1.0*data::kINVALID_INT;
+
+    _mcinfoInteractionType = -1.0*data::kINAVLID_INT;
+    _mcinfoMode            = -1.0*data::kINAVLID_INT;
 
   }
 
