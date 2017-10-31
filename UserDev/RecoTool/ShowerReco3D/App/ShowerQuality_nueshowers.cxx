@@ -125,8 +125,6 @@ namespace larlite {
 						 size_t shower_index)
   {
 
-    ResetShowerTreeParams();
-
     fShowerTreeParams.event = _event;
     fShowerTreeParams.run   = _run;
     fShowerTreeParams.event = _event;
@@ -369,12 +367,13 @@ namespace larlite {
 
     fShowerTreeParams.mc_pdg_code = -1.0*data::kINVALID_INT;
 
-    _mcinfoInteractionType = -1.0*data::kINVALID_INT;
-    _mcinfoMode            = -1.0*data::kINVALID_INT;
 
   }
 
   void ShowerQuality_nueshowers::ResetEventTreeParams() {
+    _mcinfoInteractionType = -1.0*data::kINVALID_INT;
+    _mcinfoMode            = -1.0*data::kINVALID_INT;
+
     fEventTreeParams.n_mcshowers = 0;
     fEventTreeParams.n_recoshowers = 0;
     fEventTreeParams.mcs_E = -1.0*data::kINVALID_DOUBLE;
