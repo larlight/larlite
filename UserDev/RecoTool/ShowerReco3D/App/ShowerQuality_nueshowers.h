@@ -25,6 +25,7 @@
 #include "ShowerReco3D/Base/ShowerRecoException.h"
 #include "DataFormat/shower.h"
 #include "DataFormat/mcshower.h"
+#include "DataFormat/mctruth.h"
 
 #include "MCSingleShowerCompAlg.h"
 

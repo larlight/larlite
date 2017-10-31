@@ -59,6 +59,8 @@ namespace larlite {
       //
       // Read out some nu shits
       //
+      const auto& truth = ev_truth->front();
+      const auto& nu = truth.GetNeutrino();
       _mcinfoInteractionType =  (int)   nu.InteractionType();
       _mcinfoMode            =  (int)   nu.Mode();
 
@@ -367,8 +369,8 @@ namespace larlite {
 
     fShowerTreeParams.mc_pdg_code = -1.0*data::kINVALID_INT;
 
-    _mcinfoInteractionType = -1.0*data::kINAVLID_INT;
-    _mcinfoMode            = -1.0*data::kINAVLID_INT;
+    _mcinfoInteractionType = -1.0*data::kINVALID_INT;
+    _mcinfoMode            = -1.0*data::kINVALID_INT;
 
   }
 
