@@ -120,8 +120,8 @@ namespace larlite {
     /// Analysis TTree. Filled once per event.
     TTree *fEventTree;
 
-    int _event, _subrun, _run;
-
+    int _event, _subrun, _run, _entry;
+    int _shower_index;
     int _mcinfoInteractionType;
     int _mcinfoMode;
 

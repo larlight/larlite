@@ -47,6 +47,7 @@ namespace larlite {
     _event  = storage->event_id();
     _run    = storage->run_id();
     _subrun = storage->subrun_id();
+    _event  = -1.0*data::kINVALID_INT;
 
     larlite::mcshower nue_shower;
     nue_shower.PdgCode(data::kINVALID_INT);
@@ -85,19 +86,21 @@ namespace larlite {
     // Retrieve shower data product
     auto ev_shower = storage->get_data<event_shower>(fShowerProducer);
     if (!ev_shower) {
-      print(msg::kERROR, __FUNCTION__, Form("Did not find shower produced by \"%s\"", fShowerProducer.c_str()));
+      print(msg::kINFO, __FUNCTION__, Form("Did not find shower produced by \"%s\"", fShowerProducer.c_str()));
+      fEventTree->Fill();
       return false;
     }
 
     //Fill event TTree number of reconstructed showers
     fEventTreeParams.n_recoshowers = ev_shower->size();
 
-    if (!ev_shower->size()) {
-      //Fill the once-per-event TTree before you quit out early
+    if (ev_shower->empty()) {
+      std::cout << "no... showers..." << std::endl;
       fEventTree->Fill();
       return false;
     }
 
+    std::cout << "Filling " << ev_shower->size() << " showers" << std::endl;
     for (size_t shower_index = 0; shower_index < ev_shower->size(); ++shower_index) {
       auto const& myrecoshower = ev_shower->at(shower_index);
       auto const& mymcshower   = nue_shower;
@@ -181,6 +184,9 @@ namespace larlite {
 
     }
 
+    // shower index
+    _shower_index = shower_index;
+
     // Reco vtx
     fShowerTreeParams.reco_x = reco_shower.ShowerStart()[0];
     fShowerTreeParams.reco_y = reco_shower.ShowerStart()[1];
@@ -228,6 +234,8 @@ namespace larlite {
     fShowerTree->Branch("event" , &_event  , "event/I");
     fShowerTree->Branch("run"   , &_run    , "run/I");
     fShowerTree->Branch("subrun", &_subrun , "subrun/I");
+    fShowerTree->Branch("event" , &_event , "event/I");
+    fShowerTree->Branch("shower_id", &_shower_index, "shower_id/I");
 
     fShowerTree->Branch("interactiontype", &_mcinfoInteractionType , "interactiontype/I");
     fShowerTree->Branch("mode"           , &_mcinfoMode            , "mode/I");
@@ -366,8 +374,7 @@ namespace larlite {
     fShowerTreeParams.mc_charge_Y = -1.0*data::kINVALID_DOUBLE;
 
     fShowerTreeParams.mc_pdg_code = -1.0*data::kINVALID_INT;
-
-
+    _shower_index = -1.0*data::kINVALID_INT;
   }
 
   void ShowerQuality_nueshowers::ResetEventTreeParams() {

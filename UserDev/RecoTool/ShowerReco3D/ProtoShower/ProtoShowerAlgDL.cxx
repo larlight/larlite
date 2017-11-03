@@ -49,26 +49,30 @@ namespace protoshower {
     // That means using cluster_params and cluster3D_params if needed
 
     // Do the vertex:
-    auto ev_vertex = storage->get_data<::larlite::event_vertex>(_vtx_producer);
+    larlite::event_vertex *ev_vertex = nullptr;
+    auto const& ass_vertex_v = storage->find_one_ass(ev_pfpart->id(), ev_vertex, ev_pfpart->name());
+    std::cout << "@pfpart=" << proto_shower_pfpart << std::endl;
 
+    if (!ev_vertex) {
+      std::cout << "No vertex found?" << std::endl;
+      throw std::exception();
+      return;
+    }
+
+    // get the associated vertex
     std::array<double,3> xyz;
     std::array<larutil::Point2D, 3> xz_v;
 
-    if (ev_vertex and (ev_vertex->size() == 1) ) {
-      proto_shower.hasVertex(true);
-      auto const& vtx = ev_vertex->front(); // only 1 vertex @ a time?
-      vtx.XYZ(xyz.data());
-      proto_shower._vertexes.push_back( TVector3(xyz[0],xyz[1],xyz[2]) );
+    proto_shower.hasVertex(true);
+    auto vtxid_v = ass_vertex_v.at(proto_shower_pfpart);
+    assert(vtxid_v.size()==1);
+    auto const& vtx = ev_vertex->at(vtxid_v.front());
+    vtx.XYZ(xyz.data());
+    proto_shower._vertexes.push_back( TVector3(xyz[0],xyz[1],xyz[2]) );
 
-      for(size_t plane=0; plane<3; ++plane) {
-	auto pt = geomH->Point_3Dto2D(xyz.data(),plane);
-	xz_v[plane] = pt;
-      }
-
-    }// if there is vertex info
-    else {
-      if (_debug) std::cout << "No vertex @ found, SKIP!" << std::endl;
-      return;
+    for(size_t plane=0; plane<3; ++plane) {
+      auto pt = geomH->Point_3Dto2D(xyz.data(),plane);
+      xz_v[plane] = pt;
     }
 
     // Try to get the clusters if they are there
@@ -92,7 +96,7 @@ namespace protoshower {
 	std::vector< std::vector< const larlite::hit*> > cluster_hits_vv;
 
 	// if there are any clusters:
-	if ( ev_clust && ev_clust->size() != 0) {
+	if ( ev_clust && ev_clust->size()) {
 	  for (auto j_clust : ass_cluster_v.at(proto_shower_pfpart)) {
 	    cluster_v.push_back( &ev_clust->at( j_clust ) );
 	    std::vector< const larlite::hit* > cluster_hits_v;
@@ -108,14 +112,13 @@ namespace protoshower {
 	proto_shower.hasCluster2D(true);
 
 	if (cluster_v.empty()) {
+	  std::cout << "...no cluster2d" << std::endl;
 	  proto_shower.hasCluster2D(false);
 	}
 
 	
 	size_t n_filled_cluster = 0;
 	std::vector<bool> valid_cluster_v(cluster_v.size(),false);
-	// valid_cluster_v.resize(cluster_v.size());
-	// for(auto& v : valid_cluster_v) v = false;
 
 	for (size_t i = 0; i < cluster_v.size(); i++) {
 	  if (!cluster_hits_vv[i].empty()) {
@@ -135,7 +138,7 @@ namespace protoshower {
 	  
 	  proto_idx += 1;
 	  
-	  assert (proto_idx < proto_shower._params.size());
+	  assert ((size_t)proto_idx < proto_shower._params.size());
 
 	  _cru_helper.GenerateParams( cluster_hits_vv[i], proto_shower._params.at( proto_idx ) );
 	  _params_alg->FillParams( proto_shower._params.at( proto_idx ) );
@@ -160,25 +163,25 @@ namespace protoshower {
 	  size_t plane = clus->Plane().Plane;
 	    
 	  // get the closest hit to the 2D vertex
-	    for(const auto hit : cluster_hits_vv[i]) {
-
-	      double x  = hit->WireID().Wire;
-	      double dx = xz_v.at(plane).w;
-	      dx -= x;
-	      auto dx2 = dx*dx;
-
-	      double y  = hit->PeakTime();
-	      double dy = xz_v.at(plane).t;
-	      dy -= y;
-	      auto dy2 = dy*dy;
+	  for(const auto hit : cluster_hits_vv[i]) {
+	    
+	    double x  = hit->WireID().Wire;
+	    double dx = xz_v.at(plane).w;
+	    dx -= x;
+	    auto dx2 = dx*dx;
+	    
+	    double y  = hit->PeakTime();
+	    double dy = xz_v.at(plane).t;
+	    dy -= y;
+	    auto dy2 = dy*dy;
+	    
+	    auto dr = std::sqrt(dx2 + dy2);
 	      
-	      auto dr = std::sqrt(dx2 + dy2);
-	      
-	      if (dr < min_dr) {
-		min_dr = dr;
-		start_hit = hit;
-	      }
+	    if (dr < min_dr) {
+	      min_dr = dr;
+	      start_hit = hit;
 	    }
+	  }
 
 
 	  if (!start_hit) 
