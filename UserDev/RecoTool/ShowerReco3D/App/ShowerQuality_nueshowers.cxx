@@ -47,7 +47,7 @@ namespace larlite {
     _event  = storage->event_id();
     _run    = storage->run_id();
     _subrun = storage->subrun_id();
-    _event  = -1.0*data::kINVALID_INT;
+    _entry  = -1.0*data::kINVALID_INT;
 
     larlite::mcshower nue_shower;
     nue_shower.PdgCode(data::kINVALID_INT);
@@ -234,7 +234,7 @@ namespace larlite {
     fShowerTree->Branch("event" , &_event  , "event/I");
     fShowerTree->Branch("run"   , &_run    , "run/I");
     fShowerTree->Branch("subrun", &_subrun , "subrun/I");
-    fShowerTree->Branch("event" , &_event , "event/I");
+    fShowerTree->Branch("entry" , &_entry , "entry/I");
     fShowerTree->Branch("shower_id", &_shower_index, "shower_id/I");
 
     fShowerTree->Branch("interactiontype", &_mcinfoInteractionType , "interactiontype/I");
