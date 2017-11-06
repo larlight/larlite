@@ -59,8 +59,8 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     return false;
   }
 
-  // std::cout << "Run: " << storage->run_id() << ", Subrun: " << storage->subrun_id()
-  //           << ", Event: " << storage->event_id() << std::endl;
+  std::cout << "Run: " << storage->run_id() << ", Subrun: " << storage->subrun_id()
+            << ", Event: " << storage->event_id() << std::endl;
 
   // This item holds the list of PFParticles tagged as showers (11)
   // We only run reco on particles tagged that way.
@@ -75,9 +75,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     index ++;
   }
 
-  // std::cout << "This event has " << showerLikePFParts.size()
-  //           << " particles of " << ev_pfpart->size()
-  //           <<  "tagged as showers." << std::endl;
+  std::cout << "This event has " << showerLikePFParts.size()
+            << " particles of " << ev_pfpart->size()
+            <<  "tagged as showers." << std::endl;
 
 
   // retrieve clusters associated with this pfpart
