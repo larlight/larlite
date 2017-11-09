@@ -135,7 +135,7 @@ namespace larlite {
     _has_mc = false;
     if (ev_mcs and !ev_mcs->empty()) {
       
-      _has_mc = true;
+
       assert(ev_truth);
       assert(!ev_truth->empty());
 
@@ -154,42 +154,45 @@ namespace larlite {
 	}
       }
 
-      _mcs_E = nue_shower.DetProfile().E();
-      _mc_containment = nue_shower.DetProfile().E() / nue_shower.Start().E();
+      if (nue_shower.PdgCode() != data::kINVALID_INT)
+	_has_mc = true;
 
-      _mc_x = nue_shower.DetProfile().X();
-      _mc_y = nue_shower.DetProfile().Y();
-      _mc_z = nue_shower.DetProfile().Z();
+      if (_has_mc) {
+	_mcs_E = nue_shower.DetProfile().E();
+	_mc_containment = nue_shower.DetProfile().E() / nue_shower.Start().E();
 
-      _mc_energy = nue_shower.DetProfile().E();
-      _mc_containment = nue_shower.DetProfile().E() / nue_shower.Start().E();
+	_mc_x = nue_shower.DetProfile().X();
+	_mc_y = nue_shower.DetProfile().Y();
+	_mc_z = nue_shower.DetProfile().Z();
 
-      _mc_dcosx = nue_shower.Start().Px() / nue_shower.Start().E();
-      _mc_dcosy = nue_shower.Start().Py() / nue_shower.Start().E();
-      _mc_dcosz = nue_shower.Start().Pz() / nue_shower.Start().E();
+	_mc_energy = nue_shower.DetProfile().E();
+	_mc_containment = nue_shower.DetProfile().E() / nue_shower.Start().E();
 
-      EMShowerProfile mcshower_helper;
-      _mc_length = mcshower_helper.Length( nue_shower.DetProfile().E() );
+	_mc_dcosx = nue_shower.Start().Px() / nue_shower.Start().E();
+	_mc_dcosy = nue_shower.Start().Py() / nue_shower.Start().E();
+	_mc_dcosz = nue_shower.Start().Pz() / nue_shower.Start().E();
 
-      TVector3 WildShowerDir( nue_shower.End().X() - nue_shower.Start().X(), 
-			      nue_shower.End().Y() - nue_shower.Start().Y(),
-			      nue_shower.End().Z() - nue_shower.Start().Z() );
+	EMShowerProfile mcshower_helper;
+	_mc_length = mcshower_helper.Length( nue_shower.DetProfile().E() );
 
-      _mc_wildlength = WildShowerDir.Mag();
+	TVector3 WildShowerDir( nue_shower.End().X() - nue_shower.Start().X(), 
+				nue_shower.End().Y() - nue_shower.Start().Y(),
+				nue_shower.End().Z() - nue_shower.Start().Z() );
+
+	_mc_wildlength = WildShowerDir.Mag();
 
       
-      _mc_dedx     = nue_shower.dEdx();
-      _mc_dqdx_U   = nue_shower.dQdx(0);
-      _mc_dqdx_V   = nue_shower.dQdx(1);
-      _mc_dqdx_Y   = nue_shower.dQdx(2);
+	_mc_dedx     = nue_shower.dEdx();
+	_mc_dqdx_U   = nue_shower.dQdx(0);
+	_mc_dqdx_V   = nue_shower.dQdx(1);
+	_mc_dqdx_Y   = nue_shower.dQdx(2);
     
-      _mc_charge_U = nue_shower.Charge(0);
-      _mc_charge_V = nue_shower.Charge(1);
-      _mc_charge_Y = nue_shower.Charge(2);
+	_mc_charge_U = nue_shower.Charge(0);
+	_mc_charge_V = nue_shower.Charge(1);
+	_mc_charge_Y = nue_shower.Charge(2);
       
-      _mc_pdg_code = nue_shower.PdgCode();
-
-
+	_mc_pdg_code = nue_shower.PdgCode();
+      }
     } // end truth
     
   

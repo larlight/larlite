@@ -17,18 +17,25 @@ namespace showerreco {
 const double kDOUBLE_MAX = std::numeric_limits<double>::max();
 
 /// Utility: minimum value for double
-const double kDOUBLE_MIN = std::numeric_limits<double>::min();
+const double kDOUBLE_MIN = std::numeric_limits<double>::lowest();
 
 /// Utility: maximum value for int
 const int    kINT_MAX    = std::numeric_limits<int>::max();
 
+/// Utility: maximum value for int
+const int    kINT_MIN    = std::numeric_limits<int>::lowest();
+
 /// Utility: maximum value for unsigned int
 const unsigned int kUINT_MAX    = std::numeric_limits<unsigned int>::max();
+
+/// Utility: maximum value for unsigned int
+const unsigned int kUINT_MIN    = std::numeric_limits<unsigned int>::lowest();
 
 /// Utility: maximum value for size_t
 const size_t kSIZE_MAX   = std::numeric_limits<size_t>::max();
 
-
+/// Utility: maximum value for size_t
+const size_t kSIZE_MIN   = std::numeric_limits<size_t>::lowest();
 
 
 /// Input matched cluster set representation for shower reco algorithms
@@ -98,7 +105,7 @@ struct Shower_t {
 
     fLength = kDOUBLE_MIN;
     fWidth[0] = fWidth[1] = kDOUBLE_MIN;
-    fOpeningAngle = 0;
+    fOpeningAngle = kDOUBLE_MIN;
 
     fTotalEnergy = kDOUBLE_MIN;
     fSigmaTotalEnergy = kDOUBLE_MIN;
