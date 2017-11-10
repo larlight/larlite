@@ -128,6 +128,7 @@ namespace larlite {
     _run    = (int)storage->run_id();
     _subrun = (int)storage->subrun_id();
     _event  = (int)storage->event_id();
+    _entry  = (int)storage->get_index();
 
     larlite::mcshower nue_shower;
     nue_shower.PdgCode(data::kINVALID_INT);
@@ -135,7 +136,6 @@ namespace larlite {
     _has_mc = false;
     if (ev_mcs and !ev_mcs->empty()) {
       
-
       assert(ev_truth);
       assert(!ev_truth->empty());
 

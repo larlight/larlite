@@ -18,6 +18,7 @@
 #pragma link C++ class showerreco::VertexIsStartPoint3D+;
 #pragma link C++ class showerreco::dQdx2DModule+;
 #pragma link C++ class showerreco::dQdxModule+;
+#pragma link C++ class showerreco::dQdxModuleUVY+;
 #pragma link C++ class showerreco::dEdxFromdQdx+;
 #pragma link C++ class showerreco::EnergyModule+;
 #pragma link C++ class showerreco::LinearEnergy+;
