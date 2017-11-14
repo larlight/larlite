@@ -10,242 +10,273 @@
 #include <algorithm>
 #include <functional>
 
-bool larger( std::pair<int, double> a, std::pair<int, double> b) {
-  return a.second < b.second;
-}
-
 namespace showerreco {
-
-dQdxModule::dQdxModule()
-{
-  _caloAlg = ::calo::CalorimetryAlg();
-  _caloAlg.setUseModBox(true);
-  _name = "dQdxModule";
-  _tree = nullptr;
-}
-
-void dQdxModule::initialize()
-{
-
-  // Correction factr
-  _tau = larutil::LArProperties::GetME()->ElectronLifetime();             //electron lifetime in usec
-  _timetick = larutil::DetectorProperties::GetME()->SamplingRate() * 1.e-3; //time sample in usec, 0.5us
-
-  // degbugging tree
-  if (_tree) delete _tree;
-  _tree = new TTree(_name.c_str(),"dQdx tree");
-  _tree->Branch("_pitch",&_pitch,"pitch/D");
-  _tree->Branch("_pl_best",&_pl_best,"pl_best/I");
-  _tree->Branch("_px",&_px,"px/D");
-  _tree->Branch("_py",&_py,"py/D");
-  _tree->Branch("_pz",&_pz,"pz/D");
-  _tree->Branch("_dqdx",&_dqdx,"dqdx/D");
-  _tree->Branch("_dqdx_u",&_dqdx_u,"dqdx_u/D");
-  _tree->Branch("_dqdx_v",&_dqdx_v,"dqdx_v/D");
-  _tree->Branch("_dqdx_y",&_dqdx_y,"dqdx_y/D");
-  _tree->Branch("_n_hits_u",&_n_hits_u,"n_hits_u/I");
-  _tree->Branch("_n_hits_v",&_n_hits_v,"n_hits_v/I");
-  _tree->Branch("_n_hits_y",&_n_hits_y,"n_hits_y/I");
-  _tree->Branch("_trunk_l_u",&_trunk_l_u,"trunk_l_u/D");
-  _tree->Branch("_trunk_l_v",&_trunk_l_v,"trunk_l_v/D");
-  _tree->Branch("_trunk_l_y",&_trunk_l_y,"trunk_l_y/D");
-
-  return;
-}
-
-void dQdxModule::do_reconstruction(const ::protoshower::ProtoShower & proto_shower, Shower_t & resultShower) {
-
-  //if the module does not have 2D cluster info -> fail the reconstruction
-  if (!proto_shower.hasCluster2D()){
-    std::stringstream ss;
-    ss << "Fail @ algo " << this->name() << " due to missing 2D cluster";
-    throw ShowerRecoException(ss.str());
-    }
   
-  auto & clusters = proto_shower.params();
+  dQdxModule::dQdxModule()
+  {
+    _name = "dQdxModule";
+    _tree = nullptr;
+    _dtrunk = 0.;
+  }
   
-  /***
-  dQdx = hit charge / pitch .
-  For details, see Doc-db 4909 .
-  dQdx of a shower is the median of dQdx_v of hits along trunk .
-  Trunk connects cluster and shower start points .
-  Calculation starts line 84 .
-  dQdx is calculated for 3 planes. All variables are initialized
-  correspondingly as a 3-dimensional vector.
-  Note within this Algorithm, the best plane is defined as the
-  plane w/ longest trunk length. Therefore here best plane does
-  NOT refer to best dQdx.
-  User should define their own best plane OUTSIDE this algorithm.
-  --------------------------------------------------------------
-  In OCT 2015, developers tried sigma or rms to better calculate
-  dQdx but results showed no improvements. Now this part is removed.
-  ***/
-
-  auto geom = larutil::Geometry::GetME();
-  auto geomHelper = larutil::GeometryHelper::GetME();
-  const size_t nplanes = geom->Nplanes();
-  auto t2cm = geomHelper->TimeToCm();  //time to cm conversion for e lifetime correction
-  auto const& dir3D = resultShower.fDCosStart;
-
-  _px = dir3D[0];
-  _py = dir3D[1];
-  _pz = dir3D[2];
-
-  std::vector<double> trunk_length(nplanes, 0);
-  std::vector<int>    n_hits(nplanes, 0);
-  std::vector<std::vector<double> > dQdx_v(nplanes, std::vector<double>());
-  std::vector<double> median(nplanes, 0);
-
-  //// loop over all input cluster -> calculate a dQdx per plane
-  for (size_t n = 0; n < clusters.size(); n++) {
-
-    // get the hits associated with this cluster
-    auto const& hits = clusters.at(n).hit_vector;
-    // get the plane associated with this cluster
-    auto const& pl = clusters.at(n).plane_id.Plane;
-    // get the start point for this cluster
-    auto const& clu_start = clusters.at(n).start_point;
-    // get the showering point for this cluster
-    auto const& shr_start = clusters.at(n).showering_point;
-    // cluster open angle
-    auto const& cluster_open_angle = clusters.at(n).opening_angle;
-    // start direction
-    //auto const& start_dir = clusters.at(n).start_dir;
-
-    if (pl >= nplanes) throw ShowerRecoException("Invalid plane found!");
-
-    /***
-    Find list of hits that are along the trunk of
-    the shower. Grab all hits within 2.4cm w.r.t
-    to cluster strat points and hits within trunk
-    length compared to cluster start point.
-    ---------------------------------------------
-    2.4cm is just another magic number in uBooNE.
-    If you found a better cut, should just modify it.
-    ---------------------------------------------
-    For all these hits, save dQdx into dQdx if tan
-    value at cluster start point is no larger than
-    tan value of shower open angle.
-    ***/
-    _pitch = geomHelper->GetPitch(dir3D, (int)pl);
-
-    double dist_hit_clu;
-    double dist_hit_shr;
-    trunk_length[pl] = sqrt ( (shr_start.w - clu_start.w) * (shr_start.w - clu_start.w) +
-                              (shr_start.t - clu_start.t) * (shr_start.t - clu_start.t) );
+  void dQdxModule::initialize()
+  {
     
-    n_hits[pl] = hits.size();
+    // degbugging tree
+    if (_tree) delete _tree;
+    _tree = new TTree(_name.c_str(),"dQdx tree");
+    _tree->Branch("_pitch",&_pitch,"pitch/D");
+    _tree->Branch("_dqdx",&_dqdx,"dqdx/D");
+    _tree->Branch("_dqdx_v","std::vector<double>",&_dqdx_v);
+    _tree->Branch("_dmax",&_dmax,"dmax/D");
+    _tree->Branch("_nhits",&_nhits,"nhits/I");
+    _tree->Branch("_ntot",&_ntot,"ntot/I");
+    return;
+  }
+  
+  void dQdxModule::do_reconstruction(const ::protoshower::ProtoShower & proto_shower, Shower_t & resultShower) {
+    
+    //if the module does not have 2D cluster info -> fail the reconstruction
+    if (!proto_shower.hasCluster2D()){
+      std::stringstream ss;
+      ss << "Fail @ algo " << this->name() << " due to missing 2D cluster";
+      throw ShowerRecoException(ss.str());
+    }
+    
+    auto& clusters = proto_shower.params();
+    
+    // grab shower direction
+    auto const& dir3D = resultShower.fDCosStart;
 
-    for (int i = 0; i < n_hits[pl]; i++) {
+    auto geomHelper = larutil::GeometryHelper::GetME();
+    
+    // is plane 2 info available?
+    bool CollPlane = false;
+    
+    // loop through planes
+    for (size_t n = 0; n < clusters.size(); n++) {
+      
+      auto const& clus = clusters.at(n);
+      
+      // get the hits associated with this cluster
+      auto const& hits = clus.hit_vector;
+      
+      // get the plane associated with this cluster
+      auto const& pl = clus.plane_id.Plane;
+      
+      if (pl != 2) continue;
+      
+      CollPlane = true;
+      
+      // grab the 2D start point of the cluster
+      auto& start2D = clus.start_point;
+      
+      // grab the pitch for this plane
+      //_pitch = geomHelper->GetPitch(dir3D, (int)pl);
 
-      auto const hit = hits[i];
+      double f = (1 - dir3D[1]*dir3D[1] );
 
-      // distance of hit to the shower start point
-      dist_hit_clu = sqrt((hit.w - clu_start.w) * (hit.w - clu_start.w) +
-                          (hit.t - clu_start.t) * (hit.t - clu_start.t));
-      // distance to clustering start point
-      dist_hit_shr = sqrt((hit.w - shr_start.w) * (hit.w - shr_start.w) +
-                          (hit.t - shr_start.t) * (hit.t - shr_start.t));
+      double dmax2D = _dtrunk * (1 - dir3D[1]*dir3D[1] );
 
-      // Correction for electron life time,
-      // Now removed since T0 is unknown.
-      //  ---------------------------------
-      double hit_tick =hit.t/t2cm;
-      double lifetimeCorr = exp( hit_tick * _timetick / _tau );
-      //double Q = hit.charge * _charge_conversion*lifetimeCorr;
+      _pitch = geomHelper->GetPitch(dir3D, (int)pl);
+      
+      _dmax = 0.;
 
-      double Q = _caloAlg.ElectronsFromADCArea( hit.charge, pl);
-      Q *= lifetimeCorr;
-      //double Q = hit.charge * _charge_conversion;
-      if (dist_hit_clu <= 2.4 || dist_hit_clu < trunk_length[pl]) {
+      _nhits = 0;
+      
+      _dqdx_v.clear();
 
-        if (trunk_length[pl] == 0 || dist_hit_clu * dist_hit_shr == 0) {
-          dQdx_v[pl].push_back(Q / _pitch);
-        }
+      _dqdx_v = std::vector<double>(3 * _dtrunk, 0.);
+      
+      // loop through hits and find those within some radial distance of the start point
+      
+      // loop over hits
+      for (auto const &h : hits) {
+	
+	double d2D = sqrt( pow(h.w - start2D.w, 2) + pow(h.t - start2D.t, 2) );
 
-        else if (dist_hit_clu * dist_hit_shr > 0) {
+	/* OLD
+	if (d2D > dmax2D) continue;
 
-          double cos_hit_angle = (dist_hit_clu * dist_hit_clu +
-                                  trunk_length[pl] * trunk_length[pl] -
-                                  dist_hit_shr * dist_hit_shr) / (2 * dist_hit_clu * trunk_length[pl]);
+	if (d2D > _dmax) _dmax = d2D;
+	
+	_dqdx_v.push_back( h.charge );
+	*/
+	
+	// NEW
+	double d3D = d2D / f;
 
-          if (tan(acos(cos_hit_angle)) <= tan(cluster_open_angle)) {
-            dQdx_v[pl].push_back(Q / _pitch);
-          }
-        }
+	if (d3D >= _dtrunk) continue;
+
+	double qcorr = ChargeCorrection(h.charge,resultShower.fXYZStart);
+	
+
+	_dqdx_v[ d3D * 3 ] += qcorr;
+	
+	_nhits += 1;
+	
+      }// loop over all hits
+
+      std::vector<double> _dqdx_nonzero_v;
+      for (auto const& dqdx : _dqdx_v)
+	if (dqdx != 0) { _dqdx_nonzero_v.push_back(dqdx); }
+      
+      /* OLD
+      std::nth_element(_dqdx_v.begin(), _dqdx_v.end(), _dqdx_v.end() );
+      _dqdx = _dqdx_v[_dqdx_v.size()/2.] / _pitch;
+      */
+
+      if (_dqdx_nonzero_v.size() == 0)
+	_dqdx = 0.;
+
+      else {
+	std::nth_element(_dqdx_nonzero_v.begin(), _dqdx_nonzero_v.end(), _dqdx_nonzero_v.end() );
+	_dqdx = _dqdx_nonzero_v[ _dqdx_nonzero_v.size()/2.] / _pitch;
       }
+
+      _ntot = hits.size();
+
+      resultShower.fBestdQdxPlane = pl;
+      resultShower.fdQdx_v[pl] = _dqdx;
+      resultShower.fBestdQdx   = _dqdx;
+      
+    }// for all clusters (planes)
+    
+    _tree->Fill();
+    
+    return;
+  }
+
+  void dQdxModule::CreateResponseMap(const double& stepsize) {
+    
+    _responseMap.clear();
+    _responseStep = stepsize;
+
+    auto geom = larutil::Geometry::GetME();
+    
+    int nx = int((geom->DetHalfWidth() * 2)  / _responseStep) + 1;
+    int ny = int((geom->DetHalfHeight() * 2) / _responseStep) + 1;
+    int nz = int((geom->DetLength())         / _responseStep) + 1;
+    
+    _responseMap = std::vector< std::vector< std::vector<double> > >(nx,std::vector< std::vector<double> >(ny, std::vector<double>(nz,-1) ) );
+    
+    return;
+  }
+
+  double dQdxModule::ChargeCorrection(const double& q, const TVector3& vtx){
+
+    auto geom = larutil::Geometry::GetME();
+
+    // find cells in map
+    size_t i = vtx.X() / _responseStep;
+    size_t j = (geom->DetHalfHeight() + vtx.Y()) / _responseStep;
+    size_t k = vtx.Z() / _responseStep;
+
+    // make sure not out of bounds:
+    if ( (i < 0) or (j < 0) or (k < 0) or
+	 (i >= _responseMap.size()) or
+	 (j >= _responseMap[0].size()) or
+	 (k >= _responseMap[0][0].size()) ) {
+      return q;
     }
 
-    
-    // Get median of dQdx
-    std::nth_element(dQdx_v[pl].begin(), dQdx_v[pl].begin() + dQdx_v[pl].size() / 2, dQdx_v[pl].end());
-    if (dQdx_v[pl].size() > 0)
-      median[pl] = dQdx_v[pl].at((dQdx_v[pl].size() / 2));
+    double corr = _responseMap[i][j][k];
 
-    /***
-    Best plane here refers to the plane w/ longest
-    trunk length. Note that Some trunk length are
-    larger than 10cm due to mis-assigned cluster
-    or shower start point. Throw them away.
-    --------------------------------------------------
-    From previous study and for users' convenience,
-    set Y plane the best plane.
-    ***/
-    /*if(pl==2){
-    std::vector<std::pair<int,double>> pl_best;
-    pl_best.resize(3);
-    pl_best.at(0).first=0;
-    pl_best.at(0).second=trunk_length[0];
-    pl_best.at(1).first=1;
-    pl_best.at(1).second=trunk_length[1];
-    pl_best.at(2).first=2;
-    pl_best.at(2).second=trunk_length[2];
+    if (corr <= 0) {
+      //std::cout << "No correction available..." << std::endl;
+      // find nearest non-empty box
+      corr = NearestCell(i,j,k);
+    }
 
-    std::sort(pl_best.begin(),pl_best.end(),larger);
-
-    if(pl_best.at(2).second<10)_pl_best=pl_best.at(2).first;
-    else if(pl_best.at(1).second<10)_pl_best=pl_best.at(1).first;
-    else if(pl_best.at(0).second<10)_pl_best=pl_best.at(0).first;
-    else break;
-    resultShower.fBestdQdxPlane = _pl_best;
-    }*/
-    _pl_best = nplanes - 1;
-    resultShower.fBestdQdxPlane = _pl_best;
-    resultShower.fdQdx_v[pl] = median[pl];
-
-  }// for all clusters (planes)
-
-  // figure out best plane based on the one with the most number of points used
-  // for dQdx calculation
-  if ( (dQdx_v[2].size() > dQdx_v[0].size()) and (dQdx_v[2].size() > dQdx_v[1].size()) )
-    _pl_best = 2;
-  else if (dQdx_v[1].size() > dQdx_v[0].size())
-    _pl_best = 1;
-  else
-    _pl_best = 0;
-
-  resultShower.fBestdQdxPlane = _pl_best;
-  resultShower.fdQdx = resultShower.fdQdx_v[_pl_best];
-
-  _dqdx   = resultShower.fdQdx;
-  _dqdx_u = resultShower.fdQdx_v[0];
-  _dqdx_v = resultShower.fdQdx_v[1];
-  _dqdx_y = resultShower.fdQdx_v[2];
-
-  _n_hits_u = dQdx_v[0].size();
-  _n_hits_v = dQdx_v[1].size();
-  _n_hits_y = dQdx_v[2].size();
-
-  _trunk_l_u = trunk_length[0];
-  _trunk_l_v = trunk_length[1];
-  _trunk_l_y = trunk_length[2];
-
-  _pitch = geomHelper->GetPitch(dir3D, 2);
-
-  _tree->Fill();
+    return q * corr;
+  }
   
-  return;
-}
+  
+  void dQdxModule::SetResponse(const double& x, const double& y, const double& z, const double& q)
+    
+  {
+
+    auto geom = larutil::Geometry::GetME();
+    
+    if ( (x < 0) || (x > 2 * geom->DetHalfWidth()) ) {
+      std::cout << "X value out of bounds." << std::endl;
+      return;
+    }
+
+    if ( (y < -geom->DetHalfHeight()) || (y > geom->DetHalfHeight()) ) {
+      std::cout << "y value out of bounds." << std::endl;
+      return;
+    }
+
+    if ( (z < 0) || (z > geom->DetLength()) ) {
+      std::cout << "X value out of bounds." << std::endl;
+      return;
+    }
+
+    // find vector position
+    size_t i = x / _responseStep;
+    size_t j = (geom->DetHalfHeight() + y) / _responseStep;
+    size_t k = z / _responseStep;
+
+    //std::cout << "x, y, z " << x << ", " << y << ", " << z << "\t i, j, k " << i << ", " << j << ", "  << k << std::endl;
+    
+    _responseMap[i][j][k] = q;
+
+    return;
+  }
+
+  double dQdxModule::NearestCell(const size_t& i, const size_t& j, const size_t& k) {
+
+    double val;
+    int    ctr;
+
+    std::vector<int> cellspan;
+
+    for (int cellsize = 1; cellsize < 4; cellsize++) {
+
+      val = 0;
+      ctr = 0;
+
+      cellspan.clear();
+      for (int n=1; n < cellsize; n++){
+	cellspan.push_back(-(n+1));
+	cellspan.push_back(n+1);
+      }
+      
+      for (auto const& xd : cellspan) {
+	for (auto const& yd : cellspan) {
+	  for (auto const& zd : cellspan) {
+	    
+	    if ( (i+xd >= 0) and (j+yd > 0) and (k+zd > 0) and
+		 (i+xd < _responseMap.size()) and
+		 (j+yd < _responseMap[0].size()) and
+		 (k+zd < _responseMap[0][0].size()) ) {
+	      
+	      if ( _responseMap[i+xd][j+yd][k+zd] > 0){
+		val += _responseMap[i+xd][j+yd][k+zd];
+		ctr += 1;
+	      }
+	      
+	    }// if not out of bounds
+	    
+	  }// z loop
+	}// y loop
+      }// x loop
+
+      if (val != 0) {
+	val /= ctr;
+	//std::cout << "val is " << val << std::endl;
+	return val;
+      }
+      
+    }// for all cell-sizes
+
+    // if we never found non-zero correction, return 1
+    //std::cout << "no neighboring correction found..return 1" << std::endl;
+    return 1;
+  }
+
+  
 } //showerreco
 
 #endif

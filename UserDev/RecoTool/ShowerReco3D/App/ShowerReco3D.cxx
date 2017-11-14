@@ -59,8 +59,10 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     return false;
   }
 
-  // std::cout << "Run: " << storage->run_id() << ", Subrun: " << storage->subrun_id()
-  //           << ", Event: " << storage->event_id() << std::endl;
+  std::cout << "Run: " << storage->run_id() << ", Subrun: " << storage->subrun_id()
+            << ", Event: " << storage->event_id() << std::endl;
+
+  std::cout << "Require shower like? " << (int)_require_shrlike << std::endl;
 
   // This item holds the list of PFParticles tagged as showers (11)
   // We only run reco on particles tagged that way.
@@ -75,9 +77,9 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     index ++;
   }
 
-  // std::cout << "This event has " << showerLikePFParts.size()
-  //           << " particles of " << ev_pfpart->size()
-  //           <<  "tagged as showers." << std::endl;
+  std::cout << "This event has " << showerLikePFParts.size()
+            << " particles of " << ev_pfpart->size()
+            <<  "tagged as showers." << std::endl;
 
 
   // retrieve clusters associated with this pfpart
@@ -146,28 +148,6 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
                                    proto_showers,
                                    showerLikePFParts);
 
-
-
-  // // Let's do a little debugging:
-  // std::cout << "In this event ( " << storage -> event_id() << "), there are "
-  //           << ev_pfpart -> size() << " pfparticles.\n"
-  //           << "\tOf the pfparticles, the following are tagged as showers:\n\t";
-  // for (auto i : showerLikePFParts) {
-  //   std::cout << i << " ";
-  // }
-  // std::cout << "\n\tFor the shower-like pfparticles, we have:\n";
-  // size_t debug_index = 0;
-  // for (auto i : showerLikePFParts) {
-  //   std::cout << "\tOn particle " << i << ": \n"
-  //             << "\tHas cluster2D: " << proto_showers.at(debug_index).hasCluster2D() << "\n"
-  //             << "\t\tcluster2D.size(): " << proto_showers.at(debug_index).params().size() << "\n"
-  //             << "\tHas cluster3D: " << proto_showers.at(debug_index).hasCluster3D() << "\n"
-  //             << "\tHas vertexes: " << proto_showers.at(debug_index).hasVertex() << "\n"
-  //             << "\t\tvertexes.size(): " << proto_showers.at(debug_index).vertexes().size() << "\n";
-  //   debug_index ++;
-  // }
-
-
   // Result shower holder
   std::vector< ::showerreco::Shower_t> res_shower_v;
 
@@ -201,8 +181,6 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
     if (res_shower.fPassedReconstruction == false) {
       continue;
     }
-
-
 
     // filter out showers with garbage values
     if (res_shower.fXYZStart.Mag2()  == 0) {

@@ -2,7 +2,7 @@
 # This is an example GNUmakefile for ShowerReco3D package
 #
 
-SUBDIRS := Base ProtoShower Algo App ModularAlgo
+SUBDIRS := Base ProtoShower Algo App ModularAlgo PhotonTagging
 
 .phony: all clean
 

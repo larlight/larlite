@@ -56,7 +56,7 @@ void dEdxFromdQdx::do_reconstruction(const ::protoshower::ProtoShower & proto_sh
 
     if (_verbose) { std::cout << "dQdx on plane : " << pl << " -> " << dqdx << std::endl; }
 
-    dedx = larutil::LArProperties::GetME()->ModBoxCorrection(dqdx);
+    dedx = dqdx;//larutil::LArProperties::GetME()->ModBoxCorrection(dqdx);
 
     if (_verbose) { std::cout << "dEdx on plane : " << pl << " -> " << dedx << std::endl; }
 

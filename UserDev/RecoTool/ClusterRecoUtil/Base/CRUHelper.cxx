@@ -18,6 +18,16 @@ namespace cluster {
     params.SetHits(hits2d);
     
   }
+
+  /// Generate: from hit vector
+  void CRUHelper::GenerateParams(const std::vector<const ::larlite::hit*>& hit_v,
+				 cluster_params &params) const
+  {
+    std::vector<larutil::Hit2D> hits2d;
+    GenerateHit2D(hit_v, hits2d);
+    params.SetHits(hits2d);
+    
+  }
   
   
   /// Generate: from 1 set of hits => 1 CPAN using indexes (association)
@@ -161,6 +171,47 @@ namespace cluster {
     
     return;
   }
+
+  /// Generate: from hit vector
+  void CRUHelper::GenerateHit2D(const std::vector<const larlite::hit*>& hit_v,
+				std::vector<larutil::Hit2D> &hits2d) const
+  {
+    
+    if (!(hit_v.size())) throw CRUException(Form("Hit list empty! (%s)", __FUNCTION__));
+    
+    hits2d.clear();
+    hits2d.reserve(hit_v.size());
+    
+    auto geo  = ::larutil::Geometry::GetME();
+    auto geoH = ::larutil::GeometryHelper::GetME();
+    auto detProp = ::larutil::DetectorProperties::GetME();
+    
+    UChar_t plane = geo->ChannelToPlane(hit_v.front()->Channel());
+    
+    double * origin;
+    origin = new double[geo->Nviews()];
+    geo->PlaneOriginVtx(plane, origin);
+    float planeOffset = origin[0];
+    
+    for (auto const hit : hit_v) {
+      
+      ::larutil::Hit2D h;
+      
+      h.t = (hit->PeakTime() - detProp->TriggerOffset()) * geoH->TimeToCm() + planeOffset;
+      h.w = hit->WireID().Wire * geoH->WireToCm();
+      
+      h.charge = hit->Integral();
+      h.peak   = hit->PeakAmplitude();
+      h.plane  = plane;
+      
+      hits2d.push_back(h);
+    }
+    
+    delete origin;
+    
+    return;
+  }
+
   
   /// Generate: vector of PxHit sets from event storage by specifying cluster type
   void CRUHelper::GenerateHit2D(::larlite::storage_manager* storage,

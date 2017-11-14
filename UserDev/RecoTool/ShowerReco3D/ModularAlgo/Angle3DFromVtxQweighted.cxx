@@ -3,9 +3,11 @@
 
 #include "Angle3DFromVtxQweighted.h"
 #include "LArUtil/GeometryHelper.h"
+#include "Base/DataFormatConstants.h"
 #include <math.h>
 #include <sstream>
 #include <algorithm>
+#include <cassert>
 
 namespace showerreco {
   
@@ -37,7 +39,7 @@ namespace showerreco {
       return;
     }
 
-    // take the vtx -> start point direction as the 3D direction
+    // take the vtx for the neutrino interaction
     auto const& vtx = vtx3D_v[0];
 
     std::vector<double> dir3D = {0,0,0};
@@ -79,11 +81,13 @@ namespace showerreco {
 
     }// for all planes
 
-    int pl_max = 0;
-    int n_max  = 0;
-    int pl_mid = 0;
-    int pl_min = 0;
-    int n_min  = 1000;
+    int pl_max = larlite::data::kINVALID_INT;
+    int pl_mid = larlite::data::kINVALID_INT;
+    int pl_min = larlite::data::kINVALID_INT;
+
+    int n_max  = -1.0*larlite::data::kINVALID_INT;
+    int n_min  =      larlite::data::kINVALID_INT;
+
     for (size_t pl=0; pl < planeHits.size(); pl++){
       if (planeHits[pl] > n_max){
 	pl_max = pl;
@@ -94,11 +98,18 @@ namespace showerreco {
 	n_min  = planeHits[pl];
       }
     }
+
+    assert(pl_max != larlite::data::kINVALID_INT);
+    assert(pl_min != larlite::data::kINVALID_INT);
+
     // find the medium plane
-    std::vector<int> planes = {0,1,2};
-    planes.erase( std::find( planes.begin(), planes.end(), pl_max) );
-    planes.erase( std::find( planes.begin(), planes.end(), pl_min) );
-    pl_mid = planes[0];
+    for(int pp=0; pp<3; ++pp) {
+      if (pp == pl_max) continue;
+      if (pp == pl_min) continue;
+      pl_mid = pp;
+    }
+
+    assert(pl_mid != larlite::data::kINVALID_INT);
 
     double slope_max, slope_mid;
     double angle_max, angle_mid;

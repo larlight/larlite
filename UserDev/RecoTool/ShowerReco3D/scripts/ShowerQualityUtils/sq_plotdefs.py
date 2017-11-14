@@ -275,9 +275,16 @@ def reco_efficiency_vsenergy_singleshower_plot(df,fout=None):
 	for i in xrange(len(bins)-1):
 		this_df = df.query('mcs_E > %d and mcs_E < %d' % (bins[i], bins[i+1]))
                 oneshower_df = this_df.query('n_recoshowers == 1')
-                effs_y[i] = float(oneshower_df.shape[0])/this_df.shape[0]
+                if this_df.shape[0] != 0.0:
+                        effs_y[i] = float(oneshower_df.shape[0])/this_df.shape[0]
+                else:
+                        effs_y[i] = 0.0
+                
 		#effs_y[i] = float(np.sum(this_df['n_recoshowers']))/np.sum(this_df['n_mcshowers'])
-                errs_y[i] = np.sqrt(effs_y[i]*(1-effs_y[i])/this_df.shape[0])#np.sum(this_df['n_mcshowers']))
+                if this_df.shape[0] != 0.0:
+                        errs_y[i] = np.sqrt(effs_y[i]*(1-effs_y[i])/this_df.shape[0])#np.sum(this_df['n_mcshowers']))
+                else:
+                        errs_y[i] = 0.0
         plt.errorbar(effs_x,effs_y, yerr=errs_y, color='blue', linestyle = ':', marker='*', mfc='blue', mec='blue', label='Shower Reco Efficiency')
 	plt.legend(loc=4)
 	plt.title('Shower Reconstruction Efficiency vs True Shower Deposited Energy')
@@ -318,9 +325,18 @@ def reco_efficiency_vsenergy_goodangle_plot(df,fout=None):
 	for i in xrange(len(bins)-1):
 		this_df = df.query('mc_energy > %d and mc_energy < %d' % (bins[i], bins[i+1]))
                 gooddir_df = this_df.query('mc_reco_anglediff < 10')
-                effs_y[i] = float(gooddir_df.shape[0])/this_df.shape[0]
+                if this_df.shape[0] != 0:
+                        effs_y[i] = float(gooddir_df.shape[0])/this_df.shape[0]
+                else:
+                        effs_y[i] = 0.0
+
 		#effs_y[i] = float(np.sum(this_df['n_recoshowers']))/np.sum(this_df['n_mcshowers'])
-                errs_y[i] = np.sqrt(effs_y[i]*(1-effs_y[i])/this_df.shape[0])#np.sum(this_df['n_mcshowers']))
+
+                if this_df.shape[0] != 0:
+                        errs_y[i] = np.sqrt(effs_y[i]*(1-effs_y[i])/this_df.shape[0])#np.sum(this_df['n_mcshowers']))
+                else:
+                        errs_y[i] = 0.0
+
         plt.errorbar(effs_x,effs_y, yerr=errs_y, color='blue', linestyle = ':', marker='*', mfc='blue', mec='blue', label='Shower Reco Efficiency')
 	plt.legend(loc=4)
 	plt.title('Shower Reconstruction Efficiency vs True Shower Deposited Energy')
@@ -343,13 +359,34 @@ def startpoint_resolution_vsenergy_plot(df,fout=None):
                 z_res = e_df['mc_z']-e_df['reco_z']
                 pos_bins = np.linspace(-1.5,1.5,100)
                 entriesX, bin_edgesX = np.histogram(x_res,bins=pos_bins)
-                params, errors = getGaussFit(entriesX,bin_edgesX)
+
+                try:
+                        params, errors = getGaussFit(entriesX,bin_edgesX)
+                except RuntimeError:
+                        print "RuntimeError @ GausFit"
+                        params = np.array([0.0,0.0,0.0])
+                        errors = np.array([[0,0],[0,0]])
+
                 xres = params[2]
                 entriesY, bin_edgesY = np.histogram(y_res,bins=pos_bins)
-                params, errors = getGaussFit(entriesY,bin_edgesY)
+
+                try:
+                        params, errors = getGaussFit(entriesY,bin_edgesY)
+                except RuntimeError:
+                        print "RuntimeError @ GausFit"
+                        params = np.array([0.0,0.0,0.0])
+                        errors = np.array([[0,0],[0,0]])
+
                 yres = params[2]
                 entriesZ, bin_edgesZ = np.histogram(z_res,bins=pos_bins)
-                params, errors = getGaussFit(entriesZ,bin_edgesZ)
+
+                try:
+                        params, errors = getGaussFit(entriesZ,bin_edgesZ)
+                except RuntimeError:
+                        print "RuntimeError @ GausFit"
+                        params = np.array([0.0,0.0,0.0])
+                        errors = np.array([[0,0],[0,0]])
+
                 zres = params[2]
                 res = np.sqrt( xres*xres + yres*yres + zres*zres )
                 pos_resolution[i] = res
@@ -381,17 +418,37 @@ def eres_vsenergy_plot(df,fout=None):
                 eresY = (e_df['mc_energy']-e_df['reco_energy_Y'])/e_df['mc_energy']
                 entries, bin_edges = np.histogram(eresU,bins=resbins)
                 bin_centers = 0.5*(bin_edges[1:]+bin_edges[:-1])
-                params, errors = getGaussFit(entries,bin_edges)
+
+                try:
+                        params, errors = getGaussFit(entries,bin_edges)
+                except RuntimeError:
+                        print "RuntimeError @ GausFit"
+                        params = np.array([0.0,0.0,0.0])
+                        errors = np.array([[0,0],[0,0]])
+
                 errors = np.sqrt(np.diag(errors))
                 resolution_U[i] = params[2]
                 entries, bin_edges = np.histogram(eresV,bins=resbins)
                 bin_centers = 0.5*(bin_edges[1:]+bin_edges[:-1])
-                params, errors = getGaussFit(entries,bin_edges)
+
+                try:
+                        params, errors = getGaussFit(entries,bin_edges)
+                except RuntimeError:
+                        print "RuntimeError @ GausFit"
+                        params = np.array([0.0,0.0,0.0])
+                        errors = np.array([[0,0],[0,0]])
+
                 errors = np.sqrt(np.diag(errors))
                 resolution_V[i] = params[2]
                 entries, bin_edges = np.histogram(eresY,bins=resbins)
                 bin_centers = 0.5*(bin_edges[1:]+bin_edges[:-1])
-                params, errors = getGaussFit(entries,bin_edges)
+                try:
+                        params, errors = getGaussFit(entries,bin_edges)
+                except RuntimeError:
+                        print "RuntimeError @ GausFit"
+                        params = np.array([0.0,0.0,0.0])
+                        errors = np.array([[0,0],[0,0]])
+
                 errors = np.sqrt(np.diag(errors))
                 resolution_Y[i] = params[2]
 	plt.plot(resolution_E,resolution_U,'o--',color='b',label='U Plane')
@@ -468,9 +525,9 @@ def angleres_vsenergy_matrix(df,fout=None):
 def cluster_efficiency_perplane_plot(df,fout=None):
         this_df = df.query('match == 1')
 	fig = plt.figure(figsize=(10,6))
-	cluseff_u = this_df['cluster_eff_U']
-	cluseff_v = this_df['cluster_eff_V']
-	cluseff_y = this_df['cluster_eff_Y']
+	cluseff_u = np.nan_to_num(this_df['cluster_eff_U'])
+	cluseff_v = np.nan_to_num(this_df['cluster_eff_V'])
+	cluseff_y = np.nan_to_num(this_df['cluster_eff_Y'])
 	bins = np.linspace(0,1,100)
 	plt.hist(cluseff_u,bins=bins,histtype='stepfilled',alpha=0.5,color='b',label='U Plane')
 	plt.hist(cluseff_v,bins=bins,histtype='stepfilled',alpha=0.5,color='g',label='V Plane')
