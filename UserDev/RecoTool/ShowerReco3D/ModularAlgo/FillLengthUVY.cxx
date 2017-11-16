@@ -32,12 +32,11 @@ namespace showerreco {
 
     std::array<double,3> plane_f_v;
 
-    for(auto& v : length_) 
+    for(auto& v : length_v) 
       v = -1.0*::larlite::data::kINVALID_DOUBLE;
     
     opening_angle_v = length_v;
     plane_f_v = length_v;
-    pitch_v = length_v;
     
     TVector3 dir3D_tv(dir3D);    
     for(size_t plane=0; plane<3; ++plane)
@@ -61,8 +60,8 @@ namespace showerreco {
       opening_angle_v[plane] = clus.opening_angle;
     }
   
-    resultShower.fLength = std::max(length_v);
-    resultShower.fOpeningAngle = std::max(opening_angle_v);
+    resultShower.fLength = *std::max_element(std::begin(length_v),std::end(length_v));
+    resultShower.fOpeningAngle = *std::max_element(std::begin(opening_angle_v),std::end(opening_angle_v));
   
     return;
   }

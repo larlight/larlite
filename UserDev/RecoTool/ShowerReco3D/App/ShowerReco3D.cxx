@@ -3,7 +3,6 @@
 
 #include "ShowerReco3D.h"
 
-
 #include "DataFormat/DataFormat-TypeDef.h"
 
 namespace larlite {
@@ -52,10 +51,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
                   storage->subrun_id(),
                   storage->event_id());
 
-  if (!ev_pfpart or (ev_pfpart->size() == 0) ) {
-    //print(msg::kERROR, __FUNCTION__,
-    //    Form("PFPart producer %s product not found!",
-    //         fInputProducer.c_str()));
+  if (!ev_pfpart or ev_pfpart->empty()) {
     return false;
   }
 
@@ -109,7 +105,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
   ass_vertex_v = storage->find_one_ass(ev_pfpart->id(), ev_vertex, ev_pfpart->name());
 
   // if associated clusters not found -> quit and exit
-  if ( !ev_vertex or (ev_vertex->size() == 0) ) {
+  if ( !ev_vertex or ev_vertex->empty() ) {
     print(msg::kDEBUG, __FUNCTION__,
           Form("No vertexes found associated to PFPart w/ producer %s",
                fInputProducer.c_str()));
@@ -127,7 +123,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
   ass_sps_v = storage->find_one_ass(ev_pfpart->id(), ev_sps, ev_pfpart->name());
 
   // if associated clusters not found -> quit and exit
-  if ( !ev_sps or (ev_sps->size() == 0) ) {
+  if ( !ev_sps or ev_sps->empty() ) {
     print(msg::kDEBUG, __FUNCTION__,
           Form("No spacepoints found associated to PFPart w/ producer %s",
                fInputProducer.c_str()));
@@ -192,6 +188,7 @@ bool ShowerReco3D::analyze(storage_manager* storage) {
 
 
     shower s;
+
     s.set_id ( shower_v->size() );
     s.set_total_energy          ( res_shower.fTotalEnergy           );
     s.set_total_energy_err      ( res_shower.fSigmaTotalEnergy      );
