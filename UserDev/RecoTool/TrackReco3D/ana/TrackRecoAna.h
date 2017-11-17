@@ -16,6 +16,16 @@ namespace larlite {
     bool analyze(storage_manager* storage);
     bool finalize();
 
+    void SetTrackVertexProducer(const std::string& prod)
+    { _trk_vtx_prod = prod; }
+
+    void SetMCProducer(const std::string& prod) 
+    { _mc_producer = prod; }
+
+    void SetTrunkLength(const float length)
+    { _TrunkLength = length; } 
+
+
   private:
     TTree* _tree;
     

@@ -69,6 +69,30 @@ namespace larlite {
     _tree->Branch("ntracks", &_ntracks, "ntracks/I");
     _tree->Branch("npts_v" , &_npts_v);
 
+    _tree->Branch("TrunkLength", &_TrunkLength, "TrunkLength/F");
+    
+    _tree->Branch("dL_v"  , &_dL_v);
+    _tree->Branch("sL_v"  , &_sL_v);
+    _tree->Branch("EndX_v", &_EndX_v);
+    _tree->Branch("EndY_v", &_EndY_v);
+    _tree->Branch("EndZ_v", &_EndZ_v);
+    
+    _tree->Branch("Theta_v", &_Theta_v);
+    _tree->Branch("Phi_v"  , &_Phi_v);
+    
+    _tree->Branch("dQdx_U_vv", &_dQdx_U_vv);
+    _tree->Branch("dQdx_V_vv", &_dQdx_V_vv);
+    _tree->Branch("dQdx_Y_vv", &_dQdx_Y_vv);
+
+    _tree->Branch("Length_vv", &_Length_vv);
+
+    _tree->Branch("TrunkLength_v", &_TrunkLength_v);
+    _tree->Branch("TrunkdQdx_U_v", &_TrunkdQdx_U_v);
+    _tree->Branch("TrunkdQdx_V_v", &_TrunkdQdx_V_v);
+    _tree->Branch("TrunkdQdx_Y_v", &_TrunkdQdx_Y_v);
+    _tree->Branch("TrunkTheta_v" , &_TrunkTheta_v);
+    _tree->Branch("TrunkPhi_v"   , &_TrunkPhi_v);
+
     return true;
   }
   
@@ -238,7 +262,8 @@ namespace larlite {
 
 	for(size_t pid=0; pid< track.NumberTrajectoryPoints(); ++pid) {
 	  const auto& pt = track.LocationAtPoint(pid);      
-	  
+	  auto tdist = (pt - track.Vertex()).Mag();
+
 	  auto& dQdx_U = dQdx_U_v[pid];
 	  auto& dQdx_V = dQdx_V_v[pid];
 	  auto& dQdx_Y = dQdx_Y_v[pid];
@@ -251,7 +276,7 @@ namespace larlite {
 	  
 	  Length = track.Length(pid);
 	    
-	  if (Length > _TrunkLength) continue;
+	  if (tdist > _TrunkLength) continue;
 	  trunk_pt = &pt;
 
 	  TrunkdQdx_U += dQdx_U;
@@ -273,7 +298,7 @@ namespace larlite {
 	TrunkTheta = std::atan2(trunk_dir_u.Y(),trunk_dir_u.Z());
 	TrunkPhi   = std::atan2(trunk_dir_u.X(),trunk_dir_u.Z());
 	
-	sL = Length_v.back();
+	sL = Length_v.front();
 
       }
       _tree->Fill();
