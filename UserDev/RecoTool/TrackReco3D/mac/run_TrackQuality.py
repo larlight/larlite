@@ -1,20 +1,23 @@
 import os, sys
 
-if len(sys.argv) != 4:
+if len(sys.argv) != 5:
     print 
     print "TRKFILE  = str(sys.argv[1])"
-    print "INFOFILE = str(sys.argv[2])"
-    print "OUTDIR   = str(sys.argv[3])"
+    print "HITFILE  = str(sys.argv[2])"
+    print "INFOFILE = str(sys.argv[3])"
+    print "OUTDIR   = str(sys.argv[4])"
     print 
     sys.exit(1)
 
 from larlite import larlite as fmwk
 
 TRKFILE  = str(sys.argv[1])
-INFOFILE = str(sys.argv[2])
-OUTDIR   = str(sys.argv[3])
+HITFILE  = str(sys.argv[2])
+INFOFILE = str(sys.argv[3])
+OUTDIR   = str(sys.argv[4])
 
 print "TRKFILE=",TRKFILE
+print "HITFILE=",HITFILE
 print "INFOFILE=",INFOFILE
 print "OUTDIR=",OUTDIR
 
@@ -28,7 +31,7 @@ tq_module.SetTrunkLength(10)
 my_proc = fmwk.ana_processor()
 my_proc.add_input_file(TRKFILE)
 
-if INFOFILE != "None":
+if INFOFILE != "INVALID":
     tq_module.SetMCProducer("mcreco")
     my_proc.add_input_file(INFOFILE)
 
