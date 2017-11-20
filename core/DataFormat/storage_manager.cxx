@@ -46,6 +46,7 @@
 #include "chstatus.h"
 #include "mceventweight.h"
 #include "swtrigger.h"
+#include "backtrackermatchingdata.h"
 namespace larlite {
 
   storage_manager* storage_manager::me=0;
@@ -1195,6 +1196,9 @@ namespace larlite {
       break;
     case data::kSWTrigger:
       _ptr_data_array[type][name]=new swtrigger(name);
+      break;
+    case data::kBackTrackerMatchingData:
+      _ptr_data_array[type][name]=new event_backtrackermatchingdata(name);
       break;
     default:
       print(msg::kERROR,__FUNCTION__,Form("Event-data identifier not supported: %d",(int)type));

@@ -97,6 +97,7 @@ namespace larlite{
       kT0,                 ///< larlite::t0
       kMCEventWeight,      ///< evwgh::MCEventWeight
       kSWTrigger,          ///< larlite::swtrigger
+      kBackTrackerMatchingData, ///< anab::BackTrackerMatchingData
       kDATA_TYPE_MAX       ///< Event-wise enum boundary
     };
 
@@ -162,7 +163,8 @@ namespace larlite{
       "chstatus",
       "t0",
       "mceventweight",
-      "swtrigger"
+      "swtrigger",
+      "backtrackermatchingdata"
     };
 
     const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {

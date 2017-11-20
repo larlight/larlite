@@ -35,6 +35,9 @@ namespace larlite{
   class opflash;
   class event_opflash;
 
+  class backtrackermatchingdata;
+  class event_backtrackermatchingdata;
+
   class cluster;
   class event_cluster;
 
@@ -120,6 +123,8 @@ namespace larlite{
 
   class mceventweight;
   class event_mceventweight;
+  
+
 }
 
 class treenode;

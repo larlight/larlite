@@ -169,6 +169,10 @@
 #pragma link C++ class std::vector<larlite::mceventweight>+;
 #pragma link C++ class larlite::event_mceventweight+;
 
+#pragma link C++ class larlite::backtrackermatchingdata+;
+#pragma link C++ class std::vector<larlite::backtrackermatchingdata>+;
+#pragma link C++ class larlite::event_backtrackermatchingdata+;
+
 #pragma link C++ class larlite::mcnu+;
 #pragma link C++ class std::vector<larlite::mcnu>+;
 
@@ -236,6 +240,8 @@
 
 #pragma link C++ class larlite::storage_manager+;
 #pragma link C++ class larlite::storage_store+;
+
+
 
 /*
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_gtruth>();

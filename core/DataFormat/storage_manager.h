@@ -66,6 +66,7 @@ namespace larlite {
   class event_mucsreco;
   class event_roi;
   class event_mceventweight;
+  class event_backtrackermatchingdata;
   class event_auxsimch;
   //class event_chstatus;
 }
@@ -551,6 +552,7 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_mucsreco> () const;
   template<> data::DataType_t storage_manager::data_type<event_roi> () const;
   template<> data::DataType_t storage_manager::data_type<event_mceventweight> () const;
+  template<> data::DataType_t storage_manager::data_type<event_backtrackermatchingdata> () const;
   template<> data::DataType_t storage_manager::data_type<event_auxsimch> () const;
   template<> data::DataType_t storage_manager::data_type<event_chstatus> () const;
   template<> data::DataType_t storage_manager::data_type<swtrigger> () const;

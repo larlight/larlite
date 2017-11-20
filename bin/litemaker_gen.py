@@ -72,6 +72,7 @@ lookUpTable={
   "anab::CosmicTag": "cosmictag",
   "recob::OpHit": "ophit",
   "recob::OpFlash": "opflash",
+  "anab::BackTrackerMatchingData": "backtrackermatchingdata",
   "recob::Cluster": "cluster",
   "recob::Seed": "seed",
   "recob::SpacePoint": "sps",

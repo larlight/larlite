@@ -128,6 +128,9 @@ namespace larlite {
   template<> data::DataType_t storage_manager::data_type<event_mceventweight> () const
     { return data::kMCEventWeight; }
 
+  template<> data::DataType_t storage_manager::data_type<event_backtrackermatchingdata> () const
+  { return data::kBackTrackerMatchingData; }
+
   template <class T>
   data::DataType_t storage_manager::data_type() const
   { 
