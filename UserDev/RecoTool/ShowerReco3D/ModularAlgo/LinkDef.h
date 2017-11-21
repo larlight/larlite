@@ -24,7 +24,7 @@
 #pragma link C++ class showerreco::LinearEnergy+;
 #pragma link C++ class showerreco::GeoModule+;
 #pragma link C++ class showerreco::FillLength+;
-#pragma link C++ class showerreco::EstimateLength+;
+#pragma link C++ class showerreco::FillLengthUVY+;
 #pragma link C++ class showerreco::Angle3DFormula+;
 #pragma link C++ class showerreco::PCA3DAxis+;
 #pragma link C++ class showerreco::StartPointPandora+;

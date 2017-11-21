@@ -75,12 +75,12 @@ namespace showerreco {
       //_pitch = geomHelper->GetPitch(dir3D, (int)pl);
 
       double f = (1 - dir3D[1]*dir3D[1] );
-
+      
       double dmax2D = _dtrunk * (1 - dir3D[1]*dir3D[1] );
 
       _pitch = geomHelper->GetPitch(dir3D, (int)pl);
       
-      _dmax = 0.;
+      _dmax = 0;
 
       _nhits = 0;
       
@@ -93,7 +93,7 @@ namespace showerreco {
       // loop over hits
       for (auto const &h : hits) {
 	
-	double d2D = sqrt( pow(h.w - start2D.w, 2) + pow(h.t - start2D.t, 2) );
+	double d2D = std::sqrt( std::pow(h.w - start2D.w, 2) + std::pow(h.t - start2D.t, 2) );
 
 	/* OLD
 	if (d2D > dmax2D) continue;
