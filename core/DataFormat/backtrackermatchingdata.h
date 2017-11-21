@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-// \brief Definition of BackTrackerMatchingData object for LArSoft
+// \brief Definition of backtrackermatchingdata object for LArSoft
 //
 // \author A. Furmanski
 //         W. Ketchum
@@ -33,14 +33,14 @@ namespace larlite{
 
     void clear_data();
     
-    backtrackermatchingdata(double cleanliness,     
-			    double completeness,     
-			    float  ideFraction,     
-			    int    isMaxIDE,     
-			    float  ideNFraction,     
-			    int    isMaxIDEN,     
-			    float  numElectrons,     
-			    float  energy);
+    backtrackermatchingdata(double Cleanliness,     
+			    double Completeness,     
+			    float  IdeFraction,     
+			    int    IsMaxIDE,     
+			    float  IdeNFraction,     
+			    int    IsMaxIDEN,     
+			    float  NumElectrons,     
+			    float  Energy);
     
 
     double       cleanliness()  const;
@@ -54,14 +54,14 @@ namespace larlite{
 
 
   private: 
-     double      kcleanliness;
-     double      kcompleteness;
-     float       kideFraction;
-     int         kisMaxIDE;
-     float       kideNFraction;
-     int         kisMaxIDEN;
-     float       knumElectrons;
-     float       kenergy;
+     double      fcleanliness;
+     double      fcompleteness;
+     float       fideFraction;
+     int         fisMaxIDE;
+     float       fideNFraction;
+     int         fisMaxIDEN;
+     float       fnumElectrons;
+     float       fenergy;
      
   };
   

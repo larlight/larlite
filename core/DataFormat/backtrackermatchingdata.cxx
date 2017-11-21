@@ -12,52 +12,52 @@ namespace larlite {
   //----------------------------------------------------------------------
 
   void backtrackermatchingdata::clear_data(){
-    kcleanliness = 0 ;
-    kcompleteness = 0 ;
-    kideFraction = 0 ;
-    kisMaxIDE = 0 ;
-    kideNFraction = 0 ;
-    kisMaxIDEN = 0 ;
-    knumElectrons = 0 ;
-    kenergy = 0 ;    
+    fcleanliness = 0 ;
+    fcompleteness = 0 ;
+    fideFraction = 0 ;
+    fisMaxIDE = 0 ;
+    fideNFraction = 0 ;
+    fisMaxIDEN = 0 ;
+    fnumElectrons = 0 ;
+    fenergy = 0 ;    
   }
 
-  backtrackermatchingdata::backtrackermatchingdata(  double cleanliness,     
-						     double completeness,     
-						     float       ideFraction,     
-						     int        isMaxIDE,     
-						     float       ideNFraction,     
-						     int         isMaxIDEN,     
-						     float       numElectrons,     
-						     float       energy) 
+  backtrackermatchingdata::backtrackermatchingdata(  double Cleanliness,     
+						     double Completeness,     
+						     float  IdeFraction,     
+						     int    IsMaxIDE,     
+						     float  IdeNFraction,     
+						     int    IsMaxIDEN,     
+						     float  NumElectrons,     
+						     float  Energy) 
   {
-    kcleanliness = cleanliness;
-    kcompleteness = completeness;
-    kideFraction = ideFraction;
-    kisMaxIDE = isMaxIDE;
-    kideNFraction = ideNFraction;
-    kisMaxIDEN = isMaxIDEN;
-    knumElectrons = numElectrons;
-    kenergy = energy;
+    fcleanliness = Cleanliness;
+    fcompleteness = Completeness;
+    fideFraction = IdeFraction;
+    fisMaxIDE = IsMaxIDE;
+    fideNFraction = IdeNFraction;
+    fisMaxIDEN = IsMaxIDEN;
+    fnumElectrons = NumElectrons;
+    fenergy = Energy;
   }
 
   
   double backtrackermatchingdata::cleanliness()  const{
-    return kcleanliness;}
+    return fcleanliness;}
   double backtrackermatchingdata::completeness()  const{ 
-    return kcompleteness;}
+    return fcompleteness;}
   float backtrackermatchingdata::ideFraction()  const{ 
-    return kideFraction;}
+    return fideFraction;}
   int backtrackermatchingdata::isMaxIDE()  const{ 
-    return kisMaxIDE;}
+    return fisMaxIDE;}
   float backtrackermatchingdata::ideNFraction()  const{ 
-    return kideNFraction;}
+    return fideNFraction;}
   int backtrackermatchingdata::isMaxIDEN()  const{ 
-    return kisMaxIDEN;}
+    return fisMaxIDEN;}
   float backtrackermatchingdata::numElectrons()  const{ 
-    return knumElectrons;}
+    return fnumElectrons;}
   float backtrackermatchingdata::energy()  const{ 
-    return kenergy;}
+    return fenergy;}
 }
 
 #endif

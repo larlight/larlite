@@ -97,7 +97,7 @@ namespace larlite{
       kT0,                 ///< larlite::t0
       kMCEventWeight,      ///< evwgh::MCEventWeight
       kSWTrigger,          ///< larlite::swtrigger
-      kBackTrackerMatchingData, ///< anab::BackTrackerMatchingData
+      kBackTrackerMatchingData, 
       kDATA_TYPE_MAX       ///< Event-wise enum boundary
     };
 

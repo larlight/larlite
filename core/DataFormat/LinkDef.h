@@ -169,10 +169,6 @@
 #pragma link C++ class std::vector<larlite::mceventweight>+;
 #pragma link C++ class larlite::event_mceventweight+;
 
-#pragma link C++ class larlite::backtrackermatchingdata+;
-#pragma link C++ class std::vector<larlite::backtrackermatchingdata>+;
-#pragma link C++ class larlite::event_backtrackermatchingdata+;
-
 #pragma link C++ class larlite::mcnu+;
 #pragma link C++ class std::vector<larlite::mcnu>+;
 
@@ -202,6 +198,10 @@
 
 #pragma link C++ class larlite::trigger+;
 #pragma link C++ class larlite::swtrigger+;
+
+#pragma link C++ class larlite::backtrackermatchingdata+;
+#pragma link C++ class std::vector<larlite::backtrackermatchingdata>+;
+#pragma link C++ class larlite::event_backtrackermatchingdata+;
 
 #pragma link C++ class larlite::minos+;
 #pragma link C++ class std::vector<larlite::minos>+;
