@@ -28,7 +28,7 @@ namespace flashana {
 
   public:
 
-    enum QLLMode_t { kChi2, kLLHD };
+    enum QLLMode_t { kChi2, kLLHD, kLLR };
 
   private:
     /// Valid ctor hidden (singleton)
@@ -124,7 +124,9 @@ namespace flashana {
     
     // flags to indicate when cosmic discriminator corrections should be applied
     bool _cosmic_disc_correction;
+    bool _apply_cosmic_disc_threshold;
     bool _skip_nodata_bins;
+    double _cosmic_disc_threshold;
     
   };
 

@@ -28,6 +28,8 @@ namespace flashana {
     _normalize = pset.get<bool>("NormalizeHypothesis");
     _mode   = (QLLMode_t)(pset.get<unsigned short>("QLLMode"));
     _cosmic_disc_correction = pset.get<bool>("ApplyCosmicDiscCorrection");
+    _apply_cosmic_disc_threshold = pset.get<bool>("ApplyCosmicDiscThreshold");
+    _cosmic_disc_threshold  = pset.get<double>("CosmicDiscThreshold");
     _skip_nodata_bins = pset.get<bool>("SkipZeroFlashBins");    
     _penalty_threshold_v = pset.get<std::vector<double> >("PEPenaltyThreshold");
     _penalty_value_v = pset.get<std::vector<double> >("PEPenaltyValue");
@@ -181,6 +183,9 @@ namespace flashana {
     // Compute score
     //
     res.score = 1. / _qll;
+
+    if ( _mode==kLLR )
+      return res;
     
     // Compute X-weighting
     double x0 = _raw_xmin_pt.x - flash.time * DriftVelocity();
@@ -229,6 +234,13 @@ namespace flashana {
 	else if ( pe >= 60.0 )
 	  pe *= 0.354;
 	_hypothesis.pe_v[ich] = pe;
+      }
+    }
+    if (_apply_cosmic_disc_threshold && _current_flash_isfrom_cosmicdisc ) {
+      for (size_t ich=0; ich<_hypothesis.pe_v.size(); ich++ ) {
+	float pe = _hypothesis.pe_v.at(ich);
+	if ( pe<_cosmic_disc_threshold )
+	  _hypothesis.pe_v.at(ich) = 1.0e-6;
       }
     }
     
@@ -305,6 +317,18 @@ namespace flashana {
 	Error = O;
 	if( Error < 1.0 ) Error = 1.0;
 	_current_chi2 += std::pow((O - H), 2) / (Error);
+      } else if (_mode == kLLR ) {
+	// Poisson log-likelihood ratio from PDG
+	double arg1 = H-O;
+	double arg2 = 0;
+	if ( O>0 ) {
+	  if ( H>1.0e-6 )
+	    arg2 = O*(std::log(O)-std::log(H));
+	  else
+	    arg2 = O*(std::log(O)-std::log(1.0e-6));
+	}
+	_current_llhd += 2.0*(arg1+arg2);
+	_current_chi2 = _current_llhd;
       } else {
 	FLASH_ERROR() << "Unexpected mode" << std::endl;
 	throw OpT0FinderException();
@@ -438,7 +462,7 @@ namespace flashana {
     // Transfer the minimization variables:
     _reco_x_offset = reco_x;
     _reco_x_offset_err = reco_x_err;
-    _qll = MinFval;
+    _qll = Fmin;
     
     // Clear:
     _minuit_ptr->mnexcm("clear", arglist, 0, ierrflag);
