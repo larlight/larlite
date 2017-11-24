@@ -3,6 +3,7 @@
 
 #include "TimeCompatMatchForExtended.h"
 #include "OpT0Finder/Base/OpT0FinderException.h"
+#include "LArUtil/LArProperties.h"
 #include <cmath>
 #include <sstream>
 
@@ -23,6 +24,8 @@ namespace flashana {
   bool TimeCompatMatchForExtended::MatchCompatible(const QCluster_t& clus, const Flash_t& flash)
   {
 
+    const float cm_per_tick = ::larutil::LArProperties::GetME()->DriftVelocity()*0.5;
+    
     if(clus.empty()) return false; 
 
     // get time of flash
@@ -40,18 +43,28 @@ namespace flashana {
       if (pt.x < clus_x_min) { clus_x_min = pt.x; }
     }
 
-    // calculate time between 
-    
-    // Earliest flash time => assume clus_x_max is @ detector X-max boundary
-    double clus_t_min = (clus_x_max - ActiveXMax()) / DriftVelocity();
-    double clus_t_max = clus_x_min / DriftVelocity();
+    // we assume positions are relative to the trigger. so is the flash time!
+
+    // calculate TPC tick range
+    //double clus_t_min = clus_x_min/DriftVelocity();
+    double clus_t_min = (clus_x_max - ActiveXMax())/DriftVelocity();
+    double clus_t_max = clus_x_min/DriftVelocity();
+
+    if ( clus_t_min > clus_t_max ) {
+      // why would this happen
+      if ( _verbosity<2 )
+	std::cout << "Had to switch min/max" << std::endl;
+      double temp = clus_t_min;
+      clus_t_min = clus_t_max;
+      clus_t_max = temp;
+    }
 
 
     if ( _verbosity<2 ) {
-      std::cout<< "Inspecting TPC object @ " << clus.time << std::endl;
+      std::cout<< "Inspecting TPC object [" << clus.idx << "] @ " << clus.time << std::endl;
       std::cout<< "xmin = " << clus_x_min << " ... xmax = " << clus_x_max << std::endl;
       std::cout<< "tmin = " << clus_t_min << " ... tmax = " << clus_t_max << std::endl;
-      std::cout<< "Flash time @ " << flash_time << std::endl;
+      std::cout<< "Flash[" << flash.idx << "] time @ " << flash_time << std::endl;
     }
     return ((clus_t_min - _time_buffer) < flash_time && flash_time < (clus_t_max + _time_buffer));
 
