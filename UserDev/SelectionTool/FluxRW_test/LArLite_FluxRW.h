@@ -30,7 +30,7 @@ namespace larlite {
   public:
 
     /// Default constructor
-    LArLite_FluxRW(){ _name="LArLite_FluxRW"; _fout=0;}
+    LArLite_FluxRW() : _tree(nullptr) { _name="LArLite_FluxRW"; _fout=0;}
 
     /// Default destructor
     virtual ~LArLite_FluxRW(){}
@@ -53,6 +53,14 @@ namespace larlite {
     ::fluxRW _fluxRW;
 
   protected:
+
+
+  private:
+    TTree* _tree;
+    int _run;
+    int _subrun;
+    int _event;
+    double _weight;
     
   };
 }

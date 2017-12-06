@@ -293,7 +293,7 @@ public:
      * @return double -> distance between the two
      */
     float Get2DDistance( const Point2D & point1, const Point2D & point2) const;
-
+    
     /**
      * @brief return the projected point on a line
      * @details given a slope and a point that define a line

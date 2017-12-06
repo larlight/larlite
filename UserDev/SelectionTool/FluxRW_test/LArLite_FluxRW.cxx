@@ -16,16 +16,33 @@ namespace larlite {
 
     std::cout << "Let's go! " << std::endl;
 
+    _tree = new TTree("FLUXRW","");
+    _tree->Branch("run"   , &_run   , "run/I");
+    _tree->Branch("subrun", &_subrun, "subrun/I");
+    _tree->Branch("event" , &_event , "event/I");
+    _tree->Branch("weight" , &_weight , "weight/D");
+
+    
     return true;
   }
   
   bool LArLite_FluxRW::analyze(storage_manager* storage) {
 
 
+    _run    = data::kINVALID_INT;
+    _subrun = data::kINVALID_INT;
+    _event   = data::kINVALID_INT;
+    _weight = data::kINVALID_DOUBLE;
+
+
+    _run    = (int) storage->run_id();
+    _subrun = (int) storage->subrun_id();
+    _event  = (int) storage->event_id();
+    
     // One can just feed fluxRW the storage container and it will do all the 
     // hard work behind the curtain. This simple cout's the weight that you will 
     // want to apply to your event 
-    std::cout << "Event Weight : " << _fluxRW.event_weight(storage) << std::endl; 
+    // std::cout << "Event Weight : " << _fluxRW.event_weight(storage) << std::endl; 
   
     // If you want to make the sausage yourself then you will need to pull out 
     // the "mctruth" and "mcflux" data-products
@@ -40,84 +57,95 @@ namespace larlite {
     auto const& mc = mcn->at(0).GetNeutrino();
     
     // and then cast the neutrino PDG code into an "ntype" 
-        Int_t ntype = 0;	
-	if(mc.Nu().PdgCode() == 12) ntype = 1;	
-	else if(mc.Nu().PdgCode() == -12) ntype = 2;	
-	else if(mc.Nu().PdgCode() == 14) ntype = 3;	
-	else if(mc.Nu().PdgCode() == -14) ntype = 4;
+    Int_t ntype = 0;	
+    // if(mc.Nu().PdgCode() == 12) ntype = 1;	
+    // else if(mc.Nu().PdgCode() == -12) ntype = 2;	
+    // else if(mc.Nu().PdgCode() == 14) ntype = 3;	
+    // else if(mc.Nu().PdgCode() == -14) ntype = 4;
+
+    if     (mc.Nu().PdgCode() ==  12) ntype = 2;	
+    else if(mc.Nu().PdgCode() == -12) ntype = 3;	
+    else if(mc.Nu().PdgCode() ==  14) ntype = 0;	
+    else if(mc.Nu().PdgCode() == -14) ntype = 1;
 	
-	// Now you need to know the parent of the neutrino: muon, charged pion, K_L^0, or charged kaon
-	// This is cast as a "ptype", the "mcflux" data product isn't well commented but
-	// "fndecay" returns
-	//
-	// 1  K0L -> nue pi- e+
-	// 2  K0L -> nuebar pi+ e-
-	// 3  K0L -> numu pi- mu+
-	// 4  K0L -> numubar pi+ mu-
-	// 5  K+  -> numu mu+
-	// 6  K+  -> nue pi0 e+
-	// 7  K+  -> numu pi0 mu+
-	// 8  K-  -> numubar mu-
-	// 9  K-  -> nuebar pi0 e-
-	// 10  K-  -> numubar pi0 mu-
-	// 11  mu+ -> numubar nue e+
-	// 12  mu- -> numu nuebar e-
-	// 13  pi+ -> numu mu+
-	// 14  pi- -> numubar mu- 
-	Int_t ptype = 0;
+    // Now you need to know the parent of the neutrino: muon, charged pion, K_L^0, or charged kaon
+    // This is cast as a "ptype", the "mcflux" data product isn't well commented but
+    // "fndecay" returns
+    //
+    // 1  K0L -> nue pi- e+
+    // 2  K0L -> nuebar pi+ e-
+    // 3  K0L -> numu pi- mu+
+    // 4  K0L -> numubar pi+ mu-
+    // 5  K+  -> numu mu+
+    // 6  K+  -> nue pi0 e+
+    // 7  K+  -> numu pi0 mu+
+    // 8  K-  -> numubar mu-
+    // 9  K-  -> nuebar pi0 e-
+    // 10  K-  -> numubar pi0 mu-
+    // 11  mu+ -> numubar nue e+
+    // 12  mu- -> numu nuebar e-
+    // 13  pi+ -> numu mu+
+    // 14  pi- -> numubar mu- 
+    Int_t ptype = 0;
 	
-	Int_t decay_type = flux.fndecay;
-	switch(decay_type) {
+    Int_t decay_type = flux.fndecay;
+    std::cout << "decay_type: " << decay_type << std::endl;
+    switch(decay_type) {
 	  
-	case 1:
-	case 2:
-	case 3:
-	case 4:
-	  ptype = 3;
-	  break;
-	case 5:
-	case 6:
-	case 7:
-	case 8:
-	case 9:
-	case 10:
-	  ptype = 4;
-	  break;
-	case 11:
-	case 12:
-	  ptype = 1;
-	  break;
-	case 13:
-	case 14:
-	  ptype = 2;
+    case 1:
+    case 2:
+    case 3:
+    case 4: // K0L
+      ptype = 2;
+      break;
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+    case 9:
+    case 10: //K+/i
+      ptype = 1; // 4
+      break;
+    case 11:
+    case 12:
+      ptype = 3; // 1
+      break;
+    case 13:
+    case 14:
+      ptype = 0; // 2
 	  
-	}
+    }
 	
 
 
-	// Finally the last thing you need is the neutrinos true energy
-	// this then gets feed in with the neutrino flavor and the parent ID to produce an event weight
-	// this event weight should then be applied to any frame that contains such a neutrino interaction
-	// if you feed a ntpye or ptype which doesn't correspond to a known value this function will return
-	// a weight of 1. 
-	  std::cout << "Energy : " << mc.Nu().Trajectory().at(0).E() << 
-	         " , NType : " << ntype << 
-	         " , Ptype : " << ptype << 
-	         " thus Weight " << _fluxRW.get_weight(mc.Nu().Trajectory().at(0).E(), ntype, ptype) << std::endl;
-	
-	  // Congrats! You know are properly weighting your neutrino flux! Woohoo! 
-	  //                            ヘ(◕。◕ヘ)
-	  //           
-	  //
-	  //           ♪┏(・o･)┛♪┗ ( ･o･) ┓♪┏ ( ) ┛♪┗ (･o･ ) ┓♪┏(･o･)┛♪
-	  //
-	  //
+    // Finally the last thing you need is the neutrinos true energy
+    // this then gets feed in with the neutrino flavor and the parent ID to produce an event weight
+    // this event weight should then be applied to any frame that contains such a neutrino interaction
+    // if you feed a ntpye or ptype which doesn't correspond to a known value this function will return
+    // a weight of 1. 
+    // std::cout << "Energy : " << mc.Nu().Trajectory().at(0).E() << 
+    //   " , NType : " << ntype << 
+    //   " , Ptype : " << ptype << 
+    //   " thus Weight " << _fluxRW.get_weight(mc.Nu().Trajectory().at(0).E(), ntype, ptype) << std::endl;
+    
+    std::cout << mc.Nu().Trajectory().at(0).E() << "," << ntype << "," <<  ptype << std::endl;
+    _weight = _fluxRW.get_weight(mc.Nu().Trajectory().at(0).E(), ntype, ptype);
+    std::cout << "weight: " << _weight << std::endl;
+    _tree->Fill();
+    // Congrats! You know are properly weighting your neutrino flux! Woohoo! 
+    //                            ヘ(◕。◕ヘ)
+    //           
+    //
+    //           ♪┏(・o･)┛♪┗ ( ･o･) ┓♪┏ ( ) ┛♪┗ (･o･ ) ┓♪┏(･o･)┛♪
+    //
+    //
 
     return true;
   }
 
   bool LArLite_FluxRW::finalize() {
 
+    _tree->Write();
     std::cout << "DONE!" << std::endl; 
     
     return true;
