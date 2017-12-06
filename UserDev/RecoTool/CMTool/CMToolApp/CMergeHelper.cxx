@@ -16,20 +16,19 @@ namespace cmtool {
     for(auto& mgr : _mgr_v) mgr.SetAnaFile(fout);
   }
 
-  void CMergeHelper::Process(const std::vector<std::vector< ::larutil::PxHit> >& clusters) 
+  void CMergeHelper::Process(const std::vector< ::cluster::Cluster >& clusters) 
   {
     _bk = ::cmtool::CMergeBookKeeper(clusters.size());
 
     for(size_t i=0; i<_mgr_v.size(); ++i) {
       
       auto& mgr = _mgr_v[i];
-      
+
       mgr.Reset();
       
       if(!i) mgr.SetClusters(clusters);
       else _mgr_v[i-1].PassOutputClusters(mgr);
-      //else mgr.SetClusters( _mgr_v[i-1].GetClusters() );
-      
+
       mgr.Process();
       
       auto const& new_bk = mgr.GetBookKeeper();
@@ -41,7 +40,7 @@ namespace cmtool {
     }
   }
 
-  const std::vector< ::cluster::cluster_params>& CMergeHelper::GetClusters() const
+  const std::vector< ::cluster::Cluster>& CMergeHelper::GetClusters() const
   {
     if(!(_mgr_v.size())) throw CMTException("No manager = no output clusters...");
     return _mgr_v.back().GetClusters();

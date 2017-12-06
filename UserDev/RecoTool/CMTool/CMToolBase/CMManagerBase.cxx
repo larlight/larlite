@@ -23,7 +23,7 @@ namespace cmtool {
     if(_priority_algo) _priority_algo->Reset();
   }
 
-  void CMManagerBase::SetClusters(const std::vector<std::vector<larutil::Hit2D> > &clusters)
+  void CMManagerBase::SetClusters(const std::vector<std::vector<cluster::pt> > &clusters)
   {
 
     TStopwatch localWatch;
@@ -38,14 +38,17 @@ namespace cmtool {
     _in_clusters.reserve(clusters.size());
 
     for(auto const &c : clusters) {
+
+      ::cluster::Cluster thisclus;
+      thisclus.SetHits(c);
       
-      _in_clusters.push_back(::cluster::cluster_params());
+      _in_clusters.push_back(thisclus);//::cluster::Cluster());
+      
+      //// Set the hits for this cluster params
+      //if((*_in_clusters.rbegin()).SetHits(c) < _min_nhits) continue;
 
-      // Set the hits for this cluster params
-      if((*_in_clusters.rbegin()).SetHits(c) < _min_nhits) continue;
-
-      // Use the params alg to fill the cluster_params
-      _params_alg.FillParams(_in_clusters.back());
+      // Use the params alg to fill the Cluster
+      //_params_alg.FillParams(_in_clusters.back());
 
     }
 
@@ -61,7 +64,7 @@ namespace cmtool {
     
   }
 
-  void CMManagerBase::SetClusters(const std::vector<::cluster::cluster_params> &clusters)
+  void CMManagerBase::SetClusters(const std::vector<::cluster::Cluster> &clusters)
   {
     TStopwatch localWatch;
 
@@ -74,7 +77,7 @@ namespace cmtool {
                                << std::endl;
   }
 
-  void CMManagerBase::SetClusters(std::vector<::cluster::cluster_params>&& clusters)
+  void CMManagerBase::SetClusters(std::vector<::cluster::Cluster>&& clusters)
   {
     std::swap(_in_clusters,clusters);
   }
@@ -93,13 +96,13 @@ namespace cmtool {
     EventBegin();
 
     if(_time_report) std::cout << Form("  CMManagerBase Time Report: EventBegin = %g [s]",
-                                     localWatch.RealTime())
+				       localWatch.RealTime())
                                << std::endl;
-
+    
     bool keep_going = true;
-
+    
     while(keep_going) {
-
+      
       localWatch.Start();
 
       IterationBegin();
@@ -143,7 +146,7 @@ namespace cmtool {
     
   }
 
-  void CMManagerBase::ComputePriority(const std::vector<::cluster::cluster_params> &clusters) {
+  void CMManagerBase::ComputePriority(const std::vector<::cluster::Cluster> &clusters) {
 
     TStopwatch localWatch;
     localWatch.Start();
@@ -160,18 +163,18 @@ namespace cmtool {
         for(size_t i=0; i<clusters.size(); ++i) {
     
           size_t c_index = clusters.size() - i - 1;
-          float priority = clusters.at(c_index).hit_vector.size();
+          float priority = clusters.at(c_index).size();
 
           if(_priority_algo) {
-            priority = _priority_algo->Priority(clusters.at(c_index));
+	    priority = _priority_algo->Priority(clusters.at(c_index));
           }
 
       if(priority>0) {
         _priority.insert(std::make_pair(priority,c_index));
 
-        if( _planes.find(clusters.at(c_index).plane_id.Plane) == _planes.end() )
+        if( _planes.find(clusters.at(c_index)._plane) == _planes.end() )
 
-          _planes.insert(clusters.at(c_index).plane_id.Plane);
+          _planes.insert(clusters.at(c_index)._plane);
 
       }
       

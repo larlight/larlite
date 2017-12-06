@@ -4,6 +4,8 @@
 #include "ClusterMerger.h"
 #include <algorithm>
 
+#include "LArUtil/GeometryHelper.h"
+#include "LArUtil/Geometry.h"
 
 namespace larlite {
 
@@ -11,9 +13,14 @@ ClusterMerger::ClusterMerger()
 {
   _name = "ClusterMerger";
   _fout = 0;
-  _input_producer = "fuzzycluster";
+  _clus_producer = "";
+  _vtx_producer  = "";
   _output_producer = "";
   _write_output = false;
+
+  _wire2cm  = larutil::GeometryHelper::GetME()->WireToCm();
+  _time2cm  = larutil::GeometryHelper::GetME()->TimeToCm();
+  
 }
 
 bool ClusterMerger::initialize() {
@@ -25,9 +32,9 @@ bool ClusterMerger::initialize() {
 
 bool ClusterMerger::analyze(storage_manager* storage) {
 
-  std::vector<std::vector<larutil::Hit2D> > local_clusters;
+  std::vector< ::cluster::Cluster > local_clusters;
 
-  _cru_helper.GenerateHit2D(storage, _input_producer, local_clusters);
+  _cluster_maker.MakeClusters(storage, _clus_producer, _vtx_producer, local_clusters);
 
   _merge_helper.Process(local_clusters);
 
@@ -36,10 +43,10 @@ bool ClusterMerger::analyze(storage_manager* storage) {
   if (!_write_output) return true;
 
   // To write an output, get input cluster data
-  auto ev_cluster = storage->get_data<event_cluster>(_input_producer);
+  auto ev_cluster = storage->get_data<event_cluster>(_clus_producer);
 
   // Initialize the output cluster data product
-  if (_output_producer.empty()) _output_producer = Form("merged%s", _input_producer.c_str());
+  if (_output_producer.empty()) _output_producer = Form("merged%s", _clus_producer.c_str());
   auto out_cluster_v = storage->get_data<event_cluster>(_output_producer);
   auto out_event_ass = storage->get_data<event_ass>(out_cluster_v->name());
   if (!out_cluster_v) {
@@ -60,21 +67,27 @@ bool ClusterMerger::analyze(storage_manager* storage) {
     return true;
   }
 
-  /*
-  // Get hit producer name
-  auto hit_producer_v = ev_cluster->association_keys(data::kHit);
-
-  if(!hit_producer_v.size()) {
-
-    print(msg::kERROR,__FUNCTION__,
-          Form("Non empty cluster has no association to hits!"));
-    return false;
-  }
-  auto hit_producer = hit_producer_v[0];
-  */
   std::vector<std::vector<unsigned short> > merged_indexes;
   bk.PassResult(merged_indexes);
 
+  event_hit* ev_hits = nullptr;
+  auto const& original_hit_ass = storage->find_one_ass(ev_cluster->id(), ev_hits, ev_cluster->name());
+
+  // prepare clusters from merged indices in order to fill additional cluster attributes
+  std::vector< ::cluster::Cluster > output_clusters;
+  std::vector< std::vector<unsigned int> > output_cluster_hit_indices_v;
+  for (auto const& clus_idx_v : merged_indexes) {
+    std::vector<unsigned int> clus_hit_idx_v;
+    for (auto const& clus_idx : clus_idx_v) {
+      auto const& hit_idx_v = original_hit_ass[clus_idx];
+      for (auto const& hit_idx : hit_idx_v) {
+	clus_hit_idx_v.push_back( hit_idx );
+      }
+    }
+    output_cluster_hit_indices_v.push_back(clus_hit_idx_v);
+  }
+  _cluster_maker.MakeClusters(storage, output_cluster_hit_indices_v, _clus_producer, _vtx_producer, output_clusters);
+  
   // Reserve output vector size for faster push_back
   out_cluster_v->reserve(merged_indexes.size());
 
@@ -82,11 +95,9 @@ bool ClusterMerger::analyze(storage_manager* storage) {
   unsigned int tmp_index = 0;
   AssSet_t hit_ass;
 
-  event_hit* ev_hits = nullptr;
-  auto const& original_hit_ass = storage->find_one_ass(ev_cluster->id(), ev_hits, ev_cluster->name());
-  //auto original_hit_ass = ev_cluster->association(data::kHit,hit_producer);
+  for (size_t mi=0; mi < merged_indexes.size(); mi++) {
 
-  for (auto const& indexes : merged_indexes) {
+    auto const& indexes = merged_indexes[mi];
 
     AssUnit_t merged_association;
 
@@ -104,10 +115,15 @@ bool ClusterMerger::analyze(storage_manager* storage) {
 
     cluster out_cluster;
     out_cluster.set_id(out_cluster_v->size());
-    out_cluster.set_view(ev_cluster->at(tmp_index).View());
+    auto const& view = ev_cluster->at(tmp_index).View();
+    out_cluster.set_view( view );
+
 
     // Deal with keeping track of the mergin information
     out_cluster.set_is_merged(true);
+
+    // fill cluster information based on ::cluster::Cluster parameters
+    FillClusterProperties(out_cluster,output_clusters[mi]);
 
     // Check to see if the input was merged or not:
     if (ev_cluster -> front().IsMergedCluster()) {
@@ -135,7 +151,7 @@ bool ClusterMerger::analyze(storage_manager* storage) {
     else {
 
       // Here, set the original producer and the original indexes:
-      out_cluster.set_original_producer(_input_producer);
+      out_cluster.set_original_producer(_clus_producer);
       out_cluster.set_original_indexes(indexes);
     }
 
@@ -148,6 +164,28 @@ bool ClusterMerger::analyze(storage_manager* storage) {
   //out_cluster_v->set_association(data::kHit,hit_producer,hit_ass);
   return true;
 }
+
+  void ClusterMerger::FillClusterProperties(::larlite::cluster& cluster,
+					    const ::cluster::Cluster& CMCluster) {
+
+    float startW = CMCluster._start_pt._w;
+    float startT = CMCluster._start_pt._t;
+
+    float endW   = CMCluster._end_pt._w;
+    float endT   = CMCluster._end_pt._t;
+
+    cluster.set_planeID(::larlite::geo::PlaneID(0,0,CMCluster._plane));
+    
+    cluster.set_start_wire( int(startW / _wire2cm), 0.5);
+    cluster.set_start_tick( int(startT / _time2cm), 0.5);
+
+    cluster.set_end_wire( int(endW / _wire2cm), 0.5);
+    cluster.set_end_tick( int(endT / _time2cm), 0.5);
+
+    cluster.set_start_angle( CMCluster._angle );
+    cluster.set_summedADC( CMCluster._sum_charge, 0., 0.);
+    cluster.set_n_hits( CMCluster.size() );
+  }
 
 bool ClusterMerger::finalize() {
 

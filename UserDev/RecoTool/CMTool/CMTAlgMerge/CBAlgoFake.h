@@ -38,8 +38,10 @@ namespace cmtool {
        Core function: given the ClusterParamsAlg input, return whether a cluster should be
        merged or not.
     */
-    virtual bool Bool(const ::cluster::cluster_params &cluster1,
-                      const ::cluster::cluster_params &cluster2);
+    virtual bool Bool(const ::cluster::Cluster &cluster1,
+                      const ::cluster::Cluster &cluster2);
+
+    virtual std::vector<std::vector<size_t> > Merge(const std::vector<::cluster::Cluster>& clus_v);
 
 
     /// Function to reset the algorithm instance ... maybe implemented via child class

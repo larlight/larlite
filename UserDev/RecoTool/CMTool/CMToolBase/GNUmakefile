@@ -13,6 +13,7 @@ OBJECTS = $(SOURCES:.cxx=.o)
 # include options for this package
 INCFLAGS  = -I.                       #Include itself
 INCFLAGS += $(shell larlite-config --includes)
+INCFLAGS += $(shell basictool-config --includes)
 INCFLAGS += $(shell recotool-config --includes)
 #INCFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool/ClusterRecoUtil/Alg
 
@@ -25,6 +26,7 @@ CINTFLAGS += -p
 
 # linker flags
 LDFLAGS += $(shell larlite-config --libs)
+LDFLAGS += $(shell basictool-config --libs)
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtil
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtilAlg
 

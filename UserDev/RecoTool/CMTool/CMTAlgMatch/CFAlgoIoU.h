@@ -35,13 +35,9 @@ namespace cmtool {
     /**This algorithm calculates the difference between start and end times for merged clusters,
 		and compares across planes to form matches. 
     */
-    virtual float Float(const std::vector<const cluster::cluster_params*> &clusters);
+    virtual float Float(const std::vector<const cluster::Cluster*> &clusters);
 
-    void SetDebug(bool debug) { _debug = debug ; }
-    
-    void SetVerbose(bool verbose) { _verbose = verbose ; }
-
-    void RequireThreePlanes(bool doit) { _require_3planes = doit; }
+    void SetMinIoU(float s) { _iou_min = s; }
 
     virtual void Report();
     
@@ -49,13 +45,12 @@ namespace cmtool {
 
   protected:
 
-    void getMinMaxTime(const cluster::cluster_params* cluster, double& min, double& max);
+    void getMinMaxTime(const cluster::Cluster* cluster, double& min, double& max);
     
     float _time_ratio_cut ;
     float _start_time_cut ;
-    bool _debug ;
-    bool _verbose ;
-    bool _require_3planes;
+
+    float _iou_min;
   };
 }
 #endif

@@ -10,7 +10,8 @@ namespace larlite {
   { 
     _name="ClusterMatcher"; 
     _fout=0; 
-    _cluster_producer="mergedfuzzycluster";
+    _clus_producer = "";
+    _vtx_producer  = "";
 
     auto geom = ::larutil::Geometry::GetME();
     _mgr = new ::cmtool::CMatchManager(geom->Nplanes());
@@ -26,12 +27,12 @@ namespace larlite {
   
   bool ClusterMatcher::analyze(storage_manager* storage) {
 
-    std::vector<std::vector<larutil::Hit2D> > local_clusters;
+    std::vector< ::cluster::Cluster > local_clusters;
     
     // grab the clusters
-    auto ev_cluster = storage->get_data<event_cluster>(_cluster_producer);
+    auto ev_cluster = storage->get_data<event_cluster>(_clus_producer);
 
-    _cru_helper.GenerateHit2D(storage,_cluster_producer,local_clusters);
+    _cluster_maker.MakeClusters(storage, _clus_producer, _vtx_producer, local_clusters);
 
     _mgr->Reset();
 
@@ -64,7 +65,7 @@ namespace larlite {
 
     }
 
-    pfpart_ass_v->set_association(ev_pfpart->id(), product_id(data::kCluster,_cluster_producer),
+    pfpart_ass_v->set_association(ev_pfpart->id(), product_id(data::kCluster,_clus_producer),
 				  pfpart_cluster_ass_v);
 
 

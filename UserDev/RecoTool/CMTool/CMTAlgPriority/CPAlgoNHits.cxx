@@ -13,10 +13,10 @@ namespace cmtool {
   }
 
   //------------------------------------------------------------------------
-  float CPAlgoNHits::Priority(const ::cluster::cluster_params &cluster)
+  float CPAlgoNHits::Priority(const ::cluster::Cluster &cluster)
   //------------------------------------------------------------------------
   {
-    auto nhit = cluster.hit_vector.size();
+    auto nhit = cluster.size();
 
     return ( nhit < _min_hits ? -1 : (float)nhit );
   }

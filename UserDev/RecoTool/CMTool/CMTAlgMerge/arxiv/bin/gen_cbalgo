@@ -1,0 +1,67 @@
+#!/usr/bin/python
+import sys, os
+
+if len(sys.argv)<2:
+   sys.stderr.write('Usage: %s CLASS_NAME\n\n' % sys.argv[0])
+   sys.exit(1)
+if not 'LARLITE_USERDEVDIR' in os.environ.keys():
+   sys.stderr.write('$LARLITE_USERDEVDIR not defined!\n\n')
+   sys.exit(1)
+
+name='CBAlgo' + sys.argv[1]
+working_package='CMTAlgMerge'
+target_dir='%s/RecoTool/CMTool/CMTAlgMerge' % os.environ['LARLITE_USERDEVDIR']
+source_dir='%s/RecoTool/CMTool/CMTAlgMerge/bin/tmp' % os.environ['LARLITE_USERDEVDIR']
+
+in_source='%s/cbalgo.cxx' % source_dir
+in_header='%s/cbalgo.h' % source_dir
+
+src_list = { in_source   : '%s/%s.cxx'         % (target_dir,name),
+             in_header   : '%s/%s.h'         % (target_dir,name) }
+
+for src in src_list.keys():
+   if os.path.isfile(src_list[src]):
+      sys.stderr.write('File already exists: %s\n\n' % src_list[src])
+      sys.exit(1)
+      
+for src in src_list.keys():
+   contents=open(src,'r').read()
+   contents=contents.replace('CBALGO_CLASS_NAME',name.upper())
+   contents=contents.replace('cbalgo_class_name',name.lower())
+   contents=contents.replace('CBAlgo_Class_Name',name)
+   contents=contents.replace('USER',os.environ['USER'])
+   contents=contents.replace('Working_Package',working_package)
+   fout=open(src_list[src],'w')
+   fout.write(contents)
+   fout.close()
+
+# modify LinkDef
+contents=open('%s/LinkDef.h' % target_dir, 'r').read().split('\n')
+fout=open('%s/LinkDef.h' % target_dir,'w')
+for line in contents:
+   line=line + '\n'
+   if line.find('ADD_CBALGO_CLASS')>=0:
+      line='#pragma link C++ class cmtool::%s+;\n%s' % (name,line)
+   fout.write(line)
+
+print
+print 'Generated the followings under %s.' % target_dir
+for key in src_list.keys():
+   print '    %s' % src_list[key]
+print
+print 'To compile your program, try:'
+print '    > make --directory=%s' % target_dir
+print ' OR'
+print '    > cd %s; make;' % target_dir
+print
+print 'To remove your analysis code, you should remove:'
+print '%s/%s.h' % (target_dir,name)
+print '%s/%s.cxx' % (target_dir,name)
+print
+print 'Finally remove #pragma statement for your class from'
+print '%s/LinkDef.h' % target_dir
+print
+print 'I let you go now :)'
+print
+print
+sys.exit(0)

@@ -41,13 +41,10 @@ namespace cmtool {
     virtual void Reset();
 
     /// A simple method to add an algorithm for merging
-    void AddMergeAlgo(CBoolAlgoBase* algo) {_merge_algo = algo;}
-
-    /// A simple method to add an algorithm for separation
-    void AddSeparateAlgo(CBoolAlgoBase* algo) {_separate_algo = algo;}
+    void AddMergeAlgo(CBoolAlgoBase* algo) {_merge_algo_v.push_back(algo); }
 
     /// A method to obtain output clusters
-    const std::vector<::cluster::cluster_params>& GetClusters() const { return _out_clusters; }
+    const std::vector<::cluster::Cluster>& GetClusters() const { return _out_clusters; }
 
     /// A method to give up clusters
 #ifndef __CINT__
@@ -83,29 +80,25 @@ namespace cmtool {
 
   protected:
 
-    void RunMerge(const std::vector<::cluster::cluster_params > &in_clusters,
+    void RunMerge(const int& algo_idx,
+		  const std::vector<::cluster::Cluster > &in_clusters,
 		  CMergeBookKeeper &book_keeper) const;
 
-    void RunMerge(const std::vector<::cluster::cluster_params > &in_clusters,
+    void RunMerge(const int& algo_idx,
+		  const std::vector<::cluster::Cluster > &in_clusters,
 		  const std::vector<bool> &merge_flag,
 		  CMergeBookKeeper &book_keeper) const;
-
-    void RunSeparate(const std::vector<::cluster::cluster_params > &in_clusters,
-		     CMergeBookKeeper &book_keeper) const;
 
   protected:
 
     /// Output clusters
-    std::vector<cluster::cluster_params> _out_clusters;
+    std::vector<cluster::Cluster> _out_clusters;
 
     /// Book keeper instance
     CMergeBookKeeper _book_keeper;
 
     /// Merging algorithm
-    ::cmtool::CBoolAlgoBase* _merge_algo;
-
-    /// Separation algorithm
-    ::cmtool::CBoolAlgoBase* _separate_algo;
+    std::vector<::cmtool::CBoolAlgoBase*> _merge_algo_v;
 
     size_t _iter_ctr;
 
@@ -113,7 +106,7 @@ namespace cmtool {
 
     std::vector<std::vector<unsigned short> > _tmp_merged_indexes;
 
-    std::vector<::cluster::cluster_params> _tmp_merged_clusters;
+    std::vector<::cluster::Cluster> _tmp_merged_clusters;
 
   };
 }

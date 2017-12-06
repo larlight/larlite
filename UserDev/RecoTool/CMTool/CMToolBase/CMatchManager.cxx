@@ -32,26 +32,18 @@ namespace cmtool {
       if(_priority_algo) _priority_algo->SetVerbose(true);
     }
 
-    if(_match_algo)_match_algo->IterationBegin(_in_clusters);
-    if(_priority_algo) _priority_algo->IterationBegin(_in_clusters);
   }
   
   void CMatchManager::IterationBegin()
   {
-    if(_match_algo) _match_algo->IterationBegin(_in_clusters);
-    if(_priority_algo) _priority_algo->IterationBegin(_in_clusters);
   }
   
   void CMatchManager::IterationEnd()
   {
-    if(_match_algo) _match_algo->IterationEnd();
-    if(_priority_algo) _priority_algo->IterationEnd();
   }
 
   void CMatchManager::EventEnd()
   {
-    if(_match_algo) _match_algo->EventEnd();
-    if(_priority_algo) _priority_algo->EventEnd();
   }
 
   unsigned int CMFactorial(unsigned int n)
@@ -194,7 +186,7 @@ namespace cmtool {
         riter != _priority.rend();
         ++riter) 
 
-      cluster_array.at( plane_to_index.at(_in_clusters.at((*riter).second).plane_id.Plane) ).push_back((*riter).second);
+      cluster_array.at( plane_to_index.at(_in_clusters.at((*riter).second)._plane) ).push_back((*riter).second);
 
     // Find combinations
     std::vector<size_t> seed;
@@ -208,7 +200,7 @@ namespace cmtool {
     // Loop over combinations and call algorithm
     for(auto const& comb : combinations) {
 
-      std::vector<const cluster::cluster_params*> ptr_v;
+      std::vector<const cluster::Cluster*> ptr_v;
 
       std::vector<unsigned int> tmp_index_v;
 

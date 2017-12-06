@@ -14,6 +14,7 @@ OBJECTS = $(SOURCES:.cxx=.o)
 INCFLAGS  = -I.                       #Include itself
 INCFLAGS += $(shell larlite-config --includes)
 INCFLAGS += $(shell recotool-config --includes)
+INCFLAGS += $(shell basictool-config --includes)
 INCFLAGS += -I$(LARLITE_USERDEVDIR)/RecoTool/ClusterRecoUtil/Alg
 
 # platform-specific options
@@ -24,6 +25,7 @@ OSNAMEMODE      = $(OSNAME)
 CINTFLAGS += -p
 
 LDFLAGS += $(shell larlite-config --libs)
+LDFLAGS += $(shell basictool-config --libs)
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_CMTAlgMerge
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_CMTAlgMatch
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_CMTAlgPriority

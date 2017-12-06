@@ -29,7 +29,7 @@ namespace cmtool {
   public:
     
     /// Default constructor
-    CBoolAlgoBase(){}
+    CBoolAlgoBase(){ _merge_till_converge = false; _pair_wise = true; }
     
     /// Default destructor
     virtual ~CBoolAlgoBase(){}
@@ -38,11 +38,36 @@ namespace cmtool {
        Core function: given the CPAN input, return whether a cluster should be
        merged or not.
     */
-    virtual bool Bool(const ::cluster::cluster_params &cluster1,
-                      const ::cluster::cluster_params &cluster2)
-    { if(cluster1.plane_id.Plane != cluster2.plane_id.Plane) return false;
+    virtual bool Bool(const ::cluster::Cluster &cluster1,
+                      const ::cluster::Cluster &cluster2)
+    { if(cluster1._plane != cluster2._plane) return false;
       else return true;
     }
+
+    /**
+       
+       Core function: given full event info, return matched index vectors
+     */
+    virtual std::vector< std::vector<size_t> > Merge(const std::vector<::cluster::Cluster>& clus_v)
+    { return std::vector< std::vector<size_t> >{}; }
+
+    /**
+       Set MergeTillConverge flag
+     */
+    void SetMergeTillConverge(bool on) { _merge_till_converge = on;   }
+    bool MergeTillConverge()           { return _merge_till_converge; }
+
+    /**
+       Use algorithm pair-wise or with full list of event clusters?
+     */
+    void SetUsePairWise(bool on) { _pair_wise = on;   }
+    bool PairWiseMode()          { return _pair_wise; }
+
+  private:
+
+    bool _merge_till_converge;
+
+    bool _pair_wise;
 
   };
 

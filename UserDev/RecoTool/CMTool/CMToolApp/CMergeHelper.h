@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include "CMTool/CMToolBase/CMergeManager.h"
+#include "CMTool/CMToolBase/ClusterMaker.h"
 
 namespace cmtool {
   /**
@@ -37,13 +38,13 @@ namespace cmtool {
 
     void SetAnaFile(TFile* fout);
 
-    void Process(const std::vector<std::vector< ::larutil::PxHit> >& clusters);
+    void Process(const std::vector< ::cluster::Cluster >& clusters);
 
     size_t size() const { return _mgr_v.size(); }
 
     const CMergeBookKeeper& GetResult() const { return _bk; }
 
-    const std::vector< ::cluster::cluster_params>& GetClusters() const;
+    const std::vector< ::cluster::Cluster>& GetClusters() const;
 
   protected:
 
