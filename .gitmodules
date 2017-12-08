@@ -1,0 +1,3 @@
+[submodule "UserDev/HitRemoval"]
+	path = UserDev/HitRemoval
+	url = https://github.com/davidc1/HitRemoval

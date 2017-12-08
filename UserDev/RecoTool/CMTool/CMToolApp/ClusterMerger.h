@@ -50,8 +50,7 @@ namespace larlite {
 
     void SetClusterProducer(std::string name) {_clus_producer = name;}
     void SetVertexProducer (std::string name) {_vtx_producer  = name;}
-
-    void SetOutputProducer(std::string name) {_output_producer = name;}
+    void SetOutputProducer (std::string name) {_output_producer = name;}
 
     ::cmtool::CMergeManager& GetManager(size_t i=0) { return _merge_helper.GetManager(i); }
 

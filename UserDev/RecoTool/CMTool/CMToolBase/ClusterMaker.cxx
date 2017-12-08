@@ -64,11 +64,13 @@ namespace cluster {
 
     for (auto const& hit_idx_v : clus_hit_indexes) {
 
+      if (hit_idx_v.empty()) continue;
+
       ::cluster::Cluster clus;
 
       std::vector<::cluster::pt> cluster_pts;
 
-      auto const& pl = ev_hit->at(hit_idx_v[0]).WireID().Plane;
+      auto const& pl = ev_hit->at(hit_idx_v.front()).WireID().Plane;
 
       std::vector<::cluster::pt> pts;
       
@@ -79,6 +81,8 @@ namespace cluster {
       cluster.push_back(clus);
       
     }// for all input clusters
+
+    std::cout << "set cluster sz=" << cluster.size() << std::endl;
 
   }
 
