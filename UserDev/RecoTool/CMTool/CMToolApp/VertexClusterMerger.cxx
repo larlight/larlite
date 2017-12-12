@@ -135,8 +135,6 @@ namespace larlite {
 	const auto pfpart_id = ass_dl_pfpart_v.at(pfp_id);
 	const auto& ass_dl_cluster_v = ass_dl_cluster_vv.at(pfpart_id);
 	std::cout << "..." << ass_dl_cluster_v.size() << " ass clusters" << std::endl;
-
-
 	dl_pfpart_v.push_back(&ev_dl_pfpart->at(pfpart_id));
 
 	dl_cluster_vv.resize(dl_cluster_vv.size()+1);
@@ -187,9 +185,12 @@ namespace larlite {
 
 	const auto dl_hit_vv = dl_hit_vvv.at(pfp_id);
 	std::cout << "dl_hit_vv sz=" << dl_hit_vv.size() << std::endl;
-	if (dl_hit_vv.empty()) continue;
+	if (dl_hit_vv.empty()) {
+	  std::cout << "...skip!" << std::endl;
+	  continue;
+	}
 
-	local_hit_vv.resize(local_hit_vv.size() + raw_filter_hit_vv.size());
+	local_hit_vv.resize(dl_hit_vv.size() + raw_filter_hit_vv.size());
 
 	std::vector<bool> isdl_v(local_hit_vv.size(),false);
 	
@@ -202,7 +203,7 @@ namespace larlite {
 
 	// set the raw hits
 	for(size_t raw_filter_hit_id=dl_hit_vv.size(); raw_filter_hit_id < local_hit_vv.size(); ++raw_filter_hit_id) {
-	  const auto& raw_filter_hit_v = raw_filter_hit_vv[raw_filter_hit_id];
+	  const auto& raw_filter_hit_v = raw_filter_hit_vv.at(raw_filter_hit_id - dl_hit_vv.size());
 	  local_hit_vv[raw_filter_hit_id] = raw_filter_hit_v;
 	}
 
