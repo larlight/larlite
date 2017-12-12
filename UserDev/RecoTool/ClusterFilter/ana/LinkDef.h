@@ -4,8 +4,11 @@
 #pragma link off all functions;
 
 #pragma link C++ class larlite::DLRawClusterAss+;
+#pragma link C++ class larlite::CopyDL2DLRaw+;
 
 #endif
+
+
 
 
 

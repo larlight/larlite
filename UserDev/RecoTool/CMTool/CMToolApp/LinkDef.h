@@ -11,7 +11,7 @@
 
 #pragma link C++ class cmtool::CMergeHelper+;
 #pragma link C++ class larlite::ClusterMerger+;
-
+#pragma link C++ class larlite::VertexClusterMerger+;
 #pragma link C++ class larlite::ClusterMatcher+;
 //ADD_NEW_CLASS ... do not change this line
 #endif

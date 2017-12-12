@@ -12,6 +12,10 @@
 #pragma link C++ class cmtool::CBAlgoPolar+;
 #pragma link C++ class cmtool::CBAlgoAngleCompat+;
 #pragma link C++ class cmtool::CBAlgoFake+;
+#pragma link C++ class cmtool::CBAlgoVtxAlign+;
+#pragma link C++ class cmtool::CBAlgoVtxAlign2+;
+#pragma link C++ class cmtool::CBAlgoVtxAlign3+;
+
 //ADD_CBALGO_CLASS ... do not change this line
 //ADD_NEW_CLASS ... do not change this line
 #endif

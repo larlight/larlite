@@ -40,7 +40,6 @@ namespace cmtool {
       for (size_t i=0; i < plane_clus_pairs_v.size(); i++)
 	plane_clus_idx_v.push_back( plane_clus_pairs_v[i].second );
 
-
       
       // pair links cluster index to pair of ( NHits, angle )
       // object will hold cluster angle for cluster with largest number of hits per plane

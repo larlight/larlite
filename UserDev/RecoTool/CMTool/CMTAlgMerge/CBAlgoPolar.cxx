@@ -2,6 +2,7 @@
 #define RECOTOOL_CBALGOPOLAR_CXX
 
 #include "CBAlgoPolar.h"
+#include <cassert>
 
 namespace cmtool {
 
@@ -18,14 +19,14 @@ namespace cmtool {
 			 const ::cluster::Cluster &cluster2)
   //--------------------------------------------------------
   {
-
-    if (cluster1._plane != cluster2._plane)
-      std::cout << "Different planes!" << std::endl;
+    
+    assert(cluster1._plane == cluster2._plane);
 
     auto clusDistance = ClusterDistance(cluster1,cluster2);
 
     if (_verbose) {
-      std::cout << "cluster1 start R = " << cluster1._start_pt._r
+      std::cout << "@plane = " << cluster1._plane << std::endl
+		<< "cluster1 start R = " << cluster1._start_pt._r
 		<< "\t Qtot = " << cluster1._sum_charge
 		<< "\t Nhits = " << cluster1.size() << std::endl
 		<< "cluster2 start R = " << cluster2._start_pt._r

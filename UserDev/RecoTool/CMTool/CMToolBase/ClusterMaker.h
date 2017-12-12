@@ -44,23 +44,31 @@ namespace cluster {
     /// Default destructor
     ~ClusterMaker(){}
 
-    void MakeClusters(::larlite::storage_manager* storage,
-		      const std::string& clus_producer,
-		      const std::string& vtx_producer,
+    void MakeClusters(const std::vector<std::vector<const larlite::hit*> >& hit_vv,
+		      const larlite::vertex& vertex,
 		      std::vector<cluster::Cluster>& cluster);
-
+    
     void MakeClusters(::larlite::storage_manager* storage,
 		      const std::vector< std::vector<unsigned int> >& clus_hit_indexes,
 		      const std::string& clus_producer,
 		      const std::string& vtx_producer,
 		      std::vector<cluster::Cluster>& cluster);
-
+    
+    void MakeClusters(::larlite::storage_manager* storage,
+		      const std::string& clus_producer,
+		      const std::string& vtx_producer,
+		      std::vector<cluster::Cluster>& cluster);
+    
   private:
 
     bool loadVertex(::larlite::event_vertex *ev_vtx);
+    bool loadVertex(const larlite::vertex& vertex);
 
     void GetClusterPts(const ::larlite::event_hit* ev_hit,
 		       const std::vector<unsigned int>& hit_idx_v,
+		       std::vector<::cluster::pt>& pt_v);
+    
+    void GetClusterPts(const std::vector<const ::larlite::hit*>& hit_v,
 		       std::vector<::cluster::pt>& pt_v);
 
     /// vertex coordinates
