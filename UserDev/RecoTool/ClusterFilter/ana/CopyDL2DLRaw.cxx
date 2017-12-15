@@ -56,7 +56,6 @@ namespace larlite {
     std::vector<std::vector<unsigned int> > ass_pfpart_to_cluster_vv;
     std::vector<std::vector<unsigned int> > ass_cluster_to_hit_vv;
 
-
     for( size_t vtx_id = 0; vtx_id < ass_dl_pfpart_vv.size(); ++vtx_id) {
 
       const auto& vertex = ev_dl_vertex->at(vtx_id);
@@ -86,7 +85,7 @@ namespace larlite {
 	  
 	  dl_hit_vv.resize(dl_hit_vv.size()+1);
 	  auto& dl_hit_v = dl_hit_vv.back();
-	  
+
 	  for(size_t h_id=0; h_id < ass_dl_hit_v.size(); ++ h_id) {
 	    const auto hit_id = ass_dl_hit_v.at(h_id);
 	    dl_hit_v.push_back(&(ev_dl_hit->at(hit_id)));
@@ -122,11 +121,8 @@ namespace larlite {
 	  ass_cluster_to_hit_vv.resize(ev_out_cluster->size());
 	  auto& ass_cluster_to_hit_v = ass_cluster_to_hit_vv.back();
 
-	  out_cluster.set_view(dl_hit_v.front()->View());
-	  larlite::geo::PlaneID c_plane_id(larlite::data::kINVALID_UINT,
-					   larlite::data::kINVALID_UINT,
-					   dl_hit_v.front()->WireID().Plane);
-	  out_cluster.set_planeID(c_plane_id);
+	  out_cluster.set_view(dl_cluster_vv[pfp_id][clus_id]->View());
+	  out_cluster.set_planeID(dl_cluster_vv[pfp_id][clus_id]->Plane());
 
 	  for(auto hit_ptr : dl_hit_v) {
 	    ass_cluster_to_hit_v.push_back(ev_out_hit->size());
