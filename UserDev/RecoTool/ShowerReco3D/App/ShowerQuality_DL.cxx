@@ -37,6 +37,26 @@ namespace larlite {
       throw std::exception();
     }
 
+    //
+    // Event Tree
+    //
+    fEventTree = new TTree("EventMCINFO_DL", "");
+    fEventTree->Branch("event"  , &_event  , "event/I");
+    fEventTree->Branch("subrun" , &_subrun , "subrun/I");
+    fEventTree->Branch("run"    , &_run    , "run/I");
+    fEventTree->Branch("entry"  , &_entry  , "entry/I");
+
+    fEventTree->Branch("mc_energy", &_mc_energy, "mc_energy/D");
+    fEventTree->Branch("mcinfoInteractionType", &_mcinfoInteractionType, "mcinfoInteractionType/I");
+    fEventTree->Branch("mcinfoMode", &_mcinfoMode, "mcinfoMode/I");
+    fEventTree->Branch("mc_dcosx", &_mc_dcosx, "mc_dcosx/D");
+    fEventTree->Branch("mc_dcosy", &_mc_dcosy, "mc_dcosy/D");
+    fEventTree->Branch("mc_dcosz", &_mc_dcosz, "mc_dcosz/D");
+
+    // 
+    // Shower Tree
+    //
+
     fShowerTree = new TTree("ShowerQuality_DL", "");
     fShowerTree->Branch("event"  , &_event  , "event/I");
     fShowerTree->Branch("subrun" , &_subrun , "subrun/I");
@@ -202,7 +222,7 @@ namespace larlite {
     larlite::event_pfpart *ev_pfpart = nullptr;
     auto const& ass_pfpart_vv = storage->find_one_ass(ev_vertex->id(), ev_pfpart, ev_vertex->name());
     if (!ev_pfpart or ev_pfpart->empty()) {
-
+      fEventTree->Fill();
       return true;
     }
 
@@ -210,7 +230,7 @@ namespace larlite {
     larlite::event_shower *ev_shower = nullptr;
     auto const& ass_shower_vv = storage->find_one_ass(ev_vertex->id(), ev_shower, fShowerProducer);
     if (!ev_shower or ev_shower->empty()) {
-
+      fEventTree->Fill();
       return true;
     }
   
@@ -336,12 +356,17 @@ namespace larlite {
       fShowerTree->Fill();
     } // end this vertex
     
+    fEventTree->Fill();
     return true;
   }
   
   bool ShowerQuality_DL::finalize() {
     assert(fShowerTree);
     fShowerTree->Write();
+
+    assert(fEventTree);
+    fEventTree->Write();
+    
     return true;
   }
 

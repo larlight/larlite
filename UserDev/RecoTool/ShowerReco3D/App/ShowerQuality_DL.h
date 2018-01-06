@@ -37,6 +37,8 @@ namespace larlite {
     
     /// Analysis TTree. Filled once per reconstructed shower.
     TTree *fShowerTree;
+    TTree *fEventTree;
+
     int _event;
     int _subrun;
     int _run;
@@ -88,6 +90,7 @@ namespace larlite {
     int _mcinfoInteractionType;
     int _mcinfoMode;
     int _mc_pdg_code;
+
     double _mc_x;
     double _mc_y;
     double _mc_z;
