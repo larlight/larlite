@@ -49,9 +49,14 @@ namespace larlite {
     fEventTree->Branch("mc_energy", &_mc_energy, "mc_energy/D");
     fEventTree->Branch("mcinfoInteractionType", &_mcinfoInteractionType, "mcinfoInteractionType/I");
     fEventTree->Branch("mcinfoMode", &_mcinfoMode, "mcinfoMode/I");
-    fEventTree->Branch("mc_dcosx", &_mc_dcosx, "mc_dcosx/D");
-    fEventTree->Branch("mc_dcosy", &_mc_dcosy, "mc_dcosy/D");
-    fEventTree->Branch("mc_dcosz", &_mc_dcosz, "mc_dcosz/D");
+    fEventTree->Branch("mc_pdg_code", &_mc_pdg_code, "mc_pdg_code/I");
+    fEventTree->Branch("mc_x", &_mc_x, "mc_x/D");
+    fEventTree->Branch("mc_y", &_mc_y, "mc_y/D");
+    fEventTree->Branch("mc_z", &_mc_z, "mc_z/D");
+    fEventTree->Branch("mc_dcosx" , &_mc_dcosx, "mc_dcosx/D");
+    fEventTree->Branch("mc_dcosy" , &_mc_dcosy, "mc_dcosy/D");
+    fEventTree->Branch("mc_dcosz" , &_mc_dcosz, "mc_dcosz/D");
+    fEventTree->Branch("mc_energy", &_mc_energy, "mc_energy/D");
 
     // 
     // Shower Tree
