@@ -156,7 +156,8 @@ namespace larlite {
     _subrun = (int)storage->subrun_id();
     _event  = (int)storage->event_id();
     _entry  = (int)storage->get_index();
-
+    
+    std::cout << "(r,s,e)=(" << _run << "," << _subrun << "," << _event << ")" << std::endl;
     larlite::mcshower nue_shower;
     nue_shower.PdgCode(data::kINVALID_INT);
     
@@ -231,6 +232,7 @@ namespace larlite {
     auto const& ass_pfpart_vv = storage->find_one_ass(ev_vertex->id(), ev_pfpart, ev_vertex->name());
     if (!ev_pfpart or ev_pfpart->empty()) {
       fEventTree->Fill();
+      std::cout << "no pf particles... next!" << std::endl;
       return true;
     }
     std::cout << "ev_pfpart sz=" << ev_pfpart->size() << std::endl;
@@ -241,13 +243,14 @@ namespace larlite {
     // get the associated pf clusters
     larlite::event_shower *ev_shower = nullptr;
     auto const& ass_shower_vv = storage->find_one_ass(ev_pfpart->id(), ev_shower, fShowerProducer);
-    if (!ev_shower or ev_shower->empty()) {
-      fEventTree->Fill();
-      return true;
-    }
+    //if (!ev_shower or ev_shower->empty()) {
+    //  fEventTree->Fill();
+    //  std::cout << "no showers found... next!" << std::endl;
+    //  return true;
+    //}
 
-    
-    std::cout << "ev_shower sz=" << ev_shower->size() << std::endl;
+    if(ev_shower)    
+      std::cout << "ev_shower sz=" << ev_shower->size() << std::endl;
     std::cout << "ass_shower_vv sz=" << ass_shower_vv.size() << std::endl;
 
     //    assert (ev_pfpart->size() == ass_shower_vv.size());
@@ -265,6 +268,12 @@ namespace larlite {
       std::vector<size_t> shower_idx_v;
       std::vector<const larlite::shower* > shower_v;
 
+
+      if (!ev_shower) {
+        _nshowers = 0;
+        fShowerTree->Fill();
+        continue;
+      }
       size_t ev_shr_size = ev_shower->size();
       
       shower_idx_v.clear();
