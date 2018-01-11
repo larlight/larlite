@@ -25,8 +25,11 @@
 #pragma link C++ class cmtool::CMergeManager+;
 #pragma link C++ class cmtool::CMatchManager+;
 
+#pragma link C++ class cluster::Cluster+;
+#pragma link C++ class cluster::ClusterMaker+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 

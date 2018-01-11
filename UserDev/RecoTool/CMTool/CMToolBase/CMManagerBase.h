@@ -20,8 +20,6 @@
 
 #include "CPriorityAlgoBase.h"
 #include "TStopwatch.h"
-#include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
-#include "ClusterRecoUtil/Base/ClusterParams.h"
 
 namespace cmtool {
 
@@ -70,17 +68,17 @@ namespace cmtool {
     void MergeTillConverge(bool doit=true) {_merge_till_converge = doit;}
 
     /// A simple method to add a cluster
-    void SetClusters(const std::vector<std::vector<larutil::Hit2D> > &clusters);
+    void SetClusters(const std::vector<std::vector<cluster::pt> > &clusters);
 
     /// A simple method to add a cluster
-    void SetClusters(const std::vector<::cluster::cluster_params> &clusters);
+    void SetClusters(const std::vector<::cluster::Cluster> &clusters);
 
 #ifndef __CINT__
     /// A simple method to add a cluster
-    void SetClusters(std::vector<::cluster::cluster_params>&& clusters);
+    void SetClusters(std::vector<::cluster::Cluster>&& clusters);
 #endif
     /// A getter for input clusters
-    const std::vector<::cluster::cluster_params>&  GetInputClusters() const 
+    const std::vector<::cluster::Cluster>&  GetInputClusters() const 
     { return _in_clusters; }
 
     /// A setter for minimum # of hits ... passed onto cluster_params
@@ -95,7 +93,7 @@ namespace cmtool {
   protected:
 
     /// Function to compute priority
-    void ComputePriority(const std::vector<::cluster::cluster_params> & clusters);
+    void ComputePriority(const std::vector<::cluster::Cluster> & clusters);
 
     /// FMWK function called @ beginning of Process()
     virtual void EventBegin(){}
@@ -117,17 +115,14 @@ namespace cmtool {
     /// Timing verbosity flag
     bool _time_report;
     
-    /// Minimum number of hits: the limit set for cluster_params
+    /// Minimum number of hits: the limit set for Cluster
     unsigned int _min_nhits;
 
     /// Debug mode switch
     CMMSGLevel_t _debug_mode;
 
     /// Input clusters
-    std::vector<::cluster::cluster_params> _in_clusters;
-
-    /// Cluster Params Filler:
-    ::cluster::DefaultParamsAlg _params_alg;
+    std::vector<::cluster::Cluster> _in_clusters;
 
     /// Priority algorithm
     ::cmtool::CPriorityAlgoBase* _priority_algo;

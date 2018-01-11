@@ -18,7 +18,7 @@
 #include "Analysis/ana_base.h"
 #include "LArUtil/Geometry.h"
 #include "CMTool/CMToolBase/CMatchManager.h"
-#include "ClusterRecoUtil/Base/CRUHelper.h"
+#include "CMTool/CMToolBase/ClusterMaker.h"
 
 namespace larlite {
   /**
@@ -50,9 +50,10 @@ namespace larlite {
     */
     virtual bool finalize();
 
-    void SetClusterProducer(const std::string name) { _cluster_producer = name; }
+    void SetClusterProducer(const std::string name) { _clus_producer = name; }
+    void SetVertexProducer (const std::string name) { _vtx_producer  = name; }
 
-    void SetOutputProducer(std::string name) {_output_producer = name;}
+   void SetOutputProducer(std::string name) {_output_producer = name;}
 
     void SaveOutputCluster(bool doit=true) { _write_output = doit; }
 
@@ -64,11 +65,12 @@ namespace larlite {
 
     ::cmtool::CMatchManager *_mgr;
 
-    std::string _cluster_producer;
+    std::string _clus_producer;
+    std::string _vtx_producer;
 
     std::string _output_producer;
 
-    ::cluster::CRUHelper _cru_helper;
+    ::cluster::ClusterMaker _cluster_maker;
 
   };
 }

@@ -37,6 +37,31 @@ namespace larlite {
       throw std::exception();
     }
 
+    //
+    // Event Tree
+    //
+    fEventTree = new TTree("EventMCINFO_DL", "");
+    fEventTree->Branch("event"  , &_event  , "event/I");
+    fEventTree->Branch("subrun" , &_subrun , "subrun/I");
+    fEventTree->Branch("run"    , &_run    , "run/I");
+    fEventTree->Branch("entry"  , &_entry  , "entry/I");
+
+    fEventTree->Branch("mc_energy", &_mc_energy, "mc_energy/D");
+    fEventTree->Branch("mcinfoInteractionType", &_mcinfoInteractionType, "mcinfoInteractionType/I");
+    fEventTree->Branch("mcinfoMode", &_mcinfoMode, "mcinfoMode/I");
+    fEventTree->Branch("mc_pdg_code", &_mc_pdg_code, "mc_pdg_code/I");
+    fEventTree->Branch("mc_x", &_mc_x, "mc_x/D");
+    fEventTree->Branch("mc_y", &_mc_y, "mc_y/D");
+    fEventTree->Branch("mc_z", &_mc_z, "mc_z/D");
+    fEventTree->Branch("mc_dcosx" , &_mc_dcosx, "mc_dcosx/D");
+    fEventTree->Branch("mc_dcosy" , &_mc_dcosy, "mc_dcosy/D");
+    fEventTree->Branch("mc_dcosz" , &_mc_dcosz, "mc_dcosz/D");
+    fEventTree->Branch("mc_energy", &_mc_energy, "mc_energy/D");
+
+    // 
+    // Shower Tree
+    //
+
     fShowerTree = new TTree("ShowerQuality_DL", "");
     fShowerTree->Branch("event"  , &_event  , "event/I");
     fShowerTree->Branch("subrun" , &_subrun , "subrun/I");
@@ -112,6 +137,8 @@ namespace larlite {
   }
 
   bool ShowerQuality_DL::analyze(storage_manager* storage) {
+    std::cout << std::endl;
+    std::cout << "@entry=" << storage->get_index() << std::endl;
 
     ClearEvent();
     ClearVertex();
@@ -129,7 +156,8 @@ namespace larlite {
     _subrun = (int)storage->subrun_id();
     _event  = (int)storage->event_id();
     _entry  = (int)storage->get_index();
-
+    
+    std::cout << "(r,s,e)=(" << _run << "," << _subrun << "," << _event << ")" << std::endl;
     larlite::mcshower nue_shower;
     nue_shower.PdgCode(data::kINVALID_INT);
     
@@ -195,25 +223,38 @@ namespace larlite {
       }
     } // end truth
     
-  
-    // get associated showers to the vertex
-  
+
+    std::cout << "ev_vertex sz=" << ev_vertex->size() << std::endl;
+    
+    std::cout << "associate vertex  with ass name=" << ev_vertex->name() << std::endl;
     // get the associated pf particles
     larlite::event_pfpart *ev_pfpart = nullptr;
     auto const& ass_pfpart_vv = storage->find_one_ass(ev_vertex->id(), ev_pfpart, ev_vertex->name());
     if (!ev_pfpart or ev_pfpart->empty()) {
-
+      fEventTree->Fill();
+      std::cout << "no pf particles... next!" << std::endl;
       return true;
     }
+    std::cout << "ev_pfpart sz=" << ev_pfpart->size() << std::endl;
+    std::cout << "ass_pfpart_vv sz=" << ass_pfpart_vv.size() << std::endl;
+
+    std::cout << "associate pfpart with ass name=" << fShowerProducer << std::endl;
 
     // get the associated pf clusters
     larlite::event_shower *ev_shower = nullptr;
-    auto const& ass_shower_vv = storage->find_one_ass(ev_vertex->id(), ev_shower, fShowerProducer);
-    if (!ev_shower or ev_shower->empty()) {
+    auto const& ass_shower_vv = storage->find_one_ass(ev_pfpart->id(), ev_shower, fShowerProducer);
+    //if (!ev_shower or ev_shower->empty()) {
+    //  fEventTree->Fill();
+    //  std::cout << "no showers found... next!" << std::endl;
+    //  return true;
+    //}
 
-      return true;
-    }
-  
+    if(ev_shower)    
+      std::cout << "ev_shower sz=" << ev_shower->size() << std::endl;
+    std::cout << "ass_shower_vv sz=" << ass_shower_vv.size() << std::endl;
+
+    //    assert (ev_pfpart->size() == ass_shower_vv.size());
+
     for( size_t vtx_id = 0; vtx_id < ass_pfpart_vv.size(); ++vtx_id) {
       ClearVertex();
       const auto& vertex = ev_vertex->at(vtx_id);
@@ -227,23 +268,48 @@ namespace larlite {
       std::vector<size_t> shower_idx_v;
       std::vector<const larlite::shower* > shower_v;
 
-      shower_idx_v.reserve(ev_shower->size());
-      shower_v.reserve(ev_shower->size());
+
+      if (!ev_shower) {
+        _nshowers = 0;
+        fShowerTree->Fill();
+        continue;
+      }
+      size_t ev_shr_size = ev_shower->size();
+      
+      shower_idx_v.clear();
+      shower_idx_v.reserve(ev_shr_size);
+
+      shower_v.clear();
+      shower_v.reserve(ev_shr_size);
 
       for( size_t pfp_id=0; pfp_id < ass_pfpart_v.size(); ++ pfp_id) {
-
 	const auto pfpart_id = ass_pfpart_v.at(pfp_id);
+	std::cout << "@pfp_id=" << pfp_id << " pfpart_id=" << pfpart_id << std::endl;
+
+	if (pfpart_id >= ass_shower_vv.size()) {
+	  std::cout << std::endl;
+	  std::cout << "---------------------------" << std::endl;
+	  std::cout << "Edge case detected!" << std::endl;
+	  std::cout << "Vertex found, pfparticle exists, but no shower found?" << std::endl;
+	  std::cout << "Skip for now..." << std::endl;
+	  std::cout << "---------------------------" << std::endl << std::endl;
+	  continue;
+	}
+
 	const auto& ass_shower_v = ass_shower_vv.at(pfpart_id);
+	std::cout << "ass_shower_v sz=" << ass_shower_v.size() << std::endl;
 
 	for(size_t shr_id=0; shr_id < ass_shower_v.size(); ++ shr_id) {
-
 	  const auto shower_id = ass_shower_v.at(shr_id);
+	  std::cout << "@shr_id=" << shr_id << " shower_id=" << shower_id << std::endl;
 
-	  shower_v.push_back(&ev_shower->at(shower_id));
 	  shower_idx_v.push_back(shower_id);
-
+	  shower_v.push_back(&(ev_shower->at(shower_id)));
 	} // end ass shower
+	std::cout << std::endl;
       } // end ass pfparticle
+      std::cout << std::endl;
+      std::cout << "... _nshowers=" << shower_v.size() << std::endl;
 
       _nshowers = (int)shower_v.size();
       ResizeVectors(_nshowers);
@@ -336,12 +402,18 @@ namespace larlite {
       fShowerTree->Fill();
     } // end this vertex
     
+    fEventTree->Fill();
+    std::cout << std::endl;
     return true;
   }
   
   bool ShowerQuality_DL::finalize() {
     assert(fShowerTree);
     fShowerTree->Write();
+
+    assert(fEventTree);
+    fEventTree->Write();
+    
     return true;
   }
 

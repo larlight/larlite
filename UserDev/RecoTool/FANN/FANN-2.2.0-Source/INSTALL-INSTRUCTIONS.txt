@@ -1,9 +1,0 @@
-To compile fann, you need cmake.
-
-Run these commands from the same directory as this instruction file:
-
-cmake -DCMAKE_INSTALL_PREFIX=../ .
-
-make
-
-make install

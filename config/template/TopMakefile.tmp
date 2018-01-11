@@ -1,6 +1,6 @@
 #####################################################################################
 #
-# A top Makefile for building my project.
+# A top $(MAKE)file for building my project.
 # One needs to define $LARLITE_BASEDIR to build the sub directories.
 #
 #####################################################################################
@@ -26,25 +26,25 @@ export LARLITE_BASEDIR
 all:
 	@mkdir -p $(LARLITE_BASEDIR)/lib
 	@echo "Start building core"
-	@make --directory=$(LARLITE_COREDIR)
+	@$(MAKE) --directory=$(LARLITE_COREDIR)
 	@echo
 	@echo "Start building UserDev"
-	@make --directory=$(LARLITE_USERDEVDIR)
+	@$(MAKE) --directory=$(LARLITE_USERDEVDIR)
 	@echo 
 	@echo "Start building main"
-	@make --directory=$(LARLITE_BASEDIR)/main
+	@$(MAKE) --directory=$(LARLITE_BASEDIR)/main
 	@echo 
 	@echo "Exiting"
 
 clean:
 	@echo "Cleaning core"
-	@make clean --directory=$(LARLITE_COREDIR)
+	@$(MAKE) clean --directory=$(LARLITE_COREDIR)
 	@echo
 	@echo "Cleaning UserDev"
-	@make clean --directory=$(LARLITE_USERDEVDIR)
+	@$(MAKE) clean --directory=$(LARLITE_USERDEVDIR)
 	@echo
 	@echo "Cleaning main"
-	@make clean --directory=$(LARLITE_BASEDIR)/main
+	@$(MAKE) clean --directory=$(LARLITE_BASEDIR)/main
 	@echo
 	@echo "Exiting"
 

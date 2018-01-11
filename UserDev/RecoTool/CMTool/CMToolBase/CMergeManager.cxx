@@ -8,8 +8,7 @@ namespace cmtool {
   CMergeManager::CMergeManager() : CMManagerBase()
   {
     _iter_ctr=0;
-    _merge_algo = nullptr;
-    _separate_algo = nullptr;
+    _merge_algo_v.clear();
     Reset();
   }
 
@@ -21,8 +20,10 @@ namespace cmtool {
     _out_clusters.clear();
     _book_keeper.Reset();
     _book_keeper_v.clear();
-    if(_merge_algo)    _merge_algo->Reset();
-    if(_separate_algo) _separate_algo->Reset();
+    if(_merge_algo_v.size()) {
+      for (size_t i=0; i < _merge_algo_v.size(); i++)
+	_merge_algo_v[i]->Reset();
+    }
     _iter_ctr = 0;
   }
 
@@ -30,29 +31,15 @@ namespace cmtool {
   void CMergeManager::EventBegin()
   {
     // Initialization per event
-    if(!_merge_algo) throw CMTException("No algorithm to run!");
+    if(_merge_algo_v.size() == 0) throw CMTException("No algorithm to run!");
 
     // Merging algorithm
-    _merge_algo->SetAnaFile(_fout);
-    _merge_algo->EventBegin(_in_clusters);
-
-    // Separation algorithm
-    if(_separate_algo) {
-      _separate_algo->SetAnaFile(_fout);
-      _separate_algo->EventBegin(_in_clusters);
-    }
+    for (auto algo : _merge_algo_v)
+      algo->SetAnaFile(_fout);
 
     // Priority ordering algorithm
     if(_priority_algo) {
       _priority_algo->SetAnaFile(_fout);
-      _priority_algo->EventBegin(_in_clusters);
-    }
-
-    // Verbosity setting
-    if(_debug_mode <= kPerMerging) {
-      _merge_algo->SetVerbose(true);
-      if(_separate_algo) _separate_algo->SetVerbose(true);
-      if(_priority_algo) _priority_algo->SetVerbose(true);
     }
     
     // Book keeper reinitialization
@@ -69,20 +56,6 @@ namespace cmtool {
   /// FMWK function called @ beginning of iterative loop inside Process()
   void CMergeManager::IterationBegin()
   {
-
-    if(!_iter_ctr) {
-
-      _merge_algo->IterationBegin(_in_clusters);
-      if(_separate_algo) _separate_algo->IterationBegin(_in_clusters);
-      if(_priority_algo) _priority_algo->IterationBegin(_in_clusters);
-
-    }else{
-
-      _merge_algo->IterationBegin(_in_clusters);
-      if(_separate_algo) _separate_algo->IterationBegin(_out_clusters);
-      if(_priority_algo) _priority_algo->IterationBegin(_out_clusters);
-
-    }
 
     if(_debug_mode <= kPerIteration) {
       
@@ -103,14 +76,10 @@ namespace cmtool {
   void CMergeManager::IterationEnd()
   {
 
-    _merge_algo->IterationEnd();
-    if(_separate_algo) _separate_algo->IterationEnd();
-    if(_priority_algo) _priority_algo->IterationEnd();
-
     if(_debug_mode <= kPerIteration) {
 
-      _merge_algo->Report();
-      if(_separate_algo) _separate_algo->Report();
+      for (size_t i=0; i < _merge_algo_v.size(); i++)
+	_merge_algo_v[i]->Report();
       if(_priority_algo) _priority_algo->Report();
 
       std::cout
@@ -142,11 +111,6 @@ namespace cmtool {
 
       _book_keeper.Combine(bk);
 
-    // Call EventEnd for algorithms
-    _merge_algo->EventEnd();
-    if(_separate_algo) _separate_algo->EventEnd();
-    if(_priority_algo) _priority_algo->EventEnd();
-
     _book_keeper_v.clear();
     _tmp_merged_clusters.clear();
     _tmp_merged_indexes.clear();
@@ -157,87 +121,91 @@ namespace cmtool {
 
     // Configure input for RunMerge
     CMergeBookKeeper bk;
+
+    size_t algo_idx = 0.;
+
+    size_t iter_ctr = 0;
+
+    while (algo_idx < _merge_algo_v.size() ) {
     
-    if(!_iter_ctr) _tmp_merged_clusters = _in_clusters;
-    else _tmp_merged_clusters = _out_clusters;
-    _out_clusters.clear();
-
-    bk.Reset(_tmp_merged_clusters.size());
-
-    std::vector<bool> merge_switch(_tmp_merged_clusters.size(),true);
-
-    for(size_t i=0; i<_tmp_merged_indexes.size(); ++i)
+      if(!iter_ctr) _tmp_merged_clusters = _in_clusters;
+      else _tmp_merged_clusters = _out_clusters;
+      _out_clusters.clear();
       
-      if(_tmp_merged_indexes.at(i).size()==1)
-        
-        merge_switch.at(i) = false;
-    
-    ComputePriority(_tmp_merged_clusters);
-    
-    // Run separation algorithm
-    if(_separate_algo)
+      bk.Reset(_tmp_merged_clusters.size());
       
-      RunSeparate(_tmp_merged_clusters, bk);
-
-    // Run merging algorithm
-    RunMerge(_tmp_merged_clusters, merge_switch, bk);
-    if(_debug_mode <= kPerIteration)
+      std::vector<bool> merge_switch(_tmp_merged_clusters.size(),true);
       
-      _merge_algo->Report();
-    
-    // Save output
-    bk.PassResult(_tmp_merged_indexes);
-    
-    if(bk.size() == _tmp_merged_indexes.size())
-      _out_clusters = _tmp_merged_clusters;
-    else {
-      _out_clusters.reserve(_tmp_merged_indexes.size());
-      for(auto const& indexes_v : _tmp_merged_indexes) {
-        
-        if(indexes_v.size()==1) {
-          _out_clusters.push_back(_tmp_merged_clusters.at(indexes_v.at(0)));
-          continue;
-        }
-        
-        size_t tmp_hit_counts=0;
-        for(auto const& index : indexes_v) 
-          tmp_hit_counts += _tmp_merged_clusters.at(index).hit_vector.size();
-        std::vector<larutil::Hit2D> tmp_hits;
-        tmp_hits.reserve(tmp_hit_counts);
-        
-        for(auto const& index : indexes_v) {
-          for(auto const& hit : _tmp_merged_clusters.at(index).hit_vector)
-            tmp_hits.push_back(hit);
-        }
-        _out_clusters.push_back(::cluster::cluster_params());
-        
-        if((*_out_clusters.rbegin()).SetHits(tmp_hits) < 1) continue;
-        _params_alg.FillParams(_out_clusters.back());
+      for(size_t i=0; i<_tmp_merged_indexes.size(); ++i)
+	
+	if(_tmp_merged_indexes.at(i).size()==1)
+	  
+	  merge_switch.at(i) = false;
+      
+      ComputePriority(_tmp_merged_clusters);
+      
+      // Run merging algorithm
+      RunMerge(algo_idx,_tmp_merged_clusters, merge_switch, bk);
+      
+      if(_debug_mode <= kPerIteration) 
+	_merge_algo_v[algo_idx]->Report();
+      
+      // Save output
+      bk.PassResult(_tmp_merged_indexes);
+      
+      if(bk.size() == _tmp_merged_indexes.size())
+	_out_clusters = _tmp_merged_clusters;
+      else {
+	_out_clusters.reserve(_tmp_merged_indexes.size());
+	for(auto const& indexes_v : _tmp_merged_indexes) {
+	  
+	  if(indexes_v.size()==1) {
+	    _out_clusters.push_back(_tmp_merged_clusters.at(indexes_v.at(0)));
+	    continue;
+	  }
+	  
+	  size_t tmp_hit_counts=0;
+	  for(auto const& index : indexes_v) 
+	    tmp_hit_counts += _tmp_merged_clusters.at(index).size();
+	  std::vector<cluster::pt> tmp_hits;
+	  tmp_hits.reserve(tmp_hit_counts);
+	  
+	  for(auto const& index : indexes_v) {
+	    for(auto const& hit : _tmp_merged_clusters.at(index).GetHits())
+	      tmp_hits.push_back(hit);
+	  }
+	  _out_clusters.push_back(::cluster::Cluster());
+	  
+	  if((*_out_clusters.rbegin()).SetHits(tmp_hits) < 1) continue;
+	}
+	_book_keeper_v.push_back(bk);
       }
-      _book_keeper_v.push_back(bk);
-    }
 
-    // Break if no more merging occurred
-    if(_tmp_merged_clusters.size() == _out_clusters.size())
+      // if no merging occurred -> move to next algo
+      if(_tmp_merged_clusters.size() == _out_clusters.size())
+	algo_idx += 1;
+
+      if( (_tmp_merged_clusters.size() != _out_clusters.size()) && (_merge_algo_v[algo_idx]->MergeTillConverge() == false) )
+	algo_idx += 1;
+
+      iter_ctr += 1;
       
-      return false;
-
-    if(_out_clusters.size() == _planes.size())
-
-      return false;
-    
+    }// for all meging algorithms
+      
     return true;
   }
 
-  void CMergeManager::RunMerge(const std::vector<::cluster::cluster_params> &in_clusters,
+  void CMergeManager::RunMerge(const int& algo_idx,
+			       const std::vector<::cluster::Cluster> &in_clusters,
                                CMergeBookKeeper &book_keeper) const
   {
-    RunMerge(in_clusters,
+    RunMerge(algo_idx,in_clusters,
              std::vector<bool>(in_clusters.size(),true),
              book_keeper);
   }
 
-  void CMergeManager::RunMerge(const std::vector<::cluster::cluster_params> &in_clusters,
+  void CMergeManager::RunMerge(const int& algo_idx,
+			       const std::vector<::cluster::Cluster> &in_clusters,
                                const std::vector<bool> &merge_flag,
                                CMergeBookKeeper &book_keeper) const
   {
@@ -258,61 +226,86 @@ namespace cmtool {
     //
     // Merging
     //
-    
-    // Run over clusters and execute merging algorithms
-    for(auto citer1 = _priority.rbegin();
-        citer1 != _priority.rend();
-        ++citer1) {
+
+    // which mode? pair-wise:
+    if (_merge_algo_v[algo_idx]->PairWiseMode() == true) {
       
-      auto citer2 = citer1;
+      // Run over clusters and execute merging algorithms
+      for(auto citer1 = _priority.rbegin();
+	  citer1 != _priority.rend();
+	  ++citer1) {
+	
+	auto citer2 = citer1;
+	
+	UChar_t plane1 = in_clusters.at((*citer1).second)._plane;
+	
+	while(1) {
+	  citer2++;
+	  if(citer2 == _priority.rend()) break;
+	  
+	  // Skip if not on the same plane
+	  UChar_t plane2 = in_clusters.at((*citer2).second)._plane;
+	  if(plane1 != plane2) continue;
+	  
+	  // Skip if this combination is not meant to be compared
+	  if(!(merge_flag.at((*citer2).second)) && !(merge_flag.at((*citer1).second)) ) continue;
+	  
+	  // Skip if this combination is not allowed to merge
+	  if(!(book_keeper.MergeAllowed((*citer1).second,(*citer2).second))) continue;
+	  
+	  if(_debug_mode <= kPerMerging){
+	    
+	    std::cout
+	      << Form("    \033[93mInspecting a pair (%zu, %zu) for merging... \033[00m",(*citer1).second, (*citer2).second)
+	      << std::endl;
+	  }
+	  
+	  bool merge = _merge_algo_v[algo_idx]->Bool(in_clusters.at((*citer1).second),in_clusters.at((*citer2).second));
+	  
+	  if(_debug_mode <= kPerMerging) {
+	    
+	    if(merge) 
+	      std::cout << "    \033[93mfound to be merged!\033[00m " 
+			<< std::endl
+			<< std::endl;
+	    
+	    else 
+	      std::cout << "    \033[93mfound NOT to be merged...\033[00m" 
+			<< std::endl
+			<< std::endl;
+	    
+	  } // end looping over all sets of algorithms
+	  
+	  if(merge)
+	    
+	    book_keeper.Merge((*citer1).second,(*citer2).second);
+	  
+	} // end looping over all cluster pairs for citer1
+	
+      } // end looping over clusters
 
-      UChar_t plane1 = in_clusters.at((*citer1).second).plane_id.Plane;
+    }// if pair-wise mode
 
-      while(1) {
-        citer2++;
-        if(citer2 == _priority.rend()) break;
 
-        // Skip if not on the same plane
-        UChar_t plane2 = in_clusters.at((*citer2).second).plane_id.Plane;
-        if(plane1 != plane2) continue;
+    // which mode? if all clusters together:
+    else {
 
-        // Skip if this combination is not meant to be compared
-        if(!(merge_flag.at((*citer2).second)) && !(merge_flag.at((*citer1).second)) ) continue;
+      auto merge_clus_idx_v = _merge_algo_v[algo_idx]->Merge(in_clusters);
 
-        // Skip if this combination is not allowed to merge
-        if(!(book_keeper.MergeAllowed((*citer1).second,(*citer2).second))) continue;
+      for (auto const& merge_idx_list : merge_clus_idx_v) {
 
-        if(_debug_mode <= kPerMerging){
-          
-          std::cout
-            << Form("    \033[93mInspecting a pair (%zu, %zu) for merging... \033[00m",(*citer1).second, (*citer2).second)
-            << std::endl;
-        }
-        
-        bool merge = _merge_algo->Bool(in_clusters.at((*citer1).second),in_clusters.at((*citer2).second));
-
-        if(_debug_mode <= kPerMerging) {
-          
-          if(merge) 
-            std::cout << "    \033[93mfound to be merged!\033[00m " 
-                      << std::endl
-                      << std::endl;
-          
-          else 
-            std::cout << "    \033[93mfound NOT to be merged...\033[00m" 
-                      << std::endl
-                      << std::endl;
-
-        } // end looping over all sets of algorithms
-        
-        if(merge)
-
-          book_keeper.Merge((*citer1).second,(*citer2).second);
-
-      } // end looping over all cluster pairs for citer1
-
-    } // end looping over clusters
-
+	// merge_idx_list contains list of all clusters to be merged together.
+	for (size_t n = 0; n < merge_idx_list.size(); n++) {
+	  for (size_t m = n+1; m < merge_idx_list.size(); m++) {
+	    book_keeper.Merge( merge_idx_list[n], merge_idx_list[m]);
+	  }
+	}
+	
+      }// for all clusters in list.
+      
+    }// if merge from full event info
+    
+    
     if(_debug_mode <= kPerIteration && book_keeper.GetResult().size() != in_clusters.size()) {
       
       std::cout << "  Found following clusters to be merged..." << std::endl;
@@ -327,76 +320,6 @@ namespace cmtool {
 
       }
     }
-
-  }
-
-  void CMergeManager::RunSeparate(const std::vector<::cluster::cluster_params> &in_clusters,
-                                  CMergeBookKeeper &book_keeper) const
-  {
-    /*
-    if(separate_flag.size() != in_clusters.size())
-      throw CMTException(Form("in_clusters (%zu) and separate_flag (%zu) vectors must be of same length!",
-                                   in_clusters.size(),
-                                   separate_flag.size()
-                                   )
-                              );
-    */
-    if(_debug_mode <= kPerIteration){
-      
-      std::cout
-        << Form("  Calling %s with %zu clusters...",__FUNCTION__,in_clusters.size())
-        <<std::endl;
-
-    }
-
-    //
-    // Separation
-    //
-    
-    // Run over clusters and execute merging algorithms
-    for(size_t cindex1 = 0; cindex1 < in_clusters.size(); ++cindex1) {
-      
-      UChar_t plane1 = in_clusters.at(cindex1).plane_id.Plane;
-      
-      for(size_t cindex2 = cindex1+1; cindex2 < in_clusters.size(); ++cindex2) {
-        
-        // Skip if not on the same plane
-        UChar_t plane2 = in_clusters.at(cindex2).plane_id.Plane;
-        if(plane1 != plane2) continue;
-        
-        // Skip if this combination is not meant to be compared
-        //if(!(separate_flag.at(cindex2))) continue;
-        
-        if(_debug_mode <= kPerMerging){
-          
-          std::cout
-            << Form("    \033[93mInspecting a pair (%zu, %zu) for separation... \033[00m",cindex1,cindex2)
-            << std::endl;
-        }
-        
-        bool separate = _separate_algo->Bool(in_clusters.at(cindex1),in_clusters.at(cindex2));
-        
-        if(_debug_mode <= kPerMerging) {
-          
-          if(separate) 
-            std::cout << "    \033[93mfound to be separated!\033[00m " 
-                      << std::endl
-                      << std::endl;
-          
-          else 
-            std::cout << "    \033[93mfound NOT to be separated...\033[00m" 
-                      << std::endl
-                      << std::endl;
-          
-        } // end looping over all sets of algorithms
-        
-        if(separate)
-          
-          book_keeper.ProhibitMerge(cindex1,cindex2);
-          
-      } // end looping over all cluster pairs for citer1
-      
-    } // end looping over clusters
 
   }
 

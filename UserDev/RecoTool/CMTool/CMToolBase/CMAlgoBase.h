@@ -16,7 +16,7 @@
 
 #include <iostream>
 #include "TFile.h"
-#include "ClusterRecoUtil/Base/ClusterParams.h"
+#include "Cluster.h"
 
 namespace cmtool {
 
@@ -40,32 +40,6 @@ namespace cmtool {
     virtual void Reset(){}
 
     /**
-       Optional function: called at the beginning of 1st iteration. This is called per event.
-     */
-    virtual void EventBegin(const std::vector<::cluster::cluster_params> &clusters)
-    { if(clusters.size()) return; }
-
-    /**
-       Optional function: called at the end of event ... after the last merging iteration is over.
-     */
-    virtual void EventEnd()
-    {return;}
- 
-    /**
-       Optional function: called at the beggining of each iteration over all pairs of clusters. 
-       This provides all clusters' information in case the algorithm need them. Note this
-       is called per iteration which may be more than once per event.
-     */
-    virtual void IterationBegin(const std::vector<::cluster::cluster_params> &clusters)
-    { if(clusters.size()) return;}
-
-    /**
-       Optional function: called at the end of each iteration over all pairs of clusters.
-     */
-    virtual void IterationEnd()
-    {return; }
-
-    /**
        Optional function: called after Bool() function is called for all possible cluster
        pairs by CMergeManager/CMatchManager IFF run with verbosity level kPerIteration. 
        Maybe useful for debugging.       
@@ -86,6 +60,7 @@ namespace cmtool {
 
     /// Boolean to choose verbose mode. Turned on if CMergeManager/CMatchManager's verbosity level is >= kPerMerging
     bool _verbose;
+
   };
 
 }

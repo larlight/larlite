@@ -17,7 +17,6 @@
 
 #include "Analysis/ana_base.h"
 #include "CMergeHelper.h"
-#include "ClusterRecoUtil/Base/CRUHelper.h"
 
 namespace larlite {
   /**
@@ -49,9 +48,9 @@ namespace larlite {
     */
     virtual bool finalize();
 
-    void SetInputProducer(std::string name) {_input_producer = name;}
-
-    void SetOutputProducer(std::string name) {_output_producer = name;}
+    void SetClusterProducer(std::string name) {_clus_producer = name;}
+    void SetVertexProducer (std::string name) {_vtx_producer  = name;}
+    void SetOutputProducer (std::string name) {_output_producer = name;}
 
     ::cmtool::CMergeManager& GetManager(size_t i=0) { return _merge_helper.GetManager(i); }
 
@@ -61,15 +60,22 @@ namespace larlite {
     
   protected:
 
+    void FillClusterProperties(::larlite::cluster& cluster,
+			       const ::cluster::Cluster& CMCluster);
+
     bool _write_output;
 
     ::cmtool::CMergeHelper _merge_helper;
 
-    std::string _input_producer;
+    std::string _clus_producer;
+    std::string _vtx_producer;
 
     std::string _output_producer;
 
-    ::cluster::CRUHelper _cru_helper;
+    ::cluster::ClusterMaker _cluster_maker;
+
+    float _wire2cm;
+    float _time2cm;
 
   };
 }

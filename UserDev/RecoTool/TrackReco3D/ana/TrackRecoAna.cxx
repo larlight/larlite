@@ -251,7 +251,6 @@ namespace larlite {
 	dQdx_U_v.resize(npts,-1.0*data::kINVALID_FLOAT);
 	dQdx_V_v.resize(npts,-1.0*data::kINVALID_FLOAT);
 	dQdx_Y_v.resize(npts,-1.0*data::kINVALID_FLOAT);
-	
 	Length_v.resize(npts,-1.0*data::kINVALID_FLOAT);
 
 	const TVector3* trunk_pt = nullptr;
@@ -267,13 +266,11 @@ namespace larlite {
 	  auto& dQdx_U = dQdx_U_v[pid];
 	  auto& dQdx_V = dQdx_V_v[pid];
 	  auto& dQdx_Y = dQdx_Y_v[pid];
-	  
 	  auto& Length = Length_v[pid];
 	  
 	  dQdx_U = track.DQdxAtPoint(pid,(geo::View_t)0);
 	  dQdx_V = track.DQdxAtPoint(pid,(geo::View_t)1);
 	  dQdx_Y = track.DQdxAtPoint(pid,(geo::View_t)2);
-	  
 	  Length = track.Length(pid);
 	    
 	  if (tdist > _TrunkLength) continue;

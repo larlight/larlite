@@ -15,11 +15,14 @@ namespace cmtool {
   }
 
   //--------------------------------------------------------
-  bool CBAlgoFake::Bool(const ::cluster::cluster_params &cluster1,
-                        const ::cluster::cluster_params &cluster2)
+  bool CBAlgoFake::Bool(const ::cluster::Cluster &cluster1,
+                        const ::cluster::Cluster &cluster2)
   //--------------------------------------------------------
   {
-    if(cluster1.hit_vector.size() && cluster2.hit_vector.size()) {
+
+    std::cout << "Pair-wise called" << std::endl;
+    
+    if(cluster1.size() && cluster2.size()) {
       _ctr++;
       if( (_ctr%64) == 0)
         _flip = (!_flip);
@@ -28,6 +31,24 @@ namespace cmtool {
     else return false;
   }
 
+  std::vector< std::vector<size_t> > CBAlgoFake::Merge(const std::vector<::cluster::Cluster>& clus_v) {
+
+    std::cout << "Full view merging called" << std::endl;
+
+    std::vector< std::vector<size_t> > merge_result{ {}, {}, {} };
+
+    for (size_t clus_idx = 0; clus_idx < clus_v.size(); clus_idx++) {
+
+      auto const& clus = clus_v.at(clus_idx);
+
+      merge_result[clus._plane].push_back(clus_idx);
+      
+    }
+
+    return merge_result;
+  }
+
+  
 }
 
 #endif

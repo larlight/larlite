@@ -1,10 +1,9 @@
 import sys,os
-from ROOT import larlite as fmwk
-from recotool.mergeDef import *
+import ROOT
+from larlite import larlite as ll
+from ROOT import cluster, cmtool
 
-#from larlite import larlite as fmwk
-
-mgr = fmwk.ana_processor()
+mgr = ll.ana_processor()
 
 #args should be input file name
 for x in xrange(len(sys.argv)-2):
@@ -21,26 +20,38 @@ if os.path.isfile(out_file):
 
 mgr.set_output_file(out_file)
 
-mgr.set_io_mode(fmwk.storage_manager.kBOTH)
+mgr.set_io_mode(ll.storage_manager.kBOTH)
 
 mgr.set_ana_output_file("")
 
-prelim = GetPrelimMergerInstance()
-prelim.SetInputProducer("fuzzycluster")
-prelim.SetOutputProducer("mergedfuzzy1")
-second = GetSecondMergerInstance()
-second.SetInputProducer("mergedfuzzy1")
-second.SetOutputProducer("mergedfuzzy2")
-mgr.add_process(prelim)
-mgr.add_process(second)
+merger_instance = ll.ClusterMerger()
+merger_instance.SaveOutputCluster(True)
 
-#merge_all = GetMergeAllInstance()
-#merge_all.SetOutputProducer("mergedfuzzy")
-mgr.set_data_to_write(fmwk.data.kCluster,"mergedfuzzy1")
-mgr.set_data_to_write(fmwk.data.kAssociation,"mergedfuzzy1")
-mgr.set_data_to_write(fmwk.data.kCluster,"mergedfuzzy2")
-mgr.set_data_to_write(fmwk.data.kAssociation,"mergedfuzzy2")
-#mgr.add_process(merge_all)
+polar = cmtool.CBAlgoPolar()
+polar.SetBufferAngle(0.0)
+polar.SetVerbose(False)
+polar.SetMergeTillConverge(True)
+
+vtxalign = cmtool.CBAlgoVtxAlign()
+vtxalign.SetUsePairWise(False)
+vtxalign.SetVerbose(False)
+vtxalign.SetMergeTillConverge(True)
+vtxalign.SetMaxAngleDiff(12)
+vtxalign.SetMinGammaOAngle(15)
+vtxalign.SetMaxMergeDist(3)
+vtxalign.SetMinNHits(10)
+
+merger_instance.GetManager().AddMergeAlgo(polar)
+merger_instance.GetManager().AddMergeAlgo(vtxalign)
+merger_instance.GetManager().MergeTillConverge(False)
+
+merger_instance.SetClusterProducer("sc2")
+merger_instance.SetVertexProducer("mcvertex")
+merger_instance.SetOutputProducer("polar")
+mgr.add_process(merger_instance)
+
+mgr.set_data_to_write(ll.data.kCluster,"polar")
+mgr.set_data_to_write(ll.data.kAssociation,"polar")
 
 mgr.run()
 
