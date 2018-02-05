@@ -15,6 +15,7 @@
 #define FILLLENGTHUVY_H
 
 #include <iostream>
+#include <array>
 #include "ShowerRecoModuleBase.h"
 /**
    \class ShowerRecoModuleBase
