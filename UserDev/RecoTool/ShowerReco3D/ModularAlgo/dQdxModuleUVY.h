@@ -42,6 +42,9 @@ namespace showerreco {
     // set distance along which to calculate dE/dx
     void setTrunkLength(double d) { _dtrunk = d; }
 
+    // boolean set overall angle or trunk calculated angle
+    void setUseTrunkAngle(bool b) { _use_trunk = b; }
+
     /// 3D charge correction function
     double ChargeCorrection(const double& q, const TVector3& vtx);
 
@@ -62,6 +65,9 @@ namespace showerreco {
     // distance along which to calculate dEdx
     double _dtrunk;
 
+    // flag to use trunk angle
+    bool _use_trunk;
+    
     // position-dependent response map
     std::vector< std::vector< std::vector< double > > >_responseMap;
     double _responseStep;

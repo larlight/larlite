@@ -10,21 +10,19 @@
 #include <algorithm>
 #include <functional>
 #include <array>
+#include <cassert>
 
 namespace showerreco {
   
   dQdxModuleUVY::dQdxModuleUVY()
   {
     _name = "dQdxModuleUVY";
-    _tree = nullptr;
-    _dtrunk = 0.;
+    _dtrunk = kDOUBLE_MAX;
+    _use_trunk = false;
   }
   
   void dQdxModuleUVY::initialize()
   {
-    // degbugging tree
-    if (_tree) delete _tree;
-    _tree = new TTree(_name.c_str(),"dQdx tree");
     return;
   }
   
@@ -42,15 +40,18 @@ namespace showerreco {
 
     auto& clusters = proto_shower.params();
     
-    const auto& dir3D = resultShower.fDCosStart;
+    TVector3 dir3D;
 
-    TVector3 dir3D_tv(dir3D);
-	
+    if(_use_trunk)
+      dir3D = resultShower.fDCosTrunk;
+    else
+      dir3D = resultShower.fDCosStart;
+    
     std::array<double,3> plane_f_v;
     std::array<double,3> pitch_v;
     
     for(size_t plane=0; plane<3; ++plane) {
-      plane_f_v[plane] = geomHelper->Project_3DLine_OnPlane(dir3D_tv,plane).Mag();
+      plane_f_v[plane] = geomHelper->Project_3DLine_OnPlane(dir3D,plane).Mag();
       pitch_v[plane]   = geomHelper->GetPitch(dir3D,plane);
     }
     
@@ -71,6 +72,8 @@ namespace showerreco {
       
       double f = plane_f_v.at(pl);
       double pitch  = pitch_v[pl];
+
+      assert (_dtrunk != kDOUBLE_MAX);
 
       std::vector<double> dqdx_v(3 * _dtrunk, 0.);
       
@@ -112,8 +115,6 @@ namespace showerreco {
       resultShower.fBestdQdx      = -1.0*larlite::data::kINVALID_DOUBLE;
       
     } // for all clusters (planes)
-    
-    _tree->Fill();
     
     return;
   }

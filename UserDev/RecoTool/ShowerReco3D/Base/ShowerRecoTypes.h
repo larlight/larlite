@@ -49,6 +49,8 @@ struct Shower_t {
 
   TVector3 fDCosStart;                        ///< direction cosines at start of shower
   TVector3 fSigmaDCosStart;                   ///< uncertainty on initial direction cosines
+  TVector3 fDCosTrunk;                        ///< direction cosines for trunk of shower
+  TVector3 fSigmaDCosTrunk;                   ///< uncertainty on trunk direction cosines
   TVector3 fXYZStart;                         ///< 3D start point of shower
   TVector3 fSigmaXYZStart;                    ///< uncertainty on 3D start point
   TVector3 fCentroid;                         ///< 3D centroid of shower
@@ -79,13 +81,11 @@ struct Shower_t {
 
   std::vector< double > fShoweringLength;     ///< Calculates the distance from start to shower points [in cm]
 
-
   ::larlite::geo::PlaneID fBestPlane;         ///< "Best" plane used for geometrical interpretation
 
   std::vector< ::larlite::geo::PlaneID > fPlaneIDs;    ///< List of PlaneIDs in the order aligned w.r.t. other vectors
 
   std::vector< bool > fPlaneIsBad;            ///< Matches number of planes, gets flagged if a plane is bad
-
 
   Shower_t()
   { Reset(); }
@@ -96,6 +96,9 @@ struct Shower_t {
 
     fDCosStart[0] = fDCosStart[1] = fDCosStart[2] = kDOUBLE_MIN;
     fSigmaDCosStart[0] = fSigmaDCosStart[1] = fSigmaDCosStart[2] = kDOUBLE_MIN;
+
+    fDCosTrunk[0] = fDCosTrunk[1] = fDCosTrunk[2] = kDOUBLE_MIN;
+    fSigmaDCosTrunk[0] = fSigmaDCosTrunk[1] = fSigmaDCosTrunk[2] = kDOUBLE_MIN;
 
     fXYZStart[0] = fXYZStart[1] = fXYZStart[2] = kDOUBLE_MIN;
     fSigmaXYZStart[0] = fSigmaXYZStart[1] = fSigmaXYZStart[2] = kDOUBLE_MIN;

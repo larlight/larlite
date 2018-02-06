@@ -32,6 +32,7 @@
 #pragma link C++ class showerreco::ToyGeoModule+;
 #pragma link C++ class showerreco::Angle3DFromVtx+;
 #pragma link C++ class showerreco::Angle3DFromVtxQweighted+;
+#pragma link C++ class showerreco::TrunkAngle3DFromVtxQweighted+;
 #pragma link C++ class showerreco::CheckVtxAlignment+;
 #pragma link C++ class showerreco::FilterPFPart+;
 #pragma link C++ class showerreco::FilterShowers+;
