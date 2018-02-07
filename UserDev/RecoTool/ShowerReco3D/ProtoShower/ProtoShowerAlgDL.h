@@ -21,6 +21,11 @@
 #include "ClusterRecoUtil/Base/CRUHelper.h"
 #include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
 
+#include "LArUtil/Geometry.h"
+#include "LArUtil/GeometryHelper.h"
+#include "LArUtil/DetectorProperties.h"
+
+
 /**
    \class ProtoShowerAlgDL
    User defined class ProtoShowerAlgDL ... these comments are used to generate
@@ -51,8 +56,14 @@ private:
   ::cluster::ClusterParamsAlg * _params_alg;
   ::cluster::CRUHelper _cru_helper;
 
-  // vertex producer
   std::string _vtx_producer;
+
+  const larutil::Geometry* geom;
+  const larutil::GeometryHelper* geomH;
+  const larutil::DetectorProperties* detProp;
+
+  double Wire2Cm(const double wire);
+  double Time2Cm(const double time, const float planeOffset);
 
 };
 

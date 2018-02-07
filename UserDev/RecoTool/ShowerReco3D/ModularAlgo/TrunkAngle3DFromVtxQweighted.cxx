@@ -73,21 +73,36 @@ namespace showerreco {
       weightedDir.t = 0;
       double Qtot = 0;
       int nhits = 0;
-      for (auto const& hit : hits){
+      //for (auto const& hit : hits){
+
+      assert(_dtrunk != kDOUBLE_MAX);
+
+      for(size_t hid=0; hid<hits.size(); ++hid) {
+	const auto& hit = hits.at(hid);
+
 	double d2D = sqrt( pow(hit.w - start2D.w, 2) + pow(hit.t - start2D.t, 2) );
+
 	if (d2D > _dtrunk) continue;
+
+	//std::cout << "@hid=" << hid << " hit=(" << hit.w << "," << hit.t << ") and d2D=" << d2D << std::endl;
+	
 	weightedDir.w += (hit.w - start2D.w) * hit.charge;
 	weightedDir.t += (hit.t - start2D.t) * hit.charge;
+
 	Qtot += hit.charge;
 	nhits += 1;
       }
+      
+      //std::cout << std::endl;
+      //std::cout << "@plane=" << pl << " Qtot=" << Qtot << " nhits=" << nhits << std::endl;
+      //std::cout << std::endl;
 
       weightedDir.w /= Qtot;
       weightedDir.t /= Qtot;
 
       planeHits[pl] = nhits;
       planeDir[pl]  = weightedDir;
-
+      
     }// for all planes
 
     int pl_max = larlite::data::kINVALID_INT;
