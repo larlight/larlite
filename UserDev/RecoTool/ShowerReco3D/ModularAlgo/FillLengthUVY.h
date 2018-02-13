@@ -35,7 +35,11 @@ namespace showerreco {
 
     void do_reconstruction(const ::protoshower::ProtoShower &, Shower_t &);
 
+    void SetQFraction(float q) { _qfraction = q; }
+
   private:
+
+    float _qfraction;
 
   };
 
