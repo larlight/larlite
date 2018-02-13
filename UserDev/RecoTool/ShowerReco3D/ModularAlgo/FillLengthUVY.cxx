@@ -35,7 +35,7 @@ namespace showerreco {
     std::array<double,3> opening_angle_v;
     std::array<double,3> plane_f_v;
 
-    std::array<larutil::Point2D,3> line_start_pt_v, line_dir_v;
+    std::array<TVector2,3> line_dir_v;
 
     for(auto& v : length_v) 
       v = -1.0*::larlite::data::kINVALID_DOUBLE;
@@ -45,9 +45,17 @@ namespace showerreco {
 
     const auto& vertex = proto_shower.vertexes().front();
     
+    float alpha = 10;
+    
     for(size_t plane=0; plane<3; ++plane) {
       plane_f_v[plane] = geomHelper->Project_3DLine_OnPlane(dir3D, plane).Mag();
-      geomHelper->Line_3Dto2D(vertex, dir3D, plane, line_start_pt_v[plane], line_dir_v[plane]);
+      
+      auto startPoint2D = geomHelper->Point_3Dto2D(vertex, plane);
+      auto secondPoint3D = vertex + alpha * dir3D;
+      auto secondPoint2D = geomHelper->Point_3Dto2D(secondPoint3D, plane);
+      TVector2 dir(secondPoint2D.w - startPoint2D.w, secondPoint2D.t - startPoint2D.t);
+      dir *= 1.0 / dir.Mod();
+      line_dir_v[plane] = dir;
     }
 
     for (auto const& clus : clusters) {
@@ -70,12 +78,18 @@ namespace showerreco {
 
       for(const auto& hit : hits) qsum += hit.charge;
 
+      const auto& dr_w = line_dir_v[plane].X();
+      const auto& dr_t = line_dir_v[plane].Y();
+
       for(size_t hid = 0; hid < hits.size(); ++hid) {
 	const auto& hit = hits[hid];
+
 	float ptw = hit.w - sW;
 	float ptt = hit.t - sT;
-	d2D  = ptw * line_dir_v[plane].w;
-	d2D += ptt * line_dir_v[plane].t;
+
+	d2D  = ptw * dr_w;
+	d2D += ptt * dr_t;
+
 	dist_v[hid] = std::make_pair(d2D,hit.charge / qsum);
       }
       std::sort(std::begin(dist_v),std::end(dist_v),
