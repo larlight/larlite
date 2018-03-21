@@ -6,6 +6,8 @@
 #include "DataFormat/vertex.h"
 #include "DataFormat/pfpart.h"
 #include "DataFormat/mctruth.h"
+#include "DataFormat/mcflux.h"
+#include "DataFormat/gtruth.h"
 
 #include "LArUtil/Geometry.h"
 #include "EMShowerTools/EMShowerProfile.h"
@@ -23,7 +25,9 @@ namespace larlite {
     fVertexProducer = "";
     fShowerProducer = "";
 
+    fEventTree = nullptr;
     fShowerTree = nullptr;
+    fAndyTree = nullptr;
   }
 
   bool ShowerQuality_DL::initialize() {
@@ -53,9 +57,9 @@ namespace larlite {
     fEventTree->Branch("mc_x", &_mc_x, "mc_x/D");
     fEventTree->Branch("mc_y", &_mc_y, "mc_y/D");
     fEventTree->Branch("mc_z", &_mc_z, "mc_z/D");
-    fEventTree->Branch("mc_dcosx" , &_mc_dcosx, "mc_dcosx/D");
-    fEventTree->Branch("mc_dcosy" , &_mc_dcosy, "mc_dcosy/D");
-    fEventTree->Branch("mc_dcosz" , &_mc_dcosz, "mc_dcosz/D");
+    fEventTree->Branch("mc_dcosx" , &_mc_dcosx,  "mc_dcosx/D");
+    fEventTree->Branch("mc_dcosy" , &_mc_dcosy,  "mc_dcosy/D");
+    fEventTree->Branch("mc_dcosz" , &_mc_dcosz,  "mc_dcosz/D");
     fEventTree->Branch("mc_energy", &_mc_energy, "mc_energy/D");
 
     // 
@@ -67,6 +71,16 @@ namespace larlite {
     fShowerTree->Branch("subrun" , &_subrun , "subrun/I");
     fShowerTree->Branch("run"    , &_run    , "run/I");
     fShowerTree->Branch("entry"  , &_entry  , "entry/I");
+
+    //
+    // Andy Tree
+    //
+    fAndyTree = new TTree("EventAndyTree","");
+    fAndyTree->Branch("event"  , &_event  , "event/I");
+    fAndyTree->Branch("subrun" , &_subrun , "subrun/I");
+    fAndyTree->Branch("run"    , &_run    , "run/I");
+    fAndyTree->Branch("entry"  , &_entry  , "entry/I");
+    AttachAndy(fAndyTree);
     
     //
     // reco
@@ -162,11 +176,8 @@ namespace larlite {
     nue_shower.PdgCode(data::kINVALID_INT);
     
     _has_mc = false;
-    if (ev_mcs and !ev_mcs->empty()) {
+    if (ev_truth and !ev_truth->empty()) {
       
-      assert(ev_truth);
-      assert(!ev_truth->empty());
-
       // Read out some nu stuff
       const auto& truth = ev_truth->front();
       const auto& nu = truth.GetNeutrino();
@@ -182,6 +193,8 @@ namespace larlite {
 	}
       }
 
+      FillAndy(storage);
+	
       if (nue_shower.PdgCode() != data::kINVALID_INT)
 	_has_mc = true;
 
@@ -232,6 +245,7 @@ namespace larlite {
     auto const& ass_pfpart_vv = storage->find_one_ass(ev_vertex->id(), ev_pfpart, ev_vertex->name());
     if (!ev_pfpart or ev_pfpart->empty()) {
       fEventTree->Fill();
+      fAndyTree->Fill();
       std::cout << "no pf particles... next!" << std::endl;
       return true;
     }
@@ -243,17 +257,11 @@ namespace larlite {
     // get the associated pf clusters
     larlite::event_shower *ev_shower = nullptr;
     auto const& ass_shower_vv = storage->find_one_ass(ev_pfpart->id(), ev_shower, fShowerProducer);
-    //if (!ev_shower or ev_shower->empty()) {
-    //  fEventTree->Fill();
-    //  std::cout << "no showers found... next!" << std::endl;
-    //  return true;
-    //}
-
+    
     if(ev_shower)    
       std::cout << "ev_shower sz=" << ev_shower->size() << std::endl;
+    
     std::cout << "ass_shower_vv sz=" << ass_shower_vv.size() << std::endl;
-
-    //    assert (ev_pfpart->size() == ass_shower_vv.size());
 
     for( size_t vtx_id = 0; vtx_id < ass_pfpart_vv.size(); ++vtx_id) {
       ClearVertex();
@@ -267,7 +275,6 @@ namespace larlite {
       
       std::vector<size_t> shower_idx_v;
       std::vector<const larlite::shower* > shower_v;
-
 
       if (!ev_shower) {
         _nshowers = 0;
@@ -403,6 +410,7 @@ namespace larlite {
     } // end this vertex
     
     fEventTree->Fill();
+    fAndyTree->Fill();
     std::cout << std::endl;
     return true;
   }
@@ -414,6 +422,9 @@ namespace larlite {
     assert(fEventTree);
     fEventTree->Write();
     
+    assert(fAndyTree);
+    fAndyTree->Write();
+
     return true;
   }
 
@@ -527,6 +538,341 @@ namespace larlite {
 
     return;
   }
+
+  void ShowerQuality_DL::AttachAndy(TTree* tree) {
+
+    assert(tree);
+    tree->Branch("MCFlux_NuPosX",   &MCFlux_NuPosX    , "MCFlux_NuPosX/D");
+    tree->Branch("MCFlux_NuPosY",   &MCFlux_NuPosY    , "MCFlux_NuPosY/D");
+    tree->Branch("MCFlux_NuPosZ",   &MCFlux_NuPosZ    , "MCFlux_NuPosZ/D");
+    tree->Branch("MCFlux_NuMomX",   &MCFlux_NuMomX    , "MCFlux_NuMomX/D");
+    tree->Branch("MCFlux_NuMomY",   &MCFlux_NuMomY    , "MCFlux_NuMomY/D");
+    tree->Branch("MCFlux_NuMomZ",   &MCFlux_NuMomZ    , "MCFlux_NuMomZ/D");
+    tree->Branch("MCFlux_NuMomE",   &MCFlux_NuMomE    , "MCFlux_NuMomE/D");
+    tree->Branch("MCFlux_ntype",    &MCFlux_ntype     , "MCFlux_ntype/I");
+    tree->Branch("MCFlux_ptype",    &MCFlux_ptype     , "MCFlux_ptype/I");
+    tree->Branch("MCFlux_nimpwt",   &MCFlux_nimpwt    , "MCFlux_nimpwt/D");
+    tree->Branch("MCFlux_dk2gen",   &MCFlux_dk2gen    , "MCFlux_dk2gen/D");
+    tree->Branch("MCFlux_nenergyn", &MCFlux_nenergyn  , "MCFlux_nenergyn/D");
+    tree->Branch("MCFlux_tpx",      &MCFlux_tpx       , "MCFlux_tpx/D");
+    tree->Branch("MCFlux_tpy",      &MCFlux_tpy       , "MCFlux_tpy/D");
+    tree->Branch("MCFlux_tpz",      &MCFlux_tpz       , "MCFlux_tpz/D");
+    tree->Branch("MCFlux_tptype",   &MCFlux_tptype    , "MCFlux_tptype/I");
+    tree->Branch("MCFlux_vx",       &MCFlux_vx        , "MCFlux_vx/D");
+    tree->Branch("MCFlux_vy",       &MCFlux_vy        , "MCFlux_vy/D");
+    tree->Branch("MCFlux_vz",       &MCFlux_vz        , "MCFlux_vz/D");
+    
+    tree->Branch("MCTruth_NParticles",           &MCTruth_NParticles,"MCTruth_NParticles/I");
+    tree->Branch("MCTruth_particles_TrackId",    &MCTruth_particles_TrackId);
+    tree->Branch("MCTruth_particles_PdgCode",    &MCTruth_particles_PdgCode);
+    tree->Branch("MCTruth_particles_Mother",     &MCTruth_particles_Mother);
+    tree->Branch("MCTruth_particles_StatusCode", &MCTruth_particles_StatusCode);
+    tree->Branch("MCTruth_particles_NDaughters", &MCTruth_particles_NDaughters);
+    tree->Branch("MCTruth_particles_Daughters",  &MCTruth_particles_Daughters);
+    tree->Branch("MCTruth_particles_Gvx",        &MCTruth_particles_Gvx);
+    tree->Branch("MCTruth_particles_Gvy",        &MCTruth_particles_Gvy);
+    tree->Branch("MCTruth_particles_Gvz",        &MCTruth_particles_Gvz);
+    tree->Branch("MCTruth_particles_Gvt",        &MCTruth_particles_Gvt);
+    tree->Branch("MCTruth_particles_px0",        &MCTruth_particles_px0);
+    tree->Branch("MCTruth_particles_py0",        &MCTruth_particles_py0);
+    tree->Branch("MCTruth_particles_pz0",        &MCTruth_particles_pz0);
+    tree->Branch("MCTruth_particles_e0",         &MCTruth_particles_e0);
+    tree->Branch("MCTruth_particles_Rescatter",  &MCTruth_particles_Rescatter);
+    tree->Branch("MCTruth_particles_polx",       &MCTruth_particles_polx);
+    tree->Branch("MCTruth_particles_poly",       &MCTruth_particles_poly);
+    tree->Branch("MCTruth_particles_polz",       &MCTruth_particles_polz)
+;
+    tree->Branch("MCTruth_neutrino_CCNC",            &MCTruth_neutrino_CCNC, "MCTruth_neutrino_CCNC/I");
+    tree->Branch("MCTruth_neutrino_mode",            &MCTruth_neutrino_mode, "MCTruth_neutrino_mode/I");
+    tree->Branch("MCTruth_neutrino_interactionType", &MCTruth_neutrino_interactionType, "MCTruth_neutrino_interactionType/I");
+    tree->Branch("MCTruth_neutrino_target",          &MCTruth_neutrino_target, "MCTruth_neutrino_target/I");         
+    tree->Branch("MCTruth_neutrino_nucleon",         &MCTruth_neutrino_nucleon, "MCTruth_neutrino_nucleon/I");        
+    tree->Branch("MCTruth_neutrino_quark",           &MCTruth_neutrino_quark, "MCTruth_neutrino_quark/I");          
+    tree->Branch("MCTruth_neutrino_W",               &MCTruth_neutrino_W, "MCTruth_neutrino_W/D");              
+    tree->Branch("MCTruth_neutrino_X",               &MCTruth_neutrino_X, "MCTruth_neutrino_X/D");              
+    tree->Branch("MCTruth_neutrino_Y",               &MCTruth_neutrino_Y, "MCTruth_neutrino_Y/D");              
+    tree->Branch("MCTruth_neutrino_Q2",              &MCTruth_neutrino_Q2, "MCTruth_neutrino_Q2/D");             
+
+    tree->Branch("GTruth_ProbePDG"    , &GTruth_ProbePDG, "GTruth_ProbePDG/I");                  
+    tree->Branch("GTruth_IsSeaQuark"  , &GTruth_IsSeaQuark, "GTruth_IsSeaQuark/I");                
+    tree->Branch("GTruth_tgtPDG"      , &GTruth_tgtPDG, "GTruth_tgtPDG/I");                    
+    tree->Branch("GTruth_weight"      , &GTruth_weight, "GTruth_weight/D");                    
+    tree->Branch("GTruth_probability" , &GTruth_probability, "GTruth_probability/D");               
+    tree->Branch("GTruth_Xsec"        , &GTruth_Xsec, "GTruth_Xsec/D");                      
+    tree->Branch("GTruth_fDiffXsec"   , &GTruth_fDiffXsec, "GTruth_fDiffXsec/D");                 
+    tree->Branch("GTruth_vertexX"     , &GTruth_vertexX, "GTruth_vertexX/D");                   
+    tree->Branch("GTruth_vertexY"     , &GTruth_vertexY, "GTruth_vertexY/D");                   
+    tree->Branch("GTruth_vertexZ"     , &GTruth_vertexZ, "GTruth_vertexZ/D");                   
+    tree->Branch("GTruth_vertexT"     , &GTruth_vertexT, "GTruth_vertexT/D");                   
+    tree->Branch("GTruth_Gscatter"    , &GTruth_Gscatter, "GTruth_Gscatter/I");                  
+    tree->Branch("GTruth_Gint"        , &GTruth_Gint, "GTruth_Gint/I");                      
+    tree->Branch("GTruth_ResNum"      , &GTruth_ResNum, "GTruth_ResNum/I");                    
+    tree->Branch("GTruth_NumPiPlus"   , &GTruth_NumPiPlus, "GTruth_NumPiPlus/I");                 
+    tree->Branch("GTruth_NumPi0"      , &GTruth_NumPi0, "GTruth_NumPi0/I");                    
+    tree->Branch("GTruth_NumPiMinus"  , &GTruth_NumPiMinus, "GTruth_NumPiMinus/I");                
+    tree->Branch("GTruth_NumProton"   , &GTruth_NumProton, "GTruth_NumProton/I");                 
+    tree->Branch("GTruth_NumNeutron"  , &GTruth_NumNeutron, "GTruth_NumNeutron/I");                
+    tree->Branch("GTruth_IsCharm"     , &GTruth_IsCharm, "GTruth_IsCharm/I");                   
+    tree->Branch("GTruth_gX" , &GTruth_gX  , "GTruth_gX/D");                        
+    tree->Branch("GTruth_gY" , &GTruth_gY  , "GTruth_gY/D");                        
+    tree->Branch("GTruth_gZ" , &GTruth_gZ  , "GTruth_gZ/D");                        
+    tree->Branch("GTruth_gT" , &GTruth_gT  , "GTruth_gT/D");                        
+    tree->Branch("GTruth_gW" , &GTruth_gW  , "GTruth_gW/D");                        
+    tree->Branch("GTruth_gQ2", &GTruth_gQ2 , "GTruth_gQ2/D");                       
+    tree->Branch("GTruth_gq2", &GTruth_gq2 , "GTruth_gq2/D");                       
+    tree->Branch("GTruth_ProbePDG" , &GTruth_ProbePDG  , "GTruth_ProbePDG/I");                  
+    tree->Branch("GTruth_ProbeP4x" , &GTruth_ProbeP4x  , "GTruth_ProbeP4x/D");                  
+    tree->Branch("GTruth_ProbeP4y" , &GTruth_ProbeP4y  , "GTruth_ProbeP4y/D");                  
+    tree->Branch("GTruth_ProbeP4z" , &GTruth_ProbeP4z  , "GTruth_ProbeP4z/D");                  
+    tree->Branch("GTruth_ProbeP4E" , &GTruth_ProbeP4E  , "GTruth_ProbeP4E/D");                  
+    tree->Branch("GTruth_HitNucP4x", &GTruth_HitNucP4x , "GTruth_HitNucP4x/D");                 
+    tree->Branch("GTruth_HitNucP4y", &GTruth_HitNucP4y , "GTruth_HitNucP4y/D");                 
+    tree->Branch("GTruth_HitNucP4z", &GTruth_HitNucP4z , "GTruth_HitNucP4z/D");                 
+    tree->Branch("GTruth_HitNucP4E", &GTruth_HitNucP4E , "GTruth_HitNucP4E/D");                 
+    tree->Branch("GTruth_FShadSystP4x", &GTruth_FShadSystP4x, "GTruth_FShadSystP4x/D");              
+    tree->Branch("GTruth_FShadSystP4y", &GTruth_FShadSystP4y, "GTruth_FShadSystP4y/D");              
+    tree->Branch("GTruth_FShadSystP4z", &GTruth_FShadSystP4z, "GTruth_FShadSystP4z/D");              
+    tree->Branch("GTruth_FShadSystP4E", &GTruth_FShadSystP4E, "GTruth_FShadSystP4E/D");              
+    
+  }
+
+  void ShowerQuality_DL::ResetAndy() {
+    
+    MCFlux_NuPosX = data::kINVALID_DOUBLE;
+    MCFlux_NuPosY = data::kINVALID_DOUBLE;
+    MCFlux_NuPosZ = data::kINVALID_DOUBLE;
+    MCFlux_NuMomX = data::kINVALID_DOUBLE;
+    MCFlux_NuMomY = data::kINVALID_DOUBLE;
+    MCFlux_NuMomZ = data::kINVALID_DOUBLE;
+    MCFlux_NuMomE = data::kINVALID_DOUBLE;
+    MCFlux_ntype = data::kINVALID_INT;
+    MCFlux_ptype = data::kINVALID_INT;
+    MCFlux_nimpwt = data::kINVALID_DOUBLE;
+    MCFlux_dk2gen = data::kINVALID_DOUBLE;
+    MCFlux_nenergyn = data::kINVALID_DOUBLE;
+    MCFlux_tpx = data::kINVALID_DOUBLE;
+    MCFlux_tpy = data::kINVALID_DOUBLE;
+    MCFlux_tpz = data::kINVALID_DOUBLE;
+    MCFlux_tptype = data::kINVALID_INT;
+    MCFlux_vx = data::kINVALID_DOUBLE;
+    MCFlux_vy = data::kINVALID_DOUBLE;
+    MCFlux_vz = data::kINVALID_DOUBLE;
+    
+    MCTruth_NParticles = data::kINVALID_INT;
+    MCTruth_particles_TrackId.clear();
+    MCTruth_particles_PdgCode.clear();
+    MCTruth_particles_Mother.clear();
+    MCTruth_particles_StatusCode.clear();
+    MCTruth_particles_NDaughters.clear();
+    MCTruth_particles_Daughters.clear();
+    MCTruth_particles_Gvx.clear();
+    MCTruth_particles_Gvy.clear();
+    MCTruth_particles_Gvz.clear();
+    MCTruth_particles_Gvt.clear();
+    MCTruth_particles_px0.clear();
+    MCTruth_particles_py0.clear();
+    MCTruth_particles_pz0.clear();
+    MCTruth_particles_e0.clear();
+    MCTruth_particles_Rescatter.clear();
+    MCTruth_particles_polx.clear();
+    MCTruth_particles_poly.clear();
+    MCTruth_particles_polz.clear();
+
+    MCTruth_neutrino_CCNC = data::kINVALID_INT;
+    MCTruth_neutrino_mode = data::kINVALID_INT;
+    MCTruth_neutrino_interactionType = data::kINVALID_INT;
+    MCTruth_neutrino_target = data::kINVALID_INT;
+    MCTruth_neutrino_nucleon = data::kINVALID_INT;
+    MCTruth_neutrino_quark = data::kINVALID_INT;
+    MCTruth_neutrino_W = data::kINVALID_DOUBLE;
+    MCTruth_neutrino_X = data::kINVALID_DOUBLE;
+    MCTruth_neutrino_Y = data::kINVALID_DOUBLE;
+    MCTruth_neutrino_Q2 = data::kINVALID_DOUBLE;
+
+    GTruth_ProbePDG = data::kINVALID_INT;
+    GTruth_IsSeaQuark = data::kINVALID_INT;
+    GTruth_tgtPDG = data::kINVALID_INT;
+    GTruth_weight = data::kINVALID_DOUBLE;
+    GTruth_probability = data::kINVALID_DOUBLE;
+    GTruth_Xsec = data::kINVALID_DOUBLE;
+    GTruth_fDiffXsec = data::kINVALID_DOUBLE;
+    GTruth_vertexX = data::kINVALID_DOUBLE;
+    GTruth_vertexY = data::kINVALID_DOUBLE;
+    GTruth_vertexZ = data::kINVALID_DOUBLE;
+    GTruth_vertexT = data::kINVALID_DOUBLE;
+    GTruth_Gscatter = data::kINVALID_INT;
+    GTruth_Gint = data::kINVALID_INT;
+    GTruth_ResNum = data::kINVALID_INT;
+    GTruth_NumPiPlus = data::kINVALID_INT;
+    GTruth_NumPi0 = data::kINVALID_INT;
+    GTruth_NumPiMinus = data::kINVALID_INT;
+    GTruth_NumProton = data::kINVALID_INT;
+    GTruth_NumNeutron = data::kINVALID_INT;
+    GTruth_IsCharm = data::kINVALID_INT;
+    GTruth_gX = data::kINVALID_DOUBLE;
+    GTruth_gY = data::kINVALID_DOUBLE;
+    GTruth_gZ = data::kINVALID_DOUBLE;
+    GTruth_gT = data::kINVALID_DOUBLE;
+    GTruth_gW = data::kINVALID_DOUBLE;
+    GTruth_gQ2 = data::kINVALID_DOUBLE;
+    GTruth_gq2 = data::kINVALID_DOUBLE;
+    GTruth_ProbePDG = data::kINVALID_INT;
+    GTruth_ProbeP4x = data::kINVALID_DOUBLE;
+    GTruth_ProbeP4y = data::kINVALID_DOUBLE;
+    GTruth_ProbeP4z = data::kINVALID_DOUBLE;
+    GTruth_ProbeP4E = data::kINVALID_DOUBLE;
+    GTruth_HitNucP4x = data::kINVALID_DOUBLE;
+    GTruth_HitNucP4y = data::kINVALID_DOUBLE;
+    GTruth_HitNucP4z = data::kINVALID_DOUBLE;
+    GTruth_HitNucP4E = data::kINVALID_DOUBLE;
+    GTruth_FShadSystP4x = data::kINVALID_DOUBLE;
+    GTruth_FShadSystP4y = data::kINVALID_DOUBLE;
+    GTruth_FShadSystP4z = data::kINVALID_DOUBLE;
+    GTruth_FShadSystP4E = data::kINVALID_DOUBLE;
+
+    return;
+  }
+
+  void ShowerQuality_DL::FillAndy(storage_manager *sto) {
+    
+
+    auto ev_flux = sto->get_data<event_mcflux>("generator");
+    assert(ev_flux && !ev_flux->empty());
+
+    auto ev_truth = sto->get_data<event_mctruth>("generator");
+    assert(ev_truth && !ev_truth->empty());
+
+    auto ev_gtruth = sto->get_data<event_gtruth>("generator");
+    assert(ev_gtruth && !ev_gtruth->empty());
+
+    const auto& flux   = ev_flux->front();
+    const auto& truth  = ev_truth->front();
+    const auto& gtruth = ev_gtruth->front();
+
+    MCFlux_NuPosX = truth.GetNeutrino().Nu().Trajectory().front().X();
+    MCFlux_NuPosY = truth.GetNeutrino().Nu().Trajectory().front().Y();
+    MCFlux_NuPosZ = truth.GetNeutrino().Nu().Trajectory().front().Z();
+    MCFlux_NuMomX = truth.GetNeutrino().Nu().Trajectory().front().Px();
+    MCFlux_NuMomY = truth.GetNeutrino().Nu().Trajectory().front().Py();
+    MCFlux_NuMomZ = truth.GetNeutrino().Nu().Trajectory().front().Pz();
+    MCFlux_NuMomE = truth.GetNeutrino().Nu().Trajectory().front().E();
+    MCFlux_ntype    = flux.fntype;
+    MCFlux_ptype    = flux.fptype;
+    MCFlux_nimpwt   = flux.fnimpwt;
+    MCFlux_dk2gen   = flux.fdk2gen;
+    MCFlux_nenergyn = flux.fnenergyn;
+    MCFlux_tpx      = flux.ftpx;
+    MCFlux_tpy      = flux.ftpy;
+    MCFlux_tpz      = flux.ftpz;
+    MCFlux_tptype   = flux.ftptype;
+    MCFlux_vx       = flux.fvx;
+    MCFlux_vy       = flux.fvy;
+    MCFlux_vz       = flux.fvz;
+    
+    MCTruth_NParticles = (int) truth.GetParticles().size();
+
+    MCTruth_particles_TrackId.resize(MCTruth_NParticles);
+    MCTruth_particles_PdgCode.resize(MCTruth_NParticles);
+    MCTruth_particles_Mother.resize(MCTruth_NParticles);
+    MCTruth_particles_StatusCode.resize(MCTruth_NParticles);
+    MCTruth_particles_NDaughters.resize(MCTruth_NParticles);
+    MCTruth_particles_Daughters.resize(MCTruth_NParticles);
+    MCTruth_particles_Gvx.resize(MCTruth_NParticles);
+    MCTruth_particles_Gvy.resize(MCTruth_NParticles);
+    MCTruth_particles_Gvz.resize(MCTruth_NParticles);
+    MCTruth_particles_Gvt.resize(MCTruth_NParticles);
+    MCTruth_particles_px0.resize(MCTruth_NParticles);
+    MCTruth_particles_py0.resize(MCTruth_NParticles);
+    MCTruth_particles_pz0.resize(MCTruth_NParticles);
+    MCTruth_particles_e0.resize(MCTruth_NParticles);
+    MCTruth_particles_Rescatter.resize(MCTruth_NParticles);
+    MCTruth_particles_polx.resize(MCTruth_NParticles);
+    MCTruth_particles_poly.resize(MCTruth_NParticles);
+    MCTruth_particles_polz.resize(MCTruth_NParticles);
+
+    for(int pid=0; pid < MCTruth_NParticles; ++pid) {
+      
+      MCTruth_particles_TrackId[pid] = truth.GetParticles()[pid].TrackId();
+      MCTruth_particles_PdgCode[pid] = truth.GetParticles()[pid].PdgCode();
+      MCTruth_particles_Mother[pid] = truth.GetParticles()[pid].Mother();
+      MCTruth_particles_StatusCode[pid] = truth.GetParticles()[pid].StatusCode();
+      MCTruth_particles_NDaughters[pid] = (int)truth.GetParticles()[pid].Daughters().size();
+
+      MCTruth_particles_Daughters[pid].reserve(MCTruth_particles_NDaughters[pid]);
+
+      for(auto did : truth.GetParticles()[pid].Daughters()) {
+	MCTruth_particles_Daughters[pid].push_back(did);
+      }
+      
+      MCTruth_particles_Gvx[pid] = truth.GetParticles()[pid].GetGvtx().X();
+      MCTruth_particles_Gvy[pid] = truth.GetParticles()[pid].GetGvtx().Y();
+      MCTruth_particles_Gvz[pid] = truth.GetParticles()[pid].GetGvtx().Z();
+      MCTruth_particles_Gvt[pid] = truth.GetParticles()[pid].GetGvtx().T();
+      MCTruth_particles_px0[pid] = truth.GetParticles()[pid].Trajectory().front().Px();
+      MCTruth_particles_py0[pid] = truth.GetParticles()[pid].Trajectory().front().Py();
+      MCTruth_particles_pz0[pid] = truth.GetParticles()[pid].Trajectory().front().Pz();
+      MCTruth_particles_e0[pid]  = truth.GetParticles()[pid].Trajectory().front().E();
+      MCTruth_particles_Rescatter[pid] = truth.GetParticles()[pid].Rescatter();
+      MCTruth_particles_polx[pid] = truth.GetParticles()[pid].Polarization().X();
+      MCTruth_particles_poly[pid] = truth.GetParticles()[pid].Polarization().Y();
+      MCTruth_particles_polz[pid] = truth.GetParticles()[pid].Polarization().Z();
+      
+    }
+
+    MCTruth_neutrino_CCNC = truth.GetNeutrino().CCNC();
+    MCTruth_neutrino_mode = truth.GetNeutrino().Mode();
+    MCTruth_neutrino_interactionType = truth.GetNeutrino().InteractionType();
+    MCTruth_neutrino_target  = truth.GetNeutrino().Target();
+    MCTruth_neutrino_nucleon = truth.GetNeutrino().HitNuc();
+    MCTruth_neutrino_quark   = truth.GetNeutrino().HitQuark();
+    MCTruth_neutrino_W  = truth.GetNeutrino().W();
+    MCTruth_neutrino_X  = truth.GetNeutrino().X();
+    MCTruth_neutrino_Y  = truth.GetNeutrino().Y();
+    MCTruth_neutrino_Q2 = truth.GetNeutrino().QSqr();
+
+    GTruth_ProbePDG = gtruth.fProbePDG;
+    GTruth_IsSeaQuark = (int)gtruth.fIsSeaQuark;
+    GTruth_tgtPDG = gtruth.ftgtPDG;
+    GTruth_weight = gtruth.fweight;
+    GTruth_probability = gtruth.fprobability;
+    GTruth_Xsec = gtruth.fXsec;
+    GTruth_fDiffXsec = gtruth.fDiffXsec;
+    GTruth_vertexX = gtruth.fVertex.X();
+    GTruth_vertexY = gtruth.fVertex.Y();
+    GTruth_vertexZ = gtruth.fVertex.Z();
+    GTruth_vertexT = gtruth.fVertex.T();
+    GTruth_Gscatter = gtruth.fGscatter;
+    GTruth_Gint = gtruth.fGint;
+    GTruth_ResNum = gtruth.fResNum;
+    GTruth_NumPiPlus = gtruth.fNumPiPlus;
+    GTruth_NumPi0 = gtruth.fNumPi0;
+    GTruth_NumPiMinus = gtruth.fNumPiMinus;
+    GTruth_NumProton = gtruth.fNumProton;
+    GTruth_NumNeutron = gtruth.fNumNeutron;
+    GTruth_IsCharm = (int)gtruth.fIsCharm;
+    GTruth_gX = gtruth.fgX;
+    GTruth_gY = gtruth.fgY;
+    //GTruth_gZ = gtruth.fgZ;  -- it's missing
+    GTruth_gT = gtruth.fgT;
+    GTruth_gW = gtruth.fgW;
+    GTruth_gQ2 = gtruth.fgQ2;
+    GTruth_gq2 = gtruth.fgq2;
+    GTruth_ProbeP4x = gtruth.fProbeP4.X();
+    GTruth_ProbeP4y = gtruth.fProbeP4.Y();
+    GTruth_ProbeP4z = gtruth.fProbeP4.Z();
+    GTruth_ProbeP4E = gtruth.fProbeP4.E();
+    GTruth_HitNucP4x = gtruth.fHitNucP4.X();
+    GTruth_HitNucP4y = gtruth.fHitNucP4.Y();
+    GTruth_HitNucP4z = gtruth.fHitNucP4.Z();
+    GTruth_HitNucP4E = gtruth.fHitNucP4.E();
+    GTruth_FShadSystP4x = gtruth.fFShadSystP4.X();
+    GTruth_FShadSystP4y = gtruth.fFShadSystP4.Y();
+    GTruth_FShadSystP4z = gtruth.fFShadSystP4.Z();
+    GTruth_FShadSystP4E = gtruth.fFShadSystP4.E();
+
+    return;
+  }
+
     
 }
 #endif
