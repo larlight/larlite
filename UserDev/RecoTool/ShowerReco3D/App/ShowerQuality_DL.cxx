@@ -946,12 +946,12 @@ namespace larlite {
     }
 
 
-    for(size_t pid1=0; pid1<proton_id_v.size(); ++pid1) {
-      auto ppid = proton_id_v[pid1];
-      const auto& proton1 = proton_v[ppid];
+    for(size_t ppid=0; ppid<proton_id_v.size(); ++ppid) {
+      auto pid1 = proton_id_v[ppid];
+      const auto& proton1 = proton_v[pid1];
       for(size_t pid2=0; pid2<proton_v.size(); ++pid2) {
 	if (pid1 == pid2) continue;
-	const auto& proton2 = proton_v[pid2];;
+	const auto& proton2 = proton_v[pid2];
 	if (proton2.ancestorof(proton1)) {
 	  proton_e_v[ppid] += proton2.depeng;
 	}
