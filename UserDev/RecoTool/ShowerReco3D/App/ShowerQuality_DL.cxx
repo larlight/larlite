@@ -258,7 +258,6 @@ namespace larlite {
 
 	_mc_wildlength = WildShowerDir.Mag();
 
-      
 	_mc_dedx     = nue_shower.dEdx();
 	_mc_dqdx_U   = nue_shower.dQdx(0);
 	_mc_dqdx_V   = nue_shower.dQdx(1);
@@ -652,8 +651,8 @@ namespace larlite {
     tree->Branch("MCTruth_particles_Rescatter",  &MCTruth_particles_Rescatter);
     tree->Branch("MCTruth_particles_polx",       &MCTruth_particles_polx);
     tree->Branch("MCTruth_particles_poly",       &MCTruth_particles_poly);
-    tree->Branch("MCTruth_particles_polz",       &MCTruth_particles_polz)
-;
+    tree->Branch("MCTruth_particles_polz",       &MCTruth_particles_polz);
+
     tree->Branch("MCTruth_neutrino_CCNC",            &MCTruth_neutrino_CCNC, "MCTruth_neutrino_CCNC/I");
     tree->Branch("MCTruth_neutrino_mode",            &MCTruth_neutrino_mode, "MCTruth_neutrino_mode/I");
     tree->Branch("MCTruth_neutrino_interactionType", &MCTruth_neutrino_interactionType, "MCTruth_neutrino_interactionType/I");
@@ -809,7 +808,7 @@ namespace larlite {
   void ShowerQuality_DL::FillSegment(storage_manager *sto) {
     
     // get mctruth info
-    auto ev_mctruth = sto->get_data<event_mctruth>("generator");
+    auto ev_mctruth = (larlite::event_mctruth*)sto->get_data<event_mctruth>("generator");
 
     auto const& mcnu = ev_mctruth->at(0).GetNeutrino();
     
@@ -837,8 +836,11 @@ namespace larlite {
     _parent_sce_z = _parent_z + offset[2];
 
     // get mctracks and mcshowers
-    auto ev_mctrack = sto->get_data<event_mctrack>("mcreco");
-    auto ev_mcshower = sto->get_data<event_mcshower>("mcreco");
+    auto ev_mctrack = (larlite::event_mctrack*)sto->get_data<event_mctrack>("mcreco");
+    auto ev_mcshower = (larlite::event_mcshower*)sto->get_data<event_mcshower>("mcreco");
+
+    assert(ev_mctrack);
+    assert(ev_mcshower);
 
     std::vector<aparticle> proton_v;
     std::vector<aparticle> muon_v;
@@ -859,16 +861,6 @@ namespace larlite {
       particle.ancestortrackid = mct.AncestorTrackID();
       particle.depeng = mct.Start().E() - mct.End().E();
       
-      if(mct.PdgCode() == 2212) {
-	proton_v.emplace_back(std::move(particle));
-      }
-      else if(std::abs(mct.PdgCode()) == 13 and particle.primary()) {
-	muon_v.emplace_back(std::move(particle));
-      } 
-      else {
-	other_v.emplace_back(std::move(particle));
-      }
-
       if (particle.primary()) {
 	_daughter_pdg_v.push_back(particle.pdg);
 	_daughter_energydep_v.push_back(particle.depeng);
@@ -878,6 +870,16 @@ namespace larlite {
 	_daughterPx_v.push_back(mct.Start().Px());
 	_daughterPy_v.push_back(mct.Start().Py());
 	_daughterPz_v.push_back(mct.Start().Pz());
+      }
+
+      if(mct.PdgCode() == 2212) {
+	proton_v.emplace_back(std::move(particle));
+      }
+      else if(std::abs(mct.PdgCode()) == 13 and particle.primary()) {
+	muon_v.emplace_back(std::move(particle));
+      } 
+      else {
+	other_v.emplace_back(std::move(particle));
       }
 
     }
@@ -891,13 +893,6 @@ namespace larlite {
       particle.parenttrackid = mcs.MotherTrackID();
       particle.ancestortrackid = mcs.AncestorTrackID();
       particle.depeng = mcs.DetProfile().E();
-      
-      if(std::abs(mcs.PdgCode()) == 11 and particle.primary()) {
-	electron_v.emplace_back(std::move(particle));
-      } 
-      else {
-	other_v.emplace_back(std::move(particle));
-      }
 
       if (particle.primary()) {
 	_daughter_pdg_v.push_back(particle.pdg);
@@ -908,6 +903,13 @@ namespace larlite {
 	_daughterPx_v.push_back(mcs.Start().Px());
 	_daughterPy_v.push_back(mcs.Start().Py());
 	_daughterPz_v.push_back(mcs.Start().Pz());
+      }      
+
+      if(std::abs(mcs.PdgCode()) == 11 and particle.primary()) {
+	electron_v.emplace_back(std::move(particle));
+      } 
+      else {
+	other_v.emplace_back(std::move(particle));
       }
 
     }
@@ -945,7 +947,8 @@ namespace larlite {
     }
 
     if (!proton_e_v.empty())
-      _dep_sum_proton = *(std::max_element(std::begin(proton_e_v),std::end(proton_e_v)));
+      _dep_sum_proton = *(std::max_element(std::begin(proton_e_v),
+					   std::end(proton_e_v)));
 
     float muon_e = 0;
     float electron_e = 0;
@@ -978,14 +981,19 @@ namespace larlite {
     bool is_1mu1p = false;
     bool is_1e1p = false;
 
-    if (nprotons == 1 and nmuons == 1)
+    if (nprotons == 1 and nmuons == 1) {
       is_1mu1p = true;
+      _dep_sum_lepton = muon_e;
+    }
 
-    if (nprotons == 1 and nelectrons == 1)
+    if (nprotons == 1 and nelectrons == 1) {
       is_1e1p = true;
+      _dep_sum_lepton = electron_e;
+    }
 
-    if ((is_1mu1p || is_1e1p) and (is_1mu1p != is_1e1p))
+    if ((is_1mu1p || is_1e1p) and (is_1mu1p != is_1e1p)) {
       _selected = 1;
+    }
 
     return;
   }
@@ -993,13 +1001,13 @@ namespace larlite {
   void ShowerQuality_DL::FillAndy(storage_manager *sto) {
     
 
-    auto ev_flux = sto->get_data<event_mcflux>("generator");
+    auto ev_flux = (event_mcflux*)sto->get_data<event_mcflux>("generator");
     assert(ev_flux && !ev_flux->empty());
 
-    auto ev_truth = sto->get_data<event_mctruth>("generator");
+    auto ev_truth = (event_mctruth*)sto->get_data<event_mctruth>("generator");
     assert(ev_truth && !ev_truth->empty());
 
-    auto ev_gtruth = sto->get_data<event_gtruth>("generator");
+    auto ev_gtruth = (event_gtruth*)sto->get_data<event_gtruth>("generator");
     assert(ev_gtruth && !ev_gtruth->empty());
 
     const auto& flux   = ev_flux->front();
