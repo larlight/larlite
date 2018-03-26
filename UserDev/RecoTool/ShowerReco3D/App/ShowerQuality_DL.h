@@ -3,9 +3,8 @@
 
 #include "Analysis/ana_base.h"
 #include "ShowerReco3D/Base/ShowerRecoException.h"
-#include "DataFormat/mcshower.h"
-#include "DataFormat/shower.h"
 #include "MCSingleShowerCompAlg.h"
+#include "LArUtil/SpaceChargeMicroBooNE.h"
 
 namespace larlite {
 
@@ -125,10 +124,65 @@ namespace larlite {
     void ClearVertex();
     void AttachAndy(TTree* tree);
     void ResetAndy();
+    void FillSegment(storage_manager *sto);
     void FillAndy(storage_manager *sto);
 
-    
+    //
+    // segment stand-in
+    //
 
+    struct aparticle{
+      int pdg;
+      int trackid;
+      int parenttrackid;
+      int ancestortrackid;
+      float depeng;
+
+      bool primary() const
+      { return (this->trackid == this->parenttrackid); }
+      
+      bool daughterof (const aparticle& particle) const
+      { return (this->parenttrackid == particle.trackid); }
+      
+      bool ancestorof ( const aparticle& particle) const
+      { return (this->ancestortrackid == particle.trackid); }
+
+    };
+
+    int _selected;
+    int _parent_pdg;
+    
+    double _energy_init;
+
+    double _parent_x;
+    double _parent_y;
+    double _parent_z;
+
+    double _parent_sce_x;
+    double _parent_sce_y;
+    double _parent_sce_z;
+
+    double _parent_px;
+    double _parent_py;
+    double _parent_pz;
+
+    int _interaction_mode;
+    int _interaction_type;
+
+    double _dep_sum_lepton;
+    double _dep_sum_proton;
+
+    std::vector<double> _daughter_energydep_v;
+    std::vector<int> _daughter_pdg_v;
+
+    std::vector<double> _daughterX_v;
+    std::vector<double> _daughterY_v;
+    std::vector<double> _daughterZ_v;
+
+    std::vector<double> _daughterPx_v;
+    std::vector<double> _daughterPy_v;
+    std::vector<double> _daughterPz_v;
+    
     //
     // Andy Related
     //
@@ -171,6 +225,7 @@ namespace larlite {
     std::vector<double> MCTruth_particles_polx;
     std::vector<double> MCTruth_particles_poly;
     std::vector<double> MCTruth_particles_polz;
+
     int MCTruth_neutrino_CCNC;
     int MCTruth_neutrino_mode;
     int MCTruth_neutrino_interactionType;
@@ -221,6 +276,9 @@ namespace larlite {
     double GTruth_FShadSystP4y;
     double GTruth_FShadSystP4z;
     double GTruth_FShadSystP4E;
+
+    
+    ::larutil::SpaceChargeMicroBooNE _sce;    
 
   };
 }

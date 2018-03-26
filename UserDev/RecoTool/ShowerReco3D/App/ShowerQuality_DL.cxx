@@ -8,6 +8,9 @@
 #include "DataFormat/mctruth.h"
 #include "DataFormat/mcflux.h"
 #include "DataFormat/gtruth.h"
+#include "DataFormat/mctrack.h"
+#include "DataFormat/mcshower.h"
+#include "DataFormat/shower.h"
 
 #include "LArUtil/Geometry.h"
 #include "EMShowerTools/EMShowerProfile.h"
@@ -61,6 +64,38 @@ namespace larlite {
     fEventTree->Branch("mc_dcosy" , &_mc_dcosy,  "mc_dcosy/D");
     fEventTree->Branch("mc_dcosz" , &_mc_dcosz,  "mc_dcosz/D");
     fEventTree->Branch("mc_energy", &_mc_energy, "mc_energy/D");
+
+    // 
+    // when segment shits are not available
+    //
+    fEventTree->Branch("selected1L1P", &_selected, "selected1L1P/I");
+    fEventTree->Branch("parentPDG", &_parent_pdg, "parentPDG/I");
+    fEventTree->Branch("energyInit", &_energy_init, "energyInit/D");
+    fEventTree->Branch("parentX", &_parent_x, "parentX/D");
+    fEventTree->Branch("parentY", &_parent_y, "parentY/D");
+    fEventTree->Branch("parentZ", &_parent_z, "parentZ/D");
+    fEventTree->Branch("parentPx", &_parent_px, "parentPx/D");
+    fEventTree->Branch("parentPy", &_parent_py, "parentPy/D");
+    fEventTree->Branch("parentPz", &_parent_pz, "parentpz/D");
+
+    fEventTree->Branch("ineractionMode", &_interaction_mode, "interactionMode/I");
+    fEventTree->Branch("interactionType", &_interaction_type, "interactionType/I");
+
+    fEventTree->Branch("dep_sum_lepton", &_dep_sum_lepton, "dep_sum_lepton/D");
+    fEventTree->Branch("dep_sum_proton", &_dep_sum_proton, "dep_sum_proton/D");
+
+    fEventTree->Branch("daughterPx_v", &_daughterPx_v);
+    fEventTree->Branch("daughterPy_v", &_daughterPy_v);
+    fEventTree->Branch("daughterPz_v", &_daughterPz_v);
+
+    fEventTree->Branch("daughterX_v", &_daughterX_v);
+    fEventTree->Branch("daughterY_v", &_daughterY_v);
+    fEventTree->Branch("daughterZ_v", &_daughterZ_v);
+
+    fEventTree->Branch("daughter_energydep_v", &_daughter_energydep_v);
+
+    fEventTree->Branch("daughterPdg_v", &_daughter_pdg_v);
+
 
     // 
     // Shower Tree
@@ -181,8 +216,8 @@ namespace larlite {
       // Read out some nu stuff
       const auto& truth = ev_truth->front();
       const auto& nu = truth.GetNeutrino();
-      _mcinfoInteractionType =  (int)   nu.InteractionType();
-      _mcinfoMode            =  (int)   nu.Mode();
+      _mcinfoInteractionType =  (int) nu.InteractionType();
+      _mcinfoMode            =  (int) nu.Mode();
 
       for(const auto& mcs : *ev_mcs) {
 	if (mcs.PdgCode() == 11) {
@@ -193,6 +228,7 @@ namespace larlite {
 	}
       }
 
+      FillSegment(storage);
       FillAndy(storage);
 	
       if (nue_shower.PdgCode() != data::kINVALID_INT)
@@ -459,6 +495,42 @@ namespace larlite {
     _mc_containment = -1.0*data::kINVALID_DOUBLE;
     _mc_length = -1.0*data::kINVALID_DOUBLE;
     _mc_wildlength = -1.0*data::kINVALID_DOUBLE;
+
+    
+    //
+    // segment
+    //
+    
+    
+    _selected = -1.0*data::kINVALID_INT;
+    _parent_pdg = -1.0*data::kINVALID_INT;
+
+    _energy_init = -1.0*data::kINVALID_DOUBLE;
+
+    _parent_x = -1.0*data::kINVALID_DOUBLE;
+    _parent_y = -1.0*data::kINVALID_DOUBLE;
+    _parent_z = -1.0*data::kINVALID_DOUBLE;
+
+    _parent_px = -1.0*data::kINVALID_DOUBLE;
+    _parent_py = -1.0*data::kINVALID_DOUBLE;
+    _parent_pz = -1.0*data::kINVALID_DOUBLE;
+
+    _interaction_mode = -1.0*data::kINVALID_INT;
+    _interaction_type = -1.0*data::kINVALID_INT;
+
+    _dep_sum_lepton = -1.0*data::kINVALID_DOUBLE;
+    _dep_sum_proton = -1.0*data::kINVALID_DOUBLE;
+      
+    _daughterPx_v.clear();
+    _daughterPy_v.clear();
+    _daughterPz_v.clear();
+    _daughterX_v.clear();
+    _daughterY_v.clear();
+    _daughterZ_v.clear();
+
+    _daughter_energydep_v.clear();
+
+    _daughter_pdg_v.clear();
 
     return;
   }
@@ -733,6 +805,191 @@ namespace larlite {
     return;
   }
 
+
+  void ShowerQuality_DL::FillSegment(storage_manager *sto) {
+    
+    // get mctruth info
+    auto ev_mctruth = sto->get_data<event_mctruth>("generator");
+
+    auto const& mcnu = ev_mctruth->at(0).GetNeutrino();
+    
+    _parent_pdg = (int) mcnu.Nu().PdgCode();
+
+    _interaction_mode = (int) mcnu.Mode();
+    _interaction_type = (int) mcnu.InteractionType();
+
+    auto const& nu_start = mcnu.Nu().Trajectory().front();
+
+    _energy_init = nu_start.E();
+
+    _parent_x = nu_start.X();
+    _parent_y = nu_start.Y();
+    _parent_z = nu_start.Z();
+
+    _parent_px = nu_start.Px();
+    _parent_py = nu_start.Py();
+    _parent_pz = nu_start.Pz();
+
+    const auto offset = _sce.GetPosOffsets(_parent_x,_parent_y,_parent_z);    
+
+    _parent_sce_x = _parent_x - offset[0] + 0.7;
+    _parent_sce_y = _parent_y + offset[1];
+    _parent_sce_z = _parent_z + offset[2];
+
+    // get mctracks and mcshowers
+    auto ev_mctrack = sto->get_data<event_mctrack>("mcreco");
+    auto ev_mcshower = sto->get_data<event_mcshower>("mcreco");
+
+    std::vector<aparticle> proton_v;
+    std::vector<aparticle> muon_v;
+    std::vector<aparticle> electron_v;
+    std::vector<aparticle> other_v;
+
+    proton_v.clear();
+    muon_v.clear();
+    electron_v.clear();
+   
+    for(auto const& mct : *ev_mctrack) {
+
+      aparticle particle;
+
+      particle.pdg = mct.PdgCode();
+      particle.trackid = mct.TrackID();
+      particle.parenttrackid = mct.MotherTrackID();
+      particle.ancestortrackid = mct.AncestorTrackID();
+      particle.depeng = mct.Start().E() - mct.End().E();
+      
+      if(mct.PdgCode() == 2212) {
+	proton_v.emplace_back(std::move(particle));
+      }
+      else if(std::abs(mct.PdgCode()) == 13 and particle.primary()) {
+	muon_v.emplace_back(std::move(particle));
+      } 
+      else {
+	other_v.emplace_back(std::move(particle));
+      }
+
+      if (particle.primary()) {
+	_daughter_pdg_v.push_back(particle.pdg);
+	_daughter_energydep_v.push_back(particle.depeng);
+	_daughterX_v.push_back(mct.Start().X());
+	_daughterY_v.push_back(mct.Start().Y());
+	_daughterZ_v.push_back(mct.Start().Z());
+	_daughterPx_v.push_back(mct.Start().Px());
+	_daughterPy_v.push_back(mct.Start().Py());
+	_daughterPz_v.push_back(mct.Start().Pz());
+      }
+
+    }
+
+    for(auto const& mcs : *ev_mcshower) {
+
+      aparticle particle;
+
+      particle.pdg = mcs.PdgCode();
+      particle.trackid = mcs.TrackID();
+      particle.parenttrackid = mcs.MotherTrackID();
+      particle.ancestortrackid = mcs.AncestorTrackID();
+      particle.depeng = mcs.DetProfile().E();
+      
+      if(std::abs(mcs.PdgCode()) == 11 and particle.primary()) {
+	electron_v.emplace_back(std::move(particle));
+      } 
+      else {
+	other_v.emplace_back(std::move(particle));
+      }
+
+      if (particle.primary()) {
+	_daughter_pdg_v.push_back(particle.pdg);
+	_daughter_energydep_v.push_back(particle.depeng);
+	_daughterX_v.push_back(mcs.Start().X());
+	_daughterY_v.push_back(mcs.Start().Y());
+	_daughterZ_v.push_back(mcs.Start().Z());
+	_daughterPx_v.push_back(mcs.Start().Px());
+	_daughterPy_v.push_back(mcs.Start().Py());
+	_daughterPz_v.push_back(mcs.Start().Pz());
+      }
+
+    }
+    
+    int nprotons = 0;
+    int nmuons = 0;
+    int nelectrons = 0;
+
+    std::vector<size_t> proton_id_v;
+    std::vector<float> proton_e_v;
+
+    for(size_t pid=0; pid<proton_v.size(); ++pid) {
+      if (proton_v[pid].primary()) {
+	proton_id_v.push_back(pid);
+	proton_e_v.push_back(proton_v[pid].depeng);
+      }
+    }
+
+    for(auto ppid : proton_id_v) {
+      const auto& proton1 = proton_v[ppid];
+      for(size_t pid=0; pid<proton_v.size(); ++pid) {
+	if (pid == ppid) continue;
+	const auto& proton2 = proton_v[pid];
+	if (proton2.ancestorof(proton1)) {
+	  proton_e_v[ppid] += proton2.depeng;
+	}
+      }
+
+    }
+
+    for(auto proton_e : proton_e_v) {
+      if (proton_e > 60) {
+	nprotons += 1;
+      }
+    }
+
+    if (!proton_e_v.empty())
+      _dep_sum_proton = *(std::max_element(std::begin(proton_e_v),std::end(proton_e_v)));
+
+    float muon_e = 0;
+    float electron_e = 0;
+
+    if (!muon_v.empty()) {
+      const auto& muon1 = muon_v.front();
+      muon_e = muon1.depeng;
+      for(const auto& other : other_v) {
+	if (other.ancestorof(muon1)) {
+	  muon_e += other.depeng;
+	}
+      }
+    }
+
+    if (!electron_v.empty()) {
+      const auto& electron1 = electron_v.front();
+      electron_e = electron1.depeng;
+      for(const auto& other : other_v) {
+	if (other.ancestorof(electron1)) {
+	  electron_e += other.depeng;
+	}
+      }
+    }
+
+    if (muon_e > 35) nmuons = 1;
+    if (electron_e > 35) nelectrons = 1;
+
+    _selected = 0;
+
+    bool is_1mu1p = false;
+    bool is_1e1p = false;
+
+    if (nprotons == 1 and nmuons == 1)
+      is_1mu1p = true;
+
+    if (nprotons == 1 and nelectrons == 1)
+      is_1e1p = true;
+
+    if ((is_1mu1p || is_1e1p) and (is_1mu1p != is_1e1p))
+      _selected = 1;
+
+    return;
+  }
+
   void ShowerQuality_DL::FillAndy(storage_manager *sto) {
     
 
@@ -836,7 +1093,9 @@ namespace larlite {
     GTruth_weight = gtruth.fweight;
     GTruth_probability = gtruth.fprobability;
     GTruth_Xsec = gtruth.fXsec;
+    
     GTruth_fDiffXsec = gtruth.fDiffXsec;
+
     GTruth_vertexX = gtruth.fVertex.X();
     GTruth_vertexY = gtruth.fVertex.Y();
     GTruth_vertexZ = gtruth.fVertex.Z();
