@@ -74,6 +74,11 @@ namespace larlite {
     fEventTree->Branch("parentX", &_parent_x, "parentX/D");
     fEventTree->Branch("parentY", &_parent_y, "parentY/D");
     fEventTree->Branch("parentZ", &_parent_z, "parentZ/D");
+
+    fEventTree->Branch("parentSCEX", &_parent_sce_x, "parentSCEX/D");
+    fEventTree->Branch("parentSCEY", &_parent_sce_y, "parentSCEY/D");
+    fEventTree->Branch("parentSCEZ", &_parent_sce_z, "parentSCEZ/D");
+
     fEventTree->Branch("parentPx", &_parent_px, "parentPx/D");
     fEventTree->Branch("parentPy", &_parent_py, "parentPy/D");
     fEventTree->Branch("parentPz", &_parent_pz, "parentPz/D");
@@ -84,17 +89,17 @@ namespace larlite {
     fEventTree->Branch("dep_sum_lepton", &_dep_sum_lepton, "dep_sum_lepton/D");
     fEventTree->Branch("dep_sum_proton", &_dep_sum_proton, "dep_sum_proton/D");
 
-    fEventTree->Branch("daughterPx_v", &_daughterPx_v);
-    fEventTree->Branch("daughterPy_v", &_daughterPy_v);
-    fEventTree->Branch("daughterPz_v", &_daughterPz_v);
+    fEventTree->Branch("daughter_energydep_v", &_daughter_energydep_v);
+
+    fEventTree->Branch("daughterPdg_v", &_daughter_pdg_v);
 
     fEventTree->Branch("daughterX_v", &_daughterX_v);
     fEventTree->Branch("daughterY_v", &_daughterY_v);
     fEventTree->Branch("daughterZ_v", &_daughterZ_v);
-
-    fEventTree->Branch("daughter_energydep_v", &_daughter_energydep_v);
-
-    fEventTree->Branch("daughterPdg_v", &_daughter_pdg_v);
+    
+    fEventTree->Branch("daughterPx_v", &_daughterPx_v);
+    fEventTree->Branch("daughterPy_v", &_daughterPy_v);
+    fEventTree->Branch("daughterPz_v", &_daughterPz_v);
 
 
     // 
@@ -512,6 +517,10 @@ namespace larlite {
     _parent_y = -1.0*data::kINVALID_DOUBLE;
     _parent_z = -1.0*data::kINVALID_DOUBLE;
 
+    _parent_sce_x = -1.0*data::kINVALID_DOUBLE;
+    _parent_sce_y = -1.0*data::kINVALID_DOUBLE;
+    _parent_sce_z = -1.0*data::kINVALID_DOUBLE;
+
     _parent_px = -1.0*data::kINVALID_DOUBLE;
     _parent_py = -1.0*data::kINVALID_DOUBLE;
     _parent_pz = -1.0*data::kINVALID_DOUBLE;
@@ -525,6 +534,7 @@ namespace larlite {
     _daughterPx_v.clear();
     _daughterPy_v.clear();
     _daughterPz_v.clear();
+
     _daughterX_v.clear();
     _daughterY_v.clear();
     _daughterZ_v.clear();
@@ -854,7 +864,8 @@ namespace larlite {
     proton_v.clear();
     muon_v.clear();
     electron_v.clear();
-   
+    other_v.clear();
+
     for(auto const& mct : *ev_mctrack) {
 
       aparticle particle;
@@ -879,9 +890,11 @@ namespace larlite {
       if(mct.PdgCode() == 2212) {
 	proton_v.emplace_back(std::move(particle));
       }
+
       else if(std::abs(mct.PdgCode()) == 13 and particle.primary()) {
 	muon_v.emplace_back(std::move(particle));
       } 
+
       else {
 	other_v.emplace_back(std::move(particle));
       }
@@ -889,7 +902,7 @@ namespace larlite {
     }
 
     for(auto const& mcs : *ev_mcshower) {
-
+      
       aparticle particle;
 
       particle.pdg = mcs.PdgCode();
@@ -897,7 +910,7 @@ namespace larlite {
       particle.parenttrackid = mcs.MotherTrackID();
       particle.ancestortrackid = mcs.AncestorTrackID();
       particle.depeng = mcs.DetProfile().E();
-
+      
       if (particle.primary()) {
 	_daughter_pdg_v.push_back(particle.pdg);
 	_daughter_energydep_v.push_back(particle.depeng);
@@ -908,14 +921,14 @@ namespace larlite {
 	_daughterPy_v.push_back(mcs.Start().Py());
 	_daughterPz_v.push_back(mcs.Start().Pz());
       }      
-
+      
       if(std::abs(mcs.PdgCode()) == 11 and particle.primary()) {
 	electron_v.emplace_back(std::move(particle));
       } 
       else {
 	other_v.emplace_back(std::move(particle));
       }
-
+      
     }
     
     int nprotons = 0;
@@ -928,15 +941,17 @@ namespace larlite {
     for(size_t pid=0; pid<proton_v.size(); ++pid) {
       if (proton_v[pid].primary()) {
 	proton_id_v.push_back(pid);
-	proton_e_v.push_back(proton_v[pid].depeng);
+	proton_e_v.push_back(proton_v.at(pid).depeng);
       }
     }
 
-    for(auto ppid : proton_id_v) {
+
+    for(size_t pid1=0; pid1<proton_id_v.size(); ++pid1) {
+      auto ppid = proton_id_v[pid1];
       const auto& proton1 = proton_v[ppid];
-      for(size_t pid=0; pid<proton_v.size(); ++pid) {
-	if (pid == ppid) continue;
-	const auto& proton2 = proton_v[pid];
+      for(size_t pid2=0; pid2<proton_v.size(); ++pid2) {
+	if (pid1 == pid2) continue;
+	const auto& proton2 = proton_v[pid2];;
 	if (proton2.ancestorof(proton1)) {
 	  proton_e_v[ppid] += proton2.depeng;
 	}
