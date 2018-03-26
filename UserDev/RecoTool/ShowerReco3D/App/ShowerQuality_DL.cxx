@@ -76,7 +76,7 @@ namespace larlite {
     fEventTree->Branch("parentZ", &_parent_z, "parentZ/D");
     fEventTree->Branch("parentPx", &_parent_px, "parentPx/D");
     fEventTree->Branch("parentPy", &_parent_py, "parentPy/D");
-    fEventTree->Branch("parentPz", &_parent_pz, "parentpz/D");
+    fEventTree->Branch("parentPz", &_parent_pz, "parentPz/D");
 
     fEventTree->Branch("ineractionMode", &_interaction_mode, "interactionMode/I");
     fEventTree->Branch("interactionType", &_interaction_type, "interactionType/I");
@@ -451,6 +451,9 @@ namespace larlite {
   }
   
   bool ShowerQuality_DL::finalize() {
+
+    std::cout << "...Finalize..." << std::endl;
+
     assert(fShowerTree);
     fShowerTree->Write();
 
@@ -499,7 +502,6 @@ namespace larlite {
     //
     // segment
     //
-    
     
     _selected = -1.0*data::kINVALID_INT;
     _parent_pdg = -1.0*data::kINVALID_INT;
@@ -808,9 +810,11 @@ namespace larlite {
   void ShowerQuality_DL::FillSegment(storage_manager *sto) {
     
     // get mctruth info
-    auto ev_mctruth = (larlite::event_mctruth*)sto->get_data<event_mctruth>("generator");
+    auto ev_mctruth = (event_mctruth*)sto->get_data<event_mctruth>("generator");
 
-    auto const& mcnu = ev_mctruth->at(0).GetNeutrino();
+    assert(ev_mctruth);
+
+    auto const& mcnu = ev_mctruth->front().GetNeutrino();
     
     _parent_pdg = (int) mcnu.Nu().PdgCode();
 
@@ -836,8 +840,8 @@ namespace larlite {
     _parent_sce_z = _parent_z + offset[2];
 
     // get mctracks and mcshowers
-    auto ev_mctrack = (larlite::event_mctrack*)sto->get_data<event_mctrack>("mcreco");
-    auto ev_mcshower = (larlite::event_mcshower*)sto->get_data<event_mcshower>("mcreco");
+    auto ev_mctrack = (event_mctrack*)sto->get_data<event_mctrack>("mcreco");
+    auto ev_mcshower = (event_mcshower*)sto->get_data<event_mcshower>("mcreco");
 
     assert(ev_mctrack);
     assert(ev_mcshower);
@@ -999,7 +1003,6 @@ namespace larlite {
   }
 
   void ShowerQuality_DL::FillAndy(storage_manager *sto) {
-    
 
     auto ev_flux = (event_mcflux*)sto->get_data<event_mcflux>("generator");
     assert(ev_flux && !ev_flux->empty());
