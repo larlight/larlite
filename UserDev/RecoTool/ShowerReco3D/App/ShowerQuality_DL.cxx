@@ -941,7 +941,7 @@ namespace larlite {
       particle.depeng = mcs.DetProfile().E();
 
       // do not store corsika showers
-      if (mct.Start().Y() < 1800) {
+      if (mcs.Start().Y() < 1800) {
 	_daughter_pdg_v.push_back(particle.pdg);
 	_daughter_energydep_v.push_back(particle.depeng);
 	_daughterX_v.push_back(mcs.Start().X());
@@ -955,7 +955,7 @@ namespace larlite {
       // store only electron, primary, not corsika
       if(std::abs(mcs.PdgCode()) == 11 
 	 and particle.primary() 
-	 and mct.Start().Y() < 1800) {
+	 and mcs.Start().Y() < 1800) {
 	electron_v.emplace_back(std::move(particle));
 	_lepton_Px = mcs.Start().Px();
 	_lepton_Py = mcs.Start().Py();
