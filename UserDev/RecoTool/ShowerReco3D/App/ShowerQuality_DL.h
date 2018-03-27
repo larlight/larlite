@@ -172,6 +172,14 @@ namespace larlite {
     double _dep_sum_lepton;
     double _dep_sum_proton;
 
+    double _proton_Px;
+    double _proton_Py;
+    double _proton_Pz;
+
+    double _lepton_Px;
+    double _lepton_Py;
+    double _lepton_Pz;
+
     std::vector<double> _daughter_energydep_v;
     std::vector<int> _daughter_pdg_v;
 

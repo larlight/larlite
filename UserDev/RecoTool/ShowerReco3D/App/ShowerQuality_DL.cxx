@@ -89,6 +89,14 @@ namespace larlite {
     fEventTree->Branch("dep_sum_lepton", &_dep_sum_lepton, "dep_sum_lepton/D");
     fEventTree->Branch("dep_sum_proton", &_dep_sum_proton, "dep_sum_proton/D");
 
+    fEventTree->Branch("proton_Px", &_proton_Px, "proton_Px/D");
+    fEventTree->Branch("proton_Py", &_proton_Py, "proton_Py/D");
+    fEventTree->Branch("proton_Pz", &_proton_Pz, "proton_Pz/D");
+
+    fEventTree->Branch("lepton_Px", &_lepton_Px, "lepton_Px/D");
+    fEventTree->Branch("lepton_Py", &_lepton_Py, "lepton_Py/D");
+    fEventTree->Branch("lepton_Pz", &_lepton_Pz, "lepton_Pz/D");
+
     fEventTree->Branch("daughter_energydep_v", &_daughter_energydep_v);
 
     fEventTree->Branch("daughterPdg_v", &_daughter_pdg_v);
@@ -539,6 +547,14 @@ namespace larlite {
     _daughterY_v.clear();
     _daughterZ_v.clear();
 
+    _proton_Px = -1.0*data::kINVALID_DOUBLE;
+    _proton_Py = -1.0*data::kINVALID_DOUBLE;
+    _proton_Pz = -1.0*data::kINVALID_DOUBLE;
+    
+    _lepton_Px = -1.0*data::kINVALID_DOUBLE;
+    _lepton_Py = -1.0*data::kINVALID_DOUBLE;
+    _lepton_Pz = -1.0*data::kINVALID_DOUBLE;
+
     _daughter_energydep_v.clear();
 
     _daughter_pdg_v.clear();
@@ -889,12 +905,17 @@ namespace larlite {
 
       if(mct.PdgCode() == 2212) {
 	proton_v.emplace_back(std::move(particle));
+	_proton_Px = mct.Start().Px();
+	_proton_Py = mct.Start().Py();
+	_proton_Pz = mct.Start().Pz();
       }
-
+      
       else if(std::abs(mct.PdgCode()) == 13 and particle.primary()) {
 	muon_v.emplace_back(std::move(particle));
+	_lepton_Px = mct.Start().Px();
+	_lepton_Py = mct.Start().Py();
+	_lepton_Pz = mct.Start().Pz();
       } 
-
       else {
 	other_v.emplace_back(std::move(particle));
       }
@@ -924,6 +945,9 @@ namespace larlite {
       
       if(std::abs(mcs.PdgCode()) == 11 and particle.primary()) {
 	electron_v.emplace_back(std::move(particle));
+	_lepton_Px = mcs.Start().Px();
+	_lepton_Py = mcs.Start().Py();
+	_lepton_Pz = mcs.Start().Pz();
       } 
       else {
 	other_v.emplace_back(std::move(particle));
