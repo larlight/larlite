@@ -138,9 +138,11 @@ namespace larlite {
       int ancestortrackid;
       float depeng;
 
-      bool primary() const
-      { return (this->trackid == this->parenttrackid); }
-      
+      bool primary() const {
+	return ((this->trackid == this->parenttrackid) && 
+		(this->trackid == this->ancestortrackid));
+      }
+
       bool daughterof (const aparticle& particle) const
       { return (this->parenttrackid == particle.trackid); }
       
