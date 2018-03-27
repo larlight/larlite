@@ -286,7 +286,6 @@ namespace larlite {
     double GTruth_FShadSystP4y;
     double GTruth_FShadSystP4z;
     double GTruth_FShadSystP4E;
-
     
     ::larutil::SpaceChargeMicroBooNE _sce;    
 

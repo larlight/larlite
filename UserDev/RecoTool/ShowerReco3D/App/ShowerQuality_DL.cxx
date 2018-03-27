@@ -892,7 +892,8 @@ namespace larlite {
       particle.ancestortrackid = mct.AncestorTrackID();
       particle.depeng = mct.Start().E() - mct.End().E();
       
-      if (particle.primary()) {
+      // don't store corsika tracks
+      if (mct.Start().Y() < 1800) {
 	_daughter_pdg_v.push_back(particle.pdg);
 	_daughter_energydep_v.push_back(particle.depeng);
 	_daughterX_v.push_back(mct.Start().X());
@@ -903,19 +904,26 @@ namespace larlite {
 	_daughterPz_v.push_back(mct.Start().Pz());
       }
 
-      if(mct.PdgCode() == 2212) {
+      // must be ANY proton, but not from corsika
+      if(mct.PdgCode() == 2212 and mct.Start().Y() < 1800) {
 	proton_v.emplace_back(std::move(particle));
 	_proton_Px = mct.Start().Px();
 	_proton_Py = mct.Start().Py();
 	_proton_Pz = mct.Start().Pz();
       }
       
-      else if(std::abs(mct.PdgCode()) == 13 and particle.primary()) {
+      // must be a muon, primary, not from corsika
+      else if(std::abs(mct.PdgCode()) == 13 
+	      and particle.primary() 
+	      and mct.Start().Y() < 1800) {
+
 	muon_v.emplace_back(std::move(particle));
 	_lepton_Px = mct.Start().Px();
 	_lepton_Py = mct.Start().Py();
 	_lepton_Pz = mct.Start().Pz();
+
       } 
+      // it's something else
       else {
 	other_v.emplace_back(std::move(particle));
       }
@@ -931,8 +939,9 @@ namespace larlite {
       particle.parenttrackid = mcs.MotherTrackID();
       particle.ancestortrackid = mcs.AncestorTrackID();
       particle.depeng = mcs.DetProfile().E();
-      
-      if (particle.primary()) {
+
+      // do not store corsika showers
+      if (mct.Start().Y() < 1800) {
 	_daughter_pdg_v.push_back(particle.pdg);
 	_daughter_energydep_v.push_back(particle.depeng);
 	_daughterX_v.push_back(mcs.Start().X());
@@ -943,12 +952,17 @@ namespace larlite {
 	_daughterPz_v.push_back(mcs.Start().Pz());
       }      
       
-      if(std::abs(mcs.PdgCode()) == 11 and particle.primary()) {
+      // store only electron, primary, not corsika
+      if(std::abs(mcs.PdgCode()) == 11 
+	 and particle.primary() 
+	 and mct.Start().Y() < 1800) {
 	electron_v.emplace_back(std::move(particle));
 	_lepton_Px = mcs.Start().Px();
 	_lepton_Py = mcs.Start().Py();
 	_lepton_Pz = mcs.Start().Pz();
       } 
+
+      // it's something else
       else {
 	other_v.emplace_back(std::move(particle));
       }
