@@ -891,39 +891,44 @@ namespace larlite {
       particle.parenttrackid = mct.MotherTrackID();
       particle.ancestortrackid = mct.AncestorTrackID();
       particle.depeng = mct.Start().E() - mct.End().E();
+
+      auto sx = mct.Start().X();
+      auto sy = mct.Start().Y();
+      auto sz = mct.Start().Z();
+
+      auto px = mct.Start().X();
+      auto py = mct.Start().Y();
+      auto pz = mct.Start().Z();
       
       // don't store corsika tracks, only primaries
-      if (mct.Start().Y() < 1800 and particle.primary()) {
+      if (sy < 1799 and particle.primary()) {
 	_daughter_pdg_v.push_back(particle.pdg);
 	_daughter_energydep_v.push_back(particle.depeng);
-	_daughterX_v.push_back(mct.Start().X());
-	_daughterY_v.push_back(mct.Start().Y());
-	_daughterZ_v.push_back(mct.Start().Z());
-	_daughterPx_v.push_back(mct.Start().Px());
-	_daughterPy_v.push_back(mct.Start().Py());
-	_daughterPz_v.push_back(mct.Start().Pz());
+	_daughterX_v.push_back(sx);
+	_daughterY_v.push_back(sy);
+	_daughterZ_v.push_back(sz);
+	_daughterPx_v.push_back(px);
+	_daughterPy_v.push_back(py);
+	_daughterPz_v.push_back(pz);
       }
 
       // must be ANY proton, but not from corsika
-      if(mct.PdgCode() == 2212 
-	 and mct.Start().Y() < 1800) {
+      if(mct.PdgCode() == 2212 and sy < 1799) {
 	proton_v.emplace_back(std::move(particle));
-	_proton_Px = mct.Start().Px();
-	_proton_Py = mct.Start().Py();
-	_proton_Pz = mct.Start().Pz();
+	_proton_Px = px;
+	_proton_Py = py;
+	_proton_Pz = pz;
       }
       
       // must be a muon, primary, not from corsika
-      else if(std::abs(mct.PdgCode()) == 13 
-	      and particle.primary() 
-	      and mct.Start().Y() < 1800) {
+      else if(std::abs(mct.PdgCode()) == 13 and particle.primary() and sy < 1799) {
 	muon_v.emplace_back(std::move(particle));
-	_lepton_Px = mct.Start().Px();
-	_lepton_Py = mct.Start().Py();
-	_lepton_Pz = mct.Start().Pz();
-
+	_lepton_Px = px;
+	_lepton_Py = py;
+	_lepton_Pz = pz;
       } 
-      // it's something else
+
+      // it's something else, maybe corsika
       else {
 	other_v.emplace_back(std::move(particle));
       }
@@ -940,26 +945,32 @@ namespace larlite {
       particle.ancestortrackid = mcs.AncestorTrackID();
       particle.depeng = mcs.DetProfile().E();
 
+      auto sx = mcs.Start().X();
+      auto sy = mcs.Start().Y();
+      auto sz = mcs.Start().Z();
+
+      auto px = mcs.Start().X();
+      auto py = mcs.Start().Y();
+      auto pz = mcs.Start().Z();
+
       // do not store corsika showers
-      if (mcs.Start().Y() < 1800 and particle.primary()) {
+      if (sy < 1799 and particle.primary()) {
 	_daughter_pdg_v.push_back(particle.pdg);
 	_daughter_energydep_v.push_back(particle.depeng);
-	_daughterX_v.push_back(mcs.Start().X());
-	_daughterY_v.push_back(mcs.Start().Y());
-	_daughterZ_v.push_back(mcs.Start().Z());
-	_daughterPx_v.push_back(mcs.Start().Px());
-	_daughterPy_v.push_back(mcs.Start().Py());
-	_daughterPz_v.push_back(mcs.Start().Pz());
+	_daughterX_v.push_back(sx);
+	_daughterY_v.push_back(sy);
+	_daughterZ_v.push_back(sz);
+	_daughterPx_v.push_back(px);
+	_daughterPy_v.push_back(py);
+	_daughterPz_v.push_back(pz);
       }      
       
       // store only electron, primary, not corsika
-      if(std::abs(mcs.PdgCode()) == 11 
-	 and particle.primary() 
-	 and mcs.Start().Y() < 1800) {
+      if(std::abs(mcs.PdgCode()) == 11 and particle.primary() and sy < 1799) {
 	electron_v.emplace_back(std::move(particle));
-	_lepton_Px = mcs.Start().Px();
-	_lepton_Py = mcs.Start().Py();
-	_lepton_Pz = mcs.Start().Pz();
+	_lepton_Px = px;
+	_lepton_Py = py;
+	_lepton_Pz = pz;
       } 
 
       // it's something else
