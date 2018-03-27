@@ -892,8 +892,8 @@ namespace larlite {
       particle.ancestortrackid = mct.AncestorTrackID();
       particle.depeng = mct.Start().E() - mct.End().E();
       
-      // don't store corsika tracks
-      if (mct.Start().Y() < 1800) {
+      // don't store corsika tracks, only primaries
+      if (mct.Start().Y() < 1800 and particle.primary()) {
 	_daughter_pdg_v.push_back(particle.pdg);
 	_daughter_energydep_v.push_back(particle.depeng);
 	_daughterX_v.push_back(mct.Start().X());
@@ -905,7 +905,8 @@ namespace larlite {
       }
 
       // must be ANY proton, but not from corsika
-      if(mct.PdgCode() == 2212 and mct.Start().Y() < 1800) {
+      if(mct.PdgCode() == 2212 
+	 and mct.Start().Y() < 1800) {
 	proton_v.emplace_back(std::move(particle));
 	_proton_Px = mct.Start().Px();
 	_proton_Py = mct.Start().Py();
@@ -916,7 +917,6 @@ namespace larlite {
       else if(std::abs(mct.PdgCode()) == 13 
 	      and particle.primary() 
 	      and mct.Start().Y() < 1800) {
-
 	muon_v.emplace_back(std::move(particle));
 	_lepton_Px = mct.Start().Px();
 	_lepton_Py = mct.Start().Py();
@@ -941,7 +941,7 @@ namespace larlite {
       particle.depeng = mcs.DetProfile().E();
 
       // do not store corsika showers
-      if (mcs.Start().Y() < 1800) {
+      if (mcs.Start().Y() < 1800 and particle.primary()) {
 	_daughter_pdg_v.push_back(particle.pdg);
 	_daughter_energydep_v.push_back(particle.depeng);
 	_daughterX_v.push_back(mcs.Start().X());
