@@ -128,9 +128,9 @@ namespace larlite {
     //   " , Ptype : " << ptype << 
     //   " thus Weight " << _fluxRW.get_weight(mc.Nu().Trajectory().at(0).E(), ntype, ptype) << std::endl;
     
-    std::cout << mc.Nu().Trajectory().at(0).E() << "," << ntype << "," <<  ptype << std::endl;
+    // std::cout << mc.Nu().Trajectory().at(0).E() << "," << ntype << "," <<  ptype << std::endl;
     _weight = _fluxRW.get_weight(mc.Nu().Trajectory().at(0).E(), ntype, ptype);
-    std::cout << "weight: " << _weight << std::endl;
+    // std::cout << "weight: " << _weight << std::endl;
     _tree->Fill();
     // Congrats! You know are properly weighting your neutrino flux! Woohoo! 
     //                            ヘ(◕。◕ヘ)
