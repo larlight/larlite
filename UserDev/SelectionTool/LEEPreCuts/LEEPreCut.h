@@ -52,6 +52,8 @@ namespace larlite {
     */
     virtual bool finalize();
 
+    void bindOutputVariablesToTree( TTree* ttree );
+
   protected:
 
     leeprecuts::LEEPreCutAlgo m_algo;
@@ -63,6 +65,13 @@ namespace larlite {
     int fVetoEndTick;    
     float fPEThreshold;    
     float fPMTMaxFrac;
+
+
+    // result variables
+    float _beamPE;
+    float _vetoPE;
+    float _maxFrac;
+    int   _result;
   };
 }
 #endif
