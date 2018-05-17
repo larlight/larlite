@@ -26,9 +26,15 @@ my_proc.set_ana_output_file("");
 # Specify data output root file name
 my_proc.set_output_file("larlite_getgains.root")
 
+offset = 7298
+
+NSIGMA = 3
+
+
 hitcheck = fmwk.CheckHitAlignment()
 hitcheck.setHitProducer('gaushit')
-
+hitcheck.setOffset(offset)
+hitcheck.setNSigma(NSIGMA)
 my_proc.add_process(hitcheck)
 
 print
@@ -55,17 +61,27 @@ def gauss(mu,sigma):
 #fig, ax = plt.subplots(1,1,figsize=(20,8))
 
 
+wire_Y  = []
 ADC2e_Y = []
 ADC2e_V = []
 ADC2e_U = []
 
 #offset = 7150
-offset = 7298
+
+
+XMIN = 170
+XMAX = 230
+NBINS = 100
 
 while ( my_proc.process_event() ):
+#for n in xrange( 3 ):
+
+    #print 'event %i'%n
+
+    #my_proc.process_event()
     
     # loop through all channels
-    for chan in xrange(5000,8256):
+    for chan in xrange(0,8256):
 
         # make sure there is information stored at this channel
         if (hitcheck.hasHits(chan) == False):
@@ -75,11 +91,11 @@ while ( my_proc.process_event() ):
         ides = hitcheck.getIDEs(chan)
 
         #print 'channel : %i'%chan
-        print 'there are %i hits and %i ides'%(hits.size(), ides.size())
+        #print 'there are %i hits and %i ides'%(hits.size(), ides.size())
         
         # skip channels with > 1 hit
         #if (hits.size() > 1):
-        #    print 'skipping event w/ more than 1 hit...'
+        #   print 'skipping event w/ more than 1 hit...'
         #    continue
 
         if (len(hits) != 1):
@@ -93,87 +109,93 @@ while ( my_proc.process_event() ):
             hitPlane = 0
             
             hitPlane = hit.WireID().Plane
+
+            #if ( (hitPlane == 2) and (len(ADC2e_Y) > 3000)): continue
+            #if ( (hitPlane == 1) and (len(ADC2e_V) > 1000)): continue
+            #if ( (hitPlane == 0) and (len(ADC2e_U) > 1000)): continue
+
+            #if (hitPlane != 2): continue
+            
             #print 'Hit plane : ',hitPlane
             #print 'hit time : %i'%hit.PeakTime()
             maxhittick = hit.PeakTime()
-            times,adcs = gauss(hit.PeakTime(),hit.RMS())
             hitIntegral = hit.Integral()
+
+            if (hitIntegral < 20): continue
+            
             #print 'Hit integral : %.02f'%hitIntegral
-            #plt.plot(times,adcs,'ro')
 
             qtot = 0
             qhit = 0 # charge in simch ides that is at the same time as the hit time
-            ideTime   = []
             ideCharge = []
-            maxtick   = 0
-            maxq      = 0
             for ide in ides:
-                #print 'ide time : %i -> charge : %.02f'%(ide.first, ide.second)
-                ideTime.append(ide.first)
-                ideCharge.append(ide.second)
-                if (ide.second > maxq):
-                    maxq    = ide.second
-                    maxtick = ide.first
                 qtot += ide.second
-                if ( ( (ide.first-offset) > (hit.PeakTime() - 3*hit.RMS()) ) and ( (ide.first-offset) < (hit.PeakTime() + 3*hit.RMS()) ) ):
+                if ( ( (ide.first-offset) > (hit.PeakTime() - NSIGMA * hit.RMS()) ) and ( (ide.first-offset) < (hit.PeakTime() + NSIGMA * hit.RMS()) ) ):
                     qhit += ide.second
             
 
             #offset = maxtick - maxhittick
             #print 'offset (ticks) is ',offset
 
-            ideTime   = np.array(ideTime)-offset
-            
-            if (qtot == 0):
+            if (qhit == 0):
                 continue
-        
-            #print 'IDE Q = %.02f'%(qtot) 
-            #ideCharge = np.array(ideCharge)/float(qtot)
-            #print 'Hit Q / # e- = %.02f 10^-3'%(1000*hitIntegral/qtot)
 
-            print len(ADC2e_U)
-            
             if (hitPlane == 0):
-                ADC2e_U.append(hitIntegral/qtot)
+                ADC2e_U.append(qhit/hitIntegral)
             if (hitPlane == 1):
-                ADC2e_V.append(hitIntegral/qtot)
+                ADC2e_V.append(qhit/hitIntegral)
             if (hitPlane == 2):
-                ADC2e_Y.append(hitIntegral/qtot)
-        
-            #plt.plot(ideTime,ideCharge,'bo')
+                ADC2e_Y.append(qhit/hitIntegral)
+                wire_Y.append( hit.Channel() )
 
-            #plt.grid()
-            #plt.xlabel('Tick Number [Hit Scale]')
-            #plt.ylabel('Relative Amplitude')
-            
-            #fig.canvas
-            #fig.canvas.draw()
-            
-            #usrinput = raw_input("Hit Enter: next channel  || int: go to channel number ||  q: exit viewer\n")                        
-            #if ( usrinput == "q" ):                                                          
-            #    sys.exit(0)
-            #elif ( usrinput.isdigit() == True):
-            #    chan = int(usrinput)
+ADC2e_Y = np.array(ADC2e_Y)
+ADC2e_V = np.array(ADC2e_V)
+ADC2e_U = np.array(ADC2e_U)
+
+#print ADC2e_Y
 
 fig = plt.figure(figsize=(8,8))
-plt.hist(1000.*np.array(ADC2e_Y),bins=np.linspace(0,10,100),histtype='stepfilled')
+plt.hist(ADC2e_Y,bins=np.linspace(XMIN,XMAX,NBINS),histtype='stepfilled')
 plt.grid()
-plt.xlabel('ADC / $e^-$ [$10^3$]')
-plt.title('Y Plane')
+plt.xlabel('collected $e^-$ / ADC',fontsize=20,fontweight='bold')
+plt.xlim([XMIN,XMAX])
+plt.title('Y Plane',fontsize=20,fontweight='bold')
 plt.show()
 
 fig = plt.figure(figsize=(8,8))
-plt.hist(1000*np.array(ADC2e_V),bins=np.linspace(3,7,100),histtype='stepfilled')
+plt.hist(1000./np.array(ADC2e_Y),bins=np.linspace(1000./XMAX,1000./XMIN,NBINS),histtype='stepfilled')
 plt.grid()
-plt.title('V Plane')
-plt.xlabel('ADC / $e^-$ [$10^3$]')
+plt.xlabel('ADC / 1000. $e^-$',fontsize=20,fontweight='bold')
+plt.xlim([1000./XMAX,1000./XMIN])
+plt.title('Y Plane',fontsize=20,fontweight='bold')
 plt.show()
 
 fig = plt.figure(figsize=(8,8))
-plt.hist(1000*np.array(ADC2e_U),bins=np.linspace(3,7,100),histtype='stepfilled')
+plt.hist2d(wire_Y,1000./np.array(ADC2e_Y),bins=(np.linspace(4800,8000,100),np.linspace(1000./XMAX,1000./XMIN,NBINS)))#,histtype='stepfilled')
+#plt.grid()
+plt.xlabel('Channel Number')
+plt.ylabel('ADC / 1000. $e^-$',fontsize=20,fontweight='bold')
+#plt.xlim([1000./XMAX,1000./XMIN])
+plt.ylim([1000./XMAX,1000./XMIN])
+plt.title('Y Plane',fontsize=20,fontweight='bold')
+plt.show()
+
+#sys.exit()
+
+fig = plt.figure(figsize=(8,8))
+plt.hist(ADC2e_V,bins=np.linspace(XMIN,XMAX,NBINS),histtype='stepfilled')
 plt.grid()
-plt.title('U Plane')
-plt.xlabel('ADC / $e^-$ [$10^3$]')
+plt.title('V Plane',fontsize=20,fontweight='bold')
+plt.xlabel('$e^-$ / ADC',fontsize=20,fontweight='bold')
+plt.xlim([XMIN,XMAX])
+plt.show()
+
+fig = plt.figure(figsize=(8,8))
+plt.hist(ADC2e_U,bins=np.linspace(XMIN,XMAX,NBINS),histtype='stepfilled')
+plt.grid()
+plt.title('U Plane',fontsize=20,fontweight='bold')
+plt.xlabel('$e^-$ / ADC',fontsize=20,fontweight='bold')
+plt.xlim([XMIN,XMAX])
 plt.show()
         
 sys.exit()

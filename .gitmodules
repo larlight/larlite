@@ -1,3 +1,6 @@
 [submodule "UserDev/HitRemoval"]
 	path = UserDev/HitRemoval
 	url = https://github.com/davidc1/HitRemoval
+[submodule "UserDev/SelectionTool/LEEPreCuts/algosrc"]
+	path = UserDev/SelectionTool/LEEPreCuts/algosrc
+	url = https://github.com/LArbys/LEEPreCutAlgo
