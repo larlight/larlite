@@ -29,7 +29,7 @@ OSNAMEMODE      = $(OSNAME)
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 
 # call the common GNUmakefile
-LDFLAGS += $(shell larlite-config --libs)
+LDFLAGS += $(shell larlite-config --libs) -lBasicTool_FhiclLite
 include $(LARLITE_BASEDIR)/Makefile/GNUmakefile.CORE
 
 algosrc/LEEPreCutAlgo.h:
