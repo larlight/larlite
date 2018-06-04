@@ -1,18 +1,18 @@
 /**
- * \file FillLengthUVY.h
+ * \file Angle3DFromVtxQweighted.h
  *
  * \ingroup ModularAlgo
  *
- * \brief Class def header for a class FillLengthUVY
+ * \brief Class def header for a class Angle3DFromVtxQweighted
  *
- * @author me
+ * @author cadams
  */
 
 /** \addtogroup ModularAlgo
 
     @{*/
-#ifndef FILLLENGTHUVY_H
-#define FILLLENGTHUVY_H
+#ifndef TRUNKANGLE3DFROMVERTEXQWEIGHTED_H
+#define TRUNKANGLE3DFROMVERTEXQWEIGHTED_H
 
 #include <iostream>
 #include "ShowerRecoModuleBase.h"
@@ -23,23 +23,24 @@
 */
 namespace showerreco {
 
-  class FillLengthUVY : ShowerRecoModuleBase {
+  class TrunkAngle3DFromVtxQweighted : ShowerRecoModuleBase {
 
   public:
 
     /// Default constructor
-    FillLengthUVY();
+    TrunkAngle3DFromVtxQweighted();
 
     /// Default destructor
-    ~FillLengthUVY() {}
+    ~TrunkAngle3DFromVtxQweighted() {}
 
     void do_reconstruction(const ::protoshower::ProtoShower &, Shower_t &);
 
-    void SetQFraction(float q) { _qfraction = q; }
+    // set distance along which to calculate the angle
+    void setTrunkLength(double d) { _dtrunk = d; }
 
   private:
 
-    float _qfraction;
+    double _dtrunk;
 
   };
 

@@ -36,15 +36,16 @@ fluxRW::fluxRW() {
   //  This lives here:
   //   /pnfs/uboone/persistent/uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_02.28.2014_470_rwhist/gsimple_uboone_flux.root
   //
-  std::string const cv_file_name =
-    "$LARLITE_BASEDIR/UserDev/LArLiteApp/fluxRW/gsimple_uboone_flux.root";
+  // std::string const cv_file_name =
+  //   "$LARLITE_BASEDIR/UserDev/LArLiteApp/fluxRW/gsimple_uboone_flux.root";
+
+  std::string const cv_file_name = "/home/vgenty/bnb_oldflux_volAVTPC.root";
   
   //Get RW flux file
   //  This lives here:
   //    /pnfs/uboone/persistent/uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_02.28.2014_470_rwhist/redecay_uboone_flux.root
   //
-  std::string const rw_file_name = 
-    "$LARLITE_BASEDIR/UserDev/LArLiteApp/fluxRW/redecay_uboone_flux.root";
+    std::string const rw_file_name = "/home/vgenty/bnb_newflux_volAVTPC.root";
 
   TFile * cv_file = TFile::Open(cv_file_name.c_str());
   TFile * rw_file = TFile::Open(rw_file_name.c_str());

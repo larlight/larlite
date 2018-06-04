@@ -69,9 +69,17 @@ namespace larlite {
 
     float maxfrac     = m_algo.PMTMaxFrac( ophit_peaktime_v, ophit_pe_v, ophit_femch_v, beamPEinfo, fBinTickWidth,  fWinStartTick);
 
-    if ( beamPEinfo[0]>fPEThreshold && vetoPEinfo[0]<fPEThreshold && maxfrac < fPMTMaxFrac )
+    _beamPE = beamPEinfo[0];
+    _vetoPE = vetoPEinfo[0];
+    _maxFrac = maxfrac;
+    
+    
+    if ( beamPEinfo[0]>fPEThreshold && vetoPEinfo[0]<fPEThreshold && maxfrac < fPMTMaxFrac ) {
+      _result = 1;
       return true;
-  
+    }
+
+    _result = 0;
     return false;
   }
 
@@ -93,5 +101,12 @@ namespace larlite {
     return true;
   }
 
+  void LEEPreCut::bindOutputVariablesToTree( TTree* ttree ) {
+    ttree->Branch( "precut_result", &_result, "precut_result/I");
+    ttree->Branch( "precut_beamPE", &_beamPE, "precut_beamPE/F" );
+    ttree->Branch( "precut_vetoPE", &_vetoPE, "precut_vetoPE/F" );
+    ttree->Branch( "precut_maxFrac", &_maxFrac, "precut_maxFrac/F" );
+  }
+  
 }
 #endif

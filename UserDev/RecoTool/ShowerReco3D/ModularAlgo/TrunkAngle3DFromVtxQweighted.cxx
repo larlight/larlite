@@ -1,7 +1,7 @@
-#ifndef ANGLE3DFROMVERTEXQWEIGHTED_CXX
-#define ANGLE3DFROMVERTEXQWEIGHTED_CXX
+#ifndef TRUNKANGLE3DFROMVERTEXQWEIGHTED_CXX
+#define TRUNKANGLE3DFROMVERTEXQWEIGHTED_CXX
 
-#include "Angle3DFromVtxQweighted.h"
+#include "TrunkAngle3DFromVtxQweighted.h"
 #include "LArUtil/GeometryHelper.h"
 #include "Base/DataFormatConstants.h"
 #include <math.h>
@@ -11,8 +11,13 @@
 
 namespace showerreco {
   
-  void Angle3DFromVtxQweighted::do_reconstruction(const ::protoshower::ProtoShower & proto_shower,
-						  Shower_t& resultShower) {
+  TrunkAngle3DFromVtxQweighted::TrunkAngle3DFromVtxQweighted() {
+    _name = "TrunkAngle3DFromVtxQweighted";
+    _dtrunk = kDOUBLE_MAX;
+  }
+
+  void TrunkAngle3DFromVtxQweighted::do_reconstruction(const ::protoshower::ProtoShower & proto_shower,
+						       Shower_t& resultShower) {
 
     //if the module does not have 2D cluster info -> fail the reconstruction
     if (!proto_shower.hasVertex()){
@@ -59,26 +64,45 @@ namespace showerreco {
       // get the plane associated with this cluster
       auto const& pl = clusters.at(n).plane_id.Plane;
 
-      // project vertex onto this plane
-      auto const& vtx2D = geomH->Point_3Dto2D(vtx,pl);
+      // grab the 2D start point of the cluster
+      auto& start2D = clusters.at(n).start_point;
 
       // get the charge-averaged 2D vector pointing from vtx in shower direction
       larutil::Point2D weightedDir;
       weightedDir.w = 0;
       weightedDir.t = 0;
       double Qtot = 0;
-      for (auto const& hit : hits){
-	weightedDir.w += (hit.w - vtx2D.w) * hit.charge;
-	weightedDir.t += (hit.t - vtx2D.t) * hit.charge;
+      int nhits = 0;
+      //for (auto const& hit : hits){
+
+      assert(_dtrunk != kDOUBLE_MAX);
+
+      for(size_t hid=0; hid<hits.size(); ++hid) {
+	const auto& hit = hits.at(hid);
+
+	double d2D = sqrt( pow(hit.w - start2D.w, 2) + pow(hit.t - start2D.t, 2) );
+
+	if (d2D > _dtrunk) continue;
+
+	//std::cout << "@hid=" << hid << " hit=(" << hit.w << "," << hit.t << ") and d2D=" << d2D << std::endl;
+	
+	weightedDir.w += (hit.w - start2D.w) * hit.charge;
+	weightedDir.t += (hit.t - start2D.t) * hit.charge;
+
 	Qtot += hit.charge;
+	nhits += 1;
       }
+      
+      //std::cout << std::endl;
+      //std::cout << "@plane=" << pl << " Qtot=" << Qtot << " nhits=" << nhits << std::endl;
+      //std::cout << std::endl;
 
       weightedDir.w /= Qtot;
       weightedDir.t /= Qtot;
 
-      planeHits[pl] = (int)hits.size();
+      planeHits[pl] = nhits;
       planeDir[pl]  = weightedDir;
-
+      
     }// for all planes
 
     int pl_max = larlite::data::kINVALID_INT;
@@ -125,9 +149,9 @@ namespace showerreco {
 		      angle_max, angle_mid,
 		      phi, theta);
     
-    resultShower.fDCosStart[1] = sin(theta);
-    resultShower.fDCosStart[0] = cos(theta) * sin(phi);
-    resultShower.fDCosStart[2] = cos(theta) * cos(phi);
+    resultShower.fDCosTrunk[1] = sin(theta);
+    resultShower.fDCosTrunk[0] = cos(theta) * sin(phi);
+    resultShower.fDCosTrunk[2] = cos(theta) * cos(phi);
     
     return;
   }

@@ -1,8 +1,10 @@
-#ifndef PROTOSHOWERALGDL_CXX
-#define PROTOSHOWERALGDL_CXX
+#ifndef PROTOSHOWERALGSECONDSHOWER_CXX
+#define PROTOSHOWERALGSECONDSHOWER_CXX
 
-#include "ProtoShowerAlgDL.h"
-
+#include "ProtoShowerAlgSecondShower.h"
+#include "LArUtil/Geometry.h"
+#include "LArUtil/GeometryHelper.h"
+#include "LArUtil/DetectorProperties.h"
 #include "TVector3.h"
 #include <math.h>
 #include <array>
@@ -18,23 +20,18 @@
 
 namespace protoshower {
 
-  ProtoShowerAlgDL::ProtoShowerAlgDL()
+  ProtoShowerAlgSecondShower::ProtoShowerAlgSecondShower()
     : _params_alg(nullptr)
   {
     // if no algo for calculating cluster params -> set up default ones
     if (!_params_alg) {
       _params_alg = new ::cluster::DefaultParamsAlg();
     }
-    _name = "ProtoShowerAlgDL";
+    _name = "ProtoShowerAlgSecondShower";
     _debug = false;
-
-    geom = nullptr;
-    geomH = nullptr;
-    detProp = nullptr;
-
   }
 
-  void ProtoShowerAlgDL::GenerateProtoShower(::larlite::storage_manager* storage,
+  void ProtoShowerAlgSecondShower::GenerateProtoShower(::larlite::storage_manager* storage,
 					     ::larlite::event_pfpart* ev_pfpart,
 					     const size_t proto_shower_pfpart,
 					     protoshower::ProtoShower & proto_shower)
@@ -42,9 +39,9 @@ namespace protoshower {
 
     // larlite::cluster data-products in wire-time
     // need to convert them to cm space
-    geom    = larutil::Geometry::GetME();
-    geomH   = larutil::GeometryHelper::GetME();
-    detProp = larutil::DetectorProperties::GetME();
+    auto geom    = larutil::Geometry::GetME();
+    auto geomH   = larutil::GeometryHelper::GetME();
+    auto detProp = larutil::DetectorProperties::GetME();
 
     // For each data product, fetch it and feed
     // it into the proto showers if possible
@@ -175,12 +172,12 @@ namespace protoshower {
       // get the closest hit to the 2D vertex
       for(const auto hit : cluster_hits_vv[i]) {
 	    
-	double x  = Wire2Cm(hit->WireID().Wire);
+	double x  = hit->WireID().Wire;
 	double dx = xz_v.at(plane).w;
 	dx -= x;
 	auto dx2 = dx*dx;
 	    
-	double y  = Time2Cm(hit->PeakTime(),planeOffset);
+	double y  = hit->PeakTime();
 	double dy = xz_v.at(plane).t;
 	dy -= y;
 	auto dy2 = dy*dy;
@@ -200,13 +197,13 @@ namespace protoshower {
       double max_dr = std::numeric_limits<double>::lowest();
 	  
       for(const auto hit : cluster_hits_vv[i]) {
-	double x  = Wire2Cm(hit->WireID().Wire);
-	double dx = Wire2Cm(start_hit->WireID().Wire);
+	double x  = hit->WireID().Wire;
+	double dx = start_hit->WireID().Wire;
 	dx -= x;
 	auto dx2 = dx*dx;
 	    
-	double y  = Time2Cm(hit->PeakTime(),planeOffset);
-	double dy = Time2Cm(start_hit->PeakTime(),planeOffset);
+	double y  = hit->PeakTime();
+	double dy = start_hit->PeakTime();
 	dy -= y;
 	auto dy2 = dy*dy;
 	    
@@ -222,10 +219,10 @@ namespace protoshower {
       if (!end_hit) 
 	throw showerreco::ShowerRecoException("Farthest hit from vertex could not be found");
 
-      auto const& sw = Wire2Cm(start_hit->WireID().Wire);
-      auto const& ew = Wire2Cm(end_hit->WireID().Wire);
-      auto const& st = Time2Cm(start_hit->PeakTime(),planeOffset);
-      auto const& et = Time2Cm(end_hit->PeakTime(),planeOffset);
+      auto const& sw = (start_hit->WireID().Wire) * geomH->WireToCm();
+      auto const& ew = (end_hit->WireID().Wire)   * geomH->WireToCm();
+      auto const& st = ( start_hit->PeakTime() - detProp->TriggerOffset() ) * geomH->TimeToCm() + planeOffset;
+      auto const& et = ( end_hit->PeakTime()   - detProp->TriggerOffset() ) * geomH->TimeToCm() + planeOffset;
 
       // start point
       proto_shower._params.at(proto_idx).start_point.w = sw;
@@ -247,17 +244,6 @@ namespace protoshower {
     return;
   }
   
-  double ProtoShowerAlgDL::Wire2Cm(const double wire) {
-    assert(geomH);
-    return (wire * geomH->WireToCm());
-  }
-
-  double ProtoShowerAlgDL::Time2Cm(const double time, const float planeOffset) {
-    assert(geomH);
-    assert(detProp);
-    return ((time - detProp->TriggerOffset()) * geomH->TimeToCm() + planeOffset);
-  }
-
   
 }// namespace
 

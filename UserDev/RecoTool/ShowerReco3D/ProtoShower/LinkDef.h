@@ -21,6 +21,7 @@
 #pragma link C++ class protoshower::ProtoShowerAlgOpenCV+;
 #pragma link C++ class protoshower::ProtoShowerAlgCMTool+;
 #pragma link C++ class protoshower::ProtoShowerAlgDL+;
+#pragma link C++ class protoshower::ProtoShowerAlgSecondShower+;
 #pragma link C++ class protoshower::ProtoShowerAlgPhotonRecluster+;
 //ADD_NEW_CLASS ... do not change this line
 //ADD_NEW_ALG_CLASS ... do not change this line
