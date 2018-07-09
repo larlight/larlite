@@ -54,6 +54,11 @@ namespace larlite {
 
     void bindOutputVariablesToTree( TTree* ttree );
 
+    int passes()    { return _result; };
+    float vetoPE()  { return _vetoPE; };
+    float beamPE()  { return _beamPE; };
+    float maxFrac() { return _maxFrac; };
+    
   protected:
 
     leeprecuts::LEEPreCutAlgo m_algo;
