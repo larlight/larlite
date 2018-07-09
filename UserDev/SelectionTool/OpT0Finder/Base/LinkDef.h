@@ -9,8 +9,8 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ namespace flashana;
-#pragma link C++ namespace flashana::msg;
+#pragma link C++ namespace flashana+;
+#pragma link C++ namespace flashana::msg+;
 #pragma link C++ class flashana::QPoint_t+;
 #pragma link C++ class flashana::QCluster_t+;
 #pragma link C++ class flashana::Flash_t+;
