@@ -84,6 +84,10 @@ namespace larlite {
     std::vector<double> _daughterY_v;
     std::vector<double> _daughterZ_v;
 
+    std::vector<double> _daughterX_end_v;
+    std::vector<double> _daughterY_end_v;
+    std::vector<double> _daughterZ_end_v;
+
     std::vector<double> _daughterPx_v;
     std::vector<double> _daughterPy_v;
     std::vector<double> _daughterPz_v;

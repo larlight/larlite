@@ -110,7 +110,11 @@ namespace larlite {
     tree->Branch("daughterX_v", &_daughterX_v);
     tree->Branch("daughterY_v", &_daughterY_v);
     tree->Branch("daughterZ_v", &_daughterZ_v);
-    
+
+    tree->Branch("daughterX_end_v", &_daughterX_end_v);
+    tree->Branch("daughterY_end_v", &_daughterY_end_v);
+    tree->Branch("daughterZ_end_v", &_daughterZ_end_v);
+
     tree->Branch("daughterPx_v", &_daughterPx_v);
     tree->Branch("daughterPy_v", &_daughterPy_v);
     tree->Branch("daughterPz_v", &_daughterPz_v);
@@ -382,9 +386,13 @@ namespace larlite {
       auto sy = mct.Start().Y();
       auto sz = mct.Start().Z();
 
-      auto px = mct.Start().X();
-      auto py = mct.Start().Y();
-      auto pz = mct.Start().Z();
+      auto ex = mct.End().X();
+      auto ey = mct.End().Y();
+      auto ez = mct.End().Z();
+
+      auto px = mct.Start().Px();
+      auto py = mct.Start().Py();
+      auto pz = mct.Start().Pz();
       
       // don't store corsika tracks, only primaries
       if (sy < 1799 and particle.primary()) {
@@ -393,6 +401,9 @@ namespace larlite {
 	_daughterX_v.push_back(sx);
 	_daughterY_v.push_back(sy);
 	_daughterZ_v.push_back(sz);
+	_daughterX_end_v.push_back(ex);
+	_daughterY_end_v.push_back(ey);
+	_daughterZ_end_v.push_back(ez);
 	_daughterPx_v.push_back(px);
 	_daughterPy_v.push_back(py);
 	_daughterPz_v.push_back(pz);
@@ -435,9 +446,9 @@ namespace larlite {
       auto sy = mcs.Start().Y();
       auto sz = mcs.Start().Z();
 
-      auto px = mcs.Start().X();
-      auto py = mcs.Start().Y();
-      auto pz = mcs.Start().Z();
+      auto px = mcs.Start().Px();
+      auto py = mcs.Start().Py();
+      auto pz = mcs.Start().Pz();
 
       // do not store corsika showers
       if (sy < 1799 and particle.primary()) {
@@ -446,6 +457,9 @@ namespace larlite {
 	_daughterX_v.push_back(sx);
 	_daughterY_v.push_back(sy);
 	_daughterZ_v.push_back(sz);
+	_daughterX_end_v.push_back(-1);
+	_daughterY_end_v.push_back(-1);
+	_daughterZ_end_v.push_back(-1);
 	_daughterPx_v.push_back(px);
 	_daughterPy_v.push_back(py);
 	_daughterPz_v.push_back(pz);
@@ -735,6 +749,10 @@ namespace larlite {
     _daughterX_v.clear();
     _daughterY_v.clear();
     _daughterZ_v.clear();
+
+    _daughterX_end_v.clear();
+    _daughterY_end_v.clear();
+    _daughterZ_end_v.clear();
 
     _proton_Px = -1.0*data::kINVALID_DOUBLE;
     _proton_Py = -1.0*data::kINVALID_DOUBLE;
