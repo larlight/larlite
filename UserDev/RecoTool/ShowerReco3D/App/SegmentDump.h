@@ -26,12 +26,27 @@ namespace larlite {
 
     bool _has_mc;
 
+  private:
+    bool in_av(float x, float y, float z);
+    
+  public:
+    
     struct aparticle{
       int pdg;
       int trackid;
       int parenttrackid;
       int ancestortrackid;
       float depeng;
+      float keng;
+      float sx;
+      float sy;
+      float sz;
+      float ex;
+      float ey;
+      float ez;
+
+      int size;
+      int origin;
 
       bool primary() const {
 	return ((this->trackid == this->parenttrackid) && 
@@ -77,7 +92,12 @@ namespace larlite {
     double _lepton_Py;
     double _lepton_Pz;
 
+    int _n_primary_lepton;
+    int _n_primary_proton;
+    int _n_primary_other;
+
     std::vector<double> _daughter_energydep_v;
+    std::vector<double> _daughter_energyk_v;
     std::vector<int> _daughter_pdg_v;
 
     std::vector<double> _daughterX_v;

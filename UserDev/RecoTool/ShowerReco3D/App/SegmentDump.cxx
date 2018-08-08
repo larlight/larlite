@@ -103,6 +103,11 @@ namespace larlite {
     tree->Branch("lepton_Py", &_lepton_Py, "lepton_Py/D");
     tree->Branch("lepton_Pz", &_lepton_Pz, "lepton_Pz/D");
 
+    tree->Branch("n_primary_lepton", &_n_primary_lepton , "n_primary_lepton/I" );
+    tree->Branch("n_primary_proton", &_n_primary_proton , "n_primary_proton/I" );
+    tree->Branch("n_primary_other" , &_n_primary_other  , "n_primary_other/I" );
+    
+    tree->Branch("daughter_energyk_v"  , &_daughter_energyk_v);
     tree->Branch("daughter_energydep_v", &_daughter_energydep_v);
 
     tree->Branch("daughterPdg_v", &_daughter_pdg_v);
@@ -372,6 +377,10 @@ namespace larlite {
     electron_v.clear();
     other_v.clear();
 
+    _n_primary_proton=0;
+    _n_primary_lepton=0;
+    _n_primary_other=0;
+
     for(auto const& mct : *ev_mctrack) {
 
       aparticle particle;
@@ -380,15 +389,39 @@ namespace larlite {
       particle.trackid = mct.TrackID();
       particle.parenttrackid = mct.MotherTrackID();
       particle.ancestortrackid = mct.AncestorTrackID();
-      particle.depeng = mct.Start().E() - mct.End().E();
+      particle.keng = mct.Start().E() - mct.End().E();
+      
+      const mcstep* av_step = nullptr;
+      for(const mcstep& step : mct) {
+	if (in_av(step.X(),step.Y(),step.Z())) {
+	  av_step = &step;
+	} 
+	else break;
+      }
+
+      if (av_step != nullptr)
+	particle.depeng = mct.Start().E() - av_step->E();
+      else 
+	particle.depeng = 0;
 
       auto sx = mct.Start().X();
       auto sy = mct.Start().Y();
       auto sz = mct.Start().Z();
 
+      particle.origin = (int)mct.Origin();
+      particle.size = mct.size();
+
+      particle.sx = sx;
+      particle.sy = sy;
+      particle.sz = sz;
+
       auto ex = mct.End().X();
       auto ey = mct.End().Y();
       auto ez = mct.End().Z();
+
+      particle.ex = ex;
+      particle.ey = ey;
+      particle.ez = ez;
 
       auto px = mct.Start().Px();
       auto py = mct.Start().Py();
@@ -396,7 +429,14 @@ namespace larlite {
       
       // don't store corsika tracks, only primaries
       if (sy < 1799 and particle.primary()) {
+
+	if (particle.pdg == 2212)
+	  _n_primary_proton += 1;
+	else if (std::abs(particle.pdg)!=13)
+	  _n_primary_other += 1;
+		
 	_daughter_pdg_v.push_back(particle.pdg);
+	_daughter_energyk_v.push_back(particle.keng);
 	_daughter_energydep_v.push_back(particle.depeng);
 	_daughterX_v.push_back(sx);
 	_daughterY_v.push_back(sy);
@@ -419,6 +459,7 @@ namespace larlite {
       
       // must be a muon, primary, not from corsika
       else if(std::abs(mct.PdgCode()) == 13 and particle.primary() and sy < 1799) {
+	_n_primary_lepton += 1;
 	muon_v.emplace_back(std::move(particle));
 	_lepton_Px = px;
 	_lepton_Py = py;
@@ -440,19 +481,30 @@ namespace larlite {
       particle.trackid = mcs.TrackID();
       particle.parenttrackid = mcs.MotherTrackID();
       particle.ancestortrackid = mcs.AncestorTrackID();
+      particle.keng = mcs.DetProfile().E();
       particle.depeng = mcs.DetProfile().E();
 
       auto sx = mcs.Start().X();
       auto sy = mcs.Start().Y();
       auto sz = mcs.Start().Z();
 
+      particle.sx = sx;
+      particle.sy = sy;
+      particle.sz = sz;
+
       auto px = mcs.Start().Px();
       auto py = mcs.Start().Py();
       auto pz = mcs.Start().Pz();
 
+
       // do not store corsika showers
       if (sy < 1799 and particle.primary()) {
+
+	if (std::abs(particle.pdg)!=11)
+	  _n_primary_other += 1;
+	
 	_daughter_pdg_v.push_back(particle.pdg);
+	_daughter_energyk_v.push_back(particle.keng);
 	_daughter_energydep_v.push_back(particle.depeng);
 	_daughterX_v.push_back(sx);
 	_daughterY_v.push_back(sy);
@@ -494,19 +546,19 @@ namespace larlite {
       }
     }
 
+    // need to debug this against MCParticleTree https://goo.gl/fquert
 
-    for(size_t ppid=0; ppid<proton_id_v.size(); ++ppid) {
-      auto pid1 = proton_id_v[ppid];
-      const auto& proton1 = proton_v[pid1];
-      for(size_t pid2=0; pid2<proton_v.size(); ++pid2) {
-	if (pid1 == pid2) continue;
-	const auto& proton2 = proton_v[pid2];
-	if (proton2.ancestorof(proton1)) {
-	  proton_e_v[ppid] += proton2.depeng;
-	}
-      }
-
-    }
+    // for(size_t ppid=0; ppid<proton_id_v.size(); ++ppid) {
+    //   auto pid1 = proton_id_v[ppid];
+    //   const auto& proton1 = proton_v[pid1];
+    //   for(size_t pid2=0; pid2<proton_v.size(); ++pid2) {
+    // 	if (pid1 == pid2) continue;
+    // 	const auto& proton2 = proton_v[pid2];
+    // 	if (proton2.ancestorof(proton1)) {
+    // 	  proton_e_v[ppid] += proton2.depeng;
+    // 	}
+    //   }
+    // }
 
     for(auto proton_e : proton_e_v) {
       if (proton_e > 60) {
@@ -549,12 +601,12 @@ namespace larlite {
     bool is_1mu1p = false;
     bool is_1e1p = false;
 
-    if (nprotons == 1 and nmuons == 1) {
+    if (nprotons == 1 and nmuons == 1 and _n_primary_other==0) {
       is_1mu1p = true;
       _dep_sum_lepton = muon_e;
     }
 
-    if (nprotons == 1 and nelectrons == 1) {
+    if (nprotons == 1 and nelectrons == 1 and _n_primary_other==0) {
       is_1e1p = true;
       _dep_sum_lepton = electron_e;
     }
@@ -763,10 +815,25 @@ namespace larlite {
     _lepton_Pz = -1.0*data::kINVALID_DOUBLE;
 
     _daughter_energydep_v.clear();
+    _daughter_energyk_v.clear();
 
     _daughter_pdg_v.clear();
 
+    _n_primary_lepton = -1.0*data::kINVALID_INT;
+    _n_primary_proton = -1.0*data::kINVALID_INT;
+    _n_primary_other  = -1.0*data::kINVALID_INT;
+
     return;
+  }
+  
+  bool SegmentDump::in_av(float x, float y, float z) {
+    if (x <    0) return false;
+    if (x >  256) return false;
+    if (y < -117) return false;
+    if (y >  117) return false;
+    if (z <    0) return false;
+    if (z > 1036) return false;
+    return true;
   }
 
 
