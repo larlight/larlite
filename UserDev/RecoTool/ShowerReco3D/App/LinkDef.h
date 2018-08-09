@@ -6,6 +6,7 @@
 #pragma link C++ class larlite::ShowerReco3D+;
 #pragma link C++ class larlite::ShowerQuality_DL+;
 #pragma link C++ class larlite::SegmentDump+;
+#pragma link C++ class larlite::TaggerDump+;
 
 #endif
 
