@@ -1,41 +1,29 @@
-import sys
-
-if len(sys.argv) < 2:
-    msg  = '\n'
-    msg += "Usage 1: %s $INPUT_ROOT_FILE(s)\n" % sys.argv[0]
-    msg += '\n'
-    sys.stderr.write(msg)
-    sys.exit(1)
-
+import os, sys
 from larlite import larlite as fmwk
 
-# Create ana_processor instance
+if len(sys.argv) != 4:
+    print ""
+    print "INFILE = str(sys.argv[1])"
+    print "NUM    = str(sys.argv[2])"
+    print "OUTDIR = str(sys.argv[3])"
+    print ""
+    sys.exit(1)
+
+INFILE = str(sys.argv[1])
+NUM    = str(sys.argv[2])
+OUTDIR = str(sys.argv[3])
+
 my_proc = fmwk.ana_processor()
 
-# Set input root file
-for x in xrange(len(sys.argv)-1):
-    my_proc.add_input_file(sys.argv[x+1])
+if INFILE=="INVALID":
+    sys.exit(0)
 
-# Specify IO mode
+my_proc.add_input_file(INFILE)
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
+my_proc.set_ana_output_file(os.path.join(OUTDIR,"fluxrw_%s.root" % NUM))
 
-# Specify output root file name
-my_proc.set_ana_output_file("from.root");
-
-# Attach an analysis unit ... here we use a base class which does nothing.
-# Replace with your analysis unit if you wish.
-my_proc.add_process(fmwk.LArLite_FluxRW())
-
-print
-print  "Finished configuring ana_processor. Start event loop!"
-print
-
-# Let's run it.
+my_mod = fmwk.LArLite_FluxRW()
+my_proc.add_process(my_mod)
 my_proc.run();
-
-# done!
-print
-print "Finished running ana_processor event loop!"
-print
 
 sys.exit(0)

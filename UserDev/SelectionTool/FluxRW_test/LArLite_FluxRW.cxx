@@ -7,19 +7,10 @@ namespace larlite {
 
   bool LArLite_FluxRW::initialize() {
 
-    //
-    // This function is called in the beggining of event loop
-    // Do all variable initialization you wish to do here.
-    // If you have a histogram to fill in the event loop, for example,
-    // here is a good place to create one on the heap (i.e. "new TH1D"). 
-    //
-
-    std::cout << "Let's go! " << std::endl;
-
     _tree = new TTree("FLUXRW","");
-    _tree->Branch("run"   , &_run   , "run/I");
-    _tree->Branch("subrun", &_subrun, "subrun/I");
-    _tree->Branch("event" , &_event , "event/I");
+    _tree->Branch("run"    , &_run    , "run/I");
+    _tree->Branch("subrun" , &_subrun , "subrun/I");
+    _tree->Branch("event"  , &_event  , "event/I");
     _tree->Branch("weight" , &_weight , "weight/D");
 
     
@@ -50,11 +41,19 @@ namespace larlite {
     // to extract the information that relates to the event you are studying
     // though if you are using something like a "cosmic overlaid neutrino interaction" 
     // you will want to use the **product of the weights**! 
-    auto mcn = storage->get_data<event_mctruth>("generator");
-    auto flux = storage->get_data<event_mcflux>("generator")->at(0); 
+
+    const auto ev_mcn = (event_mctruth*)storage->get_data<event_mctruth>("generator");
+    const auto ev_flux = (event_mcflux*)storage->get_data<event_mcflux>("generator");
     
+    if (!ev_mcn) return true;
+    if (!ev_flux)return true;
+
+    if (ev_mcn->empty()) return true;
+    if (ev_flux->empty()) return true;
+
     // You will need to extract the neutrino 
-    auto const& mc = mcn->at(0).GetNeutrino();
+    const auto& mc = ev_mcn->front().GetNeutrino();
+    const auto& flux = ev_flux->front();
     
     // and then cast the neutrino PDG code into an "ntype" 
     Int_t ntype = 0;	
@@ -89,7 +88,7 @@ namespace larlite {
     Int_t ptype = 0;
 	
     Int_t decay_type = flux.fndecay;
-    std::cout << "decay_type: " << decay_type << std::endl;
+    //std::cout << "decay_type: " << decay_type << std::endl;
     switch(decay_type) {
 	  
     case 1:
@@ -146,7 +145,7 @@ namespace larlite {
   bool LArLite_FluxRW::finalize() {
 
     _tree->Write();
-    std::cout << "DONE!" << std::endl; 
+    //std::cout << "DONE!" << std::endl; 
     
     return true;
   }
