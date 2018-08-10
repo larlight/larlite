@@ -21,7 +21,7 @@ endif
 # Define directories to be compile upon a global "make"...
 #
 #SUBDIRS := OpT0Finder ERTool RecoEmulator #ADD_NEW_SUBDIR ... do not remove this comment from this line
-SUBDIRS := OpT0Finder FluxRW_test
+SUBDIRS := OpT0Finder FluxRW_test LEEPreCuts
 
 #####################################################################################
 #
