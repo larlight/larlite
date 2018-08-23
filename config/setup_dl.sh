@@ -1,4 +1,4 @@
-export USER_MODULE="BasicTool RecoTool HitRemoval SelectionTool LArLiteApp"
+export USER_MODULE="BasicTool RecoTool HitRemoval LArLiteApp SelectionTool"
 # Find the location of this script:
 me="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Find the directory one above.
