@@ -1,16 +1,16 @@
-#ifndef LARLITE_INTERWRITEOUT_H
-#define LARLITE_INTERWRITEOUT_H
+#ifndef LARLITE_INTERWRITEOUTLL_H
+#define LARLITE_INTERWRITEOUTLL_H
 
 #include "Analysis/ana_base.h"
 
 namespace larlite {
 
-  class InterWriteOut : public ana_base {
+  class InterWriteOutLL : public ana_base {
   
   public:
 
-    InterWriteOut();
-    ~InterWriteOut(){}
+    InterWriteOutLL();
+    ~InterWriteOutLL(){}
 
     bool initialize() { return true; }
     bool analyze(storage_manager* storage);

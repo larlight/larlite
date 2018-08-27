@@ -1,18 +1,18 @@
-#ifndef LARLITE_INTERWRITEOUT_CXX
-#define LARLITE_INTERWRITEOUT_CXX
+#ifndef LARLITE_INTERWRITEOUTLL_CXX
+#define LARLITE_INTERWRITEOUTLL_CXX
 
-#include "InterWriteOut.h"
+#include "InterWriteOutLL.h"
 #include "DataFormat/vertex.h"
 #include "DataFormat/track.h"
 #include "DataFormat/shower.h"
 
 namespace larlite {
 
-  InterWriteOut::InterWriteOut() {
-    _name = "InterWriteOut";
+  InterWriteOutLL::InterWriteOutLL() {
+    _name = "InterWriteOutLL";
   }
   
-  bool InterWriteOut::analyze(storage_manager* storage) {
+  bool InterWriteOutLL::analyze(storage_manager* storage) {
 
     larlite::event_vertex* ev_inter_vertex = nullptr;
     ev_inter_vertex = (larlite::event_vertex*)storage->get_data(larlite::data::kVertex,"inter_vertex");

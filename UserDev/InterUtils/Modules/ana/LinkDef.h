@@ -3,7 +3,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class larlite::InterWriteOut+;
+#pragma link C++ class larlite::InterWriteOutLL+;
 
 #endif
 
