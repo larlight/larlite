@@ -20,7 +20,7 @@ endif
 #
 # Define directories to be compile upon a global "make"...
 #
-SUBDIRS := AnalysisAlg ClusterRecoUtil Cluster3DRecoUtil CMTool MCComp CMToolAna ShowerReco3D TrackReco3D ClusterFilter
+SUBDIRS := AnalysisAlg ClusterRecoUtil Cluster3DRecoUtil CMTool MCComp CMToolAna ShowerReco3D TrackReco3D ClusterFilter NCStudy
 
 #####################################################################################
 #
