@@ -33,6 +33,7 @@ namespace larlite {
     auto ev_out_hit     = (larlite::event_hit*) storage->get_data(larlite::data::kHit,_output_producer);
     auto ev_out_ass     = (larlite::event_ass*) storage->get_data(data::kAssociation,_output_producer);
 
+    std::cout <<  "@rse=(" << storage->run_id() << "," << storage->subrun_id() << "," << storage->event_id() << ")" << std::endl;
 
     if (ev_dl_vertex->empty()) return true;
 

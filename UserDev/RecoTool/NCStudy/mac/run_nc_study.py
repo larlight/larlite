@@ -1,6 +1,6 @@
 import sys, os
 
-if len(sys.argv) != 3:
+if len(sys.argv) != 4:
     print
     print "MCINFO = str(sys.argv[1])"
     print "NUM    = str(sys.argv[2])"
@@ -15,7 +15,7 @@ OUTDIR = str(sys.argv[3])
 from larlite import larlite as fmwk
 
 my_proc = fmwk.ana_processor()
-my_proc.add_input_file(sys.argv[x+1])
+my_proc.add_input_file(MCINFO)
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 my_proc.set_ana_output_file(os.path.join(OUTDIR,"nc_dump_%s.root" % NUM));
 
