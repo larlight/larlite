@@ -97,6 +97,7 @@ namespace larlite{
       kT0,                 ///< larlite::t0
       kMCEventWeight,      ///< evwgh::MCEventWeight
       kSWTrigger,          ///< larlite::swtrigger
+      kLArFlow3DHit,       ///< larflow::LArFlow3DHit
       kDATA_TYPE_MAX       ///< Event-wise enum boundary
     };
 
@@ -162,7 +163,8 @@ namespace larlite{
       "chstatus",
       "t0",
       "mceventweight",
-      "swtrigger"
+      "swtrigger",
+      "larflow3dhit"
     };
 
     const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {
