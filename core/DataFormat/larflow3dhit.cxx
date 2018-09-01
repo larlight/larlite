@@ -9,6 +9,16 @@ namespace larlite {
   larflow3dhit::larflow3dhit() : data_base(data::kLArFlow3DHit)
   //#################################################
   {
+    this->resize(3,0);
+    targetwire.resize(2,0);
+    tick = 0;        // row
+    srcwire = 0;     // column in source image
+    idxhit = 0;
+    matchquality = kNoMatch;
+    consistency3d = kNoValue;
+    center_y_dist = 4000;
+    dy = 0;
+    dz = 0;
     clear_data();
   }
 

@@ -5,7 +5,7 @@
  * 
  * \brief Class def header for larflow3dhit data container
  *
- * @author Kazu - Nevis 2013
+ * @author R. Sharankova - Tufts - 08/2018
  */
 
 /** \addtogroup DataFormat
@@ -25,7 +25,7 @@ namespace larlite{
      \class larflow3dhit
      LArSoft Larflow3dhit class equivalent data container
   */
-  class larflow3dhit : public data_base {
+  class larflow3dhit : public std::vector<float>, public data_base {
     
   public:
     
@@ -37,17 +37,22 @@ namespace larlite{
 
     void clear_data();
 
-    // Set methods
 
-    /// @{
-    /// @name Accessors
-      
-      
-    /// @}
-      
+    typedef enum { kQandCmatch=0, kCmatch, kClosestC, kNoMatch } MatchQuality_t; // quality of match
+    typedef enum { kIn5mm=0, kIn10mm, kIn50mm, kOut50mm, kNoValue } Consistency_t; // distance b/n y2u and y2v
     
-  protected:
-
+    int tick;        // row
+    int srcwire;     // column in source image
+    std::vector<int> targetwire;  // column in target image
+    //int src_ctrid;   // contour index in source image
+    //int tar_ctrid;   // contour index in target image
+    int idxhit;      // index in eventhit vector
+    MatchQuality_t matchquality; // quality of plane-correspondence match
+    Consistency_t consistency3d; //flag for distance b/n y2u and y2v predicted spacepoints
+    float center_y_dist;  // distance to center of y-image used for flow prediction
+    float dy; //distance in y coord. between y2u and y2v predicted spacepoints
+    float dz; //distance in z coord. between y2u and y2v predicted spacepoints
+    
   private:
     
   };
