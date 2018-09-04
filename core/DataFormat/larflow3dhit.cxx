@@ -19,6 +19,12 @@ namespace larlite {
     center_y_dist = 4000;
     dy = 0;
     dz = 0;
+    endpt_score = 0;
+    track_score = 0;
+    shower_score = 0;
+    renormed_track_score = 0;
+    renormed_shower_score = 0;
+    
     clear_data();
   }
 

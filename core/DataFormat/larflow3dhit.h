@@ -52,6 +52,11 @@ namespace larlite{
     float center_y_dist;  // distance to center of y-image used for flow prediction
     float dy; //distance in y coord. between y2u and y2v predicted spacepoints
     float dz; //distance in z coord. between y2u and y2v predicted spacepoints
+    float endpt_score;
+    float track_score;
+    float shower_score;
+    float renormed_track_score;
+    float renormed_shower_score;
     
   private:
     
