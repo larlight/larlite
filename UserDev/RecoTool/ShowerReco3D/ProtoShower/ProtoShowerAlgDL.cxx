@@ -151,7 +151,15 @@ namespace protoshower {
       assert ((size_t)proto_idx < proto_shower._params.size());
 
       _cru_helper.GenerateParams( cluster_hits_vv[i], proto_shower._params.at( proto_idx ) );
-      _params_alg->FillParams( proto_shower._params.at( proto_idx ) );
+      try { 
+        _params_alg->FillParams( proto_shower._params.at( proto_idx ) );
+      } catch (const larutil::LArUtilException& what) {
+        std::cout << "Edge case detected in _params_alg->FillParams(...)" << std::endl;
+        valid_cluster_v[i] = false;
+        proto_shower.hasCluster2D(false);
+        proto_idx -= 1;
+        continue; 
+      }
 
       // now fill quantities specifically to LArDL
       auto const& clus = cluster_v[i];
