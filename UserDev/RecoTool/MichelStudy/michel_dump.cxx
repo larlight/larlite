@@ -40,14 +40,6 @@ namespace larlite {
     auto ev_mctrack  = (event_mctrack*)storage->get_data<event_mctrack>("mcreco");
     auto ev_mcshower = (event_mcshower*)storage->get_data<event_mcshower>("mcreco"); 
 
-    // build ID -> position map for MCTracks
-    std::map<int,int> trackIDMap;
-    for (size_t i=0; i < ev_mctrack->size(); i++)
-      trackIDMap[ ev_mctrack->at(i).TrackID() ] = i;
-
-    static std::string decay   = "Decay";
-    static std::string process = "muMinusCaptureAtRest";
-
     _has_michel = 0;
 
     _muon_e = -1*data::kINVALID_FLOAT;
@@ -61,6 +53,25 @@ namespace larlite {
     _michel_sy = -1*data::kINVALID_FLOAT;
     _michel_sz = -1*data::kINVALID_FLOAT;
     
+
+    if (ev_mctrack->empty()) {
+      _outtree->Fill();
+      return true;
+    }
+
+    if (ev_mcshower->empty()) {
+      _outtree->Fill();
+      return true;
+    }
+
+    // build ID -> position map for MCTracks
+    std::map<int,int> trackIDMap;
+    for (size_t i=0; i < ev_mctrack->size(); i++)
+      trackIDMap[ ev_mctrack->at(i).TrackID() ] = i;
+
+    static std::string decay   = "Decay";
+    static std::string process = "muMinusCaptureAtRest";
+
     
     for(const auto& mcsh : *(ev_mcshower)) {
       
