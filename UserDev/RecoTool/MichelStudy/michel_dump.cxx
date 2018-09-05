@@ -88,8 +88,18 @@ namespace larlite {
 
       if (e_strt.E() < 1)
 	continue;
+      
+      int muon_idx = mcsh.MotherTrackID();
+      auto it = trackIDMap.find(muon_idx);
 
-      auto const& muon = ev_mctrack->at( trackIDMap.at(mcsh.MotherTrackID()) );
+      if (it == trackIDMap.end())
+	continue;
+
+      int track_idx = (*it).second;
+      if (track_idx >= (int)ev_mctrack->size())
+	continue;
+
+      auto const& muon = ev_mctrack->at(track_idx);
 
       if (muon.size() < 2)
 	continue;
