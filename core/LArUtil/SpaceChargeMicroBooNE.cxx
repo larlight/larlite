@@ -27,8 +27,173 @@ namespace larutil{
   //-----------------------------------------------
   SpaceChargeMicroBooNE::SpaceChargeMicroBooNE()
   {
+    f1_x = nullptr;
+    f2_x = nullptr;
+    f3_x = nullptr;
+    f4_x = nullptr;
+    f5_x = nullptr;
+    fFinal_x = nullptr;
+      
+    f1_y = nullptr;
+    f2_y = nullptr;
+    f3_y = nullptr;
+    f4_y = nullptr;
+    f5_y = nullptr;
+    f6_y = nullptr;
+    fFinal_y = nullptr;
+      
+    f1_z = nullptr;
+    f2_z = nullptr;
+    f3_z = nullptr;
+    f4_z = nullptr;
+    fFinal_z = nullptr;
+      
+    f1_Ex = nullptr;
+    f2_Ex = nullptr;
+    f3_Ex = nullptr;
+    f4_Ex = nullptr;
+    f5_Ex = nullptr;
+    fFinal_Ex = nullptr;
+      
+    f1_Ey = nullptr;
+    f2_Ey = nullptr;
+    f3_Ey = nullptr;
+    f4_Ey = nullptr;
+    f5_Ey = nullptr;
+    f6_Ey = nullptr;
+    fFinal_Ey = nullptr;
+      
+    f1_Ez = nullptr;
+    f2_Ez = nullptr;
+    f3_Ez = nullptr;
+    f4_Ez = nullptr;
+    fFinal_Ez = nullptr;
+
+    f1_x = nullptr;
+    f2_x = nullptr;
+    f3_x = nullptr;
+    f4_x = nullptr;
+    f5_x = nullptr;
+    fFinal_x = nullptr;
+      
+    f1_y = nullptr;
+    f2_y = nullptr;
+    f3_y = nullptr;
+    f4_y = nullptr;
+    f5_y = nullptr;
+    f6_y = nullptr;
+    fFinal_y = nullptr;
+      
+    f1_z = nullptr;
+    f2_z = nullptr;
+    f3_z = nullptr;
+    f4_z = nullptr;
+    fFinal_z = nullptr;
+      
+    f1_Ex = nullptr;
+    f2_Ex = nullptr;
+    f3_Ex = nullptr;
+    f4_Ex = nullptr;
+    f5_Ex = nullptr;
+    fFinal_Ex = nullptr;
+      
+    f1_Ey = nullptr;
+    f2_Ey = nullptr;
+    f3_Ey = nullptr;
+    f4_Ey = nullptr;
+    f5_Ey = nullptr;
+    f6_Ey = nullptr;
+    fFinal_Ey = nullptr;
+      
+    f1_Ez = nullptr;
+    f2_Ez = nullptr;
+    f3_Ez = nullptr;
+    f4_Ez = nullptr;
+    fFinal_Ez = nullptr;
+
+    f1_x = new TF1("f1_x","pol6");
+    f2_x = new TF1("f2_x","pol6");
+    f3_x = new TF1("f3_x","pol6");
+    f4_x = new TF1("f4_x","pol6");
+    f5_x = new TF1("f5_x","pol6");
+    fFinal_x = new TF1("fFinal_x","pol4");
+      
+    f1_y = new TF1("f1_y","pol5");
+    f2_y = new TF1("f2_y","pol5");
+    f3_y = new TF1("f3_y","pol5");
+    f4_y = new TF1("f4_y","pol5");
+    f5_y = new TF1("f5_y","pol5");
+    f6_y = new TF1("f6_y","pol5");
+    fFinal_y = new TF1("fFinal_y","pol5");
+      
+    f1_z = new TF1("f1_z","pol4");
+    f2_z = new TF1("f2_z","pol4");
+    f3_z = new TF1("f3_z","pol4");
+    f4_z = new TF1("f4_z","pol4");
+    fFinal_z = new TF1("fFinal_z","pol3");
+      
+    f1_Ex = new TF1("f1_Ex","pol6");
+    f2_Ex = new TF1("f2_Ex","pol6");
+    f3_Ex = new TF1("f3_Ex","pol6");
+    f4_Ex = new TF1("f4_Ex","pol6");
+    f5_Ex = new TF1("f5_Ex","pol6");
+    fFinal_Ex = new TF1("fFinal_Ex","pol4");
+      
+    f1_Ey = new TF1("f1_Ey","pol5");
+    f2_Ey = new TF1("f2_Ey","pol5");
+    f3_Ey = new TF1("f3_Ey","pol5");
+    f4_Ey = new TF1("f4_Ey","pol5");
+    f5_Ey = new TF1("f5_Ey","pol5");
+    f6_Ey = new TF1("f6_Ey","pol5");
+    fFinal_Ey = new TF1("fFinal_Ey","pol5");
+      
+    f1_Ez = new TF1("f1_Ez","pol4");
+    f2_Ez = new TF1("f2_Ez","pol4");
+    f3_Ez = new TF1("f3_Ez","pol4");
+    f4_Ez = new TF1("f4_Ez","pol4");
+    fFinal_Ez = new TF1("fFinal_Ez","pol3");
+
+    inputfile = nullptr;
+
+    for(int i = 0; i < 7; i++) {
+      g1_x[i] =  nullptr;
+      g2_x[i] =  nullptr;
+      g3_x[i] =  nullptr;
+      g4_x[i] =  nullptr;
+      g5_x[i] =  nullptr;
+
+      g1_y[i] =  nullptr;
+      g2_y[i] =  nullptr;
+      g3_y[i] =  nullptr;
+      g4_y[i] =  nullptr;
+      g5_y[i] =  nullptr;
+      g6_y[i] =  nullptr;
+
+      g1_z[i] =  nullptr;
+      g2_z[i] =  nullptr;
+      g3_z[i] =  nullptr;
+      g4_z[i] =  nullptr;
+
+      g1_Ex[i] = nullptr;
+      g2_Ex[i] = nullptr;
+      g3_Ex[i] = nullptr;
+      g4_Ex[i] = nullptr;
+      g5_Ex[i] = nullptr;
+
+      g1_Ey[i] = nullptr;
+      g2_Ey[i] = nullptr;
+      g3_Ey[i] = nullptr;
+      g4_Ey[i] = nullptr;
+      g5_Ey[i] = nullptr;
+      g6_Ey[i] = nullptr;
+
+      g1_Ez[i] = nullptr;
+      g2_Ez[i] = nullptr;
+      g3_Ez[i] = nullptr;
+      g4_Ez[i] = nullptr;
+    }
     std::string sce_file_path = Form("%s/LArUtil/dat/SCEoffsets_MicroBooNE_E273.root",getenv("LARLITE_COREDIR"));
-    Configure(sce_file_path.c_str());
+    Configure(sce_file_path);
   }
 
   //-----------------------------------------------
@@ -40,92 +205,255 @@ namespace larutil{
   //-----------------------------------------------
   SpaceChargeMicroBooNE::~SpaceChargeMicroBooNE()
   {
-
+    inputfile->Close();
   }
 
   //------------------------------------------------
   bool SpaceChargeMicroBooNE::Configure(std::string filename)
   {  
-    TFile inputfile(filename.c_str(), "READ");
+    //TFile inputfile(filename.c_str(), "READ");
+    inputfile = new TFile(filename.c_str(), "READ");
 
-    for(int i = 0; i < 5; i++)
-      {
-        g1_x[i] = (TGraph*)inputfile.Get(Form("deltaX/g1_%d",i));
-        g2_x[i] = (TGraph*)inputfile.Get(Form("deltaX/g2_%d",i));
-        g3_x[i] = (TGraph*)inputfile.Get(Form("deltaX/g3_%d",i));   
-        g4_x[i] = (TGraph*)inputfile.Get(Form("deltaX/g4_%d",i));
-        g5_x[i] = (TGraph*)inputfile.Get(Form("deltaX/g5_%d",i));
+    // std::cout << "@filename=" << filename << std::endl;
+    // std::cout << "@filename=" << filename << std::endl;
+    // std::cout << "@filename=" << filename << std::endl;
+    // std::cout << "@filename=" << filename << std::endl;
+    // for(int i = 0; i < 5; i++)
+    //   {
+    g1_x[0] = (TGraph*)inputfile->Get("deltaX/g1_0");
+    g2_x[0] = (TGraph*)inputfile->Get("deltaX/g2_0");
+    g3_x[0] = (TGraph*)inputfile->Get("deltaX/g3_0");
+    g4_x[0] = (TGraph*)inputfile->Get("deltaX/g4_0");
+    g5_x[0] = (TGraph*)inputfile->Get("deltaX/g5_0");
 
-        g1_y[i] = (TGraph*)inputfile.Get(Form("deltaY/g1_%d",i));
-        g2_y[i] = (TGraph*)inputfile.Get(Form("deltaY/g2_%d",i));
-        g3_y[i] = (TGraph*)inputfile.Get(Form("deltaY/g3_%d",i));   
-        g4_y[i] = (TGraph*)inputfile.Get(Form("deltaY/g4_%d",i));
-        g5_y[i] = (TGraph*)inputfile.Get(Form("deltaY/g5_%d",i));
-        g6_y[i] = (TGraph*)inputfile.Get(Form("deltaY/g6_%d",i));
+    g1_y[0] = (TGraph*)inputfile->Get("deltaY/g1_0");
+    g2_y[0] = (TGraph*)inputfile->Get("deltaY/g2_0");
+    g3_y[0] = (TGraph*)inputfile->Get("deltaY/g3_0");
+    g4_y[0] = (TGraph*)inputfile->Get("deltaY/g4_0");
+    g5_y[0] = (TGraph*)inputfile->Get("deltaY/g5_0");
+    g6_y[0] = (TGraph*)inputfile->Get("deltaY/g6_0");
 
-        g1_z[i] = (TGraph*)inputfile.Get(Form("deltaZ/g1_%d",i));
-        g2_z[i] = (TGraph*)inputfile.Get(Form("deltaZ/g2_%d",i));
-        g3_z[i] = (TGraph*)inputfile.Get(Form("deltaZ/g3_%d",i));   
-        g4_z[i] = (TGraph*)inputfile.Get(Form("deltaZ/g4_%d",i));
+    g1_z[0] = (TGraph*)inputfile->Get("deltaZ/g1_0");
+    g2_z[0] = (TGraph*)inputfile->Get("deltaZ/g2_0");
+    g3_z[0] = (TGraph*)inputfile->Get("deltaZ/g3_0");
+    g4_z[0] = (TGraph*)inputfile->Get("deltaZ/g4_0");
 
-	g1_Ex[i] = (TGraph*)inputfile.Get(Form("deltaExOverE/g1_%d",i));
-	g2_Ex[i] = (TGraph*)inputfile.Get(Form("deltaExOverE/g2_%d",i));
-	g3_Ex[i] = (TGraph*)inputfile.Get(Form("deltaExOverE/g3_%d",i));
-	g4_Ex[i] = (TGraph*)inputfile.Get(Form("deltaExOverE/g4_%d",i));
-	g5_Ex[i] = (TGraph*)inputfile.Get(Form("deltaExOverE/g5_%d",i));
+    g1_Ex[0] = (TGraph*)inputfile->Get("deltaExOverE/g1_0");
+    g2_Ex[0] = (TGraph*)inputfile->Get("deltaExOverE/g2_0");
+    g3_Ex[0] = (TGraph*)inputfile->Get("deltaExOverE/g3_0");
+    g4_Ex[0] = (TGraph*)inputfile->Get("deltaExOverE/g4_0");
+    g5_Ex[0] = (TGraph*)inputfile->Get("deltaExOverE/g5_0");
 
-	g1_Ey[i] = (TGraph*)inputfile.Get(Form("deltaEyOverE/g1_%d",i));
-	g2_Ey[i] = (TGraph*)inputfile.Get(Form("deltaEyOverE/g2_%d",i));
-	g3_Ey[i] = (TGraph*)inputfile.Get(Form("deltaEyOverE/g3_%d",i));
-	g4_Ey[i] = (TGraph*)inputfile.Get(Form("deltaEyOverE/g4_%d",i));
-	g5_Ey[i] = (TGraph*)inputfile.Get(Form("deltaEyOverE/g5_%d",i));
-	g6_Ey[i] = (TGraph*)inputfile.Get(Form("deltaEyOverE/g6_%d",i));
+    g1_Ey[0] = (TGraph*)inputfile->Get("deltaEyOverE/g1_0");
+    g2_Ey[0] = (TGraph*)inputfile->Get("deltaEyOverE/g2_0");
+    g3_Ey[0] = (TGraph*)inputfile->Get("deltaEyOverE/g3_0");
+    g4_Ey[0] = (TGraph*)inputfile->Get("deltaEyOverE/g4_0");
+    g5_Ey[0] = (TGraph*)inputfile->Get("deltaEyOverE/g5_0");
+    g6_Ey[0] = (TGraph*)inputfile->Get("deltaEyOverE/g6_0");
 
-	g1_Ez[i] = (TGraph*)inputfile.Get(Form("deltaEzOverE/g1_%d",i));
-	g2_Ez[i] = (TGraph*)inputfile.Get(Form("deltaEzOverE/g2_%d",i));
-	g3_Ez[i] = (TGraph*)inputfile.Get(Form("deltaEzOverE/g3_%d",i));
-	g4_Ez[i] = (TGraph*)inputfile.Get(Form("deltaEzOverE/g4_%d",i));
-      }
+    g1_Ez[0] = (TGraph*)inputfile->Get("deltaEzOverE/g1_0");
+    g2_Ez[0] = (TGraph*)inputfile->Get("deltaEzOverE/g2_0");
+    g3_Ez[0] = (TGraph*)inputfile->Get("deltaEzOverE/g3_0");
+    g4_Ez[0] = (TGraph*)inputfile->Get("deltaEzOverE/g4_0");
+    // }
 
-    g1_x[5] = (TGraph*)inputfile.Get("deltaX/g1_5");
-    g2_x[5] = (TGraph*)inputfile.Get("deltaX/g2_5");
-    g3_x[5] = (TGraph*)inputfile.Get("deltaX/g3_5");   
-    g4_x[5] = (TGraph*)inputfile.Get("deltaX/g4_5");
-    g5_x[5] = (TGraph*)inputfile.Get("deltaX/g5_5");
+    // for(int i = 0; i < 5; i++)
+    //   {
+    g1_x[1] = (TGraph*)inputfile->Get("deltaX/g1_1");
+    g2_x[1] = (TGraph*)inputfile->Get("deltaX/g2_1");
+    g3_x[1] = (TGraph*)inputfile->Get("deltaX/g3_1");
+    g4_x[1] = (TGraph*)inputfile->Get("deltaX/g4_1");
+    g5_x[1] = (TGraph*)inputfile->Get("deltaX/g5_1");
 
-    g1_y[5] = (TGraph*)inputfile.Get("deltaY/g1_5");
-    g2_y[5] = (TGraph*)inputfile.Get("deltaY/g2_5");
-    g3_y[5] = (TGraph*)inputfile.Get("deltaY/g3_5");   
-    g4_y[5] = (TGraph*)inputfile.Get("deltaY/g4_5");
-    g5_y[5] = (TGraph*)inputfile.Get("deltaY/g5_5");
-    g6_y[5] = (TGraph*)inputfile.Get("deltaY/g6_5");
+    g1_y[1] = (TGraph*)inputfile->Get("deltaY/g1_1");
+    g2_y[1] = (TGraph*)inputfile->Get("deltaY/g2_1");
+    g3_y[1] = (TGraph*)inputfile->Get("deltaY/g3_1");
+    g4_y[1] = (TGraph*)inputfile->Get("deltaY/g4_1");
+    g5_y[1] = (TGraph*)inputfile->Get("deltaY/g5_1");
+    g6_y[1] = (TGraph*)inputfile->Get("deltaY/g6_1");
+
+    g1_z[1] = (TGraph*)inputfile->Get("deltaZ/g1_1");
+    g2_z[1] = (TGraph*)inputfile->Get("deltaZ/g2_1");
+    g3_z[1] = (TGraph*)inputfile->Get("deltaZ/g3_1");
+    g4_z[1] = (TGraph*)inputfile->Get("deltaZ/g4_1");
+
+    g1_Ex[1] = (TGraph*)inputfile->Get("deltaExOverE/g1_1");
+    g2_Ex[1] = (TGraph*)inputfile->Get("deltaExOverE/g2_1");
+    g3_Ex[1] = (TGraph*)inputfile->Get("deltaExOverE/g3_1");
+    g4_Ex[1] = (TGraph*)inputfile->Get("deltaExOverE/g4_1");
+    g5_Ex[1] = (TGraph*)inputfile->Get("deltaExOverE/g5_1");
+
+    g1_Ey[1] = (TGraph*)inputfile->Get("deltaEyOverE/g1_1");
+    g2_Ey[1] = (TGraph*)inputfile->Get("deltaEyOverE/g2_1");
+    g3_Ey[1] = (TGraph*)inputfile->Get("deltaEyOverE/g3_1");
+    g4_Ey[1] = (TGraph*)inputfile->Get("deltaEyOverE/g4_1");
+    g5_Ey[1] = (TGraph*)inputfile->Get("deltaEyOverE/g5_1");
+    g6_Ey[1] = (TGraph*)inputfile->Get("deltaEyOverE/g6_1");
+
+    g1_Ez[1] = (TGraph*)inputfile->Get("deltaEzOverE/g1_1");
+    g2_Ez[1] = (TGraph*)inputfile->Get("deltaEzOverE/g2_1");
+    g3_Ez[1] = (TGraph*)inputfile->Get("deltaEzOverE/g3_1");
+    g4_Ez[1] = (TGraph*)inputfile->Get("deltaEzOverE/g4_1");
+    // }
+
+    // for(int i = 0; i < 5; i++)
+    //   {
+    g1_x[2] = (TGraph*)inputfile->Get("deltaX/g1_2");
+    g2_x[2] = (TGraph*)inputfile->Get("deltaX/g2_2");
+    g3_x[2] = (TGraph*)inputfile->Get("deltaX/g3_2");
+    g4_x[2] = (TGraph*)inputfile->Get("deltaX/g4_2");
+    g5_x[2] = (TGraph*)inputfile->Get("deltaX/g5_2");
+
+    g1_y[2] = (TGraph*)inputfile->Get("deltaY/g1_2");
+    g2_y[2] = (TGraph*)inputfile->Get("deltaY/g2_2");
+    g3_y[2] = (TGraph*)inputfile->Get("deltaY/g3_2");
+    g4_y[2] = (TGraph*)inputfile->Get("deltaY/g4_2");
+    g5_y[2] = (TGraph*)inputfile->Get("deltaY/g5_2");
+    g6_y[2] = (TGraph*)inputfile->Get("deltaY/g6_2");
+
+    g1_z[2] = (TGraph*)inputfile->Get("deltaZ/g1_2");
+    g2_z[2] = (TGraph*)inputfile->Get("deltaZ/g2_2");
+    g3_z[2] = (TGraph*)inputfile->Get("deltaZ/g3_2");
+    g4_z[2] = (TGraph*)inputfile->Get("deltaZ/g4_2");
+
+    g1_Ex[2] = (TGraph*)inputfile->Get("deltaExOverE/g1_2");
+    g2_Ex[2] = (TGraph*)inputfile->Get("deltaExOverE/g2_2");
+    g3_Ex[2] = (TGraph*)inputfile->Get("deltaExOverE/g3_2");
+    g4_Ex[2] = (TGraph*)inputfile->Get("deltaExOverE/g4_2");
+    g5_Ex[2] = (TGraph*)inputfile->Get("deltaExOverE/g5_2");
+
+    g1_Ey[2] = (TGraph*)inputfile->Get("deltaEyOverE/g1_2");
+    g2_Ey[2] = (TGraph*)inputfile->Get("deltaEyOverE/g2_2");
+    g3_Ey[2] = (TGraph*)inputfile->Get("deltaEyOverE/g3_2");
+    g4_Ey[2] = (TGraph*)inputfile->Get("deltaEyOverE/g4_2");
+    g5_Ey[2] = (TGraph*)inputfile->Get("deltaEyOverE/g5_2");
+    g6_Ey[2] = (TGraph*)inputfile->Get("deltaEyOverE/g6_2");
+
+    g1_Ez[2] = (TGraph*)inputfile->Get("deltaEzOverE/g1_2");
+    g2_Ez[2] = (TGraph*)inputfile->Get("deltaEzOverE/g2_2");
+    g3_Ez[2] = (TGraph*)inputfile->Get("deltaEzOverE/g3_2");
+    g4_Ez[2] = (TGraph*)inputfile->Get("deltaEzOverE/g4_2");
+    // }
+    // for(int i = 0; i < 5; i++)
+    //   {
+    g1_x[3] = (TGraph*)inputfile->Get("deltaX/g1_3");
+    g2_x[3] = (TGraph*)inputfile->Get("deltaX/g2_3");
+    g3_x[3] = (TGraph*)inputfile->Get("deltaX/g3_3");
+    g4_x[3] = (TGraph*)inputfile->Get("deltaX/g4_3");
+    g5_x[3] = (TGraph*)inputfile->Get("deltaX/g5_3");
+
+    g1_y[3] = (TGraph*)inputfile->Get("deltaY/g1_3");
+    g2_y[3] = (TGraph*)inputfile->Get("deltaY/g2_3");
+    g3_y[3] = (TGraph*)inputfile->Get("deltaY/g3_3");
+    g4_y[3] = (TGraph*)inputfile->Get("deltaY/g4_3");
+    g5_y[3] = (TGraph*)inputfile->Get("deltaY/g5_3");
+    g6_y[3] = (TGraph*)inputfile->Get("deltaY/g6_3");
+
+    g1_z[3] = (TGraph*)inputfile->Get("deltaZ/g1_3");
+    g2_z[3] = (TGraph*)inputfile->Get("deltaZ/g2_3");
+    g3_z[3] = (TGraph*)inputfile->Get("deltaZ/g3_3");
+    g4_z[3] = (TGraph*)inputfile->Get("deltaZ/g4_3");
+
+    g1_Ex[3] = (TGraph*)inputfile->Get("deltaExOverE/g1_3");
+    g2_Ex[3] = (TGraph*)inputfile->Get("deltaExOverE/g2_3");
+    g3_Ex[3] = (TGraph*)inputfile->Get("deltaExOverE/g3_3");
+    g4_Ex[3] = (TGraph*)inputfile->Get("deltaExOverE/g4_3");
+    g5_Ex[3] = (TGraph*)inputfile->Get("deltaExOverE/g5_3");
+
+    g1_Ey[3] = (TGraph*)inputfile->Get("deltaEyOverE/g1_3");
+    g2_Ey[3] = (TGraph*)inputfile->Get("deltaEyOverE/g2_3");
+    g3_Ey[3] = (TGraph*)inputfile->Get("deltaEyOverE/g3_3");
+    g4_Ey[3] = (TGraph*)inputfile->Get("deltaEyOverE/g4_3");
+    g5_Ey[3] = (TGraph*)inputfile->Get("deltaEyOverE/g5_3");
+    g6_Ey[3] = (TGraph*)inputfile->Get("deltaEyOverE/g6_3");
+
+    g1_Ez[3] = (TGraph*)inputfile->Get("deltaEzOverE/g1_3");
+    g2_Ez[3] = (TGraph*)inputfile->Get("deltaEzOverE/g2_3");
+    g3_Ez[3] = (TGraph*)inputfile->Get("deltaEzOverE/g3_3");
+    g4_Ez[3] = (TGraph*)inputfile->Get("deltaEzOverE/g4_3");
+    // }
+
+    // for(int i = 0; i < 5; i++)
+    //   {
+    g1_x[4] = (TGraph*)inputfile->Get("deltaX/g1_4");
+    g2_x[4] = (TGraph*)inputfile->Get("deltaX/g2_4");
+    g3_x[4] = (TGraph*)inputfile->Get("deltaX/g3_4");
+    g4_x[4] = (TGraph*)inputfile->Get("deltaX/g4_4");
+    g5_x[4] = (TGraph*)inputfile->Get("deltaX/g5_4");
+
+    g1_y[4] = (TGraph*)inputfile->Get("deltaY/g1_4");
+    g2_y[4] = (TGraph*)inputfile->Get("deltaY/g2_4");
+    g3_y[4] = (TGraph*)inputfile->Get("deltaY/g3_4");
+    g4_y[4] = (TGraph*)inputfile->Get("deltaY/g4_4");
+    g5_y[4] = (TGraph*)inputfile->Get("deltaY/g5_4");
+    g6_y[4] = (TGraph*)inputfile->Get("deltaY/g6_4");
+
+    g1_z[4] = (TGraph*)inputfile->Get("deltaZ/g1_4");
+    g2_z[4] = (TGraph*)inputfile->Get("deltaZ/g2_4");
+    g3_z[4] = (TGraph*)inputfile->Get("deltaZ/g3_4");
+    g4_z[4] = (TGraph*)inputfile->Get("deltaZ/g4_4");
+
+    g1_Ex[4] = (TGraph*)inputfile->Get("deltaExOverE/g1_4");
+    g2_Ex[4] = (TGraph*)inputfile->Get("deltaExOverE/g2_4");
+    g3_Ex[4] = (TGraph*)inputfile->Get("deltaExOverE/g3_4");
+    g4_Ex[4] = (TGraph*)inputfile->Get("deltaExOverE/g4_4");
+    g5_Ex[4] = (TGraph*)inputfile->Get("deltaExOverE/g5_4");
+
+    g1_Ey[4] = (TGraph*)inputfile->Get("deltaEyOverE/g1_4");
+    g2_Ey[4] = (TGraph*)inputfile->Get("deltaEyOverE/g2_4");
+    g3_Ey[4] = (TGraph*)inputfile->Get("deltaEyOverE/g3_4");
+    g4_Ey[4] = (TGraph*)inputfile->Get("deltaEyOverE/g4_4");
+    g5_Ey[4] = (TGraph*)inputfile->Get("deltaEyOverE/g5_4");
+    g6_Ey[4] = (TGraph*)inputfile->Get("deltaEyOverE/g6_4");
+
+    g1_Ez[4] = (TGraph*)inputfile->Get("deltaEzOverE/g1_4");
+    g2_Ez[4] = (TGraph*)inputfile->Get("deltaEzOverE/g2_4");
+    g3_Ez[4] = (TGraph*)inputfile->Get("deltaEzOverE/g3_4");
+    g4_Ez[4] = (TGraph*)inputfile->Get("deltaEzOverE/g4_4");
+    // }
+
+    g1_x[5] = (TGraph*)inputfile->Get("deltaX/g1_5");
+    g2_x[5] = (TGraph*)inputfile->Get("deltaX/g2_5");
+    g3_x[5] = (TGraph*)inputfile->Get("deltaX/g3_5");   
+    g4_x[5] = (TGraph*)inputfile->Get("deltaX/g4_5");
+    g5_x[5] = (TGraph*)inputfile->Get("deltaX/g5_5");
+
+    g1_y[5] = (TGraph*)inputfile->Get("deltaY/g1_5");
+    g2_y[5] = (TGraph*)inputfile->Get("deltaY/g2_5");
+    g3_y[5] = (TGraph*)inputfile->Get("deltaY/g3_5");   
+    g4_y[5] = (TGraph*)inputfile->Get("deltaY/g4_5");
+    g5_y[5] = (TGraph*)inputfile->Get("deltaY/g5_5");
+    g6_y[5] = (TGraph*)inputfile->Get("deltaY/g6_5");
       
-    g1_x[6] = (TGraph*)inputfile.Get("deltaX/g1_6");
-    g2_x[6] = (TGraph*)inputfile.Get("deltaX/g2_6");
-    g3_x[6] = (TGraph*)inputfile.Get("deltaX/g3_6");
-    g4_x[6] = (TGraph*)inputfile.Get("deltaX/g4_6");
-    g5_x[6] = (TGraph*)inputfile.Get("deltaX/g5_6");
+    g1_x[6] = (TGraph*)inputfile->Get("deltaX/g1_6");
+    g2_x[6] = (TGraph*)inputfile->Get("deltaX/g2_6");
+    g3_x[6] = (TGraph*)inputfile->Get("deltaX/g3_6");
+    //std::cout << g4_x[6] << std::endl;
+    //std::cout << (TGraph*)inputfile->Get("deltaX/g4_6") << std::endl;
+    g4_x[6] = (TGraph*)inputfile->Get("deltaX/g4_6");
+    //std::cout << g4_x[6] << std::endl;
+    g5_x[6] = (TGraph*)inputfile->Get("deltaX/g5_6");
 
-    g1_Ex[5] = (TGraph*)inputfile.Get("deltaExOverE/g1_5");
-    g2_Ex[5] = (TGraph*)inputfile.Get("deltaExOverE/g2_5");
-    g3_Ex[5] = (TGraph*)inputfile.Get("deltaExOverE/g3_5");
-    g4_Ex[5] = (TGraph*)inputfile.Get("deltaExOverE/g4_5");
-    g5_Ex[5] = (TGraph*)inputfile.Get("deltaExOverE/g5_5");
+    g1_Ex[5] = (TGraph*)inputfile->Get("deltaExOverE/g1_5");
+    g2_Ex[5] = (TGraph*)inputfile->Get("deltaExOverE/g2_5");
+    g3_Ex[5] = (TGraph*)inputfile->Get("deltaExOverE/g3_5");
+    g4_Ex[5] = (TGraph*)inputfile->Get("deltaExOverE/g4_5");
+    g5_Ex[5] = (TGraph*)inputfile->Get("deltaExOverE/g5_5");
 
-    g1_Ey[5] = (TGraph*)inputfile.Get("deltaEyOverE/g1_5");
-    g2_Ey[5] = (TGraph*)inputfile.Get("deltaEyOverE/g2_5");
-    g3_Ey[5] = (TGraph*)inputfile.Get("deltaEyOverE/g3_5");
-    g4_Ey[5] = (TGraph*)inputfile.Get("deltaEyOverE/g4_5");
-    g5_Ey[5] = (TGraph*)inputfile.Get("deltaEyOverE/g5_5");
-    g6_Ey[5] = (TGraph*)inputfile.Get("deltaEyOverE/g6_5");
+    g1_Ey[5] = (TGraph*)inputfile->Get("deltaEyOverE/g1_5");
+    g2_Ey[5] = (TGraph*)inputfile->Get("deltaEyOverE/g2_5");
+    g3_Ey[5] = (TGraph*)inputfile->Get("deltaEyOverE/g3_5");
+    g4_Ey[5] = (TGraph*)inputfile->Get("deltaEyOverE/g4_5");
+    g5_Ey[5] = (TGraph*)inputfile->Get("deltaEyOverE/g5_5");
+    g6_Ey[5] = (TGraph*)inputfile->Get("deltaEyOverE/g6_5");
 
-    g1_Ex[6] = (TGraph*)inputfile.Get("deltaExOverE/g1_6");
-    g2_Ex[6] = (TGraph*)inputfile.Get("deltaExOverE/g2_6");
-    g3_Ex[6] = (TGraph*)inputfile.Get("deltaExOverE/g3_6");
-    g4_Ex[6] = (TGraph*)inputfile.Get("deltaExOverE/g4_6");
-    g5_Ex[6] = (TGraph*)inputfile.Get("deltaExOverE/g5_6");
+    g1_Ex[6] = (TGraph*)inputfile->Get("deltaExOverE/g1_6");
+    g2_Ex[6] = (TGraph*)inputfile->Get("deltaExOverE/g2_6");
+    g3_Ex[6] = (TGraph*)inputfile->Get("deltaExOverE/g3_6");
+    g4_Ex[6] = (TGraph*)inputfile->Get("deltaExOverE/g4_6");
+    g5_Ex[6] = (TGraph*)inputfile->Get("deltaExOverE/g5_6");
 
-    inputfile.Close();
+    //inputfile.Close();
 
     return true;
   }
@@ -186,6 +514,9 @@ namespace larutil{
       {
 	for(int j = 0; j < 7; j++)
 	  {
+	    //std::cout << "@j=" << j << " & zValNew=" << zValNew << std::endl;
+	    //std::cout << g1_x[j] << std::endl;
+	    fflush(stdout);
 	    parA[0][j] = g1_x[j]->Eval(zValNew);
 	    parA[1][j] = g2_x[j]->Eval(zValNew);
 	    parA[2][j] = g3_x[j]->Eval(zValNew);
