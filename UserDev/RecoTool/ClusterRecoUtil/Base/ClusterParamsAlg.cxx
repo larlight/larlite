@@ -32,7 +32,7 @@ namespace cluster{
 
 
     for (auto & module : _modules){
-      
+      //std::cout << "@module=" << nmodule << " module name" << module->name() << std::endl ;
       localWatch.Start();
       if (_verbose) module -> SetVerbose();
       module -> do_params_fill(fParams);

@@ -17,9 +17,9 @@ from larlite import larlite as fmwk
 my_proc = fmwk.ana_processor()
 my_proc.add_input_file(MCINFO)
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
-my_proc.set_ana_output_file(os.path.join(OUTDIR,"nc_dump_%s.root" % NUM));
+my_proc.set_ana_output_file(os.path.join(OUTDIR,"michel_dump_%s.root" % NUM));
 
-ncdump = fmwk.nc_dump()
+ncdump = fmwk.michel_dump()
 my_proc.add_process(ncdump)
 my_proc.run();
 sys.exit(0)

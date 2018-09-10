@@ -58,7 +58,14 @@ namespace showerreco {
       
       // get the plane associated with this cluster
       auto const& pl = clusters.at(n).plane_id.Plane;
-
+      
+      if (pl>2 or pl<0) {
+        std::stringstream ss;
+        ss << "Fail @ algo " << this->name() << " edge case pl=" << pl << std::endl; 
+        throw ShowerRecoException(ss.str());
+      }
+        
+      
       // project vertex onto this plane
       auto const& vtx2D = geomH->Point_3Dto2D(vtx,pl);
 
