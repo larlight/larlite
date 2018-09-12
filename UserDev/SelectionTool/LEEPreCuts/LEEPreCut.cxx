@@ -25,6 +25,8 @@ namespace larlite {
     _tree->Branch("beamPE" , &_beamPE , "beamPE/F");
     _tree->Branch("vetoPE" , &_vetoPE , "vetoPE/F");
     _tree->Branch("maxfrac", &_maxfrac, "maxfrac/F");
+    _tree->Branch("beamFirstBin",&_beamFirstBin,"beamFirstBin/I");
+    _tree->Branch("vetoFirstBin",&_vetoFirstBin,"vetoFirstBin/I");    
 
     return true;
   }
@@ -34,10 +36,13 @@ namespace larlite {
     fBinTickWidth  = ps.get< int >("BinTickWidth",     6);
     fWinStartTick  = ps.get< int >("WinStartTick",   190);
     fWinEndTick    = ps.get< int >("WinEndTick",     320);
-    fPEThreshold   = ps.get< float >("PEThreshold", 20.0);
+    fPEThreshold   = ps.get< float >("PEThreshold",  20.0);
+    fVetoPEThresh  = ps.get< float >("VetoPEThreshold", 20.0);    
+    fMaxVetoPE     = ps.get< float >("MaxVetoPE",    20.0);
     fVetoStartTick = ps.get< int >("VetoStartTick",  60);
     fVetoEndTick   = ps.get< int >("VetoEndTick",    190);
     fPMTMaxFrac    = ps.get< float > ("PMTMaxFrac",  0.6);
+    fUseVetoWin    = ps.get< bool >("UseVetoWindow", true );
   }
   
   bool LEEPreCut::analyze(storage_manager* storage) {
@@ -78,17 +83,23 @@ namespace larlite {
     std::vector<float> vetobins  = m_algo.MakeTimeBin( ophit_peaktime_v, ophit_pe_v, fBinTickWidth, fVetoStartTick, fVetoEndTick );
 
     std::vector<float> beamPEinfo = m_algo.GetTotalPE( fPEThreshold , flashbins );
-    std::vector<float> vetoPEinfo = m_algo.GetTotalPE( fPEThreshold , vetobins );
+    std::vector<float> vetoPEinfo = m_algo.GetTotalPE( fVetoPEThresh, vetobins );
 
     float maxfrac = m_algo.PMTMaxFrac( ophit_peaktime_v, ophit_pe_v, ophit_femch_v, beamPEinfo, fBinTickWidth,  fWinStartTick);
 	
-    _beamPE = beamPEinfo[0];
-    _vetoPE = vetoPEinfo[0];
+    _beamPE = beamPEinfo[0]; // first bin is always the totalPE in the window
+    _vetoPE = vetoPEinfo[0]; // first bin is always the totalPE in the window
     _maxfrac = maxfrac;
+    _beamFirstBin = -1;
+    if ( beamPEinfo.size()>1 )
+      _beamFirstBin = fWinStartTick + beamPEinfo[1];
+    _vetoFirstBin = -1;
+    if ( vetoPEinfo.size()>1 )
+      _vetoFirstBin = fVetoStartTick + vetoPEinfo[1];
 
     bool passed = false;
-
-    if ( beamPEinfo[0]>fPEThreshold && vetoPEinfo[0]<fPEThreshold && maxfrac < fPMTMaxFrac )
+    
+    if ( beamPEinfo[0]>fPEThreshold && (vetoPEinfo[0]<fMaxVetoPE || !fUseVetoWin) && maxfrac < fPMTMaxFrac )
       passed = true;
      
     _passed = (int)passed;

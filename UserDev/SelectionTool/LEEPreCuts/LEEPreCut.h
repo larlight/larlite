@@ -18,7 +18,7 @@
 #include "Analysis/ana_base.h"
 #include "FhiclLite/PSet.h"
 
-#include "LEEPreCutAlgo.h"
+#include "algosrc/LEEPreCutAlgo.h"
 
 namespace larlite {
   /**
@@ -62,8 +62,11 @@ namespace larlite {
     int fWinEndTick;
     int fVetoStartTick;
     int fVetoEndTick;    
-    float fPEThreshold;    
+    float fPEThreshold;
+    float fVetoPEThresh;
+    float fMaxVetoPE;    
     float fPMTMaxFrac;
+    bool  fUseVetoWin;    
     int _run;
     int _subrun;
     int _event;
@@ -72,6 +75,8 @@ namespace larlite {
     float _beamPE;
     float _vetoPE;
     float _maxfrac;
+    int   _beamFirstBin;
+    int   _vetoFirstBin;
 
   };
 }
