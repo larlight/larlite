@@ -5,25 +5,24 @@ int runCalibrationFile(double _Nevt = 1000000){
     using namespace larlite;
     Calibration_File my_Calib;
     std::string version = "test17e";
-    std::string InDir  = "/Users/hourlier/Documents/PostDocMIT/Research/MicroBooNE/FinalFiles/"+version+"/cocktail";
+    std::string sample = "cocktail";
+    std::string InDir  = "/Users/hourlier/Documents/PostDocMIT/Research/MicroBooNE/FinalFiles/"+version+"/"+sample;
     std::string OutDir = ".";
     larlite::storage_manager mgr;
 
     mgr.set_io_mode(mgr.kREAD); // Option: kREAD, kWRITE, kBOTH
-    mgr.add_in_filename("/Users/hourlier/Documents/PostDocMIT/Research/MicroBooNE/FinalFiles/test17e/cocktail/tracker_reco.root");
+    mgr.add_in_filename(InDir+"/tracker_reco.root");
 
     if(!mgr.open()) {
         std::cerr << "Failed to open ROOT file. Aborting." << std::endl;
         return 1;
     }
 
-    //my_Calib.SetCalibrationFileName("dEdxCalibrationFile");
-    //my_Calib.SetCalibrationFilePath(".");
     my_Calib.SetdEdxSplineFile("../../../../LArCV/app/Reco3D/Proton_Muon_Range_dEdx_LAr_TSplines.root");
-    //TFile *f2 = TFile::Open("anatest.root","RECREATE");
+    TFile *f2 = TFile::Open(Form("Calib_dEdx_%s_%s.root",version.c_str(),sample.c_str()),"RECREATE");
 
-    my_Calib.SetSelectionFile("/Users/hourlier/Documents/PostDocMIT/Research/MicroBooNE/FinalFiles/test17e/cocktail/FinalVertexVariables.root");
-    my_Calib.set_ana_output_file("test1.root");
+    my_Calib.SetSelectionFile("/Users/hourlier/Documents/PostDocMIT/Research/MicroBooNE/FinalFiles/"+version+"/"+sample+"/FinalVertexVariables.root");
+    my_Calib.set_output_file(f2);
     my_Calib.initialize();
 
     int Nevt = 0;

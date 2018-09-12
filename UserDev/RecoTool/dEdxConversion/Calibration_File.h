@@ -23,6 +23,7 @@
 #include "TH3D.h"
 #include "TH2D.h"
 #include "TH1D.h"
+#include "TF1.h"
 #include "TImage.h"
 #include "TCanvas.h"
 #include "TGraph.h"
@@ -69,13 +70,15 @@ namespace larlite {
         void GetSpatialCorrectionFactor(TVector3 point,geo::View_t view=geo::kUnknown);
         void Get_dEdx_Splines();
         void MakedQdxCurves();
-
+        void CorrectdQdx4recombination();
+        void FitRecombinationPlot();
         protected:
 
         int run, subrun, event, vtx_id,plane;
         bool useTruncateddQdx;
         bool selectedProton;
         bool selectedCosmic;
+        bool isdEdxReady;
 
         double alpha_box;
         double beta_box;
@@ -86,6 +89,10 @@ namespace larlite {
         double SpatialCalib;
         double Wion;
         double Efield;
+        double LArDensity;
+        double alpha_expect;
+        double beta_expect;
+        double C_dqdx_expect;
 
         double xmax;
         double xmin;
@@ -121,6 +128,7 @@ namespace larlite {
         std::vector<larlite::track> thisVertex;
         std::vector<std::vector<larlite::track> > AllVertex_m;
         std::vector<std::vector<larlite::track> > AllVertex_p;
+
         larlite::geo::View_t views[3];
         std::string SelectionFileName;
         std::string CalibrationFilePath;
@@ -128,13 +136,16 @@ namespace larlite {
         std::string SplineFileName;
         std::string dirName;
 
-        TSpline3 sMuonRange2dEdx;
-        TSpline3 sProtonRange2dEdx;
+        TSpline3 *sMuonRange2dEdx;
+        TSpline3 *sProtonRange2dEdx;
 
         TH3D *hSpatialCorr;
         TH3D *hSpatialCorr_INPUT;
         TFile *fCalib;
         TTree *RecombinationParameters;
+        TF1 *fRecombination;
+        TF1 *fRecombinationExpected;
+        TF1 *fdEdxConvert;
 
         TH1D *hSumLength;
 
@@ -148,13 +159,18 @@ namespace larlite {
         TH1D *hHitMap_X_dir;
         TH1D *hMean_X_dir;
         TH1D *hCorrectionMap_X_dir;
-        TH1D *hUncorrected_YZ_plane;
-        TH1D *hUncorrected_X_dir;
+        TH1D *hUncorrected_dQdx_1D;
+        TH1D *hCorrected_dQdx_1D;
+        TH1D *hWallDist;
 
         TH2D *hRecombination_raw;
+        TH2D *hRecombination_cor;
 
         TH2D *hUncorrecteddQdx;
         TH2D *hCorrecteddQdx;
+        TH2D *hCalibrateddEdx;
+        TH2D *hCalibrateddEdx_p;
+        TH2D *hCalibrateddEdx_m;
 
         TH3D *hHitMap3D;
         TH3D *hRawCharge3D;

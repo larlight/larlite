@@ -7,7 +7,10 @@
 #include "TLine.h"
 #include "TLatex.h"
 #include "TH2D.h"
+#include "TVirtualFitter.h"
+#include "TGraphErrors.h"
 #include "TCanvas.h"
+#include "TProfile.h"
 #include "DataFormat/hit.h"
 #include "DataFormat/track.h"
 #include "DataFormat/vertex.h"
@@ -17,6 +20,30 @@
 #include <fstream>
 #include <vector>
 
+double RecombinationFunc(double *x, double *par){
+    double dqdx=0;
+    double alpha = par[0];
+    double beta = par[1];
+    double C = par[2];
+    double W = par[3];
+    double rho = par[4];
+    double epsilon = par[5];
+    double dedx = x[0];
+    dqdx = (1./C)*((rho*epsilon)/(beta*W))*log(dedx*(beta/(rho*epsilon))+alpha);
+    return dqdx;
+}
+double dEdxFunc(double *x, double *par){
+    double dedx=0;
+    double alpha = par[0];
+    double beta = par[1];
+    double C = par[2];
+    double W = par[3];
+    double rho = par[4];
+    double epsilon = par[5];
+    double dqdx = x[0];
+    dedx = ((rho*epsilon)/beta)*(exp(C*dqdx*((beta*W)/(rho*epsilon)))-alpha);
+    return dedx;
+}
 namespace larlite {
 
     bool Calibration_File::initialize() {
@@ -34,8 +61,13 @@ namespace larlite {
         C_dqdx_calib = 1;
         SpatialCalib = 1;
 
+        alpha_expect = 0.93;
+        beta_expect = 0.212;
+        C_dqdx_expect = 1000;
+
         Wion = 23.6e-6;// MeV (i.e. 23.6eV = ionization energy)
         Efield = 0.273;// kV per cm
+        LArDensity = 1.38;
 
         MinimumTrackLength = 5;
         plane = 2;
@@ -51,46 +83,32 @@ namespace larlite {
         zmax =  1036.8;
         zmin =  0;
 
+        isdEdxReady=false;
+
         DefineTreeBranches();
         Get_dEdx_Splines();
         LoadSelectionFile();
 
         hSumLength = new TH1D("hSumLength","hSumLength;L_{1}+L_{2}",100,0,1000);
+        hUncorrecteddQdx = new TH2D("hUncorrecteddQdx","Uncorrected, uncalibrated;res. Length (cm);uncalibrated dQdx (A.U.)",400,0,400,300,0,300);
+        hCorrecteddQdx   = new TH2D("hCorrecteddQdx","Corrected, uncalibrated;res. Length (cm);calibrated dQdx (e^{-}/cm)"    ,400,0,400,300,0,300000);
+        hCalibrateddEdx   = new TH2D("hCalibrateddEdx","Corrected, Calibrated;res. Length (cm);Calibrated dE/dx (MeV/cm)"      ,400,0,400,300,0,30);
 
-        hIon_YZ_plane    = new TH2D("hIon_YZ_plane"   ,"hIon_YZ_plane;Z(cm);Y(cm)"   ,100,zmin,zmax,100,ymin,ymax);
-        hHitMap_YZ_plane = new TH2D("hHitMap_YZ_plane","hHitMap_YZ_plane;Z(cm);Y(cm)",
-                                    hIon_YZ_plane->GetNbinsX(),hIon_YZ_plane->GetXaxis()->GetXmin(),hIon_YZ_plane->GetXaxis()->GetXmax(),
-                                    hIon_YZ_plane->GetNbinsY(),hIon_YZ_plane->GetYaxis()->GetXmin(),hIon_YZ_plane->GetYaxis()->GetXmax());
-        hMean_YZ_plane   = new TH2D("hMean_YZ_plane","hMean_YZ_plane;Z(cm);Y(cm)",
-                                  hIon_YZ_plane->GetNbinsX(),hIon_YZ_plane->GetXaxis()->GetXmin(),hIon_YZ_plane->GetXaxis()->GetXmax(),
-                                  hIon_YZ_plane->GetNbinsY(),hIon_YZ_plane->GetYaxis()->GetXmin(),hIon_YZ_plane->GetYaxis()->GetXmax());
+        hCalibrateddEdx_p   = new TH2D("hCalibrateddEdx_p","protons, Calibrated;res. Length (cm);Calibrated dE/dx (MeV/cm)"      ,400,0,400,300,0,30);
+        hCalibrateddEdx_m   = new TH2D("hCalibrateddEdx_m","muons, Calibrated;res. Length (cm);Calibrated dE/dx (MeV/cm)"      ,400,0,400,300,0,30);
 
-        hCorrectionMap_YZ_plane = new TH2D("hCorrectionMap_YZ_plane","hCorrectionMap_YZ_plane;Z(cm);Y(cm)",
-                                           hIon_YZ_plane->GetNbinsX(),hIon_YZ_plane->GetXaxis()->GetXmin(),hIon_YZ_plane->GetXaxis()->GetXmax(),
-                                           hIon_YZ_plane->GetNbinsY(),hIon_YZ_plane->GetYaxis()->GetXmin(),hIon_YZ_plane->GetYaxis()->GetXmax());
+        hRecombination_raw = new TH2D("hRecombination_raw","hRecombination_raw;expected dEdx;uncalibrated, uncorrected dQdx",100,0,15,100,0,300);
+        hRecombination_cor = new TH2D("hRecombination_cor","hRecombination_cor;expected dEdx (MeV/cm);corrected dQdx (e^{-}/cm)"  ,60,0,15,50,0,500000);
 
-        hIon_corrected_YZ_plane = new TH2D("hIon_corrected_YZ_plane","hIon_corrected_YZ_plane;Z(cm);Y(cm)",
-                                           hIon_YZ_plane->GetNbinsX(),hIon_YZ_plane->GetXaxis()->GetXmin(),hIon_YZ_plane->GetXaxis()->GetXmax(),
-                                           hIon_YZ_plane->GetNbinsY(),hIon_YZ_plane->GetYaxis()->GetXmin(),hIon_YZ_plane->GetYaxis()->GetXmax());
-
-
-        hIon_X_dir       = new TH1D("hIon_X_dir","hIon_X_dir;X(cm)",50,xmin, xmax);
-        hHitMap_X_dir    = new TH1D("hHitMap_X_dir","hHitMap_X_dir;X(cm)",
-                                    hIon_X_dir->GetNbinsX(),hIon_X_dir->GetXaxis()->GetXmin(),hIon_X_dir->GetXaxis()->GetXmax());
-        hMean_X_dir = new TH1D("hMean_X_dir","hMean_X_dir;X(cm)",
-                               hIon_X_dir->GetNbinsX(),hIon_X_dir->GetXaxis()->GetXmin(),hIon_X_dir->GetXaxis()->GetXmax());
-        hCorrectionMap_X_dir = new TH1D("hCorrectionMap_X_dir","hCorrectionMap_X_dir;X(cm)",
-                                    hIon_X_dir->GetNbinsX(),hIon_X_dir->GetXaxis()->GetXmin(),hIon_X_dir->GetXaxis()->GetXmax());
-        hIon_corrected_X_dir = new TH1D("hIon_corrected_X_dir","hIon_corrected_X_dir;X(cm)",
-                                       hIon_X_dir->GetNbinsX(),hIon_X_dir->GetXaxis()->GetXmin(),hIon_X_dir->GetXaxis()->GetXmax());
-
-        hUncorrected_YZ_plane = new TH1D("hUncorrected_YZ_plane","hUncorrected_YZ_plane;Z(cm);Y(cm)",1000,0,1000);
-        hUncorrected_X_dir = new TH1D("hUncorrected_X_dir","hUncorrected_X_dir;X(cm)",100,0,1000);
-
-        hSpatialCorr = new TH3D("hSpatialCorr","hSpatialCorr;X(cm);Y(cm);Z(cm)",
-                                hIon_X_dir->GetNbinsX(),hIon_X_dir->GetXaxis()->GetXmin(),hIon_X_dir->GetXaxis()->GetXmax(),
-                                hIon_YZ_plane->GetNbinsY(),hIon_YZ_plane->GetYaxis()->GetXmin(),hIon_YZ_plane->GetYaxis()->GetXmax(),
-                                hIon_YZ_plane->GetNbinsX(),hIon_YZ_plane->GetXaxis()->GetXmin(),hIon_YZ_plane->GetXaxis()->GetXmax());
+        fRecombinationExpected = new TF1("fRecombinationExpected",RecombinationFunc,0,1000,6);
+        fRecombinationExpected->SetParameters(alpha_expect,beta_expect,1,Wion,LArDensity,Efield);
+        fRecombinationExpected->SetParNames("alpha","beta","C","W_{ion}","#rho_{LAr}","E_{field}");
+        fRecombinationExpected->FixParameter(0, alpha_expect);
+        fRecombinationExpected->FixParameter(1, beta_expect);
+        fRecombinationExpected->FixParameter(3, Wion);
+        fRecombinationExpected->FixParameter(4,LArDensity);
+        fRecombinationExpected->FixParameter(5,Efield);
+        std::cout << "Expected dQdx for MIP : " << fRecombinationExpected->Eval(2.104) << std::endl;
 
         std::cout << "initialized" << std::endl;
         return true;
@@ -131,9 +149,9 @@ namespace larlite {
                 thisVertex.push_back( (*ev_trk)[trk_index]);
                 sumLength+=(*ev_trk)[trk_index].Length();
             }
-            if(selectedCosmic){AllVertex_m.push_back(thisVertex);}
+            if(selectedCosmic){AllVertex_m.push_back(thisVertex);hSumLength->Fill(sumLength);}
             if(selectedProton){AllVertex_p.push_back(thisVertex);}
-            hSumLength->Fill(sumLength);
+
         }// vtx_id
 
 
@@ -142,13 +160,52 @@ namespace larlite {
     }
     //=====================================================
     bool Calibration_File::finalize() {
+        std::cout << "finalize()" << std::endl;
 
-        FillSpatialCalibHistos();
-        Make2planesCorrectionMaps();
         Make3DCorrectionMap();
         MakedQdxCurves();
+        FitRecombinationPlot();
+        MakedQdxCurves();
+        TCanvas *cdEdx = new TCanvas("cdEdx","cdEdx",800,600);
+        hCalibrateddEdx->Draw("colz");
+        sProtonRange2dEdx->Draw("same");
+        sMuonRange2dEdx->Draw("same");
 
         RecombinationParameters->Fill();
+
+        std::cout << "About to save histograms" << std::endl;
+        _fout->cd();
+        RecombinationParameters->Write();
+        //hSpatialCorr->Write();
+        hSumLength->Write();
+        //hIon_YZ_plane->Write();
+        //hIon_corrected_YZ_plane->Write();
+        //hHitMap_YZ_plane->Write();
+        //hMean_YZ_plane->Write();
+        //hCorrectionMap_YZ_plane->Write();
+        //hIon_X_dir->Write();
+        //hIon_corrected_X_dir->Write();
+        //hHitMap_X_dir->Write();
+        //hMean_X_dir->Write();
+        //hCorrectionMap_X_dir->Write();
+        hUncorrected_dQdx_1D->Write();
+        hCorrected_dQdx_1D->Write();
+        hRecombination_raw->Write();
+        hRecombination_cor->Write();
+        hUncorrecteddQdx->Write();
+        hCorrecteddQdx->Write();
+        hCalibrateddEdx->Write();
+        hCalibrateddEdx_p->Write();
+        hCalibrateddEdx_m->Write();
+        hHitMap3D->Write();
+        hRawCharge3D->Write();
+        hMeanCharge3D->Write();
+        hCorrectionMap3D->Write();
+        fRecombination->Write();
+        fdEdxConvert->Write();
+        sProtonRange2dEdx->Write();
+        sMuonRange2dEdx->Write();
+
         std::cout << "Bye World" << std::endl;
         return true;
     }
@@ -168,9 +225,9 @@ namespace larlite {
         std::cout << "ttree loaded with " <<NuMuVertexVariable->GetEntries() << " entries" << std::endl;
 
 
-        int run_sel, subrun_sel,event_sel, vtxid_sel,NTracks_sel,N5cmTracks_sel,InFiducial_sel;
+        int run_sel, subrun_sel,event_sel, vtxid_sel,NTracks_sel,N5cmTracks_sel,InFiducial_sel,PassCuts_sel;
         int goodReco_sel;
-        float cosmicLL_sel, Xreco_sel,Yreco_sel,Zreco_sel;
+        float cosmicLL_sel, Xreco_sel,Yreco_sel,Zreco_sel, WallDist_sel;
         std::vector<double> *TrackLength_v_sel = 0;
         std::vector<double> *dQdx_v_sel = 0;
 
@@ -188,6 +245,9 @@ namespace larlite {
         NuMuVertexVariable->SetBranchAddress("N5cmTracks",&N5cmTracks_sel);
         NuMuVertexVariable->SetBranchAddress("TrackLength_v",&TrackLength_v_sel);
         NuMuVertexVariable->SetBranchAddress("dQdx_v",&dQdx_v_sel);
+        NuMuVertexVariable->SetBranchAddress("PassCuts",&PassCuts_sel);
+        NuMuVertexVariable->SetBranchAddress("WallDist",&WallDist_sel);
+
 
         for(Long64_t i=0;i<NuMuVertexVariable->GetEntries();i++){
             NuMuVertexVariable->GetEntry(i);
@@ -206,7 +266,7 @@ namespace larlite {
             }
 
             // select well reconstructed protons
-            if(cosmicLL_sel > 4){
+            if(cosmicLL_sel > 4 && PassCuts_sel == 1){
                 std::vector<int> info;
                 info.push_back(run_sel);
                 info.push_back(subrun_sel);
@@ -244,8 +304,8 @@ namespace larlite {
     void Calibration_File::Get_dEdx_Splines(){
         std::cout << "Get_dEdx_Splines" << std::endl;
         TFile *fSplines = TFile::Open(Form("%s",SplineFileName.c_str()),"READ");
-        sMuonRange2dEdx   = (*(TSpline3*)fSplines->Get("sMuonRange2dEdx"));
-        sProtonRange2dEdx = (*(TSpline3*)fSplines->Get("sProtonRange2dEdx"));
+        sMuonRange2dEdx   = (TSpline3*)fSplines->Get("sMuonRange2dEdx");
+        sProtonRange2dEdx = (TSpline3*)fSplines->Get("sProtonRange2dEdx");
     }
     //=====================================================
     bool Calibration_File::InVolume(TVector3 point, TVector3 FVmargin){
@@ -286,91 +346,15 @@ namespace larlite {
         return;
     }
     //=====================================================
-    void Calibration_File::FillSpatialCalibHistos(){
-        for(size_t ivertex = 0;ivertex<AllVertex_m.size();ivertex++){
-            for(size_t itrack=0;itrack<AllVertex_m[ivertex].size();itrack++){
-                for(size_t iNode = 0;iNode<AllVertex_m[ivertex][itrack].NumberTrajectoryPoints();iNode++){
-                    if(AllVertex_m[ivertex][itrack].DQdxAtPoint(iNode,views[plane]) == 111)continue; // remove pixel values added for dead wire recovery
-
-                    hIon_YZ_plane->Fill(   AllVertex_m[ivertex][itrack].LocationAtPoint(iNode).Z(),AllVertex_m[ivertex][itrack].LocationAtPoint(iNode).Y(),AllVertex_m[ivertex][itrack].DQdxAtPoint(iNode,views[plane]));
-                    hHitMap_YZ_plane->Fill(AllVertex_m[ivertex][itrack].LocationAtPoint(iNode).Z(),AllVertex_m[ivertex][itrack].LocationAtPoint(iNode).Y());
-                    hIon_X_dir->Fill(   AllVertex_m[ivertex][itrack].LocationAtPoint(iNode).X(),AllVertex_m[ivertex][itrack].DQdxAtPoint(iNode,views[plane]));
-                    hHitMap_X_dir->Fill(AllVertex_m[ivertex][itrack].LocationAtPoint(iNode).X());
-                    if(AllVertex_m[ivertex][itrack].DQdxAtPoint(iNode,views[plane])!=0)hUncorrected_YZ_plane->Fill(AllVertex_m[ivertex][itrack].DQdxAtPoint(iNode,views[plane]));
-                    
-                }
-            }
-        }
-    }
-    //=====================================================
-    void Calibration_File::Make2planesCorrectionMaps(){
-        int i_YZ = 0;
-        int i_X = 0;
-
-        //--------------------------------------------------
-        // Get averaged values, per cell and the global ones
-        //--------------------------------------------------
-        for(int i=0;i<hIon_YZ_plane->GetNbinsX();i++){
-            for(int j=0;j<hIon_YZ_plane->GetNbinsY();j++){
-                if(hHitMap_YZ_plane->GetBinContent(i+1,j+1) < 10)continue;
-                hMean_YZ_plane->SetBinContent(i+1,j+1,hIon_YZ_plane->GetBinContent(i+1,j+1)/hHitMap_YZ_plane->GetBinContent(i+1,j+1));
-                i_YZ++;
-                avg_Ion_YZ += hIon_YZ_plane->GetBinContent(i+1,j+1)/hHitMap_YZ_plane->GetBinContent(i+1,j+1);
-            }
-        }
-        for(int i = 0;i<hIon_X_dir->GetNbinsX();i++){
-            if(hHitMap_X_dir->GetBinContent(i+1) < 10)continue;
-            hMean_X_dir->SetBinContent(i+1,hIon_X_dir->GetBinContent(i+1)/hHitMap_X_dir->GetBinContent(i+1));
-            i_X++;
-            avg_Ion_X+= hIon_X_dir->GetBinContent(i+1)/hHitMap_X_dir->GetBinContent(i+1);
-        }
-
-        avg_Ion_YZ/=i_YZ;
-        avg_Ion_X/=i_X;
-
-        //-----------------------------------------------------------------
-        // estimate the correction factors based on the found avraged value
-        //-----------------------------------------------------------------
-        for(int i=0;i<hMean_YZ_plane->GetNbinsX();i++){
-            for(int j=0;j<hMean_YZ_plane->GetNbinsY();j++){
-                if(hMean_YZ_plane->GetBinContent(i+1,j+1)==0){hCorrectionMap_YZ_plane->SetBinContent(i+1,j+1,1);continue;}
-                hCorrectionMap_YZ_plane->SetBinContent(i+1,j+1,avg_Ion_YZ/hMean_YZ_plane->GetBinContent(i+1,j+1));
-            }
-        }
-
-        for(int i = 0;i<hMean_X_dir->GetNbinsX();i++){
-            if(hMean_X_dir->GetBinContent(i+1) == 0)continue;
-            hCorrectionMap_X_dir->SetBinContent(i+1,avg_Ion_X/hMean_X_dir->GetBinContent(i+1));
-        }
-
-        for(int i=0;i<hSpatialCorr->GetNbinsX();i++){
-            for(int j=0;j<hSpatialCorr->GetNbinsY();j++){
-                for(int k=0;k<hSpatialCorr->GetNbinsZ();k++){
-                    hSpatialCorr->SetBinContent(i+1,j+1,k+1, hCorrectionMap_X_dir->GetBinContent(i+1)*hCorrectionMap_YZ_plane->GetBinContent(k+1,j+1));
-                }
-            }
-        }
-
-        //------------------------
-        // correct ionization maps
-        //------------------------
-        for(int i=0;i<hCorrectionMap_YZ_plane->GetNbinsX();i++){
-            for(int j=0;j<hCorrectionMap_YZ_plane->GetNbinsY();j++){
-                hIon_corrected_YZ_plane->SetBinContent(i+1,j+1,hIon_YZ_plane->GetBinContent(i+1,j+1)*hCorrectionMap_YZ_plane->GetBinContent(i+1,j+1));
-            }
-        }
-
-        for(int i = 0;i<hMean_X_dir->GetNbinsX();i++){
-           hIon_corrected_X_dir->SetBinContent(i+1,hIon_X_dir->GetBinContent(i+1)*hCorrectionMap_X_dir->GetBinContent(i+1));
-        }
-
-
-    }
-    //=====================================================
     void Calibration_File::MakedQdxCurves(){
-        hUncorrecteddQdx = new TH2D("hUncorrecteddQdx","Uncorrected, uncalibrated;res. Length (cm);uncalibrated dQdx (A.U.)",400,0,400,300,0,300);
-        hCorrecteddQdx   = new TH2D("hCorrecteddQdx","Corrected, uncalibrated;res. Length (cm);uncalibrated dQdx (A.U.)"    ,400,0,400,300,0,300);
-        hRecombination_raw = new TH2D("hRecombination_raw","hRecombination_raw;expected dEdx;uncalibrates, uncorrected dQdx",100,0,15,100,0,300);
+        std::cout << "MakedQdxCurves()" << std::endl;
+        if(hUncorrecteddQdx->GetEntries()!=0)hUncorrecteddQdx->Reset();
+        if(hCorrecteddQdx->GetEntries()!=0)hCorrecteddQdx->Reset();
+        if(hCalibrateddEdx->GetEntries()!=0)hCalibrateddEdx->Reset();
+        if(hCalibrateddEdx_m->GetEntries()!=0)hCalibrateddEdx_m->Reset();
+        if(hCalibrateddEdx_p->GetEntries()!=0)hCalibrateddEdx_p->Reset();
+        if(hRecombination_raw->GetEntries()!=0)hRecombination_raw->Reset();
+        if(hRecombination_cor->GetEntries()!=0)hRecombination_cor->Reset();
 
         double avg_ion[2]={0,0};
         for(size_t ivertex=0; ivertex<AllVertex_p.size();ivertex++){
@@ -379,64 +363,130 @@ namespace larlite {
                     double raw_ion = AllVertex_p[ivertex][itrack].DQdxAtPoint(iNode,views[plane]);
                     TVector3 point = AllVertex_p[ivertex][itrack].LocationAtPoint(iNode);
                     double correction = hCorrectionMap3D->GetBinContent(hCorrectionMap3D->FindBin(point.X(),point.Y(),point.Z()));
-
-                    //double corrected_ion = raw_ion*hSpatialCorr->GetBinContent(hSpatialCorr->FindBin(point.X(),point.Y(),point.Z()));
                     double corrected_ion = raw_ion*correction;
-                    /*std::cout << "raw_ion " << raw_ion << std::endl;
-                    std::cout << "correction " << correction << std::endl;
-                    std::cout << "corrected_ion " << corrected_ion << std::endl;
-                    std::cout << "avg_Ion_3D " << avg_Ion_3D << std::endl;*/
+                    double dEdx = corrected_ion;
+                    if(isdEdxReady)dEdx = fdEdxConvert->Eval(corrected_ion);
                     double reslength = AllVertex_p[ivertex][itrack].Length(iNode);
+                    if(reslength < 5)continue;
                     if(raw_ion <= 0 || raw_ion == 111)continue;
                     avg_ion[itrack]+=raw_ion;
                     hUncorrecteddQdx->Fill(reslength , raw_ion);
+                    if(corrected_ion < 1000)continue;
                     hCorrecteddQdx->Fill(reslength, corrected_ion);
+                    if(dEdx < 0.5)continue;
+                    hCalibrateddEdx->Fill(reslength,dEdx);
                 }
                 avg_ion[itrack]/=AllVertex_p[ivertex][itrack].NumberTrajectoryPoints();
             }
             //find only the proton track
             int kProton = 0;
-            if(AllVertex_p[ivertex][0].Length() < 5 || AllVertex_p[ivertex][1].Length() < 5)continue;
-            if(AllVertex_p[ivertex][0].Length() > AllVertex_p[ivertex][1].Length() || avg_ion[0] < avg_ion[1]){kProton=1;}
+            int kMuon = 1;
+            if(AllVertex_p[ivertex][kProton].Length() < 5 || AllVertex_p[ivertex][kMuon].Length() < 5)continue;
+            if(AllVertex_p[ivertex][kProton].Length() > AllVertex_p[ivertex][kMuon].Length())continue;
+            if(avg_ion[kProton] < avg_ion[kMuon])continue;
             for(size_t iNode=0;iNode<AllVertex_p[ivertex][kProton].NumberTrajectoryPoints();iNode++){
                 double raw_ion = AllVertex_p[ivertex][kProton].DQdxAtPoint(iNode,views[plane]);
+                TVector3 point = AllVertex_p[ivertex][kProton].LocationAtPoint(iNode);
+                double correction = hCorrectionMap3D->GetBinContent(hCorrectionMap3D->FindBin(point.X(),point.Y(),point.Z()));
+                double corrected_ion = raw_ion*correction;
+                double dEdx = corrected_ion;
+                if(isdEdxReady)dEdx = fdEdxConvert->Eval(corrected_ion);
                 double reslength = AllVertex_p[ivertex][kProton].Length(iNode);
-                if(raw_ion <= 0 || raw_ion == 111 || reslength < 2)continue;
-                hRecombination_raw->Fill(sProtonRange2dEdx.Eval(reslength),raw_ion);
+                if(raw_ion <= 0)continue;
+                if(raw_ion == 111)continue;
+                if(reslength < 2)continue;
+                if(raw_ion*correction < 2000)continue;
+                hRecombination_raw->Fill(sProtonRange2dEdx->Eval(reslength),raw_ion);
+                hRecombination_cor->Fill(sProtonRange2dEdx->Eval(reslength),corrected_ion);
+                hCalibrateddEdx_p->Fill(reslength, dEdx);
+            }
+            for(size_t iNode=0;iNode<AllVertex_p[ivertex][kMuon].NumberTrajectoryPoints();iNode++){
+                double raw_ion = AllVertex_p[ivertex][kMuon].DQdxAtPoint(iNode,views[plane]);
+                TVector3 point = AllVertex_p[ivertex][kMuon].LocationAtPoint(iNode);
+                double correction = hCorrectionMap3D->GetBinContent(hCorrectionMap3D->FindBin(point.X(),point.Y(),point.Z()));
+                double corrected_ion = raw_ion*correction;
+                double dEdx = corrected_ion;
+                if(isdEdxReady)dEdx = fdEdxConvert->Eval(corrected_ion);
+                double reslength = AllVertex_p[ivertex][kMuon].Length(iNode);
+                if(raw_ion <= 0)continue;
+                if(raw_ion == 111)continue;
+                if(reslength < 2)continue;
+                if(raw_ion*correction < 2000)continue;
+                hCalibrateddEdx_m->Fill(reslength,dEdx);
 
             }
         }
     }
     //=====================================================
     void Calibration_File::Make3DCorrectionMap(){
-        int Nx(10), Ny(10), Nz(10);
+        std::cout << "Make3DCorrectionMap()" << std::endl;
+        const int Nx(5), Ny(10), Nz(50);
+        TH1D* hRawChargeCell[Nx][Ny][Nz];
+        for(int ix=0;ix<Nx;ix++){
+            for(int iy=0;iy<Ny;iy++){
+                for(int iz=0;iz<Nz;iz++){
+                    hRawChargeCell[ix][iy][iz] = new TH1D(Form("hRawChargeCell_%02d_%02d_%02d",ix,iy,iz),Form("hRawChargeCell_%02d_%02d_%02d",ix,iy,iz),100,0,200);
+                }
+            }
+        }
+
+        //TCanvas *cCells= new TCanvas("cCells","cCells",800,600);
         hHitMap3D = new TH3D("hHitMap3D","hHitMap3D",Nx,xmin, xmax, Ny,ymin, ymax, Nz, zmin, zmax);
         hRawCharge3D = new TH3D("hRawCharge3D","hRawCharge3D",Nx,xmin, xmax, Ny,ymin, ymax, Nz, zmin, zmax);
         hMeanCharge3D = new TH3D("hMeanCharge3D","hMeanCharge3D",Nx,xmin, xmax, Ny,ymin, ymax, Nz, zmin, zmax);
         hCorrectionMap3D = new TH3D("hCorrectionMap3D","hCorrectionMap3D",Nx,xmin, xmax, Ny,ymin, ymax, Nz, zmin, zmax);
 
+        hUncorrected_dQdx_1D = new TH1D("hUncorrected_dQdx_1D","hUncorrected_dQdx_1D;dQdx",1000,0,1000);
+        hCorrected_dQdx_1D = new TH1D("hCorrected_dQdx_1D","hCorrected_dQdx_1D;dQdx",1000,0,-1);hCorrected_dQdx_1D->SetLineColor(2);
+
         for(size_t ivertex = 0;ivertex<AllVertex_m.size();ivertex++){
             for(size_t itrack=0;itrack<AllVertex_m[ivertex].size();itrack++){
                 for(size_t iNode = 0;iNode<AllVertex_m[ivertex][itrack].NumberTrajectoryPoints();iNode++){
                     if(AllVertex_m[ivertex][itrack].DQdxAtPoint(iNode,views[plane]) == 111)continue; // remove pixel values added for dead wire recovery
+                    if(AllVertex_m[ivertex][itrack].DQdxAtPoint(iNode,views[plane]) >  75)continue; // remove pixel from obviously non MIPs parts
                     if(AllVertex_m[ivertex][itrack].DQdxAtPoint(iNode,views[plane]) == 0  )continue; // remove empty points
-                    TVector3 point = AllVertex_m[ivertex][itrack].LocationAtPoint(iNode);
+                    if(AllVertex_m[ivertex][itrack].Length(iNode) < 20)continue; // remove points near Bragg peak
 
+                    TVector3 point = AllVertex_m[ivertex][itrack].LocationAtPoint(iNode);
+                    if(point.X() < xmin || point.X() > xmax)continue;
+                    if(point.Y() < ymin || point.Y() > ymax)continue;
+                    if(point.Z() < zmin || point.Z() > zmax)continue;
+                    if(AllVertex_m[ivertex][itrack].DQdxAtPoint(iNode,views[plane])!=0)hUncorrected_dQdx_1D->Fill(AllVertex_m[ivertex][itrack].DQdxAtPoint(iNode,views[plane]));
                     hRawCharge3D->Fill(point.X(),point.Y(),point.Z(), AllVertex_m[ivertex][itrack].DQdxAtPoint(iNode,views[plane]));
                     hHitMap3D->Fill(point.X(),point.Y(),point.Z());
-
+                    int binx = (int)((point.X()-xmin)*(Nx/(xmax-xmin)));
+                    int biny = (int)((point.Y()-ymin)*(Ny/(ymax-ymin)));
+                    int binz = (int)((point.Z()-zmin)*(Nz/(zmax-zmin)));
+                    //if(binx>=Nx)binx=Nx-1;
+                    //if(biny>=Ny)biny=Ny-1;
+                    //if(binz>=Nz)binz=Nz-1;
+                    if(binx>=Nx)std::cout << xmin << " : " << point.X() << " : " << xmax << std::endl;
+                    if(biny>=Ny)std::cout << ymin << " : " << point.Y() << " : " << ymax << std::endl;
+                    if(binz>=Nz)std::cout << zmin << " : " << point.Z() << " : " << zmax << std::endl;
+                    //std::cout << binx << "/" << Nx <<"\t" << biny<<"/"<<Ny << "\t" <<binz<<"/" << Nz<< std::endl;
+                    hRawChargeCell[binx][biny][binz]->Fill(AllVertex_m[ivertex][itrack].DQdxAtPoint(iNode,views[plane]));
                 }
             }
         }
 
         avg_Ion_3D=0;
         int nentries=0;
-        for(int iX = 0;iX < hRawCharge3D->GetNbinsX();iX++){
+        /*for(int iX = 0;iX < hRawCharge3D->GetNbinsX();iX++){
             for(int iY = 0;iY < hRawCharge3D->GetNbinsY();iY++){
                 for(int iZ = 0;iZ < hRawCharge3D->GetNbinsZ();iZ++){
-                    if(hHitMap3D->GetBinContent(iX+1,iY+1,iZ+1)==0)continue;
-                    std::cout << "hHitMap3D : " << hHitMap3D->GetBinContent(iX+1,iY+1,iZ+1) << std::endl;
+                    if(hHitMap3D->GetBinContent(iX+1,iY+1,iZ+1)<=10)continue;
+                    //std::cout << "hHitMap3D : " << hHitMap3D->GetBinContent(iX+1,iY+1,iZ+1) << std::endl;
                     hMeanCharge3D->SetBinContent(iX+1,iY+1,iZ+1, hRawCharge3D->GetBinContent(iX+1,iY+1,iZ+1)/hHitMap3D->GetBinContent(iX+1,iY+1,iZ+1));
+                }
+            }
+        }*/
+
+        for(int ix=0;ix<Nx;ix++){
+            for(int iy=0;iy<Ny;iy++){
+                for(int iz=0;iz<Nz;iz++){
+                    //hRawChargeCell[ix][iy][iz]->Draw();cCells->Modified();cCells->Update();cCells->SaveAs(Form("%s.pdf",hRawChargeCell[ix][iy][iz]->GetTitle()));
+                    if(hRawChargeCell[ix][iy][iz]->GetEntries()<10){hMeanCharge3D->SetBinContent(ix+1,iy+1,iz+1,0);continue;}
+                    else hMeanCharge3D->SetBinContent(ix+1,iy+1,iz+1,hRawChargeCell[ix][iy][iz]->GetBinCenter(hRawChargeCell[ix][iy][iz]->GetMaximumBin()));
                 }
             }
         }
@@ -444,6 +494,7 @@ namespace larlite {
         for(int iX = 0;iX < hRawCharge3D->GetNbinsX();iX++){
             for(int iY = 0;iY < hRawCharge3D->GetNbinsY();iY++){
                 for(int iZ = 0;iZ < hRawCharge3D->GetNbinsZ();iZ++){
+                    if(hMeanCharge3D->GetBinContent(iX+1,iY+1,iZ+1) <= 0 || hMeanCharge3D->GetBinContent(iX+1,iY+1,iZ+1) > 200)continue;
                     avg_Ion_3D+=hMeanCharge3D->GetBinContent(iX+1,iY+1,iZ+1);
                     nentries++;
                 }
@@ -451,15 +502,85 @@ namespace larlite {
         }
         if(nentries!=0)avg_Ion_3D/=nentries;
         std::cout << "avg_Ion_3D : " << avg_Ion_3D << std::endl;
+        std::cout << "Expected dQdx for MIP : " << fRecombinationExpected->Eval(2.104) << std::endl;
+        avg_Ion_3D = fRecombinationExpected->Eval(2.104);
 
         for(int iX = 0;iX < hMeanCharge3D->GetNbinsX();iX++){
             for(int iY = 0;iY < hMeanCharge3D->GetNbinsY();iY++){
                 for(int iZ = 0;iZ < hMeanCharge3D->GetNbinsZ();iZ++){
+                    if(hMeanCharge3D->GetBinContent(iX+1,iY+1,iZ+1)<=0){hCorrectionMap3D->SetBinContent(iX+1,iY+1,iZ+1,1);continue;}
                     hCorrectionMap3D->SetBinContent(iX+1,iY+1,iZ+1,avg_Ion_3D/hMeanCharge3D->GetBinContent(iX+1,iY+1,iZ+1));
                 }
             }
         }
 
+        for(size_t ivertex = 0;ivertex<AllVertex_m.size();ivertex++){
+            for(size_t itrack=0;itrack<AllVertex_m[ivertex].size();itrack++){
+                for(size_t iNode = 0;iNode<AllVertex_m[ivertex][itrack].NumberTrajectoryPoints();iNode++){
+                    if(AllVertex_m[ivertex][itrack].DQdxAtPoint(iNode,views[plane]) == 111)continue; // remove pixel values added for dead wire recovery
+                    if(AllVertex_m[ivertex][itrack].DQdxAtPoint(iNode,views[plane]) == 0  )continue; // remove empty points
+                    if(AllVertex_m[ivertex][itrack].Length(iNode) < 20)continue; // remove points near Bragg peak
+                    TVector3 point = AllVertex_m[ivertex][itrack].LocationAtPoint(iNode);
+                    double correction = hCorrectionMap3D->GetBinContent(hCorrectionMap3D->FindBin(point.X(),point.Y(),point.Z()));
+                    //std::cout << correction << "\t" << AllVertex_m[ivertex][itrack].DQdxAtPoint(iNode,views[plane])*correction << std::endl;
+                    if(correction==0)correction=1;
+                    hCorrected_dQdx_1D->Fill(AllVertex_m[ivertex][itrack].DQdxAtPoint(iNode,views[plane])*correction);
+                }
+            }
+        }
+        std::cout << "Expected dQdx for MIP : " << fRecombinationExpected->Eval(2.104) << std::endl;
+
+    }
+    //=====================================================
+    void Calibration_File::FitRecombinationPlot(){
+        std::cout << "FitRecombinationPlot()" << std::endl;
+        fRecombination = new TF1("fRecombination",RecombinationFunc,0,1000,6);
+        fRecombination->SetParameters(alpha_expect,beta_expect,1,Wion,LArDensity,Efield);
+        fRecombination->SetParNames("alpha","beta","C","W_{ion}","#rho_{LAr}","E_{field}");
+        //fRecombination->SetParLimits(0,0.5,1.5);
+        //fRecombination->SetParLimits(1,0,0.5);
+        //fRecombination->SetParLimits(2,0.5,1.5);
+
+        //fRecombination->FixParameter(0, alpha_expect);
+        //fRecombination->FixParameter(1,beta_expect);
+        fRecombination->FixParameter(2,1);
+        fRecombination->FixParameter(3, Wion);
+        fRecombination->FixParameter(4,LArDensity);
+        fRecombination->FixParameter(5,Efield);
+
+
+        TCanvas *cRecombination = new TCanvas("cRecombination","cRecombination",800,600);
+        TF1 *fgaus = new TF1("fgaus","gaus(0)",0,1000);
+        fgaus->SetParameters(100,200,20,10,200,100);
+
+        TProfile *P = hRecombination_cor->ProfileX("P");
+        P->Fit(fRecombination,"re","e",2.75,15);
+        hRecombination_cor->Draw("colz");
+
+        TH1D *hint = new TH1D("hint",".68 conf.band", hRecombination_cor->GetNbinsX(),hRecombination_cor->GetXaxis()->GetXmin(),hRecombination_cor->GetXaxis()->GetXmax());
+        (TVirtualFitter::GetFitter())->GetConfidenceIntervals(hint,0.68);
+        hint->SetStats(kFALSE);
+        hint->SetFillColor(2);
+        hint->SetFillStyle(3001);
+        hint->Draw("e3 same");
+        fRecombination->Draw("same");
+        P->SetLineColor(1);
+        P->SetMarkerStyle(20);
+        P->Draw("sames");
+        //fRecombinationExpected->SetParameter(2,fRecombination->GetParameter(2));
+        fRecombinationExpected->SetLineColor(4);
+        fRecombinationExpected->Draw("same");
+
+        alpha_box = fRecombination->GetParameter(0);
+        beta_box = fRecombination->GetParameter(1);
+        C_dqdx_calib = fRecombination->GetParameter(2);
+        sigma_alpha_box = fRecombination->GetParError(0);
+        sigma_beta_box = fRecombination->GetParError(1);
+        sigma_C_dqdx_calib = fRecombination->GetParError(2);
+
+        fdEdxConvert = new TF1("fdEdxConvert",dEdxFunc,0,1000000,6);
+        fdEdxConvert->SetParameters(alpha_box,beta_box,C_dqdx_calib,Wion,LArDensity,Efield);
+        isdEdxReady=true;
     }
     //=====================================================
 
