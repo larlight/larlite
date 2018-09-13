@@ -58,6 +58,8 @@ namespace flashana {
     void Add(flashana::QCluster_t& obj);
     /// Adder of a TPC object
     void Add(flashana::Flash_t& obj);
+    /// Adder of a flash object. But is designated as a cosmic flash
+    void Add(flashana::Flash_t& obj, bool isCosmicDiscFlash );
 
     /**
        CORE FUNCTION: executes algorithms to find a match of TPC object and flash provided by users. \n
@@ -71,7 +73,7 @@ namespace flashana {
 
     /// Clears locally kept TPC object (QClusterArray_t) and flash (FlashArray_t), both provided by a user
     void Reset()
-    { _tpc_object_v.clear(); _flash_v.clear(); }
+    { _tpc_object_v.clear(); _flash_v.clear(); _flash_iscosmic_v.clear(); }
 
     /// Configuration option: true => allows an assignment of the same flash to multiple TPC objects
     void CanReuseFlash(bool ok=true)
@@ -93,6 +95,9 @@ namespace flashana {
     const std::vector<std::vector<flashana::FlashMatch_t> > FullResultFlashTPC() const
     { return _res_flash_tpc_v; }
 
+    /// Print Full Result (if configured to store)
+    void PrintFullResult();
+    
   private:
 
     void AddCustomAlgo(BaseAlgorithm* alg);
@@ -112,6 +117,8 @@ namespace flashana {
     QClusterArray_t _tpc_object_v;
     /// Flash object information collection (provided by a user)
     FlashArray_t _flash_v;
+    /// bool to tag which flash objects provided by the user are from the cosmic readout
+    std::vector<bool> _flash_iscosmic_v;    
     /// Configuration option to allow re-use of a flash (i.e. 1 flash can be assigned to multiple TPC object)
     bool _allow_reuse_flash;
     /// Configuration readiness flag

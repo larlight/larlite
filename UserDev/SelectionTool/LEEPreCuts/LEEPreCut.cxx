@@ -15,19 +15,14 @@ namespace larlite {
     // If you have a histogram to fill in the event loop, for example,
     // here is a good place to create one on the heap (i.e. "new TH1D"). 
     //
-    
+    if (_fout)
+      _fout->cd();
+    // if we make our own tree
     _tree = new TTree("pmt_precut_tree","");
     _tree->Branch("run"    , &_run    , "run/I");
     _tree->Branch("subrun" , &_subrun , "subrun/I");
-    _tree->Branch("event"  , &_event  , "event/I");
-
-    _tree->Branch("passed" , &_passed , "passed/I");
-    _tree->Branch("beamPE" , &_beamPE , "beamPE/F");
-    _tree->Branch("vetoPE" , &_vetoPE , "vetoPE/F");
-    _tree->Branch("maxfrac", &_maxfrac, "maxfrac/F");
-    _tree->Branch("beamFirstBin",&_beamFirstBin,"beamFirstBin/I");
-    _tree->Branch("vetoFirstBin",&_vetoFirstBin,"vetoFirstBin/I");    
-
+    _tree->Branch("event"  , &_event  , "event/I");    
+    bindOutputVariablesToTree(_tree);
     return true;
   }
 
@@ -64,6 +59,7 @@ namespace larlite {
     //   std::cout << "Event ID: " << my_pmtfifo_v->event_id() << std::endl;
     //
 
+
     _run = (int)storage->run_id();
     _subrun = (int)storage->subrun_id();
     _event = (int)storage->event_id();
@@ -83,6 +79,7 @@ namespace larlite {
     std::vector<float> vetobins  = m_algo.MakeTimeBin( ophit_peaktime_v, ophit_pe_v, fBinTickWidth, fVetoStartTick, fVetoEndTick );
 
     std::vector<float> beamPEinfo = m_algo.GetTotalPE( fPEThreshold , flashbins );
+
     std::vector<float> vetoPEinfo = m_algo.GetTotalPE( fVetoPEThresh, vetobins );
 
     float maxfrac = m_algo.PMTMaxFrac( ophit_peaktime_v, ophit_pe_v, ophit_femch_v, beamPEinfo, fBinTickWidth,  fWinStartTick);
@@ -103,12 +100,13 @@ namespace larlite {
       passed = true;
      
     _passed = (int)passed;
-    
-    _tree->Fill(); 
+
+    if (_tree )
+      _tree->Fill(); 
     
     return true;
   }
-
+  
   bool LEEPreCut::finalize() {
 
     // This function is called at the end of event loop.
@@ -124,11 +122,25 @@ namespace larlite {
     //   print(MSG::ERROR,__FUNCTION__,"Did not find an output file pointer!!! File not opened?");
     //
 
-    _tree->Write();
-
+    if (_tree ) {
+      if (_fout)
+	_fout->cd();
+      _tree->Write();
+    }
+    
     return true;
   }
-
+  
+  void LEEPreCut::bindOutputVariablesToTree( TTree* ttree ) {
+    // bind variables of interest to an external tree
+    // we do not own it
+    _tree->Branch("passed" , &_passed , "passed/I");
+    _tree->Branch("beamPE" , &_beamPE , "beamPE/F");
+    _tree->Branch("vetoPE" , &_vetoPE , "vetoPE/F");
+    _tree->Branch("maxfrac", &_maxfrac, "maxfrac/F");
+    _tree->Branch("beamFirstBin",&_beamFirstBin,"beamFirstBin/I");
+    _tree->Branch("vetoFirstBin",&_vetoFirstBin,"vetoFirstBin/I");    
+  }
+  
 }
 #endif
-	

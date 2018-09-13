@@ -4,6 +4,7 @@
 #include <TROOT.h>
 #include <TRint.h>
 #include <TStyle.h>
+//int Error; 
 
 extern void InitGui(); // Initializer for GUI
 VoidFuncPtr_t initfuncs[] = { InitGui, 0 };

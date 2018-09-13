@@ -30,7 +30,7 @@ namespace larlite {
   public:
 
     /// Default constructor
-    LEEPreCut() : _tree(nullptr) { _name="LEEPreCut"; _fout=0;}
+    LEEPreCut() : _tree(nullptr) { _name="LEEPreCut"; _fout=0; }
 
     /// Default destructor
     virtual ~LEEPreCut(){}
@@ -52,8 +52,14 @@ namespace larlite {
     */
     virtual bool finalize();
 
+
   protected:
     TTree* _tree;
+
+  public:
+    void bindOutputVariablesToTree( TTree* ttree );
+    
+  protected:
 
     leeprecuts::LEEPreCutAlgo m_algo;
     std::string fOpHitProducer;
@@ -62,6 +68,7 @@ namespace larlite {
     int fWinEndTick;
     int fVetoStartTick;
     int fVetoEndTick;    
+
     float fPEThreshold;
     float fVetoPEThresh;
     float fMaxVetoPE;    
@@ -77,6 +84,12 @@ namespace larlite {
     float _maxfrac;
     int   _beamFirstBin;
     int   _vetoFirstBin;
+
+  public:
+    int passes()    { return _passed; };
+    float vetoPE()  { return _vetoPE; };
+    float beamPE()  { return _beamPE; };
+    float maxFrac() { return _maxfrac; };
 
   };
 }

@@ -28,7 +28,7 @@ namespace flashana {
 
   public:
 
-    enum QLLMode_t { kChi2, kLLHD };
+    enum QLLMode_t { kChi2, kLLHD, kLLR };
 
   private:
     /// Valid ctor hidden (singleton)
@@ -75,6 +75,7 @@ namespace flashana {
     const std::vector<double>& HistoryChi2() const { return _minimizer_record_chi2_v; }
     const std::vector<double>& HistoryX()    const { return _minimizer_record_x_v;    }
 
+
   protected:
 
     void _Configure_(const Config_t &pset);
@@ -100,6 +101,9 @@ namespace flashana {
     flashana::QCluster_t _var_trk;
     flashana::Flash_t    _hypothesis;  ///< Hypothesis PE distribution over PMTs
     flashana::Flash_t    _measurement; ///< Flash PE distribution over PMTs
+    double               _current_xoffset; ///< Last Minuit value for x-offset parameter
+    double               _xoffset_penalty_sigma; //< sigma used in x-offset penalty term
+    bool                 _minuit_penalize_x0_deviations;
 
     double _current_chi2;
     double _current_llhd;
@@ -120,6 +124,14 @@ namespace flashana {
     double _onepmt_xdiff_threshold;
     double _onepmt_pesum_threshold;
     double _onepmt_pefrac_threshold;
+    
+    // flags to indicate when cosmic discriminator corrections should be applied
+    bool   _cosmic_disc_correction;
+    bool   _apply_cosmic_disc_threshold;
+    bool   _skip_nodata_bins;
+    double _cosmic_disc_threshold;
+    bool   _run_migrad;
+    
   };
 
   /**

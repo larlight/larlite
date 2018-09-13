@@ -54,11 +54,17 @@ namespace phot{
     bool UseParameterization() const {return fParameterization;}
 
     sim::PhotonVoxelDef GetVoxelDef() const {return fVoxelDef; }
-    int NOpChannels() const { return fNOpDetChannels; } 
+    int NOpChannels() const { return fNOpDetChannels; }
 
-    static PhotonVisibilityService& GetME()
+    const std::string& GetLibraryFilename() { return fLibraryFile; }; // Allows one to check loaded filename
+
+    static PhotonVisibilityService& GetME(std::string filename="uboone_photon_library_v6_efield.root")
     {
-      if(!_me) _me = new PhotonVisibilityService;
+      // argument allows user to choose file loaded
+      // if relative, searches for file in designated folder
+      // if absolute, searches for file with given path
+      // see LoadLibrary()
+      if(!_me) _me = new PhotonVisibilityService(filename);
       return *_me;
     }
     

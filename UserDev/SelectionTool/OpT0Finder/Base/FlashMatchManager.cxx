@@ -248,12 +248,21 @@ namespace flashana {
   {
     if(!obj.Valid()) throw OpT0FinderException("Invalid Flash_t object cannot be registered!");
     _flash_v.push_back(obj);
+    _flash_iscosmic_v.push_back(false);
+  }
+
+  void FlashMatchManager::Add(flashana::Flash_t& obj, bool isCosmicDiscFlash ) {
+    // should just use default value for isCosmicDiscFlash instead of new method. but worrying about backwards compatibility.
+    if(!obj.Valid()) throw OpT0FinderException("Invalid Flash_t object cannot be registered!");
+    _flash_v.push_back(obj);
+    _flash_iscosmic_v.push_back(isCosmicDiscFlash);
   }
 
   void FlashMatchManager::Emplace(flashana::Flash_t&& obj)
   {
     if(!obj.Valid()) throw OpT0FinderException("Invalid Flash_t object cannot be registered!");
     _flash_v.emplace_back(std::move(obj));
+    _flash_iscosmic_v.push_back(false);
   }
   
   // CORE FUNCTION
@@ -322,6 +331,7 @@ namespace flashana {
 
         auto const& tpc   = _tpc_object_v[tpc_index_v[tpc_index]]; // Retrieve TPC object
         auto const& flash = _flash_v[flash_index];    // Retrieve flash
+	bool cosmictag    = _flash_iscosmic_v[flash_index]; // Retrieve flash cosmic disc tag
 
         if (tpc.size() == 0 )
           continue;
@@ -333,6 +343,7 @@ namespace flashana {
             continue;
         }
 
+	_alg_flash_match->setCosmicTagForFlash( cosmictag ); // set cosmic disc tag for flash
         auto res = _alg_flash_match->Match( tpc, flash ); // Run matching
 
         // ignore this match if the score is <= 0
@@ -422,6 +433,46 @@ namespace flashana {
     for (auto& name_ptr : _custom_alg_m)
       std::cout << "\t" << name_ptr.first << std::endl;
     std::cout << "---- END FLASH MATCH MANAGER PRINTING CONFIG ----" << std::endl;
+  }
+
+  void FlashMatchManager::PrintFullResult() {
+    std::cout << "======= FlashMatchManager: Full Results ==========" << std::endl;
+    if ( !_store_full ) {
+      std::cout << " Results not configured to be saved." << std::endl;
+      std::cout << "==================================================" << std::endl;
+      return;
+    }
+
+    // IDArray_t to retrieve candidate list of tpc/flash to be used for matching
+    //  note ID_t is just a size_t object
+    
+    IDArray_t tpc_index_v;
+    if (_alg_tpc_filter)
+      tpc_index_v = _alg_tpc_filter->Filter(_tpc_object_v);
+    else {
+      tpc_index_v.reserve(_tpc_object_v.size());
+      for (size_t i = 0; i < _tpc_object_v.size(); ++i) tpc_index_v.push_back(i);
+    }
+
+    IDArray_t flash_index_v;    
+    if (_alg_flash_filter)
+      flash_index_v = _alg_flash_filter->Filter(_flash_v);
+    else {
+      flash_index_v.reserve(_flash_v.size());
+      for (size_t i = 0; i < _flash_v.size(); ++i) flash_index_v.push_back(i);
+    }
+    
+    for ( size_t tpc_index = 0; tpc_index < tpc_index_v.size(); ++tpc_index) {
+      std::cout << "[TPC Index #" << tpc_index << "]" << std::endl;
+      for ( auto const& flash_index : flash_index_v) {
+	std::cout << "  Flash #" << flash_index << ":";
+	auto const &result = _res_tpc_flash_v[tpc_index][flash_index];
+	std::cout << " score=" << 1.0/result.score << std::endl;
+      }
+    }
+
+    std::cout << "==================================================" << std::endl;    
+    return;
   }
 }
 
