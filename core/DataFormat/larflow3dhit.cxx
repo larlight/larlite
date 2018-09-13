@@ -24,6 +24,8 @@ namespace larlite {
     shower_score = 0;
     renormed_track_score = 0;
     renormed_shower_score = 0;
+    src_infill = 0;
+    tar_infill.resize(2,0);
     
     clear_data();
   }
