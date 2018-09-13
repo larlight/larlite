@@ -59,6 +59,8 @@ namespace larlite{
     float shower_score;
     float renormed_track_score;
     float renormed_shower_score;
+    unsigned short src_infill; // source is on infill prediction. THIS SHOULD BE CONSIDERED A BOOL
+    std::vector<unsigned short> tar_infill; // target is on infill prediction. THIS SHOULD BE CONSIDERED A BOOL
     
   private:
     
