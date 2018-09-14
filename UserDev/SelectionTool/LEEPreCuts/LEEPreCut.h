@@ -86,10 +86,14 @@ namespace larlite {
     int   _vetoFirstBin;
 
   public:
-    int passes()    { return _passed; };
+    
+    int   passes()    { return _passed; };
     float vetoPE()  { return _vetoPE; };
     float beamPE()  { return _beamPE; };
-    float maxFrac() { return _maxfrac; };
+    float maxFrac() { return _maxfrac; }
+    int   beamFirstTick() { return _beamFirstBin; };    
+    int   vetoFirstTick() { return _vetoFirstBin; };
+    
 
   };
 }
