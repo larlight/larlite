@@ -29,6 +29,7 @@ namespace larlite {
     tar_infill.resize(2,0);
     X_truth.resize(3,0);
     trackid = 0;
+    dWall = 0;
     
     clear_data();
   }

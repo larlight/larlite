@@ -65,6 +65,8 @@ namespace larlite{
     std::vector<unsigned short> tar_infill; // target is on infill prediction. THIS SHOULD BE CONSIDERED A BOOL
     std::vector<float> X_truth; // true position from mctrack
     int trackid; //mctrtack id
+    float dWall; // mctruth min dist to wall
+    
   private:
     
   };
