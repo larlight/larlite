@@ -16,6 +16,7 @@ namespace larlite {
     idxhit = 0;
     matchquality = kNoMatch;
     consistency3d = kNoValue;
+    truthflag = kNoTruthMatch;
     center_y_dist = 4000;
     dy = 0;
     dz = 0;
