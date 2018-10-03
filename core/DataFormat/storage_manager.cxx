@@ -47,6 +47,7 @@
 #include "mceventweight.h"
 #include "swtrigger.h"
 #include "larflow3dhit.h"
+#include "larflowcluster.h"
 
 namespace larlite {
 
@@ -1200,6 +1201,9 @@ namespace larlite {
       break;
     case data::kLArFlow3DHit:
       _ptr_data_array[type][name]=new event_larflow3dhit(name);
+      break;
+    case data::kLArFlowCluster:
+      _ptr_data_array[type][name]=new event_larflowcluster(name);
       break;
     default:
       print(msg::kERROR,__FUNCTION__,Form("Event-data identifier not supported: %d",(int)type));
