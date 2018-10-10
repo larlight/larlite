@@ -28,13 +28,26 @@ namespace larlite{
   public:
     
     /// Default constructor
-  larflowcluster() : data_base(data::kLArFlowCluster) { clear_data(); }
+    larflowcluster() :
+    data_base(data::kLArFlowCluster),
+      isflashmatched(-1),
+      flash_tick(-1),
+      truthmatched_mctrackid(-1),
+      truthmatched_flashtick(-1)
+      { clear_data(); }
 
     void clear_data() { clear(); };
     
     /// Default destructor
     virtual ~larflowcluster(){}
+
+    // reco flash matching
+    int isflashmatched;
+    float flash_tick;
     
+    // truth-based flash matching
+    int truthmatched_mctrackid;
+    float truthmatched_flashtick;
   };
   
   /**
