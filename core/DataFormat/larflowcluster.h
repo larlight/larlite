@@ -48,6 +48,10 @@ namespace larlite{
     // truth-based flash matching
     int truthmatched_mctrackid;
     float truthmatched_flashtick;
+
+    std::vector<float> _flash_data_v;
+    std::vector<float> _flash_hypo_v;
+    
   };
   
   /**
