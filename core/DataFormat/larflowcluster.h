@@ -30,27 +30,49 @@ namespace larlite{
     /// Default constructor
     larflowcluster() :
     data_base(data::kLArFlowCluster),
-      isflashmatched(-1),
-      flash_tick(-1),
-      truthmatched_mctrackid(-1),
-      truthmatched_flashtick(-1)
+      isflashmatched(0),
+      flash_tick(0),
+      flash_time_us(0),
+      flashmatch_score(0),
+      matchedflash_producer(""),
+      matchedflash_idx(0),
+      has_truthmatch(0),
+      is_neutrino(0),
+      truthmatched_mctrackid(0),
+      truthmatched_flashtick(0)
       { clear_data(); }
 
-    void clear_data() { clear(); };
+    void clear_data() {
+      clear();
+      _flash_data_v.clear();
+      _flash_hypo_v.clear();
+      _flash_truthmatched_v.clear();
+    };
     
     /// Default destructor
     virtual ~larflowcluster(){}
 
     // reco flash matching
-    int isflashmatched;
-    float flash_tick;
+    int isflashmatched;     // found match-flash
+    float flash_tick;       // relative to tick 0 of TPC image
+    float flash_time_us;    // relative to trigger
+    float flashmatch_score; // score quality from flash-match algo
+    std::string matchedflash_producer; // producername for flash matched to cluster
+    int         matchedflash_idx;      // index of matched flash in event_opflash vector
+    /* std::vector<float>       alternative_match_score_v; */
+    /* std::vector<int>         alternative_match_idx_v; */
+    /* std::vector<std::string> alternative_match_producer_v; */
     
-    // truth-based flash matching
+    // reco-truth matched info
+    int has_truthmatch;
+    int is_neutrino;
     int truthmatched_mctrackid;
     float truthmatched_flashtick;
 
     std::vector<float> _flash_data_v;
     std::vector<float> _flash_hypo_v;
+    std::vector<float> _flash_truthmatched_v;
+
     
   };
   
