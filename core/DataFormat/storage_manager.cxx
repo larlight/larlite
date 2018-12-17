@@ -48,6 +48,7 @@
 #include "swtrigger.h"
 #include "larflow3dhit.h"
 #include "larflowcluster.h"
+#include "pixelmask.h"
 
 namespace larlite {
 
@@ -1204,6 +1205,9 @@ namespace larlite {
       break;
     case data::kLArFlowCluster:
       _ptr_data_array[type][name]=new event_larflowcluster(name);
+      break;
+    case data::kPixelMask:
+      _ptr_data_array[type][name]=new event_pixelmask(name);
       break;
     default:
       print(msg::kERROR,__FUNCTION__,Form("Event-data identifier not supported: %d",(int)type));
