@@ -34,6 +34,9 @@ namespace larlite {
        be modified when the crop only contains a portion of the object.
 
      We allow the fact that there is a 2D coordinate system overlaid on the 2D array
+
+     points provided are assumed to be (x,y) <--> (col,row)
+     however, when returning dense arrays, the values are in (row,col) order
     
   */
 
