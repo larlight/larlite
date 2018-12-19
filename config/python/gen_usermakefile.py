@@ -1,4 +1,4 @@
-import os,sys,commands
+import os,sys,subprocess
 
 # check if LARLITE_BASEDIR is defined. If not, nothing to do.
 if not 'LARLITE_BASEDIR' in os.environ:
@@ -31,7 +31,7 @@ else:
         print
         print ('\033[93m' + 'Packages not found:' + '\033[0m')
         for x in not_found:
-            print x
+            print (x)
     makefile=makefile.replace('USER_MODULE',valid_packages)
 
 fout=open('%s/GNUmakefile' % os.environ['LARLITE_USERDEVDIR'],'w')
