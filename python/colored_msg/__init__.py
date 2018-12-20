@@ -1,1 +1,1 @@
-from colored_msg import debug,info,warning,error
+from .colored_msg import debug,info,warning,error

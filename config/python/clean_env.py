@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os,sys
 cmd = ''
 if not len(sys.argv) == 2 or not 'LARLITE_BASEDIR' in os.environ or not sys.argv[1] in os.environ:
@@ -19,4 +20,4 @@ else:
         cmd = 'export %s=%s' % (e,v.replace(replace,''))
         while cmd.find('::') >= 0:
             cmd = cmd.replace('::',':')
-print cmd
+print(cmd)

@@ -4,6 +4,7 @@
 ROOTMAP=$(SHLIB:.so=.rootmap)
 LARLITE_BASIC_ROOTLIBS = $(shell root-config --libs)
 LARLITE_BASIC_ROOTINC  = $(shell root-config --cflags)
+LARLITE_PYTHON_CONFIG  = ${LARLITE_PYTHON)-config
 
 all: pre_build main_build 
 
