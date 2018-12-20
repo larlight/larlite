@@ -632,7 +632,7 @@ namespace larlite {
       }
       
       if(_mode==kREAD) break;
-
+      
     case kWRITE:
       sprintf(_buf,"Opening a file in kWRITE mode: %s",_out_fname.c_str());
       print(msg::kNORMAL,__FUNCTION__,_buf);
@@ -1495,6 +1495,64 @@ namespace larlite {
     
     return status;
   }
+
+  bool storage_manager::go_to( const unsigned int run_id, const unsigned int subrun_id, const unsigned int event_id ) {
+    // we cannot assume that the above indices are in order in a given tree (or chain)
+    // this makes smart random access routines impossible
+    // instead, we search sequentially through the index tree. however, we are usually coordinating between two files
+    // whose (rse) numbers are in the same order -- though one file might have entries missing.
+    // for that use, this isn't a disaster, as we start the sequential search from the last index and loop
+    //  back only once in the beginning to search
+    // for the coordination between truly randomly ordered files, the only thing we can do is compile an index map
+    //  as we go along, then using that to search after its been completely populated.
+    // also, we assume we have only one instance of r,s,e per file here.    
+    // we can do that in the future, maybe fill vector< struct index_t { run, subrun, event, instance, entry } >, sort it, then
+    //  freeze it after we've filled _nevents. Then we can use binary search. (not bothering to implement now)
+
+    bool status=true;
+    
+    if(_mode==kWRITE) {
+      Message::send(msg::kERROR,__FUNCTION__,
+		    "Cannot do look up with run_id, subrun_id, event_id in kWRITE mode.");
+      status=false;
+    }else if(!_nevents) {
+      Message::send(msg::kWARNING,__FUNCTION__,"Input file empty!");
+      status=false;
+    }
+
+    if (!status)
+      return status;
+    
+    size_t current_index = _index;    
+    size_t search_index  = current_index+1;
+    bool found = false;
+    while ( current_index!=search_index && !found) {
+      ULong_t bytes = _in_id_ch->GetEntry( search_index );
+      if ( bytes==0 ) {
+	// end of file, go to beginning
+	search_index = 0;
+      }
+      else {
+	if ( _run_id==run_id && _subrun_id==subrun_id && _event_id==event_id ) {
+	  // found
+	  found = true;
+	}
+      }
+    }
+    
+    // return result of search
+    if ( !found ) {
+      // reset the index tree state, return status = false;
+      _in_id_ch->GetEntry( current_index );
+      status = false;
+    }
+    else {
+      // found a matching entry
+      go_to( search_index );
+      status = true;
+    }
+    return status;
+  }
   
   bool storage_manager::next_event(bool store){
     
@@ -1532,6 +1590,7 @@ namespace larlite {
 
     return status;
   }
+
   
   bool storage_manager::read_event(){
     

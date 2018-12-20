@@ -174,6 +174,9 @@ namespace larlite {
     
     /// Move to the TTree entry with the provided index number
     bool go_to(UInt_t index, bool store=true);
+
+    /// Move to the TTree entry with the (run_id, subrun_id, event_id)
+    bool go_to( const unsigned int run_id, const unsigned int subrun_id, const unsigned int event_id );
     
     /// Close I/O file. 
     bool close(); 
