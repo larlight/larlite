@@ -192,8 +192,7 @@ namespace larutil{
       g3_Ez[i] = nullptr;
       g4_Ez[i] = nullptr;
     }
-    //std::string sce_file_path = Form("%s/LArUtil/dat/SCEoffsets_MicroBooNE_E273.root",getenv("LARLITE_COREDIR"));
-    std::string sce_file_path = "/home/vgenty/sw/larlite/core/LArUtil/dat/SCEoffsets_MicroBooNE_E273.root";
+    std::string sce_file_path = Form("%s/LArUtil/dat/SCEoffsets_MicroBooNE_E273.root",getenv("LARLITE_COREDIR"));
     Configure(sce_file_path);
   }
 
@@ -215,10 +214,10 @@ namespace larutil{
     //TFile inputfile(filename.c_str(), "READ");
     inputfile = new TFile(filename.c_str(), "READ");
 
-    std::cout << "@filename=" << filename << std::endl;
-    std::cout << "@filename=" << filename << std::endl;
-    std::cout << "@filename=" << filename << std::endl;
-    std::cout << "@filename=" << filename << std::endl;
+    // std::cout << "@filename=" << filename << std::endl;
+    // std::cout << "@filename=" << filename << std::endl;
+    // std::cout << "@filename=" << filename << std::endl;
+    // std::cout << "@filename=" << filename << std::endl;
     // for(int i = 0; i < 5; i++)
     //   {
     g1_x[0] = (TGraph*)inputfile->Get("deltaX/g1_0");
@@ -429,10 +428,10 @@ namespace larutil{
     g1_x[6] = (TGraph*)inputfile->Get("deltaX/g1_6");
     g2_x[6] = (TGraph*)inputfile->Get("deltaX/g2_6");
     g3_x[6] = (TGraph*)inputfile->Get("deltaX/g3_6");
-    std::cout << g4_x[6] << std::endl;
-    std::cout << (TGraph*)inputfile->Get("deltaX/g4_6") << std::endl;
+    //std::cout << g4_x[6] << std::endl;
+    //std::cout << (TGraph*)inputfile->Get("deltaX/g4_6") << std::endl;
     g4_x[6] = (TGraph*)inputfile->Get("deltaX/g4_6");
-    std::cout << g4_x[6] << std::endl;
+    //std::cout << g4_x[6] << std::endl;
     g5_x[6] = (TGraph*)inputfile->Get("deltaX/g5_6");
 
     g1_Ex[5] = (TGraph*)inputfile->Get("deltaExOverE/g1_5");
@@ -515,8 +514,8 @@ namespace larutil{
       {
 	for(int j = 0; j < 7; j++)
 	  {
-	    std::cout << "@j=" << j << " & zValNew=" << zValNew << std::endl;
-	    std::cout << g1_x[j] << std::endl;
+	    //std::cout << "@j=" << j << " & zValNew=" << zValNew << std::endl;
+	    //std::cout << g1_x[j] << std::endl;
 	    fflush(stdout);
 	    parA[0][j] = g1_x[j]->Eval(zValNew);
 	    parA[1][j] = g2_x[j]->Eval(zValNew);

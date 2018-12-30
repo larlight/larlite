@@ -237,6 +237,10 @@
 #pragma link C++ class larlite::storage_manager+;
 #pragma link C++ class larlite::storage_store+;
 
+#pragma link C++ class larlite::larflow3dhit+;
+#pragma link C++ class std::vector<larlite::larflow3dhit>+;
+#pragma link C++ class larlite::event_larflow3dhit+;
+
 /*
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_gtruth>();
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_mctruth>();
