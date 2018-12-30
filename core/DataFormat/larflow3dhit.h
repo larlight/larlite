@@ -41,6 +41,7 @@ namespace larlite{
     typedef enum { kQandCmatch=0, kCmatch, kClosestC, kNoMatch } MatchQuality_t; // quality of match
     typedef enum { kIn5mm=0, kIn10mm, kIn50mm, kOut50mm, kNoValue } Consistency_t; // distance b/n y2u and y2v
     typedef enum { kY2U=0, kY2V, kNumFlowDir } FlowDirection_t; 
+    typedef enum { kNoTruthMatch=0, kOnTrack, kOnSmear, kUnknown } TruthFlag_t; // should add kOnShower in the future?
     
     int tick;        // row
     int srcwire;     // column in source image
@@ -51,6 +52,7 @@ namespace larlite{
     MatchQuality_t matchquality; // quality of plane-correspondence match
     Consistency_t consistency3d; // flag for distance b/n y2u and y2v predicted spacepoints
     FlowDirection_t flowdir;     // flow direction used
+    TruthFlag_t truthflag; // do we have a matching mctruth?
     float center_y_dist;  // distance to center of y-image used for flow prediction
     float dy; //distance in y coord. between y2u and y2v predicted spacepoints
     float dz; //distance in z coord. between y2u and y2v predicted spacepoints
@@ -59,6 +61,11 @@ namespace larlite{
     float shower_score;
     float renormed_track_score;
     float renormed_shower_score;
+    unsigned short src_infill; // source is on infill prediction. THIS SHOULD BE CONSIDERED A BOOL
+    std::vector<unsigned short> tar_infill; // target is on infill prediction. THIS SHOULD BE CONSIDERED A BOOL
+    std::vector<float> X_truth; // true position from mctrack
+    int trackid; //mctrtack id
+    float dWall; // mctruth min dist to wall
     
   private:
     

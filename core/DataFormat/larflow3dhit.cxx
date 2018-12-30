@@ -16,6 +16,7 @@ namespace larlite {
     idxhit = 0;
     matchquality = kNoMatch;
     consistency3d = kNoValue;
+    truthflag = kNoTruthMatch;
     center_y_dist = 4000;
     dy = 0;
     dz = 0;
@@ -24,6 +25,11 @@ namespace larlite {
     shower_score = 0;
     renormed_track_score = 0;
     renormed_shower_score = 0;
+    src_infill = 0;
+    tar_infill.resize(2,0);
+    X_truth.resize(3,0);
+    trackid = 0;
+    dWall = 0;
     
     clear_data();
   }

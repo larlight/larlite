@@ -1,4 +1,4 @@
-import os,sys,commands
+import os,sys
 
 # check if LARLITE_BASEDIR is defined. If not, nothing to do.
 if not 'LARLITE_BASEDIR' in os.environ:

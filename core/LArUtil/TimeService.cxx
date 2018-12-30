@@ -24,7 +24,7 @@ namespace larutil {
   {
     fG4RefTime        = -4.05e3;
     fFramePeriod      =  1.6e3;
-    fTriggerOffsetTPC = -0.4e3;
+    fTriggerOffsetTPC = kDEFAULT_TRIG_OFFSET_TPC;//-0.4e3; //hack for MCC8
     fTriggerTime      =  4.05e3;
     fBeamGateTime     =  4.05e3;
 
