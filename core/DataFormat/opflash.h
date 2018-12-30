@@ -66,6 +66,7 @@ namespace larlite {
     bool  InBeamFrame()        const;
     int  OnBeamTime()          const;
     double TotalPE() const;
+    size_t nOpDets() const { return fPEperOpDet.size(); };
 
     friend bool           operator <  (const opflash & a, const opflash & b);
 

@@ -91,6 +91,18 @@ else
 	echo 
     fi
 fi
+
+# Python version
+if [[ -z $LARLITE_PYTHON_VERSION ]]; then
+    export LARLITE_PYTHON_VERSION=`python -V 2>&1 | awk '{ print $2 }' | sed 's/\./\ /g' | awk '{ print $1 }'`
+    echo "LARLITE_PYTHON_VERSION =  ${LARLITE_PYTHON_VERSION}"
+else
+    echo "LARLITE_PYTHON_VERSION =  ${LARLITE_PYTHON_VERSION} (ALREADY SPECIFIED)"
+fi
+
+export LARLITE_PYTHON="python${LARLITE_PYTHON_VERSION}"
+echo "LARLITE_PYTHON = ${LARLITE_PYTHON}"
+
 if [[ -z $ROOTSYS ]]; then
     case `uname -n` in
 	(houston.nevis.columbia.edu)
@@ -122,8 +134,8 @@ fi
 
 
 
-python $LARLITE_BASEDIR/config/python/gen_usermakefile.py
-python $LARLITE_BASEDIR/config/python/gen_topmakefile.py
+${LARLITE_PYTHON} $LARLITE_BASEDIR/config/python/gen_usermakefile.py
+${LARLITE_PYTHON} $LARLITE_BASEDIR/config/python/gen_topmakefile.py
 export LD_LIBRARY_PATH=$LARLITE_LIBDIR:$LD_LIBRARY_PATH
 export PYTHONPATH=$LARLITE_BASEDIR/python:$PYTHONPATH
 if [ $LARLITE_OS = 'Darwin' ]; then
@@ -133,13 +145,13 @@ export PATH=$LARLITE_BASEDIR/bin:$PATH
 if [ $ENABLE_LARLITE_ALIAS ]; then
     alias maketop="make --directory=$LARLITE_BASEDIR"
     alias cdtop="cd $LARLITE_BASEDIR"
-    alias llgen_package="python $LARLITE_BASEDIR/bin/gen_package"
-    alias llgen_repository="python $LARLITE_BASEDIR/bin/gen_repository"
-    alias llgen_class_empty="python $LARLITE_BASEDIR/bin/gen_class_empty"
-    alias llgen_class_anaunit="python $LARLITE_BASEDIR/bin/gen_class_anaunit"
-    alias llgen_class_erana="python $LARLITE_BASEDIR/bin/gen_class_erana"
-    alias llgen_class_eralgo="python $LARLITE_BASEDIR/bin/gen_class_eralgo"
-    alias llgen_class_erfilter="python $LARLITE_BASEDIR/bin/gen_class_erfilter"
+    alias llgen_package="${LARLITE_PYTHON} $LARLITE_BASEDIR/bin/gen_package"
+    alias llgen_repository="${LARLITE_PYTHON} $LARLITE_BASEDIR/bin/gen_repository"
+    alias llgen_class_empty="${LARLITE_PYTHON} $LARLITE_BASEDIR/bin/gen_class_empty"
+    alias llgen_class_anaunit="${LARLITE_PYTHON} $LARLITE_BASEDIR/bin/gen_class_anaunit"
+    alias llgen_class_erana="${LARLITE_PYTHON} $LARLITE_BASEDIR/bin/gen_class_erana"
+    alias llgen_class_eralgo="${LARLITE_PYTHON} $LARLITE_BASEDIR/bin/gen_class_eralgo"
+    alias llgen_class_erfilter="${LARLITE_PYTHON} $LARLITE_BASEDIR/bin/gen_class_erfilter"
 fi
 echo
 echo "Finish configuration. To build, type:"

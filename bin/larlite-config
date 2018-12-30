@@ -20,12 +20,20 @@ while test $# -gt 0; do
       --libs)
 	  out="-L${LARLITE_LIBDIR} -lLArLite_Analysis -lLArLite_LArUtil -lLArLite_DataFormat -lLArLite_Base "
 	  ;;
+      --python)
+	  out="${LARLITE_PYTHON}"
+	  ;;
+      --python-config)
+	  out="${LARLITE_PYTHON}-config"
+	  ;;
       --help)
 	  ### Print a help message
           echo "Usage: `basename $0` [options]"
 	  echo ""
 	  echo "  --includes ... print out includes"
 	  echo "  --libs     ... print out libraries"
+	  echo "  --python   ... print out python used"
+	  echo "  --python-config ... print out python-config used"	  
 	  exit 0
 	  ;;
       *)
