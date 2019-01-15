@@ -58,7 +58,7 @@ namespace larlite{
     
   protected:
 
-    char _buf[200];                ///< char buffer for message manipulation
+    char _buf[5120];                ///< char buffer for message manipulation
     std::vector<bool> _verbosity;  ///< holder for enabled message levels
     msg::Level _verbosity_level;   ///< holder for specified verbosity level
     std::string _name;             ///< class name holder
