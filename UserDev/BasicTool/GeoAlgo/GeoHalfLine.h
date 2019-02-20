@@ -15,7 +15,7 @@
 #define BASICTOOL_GEOHALFLINE_H
 
 #include "GeoVector.h"
-namespace geoalgo {
+namespace larlite::geoalgo {
   /**
      \class HalfLine
      @brief Representation of a 3D semi-infinite line.

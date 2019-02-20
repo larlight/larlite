@@ -3,7 +3,7 @@
 
 #include "GeoLine.h"
 
-namespace geoalgo {
+namespace larlite::geoalgo {
 
   Line::Line() 
     : _pt1(3)

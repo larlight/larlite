@@ -23,7 +23,7 @@ namespace geotree{
     // if sibling does not have the same parent -> remove sibling relation
     if (_coll->GetNode(sibling).hasParent() == false){
       if (_verbose) { std::cout << "\tsibling does not have the same parent. Remove sibling realtion " << std::endl; } 
-      Correlation corr(-1, ::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
+      Correlation corr(-1, larlite::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
       nodePair = std::make_pair(id,sibling);
       _corr_v[nodePair] = corr;
     }
@@ -31,7 +31,7 @@ namespace geotree{
     // if parent exists but is different -> remove sibling relation
     else if (_coll->GetNode(sibling).getParent() != parent){
       if (_verbose) { std::cout << "\tsibling parent different from this node's parent. Remove sibling realtion " << std::endl; } 
-      Correlation corr(-1, ::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
+      Correlation corr(-1, larlite::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
       nodePair = std::make_pair(id,sibling);
       _corr_v[nodePair] = corr;
     }

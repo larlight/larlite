@@ -23,7 +23,7 @@
 #include "GeoSphere.h"
 #include "GeoAlgoException.h"
 #include <map>
-namespace geoalgo {
+namespace larlite::geoalgo {
 
   /**
      \class GeoObjCollection

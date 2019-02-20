@@ -17,7 +17,7 @@
 #include "GeoAlgo.h"
 #include "GeoLine.h"
 
-namespace geoalgo {
+namespace larlite::geoalgo {
   /**
      \class Cylinder
      @brief Representation of a 3D Cylinder volume.

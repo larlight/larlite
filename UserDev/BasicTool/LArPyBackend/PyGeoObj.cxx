@@ -5,7 +5,7 @@
 
 namespace larpy {
 
-  PyObject* PyGeoObj::Convert(const ::geoalgo::Point_t& pt       ) const
+  PyObject* PyGeoObj::Convert(const larlite::geoalgo::Point_t& pt       ) const
   {
     PyObject* pvec = PyList_New(pt.size());
 
@@ -14,7 +14,7 @@ namespace larpy {
       if(PyList_SetItem(pvec, i, PyFloat_FromDouble(pt[i]))) {
 
 	Py_DECREF(pvec);
-	throw ::geoalgo::GeoAlgoException("<<Convert>> failed!");
+	throw larlite::geoalgo::GeoAlgoException("<<Convert>> failed!");
       }
     }
     return pvec;
@@ -30,13 +30,13 @@ namespace larpy {
       if( PyList_SetItem(pvec, i, col[i]) ) {
 
 	Py_DECREF(pvec);
-	throw ::geoalgo::GeoAlgoException("<<Convert>> failed!");
+	throw larlite::geoalgo::GeoAlgoException("<<Convert>> failed!");
       }
     }
     return pvec;
   }
   */
-  PyObject* PyGeoObj::Convert(const ::geoalgo::LineSegment_t& pt ) const
+  PyObject* PyGeoObj::Convert(const larlite::geoalgo::LineSegment_t& pt ) const
   {
     PyObject* pres = PyList_New(3);
 
@@ -46,7 +46,7 @@ namespace larpy {
 	PyList_SetItem(pres,0,x) ) {
       Py_DECREF(pres);
       Py_DECREF(x);
-      throw ::geoalgo::GeoAlgoException("<<Convert>> failed!");
+      throw larlite::geoalgo::GeoAlgoException("<<Convert>> failed!");
     }
 
     PyObject* y = PyList_New(2);
@@ -55,7 +55,7 @@ namespace larpy {
 	PyList_SetItem(pres,1,y) ) {
       Py_DECREF(pres);
       Py_DECREF(y);
-      throw ::geoalgo::GeoAlgoException("<<Convert>> failed!");
+      throw larlite::geoalgo::GeoAlgoException("<<Convert>> failed!");
     }
 
     PyObject* z = PyList_New(2);
@@ -64,14 +64,14 @@ namespace larpy {
 	PyList_SetItem(pres,2,z) ) {
       Py_DECREF(pres);
       Py_DECREF(z);
-      throw ::geoalgo::GeoAlgoException("<<Convert>> failed!");
+      throw larlite::geoalgo::GeoAlgoException("<<Convert>> failed!");
     }
     
     return pres;
   }
 
 
-  PyObject* PyGeoObj::Convert(const ::geoalgo::HalfLine_t& pt ) const
+  PyObject* PyGeoObj::Convert(const larlite::geoalgo::HalfLine_t& pt ) const
   {
     PyObject* pres = PyList_New(3);
 
@@ -81,7 +81,7 @@ namespace larpy {
 	PyList_SetItem(pres,0,x) ) {
       Py_DECREF(pres);
       Py_DECREF(x);
-      throw ::geoalgo::GeoAlgoException("<<Convert>> failed!");
+      throw larlite::geoalgo::GeoAlgoException("<<Convert>> failed!");
     }
 
     PyObject* y = PyList_New(2);
@@ -90,7 +90,7 @@ namespace larpy {
 	PyList_SetItem(pres,1,y) ) {
       Py_DECREF(pres);
       Py_DECREF(y);
-      throw ::geoalgo::GeoAlgoException("<<Convert>> failed!");
+      throw larlite::geoalgo::GeoAlgoException("<<Convert>> failed!");
     }
 
     PyObject* z = PyList_New(2);
@@ -99,14 +99,14 @@ namespace larpy {
 	PyList_SetItem(pres,2,z) ) {
       Py_DECREF(pres);
       Py_DECREF(z);
-      throw ::geoalgo::GeoAlgoException("<<Convert>> failed!");
+      throw larlite::geoalgo::GeoAlgoException("<<Convert>> failed!");
     }
     
     return pres;
   }
 
 
-  PyObject* PyGeoObj::Convert(const ::geoalgo::AABox_t& box) const
+  PyObject* PyGeoObj::Convert(const larlite::geoalgo::AABox_t& box) const
   {
 
     double x_min = box.Min()[0];
@@ -116,25 +116,25 @@ namespace larpy {
     double y_max = box.Max()[1];
     double z_max = box.Max()[2];
 
-    std::vector< ::geoalgo::LineSegment_t> lines;
+    std::vector< larlite::geoalgo::LineSegment_t> lines;
     lines.reserve(12);
 
-    lines.push_back(::geoalgo::LineSegment_t(x_min,y_min,z_min, x_min,y_min,z_max));
-    lines.push_back(::geoalgo::LineSegment_t(x_min,y_min,z_min, x_min,y_max,z_min));
-    lines.push_back(::geoalgo::LineSegment_t(x_min,y_min,z_min, x_max,y_min,z_min));
+    lines.push_back(larlite::geoalgo::LineSegment_t(x_min,y_min,z_min, x_min,y_min,z_max));
+    lines.push_back(larlite::geoalgo::LineSegment_t(x_min,y_min,z_min, x_min,y_max,z_min));
+    lines.push_back(larlite::geoalgo::LineSegment_t(x_min,y_min,z_min, x_max,y_min,z_min));
 
-    lines.push_back(::geoalgo::LineSegment_t(x_min,y_min,z_max, x_max,y_min,z_max));
-    lines.push_back(::geoalgo::LineSegment_t(x_min,y_min,z_max, x_min,y_max,z_max));
+    lines.push_back(larlite::geoalgo::LineSegment_t(x_min,y_min,z_max, x_max,y_min,z_max));
+    lines.push_back(larlite::geoalgo::LineSegment_t(x_min,y_min,z_max, x_min,y_max,z_max));
     
-    lines.push_back(::geoalgo::LineSegment_t(x_max,y_min,z_min, x_max,y_min,z_max));
-    lines.push_back(::geoalgo::LineSegment_t(x_max,y_min,z_min, x_max,y_max,z_min));
+    lines.push_back(larlite::geoalgo::LineSegment_t(x_max,y_min,z_min, x_max,y_min,z_max));
+    lines.push_back(larlite::geoalgo::LineSegment_t(x_max,y_min,z_min, x_max,y_max,z_min));
 
-    lines.push_back(::geoalgo::LineSegment_t(x_min,y_max,z_min, x_min,y_max,z_max));
-    lines.push_back(::geoalgo::LineSegment_t(x_min,y_max,z_min, x_max,y_max,z_min));
+    lines.push_back(larlite::geoalgo::LineSegment_t(x_min,y_max,z_min, x_min,y_max,z_max));
+    lines.push_back(larlite::geoalgo::LineSegment_t(x_min,y_max,z_min, x_max,y_max,z_min));
 
-    lines.push_back(::geoalgo::LineSegment_t(x_max,y_max,z_max, x_min,y_max,z_max));
-    lines.push_back(::geoalgo::LineSegment_t(x_max,y_max,z_max, x_max,y_min,z_max));
-    lines.push_back(::geoalgo::LineSegment_t(x_max,y_max,z_max, x_max,y_max,z_min));
+    lines.push_back(larlite::geoalgo::LineSegment_t(x_max,y_max,z_max, x_min,y_max,z_max));
+    lines.push_back(larlite::geoalgo::LineSegment_t(x_max,y_max,z_max, x_max,y_min,z_max));
+    lines.push_back(larlite::geoalgo::LineSegment_t(x_max,y_max,z_max, x_max,y_max,z_min));
 
     PyObject* pres = PyTuple_New(lines.size());
     bool status = true;
@@ -163,7 +163,7 @@ namespace larpy {
     }
     if(!status) {
       Py_DECREF(pres);
-      throw ::geoalgo::GeoAlgoException("<<Convert>> failed!");
+      throw larlite::geoalgo::GeoAlgoException("<<Convert>> failed!");
     }
     
     return pres;
@@ -193,7 +193,7 @@ namespace larpy {
       poly_pt_v.push_back(std::make_pair(x_min,z_min));
       poly_pt_v.push_back(std::make_pair(y_min,y_max));
     }else
-      throw ::geoalgo::GeoAlgoException("<<Convert>> failed!");
+      throw larlite::geoalgo::GeoAlgoException("<<Convert>> failed!");
 
     // Create 5-points to define one plane polygon
     PyObject* poly_xy = PyTuple_New(5);
@@ -213,7 +213,7 @@ namespace larpy {
     }
     if(!status) {
       Py_DECREF(poly_xy);
-      throw ::geoalgo::GeoAlgoException("<<Convert>> failed!");	
+      throw larlite::geoalgo::GeoAlgoException("<<Convert>> failed!");	
     }
 
     // Create z-axis point tuple
@@ -222,7 +222,7 @@ namespace larpy {
 	PyTuple_SetItem(poly_z,1,PyFloat_FromDouble(poly_pt_v[5].second)) ) {
       Py_DECREF(poly_xy);
       Py_DECREF(poly_z);
-      throw ::geoalgo::GeoAlgoException("<<Convert>> failed!");
+      throw larlite::geoalgo::GeoAlgoException("<<Convert>> failed!");
     }
 
     // Create result
@@ -230,20 +230,20 @@ namespace larpy {
     if( PyTuple_SetItem(pres,0,poly_xy) ) {
       Py_DECREF(pres);
       Py_DECREF(poly_z);
-      throw ::geoalgo::GeoAlgoException("<<Convert>> failed!");
+      throw larlite::geoalgo::GeoAlgoException("<<Convert>> failed!");
     }
     if( PyTuple_SetItem(pres,1,poly_z) ) {
       Py_DECREF(pres);
-      throw ::geoalgo::GeoAlgoException("<<Convert>> failed!");
+      throw larlite::geoalgo::GeoAlgoException("<<Convert>> failed!");
     }
     */
     return pres;
   }
 
-  PyObject* PyGeoObj::Convert(const ::geoalgo::Trajectory_t& trj  ) const
+  PyObject* PyGeoObj::Convert(const larlite::geoalgo::Trajectory_t& trj  ) const
   {
     if(trj.size()<2)
-      throw ::geoalgo::GeoAlgoException("<<Convert>> Can't process trajectory w/ size <2!");
+      throw larlite::geoalgo::GeoAlgoException("<<Convert>> Can't process trajectory w/ size <2!");
 
     PyObject* pres = PyList_New(3);
     PyObject* x    = PyList_New(trj.size());
@@ -262,13 +262,13 @@ namespace larpy {
 	Py_DECREF(pres);
 	Py_DECREF(y);
 	Py_DECREF(z);
-	throw ::geoalgo::GeoAlgoException("<<Convert>> Failed!");
+	throw larlite::geoalgo::GeoAlgoException("<<Convert>> Failed!");
       }
       if( PyList_SetItem(y,i,PyFloat_FromDouble(tmp_pt[1])) ) {
 	Py_DECREF(pres);
 	Py_DECREF(x);
 	Py_DECREF(z);
-	throw ::geoalgo::GeoAlgoException("<<Convert>> Failed!");
+	throw larlite::geoalgo::GeoAlgoException("<<Convert>> Failed!");
       }
       if(fill_z) tmp_z = tmp_pt[2];
 
@@ -276,7 +276,7 @@ namespace larpy {
 	Py_DECREF(pres);
 	Py_DECREF(x);
 	Py_DECREF(y);
-	throw ::geoalgo::GeoAlgoException("<<Convert>> Failed!");
+	throw larlite::geoalgo::GeoAlgoException("<<Convert>> Failed!");
       }
     }
 
@@ -284,27 +284,27 @@ namespace larpy {
 	Py_DECREF(pres);
 	Py_DECREF(y);
 	Py_DECREF(z);
-	throw ::geoalgo::GeoAlgoException("<<Convert>> Failed!");
+	throw larlite::geoalgo::GeoAlgoException("<<Convert>> Failed!");
     }
 
     if( PyList_SetItem(pres,1,y) ) {
 	Py_DECREF(pres);
 	Py_DECREF(x);
 	Py_DECREF(z);
-	throw ::geoalgo::GeoAlgoException("<<Convert>> Failed!");
+	throw larlite::geoalgo::GeoAlgoException("<<Convert>> Failed!");
     }
 
     if( PyList_SetItem(pres,2,z) ) {
 	Py_DECREF(pres);
 	Py_DECREF(x);
 	Py_DECREF(y);
-	throw ::geoalgo::GeoAlgoException("<<Convert>> Failed!");
+	throw larlite::geoalgo::GeoAlgoException("<<Convert>> Failed!");
     }
     
     return pres;
   }
 
-  PyObject* PyGeoObj::Convert(const std::map<geoalgo::Point_t,std::string>& labels) const
+  PyObject* PyGeoObj::Convert(const std::map<larlite::geoalgo::Point_t,std::string>& labels) const
   {
     PyObject* pres  = PyList_New(labels.size());
 
@@ -334,7 +334,7 @@ namespace larpy {
 
     if(failed) {
       Py_DECREF(pres);
-      throw ::geoalgo::GeoAlgoException("<<Convert>> Failed!");
+      throw larlite::geoalgo::GeoAlgoException("<<Convert>> Failed!");
     }
 
     return pres;

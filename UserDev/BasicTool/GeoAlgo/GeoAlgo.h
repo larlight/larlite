@@ -23,7 +23,7 @@
 #include "GeoAABox.h"
 #include "GeoSphere.h"
 
-namespace geoalgo {
+namespace larlite::geoalgo {
 
   /**
      \class GeoAlgo

@@ -3,7 +3,7 @@
 
 #include "GeoCone.h"
 #include <sstream>
-namespace geoalgo {
+namespace larlite::geoalgo {
 
   Cone::Cone() : HalfLine()
   {

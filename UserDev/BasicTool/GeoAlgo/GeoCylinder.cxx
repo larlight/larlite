@@ -3,7 +3,7 @@
 
 #include "GeoCylinder.h"
 
-namespace geoalgo {
+namespace larlite::geoalgo {
 
   Cylinder::Cylinder() 
     : Line()

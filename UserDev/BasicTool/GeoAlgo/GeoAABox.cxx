@@ -3,7 +3,7 @@
 
 #include "GeoAABox.h"
 
-namespace geoalgo {
+namespace larlite::geoalgo {
 
   AABox::AABox() 
     : _min(3)

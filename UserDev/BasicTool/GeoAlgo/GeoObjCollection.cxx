@@ -3,7 +3,7 @@
 
 #include "GeoObjCollection.h"
 
-namespace geoalgo {
+namespace larlite::geoalgo {
 
   GeoObjCollection::GeoObjCollection() 
   {}

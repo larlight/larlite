@@ -16,7 +16,7 @@
 
 #include "GeoVector.h"
 
-namespace geoalgo {
+namespace larlite::geoalgo {
   /**
      \class LineSegment
      @brief Representation of a simple 3D line segment

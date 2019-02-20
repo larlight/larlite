@@ -3,7 +3,7 @@
 
 #include <limits>
 #include <climits>
-namespace geoalgo {
+namespace larlite::geoalgo {
 
   static const double kPI = 3.141592653589793238462643383279502884;
 

@@ -3,7 +3,7 @@
 
 #include "GeoLineSegment.h"
 
-namespace geoalgo {
+namespace larlite::geoalgo {
 
   LineSegment::LineSegment()
     : _start(3)

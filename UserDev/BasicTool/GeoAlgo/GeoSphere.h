@@ -16,7 +16,7 @@
 
 #include "GeoVector.h"
 
-namespace geoalgo {
+namespace larlite::geoalgo {
   /**
      \class Spehere
      @brief Representation of a 3D sphere
@@ -45,7 +45,7 @@ namespace geoalgo {
     Sphere(const Point_t& A, const Point_t& B, const Point_t& C, const Point_t& D);
 
     // Alternative ctor (5) - Set of points
-    Sphere(const std::vector< ::geoalgo::Point_t>& pts);
+    Sphere(const std::vector< larlite::geoalgo::Point_t>& pts);
 
     //
     // Getters
@@ -102,7 +102,7 @@ namespace geoalgo {
     
     template <class T> Sphere(const std::vector<T>& pts)
     {
-      std::vector< ::geoalgo::Vector> geo_pts;
+      std::vector< larlite::geoalgo::Vector> geo_pts;
       geo_pts.reserve(pts);
       for(auto const& p : pts) geo_pts.emplace_back(p);
       (*this) = Sphere(geo_pts);

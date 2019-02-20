@@ -2,7 +2,7 @@
 #define BASICTOOL_GEOHALFLINE_CXX
 
 #include "GeoHalfLine.h"
-namespace geoalgo {
+namespace larlite::geoalgo {
 
   HalfLine::HalfLine()
     : _start(3)

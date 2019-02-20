@@ -3,7 +3,7 @@
 
 #include "GeoTrajectory.h"
 #include <sstream>
-namespace geoalgo {
+namespace larlite::geoalgo {
 
   Trajectory::Trajectory(size_t npoints, size_t ndimension) 
     : std::vector<geoalgo::Point_t>(npoints, Point_t(ndimension))

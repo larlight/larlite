@@ -16,7 +16,7 @@
 
 #include "GeoHalfLine.h"
 
-namespace geoalgo {
+namespace larlite::geoalgo {
   /**
      \class Line
      @brief Representation of a 3D infinite line.

@@ -3,7 +3,7 @@
 
 #include "GeoAlgo.h"
 
-namespace geoalgo {
+namespace larlite::geoalgo {
 
   // Ref. RTCD 5.3.2 p. 177
   // Intersection of a HalfLine w/ AABox

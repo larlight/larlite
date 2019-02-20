@@ -16,7 +16,7 @@
 
 #include "GeoVector.h"
 #include "GeoHalfLine.h"
-namespace geoalgo {
+namespace larlite::geoalgo {
   /**
      \class Cone
      @brief Representation of a 3D semi-infinite line.

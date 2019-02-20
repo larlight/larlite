@@ -16,7 +16,7 @@
 
 #include "GeoHalfLine.h"
 
-namespace geoalgo {
+namespace larlite::geoalgo {
   /**
      \class AABox
      @brief Representation of a 3D rectangular box which sides are aligned w/ coordinate axis.

@@ -17,7 +17,7 @@
 #include <iostream>
 #include <exception>
 
-namespace geoalgo {
+namespace larlite::geoalgo {
 /**
    \class GeoAlgoException
    User defined class GeoAlgoException ... these comments are used to generate

@@ -146,26 +146,26 @@ namespace geotree{
 	  for (auto &s : siblings){
 	    auto const vtx2 = _coll.GetNode(ID).getVtx(s);
 	    if (vtx != vtx2)
-	      throw ::geoalgo::GeoAlgoException("Multiple siblings @ different Vertices. Should have been solved by SortSiblings!");
+	      throw ::larlite::geoalgo::GeoAlgoException("Multiple siblings @ different Vertices. Should have been solved by SortSiblings!");
 	  }//for all siblings
 	}// if multiple siblings
 	// create new node to host the new siblings
 	NodeID_t id = _coll.GetNumNodes();
 	// Make sure this ID does not exist
 	if (_coll.NodeExists(id) == true)
-	  throw ::geoalgo::GeoAlgoException(Form("About to create a NodeID that already exists (%i). Not acceptable!",(int)id));
+	  throw ::larlite::geoalgo::GeoAlgoException(Form("About to create a NodeID that already exists (%i). Not acceptable!",(int)id));
 	_coll.AddNode(id);
 	// add child nodes to newly created node
 	_coll.GetNode(id).addChild(ID);
 	_coll.GetNode(ID).setParent(id);
 	// also add correlations so they show up on correlation matrix (not too important...)
-	AddCorrelation(id,ID,1.,::geoalgo::Point_t(3),::geotree::RelationType_t::kParent);
+	AddCorrelation(id,ID,1.,::larlite::geoalgo::Point_t(3),::geotree::RelationType_t::kParent);
 	// loop over siblings and add them
 	for (auto& sib : siblings){ 
 	  // add node parentage
 	  _coll.GetNode(id).addChild(sib);
 	  _coll.GetNode(sib).setParent(id);
-	AddCorrelation(id,sib,1.,::geoalgo::Point_t(3),::geotree::RelationType_t::kParent);
+	AddCorrelation(id,sib,1.,::larlite::geoalgo::Point_t(3),::geotree::RelationType_t::kParent);
 	  // and correlations
 	}
 	if (_verbose) { std::cout << "\tadding node " << id << " to tree nodes" << std::endl; }
@@ -187,7 +187,7 @@ namespace geotree{
   // Correlation provided indicates relationship between node id1 and node id2
   void Manager::AddCorrelation(const NodeID_t id1, const NodeID_t id2,
 			       const double score,
-			       const geoalgo::Point_t& vtx,
+			       const larlite::geoalgo::Point_t& vtx,
 			       const geotree::RelationType_t type){
 
     if (type == geotree::RelationType_t::kUnknown)
@@ -195,9 +195,9 @@ namespace geotree{
 
     // make sure nodes exist
     if (_coll.NodeExists(id1) == false)
-      throw ::geoalgo::GeoAlgoException("Node ID not found!");
+      throw ::larlite::geoalgo::GeoAlgoException("Node ID not found!");
     if (_coll.NodeExists(id2) == false)
-      throw ::geoalgo::GeoAlgoException("Node ID not found!");
+      throw ::larlite::geoalgo::GeoAlgoException("Node ID not found!");
 
     //type returned is the relation of 1 w.r.t. 2
     // find "inverse" relation to assign to 2 w.r.t. 1
@@ -226,14 +226,14 @@ namespace geotree{
 
   void Manager::EditCorrelation(const NodeID_t id1, const NodeID_t id2,
 				const double score,
-				const geoalgo::Point_t& vtx,
+				const larlite::geoalgo::Point_t& vtx,
 				const geotree::RelationType_t type){
 
     // make sure nodes exist
     if (_coll.NodeExists(id1) == false)
-      throw ::geoalgo::GeoAlgoException("Node ID not found!");
+      throw ::larlite::geoalgo::GeoAlgoException("Node ID not found!");
     if (_coll.NodeExists(id2) == false)
-      throw ::geoalgo::GeoAlgoException("Node ID not found!");
+      throw ::larlite::geoalgo::GeoAlgoException("Node ID not found!");
 
     //type returned is the relation of 1 w.r.t. 2
     // find "inverse" relation to assign to 2 w.r.t. 1
@@ -265,9 +265,9 @@ namespace geotree{
 
     // make sure nodes exist
     if (_coll.NodeExists(id1) == false)
-      throw ::geoalgo::GeoAlgoException("Node ID not found!");
+      throw ::larlite::geoalgo::GeoAlgoException("Node ID not found!");
     if (_coll.NodeExists(id2) == false)
-      throw ::geoalgo::GeoAlgoException("Node ID not found!");
+      throw ::larlite::geoalgo::GeoAlgoException("Node ID not found!");
 
     if (_verbose) { std::cout << "\tEditing Correlation Score..." << std::endl; }
     _coll.GetNode(id2).editCorrelation(id1,score);
@@ -278,13 +278,13 @@ namespace geotree{
 
 
   void Manager::EditCorrelation(const NodeID_t id1, const NodeID_t id2,
-				const geoalgo::Point_t& vtx){
+				const larlite::geoalgo::Point_t& vtx){
 
     // make sure nodes exist
     if (_coll.NodeExists(id1) == false)
-      throw ::geoalgo::GeoAlgoException("Node ID not found!");
+      throw ::larlite::geoalgo::GeoAlgoException("Node ID not found!");
     if (_coll.NodeExists(id2) == false)
-      throw ::geoalgo::GeoAlgoException("Node ID not found!");
+      throw ::larlite::geoalgo::GeoAlgoException("Node ID not found!");
 
     if (_verbose) { std::cout << "\tEditing Correlation Vtx..." << std::endl; }
     _coll.GetNode(id2).editCorrelation(id1,vtx);
@@ -299,9 +299,9 @@ namespace geotree{
 
     // make sure nodes exist
     if (_coll.NodeExists(id1) == false)
-      throw ::geoalgo::GeoAlgoException("Node ID not found!");
+      throw ::larlite::geoalgo::GeoAlgoException("Node ID not found!");
     if (_coll.NodeExists(id2) == false)
-      throw ::geoalgo::GeoAlgoException("Node ID not found!");
+      throw ::larlite::geoalgo::GeoAlgoException("Node ID not found!");
 
     //type returned is the relation of 1 w.r.t. 2
     // find "inverse" relation to assign to 2 w.r.t. 1
@@ -333,9 +333,9 @@ namespace geotree{
 
     // make sure nodes exist
     if (_coll.NodeExists(id1) == false)
-      throw ::geoalgo::GeoAlgoException("Node ID not found!");
+      throw ::larlite::geoalgo::GeoAlgoException("Node ID not found!");
     if (_coll.NodeExists(id2) == false)
-      throw ::geoalgo::GeoAlgoException("Node ID not found!");
+      throw ::larlite::geoalgo::GeoAlgoException("Node ID not found!");
 
     if (_verbose) { std::cout << "\tRemoving Correlation..." << std::endl; }
     _coll.GetNode(id1).eraseCorrelation(id2);
@@ -488,7 +488,7 @@ namespace geotree{
     // - find the best sibling
     if (_loose){
       // find all vertices of siblings
-      std::vector<::geoalgo::Vector_t> siblingVtxList;
+      std::vector<::larlite::geoalgo::Vector_t> siblingVtxList;
       // siblings contains NodeID of all siblings. Use to get vtx
       for (auto& sID : siblings)
 	siblingVtxList.push_back(_coll.GetNode(ID).getVtx(sID));
@@ -498,7 +498,7 @@ namespace geotree{
 	for (size_t v=0; v < siblingVtxList.size(); v++)
 	  std::cout << "\tSib: " << siblings[v] << "\tVtx: "<< siblingVtxList[v] << std::endl;
       }
-      ::geoalgo::Point_t newVtx = _geoAlgo.boundingSphere(siblingVtxList).Center();
+      ::larlite::geoalgo::Point_t newVtx = _geoAlgo.boundingSphere(siblingVtxList).Center();
       if (_verbose) { std::cout << "\taverage vtx from " << siblings.size() << " siblings is: " << newVtx << std::endl; }
       // edit all correlations so that vertices are updated.
       for (auto& sID : siblings)
@@ -510,7 +510,7 @@ namespace geotree{
 	  if (_coll.GetNode(siblings[s1]).isCorrelated(siblings[s2])){
 	    // if correlation is not sibling then throw exception!
 	    if (_coll.GetNode(siblings[s1]).getRelation(siblings[s2]) != ::geotree::RelationType_t::kSibling)
-	      throw ::geoalgo::GeoAlgoException("About to edit what you think is sibling relation but is not!");
+	      throw ::larlite::geoalgo::GeoAlgoException("About to edit what you think is sibling relation but is not!");
 	    EditCorrelation(siblings[s1],siblings[s2],newVtx);
 	  }// if the two siblings are already correlated
 	  else{

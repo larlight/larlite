@@ -33,7 +33,7 @@ namespace geotree{
      between two nodes.
      It is composed of:
      - a score (double)
-     - a vertex (::geoalgo::Point_t)
+     - a vertex (larlite::geoalgo::Point_t)
      - a type (::geotree::RelationType_t)
   */
   
@@ -42,14 +42,14 @@ namespace geotree{
   public:
 
     /// Default constructor
-    Correlation() { _score = 0.; _vtx = ::geoalgo::Point_t(); _type = ::geotree::RelationType_t::kUnknown; }
+    Correlation() { _score = 0.; _vtx = larlite::geoalgo::Point_t(); _type = ::geotree::RelationType_t::kUnknown; }
 
     /// Constructor with information specified
-    Correlation(double s, ::geoalgo::Point_t vtx, ::geotree::RelationType_t type);
+    Correlation(double s, larlite::geoalgo::Point_t vtx, ::geotree::RelationType_t type);
     
     /// Getters
     double Score() const { return _score; }
-    ::geoalgo::Point_t Vtx() const { return _vtx; }
+    larlite::geoalgo::Point_t Vtx() const { return _vtx; }
     ::geotree::RelationType_t Relation() const { return _type; }
 
     /// Default destructor
@@ -59,18 +59,18 @@ namespace geotree{
     void EditCorrelation(double s) { _score = s; }
 
     /// Correlation editing: vtx
-    void EditCorrelation(::geoalgo::Point_t vtx) { _vtx = vtx; }
+    void EditCorrelation(larlite::geoalgo::Point_t vtx) { _vtx = vtx; }
 
     /// Correlation editing: type
     void EditCorrelation(::geotree::RelationType_t type) { _type = type; }
     
     /// Correlation editing: edit all fields
-    void EditCorrelation(double s, ::geoalgo::Point_t vtx, ::geotree::RelationType_t type);
+    void EditCorrelation(double s, larlite::geoalgo::Point_t vtx, ::geotree::RelationType_t type);
     
   private: 
     
     double _score;
-    ::geoalgo::Point_t _vtx;
+    larlite::geoalgo::Point_t _vtx;
     ::geotree::RelationType_t _type;
 
   };

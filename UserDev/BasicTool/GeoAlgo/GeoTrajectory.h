@@ -16,7 +16,7 @@
 
 #include "GeoVector.h"
 
-namespace geoalgo {
+namespace larlite::geoalgo {
 
   /**
      \class Trajectory

@@ -3,7 +3,7 @@
 
 #include "GeoDirectedLine.h"
 
-namespace geoalgo {
+namespace larlite::geoalgo {
 
   DirectedLine::DirectedLine() : Line()
   {}
