@@ -16,7 +16,8 @@
 
 #include "GeoVector.h"
 
-namespace larlite::geoalgo {
+namespace larlite {
+  namespace geoalgo {
 
   /**
      \class Trajectory
@@ -93,7 +94,7 @@ namespace larlite::geoalgo {
   typedef Trajectory Trajectory_t;
 
 }
-
+}
 #endif
 /** @} */ // end of doxygen group 
 

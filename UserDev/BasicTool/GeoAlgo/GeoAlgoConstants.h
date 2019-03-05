@@ -3,7 +3,8 @@
 
 #include <limits>
 #include <climits>
-namespace larlite::geoalgo {
+namespace larlite {
+  namespace geoalgo {
 
   static const double kPI = 3.141592653589793238462643383279502884;
 
@@ -13,5 +14,6 @@ namespace larlite::geoalgo {
 
   static const double kMIN_DOUBLE = std::numeric_limits<double>::min();
 
+}
 }
 #endif

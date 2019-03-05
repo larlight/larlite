@@ -3,7 +3,8 @@
 
 #include "GeoSphere.h"
 
-namespace larlite::geoalgo {
+namespace larlite {
+  namespace geoalgo {
 
   Sphere::Sphere() : _center (3)
 		   , _radius (0)
@@ -370,7 +371,7 @@ namespace larlite::geoalgo {
   { if(r<0) throw GeoAlgoException("Only positive value allowed for radius"); }
   
 }
-
+}
 #endif
 
 

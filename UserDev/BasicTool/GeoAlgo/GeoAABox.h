@@ -16,7 +16,8 @@
 
 #include "GeoHalfLine.h"
 
-namespace larlite::geoalgo {
+namespace larlite {
+  namespace geoalgo {
   /**
      \class AABox
      @brief Representation of a 3D rectangular box which sides are aligned w/ coordinate axis.
@@ -75,6 +76,7 @@ namespace larlite::geoalgo {
   };
 
   typedef AABox AABox_t;
+}
 }
 #endif
 /** @} */ // end of doxygen group 

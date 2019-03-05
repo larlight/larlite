@@ -19,7 +19,8 @@
 #include <TVector3.h>
 #include <TLorentzVector.h>
 
-namespace larlite::geoalgo {
+namespace larlite {
+  namespace geoalgo {
 
   // Forward declaration (don't worry)
   class Trajectory;
@@ -199,6 +200,7 @@ namespace larlite::geoalgo {
   typedef Vector Vector_t;
   typedef Vector Point_t;
 }
+}
 
 // Define a pointer comparison                                                                                                                     
 #ifndef __GCCXML__
@@ -210,9 +212,8 @@ namespace std {
     bool operator()( const larlite::geoalgo::Vector* lhs, const larlite::geoalgo::Vector* rhs )
     { return (*lhs) < (*rhs); }
   };
-}
 #endif
-
+}
 #endif
 /** @} */ // end of doxygen group 
 

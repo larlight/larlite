@@ -16,7 +16,8 @@
 
 #include "GeoLine.h"
 
-namespace larlite::geoalgo {
+namespace larlite {
+  namespace geoalgo {
   /**
      \class DirectedLine
      @brief Representation of a 3D infinite line.
@@ -52,6 +53,7 @@ namespace larlite::geoalgo {
   };
 
   typedef DirectedLine DirectedLine_t;
+}
 }
 #endif
 /** @} */ // end of doxygen group 

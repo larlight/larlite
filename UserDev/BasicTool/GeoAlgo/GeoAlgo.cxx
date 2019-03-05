@@ -3,7 +3,8 @@
 
 #include "GeoAlgo.h"
 
-namespace larlite::geoalgo {
+namespace larlite {
+  namespace geoalgo {
 
   // Ref. RTCD 5.3.2 p. 177
   // Intersection of a HalfLine w/ AABox
@@ -1111,5 +1112,6 @@ namespace larlite::geoalgo {
     return _WelzlSphere_(pts, numPts-1, sosPts);
   }
   
+}
 }
 #endif

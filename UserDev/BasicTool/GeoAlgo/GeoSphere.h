@@ -16,7 +16,8 @@
 
 #include "GeoVector.h"
 
-namespace larlite::geoalgo {
+namespace larlite {
+  namespace geoalgo {
   /**
      \class Spehere
      @brief Representation of a 3D sphere
@@ -117,6 +118,7 @@ namespace larlite::geoalgo {
   };
   
   typedef Sphere Sphere_t;
+}
 }
 #endif
 /** @} */ // end of doxygen group 
