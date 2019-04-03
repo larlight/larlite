@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
   std::string producer(argv[1]);
   std::vector<larlite::storage_manager*> in_mgr_v;
   size_t min_entries=1e10;
-  for(size_t i=0; i<(argc-2); ++i) {
+  for(int i=0; i<(argc-2); ++i) {
     //std::cout<<"Listing files for IO " << i << std::endl;
     auto in_mgr = new larlite::storage_manager(larlite::storage_manager::kREAD);
     std::ifstream fin(argv[i+2]);
