@@ -20,6 +20,7 @@ typedef _object PyObject;
 
 #ifndef __CINT__
 #include "Python.h"
+#include "bytesobject.h" // python2 pystring compatibility with pybytes object
 #endif
 
 #include <map>

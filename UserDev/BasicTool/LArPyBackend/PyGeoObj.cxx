@@ -321,7 +321,7 @@ namespace larpy {
       if( PyList_SetItem(tmp_label,0,PyFloat_FromDouble(pt_label.first[0])) ||
 	  PyList_SetItem(tmp_label,1,PyFloat_FromDouble(pt_label.first[1])) ||
 	  PyList_SetItem(tmp_label,2,PyFloat_FromDouble(pt_label.first[2])) ||
-	  PyList_SetItem(tmp_label,3,PyString_FromString(pt_label.second.c_str())) ) {
+	  PyList_SetItem(tmp_label,3,PyUnicode_FromString(pt_label.second.c_str())) ) {
 	Py_DECREF(tmp_label);
 	failed = true;
 	break;

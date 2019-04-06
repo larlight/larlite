@@ -13,7 +13,11 @@ OBJECTS = $(SOURCES:.cxx=.o)
 # include options for this package
 INCFLAGS  = -I.                       #Include itself
 INCFLAGS += $(shell basictool-config --includes)
-INCFLAGS += $(shell python-config --includes)
+ifeq ("${LARLITE_PYTHON_VERSION}","3")
+  INCFLAGS += $(shell python3-config --includes)
+else
+  INCFLAGS += $(shell python-config --includes)
+endif
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
@@ -25,8 +29,13 @@ include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
 # Use build compiler to pre-process macros instead of rootcint
 CINTFLAGS += -p
 
+ifeq ("${LARLITE_PYTHON_VERSION}","3")
+LDFLAGS += -L$(shell python3-config --prefix)/lib 
+LDFLAGS += $(shell python3-config --libs)
+else
 LDFLAGS += -L$(shell python-config --prefix)/lib 
 LDFLAGS += $(shell python-config --libs)
+endif
 LDFLAGS += -L$(LARLITE_LIBDIR) -lBasicTool_GeoAlgo
 
 # call the common GNUmakefile
