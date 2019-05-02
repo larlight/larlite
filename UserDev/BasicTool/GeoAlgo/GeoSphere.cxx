@@ -3,7 +3,8 @@
 
 #include "GeoSphere.h"
 
-namespace geoalgo {
+namespace larlite {
+  namespace geoalgo {
 
   Sphere::Sphere() : _center (3)
 		   , _radius (0)
@@ -319,7 +320,7 @@ namespace geoalgo {
   
   
   // Alternative ctor (5) - Set of points
-  Sphere::Sphere(const std::vector< ::geoalgo::Point_t>& pts)
+  Sphere::Sphere(const std::vector< larlite::geoalgo::Point_t>& pts)
     : _center(0,0,0)
     , _radius(0)
   {
@@ -370,7 +371,7 @@ namespace geoalgo {
   { if(r<0) throw GeoAlgoException("Only positive value allowed for radius"); }
   
 }
-
+}
 #endif
 
 

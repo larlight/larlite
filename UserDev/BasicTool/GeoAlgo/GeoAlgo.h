@@ -23,7 +23,8 @@
 #include "GeoAABox.h"
 #include "GeoSphere.h"
 
-namespace geoalgo {
+namespace larlite {
+  namespace geoalgo {
 
   /**
      \class GeoAlgo
@@ -473,7 +474,7 @@ namespace geoalgo {
 
   };
 }
-
+}
 #endif
 /** @} */ // end of doxygen group 
 

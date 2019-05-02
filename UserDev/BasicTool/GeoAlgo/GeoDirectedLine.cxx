@@ -3,7 +3,8 @@
 
 #include "GeoDirectedLine.h"
 
-namespace geoalgo {
+namespace larlite {
+  namespace geoalgo {
 
   DirectedLine::DirectedLine() : Line()
   {}
@@ -24,6 +25,7 @@ namespace geoalgo {
   Vector_t DirectedLine::Dir() const
   { return _pt2 - _pt1; }
   
+}
 }
 #endif
 

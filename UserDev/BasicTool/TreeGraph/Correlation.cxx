@@ -5,7 +5,7 @@
 
 namespace geotree{
 
-  Correlation::Correlation(double s, ::geoalgo::Point_t vtx,
+  Correlation::Correlation(double s, ::larlite::geoalgo::Point_t vtx,
 			   ::geotree::RelationType_t type)
   {
     _score = s;
@@ -13,7 +13,7 @@ namespace geotree{
     _type  = type;
   }
 
-  void Correlation::EditCorrelation(double s, ::geoalgo::Point_t vtx,
+  void Correlation::EditCorrelation(double s, ::larlite::geoalgo::Point_t vtx,
 			   ::geotree::RelationType_t type)
   {
     _score = s;

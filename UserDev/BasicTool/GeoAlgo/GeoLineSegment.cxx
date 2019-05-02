@@ -3,7 +3,8 @@
 
 #include "GeoLineSegment.h"
 
-namespace geoalgo {
+namespace larlite {
+  namespace geoalgo {
 
   LineSegment::LineSegment()
     : _start(3)
@@ -47,6 +48,6 @@ namespace geoalgo {
   void LineSegment::DirReset() { _dir = _end - _start; }
 
 }
-
+}
 #endif
 

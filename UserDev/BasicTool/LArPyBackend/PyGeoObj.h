@@ -42,14 +42,14 @@ namespace larpy {
     /// Default destructor
     virtual ~PyGeoObj(){};
 
-    PyObject* Convert(const ::geoalgo::Point_t& pt        ) const;
+    PyObject* Convert(const larlite::geoalgo::Point_t& pt        ) const;
     //PyObject* Convert(const std::string& col              ) const;
-    PyObject* Convert(const ::geoalgo::LineSegment_t& seg ) const;
-    PyObject* Convert(const ::geoalgo::HalfLine_t& seg    ) const;
-    PyObject* Convert(const ::geoalgo::Trajectory_t& trj  ) const;
-    PyObject* Convert(const ::geoalgo::AABox_t& box       ) const;
+    PyObject* Convert(const larlite::geoalgo::LineSegment_t& seg ) const;
+    PyObject* Convert(const larlite::geoalgo::HalfLine_t& seg    ) const;
+    PyObject* Convert(const larlite::geoalgo::Trajectory_t& trj  ) const;
+    PyObject* Convert(const larlite::geoalgo::AABox_t& box       ) const;
 		      
-    PyObject* Convert(const std::map<geoalgo::Point_t,std::string>& label) const;
+    PyObject* Convert(const std::map<larlite::geoalgo::Point_t,std::string>& label) const;
   };
   
 }

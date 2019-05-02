@@ -16,7 +16,8 @@
 
 #include "GeoVector.h"
 #include "GeoHalfLine.h"
-namespace geoalgo {
+namespace larlite {
+  namespace geoalgo {
   /**
      \class Cone
      @brief Representation of a 3D semi-infinite line.
@@ -74,6 +75,7 @@ namespace geoalgo {
   };
   
   typedef Cone Cone_t;
+}
 }
 #endif
 /** @} */ // end of doxygen group 

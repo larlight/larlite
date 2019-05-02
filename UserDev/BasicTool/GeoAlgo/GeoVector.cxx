@@ -9,7 +9,8 @@
 #include <cmath>
 #include <limits>
 
-namespace geoalgo {
+namespace larlite {
+  namespace geoalgo {
 
   Vector::Vector(const double x, const double y) : Vector(2)
   { (*this)[0] = x; (*this)[1] = y; }
@@ -184,7 +185,7 @@ namespace geoalgo {
 
 
 }
-
+}
 #endif
 
 

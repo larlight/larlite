@@ -2,7 +2,8 @@
 #define BASICTOOL_GEOHALFLINE_CXX
 
 #include "GeoHalfLine.h"
-namespace geoalgo {
+namespace larlite {
+  namespace geoalgo {
 
   HalfLine::HalfLine()
     : _start(3)
@@ -51,6 +52,7 @@ namespace geoalgo {
     //throw GeoAlgoException("<<Normalize>> cannot normalize inf-length direction vector!");
     _dir /= l;
   }
+}
 }
 #endif
 

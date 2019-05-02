@@ -3,7 +3,8 @@
 
 #include "GeoCone.h"
 #include <sstream>
-namespace geoalgo {
+namespace larlite {
+  namespace geoalgo {
 
   Cone::Cone() : HalfLine()
   {
@@ -62,6 +63,7 @@ namespace geoalgo {
   }
   
   void Cone::Radius(const double r) { _radius = r; _angle = atan(_radius/_length); }
+}
 }
 #endif
 

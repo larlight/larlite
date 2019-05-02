@@ -23,7 +23,8 @@
 #include "GeoSphere.h"
 #include "GeoAlgoException.h"
 #include <map>
-namespace geoalgo {
+namespace larlite {
+  namespace geoalgo {
 
   /**
      \class GeoObjCollection
@@ -118,6 +119,7 @@ namespace geoalgo {
 
   };
   
+}
 }
 #endif
 /** @} */ // end of doxygen group 

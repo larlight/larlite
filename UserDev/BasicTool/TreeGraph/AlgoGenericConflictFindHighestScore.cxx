@@ -27,14 +27,14 @@ namespace geotree{
     // if parent score is higher than sibling's
     if (parentScore > siblingScore){
       if (_verbose) { std::cout << "\tParent's score is larger than sibling's. Remove corr. w/ sibling " << std::endl; } 
-      Correlation corr(-1, ::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
+      Correlation corr(-1, larlite::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
       nodePair = std::make_pair(id,sibling);
       _corr_v[nodePair] = corr;
     }
     else{
       // if sibling's score is larger
       if (_verbose) { std::cout << "\tSibling's score is larger than parent's. Remove corr. w/ parent" << std::endl; } 
-      Correlation corr(-1, ::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
+      Correlation corr(-1, larlite::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
       nodePair = std::make_pair(id,parent);
       _corr_v[nodePair] = corr;
     }

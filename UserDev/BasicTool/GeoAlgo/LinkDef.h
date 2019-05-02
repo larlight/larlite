@@ -9,34 +9,34 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ namespace geoalgo+;
-#pragma link C++ class geoalgo::Vector+;
-#pragma link C++ class std::vector<geoalgo::Vector>+;
-#pragma link C++ class std::vector<std::vector<geoalgo::Vector> >+;
-#pragma link C++ class std::map<geoalgo::Vector,string>+;
-#pragma link C++ class geoalgo::Trajectory+;
-#pragma link C++ class std::vector<geoalgo::Trajectory>+;
-#pragma link C++ class geoalgo::HalfLine+;
-#pragma link C++ class std::vector<geoalgo::HalfLine>+;
-#pragma link C++ class geoalgo::Line+;
-#pragma link C++ class std::vector<geoalgo::Line>+;
-#pragma link C++ class geoalgo::DirectedLine+;
-#pragma link C++ class std::vector<geoalgo::DirectedLine>+;
-#pragma link C++ class geoalgo::LineSegment+;
-#pragma link C++ class std::vector<geoalgo::LineSegment>+;
-#pragma link C++ class geoalgo::AABox+;
-#pragma link C++ class std::vector<geoalgo::AABox>+;
-#pragma link C++ class geoalgo::Cylinder+;
-#pragma link C++ class std::vector<geoalgo::Cylinder>+;
-#pragma link C++ class geoalgo::Cone+;
-#pragma link C++ class std::vector<geoalgo::Cone>+;
-#pragma link C++ class geoalgo::Sphere+;
-#pragma link C++ class std::vector<geoalgo::Sphere>+;
-#pragma link C++ class std::pair<geoalgo::Vector,string>+;
-#pragma link C++ class std::map<geoalgo::Vector,string>+;
+#pragma link C++ namespace larlite::geoalgo+;
+#pragma link C++ class larlite::geoalgo::Vector+;
+#pragma link C++ class std::vector<larlite::geoalgo::Vector>+;
+#pragma link C++ class std::vector<std::vector<larlite::geoalgo::Vector> >+;
+#pragma link C++ class std::map<larlite::geoalgo::Vector,string>+;
+#pragma link C++ class larlite::geoalgo::Trajectory+;
+#pragma link C++ class std::vector<larlite::geoalgo::Trajectory>+;
+#pragma link C++ class larlite::geoalgo::HalfLine+;
+#pragma link C++ class std::vector<larlite::geoalgo::HalfLine>+;
+#pragma link C++ class larlite::geoalgo::Line+;
+#pragma link C++ class std::vector<larlite::geoalgo::Line>+;
+#pragma link C++ class larlite::geoalgo::DirectedLine+;
+#pragma link C++ class std::vector<larlite::geoalgo::DirectedLine>+;
+#pragma link C++ class larlite::geoalgo::LineSegment+;
+#pragma link C++ class std::vector<larlite::geoalgo::LineSegment>+;
+#pragma link C++ class larlite::geoalgo::AABox+;
+#pragma link C++ class std::vector<larlite::geoalgo::AABox>+;
+#pragma link C++ class larlite::geoalgo::Cylinder+;
+#pragma link C++ class std::vector<larlite::geoalgo::Cylinder>+;
+#pragma link C++ class larlite::geoalgo::Cone+;
+#pragma link C++ class std::vector<larlite::geoalgo::Cone>+;
+#pragma link C++ class larlite::geoalgo::Sphere+;
+#pragma link C++ class std::vector<larlite::geoalgo::Sphere>+;
+#pragma link C++ class std::pair<larlite::geoalgo::Vector,string>+;
+#pragma link C++ class std::map<larlite::geoalgo::Vector,string>+;
 
-#pragma link C++ class geoalgo::GeoAlgo+;
-#pragma link C++ class geoalgo::GeoObjCollection+;
+#pragma link C++ class larlite::geoalgo::GeoAlgo+;
+#pragma link C++ class larlite::geoalgo::GeoObjCollection+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif

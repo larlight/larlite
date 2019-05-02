@@ -62,7 +62,7 @@ namespace geotree{
     /// eg: type == Child => id2 is Child of id1
     void AddCorrelation(const NodeID_t id1, const NodeID_t id2,
 			const double score,
-			const geoalgo::Point_t& vtx,
+			const larlite::geoalgo::Point_t& vtx,
 			const geotree::RelationType_t type);
 
     /// CompareNodes: act on result of correlation check
@@ -70,14 +70,14 @@ namespace geotree{
     /// eg: type == Child => id2 is Child of id1
     void EditCorrelation(const NodeID_t id1, const NodeID_t id2,
 			 const double score,
-			 const geoalgo::Point_t& vtx,
+			 const larlite::geoalgo::Point_t& vtx,
 			 const geotree::RelationType_t type);
 
     void EditCorrelation(const NodeID_t id1, const NodeID_t id2,
 			 const double score);
 
     void EditCorrelation(const NodeID_t id1, const NodeID_t id2,
-			 const geoalgo::Point_t& vtx);
+			 const larlite::geoalgo::Point_t& vtx);
 
     void EditCorrelation(const NodeID_t id1, const NodeID_t id2,
 			 const geotree::RelationType_t type);
@@ -162,7 +162,7 @@ namespace geotree{
     bool IsSubNode(NodeID_t search, NodeID_t top);
 
     /// geoalgo instance to find "average" vertex
-    ::geoalgo::GeoAlgo _geoAlgo;
+    ::larlite::geoalgo::GeoAlgo _geoAlgo;
 
     /// multiple parents algorithm
     AlgoMultipleParentsBase*         _algoMultipleParents;

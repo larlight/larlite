@@ -17,7 +17,8 @@
 #include "GeoAlgo.h"
 #include "GeoLine.h"
 
-namespace geoalgo {
+namespace larlite {
+  namespace geoalgo {
   /**
      \class Cylinder
      @brief Representation of a 3D Cylinder volume.
@@ -62,6 +63,7 @@ namespace geoalgo {
   };
 
   typedef Cylinder Cylinder_t;
+}
 }
 #endif
 /** @} */ // end of doxygen group 

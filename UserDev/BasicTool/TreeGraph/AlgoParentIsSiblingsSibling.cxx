@@ -31,13 +31,13 @@ namespace geotree{
     double B = _coll->GetNode(parent).getScore(sibling);
     if (A > B){
       if (_verbose) { std::cout << "keep sibling. Remove relation between parent and sibling" << std::endl; }
-      Correlation corr(-1, ::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
+      Correlation corr(-1, larlite::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
       nodePair = std::make_pair(parent,sibling);
       _corr_v[nodePair] = corr;
     }
     else{
       if (_verbose) { std::cout << "keep parent. Remove relation with sibling" << std::endl; }
-      Correlation corr(-1, ::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
+      Correlation corr(-1, larlite::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
       nodePair = std::make_pair(id,sibling);
       _corr_v[nodePair] = corr;
     }
