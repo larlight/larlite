@@ -1,4 +1,5 @@
-import os,sys
+import os,sys,subprocess
+# commands used in python2?
 
 # check if LARLITE_BASEDIR is defined. If not, nothing to do.
 if not 'LARLITE_BASEDIR' in os.environ:

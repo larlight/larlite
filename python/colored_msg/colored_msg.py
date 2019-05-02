@@ -15,12 +15,12 @@ class colored_msg:
     def info(cls,msg):
         if int(cls.level)<=1:
             print('\033[92m[INFO]   \033[00m',msg)
-    
+
     @classmethod
     def warning(cls,msg):
         if int(cls.level)<=2:
             print('\033[95m[WARNING]\033[00m',msg)
-    
+
     @classmethod
     def error(cls,msg):
         if int(cls.level)<=3:
