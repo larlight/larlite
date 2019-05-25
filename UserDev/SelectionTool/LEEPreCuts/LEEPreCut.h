@@ -29,6 +29,8 @@ namespace larlite {
   
   public:
 
+    typedef enum { kBNB=0, kMC, kEXTBNB, kOVERLAY } FileType_t;
+
     /// Default constructor
     LEEPreCut() : _tree(nullptr) { _name="LEEPreCut"; _fout=0; }
 
@@ -52,6 +54,11 @@ namespace larlite {
     */
     virtual bool finalize();
 
+    /** Apply precuts */
+    bool apply( const larlite::event_ophit& ophit_v );
+
+    /** Set default parameters */
+    void setDefaults( larlite::LEEPreCut::FileType_t ft=kBNB );
 
   protected:
     TTree* _tree;
@@ -67,7 +74,7 @@ namespace larlite {
     int fWinStartTick;
     int fWinEndTick;
     int fVetoStartTick;
-    int fVetoEndTick;    
+    int fVetoEndTick;
 
     float fPEThreshold;
     float fVetoPEThresh;
