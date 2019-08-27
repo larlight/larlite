@@ -192,8 +192,8 @@ namespace larutil{
       g3_Ez[i] = nullptr;
       g4_Ez[i] = nullptr;
     }
-    //std::string sce_file_path = Form("%s/LArUtil/dat/SCEoffsets_MicroBooNE_E273.root",getenv("LARLITE_COREDIR"));
-    std::string sce_file_path = "/home/vgenty/sw/larlite/core/LArUtil/dat/SCEoffsets_MicroBooNE_E273.root";
+    std::string sce_file_path = Form("%s/LArUtil/dat/SCEoffsets_MicroBooNE_E273.root",getenv("LARLITE_COREDIR"));
+    //std::string sce_file_path = "/home/vgenty/sw/larlite/core/LArUtil/dat/SCEoffsets_MicroBooNE_E273.root";
     Configure(sce_file_path);
   }
 
