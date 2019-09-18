@@ -26,6 +26,12 @@ namespace larlite{
   class hit;
   class event_hit;
 
+  class crthit;
+  class event_crthit;
+
+  class crttrack;
+  class event_crttrack;
+
   class cosmictag;
   class event_cosmictag;
 

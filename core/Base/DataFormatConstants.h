@@ -64,6 +64,8 @@ namespace larlite{
       kRawDigit,           ///< raw::RawDigit
       kWire,               ///< recob::Wire
       kHit,                ///< recob::Hit
+      kCRTHit,             ///< crt::CRTHit
+      kCRTTrack,             ///< crt::CRTTrack
       kCosmicTag,          ///< anab::CosmicTag 
       kOpHit,              ///< opdet::OpHit
       kOpFlash,            ///< opdet::OpFlash
@@ -130,6 +132,7 @@ namespace larlite{
       "rawdigit",
       "wire",
       "hit",
+      "crthit",
       "cosmictag",
       "ophit",
       "opflash",
