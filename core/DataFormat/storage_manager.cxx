@@ -1533,23 +1533,38 @@ namespace larlite {
       status=false;
     }
 
+    if ( run_id==data::kINVALID_UINT || subrun_id==data::kINVALID_UINT || event_id==data::kINVALID_UINT ) {
+      Message::send(msg::kERROR,__FUNCTION__,
+		    "Invalid run_id, subrun_id, event_id given.");
+      status = false;
+    }
+    
     if (!status)
       return status;
     
     size_t current_index = _index;    
-    size_t search_index  = current_index+1;
+    size_t search_index  = current_index;
+    if ( _index==data::kINVALID_UINT )
+      search_index = 0;
+    if ( search_index>=1 ) search_index--;
+    
+    ULong_t bytes = 1;
     bool found = false;
-    while ( current_index!=search_index && !found) {
-      ULong_t bytes = _in_id_ch->GetEntry( search_index );
+    bool end_reached = false;
+    while ( (current_index!=search_index || !end_reached)  && !found ) {
+      bytes = _in_id_ch->GetEntry( search_index );
       if ( bytes==0 ) {
 	// end of file, go to beginning
 	search_index = 0;
+        end_reached = true;
       }
       else {
 	if ( _run_id==run_id && _subrun_id==subrun_id && _event_id==event_id ) {
 	  // found
 	  found = true;
+          break;
 	}
+        search_index++;        
       }
     }
     
@@ -1561,7 +1576,7 @@ namespace larlite {
     }
     else {
       // found a matching entry
-      go_to( search_index );
+      go_to( search_index, false );
       status = true;
     }
     return status;
@@ -1765,7 +1780,7 @@ namespace larlite {
       } // loop over all types
 
     }
-    
+
     _index++;
     _nevents_read++;
     return true;
@@ -1892,8 +1907,9 @@ namespace larlite {
       _last_subrun_id = _subrun_id;
     }
 
-    if(_mode==kWRITE)
+    if(_mode==kWRITE) {
       _index++;
+    }
 
     _nevents_written++;
     //_event_wf->clear_data();
