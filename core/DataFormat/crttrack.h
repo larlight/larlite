@@ -1,5 +1,5 @@
 /**
- * \class CRTHit
+ * \class CRTTrack
  *
  * \ingroup larlite
  *
@@ -34,16 +34,18 @@ namespace larlite {
     std::vector<uint8_t> feb_id;
     std::map< uint8_t, std::vector<std::pair<int,float> > > pesmap;
     float peshit;
-     
+
+    // CRT GPS clock in s     
     uint32_t ts0_s;
     uint16_t ts0_s_err;
-      
+    // CRT GPS clock in ns
     uint32_t ts0_ns;
     uint16_t ts0_ns_err;
 
+    // CRT hit time w.r.t. BNB trigger
     int32_t ts1_ns;
     uint16_t ts1_ns_err;
-      
+    
     int plane1;
     int plane2;
 
@@ -64,10 +66,18 @@ namespace larlite {
     float thetaxy;
     float phiz;
 
+    // CRT GPS time of 1st hit 
     uint32_t ts0_ns_h1;
     uint16_t ts0_ns_err_h1;
+    // CRT GPS time of 1nd hit
     uint32_t ts0_ns_h2;
     uint16_t ts0_ns_err_h2;      
+
+    // time of 1st hit in TPC time frame
+    float ts2_ns_h1;
+    // time of 2nd hit in TPC time frame
+    float ts2_ns_h2;
+
 
   };
   /**

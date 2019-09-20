@@ -21,7 +21,9 @@ namespace larlite {
     ts0_ns_corr=0;
 
     ts1_ns=0;
-      
+
+    ts2_ns=0;
+
     plane=-1;
     x_pos=-1;
     x_err=-1;

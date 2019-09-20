@@ -46,6 +46,9 @@ namespace larlite {
 
     ts0_ns_h2=0;
     ts0_ns_err_h2=0;
+
+    ts2_ns_h1=0;
+    ts2_ns_h2=0;
     
     clear_data();
   }
