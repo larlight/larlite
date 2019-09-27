@@ -59,6 +59,10 @@
 #pragma link C++ class std::vector<larlite::rawdigit>+;
 #pragma link C++ class larlite::event_rawdigit+;
 
+#pragma link C++ class larlite::daqheadertimeuboone+;
+#pragma link C++ class std::vector<larlite::daqheadertimeuboone>+;
+#pragma link C++ class larlite::event_daqheadertimeuboone+;
+
 #pragma link C++ class larlite::wire+;
 #pragma link C++ class std::vector<larlite::wire>+;
 #pragma link C++ class larlite::event_wire+;

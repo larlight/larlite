@@ -62,10 +62,11 @@ namespace larlite{
       kSimChannel,         ///< sim::SimChannel
       kMCShower,           ///< sim::MCShower
       kRawDigit,           ///< raw::RawDigit
+      kDAQHeaderTimeUBooNE,///< raw::DAQHeaderTimeUBooNE
       kWire,               ///< recob::Wire
       kHit,                ///< recob::Hit
       kCRTHit,             ///< crt::CRTHit
-      kCRTTrack,             ///< crt::CRTTrack
+      kCRTTrack,           ///< crt::CRTTrack
       kCosmicTag,          ///< anab::CosmicTag 
       kOpHit,              ///< opdet::OpHit
       kOpFlash,            ///< opdet::OpFlash
@@ -130,9 +131,11 @@ namespace larlite{
       "simch",
       "mcshower",
       "rawdigit",
+      "daqheadertimeuboone",
       "wire",
       "hit",
       "crthit",
+      "crttrack",
       "cosmictag",
       "ophit",
       "opflash",

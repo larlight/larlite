@@ -20,6 +20,9 @@ namespace larlite{
   class rawdigit;
   class event_rawdigit;
 
+  class daqheadertimeuboone;
+  class event_daqheadertimeuboone;
+
   class wire;
   class event_wire;
 
