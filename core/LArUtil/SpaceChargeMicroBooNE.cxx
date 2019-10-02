@@ -112,6 +112,13 @@ namespace larutil{
     return _sce->GetEfieldOffsets(xVal,yVal,zVal);
   }
   
+  float SpaceChargeMicroBooNE::tickoffset_forward_hack( float tick ) const {
+    return 6 + (tick-3200)*0.014;
+  }
+
+  float SpaceChargeMicroBooNE::tickoffset_backward_hack( float tick ) const {
+    return (tick-6+3200*0.014)/1.014 - tick;
+  }
   
 }
 

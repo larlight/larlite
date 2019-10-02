@@ -31,7 +31,9 @@ namespace larutil{
     std::vector<double> GetPosOffsets(double xVal, double yVal, double zVal) const;
     std::vector<double> GetEfieldOffsets(double xVal, double yVal, double zVal) const;
     Version_t GetVersion() const { return _version; };
- 
+    float tickoffset_forward_hack( float tick ) const; // tick offset to add when going from SCE projected position to image
+    float tickoffset_backward_hack( float tick ) const; // tick offset to add when going from SCE projected position to image    
+    
   protected:
 
 

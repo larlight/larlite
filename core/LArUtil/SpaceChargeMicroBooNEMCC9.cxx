@@ -12,6 +12,7 @@
 // C++ language includes
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include "math.h"
@@ -68,9 +69,36 @@ namespace larutil{
       double xValNew = TransformX(xVal);
       double yValNew = TransformY(yVal);
       double zValNew = TransformZ(zVal);
+      std::cout << "[" <<  __FILE__ <<  ":L" << __LINE__ << "] getting offset for "
+                << "input=(" << xVal << "," << yVal << "," << zVal << ") "
+                << "transformed=(" << xValNew << "," << yValNew << "," << zValNew << ") "
+                << std::endl;
       
-      for (int i=0; i<3; i++ ) 
-        thePosOffsets[i] = _hD[i]->Interpolate( xValNew, yValNew, zValNew );
+      for (int i=0; i<3; i++ )  {
+        try {
+          thePosOffsets[i] = _hD[i]->Interpolate( xValNew, yValNew, zValNew );
+        }
+        catch ( std::exception& e ) {
+          std::stringstream ss;
+          ss << "[" <<  __FILE__ <<  ":L" << __LINE__ << "] error getting offset for "
+             << "input=(" << xVal << "," << yVal << "," << zVal << ") "
+             << "transformed=(" << xValNew << "," << yValNew << "," << zValNew << ") "
+             << "bounds "
+             << " x=[" << _hD[i]->GetXaxis()->GetXmin() << "," << _hD[i]->GetXaxis()->GetXmax() << "] "
+             << " y=[" << _hD[i]->GetYaxis()->GetXmin() << "," << _hD[i]->GetYaxis()->GetXmax() << "] "
+             << " z=[" << _hD[i]->GetZaxis()->GetXmin() << "," << _hD[i]->GetZaxis()->GetXmax() << "] "
+             << " error=" << e.what()
+             << std::endl;
+          throw std::runtime_error( ss.str() );
+        }
+
+        std::cout << "bounds "
+                  << " x=[" << _hD[i]->GetXaxis()->GetXmin() << "," << _hD[i]->GetXaxis()->GetXmax() << "] "
+                  << " y=[" << _hD[i]->GetYaxis()->GetXmin() << "," << _hD[i]->GetYaxis()->GetXmax() << "] "
+                  << " z=[" << _hD[i]->GetZaxis()->GetXmin() << "," << _hD[i]->GetZaxis()->GetXmax() << "] "
+                  << std::endl;
+
+      }
       
     }
 
@@ -104,7 +132,7 @@ namespace larutil{
   {
     double xValNew;
     xValNew = 2.50 - (2.50/2.56)*(xVal/100.0);
-    xValNew -= 1.25;
+    //xValNew -= 1.25;
 
     return xValNew;
   }
@@ -115,8 +143,7 @@ namespace larutil{
   {
     double yValNew;
     yValNew = (2.50/2.33)*((yVal/100.0)+1.165);
-    yValNew -= 1.25;
-
+    //yValNew -= 1.25;
     return yValNew;
   }
 

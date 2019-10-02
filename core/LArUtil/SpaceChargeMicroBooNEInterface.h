@@ -20,7 +20,7 @@ namespace larutil{
  
   public:
 
-    SpaceChargeMicroBooNEInterface();
+    SpaceChargeMicroBooNEInterface() {};
     virtual ~SpaceChargeMicroBooNEInterface() {}
       
     virtual bool Configure(std::string filename) = 0;
