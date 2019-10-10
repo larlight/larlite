@@ -59,6 +59,10 @@
 #pragma link C++ class std::vector<larlite::rawdigit>+;
 #pragma link C++ class larlite::event_rawdigit+;
 
+#pragma link C++ class larlite::daqheadertimeuboone+;
+#pragma link C++ class std::vector<larlite::daqheadertimeuboone>+;
+#pragma link C++ class larlite::event_daqheadertimeuboone+;
+
 #pragma link C++ class larlite::wire+;
 #pragma link C++ class std::vector<larlite::wire>+;
 #pragma link C++ class larlite::event_wire+;
@@ -66,6 +70,14 @@
 #pragma link C++ class larlite::hit+;
 #pragma link C++ class std::vector<larlite::hit>+;
 #pragma link C++ class larlite::event_hit+;
+
+#pragma link C++ class larlite::crthit+;
+#pragma link C++ class std::vector<larlite::crthit>+;
+#pragma link C++ class larlite::event_crthit+;
+
+#pragma link C++ class larlite::crttrack+;
+#pragma link C++ class std::vector<larlite::crttrack>+;
+#pragma link C++ class larlite::event_crttrack+;
 
 #pragma link C++ class larlite::t0+;
 #pragma link C++ class std::vector<larlite::t0>+;

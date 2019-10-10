@@ -31,6 +31,7 @@ namespace larutil{
   SpaceChargeMicroBooNE::SpaceChargeMicroBooNE( Version_t version )
     : _version(version)
   {
+
     Configure(version,"");
   }
 

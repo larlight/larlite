@@ -49,6 +49,9 @@
 #include "larflow3dhit.h"
 #include "larflowcluster.h"
 #include "pixelmask.h"
+#include "crthit.h"
+#include "crttrack.h"
+#include "daqheadertimeuboone.h"
 
 namespace larlite {
 
@@ -1077,6 +1080,9 @@ namespace larlite {
     case data::kRawDigit:
       _ptr_data_array[type][name]=new event_rawdigit(name);
       break;
+    case data::kDAQHeaderTimeUBooNE:
+      _ptr_data_array[type][name]=new event_daqheadertimeuboone(name);
+      break;
     case data::kSimChannel:
       _ptr_data_array[type][name]=new event_simch(name);
       break;
@@ -1112,6 +1118,12 @@ namespace larlite {
       break;
     case data::kHit:
       _ptr_data_array[type][name]=new event_hit(name);
+      break;
+    case data::kCRTHit:
+      _ptr_data_array[type][name]=new event_crthit(name);
+      break;
+    case data::kCRTTrack:
+      _ptr_data_array[type][name]=new event_crttrack(name);
       break;
     case data::kCluster:
       _ptr_data_array[type][name]=new event_cluster(name);
