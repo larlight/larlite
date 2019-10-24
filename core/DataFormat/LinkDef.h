@@ -59,6 +59,10 @@
 #pragma link C++ class std::vector<larlite::rawdigit>+;
 #pragma link C++ class larlite::event_rawdigit+;
 
+#pragma link C++ class larlite::daqheadertimeuboone+;
+#pragma link C++ class std::vector<larlite::daqheadertimeuboone>+;
+#pragma link C++ class larlite::event_daqheadertimeuboone+;
+
 #pragma link C++ class larlite::wire+;
 #pragma link C++ class std::vector<larlite::wire>+;
 #pragma link C++ class larlite::event_wire+;
@@ -66,6 +70,14 @@
 #pragma link C++ class larlite::hit+;
 #pragma link C++ class std::vector<larlite::hit>+;
 #pragma link C++ class larlite::event_hit+;
+
+#pragma link C++ class larlite::crthit+;
+#pragma link C++ class std::vector<larlite::crthit>+;
+#pragma link C++ class larlite::event_crthit+;
+
+#pragma link C++ class larlite::crttrack+;
+#pragma link C++ class std::vector<larlite::crttrack>+;
+#pragma link C++ class larlite::event_crttrack+;
 
 #pragma link C++ class larlite::t0+;
 #pragma link C++ class std::vector<larlite::t0>+;
@@ -236,6 +248,18 @@
 
 #pragma link C++ class larlite::storage_manager+;
 #pragma link C++ class larlite::storage_store+;
+
+#pragma link C++ class larlite::larflow3dhit+;
+#pragma link C++ class std::vector<larlite::larflow3dhit>+;
+#pragma link C++ class larlite::event_larflow3dhit+;
+
+#pragma link C++ class larlite::larflowcluster+;
+#pragma link C++ class std::vector<larlite::larflowcluster>+;
+#pragma link C++ class larlite::event_larflowcluster+;
+
+#pragma link C++ class larlite::pixelmask+;
+#pragma link C++ class std::vector<larlite::pixelmask>+;
+#pragma link C++ class larlite::event_pixelmask+;
 
 /*
 #pragma link C++ function larlite::storage_manager::data_type<larlite::event_gtruth>();

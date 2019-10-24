@@ -9,14 +9,9 @@
 // 
 ////////////////////////////////////////////////////////////////////////
 
-// ROOT includes
-#include "TGraph.h"
-#include "TF1.h"
-#include "TFile.h"
 
 // C/C++ standard libraries
-#include <string>
-#include <vector>
+#include "SpaceChargeMicroBooNEInterface.h"
 
 namespace larutil{
   
@@ -24,187 +19,26 @@ namespace larutil{
  
   public:
 
-    SpaceChargeMicroBooNE();
-    SpaceChargeMicroBooNE(std::string filename);
+    typedef enum { kMCC9_Forward=0, kMCC9_Backward, kMCC8_E273, kMCC8_E227, kMCC8_E500 } Version_t;
+    
+    SpaceChargeMicroBooNE( Version_t version=kMCC9_Forward );
+    SpaceChargeMicroBooNE( Version_t version, std::string filename="");
     ~SpaceChargeMicroBooNE();
-      
-    bool Configure(std::string filename);
-      
+
+    bool Configure( Version_t version, std::string filename="");
+    bool Configure( std::string filename ) { return Configure(kMCC9_Forward,filename); };  ///< [DEPRECATED] kept to be backwards compatible. will default to kMCC9_Forward.
+    
     std::vector<double> GetPosOffsets(double xVal, double yVal, double zVal) const;
     std::vector<double> GetEfieldOffsets(double xVal, double yVal, double zVal) const;
- 
-  private:
+    Version_t GetVersion() const { return _version; };
+    float tickoffset_forward_hack( float tick ) const; // tick offset to add when going from SCE projected position to image
+    float tickoffset_backward_hack( float tick ) const; // tick offset to add when going from SCE projected position to image    
+    
+  protected:
 
-    std::vector<double> GetPosOffsetsParametric(double xVal, double yVal, double zVal) const;
-    double GetOnePosOffsetParametric(double xVal, double yVal, double zVal, std::string axis) const;
-    std::vector<double> GetEfieldOffsetsParametric(double xVal, double yVal, double zVal) const;
-    double GetOneEfieldOffsetParametric(double xVal, double yVal, double zVal, std::string axis) const;
-    double TransformX(double xVal) const;
-    double TransformY(double yVal) const;
-    double TransformZ(double zVal) const;
-    bool IsInsideBoundaries(double xVal, double yVal, double zVal) const;
 
-    bool fEnableSimSpatialSCE;
-    bool fEnableSimEfieldSCE;
-    bool fEnableCorrSCE;
-      
-    /* TGraph **g1_x = new TGraph*[7]; */
-    /* TGraph **g2_x = new TGraph*[7]; */
-    /* TGraph **g3_x = new TGraph*[7]; */
-    /* TGraph **g4_x = new TGraph*[7]; */
-    /* TGraph **g5_x = new TGraph*[7]; */
-      
-    /* TGraph **g1_y = new TGraph*[7]; */
-    /* TGraph **g2_y = new TGraph*[7]; */
-    /* TGraph **g3_y = new TGraph*[7]; */
-    /* TGraph **g4_y = new TGraph*[7]; */
-    /* TGraph **g5_y = new TGraph*[7]; */
-    /* TGraph **g6_y = new TGraph*[7]; */
-      
-    /* TGraph **g1_z = new TGraph*[7]; */
-    /* TGraph **g2_z = new TGraph*[7]; */
-    /* TGraph **g3_z = new TGraph*[7]; */
-    /* TGraph **g4_z = new TGraph*[7]; */
-      
-    /* TF1 *f1_x = new TF1("f1_x","pol6"); */
-    /* TF1 *f2_x = new TF1("f2_x","pol6"); */
-    /* TF1 *f3_x = new TF1("f3_x","pol6"); */
-    /* TF1 *f4_x = new TF1("f4_x","pol6"); */
-    /* TF1 *f5_x = new TF1("f5_x","pol6"); */
-    /* TF1 *fFinal_x = new TF1("fFinal_x","pol4"); */
-      
-    /* TF1 *f1_y = new TF1("f1_y","pol5"); */
-    /* TF1 *f2_y = new TF1("f2_y","pol5"); */
-    /* TF1 *f3_y = new TF1("f3_y","pol5"); */
-    /* TF1 *f4_y = new TF1("f4_y","pol5"); */
-    /* TF1 *f5_y = new TF1("f5_y","pol5"); */
-    /* TF1 *f6_y = new TF1("f6_y","pol5"); */
-    /* TF1 *fFinal_y = new TF1("fFinal_y","pol5"); */
-      
-    /* TF1 *f1_z = new TF1("f1_z","pol4"); */
-    /* TF1 *f2_z = new TF1("f2_z","pol4"); */
-    /* TF1 *f3_z = new TF1("f3_z","pol4"); */
-    /* TF1 *f4_z = new TF1("f4_z","pol4"); */
-    /* TF1 *fFinal_z = new TF1("fFinal_z","pol3"); */
-
-    /* TGraph **g1_Ex = new TGraph*[7]; */
-    /* TGraph **g2_Ex = new TGraph*[7]; */
-    /* TGraph **g3_Ex = new TGraph*[7]; */
-    /* TGraph **g4_Ex = new TGraph*[7]; */
-    /* TGraph **g5_Ex = new TGraph*[7]; */
-      
-    /* TGraph **g1_Ey = new TGraph*[7]; */
-    /* TGraph **g2_Ey = new TGraph*[7]; */
-    /* TGraph **g3_Ey = new TGraph*[7]; */
-    /* TGraph **g4_Ey = new TGraph*[7]; */
-    /* TGraph **g5_Ey = new TGraph*[7]; */
-    /* TGraph **g6_Ey = new TGraph*[7]; */
-      
-    /* TGraph **g1_Ez = new TGraph*[7]; */
-    /* TGraph **g2_Ez = new TGraph*[7]; */
-    /* TGraph **g3_Ez = new TGraph*[7]; */
-    /* TGraph **g4_Ez = new TGraph*[7]; */
-      
-    /* TF1 *f1_Ex = new TF1("f1_Ex","pol6"); */
-    /* TF1 *f2_Ex = new TF1("f2_Ex","pol6"); */
-    /* TF1 *f3_Ex = new TF1("f3_Ex","pol6"); */
-    /* TF1 *f4_Ex = new TF1("f4_Ex","pol6"); */
-    /* TF1 *f5_Ex = new TF1("f5_Ex","pol6"); */
-    /* TF1 *fFinal_Ex = new TF1("fFinal_Ex","pol4"); */
-      
-    /* TF1 *f1_Ey = new TF1("f1_Ey","pol5"); */
-    /* TF1 *f2_Ey = new TF1("f2_Ey","pol5"); */
-    /* TF1 *f3_Ey = new TF1("f3_Ey","pol5"); */
-    /* TF1 *f4_Ey = new TF1("f4_Ey","pol5"); */
-    /* TF1 *f5_Ey = new TF1("f5_Ey","pol5"); */
-    /* TF1 *f6_Ey = new TF1("f6_Ey","pol5"); */
-    /* TF1 *fFinal_Ey = new TF1("fFinal_Ey","pol5"); */
-      
-    /* TF1 *f1_Ez = new TF1("f1_Ez","pol4"); */
-    /* TF1 *f2_Ez = new TF1("f2_Ez","pol4"); */
-    /* TF1 *f3_Ez = new TF1("f3_Ez","pol4"); */
-    /* TF1 *f4_Ez = new TF1("f4_Ez","pol4"); */
-    /* TF1 *fFinal_Ez = new TF1("fFinal_Ez","pol3"); */
-
-    TGraph* g1_x[7];
-    TGraph* g2_x[7];
-    TGraph* g3_x[7];
-    TGraph* g4_x[7];
-    TGraph* g5_x[7];
-      
-    TGraph* g1_y[7];
-    TGraph* g2_y[7];
-    TGraph* g3_y[7];
-    TGraph* g4_y[7];
-    TGraph* g5_y[7];
-    TGraph* g6_y[7];
-      
-    TGraph* g1_z[7];
-    TGraph* g2_z[7];
-    TGraph* g3_z[7];
-    TGraph* g4_z[7];
-      
-    TF1 *f1_x;
-    TF1 *f2_x;
-    TF1 *f3_x;
-    TF1 *f4_x;
-    TF1 *f5_x;
-    TF1 *fFinal_x;
-      
-    TF1 *f1_y;
-    TF1 *f2_y;
-    TF1 *f3_y;
-    TF1 *f4_y;
-    TF1 *f5_y;
-    TF1 *f6_y;
-    TF1 *fFinal_y;
-      
-    TF1 *f1_z;
-    TF1 *f2_z;
-    TF1 *f3_z;
-    TF1 *f4_z;
-    TF1 *fFinal_z;
-
-    TGraph *g1_Ex[7];
-    TGraph *g2_Ex[7];
-    TGraph *g3_Ex[7];
-    TGraph *g4_Ex[7];
-    TGraph *g5_Ex[7];
-      
-    TGraph *g1_Ey[7];
-    TGraph *g2_Ey[7];
-    TGraph *g3_Ey[7];
-    TGraph *g4_Ey[7];
-    TGraph *g5_Ey[7];
-    TGraph *g6_Ey[7];
-      
-    TGraph *g1_Ez[7];
-    TGraph *g2_Ez[7];
-    TGraph *g3_Ez[7];
-    TGraph *g4_Ez[7];
-      
-    TF1 *f1_Ex;
-    TF1 *f2_Ex;
-    TF1 *f3_Ex;
-    TF1 *f4_Ex;
-    TF1 *f5_Ex;
-    TF1 *fFinal_Ex;
-      
-    TF1 *f1_Ey;
-    TF1 *f2_Ey;
-    TF1 *f3_Ey;
-    TF1 *f4_Ey;
-    TF1 *f5_Ey;
-    TF1 *f6_Ey;
-    TF1 *fFinal_Ey;
-      
-    TF1 *f1_Ez;
-    TF1 *f2_Ez;
-    TF1 *f3_Ez;
-    TF1 *f4_Ez;
-    TF1 *fFinal_Ez;
-
-    TFile* inputfile;
+    Version_t _version;
+    SpaceChargeMicroBooNEInterface* _sce;
 
   }; // class SpaceChargeMicroBooNE
 }

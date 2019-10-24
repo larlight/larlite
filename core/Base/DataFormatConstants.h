@@ -62,8 +62,11 @@ namespace larlite{
       kSimChannel,         ///< sim::SimChannel
       kMCShower,           ///< sim::MCShower
       kRawDigit,           ///< raw::RawDigit
+      kDAQHeaderTimeUBooNE,///< raw::DAQHeaderTimeUBooNE
       kWire,               ///< recob::Wire
       kHit,                ///< recob::Hit
+      kCRTHit,             ///< crt::CRTHit
+      kCRTTrack,           ///< crt::CRTTrack
       kCosmicTag,          ///< anab::CosmicTag 
       kOpHit,              ///< opdet::OpHit
       kOpFlash,            ///< opdet::OpFlash
@@ -97,6 +100,9 @@ namespace larlite{
       kT0,                 ///< larlite::t0
       kMCEventWeight,      ///< evwgh::MCEventWeight
       kSWTrigger,          ///< larlite::swtrigger
+      kLArFlow3DHit,       ///< larflow::LArFlow3DHit   (larflow addition)
+      kLArFlowCluster,     ///< larflow::LArFlowCluster (larflow addition)
+      kPixelMask,          ///< larlite::pixelmask (larflow addition)
       kDATA_TYPE_MAX       ///< Event-wise enum boundary
     };
 
@@ -128,8 +134,11 @@ namespace larlite{
       "simch",
       "mcshower",
       "rawdigit",
+      "daqheadertimeuboone",
       "wire",
       "hit",
+      "crthit",
+      "crttrack",
       "cosmictag",
       "ophit",
       "opflash",
@@ -162,7 +171,10 @@ namespace larlite{
       "chstatus",
       "t0",
       "mceventweight",
-      "swtrigger"
+      "swtrigger",
+      "larflow3dhit",
+      "larflowcluster",
+      "pixelmask"
     };
 
     const std::string kRUNDATA_TREE_NAME[kRUNDATA_TYPE_MAX] = {

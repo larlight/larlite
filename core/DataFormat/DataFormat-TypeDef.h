@@ -20,11 +20,20 @@ namespace larlite{
   class rawdigit;
   class event_rawdigit;
 
+  class daqheadertimeuboone;
+  class event_daqheadertimeuboone;
+
   class wire;
   class event_wire;
 
   class hit;
   class event_hit;
+
+  class crthit;
+  class event_crthit;
+
+  class crttrack;
+  class event_crttrack;
 
   class cosmictag;
   class event_cosmictag;
@@ -120,6 +129,15 @@ namespace larlite{
 
   class mceventweight;
   class event_mceventweight;
+
+  class laflow3dhit;
+  class event_larflow3dhit;
+
+  class larflowcluster;
+  class event_larflowcluster;
+
+  class pixelmask;
+  class event_pixelmask;
 }
 
 class treenode;

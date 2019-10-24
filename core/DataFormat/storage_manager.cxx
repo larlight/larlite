@@ -46,6 +46,13 @@
 #include "chstatus.h"
 #include "mceventweight.h"
 #include "swtrigger.h"
+#include "larflow3dhit.h"
+#include "larflowcluster.h"
+#include "pixelmask.h"
+#include "crthit.h"
+#include "crttrack.h"
+#include "daqheadertimeuboone.h"
+
 namespace larlite {
 
   storage_manager* storage_manager::me=0;
@@ -1073,6 +1080,9 @@ namespace larlite {
     case data::kRawDigit:
       _ptr_data_array[type][name]=new event_rawdigit(name);
       break;
+    case data::kDAQHeaderTimeUBooNE:
+      _ptr_data_array[type][name]=new event_daqheadertimeuboone(name);
+      break;
     case data::kSimChannel:
       _ptr_data_array[type][name]=new event_simch(name);
       break;
@@ -1108,6 +1118,12 @@ namespace larlite {
       break;
     case data::kHit:
       _ptr_data_array[type][name]=new event_hit(name);
+      break;
+    case data::kCRTHit:
+      _ptr_data_array[type][name]=new event_crthit(name);
+      break;
+    case data::kCRTTrack:
+      _ptr_data_array[type][name]=new event_crttrack(name);
       break;
     case data::kCluster:
       _ptr_data_array[type][name]=new event_cluster(name);
@@ -1195,6 +1211,15 @@ namespace larlite {
       break;
     case data::kSWTrigger:
       _ptr_data_array[type][name]=new swtrigger(name);
+      break;
+    case data::kLArFlow3DHit:
+      _ptr_data_array[type][name]=new event_larflow3dhit(name);
+      break;
+    case data::kLArFlowCluster:
+      _ptr_data_array[type][name]=new event_larflowcluster(name);
+      break;
+    case data::kPixelMask:
+      _ptr_data_array[type][name]=new event_pixelmask(name);
       break;
     default:
       print(msg::kERROR,__FUNCTION__,Form("Event-data identifier not supported: %d",(int)type));
@@ -1520,23 +1545,38 @@ namespace larlite {
       status=false;
     }
 
+    if ( run_id==data::kINVALID_UINT || subrun_id==data::kINVALID_UINT || event_id==data::kINVALID_UINT ) {
+      Message::send(msg::kERROR,__FUNCTION__,
+		    "Invalid run_id, subrun_id, event_id given.");
+      status = false;
+    }
+    
     if (!status)
       return status;
     
     size_t current_index = _index;    
-    size_t search_index  = current_index+1;
+    size_t search_index  = current_index;
+    if ( _index==data::kINVALID_UINT )
+      search_index = 0;
+    if ( search_index>=1 ) search_index--;
+    
+    ULong_t bytes = 1;
     bool found = false;
-    while ( current_index!=search_index && !found) {
-      ULong_t bytes = _in_id_ch->GetEntry( search_index );
+    bool end_reached = false;
+    while ( (current_index!=search_index || !end_reached)  && !found ) {
+      bytes = _in_id_ch->GetEntry( search_index );
       if ( bytes==0 ) {
 	// end of file, go to beginning
 	search_index = 0;
+        end_reached = true;
       }
       else {
 	if ( _run_id==run_id && _subrun_id==subrun_id && _event_id==event_id ) {
 	  // found
 	  found = true;
+          break;
 	}
+        search_index++;        
       }
     }
     
@@ -1548,7 +1588,7 @@ namespace larlite {
     }
     else {
       // found a matching entry
-      go_to( search_index );
+      go_to( search_index, false );
       status = true;
     }
     return status;
@@ -1752,7 +1792,7 @@ namespace larlite {
       } // loop over all types
 
     }
-    
+
     _index++;
     _nevents_read++;
     return true;
@@ -1879,8 +1919,9 @@ namespace larlite {
       _last_subrun_id = _subrun_id;
     }
 
-    if(_mode==kWRITE)
+    if(_mode==kWRITE) {
       _index++;
+    }
 
     _nevents_written++;
     //_event_wf->clear_data();

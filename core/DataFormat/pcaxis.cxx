@@ -13,8 +13,17 @@ namespace larlite
 {
 
   //----------------------------------------------------------------------
-  pcaxis::pcaxis()
+  pcaxis::pcaxis() :
+    data_base(data::kPCAxis),
+    fSvdOK(false),
+    fNumHitsUsed(0),
+    fAveHitDoca(0),
+    fID(0)
   {
+    for (int i=0; i<3; i++) {
+      fEigenValues[i] = 0;
+      fAvePosition[i] = 0;
+    }
   }
   
   //----------------------------------------------------------------------
