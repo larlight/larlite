@@ -21,8 +21,7 @@ namespace larutil{
 
     typedef enum { kMCC9_Forward=0, kMCC9_Backward, kMCC8_E273, kMCC8_E227, kMCC8_E500 } Version_t;
     
-    SpaceChargeMicroBooNE( Version_t version=kMCC9_Forward );
-    SpaceChargeMicroBooNE( Version_t version, std::string filename="");
+    SpaceChargeMicroBooNE( Version_t version=kMCC9_Forward, std::string filename="" );
     ~SpaceChargeMicroBooNE();
 
     bool Configure( Version_t version, std::string filename="");
