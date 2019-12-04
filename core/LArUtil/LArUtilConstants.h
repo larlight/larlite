@@ -59,6 +59,9 @@ namespace larutil{
   static const int    kBogusI            = -999;                  ///< obviously bogus integer value
   static const float  kBogusF            = -999.;                 ///< obviously bogus float value
   static const double quietCompiler = kBogusD*kBogusI*kBogusF*kRecombA*kRecombk*kGeVToElectrons;
+
+  static const double kDriftVelMCC9 = 0.1098;                     ///< cm/us
+  static const double kDriftVelMCC8 = 0.111;                      ///< cm/us
 }
 
 #endif

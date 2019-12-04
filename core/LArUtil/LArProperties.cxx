@@ -23,6 +23,7 @@ namespace larutil {
   {
     fEfield.clear();
     fTemperature = larlite::data::kINVALID_DOUBLE;
+    fVd = larlite::data::kINVALID_DOUBLE;
     fElectronlifetime = larlite::data::kINVALID_DOUBLE;
     fRadiationLength = larlite::data::kINVALID_DOUBLE;
     fArgon39DecayRate = larlite::data::kINVALID_DOUBLE;
@@ -73,6 +74,8 @@ namespace larutil {
   {
     ClearData();
 
+    fVd = larutil::kDriftVelMCC9;
+    
     TChain* ch = new TChain(_tree_name.c_str());
     ch->AddFile(_file_name.c_str());
 
@@ -297,6 +300,7 @@ namespace larutil {
     return fEfield.at(planegap);
   }
 
+
   //------------------------------------------------------------------------------------//
   Double_t LArProperties::DriftVelocity(Double_t efield, Double_t temperature) const {
     
@@ -307,8 +311,9 @@ namespace larutil {
     // Temperature should have units of Kelvin
     
     // Default Efield, use internal value.
-    if(efield == 0.)
-      efield = Efield();
+    if(efield == 0. && temperature == 0.)
+      //  efield = Efield();
+      return Vd();
     //
     if(efield > 4.0) {
 
@@ -322,8 +327,8 @@ namespace larutil {
     }    
     
     // Default temperature use internal value.
-    if(temperature == 0.)
-      temperature = Temperature();
+    //if(temperature == 0.)
+    //temperature = Temperature();
     
     if(temperature < 87.0 || temperature > 94.0) {
       std::ostringstream msg;
