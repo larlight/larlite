@@ -21,8 +21,8 @@ namespace flashana {
     _dEdxMIP      = pset.get< double > ( "MIPdEdx"     );
   }
 
-  void LightPath::QCluster(const ::geoalgo::Vector& pt_1,
-                           const ::geoalgo::Vector& pt_2,
+  void LightPath::QCluster(const larlite::geoalgo::Vector& pt_1,
+                           const larlite::geoalgo::Vector& pt_2,
                            QCluster_t& Q_cluster,
 			   double dedx) const {
 
@@ -32,7 +32,7 @@ namespace flashana {
     QPoint_t q_pt;
 
     if (dist <= _gap) {
-      ::geoalgo::Vector mid_pt((pt_1 + pt_2) / 2.);
+      larlite::geoalgo::Vector mid_pt((pt_1 + pt_2) / 2.);
       q_pt.x = mid_pt[0];
       q_pt.y = mid_pt[1];
       q_pt.z = mid_pt[2];
@@ -44,7 +44,7 @@ namespace flashana {
 
     int num_div = int(dist / _gap);
 
-    ::geoalgo::Vector direct = (pt_1 - pt_2).Dir();
+    larlite::geoalgo::Vector direct = (pt_1 - pt_2).Dir();
 
     Q_cluster.reserve(Q_cluster.size() + num_div);
 
@@ -69,7 +69,7 @@ namespace flashana {
     }
   }
 
-  QCluster_t LightPath::FlashHypothesis(const ::geoalgo::Trajectory& trj) const {
+  QCluster_t LightPath::FlashHypothesis(const larlite::geoalgo::Trajectory& trj) const {
 
     QCluster_t result;
     result.clear();

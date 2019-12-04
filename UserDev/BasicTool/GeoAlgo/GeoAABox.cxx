@@ -3,7 +3,8 @@
 
 #include "GeoAABox.h"
 
-namespace geoalgo {
+namespace larlite {
+  namespace geoalgo {
 
   AABox::AABox() 
     : _min(3)
@@ -37,6 +38,8 @@ namespace geoalgo {
 	      (pt[1] < _min[1] || _max[1] < pt[1]) || // point is outside Y boundaries OR
 	      (pt[2] < _min[2] || _max[2] < pt[2])    // point is outside Z boundaries
 	      );
+  }
+   
   }
 }
 #endif

@@ -42,7 +42,7 @@ namespace geotree{
 	nodePair = std::make_pair(id,parents[n]);
 	// make correlation
 	// give a score of -1 so that we know to remove this correlation
-	Correlation corr(-1, ::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
+	Correlation corr(-1, larlite::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
 	_corr_v[nodePair] = corr;
       }// if not best parent
     }// for all parents

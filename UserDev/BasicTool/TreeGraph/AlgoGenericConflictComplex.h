@@ -47,7 +47,7 @@ namespace geotree{
     /// loose flag: decide if to break or merge correlations
     bool _loose;
 
-    ::geoalgo::GeoAlgo _geoAlgo;
+    larlite::geoalgo::GeoAlgo _geoAlgo;
 
   };
 }

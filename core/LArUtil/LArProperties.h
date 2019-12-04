@@ -68,6 +68,9 @@ namespace larutil {
     Double_t Temperature()             const  ///< kelvin
     {return fTemperature;}
 
+    Double_t Vd()                      const  ///< cm/us
+    {return fVd;}
+    
     Double_t ElectronLifetime()        const  ///< microseconds
     {return fElectronlifetime;}
     
@@ -121,6 +124,7 @@ namespace larutil {
     
     std::vector< Double_t >          fEfield;           ///< kV/cm 
     Double_t                         fTemperature;      ///< kelvin
+    Double_t                         fVd;               ///< cm/us
     Double_t                         fElectronlifetime; ///< microseconds
     Double_t                         fRadiationLength;  ///< g/cm^2
     

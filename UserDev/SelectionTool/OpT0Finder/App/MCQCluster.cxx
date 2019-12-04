@@ -145,8 +145,8 @@ namespace flashana {
     double event_time = ::larutil::TimeService::GetME()->G4ToElecTime(mct[0].T()) - _trigger_time; // ns
     double shift_x = event_time * det_drift_velocity; //cm
     
-    ::geoalgo::Vector pt0(0.,0.,0.); // variable to be used in this function
-    ::geoalgo::Vector pt1(0.,0.,0.); // variable to be used in this function
+    ::larlite::geoalgo::Vector pt0(0.,0.,0.); // variable to be used in this function
+    ::larlite::geoalgo::Vector pt1(0.,0.,0.); // variable to be used in this function
 
     //
     // Add body
@@ -177,7 +177,7 @@ namespace flashana {
     //
     // Inspect "start edge"
     //
-    ::geoalgo::GeoAlgo alg;
+    ::larlite::geoalgo::GeoAlgo alg;
     auto const& tpc_vol = ActiveVolume();
     pt0[0] = mct[0].X(); pt0[1] = mct[0].Y(); pt0[2] = mct[0].Z();
     if(!tpc_vol.Contain(pt0)) {
@@ -198,7 +198,7 @@ namespace flashana {
       
       // 1) find crossing point
       pt0[0] = mct[idx-1].X(); pt0[1] = mct[idx-1].Y(); pt0[2] = mct[idx-1].Z();
-      auto xs_pt_v = alg.Intersection(tpc_vol,::geoalgo::LineSegment(pt0,pt1));
+      auto xs_pt_v = alg.Intersection(tpc_vol,::larlite::geoalgo::LineSegment(pt0,pt1));
       if(xs_pt_v.empty()) throw OpT0FinderException("Logic error: crossing point not found!");
       auto const& xs_pt = xs_pt_v[0];
 
@@ -259,7 +259,7 @@ namespace flashana {
       
       // 1) find crossing point
       pt0[0] = mct[idx+1].X(); pt0[1] = mct[idx+1].Y(); pt0[2] = mct[idx+1].Z();
-      auto xs_pt_v = alg.Intersection(tpc_vol,::geoalgo::LineSegment(pt0,pt1));
+      auto xs_pt_v = alg.Intersection(tpc_vol,::larlite::geoalgo::LineSegment(pt0,pt1));
       if(xs_pt_v.empty()) throw OpT0FinderException("Logic error: crossing point not found!");
       auto const& xs_pt = xs_pt_v[0];
 

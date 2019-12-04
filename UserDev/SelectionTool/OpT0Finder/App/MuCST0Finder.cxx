@@ -161,9 +161,9 @@ namespace larlite {
     }
 
     auto const& mucs_track  = (*ev_track)[ctag_ass[0][0]];
-    ::geoalgo::Vector mucs_track_start(mucs_track.LocationAtPoint(0));
-    ::geoalgo::Vector mucs_track_end(mucs_track.LocationAtPoint(mucs_track.NumberTrajectoryPoints()-1));
-    ::geoalgo::AABox fidvol(10, (-1.)*(geo->DetHalfHeight())+10., 10.,
+    ::larlite::geoalgo::Vector mucs_track_start(mucs_track.LocationAtPoint(0));
+    ::larlite::geoalgo::Vector mucs_track_end(mucs_track.LocationAtPoint(mucs_track.NumberTrajectoryPoints()-1));
+    ::larlite::geoalgo::AABox fidvol(10, (-1.)*(geo->DetHalfHeight())+10., 10.,
 			    geo->DetHalfWidth()*2-10., geo->DetHalfHeight()-10., geo->DetLength() -10.);
     if(fidvol.Contain(mucs_track_start) || fidvol.Contain(mucs_track_end)) {
       std::cerr << "Start/End not close enough to the detector edge!" << storage->event_id() << std::endl;
@@ -172,10 +172,10 @@ namespace larlite {
       return false;
     }
 
-    ::geoalgo::Trajectory mucs_geotrj;
+    ::larlite::geoalgo::Trajectory mucs_geotrj;
     mucs_geotrj.reserve(mucs_track.NumberTrajectoryPoints() - 1);
     for (size_t i = 0; i < mucs_track.NumberTrajectoryPoints(); ++i) {
-      ::geoalgo::Vector pt(mucs_track.LocationAtPoint(i));
+      ::larlite::geoalgo::Vector pt(mucs_track.LocationAtPoint(i));
       mucs_geotrj.emplace_back(std::move(pt));
     }
     auto mucs_qcluster = ((flashana::LightPath*)(_mgr.GetCustomAlgo("LightPath")))->FlashHypothesis(mucs_geotrj);
@@ -187,7 +187,7 @@ namespace larlite {
       if(_mgr.QClusterArray().size() >= _num_tracks) break;
 
       auto const& trk = (*ev_track)[trk_idx];
-      mucs_geotrj.resize(trk.NumberTrajectoryPoints(),::geoalgo::Vector(0.,0.,0.));
+      mucs_geotrj.resize(trk.NumberTrajectoryPoints(),::larlite::geoalgo::Vector(0.,0.,0.));
       for (size_t pt_idx=0; pt_idx < trk.NumberTrajectoryPoints(); ++pt_idx) {
 	auto const& pt = trk.LocationAtPoint(pt_idx);
 	mucs_geotrj[pt_idx][0] = pt[0];

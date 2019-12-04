@@ -81,7 +81,7 @@ namespace geotree{
     /// get score (if corr exists)
     double getScore(NodeID_t node);
     /// get vertex (if corr exists)
-    ::geoalgo::Point_t getVtx(NodeID_t node);
+    larlite::geoalgo::Point_t getVtx(NodeID_t node);
     /// get relation type (if corr exists)
     ::geotree::RelationType_t getRelation(NodeID_t node);
     
@@ -132,12 +132,12 @@ namespace geotree{
 
     /// Add a correlated node and the associated score & vtx info
     void addCorrelation(const NodeID_t id, const double score,
-    			const ::geoalgo::Point_t& vtx,
+    			const larlite::geoalgo::Point_t& vtx,
 			const geotree::RelationType_t type);
 
     /// edit a correlated node's information (score, vtx, type)
     void editCorrelation(const NodeID_t id, const double score,
-			 const ::geoalgo::Point_t& vtx,
+			 const larlite::geoalgo::Point_t& vtx,
 			 const geotree::RelationType_t type);
 
     /// edit a correlated node's information (score)
@@ -145,7 +145,7 @@ namespace geotree{
 
     /// edit a correlated node's information (vtx)
     void editCorrelation(const NodeID_t id,
-			 const ::geoalgo::Point_t& vtx);
+			 const larlite::geoalgo::Point_t& vtx);
 
     /// edit a correlated node's information (type)
     void editCorrelation(const NodeID_t id,
@@ -163,7 +163,7 @@ namespace geotree{
     // vector listing IDs of children nodes
     std::vector<NodeID_t> _child_id_v;
     // vertex
-    geoalgo::Point_t _vtx;
+    larlite::geoalgo::Point_t _vtx;
     // each node can have a list of "correlated" nodes
     // each correlated node comes with a score
     std::map<size_t, ::geotree::Correlation> _corr;

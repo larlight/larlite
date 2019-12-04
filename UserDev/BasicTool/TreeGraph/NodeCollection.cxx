@@ -128,7 +128,7 @@ namespace geotree{
 
     // does this node exist?
     if (NodeExists(id) == false)
-      throw ::geoalgo::GeoAlgoException("Node ID not found!");
+      throw ::larlite::geoalgo::GeoAlgoException("Node ID not found!");
 
     for (int g=0; g < gen; g++)
       std::cout << "..";
@@ -149,7 +149,7 @@ namespace geotree{
 
     // check that node has not been added
     if (NodeExists(ID) == true)
-      throw ::geoalgo::GeoAlgoException("Error: Adding a node with ID that already exists! ID must be unique!");      
+      throw ::larlite::geoalgo::GeoAlgoException("Error: Adding a node with ID that already exists! ID must be unique!");      
 
     // made it this far. no problems -> save node
     Node thisnode(ID);
@@ -175,7 +175,7 @@ namespace geotree{
   Node& NodeCollection::GetNode(const NodeID_t ID){
 
     if (NodeExists(ID) == false)
-      throw ::geoalgo::GeoAlgoException("Error: Node ID does not exist!");      
+      throw ::larlite::geoalgo::GeoAlgoException("Error: Node ID does not exist!");      
 
     return _nodes[_n_map[ID]];
   }
@@ -185,7 +185,7 @@ namespace geotree{
   NodeID_t NodeCollection::FindID(size_t idx){
     
     if (_idx_map.find(idx) == _idx_map.end())
-      throw ::geoalgo::GeoAlgoException("Looking for an index that is out of bounds!");
+      throw ::larlite::geoalgo::GeoAlgoException("Looking for an index that is out of bounds!");
 
     return _idx_map[idx];
   }

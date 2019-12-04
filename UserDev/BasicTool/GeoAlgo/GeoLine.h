@@ -16,7 +16,8 @@
 
 #include "GeoHalfLine.h"
 
-namespace geoalgo {
+namespace larlite {
+  namespace geoalgo {
   /**
      \class Line
      @brief Representation of a 3D infinite line.
@@ -89,6 +90,7 @@ namespace geoalgo {
 
 
   typedef Line Line_t;
+}
 }
 #endif
 /** @} */ // end of doxygen group 

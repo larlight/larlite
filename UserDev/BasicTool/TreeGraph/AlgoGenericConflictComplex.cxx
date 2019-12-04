@@ -28,7 +28,7 @@ namespace geotree{
       auto parentScore = _coll->GetNode(id).getScore(parent);
       // vertex is average of vtx for parent and vertices for siblings
       auto parentVtx = _coll->GetNode(id).getVtx(parent);
-      std::vector<::geoalgo::Vector_t> vtxList;
+      std::vector<larlite::geoalgo::Vector_t> vtxList;
       vtxList.push_back(parentVtx);
       for (auto& sID : siblings)
 	vtxList.push_back(_coll->GetNode(id).getVtx(sID));
@@ -42,7 +42,7 @@ namespace geotree{
 	    std::cout << "\tSibling ID: " << parent << "\tVtx: "<< vtxList[v] << std::endl;
 	}
       }
-      ::geoalgo::Point_t newVtx = _geoAlgo.boundingSphere(vtxList).Center();
+      larlite::geoalgo::Point_t newVtx = _geoAlgo.boundingSphere(vtxList).Center();
       if (_verbose) { std::cout << "\taverage vtx from " << siblings.size() << " siblings is: " << newVtx << std::endl; }
       // Edit all sibling & parent correlations to match the new vertex information
       if (_verbose) { std::cout << "\tEditing Corr Vtx between this ID " << id << " and Parent " << parent << std::endl; }
@@ -92,7 +92,7 @@ namespace geotree{
 	if (_verbose) { std::cout << "\tErase sibling correlation" << std::endl; }
 	// for all siblings
 	for (auto& s : siblings){
-	  Correlation corr(-1, ::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
+	  Correlation corr(-1, larlite::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
 	  nodePair = std::make_pair(id,s);
 	  _corr_v[nodePair] = corr;
 	}
@@ -101,7 +101,7 @@ namespace geotree{
       else{
 	// remove parent score
 	if (_verbose) { std::cout << "\tErase parent correlation" << std::endl; }
-	Correlation corr(-1, ::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
+	Correlation corr(-1, larlite::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
 	nodePair = std::make_pair(id,parent);
 	_corr_v[nodePair] = corr;
       }

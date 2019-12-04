@@ -32,11 +32,11 @@ namespace larutil{
   SpaceChargeMicroBooNE::SpaceChargeMicroBooNE( Version_t version, std::string filename)
     : _version(version)
   {
-    Configure(version,filename);
+    Configure(version,filename);    
   }
 
   //-----------------------------------------------
-  SpaceChargeMicroBooNE::~SpaceChargeMicroBooNE()
+  SpaceChargeMicroBooNE::~SpaceChargeMicroBooNE() 
   {
     delete _sce;
     _sce = nullptr;

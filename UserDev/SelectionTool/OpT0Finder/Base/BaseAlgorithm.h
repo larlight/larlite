@@ -51,7 +51,7 @@ namespace flashana {
     double OpDetY(size_t i) const; ///< PMT Y position getter 
     double OpDetZ(size_t i) const; ///< PMT Z position getter
 
-    const ::geoalgo::AABox& ActiveVolume() const { return _active_volume; } ///< Detector active volume getter
+    const ::larlite::geoalgo::AABox& ActiveVolume() const { return _active_volume; } ///< Detector active volume getter
     
     double ActiveXMax() const; ///< Detector active volume's maximum x value
     double ActiveYMax() const; ///< Detector active volume's maximum x value
@@ -89,7 +89,7 @@ namespace flashana {
     std::vector<double> _opdet_x_v;  ///< OpticalDetector X position array
     std::vector<double> _opdet_y_v;  ///< OpticalDetector Y position array
     std::vector<double> _opdet_z_v;  ///< OpticalDetector Z position array
-    ::geoalgo::AABox _active_volume; ///< Detector active volume
+    ::larlite::geoalgo::AABox _active_volume; ///< Detector active volume
     double _drift_velocity; ///< Drift velocity in [cm/us]
   };
 }

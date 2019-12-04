@@ -27,7 +27,7 @@ namespace geotree{
     if (siblings.size() > 1){
       if (_verbose) { std::cout << "\tMany siblings: removing sibling relation because easiest now!" << std::endl; }
       nodePair = std::make_pair(id,parent);
-      Correlation corr(-1, ::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
+      Correlation corr(-1, larlite::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
       _corr_v[nodePair] = corr;
       return;
     }
@@ -66,21 +66,21 @@ namespace geotree{
       // remove sibling's parentage correlation
       if (_verbose) { std::cout << "\tChoosing A" << std::endl; }
       nodePair = std::make_pair(sibling,parent);
-      Correlation corr(-1, ::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
+      Correlation corr(-1, larlite::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
       _corr_v[nodePair] = corr;
     }
     else if (B > C){
       // remove this node's parent correlation
       if (_verbose) { std::cout << "\tChoosing B" << std::endl; }
       nodePair = std::make_pair(id,parent);
-      Correlation corr(-1, ::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
+      Correlation corr(-1, larlite::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
       _corr_v[nodePair] = corr;
     }
     else{
       // remove sibling correlation
       if (_verbose) { std::cout << "\tChoosing C" << std::endl; }
       nodePair = std::make_pair(id,sibling);
-      Correlation corr(-1, ::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
+      Correlation corr(-1, larlite::geoalgo::Point_t(), ::geotree::RelationType_t::kUnknown);
       _corr_v[nodePair] = corr;
     }
 

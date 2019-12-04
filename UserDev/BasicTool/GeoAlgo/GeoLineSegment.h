@@ -16,7 +16,8 @@
 
 #include "GeoVector.h"
 
-namespace geoalgo {
+namespace larlite {
+  namespace geoalgo {
   /**
      \class LineSegment
      @brief Representation of a simple 3D line segment
@@ -74,7 +75,7 @@ namespace geoalgo {
 
   typedef LineSegment LineSegment_t;
 }
-
+}
 #endif
 /** @} */ // end of doxygen group 
 

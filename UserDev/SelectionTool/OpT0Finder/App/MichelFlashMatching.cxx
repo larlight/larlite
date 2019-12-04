@@ -139,9 +139,9 @@ namespace larlite {
     }
     
     auto const res = _mgr.Match();
-    ::geoalgo::LineSegment line;
-    ::geoalgo::Point_t pt(0, 0, 0);
-    ::geoalgo::GeoAlgo geoalg;
+    ::larlite::geoalgo::LineSegment line;
+    ::larlite::geoalgo::Point_t pt(0, 0, 0);
+    ::larlite::geoalgo::GeoAlgo geoalg;
     for (auto const& match : res) {
       auto const& flash = (*ev_opflash)[match.flash_id];
       _flash_y = flash.YCenter();

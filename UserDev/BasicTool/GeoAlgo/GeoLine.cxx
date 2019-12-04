@@ -3,7 +3,8 @@
 
 #include "GeoLine.h"
 
-namespace geoalgo {
+namespace larlite {
+  namespace geoalgo {
 
   Line::Line() 
     : _pt1(3)
@@ -47,6 +48,7 @@ namespace geoalgo {
     if(p1 == p2) throw GeoAlgoException("<<check_and_raise>> Two identical points not allowed for Line ctor!"); 
   }
 
+}
 }
 #endif
 /** @} */ // end of doxygen group 

@@ -6,12 +6,12 @@
 namespace geotree{
 
   void Node::addCorrelation(const NodeID_t id, const double score,
-			    const ::geoalgo::Point_t& vtx,
+			    const ::larlite::geoalgo::Point_t& vtx,
 			    const geotree::RelationType_t type){
 
     // if correlation exists then return exception!
     if (this->isCorrelated(id) == true)
-      throw ::geoalgo::GeoAlgoException("Error: Adding correlation that already exists!");
+      throw ::larlite::geoalgo::GeoAlgoException("Error: Adding correlation that already exists!");
     
     if (_verbose){
       std::cout << "\tThis node: " << this->ID()
@@ -25,14 +25,14 @@ namespace geotree{
 
 
   void Node::editCorrelation(const NodeID_t id, const double score,
-			     const ::geoalgo::Point_t& vtx,
+			     const ::larlite::geoalgo::Point_t& vtx,
 			     const geotree::RelationType_t type){
 
     // if correlation between these nodes not found, raise exception
     // this function should be called only if correlation exists
     // and needs to be edited
     if ( _corr.find(id) == _corr.end() )
-      throw ::geoalgo::GeoAlgoException("Error: editing correlation that does not exist!");      
+      throw ::larlite::geoalgo::GeoAlgoException("Error: editing correlation that does not exist!");      
 
     if (_verbose){
       std::cout << "This node: " << this->ID()
@@ -51,7 +51,7 @@ namespace geotree{
     // this function should be called only if correlation exists
     // and needs to be edited
     if ( _corr.find(id) == _corr.end() )
-      throw ::geoalgo::GeoAlgoException("Error: editing correlation that does not exist!");      
+      throw ::larlite::geoalgo::GeoAlgoException("Error: editing correlation that does not exist!");      
 
     if (_verbose){
       std::cout << "\tThis node: " << this->ID()
@@ -63,14 +63,14 @@ namespace geotree{
   }
 
 
-  void Node::editCorrelation(const NodeID_t id, const ::geoalgo::Point_t& vtx)
+  void Node::editCorrelation(const NodeID_t id, const ::larlite::geoalgo::Point_t& vtx)
   {
     
     // if correlation between these nodes not found, raise exception
     // this function should be called only if correlation exists
     // and needs to be edited
     if ( _corr.find(id) == _corr.end() )
-      throw ::geoalgo::GeoAlgoException("Error: editing correlation that does not exist!");      
+      throw ::larlite::geoalgo::GeoAlgoException("Error: editing correlation that does not exist!");      
 
     if (_verbose){
       std::cout << "\tThis node: " << this->ID()
@@ -89,7 +89,7 @@ namespace geotree{
     // this function should be called only if correlation exists
     // and needs to be edited
     if ( _corr.find(id) == _corr.end() )
-      throw ::geoalgo::GeoAlgoException("Error: editing correlation that does not exist!");      
+      throw ::larlite::geoalgo::GeoAlgoException("Error: editing correlation that does not exist!");      
 
     if (_verbose){
       std::cout << "\tThis node: " << this->ID()
@@ -117,19 +117,19 @@ namespace geotree{
   {
 
     if (_corr.find(node) == _corr.end()){
-      throw ::geoalgo::GeoAlgoException("Trying to get correlation score for a correlation that does not exist");
+      throw ::larlite::geoalgo::GeoAlgoException("Trying to get correlation score for a correlation that does not exist");
       return -1;
     }
     //return _corrScores[node];
     return _corr[node].Score();
   }
 
-  ::geoalgo::Point_t Node::getVtx(NodeID_t node)
+  ::larlite::geoalgo::Point_t Node::getVtx(NodeID_t node)
   {
 
     if (_corr.find(node) == _corr.end()){
-      throw ::geoalgo::GeoAlgoException("Trying to get correlation vertex for a correlation that does not exist");
-      return ::geoalgo::Point_t();
+      throw ::larlite::geoalgo::GeoAlgoException("Trying to get correlation vertex for a correlation that does not exist");
+      return ::larlite::geoalgo::Point_t();
     }
     //return _corrScores[node];
     return _corr[node].Vtx();
@@ -139,7 +139,7 @@ namespace geotree{
   {
 
     if (_corr.find(node) == _corr.end()){
-      throw ::geoalgo::GeoAlgoException("Trying to get correlation type for a correlation that does not exist");
+      throw ::larlite::geoalgo::GeoAlgoException("Trying to get correlation type for a correlation that does not exist");
       return ::geotree::RelationType_t::kUnknown;
     }
     //return _corrScores[node];
@@ -184,7 +184,7 @@ namespace geotree{
     
     // if more than 1 parent something went wrong!
     if (parents > 1)
-      throw ::geoalgo::GeoAlgoException("hasConflict: Node has more than 1 parent! something went wrong!");
+      throw ::larlite::geoalgo::GeoAlgoException("hasConflict: Node has more than 1 parent! something went wrong!");
 
     if ( (parents > 0) and (siblings > 0) )
       return true;
@@ -206,7 +206,7 @@ namespace geotree{
     }
 
     if (parents > 1)
-      throw ::geoalgo::GeoAlgoException("hasParent: Node has more than 1 parent! something went wrong!");
+      throw ::larlite::geoalgo::GeoAlgoException("hasParent: Node has more than 1 parent! something went wrong!");
 
     if (parents == 1)
       return true;
@@ -231,10 +231,10 @@ namespace geotree{
     }
 
     if (parents > 1)
-      throw ::geoalgo::GeoAlgoException("getParent: Node has more than 1 parent! something went wrong!");
+      throw ::larlite::geoalgo::GeoAlgoException("getParent: Node has more than 1 parent! something went wrong!");
 
     if (parents == 0)
-      throw ::geoalgo::GeoAlgoException("No parent when one expected! something went wrong!");
+      throw ::larlite::geoalgo::GeoAlgoException("No parent when one expected! something went wrong!");
 
     return parent;
   }
@@ -272,7 +272,7 @@ namespace geotree{
     }
 
     if (siblings.size() == 0)
-      throw ::geoalgo::GeoAlgoException("Trying to get siblings expecting >=1 but got 0! something went wrong!");
+      throw ::larlite::geoalgo::GeoAlgoException("Trying to get siblings expecting >=1 but got 0! something went wrong!");
     
     return siblings;
   }

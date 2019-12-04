@@ -19,7 +19,8 @@
 //ADD_NEW_HEADER ... do not change this comment line
 
 // Class forward declaration here
-namespace geoalgo {
+namespace larlite {
+  namespace geoalgo {
   class GeoAlgoException;
   class Vector;
   class Trajectory;
@@ -30,6 +31,7 @@ namespace geoalgo {
   class GeoAlgo;
 
   class GeoObjCollection;
+}
 }
 
 //ADD_EMPTY_CLASS ... do not change this comment line

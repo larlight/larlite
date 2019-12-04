@@ -17,14 +17,15 @@
 #include <iostream>
 #include <exception>
 
-namespace geoalgo {
+namespace larlite {
+  namespace geoalgo {
 /**
    \class GeoAlgoException
    User defined class GeoAlgoException ... these comments are used to generate
    doxygen documentation!
  */
     
- class GeoAlgoException : public std::exception{
+    class GeoAlgoException : public ::std::exception{
 
   public:
         
@@ -45,7 +46,7 @@ namespace geoalgo {
  };
 
 }
-
+}
 #endif
 /** @} */ // end of doxygen group 
 

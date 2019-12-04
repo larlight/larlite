@@ -42,10 +42,10 @@ namespace flashana{
     double Set_Gap      ( double x) { _gap   =x;      return _gap;}
       
     // Flash Hypothesis for Trajectory (Track)
-    flashana::QCluster_t FlashHypothesis(const ::geoalgo::Trajectory& trj) const;
+    flashana::QCluster_t FlashHypothesis(const larlite::geoalgo::Trajectory& trj) const;
 
-    void QCluster(const ::geoalgo::Vector& pt_1,
-                  const ::geoalgo::Vector& pt_2,
+    void QCluster(const larlite::geoalgo::Vector& pt_1,
+                  const larlite::geoalgo::Vector& pt_2,
                   flashana::QCluster_t& Q_cluster,
 		  double dedx=-1) const;
 

@@ -1,7 +1,7 @@
-import commands,sys
+import subprocess,sys
 
 try:
-    flag=[x for x in commands.getoutput('root-config --cflags').split() if x.startswith('-std=c++')]
+    flag=[x for x in subprocess.getoutput('root-config --cflags').split() if x.startswith('-std=c++')]
     if len(flag) == 1:
         sys.stdout.write(flag[0])
     else:
