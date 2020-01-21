@@ -10,6 +10,6 @@ k.Initialize()
 
 while k.ProcessEvent():
 
-    print k.FIFO()
+    print(k.FIFO())
 
 k.Reset()

@@ -1,22 +1,22 @@
 # Simple script to build fann
 
-import os,commands,sys
+import os,subprocess,sys
 
 # Check cmake
-cmake=commands.getoutput('which cmake')
+cmake=subprocess.getoutput('which cmake')
 if not cmake:
-    print
-    print "  ERROR: You don't seem to have cmake installed!       "
-    print "         You cannot build FANN w/o cmake at the moment!"
-    print "         Try installing cmake (easy on Linux/OSX!).... "
-    print
+    print()
+    print("  ERROR: You don't seem to have cmake installed!       ")
+    print("         You cannot build FANN w/o cmake at the moment!")
+    print("         Try installing cmake (easy on Linux/OSX!).... ")
+    print()
     sys.exit(1)
 
 # Check shell env. var
-if not "LARLITE_USERDEVDIR" in os.environ.keys():
-    print
-    print "  ERROR: Source LArLite config script first!"
-    print
+if not "LARLITE_USERDEVDIR" in list(os.environ.keys()):
+    print()
+    print("  ERROR: Source LArLite config script first!")
+    print()
     sys.exit(1)
 
 # Build fann
@@ -31,9 +31,9 @@ libs = [x for x in os.listdir("%s/src" % FANN_DIR) if (x.find("fann.so")>=0 or
                                                        x.endswith(".so"))]
 
 if not len(libs):
-    print
-    print "  ERROR: Building fann base package failed..."
-    print
+    print()
+    print("  ERROR: Building fann base package failed...")
+    print()
     sys.exit(1)
 
 for l in libs:

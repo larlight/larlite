@@ -9,7 +9,7 @@ For testing rapid updates of ScatterPlotItem under various conditions.
 
 
 ## Add path to library (just for examples; you do not need this)
-import initExample
+from . import initExample
 
 
 from pyqtgraph.Qt import QtGui, QtCore, USE_PYSIDE
@@ -21,9 +21,9 @@ app = QtGui.QApplication([])
 #mw = QtGui.QMainWindow()
 #mw.resize(800,800)
 if USE_PYSIDE:
-    from ScatterPlotSpeedTestTemplate_pyside import Ui_Form
+    from .ScatterPlotSpeedTestTemplate_pyside import Ui_Form
 else:
-    from ScatterPlotSpeedTestTemplate_pyqt import Ui_Form
+    from .ScatterPlotSpeedTestTemplate_pyqt import Ui_Form
 
 win = QtGui.QWidget()
 win.setWindowTitle('pyqtgraph example: ScatterPlotSpeedTest')

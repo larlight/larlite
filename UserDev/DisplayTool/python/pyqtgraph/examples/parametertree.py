@@ -8,7 +8,7 @@ as well as some customized parameter types
 """
 
 
-import initExample ## Add path to library (just for examples; you do not need this)
+from . import initExample ## Add path to library (just for examples; you do not need this)
 
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
@@ -115,16 +115,16 @@ def change(param, changes):
             childName = '.'.join(path)
         else:
             childName = param.name()
-        print('  parameter: %s'% childName)
-        print('  change:    %s'% change)
-        print('  data:      %s'% str(data))
+        print(('  parameter: %s'% childName))
+        print(('  change:    %s'% change))
+        print(('  data:      %s'% str(data)))
         print('  ----------')
     
 p.sigTreeStateChanged.connect(change)
 
 
 def valueChanging(param, value):
-    print("Value changing (not finalized):", param, value)
+    print(("Value changing (not finalized):", param, value))
     
 # Too lazy for recursion:
 for child in p.children():

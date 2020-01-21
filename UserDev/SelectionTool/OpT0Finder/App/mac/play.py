@@ -39,7 +39,7 @@ def hypothesis(pt_v):
     g.SetMarkerSize(1)
     g.SetMarkerStyle(22)
     g.SetMarkerColor(ROOT.kBlue)
-    for x in xrange(hypothesis.size()):
+    for x in range(hypothesis.size()):
         #h.SetBinContent(x+1,hypothesis[x])
         g.SetPoint(x,x,hypothesis[x])
 
@@ -63,7 +63,7 @@ def make_graph(x,y,z,q=1):
     g.SetMarkerSize(1)
     g.SetMarkerStyle(22)
     g.SetMarkerColor(ROOT.kBlue)
-    for x in xrange(hypothesis.size()):
+    for x in range(hypothesis.size()):
         #h.SetBinContent(x+1,hypothesis[x])
         g.SetPoint(x,x,hypothesis[x])
 

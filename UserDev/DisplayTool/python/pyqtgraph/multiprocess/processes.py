@@ -1,7 +1,7 @@
 import subprocess, atexit, os, sys, time, random, socket, signal
 import multiprocessing.connection
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
 
@@ -238,7 +238,7 @@ class ForkedProcess(RemoteEventHandler):
         
         proxyIDs = {}
         if preProxy is not None:
-            for k, v in preProxy.iteritems():
+            for k, v in preProxy.items():
                 proxyId = LocalObjectProxy.registerObject(v)
                 proxyIDs[k] = proxyId
         
@@ -287,7 +287,7 @@ class ForkedProcess(RemoteEventHandler):
             RemoteEventHandler.__init__(self, remoteConn, name+'_child', pid=ppid)
             
             self.forkedProxies = {}
-            for name, proxyId in proxyIDs.iteritems():
+            for name, proxyId in proxyIDs.items():
                 self.forkedProxies[name] = ObjectProxy(ppid, proxyId=proxyId, typeStr=repr(preProxy[name]))
             
             if target is not None:

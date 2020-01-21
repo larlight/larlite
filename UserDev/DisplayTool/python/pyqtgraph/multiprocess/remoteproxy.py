@@ -2,8 +2,8 @@ import os, time, sys, traceback, weakref
 import numpy as np
 import threading
 try:
-    import __builtin__ as builtins
-    import cPickle as pickle
+    import builtins as builtins
+    import pickle as pickle
 except ImportError:
     import builtins
     import pickle
@@ -85,7 +85,7 @@ class RemoteEventHandler(object):
         try:
             return cls.handlers[pid]
         except:
-            print(pid, cls.handlers)
+            print((pid, cls.handlers))
             raise
     
     def debugMsg(self, msg):
@@ -141,7 +141,7 @@ class RemoteEventHandler(object):
                     #else:
                         #raise
                 except:
-                    print("Error in process %s" % self.name)
+                    print(("Error in process %s" % self.name))
                     sys.excepthook(*sys.exc_info())
                     
             if numProcessed > 0:
@@ -224,7 +224,7 @@ class RemoteEventHandler(object):
                             ind = arg[1]
                             dtype, shape = arg[2]
                             fnargs[i] = np.fromstring(byteData[ind], dtype=dtype).reshape(shape)
-                    for k,arg in fnkwds.items():
+                    for k,arg in list(fnkwds.items()):
                         if isinstance(arg, tuple) and len(arg) > 0 and arg[0] == '__byte_message__':
                             ind = arg[1]
                             dtype, shape = arg[2]
@@ -234,7 +234,7 @@ class RemoteEventHandler(object):
                     try:
                         result = obj(*fnargs)
                     except:
-                        print("Failed to call object %s: %d, %s" % (obj, len(fnargs), fnargs[1:]))
+                        print(("Failed to call object %s: %d, %s" % (obj, len(fnargs), fnargs[1:])))
                         raise
                 else:
                     result = obj(*fnargs, **fnkwds)
@@ -260,7 +260,7 @@ class RemoteEventHandler(object):
                     for part in parts[1:]:
                         result = getattr(result, part)
                 else:
-                    result = map(mod.__getattr__, fromlist)
+                    result = list(map(mod.__getattr__, fromlist))
                 
             elif cmd == 'del':
                 LocalObjectProxy.releaseProxyId(opts['proxyId'])
@@ -314,7 +314,7 @@ class RemoteEventHandler(object):
         self.send(request='result', reqId=reqId, callSync='off', opts=dict(result=result))
     
     def replyError(self, reqId, *exc):
-        print("error: %s %s %s" % (self.name, str(reqId), str(exc[1])))
+        print(("error: %s %s %s" % (self.name, str(reqId), str(exc[1]))))
         excStr = traceback.format_exception(*exc)
         try:
             self.send(request='error', reqId=reqId, callSync='off', opts=dict(exception=exc[1], excString=excStr))
@@ -498,11 +498,11 @@ class RemoteEventHandler(object):
             exc, excStr = result
             if exc is not None:
                 print("===== Remote process raised exception on request: =====")
-                print(''.join(excStr))
+                print((''.join(excStr)))
                 print("===== Local Traceback to request follows: =====")
                 raise exc
             else:
-                print(''.join(excStr))
+                print((''.join(excStr)))
                 raise Exception("Error getting result. See above for exception from remote process.")
                 
         else:
@@ -543,7 +543,7 @@ class RemoteEventHandler(object):
         
         if autoProxy is True:
             args = [self.autoProxy(v, noProxyTypes) for v in args]
-            for k, v in kwds.iteritems():
+            for k, v in kwds.items():
                 opts[k] = self.autoProxy(v, noProxyTypes)
         
         byteMsgs = []
@@ -554,7 +554,7 @@ class RemoteEventHandler(object):
             if arg.__class__ == np.ndarray:
                 args[i] = ("__byte_message__", len(byteMsgs), (arg.dtype, arg.shape))
                 byteMsgs.append(arg)
-        for k,v in kwds.items():
+        for k,v in list(kwds.items()):
             if v.__class__ == np.ndarray:
                 kwds[k] = ("__byte_message__", len(byteMsgs), (v.dtype, v.shape))
                 byteMsgs.append(v)
@@ -633,7 +633,7 @@ class Request(object):
                     raise ClosedError()
                 time.sleep(0.005)
                 if timeout >= 0 and time.time() - start > timeout:
-                    print("Request timed out: %s" % self.description)
+                    print(("Request timed out: %s" % self.description))
                     import traceback
                     traceback.print_stack()
                     raise NoResultError()

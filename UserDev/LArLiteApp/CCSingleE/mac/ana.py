@@ -8,9 +8,9 @@ chBkgd=TChain("_result_tree")
 chBkgd.AddFile(sys.argv[2])
 
 # Cut value arrays
-fid_cuts    = [ x   for x in xrange(100) ] # 5cm steps, spans from 0=>60 cm
-BDtW_cuts = [ x*5 for x in xrange(80)   ] # 5cm steps, spans from 0=>100 cm
-BDtTW_cuts = [ x*5 for x in xrange(100)   ] # 5cm steps, spans from 0=>100 cm
+fid_cuts    = [ x   for x in range(100) ] # 5cm steps, spans from 0=>60 cm
+BDtW_cuts = [ x*5 for x in range(80)   ] # 5cm steps, spans from 0=>100 cm
+BDtTW_cuts = [ x*5 for x in range(100)   ] # 5cm steps, spans from 0=>100 cm
 angle_cuts = [x*5 for x in range(40,72) ] #5degree steps from 200->360 cm
 
 # Efficiency arrays for first daughter
@@ -26,20 +26,20 @@ angleBkgd_eff = [0 for x in angle_cuts]
 
 c=TCanvas("c","",600,500)
 
-for x in xrange(len(fid_cuts)):
+for x in range(len(fid_cuts)):
     fidSig_eff[x] = float(ch.GetEntries("_distToWall>=%g" % fid_cuts[x]))/ch.GetEntries()
     fidBkgd_eff[x] = 1-float(chBkgd.GetEntries("_distToWall>=%g" % fid_cuts[x]))/chBkgd.GetEntries()
  #   print 'Fid eff, cuts: ', fidSig_eff[x], ' ',fid_cuts[x]
 
-for x in xrange(len(BDtW_cuts)):
+for x in range(len(BDtW_cuts)):
     BDtWSig_eff[x] = float(ch.GetEntries("_distToWall > 0 && _distBackAlongTraj>=%g" % BDtW_cuts[x]))/ch.GetEntries()
     BDtWBkgd_eff[x] = 1-float(chBkgd.GetEntries(" _distToWall > 0 &&_distBackAlongTraj>=%g" % BDtW_cuts[x]))/chBkgd.GetEntries()
 
-for x in xrange(len(BDtTW_cuts)):
+for x in range(len(BDtTW_cuts)):
     BDtTWSig_eff[x] = float(ch.GetEntries(" _distToTopWall>=%g" % BDtTW_cuts[x]))/ch.GetEntries()
     BDtTWBkgd_eff[x] = 1-float(chBkgd.GetEntries("_distToTopWall>=%g" % BDtTW_cuts[x]))/chBkgd.GetEntries()
 
-for x in xrange(len(angle_cuts)):
+for x in range(len(angle_cuts)):
     angleSig_eff[x] = float(ch.GetEntries("( _distToWall > 5 && (_distToTopWall < 0 || _distToTopWall > 30) && _angle_Norm <180 || _angle_Norm>=%g)" % angle_cuts[x]))/ch.GetEntries()
     angleBkgd_eff[x] = 1-float(chBkgd.GetEntries("_distToWall > 5 && (_distToTopWall < 0 || _distToTopWall > 30) && (_angle_Norm <180 || _angle_Norm>=%g)" % angle_cuts[x]))/chBkgd.GetEntries()
 
@@ -94,7 +94,7 @@ sys.stdin.readline()
 #for x in xrange(len(BDtW_cuts)):
     #print BDtW_cuts[x], BDtWSig_eff[x],'...'
 
-print
+print()
 
 BDtWSig_eff_xvalues = array.array('d', BDtW_cuts)
 BDtWSig_eff_yvalues = array.array('d', BDtWSig_eff)

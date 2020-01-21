@@ -16,7 +16,7 @@ except ImportError:
 
 #File that was output from ShowerQuality code including a ttree
 if len(sys.argv) > 3:
-        print "Usage: python %s $ROOT_FILE_OUTPUT_FROM_SHOWER_QUALITY [OPTIONAL: OUTFILE]" % sys.argv[0]
+        print("Usage: python %s $ROOT_FILE_OUTPUT_FROM_SHOWER_QUALITY [OPTIONAL: OUTFILE]" % sys.argv[0])
         quit()
 
 #File that was output from ShowerQuality code including a ttree
@@ -134,4 +134,4 @@ plt.savefig('%s/cluster_efficiency_perplane_single.png'%output_directory)
 if (fout != None):
         fout.write('}\n')
         fout.close()
-        print 'closed file '
+        print('closed file ')

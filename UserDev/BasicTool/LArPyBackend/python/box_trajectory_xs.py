@@ -6,13 +6,13 @@ xs_alg=geoalgo.GeoAlgo()
 pt=geoalgo.Vector(3)
 trj=geoalgo.Trajectory()
 
-for x in xrange(12):
-    for y in xrange(pt.size()):
+for x in range(12):
+    for y in range(pt.size()):
         if x<5 or not y:
             pt[y] = x-2
         elif y>=1:
             pt[y] = 5
-    print 'Adding trajectory point:',x,' ... ',pt[0],pt[1],pt[2]
+    print('Adding trajectory point:',x,' ... ',pt[0],pt[1],pt[2])
     trj += pt
 
 box=geoalgo.AABox(0,0,0,7,7,7)
@@ -22,7 +22,7 @@ k.add(trj,'Test Trajectory')
 
 xs_pts = xs_alg.Intersection(trj,box)
 
-for x in xrange(xs_pts.size()):
+for x in range(xs_pts.size()):
     k.add(xs_pts[x],'XS Point')
 
 k.show()

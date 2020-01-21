@@ -1,4 +1,4 @@
-from gui import gui, view_manager
+from .gui import gui, view_manager
 from pyqtgraph.Qt import QtGui, QtCore
 try:
     from evdmanager.ubdaq_fileglobber import *
@@ -32,7 +32,7 @@ class livegui(gui):
 
 
     def eventTimeoutTest(self):
-        self._event_manager.next()
+        next(self._event_manager)
 
     # override the initUI function to change things:
     def initUI(self):
@@ -159,7 +159,7 @@ class livegui(gui):
     def fileUpdateEntryHandler(self):
         try:
             delay = float(self._fileUpdateDelayEntry.text())
-        except Exception, e:
+        except Exception as e:
             delay = self._minFileUpdateTime
             self._fileUpdateDelayEntry.setText(str(delay))
             return
@@ -172,7 +172,7 @@ class livegui(gui):
     def eventUpdateEntryHandler(self):
         try:
             delay = float(self._eventUpdateDelayEntry.text())
-        except Exception, e:
+        except Exception as e:
             delay = self._minEventUpdateTime
             self._eventUpdateDelayEntry.setText(str(delay))
             return
@@ -195,7 +195,7 @@ class livegui(gui):
         else:
             try:
                 delay = float(self._fileUpdateDelayEntry.text())
-            except Exception, e:
+            except Exception as e:
                 delay = self._minFileUpdateTime
             if delay < self._minFileUpdateTime:
                 delay = self._minFileUpdateTime
@@ -213,7 +213,7 @@ class livegui(gui):
         else:
             try:
                 delay = float(self._eventUpdateDelayEntry.text())
-            except Exception, e:
+            except Exception as e:
                 delay = self._minEventUpdateTime
             if delay < self._minEventUpdateTime:
                 delay = self._minEventUpdateTime

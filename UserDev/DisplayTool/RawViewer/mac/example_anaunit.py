@@ -36,7 +36,7 @@ my_proc = fmwk.ana_processor()
 
 
 # Set input root file
-for x in xrange(len(sys.argv)-1):
+for x in range(len(sys.argv)-1):
     my_proc.add_input_file(sys.argv[x+1])
 
 # Specify IO mode
@@ -49,9 +49,9 @@ my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 # Replace with your analysis unit if you wish.
 my_proc.add_process(fmwk.DrawRaw())
 
-print
-print  "Finished configuring ana_processor. Start event loop!"
-print
+print()
+print("Finished configuring ana_processor. Start event loop!")
+print()
 
 pg.plot()
 
@@ -68,11 +68,11 @@ d6 = c2p.Convert(my_proc.get_process(0).getDataByPlane(1))
 # d0 = np.array(d5)
 d1 = np.array(d6)
 
-print "Done converting, show!"
+print("Done converting, show!")
 time2 = time.clock()
 # fig, axes = plt.subplots(2,1,figsize=(10,20))
 
-print type(d1)
+print(type(d1))
 # print d0.shape
 # print d0
 # for ax in axes.flat:
@@ -81,8 +81,8 @@ print type(d1)
 # axes[1].imshow(d1.T,aspect=aspectRatio,cmap="jet")
 
 time3 = time.clock()
-print ("Time to prepare: ", (time2-time1))
-print ("Time to draw   : ", (time3-time2))
+print(("Time to prepare: ", (time2-time1)))
+print(("Time to draw   : ", (time3-time2)))
 # 
 # plt.show()
 
@@ -99,8 +99,8 @@ sys.stdin.readline()
 
 
 # done!
-print
-print "Finished running ana_processor event loop!"
-print
+print()
+print("Finished running ana_processor event loop!")
+print()
 
 sys.exit(0)

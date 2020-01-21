@@ -247,7 +247,7 @@ class GridParam(pTypes.GroupParameter):
         template = self.param('ClockTemplate')
         spacing = self['Spacing']
         for i in range(self['Number of Clocks']):
-            c = template.buildClocks().values()[0]
+            c = list(template.buildClocks().values())[0]
             c.x0 += i * spacing
             clocks[self.name() + '%02d' % i] = c
         return clocks
@@ -502,7 +502,7 @@ class Simulation:
         
     def run(self):
         nPts = int(self.duration/self.dt)+1
-        for cl in self.clocks.itervalues():
+        for cl in self.clocks.values():
             cl.init(nPts)
             
         if self.ref is None:
@@ -514,8 +514,8 @@ class Simulation:
         clocks = self.clocks
         dt = self.dt
         tVals = np.linspace(0, dt*(nPts-1), nPts)
-        for cl in self.clocks.itervalues():
-            for i in xrange(1,nPts):
+        for cl in self.clocks.values():
+            for i in range(1,nPts):
                 nextT = tVals[i]
                 while True:
                     tau1, tau2 = cl.accelLimits()
@@ -549,7 +549,7 @@ class Simulation:
         
         ## make sure reference clock is not present in the list of clocks--this will be handled separately.
         clocks = clocks.copy()
-        for k,v in clocks.iteritems():
+        for k,v in clocks.items():
             if v is ref:
                 del clocks[k]
                 break
@@ -561,7 +561,7 @@ class Simulation:
         ## These are the set of proper times (in the reference frame) that will be simulated
         ptVals = np.linspace(ref.pt, ref.pt + dt*(nPts-1), nPts)
         
-        for i in xrange(1,nPts):
+        for i in range(1,nPts):
                 
             ## step reference clock ahead one time step in its proper time
             nextPt = ptVals[i]  ## this is where (when) we want to end up
@@ -586,7 +586,7 @@ class Simulation:
             
             
             ## update all other clocks
-            for cl in clocks.itervalues():
+            for cl in clocks.values():
                 while True:
                     g = cl.acceleration()
                     tau1, tau2 = cl.accelLimits()
@@ -635,7 +635,7 @@ class Simulation:
         
     def plot(self, plot):
         plot.clear()
-        for cl in self.clocks.itervalues():
+        for cl in self.clocks.values():
             c, p = cl.getCurve()
             plot.addItem(c)
             plot.addItem(p)
@@ -647,7 +647,7 @@ class Animation(pg.ItemGroup):
         self.clocks = sim.clocks
         
         self.items = {}
-        for name, cl in self.clocks.items():
+        for name, cl in list(self.clocks.items()):
             item = ClockItem(cl)
             self.addItem(item)
             self.items[name] = item
@@ -662,11 +662,11 @@ class Animation(pg.ItemGroup):
             #self.timer.start(self.dt)
         
     def restart(self):
-        for cl in self.items.values():
+        for cl in list(self.items.values()):
             cl.reset()
         
     def stepTo(self, t):
-        for i in self.items.values():
+        for i in list(self.items.values()):
             i.stepTo(t)
         
 

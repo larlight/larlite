@@ -5,7 +5,7 @@ Update a simple plot as rapidly as possible to measure speed.
 """
 
 ## Add path to library (just for examples; you do not need this)
-import initExample
+from . import initExample
 
 
 from pyqtgraph.Qt import QtGui, QtCore

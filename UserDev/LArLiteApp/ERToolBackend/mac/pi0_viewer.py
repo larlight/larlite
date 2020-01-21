@@ -14,7 +14,7 @@ def ask_binary(msg='Proceed? [y/n]:'):
         user_input = sys.stdin.readline().rstrip('\n').lower()
         if user_input in ['y','n']: break
 
-        print 'Invalid input:',user_input
+        print('Invalid input:',user_input)
         user_input=''
 
     return user_input == 'y'
@@ -71,17 +71,17 @@ def main():
 
     # Obtain input root files
     files = []
-    for x in xrange(len(sys.argv)-1):
+    for x in range(len(sys.argv)-1):
         fname = sys.argv[x+1]
         if fname.endswith('.root'):
             files.append(fname)
 
-    print
-    print '  Running AlgoPi0 training script...'
-    print
-    print '  Identified %2d input files' % len(files)
+    print()
+    print('  Running AlgoPi0 training script...')
+    print()
+    print('  Identified %2d input files' % len(files))
     if not ask_binary('  Proceed? [y/n]:'): return False
-    print
+    print()
     if ask_binary('  Load previously extracted fit parameters? [y/n]:'):
         my_algo.LoadParams()    
 
@@ -92,13 +92,13 @@ def main():
 
     my_ana._mgr.Reset()
     my_proc.set_ana_output_file("pi0_viewing.root")
-    print '    Start running pi0 training...'
+    print('    Start running pi0 training...')
 
     # Start event-by-event loop
     counter = 0
     while (counter < 1000):
         try:
-            counter = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
+            counter = eval(input('Hit Enter to continue to next evt, or type in an event number to jump to that event:'))
         except SyntaxError:
             counter = counter + 1
         my_proc.process_event(counter)
@@ -115,8 +115,8 @@ def main():
         display_mc.add(part_mc, data_mc, False)
         display_reco.add(part_reco, data_reco, False)
 
-        for x in xrange(part_mc.size()):
-            print part_mc[x].Diagram()
+        for x in range(part_mc.size()):
+            print(part_mc[x].Diagram())
         #for x in xrange(part_reco.size()):
         #    print part_reco[x].Diagram()
         #Last argument decides if un-taggeg showers/tracks should have random color (True) or grey (False)
@@ -126,26 +126,26 @@ def main():
 
     #my_proc.run()
 
-    print
-    print '    Finished running pi0 training...'
-    print
+    print()
+    print('    Finished running pi0 training...')
+    print()
 
     #
     # Store trained parameters
     #
     if ask_binary('  Store train result parameters? [y/n]:'):
         my_algo.StoreParams()
-        print '  Parameter stored...'
-        print
+        print('  Parameter stored...')
+        print()
 
     return True
 
 if __name__ == '__main__':
     if not main(): 
-        print
-        print 'Process terminated.'
+        print()
+        print('Process terminated.')
     else:
-        print
-        print 'Process finished.'
-    print
+        print()
+        print('Process finished.')
+    print()
 

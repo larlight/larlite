@@ -51,7 +51,7 @@ viewer = getViewer("Reco")
 view( viewer, mgr.EventData(), mgr.ParticleGraph() )
 # Wait for a user's "hit-enter"
 try:
-    input('')
+    eval(input(''))
 except Exception:
     pass
 # Finalize

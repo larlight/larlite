@@ -3,9 +3,9 @@ from ROOT import std
 from larlite import larlite
 from larlite import larutil
 
-for x in xrange(1000000):
+for x in range(1000000):
     if x%1000==0:
-        print x
+        print(x)
     sce = larutil.SpaceChargeMicroBooNE()
     del sce
     #print sce
@@ -17,5 +17,5 @@ for x in xrange(1000000):
 
 
 
-print "press entry to end"
-raw_input()
+print("press entry to end")
+input()

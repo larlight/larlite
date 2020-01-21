@@ -9,13 +9,13 @@ man.set_verbosity(fmwk.msg.kDEBUG)
 man.open()
 
 run,subrun,event=(0,0,0)
-for x in xrange(10):
+for x in range(10):
 
     if x%5==0: run=x/5
     subrun = (x%5)/3
     event = x - run*5 - subrun*3
     
-    for y in xrange(fmwk.data.kDATA_TYPE_MAX):
+    for y in range(fmwk.data.kDATA_TYPE_MAX):
 
         if y in [fmwk.data.kUndefined,
                  fmwk.data.kSeed,
@@ -27,14 +27,14 @@ for x in xrange(10):
             
         man.get_data(y,"test")
 
-    for y in xrange(fmwk.data.kSUBRUNDATA_TYPE_MAX):
+    for y in range(fmwk.data.kSUBRUNDATA_TYPE_MAX):
 
         if y in [fmwk.data.kSUBRUNDATA_Undefined]:
             continue
 
         man.get_subrundata(y,"test")
 
-    for y in xrange(fmwk.data.kRUNDATA_TYPE_MAX):
+    for y in range(fmwk.data.kRUNDATA_TYPE_MAX):
 
         if y in [fmwk.data.kRUNDATA_Undefined]:
             continue

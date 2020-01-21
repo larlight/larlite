@@ -16,7 +16,7 @@ try:
         else:
             info('%s %s' % (val,l))
     from ROOT import ertool
-except ImportError,NameError:
+except ImportError as NameError:
     warning('Skipped ERTool (unavailable)')
 
 ROOT.gErrorIgnoreLevel = orig_level

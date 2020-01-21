@@ -28,7 +28,7 @@ s=fmwk.storage_manager()
 
 s.set_io_mode(fmwk.storage_manager.kREAD)
 
-for x in xrange(len(sys.argv)-1):
+for x in range(len(sys.argv)-1):
 
     s.add_in_filename(sys.argv[x+1])
 
@@ -44,7 +44,7 @@ while s.next_event():
     mct = mct_v[0]
 
     pt_v=[]
-    for i in xrange(mct.size()-1):
+    for i in range(mct.size()-1):
 
         step1 = mct[i]
         step2 = mct[i+1]
@@ -61,7 +61,7 @@ while s.next_event():
             nsteps = int(step_size / 5.)
             ux, uy, uz = dir(step1,step2)
             unit_q = (step2.E() - step1.E())/(float(nsteps+1))
-            for j in xrange(nsteps):
+            for j in range(nsteps):
                 pt_v.append(((step1.X() + ux * (2.5+5*j)),
                              (step1.Y() + uy * (2.5+5*j)),
                              (step1.Z() + uz * (2.5+5*j)),
@@ -77,16 +77,16 @@ while s.next_event():
 
     c2.cd()
     g2=TGraph(32)
-    q_v=[0 for x in xrange(32)]
-    for i in xrange(flash_v.size()):
+    q_v=[0 for x in range(32)]
+    for i in range(flash_v.size()):
         f = flash_v[i]
         if f.TotalPE() < 10: continue
-        for j in xrange(32):
+        for j in range(32):
             q_v[j] += f.PE(j)
     q_max=0
-    for i in xrange(32):
+    for i in range(32):
         if q_v[i] > q_max: q_max = q_v[i]
-    for i in xrange(32):
+    for i in range(32):
         g2.SetPoint(i,i,q_v[i]/q_max)
     g2.SetMarkerStyle(22)
     g2.SetMarkerColor(ROOT.kRed)

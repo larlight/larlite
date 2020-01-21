@@ -5,7 +5,7 @@ from .Container import *
 from .DockDrop import *
 from .Dock import Dock
 from .. import debug as debug
-from ..python2_3 import basestring
+from ..python2_3 import str
 
 
 class DockArea(Container, QtGui.QWidget, DockDrop):
@@ -58,7 +58,7 @@ class DockArea(Container, QtGui.QWidget, DockDrop):
                 container = self.topContainer
                 neighbor = None
         else:
-            if isinstance(relativeTo, basestring):
+            if isinstance(relativeTo, str):
                 relativeTo = self.docks[relativeTo]
             container = self.getContainer(relativeTo)
             neighbor = relativeTo
@@ -238,7 +238,7 @@ class DockArea(Container, QtGui.QWidget, DockDrop):
             a.win.setGeometry(*s[1])
         
         ## 4) Add any remaining docks to the bottom
-        for d in docks.values():
+        for d in list(docks.values()):
             self.moveDock(d, 'below', None)
         
         #print "\nKill old containers:"
@@ -305,7 +305,7 @@ class DockArea(Container, QtGui.QWidget, DockDrop):
 
     def clear(self):
         docks = self.findAll()[1]
-        for dock in docks.values():
+        for dock in list(docks.values()):
             dock.close()
             
     ## PySide bug: We need to explicitly redefine these methods

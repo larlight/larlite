@@ -13,7 +13,7 @@ from larlite import larlite as fmwk
 my_proc = fmwk.ana_processor()
 
 # Set input root file
-for x in xrange(len(sys.argv)-1):
+for x in range(len(sys.argv)-1):
     my_proc.add_input_file(sys.argv[x+1])
 
 # Specify IO mode
@@ -34,16 +34,16 @@ unit.AddMCTrackModule("trackkalmanhit")
 
 my_proc.add_process(unit)
 
-print
-print  "Finished configuring ana_processor. Start event loop!"
-print
+print()
+print("Finished configuring ana_processor. Start event loop!")
+print()
 
 # Let's run it.
 my_proc.run();
 
 # done!
-print
-print "Finished running ana_processor event loop!"
-print
+print()
+print("Finished running ana_processor event loop!")
+print()
 
 sys.exit(0)

@@ -1,4 +1,4 @@
-from gui import gui, view_manager
+from .gui import gui, view_manager
 from pyqtgraph.Qt import QtGui, QtCore
 
 # override the gui to give the larsoft display any special features:

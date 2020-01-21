@@ -3,7 +3,7 @@ try:
 except:
     print("ERROR: Must have opengl for this display.")
 
-from gui3D import gui3D
+from .gui3D import gui3D
 from pyqtgraph.Qt import QtGui, QtCore
 from evdmanager import larlite_manager_3D
 

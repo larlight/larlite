@@ -1,4 +1,4 @@
-from database import recoBase
+from .database import recoBase
 from ROOT import evd, TVector3
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui, QtCore
@@ -123,7 +123,7 @@ import math as mt
 #                 i_color += 1
 
 
-from database import recoBase3D
+from .database import recoBase3D
 
 try:
     import pyqtgraph.opengl as gl
@@ -156,7 +156,7 @@ try:
 
             showers = self._process.getData()
 
-            for i in xrange(len(showers)):
+            for i in range(len(showers)):
                 shower = showers[i]
 
                 if abs(shower.pdg()) == 11:
@@ -221,5 +221,5 @@ try:
 
 
 
-except Exception, e:
+except Exception as e:
     pass

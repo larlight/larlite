@@ -118,11 +118,11 @@ class RegionSelectNode(CtrlNode):
         self.ctrls['movable'].toggled.connect(self.movableToggled)
         
     def displayToggled(self, b):
-        for item in self.items.values():
+        for item in list(self.items.values()):
             item.setVisible(b)
             
     def movableToggled(self, b):
-        for item in self.items.values():
+        for item in list(self.items.values()):
             item.setMovable(b)
             
         
@@ -235,7 +235,7 @@ class EvalNode(Node):
             text = fn + "\n".join(["    "+l for l in str(self.text.toPlainText()).split('\n')]) + run
             exec(text)
         except:
-            print("Error processing node: %s" % self.name())
+            print(("Error processing node: %s" % self.name()))
             raise
         return output
         

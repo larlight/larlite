@@ -30,17 +30,17 @@ my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 # Attach a template process
 my_proc.add_process(fmwk.sample_ana());
 
-print
-print  "Finished configuring ana_processor. Start event loop!"
-print
+print()
+print("Finished configuring ana_processor. Start event loop!")
+print()
 
 # Let's run it.
 my_proc.run();
 
 # done!
-print
-print "Finished running ana_processor event loop!"
-print
+print()
+print("Finished running ana_processor event loop!")
+print()
 
 sys.exit(0)
 

@@ -1,19 +1,19 @@
-import hit
-import match
-import shower
-import track
-import wire
-import cluster
-import endpoint2d
-import vertex
-import mctrack
-import mcshower
-import spacepoint
-import simch
-import opflash
-import seed
-import pfpart
-import neutrino
+from . import hit
+from . import match
+from . import shower
+from . import track
+from . import wire
+from . import cluster
+from . import endpoint2d
+from . import vertex
+from . import mctrack
+from . import mcshower
+from . import spacepoint
+from . import simch
+from . import opflash
+from . import seed
+from . import pfpart
+from . import neutrino
 
 # This is the class that maintains the list of drawable items.
 # If your class isn't here, it can't be drawn
@@ -40,10 +40,10 @@ class drawableItems(object):
         self._drawableClasses.update({'SPS': [spacepoint.spacepoint,"sps"]})
 
     def getListOfTitles(self):
-        return self._drawableClasses.keys()
+        return list(self._drawableClasses.keys())
 
     def getListOfItems(self):
-        return zip(*self._drawableClasses.values())[1]
+        return list(zip(*list(self._drawableClasses.values())))[1]
 
     def getDict(self):
         return self._drawableClasses
@@ -72,10 +72,10 @@ try:
             self._drawableClasses.update({'Simch': [simch.simch3D,"simch"]})
 
         def getListOfTitles(self):
-            return self._drawableClasses.keys()
+            return list(self._drawableClasses.keys())
 
         def getListOfItems(self):
-            return zip(*self._drawableClasses.values())[1]
+            return list(zip(*list(self._drawableClasses.values())))[1]
 
         def getDict(self):
             return self._drawableClasses

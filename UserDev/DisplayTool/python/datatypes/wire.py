@@ -1,4 +1,4 @@
-from database import dataBase
+from .database import dataBase
 from ROOT import evd
 import pyqtgraph as pg
 
@@ -21,7 +21,7 @@ class recoWire(wire):
         super(recoWire, self).__init__()
         self._process = evd.DrawWire()
         self._process.initialize()
-        for plane in xrange(geom.nViews()):
+        for plane in range(geom.nViews()):
             self._process.setYDimension(geom.readoutWindowSize(),plane)
 
 
@@ -30,7 +30,7 @@ class rawDigit(wire):
     def __init__(self, geom):
         super(rawDigit, self).__init__()
         self._process = evd.DrawRawDigit()
-        for i in xrange(len(geom._pedestals)):
+        for i in range(len(geom._pedestals)):
             self._process.setPedestal(geom._pedestals[i], i)
         self._process.initialize()
         self._process.SetStepSizeByPlane(48, 0)

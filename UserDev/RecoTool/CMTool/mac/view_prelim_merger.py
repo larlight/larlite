@@ -6,9 +6,9 @@ from ROOT import *
 gSystem.Load("libCMTool")
 from ROOT import *
 if len(sys.argv) != 2:
-    print
-    print "*** Improper usage. Usage: python viewclusters.py /path/to/input/file.root ***"
-    print
+    print()
+    print("*** Improper usage. Usage: python viewclusters.py /path/to/input/file.root ***")
+    print()
 
 
 filename = sys.argv[1]
@@ -48,7 +48,7 @@ user_input_evt_no = -1;
 while true:
 
     try:
-        user_input_evt_no = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
+        user_input_evt_no = eval(input('Hit Enter to continue to next evt, or type in an event number to jump to that event:'))
     except SyntaxError:
         user_input_evt_no = user_input_evt_no + 1
 
@@ -58,7 +58,7 @@ while true:
 
     merge_viewer.DrawAllClusters();
 
-    print "Just displayed Event %d.  Hit enter to go next event..." % user_input_evt_no
+    print("Just displayed Event %d.  Hit enter to go next event..." % user_input_evt_no)
     sys.stdin.readline()
 
 

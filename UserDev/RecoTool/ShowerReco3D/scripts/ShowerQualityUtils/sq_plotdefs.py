@@ -5,7 +5,7 @@ try:
 	import numpy as np
 	import pandas as pd
 	import matplotlib.pyplot as plt
-	from sq_fitutils import *
+	from .sq_fitutils import *
 except ImportError:
 	raise ImportError('Something didn\'t import correctly! Do you have numpy, pandas, matplotlib, and root_numpy? Get it!')
 
@@ -16,9 +16,9 @@ def energy_res_plot(df,fout=None):
 	plt.title("(MC Energy - Reco Energy)/MC Energy")
 	bins = np.linspace(-0.9,0.9,100)
 	curvebins = np.linspace(-0.9,0.9,300)
-        print len(df)
+        print(len(df))
         this_df = df.query('match == 1')
-        print len(this_df)
+        print(len(this_df))
 	eresU = np.array((this_df['mc_energy']-this_df['reco_energy_U'])/this_df['mc_energy'])
 	eresV = np.array((this_df['mc_energy']-this_df['reco_energy_V'])/this_df['mc_energy'])
 	eresY = np.array((this_df['mc_energy']-this_df['reco_energy_Y'])/this_df['mc_energy'])
@@ -227,7 +227,7 @@ def dEdx_plot(df,fout=None):
                         if (entries > maxentries):
                                 maxentries = entries
                                 maxdedx = bin_centers[i+1]
-                print 'max dedx is ',maxdedx
+                print('max dedx is ',maxdedx)
                 bins = np.linspace(maxdedx-1,maxdedx+1,50)
                 dedx_res, bins = np.histogram(dedx_y,bins)
 
@@ -272,7 +272,7 @@ def reco_efficiency_vsenergy_singleshower_plot(df,fout=None):
 	effs_x = np.arange(binmin + (binwidth/2), binmax-binwidth, binwidth)
 	effs_y = np.zeros(len(effs_x))
 	errs_y = np.zeros(len(effs_x))
-	for i in xrange(len(bins)-1):
+	for i in range(len(bins)-1):
 		this_df = df.query('mcs_E > %d and mcs_E < %d' % (bins[i], bins[i+1]))
                 oneshower_df = this_df.query('n_recoshowers == 1')
                 effs_y[i] = float(oneshower_df.shape[0])/this_df.shape[0]
@@ -288,14 +288,14 @@ def reco_efficiency_vsenergy_singleshower_plot(df,fout=None):
 
 def reco_efficiency_vsenergy_multishower_plot(df,fout=None):
 	fig = plt.figure(figsize=(10,6))
-        print len(df)
+        print(len(df))
 	plt.grid(True)
 	binmin, binmax, binwidth = 0, 1000, 100
 	bins = np.arange(binmin, binmax, binwidth)
 	effs_x = np.arange(binmin + (binwidth/2), binmax-binwidth, binwidth)
 	effs_y = np.zeros(len(effs_x))
 	errs_y = np.zeros(len(effs_x))
-	for i in xrange(len(bins)-1):
+	for i in range(len(bins)-1):
                 e_df = df.query('mc_energy > %d and mc_energy < %d' % (bins[i], bins[i+1]))
                 oneshower_df = e_df.query('match == 1 and mc_reco_anglediff < 10 and mc_reco_dist < 2')
                 effs_y[i] = float(oneshower_df.shape[0])/e_df.shape[0]
@@ -315,7 +315,7 @@ def reco_efficiency_vsenergy_goodangle_plot(df,fout=None):
 	effs_x = np.arange(binmin + (binwidth/2), binmax-binwidth, binwidth)
 	effs_y = np.zeros(len(effs_x))
 	errs_y = np.zeros(len(effs_x))
-	for i in xrange(len(bins)-1):
+	for i in range(len(bins)-1):
 		this_df = df.query('mc_energy > %d and mc_energy < %d' % (bins[i], bins[i+1]))
                 gooddir_df = this_df.query('mc_reco_anglediff < 10')
                 effs_y[i] = float(gooddir_df.shape[0])/this_df.shape[0]
@@ -336,7 +336,7 @@ def startpoint_resolution_vsenergy_plot(df,fout=None):
 	bins = np.arange(binmin, binmax, binwidth)
 	energy_bins = np.arange(binmin + (binwidth/2), binmax-binwidth, binwidth)
 	pos_resolution     = np.zeros(len(energy_bins))
-	for i in xrange(len(bins)-1):
+	for i in range(len(bins)-1):
                 e_df = this_df.query('mc_energy > %d and mc_energy < %d' % (bins[i], bins[i+1]))
                 x_res = e_df['mc_x']-e_df['reco_x']
                 y_res = e_df['mc_y']-e_df['reco_y']
@@ -374,7 +374,7 @@ def eres_vsenergy_plot(df,fout=None):
 	resolution_V = np.zeros(len(resolution_E))
 	resolution_Y = np.zeros(len(resolution_E))
         resbins = np.linspace(-0.9,0.9,25)
-	for i in xrange(len(bins)-1):
+	for i in range(len(bins)-1):
                 e_df = this_df.query('mc_energy > %d and mc_energy < %d' % (bins[i], bins[i+1]))
                 eresU = (e_df['mc_energy']-e_df['reco_energy_U'])/e_df['mc_energy']
                 eresV = (e_df['mc_energy']-e_df['reco_energy_V'])/e_df['mc_energy']
@@ -416,7 +416,7 @@ def angleres_vsenergy_plot(df,fout=None):
         #resolution_E = 0.5*(resolution_E[1:]+resolution_E[:-1])
 	angle_res = np.zeros(len(resolution_E))
         resbins = np.linspace(0,10,100)
-	for i in xrange(len(bins)-1):
+	for i in range(len(bins)-1):
                 e_df = this_df.query('mc_energy > %d and mc_energy < %d' % (bins[i], bins[i+1]))
                 angle_vals = e_df['mc_reco_anglediff'].ravel()
                 entries, bin_edges = np.histogram(angle_vals,bins=resbins)
@@ -448,7 +448,7 @@ def angleres_vsenergy_matrix(df,fout=None):
         # calculate matrix aspect ratio
         hist_extent = [resbins[0],resbins[-1],bins[0],bins[-1]]
         aspect_ratio = ( (bins[1]-bins[0])  ) / float( (resbins[1]-resbins[0])  )
-	for i in xrange(len(bins)-1):
+	for i in range(len(bins)-1):
                 e_df = this_df.query('mc_energy > %d and mc_energy < %d' % (bins[i], bins[i+1]))
                 angle_vals = e_df['mc_reco_anglediff'].ravel()
                 entries, bin_edges = np.histogram(angle_vals,bins=resbins,normed=True)

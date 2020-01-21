@@ -210,5 +210,5 @@ USE_PYQT5 = QT_LIB == PYQT5
 QtVersion = PySide.QtCore.__version__ if QT_LIB == PYSIDE else QtCore.QT_VERSION_STR
 m = re.match(r'(\d+)\.(\d+).*', QtVersion)
 if m is not None and list(map(int, m.groups())) < versionReq:
-    print(list(map(int, m.groups())))
+    print((list(map(int, m.groups()))))
     raise Exception('pyqtgraph requires Qt version >= %d.%d  (your version is %s)' % (versionReq[0], versionReq[1], QtVersion))

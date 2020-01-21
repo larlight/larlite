@@ -30,17 +30,17 @@ ana_unit._mgr.SetAlgo(ertool.AlgoPi0())
 # Attach a template process
 my_proc.add_process(ana_unit)
 
-print
-print  "Finished configuring ana_processor. Start event loop!"
-print
+print()
+print("Finished configuring ana_processor. Start event loop!")
+print()
 
 # Let's run it.
 my_proc.run();
 
 # done!
-print
-print "Finished running ana_processor event loop!"
-print
+print()
+print("Finished running ana_processor event loop!")
+print()
 
 sys.exit(0)
 

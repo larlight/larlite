@@ -163,7 +163,7 @@ class Canvas(QtGui.QWidget):
             if parent is None:
                 tree = li.treeWidget()
                 if tree is None:
-                    print("Skipping item", i, i.name)
+                    print(("Skipping item", i, i.name))
                     continue
                 tree.removeTopLevelItem(li)
             else:

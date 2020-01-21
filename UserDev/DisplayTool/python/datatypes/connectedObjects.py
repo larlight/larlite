@@ -133,7 +133,7 @@ class boxCollection(QtCore.QObject):
             self.highlightChange.emit()
 
     def drawHits(self, view, cluster):
-        for i in xrange(len(cluster)):
+        for i in range(len(cluster)):
             hit = cluster[i]
             # Draws a rectangle at (x,y,xlength, ylength)
             r = connectedBox(hit.wire(), hit.time(), 1, hit.rms())

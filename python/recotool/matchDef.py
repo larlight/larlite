@@ -2,7 +2,7 @@ import sys
 from ROOT import gSystem,TMath
 from larlite import larlite as fmwk
 from larlite import larutil
-from cpp_classes import cmtool
+from .cpp_classes import cmtool
 
 
 def DefaultMatch():

@@ -6,7 +6,7 @@ In this example, the image data is sampled from a volume and the image planes
 placed as if they slice through the volume.
 """
 ## Add path to library (just for examples; you do not need this)
-import initExample
+from . import initExample
 
 from pyqtgraph.Qt import QtCore, QtGui
 import pyqtgraph.opengl as gl

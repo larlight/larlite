@@ -10,7 +10,7 @@ import numpy as np
 import evdmanager 
 
 # Import the class that manages the view windows
-from viewport import viewport
+from .viewport import viewport
 
 
 class view_manager(QtCore.QObject):
@@ -198,7 +198,7 @@ class view_manager(QtCore.QObject):
 
 
   def drawPlanes(self,event_manager):
-    for i in xrange(len(self._drawerList)):
+    for i in range(len(self._drawerList)):
       if event_manager.hasWireData():
         self._drawerList[i].drawPlane(event_manager.getPlane(i))
       else:
@@ -221,7 +221,7 @@ class view_manager(QtCore.QObject):
   def drawHitsOnPlot(self,hits):
     if not self._wireDrawer.isVisible():
       return
-    for i in xrange(len(hits)):
+    for i in range(len(hits)):
       hit = hits[i]
       xPts = np.linspace(hit.start_time(), hit.end_time(), hit.end_time() - hit.start_time() + 1)
       yPts = hit.peak_amplitude() * np.exp( - 0.5 * (xPts - hit.peak_time())**2 / hit.rms()**2  )
@@ -301,7 +301,7 @@ class gui(QtGui.QWidget):
     # Jump to the next event
     self._nextButton = QtGui.QPushButton("Next")
     # self._nextButton.setStyleSheet("background-color: red")
-    self._nextButton.clicked.connect(self._event_manager.next)
+    self._nextButton.clicked.connect(self._event_manager.__next__)
     self._nextButton.setToolTip("Move to the next event.")
     # Go to the previous event
     self._prevButton = QtGui.QPushButton("Previous")
@@ -429,7 +429,7 @@ class gui(QtGui.QWidget):
   def viewSelectWorker(self):
 
     i = 0
-    for i in xrange(self._geometry.nViews()):
+    for i in range(self._geometry.nViews()):
       if self.sender() == self._viewButtonArray[i]:
         self._view_manager.selectPlane(i)
         self._view_manager.refreshDrawListWidget()
@@ -525,7 +525,7 @@ class gui(QtGui.QWidget):
 
     i = 0
     self._viewButtonArray = []
-    for plane in xrange(self._geometry.nViews()):
+    for plane in range(self._geometry.nViews()):
       button = QtGui.QRadioButton("Plane" + str(i))
       i += 1
       self._viewButtonGroup.addButton(button)
@@ -658,7 +658,7 @@ class gui(QtGui.QWidget):
 
   def keyPressEvent(self,e):
     if e.key() == QtCore.Qt.Key_N:
-      self._event_manager.next()
+      next(self._event_manager)
       return
     if e.key() == QtCore.Qt.Key_P:
       self._event_manager.prev()

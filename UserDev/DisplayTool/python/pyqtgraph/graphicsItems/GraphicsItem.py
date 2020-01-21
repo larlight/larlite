@@ -5,6 +5,7 @@ from .. import functions as fn
 import weakref
 import operator
 from ..util.lru_cache import LRUCache
+from functools import reduce
 
 
 class GraphicsItem(object):

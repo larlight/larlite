@@ -4,9 +4,9 @@ gSystem.Load("libAnalysis")
 
 
 if len(sys.argv) != 2:
-    print
-    print "*** Improper usage. Usage: python viewclusters.py /path/to/input/file.root ***"
-    print
+    print()
+    print("*** Improper usage. Usage: python viewclusters.py /path/to/input/file.root ***")
+    print()
 
 
 filename = sys.argv[1]
@@ -46,13 +46,13 @@ c_graph=TCanvas("csub","Individual cluster start/end points",500,300)
 while my_proc.process_event():
     currentview = 0;
     #First fill the 6 pads on the main canvas with stuff
-    for pad in xrange(1,7,2):
+    for pad in range(1,7,2):
         
         c.cd(pad)
         
         vReco = my_ana.GetHisto_Reco(int(currentview))
         vReco.at(0).Draw()
-        for x in xrange(1,vReco.size()):
+        for x in range(1,vReco.size()):
             vReco.at(x).Draw("same")
     
         c.cd(pad+1)
@@ -64,8 +64,8 @@ while my_proc.process_event():
 
     #now draw individual clusters on the separate canvas
     c_graph.cd()
-    for iview in xrange(0,3):
-        for iclus in xrange(my_ana.GetClusterGraph_Reco(int(iview),bool(true)).size()):
+    for iview in range(0,3):
+        for iclus in range(my_ana.GetClusterGraph_Reco(int(iview),bool(true)).size()):
             gstart=my_ana.GetClusterGraph_Reco(int(iview),bool(true)).at(iclus)
             gend  =my_ana.GetClusterGraph_Reco(int(iview),bool(false)).at(iclus)
             xmin=my_ana.GetHisto_Hits(int(iview)).GetXaxis().GetXmin()
@@ -89,10 +89,10 @@ while my_proc.process_event():
             leg.AddEntry(gend,"End Point","p")
             leg.Draw()
             c_graph.Update()
-            print "Drawing cluster %d out of %d for view %d. To look at the next cluster hit enter." % (iclus,my_ana.GetClusterGraph_Reco(int(iview),bool(true)).size()-1,iview+1)
+            print("Drawing cluster %d out of %d for view %d. To look at the next cluster hit enter." % (iclus,my_ana.GetClusterGraph_Reco(int(iview),bool(true)).size()-1,iview+1))
             sys.stdin.readline()
 
-    print "Hit Enter to continue to next evt..."
+    print("Hit Enter to continue to next evt...")
     sys.stdin.readline()
 
 # done!

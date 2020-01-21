@@ -33,9 +33,9 @@ proc.printParams()
 
 my_proc.add_process(proc)
 
-print
-print  "Finished configuring ana_processor. Start event loop!"
-print
+print()
+print("Finished configuring ana_processor. Start event loop!")
+print()
 my_proc.process_event(0)
 my_proc.process_event(1)
 my_proc.process_event(2)
@@ -46,8 +46,8 @@ my_proc.process_event(2)
 # my_proc.run(0,20)
 
 # done!
-print
-print "Finished running ana_processor event loop!"
-print
+print()
+print("Finished running ana_processor event loop!")
+print()
 
 sys.exit(0)

@@ -1,5 +1,5 @@
 from pyqtgraph.Qt import QtCore
-from event import manager, event
+from .event import manager, event
 import datatypes
 from ROOT import larlite as fmwk
 import os
@@ -101,14 +101,14 @@ class larlite_manager_base(manager, QtCore.QObject):
             # First, check that the file exists:
             try:
                 if not os.path.exists(file):
-                    print "ERROR: requested file does not exist."
+                    print("ERROR: requested file does not exist.")
                     continue
-            except Exception, e:
-                print e
+            except Exception as e:
+                print(e)
                 return
             # Next, verify it is a root file:
             if not file.endswith(".root"):
-                print "ERROR: must supply a root file."
+                print("ERROR: must supply a root file.")
                 continue
 
             # Finally, ping the file to see what is available to draw
@@ -161,19 +161,19 @@ class larlite_manager_base(manager, QtCore.QObject):
         return self._event
 
     # override the functions from manager as needed here
-    def next(self):
+    def __next__(self):
         # print "Called next"
         # Check that this isn't the last event:
         if self._event < self._n_entries - 1:
             self.goToEvent(self._event + 1)
         else:
-            print "On the last event, can't go to next."
+            print("On the last event, can't go to next.")
 
     def prev(self):
         if self._event != 0:
             self.goToEvent(self._event - 1)
         else:
-            print "On the first event, can't go to previous."
+            print("On the first event, can't go to previous.")
 
     def processEvent(self, force=False):
         if len(self._drawnClasses) == 0 and not (self._drawWires or self._drawTruth):
@@ -295,7 +295,7 @@ class larlite_manager(larlite_manager_base):
 
         if product == 'wire':
             if 'wire' not in self._keyTable:
-                print "No wire data available to draw"
+                print("No wire data available to draw")
                 self._drawWires = False
                 return
             self._drawWires = True
@@ -306,10 +306,10 @@ class larlite_manager(larlite_manager_base):
 
         elif product == 'rawdigit':
             if 'rawdigit' not in self._keyTable:
-                print "No raw digit data available to draw"
+                print("No raw digit data available to draw")
                 self._drawWires = False
                 return
-            print self._keyTable['rawdigit']
+            print(self._keyTable['rawdigit'])
             self._drawWires = True
             self._wireDrawer = datatypes.rawDigit(self._geom)
             self._wireDrawer.setProducer(self._keyTable['rawdigit'][0])
@@ -326,7 +326,7 @@ class larlite_manager(larlite_manager_base):
             self._truthDrawer = None
             return
         if 'mctruth' not in self._keyTable:
-            print "No truth information to display"
+            print("No truth information to display")
             self._drawTruth = False
             return
         self._drawTruth = True

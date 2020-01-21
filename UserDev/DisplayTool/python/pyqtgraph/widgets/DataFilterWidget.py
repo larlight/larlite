@@ -53,7 +53,7 @@ class DataFilterParameter(ptree.types.GroupParameter):
             
             
     def fieldNames(self):
-        return self.fields.keys()
+        return list(self.fields.keys())
     
     def setFields(self, fields):
         self.fields = OrderedDict(fields)
@@ -117,7 +117,7 @@ class EnumFilterItem(ptree.types.SimpleParameter):
         childs = []
         if isinstance(vals, list):
             vals = OrderedDict([(v,str(v)) for v in vals])
-        for val,vname in vals.items():
+        for val,vname in list(vals.items()):
             ch = ptree.Parameter.create(name=vname, type='bool', value=True)
             ch.maskValue = val
             childs.append(ch)

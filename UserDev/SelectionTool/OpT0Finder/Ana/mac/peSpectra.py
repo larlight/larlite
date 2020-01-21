@@ -13,7 +13,7 @@ fout=TFile.Open("plots.root","RECREATE")
 event=TChain("ev_tree")
 event.AddFile(sys.argv[1])
 
-x_array = [x for x in xrange(32)]
+x_array = [x for x in range(32)]
 
 c=TCanvas("c","",600,500)
 

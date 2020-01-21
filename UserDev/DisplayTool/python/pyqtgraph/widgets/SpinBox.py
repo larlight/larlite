@@ -223,7 +223,7 @@ class SpinBox(QtGui.QAbstractSpinBox):
                 #val = val.toDouble()[0]
             self.setValue(val)
         else:
-            print("Warning: SpinBox.setProperty('%s', ..) not supported." % prop)
+            print(("Warning: SpinBox.setProperty('%s', ..) not supported." % prop))
 
     def setSuffix(self, suf):
         """Set the string suffix appended to the spinbox text.

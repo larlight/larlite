@@ -33,7 +33,7 @@ MCfilter.flip(False)
 #MCfilter.flip(True)
 
 # Set input root file
-for x in xrange(len(sys.argv)-1):
+for x in range(len(sys.argv)-1):
     my_proc.add_input_file(sys.argv[x+1])
 
 # Specify IO mode
@@ -87,7 +87,7 @@ while (my_proc.process_event(counter)):
     data_reco = my_anaunit.GetData()
     part_reco = my_anaunit.GetParticles()
 
-    print "Event: ", counter
+    print("Event: ", counter)
     
     # how many neutrinos?
     numNeutrinos = 0
@@ -96,27 +96,27 @@ while (my_proc.process_event(counter)):
         if (part_reco.GetParticle(nodeID).PdgCode() == 12):
             numNeutrinos += 1
 
-    print numNeutrinos
+    print(numNeutrinos)
 
     
     if (numNeutrinos == 1):
         # we found something...lets plot it
         data_mc   = my_anaunit.GetData(True)
         part_mc   = my_anaunit.GetParticles(True)
-        print "Processing event {0}".format(counter) 
+        print("Processing event {0}".format(counter)) 
         # get objets and display
         viewAll(mcviewer,data_mc,part_mc,
                 recoviewer,data_reco,part_reco)
 
         try:
-            counter = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
+            counter = eval(input('Hit Enter to continue to next evt, or type in an event number to jump to that event:'))
         except SyntaxError:
             counter = counter
 
 # done!
-print
-print "Finished running ana_processor event loop!"
-print
+print()
+print("Finished running ana_processor event loop!")
+print()
 
 #my_algo.StoreParams()
 sys.exit(0)

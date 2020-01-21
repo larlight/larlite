@@ -24,7 +24,7 @@ class event(object):
 
     self._lastProcessed = -1
 
-  def next(self):
+  def __next__(self):
     print("Called next event")
 
   def prev(self):
@@ -68,7 +68,7 @@ class manager(event):
   def connectViewManager(self,view_manager):
     self._view_manager = view_manager
 
-  def next(self):
+  def __next__(self):
     print("Called next")
     # self._process.nextEvent()  
 
@@ -78,12 +78,12 @@ class manager(event):
     # self._process.prevEvent()   
 
   def goToEvent(self,event):
-    print("Requested jump to event ", event)
+    print(("Requested jump to event ", event))
 
   def selectFile(self):
     filePath = str(QtGui.QFileDialog.getOpenFileName())
     self.setInputFile(filePath)
-    print("Selected file is ", filePath)
+    print(("Selected file is ", filePath))
     return filePath
 
   def setInputFile(self,file):

@@ -9,22 +9,22 @@ class test_msg:
     @classmethod
     def debug(cls,msg=''):
         if int(cls.level)<=0:
-            print '\033[94m[DEBUG]  \033[00m',msg    
+            print('\033[94m[DEBUG]  \033[00m',msg)    
 
     @classmethod
     def info(cls,msg=''):
         if int(cls.level)<=1:
-            print '\033[92m[INFO]   \033[00m',msg
+            print('\033[92m[INFO]   \033[00m',msg)
     
     @classmethod
     def warning(cls,msg=''):
         if int(cls.level)<=2:
-            print '\033[95m[WARNING]\033[00m',msg
+            print('\033[95m[WARNING]\033[00m',msg)
     
     @classmethod
     def error(cls,msg=''):
         if int(cls.level)<=3:
-            print '\033[91m[ERROR]  \033[00m',msg
+            print('\033[91m[ERROR]  \033[00m',msg)
 
 debug   = test_msg.debug
 info    = test_msg.info

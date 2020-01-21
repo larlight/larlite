@@ -10,7 +10,7 @@ processor.set_io_mode(fmwk.storage_manager.BOTH)
 
 processor.set_rootdir('scanner')
 
-for x in xrange(len(sys.argv)):
+for x in range(len(sys.argv)):
 
     if x < 1: continue
     processor.add_input_file(sys.argv[x])

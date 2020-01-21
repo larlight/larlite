@@ -40,5 +40,5 @@ if __name__ == '__main__':
     cb.show()
     cb.setItems({'': None, 'a': 1, 'b': 2, 'c': 3})
     def fn(ind):
-        print("New value: %s" % cb.value())
+        print(("New value: %s" % cb.value()))
     cb.currentIndexChanged.connect(fn)

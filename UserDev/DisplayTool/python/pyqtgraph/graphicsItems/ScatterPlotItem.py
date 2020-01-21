@@ -1,6 +1,6 @@
 from itertools import starmap, repeat
 try:
-    from itertools import imap
+    
 except ImportError:
     imap = map
 import numpy as np
@@ -13,7 +13,7 @@ from .GraphicsObject import GraphicsObject
 from .. import getConfigOption
 from ..pgcollections import OrderedDict
 from .. import debug
-from ..python2_3 import basestring
+from ..python2_3 import str
 
 __all__ = ['ScatterPlotItem', 'SpotItem']
 
@@ -31,7 +31,7 @@ coords = {
         (0.05, -0.05), (0.05, -0.5), (-0.05, -0.5), (-0.05, -0.05)
     ],
 }
-for k, c in coords.items():
+for k, c in list(coords.items()):
     Symbols[k].moveTo(*c[0])
     for x,y in c[1:]:
         Symbols[k].lineTo(x, y)
@@ -47,7 +47,7 @@ def drawSymbol(painter, symbol, size, pen, brush):
     painter.scale(size, size)
     painter.setPen(pen)
     painter.setBrush(brush)
-    if isinstance(symbol, basestring):
+    if isinstance(symbol, str):
         symbol = Symbols[symbol]
     if np.isscalar(symbol):
         symbol = list(Symbols.values())[symbol % len(Symbols)]
@@ -138,7 +138,7 @@ class SymbolAtlas(object):
         avgWidth = 0.0
         maxWidth = 0
         images = []
-        for key, sourceRect in self.symbolMap.items():
+        for key, sourceRect in list(self.symbolMap.items()):
             if sourceRect.width() == 0:
                 img = renderSymbol(key[0], key[1], sourceRect.pen, sourceRect.brush)
                 images.append(img)  ## we only need this to prevent the images being garbage collected immediately
@@ -160,7 +160,7 @@ class SymbolAtlas(object):
             width = 0
         
         # sort symbols by height
-        symbols = sorted(rendered.keys(), key=lambda x: rendered[x].shape[1], reverse=True)
+        symbols = sorted(list(rendered.keys()), key=lambda x: rendered[x].shape[1], reverse=True)
         
         self.atlasRows = []
 
@@ -550,7 +550,7 @@ class ScatterPlotItem(GraphicsObject):
                 
             self.fragmentAtlas.getAtlas() # generate atlas so source widths are available.
             
-            dataSet['width'] = np.array(list(imap(QtCore.QRectF.width, dataSet['sourceRect'])))/2
+            dataSet['width'] = np.array(list(map(QtCore.QRectF.width, dataSet['sourceRect'])))/2
             dataSet['targetRect'] = None
             self._maxSpotPxWidth = self.fragmentAtlas.max_width
         else:
@@ -753,11 +753,11 @@ class ScatterPlotItem(GraphicsObject):
                 if np.any(updateMask):
                     updatePts = pts[:,updateMask]
                     width = self.data[updateMask]['width']*2
-                    self.data['targetRect'][updateMask] = list(imap(QtCore.QRectF, updatePts[0,:], updatePts[1,:], width, width))
+                    self.data['targetRect'][updateMask] = list(map(QtCore.QRectF, updatePts[0,:], updatePts[1,:], width, width))
                 
                 data = self.data[viewMask]
                 if USE_PYSIDE or USE_PYQT5:
-                    list(imap(p.drawPixmap, data['targetRect'], repeat(atlas), data['sourceRect']))
+                    list(map(p.drawPixmap, data['targetRect'], repeat(atlas), data['sourceRect']))
                 else:
                     p.drawPixmapFragments(data['targetRect'].tolist(), data['sourceRect'].tolist(), atlas)
             else:

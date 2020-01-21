@@ -24,7 +24,7 @@ Does NOT:
 
 import inspect, os, sys, gc, traceback
 try:
-    import __builtin__ as builtins
+    import builtins as builtins
 except ImportError:
     import builtins
 from .debug import printExc
@@ -75,7 +75,7 @@ def reload(module, debug=False, lists=False, dicts=False):
     - Requires that class and function names have not changed
     """
     if debug:
-        print("Reloading %s" % str(module))
+        print(("Reloading %s" % str(module)))
         
     ## make a copy of the old module dictionary, reload, then grab the new module dictionary for comparison
     oldDict = module.__dict__.copy()
@@ -95,7 +95,7 @@ def reload(module, debug=False, lists=False, dicts=False):
         
         if inspect.isclass(old):
             if debug:
-                print("  Updating class %s.%s (0x%x -> 0x%x)" % (module.__name__, k, id(old), id(new)))
+                print(("  Updating class %s.%s (0x%x -> 0x%x)" % (module.__name__, k, id(old), id(new))))
             updateClass(old, new, debug)
                     
         elif inspect.isfunction(old):
@@ -104,7 +104,7 @@ def reload(module, debug=False, lists=False, dicts=False):
                 extra = ""
                 if depth > 0:
                     extra = " (and %d previous versions)" % depth
-                print("  Updating function %s.%s%s" % (module.__name__, k, extra))
+                print(("  Updating function %s.%s%s" % (module.__name__, k, extra)))
         elif lists and isinstance(old, list):
             l = old.len()
             old.extend(new)
@@ -160,7 +160,7 @@ def updateClass(old, new, debug):
             if isinstance(ref, old) and ref.__class__ is old:
                 ref.__class__ = new
                 if debug:
-                    print("    Changed class for %s" % safeStr(ref))
+                    print(("    Changed class for %s" % safeStr(ref)))
             elif inspect.isclass(ref) and issubclass(ref, old) and old in ref.__bases__:
                 ind = ref.__bases__.index(old)
                 
@@ -176,12 +176,12 @@ def updateClass(old, new, debug):
                 ## (and I presume this may slow things down?)
                 ref.__bases__ = ref.__bases__[:ind] + (new,old) + ref.__bases__[ind+1:]
                 if debug:
-                    print("    Changed superclass for %s" % safeStr(ref))
+                    print(("    Changed superclass for %s" % safeStr(ref)))
             #else:
                 #if debug:
                     #print "    Ignoring reference", type(ref)
         except:
-            print("Error updating reference (%s) for class change (%s -> %s)" % (safeStr(ref), safeStr(old), safeStr(new)))
+            print(("Error updating reference (%s) for class change (%s -> %s)" % (safeStr(ref), safeStr(old), safeStr(new))))
             raise
         
     ## update all class methods to use new code.
@@ -194,7 +194,7 @@ def updateClass(old, new, debug):
                 na = getattr(new, attr)
             except AttributeError:
                 if debug:
-                    print("    Skipping method update for %s; new class does not have this attribute" % attr)
+                    print(("    Skipping method update for %s; new class does not have this attribute" % attr))
                 continue
                 
             if hasattr(oa, 'im_func') and hasattr(na, 'im_func') and oa.__func__ is not na.__func__:
@@ -204,13 +204,13 @@ def updateClass(old, new, debug):
                     extra = ""
                     if depth > 0:
                         extra = " (and %d previous versions)" % depth
-                    print("    Updating method %s%s" % (attr, extra))
+                    print(("    Updating method %s%s" % (attr, extra)))
                 
     ## And copy in new functions that didn't exist previously
     for attr in dir(new):
         if not hasattr(old, attr):
             if debug:
-                print("    Adding missing attribute %s" % attr)
+                print(("    Adding missing attribute %s" % attr))
             setattr(old, attr, getattr(new, attr))
             
     ## finally, update any previous versions still hanging around..
@@ -402,14 +402,14 @@ def fn():
     print("\n==> Test 1 Old instances:")
     a1.fn()
     b1.fn()
-    print("function IDs  a1 bound method: %d a1 func: %d  a1 class: %d  b1 func: %d  b1 class: %d" % (id(a1.fn), id(a1.fn.__func__), id(a1.fn.__self__.__class__), id(b1.fn.__func__), id(b1.fn.__self__.__class__)))
+    print(("function IDs  a1 bound method: %d a1 func: %d  a1 class: %d  b1 func: %d  b1 class: %d" % (id(a1.fn), id(a1.fn.__func__), id(a1.fn.__self__.__class__), id(b1.fn.__func__), id(b1.fn.__self__.__class__))))
 
     print("\n==> Test 1 New instances:")
     a2 = test1.A("a2")
     b2 = test1.B("b2")
     a2.fn()
     b2.fn()
-    print("function IDs  a1 bound method: %d a1 func: %d  a1 class: %d  b1 func: %d  b1 class: %d" % (id(a1.fn), id(a1.fn.__func__), id(a1.fn.__self__.__class__), id(b1.fn.__func__), id(b1.fn.__self__.__class__)))
+    print(("function IDs  a1 bound method: %d a1 func: %d  a1 class: %d  b1 func: %d  b1 class: %d" % (id(a1.fn), id(a1.fn.__func__), id(a1.fn.__self__.__class__), id(b1.fn.__func__), id(b1.fn.__self__.__class__))))
 
 
     os.remove(modFile1)

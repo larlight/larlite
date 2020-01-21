@@ -37,7 +37,7 @@ def mkrefs(*objs):
         for o in obj:
             allObjs[id(o)] = o
             
-    return map(weakref.ref, allObjs.values())
+    return list(map(weakref.ref, list(allObjs.values())))
 
 
 @pytest.mark.skipif(six.PY3 or pg.Qt.USE_PYSIDE, reason=skipreason)

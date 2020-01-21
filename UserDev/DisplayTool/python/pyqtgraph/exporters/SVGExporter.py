@@ -76,7 +76,7 @@ def generateSvg(item):
     finally:
         ## reset export mode for all items in the tree
         if isinstance(item, QtGui.QGraphicsScene):
-            items = item.items()
+            items = list(item.items())
         else:
             items = [item]
             for i in items:
@@ -147,7 +147,7 @@ def _generateItemSvg(item, nodes=None, root=None):
     if isinstance(item, QtGui.QGraphicsScene):
         xmlStr = "<g>\n</g>\n"
         doc = xml.parseString(xmlStr)
-        childs = [i for i in item.items() if i.parentItem() is None]
+        childs = [i for i in list(item.items()) if i.parentItem() is None]
     elif item.__class__.paint == QtGui.QGraphicsItem.paint:
         xmlStr = "<g>\n</g>\n"
         doc = xml.parseString(xmlStr)
@@ -202,7 +202,7 @@ def _generateItemSvg(item, nodes=None, root=None):
         if len(defs) > 0:
             defs = [n for n in defs[0].childNodes if isinstance(n, xml.Element)]
     except:
-        print(doc.toxml())
+        print((doc.toxml()))
         raise
 
     profiler('render')

@@ -93,7 +93,7 @@ class ViewBoxMenu(QtGui.QMenu):
     def setExportMethods(self, methods):
         self.exportMethods = methods
         self.export.clear()
-        for opt, fn in methods.items():
+        for opt, fn in list(methods.items()):
             self.export.addAction(opt, self.exportMethod)
         
 

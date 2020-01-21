@@ -3,11 +3,11 @@ from ROOT import *
 
 try:
 
-    print "PyROOT recognized your class %s" % str(sample)
+    print("PyROOT recognized your class %s" % str(sample))
 
 except NameError:
 
-    print "Failed importing FhiclLite..."
+    print("Failed importing FhiclLite...")
 
 sys.exit(0)
 

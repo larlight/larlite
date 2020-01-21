@@ -14,7 +14,7 @@ class ERViewer (GeoViewer):
     def setConfigFile(self, fname):
 
         if not os.path.isfile(fname):
-            print 'Error! not a file:',fname
+            print('Error! not a file:',fname)
             raise Exception
         self._cfg_mgr.Reset()
         self._cfg_mgr.AddCfgFile(fname);

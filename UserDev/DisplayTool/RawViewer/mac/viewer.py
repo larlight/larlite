@@ -1,8 +1,8 @@
 
 # Window Management
-from Tkinter import *
-import Tkinter as Tk
-import ttk
+from tkinter import *
+import tkinter as Tk
+import tkinter.ttk
 
 # Larlite 
 from larlite import larlite as fmwk
@@ -34,7 +34,7 @@ class DrawHandle():
   def init_proc(self):
     self.my_proc = fmwk.ana_processor()
     # Set input root file
-    for x in xrange(len(sys.argv)-1):
+    for x in range(len(sys.argv)-1):
       self.my_proc.add_input_file(sys.argv[x+1])
     # Specify IO mode
     self.my_proc.set_io_mode(fmwk.storage_manager.kREAD)
@@ -87,7 +87,7 @@ canvas.get_tk_widget().pack(side=Tk.TOP, fill=Tk.BOTH, expand=1)
 
 
 def on_key_event(event):
-    print('you pressed %s'%event.key)
+    print(('you pressed %s'%event.key))
     key_press_handler(event, canvas, toolbar)
 
 canvas.mpl_connect('key_press_event', on_key_event)

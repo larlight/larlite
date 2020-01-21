@@ -79,7 +79,7 @@ class SRTTransform(QtGui.QTransform):
         m = SRTTransform3D(m)
         angle, axis = m.getRotation()
         if angle != 0 and (axis[0] != 0 or axis[1] != 0 or axis[2] != 1):
-            print("angle: %s  axis: %s" % (str(angle), str(axis)))
+            print(("angle: %s  axis: %s" % (str(angle), str(axis))))
             raise Exception("Can only convert 4x4 matrix to 3x3 if rotation is around Z-axis.")
         self._state = {
             'pos': Point(m.getTranslation()),
@@ -215,23 +215,23 @@ if __name__ == '__main__':
     tr3 = QtGui.QTransform()
     tr3.translate(20, 0)
     tr3.rotate(45)
-    print("QTransform -> Transform:", SRTTransform(tr3))
+    print(("QTransform -> Transform:", SRTTransform(tr3)))
     
-    print("tr1:", tr1)
+    print(("tr1:", tr1))
     
     tr2.translate(20, 0)
     tr2.rotate(45)
-    print("tr2:", tr2)
+    print(("tr2:", tr2))
     
     dt = tr2/tr1
-    print("tr2 / tr1 = ", dt)
+    print(("tr2 / tr1 = ", dt))
     
-    print("tr2 * tr1 = ", tr2*tr1)
+    print(("tr2 * tr1 = ", tr2*tr1))
     
     tr4 = SRTTransform()
     tr4.scale(-1, 1)
     tr4.rotate(30)
-    print("tr1 * tr4 = ", tr1*tr4)
+    print(("tr1 * tr4 = ", tr1*tr4))
     
     w1 = widgets.TestROI((19,19), (22, 22), invertible=True)
     #w2 = widgets.TestROI((0,0), (150, 150))

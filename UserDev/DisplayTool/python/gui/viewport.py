@@ -101,7 +101,7 @@ class viewport(pg.GraphicsLayoutWidget):
 
   def toggleLogo(self,logoBool):
 
-    if self._logo in self.scene().items():
+    if self._logo in list(self.scene().items()):
         self.scene().removeItem(self._logo)
 
     self._useLogo = logoBool
@@ -131,7 +131,7 @@ class viewport(pg.GraphicsLayoutWidget):
     self._cmap.restoreState(self._colorMap)
 
   def mouseDrag(self):
-    print "mouse was dragged"
+    print("mouse was dragged")
 
   def getWidget(self):
 
@@ -369,12 +369,12 @@ class viewport(pg.GraphicsLayoutWidget):
     data = self._item.image
     totalpath = np.empty(0)
 
-    for p in xrange(len(self._dataPoints) - 1):
+    for p in range(len(self._dataPoints) - 1):
       start = int(round(self._dataPoints[p].x())), int(round(self._dataPoints[p].y()))
       end =  int(round(self._dataPoints[p+1].x())), int(round(self._dataPoints[p+1].y()))
       line = self.get_line(start,end)
       path = np.zeros([len(line)])
-      for i in xrange(len(line)):
+      for i in range(len(line)):
         pt = line[i]
         path[i] = data[pt[0]][pt[1]]
       # print line

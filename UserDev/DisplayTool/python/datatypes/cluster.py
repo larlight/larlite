@@ -1,6 +1,6 @@
-from database import recoBase
+from .database import recoBase
 from pyqtgraph.Qt import QtGui, QtCore
-from connectedObjects import connectedBox, connectedCircle, boxCollection
+from .connectedObjects import connectedBox, connectedCircle, boxCollection
 from ROOT import evd, vector
 import pyqtgraph as pg
 import larlite as larlite
@@ -178,7 +178,7 @@ class clusterParams(QtCore.QObject):  # recoBase):
         ########################################
         # Not super hard to do with the poly object
         self._thisPolyF = QtGui.QPolygonF()
-        for p in xrange(self._params.PolyObject.Size()):
+        for p in range(self._params.PolyObject.Size()):
             point = self._params.PolyObject.Point(p)
             qpoint = QtCore.QPointF( point.first / w2cm,
                                      (point.second - planeOffset) / t2cm + trigOffset)
@@ -313,7 +313,7 @@ class cluster(recoBase):
 
             clusters = self._process.getDataByPlane(thisPlane)
 
-            for i in xrange(len(clusters)):
+            for i in range(len(clusters)):
                 cluster = clusters[i]
                 # Now make the cluster
                 cluster_box_coll = boxCollection()

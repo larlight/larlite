@@ -5,9 +5,9 @@ from ROOT import *
 # Now import ana_processor & your class. For this example, ana_base.
 from ROOT import *
 if len(sys.argv) < 2:
-    print
-    print "*** Improper usage. Usage: python viewclusters.py /path/to/input/file.root ***"
-    print
+    print()
+    print("*** Improper usage. Usage: python viewclusters.py /path/to/input/file.root ***")
+    print()
 
 
 my_proc = larlite.ana_processor()
@@ -16,7 +16,7 @@ my_proc.set_verbosity(larlite.msg.kDEBUG)
 my_proc.set_io_mode(larlite.storage_manager.kREAD)
 
 #args should be input file name
-for x in xrange(len(sys.argv)-1):
+for x in range(len(sys.argv)-1):
 
     my_proc.add_input_file(sys.argv[x+1])
 
@@ -46,7 +46,7 @@ user_input_evt_no = 0;
 while true:
 
     try:
-        user_input_evt_no = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
+        user_input_evt_no = eval(input('Hit Enter to continue to next evt, or type in an event number to jump to that event:'))
     except SyntaxError:
         user_input_evt_no = user_input_evt_no + 1
 
@@ -66,7 +66,7 @@ while true:
 #            sys.stdin.readline()
 #    
 
-    print "Just showed Event %d. Hit enter to go next event..." % user_input_evt_no
+    print("Just showed Event %d. Hit enter to go next event..." % user_input_evt_no)
     sys.stdin.readline()
 
 

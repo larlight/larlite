@@ -16,8 +16,8 @@ from ROOT import flashana
 my_proc = fmwk.ana_processor()
 
 # Set input root file
-for x in xrange(len(sys.argv)-1):
-    print sys.argv[x+1]
+for x in range(len(sys.argv)-1):
+    print(sys.argv[x+1])
     my_proc.add_input_file(sys.argv[x+1])
 
 # Specify IO mode
@@ -59,16 +59,16 @@ my_unit.Manager().SetAlgo( flashana.QWeightPoint()   )
 
 my_unit.Manager().Configure( "%s/SelectionTool/OpT0Finder/App/mac/flashmatch.fcl" % os.environ['LARLITE_USERDEVDIR'])
 
-print
-print  "Finished configuring ana_processor. Start event loop!"
-print
+print()
+print("Finished configuring ana_processor. Start event loop!")
+print()
 
 # Let's run it.
 my_proc.run()
 
 # done!
-print
-print "Finished running ana_processor event loop!"
-print
+print()
+print("Finished running ana_processor event loop!")
+print()
 
 sys.exit(0)

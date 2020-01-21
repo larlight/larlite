@@ -18,7 +18,7 @@ shower._dedx   = 2.2
 
 # track:
 track = ertool.Track()
-for n in xrange(11):
+for n in range(11):
     track.push_back(geoalgo.Vector(-45.1+(10+45)*(n/10.),15.1-(10+15)*(n/10.),4.1+(30-4)*(n/10.)))
 track._energy = 435;
 
@@ -28,13 +28,13 @@ viewer.add(shower,'shower','b')
 viewer.add(track,'track','r')
 viewer.show()
 try:
-    counter = input('Hit ENTER when you are ready to close the viewer')
+    counter = eval(input('Hit ENTER when you are ready to close the viewer'))
 except:
-    print "Continuing to analys..."
+    print("Continuing to analys...")
 
 
 # are these shower and track correlated? is the shower a michel?
 dist = shower.Start().Dist(track.back())
-print "distance between shower start and track end is: %f"%dist
+print("distance between shower start and track end is: %f"%dist)
 
 

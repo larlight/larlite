@@ -14,7 +14,7 @@ from larlite import larlite as fmwk
 my_proc = fmwk.ana_processor()
 
 # Set input root files
-for x in xrange(len(sys.argv)):
+for x in range(len(sys.argv)):
     if x < 1:
         continue
     my_proc.add_input_file(sys.argv[x])
@@ -41,9 +41,9 @@ sq_module.SetMinEnergyCut(0.)
 sq_module.SetSingleParticleQuality(True)
 my_proc.add_process(sq_module)
 
-print
-print  "Finished configuring ana_processor. Start event loop!"
-print
+print()
+print("Finished configuring ana_processor. Start event loop!")
+print()
 
 my_proc.run()
 

@@ -1,6 +1,6 @@
 import numpy as np
 from .Qt import QtGui, QtCore
-from .python2_3 import basestring
+from .python2_3 import str
 
 
 class ColorMap(object):
@@ -85,7 +85,7 @@ class ColorMap(object):
         qcolor      Values are returned as an array of QColor objects.
         =========== ===============================================================
         """
-        if isinstance(mode, basestring):
+        if isinstance(mode, str):
             mode = self.enumMap[mode.lower()]
             
         if mode == self.QCOLOR:
@@ -139,7 +139,7 @@ class ColorMap(object):
         
         pos, color = self.getStops(mode=self.BYTE)
         color = [QtGui.QColor(*x) for x in color]
-        g.setStops(zip(pos, color))
+        g.setStops(list(zip(pos, color)))
         
         #if self.colorMode == 'rgb':
             #ticks = self.listTicks()
@@ -162,7 +162,7 @@ class ColorMap(object):
     def getColors(self, mode=None):
         """Return list of all color stops converted to the specified mode.
         If mode is None, then no conversion is done."""
-        if isinstance(mode, basestring):
+        if isinstance(mode, str):
             mode = self.enumMap[mode.lower()]
         
         color = self.color
@@ -214,7 +214,7 @@ class ColorMap(object):
                           See :func:`map() <pyqtgraph.ColorMap.map>`.
         ===============   =============================================================================
         """
-        if isinstance(mode, basestring):
+        if isinstance(mode, str):
             mode = self.enumMap[mode.lower()]
         
         if alpha is None:

@@ -7,7 +7,7 @@ possible to pre-compile the .ui file using pyuic (see VideoSpeedTest and
 ScatterPlotSpeedTest examples; these .ui files have been compiled with the
 tools/rebuildUi.py script).
 """
-import initExample ## Add path to library (just for examples; you do not need this)
+from . import initExample ## Add path to library (just for examples; you do not need this)
 
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui

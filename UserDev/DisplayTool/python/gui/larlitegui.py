@@ -1,4 +1,4 @@
-from gui import gui
+from .gui import gui
 from pyqtgraph.Qt import QtGui, QtCore
 from evdmanager import larlite_manager
 

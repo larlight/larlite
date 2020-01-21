@@ -13,32 +13,32 @@ def main(**args):
   # my_proc.enable_event_alignment(False)
 
   if args['verbose']:
-      print "Verbose mode turned on."
+      print("Verbose mode turned on.")
       if args['source'] != None:
-          print "\tSource file is " + args['source']
+          print("\tSource file is " + args['source'])
       if args['data_output'] != None:
-          print "\tData output file is " + args['data_output']
+          print("\tData output file is " + args['data_output'])
       if args['ana_output'] != None:
-          print "\tAna output file is " + args['ana_output'] 
+          print("\tAna output file is " + args['ana_output']) 
       # my_proc.set_verbosity(larlite.msg.kDEBUG)
   # else:
   my_proc.set_verbosity(larlite.msg.kERROR)
 
   if args['source'] == None:
-      print "Error: please specificy an input file with -s or --source."
+      print("Error: please specificy an input file with -s or --source.")
       quit()
 
   if args['data_output'] == None:
       args['data_output'] = "default_event_output.root"
       if args['verbose']:
-        print "No event output file selected.  If necessary, output will go to:"
-        print "\t"+args['data_output']
+        print("No event output file selected.  If necessary, output will go to:")
+        print("\t"+args['data_output'])
 
   if args['ana_output'] == None:
       args['ana_output'] = "default_ana_output.root"
       if  args['verbose']:
-        print "No ana output file selected.  If necessary, output will go to:"
-        print "\t"+args['ana_output']
+        print("No ana output file selected.  If necessary, output will go to:")
+        print("\t"+args['ana_output'])
 
   if args['num_events'] != None:
     nevents = int(args['num_events'])
@@ -76,8 +76,8 @@ def main(**args):
     start = time.clock()
     my_proc.run(0,nevents)
     end = time.clock()
-    print "Processed ", nevents, " events in ", end-start, "seconds."
-    print "Average per event: ", (end-start)/nevents, "seconds."
+    print("Processed ", nevents, " events in ", end-start, "seconds.")
+    print("Average per event: ", (end-start)/nevents, "seconds.")
   else:
     my_proc.run()
 
@@ -98,7 +98,7 @@ if __name__ == '__main__':
   args = parser.parse_args()
 
   if len(sys.argv) == 1:
-      print "\n-------You forgot to include a source file!-------\n"
+      print("\n-------You forgot to include a source file!-------\n")
       parser.print_help()
 
   main(**vars(args))

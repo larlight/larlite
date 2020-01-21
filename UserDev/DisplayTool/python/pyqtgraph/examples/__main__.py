@@ -138,12 +138,12 @@ class ExampleLoader(QtGui.QMainWindow):
         
 
     def populateTree(self, root, examples):
-        for key, val in examples.items():
+        for key, val in list(examples.items()):
             item = QtGui.QTreeWidgetItem([key])
             self.itemCache.append(item) # PyQt 4.9.6 no longer keeps references to these wrappers,
                                         # so we need to make an explicit reference or else the .file
                                         # attribute will disappear.
-            if isinstance(val, basestring):
+            if isinstance(val, str):
                 item.file = val
             else:
                 self.populateTree(item, val)
@@ -216,9 +216,9 @@ def run():
 def buildFileList(examples, files=None):
     if files == None:
         files = []
-    for key, val in examples.items():
+    for key, val in list(examples.items()):
         #item = QtGui.QTreeWidgetItem([key])
-        if isinstance(val, basestring):
+        if isinstance(val, str):
             #item.file = val
             files.append((key,val))
         else:
@@ -282,11 +282,11 @@ except:
     res = (process.stdout.read(), process.stderr.read())
     
     if fail or 'exception' in res[1].decode().lower() or 'error' in res[1].decode().lower():
-        print('.' * (50-len(name)) + 'FAILED')
-        print(res[0].decode())
-        print(res[1].decode())
+        print(('.' * (50-len(name)) + 'FAILED'))
+        print((res[0].decode()))
+        print((res[1].decode()))
     else:
-        print('.' * (50-len(name)) + 'passed')
+        print(('.' * (50-len(name)) + 'passed'))
     
 
 
@@ -304,7 +304,7 @@ if __name__ == '__main__':
             lib = ''
             
         exe = sys.executable
-        print("Running tests:", lib, sys.executable)
+        print(("Running tests:", lib, sys.executable))
         for f in files:
             testFile(f[0], f[1], exe, lib)
     else: 

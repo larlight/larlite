@@ -11,7 +11,7 @@ def ask_binary(msg='Proceed? [y/n]:'):
         user_input = sys.stdin.readline().rstrip('\n').lower()
         if user_input in ['y','n']: break
 
-        print 'Invalid input:',user_input
+        print('Invalid input:',user_input)
         user_input=''
 
     return user_input == 'y'

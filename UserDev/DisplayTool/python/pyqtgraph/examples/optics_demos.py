@@ -6,9 +6,9 @@ Optical system design demo
 
 """
 
-import initExample ## Add path to library (just for examples; you do not need this)
+from . import initExample ## Add path to library (just for examples; you do not need this)
 
-from optics import *
+from .optics import *
 
 import pyqtgraph as pg
 

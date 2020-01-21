@@ -13,7 +13,7 @@ from larlite import larlite as fmwk
 my_proc = fmwk.ana_processor()
 
 # Set input root file
-for x in xrange(len(sys.argv)-1):
+for x in range(len(sys.argv)-1):
     fname = sys.argv[x+1]
     my_proc.add_input_file(fname)
     
@@ -37,9 +37,9 @@ hitcheck.setOffset(offset)
 hitcheck.setNSigma(NSIGMA)
 my_proc.add_process(hitcheck)
 
-print
-print  "Finished configuring ana_processor. Start event loop!"
-print
+print()
+print("Finished configuring ana_processor. Start event loop!")
+print()
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -51,7 +51,7 @@ def gauss(mu,sigma):
     timeticks = []
     amps = []
     numpoints = 200
-    for i in xrange(numpoints):
+    for i in range(numpoints):
         t = (mu-2*sigma) + (2*sigma) * (float(i)/ (numpoints/2.) )
         timeticks.append(t)
         adc = 1./np.sqrt( 2 * np.pi * sigma*sigma ) * np.exp ( - ( (t-mu) / sigma )**2 * 0.5 )
@@ -81,7 +81,7 @@ while ( my_proc.process_event() ):
     #my_proc.process_event()
     
     # loop through all channels
-    for chan in xrange(0,8256):
+    for chan in range(0,8256):
 
         # make sure there is information stored at this channel
         if (hitcheck.hasHits(chan) == False):

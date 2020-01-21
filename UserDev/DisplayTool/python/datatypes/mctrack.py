@@ -1,4 +1,4 @@
-from database import recoBase
+from .database import recoBase
 from pyqtgraph.Qt import QtGui, QtCore
 from ROOT import evd
 import pyqtgraph as pg
@@ -63,7 +63,7 @@ import pyqtgraph as pg
 #                 self._drawnObjects[view.plane()].append(thisPoly)
 
 
-from database import recoBase3D
+from .database import recoBase3D
 
 try:
     import pyqtgraph.opengl as gl
@@ -116,6 +116,6 @@ try:
     # self.addItem(cylinder)
 
 
-except Exception, e:
+except Exception as e:
     pass
 

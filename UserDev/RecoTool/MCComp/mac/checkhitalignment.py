@@ -13,7 +13,7 @@ from larlite import larlite as fmwk
 my_proc = fmwk.ana_processor()
 
 # Set input root file
-for x in xrange(len(sys.argv)-1):
+for x in range(len(sys.argv)-1):
     fname = sys.argv[x+1]
     my_proc.add_input_file(fname)
     
@@ -31,9 +31,9 @@ hitcheck.setHitProducer('gaushit')
 
 my_proc.add_process(hitcheck)
 
-print
-print  "Finished configuring ana_processor. Start event loop!"
-print
+print()
+print("Finished configuring ana_processor. Start event loop!")
+print()
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -43,7 +43,7 @@ def gauss(mu,sigma):
     timeticks = []
     amps = []
     numpoints = 200
-    for i in xrange(numpoints):
+    for i in range(numpoints):
         t = (mu-2*sigma) + (2*sigma) * (float(i)/ (numpoints/2.) )
         timeticks.append(t)
         adc = 1./np.sqrt( 2 * np.pi * sigma*sigma ) * np.exp ( - ( (t-mu) / sigma )**2 * 0.5 )
@@ -55,7 +55,7 @@ fig, ax = plt.subplots(1,1,figsize=(20,8))
 while ( my_proc.process_event() ):
     
     # loop through all channels
-    for chan in xrange(4800,8256):
+    for chan in range(4800,8256):
         
         # make sure there is information stored at this channel
         if (hitcheck.hasHits(chan) == False):
@@ -67,12 +67,12 @@ while ( my_proc.process_event() ):
         hits = hitcheck.getHits(chan)
         ides = hitcheck.getIDEs(chan)
 
-        print 'channel : %i'%chan
-        print 'there are %i hits and %i ides'%(hits.size(), ides.size())
+        print('channel : %i'%chan)
+        print('there are %i hits and %i ides'%(hits.size(), ides.size()))
         
         # skip channels with > 1 hit
         if (hits.size() > 1):
-            print 'skipping event w/ more than 1 hit...'
+            print('skipping event w/ more than 1 hit...')
             continue
 
         maxhittick = 0
@@ -80,11 +80,11 @@ while ( my_proc.process_event() ):
         hitIntegral = 0.
         
         for hit in hits:
-            print 'hit time : %i'%hit.PeakTime()
+            print('hit time : %i'%hit.PeakTime())
             maxhittick = hit.PeakTime()
             times,adcs = gauss(hit.PeakTime(),hit.RMS())
             hitIntegral = hit.Integral()
-            print 'Hit integral : %.02f'%hitIntegral
+            print('Hit integral : %.02f'%hitIntegral)
             plt.plot(times,adcs,'ro',label='Hit Gauss Fit')
             plt.axvspan(hit.PeakTime()-3*hit.RMS(),hit.PeakTime()+3*hit.RMS(),color='r',alpha=0.5,label='Simch integration Region')
             plt.xlim([hit.PeakTime()-10*hit.RMS(),hit.PeakTime()+10*hit.RMS()])
@@ -104,15 +104,15 @@ while ( my_proc.process_event() ):
             qtot += ide.second
 
         offset = maxtick - maxhittick
-        print 'offset (ticks) is ',offset
+        print('offset (ticks) is ',offset)
 
         ideTime   = np.array(ideTime)-offset
         
-        print 'IDE Q = %.02f'%(np.sum(ideCharge))
+        print('IDE Q = %.02f'%(np.sum(ideCharge)))
         ideCharge = np.array(ideCharge)/float(qtot)
         if (qtot == 0):
             continue
-        print 'Hit Q / # e- = %.02f 10^3'%(1000*hitIntegral/qtot)
+        print('Hit Q / # e- = %.02f 10^3'%(1000*hitIntegral/qtot))
 
         
         plt.plot(ideTime,ideCharge,'bo',label='Simch IDEs')
@@ -125,7 +125,7 @@ while ( my_proc.process_event() ):
         fig.canvas
         fig.canvas.draw()
         
-        usrinput = raw_input("Hit Enter: next channel  || int: go to channel number ||  q: exit viewer\n")                        
+        usrinput = input("Hit Enter: next channel  || int: go to channel number ||  q: exit viewer\n")                        
         if ( usrinput == "q" ):                                                          
             sys.exit(0)
         elif ( usrinput.isdigit() == True):

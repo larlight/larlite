@@ -2,7 +2,7 @@
 """
 Test programmatically setting log transformation modes.
 """
-import initExample ## Add path to library (just for examples; you do not need this)
+from . import initExample ## Add path to library (just for examples; you do not need this)
 
 import numpy as np
 from pyqtgraph.Qt import QtGui, QtCore

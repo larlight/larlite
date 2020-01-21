@@ -20,7 +20,7 @@ my_proc = fmwk.ana_processor()
 #    my_proc.add_input_file(sys.argv[x])
 
 
-for x in xrange(len(sys.argv)-3):
+for x in range(len(sys.argv)-3):
     my_proc.add_input_file(sys.argv[x+1])
 
 #last arg should be output file name
@@ -42,16 +42,16 @@ mmq.SetPFParticleProducer("timeprofile")
 
 my_proc.add_process(mmq)
 
-print
-print  "Finished configuring ana_processor. Start event loop!"
-print
+print()
+print("Finished configuring ana_processor. Start event loop!")
+print()
 
 # Let's run it.
 my_proc.run(0,100)
 
 # done!
-print
-print "Finished running ana_processor event loop!"
-print
+print()
+print("Finished running ana_processor event loop!")
+print()
 
 sys.exit(0)

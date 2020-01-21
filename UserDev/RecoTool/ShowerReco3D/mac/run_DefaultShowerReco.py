@@ -18,7 +18,7 @@ from recotool.showerDef import DefaultShowerReco3D, PandoraShowerReco3D
 my_proc = fmwk.ana_processor()
 
 # Set input root file
-for x in xrange(len(sys.argv)-1):
+for x in range(len(sys.argv)-1):
     my_proc.add_input_file(sys.argv[x+1])
 
 # Specify IO mode
@@ -41,9 +41,9 @@ my_proc.set_data_to_write(fmwk.data.kShower,shrname)
 my_proc.set_data_to_write(fmwk.data.kAssociation,shrname)
 my_proc.add_process(ana_unit)
 
-print
-print  "Finished configuring ana_processor. Start event loop!"
-print
+print()
+print("Finished configuring ana_processor. Start event loop!")
+print()
 
 #my_proc.run(0,5)
 my_proc.run()

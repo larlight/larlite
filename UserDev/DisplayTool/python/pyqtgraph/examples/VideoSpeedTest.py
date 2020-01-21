@@ -7,7 +7,7 @@ is used by the view widget
 """
 
 
-import initExample ## Add path to library (just for examples; you do not need this)
+from . import initExample ## Add path to library (just for examples; you do not need this)
 
 
 from pyqtgraph.Qt import QtGui, QtCore, USE_PYSIDE
@@ -16,9 +16,9 @@ import pyqtgraph as pg
 import pyqtgraph.ptime as ptime
 
 if USE_PYSIDE:
-    import VideoTemplate_pyside as VideoTemplate
+    from . import VideoTemplate_pyside as VideoTemplate
 else:
-    import VideoTemplate_pyqt as VideoTemplate
+    from . import VideoTemplate_pyqt as VideoTemplate
     
 
 #QtGui.QApplication.setGraphicsSystem('raster')

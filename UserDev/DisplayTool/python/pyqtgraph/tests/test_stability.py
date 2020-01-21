@@ -58,7 +58,7 @@ def crashtest():
             try:
                 action = randItem(actions)
                 action()
-                print('[%d widgets alive, %d zombie]' % (len(allWidgets), len(allWidgets) - len(widgets)))
+                print(('[%d widgets alive, %d zombie]' % (len(allWidgets), len(allWidgets) - len(widgets))))
             except KeyboardInterrupt:
                 print("Caught interrupt; send another to exit.")
                 try:

@@ -148,7 +148,7 @@ class product(object):
           assTokens=self._typeName.split(',')
           product1=assTokens[0].split('<')[-1]
           product2=assTokens[1]
-          print "Association between ", product1, " and ", product2, " by ", self._producer
+          print("Association between ", product1, " and ", product2, " by ", self._producer)
           try:
               self._larliteLookupName=lookUpTable[product1]
           except:
@@ -243,7 +243,7 @@ if __name__ == '__main__':
     else:
       exp="microboone"
 
-    print args
+    print(args)
 
     if args.file is None:
       parser.print_help()
@@ -284,8 +284,8 @@ if __name__ == '__main__':
                     product.producer())
         # print product.typeName()
 
-    print ""
-    print ""
+    print("")
+    print("")
 
     # for item in larlite_data_table:
       # print item, ": ", larlite_data_table[item]

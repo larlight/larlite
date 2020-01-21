@@ -16,10 +16,10 @@ from ROOT import flashana
 my_proc = fmwk.ana_processor()
 
 # Set input root file
-for x in xrange(len(sys.argv)):
+for x in range(len(sys.argv)):
     if not sys.argv[x].endswith('.root'):
         continue
-    print sys.argv[x]
+    print(sys.argv[x])
     my_proc.add_input_file(sys.argv[x])
 
 # Specify IO mode
@@ -34,9 +34,9 @@ my_unit = fmwk.UBT0Finder()
 my_proc.add_process(my_unit)
 my_unit.SetConfigFile("%s/SelectionTool/OpT0Finder/App/mac/flashmatch.fcl" % os.environ['LARLITE_USERDEVDIR'])
 
-print
-print  "Finished configuring ana_processor. Start event loop!"
-print
+print()
+print("Finished configuring ana_processor. Start event loop!")
+print()
 fout1=open('data.txt','w')
 fout1.write('xmin,xmax,time,x,t,q,oppe,hypope\n')
 ctr=0
@@ -54,7 +54,7 @@ while 1:
 
     #print match_v.size(),'match found for',qcluster_v.size(),'tpc objects and',flash_v.size(),'pmt objects'
 
-    for index in xrange(match_v.size()):
+    for index in range(match_v.size()):
         #print 'Match id',index
         match = match_v[index]
         #print 'TPC:',match.tpc_id,'PMT:',match.flash_id,'Score:',match.score,'TPC point:',match.tpc_point.x,match.tpc_point.y,match.tpc_point.z
@@ -65,11 +65,11 @@ while 1:
         try:
             qc = qcluster_v[match.tpc_id]
         except IndexError:
-            print
-            print match.tpc_id,'/',qcluster_v.size()
-            print
+            print()
+            print(match.tpc_id,'/',qcluster_v.size())
+            print()
             raise IndexError
-        for pt_idx in xrange(qc.size()):
+        for pt_idx in range(qc.size()):
             pt = qc[pt_idx]
             if pt.x > xmax: xmax = pt.x
             if pt.x < xmin: xmin = pt.x
@@ -93,8 +93,8 @@ while 1:
         cmd=sys.stdin.readline().rstrip('\n')
         if cmd.lower() in ['n','no']: break
 # done!
-print
-print "Finished running ana_processor event loop!"
-print
+print()
+print("Finished running ana_processor event loop!")
+print()
 fout.close()
 sys.exit(0)

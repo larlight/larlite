@@ -83,7 +83,7 @@ def test_dAlgo():
             a2 = pt2.SqDist(p)
             if not ( np.abs(answer-a1) < _epsilon ) : success_f = 0
             if not ( np.abs(answer-a2) < _epsilon ) : success_f = 0
-            for x in xrange(3):
+            for x in range(3):
                 if not ( np.abs(pt1[x]-i[x]) < _epsilon) : success_f = 0
                 if not ( np.abs(pt1[x]-i[x]) < _epsilon) : success_f = 0
             totSuccess_f += success_f
@@ -103,7 +103,7 @@ def test_dAlgo():
             a2 = pt2.SqDist(p)
             if not ( np.abs(answer-a1) < _epsilon ) : success_b = 0
             if not ( np.abs(answer-a2) < _epsilon ) : success_b = 0
-            for x in xrange(3):
+            for x in range(3):
                 if not ( np.abs(pt1[x]-i[x]) < _epsilon) : success_b = 0
                 if not ( np.abs(pt1[x]-i[x]) < _epsilon) : success_b = 0
             if (success_b == 1) : totSuccess_b += 1
@@ -122,7 +122,7 @@ def test_dAlgo():
 
     except Exception:
         error('geoalgo::IntersectAlgo unit test failed.')
-        print traceback.format_exception(*sys.exc_info())[2]
+        print(traceback.format_exception(*sys.exc_info())[2])
         return 1
     
     info('geoalgo::IntersectAlgo unit test complete.')

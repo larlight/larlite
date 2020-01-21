@@ -14,7 +14,7 @@ import types, copy, threading, os, re
 import pickle
 from functools import reduce
 import numpy as np
-from ..python2_3 import basestring
+from ..python2_3 import str
 #import traceback
 
 ## By default, the library will use HDF5 when writing files.
@@ -114,7 +114,7 @@ class MetaArray(object):
     defaultCompression = None
     
     ## Types allowed as axis or column names
-    nameTypes = [basestring, tuple]
+    nameTypes = [str, tuple]
     @staticmethod
     def isNameType(var):
         return any([isinstance(var, t) for t in MetaArray.nameTypes])
@@ -303,7 +303,7 @@ class MetaArray(object):
         try:
             self._data[nInd] = val
         except:
-            print(self, nInd, val)
+            print((self, nInd, val))
             raise
         
     def __getattr__(self, attr):
@@ -442,7 +442,7 @@ class MetaArray(object):
         if type(axis) == int:
             ind = [slice(None)]*axis
             ind.append(order)
-        elif isinstance(axis, basestring):
+        elif isinstance(axis, str):
             ind = (slice(axis, order),)
         return self[tuple(ind)]
   
@@ -506,7 +506,7 @@ class MetaArray(object):
         return tuple(nInd)
       
     def _interpretAxis(self, axis):
-        if isinstance(axis, basestring) or isinstance(axis, tuple):
+        if isinstance(axis, str) or isinstance(axis, tuple):
             return self._getAxis(axis)
         else:
             return axis
@@ -927,7 +927,7 @@ class MetaArray(object):
         
         ver = f.attrs['MetaArray']
         if ver > MetaArray.version:
-            print("Warning: This file was written with MetaArray version %s, but you are using version %s. (Will attempt to read anyway)" % (str(ver), str(MetaArray.version)))
+            print(("Warning: This file was written with MetaArray version %s, but you are using version %s. (Will attempt to read anyway)" % (str(ver), str(MetaArray.version))))
         meta = MetaArray.readHDF5Meta(f['info'])
         self._info = meta
         
@@ -982,7 +982,7 @@ class MetaArray(object):
         ## Pull list of values from attributes and child objects
         for k in root.attrs:
             val = root.attrs[k]
-            if isinstance(val, basestring):  ## strings need to be re-evaluated to their original types
+            if isinstance(val, str):  ## strings need to be re-evaluated to their original types
                 try:
                     val = eval(val)
                 except:
@@ -1156,7 +1156,7 @@ class MetaArray(object):
         elif isinstance(data, dict):
             gr = root.create_group(name)
             gr.attrs['_metaType_'] = 'dict'
-            for k, v in data.items():
+            for k, v in list(data.items()):
                 self.writeHDF5Meta(gr, k, v, **dsOpts)
         elif isinstance(data, int) or isinstance(data, float) or isinstance(data, np.integer) or isinstance(data, np.floating):
             root.attrs[name] = data
@@ -1164,7 +1164,7 @@ class MetaArray(object):
             try:   ## strings, bools, None are stored as repr() strings
                 root.attrs[name] = repr(data)
             except:
-                print("Can not store meta data of type '%s' in HDF5. (key is '%s')" % (str(type(data)), str(name)))
+                print(("Can not store meta data of type '%s' in HDF5. (key is '%s')" % (str(type(data)), str(name))))
                 raise 
 
         
@@ -1365,80 +1365,80 @@ if __name__ == '__main__':
     print("\n -- normal integer indexing\n")
     
     print("\n  ma[1]")
-    print(ma[1])
+    print((ma[1]))
     
     print("\n  ma[1, 2:4]")
-    print(ma[1, 2:4])
+    print((ma[1, 2:4]))
     
     print("\n  ma[1, 1:5:2]")
-    print(ma[1, 1:5:2])
+    print((ma[1, 1:5:2]))
     
     print("\n -- named axis indexing\n")
     
     print("\n  ma['Axis2':3]")
-    print(ma['Axis2':3])
+    print((ma['Axis2':3]))
     
     print("\n  ma['Axis2':3:5]")
-    print(ma['Axis2':3:5])
+    print((ma['Axis2':3:5]))
     
     print("\n  ma[1, 'Axis2':3]")
-    print(ma[1, 'Axis2':3])
+    print((ma[1, 'Axis2':3]))
     
     print("\n  ma[:, 'Axis2':3]")
-    print(ma[:, 'Axis2':3])
+    print((ma[:, 'Axis2':3]))
     
     print("\n  ma['Axis2':3, 'Axis4':0:2]")
-    print(ma['Axis2':3, 'Axis4':0:2])
+    print((ma['Axis2':3, 'Axis4':0:2]))
     
     
     print("\n -- column name indexing\n")
     
     print("\n  ma['Axis3':'Ax3Col1']")
-    print(ma['Axis3':'Ax3Col1'])
+    print((ma['Axis3':'Ax3Col1']))
     
     print("\n  ma['Axis3':('Ax3','Col3')]")
-    print(ma['Axis3':('Ax3','Col3')])
+    print((ma['Axis3':('Ax3','Col3')]))
     
     print("\n  ma[:, :, 'Ax3Col2']")
-    print(ma[:, :, 'Ax3Col2'])
+    print((ma[:, :, 'Ax3Col2']))
     
     print("\n  ma[:, :, ('Ax3','Col3')]")
-    print(ma[:, :, ('Ax3','Col3')])
+    print((ma[:, :, ('Ax3','Col3')]))
     
     
     print("\n -- axis value range indexing\n")
     
     print("\n  ma['Axis2':1.5:4.5]")
-    print(ma['Axis2':1.5:4.5])
+    print((ma['Axis2':1.5:4.5]))
     
     print("\n  ma['Axis4':1.15:1.45]")
-    print(ma['Axis4':1.15:1.45])
+    print((ma['Axis4':1.15:1.45]))
     
     print("\n  ma['Axis4':1.15:1.25]")
-    print(ma['Axis4':1.15:1.25])
+    print((ma['Axis4':1.15:1.25]))
     
     
     
     print("\n -- list indexing\n")
     
     print("\n  ma[:, [0,2,4]]")
-    print(ma[:, [0,2,4]])
+    print((ma[:, [0,2,4]]))
     
     print("\n  ma['Axis4':[0,2,4]]")
-    print(ma['Axis4':[0,2,4]])
+    print((ma['Axis4':[0,2,4]]))
     
     print("\n  ma['Axis3':[0, ('Ax3','Col3')]]")
-    print(ma['Axis3':[0, ('Ax3','Col3')]])
+    print((ma['Axis3':[0, ('Ax3','Col3')]]))
     
     
     
     print("\n -- boolean indexing\n")
     
     print("\n  ma[:, array([True, True, False, True, False])]")
-    print(ma[:, np.array([True, True, False, True, False])])
+    print((ma[:, np.array([True, True, False, True, False])]))
     
     print("\n  ma['Axis4':array([True, False, False, False])]")
-    print(ma['Axis4':np.array([True, False, False, False])])
+    print((ma['Axis4':np.array([True, False, False, False])]))
     
     
     
@@ -1466,7 +1466,7 @@ if __name__ == '__main__':
     ma2 = MetaArray(file=tf)
     
     #print ma2
-    print("\nArrays are equivalent:", (ma == ma2).all())
+    print(("\nArrays are equivalent:", (ma == ma2).all()))
     #print "Meta info is equivalent:", ma.infoCopy() == ma2.infoCopy()
     os.remove(tf)
     
@@ -1475,7 +1475,7 @@ if __name__ == '__main__':
     # append mode
     
     
-    print("\n================append test (%s)===============" % tf)
+    print(("\n================append test (%s)===============" % tf))
     ma['Axis2':0:2].write(tf, appendAxis='Axis2')
     for i in range(2,ma.shape[1]):
         ma['Axis2':[i]].write(tf, appendAxis='Axis2')
@@ -1483,7 +1483,7 @@ if __name__ == '__main__':
     ma2 = MetaArray(file=tf)
     
     #print ma2
-    print("\nArrays are equivalent:", (ma == ma2).all())
+    print(("\nArrays are equivalent:", (ma == ma2).all()))
     #print "Meta info is equivalent:", ma.infoCopy() == ma2.infoCopy()
     
     os.remove(tf)    
@@ -1494,6 +1494,6 @@ if __name__ == '__main__':
     print("\n==========Memmap test============")
     ma.write(tf, mappable=True)
     ma2 = MetaArray(file=tf, mmap=True)
-    print("\nArrays are equivalent:", (ma == ma2).all())
+    print(("\nArrays are equivalent:", (ma == ma2).all()))
     os.remove(tf)    
     

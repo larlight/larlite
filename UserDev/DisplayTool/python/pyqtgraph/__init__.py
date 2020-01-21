@@ -73,10 +73,10 @@ def getConfigOption(opt):
 
 
 def systemInfo():
-    print("sys.platform: %s" % sys.platform)
-    print("sys.version: %s" % sys.version)
+    print(("sys.platform: %s" % sys.platform))
+    print(("sys.version: %s" % sys.version))
     from .Qt import VERSION_INFO
-    print("qt bindings: %s" % VERSION_INFO)
+    print(("qt bindings: %s" % VERSION_INFO))
     
     global __version__
     rev = None
@@ -85,7 +85,7 @@ def systemInfo():
         if os.path.exists(lastRevFile):
             rev = open(lastRevFile, 'r').read().strip()
     
-    print("pyqtgraph: %s; %s" % (__version__, rev))
+    print(("pyqtgraph: %s; %s" % (__version__, rev)))
     print("config:")
     import pprint
     pprint.pprint(CONFIG_OPTIONS)
@@ -121,8 +121,8 @@ def renamePyc(startDir):
                     if not os.path.exists(name2):
                         break
                     n += 1
-                print("  " + fileName + "  ==>")
-                print("  " + name2)
+                print(("  " + fileName + "  ==>"))
+                print(("  " + name2))
                 os.rename(fileName, name2)
                 
 path = os.path.split(__file__)[0]

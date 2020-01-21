@@ -1,7 +1,7 @@
 import os, sys, time, multiprocessing, re
 from .processes import ForkedProcess
 from .remoteproxy import ClosedError
-from ..python2_3 import basestring, xrange
+from ..python2_3 import str, xrange
 
 
 class CanceledError(Exception):
@@ -63,7 +63,7 @@ class Parallelize(object):
         self.showProgress = False
         if progressDialog is not None:
             self.showProgress = True
-            if isinstance(progressDialog, basestring):
+            if isinstance(progressDialog, str):
                 progressDialog = {'labelText': progressDialog}
             from ..widgets.ProgressDialog import ProgressDialog
             self.progressDlg = ProgressDialog(**progressDialog)
@@ -74,7 +74,7 @@ class Parallelize(object):
             workers = 1
         self.workers = workers
         if tasks is None:
-            tasks = range(workers)
+            tasks = list(range(workers))
         self.tasks = list(tasks)
         self.reseed = randomReseed
         self.kwds = kwds.copy()
@@ -116,7 +116,7 @@ class Parallelize(object):
         
         ## break up tasks into one set per worker
         workers = self.workers
-        chunks = [[] for i in xrange(workers)]
+        chunks = [[] for i in range(workers)]
         i = 0
         for i in range(len(self.tasks)):
             chunks[i%workers].append(self.tasks[i])
@@ -240,7 +240,7 @@ class Tasker(object):
         self.proc = process
         self.par = parallelizer
         self.tasks = tasks
-        for k, v in kwds.iteritems():
+        for k, v in kwds.items():
             setattr(self, k, v)
         
     def __iter__(self):

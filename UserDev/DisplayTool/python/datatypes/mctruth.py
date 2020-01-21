@@ -1,4 +1,4 @@
-from database import recoBase
+from .database import recoBase
 from pyqtgraph.Qt import QtGui, QtCore
 from ROOT import evd, larutil
 import pyqtgraph as pg

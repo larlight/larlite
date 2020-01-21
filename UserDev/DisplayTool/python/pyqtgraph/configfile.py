@@ -13,7 +13,7 @@ import re, os, sys
 import numpy
 from .pgcollections import OrderedDict
 from . import units
-from .python2_3 import asUnicode, basestring
+from .python2_3 import asUnicode, str
 from .Qt import QtCore
 from .Point import Point
 from .colormap import ColorMap
@@ -66,7 +66,7 @@ def readConfigFile(fname):
         sys.exc_info()[1].fileName = fname
         raise
     except:
-        print("Error while reading config file %s:"% fname)
+        print(("Error while reading config file %s:"% fname))
         raise
     #finally:
         #os.chdir(cwd)
@@ -99,7 +99,7 @@ def genString(data, indent=''):
 def parseString(lines, start=0):
     
     data = OrderedDict()
-    if isinstance(lines, basestring):
+    if isinstance(lines, str):
         lines = lines.split('\n')
         lines = [l for l in lines if re.search(r'\S', l) and not re.match(r'\s*#', l)]  ## remove empty lines
         
@@ -209,7 +209,7 @@ key2:              ##comment
     print("=== Test:===")
     num = 1
     for line in cf.split('\n'):
-        print("%02d   %s" % (num, line))
+        print(("%02d   %s" % (num, line)))
         num += 1
     print(cf)
     print("============")

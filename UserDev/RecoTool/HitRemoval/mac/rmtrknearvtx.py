@@ -16,7 +16,7 @@ my_proc=fmwk.ana_processor()
 # Specify IO mode
 my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 
-for x in xrange(len(sys.argv)-2):
+for x in range(len(sys.argv)-2):
     my_proc.add_input_file(sys.argv[x+1])
 
 my_proc.set_ana_output_file("ana.root")

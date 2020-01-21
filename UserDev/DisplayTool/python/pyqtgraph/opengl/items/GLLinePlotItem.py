@@ -43,7 +43,7 @@ class GLLinePlotItem(GLGraphicsItem):
         ====================  ==================================================
         """
         args = ['pos', 'color', 'width', 'mode', 'antialias']
-        for k in kwds.keys():
+        for k in list(kwds.keys()):
             if k not in args:
                 raise Exception('Invalid keyword argument: %s (allowed arguments are %s)' % (k, str(args)))
         self.antialias = False

@@ -26,20 +26,20 @@ parser.add_argument("-d","--display",help="Turn on the display to see each view 
 args = parser.parse_args()
 
 if len(sys.argv) == 1:
-    print "\n-------You forgot to include a source file!-------\n"
+    print("\n-------You forgot to include a source file!-------\n")
     parser.print_help()
 
 if args.verbose:
-    print "Verbose mode turned on."
+    print("Verbose mode turned on.")
     if args.source != None:
-        print "\tSource file is " + args.source
+        print("\tSource file is " + args.source)
     if args.data_output != None:
-        print "\tData output file is " + args.data_output
+        print("\tData output file is " + args.data_output)
     if args.ana_output != None:
-        print "\tAna output file is " + args.ana_output
+        print("\tAna output file is " + args.ana_output)
 
 if args.source == None:
-    print "Error: please specificy an input file with -s or --source."
+    print("Error: please specificy an input file with -s or --source.")
     quit()
 
 if args.num_events == None:
@@ -47,13 +47,13 @@ if args.num_events == None:
 
 if args.data_output == None:
     args.data_output = "default_event_output.root"
-    print "No event output file selected.  If necessary, output will go to:"
-    print "\t"+args.data_output
+    print("No event output file selected.  If necessary, output will go to:")
+    print("\t"+args.data_output)
 
 if args.ana_output == None:
     args.ana_output = "default_ana_output.root"
-    print "No ana output file selected.  If necessary, output will go to:"
-    print "\t"+args.ana_output
+    print("No ana output file selected.  If necessary, output will go to:")
+    print("\t"+args.ana_output)
 
 
 
@@ -127,9 +127,9 @@ while mgr.next_event():
     if not cluster_v:
         continue
 
-    print "Event:",cluster_v.event_id()
+    print("Event:",cluster_v.event_id())
 
-    for x in xrange(cluster_v.size()):
+    for x in range(cluster_v.size()):
 
         #Hits as vector of hits
 
@@ -179,7 +179,7 @@ while mgr.next_event():
 HistoTree.Print()
 HistoFile.Write()
 
-print "Finished Looping over events! Output Histograms in outputhistos.root"
+print("Finished Looping over events! Output Histograms in outputhistos.root")
         
         
 

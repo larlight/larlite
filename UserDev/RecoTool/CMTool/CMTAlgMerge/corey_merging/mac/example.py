@@ -5,11 +5,11 @@ from ROOT import larlite
 
 try:
 
-    print "PyROOT recognized your class %s" % str(HitToCluster)
+    print("PyROOT recognized your class %s" % str(HitToCluster))
 
 except NameError:
 
-    print "Failed importing merging..."
+    print("Failed importing merging...")
 
 sys.exit(0)
 

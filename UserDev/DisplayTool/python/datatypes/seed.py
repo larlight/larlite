@@ -1,11 +1,11 @@
-from database import recoBase
+from .database import recoBase
 from ROOT import evd, TVector3
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui, QtCore
 import math as mt
 
 
-from database import recoBase3D
+from .database import recoBase3D
 
 try:
     import pyqtgraph.opengl as gl
@@ -29,7 +29,7 @@ try:
             seeds = self._process.getData()
 
             # Each flash is drawn as an oval in Y/Z/X
-            for i in xrange(len(seeds)):
+            for i in range(len(seeds)):
                 thisSeed = seeds[i]
 
                 # Each seed just needs two points, the start and end point
@@ -58,5 +58,5 @@ try:
 
 
 
-except Exception, e:
+except Exception as e:
     pass

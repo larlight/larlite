@@ -12,7 +12,7 @@ A more clever implementation of this class would employ some kind of caching
 to avoid re-reading the entire visible waveform at every update.
 """
 
-import initExample ## Add path to library (just for examples; you do not need this)
+from . import initExample ## Add path to library (just for examples; you do not need this)
 
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui

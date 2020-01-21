@@ -25,20 +25,20 @@ parser.add_argument("-d","--display",help="Turn on the display to see each view 
 args = parser.parse_args()
 
 if len(sys.argv) == 1:
-    print "\n-------You forgot to include a source file!-------\n"
+    print("\n-------You forgot to include a source file!-------\n")
     parser.print_help()
 
 if args.verbose:
-    print "Verbose mode turned on."
+    print("Verbose mode turned on.")
     if args.source != None:
-        print "\tSource file is " + args.source
+        print("\tSource file is " + args.source)
     if args.data_output != None:
-        print "\tData output file is " + args.data_output
+        print("\tData output file is " + args.data_output)
     if args.ana_output != None:
-        print "\tAna output file is " + args.ana_output
+        print("\tAna output file is " + args.ana_output)
 
 if args.source == None:
-    print "Error: please specificy an input file with -s or --source."
+    print("Error: please specificy an input file with -s or --source.")
     quit()
 
 if args.num_events == None:
@@ -46,13 +46,13 @@ if args.num_events == None:
 
 if args.data_output == None:
     args.data_output = "default_event_output.root"
-    print "No event output file selected.  If necessary, output will go to:"
-    print "\t"+args.data_output
+    print("No event output file selected.  If necessary, output will go to:")
+    print("\t"+args.data_output)
 
 if args.ana_output == None:
     args.ana_output = "default_ana_output.root"
-    print "No ana output file selected.  If necessary, output will go to:"
-    print "\t"+args.ana_output
+    print("No ana output file selected.  If necessary, output will go to:")
+    print("\t"+args.ana_output)
 
 
 
@@ -102,14 +102,14 @@ while mgr.next_event():
     mct_vtx=None
     if mctruth_v and mctruth_v.size():
         if mctruth_v.size()>1:
-            print "Found more than 1 MCTruth. Only use the 1st one... \n \n"
+            print("Found more than 1 MCTruth. Only use the 1st one... \n \n")
         if mctruth_v.at(0).GetParticles().at(0).PdgCode() == 11:      ## electron    
             mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
-            print "\n electron \n"
+            print("\n electron \n")
         elif mctruth_v.at(0).GetParticles().at(0).PdgCode() == 22:    
             trajsize= mctruth_v.at(0).GetParticles().at(0).Trajectory().size()
             mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(trajsize-1).Position()
-            print "\n gamma \n"
+            print("\n gamma \n")
    #PdgCode
 
     if args.num_events == processed_events:
@@ -118,11 +118,11 @@ while mgr.next_event():
     if not cluster_v:
         continue
 
-    print "Event:",cluster_v.event_id()
+    print("Event:",cluster_v.event_id())
 
-    for x in xrange(cluster_v.size()):
+    for x in range(cluster_v.size()):
 
-        print "  Cluster ID:",cluster_v.at(x).ID()
+        print("  Cluster ID:",cluster_v.at(x).ID())
         algo.LoadCluster(cluster_v.at(x),
                          mgr.get_data(cluster_v.get_hit_type()))
 
@@ -139,14 +139,14 @@ while mgr.next_event():
         
         result = algo.GetParams()
 
-        print "(%g,%g) => (%g,%g), plane: %g" % (result.start_point.w,
+        print("(%g,%g) => (%g,%g), plane: %g" % (result.start_point.w,
                                                  result.start_point.t,
                                                  result.end_point.w,
-                                                 result.end_point.t,result.start_point.plane)
+                                                 result.end_point.t,result.start_point.plane))
 
         mc_begin=None
         if(mct_vtx):
-            print "MC Particle Start Point: (%g,%g,%g)" % (mct_vtx[0],mct_vtx[1],mct_vtx[2])
+            print("MC Particle Start Point: (%g,%g,%g)" % (mct_vtx[0],mct_vtx[1],mct_vtx[2]))
 
             # Usage example 1: std::vector<double> in python
             # std.vector(ROOT.Double) is equivalent of std::vector<double> template specialization
@@ -193,7 +193,7 @@ while mgr.next_event():
         gPolygon = None
         if result.PolyObject.Size() > 0:
             gPolygon = TGraph(result.PolyObject.Size() + 1)
-            for x in xrange(result.PolyObject.Size()):
+            for x in range(result.PolyObject.Size()):
                 gPolygon.SetPoint(x,
                                   result.PolyObject.Point(x).first,
                                   result.PolyObject.Point(x).second)

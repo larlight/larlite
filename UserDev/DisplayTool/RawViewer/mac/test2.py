@@ -13,7 +13,7 @@ from matplotlib.figure import Figure
 
 import sys
 if sys.version_info[0] < 3:
-    import Tkinter as Tk
+    import tkinter as Tk
 else:
     import tkinter as Tk
 
@@ -39,7 +39,7 @@ toolbar.update()
 canvas._tkcanvas.pack(side=Tk.TOP, fill=Tk.BOTH, expand=1)
 
 def on_key_event(event):
-    print('you pressed %s'%event.key)
+    print(('you pressed %s'%event.key))
     key_press_handler(event, canvas, toolbar)
 
 canvas.mpl_connect('key_press_event', on_key_event)

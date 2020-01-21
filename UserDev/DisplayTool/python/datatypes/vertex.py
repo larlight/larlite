@@ -1,4 +1,4 @@
-from database import recoBase
+from .database import recoBase
 from ROOT import evd
 from pyqtgraph.Qt import QtGui
 import pyqtgraph as pg
@@ -24,7 +24,7 @@ class vertex(recoBase):
             # First get the vertex information:
             vertexes = self._process.getDataByPlane(thisPlane)
 
-            for i in xrange(len(vertexes)):
+            for i in range(len(vertexes)):
                 point = vertexes[i]
                 # Draws a circle at (x,y,radius = 0.5cm)
                 radBigW = 0.5 / view_manager._geometry.wire2cm()
@@ -57,7 +57,7 @@ class vertex(recoBase):
                 view._view.addItem(r)
 
 
-from database import recoBase3D
+from .database import recoBase3D
 
 try:
     import pyqtgraph.opengl as gl
@@ -80,7 +80,7 @@ try:
 
             vertexes = self._process.getData()
 
-            for i in xrange(len(vertexes)):
+            for i in range(len(vertexes)):
                 vertex = vertexes[i]
 
                 # Stupid thing right now:
@@ -122,5 +122,5 @@ try:
                 self._drawnObjects.append(yglline)
                 self._drawnObjects.append(zglline)
 
-except Exception, e:
+except Exception as e:
     pass

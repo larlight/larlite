@@ -24,9 +24,9 @@ line3 = geoalgo.LineSegment(pt1,pt2)
 viewer.add(line1,'ln1','b')
 viewer.add(line2,'ln2','r')
 viewer.add(line3,'ln3','k')
-print 'distance is %.02f'%d
+print('distance is %.02f'%d)
 viewer.show()
 try:
-    counter = input('Hit ENTER when you are ready to close the viewer')
+    counter = eval(input('Hit ENTER when you are ready to close the viewer'))
 except:
-    print "done with this example..."
+    print("done with this example...")

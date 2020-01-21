@@ -21,27 +21,27 @@ if len(sys.argv) == 1:
     parser.print_help()
 
 if args.verbose:
-    print "Verbose mode turned on."
+    print("Verbose mode turned on.")
     if args.source != None:
-        print "\tSource file is " + args.source
+        print("\tSource file is " + args.source)
     if args.data_output != None:
-        print "\tData output file is " + args.data_output
+        print("\tData output file is " + args.data_output)
     if args.ana_output != None:
-        print "\tAna output file is " + args.ana_output
+        print("\tAna output file is " + args.ana_output)
 
 if args.source == None:
-    print "Error: please specificy an input file with -s or --source."
+    print("Error: please specificy an input file with -s or --source.")
     quit()
 
 if args.data_output == None:
     args.data_output = "default_event_output.root"
-    print "No event output file selected.  If necessary, output will go to:"
-    print "\t"+args.data_output
+    print("No event output file selected.  If necessary, output will go to:")
+    print("\t"+args.data_output)
 
 if args.ana_output == None:
     args.ana_output = "default_ana_output.root"
-    print "No ana output file selected.  If necessary, output will go to:"
-    print "\t"+args.ana_output
+    print("No ana output file selected.  If necessary, output will go to:")
+    print("\t"+args.ana_output)
 
 
 ana_proc = larlight.ana_processor()
@@ -79,9 +79,9 @@ c=TCanvas("c","Wire v. Time Cluster Viewer",900,600)
 
 while ana_proc.process_event() and ana_proc.get_process_status() == ana_proc.PROCESSING:
     currentview = 0;
-    print my_merge_alg.GetMergeTree()
-    for iview in xrange(0,3):
-        for iclus in xrange(ana_proc.GetClusterGraph_Reco(int(iview),bool(true)).size()):
+    print(my_merge_alg.GetMergeTree())
+    for iview in range(0,3):
+        for iclus in range(ana_proc.GetClusterGraph_Reco(int(iview),bool(true)).size()):
             gstart=ana_proc.GetClusterGraph_Reco(int(iview),bool(true)).at(iclus)
             gend  =ana_proc.GetClusterGraph_Reco(int(iview),bool(false)).at(iclus)
             xmin=ana_proc.GetHisto_Hits(int(iview)).GetXaxis().GetXmin()
@@ -105,10 +105,10 @@ while ana_proc.process_event() and ana_proc.get_process_status() == ana_proc.PRO
             leg.AddEntry(gend,"End Point","p")
             leg.Draw()
             c_graph.Update()
-            print "Drawing cluster %d out of %d for view %d. To look at the next cluster hit enter." % (iclus,ana_proc.GetClusterGraph_Reco(int(iview),bool(true)).size()-1,iview+1)
+            print("Drawing cluster %d out of %d for view %d. To look at the next cluster hit enter." % (iclus,ana_proc.GetClusterGraph_Reco(int(iview),bool(true)).size()-1,iview+1))
             sys.stdin.readline()
 
-    print "Hit Enter to continue to next evt..."
+    print("Hit Enter to continue to next evt...")
     sys.stdin.readline()
 
 #ana_proc.run()

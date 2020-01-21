@@ -16,7 +16,7 @@ ertool.Manager
 my_proc = fmwk.ana_processor()
 
 # Set input root file
-for x in xrange(len(sys.argv)-1):
+for x in range(len(sys.argv)-1):
     my_proc.add_input_file(sys.argv[x+1])
 
 # Specify IO mode
@@ -57,7 +57,7 @@ my_proc.add_process(my_ana)
 counter = 0
 while (counter < 1000):
     try:
-        counter = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
+        counter = eval(input('Hit Enter to continue to next evt, or type in an event number to jump to that event:'))
     except SyntaxError:
         counter += 1
     my_proc.process_event(counter)
@@ -69,9 +69,9 @@ my_algo.Reset()
 
 
 # done!
-print
-print "Finished running ana_processor event loop!"
-print
+print()
+print("Finished running ana_processor event loop!")
+print()
 
 #my_algo.StoreParams()
 sys.exit(0)

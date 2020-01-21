@@ -4,7 +4,7 @@ This example demonstrates writing a custom Node subclass for use with flowcharts
 
 We implement a couple of simple image processing nodes.
 """
-import initExample ## Add path to library (just for examples; you do not need this)
+from . import initExample ## Add path to library (just for examples; you do not need this)
 
 from pyqtgraph.flowchart import Flowchart, Node
 import pyqtgraph.flowchart.library as fclib

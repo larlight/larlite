@@ -35,7 +35,7 @@ my_algo.setEThreshold(0.)	 #100
 #MCfilter.flip(False)
 
 # Set input root file
-for x in xrange(len(sys.argv)-1):
+for x in range(len(sys.argv)-1):
     my_proc.add_input_file(sys.argv[x+1])
 
 # Specify IO mode
@@ -86,9 +86,9 @@ my_proc.run()
 #myfile.write(str(eff)+"\n")
 
 # done!
-print
-print "Finished running ana_processor event loop!"
-print
+print()
+print("Finished running ana_processor event loop!")
+print()
 
 #my_algo.StoreParams()
 sys.exit(0)

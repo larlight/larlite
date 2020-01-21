@@ -72,7 +72,7 @@ class NodeLibrary:
     @staticmethod
     def treeCopy(tree):
         copy = OrderedDict()
-        for k,v in tree.items():
+        for k,v in list(tree.items()):
             if isNodeClass(v):
                 copy[k] = v
             else:

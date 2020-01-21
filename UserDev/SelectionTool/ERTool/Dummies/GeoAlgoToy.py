@@ -35,9 +35,9 @@ viewer.add(shower2,'shower2','b')
 #viewer.add(track,'track','r')
 viewer.show()
 try:
-    counter = input('Hit ENTER when you are ready to close the viewer')
+    counter = eval(input('Hit ENTER when you are ready to close the viewer'))
 except:
-    print "Continuing to analys..."
+    print("Continuing to analys...")
 
 # figure out the impact parameter between the two:
 # use AlgoFindRelationship
@@ -49,9 +49,9 @@ IP = algo.FindClosestApproach(shower1,shower2,vertex)
 seg1 = geoalgo.LineSegment(vertex,shower1.Start())
 seg2 = geoalgo.LineSegment(vertex,shower2.Start())
 
-print "The closest approach between the two showers is: "
-print "Impact parameter: %f cm"%IP
-print "Vertex: [%.02f,%.02f,%.02f]"%(vertex[0],vertex[1],vertex[2])
+print("The closest approach between the two showers is: ")
+print("Impact parameter: %f cm"%IP)
+print("Vertex: [%.02f,%.02f,%.02f]"%(vertex[0],vertex[1],vertex[2]))
 
 #viewer = GeoViewer()
 viewer.add(seg1,'','r')
@@ -59,9 +59,9 @@ viewer.add(seg2,'','r')
 viewer.add(vertex,'vertex','k')
 viewer.show()
 try:
-    counter = input('Hit ENTER when you are ready to close the viewer')
+    counter = eval(input('Hit ENTER when you are ready to close the viewer'))
 except:
-    print "done with this example..."
+    print("done with this example...")
 
 
 
@@ -71,8 +71,8 @@ halfLine = geoalgo.HalfLine(0,0,0,0.3,0.5,0.1)
 viewer.add(halfLine)
 viewer.show()
 try:
-    counter = input('Hit ENTER when you are ready to close the viewer')
+    counter = eval(input('Hit ENTER when you are ready to close the viewer'))
 except:
-    print "done with this example..."
+    print("done with this example...")
 
 sys.exit(0)

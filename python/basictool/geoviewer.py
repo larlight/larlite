@@ -1,9 +1,9 @@
-from cpp_classes import geoalgo, larpy
+from .cpp_classes import geoalgo, larpy
 from matplotlib.collections import PolyCollection
 #from matplotlib.colors import colorConverter
 from mpl_toolkits.mplot3d import Axes3D
-from drawcone import  rot
-from drawsphere import sphere
+from .drawcone import  rot
+from .drawsphere import sphere
 import matplotlib.pyplot as plt
 import numpy as np
 import random
@@ -89,14 +89,14 @@ class GeoViewer(object):
         if not c: c = self.rand_color()
         
         # update boundaries
-        for i in xrange(3):
+        for i in range(3):
             if data[i] < self._range_min[i]: self._range_min[i] = data[i]
             if data[i] > self._range_max[i]: self._range_max[i] = data[i]
 
         self._ax.scatter(*data,color=c,marker='*',s=100)
 
         # update boundaries
-        for i in xrange(3):
+        for i in range(3):
             if data[i] < self._range_min[i]: self._range_min[i] = data[i]
             if data[i] > self._range_max[i]: self._range_max[i] = data[i]
 
@@ -107,8 +107,8 @@ class GeoViewer(object):
         data = self._converter.Convert(arg) 
         
         # update boundaries
-        for i in xrange(3):
-            for j in xrange(len(data[i])):
+        for i in range(3):
+            for j in range(len(data[i])):
                 if data[i][j] < self._range_min[i]: self._range_min[i] = data[i][j]
                 if data[i][j] > self._range_max[i]: self._range_max[i] = data[i][j]
 
@@ -152,8 +152,8 @@ class GeoViewer(object):
         e = arg.End()
 
         # update boundaries
-        for i in xrange(3):
-            for j in xrange(len(data[i])):
+        for i in range(3):
+            for j in range(len(data[i])):
                 if data[i][j] < self._range_min[i]: self._range_min[i] = data[i][j]
                 if data[i][j] > self._range_max[i]: self._range_max[i] = data[i][j]
 
@@ -169,8 +169,8 @@ class GeoViewer(object):
         e = arg.Start() + arg.Dir()*1000
 
         # update boundaries
-        for i in xrange(3):
-            for j in xrange(len(data[i])):
+        for i in range(3):
+            for j in range(len(data[i])):
                 if data[i][j] < self._range_min[i]: self._range_min[i] = data[i][j]
                 if data[i][j] > self._range_max[i]: self._range_max[i] = data[i][j]
 
@@ -252,19 +252,19 @@ class GeoViewer(object):
 
         xp,yp,zp = rot(XYZ,theta,phi) 
 
-        for i in xrange(len(xp)):
+        for i in range(len(xp)):
             xp[i] += s[0]
             yp[i] += s[1]
             zp[i] += s[2]
 
         # update boundaries
-        for j in xrange(len(xp)):
+        for j in range(len(xp)):
                 if xp[j] < self._range_min[0]: self._range_min[0] = xp[j]
                 if xp[j] > self._range_max[0]: self._range_max[0] = xp[j]
-        for j in xrange(len(yp)):
+        for j in range(len(yp)):
                 if yp[j] < self._range_min[1]: self._range_min[1] = yp[j]
                 if yp[j] > self._range_max[1]: self._range_max[1] = yp[j]
-        for j in xrange(len(zp)):
+        for j in range(len(zp)):
                 if zp[j] < self._range_min[2]: self._range_min[2] = zp[j]
                 if zp[j] > self._range_max[2]: self._range_max[2] = zp[j]
 
@@ -284,16 +284,16 @@ class GeoViewer(object):
 
         # update boundaries
 
-        for j in xrange(len(xp)):
-            for j1 in xrange(len(xp[j])):
+        for j in range(len(xp)):
+            for j1 in range(len(xp[j])):
                 if xp[j][j1] < self._range_min[0]: self._range_min[0] = xp[j][j1]
                 if xp[j][j1] > self._range_max[0]: self._range_max[0] = xp[j][j1]
-        for j in xrange(len(yp)):
-            for j1 in xrange(len(yp[j])):
+        for j in range(len(yp)):
+            for j1 in range(len(yp[j])):
                 if yp[j][j1] < self._range_min[1]: self._range_min[1] = yp[j][j1]
                 if yp[j][j1] > self._range_max[1]: self._range_max[1] = yp[j][j1]
-        for j in xrange(len(zp)):
-            for j1 in xrange(len(zp[j])):
+        for j in range(len(zp)):
+            for j1 in range(len(zp[j])):
                 if zp[j][j1] < self._range_min[2]: self._range_min[2] = zp[j][j1]
                 if zp[j][j1] > self._range_max[2]: self._range_max[2] = zp[j][j1]
 
@@ -311,11 +311,11 @@ class GeoViewer(object):
         # Update max/min
         pt_min = arg.Min()
         pt_max = arg.Max()
-        for x in xrange(pt_min.size()):
+        for x in range(pt_min.size()):
             if pt_min[x] < self._range_min[x]: self._range_min[x] = pt_min[x]
             if pt_min[x] > self._range_max[x]: self._range_max[x] = pt_min[x]        
 
-        for x in xrange(pt_max.size()):
+        for x in range(pt_max.size()):
             if pt_max[x] < self._range_min[x]: self._range_min[x] = pt_max[x]
             if pt_max[x] > self._range_max[x]: self._range_max[x] = pt_max[x]        
 
@@ -347,20 +347,20 @@ class GeoViewer(object):
 
         # Draw axis
 
-        for x in xrange(len(self._holder.Point())):
+        for x in range(len(self._holder.Point())):
             #print x[0],x[1],x[2]
             self._add_point(self._holder.Point()[x], self._holder.PointColor()[x])
-        for x in xrange(len(self._holder.LineSegment())):
+        for x in range(len(self._holder.LineSegment())):
             self._add_linesegment(self._holder.LineSegment()[x], self._holder.LineSegmentColor()[x])
-        for x in xrange(len(self._holder.HalfLine())):
+        for x in range(len(self._holder.HalfLine())):
             self._add_halfline(self._holder.HalfLine()[x], self._holder.HalfLineColor()[x])
-        for x in xrange(len(self._holder.AABox())):
+        for x in range(len(self._holder.AABox())):
             self._add_box(self._holder.AABox()[x], self._holder.AABoxColor()[x])
-        for x in xrange(len(self._holder.Trajectory())):
+        for x in range(len(self._holder.Trajectory())):
             self._add_trajectory(self._holder.Trajectory()[x], self._holder.TrajectoryColor()[x])
-        for x in xrange(len(self._holder.Cone())):
+        for x in range(len(self._holder.Cone())):
             self._add_cone(self._holder.Cone()[x], self._holder.ConeColor()[x])
-        for x in xrange(len(self._holder.Sphere())):
+        for x in range(len(self._holder.Sphere())):
             self._add_sphere(self._holder.Sphere()[x], self._holder.SphereColor()[x])
         for x in self._converter.Convert(self._holder.Labels()):
             self._add_label(x)

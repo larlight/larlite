@@ -1,4 +1,4 @@
-from __future__ import division
+
 
 from ..Qt import QtGui, QtCore
 import numpy as np
@@ -466,9 +466,9 @@ class ImageItem(GraphicsObject):
 
         
     def tabletEvent(self, ev):
-        print(ev.device())
-        print(ev.pointerType())
-        print(ev.pressure())
+        print((ev.device()))
+        print((ev.pointerType()))
+        print((ev.pressure()))
     
     def drawAt(self, pos, ev=None):
         pos = [int(pos.x()), int(pos.y())]

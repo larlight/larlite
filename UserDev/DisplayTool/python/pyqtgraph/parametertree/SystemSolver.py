@@ -212,7 +212,7 @@ class SystemSolver(object):
         Return a serializable description of the solver's current state.
         """
         state = OrderedDict()
-        for name, var in self._vars.items():
+        for name, var in list(self._vars.items()):
             state[name] = (var[0], var[2])
         return state
     
@@ -221,7 +221,7 @@ class SystemSolver(object):
         Restore the state of all values and constraints in the solver.
         """
         self.reset()
-        for name, var in state.items():
+        for name, var in list(state.items()):
             self.set(name, var[0], var[1])
     
     def resetUnfixed(self):
@@ -229,7 +229,7 @@ class SystemSolver(object):
         For any variable that does not have a fixed value, reset
         its value to None.
         """
-        for var in self._vars.values():
+        for var in list(self._vars.values()):
             if var[2] != 'fixed':
                 var[0] = None
                 
@@ -239,10 +239,10 @@ class SystemSolver(object):
                 
     def __repr__(self):
         state = OrderedDict()
-        for name, var in self._vars.items():
+        for name, var in list(self._vars.items()):
             if var[2] == 'fixed':
                 state[name] = var[0]
-        state = ', '.join(["%s=%s" % (n, v) for n,v in state.items()])
+        state = ', '.join(["%s=%s" % (n, v) for n,v in list(state.items())])
         return "<%s %s>" % (self.__class__.__name__, state)
 
 
@@ -377,5 +377,5 @@ if __name__ == '__main__':
     camera.flash = 0
     
     camera.solve()
-    print(camera.saveState())
+    print((camera.saveState()))
     

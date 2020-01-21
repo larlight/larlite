@@ -389,7 +389,7 @@ class TerminalGraphicsItem(GraphicsObject):
         self.updateConnections()
         
     def updateConnections(self):
-        for t, c in self.term.connections().items():
+        for t, c in list(self.term.connections().items()):
             c.updateLine()
             
     def mousePressEvent(self, ev):
@@ -499,7 +499,7 @@ class TerminalGraphicsItem(GraphicsObject):
         return self.mapToView(self.mapFromItem(self.box, self.box.boundingRect().center()))
 
     def nodeMoved(self):
-        for t, item in self.term.connections().items():
+        for t, item in list(self.term.connections().items()):
             item.updateLine()
 
 

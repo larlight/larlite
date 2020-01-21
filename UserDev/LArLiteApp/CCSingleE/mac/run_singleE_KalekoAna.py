@@ -95,9 +95,9 @@ my_proc.add_process(my_anaunit)
 my_proc.run()
 
 # done!
-print
-print "Finished running ana_processor event loop!"
-print
+print()
+print("Finished running ana_processor event loop!")
+print()
 
 sys.exit(0)
 

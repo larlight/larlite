@@ -25,7 +25,7 @@ def restoreSplitter(w, s):
     elif type(s) is str:
         w.restoreState(QtCore.QByteArray.fromPercentEncoding(s))
     else:
-        print("Can't configure QSplitter using object of type", type(s))
+        print(("Can't configure QSplitter using object of type", type(s)))
     if w.count() > 0:   ## make sure at least one item is not collapsed
         for i in w.sizes():
             if i > 0:
@@ -138,7 +138,7 @@ class WidgetGroup(QtCore.QObject):
             for w in widgetList:
                 self.addWidget(*w)
         elif isinstance(widgetList, dict):
-            for name, w in widgetList.items():
+            for name, w in list(widgetList.items()):
                 self.addWidget(w, name)
         elif widgetList is None:
             return

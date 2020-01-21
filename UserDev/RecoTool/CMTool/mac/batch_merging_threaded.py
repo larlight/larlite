@@ -3,7 +3,7 @@ import threading
 from ROOT import TFile
 
 if len(sys.argv) != 2:
-    print 'Usage: python %s batchname'%sys.argv[0]
+    print('Usage: python %s batchname'%sys.argv[0])
     quit()
 
 max_files_to_process = 50
@@ -55,18 +55,18 @@ class Worker(threading.Thread):
         #and puts the result into the result queue
         while 1:
             requestID, callable, args, kwds = self.workRequestQueue.get()
-            print "Worker that is executing request %d is: %s" \
-                %(requestID,self.getName())
+            print("Worker that is executing request %d is: %s" \
+                %(requestID,self.getName()))
             self.resultQueue.put((requestID, callable(*args, **kwds)))
 
 ##The main thread creates the two queues, then instantiates worker
 ##threads as follows:
-import Queue
-requestsQueue = Queue.Queue()
-resultsQueue = Queue.Queue()
+import queue
+requestsQueue = queue.Queue()
+resultsQueue = queue.Queue()
 for i in range(numberOfWorkers):
     worker = Worker(requestsQueue, resultsQueue)
-    print worker
+    print(worker)
 
 ##Simulate work by evaluating random expressions, with random delays,
 ##on several worker threads.
@@ -79,8 +79,8 @@ workRequests = {}
 def showResults():
     while 1:
         try: id, results = resultsQueue.get_nowait()
-        except Queue.Empty: return
-        print 'Result %d: %s has is successfully completed.' % (id, workRequests[id])
+        except queue.Empty: return
+        print('Result %d: %s has is successfully completed.' % (id, workRequests[id]))
         del workRequests[id]
 
 counter = 0
@@ -93,7 +93,7 @@ for myfile in files:
     #stuff into the work request queue
     id = worker.performWork(evaluate, commandString)
     workRequests[id] = commandString
-    print 'Submitted request %d.\n' % id
+    print('Submitted request %d.\n' % id)
     time.sleep(1)
     showResults()
 while workRequests:

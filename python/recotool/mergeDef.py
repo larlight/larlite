@@ -9,7 +9,7 @@
 ########################################################################
 
 from larlite import larlite as fmwk
-from cpp_classes import cmtool
+from .cpp_classes import cmtool
 
 def ConfigureMergeAllInstance(merger_instance=0, producer="fuzzycluster",saveOutput=True):
     if not merger_instance:

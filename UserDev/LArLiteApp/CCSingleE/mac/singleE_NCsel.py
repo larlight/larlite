@@ -39,7 +39,7 @@ MCfilter = fmwk.MC_NC_Filter();
 MCfilter.flip(True)
 
 # Set input root file
-for x in xrange(len(sys.argv)-1):
+for x in range(len(sys.argv)-1):
     my_proc.add_input_file(sys.argv[x+1])
 
 # Specify IO mode
@@ -77,9 +77,9 @@ my_proc.run()
 
 
 # done!
-print
-print "Finished running ana_processor event loop!"
-print
+print()
+print("Finished running ana_processor event loop!")
+print()
 
 #my_algo.StoreParams()
 sys.exit(0)

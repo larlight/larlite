@@ -17,15 +17,15 @@ my_proc = fmwk.ana_processor()
 
 # Set input root file
 cfg_name = ''
-for x in xrange(len(sys.argv)):
+for x in range(len(sys.argv)):
     if sys.argv[x].endswith('.fcl') or sys.argv[x].endswith('.cfg'):
         cfg_name = sys.argv[x]
     if not sys.argv[x].endswith('.root'):
         continue
-    print sys.argv[x]
+    print(sys.argv[x])
     my_proc.add_input_file(sys.argv[x])
 if not cfg_name:
-    print 'No config file given in input arguments'
+    print('No config file given in input arguments')
     sys.exit(1)
 
 # Specify IO mode
@@ -60,14 +60,14 @@ my_proc.add_process(my_unit)
 
 my_unit.SetConfigFile(cfg_name)
 
-print
-print  "Finished configuring ana_processor. Start event loop!"
-print
+print()
+print("Finished configuring ana_processor. Start event loop!")
+print()
 fout_pe=open('pespec.txt','w')
 line_pe=''
-for x in xrange(32):
+for x in range(32):
     line_pe += 'hypo%02d,' % x
-for x in xrange(32):
+for x in range(32):
     line_pe += 'flash%02d,' % x
 line_pe=line_pe.rstrip(',')
 line_pe+='\n'
@@ -89,7 +89,7 @@ while ctr < 500:
 
     #print match_v.size(),'match found for',qcluster_v.size(),'tpc objects and',flash_v.size(),'pmt objects'
 
-    for index in xrange(match_v.size()):
+    for index in range(match_v.size()):
         #print 'Match id',index
         match = match_v[index]
         #print 'TPC:',match.tpc_id,'PMT:',match.flash_id,'Score:',match.score,'TPC point:',match.tpc_point.x,match.tpc_point.y,match.tpc_point.z
@@ -100,11 +100,11 @@ while ctr < 500:
         try:
             qc = qcluster_v[match.tpc_id]
         except IndexError:
-            print
-            print match.tpc_id,'/',qcluster_v.size()
-            print
+            print()
+            print(match.tpc_id,'/',qcluster_v.size())
+            print()
             raise IndexError
-        for pt_idx in xrange(qc.size()):
+        for pt_idx in range(qc.size()):
             pt = qc[pt_idx]
             if pt.x > xmax: xmax = pt.x
             if pt.x < xmin: xmin = pt.x
@@ -145,9 +145,9 @@ while ctr < 500:
         cmd=sys.stdin.readline().rstrip('\n')
         if cmd.lower() in ['n','no']: break
 # done!
-print
-print "Finished running ana_processor event loop!"
-print
+print()
+print("Finished running ana_processor event loop!")
+print()
 fout.close()
 fout_pe.close()
 

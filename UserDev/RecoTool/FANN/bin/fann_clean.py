@@ -1,11 +1,11 @@
 # Simple script to clean fann
-import os,commands,sys
+import os,subprocess,sys
 
 # Check shell env. var
-if not "LARLITE_USERDEVDIR" in os.environ.keys():
-    print
-    print "  ERROR: Source LArLight config script first!"
-    print
+if not "LARLITE_USERDEVDIR" in list(os.environ.keys()):
+    print()
+    print("  ERROR: Source LArLight config script first!")
+    print()
     sys.exit(1)
 
 # Clean library copies

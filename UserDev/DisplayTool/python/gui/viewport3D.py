@@ -2,7 +2,7 @@
 try:
     import pyqtgraph.opengl as gl
 except:
-    print "Error, must have open gl to use this viewer."
+    print("Error, must have open gl to use this viewer.")
     exit(-1)
 
 from pyqtgraph.Qt import QtGui, QtCore

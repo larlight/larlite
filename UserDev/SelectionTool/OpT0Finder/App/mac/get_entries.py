@@ -1,6 +1,6 @@
 from ROOT import TChain
 
-for x in xrange(40):
+for x in range(40):
 
     v = (x+1)*5
 
@@ -8,4 +8,4 @@ for x in xrange(40):
 
     ch.AddFile("x_offset_%04d.root" % v)
 
-    print v,ch.GetEntries()
+    print(v,ch.GetEntries())

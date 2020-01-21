@@ -10,7 +10,7 @@ plot area with axes, very similar to the way PlotItem is built.
 
 
 ## Add path to library (just for examples; you do not need this)
-import initExample
+from . import initExample
 
 ## This example uses a ViewBox to create a PlotWidget-like interface
 

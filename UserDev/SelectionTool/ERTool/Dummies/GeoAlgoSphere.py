@@ -38,10 +38,10 @@ tdelta = time.time()-t
 tottime += tdelta
 #print "sphere center is: [%.02f,%.02f,%.02f]"%(sphere.Center()[0],sphere.Center()[1],sphere.Center()[2])
 #print "sphere radius is: %f"%sphere.Radius()
-print "Time per sphere with %i points is: %.02f [us]"%(npoints,1000000*(tottime/float(ntries)))
+print("Time per sphere with %i points is: %.02f [us]"%(npoints,1000000*(tottime/float(ntries))))
 viewer2.add(sphere,'','r')
 viewer2.show()
 try:
-    counter = input('Hit ENTER when you are ready to close the viewer')
+    counter = eval(input('Hit ENTER when you are ready to close the viewer'))
 except:
-    print "done with this example..."
+    print("done with this example...")

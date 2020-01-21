@@ -53,7 +53,7 @@ class UBDaqFileGlobber(QtCore.QObject):
         #in which case we just return (don't emit any signals)
         try:
             list_of_files = GetAvailableFileList(50)
-            runid_v = list_of_files.keys()
+            runid_v = list(list_of_files.keys())
             runid_v.sort()
             runid_v.reverse()
             newest = list_of_files[runid_v[0]]
@@ -70,7 +70,7 @@ class UBDaqFileGlobber(QtCore.QObject):
 
         #Sanity check: does the file have zero size? If so, return (don't emit any signals)
         if os.stat(newest).st_size == 0:
-            print "File has size 0"
+            print("File has size 0")
             return
 
         #Is this "newest" file one for which we've already emitted a signal?

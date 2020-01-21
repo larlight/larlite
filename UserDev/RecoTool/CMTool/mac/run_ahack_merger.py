@@ -5,7 +5,7 @@ from ROOT import larlite as fmwk
 mgr = fmwk.ana_processor()
 
 #args should be input file name
-for x in xrange(len(sys.argv)-2):
+for x in range(len(sys.argv)-2):
 
     mgr.add_input_file(sys.argv[x+1])
 
@@ -20,14 +20,14 @@ mgr.set_ana_output_file("")
 
 producer = "cccluster"
 
-print "At this stage, producer is: ",producer 
+print("At this stage, producer is: ",producer) 
 shortestDist = getShortestDist(producer)
 shortestDist.SetInputProducer(producer)
 shortestDist.SetOutputProducer('Step1ShortestDist')
 shortestDist.SaveOutputCluster()
 prevProducer = 'Step1ShortestDist'
 mgr.add_process(shortestDist)
-print "At this stage, producer is: ", prevProducer
+print("At this stage, producer is: ", prevProducer)
 
 startTrack = getStartTrack()
 startTrack.SetInputProducer(prevProducer)
@@ -35,7 +35,7 @@ startTrack.SetOutputProducer('Step2StartTrack')
 startTrack.SaveOutputCluster()
 prevProducer = 'Step2StartTrack'
 mgr.add_process(startTrack)
-print "At this stage, producer is: ", prevProducer
+print("At this stage, producer is: ", prevProducer)
 
 polyContain = getPolyContain()
 polyContain.SetInputProducer(prevProducer)
@@ -43,7 +43,7 @@ polyContain.SetOutputProducer('Step3PolyContain')
 polyContain.SaveOutputCluster()
 prevProducer = 'Step3PolyContain'
 mgr.add_process(polyContain)
-print "At this stage, producer is: ", prevProducer
+print("At this stage, producer is: ", prevProducer)
 
 
 com = getCOM()
@@ -52,7 +52,7 @@ com.SetOutputProducer('Step4CenterOfMass')
 com.SaveOutputCluster()
 prevProducer = 'Step4CenterOfMass'
 mgr.add_process(com)
-print "At this stage, producer is: ", prevProducer
+print("At this stage, producer is: ", prevProducer)
 
 polyOverlap = getPolyOverlap()
 polyOverlap.SetInputProducer(prevProducer)
@@ -60,7 +60,7 @@ polyOverlap.SetOutputProducer('Step5PolyOverlap')
 polyOverlap.SaveOutputCluster()
 prevProducer = 'Step5PolyOverlap'
 mgr.add_process(polyOverlap)
-print "At this stage, producer is: ", prevProducer
+print("At this stage, producer is: ", prevProducer)
 
 
 
@@ -70,7 +70,7 @@ polyShortestDist.SetOutputProducer('Step6PolyShortDist')
 polyShortestDist.SaveOutputCluster()
 prevProducer = 'Step6PolyShortDist'
 mgr.add_process(polyShortestDist)
-print "At this stage, producer is: ", prevProducer
+print("At this stage, producer is: ", prevProducer)
 
 
 #nickiePoly = getNickiePoly()

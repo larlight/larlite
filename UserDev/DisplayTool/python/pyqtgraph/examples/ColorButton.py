@@ -4,7 +4,7 @@ Simple example demonstrating a button which displays a colored rectangle
 and allows the user to select a new color by clicking on the button.
 """
 
-import initExample ## Add path to library (just for examples; you do not need this)
+from . import initExample ## Add path to library (just for examples; you do not need this)
 
 
 import pyqtgraph as pg
@@ -19,9 +19,9 @@ win.show()
 win.setWindowTitle('pyqtgraph example: ColorButton')
 
 def change(btn):
-    print("change", btn.color())
+    print(("change", btn.color()))
 def done(btn):
-    print("done", btn.color())
+    print(("done", btn.color()))
 
 btn.sigColorChanging.connect(change)
 btn.sigColorChanged.connect(done)

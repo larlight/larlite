@@ -12,7 +12,7 @@ def ask_binary(msg='Proceed? [y/n]:'):
         user_input = sys.stdin.readline().rstrip('\n').lower()
         if user_input in ['y','n']: break
 
-        print 'Invalid input:',user_input
+        print('Invalid input:',user_input)
         user_input=''
 
     return user_input == 'y'
@@ -65,20 +65,20 @@ def main():
     # Check if gamma/electron files are provided:
     gamma_files    = []
     electron_files = []
-    for x in xrange(len(sys.argv)-1):
+    for x in range(len(sys.argv)-1):
         fname = sys.argv[x+1]
         if fname.find('gamma')>=0:
             gamma_files.append(fname)
         else:
             electron_files.append(fname)
 
-    print
-    print '  Running AlgoEMPart training script...'
-    print
-    print '  Identified %2d input files for gamma' % len(gamma_files)
-    print '  Identified %2d input files for electron' % len(electron_files)
+    print()
+    print('  Running AlgoEMPart training script...')
+    print()
+    print('  Identified %2d input files for gamma' % len(gamma_files))
+    print('  Identified %2d input files for electron' % len(electron_files))
     if not ask_binary('  Proceed? [y/n]:'): return False
-    print
+    print()
     if ask_binary('  Load previously extracted fit parameters? [y/n]:'):
         my_algo.setLoadParams(True)
     else:
@@ -97,11 +97,11 @@ def main():
         my_algo.SetMode(True)
         my_ana._mgr.Reset()
         my_proc.set_ana_output_file("gamma_training.root")
-        print '    Start running gamma training...'
+        print('    Start running gamma training...')
         my_proc.run()
-        print
-        print '    Finished running gamma training...'
-        print
+        print()
+        print('    Finished running gamma training...')
+        print()
         # Re-set
         my_proc.reset()
         gamma_trained = True
@@ -120,11 +120,11 @@ def main():
         my_algo.SetMode(False)
         my_ana._mgr.Reset()
         my_proc.set_ana_output_file("electron_training.root")
-        print '    Start running electron training...'
+        print('    Start running electron training...')
         my_proc.run()
-        print
-        print '    Finished running electron training...'
-        print
+        print()
+        print('    Finished running electron training...')
+        print()
         # Re-set
         my_proc.reset()
         electron_trained = True
@@ -135,17 +135,17 @@ def main():
     if (gamma_trained or electron_trained) and ask_binary('  Store train result parameters? [y/n]:'):
         my_ana._mgr.StorePSet("new_empart.txt")
         #my_algo.StoreParams()
-        print '  Parameter stored...'
-        print
+        print('  Parameter stored...')
+        print()
 
     return True
 
 if __name__ == '__main__':
     if not main(): 
-        print
-        print 'Process terminated.'
+        print()
+        print('Process terminated.')
     else:
-        print
-        print 'Process finished.'
-    print
+        print()
+        print('Process finished.')
+    print()
 

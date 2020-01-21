@@ -1,5 +1,5 @@
 from pyqtgraph.Qt import QtGui, QtCore
-from event import manager, event
+from .event import manager, event
 from datatypes import wire
 # from ROOT import larlite as fmwk
 from ROOT import evd
@@ -27,7 +27,7 @@ class larsoft_manager(manager, wire, QtCore.QObject):
         self._process.SetStepSizeByPlane(48, 0)
         self._process.SetStepSizeByPlane(48, 1)
         self._process.SetStepSizeByPlane(96, 2)
-        for plane in xrange(geom.nViews()):
+        for plane in range(geom.nViews()):
             self._process.setYDimension(geom.readoutWindowSize(), plane)
         self._process.initialize()
         self.setInputFile(file)
@@ -50,24 +50,24 @@ class larsoft_manager(manager, wire, QtCore.QObject):
     def selectFile(self):
         filePath = str(QtGui.QFileDialog.getOpenFileName())
         self.setInputFile(filePath)
-        print "Selected file is ", filePath
+        print("Selected file is ", filePath)
 
     def setNoiseFilter(self, runFilterBool):
         self._process.SetCorrectData(runFilterBool)
 
     # override the functions from manager as needed here
-    def next(self):
+    def __next__(self):
         # Check that this isn't the last event:
         if self._event < self._process.n_events() - 1:
             self.goToEvent(self._event + 1)
         else:
-            print "On the last event, can't go to next."
+            print("On the last event, can't go to next.")
 
     def prev(self):
         if self._event != 0:
             self.goToEvent(self._event - 1)
         else:
-            print "On the first event, can't go to previous."
+            print("On the first event, can't go to previous.")
 
     def goToEvent(self, event):
         self.setEvent(event)

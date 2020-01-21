@@ -8,8 +8,8 @@ k=GeoViewer()
 pt=geoalgo.Vector(3)
 trj=geoalgo.Trajectory()
 
-for x in xrange(10):
-    for y in xrange(pt.size()):
+for x in range(10):
+    for y in range(pt.size()):
         if x<5 or not y:
             pt[y] = x
         elif y>=1:
@@ -24,11 +24,11 @@ box=geoalgo.AABox(0,0,0,7,7,7)
 # set interactive mode on
 plt.ion()
 
-for x in xrange(10):
+for x in range(10):
     line = geoalgo.LineSegment(random.random(),random.random(),random.random(),random.random(),random.random(),random.random())
     k.add(line,"shower","green")
     k.show()
-    counter = input('Hit Enter for next event')
+    counter = eval(input('Hit Enter for next event'))
     k.clear()
 
-print "done."
+print("done.")

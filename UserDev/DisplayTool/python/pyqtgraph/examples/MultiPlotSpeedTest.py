@@ -5,7 +5,7 @@ Test the speed of rapidly updating multiple plot curves
 """
 
 ## Add path to library (just for examples; you do not need this)
-import initExample
+from . import initExample
 
 
 from pyqtgraph.Qt import QtGui, QtCore

@@ -154,7 +154,7 @@ my_proc = fmwk.ana_processor()
 
 
 # Set input root file
-for x in xrange(len(sys.argv)-1):
+for x in range(len(sys.argv)-1):
     my_proc.add_input_file(sys.argv[x+1])
 
 # Specify IO mode
@@ -192,9 +192,9 @@ quality_unit = fmwk.MCShowerAna()
 
 my_proc.add_process(quality_unit)
 
-print
-print  "Finished configuring ana_processor. Start event loop!"
-print
+print()
+print("Finished configuring ana_processor. Start event loop!")
+print()
 
 my_proc.run()
 # my_proc.process_event(2)

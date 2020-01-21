@@ -47,12 +47,12 @@ class Mutex(QtCore.QMutex):
             if self.debug:
                 self.l.lock()
                 try:
-                    print("Waiting for mutex lock (%0.1f sec). Traceback follows:" 
-                          % (c*waitTime/1000.))
+                    print(("Waiting for mutex lock (%0.1f sec). Traceback follows:" 
+                          % (c*waitTime/1000.)))
                     traceback.print_stack()
                     if len(self.tb) > 0:
                         print("Mutex is currently locked from:\n")
-                        print(self.tb[-1])
+                        print((self.tb[-1]))
                     else:
                         print("Mutex is currently locked from [???]")
                 finally:

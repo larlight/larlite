@@ -8,7 +8,7 @@ chReco=TChain("_pi0_tree")
 chReco.AddFile(sys.argv[2])
 
 # Cut value arrays
-mom_cuts    = [ x*50 for x in xrange(2,20) ] # 100cm steps, spans from -100=>1600 cm
+mom_cuts    = [ x*50 for x in range(2,20) ] # 100cm steps, spans from -100=>1600 cm
 #print mom_cuts
 
 # Efficiency arrays for first daughter
@@ -18,24 +18,24 @@ momReco_eff  = [0 for x in mom_cuts]
 c=TCanvas("c","",600,500)
 
 length = len(mom_cuts) - 1
-print 'length is ', length  
+print('length is ', length)  
 
 total = 0
 totalTrue = 0 
 
-for x in xrange(length):
-    print "Cuts are : ", mom_cuts[x], " and ", mom_cuts[x+1]
-    print "entries between bounds: ", ch.GetEntries("_p_tot_pi0 >= %g && _p_tot_pi0 < %g" % (mom_cuts[x], mom_cuts[x+1]) )
+for x in range(length):
+    print("Cuts are : ", mom_cuts[x], " and ", mom_cuts[x+1])
+    print("entries between bounds: ", ch.GetEntries("_p_tot_pi0 >= %g && _p_tot_pi0 < %g" % (mom_cuts[x], mom_cuts[x+1]) ))
     if ( ch.GetEntries("_p_tot_pi0 >= %g && _p_tot_pi0 < %g" % (mom_cuts[x], mom_cuts[x+1]) ) > 0 ):
-	print "number of entries wiht 1 MCC: ", ch.GetEntries("_p_tot_pi0 >= %g && _p_tot_pi0 <= %g" % (mom_cuts[x], mom_cuts[x+1]))
-	print "number of entries with 1 Reco: ", chReco.GetEntries("_nNC1Pi0 == 1 && _p_tot_pi0 >= %g && _p_tot_pi0 <= %g " % (mom_cuts[x],  mom_cuts[x+1]) )
+	print("number of entries wiht 1 MCC: ", ch.GetEntries("_p_tot_pi0 >= %g && _p_tot_pi0 <= %g" % (mom_cuts[x], mom_cuts[x+1])))
+	print("number of entries with 1 Reco: ", chReco.GetEntries("_nNC1Pi0 == 1 && _p_tot_pi0 >= %g && _p_tot_pi0 <= %g " % (mom_cuts[x],  mom_cuts[x+1]) ))
 	momSig_eff[x] = float(ch.GetEntries("_nNC1Pi0 == 1 && _p_tot_pi0 >= %g && _p_tot_pi0 <= %g " % (mom_cuts[x],  mom_cuts[x+1]) ))/ch.GetEntries("_p_tot_pi0 >= %g && _p_tot_pi0 <= %g" % (mom_cuts[x], mom_cuts[x+1]) )
 	momReco_eff[x] = float(chReco.GetEntries("_nNC1Pi0 == 1 && _p_tot_pi0 >= %g && _p_tot_pi0 <= %g " % (mom_cuts[x],  mom_cuts[x+1]) ))/ch.GetEntries("_p_tot_pi0 >= %g && _p_tot_pi0 <= %g" % (mom_cuts[x], mom_cuts[x+1]) )
 
 	total +=  ch.GetEntries("_nNC1Pi0 == 1 && _p_tot_pi0 >= %g && _p_tot_pi0 <= %g " % (mom_cuts[x],  mom_cuts[x+1]) )
 	totalTrue +=  chReco.GetEntries("_p_tot_pi0 >= %g && _p_tot_pi0 <= %g " % (mom_cuts[x],  mom_cuts[x+1]) )
 
-print "Total entries: ", total, ", ", totalTrue
+print("Total entries: ", total, ", ", totalTrue)
 
 
 momSig_eff_xvalues = array.array('d', mom_cuts[:length])

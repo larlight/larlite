@@ -33,13 +33,13 @@ psh.GenerateProtoShowers(_mgr,producer_name,protoShowerVec)
 
 
 for shower in protoShowerVec:
-  print "This shower has {N} params associated.".format(N=shower.params().size())
-  print "shower.hasCluster2D(): ", shower.hasCluster2D()
-  print "shower.hasCluster3D(): ", shower.hasCluster3D()
-  print "shower.hasVertex(): ", shower.hasVertex()
+  print("This shower has {N} params associated.".format(N=shower.params().size()))
+  print("shower.hasCluster2D(): ", shower.hasCluster2D())
+  print("shower.hasCluster3D(): ", shower.hasCluster3D())
+  print("shower.hasVertex(): ", shower.hasVertex())
   for param in shower.params():
     param.Report()
-    print param.start_point.w, ",", param.start_point.t
+    print(param.start_point.w, ",", param.start_point.t)
   for vertex in shower.vertexes():
-    print "vertex is ({x},{y},{z})".format(x=vertex.X(), y=vertex.Y(), z=vertex.Z())
+    print("vertex is ({x},{y},{z})".format(x=vertex.X(), y=vertex.Y(), z=vertex.Z()))
     # print "\n\n\n"

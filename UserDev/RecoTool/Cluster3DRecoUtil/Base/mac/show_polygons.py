@@ -25,20 +25,20 @@ parser.add_argument("-d","--display",help="Turn on the display to see each view 
 args = parser.parse_args()
 
 if len(sys.argv) == 1:
-    print "\n-------You forgot to include a source file!-------\n"
+    print("\n-------You forgot to include a source file!-------\n")
     parser.print_help()
 
 if args.verbose:
-    print "Verbose mode turned on."
+    print("Verbose mode turned on.")
     if args.source != None:
-        print "\tSource file is " + args.source
+        print("\tSource file is " + args.source)
     if args.data_output != None:
-        print "\tData output file is " + args.data_output
+        print("\tData output file is " + args.data_output)
     if args.ana_output != None:
-        print "\tAna output file is " + args.ana_output
+        print("\tAna output file is " + args.ana_output)
 
 if args.source == None:
-    print "Error: please specificy an input file with -s or --source."
+    print("Error: please specificy an input file with -s or --source.")
     quit()
 
 if args.num_events == None:
@@ -46,13 +46,13 @@ if args.num_events == None:
 
 if args.data_output == None:
     args.data_output = "default_event_output.root"
-    print "No event output file selected.  If necessary, output will go to:"
-    print "\t"+args.data_output
+    print("No event output file selected.  If necessary, output will go to:")
+    print("\t"+args.data_output)
 
 if args.ana_output == None:
     args.ana_output = "default_ana_output.root"
-    print "No ana output file selected.  If necessary, output will go to:"
-    print "\t"+args.ana_output
+    print("No ana output file selected.  If necessary, output will go to:")
+    print("\t"+args.ana_output)
 
 
 # ana_proc = larlight.ana_processor()
@@ -99,23 +99,23 @@ while mgr.next_event():
     # Get event_hit     ... std::vector<larlight::hit>
     hits_v    = mgr.get_data(fmwk.DATA.GausHit)
 
-    print mctruth_v
+    print(mctruth_v)
     if not hits_v:
-        print "No Hits! \n"
+        print("No Hits! \n")
         continue
 
     # Get the primary particl generator vtx position
     mct_vtx=None
     if mctruth_v and mctruth_v.size():
         if mctruth_v.size()>1:
-            print "Found more than 1 MCTruth. Only use the 1st one... \n \n"
+            print("Found more than 1 MCTruth. Only use the 1st one... \n \n")
         if mctruth_v.at(0).GetParticles().at(0).PdgCode() == 11:      ## electron    
 	    mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(0).Position()
-	    print "\n electron \n"
+	    print("\n electron \n")
 	elif mctruth_v.at(0).GetParticles().at(0).PdgCode() == 22:    
 	    trajsize= mctruth_v.at(0).GetParticles().at(0).Trajectory().size()
 	    mct_vtx = mctruth_v.at(0).GetParticles().at(0).Trajectory().at(trajsize-1).Position()
-	    print "\n gamma \n"
+	    print("\n gamma \n")
    #PdgCode
 
     if args.num_events == processed_events:
@@ -124,13 +124,13 @@ while mgr.next_event():
     if not cluster_v:
         continue
 
-    print "Event:",cluster_v.event_id()
+    print("Event:",cluster_v.event_id())
 
 
     #Loop over all planes
     
     for pl in range( fGeo.Nviews() ):
-        print "View: ",pl
+        print("View: ",pl)
         cluster_counter = 0
         #Get all hit coordinates and make TH2D of them
         hit_wires  = []
@@ -142,13 +142,13 @@ while mgr.next_event():
         time_max = 0
         polygons = []
         
-        print "Number of Clusters in Event: ",cluster_v.size()
-        for x in xrange(cluster_v.size()):
+        print("Number of Clusters in Event: ",cluster_v.size())
+        for x in range(cluster_v.size()):
             cluster_counter += 1
             
             if  ( cluster_v.at(x).View() == fGeo.PlaneToView(pl) ):
 
-                print "  Cluster ID:",cluster_v.at(x).ID()
+                print("  Cluster ID:",cluster_v.at(x).ID())
                 algo.LoadCluster(cluster_v.at(x),
                                  mgr.get_data(cluster_v.get_hit_type()))
                 
@@ -182,8 +182,8 @@ while mgr.next_event():
                             time_max = hit.PeakTime()
 
 
-                print "Wire Min: ", wire_min
-                print "Wire Max: ", wire_max
+                print("Wire Min: ", wire_min)
+                print("Wire Max: ", wire_max)
 
                 #print "(%g,%g) => (%g,%g), plane: %g" % (result.start_point.w,
                 #                                         result.start_point.t,
@@ -224,11 +224,11 @@ while mgr.next_event():
                     gPolygon = None
                     if result.container_polygon.size() > 0:
                         gPolygon = TGraph(result.container_polygon.size() + 1)
-                        for x in xrange(result.container_polygon.size()):
+                        for x in range(result.container_polygon.size()):
                             gPolygon.SetPoint(x,
                                               result.container_polygon.at(x).w,
                                               result.container_polygon.at(x).t)
-                            print result.container_polygon.at(x).w, result.container_polygon.at(x).t
+                            print(result.container_polygon.at(x).w, result.container_polygon.at(x).t)
                             
                         gPolygon.SetPoint(result.container_polygon.size(),
                                           result.container_polygon.at(0).w,
@@ -242,7 +242,7 @@ while mgr.next_event():
         hHits=ROOT.TH2D("AllHits","Hits and Polygons; Wire [cm]; Time [cm]",
                         100, 0.9*wire_min*fGSer.WireToCm(), 1.1*wire_max*fGSer.WireToCm(),
                         100, 0.9*time_min*fGSer.TimeToCm(), 1.1*time_max*fGSer.TimeToCm())
-        print "Length of Hit array: {0}".format(len(hit_wires))
+        print("Length of Hit array: {0}".format(len(hit_wires)))
         for x in range(len(hit_wires)):
             hHits.Fill( hit_wires[x]*fGSer.WireToCm(), hit_times[x]*fGSer.TimeToCm(), hit_charge[x])
         chit.cd()

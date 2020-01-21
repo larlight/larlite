@@ -108,9 +108,9 @@ if __name__ == '__main__':
     win.show()
     
     def fn(*args):
-        print("Raw signal:", args)
+        print(("Raw signal:", args))
     def fn2(*args):
-        print("Delayed signal:", args)
+        print(("Delayed signal:", args))
     
     
     spin.valueChanged.connect(fn)

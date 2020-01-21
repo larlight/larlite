@@ -67,7 +67,7 @@ def test_dAlgo():
             pAnswer2 = dAlgo.ClosestPt(l,pt)
             if not ( np.abs(answer-a1) < _epsilon ) : success = 0
             if not ( np.abs(answer-a2) < _epsilon ) : success = 0
-            for x in xrange(3):
+            for x in range(3):
                 if not ( np.abs(p1[x]-pAnswer1[x]) < _epsilon) : success = 0
                 if not ( np.abs(p1[x]-pAnswer2[x]) < _epsilon) : success = 0
             totSuccess += success
@@ -126,7 +126,7 @@ def test_dAlgo():
             point1 = dAlgo.ClosestPt(pTest,l)
             closestT_out += (time() - tim)
             point2 = dAlgo.ClosestPt(l,pTest)
-            for x in xrange(3):
+            for x in range(3):
                 if not ( (l.Start()[x]-point1[x]) < _epsilon ) : success = 0
                 if not ( (l.Start()[x]-point2[x]) < _epsilon ) : success = 0
 
@@ -148,7 +148,7 @@ def test_dAlgo():
             point1 = dAlgo.ClosestPt(pTest,l)
             closestT_in += (time() - tim)
             point2 = dAlgo.ClosestPt(l,pTest)
-            for x in xrange(3):
+            for x in range(3):
                 if not ( (pAns[x]-point1[x]) < _epsilon ) : success = 0
                 if not ( (pAns[x]-point2[x]) < _epsilon ) : success = 0
 
@@ -161,7 +161,7 @@ def test_dAlgo():
             if not ( np.abs(answer-dAlgo.SqDist(l,pTest)) < _epsilon): success = 0
             point1 = dAlgo.ClosestPt(pTest,l)
             point2 = dAlgo.ClosestPt(pTest,l)
-            for x in xrange(3):
+            for x in range(3):
                 if not ( (l.End()[x]-point1[x]) < _epsilon ) : success = 0
                 if not ( (l.End()[x]-point2[x]) < _epsilon ) : success = 0
                 
@@ -218,7 +218,7 @@ def test_dAlgo():
             tim = time() - tim
             closestT_out += tim
             point2 = dAlgo.ClosestPt(l,pTest)
-            for x in xrange(3):
+            for x in range(3):
                 if not ( (l.Start()[x]-point1[x]) < _epsilon ) : success = 0
                 if not ( (l.Start()[x]-point2[x]) < _epsilon ) : success = 0
 
@@ -242,7 +242,7 @@ def test_dAlgo():
             tim = time() - tim
             closestT_in += tim
             point2 = dAlgo.ClosestPt(l,pTest)
-            for x in xrange(3):
+            for x in range(3):
                 if not ( (pAns[x]-point1[x]) < _epsilon ) : success = 0
                 if not ( (pAns[x]-point2[x]) < _epsilon ) : success = 0
 
@@ -298,7 +298,7 @@ def test_dAlgo():
             a2 = dAlgo.SqDist(l1,l2,ptL1,ptL2)
             if not (np.abs(answer-a1) < _epsilon): success = 0
             if not (np.abs(answer-a2) < _epsilon) : success = 0
-            for x in xrange(3):
+            for x in range(3):
                 if not ( np.abs(ptL1[x]-p1[x]) < _epsilon ) : success = 0
                 if not ( np.abs(ptL2[x]-l2.Pt1()[x]) < _epsilon ) : success = 0
 
@@ -351,7 +351,7 @@ def test_dAlgo():
                 sqdistT_in += tim
                 if not (np.abs(answer-a1) < _epsilon): success = 0
                 if not (np.abs(answer-a2) < _epsilon): success = 0
-                for x in xrange(3):
+                for x in range(3):
                     if not (L1[x]-L2[x] < _epsilon) : success = 0
             if (aligned == 1):
                 timesOUT += 1
@@ -365,7 +365,7 @@ def test_dAlgo():
                 sqdistT_out += tim
                 if not (np.abs(answer-a1) < _epsilon): success = 0
                 if not (np.abs(answer-a2) < _epsilon): success = 0
-                for x in xrange(3):
+                for x in range(3):
                     if not (L1[x]-l1.Start()[x] < _epsilon) : success = 0
                     if not (L2[x]-l2.Start()[x] < _epsilon) : success = 0
 
@@ -428,7 +428,7 @@ def test_dAlgo():
             a2 = dAlgo.SqDist(l1,seg,L1,L2)
             if not (np.abs(answer-a1) < _epsilon): success1 = 0
             if not (np.abs(answer-a2) < _epsilon): success1 = 0
-            for x in xrange(3):
+            for x in range(3):
                 if not (L1[x]-l1.Start()[x] < _epsilon) : success1 = 0
                 if not (L2[x]-seg.Start()[x] < _epsilon) : success1 = 0
             if (success1 == 1) : totSuccess1 += 1
@@ -447,7 +447,7 @@ def test_dAlgo():
             a2 = dAlgo.SqDist(seg,l1)
             if not (np.abs(answer-a1) < _epsilon): success2 = 0
             if not (np.abs(answer-a2) < _epsilon): success2 = 0
-            for x in xrange(3):
+            for x in range(3):
                 if not (L1[x]-l1.Start()[x] < _epsilon) : success2 = 0
                 if not (L2[x]-pivot[x] < _epsilon) : success2 = 0
             if (success2 == 1) : totSuccess2 += 1
@@ -463,7 +463,7 @@ def test_dAlgo():
             if not (np.abs(answer-a1) < _epsilon): success3 = 0
             if not (np.abs(answer-a2) < _epsilon): success3 = 0
             ptLine = l1.Start()+d1*dist
-            for x in xrange(3):
+            for x in range(3):
                 if not (L1[x]-ptLine[x] < _epsilon) : success3 = 0
                 if not (L2[x]-seg.Start()[x] < _epsilon) : success3 = 0
             if (success3 == 1) : totSuccess3 += 1
@@ -480,7 +480,7 @@ def test_dAlgo():
             if not (np.abs(answer-a1) < _epsilon): success4 = 0
             if not (np.abs(answer-a2) < _epsilon): success4 = 0
             ptLine = l1.Start()+d1*dist
-            for x in xrange(3):
+            for x in range(3):
                 if not (L1[x]-ptLine[x] < _epsilon) : success4 = 0
                 if not (L2[x]-pivot[x] < _epsilon) : success4 = 0
             if (success4 == 1) : totSuccess4 += 1
@@ -559,7 +559,7 @@ def test_dAlgo():
             a2 = dAlgo.SqDist(seg1,seg,L1,L2)
             if not (np.abs(answer-a1) < _epsilon): success1 = 0
             if not (np.abs(answer-a2) < _epsilon): success1 = 0
-            for x in xrange(3):
+            for x in range(3):
                 if not (L1[x]-seg1.Start()[x] < _epsilon) : success1 = 0
                 if not (L2[x]-seg.Start()[x] < _epsilon) : success1 = 0
             if (success1 == 1) : totSuccess1 += 1
@@ -578,7 +578,7 @@ def test_dAlgo():
             a2 = dAlgo.SqDist(seg,seg1)
             if not (np.abs(answer-a1) < _epsilon): success2 = 0
             if not (np.abs(answer-a2) < _epsilon): success2 = 0
-            for x in xrange(3):
+            for x in range(3):
                 if not (L1[x]-seg1.Start()[x] < _epsilon) : success2 = 0
                 if not (L2[x]-pivot[x] < _epsilon) : success2 = 0
             if (success2 == 1) : totSuccess2 += 1
@@ -595,7 +595,7 @@ def test_dAlgo():
             if not (np.abs(answer-a1) < _epsilon): success3 = 0
             if not (np.abs(answer-a2) < _epsilon): success3 = 0
             ptLine = seg1.Start()+d*distin
-            for x in xrange(3):
+            for x in range(3):
                 if not (L1[x]-ptLine[x] < _epsilon) : success3 = 0
                 if not (L2[x]-seg.Start()[x] < _epsilon) : success3 = 0
             if (success3 == 1) : totSuccess3 += 1
@@ -612,7 +612,7 @@ def test_dAlgo():
             if not (np.abs(answer-a1) < _epsilon): success4 = 0
             if not (np.abs(answer-a2) < _epsilon): success4 = 0
             ptLine = seg1.Start()+d*distin
-            for x in xrange(3):
+            for x in range(3):
                 if not (L1[x]-ptLine[x] < _epsilon) : success4 = 0
                 if not (L2[x]-pivot[x] < _epsilon) : success4 = 0
             if (success4 == 1) : totSuccess4 += 1
@@ -657,7 +657,7 @@ def test_dAlgo():
         totSuccess4 = 0.
         sqdistT4 = 0
         closestT4 = 0
-        for y in xrange(tests):
+        for y in range(tests):
             success1 = 1
             success2 = 1
             success3 = 1
@@ -696,7 +696,7 @@ def test_dAlgo():
             pt2 = dAlgo.ClosestPt(p,b)
             if not (np.abs(answer-a1) < _epsilon): success1 = 0
             if not (np.abs(answer-a2) < _epsilon): success1 = 0
-            for x in xrange(3):
+            for x in range(3):
                 if not (pt1[x]-p[x] < _epsilon) : success1 = 0
                 if not (pt2[x]-p[x] < _epsilon) : success1 = 0
             if (success1 == 1) : totSuccess1 += 1
@@ -757,7 +757,7 @@ def test_dAlgo():
             #info("Expected: {0}. Got: {1}".format(answer,a2))
             if not (np.abs(answer-a1) < _epsilon): success2 = 0
             if not (np.abs(answer-a2) < _epsilon): success2 = 0
-            for x in xrange(3):
+            for x in range(3):
                 #info("\tExpected: {0}. Got: {1}".format(p[x],pt1[x]))
                 #info("\tExpected: {0}. Got: {1}".format(p[x],pt2[x]))
                 if not (pt1[x]-pMin[x] < _epsilon) : success2 = 0
@@ -780,7 +780,7 @@ def test_dAlgo():
             
     except Exception:
         error('geoalgo::DistanceAlgo unit test failed.')
-        print traceback.format_exception(*sys.exc_info())[2]
+        print(traceback.format_exception(*sys.exc_info())[2])
         return 1
     
     info('geoalgo::DistanceAlgo unit test complete.')

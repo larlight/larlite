@@ -29,7 +29,7 @@ class ConnectedSpinBox(QtGui.QSpinBox):
 
 
 # Import the class that manages the view windows
-from viewport3D import viewport3D
+from .viewport3D import viewport3D
 
 class view_manager3D(QtCore.QObject):
   """This class manages a collection of viewports"""
@@ -62,7 +62,7 @@ class view_manager3D(QtCore.QObject):
     self._view.update()
 
   def restoreDefaults(self):
-    print "restoreDefaults called but not implemented"
+    print("restoreDefaults called but not implemented")
 
 class gui3D(QtGui.QWidget):
 
@@ -176,7 +176,7 @@ class gui3D(QtGui.QWidget):
     # Jump to the next event
     self._nextButton = QtGui.QPushButton("Next")
     # self._nextButton.setStyleSheet("background-color: red")
-    self._nextButton.clicked.connect(self._event_manager.next)
+    self._nextButton.clicked.connect(self._event_manager.__next__)
     self._nextButton.setToolTip("Move to the next event.")
     # Go to the previous event
     self._prevButton = QtGui.QPushButton("Previous")
@@ -214,7 +214,7 @@ class gui3D(QtGui.QWidget):
     try:
       event = int(self._larliteEventEntry.text())
     except:
-      print "Error, must enter an integer"
+      print("Error, must enter an integer")
       self._larliteEventEntry.setText(str(self._event_manager.event()))
       return
     self._event_manager.goToEvent(event)
@@ -496,7 +496,7 @@ class gui3D(QtGui.QWidget):
 
   def keyPressEvent(self,e):
     if e.key() == QtCore.Qt.Key_N:
-      self._event_manager.next()
+      next(self._event_manager)
       return
     if e.key() == QtCore.Qt.Key_P:
       self._event_manager.prev()
@@ -519,7 +519,7 @@ class gui3D(QtGui.QWidget):
     super(gui3D, self).keyPressEvent(e)
 
   def screenCapture(self):
-    print "Screen Capture!"
+    print("Screen Capture!")
     dialog = QtGui.QFileDialog()
     r = self._event_manager.run()
     e = self._event_manager.event()
@@ -530,7 +530,7 @@ class gui3D(QtGui.QWidget):
     f = dialog.getSaveFileName(self,"Save File",name,
         "PNG (*.png);;JPG (*.jpg);;All Files (*)")
 
-    print f
+    print(f)
     # print filt
     # Print
     pixmapImage = QtGui.QPixmap.grabWidget(self)

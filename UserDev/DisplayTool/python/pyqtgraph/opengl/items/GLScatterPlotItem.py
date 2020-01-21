@@ -40,7 +40,7 @@ class GLScatterPlotItem(GLGraphicsItem):
         ====================  ==================================================
         """
         args = ['pos', 'color', 'size', 'pxMode']
-        for k in kwds.keys():
+        for k in list(kwds.keys()):
             if k not in args:
                 raise Exception('Invalid keyword argument: %s (allowed arguments are %s)' % (k, str(args)))
             

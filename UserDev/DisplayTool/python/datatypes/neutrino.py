@@ -1,9 +1,9 @@
-from database import recoBase
+from .database import recoBase
 from ROOT import evd
 from pyqtgraph.Qt import QtGui, QtCore
-from connectedObjects import boxCollection
+from .connectedObjects import boxCollection
 import pyqtgraph as pg
-from track import polyLine
+from .track import polyLine
 
 class neutrino(recoBase):
 
@@ -30,7 +30,7 @@ class neutrino(recoBase):
             self._drawnObjects.append([])
             nu_v = self._process.getDataByPlane(view.plane())
 
-            print 'looking at neutrinos!'
+            print('looking at neutrinos!')
 
             for nu in nu_v:
 
@@ -100,8 +100,8 @@ class neutrino(recoBase):
                 
                 # draw clusters for shower-like pfparticls
                 clusters = nu._clus_v
-                print 'there are %i clusters to be drawn'%(clusters.size())
-                for i in xrange(len(clusters)):
+                print('there are %i clusters to be drawn'%(clusters.size()))
+                for i in range(len(clusters)):
                     cluster = clusters[i]
                     # Now make the cluster
                     cluster_box_coll = boxCollection()

@@ -19,4 +19,4 @@ else:
         cmd = 'export %s=%s' % (e,v.replace(replace,''))
         while cmd.find('::') >= 0:
             cmd = cmd.replace('::',':')
-print cmd
+print(cmd)

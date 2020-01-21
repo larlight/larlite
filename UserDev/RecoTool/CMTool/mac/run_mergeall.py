@@ -6,7 +6,7 @@ import os
 mgr = fmwk.ana_processor()
 
 #args should be input file name
-for x in xrange(len(sys.argv)-1):
+for x in range(len(sys.argv)-1):
     mgr.add_input_file(sys.argv[x+1])
 
 #last arg should be output file name

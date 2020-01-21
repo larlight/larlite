@@ -1,4 +1,4 @@
-from database import recoBase
+from .database import recoBase
 from ROOT import evd
 from pyqtgraph.Qt import QtGui
 import pyqtgraph as pg
@@ -24,7 +24,7 @@ class hit(recoBase):
             # First get the hit information:
             hits = self._process.getDataByPlane(thisPlane)
 
-            for i in xrange(len(hits)):
+            for i in range(len(hits)):
                 hit = hits[i]
                 # Draws a rectangle at (x,y,xlength, ylength)
                 r = QtGui.QGraphicsRectItem(

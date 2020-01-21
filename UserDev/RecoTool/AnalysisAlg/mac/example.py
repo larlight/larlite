@@ -3,11 +3,11 @@ from ROOT import *
 
 try:
 
-    print "PyROOT recognized your class %s" % str(sample)
+    print("PyROOT recognized your class %s" % str(sample))
 
 except NameError:
 
-    print "Failed importing AnalysisAlg..."
+    print("Failed importing AnalysisAlg...")
 
 sys.exit(0)
 

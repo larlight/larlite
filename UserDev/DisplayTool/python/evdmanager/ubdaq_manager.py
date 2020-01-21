@@ -1,5 +1,5 @@
 from pyqtgraph.Qt import QtGui, QtCore
-from event import manager, event
+from .event import manager, event
 from datatypes import wire
 
 from ROOT import evd
@@ -9,7 +9,7 @@ from ROOT import evd
 try:
     a = evd.DrawUbDaq()
     has_daq_types = True
-except Exception, e:
+except Exception as e:
     has_daq_types = False
 
 
@@ -49,8 +49,8 @@ class ubdaq_manager(manager, wire, QtCore.QObject):
 
 
         if not has_daq_types:
-            print bcolors.WARNING + "NOTIFICATION: uboonedaq types are not configured to run.  \
-Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolors.ENDC
+            print(bcolors.WARNING + "NOTIFICATION: uboonedaq types are not configured to run.  \
+Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolors.ENDC)
 
     def initProcess(self):
         if self._process is None:
@@ -73,13 +73,13 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
     def selectFile(self):
         filePath = str(QtGui.QFileDialog.getOpenFileName())
         self.parseFileName(filePath)
-        print "Selected file is ", filePath
+        print("Selected file is ", filePath)
 
     def setNoiseFilter(self, runFilterBool):
         self._process.SetCorrectData(runFilterBool)
 
     # override the functions from manager as needed here
-    def next(self):
+    def __next__(self):
         # Only support for sequential access so just verify we're not on last event
         # And then go forward
 
@@ -87,7 +87,7 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
         if self._event < self._process.n_events() - 1:
             self._process.nextEvent()
         else:
-            print "On the last event, can't go to next."
+            print("On the last event, can't go to next.")
         self.setRun(self._process.run())
         self.setSubRun(self._process.subrun())
         self.setEventNo(self._process.event_no())
@@ -97,7 +97,7 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
         if self._event != 0:
             self.goToEvent(self._event - 1)
         else:
-            print "On the first event, can't go to previous."
+            print("On the first event, can't go to previous.")
 
     def goToEvent(self, event):
         # No support for random access so bail:
@@ -118,18 +118,18 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
         else:
             file = str(file).rstrip('\n')
             self._file = file
-            print file
+            print(file)
             if file.endswith(".ubdaq"):
                 if has_daq_types:
                     self.initProcess()
                 else:
-                    print bcolors.FAIL + "ERROR: Can not open a daq file because daq types are not loaded" + bcolors.ENDC
+                    print(bcolors.FAIL + "ERROR: Can not open a daq file because daq types are not loaded" + bcolors.ENDC)
                     return
             else:
                 return
             self._process.setInput(file)
             self._hasFile = True
-            self.next()
+            next(self)
             if self._view_manager != None:
                 self._view_manager.setRangeToMax()
 
@@ -173,6 +173,6 @@ Unless you are attempting to draw *.ubdaq, disregard this notification." + bcolo
             self._process.SetCorrectData(doit)
 
     def reprocessEvent(self):
-        print "Calling event re-process"
+        print("Calling event re-process")
         self._process.reprocessEvent()
         self.eventChanged.emit()

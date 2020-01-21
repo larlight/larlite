@@ -69,16 +69,16 @@ my_proc.add_process(my_unit)
 # producer
 my_unit.SetConfigFile(cfg_file)
 
-print
-print  "Finished configuring ana_processor. Start event loop!"
-print
+print()
+print("Finished configuring ana_processor. Start event loop!")
+print()
 ctr=0
 max_ctr=20
 geo=larutil.Geometry.GetME()
 while ctr<max_ctr:
 
-    print
-    print 'Entry',ctr,'processing...'
+    print()
+    print('Entry',ctr,'processing...')
     my_proc.process_event(ctr)
 
     match_v = my_unit.MatchResult()
@@ -90,13 +90,13 @@ while ctr<max_ctr:
     flash_v = mgr.FlashArray()
 
     ctr+=1
-    print match_v.size(),'match found for',qcluster_v.size(),'tpc objects and',flash_v.size(),'pmt objects'
+    print(match_v.size(),'match found for',qcluster_v.size(),'tpc objects and',flash_v.size(),'pmt objects')
 
     # full result
     fullres_tpc_flash_v = mgr.FullResultTPCFlash()
     fullres_flash_tpc_v = mgr.FullResultFlashTPC()
 
-    print qcluster_v.size(), flash_v.size(), fullres_tpc_flash_v.size()
+    print(qcluster_v.size(), flash_v.size(), fullres_tpc_flash_v.size())
 
     if qcluster_v.empty() or flash_v.empty(): continue
 
@@ -109,19 +109,19 @@ while ctr<max_ctr:
             qc = qcluster_v[0]
             xmin = 1e4
             xmax = 0
-            for pt_idx in xrange(qc.size()):
+            for pt_idx in range(qc.size()):
                 pt = qc[pt_idx]
                 if pt.x > xmax: xmax = pt.x
                 if pt.x < xmin: xmin = pt.x
             if flash.time < -1.5 or -0.5 < flash.time:
                 continue
 
-            print 'Right match parameters:'
-            print 'TPC: 0 ... PMT:',res.flash_id
-            print 'TPC MinX:',xmin
-            print 'PMT MinX:',res.tpc_point.x
-            print 'Match Score:',res.score
-            print 'Flash Time:',flash.time
+            print('Right match parameters:')
+            print('TPC: 0 ... PMT:',res.flash_id)
+            print('TPC MinX:',xmin)
+            print('PMT MinX:',res.tpc_point.x)
+            print('Match Score:',res.score)
+            print('Flash Time:',flash.time)
         
             flash = np.array(flash.pe_v)
             hypothesis = np.array(res.hypothesis)
@@ -149,31 +149,31 @@ while ctr<max_ctr:
             plt.show()
             break
             
-    for match_idx in xrange(match_v.size()):
+    for match_idx in range(match_v.size()):
 
         match = match_v[match_idx]
         if 'onlymucs' in sys.argv and not match.tpc_id == 0:
             continue
             
-        print
-        print 'Match #',match_idx,
-        print 'TPC:',match.tpc_id,'PMT:',match.flash_id,'Score:',match.score,'TPC point:',match.tpc_point.x,match.tpc_point.y,match.tpc_point.z
+        print()
+        print('Match #',match_idx, end=' ')
+        print('TPC:',match.tpc_id,'PMT:',match.flash_id,'Score:',match.score,'TPC point:',match.tpc_point.x,match.tpc_point.y,match.tpc_point.z)
 
         xmin = 1e4
         xmax = 0
         qc = qcluster_v[match.tpc_id]
-        for pt_idx in xrange(qc.size()):
+        for pt_idx in range(qc.size()):
             pt = qc[pt_idx]
             if pt.x > xmax: xmax = pt.x
             if pt.x < xmin: xmin = pt.x
 
         #print 'xmin:',xmin,'xmax:',xmax
         flash = flash_v[match.flash_id]
-        print 'TPC MinX:',xmin,'TPC MaxX:',xmax
-        print 'PMT MinX:',match.tpc_point.x,'qll:',match.score,'t0',flash.time
+        print('TPC MinX:',xmin,'TPC MaxX:',xmax)
+        print('PMT MinX:',match.tpc_point.x,'qll:',match.score,'t0',flash.time)
         flash = np.array(flash.pe_v)
 
-        print 'Max PE @',flash.argmax(),'fraction',flash[flash.argmax()]/flash.sum()
+        print('Max PE @',flash.argmax(),'fraction',flash[flash.argmax()]/flash.sum())
         
         hypothesis = np.array(match.hypothesis)
 
@@ -200,13 +200,13 @@ while ctr<max_ctr:
         plt.show()
         
         #sys.stdin.readline()
-    print 'Type event entry or hit enter'
+    print('Type event entry or hit enter')
     entry=sys.stdin.readline().rstrip('\n')
     if entry: ctr=int(entry)
     
 # done!
-print
-print "Finished running ana_processor event loop!"
-print
+print()
+print("Finished running ana_processor event loop!")
+print()
 
 sys.exit(0)

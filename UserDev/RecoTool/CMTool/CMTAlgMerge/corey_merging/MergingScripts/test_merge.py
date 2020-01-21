@@ -29,17 +29,17 @@ mgr.add_process(proc)
 
 while mgr.process_event():
 
-    print 
+    print() 
     bk=proc.GetManager().GetBookKeeper()
 
     res = bk.GetResult()
 
-    for x in xrange(res.size()):
+    for x in range(res.size()):
 
-        for y in xrange(res.at(x).size()):
+        for y in range(res.at(x).size()):
 
-            print res.at(x).at(y),
-        print
+            print(res.at(x).at(y), end=' ')
+        print()
 
     sys.stdin.readline()
 

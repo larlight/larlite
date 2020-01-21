@@ -5,11 +5,11 @@ from ROOT import sample
 
 try:
 
-    print "PyROOT recognized your class %s" % str(sample)
+    print("PyROOT recognized your class %s" % str(sample))
 
 except NameError:
 
-    print "Failed importing RecoViewer..."
+    print("Failed importing RecoViewer...")
 
 sys.exit(0)
 

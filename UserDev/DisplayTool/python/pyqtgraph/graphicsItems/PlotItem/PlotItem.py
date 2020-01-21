@@ -33,7 +33,7 @@ from .. GraphicsWidget import GraphicsWidget
 from .. ButtonItem import ButtonItem
 from .. InfiniteLine import InfiniteLine
 from ...WidgetGroup import WidgetGroup
-from ...python2_3 import basestring
+from ...python2_3 import str
 
 if QT_LIB == 'PyQt4':
     from .plotConfigTemplate_pyqt import *
@@ -279,7 +279,7 @@ class PlotItem(GraphicsWidget):
                 labels[label] = kargs[label]
                 del kargs[label]
         for k in labels:
-            if isinstance(labels[k], basestring):
+            if isinstance(labels[k], str):
                 labels[k] = (labels[k],)
             self.setLabel(k, *labels[k])
                 
@@ -1109,11 +1109,11 @@ class PlotItem(GraphicsWidget):
         Keyword arguments can be 'title', 'left', 'bottom', 'right', or 'top'.
         Values may be strings or a tuple of arguments to pass to setLabel.
         """
-        for k,v in kwds.items():
+        for k,v in list(kwds.items()):
             if k == 'title':
                 self.setTitle(v)
             else:
-                if isinstance(v, basestring):
+                if isinstance(v, str):
                     v = (v,)
                 self.setLabel(k, *v)
         

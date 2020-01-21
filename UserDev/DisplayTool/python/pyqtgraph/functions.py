@@ -5,8 +5,8 @@ Copyright 2010  Luke Campagnola
 Distributed under MIT/X11 license. See license.txt for more infomation.
 """
 
-from __future__ import division
-from .python2_3 import asUnicode, basestring
+
+from .python2_3 import asUnicode, str
 from .Qt import QtGui, QtCore, USE_PYSIDE
 Colors = {
     'b': QtGui.QColor(0,0,255,255),
@@ -53,7 +53,7 @@ def siScale(x, minVal=1e-25, allowUnicode=True):
         if np.isnan(x) or np.isinf(x):
             return(1, '')
     except:
-        print(x, type(x))
+        print((x, type(x)))
         raise
     if abs(x) < minVal:
         m = 0
@@ -161,7 +161,7 @@ def mkColor(*args):
     """
     err = 'Not sure how to make a color from "%s"' % str(args)
     if len(args) == 1:
-        if isinstance(args[0], basestring):
+        if isinstance(args[0], str):
             c = args[0]
             if c[0] == '#':
                 c = c[1:]
@@ -1595,7 +1595,7 @@ def isocurve(data, level, connected=False, extendToEdge=False, path=False):
 
     ## extract point locations 
     lines = []
-    for chain in points.values():
+    for chain in list(points.values()):
         if len(chain) == 2:
             chain = chain[1][1:][::-1] + chain[0]  # join together ends of chain
         else:
@@ -2235,7 +2235,7 @@ def toposort(deps, nodes=None, seen=None, stack=None, depth=0):
     if nodes is None:
         ## run through deps to find nodes that are not depended upon
         rem = set()
-        for dep in deps.values():
+        for dep in list(deps.values()):
             rem |= set(dep)
         nodes = set(deps.keys()) - rem
     if seen is None:

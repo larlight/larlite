@@ -24,27 +24,27 @@ if len(sys.argv) == 1:
     parser.print_help()
 
 if args.verbose:
-    print "Verbose mode turned on."
+    print("Verbose mode turned on.")
     if args.source != None:
-        print "\tSource file is " + args.source
+        print("\tSource file is " + args.source)
     if args.data_output != None:
-        print "\tData output file is " + args.data_output
+        print("\tData output file is " + args.data_output)
     if args.ana_output != None:
-        print "\tAna output file is " + args.ana_output
+        print("\tAna output file is " + args.ana_output)
 
 if args.source == None:
-    print "Error: please specificy an input file with -s or --source."
+    print("Error: please specificy an input file with -s or --source.")
     quit()
 
 if args.data_output == None:
     args.data_output = "default_event_output.root"
-    print "No event output file selected.  If necessary, output will go to:"
-    print "\t"+args.data_output
+    print("No event output file selected.  If necessary, output will go to:")
+    print("\t"+args.data_output)
 
 if args.ana_output == None:
     args.ana_output = "default_ana_output.root"
-    print "No ana output file selected.  If necessary, output will go to:"
-    print "\t"+args.ana_output
+    print("No ana output file selected.  If necessary, output will go to:")
+    print("\t"+args.ana_output)
 
 if args.num_events == None:
     args.num_events = 0
@@ -55,7 +55,7 @@ if args.first == None:
 if args.cluster == None:
     args.cluster = "fuzzycluster"
 
-print args.cluster, " is a ", type(args.cluster)
+print(args.cluster, " is a ", type(args.cluster))
 
 
 ana_proc = larlite.ana_processor()
@@ -109,7 +109,7 @@ else:
     while true:
 
         try:
-            args.first = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
+            args.first = eval(input('Hit Enter to continue to next evt, or type in an event number to jump to that event:'))
         except SyntaxError:
             args.first = int(args.first) + 1
 

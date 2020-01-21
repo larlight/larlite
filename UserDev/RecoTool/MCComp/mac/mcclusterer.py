@@ -13,7 +13,7 @@ from larlite import larlite as fmwk
 my_proc = fmwk.ana_processor()
 
 # Set input root file
-for x in xrange(len(sys.argv)-1):
+for x in range(len(sys.argv)-1):
     fname = sys.argv[x+1]
     my_proc.add_input_file(fname)
     
@@ -39,9 +39,9 @@ my_proc.add_process(clusterer)
 my_proc.set_data_to_write(fmwk.data.kCluster,'mccluster')
 my_proc.set_data_to_write(fmwk.data.kAssociation,'mccluster')
 
-print
-print  "Finished configuring ana_processor. Start event loop!"
-print
+print()
+print("Finished configuring ana_processor. Start event loop!")
+print()
 
 my_proc.run()
 
