@@ -69,10 +69,10 @@ namespace larutil{
       double xValNew = TransformX(xVal);
       double yValNew = TransformY(yVal);
       double zValNew = TransformZ(zVal);
-      std::cout << "[" <<  __FILE__ <<  ":L" << __LINE__ << "] getting offset for "
-                << "input=(" << xVal << "," << yVal << "," << zVal << ") "
-                << "transformed=(" << xValNew << "," << yValNew << "," << zValNew << ") "
-                << std::endl;
+      // std::cout << "[" <<  __FILE__ <<  ":L" << __LINE__ << "] getting offset for "
+      //           << "input=(" << xVal << "," << yVal << "," << zVal << ") "
+      //           << "transformed=(" << xValNew << "," << yValNew << "," << zValNew << ") "
+      //           << std::endl;
       
       for (int i=0; i<3; i++ )  {
         try {
@@ -92,11 +92,11 @@ namespace larutil{
           throw std::runtime_error( ss.str() );
         }
 
-        std::cout << "bounds "
-                  << " x=[" << _hD[i]->GetXaxis()->GetXmin() << "," << _hD[i]->GetXaxis()->GetXmax() << "] "
-                  << " y=[" << _hD[i]->GetYaxis()->GetXmin() << "," << _hD[i]->GetYaxis()->GetXmax() << "] "
-                  << " z=[" << _hD[i]->GetZaxis()->GetXmin() << "," << _hD[i]->GetZaxis()->GetXmax() << "] "
-                  << std::endl;
+        // std::cout << "bounds "
+        //           << " x=[" << _hD[i]->GetXaxis()->GetXmin() << "," << _hD[i]->GetXaxis()->GetXmax() << "] "
+        //           << " y=[" << _hD[i]->GetYaxis()->GetXmin() << "," << _hD[i]->GetYaxis()->GetXmax() << "] "
+        //           << " z=[" << _hD[i]->GetZaxis()->GetXmin() << "," << _hD[i]->GetZaxis()->GetXmax() << "] "
+        //           << std::endl;
 
       }
       
