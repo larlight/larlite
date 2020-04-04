@@ -54,6 +54,14 @@ namespace larutil{
     _hE[0] = (TH3F*)_inputfile->Get("hEx");
     _hE[1] = (TH3F*)_inputfile->Get("hEy");
     _hE[2] = (TH3F*)_inputfile->Get("hEz");
+
+    _Xmin = _hD[0]->GetXaxis()->GetBinCenter(1);
+    _Xmax = _hD[0]->GetXaxis()->GetBinCenter( _hD[0]->GetXaxis()->GetNbins() );
+    _Ymin = _hD[0]->GetYaxis()->GetBinCenter(1);
+    _Ymax = _hD[0]->GetYaxis()->GetBinCenter( _hD[0]->GetYaxis()->GetNbins() );
+    _Zmin = _hD[0]->GetZaxis()->GetBinCenter(1);
+    _Zmax = _hD[0]->GetZaxis()->GetBinCenter( _hD[0]->GetZaxis()->GetNbins() );
+    
     return true;
   }
 
@@ -162,12 +170,18 @@ namespace larutil{
   bool SpaceChargeMicroBooNEMCC9::IsInsideBoundaries(double xVal, double yVal, double zVal) const
   {
     bool isInside = true;
+    double xValNew = TransformX(xVal);
+    double yValNew = TransformY(yVal);
+    double zValNew = TransformZ(zVal);      
 
-    if((xVal < 0.0) || (xVal > 260.0) || (yVal < -120.0) || (yVal > 120.0) || (zVal < 0.0) || (zVal > 1050.0))
+    //if((xVal < 0.0) || (xVal > 260.0) || (yVal < -120.0) || (yVal > 120.0) || (zVal < 0.0) || (zVal > 1050.0))
+    if( (   xValNew <= _Xmin || xValNew >= _Xmax )
+        || (yValNew <= _Ymin || yValNew >= _Ymax )
+        || (zValNew <= _Zmin || zValNew >= _Zmax ) )
       {
 	isInside = false;
       }
-
+    
     return isInside;
   }
   

@@ -45,6 +45,13 @@ namespace larutil{
     double TransformY(double yVal) const;
     double TransformZ(double zVal) const;
     bool IsInsideBoundaries(double xVal, double yVal, double zVal) const;
+
+    double _Xmin;
+    double _Xmax;
+    double _Ymin;
+    double _Ymax;
+    double _Zmin;
+    double _Zmax;
     
 
   }; // class SpaceChargeMicroBooNEMCC9
