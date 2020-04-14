@@ -61,6 +61,10 @@ namespace larlite {
     /** Set default parameters */
     void setDefaults( larlite::CRTVeto::FileType_t ft=kBNB );
 
+    /** Set input producers */
+    void setOpFlashProducer( std::string name ) { fOpFlashProducer=name; };
+    void setCRTHitProducer( std::string name )  { fCRTHitProducer=name; };
+
   protected:
     TTree* _tree;
 

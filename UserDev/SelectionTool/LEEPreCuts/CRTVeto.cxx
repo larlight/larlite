@@ -97,7 +97,14 @@ namespace larlite {
       if( opflash.Time()>= fWinStart && opflash.Time()<= fWinEnd ) opflash_time_v.push_back(opflash.Time());
     }
     //if we don't have any flashes do not tag
-    if(opflash_time_v.size()<1) return true;
+    if(opflash_time_v.size()<1) {
+      std::cout << "[CRTVeto] No flashes in the beam window. "
+		<< "window=[" << fWinStart << "," << fWinEnd << "] "
+		<< "In input container=" << opflash_v.size()
+		<< std::endl;
+      _passed = 1;
+      return true;
+    }
       
     bool passed = true;
     
@@ -111,6 +118,10 @@ namespace larlite {
       for (size_t j = 0; j< opflash_time_v.size(); j++){
 	_DT.push_back(crthit.ts2_ns/1000. - opflash_time_v[j]);
 	if ( fabs(crthit.ts2_ns/1000. - opflash_time_v[j]) <= fDeltaT ){
+	  std::cout << "[CRTVeto] Found coincident CRT Hit: "
+		    << " hit_time=" << crthit.ts2_ns/1000. << " usec; "
+		    << " dT=" << fabs(crthit.ts2_ns/1000. - opflash_time_v[j]) 
+		    << std::endl;
 	  passed = false;
 	  break;
 	}
