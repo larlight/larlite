@@ -12,6 +12,7 @@
 //#pragma link C++ class +;
 #pragma link C++ class leeprecuts::LEEPreCutAlgo+;
 #pragma link C++ class larlite::LEEPreCut+;
+#pragma link C++ class larlite::CRTVeto+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
