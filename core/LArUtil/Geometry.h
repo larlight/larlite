@@ -160,6 +160,10 @@ public:
     /// boundaries of cryostat, 3 pairs of +/- coord
     void     CryostatBoundaries(Double_t* boundaries) const;
 
+    const std::vector<Double_t>& GetOrthVectorsY()  const { return fOrthVectorsY; };
+    const std::vector<Double_t>& GetOrthVectorsZ()  const { return fOrthVectorsZ; };
+    const std::vector<Double_t>& GetFirstWireProj() const { return fFirstWireProj; };
+
 private:
 
     Double_t fDetLength;
