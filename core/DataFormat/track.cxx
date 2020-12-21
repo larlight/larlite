@@ -74,10 +74,10 @@ namespace larlite {
     if(view == geo::kUnknown){
       std::cout<<"<<Track::DQdxAtPoint>> asking for unknown view to get number of dQdX entries"
 	       << " return the size for the 0th view vector";
-      return fdQdx.at(0).at(p);
+      return fdQdx.at(p).at(0);
     }
 
-    return fdQdx.at(view).at(p);
+    return fdQdx.at(p).at(view);
   }
 
   //----------------------------------------------------------------------

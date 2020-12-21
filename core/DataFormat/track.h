@@ -66,13 +66,13 @@ namespace larlite {
     size_t          NumberTrajectoryPoints()                    const;
     size_t          NumberCovariance()                          const;
     size_t          NumberFitMomentum()                         const;
-    #ifndef __CINT__
-    #ifndef __CLING__
+    //#ifndef __CINT__
+    //#ifndef __CLING__
     size_t          NumberdQdx(geo::View_t view=geo::kUnknown)  const;
     const double&   DQdxAtPoint(unsigned int p,
 				geo::View_t view=geo::kUnknown) const;
-    #endif
-    #endif
+    //#endif
+    //#endif
     double          Length(size_t p=0)                          const;
     void            TrajectoryAtPoint(unsigned int  p,
 				      TVector3     &pos,
