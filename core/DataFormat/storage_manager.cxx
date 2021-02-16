@@ -1368,7 +1368,7 @@ namespace larlite {
 	  
 	  if(!_out_ch[i].size()) continue;
 
-	  if(_use_write_bool && !_write_data_array[i].size()) continue;
+	  //if(_use_write_bool && !_write_data_array[i].size()) continue;
 
 	  for(auto& name_ptr : _out_ch[i]) {
 
@@ -1426,7 +1426,7 @@ namespace larlite {
 	  
 	  if(!_out_subrundata_ch[i].size()) continue;
 
-	  if(_use_write_bool && !_write_subrundata_array[i].size()) continue;
+	  //if(_use_write_bool && !_write_subrundata_array[i].size()) continue;
 
 	  for(auto& name_ptr : _out_subrundata_ch[i]) {
 
@@ -1852,7 +1852,7 @@ namespace larlite {
 
     for(int i=0; i<data::kDATA_TYPE_MAX; ++i) {
 
-      if(_use_write_bool && !(_write_data_array[i].size())) continue;
+      //if(_use_write_bool && !(_write_data_array[i].size())) continue;
 
       for(auto& name_ptr : _out_ch[i]) {
       
@@ -1875,7 +1875,7 @@ namespace larlite {
 
       for(int i=0; i<data::kSUBRUNDATA_TYPE_MAX; ++i) {
 	
-	if(_use_write_bool && !(_write_subrundata_array[i].size())) continue;
+	//if(_use_write_bool && !(_write_subrundata_array[i].size())) continue;
 	
 	for(auto& name_ptr : _out_subrundata_ch[i]) {
 	  
@@ -1897,7 +1897,7 @@ namespace larlite {
 	
 	for(int i=0; i<data::kRUNDATA_TYPE_MAX; ++i) {
 	  
-	  if(_use_write_bool && !(_write_rundata_array[i].size())) continue;
+	  //if(_use_write_bool && !(_write_rundata_array[i].size())) continue;
 	  
 	  for(auto& name_ptr : _out_rundata_ch[i]) {
 	    
