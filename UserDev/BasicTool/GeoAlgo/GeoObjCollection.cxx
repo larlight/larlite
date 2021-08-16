@@ -1,6 +1,7 @@
 #ifndef BASICTOOL_GEOOBJCOLLECTION_CXX
 #define BASICTOOL_GEOOBJCOLLECTION_CXX
 
+#include "TString.h"
 #include "GeoObjCollection.h"
 
 namespace larlite {

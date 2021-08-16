@@ -1,6 +1,7 @@
 #ifndef MANAGER_CXX
 #define MANAGER_CXX
 
+#include "TString.h"
 #include "Manager.h"
 
 namespace geotree{
